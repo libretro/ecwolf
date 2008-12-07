@@ -1,0 +1,46 @@
+game Wolf3D, Spear
+{
+	actor Guard 27
+	{
+		speed 512
+		+COUNTKILL
+		states
+		{
+			Spawn:
+				GRD0 A -1
+				goto Spawn
+			Path:
+				GRD0 B 20 T_Path
+				GRD0 B 5
+				GRD0 C 15 T_Path
+				GRD0 D 20 T_Path
+				GRD0 D 5
+				GRD0 E 15 T_Path
+				goto Path
+			See:
+				GRD0 B 10 T_Chase
+				GRD0 B 3
+				GRD0 C 8 T_Chase
+				GRD0 D 10 T_Chase
+				GRD0 D 3
+				GRD0 E 8 T_Chase
+				goto See
+			Missile:
+				GRD0 L 20
+				GRD0 M 20 T_Shoot
+				GRD0 N 20
+				goto Missile
+			Pain:
+				GRD0 F 10
+				goto See
+			Pain2:
+				GRD0 J 10
+				goto See
+			Death:
+				GRD0 G 15 A_DeathScream
+				GRD0 HI 15
+				GRD0 K -1
+				stop
+		}
+	}
+}
