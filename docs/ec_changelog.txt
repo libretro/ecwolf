@@ -1,5 +1,6 @@
 December 6th, 2008
 -----------------------------
+- Added: Adlib volume slider.
 - Added: Volume sliders.  Their values aren't saved yet but at least they are 
   there.
 - Rewrote part of the menu code to use C++ classes.

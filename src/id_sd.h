@@ -120,6 +120,7 @@ extern  int             DigiMap[];
 extern  int             DigiChannel[];
 #define MAX_VOLUME		20
 #define DIVIDE_VOLUME(v)((((3.123170/log((v)+2.718281828))-1.0)*4)+1.0)
+extern	int				AdlibVolume;
 extern	int				SoundVolume;
 extern	int				MusicVolume;
 

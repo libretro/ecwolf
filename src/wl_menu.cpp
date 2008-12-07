@@ -563,6 +563,8 @@ void CreateMenus()
 
 	soundBase.setHeadText("Sound Configuration");
 	soundBase.addItem(new FunctionMenuItem("Configure Sound Devices", CP_Sound));
+	soundBase.addItem(new LabelMenuItem("Adlib Volume"));
+	soundBase.addItem(new SliderMenuItem(AdlibVolume, 150, MAX_VOLUME, "Soft", "Loud"));
 	soundBase.addItem(new LabelMenuItem("Sound Volume"));
 	soundBase.addItem(new SliderMenuItem(SoundVolume, 150, MAX_VOLUME, "Soft", "Loud"));
 	soundBase.addItem(new LabelMenuItem("Music Volume"));

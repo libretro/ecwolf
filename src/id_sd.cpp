@@ -77,6 +77,7 @@ globalsoundpos channelSoundPos[MIX_CHANNELS];
 static  byte          **SoundTable;
         int             DigiMap[LASTSOUND];
         int             DigiChannel[STARTMUSIC - STARTDIGISOUNDS];
+		int				AdlibVolume=MAX_VOLUME;
 		int				SoundVolume=MAX_VOLUME;
 		int				MusicVolume=MAX_VOLUME;
 
@@ -728,7 +729,7 @@ SDL_AlSetFXInst(Instrument *inst)
     alOut(m + alWave,inst->mWave);
     alOut(c + alChar,inst->cChar);
     alOut(c + alScale,inst->cScale);
-    alOut(c + alAttack,inst->cAttack/DIVIDE_VOLUME(SoundVolume));
+    alOut(c + alAttack,inst->cAttack/DIVIDE_VOLUME(AdlibVolume));
     alOut(c + alSus,inst->cSus);
     alOut(c + alWave,inst->cWave);
 
