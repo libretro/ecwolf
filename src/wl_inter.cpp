@@ -1028,9 +1028,9 @@ DrawHighScores (void)
     word i, w, h;
     HighScore *s;
 
+	CA_CacheGrChunk(HIGHSCORESPIC);
+	CA_CacheGrChunk(STARTFONT);
 #ifndef SPEAR
-    CA_CacheGrChunk (HIGHSCORESPIC);
-    CA_CacheGrChunk (STARTFONT);
 #ifndef APOGEE_1_0
     CA_CacheGrChunk (C_LEVELPIC);
     CA_CacheGrChunk (C_SCOREPIC);
@@ -1038,10 +1038,15 @@ DrawHighScores (void)
 #else
     CA_CacheGrChunk (C_CODEPIC);
 #endif
+#else
+	CA_CacheGrChunk(C_BACKDROPPIC);
+	CA_CacheGrChunk(C_WONSPEARPIC);
+#endif
 
     ClearMScreen ();
     DrawStripes (10);
 
+#ifndef SPEAR
     VWB_DrawPic (48, 0, HIGHSCORESPIC);
     UNCACHEGRCHUNK (HIGHSCORESPIC);
 
@@ -1055,12 +1060,6 @@ DrawHighScores (void)
     fontnumber = 0;
 
 #else
-    CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-    ClearMScreen ();
-    DrawStripes (10);
-    UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-
-    CacheLump (HIGHSCORES_LUMP_START, HIGHSCORES_LUMP_END);
     CA_CacheGrChunk (STARTFONT + 1);
     VWB_DrawPic (0, 0, HIGHSCORESPIC);
 
@@ -1165,7 +1164,6 @@ DrawHighScores (void)
     VW_UpdateScreen ();
 
 #ifdef SPEAR
-    UnCacheLump (HIGHSCORES_LUMP_START, HIGHSCORES_LUMP_END);
     fontnumber = 0;
 #endif
 }

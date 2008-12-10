@@ -2234,8 +2234,8 @@ void YM3812UpdateOne(int which, INT16 *buffer, int length)
 
 //		buf[i] = lt;
 
-		buf[i*2] = lt/DIVIDE_VOLUME(MusicVolume);          // stereo version
-		buf[i*2+1] = lt/DIVIDE_VOLUME(MusicVolume);
+		buf[i*2] = lt*MULTIPLY_VOLUME(AdlibVolume);          // stereo version
+		buf[i*2+1] = lt*MULTIPLY_VOLUME(AdlibVolume);
 
 		advance(OPL);
 	}

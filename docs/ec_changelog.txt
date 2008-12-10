@@ -1,3 +1,13 @@
+December 9th, 2008
+-----------------------------
+- Re-combined the Adlib slider, only this time with the music volume since I 
+  figured out that the adlib player latched on the music channel.  I really 
+  don't feel like figuring out how to separate them at the moment.
+- Continued work on the Menu code.  In the process I was able to remove quite 
+  a few #ifdef SPEARs!  This means ECWolf will use a little more memory, but 
+  it is worth it.
+- Tweaked the volume formula.
+
 December 6th, 2008
 -----------------------------
 - Added: Adlib volume slider.

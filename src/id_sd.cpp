@@ -79,7 +79,6 @@ static  byte          **SoundTable;
         int             DigiChannel[STARTMUSIC - STARTDIGISOUNDS];
 		int				AdlibVolume=MAX_VOLUME;
 		int				SoundVolume=MAX_VOLUME;
-		int				MusicVolume=MAX_VOLUME;
 
 //      Internal variables
 static  boolean                 SD_Started;
@@ -602,7 +601,7 @@ int SD_PlayDigitized(word which,int leftpos,int rightpos)
         return 0;
     }
 
-	Mix_Volume(channel, static_cast<int> (ceil(128.0/DIVIDE_VOLUME(SoundVolume))));
+	Mix_Volume(channel, static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(SoundVolume))));
     if(Mix_PlayChannel(channel, sample, 0) == -1)
     {
         printf("Unable to play sound: %s\n", Mix_GetError());
@@ -729,7 +728,7 @@ SDL_AlSetFXInst(Instrument *inst)
     alOut(m + alWave,inst->mWave);
     alOut(c + alChar,inst->cChar);
     alOut(c + alScale,inst->cScale);
-    alOut(c + alAttack,inst->cAttack/DIVIDE_VOLUME(AdlibVolume));
+    alOut(c + alAttack,inst->cAttack);
     alOut(c + alSus,inst->cSus);
     alOut(c + alWave,inst->cWave);
 

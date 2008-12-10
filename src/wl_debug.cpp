@@ -52,7 +52,8 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height);
 
 int     maporgx;
 int     maporgy;
-enum {mapview,tilemapview,actoratview,visview}  viewtype;
+enum ViewType {mapview,tilemapview,actoratview,visview};
+ViewType viewtype;
 
 void ViewMap (void);
 

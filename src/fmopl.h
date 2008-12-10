@@ -1,6 +1,8 @@
 #ifndef __FMOPL_H_
 #define __FMOPL_H_
 
+#include "wl_def.h"
+
 #define HAS_YM3812 1
 
 /* --- select emulation chips --- */

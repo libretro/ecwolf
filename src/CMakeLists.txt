@@ -17,6 +17,7 @@ add_executable(../ecwolf
 	id_us_1.cpp
 	id_vh.cpp
 	id_vl.cpp
+	m_classes.cpp
 	signon.cpp
 	wl_act1.cpp
 	wl_act2.cpp

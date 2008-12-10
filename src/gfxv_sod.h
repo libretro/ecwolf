@@ -205,6 +205,9 @@ typedef enum {
 //
 // Data LUMPs
 //
+#define CONTROLS_LUMP_START		C_BACKDROPPIC
+#define CONTROLS_LUMP_END		C_WONSPEARPIC
+
 #define BACKDROP_LUMP_START		3
 #define BACKDROP_LUMP_END		8
 

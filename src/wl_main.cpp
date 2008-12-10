@@ -1119,11 +1119,7 @@ void DoJukebox(void)
 #endif
 
     CA_CacheGrChunk (STARTFONT+1);
-#ifdef SPEAR
-    CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-#else
     CacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
-#endif
     CA_LoadAllSounds ();
 
     fontnumber=1;
@@ -1168,11 +1164,7 @@ void DoJukebox(void)
 
     MenuFadeOut();
     IN_ClearKeysDown();
-#ifdef SPEAR
-    UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-#else
     UnCacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
-#endif
 }
 #endif
 
@@ -1871,11 +1863,10 @@ int main (int argc, char *argv[])
     CheckParameters(argc, argv);
 #endif
 
-	CreateMenus();
-
     CheckForEpisodes();
 
     InitGame();
+	CreateMenus();
 
     DemoLoop();
 

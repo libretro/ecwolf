@@ -56,7 +56,7 @@ class BooleanMenuItem : public MenuItem
 	public:
 		BooleanMenuItem(const char string[36], boolean &value);
 
-		void	activate() { value ^= 1; }
+		void	activate();
 		void	draw();
 };
 
@@ -71,6 +71,17 @@ class FunctionMenuItem : public MenuItem
 
 		void	activate();
 		void	setEnableFade(bool fadeEnabled=true) { this->fadeEnabled = fadeEnabled; }
+};
+
+class MenuSwitcherMenuItem : public MenuItem
+{
+	protected:
+		Menu	&menu;
+
+	public:
+		MenuSwitcherMenuItem(const char string[36], Menu &menu);
+
+		void	activate();
 };
 
 class SliderMenuItem : public MenuItem
@@ -93,6 +104,7 @@ class Menu
 {
 	protected:
 		int						curPos;
+		void					(*handler)(unsigned int);
 		int						headPicture;
 		char					headText[36];
 		const int				indent;
@@ -105,7 +117,7 @@ class Menu
 		void	eraseGun(int x, int y, int which);
 
 	public:
-		Menu(int x, int y, int w, int indent, const char headText[36]="");
+		Menu(int x, int y, int w, int indent, void (*handler)(unsigned int)=NULL, const char headText[36]="");
 		~Menu();
 
 		void				addItem(MenuItem *item);
@@ -121,6 +133,7 @@ class Menu
 		const int			getY() const { return y; }
 		void				setHeadPicture(int picture) { headPicture = picture; }
 		void				setHeadText(const char text[36]) { strcpy(headText, text); }
+		void				show();
 		MenuItem			*operator[] (int index) { return getIndex(index); }
 };
 
