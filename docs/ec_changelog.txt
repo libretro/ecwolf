@@ -1,3 +1,7 @@
+December 11th, 2008
+-----------------------------
+- Tweaked the volume formula again.  It's a lot simpler now.
+
 December 9th, 2008
 -----------------------------
 - Re-combined the Adlib slider, only this time with the music volume since I 

@@ -119,8 +119,7 @@ extern  SMMode          MusicMode;
 extern  int             DigiMap[];
 extern  int             DigiChannel[];
 #define MAX_VOLUME		20
-#define DIVIDE_VOLUME(v)((((3.123170/log((v)+2.718281828))-1.0)*16)+1.0)
-#define MULTIPLY_VOLUME(v)(log10((v/(((MAX_VOLUME+1)+((MAX_VOLUME+1)/10))/10))+1.2))
+#define MULTIPLY_VOLUME(v)((double(v)+0.3)/(MAX_VOLUME+0.3))
 extern	int				AdlibVolume;
 extern	int				SoundVolume;
 
