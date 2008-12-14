@@ -16,6 +16,8 @@
 #	include <stdint.h>
 #	include <string.h>
 #	include <stdarg.h>
+#elif defined(__GNUC__)
+#	include <stdint.h>
 #endif
 #include <SDL.h>
 

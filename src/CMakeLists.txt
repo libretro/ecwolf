@@ -1,5 +1,20 @@
 include_directories(${ECWOLF_SOURCE_DIR}/src)
 
+option(SPEAR "Spear of Destiny")
+option(SPEARDEMO "Spear of Destiny Demo")
+option(WOLF3DSW "Wolfenstein 3D Shareware")
+
+if(SPEAR)
+	add_definitions(-DSPEAR)
+	if(SPEARDEMO)
+		add_definitions(-DSPEARDEMO)
+	endif(SPEARDEMO)
+else(SPEAR)
+	if(WOLF3DSW)
+		add_definitions(-DUPLOAD)
+	endif(WOLF3DSW)
+endif(SPEAR)
+
 find_package(SDL)
 find_package(SDL_mixer)
 if(NOT SDL_FOUND OR NOT SDLMIXER_FOUND)
@@ -7,6 +22,12 @@ if(NOT SDL_FOUND OR NOT SDLMIXER_FOUND)
 endif(NOT SDL_FOUND OR NOT SDLMIXER_FOUND)
 include_directories(${SDLMIXER_INCLUDE_DIR})
 include_directories(${SDL_INCLUDE_DIR})
+
+if(WIN32)
+	set(EXTRA_FILES
+		sdl_winmain.cpp
+	)
+endif(WIN32)
 
 add_executable(../ecwolf
 	fmopl.cpp
@@ -36,6 +57,7 @@ add_executable(../ecwolf
 	wl_state.cpp
 	wl_text.cpp
 	actors/scanner.cpp
+	${EXTRA_FILES}
 )
 
 target_link_libraries(../ecwolf ${SDL_LIBRARY} ${SDLMIXER_LIBRARY})

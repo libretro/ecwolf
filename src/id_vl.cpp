@@ -28,7 +28,7 @@ unsigned screenBits = 8;
 #else
 unsigned screenWidth = 640;
 unsigned screenHeight = 400;
-unsigned screenBits = -1;      // use "best" color depth according to libSDL
+unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
 #endif
 
 SDL_Surface *screen = NULL;

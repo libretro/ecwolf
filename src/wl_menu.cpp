@@ -99,7 +99,7 @@ void CreateMenus()
 	controlBase.addItem(new MenuSwitcherMenuItem(STR_SENS, mouseSensitivity));
 	controlBase.addItem(new BooleanMenuItem(STR_JOYEN, joystickenabled));
 	controlBase.addItem(new FunctionMenuItem(STR_CUSTOM, CustomControls));
-	HandleControlBase(-1); // Enabled/Disable options
+	HandleControlBase(static_cast<unsigned> (-1)); // Enabled/Disable options
 
 	mouseSensitivity.addItem(new LabelMenuItem(STR_MOUSEADJ));
 	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 10, STR_SLOW, STR_FAST));
