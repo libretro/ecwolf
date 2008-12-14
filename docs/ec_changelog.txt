@@ -1,3 +1,7 @@
+December 13th, 2008
+-----------------------------
+- Fixed issues in Windows.
+
 December 11th, 2008
 -----------------------------
 - Tweaked the volume formula again.  It's a lot simpler now.
