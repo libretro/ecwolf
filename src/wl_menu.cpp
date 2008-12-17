@@ -160,45 +160,6 @@ char endStrings[9][80] = {
 #endif
 };
 
-CP_itemtype MainMenu[] = {
-#ifdef JAPAN
-    {1, "", CP_NewGame},
-    {1, "", CP_Sound},
-    {1, "", 0},
-    {1, "", CP_LoadGame},
-    {0, "", CP_SaveGame},
-    {1, "", CP_ChangeView},
-    {2, "", CP_ReadThis},
-    {1, "", CP_ViewScores},
-    {1, "", 0},
-    {1, "", 0}
-#else
-
-    {1, STR_NG, CP_NewGame},
-    {1, STR_SD, CP_Sound},
-    {1, STR_CL, 0},
-    {1, STR_LG, CP_LoadGame},
-    {0, STR_SG, CP_SaveGame},
-    {1, STR_CV, CP_ChangeView},
-
-#ifndef GOODTIMES
-#ifndef SPEAR
-
-#ifdef SPANISH
-    {2, "Ve esto!", CP_ReadThis},
-#else
-    {2, "Read This!", CP_ReadThis},
-#endif
-
-#endif
-#endif
-
-    {1, STR_VS, CP_ViewScores},
-    {1, STR_BD, 0},
-    {1, STR_QT, 0}
-#endif
-};
-
 CP_itemtype SndMenu[] = {
 #ifdef JAPAN
     {1, "", 0},
@@ -226,24 +187,6 @@ CP_itemtype SndMenu[] = {
     {0, "", 0},
     {1, STR_NONE, 0},
     {1, STR_ALSB, 0}
-#endif
-};
-
-enum { CTL_MOUSEENABLE, CTL_DISABLEYAXIS, CTL_MOUSESENS, CTL_JOYENABLE, CTL_CUSTOMIZE };
-
-CP_itemtype CtlMenu[] = {
-#ifdef JAPAN
-    {0, "", 0},
-	{0, "", 0},
-    {0, "", MouseSensitivity},
-    {0, "", 0},
-    {1, "", CustomControls}
-#else
-    {0, STR_MOUSEEN, 0},
-	{0, STR_DISABLEYAXIS, 0},
-    {0, STR_SENS, MouseSensitivity},
-    {0, STR_JOYEN, 0},
-    {1, STR_CUSTOM, CustomControls}
 #endif
 };
 
@@ -348,10 +291,8 @@ CP_itemtype CusMenu[] = {
 };
 
 // CP_iteminfo struct format: short x, y, amount, curpos, indent;
-CP_iteminfo MainItems = { MENU_X, MENU_Y, lengthof(MainMenu), STARTITEM, 24 },
-            SndItems  = { SM_X, SM_Y1, lengthof(SndMenu), 0, 52 },
+CP_iteminfo SndItems  = { SM_X, SM_Y1, lengthof(SndMenu), 0, 52 },
             LSItems   = { LSM_X, LSM_Y, lengthof(LSMenu), 0, 24 },
-            CtlItems  = { CTL_X, CTL_Y, lengthof(CtlMenu), -1, 56 },
             CusItems  = { 8, CST_Y + 13 * 2, lengthof(CusMenu), -1, 0},
 #ifndef SPEAR
             NewEitems = { NE_X, NE_Y, lengthof(NewEmenu), 0, 88 },
@@ -659,21 +600,7 @@ US_ControlPanel (ScanCode scancode)
     //
     CleanupControlPanel ();
 
-    //
-    // CHANGE MAINMENU ITEM
-    //
-    if (startgame || loadedgame)
-        EnableEndGameMenuItem();
-
     // RETURN/START GAME EXECUTION
-}
-
-void EnableEndGameMenuItem()
-{
-    MainMenu[viewscores].routine = NULL;
-#ifndef JAPAN
-    strcpy (MainMenu[viewscores].string, STR_EG);
-#endif
 }
 
 #ifndef GOODTIMES
@@ -789,7 +716,6 @@ CP_CheckQuick (ScanCode scancode)
 
             WindowH = 200;
             fontnumber = 0;
-            MainMenu[savegame].active = 0;
             return 1;
 
         //
@@ -985,12 +911,6 @@ CP_EndGame (int)
     playstate = ex_died;
     killerobj = NULL;
 
-    MainMenu[savegame].active = 0;
-    MainMenu[viewscores].routine = CP_ViewScores;
-#ifndef JAPAN
-    strcpy (MainMenu[viewscores].string, STR_VS);
-#endif
-
     return 1;
 }
 
@@ -1136,7 +1056,7 @@ CP_NewGame (int)
     //
 #ifndef SPEAR
 #ifndef GOODTIMES
-    MainMenu[readthis].active = 1;
+    mainMenu[mainMenu.countItems()-3].setHighlighted(false);
 #endif
 #endif
 
@@ -1566,7 +1486,7 @@ CP_LoadGame (int quick)
 
 #ifndef SPEAR
 #ifndef GOODTIMES
-            MainMenu[readthis].active = 1;
+            mainMenu[mainMenu.countItems()-3].setHighlighted(false);
 #endif
 #endif
 
@@ -1907,82 +1827,6 @@ MouseSensitivity (int)
 
     return 0;
 }
-
-
-///////////////////////////
-//
-// DRAW CONTROL MENU SCREEN
-//
-void
-DrawCtlScreen (void)
-{
-    int i, x, y;
-
-#ifdef JAPAN
-    CA_CacheScreen (S_CONTROLPIC);
-#else
-    ClearMScreen ();
-    DrawStripes (10);
-    VWB_DrawPic (80, 0, C_CONTROLPIC);
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
-    DrawWindow (CTL_X - 8, CTL_Y - 5, CTL_W, CTL_H, BKGDCOLOR);
-#endif
-    WindowX = 0;
-    WindowW = 320;
-    SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
-
-    if (IN_JoyPresent())
-        CtlMenu[CTL_JOYENABLE].active = 1;
-
-    if (MousePresent)
-    {
-        CtlMenu[CTL_MOUSESENS].active = CtlMenu[CTL_DISABLEYAXIS].active = CtlMenu[CTL_MOUSEENABLE].active = 1; 
-    }
-
-    CtlMenu[CTL_MOUSESENS].active = mouseenabled;
-
-
-    DrawMenu (&CtlItems, CtlMenu);
-
-
-    x = CTL_X + CtlItems.indent - 24;
-    y = CTL_Y + 3;
-    if (mouseenabled)
-        VWB_DrawPic (x, y, C_SELECTEDPIC);
-    else
-        VWB_DrawPic (x, y, C_NOTSELECTEDPIC);
-
-	y = CTL_Y + 16;
-	if (mouseyaxisdisabled)
-        VWB_DrawPic (x, y, C_SELECTEDPIC);
-    else
-        VWB_DrawPic (x, y, C_NOTSELECTEDPIC);
-
-    y = CTL_Y + 42;
-    if (joystickenabled)
-        VWB_DrawPic (x, y, C_SELECTEDPIC);
-    else
-        VWB_DrawPic (x, y, C_NOTSELECTEDPIC);
-
-    //
-    // PICK FIRST AVAILABLE SPOT
-    //
-    if (CtlItems.curpos < 0 || !CtlMenu[CtlItems.curpos].active)
-    {
-        for (i = 0; i < CtlItems.amount; i++)
-        {
-            if (CtlMenu[i].active)
-            {
-                CtlItems.curpos = i;
-                break;
-            }
-        }
-    }
-
-    DrawMenuGun (&CtlItems);
-    VW_UpdateScreen ();
-}
-
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -3050,8 +2894,6 @@ SetupControlPanel (void)
 
     if (!ingame)
         CA_LoadAllSounds ();
-    else
-        MainMenu[savegame].active = 1;
 
     //
     // CENTER MOUSE

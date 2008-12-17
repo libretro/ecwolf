@@ -1475,10 +1475,6 @@ startplayloop:
                     ClearMemory ();
 
                     CheckHighScore (gamestate.score,gamestate.mapon+1);
-#ifndef JAPAN
-                    strcpy(MainMenu[viewscores].string,STR_VS);
-#endif
-                    MainMenu[viewscores].routine = CP_ViewScores;
                     return;
                 }
 #endif
@@ -1493,10 +1489,6 @@ startplayloop:
                     ClearMemory ();
 
                     CheckHighScore (gamestate.score,gamestate.mapon+1);
-#ifndef JAPAN
-                    strcpy(MainMenu[viewscores].string,STR_VS);
-#endif
-                    MainMenu[viewscores].routine = CP_ViewScores;
                     return;
                 }
 #endif
@@ -1561,10 +1553,6 @@ startplayloop:
                 ClearMemory ();
 
                 CheckHighScore (gamestate.score,gamestate.mapon+1);
-#ifndef JAPAN
-                strcpy(MainMenu[viewscores].string,STR_VS);
-#endif
-                MainMenu[viewscores].routine = CP_ViewScores;
                 return;
 
             case ex_victorious:
@@ -1581,10 +1569,6 @@ startplayloop:
                 ClearMemory ();
 
                 CheckHighScore (gamestate.score,gamestate.mapon+1);
-#ifndef JAPAN
-                strcpy(MainMenu[viewscores].string,STR_VS);
-#endif
-                MainMenu[viewscores].routine = CP_ViewScores;
                 return;
 
             default:

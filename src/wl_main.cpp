@@ -192,9 +192,6 @@ void ReadConfig(void)
 
         if(viewsize<4) viewsize=4;
         else if(viewsize>21) viewsize=21;
-
-        MainMenu[6].active=1;
-        MainItems.curpos=0;
     }
     else
     {
@@ -1494,7 +1491,6 @@ static void DemoLoop()
     if (param_tedlevel != -1)
     {
         param_nowait = true;
-        EnableEndGameMenuItem();
         NewGame(param_difficulty,0);
 
 #ifndef SPEAR

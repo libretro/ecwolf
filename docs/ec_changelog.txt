@@ -1,3 +1,10 @@
+December 16th, 2008
+-----------------------------
+- Cleaned up some menu source code.
+- Worked on the wolf data maps in preparation to converting the engine to use 
+  named lumps.
+- Added language lump.
+
 December 13th, 2008
 -----------------------------
 - Fixed issues in Windows.

@@ -96,8 +96,6 @@ EndSpear (void)
     EndScreen (END9PALETTE, ENDSCREEN9PIC);
 
     EndScreen (END2PALETTE, ENDSCREEN12PIC);
-
-    MainMenu[savegame].active = 0;
 }
 #endif
 #endif

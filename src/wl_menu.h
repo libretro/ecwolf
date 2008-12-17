@@ -137,6 +137,8 @@ class Menu
 		MenuItem			*operator[] (int index) { return getIndex(index); }
 };
 
+extern Menu mainMenu;
+
 #ifdef SPEAR
 
 #define BORDCOLOR       0x99
@@ -245,9 +247,6 @@ typedef struct {
                 short allowed[4];
                 } CustomCtrls;
 
-extern CP_itemtype MainMenu[];
-extern CP_iteminfo MainItems;
-
 //
 // FUNCTION PROTOTYPES
 //
@@ -255,8 +254,6 @@ extern CP_iteminfo MainItems;
 void CreateMenus();
 
 void US_ControlPanel(ScanCode);
-
-void EnableEndGameMenuItem();
 
 void SetupControlPanel(void);
 void SetupSaveGames();
@@ -301,7 +298,6 @@ void DrawNewEpisode(void);
 void DrawNewGame(void);
 void DrawChangeView(int view);
 void DrawMouseSens(void);
-void DrawCtlScreen(void);
 void DrawCustomScreen(void);
 void DrawLSAction(int which);
 void DrawCustMouse(int hilight);
