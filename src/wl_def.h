@@ -83,8 +83,6 @@ void Quit(const char *errorStr, ...);
 #include "id_us.h"
 #include "id_ca.h"
 
-#include "wl_menu.h"
-
 #ifdef SPEAR
 #include "f_spear.h"
 #endif

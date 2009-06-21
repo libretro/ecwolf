@@ -8,7 +8,8 @@
 #ifndef __ID_SD__
 #define __ID_SD__
 
-#define alOut(n,b) YM3812Write(0, n, b)
+#define alOut(n,b) 		YM3812Write(0, n, b, AdlibVolume)
+#define alOutMusic(n,b)	YM3812Write(0, n, b, MusicVolume)
 
 #define TickBase        70      // 70Hz per tick - used as a base for timer 0
 
@@ -121,6 +122,7 @@ extern  int             DigiChannel[];
 #define MAX_VOLUME		20
 #define MULTIPLY_VOLUME(v)((double(v)+0.3)/(MAX_VOLUME+0.3))
 extern	int				AdlibVolume;
+extern	int				MusicVolume;
 extern	int				SoundVolume;
 
 #define GetTimeCount()  ((SDL_GetTicks()*7)/100)

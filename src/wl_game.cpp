@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include "wl_def.h"
+#include "wl_menu.h"
 #include <SDL_mixer.h>
 #pragma hdrstop
 

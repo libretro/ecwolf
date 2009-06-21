@@ -7,6 +7,7 @@
 #endif
 
 #include "wl_def.h"
+#include "wl_menu.h"
 #pragma hdrstop
 
 #ifdef USE_CLOUDSKY

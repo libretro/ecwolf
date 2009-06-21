@@ -263,6 +263,9 @@ typedef struct{
 
 	/* waveform select */
 	unsigned int wavetable;
+
+	// ECWOLF ------------------------------------------------------------------
+	int		playVolume;
 } OPL_SLOT;
 
 typedef struct{
@@ -961,7 +964,7 @@ INLINE void OPL_CALC_CH( OPL_CH *CH )
 	SLOT++;
 	env = volume_calc(SLOT);
 	if( env < ENV_QUIET )
-		output[0] += op_calc(SLOT->Cnt, env, phase_modulation, SLOT->wavetable);
+		output[0] += op_calc(SLOT->Cnt, env, phase_modulation, SLOT->wavetable)*MULTIPLY_VOLUME(SLOT->playVolume);
 }
 
 /*
@@ -1347,8 +1350,9 @@ static void OPL_initalize(FM_OPL *OPL)
 
 }
 
-INLINE void FM_KEYON(OPL_SLOT *SLOT, UINT32 key_set)
+INLINE void FM_KEYON(OPL_SLOT *SLOT, UINT32 key_set, int volume=MAX_VOLUME)
 {
+	SLOT->playVolume = volume;
 	if( !SLOT->key )
 	{
 		/* restart Phase Generator */
@@ -1471,7 +1475,7 @@ INLINE void set_sl_rr(FM_OPL *OPL,int slot,int v)
 
 
 /* write a value v to register r on OPL chip */
-static void OPLWriteReg(FM_OPL *OPL, int r, int v)
+static void OPLWriteReg(FM_OPL *OPL, int r, int v, int volume=MAX_VOLUME)
 {
 	OPL_CH *CH;
 	int slot;
@@ -1634,8 +1638,8 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 				/* BD key on/off */
 				if(v&0x10)
 				{
-					FM_KEYON (&OPL->P_CH[6].SLOT[SLOT1], 2);
-					FM_KEYON (&OPL->P_CH[6].SLOT[SLOT2], 2);
+					FM_KEYON (&OPL->P_CH[6].SLOT[SLOT1], 2, volume);
+					FM_KEYON (&OPL->P_CH[6].SLOT[SLOT2], 2, volume);
 				}
 				else
 				{
@@ -1643,16 +1647,16 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 					FM_KEYOFF(&OPL->P_CH[6].SLOT[SLOT2],~2);
 				}
 				/* HH key on/off */
-				if(v&0x01) FM_KEYON (&OPL->P_CH[7].SLOT[SLOT1], 2);
+				if(v&0x01) FM_KEYON (&OPL->P_CH[7].SLOT[SLOT1], 2, volume);
 				else       FM_KEYOFF(&OPL->P_CH[7].SLOT[SLOT1],~2);
 				/* SD key on/off */
-				if(v&0x08) FM_KEYON (&OPL->P_CH[7].SLOT[SLOT2], 2);
+				if(v&0x08) FM_KEYON (&OPL->P_CH[7].SLOT[SLOT2], 2, volume);
 				else       FM_KEYOFF(&OPL->P_CH[7].SLOT[SLOT2],~2);
 				/* TOM key on/off */
-				if(v&0x04) FM_KEYON (&OPL->P_CH[8].SLOT[SLOT1], 2);
+				if(v&0x04) FM_KEYON (&OPL->P_CH[8].SLOT[SLOT1], 2, volume);
 				else       FM_KEYOFF(&OPL->P_CH[8].SLOT[SLOT1],~2);
 				/* TOP-CY key on/off */
-				if(v&0x02) FM_KEYON (&OPL->P_CH[8].SLOT[SLOT2], 2);
+				if(v&0x02) FM_KEYON (&OPL->P_CH[8].SLOT[SLOT2], 2, volume);
 				else       FM_KEYOFF(&OPL->P_CH[8].SLOT[SLOT2],~2);
 			}
 			else
@@ -1684,8 +1688,8 @@ static void OPLWriteReg(FM_OPL *OPL, int r, int v)
 
 			if(v&0x20)
 			{
-				FM_KEYON (&CH->SLOT[SLOT1], 1);
-				FM_KEYON (&CH->SLOT[SLOT2], 1);
+				FM_KEYON (&CH->SLOT[SLOT1], 1, volume);
+				FM_KEYON (&CH->SLOT[SLOT2], 1, volume);
 			}
 			else
 			{
@@ -2124,9 +2128,9 @@ void YM3812ResetChip(int which)
 	OPLResetChip(OPL_YM3812[which]);
 }
 
-int YM3812Write(int which, int a, int v)
+int YM3812Write(int which, int a, int v, int volume)
 {
-	OPLWriteReg(OPL_YM3812[which], a, v);
+	OPLWriteReg(OPL_YM3812[which], a, v, volume);
 	return (OPL_YM3812[which]->status>>7);
 }
 
@@ -2234,8 +2238,9 @@ void YM3812UpdateOne(int which, INT16 *buffer, int length)
 
 //		buf[i] = lt;
 
-		buf[i*2] = static_cast<OPLSAMPLE> (lt*MULTIPLY_VOLUME(AdlibVolume));          // stereo version
-		buf[i*2+1] = static_cast<OPLSAMPLE> (lt*MULTIPLY_VOLUME(AdlibVolume));
+		buf[i*2] = buf[i*2+1] = lt;
+		//buf[i*2] = static_cast<OPLSAMPLE> (lt*MULTIPLY_VOLUME(AdlibVolume));          // stereo version
+		//buf[i*2+1] = static_cast<OPLSAMPLE> (lt*MULTIPLY_VOLUME(AdlibVolume));
 
 		advance(OPL);
 	}

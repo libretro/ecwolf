@@ -46,7 +46,7 @@ typedef unsigned char (*OPL_PORTHANDLER_R)(int param);
 int  YM3812Init(int num, int clock, int rate);
 void YM3812Shutdown(void);
 void YM3812ResetChip(int which);
-int  YM3812Write(int which, int a, int v);
+int  YM3812Write(int which, int a, int v, int volume=MAX_VOLUME);
 unsigned char YM3812Read(int which, int a);
 void YM3812Mute(int which,int channel,BOOL mute);
 int  YM3812TimerOver(int which, int c);

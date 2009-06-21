@@ -14,6 +14,7 @@
 #endif
 
 #include "wl_def.h"
+#include "wl_menu.h"
 #pragma hdrstop
 //new #includes
 #include <vector>
@@ -22,51 +23,195 @@ using namespace std;
 extern int lastgamemusicoffset;
 extern int numEpisodesMissing;
 
-void HandleControlBase(unsigned int which);
-void HandleSoundBase(unsigned int which);
-
 Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
-Menu soundBase(24, 70, 284, 24, &HandleSoundBase);
-Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, &HandleControlBase);
-Menu mouseSensitivity(10, 80, 300, 0);
+MENU_LISTENER(PlayDemosOrReturnToGame)
+{
+	Menu::closeMenus();
+	if (!ingame)
+		StartCPMusic(INTROSONG);
+	VL_FadeOut(0, 255, 0, 0, 0, 10);
+	return true;
+}
+MENU_LISTENER(ViewScoresOrEndGame)
+{
+	if (ingame)
+	{
+		if(CP_EndGame(0))
+			Menu::closeMenus();
+	}
+	else
+	{
+		MenuFadeOut();
+	
+		fontnumber = 0;
+	
+#ifdef SPEAR
+		StartCPMusic(XAWARD_MUS);
+#else
+		StartCPMusic(ROSTER_MUS);
+#endif
+	
+		DrawHighScores();
+		VW_UpdateScreen();
+		MenuFadeIn();
+		fontnumber = 1;
+	
+		IN_Ack();
+	
+		StartCPMusic(MENUSONG);
+		MenuFadeOut();
+		mainMenu.draw();
+		MenuFadeIn ();
+	}
+	return true;
+}
+////////////////////////////////////////////////////////////////////
+//
+// QUIT THIS INFERNAL GAME!
+//
+////////////////////////////////////////////////////////////////////
+MENU_LISTENER(QuitGame)
+{
+#ifdef JAPAN
+	if(GetYorN(7, 11, C_QUITMSGPIC))
+#else
 
-void HandleControlBase(unsigned int which)
+const char endStrings[9][80] = {
+#ifndef SPEAR
+    {"Dost thou wish to\nleave with such hasty\nabandon?"},
+    {"Chickening out...\nalready?"},
+    {"Press N for more carnage.\nPress Y to be a weenie."},
+    {"So, you think you can\nquit this easily, huh?"},
+    {"Press N to save the world.\nPress Y to abandon it in\nits hour of need."},
+    {"Press N if you are brave.\nPress Y to cower in shame."},
+    {"Heroes, press N.\nWimps, press Y."},
+    {"You are at an intersection.\nA sign says, 'Press Y to quit.'\n>"},
+    {"For guns and glory, press N.\nFor work and worry, press Y."}
+#else
+    ENDSTR1,
+    ENDSTR2,
+    ENDSTR3,
+    ENDSTR4,
+    ENDSTR5,
+    ENDSTR6,
+    ENDSTR7,
+    ENDSTR8,
+    ENDSTR9
+#endif
+};
+
+#ifdef SPANISH
+	if(Confirm(ENDGAMESTR))
+#else
+	if(Confirm(endStrings[US_RndT() & 0x7 + (US_RndT() & 1)]))
+#endif
+
+#endif
+	{
+		VW_UpdateScreen();
+		SD_MusicOff();
+		SD_StopSound();
+		MenuFadeOut();
+		Quit(NULL);
+	}
+
+	// special case
+	if(which != -1)
+		mainMenu.draw();
+	return false;
+}
+Menu soundBase(24, 45, 284, 24);
+MENU_LISTENER(SetSoundEffects)
+{
+	SDMode modes[3] = { sdm_Off, sdm_PC, sdm_AdLib };
+	if(SoundMode != modes[which])
+	{
+		SD_WaitSoundDone();
+		SD_SetSoundMode(modes[which]);
+	}
+	return true;
+}
+MENU_LISTENER(SetDigitalSound)
+{
+	if(DigiMode != (which == 0 ? sds_Off : sds_SoundBlaster))
+		SD_SetDigiDevice(which == 0 ? sds_Off : sds_SoundBlaster);
+	return true;
+}
+MENU_LISTENER(SetMusic)
+{
+	if(MusicMode != (which == 0 ? smm_Off : smm_AdLib))
+	{
+		SD_SetMusicMode((which == 0 ? smm_Off : smm_AdLib));
+		if(which != 0)
+			StartCPMusic(MENUSONG);
+	}
+	return true;
+}
+MENU_LISTENER(EnterControlBase);
+Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
+MENU_LISTENER(EnterControlBase)
 {
 	controlBase[1]->setEnabled(mouseenabled);
 	controlBase[2]->setEnabled(mouseenabled);
 	controlBase[3]->setEnabled(IN_JoyPresent());
-	switch(which)
-	{
-		case 0:
-			controlBase.draw();
-			break;
-		case 2:
-		case 4:
-			controlBase.draw();
-			MenuFadeIn();
-			WaitKeyUp();
-		default:
-			break;
-	}
+	controlBase.draw();
 }
-
-void HandleSoundBase(unsigned int which)
+Menu mouseSensitivity(10, 80, 300, 0);
+Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
+Menu skills(NM_X, NM_Y, NM_W, 24);
+int episode = 0;
+MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
-	switch(which)
+	if(which >= 6-numEpisodesMissing)
 	{
-		case 0:
-			soundBase.draw();
-			MenuFadeIn();
-			break;
-		default:
-			break;
+		SD_PlaySound(NOWAYSND);
+		Message("Please select \"Read This!\"\n"
+				"from the Options menu to\n"
+				"find out how to order this\n" "episode from Apogee.");
+		IN_ClearKeysDown();
+		IN_Ack();
+		episodes.draw();
+		return false;
 	}
+
+	if(ingame)
+	{
+		if(!Confirm(CURGAME))
+		{
+			episodes.draw();
+			return false;
+		}
+	}
+
+	episode = which;
+	return true;
+}
+MENU_LISTENER(StartNewGame)
+{
+	NewGame(which, episode);
+	Menu::closeMenus();
+	MenuFadeOut();
+
+	//
+	// CHANGE "READ THIS!" TO NORMAL COLOR
+	//
+#ifndef SPEAR
+#ifndef GOODTIMES
+	mainMenu[mainMenu.countItems()-3]->setHighlighted(false);
+#endif
+#endif
+
+	return true;
 }
 
 void CreateMenus()
 {
 	mainMenu.setHeadPicture(C_OPTIONSPIC);
-	mainMenu.addItem(new FunctionMenuItem(STR_NG, CP_NewGame));
+#ifndef SPEAR
+	mainMenu.addItem(new MenuSwitcherMenuItem(STR_NG, episodes));
+#else
+	mainMenu.addItem(new MenuSwitcherMenuItem(STR_NG, skills));
+#endif
 	mainMenu.addItem(new MenuSwitcherMenuItem(STR_SD, soundBase));
 	mainMenu.addItem(new MenuSwitcherMenuItem(STR_CL, controlBase));
 	mainMenu.addItem(new FunctionMenuItem(STR_LG, CP_LoadGame));
@@ -82,24 +227,97 @@ void CreateMenus()
 #endif
 	rt->setHighlighted(true);
 	mainMenu.addItem(rt);
-	mainMenu.addItem(new FunctionMenuItem(STR_VS, CP_ViewScores, false));
-	mainMenu.addItem(new MenuItem(STR_BD));
-	mainMenu.addItem(new MenuItem(STR_QT));
+	mainMenu.addItem(new MenuItem(STR_VS, ViewScoresOrEndGame));
+	mainMenu.addItem(new MenuItem(STR_BD, PlayDemosOrReturnToGame));
+	mainMenu.addItem(new MenuItem(STR_QT, QuitGame));
 
+#ifndef SPEAR
+	episodes.setHeadText("Which episode to play?");
+	const char* episodeText[6] =
+	{
+		"Episode 1\nEscape from Wolfenstein",
+		"Episode 2\nOperation: Eisenfaust",
+		"Episode 3\nDie, Fuhrer, Die!",
+		"Episode 4\nA Dark Secret",
+		"Episode 5\nTrail of the Madman",
+		"Episode 6\nConfrontation"
+	};
+	int episodePicture[6] = { C_EPISODE1PIC, C_EPISODE2PIC, C_EPISODE3PIC, C_EPISODE4PIC, C_EPISODE5PIC, C_EPISODE6PIC };
+	for(unsigned int i = 0;i < 6;i++)
+	{
+		MenuItem *tmp = new MenuSwitcherMenuItem(episodeText[i], skills, SetEpisodeAndSwitchToSkill);
+		tmp->setPicture(episodePicture[i]);
+		if(i >= 6-numEpisodesMissing)
+			tmp->setEnabled(false);
+		episodes.addItem(tmp);
+	}
+#endif
+
+	skills.setHeadText("How tough are you?");
+	const char* skillText[4] =
+	{
+		STR_DADDY,
+		STR_HURTME,
+		STR_BRINGEM,
+		STR_DEATH
+	};
+	int skillPicture[4] = { C_BABYMODEPIC, C_EASYPIC, C_NORMALPIC, C_HARDPIC };
+	for(unsigned int i = 0;i < 4;i++)
+	{
+		MenuItem *tmp = new MenuItem(skillText[i], StartNewGame);
+		tmp->setPicture(skillPicture[i], NM_X + 185, NM_Y + 7);
+		skills.addItem(tmp);
+	}
+
+	// Collect options and defaults
+	const char* soundEffectsOptions[] = {STR_NONE, STR_PC, STR_ALSB };
+	soundEffectsOptions[1] = NULL;
+	const char* digitizedOptions[] = {STR_NONE, STR_SB };
+	const char* musicOptions[] = { STR_NONE, STR_ALSB };
+	if(!AdLibPresent && !SoundBlasterPresent)
+	{
+		soundEffectsOptions[2] = NULL;
+		musicOptions[2] = NULL;
+	}
+	if(!SoundBlasterPresent)
+		digitizedOptions[1] = NULL;
+	int soundEffectsMode = 0;
+	int digitizedMode = 0;
+	int musicMode = 0;
+	switch(SoundMode)
+	{
+		default: soundEffectsMode = 0; break;
+		case sdm_PC: soundEffectsMode = 1; break;
+		case sdm_AdLib: soundEffectsMode = 2; break;
+	}
+	switch(DigiMode)
+	{
+		default: digitizedMode = 0; break;
+		case sds_SoundBlaster: digitizedMode = 1; break;
+	}
+	switch(MusicMode)
+	{
+		default: musicMode = 0; break;
+		case smm_AdLib: musicMode = 1; break;
+	}
 	soundBase.setHeadText("Sound Configuration");
-	soundBase.addItem(new FunctionMenuItem("Configure Sound Devices", CP_Sound));
-	soundBase.addItem(new LabelMenuItem("Sound Volume"));
+	soundBase.addItem(new LabelMenuItem("Digital Device & Volume"));
+	soundBase.addItem(new MultipleChoiceMenuItem(SetDigitalSound, digitizedOptions, 2, digitizedMode));
 	soundBase.addItem(new SliderMenuItem(SoundVolume, 150, MAX_VOLUME, "Soft", "Loud"));
-	soundBase.addItem(new LabelMenuItem("Adlib/Music Volume"));
+	soundBase.addItem(new LabelMenuItem("Adlib Device & Volume"));
+	soundBase.addItem(new MultipleChoiceMenuItem(SetSoundEffects, soundEffectsOptions, 3, soundEffectsMode));
 	soundBase.addItem(new SliderMenuItem(AdlibVolume, 150, MAX_VOLUME, "Soft", "Loud"));
+	soundBase.addItem(new LabelMenuItem("Music Device & Volume"));
+	soundBase.addItem(new MultipleChoiceMenuItem(SetMusic, musicOptions, 2, musicMode));
+	soundBase.addItem(new SliderMenuItem(MusicVolume, 150, MAX_VOLUME, "Soft", "Loud"));
 
 	controlBase.setHeadPicture(C_CONTROLPIC);
-	controlBase.addItem(new BooleanMenuItem(STR_MOUSEEN, mouseenabled));
-	controlBase.addItem(new BooleanMenuItem(STR_DISABLEYAXIS, mouseyaxisdisabled));
+	controlBase.addItem(new BooleanMenuItem(STR_MOUSEEN, mouseenabled, EnterControlBase));
+	controlBase.addItem(new BooleanMenuItem(STR_DISABLEYAXIS, mouseyaxisdisabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(STR_SENS, mouseSensitivity));
-	controlBase.addItem(new BooleanMenuItem(STR_JOYEN, joystickenabled));
+	controlBase.addItem(new BooleanMenuItem(STR_JOYEN, joystickenabled, EnterControlBase));
 	controlBase.addItem(new FunctionMenuItem(STR_CUSTOM, CustomControls));
-	HandleControlBase(static_cast<unsigned> (-1)); // Enabled/Disable options
+	//HandleControlBase(static_cast<unsigned> (-1)); // Enabled/Disable options
 
 	mouseSensitivity.addItem(new LabelMenuItem(STR_MOUSEADJ));
 	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 10, STR_SLOW, STR_FAST));
@@ -136,135 +354,6 @@ int CP_ReadThis (int);
 #endif
 #endif
 
-char endStrings[9][80] = {
-#ifndef SPEAR
-    {"Dost thou wish to\nleave with such hasty\nabandon?"},
-    {"Chickening out...\nalready?"},
-    {"Press N for more carnage.\nPress Y to be a weenie."},
-    {"So, you think you can\nquit this easily, huh?"},
-    {"Press N to save the world.\nPress Y to abandon it in\nits hour of need."},
-    {"Press N if you are brave.\nPress Y to cower in shame."},
-    {"Heroes, press N.\nWimps, press Y."},
-    {"You are at an intersection.\nA sign says, 'Press Y to quit.'\n>"},
-    {"For guns and glory, press N.\nFor work and worry, press Y."}
-#else
-    ENDSTR1,
-    ENDSTR2,
-    ENDSTR3,
-    ENDSTR4,
-    ENDSTR5,
-    ENDSTR6,
-    ENDSTR7,
-    ENDSTR8,
-    ENDSTR9
-#endif
-};
-
-CP_itemtype SndMenu[] = {
-#ifdef JAPAN
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-#else
-    {1, STR_NONE, 0},
-    {0, STR_PC, 0},
-    {1, STR_ALSB, 0},
-    {0, "", 0},
-    {0, "", 0},
-    {1, STR_NONE, 0},
-    {0, STR_DISNEY, 0},
-    {1, STR_SB, 0},
-    {0, "", 0},
-    {0, "", 0},
-    {1, STR_NONE, 0},
-    {1, STR_ALSB, 0}
-#endif
-};
-
-#ifndef SPEAR
-CP_itemtype NewEmenu[] = {
-#ifdef JAPAN
-#ifdef JAPDEMO
-    {1, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-    {0, "", 0},
-#else
-    {1, "", 0},
-    {0, "", 0},
-    {1, "", 0},
-    {0, "", 0},
-    {1, "", 0},
-    {0, "", 0},
-    {1, "", 0},
-    {0, "", 0},
-    {1, "", 0},
-    {0, "", 0},
-    {1, "", 0},
-    {0, "", 0}
-#endif
-#else
-#ifdef SPANISH
-    {1, "Episodio 1\n" "Fuga desde Wolfenstein", 0},
-    {0, "", 0},
-    {3, "Episodio 2\n" "Operacion Eisenfaust", 0},
-    {0, "", 0},
-    {3, "Episodio 3\n" "Muere, Fuhrer, Muere!", 0},
-    {0, "", 0},
-    {3, "Episodio 4\n" "Un Negro Secreto", 0},
-    {0, "", 0},
-    {3, "Episodio 5\n" "Huellas del Loco", 0},
-    {0, "", 0},
-    {3, "Episodio 6\n" "Confrontacion", 0}
-#else
-    {1, "Episode 1\n" "Escape from Wolfenstein", 0},
-    {0, "", 0},
-    {3, "Episode 2\n" "Operation: Eisenfaust", 0},
-    {0, "", 0},
-    {3, "Episode 3\n" "Die, Fuhrer, Die!", 0},
-    {0, "", 0},
-    {3, "Episode 4\n" "A Dark Secret", 0},
-    {0, "", 0},
-    {3, "Episode 5\n" "Trail of the Madman", 0},
-    {0, "", 0},
-    {3, "Episode 6\n" "Confrontation", 0}
-#endif
-#endif
-};
-#endif
-
-
-CP_itemtype NewMenu[] = {
-#ifdef JAPAN
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0}
-#else
-    {1, STR_DADDY, 0},
-    {1, STR_HURTME, 0},
-    {1, STR_BRINGEM, 0},
-    {1, STR_DEATH, 0}
-#endif
-};
-
 CP_itemtype LSMenu[] = {
     {1, "", 0},
     {1, "", 0},
@@ -291,19 +380,13 @@ CP_itemtype CusMenu[] = {
 };
 
 // CP_iteminfo struct format: short x, y, amount, curpos, indent;
-CP_iteminfo SndItems  = { SM_X, SM_Y1, lengthof(SndMenu), 0, 52 },
-            LSItems   = { LSM_X, LSM_Y, lengthof(LSMenu), 0, 24 },
-            CusItems  = { 8, CST_Y + 13 * 2, lengthof(CusMenu), -1, 0},
-#ifndef SPEAR
-            NewEitems = { NE_X, NE_Y, lengthof(NewEmenu), 0, 88 },
-#endif
-            NewItems  = { NM_X, NM_Y, lengthof(NewMenu), 2, 24 };
+CP_iteminfo LSItems   = { LSM_X, LSM_Y, lengthof(LSMenu), 0, 24 },
+            CusItems  = { 8, CST_Y + 13 * 2, lengthof(CusMenu), -1, 0};
 
 int EpisodeSelect[6] = { 1 };
 
 
 static int SaveGamesAvail[10];
-static int StartGame;
 static int SoundStatus = 1;
 static int pickquick;
 static char SaveGameNames[10][32];
@@ -442,6 +525,7 @@ US_ControlPanel (ScanCode scancode)
     //
     // F-KEYS FROM WITHIN GAME
     //
+	Menu::closeMenus(false);
     switch (scancode)
     {
         case sc_F1:
@@ -465,7 +549,7 @@ US_ControlPanel (ScanCode scancode)
             goto finishup;
 
         case sc_F4:
-            CP_Sound (0);
+            soundBase.show();
             goto finishup;
 
         case sc_F5:
@@ -497,7 +581,7 @@ US_ControlPanel (ScanCode scancode)
 	}
     mainMenu.draw();
     MenuFadeIn ();
-    StartGame = 0;
+	Menu::closeMenus(false);
 
     //
     // MAIN MENU LOOP
@@ -556,33 +640,12 @@ US_ControlPanel (ScanCode scancode)
 
         switch (which)
         {
-            case viewscores:
-                if (ingame)
-                {
-                    if (CP_EndGame (0))
-                        StartGame = 1;
-                }
-                else
-                {
-                    mainMenu.draw();
-                    MenuFadeIn ();
-                }
-                break;
-
-            case backtodemo:
-                StartGame = 1;
-                if (!ingame)
-                    StartCPMusic (INTROSONG);
-                VL_FadeOut (0, 255, 0, 0, 0, 10);
-                break;
-
             case -1:
-            case quit:
-                CP_Quit (0);
+                QuitGame(0);
                 break;
 
             default:
-                if (!StartGame)
+                if (!Menu::areMenusClosed())
                 {
                     mainMenu.draw();
                     MenuFadeIn ();
@@ -593,7 +656,7 @@ US_ControlPanel (ScanCode scancode)
         // "EXIT OPTIONS" OR "NEW GAME" EXITS
         //
     }
-    while (!StartGame);
+    while (!Menu::areMenusClosed());
 
     //
     // DEALLOCATE EVERYTHING
@@ -862,23 +925,7 @@ CP_CheckQuick (ScanCode scancode)
             WindowX = WindowY = 0;
             WindowW = 320;
             WindowH = 160;
-#ifdef JAPAN
-            if (GetYorN (7, 8, C_QUITMSGPIC))
-#else
-#ifdef SPANISH
-            if (Confirm (ENDGAMESTR))
-#else
-            if (Confirm (endStrings[US_RndT () & 0x7 + (US_RndT () & 1)]))
-#endif
-#endif
-            {
-                VW_UpdateScreen ();
-                SD_MusicOff ();
-                SD_StopSound ();
-                MenuFadeOut ();
-
-                Quit (NULL);
-            }
+			QuitGame(-1);
 
             DrawPlayBorder ();
             WindowH = 200;
@@ -913,471 +960,6 @@ CP_EndGame (int)
 
     return 1;
 }
-
-
-////////////////////////////////////////////////////////////////////
-//
-// VIEW THE HIGH SCORES
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_ViewScores (int)
-{
-	if(ingame)
-		return 0;
-	MenuFadeOut();
-
-    fontnumber = 0;
-
-#ifdef SPEAR
-    StartCPMusic (XAWARD_MUS);
-#else
-    StartCPMusic (ROSTER_MUS);
-#endif
-
-    DrawHighScores ();
-    VW_UpdateScreen ();
-    MenuFadeIn ();
-    fontnumber = 1;
-
-    IN_Ack ();
-
-    StartCPMusic (MENUSONG);
-    MenuFadeOut ();
-
-    return 0;
-}
-
-
-////////////////////////////////////////////////////////////////////
-//
-// START A NEW GAME
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_NewGame (int)
-{
-    int which, episode;
-
-#ifndef SPEAR
-  firstpart:
-
-    DrawNewEpisode ();
-    do
-    {
-        which = HandleMenu (&NewEitems, &NewEmenu[0], NULL);
-        switch (which)
-        {
-            case -1:
-                MenuFadeOut ();
-                return 0;
-
-            default:
-                if (!EpisodeSelect[which / 2])
-                {
-                    SD_PlaySound (NOWAYSND);
-                    Message ("Please select \"Read This!\"\n"
-                             "from the Options menu to\n"
-                             "find out how to order this\n" "episode from Apogee.");
-                    IN_ClearKeysDown ();
-                    IN_Ack ();
-                    DrawNewEpisode ();
-                    which = 0;
-                }
-                else
-                {
-                    episode = which / 2;
-                    which = 1;
-                }
-                break;
-        }
-
-    }
-    while (!which);
-
-    ShootSnd ();
-
-    //
-    // ALREADY IN A GAME?
-    //
-    if (ingame)
-#ifdef JAPAN
-        if (!GetYorN (7, 8, C_JAPNEWGAMEPIC))
-#else
-        if (!Confirm (CURGAME))
-#endif
-        {
-            MenuFadeOut ();
-            return 0;
-        }
-
-    MenuFadeOut ();
-
-#else
-    episode = 0;
-
-    //
-    // ALREADY IN A GAME?
-    //
-    CacheLump (NEWGAME_LUMP_START, NEWGAME_LUMP_END);
-    DrawNewGame ();
-    if (ingame)
-        if (!Confirm (CURGAME))
-        {
-            MenuFadeOut ();
-            UnCacheLump (NEWGAME_LUMP_START, NEWGAME_LUMP_END);
-            CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
-            return 0;
-        }
-
-#endif
-
-    DrawNewGame ();
-    which = HandleMenu (&NewItems, &NewMenu[0], DrawNewGameDiff);
-    if (which < 0)
-    {
-        MenuFadeOut ();
-#ifndef SPEAR
-        goto firstpart;
-#else
-        UnCacheLump (NEWGAME_LUMP_START, NEWGAME_LUMP_END);
-        CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
-        return 0;
-#endif
-    }
-
-    ShootSnd ();
-    NewGame (which, episode);
-    StartGame = 1;
-    MenuFadeOut ();
-
-    //
-    // CHANGE "READ THIS!" TO NORMAL COLOR
-    //
-#ifndef SPEAR
-#ifndef GOODTIMES
-    mainMenu[mainMenu.countItems()-3].setHighlighted(false);
-#endif
-#endif
-
-    pickquick = 0;
-
-    return 0;
-}
-
-
-#ifndef SPEAR
-/////////////////////
-//
-// DRAW NEW EPISODE MENU
-//
-void
-DrawNewEpisode (void)
-{
-    int i;
-
-#ifdef JAPAN
-    CA_CacheScreen (S_EPISODEPIC);
-#else
-    ClearMScreen ();
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
-
-    DrawWindow (NE_X - 4, NE_Y - 4, NE_W + 8, NE_H + 8, BKGDCOLOR);
-    SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
-    PrintY = 2;
-    WindowX = 0;
-#ifdef SPANISH
-    US_CPrint ("Cual episodio jugar?");
-#else
-    US_CPrint ("Which episode to play?");
-#endif
-#endif
-
-    SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
-    DrawMenu (&NewEitems, &NewEmenu[0]);
-
-    for (i = 0; i < 6; i++)
-        VWB_DrawPic (NE_X + 32, NE_Y + i * 26, C_EPISODE1PIC + i);
-
-    VW_UpdateScreen ();
-    MenuFadeIn ();
-    WaitKeyUp ();
-}
-#endif
-
-/////////////////////
-//
-// DRAW NEW GAME MENU
-//
-void
-DrawNewGame (void)
-{
-#ifdef JAPAN
-    CA_CacheScreen (S_SKILLPIC);
-#else
-    ClearMScreen ();
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
-
-    SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
-    PrintX = NM_X + 20;
-    PrintY = NM_Y - 32;
-
-#ifndef SPEAR
-#ifdef SPANISH
-    US_Print ("Eres macho?");
-#else
-    US_Print ("How tough are you?");
-#endif
-#else
-    VWB_DrawPic (PrintX, PrintY, C_HOWTOUGHPIC);
-#endif
-
-    DrawWindow (NM_X - 5, NM_Y - 10, NM_W, NM_H, BKGDCOLOR);
-#endif
-
-    DrawMenu (&NewItems, &NewMenu[0]);
-    DrawNewGameDiff (NewItems.curpos);
-    VW_UpdateScreen ();
-    MenuFadeIn ();
-    WaitKeyUp ();
-}
-
-
-////////////////////////
-//
-// DRAW NEW GAME GRAPHIC
-//
-void
-DrawNewGameDiff (int w)
-{
-    VWB_DrawPic (NM_X + 185, NM_Y + 7, w + C_BABYMODEPIC);
-}
-
-
-////////////////////////////////////////////////////////////////////
-//
-// HANDLE SOUND MENU
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_Sound (int)
-{
-    int which;
-
-    DrawSoundMenu ();
-    MenuFadeIn ();
-    WaitKeyUp ();
-
-    do
-    {
-        which = HandleMenu (&SndItems, &SndMenu[0], NULL);
-        //
-        // HANDLE MENU CHOICES
-        //
-        switch (which)
-        {
-                //
-                // SOUND EFFECTS
-                //
-            case 0:
-                if (SoundMode != sdm_Off)
-                {
-                    SD_WaitSoundDone ();
-                    SD_SetSoundMode (sdm_Off);
-                    DrawSoundMenu ();
-                }
-                break;
-            case 1:
-                if (SoundMode != sdm_PC)
-                {
-                    SD_WaitSoundDone ();
-                    SD_SetSoundMode (sdm_PC);
-                    CA_LoadAllSounds ();
-                    DrawSoundMenu ();
-                    ShootSnd ();
-                }
-                break;
-            case 2:
-                if (SoundMode != sdm_AdLib)
-                {
-                    SD_WaitSoundDone ();
-                    SD_SetSoundMode (sdm_AdLib);
-                    CA_LoadAllSounds ();
-                    DrawSoundMenu ();
-                    ShootSnd ();
-                }
-                break;
-
-                //
-                // DIGITIZED SOUND
-                //
-            case 5:
-                if (DigiMode != sds_Off)
-                {
-                    SD_SetDigiDevice (sds_Off);
-                    DrawSoundMenu ();
-                }
-                break;
-            case 6:
-/*                if (DigiMode != sds_SoundSource)
-                {
-                    SD_SetDigiDevice (sds_SoundSource);
-                    DrawSoundMenu ();
-                    ShootSnd ();
-                }*/
-                break;
-            case 7:
-                if (DigiMode != sds_SoundBlaster)
-                {
-                    SD_SetDigiDevice (sds_SoundBlaster);
-                    DrawSoundMenu ();
-                    ShootSnd ();
-                }
-                break;
-
-                //
-                // MUSIC
-                //
-            case 10:
-                if (MusicMode != smm_Off)
-                {
-                    SD_SetMusicMode (smm_Off);
-                    DrawSoundMenu ();
-                    ShootSnd ();
-                }
-                break;
-            case 11:
-                if (MusicMode != smm_AdLib)
-                {
-                    SD_SetMusicMode (smm_AdLib);
-                    DrawSoundMenu ();
-                    ShootSnd ();
-                    StartCPMusic (MENUSONG);
-                }
-                break;
-        }
-    }
-    while (which >= 0);
-
-    MenuFadeOut ();
-
-    return 0;
-}
-
-
-//////////////////////
-//
-// DRAW THE SOUND MENU
-//
-void
-DrawSoundMenu (void)
-{
-    int i, on;
-
-
-#ifdef JAPAN
-    CA_CacheScreen (S_SOUNDPIC);
-#else
-    //
-    // DRAW SOUND MENU
-    //
-    ClearMScreen ();
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
-
-    DrawWindow (SM_X - 8, SM_Y1 - 3, SM_W, SM_H1, BKGDCOLOR);
-    DrawWindow (SM_X - 8, SM_Y2 - 3, SM_W, SM_H2, BKGDCOLOR);
-    DrawWindow (SM_X - 8, SM_Y3 - 3, SM_W, SM_H3, BKGDCOLOR);
-#endif
-
-    //
-    // IF NO ADLIB, NON-CHOOSENESS!
-    //
-    if (!AdLibPresent && !SoundBlasterPresent)
-    {
-        SndMenu[2].active = SndMenu[10].active = SndMenu[11].active = 0;
-    }
-
-    if (!SoundBlasterPresent)
-        SndMenu[7].active = 0;
-
-    if (!SoundBlasterPresent)
-        SndMenu[5].active = 0;
-
-    DrawMenu (&SndItems, &SndMenu[0]);
-#ifndef JAPAN
-    VWB_DrawPic (100, SM_Y1 - 20, C_FXTITLEPIC);
-    VWB_DrawPic (100, SM_Y2 - 20, C_DIGITITLEPIC);
-    VWB_DrawPic (100, SM_Y3 - 20, C_MUSICTITLEPIC);
-#endif
-
-    for (i = 0; i < SndItems.amount; i++)
-#ifdef JAPAN
-        if (i != 3 && i != 4 && i != 8 && i != 9)
-#else
-        if (SndMenu[i].string[0])
-#endif
-        {
-            //
-            // DRAW SELECTED/NOT SELECTED GRAPHIC BUTTONS
-            //
-            on = 0;
-            switch (i)
-            {
-                    //
-                    // SOUND EFFECTS
-                    //
-                case 0:
-                    if (SoundMode == sdm_Off)
-                        on = 1;
-                    break;
-                case 1:
-                    if (SoundMode == sdm_PC)
-                        on = 1;
-                    break;
-                case 2:
-                    if (SoundMode == sdm_AdLib)
-                        on = 1;
-                    break;
-
-                    //
-                    // DIGITIZED SOUND
-                    //
-                case 5:
-                    if (DigiMode == sds_Off)
-                        on = 1;
-                    break;
-                case 6:
-//                    if (DigiMode == sds_SoundSource)
-//                        on = 1;
-                    break;
-                case 7:
-                    if (DigiMode == sds_SoundBlaster)
-                        on = 1;
-                    break;
-
-                    //
-                    // MUSIC
-                    //
-                case 10:
-                    if (MusicMode == smm_Off)
-                        on = 1;
-                    break;
-                case 11:
-                    if (MusicMode == smm_AdLib)
-                        on = 1;
-                    break;
-            }
-
-            if (on)
-                VWB_DrawPic (SM_X + 24, SM_Y1 + i * 13 + 2, C_SELECTEDPIC);
-            else
-                VWB_DrawPic (SM_X + 24, SM_Y1 + i * 13 + 2, C_NOTSELECTEDPIC);
-        }
-
-    DrawMenuGun (&SndItems);
-    VW_UpdateScreen ();
-}
-
 
 //
 // DRAW LOAD/SAVE IN PROGRESS
@@ -1478,7 +1060,7 @@ CP_LoadGame (int quick)
             LoadTheGame (file, LSA_X + 8, LSA_Y + 5);
             fclose (file);
 
-            StartGame = 1;
+			Menu::closeMenus();
             ShootSnd ();
             //
             // CHANGE "READ THIS!" TO NORMAL COLOR
@@ -1486,7 +1068,7 @@ CP_LoadGame (int quick)
 
 #ifndef SPEAR
 #ifndef GOODTIMES
-            mainMenu[mainMenu.countItems()-3].setHighlighted(false);
+            mainMenu[mainMenu.countItems()-3]->setHighlighted(false);
 #endif
 #endif
 
@@ -1704,128 +1286,6 @@ CP_SaveGame (int quick)
     MenuFadeOut ();
 
     return exit;
-}
-
-////////////////////////////////
-//
-// DRAW MOUSE SENSITIVITY SCREEN
-//
-void
-DrawMouseSens (void)
-{
-#ifdef JAPAN
-    CA_CacheScreen (S_MOUSESENSPIC);
-#else
-    ClearMScreen ();
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
-#ifdef SPANISH
-    DrawWindow (10, 80, 300, 43, BKGDCOLOR);
-#else
-    DrawWindow (10, 80, 300, 30, BKGDCOLOR);
-#endif
-
-    WindowX = 0;
-    WindowW = 320;
-    PrintY = 82;
-    SETFONTCOLOR (READCOLOR, BKGDCOLOR);
-    US_CPrint (STR_MOUSEADJ);
-
-    SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
-#ifdef SPANISH
-    PrintX = 14;
-    PrintY = 95 + 13;
-    US_Print (STR_SLOW);
-    PrintX = 252;
-    US_Print (STR_FAST);
-#else
-    PrintX = 14;
-    PrintY = 95;
-    US_Print (STR_SLOW);
-    PrintX = 269;
-    US_Print (STR_FAST);
-#endif
-#endif
-
-    VWB_Bar (60, 97, 200, 10, TEXTCOLOR);
-    DrawOutline (60, 97, 200, 10, 0, HIGHLIGHT);
-    DrawOutline (60 + 20 * mouseadjustment, 97, 20, 10, 0, READCOLOR);
-    VWB_Bar (61 + 20 * mouseadjustment, 98, 19, 9, READHCOLOR);
-
-    VW_UpdateScreen ();
-    MenuFadeIn ();
-}
-
-
-///////////////////////////
-//
-// ADJUST MOUSE SENSITIVITY
-//
-int
-MouseSensitivity (int)
-{
-    ControlInfo ci;
-    int exit = 0, oldMA;
-
-
-    oldMA = mouseadjustment;
-    DrawMouseSens ();
-    do
-    {
-        SDL_Delay(5);
-        ReadAnyControl (&ci);
-        switch (ci.dir)
-        {
-            case dir_North:
-            case dir_West:
-                if (mouseadjustment)
-                {
-                    mouseadjustment--;
-                    VWB_Bar (60, 97, 200, 10, TEXTCOLOR);
-                    DrawOutline (60, 97, 200, 10, 0, HIGHLIGHT);
-                    DrawOutline (60 + 20 * mouseadjustment, 97, 20, 10, 0, READCOLOR);
-                    VWB_Bar (61 + 20 * mouseadjustment, 98, 19, 9, READHCOLOR);
-                    VW_UpdateScreen ();
-                    SD_PlaySound (MOVEGUN1SND);
-                    TicDelay(20);
-                }
-                break;
-
-            case dir_South:
-            case dir_East:
-                if (mouseadjustment < 9)
-                {
-                    mouseadjustment++;
-                    VWB_Bar (60, 97, 200, 10, TEXTCOLOR);
-                    DrawOutline (60, 97, 200, 10, 0, HIGHLIGHT);
-                    DrawOutline (60 + 20 * mouseadjustment, 97, 20, 10, 0, READCOLOR);
-                    VWB_Bar (61 + 20 * mouseadjustment, 98, 19, 9, READHCOLOR);
-                    VW_UpdateScreen ();
-                    SD_PlaySound (MOVEGUN1SND);
-                    TicDelay(20);
-                }
-                break;
-        }
-
-        if (ci.button0 || Keyboard[sc_Space] || Keyboard[sc_Enter])
-            exit = 1;
-        else if (ci.button1 || Keyboard[sc_Escape])
-            exit = 2;
-
-    }
-    while (!exit);
-
-    if (exit == 2)
-    {
-        mouseadjustment = oldMA;
-        SD_PlaySound (ESCPRESSEDSND);
-    }
-    else
-        SD_PlaySound (SHOOTSND);
-
-    WaitKeyUp ();
-    MenuFadeOut ();
-
-    return 0;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -2669,38 +2129,6 @@ DrawChangeView (int view)
     US_CPrint (STR_SIZE3);
 #endif
     VW_UpdateScreen ();
-}
-
-
-////////////////////////////////////////////////////////////////////
-//
-// QUIT THIS INFERNAL GAME!
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_Quit (int)
-{
-#ifdef JAPAN
-    if (GetYorN (7, 11, C_QUITMSGPIC))
-#else
-
-#ifdef SPANISH
-    if (Confirm (ENDGAMESTR))
-#else
-    if (Confirm (endStrings[US_RndT () & 0x7 + (US_RndT () & 1)]))
-#endif
-
-#endif
-    {
-        VW_UpdateScreen ();
-        SD_MusicOff ();
-        SD_StopSound ();
-        MenuFadeOut ();
-        Quit (NULL);
-    }
-
-    mainMenu.draw();
-    return 0;
 }
 
 
@@ -3800,13 +3228,6 @@ CheckForEpisodes (void)
     if(!stat("vswap.wl6", &statbuf))
     {
         strcpy (extension, "wl6");
-        NewEmenu[2].active =
-            NewEmenu[4].active =
-            NewEmenu[6].active =
-            NewEmenu[8].active =
-            NewEmenu[10].active =
-            EpisodeSelect[1] =
-            EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
     }
     else
     {
@@ -3814,7 +3235,6 @@ CheckForEpisodes (void)
         {
             strcpy (extension, "wl3");
             numEpisodesMissing = 3;
-            NewEmenu[2].active = NewEmenu[4].active = EpisodeSelect[1] = EpisodeSelect[2] = 1;
         }
         else
         {

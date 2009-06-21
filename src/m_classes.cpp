@@ -1,4 +1,5 @@
 #include "wl_def.h"
+#include "wl_menu.h"
 
 static const int color_hlite[] = {
     DEACTIVE,
@@ -14,6 +15,8 @@ static const int color_norml[] = {
     0x6b
 };
 
+bool Menu::close = false;
+
 void MenuItem::setTextColor()
 {
 	if (isSelected())
@@ -26,16 +29,25 @@ void MenuItem::setTextColor()
 	}
 }
 
-MenuItem::MenuItem(const char string[36]) : enabled(true), highlight(false), selected(false), visible(true)
+MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) : activateListener(activateListener), enabled(true), highlight(false), picture(-1), selected(false), visible(true), pictureX(-1), pictureY(-1)
 {
 	setText(string);
+}
+
+void MenuItem::activate()
+{
+	if(activateListener != NULL)
+		activateListener(menu->getCurrentPosition());
 }
 
 void MenuItem::draw()
 {
 	setTextColor();
 
-	if (getActive())
+	if(picture != -1)
+		VWB_DrawPic(pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, picture);
+
+	if(getActive())
 		US_Print(getString());
 	else
 	{
@@ -44,7 +56,27 @@ void MenuItem::draw()
 		SETFONTCOLOR(TEXTCOLOR, BKGDCOLOR);
 	}
 
-	US_Print ("\n");
+	US_Print("\n");
+}
+
+void MenuItem::setPicture(int picture, int x, int y)
+{
+	this->picture = picture;
+	pictureX = x;
+	pictureY = y;
+}
+
+void MenuItem::setText(const char string[36])
+{
+	height = 13;
+	strcpy(this->string, string);
+	for(unsigned int i = 0;i < 36;i++)
+	{
+		if(string[i] == '\n')
+			height += 13;
+		else if(string[i] == '\0')
+			break;
+	}
 }
 
 LabelMenuItem::LabelMenuItem(const char string[36]) : MenuItem(string)
@@ -64,13 +96,14 @@ void LabelMenuItem::draw()
 	WindowY = oldWindowY;
 }
 
-BooleanMenuItem::BooleanMenuItem(const char string[36], boolean &value) : MenuItem(string), value(value)
+BooleanMenuItem::BooleanMenuItem(const char string[36], boolean &value, MENU_LISTENER_PROTOTYPE(activateListener)) : MenuItem(string, activateListener), value(value)
 {
 }
 
 void BooleanMenuItem::activate()
 {
 	value ^= 1;
+	MenuItem::activate();
 }
 
 void BooleanMenuItem::draw()
@@ -92,17 +125,26 @@ void FunctionMenuItem::activate()
 	if(fadeEnabled)
 		MenuFadeOut();
 	if(function != 0)
-		function(0);
+		function(menu->getCurrentPosition());
 }
 
-MenuSwitcherMenuItem::MenuSwitcherMenuItem(const char string[36], Menu &menu) : MenuItem(string), menu(menu)
+MenuSwitcherMenuItem::MenuSwitcherMenuItem(const char string[36], Menu &menu, MENU_LISTENER_PROTOTYPE(activateListener)) : MenuItem(string, activateListener), menu(menu)
 {
 }
 
 void MenuSwitcherMenuItem::activate()
 {
-	MenuFadeOut();
-	menu.show();
+	// If there is an activateListener then use it to determine if the menu should switch
+	if(activateListener == NULL || activateListener(MenuItem::menu->getCurrentPosition()))
+	{
+		MenuFadeOut();
+		menu.show();
+		if(!Menu::areMenusClosed())
+		{
+			MenuItem::menu->draw();
+			MenuFadeIn();
+		}
+	}
 }
 
 SliderMenuItem::SliderMenuItem(int &value, int width, int max, const char begString[36], const char endString[36]) : MenuItem(endString), value(value), width(width), max(max)
@@ -147,18 +189,128 @@ void SliderMenuItem::left()
 void SliderMenuItem::right()
 {
 	value += value < max ? 1 : 0;
-	SD_PlaySound (MOVEGUN1SND);
+	SD_PlaySound(MOVEGUN1SND);
+}
+
+MultipleChoiceMenuItem::MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, int numOptions, int curOption) : MenuItem("", changeListener), numOptions(numOptions), curOption(curOption)
+{
+	// Copy all of the options
+	this->options = new char *[numOptions];
+	for(unsigned int i = 0;i < numOptions;i++)
+	{
+		if(options[i] == NULL)
+			this->options[i] = NULL;
+		else
+		{
+			this->options[i] = new char[strlen(options[i])+1];
+			strcpy(this->options[i], options[i]);
+		}
+	}
+
+	// clamp current option
+	if(curOption < 0)
+		curOption = 0;
+	else if(curOption >= numOptions)
+		curOption = numOptions-1;
+
+	while(options[curOption] == NULL)
+	{
+		curOption--; // Easier to go backwards
+		if(curOption < 0)
+			curOption = numOptions-1;
+	}
+
+	if(numOptions > 0)
+		setText(options[curOption]);
+}
+
+MultipleChoiceMenuItem::~MultipleChoiceMenuItem()
+{
+	for(unsigned int i = 0;i < numOptions;i++)
+		delete[] options[i];
+	delete[] options;
+}
+
+void MultipleChoiceMenuItem::activate()
+{
+	if(activateListener != NULL)
+		activateListener(curOption);
+}
+
+void MultipleChoiceMenuItem::draw()
+{
+	VWB_Bar(PrintX, PrintY, menu->getWidth()-menu->getIndent()-menu->getX(), 13, BKGDCOLOR);
+	MenuItem::draw();
+}
+
+void MultipleChoiceMenuItem::left()
+{
+	do
+	{
+		curOption--;
+		if(curOption < 0)
+			curOption = numOptions-1;
+	}
+	while(options[curOption] == NULL);
+	setText(options[curOption]);
+	activate();
+	SD_PlaySound(MOVEGUN1SND);
+}
+
+void MultipleChoiceMenuItem::right()
+{
+	do
+	{
+		curOption++;
+		if(curOption >= numOptions)
+			curOption = 0;
+	}
+	while(options[curOption] == NULL);
+	setText(options[curOption]);
+	activate();
+	SD_PlaySound(MOVEGUN1SND);
+}
+
+TextInputMenuItem::TextInputMenuItem(std::string text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener)) : MenuItem("", posteditListener), max(max), preeditListener(preeditListener)
+{
+	setValue(text);
+}
+
+void TextInputMenuItem::activate()
+{
+	if(preeditListener == NULL || preeditListener(menu->getCurrentPosition()))
+	{
+		setTextColor();
+		fontnumber = 0;
+		char* buffer = new char[max+1];
+		US_LineInput(menu->getX() + menu->getIndent() + 2, PrintY, buffer, getValue(), true, max, menu->getWidth() - menu->getIndent() - menu->getX());
+		setValue(buffer);
+		delete[] buffer;
+		fontnumber = 1;
+		MenuItem::activate();
+	}
+}
+
+void TextInputMenuItem::draw()
+{
+	setTextColor();
+	DrawOutline(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - menu->getX(), 11, fontcolor, fontcolor);
+	PrintX = menu->getX() + menu->getIndent() + 2;
+	PrintY += 1;
+	fontnumber = 0;
+	US_Print(getValue());
+	fontnumber = 1;
 }
 
 void Menu::drawGun(int x, int &y, int which, int basey)
 {
 	VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
-	y = basey + which * 13;
+	y = basey + getHeight(which);
 	if(getIndent() != 0)
 		VWB_DrawPic (x, y, C_CURSOR1PIC);
 
 	PrintX = getX() + getIndent();
-	PrintY = getY() + which * 13;
+	PrintY = getY() + getHeight(which);
 	getIndex(which)->setSelected(true);
 	getIndex(which)->draw();
 
@@ -171,15 +323,16 @@ void Menu::eraseGun(int x, int y, int which)
 	VWB_Bar(x - 1, y, 25, 16, BKGDCOLOR);
 
 	PrintX = getX() + getIndent();
-	PrintY = getY() + which * 13;
+	PrintY = getY() + getHeight(which);
 	getIndex(which)->setSelected(false);
 	getIndex(which)->draw();
 	VW_UpdateScreen();
 }
 
-Menu::Menu(int x, int y, int w, int indent, void (*handler)(unsigned int), const char headText[36]) : x(x), y(y), w(w), indent(indent), headPicture(-1), curPos(0), handler(handler)
+Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), headPicture(-1), curPos(0), height(0)
 {
-	strcpy(this->headText, headText);
+	for(unsigned int i = 0;i < 36;i++)
+		headText[i] = '\0';
 }
 Menu::~Menu()
 {
@@ -194,9 +347,10 @@ void Menu::addItem(MenuItem *item)
 	items.push_back(item);
 	if(!item->isEnabled() && items.size()-1 == curPos)
 		curPos++;
+	height += item->getHeight();
 }
 
-const unsigned int Menu::countItems() const
+unsigned int Menu::countItems() const
 {
 	unsigned int num = 0;
 	for(unsigned int i = 0;i < items.size();i++)
@@ -207,7 +361,26 @@ const unsigned int Menu::countItems() const
 	return num;
 }
 
-MenuItem *Menu::getIndex(int index)
+int Menu::getHeight(int position) const
+{
+	unsigned int num = 0;
+	for(unsigned int i = 0;i < items.size();i++)
+	{
+		if(position == 0)
+			break;
+
+		if(items[i]->isVisible())
+		{
+			num += items[i]->getHeight();
+			position--;
+		}
+	}
+	if(position >= 0)
+		return num;
+	return num + 6;
+}
+
+MenuItem *Menu::getIndex(int index) const
 {
 	unsigned int idx = 0;
 	for(idx = 0;idx < items.size() && index >= 0;idx++)
@@ -219,7 +392,7 @@ MenuItem *Menu::getIndex(int index)
 	return idx >= items.size() ? items[items.size()-1] : items[idx];
 }
 
-void Menu::drawMenu()
+void Menu::drawMenu() const
 {
 	int which = curPos;
 
@@ -228,15 +401,29 @@ void Menu::drawMenu()
 	WindowW = 320;
 	WindowH = 200;
 
+	PrintY = getY();
+	int y = getY();
+	int selectedY = getY(); // See later
+
 	for (unsigned int i = 0; i < countItems(); i++)
 	{
-		getIndex(i)->setSelected(i == curPos);
-		PrintY = getY() + i * 13;
-		getIndex(i)->draw();
+		if(i == curPos)
+			selectedY = y;
+		else
+		{
+			PrintY = y;
+			getIndex(i)->draw();
+		}
+		y += getIndex(i)->getHeight();
 	}
+
+	// In order to draw the skill menu correctly we need to draw the selected option now
+	PrintY = selectedY;
+	getIndex(curPos)->setSelected(true);
+	getIndex(curPos)->draw();
 }
 
-void Menu::draw()
+void Menu::draw() const
 {
 	ClearMScreen();
 	if(headPicture != -1)
@@ -249,7 +436,7 @@ void Menu::draw()
 	SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
 	WindowX = 0;
 	WindowW = 320;
-    PrintY = getY() - 16;
+    PrintY = getY() - 22;
 	US_CPrint(headText);
 
 	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);
@@ -265,18 +452,20 @@ int Menu::handle()
 	int32_t lastBlinkTime, timer;
 	ControlInfo ci;
 
+	if(close)
+		return -1;
 
 	which = curPos;
 	x = getX() & -8;
 	basey = getY() - 2;
-	y = basey + which * 13;
+	y = basey + getHeight(which);
 
 	if(getIndent() != 0)
 		VWB_DrawPic (x, y, C_CURSOR1PIC);
 	if (redrawitem)
 	{
 		PrintX = getX() + getIndent();
-		PrintY = getY() + which * 13;;
+		PrintY = getY() + getHeight(which);
 		getIndex(which)->draw();
 	}
 	VW_UpdateScreen ();
@@ -341,6 +530,7 @@ int Menu::handle()
 			if (!ok)
 			{
 				for (i = 0; i < which; i++)
+				{
 					if (getIndex(i)->isEnabled() && getIndex(i)->getString()[0] == key)
 					{
 						eraseGun(x, y, which);
@@ -349,6 +539,7 @@ int Menu::handle()
 						IN_ClearKeysDown ();
 						break;
 					}
+				}
 			}
 		}
 
@@ -429,7 +620,7 @@ int Menu::handle()
 			case dir_West:
 				getIndex(which)->left();
 				PrintX = getX() + getIndent();
-				PrintY = getY() + which * 13;
+				PrintY = getY() + getHeight(which);
 				getIndex(which)->draw();
 				VW_UpdateScreen();
 				TicDelay(20);
@@ -437,7 +628,7 @@ int Menu::handle()
 			case dir_East:
 				getIndex(which)->right();
 				PrintX = getX() + getIndent();
-				PrintY = getY() + which * 13;
+				PrintY = getY() + getHeight(which);
 				getIndex(which)->draw();
 				VW_UpdateScreen();
 				TicDelay(20);
@@ -463,7 +654,7 @@ int Menu::handle()
 	{
 		VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 		PrintX = getX() + getIndent();
-		PrintY = getY() + which * 13;
+		PrintY = getY() + getHeight(which);
 		getIndex(which)->draw();
 		redrawitem = 1;
 	}
@@ -482,7 +673,7 @@ int Menu::handle()
 			getIndex(which)->activate();
 			VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 			PrintX = getX() + getIndent();
-			PrintY = getY() + which * 13;
+			PrintY = getY() + getHeight(which);
 			getIndex(which)->draw();
 			VW_UpdateScreen();
 			return which;
@@ -495,18 +686,22 @@ int Menu::handle()
 	return 0;                   // JUST TO SHUT UP THE ERROR MESSAGES!
 }
 
+void Menu::setHeadText(const char text[36])
+{
+	strcpy(headText, text);
+}
+
 void Menu::show()
 {
+	if(entryListener != NULL)
+		entryListener(0);
+
 	draw();
 	MenuFadeIn();
 	WaitKeyUp();
 
 	int item = 0;
-	while((item = handle()) != -1)
-	{
-		if(handler != NULL)
-			handler(item);
-	}
+	while((item = handle()) != -1);
 
 	MenuFadeOut ();
 }

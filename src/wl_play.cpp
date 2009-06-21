@@ -1,6 +1,7 @@
 // WL_PLAY.C
 
 #include "wl_def.h"
+#include "wl_menu.h"
 #pragma hdrstop
 
 #include "wl_cloudsky.h"

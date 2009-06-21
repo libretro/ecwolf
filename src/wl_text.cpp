@@ -1,6 +1,7 @@
 // WL_TEXT.C
 
 #include "wl_def.h"
+#include "wl_menu.h"
 #pragma hdrstop
 
 /*

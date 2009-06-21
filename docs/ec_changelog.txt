@@ -1,3 +1,24 @@
+June 20th, 2009
+-----------------------------
+- Removed custom menu handlers in favor of the listeners system since it
+  offers order independance with equal flexibility.
+- Separated the Adlib sounds and music volume.
+
+June 19th, 2009
+-----------------------------
+- Did a lot of work on the menu system.  I've added a text entry type and
+  introduced the concept of listeners to alter the functionality of specific
+  MenuItems.
+
+June 17th, 2009
+-----------------------------
+- Continued menu work, removed old sound devices menu in favor of a more
+  flexable multiple choice option.
+
+June 16th, 2009
+-----------------------------
+- More menu work.  The episode and skill menus are now using the new code.
+
 December 16th, 2008
 -----------------------------
 - Cleaned up some menu source code.
