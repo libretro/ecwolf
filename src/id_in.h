@@ -90,6 +90,9 @@ typedef	int		ScanCode;
 #define	sc_Y			SDLK_y
 #define	sc_Z			SDLK_z
 
+#define sc_Equals		SDLK_EQUALS
+#define sc_Minus		SDLK_MINUS
+
 #define	key_None		0
 
 typedef	enum		{

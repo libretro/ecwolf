@@ -1,6 +1,7 @@
 // WL_ACT1.C
 
 #include "wl_def.h"
+#include "id_sd.h"
 #pragma hdrstop
 
 /*

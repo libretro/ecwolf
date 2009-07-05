@@ -2,6 +2,10 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_sd.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_us.h"
 #pragma hdrstop
 
 #include "wl_cloudsky.h"
@@ -552,6 +556,7 @@ void CenterWindow (word w, word h)
 =====================
 */
 
+bool changeSize = true;
 void CheckKeys (void)
 {
     ScanCode scan;
@@ -562,6 +567,22 @@ void CheckKeys (void)
 
     scan = LastScan;
 
+	// [BL] Allow changing the screen size with the -/= keys a la Doom.
+	if(changeSize)
+	{
+		if(Keyboard[sc_Equals] && !Keyboard[sc_Minus])
+			NewViewSize(viewsize+1);
+		else if(!Keyboard[sc_Equals] && Keyboard[sc_Minus])
+			NewViewSize(viewsize-1);
+		if(Keyboard[sc_Equals] || Keyboard[sc_Minus])
+		{
+			SD_PlaySound(HITWALLSND);
+			DrawPlayScreen();
+			changeSize = false;
+		}
+	}
+	else if(!Keyboard[sc_Equals] && !Keyboard[sc_Minus])
+		changeSize = true;
 
 #ifdef SPEAR
     //

@@ -8,6 +8,11 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_pm.h"
+#include "id_sd.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_us.h"
 #pragma hdrstop
 #include "wl_atmos.h"
 #include <SDL_syswm.h>
@@ -1369,6 +1374,9 @@ void ShowViewSize (int width)
 
 void NewViewSize (int width)
 {
+	if(width < 4 || width > 21)
+		return;
+
     viewsize = width;
     if(viewsize == 21)
         SetViewSize(screenWidth, screenHeight);

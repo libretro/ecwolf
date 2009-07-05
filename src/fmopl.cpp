@@ -81,6 +81,7 @@ Revision History:
 #include <math.h>
 #include <string.h>
 #include "wl_def.h"
+#include "id_sd.h"
 
 //#include "driver.h"		/* use M.A.M.E. */
 

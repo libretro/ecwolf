@@ -1,7 +1,14 @@
+June 22nd, 2009
+-----------------------------
+- Removed "Change View" menu (F5 IIRC) and replace it with Doom style in game
+  changing with the -/= keys.
+- The load/save menus are now using the new system.  Also save slots are
+  dynamically created so you're no longer limited to 10.
+
 June 20th, 2009
 -----------------------------
-- Removed custom menu handlers in favor of the listeners system since it
-  offers order independance with equal flexibility.
+- Removed custom menu handlers in favor of the listeners system since it offers
+  order independance with equal flexibility.
 - Separated the Adlib sounds and music volume.
 
 June 19th, 2009

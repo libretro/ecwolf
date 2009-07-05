@@ -1,5 +1,8 @@
 #include "wl_def.h"
-
+#include "id_sd.h"
+#include "id_in.h"
+#include "id_vl.h"
+#include "id_vh.h"
 
 pictabletype	*pictable;
 SDL_Surface     *latchpics[NUMLATCHPICS];

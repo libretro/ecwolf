@@ -13,17 +13,52 @@
 	#include <unistd.h>
 #endif
 
+#define LSA_X	96
+#define LSA_Y	80
+#define LSA_W	130
+#define LSA_H	42
+
+#include "m_classes.h"
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_sd.h"
+#include "id_in.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_us.h"
 #pragma hdrstop
-//new #includes
+#include <deque>
 #include <vector>
 using namespace std;
 
-extern int lastgamemusicoffset;
-extern int numEpisodesMissing;
+struct SaveFile
+{
+	public:
+		static deque<SaveFile>	files;
 
+		char	name[32]; // Displayed on the menu.
+		char	filename[15];
+};
+deque<SaveFile> SaveFile::files;
+
+extern int	lastgamemusicoffset;
+extern int	numEpisodesMissing;
+int			episode = 0;
+bool		quickSaveLoad = false;
+
+MENU_LISTENER(EnterControlBase);
+MENU_LISTENER(EnterLoadMenu);
+MENU_LISTENER(EnterSaveMenu);
+
+Menu loadGame(LSM_X, LSM_Y, LSM_W, 24, EnterLoadMenu);
 Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
+Menu saveGame(LSM_X, LSM_Y, LSM_W, 24, EnterSaveMenu);
+Menu soundBase(24, 45, 284, 24);
+Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
+Menu mouseSensitivity(10, 80, 300, 0);
+Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
+Menu skills(NM_X, NM_Y, NM_W, 24);
+
 MENU_LISTENER(PlayDemosOrReturnToGame)
 {
 	Menu::closeMenus();
@@ -65,11 +100,6 @@ MENU_LISTENER(ViewScoresOrEndGame)
 	}
 	return true;
 }
-////////////////////////////////////////////////////////////////////
-//
-// QUIT THIS INFERNAL GAME!
-//
-////////////////////////////////////////////////////////////////////
 MENU_LISTENER(QuitGame)
 {
 #ifdef JAPAN
@@ -120,7 +150,6 @@ const char endStrings[9][80] = {
 		mainMenu.draw();
 	return false;
 }
-Menu soundBase(24, 45, 284, 24);
 MENU_LISTENER(SetSoundEffects)
 {
 	SDMode modes[3] = { sdm_Off, sdm_PC, sdm_AdLib };
@@ -147,8 +176,6 @@ MENU_LISTENER(SetMusic)
 	}
 	return true;
 }
-MENU_LISTENER(EnterControlBase);
-Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 MENU_LISTENER(EnterControlBase)
 {
 	controlBase[1]->setEnabled(mouseenabled);
@@ -156,10 +183,127 @@ MENU_LISTENER(EnterControlBase)
 	controlBase[3]->setEnabled(IN_JoyPresent());
 	controlBase.draw();
 }
-Menu mouseSensitivity(10, 80, 300, 0);
-Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
-Menu skills(NM_X, NM_Y, NM_W, 24);
-int episode = 0;
+MENU_LISTENER(BeginEditSave)
+{
+	bool ret = Confirm(GAMESVD);
+	saveGame.draw();
+	return ret;
+}
+MENU_LISTENER(PerformSaveGame)
+{
+	SaveFile file;
+
+	// Copy the name
+	strcpy(file.name, static_cast<TextInputMenuItem *> (saveGame[which])->getValue());
+	if(which == 0) // New
+	{
+		// Locate a available filename.  I don't want to assume savegamX.yza so this
+		// might not be the fastest way to do things.
+		bool nextSaveNumber = false;
+		for(unsigned int i = 0;i < 10000;i++)
+		{
+			sprintf(file.filename, "savegam%u.%s", i, extension);
+			for(unsigned int j = 0;j < SaveFile::files.size();j++)
+			{
+				if(strcasecmp(file.filename, SaveFile::files[j].filename) == 0)
+				{
+					nextSaveNumber = true;
+					continue;
+				}
+			}
+			if(nextSaveNumber)
+			{
+				nextSaveNumber = false;
+				continue;
+			}
+			break;
+		}
+
+		SaveFile::files.push_front(file);
+
+		saveGame[0]->setHighlighted(false);
+		saveGame.setCurrentPosition(1);
+		loadGame.setCurrentPosition(0);
+	}
+	else
+	{
+		strcpy(file.filename, SaveFile::files[which-1].filename);
+		SaveFile::files[which-1] = file;
+		loadGame.setCurrentPosition(which-1);
+	}
+
+	FILE *fileh = fopen(file.filename, "wb");
+	fwrite(file.name, 32, 1, fileh);
+	fseek(fileh, 32, SEEK_SET);
+	if(!quickSaveLoad)
+	{
+		DrawLSAction(1);
+		SaveTheGame(fileh, LSA_X + 8, LSA_Y + 5);
+	}
+	else
+	{
+		fontnumber = 1;
+		Message (STR_SAVING "...");
+		fontnumber = 0;
+		SaveTheGame(fileh, 0, 0);
+	}
+	fclose(fileh);
+#ifdef _arch_dreamcast
+	DC_SaveToVMU(file.filename, 2);
+#endif
+	if(!quickSaveLoad)
+		Menu::closeMenus(true);
+
+	return true;
+}
+MENU_LISTENER(LoadSaveGame)
+{
+#ifdef _arch_dreamcast
+	DC_LoadFromVMU(SaveFile::files[which].filename);
+#endif
+	FILE *file = fopen(SaveFile::files[which].filename, "rb");
+	fseek(file, 32, SEEK_SET);
+	if(!quickSaveLoad)
+		DrawLSAction(0);
+	loadedgame = true;
+	if(!quickSaveLoad)
+		LoadTheGame(file, LSA_X + 8, LSA_Y + 5);
+	else
+		LoadTheGame(file, 0, 0);
+	fclose(file);
+	ShootSnd();
+	if(!quickSaveLoad)
+		Menu::closeMenus(true);
+
+	saveGame.setCurrentPosition(which+1);
+	return false;
+}
+MENU_LISTENER(EnterLoadMenu)
+{
+	if(saveGame.getNumItems() == 0)
+		EnterSaveMenu(which); // This is needed so that there are no crashes on quick save/load
+
+	loadGame.clear();
+
+	for(unsigned int i = 0;i < SaveFile::files.size();i++)
+		loadGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
+
+	return true;
+}
+MENU_LISTENER(EnterSaveMenu)
+{
+	// Create the menu now
+	saveGame.clear();
+
+	MenuItem *newSave = new TextInputMenuItem("    - NEW SAVE -", 31, NULL, PerformSaveGame, true);
+	newSave->setHighlighted(true);
+	saveGame.addItem(newSave);
+
+	for(unsigned int i = 0;i < SaveFile::files.size();i++)
+		saveGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame));
+
+	return true;
+}
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	if(which >= 6-numEpisodesMissing)
@@ -214,11 +358,12 @@ void CreateMenus()
 #endif
 	mainMenu.addItem(new MenuSwitcherMenuItem(STR_SD, soundBase));
 	mainMenu.addItem(new MenuSwitcherMenuItem(STR_CL, controlBase));
-	mainMenu.addItem(new FunctionMenuItem(STR_LG, CP_LoadGame));
-	MenuItem *sg = new FunctionMenuItem(STR_SG, CP_SaveGame);
+	MenuItem *lg = new MenuSwitcherMenuItem(STR_LG, loadGame);
+	lg->setEnabled(SaveFile::files.size() > 0);
+	mainMenu.addItem(lg);
+	MenuItem *sg = new MenuSwitcherMenuItem(STR_SG, saveGame);
 	sg->setEnabled(false);
 	mainMenu.addItem(sg);
-	mainMenu.addItem(new FunctionMenuItem(STR_CV, CP_ChangeView));
 	MenuItem *rt = new FunctionMenuItem("Read This!", 0);
 #if defined(SPEAR) || defined(GOODTIMES)
 	rt->setVisible(false);
@@ -319,6 +464,9 @@ void CreateMenus()
 	controlBase.addItem(new FunctionMenuItem(STR_CUSTOM, CustomControls));
 	//HandleControlBase(static_cast<unsigned> (-1)); // Enabled/Disable options
 
+	loadGame.setHeadPicture(C_LOADGAMEPIC);
+	saveGame.setHeadPicture(C_SAVEGAMEPIC);
+
 	mouseSensitivity.addItem(new LabelMenuItem(STR_MOUSEADJ));
 	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 10, STR_SLOW, STR_FAST));
 }
@@ -354,19 +502,6 @@ int CP_ReadThis (int);
 #endif
 #endif
 
-CP_itemtype LSMenu[] = {
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0},
-    {1, "", 0}
-};
-
 CP_itemtype CusMenu[] = {
     {1, "", 0},
     {0, "", 0},
@@ -380,16 +515,10 @@ CP_itemtype CusMenu[] = {
 };
 
 // CP_iteminfo struct format: short x, y, amount, curpos, indent;
-CP_iteminfo LSItems   = { LSM_X, LSM_Y, lengthof(LSMenu), 0, 24 },
-            CusItems  = { 8, CST_Y + 13 * 2, lengthof(CusMenu), -1, 0};
+CP_iteminfo CusItems  = { 8, CST_Y + 13 * 2, lengthof(CusMenu), -1, 0};
 
-int EpisodeSelect[6] = { 1 };
-
-
-static int SaveGamesAvail[10];
 static int SoundStatus = 1;
 static int pickquick;
-static char SaveGameNames[10][32];
 static char SaveName[13] = "savegam?.";
 
 
@@ -541,19 +670,15 @@ US_ControlPanel (ScanCode scancode)
             goto finishup;
 
         case sc_F2:
-            CP_SaveGame (0);
+			saveGame.show();
             goto finishup;
 
         case sc_F3:
-            CP_LoadGame (0);
+			loadGame.show();
             goto finishup;
 
         case sc_F4:
             soundBase.show();
-            goto finishup;
-
-        case sc_F5:
-            CP_ChangeView (0);
             goto finishup;
 
         case sc_F6:
@@ -563,6 +688,9 @@ US_ControlPanel (ScanCode scancode)
         finishup:
             CleanupControlPanel ();
             return;
+
+		default:
+			break;
     }
 
 	if(ingame)
@@ -785,13 +913,12 @@ CP_CheckQuick (ScanCode scancode)
         // QUICKSAVE
         //
         case sc_F8:
-            if (SaveGamesAvail[LSItems.curpos] && pickquick)
+			if(saveGame.getCurrentPosition() != 0)
             {
-                CA_CacheGrChunk (STARTFONT + 1);
-                fontnumber = 1;
-                Message (STR_SAVING "...");
-                CP_SaveGame (1);
-                fontnumber = 0;
+				quickSaveLoad = true;
+				CA_CacheGrChunk(STARTFONT + 1);
+				PerformSaveGame(saveGame.getCurrentPosition());
+				quickSaveLoad = false;
             }
             else
             {
@@ -813,7 +940,8 @@ CP_CheckQuick (ScanCode scancode)
                     VL_ClearScreen(0);
 
                 lastgamemusicoffset = StartCPMusic (MENUSONG);
-                pickquick = CP_SaveGame (0);
+				Menu::closeMenus(false);
+                saveGame.show();
 
                 SETFONTCOLOR (0, 15);
                 IN_ClearKeysDown ();
@@ -848,21 +976,17 @@ CP_CheckQuick (ScanCode scancode)
         // QUICKLOAD
         //
         case sc_F9:
-            if (SaveGamesAvail[LSItems.curpos] && pickquick)
-            {
-                char string[100] = STR_LGC;
-
-
-                CA_CacheGrChunk (STARTFONT + 1);
-                fontnumber = 1;
-
-                strcat (string, SaveGameNames[LSItems.curpos]);
-                strcat (string, "\"?");
-
-                if (Confirm (string))
-                    CP_LoadGame (1);
-
-                fontnumber = 0;
+			if(saveGame.getCurrentPosition() != 0)
+			{
+				quickSaveLoad = true;
+				char string[100];
+				sprintf(string, STR_LGC "%s\"?", SaveFile::files[saveGame.getCurrentPosition()-1].name);
+				CA_CacheGrChunk(STARTFONT + 1);
+				fontnumber = 1;
+				if(Confirm(string))
+					LoadSaveGame(saveGame.getCurrentPosition()-1);
+				fontnumber = 0;
+				quickSaveLoad = false;
             }
             else
             {
@@ -884,7 +1008,8 @@ CP_CheckQuick (ScanCode scancode)
                     VL_ClearScreen(0);
 
                 lastgamemusicoffset = StartCPMusic (MENUSONG);
-                pickquick = CP_LoadGame (0);    // loads lastgamemusicoffs
+				Menu::closeMenus(false);
+                loadGame.show();
 
                 SETFONTCOLOR (0, 15);
                 IN_ClearKeysDown ();
@@ -967,11 +1092,6 @@ CP_EndGame (int)
 void
 DrawLSAction (int which)
 {
-#define LSA_X   96
-#define LSA_Y   80
-#define LSA_W   130
-#define LSA_H   42
-
     DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, TEXTCOLOR);
     DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
     VWB_DrawPic (LSA_X + 8, LSA_Y + 5, C_DISKLOADING1PIC);
@@ -987,305 +1107,6 @@ DrawLSAction (int which)
         US_Print (STR_SAVING "...");
 
     VW_UpdateScreen ();
-}
-
-
-////////////////////////////////////////////////////////////////////
-//
-// LOAD SAVED GAMES
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_LoadGame (int quick)
-{
-    FILE *file;
-    int which, exit = 0;
-    char name[13];
-
-
-    strcpy (name, SaveName);
-
-    //
-    // QUICKLOAD?
-    //
-    if (quick)
-    {
-        which = LSItems.curpos;
-
-        if (SaveGamesAvail[which])
-        {
-            name[7] = which + '0';
-#ifdef _arch_dreamcast
-            DC_LoadFromVMU(name);
-#endif
-            file = fopen (name, "rb");
-            fseek (file, 32, SEEK_SET);
-            loadedgame = true;
-            LoadTheGame (file, 0, 0);
-            loadedgame = false;
-            fclose (file);
-
-            DrawFace ();
-            DrawHealth ();
-            DrawLives ();
-            DrawLevel ();
-            DrawAmmo ();
-            DrawKeys ();
-            DrawWeapon ();
-            DrawScore ();
-            ContinueMusic (lastgamemusicoffset);
-            return 1;
-        }
-    }
-
-    DrawLoadSaveScreen (0);
-
-    do
-    {
-        which = HandleMenu (&LSItems, &LSMenu[0], TrackWhichGame);
-        if (which >= 0 && SaveGamesAvail[which])
-        {
-            ShootSnd ();
-            name[7] = which + '0';
-
-#ifdef _arch_dreamcast
-            DC_LoadFromVMU(name);
-#endif
-            file = fopen (name, "rb");
-            fseek (file, 32, SEEK_SET);
-
-            DrawLSAction (0);
-            loadedgame = true;
-
-            LoadTheGame (file, LSA_X + 8, LSA_Y + 5);
-            fclose (file);
-
-			Menu::closeMenus();
-            ShootSnd ();
-            //
-            // CHANGE "READ THIS!" TO NORMAL COLOR
-            //
-
-#ifndef SPEAR
-#ifndef GOODTIMES
-            mainMenu[mainMenu.countItems()-3]->setHighlighted(false);
-#endif
-#endif
-
-            exit = 1;
-            break;
-        }
-
-    }
-    while (which >= 0);
-
-    MenuFadeOut ();
-
-    return exit;
-}
-
-
-///////////////////////////////////
-//
-// HIGHLIGHT CURRENT SELECTED ENTRY
-//
-void
-TrackWhichGame (int w)
-{
-    static int lastgameon = 0;
-
-    PrintLSEntry (lastgameon, TEXTCOLOR);
-    PrintLSEntry (w, HIGHLIGHT);
-
-    lastgameon = w;
-}
-
-
-////////////////////////////
-//
-// DRAW THE LOAD/SAVE SCREEN
-//
-void
-DrawLoadSaveScreen (int loadsave)
-{
-#define DISKX   100
-#define DISKY   0
-
-    int i;
-
-
-    ClearMScreen ();
-    fontnumber = 1;
-    VWB_DrawPic (112, 184, C_MOUSELBACKPIC);
-    DrawWindow (LSM_X - 10, LSM_Y - 5, LSM_W, LSM_H, BKGDCOLOR);
-    DrawStripes (10);
-
-    if (!loadsave)
-        VWB_DrawPic (60, 0, C_LOADGAMEPIC);
-    else
-        VWB_DrawPic (60, 0, C_SAVEGAMEPIC);
-
-    for (i = 0; i < 10; i++)
-        PrintLSEntry (i, TEXTCOLOR);
-
-    DrawMenu (&LSItems, &LSMenu[0]);
-    VW_UpdateScreen ();
-    MenuFadeIn ();
-    WaitKeyUp ();
-}
-
-
-///////////////////////////////////////////
-//
-// PRINT LOAD/SAVE GAME ENTRY W/BOX OUTLINE
-//
-void
-PrintLSEntry (int w, int color)
-{
-    SETFONTCOLOR (color, BKGDCOLOR);
-    DrawOutline (LSM_X + LSItems.indent, LSM_Y + w * 13, LSM_W - LSItems.indent - 15, 11, color,
-                 color);
-    PrintX = LSM_X + LSItems.indent + 2;
-    PrintY = LSM_Y + w * 13 + 1;
-    fontnumber = 0;
-
-    if (SaveGamesAvail[w])
-        US_Print (SaveGameNames[w]);
-    else
-        US_Print ("      - " STR_EMPTY " -");
-
-    fontnumber = 1;
-}
-
-
-////////////////////////////////////////////////////////////////////
-//
-// SAVE CURRENT GAME
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_SaveGame (int quick)
-{
-    int which, exit = 0;
-    FILE *file;
-    char name[13];
-    char input[32];
-
-
-    strcpy (name, SaveName);
-
-    //
-    // QUICKSAVE?
-    //
-    if (quick)
-    {
-        which = LSItems.curpos;
-
-        if (SaveGamesAvail[which])
-        {
-            name[7] = which + '0';
-            unlink (name);
-            file = fopen (name, "wb");
-
-            strcpy (input, &SaveGameNames[which][0]);
-
-//                      _dos_write(handle,(void far *)input,32,&nwritten);
-            fwrite (input, 1, 32, file);
-            fseek (file, 32, SEEK_SET);
-            SaveTheGame (file, 0, 0);
-            fclose (file);
-
-#ifdef _arch_dreamcast
-            DC_SaveToVMU (name, 2);
-#endif
-
-            return 1;
-        }
-    }
-
-    DrawLoadSaveScreen (1);
-
-    do
-    {
-        which = HandleMenu (&LSItems, &LSMenu[0], TrackWhichGame);
-        if (which >= 0)
-        {
-            //
-            // OVERWRITE EXISTING SAVEGAME?
-            //
-            if (SaveGamesAvail[which])
-#ifdef JAPAN
-                if (!GetYorN (7, 8, C_JAPSAVEOVERPIC))
-#else
-                if (!Confirm (GAMESVD))
-#endif
-                {
-                    DrawLoadSaveScreen (1);
-                    continue;
-                }
-                else
-                {
-                    DrawLoadSaveScreen (1);
-                    PrintLSEntry (which, HIGHLIGHT);
-                    VW_UpdateScreen ();
-                }
-
-            ShootSnd ();
-
-            strcpy (input, &SaveGameNames[which][0]);
-            name[7] = which + '0';
-
-            fontnumber = 0;
-            if (!SaveGamesAvail[which])
-                VWB_Bar (LSM_X + LSItems.indent + 1, LSM_Y + which * 13 + 1,
-                         LSM_W - LSItems.indent - 16, 10, BKGDCOLOR);
-            VW_UpdateScreen ();
-
-            if (US_LineInput
-                (LSM_X + LSItems.indent + 2, LSM_Y + which * 13 + 1, input, input, true, 31,
-                 LSM_W - LSItems.indent - 30))
-            {
-                SaveGamesAvail[which] = 1;
-                strcpy (&SaveGameNames[which][0], input);
-
-                unlink (name);
-                file = fopen (name, "wb");
-//                              _dos_write(handle,(void far *)input,32,&nwritten);
-                fwrite (input, 32, 1, file);
-                fseek (file, 32, SEEK_SET);
-
-                DrawLSAction (1);
-                SaveTheGame (file, LSA_X + 8, LSA_Y + 5);
-
-                fclose (file);
-
-#ifdef _arch_dreamcast
-                DC_SaveToVMU (name, 2);
-#endif
-
-                ShootSnd ();
-                exit = 1;
-            }
-            else
-            {
-                VWB_Bar (LSM_X + LSItems.indent + 1, LSM_Y + which * 13 + 1,
-                         LSM_W - LSItems.indent - 16, 10, BKGDCOLOR);
-                PrintLSEntry (which, HIGHLIGHT);
-                VW_UpdateScreen ();
-                SD_PlaySound (ESCPRESSEDSND);
-                continue;
-            }
-
-            fontnumber = 1;
-            break;
-        }
-
-    }
-    while (which >= 0);
-
-    MenuFadeOut ();
-
-    return exit;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -2020,118 +1841,6 @@ DrawCustKeys (int hilight)
         PrintCustKeys (i);
 }
 
-
-////////////////////////////////////////////////////////////////////
-//
-// CHANGE SCREEN VIEWING SIZE
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_ChangeView (int)
-{
-    int exit = 0, oldview, newview;
-    ControlInfo ci;
-
-    WindowX = WindowY = 0;
-    WindowW = 320;
-    WindowH = 200;
-    newview = oldview = viewsize;
-    DrawChangeView (oldview);
-    MenuFadeIn ();
-
-    do
-    {
-        CheckPause ();
-        SDL_Delay(5);
-        ReadAnyControl (&ci);
-        switch (ci.dir)
-        {
-            case dir_South:
-            case dir_West:
-                newview--;
-                if (newview < 4)
-                    newview = 4;
-                if(newview >= 19) DrawChangeView(newview);
-                else ShowViewSize (newview);
-                VW_UpdateScreen ();
-                SD_PlaySound (HITWALLSND);
-                TicDelay (10);
-                break;
-
-            case dir_North:
-            case dir_East:
-                newview++;
-                if (newview >= 21)
-                {
-                    newview = 21;
-                    DrawChangeView(newview);
-                }
-                else ShowViewSize (newview);
-                VW_UpdateScreen ();
-                SD_PlaySound (HITWALLSND);
-                TicDelay (10);
-                break;
-        }
-
-        if (ci.button0 || Keyboard[sc_Enter])
-            exit = 1;
-        else if (ci.button1 || Keyboard[sc_Escape])
-        {
-            SD_PlaySound (ESCPRESSEDSND);
-            MenuFadeOut ();
-            if(screenHeight % 200 != 0)
-                VL_ClearScreen(0);
-            return 0;
-        }
-    }
-    while (!exit);
-
-    if (oldview != newview)
-    {
-        SD_PlaySound (SHOOTSND);
-        Message (STR_THINK "...");
-        NewViewSize (newview);
-    }
-
-    ShootSnd ();
-    MenuFadeOut ();
-    if(screenHeight % 200 != 0)
-        VL_ClearScreen(0);
-
-    return 0;
-}
-
-
-/////////////////////////////
-//
-// DRAW THE CHANGEVIEW SCREEN
-//
-void
-DrawChangeView (int view)
-{
-    int rescaledHeight = screenHeight / scaleFactor;
-    if(view != 21) VWB_Bar (0, rescaledHeight - 40, 320, 40, bordercol);
-
-#ifdef JAPAN
-    CA_CacheScreen (S_CHANGEPIC);
-
-    ShowViewSize (view);
-#else
-    ShowViewSize (view);
-
-    PrintY = (screenHeight / scaleFactor) - 39;
-    WindowX = 0;
-    WindowY = 320;                                  // TODO: Check this!
-    SETFONTCOLOR (HIGHLIGHT, BKGDCOLOR);
-
-    US_CPrint (STR_SIZE1 "\n");
-    US_CPrint (STR_SIZE2 "\n");
-    US_CPrint (STR_SIZE3);
-#endif
-    VW_UpdateScreen ();
-}
-
-
 ////////////////////////////////////////////////////////////////////
 //
 // HANDLE INTRO SCREEN (SYSTEM CONFIG)
@@ -2342,38 +2051,39 @@ void SetupSaveGames()
 #ifdef _arch_dreamcast
     file_t dir;
     dirent_t *dirent;
-    int x;
 
     dir = fs_open("/vmu/a1", O_RDONLY | O_DIR);
-    x = 0;
 
     strcpy(name, SaveName);
     while((dirent = fs_readdir(dir)) && x < 10)
     {
-        for(int i=0; i<10; i++)
-        {
-            name[7] = '0' + i;
-            if(!strcmp(name, dirent->name))
-            {
-                if(DC_LoadFromVMU(name) != -1)
-                {
-                    const int handle = open(name, O_RDONLY);
-                    if (handle >= 0)
-                    {
-                        char temp[32];
-
-                        SaveGamesAvail[i] = 1;
-                        read(handle, temp, 32);
-                        close(handle);
-                        strcpy(&SaveGameNames[i][0], temp);
-                        x++;
-                    }
-                    fs_unlink(name);
-                }
-            }
-        }
-    }
-
+		int filenameLen = strlen(dirent->name);
+		if(filenameLen < 12)
+			continue;
+		char savegam[8];
+		char extent[4];
+		memcpy(savegam, dirent->name, 7);
+		memcpy(extent, dirent->name+(filenameLen-3), 3);
+		savegam[7] = 0;
+		extent[3] = 0;
+		// match pattern savegam%u.%s
+		if(strcasecmp("savegam", savegam) == 0 && dirent->name[filenameLen-4] == '.' && strcasecmp(extension, extent) == 0)
+		{
+			if(DC_LoadFromVMU(dirent->name) != -1)
+			{
+				const int handle = open(name, O_RDONLY);
+				if(handle >= 0)
+				{
+					SaveFile sFile;
+					read(handle, sFile.name, 32);
+					close(handle);
+					strcpy(sFile.filename, dirent->name);
+					SaveFile::files.push_back(sFile);
+				}
+				fs_unlink(name);
+			}
+		}
+	}
     fs_close(dir);
 #else
     strcpy(name, SaveName);
@@ -2383,12 +2093,11 @@ void SetupSaveGames()
         const int handle = open(name, O_RDONLY | O_BINARY);
         if (handle >= 0)
         {
-            char temp[32];
-
-            SaveGamesAvail[i] = 1;
-            read(handle, temp, 32);
-            close(handle);
-            strcpy(&SaveGameNames[i][0], temp);
+			SaveFile sFile;
+			read(handle, sFile.name, 32);
+			close(handle);
+			strcpy(sFile.filename, name);
+			SaveFile::files.push_back(sFile);
         }
     }
 #endif

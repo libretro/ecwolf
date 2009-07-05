@@ -1,6 +1,10 @@
 // WL_AGENT.C
 
 #include "wl_def.h"
+#include "id_sd.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_us.h"
 #pragma hdrstop
 
 /*

@@ -8,6 +8,9 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_us.h"
 #pragma hdrstop
 
 #ifdef USE_CLOUDSKY

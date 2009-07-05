@@ -28,6 +28,8 @@
 //
 
 #include "wl_def.h"
+#include "id_pm.h"
+#include "id_sd.h"
 #include <SDL_mixer.h>
 #include "fmopl.h"
 

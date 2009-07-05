@@ -18,6 +18,9 @@
 //
 
 #include "wl_def.h"
+#include "id_sd.h"
+#include "id_in.h"
+#include "id_vl.h"
 
 
 /*

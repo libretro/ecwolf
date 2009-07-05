@@ -1,5 +1,10 @@
+#include "m_classes.h"
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_sd.h"
+#include "id_vl.h"
+#include "id_vh.h"
+#include "id_us.h"
 
 static const int color_hlite[] = {
     DEACTIVE,
@@ -271,7 +276,7 @@ void MultipleChoiceMenuItem::right()
 	SD_PlaySound(MOVEGUN1SND);
 }
 
-TextInputMenuItem::TextInputMenuItem(std::string text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener)) : MenuItem("", posteditListener), max(max), preeditListener(preeditListener)
+TextInputMenuItem::TextInputMenuItem(std::string text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener), bool clearFirst) : MenuItem("", posteditListener), clearFirst(clearFirst), max(max), preeditListener(preeditListener)
 {
 	setValue(text);
 }
@@ -283,20 +288,31 @@ void TextInputMenuItem::activate()
 		setTextColor();
 		fontnumber = 0;
 		char* buffer = new char[max+1];
-		US_LineInput(menu->getX() + menu->getIndent() + 2, PrintY, buffer, getValue(), true, max, menu->getWidth() - menu->getIndent() - menu->getX());
-		setValue(buffer);
+		if(clearFirst)
+			VWB_Bar(menu->getX() + menu->getIndent() + 1, PrintY + 1, menu->getWidth() - menu->getIndent() - 14, 8, BKGDCOLOR);
+		bool accept = US_LineInput(menu->getX() + menu->getIndent() + 2, PrintY, buffer, clearFirst ? "" : getValue(), true, max, menu->getWidth() - menu->getIndent() - 16);
+		if(accept)
+			setValue(buffer);
 		delete[] buffer;
 		fontnumber = 1;
-		MenuItem::activate();
+		if(accept)
+			MenuItem::activate();
+		else
+		{
+			SD_PlaySound(ESCPRESSEDSND);
+			VWB_Bar(menu->getX() + menu->getIndent() + 1, PrintY + 1, menu->getWidth() - menu->getIndent() - 14, 10, BKGDCOLOR);
+			PrintY--;
+			draw();
+		}
 	}
 }
 
 void TextInputMenuItem::draw()
 {
 	setTextColor();
-	DrawOutline(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - menu->getX(), 11, fontcolor, fontcolor);
+	DrawOutline(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, fontcolor, fontcolor);
 	PrintX = menu->getX() + menu->getIndent() + 2;
-	PrintY += 1;
+	PrintY++;
 	fontnumber = 0;
 	US_Print(getValue());
 	fontnumber = 1;
@@ -336,9 +352,7 @@ Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListene
 }
 Menu::~Menu()
 {
-	for(unsigned int i = 0;i < items.size();i++)
-		delete items[i];
-	items.clear();
+	clear();
 }
 
 void Menu::addItem(MenuItem *item)
@@ -348,6 +362,13 @@ void Menu::addItem(MenuItem *item)
 	if(!item->isEnabled() && items.size()-1 == curPos)
 		curPos++;
 	height += item->getHeight();
+}
+
+void Menu::clear()
+{
+	for(unsigned int i = 0;i < items.size();i++)
+		delete items[i];
+	items.clear();
 }
 
 unsigned int Menu::countItems() const
