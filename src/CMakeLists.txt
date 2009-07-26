@@ -30,6 +30,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(../ecwolf
+	file.cpp
 	fmopl.cpp
 	id_ca.cpp
 	id_in.cpp

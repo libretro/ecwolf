@@ -20,7 +20,8 @@ static const int color_norml[] = {
     0x6b
 };
 
-bool Menu::close = false;
+bool 			Menu::close = false;
+unsigned int	Menu::lastIndexDrawn = 0;
 
 void MenuItem::setTextColor()
 {
@@ -318,34 +319,42 @@ void TextInputMenuItem::draw()
 	fontnumber = 1;
 }
 
-void Menu::drawGun(int x, int &y, int which, int basey)
+void Menu::drawGun(int x, int &y, int basey)
 {
 	VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
-	y = basey + getHeight(which);
+	y = getY() + getHeight(curPos);
 	if(getIndent() != 0)
 		VWB_DrawPic (x, y, C_CURSOR1PIC);
 
 	PrintX = getX() + getIndent();
-	PrintY = getY() + getHeight(which);
-	getIndex(which)->setSelected(true);
-	getIndex(which)->draw();
+	PrintY = getY() + getHeight(curPos);
+	getIndex(curPos)->setSelected(true);
+	getIndex(curPos)->draw();
 
 	VW_UpdateScreen();
 	SD_PlaySound(MOVEGUN2SND);
 }
 
-void Menu::eraseGun(int x, int y, int which)
+void Menu::drawGunHalfStep(int x, int y)
+{
+	VWB_DrawPic (x, y, C_CURSOR1PIC);
+	VW_UpdateScreen ();
+	SD_PlaySound (MOVEGUN1SND);
+	SDL_Delay (8 * 100 / 7);
+}
+
+void Menu::eraseGun(int x, int y)
 {
 	VWB_Bar(x - 1, y, 25, 16, BKGDCOLOR);
 
 	PrintX = getX() + getIndent();
-	PrintY = getY() + getHeight(which);
-	getIndex(which)->setSelected(false);
-	getIndex(which)->draw();
+	PrintY = getY() + getHeight(curPos);
+	getIndex(curPos)->setSelected(false);
+	getIndex(curPos)->draw();
 	VW_UpdateScreen();
 }
 
-Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), headPicture(-1), curPos(0), height(0)
+Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), headPicture(-1), curPos(0), height(0), itemOffset(0)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';
@@ -384,16 +393,27 @@ unsigned int Menu::countItems() const
 
 int Menu::getHeight(int position) const
 {
-	unsigned int num = 0;
-	for(unsigned int i = 0;i < items.size();i++)
+	// Make sure we have the position we think we have.
+	if(position != -1)
 	{
-		if(position == 0)
+		for(unsigned int i = 0;i < items.size() && i < position;i++)
+		{
+			if(!items[i]->isVisible())
+				position++;
+		}
+	}
+
+	unsigned int num = 0;
+	for(unsigned int i = itemOffset;i < items.size();i++)
+	{
+		if(position == i)
 			break;
 
 		if(items[i]->isVisible())
 		{
+			if(getY() + num + items[i]->getHeight() + 6 >= 200)
+				break;
 			num += items[i]->getHeight();
-			position--;
 		}
 	}
 	if(position >= 0)
@@ -415,8 +435,6 @@ MenuItem *Menu::getIndex(int index) const
 
 void Menu::drawMenu() const
 {
-	int which = curPos;
-
 	WindowX = PrintX = getX() + getIndent();
 	WindowY = PrintY = getY();
 	WindowW = 320;
@@ -426,22 +444,30 @@ void Menu::drawMenu() const
 	int y = getY();
 	int selectedY = getY(); // See later
 
-	for (unsigned int i = 0; i < countItems(); i++)
+	for (unsigned int i = itemOffset; i < countItems(); i++)
 	{
 		if(i == curPos)
 			selectedY = y;
 		else
 		{
 			PrintY = y;
+			if(PrintY + getIndex(i)->getHeight() + 6 >= 200)
+				break;
 			getIndex(i)->draw();
+			lastIndexDrawn = i;
 		}
 		y += getIndex(i)->getHeight();
 	}
 
 	// In order to draw the skill menu correctly we need to draw the selected option now
-	PrintY = selectedY;
-	getIndex(curPos)->setSelected(true);
-	getIndex(curPos)->draw();
+	if(curPos >= itemOffset)
+	{
+		PrintY = selectedY;
+		getIndex(curPos)->setSelected(true);
+		getIndex(curPos)->draw();
+		if(curPos > lastIndexDrawn)
+			lastIndexDrawn = curPos;
+	}
 }
 
 void Menu::draw() const
@@ -469,25 +495,24 @@ int Menu::handle()
 {
 	char key;
 	static int redrawitem = 1, lastitem = -1;
-	int i, x, y, basey, exit, which, shape;
+	int i, x, y, basey, exit, shape;
 	int32_t lastBlinkTime, timer;
 	ControlInfo ci;
 
 	if(close)
 		return -1;
 
-	which = curPos;
 	x = getX() & -8;
 	basey = getY() - 2;
-	y = basey + getHeight(which);
+	y = basey + getHeight(curPos);
 
 	if(getIndent() != 0)
 		VWB_DrawPic (x, y, C_CURSOR1PIC);
 	if (redrawitem)
 	{
 		PrintX = getX() + getIndent();
-		PrintY = getY() + getHeight(which);
-		getIndex(which)->draw();
+		PrintY = getY() + getHeight(curPos);
+		getIndex(curPos)->draw();
 	}
 	VW_UpdateScreen ();
 
@@ -534,12 +559,12 @@ int Menu::handle()
 			if (key >= 'a')
 				key -= 'a' - 'A';
 
-			for (i = which + 1; i < countItems(); i++)
+			for (i = curPos + 1; i < countItems(); i++)
 				if (getIndex(i)->isEnabled() && getIndex(i)->getString()[0] == key)
 				{
-					eraseGun(x, y, which);
-					which = i;
-					drawGun(x, y, which, basey);
+					eraseGun(x, y);
+					curPos = i;
+					drawGun(x, y, basey);
 					ok = 1;
 					IN_ClearKeysDown ();
 					break;
@@ -550,13 +575,13 @@ int Menu::handle()
 			//
 			if (!ok)
 			{
-				for (i = 0; i < which; i++)
+				for (i = 0; i < curPos; i++)
 				{
 					if (getIndex(i)->isEnabled() && getIndex(i)->getString()[0] == key)
 					{
-						eraseGun(x, y, which);
-						which = i;
-						drawGun(x, y, which, basey);
+						eraseGun(x, y);
+						curPos = i;
+						drawGun(x, y, basey);
 						IN_ClearKeysDown ();
 						break;
 					}
@@ -576,15 +601,23 @@ int Menu::handle()
 				//
 			case dir_North:
 
-				eraseGun(x, y, which);
+				eraseGun(x, y);
 
 				//
 				// ANIMATE HALF-STEP
 				//
-				if (which && getIndex(which - 1)->isEnabled())
+				if (curPos != itemOffset && getIndex(curPos - 1)->isEnabled())
 				{
 					y -= 6;
-					DrawHalfStep (x, y);
+					drawGunHalfStep(x, y);
+				}
+				if (curPos == itemOffset && curPos != 0)
+				{
+					itemOffset--;
+					draw();
+					getIndex(curPos)->setSelected(false); // Undo a change made by draw.
+					PrintY = getY() + getHeight(curPos);
+					getIndex(curPos)->draw();
 				}
 
 				//
@@ -592,14 +625,18 @@ int Menu::handle()
 				//
 				do
 				{
-					if (!which)
-						which = countItems() - 1;
+					if (curPos == 0)
+					{
+						curPos = countItems() - 1;
+						itemOffset = (countItems() - 1) - lastIndexDrawn;
+						draw();
+					}
 					else
-						which--;
+						curPos--;
 				}
-				while (!getIndex(which)->isEnabled());
+				while (!getIndex(curPos)->isEnabled());
 
-				drawGun(x, y, which, basey);
+				drawGun(x, y, basey);
 				//
 				// WAIT FOR BUTTON-UP OR DELAY NEXT MOVE
 				//
@@ -612,26 +649,38 @@ int Menu::handle()
 				//
 			case dir_South:
 
-				eraseGun(x, y, which);
+				eraseGun(x, y);
 				//
 				// ANIMATE HALF-STEP
 				//
-				if (which != countItems() - 1 && getIndex(which + 1)->isEnabled())
+				if (curPos != lastIndexDrawn && curPos != countItems() - 1 && getIndex(curPos + 1)->isEnabled())
 				{
 					y += 6;
-					DrawHalfStep (x, y);
+					drawGunHalfStep(x, y);
+				}
+				if (curPos == lastIndexDrawn && curPos != countItems() - 1)
+				{
+					itemOffset++;
+					draw();
+					getIndex(curPos)->setSelected(false); // Undo a change made by draw.
+					PrintY = getY() + getHeight(curPos);
+					getIndex(curPos)->draw();
 				}
 
 				do
 				{
-					if (which == countItems() - 1)
-						which = 0;
+					if (curPos == countItems() - 1)
+					{
+						curPos = 0;
+						itemOffset = 0;
+						draw();
+					}
 					else
-						which++;
+						curPos++;
 				}
-				while (!getIndex(which)->isEnabled());
+				while (!getIndex(curPos)->isEnabled());
 
-				drawGun(x, y, which, basey);
+				drawGun(x, y, basey);
 
 				//
 				// WAIT FOR BUTTON-UP OR DELAY NEXT MOVE
@@ -639,18 +688,18 @@ int Menu::handle()
 				TicDelay (20);
 				break;
 			case dir_West:
-				getIndex(which)->left();
+				getIndex(curPos)->left();
 				PrintX = getX() + getIndent();
-				PrintY = getY() + getHeight(which);
-				getIndex(which)->draw();
+				PrintY = getY() + getHeight(curPos);
+				getIndex(curPos)->draw();
 				VW_UpdateScreen();
 				TicDelay(20);
 				break;
 			case dir_East:
-				getIndex(which)->right();
+				getIndex(curPos)->right();
 				PrintX = getX() + getIndent();
-				PrintY = getY() + getHeight(which);
-				getIndex(which)->draw();
+				PrintY = getY() + getHeight(curPos);
+				getIndex(curPos)->draw();
 				VW_UpdateScreen();
 				TicDelay(20);
 				break;
@@ -671,12 +720,12 @@ int Menu::handle()
 	//
 	// ERASE EVERYTHING
 	//
-	if (lastitem != which)
+	if (lastitem != curPos)
 	{
 		VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 		PrintX = getX() + getIndent();
-		PrintY = getY() + getHeight(which);
-		getIndex(which)->draw();
+		PrintY = getY() + getHeight(curPos);
+		getIndex(curPos)->draw();
 		redrawitem = 1;
 	}
 	else
@@ -684,20 +733,18 @@ int Menu::handle()
 
 	VW_UpdateScreen ();
 
-	curPos = which;
-
-	lastitem = which;
+	lastitem = curPos;
 	switch (exit)
 	{
 		case 1:
 			SD_PlaySound (SHOOTSND);
-			getIndex(which)->activate();
+			getIndex(curPos)->activate();
 			VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 			PrintX = getX() + getIndent();
-			PrintY = getY() + getHeight(which);
-			getIndex(which)->draw();
+			PrintY = getY() + getHeight(curPos);
+			getIndex(curPos)->draw();
 			VW_UpdateScreen();
-			return which;
+			return curPos;
 
 		case 2:
 			SD_PlaySound(ESCPRESSEDSND);

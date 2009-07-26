@@ -26,6 +26,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "file.h"
 #pragma hdrstop
 #include <deque>
 #include <vector>
@@ -1151,6 +1152,8 @@ CustomControls (int)
     while (which >= 0);
 
     MenuFadeOut ();
+	controlBase.draw();
+	MenuFadeIn ();
 
     return 0;
 }
@@ -2086,20 +2089,27 @@ void SetupSaveGames()
 	}
     fs_close(dir);
 #else
-    strcpy(name, SaveName);
-    for(int i=0; i<10; i++)
-    {
-        name[7] = '0' + i;
-        const int handle = open(name, O_RDONLY | O_BINARY);
-        if (handle >= 0)
-        {
+	File saveDirectory("./");
+	const deque<string> &files = saveDirectory.getFileList();
+	for(unsigned int i = 0;i < files.size();i++)
+	{
+		const string &filename = files[i];
+		if(filename.length() <= 11 ||
+			filename.length() >= 15 ||
+			filename.substr(0, 7).compare("savegam") != 0 ||
+			filename.substr(filename.length()-3, 3).compare(extension) != 0)
+			continue; // Too short or incorrect name
+
+		const int handle = open(filename.c_str(), O_RDONLY | O_BINARY);
+		if(handle >= 0)
+		{
 			SaveFile sFile;
 			read(handle, sFile.name, 32);
 			close(handle);
-			strcpy(sFile.filename, name);
+			strcpy(sFile.filename, filename.c_str());
 			SaveFile::files.push_back(sFile);
-        }
-    }
+		}
+	}
 #endif
 }
 
