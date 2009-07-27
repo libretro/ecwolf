@@ -15,6 +15,7 @@
 #include "id_us.h"
 #pragma hdrstop
 #include "wl_atmos.h"
+#include "m_classes.h"
 #include <SDL_syswm.h>
 
 
@@ -1023,151 +1024,87 @@ void InitDigiMap (void)
     }
 }
 
+Menu musicMenu(CTL_X, CTL_Y-6, 280, 32);
+static struct Song
+{
+	const char*		name;
+	unsigned int	track;
+} songList[] =
+{
 #ifndef SPEAR
-CP_iteminfo MusicItems={CTL_X,CTL_Y,6,0,32};
-CP_itemtype MusicMenu[]=
-    {
-        {1,"Get Them!",0},
-        {1,"Searching",0},
-        {1,"P.O.W.",0},
-        {1,"Suspense",0},
-        {1,"War March",0},
-        {1,"Around The Corner!",0},
-
-        {1,"Nazi Anthem",0},
-        {1,"Lurking...",0},
-        {1,"Going After Hitler",0},
-        {1,"Pounding Headache",0},
-        {1,"Into the Dungeons",0},
-        {1,"Ultimate Conquest",0},
-
-        {1,"Kill the S.O.B.",0},
-        {1,"The Nazi Rap",0},
-        {1,"Twelfth Hour",0},
-        {1,"Zero Hour",0},
-        {1,"Ultimate Conquest",0},
-        {1,"Wolfpack",0}
-    };
+	{"Get Them!",			GETTHEM_MUS},
+	{"Searching",			SEARCHN_MUS},
+	{"P.O.W.",				POW_MUS},
+	{"Suspense",			SUSPENSE_MUS},
+	{"War March",			WARMARCH_MUS},
+	{"Around The Corner!",	CORNER_MUS},
+	{"Nazi Anthem",			NAZI_OMI_MUS},
+	{"Lurking...",			PREGNANT_MUS},
+	{"Going After Hitler",	GOINGAFT_MUS},
+	{"Pounding Headache",	HEADACHE_MUS},
+	{"Into the Dungeons",	DUNGEON_MUS},
+	{"Ultimate Conquest",	ULTIMATE_MUS},
+	{"Kill the S.O.B.",		INTROCW3_MUS},
+	{"The Nazi Rap",		NAZI_RAP_MUS},
+	{"Twelfth Hour",		TWELFTH_MUS},
+	{"Zero Hour",			ZEROHOUR_MUS},
+	{"Ultimate Conquest",	ULTIMATE_MUS},
+	{"Wolfpack",			PACMAN_MUS},
 #else
-CP_iteminfo MusicItems={CTL_X,CTL_Y-20,9,0,32};
-CP_itemtype MusicMenu[]=
-    {
-        {1,"Funky Colonel Bill",0},
-        {1,"Death To The Nazis",0},
-        {1,"Tiptoeing Around",0},
-        {1,"Is This THE END?",0},
-        {1,"Evil Incarnate",0},
-        {1,"Jazzin' Them Nazis",0},
-        {1,"Puttin' It To The Enemy",0},
-        {1,"The SS Gonna Get You",0},
-        {1,"Towering Above",0}
-    };
+	{"Funky Colonel Bill",		XFUNKIE_MUS},
+	{"Death To The Nazis",		XDEATH_MUS},
+	{"Tiptoeing Around",		XTIPTOE_MUS},
+	{"Is This THE END?",		XTHEEND_MUS},
+	{"Evil Incarnate",			XEVIL_MUS},
+	{"Jazzin' Them Nazis",		XJAZNAZI_MUS},
+	{"Puttin' It To The Enemy",	XPUTIT_MUS},
+	{"The SS Gonna Get You",	XGETYOU_MUS},
+	{"Towering Above",			XTOWER2_MUS},
 #endif
+
+	// End of list
+	{ NULL, 0 }
+};
+MENU_LISTENER(ChangeMusic)
+{
+	StartCPMusic(songList[which].track);
+	for(unsigned int i = 0;songList[i].name != NULL;i++)
+	{
+		musicMenu[i]->setHighlighted(i == which);
+	}
+	musicMenu.draw();
+}
 
 #ifndef SPEARDEMO
 void DoJukebox(void)
 {
-    int which,lastsong=-1;
-    unsigned start;
-    unsigned songs[]=
-        {
-#ifndef SPEAR
-            GETTHEM_MUS,
-            SEARCHN_MUS,
-            POW_MUS,
-            SUSPENSE_MUS,
-            WARMARCH_MUS,
-            CORNER_MUS,
-
-            NAZI_OMI_MUS,
-            PREGNANT_MUS,
-            GOINGAFT_MUS,
-            HEADACHE_MUS,
-            DUNGEON_MUS,
-            ULTIMATE_MUS,
-
-            INTROCW3_MUS,
-            NAZI_RAP_MUS,
-            TWELFTH_MUS,
-            ZEROHOUR_MUS,
-            ULTIMATE_MUS,
-            PACMAN_MUS
-#else
-            XFUNKIE_MUS,             // 0
-            XDEATH_MUS,              // 2
-            XTIPTOE_MUS,             // 4
-            XTHEEND_MUS,             // 7
-            XEVIL_MUS,               // 17
-            XJAZNAZI_MUS,            // 18
-            XPUTIT_MUS,              // 21
-            XGETYOU_MUS,             // 22
-            XTOWER2_MUS              // 23
-#endif
-        };
-
     IN_ClearKeysDown();
     if (!AdLibPresent && !SoundBlasterPresent)
         return;
 
     MenuFadeOut();
 
-#ifndef SPEAR
-#ifndef UPLOAD
-    start = ((SDL_GetTicks()/10)%3)*6;
-#else
-    start = 0;
-#endif
-#else
-    start = 0;
-#endif
-
     CA_CacheGrChunk (STARTFONT+1);
-    CacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
+#ifdef SPEAR
+	CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
+#else
+	CacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
+#endif
     CA_LoadAllSounds ();
 
     fontnumber=1;
     ClearMScreen ();
-    VWB_DrawPic(112,184,C_MOUSELBACKPIC);
-    DrawStripes (10);
-    SETFONTCOLOR (TEXTCOLOR,BKGDCOLOR);
+	musicMenu.setHeadText("Robert's Jukebox", true);
+	for(unsigned int i = 0;songList[i].name != NULL;i++)
+		musicMenu.addItem(new MenuItem(songList[i].name, ChangeMusic));
+	musicMenu.show();
 
-#ifndef SPEAR
-    DrawWindow (CTL_X-2,CTL_Y-6,280,13*7,BKGDCOLOR);
+#ifdef SPEAR
+	UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
 #else
-    DrawWindow (CTL_X-2,CTL_Y-26,280,13*10,BKGDCOLOR);
+	UnCacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
 #endif
-
-    DrawMenu (&MusicItems,&MusicMenu[start]);
-
-    SETFONTCOLOR (READHCOLOR,BKGDCOLOR);
-    PrintY=15;
-    WindowX = 0;
-    WindowY = 320;
-    US_CPrint ("Robert's Jukebox");
-
-    SETFONTCOLOR (TEXTCOLOR,BKGDCOLOR);
-    VW_UpdateScreen();
-    MenuFadeIn();
-
-    do
-    {
-        which = HandleMenu(&MusicItems,&MusicMenu[start],NULL);
-        if (which>=0)
-        {
-            if (lastsong >= 0)
-                MusicMenu[start+lastsong].active = 1;
-
-            StartCPMusic(songs[start + which]);
-            MusicMenu[start+which].active = 2;
-            DrawMenu (&MusicItems,&MusicMenu[start]);
-            VW_UpdateScreen();
-            lastsong = which;
-        }
-    } while(which>=0);
-
-    MenuFadeOut();
-    IN_ClearKeysDown();
-    UnCacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
+	return;
 }
 #endif
 

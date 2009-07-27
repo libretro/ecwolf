@@ -539,7 +539,7 @@ void Menu::eraseGun(int x, int y)
 	VW_UpdateScreen();
 }
 
-Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), headPicture(-1), curPos(0), height(0), itemOffset(0)
+Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), headPicture(-1), curPos(0), height(0), itemOffset(0), headTextInStripes(false)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';
@@ -681,7 +681,14 @@ void Menu::draw() const
 		US_Print("Joy");
 	}
 	else
+	{
+		if(headTextInStripes)
+		{
+			DrawStripes(10);
+			PrintY = 15;
+		}
 		US_CPrint(headText);
+	}
 
 	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);
 	drawMenu();
@@ -951,9 +958,10 @@ int Menu::handle()
 	return 0;                   // JUST TO SHUT UP THE ERROR MESSAGES!
 }
 
-void Menu::setHeadText(const char text[36])
+void Menu::setHeadText(const char text[36], bool drawInStripes)
 {
 	strcpy(headText, text);
+	headTextInStripes = drawInStripes;
 }
 
 void Menu::show()

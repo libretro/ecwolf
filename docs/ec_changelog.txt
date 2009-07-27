@@ -1,3 +1,9 @@
+July 27th, 2009
+-----------------------------
+- Customize controls menu is now using the new code.  In addition more contorls
+  are available.
+- Completely removed the old menu handling code.
+
 July 26th, 2009
 -----------------------------
 - Added scrolling code to menus.

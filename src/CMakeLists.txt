@@ -57,7 +57,7 @@ add_executable(../ecwolf
 	wl_play.cpp
 	wl_state.cpp
 	wl_text.cpp
-	actors/scanner.cpp
+#	actors/scanner.cpp
 	${EXTRA_FILES}
 )
 

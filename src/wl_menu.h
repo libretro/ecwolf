@@ -99,23 +99,6 @@
 
 
 //
-// TYPEDEFS
-//
-typedef struct {
-                short x,y,amount,curpos,indent;
-                } CP_iteminfo;
-
-typedef struct {
-                short active;
-                char string[36];
-                int (* routine)(int temp1);
-                } CP_itemtype;
-
-typedef struct {
-                short allowed[4];
-                } CustomCtrls;
-
-//
 // FUNCTION PROTOTYPES
 //
 
@@ -127,10 +110,6 @@ void SetupControlPanel(void);
 void SetupSaveGames();
 void CleanupControlPanel(void);
 
-void DrawMenu(CP_iteminfo *item_i,CP_itemtype *items);
-int  HandleMenu(CP_iteminfo *item_i,
-                CP_itemtype *items,
-                void (*routine)(int w));
 void ClearMScreen(void);
 void DrawWindow(int x,int y,int w,int h,int wcolor);
 void DrawOutline(int x,int y,int w,int h,int color1,int color2);
@@ -147,11 +126,6 @@ void ShootSnd(void);
 void CheckSecretMissions(void);
 void BossKey(void);
 
-void DrawGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int *y,int which,int basey,void (*routine)(int w));
-void DrawHalfStep(int x,int y);
-void EraseGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int y,int which);
-void SetTextColor(CP_itemtype *items,int hlight);
-void DrawMenuGun(CP_iteminfo *iteminfo);
 void DrawStripes(int y);
 
 void DrawLSAction(int which);
@@ -159,7 +133,6 @@ void DrawLSAction(int which);
 void DrawNewGameDiff(int w);
 void FixupCustom(int w);
 
-int CP_Control(int);
 int CP_ExitOptions(int);
 int  CP_EndGame(int);
 int  CP_CheckQuick(ScanCode scancode);

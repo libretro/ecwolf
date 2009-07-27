@@ -199,6 +199,7 @@ class Menu
 		int						curPos;
 		int						headPicture;
 		char					headText[36];
+		bool					headTextInStripes;
 		int						height;
 		const int				indent;
 		std::vector<MenuItem *>	items;
@@ -238,7 +239,7 @@ class Menu
 		int				getY() const { return y; }
 		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : (position >= items.size() ? items.size()-1 : position); }
 		void			setHeadPicture(int picture) { headPicture = picture; }
-		void			setHeadText(const char text[36]);
+		void			setHeadText(const char text[36], bool drawInStripes=false);
 		void			show();
 		/**
 		 * Should this menu show the Key, Mse. and Joy headers?
