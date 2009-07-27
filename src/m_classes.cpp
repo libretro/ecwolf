@@ -62,7 +62,7 @@ void MenuItem::draw()
 		SETFONTCOLOR(TEXTCOLOR, BKGDCOLOR);
 	}
 
-	US_Print("\n");
+	PrintX = menu->getX() + menu->getIndent();
 }
 
 void MenuItem::setPicture(int picture, int x, int y)
@@ -319,6 +319,191 @@ void TextInputMenuItem::draw()
 	fontnumber = 1;
 }
 
+int ControlMenuItem::column = 0;
+const char* const ControlMenuItem::keyNames[SDLK_LAST] =
+{
+	"?","?","?","?","?","?","?","?",                                //   0
+	"BkSp","Tab","?","?","?","Ret","?","?",                      //   8
+	"?","?","?","Paus","?","?","?","?",                            //  16
+	"?","?","?","Esc","?","?","?","?",                              //  24
+	"Spce","!","\"","#","$","?","&","'",                           //  32
+	"(",")","*","+",",","-",".","/",                                //  40
+	"0","1","2","3","4","5","6","7",                                //  48
+	"8","9",":",";","<","=",">","?",                                //  56
+	"@","A","B","C","D","E","F","G",                                //  64
+	"H","I","J","K","L","M","N","O",                                //  72
+	"P","Q","R","S","T","U","V","W",                                //  80
+	"X","Y","Z","[","\\","]","^","_",                               //  88
+	"`","a","b","c","d","e","f","h",                                //  96
+	"h","i","j","k","l","m","n","o",                                // 104
+	"p","q","r","s","t","u","v","w",                                // 112
+	"x","y","z","{","|","}","~","?",                                // 120
+	"?","?","?","?","?","?","?","?",                                // 128
+	"?","?","?","?","?","?","?","?",                                // 136
+	"?","?","?","?","?","?","?","?",                                // 144
+	"?","?","?","?","?","?","?","?",                                // 152
+	"?","?","?","?","?","?","?","?",                                // 160
+	"?","?","?","?","?","?","?","?",                                // 168
+	"?","?","?","?","?","?","?","?",                                // 176
+	"?","?","?","?","?","?","?","?",                                // 184
+	"?","?","?","?","?","?","?","?",                                // 192
+	"?","?","?","?","?","?","?","?",                                // 200
+	"?","?","?","?","?","?","?","?",                                // 208
+	"?","?","?","?","?","?","?","?",                                // 216
+	"?","?","?","?","?","?","?","?",                                // 224
+	"?","?","?","?","?","?","?","?",                                // 232
+	"?","?","?","?","?","?","?","?",                                // 240
+	"?","?","?","?","?","?","?","?",                                // 248
+	"?","?","?","?","?","?","?","?",                                // 256
+	"?","?","?","?","?","?","?","Entr",                            // 264
+	"?","Up","Down","Rght","Left","Ins","Home","End",              // 272
+	"PgUp","PgDn","F1","F2","F3","F4","F5","F6",                    // 280
+	"F7","F8","F9","F10","F11","F12","?","?",                       // 288
+	"?","?","?","?","NmLk","CpLk","ScLk","RShf",              // 296
+	"Shft","RCtl","Ctrl","RAlt","Alt","?","?","?",                // 304
+	"?","?","?","?","PrtS","?","?","?",                            // 312
+	"?","?"                                                         // 320
+};
+
+ControlMenuItem::ControlMenuItem(ControlScheme &button) : MenuItem(button.name), button(button)
+{
+}
+
+void ControlMenuItem::activate()
+{
+	DrawOutline(159 + (52*column), PrintY, 49, 12, 0, HIGHLIGHT);
+	VWB_Bar(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR);
+	PrintX = 162 + (52*column);
+	US_Print("???");
+	VW_UpdateScreen();
+
+	IN_ClearKeysDown();
+	ControlInfo ci;
+	bool exit = false;
+	int btn = 0;
+	while(!exit)
+	{
+		SDL_Delay(5);
+
+		switch(column)
+		{
+			default:
+			case 0:
+				if(LastScan != 0)
+				{
+					ControlScheme::setKeyboard(controlScheme, button.button, LastScan);
+					ShootSnd();
+					IN_ClearKeysDown();
+					exit = true;
+				}
+				break;
+			case 1:
+				if(!mouseenabled)
+				{
+					exit = true;
+					break;
+				}
+
+				btn = IN_MouseButtons();
+				for(int i = 0;btn != 0 && i < 32;i++)
+				{
+					if(btn & (1<<i))
+					{
+						ControlScheme::setMouse(controlScheme, button.button, i);
+						exit = true;
+					}
+				}
+				break;
+			case 2:
+				if(!joystickenabled)
+				{
+					exit = true;
+					break;
+				}
+
+				btn = IN_JoyButtons();
+				for(int i = 0;btn != 0 && i < 32;i++)
+				{
+					if(btn & (1<<i))
+					{
+						ControlScheme::setJoystick(controlScheme, button.button, i);
+						exit = true;
+					}
+				}
+				break;
+		}
+
+		ReadAnyControl(&ci);
+		if(LastScan == sc_Escape)
+			break;
+	}
+
+	PrintX = menu->getX() + menu->getIndent();
+
+	MenuItem::activate();
+
+	// Setting one vale could affect another
+	menu->draw();
+}
+
+void ControlMenuItem::draw()
+{
+	VWB_Bar(159, PrintY, ((52)*3) - 1, 13, BKGDCOLOR);
+	if(isSelected())
+	{
+		DrawOutline(159 + (52*column), PrintY, 49, 12, 0, HIGHLIGHT);
+		VWB_Bar(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR);
+	}
+
+	setTextColor();
+
+	if(!getActive())
+	{
+		SETFONTCOLOR(DEACTIVE, BKGDCOLOR);
+	}
+
+	US_Print(getString());
+
+	if(button.keyboard != -1)
+	{
+		PrintX = 162;
+		US_Print(keyNames[button.keyboard]);
+	}
+	if(button.mouse != -1)
+	{
+		PrintX = 214;
+		char btn[8];
+		sprintf(btn, "MS%d", button.mouse);
+		US_Print(btn);
+	}
+	if(button.joystick != -1)
+	{
+		PrintX = 266;
+		char btn[8];
+		sprintf(btn, "JY%d", button.mouse);
+		US_Print(btn);
+	}
+
+	if(!getActive())
+	{
+		SETFONTCOLOR(TEXTCOLOR, BKGDCOLOR);
+	}
+
+	PrintX = menu->getX() + menu->getIndent();
+}
+
+void ControlMenuItem::left()
+{
+	if(column != 0)
+		column--;
+}
+
+void ControlMenuItem::right()
+{
+	if(column != 2)
+		column++;
+}
+
 void Menu::drawGun(int x, int &y, int basey)
 {
 	VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
@@ -484,7 +669,19 @@ void Menu::draw() const
 	WindowX = 0;
 	WindowW = 320;
     PrintY = getY() - 22;
-	US_CPrint(headText);
+	if(controlHeaders)
+	{
+		PrintX = getX() + getIndent();
+		US_Print("Control");
+		PrintX = 168;
+		US_Print("Key");
+		PrintX = 220;
+		US_Print("Mse");
+		PrintX = 272;
+		US_Print("Joy");
+	}
+	else
+		US_CPrint(headText);
 
 	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);
 	drawMenu();

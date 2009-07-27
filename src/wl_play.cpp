@@ -55,6 +55,60 @@ unsigned tics;
 //
 // control info
 //
+ControlScheme controlScheme[] =
+{
+	{ bt_moveforward,		"Forward",		-1,	sc_UpArrow,		-1 },
+	{ bt_movebackward,		"Backward",		-1,	sc_DownArrow,	-1 },
+	{ bt_strafeleft,		"Strafe Left",	-1,	sc_Comma,		-1 },
+	{ bt_straferight,		"Strafe Right",	-1,	sc_Peroid,		-1 },
+	{ bt_turnleft,			"Turn Left",	-1,	sc_LeftArrow,	-1 },
+	{ bt_turnright,			"Turn Right",	-1,	sc_RightArrow,	-1 },
+	{ bt_attack,			"Attack",		-1,	sc_Control,		-1 },
+	{ bt_strafe,			"Strafe",		-1,	sc_Alt,			-1 },
+	{ bt_run,				"Run",			-1,	sc_LShift,		-1 },
+	{ bt_use,				"Use",			-1,	sc_Space,		-1 },
+	{ bt_readyknife,		"Slot 1",		-1,	sc_1,			-1 },
+	{ bt_readypistol,		"Slot 2", 		-1,	sc_2,			-1 },
+	{ bt_readymachinegun,	"Slot 3",		-1,	sc_3,			-1 },
+	{ bt_readychaingun,		"Slot 4",		-1,	sc_4,			-1 },
+
+	// End of List
+	{ bt_nobutton,			NULL,			-1,	-1,				-1 }
+};
+
+void ControlScheme::setKeyboard(ControlScheme* scheme, Button button, int value)
+{
+	for(int i = 0;scheme[i].button != bt_nobutton;i++)
+	{
+		if(scheme[i].keyboard == value)
+			scheme[i].keyboard = -1;
+		if(scheme[i].button == button)
+			scheme[i].keyboard = value;
+	}
+}
+
+void ControlScheme::setJoystick(ControlScheme* scheme, Button button, int value)
+{
+	for(int i = 0;scheme[i].button != bt_nobutton;i++)
+	{
+		if(scheme[i].joystick == value)
+			scheme[i].joystick = -1;
+		if(scheme[i].button == button)
+			scheme[i].joystick = value;
+	}
+}
+
+void ControlScheme::setMouse(ControlScheme* scheme, Button button, int value)
+{
+	for(int i = 0;scheme[i].button != bt_nobutton;i++)
+	{
+		if(scheme[i].mouse == value)
+			scheme[i].mouse = -1;
+		if(scheme[i].button == button)
+			scheme[i].mouse = value;
+	}
+}
+
 boolean mouseenabled, mouseyaxisdisabled, joystickenabled;
 int dirscan[4] = { sc_UpArrow, sc_RightArrow, sc_DownArrow, sc_LeftArrow };
 int buttonscan[NUMBUTTONS] = { sc_Control, sc_Alt, sc_LShift, sc_Space, sc_1, sc_2, sc_3, sc_4 };
@@ -260,11 +314,11 @@ int songs[] = {
 
 void PollKeyboardButtons (void)
 {
-    int i;
-
-    for (i = 0; i < NUMBUTTONS; i++)
-        if (Keyboard[buttonscan[i]])
-            buttonstate[i] = true;
+	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	{
+		if(controlScheme[i].keyboard != -1 && Keyboard[controlScheme[i].keyboard])
+			buttonstate[controlScheme[i].button] = true;
+	}
 }
 
 
@@ -278,14 +332,12 @@ void PollKeyboardButtons (void)
 
 void PollMouseButtons (void)
 {
-    int buttons = IN_MouseButtons ();
-
-    if (buttons & 1)
-        buttonstate[buttonmouse[0]] = true;
-    if (buttons & 2)
-        buttonstate[buttonmouse[1]] = true;
-    if (buttons & 4)
-        buttonstate[buttonmouse[2]] = true;
+	int buttons = IN_MouseButtons();
+	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	{
+		if(controlScheme[i].mouse != -1 && (buttons & (1<<controlScheme[i].mouse)))
+			buttonstate[controlScheme[i].button] = true;
+	}
 }
 
 
@@ -300,13 +352,12 @@ void PollMouseButtons (void)
 
 void PollJoystickButtons (void)
 {
-    int buttons = IN_JoyButtons();
-
-    for(int i = 0, val = 1; i < JoyNumButtons; i++, val <<= 1)
-    {
-        if(buttons & val)
-            buttonstate[buttonjoy[i]] = true;
-    }
+	int buttons = IN_JoyButtons();
+	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	{
+		if(controlScheme[i].joystick != -1 && (buttons & (1<<controlScheme[i].joystick)))
+			buttonstate[controlScheme[i].button] = true;
+	}
 }
 
 
@@ -322,14 +373,14 @@ void PollKeyboardMove (void)
 {
     int delta = buttonstate[bt_run] ? RUNMOVE * tics : BASEMOVE * tics;
 
-    if (Keyboard[dirscan[di_north]])
-        controly -= delta;
-    if (Keyboard[dirscan[di_south]])
-        controly += delta;
-    if (Keyboard[dirscan[di_west]])
-        controlx -= delta;
-    if (Keyboard[dirscan[di_east]])
-        controlx += delta;
+	if(buttonstate[bt_moveforward])
+		controly -= delta;
+	if(buttonstate[bt_movebackward])
+		controly += delta;
+	if(buttonstate[bt_turnleft])
+		controlx -= delta;
+	if(buttonstate[bt_turnright])
+		controlx += delta;
 }
 
 

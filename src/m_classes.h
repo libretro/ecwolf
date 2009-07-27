@@ -174,11 +174,28 @@ class TextInputMenuItem : public MenuItem
 		void		setValue(std::string text) { value = text; }
 };
 
+class ControlMenuItem : public MenuItem
+{
+	protected:
+		ControlScheme				&button;
+		static int					column;
+		static const char* const	keyNames[SDLK_LAST];
+
+	public:
+		ControlMenuItem(ControlScheme &button);
+
+		void	activate();
+		void	draw();
+		void	left();
+		void	right();
+};
+
 class Menu
 {
 	protected:
 		MENU_LISTENER_PROTOTYPE(entryListener);
 		static bool				close;
+		bool					controlHeaders;
 		int						curPos;
 		int						headPicture;
 		char					headText[36];
@@ -223,6 +240,10 @@ class Menu
 		void			setHeadPicture(int picture) { headPicture = picture; }
 		void			setHeadText(const char text[36]);
 		void			show();
+		/**
+		 * Should this menu show the Key, Mse. and Joy headers?
+		 */
+		void			showControlHeaders(bool show) { controlHeaders = show; }
 		MenuItem		*operator[] (int index) { return getIndex(index); }
 };
 

@@ -795,7 +795,7 @@ typedef struct objstruct
     struct objstruct *next,*prev;
 } objtype;
 
-enum
+enum Button
 {
     bt_nobutton=-1,
     bt_attack=0,
@@ -818,6 +818,22 @@ enum
     bt_turnright,
     NUMBUTTONS
 };
+
+struct ControlScheme
+{
+	public:
+		static void	setKeyboard(ControlScheme* scheme, Button button, int value);
+		static void setJoystick(ControlScheme* scheme, Button button, int value);
+		static void setMouse(ControlScheme* scheme, Button button, int value);
+
+		Button		button;
+		const char*	name;
+		int			joystick;
+		int			keyboard;
+		int			mouse;
+};
+
+extern ControlScheme controlScheme[];
 
 
 #define NUMWEAPONS      4
