@@ -1044,6 +1044,7 @@ extern  memptr      demobuffer;
 //
 // control info
 //
+extern  boolean		alwaysrun;
 extern  boolean     mouseenabled,mouseyaxisdisabled,joystickenabled;
 extern  int         dirscan[4];
 extern  int         buttonscan[NUMBUTTONS];

@@ -180,9 +180,9 @@ MENU_LISTENER(SetMusic)
 }
 MENU_LISTENER(EnterControlBase)
 {
-	controlBase[1]->setEnabled(mouseenabled);
 	controlBase[2]->setEnabled(mouseenabled);
-	controlBase[3]->setEnabled(IN_JoyPresent());
+	controlBase[3]->setEnabled(mouseenabled);
+	controlBase[4]->setEnabled(IN_JoyPresent());
 	controlBase.draw();
 }
 MENU_LISTENER(BeginEditSave)
@@ -459,6 +459,7 @@ void CreateMenus()
 	soundBase.addItem(new SliderMenuItem(MusicVolume, 150, MAX_VOLUME, "Soft", "Loud"));
 
 	controlBase.setHeadPicture(C_CONTROLPIC);
+	controlBase.addItem(new BooleanMenuItem("Always Run", alwaysrun, EnterControlBase));
 	controlBase.addItem(new BooleanMenuItem(STR_MOUSEEN, mouseenabled, EnterControlBase));
 	controlBase.addItem(new BooleanMenuItem(STR_DISABLEYAXIS, mouseyaxisdisabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(STR_SENS, mouseSensitivity));

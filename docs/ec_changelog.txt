@@ -3,6 +3,7 @@ July 27th, 2009
 - Customize controls menu is now using the new code.  In addition more contorls
   are available.
 - Completely removed the old menu handling code.
+- Added always run.
 
 July 26th, 2009
 -----------------------------
