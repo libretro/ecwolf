@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 // =============================================================================
 // ### ### ##   ## ###  #   ###  ##   #   #  ##   ## ### ##  ### ###  #  ###
 // #    #  # # # # #  # #   #    # # # # # # # # # # #   # #  #   #  # # #  #
@@ -32,6 +32,7 @@
 #include <string>
 #include <string.h>
 #include <stdlib.h>
+#include <cstdio>
 
 #include "actors/scanner.hpp"
 

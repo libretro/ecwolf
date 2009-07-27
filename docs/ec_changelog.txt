@@ -2,6 +2,7 @@ July 26th, 2009
 -----------------------------
 - Added scrolling code to menus.
 - It can now search an entire directory for save games.  (Linux only)
+- Fixed Windows compile error.
 
 June 22nd, 2009
 -----------------------------
