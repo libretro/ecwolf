@@ -6,7 +6,6 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
-#pragma hdrstop
 
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;

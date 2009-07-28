@@ -1,6 +1,5 @@
 // ID_VH.H
 
-
 #define WHITE			15			// graphics mode independant colors
 #define BLACK			0
 #define FIRSTCOLOR		1

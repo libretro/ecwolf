@@ -25,7 +25,7 @@
 #	define O_BINARY 0
 #endif
 
-#pragma pack(1)
+//#pragma pack(1)
 
 #include "foreign.h"
 

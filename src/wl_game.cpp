@@ -8,7 +8,6 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include <SDL_mixer.h>
-#pragma hdrstop
 
 #ifdef MYPROFILE
 #include <TIME.H>

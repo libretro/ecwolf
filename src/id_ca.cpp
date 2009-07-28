@@ -22,11 +22,11 @@ loaded into the data segment
 	#include <unistd.h>
 #endif
 
+#pragma pack(1)
 #include "wl_def.h"
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
-#pragma hdrstop
 
 #define THREEBYTEGRSTARTS
 

@@ -1,3 +1,8 @@
+July 28th, 2009
+-----------------------------
+- Removed #pragma pack(1) (among others) from as many source files as possible.
+  This fixes some crashes that only appeared in release builds.
+
 July 27th, 2009
 -----------------------------
 - Customize controls menu is now using the new code.  In addition more contorls

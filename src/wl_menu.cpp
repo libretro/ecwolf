@@ -12,12 +12,15 @@
 #else
 	#include <unistd.h>
 #endif
+#include <deque>
+#include <vector>
 
 #define LSA_X	96
 #define LSA_Y	80
 #define LSA_W	130
 #define LSA_H	42
 
+#include "file.h"
 #include "m_classes.h"
 #include "wl_def.h"
 #include "wl_menu.h"
@@ -26,10 +29,6 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
-#include "file.h"
-#pragma hdrstop
-#include <deque>
-#include <vector>
 using namespace std;
 
 struct SaveFile

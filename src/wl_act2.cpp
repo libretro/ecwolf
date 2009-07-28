@@ -8,7 +8,6 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
-#pragma hdrstop
 
 /*
 =============================================================================

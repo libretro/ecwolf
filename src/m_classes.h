@@ -1,9 +1,10 @@
 #ifndef __M_CLASSES_H__
 #define __M_CLASSES_H__
 
-#include "wl_def.h"
 #include <string>
 #include <vector>
+
+#include "wl_def.h"
 
 /*//////////////////////////////////////////////////////////////////////////////
 //                         NEW MENU CODE
