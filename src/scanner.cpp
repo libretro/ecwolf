@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <cstdio>
 
-#include "actors/scanner.hpp"
+#include "scanner.hpp"
 
 using namespace std;
 

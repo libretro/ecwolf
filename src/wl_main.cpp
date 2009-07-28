@@ -16,6 +16,7 @@
 #pragma hdrstop
 #include "wl_atmos.h"
 #include "m_classes.h"
+#include "config.hpp"
 #include <SDL_syswm.h>
 
 
@@ -132,105 +133,101 @@ void ReadConfig(void)
     SMMode  sm;
     SDSMode sds;
 
+	config->CreateSetting("MouseEnabled", 1);
+	config->CreateSetting("JoystickEnabled", 0);
+	config->CreateSetting("ViewSize", 19);
+	config->CreateSetting("MouseAdjustment", 5);
+	config->CreateSetting("SoundDevice", sdm_AdLib);
+	config->CreateSetting("MusicDevice", smm_AdLib);
+	config->CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
+	config->CreateSetting("AlwaysRun", 0);
+	config->CreateSetting("MouseYAxisDisabled", 0);
+
 #ifdef _arch_dreamcast
-    DC_LoadFromVMU(configname);
+    DC_LoadFromVMU("ecwolf.cfg");
 #endif
 
-    const int file = open(configname, O_RDONLY | O_BINARY);
-    if (file != -1)
-    {
-        //
-        // valid config file
-        //
-        word tmp;
-        read(file,&tmp,sizeof(tmp));
-        if(tmp!=0xfefa)
-        {
-            close(file);
-            goto noconfig;
-        }
-        read(file,Scores,sizeof(HighScore) * MaxScores);
+	char joySettingName[50];
+	char keySettingName[50];
+	char mseSettingName[50];
+	mouseenabled = config->GetSetting("MouseEnabled")->GetInteger() != 0;
+	joystickenabled = config->GetSetting("JoystickEnabled")->GetInteger() != 0;
+	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	{
+		sprintf(joySettingName, "Joystick_%s", controlScheme[i].name);
+		sprintf(keySettingName, "Keybaord_%s", controlScheme[i].name);
+		sprintf(mseSettingName, "Mouse_%s", controlScheme[i].name);
+		for(unsigned int j = 0;j < 50;j++)
+		{
+			if(joySettingName[j] == ' ')
+				joySettingName[j] = '_';
+			if(keySettingName[j] == ' ')
+				keySettingName[j] = '_';
+			if(mseSettingName[j] == ' ')
+				mseSettingName[j] = '_';
+		}
+		config->CreateSetting(joySettingName, controlScheme[i].joystick);
+		config->CreateSetting(keySettingName, controlScheme[i].keyboard);
+		config->CreateSetting(mseSettingName, controlScheme[i].mouse);
+		controlScheme[i].joystick = config->GetSetting(joySettingName)->GetInteger();
+		controlScheme[i].keyboard = config->GetSetting(keySettingName)->GetInteger();
+		controlScheme[i].mouse = config->GetSetting(mseSettingName)->GetInteger();
+	}
+	viewsize = config->GetSetting("ViewSize")->GetInteger();
+	mouseadjustment = config->GetSetting("MouseAdjustment")->GetInteger();
+	mouseyaxisdisabled = config->GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
+	alwaysrun = config->GetSetting("AlwaysRun")->GetInteger() != 0;
+	sd = static_cast<SDMode> (config->GetSetting("SoundDevice")->GetInteger());
+	sm = static_cast<SMMode> (config->GetSetting("MusicDevice")->GetInteger());
+	sds = static_cast<SDSMode> (config->GetSetting("DigitalSoundDevice")->GetInteger());
 
-        read(file,&sd,sizeof(sd));
-        read(file,&sm,sizeof(sm));
-        read(file,&sds,sizeof(sds));
+	char hsName[50];
+	char hsScore[50];
+	char hsCompleted[50];
+	char hsEpisode[50];
+	for(unsigned int i = 0;i < MaxScores;i++)
+	{
+		sprintf(hsName, "HighScore%u_Name", i);
+		sprintf(hsScore, "HighScore%u_Score", i);
+		sprintf(hsCompleted, "HighScore%u_Completed", i);
+		sprintf(hsEpisode, "HighScore%u_Episode", i);
 
-        read(file,&mouseenabled,sizeof(mouseenabled));
-        read(file,&joystickenabled,sizeof(joystickenabled));
-        boolean dummyJoypadEnabled;
-        read(file,&dummyJoypadEnabled,sizeof(dummyJoypadEnabled));
-        boolean dummyJoystickProgressive;
-        read(file,&dummyJoystickProgressive,sizeof(dummyJoystickProgressive));
-        int dummyJoystickPort = 0;
-        read(file,&dummyJoystickPort,sizeof(dummyJoystickPort));
+		config->CreateSetting(hsName, Scores[i].name);
+		config->CreateSetting(hsScore, Scores[i].score);
+		config->CreateSetting(hsCompleted, Scores[i].completed);
+		config->CreateSetting(hsEpisode, Scores[i].episode);
 
-        read(file,dirscan,sizeof(dirscan));
-        read(file,buttonscan,sizeof(buttonscan));
-        read(file,buttonmouse,sizeof(buttonmouse));
-        read(file,buttonjoy,sizeof(buttonjoy));
+		strcpy(Scores[i].name, config->GetSetting(hsName)->GetString().c_str());
+		Scores[i].score = config->GetSetting(hsScore)->GetInteger();
+		Scores[i].completed = config->GetSetting(hsCompleted)->GetInteger();
+		Scores[i].episode = config->GetSetting(hsEpisode)->GetInteger();
+	}
 
-        read(file,&viewsize,sizeof(viewsize));
-        read(file,&mouseadjustment,sizeof(mouseadjustment));
+	if ((sd == sdm_AdLib || sm == smm_AdLib) && !AdLibPresent
+			&& !SoundBlasterPresent)
+	{
+		sd = sdm_PC;
+		sm = smm_Off;
+	}
 
-        close(file);
+	if ((sds == sds_SoundBlaster && !SoundBlasterPresent))
+		sds = sds_Off;
 
-        if ((sd == sdm_AdLib || sm == smm_AdLib) && !AdLibPresent
-                && !SoundBlasterPresent)
-        {
-            sd = sdm_PC;
-            sm = smm_Off;
-        }
+	// make sure values are correct
 
-        if ((sds == sds_SoundBlaster && !SoundBlasterPresent))
-            sds = sds_Off;
+	if(mouseenabled) mouseenabled=true;
+	if(joystickenabled) joystickenabled=true;
 
-        // make sure values are correct
+	if (!MousePresent)
+		mouseenabled = false;
+	if (!IN_JoyPresent())
+		joystickenabled = false;
 
-        if(mouseenabled) mouseenabled=true;
-        if(joystickenabled) joystickenabled=true;
+	if(mouseadjustment<0) mouseadjustment=0;
+	else if(mouseadjustment>9) mouseadjustment=9;
 
-        if (!MousePresent)
-            mouseenabled = false;
-        if (!IN_JoyPresent())
-            joystickenabled = false;
-
-        if(mouseadjustment<0) mouseadjustment=0;
-        else if(mouseadjustment>9) mouseadjustment=9;
-
-        if(viewsize<4) viewsize=4;
-        else if(viewsize>21) viewsize=21;
-    }
-    else
-    {
-        //
-        // no config file, so select by hardware
-        //
-noconfig:
-        if (SoundBlasterPresent || AdLibPresent)
-        {
-            sd = sdm_AdLib;
-            sm = smm_AdLib;
-        }
-        else
-        {
-            sd = sdm_PC;
-            sm = smm_Off;
-        }
-
-        if (SoundBlasterPresent)
-            sds = sds_SoundBlaster;
-        else
-            sds = sds_Off;
-
-        if (MousePresent)
-            mouseenabled = true;
-
-        if (IN_JoyPresent())
-            joystickenabled = true;
-
-        viewsize = 19;                          // start with a good size
-        mouseadjustment=5;
-    }
+	if(viewsize<4) viewsize=4;
+	else if(viewsize>21) viewsize=21;
 
     SD_SetMusicMode (sm);
     SD_SetSoundMode (sd);
@@ -248,41 +245,59 @@ noconfig:
 void WriteConfig(void)
 {
 #ifdef _arch_dreamcast
-    fs_unlink(configname);
+    fs_unlink("ecwolf.cfg");
 #endif
 
-    const int file = open(configname, O_CREAT | O_WRONLY | O_BINARY, 0644);
-    if (file != -1)
-    {
-        word tmp=0xfefa;
-        write(file,&tmp,sizeof(tmp));
-        write(file,Scores,sizeof(HighScore) * MaxScores);
+	char joySettingName[50];
+	char keySettingName[50];
+	char mseSettingName[50];
+	config->GetSetting("MouseEnabled")->SetValue(mouseenabled);
+	config->GetSetting("JoystickEnabled")->SetValue(joystickenabled);
+	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	{
+		sprintf(joySettingName, "Joystick_%s", controlScheme[i].name);
+		sprintf(keySettingName, "Keybaord_%s", controlScheme[i].name);
+		sprintf(mseSettingName, "Mouse_%s", controlScheme[i].name);
+		for(unsigned int j = 0;j < 50;j++)
+		{
+			if(joySettingName[j] == ' ')
+				joySettingName[j] = '_';
+			if(keySettingName[j] == ' ')
+				keySettingName[j] = '_';
+			if(mseSettingName[j] == ' ')
+				mseSettingName[j] = '_';
+		}
+		config->GetSetting(joySettingName)->SetValue(controlScheme[i].joystick);
+		config->GetSetting(keySettingName)->SetValue(controlScheme[i].keyboard);
+		config->GetSetting(mseSettingName)->SetValue(controlScheme[i].mouse);
+	}
+	config->GetSetting("ViewSize")->SetValue(viewsize);
+	config->GetSetting("MouseAdjustment")->SetValue(mouseadjustment);
+	config->GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
+	config->GetSetting("AlwaysRun")->SetValue(alwaysrun);
+	config->GetSetting("SoundDevice")->SetValue(SoundMode);
+	config->GetSetting("MusicDevice")->SetValue(MusicMode);
+	config->GetSetting("DigitalSoundDevice")->SetValue(DigiMode);
 
-        write(file,&SoundMode,sizeof(SoundMode));
-        write(file,&MusicMode,sizeof(MusicMode));
-        write(file,&DigiMode,sizeof(DigiMode));
+	char hsName[50];
+	char hsScore[50];
+	char hsCompleted[50];
+	char hsEpisode[50];
+	for(unsigned int i = 0;i < MaxScores;i++)
+	{
+		sprintf(hsName, "HighScore%u_Name", i);
+		sprintf(hsScore, "HighScore%u_Score", i);
+		sprintf(hsCompleted, "HighScore%u_Completed", i);
+		sprintf(hsEpisode, "HighScore%u_Episode", i);
 
-        write(file,&mouseenabled,sizeof(mouseenabled));
-        write(file,&joystickenabled,sizeof(joystickenabled));
-        boolean dummyJoypadEnabled = false;
-        write(file,&dummyJoypadEnabled,sizeof(dummyJoypadEnabled));
-        boolean dummyJoystickProgressive = false;
-        write(file,&dummyJoystickProgressive,sizeof(dummyJoystickProgressive));
-        int dummyJoystickPort = 0;
-        write(file,&dummyJoystickPort,sizeof(dummyJoystickPort));
+		config->GetSetting(hsName)->SetValue(Scores[i].name);
+		config->GetSetting(hsScore)->SetValue(Scores[i].score);
+		config->GetSetting(hsCompleted)->SetValue(Scores[i].completed);
+		config->GetSetting(hsEpisode)->SetValue(Scores[i].episode);
+	}
 
-        write(file,dirscan,sizeof(dirscan));
-        write(file,buttonscan,sizeof(buttonscan));
-        write(file,buttonmouse,sizeof(buttonmouse));
-        write(file,buttonjoy,sizeof(buttonjoy));
-
-        write(file,&viewsize,sizeof(viewsize));
-        write(file,&mouseadjustment,sizeof(mouseadjustment));
-
-        close(file);
-    }
 #ifdef _arch_dreamcast
-    DC_SaveToVMU(configname, 1);
+    DC_SaveToVMU("ecwolf.cfg", 1);
 #endif
 }
 
@@ -1796,6 +1811,8 @@ void CheckParameters(int argc, char *argv[])
 
 int main (int argc, char *argv[])
 {
+	config->LocateConfigFile(argc, argv);
+
 #if defined(_arch_dreamcast)
     DC_Main();
     DC_CheckParameters();

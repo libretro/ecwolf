@@ -4,6 +4,7 @@ July 27th, 2009
   are available.
 - Completely removed the old menu handling code.
 - Added always run.
+- Changed the config system to use an ascii file.
 
 July 26th, 2009
 -----------------------------

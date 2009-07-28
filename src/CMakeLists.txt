@@ -27,7 +27,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(../ecwolf
-#	config.cpp
+	config.cpp
 	file.cpp
 	fmopl.cpp
 	id_ca.cpp
@@ -38,7 +38,7 @@ add_executable(../ecwolf
 	id_vh.cpp
 	id_vl.cpp
 	m_classes.cpp
-#	scanner.cpp
+	scanner.cpp
 	signon.cpp
 	wl_act1.cpp
 	wl_act2.cpp
