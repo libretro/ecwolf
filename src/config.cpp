@@ -69,7 +69,9 @@ void Config::LocateConfigFile(int argc, char* argv[])
 {
 	string configDir;
 #ifdef WINDOWS
-	configDir = g_MainController.GetWorkingDir();
+	configDir = argv[0];
+	int pos = static_cast<int> (configDir.find_last_of('\\')) > static_cast<int> (configDir.find_last_of('/')) ? configDir.find_last_of('\\') : configDir.find_last_of('/');
+	configDir = configDir.substr(0, pos+1);
 #else
 	char *home = getenv("HOME");
 	if(home == NULL || *home == '\0')
