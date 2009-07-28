@@ -21,6 +21,8 @@ include_directories(${SDLMIXER_INCLUDE_DIR})
 include_directories(${SDL_INCLUDE_DIR})
 
 if(WIN32)
+	add_definitions(-DWINDOWS)
+
 	set(EXTRA_FILES
 		sdl_winmain.cpp
 	)
