@@ -156,6 +156,9 @@ void ReadConfig(void)
 	config->CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
 	config->CreateSetting("AlwaysRun", 0);
 	config->CreateSetting("MouseYAxisDisabled", 0);
+	config->CreateSetting("SoundVolume", MAX_VOLUME);
+	config->CreateSetting("MusicVolume", MAX_VOLUME);
+	config->CreateSetting("DigitizedVolume", MAX_VOLUME);
 
 #ifdef _arch_dreamcast
     DC_LoadFromVMU("ecwolf.cfg");
@@ -194,6 +197,9 @@ void ReadConfig(void)
 	sd = static_cast<SDMode> (config->GetSetting("SoundDevice")->GetInteger());
 	sm = static_cast<SMMode> (config->GetSetting("MusicDevice")->GetInteger());
 	sds = static_cast<SDSMode> (config->GetSetting("DigitalSoundDevice")->GetInteger());
+	AdlibVolume = config->GetSetting("SoundVolume")->GetInteger();
+	MusicVolume = config->GetSetting("MusicVolume")->GetInteger();
+	SoundVolume = config->GetSetting("DigitizedVolume")->GetInteger();
 
 	char hsName[50];
 	char hsScore[50];
@@ -238,7 +244,7 @@ void ReadConfig(void)
 		joystickenabled = false;
 
 	if(mouseadjustment<0) mouseadjustment=0;
-	else if(mouseadjustment>9) mouseadjustment=9;
+	else if(mouseadjustment>20) mouseadjustment=20;
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
@@ -292,6 +298,9 @@ void WriteConfig(void)
 	config->GetSetting("SoundDevice")->SetValue(SoundMode);
 	config->GetSetting("MusicDevice")->SetValue(MusicMode);
 	config->GetSetting("DigitalSoundDevice")->SetValue(DigiMode);
+	config->GetSetting("SoundVolume")->SetValue(AdlibVolume);
+	config->GetSetting("MusicVolume")->SetValue(MusicVolume);
+	config->GetSetting("DigitizedVolume")->SetValue(SoundVolume);
 
 	char hsName[50];
 	char hsScore[50];

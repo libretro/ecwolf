@@ -403,9 +403,9 @@ void PollMouseMove (void)
     mousexmove -= screenWidth / 2;
     mouseymove -= screenHeight / 2;
 
-    controlx += mousexmove * 10 / (13 - mouseadjustment);
+    controlx += mousexmove * 20 / (21 - mouseadjustment);
 	if(!mouseyaxisdisabled)
-    	controly += mouseymove * 20 / (13 - mouseadjustment);
+    	controly += mouseymove * 40 / (21 - mouseadjustment);
 }
 
 

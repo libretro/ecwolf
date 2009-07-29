@@ -2,6 +2,8 @@ July 29th, 2009
 -----------------------------
 - Used ZDoom's file management to export the palettes.
 - Added Executor's texture names.
+- Added 10 extra levels of mouse sensitivity
+- Fixed: Volume sliders were not saved to the config file.
 
 July 28th, 2009
 -----------------------------

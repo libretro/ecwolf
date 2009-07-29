@@ -471,7 +471,7 @@ void CreateMenus()
 	saveGame.setHeadPicture(C_SAVEGAMEPIC);
 
 	mouseSensitivity.addItem(new LabelMenuItem(STR_MOUSEADJ));
-	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 10, STR_SLOW, STR_FAST));
+	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, STR_SLOW, STR_FAST));
 
 	controls.setHeadPicture(C_CUSTOMIZEPIC);
 	controls.showControlHeaders(true);
