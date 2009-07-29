@@ -1,4 +1,23 @@
 cmake_minimum_required(VERSION 2.4)
 project(ECWOLF)
 
+set(LZMA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lzma/C")
+
+find_package(ZLIB)
+find_package(BZip2)
+
+if(NOT ZLIB_FOUND)
+	set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib)
+	add_subdirectory(zlib)
+	set(ZLIB_LIBRARY z)
+endif(NOT ZLIB_FOUND)
+
+if(NOT BZIP2_FOUND)
+	set(BZIP2_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bzip2)
+	add_subdirectory(bzip2)
+	set(ZLIB_LIBRARIES bz2)
+endif(NOT BZIP2_FOUND)
+
+add_subdirectory(gdtoa)
+add_subdirectory(lzma)
 add_subdirectory(src)

@@ -58,9 +58,17 @@ typedef ptr_t uintptr_t;
 #endif
 
 typedef uint8_t byte;
+typedef uint8_t BYTE;
+typedef int8_t SBYTE;
 typedef uint16_t word;
+typedef uint16_t WORD;
+typedef int16_t SWORD;
 typedef int32_t fixed;
 typedef uint32_t longword;
+typedef uint32_t DWORD;
+typedef int32_t SDWORD;
+typedef uint64_t QWORD;
+typedef int64_t SQWORD;
 typedef int8_t boolean;
 typedef void * memptr;
 

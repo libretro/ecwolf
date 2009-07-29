@@ -2,6 +2,7 @@ July 28th, 2009
 -----------------------------
 - Removed #pragma pack(1) (among others) from as many source files as possible.
   This fixes some crashes that only appeared in release builds.
+- Added some file management code from ZDoom.
 
 July 27th, 2009
 -----------------------------
