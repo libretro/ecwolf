@@ -225,6 +225,8 @@ MENU_LISTENER(PerformSaveGame)
 		saveGame[0]->setHighlighted(false);
 		saveGame.setCurrentPosition(1);
 		loadGame.setCurrentPosition(0);
+
+		mainMenu[3]->setEnabled(true);
 	}
 	else
 	{

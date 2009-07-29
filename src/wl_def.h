@@ -65,7 +65,11 @@ typedef uint16_t WORD;
 typedef int16_t SWORD;
 typedef int32_t fixed;
 typedef uint32_t longword;
+#ifndef WINDOWS
 typedef uint32_t DWORD;
+#else
+#include <windef.h>
+#endif
 typedef int32_t SDWORD;
 typedef uint64_t QWORD;
 typedef int64_t SQWORD;

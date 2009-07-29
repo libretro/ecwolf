@@ -15,7 +15,7 @@ endif(NOT ZLIB_FOUND)
 if(NOT BZIP2_FOUND)
 	set(BZIP2_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bzip2)
 	add_subdirectory(bzip2)
-	set(ZLIB_LIBRARIES bz2)
+	set(BZIP2_LIBRARIES bz2)
 endif(NOT BZIP2_FOUND)
 
 add_subdirectory(gdtoa)

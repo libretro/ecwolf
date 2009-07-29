@@ -620,6 +620,8 @@ MenuItem *Menu::getIndex(int index) const
 
 void Menu::drawMenu() const
 {
+	lastIndexDrawn = 0;
+
 	WindowX = PrintX = getX() + getIndent();
 	WindowY = PrintY = getY();
 	WindowW = 320;
@@ -804,6 +806,8 @@ int Menu::handle()
 				// MOVE UP
 				//
 			case dir_North:
+				if(countItems() <= 1)
+					break;
 
 				eraseGun(x, y);
 
@@ -829,7 +833,7 @@ int Menu::handle()
 				//
 				do
 				{
-					if (curPos == 0)
+					if (curPos == 0 && lastIndexDrawn != 0)
 					{
 						curPos = countItems() - 1;
 						itemOffset = (countItems() - 1) - lastIndexDrawn;
@@ -852,6 +856,8 @@ int Menu::handle()
 				// MOVE DOWN
 				//
 			case dir_South:
+				if(countItems() <= 1)
+					break;
 
 				eraseGun(x, y);
 				//
@@ -968,6 +974,11 @@ void Menu::show()
 {
 	if(entryListener != NULL)
 		entryListener(0);
+
+	if(countItems() == 0) // Do nothing.
+		return;
+	if(curPos >= countItems())
+		curPos = countItems()-1;
 
 	draw();
 	MenuFadeIn();
