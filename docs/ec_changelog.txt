@@ -1,3 +1,8 @@
+July 29th, 2009
+-----------------------------
+- Used ZDoom's file management to export the palettes.
+- Added Executor's texture names.
+
 July 28th, 2009
 -----------------------------
 - Removed #pragma pack(1) (among others) from as many source files as possible.

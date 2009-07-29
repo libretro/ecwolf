@@ -393,7 +393,7 @@ int FWadCollection::CheckNumForName (const char *name, int space)
 	}
 
 	uppercopy (uname, name);
-	i = FirstLumpIndex[LumpNameHash (uname) % NumLumps];
+	i = FirstLumpIndex[LumpNameHash(uname) % NumLumps];
 
 	while (i != NULL_INDEX)
 	{
@@ -607,7 +607,7 @@ int FWadCollection::GetLumpFlags (int lump)
 
 DWORD FWadCollection::LumpNameHash (const char *s)
 {
-	const DWORD *table = GetCRCTable ();;
+	const DWORD *table = GetCRCTable ();
 	DWORD hash = 0xffffffff;
 	int i;
 

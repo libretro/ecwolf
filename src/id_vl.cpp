@@ -3,6 +3,7 @@
 #include <string.h>
 #include "wl_def.h"
 #include "id_vl.h"
+#include "w_wad.h"
 
 
 // Uncomment the following line, if you get destination out of bounds
@@ -49,21 +50,28 @@ unsigned bordercolor;
 SDL_Color palette1[256], palette2[256];
 SDL_Color curpal[256];
 
-
-#define CASSERT(x) extern int ASSERT_COMPILE[((x) != 0) * 2 - 1];
-#define RGB(r, g, b) {(r)*255/63, (g)*255/63, (b)*255/63, 0}
-
-SDL_Color gamepal[]={
-#ifdef SPEAR
-    #include "sodpal.inc"
-#else
-    #include "wolfpal.inc"
-#endif
-};
-
-CASSERT(lengthof(gamepal) == 256)
+SDL_Color gamepal[256];
 
 //===========================================================================
+
+void VL_ReadPalette()
+{
+	int lump = Wads.GetNumForName("WOLFPAL");
+	if(lump == -1 || Wads.LumpLength(lump) < 768)
+	{
+		printf("ERROR: Valid palette data not found.\n");
+		exit(0);
+	}
+
+	FWadLump palette = Wads.OpenLumpNum(lump);
+	unsigned char data[768];
+	palette.Read(data, 768);
+	for(unsigned int i = 0;i < 768;i += 3)
+	{
+		SDL_Color color = {data[i], data[i+1], data[i+2], 0};
+		gamepal[i/3] = color;
+	}
+}
 
 
 /*

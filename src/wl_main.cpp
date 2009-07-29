@@ -17,7 +17,21 @@
 #include "wl_atmos.h"
 #include "m_classes.h"
 #include "config.hpp"
+#include "w_wad.h"
 #include <SDL_syswm.h>
+
+// Wad Code Stuff
+wadlist_t *wadfiles;
+static wadlist_t **wadtail = &wadfiles;
+void WL_AddFile(const char *file)
+{
+	wadlist_t *wad = (wadlist_t *)malloc(sizeof(*wad) + strlen(file));
+
+	*wadtail = wad;
+	wad->next = NULL;
+	strcpy(wad->name, file);
+	wadtail = &wad->next;
+}
 
 
 /*
@@ -1746,7 +1760,8 @@ void CheckParameters(int argc, char *argv[])
             param_ignorenumchunks = true;
         else IFARG("--help")
             showHelp = true;
-        else hasError = true;
+        else
+			WL_AddFile(argv[i]);
     }
     if(hasError || showHelp)
     {
@@ -1812,6 +1827,7 @@ void CheckParameters(int argc, char *argv[])
 int main (int argc, char *argv[])
 {
 	config->LocateConfigFile(argc, argv);
+	WL_AddFile("ecwolf.pk3");
 
 #if defined(_arch_dreamcast)
     DC_Main();
@@ -1822,8 +1838,11 @@ int main (int argc, char *argv[])
     CheckParameters(argc, argv);
 #endif
 
+	Wads.InitMultipleFiles(&wadfiles, NULL);
+
     CheckForEpisodes();
 
+	VL_ReadPalette();
     InitGame();
 	CreateMenus();
 
