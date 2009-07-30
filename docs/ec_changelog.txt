@@ -2,6 +2,8 @@ July 30th, 2009
 -----------------------------
 - Removed Spear of Destiny copy protection quiz.
 - Added language lump support.
+- Fixed: Crash at intermission.
+- Fixed: Typo in language lump with STR_FLOORCOMPLETED which caused a crash.
 
 July 29th, 2009
 -----------------------------

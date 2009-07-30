@@ -356,6 +356,9 @@ Write (int x, int y, const char *string)
                 ch -= ('a' - 'A');
             ch -= '0';
 
+			if(nx >= 320 || ny >= 200)
+				continue;
+
             switch (string[i])
             {
                 case '!':
@@ -383,6 +386,8 @@ Write (int x, int y, const char *string)
                     break;
 
                 default:
+					if(ch >= 43)
+						break;
                     VWB_DrawPic (nx, ny, alpha[ch]);
             }
             nx += 16;
