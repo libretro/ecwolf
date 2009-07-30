@@ -1,0 +1,12 @@
+/* SPANISH TRANSLATION */
+
+[spa]
+STR_RT = "Ve esto!";
+STR_FLOORCOMPLETED = "piso\ncompletado";
+
+WL_EPISODE1 = "Episodio 1\nFuga desde Wolfenstein";
+WL_EPISODE2 = "Episodio 2\nOperacion Eisenfaust";
+WL_EPISODE3 = "Episodio 3\nMuere, Fuhrer, Muere!";
+WL_EPISODE4 = "Episodio 4\nUn Negro Secreto";
+WL_EPISODE5 = "Episodio 5\nHuellas del Loco";
+WL_EPISODE6 = "Episodio 6\nConfrontacion";

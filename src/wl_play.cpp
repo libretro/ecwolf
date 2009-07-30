@@ -9,6 +9,7 @@
 
 #include "wl_cloudsky.h"
 #include "wl_shade.h"
+#include "language.h"
 
 /*
 =============================================================================
@@ -683,8 +684,7 @@ void CheckKeys (void)
         CA_CacheGrChunk (STARTFONT + 1);
         ClearSplitVWB ();
 
-        Message (STR_CHEATER1 "\n"
-                 STR_CHEATER2 "\n\n" STR_CHEATER3 "\n" STR_CHEATER4 "\n" STR_CHEATER5);
+        Message (language["STR_CHEATER"]);
 
         UNCACHEGRCHUNK (STARTFONT + 1);
         IN_ClearKeysDown ();

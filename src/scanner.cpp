@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*-
+// Emacs style mode select   -*- C++ -*- 
 // =============================================================================
 // ### ### ##   ## ###  #   ###  ##   #   #  ##   ## ### ##  ### ###  #  ###
 // #    #  # # # # #  # #   #    # # # # # # # # # # #   # #  #   #  # # #  #
@@ -32,25 +32,28 @@
 #include <string>
 #include <string.h>
 #include <stdlib.h>
-#include <cstdio>
+#include <math.h>
 
 #include "scanner.hpp"
+#include "config.hpp"
 
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Scanner::Scanner(char* data, UInt32 length)
-: str(NULL), number(0), decimal(0), boolean(false), lastToken(0), error(false), data(data), length(length), line(0), lpos(0), pos(0)
+Scanner::Scanner(const char* data, UInt32 length)
+: number(0), decimal(0), boolean(false), lastToken(0), error(false), length(length), line(0), lpos(0), pos(0), ret(NULL)
 {
+	this->data = new char[length];
+	memcpy(this->data, data, length);
+	CheckForWhitespace();
 }
 
 Scanner::~Scanner()
 {
-	if(str != NULL) {
-		delete [] str;
-		str = NULL;
-	}
+	if(ret != NULL)
+		delete[] ret;
+	delete[] data;
 }
 
 void Scanner::MustGetToken(char token)
@@ -65,7 +68,7 @@ bool Scanner::CheckToken(char token)
 	UInt32 nPos = pos;
 	UInt32 nLpos = lpos;
 	UInt32 nLine = line;
-	GetToken(nPos, nLpos, nLine, token);
+	GetToken(nPos, nLpos, nLine, token, false);
 	if(!error)
 	{
 		pos = nPos;
@@ -78,6 +81,138 @@ bool Scanner::CheckToken(char token)
 	return false;
 }
 
+ETokenType Scanner::GetNextToken()
+{
+	if(pos >= length)
+		return TK_NoToken;
+
+	if(data[pos] >= '0' && data[pos] <= '9')
+	{
+		if(CheckToken(TK_Identifier))
+			return TK_Identifier;
+		else if(CheckToken(TK_FloatConst))
+		{
+			double integerPart = 0.0;
+			if(modf(decimal, &integerPart) != 0.0)
+				return TK_FloatConst;
+			else
+			{
+				number = static_cast<UInt32> (integerPart);
+				return TK_IntConst;
+			}
+		}
+		else if(CheckToken(TK_IntConst))
+			return TK_IntConst;
+	}
+	else if(data[pos] >= 'a' && data[pos] <= 'z')
+	{
+		if(CheckToken(TK_BoolConst))
+			return TK_BoolConst;
+		else if(CheckToken(TK_Void))
+			return TK_Void;
+		else if(CheckToken(TK_String))
+			return TK_String;
+		else if(CheckToken(TK_Int))
+			return TK_Int;
+		else if(CheckToken(TK_Bool))
+			return TK_Bool;
+		else if(CheckToken(TK_Identifier))
+			return TK_Identifier;
+	}
+	else if((data[pos] >= 'A' && data[pos] <= 'Z') || data[pos] == '_')
+	{
+		if(CheckToken(TK_Identifier))
+			return TK_Identifier;
+	}
+	else if(data[pos] == '"')
+	{
+		if(CheckToken(TK_StringConst))
+			return TK_StringConst;
+	}
+	else
+	{
+		if(CheckToken(TK_AndAnd))
+			return TK_AndAnd;
+		else if(CheckToken(TK_OrOr))
+			return TK_OrOr;
+		else if(CheckToken(TK_EqEq))
+			return TK_EqEq;
+		else if(CheckToken(TK_NotEq))
+			return TK_NotEq;
+		else if(CheckToken(TK_GtrEq))
+			return TK_GtrEq;
+		else if(CheckToken(TK_LessEq))
+			return TK_LessEq;
+		else if(CheckToken(TK_ShiftLeft))
+			return TK_ShiftLeft;
+		else if(CheckToken(TK_ShiftRight))
+			return TK_ShiftRight;
+	}
+	if(CheckToken(data[pos]))
+		return static_cast<ETokenType> (data[pos-1]);
+	return TK_NoToken;
+}
+
+void Scanner::CheckForWhitespace(UInt32 *nPos, UInt32 *nLpos)
+{
+	UInt32 & uPos = (nPos ? (*nPos) : pos);
+	UInt32 & uLpos = (nLpos ? (*nLpos) : lpos);
+	while(data[uPos] == ' ' || data[uPos] == '\0' || data[uPos] == '	' || data[uPos] == '\n' || data[uPos] == '\r' ||
+		(data[uPos] == '/' && uPos+1 < length && (data[uPos+1] == '/' || data[uPos+1] == '*')))
+	{
+		//comment
+		if(data[uPos] == '/' && uPos+1 < length && (data[uPos+1] == '/' || data[uPos+1] == '*'))
+		{
+			uPos += 2;
+			if(uPos == length)
+				return;
+			if(data[uPos-1] == '*') // multiline
+			{
+				while(true)
+				{
+					// Since we may be skipping end of lines lets check for them.
+					if(data[uPos] == '\r' || data[uPos] == '\n')
+					{
+						if(data[uPos] == '\r' && uPos+1 < length && data[uPos+1] == '\n')
+							uPos++;
+						line++;
+						uLpos = 0;
+					}
+
+					uPos++;
+					if(data[uPos-1] == '*' && uPos < length && data[uPos] == '/')
+						break;
+					if(uPos == length)
+						return;
+				}
+			}
+			else // single line
+			{
+				// Go until the end of line is reached.
+				while(data[uPos] != '\r' && data[uPos] != '\n')
+				{
+					uPos++;
+					if(uPos == length)
+						return;
+				}
+			}
+		}
+
+		if(data[uPos] == '\r' || data[uPos] == '\n')
+		{
+			if(data[uPos] == '\r' && uPos+1 < length && data[uPos+1] == '\n')
+				uPos++;
+			line++;
+			uLpos = 0;
+		}
+
+		uPos++;
+		uLpos++;
+		if(uPos >= length)
+			return;
+	}
+}
+
 //For exmaple GENERIC_TOKEN(void) would do all the needed errors and such for looking for void
 #define GENERIC_GETTOKEN(token) \
 { \
@@ -86,18 +221,13 @@ bool Scanner::CheckToken(char token)
 	{ \
 		if(strcasecmp(ident, token) == 0) \
 		{ \
-			if(str != NULL) \
-			{ \
-				delete [] str; \
-				str = NULL; \
-			} \
 			str = ident; \
 		} \
 		else \
 		{ \
 			error = true; \
 			if(report) \
-				printf("Line %d:%d: Expected \"%s\", but got \"%s\" instead.\n", line, lpos, token, ident); \
+				{printf("Line %d:%d: Expected \"%s\", but got \"%s\" instead.\n", line, lpos, token, ident);exit(0);} \
 		} \
 	} \
 	break; \
@@ -106,11 +236,11 @@ bool Scanner::CheckToken(char token)
 #define GENERIC_DOUBLETOKEN(token) \
 { \
 	const char* tkn = token; \
-	if(pos == length-1) \
+	if(pos >= length-1) \
 	{ \
 		error = true; \
 		if(report) \
-			printf("Line %d:%d: Expected \"%s\".\n", line, lpos, token); \
+			{printf("Line %d:%d: Expected \"%s\".\n", line, lpos, token);exit(0);} \
 	} \
 	if(data[pos] == tkn[0] && data[pos+1] == tkn[1]) \
 	{ \
@@ -122,7 +252,7 @@ bool Scanner::CheckToken(char token)
 	{ \
 		error = true; \
 		if(report) \
-			printf("Line %d:%d: Expected \"%s\", but got \"%c%c\" instead.\n", line, lpos, token, data[pos], data[pos+1]); \
+			{printf("Line %d:%d: Expected \"%s\", but got \"%c%c\" instead.\n", line, lpos, token, data[pos], data[pos+1]);exit(0);} \
 	} \
 	break; \
 }
@@ -130,10 +260,10 @@ void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool
 {
 	if(error)
 		return;
-	if(pos == length)
+	if(pos >= length)
 	{
 		if(report)
-			printf("Unexpected end of file.\n");
+			{printf("Unexpected end of file.\n");exit(0);}
 		return;
 	}
 	switch(token)
@@ -143,11 +273,6 @@ void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool
 			char* ident = GetNext(pos, lpos, TK_Identifier, report);
 			if(ident != NULL)
 			{
-				if(str != NULL)
-				{
-					delete [] str;
-					str = NULL;
-				}
 				str = ident;
 			}
 			break;
@@ -157,11 +282,6 @@ void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool
 			char* stringConst = GetNext(pos, lpos, TK_StringConst, report);
 			if(stringConst != NULL)
 			{
-				if(str != NULL)
-				{
-					delete [] str;
-					str = NULL;
-				}
 				str = stringConst;
 			}
 			break;
@@ -193,7 +313,7 @@ void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool
 				{
 					error = true;
 					if(report)
-						printf("Line %d:%d: Expected true/false, but got \"%s\" instead.\n", line, lpos, ident);
+						{printf("Line %d:%d: Expected true/false, but got \"%s\" instead.\n", line, lpos, ident);exit(0);}
 					break;
 				}
 			}
@@ -230,7 +350,7 @@ void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool
 			{
 				error = true;
 				if(report)
-					printf("Line %d:%d: Expected '%c', but got '%c' instead.\n", line, lpos, token, data[pos]);
+					{printf("Line %d:%d: Expected '%c', but got '%c' instead.\n", line, lpos, token, data[pos]);exit(0);}
 			}
 			pos++;
 			lpos++;
@@ -240,26 +360,14 @@ void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool
 		lastToken = token;
 	else
 		lastToken = 0;
-	while(data[pos] == ' ' || data[pos] == '\0' || data[pos] == '	' || data[pos] == '\n' || data[pos] == '\r')
-	{
-		if(data[pos] == '\r' || data[pos] == '\n')
-		{
-			if(data[pos] == '\r' && pos+1 < length && data[pos+1] == '\n')
-				pos++;
-			line++;
-			lpos = 0;
-		}
-		lpos++;
-		pos++;
-		if(pos == length)
-			return;
-	}
+
+	CheckForWhitespace(&pos, &lpos);
 }
 
 //Find the next identifier by looping until we find an invalid character.
 char* Scanner::GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report)
 {
-	if(pos == length)
+	if(pos >= length)
 		return NULL;
 	UInt32 end = pos;
 	bool special = false;
@@ -316,13 +424,13 @@ char* Scanner::GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report)
 		if(report)
 		{
 			if(type == TK_Identifier)
-				printf("Line %d:%d: Expected an identifier, but got '%c' instead.\n", line, lpos, data[pos]);
+				{printf("Line %d:%d: Expected an identifier, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
 			else if(type == TK_StringConst)
-				printf("Line %d:%d: Expected a string constant, but got '%c' instead.\n", line, lpos, data[pos]);
+				{printf("Line %d:%d: Expected a string constant, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
 			else if(type == TK_IntConst)
-				printf("Line %d:%d: Expected an integer, but got '%c' instead.\n", line, lpos, data[pos]);
+				{printf("Line %d:%d: Expected an integer, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
 			else
-				printf("Line %d:%d: Expected a decimal value, but got '%c' instead.\n", line, lpos, data[pos]);
+				{printf("Line %d:%d: Expected a decimal value, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
 		}
 		return NULL;
 	}
@@ -331,10 +439,7 @@ char* Scanner::GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report)
 	if(type == TK_StringConst)
 	{
 		result = result.substr(1, result.length()-1);
-		while(result.find("\\\\") != result.npos)
-			result.replace(result.find("\\\\"), 2, 1, '\\');
-		while(result.find("\\\"") != result.npos)
-			result.replace(result.find("\\\""), 2, 1, '"');
+		Config::Unescape(result);
 	}
 	result.append(1, '\0');
 	lpos += end - pos;
@@ -344,8 +449,9 @@ char* Scanner::GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report)
 		pos++;
 		lpos++;
 	}
-
-	char * ret = new char[result.length() + 1];
+	if(ret != NULL)
+		delete[] ret;
+	ret = new char[result.length() + 1];
 	for(UInt32 ret_pos = 0; ret_pos < result.length(); ret_pos ++)
 		ret[ret_pos] = result[ret_pos];
 	ret[result.length()] = '\0';

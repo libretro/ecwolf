@@ -6,6 +6,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "language.h"
 
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;
@@ -77,16 +78,16 @@ EndSpear (void)
     WindowW = 320;
     PrintX = 0;
     PrintY = 180;
-    US_CPrint (STR_ENDGAME1 "\n");
-    US_CPrint (STR_ENDGAME2);
+    US_CPrint (language["STR_ENDGAME1"]);
+    US_CPrint (language["STR_ENDGAME2"]);
     VW_UpdateScreen ();
     IN_UserInput(700);
 
     PrintX = 0;
     PrintY = 180;
     VWB_Bar (0, 180, 320, 20, 0);
-    US_CPrint (STR_ENDGAME3 "\n");
-    US_CPrint (STR_ENDGAME4);
+    US_CPrint (language["STR_ENDGAME3"]);
+    US_CPrint (language["STR_ENDGAME4"]);
     VW_UpdateScreen ();
     IN_UserInput(700);
 
@@ -178,21 +179,15 @@ Victory (void)
     UNCACHEGRCHUNK (C_ENDRATIOSPIC);
 #endif
 #else
-    Write (18, 2, STR_YOUWIN);
+    Write (18, 2, language["STR_YOUWIN"]);
 
-    Write (TIMEX, TIMEY - 2, STR_TOTALTIME);
+    Write (TIMEX, TIMEY - 2, language["STR_TOTALTIME"]);
 
     Write (12, RATIOY - 2, "averages");
 
-#ifdef SPANISH
-    Write (RATIOX + 2, RATIOY, STR_RATKILL);
-    Write (RATIOX + 2, RATIOY + 2, STR_RATSECRET);
-    Write (RATIOX + 2, RATIOY + 4, STR_RATTREASURE);
-#else
-    Write (RATIOX + 8, RATIOY, STR_RATKILL);
-    Write (RATIOX + 4, RATIOY + 2, STR_RATSECRET);
-    Write (RATIOX, RATIOY + 4, STR_RATTREASURE);
-#endif
+    Write (RATIOX + 8, RATIOY, language["STR_RATKILL"]);
+    Write (RATIOX + 4, RATIOY + 2, language["STR_RATSECRET"]);
+    Write (RATIOX, RATIOY + 4, language["STR_RATTREASURE"]);
 
 #endif
 
@@ -588,25 +583,15 @@ LevelCompleted (void)
 #endif
     {
 #ifndef JAPAN
-#ifdef SPANISH
-        Write (14, 2, "piso\ncompletado");
-#else
-        Write (14, 2, "floor\ncompleted");
-#endif
+        Write (14, 2, language["STR_FLOORCOMPLETED"]);
 
-        Write (14, 7, STR_BONUS "     0");
-        Write (16, 10, STR_TIME);
-        Write (16, 12, STR_PAR);
+        Write (14, 7, language["STR_BONUS"]);
+        Write (16, 10, language["STR_TIME"]);
+        Write (16, 12, language["STR_PAR"]);
 
-#ifdef SPANISH
-        Write (11, 14, STR_RAT2KILL);
-        Write (11, 16, STR_RAT2SECRET);
-        Write (11, 18, STR_RAT2TREASURE);
-#else
-        Write (9, 14, STR_RAT2KILL);
-        Write (5, 16, STR_RAT2SECRET);
-        Write (1, 18, STR_RAT2TREASURE);
-#endif
+        Write (9, 14, language["STR_RAT2KILL"]);
+        Write (5, 16, language["STR_RAT2SECRET"]);
+        Write (1, 18, language["STR_RAT2TREASURE"]);
 
         Write (26, 2, itoa (gamestate.mapon + 1, tempstr, 10));
 #endif
@@ -859,16 +844,16 @@ done:   itoa (kr, tempstr, 10);
         switch (mapon)
         {
             case 4:
-                Write (14, 4, " trans\n" " grosse\n" STR_DEFEATED);
+                Write (14, 4, " trans\n" " grosse\n" "defeated!");
                 break;
             case 9:
-                Write (14, 4, "barnacle\n" "wilhelm\n" STR_DEFEATED);
+                Write (14, 4, "barnacle\n" "wilhelm\n" "defeated!");
                 break;
             case 15:
-                Write (14, 4, "ubermutant\n" STR_DEFEATED);
+                Write (14, 4, "ubermutant\n" "defeated!");
                 break;
             case 17:
-                Write (14, 4, " death\n" " knight\n" STR_DEFEATED);
+                Write (14, 4, " death\n" " knight\n" "defeated!");
                 break;
             case 18:
                 Write (13, 4, "secret tunnel\n" "    area\n" "  completed!");
@@ -1296,429 +1281,4 @@ NonShareware (void)
 #endif
 #endif
 
-#ifdef SPEAR
-#ifndef GOODTIMES
-#ifndef SPEARDEMO
-////////////////////////////////////////////////////////
-//
-// COPY PROTECTION FOR FormGen
-//
-////////////////////////////////////////////////////////
-char CopyProFailedStrs[][100] = {
-    STR_COPY1,
-    STR_COPY2,
-
-    STR_COPY3,
-    STR_COPY4,
-
-    STR_COPY5,
-    STR_COPY6,
-
-    STR_COPY7,
-    STR_COPY8,
-
-    STR_COPY9,
-    "",
-
-    STR_COPY10,
-    STR_COPY11,
-
-    STR_COPY12,
-    "",
-
-    STR_COPY13,
-    "",
-
-    STR_COPY14,
-    ""
-};
-
-char BackDoorStrs[5][16] = {
-    "a spoon?",
-    "bite me!",
-    "joshua",
-    "pelt",
-    "snoops"
-};
-
-char GoodBoyStrs[10][40] = {
-    "...is the CORRECT ANSWER!",
-    "",
-
-    "Consider yourself bitten, sir.",
-    "",
-
-    "Greetings Professor Falken, would you",
-    "like to play Spear of Destiny?",
-
-    "Do you have any gold spray paint?",
-    "",
-
-    "I wish I had a 21\" monitor...",
-    ""
-};
-
-char bossstrs[4][24] = {
-    "DEATH KNIGHT",
-    "BARNACLE WILHELM",
-    "UBERMUTANTUBER MUTANT",
-    "TRANS GROSSE"
-};
-
-char WordStr[5][20] = {
-    "New Game",
-    "Sound...F4",
-    "Control...F6",
-    "Change View...F5",
-    "Quit...F10"
-};
-
-char WordCorrect[5][2] = { "3", "4", "4", "5", "5" };
-
-char MemberStr[10][40] = {
-    STR_COPY15,
-    "",
-
-    STR_COPY16,
-    "",
-
-    STR_COPY17,
-    STR_COPY18,
-
-    STR_COPY19,
-    STR_COPY20,
-
-    STR_COPY21,
-    STR_COPY22
-};
-
-char MemberCorrect[5][24] = {
-    "adrian carmack",
-    "john carmackjohn romero",
-    "tom hall",
-    "jay wilbur",
-    "kevin cloud"
-};
-
-char DosMessages[9][80] = {
-    STR_NOPE1,
-    STR_NOPE2,
-    STR_NOPE3,
-    STR_NOPE4,
-    STR_NOPE5,
-    STR_NOPE6,
-    STR_NOPE7,
-    STR_NOPE8,
-    STR_NOPE9
-};
-
-char MiscTitle[4][20] = {
-    "BLOOD TEST",
-    "STRAIGHT-LACED",
-    "QUITE SHAPELY",
-    "I AM WHAT I AMMO"
-};
-
-char MiscStr[12][40] = {
-    STR_MISC1,
-    STR_MISC2,
-    "",
-
-    STR_MISC3,
-    STR_MISC4,
-    "",
-
-    STR_MISC5,
-    STR_MISC6,
-    "",
-
-    STR_MISC7,
-    STR_MISC8,
-    STR_MISC9
-};
-
-char MiscCorrect[4][5] = { "ss", "8", STR_STAR, "45" };
-
-
-int
-BackDoor (char *s)
-{
-    for (int i = 0; i < 5; i++)
-    {
-        if (!strcasecmp (s, BackDoorStrs[i]))
-        {
-            SETFONTCOLOR (14, 15);
-            fontnumber = 0;
-            PrintY = 175;
-            VWB_DrawPic (0, 20 * 8, COPYPROTBOXPIC);
-            US_CPrint (GoodBoyStrs[i * 2]);
-            US_CPrint (GoodBoyStrs[i * 2 + 1]);
-            VW_UpdateScreen ();
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-
-void
-CopyProtection (void)
-{
-#define TYPEBOX_Y       177
-#define TYPEBOX_BKGD    0x9c
-#define PRINTCOLOR      HIGHLIGHT
-
-    unsigned i;
-    int match, whichboss, bossnum, attempt, whichline;
-    int enemypicked[4] = { 0, 0, 0, 0 };
-    int bosses[4] = { BOSSPIC1PIC, BOSSPIC2PIC, BOSSPIC3PIC, BOSSPIC4PIC };
-    int whichpicked[4] = { 0, 0, 0, 0 };
-    int whichone, quiztype, whichmem, whichword;
-    int memberpicked[5] = { 0, 0, 0, 0, 0 };
-    int wordpicked[5] = { 0, 0, 0, 0, 0 };
-
-    char inputbuffer[20];
-    char message[80];
-
-    enum
-    {
-        debriefing,
-        checkmanual,
-        staffquiz,
-        miscquiz,
-
-        totaltypes
-    };
-
-
-
-    attempt = 0;
-    VW_FadeOut ();
-    CA_CacheGrChunk (C_BACKDROPPIC);
-    CacheLump (COPYPROT_LUMP_START, COPYPROT_LUMP_END);
-    CA_CacheGrChunk (STARTFONT + 1);
-    CA_LoadAllSounds ();
-    StartCPMusic (COPYPRO_MUS);
-    US_InitRndT (true);
-
-    while (attempt < 3)
-    {
-        fontnumber = 1;
-        SETFONTCOLOR (PRINTCOLOR - 2, 15);
-        VWB_DrawPic (0, 0, C_BACKDROPPIC);
-        VWB_DrawPic (0, 0, COPYPROTTOPPIC);
-        VWB_DrawPic (0, 20 * 8, COPYPROTBOXPIC);
-        WindowX = WindowY = 0;
-        WindowW = 320;
-        WindowH = 200;
-        PrintY = 65;
-
-        quiztype = US_RndT () % totaltypes;
-        switch (quiztype)
-        {
-            //
-            // BOSSES QUIZ
-            //
-            case debriefing:
-            {
-                PrintX = 0;
-                US_Print (STR_DEBRIEF);
-                SETFONTCOLOR (PRINTCOLOR, 15);
-
-                while (enemypicked[whichboss = US_RndT () & 3]);
-                enemypicked[whichboss] = 1;
-                bossnum = bosses[whichboss];
-                VWB_DrawPic (128, 60, bossnum);
-                fontnumber = 0;
-                PrintY = 130;
-                US_CPrint (STR_ENEMY1 "\n");
-                US_CPrint (STR_ENEMY2 "\n\n");
-
-                VW_UpdateScreen ();
-                VW_FadeIn ();
-
-                PrintX = 100;
-                fontcolor = 15;
-                backcolor = TYPEBOX_BKGD;
-                inputbuffer[0] = 0;
-                PrintY = TYPEBOX_Y;
-                fontnumber = 1;
-                US_LineInput (PrintX, PrintY, inputbuffer, 0, true, 20, 100);
-
-                match = 0;
-                size_t inputlen = strlen(inputbuffer);
-                if(inputlen > 3)
-                {
-                    size_t bosslen = strlen(bossstrs[whichboss]);
-                    for (i = 0; i < bosslen; i++)
-                    {
-                        if (!strncasecmp (inputbuffer, bossstrs[whichboss] + i, inputlen))
-                        {
-                            match = 1;
-                            break;
-                        }
-                    }
-                }
-
-                match += BackDoor (inputbuffer);
-                break;
-            }
-
-            //
-            // MANUAL CHECK
-            //
-            case checkmanual:
-            {
-                while (wordpicked[whichword = US_RndT () % 5]);
-                wordpicked[whichword] = 1;
-                US_CPrint (STR_CHECKMAN);
-                SETFONTCOLOR (PRINTCOLOR, 15);
-                PrintY += 25;
-                US_CPrint (STR_MAN1);
-                US_CPrint (STR_MAN2);
-                sprintf(message, STR_MAN3 " \"%s\" " STR_MAN4, WordStr[whichword]);
-                US_CPrint (message);
-                VW_UpdateScreen ();
-                VW_FadeIn ();
-
-                PrintX = 146;
-                fontcolor = 15;
-                backcolor = TYPEBOX_BKGD;
-                inputbuffer[0] = 0;
-                PrintY = TYPEBOX_Y;
-                US_LineInput (PrintX, PrintY, inputbuffer, 0, true, 6, 100);
-
-                match = 1 - (strcasecmp (inputbuffer, WordCorrect[whichword]) != 0);
-                match += BackDoor (inputbuffer);
-                break;
-            }
-
-            //
-            // STAFF QUIZ
-            //
-            case staffquiz:
-            {
-                while (memberpicked[whichmem = US_RndT () % 5]);
-                memberpicked[whichmem] = 1;
-                US_CPrint (STR_ID1);
-                SETFONTCOLOR (PRINTCOLOR, 15);
-                PrintY += 25;
-                US_CPrint (MemberStr[whichmem * 2]);
-                US_CPrint (MemberStr[whichmem * 2 + 1]);
-                VW_UpdateScreen ();
-                VW_FadeIn ();
-
-                PrintX = 100;
-                fontcolor = 15;
-                backcolor = TYPEBOX_BKGD;
-                inputbuffer[0] = 0;
-                PrintY = TYPEBOX_Y;
-                US_LineInput (PrintX, PrintY, inputbuffer, 0, true, 20, 120);
-
-                match = 0;
-                size_t inputlen = strlen(inputbuffer);
-                if(inputlen > 2)
-                {
-                    size_t memberlen = strlen(MemberCorrect[whichmem]);
-                    for (i = 0; i < memberlen; i++)
-                    {
-                        if (!strncasecmp (inputbuffer, MemberCorrect[whichmem] + i, inputlen))
-                        {
-                            match = 1;
-                            break;
-                        }
-                    }
-                }
-
-                match += BackDoor (inputbuffer);
-                break;
-            }
-
-            //
-            // MISCELLANEOUS QUESTIONS
-            //
-            case miscquiz:
-            {
-                while (whichpicked[whichone = US_RndT () & 3]);
-                whichpicked[whichone] = 1;
-                US_CPrint (MiscTitle[whichone]);
-                SETFONTCOLOR (PRINTCOLOR, 15);
-                PrintY += 25;
-                US_CPrint (MiscStr[whichone * 3]);
-                US_CPrint (MiscStr[whichone * 3 + 1]);
-                US_CPrint (MiscStr[whichone * 3 + 2]);
-                VW_UpdateScreen ();
-                VW_FadeIn ();
-
-                PrintX = 146;
-                fontcolor = 15;
-                backcolor = TYPEBOX_BKGD;
-                inputbuffer[0] = 0;
-                PrintY = TYPEBOX_Y;
-                US_LineInput (PrintX, PrintY, inputbuffer, 0, true, 6, 100);
-
-                match = 1 - (strcasecmp (inputbuffer, MiscCorrect[whichone]) != 0);
-                match += BackDoor (inputbuffer);
-                break;
-            }
-        }
-
-        //
-        // IF NO MATCH, WE'VE GOT A (MINOR) PROBLEM!
-        //
-
-        if (!match)
-        {
-            whichline = 2 * (US_RndT () % 9);
-            SETFONTCOLOR (14, 15);
-            fontnumber = 0;
-            PrintY = 175;
-            VWB_DrawPic (0, 20 * 8, COPYPROTBOXPIC);
-            US_CPrint (CopyProFailedStrs[whichline]);
-            US_CPrint (CopyProFailedStrs[whichline + 1]);
-
-            VW_UpdateScreen ();
-            SD_PlaySound (NOWAYSND);
-            IN_UserInput (TickBase * 6);
-            VW_FadeOut ();
-            attempt++;
-        }
-        else
-        {
-            int start;
-
-            SD_PlaySound (BONUS1UPSND);
-            SD_WaitSoundDone ();
-            UNCACHEGRCHUNK (STARTFONT + 1);
-            UNCACHEGRCHUNK (C_BACKDROPPIC);
-            UnCacheLump (COPYPROT_LUMP_START, COPYPROT_LUMP_END);
-
-            switch (SoundMode)
-            {
-                case sdm_Off:
-                    return;
-                case sdm_PC:
-                    start = STARTPCSOUNDS;
-                    break;
-                case sdm_AdLib:
-                    start = STARTADLIBSOUNDS;
-            }
-
-/*                        for (i=0;i<NUMSOUNDS;i++,start++)
-                                MM_FreePtr ((memptr *)&audiosegs[start]); */
-            return;
-        }
-    }
-
-    ClearMemory ();
-    ShutdownId ();
-
-    printf ("%s\n", DosMessages[US_RndT () % 9]);
-    exit (1);
-}
-
-#endif // SPEARDEMO
-#endif // GOODTIMES
-#endif // SPEAR
 //===========================================================================

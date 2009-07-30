@@ -96,15 +96,17 @@ void Config::LocateConfigFile(int argc, char* argv[])
 }
 
 // NOTE: Be sure that '\\' is the first thing in the array otherwise it will re-escape.
-static char escapeCharacters[] = {'\\', '"', 0};
+static char escapeCharacters[] =		{'\\', '"', 'n', 0};
+static char escapeCharactersReplace[] =	{'\\', '"', '\n', 0};
 const string &Config::Escape(string &str)
 {
 	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
 	{
+		string sequence = string("\\").append(1, escapeCharacters[i]);
 		// += 2 because we'll be inserting 1 character.
-		for(size_t p = 0;p < str.length() && (p = str.find_first_of(escapeCharacters[i], p)) != string::npos;p += 2)
+		for(size_t p = 0;p < str.length() && (p = str.find(escapeCharactersReplace[i], p)) != string::npos;p += 2)
 		{
-			str.insert(p, 1, '\\');
+			str.replace(p, 1, sequence);
 		}
 	}
 	return str;
@@ -114,9 +116,9 @@ const string &Config::Unescape(string &str)
 	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
 	{
 		string sequence = string("\\").append(1, escapeCharacters[i]);
-		for(size_t p = 0;p < str.length() && (p = str.find_first_of(sequence, p)) != string::npos;p++)
+		for(size_t p = 0;p < str.length() && (p = str.find(sequence, p)) != string::npos;p++)
 		{
-			str.replace(str.find_first_of(sequence, p), 2, 1, escapeCharacters[i]);
+			str.replace(str.find_first_of(sequence, p), 2, 1, escapeCharactersReplace[i]);
 		}
 	}
 	return str;

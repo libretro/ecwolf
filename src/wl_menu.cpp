@@ -29,6 +29,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "language.h"
 using namespace std;
 
 struct SaveFile
@@ -107,35 +108,31 @@ MENU_LISTENER(QuitGame)
 	if(GetYorN(7, 11, C_QUITMSGPIC))
 #else
 
-const char endStrings[9][80] = {
+const char* endStrings[9] = {
 #ifndef SPEAR
-    {"Dost thou wish to\nleave with such hasty\nabandon?"},
-    {"Chickening out...\nalready?"},
-    {"Press N for more carnage.\nPress Y to be a weenie."},
-    {"So, you think you can\nquit this easily, huh?"},
-    {"Press N to save the world.\nPress Y to abandon it in\nits hour of need."},
-    {"Press N if you are brave.\nPress Y to cower in shame."},
-    {"Heroes, press N.\nWimps, press Y."},
-    {"You are at an intersection.\nA sign says, 'Press Y to quit.'\n>"},
-    {"For guns and glory, press N.\nFor work and worry, press Y."}
+	language["ENDSTR10"],
+	language["ENDSTR11"],
+	language["ENDSTR12"],
+	language["ENDSTR13"],
+	language["ENDSTR14"],
+	language["ENDSTR15"],
+	language["ENDSTR16"],
+	language["ENDSTR17"],
+	language["ENDSTR18"]
 #else
-    ENDSTR1,
-    ENDSTR2,
-    ENDSTR3,
-    ENDSTR4,
-    ENDSTR5,
-    ENDSTR6,
-    ENDSTR7,
-    ENDSTR8,
-    ENDSTR9
+	language["ENDSTR01"],
+	language["ENDSTR02"],
+	language["ENDSTR03"],
+	language["ENDSTR04"],
+	language["ENDSTR05"],
+	language["ENDSTR06"],
+	language["ENDSTR07"],
+	language["ENDSTR08"],
+	language["ENDSTR09"]
 #endif
 };
 
-#ifdef SPANISH
-	if(Confirm(ENDGAMESTR))
-#else
 	if(Confirm(endStrings[US_RndT() & 0x7 + (US_RndT() & 1)]))
-#endif
 
 #endif
 	{
@@ -186,7 +183,7 @@ MENU_LISTENER(EnterControlBase)
 }
 MENU_LISTENER(BeginEditSave)
 {
-	bool ret = Confirm(GAMESVD);
+	bool ret = Confirm(language["GAMESVD"]);
 	saveGame.draw();
 	return ret;
 }
@@ -246,7 +243,7 @@ MENU_LISTENER(PerformSaveGame)
 	else
 	{
 		fontnumber = 1;
-		Message (STR_SAVING "...");
+		Message (language["STR_SAVING"]);
 		fontnumber = 0;
 		SaveTheGame(fileh, 0, 0);
 	}
@@ -323,7 +320,7 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 
 	if(ingame)
 	{
-		if(!Confirm(CURGAME))
+		if(!Confirm(language["CURGAME"]))
 		{
 			episodes.draw();
 			return false;
@@ -355,19 +352,19 @@ void CreateMenus()
 {
 	mainMenu.setHeadPicture(C_OPTIONSPIC);
 #ifndef SPEAR
-	mainMenu.addItem(new MenuSwitcherMenuItem(STR_NG, episodes));
+	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], episodes));
 #else
-	mainMenu.addItem(new MenuSwitcherMenuItem(STR_NG, skills));
+	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], skills));
 #endif
-	mainMenu.addItem(new MenuSwitcherMenuItem(STR_SD, soundBase));
-	mainMenu.addItem(new MenuSwitcherMenuItem(STR_CL, controlBase));
-	MenuItem *lg = new MenuSwitcherMenuItem(STR_LG, loadGame);
+	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_SD"], soundBase));
+	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_CL"], controlBase));
+	MenuItem *lg = new MenuSwitcherMenuItem(language["STR_LG"], loadGame);
 	lg->setEnabled(SaveFile::files.size() > 0);
 	mainMenu.addItem(lg);
-	MenuItem *sg = new MenuSwitcherMenuItem(STR_SG, saveGame);
+	MenuItem *sg = new MenuSwitcherMenuItem(language["STR_SG"], saveGame);
 	sg->setEnabled(false);
 	mainMenu.addItem(sg);
-	MenuItem *rt = new FunctionMenuItem("Read This!", 0);
+	MenuItem *rt = new FunctionMenuItem(language["STR_RT"], 0);
 #if defined(SPEAR) || defined(GOODTIMES)
 	rt->setVisible(false);
 #else
@@ -375,20 +372,20 @@ void CreateMenus()
 #endif
 	rt->setHighlighted(true);
 	mainMenu.addItem(rt);
-	mainMenu.addItem(new MenuItem(STR_VS, ViewScoresOrEndGame));
-	mainMenu.addItem(new MenuItem(STR_BD, PlayDemosOrReturnToGame));
-	mainMenu.addItem(new MenuItem(STR_QT, QuitGame));
+	mainMenu.addItem(new MenuItem(language["STR_VS"], ViewScoresOrEndGame));
+	mainMenu.addItem(new MenuItem(language["STR_BD"], PlayDemosOrReturnToGame));
+	mainMenu.addItem(new MenuItem(language["STR_QT"], QuitGame));
 
 #ifndef SPEAR
-	episodes.setHeadText("Which episode to play?");
+	episodes.setHeadText(language["STR_WHICHEPISODE"]);
 	const char* episodeText[6] =
 	{
-		"Episode 1\nEscape from Wolfenstein",
-		"Episode 2\nOperation: Eisenfaust",
-		"Episode 3\nDie, Fuhrer, Die!",
-		"Episode 4\nA Dark Secret",
-		"Episode 5\nTrail of the Madman",
-		"Episode 6\nConfrontation"
+		language["WL_EPISODE1"],
+		language["WL_EPISODE2"],
+		language["WL_EPISODE3"],
+		language["WL_EPISODE4"],
+		language["WL_EPISODE5"],
+		language["WL_EPISODE6"]
 	};
 	int episodePicture[6] = { C_EPISODE1PIC, C_EPISODE2PIC, C_EPISODE3PIC, C_EPISODE4PIC, C_EPISODE5PIC, C_EPISODE6PIC };
 	for(unsigned int i = 0;i < 6;i++)
@@ -401,13 +398,13 @@ void CreateMenus()
 	}
 #endif
 
-	skills.setHeadText("How tough are you?");
+	skills.setHeadText(language["STR_HOWTOUGH"]);
 	const char* skillText[4] =
 	{
-		STR_DADDY,
-		STR_HURTME,
-		STR_BRINGEM,
-		STR_DEATH
+		language["STR_DADDY"],
+		language["STR_HURTME"],
+		language["STR_BRINGEM"],
+		language["STR_DEATH"]
 	};
 	int skillPicture[4] = { C_BABYMODEPIC, C_EASYPIC, C_NORMALPIC, C_HARDPIC };
 	for(unsigned int i = 0;i < 4;i++)
@@ -418,10 +415,10 @@ void CreateMenus()
 	}
 
 	// Collect options and defaults
-	const char* soundEffectsOptions[] = {STR_NONE, STR_PC, STR_ALSB };
+	const char* soundEffectsOptions[] = {language["STR_NONE"], language["STR_PC"], language["STR_ALSB"] };
 	soundEffectsOptions[1] = NULL;
-	const char* digitizedOptions[] = {STR_NONE, STR_SB };
-	const char* musicOptions[] = { STR_NONE, STR_ALSB };
+	const char* digitizedOptions[] = {language["STR_NONE"], language["STR_SB"] };
+	const char* musicOptions[] = { language["STR_NONE"], language["STR_ALSB"] };
 	if(!AdLibPresent && !SoundBlasterPresent)
 	{
 		soundEffectsOptions[2] = NULL;
@@ -448,30 +445,30 @@ void CreateMenus()
 		default: musicMode = 0; break;
 		case smm_AdLib: musicMode = 1; break;
 	}
-	soundBase.setHeadText("Sound Configuration");
-	soundBase.addItem(new LabelMenuItem("Digital Device & Volume"));
+	soundBase.setHeadText(language["STR_SOUNDCONFIG"]);
+	soundBase.addItem(new LabelMenuItem(language["STR_DIGITALDEVICE"]));
 	soundBase.addItem(new MultipleChoiceMenuItem(SetDigitalSound, digitizedOptions, 2, digitizedMode));
-	soundBase.addItem(new SliderMenuItem(SoundVolume, 150, MAX_VOLUME, "Soft", "Loud"));
-	soundBase.addItem(new LabelMenuItem("Adlib Device & Volume"));
+	soundBase.addItem(new SliderMenuItem(SoundVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"]));
+	soundBase.addItem(new LabelMenuItem(language["STR_ADLIBDEVICE"]));
 	soundBase.addItem(new MultipleChoiceMenuItem(SetSoundEffects, soundEffectsOptions, 3, soundEffectsMode));
-	soundBase.addItem(new SliderMenuItem(AdlibVolume, 150, MAX_VOLUME, "Soft", "Loud"));
-	soundBase.addItem(new LabelMenuItem("Music Device & Volume"));
+	soundBase.addItem(new SliderMenuItem(AdlibVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"]));
+	soundBase.addItem(new LabelMenuItem(language["STR_MUSICDEVICE"]));
 	soundBase.addItem(new MultipleChoiceMenuItem(SetMusic, musicOptions, 2, musicMode));
-	soundBase.addItem(new SliderMenuItem(MusicVolume, 150, MAX_VOLUME, "Soft", "Loud"));
+	soundBase.addItem(new SliderMenuItem(MusicVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"]));
 
 	controlBase.setHeadPicture(C_CONTROLPIC);
-	controlBase.addItem(new BooleanMenuItem("Always Run", alwaysrun, EnterControlBase));
-	controlBase.addItem(new BooleanMenuItem(STR_MOUSEEN, mouseenabled, EnterControlBase));
-	controlBase.addItem(new BooleanMenuItem(STR_DISABLEYAXIS, mouseyaxisdisabled, EnterControlBase));
-	controlBase.addItem(new MenuSwitcherMenuItem(STR_SENS, mouseSensitivity));
-	controlBase.addItem(new BooleanMenuItem(STR_JOYEN, joystickenabled, EnterControlBase));
-	controlBase.addItem(new MenuSwitcherMenuItem(STR_CUSTOM, controls));
+	controlBase.addItem(new BooleanMenuItem(language["STR_ALWAYSRUN"], alwaysrun, EnterControlBase));
+	controlBase.addItem(new BooleanMenuItem(language["STR_MOUSEEN"], mouseenabled, EnterControlBase));
+	controlBase.addItem(new BooleanMenuItem(language["STR_DISABLEYAXIS"], mouseyaxisdisabled, EnterControlBase));
+	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_SENS"], mouseSensitivity));
+	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
+	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
 
 	loadGame.setHeadPicture(C_LOADGAMEPIC);
 	saveGame.setHeadPicture(C_SAVEGAMEPIC);
 
-	mouseSensitivity.addItem(new LabelMenuItem(STR_MOUSEADJ));
-	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, STR_SLOW, STR_FAST));
+	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEADJ"]));
+	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
 
 	controls.setHeadPicture(C_CUSTOMIZEPIC);
 	controls.showControlHeaders(true);
@@ -580,15 +577,15 @@ US_ControlPanel (ScanCode scancode)
 
 	if(ingame)
 	{
-		mainMenu[mainMenu.countItems()-3]->setText(STR_EG);
-		mainMenu[mainMenu.countItems()-2]->setText("Back to Game");
+		mainMenu[mainMenu.countItems()-3]->setText(language["STR_EG"]);
+		mainMenu[mainMenu.countItems()-2]->setText(language["STR_BG"]);
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(true);
 		mainMenu[4]->setEnabled(true);
 	}
 	else
 	{
-		mainMenu[mainMenu.countItems()-3]->setText(STR_VS);
-		mainMenu[mainMenu.countItems()-2]->setText(STR_BD);
+		mainMenu[mainMenu.countItems()-3]->setText(language["STR_VS"]);
+		mainMenu[mainMenu.countItems()-2]->setText(language["STR_BD"]);
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(false);
 		mainMenu[4]->setEnabled(false);
 	}
@@ -782,7 +779,7 @@ CP_CheckQuick (ScanCode scancode)
 #ifdef JAPAN
             if (GetYorN (7, 8, C_JAPQUITPIC))
 #else
-            if (Confirm (ENDGAMESTR))
+            if (Confirm (language["ENDGAMESTR"]))
 #endif
             {
                 playstate = ex_died;
@@ -865,7 +862,7 @@ CP_CheckQuick (ScanCode scancode)
 			{
 				quickSaveLoad = true;
 				char string[100];
-				sprintf(string, STR_LGC "%s\"?", SaveFile::files[saveGame.getCurrentPosition()-1].name);
+				sprintf(string, "%s%s\"?", language["STR_LGC"], SaveFile::files[saveGame.getCurrentPosition()-1].name);
 				CA_CacheGrChunk(STARTFONT + 1);
 				fontnumber = 1;
 				if(Confirm(string))
@@ -959,7 +956,7 @@ CP_EndGame (int)
 #ifdef JAPAN
     res = GetYorN (7, 8, C_JAPQUITPIC);
 #else
-    res = Confirm (ENDGAMESTR);
+    res = Confirm (language["ENDGAMESTR"]);
 #endif
     mainMenu.draw();
     if(!res) return 0;
@@ -987,9 +984,9 @@ DrawLSAction (int which)
     PrintY = LSA_Y + 13;
 
     if (!which)
-        US_Print (STR_LOADING "...");
+        US_Print (language["STR_LOADING"]);
     else
-        US_Print (STR_SAVING "...");
+        US_Print (language["STR_SAVING"]);
 
     VW_UpdateScreen ();
 }

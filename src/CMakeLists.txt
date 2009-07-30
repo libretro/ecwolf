@@ -63,6 +63,7 @@ add_executable(../ecwolf
 	id_us_1.cpp
 	id_vh.cpp
 	id_vl.cpp
+	language.cpp
 	m_classes.cpp
 	scanner.cpp
 	signon.cpp

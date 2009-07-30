@@ -18,6 +18,7 @@
 #include "m_classes.h"
 #include "config.hpp"
 #include "w_wad.h"
+#include "language.h"
 #include <SDL_syswm.h>
 
 // Wad Code Stuff
@@ -424,7 +425,7 @@ boolean SaveTheGame(FILE *file,int x,int y)
 
     if (avail < size)
     {
-        Message(STR_NOSPACE1"\n"STR_NOSPACE2);
+        Message(language["STR_NOSPACE"]);
         return false;
     }*/
 
@@ -668,10 +669,7 @@ boolean LoadTheGame(FILE *file,int x,int y)
 
     if (oldchecksum != checksum)
     {
-        Message(STR_SAVECHT1"\n"
-                STR_SAVECHT2"\n"
-                STR_SAVECHT3"\n"
-                STR_SAVECHT4);
+        Message(language["STR_SAVECHT"]);
 
         IN_ClearKeysDown();
         IN_Ack();
@@ -1503,14 +1501,6 @@ static void DemoLoop()
         if (!param_nowait)
             NonShareware();
         #endif
-        #else
-            #ifndef GOODTIMES
-            #ifndef SPEARDEMO
-            extern void CopyProtection(void);
-            if(!param_goodtimes)
-                CopyProtection();
-            #endif
-            #endif
         #endif
         #endif
     #endif
@@ -1848,6 +1838,7 @@ int main (int argc, char *argv[])
 #endif
 
 	Wads.InitMultipleFiles(&wadfiles, NULL);
+	language.SetupStrings();
 
     CheckForEpisodes();
 

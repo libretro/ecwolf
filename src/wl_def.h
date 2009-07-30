@@ -27,8 +27,6 @@
 
 //#pragma pack(1)
 
-#include "foreign.h"
-
 #ifndef SPEAR
     #include "audiowl6.h"
     #ifdef UPLOAD
@@ -43,7 +41,6 @@
 #else
     #include "audiosod.h"
     #include "gfxv_sod.h"
-    #include "f_spear.h"
 #endif
 
 #ifdef _arch_dreamcast
@@ -88,10 +85,6 @@ typedef struct
 void Quit(const char *errorStr, ...);
 
 #include "id_ca.h"
-
-#ifdef SPEAR
-#include "f_spear.h"
-#endif
 
 #define MAPSPOT(x,y,plane) (mapsegs[plane][((y)<<mapshift)+(x)])
 

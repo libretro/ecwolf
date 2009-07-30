@@ -1,0 +1,105 @@
+/* DEFAULT ENGLISH TRANSLATION */
+
+[enu default]
+
+QUITSUR = "Are you sure you want\nto quit this great game?";
+CURGAME = "You are currently in\na game. Continuing will\nerase old game. Ok?";
+GAMESVD = "There's already a game\nsaved at this position.\n      Overwrite?";
+ENDGAMESTR = "Are you sure you want\nto end the game you\nare playing? (Y or N)";
+STR_NG = "New Game";
+STR_SD = "Sound";
+STR_CL = "Control";
+STR_LG = "Load Game";
+STR_SG = "Save Game";
+STR_CV = "Change View";
+STR_VS = "View Scores";
+STR_RT = "Read This!";
+STR_EG = "End Game";
+STR_BD = "Back to Demo";
+STR_BG = "Back to Game";
+STR_QT = "Quit";
+STR_LOADING = "Loading...";
+STR_SAVING = "Saving...";
+STR_LGC = "Load Game called\n";
+STR_NONE = "None";
+STR_PC = "PC Speaker";
+STR_ALSB = "AdLib/Sound Blaster";
+STR_DISNEY = "Disney Sound Source";
+STR_SB = "Sound Blaster";
+STR_MOUSEEN = "Mouse Enabled";
+STR_JOYEN = "Joystick Enabled";
+STR_PORT2 = "Use joystick port 2";
+STR_GAMEPAD = "Gravis GamePad Enabled";
+STR_SENS = "Mouse Sensitivity";
+STR_DISABLEYAXIS = "Disable Y Axis";
+STR_CUSTOM = "Customize controls";
+STR_HOWTOUGH = "How tough are you?";
+STR_DADDY = "Can I play, Daddy?";
+STR_HURTME = "Don't hurt me.";
+STR_BRINGEM = "Bring 'em on!";
+STR_DEATH = "I am Death incarnate!";
+STR_MOUSEADJ = "Adjust Mouse Sensitivity";
+STR_SLOW = "Slow";
+STR_FAST = "Fast";
+STR_THINK = "Thinking";
+STR_YOUWIN = "you win!";
+STR_TOTALTIME = "total time";
+STR_BONUS = "bonus     0";
+STR_TIME = "time";
+STR_PAR = " par";
+STR_RATKILL = "kill    %";
+STR_RATSECRET = "secret    %";
+STR_RATTREASURE = "treasure    %";
+STR_RAT2KILL = "kill ratio    %";
+STR_RAT2SECRET = "secret ratio    %";
+STR_RAT2TREASURE = "treasure ratio    %";
+STR_NOSPACE = "There is not enough space\non your disk to Save Game!";
+STR_SAVECHT = "Your Save Game file is,\nshall we say, \"corrupted\".\nBut I'll let you go on and\nplay anyway....";
+STR_SEEAGAIN = "Let's see that again!";
+STR_SOUNDCONFIG = "Sound Configuration";
+STR_DIGITALDEVICE = "Digital Device & Volume";
+STR_ADLIBDEVICE = "Adlib Device & Volume";
+STR_MUSICDEVICE = "Music Device & Volume";
+STR_SOFT = "Soft";
+STR_LOUD = "Loud";
+STR_ALWAYSRUN = "Always Run";
+STR_CHEATER = "You now have 100% Health,\n99 Ammo and both Keys!\n\nNote that you have basically\neliminated your chances of\ngetting a high score!";
+STR_FLOOTCOMPLETED = "floor\ncompleted";
+
+STR_WHICHEPISODE = "Which episode to play?";
+WL_EPISODE1 = "Episode 1\nEscape from Wolfenstein";
+WL_EPISODE2 = "Episode 2\nOperation: Eisenfaust";
+WL_EPISODE3 = "Episode 3\nDie, Fuhrer, Die!";
+WL_EPISODE4 = "Episode 4\nA Dark Secret";
+WL_EPISODE5 = "Episode 5\nTrail of the Madman";
+WL_EPISODE6 = "Episode 6\nConfrontation";
+
+SOD_EPISODE1 = "Episode 1\nSpear of Destiny";
+SOD_EPISODE2 = "Episode 2\nReturn to Danger";
+SOD_EPISODE3 = "Episode 3\nThe Ultimate Challenge";
+
+// Spear of Destiny
+ENDSTR01 = "Heroes don't quit, but\ngo ahead and press Y\nif you aren't one.";
+ENDSTR02 = "Press Y to quit,\nor press N to enjoy\nmore violent diversion.";
+ENDSTR03 = "Depressing the Y key means\nyou must return to the\nhumdrum workday world.";
+ENDSTR04 = "Hey, quit or play,\nY or N:\nit's your choice.";
+ENDSTR05 = "Sure you don't want to\nwaste a few more\nproductive hours?";
+ENDSTR06 = "I think you had better\nplay some more. Please\npress N...please?";
+ENDSTR07 = "If you are tough, press N.\nIf not, press Y daintily.";
+ENDSTR08 = "I'm thinkin' that\nyou might wanna press N\nto play more. You do it.";
+ENDSTR09 = "Sure. Fine. Quit.\nSee if we care.\nGet it over with.\nPress Y.";
+// Wolfenstein 3D
+ENDSTR10 = "Dost thou wish to\nleave with such hasty\nabandon?";
+ENDSTR11 = "Chickening out...\nalready?";
+ENDSTR12 = "Press N for more carnage.\nPress Y to be a weenie.";
+ENDSTR13 = "So, you think you can\nquit this easily, huh?";
+ENDSTR14 = "Press N to save the world.\nPress Y to abandon it in\nits hour of need.";
+ENDSTR15 = "Press N if you are brave.\nPress Y to cower in shame.";
+ENDSTR16 = "Heroes, press N.\nWimps, press Y.";
+ENDSTR17 = "You are at an intersection.\nA sign says, 'Press Y to quit.'\n>";
+ENDSTR18 = "For guns and glory, press N.\nFor work and worry, press Y.";
+
+STR_ENDGAME1 = "We owe you a great debt, Mr. Blazkowicz.\n";
+STR_ENDGAME2 = "You have served your country well.";
+STR_ENDGAME3 = "With the spear gone, the Allies will finally\n";
+STR_ENDGAME4 = "by able to destroy Hitler...";

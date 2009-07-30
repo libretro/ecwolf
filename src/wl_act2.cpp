@@ -8,6 +8,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "language.h"
 
 /*
 =============================================================================
@@ -3815,7 +3816,7 @@ void    A_StartDeathCam (objtype *ob)
         fontnumber = 1;
         SETFONTCOLOR(15,bordercol);
         PrintX = 68; PrintY = 45;
-        US_Print (STR_SEEAGAIN);
+        US_Print (language["STR_SEEAGAIN"]);
         UNCACHEGRCHUNK(STARTFONT+1);
     }
     else
@@ -3826,7 +3827,7 @@ void    A_StartDeathCam (objtype *ob)
         CA_CacheScreen(C_LETSSEEPIC);
 #endif
 #else
-        Write(0,7,STR_SEEAGAIN);
+        Write(0,7,language["STR_SEEAGAIN"]);
 #endif
     }
 

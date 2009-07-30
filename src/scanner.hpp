@@ -31,12 +31,12 @@
 #ifndef __SCANNER_HPP__
 #define __SCANNER_HPP__
 
-typedef	unsigned int	UInt32;
-typedef	int				Int32;
-
 #include <string>
 
-enum
+typedef unsigned int UInt32;
+typedef int Int32;
+
+enum ETokenType
 {
 	TK_Identifier,	// Ex: SomeIdentifier
 	TK_StringConst,	// Ex: "Some String"
@@ -56,6 +56,8 @@ enum
 	TK_LessEq,		// <=
 	TK_ShiftLeft,	// <<
 	TK_ShiftRight,	// >>
+
+	TK_NoToken = -1,
 };
 
 /**
@@ -65,7 +67,7 @@ enum
 class Scanner
 {
 	public:
-		Scanner(char* data, UInt32 length);
+		Scanner(const char* data, UInt32 length);
 		~Scanner();
 
 		/**
@@ -75,6 +77,10 @@ class Scanner
 		 */
 		bool		CheckToken(char token);
 		/**
+		 * Gets whatever token is next.
+		 */
+		ETokenType	GetNextToken();
+		/**
 		 * Requires that the next token be of the specified type.  Errors will 
 		 * be printed if that is not the case.
 		 */
@@ -82,14 +88,19 @@ class Scanner
 		/**
 		 * Returns true if there is still more to read.
 		 */
-		bool		TokensLeft() { return (error != 0) || (pos != length); }
+		bool		TokensLeft() { return (error != 0) || (pos < length); }
 
-		const char*	str;
+		std::string	str;
 		UInt32		number;
 		double		decimal;
 		bool		boolean;
 		char		lastToken;
 	protected:
+		/**
+		 * Moves the position ahead any whitespace that there might be from the 
+		 * current position.
+		 */
+		void		CheckForWhitespace(UInt32 *nPos = NULL, UInt32 *nLpos = NULL);
 		void		GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool report=false);
 		char*		GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report=false);
 
@@ -99,6 +110,9 @@ class Scanner
 		UInt32		line;
 		UInt32		lpos;
 		UInt32		pos;
+
+	private:
+		char*		ret; // tmp variable.
 };
 
 #endif /* __SCANNER_HPP__ */
