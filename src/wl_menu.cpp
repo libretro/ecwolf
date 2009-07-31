@@ -349,6 +349,7 @@ MENU_LISTENER(StartNewGame)
 }
 MENU_LISTENER(ReadThis)
 {
+	MenuFadeOut();
 	StartCPMusic(CORNER_MUS);
 	HelpScreens();
 	StartCPMusic(MENUSONG);
@@ -373,7 +374,7 @@ void CreateMenus()
 	mainMenu.addItem(sg);
 	MenuItem *rt = new MenuItem(language["STR_RT"], ReadThis);
 #if defined(SPEAR) || defined(GOODTIMES)
-	rt->setVisible(false);
+//	rt->setVisible(false);
 #else
 	rt->setVisible(true);
 #endif
