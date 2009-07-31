@@ -91,19 +91,6 @@ class BooleanMenuItem : public MenuItem
 		void	draw();
 };
 
-class FunctionMenuItem : public MenuItem
-{
-	protected:
-		bool	fadeEnabled;
-		int		(*function)(int);
-
-	public:
-		FunctionMenuItem(const char string[36], int (*function)(int), bool fadeEnabled=true);
-
-		void	activate();
-		void	setEnableFade(bool fadeEnabled=true) { this->fadeEnabled = fadeEnabled; }
-};
-
 class MenuSwitcherMenuItem : public MenuItem
 {
 	protected:

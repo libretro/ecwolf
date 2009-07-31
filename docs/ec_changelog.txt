@@ -5,6 +5,8 @@ July 30th, 2009
 - Fixed: Crash at intermission.
 - Fixed: Typo in language lump with STR_FLOORCOMPLETED which caused a crash.
 - Fixed: Save games didn't work under Windows.
+- Fixed: Read This didn't work.
+- Removed FunctionMenuItem since it was no longer needed.
 
 July 29th, 2009
 -----------------------------

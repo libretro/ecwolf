@@ -347,6 +347,13 @@ MENU_LISTENER(StartNewGame)
 
 	return true;
 }
+MENU_LISTENER(ReadThis)
+{
+	StartCPMusic(CORNER_MUS);
+	HelpScreens();
+	StartCPMusic(MENUSONG);
+	return true;
+}
 
 void CreateMenus()
 {
@@ -364,7 +371,7 @@ void CreateMenus()
 	MenuItem *sg = new MenuSwitcherMenuItem(language["STR_SG"], saveGame);
 	sg->setEnabled(false);
 	mainMenu.addItem(sg);
-	MenuItem *rt = new FunctionMenuItem(language["STR_RT"], 0);
+	MenuItem *rt = new MenuItem(language["STR_RT"], ReadThis);
 #if defined(SPEAR) || defined(GOODTIMES)
 	rt->setVisible(false);
 #else
@@ -491,23 +498,6 @@ static const int color_norml[] = {
     READCOLOR,
     0x6b
 };
-
-//
-// PRIVATE PROTOTYPES
-//
-int CP_ReadThis (int);
-
-#ifdef SPEAR
-#define STARTITEM       newgame
-
-#else
-#ifdef GOODTIMES
-#define STARTITEM       newgame
-
-#else
-#define STARTITEM       readthis
-#endif
-#endif
 
 static int SoundStatus = 1;
 static int pickquick;
@@ -675,25 +665,6 @@ US_ControlPanel (ScanCode scancode)
 
     // RETURN/START GAME EXECUTION
 }
-
-#ifndef GOODTIMES
-#ifndef SPEAR
-////////////////////////////////////////////////////////////////////
-//
-// READ THIS!
-//
-////////////////////////////////////////////////////////////////////
-int
-CP_ReadThis (int)
-{
-    StartCPMusic (CORNER_MUS);
-    HelpScreens ();
-    StartCPMusic (MENUSONG);
-    return true;
-}
-#endif
-#endif
-
 
 #ifdef GOODTIMES
 ////////////////////////////////////////////////////////////////////

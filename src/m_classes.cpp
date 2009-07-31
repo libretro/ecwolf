@@ -121,19 +121,6 @@ void BooleanMenuItem::draw()
 	MenuItem::draw();
 }
 
-FunctionMenuItem::FunctionMenuItem(const char string[36], int (*function)(int), bool fadeEnabled) : MenuItem(string), function(function)
-{
-	setEnableFade(fadeEnabled);
-}
-
-void FunctionMenuItem::activate()
-{
-	if(fadeEnabled)
-		MenuFadeOut();
-	if(function != 0)
-		function(menu->getCurrentPosition());
-}
-
 MenuSwitcherMenuItem::MenuSwitcherMenuItem(const char string[36], Menu &menu, MENU_LISTENER_PROTOTYPE(activateListener)) : MenuItem(string, activateListener), menu(menu)
 {
 }
