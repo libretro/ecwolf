@@ -4,6 +4,7 @@ July 30th, 2009
 - Added language lump support.
 - Fixed: Crash at intermission.
 - Fixed: Typo in language lump with STR_FLOORCOMPLETED which caused a crash.
+- Fixed: Save games didn't work under Windows.
 
 July 29th, 2009
 -----------------------------

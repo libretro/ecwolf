@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 // =============================================================================
 // ### ### ##   ## ###  #   ###  ##   #   #  ##   ## ### ##  ### ###  #  ###
 // #    #  # # # # #  # #   #    # # # # # # # # # # #   # #  #   #  # # #  #
@@ -33,6 +33,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <cstdio>
 
 #include "scanner.hpp"
 #include "config.hpp"
