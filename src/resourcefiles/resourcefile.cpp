@@ -258,11 +258,12 @@ FResourceFile *CheckRFF(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckPak(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckZip(const char *filename, FileReader *file, bool quiet);
 FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet);
-//FResourceFile *CheckLump(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckLump(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckDir(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet);
 
-#define COUNTOF_FUNCS 6
-static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF };//, CheckLump };
+#define COUNTOF_FUNCS 8
+static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF, CheckVGAGraph, CheckLump };
 
 FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader *file, bool quiet)
 {

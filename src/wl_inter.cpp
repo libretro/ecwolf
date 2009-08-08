@@ -66,7 +66,7 @@ EndSpear (void)
 
     EndScreen (END1PALETTE, ENDSCREEN11PIC);
 
-    CA_CacheScreen (ENDSCREEN3PIC);
+    CA_CacheScreen ("ENDSCR3");
     VW_UpdateScreen ();
     CA_CacheGrChunk (END3PALETTE);
     VL_ConvertPalette(grsegs[END3PALETTE], pal, 256);

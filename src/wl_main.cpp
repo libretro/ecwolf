@@ -1540,7 +1540,7 @@ static void DemoLoop()
 
             UNCACHEGRCHUNK (TITLEPALETTE);
 #else
-            CA_CacheScreen (TITLEPIC);
+            CA_CacheScreen ("TITLEPIC");
             VW_UpdateScreen ();
             VW_FadeIn();
 #endif
@@ -1550,7 +1550,7 @@ static void DemoLoop()
 //
 // credits page
 //
-            CA_CacheScreen (CREDITSPIC);
+            CA_CacheScreen ("CREDITS");
             VW_UpdateScreen();
             VW_FadeIn ();
             if (IN_UserInput(TickBase*10))
@@ -1823,10 +1823,17 @@ void CheckParameters(int argc, char *argv[])
 ==========================
 */
 
+#include "lumpremap.h"
 int main (int argc, char *argv[])
 {
 	config->LocateConfigFile(argc, argv);
 	WL_AddFile("ecwolf.pk3");
+
+	CheckForEpisodes();
+	char vgadict[11] = {'v','g','a','d','i','c','t','.',0,0,0};
+	memcpy(vgadict+8, extension, 3);
+	WL_AddFile(vgadict);
+	WL_AddFile("vgagraph.wl6");
 
 #if defined(_arch_dreamcast)
     DC_Main();
@@ -1837,15 +1844,23 @@ int main (int argc, char *argv[])
     CheckParameters(argc, argv);
 #endif
 
+	CheckForEpisodes();
+
+	printf("W_Init: Init WADfiles.\n");
 	Wads.InitMultipleFiles(&wadfiles, NULL);
 	language.SetupStrings();
+	LumpRemaper::RemapAll();
 
-    CheckForEpisodes();
-
+	printf("CA_SetupVgaDict: Reading Huffman tree...\n");
+	CA_SetupVgaDict();
+	printf("VL_ReadPalette: Setting up the Palette...\n");
 	VL_ReadPalette();
+	printf("InitGame: Setting up the game...\n");
     InitGame();
+	printf("CreateMenus: Preparing the menu system...\n");
 	CreateMenus();
 
+	printf("DemoLoop: Starting the game loop...\n");
     DemoLoop();
 
     Quit("Demo loop exited???");

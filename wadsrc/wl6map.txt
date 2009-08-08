@@ -4,8 +4,9 @@
 
 graphics
 {
-	"EMPTY0",
-	"EMPTY1",
+	"PICTABLE",
+	"FONT1",
+	"FONT2",
 	"BJPIC",
 	"CASTLE",
 	"BLAZE",
@@ -139,8 +140,7 @@ graphics
 	"STFMUT0",
 	"PAUSED",
 	"GETPSYCH",
-
-	"EMPTY2",
+	"UNKOWN",
 	"ORDERSCR",
 	"ERRORSCR",
 	"T_HELP",
@@ -365,13 +365,13 @@ sounds
 	"BOSSFIRE",
 	"SSFIRE",
 	"SLURPIE",
-	"TOT_HUND"
+	"TOT_HUND",
 	"MEINGOTT",
 	"SCHABBSH",
 	"HITLERHA",
 	"SPOIN",
 	"NEINSOVA",
-	"DOGATTAK"
+	"DOGATTAK",
 	"FLAMTHRW",
 	"MECHSTEP",
 	"GOOB",
@@ -388,7 +388,7 @@ sounds
 	"KEIN",
 	"MEIN",
 	"ROSE",
-	"MISSLEFR"
+	"MISSLEFR",
 	"MISSLEHT"
 }
 

@@ -1,3 +1,10 @@
+August 7th, 2009
+-----------------------------
+- The VGAGRAPH, VGAHEAD, and VGADICT are now loaded by the new resource system 
+  and given names at run time.
+- The TITEPIC and CREDITS lump are now used. They are 320x200 raw pages similar
+  to Heretic's TITLE lump.
+
 July 30th, 2009
 -----------------------------
 - Removed Spear of Destiny copy protection quiz.

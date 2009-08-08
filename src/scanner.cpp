@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <cstdio>
+#include <cstdarg>
 
 #include "scanner.hpp"
 #include "config.hpp"
@@ -458,3 +459,16 @@ char* Scanner::GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report)
 	ret[result.length()] = '\0';
 	return ret;
 }
+
+void Scanner::ScriptError(const char* message, ...)
+{
+	printf("%d:%d:", line, lpos);
+
+	va_list list;
+	va_start(list, message);
+	printf(message, list);
+	va_end(list);
+
+	exit(0);
+}
+

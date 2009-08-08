@@ -65,9 +65,17 @@ FLumpFile::FLumpFile(const char *filename, FileReader *file) : FUncompressedFile
 //
 //==========================================================================
 
-bool FLumpFile::Open(bool)
+bool FLumpFile::Open(bool quiet)
 {
-	FString name(ExtractFileBase (Filename));
+	if(!quiet) printf("\n");
+
+	FString name(Filename);
+	long lastSlash = name.LastIndexOf('/') > name.LastIndexOf('\\') ? name.LastIndexOf('/') : name.LastIndexOf('\\');
+	long dot = name.LastIndexOf('.');
+	if(lastSlash != -1)
+		name = name.Mid(lastSlash+1, dot-lastSlash-1);
+	else if(dot != -1)
+		name = name.Mid(0, dot);
 
 	Lumps = new FUncompressedLump[1];	// must use array allocator
 	uppercopy(Lumps->Name, name);

@@ -37,6 +37,8 @@ extern  char  audioext[5];
 
 //===========================================================================
 
+void CA_SetupVgaDict();
+
 boolean CA_LoadFile (const char *filename, memptr *ptr);
 boolean CA_WriteFile (const char *filename, void *ptr, int32_t length);
 
@@ -53,7 +55,7 @@ void CA_LoadAllSounds (void);
 void CA_CacheGrChunk (int chunk);
 void CA_CacheMap (int mapnum);
 
-void CA_CacheScreen (int chunk);
+void CA_CacheScreen (const char* chunk);
 
 void CA_CannotOpen(const char *name);
 

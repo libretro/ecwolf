@@ -138,7 +138,7 @@ graphics
 	"ORDERSCR",
 	"ERRORSCR",
 	"TITLEPAL",
-	"T_DEMO0",
+	"T_DEMO0"
 }
 
 sprites
@@ -338,13 +338,13 @@ sounds
 	"BOSSFIRE",
 	"SSFIRE",
 	"SLURPIE",
-	"GHOSTFDE"
+	"GHOSTFDE",
 	"DEATHSR9",
 	"AMMOBOX",
 	"ANGELSEE",
 	"SPOIN",
 	"NEINSOVA",
-	"DOGATTAK"
+	"DOGATTAK",
 	"ANGLESHT",
 	"TRANSSEE",
 	"TRANSDTH",

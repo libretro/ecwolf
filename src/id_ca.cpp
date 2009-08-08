@@ -27,6 +27,7 @@ loaded into the data segment
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
+#include "w_wad.h"
 
 #define THREEBYTEGRSTARTS
 
@@ -444,32 +445,33 @@ void CA_RLEWexpand (word *source, word *dest, int32_t length, word rlewtag)
 ======================
 */
 
-void CAL_SetupGrFile (void)
+void CA_SetupVgaDict()
 {
-    char fname[13];
-    int handle;
-    byte *compseg;
-
 #ifdef GRHEADERLINKED
-
     grhuffman = (huffnode *)&EGAdict;
     grstarts = (int32_t _seg *)FP_SEG(&EGAhead);
-
 #else
 
 //
 // load ???dict.ext (huffman dictionary for graphics files)
 //
 
-    strcpy(fname,gdictname);
-    strcat(fname,graphext);
+	int lump = Wads.GetNumForName("VGADICT");
+	if(lump == -1)
+	{
+		printf("ERROR: No VGADICT\n");
+		exit(0);
+	}
+	FWadLump vgadict = Wads.OpenLumpNum(lump);
 
-    handle = open(fname, O_RDONLY | O_BINARY);
-    if (handle == -1)
-        CA_CannotOpen(fname);
+	vgadict.Read(grhuffman, sizeof(grhuffman));
+}
 
-    read(handle, grhuffman, sizeof(grhuffman));
-    close(handle);
+void CAL_SetupGrFile (void)
+{
+    char fname[13];
+    int handle;
+    byte *compseg;
 
     // load the data offsets from ???head.ext
     strcpy(fname,gheadname);
@@ -968,53 +970,31 @@ void CA_CacheGrChunk (int chunk)
 ======================
 */
 
-void CA_CacheScreen (int chunk)
+void CA_CacheScreen(const char* chunk)
 {
-    int32_t    pos,compressed,expanded;
-    memptr  bigbufferseg;
-    int32_t    *source;
-    int             next;
+	int lumpNum = Wads.GetNumForName(chunk);
+	if(lumpNum == -1)
+	{
+		printf("\n");
+		exit(0);
+	}
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
 
-//
-// load the chunk into a buffer
-//
-    pos = GRFILEPOS(chunk);
-    next = chunk +1;
-    while (GRFILEPOS(next) == -1)           // skip past any sparse tiles
-        next++;
-    compressed = GRFILEPOS(next)-pos;
-
-    lseek(grhandle,pos,SEEK_SET);
-
-    bigbufferseg=malloc(compressed);
-    CHECKMALLOCRESULT(bigbufferseg);
-    read(grhandle,bigbufferseg,compressed);
-    source = (int32_t *) bigbufferseg;
-
-    expanded = *source++;
-
-//
-// allocate final space, decompress it, and free bigbuffer
-// Sprites need to have shifts made and various other junk
-//
-    byte *pic = (byte *) malloc(64000);
-    CHECKMALLOCRESULT(pic);
-    CAL_HuffExpand((byte *) source, pic, expanded, grhuffman);
-
-    byte *vbuf = LOCK();
-    for(int y = 0, scy = 0; y < 200; y++, scy += scaleFactor)
-    {
-        for(int x = 0, scx = 0; x < 320; x++, scx += scaleFactor)
-        {
-            byte col = pic[(y * 80 + (x >> 2)) + (x & 3) * 80 * 200];
-            for(unsigned i = 0; i < scaleFactor; i++)
-                for(unsigned j = 0; j < scaleFactor; j++)
-                    vbuf[(scy + i) * curPitch + scx + j] = col;
-        }
-    }
-    UNLOCK();
-    free(pic);
-    free(bigbufferseg);
+	byte* pic = new byte[64000];
+	lump.Read(pic, 64000);
+	byte *vbuf = LOCK();
+	for(int y = 0, scy = 0; y < 200; y++, scy += scaleFactor)
+	{
+		for(int x = 0, scx = 0; x < 320; x++, scx += scaleFactor)
+		{
+			byte col = pic[(y * 80 + (x >> 2)) + (x & 3) * 80 * 200];
+			for(unsigned i = 0; i < scaleFactor; i++)
+				for(unsigned j = 0; j < scaleFactor; j++)
+					vbuf[(scy + i) * curPitch + scx + j] = col;
+		}
+	}
+	UNLOCK();
+	delete[] pic;
 }
 
 //==========================================================================

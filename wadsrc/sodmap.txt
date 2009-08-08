@@ -174,7 +174,7 @@ graphics
 	"T_DEMO1",
 	"T_DEMO2",
 	"T_DEMO3",
-	"T_END",
+	"T_END"
 }
 
 sprites
@@ -374,13 +374,14 @@ sounds
 	"BOSSFIRE",
 	"SSFIRE",
 	"SLURPIE",
-	"GHOSTFDE"
+	"GHOSTFDE",
 	"DEATHSR9",
+	"GHOSTFDE",
 	"AMMOBOX",
 	"ANGELSEE",
 	"SPOIN",
 	"NEINSOVA",
-	"DOGATTAK"
+	"DOGATTAK",
 	"ANGLESHT",
 	"TRANSSEE",
 	"TRANSDTH",

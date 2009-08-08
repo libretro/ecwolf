@@ -89,6 +89,7 @@ class Scanner
 		 * Returns true if there is still more to read.
 		 */
 		bool		TokensLeft() { return (error != 0) || (pos < length); }
+		void		ScriptError(const char* message, ...);
 
 		std::string	str;
 		UInt32		number;
