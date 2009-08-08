@@ -7,6 +7,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "w_wad.h"
 #include <SDL_mixer.h>
 
 #ifdef MYPROFILE
@@ -1162,21 +1163,15 @@ void RecordDemo (void) {return;}
 void PlayDemo (int demonumber)
 {
     int length;
-#ifdef DEMOSEXTERN
-// debug: load chunk
-#ifndef SPEARDEMO
-    int dems[4]={T_DEMO0,T_DEMO1,T_DEMO2,T_DEMO3};
-#else
-    int dems[1]={T_DEMO0};
-#endif
-
-    CA_CacheGrChunk(dems[demonumber]);
-    demoptr = (int8_t *) grsegs[dems[demonumber]];
-#else
-    demoname[4] = '0'+demonumber;
-    CA_LoadFile (demoname,&demobuffer);
-    demoptr = (int8_t *)demobuffer;
-#endif
+	char demoName[9];
+	sprintf(demoName, "DEMO%d", demonumber);
+	int lumpNum = Wads.GetNumForName(demoName);
+	if(lumpNum == -1)
+		return;
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+	demoptr = new int8_t[Wads.LumpLength(lumpNum)];
+	int8_t* demoptr_freeme = demoptr; // Since I can't delete[] demoptr when the time comes.
+	lump.Read(demoptr, Wads.LumpLength(lumpNum));
 
     NewGame (1,0);
     gamestate.mapon = *demoptr++;
@@ -1200,11 +1195,7 @@ void PlayDemo (int demonumber)
 
     PlayLoop ();
 
-#ifdef DEMOSEXTERN
-    UNCACHEGRCHUNK(dems[demonumber]);
-#else
-    MM_FreePtr (&demobuffer);
-#endif
+	delete[] demoptr_freeme;
 
     demoplayback = false;
 

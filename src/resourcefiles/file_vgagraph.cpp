@@ -26,9 +26,7 @@ struct FVGALump : public FResourceLump
 			Owner->Reader->Seek(position+4, SEEK_SET);
 
 			byte* data = new byte[length];
-			memset(data, 0, length);
 			byte* out = new byte[LumpSize];
-			memset(out, 0, length);
 			Owner->Reader->Read(data, length);
 			HuffExpand(data, out);
 			delete[] data;
