@@ -35,7 +35,7 @@ void MenuItem::setTextColor()
 	}
 }
 
-MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) : activateListener(activateListener), enabled(true), highlight(false), picture(-1), selected(false), visible(true), pictureX(-1), pictureY(-1)
+MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) : activateListener(activateListener), enabled(true), highlight(false), selected(false), visible(true), pictureX(-1), pictureY(-1)
 {
 	setText(string);
 }
@@ -50,8 +50,8 @@ void MenuItem::draw()
 {
 	setTextColor();
 
-	if(picture != -1)
-		VWB_DrawPic(pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, picture);
+	if(!picture.empty())
+		VWB_DrawPic(pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, picture.c_str());
 
 	if(getActive())
 		US_Print(getString());
@@ -65,7 +65,7 @@ void MenuItem::draw()
 	PrintX = menu->getX() + menu->getIndent();
 }
 
-void MenuItem::setPicture(int picture, int x, int y)
+void MenuItem::setPicture(const char* picture, int x, int y)
 {
 	this->picture = picture;
 	pictureX = x;
@@ -115,9 +115,9 @@ void BooleanMenuItem::activate()
 void BooleanMenuItem::draw()
 {
 	if (value)
-		VWB_DrawPic (PrintX - 24, PrintY + 3, C_SELECTEDPIC);
+		VWB_DrawPic (PrintX - 24, PrintY + 3, "M_SELCT");
 	else
-		VWB_DrawPic (PrintX - 24, PrintY + 3, C_NOTSELECTEDPIC);
+		VWB_DrawPic (PrintX - 24, PrintY + 3, "M_NSELCT");
 	MenuItem::draw();
 }
 
@@ -496,7 +496,7 @@ void Menu::drawGun(int x, int &y, int basey)
 	VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 	y = getY() + getHeight(curPos);
 	if(getIndent() != 0)
-		VWB_DrawPic (x, y, C_CURSOR1PIC);
+		VWB_DrawPic (x, y, "M_CURS1");
 
 	PrintX = getX() + getIndent();
 	PrintY = getY() + getHeight(curPos);
@@ -509,7 +509,7 @@ void Menu::drawGun(int x, int &y, int basey)
 
 void Menu::drawGunHalfStep(int x, int y)
 {
-	VWB_DrawPic (x, y, C_CURSOR1PIC);
+	VWB_DrawPic (x, y, "M_CURS1");
 	VW_UpdateScreen ();
 	SD_PlaySound (MOVEGUN1SND);
 	SDL_Delay (8 * 100 / 7);
@@ -526,7 +526,7 @@ void Menu::eraseGun(int x, int y)
 	VW_UpdateScreen();
 }
 
-Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), headPicture(-1), curPos(0), height(0), itemOffset(0), headTextInStripes(false)
+Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), curPos(0), height(0), itemOffset(0), headTextInStripes(false)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';
@@ -647,12 +647,12 @@ void Menu::drawMenu() const
 void Menu::draw() const
 {
 	ClearMScreen();
-	if(headPicture != -1)
+	if(!headPicture.empty())
 	{
 		DrawStripes(10);
-		VWB_DrawPic(84, 0, headPicture);
+		VWB_DrawPic(84, 0, headPicture.c_str());
 	}
-	VWB_DrawPic(112, 184, C_MOUSELBACKPIC);
+	VWB_DrawPic(112, 184, "M_MCONTL");
 
 	SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
 	WindowX = 0;
@@ -700,7 +700,7 @@ int Menu::handle()
 	y = basey + getHeight(curPos);
 
 	if(getIndent() != 0)
-		VWB_DrawPic (x, y, C_CURSOR1PIC);
+		VWB_DrawPic (x, y, "M_CURS1");
 	if (redrawitem)
 	{
 		PrintX = getX() + getIndent();
@@ -724,17 +724,17 @@ int Menu::handle()
 		if (getIndent() != 0 && (int32_t)GetTimeCount () - lastBlinkTime > timer)
 		{
 			lastBlinkTime = GetTimeCount ();
-			if (shape == C_CURSOR1PIC)
+			if (shape == 0)
 			{
-				shape = C_CURSOR2PIC;
+				shape = 1;
 				timer = 8;
 			}
 			else
 			{
-				shape = C_CURSOR1PIC;
+				shape = 0;
 				timer = 70;
 			}
-			VWB_DrawPic (x, y, shape);
+			VWB_DrawPic (x, y, shape == 0 ? "M_CURS1" : "M_CURS2");
 			VW_UpdateScreen ();
 		}
 		else SDL_Delay(5);

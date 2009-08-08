@@ -980,6 +980,10 @@ void CA_CacheScreen(const char* chunk)
 	}
 	FWadLump lump = Wads.OpenLumpNum(lumpNum);
 
+	if(Wads.LumpLength(lumpNum) > 64000)
+		lump.Seek(4, SEEK_SET); // Probably a standard image.
+	else if(Wads.LumpLength(lumpNum) < 64000)
+		return; // Not big enough
 	byte* pic = new byte[64000];
 	lump.Read(pic, 64000);
 	byte *vbuf = LOCK();

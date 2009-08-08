@@ -33,7 +33,7 @@ graphics
 	"C_LOADGM",
 	"C_SAVEGM",
 	"HGHSCORE",
-	"C_WONSPR",
+	"M_WONSPR",
 	"BJCOLPS1",
 	"BJCOLPS2",
 	"BJCOLPS3",

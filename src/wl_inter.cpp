@@ -132,30 +132,21 @@ Victory (void)
 #ifdef SPEAR
     StartCPMusic (XTHEEND_MUS);
 
-    CA_CacheGrChunk (BJCOLLAPSE1PIC);
-    CA_CacheGrChunk (BJCOLLAPSE2PIC);
-    CA_CacheGrChunk (BJCOLLAPSE3PIC);
-    CA_CacheGrChunk (BJCOLLAPSE4PIC);
-
     VWB_Bar (0, 0, 320, 200, VIEWCOLOR);
-    VWB_DrawPic (124, 44, BJCOLLAPSE1PIC);
+    VWB_DrawPic (124, 44, "BJCOLPS1");
     VW_UpdateScreen ();
     VW_FadeIn ();
     VW_WaitVBL (2 * 70);
-    VWB_DrawPic (124, 44, BJCOLLAPSE2PIC);
+    VWB_DrawPic (124, 44, "BJCOLPS2");
     VW_UpdateScreen ();
     VW_WaitVBL (105);
-    VWB_DrawPic (124, 44, BJCOLLAPSE3PIC);
+    VWB_DrawPic (124, 44, "BJCOLPS3");
     VW_UpdateScreen ();
     VW_WaitVBL (105);
-    VWB_DrawPic (124, 44, BJCOLLAPSE4PIC);
+    VWB_DrawPic (124, 44, "BJCOLPS4");
     VW_UpdateScreen ();
     VW_WaitVBL (3 * 70);
 
-    UNCACHEGRCHUNK (BJCOLLAPSE1PIC);
-    UNCACHEGRCHUNK (BJCOLLAPSE2PIC);
-    UNCACHEGRCHUNK (BJCOLLAPSE3PIC);
-    UNCACHEGRCHUNK (BJCOLLAPSE4PIC);
     VL_FadeOut (0, 255, 0, 17, 17, 5);
 #endif
 
@@ -192,7 +183,7 @@ Victory (void)
 #endif
 
 #ifndef JAPDEMO
-    VWB_DrawPic (8, 4, L_BJWINSPIC);
+    VWB_DrawPic (8, 4, "L_BJWINS");
 #endif
 
 
@@ -220,16 +211,17 @@ Victory (void)
     if (min > 99)
         min = sec = 99;
 
+	const char* numericGraphics[10] = { "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052", "FONTL053", "FONTL054", "FONTL055", "FONTL056", "FONTL057" };
     i = TIMEX * 8 + 1;
-    VWB_DrawPic (i, TIMEY * 8, L_NUM0PIC + (min / 10));
+    VWB_DrawPic (i, TIMEY * 8, numericGraphics[(min / 10)]);
     i += 2 * 8;
-    VWB_DrawPic (i, TIMEY * 8, L_NUM0PIC + (min % 10));
+    VWB_DrawPic (i, TIMEY * 8, numericGraphics[(min % 10)]);
     i += 2 * 8;
     Write (i / 8, TIMEY, ":");
     i += 1 * 8;
-    VWB_DrawPic (i, TIMEY * 8, L_NUM0PIC + (sec / 10));
+    VWB_DrawPic (i, TIMEY * 8, numericGraphics[(sec / 10)]);
     i += 2 * 8;
-    VWB_DrawPic (i, TIMEY * 8, L_NUM0PIC + (sec % 10));
+    VWB_DrawPic (i, TIMEY * 8, numericGraphics[(sec % 10)]);
     VW_UpdateScreen ();
 
     itoa (kr, tempstr, 10);
@@ -252,7 +244,7 @@ Victory (void)
     //
     if (gamestate.difficulty >= gd_medium)
     {
-        VWB_DrawPic (30 * 8, TIMEY * 8, C_TIMECODEPIC);
+        VWB_DrawPic (30 * 8, TIMEY * 8, "M_TIMECD");
         fontnumber = 0;
         fontcolor = READHCOLOR;
         PrintX = 30 * 8 - 3;
@@ -311,11 +303,8 @@ PG13 (void)
     VW_FadeOut ();
     VWB_Bar (0, 0, 320, 200, 0x82);     // background
 
-    CA_CacheGrChunk (PG13PIC);
-    VWB_DrawPic (216, 110, PG13PIC);
+    VWB_DrawPic (216, 110, "PG13");
     VW_UpdateScreen ();
-
-    UNCACHEGRCHUNK (PG13PIC);
 
     VW_FadeIn ();
     IN_UserInput (TickBase * 7);
@@ -330,11 +319,11 @@ PG13 (void)
 void
 Write (int x, int y, const char *string)
 {
-    static const int alpha[] = { L_NUM0PIC, L_NUM1PIC, L_NUM2PIC, L_NUM3PIC, L_NUM4PIC, L_NUM5PIC,
-        L_NUM6PIC, L_NUM7PIC, L_NUM8PIC, L_NUM9PIC, L_COLONPIC, 0, 0, 0, 0, 0, 0, L_APIC, L_BPIC,
-        L_CPIC, L_DPIC, L_EPIC, L_FPIC, L_GPIC, L_HPIC, L_IPIC, L_JPIC, L_KPIC,
-        L_LPIC, L_MPIC, L_NPIC, L_OPIC, L_PPIC, L_QPIC, L_RPIC, L_SPIC, L_TPIC,
-        L_UPIC, L_VPIC, L_WPIC, L_XPIC, L_YPIC, L_ZPIC
+    static const char* alpha[] = { "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052", "FONTL053",
+        "FONTL054", "FONTL055", "FONTL056", "FONTL057", "FONTL058", 0, 0, 0, 0, 0, 0, "FONTL065", "FONTL066",
+        "FONTL067", "FONTL068", "FONTL069", "FONTL070", "FONTL071", "FONTL072", "FONTL073", "FONTL074", "FONTL075",
+        "FONTL076", "FONTL077", "FONTL078", "FONTL079", "FONTL080", "FONTL081", "FONTL082", "FONTL083", "FONTL084",
+        "FONTL085", "FONTL086", "FONTL087", "FONTL088", "FONTL089", "FONTL090"
     };
 
     int i, ox, nx, ny, len = (int) strlen(string);
@@ -362,13 +351,13 @@ Write (int x, int y, const char *string)
             switch (string[i])
             {
                 case '!':
-                    VWB_DrawPic (nx, ny, L_EXPOINTPIC);
+                    VWB_DrawPic (nx, ny, "FONTL033");
                     nx += 8;
                     continue;
 
 #ifndef APOGEE_1_0
                 case '\'':
-                    VWB_DrawPic (nx, ny, L_APOSTROPHEPIC);
+                    VWB_DrawPic (nx, ny, "FONTL039");
                     nx += 8;
                     continue;
 #endif
@@ -377,12 +366,12 @@ Write (int x, int y, const char *string)
                     break;
 
                 case 0x3a:     // ':'
-                    VWB_DrawPic (nx, ny, L_COLONPIC);
+                    VWB_DrawPic (nx, ny, "FONTL058");
                     nx += 8;
                     continue;
 
                 case '%':
-                    VWB_DrawPic (nx, ny, L_PERCENTPIC);
+                    VWB_DrawPic (nx, ny, "FONTL037");
                     break;
 
                 default:
@@ -403,7 +392,7 @@ void
 BJ_Breathe (void)
 {
     static int which = 0, max = 10;
-    int pics[2] = { L_GUYPIC, L_GUY2PIC };
+    const char* pics[2] = { "L_GUY1", "L_GUY2" };
 
     SDL_Delay(5);
 
@@ -579,7 +568,7 @@ LevelCompleted (void)
     VWB_DrawPic (0, 0, C_INTERMISSIONPIC);
     UNCACHEGRCHUNK (C_INTERMISSIONPIC);
 #endif
-    VWB_DrawPic (0, 16, L_GUYPIC);
+    VWB_DrawPic (0, 16, "L_GUY1");
 
 #ifndef SPEAR
     if (mapon < 8)
@@ -626,15 +615,16 @@ LevelCompleted (void)
 #else
         i = 26 * 8;
 #endif
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (min / 10));
+		const char* numericGraphics[10] = { "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052", "FONTL053", "FONTL054", "FONTL055", "FONTL056", "FONTL057" };
+        VWB_DrawPic (i, 10 * 8, numericGraphics[(min / 10)]);
         i += 2 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (min % 10));
+        VWB_DrawPic (i, 10 * 8, numericGraphics[(min % 10)]);
         i += 2 * 8;
         Write (i / 8, 10, ":");
         i += 1 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (sec / 10));
+        VWB_DrawPic (i, 10 * 8, numericGraphics[(sec / 10)]);
         i += 2 * 8;
-        VWB_DrawPic (i, 10 * 8, L_NUM0PIC + (sec % 10));
+        VWB_DrawPic (i, 10 * 8, numericGraphics[(sec % 10)]);
 
         VW_UpdateScreen ();
         VW_FadeIn ();
@@ -1020,7 +1010,6 @@ DrawHighScores (void)
     word i, w, h;
     HighScore *s;
 
-	CA_CacheGrChunk(HIGHSCORESPIC);
 	CA_CacheGrChunk(STARTFONT);
 #ifndef SPEAR
 #ifndef APOGEE_1_0
@@ -1032,28 +1021,27 @@ DrawHighScores (void)
 #endif
 #else
 	CA_CacheGrChunk(C_BACKDROPPIC);
-	CA_CacheGrChunk(C_WONSPEARPIC);
+	CA_CacheGrChunk(C_WONSPEARPIC)
 #endif
 
     ClearMScreen ();
     DrawStripes (10);
 
 #ifndef SPEAR
-    VWB_DrawPic (48, 0, HIGHSCORESPIC);
-    UNCACHEGRCHUNK (HIGHSCORESPIC);
+    VWB_DrawPic (48, 0, "HGHSCORE");
 
 #ifndef APOGEE_1_0
-    VWB_DrawPic (4 * 8, 68, C_NAMEPIC);
-    VWB_DrawPic (20 * 8, 68, C_LEVELPIC);
-    VWB_DrawPic (28 * 8, 68, C_SCOREPIC);
+    VWB_DrawPic (4 * 8, 68, "M_NAME");
+    VWB_DrawPic (20 * 8, 68, "M_LEVEL");
+    VWB_DrawPic (28 * 8, 68, "M_SCORE");
 #else
-    VWB_DrawPic(35*8,68,C_CODEPIC);
+    VWB_DrawPic(35*8,68,"M_CODE");
 #endif
     fontnumber = 0;
 
 #else
     CA_CacheGrChunk (STARTFONT + 1);
-    VWB_DrawPic (0, 0, HIGHSCORESPIC);
+    VWB_DrawPic (0, 0, "HGHSCORE");
 
     fontnumber = 1;
 #endif
@@ -1105,7 +1093,7 @@ DrawHighScores (void)
 
 #ifdef SPEAR
         if (s->completed == 21)
-            VWB_DrawPic (PrintX + 8, PrintY - 1, C_WONSPEARPIC);
+            VWB_DrawPic (PrintX + 8, PrintY - 1, "M_WONSPR");
         else
 #endif
             US_Print (buffer);

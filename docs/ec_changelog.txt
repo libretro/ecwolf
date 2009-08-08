@@ -1,6 +1,10 @@
 August 8th, 2009
 -----------------------------
 - DEMOs use the resource system.  You can have up to 10000 demos now.
+- Graphics are changed to have the format of a 4 byte header followed by the
+  graphic data.  2 bytes for width, 2 bytes for height.  This is done
+  on the fly for VGAGRAPH data, but new data must use the new format.
+- Quite a few of the graphics are now drawn using the new system.
 
 August 7th, 2009
 -----------------------------

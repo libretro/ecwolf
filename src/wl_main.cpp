@@ -360,7 +360,7 @@ void DiskFlopAnim(int x,int y)
     static int8_t which=0;
     if (!x && !y)
         return;
-    VWB_DrawPic(x,y,C_DISKLOADING1PIC+which);
+    VWB_DrawPic(x,y,which == 0 ? "M_LDING1" : "M_LDING2");
     VW_UpdateScreen();
     which^=1;
 }
@@ -1526,13 +1526,9 @@ static void DemoLoop()
             CA_CacheGrChunk (TITLEPALETTE);
             VL_ConvertPalette(grsegs[TITLEPALETTE], pal, 256);
 
-            CA_CacheGrChunk (TITLE1PIC);
-            VWB_DrawPic (0,0,TITLE1PIC);
-            UNCACHEGRCHUNK (TITLE1PIC);
+            VWB_DrawPic (0,0,"TITLE1");
 
-            CA_CacheGrChunk (TITLE2PIC);
-            VWB_DrawPic (0,80,TITLE2PIC);
-            UNCACHEGRCHUNK (TITLE2PIC);
+            VWB_DrawPic (0,80,"TITLE2");
             VW_UpdateScreen ();
             VL_FadeIn(0,255,pal,30);
 

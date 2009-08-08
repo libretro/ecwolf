@@ -30,6 +30,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "language.h"
+#include "w_wad.h"
 using namespace std;
 
 struct SaveFile
@@ -358,7 +359,7 @@ MENU_LISTENER(ReadThis)
 
 void CreateMenus()
 {
-	mainMenu.setHeadPicture(C_OPTIONSPIC);
+	mainMenu.setHeadPicture("M_OPTION");
 #ifndef SPEAR
 	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], episodes));
 #else
@@ -374,7 +375,7 @@ void CreateMenus()
 	mainMenu.addItem(sg);
 	MenuItem *rt = new MenuItem(language["STR_RT"], ReadThis);
 #if defined(SPEAR) || defined(GOODTIMES)
-//	rt->setVisible(false);
+	rt->setVisible(false);
 #else
 	rt->setVisible(true);
 #endif
@@ -395,7 +396,15 @@ void CreateMenus()
 		language["WL_EPISODE5"],
 		language["WL_EPISODE6"]
 	};
-	int episodePicture[6] = { C_EPISODE1PIC, C_EPISODE2PIC, C_EPISODE3PIC, C_EPISODE4PIC, C_EPISODE5PIC, C_EPISODE6PIC };
+	const char* episodePicture[6] =
+	{
+		"M_EPIS1",
+		"M_EPIS2",
+		"M_EPIS3",
+		"M_EPIS4",
+		"M_EPIS5",
+		"M_EPIS6"
+	};
 	for(unsigned int i = 0;i < 6;i++)
 	{
 		MenuItem *tmp = new MenuSwitcherMenuItem(episodeText[i], skills, SetEpisodeAndSwitchToSkill);
@@ -414,7 +423,13 @@ void CreateMenus()
 		language["STR_BRINGEM"],
 		language["STR_DEATH"]
 	};
-	int skillPicture[4] = { C_BABYMODEPIC, C_EASYPIC, C_NORMALPIC, C_HARDPIC };
+	const char* skillPicture[4] =
+	{
+		"M_BABY",
+		"M_EASY",
+		"M_NORMAL",
+		"M_HARD"
+	};
 	for(unsigned int i = 0;i < 4;i++)
 	{
 		MenuItem *tmp = new MenuItem(skillText[i], StartNewGame);
@@ -464,7 +479,7 @@ void CreateMenus()
 	soundBase.addItem(new MultipleChoiceMenuItem(SetMusic, musicOptions, 2, musicMode));
 	soundBase.addItem(new SliderMenuItem(MusicVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"]));
 
-	controlBase.setHeadPicture(C_CONTROLPIC);
+	controlBase.setHeadPicture("M_CONTRL");
 	controlBase.addItem(new BooleanMenuItem(language["STR_ALWAYSRUN"], alwaysrun, EnterControlBase));
 	controlBase.addItem(new BooleanMenuItem(language["STR_MOUSEEN"], mouseenabled, EnterControlBase));
 	controlBase.addItem(new BooleanMenuItem(language["STR_DISABLEYAXIS"], mouseyaxisdisabled, EnterControlBase));
@@ -472,13 +487,13 @@ void CreateMenus()
 	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
 
-	loadGame.setHeadPicture(C_LOADGAMEPIC);
-	saveGame.setHeadPicture(C_SAVEGAMEPIC);
+	loadGame.setHeadPicture("M_LOADGM");
+	saveGame.setHeadPicture("M_SAVEGM");
 
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEADJ"]));
 	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
 
-	controls.setHeadPicture(C_CUSTOMIZEPIC);
+	controls.setHeadPicture("M_CUSTOM");
 	controls.showControlHeaders(true);
 	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
 	{
@@ -607,13 +622,8 @@ US_ControlPanel (ScanCode scancode)
             ClearMemory ();
 
 
-            CA_CacheGrChunk (IDGUYS1PIC);
-            VWB_DrawPic (0, 0, IDGUYS1PIC);
-            UNCACHEGRCHUNK (IDGUYS1PIC);
-
-            CA_CacheGrChunk (IDGUYS2PIC);
-            VWB_DrawPic (0, 80, IDGUYS2PIC);
-            UNCACHEGRCHUNK (IDGUYS2PIC);
+            VWB_DrawPic (0, 0, "IDGUYS1");
+            VWB_DrawPic (0, 80, "IDGUYS2");
 
             VW_UpdateScreen ();
 
@@ -948,7 +958,7 @@ DrawLSAction (int which)
 {
     DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, TEXTCOLOR);
     DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
-    VWB_DrawPic (LSA_X + 8, LSA_Y + 5, C_DISKLOADING1PIC);
+    VWB_DrawPic (LSA_X + 8, LSA_Y + 5, "M_LDING1");
 
     fontnumber = 1;
     SETFONTCOLOR (0, TEXTCOLOR);
@@ -1070,11 +1080,10 @@ IntroScreen (void)
 void
 ClearMScreen (void)
 {
-#ifndef SPEAR
-    VWB_Bar (0, 0, 320, 200, BORDCOLOR);
-#else
-    VWB_DrawPic (0, 0, C_BACKDROPPIC);
-#endif
+	if(Wads.CheckNumForName("BACKDROP") == -1)
+		VWB_Bar (0, 0, 320, 200, BORDCOLOR);
+	else
+		VWB_DrawPic (0, 0, "BACKDROP");
 }
 
 

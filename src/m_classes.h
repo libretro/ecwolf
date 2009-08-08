@@ -35,7 +35,7 @@ class MenuItem
 		bool		enabled;
 		int			height;
 		bool		highlight; // Makes the font a different color, not to be confused with the item being selected.
-		int			picture;
+		std::string	picture;
 		int			pictureX;
 		int			pictureY;
 		bool		selected;
@@ -60,7 +60,7 @@ class MenuItem
 		void		setEnabled(bool enabled=true) { this->enabled = enabled; }
 		void		setHighlighted(bool highlight=true) { this->highlight = highlight; }
 		void		setMenu(const Menu *menu) { this->menu = menu; }
-		void		setPicture(int picture, int x=-1, int y=-1);
+		void		setPicture(const char* picture, int x=-1, int y=-1);
 		void		setSelected(bool selected=true) {this->selected = selected; }
 		void		setText(const char string[36]);
 		void		setVisible(bool visible=true) { this->visible = visible; }
@@ -185,7 +185,7 @@ class Menu
 		static bool				close;
 		bool					controlHeaders;
 		int						curPos;
-		int						headPicture;
+		std::string				headPicture;
 		char					headText[36];
 		bool					headTextInStripes;
 		int						height;
@@ -226,7 +226,7 @@ class Menu
 		int				getX() const { return x; }
 		int				getY() const { return y; }
 		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : (position >= items.size() ? items.size()-1 : position); }
-		void			setHeadPicture(int picture) { headPicture = picture; }
+		void			setHeadPicture(const char* picture) { headPicture = picture; }
 		void			setHeadText(const char text[36], bool drawInStripes=false);
 		void			show();
 		/**

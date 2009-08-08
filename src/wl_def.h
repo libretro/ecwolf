@@ -1521,4 +1521,21 @@ static inline longword READLONGWORD(byte *&ptr)
     void Scale3DShape(byte *vbuf, unsigned vbufPitch, statobj_t *ob);
 #endif
 
+// Some old macros from SDE, no longer in use do to pickyness of another author
+#define READINT32(pointer) ((DWORD((BYTE)(*pointer))) | (DWORD(BYTE(*(pointer+1)))<<8) | (DWORD(BYTE(*(pointer+2)))<<16) | (DWORD(BYTE(*(pointer+3)))<<24))
+#define READINT24(pointer) ((DWORD((BYTE)(*pointer))) | (DWORD(BYTE(*(pointer+1)))<<8) | (DWORD(BYTE(*(pointer+2)))<<16))
+#define READINT16(pointer) ((WORD((BYTE)(*pointer))) | (WORD(BYTE(*(pointer+1)))<<8))
+#define READINT8(pointer) ((BYTE)(*pointer))
+
+// Now for some writing
+// Syntax: char data[x] = {WRITEINT32_DIRECT(integer),WRITEINT32_DIRECT(integer)...}
+#define WRITEINT32_DIRECT(integer) (BYTE)(integer&0xFF),(BYTE)((integer>>8)&0xFF),(BYTE)((integer>>16)&0xFF),(BYTE)((integer>>24)&0xFF)
+#define WRITEINT16_DIRECT(integer) (BYTE)(integer&0xFF),(BYTE)((integer>>8)&0xFF)
+#define WRITEINT8_DIRECT(integer) (BYTE)(integer&0xFF)
+
+#define WRITEINT32(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);*(pointer+2) = (BYTE)((integer>>16)&0xFF);*(pointer+3) = (BYTE)((integer>>24)&0xFF);
+#define WRITEINT24(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);*(pointer+2) = (BYTE)((integer>>16)&0xFF);
+#define WRITEINT16(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);
+#define WRITEINT8(pointer, integer) *pointer = (BYTE)(integer&0xFF);
+
 #endif

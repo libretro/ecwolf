@@ -3,6 +3,7 @@
 #include "id_in.h"
 #include "id_vl.h"
 #include "id_vh.h"
+#include "w_wad.h"
 
 pictabletype	*pictable;
 SDL_Surface     *latchpics[NUMLATCHPICS];
@@ -131,6 +132,26 @@ void VWB_DrawTile8 (int x, int y, int tile)
 void VWB_DrawTile8M (int x, int y, int tile)
 {
 	VL_MemToScreen (((byte *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
+}
+
+void VWB_DrawPic(int x, int y, const char* chunk)
+{
+	int lumpNum = Wads.CheckNumForName(chunk);
+	if(lumpNum == -1)
+		return;
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+
+	WORD width;
+	WORD height;
+	lump.Read(&width, 2);
+	lump.Read(&height, 2);
+
+	if(Wads.LumpLength(lumpNum) < (width*height) + 4)
+		return; // Malformed?
+	byte* data = new byte[width*height];
+	lump.Read(data, width*height);
+
+	VL_MemToScreen(data, width, height, x, y);
 }
 
 void VWB_DrawPic (int x, int y, int chunknum)

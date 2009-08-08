@@ -9,7 +9,14 @@ using namespace std;
 
 struct Huffnode
 {
-	WORD	bit0, bit1;	// 0-255 is a character, > is a pointer to a node
+	public:
+		WORD	bit0, bit1;	// 0-255 is a character, > is a pointer to a node
+};
+
+struct Dimensions
+{
+	public:
+		WORD	width, height;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,6 +27,9 @@ struct FVGALump : public FResourceLump
 		DWORD		position;
 		DWORD		length;
 		Huffnode*	huffman;
+
+		bool		isImage;
+		Dimensions	dimensions;
 
 		int FillCache()
 		{
@@ -32,14 +42,19 @@ struct FVGALump : public FResourceLump
 			delete[] data;
 
 			Cache = new char[LumpSize];
-			memcpy(Cache, out, LumpSize);
+			if(!isImage)
+				memcpy(Cache, out, LumpSize);
+			else
+			{
+				memcpy(Cache, &dimensions, 4);
+				memcpy(Cache+4, out, LumpSize-4);
+			}
 			delete[] out;
 
 			RefCount = 1;
 			return 1;
 		}
 
-	private:
 		void HuffExpand(byte* source, byte* dest)
 		{
 			byte *end;
@@ -128,6 +143,9 @@ class FVGAGraph : public FResourceFile
 			// The vgahead has 24-bit ints.
 			BYTE* data = new BYTE[NumLumps*3];
 			vgaheadReader.Read(data, NumLumps*3);
+
+			int numPictures = 0;
+			Dimensions* dimensions = NULL;
 			for(unsigned int i = 0;i < NumLumps;i++)
 			{
 				// Give the lump a temporary name.
@@ -136,7 +154,8 @@ class FVGAGraph : public FResourceFile
 				lumps[i].Owner = this;
 				lumps[i].LumpNameSetup(lumpname);
 
-				lumps[i].position = data[(i*3)] | (data[(i*3)+1] << 8) | (data[(i*3)+2] << 16);
+				lumps[i].isImage = (i >= 3 && i-3 < numPictures);
+				lumps[i].position = READINT24(&data[i*3]);
 				lumps[i].huffman = huffman;
 
 				// The actual length isn't stored so we need to go by the position of the following lump.
@@ -148,7 +167,32 @@ class FVGAGraph : public FResourceFile
 
 				Reader->Seek(lumps[i].position, SEEK_SET);
 				Reader->Read(&lumps[i].LumpSize, 4);
+				if(i == 1) // We must do this on the second lump do to how the position is filled.
+				{
+					Reader->Seek(lumps[0].position+4, SEEK_SET);
+					numPictures = lumps[0].LumpSize/4;
+
+					byte* data = new byte[lumps[0].length];
+					byte* out = new byte[lumps[0].LumpSize];
+					Reader->Read(data, lumps[0].length);
+					lumps[0].HuffExpand(data, out);
+					delete[] data;
+
+					dimensions = new Dimensions[numPictures];
+					for(int j = 0;j < numPictures;j++)
+					{
+						dimensions[j].width = READINT16(&out[j*4]);
+						dimensions[j].height = READINT16(&out[(j*4)+2]);
+					}
+				}
+				else if(lumps[i].isImage)
+				{
+					lumps[i].dimensions = dimensions[i-3];
+					lumps[i].LumpSize += 4;
+				}
 			}
+			if(dimensions != NULL)
+				delete[] dimensions;
 			delete[] data;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
