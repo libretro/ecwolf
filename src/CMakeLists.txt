@@ -69,7 +69,6 @@ add_executable(../ecwolf
 	lumpremap.cpp
 	m_classes.cpp
 	scanner.cpp
-	signon.cpp
 	w_wad.cpp
 	wl_act1.cpp
 	wl_act2.cpp

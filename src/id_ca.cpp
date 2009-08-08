@@ -972,7 +972,7 @@ void CA_CacheGrChunk (int chunk)
 
 void CA_CacheScreen(const char* chunk)
 {
-	int lumpNum = Wads.GetNumForName(chunk);
+	int lumpNum = Wads.GetNumForName(chunk, ns_graphics);
 	if(lumpNum == -1)
 	{
 		printf("\n");

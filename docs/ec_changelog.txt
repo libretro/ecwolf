@@ -4,6 +4,7 @@ August 7th, 2009
   and given names at run time.
 - The TITEPIC and CREDITS lump are now used. They are 320x200 raw pages similar
   to Heretic's TITLE lump.
+- Exported the signon screens to the pk3.
 
 July 30th, 2009
 -----------------------------

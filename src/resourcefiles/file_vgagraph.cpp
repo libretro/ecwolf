@@ -23,7 +23,6 @@ struct FVGALump : public FResourceLump
 
 		int FillCache()
 		{
-			Printf("Here: %d->%d\n", length, LumpSize);
 			Owner->Reader->Seek(position+4, SEEK_SET);
 
 			byte* data = new byte[length];
