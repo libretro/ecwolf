@@ -5,6 +5,7 @@
 using namespace std;
 
 map<string, LumpRemaper> LumpRemaper::remaps;
+map<int, string> LumpRemaper::reverseMap;
 
 LumpRemaper::LumpRemaper(const char* extension) : mapLumpName(extension)
 {
@@ -72,17 +73,21 @@ bool LumpRemaper::LoadMap()
 		if(!sc.CheckToken(TK_Identifier))
 			sc.ScriptError("Expected identifier in map.\n");
 
-		std::deque<std::string> &map = graphics;
-		if(sc.str.compare("graphics"))
-			map = graphics;
-		else if(sc.str.compare("sprites"))
-			map = sprites;
-		else if(sc.str.compare("sounds"))
-			map = sprites;
-		else if(sc.str.compare("music"))
-			map = music;
-		else if(sc.str.compare("textures"))
-			map = textures;
+		bool doReverse = false;
+		std::deque<std::string> *map = NULL;
+		if(sc.str.compare("graphics") == 0)
+		{
+			doReverse = true;
+			map = &graphics;
+		}
+		else if(sc.str.compare("sprites") == 0)
+			map = &sprites;
+		else if(sc.str.compare("sounds") == 0)
+			map = &sounds;
+		else if(sc.str.compare("music") == 0)
+			map = &music;
+		else if(sc.str.compare("textures") == 0)
+			map = &textures;
 		else
 			sc.ScriptError("Unknown map section '%s'.\n", sc.str.c_str());
 
@@ -90,11 +95,14 @@ bool LumpRemaper::LoadMap()
 			sc.ScriptError("Expected '{'.");
 		if(!sc.CheckToken('}'))
 		{
+			int i = 0;
 			while(true)
 			{
 				if(!sc.CheckToken(TK_StringConst))
 					sc.ScriptError("Expected string constant.\n");
-				map.push_back(sc.str);
+				if(doReverse)
+					reverseMap[i++] = sc.str;
+				map->push_back(sc.str);
 				if(sc.CheckToken('}'))
 					break;
 				if(!sc.CheckToken(','))

@@ -274,16 +274,17 @@ void ControlMovement (objtype *ob)
 ==================
 */
 
-void StatusDrawPic (unsigned x, unsigned y, unsigned picnum)
+void StatusDrawPic (unsigned x, unsigned y, const char* pic)
 {
-    LatchDrawPicScaledCoord ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
-        screenHeight-scaleFactor*(STATUSLINES-y),picnum);
+	VWB_DrawPic((screenWidth-scaleFactor*320)/16 + scaleFactor*(x*8), screenHeight-scaleFactor*(STATUSLINES-y), pic, true);
+//    LatchDrawPicScaledCoord ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
+//        screenHeight-scaleFactor*(STATUSLINES-y),picnum);
 }
 
-void StatusDrawFace(unsigned picnum)
+void StatusDrawFace(const char* pic)
 {
-    StatusDrawPic(17, 4, picnum);
-    StatusDrawLCD(picnum);
+    StatusDrawPic(17, 4, pic);
+    //StatusDrawLCD(picnum);
 }
 
 
@@ -297,26 +298,37 @@ void StatusDrawFace(unsigned picnum)
 
 void DrawFace (void)
 {
+	const char* godmode[3] = { "STFGOD0", "STFGOD1", "STFGOD2" };
+	const char* animations[7][3] =
+	{
+		{ "STFST00", "STFST01", "STFST02" },
+		{ "STFST10", "STFST11", "STFST12" },
+		{ "STFST20", "STFST21", "STFST22" },
+		{ "STFST30", "STFST31", "STFST32" },
+		{ "STFST40", "STFST41", "STFST42" },
+		{ "STFST50", "STFST51", "STFST52" },
+		{ "STFST60", "STFST61", "STFST62" },
+	};
     if(viewsize == 21 && ingame) return;
     if (SD_SoundPlaying() == GETGATLINGSND)
-        StatusDrawFace(GOTGATLINGPIC);
+        StatusDrawFace("STFEVL0");
     else if (gamestate.health)
     {
 #ifdef SPEAR
         if (godmode)
-            StatusDrawFace(GODMODEFACE1PIC+gamestate.faceframe);
+            StatusDrawFace(godmode[gamestate.faceframe]);
         else
 #endif
-            StatusDrawFace(FACE1APIC+3*((100-gamestate.health)/16)+gamestate.faceframe);
+            StatusDrawFace(animations[(100-gamestate.health)/16][gamestate.faceframe]);
     }
     else
     {
 #ifndef SPEAR
         if (LastAttacker && LastAttacker->obclass == needleobj)
-            StatusDrawFace(MUTANTBJPIC);
+            StatusDrawFace("STFMUT0");
         else
 #endif
-            StatusDrawFace(FACE8APIC);
+            StatusDrawFace("STFDEAD0");
     }
 }
 
@@ -382,16 +394,17 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number)
 
     while (length<width)
     {
-        StatusDrawPic (x,y,N_BLANKPIC);
+        StatusDrawPic (x,y,"FONTN032");
         x++;
         width--;
     }
 
     c = length <= width ? 0 : length-width;
 
+	const char* numerics[10] = { "FONTN048", "FONTN049", "FONTN050", "FONTN051", "FONTN052", "FONTN053", "FONTN054", "FONTN055", "FONTN056", "FONTN057" };
     while (c<length)
     {
-        StatusDrawPic (x,y,str[c]-'0'+ N_0PIC);
+        StatusDrawPic (x,y,numerics[str[c]-'0']);
         x++;
         c++;
     }
@@ -452,7 +465,7 @@ void TakeDamage (int points,objtype *attacker)
 #ifdef SPEAR
     if (points > 30 && gamestate.health!=0 && !godmode && viewsize != 21)
     {
-        StatusDrawFace(BJOUCHPIC);
+        StatusDrawFace("STFOUCH0");
         facecount = 0;
     }
 #endif
@@ -580,8 +593,9 @@ void GivePoints (int32_t points)
 
 void DrawWeapon (void)
 {
+	const char* weapons[] = { "KNIFE", "PISTOL", "MACHGUN", "GATLGUN" };
     if(viewsize == 21 && ingame) return;
-    StatusDrawPic (32,8,KNIFEPIC+gamestate.weapon);
+    StatusDrawPic (32,8,weapons[gamestate.weapon]);
 }
 
 
@@ -597,14 +611,14 @@ void DrawKeys (void)
 {
     if(viewsize == 21 && ingame) return;
     if (gamestate.keys & 1)
-        StatusDrawPic (30,4,GOLDKEYPIC);
+        StatusDrawPic (30,4,"GOLDKEY");
     else
-        StatusDrawPic (30,4,NOKEYPIC);
+        StatusDrawPic (30,4,"NOKEY");
 
     if (gamestate.keys & 2)
-        StatusDrawPic (30,20,SILVERKEYPIC);
+        StatusDrawPic (30,20,"SILVRKEY");
     else
-        StatusDrawPic (30,20,NOKEYPIC);
+        StatusDrawPic (30,20,"NOKEY");
 }
 
 /*
@@ -776,7 +790,7 @@ void GetBonus (statobj_t *check)
             GiveWeapon (wp_chaingun);
 
             if(viewsize != 21)
-                StatusDrawFace (GOTGATLINGPIC);
+                StatusDrawFace ("STFEVL0");
             facecount = 0;
             break;
 

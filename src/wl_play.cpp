@@ -681,12 +681,10 @@ void CheckKeys (void)
         DrawScore ();
 
         ClearMemory ();
-        CA_CacheGrChunk (STARTFONT + 1);
         ClearSplitVWB ();
 
         Message (language["STR_CHEATER"]);
 
-        UNCACHEGRCHUNK (STARTFONT + 1);
         IN_ClearKeysDown ();
         IN_Ack ();
 
@@ -701,11 +699,9 @@ void CheckKeys (void)
     if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt] && param_debugmode)
     {
         ClearMemory ();
-        CA_CacheGrChunk (STARTFONT + 1);
         ClearSplitVWB ();
 
         Message ("Debugging keys are\nnow available!");
-        UNCACHEGRCHUNK (STARTFONT + 1);
         IN_ClearKeysDown ();
         IN_Ack ();
 
@@ -720,14 +716,12 @@ void CheckKeys (void)
     if (Keyboard[sc_B] && Keyboard[sc_A] && Keyboard[sc_T])
     {
         ClearMemory ();
-        CA_CacheGrChunk (STARTFONT + 1);
         ClearSplitVWB ();
 
         Message ("Commander Keen is also\n"
                  "available from Apogee, but\n"
                  "then, you already know\n" "that - right, Cheatmeister?!");
 
-        UNCACHEGRCHUNK (STARTFONT + 1);
         IN_ClearKeysDown ();
         IN_Ack ();
 
@@ -742,7 +736,8 @@ void CheckKeys (void)
     if(Paused)
     {
         int lastoffs = StopMusic();
-        LatchDrawPic (20 - 4, 80 - 2 * 8, PAUSEDPIC);
+//        LatchDrawPic (20 - 4, 80 - 2 * 8, PAUSEDPIC);
+		VWB_DrawPic((20 - 4)*8, 80 - 2*8, "PAUSED");
         VH_UpdateScreen();
         IN_Ack ();
         Paused = false;
@@ -804,7 +799,6 @@ void CheckKeys (void)
 #ifdef DEBUGKEYS
     if (Keyboard[sc_Tab] && DebugOk)
     {
-        CA_CacheGrChunk (STARTFONT);
         fontnumber = 0;
         SETFONTCOLOR (0, 15);
         if (DebugKeys () && viewsize < 18)

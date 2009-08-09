@@ -21,9 +21,17 @@ void VWB_DrawPropString(const char* string)
 	byte	    *source, *dest;
 	byte	    ch;
 
+	const char* fonts[2] = { "FONT1", "FONT2" };
+	int lumpNum = Wads.CheckNumForName(fonts[fontnumber]);
+	if(lumpNum == -1)
+		return;
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+
     byte *vbuf = LOCK();
 
-	font = (fontstruct *) grsegs[STARTFONT+fontnumber];
+	byte* fontData = new byte[Wads.LumpLength(lumpNum)];
+	lump.Read(fontData, Wads.LumpLength(lumpNum));
+	font = (fontstruct *) fontData;
 	height = font->height;
 	dest = vbuf + scaleFactor * (py * curPitch + px);
 
@@ -48,6 +56,8 @@ void VWB_DrawPropString(const char* string)
 			dest+=scaleFactor;
 		}
 	}
+
+	delete[] fontData;
 
 	UNLOCK();
 }
@@ -106,7 +116,18 @@ void VWL_MeasureString (const char *string, word *width, word *height, fontstruc
 
 void VW_MeasurePropString (const char *string, word *width, word *height)
 {
-	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
+	const char* fonts[2] = { "FONT1", "FONT2" };
+	int lumpNum = Wads.CheckNumForName(fonts[fontnumber]);
+	if(lumpNum == -1)
+		return;
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+
+	fontstruct *font = new fontstruct();
+	lump.Read(font, sizeof(fontstruct));
+
+	VWL_MeasureString(string,width,height,font);
+
+	delete font;
 }
 
 /*
@@ -129,12 +150,12 @@ void VWB_DrawTile8 (int x, int y, int tile)
 	LatchDrawChar(x,y,tile);
 }
 
-void VWB_DrawTile8M (int x, int y, int tile)
+/*void VWB_DrawTile8M (int x, int y, int tile)
 {
 	VL_MemToScreen (((byte *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
-}
+}*/
 
-void VWB_DrawPic(int x, int y, const char* chunk)
+void VWB_DrawPic(int x, int y, const char* chunk, bool scaledCoord)
 {
 	int lumpNum = Wads.CheckNumForName(chunk);
 	if(lumpNum == -1)
@@ -151,33 +172,11 @@ void VWB_DrawPic(int x, int y, const char* chunk)
 	byte* data = new byte[width*height];
 	lump.Read(data, width*height);
 
-	VL_MemToScreen(data, width, height, x, y);
+	if(!scaledCoord)
+		VL_MemToScreen(data, width, height, x, y);
+	else
+		VL_MemToScreenScaledCoord(data, width, height, x, y);
 }
-
-void VWB_DrawPic (int x, int y, int chunknum)
-{
-	int	picnum = chunknum - STARTPICS;
-	unsigned width,height;
-
-	x &= ~7;
-
-	width = pictable[picnum].width;
-	height = pictable[picnum].height;
-
-	VL_MemToScreen (grsegs[chunknum],width,height,x,y);
-}
-
-void VWB_DrawPicScaledCoord (int scx, int scy, int chunknum)
-{
-	int	picnum = chunknum - STARTPICS;
-	unsigned width,height;
-
-	width = pictable[picnum].width;
-	height = pictable[picnum].height;
-
-    VL_MemToScreenScaledCoord (grsegs[chunknum],width,height,scx,scy);
-}
-
 
 void VWB_Bar (int x, int y, int width, int height, int color)
 {
@@ -225,15 +224,15 @@ void VWB_Vlin (int y1, int y2, int x, int color)
 =====================
 */
 
-void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
+/*void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 {
 	VL_LatchToScreen (latchpics[2+picnum-LATCHPICS_LUMP_START], x*8, y);
-}
+}*/
 
-void LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum)
+/*void LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum)
 {
 	VL_LatchToScreenScaledCoord (latchpics[2+picnum-LATCHPICS_LUMP_START], scx*8, scy);
-}
+}*/
 
 
 //==========================================================================
@@ -256,7 +255,7 @@ void LoadLatchMem (void)
 // tile 8s
 //
     surf = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
-        ((NUMTILE8 + 7) / 8) * 8, 8, 0, 0, 0, 0);
+        ((72 + 7) / 8) * 8, 8, 0, 0, 0, 0);
     if(surf == NULL)
     {
         Quit("Unable to create surface for tiles!");
@@ -264,20 +263,28 @@ void LoadLatchMem (void)
     SDL_SetColors(surf, gamepal, 0, 256);
 
 	latchpics[0] = surf;
-	CA_CacheGrChunk (STARTTILE8);
-	src = grsegs[STARTTILE8];
+	int lumpNum = Wads.GetNumForName("TILE8");
+	if(lumpNum == -1)
+	{
+		printf("\n");
+		exit(0);
+	}
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+	src = new byte[Wads.LumpLength(lumpNum)];
+	byte* src_freeme = src; // Wolf likes to play with pointers
+	lump.Read(src, Wads.LumpLength(lumpNum));
 
-	for (i=0;i<NUMTILE8;i++)
+	for (i=0;i<72;i++)
 	{
 		VL_MemToLatch (src, 8, 8, surf, (i & 7) * 8, (i >> 3) * 8);
 		src += 64;
 	}
-	UNCACHEGRCHUNK (STARTTILE8);
+	delete[] src_freeme;
 
 //
 // pics
 //
-	start = LATCHPICS_LUMP_START;
+/*	start = LATCHPICS_LUMP_START;
 	end = LATCHPICS_LUMP_END;
 
 	for (i=start;i<=end;i++)
@@ -292,10 +299,10 @@ void LoadLatchMem (void)
         SDL_SetColors(surf, gamepal, 0, 256);
 
 		latchpics[2+i-start] = surf;
-		CA_CacheGrChunk (i);
-		VL_MemToLatch (grsegs[i], width, height, surf, 0, 0);
-		UNCACHEGRCHUNK(i);
-	}
+		//CA_CacheGrChunk (i);
+		//VL_MemToLatch (grsegs[i], width, height, surf, 0, 0);
+		//UNCACHEGRCHUNK(i);
+	}*/
 }
 
 //==========================================================================

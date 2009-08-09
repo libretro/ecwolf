@@ -48,12 +48,10 @@ extern	int             px,py;
 void VWB_DrawPropString	 (const char *string);
 
 void VWB_DrawTile8 (int x, int y, int tile);
-void VWB_DrawTile8M (int x, int y, int tile);
+//void VWB_DrawTile8M (int x, int y, int tile);
 void VWB_DrawTile16 (int x, int y, int tile);
 void VWB_DrawTile16M (int x, int y, int tile);
-void VWB_DrawPic (int x, int y, const char* chunk);
-void VWB_DrawPic (int x, int y, int chunknum);
-void VWB_DrawPicScaledCoord (int x, int y, int chunknum);
+void VWB_DrawPic (int x, int y, const char* chunk, bool scaledCoord=false);
 void VWB_DrawMPic(int x, int y, int chunknum);
 void VWB_Bar (int x, int y, int width, int height, int color);
 #define VWB_BarScaledCoord VL_BarScaledCoord
@@ -87,8 +85,8 @@ void	VW_MeasurePropString (const char *string, word *width, word *height);
 #define LatchDrawChar(x,y,p) VL_LatchToScreen(latchpics[0],((p)&7)*8,((p)>>3)*8*64,8,8,x,y)
 #define LatchDrawTile(x,y,p) VL_LatchToScreen(latchpics[1],(p)*64,0,16,16,x,y)
 
-void    LatchDrawPic (unsigned x, unsigned y, unsigned picnum);
-void    LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum);
+//void    LatchDrawPic (unsigned x, unsigned y, unsigned picnum);
+//void    LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum);
 void    LoadLatchMem (void);
 
 void    VH_Startup();

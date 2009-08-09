@@ -1117,13 +1117,6 @@ void DoJukebox(void)
         return;
 
     MenuFadeOut();
-
-    CA_CacheGrChunk (STARTFONT+1);
-#ifdef SPEAR
-	CacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-#else
-	CacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
-#endif
     CA_LoadAllSounds ();
 
     fontnumber=1;
@@ -1132,12 +1125,6 @@ void DoJukebox(void)
 	for(unsigned int i = 0;songList[i].name != NULL;i++)
 		musicMenu.addItem(new MenuItem(songList[i].name, ChangeMusic));
 	musicMenu.show();
-
-#ifdef SPEAR
-	UnCacheLump (BACKDROP_LUMP_START,BACKDROP_LUMP_END);
-#else
-	UnCacheLump (CONTROLS_LUMP_START,CONTROLS_LUMP_END);
-#endif
 	return;
 }
 #endif
@@ -1253,9 +1240,6 @@ static void InitGame()
 //
 // load in and lock down some basic chunks
 //
-
-    CA_CacheGrChunk(STARTFONT);
-    CA_CacheGrChunk(STATUSBARPIC);
 
     LoadLatchMem ();
     BuildTables ();          // trig tables
@@ -1523,16 +1507,13 @@ static void DemoLoop()
 
 #ifdef SPEAR
             SDL_Color pal[256];
-            CA_CacheGrChunk (TITLEPALETTE);
-            VL_ConvertPalette(grsegs[TITLEPALETTE], pal, 256);
+            VL_ConvertPalette("TITLEPAL", pal, 256);
 
             VWB_DrawPic (0,0,"TITLE1");
 
             VWB_DrawPic (0,80,"TITLE2");
             VW_UpdateScreen ();
             VL_FadeIn(0,255,pal,30);
-
-            UNCACHEGRCHUNK (TITLEPALETTE);
 #else
             CA_CacheScreen ("TITLEPIC");
             VW_UpdateScreen ();
@@ -1843,7 +1824,7 @@ int main (int argc, char *argv[])
 	CheckForEpisodes();
 	char vgadict[11] = {'v','g','a','d','i','c','t','.',0,0,0};
 	memcpy(vgadict+8, extension, 3);
-	WL_AddFile(vgadict);
+//	WL_AddFile(vgadict);
 	WL_AddFile("vgagraph.wl6");
 
 #if defined(_arch_dreamcast)
@@ -1862,8 +1843,8 @@ int main (int argc, char *argv[])
 	language.SetupStrings();
 	LumpRemaper::RemapAll();
 
-	printf("CA_SetupVgaDict: Reading Huffman tree...\n");
-	CA_SetupVgaDict();
+//	printf("CA_SetupVgaDict: Reading Huffman tree...\n");
+//	CA_SetupVgaDict();
 	printf("VL_ReadPalette: Setting up the Palette...\n");
 	VL_ReadPalette();
 	printf("InitGame: Setting up the game...\n");

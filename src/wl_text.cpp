@@ -5,6 +5,8 @@
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
+#include "lumpremap.h"
+#include "w_wad.h"
 
 /*
 =============================================================================
@@ -180,7 +182,7 @@ void TimedPicCommand (void)
     //
     // draw pic
     //
-    VWB_DrawPic (picx&~7,picy,picnum);
+    VWB_DrawPic (picx&~7,picy,LumpRemaper::ConvertIndexToLump(picnum));
 }
 
 
@@ -251,10 +253,18 @@ void HandleCommand (void)
             break;
 
         case 'G':               // ^Gyyy,xxx,ppp draws graphic
+		{
             ParsePicCommand ();
-            VWB_DrawPic (picx&~7,picy,picnum);
-            picwidth = pictable[picnum-STARTPICS].width;
-            picheight = pictable[picnum-STARTPICS].height;
+            VWB_DrawPic (picx&~7,picy,LumpRemaper::ConvertIndexToLump(picnum));
+			int lumpNum = Wads.CheckNumForName(LumpRemaper::ConvertIndexToLump(picnum));
+			if(lumpNum == -1)
+				picwidth = picheight = 0;
+			else
+			{
+				FWadLump lump = Wads.OpenLumpNum(lumpNum);
+				lump.Read(&picwidth, 2);
+				lump.Read(&picheight, 2);
+			}
             //
             // adjust margins
             //
@@ -283,6 +293,7 @@ void HandleCommand (void)
             if (px < (int) leftmargin[rowon])
                 px = leftmargin[rowon];
             break;
+		}
     }
 }
 
@@ -430,7 +441,7 @@ void PageLayout (boolean shownumber)
     VWB_Bar (0,0,320,200,BACKCOLOR);
     VWB_DrawPic (0,0,"TOPWINDW");
     VWB_DrawPic (0,8,"LFTWINDW");
-    VWB_DrawPic (312,8,"RHTWINDW");
+    VWB_DrawPic (312,8,"RGTWINDW");
     VWB_DrawPic (8,176,"BOTWINDW");
 
 
@@ -555,12 +566,6 @@ void CacheLayoutGraphics (void)
                 numpages++;
             if (ch == 'E')          // end of file, so load graphics and return
             {
-#ifndef SPEAR
-                CA_CacheGrChunk(H_TOPWINDOWPIC);
-                CA_CacheGrChunk(H_LEFTWINDOWPIC);
-                CA_CacheGrChunk(H_RIGHTWINDOWPIC);
-                CA_CacheGrChunk(H_BOTTOMINFOPIC);
-#endif
                 //                              CA_CacheMarks ();
                 text = textstart;
                 return;
@@ -568,12 +573,12 @@ void CacheLayoutGraphics (void)
             if (ch == 'G')          // draw graphic command, so mark graphics
             {
                 ParsePicCommand ();
-                CA_CacheGrChunk (picnum);
+//                CA_CacheGrChunk (picnum);
             }
             if (ch == 'T')          // timed draw graphic command, so mark graphics
             {
                 ParseTimedCommand ();
-                CA_CacheGrChunk (picnum);
+//                CA_CacheGrChunk (picnum);
             }
         }
         else
@@ -644,7 +649,6 @@ void ShowArticle (char *article)
     text = article;
     oldfontnumber = fontnumber;
     fontnumber = 0;
-    CA_CacheGrChunk(STARTFONT);
     VWB_Bar (0,0,320,200,BACKCOLOR);
     CacheLayoutGraphics ();
 #endif
@@ -741,17 +745,6 @@ void ShowArticle (char *article)
 
 //===========================================================================
 
-#ifndef JAPAN
-#ifdef ARTSEXTERN
-int     endextern = T_ENDART1;
-#ifndef SPEAR
-int     helpextern = T_HELPART;
-#endif
-#endif
-char helpfilename[13] = "HELPART.",
-    endfilename[13] = "ENDART1.";
-#endif
-
 /*
 =================
 =
@@ -764,9 +757,6 @@ void HelpScreens (void)
 {
     int     artnum;
     char    *text;
-#ifndef ARTSEXTERN
-    memptr  layout;
-#endif
 
 
     //      CA_UpLevel ();
@@ -779,22 +769,17 @@ void HelpScreens (void)
     MM_SortMem ();
 #else
 
-#ifdef ARTSEXTERN
-    artnum = helpextern;
-    CA_CacheGrChunk (artnum);
-    text = (char *)grsegs[artnum];
-#else
-    CA_LoadFile (helpfilename,&layout);
-    text = (char *)layout;
-#endif
+	int lumpNum = Wads.CheckNumForName("HELPART");
+	if(lumpNum != -1)
+	{
+		FWadLump lump = Wads.OpenLumpNum(lumpNum);
+		text = new char[Wads.LumpLength(lumpNum)];
+		lump.Read(text, Wads.LumpLength(lumpNum));
 
-    ShowArticle (text);
+		ShowArticle(text);
 
-#ifdef ARTSEXTERN
-    UNCACHEGRCHUNK(artnum);
-#else
-    free(layout);
-#endif
+		delete[] text;
+	}
 
     VW_FadeOut();
 
@@ -829,26 +814,19 @@ void EndText (void)
     FreeMusic ();
 #else
 
+	char lumpName[9];
+	sprintf(lumpName, "ENDART%d", gamestate.episode+1);
+	int lumpNum = Wads.CheckNumForName(lumpName);
+	if(lumpNum != -1)
+	{
+		FWadLump lump = Wads.OpenLumpNum(lumpNum);
+		text = new char[Wads.LumpLength(lumpNum)];
+		lump.Read(text, Wads.LumpLength(lumpNum));
 
+		ShowArticle(text);
 
-#ifdef ARTSEXTERN
-    artnum = endextern+gamestate.episode;
-    CA_CacheGrChunk (artnum);
-    text = (char *)grsegs[artnum];
-#else
-    endfilename[6] = '1'+gamestate.episode;
-    CA_LoadFile (endfilename,&layout);
-    text = (char *)layout;
-#endif
-
-    ShowArticle (text);
-
-#ifdef ARTSEXTERN
-    UNCACHEGRCHUNK(artnum);
-#else
-    free(layout);
-#endif
-
+		delete[] text;
+	}
 
     VW_FadeOut();
     SETFONTCOLOR(0,15);

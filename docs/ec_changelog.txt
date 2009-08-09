@@ -1,3 +1,7 @@
+August 9th, 2009
+-----------------------------
+- Removed old VGAGRAPH code.
+
 August 8th, 2009
 -----------------------------
 - DEMOs use the resource system.  You can have up to 10000 demos now.

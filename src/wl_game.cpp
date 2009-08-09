@@ -932,7 +932,7 @@ void DrawPlayBorder (void)
 
 void DrawPlayScreen (void)
 {
-    VWB_DrawPicScaledCoord ((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,STATUSBARPIC);
+    VWB_DrawPic((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,"STBAR",true);
     DrawPlayBorder ();
 
     DrawFace ();
@@ -945,43 +945,17 @@ void DrawPlayScreen (void)
     DrawScore ();
 }
 
-// Uses LatchDrawPic instead of StatusDrawPic
-void LatchNumberHERE (int x, int y, unsigned width, int32_t number)
-{
-    unsigned length,c;
-    char str[20];
-
-    ltoa (number,str,10);
-
-    length = (unsigned) strlen (str);
-
-    while (length<width)
-    {
-        LatchDrawPic (x,y,N_BLANKPIC);
-        x++;
-        width--;
-    }
-
-    c = length <= width ? 0 : length-width;
-
-    while (c<length)
-    {
-        LatchDrawPic (x,y,str[c]-'0'+ N_0PIC);
-        x++;
-        c++;
-    }
-}
-
 void ShowActStatus()
 {
     // Draw status bar without borders
-    byte *source = grsegs[STATUSBARPIC];
-    int	picnum = STATUSBARPIC - STARTPICS;
+//    byte *source = grsegs[STATUSBARPIC];
+/*    int	picnum = STATUSBARPIC - STARTPICS;
     int width = pictable[picnum].width;
     int height = pictable[picnum].height;
     int destx = (screenWidth-scaleFactor*320)/2 + 9 * scaleFactor;
-    int desty = screenHeight - (height - 4) * scaleFactor;
-    VL_MemToScreenScaledCoord(source, width, height, 9, 4, destx, desty, width - 18, height - 7);
+    int desty = screenHeight - (height - 4) * scaleFactor;*/
+//    VL_MemToScreenScaledCoord(source, width, height, 9, 4, destx, desty, width - 18, height - 7);
+	VWB_DrawPic((screenWidth-scaleFactor*320)/2,screenHeight-scaleFactor*STATUSLINES,"STBAR",true);
 
     ingame = false;
     DrawFace ();
@@ -1084,7 +1058,6 @@ void RecordDemo (void)
 
     CenterWindow(26,3);
     PrintY+=6;
-    CA_CacheGrChunk(STARTFONT);
     fontnumber=0;
     SETFONTCOLOR(0,15);
 #ifndef SPEAR

@@ -32,9 +32,7 @@
     #ifdef UPLOAD
         #include "gfxv_apo.h"
     #else
-        #ifdef GOODTIMES
-            #include "gfxv_wl6.h"
-        #else
+        #ifndef GOODTIMES
             #include "gfxv_apo.h"
         #endif
     #endif
@@ -1354,8 +1352,6 @@ void SpawnBJVictory (void);
 
 =============================================================================
 */
-
-extern  char    helpfilename[],endfilename[];
 
 extern  void    HelpScreens(void);
 extern  void    EndText(void);

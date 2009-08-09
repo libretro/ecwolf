@@ -528,6 +528,7 @@ void
 US_ControlPanel (ScanCode scancode)
 {
     int which;
+	bool idEasterEgg = Wads.CheckNumForName("IDGUYS1") != -1;
 
     if (ingame)
     {
@@ -606,48 +607,45 @@ US_ControlPanel (ScanCode scancode)
     {
         which = mainMenu.handle();
 
-#ifdef SPEAR
-#ifndef SPEARDEMO
-        IN_ProcessEvents();
-
-        //
-        // EASTER EGG FOR SPEAR OF DESTINY!
-        //
-        if (Keyboard[sc_I] && Keyboard[sc_D])
-        {
-            VW_FadeOut ();
-            StartCPMusic (XJAZNAZI_MUS);
-            UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
-            UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-            ClearMemory ();
-
-
-            VWB_DrawPic (0, 0, "IDGUYS1");
-            VWB_DrawPic (0, 80, "IDGUYS2");
-
-            VW_UpdateScreen ();
-
-            SDL_Color pal[256];
-            CA_CacheGrChunk (IDGUYSPALETTE);
-            VL_ConvertPalette(grsegs[IDGUYSPALETTE], pal, 256);
-            VL_FadeIn (0, 255, pal, 30);
-            UNCACHEGRCHUNK (IDGUYSPALETTE);
-
-            while (Keyboard[sc_I] || Keyboard[sc_D])
-                IN_WaitAndProcessEvents();
-            IN_ClearKeysDown ();
-            IN_Ack ();
-
-            VW_FadeOut ();
-
-            CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-            CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
-            mainMenu.draw();
-            StartCPMusic (MENUSONG);
-            MenuFadeIn ();
-        }
-#endif
-#endif
+/*		if(idEasterEgg)
+		{
+			IN_ProcessEvents();
+	
+			//
+			// EASTER EGG FOR SPEAR OF DESTINY!
+			//
+			if (Keyboard[sc_I] && Keyboard[sc_D])
+			{
+				VW_FadeOut ();
+				StartCPMusic (XJAZNAZI_MUS);
+				UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
+				UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
+				ClearMemory ();
+	
+	
+				VWB_DrawPic (0, 0, "IDGUYS1");
+				VWB_DrawPic (0, 80, "IDGUYS2");
+	
+				VW_UpdateScreen ();
+	
+				SDL_Color pal[256];
+				VL_ConvertPalette("IDGUYPAL", pal, 256);
+				VL_FadeIn (0, 255, pal, 30);
+	
+				while (Keyboard[sc_I] || Keyboard[sc_D])
+					IN_WaitAndProcessEvents();
+				IN_ClearKeysDown ();
+				IN_Ack ();
+	
+				VW_FadeOut ();
+	
+				CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
+				CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
+				mainMenu.draw();
+				StartCPMusic (MENUSONG);
+				MenuFadeIn ();
+			}
+		}*/
 
         switch (which)
         {
@@ -755,8 +753,6 @@ CP_CheckQuick (ScanCode scancode)
         // END GAME
         //
         case sc_F7:
-            CA_CacheGrChunk (STARTFONT + 1);
-
             WindowH = 160;
 #ifdef JAPAN
             if (GetYorN (7, 8, C_JAPQUITPIC))
@@ -780,25 +776,11 @@ CP_CheckQuick (ScanCode scancode)
 			if(saveGame.getCurrentPosition() != 0)
             {
 				quickSaveLoad = true;
-				CA_CacheGrChunk(STARTFONT + 1);
 				PerformSaveGame(saveGame.getCurrentPosition());
 				quickSaveLoad = false;
             }
             else
             {
-#ifndef SPEAR
-                CA_CacheGrChunk (STARTFONT + 1);
-                CA_CacheGrChunk (C_CURSOR1PIC);
-                CA_CacheGrChunk (C_CURSOR2PIC);
-                CA_CacheGrChunk (C_DISKLOADING1PIC);
-                CA_CacheGrChunk (C_DISKLOADING2PIC);
-                CA_CacheGrChunk (C_SAVEGAMEPIC);
-                CA_CacheGrChunk (C_MOUSELBACKPIC);
-#else
-                CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-                CA_CacheGrChunk (C_CURSOR1PIC);
-#endif
-
                 VW_FadeOut ();
                 if(screenHeight % 200 != 0)
                     VL_ClearScreen(0);
@@ -822,17 +804,6 @@ CP_CheckQuick (ScanCode scancode)
 
                 if (MousePresent && IN_IsInputGrabbed())
                     IN_CenterMouse();     // Clear accumulated mouse movement
-
-#ifndef SPEAR
-                UNCACHEGRCHUNK (C_CURSOR1PIC);
-                UNCACHEGRCHUNK (C_CURSOR2PIC);
-                UNCACHEGRCHUNK (C_DISKLOADING1PIC);
-                UNCACHEGRCHUNK (C_DISKLOADING2PIC);
-                UNCACHEGRCHUNK (C_SAVEGAMEPIC);
-                UNCACHEGRCHUNK (C_MOUSELBACKPIC);
-#else
-                UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-#endif
             }
             return 1;
 
@@ -845,7 +816,6 @@ CP_CheckQuick (ScanCode scancode)
 				quickSaveLoad = true;
 				char string[100];
 				sprintf(string, "%s%s\"?", language["STR_LGC"], SaveFile::files[saveGame.getCurrentPosition()-1].name);
-				CA_CacheGrChunk(STARTFONT + 1);
 				fontnumber = 1;
 				if(Confirm(string))
 					LoadSaveGame(saveGame.getCurrentPosition()-1);
@@ -854,19 +824,6 @@ CP_CheckQuick (ScanCode scancode)
             }
             else
             {
-#ifndef SPEAR
-                CA_CacheGrChunk (STARTFONT + 1);
-                CA_CacheGrChunk (C_CURSOR1PIC);
-                CA_CacheGrChunk (C_CURSOR2PIC);
-                CA_CacheGrChunk (C_DISKLOADING1PIC);
-                CA_CacheGrChunk (C_DISKLOADING2PIC);
-                CA_CacheGrChunk (C_LOADGAMEPIC);
-                CA_CacheGrChunk (C_MOUSELBACKPIC);
-#else
-                CA_CacheGrChunk (C_CURSOR1PIC);
-                CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-#endif
-
                 VW_FadeOut ();
                 if(screenHeight % 200 != 0)
                     VL_ClearScreen(0);
@@ -891,17 +848,6 @@ CP_CheckQuick (ScanCode scancode)
 
                 if (MousePresent && IN_IsInputGrabbed())
                     IN_CenterMouse();     // Clear accumulated mouse movement
-
-#ifndef SPEAR
-                UNCACHEGRCHUNK (C_CURSOR1PIC);
-                UNCACHEGRCHUNK (C_CURSOR2PIC);
-                UNCACHEGRCHUNK (C_DISKLOADING1PIC);
-                UNCACHEGRCHUNK (C_DISKLOADING2PIC);
-                UNCACHEGRCHUNK (C_LOADGAMEPIC);
-                UNCACHEGRCHUNK (C_MOUSELBACKPIC);
-#else
-                UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-#endif
             }
             return 1;
 
@@ -909,8 +855,6 @@ CP_CheckQuick (ScanCode scancode)
         // QUIT
         //
         case sc_F10:
-            CA_CacheGrChunk (STARTFONT + 1);
-
             WindowX = WindowY = 0;
             WindowW = 320;
             WindowH = 160;
@@ -1097,8 +1041,8 @@ CacheLump (int lumpstart, int lumpend)
 {
     int i;
 
-    for (i = lumpstart; i <= lumpend; i++)
-        CA_CacheGrChunk (i);
+//    for (i = lumpstart; i <= lumpend; i++)
+//        CA_CacheGrChunk (i);
 }
 
 
@@ -1107,9 +1051,9 @@ UnCacheLump (int lumpstart, int lumpend)
 {
     int i;
 
-    for (i = lumpstart; i <= lumpend; i++)
-        if (grsegs[i])
-            UNCACHEGRCHUNK (i);
+  //  for (i = lumpstart; i <= lumpend; i++)
+ //       if (grsegs[i])
+//            UNCACHEGRCHUNK (i);
 }
 
 
@@ -1147,9 +1091,7 @@ SetupControlPanel (void)
     //
     // CACHE GRAPHICS & SOUNDS
     //
-    CA_CacheGrChunk (STARTFONT + 1);
 //#ifndef SPEAR
-    CacheLump (CONTROLS_LUMP_START, CONTROLS_LUMP_END);
 //#else
 //    CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
 //#endif
@@ -1250,7 +1192,6 @@ void
 CleanupControlPanel (void)
 {
 //#ifndef SPEAR
-    UnCacheLump (CONTROLS_LUMP_START, CONTROLS_LUMP_END);
 //#else
 //    UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
 //#endif
@@ -1528,10 +1469,14 @@ Message (const char *string)
     int h = 0, w = 0, mw = 0, i, len = (int) strlen(string);
     fontstruct *font;
 
-
-    CA_CacheGrChunk (STARTFONT + 1);
     fontnumber = 1;
-    font = (fontstruct *) grsegs[STARTFONT + fontnumber];
+	int lumpNum = Wads.CheckNumForName("FONT2");
+	if(lumpNum == -1)
+		return;
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+
+	font = new fontstruct();
+	lump.Read(font, sizeof(fontstruct));
     h = font->height;
     for (i = 0; i < len; i++)
     {
@@ -1557,6 +1502,8 @@ Message (const char *string)
     SETFONTCOLOR (0, TEXTCOLOR);
     US_Print (string);
     VW_UpdateScreen ();
+
+	delete font;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1747,19 +1694,12 @@ CheckForEpisodes (void)
     strcpy (audioext, "sdm");
 #endif
 #else
-    strcpy (graphext, extension);
+//    strcpy (graphext, extension);
     strcpy (audioext, extension);
 #endif
 
     strcat (configname, extension);
     strcat (SaveName, extension);
     strcat (demoname, extension);
-
-#ifndef SPEAR
-#ifndef GOODTIMES
-    strcat (helpfilename, extension);
-#endif
-    strcat (endfilename, extension);
-#endif
 #endif
 }

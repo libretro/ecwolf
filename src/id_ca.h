@@ -10,7 +10,6 @@
     #define MAPPLANES       2
 #endif
 
-#define UNCACHEGRCHUNK(chunk) {if(grsegs[chunk]) {free(grsegs[chunk]); grsegs[chunk]=NULL;}}
 #define UNCACHEAUDIOCHUNK(chunk) {if(audiosegs[chunk]) {free(audiosegs[chunk]); audiosegs[chunk]=NULL;}}
 
 //===========================================================================
@@ -29,15 +28,12 @@ extern  int   mapon;
 
 extern  word *mapsegs[MAPPLANES];
 extern  byte *audiosegs[NUMSNDCHUNKS];
-extern  byte *grsegs[NUMCHUNKS];
 
 extern  char  extension[5];
 extern  char  graphext[5];
 extern  char  audioext[5];
 
 //===========================================================================
-
-void CA_SetupVgaDict();
 
 boolean CA_LoadFile (const char *filename, memptr *ptr);
 boolean CA_WriteFile (const char *filename, void *ptr, int32_t length);
@@ -52,7 +48,7 @@ void CA_Shutdown (void);
 int32_t CA_CacheAudioChunk (int chunk);
 void CA_LoadAllSounds (void);
 
-void CA_CacheGrChunk (int chunk);
+//void CA_CacheGrChunk (int chunk);
 void CA_CacheMap (int mapnum);
 
 void CA_CacheScreen (const char* chunk);

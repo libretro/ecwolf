@@ -44,15 +44,13 @@ ClearSplitVWB (void)
 ////////////////////////////////////////////////////////
 
 void
-EndScreen (int palette, int screen)
+EndScreen (const char* palette, const char* screen)
 {
     SDL_Color pal[256];
     CA_CacheScreen (screen);
     VW_UpdateScreen ();
-    CA_CacheGrChunk (palette);
-    VL_ConvertPalette(grsegs[palette], pal, 256);
+    VL_ConvertPalette(palette, pal, 256);
     VL_FadeIn (0, 255, pal, 30);
-    UNCACHEGRCHUNK (palette);
     IN_ClearKeysDown ();
     IN_Ack ();
     VW_FadeOut ();
@@ -64,14 +62,12 @@ EndSpear (void)
 {
     SDL_Color pal[256];
 
-    EndScreen (END1PALETTE, ENDSCREEN11PIC);
+    EndScreen ("END1PAL", "ENDSCR11");
 
     CA_CacheScreen ("ENDSCR3");
     VW_UpdateScreen ();
-    CA_CacheGrChunk (END3PALETTE);
-    VL_ConvertPalette(grsegs[END3PALETTE], pal, 256);
+    VL_ConvertPalette("END3PAL", pal, 256);
     VL_FadeIn (0, 255, pal, 30);
-    UNCACHEGRCHUNK (END3PALETTE);
     fontnumber = 0;
     fontcolor = 0xd0;
     WindowX = 0;
@@ -93,14 +89,14 @@ EndSpear (void)
 
     VW_FadeOut ();
 
-    EndScreen (END4PALETTE, ENDSCREEN4PIC);
-    EndScreen (END5PALETTE, ENDSCREEN5PIC);
-    EndScreen (END6PALETTE, ENDSCREEN6PIC);
-    EndScreen (END7PALETTE, ENDSCREEN7PIC);
-    EndScreen (END8PALETTE, ENDSCREEN8PIC);
-    EndScreen (END9PALETTE, ENDSCREEN9PIC);
+    EndScreen ("END4PAL", "ENDSCR4");
+    EndScreen ("END5PAL", "ENDSCR5");
+    EndScreen ("END6PAL", "ENDSCR6");
+    EndScreen ("END7PAL", "ENDSCR7");
+    EndScreen ("END8PAL", "ENDSCR8");
+    EndScreen ("END9PAL", "ENDSCR9");
 
-    EndScreen (END2PALETTE, ENDSCREEN12PIC);
+    EndScreen ("END2PAL", "ENDSCR12");
 }
 #endif
 #endif
@@ -152,12 +148,6 @@ Victory (void)
 
     StartCPMusic (URAHERO_MUS);
     ClearSplitVWB ();
-    CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
-    CA_CacheGrChunk (STARTFONT);
-
-#ifndef SPEAR
-    CA_CacheGrChunk (C_TIMECODEPIC);
-#endif
 
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
     if (bordercol != VIEWCOLOR)
@@ -270,11 +260,6 @@ Victory (void)
     VW_FadeOut ();
     if(screenHeight % 200 != 0)
         VL_ClearScreen(0);
-
-#ifndef SPEAR
-    UNCACHEGRCHUNK (C_TIMECODEPIC);
-#endif
-    UnCacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 
 #ifndef SPEAR
     EndText ();
@@ -548,7 +533,6 @@ LevelCompleted (void)
 #endif
     };
 
-    CacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
     ClearSplitVWB ();           // set up for double buffering in split screen
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
 
@@ -887,10 +871,8 @@ done:   itoa (kr, tempstr, 10);
     {
         SD_PlaySound (BONUS1UPSND);
 
-        CA_CacheGrChunk (STARTFONT + 1);
         Message ("This concludes your demo\n"
                  "of Spear of Destiny! Now,\n" "go to your local software\n" "store and buy it!");
-        UNCACHEGRCHUNK (STARTFONT + 1);
 
         IN_ClearKeysDown ();
         IN_Ack ();
@@ -902,10 +884,8 @@ done:   itoa (kr, tempstr, 10);
     {
         SD_PlaySound (BONUS1UPSND);
 
-        CA_CacheGrChunk (STARTFONT + 1);
         Message ("This concludes your demo\n"
                  "of Wolfenstein 3-D! Now,\n" "go to your local software\n" "store and buy it!");
-        UNCACHEGRCHUNK (STARTFONT + 1);
 
         IN_ClearKeysDown ();
         IN_Ack ();
@@ -914,8 +894,6 @@ done:   itoa (kr, tempstr, 10);
 
     VW_FadeOut ();
     DrawPlayBorder();
-
-    UnCacheLump (LEVELEND_LUMP_START, LEVELEND_LUMP_END);
 }
 
 
@@ -966,8 +944,8 @@ PreloadGraphics (void)
     ClearSplitVWB ();           // set up for double buffering in split screen
 
     VWB_BarScaledCoord (0, 0, screenWidth, screenHeight - scaleFactor * (STATUSLINES - 1), bordercol);
-    LatchDrawPicScaledCoord ((screenWidth-scaleFactor*224)/16,
-        (screenHeight-scaleFactor*(STATUSLINES+48))/2, GETPSYCHEDPIC);
+    VWB_DrawPic(((screenWidth-scaleFactor*224)/16)*8,
+        (screenHeight-scaleFactor*(STATUSLINES+48))/2, "GETPSYCH", true);
 
     WindowX = (screenWidth - scaleFactor*224)/2;
     WindowY = (screenHeight - scaleFactor*(STATUSLINES+48))/2;
@@ -1010,20 +988,6 @@ DrawHighScores (void)
     word i, w, h;
     HighScore *s;
 
-	CA_CacheGrChunk(STARTFONT);
-#ifndef SPEAR
-#ifndef APOGEE_1_0
-    CA_CacheGrChunk (C_LEVELPIC);
-    CA_CacheGrChunk (C_SCOREPIC);
-    CA_CacheGrChunk (C_NAMEPIC);
-#else
-    CA_CacheGrChunk (C_CODEPIC);
-#endif
-#else
-	CA_CacheGrChunk(C_BACKDROPPIC);
-	CA_CacheGrChunk(C_WONSPEARPIC)
-#endif
-
     ClearMScreen ();
     DrawStripes (10);
 
@@ -1040,7 +1004,6 @@ DrawHighScores (void)
     fontnumber = 0;
 
 #else
-    CA_CacheGrChunk (STARTFONT + 1);
     VWB_DrawPic (0, 0, "HGHSCORE");
 
     fontnumber = 1;
@@ -1239,7 +1202,6 @@ NonShareware (void)
     ClearMScreen ();
     DrawStripes (10);
 
-    CA_CacheGrChunk (STARTFONT + 1);
     fontnumber = 1;
 
     SETFONTCOLOR (READHCOLOR, BKGDCOLOR);

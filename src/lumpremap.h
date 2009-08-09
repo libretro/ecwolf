@@ -21,8 +21,10 @@ class LumpRemaper
 		void		AddFile(FResourceFile *file, Type type);
 		void		DoRemap();
 
-		static void	AddFile(const char* extension, FResourceFile *file, Type type);
-		static void RemapAll();
+		static void			AddFile(const char* extension, FResourceFile *file, Type type);
+		// For Read This screens which reference VGAGraph entries by number.
+		static const char*	ConvertIndexToLump(int num) { return reverseMap[num].c_str(); }
+		static void			RemapAll();
 	protected:
 		bool		LoadMap();
 	private:
@@ -37,6 +39,7 @@ class LumpRemaper
 		std::deque<RemapFile>	files;
 
 		static std::map<std::string, LumpRemaper>	remaps;
+		static std::map<int, std::string>			reverseMap;
 };
 
 #endif

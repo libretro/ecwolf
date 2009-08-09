@@ -41,12 +41,6 @@ loaded into the data segment
 
 typedef struct
 {
-    word bit0,bit1;       // 0-255 is a character, > is a pointer to a node
-} huffnode;
-
-
-typedef struct
-{
     word RLEWtag;
     int32_t headeroffsets[100];
 } mapfiletype;
@@ -68,7 +62,6 @@ int     mapon;
 word    *mapsegs[MAPPLANES];
 static maptype* mapheaderseg[NUMMAPS];
 byte    *audiosegs[NUMSNDCHUNKS];
-byte    *grsegs[NUMCHUNKS];
 
 word    RLEWtag;
 
@@ -83,11 +76,7 @@ int     numEpisodesMissing = 0;
 */
 
 char extension[5]; // Need a string, not constant to change cache files
-char graphext[5];
 char audioext[5];
-static const char gheadname[] = "vgahead.";
-static const char gfilename[] = "vgagraph.";
-static const char gdictname[] = "vgadict.";
 static const char mheadname[] = "maphead.";
 static const char mfilename[] = "maptemp.";
 static const char aheadname[] = "audiohed.";
@@ -95,29 +84,14 @@ static const char afilename[] = "audiot.";
 
 void CA_CannotOpen(const char *string);
 
-static int32_t  grstarts[NUMCHUNKS + 1];
 static int32_t* audiostarts; // array of offsets in audio / audiot
 
-#ifdef GRHEADERLINKED
-huffnode *grhuffman;
-#else
-huffnode grhuffman[255];
-#endif
-
-int    grhandle = -1;               // handle to EGAGRAPH
 int    maphandle = -1;              // handle to MAPTEMP / GAMEMAPS
 int    audiohandle = -1;            // handle to AUDIOT / AUDIO
 
 int32_t   chunkcomplen,chunkexplen;
 
 SDMode oldsoundmode;
-
-
-static int32_t GRFILEPOS(const size_t idx)
-{
-	assert(idx < lengthof(grstarts));
-	return grstarts[idx];
-}
 
 /*
 =============================================================================
@@ -126,25 +100,6 @@ static int32_t GRFILEPOS(const size_t idx)
 
 =============================================================================
 */
-
-/*
-============================
-=
-= CAL_GetGrChunkLength
-=
-= Gets the length of an explicit length chunk (not tiles)
-= The file pointer is positioned so the compressed data can be read in next.
-=
-============================
-*/
-
-void CAL_GetGrChunkLength (int chunk)
-{
-    lseek(grhandle,GRFILEPOS(chunk),SEEK_SET);
-    read(grhandle,&chunkexplen,sizeof(chunkexplen));
-    chunkcomplen = GRFILEPOS(chunk+1)-GRFILEPOS(chunk)-4;
-}
-
 
 /*
 ==========================
@@ -212,53 +167,6 @@ boolean CA_LoadFile (const char *filename, memptr *ptr)
 ============================================================================
 */
 
-static void CAL_HuffExpand(byte *source, byte *dest, int32_t length, huffnode *hufftable)
-{
-    byte *end;
-    huffnode *headptr, *huffptr;
-
-    if(!length || !dest)
-    {
-        Quit("length or dest is null!");
-        return;
-    }
-
-    headptr = hufftable+254;        // head node is always node 254
-
-    int written = 0;
-
-    end=dest+length;
-
-    byte val = *source++;
-    byte mask = 1;
-    word nodeval;
-    huffptr = headptr;
-    while(1)
-    {
-        if(!(val & mask))
-            nodeval = huffptr->bit0;
-        else
-            nodeval = huffptr->bit1;
-        if(mask==0x80)
-        {
-            val = *source++;
-            mask = 1;
-        }
-        else mask <<= 1;
-
-        if(nodeval<256)
-        {
-            *dest++ = (byte) nodeval;
-            written++;
-            huffptr = headptr;
-            if(dest>=end) break;
-        }
-        else
-        {
-            huffptr = hufftable + (nodeval - 256);
-        }
-    }
-}
 
 /*
 ======================
@@ -436,98 +344,6 @@ void CA_RLEWexpand (word *source, word *dest, int32_t length, word rlewtag)
 =============================================================================
 */
 
-
-/*
-======================
-=
-= CAL_SetupGrFile
-=
-======================
-*/
-
-void CA_SetupVgaDict()
-{
-#ifdef GRHEADERLINKED
-    grhuffman = (huffnode *)&EGAdict;
-    grstarts = (int32_t _seg *)FP_SEG(&EGAhead);
-#else
-
-//
-// load ???dict.ext (huffman dictionary for graphics files)
-//
-
-	int lump = Wads.GetNumForName("VGADICT");
-	if(lump == -1)
-	{
-		printf("ERROR: No VGADICT\n");
-		exit(0);
-	}
-	FWadLump vgadict = Wads.OpenLumpNum(lump);
-
-	vgadict.Read(grhuffman, sizeof(grhuffman));
-}
-
-void CAL_SetupGrFile (void)
-{
-    char fname[13];
-    int handle;
-    byte *compseg;
-
-    // load the data offsets from ???head.ext
-    strcpy(fname,gheadname);
-    strcat(fname,graphext);
-
-    handle = open(fname, O_RDONLY | O_BINARY);
-    if (handle == -1)
-        CA_CannotOpen(fname);
-
-    long headersize = lseek(handle, 0, SEEK_END);
-    lseek(handle, 0, SEEK_SET);
-
-    if(!param_ignorenumchunks && headersize / 3 != (long) (lengthof(grstarts) - numEpisodesMissing))
-        Quit("Wolf4SDL was not compiled for these data files:\n"
-            "%s contains a wrong number of offsets (%i instead of %i)!\n\n"
-            "Please check whether you are using the right executable!\n"
-            "(For mod developers: perhaps you forgot to update NUMCHUNKS?)",
-            fname, headersize / 3, lengthof(grstarts) - numEpisodesMissing);
-
-    byte data[lengthof(grstarts) * 3];
-    read(handle, data, sizeof(data));
-    close(handle);
-
-    const byte* d = data;
-    for (int32_t* i = grstarts; i != endof(grstarts); ++i)
-    {
-        const int32_t val = d[0] | d[1] << 8 | d[2] << 16;
-        *i = (val == 0x00FFFFFF ? -1 : val);
-        d += 3;
-    }
-#endif
-
-//
-// Open the graphics file, leaving it open until the game is finished
-//
-    strcpy(fname,gfilename);
-    strcat(fname,graphext);
-
-    grhandle = open(fname, O_RDONLY | O_BINARY);
-    if (grhandle == -1)
-        CA_CannotOpen(fname);
-
-
-//
-// load the pic and sprite headers into the arrays in the data segment
-//
-    pictable=(pictabletype *) malloc(NUMPICS*sizeof(pictabletype));
-    CHECKMALLOCRESULT(pictable);
-    CAL_GetGrChunkLength(STRUCTPIC);                // position file pointer
-    compseg=(byte *) malloc(chunkcomplen);
-    CHECKMALLOCRESULT(compseg);
-    read (grhandle,compseg,chunkcomplen);
-    CAL_HuffExpand(compseg, (byte*)pictable, NUMPICS * sizeof(pictabletype), grhuffman);
-    free(compseg);
-}
-
 //==========================================================================
 
 
@@ -669,7 +485,6 @@ void CA_Startup (void)
 #endif
 
     CAL_SetupMapFile ();
-    CAL_SetupGrFile ();
     CAL_SetupAudioFile ();
 
     mapon = -1;
@@ -694,14 +509,8 @@ void CA_Shutdown (void)
 
     if(maphandle != -1)
         close(maphandle);
-    if(grhandle != -1)
-        close(grhandle);
     if(audiohandle != -1)
         close(audiohandle);
-
-    for(i=0; i<NUMCHUNKS; i++)
-        UNCACHEGRCHUNK(i);
-    free(pictable);
 
     switch(oldsoundmode)
     {
@@ -845,118 +654,6 @@ cachein:
             CA_CacheAudioChunk(start);
     }
 }
-
-//===========================================================================
-
-
-/*
-======================
-=
-= CAL_ExpandGrChunk
-=
-= Does whatever is needed with a pointer to a compressed chunk
-=
-======================
-*/
-
-void CAL_ExpandGrChunk (int chunk, int32_t *source)
-{
-    int32_t    expanded;
-
-    if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
-    {
-        //
-        // expanded sizes of tile8/16/32 are implicit
-        //
-
-#define BLOCK           64
-#define MASKBLOCK       128
-
-        if (chunk<STARTTILE8M)          // tile 8s are all in one chunk!
-            expanded = BLOCK*NUMTILE8;
-        else if (chunk<STARTTILE16)
-            expanded = MASKBLOCK*NUMTILE8M;
-        else if (chunk<STARTTILE16M)    // all other tiles are one/chunk
-            expanded = BLOCK*4;
-        else if (chunk<STARTTILE32)
-            expanded = MASKBLOCK*4;
-        else if (chunk<STARTTILE32M)
-            expanded = BLOCK*16;
-        else
-            expanded = MASKBLOCK*16;
-    }
-    else
-    {
-        //
-        // everything else has an explicit size longword
-        //
-        expanded = *source++;
-    }
-
-    //
-    // allocate final space, decompress it, and free bigbuffer
-    // Sprites need to have shifts made and various other junk
-    //
-    grsegs[chunk]=(byte *) malloc(expanded);
-    CHECKMALLOCRESULT(grsegs[chunk]);
-    CAL_HuffExpand((byte *) source, grsegs[chunk], expanded, grhuffman);
-}
-
-
-/*
-======================
-=
-= CA_CacheGrChunk
-=
-= Makes sure a given chunk is in memory, loadiing it if needed
-=
-======================
-*/
-
-void CA_CacheGrChunk (int chunk)
-{
-    int32_t pos,compressed;
-    int32_t *source;
-    int  next;
-
-    if (grsegs[chunk])
-        return;                             // already in memory
-
-//
-// load the chunk into a buffer, either the miscbuffer if it fits, or allocate
-// a larger buffer
-//
-    pos = GRFILEPOS(chunk);
-    if (pos<0)                              // $FFFFFFFF start is a sparse tile
-        return;
-
-    next = chunk +1;
-    while (GRFILEPOS(next) == -1)           // skip past any sparse tiles
-        next++;
-
-    compressed = GRFILEPOS(next)-pos;
-
-    lseek(grhandle,pos,SEEK_SET);
-
-    if (compressed<=BUFFERSIZE)
-    {
-        read(grhandle,bufferseg,compressed);
-        source = bufferseg;
-    }
-    else
-    {
-        source = (int32_t *) malloc(compressed);
-        CHECKMALLOCRESULT(source);
-        read(grhandle,source,compressed);
-    }
-
-    CAL_ExpandGrChunk (chunk,source);
-
-    if (compressed>BUFFERSIZE)
-        free(source);
-}
-
-
 
 //==========================================================================
 

@@ -167,14 +167,50 @@ void	VL_SetVGAPlaneMode (void)
 =================
 */
 
-void VL_ConvertPalette(byte *srcpal, SDL_Color *destpal, int numColors)
+// [BL] HACK: In order to preserve compatibility with the VGAGRAPH files, 
+//            palettes containing only bytes with a value <= 63 will have the
+//            colors increased in brightness.
+void VL_ConvertPalette(const char* srcpal, SDL_Color *destpal)
 {
-    for(int i=0; i<numColors; i++)
-    {
-        destpal[i].r = *srcpal++ * 255 / 63;
-        destpal[i].g = *srcpal++ * 255 / 63;
-        destpal[i].b = *srcpal++ * 255 / 63;
-    }
+	int lumpNum = Wads.CheckNumForName(srcpal);
+	if(lumpNum == -1)
+		return;
+	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+	int length = Wads.LumpLength(lumpNum);
+	byte* data = new byte[length];
+	lump.Read(data, length);
+
+	// Determine number of colors
+	int numColors = length/3;
+	if(numColors > 256)
+		numColors = 256;
+
+	bool newFormat = false;
+	for(int i = 0;i < length;i++)
+	{
+		if(data[i] > 63)
+		{
+			newFormat = true;
+			break;
+		}
+	}
+
+	for(int i = 0;i < numColors;i++)
+	{
+		if(newFormat)
+		{
+			destpal[i].r = data[i*3];
+			destpal[i].g = data[(i*3)+1];
+			destpal[i].b = data[(i*3)+2];
+		}
+		else
+		{
+			destpal[i].r = data[i*3] * 255/63;
+			destpal[i].g = data[(i*3)+1] * 255/63;
+			destpal[i].b = data[(i*3)+2] * 255/63;
+		}
+	}
+	delete[] data;
 }
 
 /*

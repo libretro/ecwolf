@@ -36,7 +36,7 @@ void VL_SetVGAPlaneMode (void);
 void VL_SetTextMode (void);
 void VL_Shutdown (void);
 
-void VL_ConvertPalette(byte *srcpal, SDL_Color *destpal, int numColors);
+void VL_ConvertPalette(const char* srcpal, SDL_Color *destpal);
 void VL_FillPalette (int red, int green, int blue);
 void VL_SetColor	(int color, int red, int green, int blue);
 void VL_GetColor	(int color, int *red, int *green, int *blue);

@@ -709,7 +709,7 @@ int Menu::handle()
 	}
 	VW_UpdateScreen ();
 
-	shape = C_CURSOR1PIC;
+	shape = 0;
 	timer = 8;
 	exit = 0;
 	lastBlinkTime = GetTimeCount ();

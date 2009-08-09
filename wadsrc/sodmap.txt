@@ -174,7 +174,7 @@ graphics
 	"T_DEMO1",
 	"T_DEMO2",
 	"T_DEMO3",
-	"T_END"
+	"ENDART1"
 }
 
 sprites

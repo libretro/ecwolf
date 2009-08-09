@@ -29,11 +29,12 @@ struct FVGALump : public FResourceLump
 		Huffnode*	huffman;
 
 		bool		isImage;
+		bool		noSkip;
 		Dimensions	dimensions;
 
 		int FillCache()
 		{
-			Owner->Reader->Seek(position+4, SEEK_SET);
+			Owner->Reader->Seek(position+(noSkip ? 0 : 4), SEEK_SET);
 
 			byte* data = new byte[length];
 			byte* out = new byte[LumpSize];
@@ -154,7 +155,9 @@ class FVGAGraph : public FResourceFile
 				lumps[i].Owner = this;
 				lumps[i].LumpNameSetup(lumpname);
 
+				lumps[i].noSkip = false;
 				lumps[i].isImage = (i >= 3 && i-3 < numPictures);
+				lumps[i].Namespace = lumps[i].isImage ? ns_graphics : ns_global;
 				lumps[i].position = READINT24(&data[i*3]);
 				lumps[i].huffman = huffman;
 
@@ -190,6 +193,15 @@ class FVGAGraph : public FResourceFile
 					lumps[i].dimensions = dimensions[i-3];
 					lumps[i].LumpSize += 4;
 				}
+			}
+			// HACK: For some reason id decided the tile8 lump will not tell
+			//       its size.  So we need to assume it's right after the
+			//       graphics and is 72 tiles long.
+			int tile8Position = 3+numPictures;
+			if(tile8Position < NumLumps && lumps[tile8Position].LumpSize > lumps[tile8Position].length)
+			{
+				lumps[tile8Position].noSkip = true;
+				lumps[tile8Position].LumpSize = 64*72;
 			}
 			if(dimensions != NULL)
 				delete[] dimensions;
