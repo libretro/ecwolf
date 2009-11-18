@@ -1062,42 +1062,42 @@ Menu musicMenu(CTL_X, CTL_Y-6, 280, 32);
 static struct Song
 {
 	const char*		name;
-	unsigned int	track;
+	const char*		track;
 } songList[] =
 {
 #ifndef SPEAR
-	{"Get Them!",			GETTHEM_MUS},
-	{"Searching",			SEARCHN_MUS},
-	{"P.O.W.",				POW_MUS},
-	{"Suspense",			SUSPENSE_MUS},
-	{"War March",			WARMARCH_MUS},
-	{"Around The Corner!",	CORNER_MUS},
-	{"Nazi Anthem",			NAZI_OMI_MUS},
-	{"Lurking...",			PREGNANT_MUS},
-	{"Going After Hitler",	GOINGAFT_MUS},
-	{"Pounding Headache",	HEADACHE_MUS},
-	{"Into the Dungeons",	DUNGEON_MUS},
-	{"Ultimate Conquest",	ULTIMATE_MUS},
-	{"Kill the S.O.B.",		INTROCW3_MUS},
-	{"The Nazi Rap",		NAZI_RAP_MUS},
-	{"Twelfth Hour",		TWELFTH_MUS},
-	{"Zero Hour",			ZEROHOUR_MUS},
-	{"Ultimate Conquest",	ULTIMATE_MUS},
-	{"Wolfpack",			PACMAN_MUS},
+	{"Get Them!",			"GETTHEM"},
+	{"Searching",			"SEARCHIN"},
+	{"P.O.W.",				"POW"},
+	{"Suspense",			"SUSPENSE"},
+	{"War March",			"WARMARCH"},
+	{"Around The Corner!",	"CORNER"},
+	{"Nazi Anthem",			"NAZI_OMI"},
+	{"Lurking...",			"PREGNANT"},
+	{"Going After Hitler",	"GOINGAFT"},
+	{"Pounding Headache",	"HEADACHE"},
+	{"Into the Dungeons",	"DUNGEON"},
+	{"Ultimate Conquest",	"ULTIMATE"},
+	{"Kill the S.O.B.",		"INTROCW3"},
+	{"The Nazi Rap",		"NAZI_RAP"},
+	{"Twelfth Hour",		"TWELFTH"},
+	{"Zero Hour",			"ZEROHOUR"},
+	{"Ultimate Conquest",	"ULTIMATE"},
+	{"Wolfpack",			"PACMAN"},
 #else
-	{"Funky Colonel Bill",		XFUNKIE_MUS},
-	{"Death To The Nazis",		XDEATH_MUS},
-	{"Tiptoeing Around",		XTIPTOE_MUS},
-	{"Is This THE END?",		XTHEEND_MUS},
-	{"Evil Incarnate",			XEVIL_MUS},
-	{"Jazzin' Them Nazis",		XJAZNAZI_MUS},
-	{"Puttin' It To The Enemy",	XPUTIT_MUS},
-	{"The SS Gonna Get You",	XGETYOU_MUS},
-	{"Towering Above",			XTOWER2_MUS},
+	{"Funky Colonel Bill",		"XFUNKIE"},
+	{"Death To The Nazis",		"XDEATH"},
+	{"Tiptoeing Around",		"XTIPTOE"},
+	{"Is This THE END?",		"XTHEEND"},
+	{"Evil Incarnate",			"XEVIL"},
+	{"Jazzin' Them Nazis",		"XJAZNAZI"},
+	{"Puttin' It To The Enemy",	"XPUTIT"},
+	{"The SS Gonna Get You",	"XGETYOU"},
+	{"Towering Above",			"XTOWER2"},
 #endif
 
 	// End of list
-	{ NULL, 0 }
+	{ NULL, NULL }
 };
 MENU_LISTENER(ChangeMusic)
 {
@@ -1825,6 +1825,7 @@ int main (int argc, char *argv[])
 	char vgadict[11] = {'v','g','a','d','i','c','t','.',0,0,0};
 	memcpy(vgadict+8, extension, 3);
 //	WL_AddFile(vgadict);
+	WL_AddFile("audiot.wl6");
 	WL_AddFile("vgagraph.wl6");
 
 #if defined(_arch_dreamcast)

@@ -5,7 +5,8 @@
 using namespace std;
 
 map<string, LumpRemaper> LumpRemaper::remaps;
-map<int, string> LumpRemaper::reverseMap;
+map<int, string> LumpRemaper::musicReverseMap;
+map<int, string> LumpRemaper::vgaReverseMap;
 
 LumpRemaper::LumpRemaper(const char* extension) : mapLumpName(extension)
 {
@@ -42,12 +43,49 @@ void LumpRemaper::DoRemap()
 	for(unsigned int i = 0;i < files.size();i++)
 	{
 		RemapFile &file = files[i];
+		int temp = 0; // Use to count something
+		int temp2 = 0;
 		for(unsigned int i = 0;i < file.file->LumpCount();i++)
 		{
 			FResourceLump *lump = file.file->GetLump(i);
-			if(i < graphics.size())
+			switch(file.type)
 			{
-				lump->LumpNameSetup(graphics[i].c_str());
+				case AUDIOT:
+					if(lump->Namespace == ns_sounds)
+					{
+						if(i < sounds.size())
+							lump->LumpNameSetup(sounds[i].c_str());
+						temp++;
+					}
+					else if(lump->Namespace == ns_music && i-temp < music.size())
+						lump->LumpNameSetup(music[i-temp].c_str());
+					break;
+				case VGAGRAPH:
+					if(i < graphics.size())
+						lump->LumpNameSetup(graphics[i].c_str());
+					break;
+				case VSWAP:
+					if(lump->Namespace == ns_newtextures)
+					{
+						if(i < textures.size())
+							lump->LumpNameSetup(textures[i].c_str());
+						temp++;
+						temp2++;
+					}
+					else if(lump->Namespace == ns_sprites)
+					{
+						if(i-temp < sprites.size())
+							lump->LumpNameSetup(sprites[i-temp].c_str());
+						temp2++;
+					}
+					else if(lump->Namespace == ns_sounds && i-temp2 < digitalsounds.size())
+					{
+						printf("%d->%s\n", i, digitalsounds[i-temp2].c_str());
+						lump->LumpNameSetup(digitalsounds[i-temp2].c_str());
+					}
+					break;
+				default:
+					break;
 			}
 		}
 	}
@@ -73,19 +111,24 @@ bool LumpRemaper::LoadMap()
 		if(!sc.CheckToken(TK_Identifier))
 			sc.ScriptError("Expected identifier in map.\n");
 
-		bool doReverse = false;
+		map<int, string> *reverse = NULL;
 		std::deque<std::string> *map = NULL;
 		if(sc.str.compare("graphics") == 0)
 		{
-			doReverse = true;
+			reverse = &vgaReverseMap;
 			map = &graphics;
 		}
 		else if(sc.str.compare("sprites") == 0)
 			map = &sprites;
 		else if(sc.str.compare("sounds") == 0)
 			map = &sounds;
+		else if(sc.str.compare("digitalsounds") == 0)
+			map = &digitalsounds;
 		else if(sc.str.compare("music") == 0)
+		{
+			reverse = &musicReverseMap;
 			map = &music;
+		}
 		else if(sc.str.compare("textures") == 0)
 			map = &textures;
 		else
@@ -100,8 +143,8 @@ bool LumpRemaper::LoadMap()
 			{
 				if(!sc.CheckToken(TK_StringConst))
 					sc.ScriptError("Expected string constant.\n");
-				if(doReverse)
-					reverseMap[i++] = sc.str;
+				if(reverse != NULL)
+					(*reverse)[i++] = sc.str;
 				map->push_back(sc.str);
 				if(sc.CheckToken('}'))
 					break;

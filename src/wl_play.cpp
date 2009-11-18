@@ -10,6 +10,7 @@
 #include "wl_cloudsky.h"
 #include "wl_shade.h"
 #include "language.h"
+#include "lumpremap.h"
 
 /*
 =============================================================================
@@ -996,7 +997,7 @@ void StartMusic ()
 {
     SD_MusicOff ();
     lastmusicchunk = (musicnames) songs[gamestate.mapon + gamestate.episode * 10];
-    SD_StartMusic(STARTMUSIC + lastmusicchunk);
+    SD_StartMusic(LumpRemaper::ConvertMusicIndexToLump(lastmusicchunk));
 }
 
 void ContinueMusic (int offs)

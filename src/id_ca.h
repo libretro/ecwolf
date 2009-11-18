@@ -30,7 +30,6 @@ extern  word *mapsegs[MAPPLANES];
 extern  byte *audiosegs[NUMSNDCHUNKS];
 
 extern  char  extension[5];
-extern  char  graphext[5];
 extern  char  audioext[5];
 
 //===========================================================================
@@ -48,7 +47,6 @@ void CA_Shutdown (void);
 int32_t CA_CacheAudioChunk (int chunk);
 void CA_LoadAllSounds (void);
 
-//void CA_CacheGrChunk (int chunk);
 void CA_CacheMap (int mapnum);
 
 void CA_CacheScreen (const char* chunk);

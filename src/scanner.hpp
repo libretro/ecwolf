@@ -57,6 +57,8 @@ enum ETokenType
 	TK_ShiftLeft,	// <<
 	TK_ShiftRight,	// >>
 
+	TK_UnquotedString, // For compatibility.
+
 	TK_NoToken = -1,
 };
 

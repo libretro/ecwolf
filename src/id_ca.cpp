@@ -29,8 +29,6 @@ loaded into the data segment
 #include "id_vh.h"
 #include "w_wad.h"
 
-#define THREEBYTEGRSTARTS
-
 /*
 =============================================================================
 
@@ -88,8 +86,6 @@ static int32_t* audiostarts; // array of offsets in audio / audiot
 
 int    maphandle = -1;              // handle to MAPTEMP / GAMEMAPS
 int    audiohandle = -1;            // handle to AUDIOT / AUDIO
-
-int32_t   chunkcomplen,chunkexplen;
 
 SDMode oldsoundmode;
 

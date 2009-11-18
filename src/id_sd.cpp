@@ -32,6 +32,7 @@
 #include "id_sd.h"
 #include <SDL_mixer.h>
 #include "fmopl.h"
+#include "w_wad.h"
 
 #define ORIGSAMPLERATE 7042
 
@@ -110,6 +111,7 @@ static  Instrument              alZeroInst;
 //      Sequencer variables
 static  volatile boolean        sqActive;
 static  word                   *sqHack;
+static	word					*sqHackFreeable=NULL;
 static  word                   *sqHackPtr;
 static  int                     sqHackLen;
 static  int                     sqHackSeqLen;
@@ -1324,15 +1326,22 @@ SD_MusicOff(void)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-SD_StartMusic(int chunk)
+SD_StartMusic(const char* chunk)
 {
     SD_MusicOff();
 
     if (MusicMode == smm_AdLib)
     {
-        int32_t chunkLen = CA_CacheAudioChunk(chunk);
-        sqHack = (word *)(void *) audiosegs[chunk];     // alignment is correct
-        if(*sqHack == 0) sqHackLen = sqHackSeqLen = chunkLen;
+		int lumpNum = Wads.CheckNumForName(chunk);
+		if(lumpNum == -1)
+			return;
+		FWadLump lump = Wads.OpenLumpNum(lumpNum);
+		if(sqHackFreeable != NULL)
+			delete[] sqHackFreeable;
+		sqHack = new word[(Wads.LumpLength(lumpNum)/2)+1]; //+1 is just safety
+		sqHackFreeable = sqHack;
+		lump.Read(sqHack, Wads.LumpLength(lumpNum));
+		if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
         else sqHackLen = sqHackSeqLen = *sqHack++;
         sqHackPtr = sqHack;
         sqHackTime = 0;

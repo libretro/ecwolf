@@ -1,3 +1,9 @@
+November 17th, 2009
+-----------------------------
+- Music is now using the new resource code.  I actually did this a while ago
+  (probably sometime in august), but apparently I never committed it.
+- Added some code to handle the rest of the audio later.
+
 August 9th, 2009
 -----------------------------
 - Removed old VGAGRAPH code.

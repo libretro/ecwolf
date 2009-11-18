@@ -279,6 +279,15 @@ void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool
 			}
 			break;
 		}
+		case TK_UnquotedString:
+		{
+			char* uqString = GetNext(pos, lpos, TK_UnquotedString, report);
+			if(uqString != NULL)
+			{
+				str = uqString;
+			}
+			break;
+		}
 		case TK_StringConst:
 		{
 			char* stringConst = GetNext(pos, lpos, TK_StringConst, report);
@@ -380,6 +389,13 @@ char* Scanner::GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report)
 		{
 			if(!((data[i] >= 'a' && data[i] <= 'z') || (data[i] >= 'A' && data[i] <= 'Z') ||
 				data[i] == '_' || (i != pos && data[i] >= '0' && data[i] <= '9')))
+			{
+				break;
+			}
+		}
+		else if(type == TK_UnquotedString)
+		{
+			if(data[i] == ' ' || data[i] == '\t' || data[i] == '\r' || data[i] == '\n')
 			{
 				break;
 			}

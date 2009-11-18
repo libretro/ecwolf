@@ -37,12 +37,12 @@
 #define MenuFadeIn()    VL_FadeIn(0,255,gamepal,10)
 
 
-#define MENUSONG        WONDERIN_MUS
+#define MENUSONG        "WONDERIN"
 
 #ifndef SPEAR
-#define INTROSONG       NAZI_NOR_MUS
+#define INTROSONG       "NAZI_NOR"
 #else
-#define INTROSONG       XTOWER2_MUS
+#define INTROSONG       "XTOWER2"
 #endif
 
 #define SENSITIVE       60
@@ -116,9 +116,7 @@ void DrawOutline(int x,int y,int w,int h,int color1,int color2);
 void WaitKeyUp(void);
 void ReadAnyControl(ControlInfo *ci);
 void TicDelay(int count);
-void CacheLump(int lumpstart,int lumpend);
-void UnCacheLump(int lumpstart,int lumpend);
-int StartCPMusic(int song);
+int StartCPMusic(const char* song);
 int  Confirm(const char *string);
 void Message(const char *string);
 void CheckPause(void);

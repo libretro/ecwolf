@@ -146,7 +146,7 @@ Victory (void)
     VL_FadeOut (0, 255, 0, 17, 17, 5);
 #endif
 
-    StartCPMusic (URAHERO_MUS);
+    StartCPMusic ("URAHERO");
     ClearSplitVWB ();
 
     VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
@@ -539,7 +539,7 @@ LevelCompleted (void)
     if (bordercol != VIEWCOLOR)
         DrawStatusBorder (VIEWCOLOR);
 
-    StartCPMusic (ENDLEVEL_MUS);
+    StartCPMusic ("ENDLEVEL");
 
 //
 // do the intermission
@@ -1150,7 +1150,7 @@ CheckHighScore (int32_t score, word other)
 #ifdef SPEAR
     StartCPMusic (XAWARD_MUS);
 #else
-    StartCPMusic (ROSTER_MUS);
+    StartCPMusic ("ROSTER");
 #endif
     DrawHighScores ();
 

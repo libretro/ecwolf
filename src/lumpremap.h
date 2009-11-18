@@ -13,7 +13,9 @@ class LumpRemaper
 	public:
 		enum Type
 		{
-			VGAGRAPH
+			AUDIOT,
+			VGAGRAPH,
+			VSWAP
 		};
 
 		LumpRemaper(const char* extension);
@@ -23,7 +25,8 @@ class LumpRemaper
 
 		static void			AddFile(const char* extension, FResourceFile *file, Type type);
 		// For Read This screens which reference VGAGraph entries by number.
-		static const char*	ConvertIndexToLump(int num) { return reverseMap[num].c_str(); }
+		static const char*	ConvertMusicIndexToLump(int num) { return musicReverseMap[num].c_str(); }
+		static const char*	ConvertVGAIndexToLump(int num) { return vgaReverseMap[num].c_str(); }
 		static void			RemapAll();
 	protected:
 		bool		LoadMap();
@@ -35,11 +38,12 @@ class LumpRemaper
 		};
 
 		FString					mapLumpName;
-		std::deque<std::string>	graphics, sprites, sounds, music, textures;
+		std::deque<std::string>	graphics, sprites, sounds, digitalsounds, music, textures;
 		std::deque<RemapFile>	files;
 
 		static std::map<std::string, LumpRemaper>	remaps;
-		static std::map<int, std::string>			reverseMap;
+		static std::map<int, std::string>			musicReverseMap;
+		static std::map<int, std::string>			vgaReverseMap;
 };
 
 #endif

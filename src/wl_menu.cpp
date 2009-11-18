@@ -86,7 +86,7 @@ MENU_LISTENER(ViewScoresOrEndGame)
 #ifdef SPEAR
 		StartCPMusic(XAWARD_MUS);
 #else
-		StartCPMusic(ROSTER_MUS);
+		StartCPMusic("ROSTER");
 #endif
 	
 		DrawHighScores();
@@ -351,7 +351,7 @@ MENU_LISTENER(StartNewGame)
 MENU_LISTENER(ReadThis)
 {
 	MenuFadeOut();
-	StartCPMusic(CORNER_MUS);
+	StartCPMusic("CORNER");
 	HelpScreens();
 	StartCPMusic(MENUSONG);
 	return true;
@@ -618,8 +618,6 @@ US_ControlPanel (ScanCode scancode)
 			{
 				VW_FadeOut ();
 				StartCPMusic (XJAZNAZI_MUS);
-				UnCacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
-				UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
 				ClearMemory ();
 	
 	
@@ -639,8 +637,6 @@ US_ControlPanel (ScanCode scancode)
 	
 				VW_FadeOut ();
 	
-				CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-				CacheLump (OPTIONS_LUMP_START, OPTIONS_LUMP_END);
 				mainMenu.draw();
 				StartCPMusic (MENUSONG);
 				MenuFadeIn ();
@@ -1033,32 +1029,6 @@ ClearMScreen (void)
 
 ////////////////////////////////////////////////////////////////////
 //
-// Un/Cache a LUMP of graphics
-//
-////////////////////////////////////////////////////////////////////
-void
-CacheLump (int lumpstart, int lumpend)
-{
-    int i;
-
-//    for (i = lumpstart; i <= lumpend; i++)
-//        CA_CacheGrChunk (i);
-}
-
-
-void
-UnCacheLump (int lumpstart, int lumpend)
-{
-    int i;
-
-  //  for (i = lumpstart; i <= lumpend; i++)
- //       if (grsegs[i])
-//            UNCACHEGRCHUNK (i);
-}
-
-
-////////////////////////////////////////////////////////////////////
-//
 // Draw a window for a menu
 //
 ////////////////////////////////////////////////////////////////////
@@ -1088,14 +1058,6 @@ DrawOutline (int x, int y, int w, int h, int color1, int color2)
 void
 SetupControlPanel (void)
 {
-    //
-    // CACHE GRAPHICS & SOUNDS
-    //
-//#ifndef SPEAR
-//#else
-//    CacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-//#endif
-
     SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
     fontnumber = 1;
     WindowH = 200;
@@ -1191,11 +1153,6 @@ void SetupSaveGames()
 void
 CleanupControlPanel (void)
 {
-//#ifndef SPEAR
-//#else
-//    UnCacheLump (BACKDROP_LUMP_START, BACKDROP_LUMP_END);
-//#endif
-
     fontnumber = 0;
 }
 
@@ -1514,15 +1471,14 @@ Message (const char *string)
 static int lastmusic;
 
 int
-StartCPMusic (int song)
+StartCPMusic (const char* song)
 {
     int lastoffs;
 
-    lastmusic = song;
+    //lastmusic = song;
     lastoffs = SD_MusicOff ();
-    UNCACHEAUDIOCHUNK (STARTMUSIC + lastmusic);
 
-    SD_StartMusic(STARTMUSIC + song);
+    SD_StartMusic(song);
     return lastoffs;
 }
 
