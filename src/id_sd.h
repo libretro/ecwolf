@@ -197,7 +197,7 @@ extern  void    SD_StopSound(void),
                 SD_WaitSoundDone(void);
 
 extern  void    SD_StartMusic(const char* chunk);
-extern  void    SD_ContinueMusic(int chunk, int startoffs);
+extern  void    SD_ContinueMusic(const char* chunk, int startoffs);
 extern  void    SD_MusicOn(void),
                 SD_FadeOutMusic(void);
 extern  int     SD_MusicOff(void);
@@ -205,7 +205,8 @@ extern  int     SD_MusicOff(void);
 extern  boolean SD_MusicPlaying(void);
 extern  boolean SD_SetSoundMode(SDMode mode);
 extern  boolean SD_SetMusicMode(SMMode mode);
-extern  word    SD_SoundPlaying(void);
+extern  bool    SD_SoundPlaying(void);
+extern  bool    GotChaingun(void);
 
 extern  void    SD_SetDigiDevice(SDSMode);
 extern  byte*	SD_PrepareSound(int which);

@@ -28,7 +28,6 @@
 //#pragma pack(1)
 
 #ifndef SPEAR
-    #include "audiowl6.h"
     #ifdef UPLOAD
         #include "gfxv_apo.h"
     #else
@@ -37,7 +36,6 @@
         #endif
     #endif
 #else
-    #include "audiosod.h"
     #include "gfxv_sod.h"
 #endif
 

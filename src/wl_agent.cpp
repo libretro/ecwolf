@@ -310,7 +310,7 @@ void DrawFace (void)
 		{ "STFST60", "STFST61", "STFST62" },
 	};
     if(viewsize == 21 && ingame) return;
-    if (SD_SoundPlaying() == GETGATLINGSND)
+    if (GotChaingun())
         StatusDrawFace("STFEVL0");
     else if (gamestate.health)
     {
@@ -356,7 +356,7 @@ void UpdateFace (void)
             return;
         }
     }
-    else if(SD_SoundPlaying() == GETGATLINGSND)
+    else if(GotChaingun())
         return;
 
     facecount += tics;

@@ -33,6 +33,7 @@
 #include <SDL_mixer.h>
 #include "fmopl.h"
 #include "w_wad.h"
+#include "zstring.h"
 
 #define ORIGSAMPLERATE 7042
 
@@ -63,9 +64,6 @@ typedef struct
     uint32_t length;
 } digiinfo;
 
-static Mix_Chunk *SoundChunks[ STARTMUSIC - STARTDIGISOUNDS];
-static byte      *SoundBuffers[STARTMUSIC - STARTDIGISOUNDS];
-
 globalsoundpos channelSoundPos[MIX_CHANNELS];
 
 //      Global variables
@@ -82,8 +80,7 @@ globalsoundpos channelSoundPos[MIX_CHANNELS];
 //      Internal variables
 static  boolean                 SD_Started;
 static  boolean                 nextsoundpos;
-static  soundnames              SoundNumber;
-static  soundnames              DigiNumber;
+static  FString                 SoundPlaying;
 static  word                    SoundPriority;
 static  word                    DigiPriority;
 static  int                     LeftPosition;
@@ -117,7 +114,7 @@ static  longword                sqHackTime;
 
 static void SDL_SoundFinished(void)
 {
-	SoundNumber   = (soundnames)0;
+	SoundPlaying = FString();
 	SoundPriority = 0;
 }
 
@@ -172,7 +169,7 @@ void inline SDL_DoFX()
                 if(!pcLengthLeft)
                 {
                         pcSound=0;
-                        SoundNumber=(soundnames)0;
+                        SoundPlaying = FString();
                         SoundPriority=0;
                         SDL_turnOffPCSpeaker();
                 }
@@ -475,7 +472,6 @@ void
 SD_StopDigitized(void)
 {
     DigiPlaying = false;
-    DigiNumber = (soundnames) 0;
     DigiPriority = 0;
     SoundPositioned = false;
     if ((DigiMode == sds_PC) && (SoundMode == sdm_PC))
@@ -560,10 +556,11 @@ byte* SD_PrepareSound(int which)
         newsamples[i] = GetSample((float)size * (float)i / (float)destsamples,
             origsamples, size);
     }
-    SoundBuffers[which] = wavebuffer;
 
 	delete[] origsamples;
-	return reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(wavebuffer, sizeof(headchunk) + sizeof(wavechunk) + destsamples * 2), 1));
+	byte* out = reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(wavebuffer, sizeof(headchunk) + sizeof(wavechunk) + destsamples * 2), 1));
+	free(wavebuffer);
+	return out;
 }
 
 int SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChannel chan)
@@ -583,7 +580,7 @@ int SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChann
 
     DigiPlaying = true;
 
-    Mix_Chunk *sample = reinterpret_cast<Mix_Chunk*> (which.GetData(SoundIndex::DIGITAL));//SoundChunks[which];
+    Mix_Chunk *sample = reinterpret_cast<Mix_Chunk*> (which.GetData(SoundIndex::DIGITAL));
     if(sample == NULL)
         return 0;
 
@@ -849,7 +846,7 @@ SDL_StartDevice(void)
             SDL_StartAL();
             break;
     }
-    SoundNumber = (soundnames) 0;
+    SoundPlaying = FString();
     SoundPriority = 0;
 }
 
@@ -864,7 +861,6 @@ boolean
 SD_SetSoundMode(SDMode mode)
 {
     boolean result = false;
-    word    tableoffset;
 
     SD_StopSound();
 
@@ -874,15 +870,10 @@ SD_SetSoundMode(SDMode mode)
     switch (mode)
     {
         case sdm_Off:
-            tableoffset = STARTADLIBSOUNDS;
-            result = true;
-            break;
-        case sdm_PC:
-            tableoffset = STARTPCSOUNDS;
+		case sdm_PC:
             result = true;
             break;
         case sdm_AdLib:
-            tableoffset = STARTADLIBSOUNDS;
             if (AdLibPresent)
                 result = true;
             break;
@@ -986,7 +977,7 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
                 if(!curAlLengthLeft)
                 {
                     curAlSound = alSound = 0;
-                    SoundNumber = (soundnames) 0;
+                    SoundPlaying = FString();
                     SoundPriority = 0;
                     alOut(alFreqH, 0);
                 }
@@ -1086,12 +1077,6 @@ SD_Shutdown(void)
     SD_MusicOff();
     SD_StopSound();
 
-    for(int i = 0; i < STARTMUSIC - STARTDIGISOUNDS; i++)
-    {
-        if(SoundChunks[i]) Mix_FreeChunk(SoundChunks[i]);
-        if(SoundBuffers[i]) free(SoundBuffers[i]);
-    }
-
     free(DigiList);
 
     SD_Started = false;
@@ -1147,7 +1132,6 @@ SD_PlaySound(const char* sound, SoundChannel chan)
 
             SD_PlayDigitized(sindex,lp,rp);
             SoundPositioned = ispos;
-            SoundNumber = idx;
             SoundPriority = s->priority;
 #else
             return 0;
@@ -1162,8 +1146,8 @@ SD_PlaySound(const char* sound, SoundChannel chan)
 
             int channel = SD_PlayDigitized(sindex, lp, rp, chan);
             SoundPositioned = ispos;
-            DigiNumber = static_cast<soundnames> (0);
             DigiPriority = sindex.GetPriority();
+			SoundPlaying = sound;
             return channel + 1;
         }
 
@@ -1188,8 +1172,8 @@ SD_PlaySound(const char* sound, SoundChannel chan)
             break;
     }
 
-    SoundNumber = static_cast<soundnames> (0);
     SoundPriority = sindex.GetPriority();
+	SoundPlaying = sound;
 
     return 0;
 }
@@ -1200,7 +1184,7 @@ SD_PlaySound(const char* sound, SoundChannel chan)
 //              no sound is playing
 //
 ///////////////////////////////////////////////////////////////////////////
-word
+bool
 SD_SoundPlaying(void)
 {
     boolean result = false;
@@ -1215,11 +1199,13 @@ SD_SoundPlaying(void)
             break;
     }
 
-    if (result)
-        return(SoundNumber);
+    if (SoundPlaying.IsNotEmpty())
+        return true;
     else
-        return(false);
+        return false;
 }
+
+bool GotChaingun() { return SoundPlaying.Compare("weapon/gatling/pickup") == 0; }
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1325,17 +1311,26 @@ SD_StartMusic(const char* chunk)
 }
 
 void
-SD_ContinueMusic(int chunk, int startoffs)
+SD_ContinueMusic(const char* chunk, int startoffs)
 {
     SD_MusicOff();
 
     if (MusicMode == smm_AdLib)
     {
-        int32_t chunkLen = CA_CacheAudioChunk(chunk);
-        sqHack = (word *)(void *) audiosegs[chunk];     // alignment is correct
-        if(*sqHack == 0) sqHackLen = sqHackSeqLen = chunkLen;
-        else sqHackLen = sqHackSeqLen = *sqHack++;
-        sqHackPtr = sqHack;
+		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
+			int lumpNum = Wads.CheckNumForName(chunk);
+			if(lumpNum == -1)
+				return;
+			FWadLump lump = Wads.OpenLumpNum(lumpNum);
+			if(sqHackFreeable != NULL)
+				delete[] sqHackFreeable;
+			sqHack = new word[(Wads.LumpLength(lumpNum)/2)+1]; //+1 is just safety
+			sqHackFreeable = sqHack;
+			lump.Read(sqHack, Wads.LumpLength(lumpNum));
+			if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
+			else sqHackLen = sqHackSeqLen = *sqHack++;
+			sqHackPtr = sqHack;
+		}
 
         if(startoffs >= sqHackLen)
         {

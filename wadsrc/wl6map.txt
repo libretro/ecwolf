@@ -477,7 +477,7 @@ music
 	"NAZI_OMI",
 	"POW",
 	"SALUTE",
-	"SEARCHIN",
+	"SEARCHN",
 	"SUSPENSE",
 	"VICTORS",
 	"WONDERIN",

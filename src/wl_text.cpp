@@ -764,7 +764,6 @@ void HelpScreens (void)
 #ifdef JAPAN
     ShowArticle (0);
     VW_FadeOut();
-    FreeMusic ();
     CA_DownLevel ();
     MM_SortMem ();
 #else
@@ -782,8 +781,6 @@ void HelpScreens (void)
 	}
 
     VW_FadeOut();
-
-    FreeMusic ();
 #endif
 }
 #endif
@@ -810,8 +807,6 @@ void EndText (void)
     IN_ClearKeysDown();
     if (MousePresent && IN_IsInputGrabbed())
         IN_CenterMouse();  // Clear accumulated mouse movement
-
-    FreeMusic ();
 #else
 
 	char lumpName[9];
@@ -833,8 +828,6 @@ void EndText (void)
     IN_ClearKeysDown();
     if (MousePresent && IN_IsInputGrabbed())
         IN_CenterMouse();  // Clear accumulated mouse movement
-
-    FreeMusic ();
 #endif
 }
 #endif

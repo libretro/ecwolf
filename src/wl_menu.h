@@ -138,8 +138,6 @@ int CustomControls(int);
 
 void CheckForEpisodes(void);
 
-void FreeMusic(void);
-
 
 enum {MOUSE,JOYSTICK,KEYBOARDBTNS,KEYBOARDMOVE};        // FOR INPUT TYPES
 

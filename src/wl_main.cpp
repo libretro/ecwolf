@@ -929,7 +929,7 @@ static struct Song
 {
 #ifndef SPEAR
 	{"Get Them!",			"GETTHEM"},
-	{"Searching",			"SEARCHIN"},
+	{"Searching",			"SEARCHN"},
 	{"P.O.W.",				"POW"},
 	{"Suspense",			"SUSPENSE"},
 	{"War March",			"WARMARCH"},

@@ -1480,12 +1480,6 @@ StartCPMusic (const char* song)
     return lastoffs;
 }
 
-void
-FreeMusic (void)
-{
-    UNCACHEAUDIOCHUNK (STARTMUSIC + lastmusic);
-}
-
 ///////////////////////////////////////////////////////////////////////////
 //
 // CHECK FOR PAUSE KEY (FOR MUSIC ONLY)
@@ -1636,7 +1630,6 @@ CheckForEpisodes (void)
     else
         Quit ("UNSUPPORTED MISSION!");
     strcpy (graphext, "sod");
-    strcpy (audioext, "sod");
 #else
     if(!stat("vswap.sdm", &statbuf))
     {
@@ -1645,11 +1638,7 @@ CheckForEpisodes (void)
     else
         Quit ("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
     strcpy (graphext, "sdm");
-    strcpy (audioext, "sdm");
 #endif
-#else
-//    strcpy (graphext, extension);
-    strcpy (audioext, extension);
 #endif
 
     strcat (configname, extension);

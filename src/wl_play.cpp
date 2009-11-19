@@ -34,8 +34,6 @@ boolean madenoise;              // true when shooting or screaming
 
 exit_t playstate;
 
-static musicnames lastmusicchunk = (musicnames) 0;
-
 static int DebugOk;
 
 objtype objlist[MAXACTORS];
@@ -170,97 +168,43 @@ objtype dummyobj;
 //
 // LIST OF SONGS FOR EACH VERSION
 //
-int songs[] = {
+const char* songs[] = {
 #ifndef SPEAR
     //
     // Episode One
     //
-    GETTHEM_MUS,
-    SEARCHN_MUS,
-    POW_MUS,
-    SUSPENSE_MUS,
-    GETTHEM_MUS,
-    SEARCHN_MUS,
-    POW_MUS,
-    SUSPENSE_MUS,
-
-    WARMARCH_MUS,               // Boss level
-    CORNER_MUS,                 // Secret level
+	"GETTHEM",	"SEARCHN",	"POW",		"SUSPENSE",	"GETTHEM",
+	"SEARCHN",	"POW",		"SUSPENSE",	"WARMARCH",	"CORNER",
 
     //
     // Episode Two
     //
-    NAZI_OMI_MUS,
-    PREGNANT_MUS,
-    GOINGAFT_MUS,
-    HEADACHE_MUS,
-    NAZI_OMI_MUS,
-    PREGNANT_MUS,
-    HEADACHE_MUS,
-    GOINGAFT_MUS,
-
-    WARMARCH_MUS,               // Boss level
-    DUNGEON_MUS,                // Secret level
+    "NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
+    "PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
 
     //
     // Episode Three
     //
-    INTROCW3_MUS,
-    NAZI_RAP_MUS,
-    TWELFTH_MUS,
-    ZEROHOUR_MUS,
-    INTROCW3_MUS,
-    NAZI_RAP_MUS,
-    TWELFTH_MUS,
-    ZEROHOUR_MUS,
-
-    ULTIMATE_MUS,               // Boss level
-    PACMAN_MUS,                 // Secret level
+    "INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
+    "NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"PACMAN",
 
     //
     // Episode Four
     //
-    GETTHEM_MUS,
-    SEARCHN_MUS,
-    POW_MUS,
-    SUSPENSE_MUS,
-    GETTHEM_MUS,
-    SEARCHN_MUS,
-    POW_MUS,
-    SUSPENSE_MUS,
-
-    WARMARCH_MUS,               // Boss level
-    CORNER_MUS,                 // Secret level
+    "GETTHEM",	"SEARCHN",	"POW",		"SUSPENSE",	"GETTHEM",
+    "SEARCHN",	"POW",		"SUSPENSE",	"WARMARCH",	"CORNER",
 
     //
     // Episode Five
     //
-    NAZI_OMI_MUS,
-    PREGNANT_MUS,
-    GOINGAFT_MUS,
-    HEADACHE_MUS,
-    NAZI_OMI_MUS,
-    PREGNANT_MUS,
-    HEADACHE_MUS,
-    GOINGAFT_MUS,
-
-    WARMARCH_MUS,               // Boss level
-    DUNGEON_MUS,                // Secret level
+    "NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
+    "PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
 
     //
     // Episode Six
     //
-    INTROCW3_MUS,
-    NAZI_RAP_MUS,
-    TWELFTH_MUS,
-    ZEROHOUR_MUS,
-    INTROCW3_MUS,
-    NAZI_RAP_MUS,
-    TWELFTH_MUS,
-    ZEROHOUR_MUS,
-
-    ULTIMATE_MUS,               // Boss level
-    FUNKYOU_MUS                 // Secret level
+    "INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
+    "NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"FUNKYOU"
 #else
 
     //////////////////////////////////////////////////////////////
@@ -268,32 +212,17 @@ int songs[] = {
     // SPEAR OF DESTINY TRACKS
     //
     //////////////////////////////////////////////////////////////
-    XTIPTOE_MUS,
-    XFUNKIE_MUS,
-    XDEATH_MUS,
-    XGETYOU_MUS,                // DON'T KNOW
-    ULTIMATE_MUS,               // Trans Gr�sse
+    "XTIPTOE",	"XFUNKIE",	"XDEATH",	"XGETYOU",	"ULTIMATE",	// Trans Gr�sse
 
-    DUNGEON_MUS,
-    GOINGAFT_MUS,
-    POW_MUS,
-    TWELFTH_MUS,
-    ULTIMATE_MUS,               // Barnacle Wilhelm BOSS
+    "DUNGEON",	"GOINGAFT",	"POW",		"TWELFTH",	"ULTIMATE",	// Barnacle Wilhelm BOSS
 
-    NAZI_OMI_MUS,
-    GETTHEM_MUS,
-    SUSPENSE_MUS,
-    SEARCHN_MUS,
-    ZEROHOUR_MUS,
-    ULTIMATE_MUS,               // Super Mutant BOSS
+    "NAZI_OMI",	"GETTHEM",	"SUSPENSE",	"SEARCHN",	"ZEROHOUR",	"ULTIMATE",	// Super Mutant BOSS
 
-    XPUTIT_MUS,
-    ULTIMATE_MUS,               // Death Knight BOSS
+    "XPUTIT",	"ULTIMATE",	// Death Knight BOSS
 
-    XJAZNAZI_MUS,               // Secret level
-    XFUNKIE_MUS,                // Secret level (DON'T KNOW)
+    "XJAZNAZI",	"XFUNKIE",	// Secret level
 
-    XEVIL_MUS                   // Angel of Death BOSS
+    "XEVIL"	// Angel of Death BOSS
 #endif
 };
 
@@ -977,8 +906,6 @@ int StopMusic (void)
 {
     int lastoffs = SD_MusicOff ();
 
-    UNCACHEAUDIOCHUNK (STARTMUSIC + lastmusicchunk);
-
     return lastoffs;
 }
 
@@ -996,15 +923,13 @@ int StopMusic (void)
 void StartMusic ()
 {
     SD_MusicOff ();
-    lastmusicchunk = (musicnames) songs[gamestate.mapon + gamestate.episode * 10];
-    SD_StartMusic(LumpRemaper::ConvertMusicIndexToLump(lastmusicchunk));
+    SD_StartMusic(songs[gamestate.mapon + gamestate.episode * 10]);
 }
 
 void ContinueMusic (int offs)
 {
     SD_MusicOff ();
-    lastmusicchunk = (musicnames) songs[gamestate.mapon + gamestate.episode * 10];
-    SD_ContinueMusic(STARTMUSIC + lastmusicchunk, offs);
+    SD_ContinueMusic(songs[gamestate.mapon + gamestate.episode * 10], offs);
 }
 
 /*

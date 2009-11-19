@@ -1,3 +1,7 @@
+November 19th, 2009
+-----------------------------
+- I believe I got the rest of the old sound stuff out.
+
 November 18th, 2009
 -----------------------------
 - All sounds now use the new resource system.

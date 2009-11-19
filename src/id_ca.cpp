@@ -59,7 +59,6 @@ int     mapon;
 
 word    *mapsegs[MAPPLANES];
 static maptype* mapheaderseg[NUMMAPS];
-byte    *audiosegs[NUMSNDCHUNKS];
 
 word    RLEWtag;
 
@@ -74,18 +73,12 @@ int     numEpisodesMissing = 0;
 */
 
 char extension[5]; // Need a string, not constant to change cache files
-char audioext[5];
 static const char mheadname[] = "maphead.";
 static const char mfilename[] = "maptemp.";
-static const char aheadname[] = "audiohed.";
-static const char afilename[] = "audiot.";
 
 void CA_CannotOpen(const char *string);
 
-static int32_t* audiostarts; // array of offsets in audio / audiot
-
 int    maphandle = -1;              // handle to MAPTEMP / GAMEMAPS
-int    audiohandle = -1;            // handle to AUDIOT / AUDIO
 
 SDMode oldsoundmode;
 
@@ -422,44 +415,6 @@ void CAL_SetupMapFile (void)
     }
 }
 
-
-//==========================================================================
-
-
-/*
-======================
-=
-= CAL_SetupAudioFile
-=
-======================
-*/
-
-void CAL_SetupAudioFile (void)
-{
-    char fname[13];
-
-//
-// load audiohed.ext (offsets for audio file)
-//
-    strcpy(fname,aheadname);
-    strcat(fname,audioext);
-
-    void* ptr;
-    if (!CA_LoadFile(fname, &ptr))
-        CA_CannotOpen(fname);
-    audiostarts = (int32_t*)ptr;
-
-//
-// open the data file
-//
-    strcpy(fname,afilename);
-    strcat(fname,audioext);
-
-    audiohandle = open(fname, O_RDONLY | O_BINARY);
-    if (audiohandle == -1)
-        CA_CannotOpen(fname);
-}
-
 //==========================================================================
 
 
@@ -481,7 +436,6 @@ void CA_Startup (void)
 #endif
 
     CAL_SetupMapFile ();
-    CAL_SetupAudioFile ();
 
     mapon = -1;
 }
@@ -505,53 +459,7 @@ void CA_Shutdown (void)
 
     if(maphandle != -1)
         close(maphandle);
-    if(audiohandle != -1)
-        close(audiohandle);
-
-    switch(oldsoundmode)
-    {
-        case sdm_Off:
-            return;
-        case sdm_PC:
-            start = STARTPCSOUNDS;
-            break;
-        case sdm_AdLib:
-            start = STARTADLIBSOUNDS;
-            break;
-    }
-
-    for(i=0; i<NUMSOUNDS; i++,start++)
-        UNCACHEAUDIOCHUNK(start);
 }
-
-//===========================================================================
-
-/*
-======================
-=
-= CA_CacheAudioChunk
-=
-======================
-*/
-
-int32_t CA_CacheAudioChunk (int chunk)
-{
-    int32_t pos = audiostarts[chunk];
-    int32_t size = audiostarts[chunk+1]-pos;
-
-    if (audiosegs[chunk])
-        return size;                        // already in memory
-
-    audiosegs[chunk]=(byte *) malloc(size);
-    CHECKMALLOCRESULT(audiosegs[chunk]);
-
-    lseek(audiohandle,pos,SEEK_SET);
-    read(audiohandle,audiosegs[chunk],size);
-
-    return size;
-}
-
-//===========================================================================
 
 //==========================================================================
 
