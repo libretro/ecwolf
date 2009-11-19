@@ -638,7 +638,7 @@ LevelCompleted (void)
                 x = 36 - (int) strlen(tempstr) * 2;
                 Write (x, 7, tempstr);
                 if (!(i % (PAR_AMOUNT / 10)))
-                    SD_PlaySound (ENDBONUS1SND);
+                    SD_PlaySound ("misc/end_bonus1");
                 VW_UpdateScreen ();
                 while (SD_SoundPlaying ())
                     BJ_Breathe ();
@@ -648,7 +648,7 @@ LevelCompleted (void)
 
             VW_UpdateScreen ();
 
-            SD_PlaySound (ENDBONUS2SND);
+            SD_PlaySound ("misc/end_bonus2");
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
         }
@@ -669,7 +669,7 @@ LevelCompleted (void)
             x = RATIOXX - (int) strlen(tempstr) * 2;
             Write (x, 14, tempstr);
             if (!(i % 10))
-                SD_PlaySound (ENDBONUS1SND);
+                SD_PlaySound ("misc/end_bonus1");
             VW_UpdateScreen ();
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -686,16 +686,16 @@ LevelCompleted (void)
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
             Write (x, 7, tempstr);
             VW_UpdateScreen ();
-            SD_PlaySound (PERCENT100SND);
+            SD_PlaySound ("misc/100percent");
         }
         else if (!ratio)
         {
             VW_WaitVBL (VBLWAIT);
             SD_StopSound ();
-            SD_PlaySound (NOBONUSSND);
+            SD_PlaySound ("misc/no_bonus");
         }
         else
-            SD_PlaySound (ENDBONUS2SND);
+            SD_PlaySound ("misc/end_bonus2");
 
         VW_UpdateScreen ();
         while (SD_SoundPlaying ())
@@ -711,7 +711,7 @@ LevelCompleted (void)
             x = RATIOXX - (int) strlen(tempstr) * 2;
             Write (x, 16, tempstr);
             if (!(i % 10))
-                SD_PlaySound (ENDBONUS1SND);
+                SD_PlaySound ("misc/end_bonus1");
             VW_UpdateScreen ();
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -729,16 +729,16 @@ LevelCompleted (void)
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
             Write (x, 7, tempstr);
             VW_UpdateScreen ();
-            SD_PlaySound (PERCENT100SND);
+            SD_PlaySound ("misc/100percent");
         }
         else if (!ratio)
         {
             VW_WaitVBL (VBLWAIT);
             SD_StopSound ();
-            SD_PlaySound (NOBONUSSND);
+            SD_PlaySound ("misc/no_bonus");
         }
         else
-            SD_PlaySound (ENDBONUS2SND);
+            SD_PlaySound ("misc/end_bonus2");
         VW_UpdateScreen ();
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -753,7 +753,7 @@ LevelCompleted (void)
             x = RATIOXX - (int) strlen(tempstr) * 2;
             Write (x, 18, tempstr);
             if (!(i % 10))
-                SD_PlaySound (ENDBONUS1SND);
+                SD_PlaySound ("misc/end_bonus1");
             VW_UpdateScreen ();
             while (SD_SoundPlaying ())
                 BJ_Breathe ();
@@ -769,16 +769,16 @@ LevelCompleted (void)
             x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
             Write (x, 7, tempstr);
             VW_UpdateScreen ();
-            SD_PlaySound (PERCENT100SND);
+            SD_PlaySound ("misc/100percent");
         }
         else if (!ratio)
         {
             VW_WaitVBL (VBLWAIT);
             SD_StopSound ();
-            SD_PlaySound (NOBONUSSND);
+            SD_PlaySound ("misc/no_bonus");
         }
         else
-            SD_PlaySound (ENDBONUS2SND);
+            SD_PlaySound ("misc/end_bonus2");
         VW_UpdateScreen ();
         while (SD_SoundPlaying ())
             BJ_Breathe ();
@@ -869,7 +869,7 @@ done:   itoa (kr, tempstr, 10);
 #ifdef SPEARDEMO
     if (gamestate.mapon == 1)
     {
-        SD_PlaySound (BONUS1UPSND);
+        SD_PlaySound ("misc/1up");
 
         Message ("This concludes your demo\n"
                  "of Spear of Destiny! Now,\n" "go to your local software\n" "store and buy it!");
@@ -882,7 +882,7 @@ done:   itoa (kr, tempstr, 10);
 #ifdef JAPDEMO
     if (gamestate.mapon == 3)
     {
-        SD_PlaySound (BONUS1UPSND);
+        SD_PlaySound ("misc/1up");
 
         Message ("This concludes your demo\n"
                  "of Wolfenstein 3-D! Now,\n" "go to your local software\n" "store and buy it!");

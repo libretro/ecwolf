@@ -176,13 +176,13 @@ void SliderMenuItem::draw()
 void SliderMenuItem::left()
 {
 	value -= value > 0 ? 1 : 0;
-	SD_PlaySound(MOVEGUN1SND);
+	SD_PlaySound("menu/move1");
 }
 
 void SliderMenuItem::right()
 {
 	value += value < max ? 1 : 0;
-	SD_PlaySound(MOVEGUN1SND);
+	SD_PlaySound("menu/move1");
 }
 
 MultipleChoiceMenuItem::MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, int numOptions, int curOption) : MenuItem("", changeListener), numOptions(numOptions), curOption(curOption)
@@ -247,7 +247,7 @@ void MultipleChoiceMenuItem::left()
 	while(options[curOption] == NULL);
 	setText(options[curOption]);
 	activate();
-	SD_PlaySound(MOVEGUN1SND);
+	SD_PlaySound("menu/move1");
 }
 
 void MultipleChoiceMenuItem::right()
@@ -261,7 +261,7 @@ void MultipleChoiceMenuItem::right()
 	while(options[curOption] == NULL);
 	setText(options[curOption]);
 	activate();
-	SD_PlaySound(MOVEGUN1SND);
+	SD_PlaySound("menu/move1");
 }
 
 TextInputMenuItem::TextInputMenuItem(std::string text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener), bool clearFirst) : MenuItem("", posteditListener), clearFirst(clearFirst), max(max), preeditListener(preeditListener)
@@ -287,7 +287,7 @@ void TextInputMenuItem::activate()
 			MenuItem::activate();
 		else
 		{
-			SD_PlaySound(ESCPRESSEDSND);
+			SD_PlaySound("menu/escape");
 			VWB_Bar(menu->getX() + menu->getIndent() + 1, PrintY + 1, menu->getWidth() - menu->getIndent() - 14, 10, BKGDCOLOR);
 			PrintY--;
 			draw();
@@ -504,14 +504,14 @@ void Menu::drawGun(int x, int &y, int basey)
 	getIndex(curPos)->draw();
 
 	VW_UpdateScreen();
-	SD_PlaySound(MOVEGUN2SND);
+	SD_PlaySound("menu/move2");
 }
 
 void Menu::drawGunHalfStep(int x, int y)
 {
 	VWB_DrawPic (x, y, "M_CURS1");
 	VW_UpdateScreen ();
-	SD_PlaySound (MOVEGUN1SND);
+	SD_PlaySound ("menu/move1");
 	SDL_Delay (8 * 100 / 7);
 }
 
@@ -934,7 +934,7 @@ int Menu::handle()
 	switch (exit)
 	{
 		case 1:
-			SD_PlaySound (SHOOTSND);
+			SD_PlaySound ("menu/activate");
 			getIndex(curPos)->activate();
 			VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 			PrintX = getX() + getIndent();
@@ -944,7 +944,7 @@ int Menu::handle()
 			return curPos;
 
 		case 2:
-			SD_PlaySound(ESCPRESSEDSND);
+			SD_PlaySound("menu/escape");
 			return -1;
 	}
 

@@ -484,7 +484,7 @@ void CloseDoor (int door)
         +doorobjlist[door].tilex)-AREATILE;
     if (areabyplayer[area])
     {
-        PlaySoundLocTile(CLOSEDOORSND,doorobjlist[door].tilex,doorobjlist[door].tiley); // JAB
+        PlaySoundLocTile("doors/close",doorobjlist[door].tilex,doorobjlist[door].tiley); // JAB
     }
 
     doorobjlist[door].action = dr_closing;
@@ -515,7 +515,7 @@ void OperateDoor (int door)
     {
         if ( ! (gamestate.keys & (1 << (lock-dr_lock1) ) ) )
         {
-            SD_PlaySound (NOWAYSND);                // locked
+            SD_PlaySound ("player/usefail");                // locked
             return;
         }
     }
@@ -599,7 +599,7 @@ void DoorOpening (int door)
                 ConnectAreas ();
 
             if (areabyplayer[area1])
-                PlaySoundLocTile(OPENDOORSND,doorobjlist[door].tilex,doorobjlist[door].tiley);  // JAB
+                PlaySoundLocTile("doors/open",doorobjlist[door].tilex,doorobjlist[door].tiley);  // JAB
         }
     }
 
@@ -768,7 +768,7 @@ void PushWall (int checkx, int checky, int dir)
 
     if (actorat[checkx+dx][checky+dy])
     {
-        SD_PlaySound (NOWAYSND);
+        SD_PlaySound ("player/usefail");
         return;
     }
     actorat[checkx+dx][checky+dy] = (objtype *)(uintptr_t) (tilemap[checkx+dx][checky+dy] = oldtile);
@@ -785,7 +785,7 @@ void PushWall (int checkx, int checky, int dir)
     *(mapsegs[1]+(pwally<<mapshift)+pwallx) = 0;   // remove P tile info
     *(mapsegs[0]+(pwally<<mapshift)+pwallx) = *(mapsegs[0]+(player->tiley<<mapshift)+player->tilex); // set correct floorcode (BrotherTank's fix)
 
-    SD_PlaySound (PUSHWALLSND);
+    SD_PlaySound ("world/pushwall");
 }
 
 

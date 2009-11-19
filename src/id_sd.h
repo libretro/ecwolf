@@ -125,6 +125,62 @@ extern	int				AdlibVolume;
 extern	int				MusicVolume;
 extern	int				SoundVolume;
 
+enum SoundChannel
+{
+	SD_GENERIC = -1,
+	SD_WEAPONS,
+	SD_BOSSWEAPONS
+};
+
+class SoundInformation;
+
+class SoundIndex
+{
+	public:
+		enum Type
+		{
+			DIGITAL,
+			ADLIB,
+			PCSPEAKER
+		};
+
+		SoundIndex();
+		SoundIndex(const SoundIndex &other);
+		~SoundIndex();
+
+		byte*			GetData(Type type=ADLIB) const { return data[type]; }
+		unsigned short	GetPriority() const { return priority; }
+		bool			HasType(Type type=ADLIB) const { return lump[type] != -1; }
+		bool			IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1; }
+
+		const SoundIndex &operator= (const SoundIndex &other);
+	protected:
+		byte*			data[3];
+		int				lump[3];
+		unsigned short	priority;
+
+		friend class SoundInformation;
+};
+
+#include <map>
+#include <string>
+class SoundInformation
+{
+	public:
+		SoundInformation();
+
+		void				Init();
+		const SoundIndex	&operator[] (const char* logical) const;
+
+	protected:
+		void	ParseSoundInformation(int lumpNum);
+
+	private:
+		SoundIndex							nullIndex;
+		std::map<std::string, SoundIndex>	soundMap;
+};
+extern SoundInformation	SoundInfo;
+
 #define GetTimeCount()  ((SDL_GetTicks()*7)/100)
 
 inline void Delay(int wolfticks)
@@ -138,7 +194,8 @@ extern  void    SD_Startup(void),
 
 extern  int     SD_GetChannelForDigi(int which);
 extern  void    SD_PositionSound(int leftvol,int rightvol);
-extern  boolean SD_PlaySound(soundnames sound);
+//extern  boolean SD_PlaySound(soundnames sound);
+extern  boolean SD_PlaySound(const char* sound);
 extern  void    SD_SetPosition(int channel, int leftvol,int rightvol);
 extern  void    SD_StopSound(void),
                 SD_WaitSoundDone(void);
@@ -156,7 +213,9 @@ extern  word    SD_SoundPlaying(void);
 
 extern  void    SD_SetDigiDevice(SDSMode);
 extern  void	SD_PrepareSound(int which);
+extern  byte*	SD_PrepareSoundLump(int which);
 extern  int     SD_PlayDigitized(word which,int leftpos,int rightpos);
+extern  int     SD_PlayDigitizedLump(const SoundIndex &which,int leftpos,int rightpos);
 extern  void    SD_StopDigitized(void);
 
 #endif

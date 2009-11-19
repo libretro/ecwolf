@@ -629,7 +629,7 @@ void CheckKeys (void)
 			NewViewSize(viewsize-1);
 		if(Keyboard[sc_Equals] || Keyboard[sc_Minus])
 		{
-			SD_PlaySound(HITWALLSND);
+			SD_PlaySound("world/hitwall");
 			DrawPlayScreen();
 			changeSize = false;
 		}
@@ -647,12 +647,12 @@ void CheckKeys (void)
         if (godmode)
         {
             Message ("God mode OFF");
-            SD_PlaySound (NOBONUSSND);
+            SD_PlaySound ("misc/no_bonus");
         }
         else
         {
             Message ("God mode ON");
-            SD_PlaySound (ENDBONUS2SND);
+            SD_PlaySound ("misc/end_bonus2");
         }
 
         IN_Ack ();

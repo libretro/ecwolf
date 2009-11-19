@@ -53,6 +53,7 @@ add_executable(../ecwolf
 	resourcefiles/file_lump.cpp
 	resourcefiles/file_audiot.cpp
 	resourcefiles/file_vgagraph.cpp
+	resourcefiles/file_vswap.cpp
 	resourcefiles/file_wad.cpp
 	resourcefiles/file_zip.cpp
 	config.cpp
@@ -70,6 +71,7 @@ add_executable(../ecwolf
 	lumpremap.cpp
 	m_classes.cpp
 	scanner.cpp
+	sndinfo.cpp
 	w_wad.cpp
 	wl_act1.cpp
 	wl_act2.cpp

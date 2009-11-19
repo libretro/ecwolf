@@ -543,7 +543,7 @@ void GiveExtraMan (void)
     if (gamestate.lives<9)
         gamestate.lives++;
     DrawLives ();
-    SD_PlaySound (BONUS1UPSND);
+    SD_PlaySound ("misc/end_bonus1");
 }
 
 //===========================================================================
@@ -722,7 +722,7 @@ void GetBonus (statobj_t *check)
             if (gamestate.health == 100)
                 return;
 
-            SD_PlaySound (HEALTH2SND);
+            SD_PlaySound ("misc/medkit_pickup");
             HealSelf (25);
             break;
 
@@ -731,26 +731,26 @@ void GetBonus (statobj_t *check)
         case    bo_key3:
         case    bo_key4:
             GiveKey (check->itemnumber - bo_key1);
-            SD_PlaySound (GETKEYSND);
+            SD_PlaySound ("misc/key_pickup");
             break;
 
         case    bo_cross:
-            SD_PlaySound (BONUS1SND);
+            SD_PlaySound ("treasure/cross/pickup");
             GivePoints (100);
             gamestate.treasurecount++;
             break;
         case    bo_chalice:
-            SD_PlaySound (BONUS2SND);
+            SD_PlaySound ("treasure/chalice/pickup");
             GivePoints (500);
             gamestate.treasurecount++;
             break;
         case    bo_bible:
-            SD_PlaySound (BONUS3SND);
+            SD_PlaySound ("treasure/bible/pickup");
             GivePoints (1000);
             gamestate.treasurecount++;
             break;
         case    bo_crown:
-            SD_PlaySound (BONUS4SND);
+            SD_PlaySound ("treasure/crown/pickup");
             GivePoints (5000);
             gamestate.treasurecount++;
             break;
@@ -759,14 +759,14 @@ void GetBonus (statobj_t *check)
             if (gamestate.ammo == 99)
                 return;
 
-            SD_PlaySound (GETAMMOSND);
+            SD_PlaySound ("misc/ammo_pickup");
             GiveAmmo (8);
             break;
         case    bo_clip2:
             if (gamestate.ammo == 99)
                 return;
 
-            SD_PlaySound (GETAMMOSND);
+            SD_PlaySound ("misc/ammo_pickup");
             GiveAmmo (4);
             break;
 
@@ -775,17 +775,17 @@ void GetBonus (statobj_t *check)
             if (gamestate.ammo == 99)
                 return;
 
-            SD_PlaySound (GETAMMOBOXSND);
+            SD_PlaySound ("misc/ammobox_pickup");
             GiveAmmo (25);
             break;
 #endif
 
         case    bo_machinegun:
-            SD_PlaySound (GETMACHINESND);
+            SD_PlaySound ("weapon/machine/pickup");
             GiveWeapon (wp_machinegun);
             break;
         case    bo_chaingun:
-            SD_PlaySound (GETGATLINGSND);
+            SD_PlaySound ("weapon/gatling/pickup");
             facetimes = 38;
             GiveWeapon (wp_chaingun);
 
@@ -795,7 +795,7 @@ void GetBonus (statobj_t *check)
             break;
 
         case    bo_fullheal:
-            SD_PlaySound (BONUS1UPSND);
+            SD_PlaySound ("misc/1up");
             HealSelf (99);
             GiveAmmo (25);
             GiveExtraMan ();
@@ -806,7 +806,7 @@ void GetBonus (statobj_t *check)
             if (gamestate.health == 100)
                 return;
 
-            SD_PlaySound (HEALTH1SND);
+            SD_PlaySound ("misc/health_pickup");
             HealSelf (10);
             break;
 
@@ -814,7 +814,7 @@ void GetBonus (statobj_t *check)
             if (gamestate.health == 100)
                 return;
 
-            SD_PlaySound (HEALTH1SND);
+            SD_PlaySound ("misc/health_pickup");
             HealSelf (4);
             break;
 
@@ -822,7 +822,7 @@ void GetBonus (statobj_t *check)
             if (gamestate.health >10)
                 return;
 
-            SD_PlaySound (SLURPIESND);
+            SD_PlaySound ("misc/slurpie");
             HealSelf (1);
             break;
 
@@ -964,7 +964,7 @@ void ClipMove (objtype *ob, int32_t xmove, int32_t ymove)
 #endif
 
     if (!SD_SoundPlaying())
-        SD_PlaySound (HITWALLSND);
+        SD_PlaySound ("world/hitwall");
 
     ob->x = basex+xmove;
     ob->y = basey;
@@ -1168,7 +1168,7 @@ void Cmd_Use (void)
             playstate = ex_secretlevel;
         else
             playstate = ex_completed;
-        SD_PlaySound (LEVELDONESND);
+        SD_PlaySound ("world/level_done");
         SD_WaitSoundDone();
     }
     else if (!buttonheld[bt_use] && doornum & 0x80)
@@ -1177,7 +1177,7 @@ void Cmd_Use (void)
         OperateDoor (doornum & ~0x80);
     }
     else
-        SD_PlaySound (DONOTHINGSND);
+        SD_PlaySound ("misc/do_nothing");
 }
 
 /*
@@ -1235,7 +1235,7 @@ void    KnifeAttack (objtype *ob)
     objtype *check,*closest;
     int32_t  dist;
 
-    SD_PlaySound (ATKKNIFESND);
+    SD_PlaySound ("weapon/knife/attack");
     // actually fire
     dist = 0x7fffffff;
     closest = NULL;
@@ -1274,13 +1274,13 @@ void    GunAttack (objtype *ob)
     switch (gamestate.weapon)
     {
         case wp_pistol:
-            SD_PlaySound (ATKPISTOLSND);
+            SD_PlaySound ("weapon/pistol/attack");
             break;
         case wp_machinegun:
-            SD_PlaySound (ATKMACHINEGUNSND);
+            SD_PlaySound ("weapon/machine/attack");
             break;
         case wp_chaingun:
-            SD_PlaySound (ATKGATLINGSND);
+            SD_PlaySound ("weapon/gatling/fire");
             break;
     }
 

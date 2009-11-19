@@ -309,7 +309,7 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	if(which >= 6-numEpisodesMissing)
 	{
-		SD_PlaySound(NOWAYSND);
+		SD_PlaySound("player/usefail");
 		Message("Please select \"Read This!\"\n"
 				"from the Options menu to\n"
 				"find out how to order this\n" "episode from Apogee.");
@@ -1286,7 +1286,7 @@ int
 Confirm (const char *string)
 {
     int xit = 0, x, y, tick = 0, lastBlinkTime;
-    int whichsnd[2] = { ESCPRESSEDSND, SHOOTSND };
+    const char* whichsnd[2] = { "menu/escape", "menu/activate" };
     ControlInfo ci;
 
     Message (string);
@@ -1347,7 +1347,7 @@ Confirm (const char *string)
     IN_ClearKeysDown ();
     WaitKeyUp ();
 
-    SD_PlaySound ((soundnames) whichsnd[xit]);
+    SD_PlaySound (whichsnd[xit]);
 
     return xit;
 }
@@ -1361,7 +1361,8 @@ Confirm (const char *string)
 int
 GetYorN (int x, int y, int pic)
 {
-    int xit = 0, whichsnd[2] = { ESCPRESSEDSND, SHOOTSND };
+    int xit = 0;
+	const char* whichsnd[2] = { "menu/escape", "menu/activate" };
 
 
     CA_CacheGrChunk (pic);
@@ -1535,7 +1536,7 @@ DrawStripes (int y)
 void
 ShootSnd (void)
 {
-    SD_PlaySound (SHOOTSND);
+    SD_PlaySound ("menu/activate");
 }
 
 

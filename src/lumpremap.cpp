@@ -80,7 +80,6 @@ void LumpRemaper::DoRemap()
 					}
 					else if(lump->Namespace == ns_sounds && i-temp2 < digitalsounds.size())
 					{
-						printf("%d->%s\n", i, digitalsounds[i-temp2].c_str());
 						lump->LumpNameSetup(digitalsounds[i-temp2].c_str());
 					}
 					break;

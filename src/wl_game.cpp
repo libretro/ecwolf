@@ -178,12 +178,12 @@ SetSoundLoc(fixed gx,fixed gy)
 =
 ==========================
 */
-void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
+void PlaySoundLocGlobal(const char* s,fixed gx,fixed gy)
 {
     SetSoundLoc(gx, gy);
     SD_PositionSound(leftchannel, rightchannel);
 
-    int channel = SD_PlaySound((soundnames) s);
+    int channel = SD_PlaySound(s);
     if(channel)
     {
         channelSoundPos[channel - 1].globalsoundx = gx;
@@ -1201,7 +1201,7 @@ void Died (void)
     }
 
     gamestate.weapon = (weapontype) -1;                     // take away weapon
-    SD_PlaySound (PLAYERDEATHSND);
+    SD_PlaySound ("player/death");
 
     //
     // swing around to face attacker
@@ -1388,7 +1388,7 @@ startplayloop:
         if (spearflag)
         {
             SD_StopSound();
-            SD_PlaySound(GETSPEARSND);
+            SD_PlaySound("misc/spear_pickup");
             if (DigiMode != sds_Off)
             {
                 Delay(150);

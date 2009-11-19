@@ -1827,6 +1827,7 @@ int main (int argc, char *argv[])
 //	WL_AddFile(vgadict);
 	WL_AddFile("audiot.wl6");
 	WL_AddFile("vgagraph.wl6");
+	WL_AddFile("vswap.wl6");
 
 #if defined(_arch_dreamcast)
     DC_Main();
