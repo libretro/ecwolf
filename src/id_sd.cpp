@@ -75,9 +75,6 @@ globalsoundpos channelSoundPos[MIX_CHANNELS];
         SDMode          SoundMode;
         SMMode          MusicMode;
         SDSMode         DigiMode;
-static  byte          **SoundTable;
-        int             DigiMap[LASTSOUND];
-        int             DigiChannel[STARTMUSIC - STARTDIGISOUNDS];
 		int				AdlibVolume=MAX_VOLUME;
 		int				MusicVolume=MAX_VOLUME;
 		int				SoundVolume=MAX_VOLUME;
@@ -496,17 +493,6 @@ SD_StopDigitized(void)
     }
 }
 
-int SD_GetChannelForDigi(int which)
-{
-    if(DigiChannel[which] != -1) return DigiChannel[which];
-
-    int channel = Mix_GroupAvailable(1);
-    if(channel == -1) channel = Mix_GroupOldest(1);
-    if(channel == -1)           // All sounds stopped in the meantime?
-        return Mix_GroupAvailable(1);
-    return channel;
-}
-
 void SD_SetPosition(int channel, int leftpos, int rightpos)
 {
     if((leftpos < 0) || (leftpos > 15) || (rightpos < 0) || (rightpos > 15)
@@ -540,7 +526,7 @@ Sint16 GetSample(float csample, byte *samples, int size)
     return (Sint16) intval;
 }
 
-byte* SD_PrepareSoundLump(int which)
+byte* SD_PrepareSound(int which)
 {
 	int size = Wads.LumpLength(which);
 
@@ -580,86 +566,19 @@ byte* SD_PrepareSoundLump(int which)
 	return reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(wavebuffer, sizeof(headchunk) + sizeof(wavechunk) + destsamples * 2), 1));
 }
 
-void SD_PrepareSound(int which)
-{
-    if(DigiList == NULL)
-        Quit("SD_PrepareSound(%i): DigiList not initialized!\n", which);
-
-    int page = DigiList[which].startpage;
-    int size = DigiList[which].length;
-
-    byte *origsamples = PM_GetSound(page);
-    if(origsamples + size >= PM_GetEnd())
-        Quit("SD_PrepareSound(%i): Sound reaches out of page file!\n", which);
-
-    int destsamples = (int) ((float) size * (float) param_samplerate
-        / (float) ORIGSAMPLERATE);
-
-    byte *wavebuffer = (byte *) malloc(sizeof(headchunk) + sizeof(wavechunk)
-        + destsamples * 2);     // dest are 16-bit samples
-    if(wavebuffer == NULL)
-        Quit("Unable to allocate wave buffer for sound %i!\n", which);
-
-    headchunk head = {{'R','I','F','F'}, 0, {'W','A','V','E'},
-        {'f','m','t',' '}, 0x10, 0x0001, 1, param_samplerate, param_samplerate*2, 2, 16};
-    wavechunk dhead = {{'d', 'a', 't', 'a'}, destsamples*2};
-    head.filelenminus8 = sizeof(head) + destsamples*2;  // (sizeof(dhead)-8 = 0)
-    memcpy(wavebuffer, &head, sizeof(head));
-    memcpy(wavebuffer+sizeof(head), &dhead, sizeof(dhead));
-
-    // alignment is correct, as wavebuffer comes from malloc
-    // and sizeof(headchunk) % 4 == 0 and sizeof(wavechunk) % 4 == 0
-    Sint16 *newsamples = (Sint16 *)(void *) (wavebuffer + sizeof(headchunk)
-        + sizeof(wavechunk));
-    float cursample = 0.F;
-    float samplestep = (float) ORIGSAMPLERATE / (float) param_samplerate;
-    for(int i=0; i<destsamples; i++, cursample+=samplestep)
-    {
-        newsamples[i] = GetSample((float)size * (float)i / (float)destsamples,
-            origsamples, size);
-    }
-    SoundBuffers[which] = wavebuffer;
-
-    SoundChunks[which] = Mix_LoadWAV_RW(SDL_RWFromMem(wavebuffer,
-        sizeof(headchunk) + sizeof(wavechunk) + destsamples * 2), 1);
-}
-
-int SD_PlayDigitized(word which,int leftpos,int rightpos)
+int SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChannel chan)
 {
     if (!DigiMode)
         return 0;
 
-    if (which >= NumDigi)
-        Quit("SD_PlayDigitized: bad sound number %i", which);
-
-    int channel = SD_GetChannelForDigi(which);
-    SD_SetPosition(channel, leftpos,rightpos);
-
-    DigiPlaying = true;
-
-    Mix_Chunk *sample = SoundChunks[which];
-    if(sample == NULL)
-    {
-        printf("SoundChunks[%i] is NULL!\n", which);
-        return 0;
-    }
-
-	Mix_Volume(channel, static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(SoundVolume))));
-    if(Mix_PlayChannel(channel, sample, 0) == -1)
-    {
-        printf("Unable to play sound: %s\n", Mix_GetError());
-        return 0;
-    }
-
-    return channel;
-}
-
-int SD_PlayDigitizedLump(const SoundIndex &which,int leftpos,int rightpos)
-{
-    if (!DigiMode)
-        return 0;
-
-    int channel = SD_GetChannelForDigi(1);
+	int channel = chan;
+	if(chan == SD_GENERIC)
+	{
+		channel = Mix_GroupAvailable(1);
+		if(channel == -1) channel = Mix_GroupOldest(1);
+		if(channel == -1)           // All sounds stopped in the meantime?
+			channel = Mix_GroupAvailable(1);
+	}
     SD_SetPosition(channel, leftpos,rightpos);
 
     DigiPlaying = true;
@@ -757,12 +676,6 @@ SDL_SetupDigi(void)
         size = (size & 0xffff0000) | soundInfoPage[i * 2 + 1];
 
         DigiList[i].length = size;
-    }
-
-    for(i = 0; i < LASTSOUND; i++)
-    {
-        DigiMap[i] = -1;
-        DigiChannel[i] = -1;
     }
 }
 
@@ -977,7 +890,6 @@ SD_SetSoundMode(SDMode mode)
             Quit("SD_SetSoundMode: Invalid sound mode %i", mode);
             return false;
     }
-    SoundTable = &audiosegs[tableoffset];
 
     if (result && (mode != SoundMode))
     {
@@ -1204,90 +1116,8 @@ SD_PositionSound(int leftvol,int rightvol)
 //      SD_PlaySound() - plays the specified sound on the appropriate hardware
 //
 ///////////////////////////////////////////////////////////////////////////
-/*boolean
-SD_PlaySound(soundnames sound)
-{
-    boolean         ispos;
-    SoundCommon     *s;
-    int             lp,rp;
-
-    lp = LeftPosition;
-    rp = RightPosition;
-    LeftPosition = 0;
-    RightPosition = 0;
-
-    ispos = nextsoundpos;
-    nextsoundpos = false;
-
-    if (sound == -1 || (DigiMode == sds_Off && SoundMode == sdm_Off))
-        return 0;
-
-    s = (SoundCommon *) SoundTable[sound];
-
-    if ((SoundMode != sdm_Off) && !s)
-            Quit("SD_PlaySound() - Uncached sound");
-
-    if ((DigiMode != sds_Off) && (DigiMap[sound] != -1))
-    {
-        if ((DigiMode == sds_PC) && (SoundMode == sdm_PC))
-        {
-#ifdef NOTYET
-            if (s->priority < SoundPriority)
-                return 0;
-
-            SDL_PCStopSound();
-
-            SD_PlayDigitized(DigiMap[sound],lp,rp);
-            SoundPositioned = ispos;
-            SoundNumber = sound;
-            SoundPriority = s->priority;
-#else
-            return 0;
-#endif
-        }
-        else
-        {
-#ifdef NOTYET
-            if (s->priority < DigiPriority)
-                return(false);
-#endif
-
-            int channel = SD_PlayDigitized(DigiMap[sound], lp, rp);
-            SoundPositioned = ispos;
-            DigiNumber = sound;
-            DigiPriority = s->priority;
-            return channel + 1;
-        }
-
-        return(true);
-    }
-
-    if (SoundMode == sdm_Off)
-        return 0;
-
-    if (!s->length)
-        Quit("SD_PlaySound() - Zero length sound");
-    if (s->priority < SoundPriority)
-        return 0;
-
-    switch (SoundMode)
-    {
-        case sdm_PC:
-//            SDL_PCPlaySound((PCSound *)s);
-            break;
-        case sdm_AdLib:
-            SDL_ALPlaySound((AdLibSound *)s);
-            break;
-    }
-
-    SoundNumber = sound;
-    SoundPriority = s->priority;
-
-    return 0;
-}*/
-
 boolean
-SD_PlaySound(const char* sound)
+SD_PlaySound(const char* sound, SoundChannel chan)
 {
     boolean         ispos;
     int             lp,rp;
@@ -1315,7 +1145,7 @@ SD_PlaySound(const char* sound)
 
             SDL_PCStopSound();
 
-            SD_PlayDigitized(DigiMap[idx],lp,rp);
+            SD_PlayDigitized(sindex,lp,rp);
             SoundPositioned = ispos;
             SoundNumber = idx;
             SoundPriority = s->priority;
@@ -1330,7 +1160,7 @@ SD_PlaySound(const char* sound)
                 return(false);
 #endif
 
-            int channel = SD_PlayDigitizedLump(sindex, lp, rp);//SD_PlayDigitized(DigiMap[idx], lp, rp);
+            int channel = SD_PlayDigitized(sindex, lp, rp, chan);
             SoundPositioned = ispos;
             DigiNumber = static_cast<soundnames> (0);
             DigiPriority = sindex.GetPriority();

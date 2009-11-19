@@ -3535,13 +3535,13 @@ void T_Shoot (objtype *ob)
         case mechahitlerobj:
         case realhitlerobj:
         case bossobj:
-            PlaySoundLocActor("hans/attack",ob);
+            PlaySoundLocActorBoss("hans/attack",ob);
             break;
         case schabbobj:
             PlaySoundLocActor("schabbs/throw",ob);
             break;
         case fakeobj:
-            PlaySoundLocActor("hans/attack",ob);
+            PlaySoundLocActor("fake/attack",ob);
             break;
 #endif
         default:

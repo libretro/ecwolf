@@ -50,9 +50,4 @@ static inline uint16_t *PM_GetSprite(int shapenum)
     return (uint16_t *) (void *) PM_GetPage(PMSpriteStart + shapenum);
 }
 
-static inline byte *PM_GetSound(int soundpagenum)
-{
-    return PM_GetPage(PMSoundStart + soundpagenum);
-}
-
 #endif

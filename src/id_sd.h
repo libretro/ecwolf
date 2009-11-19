@@ -117,8 +117,6 @@ extern  boolean         AdLibPresent,
 extern  SDMode          SoundMode;
 extern  SDSMode         DigiMode;
 extern  SMMode          MusicMode;
-extern  int             DigiMap[];
-extern  int             DigiChannel[];
 #define MAX_VOLUME		20
 #define MULTIPLY_VOLUME(v)((double(v)+0.3)/(MAX_VOLUME+0.3))
 extern	int				AdlibVolume;
@@ -192,10 +190,8 @@ inline void Delay(int wolfticks)
 extern  void    SD_Startup(void),
                 SD_Shutdown(void);
 
-extern  int     SD_GetChannelForDigi(int which);
 extern  void    SD_PositionSound(int leftvol,int rightvol);
-//extern  boolean SD_PlaySound(soundnames sound);
-extern  boolean SD_PlaySound(const char* sound);
+extern  boolean SD_PlaySound(const char* sound,SoundChannel chan=SD_GENERIC);
 extern  void    SD_SetPosition(int channel, int leftvol,int rightvol);
 extern  void    SD_StopSound(void),
                 SD_WaitSoundDone(void);
@@ -212,10 +208,8 @@ extern  boolean SD_SetMusicMode(SMMode mode);
 extern  word    SD_SoundPlaying(void);
 
 extern  void    SD_SetDigiDevice(SDSMode);
-extern  void	SD_PrepareSound(int which);
-extern  byte*	SD_PrepareSoundLump(int which);
-extern  int     SD_PlayDigitized(word which,int leftpos,int rightpos);
-extern  int     SD_PlayDigitizedLump(const SoundIndex &which,int leftpos,int rightpos);
+extern  byte*	SD_PrepareSound(int which);
+extern  int     SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChannel chan=SD_GENERIC);
 extern  void    SD_StopDigitized(void);
 
 #endif

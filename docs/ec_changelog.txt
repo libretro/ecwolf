@@ -1,6 +1,7 @@
 November 18th, 2009
 -----------------------------
 - All sounds now use the new resource system.
+- Removed a large portion of the old sound code which is now unused.
 
 November 17th, 2009
 -----------------------------

@@ -178,12 +178,12 @@ SetSoundLoc(fixed gx,fixed gy)
 =
 ==========================
 */
-void PlaySoundLocGlobal(const char* s,fixed gx,fixed gy)
+void PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan)
 {
     SetSoundLoc(gx, gy);
     SD_PositionSound(leftchannel, rightchannel);
 
-    int channel = SD_PlaySound(s);
+    int channel = SD_PlaySound(s, static_cast<SoundChannel> (chan));
     if(channel)
     {
         channelSoundPos[channel - 1].globalsoundx = gx;
@@ -777,13 +777,6 @@ void SetupGameLevel (void)
             }
         }
     }
-
-
-//
-// have the caching manager load and purge stuff to make sure all marks
-// are in memory
-//
-    CA_LoadAllSounds ();
 }
 
 

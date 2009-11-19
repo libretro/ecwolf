@@ -1064,9 +1064,6 @@ SetupControlPanel (void)
     if(screenHeight % 200 != 0)
         VL_ClearScreen(0);
 
-    if (!ingame)
-        CA_LoadAllSounds ();
-
     //
     // CENTER MOUSE
     //

@@ -1235,7 +1235,7 @@ void    KnifeAttack (objtype *ob)
     objtype *check,*closest;
     int32_t  dist;
 
-    SD_PlaySound ("weapon/knife/attack");
+    SD_PlaySound ("weapon/knife/attack", SD_WEAPONS);
     // actually fire
     dist = 0x7fffffff;
     closest = NULL;
@@ -1274,13 +1274,13 @@ void    GunAttack (objtype *ob)
     switch (gamestate.weapon)
     {
         case wp_pistol:
-            SD_PlaySound ("weapon/pistol/attack");
+            SD_PlaySound ("weapon/pistol/attack", SD_WEAPONS);
             break;
         case wp_machinegun:
-            SD_PlaySound ("weapon/machine/attack");
+            SD_PlaySound ("weapon/machine/attack", SD_WEAPONS);
             break;
         case wp_chaingun:
-            SD_PlaySound ("weapon/gatling/fire");
+            SD_PlaySound ("weapon/gatling/fire", SD_WEAPONS);
             break;
     }
 
