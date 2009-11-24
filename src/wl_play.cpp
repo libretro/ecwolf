@@ -465,15 +465,15 @@ void PollControls (void)
 //
     max = 100 * tics;
     min = -max;
-    if (controlx > max)
-        controlx = max;
-    else if (controlx < min)
-        controlx = min;
+    //if (controlx > max)
+    //    controlx = max;
+    //else if (controlx < min)
+    //    controlx = min;
 
-    if (controly > max)
-        controly = max;
-    else if (controly < min)
-        controly = min;
+    //if (controly > max)
+    //    controly = max;
+    //else if (controly < min)
+    //    controly = min;
 
     if (demorecord)
     {

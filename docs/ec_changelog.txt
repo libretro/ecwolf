@@ -1,3 +1,13 @@
+November 23th, 2009
+-----------------------------
+- Removed mouse movement speed limiter.  I don't know if there are any side
+  effects to this.
+- Move the jukebox to be after the signon screen.  This is because I was unable
+  to access it on my system where it was.  So press M at the signon screen to
+  go to the jukebox.
+- Removed the duplicate ULTIMATE on the jukebox.  Added all missing tracks.
+- Fixed: Strafing didn't apply autorun.
+
 November 19th, 2009
 -----------------------------
 - I believe I got the rest of the old sound stuff out.

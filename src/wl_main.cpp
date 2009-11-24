@@ -934,18 +934,27 @@ static struct Song
 	{"Suspense",			"SUSPENSE"},
 	{"War March",			"WARMARCH"},
 	{"Around The Corner!",	"CORNER"},
+	{"Nazi Anthem (Title)",	"NAZI_NOR"},
 	{"Nazi Anthem",			"NAZI_OMI"},
 	{"Lurking...",			"PREGNANT"},
 	{"Going After Hitler",	"GOINGAFT"},
 	{"Pounding Headache",	"HEADACHE"},
 	{"Into the Dungeons",	"DUNGEON"},
-	{"Ultimate Conquest",	"ULTIMATE"},
 	{"Kill the S.O.B.",		"INTROCW3"},
 	{"The Nazi Rap",		"NAZI_RAP"},
 	{"Twelfth Hour",		"TWELFTH"},
 	{"Zero Hour",			"ZEROHOUR"},
 	{"Ultimate Conquest",	"ULTIMATE"},
 	{"Wolfpack",			"PACMAN"},
+	{"Hitler Waltz",		"HITLWLTZ"},
+	{"Salute",				"SALUTE"},
+	{"Victors",				"VICTORS"},
+	{"Wondering About My...",	"WONDERIN"},
+	{"Funk You",			"FUNKYOU"},
+	{"Intermission",		"ENDLEVEL"},
+	{"Roster",				"ROSTER"},
+	{"You're a Hero",		"URAHERO"},
+	{"Victory March",		"VICMARCH"},
 #else
 	{"Funky Colonel Bill",		"XFUNKIE"},
 	{"Death To The Nazis",		"XDEATH"},
@@ -1080,18 +1089,6 @@ static void InitGame()
     SetupSaveGames();
 
 //
-// HOLDING DOWN 'M' KEY?
-//
-#ifndef SPEARDEMO
-    if (Keyboard[sc_M])
-    {
-        DoJukebox();
-        didjukebox=true;
-    }
-    else
-#endif
-
-//
 // draw intro screen stuff
 //
     IntroScreen ();
@@ -1114,6 +1111,17 @@ static void InitGame()
     if(!didjukebox)
 #endif
         FinishSignon();
+
+//
+// HOLDING DOWN 'M' KEY?
+//
+#ifndef SPEARDEMO
+    if (Keyboard[sc_M])
+    {
+        DoJukebox();
+        didjukebox=true;
+    }
+#endif
 
 #ifdef NOTYET
     vdisp = (byte *) (0xa0000+PAGE1START);

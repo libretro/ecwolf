@@ -180,7 +180,7 @@ void ControlMovement (objtype *ob)
         angle = ob->angle + ANGLES/4;
         if(angle >= ANGLES)
             angle -= ANGLES;
-        if(buttonstate[bt_run])
+        if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
             Thrust(angle, RUNMOVE * MOVESCALE * tics);
         else
             Thrust(angle, BASEMOVE * MOVESCALE * tics);
@@ -191,7 +191,7 @@ void ControlMovement (objtype *ob)
         angle = ob->angle - ANGLES/4;
         if(angle < 0)
             angle += ANGLES;
-        if(buttonstate[bt_run])
+        if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
             Thrust(angle, RUNMOVE * MOVESCALE * tics );
         else
             Thrust(angle, BASEMOVE * MOVESCALE * tics);
