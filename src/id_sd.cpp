@@ -1199,8 +1199,8 @@ SD_SoundPlaying(void)
             break;
     }
 
-    if (SoundPlaying.IsNotEmpty())
-        return true;
+    if (result)
+        return SoundPlaying.IsNotEmpty();
     else
         return false;
 }
