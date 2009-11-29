@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.4)
 project(ECWOLF)
 
+set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWolf.")
+
 set(LZMA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lzma/C")
 
 find_package(ZLIB)
@@ -23,9 +25,9 @@ add_subdirectory(tools/zipdir)
 add_custom_command( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/ecwolf.pk3
    COMMAND ${CMAKE_BINARY_DIR}/tools/zipdir/zipdir -udf ${CMAKE_CURRENT_SOURCE_DIR}/ecwolf.pk3 ${CMAKE_CURRENT_SOURCE_DIR}/wadsrc
    DEPENDS zipdir )
-	
+
 add_custom_target( pk3 ALL
-	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ecwolf.pk3 )
+	DEPENDS ${OUTPUT_DIR}/ecwolf.pk3 )
 
 add_subdirectory(gdtoa)
 add_subdirectory(lzma)

@@ -475,17 +475,18 @@ void CA_Shutdown (void)
 
 void CA_CacheScreen(const char* chunk)
 {
-	int lumpNum = Wads.GetNumForName(chunk, ns_graphics);
+    const int lumpNum = Wads.GetNumForName(chunk, ns_graphics);
 	if(lumpNum == -1)
 	{
 		printf("\n");
 		exit(0);
 	}
+	int lumpSize = Wads.LumpLength(lumpNum);
 	FWadLump lump = Wads.OpenLumpNum(lumpNum);
 
-	if(Wads.LumpLength(lumpNum) > 64000)
+	if(lumpSize > 64000)
 		lump.Seek(4, SEEK_SET); // Probably a standard image.
-	else if(Wads.LumpLength(lumpNum) < 64000)
+	else if(lumpSize < 64000)
 		return; // Not big enough
 	byte* pic = new byte[64000];
 	lump.Read(pic, 64000);

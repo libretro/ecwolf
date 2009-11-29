@@ -1,3 +1,7 @@
+November 29th, 2009
+-----------------------------
+- Fixed: Somehow the value of lumpNum was changing during the OpenLumpNum call.
+
 November 23th, 2009
 -----------------------------
 - Removed mouse movement speed limiter.  I don't know if there are any side
@@ -37,7 +41,7 @@ August 8th, 2009
 
 August 7th, 2009
 -----------------------------
-- The VGAGRAPH, VGAHEAD, and VGADICT are now loaded by the new resource system 
+- The VGAGRAPH, VGAHEAD, and VGADICT are now loaded by the new resource system
   and given names at run time.
 - The TITEPIC and CREDITS lump are now used. They are 320x200 raw pages similar
   to Heretic's TITLE lump.
@@ -113,7 +117,7 @@ June 16th, 2009
 December 16th, 2008
 -----------------------------
 - Cleaned up some menu source code.
-- Worked on the wolf data maps in preparation to converting the engine to use 
+- Worked on the wolf data maps in preparation to converting the engine to use
   named lumps.
 - Added language lump.
 
@@ -127,18 +131,18 @@ December 11th, 2008
 
 December 9th, 2008
 -----------------------------
-- Re-combined the Adlib slider, only this time with the music volume since I 
-  figured out that the adlib player latched on the music channel.  I really 
+- Re-combined the Adlib slider, only this time with the music volume since I
+  figured out that the adlib player latched on the music channel.  I really
   don't feel like figuring out how to separate them at the moment.
-- Continued work on the Menu code.  In the process I was able to remove quite 
-  a few #ifdef SPEARs!  This means ECWolf will use a little more memory, but 
+- Continued work on the Menu code.  In the process I was able to remove quite
+  a few #ifdef SPEARs!  This means ECWolf will use a little more memory, but
   it is worth it.
 - Tweaked the volume formula.
 
 December 6th, 2008
 -----------------------------
 - Added: Adlib volume slider.
-- Added: Volume sliders.  Their values aren't saved yet but at least they are 
+- Added: Volume sliders.  Their values aren't saved yet but at least they are
   there.
 - Rewrote part of the menu code to use C++ classes.
 - Using Wolf4SDL v1.6 as a base.

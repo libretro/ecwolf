@@ -42,7 +42,7 @@ if(WIN32)
 	)
 endif(WIN32)
 
-add_executable(../ecwolf
+add_executable(ecwolf
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp
 	resourcefiles/file_7z.cpp
@@ -95,6 +95,6 @@ add_executable(../ecwolf
 	${EXTRA_FILES}
 )
 
-add_dependencies(../ecwolf lzma gdtoa)
-
-target_link_libraries(../ecwolf ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} lzma gdtoa)
+add_dependencies(ecwolf lzma gdtoa)
+target_link_libraries(ecwolf ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} lzma gdtoa)
+set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
