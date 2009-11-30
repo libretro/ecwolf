@@ -61,6 +61,7 @@ add_executable(ecwolf
 	files.cpp
 	fmopl.cpp
 	id_ca.cpp
+	id_ca2.cpp
 	id_in.cpp
 	id_pm.cpp
 	id_sd.cpp
@@ -72,7 +73,7 @@ add_executable(ecwolf
 	m_classes.cpp
 	scanner.cpp
 	sndinfo.cpp
-#	tiles.cpp
+	#tiles.cpp
 	w_wad.cpp
 	wl_act1.cpp
 	wl_act2.cpp

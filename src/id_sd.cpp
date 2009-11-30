@@ -86,8 +86,6 @@ static  word                    DigiPriority;
 static  int                     LeftPosition;
 static  int                     RightPosition;
 
-        word                    NumDigi;
-static  digiinfo               *DigiList;
 static  boolean                 DigiPlaying;
 
 //      PC Sound variables
@@ -628,54 +626,6 @@ SD_SetDigiDevice(SDSMode mode)
     }
 }
 
-void
-SDL_SetupDigi(void)
-{
-    // Correct padding enforced by PM_Startup()
-    word *soundInfoPage = (word *) (void *) PM_GetPage(ChunksInFile-1);
-    NumDigi = (word) PM_GetPageSize(ChunksInFile - 1) / 4;
-
-    DigiList = (digiinfo *) malloc(NumDigi * sizeof(digiinfo));
-    int i;
-    for(i = 0; i < NumDigi; i++)
-    {
-        // Calculate the size of the digi from the sizes of the pages between
-        // the start page and the start page of the next sound
-
-        DigiList[i].startpage = soundInfoPage[i * 2];
-        if((int) DigiList[i].startpage >= ChunksInFile - 1)
-        {
-            NumDigi = i;
-            break;
-        }
-
-        int lastPage;
-        if(i < NumDigi - 1)
-        {
-            lastPage = soundInfoPage[i * 2 + 2];
-            if(lastPage == 0 || lastPage + PMSoundStart > ChunksInFile - 1) lastPage = ChunksInFile - 1;
-            else lastPage += PMSoundStart;
-        }
-        else lastPage = ChunksInFile - 1;
-
-        int size = 0;
-        for(int page = PMSoundStart + DigiList[i].startpage; page < lastPage; page++)
-            size += PM_GetPageSize(page);
-
-        // Don't include padding of sound info page, if padding was added
-        if(lastPage == ChunksInFile - 1 && PMSoundInfoPagePadded) size--;
-
-        // Patch lower 16-bit of size with size from sound info page.
-        // The original VSWAP contains padding which is included in the page size,
-        // but not included in the 16-bit size. So we use the more precise value.
-        if((size & 0xffff0000) != 0 && (size & 0xffff) < soundInfoPage[i * 2 + 1])
-            size -= 0x10000;
-        size = (size & 0xffff0000) | soundInfoPage[i * 2 + 1];
-
-        DigiList[i].length = size;
-    }
-}
-
 //      AdLib Code
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1055,8 +1005,6 @@ SD_Startup(void)
     SD_SetSoundMode(sdm_Off);
     SD_SetMusicMode(smm_Off);
 
-    SDL_SetupDigi();
-
     SD_Started = true;
 
 	SoundInfo.Init();
@@ -1076,8 +1024,6 @@ SD_Shutdown(void)
 
     SD_MusicOff();
     SD_StopSound();
-
-    free(DigiList);
 
     SD_Started = false;
 }

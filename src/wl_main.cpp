@@ -19,6 +19,7 @@
 #include "config.hpp"
 #include "w_wad.h"
 #include "language.h"
+#include "tiles.h"
 #include <SDL_syswm.h>
 
 // Wad Code Stuff
@@ -1058,7 +1059,9 @@ static void InitGame()
     IN_Startup ();
     PM_Startup ();
     SD_Startup ();
+	printf("CA_Startup: Starting the Cache Manager.\n");
     CA_Startup ();
+	printf("US_Startup: Starting the User Manager.\n");
     US_Startup ();
 
     // TODO: Will any memory checking be needed someday??
@@ -1084,9 +1087,17 @@ static void InitGame()
 //
 // build some tables
 //
+	printf("ReadConfig: Reading the Configuration.\n");
     ReadConfig ();
 
+	printf("SetupSaveGames: Looking for saves.\n");
     SetupSaveGames();
+
+//
+// Init texture manager
+//
+
+	//TexMan.Init();
 
 //
 // draw intro screen stuff
