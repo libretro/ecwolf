@@ -25,6 +25,7 @@ struct FVSwapSound : public FResourceLump
 		FVSwapSound(int numChunks) : FResourceLump(), numChunks(0)
 		{
 			chunks = new Chunk[numChunks];
+			LumpSize = 0;
 		}
 		~FVSwapSound()
 		{
@@ -34,6 +35,7 @@ struct FVSwapSound : public FResourceLump
 		int AddChunk(int offset, int length)
 		{
 			LumpSize += length;
+			printf("Increasing lump size: %d\n", LumpSize);
 
 			chunks[numChunks].offset = offset;
 			chunks[numChunks].length = length;
@@ -89,7 +91,7 @@ class FVSwap : public FResourceFile
 			soundStart = READINT16(&header[4]);
 
 			Lumps = new FUncompressedLump[soundStart];
-			
+
 
 			char* data = new char[6*numChunks];
 			vswapReader.Read(data, 6*numChunks);
