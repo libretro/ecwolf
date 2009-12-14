@@ -1,3 +1,8 @@
+December 13th, 2009
+-----------------------------
+- Completed the TEXTURES lump thanks to Executor.
+- As far as I know, all texture drawing pulls from the Textures lump.
+
 November 29th, 2009
 -----------------------------
 - Fixed: Somehow the value of lumpNum was changing during the OpenLumpNum call.

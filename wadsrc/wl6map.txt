@@ -590,7 +590,7 @@ textures
 	"MARB2_1",  // Brown Marble 2 N/S
 	"MARB2_2",  // Brown Marble 2 E/W
 	"MARB3_1",  // Brown Marble Flag N/S
-	"MARB3_2 ", // Brown Marble Flag E/W
+	"MARB3_2",  // Brown Marble Flag E/W
 	"PLASTER1", // Plaster N/S
 	"PLASTER2", // Plaster E/W
 	"GRYHTLR1", // Gray Brick Hitler N/S

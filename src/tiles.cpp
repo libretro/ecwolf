@@ -12,10 +12,15 @@ Texture::Texture(const char* name, unsigned int width, unsigned int height) : na
 	memset(pixels, 0, width*height); // Initialize the pixels
 }
 
+Texture::Texture(const Texture &other) : pixels(NULL)
+{
+	Copy(other);
+}
+
 Texture::~Texture()
 {
-//	if(pixels != NULL)
-//		delete[] pixels;
+	if(pixels != NULL)
+		delete[] pixels;
 }
 
 void Texture::AddPatch(const char* lump, unsigned int xOffset, unsigned int yOffset)
@@ -36,19 +41,12 @@ void Texture::AddPatch(const char* lump, unsigned int xOffset, unsigned int yOff
 		byte* column = new byte[patchSize];
 		lumpReader.Read(column, patchSize);
 		for(int y = 0;y < patchSize && y+yOffset < height;y++)
-		{
 			pixels[(x+xOffset)*height+(y+yOffset)] = column[y];
-		}
 		delete[] column;
 	}
 }
 
-const byte* Texture::GetPost(unsigned int which) const
-{
-	return pixels+(which % width)*height;
-}
-
-Texture &Texture::operator= (const Texture &other)
+Texture &Texture::Copy(const Texture &other)
 {
 	name = other.name;
 	width = other.width;
@@ -64,12 +62,29 @@ Texture &Texture::operator= (const Texture &other)
 	return *this;
 }
 
+const byte* Texture::GetPost(unsigned int which) const
+{
+	return pixels+(which % width)*height;
+}
+
+Texture &Texture::operator= (const Texture &other)
+{
+	return Copy(other);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 TextureManager TexMan;
 
-TextureManager::TextureManager()
+TextureManager::TextureManager() : nullTexture("-", 64, 64)
 {
+}
+
+const Texture *TextureManager::GetDoor(unsigned int tile, bool track) const
+{
+	if(tile > 63)
+		tile = 63;
+	return (*this)[doorTiles[tile][track]];
 }
 
 void TextureManager::Init()
@@ -136,6 +151,27 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 			}
 			textures[name] = tex;
 		}
+		else if(sc.str.compare("maptile") == 0)
+		{
+			sc.MustGetToken(TK_IntConst);
+			int index = sc.number;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_StringConst);
+			mapTiles[index] = sc.str;
+		}
+		else if(sc.str.compare("doortile") == 0)
+		{
+			sc.MustGetToken(TK_IntConst);
+			int index = sc.number;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_StringConst);
+			doorTiles[index][0] = sc.str;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_StringConst);
+			doorTiles[index][1] = sc.str;
+		}
+		else
+			sc.ScriptError("Unkown property %s.\n", sc.str.c_str());
 	}
 }
 
@@ -144,5 +180,12 @@ const Texture *TextureManager::operator[] (const string &texture) const
 	map<string, Texture>::const_iterator it = textures.find(texture);
 	if(it != textures.end())
 		return &it->second;
-	return NULL;
+	return &nullTexture;
+}
+
+const Texture *TextureManager::operator() (unsigned int tile) const
+{
+	if(tile > 63)
+		tile = 63;
+	return (*this)[mapTiles[tile]];
 }

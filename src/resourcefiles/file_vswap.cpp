@@ -35,7 +35,6 @@ struct FVSwapSound : public FResourceLump
 		int AddChunk(int offset, int length)
 		{
 			LumpSize += length;
-			printf("Increasing lump size: %d\n", LumpSize);
 
 			chunks[numChunks].offset = offset;
 			chunks[numChunks].length = length;

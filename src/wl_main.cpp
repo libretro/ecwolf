@@ -1097,7 +1097,7 @@ static void InitGame()
 // Init texture manager
 //
 
-	//TexMan.Init();
+	TexMan.Init();
 
 //
 // draw intro screen stuff

@@ -7,6 +7,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "tiles.h"
 
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
@@ -86,6 +87,7 @@ longword xpartialup,xpartialdown,ypartialup,ypartialdown;
 
 short   midangle,angle;
 
+byte	hitdir;
 word    tilehit;
 int     pixx;
 
@@ -276,7 +278,7 @@ int CalcHeight()
 ===================
 */
 
-byte *postsource;
+const byte *postsource;
 int postx;
 int postwidth;
 
@@ -363,6 +365,10 @@ void HitVertWall (void)
     int wallpic;
     int texture;
 
+	if(xtilestep==-1 && (xintercept>>16)<=xtile)
+		hitdir = di_east;
+	else
+		hitdir = di_west;
     texture = ((yintercept+texdelta)>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
     if (xtilestep == -1)
     {
@@ -397,19 +403,20 @@ void HitVertWall (void)
     wallheight[pixx] = CalcHeight();
     postx = pixx;
     postwidth = 1;
+	const Texture *source = NULL;
 
     if (tilehit & 0x40)
     {                                                               // check for adjacent doors
         ytile = (short)(yintercept>>TILESHIFT);
         if ( tilemap[xtile-xtilestep][ytile]&0x80 )
-            wallpic = DOORWALL+3;
+			source = TexMan.GetDoor(doorobjlist[tilemap[xtile-xtilestep][ytile]&0x7F].lock, true);
         else
-            wallpic = vertwall[tilehit & ~0x40];
+			source = TexMan(tilehit&~0x40);
     }
-    else
-        wallpic = vertwall[tilehit];
+	if(source == NULL)
+		source = TexMan(tilehit);
 
-    postsource = PM_GetTexture(wallpic) + texture;
+	postsource = source->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 64 : 192));
 }
 
 
@@ -429,6 +436,10 @@ void HitHorizWall (void)
     int wallpic;
     int texture;
 
+	if(ytilestep==-1 && (yintercept>>16)<=ytile)
+		hitdir = di_north;
+	else
+		hitdir = di_south;
     texture = ((xintercept+texdelta)>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
     if (ytilestep == -1)
         yintercept += TILEGLOBAL;
@@ -462,19 +473,20 @@ void HitHorizWall (void)
     wallheight[pixx] = CalcHeight();
     postx = pixx;
     postwidth = 1;
+	const Texture *source = NULL;
 
     if (tilehit & 0x40)
     {                                                               // check for adjacent doors
         xtile = (short)(xintercept>>TILESHIFT);
         if ( tilemap[xtile][ytile-ytilestep]&0x80)
-            wallpic = DOORWALL+2;
+			source = TexMan.GetDoor(doorobjlist[tilemap[xtile][ytile-ytilestep]&0x7F].lock, true);
         else
-            wallpic = horizwall[tilehit & ~0x40];
+			source = TexMan(tilehit&~0x40);
     }
-    else
-        wallpic = horizwall[tilehit];
+	if(source == NULL)
+		source = TexMan(tilehit);
 
-    postsource = PM_GetTexture(wallpic) + texture;
+	postsource = source->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 0 : 128));
 }
 
 //==========================================================================
@@ -523,23 +535,7 @@ void HitHorizDoor (void)
     postx = pixx;
     postwidth = 1;
 
-    switch(doorobjlist[doornum].lock)
-    {
-        case dr_normal:
-            doorpage = DOORWALL;
-            break;
-        case dr_lock1:
-        case dr_lock2:
-        case dr_lock3:
-        case dr_lock4:
-            doorpage = DOORWALL+6;
-            break;
-        case dr_elevator:
-            doorpage = DOORWALL+4;
-            break;
-    }
-
-    postsource = PM_GetTexture(doorpage) + texture;
+	postsource = TexMan.GetDoor(doorobjlist[doornum].lock)->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 0 : 128));
 }
 
 //==========================================================================
@@ -588,23 +584,7 @@ void HitVertDoor (void)
     postx = pixx;
     postwidth = 1;
 
-    switch(doorobjlist[doornum].lock)
-    {
-        case dr_normal:
-            doorpage = DOORWALL+1;
-            break;
-        case dr_lock1:
-        case dr_lock2:
-        case dr_lock3:
-        case dr_lock4:
-            doorpage = DOORWALL+7;
-            break;
-        case dr_elevator:
-            doorpage = DOORWALL+5;
-            break;
-    }
-
-    postsource = PM_GetTexture(doorpage) + texture;
+	postsource = TexMan.GetDoor(doorobjlist[doornum].lock)->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 64 : 192));
 }
 
 //==========================================================================
@@ -1308,6 +1288,7 @@ void AsmRefresh()
             if(ytilestep==-1 && (yintercept>>16)<=ytile) goto horizentry;
             if(ytilestep==1 && (yintercept>>16)>=ytile) goto horizentry;
 vertentry:
+
             if((uint32_t)yintercept>mapheight*65536-1 || (word)xtile>=mapwidth)
             {
                 if(xtile<0) xintercept=0;
@@ -1454,6 +1435,7 @@ passvert:
             if(xtilestep==-1 && (xintercept>>16)<=xtile) goto vertentry;
             if(xtilestep==1 && (xintercept>>16)>=xtile) goto vertentry;
 horizentry:
+
             if((uint32_t)xintercept>mapwidth*65536-1 || (word)ytile>=mapheight)
             {
                 if(ytile<0) yintercept=0;
