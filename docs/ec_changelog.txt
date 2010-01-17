@@ -1,3 +1,8 @@
+January 17th, 2010
+-----------------------------
+- Fixed: Various crashes with the sound code.  I'll be so happy once I can 
+  finally isolate all the areas that need #pragma pack(1) set.
+
 December 13th, 2009
 -----------------------------
 - Completed the TEXTURES lump thanks to Executor.

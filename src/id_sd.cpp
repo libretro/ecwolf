@@ -26,14 +26,14 @@
 //                      NeedsDigitized - load digitized sounds?
 //                      NeedsMusic - load music?
 //
-#pragma pack(1)
 #include "wl_def.h"
 #include "id_pm.h"
-#include "id_sd.h"
 #include <SDL_mixer.h>
-#include "fmopl.h"
 #include "w_wad.h"
 #include "zstring.h"
+#pragma pack(1)
+#include "id_sd.h"
+#include "fmopl.h"
 
 #define ORIGSAMPLERATE 7042
 

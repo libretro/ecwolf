@@ -18,13 +18,17 @@ struct FVSwapSound : public FResourceLump
 			public:
 				int	offset;
 				int	length;
-		} *chunks;
+		};
+
+		Chunk *chunks;
 		unsigned short numChunks;
 
 	public:
-		FVSwapSound(int numChunks) : FResourceLump(), numChunks(0)
+		FVSwapSound(int maxNumChunks) : FResourceLump(), numChunks(0)
 		{
-			chunks = new Chunk[numChunks];
+			if(maxNumChunks < 0)
+				maxNumChunks = 0;
+			chunks = new Chunk[maxNumChunks];
 			LumpSize = 0;
 		}
 		~FVSwapSound()
