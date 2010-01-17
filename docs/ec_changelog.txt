@@ -2,6 +2,9 @@ January 17th, 2010
 -----------------------------
 - Fixed: Various crashes with the sound code.  I'll be so happy once I can 
   finally isolate all the areas that need #pragma pack(1) set.
+- Fixed: CMake didn't check if there was a need to update the pk3.
+- Added a dummy decorate reader.  Still haven't quite decided where I'm going 
+  with this.
 
 December 13th, 2009
 -----------------------------

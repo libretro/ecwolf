@@ -24,7 +24,7 @@ add_subdirectory(tools/zipdir)
 
 add_custom_command( OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/ecwolf.pk3
    COMMAND ${CMAKE_BINARY_DIR}/tools/zipdir/zipdir -udf ${CMAKE_CURRENT_SOURCE_DIR}/ecwolf.pk3 ${CMAKE_CURRENT_SOURCE_DIR}/wadsrc
-   DEPENDS zipdir )
+   DEPENDS zipdir ${CMAKE_CURRENT_SOURCE_DIR}/wadsrc )
 
 add_custom_target( pk3 ALL
 	DEPENDS ${OUTPUT_DIR}/ecwolf.pk3 )

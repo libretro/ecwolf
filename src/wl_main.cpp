@@ -20,6 +20,7 @@
 #include "w_wad.h"
 #include "language.h"
 #include "tiles.h"
+#include "thingdef.h"
 #include <SDL_syswm.h>
 
 // Wad Code Stuff
@@ -1092,6 +1093,12 @@ static void InitGame()
 
 	printf("SetupSaveGames: Looking for saves.\n");
     SetupSaveGames();
+
+//
+// Load Actors
+//
+
+	ClassDef::LoadActors();
 
 //
 // Init texture manager

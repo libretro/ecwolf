@@ -1,0 +1,101 @@
+/*
+19 - Player 1 Start North
+20 - Player 1 Start East
+21 - Player 1 Start South
+22 - Player 1 Start West
+23:73 - Static Decorations
+98 - Secret Pushwall
+180:183 - Guard Easy (Standing)
+144:147 - Guard Medium (Standing)
+108:111 - Guard Hard (Standing)
+184:187 - Guard Easy (Walking)
+148:151 - Guard Medium (Walking)
+112:115 - Guard Hard (Walking)
+124 - Dead Guard
+188:191 - Officer Easy (Standing)
+152:155 - Officer Medium (Standing)
+116:119 - Officer Hard (Standing)
+192:195 - Officer Easy (Walking)
+156:159 - Officer Medium (Walking)
+120:123 - Officer Hard (Walking)
+198:201 - SS Easy (Standing)
+162:165 - SS Medium (Standing)
+126:129 - SS Hard (Standing)
+202:205 - SS Easy (Walking)
+166:169 - SS Medium (Walking)
+130:133 - SS Hard (Walking)
+206:209 - Dog Easy (Standing)
+170:173 - Dog Medium (Standing)
+134:137 - Dog Hard (Standing)
+210:213 - Dog Easy (Walking)
+174:177 - Dog Medium (Walking)
+138:141 - Dog Hard (Walking)
+214 - Hans
+197 - Gretel
+215 - Gift
+179 - Fat
+196 - Schabbs
+160 - Fake Hitler
+178 - Hitler
+106 - Spectre
+107 - Angel
+125 - Trans
+142 - Uber
+143 - Will
+161 - Death
+252:255 - Mutant Easy (Standing)
+234:237 - Mutant Medium (Standing)
+216:219 - Mutant Hard (Standing)
+256:259 - Mutant Easy (Walking)
+238:241 - Mutant Medium (Walking)
+220:223 - Mutant Hard (Walking)
+224 - Blinky
+225 - Clyde
+226 - Pinky
+227 - Inky
+*/
+
+actor Guard
+{
+	game Wolf3D
+	speed 512
+	+COUNTKILL
+	states
+	{
+		Spawn:
+			GRD0 A -1
+			goto Spawn
+		Path:
+			GRD0 B 20 T_Path
+			GRD0 B 5
+			GRD0 C 15 T_Path
+			GRD0 D 20 T_Path
+			GRD0 D 5
+			GRD0 E 15 T_Path
+			goto Path
+		See:
+			GRD0 B 10 T_Chase
+			GRD0 B 3
+			GRD0 C 8 T_Chase
+			GRD0 D 10 T_Chase
+			GRD0 D 3
+			GRD0 E 8 T_Chase
+			goto See
+		Missile:
+			GRD0 L 20
+			GRD0 M 20 T_Shoot
+			GRD0 N 20
+			goto Missile
+		Pain:
+			GRD0 F 10
+			goto See
+		Pain2:
+			GRD0 J 10
+			goto See
+		Death:
+			GRD0 G 15 A_DeathScream
+			GRD0 HI 15
+			GRD0 K -1
+			stop
+	}
+}

@@ -74,6 +74,7 @@ add_executable(ecwolf
 	scanner.cpp
 	sndinfo.cpp
 	tiles.cpp
+	thingdef.cpp
 	w_wad.cpp
 	wl_act1.cpp
 	wl_act2.cpp
