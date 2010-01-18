@@ -23,28 +23,28 @@
 #define	MaxScores	7
 typedef	struct
 {
-    char	name[MaxHighName + 1];
-    int32_t	score;
-    word	completed,episode;
+	char	name[MaxHighName + 1];
+	int32_t	score;
+	word	completed,episode;
 } HighScore;
 
 #define	MaxGameName		32
 #define	MaxSaveGames	6
 typedef	struct
 {
-    char	signature[4];
-    word	*oldtest;
-    boolean	present;
-    char	name[MaxGameName + 1];
+	char	signature[4];
+	word	*oldtest;
+	boolean	present;
+	char	name[MaxGameName + 1];
 } SaveGame;
 
 #define	MaxString	128	// Maximum input string size
 
 typedef	struct
 {
-    int	x,y,
-        w,h,
-        px,py;
+	int	x,y,
+		w,h,
+		px,py;
 } WindowRec;	// Record used to save & restore screen windows
 
 extern	boolean		ingame,		// Set by game code if a game is in progress
@@ -90,7 +90,7 @@ void			US_CheckHighScore(int32_t score,word other);
 void			US_DisplayHighScores(int which);
 extern	boolean	US_UpdateCursor(void);
 boolean         US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
-                             int maxchars,int maxwidth);
+							int maxchars,int maxwidth);
 
 void	        USL_PrintInCenter(const char *s,Rect r);
 char 	        *USL_GiveSaveName(word game);

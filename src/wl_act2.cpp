@@ -13,7 +13,7 @@
 /*
 =============================================================================
 
-                               LOCAL CONSTANTS
+							LOCAL CONSTANTS
 
 =============================================================================
 */
@@ -27,7 +27,7 @@
 /*
 =============================================================================
 
-                              GLOBAL VARIABLES
+							GLOBAL VARIABLES
 
 =============================================================================
 */
@@ -37,133 +37,133 @@
 /*
 =============================================================================
 
-                              LOCAL VARIABLES
+							LOCAL VARIABLES
 
 =============================================================================
 */
 
 
 dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
-    southwest,south,southeast};
+	southwest,south,southeast};
 
 short starthitpoints[4][NUMENEMIES] =
 //
 // BABY MODE
 //
 {
-    {
-        25,   // guards
-        50,   // officer
-        100,  // SS
-        1,    // dogs
-        850,  // Hans
-        850,  // Schabbs
-        200,  // fake hitler
-        800,  // mecha hitler
-        45,   // mutants
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
+	{
+		25,   // guards
+		50,   // officer
+		100,  // SS
+		1,    // dogs
+		850,  // Hans
+		850,  // Schabbs
+		200,  // fake hitler
+		800,  // mecha hitler
+		45,   // mutants
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
 
-        850,  // Gretel
-        850,  // Gift
-        850,  // Fat
-        5,    // en_spectre,
-        1450, // en_angel,
-        850,  // en_trans,
-        1050, // en_uber,
-        950,  // en_will,
-        1250  // en_death
-    },
-    //
-    // DON'T HURT ME MODE
-    //
-    {
-        25,   // guards
-        50,   // officer
-        100,  // SS
-        1,    // dogs
-        950,  // Hans
-        950,  // Schabbs
-        300,  // fake hitler
-        950,  // mecha hitler
-        55,   // mutants
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
+		850,  // Gretel
+		850,  // Gift
+		850,  // Fat
+		5,    // en_spectre,
+		1450, // en_angel,
+		850,  // en_trans,
+		1050, // en_uber,
+		950,  // en_will,
+		1250  // en_death
+	},
+	//
+	// DON'T HURT ME MODE
+	//
+	{
+		25,   // guards
+		50,   // officer
+		100,  // SS
+		1,    // dogs
+		950,  // Hans
+		950,  // Schabbs
+		300,  // fake hitler
+		950,  // mecha hitler
+		55,   // mutants
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
 
-        950,  // Gretel
-        950,  // Gift
-        950,  // Fat
-        10,   // en_spectre,
-        1550, // en_angel,
-        950,  // en_trans,
-        1150, // en_uber,
-        1050, // en_will,
-        1350  // en_death
-    },
-    //
-    // BRING 'EM ON MODE
-    //
-    {
-        25,   // guards
-        50,   // officer
-        100,  // SS
-        1,    // dogs
+		950,  // Gretel
+		950,  // Gift
+		950,  // Fat
+		10,   // en_spectre,
+		1550, // en_angel,
+		950,  // en_trans,
+		1150, // en_uber,
+		1050, // en_will,
+		1350  // en_death
+	},
+	//
+	// BRING 'EM ON MODE
+	//
+	{
+		25,   // guards
+		50,   // officer
+		100,  // SS
+		1,    // dogs
 
-        1050, // Hans
-        1550, // Schabbs
-        400,  // fake hitler
-        1050, // mecha hitler
+		1050, // Hans
+		1550, // Schabbs
+		400,  // fake hitler
+		1050, // mecha hitler
 
-        55,   // mutants
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
+		55,   // mutants
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
 
-        1050, // Gretel
-        1050, // Gift
-        1050, // Fat
-        15,   // en_spectre,
-        1650, // en_angel,
-        1050, // en_trans,
-        1250, // en_uber,
-        1150, // en_will,
-        1450  // en_death
-    },
-    //
-    // DEATH INCARNATE MODE
-    //
-    {
-        25,   // guards
-        50,   // officer
-        100,  // SS
-        1,    // dogs
+		1050, // Gretel
+		1050, // Gift
+		1050, // Fat
+		15,   // en_spectre,
+		1650, // en_angel,
+		1050, // en_trans,
+		1250, // en_uber,
+		1150, // en_will,
+		1450  // en_death
+	},
+	//
+	// DEATH INCARNATE MODE
+	//
+	{
+		25,   // guards
+		50,   // officer
+		100,  // SS
+		1,    // dogs
 
-        1200, // Hans
-        2400, // Schabbs
-        500,  // fake hitler
-        1200, // mecha hitler
+		1200, // Hans
+		2400, // Schabbs
+		500,  // fake hitler
+		1200, // mecha hitler
 
-        65,   // mutants
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
-        25,   // ghosts
+		65,   // mutants
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
+		25,   // ghosts
 
-        1200, // Gretel
-        1200, // Gift
-        1200, // Fat
-        25,   // en_spectre,
-        2000, // en_angel,
-        1200, // en_trans,
-        1400, // en_uber,
-        1300, // en_will,
-        1600  // en_death
-    }
+		1200, // Gretel
+		1200, // Gift
+		1200, // Fat
+		25,   // en_spectre,
+		2000, // en_angel,
+		1200, // en_trans,
+		1400, // en_uber,
+		1300, // en_will,
+		1600  // en_death
+	}
 };
 
 void    A_StartDeathCam (objtype *ob);
@@ -243,23 +243,23 @@ void A_MechaSound (objtype *ob);
 
 void A_Smoke (objtype *ob)
 {
-    GetNewActor ();
+	GetNewActor ();
 #ifdef SPEAR
-    if (ob->obclass == hrocketobj)
-        newobj->state = &s_hsmoke1;
-    else
+	if (ob->obclass == hrocketobj)
+		newobj->state = &s_hsmoke1;
+	else
 #endif
-        newobj->state = &s_smoke1;
-    newobj->ticcount = 6;
+		newobj->state = &s_smoke1;
+	newobj->ticcount = 6;
 
-    newobj->tilex = ob->tilex;
-    newobj->tiley = ob->tiley;
-    newobj->x = ob->x;
-    newobj->y = ob->y;
-    newobj->obclass = inertobj;
-    newobj->active = ac_yes;
+	newobj->tilex = ob->tilex;
+	newobj->tiley = ob->tiley;
+	newobj->x = ob->x;
+	newobj->y = ob->y;
+	newobj->obclass = inertobj;
+	newobj->active = ac_yes;
 
-    newobj->flags = FL_NEVERMARK;
+	newobj->flags = FL_NEVERMARK;
 }
 
 
@@ -276,27 +276,27 @@ void A_Smoke (objtype *ob)
 
 boolean ProjectileTryMove (objtype *ob)
 {
-    int      xl,yl,xh,yh,x,y;
-    objtype *check;
+	int      xl,yl,xh,yh,x,y;
+	objtype *check;
 
-    xl = (ob->x-PROJSIZE) >> TILESHIFT;
-    yl = (ob->y-PROJSIZE) >> TILESHIFT;
+	xl = (ob->x-PROJSIZE) >> TILESHIFT;
+	yl = (ob->y-PROJSIZE) >> TILESHIFT;
 
-    xh = (ob->x+PROJSIZE) >> TILESHIFT;
-    yh = (ob->y+PROJSIZE) >> TILESHIFT;
+	xh = (ob->x+PROJSIZE) >> TILESHIFT;
+	yh = (ob->y+PROJSIZE) >> TILESHIFT;
 
-    //
-    // check for solid walls
-    //
-    for (y=yl;y<=yh;y++)
-        for (x=xl;x<=xh;x++)
-        {
-            check = actorat[x][y];
-            if (check && !ISPOINTER(check))
-                return false;
-        }
+	//
+	// check for solid walls
+	//
+	for (y=yl;y<=yh;y++)
+		for (x=xl;x<=xh;x++)
+		{
+			check = actorat[x][y];
+			if (check && !ISPOINTER(check))
+				return false;
+		}
 
-        return true;
+		return true;
 }
 
 
@@ -311,72 +311,72 @@ boolean ProjectileTryMove (objtype *ob)
 
 void T_Projectile (objtype *ob)
 {
-    int32_t deltax,deltay;
-    int     damage;
-    int32_t speed;
+	int32_t deltax,deltay;
+	int     damage;
+	int32_t speed;
 
-    speed = (int32_t)ob->speed*tics;
+	speed = (int32_t)ob->speed*tics;
 
-    deltax = FixedMul(speed,costable[ob->angle]);
-    deltay = -FixedMul(speed,sintable[ob->angle]);
+	deltax = FixedMul(speed,costable[ob->angle]);
+	deltay = -FixedMul(speed,sintable[ob->angle]);
 
-    if (deltax>0x10000l)
-        deltax = 0x10000l;
-    if (deltay>0x10000l)
-        deltay = 0x10000l;
+	if (deltax>0x10000l)
+		deltax = 0x10000l;
+	if (deltay>0x10000l)
+		deltay = 0x10000l;
 
-    ob->x += deltax;
-    ob->y += deltay;
+	ob->x += deltax;
+	ob->y += deltay;
 
-    deltax = LABS(ob->x - player->x);
-    deltay = LABS(ob->y - player->y);
+	deltax = LABS(ob->x - player->x);
+	deltay = LABS(ob->y - player->y);
 
-    if (!ProjectileTryMove (ob))
-    {
+	if (!ProjectileTryMove (ob))
+	{
 #ifndef APOGEE_1_0          // actually the whole method is never reached in shareware 1.0
-        if (ob->obclass == rocketobj)
-        {
-            PlaySoundLocActor("missile/hit",ob);
-            ob->state = &s_boom1;
-        }
+		if (ob->obclass == rocketobj)
+		{
+			PlaySoundLocActor("missile/hit",ob);
+			ob->state = &s_boom1;
+		}
 #ifdef SPEAR
-        else if (ob->obclass == hrocketobj)
-        {
-            PlaySoundLocActor("missile/hit",ob);
-            ob->state = &s_hboom1;
-        }
+		else if (ob->obclass == hrocketobj)
+		{
+			PlaySoundLocActor("missile/hit",ob);
+			ob->state = &s_hboom1;
+		}
 #endif
-        else
+		else
 #endif
-            ob->state = NULL;               // mark for removal
+			ob->state = NULL;               // mark for removal
 
-        return;
-    }
+		return;
+	}
 
-    if (deltax < PROJECTILESIZE && deltay < PROJECTILESIZE)
-    {       // hit the player
-        switch (ob->obclass)
-        {
-        case needleobj:
-            damage = (US_RndT() >>3) + 20;
-            break;
-        case rocketobj:
-        case hrocketobj:
-        case sparkobj:
-            damage = (US_RndT() >>3) + 30;
-            break;
-        case fireobj:
-            damage = (US_RndT() >>3);
-            break;
-        }
+	if (deltax < PROJECTILESIZE && deltay < PROJECTILESIZE)
+	{       // hit the player
+		switch (ob->obclass)
+		{
+		case needleobj:
+			damage = (US_RndT() >>3) + 20;
+			break;
+		case rocketobj:
+		case hrocketobj:
+		case sparkobj:
+			damage = (US_RndT() >>3) + 30;
+			break;
+		case fireobj:
+			damage = (US_RndT() >>3);
+			break;
+		}
 
-        TakeDamage (damage,ob);
-        ob->state = NULL;               // mark for removal
-        return;
-    }
+		TakeDamage (damage,ob);
+		ob->state = NULL;               // mark for removal
+		return;
+	}
 
-    ob->tilex = (short)(ob->x >> TILESHIFT);
-    ob->tiley = (short)(ob->y >> TILESHIFT);
+	ob->tilex = (short)(ob->x >> TILESHIFT);
+	ob->tiley = (short)(ob->y >> TILESHIFT);
 }
 
 
@@ -855,66 +855,66 @@ statetype s_gretelshoot8        = {false,SPR_GRETEL_SHOOT1,10,NULL,NULL,&s_grete
 
 void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 {
-    word *map;
-    word tile;
+	word *map;
+	word tile;
 
-    switch (which)
-    {
-        case en_guard:
-            SpawnNewObj (tilex,tiley,&s_grdstand);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
+	switch (which)
+	{
+		case en_guard:
+			SpawnNewObj (tilex,tiley,&s_grdstand);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
 
-        case en_officer:
-            SpawnNewObj (tilex,tiley,&s_ofcstand);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
+		case en_officer:
+			SpawnNewObj (tilex,tiley,&s_ofcstand);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
 
-        case en_mutant:
-            SpawnNewObj (tilex,tiley,&s_mutstand);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
+		case en_mutant:
+			SpawnNewObj (tilex,tiley,&s_mutstand);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
 
-        case en_ss:
-            SpawnNewObj (tilex,tiley,&s_ssstand);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
-    }
+		case en_ss:
+			SpawnNewObj (tilex,tiley,&s_ssstand);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
+	}
 
 
-    map = mapsegs[0]+(tiley<<mapshift)+tilex;
-    tile = *map;
-    if (tile == AMBUSHTILE)
-    {
-        tilemap[tilex][tiley] = 0;
+	map = mapsegs[0]+(tiley<<mapshift)+tilex;
+	tile = *map;
+	if (tile == AMBUSHTILE)
+	{
+		tilemap[tilex][tiley] = 0;
 
-        if (*(map+1) >= AREATILE)
-            tile = *(map+1);
-        if (*(map-mapwidth) >= AREATILE)
-            tile = *(map-mapwidth);
-        if (*(map+mapwidth) >= AREATILE)
-            tile = *(map+mapwidth);
-        if ( *(map-1) >= AREATILE)
-            tile = *(map-1);
+		if (*(map+1) >= AREATILE)
+			tile = *(map+1);
+		if (*(map-mapwidth) >= AREATILE)
+			tile = *(map-mapwidth);
+		if (*(map+mapwidth) >= AREATILE)
+			tile = *(map+mapwidth);
+		if ( *(map-1) >= AREATILE)
+			tile = *(map-1);
 
-        *map = tile;
-        newobj->areanumber = tile-AREATILE;
+		*map = tile;
+		newobj->areanumber = tile-AREATILE;
 
-        newobj->flags |= FL_AMBUSH;
-    }
+		newobj->flags |= FL_AMBUSH;
+	}
 
-    newobj->obclass = (classtype)(guardobj + which);
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][which];
-    newobj->dir = (dirtype)(dir * 2);
-    newobj->flags |= FL_SHOOTABLE;
+	newobj->obclass = (classtype)(guardobj + which);
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][which];
+	newobj->dir = (dirtype)(dir * 2);
+	newobj->flags |= FL_SHOOTABLE;
 }
 
 
@@ -929,12 +929,12 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 
 void SpawnDeadGuard (int tilex, int tiley)
 {
-    SpawnNewObj (tilex,tiley,&s_grddie4);
-    DEMOIF_SDL
-    {
-        newobj->flags |= FL_NONMARK;    // walk through moving enemy fix
-    }
-    newobj->obclass = inertobj;
+	SpawnNewObj (tilex,tiley,&s_grddie4);
+	DEMOIF_SDL
+	{
+		newobj->flags |= FL_NONMARK;    // walk through moving enemy fix
+	}
+	newobj->obclass = inertobj;
 }
 
 
@@ -950,15 +950,15 @@ void SpawnDeadGuard (int tilex, int tiley)
 
 void SpawnBoss (int tilex, int tiley)
 {
-    SpawnNewObj (tilex,tiley,&s_bossstand);
-    newobj->speed = SPDPATROL;
+	SpawnNewObj (tilex,tiley,&s_bossstand);
+	newobj->speed = SPDPATROL;
 
-    newobj->obclass = bossobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_boss];
-    newobj->dir = nodir;
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	newobj->obclass = bossobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_boss];
+	newobj->dir = nodir;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 /*
@@ -971,15 +971,15 @@ void SpawnBoss (int tilex, int tiley)
 
 void SpawnGretel (int tilex, int tiley)
 {
-    SpawnNewObj (tilex,tiley,&s_gretelstand);
-    newobj->speed = SPDPATROL;
+	SpawnNewObj (tilex,tiley,&s_gretelstand);
+	newobj->speed = SPDPATROL;
 
-    newobj->obclass = gretelobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gretel];
-    newobj->dir = nodir;
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	newobj->obclass = gretelobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gretel];
+	newobj->dir = nodir;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 #endif
 
@@ -993,70 +993,70 @@ void SpawnGretel (int tilex, int tiley)
 
 void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 {
-    switch (which)
-    {
-        case en_guard:
-            SpawnNewObj (tilex,tiley,&s_grdpath1);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
+	switch (which)
+	{
+		case en_guard:
+			SpawnNewObj (tilex,tiley,&s_grdpath1);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
 
-        case en_officer:
-            SpawnNewObj (tilex,tiley,&s_ofcpath1);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
+		case en_officer:
+			SpawnNewObj (tilex,tiley,&s_ofcpath1);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
 
-        case en_ss:
-            SpawnNewObj (tilex,tiley,&s_sspath1);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
+		case en_ss:
+			SpawnNewObj (tilex,tiley,&s_sspath1);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
 
-        case en_mutant:
-            SpawnNewObj (tilex,tiley,&s_mutpath1);
-            newobj->speed = SPDPATROL;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
+		case en_mutant:
+			SpawnNewObj (tilex,tiley,&s_mutpath1);
+			newobj->speed = SPDPATROL;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
 
-        case en_dog:
-            SpawnNewObj (tilex,tiley,&s_dogpath1);
-            newobj->speed = SPDDOG;
-            if (!loadedgame)
-                gamestate.killtotal++;
-            break;
-    }
+		case en_dog:
+			SpawnNewObj (tilex,tiley,&s_dogpath1);
+			newobj->speed = SPDDOG;
+			if (!loadedgame)
+				gamestate.killtotal++;
+			break;
+	}
 
-    newobj->obclass = (classtype)(guardobj+which);
-    newobj->dir = (dirtype)(dir*2);
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][which];
-    newobj->distance = TILEGLOBAL;
-    newobj->flags |= FL_SHOOTABLE;
-    newobj->active = ac_yes;
+	newobj->obclass = (classtype)(guardobj+which);
+	newobj->dir = (dirtype)(dir*2);
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][which];
+	newobj->distance = TILEGLOBAL;
+	newobj->flags |= FL_SHOOTABLE;
+	newobj->active = ac_yes;
 
-    actorat[newobj->tilex][newobj->tiley] = NULL;           // don't use original spot
+	actorat[newobj->tilex][newobj->tiley] = NULL;           // don't use original spot
 
-    switch (dir)
-    {
-        case 0:
-            newobj->tilex++;
-            break;
-        case 1:
-            newobj->tiley--;
-            break;
-        case 2:
-            newobj->tilex--;
-            break;
-        case 3:
-            newobj->tiley++;
-            break;
-    }
+	switch (dir)
+	{
+		case 0:
+			newobj->tilex++;
+			break;
+		case 1:
+			newobj->tiley--;
+			break;
+		case 2:
+			newobj->tilex--;
+			break;
+		case 3:
+			newobj->tiley++;
+			break;
+	}
 
-    actorat[newobj->tilex][newobj->tiley] = newobj;
+	actorat[newobj->tilex][newobj->tiley] = newobj;
 }
 
 
@@ -1073,115 +1073,115 @@ void A_DeathScream (objtype *ob)
 {
 #ifndef UPLOAD
 #ifndef SPEAR
-    if (mapon==9 && !US_RndT())
+	if (mapon==9 && !US_RndT())
 #else
-    if ((mapon==18 || mapon==19) && !US_RndT())
+	if ((mapon==18 || mapon==19) && !US_RndT())
 #endif
-    {
-        switch(ob->obclass)
-        {
-            case mutantobj:
-            case guardobj:
-            case officerobj:
-            case ssobj:
-            case dogobj:
-                PlaySoundLocActor("guard/death6",ob);
-                return;
-        }
-    }
+	{
+		switch(ob->obclass)
+		{
+			case mutantobj:
+			case guardobj:
+			case officerobj:
+			case ssobj:
+			case dogobj:
+				PlaySoundLocActor("guard/death6",ob);
+				return;
+		}
+	}
 #endif
 
-    switch (ob->obclass)
-    {
-        case mutantobj:
-            PlaySoundLocActor("mutant/death",ob);
-            break;
+	switch (ob->obclass)
+	{
+		case mutantobj:
+			PlaySoundLocActor("mutant/death",ob);
+			break;
 
-        case guardobj:
-        {
-            const char* sounds[9]={ "guard/death1",
-                "guard/death2",
-                "guard/death3",
+		case guardobj:
+		{
+			const char* sounds[9]={ "guard/death1",
+				"guard/death2",
+				"guard/death3",
 #ifndef APOGEE_1_0
-                "guard/death4",
-                "guard/death5",
-                "guard/death7",
-                "guard/death8",
-                "guard/death9"
+				"guard/death4",
+				"guard/death5",
+				"guard/death7",
+				"guard/death8",
+				"guard/death9"
 #endif
-            };
+			};
 
 #ifndef UPLOAD
-            PlaySoundLocActor(sounds[US_RndT()%8],ob);
+			PlaySoundLocActor(sounds[US_RndT()%8],ob);
 #else
-            PlaySoundLocActor(sounds[US_RndT()%2],ob);
+			PlaySoundLocActor(sounds[US_RndT()%2],ob);
 #endif
-            break;
-        }
-        case officerobj:
-            PlaySoundLocActor("officer/death",ob);
-            break;
-        case ssobj:
-            PlaySoundLocActor("wolfss/death",ob); // JAB
-            break;
-        case dogobj:
-            PlaySoundLocActor("dog/death",ob);      // JAB
-            break;
+			break;
+		}
+		case officerobj:
+			PlaySoundLocActor("officer/death",ob);
+			break;
+		case ssobj:
+			PlaySoundLocActor("wolfss/death",ob); // JAB
+			break;
+		case dogobj:
+			PlaySoundLocActor("dog/death",ob);      // JAB
+			break;
 #ifndef SPEAR
-        case bossobj:
-            SD_PlaySound("hans/death");                         // JAB
-            break;
-        case schabbobj:
-            SD_PlaySound("schabbs/death");
-            break;
-        case fakeobj:
-            SD_PlaySound("fake/death");
-            break;
-        case mechahitlerobj:
-            SD_PlaySound("hitler/mechadeath");
-            break;
-        case realhitlerobj:
-            SD_PlaySound("hitler/death");
-            break;
+		case bossobj:
+			SD_PlaySound("hans/death");                         // JAB
+			break;
+		case schabbobj:
+			SD_PlaySound("schabbs/death");
+			break;
+		case fakeobj:
+			SD_PlaySound("fake/death");
+			break;
+		case mechahitlerobj:
+			SD_PlaySound("hitler/mechadeath");
+			break;
+		case realhitlerobj:
+			SD_PlaySound("hitler/death");
+			break;
 #ifndef APOGEE_1_0
-        case gretelobj:
-            SD_PlaySound("gretel/death");
-            break;
-        case giftobj:
-            SD_PlaySound("gift/death");
-            break;
-        case fatobj:
-            SD_PlaySound("fat/death");
-            break;
+		case gretelobj:
+			SD_PlaySound("gretel/death");
+			break;
+		case giftobj:
+			SD_PlaySound("gift/death");
+			break;
+		case fatobj:
+			SD_PlaySound("fat/death");
+			break;
 #endif
 #else
-        case spectreobj:
-            SD_PlaySound("ghost/fade");
-            break;
-        case angelobj:
-            SD_PlaySound("angel/death");
-            break;
-        case transobj:
-            SD_PlaySound("trans/death");
-            break;
-        case uberobj:
-            SD_PlaySound("uber/death");
-            break;
-        case willobj:
-            SD_PlaySound("wilhelm/death");
-            break;
-        case deathobj:
-            SD_PlaySound("deathknight/death");
-            break;
+		case spectreobj:
+			SD_PlaySound("ghost/fade");
+			break;
+		case angelobj:
+			SD_PlaySound("angel/death");
+			break;
+		case transobj:
+			SD_PlaySound("trans/death");
+			break;
+		case uberobj:
+			SD_PlaySound("uber/death");
+			break;
+		case willobj:
+			SD_PlaySound("wilhelm/death");
+			break;
+		case deathobj:
+			SD_PlaySound("deathknight/death");
+			break;
 #endif
-    }
+	}
 }
 
 
 /*
 =============================================================================
 
-                                SPEAR ACTORS
+								SPEAR ACTORS
 
 =============================================================================
 */
@@ -1260,18 +1260,18 @@ statetype s_transshoot8         = {false,SPR_TRANS_SHOOT1,10,NULL,NULL,&s_transc
 
 void SpawnTrans (int tilex, int tiley)
 {
-    //        word *map;
-    //        word tile;
+	//        word *map;
+	//        word tile;
 
-    if (SoundBlasterPresent && DigiMode != sds_Off)
-        s_transdie01.tictime = 105;
+	if (SoundBlasterPresent && DigiMode != sds_Off)
+		s_transdie01.tictime = 105;
 
-    SpawnNewObj (tilex,tiley,&s_transstand);
-    newobj->obclass = transobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_trans];
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	SpawnNewObj (tilex,tiley,&s_transstand);
+	newobj->obclass = transobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_trans];
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -1342,15 +1342,15 @@ statetype s_ubershoot7          = {false,SPR_UBER_SHOOT1,12,NULL,NULL,&s_ubercha
 
 void SpawnUber (int tilex, int tiley)
 {
-    if (SoundBlasterPresent && DigiMode != sds_Off)
-        s_uberdie01.tictime = 70;
+	if (SoundBlasterPresent && DigiMode != sds_Off)
+		s_uberdie01.tictime = 70;
 
-    SpawnNewObj (tilex,tiley,&s_uberstand);
-    newobj->obclass = uberobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_uber];
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	SpawnNewObj (tilex,tiley,&s_uberstand);
+	newobj->obclass = uberobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_uber];
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -1364,15 +1364,15 @@ void SpawnUber (int tilex, int tiley)
 
 void T_UShoot (objtype *ob)
 {
-    int     dx,dy,dist;
+	int     dx,dy,dist;
 
-    T_Shoot (ob);
+	T_Shoot (ob);
 
-    dx = abs(ob->tilex - player->tilex);
-    dy = abs(ob->tiley - player->tiley);
-    dist = dx>dy ? dx : dy;
-    if (dist <= 1)
-        TakeDamage (10,ob);
+	dx = abs(ob->tilex - player->tilex);
+	dy = abs(ob->tiley - player->tiley);
+	dist = dx>dy ? dx : dy;
+	if (dist <= 1)
+		TakeDamage (10,ob);
 }
 
 
@@ -1439,15 +1439,15 @@ statetype s_willshoot6          = {false,SPR_WILL_SHOOT4,10,NULL,(statefunc)T_Sh
 
 void SpawnWill (int tilex, int tiley)
 {
-    if (SoundBlasterPresent && DigiMode != sds_Off)
-        s_willdie2.tictime = 70;
+	if (SoundBlasterPresent && DigiMode != sds_Off)
+		s_willdie2.tictime = 70;
 
-    SpawnNewObj (tilex,tiley,&s_willstand);
-    newobj->obclass = willobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_will];
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	SpawnNewObj (tilex,tiley,&s_willstand);
+	newobj->obclass = willobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_will];
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -1461,90 +1461,90 @@ void SpawnWill (int tilex, int tiley)
 
 void T_Will (objtype *ob)
 {
-    int32_t move;
-    int     dx,dy,dist;
-    boolean dodge;
+	int32_t move;
+	int     dx,dy,dist;
+	boolean dodge;
 
-    dodge = false;
-    dx = abs(ob->tilex - player->tilex);
-    dy = abs(ob->tiley - player->tiley);
-    dist = dx>dy ? dx : dy;
+	dodge = false;
+	dx = abs(ob->tilex - player->tilex);
+	dy = abs(ob->tiley - player->tiley);
+	dist = dx>dy ? dx : dy;
 
-    if (CheckLine(ob))                                              // got a shot at player?
-    {
-        ob->hidden = false;
-        if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-        {
-            //
-            // go into attack frame
-            //
-            if (ob->obclass == willobj)
-                NewState (ob,&s_willshoot1);
-            else if (ob->obclass == angelobj)
-                NewState (ob,&s_angelshoot1);
-            else
-                NewState (ob,&s_deathshoot1);
-            return;
-        }
-        dodge = true;
-    }
-    else
-        ob->hidden = true;
+	if (CheckLine(ob))                                              // got a shot at player?
+	{
+		ob->hidden = false;
+		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
+		{
+			//
+			// go into attack frame
+			//
+			if (ob->obclass == willobj)
+				NewState (ob,&s_willshoot1);
+			else if (ob->obclass == angelobj)
+				NewState (ob,&s_angelshoot1);
+			else
+				NewState (ob,&s_deathshoot1);
+			return;
+		}
+		dodge = true;
+	}
+	else
+		ob->hidden = true;
 
-    if (ob->dir == nodir)
-    {
-        if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (ob->distance < 0)
-        {
-            //
-            // waiting for a door to open
-            //
-            OpenDoor (-ob->distance-1);
-            if (doorobjlist[-ob->distance-1].action != dr_open)
-                return;
-            ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-            TryWalk(ob);
-        }
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			//
+			// waiting for a door to open
+			//
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
+			TryWalk(ob);
+		}
 
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        if (dist <4)
-            SelectRunDir (ob);
-        else if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
+		if (dist <4)
+			SelectRunDir (ob);
+		else if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
 }
 
@@ -1616,15 +1616,15 @@ statetype s_deathshoot5         = {false,SPR_DEATH_SHOOT4,10,NULL,(statefunc)T_S
 
 void SpawnDeath (int tilex, int tiley)
 {
-    if (SoundBlasterPresent && DigiMode != sds_Off)
-        s_deathdie2.tictime = 105;
+	if (SoundBlasterPresent && DigiMode != sds_Off)
+		s_deathdie2.tictime = 105;
 
-    SpawnNewObj (tilex,tiley,&s_deathstand);
-    newobj->obclass = deathobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_death];
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	SpawnNewObj (tilex,tiley,&s_deathstand);
+	newobj->obclass = deathobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_death];
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 /*
@@ -1637,63 +1637,63 @@ void SpawnDeath (int tilex, int tiley)
 
 void T_Launch (objtype *ob)
 {
-    int32_t deltax,deltay;
-    float   angle;
-    int     iangle;
+	int32_t deltax,deltay;
+	float   angle;
+	int     iangle;
 
-    deltax = player->x - ob->x;
-    deltay = ob->y - player->y;
-    angle = (float) atan2 ((float) deltay, (float) deltax);
-    if (angle<0)
-        angle = (float) (M_PI*2+angle);
-    iangle = (int) (angle/(M_PI*2)*ANGLES);
-    if (ob->obclass == deathobj)
-    {
-        T_Shoot (ob);
-        if (ob->state == &s_deathshoot2)
-        {
-            iangle-=4;
-            if (iangle<0)
-                iangle+=ANGLES;
-        }
-        else
-        {
-            iangle+=4;
-            if (iangle>=ANGLES)
-                iangle-=ANGLES;
-        }
-    }
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle = (float) atan2 ((float) deltay, (float) deltax);
+	if (angle<0)
+		angle = (float) (M_PI*2+angle);
+	iangle = (int) (angle/(M_PI*2)*ANGLES);
+	if (ob->obclass == deathobj)
+	{
+		T_Shoot (ob);
+		if (ob->state == &s_deathshoot2)
+		{
+			iangle-=4;
+			if (iangle<0)
+				iangle+=ANGLES;
+		}
+		else
+		{
+			iangle+=4;
+			if (iangle>=ANGLES)
+				iangle-=ANGLES;
+		}
+	}
 
-    GetNewActor ();
-    newobj->state = &s_rocket;
-    newobj->ticcount = 1;
+	GetNewActor ();
+	newobj->state = &s_rocket;
+	newobj->ticcount = 1;
 
-    newobj->tilex = ob->tilex;
-    newobj->tiley = ob->tiley;
-    newobj->x = ob->x;
-    newobj->y = ob->y;
-    newobj->obclass = rocketobj;
-    switch(ob->obclass)
-    {
-        case deathobj:
-            newobj->state = &s_hrocket;
-            newobj->obclass = hrocketobj;
-            PlaySoundLocActor ("deathknight/attack",newobj);
-            break;
-        case angelobj:
-            newobj->state = &s_spark1;
-            newobj->obclass = sparkobj;
-            PlaySoundLocActor ("angel/attack",newobj);
-            break;
-        default:
-            PlaySoundLocActor ("missile/fire",newobj);
-    }
+	newobj->tilex = ob->tilex;
+	newobj->tiley = ob->tiley;
+	newobj->x = ob->x;
+	newobj->y = ob->y;
+	newobj->obclass = rocketobj;
+	switch(ob->obclass)
+	{
+		case deathobj:
+			newobj->state = &s_hrocket;
+			newobj->obclass = hrocketobj;
+			PlaySoundLocActor ("deathknight/attack",newobj);
+			break;
+		case angelobj:
+			newobj->state = &s_spark1;
+			newobj->obclass = sparkobj;
+			PlaySoundLocActor ("angel/attack",newobj);
+			break;
+		default:
+			PlaySoundLocActor ("missile/fire",newobj);
+	}
 
-    newobj->dir = nodir;
-    newobj->angle = iangle;
-    newobj->speed = 0x2000l;
-    newobj->flags = FL_NEVERMARK;
-    newobj->active = ac_yes;
+	newobj->dir = nodir;
+	newobj->angle = iangle;
+	newobj->speed = 0x2000l;
+	newobj->flags = FL_NEVERMARK;
+	newobj->active = ac_yes;
 }
 
 
@@ -1787,12 +1787,12 @@ statetype s_spark4              = {false,SPR_SPARK4,6,(statefunc)T_Projectile,NU
 
 void A_Slurpie (objtype *)
 {
-    SD_PlaySound("misc/slurpie");
+	SD_PlaySound("misc/slurpie");
 }
 
 void A_Breathing (objtype *)
 {
-    SD_PlaySound("angel/breath");
+	SD_PlaySound("angel/breath");
 }
 
 /*
@@ -1805,15 +1805,15 @@ void A_Breathing (objtype *)
 
 void SpawnAngel (int tilex, int tiley)
 {
-    if (SoundBlasterPresent && DigiMode != sds_Off)
-        s_angeldie11.tictime = 105;
+	if (SoundBlasterPresent && DigiMode != sds_Off)
+		s_angeldie11.tictime = 105;
 
-    SpawnNewObj (tilex,tiley,&s_angelstand);
-    newobj->obclass = angelobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_angel];
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	SpawnNewObj (tilex,tiley,&s_angelstand);
+	newobj->obclass = angelobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_angel];
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -1827,7 +1827,7 @@ void SpawnAngel (int tilex, int tiley)
 
 void A_Victory (objtype *)
 {
-    playstate = ex_victorious;
+	playstate = ex_victorious;
 }
 
 
@@ -1841,7 +1841,7 @@ void A_Victory (objtype *)
 
 void A_StartAttack (objtype *ob)
 {
-    ob->temp1 = 0;
+	ob->temp1 = 0;
 }
 
 
@@ -1855,17 +1855,17 @@ void A_StartAttack (objtype *ob)
 
 void A_Relaunch (objtype *ob)
 {
-    if (++ob->temp1 == 3)
-    {
-        NewState (ob,&s_angeltired);
-        return;
-    }
+	if (++ob->temp1 == 3)
+	{
+		NewState (ob,&s_angeltired);
+		return;
+	}
 
-    if (US_RndT()&1)
-    {
-        NewState (ob,&s_angelchase1);
-        return;
-    }
+	if (US_RndT()&1)
+	{
+		NewState (ob,&s_angelchase1);
+		return;
+	}
 }
 
 
@@ -1920,12 +1920,12 @@ statetype s_spectrewake         = {false,SPR_SPECTRE_F4,10,NULL,(statefunc)A_Dor
 
 void SpawnSpectre (int tilex, int tiley)
 {
-    SpawnNewObj (tilex,tiley,&s_spectrewait1);
-    newobj->obclass = spectreobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_spectre];
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_BONUS; // |FL_NEVERMARK|FL_NONMARK;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	SpawnNewObj (tilex,tiley,&s_spectrewait1);
+	newobj->obclass = spectreobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_spectre];
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_BONUS; // |FL_NEVERMARK|FL_NONMARK;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -1939,43 +1939,43 @@ void SpawnSpectre (int tilex, int tiley)
 
 void A_Dormant (objtype *ob)
 {
-    int32_t     deltax,deltay;
-    int         xl,xh,yl,yh;
-    int         x,y;
-    uintptr_t   tile;
+	int32_t     deltax,deltay;
+	int         xl,xh,yl,yh;
+	int         x,y;
+	uintptr_t   tile;
 
-    deltax = ob->x - player->x;
-    if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
-        goto moveok;
-    deltay = ob->y - player->y;
-    if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
-        goto moveok;
+	deltax = ob->x - player->x;
+	if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
+		goto moveok;
+	deltay = ob->y - player->y;
+	if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
+		goto moveok;
 
-    return;
+	return;
 moveok:
 
-    xl = (ob->x-MINDIST) >> TILESHIFT;
-    xh = (ob->x+MINDIST) >> TILESHIFT;
-    yl = (ob->y-MINDIST) >> TILESHIFT;
-    yh = (ob->y+MINDIST) >> TILESHIFT;
+	xl = (ob->x-MINDIST) >> TILESHIFT;
+	xh = (ob->x+MINDIST) >> TILESHIFT;
+	yl = (ob->y-MINDIST) >> TILESHIFT;
+	yh = (ob->y+MINDIST) >> TILESHIFT;
 
-    for (y=yl ; y<=yh ; y++)
-        for (x=xl ; x<=xh ; x++)
-        {
-            tile = (uintptr_t)actorat[x][y];
-            if (!tile)
-                continue;
-            if (!ISPOINTER(tile))
-                return;
-            if (((objtype *)tile)->flags&FL_SHOOTABLE)
-                return;
-        }
+	for (y=yl ; y<=yh ; y++)
+		for (x=xl ; x<=xh ; x++)
+		{
+			tile = (uintptr_t)actorat[x][y];
+			if (!tile)
+				continue;
+			if (!ISPOINTER(tile))
+				return;
+			if (((objtype *)tile)->flags&FL_SHOOTABLE)
+				return;
+		}
 
-        ob->flags |= FL_AMBUSH | FL_SHOOTABLE;
-        ob->flags &= ~FL_ATTACKMODE;
-        ob->flags &= ~FL_NONMARK;      // stuck bugfix 1
-        ob->dir = nodir;
-        NewState (ob,&s_spectrewait1);
+		ob->flags |= FL_AMBUSH | FL_SHOOTABLE;
+		ob->flags &= ~FL_ATTACKMODE;
+		ob->flags &= ~FL_NONMARK;      // stuck bugfix 1
+		ob->dir = nodir;
+		NewState (ob,&s_spectrewait1);
 }
 
 
@@ -1984,7 +1984,7 @@ moveok:
 /*
 =============================================================================
 
-                            SCHABBS / GIFT / FAT
+							SCHABBS / GIFT / FAT
 
 =============================================================================
 */
@@ -2000,32 +2000,32 @@ moveok:
 
 void SpawnGhosts (int which, int tilex, int tiley)
 {
-    switch(which)
-    {
-        case en_blinky:
-            SpawnNewObj (tilex,tiley,&s_blinkychase1);
-            break;
-        case en_clyde:
-            SpawnNewObj (tilex,tiley,&s_clydechase1);
-            break;
-        case en_pinky:
-            SpawnNewObj (tilex,tiley,&s_pinkychase1);
-            break;
-        case en_inky:
-            SpawnNewObj (tilex,tiley,&s_inkychase1);
-            break;
-    }
+	switch(which)
+	{
+		case en_blinky:
+			SpawnNewObj (tilex,tiley,&s_blinkychase1);
+			break;
+		case en_clyde:
+			SpawnNewObj (tilex,tiley,&s_clydechase1);
+			break;
+		case en_pinky:
+			SpawnNewObj (tilex,tiley,&s_pinkychase1);
+			break;
+		case en_inky:
+			SpawnNewObj (tilex,tiley,&s_inkychase1);
+			break;
+	}
 
-    newobj->obclass = ghostobj;
-    newobj->speed = SPDDOG;
+	newobj->obclass = ghostobj;
+	newobj->speed = SPDDOG;
 
-    newobj->dir = east;
-    newobj->flags |= FL_AMBUSH;
-    if (!loadedgame)
-    {
-        gamestate.killtotal++;
-        gamestate.killcount++;
-    }
+	newobj->dir = east;
+	newobj->flags |= FL_AMBUSH;
+	if (!loadedgame)
+	{
+		gamestate.killtotal++;
+		gamestate.killcount++;
+	}
 }
 
 
@@ -2219,20 +2219,20 @@ statetype s_fatshoot6           = {false,SPR_FAT_SHOOT4,10,NULL,(statefunc)T_Sho
 
 void SpawnSchabbs (int tilex, int tiley)
 {
-    if (DigiMode != sds_Off)
-        s_schabbdie2.tictime = 140;
-    else
-        s_schabbdie2.tictime = 5;
+	if (DigiMode != sds_Off)
+		s_schabbdie2.tictime = 140;
+	else
+		s_schabbdie2.tictime = 5;
 
-    SpawnNewObj (tilex,tiley,&s_schabbstand);
-    newobj->speed = SPDPATROL;
+	SpawnNewObj (tilex,tiley,&s_schabbstand);
+	newobj->speed = SPDPATROL;
 
-    newobj->obclass = schabbobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_schabbs];
-    newobj->dir = nodir;
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	newobj->obclass = schabbobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_schabbs];
+	newobj->dir = nodir;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -2246,20 +2246,20 @@ void SpawnSchabbs (int tilex, int tiley)
 
 void SpawnGift (int tilex, int tiley)
 {
-    if (DigiMode != sds_Off)
-        s_giftdie2.tictime = 140;
-    else
-        s_giftdie2.tictime = 5;
+	if (DigiMode != sds_Off)
+		s_giftdie2.tictime = 140;
+	else
+		s_giftdie2.tictime = 5;
 
-    SpawnNewObj (tilex,tiley,&s_giftstand);
-    newobj->speed = SPDPATROL;
+	SpawnNewObj (tilex,tiley,&s_giftstand);
+	newobj->speed = SPDPATROL;
 
-    newobj->obclass = giftobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gift];
-    newobj->dir = nodir;
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	newobj->obclass = giftobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gift];
+	newobj->dir = nodir;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -2273,20 +2273,20 @@ void SpawnGift (int tilex, int tiley)
 
 void SpawnFat (int tilex, int tiley)
 {
-    if (DigiMode != sds_Off)
-        s_fatdie2.tictime = 140;
-    else
-        s_fatdie2.tictime = 5;
+	if (DigiMode != sds_Off)
+		s_fatdie2.tictime = 140;
+	else
+		s_fatdie2.tictime = 5;
 
-    SpawnNewObj (tilex,tiley,&s_fatstand);
-    newobj->speed = SPDPATROL;
+	SpawnNewObj (tilex,tiley,&s_fatstand);
+	newobj->speed = SPDPATROL;
 
-    newobj->obclass = fatobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fat];
-    newobj->dir = nodir;
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	newobj->obclass = fatobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fat];
+	newobj->dir = nodir;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -2300,34 +2300,34 @@ void SpawnFat (int tilex, int tiley)
 
 void T_SchabbThrow (objtype *ob)
 {
-    int32_t deltax,deltay;
-    float   angle;
-    int     iangle;
+	int32_t deltax,deltay;
+	float   angle;
+	int     iangle;
 
-    deltax = player->x - ob->x;
-    deltay = ob->y - player->y;
-    angle = (float) atan2((float) deltay, (float) deltax);
-    if (angle<0)
-        angle = (float) (M_PI*2+angle);
-    iangle = (int) (angle/(M_PI*2)*ANGLES);
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle = (float) atan2((float) deltay, (float) deltax);
+	if (angle<0)
+		angle = (float) (M_PI*2+angle);
+	iangle = (int) (angle/(M_PI*2)*ANGLES);
 
-    GetNewActor ();
-    newobj->state = &s_needle1;
-    newobj->ticcount = 1;
+	GetNewActor ();
+	newobj->state = &s_needle1;
+	newobj->ticcount = 1;
 
-    newobj->tilex = ob->tilex;
-    newobj->tiley = ob->tiley;
-    newobj->x = ob->x;
-    newobj->y = ob->y;
-    newobj->obclass = needleobj;
-    newobj->dir = nodir;
-    newobj->angle = iangle;
-    newobj->speed = 0x2000l;
+	newobj->tilex = ob->tilex;
+	newobj->tiley = ob->tiley;
+	newobj->x = ob->x;
+	newobj->y = ob->y;
+	newobj->obclass = needleobj;
+	newobj->dir = nodir;
+	newobj->angle = iangle;
+	newobj->speed = 0x2000l;
 
-    newobj->flags = FL_NEVERMARK;
-    newobj->active = ac_yes;
+	newobj->flags = FL_NEVERMARK;
+	newobj->active = ac_yes;
 
-    PlaySoundLocActor ("schabbs/throw",newobj);
+	PlaySoundLocActor ("schabbs/throw",newobj);
 }
 
 /*
@@ -2340,34 +2340,34 @@ void T_SchabbThrow (objtype *ob)
 
 void T_GiftThrow (objtype *ob)
 {
-    int32_t deltax,deltay;
-    float   angle;
-    int     iangle;
+	int32_t deltax,deltay;
+	float   angle;
+	int     iangle;
 
-    deltax = player->x - ob->x;
-    deltay = ob->y - player->y;
-    angle = (float) atan2((float) deltay, (float) deltax);
-    if (angle<0)
-        angle = (float) (M_PI*2+angle);
-    iangle = (int) (angle/(M_PI*2)*ANGLES);
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle = (float) atan2((float) deltay, (float) deltax);
+	if (angle<0)
+		angle = (float) (M_PI*2+angle);
+	iangle = (int) (angle/(M_PI*2)*ANGLES);
 
-    GetNewActor ();
-    newobj->state = &s_rocket;
-    newobj->ticcount = 1;
+	GetNewActor ();
+	newobj->state = &s_rocket;
+	newobj->ticcount = 1;
 
-    newobj->tilex = ob->tilex;
-    newobj->tiley = ob->tiley;
-    newobj->x = ob->x;
-    newobj->y = ob->y;
-    newobj->obclass = rocketobj;
-    newobj->dir = nodir;
-    newobj->angle = iangle;
-    newobj->speed = 0x2000l;
-    newobj->flags = FL_NEVERMARK;
-    newobj->active = ac_yes;
+	newobj->tilex = ob->tilex;
+	newobj->tiley = ob->tiley;
+	newobj->x = ob->x;
+	newobj->y = ob->y;
+	newobj->obclass = rocketobj;
+	newobj->dir = nodir;
+	newobj->angle = iangle;
+	newobj->speed = 0x2000l;
+	newobj->flags = FL_NEVERMARK;
+	newobj->active = ac_yes;
 
 #ifndef APOGEE_1_0          // T_GiftThrow will never be called in shareware v1.0
-    PlaySoundLocActor ("missile/fire",newobj);
+	PlaySoundLocActor ("missile/fire",newobj);
 #endif
 }
 
@@ -2382,85 +2382,85 @@ void T_GiftThrow (objtype *ob)
 
 void T_Schabb (objtype *ob)
 {
-    int32_t move;
-    int     dx,dy,dist;
-    boolean dodge;
+	int32_t move;
+	int     dx,dy,dist;
+	boolean dodge;
 
-    dodge = false;
-    dx = abs(ob->tilex - player->tilex);
-    dy = abs(ob->tiley - player->tiley);
-    dist = dx>dy ? dx : dy;
+	dodge = false;
+	dx = abs(ob->tilex - player->tilex);
+	dy = abs(ob->tiley - player->tiley);
+	dist = dx>dy ? dx : dy;
 
-    if (CheckLine(ob))                                              // got a shot at player?
-    {
-        ob->hidden = false;
-        if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-        {
-            //
-            // go into attack frame
-            //
-            NewState (ob,&s_schabbshoot1);
-            return;
-        }
-        dodge = true;
-    }
-    else
-        ob->hidden = true;
+	if (CheckLine(ob))                                              // got a shot at player?
+	{
+		ob->hidden = false;
+		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
+		{
+			//
+			// go into attack frame
+			//
+			NewState (ob,&s_schabbshoot1);
+			return;
+		}
+		dodge = true;
+	}
+	else
+		ob->hidden = true;
 
-    if (ob->dir == nodir)
-    {
-        if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (ob->distance < 0)
-        {
-            //
-            // waiting for a door to open
-            //
-            OpenDoor (-ob->distance-1);
-            if (doorobjlist[-ob->distance-1].action != dr_open)
-                return;
-            ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-            TryWalk(ob);
-        }
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			//
+			// waiting for a door to open
+			//
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
+			TryWalk(ob);
+		}
 
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        if (dist <4)
-            SelectRunDir (ob);
-        else if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
+		if (dist <4)
+			SelectRunDir (ob);
+		else if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 }
 
 
@@ -2474,85 +2474,85 @@ void T_Schabb (objtype *ob)
 
 void T_Gift (objtype *ob)
 {
-    int32_t move;
-    int     dx,dy,dist;
-    boolean dodge;
+	int32_t move;
+	int     dx,dy,dist;
+	boolean dodge;
 
-    dodge = false;
-    dx = abs(ob->tilex - player->tilex);
-    dy = abs(ob->tiley - player->tiley);
-    dist = dx>dy ? dx : dy;
+	dodge = false;
+	dx = abs(ob->tilex - player->tilex);
+	dy = abs(ob->tiley - player->tiley);
+	dist = dx>dy ? dx : dy;
 
-    if (CheckLine(ob))                                              // got a shot at player?
-    {
-        ob->hidden = false;
-        if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-        {
-            //
-            // go into attack frame
-            //
-            NewState (ob,&s_giftshoot1);
-            return;
-        }
-        dodge = true;
-    }
-    else
-        ob->hidden = true;
+	if (CheckLine(ob))                                              // got a shot at player?
+	{
+		ob->hidden = false;
+		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
+		{
+			//
+			// go into attack frame
+			//
+			NewState (ob,&s_giftshoot1);
+			return;
+		}
+		dodge = true;
+	}
+	else
+		ob->hidden = true;
 
-    if (ob->dir == nodir)
-    {
-        if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (ob->distance < 0)
-        {
-            //
-            // waiting for a door to open
-            //
-            OpenDoor (-ob->distance-1);
-            if (doorobjlist[-ob->distance-1].action != dr_open)
-                return;
-            ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-            TryWalk(ob);
-        }
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			//
+			// waiting for a door to open
+			//
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
+			TryWalk(ob);
+		}
 
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        if (dist <4)
-            SelectRunDir (ob);
-        else if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
+		if (dist <4)
+			SelectRunDir (ob);
+		else if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 }
 
 
@@ -2566,92 +2566,92 @@ void T_Gift (objtype *ob)
 
 void T_Fat (objtype *ob)
 {
-    int32_t move;
-    int     dx,dy,dist;
-    boolean dodge;
+	int32_t move;
+	int     dx,dy,dist;
+	boolean dodge;
 
-    dodge = false;
-    dx = abs(ob->tilex - player->tilex);
-    dy = abs(ob->tiley - player->tiley);
-    dist = dx>dy ? dx : dy;
+	dodge = false;
+	dx = abs(ob->tilex - player->tilex);
+	dy = abs(ob->tiley - player->tiley);
+	dist = dx>dy ? dx : dy;
 
-    if (CheckLine(ob))                                              // got a shot at player?
-    {
-        ob->hidden = false;
-        if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-        {
-            //
-            // go into attack frame
-            //
-            NewState (ob,&s_fatshoot1);
-            return;
-        }
-        dodge = true;
-    }
-    else
-        ob->hidden = true;
+	if (CheckLine(ob))                                              // got a shot at player?
+	{
+		ob->hidden = false;
+		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
+		{
+			//
+			// go into attack frame
+			//
+			NewState (ob,&s_fatshoot1);
+			return;
+		}
+		dodge = true;
+	}
+	else
+		ob->hidden = true;
 
-    if (ob->dir == nodir)
-    {
-        if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (ob->distance < 0)
-        {
-            //
-            // waiting for a door to open
-            //
-            OpenDoor (-ob->distance-1);
-            if (doorobjlist[-ob->distance-1].action != dr_open)
-                return;
-            ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-            TryWalk(ob);
-        }
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			//
+			// waiting for a door to open
+			//
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
+			TryWalk(ob);
+		}
 
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        if (dist <4)
-            SelectRunDir (ob);
-        else if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
+		if (dist <4)
+			SelectRunDir (ob);
+		else if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 }
 
 
 /*
 =============================================================================
 
-                                    HITLERS
+									HITLERS
 
 =============================================================================
 */
@@ -2829,20 +2829,20 @@ statetype s_hitlershoot6        = {false,SPR_HITLER_SHOOT2,10,NULL,(statefunc)T_
 
 void SpawnFakeHitler (int tilex, int tiley)
 {
-    if (DigiMode != sds_Off)
-        s_hitlerdie2.tictime = 140;
-    else
-        s_hitlerdie2.tictime = 5;
+	if (DigiMode != sds_Off)
+		s_hitlerdie2.tictime = 140;
+	else
+		s_hitlerdie2.tictime = 5;
 
-    SpawnNewObj (tilex,tiley,&s_fakestand);
-    newobj->speed = SPDPATROL;
+	SpawnNewObj (tilex,tiley,&s_fakestand);
+	newobj->speed = SPDPATROL;
 
-    newobj->obclass = fakeobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fake];
-    newobj->dir = nodir;
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	newobj->obclass = fakeobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fake];
+	newobj->dir = nodir;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -2856,21 +2856,21 @@ void SpawnFakeHitler (int tilex, int tiley)
 
 void SpawnHitler (int tilex, int tiley)
 {
-    if (DigiMode != sds_Off)
-        s_hitlerdie2.tictime = 140;
-    else
-        s_hitlerdie2.tictime = 5;
+	if (DigiMode != sds_Off)
+		s_hitlerdie2.tictime = 140;
+	else
+		s_hitlerdie2.tictime = 5;
 
 
-    SpawnNewObj (tilex,tiley,&s_mechastand);
-    newobj->speed = SPDPATROL;
+	SpawnNewObj (tilex,tiley,&s_mechastand);
+	newobj->speed = SPDPATROL;
 
-    newobj->obclass = mechahitlerobj;
-    newobj->hitpoints = starthitpoints[gamestate.difficulty][en_hitler];
-    newobj->dir = nodir;
-    newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
-    if (!loadedgame)
-        gamestate.killtotal++;
+	newobj->obclass = mechahitlerobj;
+	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_hitler];
+	newobj->dir = nodir;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+		gamestate.killtotal++;
 }
 
 
@@ -2884,21 +2884,21 @@ void SpawnHitler (int tilex, int tiley)
 
 void A_HitlerMorph (objtype *ob)
 {
-    short hitpoints[4]={500,700,800,900};
+	short hitpoints[4]={500,700,800,900};
 
-    SpawnNewObj (ob->tilex,ob->tiley,&s_hitlerchase1);
-    newobj->speed = SPDPATROL*5;
+	SpawnNewObj (ob->tilex,ob->tiley,&s_hitlerchase1);
+	newobj->speed = SPDPATROL*5;
 
-    newobj->x = ob->x;
-    newobj->y = ob->y;
+	newobj->x = ob->x;
+	newobj->y = ob->y;
 
-    newobj->distance = ob->distance;
-    newobj->dir = ob->dir;
-    newobj->flags = ob->flags | FL_SHOOTABLE;
-    newobj->flags &= ~FL_NONMARK;   // hitler stuck with nodir fix
+	newobj->distance = ob->distance;
+	newobj->dir = ob->dir;
+	newobj->flags = ob->flags | FL_SHOOTABLE;
+	newobj->flags &= ~FL_NONMARK;   // hitler stuck with nodir fix
 
-    newobj->obclass = realhitlerobj;
-    newobj->hitpoints = hitpoints[gamestate.difficulty];
+	newobj->obclass = realhitlerobj;
+	newobj->hitpoints = hitpoints[gamestate.difficulty];
 }
 
 
@@ -2910,13 +2910,13 @@ void A_HitlerMorph (objtype *ob)
 ////////////////////////////////////////////////////////
 void A_MechaSound (objtype *ob)
 {
-    if (areabyplayer[ob->areanumber])
-        PlaySoundLocActor ("hitler/active",ob);
+	if (areabyplayer[ob->areanumber])
+		PlaySoundLocActor ("hitler/active",ob);
 }
 
 void A_Slurpie (objtype *)
 {
-    SD_PlaySound("misc/slurpie");
+	SD_PlaySound("misc/slurpie");
 }
 
 /*
@@ -2929,39 +2929,39 @@ void A_Slurpie (objtype *)
 
 void T_FakeFire (objtype *ob)
 {
-    int32_t deltax,deltay;
-    float   angle;
-    int     iangle;
+	int32_t deltax,deltay;
+	float   angle;
+	int     iangle;
 
-    if (!objfreelist)       // stop shooting if over MAXACTORS
-    {
-        NewState (ob,&s_fakechase1);
-        return;
-    }
+	if (!objfreelist)       // stop shooting if over MAXACTORS
+	{
+		NewState (ob,&s_fakechase1);
+		return;
+	}
 
-    deltax = player->x - ob->x;
-    deltay = ob->y - player->y;
-    angle = (float) atan2((float) deltay, (float) deltax);
-    if (angle<0)
-        angle = (float)(M_PI*2+angle);
-    iangle = (int) (angle/(M_PI*2)*ANGLES);
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle = (float) atan2((float) deltay, (float) deltax);
+	if (angle<0)
+		angle = (float)(M_PI*2+angle);
+	iangle = (int) (angle/(M_PI*2)*ANGLES);
 
-    GetNewActor ();
-    newobj->state = &s_fire1;
-    newobj->ticcount = 1;
+	GetNewActor ();
+	newobj->state = &s_fire1;
+	newobj->ticcount = 1;
 
-    newobj->tilex = ob->tilex;
-    newobj->tiley = ob->tiley;
-    newobj->x = ob->x;
-    newobj->y = ob->y;
-    newobj->dir = nodir;
-    newobj->angle = iangle;
-    newobj->obclass = fireobj;
-    newobj->speed = 0x1200l;
-    newobj->flags = FL_NEVERMARK;
-    newobj->active = ac_yes;
+	newobj->tilex = ob->tilex;
+	newobj->tiley = ob->tiley;
+	newobj->x = ob->x;
+	newobj->y = ob->y;
+	newobj->dir = nodir;
+	newobj->angle = iangle;
+	newobj->obclass = fireobj;
+	newobj->speed = 0x1200l;
+	newobj->flags = FL_NEVERMARK;
+	newobj->active = ac_yes;
 
-    PlaySoundLocActor ("fake/attack",newobj);
+	PlaySoundLocActor ("fake/attack",newobj);
 }
 
 
@@ -2976,57 +2976,57 @@ void T_FakeFire (objtype *ob)
 
 void T_Fake (objtype *ob)
 {
-    int32_t move;
+	int32_t move;
 
-    if (CheckLine(ob))                      // got a shot at player?
-    {
-        ob->hidden = false;
-        if ( (unsigned) US_RndT() < (tics<<1) && objfreelist)
-        {
-            //
-            // go into attack frame
-            //
-            NewState (ob,&s_fakeshoot1);
-            return;
-        }
-    }
-    else
-        ob->hidden = true;
+	if (CheckLine(ob))                      // got a shot at player?
+	{
+		ob->hidden = false;
+		if ( (unsigned) US_RndT() < (tics<<1) && objfreelist)
+		{
+			//
+			// go into attack frame
+			//
+			NewState (ob,&s_fakeshoot1);
+			return;
+		}
+	}
+	else
+		ob->hidden = true;
 
-    if (ob->dir == nodir)
-    {
-        SelectDodgeDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		SelectDodgeDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+	while (move)
+	{
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        SelectDodgeDir (ob);
+		SelectDodgeDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 }
 
 #endif
@@ -3049,7 +3049,7 @@ STAND
 
 void T_Stand (objtype *ob)
 {
-    SightPlayer (ob);
+	SightPlayer (ob);
 }
 
 
@@ -3071,161 +3071,161 @@ CHASE
 
 void T_Chase (objtype *ob)
 {
-    int32_t move,target;
-    int     dx,dy,dist,chance;
-    boolean dodge;
+	int32_t move,target;
+	int     dx,dy,dist,chance;
+	boolean dodge;
 
-    if (gamestate.victoryflag)
-        return;
+	if (gamestate.victoryflag)
+		return;
 
-    dodge = false;
-    if (CheckLine(ob))      // got a shot at player?
-    {
-        ob->hidden = false;
-        dx = abs(ob->tilex - player->tilex);
-        dy = abs(ob->tiley - player->tiley);
-        dist = dx>dy ? dx : dy;
+	dodge = false;
+	if (CheckLine(ob))      // got a shot at player?
+	{
+		ob->hidden = false;
+		dx = abs(ob->tilex - player->tilex);
+		dy = abs(ob->tiley - player->tiley);
+		dist = dx>dy ? dx : dy;
 
 #ifdef PLAYDEMOLIKEORIGINAL
-        if(DEMOCOND_ORIG)
-        {
-            if(!dist || (dist == 1 && ob->distance < 0x4000))
-                chance = 300;
-            else
-                chance = (tics<<4)/dist;
-        }
-        else
+		if(DEMOCOND_ORIG)
+		{
+			if(!dist || (dist == 1 && ob->distance < 0x4000))
+				chance = 300;
+			else
+				chance = (tics<<4)/dist;
+		}
+		else
 #endif
-        {
-            if (dist)
-                chance = (tics<<4)/dist;
-            else
-                chance = 300;
+		{
+			if (dist)
+				chance = (tics<<4)/dist;
+			else
+				chance = 300;
 
-            if (dist == 1)
-            {
-                target = abs(ob->x - player->x);
-                if (target < 0x14000l)
-                {
-                    target = abs(ob->y - player->y);
-                    if (target < 0x14000l)
-                        chance = 300;
-                }
-            }
-        }
+			if (dist == 1)
+			{
+				target = abs(ob->x - player->x);
+				if (target < 0x14000l)
+				{
+					target = abs(ob->y - player->y);
+					if (target < 0x14000l)
+						chance = 300;
+				}
+			}
+		}
 
-        if ( US_RndT()<chance)
-        {
-            //
-            // go into attack frame
-            //
-            switch (ob->obclass)
-            {
-                case guardobj:
-                    NewState (ob,&s_grdshoot1);
-                    break;
-                case officerobj:
-                    NewState (ob,&s_ofcshoot1);
-                    break;
-                case mutantobj:
-                    NewState (ob,&s_mutshoot1);
-                    break;
-                case ssobj:
-                    NewState (ob,&s_ssshoot1);
-                    break;
+		if ( US_RndT()<chance)
+		{
+			//
+			// go into attack frame
+			//
+			switch (ob->obclass)
+			{
+				case guardobj:
+					NewState (ob,&s_grdshoot1);
+					break;
+				case officerobj:
+					NewState (ob,&s_ofcshoot1);
+					break;
+				case mutantobj:
+					NewState (ob,&s_mutshoot1);
+					break;
+				case ssobj:
+					NewState (ob,&s_ssshoot1);
+					break;
 #ifndef SPEAR
-                case bossobj:
-                    NewState (ob,&s_bossshoot1);
-                    break;
-                case gretelobj:
-                    NewState (ob,&s_gretelshoot1);
-                    break;
-                case mechahitlerobj:
-                    NewState (ob,&s_mechashoot1);
-                    break;
-                case realhitlerobj:
-                    NewState (ob,&s_hitlershoot1);
-                    break;
+				case bossobj:
+					NewState (ob,&s_bossshoot1);
+					break;
+				case gretelobj:
+					NewState (ob,&s_gretelshoot1);
+					break;
+				case mechahitlerobj:
+					NewState (ob,&s_mechashoot1);
+					break;
+				case realhitlerobj:
+					NewState (ob,&s_hitlershoot1);
+					break;
 #else
-                case angelobj:
-                    NewState (ob,&s_angelshoot1);
-                    break;
-                case transobj:
-                    NewState (ob,&s_transshoot1);
-                    break;
-                case uberobj:
-                    NewState (ob,&s_ubershoot1);
-                    break;
-                case willobj:
-                    NewState (ob,&s_willshoot1);
-                    break;
-                case deathobj:
-                    NewState (ob,&s_deathshoot1);
-                    break;
+				case angelobj:
+					NewState (ob,&s_angelshoot1);
+					break;
+				case transobj:
+					NewState (ob,&s_transshoot1);
+					break;
+				case uberobj:
+					NewState (ob,&s_ubershoot1);
+					break;
+				case willobj:
+					NewState (ob,&s_willshoot1);
+					break;
+				case deathobj:
+					NewState (ob,&s_deathshoot1);
+					break;
 #endif
-            }
-            return;
-        }
-        dodge = true;
-    }
-    else
-        ob->hidden = true;
+			}
+			return;
+		}
+		dodge = true;
+	}
+	else
+		ob->hidden = true;
 
-    if (ob->dir == nodir)
-    {
-        if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (ob->distance < 0)
-        {
-            //
-            // waiting for a door to open
-            //
-            OpenDoor (-ob->distance-1);
-            if (doorobjlist[-ob->distance-1].action != dr_open)
-                return;
-            ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-            DEMOIF_SDL
-            {
-                TryWalk(ob);
-            }
-        }
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			//
+			// waiting for a door to open
+			//
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
+			DEMOIF_SDL
+			{
+				TryWalk(ob);
+			}
+		}
 
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        if (dodge)
-            SelectDodgeDir (ob);
-        else
-            SelectChaseDir (ob);
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 }
 
 
@@ -3239,42 +3239,42 @@ void T_Chase (objtype *ob)
 
 void T_Ghosts (objtype *ob)
 {
-    int32_t move;
+	int32_t move;
 
-    if (ob->dir == nodir)
-    {
-        SelectChaseDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+	while (move)
+	{
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        SelectChaseDir (ob);
+		SelectChaseDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 }
 
 /*
@@ -3287,64 +3287,64 @@ void T_Ghosts (objtype *ob)
 
 void T_DogChase (objtype *ob)
 {
-    int32_t    move;
-    int32_t    dx,dy;
+	int32_t    move;
+	int32_t    dx,dy;
 
 
-    if (ob->dir == nodir)
-    {
-        SelectDodgeDir (ob);
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+	if (ob->dir == nodir)
+	{
+		SelectDodgeDir (ob);
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        //
-        // check for byte range
-        //
-        dx = player->x - ob->x;
-        if (dx<0)
-            dx = -dx;
-        dx -= move;
-        if (dx <= MINACTORDIST)
-        {
-            dy = player->y - ob->y;
-            if (dy<0)
-                dy = -dy;
-            dy -= move;
-            if (dy <= MINACTORDIST)
-            {
-                NewState (ob,&s_dogjump1);
-                return;
-            }
-        }
+	while (move)
+	{
+		//
+		// check for byte range
+		//
+		dx = player->x - ob->x;
+		if (dx<0)
+			dx = -dx;
+		dx -= move;
+		if (dx <= MINACTORDIST)
+		{
+			dy = player->y - ob->y;
+			if (dy<0)
+				dy = -dy;
+			dy -= move;
+			if (dy <= MINACTORDIST)
+			{
+				NewState (ob,&s_dogjump1);
+				return;
+			}
+		}
 
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        //
-        // reached goal tile, so select another one
-        //
+		//
+		// reached goal tile, so select another one
+		//
 
-        //
-        // fix position to account for round off during moving
-        //
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		//
+		// fix position to account for round off during moving
+		//
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-        move -= ob->distance;
+		move -= ob->distance;
 
-        SelectDodgeDir (ob);
+		SelectDodgeDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                                 // object is blocked in
-    }
+		if (ob->dir == nodir)
+			return;                                                 // object is blocked in
+	}
 }
 
 
@@ -3352,7 +3352,7 @@ void T_DogChase (objtype *ob)
 /*
 ============================================================================
 
-                                    PATH
+									PATH
 
 ============================================================================
 */
@@ -3368,20 +3368,20 @@ void T_DogChase (objtype *ob)
 
 void SelectPathDir (objtype *ob)
 {
-    unsigned spot;
+	unsigned spot;
 
-    spot = MAPSPOT(ob->tilex,ob->tiley,1)-ICONARROWS;
+	spot = MAPSPOT(ob->tilex,ob->tiley,1)-ICONARROWS;
 
-    if (spot<8)
-    {
-        // new direction
-        ob->dir = (dirtype)(spot);
-    }
+	if (spot<8)
+	{
+		// new direction
+		ob->dir = (dirtype)(spot);
+	}
 
-    ob->distance = TILEGLOBAL;
+	ob->distance = TILEGLOBAL;
 
-    if (!TryWalk (ob))
-        ob->dir = nodir;
+	if (!TryWalk (ob))
+		ob->dir = nodir;
 }
 
 
@@ -3395,67 +3395,67 @@ void SelectPathDir (objtype *ob)
 
 void T_Path (objtype *ob)
 {
-    int32_t    move;
+	int32_t    move;
 
-    if (SightPlayer (ob))
-        return;
+	if (SightPlayer (ob))
+		return;
 
-    if (ob->dir == nodir)
-    {
-        SelectPathDir (ob);
-        if (ob->dir == nodir)
-            return;                                 // all movement is blocked
-    }
+	if (ob->dir == nodir)
+	{
+		SelectPathDir (ob);
+		if (ob->dir == nodir)
+			return;                                 // all movement is blocked
+	}
 
 
-    move = ob->speed*tics;
+	move = ob->speed*tics;
 
-    while (move)
-    {
-        if (ob->distance < 0)
-        {
-            //
-            // waiting for a door to open
-            //
-            OpenDoor (-ob->distance-1);
-            if (doorobjlist[-ob->distance-1].action != dr_open)
-                return;
-            ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-            DEMOIF_SDL
-            {
-                TryWalk(ob);
-            }
-        }
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			//
+			// waiting for a door to open
+			//
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
+			DEMOIF_SDL
+			{
+				TryWalk(ob);
+			}
+		}
 
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
-        if (ob->tilex>MAPSIZE || ob->tiley>MAPSIZE)
-        {
-            sprintf (str, "T_Path hit a wall at %u,%u, dir %u",
-                ob->tilex,ob->tiley,ob->dir);
-            Quit (str);
-        }
+		if (ob->tilex>MAPSIZE || ob->tiley>MAPSIZE)
+		{
+			sprintf (str, "T_Path hit a wall at %u,%u, dir %u",
+				ob->tilex,ob->tiley,ob->dir);
+			Quit (str);
+		}
 
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-        move -= ob->distance;
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		move -= ob->distance;
 
-        SelectPathDir (ob);
+		SelectPathDir (ob);
 
-        if (ob->dir == nodir)
-            return;                                 // all movement is blocked
-    }
+		if (ob->dir == nodir)
+			return;                                 // all movement is blocked
+	}
 }
 
 
 /*
 =============================================================================
 
-                                    FIGHT
+									FIGHT
 
 =============================================================================
 */
@@ -3473,80 +3473,80 @@ void T_Path (objtype *ob)
 
 void T_Shoot (objtype *ob)
 {
-    int     dx,dy,dist;
-    int     hitchance,damage;
+	int     dx,dy,dist;
+	int     hitchance,damage;
 
-    hitchance = 128;
+	hitchance = 128;
 
-    if (!areabyplayer[ob->areanumber])
-        return;
+	if (!areabyplayer[ob->areanumber])
+		return;
 
-    if (CheckLine (ob))                    // player is not behind a wall
-    {
-        dx = abs(ob->tilex - player->tilex);
-        dy = abs(ob->tiley - player->tiley);
-        dist = dx>dy ? dx:dy;
+	if (CheckLine (ob))                    // player is not behind a wall
+	{
+		dx = abs(ob->tilex - player->tilex);
+		dy = abs(ob->tiley - player->tiley);
+		dist = dx>dy ? dx:dy;
 
-        if (ob->obclass == ssobj || ob->obclass == bossobj)
-            dist = dist*2/3;                                        // ss are better shots
+		if (ob->obclass == ssobj || ob->obclass == bossobj)
+			dist = dist*2/3;                                        // ss are better shots
 
-        if (thrustspeed >= RUNSPEED)
-        {
-            if (ob->flags&FL_VISABLE)
-                hitchance = 160-dist*16;                // player can see to dodge
-            else
-                hitchance = 160-dist*8;
-        }
-        else
-        {
-            if (ob->flags&FL_VISABLE)
-                hitchance = 256-dist*16;                // player can see to dodge
-            else
-                hitchance = 256-dist*8;
-        }
+		if (thrustspeed >= RUNSPEED)
+		{
+			if (ob->flags&FL_VISABLE)
+				hitchance = 160-dist*16;                // player can see to dodge
+			else
+				hitchance = 160-dist*8;
+		}
+		else
+		{
+			if (ob->flags&FL_VISABLE)
+				hitchance = 256-dist*16;                // player can see to dodge
+			else
+				hitchance = 256-dist*8;
+		}
 
-        // see if the shot was a hit
+		// see if the shot was a hit
 
-        if (US_RndT()<hitchance)
-        {
-            if (dist<2)
-                damage = US_RndT()>>2;
-            else if (dist<4)
-                damage = US_RndT()>>3;
-            else
-                damage = US_RndT()>>4;
+		if (US_RndT()<hitchance)
+		{
+			if (dist<2)
+				damage = US_RndT()>>2;
+			else if (dist<4)
+				damage = US_RndT()>>3;
+			else
+				damage = US_RndT()>>4;
 
-            TakeDamage (damage,ob);
-        }
-    }
+			TakeDamage (damage,ob);
+		}
+	}
 
-    switch(ob->obclass)
-    {
-        case ssobj:
-            PlaySoundLocActor("wolfss/attack",ob);
-            break;
+	switch(ob->obclass)
+	{
+		case ssobj:
+			PlaySoundLocActor("wolfss/attack",ob);
+			break;
 #ifndef SPEAR
 #ifndef APOGEE_1_0
-        case giftobj:
-        case fatobj:
-            PlaySoundLocActor("missile/fire",ob);
-            break;
+		case giftobj:
+		case fatobj:
+			PlaySoundLocActor("missile/fire",ob);
+			break;
 #endif
-        case mechahitlerobj:
-        case realhitlerobj:
-        case bossobj:
-            PlaySoundLocActorBoss("hans/attack",ob);
-            break;
-        case schabbobj:
-            PlaySoundLocActor("schabbs/throw",ob);
-            break;
-        case fakeobj:
-            PlaySoundLocActor("fake/attack",ob);
-            break;
+		case mechahitlerobj:
+		case realhitlerobj:
+		case bossobj:
+			PlaySoundLocActorBoss("hans/attack",ob);
+			break;
+		case schabbobj:
+			PlaySoundLocActor("schabbs/throw",ob);
+			break;
+		case fakeobj:
+			PlaySoundLocActor("fake/attack",ob);
+			break;
 #endif
-        default:
-            PlaySoundLocActor("guard/attack",ob);
-    }
+		default:
+			PlaySoundLocActor("guard/attack",ob);
+	}
 }
 
 
@@ -3560,29 +3560,29 @@ void T_Shoot (objtype *ob)
 
 void T_Bite (objtype *ob)
 {
-    int32_t    dx,dy;
+	int32_t    dx,dy;
 
-    PlaySoundLocActor("dog/attack",ob);     // JAB
+	PlaySoundLocActor("dog/attack",ob);     // JAB
 
-    dx = player->x - ob->x;
-    if (dx<0)
-        dx = -dx;
-    dx -= TILEGLOBAL;
-    if (dx <= MINACTORDIST)
-    {
-        dy = player->y - ob->y;
-        if (dy<0)
-            dy = -dy;
-        dy -= TILEGLOBAL;
-        if (dy <= MINACTORDIST)
-        {
-            if (US_RndT()<180)
-            {
-                TakeDamage (US_RndT()>>4,ob);
-                return;
-            }
-        }
-    }
+	dx = player->x - ob->x;
+	if (dx<0)
+		dx = -dx;
+	dx -= TILEGLOBAL;
+	if (dx <= MINACTORDIST)
+	{
+		dy = player->y - ob->y;
+		if (dy<0)
+			dy = -dy;
+		dy -= TILEGLOBAL;
+		if (dy <= MINACTORDIST)
+		{
+			if (US_RndT()<180)
+			{
+				TakeDamage (US_RndT()>>4,ob);
+				return;
+			}
+		}
+	}
 }
 
 
@@ -3590,7 +3590,7 @@ void T_Bite (objtype *ob)
 /*
 ============================================================================
 
-                                    BJ VICTORY
+									BJ VICTORY
 
 ============================================================================
 */
@@ -3647,12 +3647,12 @@ statetype s_deathcam            = {false,0,0,NULL,NULL,NULL};
 
 void SpawnBJVictory (void)
 {
-    SpawnNewObj (player->tilex,player->tiley+1,&s_bjrun1);
-    newobj->x = player->x;
-    newobj->y = player->y;
-    newobj->obclass = bjobj;
-    newobj->dir = north;
-    newobj->temp1 = 6;                      // tiles to run forward
+	SpawnNewObj (player->tilex,player->tiley+1,&s_bjrun1);
+	newobj->x = player->x;
+	newobj->y = player->y;
+	newobj->obclass = bjobj;
+	newobj->dir = north;
+	newobj->temp1 = 6;                      // tiles to run forward
 }
 
 
@@ -3667,31 +3667,31 @@ void SpawnBJVictory (void)
 
 void T_BJRun (objtype *ob)
 {
-    int32_t    move;
+	int32_t    move;
 
-    move = BJRUNSPEED*tics;
+	move = BJRUNSPEED*tics;
 
-    while (move)
-    {
-        if (move < ob->distance)
-        {
-            MoveObj (ob,move);
-            break;
-        }
+	while (move)
+	{
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
 
 
-        ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-        ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-        move -= ob->distance;
+		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		move -= ob->distance;
 
-        SelectPathDir (ob);
+		SelectPathDir (ob);
 
-        if ( !(--ob->temp1) )
-        {
-            NewState (ob,&s_bjjump1);
-            return;
-        }
-    }
+		if ( !(--ob->temp1) )
+		{
+			NewState (ob,&s_bjjump1);
+			return;
+		}
+	}
 }
 
 
@@ -3705,10 +3705,10 @@ void T_BJRun (objtype *ob)
 
 void T_BJJump (objtype *ob)
 {
-    int32_t    move;
+	int32_t    move;
 
-    move = BJJUMPSPEED*tics;
-    MoveObj (ob,move);
+	move = BJJUMPSPEED*tics;
+	MoveObj (ob,move);
 }
 
 
@@ -3722,7 +3722,7 @@ void T_BJJump (objtype *ob)
 
 void T_BJYell (objtype *ob)
 {
-    PlaySoundLocActor("misc/yeah",ob);  // JAB
+	PlaySoundLocActor("misc/yeah",ob);  // JAB
 }
 
 
@@ -3736,7 +3736,7 @@ void T_BJYell (objtype *ob)
 
 void T_BJDone (objtype *)
 {
-    playstate = ex_victorious;                              // exit castle tile
+	playstate = ex_victorious;                              // exit castle tile
 }
 
 
@@ -3754,29 +3754,29 @@ void T_BJDone (objtype *)
 
 boolean CheckPosition (objtype *ob)
 {
-    int     x,y,xl,yl,xh,yh;
-    objtype *check;
+	int     x,y,xl,yl,xh,yh;
+	objtype *check;
 
-    xl = (ob->x-PLAYERSIZE) >> TILESHIFT;
-    yl = (ob->y-PLAYERSIZE) >> TILESHIFT;
+	xl = (ob->x-PLAYERSIZE) >> TILESHIFT;
+	yl = (ob->y-PLAYERSIZE) >> TILESHIFT;
 
-    xh = (ob->x+PLAYERSIZE) >> TILESHIFT;
-    yh = (ob->y+PLAYERSIZE) >> TILESHIFT;
+	xh = (ob->x+PLAYERSIZE) >> TILESHIFT;
+	yh = (ob->y+PLAYERSIZE) >> TILESHIFT;
 
-    //
-    // check for solid walls
-    //
-    for (y=yl;y<=yh;y++)
-    {
-        for (x=xl;x<=xh;x++)
-        {
-            check = actorat[x][y];
-            if (check && !ISPOINTER(check))
-                return false;
-        }
-    }
+	//
+	// check for solid walls
+	//
+	for (y=yl;y<=yh;y++)
+	{
+		for (x=xl;x<=xh;x++)
+		{
+			check = actorat[x][y];
+			if (check && !ISPOINTER(check))
+				return false;
+		}
+	}
 
-    return true;
+	return true;
 }
 
 
@@ -3790,109 +3790,109 @@ boolean CheckPosition (objtype *ob)
 
 void    A_StartDeathCam (objtype *ob)
 {
-    int32_t dx,dy;
-    float   fangle;
-    int32_t xmove,ymove;
-    int32_t dist;
+	int32_t dx,dy;
+	float   fangle;
+	int32_t xmove,ymove;
+	int32_t dist;
 
-    FinishPaletteShifts ();
+	FinishPaletteShifts ();
 
-    VW_WaitVBL (100);
+	VW_WaitVBL (100);
 
-    if (gamestate.victoryflag)
-    {
-        playstate = ex_victorious;                              // exit castle tile
-        return;
-    }
+	if (gamestate.victoryflag)
+	{
+		playstate = ex_victorious;                              // exit castle tile
+		return;
+	}
 
-    gamestate.victoryflag = true;
-    unsigned fadeheight = viewsize != 21 ? screenHeight-scaleFactor*STATUSLINES : screenHeight;
-    VL_BarScaledCoord (0, 0, screenWidth, fadeheight, bordercol);
-    FizzleFade(screenBuffer, screen, 0, 0, screenWidth, fadeheight, 70, false);
+	gamestate.victoryflag = true;
+	unsigned fadeheight = viewsize != 21 ? screenHeight-scaleFactor*STATUSLINES : screenHeight;
+	VL_BarScaledCoord (0, 0, screenWidth, fadeheight, bordercol);
+	FizzleFade(screenBuffer, screen, 0, 0, screenWidth, fadeheight, 70, false);
 
-    if (bordercol != VIEWCOLOR)
-    {
-        fontnumber = 1;
-        SETFONTCOLOR(15,bordercol);
-        PrintX = 68; PrintY = 45;
-        US_Print (language["STR_SEEAGAIN"]);
-    }
-    else
-    {
+	if (bordercol != VIEWCOLOR)
+	{
+		fontnumber = 1;
+		SETFONTCOLOR(15,bordercol);
+		PrintX = 68; PrintY = 45;
+		US_Print (language["STR_SEEAGAIN"]);
+	}
+	else
+	{
 #ifdef JAPAN
 #ifndef JAPDEMO
-        CA_CacheScreen(C_LETSSEEPIC);
+		CA_CacheScreen(C_LETSSEEPIC);
 #endif
 #else
-        Write(0,7,language["STR_SEEAGAIN"]);
+		Write(0,7,language["STR_SEEAGAIN"]);
 #endif
-    }
+	}
 
-    VW_UpdateScreen ();
+	VW_UpdateScreen ();
 
-    IN_UserInput(300);
+	IN_UserInput(300);
 
-    //
-    // line angle up exactly
-    //
-    NewState (player,&s_deathcam);
+	//
+	// line angle up exactly
+	//
+	NewState (player,&s_deathcam);
 
-    player->x = gamestate.killx;
-    player->y = gamestate.killy;
+	player->x = gamestate.killx;
+	player->y = gamestate.killy;
 
-    dx = ob->x - player->x;
-    dy = player->y - ob->y;
+	dx = ob->x - player->x;
+	dy = player->y - ob->y;
 
-    fangle = (float) atan2((float) dy, (float) dx);          // returns -pi to pi
-    if (fangle<0)
-        fangle = (float) (M_PI*2+fangle);
+	fangle = (float) atan2((float) dy, (float) dx);          // returns -pi to pi
+	if (fangle<0)
+		fangle = (float) (M_PI*2+fangle);
 
-    player->angle = (short) (fangle/(M_PI*2)*ANGLES);
+	player->angle = (short) (fangle/(M_PI*2)*ANGLES);
 
-    //
-    // try to position as close as possible without being in a wall
-    //
-    dist = 0x14000l;
-    do
-    {
-        xmove = FixedMul(dist,costable[player->angle]);
-        ymove = -FixedMul(dist,sintable[player->angle]);
+	//
+	// try to position as close as possible without being in a wall
+	//
+	dist = 0x14000l;
+	do
+	{
+		xmove = FixedMul(dist,costable[player->angle]);
+		ymove = -FixedMul(dist,sintable[player->angle]);
 
-        player->x = ob->x - xmove;
-        player->y = ob->y - ymove;
-        dist += 0x1000;
+		player->x = ob->x - xmove;
+		player->y = ob->y - ymove;
+		dist += 0x1000;
 
-    } while (!CheckPosition (player));
-    plux = (word)(player->x >> UNSIGNEDSHIFT);                      // scale to fit in unsigned
-    pluy = (word)(player->y >> UNSIGNEDSHIFT);
-    player->tilex = (word)(player->x >> TILESHIFT);         // scale to tile values
-    player->tiley = (word)(player->y >> TILESHIFT);
+	} while (!CheckPosition (player));
+	plux = (word)(player->x >> UNSIGNEDSHIFT);                      // scale to fit in unsigned
+	pluy = (word)(player->y >> UNSIGNEDSHIFT);
+	player->tilex = (word)(player->x >> TILESHIFT);         // scale to tile values
+	player->tiley = (word)(player->y >> TILESHIFT);
 
-    //
-    // go back to the game
-    //
+	//
+	// go back to the game
+	//
 
-    DrawPlayBorder ();
+	DrawPlayBorder ();
 
-    fizzlein = true;
+	fizzlein = true;
 
-    switch (ob->obclass)
-    {
+	switch (ob->obclass)
+	{
 #ifndef SPEAR
-        case schabbobj:
-            NewState (ob,&s_schabbdeathcam);
-            break;
-        case realhitlerobj:
-            NewState (ob,&s_hitlerdeathcam);
-            break;
-        case giftobj:
-            NewState (ob,&s_giftdeathcam);
-            break;
-        case fatobj:
-            NewState (ob,&s_fatdeathcam);
-            break;
+		case schabbobj:
+			NewState (ob,&s_schabbdeathcam);
+			break;
+		case realhitlerobj:
+			NewState (ob,&s_hitlerdeathcam);
+			break;
+		case giftobj:
+			NewState (ob,&s_giftdeathcam);
+			break;
+		case fatobj:
+			NewState (ob,&s_fatdeathcam);
+			break;
 #endif
-    }
+	}
 }
 
 #endif

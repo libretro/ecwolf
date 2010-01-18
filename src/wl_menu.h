@@ -145,9 +145,9 @@ enum {MOUSE,JOYSTICK,KEYBOARDBTNS,KEYBOARDMOVE};        // FOR INPUT TYPES
 // WL_INTER
 //
 typedef struct {
-                int kill,secret,treasure;
-                int32_t time;
-                } LRstruct;
+				int kill,secret,treasure;
+				int32_t time;
+				} LRstruct;
 
 extern LRstruct LevelRatios[];
 

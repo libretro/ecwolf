@@ -520,17 +520,17 @@ void CreateMenus()
 }
 
 static const int color_hlite[] = {
-    DEACTIVE,
-    HIGHLIGHT,
-    READHCOLOR,
-    0x67
+	DEACTIVE,
+	HIGHLIGHT,
+	READHCOLOR,
+	0x67
 };
 
 static const int color_norml[] = {
-    DEACTIVE,
-    TEXTCOLOR,
-    READCOLOR,
-    0x6b
+	DEACTIVE,
+	TEXTCOLOR,
+	READCOLOR,
+	0x6b
 };
 
 static int SoundStatus = 1;
@@ -545,60 +545,60 @@ static char SaveName[13] = "savegam?.";
 void
 US_ControlPanel (ScanCode scancode)
 {
-    int which;
+	int which;
 	bool idEasterEgg = Wads.CheckNumForName("IDGUYS1") != -1;
 
-    if (ingame)
-    {
-        if (CP_CheckQuick (scancode))
-            return;
-        lastgamemusicoffset = StartCPMusic (MENUSONG);
-    }
-    else
-        StartCPMusic (MENUSONG);
-    SetupControlPanel ();
+	if (ingame)
+	{
+		if (CP_CheckQuick (scancode))
+			return;
+		lastgamemusicoffset = StartCPMusic (MENUSONG);
+	}
+	else
+		StartCPMusic (MENUSONG);
+	SetupControlPanel ();
 
-    //
-    // F-KEYS FROM WITHIN GAME
-    //
+	//
+	// F-KEYS FROM WITHIN GAME
+	//
 	Menu::closeMenus(false);
-    switch (scancode)
-    {
-        case sc_F1:
+	switch (scancode)
+	{
+		case sc_F1:
 #ifdef SPEAR
-            BossKey ();
+			BossKey ();
 #else
 #ifdef GOODTIMES
-            BossKey ();
+			BossKey ();
 #else
-            HelpScreens ();
+			HelpScreens ();
 #endif
 #endif
-            goto finishup;
+			goto finishup;
 
-        case sc_F2:
+		case sc_F2:
 			saveGame.show();
-            goto finishup;
+			goto finishup;
 
-        case sc_F3:
+		case sc_F3:
 			loadGame.show();
-            goto finishup;
+			goto finishup;
 
-        case sc_F4:
-            soundBase.show();
-            goto finishup;
+		case sc_F4:
+			soundBase.show();
+			goto finishup;
 
-        case sc_F6:
-            controlBase.show ();
-            goto finishup;
+		case sc_F6:
+			controlBase.show ();
+			goto finishup;
 
-        finishup:
-            CleanupControlPanel ();
-            return;
+		finishup:
+			CleanupControlPanel ();
+			return;
 
 		default:
 			break;
-    }
+	}
 
 	if(ingame)
 	{
@@ -614,16 +614,16 @@ US_ControlPanel (ScanCode scancode)
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(false);
 		mainMenu[4]->setEnabled(false);
 	}
-    mainMenu.draw();
-    MenuFadeIn ();
+	mainMenu.draw();
+	MenuFadeIn ();
 	Menu::closeMenus(false);
 
-    //
-    // MAIN MENU LOOP
-    //
-    do
-    {
-        which = mainMenu.handle();
+	//
+	// MAIN MENU LOOP
+	//
+	do
+	{
+		which = mainMenu.handle();
 
 /*		if(idEasterEgg)
 		{
@@ -661,32 +661,32 @@ US_ControlPanel (ScanCode scancode)
 			}
 		}*/
 
-        switch (which)
-        {
-            case -1:
-                QuitGame(0);
-                break;
+		switch (which)
+		{
+			case -1:
+				QuitGame(0);
+				break;
 
-            default:
-                if (!Menu::areMenusClosed())
-                {
-                    mainMenu.draw();
-                    MenuFadeIn ();
-                }
-        }
+			default:
+				if (!Menu::areMenusClosed())
+				{
+					mainMenu.draw();
+					MenuFadeIn ();
+				}
+		}
 
-        //
-        // "EXIT OPTIONS" OR "NEW GAME" EXITS
-        //
-    }
-    while (!Menu::areMenusClosed());
+		//
+		// "EXIT OPTIONS" OR "NEW GAME" EXITS
+		//
+	}
+	while (!Menu::areMenusClosed());
 
-    //
-    // DEALLOCATE EVERYTHING
-    //
-    CleanupControlPanel ();
+	//
+	// DEALLOCATE EVERYTHING
+	//
+	CleanupControlPanel ();
 
-    // RETURN/START GAME EXECUTION
+	// RETURN/START GAME EXECUTION
 }
 
 #ifdef GOODTIMES
@@ -699,26 +699,26 @@ void
 BossKey (void)
 {
 #ifdef NOTYET
-    byte palette1[256][3];
-    SD_MusicOff ();
+	byte palette1[256][3];
+	SD_MusicOff ();
 /*       _AX = 3;
-        geninterrupt(0x10); */
-    _asm
-    {
-    mov eax, 3 int 0x10}
-    puts ("C>");
-    SetTextCursor (2, 0);
+		geninterrupt(0x10); */
+	_asm
+	{
+	mov eax, 3 int 0x10}
+	puts ("C>");
+	SetTextCursor (2, 0);
 //      while (!Keyboard[sc_Escape])
-    IN_Ack ();
-    IN_ClearKeysDown ();
+	IN_Ack ();
+	IN_ClearKeysDown ();
 
-    SD_MusicOn ();
-    VL_SetVGAPlaneMode ();
-    for (int i = 0; i < 768; i++)
-        palette1[0][i] = 0;
+	SD_MusicOn ();
+	VL_SetVGAPlaneMode ();
+	for (int i = 0; i < 768; i++)
+		palette1[0][i] = 0;
 
-    VL_SetPalette (&palette1[0][0]);
-    LoadLatchMem ();
+	VL_SetPalette (&palette1[0][0]);
+	LoadLatchMem ();
 #endif
 }
 #else
@@ -727,26 +727,26 @@ void
 BossKey (void)
 {
 #ifdef NOTYET
-    byte palette1[256][3];
-    SD_MusicOff ();
+	byte palette1[256][3];
+	SD_MusicOff ();
 /*       _AX = 3;
-        geninterrupt(0x10); */
-    _asm
-    {
-    mov eax, 3 int 0x10}
-    puts ("C>");
-    SetTextCursor (2, 0);
+		geninterrupt(0x10); */
+	_asm
+	{
+	mov eax, 3 int 0x10}
+	puts ("C>");
+	SetTextCursor (2, 0);
 //      while (!Keyboard[sc_Escape])
-    IN_Ack ();
-    IN_ClearKeysDown ();
+	IN_Ack ();
+	IN_ClearKeysDown ();
 
-    SD_MusicOn ();
-    VL_SetVGAPlaneMode ();
-    for (int i = 0; i < 768; i++)
-        palette1[0][i] = 0;
+	SD_MusicOn ();
+	VL_SetVGAPlaneMode ();
+	for (int i = 0; i < 768; i++)
+		palette1[0][i] = 0;
 
-    VL_SetPalette (&palette1[0][0]);
-    LoadLatchMem ();
+	VL_SetPalette (&palette1[0][0]);
+	LoadLatchMem ();
 #endif
 }
 #endif
@@ -761,70 +761,70 @@ BossKey (void)
 int
 CP_CheckQuick (ScanCode scancode)
 {
-    switch (scancode)
-    {
-        //
-        // END GAME
-        //
-        case sc_F7:
-            WindowH = 160;
+	switch (scancode)
+	{
+		//
+		// END GAME
+		//
+		case sc_F7:
+			WindowH = 160;
 #ifdef JAPAN
-            if (GetYorN (7, 8, C_JAPQUITPIC))
+			if (GetYorN (7, 8, C_JAPQUITPIC))
 #else
-            if (Confirm (language["ENDGAMESTR"]))
+			if (Confirm (language["ENDGAMESTR"]))
 #endif
-            {
-                playstate = ex_died;
-                killerobj = NULL;
-                pickquick = gamestate.lives = 0;
-            }
+			{
+				playstate = ex_died;
+				killerobj = NULL;
+				pickquick = gamestate.lives = 0;
+			}
 
-            WindowH = 200;
-            fontnumber = 0;
-            return 1;
+			WindowH = 200;
+			fontnumber = 0;
+			return 1;
 
-        //
-        // QUICKSAVE
-        //
-        case sc_F8:
+		//
+		// QUICKSAVE
+		//
+		case sc_F8:
 			if(saveGame.getCurrentPosition() != 0)
-            {
+			{
 				quickSaveLoad = true;
 				PerformSaveGame(saveGame.getCurrentPosition());
 				quickSaveLoad = false;
-            }
-            else
-            {
-                VW_FadeOut ();
-                if(screenHeight % 200 != 0)
-                    VL_ClearScreen(0);
+			}
+			else
+			{
+				VW_FadeOut ();
+				if(screenHeight % 200 != 0)
+					VL_ClearScreen(0);
 
-                lastgamemusicoffset = StartCPMusic (MENUSONG);
+				lastgamemusicoffset = StartCPMusic (MENUSONG);
 				Menu::closeMenus(false);
-                saveGame.show();
+				saveGame.show();
 
-                SETFONTCOLOR (0, 15);
-                IN_ClearKeysDown ();
-                VW_FadeOut();
-                if(viewsize != 21)
-                    DrawPlayScreen ();
+				SETFONTCOLOR (0, 15);
+				IN_ClearKeysDown ();
+				VW_FadeOut();
+				if(viewsize != 21)
+					DrawPlayScreen ();
 
-                if (!startgame && !loadedgame)
-                    ContinueMusic (lastgamemusicoffset);
+				if (!startgame && !loadedgame)
+					ContinueMusic (lastgamemusicoffset);
 
-                if (loadedgame)
-                    playstate = ex_abort;
-                lasttimecount = GetTimeCount ();
+				if (loadedgame)
+					playstate = ex_abort;
+				lasttimecount = GetTimeCount ();
 
-                if (MousePresent && IN_IsInputGrabbed())
-                    IN_CenterMouse();     // Clear accumulated mouse movement
-            }
-            return 1;
+				if (MousePresent && IN_IsInputGrabbed())
+					IN_CenterMouse();     // Clear accumulated mouse movement
+			}
+			return 1;
 
-        //
-        // QUICKLOAD
-        //
-        case sc_F9:
+		//
+		// QUICKLOAD
+		//
+		case sc_F9:
 			if(saveGame.getCurrentPosition() != 0)
 			{
 				quickSaveLoad = true;
@@ -835,52 +835,52 @@ CP_CheckQuick (ScanCode scancode)
 					LoadSaveGame(saveGame.getCurrentPosition()-1);
 				fontnumber = 0;
 				quickSaveLoad = false;
-            }
-            else
-            {
-                VW_FadeOut ();
-                if(screenHeight % 200 != 0)
-                    VL_ClearScreen(0);
+			}
+			else
+			{
+				VW_FadeOut ();
+				if(screenHeight % 200 != 0)
+					VL_ClearScreen(0);
 
-                lastgamemusicoffset = StartCPMusic (MENUSONG);
+				lastgamemusicoffset = StartCPMusic (MENUSONG);
 				Menu::closeMenus(false);
-                loadGame.show();
+				loadGame.show();
 
-                SETFONTCOLOR (0, 15);
-                IN_ClearKeysDown ();
-                VW_FadeOut();
-                if(viewsize != 21)
-                    DrawPlayScreen ();
+				SETFONTCOLOR (0, 15);
+				IN_ClearKeysDown ();
+				VW_FadeOut();
+				if(viewsize != 21)
+					DrawPlayScreen ();
 
-                if (!startgame && !loadedgame)
-                    ContinueMusic (lastgamemusicoffset);
+				if (!startgame && !loadedgame)
+					ContinueMusic (lastgamemusicoffset);
 
-                if (loadedgame)
-                    playstate = ex_abort;
+				if (loadedgame)
+					playstate = ex_abort;
 
-                lasttimecount = GetTimeCount ();
+				lasttimecount = GetTimeCount ();
 
-                if (MousePresent && IN_IsInputGrabbed())
-                    IN_CenterMouse();     // Clear accumulated mouse movement
-            }
-            return 1;
+				if (MousePresent && IN_IsInputGrabbed())
+					IN_CenterMouse();     // Clear accumulated mouse movement
+			}
+			return 1;
 
-        //
-        // QUIT
-        //
-        case sc_F10:
-            WindowX = WindowY = 0;
-            WindowW = 320;
-            WindowH = 160;
+		//
+		// QUIT
+		//
+		case sc_F10:
+			WindowX = WindowY = 0;
+			WindowW = 320;
+			WindowH = 160;
 			QuitGame(-1);
 
-            DrawPlayBorder ();
-            WindowH = 200;
-            fontnumber = 0;
-            return 1;
-    }
+			DrawPlayBorder ();
+			WindowH = 200;
+			fontnumber = 0;
+			return 1;
+	}
 
-    return 0;
+	return 0;
 }
 
 
@@ -892,20 +892,20 @@ CP_CheckQuick (ScanCode scancode)
 int
 CP_EndGame (int)
 {
-    int res;
+	int res;
 #ifdef JAPAN
-    res = GetYorN (7, 8, C_JAPQUITPIC);
+	res = GetYorN (7, 8, C_JAPQUITPIC);
 #else
-    res = Confirm (language["ENDGAMESTR"]);
+	res = Confirm (language["ENDGAMESTR"]);
 #endif
-    mainMenu.draw();
-    if(!res) return 0;
+	mainMenu.draw();
+	if(!res) return 0;
 
-    pickquick = gamestate.lives = 0;
-    playstate = ex_died;
-    killerobj = NULL;
+	pickquick = gamestate.lives = 0;
+	playstate = ex_died;
+	killerobj = NULL;
 
-    return 1;
+	return 1;
 }
 
 //
@@ -914,21 +914,21 @@ CP_EndGame (int)
 void
 DrawLSAction (int which)
 {
-    DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, TEXTCOLOR);
-    DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
-    VWB_DrawPic (LSA_X + 8, LSA_Y + 5, "M_LDING1");
+	DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, TEXTCOLOR);
+	DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
+	VWB_DrawPic (LSA_X + 8, LSA_Y + 5, "M_LDING1");
 
-    fontnumber = 1;
-    SETFONTCOLOR (0, TEXTCOLOR);
-    PrintX = LSA_X + 46;
-    PrintY = LSA_Y + 13;
+	fontnumber = 1;
+	SETFONTCOLOR (0, TEXTCOLOR);
+	PrintX = LSA_X + 46;
+	PrintY = LSA_Y + 13;
 
-    if (!which)
-        US_Print (language["STR_LOADING"]);
-    else
-        US_Print (language["STR_SAVING"]);
+	if (!which)
+		US_Print (language["STR_LOADING"]);
+	else
+		US_Print (language["STR_SAVING"]);
 
-    VW_UpdateScreen ();
+	VW_UpdateScreen ();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -956,66 +956,66 @@ IntroScreen (void)
 
 //      long memory;
 //      long emshere,xmshere;
-    int i;
+	int i;
 /*      int ems[10]={100,200,300,400,500,600,700,800,900,1000},
-                xms[10]={100,200,300,400,500,600,700,800,900,1000};
-        int main[10]={32,64,96,128,160,192,224,256,288,320};*/
+				xms[10]={100,200,300,400,500,600,700,800,900,1000};
+		int main[10]={32,64,96,128,160,192,224,256,288,320};*/
 
 
-    //
-    // DRAW MAIN MEMORY
-    //
+	//
+	// DRAW MAIN MEMORY
+	//
 #ifdef ABCAUS
-    memory = (1023l + mminfo.nearheap + mminfo.farheap) / 1024l;
-    for (i = 0; i < 10; i++)
-        if (memory >= main[i])
-            VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
+	memory = (1023l + mminfo.nearheap + mminfo.farheap) / 1024l;
+	for (i = 0; i < 10; i++)
+		if (memory >= main[i])
+			VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
 
-    //
-    // DRAW EMS MEMORY
-    //
-    if (EMSPresent)
-    {
-        emshere = 4l * EMSPagesAvail;
-        for (i = 0; i < 10; i++)
-            if (emshere >= ems[i])
-                VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
-    }
+	//
+	// DRAW EMS MEMORY
+	//
+	if (EMSPresent)
+	{
+		emshere = 4l * EMSPagesAvail;
+		for (i = 0; i < 10; i++)
+			if (emshere >= ems[i])
+				VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
+	}
 
-    //
-    // DRAW XMS MEMORY
-    //
-    if (XMSPresent)
-    {
-        xmshere = 4l * XMSPagesAvail;
-        for (i = 0; i < 10; i++)
-            if (xmshere >= xms[i])
-                VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
-    }
+	//
+	// DRAW XMS MEMORY
+	//
+	if (XMSPresent)
+	{
+		xmshere = 4l * XMSPagesAvail;
+		for (i = 0; i < 10; i++)
+			if (xmshere >= xms[i])
+				VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
+	}
 #else
-    for (i = 0; i < 10; i++)
-        VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
-    for (i = 0; i < 10; i++)
-        VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
-    for (i = 0; i < 10; i++)
-        VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
+	for (i = 0; i < 10; i++)
+		VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
+	for (i = 0; i < 10; i++)
+		VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
+	for (i = 0; i < 10; i++)
+		VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
 #endif
 
 
-    //
-    // FILL BOXES
-    //
-    if (MousePresent)
-        VWB_Bar (164, 82, 12, 2, FILLCOLOR);
+	//
+	// FILL BOXES
+	//
+	if (MousePresent)
+		VWB_Bar (164, 82, 12, 2, FILLCOLOR);
 
-    if (IN_JoyPresent())
-        VWB_Bar (164, 105, 12, 2, FILLCOLOR);
+	if (IN_JoyPresent())
+		VWB_Bar (164, 105, 12, 2, FILLCOLOR);
 
-    if (AdLibPresent && !SoundBlasterPresent)
-        VWB_Bar (164, 128, 12, 2, FILLCOLOR);
+	if (AdLibPresent && !SoundBlasterPresent)
+		VWB_Bar (164, 128, 12, 2, FILLCOLOR);
 
-    if (SoundBlasterPresent)
-        VWB_Bar (164, 151, 12, 2, FILLCOLOR);
+	if (SoundBlasterPresent)
+		VWB_Bar (164, 151, 12, 2, FILLCOLOR);
 
 //    if (SoundSourcePresent)
 //        VWB_Bar (164, 174, 12, 2, FILLCOLOR);
@@ -1053,18 +1053,18 @@ ClearMScreen (void)
 void
 DrawWindow (int x, int y, int w, int h, int wcolor)
 {
-    VWB_Bar (x, y, w, h, wcolor);
-    DrawOutline (x, y, w, h, BORD2COLOR, DEACTIVE);
+	VWB_Bar (x, y, w, h, wcolor);
+	DrawOutline (x, y, w, h, BORD2COLOR, DEACTIVE);
 }
 
 
 void
 DrawOutline (int x, int y, int w, int h, int color1, int color2)
 {
-    VWB_Hlin (x, x + w, y, color2);
-    VWB_Vlin (y, y + h, x, color2);
-    VWB_Hlin (x, x + w, y + h, color1);
-    VWB_Vlin (y, y + h, x + w, color1);
+	VWB_Hlin (x, x + w, y, color2);
+	VWB_Vlin (y, y + h, x, color2);
+	VWB_Hlin (x, x + w, y + h, color1);
+	VWB_Vlin (y, y + h, x + w, color1);
 }
 
 
@@ -1076,17 +1076,17 @@ DrawOutline (int x, int y, int w, int h, int color1, int color2)
 void
 SetupControlPanel (void)
 {
-    SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
-    fontnumber = 1;
-    WindowH = 200;
-    if(screenHeight % 200 != 0)
-        VL_ClearScreen(0);
+	SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
+	fontnumber = 1;
+	WindowH = 200;
+	if(screenHeight % 200 != 0)
+		VL_ClearScreen(0);
 
-    //
-    // CENTER MOUSE
-    //
-    if(IN_IsInputGrabbed())
-        IN_CenterMouse();
+	//
+	// CENTER MOUSE
+	//
+	if(IN_IsInputGrabbed())
+		IN_CenterMouse();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1096,17 +1096,17 @@ SetupControlPanel (void)
 ////////////////////////////////////////////////////////////////////
 void SetupSaveGames()
 {
-    char name[13];
+	char name[13];
 
 #ifdef _arch_dreamcast
-    file_t dir;
-    dirent_t *dirent;
+	file_t dir;
+	dirent_t *dirent;
 
-    dir = fs_open("/vmu/a1", O_RDONLY | O_DIR);
+	dir = fs_open("/vmu/a1", O_RDONLY | O_DIR);
 
-    strcpy(name, SaveName);
-    while((dirent = fs_readdir(dir)) && x < 10)
-    {
+	strcpy(name, SaveName);
+	while((dirent = fs_readdir(dir)) && x < 10)
+	{
 		int filenameLen = strlen(dirent->name);
 		if(filenameLen < 12)
 			continue;
@@ -1134,7 +1134,7 @@ void SetupSaveGames()
 			}
 		}
 	}
-    fs_close(dir);
+	fs_close(dir);
 #else
 	File saveDirectory("./");
 	const deque<string> &files = saveDirectory.getFileList();
@@ -1168,7 +1168,7 @@ void SetupSaveGames()
 void
 CleanupControlPanel (void)
 {
-    fontnumber = 0;
+	fontnumber = 0;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1179,15 +1179,15 @@ CleanupControlPanel (void)
 void
 TicDelay (int count)
 {
-    ControlInfo ci;
+	ControlInfo ci;
 
-    int32_t startTime = GetTimeCount ();
-    do
-    {
-        SDL_Delay(5);
-        ReadAnyControl (&ci);
-    }
-    while ((int32_t) GetTimeCount () - startTime < count && ci.dir != dir_None);
+	int32_t startTime = GetTimeCount ();
+	do
+	{
+		SDL_Delay(5);
+		ReadAnyControl (&ci);
+	}
+	while ((int32_t) GetTimeCount () - startTime < count && ci.dir != dir_None);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1198,13 +1198,13 @@ TicDelay (int count)
 void
 WaitKeyUp (void)
 {
-    ControlInfo ci;
-    while (ReadAnyControl (&ci), ci.button0 |
-           ci.button1 |
-           ci.button2 | ci.button3 | Keyboard[sc_Space] | Keyboard[sc_Enter] | Keyboard[sc_Escape])
-    {
-        IN_WaitAndProcessEvents();
-    }
+	ControlInfo ci;
+	while (ReadAnyControl (&ci), ci.button0 |
+		ci.button1 |
+		ci.button2 | ci.button3 | Keyboard[sc_Space] | Keyboard[sc_Enter] | Keyboard[sc_Escape])
+	{
+		IN_WaitAndProcessEvents();
+	}
 }
 
 
@@ -1216,79 +1216,79 @@ WaitKeyUp (void)
 void
 ReadAnyControl (ControlInfo * ci)
 {
-    int mouseactive = 0;
+	int mouseactive = 0;
 
-    IN_ReadControl (0, ci);
+	IN_ReadControl (0, ci);
 
-    if (mouseenabled && IN_IsInputGrabbed())
-    {
-        int mousex, mousey, buttons;
-        buttons = SDL_GetMouseState(&mousex, &mousey);
-        int middlePressed = buttons & SDL_BUTTON(SDL_BUTTON_MIDDLE);
-        int rightPressed = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
-        buttons &= ~(SDL_BUTTON(SDL_BUTTON_MIDDLE) | SDL_BUTTON(SDL_BUTTON_RIGHT));
-        if(middlePressed) buttons |= 1 << 2;
-        if(rightPressed) buttons |= 1 << 1;
+	if (mouseenabled && IN_IsInputGrabbed())
+	{
+		int mousex, mousey, buttons;
+		buttons = SDL_GetMouseState(&mousex, &mousey);
+		int middlePressed = buttons & SDL_BUTTON(SDL_BUTTON_MIDDLE);
+		int rightPressed = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
+		buttons &= ~(SDL_BUTTON(SDL_BUTTON_MIDDLE) | SDL_BUTTON(SDL_BUTTON_RIGHT));
+		if(middlePressed) buttons |= 1 << 2;
+		if(rightPressed) buttons |= 1 << 1;
 
-        if(mousey - CENTERY < -SENSITIVE)
-        {
-            ci->dir = dir_North;
-            mouseactive = 1;
-        }
-        else if(mousey - CENTERY > SENSITIVE)
-        {
-            ci->dir = dir_South;
-            mouseactive = 1;
-        }
+		if(mousey - CENTERY < -SENSITIVE)
+		{
+			ci->dir = dir_North;
+			mouseactive = 1;
+		}
+		else if(mousey - CENTERY > SENSITIVE)
+		{
+			ci->dir = dir_South;
+			mouseactive = 1;
+		}
 
-        if(mousex - CENTERX < -SENSITIVE)
-        {
-            ci->dir = dir_West;
-            mouseactive = 1;
-        }
-        else if(mousex - CENTERX > SENSITIVE)
-        {
-            ci->dir = dir_East;
-            mouseactive = 1;
-        }
+		if(mousex - CENTERX < -SENSITIVE)
+		{
+			ci->dir = dir_West;
+			mouseactive = 1;
+		}
+		else if(mousex - CENTERX > SENSITIVE)
+		{
+			ci->dir = dir_East;
+			mouseactive = 1;
+		}
 
-        if(mouseactive)
-            IN_CenterMouse();
+		if(mouseactive)
+			IN_CenterMouse();
 
-        if (buttons)
-        {
-            ci->button0 = buttons & 1;
-            ci->button1 = buttons & 2;
-            ci->button2 = buttons & 4;
-            ci->button3 = false;
-            mouseactive = 1;
-        }
-    }
+		if (buttons)
+		{
+			ci->button0 = buttons & 1;
+			ci->button1 = buttons & 2;
+			ci->button2 = buttons & 4;
+			ci->button3 = false;
+			mouseactive = 1;
+		}
+	}
 
-    if (joystickenabled && !mouseactive)
-    {
-        int jx, jy, jb;
+	if (joystickenabled && !mouseactive)
+	{
+		int jx, jy, jb;
 
-        IN_GetJoyDelta (&jx, &jy);
-        if (jy < -SENSITIVE)
-            ci->dir = dir_North;
-        else if (jy > SENSITIVE)
-            ci->dir = dir_South;
+		IN_GetJoyDelta (&jx, &jy);
+		if (jy < -SENSITIVE)
+			ci->dir = dir_North;
+		else if (jy > SENSITIVE)
+			ci->dir = dir_South;
 
-        if (jx < -SENSITIVE)
-            ci->dir = dir_West;
-        else if (jx > SENSITIVE)
-            ci->dir = dir_East;
+		if (jx < -SENSITIVE)
+			ci->dir = dir_West;
+		else if (jx > SENSITIVE)
+			ci->dir = dir_East;
 
-        jb = IN_JoyButtons ();
-        if (jb)
-        {
-            ci->button0 = jb & 1;
-            ci->button1 = jb & 2;
-            ci->button2 = jb & 4;
-            ci->button3 = jb & 8;
-        }
-    }
+		jb = IN_JoyButtons ();
+		if (jb)
+		{
+			ci->button0 = jb & 1;
+			ci->button1 = jb & 2;
+			ci->button2 = jb & 4;
+			ci->button3 = jb & 8;
+		}
+	}
 }
 
 
@@ -1300,71 +1300,71 @@ ReadAnyControl (ControlInfo * ci)
 int
 Confirm (const char *string)
 {
-    int xit = 0, x, y, tick = 0, lastBlinkTime;
-    const char* whichsnd[2] = { "menu/escape", "menu/activate" };
-    ControlInfo ci;
+	int xit = 0, x, y, tick = 0, lastBlinkTime;
+	const char* whichsnd[2] = { "menu/escape", "menu/activate" };
+	ControlInfo ci;
 
-    Message (string);
-    IN_ClearKeysDown ();
-    WaitKeyUp ();
+	Message (string);
+	IN_ClearKeysDown ();
+	WaitKeyUp ();
 
-    //
-    // BLINK CURSOR
-    //
-    x = PrintX;
-    y = PrintY;
-    lastBlinkTime = GetTimeCount();
+	//
+	// BLINK CURSOR
+	//
+	x = PrintX;
+	y = PrintY;
+	lastBlinkTime = GetTimeCount();
 
-    do
-    {
-        ReadAnyControl(&ci);
+	do
+	{
+		ReadAnyControl(&ci);
 
-        if (GetTimeCount() - lastBlinkTime >= 10)
-        {
-            switch (tick)
-            {
-                case 0:
-                    VWB_Bar (x, y, 8, 13, TEXTCOLOR);
-                    break;
-                case 1:
-                    PrintX = x;
-                    PrintY = y;
-                    US_Print ("_");
-            }
-            VW_UpdateScreen ();
-            tick ^= 1;
-            lastBlinkTime = GetTimeCount();
-        }
-        else SDL_Delay(5);
+		if (GetTimeCount() - lastBlinkTime >= 10)
+		{
+			switch (tick)
+			{
+				case 0:
+					VWB_Bar (x, y, 8, 13, TEXTCOLOR);
+					break;
+				case 1:
+					PrintX = x;
+					PrintY = y;
+					US_Print ("_");
+			}
+			VW_UpdateScreen ();
+			tick ^= 1;
+			lastBlinkTime = GetTimeCount();
+		}
+		else SDL_Delay(5);
 
 #ifdef SPANISH
-    }
-    while (!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
+	}
+	while (!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 #else
-    }
-    while (!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape] && !ci.button0 && !ci.button1);
+	}
+	while (!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape] && !ci.button0 && !ci.button1);
 #endif
 
 #ifdef SPANISH
-    if (Keyboard[sc_S] || ci.button0)
-    {
-        xit = 1;
-        ShootSnd ();
-    }
+	if (Keyboard[sc_S] || ci.button0)
+	{
+		xit = 1;
+		ShootSnd ();
+	}
 #else
-    if (Keyboard[sc_Y] || ci.button0)
-    {
-        xit = 1;
-        ShootSnd ();
-    }
+	if (Keyboard[sc_Y] || ci.button0)
+	{
+		xit = 1;
+		ShootSnd ();
+	}
 #endif
 
-    IN_ClearKeysDown ();
-    WaitKeyUp ();
+	IN_ClearKeysDown ();
+	WaitKeyUp ();
 
-    SD_PlaySound (whichsnd[xit]);
+	SD_PlaySound (whichsnd[xit]);
 
-    return xit;
+	return xit;
 }
 
 #ifdef JAPAN
@@ -1376,57 +1376,57 @@ Confirm (const char *string)
 int
 GetYorN (int x, int y, int pic)
 {
-    int xit = 0;
+	int xit = 0;
 	const char* whichsnd[2] = { "menu/escape", "menu/activate" };
 
 
-    CA_CacheGrChunk (pic);
-    VWB_DrawPic (x * 8, y * 8, pic);
-    UNCACHEGRCHUNK (pic);
-    VW_UpdateScreen ();
-    IN_ClearKeysDown ();
+	CA_CacheGrChunk (pic);
+	VWB_DrawPic (x * 8, y * 8, pic);
+	UNCACHEGRCHUNK (pic);
+	VW_UpdateScreen ();
+	IN_ClearKeysDown ();
 
-    do
-    {
-        IN_WaitAndProcessEvents();
+	do
+	{
+		IN_WaitAndProcessEvents();
 #ifndef SPEAR
-        if (Keyboard[sc_Tab] && Keyboard[sc_P] && param_debugmode)
-            PicturePause ();
+		if (Keyboard[sc_Tab] && Keyboard[sc_P] && param_debugmode)
+			PicturePause ();
 #endif
 
 #ifdef SPANISH
-    }
-    while (!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
+	}
+	while (!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 #else
-    }
-    while (!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
+	}
+	while (!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
 #endif
 
 #ifdef SPANISH
-    if (Keyboard[sc_S])
-    {
-        xit = 1;
-        ShootSnd ();
-    }
+	if (Keyboard[sc_S])
+	{
+		xit = 1;
+		ShootSnd ();
+	}
 
-    while (Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape])
-        IN_WaitAndProcessEvents();
+	while (Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape])
+		IN_WaitAndProcessEvents();
 
 #else
 
-    if (Keyboard[sc_Y])
-    {
-        xit = 1;
-        ShootSnd ();
-    }
+	if (Keyboard[sc_Y])
+	{
+		xit = 1;
+		ShootSnd ();
+	}
 
-    while (Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape])
-        IN_WaitAndProcessEvents();
+	while (Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape])
+		IN_WaitAndProcessEvents();
 #endif
 
-    IN_ClearKeysDown ();
-    SD_PlaySound (whichsnd[xit]);
-    return xit;
+	IN_ClearKeysDown ();
+	SD_PlaySound (whichsnd[xit]);
+	return xit;
 }
 #endif
 
@@ -1439,10 +1439,10 @@ GetYorN (int x, int y, int pic)
 void
 Message (const char *string)
 {
-    int h = 0, w = 0, mw = 0, i, len = (int) strlen(string);
-    fontstruct *font;
+	int h = 0, w = 0, mw = 0, i, len = (int) strlen(string);
+	fontstruct *font;
 
-    fontnumber = 1;
+	fontnumber = 1;
 	int lumpNum = Wads.CheckNumForName("FONT2");
 	if(lumpNum == -1)
 		return;
@@ -1450,31 +1450,31 @@ Message (const char *string)
 
 	font = new fontstruct();
 	lump.Read(font, sizeof(fontstruct));
-    h = font->height;
-    for (i = 0; i < len; i++)
-    {
-        if (string[i] == '\n')
-        {
-            if (w > mw)
-                mw = w;
-            w = 0;
-            h += font->height;
-        }
-        else
-            w += font->width[string[i]];
-    }
+	h = font->height;
+	for (i = 0; i < len; i++)
+	{
+		if (string[i] == '\n')
+		{
+			if (w > mw)
+				mw = w;
+			w = 0;
+			h += font->height;
+		}
+		else
+			w += font->width[string[i]];
+	}
 
-    if (w + 10 > mw)
-        mw = w + 10;
+	if (w + 10 > mw)
+		mw = w + 10;
 
-    PrintY = (WindowH / 2) - h / 2;
-    PrintX = WindowX = 160 - mw / 2;
+	PrintY = (WindowH / 2) - h / 2;
+	PrintX = WindowX = 160 - mw / 2;
 
-    DrawWindow (WindowX - 5, PrintY - 5, mw + 10, h + 10, TEXTCOLOR);
-    DrawOutline (WindowX - 5, PrintY - 5, mw + 10, h + 10, 0, HIGHLIGHT);
-    SETFONTCOLOR (0, TEXTCOLOR);
-    US_Print (string);
-    VW_UpdateScreen ();
+	DrawWindow (WindowX - 5, PrintY - 5, mw + 10, h + 10, TEXTCOLOR);
+	DrawOutline (WindowX - 5, PrintY - 5, mw + 10, h + 10, 0, HIGHLIGHT);
+	SETFONTCOLOR (0, TEXTCOLOR);
+	US_Print (string);
+	VW_UpdateScreen ();
 
 	delete font;
 }
@@ -1489,13 +1489,13 @@ static int lastmusic;
 int
 StartCPMusic (const char* song)
 {
-    int lastoffs;
+	int lastoffs;
 
-    //lastmusic = song;
-    lastoffs = SD_MusicOff ();
+	//lastmusic = song;
+	lastoffs = SD_MusicOff ();
 
-    SD_StartMusic(song);
-    return lastoffs;
+	SD_StartMusic(song);
+	return lastoffs;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1506,23 +1506,23 @@ StartCPMusic (const char* song)
 void
 CheckPause (void)
 {
-    if (Paused)
-    {
-        switch (SoundStatus)
-        {
-            case 0:
-                SD_MusicOn ();
-                break;
-            case 1:
-                SD_MusicOff ();
-                break;
-        }
+	if (Paused)
+	{
+		switch (SoundStatus)
+		{
+			case 0:
+				SD_MusicOn ();
+				break;
+			case 1:
+				SD_MusicOff ();
+				break;
+		}
 
-        SoundStatus ^= 1;
-        VW_WaitVBL (3);
-        IN_ClearKeysDown ();
-        Paused = false;
-    }
+		SoundStatus ^= 1;
+		VW_WaitVBL (3);
+		IN_ClearKeysDown ();
+		Paused = false;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1534,18 +1534,18 @@ void
 DrawStripes (int y)
 {
 #ifndef SPEAR
-    VWB_Bar (0, y, 320, 24, 0);
-    VWB_Hlin (0, 319, y + 22, STRIPE);
+	VWB_Bar (0, y, 320, 24, 0);
+	VWB_Hlin (0, 319, y + 22, STRIPE);
 #else
-    VWB_Bar (0, y, 320, 22, 0);
-    VWB_Hlin (0, 319, y + 23, 0);
+	VWB_Bar (0, y, 320, 22, 0);
+	VWB_Hlin (0, 319, y + 23, 0);
 #endif
 }
 
 void
 ShootSnd (void)
 {
-    SD_PlaySound ("menu/activate");
+	SD_PlaySound ("menu/activate");
 }
 
 
@@ -1557,110 +1557,110 @@ ShootSnd (void)
 void
 CheckForEpisodes (void)
 {
-    struct stat statbuf;
+	struct stat statbuf;
 
 //
 // JAPANESE VERSION
 //
 #ifdef JAPAN
 #ifdef JAPDEMO
-    if(!stat("vswap.wj1", &statbuf))
-    {
-        strcpy (extension, "wj1");
-        numEpisodesMissing = 5;
+	if(!stat("vswap.wj1", &statbuf))
+	{
+		strcpy (extension, "wj1");
+		numEpisodesMissing = 5;
 #else
-    if(!stat("vswap.wj6", &statbuf))
-    {
-        strcpy (extension, "wj6");
+	if(!stat("vswap.wj6", &statbuf))
+	{
+		strcpy (extension, "wj6");
 #endif
-        strcat (configname, extension);
-        strcat (SaveName, extension);
-        strcat (demoname, extension);
-        EpisodeSelect[1] =
-            EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
-    }
-    else
-        Quit ("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
+		strcat (configname, extension);
+		strcat (SaveName, extension);
+		strcat (demoname, extension);
+		EpisodeSelect[1] =
+			EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
+	}
+	else
+		Quit ("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
 #else
 
 //
 // ENGLISH
 //
 #ifdef UPLOAD
-    if(!stat("vswap.wl1", &statbuf))
-    {
-        strcpy (extension, "wl1");
-        numEpisodesMissing = 5;
-    }
-    else
-        Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+	if(!stat("vswap.wl1", &statbuf))
+	{
+		strcpy (extension, "wl1");
+		numEpisodesMissing = 5;
+	}
+	else
+		Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
 #else
 #ifndef SPEAR
-    if(!stat("vswap.wl6", &statbuf))
-    {
-        strcpy (extension, "wl6");
-    }
-    else
-    {
-        if(!stat("vswap.wl3", &statbuf))
-        {
-            strcpy (extension, "wl3");
-            numEpisodesMissing = 3;
-        }
-        else
-        {
-            if(!stat("vswap.wl1", &statbuf))
-            {
-                strcpy (extension, "wl1");
-                numEpisodesMissing = 5;
-            }
-            else
-                Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
-        }
-    }
+	if(!stat("vswap.wl6", &statbuf))
+	{
+		strcpy (extension, "wl6");
+	}
+	else
+	{
+		if(!stat("vswap.wl3", &statbuf))
+		{
+			strcpy (extension, "wl3");
+			numEpisodesMissing = 3;
+		}
+		else
+		{
+			if(!stat("vswap.wl1", &statbuf))
+			{
+				strcpy (extension, "wl1");
+				numEpisodesMissing = 5;
+			}
+			else
+				Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+		}
+	}
 #endif
 #endif
 
 
 #ifdef SPEAR
 #ifndef SPEARDEMO
-    if(param_mission == 1)
-    {
-        if(!stat("vswap.sod", &statbuf))
-            strcpy (extension, "sod");
-        else
-            Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-    }
-    else if(param_mission == 2)
-    {
-        if(!stat("vswap.sd2", &statbuf))
-            strcpy (extension, "sd2");
-        else
-            Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-    }
-    else if(param_mission == 3)
-    {
-        if(!stat("vswap.sd3", &statbuf))
-            strcpy (extension, "sd3");
-        else
-            Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-    }
-    else
-        Quit ("UNSUPPORTED MISSION!");
-    strcpy (graphext, "sod");
+	if(param_mission == 1)
+	{
+		if(!stat("vswap.sod", &statbuf))
+			strcpy (extension, "sod");
+		else
+			Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
+	}
+	else if(param_mission == 2)
+	{
+		if(!stat("vswap.sd2", &statbuf))
+			strcpy (extension, "sd2");
+		else
+			Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
+	}
+	else if(param_mission == 3)
+	{
+		if(!stat("vswap.sd3", &statbuf))
+			strcpy (extension, "sd3");
+		else
+			Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
+	}
+	else
+		Quit ("UNSUPPORTED MISSION!");
+	strcpy (graphext, "sod");
 #else
-    if(!stat("vswap.sdm", &statbuf))
-    {
-        strcpy (extension, "sdm");
-    }
-    else
-        Quit ("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
-    strcpy (graphext, "sdm");
+	if(!stat("vswap.sdm", &statbuf))
+	{
+		strcpy (extension, "sdm");
+	}
+	else
+		Quit ("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
+	strcpy (graphext, "sdm");
 #endif
 #endif
 
-    strcat (configname, extension);
-    strcat (SaveName, extension);
-    strcat (demoname, extension);
+	strcat (configname, extension);
+	strcat (SaveName, extension);
+	strcat (demoname, extension);
 #endif
 }

@@ -15,7 +15,7 @@
 /*
 =============================================================================
 
-                                                 LOCAL CONSTANTS
+												LOCAL CONSTANTS
 
 =============================================================================
 */
@@ -25,7 +25,7 @@
 /*
 =============================================================================
 
-                                                 GLOBAL VARIABLES
+												GLOBAL VARIABLES
 
 =============================================================================
 */
@@ -115,14 +115,14 @@ int buttonscan[NUMBUTTONS] = { sc_Control, sc_Alt, sc_LShift, sc_Space, sc_1, sc
 int buttonmouse[4] = { bt_attack, bt_strafe, bt_use, bt_nobutton };
 int buttonjoy[32] = {
 #ifdef _arch_dreamcast
-    bt_attack, bt_strafe, bt_use, bt_run, bt_esc, bt_prevweapon, bt_nobutton, bt_nextweapon,
-    bt_pause, bt_strafeleft, bt_straferight, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
+	bt_attack, bt_strafe, bt_use, bt_run, bt_esc, bt_prevweapon, bt_nobutton, bt_nextweapon,
+	bt_pause, bt_strafeleft, bt_straferight, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
 #else
-    bt_attack, bt_strafe, bt_use, bt_run, bt_strafeleft, bt_straferight, bt_esc, bt_pause,
-    bt_prevweapon, bt_nextweapon, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
+	bt_attack, bt_strafe, bt_use, bt_run, bt_strafeleft, bt_straferight, bt_esc, bt_pause,
+	bt_prevweapon, bt_nextweapon, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
 #endif
-    bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
-    bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton
+	bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
+	bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton
 };
 
 int viewsize;
@@ -157,7 +157,7 @@ void PlayLoop (void);
 /*
 =============================================================================
 
-                                                 LOCAL VARIABLES
+												LOCAL VARIABLES
 
 =============================================================================
 */
@@ -170,59 +170,59 @@ objtype dummyobj;
 //
 const char* songs[] = {
 #ifndef SPEAR
-    //
-    // Episode One
-    //
+	//
+	// Episode One
+	//
 	"GETTHEM",	"SEARCHN",	"POW",		"SUSPENSE",	"GETTHEM",
 	"SEARCHN",	"POW",		"SUSPENSE",	"WARMARCH",	"CORNER",
 
-    //
-    // Episode Two
-    //
-    "NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
-    "PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
+	//
+	// Episode Two
+	//
+	"NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
+	"PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
 
-    //
-    // Episode Three
-    //
-    "INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
-    "NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"PACMAN",
+	//
+	// Episode Three
+	//
+	"INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
+	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"PACMAN",
 
-    //
-    // Episode Four
-    //
-    "GETTHEM",	"SEARCHN",	"POW",		"SUSPENSE",	"GETTHEM",
-    "SEARCHN",	"POW",		"SUSPENSE",	"WARMARCH",	"CORNER",
+	//
+	// Episode Four
+	//
+	"GETTHEM",	"SEARCHN",	"POW",		"SUSPENSE",	"GETTHEM",
+	"SEARCHN",	"POW",		"SUSPENSE",	"WARMARCH",	"CORNER",
 
-    //
-    // Episode Five
-    //
-    "NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
-    "PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
+	//
+	// Episode Five
+	//
+	"NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
+	"PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
 
-    //
-    // Episode Six
-    //
-    "INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
-    "NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"FUNKYOU"
+	//
+	// Episode Six
+	//
+	"INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
+	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"FUNKYOU"
 #else
 
-    //////////////////////////////////////////////////////////////
-    //
-    // SPEAR OF DESTINY TRACKS
-    //
-    //////////////////////////////////////////////////////////////
-    "XTIPTOE",	"XFUNKIE",	"XDEATH",	"XGETYOU",	"ULTIMATE",	// Trans Gr�sse
+	//////////////////////////////////////////////////////////////
+	//
+	// SPEAR OF DESTINY TRACKS
+	//
+	//////////////////////////////////////////////////////////////
+	"XTIPTOE",	"XFUNKIE",	"XDEATH",	"XGETYOU",	"ULTIMATE",	// Trans Gr�sse
 
-    "DUNGEON",	"GOINGAFT",	"POW",		"TWELFTH",	"ULTIMATE",	// Barnacle Wilhelm BOSS
+	"DUNGEON",	"GOINGAFT",	"POW",		"TWELFTH",	"ULTIMATE",	// Barnacle Wilhelm BOSS
 
-    "NAZI_OMI",	"GETTHEM",	"SUSPENSE",	"SEARCHN",	"ZEROHOUR",	"ULTIMATE",	// Super Mutant BOSS
+	"NAZI_OMI",	"GETTHEM",	"SUSPENSE",	"SEARCHN",	"ZEROHOUR",	"ULTIMATE",	// Super Mutant BOSS
 
-    "XPUTIT",	"ULTIMATE",	// Death Knight BOSS
+	"XPUTIT",	"ULTIMATE",	// Death Knight BOSS
 
-    "XJAZNAZI",	"XFUNKIE",	// Secret level
+	"XJAZNAZI",	"XFUNKIE",	// Secret level
 
-    "XEVIL"	// Angel of Death BOSS
+	"XEVIL"	// Angel of Death BOSS
 #endif
 };
 
@@ -230,7 +230,7 @@ const char* songs[] = {
 /*
 =============================================================================
 
-                               USER CONTROL
+							USER CONTROL
 
 =============================================================================
 */
@@ -302,7 +302,7 @@ void PollJoystickButtons (void)
 
 void PollKeyboardMove (void)
 {
-    int delta = (!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]) ? RUNMOVE * tics : BASEMOVE * tics;
+	int delta = (!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]) ? RUNMOVE * tics : BASEMOVE * tics;
 
 	if(buttonstate[bt_moveforward])
 		controly -= delta;
@@ -325,18 +325,18 @@ void PollKeyboardMove (void)
 
 void PollMouseMove (void)
 {
-    int mousexmove, mouseymove;
+	int mousexmove, mouseymove;
 
-    SDL_GetMouseState(&mousexmove, &mouseymove);
-    if(IN_IsInputGrabbed())
-        IN_CenterMouse();
+	SDL_GetMouseState(&mousexmove, &mouseymove);
+	if(IN_IsInputGrabbed())
+		IN_CenterMouse();
 
-    mousexmove -= screenWidth / 2;
-    mouseymove -= screenHeight / 2;
+	mousexmove -= screenWidth / 2;
+	mouseymove -= screenHeight / 2;
 
-    controlx += mousexmove * 20 / (21 - mouseadjustment);
+	controlx += mousexmove * 20 / (21 - mouseadjustment);
 	if(!mouseyaxisdisabled)
-    	controly += mouseymove * 40 / (21 - mouseadjustment);
+		controly += mouseymove * 40 / (21 - mouseadjustment);
 }
 
 
@@ -350,20 +350,20 @@ void PollMouseMove (void)
 
 void PollJoystickMove (void)
 {
-    int joyx, joyy;
+	int joyx, joyy;
 
-    IN_GetJoyDelta (&joyx, &joyy);
+	IN_GetJoyDelta (&joyx, &joyy);
 
-    int delta = buttonstate[bt_run] ? RUNMOVE * tics : BASEMOVE * tics;
+	int delta = buttonstate[bt_run] ? RUNMOVE * tics : BASEMOVE * tics;
 
-    if (joyx > 64 || buttonstate[bt_turnright])
-        controlx += delta;
-    else if (joyx < -64  || buttonstate[bt_turnleft])
-        controlx -= delta;
-    if (joyy > 64 || buttonstate[bt_movebackward])
-        controly += delta;
-    else if (joyy < -64 || buttonstate[bt_moveforward])
-        controly -= delta;
+	if (joyx > 64 || buttonstate[bt_turnright])
+		controlx += delta;
+	else if (joyx < -64  || buttonstate[bt_turnleft])
+		controlx -= delta;
+	if (joyy > 64 || buttonstate[bt_movebackward])
+		controly += delta;
+	else if (joyy < -64 || buttonstate[bt_moveforward])
+		controly -= delta;
 }
 
 /*
@@ -383,128 +383,128 @@ void PollJoystickMove (void)
 
 void PollControls (void)
 {
-    int max, min, i;
-    byte buttonbits;
+	int max, min, i;
+	byte buttonbits;
 
-    IN_ProcessEvents();
+	IN_ProcessEvents();
 
 //
 // get timing info for last frame
 //
-    if (demoplayback || demorecord)   // demo recording and playback needs to be constant
-    {
-        // wait up to DEMOTICS Wolf tics
-        uint32_t curtime = SDL_GetTicks();
-        lasttimecount += DEMOTICS;
-        int32_t timediff = (lasttimecount * 100) / 7 - curtime;
-        if(timediff > 0)
-            SDL_Delay(timediff);
+	if (demoplayback || demorecord)   // demo recording and playback needs to be constant
+	{
+		// wait up to DEMOTICS Wolf tics
+		uint32_t curtime = SDL_GetTicks();
+		lasttimecount += DEMOTICS;
+		int32_t timediff = (lasttimecount * 100) / 7 - curtime;
+		if(timediff > 0)
+			SDL_Delay(timediff);
 
-        if(timediff < -2 * DEMOTICS)       // more than 2-times DEMOTICS behind?
-            lasttimecount = (curtime * 7) / 100;    // yes, set to current timecount
+		if(timediff < -2 * DEMOTICS)       // more than 2-times DEMOTICS behind?
+			lasttimecount = (curtime * 7) / 100;    // yes, set to current timecount
 
-        tics = DEMOTICS;
-    }
-    else
-        CalcTics ();
+		tics = DEMOTICS;
+	}
+	else
+		CalcTics ();
 
-    controlx = 0;
-    controly = 0;
-    memcpy (buttonheld, buttonstate, sizeof (buttonstate));
-    memset (buttonstate, 0, sizeof (buttonstate));
+	controlx = 0;
+	controly = 0;
+	memcpy (buttonheld, buttonstate, sizeof (buttonstate));
+	memset (buttonstate, 0, sizeof (buttonstate));
 
-    if (demoplayback)
-    {
-        //
-        // read commands from demo buffer
-        //
-        buttonbits = *demoptr++;
-        for (i = 0; i < NUMBUTTONS; i++)
-        {
-            buttonstate[i] = buttonbits & 1;
-            buttonbits >>= 1;
-        }
+	if (demoplayback)
+	{
+		//
+		// read commands from demo buffer
+		//
+		buttonbits = *demoptr++;
+		for (i = 0; i < NUMBUTTONS; i++)
+		{
+			buttonstate[i] = buttonbits & 1;
+			buttonbits >>= 1;
+		}
 
-        controlx = *demoptr++;
-        controly = *demoptr++;
+		controlx = *demoptr++;
+		controly = *demoptr++;
 
-        if (demoptr == lastdemoptr)
-            playstate = ex_completed;   // demo is done
+		if (demoptr == lastdemoptr)
+			playstate = ex_completed;   // demo is done
 
-        controlx *= (int) tics;
-        controly *= (int) tics;
+		controlx *= (int) tics;
+		controly *= (int) tics;
 
-        return;
-    }
+		return;
+	}
 
 
 //
 // get button states
 //
-    PollKeyboardButtons ();
+	PollKeyboardButtons ();
 
-    if (mouseenabled && IN_IsInputGrabbed())
-        PollMouseButtons ();
+	if (mouseenabled && IN_IsInputGrabbed())
+		PollMouseButtons ();
 
-    if (joystickenabled)
-        PollJoystickButtons ();
+	if (joystickenabled)
+		PollJoystickButtons ();
 
 //
 // get movements
 //
-    PollKeyboardMove ();
+	PollKeyboardMove ();
 
-    if (mouseenabled && IN_IsInputGrabbed())
-        PollMouseMove ();
+	if (mouseenabled && IN_IsInputGrabbed())
+		PollMouseMove ();
 
-    if (joystickenabled)
-        PollJoystickMove ();
+	if (joystickenabled)
+		PollJoystickMove ();
 
 //
 // bound movement to a maximum
 //
-    max = 100 * tics;
-    min = -max;
-    //if (controlx > max)
-    //    controlx = max;
-    //else if (controlx < min)
-    //    controlx = min;
+	max = 100 * tics;
+	min = -max;
+	//if (controlx > max)
+	//    controlx = max;
+	//else if (controlx < min)
+	//    controlx = min;
 
-    //if (controly > max)
-    //    controly = max;
-    //else if (controly < min)
-    //    controly = min;
+	//if (controly > max)
+	//    controly = max;
+	//else if (controly < min)
+	//    controly = min;
 
-    if (demorecord)
-    {
-        //
-        // save info out to demo buffer
-        //
-        controlx /= (int) tics;
-        controly /= (int) tics;
+	if (demorecord)
+	{
+		//
+		// save info out to demo buffer
+		//
+		controlx /= (int) tics;
+		controly /= (int) tics;
 
-        buttonbits = 0;
+		buttonbits = 0;
 
-        // TODO: Support 32-bit buttonbits
-        for (i = NUMBUTTONS - 1; i >= 0; i--)
-        {
-            buttonbits <<= 1;
-            if (buttonstate[i])
-                buttonbits |= 1;
-        }
+		// TODO: Support 32-bit buttonbits
+		for (i = NUMBUTTONS - 1; i >= 0; i--)
+		{
+			buttonbits <<= 1;
+			if (buttonstate[i])
+				buttonbits |= 1;
+		}
 
-        *demoptr++ = buttonbits;
-        *demoptr++ = controlx;
-        *demoptr++ = controly;
+		*demoptr++ = buttonbits;
+		*demoptr++ = controlx;
+		*demoptr++ = controly;
 
-        if (demoptr >= lastdemoptr - 8)
-            playstate = ex_completed;
-        else
-        {
-            controlx *= (int) tics;
-            controly *= (int) tics;
-        }
-    }
+		if (demoptr >= lastdemoptr - 8)
+			playstate = ex_completed;
+		else
+		{
+			controlx *= (int) tics;
+			controly *= (int) tics;
+		}
+	}
 }
 
 
@@ -524,7 +524,7 @@ void PollControls (void)
 
 void CenterWindow (word w, word h)
 {
-    US_DrawWindow (((MAXX / 8) - w) / 2, ((MAXY / 8) - h) / 2, w, h);
+	US_DrawWindow (((MAXX / 8) - w) / 2, ((MAXY / 8) - h) / 2, w, h);
 }
 
 //===========================================================================
@@ -541,13 +541,13 @@ void CenterWindow (word w, word h)
 bool changeSize = true;
 void CheckKeys (void)
 {
-    ScanCode scan;
+	ScanCode scan;
 
 
-    if (screenfaded || demoplayback)    // don't do anything with a faded screen
-        return;
+	if (screenfaded || demoplayback)    // don't do anything with a faded screen
+		return;
 
-    scan = LastScan;
+	scan = LastScan;
 
 	// [BL] Allow changing the screen size with the -/= keys a la Doom.
 	if(changeSize)
@@ -567,179 +567,179 @@ void CheckKeys (void)
 		changeSize = true;
 
 #ifdef SPEAR
-    //
-    // SECRET CHEAT CODE: TAB-G-F10
-    //
-    if (Keyboard[sc_Tab] && Keyboard[sc_G] && Keyboard[sc_F10])
-    {
-        WindowH = 160;
-        if (godmode)
-        {
-            Message ("God mode OFF");
-            SD_PlaySound ("misc/no_bonus");
-        }
-        else
-        {
-            Message ("God mode ON");
-            SD_PlaySound ("misc/end_bonus2");
-        }
+	//
+	// SECRET CHEAT CODE: TAB-G-F10
+	//
+	if (Keyboard[sc_Tab] && Keyboard[sc_G] && Keyboard[sc_F10])
+	{
+		WindowH = 160;
+		if (godmode)
+		{
+			Message ("God mode OFF");
+			SD_PlaySound ("misc/no_bonus");
+		}
+		else
+		{
+			Message ("God mode ON");
+			SD_PlaySound ("misc/end_bonus2");
+		}
 
-        IN_Ack ();
-        godmode ^= 1;
-        DrawPlayBorderSides ();
-        IN_ClearKeysDown ();
-        return;
-    }
+		IN_Ack ();
+		godmode ^= 1;
+		DrawPlayBorderSides ();
+		IN_ClearKeysDown ();
+		return;
+	}
 #endif
 
 
-    //
-    // SECRET CHEAT CODE: 'MLI'
-    //
-    if (Keyboard[sc_M] && Keyboard[sc_L] && Keyboard[sc_I])
-    {
-        gamestate.health = 100;
-        gamestate.ammo = 99;
-        gamestate.keys = 3;
-        gamestate.score = 0;
-        gamestate.TimeCount += 42000L;
-        GiveWeapon (wp_chaingun);
-        DrawWeapon ();
-        DrawHealth ();
-        DrawKeys ();
-        DrawAmmo ();
-        DrawScore ();
+	//
+	// SECRET CHEAT CODE: 'MLI'
+	//
+	if (Keyboard[sc_M] && Keyboard[sc_L] && Keyboard[sc_I])
+	{
+		gamestate.health = 100;
+		gamestate.ammo = 99;
+		gamestate.keys = 3;
+		gamestate.score = 0;
+		gamestate.TimeCount += 42000L;
+		GiveWeapon (wp_chaingun);
+		DrawWeapon ();
+		DrawHealth ();
+		DrawKeys ();
+		DrawAmmo ();
+		DrawScore ();
 
-        ClearMemory ();
-        ClearSplitVWB ();
+		ClearMemory ();
+		ClearSplitVWB ();
 
-        Message (language["STR_CHEATER"]);
+		Message (language["STR_CHEATER"]);
 
-        IN_ClearKeysDown ();
-        IN_Ack ();
+		IN_ClearKeysDown ();
+		IN_Ack ();
 
-        if (viewsize < 17)
-            DrawPlayBorder ();
-    }
+		if (viewsize < 17)
+			DrawPlayBorder ();
+	}
 
-    //
-    // OPEN UP DEBUG KEYS
-    //
+	//
+	// OPEN UP DEBUG KEYS
+	//
 #ifdef DEBUGKEYS
-    if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt] && param_debugmode)
-    {
-        ClearMemory ();
-        ClearSplitVWB ();
+	if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt] && param_debugmode)
+	{
+		ClearMemory ();
+		ClearSplitVWB ();
 
-        Message ("Debugging keys are\nnow available!");
-        IN_ClearKeysDown ();
-        IN_Ack ();
+		Message ("Debugging keys are\nnow available!");
+		IN_ClearKeysDown ();
+		IN_Ack ();
 
-        DrawPlayBorderSides ();
-        DebugOk = 1;
-    }
+		DrawPlayBorderSides ();
+		DebugOk = 1;
+	}
 #endif
 
-    //
-    // TRYING THE KEEN CHEAT CODE!
-    //
-    if (Keyboard[sc_B] && Keyboard[sc_A] && Keyboard[sc_T])
-    {
-        ClearMemory ();
-        ClearSplitVWB ();
+	//
+	// TRYING THE KEEN CHEAT CODE!
+	//
+	if (Keyboard[sc_B] && Keyboard[sc_A] && Keyboard[sc_T])
+	{
+		ClearMemory ();
+		ClearSplitVWB ();
 
-        Message ("Commander Keen is also\n"
-                 "available from Apogee, but\n"
-                 "then, you already know\n" "that - right, Cheatmeister?!");
+		Message ("Commander Keen is also\n"
+				"available from Apogee, but\n"
+				"then, you already know\n" "that - right, Cheatmeister?!");
 
-        IN_ClearKeysDown ();
-        IN_Ack ();
+		IN_ClearKeysDown ();
+		IN_Ack ();
 
-        if (viewsize < 18)
-            DrawPlayBorder ();
-    }
+		if (viewsize < 18)
+			DrawPlayBorder ();
+	}
 
 //
 // pause key weirdness can't be checked as a scan code
 //
-    if(buttonstate[bt_pause]) Paused = true;
-    if(Paused)
-    {
-        int lastoffs = StopMusic();
+	if(buttonstate[bt_pause]) Paused = true;
+	if(Paused)
+	{
+		int lastoffs = StopMusic();
 //        LatchDrawPic (20 - 4, 80 - 2 * 8, PAUSEDPIC);
 		VWB_DrawPic((20 - 4)*8, 80 - 2*8, "PAUSED");
-        VH_UpdateScreen();
-        IN_Ack ();
-        Paused = false;
-        ContinueMusic(lastoffs);
-        if (MousePresent && IN_IsInputGrabbed())
-            IN_CenterMouse();     // Clear accumulated mouse movement
-        lasttimecount = GetTimeCount();
-        return;
-    }
+		VH_UpdateScreen();
+		IN_Ack ();
+		Paused = false;
+		ContinueMusic(lastoffs);
+		if (MousePresent && IN_IsInputGrabbed())
+			IN_CenterMouse();     // Clear accumulated mouse movement
+		lasttimecount = GetTimeCount();
+		return;
+	}
 
 //
 // F1-F7/ESC to enter control panel
 //
-    if (
+	if (
 #ifndef DEBCHECK
-           scan == sc_F10 ||
+		scan == sc_F10 ||
 #endif
-           scan == sc_F9 || scan == sc_F7 || scan == sc_F8)     // pop up quit dialog
-    {
-        short oldmapon = gamestate.mapon;
-        short oldepisode = gamestate.episode;
-        ClearMemory ();
-        ClearSplitVWB ();
-        US_ControlPanel (scan);
+		scan == sc_F9 || scan == sc_F7 || scan == sc_F8)     // pop up quit dialog
+	{
+		short oldmapon = gamestate.mapon;
+		short oldepisode = gamestate.episode;
+		ClearMemory ();
+		ClearSplitVWB ();
+		US_ControlPanel (scan);
 
-        DrawPlayBorderSides ();
+		DrawPlayBorderSides ();
 
-        SETFONTCOLOR (0, 15);
-        IN_ClearKeysDown ();
-        return;
-    }
+		SETFONTCOLOR (0, 15);
+		IN_ClearKeysDown ();
+		return;
+	}
 
-    if ((scan >= sc_F1 && scan <= sc_F9) || scan == sc_Escape || buttonstate[bt_esc])
-    {
-        int lastoffs = StopMusic ();
-        ClearMemory ();
-        VW_FadeOut ();
+	if ((scan >= sc_F1 && scan <= sc_F9) || scan == sc_Escape || buttonstate[bt_esc])
+	{
+		int lastoffs = StopMusic ();
+		ClearMemory ();
+		VW_FadeOut ();
 
-        US_ControlPanel (buttonstate[bt_esc] ? sc_Escape : scan);
+		US_ControlPanel (buttonstate[bt_esc] ? sc_Escape : scan);
 
-        SETFONTCOLOR (0, 15);
-        IN_ClearKeysDown ();
-        VW_FadeOut();
-        if(viewsize != 21)
-            DrawPlayScreen ();
-        if (!startgame && !loadedgame)
-            ContinueMusic (lastoffs);
-        if (loadedgame)
-            playstate = ex_abort;
-        lasttimecount = GetTimeCount();
-        if (MousePresent && IN_IsInputGrabbed())
-            IN_CenterMouse();     // Clear accumulated mouse movement
-        return;
-    }
+		SETFONTCOLOR (0, 15);
+		IN_ClearKeysDown ();
+		VW_FadeOut();
+		if(viewsize != 21)
+			DrawPlayScreen ();
+		if (!startgame && !loadedgame)
+			ContinueMusic (lastoffs);
+		if (loadedgame)
+			playstate = ex_abort;
+		lasttimecount = GetTimeCount();
+		if (MousePresent && IN_IsInputGrabbed())
+			IN_CenterMouse();     // Clear accumulated mouse movement
+		return;
+	}
 
 //
 // TAB-? debug keys
 //
 #ifdef DEBUGKEYS
-    if (Keyboard[sc_Tab] && DebugOk)
-    {
-        fontnumber = 0;
-        SETFONTCOLOR (0, 15);
-        if (DebugKeys () && viewsize < 18)
-            DrawPlayBorder ();       // dont let the blue borders flash
+	if (Keyboard[sc_Tab] && DebugOk)
+	{
+		fontnumber = 0;
+		SETFONTCOLOR (0, 15);
+		if (DebugKeys () && viewsize < 18)
+			DrawPlayBorder ();       // dont let the blue borders flash
 
-        if (MousePresent && IN_IsInputGrabbed())
-            IN_CenterMouse();     // Clear accumulated mouse movement
+		if (MousePresent && IN_IsInputGrabbed())
+			IN_CenterMouse();     // Clear accumulated mouse movement
 
-        lasttimecount = GetTimeCount();
-        return;
-    }
+		lasttimecount = GetTimeCount();
+		return;
+	}
 #endif
 }
 
@@ -749,7 +749,7 @@ void CheckKeys (void)
 /*
 #############################################################################
 
-                                  The objlist data structure
+								The objlist data structure
 
 #############################################################################
 
@@ -783,29 +783,29 @@ int objcount;
 
 void InitActorList (void)
 {
-    int i;
+	int i;
 
 //
 // init the actor lists
 //
-    for (i = 0; i < MAXACTORS; i++)
-    {
-        objlist[i].prev = &objlist[i + 1];
-        objlist[i].next = NULL;
-    }
+	for (i = 0; i < MAXACTORS; i++)
+	{
+		objlist[i].prev = &objlist[i + 1];
+		objlist[i].next = NULL;
+	}
 
-    objlist[MAXACTORS - 1].prev = NULL;
+	objlist[MAXACTORS - 1].prev = NULL;
 
-    objfreelist = &objlist[0];
-    lastobj = NULL;
+	objfreelist = &objlist[0];
+	lastobj = NULL;
 
-    objcount = 0;
+	objcount = 0;
 
 //
 // give the player the first free spots
 //
-    GetNewActor ();
-    player = newobj;
+	GetNewActor ();
+	player = newobj;
 
 }
 
@@ -827,21 +827,21 @@ void InitActorList (void)
 
 void GetNewActor (void)
 {
-    if (!objfreelist)
-        Quit ("GetNewActor: No free spots in objlist!");
+	if (!objfreelist)
+		Quit ("GetNewActor: No free spots in objlist!");
 
-    newobj = objfreelist;
-    objfreelist = newobj->prev;
-    memset (newobj, 0, sizeof (*newobj));
+	newobj = objfreelist;
+	objfreelist = newobj->prev;
+	memset (newobj, 0, sizeof (*newobj));
 
-    if (lastobj)
-        lastobj->next = newobj;
-    newobj->prev = lastobj;     // new->next is allready NULL from memset
+	if (lastobj)
+		lastobj->next = newobj;
+	newobj->prev = lastobj;     // new->next is allready NULL from memset
 
-    newobj->active = ac_no;
-    lastobj = newobj;
+	newobj->active = ac_no;
+	lastobj = newobj;
 
-    objcount++;
+	objcount++;
 }
 
 //===========================================================================
@@ -859,37 +859,37 @@ void GetNewActor (void)
 
 void RemoveObj (objtype * gone)
 {
-    if (gone == player)
-        Quit ("RemoveObj: Tried to remove the player!");
+	if (gone == player)
+		Quit ("RemoveObj: Tried to remove the player!");
 
-    gone->state = NULL;
+	gone->state = NULL;
 
 //
 // fix the next object's back link
 //
-    if (gone == lastobj)
-        lastobj = (objtype *) gone->prev;
-    else
-        gone->next->prev = gone->prev;
+	if (gone == lastobj)
+		lastobj = (objtype *) gone->prev;
+	else
+		gone->next->prev = gone->prev;
 
 //
 // fix the previous object's forward link
 //
-    gone->prev->next = gone->next;
+	gone->prev->next = gone->next;
 
 //
 // add it back in to the free list
 //
-    gone->prev = objfreelist;
-    objfreelist = gone;
+	gone->prev = objfreelist;
+	objfreelist = gone;
 
-    objcount--;
+	objcount--;
 }
 
 /*
 =============================================================================
 
-                                                MUSIC STUFF
+												MUSIC STUFF
 
 =============================================================================
 */
@@ -904,9 +904,9 @@ void RemoveObj (objtype * gone)
 */
 int StopMusic (void)
 {
-    int lastoffs = SD_MusicOff ();
+	int lastoffs = SD_MusicOff ();
 
-    return lastoffs;
+	return lastoffs;
 }
 
 //==========================================================================
@@ -922,20 +922,20 @@ int StopMusic (void)
 
 void StartMusic ()
 {
-    SD_MusicOff ();
-    SD_StartMusic(songs[gamestate.mapon + gamestate.episode * 10]);
+	SD_MusicOff ();
+	SD_StartMusic(songs[gamestate.mapon + gamestate.episode * 10]);
 }
 
 void ContinueMusic (int offs)
 {
-    SD_MusicOff ();
-    SD_ContinueMusic(songs[gamestate.mapon + gamestate.episode * 10], offs);
+	SD_MusicOff ();
+	SD_ContinueMusic(songs[gamestate.mapon + gamestate.episode * 10], offs);
 }
 
 /*
 =============================================================================
 
-                                        PALETTE SHIFTING STUFF
+										PALETTE SHIFTING STUFF
 
 =============================================================================
 */
@@ -964,48 +964,48 @@ boolean palshifted;
 
 void InitRedShifts (void)
 {
-    SDL_Color *workptr, *baseptr;
-    int i, j, delta;
+	SDL_Color *workptr, *baseptr;
+	int i, j, delta;
 
 
 //
 // fade through intermediate frames
 //
-    for (i = 1; i <= NUMREDSHIFTS; i++)
-    {
-        workptr = redshifts[i - 1];
-        baseptr = gamepal;
+	for (i = 1; i <= NUMREDSHIFTS; i++)
+	{
+		workptr = redshifts[i - 1];
+		baseptr = gamepal;
 
-        for (j = 0; j <= 255; j++)
-        {
-            delta = 256 - baseptr->r;
-            workptr->r = baseptr->r + delta * i / REDSTEPS;
-            delta = -baseptr->g;
-            workptr->g = baseptr->g + delta * i / REDSTEPS;
-            delta = -baseptr->b;
-            workptr->b = baseptr->b + delta * i / REDSTEPS;
-            baseptr++;
-            workptr++;
-        }
-    }
+		for (j = 0; j <= 255; j++)
+		{
+			delta = 256 - baseptr->r;
+			workptr->r = baseptr->r + delta * i / REDSTEPS;
+			delta = -baseptr->g;
+			workptr->g = baseptr->g + delta * i / REDSTEPS;
+			delta = -baseptr->b;
+			workptr->b = baseptr->b + delta * i / REDSTEPS;
+			baseptr++;
+			workptr++;
+		}
+	}
 
-    for (i = 1; i <= NUMWHITESHIFTS; i++)
-    {
-        workptr = whiteshifts[i - 1];
-        baseptr = gamepal;
+	for (i = 1; i <= NUMWHITESHIFTS; i++)
+	{
+		workptr = whiteshifts[i - 1];
+		baseptr = gamepal;
 
-        for (j = 0; j <= 255; j++)
-        {
-            delta = 256 - baseptr->r;
-            workptr->r = baseptr->r + delta * i / WHITESTEPS;
-            delta = 248 - baseptr->g;
-            workptr->g = baseptr->g + delta * i / WHITESTEPS;
-            delta = 0-baseptr->b;
-            workptr->b = baseptr->b + delta * i / WHITESTEPS;
-            baseptr++;
-            workptr++;
-        }
-    }
+		for (j = 0; j <= 255; j++)
+		{
+			delta = 256 - baseptr->r;
+			workptr->r = baseptr->r + delta * i / WHITESTEPS;
+			delta = 248 - baseptr->g;
+			workptr->g = baseptr->g + delta * i / WHITESTEPS;
+			delta = 0-baseptr->b;
+			workptr->b = baseptr->b + delta * i / WHITESTEPS;
+			baseptr++;
+			workptr++;
+		}
+	}
 }
 
 
@@ -1019,8 +1019,8 @@ void InitRedShifts (void)
 
 void ClearPaletteShifts (void)
 {
-    bonuscount = damagecount = 0;
-    palshifted = false;
+	bonuscount = damagecount = 0;
+	palshifted = false;
 }
 
 
@@ -1034,7 +1034,7 @@ void ClearPaletteShifts (void)
 
 void StartBonusFlash (void)
 {
-    bonuscount = NUMWHITESHIFTS * WHITETICS;    // white shift palette
+	bonuscount = NUMWHITESHIFTS * WHITETICS;    // white shift palette
 }
 
 
@@ -1048,7 +1048,7 @@ void StartBonusFlash (void)
 
 void StartDamageFlash (int damage)
 {
-    damagecount += damage;
+	damagecount += damage;
 }
 
 
@@ -1062,49 +1062,49 @@ void StartDamageFlash (int damage)
 
 void UpdatePaletteShifts (void)
 {
-    int red, white;
+	int red, white;
 
-    if (bonuscount)
-    {
-        white = bonuscount / WHITETICS + 1;
-        if (white > NUMWHITESHIFTS)
-            white = NUMWHITESHIFTS;
-        bonuscount -= tics;
-        if (bonuscount < 0)
-            bonuscount = 0;
-    }
-    else
-        white = 0;
+	if (bonuscount)
+	{
+		white = bonuscount / WHITETICS + 1;
+		if (white > NUMWHITESHIFTS)
+			white = NUMWHITESHIFTS;
+		bonuscount -= tics;
+		if (bonuscount < 0)
+			bonuscount = 0;
+	}
+	else
+		white = 0;
 
 
-    if (damagecount)
-    {
-        red = damagecount / 10 + 1;
-        if (red > NUMREDSHIFTS)
-            red = NUMREDSHIFTS;
+	if (damagecount)
+	{
+		red = damagecount / 10 + 1;
+		if (red > NUMREDSHIFTS)
+			red = NUMREDSHIFTS;
 
-        damagecount -= tics;
-        if (damagecount < 0)
-            damagecount = 0;
-    }
-    else
-        red = 0;
+		damagecount -= tics;
+		if (damagecount < 0)
+			damagecount = 0;
+	}
+	else
+		red = 0;
 
-    if (red)
-    {
-        VL_SetPalette (redshifts[red - 1]);
-        palshifted = true;
-    }
-    else if (white)
-    {
-        VL_SetPalette (whiteshifts[white - 1]);
-        palshifted = true;
-    }
-    else if (palshifted)
-    {
-        VL_SetPalette (gamepal);        // back to normal
-        palshifted = false;
-    }
+	if (red)
+	{
+		VL_SetPalette (redshifts[red - 1]);
+		palshifted = true;
+	}
+	else if (white)
+	{
+		VL_SetPalette (whiteshifts[white - 1]);
+		palshifted = true;
+	}
+	else if (palshifted)
+	{
+		VL_SetPalette (gamepal);        // back to normal
+		palshifted = false;
+	}
 }
 
 
@@ -1120,18 +1120,18 @@ void UpdatePaletteShifts (void)
 
 void FinishPaletteShifts (void)
 {
-    if (palshifted)
-    {
-        palshifted = 0;
-        VL_SetPalette (gamepal);
-    }
+	if (palshifted)
+	{
+		palshifted = 0;
+		VL_SetPalette (gamepal);
+	}
 }
 
 
 /*
 =============================================================================
 
-                                                CORE PLAYLOOP
+												CORE PLAYLOOP
 
 =============================================================================
 */
@@ -1147,97 +1147,97 @@ void FinishPaletteShifts (void)
 
 void DoActor (objtype * ob)
 {
-    void (*think) (objtype *);
+	void (*think) (objtype *);
 
-    if (!ob->active && !areabyplayer[ob->areanumber])
-        return;
+	if (!ob->active && !areabyplayer[ob->areanumber])
+		return;
 
-    if (!(ob->flags & (FL_NONMARK | FL_NEVERMARK)))
-        actorat[ob->tilex][ob->tiley] = NULL;
+	if (!(ob->flags & (FL_NONMARK | FL_NEVERMARK)))
+		actorat[ob->tilex][ob->tiley] = NULL;
 
 //
 // non transitional object
 //
 
-    if (!ob->ticcount)
-    {
-        think = (void (*)(objtype *)) ob->state->think;
-        if (think)
-        {
-            think (ob);
-            if (!ob->state)
-            {
-                RemoveObj (ob);
-                return;
-            }
-        }
+	if (!ob->ticcount)
+	{
+		think = (void (*)(objtype *)) ob->state->think;
+		if (think)
+		{
+			think (ob);
+			if (!ob->state)
+			{
+				RemoveObj (ob);
+				return;
+			}
+		}
 
-        if (ob->flags & FL_NEVERMARK)
-            return;
+		if (ob->flags & FL_NEVERMARK)
+			return;
 
-        if ((ob->flags & FL_NONMARK) && actorat[ob->tilex][ob->tiley])
-            return;
+		if ((ob->flags & FL_NONMARK) && actorat[ob->tilex][ob->tiley])
+			return;
 
-        actorat[ob->tilex][ob->tiley] = ob;
-        return;
-    }
+		actorat[ob->tilex][ob->tiley] = ob;
+		return;
+	}
 
 //
 // transitional object
 //
-    ob->ticcount -= (short) tics;
-    while (ob->ticcount <= 0)
-    {
-        think = (void (*)(objtype *)) ob->state->action;        // end of state action
-        if (think)
-        {
-            think (ob);
-            if (!ob->state)
-            {
-                RemoveObj (ob);
-                return;
-            }
-        }
+	ob->ticcount -= (short) tics;
+	while (ob->ticcount <= 0)
+	{
+		think = (void (*)(objtype *)) ob->state->action;        // end of state action
+		if (think)
+		{
+			think (ob);
+			if (!ob->state)
+			{
+				RemoveObj (ob);
+				return;
+			}
+		}
 
-        ob->state = ob->state->next;
+		ob->state = ob->state->next;
 
-        if (!ob->state)
-        {
-            RemoveObj (ob);
-            return;
-        }
+		if (!ob->state)
+		{
+			RemoveObj (ob);
+			return;
+		}
 
-        if (!ob->state->tictime)
-        {
-            ob->ticcount = 0;
-            goto think;
-        }
+		if (!ob->state->tictime)
+		{
+			ob->ticcount = 0;
+			goto think;
+		}
 
-        ob->ticcount += ob->state->tictime;
-    }
+		ob->ticcount += ob->state->tictime;
+	}
 
 think:
-    //
-    // think
-    //
-    think = (void (*)(objtype *)) ob->state->think;
-    if (think)
-    {
-        think (ob);
-        if (!ob->state)
-        {
-            RemoveObj (ob);
-            return;
-        }
-    }
+	//
+	// think
+	//
+	think = (void (*)(objtype *)) ob->state->think;
+	if (think)
+	{
+		think (ob);
+		if (!ob->state)
+		{
+			RemoveObj (ob);
+			return;
+		}
+	}
 
-    if (ob->flags & FL_NEVERMARK)
-        return;
+	if (ob->flags & FL_NEVERMARK)
+		return;
 
-    if ((ob->flags & FL_NONMARK) && actorat[ob->tilex][ob->tiley])
-        return;
+	if ((ob->flags & FL_NONMARK) && actorat[ob->tilex][ob->tiley])
+		return;
 
-    actorat[ob->tilex][ob->tiley] = ob;
+	actorat[ob->tilex][ob->tiley] = ob;
 }
 
 //==========================================================================
@@ -1256,90 +1256,90 @@ int32_t funnyticount;
 void PlayLoop (void)
 {
 #if defined(USE_FEATUREFLAGS) && defined(USE_CLOUDSKY)
-    if(GetFeatureFlags() & FF_CLOUDSKY)
-        InitSky();
+	if(GetFeatureFlags() & FF_CLOUDSKY)
+		InitSky();
 #endif
 
-    InitLevelShadeTable();
+	InitLevelShadeTable();
 
-    playstate = ex_stillplaying;
-    lasttimecount = GetTimeCount();
-    frameon = 0;
-    anglefrac = 0;
-    facecount = 0;
-    funnyticount = 0;
-    memset (buttonstate, 0, sizeof (buttonstate));
-    ClearPaletteShifts ();
+	playstate = ex_stillplaying;
+	lasttimecount = GetTimeCount();
+	frameon = 0;
+	anglefrac = 0;
+	facecount = 0;
+	funnyticount = 0;
+	memset (buttonstate, 0, sizeof (buttonstate));
+	ClearPaletteShifts ();
 
-    if (MousePresent && IN_IsInputGrabbed())
-        IN_CenterMouse();         // Clear accumulated mouse movement
+	if (MousePresent && IN_IsInputGrabbed())
+		IN_CenterMouse();         // Clear accumulated mouse movement
 
-    if (demoplayback)
-        IN_StartAck ();
+	if (demoplayback)
+		IN_StartAck ();
 
-    do
-    {
-        PollControls ();
+	do
+	{
+		PollControls ();
 
 //
 // actor thinking
 //
-        madenoise = false;
+		madenoise = false;
 
-        MoveDoors ();
-        MovePWalls ();
+		MoveDoors ();
+		MovePWalls ();
 
-        for (obj = player; obj; obj = obj->next)
-            DoActor (obj);
+		for (obj = player; obj; obj = obj->next)
+			DoActor (obj);
 
-        UpdatePaletteShifts ();
+		UpdatePaletteShifts ();
 
-        ThreeDRefresh ();
+		ThreeDRefresh ();
 
-        //
-        // MAKE FUNNY FACE IF BJ DOESN'T MOVE FOR AWHILE
-        //
+		//
+		// MAKE FUNNY FACE IF BJ DOESN'T MOVE FOR AWHILE
+		//
 #ifdef SPEAR
-        funnyticount += tics;
-        if (funnyticount > 30l * 70)
-        {
-            funnyticount = 0;
-            if(viewsize != 21)
-                StatusDrawFace(BJWAITING1PIC + (US_RndT () & 1));
-            facecount = 0;
-        }
+		funnyticount += tics;
+		if (funnyticount > 30l * 70)
+		{
+			funnyticount = 0;
+			if(viewsize != 21)
+				StatusDrawFace(BJWAITING1PIC + (US_RndT () & 1));
+			facecount = 0;
+		}
 #endif
 
-        gamestate.TimeCount += tics;
+		gamestate.TimeCount += tics;
 
-        UpdateSoundLoc ();      // JAB
-        if (screenfaded)
-            VW_FadeIn ();
+		UpdateSoundLoc ();      // JAB
+		if (screenfaded)
+			VW_FadeIn ();
 
-        CheckKeys ();
+		CheckKeys ();
 
 //
 // debug aids
 //
-        if (singlestep)
-        {
-            VW_WaitVBL (singlestep);
-            lasttimecount = GetTimeCount();
-        }
-        if (extravbls)
-            VW_WaitVBL (extravbls);
+		if (singlestep)
+		{
+			VW_WaitVBL (singlestep);
+			lasttimecount = GetTimeCount();
+		}
+		if (extravbls)
+			VW_WaitVBL (extravbls);
 
-        if (demoplayback)
-        {
-            if (IN_CheckAck ())
-            {
-                IN_ClearKeysDown ();
-                playstate = ex_abort;
-            }
-        }
-    }
-    while (!playstate && !startgame);
+		if (demoplayback)
+		{
+			if (IN_CheckAck ())
+			{
+				IN_ClearKeysDown ();
+				playstate = ex_abort;
+			}
+		}
+	}
+	while (!playstate && !startgame);
 
-    if (playstate != ex_died)
-        FinishPaletteShifts ();
+	if (playstate != ex_died)
+		FinishPaletteShifts ();
 }

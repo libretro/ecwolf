@@ -1,11 +1,11 @@
 #ifdef _WIN32
 
 /*
-    SDL_main.c, placed in the public domain by Sam Lantinga  4/13/98
+	SDL_main.c, placed in the public domain by Sam Lantinga  4/13/98
 
-    Modified to write stdout/stderr to a message box at shutdown by Ripper  2007-12-27
+	Modified to write stdout/stderr to a message box at shutdown by Ripper  2007-12-27
 
-    The WinMain function -- calls your program's main() function
+	The WinMain function -- calls your program's main() function
 */
 
 #include <stdio.h>
@@ -44,11 +44,11 @@
 
 #ifndef NO_STDIO_REDIRECT
 # ifdef _WIN32_WCE
-  static wchar_t stdoutPath[MAX_PATH];
-  static wchar_t stderrPath[MAX_PATH];
+static wchar_t stdoutPath[MAX_PATH];
+static wchar_t stderrPath[MAX_PATH];
 # else
-  static char stdoutPath[MAX_PATH];
-  static char stderrPath[MAX_PATH];
+static char stdoutPath[MAX_PATH];
+static char stderrPath[MAX_PATH];
 # endif
 #endif
 
@@ -126,7 +126,7 @@ static BOOL OutOfMemory(void)
 }
 
 /* SDL_Quit() shouldn't be used with atexit() directly because
-   calling conventions may differ... */
+calling conventions may differ... */
 static void cleanup(void)
 {
 	SDL_Quit();
@@ -151,33 +151,33 @@ static void cleanup_output(void)
 	if ( stdoutPath[0] ) {
 		file = fopen(stdoutPath, TEXT("r"));
 		if ( file ) {
-            char buf[16384];
-            size_t readbytes = fread(buf, 1, 16383, file);
-            fclose(file);
+			char buf[16384];
+			size_t readbytes = fread(buf, 1, 16383, file);
+			fclose(file);
 
-            if(readbytes != 0)
-            {
-                buf[readbytes] = 0;     // cut after last byte (<=16383)
-                MessageBox(NULL, buf, "Wolf4SDL", MB_OK);
-            }
-            else
-                remove(stdoutPath);     // remove empty file
+			if(readbytes != 0)
+			{
+				buf[readbytes] = 0;     // cut after last byte (<=16383)
+				MessageBox(NULL, buf, "Wolf4SDL", MB_OK);
+			}
+			else
+				remove(stdoutPath);     // remove empty file
 		}
 	}
 	if ( stderrPath[0] ) {
 		file = fopen(stderrPath, TEXT("rb"));
 		if ( file ) {
-            char buf[16384];
-            size_t readbytes = fread(buf, 1, 16383, file);
-            fclose(file);
+			char buf[16384];
+			size_t readbytes = fread(buf, 1, 16383, file);
+			fclose(file);
 
-            if(readbytes != 0)
-            {
-                buf[readbytes] = 0;     // cut after last byte (<=16383)
-                MessageBox(NULL, buf, "Wolf4SDL", MB_OK);
-            }
-            else
-                remove(stderrPath);     // remove empty file
+			if(readbytes != 0)
+			{
+				buf[readbytes] = 0;     // cut after last byte (<=16383)
+				MessageBox(NULL, buf, "Wolf4SDL", MB_OK);
+			}
+			else
+				remove(stderrPath);     // remove empty file
 		}
 	}
 #endif
@@ -226,10 +226,10 @@ int console_main(int argc, char *argv[])
 	atexit(cleanup);
 
 	/* Sam:
-	   We still need to pass in the application handle so that
-	   DirectInput will initialize properly when SDL_RegisterApp()
-	   is called later in the video initialization.
-	 */
+	We still need to pass in the application handle so that
+	DirectInput will initialize properly when SDL_RegisterApp()
+	is called later in the video initialization.
+	*/
 	SDL_SetModuleHandle(GetModuleHandle(NULL));
 
 	/* Run the application main() code */
@@ -271,9 +271,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 #endif
 
 	/* Start up DDHELP.EXE before opening any files, so DDHELP doesn't
-	   keep them open.  This is a hack.. hopefully it will be fixed
-	   someday.  DDHELP.EXE starts up the first time DDRAW.DLL is loaded.
-	 */
+	keep them open.  This is a hack.. hopefully it will be fixed
+	someday.  DDHELP.EXE starts up the first time DDRAW.DLL is loaded.
+	*/
 	handle = LoadLibrary(TEXT("DDRAW.DLL"));
 	if ( handle != NULL ) {
 		FreeLibrary(handle);

@@ -5,9 +5,9 @@
 
 #define NUMMAPS         60
 #ifdef USE_FLOORCEILINGTEX
-    #define MAPPLANES       3
+	#define MAPPLANES       3
 #else
-    #define MAPPLANES       2
+	#define MAPPLANES       2
 #endif
 
 #define UNCACHEAUDIOCHUNK(chunk) {if(audiosegs[chunk]) {free(audiosegs[chunk]); audiosegs[chunk]=NULL;}}
@@ -16,10 +16,10 @@
 
 typedef struct
 {
-    int32_t planestart[3];
-    word    planelength[3];
-    word    width,height;
-    char    name[16];
+	int32_t planestart[3];
+	word    planelength[3];
+	word    width,height;
+	char    name[16];
 } maptype;
 
 //===========================================================================
