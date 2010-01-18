@@ -3,6 +3,7 @@
 #ifdef USE_DIR3DSPR
 #include "wl_def.h"
 #include "wl_shade.h"
+#include "c_cvars.h"
 
 // Define directional 3d sprites in wl_act1.cpp (there are two examples)
 // Make sure you have according entries in ScanInfoPlane in wl_game.cpp.
@@ -70,13 +71,11 @@ void Scale3DShaper(int x1, int x2, int shapenum, uint32_t flags, fixed ny1, fixe
 
             if(wallheight[slinex]<(height>>12) && scale1 /*&& scale1<=maxscale*/)
             {
-#ifdef USE_SHADING
                 byte *curshades;
                 if(flags & FL_FULLBRIGHT)
                     curshades = shadetable[0];
                 else
                     curshades = shadetable[GetShade(scale1<<3)];
-#endif
 
                 pixheight=scale1*SPRITESCALEFACTOR;
                 upperedge=viewheight/2-scale1;
@@ -100,11 +99,10 @@ void Scale3DShaper(int x1, int x2, int shapenum, uint32_t flags, fixed ny1, fixe
                         screndy=(ycnt>>6)+upperedge;
                         if(scrstarty!=screndy && screndy>0)
                         {
-#ifdef USE_SHADING
-                            col=curshades[((byte *)shape)[newstart+j]];
-#else
-                            col=((byte *)shape)[newstart+j];
-#endif
+							if(r_depthfog)
+								col=curshades[((byte *)shape)[newstart+j]];
+							else
+								col=((byte *)shape)[newstart+j];
                             if(scrstarty<0) scrstarty=0;
                             if(screndy>viewheight) screndy=viewheight,j=endy;
 

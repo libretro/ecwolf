@@ -1,4 +1,4 @@
-#if defined(USE_SHADING) && !defined(_WL_SHADE_H_)
+#ifndef _WL_SHADE_H_
 #define _WL_SHADE_H_
 
 #define SHADE_COUNT 32

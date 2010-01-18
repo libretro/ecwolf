@@ -8,6 +8,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "tiles.h"
+#include "c_cvars.h"
 
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
@@ -287,9 +288,7 @@ void ScalePost()
     int ywcount, yoffs, yw, yd, yendoffs;
     byte col;
 
-#ifdef USE_SHADING
     byte *curshades = shadetable[GetShade(wallheight[postx])];
-#endif
 
     ywcount = yd = wallheight[postx] >> 3;
     if(yd <= 0) yd = 100;
@@ -313,11 +312,10 @@ void ScalePost()
     }
     if(yw < 0) return;
 
-#ifdef USE_SHADING
-    col = curshades[postsource[yw]];
-#else
-    col = postsource[yw];
-#endif
+	if(r_depthfog)
+		col = curshades[postsource[yw]];
+	else
+		col = postsource[yw];
     yendoffs = yendoffs * vbufPitch + postx;
     while(yoffs <= yendoffs)
     {
@@ -332,11 +330,10 @@ void ScalePost()
             }
             while(ywcount <= 0);
             if(yw < 0) break;
-#ifdef USE_SHADING
-            col = curshades[postsource[yw]];
-#else
-            col = postsource[yw];
-#endif
+			if(r_depthfog)
+				col = curshades[postsource[yw]];
+			else
+				col = postsource[yw];
         }
         yendoffs -= vbufPitch;
     }
@@ -589,121 +586,6 @@ void HitVertDoor (void)
 
 //==========================================================================
 
-
-/*
-====================
-=
-= HitHorizPWall
-=
-= A pushable wall in action has been hit
-=
-====================
-*/
-
-void HitHorizPWall (void)
-{
-    int wallpic;
-    int texture,offset;
-
-    texture = (xintercept>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
-    offset = pwallpos<<10;
-    if (ytilestep == -1)
-        yintercept += TILEGLOBAL-offset;
-    else
-    {
-        texture = TEXTUREMASK-texture;
-        yintercept += offset;
-    }
-
-    if(lasttilehit==tilehit && lastside==0)
-    {
-        if((pixx&3) && texture == lasttexture)
-        {
-            ScalePost();
-            postx=pixx;
-            wallheight[pixx] = wallheight[pixx-1];
-            return;
-        }
-        ScalePost();
-        wallheight[pixx] = CalcHeight();
-        postsource+=texture-lasttexture;
-        postwidth=1;
-        postx=pixx;
-        lasttexture=texture;
-        return;
-    }
-
-    if(lastside!=-1) ScalePost();
-
-    lastside=0;
-    lasttilehit=tilehit;
-    lasttexture=texture;
-    wallheight[pixx] = CalcHeight();
-    postx = pixx;
-    postwidth = 1;
-
-    wallpic = horizwall[pwalltile&63];
-
-    postsource = PM_GetTexture(wallpic) + texture;
-}
-
-/*
-====================
-=
-= HitVertPWall
-=
-= A pushable wall in action has been hit
-=
-====================
-*/
-
-void HitVertPWall (void)
-{
-    int wallpic;
-    int texture,offset;
-
-    texture = (yintercept>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
-    offset = pwallpos<<10;
-    if (xtilestep == -1)
-    {
-        xintercept += TILEGLOBAL-offset;
-        texture = TEXTUREMASK-texture;
-    }
-    else
-        xintercept += offset;
-
-    if(lasttilehit==tilehit && lastside==1)
-    {
-        if((pixx&3) && texture == lasttexture)
-        {
-            ScalePost();
-            postx=pixx;
-            wallheight[pixx] = wallheight[pixx-1];
-            return;
-        }
-        ScalePost();
-        wallheight[pixx] = CalcHeight();
-        postsource+=texture-lasttexture;
-        postwidth=1;
-        postx=pixx;
-        lasttexture=texture;
-        return;
-    }
-
-    if(lastside!=-1) ScalePost();
-
-    lastside=1;
-    lasttilehit=tilehit;
-    lasttexture=texture;
-    wallheight[pixx] = CalcHeight();
-    postx = pixx;
-    postwidth = 1;
-
-    wallpic = vertwall[pwalltile&63];
-
-    postsource = PM_GetTexture(wallpic) + texture;
-}
-
 #define HitHorizBorder HitHorizWall
 #define HitVertBorder HitVertWall
 
@@ -739,17 +621,20 @@ void VGAClearScreen (void)
 
     int y;
     byte *ptr = vbuf;
-#ifdef USE_SHADING
-    for(y = 0; y < viewheight / 2; y++, ptr += vbufPitch)
-        memset(ptr, shadetable[GetShade((viewheight / 2 - y) << 3)][ceiling], viewwidth);
-    for(; y < viewheight; y++, ptr += vbufPitch)
-        memset(ptr, shadetable[GetShade((y - viewheight / 2) << 3)][0x19], viewwidth);
-#else
-    for(y = 0; y < viewheight / 2; y++, ptr += vbufPitch)
-        memset(ptr, ceiling, viewwidth);
-    for(; y < viewheight; y++, ptr += vbufPitch)
-        memset(ptr, 0x19, viewwidth);
-#endif
+	if(r_depthfog)
+	{
+		for(y = 0; y < viewheight / 2; y++, ptr += vbufPitch)
+			memset(ptr, shadetable[GetShade((viewheight / 2 - y) << 3)][ceiling], viewwidth);
+		for(; y < viewheight; y++, ptr += vbufPitch)
+			memset(ptr, shadetable[GetShade((y - viewheight / 2) << 3)][0x19], viewwidth);
+	}
+	else
+	{
+		for(y = 0; y < viewheight / 2; y++, ptr += vbufPitch)
+			memset(ptr, ceiling, viewwidth);
+		for(; y < viewheight; y++, ptr += vbufPitch)
+			memset(ptr, 0x19, viewwidth);
+	}
 }
 
 //==========================================================================
@@ -803,13 +688,11 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
     unsigned j;
     byte col;
 
-#ifdef USE_SHADING
     byte *curshades;
     if(flags & FL_FULLBRIGHT)
         curshades = shadetable[0];
     else
         curshades = shadetable[GetShade(height)];
-#endif
 
     shape = (t_compshape *) PM_GetSprite(shapenum);
 
@@ -855,11 +738,10 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
                             screndy=(ycnt>>6)+upperedge;
                             if(scrstarty!=screndy && screndy>0)
                             {
-#ifdef USE_SHADING
-                                col=curshades[((byte *)shape)[newstart+j]];
-#else
-                                col=((byte *)shape)[newstart+j];
-#endif
+								if(r_depthfog)
+									col=curshades[((byte *)shape)[newstart+j]];
+								else
+									col=((byte *)shape)[newstart+j];
                                 if(scrstarty<0) scrstarty=0;
                                 if(screndy>viewheight) screndy=viewheight,j=endy;
 

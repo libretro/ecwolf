@@ -11,13 +11,14 @@ class TextureManager;
 class Texture
 {
 	public:
-		Texture(const char* name="--NULL--", unsigned int width=1, unsigned int height=1);
+		Texture();
 		Texture(const Texture &other);
 		~Texture();
 
 		unsigned int	GetWidth() const { return width; }
 		unsigned int	GetHeight() const { return height; }
 		const byte*		GetPost(unsigned int which) const;
+		void			Initialize(const char* name, unsigned int width, unsigned int height);
 
 		Texture			&operator= (const Texture &other);
 
@@ -40,6 +41,7 @@ class TextureManager
 		TextureManager();
 
 		const Texture	*GetDoor(unsigned int tile, bool track=false) const;
+		const Texture	*GetFlat(unsigned int tile, bool ceiling=false) const;
 		void			Init();
 
 		const Texture	*operator[] (const std::string &texture) const;
@@ -53,6 +55,7 @@ class TextureManager
 		std::map<std::string, Texture>	textures;
 		std::string						mapTiles[64];
 		std::string						doorTiles[64][2]; // Door and track
+		std::string						flatTiles[256][2]; // floor/ceiling
 };
 
 extern TextureManager TexMan;

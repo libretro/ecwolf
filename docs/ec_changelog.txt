@@ -3,6 +3,9 @@ January 18th, 2010
 - Doing more work on the DECORATE system.  In particular I started on doing
   native actors and inheritance.  I believe things are vary slowly falling into
   place now.
+- Added video options.
+- Moved all of the options into their own submenu.
+- Third map plane is now always on.
 
 January 17th, 2010
 -----------------------------

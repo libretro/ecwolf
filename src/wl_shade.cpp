@@ -1,8 +1,9 @@
-#include "version.h"
+//#include "version.h"
 
-#ifdef USE_SHADING
+//#ifdef USE_SHADING
 #include "wl_def.h"
 #include "wl_shade.h"
+#include "id_vl.h"
 
 typedef struct {
     uint8_t destRed, destGreen, destBlue;   // values between 0 and 255
@@ -140,4 +141,4 @@ int GetShade(int scale)
     return shade;
 }
 
-#endif
+//#endif

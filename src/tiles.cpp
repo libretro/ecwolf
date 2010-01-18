@@ -6,10 +6,9 @@
 
 using namespace std;
 
-Texture::Texture(const char* name, unsigned int width, unsigned int height) : name(name), width(width), height(height), pixels(NULL)
+Texture::Texture() : name("--NULL--"), width(1), height(1), pixels(NULL)
 {
-	pixels = new byte[width*height];
-	memset(pixels, 0, width*height); // Initialize the pixels
+	Initialize(name.c_str(), width, height);
 }
 
 Texture::Texture(const Texture &other) : pixels(NULL)
@@ -67,6 +66,18 @@ const byte* Texture::GetPost(unsigned int which) const
 	return pixels+(which % width)*height;
 }
 
+void Texture::Initialize(const char* name, unsigned int width, unsigned int height)
+{
+	this->name = name;
+	this->width = width;
+	this->height = height;
+
+	if(pixels != NULL)
+		delete[] pixels;
+	pixels = new byte[width*height];
+	memset(pixels, 0, width*height); // Initialize the pixels
+}
+
 Texture &Texture::operator= (const Texture &other)
 {
 	return Copy(other);
@@ -76,8 +87,9 @@ Texture &Texture::operator= (const Texture &other)
 
 TextureManager TexMan;
 
-TextureManager::TextureManager() : nullTexture("-", 64, 64)
+TextureManager::TextureManager() : nullTexture()
 {
+	nullTexture.Initialize("-", 64, 64);
 }
 
 const Texture *TextureManager::GetDoor(unsigned int tile, bool track) const
@@ -85,6 +97,13 @@ const Texture *TextureManager::GetDoor(unsigned int tile, bool track) const
 	if(tile > 63)
 		tile = 63;
 	return (*this)[doorTiles[tile][track]];
+}
+
+const Texture *TextureManager::GetFlat(unsigned int tile, bool ceiling) const
+{
+	if(tile > 255)
+		tile = 255;
+	return (*this)[flatTiles[tile][ceiling]];
 }
 
 void TextureManager::Init()
@@ -124,7 +143,8 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 			sc.MustGetToken(TK_IntConst);
 			height = sc.number;
 
-			Texture tex(name.c_str(), width, height);
+			Texture &tex = textures[name];
+			tex.Initialize(name.c_str(), width, height);
 			// See if we're defining more than a NULL texture
 			if(sc.CheckToken('{'))
 			{
@@ -149,15 +169,29 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 					}
 				}
 			}
-			textures[name] = tex;
 		}
-		else if(sc.str.compare("maptile") == 0)
+		else if(sc.str.compare("maptile") == 0 || sc.str.compare("floortile") == 0 || sc.str.compare("ceilingtile") == 0)
 		{
+			int type = sc.str.compare("maptile") == 0 ? 0 : (sc.str.compare("floortile") == 0  ? 1 : 2);
 			sc.MustGetToken(TK_IntConst);
 			int index = sc.number;
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_StringConst);
-			mapTiles[index] = sc.str;
+			switch(type)
+			{
+				default:
+				case 0:
+					if(index > 63)
+						sc.ScriptError("Can't assign map tile over 63.\n");
+					mapTiles[index] = sc.str;
+					break;
+				case 1:
+				case 2:
+					if(index > 255)
+						sc.ScriptError("Can't assign floor or ceiling tile over 255.\n");
+					flatTiles[index][type-1] = sc.str;
+					break;
+			}
 		}
 		else if(sc.str.compare("doortile") == 0)
 		{

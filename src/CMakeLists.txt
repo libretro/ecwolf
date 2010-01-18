@@ -57,6 +57,7 @@ add_executable(ecwolf
 	resourcefiles/file_wad.cpp
 	resourcefiles/file_zip.cpp
 	config.cpp
+	c_cvars.cpp
 	file.cpp
 	files.cpp
 	fmopl.cpp
@@ -90,6 +91,7 @@ add_executable(ecwolf
 	wl_menu.cpp
 	wl_parallax.cpp
 	wl_play.cpp
+	wl_shade.cpp
 	wl_state.cpp
 	wl_text.cpp
 	zstrformat.cpp

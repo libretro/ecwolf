@@ -31,6 +31,7 @@
 #include "id_us.h"
 #include "language.h"
 #include "w_wad.h"
+#include "c_cvars.h"
 using namespace std;
 
 struct SaveFile
@@ -54,9 +55,11 @@ MENU_LISTENER(EnterSaveMenu);
 
 Menu loadGame(LSM_X, LSM_Y, LSM_W, 24, EnterLoadMenu);
 Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
+Menu optionsMenu(80, 85, 180, 24);
 Menu saveGame(LSM_X, LSM_Y, LSM_W, 24, EnterSaveMenu);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
+Menu displayMenu(60, 95, 225, 56);
 Menu mouseSensitivity(10, 80, 300, 0);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
@@ -356,6 +359,13 @@ MENU_LISTENER(ReadThis)
 	StartCPMusic(MENUSONG);
 	return true;
 }
+MENU_LISTENER(ToggleFullscreen)
+{
+	fullscreen = ~fullscreen;
+	VL_SetVGAPlaneMode();
+	displayMenu.draw();
+	return true;
+}
 
 void CreateMenus()
 {
@@ -365,8 +375,7 @@ void CreateMenus()
 #else
 	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], skills));
 #endif
-	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_SD"], soundBase));
-	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_CL"], controlBase));
+	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_OPTIONS"], optionsMenu));
 	MenuItem *lg = new MenuSwitcherMenuItem(language["STR_LG"], loadGame);
 	lg->setEnabled(SaveFile::files.size() > 0);
 	mainMenu.addItem(lg);
@@ -437,6 +446,11 @@ void CreateMenus()
 		skills.addItem(tmp);
 	}
 
+	optionsMenu.setHeadPicture("M_OPTION");
+	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_CL"], controlBase));
+	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_SD"], soundBase));
+	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_DISPLAY"], displayMenu));
+
 	// Collect options and defaults
 	const char* soundEffectsOptions[] = {language["STR_NONE"], language["STR_PC"], language["STR_ALSB"] };
 	soundEffectsOptions[1] = NULL;
@@ -486,6 +500,10 @@ void CreateMenus()
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_SENS"], mouseSensitivity));
 	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
+
+	displayMenu.setHeadText(language["STR_DISPLAY"]);
+	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
+	displayMenu.addItem(new BooleanMenuItem(language["STR_DEPTHFOG"], r_depthfog));
 
 	loadGame.setHeadPicture("M_LOADGM");
 	saveGame.setHeadPicture("M_SAVEGM");

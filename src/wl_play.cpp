@@ -1260,9 +1260,7 @@ void PlayLoop (void)
         InitSky();
 #endif
 
-#ifdef USE_SHADING
     InitLevelShadeTable();
-#endif
 
     playstate = ex_stillplaying;
     lasttimecount = GetTimeCount();

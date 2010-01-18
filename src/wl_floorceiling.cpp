@@ -1,6 +1,7 @@
-#include "version.h"
+#include "tiles.h"
+#include "c_cvars.h"
 
-#ifdef USE_FLOORCEILINGTEX
+//#ifdef USE_FLOORCEILINGTEX
 
 #include "wl_def.h"
 #include "wl_shade.h"
@@ -14,7 +15,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
     fixed tex_step;                            // global step per one screen pixel
     fixed gu, gv, du, dv;                      // global texture coordinates
     int u, v;                                  // local texture coordinates
-    byte *toptex, *bottex;
+    const byte *toptex, *bottex;
     unsigned lasttoptex = 0xffffffff, lastbottex = 0xffffffff;
 
     int halfheight = viewheight >> 1;
@@ -37,9 +38,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
         dv = -FixedMul(tex_step, viewcos);
         gu -= (viewwidth >> 1) * du;
         gv -= (viewwidth >> 1) * dv; // starting point (leftmost)
-#ifdef USE_SHADING
         byte *curshades = shadetable[GetShade(y << 3)];
-#endif
         for(int x = 0, bot_add = bot_offset, top_add = top_offset;
             x < viewwidth; x++, bot_add++, top_add++)
         {
@@ -54,28 +53,31 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
                     if (curtoptex != lasttoptex)
                     {
                         lasttoptex = curtoptex;
-                        toptex = PM_GetTexture(curtoptex);
+                        toptex = TexMan.GetFlat(curtoptex, true)->GetPost(0);
                     }
                     unsigned curbottex = curtex & 0xff;
                     if (curbottex != lastbottex)
                     {
                         lastbottex = curbottex;
-                        bottex = PM_GetTexture(curbottex);
+                        bottex = TexMan.GetFlat(curbottex, false)->GetPost(0);
                     }
                     u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
                     v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
                     unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
-#ifdef USE_SHADING
-                    if(curtoptex)
-                        vbuf[top_add] = curshades[toptex[texoffs]];
-                    if(curbottex)
-                        vbuf[bot_add] = curshades[bottex[texoffs]];
-#else
-                    if(curtoptex)
-                        vbuf[top_add] = toptex[texoffs];
-                    if(curbottex)
-                        vbuf[bot_add] = bottex[texoffs];
-#endif
+					if(r_depthfog)
+					{
+						if(curtoptex)
+							vbuf[top_add] = curshades[toptex[texoffs]];
+						if(curbottex)
+							vbuf[bot_add] = curshades[bottex[texoffs]];
+					}
+					else
+					{
+						if(curtoptex)
+							vbuf[top_add] = toptex[texoffs];
+						if(curbottex)
+							vbuf[bot_add] = bottex[texoffs];
+					}
                 }
             }
             gu += du;
@@ -84,4 +86,4 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
     }
 }
 
-#endif
+//#endif
