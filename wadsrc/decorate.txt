@@ -55,6 +55,10 @@
 227 - Inky
 */
 
+actor Actor native
+{
+}
+
 actor Guard
 {
 	game Wolf3D
@@ -97,5 +101,14 @@ actor Guard
 			GRD0 HI 15
 			GRD0 K -1
 			stop
+	}
+}
+
+actor PatrolingGuard : Guard
+{
+	states
+	{
+		Spawn:
+			goto Path
 	}
 }

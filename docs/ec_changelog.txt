@@ -1,3 +1,9 @@
+January 18th, 2010
+-----------------------------
+- Doing more work on the DECORATE system.  In particular I started on doing
+  native actors and inheritance.  I believe things are vary slowly falling into
+  place now.
+
 January 17th, 2010
 -----------------------------
 - Fixed: Various crashes with the sound code.  I'll be so happy once I can 
