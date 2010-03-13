@@ -64,6 +64,7 @@ actor Guard
 	game Wolf3D
 	speed 512
 	+COUNTKILL
+	+SHOOTABLE
 	states
 	{
 		Spawn:

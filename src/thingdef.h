@@ -5,6 +5,7 @@
 #include <map>
 
 #include "scanner.hpp"
+#include "wl_def.h"
 
 class ClassDef;
 
@@ -12,11 +13,14 @@ class ClassDef;
 	friend class ClassDef; \
 	protected: \
 		A##name(const ClassDef *classType) : A##parent(classType) {} \
+		virtual AActor *__NewNativeInstance(const ClassDef *classType) { return new A##name(classType); } \
 	public: \
 		static const ClassDef *__StaticClass;
 #define IMPLEMENT_CLASS(name, parent) \
 	const ClassDef *A##name::__StaticClass = ClassDef::DeclareNativeClass<A##name>(#name, A##parent::__StaticClass);
 #define NATIVE_CLASS(name) A##name::__StaticClass;
+
+typedef uint32_t flagstype_t;
 
 class AActor
 {
@@ -32,11 +36,24 @@ class AActor
 				void	(*thinker);
 		};
 
-		unsigned int flags;
+		// Basic properties from objtype
+		flagstype_t flags;
+
+		int32_t	distance; // if negative, wait for that door to open
+		dirtype	dir;
+
+		fixed	x, y;
+		word	tilex, tiley;
+		byte	areanumber;
+
+		short	angle;
+		short	health;
+		int32_t	speed;
 
 		static const ClassDef *__StaticClass;
 	protected:
 		AActor(const ClassDef *type);
+		virtual AActor *__NewNativeInstance(const ClassDef *classType) { return new AActor(classType); }
 
 		const ClassDef	*classType;
 };
@@ -76,6 +93,7 @@ class ClassDef
 	protected:
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
+		static bool	SetFlag(ClassDef *newClass, const char* flagName, bool set);
 
 		static std::map<std::string, ClassDef *>	classTable;
 

@@ -10,10 +10,15 @@ using namespace std;
 #define DEFINE_FLAG(prefix, flag, type, variable) { prefix##_##flag, #flag, (int)(size_t)&((type*)1)->variable - 1 }
 const FlagDef flags[] =
 {
-	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
+	DEFINE_FLAG(FL, AMBUSH, AActor, flags),
+	DEFINE_FLAG(FL, ATTACKMODE, AActor, flags),
 	DEFINE_FLAG(FL, BONUS, AActor, flags),
+	DEFINE_FLAG(FL, FIRSTATTACK, AActor, flags),
+	DEFINE_FLAG(FL, FULLBRIGHT, AActor, flags),
+	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
 	DEFINE_FLAG(FL, NEVERMARK, AActor, flags),
-	DEFINE_FLAG(FL, VISABLE, AActor, flags)
+	DEFINE_FLAG(FL, NONMARK, AActor, flags),
+	DEFINE_FLAG(FL, VISABLE, AActor, flags),
 };
 
 map<string, ClassDef *> ClassDef::classTable;
@@ -93,12 +98,18 @@ void ClassDef::ParseActor(Scanner &sc)
 	}
 	if(previouslyDefined && !native)
 		sc.ScriptError("Actor '%s' already defined.\n", newClass->name.c_str());
+	if(!native) // Initialize the default instance to the nearest native class.
+	{
+		delete newClass->defaultInstance;
+		newClass->defaultInstance = newClass->parent->defaultInstance->__NewNativeInstance(newClass);
+	}
 
 	sc.MustGetToken('{');
 	while(!sc.CheckToken('}'))
 	{
 		if(sc.CheckToken('+') || sc.CheckToken('-'))
 		{
+			bool set = sc.lastToken == '+';
 			string flagName;
 			sc.MustGetToken(TK_Identifier);
 			flagName = sc.str;
@@ -107,7 +118,8 @@ void ClassDef::ParseActor(Scanner &sc)
 				sc.MustGetToken(TK_Identifier);
 				flagName += string(".") + sc.str;
 			}
-			printf("Warning: Unkown flag '%s' for actor '%s'.\n", flagName.c_str(), newClass->name.c_str());
+			if(!SetFlag(newClass, flagName.c_str(), set))
+				printf("Warning: Unkown flag '%s' for actor '%s'.\n", flagName.c_str(), newClass->name.c_str());
 		}
 		else
 		{
@@ -214,6 +226,30 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 		else
 			sc.ScriptError("Unknown thing section '%s'.", sc.str.c_str());
 	}
+}
+
+bool ClassDef::SetFlag(ClassDef *newClass, const char* flagName, bool set)
+{
+	int min = 0;
+	int max = sizeof(flags)/sizeof(FlagDef) - 1;
+	while(min <= max)
+	{
+		int mid = (min+max)/2;
+		int ret = stricmp(flags[mid].name, flagName);
+		if(ret == 0)
+		{
+			if(set)
+				*reinterpret_cast<flagstype_t *>(newClass->defaultInstance + flags[mid].varOffset) |= flags[mid].value;
+			else
+				*reinterpret_cast<flagstype_t *>(newClass->defaultInstance + flags[mid].varOffset) &= ~flags[mid].value;
+			return true;
+		}
+		else if(ret > 0)
+			min = mid+1;
+		else
+			max = mid-1;
+	}
+	return false;
 }
 
 void ClassDef::UnloadActors()
