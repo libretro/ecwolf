@@ -1,7 +1,7 @@
 #include "lumpremap.h"
 #include "w_wad.h"
 #include "zstring.h"
-#include "scanner.hpp"
+#include "scanner.h"
 using namespace std;
 
 map<string, LumpRemaper> LumpRemaper::remaps;

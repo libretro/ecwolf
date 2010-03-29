@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "tiles.h"
-#include "scanner.hpp"
+#include "scanner.h"
 #include "w_wad.h"
 
 using namespace std;

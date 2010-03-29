@@ -1,6 +1,6 @@
 #include "language.h"
 #include "w_wad.h"
-#include "scanner.hpp"
+#include "scanner.h"
 using namespace std;
 
 Language language;
@@ -26,8 +26,9 @@ void Language::ReadLump(int lump, const char* language)
 	int token = TK_NoToken;
 	bool skip = false;
 	bool noReplace = false;
-	while((token = sc.GetNextToken()) != TK_NoToken)
+	while(sc.GetNextToken())
 	{
+		token = sc.token;
 		if(token == '[')
 		{
 			// match with language
@@ -74,7 +75,7 @@ void Language::ReadLump(int lump, const char* language)
 		}
 		else
 		{
-			printf("Unexpected token.\n");
+			sc.ScriptError("Unexpected token.\n");
 			exit(0);
 		}
 	}

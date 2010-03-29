@@ -29,7 +29,7 @@
 // =============================================================================
 
 #include "config.hpp"
-#include "scanner.hpp"
+#include "scanner.h"
 
 #include <string>
 #include <fstream>

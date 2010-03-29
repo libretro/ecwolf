@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-#include "scanner.hpp"
+#include "scanner.h"
 #include "wl_def.h"
 
 class ClassDef;

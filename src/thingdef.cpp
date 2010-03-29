@@ -1,6 +1,6 @@
 #include <string>
 
-#include "scanner.hpp"
+#include "scanner.h"
 #include "w_wad.h"
 #include "wl_def.h"
 #include "thingdef.h"
@@ -109,7 +109,7 @@ void ClassDef::ParseActor(Scanner &sc)
 	{
 		if(sc.CheckToken('+') || sc.CheckToken('-'))
 		{
-			bool set = sc.lastToken == '+';
+			bool set = sc.token == '+';
 			string flagName;
 			sc.MustGetToken(TK_Identifier);
 			flagName = sc.str;
@@ -128,7 +128,7 @@ void ClassDef::ParseActor(Scanner &sc)
 			{
 				sc.MustGetToken('{');
 				sc.MustGetToken(TK_Identifier); // We should already have grabbed the identifier in all other cases.
-				while(sc.lastToken != '}')
+				while(sc.token != '}')
 				{
 					if(sc.CheckToken(':'))
 					{

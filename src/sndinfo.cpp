@@ -1,7 +1,7 @@
 #include "wl_def.h"
 #include "id_sd.h"
 #include "w_wad.h"
-#include "scanner.hpp"
+#include "scanner.h"
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 	while(sc.TokensLeft() != 0)
 	{
-		if(!sc.CheckToken(TK_UnquotedString))
+		if(!sc.GetNextString())
 			sc.ScriptError("Expected logical name.\n");
 		string logicalName = sc.str;
 
@@ -96,7 +96,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 		unsigned int i = 0;
 		do
 		{
-			if(sc.CheckToken('}') || !sc.CheckToken(TK_UnquotedString))
+			if(sc.CheckToken('}') || !sc.GetNextString())
 			{
 				if(i == 0)
 					sc.ScriptError("Expected lump name.\n");

@@ -1,16 +1,7 @@
-// Emacs style mode select   -*- C++ -*-
-// =============================================================================
-// ### ### ##   ## ###  #   ###  ##   #   #  ##   ## ### ##  ### ###  #  ###
-// #    #  # # # # #  # #   #    # # # # # # # # # # #   # #  #   #  # # #  #
-// ###  #  #  #  # ###  #   ##   # # # # # # #  #  # ##  # #  #   #  # # ###
-//   #  #  #     # #    #   #    # # # # # # #     # #   # #  #   #  # # #  #
-// ### ### #     # #    ### ###  ##   #   #  #     # ### ##  ###  #   #  #  #
-//                                     --= http://bitowl.com/sde/ =--
-// =============================================================================
-// Copyright (C) 2008 "Blzut3" (admin@maniacsvault.net)
-// Copyright (C) 2008 GhostlyDeath (ghostlydeath@gmail.com)
-// The SDE Logo is a trademark of GhostlyDeath (ghostlydeath@gmail.com)
-// =============================================================================
+//------------------------------------------------------------------------------
+// scanner.h
+//------------------------------------------------------------------------------
+//
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
@@ -23,468 +14,481 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
-// 02111-1307, USA.
-// =============================================================================
-// Description:
-// =============================================================================
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+// 02110-1301, USA.
+//
+//------------------------------------------------------------------------------
+// Copyright (C) 2010 "Blzut3" <admin@maniacsvault.net>
+//------------------------------------------------------------------------------
 
-#include <string>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
 #include <cstdio>
+#include <cstring>
 #include <cstdarg>
+#include <string>
 
-#include "scanner.hpp"
-#include "config.hpp"
+#include "scanner.h"
 
 using namespace std;
 
-////////////////////////////////////////////////////////////////////////////////
-
-Scanner::Scanner(const char* data, UInt32 length)
-: number(0), decimal(0), boolean(false), lastToken(0), error(false), length(length), line(0), lpos(0), pos(0), ret(NULL)
+static const char* const TokenNames[TK_NumSpecialTokens] =
 {
+	"Identifier",
+	"String Constant",
+	"Integer Constant",
+	"Float Constant",
+	"Boolean Constant",
+	"Logical And",
+	"Logical Or",
+	"Equals",
+	"Not Equals",
+	"Greater Than or Equals"
+	"Less Than or Equals",
+	"Left Shift",
+	"Right Shift"
+};
+
+Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), tokenLine(1), tokenLinePosition(0), scanPos(0), needNext(true)
+{
+	if(length == -1)
+		length = strlen(data);
+	this->length = length;
 	this->data = new char[length];
 	memcpy(this->data, data, length);
+
 	CheckForWhitespace();
 }
 
 Scanner::~Scanner()
 {
-	if(ret != NULL)
-		delete[] ret;
 	delete[] data;
 }
 
-void Scanner::MustGetToken(char token)
+void Scanner::CheckForWhitespace()
 {
-	GetToken(pos, lpos, line, token, true);
+	int comment = 0; // 1 = till next new line, 2 = till end block
+	while(scanPos < length)
+	{
+		char cur = data[scanPos];
+		char next = scanPos+1 < length ? data[scanPos+1] : 0;
+		if(comment == 2)
+		{
+			if(cur != '*' || next != '/')
+				scanPos++;
+			else
+			{
+				comment = 0;
+				scanPos += 2;
+			}
+			continue;
+		}
+
+		if(cur == ' ' || cur == '\t' || cur == 0)
+			scanPos++;
+		else if(cur == '\n' || cur == '\r')
+		{
+			scanPos++;
+			if(comment == 1)
+				comment = 0;
+
+			// Do a quick check for Windows style new line
+			if(cur == '\r' && next == '\n')
+				scanPos++;
+			IncrementLine();
+		}
+		else if(cur == '/' && comment == 0)
+		{
+			switch(next)
+			{
+				case '/':
+					comment = 1;
+					break;
+				case '*':
+					comment = 2;
+					break;
+				default:
+					return;
+			}
+			scanPos += 2;
+		}
+		else
+		{
+			if(comment == 0)
+				return;
+			else
+				scanPos++;
+		}
+	}
 }
 
 bool Scanner::CheckToken(char token)
 {
-	if(error)
-		return false;
-	UInt32 nPos = pos;
-	UInt32 nLpos = lpos;
-	UInt32 nLine = line;
-	GetToken(nPos, nLpos, nLine, token, false);
-	if(!error)
+	if(needNext)
 	{
-		pos = nPos;
-		lpos = nLpos;
-		line = nLine;
+		if(!GetNextToken(false))
+			return false;
+	}
+
+	// An int can also be a float.
+	if(nextState.token == token || (nextState.token == TK_IntConst && token == TK_FloatConst))
+	{
+		needNext = true;
+		ExpandState();
 		return true;
 	}
-	else
-		error = false;
+	needNext = false;
 	return false;
 }
 
-ETokenType Scanner::GetNextToken()
+void Scanner::ExpandState()
 {
-	if(pos >= length)
-		return TK_NoToken;
+	str = nextState.str;
+	number = nextState.number;
+	decimal = nextState.decimal;
+	boolean = nextState.boolean;
+	token = nextState.token;
+	tokenLine = nextState.tokenLine;
+	tokenLinePosition = nextState.tokenLinePosition;
+}
 
-	if(data[pos] >= '0' && data[pos] <= '9')
+bool Scanner::GetNextString()
+{
+	if(scanPos >= length)
+		return false;
+
+	int start = scanPos;
+	int end = scanPos;
+	if(data[scanPos] == '"') // String Constant
 	{
-		if(CheckToken(TK_Identifier))
-			return TK_Identifier;
-		else if(CheckToken(TK_FloatConst))
+		end = ++start; // Remove starting quote
+		scanPos++;
+		while(scanPos < length)
 		{
-			double integerPart = 0.0;
-			if(modf(decimal, &integerPart) != 0.0)
-				return TK_FloatConst;
-			else
+			char cur = data[scanPos];
+			if(cur == '"')
+				end = scanPos;
+			else if(cur == '\\')
 			{
-				number = static_cast<UInt32> (integerPart);
-				return TK_IntConst;
+				scanPos += 2;
+				continue;
 			}
+			scanPos++;
+			if(start != end)
+				break;
 		}
-		else if(CheckToken(TK_IntConst))
-			return TK_IntConst;
 	}
-	else if(data[pos] >= 'a' && data[pos] <= 'z')
+	else // Unquoted string
 	{
-		if(CheckToken(TK_BoolConst))
-			return TK_BoolConst;
-		else if(CheckToken(TK_Void))
-			return TK_Void;
-		else if(CheckToken(TK_String))
-			return TK_String;
-		else if(CheckToken(TK_Int))
-			return TK_Int;
-		else if(CheckToken(TK_Bool))
-			return TK_Bool;
-		else if(CheckToken(TK_Identifier))
-			return TK_Identifier;
+		while(scanPos < length)
+		{
+			char cur = data[scanPos];
+			switch(cur)
+			{
+				default:
+					break;
+				case ' ':
+				case '\t':
+				case '\n':
+				case '\r':
+					end = scanPos;
+					break;
+			}
+			if(start != end)
+				break;
+			scanPos++;
+		}
 	}
-	else if((data[pos] >= 'A' && data[pos] <= 'Z') || data[pos] == '_')
+	if(end-start > 0)
 	{
-		if(CheckToken(TK_Identifier))
-			return TK_Identifier;
+		string thisString(data+start, end-start);
+		CheckForWhitespace();
+		return true;
 	}
-	else if(data[pos] == '"')
+	CheckForWhitespace();
+	return false;
+}
+
+bool Scanner::GetNextToken(bool expandState)
+{
+	if(!needNext)
 	{
-		if(CheckToken(TK_StringConst))
-			return TK_StringConst;
+		needNext = true;
+		return true;
+	}
+
+	nextState.tokenLine = line;
+	nextState.tokenLinePosition = scanPos - lineStart;
+	if(scanPos >= length)
+		return false;
+
+	int start = scanPos;
+	int end = scanPos;
+	nextState.token = TK_NoToken;
+	int integerBase = 10;
+	bool floatHasDecimal = false;
+	bool floatHasExponent = false;
+	bool stringFinished = false; // Strings are the only things that can have 0 length tokens.
+
+	char cur = data[scanPos++];
+	// Determine by first character
+	if(cur == '_' || (cur >= 'A' && cur <= 'Z') || (cur >= 'a' && cur <= 'z'))
+		nextState.token = TK_Identifier;
+	else if(cur >= '0' && cur <= '9')
+	{
+		if(cur == '0')
+			integerBase = 8;
+		nextState.token = TK_IntConst;
+	}
+	else if(cur == '.')
+	{
+		floatHasDecimal = true;
+		nextState.token = TK_FloatConst;
+	}
+	else if(cur == '"')
+	{
+		end = ++start; // Move the start up one character so we don't have to trim it later.
+		nextState.token = TK_StringConst;
 	}
 	else
 	{
-		if(CheckToken(TK_AndAnd))
-			return TK_AndAnd;
-		else if(CheckToken(TK_OrOr))
-			return TK_OrOr;
-		else if(CheckToken(TK_EqEq))
-			return TK_EqEq;
-		else if(CheckToken(TK_NotEq))
-			return TK_NotEq;
-		else if(CheckToken(TK_GtrEq))
-			return TK_GtrEq;
-		else if(CheckToken(TK_LessEq))
-			return TK_LessEq;
-		else if(CheckToken(TK_ShiftLeft))
-			return TK_ShiftLeft;
-		else if(CheckToken(TK_ShiftRight))
-			return TK_ShiftRight;
-	}
-	if(CheckToken(data[pos]))
-		return static_cast<ETokenType> (data[pos-1]);
-	return TK_NoToken;
-}
+		end = scanPos;
+		nextState.token = cur;
 
-void Scanner::CheckForWhitespace(UInt32 *nPos, UInt32 *nLpos)
-{
-	UInt32 & uPos = (nPos ? (*nPos) : pos);
-	UInt32 & uLpos = (nLpos ? (*nLpos) : lpos);
-	while(data[uPos] == ' ' || data[uPos] == '\0' || data[uPos] == '	' || data[uPos] == '\n' || data[uPos] == '\r' ||
-		(data[uPos] == '/' && uPos+1 < length && (data[uPos+1] == '/' || data[uPos+1] == '*')))
-	{
-		//comment
-		if(data[uPos] == '/' && uPos+1 < length && (data[uPos+1] == '/' || data[uPos+1] == '*'))
+		// Now check for operator tokens
+		if(scanPos < length)
 		{
-			uPos += 2;
-			if(uPos == length)
-				return;
-			if(data[uPos-1] == '*') // multiline
+			char next = data[scanPos];
+			if(cur == '&' && next == '&')
+				nextState.token = TK_AndAnd;
+			else if(cur == '|' && next == '|')
+				nextState.token = TK_OrOr;
+			else if(cur == '<' && next == '<')
+				nextState.token = TK_ShiftLeft;
+			else if(cur == '>' && next == '>')
+				nextState.token = TK_ShiftRight;
+			else if(next == '=')
 			{
-				while(true)
+				switch(cur)
 				{
-					// Since we may be skipping end of lines lets check for them.
-					if(data[uPos] == '\r' || data[uPos] == '\n')
-					{
-						if(data[uPos] == '\r' && uPos+1 < length && data[uPos+1] == '\n')
-							uPos++;
-						line++;
-						uLpos = 0;
-					}
-
-					uPos++;
-					if(data[uPos-1] == '*' && uPos < length && data[uPos] == '/')
+					case '=':
+						nextState.token = TK_EqEq;
 						break;
-					if(uPos == length)
-						return;
+					case '!':
+						nextState.token = TK_NotEq;
+						break;
+					case '>':
+						nextState.token = TK_GtrEq;
+						break;
+					case '<':
+						nextState.token = TK_LessEq;
+						break;
+					default:
+						break;
 				}
 			}
-			else // single line
+
+			if(nextState.token != cur)
 			{
-				// Go until the end of line is reached.
-				while(data[uPos] != '\r' && data[uPos] != '\n')
-				{
-					uPos++;
-					if(uPos == length)
-						return;
-				}
+				scanPos++;
+				end = scanPos;
 			}
 		}
-
-		if(data[uPos] == '\r' || data[uPos] == '\n')
-		{
-			if(data[uPos] == '\r' && uPos+1 < length && data[uPos+1] == '\n')
-				uPos++;
-			line++;
-			uLpos = 0;
-		}
-
-		uPos++;
-		uLpos++;
-		if(uPos >= length)
-			return;
 	}
-}
 
-//For exmaple GENERIC_TOKEN(void) would do all the needed errors and such for looking for void
-#define GENERIC_GETTOKEN(token) \
-{ \
-	char* ident = GetNext(pos, lpos, TK_Identifier, report); \
-	if(ident != NULL) \
-	{ \
-		if(strcasecmp(ident, token) == 0) \
-		{ \
-			str = ident; \
-		} \
-		else \
-		{ \
-			error = true; \
-			if(report) \
-				{printf("Line %d:%d: Expected \"%s\", but got \"%s\" instead.\n", line, lpos, token, ident);exit(0);} \
-		} \
-	} \
-	break; \
-}
-//For searching for symbols like == or <<
-#define GENERIC_DOUBLETOKEN(token) \
-{ \
-	const char* tkn = token; \
-	if(pos >= length-1) \
-	{ \
-		error = true; \
-		if(report) \
-			{printf("Line %d:%d: Expected \"%s\".\n", line, lpos, token);exit(0);} \
-	} \
-	if(data[pos] == tkn[0] && data[pos+1] == tkn[1]) \
-	{ \
-		str = token; \
-		pos += 2; \
-		lpos += 2; \
-	} \
-	else \
-	{ \
-		error = true; \
-		if(report) \
-			{printf("Line %d:%d: Expected \"%s\", but got \"%c%c\" instead.\n", line, lpos, token, data[pos], data[pos+1]);exit(0);} \
-	} \
-	break; \
-}
-void Scanner::GetToken(UInt32 &pos, UInt32 &lpos, UInt32 &line, char token, bool report)
-{
-	if(error)
-		return;
-	if(pos >= length)
+	if(start == end)
 	{
-		if(report)
-			{printf("Unexpected end of file.\n");exit(0);}
-		return;
-	}
-	switch(token)
-	{
-		case TK_Identifier:
+		while(scanPos < length)
 		{
-			char* ident = GetNext(pos, lpos, TK_Identifier, report);
-			if(ident != NULL)
+			cur = data[scanPos];
+			switch(nextState.token)
 			{
-				str = ident;
-			}
-			break;
-		}
-		case TK_UnquotedString:
-		{
-			char* uqString = GetNext(pos, lpos, TK_UnquotedString, report);
-			if(uqString != NULL)
-			{
-				str = uqString;
-			}
-			break;
-		}
-		case TK_StringConst:
-		{
-			char* stringConst = GetNext(pos, lpos, TK_StringConst, report);
-			if(stringConst != NULL)
-			{
-				str = stringConst;
-			}
-			break;
-		}
-		case TK_IntConst:
-		{
-			const char* integer = GetNext(pos, lpos, TK_IntConst, report);
-			if(integer != NULL)
-				number = atoi(integer);
-			break;
-		}
-		case TK_FloatConst:
-		{
-			const char* integer = GetNext(pos, lpos, TK_FloatConst, report);
-			if(integer != NULL)
-				decimal = atof(integer);
-			break;
-		}
-		case TK_BoolConst:
-		{
-			const char* ident = GetNext(pos, lpos, TK_Identifier, report);
-			if(ident != NULL)
-			{
-				if(strcasecmp(ident, "true") == 0)
-					boolean = true;
-				else if(strcasecmp(ident, "false") == 0)
-					boolean = false;
-				else
-				{
-					error = true;
-					if(report)
-						{printf("Line %d:%d: Expected true/false, but got \"%s\" instead.\n", line, lpos, ident);exit(0);}
+				default:
 					break;
-				}
-			}
-			break;
-		}
-		case TK_Void:
-			GENERIC_GETTOKEN("void");
-		case TK_String:
-			GENERIC_GETTOKEN("str");
-		case TK_Int:
-			GENERIC_GETTOKEN("int");
-		case TK_Float:
-			GENERIC_GETTOKEN("float");
-		case TK_Bool:
-			GENERIC_GETTOKEN("bool");
-		case TK_AndAnd:
-			GENERIC_DOUBLETOKEN("&&");
-		case TK_OrOr:
-			GENERIC_DOUBLETOKEN("||");
-		case TK_EqEq:
-			GENERIC_DOUBLETOKEN("==");
-		case TK_NotEq:
-			GENERIC_DOUBLETOKEN("!=");
-		case TK_GtrEq:
-			GENERIC_DOUBLETOKEN(">=");
-		case TK_LessEq:
-			GENERIC_DOUBLETOKEN("<=");
-		case TK_ShiftLeft:
-			GENERIC_DOUBLETOKEN("<<");
-		case TK_ShiftRight:
-			GENERIC_DOUBLETOKEN(">>");
-		default:
-			if(data[pos] != token)
-			{
-				error = true;
-				if(report)
-					{printf("Line %d:%d: Expected '%c', but got '%c' instead.\n", line, lpos, token, data[pos]);exit(0);}
-			}
-			pos++;
-			lpos++;
-			break;
-	}
-	if(!error)
-		lastToken = token;
-	else
-		lastToken = 0;
-
-	CheckForWhitespace(&pos, &lpos);
-}
-
-//Find the next identifier by looping until we find an invalid character.
-char* Scanner::GetNext(UInt32 &pos, UInt32 &lpos, char type, bool report)
-{
-	if(pos >= length)
-		return NULL;
-	UInt32 end = pos;
-	bool special = false;
-	bool special2 = false;
-	for(UInt32 i = pos;i < length;i++)
-	{
-		if(type == TK_Identifier)
-		{
-			if(!((data[i] >= 'a' && data[i] <= 'z') || (data[i] >= 'A' && data[i] <= 'Z') ||
-				data[i] == '_' || (i != pos && data[i] >= '0' && data[i] <= '9')))
-			{
-				break;
-			}
-		}
-		else if(type == TK_UnquotedString)
-		{
-			if(data[i] == ' ' || data[i] == '\t' || data[i] == '\r' || data[i] == '\n')
-			{
-				break;
-			}
-		}
-		else if(type == TK_StringConst)
-		{
-			if(!special) // Did we start the string?
-			{
-				if(data[i] != '"')
+				case TK_Identifier:
+					if(cur != '_' && (cur < 'A' || cur > 'Z') && (cur < 'a' || cur > 'z') && (cur < '0' || cur > '9'))
+						end = scanPos;
 					break;
-				special = true;
+				case TK_IntConst:
+					if(cur == '.' || (scanPos-1 != start && cur == 'e'))
+						nextState.token = TK_FloatConst;
+					else if((cur == 'x' || cur == 'X') && scanPos-1 == start)
+					{
+						integerBase = 16;
+						break;
+					}
+					else
+					{
+						switch(integerBase)
+						{
+							default:
+								if(cur < '0' || cur > '9')
+									end = scanPos;
+								break;
+							case 8:
+								if(cur < '0' || cur > '7')
+									end = scanPos;
+								break;
+							case 16:
+								if((cur < '0' || cur > '9') && (cur < 'A' || cur > 'F') && (cur < 'a' || cur > 'f'))
+									end = scanPos;
+								break;
+						}
+						break;
+					}
+				case TK_FloatConst:
+					if(cur < '0' || cur > '9')
+					{
+						if(!floatHasDecimal && cur == '.')
+						{
+							floatHasDecimal = true;
+							break;
+						}
+						else if(!floatHasExponent && cur == 'e')
+						{
+							floatHasDecimal = true;
+							floatHasExponent = true;
+							if(scanPos+1 < length)
+							{
+								char next = data[scanPos+1];
+								if((next < '0' || next > '9') && next != '+' && next != '-')
+									end = scanPos;
+								else
+									scanPos++;
+							}
+							break;
+						}
+						end = scanPos;
+					}
+					break;
+				case TK_StringConst:
+					if(cur == '"')
+					{
+						stringFinished = true;
+						end = scanPos;
+						scanPos++;
+					}
+					else if(cur == '\\')
+						scanPos++; // Will add two since the loop automatically adds one
+					break;
 			}
+			if(start == end && !stringFinished)
+				scanPos++;
 			else
-			{
-				if(!special2 && data[i] == '"')
-					break;
-				if(data[i] == '\\')
-					special2 = !special2;
-				else
-					special2 = false;
-			}
-		}
-		else if(type == TK_IntConst)
-		{
-			if(!(data[i] >= '0' && data[i] <= '9'))
 				break;
 		}
+	}
+
+	if(end-start > 0 || stringFinished)
+	{
+		nextState.str = string(data+start, end-start);
+		if(nextState.token == TK_FloatConst)
+		{
+			nextState.decimal = atof(nextState.str.c_str());
+			nextState.number = static_cast<int> (nextState.decimal);
+			nextState.boolean = (nextState.number != 0);
+		}
+		else if(nextState.token == TK_IntConst)
+		{
+			nextState.number = strtol(nextState.str.c_str(), NULL, integerBase);
+			nextState.decimal = nextState.number;
+			nextState.boolean = (nextState.number != 0);
+		}
+		else if(nextState.token == TK_Identifier)
+		{
+			// Check for a boolean constant.
+			if(nextState.str.compare("true") == 0)
+			{
+				nextState.token = TK_BoolConst;
+				nextState.boolean = true;
+			}
+			else if(nextState.str.compare("false") == 0)
+			{
+				nextState.token = TK_BoolConst;
+				nextState.boolean = false;
+			}
+		}
+		else if(nextState.token == TK_StringConst)
+		{
+			Unescape(nextState.str);
+		}
+		if(expandState)
+			ExpandState();
+		CheckForWhitespace();
+		return true;
+	}
+	CheckForWhitespace();
+	return false;
+}
+
+void Scanner::IncrementLine()
+{
+	line++;
+	lineStart = scanPos;
+}
+
+void Scanner::MustGetToken(char token)
+{
+	if(!CheckToken(token))
+	{
+		ExpandState();
+		if(token < TK_NumSpecialTokens && this->token < TK_NumSpecialTokens)
+			ScriptError("Expected '%s' but got '%s' instead.", TokenNames[token], TokenNames[this->token]);
+		else if(token < TK_NumSpecialTokens && this->token >= TK_NumSpecialTokens)
+			ScriptError("Expected '%s' but got '%c' instead.", TokenNames[token], this->token);
+		else if(token >= TK_NumSpecialTokens && this->token < TK_NumSpecialTokens)
+			ScriptError("Expected '%c' but got '%s' instead.", token, TokenNames[this->token]);
 		else
-		{
-			if(data[i] == '.')
-			{
-				if(special)
-					break;
-				special = true;
-			}
-			else if(!(data[i] >= '0' && data[i] <= '9'))
-				break;
-		}
-		end = i+1;
+			ScriptError("Expected '%c' but got '%c' instead.", token, this->token);
 	}
-	if(end == pos)
-	{
-		error = true;
-		if(report)
-		{
-			if(type == TK_Identifier)
-				{printf("Line %d:%d: Expected an identifier, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
-			else if(type == TK_StringConst)
-				{printf("Line %d:%d: Expected a string constant, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
-			else if(type == TK_IntConst)
-				{printf("Line %d:%d: Expected an integer, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
-			else
-				{printf("Line %d:%d: Expected a decimal value, but got '%c' instead.\n", line, lpos, data[pos]);exit(0);}
-		}
-		return NULL;
-	}
-	string result(data, pos, end - pos);
-	//strip \\ and \" and cut out the opening quote
-	if(type == TK_StringConst)
-	{
-		result = result.substr(1, result.length()-1);
-		Config::Unescape(result);
-	}
-	result.append(1, '\0');
-	lpos += end - pos;
-	pos = end;
-	if(type == TK_StringConst)
-	{
-		pos++;
-		lpos++;
-	}
-	if(ret != NULL)
-		delete[] ret;
-	ret = new char[result.length() + 1];
-	for(UInt32 ret_pos = 0; ret_pos < result.length(); ret_pos ++)
-		ret[ret_pos] = result[ret_pos];
-	ret[result.length()] = '\0';
-	return ret;
 }
 
-void Scanner::ScriptError(const char* message, ...)
+void Scanner::ScriptError(const char* error, ...) const
 {
-	printf("%d:%d:", line, lpos);
-
+	printf("%s\n", data+scanPos);
+	char* newMessage = new char[strlen(error) + 20];
+	sprintf(newMessage, "%d:%d:%s", GetLine(), GetLinePos(), error);
 	va_list list;
-	va_start(list, message);
-	printf(message, list);
+	va_start(list, error);
+	vfprintf(stderr, newMessage, list);
 	va_end(list);
-
 	exit(0);
 }
 
+bool Scanner::TokensLeft() const
+{
+	return scanPos < length;
+}
+
+// NOTE: Be sure that '\\' is the first thing in the array otherwise it will re-escape.
+static char escapeCharacters[] = {'\\', '"', 'n', 0};
+static char resultCharacters[] = {'\\', '"', '\n', 0};
+const string &Scanner::Escape(string &str)
+{
+	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
+	{
+		// += 2 because we'll be inserting 1 character.
+		for(size_t p = 0;p < str.length() && (p = str.find_first_of(escapeCharacters[i], p)) != string::npos;p += 2)
+		{
+			str.insert(p, 1, '\\');
+		}
+	}
+	return str;
+}
+const string Scanner::Escape(const char *str)
+{
+	string tmp(str);
+	Escape(tmp);
+	return tmp;
+}
+const string &Scanner::Unescape(string &str)
+{
+	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
+	{
+		string sequence = string("\\").append(1, escapeCharacters[i]);
+		for(size_t p = 0;p < str.length() && (p = str.find(sequence, p)) != string::npos;p++)
+		{
+			str.replace(str.find_first_of(sequence, p), 2, 1, resultCharacters[i]);
+		}
+	}
+	return str;
+}
