@@ -36,7 +36,9 @@
 #define stat _stat
 #else
 #include <dirent.h>
+#if !defined(__sun)
 #include <fts.h>
+#endif
 #endif
 #include <stdio.h>
 #include <string.h>
@@ -58,7 +60,7 @@
 #define __cdecl
 #endif
 
-#ifndef WORDS_BIGENDIAN
+#ifndef __BIG_ENDIAN__
 #define MAKE_ID(a,b,c,d)	((a)|((b)<<8)|((c)<<16)|((d)<<24))
 #define LittleShort(x)		(x)
 #define LittleLong(x)		(x)
@@ -131,7 +133,10 @@ typedef unsigned int DWORD;
 typedef unsigned short WORD;
 typedef unsigned char BYTE;
 
-#pragma pack(push,1)
+// [BL] Solaris (well GCC on Solaris) doesn't seem to support pack(push/pop, 1) so we'll need to use use it
+//      on the whole file.
+#pragma pack(1)
+//#pragma pack(push,1)
 typedef struct
 {
 	DWORD	Magic;						// 0
@@ -179,7 +184,7 @@ typedef struct
 	DWORD	DirectoryOffset;
 	WORD	ZipCommentLength;
 } EndOfCentralDirectory;
-#pragma pack(pop)
+//#pragma pack(pop)
 
 // EXTERNAL FUNCTION PROTOTYPES --------------------------------------------
 
@@ -484,6 +489,97 @@ dir_tree_t *add_dirs(char **argv)
 	return trees;
 }
 
+#elif defined(__sun)
+
+//==========================================================================
+//
+// add_dirs
+// Solaris version
+//
+// Given NULL-terminated array of directory paths, create trees for them.
+//
+//==========================================================================
+
+void add_dir(dir_tree_t *tree, char* dirpath)
+{
+	DIR *directory = opendir(dirpath);
+	if(directory == NULL)
+		return;
+
+	struct dirent *file;
+	while((file = readdir(directory)) != NULL)
+	{
+		if(file->d_name[0] == '.') //File is hidden or ./.. directory so ignore it.
+			continue;
+
+		int isDirectory = 0;
+		int time = 0;
+
+		char* fullFileName = malloc(strlen(dirpath) + strlen(file->d_name) + 1);
+		strcpy(fullFileName, dirpath);
+		strcat(fullFileName, file->d_name);
+
+		struct stat *fileStat;
+		fileStat = malloc(sizeof(struct stat));
+		stat(fullFileName, fileStat);
+		isDirectory = S_ISDIR(fileStat->st_mode);
+		time = fileStat->st_mtime;
+		free(stat);
+
+		free(fullFileName);
+
+		if(isDirectory)
+		{
+			char* newdir;
+			newdir = malloc(strlen(dirpath) + strlen(file->d_name) + 2);
+			strcpy(newdir, dirpath);
+			strcat(newdir, file->d_name);
+			strcat(newdir, "/");
+			add_dir(tree, newdir);
+			free(newdir);
+			continue;
+		}
+
+		file_entry_t *entry;
+		entry = alloc_file_entry(dirpath, file->d_name, time);
+		if (entry == NULL)
+		{
+			//no_mem = 1;
+			break;
+		}
+		entry->next = tree->files;
+		tree->files = entry;
+	}
+
+	closedir(directory);
+}
+
+dir_tree_t *add_dirs(char **argv)
+{
+	dir_tree_t *tree, *trees = NULL;
+
+	int i = 0;
+	while(argv[i] != NULL)
+	{
+		tree = alloc_dir_tree(argv[i]);
+		tree->next = trees;
+		trees = tree;
+
+		if(tree != NULL)
+		{
+			char* dirpath = malloc(sizeof(argv[i]) + 2);
+			strcpy(dirpath, argv[i]);
+			if(dirpath[strlen(dirpath)] != '/')
+				strcat(dirpath, "/");
+			add_dir(tree, dirpath);
+			free(dirpath);
+		}
+
+		i++;
+	}
+	return trees;
+}
+
 #else
 
 //==========================================================================
@@ -527,9 +623,9 @@ dir_tree_t *add_dirs(char **argv)
 			tree->next = trees;
 			trees = tree;
 		}
-		if (ent->fts_info != FTS_F)
+		if (ent->fts_info != FTS_F || ent->fts_name[strlen(ent->fts_name)-1] == '~')
 		{
-			// We're only interested in remembering files.
+			// We're only interested in remembering files that are not backups.
 			continue;
 		}
 		file = alloc_file_entry("", ent->fts_path, ent->fts_statp->st_mtime);
@@ -931,9 +1027,13 @@ int append_to_zip(FILE *zip_file, file_sorted_t *filep, FILE *ozip, BYTE *odir)
 		}
 		fprintf(stderr, "Unable to write %s to zip\n", file->path);
 		free(readbuf);
-		if (compbuf != NULL)
+		if (compbuf[0] != NULL)
 		{
-			free(compbuf);
+			free(compbuf[0]);
+		}
+		if (compbuf[1] != NULL)
+		{
+			free(compbuf[1]);
 		}
 		return 1;
 	}
@@ -980,8 +1080,8 @@ int write_central_dir(FILE *zip, file_sorted_t *filep)
 	dir.ModTime = file->time;
 	dir.ModDate = file->date;
 	dir.CRC32 = file->crc32;
-	dir.CompressedSize = file->compressed_size;
-	dir.UncompressedSize = file->uncompressed_size;
+	dir.CompressedSize = LittleLong(file->compressed_size);
+	dir.UncompressedSize = LittleLong(file->uncompressed_size);
 	dir.NameLength = LittleShort((unsigned short)strlen(filep->path_in_zip));
 	dir.ExtraLength = 0;
 	dir.CommentLength = 0;
@@ -1150,7 +1250,7 @@ int compress_lzma(Byte *out, unsigned int *outlen, const Byte *in, unsigned int 
 
 int compress_bzip2(Byte *out, unsigned int *outlen, const Byte *in, unsigned int inlen)
 {
-	if (BZ_OK == BZ2_bzBuffToBuffCompress(out, outlen, in, inlen, 9, 0, 0))
+	if (BZ_OK == BZ2_bzBuffToBuffCompress(out, outlen, (char*) in, inlen, 9, 0, 0))
 	{
 		return 0;
 	}
