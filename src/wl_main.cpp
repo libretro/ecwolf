@@ -25,16 +25,16 @@
 #include <SDL_syswm.h>
 
 // Wad Code Stuff
-wadlist_t *wadfiles;
-static wadlist_t **wadtail = &wadfiles;
+TArray<FString> wadfiles;
 void WL_AddFile(const char *file)
 {
-	wadlist_t *wad = (wadlist_t *)malloc(sizeof(*wad) + strlen(file));
+	wadfiles.Push(file);
+/*	wadlist_t *wad = (wadlist_t *)malloc(sizeof(*wad) + strlen(file));
 
 	*wadtail = wad;
 	wad->next = NULL;
 	strcpy(wad->name, file);
-	wadtail = &wad->next;
+	wadtail = &wad->next;*/
 }
 
 
@@ -1542,7 +1542,7 @@ int main (int argc, char *argv[])
 	CheckForEpisodes();
 
 	printf("W_Init: Init WADfiles.\n");
-	Wads.InitMultipleFiles(&wadfiles, NULL);
+	Wads.InitMultipleFiles(wadfiles);
 	language.SetupStrings();
 	LumpRemaper::RemapAll();
 

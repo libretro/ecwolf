@@ -4,7 +4,7 @@ endif(COMMAND cmake_policy)
 
 include(CheckFunctionExists)
 
-include_directories(${ECWOLF_SOURCE_DIR}/src ${LZMA_INCLUDE_DIR} ${CMAKE_BINARY_DIR}/gdtoa)
+include_directories(${ECWOLF_SOURCE_DIR}/src ${LZMA_INCLUDE_DIR} ${ECWOLF_SOURCE_DIR}/gdtoa ${CMAKE_BINARY_DIR}/gdtoa)
 
 option(SPEAR "Spear of Destiny")
 option(SPEARDEMO "Spear of Destiny Demo")

@@ -288,9 +288,9 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 	return NULL;
 }
 
-FResourceFile *FResourceFile::OpenDirectory(const char *filename)
+FResourceFile *FResourceFile::OpenDirectory(const char *filename, bool quiet)
 {
-	return CheckDir(filename, NULL, false);
+	return CheckDir(filename, NULL, quiet);
 }
 
 //==========================================================================

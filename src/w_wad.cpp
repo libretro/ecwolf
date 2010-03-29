@@ -38,7 +38,6 @@
 
 #include <stdlib.h>
 #include <ctype.h>
-#include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -47,18 +46,15 @@
 #include "w_zip.h"
 #include "m_crc32.h"
 #include "doomerrors.h"
-#include "zstring.h"
 #include "resourcefiles/resourcefile.h"
 
+// Work around missing defines for ECWolf
 #ifndef PATH_MAX
 #define PATH_MAX 260
 #endif
-
 #define TEXTCOLOR_RED
-
 #define I_Error printf
 #define I_FatalError(a) printf(a);exit(0);
-
 #define MakeKey(a) CalcCRC32((const BYTE*) a, strlen(a))
 
 // MACROS ------------------------------------------------------------------
@@ -165,7 +161,7 @@ void FWadCollection::DeleteAll ()
 //
 //==========================================================================
 
-void FWadCollection::InitMultipleFiles (wadlist_t **filenames, const char *loaddir)
+void FWadCollection::InitMultipleFiles (TArray<FString> &filenames)
 {
 	int numfiles;
 
@@ -173,25 +169,11 @@ void FWadCollection::InitMultipleFiles (wadlist_t **filenames, const char *loadd
 	DeleteAll();
 	numfiles = 0;
 
-	while (*filenames)
+	for(unsigned i=0;i<filenames.Size(); i++)
 	{
-		wadlist_t *next = (*filenames)->next;
 		int baselump = NumLumps;
-		char name[PATH_MAX];
-
-		// [RH] Automatically append .wad extension if none is specified.
-		strcpy (name, (*filenames)->name);
-		FString fsName = name;
-		fsName.ReplaceChars('\\','/');
-		if(fsName.LastIndexOf('.') == -1)
-			fsName += ".wad";
-		strcpy (name, fsName.GetChars());
-
-		AddFile (name);
-		M_Free (*filenames);
-		*filenames = next;
+		AddFile (filenames[i]);
 	}
-	if (loaddir != NULL) AddFile(loaddir, NULL, true);
 
 	NumLumps = LumpInfo.Size();
 	if (NumLumps == 0)
@@ -238,21 +220,35 @@ int FWadCollection::AddExternalFile(const char *filename)
 // [RH] Removed reload hack
 //==========================================================================
 
-void FWadCollection::AddFile (const char *filename, FileReader *wadinfo, bool isdir)
+void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 {
-	int				startlump;
+	int startlump;
+	bool isdir = false;
 
-	if (wadinfo == NULL && !isdir)
+	if (wadinfo == NULL)
 	{
-		try
+		// Does this exist? If so, is it a directory?
+		struct stat info;
+		if (stat(filename, &info) != 0)
 		{
-			wadinfo = new FileReader(filename);
-		}
-		catch (CRecoverableError &err)
-		{ // Didn't find file
-			Printf (TEXTCOLOR_RED "%s\n", err.GetMessage());
-			PrintLastError ();
+			Printf(TEXTCOLOR_RED "Could not stat %s\n", filename);
+			PrintLastError();
 			return;
+		}
+		isdir = (info.st_mode & S_IFDIR) != 0;
+
+		if (!isdir)
+		{
+			try
+			{
+				wadinfo = new FileReader(filename);
+			}
+			catch (CRecoverableError &err)
+			{ // Didn't find file
+				Printf (TEXTCOLOR_RED "%s\n", err.GetMessage());
+				PrintLastError ();
+				return;
+			}
 		}
 	}
 
@@ -261,8 +257,10 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo, bool is
 
 	FResourceFile *resfile;
 	
-	if (!isdir) resfile = FResourceFile::OpenResourceFile(filename, wadinfo);
-	else resfile = FResourceFile::OpenDirectory(filename);
+	if (!isdir)
+		resfile = FResourceFile::OpenResourceFile(filename, wadinfo);
+	else
+		resfile = FResourceFile::OpenDirectory(filename);
 
 	if (resfile != NULL)
 	{
@@ -278,10 +276,6 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo, bool is
 			lump_p->wadnum = Files.Size();
 		}
 
-/*		if (Files.Size() == IWAD_FILENUM && gameinfo.gametype == GAME_Strife && gameinfo.flags & GI_SHAREWARE)
-		{
-			resfile->FindStrifeTeaserVoices();
-		}*/
 		Files.Push(resfile);
 
 		for (DWORD i=0; i < resfile->LumpCount(); i++)
@@ -297,7 +291,7 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo, bool is
 				FileReader *embedded = lump->NewReader();
 				strcpy(wadstr, lump->FullName);
 
-				AddFile(wadstr, embedded);
+				AddFile(path, embedded);
 			}
 		}
 		return;
@@ -377,7 +371,11 @@ int FWadCollection::GetNumWads () const
 
 int FWadCollection::CheckNumForName (const char *name, int space)
 {
-	char uname[8];
+	union
+	{
+		char uname[8];
+		QWORD qname;
+	};
 	DWORD i;
 
 	if (name == NULL)
@@ -393,13 +391,13 @@ int FWadCollection::CheckNumForName (const char *name, int space)
 	}
 
 	uppercopy (uname, name);
-	i = FirstLumpIndex[LumpNameHash(uname) % NumLumps];
+	i = FirstLumpIndex[LumpNameHash (uname) % NumLumps];
 
 	while (i != NULL_INDEX)
 	{
 		FResourceLump *lump = LumpInfo[i].lump;
 
-		if (*(QWORD *)&lump->Name == *(QWORD *)&uname)
+		if (lump->qwName == qname)
 		{
 			if (lump->Namespace == space) break;
 			// If the lump is from one of the special namespaces exclusive to Zips
@@ -419,7 +417,11 @@ int FWadCollection::CheckNumForName (const char *name, int space)
 int FWadCollection::CheckNumForName (const char *name, int space, int wadnum, bool exact)
 {
 	FResourceLump *lump;
-	char uname[8];
+	union
+	{
+		char uname[8];
+		QWORD qname;
+	};
 	DWORD i;
 
 	if (wadnum < 0)
@@ -434,7 +436,7 @@ int FWadCollection::CheckNumForName (const char *name, int space, int wadnum, bo
 	// also those in earlier WADs.
 
 	while (i != NULL_INDEX &&
-		(lump = LumpInfo[i].lump, *(QWORD *)&lump->Name != *(QWORD *)&uname ||
+		(lump = LumpInfo[i].lump, lump->qwName != qname ||
 		lump->Namespace != space ||
 		 (exact? (LumpInfo[i].wadnum != wadnum) : (LumpInfo[i].wadnum > wadnum)) ))
 	{
@@ -607,7 +609,7 @@ int FWadCollection::GetLumpFlags (int lump)
 
 DWORD FWadCollection::LumpNameHash (const char *s)
 {
-	const DWORD *table = GetCRCTable ();
+	const DWORD *table = GetCRCTable ();;
 	DWORD hash = 0xffffffff;
 	int i;
 
@@ -669,139 +671,6 @@ void FWadCollection::InitHashChains (void)
 
 void FWadCollection::RenameSprites ()
 {
-/*	bool renameAll;
-	bool MNTRZfound = false;
-
-	static const DWORD HereticRenames[] =
-	{ MAKE_ID('H','E','A','D'), MAKE_ID('L','I','C','H'),		// Ironlich
-	};
-
-	static const DWORD HexenRenames[] =
-	{ MAKE_ID('B','A','R','L'), MAKE_ID('Z','B','A','R'),		// ZBarrel
-	  MAKE_ID('A','R','M','1'), MAKE_ID('A','R','_','1'),		// MeshArmor
-	  MAKE_ID('A','R','M','2'), MAKE_ID('A','R','_','2'),		// FalconShield
-	  MAKE_ID('A','R','M','3'), MAKE_ID('A','R','_','3'),		// PlatinumHelm
-	  MAKE_ID('A','R','M','4'), MAKE_ID('A','R','_','4'),		// AmuletOfWarding
-	  MAKE_ID('S','U','I','T'), MAKE_ID('Z','S','U','I'),		// ZSuitOfArmor and ZArmorChunk
-	  MAKE_ID('T','R','E','1'), MAKE_ID('Z','T','R','E'),		// ZTree and ZTreeDead
-	  MAKE_ID('T','R','E','2'), MAKE_ID('T','R','E','S'),		// ZTreeSwamp150
-	  MAKE_ID('C','A','N','D'), MAKE_ID('B','C','A','N'),		// ZBlueCandle
-	  MAKE_ID('R','O','C','K'), MAKE_ID('R','O','K','K'),		// rocks and dirt in a_debris.cpp
-	  MAKE_ID('W','A','T','R'), MAKE_ID('H','W','A','T'),		// Strife also has WATR
-	  MAKE_ID('G','I','B','S'), MAKE_ID('P','O','L','5'),		// RealGibs
-	  MAKE_ID('E','G','G','M'), MAKE_ID('P','R','K','M'),		// PorkFX
-	  MAKE_ID('I','N','V','U'), MAKE_ID('D','E','F','N'),		// Icon of the Defender
-	};
-
-	static const DWORD StrifeRenames[] =
-	{ MAKE_ID('M','I','S','L'), MAKE_ID('S','M','I','S'),		// lots of places
-	  MAKE_ID('A','R','M','1'), MAKE_ID('A','R','M','3'),		// MetalArmor
-	  MAKE_ID('A','R','M','2'), MAKE_ID('A','R','M','4'),		// LeatherArmor
-	  MAKE_ID('P','M','A','P'), MAKE_ID('S','M','A','P'),		// StrifeMap
-	  MAKE_ID('T','L','M','P'), MAKE_ID('T','E','C','H'),		// TechLampSilver and TechLampBrass
-	  MAKE_ID('T','R','E','1'), MAKE_ID('T','R','E','T'),		// TreeStub
-	  MAKE_ID('B','A','R','1'), MAKE_ID('B','A','R','C'),		// BarricadeColumn
-	  MAKE_ID('S','H','T','2'), MAKE_ID('M','P','U','F'),		// MaulerPuff
-	  MAKE_ID('B','A','R','L'), MAKE_ID('B','B','A','R'),		// StrifeBurningBarrel
-	  MAKE_ID('T','R','C','H'), MAKE_ID('T','R','H','L'),		// SmallTorchLit
-	  MAKE_ID('S','H','R','D'), MAKE_ID('S','H','A','R'),		// glass shards
-	  MAKE_ID('B','L','S','T'), MAKE_ID('M','A','U','L'),		// Mauler
-	  MAKE_ID('L','O','G','G'), MAKE_ID('L','O','G','W'),		// StickInWater
-	  MAKE_ID('V','A','S','E'), MAKE_ID('V','A','Z','E'),		// Pot and Pitcher
-	  MAKE_ID('C','N','D','L'), MAKE_ID('K','N','D','L'),		// Candle
-	  MAKE_ID('P','O','T','1'), MAKE_ID('M','P','O','T'),		// MetalPot
-	  MAKE_ID('S','P','I','D'), MAKE_ID('S','T','L','K'),		// Stalker
-	};
-
-	const DWORD *renames;
-	int numrenames;
-
-	switch (gameinfo.gametype)
-	{
-	case GAME_Doom:
-	default:
-		// Doom's sprites don't get renamed.
-		return;
-
-	case GAME_Heretic:
-		renames = HereticRenames;
-		numrenames = sizeof(HereticRenames)/8;
-		break;
-
-	case GAME_Hexen:
-		renames = HexenRenames;
-		numrenames = sizeof(HexenRenames)/8;
-		break;
-
-	case GAME_Strife:
-		renames = StrifeRenames;
-		numrenames = sizeof(StrifeRenames)/8;
-		break;
-	}
-
-
-	for (DWORD i=0; i< LumpInfo.Size(); i++)
-	{
-		// check for full Minotaur animations. If this is not found
-		// some frames need to be renamed.
-		if (LumpInfo[i].lump->Namespace == ns_sprites)
-		{
-			if (*(DWORD *)LumpInfo[i].lump->Name == MAKE_ID('M', 'N', 'T', 'R') && LumpInfo[i].lump->Name[4] == 'Z' )
-			{
-				MNTRZfound = true;
-				break;
-			}
-		}
-	}
-
-	renameAll = !!Args->CheckParm ("-oldsprites");
-	
-	for (DWORD i = 0; i < LumpInfo.Size(); i++)
-	{
-		if (LumpInfo[i].lump->Namespace == ns_sprites)
-		{
-			// Only sprites in the IWAD normally get renamed
-			if (renameAll || LumpInfo[i].wadnum == IWAD_FILENUM)
-			{
-				for (int j = 0; j < numrenames; ++j)
-				{
-					if (*(DWORD *)LumpInfo[i].lump->Name == renames[j*2])
-					{
-						*(DWORD *)LumpInfo[i].lump->Name = renames[j*2+1];
-					}
-				}
-				if (gameinfo.gametype == GAME_Hexen)
-				{
-					if (CheckLumpName (i, "ARTIINVU"))
-					{
-						LumpInfo[i].lump->Name[4]='D'; LumpInfo[i].lump->Name[5]='E';
-						LumpInfo[i].lump->Name[6]='F'; LumpInfo[i].lump->Name[7]='N';
-					}
-				}
-			}
-
-			if (!MNTRZfound)
-			{
-				if (*(DWORD *)LumpInfo[i].lump->Name == MAKE_ID('M', 'N', 'T', 'R'))
-				{
-					if (LumpInfo[i].lump->Name[4] >= 'F' && LumpInfo[i].lump->Name[4] <= 'K')
-					{
-						LumpInfo[i].lump->Name[4] += 'U' - 'F';
-					}
-				}
-			}
-			
-			// When not playing Doom rename all BLOD sprites to BLUD so that
-			// the same blood states can be used everywhere
-			if (!(gameinfo.gametype & GAME_DoomChex))
-			{
-				if (*(DWORD *)LumpInfo[i].lump->Name == MAKE_ID('B', 'L', 'O', 'D'))
-				{
-					*(DWORD *)LumpInfo[i].lump->Name = MAKE_ID('B', 'L', 'U', 'D');
-				}
-			}
-		}
-	}*/
 }
 
 //==========================================================================
@@ -815,22 +684,66 @@ void FWadCollection::RenameSprites ()
 
 int FWadCollection::FindLump (const char *name, int *lastlump, bool anyns)
 {
-	char name8[8];
+	union
+	{
+		char name8[8];
+		QWORD qname;
+	};
 	LumpRecord *lump_p;
 
 	uppercopy (name8, name);
 
+	assert(lastlump != NULL && *lastlump >= 0);
 	lump_p = &LumpInfo[*lastlump];
 	while (lump_p < &LumpInfo[NumLumps])
 	{
 		FResourceLump *lump = lump_p->lump;
 
-		if ((anyns || lump->Namespace == ns_global) &&
-			*(QWORD *)&lump->Name == *(QWORD *)&name8)
+		if ((anyns || lump->Namespace == ns_global) && lump->qwName == qname)
 		{
 			int lump = int(lump_p - &LumpInfo[0]);
 			*lastlump = lump + 1;
 			return lump;
+		}
+		lump_p++;
+	}
+
+	*lastlump = NumLumps;
+	return -1;
+}
+
+//==========================================================================
+//
+// W_FindLumpMulti
+//
+// Find a named lump. Specifically allows duplicates for merging of e.g.
+// SNDINFO lumps. Returns everything having one of the passed names.
+//
+//==========================================================================
+
+int FWadCollection::FindLumpMulti (const char **names, int *lastlump, bool anyns, int *nameindex)
+{
+	LumpRecord *lump_p;
+
+	assert(lastlump != NULL && *lastlump >= 0);
+	lump_p = &LumpInfo[*lastlump];
+	while (lump_p < &LumpInfo[NumLumps])
+	{
+		FResourceLump *lump = lump_p->lump;
+
+		if (anyns || lump->Namespace == ns_global)
+		{
+			
+			for(const char **name = names; *name != NULL; name++)
+			{
+				if (!strnicmp(*name, lump->Name, 8))
+				{
+					int lump = int(lump_p - &LumpInfo[0]);
+					*lastlump = lump + 1;
+					if (nameindex != NULL) *nameindex = int(name - names);
+					return lump;
+				}
+			}
 		}
 		lump_p++;
 	}
@@ -916,6 +829,24 @@ int FWadCollection::GetLumpNamespace (int lump) const
 		return ns_global;
 	else
 		return LumpInfo[lump].lump->Namespace;
+}
+
+//==========================================================================
+//
+// FWadCollection :: GetLumpIndexNum
+//
+// Returns the index number for this lump. This is *not* the lump's position
+// in the lump directory, but rather a special value that RFF can associate
+// with files. Other archive types will return 0, since they don't have it.
+//
+//==========================================================================
+
+int FWadCollection::GetLumpIndexNum(int lump) const
+{
+	if ((size_t)lump >= NumLumps)
+		return 0;
+	else
+		return LumpInfo[lump].lump->GetIndexNum();
 }
 
 //==========================================================================
@@ -1217,11 +1148,7 @@ long FWadLump::Seek (long offset, int origin)
 		default:
 			break;
 		}
-		FilePos = offset;
-		if(FilePos < 0)
-			FilePos = 0;
-		else if(FilePos > Length)
-			FilePos = Length;
+		FilePos = offset < 0 ? 0 : (offset > Length ? Length : offset);
 		return 0;
 	}
 	return FileReader::Seek(offset, origin);
@@ -1345,6 +1272,7 @@ static void PrintLastError ()
 	LocalFree( lpMsgBuf );
 }
 #else
+#include <cerrno>
 static void PrintLastError ()
 {
 	Printf (TEXTCOLOR_RED "  %s\n", strerror(errno));

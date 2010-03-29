@@ -20,7 +20,13 @@ struct FResourceLump
 
 	int				LumpSize;
 	char *			FullName;		// only valid for files loaded from a .zip file
-	char			Name[9];
+	union
+	{
+		char		Name[9];
+
+		DWORD		dwName;	// These are for accessing the first 4 or 8 chars of
+		QWORD		qwName;	// Name as a unit without breaking strict aliasing rules
+	};
 	BYTE			Flags;
 	SBYTE			RefCount;
 	char *			Cache;
@@ -42,6 +48,7 @@ struct FResourceLump
 	virtual FileReader *GetReader();
 	virtual FileReader *NewReader();
 	virtual int GetFileOffset() { return -1; }
+	virtual int GetIndexNum() const { return 0; }
 	void LumpNameSetup(const char *iname);
 	void CheckEmbedded();
 
@@ -68,7 +75,7 @@ private:
 
 public:
 	static FResourceFile *OpenResourceFile(const char *filename, FileReader *file, bool quiet = false);
-	static FResourceFile *OpenDirectory(const char *filename);
+	static FResourceFile *OpenDirectory(const char *filename, bool quiet = false);
 	virtual ~FResourceFile();
 	FileReader *GetReader() const { return Reader; }
 	DWORD LumpCount() const { return NumLumps; }
@@ -115,5 +122,10 @@ struct FExternalLump : public FResourceLump
 	virtual int FillCache();
 
 };
+
+
+
+
+
 
 #endif

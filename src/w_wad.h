@@ -26,8 +26,8 @@
 #include "files.h"
 #include "zstring.h"
 #include "tarray.h"
-#include "lumpremap.h"
 
+class LumpRemaper;
 class FResourceFile;
 struct FResourceLump;
 
@@ -49,14 +49,6 @@ struct wadlump_t
 #define IWAD_ID		MAKE_ID('I','W','A','D')
 #define PWAD_ID		MAKE_ID('P','W','A','D')
 
-
-// [RH] Remove limit on number of WAD files
-struct wadlist_t
-{
-	wadlist_t *next;
-	char name[1];	// +size of string
-};
-extern wadlist_t *wadfiles;
 
 // [RH] Namespaces from BOOM.
 typedef enum {
@@ -154,8 +146,8 @@ public:
 	// The wadnum for the IWAD
 	enum { IWAD_FILENUM = 1 };
 
-	void InitMultipleFiles (wadlist_t **filenames, const char *loaddir);
-	void AddFile (const char *filename, FileReader *wadinfo = NULL, bool isdir = false);
+	void InitMultipleFiles (TArray<FString> &filenames);
+	void AddFile (const char *filename, FileReader *wadinfo = NULL);
 	int CheckIfWadLoaded (const char *name);
 
 	const char *GetWadName (int wadnum) const;
@@ -191,6 +183,7 @@ public:
 	FileReader * GetFileReader(int wadnum);	// Gets a FileReader object to the entire WAD
 
 	int FindLump (const char *name, int *lastlump, bool anyns=false);		// [RH] Find lumps with duplication
+	int FindLumpMulti (const char **names, int *lastlump, bool anyns = false, int *nameindex = NULL); // same with multiple possible names
 	bool CheckLumpName (int lump, const char *name);	// [RH] True if lump's name == name
 
 	static DWORD LumpNameHash (const char *name);		// [RH] Create hash key from an 8-char name
@@ -203,6 +196,7 @@ public:
 	FString GetLumpFullPath (int lump) const;		// [RH] Returns wad's name + lump's full name
 	int GetLumpFile (int lump) const;				// [RH] Returns wadnum for a specified lump
 	int GetLumpNamespace (int lump) const;			// [RH] Returns the namespace a lump belongs to
+	int GetLumpIndexNum (int lump) const;			// Returns the RFF index number for this lump
 	bool CheckLumpName (int lump, const char *name) const;	// [RH] Returns true if the names match
 
 	bool IsUncompressedFile(int lump) const;
@@ -233,7 +227,6 @@ protected:
 	void InitHashChains ();								// [RH] Set up the lumpinfo hashing
 
 	friend class LumpRemaper;
-
 private:
 	void RenameSprites ();
 	void DeleteAll();
