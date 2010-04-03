@@ -74,7 +74,21 @@ void Scanner::CheckForWhitespace()
 		if(comment == 2)
 		{
 			if(cur != '*' || next != '/')
-				scanPos++;
+			{
+				if(cur == '\n' || cur == '\r')
+				{
+					scanPos++;
+					if(comment == 1)
+						comment = 0;
+
+					// Do a quick check for Windows style new line
+					if(cur == '\r' && next == '\n')
+						scanPos++;
+					IncrementLine();
+				}
+				else
+					scanPos++;
+			}
 			else
 			{
 				comment = 0;
@@ -444,9 +458,8 @@ void Scanner::MustGetToken(char token)
 
 void Scanner::ScriptError(const char* error, ...) const
 {
-	printf("%s\n", data+scanPos);
 	char* newMessage = new char[strlen(error) + 20];
-	sprintf(newMessage, "%d:%d:%s", GetLine(), GetLinePos(), error);
+	sprintf(newMessage, "%d:%d:%s\n", GetLine(), GetLinePos(), error);
 	va_list list;
 	va_start(list, error);
 	vfprintf(stderr, newMessage, list);

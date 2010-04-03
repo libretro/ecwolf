@@ -57,49 +57,541 @@
 
 actor Actor native
 {
+	states
+	{
+		Spawn:
+			TNT1 A -1
+			stop
+	}
 }
+
+actor Puddle
+{
+	states
+	{
+		Spawn:
+			STAT A -1
+			stop
+	}
+}
+
+actor GreenBarrel
+{
+	states
+	{
+		Spawn:
+			STAT B -1
+			stop
+	}
+}
+
+actor TableWithChairs
+{
+	states
+	{
+		Spawn:
+			STAT C -1
+			stop
+	}
+}
+
+actor FloorLamp
+{
+	+FULLBRIGHT
+	states
+	{
+		Spawn:
+			STAT D -1
+			stop
+	}
+}
+
+actor Chandelier
+{
+	+FULLBRIGHT
+	states
+	{
+		Spawn:
+			STAT E -1
+			stop
+	}
+}
+
+actor HangedMan
+{
+	states
+	{
+		Spawn:
+			STAT F -1
+			stop
+	}
+}
+
+actor BadFood
+{
+	states
+	{
+		Spawn:
+			STAT G -1
+			stop
+	}
+}
+
+actor RedPillar
+{
+	states
+	{
+		Spawn:
+			STAT H -1
+			stop
+	}
+}
+
+actor Tree
+{
+	states
+	{
+		Spawn:
+			STAT I -1
+			stop
+	}
+}
+
+actor SkeletonFlat
+{
+	states
+	{
+		Spawn:
+			STAT J -1
+			stop
+	}
+}
+
+actor Sink
+{
+	states
+	{
+		Spawn:
+			STAT K -1
+			stop
+	}
+}
+
+actor PottedPlant
+{
+	states
+	{
+		Spawn:
+			STAT L -1
+			stop
+	}
+}
+
+actor Urn
+{
+	states
+	{
+		Spawn:
+			STAT M -1
+			stop
+	}
+}
+
+actor BareTable
+{
+	states
+	{
+		Spawn:
+			STAT N -1
+			stop
+	}
+}
+
+actor CeilingLight
+{
+	states
+	{
+		Spawn:
+			STAT O -1
+			stop
+	}
+}
+
+actor KitchenStuff
+{
+	states
+	{
+		Spawn:
+			STAT P -1
+			stop
+	}
+}
+
+actor SuitOfArmor
+{
+	states
+	{
+		Spawn:
+			STAT Q -1
+			stop
+	}
+}
+
+actor HangingCage
+{
+	states
+	{
+		Spawn:
+			STAT R -1
+			stop
+	}
+}
+
+actor GoldKey
+{
+	states
+	{
+		Spawn:
+			STAT S -1
+			stop
+	}
+}
+
+actor SilverKey
+{
+	states
+	{
+		Spawn:
+			STAT T -1
+			stop
+	}
+}
+
+actor Stuff1
+{
+	states
+	{
+		Spawn:
+			STAT U -1
+			stop
+	}
+}
+
+actor Stuff2
+{
+	states
+	{
+		Spawn:
+			STAT V -1
+			stop
+	}
+}
+
+actor GoodFood
+{
+	states
+	{
+		Spawn:
+			STAT W -1
+			stop
+	}
+}
+
+actor Clip
+{
+	states
+	{
+		Spawn:
+			STAT X -1
+			stop
+	}
+}
+
+actor MachineGun
+{
+	states
+	{
+		Spawn:
+			STAT Y -1
+			stop
+	}
+}
+
+actor GatlingGun
+{
+	states
+	{
+		Spawn:
+			STAT Z -1
+			stop
+	}
+}
+
+actor Cross
+{
+	states
+	{
+		Spawn:
+			STAT "[" -1
+			stop
+	}
+}
+
+actor Chalice
+{
+	states
+	{
+		Spawn:
+			STAT "/" -1
+			stop
+	}
+}
+
+actor Bible
+{
+	states
+	{
+		Spawn:
+			STAT "]" -1
+			stop
+	}
+}
+
+actor Crown
+{
+	states
+	{
+		Spawn:
+			STT2 A -1
+			stop
+	}
+}
+
+actor OneUp
+{
+	states
+	{
+		Spawn:
+			STT2 B -1
+			stop
+	}
+}
+
+actor Gibs
+{
+	states
+	{
+		Spawn:
+			STT2 C -1
+			stop
+	}
+}
+
+actor Barrel
+{
+	states
+	{
+		Spawn:
+			STT2 D -1
+			stop
+	}
+}
+
+actor Well
+{
+	states
+	{
+		Spawn:
+			STT2 E -1
+			stop
+	}
+}
+
+actor EmptyWell
+{
+	states
+	{
+		Spawn:
+			STT2 F -1
+			stop
+	}
+}
+
+actor Gibs2
+{
+	states
+	{
+		Spawn:
+			STT2 G -1
+			stop
+	}
+}
+
+actor Flag
+{
+	states
+	{
+		Spawn:
+			STT2 H -1
+			stop
+	}
+}
+
+actor CallApogee
+{
+	states
+	{
+		Spawn:
+			STT2 I -1
+			stop
+	}
+}
+
+actor Junk1
+{
+	states
+	{
+		Spawn:
+			STT2 J -1
+			stop
+	}
+}
+
+actor Junk2
+{
+	states
+	{
+		Spawn:
+			STT2 K -1
+			stop
+	}
+}
+
+actor Junk3
+{
+	states
+	{
+		Spawn:
+			STT2 L -1
+			stop
+	}
+}
+
+actor Pots
+{
+	states
+	{
+		Spawn:
+			STT2 M -1
+			stop
+	}
+}
+
+actor Stove
+{
+	states
+	{
+		Spawn:
+			STT2 N -1
+			stop
+	}
+}
+
+actor Spears
+{
+	states
+	{
+		Spawn:
+			STT2 P -1
+			stop
+	}
+}
+
+actor Vines
+{
+	states
+	{
+		Spawn:
+			STT2 Q -1
+			stop
+	}
+}
+
+actor Rocket
+{
+	states
+	{
+		Spawn:
+			ROCK A 1.5 T_Projectile A_Smoke
+			loop
+		Death:
+			BOOM ABC 3
+			stop
+	}
+}
+
+actor Smoke
+{
+	states
+	{
+		Spawn:
+			SMOK ABCD 1.5
+			stop
+	}
+}
+
+/* Spear of destiny NOTE
+statetype s_hrocket             = {true,SPR_HROCKET_1,3,(statefunc)T_Projectile,(statefunc)A_Smoke,&s_hrocket};
+statetype s_hsmoke1             = {false,SPR_HSMOKE_1,3,NULL,NULL,&s_hsmoke2};
+statetype s_hsmoke2             = {false,SPR_HSMOKE_2,3,NULL,NULL,&s_hsmoke3};
+statetype s_hsmoke3             = {false,SPR_HSMOKE_3,3,NULL,NULL,&s_hsmoke4};
+statetype s_hsmoke4             = {false,SPR_HSMOKE_4,3,NULL,NULL,NULL};
+
+statetype s_hboom1              = {false,SPR_HBOOM_1,6,NULL,NULL,&s_hboom2};
+statetype s_hboom2              = {false,SPR_HBOOM_2,6,NULL,NULL,&s_hboom3};
+statetype s_hboom3              = {false,SPR_HBOOM_3,6,NULL,NULL,NULL};
+*/
 
 actor Guard
 {
-	game Wolf3D
+	health 25
 	speed 512
-	+COUNTKILL
 	+SHOOTABLE
 	states
 	{
 		Spawn:
-			GRD0 A -1
+			GRD0 A -1 T_Stand
 			goto Spawn
 		Path:
-			GRD0 B 20 T_Path
-			GRD0 B 5
-			GRD0 C 15 T_Path
-			GRD0 D 20 T_Path
-			GRD0 D 5
-			GRD0 E 15 T_Path
-			goto Path
+			GRD0 B 10 T_Path
+			GRD0 B 2.5
+			GRD0 C 7.5 T_Path
+			GRD0 D 10 T_Path
+			GRD0 D 2.5
+			GRD0 E 7.5 T_Path
+			loop
 		See:
-			GRD0 B 10 T_Chase
-			GRD0 B 3
-			GRD0 C 8 T_Chase
-			GRD0 D 10 T_Chase
-			GRD0 D 3
-			GRD0 E 8 T_Chase
-			goto See
+			GRD0 B 5 T_Chase
+			GRD0 B 1.5
+			GRD0 C 4 T_Chase
+			GRD0 D 5 T_Chase
+			GRD0 D 1.5
+			GRD0 E 4 T_Chase
+			loop
 		Missile:
-			GRD0 L 20
-			GRD0 M 20 T_Shoot
-			GRD0 N 20
-			goto Missile
+			GRD0 L 10
+			GRD0 M 10 T_Shoot
+			GRD0 N 10
+			loop
 		Pain:
-			GRD0 F 10
+			GRD0 F 5
 			goto See
 		Pain2:
-			GRD0 J 10
+			GRD0 J 5
 			goto See
 		Death:
-			GRD0 G 15 A_DeathScream
-			GRD0 HI 15
+			GRD0 G 7.5 A_DeathScream
+			GRD0 HI 7.5
 			GRD0 K -1
 			stop
 	}
@@ -111,5 +603,469 @@ actor PatrolingGuard : Guard
 	{
 		Spawn:
 			goto Path
+	}
+}
+
+actor Blinky
+{
+	states
+	{
+		Spawn:
+			BLKY AB 5 T_Ghosts
+			loop
+	}
+}
+
+actor Inky
+{
+	states
+	{
+		Spawn:
+			INKY AB 5 T_Ghosts
+			loop
+	}
+}
+
+actor Pinky
+{
+	states
+	{
+		Spawn:
+			PNKY AB 5 T_Ghosts
+			loop
+	}
+}
+
+actor Clyde
+{
+	states
+	{
+		Spawn:
+			CLYD AB 5 T_Ghosts
+			loop
+	}
+}
+
+actor Dog
+{
+	health 1
+	states
+	{
+		Spawn:
+		Path:
+			DOG0 A 10 T_Path
+			DOG0 A 2.5
+			DOG0 B 7.5 T_Path
+			DOG0 C 10 T_Path
+			DOG0 C 2.5
+			DOG0 D 7.5 T_Path
+			loop
+		Melee:
+			DOG0 E 5
+			DOG0 F 5 T_Bite
+			DOG0 GEA 5
+			goto See
+		See:
+			DOG0 A 5 T_DogChase
+			DOG0 A 1.5
+			DOG0 B 4 T_DogChase
+			DOG0 C 5 T_DogChase
+			DOG0 C 1.5
+			DOG0 D 4 T_DogChase
+			loop
+		Death:
+			DOG0 H 7.5 A_DeathScream
+			DOG0 IJ 7.5
+			DOG0 K -1
+			stop
+	}
+}
+
+actor Officer
+{
+	health 50
+	states
+	{
+		Spawn:
+			OFC0 A -1 T_Stand
+			stop
+		Path:
+			OFC0 B 10 T_Path
+			OFC0 B 2.5
+			OFC0 C 7.5 T_Path
+			OFC0 D 10 T_Path
+			OFC0 D 2.5
+			OFC0 E 7.5 T_Path
+			loop
+		Pain:
+			OFC0 F 5
+			goto See
+		Pain2:
+			OFC0 G 5
+			goto See
+		Missile:
+			OFC0 H 3
+			OFC0 I 10 T_Shoot
+			OFC0 J 5
+			goto See
+		See:
+			OFC0 B 5 T_Chase
+			OFC0 B 1.5
+			OFC0 C 4 T_Chase
+			OFC0 D 5 T_Chase
+			OFC0 D 1.5
+			OFC0 E 4 T_Chase
+			loop
+		Death:
+			OFC0 K 5.5 A_DeathScream
+			OFC0 LMN 5.5
+			OFC0 O -1
+			stop
+	}
+}
+
+actor Mutant
+{
+	health 45, 55, 55, 65
+	states
+	{
+		Spawn:
+			MUT0 A -1 T_Stand
+			stop
+		Path:
+			MUT0 B 10 T_Path
+			MUT0 B 2.5
+			MUT0 C 7.5 T_Path
+			MUT0 D 10 T_Path
+			MUT0 D 2.5
+			MUT0 E 7.5 T_Path
+			loop
+		Pain:
+			MUT0 F 5
+			goto See
+		Pain2:
+			MUT0 G 5
+			goto See
+		See:
+			MUT0 B 5 T_Chase
+			MUT0 B 1.5
+			MUT0 C 4 T_Chase
+			MUT0 D 5 T_Chase
+			MUT0 D 1.5
+			MUT0 E 4 T_Chase
+			loop
+		Death:
+			MUT0 H 3.5 A_DeathScream
+			MUT0 IJK 3.5
+			MUT0 L -1
+			stop
+	}
+}
+
+actor WolfensteinSS // ZDoom compatible name
+{
+	health 100
+	states
+	{
+		Spawn:
+			SSWV W -1 T_Stand
+			stop
+		Path:
+			SSWV A 10 T_Path
+			SSWV A 2.5
+			SSWV B 7.5 T_Path
+			SSWV C 10 T_Path
+			SSWV C 2.5
+			SSWV D 7.5 T_Path
+			loop
+		Pain:
+			SSWV H 5
+			goto See
+		Pain2:
+			SSWV I 5
+			goto See
+		Missile:
+			SSWV E 10
+			SSWV F 10 T_Shoot
+			SSWV G 5
+			SSWV F 5 T_Shoot
+			SSWV G 5
+			SSWV F 5 T_Shoot
+			SSWV G 5
+			SSWV F 5 T_Shoot
+			SSWV G 5
+			goto See
+		Death:
+			SSWV J 7.5 A_DeathScream
+			SSWV KL 7.5
+			SSWV M -1
+			stop
+	}
+}
+
+actor Hans
+{
+	health 850, 950, 1050, 1200
+	states
+	{
+		Spawn:
+			BOSS A -1 T_Stand
+			stop
+		See:
+			BOSS A 5 T_Chase
+			BOSS A 1.5
+			BOSS B 4 T_Chase
+			BOSS C 5 T_Chase
+			BOSS C 1.5
+			BOSS D 4 T_Chase
+			loop
+		Missile:
+			BOSS E 15
+			BOSS FGFGFG 5 T_Shoot
+			BOSS E 5
+			goto See
+		Death:
+			BOSS H 7.5 A_DeathScream
+			BOSS IJ 7.5
+			BOSS K -1
+			stop
+	}
+}
+
+actor Gretel
+{
+	health 850, 950, 1050, 1200
+	states
+	{
+		Spawn:
+			GRET A -1 T_Stand
+			stop
+		See:
+			GRET A 5 T_Chase
+			GRET A 1.5
+			GRET B 4 T_Chase
+			GRET C 5 T_Chase
+			GRET C 1.5
+			GRET D 4 T_Chase
+			loop
+		Missile:
+			GRET E 15
+			GRET FGFGFG 5 T_Shoot
+			GRET E 5
+			goto See
+		Death:
+			GRET H 7.5 A_DeathScream
+			GRET IJ 7.5
+			GRET K -1
+			stop
+	}
+}
+
+actor Needle
+{
+	states
+	{
+		Spawn:
+			HYPO ABCD 3 T_Projectile
+			loop
+	}
+}
+
+actor Schabb
+{
+	health 850, 950, 1550, 2400
+	states
+	{
+		Spawn:
+			SCHA A -1 T_Stand
+			stop
+		See:
+			SCHA B 5 T_Schabb
+			SCHA B 1.5
+			SCHA C 4 T_Schabb
+			SCHA D 5 T_Schabb
+			SCHA D 1.5
+			SCHA E 4 T_Schabb
+			loop
+		Missile:
+			SCHA F 15
+			SCHA G 5 T_SchabbThrow
+			goto See
+		Death:
+			SCHA A 5 A_DeathScream
+			SCHA AHIJ 5
+			SCHA K -1 A_StartDeathCam
+			stop
+	}
+}
+
+actor Gift
+{
+	health 850, 950, 1050, 120
+	states
+	{
+		Spawn:
+			GIFT A -1 T_Stand
+			stop
+		See:
+			GIFT A 5 T_Gift
+			GIFT A 1.5
+			GIFT B 4 T_Gift
+			GIFT C 5 T_Gift
+			GIFT C 1.5
+			GIFT D 4 T_Gift
+			loop
+		Missile:
+			GIFT E 15
+			GIFT F 5 T_GiftThrow
+			goto See
+		Death:
+			GIFT A .5 A_DeathScream
+			GIFT AGHI 5
+			GIFT J -1 A_StartDeathCam
+			stop
+	}
+}
+
+actor Fat
+{
+	health 850, 950, 1050, 120
+	states
+	{
+		Spawn:
+			FATF A -1 T_Stand
+			stop
+		See:
+			FATF A 5 T_Fat
+			FATF A 1.5
+			FATF B 4 T_Fat
+			FATF C 5 T_Fat
+			FATF C 1.5
+			FATF D 4 T_Fat
+			loop
+		Missile:
+			FATF E 15
+			FATF F 5 T_GiftThrow
+			FATF GHGH 5 T_Shoot
+			goto See
+		Death:
+			FATF A .5 A_DeathScream
+			FATF AIJK 5
+			FATF L -1 A_StartDeathCam
+			stop
+	}
+}
+
+actor FakeHitler
+{
+	health 200, 300, 400, 500
+	states
+	{
+		Spawn:
+			FAKE A -1 T_Stand
+			stop
+		See:
+			FAKE A 5 T_Fake
+			FAKE A 1.5
+			FAKE B 4 T_Fake
+			FAKE C 5 T_Fake
+			FAKE C 1.5
+			FAKE D 4 T_Fake
+			loop
+		Missile:
+			FAKE EEEEEEEE 4 T_FakeFire
+			FAKE E 4
+			goto See
+		Death:
+			FAKE F 5 A_DeathScream
+			FAKE GHIJ 5
+			FAKE K -1
+			stop
+	}
+}
+
+actor Fire
+{
+	states
+	{
+		Spawn:
+			FIRE AB 3 T_Projectile
+			loop
+	}
+}
+
+actor MechaHitler
+{
+	health 850, 950, 1050, 1200
+	states
+	{
+		Spawn:
+			MECH A -1 T_Stand
+			stop
+		See:
+			MECH A 5 T_Chase
+			MECH A 3
+			MECH B 4 T_Chase
+			MECH C 5 T_Chase
+			MECH C 3
+			MECH D 4 T_Chase
+			loop
+		Missile:
+			MECH E 15
+			MECH FGFGF 5 T_Shoot
+			goto See
+		Death:
+			MECH H 5 A_DeathScream
+			MECH I 5
+			MECH J 5 A_HitlerMorph
+			MECH K -1
+			stop
+	}
+}
+
+actor Hitler
+{
+	health 500, 700, 800, 900
+	states
+	{
+		Spawn:
+		See:
+			HTLR A 3 T_Chase
+			HTLR A 2
+			HTLR B 1 T_Chase
+			HTLR C 3 T_Chase
+			HTLR C 2
+			HTLR D 1 T_Chase
+			loop
+		Missile:
+			HTLR E 15
+			HTLR FGFGF 5 T_Shoot
+			goto See
+		Death:
+			HTLR A .5 A_DeathScream
+			HTLR A 5
+			HTLR H 5 A_Slurpie
+			HTLR IJKLMNO 5
+			HTLR P -1 A_StartDeathCam
+			stop
+	}
+}
+
+actor BJRun
+{
+	states
+	{
+		Spawn:
+			BJ00 A 6 T_BJRun
+			BJ00 A 1.5
+			BJ00 B 4 T_BJRun
+			BJ00 C 6 T_BJRun
+			BJ00 C 1.5
+			BJ00 D 4 T_BJRun
+			loop
+		Death:
+			BJ00 EFG 7 T_BJJump
+			BJ00 H 150 T_BJDone
+			stop
 	}
 }

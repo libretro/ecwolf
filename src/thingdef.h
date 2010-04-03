@@ -3,11 +3,44 @@
 
 #include <string>
 #include <map>
+#include <deque>
 
 #include "scanner.h"
 #include "wl_def.h"
 
 class ClassDef;
+
+struct StateDefinition
+{
+	public:
+		enum NextType
+		{
+			GOTO,
+			LOOP,
+			WAIT,
+			STOP,
+
+			NORMAL
+		};
+
+		std::string	label;
+		char		sprite[5];
+		std::string	frames;
+		int			duration;
+		NextType	nextType;
+		std::string nextArg;
+};
+
+struct Frame
+{
+	public:
+		char	sprite[4];
+		char	frame;
+		int		duration;
+		void	(*action);
+		void	(*thinker);
+		Frame	*next;
+};
 
 #define DECLARE_NATIVE_CLASS(name, parent) \
 	friend class ClassDef; \
@@ -27,14 +60,7 @@ class AActor
 	friend class ClassDef;
 
 	public:
-		struct Frame
-		{
-			public:
-				char	frame[4];
-				int		duration;
-				void	(*action);
-				void	(*thinker);
-		};
+		~AActor();
 
 		// Basic properties from objtype
 		flagstype_t flags;
@@ -48,6 +74,7 @@ class AActor
 
 		short	angle;
 		short	health;
+		short	defaultHealth[9];
 		int32_t	speed;
 
 		static const ClassDef *__StaticClass;
@@ -65,6 +92,24 @@ struct FlagDef
 		const char* const	name;
 		const int			varOffset;
 };
+
+union PropertyParam
+{
+	char	*s;
+	double	f;
+	int64_t	i;
+};
+typedef void (*PropHandler)(AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params);
+#define HANDLE_PROPERTY(property) void __Handler_##property(AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params)
+struct PropDef
+{
+	public:
+		const ClassDef* const	className;
+		const char* const		name;
+		const char* const		params;
+		PropHandler				handler;
+};
+#define NUM_PROPERTIES 2
 
 class ClassDef
 {
@@ -94,11 +139,18 @@ class ClassDef
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
 		static bool	SetFlag(ClassDef *newClass, const char* flagName, bool set);
+		static bool SetProperty(ClassDef *newClass, const char* propName, Scanner &sc);
 
-		static std::map<std::string, ClassDef *>	classTable;
+		Frame	*FindState(const char* stateName) const;
+		void	InstallStates(std::deque<StateDefinition> &stateDefs);
+
+		static std::map<std::string, ClassDef *>		classTable;
 
 		std::string		name;
 		const ClassDef	*parent;
+
+		std::map<std::string, Frame *>	stateList;
+		std::deque<Frame *>				frameList;
 
 		AActor			*defaultInstance;
 };

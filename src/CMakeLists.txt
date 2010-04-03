@@ -76,6 +76,7 @@ add_executable(ecwolf
 	sndinfo.cpp
 	tiles.cpp
 	thingdef.cpp
+	thingdef_properties.cpp
 	w_wad.cpp
 	wl_act1.cpp
 	wl_act2.cpp

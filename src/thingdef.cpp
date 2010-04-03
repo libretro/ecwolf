@@ -15,11 +15,12 @@ const FlagDef flags[] =
 	DEFINE_FLAG(FL, BONUS, AActor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, AActor, flags),
 	DEFINE_FLAG(FL, FULLBRIGHT, AActor, flags),
-	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
 	DEFINE_FLAG(FL, NEVERMARK, AActor, flags),
 	DEFINE_FLAG(FL, NONMARK, AActor, flags),
+	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
 	DEFINE_FLAG(FL, VISABLE, AActor, flags),
 };
+extern const PropDef properties[NUM_PROPERTIES];
 
 map<string, ClassDef *> ClassDef::classTable;
 
@@ -30,6 +31,8 @@ ClassDef::ClassDef()
 
 ClassDef::~ClassDef()
 {
+	for(deque<Frame *>::iterator iter = frameList.begin();iter != frameList.end();iter++)
+		delete *iter;
 	delete defaultInstance;
 }
 
@@ -39,6 +42,97 @@ const ClassDef *ClassDef::FindClass(const std::string &className)
 	if(iter == classTable.end())
 		return NULL;
 	return iter->second;
+}
+
+Frame *ClassDef::FindState(const char* stateName) const
+{
+	Frame *ret = NULL;
+	map<string, Frame *>::const_iterator iter = stateList.find(stateName);
+	if(iter != stateList.end())
+		ret = iter->second;
+	return ret;
+}
+
+struct Goto
+{
+	public:
+		Frame	*frame;
+		string	label;
+};
+void ClassDef::InstallStates(deque<StateDefinition> &stateDefs)
+{
+	// First populate the state index with that of the parent.
+	if(parent != NULL)
+	{
+		for(map<string, Frame *>::const_iterator iter = parent->stateList.begin();iter != parent->stateList.end();iter++)
+			stateList[iter->first] = iter->second;
+	}
+
+	// We need to resolve gotos after we install the states.
+	deque<Goto> gotos;
+
+	string thisLabel;
+	Frame *prevFrame = NULL;
+	Frame *loopPoint = NULL;
+	Frame *thisFrame = NULL;
+	for(deque<StateDefinition>::const_iterator iter = stateDefs.begin();iter != stateDefs.end();iter++)
+	{
+		const StateDefinition &thisStateDef = *iter;
+
+		// Special case, `Label: stop`, remove state.  Hmm... I wonder if ZDoom handles fall throughs on this.
+		if(!thisStateDef.label.empty() && thisStateDef.sprite[0] == 0 && thisStateDef.nextType == StateDefinition::STOP)
+		{
+			stateList.erase(stateList.find(thisStateDef.label));
+			continue;
+		}
+
+		for(int i = 0;i < thisStateDef.frames.length();i++)
+		{
+			thisFrame = new Frame();
+			if(i == 0 && !thisStateDef.label.empty())
+			{
+				stateList[thisStateDef.label] = thisFrame;
+				loopPoint = thisFrame;
+			}
+			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
+			thisFrame->frame = thisStateDef.frames[i];
+			thisFrame->duration = thisStateDef.duration;
+			thisFrame->action = NULL;
+			thisFrame->thinker = NULL;
+			thisFrame->next = NULL;
+			if(i == thisStateDef.frames.length()-1) // Handle nextType
+			{
+				if(thisStateDef.nextType == StateDefinition::WAIT)
+					thisFrame->next = thisFrame;
+				else if(thisStateDef.nextType == StateDefinition::LOOP)
+					thisFrame->next = loopPoint;
+				// Add to goto list
+				else if(thisStateDef.nextType == StateDefinition::GOTO)
+				{
+					Goto thisGoto;
+					thisGoto.frame = thisFrame;
+					thisGoto.label = thisStateDef.nextArg;
+					gotos.push_back(thisGoto);
+				}
+			}
+			if(prevFrame != NULL)
+				prevFrame->next = thisFrame;
+
+			if(!thisStateDef.nextType == StateDefinition::NORMAL || i != thisStateDef.frames.length()-1)
+				prevFrame = thisFrame;
+			else
+				prevFrame = NULL;
+			printf("Adding frame: %s %c %d\n", thisStateDef.sprite, thisFrame->frame, thisFrame->duration);
+			frameList.push_back(thisFrame);
+		}
+	}
+
+	// Resolve Gotos
+	for(deque<Goto>::const_iterator iter = gotos.begin();iter != gotos.end();iter++)
+	{
+		Frame *result = FindState((*iter).label.c_str());
+		(*iter).frame->next = result;
+	}
 }
 
 bool ClassDef::IsDecendantOf(const ClassDef *parent) const
@@ -126,69 +220,122 @@ void ClassDef::ParseActor(Scanner &sc)
 			sc.MustGetToken(TK_Identifier);
 			if(stricmp(sc.str.c_str(), "states") == 0)
 			{
+				deque<StateDefinition> stateDefs;
+
 				sc.MustGetToken('{');
-				sc.MustGetToken(TK_Identifier); // We should already have grabbed the identifier in all other cases.
-				while(sc.token != '}')
+				//sc.MustGetToken(TK_Identifier); // We should already have grabbed the identifier in all other cases.
+				bool needIdentifier = true;
+				bool infiniteLoopProtection = false;
+				while(sc.token != '}' && !sc.CheckToken('}'))
 				{
+					StateDefinition thisState;
+					thisState.sprite[0] = thisState.sprite[4] = 0;
+					thisState.duration = 0;
+					thisState.nextType = StateDefinition::NORMAL;
+
+					if(needIdentifier)
+						sc.MustGetToken(TK_Identifier);
+					else
+						needIdentifier = true;
+					string stateString = sc.str;
 					if(sc.CheckToken(':'))
 					{
+						infiniteLoopProtection = false;
+						thisState.label = stateString;
 						// New state
 						if(sc.CheckToken('}'))
-							break;
+							sc.ScriptError("State defined with no frames.");
 						sc.MustGetToken(TK_Identifier);
+					}
+
+					bool invalidSprite = (sc.str.length() != 4);
+					strncpy(thisState.sprite, sc.str.c_str(), 4);
+
+					if(sc.CheckToken(TK_Identifier) || sc.CheckToken(TK_StringConst))
+					{
+						infiniteLoopProtection = false;
+						if(invalidSprite) // We now know this is a frame so check sprite length
+							sc.ScriptError("Frame must be exactly 4 characters long.");
+
+						thisState.frames = sc.str;
+						if(sc.CheckToken('-'))
+						{
+							sc.MustGetToken(TK_FloatConst);
+							thisState.duration = -1;
+						}
+						else
+						{
+							if(sc.CheckToken(TK_FloatConst))
+								thisState.duration = static_cast<int> (sc.decimal*2);
+							else if(stricmp(thisState.sprite, "goto") == 0)
+							{
+								thisState.nextType = StateDefinition::GOTO;
+								thisState.nextArg = thisState.frames;
+								thisState.frames.clear();
+							}
+							else
+								sc.ScriptError("Expected frame duration.");
+						}
+
+						if(sc.CheckToken('}'))
+							goto FinishState;
+						else
+							sc.MustGetToken(TK_Identifier);
+
+						if(thisState.nextType == StateDefinition::NORMAL)
+						{
+							for(int func = 0;func <= 2;func++)
+							{
+								if(sc.str.length() == 4 || func == 2)
+								{
+									if(stricmp(sc.str.c_str(), "goto") == 0)
+									{
+										sc.MustGetToken(TK_Identifier);
+										thisState.nextType = StateDefinition::GOTO;
+										thisState.nextArg = sc.str;
+									}
+									else if(stricmp(sc.str.c_str(), "wait") == 0)
+									{
+										thisState.nextType = StateDefinition::WAIT;
+									}
+									else if(stricmp(sc.str.c_str(), "loop") == 0)
+									{
+										thisState.nextType = StateDefinition::LOOP;
+									}
+									else if(stricmp(sc.str.c_str(), "stop") == 0)
+									{
+										thisState.nextType = StateDefinition::STOP;
+									}
+									else
+										needIdentifier = false;
+									break;
+								}
+								else
+								{
+									if(sc.CheckToken('('))
+									{
+										while(!sc.CheckToken(')') && sc.TokensLeft())
+											sc.GetNextToken();
+									}
+								}
+
+								if(!sc.CheckToken(TK_Identifier))
+									break;
+							}
+						}
 					}
 					else
 					{
-						if(sc.str.length() != 4)
-							sc.ScriptError("Frame must be exactly 4 characters long.");
-						if(stricmp(sc.str.c_str(), "goto") == 0)
-						{
-							sc.MustGetToken(TK_Identifier);
-							if(sc.CheckToken('}'))
-								break;
-							sc.MustGetToken(TK_Identifier);
-							continue;
-						}
-						else if(stricmp(sc.str.c_str(), "wait") == 0)
-						{
-							if(sc.CheckToken('}'))
-								break;
-							sc.MustGetToken(TK_Identifier);
-							continue;
-						}
-						else if(stricmp(sc.str.c_str(), "loop") == 0)
-						{
-							if(sc.CheckToken('}'))
-								break;
-							sc.MustGetToken(TK_Identifier);
-							continue;
-						}
-						else if(stricmp(sc.str.c_str(), "stop") == 0)
-						{
-							if(sc.CheckToken('}'))
-								break;
-							sc.MustGetToken(TK_Identifier);
-							continue;
-						}
-						sc.MustGetToken(TK_Identifier);
-						sc.CheckToken('-');
-						sc.MustGetToken(TK_IntConst);
-						if(sc.CheckToken('}'))
-							break;
-						for(int func = 0;func < 3;func++)
-						{
-							sc.MustGetToken(TK_Identifier);
-							if(sc.str.length() == 4 || func == 2) // Assuming we won't have any 4 character length function names.
-								break; // Second condition is just a dummy so we satisfy our need for an indentifer before the next loop.
-							if(sc.CheckToken('}'))
-								break;
-							if(sc.CheckToken('('))
-								sc.MustGetToken(')');
-							if(sc.CheckToken('}'))
-								break;
-						}
+						needIdentifier = false;
+						if(infiniteLoopProtection)
+							sc.ScriptError("Malformed script.");
+						infiniteLoopProtection = true;
 					}
+				FinishState:
+					stateDefs.push_back(thisState);
 				}
+
+				newClass->InstallStates(stateDefs);
 			}
 			else
 			{
@@ -198,12 +345,15 @@ void ClassDef::ParseActor(Scanner &sc)
 					sc.MustGetToken(TK_Identifier);
 					propertyName = string(".") + sc.str;
 				}
-				do
+				if(!SetProperty(newClass, propertyName.c_str(), sc))
 				{
-					sc.GetNextToken();
+					do
+					{
+						sc.GetNextToken();
+					}
+					while(sc.CheckToken(','));
+					printf("Warning: Unkown property '%s' for actor '%s'.\n", propertyName.c_str(), newClass->name.c_str());
 				}
-				while(sc.CheckToken(','));
-				printf("Warning: Unkown property '%s' for actor '%s'.\n", propertyName.c_str(), newClass->name.c_str());
 			}
 		}
 	}
@@ -245,9 +395,128 @@ bool ClassDef::SetFlag(ClassDef *newClass, const char* flagName, bool set)
 			return true;
 		}
 		else if(ret > 0)
-			min = mid+1;
-		else
 			max = mid-1;
+		else
+			min = mid+1;
+	}
+	return false;
+}
+
+bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc)
+{
+	int min = 0;
+	int max = NUM_PROPERTIES - 1;
+	while(min <= max)
+	{
+		int mid = (min+max)/2;
+		int ret = stricmp(properties[mid].name, propName);
+		if(ret == 0)
+		{
+			PropertyParam* params = new PropertyParam[strlen(properties[mid].params)];
+			// Key:
+			//   K - Keyword (Identifier)
+			//   I - Integer
+			//   F - Float
+			//   S - String
+			bool optional = false;
+			bool done = false;
+			const char* p = properties[mid].params;
+			unsigned int paramc = 0;
+			do
+			{
+				printf("Loop\n");
+				if(*p != 0)
+				{
+					while(*p == '_') // Optional
+					{
+						optional = true;
+						p++;
+					}
+
+					bool negate = false;
+					params[paramc].i = 0; // Try to default to 0
+
+					switch(*p)
+					{
+						case 'K':
+							if(!optional)
+								sc.MustGetToken(TK_Identifier);
+							else if(!sc.CheckToken(TK_Identifier))
+							{
+								done = true;
+								break;
+							}
+							params[paramc].s = new char[sc.str.length()];
+							strcpy(params[paramc].s, sc.str.c_str());
+							break;
+						default:
+						case 'I':
+							if(sc.CheckToken('-'))
+								negate = true;
+
+							if(!optional) // Float also includes integers
+								sc.MustGetToken(TK_FloatConst);
+							else if(!sc.CheckToken(TK_FloatConst))
+							{
+								done = true;
+								break;
+							}
+							params[paramc].i = (negate ? -1 : 1) * static_cast<int64_t> (sc.decimal);
+							break;
+						case 'F':
+							if(sc.CheckToken('-'))
+								negate = true;
+
+							if(!optional)
+								sc.MustGetToken(TK_FloatConst);
+							else if(!sc.CheckToken(TK_FloatConst))
+							{
+								done = true;
+								break;
+							}
+							params[paramc].f = (negate ? -1 : 1) * sc.number;
+							break;
+						case 'S':
+							if(!optional)
+								sc.MustGetToken(TK_StringConst);
+							else if(!sc.CheckToken(TK_StringConst))
+							{
+								done = true;
+								break;
+							}
+							params[paramc].s = new char[sc.str.length()];
+							strcpy(params[paramc].s, sc.str.c_str());
+							break;
+					}
+					paramc++;
+					p++;
+				}
+				else
+					sc.GetNextToken();
+			}
+			while(sc.CheckToken(','));
+			if(!optional && *p != 0 && *p != '_')
+				sc.ScriptError("Not enough parameters.");
+
+			properties[mid].handler(newClass->defaultInstance, paramc, params);
+
+			// Clean up
+			p = properties[mid].params;
+			unsigned int i = 0;
+			do
+			{
+				if(*p == 'S' || *p == 'K')
+					delete[] params[i].s;
+				i++;
+			}
+			while(*(++p) != 0 && i < paramc);
+			delete[] params;
+			return true;
+		}
+		else if(ret > 0)
+			max = mid-1;
+		else
+			min = mid+1;
 	}
 	return false;
 }
@@ -284,6 +553,9 @@ AActor::AActor(const ClassDef *type) : classType(type)
 {
 }
 
+AActor::~AActor()
+{
+}
 
 class AWeapon : public AActor
 {
