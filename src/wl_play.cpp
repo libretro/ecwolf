@@ -11,6 +11,10 @@
 #include "wl_shade.h"
 #include "language.h"
 #include "lumpremap.h"
+#include "thingdef.h"
+
+#include <list>
+using namespace std;
 
 /*
 =============================================================================
@@ -36,7 +40,7 @@ exit_t playstate;
 
 static int DebugOk;
 
-objtype objlist[MAXACTORS];
+AActor *objlist[MAXACTORS];
 objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
 
 boolean noclip, ammocheat;
@@ -161,9 +165,6 @@ void PlayLoop (void);
 
 =============================================================================
 */
-
-
-objtype dummyobj;
 
 //
 // LIST OF SONGS FOR EACH VERSION
@@ -789,14 +790,16 @@ void InitActorList (void)
 // init the actor lists
 //
 	for (i = 0; i < MAXACTORS; i++)
+		objlist[i] = NATIVE_CLASS(Actor)->CreateInstance();
+	for (i = 0; i < MAXACTORS; i++)
 	{
-		objlist[i].prev = &objlist[i + 1];
-		objlist[i].next = NULL;
+		objlist[i]->prev = objlist[i + 1];
+		objlist[i]->next = NULL;
 	}
 
-	objlist[MAXACTORS - 1].prev = NULL;
+	objlist[MAXACTORS - 1]->prev = NULL;
 
-	objfreelist = &objlist[0];
+	objfreelist = objlist[0];
 	lastobj = NULL;
 
 	objcount = 0;

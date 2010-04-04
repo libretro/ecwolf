@@ -51,7 +51,7 @@ struct Frame
 		static const ClassDef *__StaticClass;
 #define IMPLEMENT_CLASS(name, parent) \
 	const ClassDef *A##name::__StaticClass = ClassDef::DeclareNativeClass<A##name>(#name, A##parent::__StaticClass);
-#define NATIVE_CLASS(name) A##name::__StaticClass;
+#define NATIVE_CLASS(name) A##name::__StaticClass
 
 typedef uint32_t flagstype_t;
 
@@ -76,6 +76,18 @@ class AActor
 		short	health;
 		short	defaultHealth[9];
 		int32_t	speed;
+
+		activetype  active;
+		short       ticcount;
+		classtype   obclass;
+		statetype   *state;
+
+		short       viewx;
+		word        viewheight;
+		fixed       transx,transy;      // in global coord
+
+		short       temp1,temp2,hidden;
+		AActor *next,*prev;
 
 		static const ClassDef *__StaticClass;
 	protected:
@@ -117,6 +129,7 @@ class ClassDef
 		ClassDef();
 		~ClassDef();
 
+		AActor					*CreateInstance() const;
 		bool					IsDecendantOf(const ClassDef *parent) const;
 
 		/**

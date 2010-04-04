@@ -394,7 +394,7 @@ bool Scanner::GetNextToken(bool expandState)
 
 	if(end-start > 0 || stringFinished)
 	{
-		nextState.str = string(data+start, end-start);
+		nextState.str.assign(data+start, end-start);
 		if(nextState.token == TK_FloatConst)
 		{
 			nextState.decimal = atof(nextState.str.c_str());

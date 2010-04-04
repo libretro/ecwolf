@@ -204,6 +204,7 @@ extern statetype s_player;
 
 boolean SaveTheGame(FILE *file,int x,int y)
 {
+#if 0
 //    struct diskfree_t dfree;
 //    int32_t avail,size,checksum;
 	int checksum;
@@ -341,6 +342,7 @@ boolean SaveTheGame(FILE *file,int x,int y)
 	fwrite (&lastgamemusicoffset,sizeof(lastgamemusicoffset),1,file);
 
 	return(true);
+#endif
 }
 
 //===========================================================================
@@ -355,6 +357,7 @@ boolean SaveTheGame(FILE *file,int x,int y)
 
 boolean LoadTheGame(FILE *file,int x,int y)
 {
+#if 0
 	int32_t checksum,oldchecksum;
 	objtype nullobj;
 	statobj_t nullstat;
@@ -497,6 +500,7 @@ boolean LoadTheGame(FILE *file,int x,int y)
 	}
 
 	return true;
+#endif
 }
 
 //===========================================================================

@@ -606,6 +606,16 @@ actor PatrolingGuard : Guard
 	}
 }
 
+actor DeadGuard
+{
+	states
+	{
+		Spawn:
+			GRD0 K -1
+			stop
+	}
+}
+
 actor Blinky
 {
 	states
@@ -871,7 +881,7 @@ actor Needle
 	}
 }
 
-actor Schabb
+actor Schabbs
 {
 	health 850, 950, 1550, 2400
 	states
@@ -893,7 +903,8 @@ actor Schabb
 			goto See
 		Death:
 			SCHA A 5 A_DeathScream
-			SCHA AHIJ 5
+			SCHA A 70
+			SCHA HIJ 5
 			SCHA K -1 A_StartDeathCam
 			stop
 	}
@@ -921,7 +932,8 @@ actor Gift
 			goto See
 		Death:
 			GIFT A .5 A_DeathScream
-			GIFT AGHI 5
+			GIFT A 70
+			GIFT GHI 5
 			GIFT J -1 A_StartDeathCam
 			stop
 	}
@@ -930,6 +942,8 @@ actor Gift
 actor Fat
 {
 	health 850, 950, 1050, 120
+	+SHOOTABLE
+	+AMBUSH
 	states
 	{
 		Spawn:
@@ -950,7 +964,8 @@ actor Fat
 			goto See
 		Death:
 			FATF A .5 A_DeathScream
-			FATF AIJK 5
+			FATF A 70
+			FATF IJK 5
 			FATF L -1 A_StartDeathCam
 			stop
 	}
@@ -1043,7 +1058,7 @@ actor Hitler
 			goto See
 		Death:
 			HTLR A .5 A_DeathScream
-			HTLR A 5
+			HTLR A 70
 			HTLR H 5 A_Slurpie
 			HTLR IJKLMNO 5
 			HTLR P -1 A_StartDeathCam
@@ -1066,6 +1081,19 @@ actor BJRun
 		Death:
 			BJ00 EFG 7 T_BJJump
 			BJ00 H 150 T_BJDone
+			stop
+	}
+}
+
+actor BJPlayer
+{
+	states
+	{
+		Spawn:
+			TNT1 A -1 T_Player
+			stop
+		Missile:
+			TNT1 A -1 T_Shoot
 			stop
 	}
 }

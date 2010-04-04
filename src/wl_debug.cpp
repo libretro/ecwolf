@@ -11,6 +11,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "thingdef.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"

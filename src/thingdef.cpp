@@ -24,7 +24,7 @@ extern const PropDef properties[NUM_PROPERTIES];
 
 map<string, ClassDef *> ClassDef::classTable;
 
-ClassDef::ClassDef()
+ClassDef::ClassDef() : defaultInstance(NULL)
 {
 	defaultInstance = new AActor(this);
 }
@@ -34,6 +34,11 @@ ClassDef::~ClassDef()
 	for(deque<Frame *>::iterator iter = frameList.begin();iter != frameList.end();iter++)
 		delete *iter;
 	delete defaultInstance;
+}
+
+AActor *ClassDef::CreateInstance() const
+{
+	return defaultInstance->__NewNativeInstance(this);
 }
 
 const ClassDef *ClassDef::FindClass(const std::string &className)
@@ -122,7 +127,7 @@ void ClassDef::InstallStates(deque<StateDefinition> &stateDefs)
 				prevFrame = thisFrame;
 			else
 				prevFrame = NULL;
-			printf("Adding frame: %s %c %d\n", thisStateDef.sprite, thisFrame->frame, thisFrame->duration);
+			//printf("Adding frame: %s %c %d\n", thisStateDef.sprite, thisFrame->frame, thisFrame->duration);
 			frameList.push_back(thisFrame);
 		}
 	}
@@ -182,7 +187,7 @@ void ClassDef::ParseActor(Scanner &sc)
 			sc.ScriptError("Could not find parent actor '%s'\n", sc.str.c_str());
 	}
 	else if(!previouslyDefined) // If no class was specified to inherit from, inherit from AActor, but not for AActor.
-		newClass->parent = NATIVE_CLASS(Actor)
+		newClass->parent = NATIVE_CLASS(Actor);
 	if(sc.CheckToken(TK_Identifier))
 	{
 		if(stricmp(sc.str.c_str(), "native") == 0)
@@ -389,9 +394,9 @@ bool ClassDef::SetFlag(ClassDef *newClass, const char* flagName, bool set)
 		if(ret == 0)
 		{
 			if(set)
-				*reinterpret_cast<flagstype_t *>(newClass->defaultInstance + flags[mid].varOffset) |= flags[mid].value;
+				*reinterpret_cast<flagstype_t *>((int8_t*)newClass->defaultInstance + flags[mid].varOffset) |= flags[mid].value;
 			else
-				*reinterpret_cast<flagstype_t *>(newClass->defaultInstance + flags[mid].varOffset) &= ~flags[mid].value;
+				*reinterpret_cast<flagstype_t *>((int8_t*)newClass->defaultInstance + flags[mid].varOffset) &= ~flags[mid].value;
 			return true;
 		}
 		else if(ret > 0)
@@ -424,7 +429,6 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 			unsigned int paramc = 0;
 			do
 			{
-				printf("Loop\n");
 				if(*p != 0)
 				{
 					while(*p == '_') // Optional
@@ -549,7 +553,7 @@ const ClassDef *ClassDef::DeclareNativeClass(const char* className, const ClassD
 
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
-AActor::AActor(const ClassDef *type) : classType(type)
+AActor::AActor(const ClassDef *type) : classType(type), flags(0)
 {
 }
 

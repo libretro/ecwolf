@@ -3,6 +3,7 @@
 #include "wl_def.h"
 #include "id_sd.h"
 #include "id_us.h"
+#include "thingdef.h"
 
 /*
 =============================================================================
@@ -1008,9 +1009,9 @@ void DamageActor (objtype *ob, unsigned damage)
 	if ( !(ob->flags & FL_ATTACKMODE) )
 		damage <<= 1;
 
-	ob->hitpoints -= (short)damage;
+	ob->health -= (short)damage;
 
-	if (ob->hitpoints<=0)
+	if (ob->health<=0)
 		KillActor (ob);
 	else
 	{
@@ -1020,28 +1021,28 @@ void DamageActor (objtype *ob, unsigned damage)
 		switch (ob->obclass)                // dogs only have one hit point
 		{
 			case guardobj:
-				if (ob->hitpoints&1)
+				if (ob->health&1)
 					NewState (ob,&s_grdpain);
 				else
 					NewState (ob,&s_grdpain1);
 				break;
 
 			case officerobj:
-				if (ob->hitpoints&1)
+				if (ob->health&1)
 					NewState (ob,&s_ofcpain);
 				else
 					NewState (ob,&s_ofcpain1);
 				break;
 
 			case mutantobj:
-				if (ob->hitpoints&1)
+				if (ob->health&1)
 					NewState (ob,&s_mutpain);
 				else
 					NewState (ob,&s_mutpain1);
 				break;
 
 			case ssobj:
-				if (ob->hitpoints&1)
+				if (ob->health&1)
 					NewState (ob,&s_sspain);
 				else
 					NewState (ob,&s_sspain1);

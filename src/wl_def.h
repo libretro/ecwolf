@@ -768,7 +768,9 @@ typedef struct doorstruct
 //
 //--------------------
 
-typedef struct objstruct
+class AActor;
+typedef AActor objtype;
+/*typedef struct objstruct
 {
 	activetype  active;
 	short       ticcount;
@@ -794,7 +796,7 @@ typedef struct objstruct
 
 	short       temp1,temp2,hidden;
 	struct objstruct *next,*prev;
-} objtype;
+} objtype;*/
 
 enum Button
 {
@@ -1012,6 +1014,8 @@ void UpdateSoundLoc(void);
 
 #define JOYSCALE                2
 
+#include <list>
+
 extern  byte            tilemap[MAPSIZE][MAPSIZE];      // wall values only
 extern  byte            spotvis[MAPSIZE][MAPSIZE];
 extern  objtype         *actorat[MAPSIZE][MAPSIZE];
@@ -1028,7 +1032,7 @@ extern  int             lastgamemusicoffset;
 //
 extern  int         controlx,controly;              // range from -100 to 100
 extern  boolean     buttonstate[NUMBUTTONS];
-extern  objtype     objlist[MAXACTORS];
+extern  AActor      *objlist[MAXACTORS];
 extern  boolean     buttonheld[NUMBUTTONS];
 extern  exit_t      playstate;
 extern  boolean     madenoise;

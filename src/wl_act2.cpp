@@ -9,6 +9,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "language.h"
+#include "thingdef.h"
 
 /*
 =============================================================================
@@ -46,7 +47,7 @@
 dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
 	southwest,south,southeast};
 
-short starthitpoints[4][NUMENEMIES] =
+short starthealth[4][NUMENEMIES] =
 //
 // BABY MODE
 //
@@ -912,7 +913,7 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 	}
 
 	newobj->obclass = (classtype)(guardobj + which);
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][which];
+	newobj->health = starthealth[gamestate.difficulty][which];
 	newobj->dir = (dirtype)(dir * 2);
 	newobj->flags |= FL_SHOOTABLE;
 }
@@ -954,7 +955,7 @@ void SpawnBoss (int tilex, int tiley)
 	newobj->speed = SPDPATROL;
 
 	newobj->obclass = bossobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_boss];
+	newobj->health = starthealth[gamestate.difficulty][en_boss];
 	newobj->dir = nodir;
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
@@ -975,7 +976,7 @@ void SpawnGretel (int tilex, int tiley)
 	newobj->speed = SPDPATROL;
 
 	newobj->obclass = gretelobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gretel];
+	newobj->health = starthealth[gamestate.difficulty][en_gretel];
 	newobj->dir = nodir;
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
@@ -1033,7 +1034,7 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 
 	newobj->obclass = (classtype)(guardobj+which);
 	newobj->dir = (dirtype)(dir*2);
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][which];
+	newobj->health = starthealth[gamestate.difficulty][which];
 	newobj->distance = TILEGLOBAL;
 	newobj->flags |= FL_SHOOTABLE;
 	newobj->active = ac_yes;
@@ -1268,7 +1269,7 @@ void SpawnTrans (int tilex, int tiley)
 
 	SpawnNewObj (tilex,tiley,&s_transstand);
 	newobj->obclass = transobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_trans];
+	newobj->health = starthealth[gamestate.difficulty][en_trans];
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 		gamestate.killtotal++;
@@ -1347,7 +1348,7 @@ void SpawnUber (int tilex, int tiley)
 
 	SpawnNewObj (tilex,tiley,&s_uberstand);
 	newobj->obclass = uberobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_uber];
+	newobj->health = starthealth[gamestate.difficulty][en_uber];
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 		gamestate.killtotal++;
@@ -1444,7 +1445,7 @@ void SpawnWill (int tilex, int tiley)
 
 	SpawnNewObj (tilex,tiley,&s_willstand);
 	newobj->obclass = willobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_will];
+	newobj->health = starthealth[gamestate.difficulty][en_will];
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 		gamestate.killtotal++;
@@ -1621,7 +1622,7 @@ void SpawnDeath (int tilex, int tiley)
 
 	SpawnNewObj (tilex,tiley,&s_deathstand);
 	newobj->obclass = deathobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_death];
+	newobj->health = starthealth[gamestate.difficulty][en_death];
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 		gamestate.killtotal++;
@@ -1810,7 +1811,7 @@ void SpawnAngel (int tilex, int tiley)
 
 	SpawnNewObj (tilex,tiley,&s_angelstand);
 	newobj->obclass = angelobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_angel];
+	newobj->health = starthealth[gamestate.difficulty][en_angel];
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 		gamestate.killtotal++;
@@ -1922,7 +1923,7 @@ void SpawnSpectre (int tilex, int tiley)
 {
 	SpawnNewObj (tilex,tiley,&s_spectrewait1);
 	newobj->obclass = spectreobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_spectre];
+	newobj->health = starthealth[gamestate.difficulty][en_spectre];
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_BONUS; // |FL_NEVERMARK|FL_NONMARK;
 	if (!loadedgame)
 		gamestate.killtotal++;
@@ -2228,7 +2229,7 @@ void SpawnSchabbs (int tilex, int tiley)
 	newobj->speed = SPDPATROL;
 
 	newobj->obclass = schabbobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_schabbs];
+	newobj->health = starthealth[gamestate.difficulty][en_schabbs];
 	newobj->dir = nodir;
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
@@ -2255,7 +2256,7 @@ void SpawnGift (int tilex, int tiley)
 	newobj->speed = SPDPATROL;
 
 	newobj->obclass = giftobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_gift];
+	newobj->health = starthealth[gamestate.difficulty][en_gift];
 	newobj->dir = nodir;
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
@@ -2282,7 +2283,7 @@ void SpawnFat (int tilex, int tiley)
 	newobj->speed = SPDPATROL;
 
 	newobj->obclass = fatobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fat];
+	newobj->health = starthealth[gamestate.difficulty][en_fat];
 	newobj->dir = nodir;
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
@@ -2838,7 +2839,7 @@ void SpawnFakeHitler (int tilex, int tiley)
 	newobj->speed = SPDPATROL;
 
 	newobj->obclass = fakeobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_fake];
+	newobj->health = starthealth[gamestate.difficulty][en_fake];
 	newobj->dir = nodir;
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
@@ -2866,7 +2867,7 @@ void SpawnHitler (int tilex, int tiley)
 	newobj->speed = SPDPATROL;
 
 	newobj->obclass = mechahitlerobj;
-	newobj->hitpoints = starthitpoints[gamestate.difficulty][en_hitler];
+	newobj->health = starthealth[gamestate.difficulty][en_hitler];
 	newobj->dir = nodir;
 	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
@@ -2884,7 +2885,7 @@ void SpawnHitler (int tilex, int tiley)
 
 void A_HitlerMorph (objtype *ob)
 {
-	short hitpoints[4]={500,700,800,900};
+	short health[4]={500,700,800,900};
 
 	SpawnNewObj (ob->tilex,ob->tiley,&s_hitlerchase1);
 	newobj->speed = SPDPATROL*5;
@@ -2898,7 +2899,7 @@ void A_HitlerMorph (objtype *ob)
 	newobj->flags &= ~FL_NONMARK;   // hitler stuck with nodir fix
 
 	newobj->obclass = realhitlerobj;
-	newobj->hitpoints = hitpoints[gamestate.difficulty];
+	newobj->health = health[gamestate.difficulty];
 }
 
 

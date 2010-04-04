@@ -8,6 +8,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "w_wad.h"
+#include "thingdef.h"
 #include <SDL_mixer.h>
 
 #ifdef MYPROFILE
