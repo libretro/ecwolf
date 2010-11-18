@@ -1522,14 +1522,11 @@ int main (int argc, char *argv[])
 {
 	printf("ReadConfig: Reading the Configuration.\n");
 	config->LocateConfigFile(argc, argv);
-	ReadConfig ();
+	ReadConfig();
 
 	WL_AddFile("ecwolf.pk3");
 
 	CheckForEpisodes();
-	char vgadict[11] = {'v','g','a','d','i','c','t','.',0,0,0};
-	memcpy(vgadict+8, extension, 3);
-//	WL_AddFile(vgadict);
 	WL_AddFile("audiot.wl6");
 	WL_AddFile("vgagraph.wl6");
 	WL_AddFile("vswap.wl6");
@@ -1550,12 +1547,11 @@ int main (int argc, char *argv[])
 	language.SetupStrings();
 	LumpRemaper::RemapAll();
 
-//	printf("CA_SetupVgaDict: Reading Huffman tree...\n");
-//	CA_SetupVgaDict();
 	printf("VL_ReadPalette: Setting up the Palette...\n");
 	VL_ReadPalette();
 	printf("InitGame: Setting up the game...\n");
 	InitGame();
+	FinalReadConfig();
 	printf("CreateMenus: Preparing the menu system...\n");
 	CreateMenus();
 

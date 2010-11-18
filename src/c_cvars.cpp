@@ -8,6 +8,31 @@
 boolean r_depthfog = false;
 boolean vid_fullscreen = true;
 
+void FinalReadConfig()
+{
+	SDMode  sd;
+	SMMode  sm;
+	SDSMode sds;
+
+	sd = static_cast<SDMode> (config->GetSetting("SoundDevice")->GetInteger());
+	sm = static_cast<SMMode> (config->GetSetting("MusicDevice")->GetInteger());
+	sds = static_cast<SDSMode> (config->GetSetting("DigitalSoundDevice")->GetInteger());
+
+	if ((sd == sdm_AdLib || sm == smm_AdLib) && !AdLibPresent
+			&& !SoundBlasterPresent)
+	{
+		sd = sdm_PC;
+		sm = smm_Off;
+	}
+
+	if ((sds == sds_SoundBlaster && !SoundBlasterPresent))
+		sds = sds_Off;
+
+	SD_SetMusicMode(sm);
+	SD_SetSoundMode(sd);
+	SD_SetDigiDevice(sds);
+}
+
 /*
 ====================
 =
@@ -18,10 +43,6 @@ boolean vid_fullscreen = true;
 
 void ReadConfig(void)
 {
-    SDMode  sd;
-    SMMode  sm;
-    SDSMode sds;
-
 	config->CreateSetting("MouseEnabled", 1);
 	config->CreateSetting("JoystickEnabled", 0);
 	config->CreateSetting("ViewSize", 19);
@@ -71,9 +92,6 @@ void ReadConfig(void)
 	mouseadjustment = config->GetSetting("MouseAdjustment")->GetInteger();
 	mouseyaxisdisabled = config->GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
 	alwaysrun = config->GetSetting("AlwaysRun")->GetInteger() != 0;
-	sd = static_cast<SDMode> (config->GetSetting("SoundDevice")->GetInteger());
-	sm = static_cast<SMMode> (config->GetSetting("MusicDevice")->GetInteger());
-	sds = static_cast<SDSMode> (config->GetSetting("DigitalSoundDevice")->GetInteger());
 	AdlibVolume = config->GetSetting("SoundVolume")->GetInteger();
 	MusicVolume = config->GetSetting("MusicVolume")->GetInteger();
 	SoundVolume = config->GetSetting("DigitizedVolume")->GetInteger();
@@ -102,16 +120,6 @@ void ReadConfig(void)
 		Scores[i].episode = config->GetSetting(hsEpisode)->GetInteger();
 	}
 
-	if ((sd == sdm_AdLib || sm == smm_AdLib) && !AdLibPresent
-			&& !SoundBlasterPresent)
-	{
-		sd = sdm_PC;
-		sm = smm_Off;
-	}
-
-	if ((sds == sds_SoundBlaster && !SoundBlasterPresent))
-		sds = sds_Off;
-
 	// make sure values are correct
 
 	if(mouseenabled) mouseenabled=true;
@@ -127,10 +135,6 @@ void ReadConfig(void)
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
-
-    SD_SetMusicMode (sm);
-    SD_SetSoundMode (sd);
-    SD_SetDigiDevice (sds);
 }
 
 /*

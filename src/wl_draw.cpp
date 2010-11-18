@@ -286,6 +286,9 @@ int postwidth;
 
 void ScalePost()
 {
+	if(postsource == NULL)
+		return;
+
 	int ywcount, yoffs, yw, yd, yendoffs;
 	byte col;
 

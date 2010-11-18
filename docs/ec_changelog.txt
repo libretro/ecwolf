@@ -1,6 +1,7 @@
 November 18th, 2010
 -----------------------------
 - Fixed: Scanner would not parse unquoted strings along with tokens.
+- Fixed: Config was read too early.
 
 January 18th, 2010
 -----------------------------

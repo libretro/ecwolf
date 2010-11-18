@@ -6,6 +6,7 @@
 
 #include "wl_def.h"
 
+void FinalReadConfig();
 void ReadConfig();
 void WriteConfig();
 
