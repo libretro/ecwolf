@@ -87,6 +87,10 @@ class Scanner
 			char			token;
 			unsigned int	tokenLine;
 			unsigned int	tokenLinePosition;
+
+			unsigned int	rewindScanPos;
+			unsigned int	rewindLine;
+			unsigned int	rewindLineStart;
 		}				nextState;
 
 		char*			data;

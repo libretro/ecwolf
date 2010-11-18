@@ -156,6 +156,10 @@ bool Scanner::CheckToken(char token)
 
 void Scanner::ExpandState()
 {
+	nextState.rewindScanPos = scanPos;
+	nextState.rewindLine = line;
+	nextState.rewindLineStart = lineStart;
+
 	str = nextState.str;
 	number = nextState.number;
 	decimal = nextState.decimal;
@@ -167,6 +171,14 @@ void Scanner::ExpandState()
 
 bool Scanner::GetNextString()
 {
+	if(!needNext)
+	{
+		needNext = true;
+		scanPos = nextState.rewindScanPos;
+		line = nextState.rewindLine;
+		lineStart = nextState.rewindLineStart;
+	}
+
 	if(scanPos >= length)
 		return false;
 
@@ -214,7 +226,7 @@ bool Scanner::GetNextString()
 	}
 	if(end-start > 0)
 	{
-		string thisString(data+start, end-start);
+		str = string(data+start, end-start);
 		CheckForWhitespace();
 		return true;
 	}
@@ -230,6 +242,9 @@ bool Scanner::GetNextToken(bool expandState)
 		return true;
 	}
 
+	nextState.rewindScanPos = scanPos;
+	nextState.rewindLine = line;
+	nextState.rewindLineStart = lineStart;
 	nextState.tokenLine = line;
 	nextState.tokenLinePosition = scanPos - lineStart;
 	if(scanPos >= length)
