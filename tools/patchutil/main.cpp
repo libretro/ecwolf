@@ -14,7 +14,7 @@
 using namespace std;
 
 extern "C" int diff(int argc, char* argv[]);
-extern "C" int patch(const unsigned char* data, unsigned int dataSize, const char* filename);
+extern "C" int patch(const unsigned char* data, unsigned int dataSize, const char* filename, const char* newfilename);
 
 struct PatchData
 {
@@ -28,7 +28,9 @@ struct FileChecksum
 	unsigned int	crc;
 	int				size;
 	const char*		filename;
+	const char*		newFilename;
 	PatchData		patchData;
+	bool			optional;
 };
 
 struct OldDataSet
@@ -41,45 +43,60 @@ struct OldDataSet
 	{
 		9,
 		{
-			{4239209784, 1024, "vgadict.wl1", P(vgadict11sw)},
-			{2001789396, 27448, "gamemaps.wl1", P(gamemaps11sw)},
-			{1935056717, 132613, "audiot.wl1", P(audiot11sw)},
-			{3203508363, 97605, "wolf3d.exe", P(wolf3d11sw)},
-			{3551669308, 462, "vgahead.wl1", P(vgahead11sw)},
-			{542266284, 402, "maphead.wl1", P(maphead11sw)},
-			{3146117708, 742912, "vswap.wl1", P(vswap11sw)},
-			{2629083114, 296826, "vgagraph.wl1", P(vgagraph11sw)},
-			{1376992708, 1156, "audiohed.wl1", NULLP},
+			{4096914596u, 295394, "vgagraph.wl1", NULL, P(vgagraph10sw), false},
+			{4079205602u, 56618, "maptemp.wl1", "gamemaps.wl1", P(maptemp10sw), false},
+			{944411798u, 988, "audiohed.wl1", NULL, P(audiohed10sw), false},
+			{3814678634u, 402, "maphead.wl1", NULL, P(maphead10sw), false},
+			{1818995766u, 94379, "wolf3d.exe", NULL, P(wolf3d10sw), true},
+			{932624354u, 1024, "vgadict.wl1", NULL, P(vgadict10sw), false},
+			{4185907760u, 707072, "vswap.wl1", NULL, P(vswap10sw), false},
+			{4132450727u, 130696, "audiot.wl1", NULL, P(audiot10sw), false},
+			{323179087u, 447, "vgahead.wl1", NULL, P(vgahead10sw), false},
+		},
+		"Wolfenstein 3D Shareware v1.0"
+	},
+	{
+		9,
+		{
+			{4239209784u, 1024, "vgadict.wl1", NULL, P(vgadict11sw), false},
+			{2001789396u, 27448, "gamemaps.wl1", NULL, P(gamemaps11sw), false},
+			{1935056717u, 132613, "audiot.wl1", NULL, P(audiot11sw), false},
+			{3203508363u, 97605, "wolf3d.exe", NULL, P(wolf3d11sw), true},
+			{3551669308u, 462, "vgahead.wl1", NULL, P(vgahead11sw), false},
+			{542266284u, 402, "maphead.wl1", NULL, P(maphead11sw), false},
+			{3146117708u, 742912, "vswap.wl1", NULL, P(vswap11sw), false},
+			{2629083114u, 296826, "vgagraph.wl1", NULL, P(vgagraph11sw), false},
+			{1376992708u, 1156, "audiohed.wl1", NULL, NULLP, false},
 		},
 		"Wolfenstein 3D Shareware v1.1"
 	},
 	{
 		9,
 		{
-			{2006621000, 1024, "vgadict.wl1", P(vgadict12sw)},
-			{391230369, 27450, "gamemaps.wl1", P(gamemaps12sw)},
-			{2277491609, 132613, "audiot.wl1", NULLP},
-			{1036300494, 97676, "wolf3d.exe", P(wolf3d12sw)},
-			{3668255810, 462, "vgahead.wl1", P(vgahead12sw)},
-			{256482848, 402, "maphead.wl1", P(maphead12sw)},
-			{1887524789, 742912, "vswap.wl1", P(vswap12sw)},
-			{4155133539, 296813, "vgagraph.wl1", P(vgagraph12sw)},
-			{1376992708, 1156, "audiohed.wl1", NULLP},
+			{2006621000u, 1024, "vgadict.wl1", NULL, P(vgadict12sw), false},
+			{391230369u, 27450, "gamemaps.wl1", NULL, P(gamemaps12sw), false},
+			{2277491609u, 132613, "audiot.wl1", NULL, NULLP, false},
+			{1036300494u, 97676, "wolf3d.exe", NULL, P(wolf3d12sw), true},
+			{3668255810u, 462, "vgahead.wl1", NULL, P(vgahead12sw), false},
+			{256482848u, 402, "maphead.wl1", NULL, P(maphead12sw), false},
+			{1887524789u, 742912, "vswap.wl1", NULL, P(vswap12sw), false},
+			{4155133539u, 296813, "vgagraph.wl1", NULL, P(vgagraph12sw), false},
+			{1376992708u, 1156, "audiohed.wl1", NULL, NULLP, false},
 		},
 		"Wolfenstein 3D Shareware v1.2"
 	},
 	{
 		9,
 		{
-			{898283639, 1024, "vgadict.wl1", NULLP},
-			{3428045633, 27425, "gamemaps.wl1", NULLP},
-			{2277491609, 132613, "audiot.wl1", NULLP},
-			{557669750, 109959, "wolf3d.exe", NULLP},
-			{2785712368, 471, "vgahead.wl1", NULLP},
-			{143619409, 402, "maphead.wl1", NULLP},
-			{2247076949, 742912, "vswap.wl1", NULLP},
-			{1953343984, 326568, "vgagraph.wl1", NULLP},
-			{1376992708, 1156, "audiohed.wl1", NULLP},
+			{898283639u, 1024, "vgadict.wl1", NULL, NULLP, false},
+			{3428045633u, 27425, "gamemaps.wl1", NULL, NULLP, false},
+			{2277491609u, 132613, "audiot.wl1", NULL, NULLP, false},
+			{557669750u, 109959, "wolf3d.exe", NULL, NULLP, true},
+			{2785712368u, 471, "vgahead.wl1", NULL, NULLP, false},
+			{143619409u, 402, "maphead.wl1", NULL, NULLP, false},
+			{2247076949u, 742912, "vswap.wl1", NULL, NULLP, false},
+			{1953343984u, 326568, "vgagraph.wl1", NULL, NULLP, false},
+			{1376992708u, 1156, "audiohed.wl1", NULL, NULLP, false},
 		},
 		"Wolfenstein 3D Shareware v1.4"
 	}
@@ -181,10 +198,21 @@ int main(int argc, char* argv[])
 	for(int i = 0;i < countof(dataSets);i++)
 	{
 		bool identified = true;
+		bool noOptional = false;
 		struct stat *fileInfo = new struct stat;
 		for(int f = 0;f < dataSets[i].numFiles;f++)
 		{
-			if(stat(dataSets[i].fileChecksum[f].filename, fileInfo) != 0 || fileInfo->st_size != dataSets[i].fileChecksum[f].size)
+			if(stat(dataSets[i].fileChecksum[f].filename, fileInfo) != 0)
+			{
+				if(dataSets[i].fileChecksum[f].optional)
+				{
+					noOptional = true;
+					continue;
+				}
+				identified = false;
+				break;
+			}
+			if(fileInfo->st_size != dataSets[i].fileChecksum[f].size)
 			{
 				identified = false;
 				break;
@@ -204,10 +232,10 @@ int main(int argc, char* argv[])
 		cout << "Patching: " << dataSets[i].setName << "\n";
 		for(int f = 0;f < dataSets[i].numFiles;f++)
 		{
-			if(dataSets[i].fileChecksum[f].patchData.data == NULL)
+			if(dataSets[i].fileChecksum[f].patchData.data == NULL || (noOptional && dataSets[i].fileChecksum[f].optional))
 				continue;
 			cout << "\t->" << dataSets[i].fileChecksum[f].filename << "\n";
-			patch(dataSets[i].fileChecksum[f].patchData.data, dataSets[i].fileChecksum[f].patchData.size, dataSets[i].fileChecksum[f].filename);
+			patch(dataSets[i].fileChecksum[f].patchData.data, dataSets[i].fileChecksum[f].patchData.size, dataSets[i].fileChecksum[f].filename, dataSets[i].fileChecksum[f].newFilename ? dataSets[i].fileChecksum[f].newFilename : dataSets[i].fileChecksum[f].filename);
 		}
 	}
 	return 0;

@@ -64,7 +64,7 @@ static off_t offtin(u_char *buf)
 	return y;
 }
 
-int patch(const unsigned char* data, unsigned int dataSize, const char* filename)
+int patch(const unsigned char* data, unsigned int dataSize, const char* filename, const char* newfilename)
 {
 	FILE * f, * cpf, * dpf, * epf;
 	BZFILE * cpfbz2, * dpfbz2, * epfbz2;
@@ -205,9 +205,9 @@ int patch(const unsigned char* data, unsigned int dataSize, const char* filename
 		err(1, "fclose()");
 
 	/* Write the new file */
-	if(((fd=open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY|O_NOINHERIT,0666))<0) ||
+	if(((fd=open(newfilename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY|O_NOINHERIT,0666))<0) ||
 		(write(fd,new,newsize)!=newsize) || (close(fd)==-1))
-		err(1,"%s",filename);
+		err(1,"%s",newfilename);
 
 	free(new);
 	free(old);
