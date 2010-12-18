@@ -72,6 +72,7 @@ add_executable(ecwolf
 	language.cpp
 	lumpremap.cpp
 	m_classes.cpp
+	name.cpp
 	scanner.cpp
 	sndinfo.cpp
 	tiles.cpp

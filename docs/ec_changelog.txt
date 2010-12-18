@@ -1,3 +1,8 @@
+December 18th, 2010
+-----------------------------
+- The DECORATE system now uses more ZDoom classes over the STL. I'll probably
+  be changing more code over in the future.
+
 November 18th, 2010
 -----------------------------
 - Fixed: Scanner would not parse unquoted strings along with tokens.

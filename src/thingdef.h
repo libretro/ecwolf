@@ -1,12 +1,9 @@
 #ifndef __THINGDEF_H__
 #define __THINGDEF_H__
-
-#include <string>
-#include <map>
-#include <deque>
-
 #include "scanner.h"
+#include "tarray.h"
 #include "wl_def.h"
+#include "zstring.h"
 
 class ClassDef;
 
@@ -23,12 +20,12 @@ struct StateDefinition
 			NORMAL
 		};
 
-		std::string	label;
+		FString		label;
 		char		sprite[5];
-		std::string	frames;
+		FString		frames;
 		int			duration;
 		NextType	nextType;
-		std::string nextArg;
+		FString		nextArg;
 };
 
 struct Frame
@@ -144,7 +141,7 @@ class ClassDef
 		 */
 		static void				DumpClasses();
 
-		static const ClassDef	*FindClass(const std::string &className);
+		static const ClassDef	*FindClass(const FName &className);
 		static void				LoadActors();
 		static void				UnloadActors();
 
@@ -155,15 +152,15 @@ class ClassDef
 		static bool SetProperty(ClassDef *newClass, const char* propName, Scanner &sc);
 
 		Frame	*FindState(const char* stateName) const;
-		void	InstallStates(std::deque<StateDefinition> &stateDefs);
+		void	InstallStates(TArray<StateDefinition> &stateDefs);
 
-		static std::map<std::string, ClassDef *>		classTable;
+		static TMap<FName, ClassDef *>	classTable;
 
-		std::string		name;
+		FName			name;
 		const ClassDef	*parent;
 
-		std::map<std::string, Frame *>	stateList;
-		std::deque<Frame *>				frameList;
+		TMap<FName, Frame *>	stateList;
+		TArray<Frame *>			frameList;
 
 		AActor			*defaultInstance;
 };

@@ -1,11 +1,7 @@
-#include <string>
-
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_def.h"
 #include "thingdef.h"
-
-using namespace std;
 
 #define DEFINE_FLAG(prefix, flag, type, variable) { prefix##_##flag, #flag, (int)(size_t)&((type*)1)->variable - 1 }
 const FlagDef flags[] =
@@ -22,7 +18,7 @@ const FlagDef flags[] =
 };
 extern const PropDef properties[NUM_PROPERTIES];
 
-map<string, ClassDef *> ClassDef::classTable;
+TMap<FName, ClassDef *> ClassDef::classTable;
 
 ClassDef::ClassDef() : defaultInstance(NULL)
 {
@@ -31,8 +27,8 @@ ClassDef::ClassDef() : defaultInstance(NULL)
 
 ClassDef::~ClassDef()
 {
-	for(deque<Frame *>::iterator iter = frameList.begin();iter != frameList.end();iter++)
-		delete *iter;
+	for(unsigned int i = 0;i < frameList.Size();i++)
+		delete frameList[i];
 	delete defaultInstance;
 }
 
@@ -41,60 +37,60 @@ AActor *ClassDef::CreateInstance() const
 	return defaultInstance->__NewNativeInstance(this);
 }
 
-const ClassDef *ClassDef::FindClass(const std::string &className)
+const ClassDef *ClassDef::FindClass(const FName &className)
 {
-	map<string, ClassDef *>::const_iterator iter = classTable.find(className);
-	if(iter == classTable.end())
+	ClassDef **ret = classTable.CheckKey(className);
+	if(ret == NULL)
 		return NULL;
-	return iter->second;
+	return *ret;
 }
 
 Frame *ClassDef::FindState(const char* stateName) const
 {
-	Frame *ret = NULL;
-	map<string, Frame *>::const_iterator iter = stateList.find(stateName);
-	if(iter != stateList.end())
-		ret = iter->second;
-	return ret;
+	Frame *const *ret = stateList.CheckKey(stateName);
+	if(ret == NULL)
+		return NULL;
+	return *ret;
 }
 
 struct Goto
 {
 	public:
 		Frame	*frame;
-		string	label;
+		FString	label;
 };
-void ClassDef::InstallStates(deque<StateDefinition> &stateDefs)
+void ClassDef::InstallStates(TArray<StateDefinition> &stateDefs)
 {
 	// First populate the state index with that of the parent.
 	if(parent != NULL)
 	{
-		for(map<string, Frame *>::const_iterator iter = parent->stateList.begin();iter != parent->stateList.end();iter++)
-			stateList[iter->first] = iter->second;
+		TMap<FName, Frame *>::ConstPair *pair;
+		for(TMap<FName, Frame *>::ConstIterator iter(parent->stateList);iter.NextPair(pair);)
+			stateList[pair->Key] = pair->Value;
 	}
 
 	// We need to resolve gotos after we install the states.
-	deque<Goto> gotos;
+	TArray<Goto> gotos;
 
-	string thisLabel;
+	FString thisLabel;
 	Frame *prevFrame = NULL;
 	Frame *loopPoint = NULL;
 	Frame *thisFrame = NULL;
-	for(deque<StateDefinition>::const_iterator iter = stateDefs.begin();iter != stateDefs.end();iter++)
+	for(unsigned int iter = 0;iter < stateDefs.Size();iter++)
 	{
-		const StateDefinition &thisStateDef = *iter;
+		const StateDefinition &thisStateDef = stateDefs[iter];
 
 		// Special case, `Label: stop`, remove state.  Hmm... I wonder if ZDoom handles fall throughs on this.
-		if(!thisStateDef.label.empty() && thisStateDef.sprite[0] == 0 && thisStateDef.nextType == StateDefinition::STOP)
+		if(!thisStateDef.label.IsEmpty() && thisStateDef.sprite[0] == 0 && thisStateDef.nextType == StateDefinition::STOP)
 		{
-			stateList.erase(stateList.find(thisStateDef.label));
+			stateList.Remove(thisStateDef.label);
 			continue;
 		}
 
-		for(int i = 0;i < thisStateDef.frames.length();i++)
+		for(int i = 0;i < thisStateDef.frames.Len();i++)
 		{
 			thisFrame = new Frame();
-			if(i == 0 && !thisStateDef.label.empty())
+			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
 				stateList[thisStateDef.label] = thisFrame;
 				loopPoint = thisFrame;
@@ -105,7 +101,7 @@ void ClassDef::InstallStates(deque<StateDefinition> &stateDefs)
 			thisFrame->action = NULL;
 			thisFrame->thinker = NULL;
 			thisFrame->next = NULL;
-			if(i == thisStateDef.frames.length()-1) // Handle nextType
+			if(i == thisStateDef.frames.Len()-1) // Handle nextType
 			{
 				if(thisStateDef.nextType == StateDefinition::WAIT)
 					thisFrame->next = thisFrame;
@@ -117,26 +113,26 @@ void ClassDef::InstallStates(deque<StateDefinition> &stateDefs)
 					Goto thisGoto;
 					thisGoto.frame = thisFrame;
 					thisGoto.label = thisStateDef.nextArg;
-					gotos.push_back(thisGoto);
+					gotos.Push(thisGoto);
 				}
 			}
 			if(prevFrame != NULL)
 				prevFrame->next = thisFrame;
 
-			if(!thisStateDef.nextType == StateDefinition::NORMAL || i != thisStateDef.frames.length()-1)
+			if(!thisStateDef.nextType == StateDefinition::NORMAL || i != thisStateDef.frames.Len()-1)
 				prevFrame = thisFrame;
 			else
 				prevFrame = NULL;
 			//printf("Adding frame: %s %c %d\n", thisStateDef.sprite, thisFrame->frame, thisFrame->duration);
-			frameList.push_back(thisFrame);
+			frameList.Push(thisFrame);
 		}
 	}
 
 	// Resolve Gotos
-	for(deque<Goto>::const_iterator iter = gotos.begin();iter != gotos.end();iter++)
+	for(unsigned int iter = 0;iter < gotos.Size();++iter)
 	{
-		Frame *result = FindState((*iter).label.c_str());
-		(*iter).frame->next = result;
+		Frame *result = FindState(gotos[iter].label);
+		gotos[iter].frame->next = result;
 	}
 }
 
@@ -170,19 +166,22 @@ void ClassDef::ParseActor(Scanner &sc)
 {
 	// Read the header
 	sc.MustGetToken(TK_Identifier);
-	ClassDef *newClass = classTable[sc.str];
-	bool previouslyDefined = newClass != NULL;
+	ClassDef **classRef = classTable.CheckKey(sc.str.c_str());
+	ClassDef *newClass;
+	bool previouslyDefined = classRef != NULL;
 	if(!previouslyDefined)
 	{
 		newClass = new ClassDef();
-		classTable[sc.str] = newClass;
+		classTable[sc.str.c_str()] = newClass;
 	}
+	else
+		newClass = *classRef;
 	bool native = false;
-	newClass->name = sc.str;
+	newClass->name = sc.str.c_str();
 	if(sc.CheckToken(':'))
 	{
 		sc.MustGetToken(TK_Identifier);
-		newClass->parent = FindClass(sc.str);
+		newClass->parent = FindClass(sc.str.c_str());
 		if(newClass->parent == NULL)
 			sc.ScriptError("Could not find parent actor '%s'\n", sc.str.c_str());
 	}
@@ -196,7 +195,7 @@ void ClassDef::ParseActor(Scanner &sc)
 			sc.ScriptError("Unknown keyword '%s'.\n", sc.str.c_str());
 	}
 	if(previouslyDefined && !native)
-		sc.ScriptError("Actor '%s' already defined.\n", newClass->name.c_str());
+		sc.ScriptError("Actor '%s' already defined.\n", newClass->name.GetChars());
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
 		delete newClass->defaultInstance;
@@ -209,23 +208,23 @@ void ClassDef::ParseActor(Scanner &sc)
 		if(sc.CheckToken('+') || sc.CheckToken('-'))
 		{
 			bool set = sc.token == '+';
-			string flagName;
+			FString flagName;
 			sc.MustGetToken(TK_Identifier);
-			flagName = sc.str;
+			flagName = sc.str.c_str();
 			if(sc.CheckToken('.'))
 			{
 				sc.MustGetToken(TK_Identifier);
-				flagName += string(".") + sc.str;
+				flagName += FString(".") + sc.str.c_str();
 			}
-			if(!SetFlag(newClass, flagName.c_str(), set))
-				printf("Warning: Unkown flag '%s' for actor '%s'.\n", flagName.c_str(), newClass->name.c_str());
+			if(!SetFlag(newClass, flagName, set))
+				printf("Warning: Unknown flag '%s' for actor '%s'.\n", flagName.GetChars(), newClass->name.GetChars());
 		}
 		else
 		{
 			sc.MustGetToken(TK_Identifier);
 			if(stricmp(sc.str.c_str(), "states") == 0)
 			{
-				deque<StateDefinition> stateDefs;
+				TArray<StateDefinition> stateDefs;
 
 				sc.MustGetToken('{');
 				//sc.MustGetToken(TK_Identifier); // We should already have grabbed the identifier in all other cases.
@@ -242,7 +241,7 @@ void ClassDef::ParseActor(Scanner &sc)
 						sc.MustGetToken(TK_Identifier);
 					else
 						needIdentifier = true;
-					string stateString = sc.str;
+					FString stateString = sc.str.c_str();
 					if(sc.CheckToken(':'))
 					{
 						infiniteLoopProtection = false;
@@ -262,7 +261,7 @@ void ClassDef::ParseActor(Scanner &sc)
 						if(invalidSprite) // We now know this is a frame so check sprite length
 							sc.ScriptError("Frame must be exactly 4 characters long.");
 
-						thisState.frames = sc.str;
+						thisState.frames = sc.str.c_str();
 						if(sc.CheckToken('-'))
 						{
 							sc.MustGetToken(TK_FloatConst);
@@ -276,7 +275,7 @@ void ClassDef::ParseActor(Scanner &sc)
 							{
 								thisState.nextType = StateDefinition::GOTO;
 								thisState.nextArg = thisState.frames;
-								thisState.frames.clear();
+								thisState.frames.Truncate(0);
 							}
 							else
 								sc.ScriptError("Expected frame duration.");
@@ -297,7 +296,7 @@ void ClassDef::ParseActor(Scanner &sc)
 									{
 										sc.MustGetToken(TK_Identifier);
 										thisState.nextType = StateDefinition::GOTO;
-										thisState.nextArg = sc.str;
+										thisState.nextArg = sc.str.c_str();
 									}
 									else if(stricmp(sc.str.c_str(), "wait") == 0)
 									{
@@ -337,27 +336,27 @@ void ClassDef::ParseActor(Scanner &sc)
 						infiniteLoopProtection = true;
 					}
 				FinishState:
-					stateDefs.push_back(thisState);
+					stateDefs.Push(thisState);
 				}
 
 				newClass->InstallStates(stateDefs);
 			}
 			else
 			{
-				string propertyName = sc.str;
+				FString propertyName = sc.str.c_str();
 				if(sc.CheckToken('.'))
 				{
 					sc.MustGetToken(TK_Identifier);
-					propertyName = string(".") + sc.str;
+					propertyName = FString(".") + sc.str.c_str();
 				}
-				if(!SetProperty(newClass, propertyName.c_str(), sc))
+				if(!SetProperty(newClass, propertyName, sc))
 				{
 					do
 					{
 						sc.GetNextToken();
 					}
 					while(sc.CheckToken(','));
-					printf("Warning: Unkown property '%s' for actor '%s'.\n", propertyName.c_str(), newClass->name.c_str());
+					printf("Warning: Unkown property '%s' for actor '%s'.\n", propertyName.GetChars(), newClass->name.GetChars());
 				}
 			}
 		}
@@ -527,9 +526,10 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 
 void ClassDef::UnloadActors()
 {
-	for(map<string, ClassDef *>::iterator iter = classTable.begin();iter != classTable.end();iter++)
+	TMap<FName, ClassDef *>::Pair *pair;
+	for(TMap<FName, ClassDef *>::Iterator iter(classTable);iter.NextPair(pair);)
 	{
-		delete iter->second;
+		delete pair->Value;
 	}
 }
 
@@ -577,11 +577,12 @@ void ClassDef::DumpClasses()
 			ClassTree(const ClassDef *classType) : child(NULL), next(NULL), thisClass(classType)
 			{
 				ClassTree **nextChild = &child;
-				for(map<string, ClassDef *>::iterator iter = classTable.begin();iter != classTable.end();iter++)
+				TMap<FName, ClassDef *>::Pair *pair;
+				for(TMap<FName, ClassDef *>::Iterator iter(classTable);iter.NextPair(pair);)
 				{
-					if(iter->second->parent == classType)
+					if(pair->Value->parent == classType)
 					{
-						*nextChild = new ClassTree(iter->second);
+						*nextChild = new ClassTree(pair->Value);
 						nextChild = &(*nextChild)->next;
 					}
 				}
@@ -597,8 +598,9 @@ void ClassDef::DumpClasses()
 
 			void Dump(int spacing)
 			{
-				string myName = string(spacing*2, ' ') + thisClass->name;
-				printf("%s\n", myName.c_str());
+				for(int i = spacing;i > 0;--i)
+					printf("  ");
+				printf("%s\n", thisClass->name.GetChars());
 				if(child != NULL)
 					child->Dump(spacing+1);
 				if(next != NULL)
