@@ -29,7 +29,7 @@ class Texture
 		friend class TextureManager;
 
 	private:
-		std::string		name;
+		FName			name;
 		unsigned int	width;
 		unsigned int	height;
 		byte*			pixels;
@@ -44,18 +44,18 @@ class TextureManager
 		const Texture	*GetFlat(unsigned int tile, bool ceiling=false) const;
 		void			Init();
 
-		const Texture	*operator[] (const std::string &texture) const;
+		const Texture	*operator[] (const FName &texture) const;
 		const Texture	*operator() (unsigned int tile) const;
 
 	protected:
 		void	ParseTexturesLump(int lumpNum);
 
 	private:
-		Texture							nullTexture;
-		std::map<std::string, Texture>	textures;
-		std::string						mapTiles[64];
-		std::string						doorTiles[64][2]; // Door and track
-		std::string						flatTiles[256][2]; // floor/ceiling
+		Texture					nullTexture;
+		TMap<FName, Texture>	textures;
+		FName					mapTiles[64];
+		FName					doorTiles[64][2]; // Door and track
+		FName					flatTiles[256][2]; // floor/ceiling
 };
 
 extern TextureManager TexMan;

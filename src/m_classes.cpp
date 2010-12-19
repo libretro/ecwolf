@@ -50,8 +50,8 @@ void MenuItem::draw()
 {
 	setTextColor();
 
-	if(!picture.empty())
-		VWB_DrawPic(pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, picture.c_str());
+	if(!picture.IsEmpty())
+		VWB_DrawPic(pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, picture);
 
 	if(getActive())
 		US_Print(getString());
@@ -264,7 +264,7 @@ void MultipleChoiceMenuItem::right()
 	SD_PlaySound("menu/move1");
 }
 
-TextInputMenuItem::TextInputMenuItem(std::string text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener), bool clearFirst) : MenuItem("", posteditListener), clearFirst(clearFirst), max(max), preeditListener(preeditListener)
+TextInputMenuItem::TextInputMenuItem(const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener), bool clearFirst) : MenuItem("", posteditListener), clearFirst(clearFirst), max(max), preeditListener(preeditListener)
 {
 	setValue(text);
 }
@@ -539,23 +539,23 @@ Menu::~Menu()
 void Menu::addItem(MenuItem *item)
 {
 	item->setMenu(this);
-	items.push_back(item);
-	if(!item->isEnabled() && items.size()-1 == curPos)
+	items.Push(item);
+	if(!item->isEnabled() && items.Size()-1 == curPos)
 		curPos++;
 	height += item->getHeight();
 }
 
 void Menu::clear()
 {
-	for(unsigned int i = 0;i < items.size();i++)
+	for(unsigned int i = 0;i < items.Size();i++)
 		delete items[i];
-	items.clear();
+	items.Delete(0, items.Size());
 }
 
 unsigned int Menu::countItems() const
 {
 	unsigned int num = 0;
-	for(unsigned int i = 0;i < items.size();i++)
+	for(unsigned int i = 0;i < items.Size();i++)
 	{
 		if(items[i]->isVisible())
 			num++;
@@ -568,7 +568,7 @@ int Menu::getHeight(int position) const
 	// Make sure we have the position we think we have.
 	if(position != -1)
 	{
-		for(unsigned int i = 0;i < items.size() && i < position;i++)
+		for(unsigned int i = 0;i < items.Size() && i < position;i++)
 		{
 			if(!items[i]->isVisible())
 				position++;
@@ -576,7 +576,7 @@ int Menu::getHeight(int position) const
 	}
 
 	unsigned int num = 0;
-	for(unsigned int i = itemOffset;i < items.size();i++)
+	for(unsigned int i = itemOffset;i < items.Size();i++)
 	{
 		if(position == i)
 			break;
@@ -596,13 +596,13 @@ int Menu::getHeight(int position) const
 MenuItem *Menu::getIndex(int index) const
 {
 	unsigned int idx = 0;
-	for(idx = 0;idx < items.size() && index >= 0;idx++)
+	for(idx = 0;idx < items.Size() && index >= 0;idx++)
 	{
 		if(items[idx]->isVisible())
 			index--;
 	}
 	idx--;
-	return idx >= items.size() ? items[items.size()-1] : items[idx];
+	return idx >= items.Size() ? items[items.Size()-1] : items[idx];
 }
 
 void Menu::drawMenu() const
@@ -647,10 +647,10 @@ void Menu::drawMenu() const
 void Menu::draw() const
 {
 	ClearMScreen();
-	if(!headPicture.empty())
+	if(!headPicture.IsEmpty())
 	{
 		DrawStripes(10);
-		VWB_DrawPic(84, 0, headPicture.c_str());
+		VWB_DrawPic(84, 0, headPicture);
 	}
 	VWB_DrawPic(112, 184, "M_MCONTL");
 

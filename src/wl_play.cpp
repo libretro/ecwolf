@@ -13,9 +13,6 @@
 #include "lumpremap.h"
 #include "thingdef.h"
 
-#include <list>
-using namespace std;
-
 /*
 =============================================================================
 

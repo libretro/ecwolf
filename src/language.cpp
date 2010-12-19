@@ -1,7 +1,6 @@
 #include "language.h"
 #include "w_wad.h"
 #include "scanner.h"
-using namespace std;
 
 Language language;
 
@@ -63,13 +62,13 @@ void Language::ReadLump(int lump, const char* language)
 		}
 		else if(token == TK_Identifier)
 		{
-			string index = sc.str;
+			FName index = sc.str.c_str();
 			sc.MustGetToken('=');
 			sc.MustGetToken(TK_StringConst);
 			if(!skip)
 			{
-				if(!noReplace || (noReplace && strings.find(index) == strings.end()))
-					strings[index] = sc.str;
+				if(!noReplace || (noReplace && strings.CheckKey(index) == NULL))
+					strings[index] = sc.str.c_str();
 			}
 			sc.MustGetToken(';');
 		}
@@ -83,8 +82,8 @@ void Language::ReadLump(int lump, const char* language)
 
 const char* Language::operator[] (const char* index) const
 {
-	map<string, string>::const_iterator it = strings.find(index);
-	if(it != strings.end())
-		return it->second.c_str();
+	const FString *it = strings.CheckKey(index);
+	if(it != NULL)
+		return it->GetChars();
 	return index;
 }

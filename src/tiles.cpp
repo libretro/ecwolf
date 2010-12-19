@@ -4,11 +4,9 @@
 #include "scanner.h"
 #include "w_wad.h"
 
-using namespace std;
-
 Texture::Texture() : name("--NULL--"), width(1), height(1), pixels(NULL)
 {
-	Initialize(name.c_str(), width, height);
+	Initialize(name, width, height);
 }
 
 Texture::Texture(const Texture &other) : pixels(NULL)
@@ -27,7 +25,7 @@ void Texture::AddPatch(const char* lump, unsigned int xOffset, unsigned int yOff
 	int lumpNum = Wads.CheckNumForName(lump, ns_patches);
 	if(lumpNum == -1)
 	{
-		printf("WARNING: Patch '%s' missing for texture '%s'.\n", lump, name.c_str());
+		printf("WARNING: Patch '%s' missing for texture '%s'.\n", lump, name.GetChars());
 		return;
 	}
 
@@ -130,12 +128,12 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 		sc.MustGetToken(TK_Identifier);
 		if(sc.str.compare("texture") == 0)
 		{
-			string name;
+			FName name;
 			unsigned int width;
 			unsigned int height;
 
 			sc.MustGetToken(TK_StringConst);
-			name = sc.str;
+			name = sc.str.c_str();
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_IntConst);
 			width = sc.number;
@@ -144,7 +142,7 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 			height = sc.number;
 
 			Texture &tex = textures[name];
-			tex.Initialize(name.c_str(), width, height);
+			tex.Initialize(name, width, height);
 			// See if we're defining more than a NULL texture
 			if(sc.CheckToken('{'))
 			{
@@ -153,19 +151,19 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 					sc.MustGetToken(TK_Identifier);
 					if(sc.str.compare("patch") == 0)
 					{
-						string patchName;
+						FName patchName;
 						unsigned int xOffset;
 						unsigned int yOffset;
 
 						sc.MustGetToken(TK_StringConst);
-						patchName = sc.str;
+						patchName = sc.str.c_str();
 						sc.MustGetToken(',');
 						sc.MustGetToken(TK_IntConst);
 						xOffset = sc.number;
 						sc.MustGetToken(',');
 						sc.MustGetToken(TK_IntConst);
 						yOffset = sc.number;
-						tex.AddPatch(patchName.c_str(), xOffset, yOffset);
+						tex.AddPatch(patchName, xOffset, yOffset);
 					}
 				}
 			}
@@ -183,13 +181,13 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 				case 0:
 					if(index > 63)
 						sc.ScriptError("Can't assign map tile over 63.\n");
-					mapTiles[index] = sc.str;
+					mapTiles[index] = sc.str.c_str();
 					break;
 				case 1:
 				case 2:
 					if(index > 255)
 						sc.ScriptError("Can't assign floor or ceiling tile over 255.\n");
-					flatTiles[index][type-1] = sc.str;
+					flatTiles[index][type-1] = sc.str.c_str();
 					break;
 			}
 		}
@@ -199,21 +197,21 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 			int index = sc.number;
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_StringConst);
-			doorTiles[index][0] = sc.str;
+			doorTiles[index][0] = sc.str.c_str();
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_StringConst);
-			doorTiles[index][1] = sc.str;
+			doorTiles[index][1] = sc.str.c_str();
 		}
 		else
 			sc.ScriptError("Unkown property %s.\n", sc.str.c_str());
 	}
 }
 
-const Texture *TextureManager::operator[] (const string &texture) const
+const Texture *TextureManager::operator[] (const FName &texture) const
 {
-	map<string, Texture>::const_iterator it = textures.find(texture);
-	if(it != textures.end())
-		return &it->second;
+	const Texture *it = textures.CheckKey(texture);
+	if(it != NULL)
+		return it;
 	return &nullTexture;
 }
 

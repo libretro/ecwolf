@@ -1,10 +1,9 @@
 #ifndef __M_CLASSES_H__
 #define __M_CLASSES_H__
 
-#include <string>
-#include <vector>
-
+#include "tarray.h"
 #include "wl_def.h"
+#include "zstring.h"
 
 /*//////////////////////////////////////////////////////////////////////////////
 //                         NEW MENU CODE
@@ -35,7 +34,7 @@ class MenuItem
 		bool		enabled;
 		int			height;
 		bool		highlight; // Makes the font a different color, not to be confused with the item being selected.
-		std::string	picture;
+		FString		picture;
 		int			pictureX;
 		int			pictureY;
 		bool		selected;
@@ -147,19 +146,19 @@ class TextInputMenuItem : public MenuItem
 		bool			clearFirst;
 		unsigned int	max;
 		MENU_LISTENER_PROTOTYPE(preeditListener);
-		std::string		value;
+		FString			value;
 
 	public:
 		/**
 		 * @param preeditListener Executed before editing the information, if returns false the field will not be edited.
 		 * @param posteditListener Execued after editing the information.
 		 */
-		TextInputMenuItem(std::string text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false);
+		TextInputMenuItem(const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false);
 
 		void		activate();
 		void		draw();
-		const char	*getValue() { return value.c_str(); }
-		void		setValue(std::string text) { value = text; }
+		const char	*getValue() const { return value; }
+		void		setValue(const FString &text) { value = text; }
 };
 
 class ControlMenuItem : public MenuItem
@@ -182,18 +181,18 @@ class Menu
 {
 	protected:
 		MENU_LISTENER_PROTOTYPE(entryListener);
-		static bool				close;
-		bool					controlHeaders;
-		int						curPos;
-		std::string				headPicture;
-		char					headText[36];
-		bool					headTextInStripes;
-		int						height;
-		const int				indent;
-		std::vector<MenuItem *>	items;
-		const int				x;
-		const int				y;
-		const int				w;
+		static bool			close;
+		bool				controlHeaders;
+		int					curPos;
+		FString				headPicture;
+		char				headText[36];
+		bool				headTextInStripes;
+		int					height;
+		const int			indent;
+		TArray<MenuItem *>	items;
+		const int			x;
+		const int			y;
+		const int			w;
 
 		unsigned int			itemOffset; // scrolling menus
 		static unsigned int		lastIndexDrawn;
@@ -221,11 +220,11 @@ class Menu
 		int				getHeight(int position=-1) const;
 		int				getIndent() const { return indent; }
 		MenuItem		*getIndex(int index) const;
-		int				getNumItems() const { return items.size(); }
+		int				getNumItems() const { return items.Size(); }
 		int				getWidth() const { return w; }
 		int				getX() const { return x; }
 		int				getY() const { return y; }
-		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : (position >= items.size() ? items.size()-1 : position); }
+		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : (position >= items.Size() ? items.Size()-1 : position); }
 		void			setHeadPicture(const char* picture) { headPicture = picture; }
 		void			setHeadText(const char text[36], bool drawInStripes=false);
 		void			show();

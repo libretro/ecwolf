@@ -12,8 +12,6 @@
 #else
 	#include <unistd.h>
 #endif
-#include <deque>
-#include <vector>
 
 #define LSA_X	96
 #define LSA_Y	80
@@ -32,17 +30,16 @@
 #include "language.h"
 #include "w_wad.h"
 #include "c_cvars.h"
-using namespace std;
 
 struct SaveFile
 {
 	public:
-		static deque<SaveFile>	files;
+		static TArray<SaveFile>	files;
 
 		char	name[32]; // Displayed on the menu.
 		char	filename[15];
 };
-deque<SaveFile> SaveFile::files;
+TArray<SaveFile> SaveFile::files;
 
 extern int	lastgamemusicoffset;
 extern int	numEpisodesMissing;
@@ -205,7 +202,7 @@ MENU_LISTENER(PerformSaveGame)
 		for(unsigned int i = 0;i < 10000;i++)
 		{
 			sprintf(file.filename, "savegam%u.%s", i, extension);
-			for(unsigned int j = 0;j < SaveFile::files.size();j++)
+			for(unsigned int j = 0;j < SaveFile::files.Size();j++)
 			{
 				if(strcasecmp(file.filename, SaveFile::files[j].filename) == 0)
 				{
@@ -221,13 +218,13 @@ MENU_LISTENER(PerformSaveGame)
 			break;
 		}
 
-		SaveFile::files.push_front(file);
+		SaveFile::files.Push(file);
 
 		saveGame[0]->setHighlighted(false);
 		saveGame.setCurrentPosition(1);
 		loadGame.setCurrentPosition(0);
 
-		mainMenu[3]->setEnabled(true);
+		mainMenu[2]->setEnabled(true);
 	}
 	else
 	{
@@ -289,7 +286,7 @@ MENU_LISTENER(EnterLoadMenu)
 
 	loadGame.clear();
 
-	for(unsigned int i = 0;i < SaveFile::files.size();i++)
+	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
 		loadGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
 
 	return true;
@@ -303,7 +300,7 @@ MENU_LISTENER(EnterSaveMenu)
 	newSave->setHighlighted(true);
 	saveGame.addItem(newSave);
 
-	for(unsigned int i = 0;i < SaveFile::files.size();i++)
+	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
 		saveGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame));
 
 	return true;
@@ -377,7 +374,7 @@ void CreateMenus()
 #endif
 	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_OPTIONS"], optionsMenu));
 	MenuItem *lg = new MenuSwitcherMenuItem(language["STR_LG"], loadGame);
-	lg->setEnabled(SaveFile::files.size() > 0);
+	lg->setEnabled(SaveFile::files.Size() > 0);
 	mainMenu.addItem(lg);
 	MenuItem *sg = new MenuSwitcherMenuItem(language["STR_SG"], saveGame);
 	sg->setEnabled(false);
@@ -605,14 +602,14 @@ US_ControlPanel (ScanCode scancode)
 		mainMenu[mainMenu.countItems()-3]->setText(language["STR_EG"]);
 		mainMenu[mainMenu.countItems()-2]->setText(language["STR_BG"]);
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(true);
-		mainMenu[4]->setEnabled(true);
+		mainMenu[3]->setEnabled(true);
 	}
 	else
 	{
 		mainMenu[mainMenu.countItems()-3]->setText(language["STR_VS"]);
 		mainMenu[mainMenu.countItems()-2]->setText(language["STR_BD"]);
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(false);
-		mainMenu[4]->setEnabled(false);
+		mainMenu[3]->setEnabled(false);
 	}
 	mainMenu.draw();
 	MenuFadeIn ();
@@ -1137,24 +1134,24 @@ void SetupSaveGames()
 	fs_close(dir);
 #else
 	File saveDirectory("./");
-	const deque<string> &files = saveDirectory.getFileList();
-	for(unsigned int i = 0;i < files.size();i++)
+	const TArray<FString> &files = saveDirectory.getFileList();
+	for(unsigned int i = 0;i < files.Size();i++)
 	{
-		const string &filename = files[i];
-		if(filename.length() <= 11 ||
-			filename.length() >= 15 ||
-			filename.substr(0, 7).compare("savegam") != 0 ||
-			filename.substr(filename.length()-3, 3).compare(extension) != 0)
+		const FString &filename = files[i];
+		if(filename.Len() <= 11 ||
+			filename.Len() >= 15 ||
+			filename.Mid(0, 7).Compare("savegam") != 0 ||
+			filename.Mid(filename.Len()-3, 3).Compare(extension) != 0)
 			continue; // Too short or incorrect name
 
-		const int handle = open(filename.c_str(), O_RDONLY | O_BINARY);
+		const int handle = open(filename, O_RDONLY | O_BINARY);
 		if(handle >= 0)
 		{
 			SaveFile sFile;
 			read(handle, sFile.name, 32);
 			close(handle);
-			strcpy(sFile.filename, filename.c_str());
-			SaveFile::files.push_back(sFile);
+			strcpy(sFile.filename, filename);
+			SaveFile::files.Push(sFile);
 		}
 	}
 #endif

@@ -7,10 +7,9 @@
 
 #include <cstdio>
 #include "file.h"
+#include "zstring.h"
 
-using namespace std;
-
-File::File(string filename) : filename(filename), existing(false), directory(false)
+File::File(const FString &filename) : filename(filename), existing(false), directory(false)
 {
 #ifdef WINDOWS
 	/* Windows, why must you be such a pain?
@@ -18,7 +17,7 @@ File::File(string filename) : filename(filename), existing(false), directory(fal
 	 * Why must you design your API around the do...while loop?
 	 * Why???
 	 */
-	DWORD fAttributes = GetFileAttributes(filename.c_str());
+	DWORD fAttributes = GetFileAttributes(filename);
 	if(fAttributes != INVALID_FILE_ATTRIBUTES)
 	{
 		existing = true;
@@ -27,12 +26,12 @@ File::File(string filename) : filename(filename), existing(false), directory(fal
 			directory = true;
 			WIN32_FIND_DATA fdata;
 			HANDLE hnd = INVALID_HANDLE_VALUE;
-			hnd = FindFirstFile((filename + "\\*").c_str(), &fdata);
+			hnd = FindFirstFile((filename + "\\*").GetChars(), &fdata);
 			if(hnd != INVALID_HANDLE_VALUE)
 			{
 				do
 				{
-					files.push_back(fdata.cFileName);
+					files.Push(fdata.cFileName);
 				}
 				while(FindNextFile(hnd, &fdata) != 0);
 			}
@@ -40,7 +39,7 @@ File::File(string filename) : filename(filename), existing(false), directory(fal
 	}
 #else
 	struct stat statRet;
-	if(stat(filename.c_str(), &statRet) == 0)
+	if(stat(filename, &statRet) == 0)
 		existing = true;
 
 	if(existing && (statRet.st_mode & S_IFDIR))
@@ -48,12 +47,12 @@ File::File(string filename) : filename(filename), existing(false), directory(fal
 		directory = true;
 
 		// Populate a base list.
-		DIR *direct = opendir(filename.c_str());
+		DIR *direct = opendir(filename);
 		if(direct != NULL)
 		{
 			dirent *file = NULL;
 			while((file = readdir(direct)) != NULL)
-				files.push_back(file->d_name);
+				files.Push(file->d_name);
 		}
 	}
 #endif

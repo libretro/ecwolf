@@ -1,9 +1,10 @@
 #ifndef __LANGUAGE_H__
 #define __LANGUAGE_H__
 
-#include <string>
-#include <map>
-#include <list>
+#include "tarray.h"
+
+class FName;
+class FString;
 
 class Language
 {
@@ -16,7 +17,7 @@ class Language
 		void		ReadLump(int lump, const char* language);
 
 	private:
-		std::map<std::string, std::string>	strings;
+		TMap<FName, FString>	strings;
 };
 
 extern Language language;

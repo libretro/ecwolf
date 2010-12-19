@@ -160,8 +160,8 @@ class SoundIndex
 		friend class SoundInformation;
 };
 
-#include <map>
-#include <string>
+#include "tarray.h"
+class FName;
 class SoundInformation
 {
 	public:
@@ -174,8 +174,8 @@ class SoundInformation
 		void	ParseSoundInformation(int lumpNum);
 
 	private:
-		SoundIndex							nullIndex;
-		std::map<std::string, SoundIndex>	soundMap;
+		SoundIndex				nullIndex;
+		TMap<FName, SoundIndex>	soundMap;
 };
 extern SoundInformation	SoundInfo;
 

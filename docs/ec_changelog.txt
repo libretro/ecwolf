@@ -1,3 +1,7 @@
+December 19th, 2010
+-----------------------------
+- More reductions in STL use.
+
 December 18th, 2010
 -----------------------------
 - The DECORATE system now uses more ZDoom classes over the STL. I'll probably

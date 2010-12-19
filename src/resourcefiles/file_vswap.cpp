@@ -1,6 +1,5 @@
 #include <cstring>
 #include <string>
-#include <vector>
 using namespace std;
 
 #include "wl_def.h"

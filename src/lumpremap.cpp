@@ -2,11 +2,10 @@
 #include "w_wad.h"
 #include "zstring.h"
 #include "scanner.h"
-using namespace std;
 
-map<string, LumpRemaper> LumpRemaper::remaps;
-map<int, string> LumpRemaper::musicReverseMap;
-map<int, string> LumpRemaper::vgaReverseMap;
+TMap<FName, LumpRemaper> LumpRemaper::remaps;
+TMap<int, FName> LumpRemaper::musicReverseMap;
+TMap<int, FName> LumpRemaper::vgaReverseMap;
 
 LumpRemaper::LumpRemaper(const char* extension) : mapLumpName(extension)
 {
@@ -16,15 +15,15 @@ LumpRemaper::LumpRemaper(const char* extension) : mapLumpName(extension)
 
 void LumpRemaper::AddFile(const char* extension, FResourceFile *file, Type type)
 {
-	map<string, LumpRemaper>::iterator iter = remaps.find(extension);
-	if(iter == remaps.end())
+	LumpRemaper *iter = remaps.CheckKey(extension);
+	if(iter == NULL)
 	{
 		LumpRemaper remaper(extension);
 		remaper.AddFile(file, type);
-		remaps.insert(pair<string, LumpRemaper>(extension, remaper));
+		remaps.Insert(extension, remaper);
 		return;
 	}
-	(*iter).second.AddFile(file, type);
+	iter->AddFile(file, type);
 }
 
 void LumpRemaper::AddFile(FResourceFile *file, Type type)
@@ -32,7 +31,7 @@ void LumpRemaper::AddFile(FResourceFile *file, Type type)
 	RemapFile rFile;
 	rFile.file = file;
 	rFile.type = type;
-	files.push_back(rFile);
+	files.Push(rFile);
 }
 
 void LumpRemaper::DoRemap()
@@ -40,7 +39,7 @@ void LumpRemaper::DoRemap()
 	if(!LoadMap())
 		return;
 
-	for(unsigned int i = 0;i < files.size();i++)
+	for(unsigned int i = 0;i < files.Size();i++)
 	{
 		RemapFile &file = files[i];
 		int temp = 0; // Use to count something
@@ -53,34 +52,34 @@ void LumpRemaper::DoRemap()
 				case AUDIOT:
 					if(lump->Namespace == ns_sounds)
 					{
-						if(i < sounds.size())
-							lump->LumpNameSetup(sounds[i].c_str());
+						if(i < sounds.Size())
+							lump->LumpNameSetup(sounds[i]);
 						temp++;
 					}
-					else if(lump->Namespace == ns_music && i-temp < music.size())
-						lump->LumpNameSetup(music[i-temp].c_str());
+					else if(lump->Namespace == ns_music && i-temp < music.Size())
+						lump->LumpNameSetup(music[i-temp]);
 					break;
 				case VGAGRAPH:
-					if(i < graphics.size())
-						lump->LumpNameSetup(graphics[i].c_str());
+					if(i < graphics.Size())
+						lump->LumpNameSetup(graphics[i]);
 					break;
 				case VSWAP:
 					if(lump->Namespace == ns_newtextures)
 					{
-						if(i < textures.size())
-							lump->LumpNameSetup(textures[i].c_str());
+						if(i < textures.Size())
+							lump->LumpNameSetup(textures[i]);
 						temp++;
 						temp2++;
 					}
 					else if(lump->Namespace == ns_sprites)
 					{
-						if(i-temp < sprites.size())
-							lump->LumpNameSetup(sprites[i-temp].c_str());
+						if(i-temp < sprites.Size())
+							lump->LumpNameSetup(sprites[i-temp]);
 						temp2++;
 					}
-					else if(lump->Namespace == ns_sounds && i-temp2 < digitalsounds.size())
+					else if(lump->Namespace == ns_sounds && i-temp2 < digitalsounds.Size())
 					{
-						lump->LumpNameSetup(digitalsounds[i-temp2].c_str());
+						lump->LumpNameSetup(digitalsounds[i-temp2]);
 					}
 					break;
 				default:
@@ -110,8 +109,8 @@ bool LumpRemaper::LoadMap()
 		if(!sc.CheckToken(TK_Identifier))
 			sc.ScriptError("Expected identifier in map.\n");
 
-		map<int, string> *reverse = NULL;
-		std::deque<std::string> *map = NULL;
+		TMap<int, FName> *reverse = NULL;
+		TArray<FName> *map = NULL;
 		if(sc.str.compare("graphics") == 0)
 		{
 			reverse = &vgaReverseMap;
@@ -143,8 +142,8 @@ bool LumpRemaper::LoadMap()
 				if(!sc.CheckToken(TK_StringConst))
 					sc.ScriptError("Expected string constant.\n");
 				if(reverse != NULL)
-					(*reverse)[i++] = sc.str;
-				map->push_back(sc.str);
+					(*reverse)[i++] = sc.str.c_str();
+				map->Push(sc.str.c_str());
 				if(sc.CheckToken('}'))
 					break;
 				if(!sc.CheckToken(','))
@@ -157,9 +156,10 @@ bool LumpRemaper::LoadMap()
 
 void LumpRemaper::RemapAll()
 {
-	for(map<string, LumpRemaper>::iterator iter = remaps.begin();iter != remaps.end();iter++)
+	TMap<FName, LumpRemaper>::Pair *pair;
+	for(TMap<FName, LumpRemaper>::Iterator iter(remaps);iter.NextPair(pair);)
 	{
-		(*iter).second.DoRemap();
+		pair->Value.DoRemap();
 	}
 }
 

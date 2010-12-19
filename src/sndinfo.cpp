@@ -2,7 +2,6 @@
 #include "id_sd.h"
 #include "w_wad.h"
 #include "scanner.h"
-using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -85,7 +84,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 	{
 		if(!sc.GetNextString())
 			sc.ScriptError("Expected logical name.\n");
-		string logicalName = sc.str;
+		FName logicalName = sc.str.c_str();
 
 		SoundIndex idx;
 		bool hasAlternatives = false;
@@ -136,8 +135,8 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 const SoundIndex &SoundInformation::operator[] (const char* logical) const
 {
-	map<string, SoundIndex>::const_iterator it = soundMap.find(logical);
-	if(it == soundMap.end())
+	const SoundIndex *it = soundMap.CheckKey(logical);
+	if(it == NULL)
 		return nullIndex;
-	return it->second;
+	return *it;
 }

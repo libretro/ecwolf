@@ -1014,8 +1014,6 @@ void UpdateSoundLoc(void);
 
 #define JOYSCALE                2
 
-#include <list>
-
 extern  byte            tilemap[MAPSIZE][MAPSIZE];      // wall values only
 extern  byte            spotvis[MAPSIZE][MAPSIZE];
 extern  objtype         *actorat[MAPSIZE][MAPSIZE];
