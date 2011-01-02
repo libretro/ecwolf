@@ -152,7 +152,7 @@ class ClassDef
 		static bool SetProperty(ClassDef *newClass, const char* propName, Scanner &sc);
 
 		Frame	*FindState(const char* stateName) const;
-		void	InstallStates(TArray<StateDefinition> &stateDefs);
+		void	InstallStates(const TArray<StateDefinition> &stateDefs);
 
 		static TMap<FName, ClassDef *>	classTable;
 

@@ -55,7 +55,7 @@ struct FVGALump : public FResourceLump
 
 		void HuffExpand(byte* source, byte* dest)
 		{
-			byte *end;
+			byte *end, *send;
 			Huffnode *headptr, *huffptr;
 		
 			if(!LumpSize || !dest)
@@ -69,7 +69,8 @@ struct FVGALump : public FResourceLump
 			int written = 0;
 		
 			end=dest+LumpSize;
-		
+			send=source+length;
+
 			byte val = *source++;
 			byte mask = 1;
 			word nodeval;
@@ -84,6 +85,7 @@ struct FVGALump : public FResourceLump
 				{
 					val = *source++;
 					mask = 1;
+					if(source>=send) break;
 				}
 				else mask <<= 1;
 			

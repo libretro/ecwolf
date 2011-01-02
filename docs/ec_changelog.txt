@@ -1,6 +1,7 @@
 January 2nd, 2010
 -----------------------------
 - Mostly got rid of the STL and updated the scanner.
+- Fixed: Valgrind errors.
 
 December 19th, 2010
 -----------------------------

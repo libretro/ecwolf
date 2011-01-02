@@ -151,9 +151,9 @@ void WriteConfig(void)
     fs_unlink("ecwolf.cfg");
 #endif
 
-	char joySettingName[50];
-	char keySettingName[50];
-	char mseSettingName[50];
+	char joySettingName[50] = {0};
+	char keySettingName[50] = {0};
+	char mseSettingName[50] = {0};
 	config->GetSetting("MouseEnabled")->SetValue(mouseenabled);
 	config->GetSetting("JoystickEnabled")->SetValue(joystickenabled);
 	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)

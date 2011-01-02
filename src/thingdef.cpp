@@ -59,7 +59,7 @@ struct Goto
 		Frame	*frame;
 		FString	label;
 };
-void ClassDef::InstallStates(TArray<StateDefinition> &stateDefs)
+void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 {
 	// First populate the state index with that of the parent.
 	if(parent != NULL)
@@ -275,7 +275,7 @@ void ClassDef::ParseActor(Scanner &sc)
 							{
 								thisState.nextType = StateDefinition::GOTO;
 								thisState.nextArg = thisState.frames;
-								thisState.frames.Truncate(0);
+								thisState.frames = FString();
 							}
 							else
 								sc.ScriptMessage(Scanner::ERROR, "Expected frame duration.");
@@ -536,12 +536,15 @@ void ClassDef::UnloadActors()
 template<class T>
 const ClassDef *ClassDef::DeclareNativeClass(const char* className, const ClassDef *parent)
 {
-	ClassDef *definition = classTable[className];
-	if(definition == NULL)
+	ClassDef **definitionLookup = classTable.CheckKey(className);
+	ClassDef *definition = NULL;
+	if(definitionLookup == NULL)
 	{
 		definition = new ClassDef();
 		classTable[className] = definition;
 	}
+	else
+		definition = *definitionLookup;
 	definition->name = className;
 	definition->parent = parent;
 	delete definition->defaultInstance;

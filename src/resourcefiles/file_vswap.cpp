@@ -109,7 +109,7 @@ class FVSwap : public FResourceFile
 			// Now for sounds we need to get the last Chunk and read the sound information.
 			int soundMapOffset = READINT32(&data[(numChunks-1)*4]);
 			int soundMapSize = READINT16(&data[(numChunks-1)*2 + 4*numChunks]);
-			int numDigi = soundMapSize/4;
+			int numDigi = soundMapSize/4 - 1;
 			byte* soundMap = new byte[soundMapSize];
 			SoundLumps = new FVSwapSound*[numDigi];
 			vswapReader.Seek(soundMapOffset, SEEK_SET);
