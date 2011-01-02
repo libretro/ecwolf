@@ -30,8 +30,8 @@
 #ifndef __CONFIG_HPP__
 #define __CONFIG_HPP__
 
-#include <string>
-#include <map>
+#include "tarray.h"
+#include "zstring.h"
 
 struct SettingsData
 {
@@ -43,18 +43,18 @@ struct SettingsData
 		};
 
 		SettingsData(int integer=0) : integer(0), str(""), type(ST_INT) { SetValue(integer); }
-		SettingsData(std::string str) : integer(0), str(""), type(ST_STR) { SetValue(str); }
+		SettingsData(FString str) : integer(0), str(""), type(ST_STR) { SetValue(str); }
 
 		const int			GetInteger() { return integer; }
-		const std::string	GetString()	{ return str; }
+		const FString		GetString()	{ return str; }
 		const SettingType	GetType() { return type; }
 		void				SetValue(int integer) { this->integer = integer;this->type = ST_INT; }
-		void				SetValue(std::string str) { this->str = str;this->type = ST_STR; }
+		void				SetValue(FString str) { this->str = str;this->type = ST_STR; }
 
 	protected:
 		SettingType		type;
 		int				integer;
-		std::string		str;
+		FString			str;
 };
 
 class Config
@@ -67,13 +67,13 @@ class Config
 		 * Creates the specified setting if it hasn't been made already.  It 
 		 * will be set to the default value.
 		 */
-		void			CreateSetting(const std::string index, unsigned int defaultInt);
-		void			CreateSetting(const std::string index, std::string defaultString);
+		void			CreateSetting(const FName index, unsigned int defaultInt);
+		void			CreateSetting(const FName index, FString defaultString);
 		/**
 		 * Gets the specified setting.  Will return NULL if the setting does 
 		 * not exist.
 		 */
-		SettingsData	*GetSetting(const std::string index);
+		SettingsData	*GetSetting(const FName index);
 		/**
 		 * Returns if this is an entirely new configuration file.  This can be 
 		 * used to see if a first time set up wizard should be run.
@@ -100,17 +100,12 @@ class Config
 		 */
 		void			SaveConfig();
 
-		/**
-		 * Converts str into a form that can be stored into config files.
-		 */
-		static const std::string	&Escape(std::string &str);
-		static const std::string	&Unescape(std::string &str);
 	protected:
-		bool			FindIndex(const std::string index, SettingsData *&data);
+		bool			FindIndex(const FName index, SettingsData *&data);
 
-		bool									firstRun;
-		std::string								configFile;
-		std::map<std::string, SettingsData *>	settings;
+		bool						firstRun;
+		FString						configFile;
+		TMap<FName, SettingsData *>	settings;
 };
 
 extern Config *config;

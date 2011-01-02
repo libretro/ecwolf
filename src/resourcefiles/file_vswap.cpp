@@ -1,11 +1,8 @@
-#include <cstring>
-#include <string>
-using namespace std;
-
 #include "wl_def.h"
 #include "resourcefile.h"
 #include "w_wad.h"
 #include "lumpremap.h"
+#include "zstring.h"
 
 // Some sounds in the VSwap file are multiparty so we need mean to concationate
 // them.
@@ -63,9 +60,8 @@ class FVSwap : public FResourceFile
 	public:
 		FVSwap(const char* filename, FileReader *file) : FResourceFile(filename, file), spriteStart(0), soundStart(0), Lumps(NULL), SoundLumps(NULL), vswapFile(filename)
 		{
-			int lastSlash = static_cast<int> (vswapFile.find_last_of('\\')) > static_cast<int> (vswapFile.find_last_of('/')) ?
-				vswapFile.find_last_of('\\') : vswapFile.find_last_of('/');
-			extension = vswapFile.substr(lastSlash+7);
+			int lastSlash = vswapFile.LastIndexOfAny("/\\");
+			extension = vswapFile.Mid(lastSlash+7);
 		}
 		~FVSwap()
 		{
@@ -82,7 +78,7 @@ class FVSwap : public FResourceFile
 		bool Open(bool quiet)
 		{
 			FileReader vswapReader;
-			if(!vswapReader.Open(vswapFile.c_str()))
+			if(!vswapReader.Open(vswapFile))
 				return false;
 
 			char header[6];
@@ -146,7 +142,7 @@ class FVSwap : public FResourceFile
 			delete[] data;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
-			LumpRemaper::AddFile(extension.c_str(), this, LumpRemaper::VSWAP);
+			LumpRemaper::AddFile(extension, this, LumpRemaper::VSWAP);
 			return true;
 		}
 
@@ -164,29 +160,24 @@ class FVSwap : public FResourceFile
 		FUncompressedLump* Lumps;
 		FVSwapSound* *SoundLumps;
 
-		string	extension;
-		string	vswapFile;
+		FString	extension;
+		FString	vswapFile;
 };
 
 FResourceFile *CheckVSwap(const char *filename, FileReader *file, bool quiet)
 {
-	string fname(filename);
-	int lastSlash = static_cast<int> (fname.find_last_of('\\')) > static_cast<int> (fname.find_last_of('/')) ?
-		fname.find_last_of('\\') : fname.find_last_of('/');
+	FString fname(filename);
+	int lastSlash = fname.LastIndexOfAny("/\\");
 	if(lastSlash != -1)
-		fname = fname.substr(lastSlash+1);
+		fname = fname.Mid(lastSlash+1, 5);
+	else
+		fname = fname.Left(5);
 
-	if(fname.length() > 6) // file must be vswap.something
+	if(fname.Len() == 5 && fname.CompareNoCase("vswap") == 0) // file must be vswap.something
 	{
-		char name[6];
-		strncpy(name, fname.c_str(), 5);
-		name[5] = 0;
-		if(stricmp(name, "vswap") == 0)
-		{
-			FResourceFile *rf = new FVSwap(filename, file);
-			if(rf->Open(quiet)) return rf;
-			delete rf;
-		}
+		FResourceFile *rf = new FVSwap(filename, file);
+		if(rf->Open(quiet)) return rf;
+		delete rf;
 	}
 	return NULL;
 }

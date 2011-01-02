@@ -1,11 +1,8 @@
-#include <cstring>
-#include <string>
-using namespace std;
-
 #include "wl_def.h"
 #include "resourcefile.h"
 #include "w_wad.h"
 #include "lumpremap.h"
+#include "zstring.h"
 
 struct Huffnode
 {
@@ -112,11 +109,10 @@ class FVGAGraph : public FResourceFile
 	public:
 		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), vgagraphFile(filename), lumps(NULL)
 		{
-			string path(filename);
-			int lastSlash = static_cast<int> (path.find_last_of('\\')) > static_cast<int> (path.find_last_of('/')) ?
-				path.find_last_of('\\') : path.find_last_of('/');
-			extension = path.substr(lastSlash+10);
-			path = path.substr(0, lastSlash+1);
+			FString path(filename);
+			int lastSlash = path.LastIndexOfAny("/\\");
+			extension = path.Mid(lastSlash+10);
+			path = path.Left(lastSlash+1);
 
 			vgadictFile = path + "vgadict." + extension;
 			vgaheadFile = path + "vgahead." + extension;
@@ -130,12 +126,12 @@ class FVGAGraph : public FResourceFile
 		bool Open(bool quiet)
 		{
 			FileReader vgadictReader;
-			if(!vgadictReader.Open(vgadictFile.c_str()))
+			if(!vgadictReader.Open(vgadictFile))
 				return false;
 			vgadictReader.Read(huffman, sizeof(huffman));
 
 			FileReader vgaheadReader;
-			if(!vgaheadReader.Open(vgaheadFile.c_str()))
+			if(!vgaheadReader.Open(vgaheadFile))
 				return false;
 			vgaheadReader.Seek(0, SEEK_END);
 			NumLumps = vgaheadReader.Tell()/3;
@@ -208,7 +204,7 @@ class FVGAGraph : public FResourceFile
 			delete[] data;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
-			LumpRemaper::AddFile(extension.c_str(), this, LumpRemaper::VGAGRAPH);
+			LumpRemaper::AddFile(extension, this, LumpRemaper::VGAGRAPH);
 			return true;
 		}
 
@@ -221,31 +217,26 @@ class FVGAGraph : public FResourceFile
 		Huffnode	huffman[255];
 		FVGALump*	lumps;
 
-		string		extension;
-		string		vgadictFile;
-		string		vgaheadFile;
-		string		vgagraphFile;
+		FString		extension;
+		FString		vgadictFile;
+		FString		vgaheadFile;
+		FString		vgagraphFile;
 };
 
 FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 {
-	string fname(filename);
-	int lastSlash = static_cast<int> (fname.find_last_of('\\')) > static_cast<int> (fname.find_last_of('/')) ?
-		fname.find_last_of('\\') : fname.find_last_of('/');
+	FString fname(filename);
+	int lastSlash = fname.LastIndexOfAny("/\\");
 	if(lastSlash != -1)
-		fname = fname.substr(lastSlash+1);
+		fname = fname.Mid(lastSlash+1, 8);
+	else
+		fname = fname.Left(8);
 
-	if(fname.length() > 9) // file must be vgagraph.something
+	if(fname.Len() == 8 && fname.CompareNoCase("vgagraph") == 0) // file must be vgagraph.something
 	{
-		char name[9];
-		strncpy(name, fname.c_str(), 8);
-		name[8] = 0;
-		if(stricmp(name, "vgagraph") == 0)
-		{
-			FResourceFile *rf = new FVGAGraph(filename, file);
-			if(rf->Open(quiet)) return rf;
-			delete rf;
-		}
+		FResourceFile *rf = new FVGAGraph(filename, file);
+		if(rf->Open(quiet)) return rf;
+		delete rf;
 	}
 	return NULL;
 }

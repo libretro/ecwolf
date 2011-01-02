@@ -166,36 +166,36 @@ void ClassDef::ParseActor(Scanner &sc)
 {
 	// Read the header
 	sc.MustGetToken(TK_Identifier);
-	ClassDef **classRef = classTable.CheckKey(sc.str.c_str());
+	ClassDef **classRef = classTable.CheckKey(sc.str);
 	ClassDef *newClass;
 	bool previouslyDefined = classRef != NULL;
 	if(!previouslyDefined)
 	{
 		newClass = new ClassDef();
-		classTable[sc.str.c_str()] = newClass;
+		classTable[sc.str] = newClass;
 	}
 	else
 		newClass = *classRef;
 	bool native = false;
-	newClass->name = sc.str.c_str();
+	newClass->name = sc.str;
 	if(sc.CheckToken(':'))
 	{
 		sc.MustGetToken(TK_Identifier);
-		newClass->parent = FindClass(sc.str.c_str());
+		newClass->parent = FindClass(sc.str);
 		if(newClass->parent == NULL)
-			sc.ScriptError("Could not find parent actor '%s'\n", sc.str.c_str());
+			sc.ScriptMessage(Scanner::ERROR, "Could not find parent actor '%s'\n", sc.str.GetChars());
 	}
 	else if(!previouslyDefined) // If no class was specified to inherit from, inherit from AActor, but not for AActor.
 		newClass->parent = NATIVE_CLASS(Actor);
 	if(sc.CheckToken(TK_Identifier))
 	{
-		if(stricmp(sc.str.c_str(), "native") == 0)
+		if(sc.str.CompareNoCase("native") == 0)
 			native = true;
 		else
-			sc.ScriptError("Unknown keyword '%s'.\n", sc.str.c_str());
+			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.\n", sc.str.GetChars());
 	}
 	if(previouslyDefined && !native)
-		sc.ScriptError("Actor '%s' already defined.\n", newClass->name.GetChars());
+		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
 		delete newClass->defaultInstance;
@@ -210,11 +210,11 @@ void ClassDef::ParseActor(Scanner &sc)
 			bool set = sc.token == '+';
 			FString flagName;
 			sc.MustGetToken(TK_Identifier);
-			flagName = sc.str.c_str();
+			flagName = sc.str;
 			if(sc.CheckToken('.'))
 			{
 				sc.MustGetToken(TK_Identifier);
-				flagName += FString(".") + sc.str.c_str();
+				flagName += FString(".") + sc.str;
 			}
 			if(!SetFlag(newClass, flagName, set))
 				printf("Warning: Unknown flag '%s' for actor '%s'.\n", flagName.GetChars(), newClass->name.GetChars());
@@ -222,7 +222,7 @@ void ClassDef::ParseActor(Scanner &sc)
 		else
 		{
 			sc.MustGetToken(TK_Identifier);
-			if(stricmp(sc.str.c_str(), "states") == 0)
+			if(sc.str.CompareNoCase("states") == 0)
 			{
 				TArray<StateDefinition> stateDefs;
 
@@ -241,27 +241,27 @@ void ClassDef::ParseActor(Scanner &sc)
 						sc.MustGetToken(TK_Identifier);
 					else
 						needIdentifier = true;
-					FString stateString = sc.str.c_str();
+					FString stateString = sc.str;
 					if(sc.CheckToken(':'))
 					{
 						infiniteLoopProtection = false;
 						thisState.label = stateString;
 						// New state
 						if(sc.CheckToken('}'))
-							sc.ScriptError("State defined with no frames.");
+							sc.ScriptMessage(Scanner::ERROR, "State defined with no frames.");
 						sc.MustGetToken(TK_Identifier);
 					}
 
-					bool invalidSprite = (sc.str.length() != 4);
-					strncpy(thisState.sprite, sc.str.c_str(), 4);
+					bool invalidSprite = (sc.str.Len() != 4);
+					strncpy(thisState.sprite, sc.str, 4);
 
 					if(sc.CheckToken(TK_Identifier) || sc.CheckToken(TK_StringConst))
 					{
 						infiniteLoopProtection = false;
 						if(invalidSprite) // We now know this is a frame so check sprite length
-							sc.ScriptError("Frame must be exactly 4 characters long.");
+							sc.ScriptMessage(Scanner::ERROR, "Frame must be exactly 4 characters long.");
 
-						thisState.frames = sc.str.c_str();
+						thisState.frames = sc.str;
 						if(sc.CheckToken('-'))
 						{
 							sc.MustGetToken(TK_FloatConst);
@@ -278,7 +278,7 @@ void ClassDef::ParseActor(Scanner &sc)
 								thisState.frames.Truncate(0);
 							}
 							else
-								sc.ScriptError("Expected frame duration.");
+								sc.ScriptMessage(Scanner::ERROR, "Expected frame duration.");
 						}
 
 						if(sc.CheckToken('}'))
@@ -290,23 +290,23 @@ void ClassDef::ParseActor(Scanner &sc)
 						{
 							for(int func = 0;func <= 2;func++)
 							{
-								if(sc.str.length() == 4 || func == 2)
+								if(sc.str.Len() == 4 || func == 2)
 								{
-									if(stricmp(sc.str.c_str(), "goto") == 0)
+									if(sc.str.CompareNoCase("goto") == 0)
 									{
 										sc.MustGetToken(TK_Identifier);
 										thisState.nextType = StateDefinition::GOTO;
-										thisState.nextArg = sc.str.c_str();
+										thisState.nextArg = sc.str;
 									}
-									else if(stricmp(sc.str.c_str(), "wait") == 0)
+									else if(sc.str.CompareNoCase("wait") == 0)
 									{
 										thisState.nextType = StateDefinition::WAIT;
 									}
-									else if(stricmp(sc.str.c_str(), "loop") == 0)
+									else if(sc.str.CompareNoCase("loop") == 0)
 									{
 										thisState.nextType = StateDefinition::LOOP;
 									}
-									else if(stricmp(sc.str.c_str(), "stop") == 0)
+									else if(sc.str.CompareNoCase("stop") == 0)
 									{
 										thisState.nextType = StateDefinition::STOP;
 									}
@@ -332,7 +332,7 @@ void ClassDef::ParseActor(Scanner &sc)
 					{
 						needIdentifier = false;
 						if(infiniteLoopProtection)
-							sc.ScriptError("Malformed script.");
+							sc.ScriptMessage(Scanner::ERROR, "Malformed script.");
 						infiniteLoopProtection = true;
 					}
 				FinishState:
@@ -343,11 +343,11 @@ void ClassDef::ParseActor(Scanner &sc)
 			}
 			else
 			{
-				FString propertyName = sc.str.c_str();
+				FString propertyName = sc.str;
 				if(sc.CheckToken('.'))
 				{
 					sc.MustGetToken(TK_Identifier);
-					propertyName = FString(".") + sc.str.c_str();
+					propertyName = FString(".") + sc.str;
 				}
 				if(!SetProperty(newClass, propertyName, sc))
 				{
@@ -373,12 +373,12 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 	while(sc.TokensLeft())
 	{
 		sc.MustGetToken(TK_Identifier);
-		if(stricmp(sc.str.c_str(), "actor") == 0)
+		if(sc.str.CompareNoCase("actor") == 0)
 		{
 			ParseActor(sc);
 		}
 		else
-			sc.ScriptError("Unknown thing section '%s'.", sc.str.c_str());
+			sc.ScriptMessage(Scanner::ERROR, "Unknown thing section '%s'.", sc.str.GetChars());
 	}
 }
 
@@ -449,8 +449,8 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 								done = true;
 								break;
 							}
-							params[paramc].s = new char[sc.str.length()];
-							strcpy(params[paramc].s, sc.str.c_str());
+							params[paramc].s = new char[sc.str.Len()];
+							strcpy(params[paramc].s, sc.str);
 							break;
 						default:
 						case 'I':
@@ -487,8 +487,8 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 								done = true;
 								break;
 							}
-							params[paramc].s = new char[sc.str.length()];
-							strcpy(params[paramc].s, sc.str.c_str());
+							params[paramc].s = new char[sc.str.Len()];
+							strcpy(params[paramc].s, sc.str);
 							break;
 					}
 					paramc++;
@@ -499,7 +499,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 			}
 			while(sc.CheckToken(','));
 			if(!optional && *p != 0 && *p != '_')
-				sc.ScriptError("Not enough parameters.");
+				sc.ScriptMessage(Scanner::ERROR, "Not enough parameters.");
 
 			properties[mid].handler(newClass->defaultInstance, paramc, params);
 

@@ -31,11 +31,11 @@
 #include "config.hpp"
 #include "scanner.h"
 
-#include <string>
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+using namespace std;
 
 #ifdef WINDOWS
 #include <direct.h>
@@ -44,7 +44,7 @@
 #include <sys/stat.h>
 #endif
 
-using namespace std;
+#include "zstring.h"
 
 Config *config = new Config();
 void saveAtExit()
@@ -60,18 +60,18 @@ Config::Config() : firstRun(false)
 
 Config::~Config()
 {
-	for(map<string, SettingsData *>::iterator it=settings.begin();it != settings.end();it++)
-		delete (*it).second;
-	settings.clear();
+	TMap<FName, SettingsData *>::Pair *pair;
+	for(TMap<FName, SettingsData *>::Iterator it(settings);it.NextPair(pair);)
+		delete pair->Value;
 }
 
 void Config::LocateConfigFile(int argc, char* argv[])
 {
-	string configDir;
+	FString configDir;
 #ifdef WINDOWS
 	configDir = argv[0];
-	int pos = static_cast<int> (configDir.find_last_of('\\')) > static_cast<int> (configDir.find_last_of('/')) ? configDir.find_last_of('\\') : configDir.find_last_of('/');
-	configDir = configDir.substr(0, pos+1);
+	int pos = configDir.LastIndexOfAny("/\\");
+	configDir = configDir.Mid(0, pos+1);
 #else
 	char *home = getenv("HOME");
 	if(home == NULL || *home == '\0')
@@ -79,11 +79,11 @@ void Config::LocateConfigFile(int argc, char* argv[])
 		printf("Please set your HOME environment variable.\n");
 		return;
 	}
-	configDir = string(home) + "/.ecwolf/";
+	configDir = FString(home) + "/.ecwolf/";
 	struct stat dirStat;
-	if(stat(configDir.c_str(), &dirStat) == -1)
+	if(stat(configDir, &dirStat) == -1)
 	{
-		if(mkdir(configDir.c_str(), S_IRWXU) == -1)
+		if(mkdir(configDir, S_IRWXU) == -1)
 		{
 			printf("Could not create settings directory, configuration will not be saved.\n");
 			return;
@@ -95,42 +95,13 @@ void Config::LocateConfigFile(int argc, char* argv[])
 	ReadConfig();
 }
 
-// NOTE: Be sure that '\\' is the first thing in the array otherwise it will re-escape.
-static char escapeCharacters[] =		{'\\', '"', 'n', 0};
-static char escapeCharactersReplace[] =	{'\\', '"', '\n', 0};
-const string &Config::Escape(string &str)
-{
-	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
-	{
-		string sequence = string("\\").append(1, escapeCharacters[i]);
-		// += 2 because we'll be inserting 1 character.
-		for(size_t p = 0;p < str.length() && (p = str.find(escapeCharactersReplace[i], p)) != string::npos;p += 2)
-		{
-			str.replace(p, 1, sequence);
-		}
-	}
-	return str;
-}
-const string &Config::Unescape(string &str)
-{
-	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
-	{
-		string sequence = string("\\").append(1, escapeCharacters[i]);
-		for(size_t p = 0;p < str.length() && (p = str.find(sequence, p)) != string::npos;p++)
-		{
-			str.replace(str.find_first_of(sequence, p), 2, 1, escapeCharactersReplace[i]);
-		}
-	}
-	return str;
-}
-
 void Config::ReadConfig()
 {
 	// Check to see if we have located the config file.
-	if(configFile.empty())
+	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(configFile.c_str(), ios_base::in | ios_base::binary);
+	fstream stream(configFile, ios_base::in | ios_base::binary);
 	if(stream.is_open())
 	{
 		stream.seekg(0, ios_base::end);
@@ -154,7 +125,7 @@ void Config::ReadConfig()
 		while(sc.TokensLeft())  // Go until there is nothing left to read.
 		{
 			sc.MustGetToken(TK_Identifier);
-			string index = sc.str;
+			FString index = sc.str;
 			sc.MustGetToken('=');
 			if(sc.CheckToken(TK_StringConst))
 			{
@@ -174,25 +145,26 @@ void Config::ReadConfig()
 		delete[] data;
 	}
 
-	if(settings.size() == 0)
+	if(settings.CountUsed() == 0)
 		firstRun = true;
 }
 
 void Config::SaveConfig()
 {
 	// Check to see if we're saving the settings.
-	if(configFile.empty())
+	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(configFile.c_str(), ios_base::out | ios_base::trunc);
+	fstream stream(configFile, ios_base::out | ios_base::trunc);
 	if(stream.is_open())
 	{
-		for(map<string, SettingsData *>::iterator it=settings.begin();it != settings.end();it++)
+		TMap<FName, SettingsData *>::Pair *pair;
+		for(TMap<FName, SettingsData *>::Iterator it(settings);it.NextPair(pair);)
 		{
-			stream.write((*it).first.c_str(), (*it).first.length());
+			stream.write(pair->Key, strlen(pair->Key));
 			if(stream.fail())
 				return;
-			SettingsData *data = (*it).second;
+			SettingsData *data = pair->Value;
 			if(data->GetType() == SettingsData::ST_INT)
 			{
 				// Determine size of number.
@@ -209,11 +181,11 @@ void Config::SaveConfig()
 			}
 			else
 			{
-				string str = data->GetString(); // Make a non const copy of the string.
-				Escape(str);
-				char* value = new char[str.length() + 8];
-				sprintf(value, " = \"%s\";\n", str.c_str());
-				stream.write(value, str.length() + 7);
+				FString str = data->GetString(); // Make a non const copy of the string.
+				Scanner::Escape(str);
+				char* value = new char[str.Len() + 8];
+				sprintf(value, " = \"%s\";\n", str.GetChars());
+				stream.write(value, str.Len() + 7);
 				delete[] value;
 				if(stream.fail())
 					return;
@@ -223,7 +195,7 @@ void Config::SaveConfig()
 	}
 }
 
-void Config::CreateSetting(const string index, unsigned int defaultInt)
+void Config::CreateSetting(const FName index, unsigned int defaultInt)
 {
 	SettingsData *data;
 	if(!FindIndex(index, data))
@@ -233,7 +205,7 @@ void Config::CreateSetting(const string index, unsigned int defaultInt)
 	}
 }
 
-void Config::CreateSetting(const string index, string defaultString)
+void Config::CreateSetting(const FName index, FString defaultString)
 {
 	SettingsData *data;
 	if(!FindIndex(index, data))
@@ -243,20 +215,18 @@ void Config::CreateSetting(const string index, string defaultString)
 	}
 }
 
-SettingsData *Config::GetSetting(const string index)
+SettingsData *Config::GetSetting(const FName index)
 {
 	SettingsData *data;
 	FindIndex(index, data);
 	return data;
 }
 
-bool Config::FindIndex(const string index, SettingsData *&data)
+bool Config::FindIndex(const FName index, SettingsData *&data)
 {
-	map<string, SettingsData *>::iterator it = settings.find(index);
-	if(it != settings.end())
-	{
-		data = (*it).second;
-		return true;
-	}
-	return false;
+	SettingsData **setting = settings.CheckKey(index);
+	if(setting == NULL)
+		return false;
+	data = *setting;
+	return true;
 }

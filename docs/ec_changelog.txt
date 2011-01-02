@@ -1,3 +1,7 @@
+January 2nd, 2010
+-----------------------------
+- Mostly got rid of the STL and updated the scanner.
+
 December 19th, 2010
 -----------------------------
 - More reductions in STL use.

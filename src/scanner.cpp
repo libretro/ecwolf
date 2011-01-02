@@ -1,35 +1,37 @@
-//------------------------------------------------------------------------------
-// scanner.h
-//------------------------------------------------------------------------------
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-// 02110-1301, USA.
-//
-//------------------------------------------------------------------------------
-// Copyright (C) 2010 "Blzut3" <admin@maniacsvault.net>
-//------------------------------------------------------------------------------
+/*
+** Copyright (c) 2010, Braden "Blzut3" Obrzut
+** All rights reserved.
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**     * Redistributions of source code must retain the above copyright
+**       notice, this list of conditions and the following disclaimer.
+**     * Redistributions in binary form must reproduce the above copyright
+**       notice, this list of conditions and the following disclaimer in the
+**       documentation and/or other materials provided with the distribution.
+**     * The names of its contributors may be used to endorse or promote
+**       products derived from this software without specific prior written
+**       permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY DIRECT,
+** INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <cstdarg>
-#include <string>
 
+#include "scanner_support.h"
 #include "scanner.h"
-
-using namespace std;
 
 static const char* const TokenNames[TK_NumSpecialTokens] =
 {
@@ -45,10 +47,15 @@ static const char* const TokenNames[TK_NumSpecialTokens] =
 	"Greater Than or Equals"
 	"Less Than or Equals",
 	"Left Shift",
-	"Right Shift"
+	"Right Shift",
+	"Increment",
+	"Decrement",
+	"Pointer Member",
+	"Scope Resolution",
+	"Macro Concatenation"
 };
 
-Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), tokenLine(1), tokenLinePosition(0), scanPos(0), needNext(true)
+Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), logicalPosition(0), tokenLine(1), tokenLinePosition(0), scanPos(0), needNext(true)
 {
 	if(length == -1)
 		length = strlen(data);
@@ -62,6 +69,47 @@ Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), tokenLin
 Scanner::~Scanner()
 {
 	delete[] data;
+}
+
+// Here's my answer to the preprocessor screwing up line numbers. What we do is
+// after a new line in CheckForWhitespace, look for a comment in the form of
+// "/*meta:filename:line*/"
+void Scanner::CheckForMeta()
+{
+	if(scanPos+10 < length)
+	{
+		char metaCheck[8];
+		memcpy(metaCheck, data+scanPos, 7);
+		metaCheck[7] = 0;
+		if(strcmp(metaCheck, "/*meta:") == 0)
+		{
+			scanPos += 7;
+			int metaStart = scanPos;
+			int fileLength = 0;
+			int lineLength = 0;
+			while(scanPos < length)
+			{
+				char thisChar = data[scanPos];
+				char nextChar = scanPos+1 < length ? data[scanPos+1] : 0;
+				if(thisChar == '*' && nextChar == '/')
+				{
+					lineLength = scanPos-metaStart-1-fileLength;
+					scanPos += 2;
+					break;
+				}
+				if(thisChar == ':' && fileLength == 0)
+					fileLength = scanPos-metaStart;
+				scanPos++;
+			}
+			if(fileLength > 0 && lineLength > 0)
+			{
+				SetScriptIdentifier(SCString(data+metaStart, fileLength));
+				SCString lineNumber(data+metaStart+fileLength+1, lineLength);
+				line = atoi(SCString_GetChars(lineNumber));
+				lineStart = scanPos;
+			}
+		}
+	}
 }
 
 void Scanner::CheckForWhitespace()
@@ -109,6 +157,7 @@ void Scanner::CheckForWhitespace()
 			if(cur == '\r' && next == '\n')
 				scanPos++;
 			IncrementLine();
+			CheckForMeta();
 		}
 		else if(cur == '/' && comment == 0)
 		{
@@ -156,9 +205,8 @@ bool Scanner::CheckToken(char token)
 
 void Scanner::ExpandState()
 {
-	nextState.rewindScanPos = scanPos;
-	nextState.rewindLine = line;
-	nextState.rewindLineStart = lineStart;
+	logicalPosition = scanPos;
+	CheckForWhitespace();
 
 	str = nextState.str;
 	number = nextState.number;
@@ -171,14 +219,6 @@ void Scanner::ExpandState()
 
 bool Scanner::GetNextString()
 {
-	if(!needNext)
-	{
-		needNext = true;
-		scanPos = nextState.rewindScanPos;
-		line = nextState.rewindLine;
-		lineStart = nextState.rewindLineStart;
-	}
-
 	if(scanPos >= length)
 		return false;
 
@@ -226,7 +266,7 @@ bool Scanner::GetNextString()
 	}
 	if(end-start > 0)
 	{
-		str = string(data+start, end-start);
+		SCString thisString(data+start, end-start);
 		CheckForWhitespace();
 		return true;
 	}
@@ -239,20 +279,23 @@ bool Scanner::GetNextToken(bool expandState)
 	if(!needNext)
 	{
 		needNext = true;
+		if(expandState)
+			ExpandState();
 		return true;
 	}
 
-	nextState.rewindScanPos = scanPos;
-	nextState.rewindLine = line;
-	nextState.rewindLineStart = lineStart;
 	nextState.tokenLine = line;
 	nextState.tokenLinePosition = scanPos - lineStart;
+	nextState.token = TK_NoToken;
 	if(scanPos >= length)
+	{
+		if(expandState)
+			ExpandState();
 		return false;
+	}
 
 	int start = scanPos;
 	int end = scanPos;
-	nextState.token = TK_NoToken;
 	int integerBase = 10;
 	bool floatHasDecimal = false;
 	bool floatHasExponent = false;
@@ -295,6 +338,19 @@ bool Scanner::GetNextToken(bool expandState)
 				nextState.token = TK_ShiftLeft;
 			else if(cur == '>' && next == '>')
 				nextState.token = TK_ShiftRight;
+			else if(cur == '#' && next == '#')
+				nextState.token = TK_MacroConcat;
+			else if(cur == ':' && next == ':')
+				nextState.token = TK_ScopeResolution;
+			else if(cur == '+' && next == '+')
+				nextState.token = TK_Increment;
+			else if(cur == '-')
+			{
+				if(next == '-')
+					nextState.token = TK_Decrement;
+				else if(next == '>')
+					nextState.token = TK_PointerMember;
+			}
 			else if(next == '=')
 			{
 				switch(cur)
@@ -409,28 +465,28 @@ bool Scanner::GetNextToken(bool expandState)
 
 	if(end-start > 0 || stringFinished)
 	{
-		nextState.str.assign(data+start, end-start);
+		nextState.str = SCString(data+start, end-start);
 		if(nextState.token == TK_FloatConst)
 		{
-			nextState.decimal = atof(nextState.str.c_str());
+			nextState.decimal = atof(SCString_GetChars(nextState.str));
 			nextState.number = static_cast<int> (nextState.decimal);
 			nextState.boolean = (nextState.number != 0);
 		}
 		else if(nextState.token == TK_IntConst)
 		{
-			nextState.number = strtol(nextState.str.c_str(), NULL, integerBase);
+			nextState.number = strtol(SCString_GetChars(nextState.str), NULL, integerBase);
 			nextState.decimal = nextState.number;
 			nextState.boolean = (nextState.number != 0);
 		}
 		else if(nextState.token == TK_Identifier)
 		{
 			// Check for a boolean constant.
-			if(nextState.str.compare("true") == 0)
+			if(SCString_Compare(nextState.str, "true") == 0)
 			{
 				nextState.token = TK_BoolConst;
 				nextState.boolean = true;
 			}
-			else if(nextState.str.compare("false") == 0)
+			else if(SCString_Compare(nextState.str, "false") == 0)
 			{
 				nextState.token = TK_BoolConst;
 				nextState.boolean = false;
@@ -442,10 +498,11 @@ bool Scanner::GetNextToken(bool expandState)
 		}
 		if(expandState)
 			ExpandState();
-		CheckForWhitespace();
 		return true;
 	}
-	CheckForWhitespace();
+	nextState.token = TK_NoToken;
+	if(expandState)
+		ExpandState();
 	return false;
 }
 
@@ -461,25 +518,68 @@ void Scanner::MustGetToken(char token)
 	{
 		ExpandState();
 		if(token < TK_NumSpecialTokens && this->token < TK_NumSpecialTokens)
-			ScriptError("Expected '%s' but got '%s' instead.", TokenNames[token], TokenNames[this->token]);
+			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%s' instead.", TokenNames[token], TokenNames[this->token]);
 		else if(token < TK_NumSpecialTokens && this->token >= TK_NumSpecialTokens)
-			ScriptError("Expected '%s' but got '%c' instead.", TokenNames[token], this->token);
+			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%c' instead.", TokenNames[token], this->token);
 		else if(token >= TK_NumSpecialTokens && this->token < TK_NumSpecialTokens)
-			ScriptError("Expected '%c' but got '%s' instead.", token, TokenNames[this->token]);
+			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%s' instead.", token, TokenNames[this->token]);
 		else
-			ScriptError("Expected '%c' but got '%c' instead.", token, this->token);
+			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%c' instead.", token, this->token);
 	}
 }
 
-void Scanner::ScriptError(const char* error, ...) const
+void Scanner::ScriptMessage(MessageLevel level, const char* error, ...) const
 {
-	char* newMessage = new char[strlen(error) + 20];
-	sprintf(newMessage, "%d:%d:%s\n", GetLine(), GetLinePos(), error);
+	const char* messageLevel;
+	switch(level)
+	{
+		default:
+			messageLevel = "Notice";
+			break;
+		case WARNING:
+			messageLevel = "Warning";
+			break;
+		case ERROR:
+			messageLevel = "Error";
+	}
+
+	char* newMessage = new char[strlen(error) + SCString_Len(scriptIdentifier) + 25];
+	sprintf(newMessage, "%s:%d:%d:%s: %s\n", SCString_GetChars(scriptIdentifier), GetLine(), GetLinePos(), messageLevel, error);
 	va_list list;
 	va_start(list, error);
 	vfprintf(stderr, newMessage, list);
 	va_end(list);
-	exit(0);
+
+	if(level == ERROR)
+		exit(0);
+}
+
+int Scanner::SkipLine()
+{
+	int ret = GetPos();
+	while(logicalPosition < length)
+	{
+		char thisChar = data[logicalPosition];
+		char nextChar = logicalPosition+1 < length ? data[logicalPosition+1] : 0;
+		if(thisChar == '\n' || thisChar == '\r')
+		{
+			ret = logicalPosition++; // Return the first newline character we see.
+			if(nextChar == '\r')
+				logicalPosition++;
+			IncrementLine();
+			CheckForWhitespace();
+			break;
+		}
+		logicalPosition++;
+	}
+	if(logicalPosition > scanPos)
+	{
+		scanPos = logicalPosition;
+		CheckForWhitespace();
+		needNext = true;
+		logicalPosition = scanPos;
+	}
+	return ret;
 }
 
 bool Scanner::TokensLeft() const
@@ -490,32 +590,33 @@ bool Scanner::TokensLeft() const
 // NOTE: Be sure that '\\' is the first thing in the array otherwise it will re-escape.
 static char escapeCharacters[] = {'\\', '"', 'n', 0};
 static char resultCharacters[] = {'\\', '"', '\n', 0};
-const string &Scanner::Escape(string &str)
+const SCString &Scanner::Escape(SCString &str)
 {
 	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
 	{
 		// += 2 because we'll be inserting 1 character.
-		for(size_t p = 0;p < str.length() && (p = str.find_first_of(escapeCharacters[i], p)) != string::npos;p += 2)
+		for(SCString_Index p = 0;p < SCString_Len(str) && (p = SCString_IndexOf(str, resultCharacters[i], p)) != SCString_NPos(str);p += 2)
 		{
-			str.insert(p, 1, '\\');
+			SCString_InsertChar(str, p, '\\');
 		}
 	}
 	return str;
 }
-const string Scanner::Escape(const char *str)
+const SCString Scanner::Escape(const char *str)
 {
-	string tmp(str);
+	SCString tmp(str);
 	Escape(tmp);
 	return tmp;
 }
-const string &Scanner::Unescape(string &str)
+const SCString &Scanner::Unescape(SCString &str)
 {
 	for(unsigned int i = 0;escapeCharacters[i] != 0;i++)
 	{
-		string sequence = string("\\").append(1, escapeCharacters[i]);
-		for(size_t p = 0;p < str.length() && (p = str.find(sequence, p)) != string::npos;p++)
+		SCString sequence("\\");
+		SCString_AppendChar(sequence, escapeCharacters[i]);
+		for(SCString_Index p = 0;p < SCString_Len(str) && (p = SCString_IndexOfSeq(str, sequence, p)) != SCString_NPos(str);p++)
 		{
-			str.replace(str.find_first_of(sequence, p), 2, 1, resultCharacters[i]);
+			SCString_Unescape(str, SCString_IndexOfSeq(str, sequence, p), resultCharacters[i]);
 		}
 	}
 	return str;

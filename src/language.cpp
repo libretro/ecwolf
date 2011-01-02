@@ -32,7 +32,7 @@ void Language::ReadLump(int lump, const char* language)
 		{
 			// match with language
 			sc.MustGetToken(TK_Identifier);
-			if(strcmp(language, sc.str.c_str()) != 0)
+			if(sc.str.Compare(language) != 0)
 				skip = true;
 			else
 			{
@@ -42,7 +42,7 @@ void Language::ReadLump(int lump, const char* language)
 
 			if(sc.CheckToken(TK_Identifier))
 			{
-				if(sc.str.compare("default") == 0)
+				if(sc.str.Compare("default") == 0)
 				{
 					// if not the correct language, go in no replace mode.
 					if(skip)
@@ -53,7 +53,7 @@ void Language::ReadLump(int lump, const char* language)
 				}
 				else
 				{
-					printf("Unexpected identifier '%s'\n", sc.str.c_str());
+					printf("Unexpected identifier '%s'\n", sc.str.GetChars());
 					exit(0);
 				}
 			}
@@ -62,19 +62,19 @@ void Language::ReadLump(int lump, const char* language)
 		}
 		else if(token == TK_Identifier)
 		{
-			FName index = sc.str.c_str();
+			FName index = sc.str;
 			sc.MustGetToken('=');
 			sc.MustGetToken(TK_StringConst);
 			if(!skip)
 			{
 				if(!noReplace || (noReplace && strings.CheckKey(index) == NULL))
-					strings[index] = sc.str.c_str();
+					strings[index] = sc.str;
 			}
 			sc.MustGetToken(';');
 		}
 		else
 		{
-			sc.ScriptError("Unexpected token.\n");
+			sc.ScriptMessage(Scanner::ERROR, "Unexpected token.\n");
 			exit(0);
 		}
 	}

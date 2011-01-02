@@ -114,7 +114,7 @@ void ReadConfig(void)
 		config->CreateSetting(hsCompleted, Scores[i].completed);
 		config->CreateSetting(hsEpisode, Scores[i].episode);
 
-		strcpy(Scores[i].name, config->GetSetting(hsName)->GetString().c_str());
+		strcpy(Scores[i].name, config->GetSetting(hsName)->GetString());
 		Scores[i].score = config->GetSetting(hsScore)->GetInteger();
 		Scores[i].completed = config->GetSetting(hsCompleted)->GetInteger();
 		Scores[i].episode = config->GetSetting(hsEpisode)->GetInteger();

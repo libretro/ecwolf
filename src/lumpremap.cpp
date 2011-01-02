@@ -107,47 +107,47 @@ bool LumpRemaper::LoadMap()
 	while(sc.TokensLeft() > 0)
 	{
 		if(!sc.CheckToken(TK_Identifier))
-			sc.ScriptError("Expected identifier in map.\n");
+			sc.ScriptMessage(Scanner::ERROR, "Expected identifier in map.\n");
 
 		TMap<int, FName> *reverse = NULL;
 		TArray<FName> *map = NULL;
-		if(sc.str.compare("graphics") == 0)
+		if(sc.str.Compare("graphics") == 0)
 		{
 			reverse = &vgaReverseMap;
 			map = &graphics;
 		}
-		else if(sc.str.compare("sprites") == 0)
+		else if(sc.str.Compare("sprites") == 0)
 			map = &sprites;
-		else if(sc.str.compare("sounds") == 0)
+		else if(sc.str.Compare("sounds") == 0)
 			map = &sounds;
-		else if(sc.str.compare("digitalsounds") == 0)
+		else if(sc.str.Compare("digitalsounds") == 0)
 			map = &digitalsounds;
-		else if(sc.str.compare("music") == 0)
+		else if(sc.str.Compare("music") == 0)
 		{
 			reverse = &musicReverseMap;
 			map = &music;
 		}
-		else if(sc.str.compare("textures") == 0)
+		else if(sc.str.Compare("textures") == 0)
 			map = &textures;
 		else
-			sc.ScriptError("Unknown map section '%s'.\n", sc.str.c_str());
+			sc.ScriptMessage(Scanner::ERROR, "Unknown map section '%s'.\n", sc.str.GetChars());
 
 		if(!sc.CheckToken('{'))
-			sc.ScriptError("Expected '{'.");
+			sc.ScriptMessage(Scanner::ERROR, "Expected '{'.");
 		if(!sc.CheckToken('}'))
 		{
 			int i = 0;
 			while(true)
 			{
 				if(!sc.CheckToken(TK_StringConst))
-					sc.ScriptError("Expected string constant.\n");
+					sc.ScriptMessage(Scanner::ERROR, "Expected string constant.\n");
 				if(reverse != NULL)
-					(*reverse)[i++] = sc.str.c_str();
-				map->Push(sc.str.c_str());
+					(*reverse)[i++] = sc.str;
+				map->Push(sc.str);
 				if(sc.CheckToken('}'))
 					break;
 				if(!sc.CheckToken(','))
-					sc.ScriptError("Expected ','.\n");
+					sc.ScriptMessage(Scanner::ERROR, "Expected ','.\n");
 			}
 		}
 	}

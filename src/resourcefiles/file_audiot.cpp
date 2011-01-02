@@ -1,22 +1,18 @@
-#include <cstring>
-#include <string>
-using namespace std;
-
 #include "wl_def.h"
 #include "resourcefile.h"
 #include "w_wad.h"
 #include "lumpremap.h"
+#include "zstring.h"
 
 class FAudiot : public FUncompressedFile
 {
 	public:
 		FAudiot(const char* filename, FileReader *file) : FUncompressedFile(filename, file), audiotFile(filename)
 		{
-			string path(filename);
-			int lastSlash = static_cast<int> (path.find_last_of('\\')) > static_cast<int> (path.find_last_of('/')) ?
-				path.find_last_of('\\') : path.find_last_of('/');
-			extension = path.substr(lastSlash+8);
-			path = path.substr(0, lastSlash+1);
+			FString path(filename);
+			int lastSlash = path.LastIndexOfAny("/\\");
+			extension = path.Mid(lastSlash+8);
+			path = path.Left(lastSlash+1);
 
 			audiohedFile = path + "audiohed." + extension;
 		}
@@ -24,7 +20,7 @@ class FAudiot : public FUncompressedFile
 		bool Open(bool quiet)
 		{
 			FileReader audiohedReader;
-			if(!audiohedReader.Open(audiohedFile.c_str()))
+			if(!audiohedReader.Open(audiohedFile))
 				return false;
 			audiohedReader.Seek(0, SEEK_END);
 			NumLumps = audiohedReader.Tell()/4;
@@ -84,35 +80,30 @@ class FAudiot : public FUncompressedFile
 			delete[] sizes;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
-			LumpRemaper::AddFile(extension.c_str(), this, LumpRemaper::AUDIOT);
+			LumpRemaper::AddFile(extension, this, LumpRemaper::AUDIOT);
 			return true;
 		}
 
 	private:
-		string		extension;
-		string		audiotFile;
-		string		audiohedFile;
+		FString		extension;
+		FString		audiotFile;
+		FString		audiohedFile;
 };
 
 FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 {
-	string fname(filename);
-	int lastSlash = static_cast<int> (fname.find_last_of('\\')) > static_cast<int> (fname.find_last_of('/')) ?
-		fname.find_last_of('\\') : fname.find_last_of('/');
+	FString fname(filename);
+	int lastSlash = fname.LastIndexOfAny("/\\");
 	if(lastSlash != -1)
-		fname = fname.substr(lastSlash+1);
+		fname = fname.Mid(lastSlash+1, 6);
+	else
+		fname = fname.Left(6);
 
-	if(fname.length() > 7) // file must be audiot.something
+	if(fname.Len() == 6 && fname.CompareNoCase("audiot") == 0) // file must be audiot.something
 	{
-		char name[7];
-		strncpy(name, fname.c_str(), 6);
-		name[6] = 0;
-		if(stricmp(name, "audiot") == 0)
-		{
-			FResourceFile *rf = new FAudiot(filename, file);
-			if(rf->Open(quiet)) return rf;
-			delete rf;
-		}
+		FResourceFile *rf = new FAudiot(filename, file);
+		if(rf->Open(quiet)) return rf;
+		delete rf;
 	}
 	return NULL;
 }
