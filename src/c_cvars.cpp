@@ -31,6 +31,11 @@ void FinalReadConfig()
 	SD_SetMusicMode(sm);
 	SD_SetSoundMode(sd);
 	SD_SetDigiDevice(sds);
+
+	if (!MousePresent)
+		mouseenabled = false;
+	if (!IN_JoyPresent())
+		joystickenabled = false;
 }
 
 /*
@@ -124,11 +129,6 @@ void ReadConfig(void)
 
 	if(mouseenabled) mouseenabled=true;
 	if(joystickenabled) joystickenabled=true;
-
-	if (!MousePresent)
-		mouseenabled = false;
-	if (!IN_JoyPresent())
-		joystickenabled = false;
 
 	if(mouseadjustment<0) mouseadjustment=0;
 	else if(mouseadjustment>20) mouseadjustment=20;
