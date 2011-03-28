@@ -1412,6 +1412,16 @@ void GP2X_ButtonUp(int button);
 =============================================================================
 */
 
+extern const struct RatioInformation
+{
+	int baseWidth;
+	int baseHeight;
+	int viewGlobal;
+	int multiplier;
+} AspectCorrection[];
+#define CorrectWidthFactor(x)	((x)*AspectCorrection[vid_aspect].multiplier/48)
+#define CorrectHeightFactor(x)	((x)*48/AspectCorrection[vid_aspect].multiplier)
+
 static inline fixed FixedMul(fixed a, fixed b)
 {
 	return (fixed)(((int64_t)a * b + 0x8000) >> 16);

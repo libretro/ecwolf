@@ -5,6 +5,7 @@
 #include "id_in.h"
 #include "id_us.h"
 
+Aspect vid_aspect = ASPECT_4_3;
 boolean r_depthfog = false;
 boolean vid_fullscreen = true;
 

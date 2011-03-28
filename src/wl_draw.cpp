@@ -36,6 +36,15 @@
 =============================================================================
 */
 
+const RatioInformation AspectCorrection[] =
+{
+	/* UNC */	{960,	600,	0x10000,	48},
+	/* 16:9 */	{1280,	450,	0x15555,	48*3/4},
+	/* 16:10 */	{1152,	500,	0x13333,	48*5/6},
+	/* 4:3 */	{960,	720,	0x10000,	48*5/6},
+	/* 5:4 */	{960,	640,	0x10000,	48*15/16}
+};
+
 static byte *vbuf = NULL;
 unsigned vbufPitch = 0;
 
@@ -680,7 +689,7 @@ int CalcRotate (objtype *ob)
 void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 {
 	t_compshape *shape;
-	unsigned scale,pixheight;
+	unsigned scale,pixheight,pixwidth;
 	unsigned starty,endy;
 	word *cmdptr;
 	byte *cline;
@@ -703,17 +712,18 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 	scale=height>>3;                 // low three bits are fractional
 	if(!scale) return;   // too close or far away
 
+	pixwidth=CorrectWidthFactor(scale*SPRITESCALEFACTOR);
 	pixheight=scale*SPRITESCALEFACTOR;
-	actx=xcenter-scale;
-	upperedge=viewheight/2-scale;
+	actx=xcenter-CorrectWidthFactor(scale);
+	upperedge=(viewheight/2)-scale;
 
 	cmdptr=(word *) shape->dataofs;
 
-	for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
+	for(i=shape->leftpix,pixcnt=i*pixwidth,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
 	{
 		lpix=rpix;
 		if(lpix>=viewwidth) break;
-		pixcnt+=pixheight;
+		pixcnt+=pixwidth;
 		rpix=(pixcnt>>6)+actx;
 		if(lpix!=rpix && rpix>0)
 		{
@@ -768,7 +778,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 {
 	t_compshape   *shape;
-	unsigned scale,pixheight;
+	unsigned scale,pixheight,pixwidth;
 	unsigned starty,endy;
 	word *cmdptr;
 	byte *cline;
@@ -783,17 +793,18 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 	shape = (t_compshape *) PM_GetSprite(shapenum);
 
 	scale=height>>1;
+	pixwidth=CorrectWidthFactor(scale*SPRITESCALEFACTOR);
 	pixheight=scale*SPRITESCALEFACTOR;
-	actx=xcenter-scale;
-	upperedge=viewheight/2-scale;
+	actx=xcenter-CorrectWidthFactor(scale);
+	upperedge=(viewheight/2)-scale;
 
 	cmdptr=shape->dataofs;
 
-	for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
+	for(i=shape->leftpix,pixcnt=i*pixwidth,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
 	{
 		lpix=rpix;
 		if(lpix>=viewwidth) break;
-		pixcnt+=pixheight;
+		pixcnt+=pixwidth;
 		rpix=(pixcnt>>6)+actx;
 		if(lpix!=rpix && rpix>0)
 		{

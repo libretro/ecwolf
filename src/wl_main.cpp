@@ -62,7 +62,6 @@ extern byte signon[];
 
 
 #define FOCALLENGTH     (0x5700l)               // in global coordinates
-#define VIEWGLOBAL      0x10000                 // globals visable flush to wall
 
 #define VIEWWIDTH       256                     // size of view window
 #define VIEWHEIGHT      144
@@ -612,13 +611,13 @@ void CalcProjection (int32_t focal)
 	// calculate scale value for vertical height calculations
 	// and sprite x calculations
 	//
-	scale = (fixed) (halfview*facedist/(VIEWGLOBAL/2));
+	scale = (fixed) (halfview*facedist/(AspectCorrection[vid_aspect].viewGlobal/2));
 
 	//
 	// divide heightnumerator by a posts distance to get the posts height for
 	// the heightbuffer.  The pixel height is height>>2
 	//
-	heightnumerator = (TILEGLOBAL*scale)>>6;
+	heightnumerator = CorrectHeightFactor((TILEGLOBAL*scale)>>6);
 
 	//
 	// calculate the angle offset from view angle of each pixel's ray
@@ -627,7 +626,7 @@ void CalcProjection (int32_t focal)
 	for (i=0;i<halfview;i++)
 	{
 		// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (int32_t)i*VIEWGLOBAL/viewwidth/facedist;
+		tang = (int32_t)i*AspectCorrection[vid_aspect].viewGlobal/viewwidth/facedist;
 		angle = (float) atan(tang);
 		intang = (int) (angle*radtoint);
 		pixelangle[halfview-1-i] = intang;
@@ -1302,6 +1301,67 @@ static void DemoLoop()
 
 //===========================================================================
 
+// CheckRatio -- From ZDoom
+//
+// Tries to guess the physical dimensions of the screen based on the
+// screen's pixel dimensions.
+Aspect CheckRatio (int width, int height)//, int *trueratio)
+{
+	//int fakeratio = -1;
+	Aspect ratio;
+
+	/*if ((vid_aspect >=1) && (vid_aspect <=4))
+	{
+		// [SP] User wants to force aspect ratio; let them.
+		fakeratio = vid_aspect == 3? 0: int(vid_aspect);
+	}*/
+	/*if (vid_nowidescreen)
+	{
+		if (!vid_tft)
+		{
+			fakeratio = 0;
+		}
+		else
+		{
+			fakeratio = (height * 5/4 == width) ? 4 : 0;
+		}
+	}*/
+	// If the size is approximately 16:9, consider it so.
+	if (abs (height * 16/9 - width) < 10)
+	{
+		ratio = ASPECT_16_9;
+	}
+	// 16:10 has more variance in the pixel dimensions. Grr.
+	else if (abs (height * 16/10 - width) < 60)
+	{
+		// 320x200 and 640x400 are always 4:3, not 16:10
+		if ((width == 320 && height == 200) || (width == 640 && height == 400))
+		{
+			ratio = ASPECT_NONE;
+		}
+		else
+		{
+			ratio = ASPECT_16_10;
+		}
+	}
+	// Unless vid_tft is set, 1280x1024 is 4:3, not 5:4.
+	else if (height * 5/4 == width)// && vid_tft)
+	{
+		ratio = ASPECT_5_4;
+	}
+	// Assume anything else is 4:3.
+	else
+	{
+		ratio = ASPECT_4_3;
+	}
+
+	/*if (trueratio != NULL)
+	{
+		*trueratio = ratio;
+	}*/
+	return /*(fakeratio >= 0) ? fakeratio :*/ ratio;
+}
+
 #define IFARG(str) if(!strcmp(arg, (str)))
 
 void CheckParameters(int argc, char *argv[])
@@ -1309,6 +1369,7 @@ void CheckParameters(int argc, char *argv[])
 	bool hasError = false, showHelp = false;
 	bool sampleRateGiven = false, audioBufferGiven = false;
 	int defaultSampleRate = param_samplerate;
+	bool needRatio = true;
 
 	fullscreen = vid_fullscreen;
 
@@ -1374,6 +1435,24 @@ void CheckParameters(int argc, char *argv[])
 				if(screenHeight < 200)
 					printf("Screen height must be at least 200!\n"), hasError = true;
 			}
+		}
+		else IFARG("--aspect")
+		{
+			const char* ratio = argv[++i];
+			if(strcmp(ratio, "4:3") == 0)
+				vid_aspect = ASPECT_4_3;
+			else if(strcmp(ratio, "16:10") == 0)
+				vid_aspect = ASPECT_16_10;
+			else if(strcmp(ratio, "16:9") == 0)
+				vid_aspect = ASPECT_16_9;
+			else if(strcmp(ratio, "5:4") == 0)
+				vid_aspect = ASPECT_5_4;
+			else
+			{
+				printf("Unknown aspect ratio %s!\n", ratio);
+				hasError = true;
+			}
+			needRatio = false;
 		}
 		else IFARG("--bits")
 		{
@@ -1477,6 +1556,7 @@ void CheckParameters(int argc, char *argv[])
 			"                        (must be multiple of 320x200 or 320x240)\n"
 			" --resf <w> <h>         Sets any screen resolution >= 320x200\n"
 			"                        (which may result in graphic errors)\n"
+			" --aspect <aspect>      Sets the aspect ratio.\n"
 			" --bits <b>             Sets the screen color depth\n"
 			"                        (use this when you have palette/fading problems\n"
 			"                        allowed: 8, 16, 24, 32, default: \"best\" depth)\n"
@@ -1499,6 +1579,11 @@ void CheckParameters(int argc, char *argv[])
 			, defaultSampleRate
 		);
 		exit(1);
+	}
+
+	if(needRatio)
+	{
+		vid_aspect = CheckRatio(screenWidth, screenHeight);
 	}
 
 	if(sampleRateGiven && !audioBufferGiven)
