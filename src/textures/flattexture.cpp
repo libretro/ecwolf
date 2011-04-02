@@ -30,8 +30,6 @@
 ** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **---------------------------------------------------------------------------
 **
-** WARNING: Modified in ECWolf to reverse read direction, Doom flat will be
-**          flipped and rotated.
 **
 */
 
@@ -203,8 +201,10 @@ void FFlatTexture::MakeTexture ()
 	{
 		memset (Pixels + numread, 0xBB, Width*Height - numread);
 	}
-	//FlipSquareBlockRemap (Pixels, Width, Height, GPalette.Remap);
-	for(int i = 0;i < Width*Height;i++)
-		Pixels[i] = GPalette.Remap[Pixels[i]];
+	if(!(Wads.GetLumpFlags(SourceLump) & LUMPF_DONTFLIPFLAT))
+		FlipSquareBlockRemap (Pixels, Width, Height, GPalette.Remap);
+	else
+		for(int i = 0;i < Width*Height;i++)
+			Pixels[i] = GPalette.Remap[Pixels[i]];
 }
 

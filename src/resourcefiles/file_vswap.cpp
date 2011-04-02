@@ -103,6 +103,8 @@ class FVSwap : public FResourceFile
 				Lumps[i].Owner = this;
 				Lumps[i].LumpNameSetup(lumpname);
 				Lumps[i].Namespace = i >= soundStart ? ns_sounds : (i >= spriteStart ? ns_sprites : ns_flats);
+				if(Lumps[i].Namespace == ns_flats)
+					Lumps[i].Flags |= LUMPF_DONTFLIPFLAT;
 				Lumps[i].Position = ReadLittleLong(&data[i*4]);
 				Lumps[i].LumpSize = ReadLittleShort(&data[i*2 + 4*numChunks]);
 			}
