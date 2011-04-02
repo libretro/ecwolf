@@ -413,20 +413,20 @@ void HitVertWall (void)
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
 	postwidth = 1;
-	const Texture *source = NULL;
+	FTexture *source = NULL;
 
 	if (tilehit & 0x40)
 	{                                                               // check for adjacent doors
 		ytile = (short)(yintercept>>TILESHIFT);
 		if ( tilemap[xtile-xtilestep][ytile]&0x80 )
-			source = TexMan.GetDoor(doorobjlist[tilemap[xtile-xtilestep][ytile]&0x7F].lock, true);
+			source = TexMan(TexMan.GetDoor(doorobjlist[tilemap[xtile-xtilestep][ytile]&0x7F].lock, true));
 		else
-			source = TexMan(tilehit&~0x40);
+			source = TexMan(TexMan.GetTile(tilehit&~0x40));
 	}
 	if(source == NULL)
-		source = TexMan(tilehit);
+		source = TexMan(TexMan.GetTile(tilehit));
 
-	postsource = source->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 64 : 192));
+	postsource = source->GetColumn(texture/64 + (hitdir==di_north||hitdir==di_east ? 64 : 192), NULL);
 }
 
 
@@ -483,20 +483,20 @@ void HitHorizWall (void)
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
 	postwidth = 1;
-	const Texture *source = NULL;
+	FTexture *source = NULL;
 
 	if (tilehit & 0x40)
 	{                                                               // check for adjacent doors
 		xtile = (short)(xintercept>>TILESHIFT);
 		if ( tilemap[xtile][ytile-ytilestep]&0x80)
-			source = TexMan.GetDoor(doorobjlist[tilemap[xtile][ytile-ytilestep]&0x7F].lock, true);
+			source = TexMan(TexMan.GetDoor(doorobjlist[tilemap[xtile][ytile-ytilestep]&0x7F].lock, true));
 		else
-			source = TexMan(tilehit&~0x40);
+			source = TexMan(TexMan.GetTile(tilehit&~0x40));
 	}
 	if(source == NULL)
-		source = TexMan(tilehit);
+		source = TexMan(TexMan.GetTile(tilehit));
 
-	postsource = source->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 0 : 128));
+	postsource = source->GetColumn(texture/64 + (hitdir==di_north||hitdir==di_east ? 0 : 128), NULL);
 }
 
 //==========================================================================
@@ -545,7 +545,7 @@ void HitHorizDoor (void)
 	postx = pixx;
 	postwidth = 1;
 
-	postsource = TexMan.GetDoor(doorobjlist[doornum].lock)->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 0 : 128));
+	postsource = TexMan(TexMan.GetDoor(doorobjlist[doornum].lock))->GetColumn(texture/64 + (hitdir==di_north||hitdir==di_east ? 0 : 128), NULL);
 }
 
 //==========================================================================
@@ -594,7 +594,7 @@ void HitVertDoor (void)
 	postx = pixx;
 	postwidth = 1;
 
-	postsource = TexMan.GetDoor(doorobjlist[doornum].lock)->GetPost(texture/64 + (hitdir==di_north||hitdir==di_east ? 64 : 192));
+	postsource = TexMan(TexMan.GetDoor(doorobjlist[doornum].lock))->GetColumn(texture/64 + (hitdir==di_north||hitdir==di_east ? 64 : 192), NULL);
 }
 
 //==========================================================================

@@ -50,6 +50,9 @@ typedef int64 int64_t;
 typedef ptr_t uintptr_t;
 #endif
 
+#define FRACBITS 16
+#define FRACUNIT (1<<FRACBITS)
+
 typedef uint8_t byte;
 typedef uint8_t BYTE;
 typedef int8_t SBYTE;
@@ -57,6 +60,7 @@ typedef uint16_t word;
 typedef uint16_t WORD;
 typedef int16_t SWORD;
 typedef int32_t fixed;
+typedef fixed fixed_t;
 typedef uint32_t longword;
 #ifndef WINDOWS
 typedef uint32_t DWORD;
@@ -68,6 +72,8 @@ typedef uint64_t QWORD;
 typedef int64_t SQWORD;
 typedef int8_t boolean;
 typedef void * memptr;
+typedef uint32_t uint32;
+typedef uint32_t BITFIELD;
 
 typedef struct
 {
@@ -77,6 +83,14 @@ typedef struct
 {
 	Point ul,lr;
 } Rect;
+
+// Screenshot buffer image data types
+enum ESSType
+{
+	SS_PAL,
+	SS_RGB,
+	SS_BGRA
+};
 
 void Quit(const char *errorStr, ...);
 
@@ -97,6 +111,10 @@ void Quit(const char *errorStr, ...);
 
 =============================================================================
 */
+
+#define MAXPLAYERS		8 // You wish! :P  (This is just here to satisfy ZDoom stuff)
+#define BODYQUESIZE		32
+#define NUMCOLORMAPS	32
 
 #define MAXTICS 10
 #define DEMOTICS        4
@@ -1461,6 +1479,8 @@ static inline fixed FixedMul(fixed a, fixed b)
 	}
 #endif
 
+#define typeoffsetof(type,variable) ((int)(size_t)&((type*)1)->variable - 1)
+
 #define lengthof(x) (sizeof(x) / sizeof(*(x)))
 #define endof(x)    ((x) + lengthof(x))
 
@@ -1527,22 +1547,5 @@ static inline longword READLONGWORD(byte *&ptr)
 #ifdef USE_DIR3DSPR
 	void Scale3DShape(byte *vbuf, unsigned vbufPitch, statobj_t *ob);
 #endif
-
-// Some old macros from SDE, no longer in use do to pickyness of another author
-#define READINT32(pointer) ((DWORD((BYTE)(*pointer))) | (DWORD(BYTE(*(pointer+1)))<<8) | (DWORD(BYTE(*(pointer+2)))<<16) | (DWORD(BYTE(*(pointer+3)))<<24))
-#define READINT24(pointer) ((DWORD((BYTE)(*pointer))) | (DWORD(BYTE(*(pointer+1)))<<8) | (DWORD(BYTE(*(pointer+2)))<<16))
-#define READINT16(pointer) ((WORD((BYTE)(*pointer))) | (WORD(BYTE(*(pointer+1)))<<8))
-#define READINT8(pointer) ((BYTE)(*pointer))
-
-// Now for some writing
-// Syntax: char data[x] = {WRITEINT32_DIRECT(integer),WRITEINT32_DIRECT(integer)...}
-#define WRITEINT32_DIRECT(integer) (BYTE)(integer&0xFF),(BYTE)((integer>>8)&0xFF),(BYTE)((integer>>16)&0xFF),(BYTE)((integer>>24)&0xFF)
-#define WRITEINT16_DIRECT(integer) (BYTE)(integer&0xFF),(BYTE)((integer>>8)&0xFF)
-#define WRITEINT8_DIRECT(integer) (BYTE)(integer&0xFF)
-
-#define WRITEINT32(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);*(pointer+2) = (BYTE)((integer>>16)&0xFF);*(pointer+3) = (BYTE)((integer>>24)&0xFF);
-#define WRITEINT24(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);*(pointer+2) = (BYTE)((integer>>16)&0xFF);
-#define WRITEINT16(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);
-#define WRITEINT8(pointer, integer) *pointer = (BYTE)(integer&0xFF);
 
 #endif

@@ -37,12 +37,8 @@
 
 #include <cstdlib>
 #include "m_crc32.h"
-#define M_Realloc realloc
-#define M_Malloc malloc
-#define M_Free free
-#define countof(x) (sizeof(x)/sizeof(x[0]))
-inline unsigned int MakeKey(const char *s, size_t len) { return CalcCRC32((const BYTE*)s, len); }
-inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s)); }
+#include "zdoomsupport.h"
+
 
 // MACROS ------------------------------------------------------------------
 

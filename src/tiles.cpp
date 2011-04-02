@@ -83,7 +83,7 @@ Texture &Texture::operator= (const Texture &other)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TextureManager TexMan;
+//TextureManager TexMan;
 
 TextureManager::TextureManager() : nullTexture()
 {
@@ -126,20 +126,20 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 	while(sc.TokensLeft())
 	{
 		sc.MustGetToken(TK_Identifier);
-		if(sc.str.Compare("texture") == 0)
+		if(sc->str.Compare("texture") == 0)
 		{
 			FName name;
 			unsigned int width;
 			unsigned int height;
 
 			sc.MustGetToken(TK_StringConst);
-			name = sc.str;
+			name = sc->str;
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_IntConst);
-			width = sc.number;
+			width = sc->number;
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_IntConst);
-			height = sc.number;
+			height = sc->number;
 
 			Texture &tex = textures[name];
 			tex.Initialize(name, width, height);
@@ -149,30 +149,30 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 				while(!sc.CheckToken('}'))
 				{
 					sc.MustGetToken(TK_Identifier);
-					if(sc.str.Compare("patch") == 0)
+					if(sc->str.Compare("patch") == 0)
 					{
 						FName patchName;
 						unsigned int xOffset;
 						unsigned int yOffset;
 
 						sc.MustGetToken(TK_StringConst);
-						patchName = sc.str;
+						patchName = sc->str;
 						sc.MustGetToken(',');
 						sc.MustGetToken(TK_IntConst);
-						xOffset = sc.number;
+						xOffset = sc->number;
 						sc.MustGetToken(',');
 						sc.MustGetToken(TK_IntConst);
-						yOffset = sc.number;
+						yOffset = sc->number;
 						tex.AddPatch(patchName, xOffset, yOffset);
 					}
 				}
 			}
 		}
-		else if(sc.str.Compare("maptile") == 0 || sc.str.Compare("floortile") == 0 || sc.str.Compare("ceilingtile") == 0)
+		else if(sc->str.Compare("maptile") == 0 || sc->str.Compare("floortile") == 0 || sc->str.Compare("ceilingtile") == 0)
 		{
-			int type = sc.str.Compare("maptile") == 0 ? 0 : (sc.str.Compare("floortile") == 0  ? 1 : 2);
+			int type = sc->str.Compare("maptile") == 0 ? 0 : (sc->str.Compare("floortile") == 0  ? 1 : 2);
 			sc.MustGetToken(TK_IntConst);
-			int index = sc.number;
+			int index = sc->number;
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_StringConst);
 			switch(type)
@@ -181,29 +181,29 @@ void TextureManager::ParseTexturesLump(int lumpNum)
 				case 0:
 					if(index > 63)
 						sc.ScriptMessage(Scanner::ERROR, "Can't assign map tile over 63.\n");
-					mapTiles[index] = sc.str;
+					mapTiles[index] = sc->str;
 					break;
 				case 1:
 				case 2:
 					if(index > 255)
 						sc.ScriptMessage(Scanner::ERROR, "Can't assign floor or ceiling tile over 255.\n");
-					flatTiles[index][type-1] = sc.str;
+					flatTiles[index][type-1] = sc->str;
 					break;
 			}
 		}
-		else if(sc.str.Compare("doortile") == 0)
+		else if(sc->str.Compare("doortile") == 0)
 		{
 			sc.MustGetToken(TK_IntConst);
-			int index = sc.number;
+			int index = sc->number;
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_StringConst);
-			doorTiles[index][0] = sc.str;
+			doorTiles[index][0] = sc->str;
 			sc.MustGetToken(',');
 			sc.MustGetToken(TK_StringConst);
-			doorTiles[index][1] = sc.str;
+			doorTiles[index][1] = sc->str;
 		}
 		else
-			sc.ScriptMessage(Scanner::ERROR, "Unkown property %s.\n", sc.str.GetChars());
+			sc.ScriptMessage(Scanner::ERROR, "Unkown property %s.\n", sc->str.GetChars());
 	}
 }
 

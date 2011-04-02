@@ -52,10 +52,20 @@ static const char* const TokenNames[TK_NumSpecialTokens] =
 	"Decrement",
 	"Pointer Member",
 	"Scope Resolution",
-	"Macro Concatenation"
+	"Macro Concatenation",
+	"Assign Sum",
+	"Assign Difference",
+	"Assign Product",
+	"Assign Quotient",
+	"Assign Modulus",
+	"Assign Left Shift",
+	"Assign Right Shift",
+	"Assign Bitwise And",
+	"Assign Bitwise Or",
+	"Assign Exclusive Or"
 };
 
-Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), logicalPosition(0), tokenLine(1), tokenLinePosition(0), scanPos(0), needNext(true)
+Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
 {
 	if(length == -1)
 		length = strlen(data);
@@ -205,26 +215,29 @@ bool Scanner::CheckToken(char token)
 
 void Scanner::ExpandState()
 {
+	scanPos = nextState.scanPos;
 	logicalPosition = scanPos;
 	CheckForWhitespace();
 
-	str = nextState.str;
-	number = nextState.number;
-	decimal = nextState.decimal;
-	boolean = nextState.boolean;
-	token = nextState.token;
-	tokenLine = nextState.tokenLine;
-	tokenLinePosition = nextState.tokenLinePosition;
+	prevState = state;
+	//printf("SC: %s\n", nextState.str.c_str());
+	state = nextState;
 }
 
 bool Scanner::GetNextString()
 {
+	nextState.tokenLine = line;
+	nextState.tokenLinePosition = scanPos - lineStart;
+	nextState.token = TK_NoToken;
+	scanPos = state.scanPos;
+	CheckForWhitespace();
 	if(scanPos >= length)
 		return false;
 
 	int start = scanPos;
 	int end = scanPos;
-	if(data[scanPos] == '"') // String Constant
+	bool quoted = data[scanPos] == '"';
+	if(quoted) // String Constant
 	{
 		end = ++start; // Remove starting quote
 		scanPos++;
@@ -266,8 +279,14 @@ bool Scanner::GetNextString()
 	}
 	if(end-start > 0)
 	{
+		nextState.scanPos = scanPos;
 		SCString thisString(data+start, end-start);
-		CheckForWhitespace();
+		if(quoted)
+			Unescape(thisString);
+		nextState.str = thisString;
+		nextState.token = TK_StringConst;
+		ExpandState();
+		needNext = true;
 		return true;
 	}
 	CheckForWhitespace();
@@ -334,10 +353,21 @@ bool Scanner::GetNextToken(bool expandState)
 				nextState.token = TK_AndAnd;
 			else if(cur == '|' && next == '|')
 				nextState.token = TK_OrOr;
-			else if(cur == '<' && next == '<')
-				nextState.token = TK_ShiftLeft;
-			else if(cur == '>' && next == '>')
-				nextState.token = TK_ShiftRight;
+			else if(
+				(cur == '<' && next == '<') ||
+				(cur == '>' && next == '>')
+			)
+			{
+				// Next for 3 character tokens
+				if(scanPos+1 > length && data[scanPos+1] == '=')
+				{
+					scanPos++;
+					nextState.token = cur == '<' ? TK_ShiftLeftEq : TK_ShiftRightEq;
+					
+				}
+				else
+					nextState.token = cur == '<' ? TK_ShiftLeft : TK_ShiftRight;
+			}
 			else if(cur == '#' && next == '#')
 				nextState.token = TK_MacroConcat;
 			else if(cur == ':' && next == ':')
@@ -366,6 +396,30 @@ bool Scanner::GetNextToken(bool expandState)
 						break;
 					case '<':
 						nextState.token = TK_LessEq;
+						break;
+					case '+':
+						nextState.token = TK_AddEq;
+						break;
+					case '-':
+						nextState.token = TK_SubEq;
+						break;
+					case '*':
+						nextState.token = TK_MulEq;
+						break;
+					case '/':
+						nextState.token = TK_DivEq;
+						break;
+					case '%':
+						nextState.token = TK_ModEq;
+						break;
+					case '&':
+						nextState.token = TK_AndEq;
+						break;
+					case '|':
+						nextState.token = TK_OrEq;
+						break;
+					case '^':
+						nextState.token = TK_XorEq;
 						break;
 					default:
 						break;
@@ -463,6 +517,7 @@ bool Scanner::GetNextToken(bool expandState)
 		}
 	}
 
+	nextState.scanPos = scanPos;
 	if(end-start > 0 || stringFinished)
 	{
 		nextState.str = SCString(data+start, end-start);
@@ -517,15 +572,23 @@ void Scanner::MustGetToken(char token)
 	if(!CheckToken(token))
 	{
 		ExpandState();
-		if(token < TK_NumSpecialTokens && this->token < TK_NumSpecialTokens)
-			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%s' instead.", TokenNames[token], TokenNames[this->token]);
-		else if(token < TK_NumSpecialTokens && this->token >= TK_NumSpecialTokens)
-			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%c' instead.", TokenNames[token], this->token);
-		else if(token >= TK_NumSpecialTokens && this->token < TK_NumSpecialTokens)
-			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%s' instead.", token, TokenNames[this->token]);
+		if(token < TK_NumSpecialTokens && state.token < TK_NumSpecialTokens)
+			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%s' instead.", TokenNames[token], TokenNames[state.token]);
+		else if(token < TK_NumSpecialTokens && state.token >= TK_NumSpecialTokens)
+			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%c' instead.", TokenNames[token], state.token);
+		else if(token >= TK_NumSpecialTokens && state.token < TK_NumSpecialTokens)
+			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%s' instead.", token, TokenNames[state.token]);
 		else
-			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%c' instead.", token, this->token);
+			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%c' instead.", token, state.token);
 	}
+}
+
+void Scanner::Rewind()
+{
+	needNext = false;
+	nextState = state;
+	state = prevState;
+	scanPos = state.scanPos;
 }
 
 void Scanner::ScriptMessage(MessageLevel level, const char* error, ...) const

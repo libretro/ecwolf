@@ -54,13 +54,13 @@ texture "BSTONEB", 128, 64
 	patch "BSTONEB2", 64, 0
 }
 
-texture "WOODEAGLE", 128, 64
+texture "WOODEAGL", 128, 64
 {
 	patch "WODEAGL1", 0, 0
 	patch "WODEAGL2", 64, 0
 }
 
-texture "WOODHITLR", 128, 64
+texture "WOODHTLR", 128, 64
 {
 	patch "WODHTLR1", 0, 0
 	patch "WODHTLR2", 64, 0
@@ -337,8 +337,8 @@ maptile 6, "GSTEAGLE"
 maptile 7, "BSTCELLB"
 maptile 8, "BSTONEA"
 maptile 9, "BSTONEB"
-maptile 10, "WOODEAGLE"
-maptile 11, "WOODHITLR"
+maptile 10, "WOODEAGL"
+maptile 11, "WOODHTLR"
 maptile 12, "WOOD"
 maptile 13, "FAKEDOOR"
 maptile 14, "METALSGN"

@@ -22,6 +22,8 @@
 #include "tiles.h"
 #include "c_cvars.h"
 #include "thingdef.h"
+#include "v_palette.h"
+#include "v_video.h"
 #include <SDL_syswm.h>
 
 // Wad Code Stuff
@@ -871,6 +873,7 @@ static void InitGame()
 	}
 #endif
 
+	GenerateLookupTables();
 	VH_Startup ();
 	IN_Startup ();
 	PM_Startup ();
@@ -1634,6 +1637,7 @@ int main (int argc, char *argv[])
 
 	printf("VL_ReadPalette: Setting up the Palette...\n");
 	VL_ReadPalette();
+	InitPalette("WOLFPAL");
 	printf("InitGame: Setting up the game...\n");
 	InitGame();
 	FinalReadConfig();

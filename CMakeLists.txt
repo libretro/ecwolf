@@ -7,6 +7,7 @@ set(LZMA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lzma/C")
 
 find_package(ZLIB)
 find_package(BZip2)
+find_package(JPEG)
 
 if(NOT ZLIB_FOUND)
 	set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib)
@@ -19,6 +20,13 @@ if(NOT BZIP2_FOUND)
 	add_subdirectory(bzip2)
 	set(BZIP2_LIBRARIES bz2)
 endif(NOT BZIP2_FOUND)
+
+if(NOT JPEG_FOUND)
+	set(JPEG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/jpeg-6b)
+	add_subdirectory(jpeg-6b)
+	set(JPEG_LIBRARIES jpeg)
+	set(JPEG_LIBRARY jpeg)
+endif(NOT JPEG_FOUND)
 
 add_subdirectory(tools/zipdir)
 add_subdirectory(wadsrc)

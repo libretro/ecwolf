@@ -47,15 +47,13 @@
 #include "m_crc32.h"
 #include "doomerrors.h"
 #include "resourcefiles/resourcefile.h"
+#include "zdoomsupport.h"
 
 // Work around missing defines for ECWolf
 #ifndef PATH_MAX
 #define PATH_MAX 260
 #endif
 #define TEXTCOLOR_RED
-#define I_Error printf
-#define I_FatalError(a) printf(a);exit(0);
-#define MakeKey(a) CalcCRC32((const BYTE*) a, strlen(a))
 
 // MACROS ------------------------------------------------------------------
 

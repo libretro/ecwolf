@@ -1,4 +1,5 @@
 #include "wl_def.h"
+#include "m_swap.h"
 #include "resourcefile.h"
 #include "w_wad.h"
 #include "lumpremap.h"
@@ -156,7 +157,7 @@ class FVGAGraph : public FResourceFile
 				lumps[i].noSkip = false;
 				lumps[i].isImage = (i >= 3 && i-3 < numPictures);
 				lumps[i].Namespace = lumps[i].isImage ? ns_graphics : ns_global;
-				lumps[i].position = READINT24(&data[i*3]);
+				lumps[i].position = ReadLittle24(&data[i*3]);
 				lumps[i].huffman = huffman;
 
 				// The actual length isn't stored so we need to go by the position of the following lump.
@@ -182,8 +183,8 @@ class FVGAGraph : public FResourceFile
 					dimensions = new Dimensions[numPictures];
 					for(int j = 0;j < numPictures;j++)
 					{
-						dimensions[j].width = READINT16(&out[j*4]);
-						dimensions[j].height = READINT16(&out[(j*4)+2]);
+						dimensions[j].width = ReadLittleShort(&out[j*4]);
+						dimensions[j].height = ReadLittleShort(&out[(j*4)+2]);
 					}
 				}
 				else if(lumps[i].isImage)

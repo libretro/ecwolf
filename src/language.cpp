@@ -27,12 +27,12 @@ void Language::ReadLump(int lump, const char* language)
 	bool noReplace = false;
 	while(sc.GetNextToken())
 	{
-		token = sc.token;
+		token = sc->token;
 		if(token == '[')
 		{
 			// match with language
 			sc.MustGetToken(TK_Identifier);
-			if(sc.str.Compare(language) != 0)
+			if(sc->str.Compare(language) != 0)
 				skip = true;
 			else
 			{
@@ -42,7 +42,7 @@ void Language::ReadLump(int lump, const char* language)
 
 			if(sc.CheckToken(TK_Identifier))
 			{
-				if(sc.str.Compare("default") == 0)
+				if(sc->str.Compare("default") == 0)
 				{
 					// if not the correct language, go in no replace mode.
 					if(skip)
@@ -53,7 +53,7 @@ void Language::ReadLump(int lump, const char* language)
 				}
 				else
 				{
-					printf("Unexpected identifier '%s'\n", sc.str.GetChars());
+					printf("Unexpected identifier '%s'\n", sc->str.GetChars());
 					exit(0);
 				}
 			}
@@ -62,13 +62,13 @@ void Language::ReadLump(int lump, const char* language)
 		}
 		else if(token == TK_Identifier)
 		{
-			FName index = sc.str;
+			FName index = sc->str;
 			sc.MustGetToken('=');
 			sc.MustGetToken(TK_StringConst);
 			if(!skip)
 			{
 				if(!noReplace || (noReplace && strings.CheckKey(index) == NULL))
-					strings[index] = sc.str;
+					strings[index] = sc->str;
 			}
 			sc.MustGetToken(';');
 		}

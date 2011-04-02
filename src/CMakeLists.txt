@@ -23,7 +23,7 @@ endif(SPEAR)
 
 find_package(SDL REQUIRED)
 find_package(SDL_mixer REQUIRED)
-include_directories(${SDLMIXER_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR})
+include_directories(${SDLMIXER_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDR_DIR})
 
 check_function_exists(stricmp STRICMP_EXISTS)
 check_function_exists(strnicmp STRNICMP_EXISTS)
@@ -56,6 +56,27 @@ add_executable(ecwolf
 	resourcefiles/file_vswap.cpp
 	resourcefiles/file_wad.cpp
 	resourcefiles/file_zip.cpp
+	sfmt/SFMT.cpp
+	textures/anim_switches.cpp
+	textures/animations.cpp
+	textures/automaptexture.cpp
+	textures/bitmap.cpp
+	#textures/buildtexture.cpp
+	textures/ddstexture.cpp
+	textures/emptytexture.cpp
+	textures/flattexture.cpp
+	textures/imgztexture.cpp
+	textures/jpegtexture.cpp
+	textures/multipatchtexture.cpp
+	textures/patchtexture.cpp
+	textures/pcxtexture.cpp
+	textures/pngtexture.cpp
+	textures/rawpagetexture.cpp
+	textures/texture.cpp
+	textures/texturemanager.cpp
+	textures/tgatexture.cpp
+	textures/warptexture.cpp
+	colormatcher.cpp
 	config.cpp
 	c_cvars.cpp
 	file.cpp
@@ -72,12 +93,17 @@ add_executable(ecwolf
 	language.cpp
 	lumpremap.cpp
 	m_classes.cpp
+	m_random.cpp
+	m_png.cpp
 	name.cpp
+	r_translate.cpp
 	scanner.cpp
 	sndinfo.cpp
-	tiles.cpp
+	#tiles.cpp
 	thingdef.cpp
 	thingdef_properties.cpp
+	v_palette.cpp
+	v_video.cpp
 	w_wad.cpp
 	wl_act1.cpp
 	wl_act2.cpp
@@ -102,5 +128,5 @@ add_executable(ecwolf
 )
 
 add_dependencies(ecwolf lzma gdtoa)
-target_link_libraries(ecwolf ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} lzma gdtoa)
+target_link_libraries(ecwolf ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
 set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})

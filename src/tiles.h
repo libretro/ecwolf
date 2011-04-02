@@ -1,6 +1,6 @@
 #ifndef __TILES_H__
 #define __TILES_H__
-
+#if 0
 #include <map>
 #include <string>
 #include "wl_def.h"
@@ -58,6 +58,8 @@ class TextureManager
 		FName					flatTiles[256][2]; // floor/ceiling
 };
 
-extern TextureManager TexMan;
+//extern TextureManager TexMan;
+#endif
+#include "textures/textures.h"
 
 #endif /* __TILES_H__ */

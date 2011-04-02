@@ -1238,7 +1238,7 @@ SD_StartMusic(const char* chunk)
 
 	if (MusicMode == smm_AdLib)
 	{
-		int lumpNum = Wads.CheckNumForName(chunk);
+		int lumpNum = Wads.CheckNumForName(chunk, ns_music);
 		if(lumpNum == -1)
 			return;
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);

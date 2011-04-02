@@ -35,9 +35,6 @@
 #define __M_ALLOC_H__
 
 #include <stdlib.h>
-
-#define M_Malloc(s) malloc(s)
-#define M_Realloc(p,s) realloc(p,s)
-#define M_Free(s) free(s)
+#include "zdoomsupport.h"
 
 #endif //__M_ALLOC_H__

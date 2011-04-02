@@ -125,19 +125,19 @@ void Config::ReadConfig()
 		while(sc.TokensLeft())  // Go until there is nothing left to read.
 		{
 			sc.MustGetToken(TK_Identifier);
-			FString index = sc.str;
+			FString index = sc->str;
 			sc.MustGetToken('=');
 			if(sc.CheckToken(TK_StringConst))
 			{
 				CreateSetting(index, "");
-				GetSetting(index)->SetValue(sc.str);
+				GetSetting(index)->SetValue(sc->str);
 			}
 			else
 			{
 				bool negative = sc.CheckToken('-');
 				sc.MustGetToken(TK_IntConst);
 				CreateSetting(index, 0);
-				GetSetting(index)->SetValue(negative ? -sc.number : sc.number);
+				GetSetting(index)->SetValue(negative ? -sc->number : sc->number);
 			}
 			sc.MustGetToken(';');
 		}

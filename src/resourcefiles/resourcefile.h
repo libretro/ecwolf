@@ -4,13 +4,13 @@
 #define __RESFILE_H
 
 #include "files.h"
+#include "zdoomsupport.h"
 
 #if defined(_MSC_VER) || defined(__WATCOMC__)
 #define STACK_ARGS __cdecl
 #else
 #define STACK_ARGS
 #endif
-#define Printf printf
 
 class FResourceFile;
 

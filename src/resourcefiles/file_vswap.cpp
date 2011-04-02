@@ -1,4 +1,5 @@
 #include "wl_def.h"
+#include "m_swap.h"
 #include "resourcefile.h"
 #include "w_wad.h"
 #include "lumpremap.h"
@@ -81,17 +82,17 @@ class FVSwap : public FResourceFile
 			if(!vswapReader.Open(vswapFile))
 				return false;
 
-			char header[6];
+			BYTE header[6];
 			vswapReader.Read(header, 6);
-			int numChunks = READINT16(&header[0]);
+			int numChunks = ReadLittleShort(&header[0]);
 
-			spriteStart = READINT16(&header[2]);
-			soundStart = READINT16(&header[4]);
+			spriteStart = ReadLittleShort(&header[2]);
+			soundStart = ReadLittleShort(&header[4]);
 
 			Lumps = new FUncompressedLump[soundStart];
 
 
-			char* data = new char[6*numChunks];
+			BYTE* data = new BYTE[6*numChunks];
 			vswapReader.Read(data, 6*numChunks);
 
 			for(unsigned int i = 0;i < soundStart;i++)
@@ -101,14 +102,14 @@ class FVSwap : public FResourceFile
 
 				Lumps[i].Owner = this;
 				Lumps[i].LumpNameSetup(lumpname);
-				Lumps[i].Namespace = i >= soundStart ? ns_sounds : (i >= spriteStart ? ns_sprites : ns_newtextures);
-				Lumps[i].Position = READINT32(&data[i*4]);
-				Lumps[i].LumpSize = READINT16(&data[i*2 + 4*numChunks]);
+				Lumps[i].Namespace = i >= soundStart ? ns_sounds : (i >= spriteStart ? ns_sprites : ns_flats);
+				Lumps[i].Position = ReadLittleLong(&data[i*4]);
+				Lumps[i].LumpSize = ReadLittleShort(&data[i*2 + 4*numChunks]);
 			}
 
 			// Now for sounds we need to get the last Chunk and read the sound information.
-			int soundMapOffset = READINT32(&data[(numChunks-1)*4]);
-			int soundMapSize = READINT16(&data[(numChunks-1)*2 + 4*numChunks]);
+			int soundMapOffset = ReadLittleLong(&data[(numChunks-1)*4]);
+			int soundMapSize = ReadLittleShort(&data[(numChunks-1)*2 + 4*numChunks]);
 			int numDigi = soundMapSize/4 - 1;
 			byte* soundMap = new byte[soundMapSize];
 			SoundLumps = new FVSwapSound*[numDigi];
@@ -116,8 +117,8 @@ class FVSwap : public FResourceFile
 			vswapReader.Read(soundMap, soundMapSize);
 			for(unsigned int i = 0;i < numDigi;i++)
 			{
-				int start = READINT16(&soundMap[i*4]);
-				int end = READINT16(&soundMap[i*4 + 4]);
+				int start = ReadLittleShort(&soundMap[i*4]);
+				int end = ReadLittleShort(&soundMap[i*4 + 4]);
 
 				if(start + soundStart > numChunks - 1)
 				{ // Read past end of chunks.
@@ -132,7 +133,7 @@ class FVSwap : public FResourceFile
 				SoundLumps[i]->LumpNameSetup(lumpname);
 				SoundLumps[i]->Namespace = ns_sounds;
 				for(unsigned int j = start;j < end && end + soundStart < numChunks;j++)
-					SoundLumps[i]->AddChunk(READINT32(&data[(soundStart+j)*4]), READINT16(&data[(soundStart+j)*2 + numChunks*4]));
+					SoundLumps[i]->AddChunk(ReadLittleLong(&data[(soundStart+j)*4]), ReadLittleShort(&data[(soundStart+j)*2 + numChunks*4]));
 			}
 
 			// Number of lumps is not the number of chunks, but the number of

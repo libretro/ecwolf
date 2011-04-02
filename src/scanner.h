@@ -50,6 +50,16 @@ enum
 	TK_PointerMember,	// ->
 	TK_ScopeResolution,	// ::
 	TK_MacroConcat,		// ##
+	TK_AddEq,			// +=
+	TK_SubEq,			// -=
+	TK_MulEq,			// *=
+	TK_DivEq,			// /=
+	TK_ModEq,			// %=
+	TK_ShiftLeftEq,		// <<=
+	TK_ShiftRightEq,	// >>=
+	TK_AndEq,			// &=
+	TK_OrEq,			// |=
+	TK_XorEq,			// ^=
 
 	TK_NumSpecialTokens,
 
@@ -59,6 +69,18 @@ enum
 class Scanner
 {
 	public:
+		struct ParserState
+		{
+			SCString		str;
+			unsigned int	number;
+			double			decimal;
+			bool			boolean;
+			char			token;
+			unsigned int	tokenLine;
+			unsigned int	tokenLinePosition;
+			unsigned int	scanPos;
+		};
+
 		enum MessageLevel
 		{
 			ERROR,
@@ -74,42 +96,32 @@ class Scanner
 		bool			CheckToken(char token);
 		void			ExpandState();
 		const char*		GetData() const { return data; }
-		int				GetLine() const { return tokenLine; }
-		int				GetLinePos() const { return tokenLinePosition; }
+		int				GetLine() const { return state.tokenLine; }
+		int				GetLinePos() const { return state.tokenLinePosition; }
 		int				GetPos() const { return logicalPosition; }
 		unsigned int	GetScanPos() const { return scanPos; }
 		bool			GetNextString();
 		bool			GetNextToken(bool expandState=true);
 		void			MustGetToken(char token);
+		void			Rewind(); /// Only can rewind one step.z
 		void			ScriptMessage(MessageLevel level, const char* error, ...) const;
 		void			SetScriptIdentifier(const SCString &ident) { scriptIdentifier = ident; }
 		int				SkipLine();
 		bool			TokensLeft() const;
+		const ParserState &operator*() const { return state; }
+		const ParserState *operator->() const { return &state; }
 
 		static const SCString	&Escape(SCString &str);
 		static const SCString	Escape(const char *str);
 		static const SCString	&Unescape(SCString &str);
 
-		SCString		str;
-		unsigned int	number;
-		double			decimal;
-		bool			boolean;
-		char			token;
+		ParserState		state;
 
 	protected:
 		void	IncrementLine();
 
 	private:
-		struct ParserState
-		{
-			SCString		str;
-			unsigned int	number;
-			double			decimal;
-			bool			boolean;
-			char			token;
-			unsigned int	tokenLine;
-			unsigned int	tokenLinePosition;
-		}				nextState;
+		ParserState		nextState, prevState;
 
 		char*			data;
 		unsigned int	length;
@@ -117,8 +129,6 @@ class Scanner
 		unsigned int	line;
 		unsigned int	lineStart;
 		unsigned int	logicalPosition;
-		unsigned int	tokenLine;
-		unsigned int	tokenLinePosition;
 		unsigned int	scanPos;
 
 		bool			needNext; // If checkToken returns false this will be false.

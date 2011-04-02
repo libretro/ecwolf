@@ -53,13 +53,13 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 					if (curtoptex != lasttoptex)
 					{
 						lasttoptex = curtoptex;
-						toptex = TexMan.GetFlat(curtoptex, true)->GetPost(0);
+						toptex = TexMan(TexMan.GetFlat(curtoptex, true))->GetPixels();
 					}
 					unsigned curbottex = curtex & 0xff;
 					if (curbottex != lastbottex)
 					{
 						lastbottex = curbottex;
-						bottex = TexMan.GetFlat(curbottex, false)->GetPost(0);
+						bottex = TexMan(TexMan.GetFlat(curbottex, false))->GetPixels();
 					}
 					u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);

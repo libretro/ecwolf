@@ -32,6 +32,9 @@
 **
 */
 
+#ifndef __M_CRC32__
+#define __M_CRC32__
+
 #include <zlib.h>
 #include "wl_def.h"
 
@@ -50,3 +53,5 @@ inline DWORD CRC1 (DWORD crc, const BYTE c, const DWORD *crcTable)
 {
 	return crcTable[(crc & 0xff) ^ c] ^ (crc >> 8);
 }
+
+#endif

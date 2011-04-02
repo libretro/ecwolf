@@ -54,20 +54,28 @@ void LumpRemaper::DoRemap()
 					{
 						if(i < sounds.Size())
 							lump->LumpNameSetup(sounds[i]);
+						lump->Namespace = ns_sounds;
 						temp++;
 					}
 					else if(lump->Namespace == ns_music && i-temp < music.Size())
+					{
 						lump->LumpNameSetup(music[i-temp]);
+						lump->Namespace = ns_music;
+					}
 					break;
 				case VGAGRAPH:
 					if(i < graphics.Size())
+					{
 						lump->LumpNameSetup(graphics[i]);
+					//	lump->Namespace = ns_graphics;
+					}
 					break;
 				case VSWAP:
-					if(lump->Namespace == ns_newtextures)
+					if(lump->Namespace == ns_flats)
 					{
 						if(i < textures.Size())
 							lump->LumpNameSetup(textures[i]);
+						lump->Namespace = ns_flats;
 						temp++;
 						temp2++;
 					}
@@ -75,11 +83,13 @@ void LumpRemaper::DoRemap()
 					{
 						if(i-temp < sprites.Size())
 							lump->LumpNameSetup(sprites[i-temp]);
+						lump->Namespace = ns_sprites;
 						temp2++;
 					}
 					else if(lump->Namespace == ns_sounds && i-temp2 < digitalsounds.Size())
 					{
 						lump->LumpNameSetup(digitalsounds[i-temp2]);
+						lump->Namespace = ns_sounds;
 					}
 					break;
 				default:
@@ -111,26 +121,26 @@ bool LumpRemaper::LoadMap()
 
 		TMap<int, FName> *reverse = NULL;
 		TArray<FName> *map = NULL;
-		if(sc.str.Compare("graphics") == 0)
+		if(sc->str.Compare("graphics") == 0)
 		{
 			reverse = &vgaReverseMap;
 			map = &graphics;
 		}
-		else if(sc.str.Compare("sprites") == 0)
+		else if(sc->str.Compare("sprites") == 0)
 			map = &sprites;
-		else if(sc.str.Compare("sounds") == 0)
+		else if(sc->str.Compare("sounds") == 0)
 			map = &sounds;
-		else if(sc.str.Compare("digitalsounds") == 0)
+		else if(sc->str.Compare("digitalsounds") == 0)
 			map = &digitalsounds;
-		else if(sc.str.Compare("music") == 0)
+		else if(sc->str.Compare("music") == 0)
 		{
 			reverse = &musicReverseMap;
 			map = &music;
 		}
-		else if(sc.str.Compare("textures") == 0)
+		else if(sc->str.Compare("textures") == 0)
 			map = &textures;
 		else
-			sc.ScriptMessage(Scanner::ERROR, "Unknown map section '%s'.\n", sc.str.GetChars());
+			sc.ScriptMessage(Scanner::ERROR, "Unknown map section '%s'.\n", sc->str.GetChars());
 
 		if(!sc.CheckToken('{'))
 			sc.ScriptMessage(Scanner::ERROR, "Expected '{'.");
@@ -142,8 +152,8 @@ bool LumpRemaper::LoadMap()
 				if(!sc.CheckToken(TK_StringConst))
 					sc.ScriptMessage(Scanner::ERROR, "Expected string constant.\n");
 				if(reverse != NULL)
-					(*reverse)[i++] = sc.str;
-				map->Push(sc.str);
+					(*reverse)[i++] = sc->str;
+				map->Push(sc->str);
 				if(sc.CheckToken('}'))
 					break;
 				if(!sc.CheckToken(','))

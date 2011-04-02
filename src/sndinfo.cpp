@@ -1,4 +1,5 @@
 #include "wl_def.h"
+#include "m_swap.h"
 #include "id_sd.h"
 #include "w_wad.h"
 #include "scanner.h"
@@ -84,7 +85,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 	{
 		if(!sc.GetNextString())
 			sc.ScriptMessage(Scanner::ERROR, "Expected logical name.\n");
-		FName logicalName = sc.str;
+		FName logicalName = sc->str;
 
 		SoundIndex idx;
 		bool hasAlternatives = false;
@@ -103,9 +104,9 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 					break;
 			}
 
-			if(sc.str.Compare("NULL") == 0)
+			if(sc->str.Compare("NULL") == 0)
 				continue;
-			int sndLump = Wads.CheckNumForName(sc.str);
+			int sndLump = Wads.CheckNumForName(sc->str, ns_sounds);
 			if(sndLump == -1)
 				continue;
 
@@ -120,7 +121,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 				soundReader.Read(idx.data[i], Wads.LumpLength(sndLump));
 
 				if(i == 1 || idx.lump[1] == -1)
-					idx.priority = READINT16(&idx.data[i][4]);
+					idx.priority = ReadLittleShort(&idx.data[i][4]);
 
 				if(i == 2 && !sc.CheckToken('}'))
 					sc.ScriptMessage(Scanner::ERROR, "Expected '}'.\n");
