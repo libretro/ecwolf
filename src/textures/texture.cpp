@@ -77,6 +77,7 @@ FTexture *FlatTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *PatchTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *EmptyTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *AutomapTexture_TryCreate(FileReader &, int lumpnum);
+FTexture *WolfShapeTexture_TryCreate(FileReader &, int lumpnum);
 
 
 // Examines the lump contents to decide what type of texture to create,
@@ -93,6 +94,7 @@ FTexture * FTexture::CreateTexture (int lumpnum, int usetype)
 		{ RawPageTexture_TryCreate,		TEX_MiscPatch },
 		{ FlatTexture_TryCreate,		TEX_Flat },
 		{ PatchTexture_TryCreate,		TEX_Any },
+		{ WolfShapeTexture_TryCreate,	TEX_Any },
 		{ EmptyTexture_TryCreate,		TEX_Any },
 		{ AutomapTexture_TryCreate,		TEX_MiscPatch },
 	};
