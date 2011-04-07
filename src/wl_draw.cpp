@@ -7,7 +7,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
-#include "tiles.h"
+#include "textures/textures.h"
 #include "c_cvars.h"
 
 #include "wl_cloudsky.h"

@@ -19,7 +19,7 @@
 #include "config.hpp"
 #include "w_wad.h"
 #include "language.h"
-#include "tiles.h"
+#include "textures/textures.h"
 #include "c_cvars.h"
 #include "thingdef.h"
 #include "v_palette.h"
