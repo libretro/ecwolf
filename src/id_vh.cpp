@@ -22,7 +22,7 @@ void VWB_DrawPropString(const char* string)
 	byte	    ch;
 
 	const char* fonts[2] = { "FONT1", "FONT2" };
-	int lumpNum = Wads.CheckNumForName(fonts[fontnumber]);
+	int lumpNum = Wads.CheckNumForName(fonts[fontnumber], ns_graphics);
 	if(lumpNum == -1)
 		return;
 	FWadLump lump = Wads.OpenLumpNum(lumpNum);
@@ -117,7 +117,7 @@ void VWL_MeasureString (const char *string, word *width, word *height, fontstruc
 void VW_MeasurePropString (const char *string, word *width, word *height)
 {
 	const char* fonts[2] = { "FONT1", "FONT2" };
-	int lumpNum = Wads.CheckNumForName(fonts[fontnumber]);
+	int lumpNum = Wads.CheckNumForName(fonts[fontnumber], ns_graphics);
 	if(lumpNum == -1)
 		return;
 	FWadLump lump = Wads.OpenLumpNum(lumpNum);
@@ -157,7 +157,7 @@ void VWB_DrawTile8 (int x, int y, int tile)
 
 void VWB_DrawPic(int x, int y, const char* chunk, bool scaledCoord)
 {
-	int lumpNum = Wads.CheckNumForName(chunk);
+	int lumpNum = Wads.CheckNumForName(chunk, ns_graphics);
 	if(lumpNum == -1)
 		return;
 	FWadLump lump = Wads.OpenLumpNum(lumpNum);
@@ -263,7 +263,7 @@ void LoadLatchMem (void)
 	SDL_SetColors(surf, gamepal, 0, 256);
 
 	latchpics[0] = surf;
-	int lumpNum = Wads.GetNumForName("TILE8");
+	int lumpNum = Wads.GetNumForName("TILE8", ns_graphics);
 	if(lumpNum == -1)
 	{
 		printf("\n");

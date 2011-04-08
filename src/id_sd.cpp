@@ -1264,7 +1264,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 	if (MusicMode == smm_AdLib)
 	{
 		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
-			int lumpNum = Wads.CheckNumForName(chunk);
+			int lumpNum = Wads.CheckNumForName(chunk, ns_music);
 			if(lumpNum == -1)
 				return;
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);

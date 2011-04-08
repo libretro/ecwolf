@@ -768,7 +768,7 @@ void HelpScreens (void)
 	MM_SortMem ();
 #else
 
-	int lumpNum = Wads.CheckNumForName("HELPART");
+	int lumpNum = Wads.CheckNumForName("HELPART", ns_graphics);
 	if(lumpNum != -1)
 	{
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);
@@ -811,7 +811,7 @@ void EndText (void)
 
 	char lumpName[9];
 	sprintf(lumpName, "ENDART%d", gamestate.episode+1);
-	int lumpNum = Wads.CheckNumForName(lumpName);
+	int lumpNum = Wads.CheckNumForName(lumpName, ns_graphics);
 	if(lumpNum != -1)
 	{
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);

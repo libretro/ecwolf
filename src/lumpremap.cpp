@@ -101,7 +101,7 @@ void LumpRemaper::DoRemap()
 					if(i < graphics.Size())
 					{
 						lump->LumpNameSetup(graphics[i]);
-					//	lump->Namespace = ns_graphics;
+						lump->Namespace = ns_graphics;
 					}
 					break;
 				case VSWAP:

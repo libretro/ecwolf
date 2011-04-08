@@ -543,7 +543,7 @@ void
 US_ControlPanel (ScanCode scancode)
 {
 	int which;
-	bool idEasterEgg = Wads.CheckNumForName("IDGUYS1") != -1;
+	bool idEasterEgg = Wads.CheckNumForName("IDGUYS1", ns_graphics) != -1;
 
 	if (ingame)
 	{
@@ -1035,10 +1035,10 @@ IntroScreen (void)
 void
 ClearMScreen (void)
 {
-	if(Wads.CheckNumForName("BACKDROP") == -1)
+	if(Wads.CheckNumForName("BACKDROP", ns_graphics) == -1)
 		VWB_Bar (0, 0, 320, 200, BORDCOLOR);
 	else
-		VWB_DrawPic (0, 0, "BACKDROP");
+		VWB_DrawPic (0, 0, "BACKDROP", ns_graphics);
 }
 
 
@@ -1440,7 +1440,7 @@ Message (const char *string)
 	fontstruct *font;
 
 	fontnumber = 1;
-	int lumpNum = Wads.CheckNumForName("FONT2");
+	int lumpNum = Wads.CheckNumForName("FONT2", ns_graphics);
 	if(lumpNum == -1)
 		return;
 	FWadLump lump = Wads.OpenLumpNum(lumpNum);
