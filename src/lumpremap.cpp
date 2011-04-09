@@ -147,6 +147,7 @@ bool LumpRemaper::LoadMap()
 	char* mapData = new char[Wads.LumpLength(lump)];
 	mapLump.Read(mapData, Wads.LumpLength(lump));
 	Scanner sc(mapData, Wads.LumpLength(lump));
+	sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
 
 	while(sc.TokensLeft() > 0)
 	{

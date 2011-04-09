@@ -220,7 +220,6 @@ void Scanner::ExpandState()
 	CheckForWhitespace();
 
 	prevState = state;
-	//printf("SC: %s\n", nextState.str.c_str());
 	state = nextState;
 }
 
@@ -436,6 +435,9 @@ bool Scanner::GetNextToken(bool expandState)
 
 	if(start == end)
 	{
+		// Handle small tokens at the end of a file.
+		if(scanPos == length)
+			end = scanPos;
 		while(scanPos < length)
 		{
 			cur = data[scanPos];

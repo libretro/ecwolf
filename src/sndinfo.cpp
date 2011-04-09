@@ -113,6 +113,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 	lump.Read(data, Wads.LumpLength(lumpNum));
 
 	Scanner sc(data, Wads.LumpLength(lumpNum));
+	sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpNum));
 	delete[] data;
 
 	while(sc.TokensLeft() != 0)

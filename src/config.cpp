@@ -122,6 +122,7 @@ void Config::ReadConfig()
 		stream.close();
 
 		Scanner sc(data, size);
+		sc.SetScriptIdentifier("Configuration");
 		while(sc.TokensLeft())  // Go until there is nothing left to read.
 		{
 			sc.MustGetToken(TK_Identifier);

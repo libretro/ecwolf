@@ -401,6 +401,7 @@ void FRemapTable::AddToTranslation(const char * range)
 	int start,end;
 	bool desaturated = false;
 	Scanner sc(range, int(strlen(range)));
+	sc.SetScriptIdentifier("Translation");
 
 	try
 	{

@@ -594,6 +594,7 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 		{
 			FMemLump lmp = Wads.ReadLump(remapLump);
 			Scanner sc((const char*)lmp.GetMem(), lmp.GetSize());
+			sc.SetScriptIdentifier(Wads.GetLumpFullName(remapLump));
 			while (sc.CheckToken(TK_Identifier))
 			{
 				/*if (sc.Compare("remap")) // remap an existing texture

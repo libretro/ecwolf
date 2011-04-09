@@ -403,6 +403,7 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 	char* data = new char[Wads.LumpLength(lumpNum)];
 	lump.Read(data, Wads.LumpLength(lumpNum));
 	Scanner sc(data, Wads.LumpLength(lumpNum));
+	sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpNum));
 
 	while(sc.TokensLeft())
 	{
