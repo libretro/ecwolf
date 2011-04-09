@@ -301,7 +301,7 @@ void FTextureManager::InitAnimDefs ()
 			}
 			else
 			{
-				sc.ScriptMessage (Scanner::ERROR, NULL);
+				sc.ScriptMessage (Scanner::ERROR, "");
 			}
 		}
 	}

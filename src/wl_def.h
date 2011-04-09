@@ -181,7 +181,8 @@ void Quit(const char *errorStr, ...);
 
 #define ANGLES          360             // must be divisable by 4
 #define ANGLEQUAD       (ANGLES/4)
-#define FINEANGLES      3600
+#define FINEANGLES      8192
+#define FINEMASK        (FINEANGLES-1)
 #define ANG90           (FINEANGLES/4)
 #define ANG180          (ANG90*2)
 #define ANG270          (ANG90*3)
@@ -1142,6 +1143,7 @@ int DebugKeys (void);
 extern  short *pixelangle;
 extern  int32_t finetangent[FINEANGLES/4];
 extern  fixed sintable[];
+extern  fixed finesine[FINEANGLES];
 extern  fixed *costable;
 extern  int *wallheight;
 extern  word horizwall[],vertwall[];

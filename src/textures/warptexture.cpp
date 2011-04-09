@@ -76,12 +76,12 @@ void FWarpTexture::Unload ()
 
 bool FWarpTexture::CheckModified ()
 {
-	return gamestate.TimeCount/2 != GenTime;
+	return gamestate.TimeCount != GenTime;
 }
 
 const BYTE *FWarpTexture::GetPixels ()
 {
-	DWORD time = gamestate.TimeCount/2;
+	DWORD time = gamestate.TimeCount;
 
 	if (Pixels == NULL || time != GenTime)
 	{
@@ -92,7 +92,7 @@ const BYTE *FWarpTexture::GetPixels ()
 
 const BYTE *FWarpTexture::GetColumn (unsigned int column, const Span **spans_out)
 {
-	DWORD time = gamestate.TimeCount/2;
+	DWORD time = gamestate.TimeCount*14;
 
 	if (Pixels == NULL || time != GenTime)
 	{
@@ -149,7 +149,7 @@ void FWarpTexture::MakeTexture (DWORD time)
 		ybits--;
 	}
 
-	/*DWORD timebase = DWORD(time * Speed * 32 / 28);
+	DWORD timebase = DWORD(time * Speed * 32 / 28);
 	for (y = ysize-1; y >= 0; y--)
 	{
 		int xt, xf = (finesine[(timebase+y*128)&FINEMASK]>>13) & xmask;
@@ -167,7 +167,7 @@ void FWarpTexture::MakeTexture (DWORD time)
 		for (yt = ysize; yt; yt--, yf = (yf+1)&ymask)
 			*dest++ = source[yf];
 		memcpy (Pixels+(x<<ybits), buffer, ysize);
-	}*/
+	}
 }
 
 // [GRB] Eternity-like warping
@@ -211,13 +211,13 @@ void FWarp2Texture::MakeTexture (DWORD time)
 		BYTE *dest = Pixels + (x << ybits);
 		for (y = 0; y < ysize; ++y)
 		{
-			/*int xt = (x + 128
+			int xt = (x + 128
 				+ ((finesine[(y*128 + timebase*5 + 900) & FINEMASK]*2)>>FRACBITS)
 				+ ((finesine[(x*256 + timebase*4 + 300) & FINEMASK]*2)>>FRACBITS)) & xmask;
 			int yt = (y + 128
 				+ ((finesine[(y*128 + timebase*3 + 700) & FINEMASK]*2)>>FRACBITS)
 				+ ((finesine[(x*256 + timebase*4 + 1200) & FINEMASK]*2)>>FRACBITS)) & ymask;
-			*dest++ = otherpix[(xt << ybits) + yt];*/
+			*dest++ = otherpix[(xt << ybits) + yt];
 		}
 	}
 }

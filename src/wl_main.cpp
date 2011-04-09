@@ -575,6 +575,13 @@ void BuildTables (void)
 		sintable[ANGLES-i]=sintable[ANGLES/2+i]=-value;
 		angle+=anglestep;
 	}
+	angle = 0;
+	anglestep = (float)(PI/2/ANG90);
+	for(i=0; i<FINEANGLES; i++)
+	{
+		finesine[i]=fixed(GLOBAL1*sin(angle));
+		angle+=anglestep;
+	}
 	sintable[ANGLEQUAD] = 65536;
 	sintable[3*ANGLEQUAD] = -65536;
 

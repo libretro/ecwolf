@@ -63,6 +63,7 @@ int min_wallheight;
 short *pixelangle;
 int32_t finetangent[FINEANGLES/4];
 fixed sintable[ANGLES+ANGLES/4];
+fixed finesine[FINEANGLES];
 fixed *costable = sintable+(ANGLES/4);
 
 //
@@ -96,7 +97,8 @@ int     lasttexture;
 short    focaltx,focalty,viewtx,viewty;
 longword xpartialup,xpartialdown,ypartialup,ypartialdown;
 
-short   midangle,angle;
+float   midangle;
+short   angle;
 
 byte	hitdir;
 word    tilehit;
@@ -1098,40 +1100,40 @@ void AsmRefresh()
 	{
 		short angl=midangle+pixelangle[pixx];
 		if(angl<0) angl+=FINEANGLES;
-		if(angl>=3600) angl-=FINEANGLES;
-		if(angl<900)
+		if(angl>=ANG360) angl-=FINEANGLES;
+		if(angl<ANG90)
 		{
 			xtilestep=1;
 			ytilestep=-1;
-			xstep=finetangent[900-1-angl];
+			xstep=finetangent[ANG90-1-angl];
 			ystep=-finetangent[angl];
 			xpartial=xpartialup;
 			ypartial=ypartialdown;
 		}
-		else if(angl<1800)
+		else if(angl<ANG180)
 		{
 			xtilestep=-1;
 			ytilestep=-1;
-			xstep=-finetangent[angl-900];
-			ystep=-finetangent[1800-1-angl];
+			xstep=-finetangent[angl-ANG90];
+			ystep=-finetangent[ANG180-1-angl];
 			xpartial=xpartialdown;
 			ypartial=ypartialdown;
 		}
-		else if(angl<2700)
+		else if(angl<ANG270)
 		{
 			xtilestep=-1;
 			ytilestep=1;
-			xstep=-finetangent[2700-1-angl];
-			ystep=finetangent[angl-1800];
+			xstep=-finetangent[ANG270-1-angl];
+			ystep=finetangent[angl-ANG180];
 			xpartial=xpartialdown;
 			ypartial=ypartialup;
 		}
-		else if(angl<3600)
+		else if(angl<ANG360)
 		{
 			xtilestep=1;
 			ytilestep=1;
-			xstep=finetangent[angl-2700];
-			ystep=finetangent[3600-1-angl];
+			xstep=finetangent[angl-ANG270];
+			ystep=finetangent[ANG360-1-angl];
 			xpartial=xpartialup;
 			ypartial=ypartialup;
 		}
@@ -1499,7 +1501,7 @@ void WallRefresh (void)
 void CalcViewVariables()
 {
 	viewangle = player->angle;
-	midangle = viewangle*(FINEANGLES/ANGLES);
+	midangle = float(viewangle)*(float(FINEANGLES)/float(ANGLES));
 	viewsin = sintable[viewangle];
 	viewcos = costable[viewangle];
 	viewx = player->x - FixedMul(focallength,viewcos);

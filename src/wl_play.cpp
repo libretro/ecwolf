@@ -12,6 +12,7 @@
 #include "language.h"
 #include "lumpremap.h"
 #include "thingdef.h"
+#include "textures/textures.h"
 
 /*
 =============================================================================
@@ -1311,6 +1312,7 @@ void PlayLoop (void)
 #endif
 
 		gamestate.TimeCount += tics;
+		TexMan.UpdateAnimations(gamestate.TimeCount*14);
 
 		UpdateSoundLoc ();      // JAB
 		if (screenfaded)
