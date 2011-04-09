@@ -220,6 +220,7 @@ void FWolfShapeTexture::MakeTexture ()
 	const BYTE* data = (const BYTE*)lump.GetMem();
 
 	Pixels = new BYTE[Width*Height];
+	memset(Pixels, 0, Width*Height);
 
 	for(int x = 0;x < Width;x++)
 	{
