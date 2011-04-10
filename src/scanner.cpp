@@ -591,6 +591,9 @@ void Scanner::Rewind()
 	nextState = state;
 	state = prevState;
 	scanPos = state.scanPos;
+
+	line = prevState.tokenLine;
+	logicalPosition = prevState.tokenLinePosition;
 }
 
 void Scanner::ScriptMessage(MessageLevel level, const char* error, ...) const

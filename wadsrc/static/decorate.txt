@@ -70,7 +70,7 @@ actor Puddle
 	states
 	{
 		Spawn:
-			STAT A -1
+			WATR A -1
 			stop
 	}
 }
@@ -80,7 +80,7 @@ actor GreenBarrel
 	states
 	{
 		Spawn:
-			STAT B -1
+			DRUM A -1
 			stop
 	}
 }
@@ -90,7 +90,7 @@ actor TableWithChairs
 	states
 	{
 		Spawn:
-			STAT C -1
+			TCHR A -1
 			stop
 	}
 }
@@ -101,7 +101,7 @@ actor FloorLamp
 	states
 	{
 		Spawn:
-			STAT D -1
+			FLMP A -1
 			stop
 	}
 }
@@ -112,7 +112,7 @@ actor Chandelier
 	states
 	{
 		Spawn:
-			STAT E -1
+			CHAN A -1
 			stop
 	}
 }
@@ -122,7 +122,7 @@ actor HangedMan
 	states
 	{
 		Spawn:
-			STAT F -1
+			HANG A -1
 			stop
 	}
 }
@@ -132,7 +132,7 @@ actor BadFood
 	states
 	{
 		Spawn:
-			STAT G -1
+			ALPO A -1
 			stop
 	}
 }
@@ -142,7 +142,7 @@ actor RedPillar
 	states
 	{
 		Spawn:
-			STAT H -1
+			COLU A -1
 			stop
 	}
 }
@@ -152,7 +152,7 @@ actor Tree
 	states
 	{
 		Spawn:
-			STAT I -1
+			PLNT A -1
 			stop
 	}
 }
@@ -162,7 +162,7 @@ actor SkeletonFlat
 	states
 	{
 		Spawn:
-			STAT J -1
+			SKEL A -1
 			stop
 	}
 }
@@ -172,7 +172,7 @@ actor Sink
 	states
 	{
 		Spawn:
-			STAT K -1
+			SINK A -1
 			stop
 	}
 }
@@ -182,7 +182,7 @@ actor PottedPlant
 	states
 	{
 		Spawn:
-			STAT L -1
+			BPNT A -1
 			stop
 	}
 }
@@ -192,7 +192,7 @@ actor Urn
 	states
 	{
 		Spawn:
-			STAT M -1
+			VASE A -1
 			stop
 	}
 }
@@ -202,7 +202,7 @@ actor BareTable
 	states
 	{
 		Spawn:
-			STAT N -1
+			TABL A -1
 			stop
 	}
 }
@@ -212,7 +212,7 @@ actor CeilingLight
 	states
 	{
 		Spawn:
-			STAT O -1
+			GLMP A -1
 			stop
 	}
 }
@@ -222,7 +222,7 @@ actor KitchenStuff
 	states
 	{
 		Spawn:
-			STAT P -1
+			POT1 A -1
 			stop
 	}
 }
@@ -232,7 +232,7 @@ actor SuitOfArmor
 	states
 	{
 		Spawn:
-			STAT Q -1
+			ARMR A -1
 			stop
 	}
 }
@@ -242,7 +242,7 @@ actor HangingCage
 	states
 	{
 		Spawn:
-			STAT R -1
+			CAG1 A -1
 			stop
 	}
 }
@@ -252,7 +252,7 @@ actor GoldKey
 	states
 	{
 		Spawn:
-			STAT S -1
+			GKEY A -1
 			stop
 	}
 }
@@ -262,7 +262,7 @@ actor SilverKey
 	states
 	{
 		Spawn:
-			STAT T -1
+			SKEY A -1
 			stop
 	}
 }
@@ -272,7 +272,7 @@ actor Stuff1
 	states
 	{
 		Spawn:
-			STAT U -1
+			BUNK A -1
 			stop
 	}
 }
@@ -282,7 +282,7 @@ actor Stuff2
 	states
 	{
 		Spawn:
-			STAT V -1
+			BASK A -1
 			stop
 	}
 }
@@ -292,7 +292,7 @@ actor GoodFood
 	states
 	{
 		Spawn:
-			STAT W -1
+			FOOD A -1
 			stop
 	}
 }
@@ -302,7 +302,7 @@ actor Clip
 	states
 	{
 		Spawn:
-			STAT X -1
+			CLIP A -1
 			stop
 	}
 }
@@ -312,7 +312,7 @@ actor MachineGun
 	states
 	{
 		Spawn:
-			STAT Y -1
+			MGUN A -1
 			stop
 	}
 }
@@ -322,7 +322,7 @@ actor GatlingGun
 	states
 	{
 		Spawn:
-			STAT Z -1
+			CGUN A -1
 			stop
 	}
 }
@@ -332,7 +332,7 @@ actor Cross
 	states
 	{
 		Spawn:
-			STAT "[" -1
+			CROS A -1
 			stop
 	}
 }
@@ -342,7 +342,7 @@ actor Chalice
 	states
 	{
 		Spawn:
-			STAT "/" -1
+			CHAL A -1
 			stop
 	}
 }
@@ -352,7 +352,7 @@ actor Bible
 	states
 	{
 		Spawn:
-			STAT "]" -1
+			JEWL A -1
 			stop
 	}
 }
@@ -362,7 +362,7 @@ actor Crown
 	states
 	{
 		Spawn:
-			STT2 A -1
+			CRWN A -1
 			stop
 	}
 }
@@ -372,7 +372,7 @@ actor OneUp
 	states
 	{
 		Spawn:
-			STT2 B -1
+			ONUP A -1
 			stop
 	}
 }
@@ -382,7 +382,7 @@ actor Gibs
 	states
 	{
 		Spawn:
-			STT2 C -1
+			GIBS A -1
 			stop
 	}
 }
@@ -392,7 +392,7 @@ actor Barrel
 	states
 	{
 		Spawn:
-			STT2 D -1
+			BARL A -1
 			stop
 	}
 }
@@ -402,7 +402,7 @@ actor Well
 	states
 	{
 		Spawn:
-			STT2 E -1
+			WEL1 A -1
 			stop
 	}
 }
@@ -412,7 +412,7 @@ actor EmptyWell
 	states
 	{
 		Spawn:
-			STT2 F -1
+			WEL2 A -1
 			stop
 	}
 }
@@ -422,7 +422,7 @@ actor Gibs2
 	states
 	{
 		Spawn:
-			STT2 G -1
+			BLUD A -1
 			stop
 	}
 }
@@ -432,7 +432,7 @@ actor Flag
 	states
 	{
 		Spawn:
-			STT2 H -1
+			FLAG A -1
 			stop
 	}
 }
@@ -442,7 +442,7 @@ actor CallApogee
 	states
 	{
 		Spawn:
-			STT2 I -1
+			AARD A -1
 			stop
 	}
 }
@@ -452,7 +452,7 @@ actor Junk1
 	states
 	{
 		Spawn:
-			STT2 J -1
+			BON1 A -1
 			stop
 	}
 }
@@ -462,7 +462,7 @@ actor Junk2
 	states
 	{
 		Spawn:
-			STT2 K -1
+			BON2 A -1
 			stop
 	}
 }
@@ -472,7 +472,7 @@ actor Junk3
 	states
 	{
 		Spawn:
-			STT2 L -1
+			BON3 A -1
 			stop
 	}
 }
@@ -482,7 +482,7 @@ actor Pots
 	states
 	{
 		Spawn:
-			STT2 M -1
+			POT2 A -1
 			stop
 	}
 }
@@ -492,7 +492,7 @@ actor Stove
 	states
 	{
 		Spawn:
-			STT2 N -1
+			STOV A -1
 			stop
 	}
 }
@@ -502,7 +502,7 @@ actor Spears
 	states
 	{
 		Spawn:
-			STT2 P -1
+			RACK A -1
 			stop
 	}
 }
@@ -512,7 +512,7 @@ actor Vines
 	states
 	{
 		Spawn:
-			STT2 Q -1
+			VINE A -1
 			stop
 	}
 }
@@ -560,39 +560,39 @@ actor Guard
 	states
 	{
 		Spawn:
-			GRD0 A -1 T_Stand
+			GARD A -1 T_Stand
 			goto Spawn
 		Path:
-			GRD0 B 10 T_Path
-			GRD0 B 2.5
-			GRD0 C 7.5 T_Path
-			GRD0 D 10 T_Path
-			GRD0 D 2.5
-			GRD0 E 7.5 T_Path
+			GARD B 10 T_Path
+			GARD B 2.5
+			GARD C 7.5 T_Path
+			GARD D 10 T_Path
+			GARD D 2.5
+			GARD E 7.5 T_Path
 			loop
 		See:
-			GRD0 B 5 T_Chase
-			GRD0 B 1.5
-			GRD0 C 4 T_Chase
-			GRD0 D 5 T_Chase
-			GRD0 D 1.5
-			GRD0 E 4 T_Chase
+			GARD B 5 T_Chase
+			GARD B 1.5
+			GARD C 4 T_Chase
+			GARD D 5 T_Chase
+			GARD D 1.5
+			GARD E 4 T_Chase
 			loop
 		Missile:
-			GRD0 L 10
-			GRD0 M 10 T_Shoot
-			GRD0 N 10
+			GARD L 10
+			GARD M 10 T_Shoot
+			GARD N 10
 			loop
 		Pain:
-			GRD0 F 5
+			GARD F 5
 			goto See
 		Pain2:
-			GRD0 J 5
+			GARD J 5
 			goto See
 		Death:
-			GRD0 G 7.5 A_DeathScream
-			GRD0 HI 7.5
-			GRD0 K -1
+			GARD G 7.5 A_DeathScream
+			GARD HI 7.5
+			GARD K -1
 			stop
 	}
 }
@@ -611,7 +611,7 @@ actor DeadGuard
 	states
 	{
 		Spawn:
-			GRD0 K -1
+			GARD K -1
 			stop
 	}
 }
@@ -663,30 +663,30 @@ actor Dog
 	{
 		Spawn:
 		Path:
-			DOG0 A 10 T_Path
-			DOG0 A 2.5
-			DOG0 B 7.5 T_Path
-			DOG0 C 10 T_Path
-			DOG0 C 2.5
-			DOG0 D 7.5 T_Path
+			DOGY A 10 T_Path
+			DOGY A 2.5
+			DOGY B 7.5 T_Path
+			DOGY C 10 T_Path
+			DOGY C 2.5
+			DOGY D 7.5 T_Path
 			loop
 		Melee:
-			DOG0 E 5
-			DOG0 F 5 T_Bite
-			DOG0 GEA 5
+			DOGY E 5
+			DOGY F 5 T_Bite
+			DOGY GEA 5
 			goto See
 		See:
-			DOG0 A 5 T_DogChase
-			DOG0 A 1.5
-			DOG0 B 4 T_DogChase
-			DOG0 C 5 T_DogChase
-			DOG0 C 1.5
-			DOG0 D 4 T_DogChase
+			DOGY A 5 T_DogChase
+			DOGY A 1.5
+			DOGY B 4 T_DogChase
+			DOGY C 5 T_DogChase
+			DOGY C 1.5
+			DOGY D 4 T_DogChase
 			loop
 		Death:
-			DOG0 H 7.5 A_DeathScream
-			DOG0 IJ 7.5
-			DOG0 K -1
+			DOGY H 7.5 A_DeathScream
+			DOGY IJ 7.5
+			DOGY K -1
 			stop
 	}
 }
@@ -697,39 +697,39 @@ actor Officer
 	states
 	{
 		Spawn:
-			OFC0 A -1 T_Stand
+			OFFI A -1 T_Stand
 			stop
 		Path:
-			OFC0 B 10 T_Path
-			OFC0 B 2.5
-			OFC0 C 7.5 T_Path
-			OFC0 D 10 T_Path
-			OFC0 D 2.5
-			OFC0 E 7.5 T_Path
+			OFFI B 10 T_Path
+			OFFI B 2.5
+			OFFI C 7.5 T_Path
+			OFFI D 10 T_Path
+			OFFI D 2.5
+			OFFI E 7.5 T_Path
 			loop
 		Pain:
-			OFC0 F 5
+			OFFI F 5
 			goto See
 		Pain2:
-			OFC0 G 5
+			OFFI G 5
 			goto See
 		Missile:
-			OFC0 H 3
-			OFC0 I 10 T_Shoot
-			OFC0 J 5
+			OFFI H 3
+			OFFI I 10 T_Shoot
+			OFFI J 5
 			goto See
 		See:
-			OFC0 B 5 T_Chase
-			OFC0 B 1.5
-			OFC0 C 4 T_Chase
-			OFC0 D 5 T_Chase
-			OFC0 D 1.5
-			OFC0 E 4 T_Chase
+			OFFI B 5 T_Chase
+			OFFI B 1.5
+			OFFI C 4 T_Chase
+			OFFI D 5 T_Chase
+			OFFI D 1.5
+			OFFI E 4 T_Chase
 			loop
 		Death:
-			OFC0 K 5.5 A_DeathScream
-			OFC0 LMN 5.5
-			OFC0 O -1
+			OFFI K 5.5 A_DeathScream
+			OFFI LMN 5.5
+			OFFI O -1
 			stop
 	}
 }
@@ -740,34 +740,34 @@ actor Mutant
 	states
 	{
 		Spawn:
-			MUT0 A -1 T_Stand
+			MTNT A -1 T_Stand
 			stop
 		Path:
-			MUT0 B 10 T_Path
-			MUT0 B 2.5
-			MUT0 C 7.5 T_Path
-			MUT0 D 10 T_Path
-			MUT0 D 2.5
-			MUT0 E 7.5 T_Path
+			MTNT B 10 T_Path
+			MTNT B 2.5
+			MTNT C 7.5 T_Path
+			MTNT D 10 T_Path
+			MTNT D 2.5
+			MTNT E 7.5 T_Path
 			loop
 		Pain:
-			MUT0 F 5
+			MTNT F 5
 			goto See
 		Pain2:
-			MUT0 G 5
+			MTNT G 5
 			goto See
 		See:
-			MUT0 B 5 T_Chase
-			MUT0 B 1.5
-			MUT0 C 4 T_Chase
-			MUT0 D 5 T_Chase
-			MUT0 D 1.5
-			MUT0 E 4 T_Chase
+			MTNT B 5 T_Chase
+			MTNT B 1.5
+			MTNT C 4 T_Chase
+			MTNT D 5 T_Chase
+			MTNT D 1.5
+			MTNT E 4 T_Chase
 			loop
 		Death:
-			MUT0 H 3.5 A_DeathScream
-			MUT0 IJK 3.5
-			MUT0 L -1
+			MTNT H 3.5 A_DeathScream
+			MTNT IJK 3.5
+			MTNT L -1
 			stop
 	}
 }
@@ -819,25 +819,25 @@ actor Hans
 	states
 	{
 		Spawn:
-			BOSS A -1 T_Stand
+			HANS A -1 T_Stand
 			stop
 		See:
-			BOSS A 5 T_Chase
-			BOSS A 1.5
-			BOSS B 4 T_Chase
-			BOSS C 5 T_Chase
-			BOSS C 1.5
-			BOSS D 4 T_Chase
+			HANS A 5 T_Chase
+			HANS A 1.5
+			HANS B 4 T_Chase
+			HANS C 5 T_Chase
+			HANS C 1.5
+			HANS D 4 T_Chase
 			loop
 		Missile:
-			BOSS E 15
-			BOSS FGFGFG 5 T_Shoot
-			BOSS E 5
+			HANS E 15
+			HANS FGFGFG 5 T_Shoot
+			HANS E 5
 			goto See
 		Death:
-			BOSS H 7.5 A_DeathScream
-			BOSS IJ 7.5
-			BOSS K -1
+			HANS H 7.5 A_DeathScream
+			HANS IJ 7.5
+			HANS K -1
 			stop
 	}
 }
@@ -887,25 +887,25 @@ actor Schabbs
 	states
 	{
 		Spawn:
-			SCHA A -1 T_Stand
+			SHAB A -1 T_Stand
 			stop
 		See:
-			SCHA B 5 T_Schabb
-			SCHA B 1.5
-			SCHA C 4 T_Schabb
-			SCHA D 5 T_Schabb
-			SCHA D 1.5
-			SCHA E 4 T_Schabb
+			SHAB B 5 T_Schabb
+			SHAB B 1.5
+			SHAB C 4 T_Schabb
+			SHAB D 5 T_Schabb
+			SHAB D 1.5
+			SHAB E 4 T_Schabb
 			loop
 		Missile:
-			SCHA F 15
-			SCHA G 5 T_SchabbThrow
+			SHAB F 15
+			SHAB G 5 T_SchabbThrow
 			goto See
 		Death:
-			SCHA A 5 A_DeathScream
-			SCHA A 70
-			SCHA HIJ 5
-			SCHA K -1 A_StartDeathCam
+			SHAB A 5 A_DeathScream
+			SHAB A 70
+			SHAB HIJ 5
+			SHAB K -1 A_StartDeathCam
 			stop
 	}
 }
@@ -1071,16 +1071,16 @@ actor BJRun
 	states
 	{
 		Spawn:
-			BJ00 A 6 T_BJRun
-			BJ00 A 1.5
-			BJ00 B 4 T_BJRun
-			BJ00 C 6 T_BJRun
-			BJ00 C 1.5
-			BJ00 D 4 T_BJRun
+			BLAZ A 6 T_BJRun
+			BLAZ A 1.5
+			BLAZ B 4 T_BJRun
+			BLAZ C 6 T_BJRun
+			BLAZ C 1.5
+			BLAZ D 4 T_BJRun
 			loop
 		Death:
-			BJ00 EFG 7 T_BJJump
-			BJ00 H 150 T_BJDone
+			BLAZ EFG 7 T_BJJump
+			BLAZ H 150 T_BJDone
 			stop
 	}
 }

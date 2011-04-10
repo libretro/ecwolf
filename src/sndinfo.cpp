@@ -121,6 +121,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 		if(!sc.GetNextString())
 			sc.ScriptMessage(Scanner::ERROR, "Expected logical name.\n");
 		FName logicalName = sc->str;
+		assert(logicalName[0] != '}');
 
 		SoundIndex idx;
 		bool hasAlternatives = false;
@@ -134,7 +135,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 			if(sc.CheckToken('}') || !sc.GetNextString())
 			{
 				if(i == 0)
-					sc.ScriptMessage(Scanner::ERROR, "Expected lump name.\n");
+					sc.ScriptMessage(Scanner::ERROR, "Expected lump name for '%s'.\n", logicalName.GetChars());
 				else
 					break;
 			}
@@ -142,6 +143,9 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 			if(sc->str.Compare("NULL") == 0)
 				continue;
 			int sndLump = Wads.CheckNumForName(sc->str, ns_sounds);
+
+			if(i == 2 && !sc.CheckToken('}'))
+				sc.ScriptMessage(Scanner::ERROR, "Expected '}'.\n");
 			if(sndLump == -1)
 				continue;
 
@@ -157,9 +161,6 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 				if(i == 1 || idx.lump[1] == -1)
 					idx.priority = ReadLittleShort(&idx.data[i][4]);
-
-				if(i == 2 && !sc.CheckToken('}'))
-					sc.ScriptMessage(Scanner::ERROR, "Expected '}'.\n");
 			}
 		}
 		while(hasAlternatives && ++i < 3);

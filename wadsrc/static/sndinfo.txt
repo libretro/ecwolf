@@ -1,15 +1,15 @@
-doors/open				{ DSOPENDR ALOPENDR PCOPENDR }
-doors/close				{ DSCLSDR ALCLSDR PCCLSDR }
+doors/open				{ DSDROPN ALDROPN PCDROPN }
+doors/close				{ DSDRCLS ALDRCLS PCDRCLS }
 
 world/hitwall			{ NULL ALHITWAL PCHITWAL }
-world/level_done		{ DSLVLDNE ALLVLDNE PCLVLDNE }
+world/level_done		{ DSSWITCH ALSWITCH PCSWITCH }
 world/pushwall			{ DSPSHWAL ALPSHWAL PCPSHWAL }
 
 misc/1up				{ NULL ALBNS1UP PCBNS1UP }
 misc/do_nothing			{ NULL ALNOTHIN PCNOTHIN }
-misc/ammo_pickup		{ NULL ALAMMO PCAMMO }
-misc/health_pickup		{ NULL ALHEAL1 PCHEAL1 }
-misc/medkit_pickup		{ NULL ALHEAL2 PCHEAL2 }
+misc/ammo_pickup		{ NULL ALAMMOUP PCAMMOUP }
+misc/health_pickup		{ NULL ALFOODUP PCFOODUP }
+misc/medkit_pickup		{ NULL ALMEDIUP PCMEDIUP }
 misc/key_pickup			{ NULL ALGETKEY PCGETKEY }
 misc/end_bonus1			{ NULL ALENDBN1 PCENDBN1 }
 misc/end_bonus2			{ NULL ALENDBN2 PCENDBN2 }
@@ -23,78 +23,78 @@ treasure/chalice/pickup	{ NULL ALBONUS2 PCBONUS2 }
 treasure/bible/pickup	{ NULL ALBONUS3 PCBONUS3 }
 treasure/crown/pickup	{ NULL ALBONUS4 PCBONUS4 }
 
-menu/activate			{ NULL ALSHOOT PCSHOOT }
+menu/activate			{ NULL ALSELECT PCSELECT }
 menu/escape				{ NULL ALESCPRS PCESCPRS }
 menu/move1				{ NULL ALMVGUN1 PCMVGUN1 }
 menu/move2				{ NULL ALMVGUN2 PCMVGUN2 }
 
-player/death			{ NULL ALPLYDTH PCPLYDTH }
-player/pain				{ DSTKDMG ALTKDMG PCTKDMG }
+player/death			{ NULL ALPLDETH PCPYDETH }
+player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN }
 player/usefail			{ NULL ALNOWAY PCNOWAY }
 
-weapon/knife/attack		{ NULL ALATKKNF PCATKKNF }
+weapon/knife/attack		{ NULL ALKNFSWG PCKNFSWG }
 
-weapon/pistol/attack	{ DSATKPST ALATKPST PCATKPST }
+weapon/pistol/attack	{ DSPISTOL ALPISTOL PCPISTOL }
 
-weapon/machine/attack	{ DSATKMCH ALATKMCH PCATKMCH }
-weapon/machine/pickup	{ NULL ALMCHINE PCMCHINE }
+weapon/machine/attack	{ DSMGUN ALMGUN PCMGUN }
+weapon/machine/pickup	{ NULL ALMGUNUP PCMGUNUP }
 
-weapon/gatling/fire		{ DSATKGAT ALATKGAT PCATKGAT }
-weapon/gatling/pickup	{ NULL ALGTGATL PCGTGATL }
+weapon/gatling/fire		{ DSCGUN ALCGUN PCCGUN }
+weapon/gatling/pickup	{ NULL ALCGUNUP PCCGUNUP }
 
-dog/sight				{ DSDGBARK ALDGBARK PCDGBARK }
+dog/sight				{ DSDOGSIT ALDOGSIT PCDOGSIT }
 dog/attack				{ DSDOGATK ALDOGATK PCDOGATK }
 dog/death				{ DSDOGDTH ALDOGDTH PCDOGDTH }
 
-guard/attack			{ DSNAZIFR ALNAZIFR PCNAZIFR }
-guard/sight				{ DSHALT ALHALT PCHALT }
-guard/death1			{ DSDTHSR1 ALDTHSR1 PCDTHSR1 }
-guard/death2			{ DSDTHSR2 ALDTHSR2 PCDTHSR2 }
-guard/death3			{ DSDTHSR2 ALDTHSR3 PCDTHSR3 }
-guard/death4			{ DSDTHSR4 ALDTHSR4 PCDTHSR4 }
-guard/death5			{ DSDTHSR5 ALDTHSR5 PCDTHSR5 }
-guard/death6			{ DSDTHSR6 ALDTHSR6 PCDTHSR6 }
-guard/death7			{ DSDTHSR7 ALDTHSR7 PCDTHSR7 }
-guard/death8			{ DSDTHSR8 ALDTHSR8 PCDTHSR8 }
-guard/death9			{ DSDTHSR9 ALDTHSR9 PCDTHSR9 }
+guard/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
+guard/sight				{ DSGRDSIT ALGRDSIT PCGRDSIT }
+guard/death1			{ DSGDDTH1 ALGDDTH1 PCGDDTH1 }
+guard/death2			{ DSGDDTH2 ALGDDTH2 PCGDDTH2 }
+guard/death3			{ DSGDDTH2 ALGDDTH3 PCGDDTH3 } // Intentionally play the 2nd sound with digital
+guard/death4			{ DSGDDTH4 ALGDDTH4 PCGDDTH4 }
+guard/death5			{ DSGDDTH5 ALGDDTH5 PCGDDTH5 }
+guard/death6			{ DSGDDTH6 ALGDDTH6 PCGDDTH6 }
+guard/death7			{ DSGDDTH7 ALGDDTH7 PCGDDTH7 }
+guard/death8			{ DSGDDTH8 ALGDDTH8 PCGDDTH8 }
+guard/death9			{ DSGDDTH9 ALGDDTH9 PCGDDTH9 }
 
 wolfss/attack			{ DSSSFIRE ALSSFIRE PCSSFIRE } // This is not the same as Doom 2 since it used the shotgun sound
 wolfss/death			{ DSSSDTH ALSSDTH PCSSDTH }
 wolfss/sight			{ DSSSSIT ALSSSIT PCSSSIT }
 
-mutant/attack			{ DSNAZIFR ALNAZIFR PCNAZIFR }
-mutant/death			{ DSAHHHG ALAHHHG PCAHHHG }
+mutant/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
+mutant/death			{ DSMUTDTH ALMUTDTH PCMUTDTH }
 
-officer/sight			{ DSSPION ALSPION PCSPION }
-officer/attack			{ DSNAZIFR ALNAZIFR PCNAZIFR }
-officer/death			{ DSNNSOVA ALNNSOVA PCNNSOVA }
+officer/sight			{ DSOFFSIT ALOFFSIT PCOFFSIT }
+officer/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
+officer/death			{ DSOFFDTH ALOFFDTH PCOFFDTH }
 
 hans/attack				{ DSBOSSFR ALBOSSFR PCBOSSFR }
-hans/sight				{ DSGTENTG ALGTENTG PCGTENTG }
-hans/death				{ DSMUTTI ALMUTTI PCMUTTI }
+hans/sight				{ DSHANSIT ALHANSIT PCHANSIT }
+hans/death				{ DSHANDTH ALHANDTH PCHANDTH }
 
 schabbs/sight			{ DSSCBSIT ALSCBSIT PCSCBSIT }
-schabbs/death			{ DSMINGOT ALMINGOT PCMINGOT }
-schabbs/throw			{ NULL ALSCHBTH PCSCHBTH }
+schabbs/death			{ DSSCBDTH ALSCBDTH PCSCBDTH }
+schabbs/throw			{ NULL ALSCBATK PCSCBATK }
 
-fake/sight				{ DSTOTHND ALTOTHND PCTOTHND }
-fake/attack				{ NULL ALFLAMTH PCFLAMTH }
-fake/death				{ DSHTLRHA ALHTLRHA PCHTLRHA }
+fake/sight				{ DSFAKSIT ALFAKSIT PCFAKSIT }
+fake/attack				{ NULL ALFAKFIR PCFAKFIR }
+fake/death				{ DSFAKDTH ALFAKDTH PCFAKDTH }
 
 hitler/attack			{ NULL ALBOSSFR PCBOSSFR }
 hitler/active			{ DSMCHSTP ALMCHSTP PCMCHSTP }
-hitler/sight			{ DSDIE ALDIE PCDIE }
-hitler/death			{ DSEVA ALEVA PCEVA }
-hitler/mechadeath		{ DSSCHIST ALSCHIST PCSCHIST }
+hitler/sight			{ DSHITSIT ALHITSIT PCHITSIT }
+hitler/death			{ DSHITDTH ALHITDTH PCHITDTH }
+hitler/mechadeath		{ DSHITSHI ALHITSHI PCHITSHI }
 
-gift/sight				{ DSEINE ALEINE PCEINE }
-gift/death				{ DSDONNER ALDONNER PCDONNER }
+gift/sight				{ DSOTOSIT ALOTOSIT PCOTOSIT }
+gift/death				{ DSOTODTH ALOTODTH PCOTODTH }
 
-gretel/sight			{ DSKEIN ALKEIN PCKEIN }
-gretel/death			{ DSMEIN ALMEIN PCMEIN }
+gretel/sight			{ DSGRTSIT ALGRTSIT PCGRTSIT }
+gretel/death			{ DSGRTDTH ALGRTDTH PCGRTDTH }
 
-fat/sight				{ DSERLABN ALERLABN PCERLABN }
-fat/death				{ DSROSE ALROSE PCROSE }
+fat/sight				{ DSFATSIT ALFATSIT PCFATSIT }
+fat/death				{ DSFATDTH ALFATDTH PCFATDTH }
 
-missile/fire			{ NULL ALMISLFR PCMISLFR }
-missile/hit				{ NULL ALMISLHT PCMISLHT }
+missile/fire			{ NULL ALRLAUNC PCRLAUNC }
+missile/hit				{ NULL ALBAREXP PCBAREXP }
