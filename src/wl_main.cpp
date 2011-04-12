@@ -523,7 +523,6 @@ void ShutdownId (void)
 	PM_Shutdown ();
 	IN_Shutdown ();
 	VW_Shutdown ();
-	CA_Shutdown ();
 #if defined(GP2X)
 	GP2X_Shutdown();
 #endif
@@ -885,8 +884,6 @@ static void InitGame()
 	IN_Startup ();
 	PM_Startup ();
 	SD_Startup ();
-	printf("CA_Startup: Starting the Cache Manager.\n");
-	CA_Startup ();
 	printf("US_Startup: Starting the User Manager.\n");
 	US_Startup ();
 
@@ -1623,6 +1620,7 @@ int main (int argc, char *argv[])
 
 	CheckForEpisodes();
 	WL_AddFile("audiot.wl6");
+	WL_AddFile("gamemaps.wl6");
 	WL_AddFile("vgagraph.wl6");
 	WL_AddFile("vswap.wl6");
 

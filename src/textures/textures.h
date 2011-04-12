@@ -376,7 +376,7 @@ public:
 	FTextureID AddTexture (FTexture *texture);
 	FTextureID GetDefaultTexture() const { return DefaultTexture; }
 
-	void LoadTextureX(int wadnum);
+	//void LoadTextureX(int wadnum);
 	void AddTexturesForWad(int wadnum);
 	void Init();
 	void DeleteAll();

@@ -802,7 +802,7 @@ void FTextureManager::AddPatches (int lumpnum)
 // Initializes the texture list with the textures from the world map.
 //
 //==========================================================================
-
+#if 0
 void FTextureManager::LoadTextureX(int wadnum)
 {
 	// Use the most recent PNAMES for this WAD.
@@ -823,6 +823,7 @@ void FTextureManager::LoadTextureX(int wadnum)
 	int texlump2 = Wads.CheckNumForName ("TEXTURE2", ns_global, wadnum);
 	AddTexturesLumps (texlump1, texlump2, pnames);
 }
+#endif
 
 //==========================================================================
 //
@@ -845,7 +846,7 @@ void FTextureManager::AddTexturesForWad(int wadnum)
 	AddGroup(wadnum, ns_patches, FTexture::TEX_WallPatch);
 
 	// Second step: TEXTUREx lumps
-	LoadTextureX(wadnum);
+	//LoadTextureX(wadnum);
 
 	// Third step: Flats
 	AddGroup(wadnum, ns_flats, FTexture::TEX_Flat);
@@ -853,6 +854,7 @@ void FTextureManager::AddTexturesForWad(int wadnum)
 	// Fourth step: Textures (TX_)
 	AddGroup(wadnum, ns_newtextures, FTexture::TEX_Override);
 
+#if 0
 	// Sixth step: Try to find any lump in the WAD that may be a texture and load as a TEX_MiscPatch
 	int firsttx = Wads.GetFirstLump(wadnum);
 	int lasttx = Wads.GetLastLump(wadnum);
@@ -908,6 +910,7 @@ void FTextureManager::AddTexturesForWad(int wadnum)
 			AddTexture (out);
 		}
 	}
+#endif
 
 	// Check for text based texture definitions
 	LoadTextureDefs(wadnum, "TEXTURES");

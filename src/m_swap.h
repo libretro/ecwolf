@@ -24,6 +24,12 @@ static inline const DWORD ReadLittleLong(const BYTE * const ptr)
 		(DWORD(BYTE(*(ptr+3)))<<24);
 }
 
+static inline void WriteLittleShort(BYTE * const ptr, WORD value)
+{
+	ptr[0] = value&0xFF;
+	ptr[1] = (value>>8)&0xFF;
+}
+
 
 // Now for some writing
 // Syntax: char data[x] = {WRITEINT32_DIRECT(integer),WRITEINT32_DIRECT(integer)...}

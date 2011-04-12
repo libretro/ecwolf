@@ -76,20 +76,26 @@ static bool CheckIfWolfShape(FileReader &file)
 {
 	if(file.GetLength() < 4) return false; // No header
 	
-	WORD header[66];
+	WORD header[4];
 	file.Seek(0, SEEK_SET);
-	file.Read(header, 132);
+	file.Read(header, 4);
 
 	WORD Width = LittleShort(header[1])-LittleShort(header[0]);
 
-	if(Width <= 0 || file.GetLength() < 4+Width*2)
+	if(Width <= 0 || Width > 256 || file.GetLength() < 4+Width*2)
 		return false;
 
-	for(int i = 2;i < Width+2;i++)
+	WORD* offsets = new WORD[Width];
+	file.Read(offsets, Width*2);
+	for(int i = 0;i < Width;i++)
 	{
-		if(LittleLong(header[i]) >= file.GetLength())
+		if(LittleLong(offsets[i]) >= file.GetLength())
+		{
+			delete[] offsets;
 			return false;
+		}
 	}
+	delete[] offsets;
 	return true;
 }
 

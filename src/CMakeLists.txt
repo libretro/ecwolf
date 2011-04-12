@@ -52,6 +52,7 @@ add_executable(ecwolf
 	resourcefiles/file_rff.cpp
 	resourcefiles/file_lump.cpp
 	resourcefiles/file_audiot.cpp
+	resourcefiles/file_gamemaps.cpp
 	resourcefiles/file_vgagraph.cpp
 	resourcefiles/file_vswap.cpp
 	resourcefiles/file_wad.cpp
@@ -61,7 +62,6 @@ add_executable(ecwolf
 	textures/animations.cpp
 	textures/automaptexture.cpp
 	textures/bitmap.cpp
-	#textures/buildtexture.cpp
 	textures/ddstexture.cpp
 	textures/emptytexture.cpp
 	textures/flattexture.cpp
