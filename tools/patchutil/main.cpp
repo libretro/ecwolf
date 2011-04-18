@@ -1,15 +1,24 @@
 #include <cstring>
 #include <cmath>
-#include <list>
 #include <iostream>
 #include <fstream>
+
+#ifdef LEARN
+#include <list>
+#endif
 
 #include <zlib.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <dirent.h>
 
+#define countof(x) (sizeof(x)/sizeof(x[0]))
+#define START(x) static const unsigned char x[] = {
+#define END(x) }; unsigned int x##size = countof(x)
+#define P(x) {x, x##size}
+
 #include "patchdata.cpp"
+#include "patchdata_reg.cpp"
 
 using namespace std;
 
@@ -99,6 +108,51 @@ struct OldDataSet
 			{1376992708u, 1156, "audiohed.wl1", NULL, NULLP, false},
 		},
 		"Wolfenstein 3D Shareware v1.4"
+	},
+	{
+		9,
+		{
+			{90883035u, 1156, "audiohed.wl6", NULL, NULLP, false},
+			{361091845u, 317049, "audiot.wl6", NULL, NULLP, false},
+			{3682273634u, 150746, "gamemaps.wl6", NULL, P(gamemaps11reg), false},
+			{122388615u, 402, "maphead.wl6", NULL, P(maphead11reg), false},
+			{677936410u, 1024, "vgadict.wl6", NULL, NULLP, false},
+			{3788928607u, 302374, "vgagraph.wl6", NULL, NULLP, false},
+			{1404351874u, 477, "vgahead.wl6", NULL, NULLP, false},
+			{2550006541u, 1545400, "vswap.wl6", NULL, NULLP, false},
+			{4004765388u, 98402, "wolf3d.exe", NULL, NULLP, true},
+		},
+		"Wolfenstein 3D Registered v1.1"
+	},
+	{
+		9,
+		{
+			{90883035u, 1156, "audiohed.wl6", NULL, P(audiohed12reg), false},
+			{361091845u, 317049, "audiot.wl6", NULL, P(audiot12reg), false},
+			{271173415u, 150758, "gamemaps.wl6", NULL, P(gamemaps12reg), false},
+			{1581501166u, 402, "maphead.wl6", NULL, P(maphead12reg), false},
+			{677936410u, 1024, "vgadict.wl6", NULL, P(vgadict12reg), false},
+			{3788928607u, 302374, "vgagraph.wl6", NULL, P(vgagraph12reg), false},
+			{1404351874u, 477, "vgahead.wl6", NULL, P(vgahead12reg), false},
+			{2550006541u, 1545400, "vswap.wl6", NULL, P(vswap12reg), false},
+			{4004765388u, 98402, "wolf3d.exe", NULL, P(wolf3d12reg), true},
+		},
+		"Wolfenstein 3D Registered v1.2"
+	},
+	{
+		9,
+		{
+			{792447856u, 1156, "audiohed.wl6", NULL, NULLP, false},
+			{3349085516u, 320209, "audiot.wl6", NULL, NULLP, false},
+			{2913323047u, 150652, "gamemaps.wl6", NULL, NULLP, false},
+			{22545385u, 402, "maphead.wl6", NULL, NULLP, false},
+			{2854356302u, 1024, "vgadict.wl6", NULL, NULLP, false},
+			{2763120157u, 275774, "vgagraph.wl6", NULL, NULLP, false},
+			{2871739603u, 450, "vgahead.wl6", NULL, NULLP, false},
+			{3859859044u, 1544376, "vswap.wl6", NULL, NULLP, false},
+			{1837206974u, 108779, "wolf3d.exe", NULL, NULLP, true},
+		},
+		"Wolfenstein 3D Registered v1.4"
 	}
 };
 

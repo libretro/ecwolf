@@ -1,8 +1,3 @@
-#define countof(x) (sizeof(x)/sizeof(x[0]))
-#define START(x) static const unsigned char x[] = {
-#define END(x) }; unsigned int x##size = countof(x)
-#define P(x) {x, x##size}
-
 // Wolfenstein 3D Shareware 1.0 -> Wolfenstein 3D Shareware 1.4
 ////////////////////////////////////////////////////////////////////////////////
 
