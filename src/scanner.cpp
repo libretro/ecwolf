@@ -228,7 +228,8 @@ bool Scanner::GetNextString()
 	nextState.tokenLine = line;
 	nextState.tokenLinePosition = scanPos - lineStart;
 	nextState.token = TK_NoToken;
-	scanPos = state.scanPos;
+	if(!needNext)
+		scanPos = state.scanPos;
 	CheckForWhitespace();
 	if(scanPos >= length)
 		return false;

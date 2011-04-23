@@ -108,13 +108,9 @@ void SoundInformation::Init()
 
 void SoundInformation::ParseSoundInformation(int lumpNum)
 {
-	FWadLump lump = Wads.OpenLumpNum(lumpNum);
-	char* data = new char[Wads.LumpLength(lumpNum)];
-	lump.Read(data, Wads.LumpLength(lumpNum));
-
-	Scanner sc(data, Wads.LumpLength(lumpNum));
+	FMemLump lump = Wads.ReadLump(lumpNum);
+	Scanner sc((const char*)(lump.GetMem()), lump.GetSize());
 	sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpNum));
-	delete[] data;
 
 	while(sc.TokensLeft() != 0)
 	{
@@ -166,7 +162,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 		while(hasAlternatives && ++i < 3);
 
 		if(!idx.IsNull())
-			soundMap[logicalName] = idx;
+			soundMap.Insert(logicalName, idx);
 	}
 }
 

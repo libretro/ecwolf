@@ -51,10 +51,8 @@ void Language::SetupStrings(const char* language)
 
 void Language::ReadLump(int lump, const char* language)
 {
-	FWadLump wadLump = Wads.OpenLumpNum(lump);
-	char* data = new char[wadLump.GetLength()];
-	wadLump.Read(data, wadLump.GetLength());
-	Scanner sc(data, wadLump.GetLength());
+	FMemLump wadLump = Wads.ReadLump(lump);
+	Scanner sc((const char*)(wadLump.GetMem()), wadLump.GetSize());
 	sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
 
 	int token = TK_NoToken;
