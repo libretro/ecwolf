@@ -155,6 +155,7 @@ class SoundIndex
 	protected:
 		byte*			data[3];
 		int				lump[3];
+		unsigned int	length[3];
 		unsigned short	priority;
 
 		friend class SoundInformation;

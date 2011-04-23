@@ -37,6 +37,7 @@
 #include "id_sd.h"
 #include "w_wad.h"
 #include "scanner.h"
+#include <SDL_mixer.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -48,6 +49,7 @@ SoundIndex::SoundIndex() : priority(50)
 {
 	data[0] = data[1] = data[2] = NULL;
 	lump[0] = lump[1] = lump[2] = -1;
+	length[0] = length[1] = length[2] = 0;
 }
 
 SoundIndex::SoundIndex(const SoundIndex &other)
@@ -69,12 +71,13 @@ const SoundIndex &SoundIndex::operator= (const SoundIndex &other)
 	priority = other.priority;
 	for(unsigned int i = 0;i < 3;i++)
 	{
+		length[i] = other.length[i];
 		lump[i] = other.lump[i];
 
 		if(lump[i] != -1)
 		{
-			data[i] = new byte[Wads.LumpLength(lump[i])];
-			memcpy(data[i], other.data[i], Wads.LumpLength(lump[i]));
+			data[i] = new byte[length[i]];
+			memcpy(data[i], other.data[i], length[i]);
 		}
 		else
 			data[i] = NULL;
@@ -147,13 +150,17 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 			idx.lump[i] = sndLump;
 			if(i == 0)
+			{
 				idx.data[i] = SD_PrepareSound(sndLump);
+				idx.length[i] = sizeof(Mix_Chunk);
+			}
 			else
 			{
-				idx.data[i] = new byte[Wads.LumpLength(sndLump)];
+				idx.length[i] = Wads.LumpLength(sndLump);
+				idx.data[i] = new byte[idx.length[i]];
 
 				FWadLump soundReader = Wads.OpenLumpNum(sndLump);
-				soundReader.Read(idx.data[i], Wads.LumpLength(sndLump));
+				soundReader.Read(idx.data[i], idx.length[i]);
 
 				if(i == 1 || idx.lump[1] == -1)
 					idx.priority = ReadLittleShort(&idx.data[i][4]);
