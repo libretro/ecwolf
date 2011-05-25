@@ -90,7 +90,7 @@ void	VW_MeasurePropString (const char *string, word *width, word *height);
 void    LoadLatchMem (void);
 
 void    VH_Startup();
-boolean FizzleFade (SDL_Surface *source, SDL_Surface *dest, int x1, int y1,
+boolean FizzleFade (SDL_Surface *source, int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, boolean abortable);
 
 #define NUMLATCHPICS	100

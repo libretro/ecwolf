@@ -1589,8 +1589,7 @@ void    ThreeDRefresh (void)
 
 	if (fizzlein)
 	{
-		FizzleFade(screenBuffer, screen, 0, 0,
-			screenWidth, screenHeight, 20, false);
+		FizzleFade(screenBuffer, 0, 0, screenWidth, screenHeight, 20, false);
 		fizzlein = false;
 
 		lasttimecount = GetTimeCount();          // don't make a big tic count
@@ -1609,7 +1608,7 @@ void    ThreeDRefresh (void)
 		}
 #endif
 		SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-		SDL_UpdateRect(screen, 0, 0, 0, 0);
+		SDL_Flip(screen);
 	}
 
 #ifndef REMDEBUG

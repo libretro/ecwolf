@@ -13,7 +13,7 @@ void Quit (const char *error,...);
 
 extern SDL_Surface *screen, *screenBuffer, *curSurface;
 
-extern  boolean  fullscreen;
+extern  boolean  fullscreen, usedoublebuffering;
 extern  unsigned screenWidth, screenHeight, screenBits, screenPitch, bufferPitch, curPitch;
 extern  unsigned scaleFactor;
 
@@ -40,7 +40,7 @@ void VL_ConvertPalette(const char* srcpal, SDL_Color *destpal);
 void VL_FillPalette (int red, int green, int blue);
 void VL_SetColor	(int color, int red, int green, int blue);
 void VL_GetColor	(int color, int *red, int *green, int *blue);
-void VL_SetPalette  (SDL_Color *palette);
+void VL_SetPalette  (SDL_Color *palette, bool forceupdate);
 void VL_GetPalette  (SDL_Color *palette);
 void VL_FadeOut     (int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn      (int start, int end, SDL_Color *palette, int steps);

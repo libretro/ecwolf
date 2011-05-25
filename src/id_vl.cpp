@@ -19,6 +19,7 @@
 #endif
 
 boolean fullscreen = true;
+boolean usedoublebuffering = true;
 #if defined(_arch_dreamcast)
 unsigned screenWidth = 320;
 unsigned screenHeight = 200;
@@ -113,13 +114,17 @@ void	VL_SetVGAPlaneMode (void)
 	}
 
 	screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
-		SDL_SWSURFACE | (screenBits == 8 ? SDL_HWPALETTE : 0) | (fullscreen ? SDL_FULLSCREEN : 0));
+		(usedoublebuffering ? SDL_HWSURFACE | SDL_DOUBLEBUF : 0) |
+		(screenBits == 8 ? SDL_HWPALETTE : 0) |
+		(fullscreen ? SDL_FULLSCREEN : 0));
 	if(!screen)
 	{
 		printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
 			screenHeight, screenBits, SDL_GetError());
 		exit(1);
 	}
+	if((screen->flags & SDL_DOUBLEBUF) != SDL_DOUBLEBUF)
+		usedoublebuffering = false;
 	SDL_ShowCursor(SDL_DISABLE);
 
 	SDL_SetColors(screen, gamepal, 0, 256);
@@ -233,7 +238,7 @@ void VL_FillPalette (int red, int green, int blue)
 		pal[i].b = blue;
 	}
 
-	VL_SetPalette(pal);
+	VL_SetPalette(pal, true);
 }
 
 //===========================================================================
@@ -257,7 +262,7 @@ void VL_SetColor	(int color, int red, int green, int blue)
 	{
 		SDL_SetPalette(curSurface, SDL_LOGPAL, &col, color, 1);
 		SDL_BlitSurface(curSurface, NULL, screen, NULL);
-		SDL_UpdateRect(screen, 0, 0, 0, 0);
+		SDL_Flip(screen);
 	}
 }
 
@@ -289,7 +294,7 @@ void VL_GetColor	(int color, int *red, int *green, int *blue)
 =================
 */
 
-void VL_SetPalette (SDL_Color *palette)
+void VL_SetPalette (SDL_Color *palette, bool forceupdate)
 {
 	memcpy(curpal, palette, sizeof(SDL_Color) * 256);
 
@@ -298,8 +303,11 @@ void VL_SetPalette (SDL_Color *palette)
 	else
 	{
 		SDL_SetPalette(curSurface, SDL_LOGPAL, palette, 0, 256);
-		SDL_BlitSurface(curSurface, NULL, screen, NULL);
-		SDL_UpdateRect(screen, 0, 0, 0, 0);
+		if(forceupdate)
+		{
+			SDL_BlitSurface(curSurface, NULL, screen, NULL);
+			SDL_Flip(screen);
+		}
 	}
 }
 
@@ -367,8 +375,8 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 			newptr++;
 		}
 
-		VL_WaitVBL(1);
-		VL_SetPalette (palette2);
+		if(!usedoublebuffering || screenBits == 8) VL_WaitVBL(1);
+		VL_SetPalette (palette2, true);
 	}
 
 //
@@ -411,14 +419,14 @@ void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 			palette2[j].b = palette1[j].b + delta * i / steps;
 		}
 
-		VL_WaitVBL(1);
-		VL_SetPalette(palette2);
+		if(!usedoublebuffering || screenBits == 8) VL_WaitVBL(1);
+		VL_SetPalette(palette2, true);
 	}
 
 //
 // final color
 //
-	VL_SetPalette (palette);
+	VL_SetPalette (palette, true);
 	screenfaded = false;
 }
 

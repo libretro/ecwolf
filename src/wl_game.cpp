@@ -1096,6 +1096,7 @@ void RecordDemo (void)
 	SetupGameLevel ();
 	StartMusic ();
 
+	if(usedoublebuffering) VH_UpdateScreen();
 	fizzlein = true;
 
 	PlayLoop ();
@@ -1280,11 +1281,13 @@ void Died (void)
 	//
 	FinishPaletteShifts ();
 
+	if(usedoublebuffering) VH_UpdateScreen();
+
 	VL_BarScaledCoord (viewscreenx,viewscreeny,viewwidth,viewheight,4);
 
 	IN_ClearKeysDown ();
 
-	FizzleFade(screenBuffer,screen,viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
+	FizzleFade(screenBuffer,viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
 
 	IN_UserInput(100);
 	SD_WaitSoundDone ();
@@ -1367,9 +1370,10 @@ restartgame:
 		if (!died)
 			PreloadGraphics ();             // TODO: Let this do something useful!
 		else
+		{
 			died = false;
-
-		fizzlein = true;
+			fizzlein = true;
+		}
 
 		DrawLevel ();
 

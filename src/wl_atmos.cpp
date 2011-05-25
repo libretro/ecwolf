@@ -56,10 +56,11 @@ void DrawStarSky(byte *vbuf, uint32_t vbufPitch)
 	int hvwidth = viewwidth >> 1;
 
 	byte *ptr = vbuf;
-	for(int i = 0; i < hvheight; i++, ptr += vbufPitch)
+	int i;
+	for(i = 0; i < hvheight; i++, ptr += vbufPitch)
 		memset(ptr, 0, viewwidth);
 
-	for(int i = 0; i < MAXPOINTS; i++)
+	for(i = 0; i < MAXPOINTS; i++)
 	{
 		point3d_t *pt = &points[i];
 		int32_t x = pt->x * viewcos + pt->z * viewsin;
@@ -82,7 +83,7 @@ void DrawStarSky(byte *vbuf, uint32_t vbufPitch)
 	if(xx > -10 && xx < viewwidth)
 	{
 		int stopx = 10, starty = 0, stopy = 10;
-		int i = 0;
+		i = 0;
 		if(xx < 0) i = -xx;
 		if(xx > viewwidth - 11) stopx = viewwidth - xx;
 		if(yy < 0) startj = -yy;

@@ -484,16 +484,10 @@ int DebugKeys (void)
 		VW_UpdateScreen();
 		IN_Ack();
 		fpscounter ^= 1;
-/*        if (!fpscounter)
-			DrawPlayScreen(); */
 		return 1;
 	}
 	if (Keyboard[sc_E])             // E = quit level
-	{
-		if (param_tedlevel != -1)
-			Quit (NULL);
 		playstate = ex_completed;
-	}
 
 	if (Keyboard[sc_F])             // F = facing spot
 	{
