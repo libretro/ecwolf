@@ -30,7 +30,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	for(int y = y0, bot_offset = bot_offset0, top_offset = top_offset0;
 		y < halfheight; y++, bot_offset += vbufPitch, top_offset -= vbufPitch)
 	{
-		dist = (heightnumerator / y) << 5;
+		dist = (heightnumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
 		gv = -viewy + FixedMul(dist, viewsin);
 		tex_step = (dist << 8) / viewwidth / 175;

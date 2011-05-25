@@ -493,6 +493,7 @@ void CreateMenus()
 	controlBase.setHeadPicture("M_CONTRL");
 	controlBase.addItem(new BooleanMenuItem(language["STR_ALWAYSRUN"], alwaysrun, EnterControlBase));
 	controlBase.addItem(new BooleanMenuItem(language["STR_MOUSEEN"], mouseenabled, EnterControlBase));
+	controlBase.addItem(new BooleanMenuItem(language["STR_WINDOWEDMOUSE"], forcegrabmouse, EnterControlBase));
 	controlBase.addItem(new BooleanMenuItem(language["STR_DISABLEYAXIS"], mouseyaxisdisabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_SENS"], mouseSensitivity));
 	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
@@ -1570,7 +1571,6 @@ CheckForEpisodes (void)
 	{
 		strcpy (extension, "wj6");
 #endif
-		strcat (configname, extension);
 		strcat (SaveName, extension);
 		strcat (demoname, extension);
 		EpisodeSelect[1] =
@@ -1656,7 +1656,6 @@ CheckForEpisodes (void)
 #endif
 #endif
 
-	strcat (configname, extension);
 	strcat (SaveName, extension);
 	strcat (demoname, extension);
 #endif

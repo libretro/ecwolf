@@ -19,6 +19,7 @@
 
 
 #include "wl_def.h"
+#include "c_cvars.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -392,7 +393,7 @@ IN_Startup(void)
 
 	SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
 
-	if(fullscreen)
+	if(fullscreen || forcegrabmouse)
 	{
 		GrabInput = true;
 		SDL_WM_GrabInput(SDL_GRAB_ON);

@@ -30,6 +30,7 @@ STR_PC = "PC Speaker";
 STR_ALSB = "AdLib/Sound Blaster";
 STR_DISNEY = "Disney Sound Source";
 STR_SB = "Sound Blaster";
+STR_WINDOWEDMOUSE = "Windowed Mouse";
 STR_MOUSEEN = "Mouse Enabled";
 STR_JOYEN = "Joystick Enabled";
 STR_PORT2 = "Use joystick port 2";

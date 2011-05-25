@@ -53,6 +53,7 @@ enum Aspect
 	ASPECT_5_4
 };
 
+extern boolean	forcegrabmouse;
 extern boolean	r_depthfog;
 extern boolean	vid_fullscreen;
 extern Aspect	vid_aspect;

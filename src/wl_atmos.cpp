@@ -81,12 +81,14 @@ void DrawStarSky(byte *vbuf, uint32_t vbufPitch)
 	int32_t yy = hvheight - ((hvheight - (hvheight >> 3)) << 22) / z;
 	if(xx > -10 && xx < viewwidth)
 	{
-		int stop = 10;
+		int stopx = 10, starty = 0, stopy = 10;
 		int i = 0;
 		if(xx < 0) i = -xx;
-		if(xx > viewwidth - 11) stop = viewwidth - xx;
-		for(; i < stop; i++)
-			for(int j = 0; j < 10; j++)
+		if(xx > viewwidth - 11) stopx = viewwidth - xx;
+		if(yy < 0) startj = -yy;
+		if(yy > viewheight - 11) stopy = viewheight - yy;
+		for(; i < stopx; i++)
+			for(int j = starty; j < stopy; j++)
 				vbuf[(yy + j) * vbufPitch + xx + i] = moon[j * 10 + i];
 	}
 }
@@ -97,6 +99,12 @@ void DrawStarSky(byte *vbuf, uint32_t vbufPitch)
 
 void DrawRain(byte *vbuf, uint32_t vbufPitch)
 {
+#if defined(USE_FLOORCEILINGTEX) && defined(FIXRAINSNOWLEAKS)
+	fixed dist;                                // distance to row projection
+	fixed tex_step;                            // global step per one screen pixel
+	fixed gu, gv, floorx, floory;              // global texture coordinates
+#endif
+
 	fixed px = (player->y + FixedMul(0x7900, viewsin)) >> 6;
 	fixed pz = (player->x - FixedMul(0x7900, viewcos)) >> 6;
 	int32_t ax, az, x, y, z, xx, yy, height, actheight;
@@ -104,7 +112,7 @@ void DrawRain(byte *vbuf, uint32_t vbufPitch)
 	int hvheight = viewheight >> 1;
 	int hvwidth = viewwidth >> 1;
 
-	rainpos -= 1800;            // TODO: make it tics dependent
+	rainpos -= tics * 900;
 	for(int i = 0; i < MAXPOINTS; i++)
 	{
 		point3d_t *pt = &points[i];
@@ -127,6 +135,19 @@ void DrawRain(byte *vbuf, uint32_t vbufPitch)
 		if(actheight < (wallheight[xx] >> 3) && height < wallheight[xx]) continue;
 		if(xx >= 0 && xx < viewwidth && yy > 0 && yy < viewheight)
 		{
+#if defined(USE_FLOORCEILINGTEX) && defined(FIXRAINSNOWLEAKS)
+			// Find the rain's tile coordinate
+			// NOTE: This sometimes goes over the map edges.
+			dist = ((heightnumerator / ((height >> 3) + 1)) << 5);
+			gu =  viewx + FixedMul(dist, viewcos);
+			gv = -viewy + FixedMul(dist, viewsin);
+			floorx = (  gu >> TILESHIFT     ) & 63;
+			floory = (-(gv >> TILESHIFT) - 1) & 63;
+
+			// Is there a ceiling tile?
+			if(MAPSPOT(floorx, floory, 2) >> 8) continue;
+#endif
+
 			vbuf[yy * vbufPitch + xx] = shade+15;
 			vbuf[(yy - 1) * vbufPitch + xx] = shade+16;
 			if(yy > 2)
@@ -141,6 +162,12 @@ void DrawRain(byte *vbuf, uint32_t vbufPitch)
 
 void DrawSnow(byte *vbuf, uint32_t vbufPitch)
 {
+#if defined(USE_FLOORCEILINGTEX) && defined(FIXRAINSNOWLEAKS)
+	fixed dist;                                // distance to row projection
+	fixed tex_step;                            // global step per one screen pixel
+	fixed gu, gv, floorx, floory;              // global texture coordinates
+#endif
+
 	fixed px = (player->y + FixedMul(0x7900, viewsin)) >> 6;
 	fixed pz = (player->x - FixedMul(0x7900, viewcos)) >> 6;
 	int32_t ax, az, x, y, z, xx, yy, height, actheight;
@@ -148,7 +175,7 @@ void DrawSnow(byte *vbuf, uint32_t vbufPitch)
 	int hvheight = viewheight >> 1;
 	int hvwidth = viewwidth >> 1;
 
-	rainpos -= 512;            // TODO: make it tics dependent
+	rainpos -= tics * 256;
 	for(int i = 0; i < MAXPOINTS; i++)
 	{
 		point3d_t *pt = &points[i];
@@ -171,6 +198,19 @@ void DrawSnow(byte *vbuf, uint32_t vbufPitch)
 		if(actheight < (wallheight[xx] >> 3) && height < wallheight[xx]) continue;
 		if(xx > 0 && xx < viewwidth && yy > 0 && yy < viewheight)
 		{
+#if defined(USE_FLOORCEILINGTEX) && defined(FIXRAINSNOWLEAKS)
+			// Find the snow's tile coordinate
+			// NOTE: This sometimes goes over the map edges.
+			dist = ((heightnumerator / ((height >> 3) + 1)) << 5);
+			gu =  viewx + FixedMul(dist, viewcos);
+			gv = -viewy + FixedMul(dist, viewsin);
+			floorx = (  gu >> TILESHIFT     ) & 63;
+			floory = (-(gv >> TILESHIFT) - 1) & 63;
+
+			// Is there a ceiling tile?
+			if(MAPSPOT(floorx, floory, 2) >> 8) continue;
+#endif
+
 			if(shade < 10)
 			{
 				vbuf[yy * vbufPitch + xx] = shade+17;

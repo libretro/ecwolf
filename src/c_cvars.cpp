@@ -40,6 +40,7 @@
 #include "id_us.h"
 
 Aspect vid_aspect = ASPECT_4_3;
+boolean forcegrabmouse = false;
 boolean r_depthfog = false;
 boolean vid_fullscreen = true;
 
@@ -83,6 +84,7 @@ void FinalReadConfig()
 
 void ReadConfig(void)
 {
+	config->CreateSetting("ForceGrabMouse", false);
 	config->CreateSetting("MouseEnabled", 1);
 	config->CreateSetting("JoystickEnabled", 0);
 	config->CreateSetting("ViewSize", 19);
@@ -105,6 +107,7 @@ void ReadConfig(void)
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
+	forcegrabmouse = config->GetSetting("ForceGrabMouse")->GetInteger() != 0;
 	mouseenabled = config->GetSetting("MouseEnabled")->GetInteger() != 0;
 	joystickenabled = config->GetSetting("JoystickEnabled")->GetInteger() != 0;
 	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)
@@ -189,6 +192,7 @@ void WriteConfig(void)
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
+	config->GetSetting("ForceGrabMouse")->SetValue(forcegrabmouse);
 	config->GetSetting("MouseEnabled")->SetValue(mouseenabled);
 	config->GetSetting("JoystickEnabled")->SetValue(joystickenabled);
 	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)

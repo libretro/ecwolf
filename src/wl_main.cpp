@@ -100,8 +100,6 @@ boolean startgame;
 boolean loadedgame;
 int     mouseadjustment;
 
-char    configname[13]="config.";
-
 //
 // Command line parameter variables
 //
@@ -878,6 +876,7 @@ static void InitGame()
 		}
 	}
 #endif
+	VW_UpdateScreen();
 
 	GenerateLookupTables();
 	VH_Startup ();
@@ -953,6 +952,8 @@ static void InitGame()
 //
 // HOLDING DOWN 'M' KEY?
 //
+	IN_ProcessEvents();
+
 #ifndef SPEARDEMO
 	if (Keyboard[sc_M])
 	{
