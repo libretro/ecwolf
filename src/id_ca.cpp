@@ -14,6 +14,7 @@ loaded into the data segment
 =============================================================================
 */
 
+#include "gamemap.h"
 #include "wl_def.h"
 #include "id_sd.h"
 #include "id_vl.h"
@@ -30,6 +31,7 @@ loaded into the data segment
 
 int     mapon = -1;
 
+GameMap *map = NULL;
 word    *mapsegs[MAPPLANES] = {NULL, NULL, NULL};
 
 int     numEpisodesMissing = 0;
@@ -78,38 +80,6 @@ boolean CA_WriteFile (const char *filename, void *ptr, int32_t length)
 }
 
 
-
-/*
-==========================
-=
-= CA_LoadFile
-=
-= Allocate space for and load a file
-=
-==========================
-*/
-
-boolean CA_LoadFile (const char *filename, memptr *ptr)
-{
-	int32_t size;
-
-	const int handle = open(filename, O_RDONLY | O_BINARY);
-	if (handle == -1)
-		return false;
-
-	size = lseek(handle, 0, SEEK_END);
-	lseek(handle, 0, SEEK_SET);
-	*ptr=malloc(size);
-	CHECKMALLOCRESULT(*ptr);
-	if (!read (handle,*ptr,size))
-	{
-		close (handle);
-		return false;
-	}
-	close (handle);
-	return true;
-}
-
 /*
 =============================================================================
 
@@ -132,8 +102,10 @@ void CA_CacheMap (int mapnum)
 
 	char mapname[9];
 	sprintf(mapname, "MAP%02d", mapnum+1);
+	delete map;
+	map = new GameMap(mapname);
 	int lmp = Wads.GetNumForName(mapname);
-	FWadLump lump = Wads.OpenLumpNum(lmp);
+	FWadLump lump = Wads.OpenLumpNum(lmp+1);
 	lump.Seek(0, SEEK_SET);
 
 	WORD dimensions[2];

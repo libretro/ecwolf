@@ -403,9 +403,9 @@ public:
 	FSwitchDef *FindSwitch (FTextureID texture);
 	FDoorAnimation *FindAnimatedDoor (FTextureID picnum);
 
-	FTextureID GetDoor(unsigned int tile, bool track=false);
+	FTextureID GetDoor(unsigned int tile, bool vertical, bool track=false);
 	FTextureID GetFlat(unsigned int tile, bool ceiling=false);
-	FTextureID GetTile(unsigned int tile);
+	FTextureID GetTile(unsigned int tile, bool vertical);
 private:
 
 	// texture counting
@@ -466,8 +466,8 @@ private:
 			FName textureName;
 			FTextureID texture;
 	};
-	TileMap mapTiles[64];
-	TileMap doorTiles[64][2]; // Door and track
+	TileMap mapTiles[64][2];
+	TileMap doorTiles[128][2]; // Door and track
 	TileMap flatTiles[256][2]; // floor/ceiling
 };
 

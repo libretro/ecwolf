@@ -9,13 +9,13 @@
 
 extern  int   mapon;
 
+extern  class GameMap *map;
 extern  word *mapsegs[MAPPLANES];
 
 extern  char  extension[5];
 
 //===========================================================================
 
-boolean CA_LoadFile (const char *filename, memptr *ptr);
 boolean CA_WriteFile (const char *filename, void *ptr, int32_t length);
 
 void CA_CacheMap (int mapnum);

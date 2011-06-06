@@ -83,6 +83,7 @@ add_executable(ecwolf
 	file.cpp
 	files.cpp
 	fmopl.cpp
+	gamemap.cpp
 	id_ca.cpp
 	id_ca2.cpp
 	id_in.cpp

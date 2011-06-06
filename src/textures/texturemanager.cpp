@@ -735,7 +735,10 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 						case 0:
 							if(index > 63)
 								sc.ScriptMessage(Scanner::ERROR, "Can't assign map tile over 63.\n");
-							mapTiles[index].textureName = sc->str;
+							mapTiles[index][0].textureName = sc->str;
+							sc.MustGetToken(',');
+							sc.MustGetToken(TK_StringConst);
+							mapTiles[index][1].textureName = sc->str;
 							break;
 						case 1:
 						case 2:
@@ -751,10 +754,16 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 					int index = sc->number;
 					sc.MustGetToken(',');
 					sc.MustGetToken(TK_StringConst);
-					doorTiles[index][0].textureName = sc->str;
+					doorTiles[index*2][0].textureName = sc->str;
 					sc.MustGetToken(',');
 					sc.MustGetToken(TK_StringConst);
-					doorTiles[index][1].textureName = sc->str;
+					doorTiles[index*2+1][0].textureName = sc->str;
+					sc.MustGetToken(',');
+					sc.MustGetToken(TK_StringConst);
+					doorTiles[index*2][1].textureName = sc->str;
+					sc.MustGetToken(',');
+					sc.MustGetToken(TK_StringConst);
+					doorTiles[index*2+1][1].textureName = sc->str;
 				}
 				else
 				{
@@ -1165,12 +1174,12 @@ int FTextureManager::CountLumpTextures (int lumpnum)
 //
 //===========================================================================
 
-FTextureID FTextureManager::GetDoor(unsigned int tile, bool track)
+FTextureID FTextureManager::GetDoor(unsigned int tile, bool vertical, bool track)
 {
 	if(tile > 63)
 		tile = 63;
-	TileMap &tm = doorTiles[tile][track];
-	if(tm.texture.isNull())
+	TileMap &tm = doorTiles[tile*2+vertical][track];
+	if(tm.texture.isNull() && tm.textureName.GetIndex() != 0)
 		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Wall);
 	return tm.texture;
 }
@@ -1179,16 +1188,16 @@ FTextureID FTextureManager::GetFlat(unsigned int tile, bool ceiling)
 	if(tile > 255)
 		tile = 255;
 	TileMap &tm = flatTiles[tile][ceiling];
-	if(tm.texture.isNull())
+	if(tm.texture.isNull() && tm.textureName.GetIndex() != 0)
 		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Flat);
 	return tm.texture;
 }
-FTextureID FTextureManager::GetTile(unsigned int tile)
+FTextureID FTextureManager::GetTile(unsigned int tile, bool vertical)
 {
 	if(tile > 63)
 		tile = 63;
-	TileMap &tm = mapTiles[tile];
-	if(tm.texture.isNull())
+	TileMap &tm = mapTiles[tile][vertical];
+	if(tm.texture.isNull() && tm.textureName.GetIndex() != 0)
 		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Wall);
 	return tm.texture;
 }

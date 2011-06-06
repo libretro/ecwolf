@@ -1,386 +1,58 @@
 /************ Wolfenstein Textures **************/
 
-texture "GSTONEA", 128, 64
-{
-	patch "GSTONEA1", 0, 0
-	patch "GSTONEA2", 64, 0
-}
+maptile 1, "GSTONEA1", "GSTONEA2"
+maptile 2, "GSTONEB1", "GSTONEB2"
+maptile 3, "GSTFLAG1", "GSTFLAG2"
+maptile 4, "GSTHTLR1", "GSTHTLR2"
+maptile 5, "BSTCELA1", "BSTCELB2"
+maptile 6, "GSTEAGL1", "GSTEAGL2"
+maptile 7, "BSTCELB1", "BSTCELB2"
+maptile 8, "BSTONEA1", "BSTONEA2"
+maptile 9, "BSTONEB1", "BSTONEB2"
+maptile 10, "WODEAGL1", "WODEAGL2"
+maptile 11, "WODHTLR1", "WODHTLR2"
+maptile 12, "WOOD1", "WOOD2"
+maptile 13, "FAKEDOR1", "FAKEDOR2"
+maptile 14, "METLSGN1", "METLSGN2"
+maptile 15, "METAL1", "METAL2"
+maptile 16, "SKY1", "SKY2"
+maptile 17, "BRICK1", "BRICK2"
+maptile 18, "BRIKWRT1", "BRIKWRT2"
+maptile 19, "PURPLE1", "PURPLE2"
+maptile 20, "BRIKEGL1", "BRIKEGL2"
+maptile 21, "ELEV1_1", "ELEV1_2"
+maptile 22, "ELEV2_1", "ELEV2_2"
+maptile 23, "WODCROS1", "WODCROS2"
+maptile 24, "GSTSLME1", "GSTSLME2"
+maptile 25, "PURPBLD1", "PURPBLD2"
+maptile 26, "GSTLSLM1", "GSTLSLM2"
+maptile 27, "GSTONEC1", "GSTONEC2"
+maptile 28, "GSTSIGN1", "GSTSIGN2"
+maptile 29, "CHIP1", "CHIP2"
+maptile 30, "CHPBLDA1", "CHPBLDA2"
+maptile 31, "CHPBLDB1", "CHPBLDB2"
+maptile 32, "CHPBLDC1", "CHPBLDC2"
+maptile 33, "GLASS1", "GLASS2"
+maptile 34, "BLUSKUL1", "BLUSKUL2"
+maptile 35, "GRYBRIK1", "GRYBRIK2"
+maptile 36, "BLUSWAS1", "BLUSWAS2"
+maptile 37, "GRYVENT1", "GRYVENT2"
+maptile 38, "BRIKODD1", "BRIKODD2"
+maptile 39, "GRYCRAK1", "GRYCRAK2"
+maptile 40, "BLUWALL1", "BLUWALL2"
+maptile 41, "BSTSIGN1", "BSTSIGN2"
+maptile 42, "MARB1_1", "MARB1_2"
+maptile 43, "GRYMAPS1", "GRYMAPS2"
+maptile 44, "BRNSTNA1", "BRNSTNA2"
+maptile 45, "BRNSTNB1", "BRNSTNB2"
+maptile 46, "MARB2_1", "MARB2_2"
+maptile 47, "MARB3_1", "MARB3_2"
+maptile 48, "PLASTER1", "PLASTER2"
+maptile 49, "GRYHTLR1", "GRYHTLR2"
 
-texture "GSTONEB", 128, 64
-{
-	patch "GSTONEB1", 0, 0
-	patch "GSTONEB2", 64, 0
-}
-
-texture "GSTFLAG", 128, 64
-{
-	patch "GSTFLAG1", 0, 0
-	patch "GSTFLAG2", 64, 0
-}
-
-texture "GSTHITLR", 128, 64
-{
-	patch "GSTHTLR1", 0, 0
-	patch "GSTHTLR2", 64, 0
-}
-
-texture "BSTCELLA", 128, 64
-{
-	patch "BSTCELA1", 0, 0
-	patch "BSTCELA2", 64, 0
-}
-
-texture "GSTEAGLE", 128, 64
-{
-	patch "GSTEAGL1", 0, 0
-	patch "GSTEAGL2", 64, 0
-}
-
-texture "BSTCELLB", 128, 64
-{
-	patch "BSTCELB1", 0, 0
-	patch "BSTCELB2", 64, 0
-}
-
-texture "BSTONEA", 128, 64
-{
-	patch "BSTONEA1", 0, 0
-	patch "BSTONEA2", 64, 0
-}
-
-texture "BSTONEB", 128, 64
-{
-	patch "BSTONEB1", 0, 0
-	patch "BSTONEB2", 64, 0
-}
-
-texture "WOODEAGL", 128, 64
-{
-	patch "WODEAGL1", 0, 0
-	patch "WODEAGL2", 64, 0
-}
-
-texture "WOODHTLR", 128, 64
-{
-	patch "WODHTLR1", 0, 0
-	patch "WODHTLR2", 64, 0
-}
-
-texture "WOOD", 128, 64
-{
-	patch "WOOD1", 0, 0
-	patch "WOOD2", 64, 0
-}
-
-texture "FAKEDOOR", 128, 64
-{
-	patch "FAKEDOR1", 0, 0
-	patch "FAKEDOR2", 64, 0
-}
-
-texture "METALSGN", 128, 64
-{
-	patch "METLSGN1", 0, 0
-	patch "METLSGN2", 64, 0
-}
-
-texture "METAL", 128, 64
-{
-	patch "METAL1", 0, 0
-	patch "METAL2", 64, 0
-}
-
-texture "SKY", 128, 64
-{
-	patch "SKY1", 0, 0
-	patch "SKY2", 64, 0
-}
-
-texture "BRICK", 128, 64
-{
-	patch "BRICK1", 0, 0
-	patch "BRICK2", 64, 0
-}
-
-texture "BRICK", 128, 64
-{
-	patch "BRICK1", 0, 0
-	patch "BRICK2", 64, 0
-}
-
-
-texture "BRIKWRTH", 128, 64
-{
-	patch "BRIKWRT1", 0, 0
-	patch "BRIKWRT2", 64, 0
-}
-
-texture "PURPLE", 128, 64
-{
-	patch "PURPLE1", 0, 0
-	patch "PURPLE2", 64, 0
-}
-
-texture "BRIKEAGL", 128, 64
-{
-	patch "BRIKEGL1", 0, 0
-	patch "BRIKEGL2", 64, 0
-}
-
-texture "ELEVATR1", 128, 64
-{
-	patch "ELEV1_1", 0, 0
-	patch "ELEV1_2", 64, 0
-}
-
-texture "ELEVATR2", 128, 64
-{
-	patch "ELEV2_1", 0, 0
-	patch "ELEV2_2", 64, 0
-}
-
-texture "WODCROSS", 128, 64
-{
-	patch "WODCROS1", 0, 0
-	patch "WODCROS2", 64, 0
-}
-
-texture "GSTSLIME", 128, 64
-{
-	patch "GSTSLME1", 0, 0
-	patch "GSTSLME2", 64, 0
-}
-
-texture "PURPBLOD", 128, 64
-{
-	patch "PURPBLD1", 0, 0
-	patch "PURPBLD2", 64, 0
-}
-
-texture "GSTLSLIM", 128, 64
-{
-	patch "GSTLSLM1", 0, 0
-	patch "GSTLSLM2", 64, 0
-}
-
-texture "GSTONEC", 128, 64
-{
-	patch "GSTONEC1", 0, 0
-	patch "GSTONEC2", 64, 0
-}
-
-
-texture "GSTSIGN", 128, 64
-{
-	patch "GSTSIGN1", 0, 0
-	patch "GSTSIGN2", 64, 0
-}
-
-texture "CHIP", 128, 64
-{
-	patch "CHIP1", 0, 0
-	patch "CHIP2", 64, 0
-}
-
-texture "CHIPBLDA", 128, 64
-{
-	patch "CHPBLDA1", 0, 0
-	patch "CHPBLDA2", 64, 0
-}
-
-
-texture "CHIPBLDB", 128, 64
-{
-	patch "CHPBLDB1", 0, 0
-	patch "CHPBLDB2", 64, 0
-}
-
-
-texture "CHIPBLDC", 128, 64
-{
-	patch "CHPBLDC1", 0, 0
-	patch "CHPBLDC2", 64, 0
-}
-
-texture "GLASS", 128, 64
-{
-	patch "GLASS1", 0, 0
-	patch "GLASS2", 64, 0
-}
-
-texture "BLUESKUL", 128, 64
-{
-	patch "BLUSKUL1", 0, 0
-	patch "BLUSKUL2", 64, 0
-}
-
-texture "GRAYBRIK", 128, 64
-{
-	patch "GRYBRIK1", 0, 0
-	patch "GRYBRIK2", 64, 0
-}
-
-texture "BLUESWAS", 128, 64
-{
-	patch "BLUSWAS1", 0, 0
-	patch "BLUSWAS2", 64, 0
-}
-
-texture "GRAYVENT", 128, 64
-{
-	patch "GRYVENT1", 0, 0
-	patch "GRYVENT2", 64, 0
-}
-
-texture "BRIKODD", 128, 64
-{
-	patch "BRIKODD1", 0, 0
-	patch "BRIKODD2", 64, 0
-}
-
-texture "GRAYCRAK", 128, 64
-{
-	patch "GRYCRAK1", 0, 0
-	patch "GRYCRAK2", 64, 0
-}
-
-texture "BLUEWALL", 128, 64
-{
-	patch "BLUWALL1", 0, 0
-	patch "BLUWALL2", 64, 0
-}
-
-texture "BSTSIGN", 128, 64
-{
-	patch "BSTSIGN1", 0, 0
-	patch "BSTSIGN2", 64, 0
-}
-
-texture "MARBLE1", 128, 64
-{
-	patch "MARB1_1", 0, 0
-	patch "MARB1_2", 64, 0
-}
-
-texture "GRAYMAPS", 128, 64
-{
-	patch "GRYMAPS1", 0, 0
-	patch "GRYMAPS2", 64, 0
-}
-
-texture "BRNSTONA", 128, 64
-{
-	patch "BRNSTNA1", 0, 0
-	patch "BRNSTNA2", 64, 0
-}
-
-texture "BRNSTONB", 128, 64
-{
-	patch "BRNSTNB1", 0, 0
-	patch "BRNSTNB2", 64, 0
-}
-
-texture "MARBLE2", 128, 64
-{
-	patch "MARB2_1", 0, 0
-	patch "MARB2_2", 64, 0
-}
-
-texture "MARBLE3", 128, 64
-{
-	patch "MARB3_1", 0, 0
-	patch "MARB3_2", 64, 0
-}
-
-texture "PLASTER", 128, 64
-{
-	patch "PLASTER1", 0, 0
-	patch "PLASTER2", 64, 0
-}
-
-texture "GRAYHTLR", 128, 64
-{
-	patch "GRYHTLR1", 0, 0
-	patch "GRYHTLR2", 64, 0
-}
-
-texture "DOOR1", 128, 64
-{
-	patch "DOOR1_1", 0, 0
-	patch "DOOR1_2", 64, 0
-}
-
-texture "SLOT1", 128, 64
-{
-	patch "SLOT1_1", 0, 0
-	patch "SLOT1_2", 64, 0
-}
-
-texture "DOOR2", 128, 64
-{
-	patch "DOOR2_1", 0, 0
-	patch "DOOR2_2", 64, 0
-}
-
-texture "DOOR3", 128, 64
-{
-	patch "DOOR3_1", 0, 0
-	patch "DOOR3_2", 64, 0
-}
-
-maptile 1, "GSTONEA"
-maptile 2, "GSTONEB"
-maptile 3, "GSTFLAG"
-maptile 4, "GSTHITLR"
-maptile 5, "BSTCELLA"
-maptile 6, "GSTEAGLE"
-maptile 7, "BSTCELLB"
-maptile 8, "BSTONEA"
-maptile 9, "BSTONEB"
-maptile 10, "WOODEAGL"
-maptile 11, "WOODHTLR"
-maptile 12, "WOOD"
-maptile 13, "FAKEDOOR"
-maptile 14, "METALSGN"
-maptile 15, "METAL"
-maptile 16, "SKY"
-maptile 17, "BRICK"
-maptile 18, "BRIKWRTH"
-maptile 19, "PURPLE"
-maptile 20, "BRIKEAGL"
-maptile 21, "ELEVATR1"
-maptile 22, "ELEVATR2"
-maptile 23, "WODCROSS"
-maptile 24, "GSTSLIME"
-maptile 25, "PURPBLOD"
-maptile 26, "GSTLSLIM"
-maptile 27, "GSTONEC"
-maptile 28, "GSTSIGN"
-maptile 29, "CHIP"
-maptile 30, "CHIPBLDA"
-maptile 31, "CHIPBLDB"
-maptile 32, "CHIPBLDC"
-maptile 33, "GLASS"
-maptile 34, "BLUESKUL"
-maptile 35, "GRAYBRIK"
-maptile 36, "BLUESWAS"
-maptile 37, "GRAYVENT"
-maptile 38, "BRIKODD"
-maptile 39, "GRAYCRAK"
-maptile 40, "BLUEWALL"
-maptile 41, "BSTSIGN"
-maptile 42, "MARBLE1"
-maptile 43, "GRAYMAPS"
-maptile 44, "BRNSTONA"
-maptile 45, "BRNSTONB"
-maptile 46, "MARBLE2"
-maptile 47, "MARBLE3"
-maptile 48, "PLASTER"
-maptile 49, "GRAYHTLR"
-
-doortile 0, "DOOR1", "SLOT1" 
-doortile 1, "DOOR3", "SLOT1"
-doortile 2, "DOOR3", "SLOT1"
-doortile 3, "DOOR3", "SLOT1"
-doortile 4, "DOOR3", "SLOT1"
-doortile 5, "DOOR2", "SLOT1"
+doortile 0, "DOOR1_1", "DOOR1_2", "SLOT1_1", "SLOT1_2" 
+doortile 1, "DOOR3_1", "DOOR3_2", "SLOT1_1", "SLOT1_2"
+doortile 2, "DOOR3_1", "DOOR3_2", "SLOT1_1", "SLOT1_2"
+doortile 3, "DOOR3_1", "DOOR3_2", "SLOT1_1", "SLOT1_2"
+doortile 4, "DOOR3_1", "DOOR3_2", "SLOT1_1", "SLOT1_2"
+doortile 5, "DOOR2_1", "DOOR2_2", "SLOT1_1", "SLOT1_2"

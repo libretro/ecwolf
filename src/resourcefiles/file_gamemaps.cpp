@@ -143,26 +143,11 @@ struct FMapLump : public FResourceLump
 			}
 		}
 
-	public:
-		struct
-		{
-			DWORD	PlaneOffset[PLANES];
-			WORD	PlaneLength[PLANES];
-			WORD	Width;
-			WORD	Height;
-			char	Name[16];
-		} Header;
-
-		FMapLump() : FResourceLump()
-		{
-			LumpSize = HEADERSIZE;
-		}
-		~FMapLump()
-		{
-		}
-
 		int FillCache()
 		{
+			if(LumpSize == 0)
+				return 1;
+
 			unsigned int PlaneSize = Header.Width*Header.Height*2;
 
 			Cache = new char[LumpSize];
@@ -186,6 +171,24 @@ struct FMapLump : public FResourceLump
 				delete[] tempOut;
 			}
 			return 1;
+		}
+
+	public:
+		struct
+		{
+			DWORD	PlaneOffset[PLANES];
+			WORD	PlaneLength[PLANES];
+			WORD	Width;
+			WORD	Height;
+			char	Name[16];
+		} Header;
+
+		FMapLump() : FResourceLump()
+		{
+			LumpSize = HEADERSIZE;
+		}
+		~FMapLump()
+		{
 		}
 };
 
@@ -228,29 +231,38 @@ bool FGamemaps::Open(bool quiet)
 	mapheadReader.Read(offsets, NumPossibleMaps*4);
 	for(NumLumps = 0;offsets[NumLumps] != 0;++NumLumps);
 
-	Lumps = new FMapLump[NumLumps];
+	Lumps = new FMapLump[NumLumps*2];
 	for(unsigned int i = 0;i < NumLumps;i++)
 	{
-		BYTE header[PLANES*6+20];
-		Reader->Seek(offsets[i], SEEK_SET);
-		Reader->Read(&header, PLANES*6+20);
-
+		// Map marker
+		FMapLump &markerLump = Lumps[i*2];
 		// Hey we don't need to use a temporary name here!
 		// First map is MAP01 and so forth.
 		char lumpname[7];
 		sprintf(lumpname, "MAP%02d", i+1);
-		Lumps[i].Owner = this;
-		Lumps[i].LumpNameSetup(lumpname);
-		Lumps[i].Namespace = ns_global;
+		markerLump.Owner = this;
+		markerLump.LumpNameSetup(lumpname);
+		markerLump.Namespace = ns_global;
+		markerLump.LumpSize = 0;
+
+		// Make the data lump
+		FMapLump &dataLump = Lumps[i*2+1];
+		BYTE header[PLANES*6+20];
+		Reader->Seek(offsets[i], SEEK_SET);
+		Reader->Read(&header, PLANES*6+20);
+
+		dataLump.Owner = this;
+		dataLump.LumpNameSetup("PLANES");
+		dataLump.Namespace = ns_global;
 		for(unsigned int j = 0;j < PLANES;j++)
 		{
-			Lumps[i].Header.PlaneOffset[j] = ReadLittleLong(&header[4*j]);
-			Lumps[i].Header.PlaneLength[j] = ReadLittleShort(&header[PLANES*4+2*j]);
+			dataLump.Header.PlaneOffset[j] = ReadLittleLong(&header[4*j]);
+			dataLump.Header.PlaneLength[j] = ReadLittleShort(&header[PLANES*4+2*j]);
 		}
-		Lumps[i].Header.Width = ReadLittleShort(&header[PLANES*6]);
-		Lumps[i].Header.Height = ReadLittleShort(&header[PLANES*6+2]);
-		memcpy(&header[PLANES*6+4], Lumps[i].Header.Name, 16);
-		Lumps[i].LumpSize += Lumps[i].Header.Width*Lumps[i].Header.Height*PLANES*2;
+		dataLump.Header.Width = ReadLittleShort(&header[PLANES*6]);
+		dataLump.Header.Height = ReadLittleShort(&header[PLANES*6+2]);
+		memcpy(&header[PLANES*6+4], dataLump.Header.Name, 16);
+		dataLump.LumpSize += dataLump.Header.Width*dataLump.Header.Height*PLANES*2;
 	}
 	delete[] offsets;
 	if(!quiet) Printf(", %d lumps\n", NumLumps);
