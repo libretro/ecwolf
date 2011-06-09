@@ -1,6 +1,8 @@
 // WL_ACT1.C
 
+#include "wl_act.h"
 #include "wl_def.h"
+#include "id_ca.h"
 #include "id_sd.h"
 #include "thingdef.h"
 
@@ -742,7 +744,8 @@ void MoveDoors (void)
 word pwallstate;
 word pwallpos;                  // amount a pushable wall has been moved (0-63)
 word pwallx,pwally;
-byte pwalldir,pwalltile;
+byte pwalldir;
+MapSpot pwalltile;
 int dirs[4][2]={{0,-1},{1,0},{0,1},{-1,0}};
 
 /*
@@ -780,7 +783,7 @@ void PushWall (int checkx, int checky, int dir)
 	pwalldir = dir;
 	pwallstate = 1;
 	pwallpos = 0;
-	pwalltile = tilemap[pwallx][pwally];
+	pwalltile = map->GetSpot(pwallx, pwally, 0);
 	tilemap[pwallx][pwally] = 64;
 	tilemap[pwallx+dx][pwally+dy] = 64;
 	*(mapsegs[1]+(pwally<<mapshift)+pwallx) = 0;   // remove P tile info
@@ -801,7 +804,8 @@ void PushWall (int checkx, int checky, int dir)
 
 void MovePWalls (void)
 {
-	int oldblock,oldtile;
+	int oldblock;
+	MapSpot oldtile;
 
 	if (!pwallstate)
 		return;
@@ -832,7 +836,7 @@ void MovePWalls (void)
 			// the block has been pushed two tiles
 			//
 			pwallstate = 0;
-			tilemap[pwallx+dx][pwally+dy] = oldtile;
+			//tilemap[pwallx+dx][pwally+dy] = oldtile;
 			return;
 		}
 		else
@@ -850,10 +854,10 @@ void MovePWalls (void)
 				|| xl<=pwallx+dx && pwallx+dx<=xh && yl<=pwally+dy && pwally+dy<=yh)
 			{
 				pwallstate = 0;
-				tilemap[pwallx][pwally] = oldtile;
+				//tilemap[pwallx][pwally] = oldtile;
 				return;
 			}
-			actorat[pwallx+dx][pwally+dy] = (objtype *)(uintptr_t) (tilemap[pwallx+dx][pwally+dy] = oldtile);
+			//actorat[pwallx+dx][pwally+dy] = (objtype *)(uintptr_t) (tilemap[pwallx+dx][pwally+dy] = oldtile);
 			tilemap[pwallx+dx][pwally+dy] = 64;
 		}
 	}

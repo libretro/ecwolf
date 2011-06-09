@@ -1,5 +1,6 @@
 // WL_DRAW.C
 
+#include "wl_act.h"
 #include "wl_def.h"
 #include "id_pm.h"
 #include "id_sd.h"
@@ -14,6 +15,8 @@
 #include "wl_atmos.h"
 #include "wl_shade.h"
 #include "thingdef.h"
+#include "id_ca.h"
+#include "gamemap.h"
 
 /*
 =============================================================================
@@ -88,7 +91,7 @@ void    ThreeDRefresh (void);
 //
 int     lastside;               // true for vertical
 int32_t    lastintercept;
-int     lasttilehit;
+MapSpot lasttilehit;
 int     lasttexture;
 
 //
@@ -100,8 +103,8 @@ longword xpartialup,xpartialdown,ypartialup,ypartialdown;
 float   midangle;
 short   angle;
 
-byte	hitdir;
-word    tilehit;
+MapTile::Side hitdir;
+MapSpot tilehit;
 int     pixx;
 
 short   xtile,ytile;
@@ -293,7 +296,6 @@ int CalcHeight()
 
 const byte *postsource;
 int postx;
-int postwidth;
 
 void ScalePost()
 {
@@ -378,17 +380,18 @@ void HitVertWall (void)
 	int texture;
 
 	if(xtilestep==-1 && (xintercept>>16)<=xtile)
-		hitdir = di_east;
+		hitdir = MapTile::East;
 	else
-		hitdir = di_west;
-	texture = ((yintercept+texdelta)>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
-	if (xtilestep == -1)
+		hitdir = MapTile::West;
+
+	texture = ((yintercept+texdelta-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
+	if (xtilestep == -1 && !tilehit->tile->offsetVertical)
 	{
 		texture = TEXTUREMASK-texture;
 		xintercept += TILEGLOBAL;
 	}
 
-	if(lastside==1 && lastintercept==xtile && lasttilehit==tilehit && !(lasttilehit & 0x40))
+	if(lastside==1 && lastintercept==xtile && lasttilehit==tilehit && !(lasttilehit->tile->offsetVertical))
 	{
 		if((pixx&3) && texture == lasttexture)
 		{
@@ -400,7 +403,6 @@ void HitVertWall (void)
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		postsource+=texture-lasttexture;
-		postwidth=1;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -414,19 +416,13 @@ void HitVertWall (void)
 	lasttexture=texture;
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
-	postwidth = 1;
 	FTexture *source = NULL;
 
-	if (tilehit & 0x40)
-	{                                                               // check for adjacent doors
-		ytile = (short)(yintercept>>TILESHIFT);
-		if ( tilemap[xtile-xtilestep][ytile]&0x80 )
-			source = TexMan(TexMan.GetDoor(doorobjlist[tilemap[xtile-xtilestep][ytile]&0x7F].lock, true, true));
-		else
-			source = TexMan(TexMan.GetTile(tilehit&~0x40, true));
-	}
-	if(source == NULL)
-		source = TexMan(TexMan.GetTile(tilehit, true));
+	MapSpot adj = tilehit->GetAdjacent(hitdir);
+	if (adj && adj->tile && adj->tile->offsetHorizontal && !adj->tile->offsetVertical) // check for adjacent doors
+		source = TexMan(adj->tile->texture[hitdir]);
+	else
+		source = TexMan(tilehit->tile->texture[hitdir]);
 
 	postsource = source->GetColumn(texture/64, NULL);
 }
@@ -449,16 +445,20 @@ void HitHorizWall (void)
 	int texture;
 
 	if(ytilestep==-1 && (yintercept>>16)<=ytile)
-		hitdir = di_north;
+		hitdir = MapTile::North;
 	else
-		hitdir = di_south;
-	texture = ((xintercept+texdelta)>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
-	if (ytilestep == -1)
-		yintercept += TILEGLOBAL;
-	else
-		texture = TEXTUREMASK-texture;
+		hitdir = MapTile::South;
 
-	if(lastside==0 && lastintercept==ytile && lasttilehit==tilehit && !(lasttilehit & 0x40))
+	texture = ((xintercept+texdelta-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
+	if(!tilehit->tile->offsetHorizontal)
+	{
+		if (ytilestep == -1)
+			yintercept += TILEGLOBAL;
+		else
+			texture = TEXTUREMASK-texture;
+	}
+
+	if(lastside==0 && lastintercept==ytile && lasttilehit==tilehit && !(lasttilehit->tile->offsetHorizontal))
 	{
 		if((pixx&3) && texture == lasttexture)
 		{
@@ -470,7 +470,6 @@ void HitHorizWall (void)
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		postsource+=texture-lasttexture;
-		postwidth=1;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -478,25 +477,19 @@ void HitHorizWall (void)
 
 	if(lastside!=-1) ScalePost();
 
-	lastside=0;
-	lastintercept=ytile;
+	lastside=2;//0;
+	//lastintercept=ytile;
 	lasttilehit=tilehit;
 	lasttexture=texture;
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
-	postwidth = 1;
 	FTexture *source = NULL;
 
-	if (tilehit & 0x40)
-	{                                                               // check for adjacent doors
-		xtile = (short)(xintercept>>TILESHIFT);
-		if ( tilemap[xtile][ytile-ytilestep]&0x80)
-			source = TexMan(TexMan.GetDoor(doorobjlist[tilemap[xtile][ytile-ytilestep]&0x7F].lock, false, true));
-		else
-			source = TexMan(TexMan.GetTile(tilehit&~0x40, false));
-	}
-	if(source == NULL)
-		source = TexMan(TexMan.GetTile(tilehit, false));
+	MapSpot adj = tilehit->GetAdjacent(hitdir);
+	if (adj && adj->tile && adj->tile->offsetVertical && !adj->tile->offsetHorizontal) // check for adjacent doors
+		source = TexMan(adj->tile->texture[hitdir]);
+	else
+		source = TexMan(tilehit->tile->texture[hitdir]);
 
 	postsource = source->GetColumn(texture/64, NULL);
 }
@@ -514,11 +507,14 @@ void HitHorizWall (void)
 void HitHorizDoor (void)
 {
 	int doorpage;
-	int doornum;
 	int texture;
 
-	doornum = tilehit&0x7f;
-	texture = ((xintercept-doorposition[doornum])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
+	if(ytilestep==-1 && (yintercept>>16)<=ytile)
+		hitdir = MapTile::North;
+	else
+		hitdir = MapTile::South;
+
+	texture = ((xintercept-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 
 	if(lasttilehit==tilehit)
 	{
@@ -532,7 +528,6 @@ void HitHorizDoor (void)
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		postsource+=texture-lasttexture;
-		postwidth=1;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -545,9 +540,8 @@ void HitHorizDoor (void)
 	lasttexture=texture;
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
-	postwidth = 1;
 
-	postsource = TexMan(TexMan.GetDoor(doorobjlist[doornum].lock, false))->GetColumn(texture/64, NULL);
+	postsource = TexMan(tilehit->tile->texture[hitdir])->GetColumn(texture/64, NULL);
 }
 
 //==========================================================================
@@ -563,11 +557,14 @@ void HitHorizDoor (void)
 void HitVertDoor (void)
 {
 	int doorpage;
-	int doornum;
 	int texture;
 
-	doornum = tilehit&0x7f;
-	texture = ((yintercept-doorposition[doornum])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
+	if(xtilestep==-1 && (xintercept>>16)<=xtile)
+		hitdir = MapTile::East;
+	else
+		hitdir = MapTile::West;
+
+	texture = ((yintercept-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 
 	if(lasttilehit==tilehit)
 	{
@@ -581,7 +578,6 @@ void HitVertDoor (void)
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		postsource+=texture-lasttexture;
-		postwidth=1;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -594,9 +590,8 @@ void HitVertDoor (void)
 	lasttexture=texture;
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
-	postwidth = 1;
 
-	postsource = TexMan(TexMan.GetDoor(doorobjlist[doornum].lock, true))->GetColumn(texture/64, NULL);
+	postsource = TexMan(tilehit->tile->texture[hitdir])->GetColumn(texture/64, NULL);
 }
 
 //==========================================================================
@@ -1200,22 +1195,23 @@ vertentry:
 				break;
 			}
 			if(xspot>=maparea) break;
-			tilehit=((byte *)tilemap)[xspot];
-			if(tilehit)
+			tilehit=map->GetSpot(xspot/MAPSIZE, xspot%MAPSIZE, 0);
+			if(tilehit && tilehit->tile)
 			{
-				if(tilehit&0x80)
+				if(tilehit->tile->offsetVertical)
 				{
 					int32_t yintbuf=yintercept+(ystep>>1);
 					if((yintbuf>>16)!=(yintercept>>16))
 						goto passvert;
-					if((word)yintbuf<doorposition[tilehit&0x7f])
+					if((word)yintbuf<tilehit->slideAmount[hitdir])
 						goto passvert;
 					yintercept=yintbuf;
 					xintercept=(xtile<<TILESHIFT)|0x8000;
-					HitVertDoor();
+					HitVertWall();
 				}
 				else
 				{
+#if 0
 					if(tilehit==64)
 					{
 						if(pwalldir==di_west || pwalldir==di_east)
@@ -1313,6 +1309,7 @@ vertentry:
 						}
 					}
 					else
+#endif
 					{
 						xintercept=xtile<<TILESHIFT;
 						HitVertWall();
@@ -1347,22 +1344,23 @@ horizentry:
 				break;
 			}
 			if(yspot>=maparea) break;
-			tilehit=((byte *)tilemap)[yspot];
-			if(tilehit)
+			tilehit=map->GetSpot(yspot/MAPSIZE, yspot%MAPSIZE, 0);
+			if(tilehit && tilehit->tile)
 			{
-				if(tilehit&0x80)
+				if(tilehit->tile->offsetHorizontal)
 				{
 					int32_t xintbuf=xintercept+(xstep>>1);
 					if((xintbuf>>16)!=(xintercept>>16))
 						goto passhoriz;
-					if((word)xintbuf<doorposition[tilehit&0x7f])
+					if((word)xintbuf<tilehit->slideAmount[hitdir])
 						goto passhoriz;
 					xintercept=xintbuf;
 					yintercept=(ytile<<TILESHIFT)+0x8000;
-					HitHorizDoor();
+					HitHorizWall();
 				}
 				else
 				{
+#if 0
 					if(tilehit==64)
 					{
 						if(pwalldir==di_north || pwalldir==di_south)
@@ -1460,6 +1458,7 @@ horizentry:
 						}
 					}
 					else
+#endif
 					{
 						yintercept=ytile<<TILESHIFT;
 						HitHorizWall();

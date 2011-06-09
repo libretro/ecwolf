@@ -1,5 +1,6 @@
 // WL_PLAY.C
 
+#include "wl_act.h"
 #include "wl_def.h"
 #include "wl_menu.h"
 #include "id_sd.h"

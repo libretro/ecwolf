@@ -32,12 +32,12 @@
 **
 */
 
-#ifndef __GAMEMAP__
-#define __GAMEMAP__
+#ifndef __GAMEMAP_H__
+#define __GAMEMAP_H__
 
-#include "textures/textures.h"
 #include "tarray.h"
 #include "zstring.h"
+#include "textures/textures.h"
 
 class GameMap
 {
@@ -88,9 +88,9 @@ class GameMap
 			Tile() : offsetVertical(false), offsetHorizontal(false) {}
 
 			enum Side { East, North, West, South };
-			FTextureID	texture[4];
-			bool		offsetVertical;
-			bool		offsetHorizontal;
+			FTextureID		texture[4];
+			bool			offsetVertical;
+			bool			offsetHorizontal;
 		};
 		struct Sector
 		{
@@ -102,12 +102,25 @@ class GameMap
 		};
 		struct Plane
 		{
+			const GameMap	*gm;
+
 			unsigned int	depth;
 			struct Map
 			{
-				Tile	*tile;
-				Sector	*sector;
-				Zone	*zone;
+				Map() : tile(NULL), sector(NULL), zone(NULL)
+				{
+					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
+				}
+
+				Map	*GetAdjacent(Tile::Side dir, bool opposite=false) const;
+
+				const Plane		*plane;
+
+				const Tile		*tile;
+				const Sector	*sector;
+				const Zone		*zone;
+
+				unsigned int	slideAmount[4];
 			}*	map;
 		};
 
@@ -115,6 +128,7 @@ class GameMap
 		~GameMap();
 
 		const Header	&GetHeader() const { return header; }
+		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		bool			IsValid() const { return valid; }
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
@@ -139,5 +153,11 @@ class GameMap
 		TArray<Trigger>	triggers;
 		TArray<Plane>	planes;
 };
+
+typedef GameMap::Plane::Map *	MapSpot;
+
+// The following are mainly for easy access to enums
+typedef GameMap::Tile			MapTile;
+typedef GameMap::Sector			MapSector;
 
 #endif

@@ -6,6 +6,7 @@
 	#include <unistd.h>
 #endif
 
+#include "wl_act.h"
 #include "wl_def.h"
 #include "wl_menu.h"
 #include "id_vl.h"
@@ -240,7 +241,6 @@ void ShapeTest (void)
 	extern  word    NumDigi;
 	extern  word    *DigiList;
 	extern  int     postx;
-	extern  int     postwidth;
 	extern  byte    *postsource;
 	static  char    buf[10];
 
@@ -305,7 +305,6 @@ void ShapeTest (void)
 				//
 				vbuf += 32*SCREENWIDTH;
 				postx = 128;
-				postwidth = 1;
 				postsource = addr;
 				for (x=0;x<64;x++,postx++,postsource+=64)
 				{

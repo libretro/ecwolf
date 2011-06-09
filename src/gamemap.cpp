@@ -85,7 +85,10 @@ GameMap::Plane &GameMap::NewPlane()
 {
 	planes.Reserve(1);
 	Plane &newPlane = planes[planes.Size()-1];
+	newPlane.gm = this;
 	newPlane.map = new Plane::Map[header.width*header.height];
+	for(unsigned int i = 0;i < header.width*header.height;++i)
+		newPlane.map[i].plane = &newPlane;
 	return newPlane;
 }
 
@@ -163,13 +166,13 @@ void GameMap::ReadPlanesData()
 					tile.offsetHorizontal = i%2 == 1;
 					if(i%2 == 0)
 					{
-						tile.texture[Tile::North] = tile.texture[Tile::South] = TexMan.GetDoor(i, true, false);
-						tile.texture[Tile::East] = tile.texture[Tile::West] = TexMan.GetDoor(i, true, true);
+						tile.texture[Tile::North] = tile.texture[Tile::South] = TexMan.GetDoor(i/2, true, true);
+						tile.texture[Tile::East] = tile.texture[Tile::West] = TexMan.GetDoor(i/2, true, false);
 					}
 					else
 					{
-						tile.texture[Tile::North] = tile.texture[Tile::South] = TexMan.GetDoor(i, false, false);
-						tile.texture[Tile::East] = tile.texture[Tile::West] = TexMan.GetDoor(i, false, true);
+						tile.texture[Tile::North] = tile.texture[Tile::South] = TexMan.GetDoor(i/2, false, false);
+						tile.texture[Tile::East] = tile.texture[Tile::West] = TexMan.GetDoor(i/2, false, true);
 					}
 				}
 				
@@ -293,4 +296,34 @@ void GameMap::ReadPlanesData()
 			}
 		}
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
+{
+	if(opposite) // Rotate the dir 180 degrees.
+		dir = MapTile::Side((dir+2)%4);
+
+	const int pos = static_cast<int>(this - plane->map);
+	int x = pos%plane->gm->GetHeader().width;
+	int y = pos/plane->gm->GetHeader().width;
+	switch(dir)
+	{
+		case MapTile::North:
+			++y;
+			break;
+		case MapTile::South:
+			--y;
+			break;
+		case MapTile::West:
+			--x;
+			break;
+		case MapTile::East:
+			++x;
+			break;
+	}
+	if(y < 0 || y >= plane->gm->GetHeader().height || x < 0 || x >= plane->gm->GetHeader().width)
+		return NULL;
+	return &plane->map[y*plane->gm->GetHeader().width+x];
 }
