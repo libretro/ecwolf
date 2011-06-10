@@ -36,6 +36,7 @@
 #include "tarray.h"
 #include "w_wad.h"
 #include "wl_def.h"
+#include "lnspec.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false)
 {
@@ -81,6 +82,14 @@ GameMap::~GameMap()
 		delete[] planes[i].map;
 }
 
+void GameMap::ActivateTrigger(Trigger &trig, AActor *activator)
+{
+	MapSpot spot = GetSpot(trig.x, trig.y, trig.z);
+
+	Specials::LineSpecialFunction func = Specials::LookupFunction(Specials::LineSpecials(trig.action));
+	func(spot, activator);
+}
+
 GameMap::Plane &GameMap::NewPlane()
 {
 	planes.Reserve(1);
@@ -90,6 +99,53 @@ GameMap::Plane &GameMap::NewPlane()
 	for(unsigned int i = 0;i < header.width*header.height;++i)
 		newPlane.map[i].plane = &newPlane;
 	return newPlane;
+}
+
+GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned int z)
+{
+	// Allow triggers to be binary searchable.
+
+	/*unsigned int max = triggers.Size();
+	unsigned int min = 0;
+	unsigned int mid = max/2;
+	if(max != 0)
+	{
+		do
+		{
+			int dir = 0;
+			Trigger &trig = triggers[mid];
+			if(z < trig.z)
+				dir = -1;
+			else if(z > trig.z)
+				dir = 1;
+			else if(y < trig.y)
+				dir = -1;
+			else if(y > trig.y)
+				dir = 1;
+			else if(x < trig.x)
+				dir = -1;
+			else if(x > trig.x)
+				dir = 1;
+
+			if(dir == 0)
+				break;
+			else if(dir < 0)
+				max = mid-1;
+			else if(dir > 0)
+				min = mid+1;
+			mid = min + (max-min)/2;
+		}
+		while(max > min);
+	}*/
+
+	MapSpot spot = GetSpot(x, y, z);
+	Trigger newTrig;
+	newTrig.x = x;
+	newTrig.y = y;
+	newTrig.z = z;
+	//triggers.Insert(mid, newTrig);
+	spot->triggers.Push(newTrig);
+	return spot->triggers[spot->triggers.Size()-1];
 }
 
 // Reads old format maps
@@ -185,18 +241,15 @@ void GameMap::ReadPlanesData()
 					{
 						const bool vertical = oldplane[i]%2 == 0;
 						const unsigned int doorType = (oldplane[i]-DOOR_START)/2;
-						Trigger trig;
-						trig.x = i%UNIT;
-						trig.y = i/UNIT;
-						trig.z = 0;
-						trig.action = 0;
+						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						trig.action = Specials::Door_Open;
+						trig.arg[0] = 1;
 						trig.playerUse = true;
 						trig.monsterUse = true;
 						if(vertical)
 							trig.activate[Trigger::North] = trig.activate[Trigger::South] = false;
 						else
 							trig.activate[Trigger::East] = trig.activate[Trigger::West] = false;
-						triggers.Push(trig);
 
 						mapPlane.map[i].tile = &tilePalette[oldplane[i]-DOOR_START+NUM_WALLS];
 					}
@@ -213,13 +266,10 @@ void GameMap::ReadPlanesData()
 					else if(oldplane[i] == EXIT_TILE)
 					{
 						// Add exit trigger
-						Trigger trig;
-						trig.x = i%UNIT;
-						trig.y = i/UNIT;
-						trig.z = 0;
-						trig.action = 0;
+						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						trig.action = Specials::Exit_Normal;
+						trig.activate[Trigger::North] = trig.activate[Trigger::South] = false;
 						trig.playerUse = true;
-						triggers.Push(trig);
 					}
 
 					if(oldplane[i] > ZONE_START && oldplane[i] < ZONE_END)
@@ -253,8 +303,9 @@ void GameMap::ReadPlanesData()
 							for(unsigned int k = 0;k < triggers.Size();++k)
 							{
 								if((triggers[k].x == candidates[j]%UNIT) &&
-									(triggers[k].y == candidates[j]/UNIT))
-									triggers[k].action = 0;
+									(triggers[k].y == candidates[j]/UNIT) &&
+									(triggers[k].action == Specials::Exit_Normal))
+									triggers[k].action = Specials::Exit_Secret;
 							}
 						}
 					}

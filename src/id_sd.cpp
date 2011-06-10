@@ -558,7 +558,12 @@ byte* SD_PrepareSound(int which)
 	delete[] origsamples;
 	byte* out = reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(wavebuffer, sizeof(headchunk) + sizeof(wavechunk) + destsamples * 2), 1));
 	free(wavebuffer);
-	return out;
+
+	// TEMPORARY WORK AROUND FOR MEMORY ERROR
+	byte* nout = new byte[sizeof(Mix_Chunk)];
+	memcpy(nout, out, sizeof(Mix_Chunk));
+	free(out);
+	return nout;
 }
 
 int SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChannel chan)

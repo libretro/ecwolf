@@ -121,12 +121,14 @@ class GameMap
 				const Zone		*zone;
 
 				unsigned int	slideAmount[4];
+				TArray<Trigger>	triggers;
 			}*	map;
 		};
 
 		GameMap(const FString &map);
 		~GameMap();
 
+		void			ActivateTrigger(Trigger &trig, AActor *activator);
 		const Header	&GetHeader() const { return header; }
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		bool			IsValid() const { return valid; }
@@ -135,6 +137,7 @@ class GameMap
 
 	private:
 		Plane	&NewPlane();
+		Trigger	&NewTrigger(unsigned int x, unsigned int y, unsigned int z);
 		void	ReadPlanesData();
 
 		FString	map;
@@ -157,7 +160,8 @@ class GameMap
 typedef GameMap::Plane::Map *	MapSpot;
 
 // The following are mainly for easy access to enums
-typedef GameMap::Tile			MapTile;
 typedef GameMap::Sector			MapSector;
+typedef GameMap::Tile			MapTile;
+typedef GameMap::Trigger		MapTrigger;
 
 #endif

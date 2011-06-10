@@ -363,6 +363,24 @@ void GlobalScalePost(byte *vidbuf, unsigned pitch)
 	ScalePost();
 }
 
+static void DetermineHitDir(bool vertical)
+{
+	if(vertical)
+	{
+		if(xtilestep==-1 && (xintercept>>16)<=xtile)
+			hitdir = MapTile::East;
+		else
+			hitdir = MapTile::West;
+	}
+	else
+	{
+		if(ytilestep==-1 && (yintercept>>16)<=ytile)
+			hitdir = MapTile::North;
+		else
+			hitdir = MapTile::South;
+	}
+}
+
 /*
 ====================
 =
@@ -379,10 +397,7 @@ void HitVertWall (void)
 	int wallpic;
 	int texture;
 
-	if(xtilestep==-1 && (xintercept>>16)<=xtile)
-		hitdir = MapTile::East;
-	else
-		hitdir = MapTile::West;
+	DetermineHitDir(true);
 
 	texture = ((yintercept+texdelta-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 	if (xtilestep == -1 && !tilehit->tile->offsetVertical)
@@ -444,10 +459,7 @@ void HitHorizWall (void)
 	int wallpic;
 	int texture;
 
-	if(ytilestep==-1 && (yintercept>>16)<=ytile)
-		hitdir = MapTile::North;
-	else
-		hitdir = MapTile::South;
+	DetermineHitDir(false);
 
 	texture = ((xintercept+texdelta-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 	if(!tilehit->tile->offsetHorizontal)
@@ -509,10 +521,7 @@ void HitHorizDoor (void)
 	int doorpage;
 	int texture;
 
-	if(ytilestep==-1 && (yintercept>>16)<=ytile)
-		hitdir = MapTile::North;
-	else
-		hitdir = MapTile::South;
+	DetermineHitDir(false);
 
 	texture = ((xintercept-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 
@@ -559,10 +568,7 @@ void HitVertDoor (void)
 	int doorpage;
 	int texture;
 
-	if(xtilestep==-1 && (xintercept>>16)<=xtile)
-		hitdir = MapTile::East;
-	else
-		hitdir = MapTile::West;
+	DetermineHitDir(true);
 
 	texture = ((yintercept-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
 
@@ -1200,6 +1206,7 @@ vertentry:
 			{
 				if(tilehit->tile->offsetVertical)
 				{
+					DetermineHitDir(true);
 					int32_t yintbuf=yintercept+(ystep>>1);
 					if((yintbuf>>16)!=(yintercept>>16))
 						goto passvert;
@@ -1349,6 +1356,7 @@ horizentry:
 			{
 				if(tilehit->tile->offsetHorizontal)
 				{
+					DetermineHitDir(false);
 					int32_t xintbuf=xintercept+(xstep>>1);
 					if((xintbuf>>16)!=(xintercept>>16))
 						goto passhoriz;

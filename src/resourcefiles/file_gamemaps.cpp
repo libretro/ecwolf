@@ -261,7 +261,7 @@ bool FGamemaps::Open(bool quiet)
 		}
 		dataLump.Header.Width = ReadLittleShort(&header[PLANES*6]);
 		dataLump.Header.Height = ReadLittleShort(&header[PLANES*6+2]);
-		memcpy(&header[PLANES*6+4], dataLump.Header.Name, 16);
+		memcpy(dataLump.Header.Name, &header[PLANES*6+4], 16);
 		dataLump.LumpSize += dataLump.Header.Width*dataLump.Header.Height*PLANES*2;
 	}
 	delete[] offsets;

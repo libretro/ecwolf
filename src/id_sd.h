@@ -8,6 +8,8 @@
 #ifndef __ID_SD__
 #define __ID_SD__
 
+#include "wl_def.h"
+
 #define alOut(n,b) 		YM3812Write(0, n, b, AdlibVolume)
 #define alOutMusic(n,b)	YM3812Write(0, n, b, MusicVolume)
 

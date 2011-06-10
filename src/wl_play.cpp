@@ -12,6 +12,7 @@
 #include "wl_shade.h"
 #include "language.h"
 #include "lumpremap.h"
+#include "thinker.h"
 #include "thingdef.h"
 #include "textures/textures.h"
 
@@ -1290,6 +1291,9 @@ void PlayLoop (void)
 
 		MoveDoors ();
 		MovePWalls ();
+
+		for (unsigned int i = 0;i < tics;++i)
+			thinkerList.Tick();
 
 		for (obj = player; obj; obj = obj->next)
 			DoActor (obj);

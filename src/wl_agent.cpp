@@ -2,11 +2,13 @@
 
 #include "wl_act.h"
 #include "wl_def.h"
+#include "id_ca.h"
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
 #include "thingdef.h"
+#include "lnspec.h"
 
 /*
 =============================================================================
@@ -1114,7 +1116,7 @@ void Cmd_Fire (void)
 void Cmd_Use (void)
 {
 	int     checkx,checky,doornum,dir;
-	boolean elevatorok;
+	MapTrigger::Side direction;
 
 	//
 	// find which cardinal direction the player is facing
@@ -1124,28 +1126,36 @@ void Cmd_Use (void)
 		checkx = player->tilex + 1;
 		checky = player->tiley;
 		dir = di_east;
-		elevatorok = true;
+		direction = MapTrigger::East;
 	}
 	else if (player->angle < 3*ANGLES/8)
 	{
 		checkx = player->tilex;
 		checky = player->tiley-1;
 		dir = di_north;
-		elevatorok = false;
+		direction = MapTrigger::North;
 	}
 	else if (player->angle < 5*ANGLES/8)
 	{
 		checkx = player->tilex - 1;
 		checky = player->tiley;
 		dir = di_west;
-		elevatorok = true;
+		direction = MapTrigger::West;
 	}
 	else
 	{
 		checkx = player->tilex;
 		checky = player->tiley + 1;
 		dir = di_south;
-		elevatorok = false;
+		direction = MapTrigger::South;
+	}
+
+	MapSpot spot = map->GetSpot(checkx, checky, 0);
+	for(unsigned int i = 0;i < spot->triggers.Size();++i)
+	{
+		MapTrigger &trig = spot->triggers[i];
+		if(trig.activate[direction] && trig.playerUse)
+			map->ActivateTrigger(trig, player);
 	}
 
 	doornum = tilemap[checkx][checky];
@@ -1157,21 +1167,6 @@ void Cmd_Use (void)
 
 		PushWall (checkx,checky,dir);
 		return;
-	}
-	if (!buttonheld[bt_use] && doornum == ELEVATORTILE && elevatorok)
-	{
-		//
-		// use elevator
-		//
-		buttonheld[bt_use] = true;
-
-		tilemap[checkx][checky]++;              // flip switch
-		if (*(mapsegs[0]+(player->tiley<<mapshift)+player->tilex) == ALTELEVATORTILE)
-			playstate = ex_secretlevel;
-		else
-			playstate = ex_completed;
-		SD_PlaySound ("world/level_done");
-		SD_WaitSoundDone();
 	}
 	else if (!buttonheld[bt_use] && doornum & 0x80)
 	{

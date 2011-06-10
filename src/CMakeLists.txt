@@ -93,6 +93,7 @@ add_executable(ecwolf
 	id_vh.cpp
 	id_vl.cpp
 	language.cpp
+	lnspec.cpp
 	lumpremap.cpp
 	m_classes.cpp
 	m_random.cpp
@@ -101,7 +102,7 @@ add_executable(ecwolf
 	r_translate.cpp
 	scanner.cpp
 	sndinfo.cpp
-	#tiles.cpp
+	thinker.cpp
 	thingdef.cpp
 	thingdef_properties.cpp
 	v_palette.cpp
