@@ -39,6 +39,8 @@
 #include "zstring.h"
 #include "textures/textures.h"
 
+class Thinker;
+
 class GameMap
 {
 	public:
@@ -99,6 +101,7 @@ class GameMap
 		};
 		struct Zone
 		{
+			unsigned short	index;
 		};
 		struct Plane
 		{
@@ -107,12 +110,14 @@ class GameMap
 			unsigned int	depth;
 			struct Map
 			{
-				Map() : tile(NULL), sector(NULL), zone(NULL)
+				Map() : tile(NULL), sector(NULL), zone(NULL), thinker(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
 				}
 
-				Map	*GetAdjacent(Tile::Side dir, bool opposite=false) const;
+				unsigned int	GetX() const;
+				unsigned int	GetY() const;
+				Map				*GetAdjacent(Tile::Side dir, bool opposite=false) const;
 
 				const Plane		*plane;
 
@@ -120,6 +125,7 @@ class GameMap
 				const Sector	*sector;
 				const Zone		*zone;
 
+				Thinker			*thinker;
 				unsigned int	slideAmount[4];
 				TArray<Trigger>	triggers;
 			}*	map;
@@ -128,17 +134,23 @@ class GameMap
 		GameMap(const FString &map);
 		~GameMap();
 
-		void			ActivateTrigger(Trigger &trig, AActor *activator);
+		void			ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator);
 		const Header	&GetHeader() const { return header; }
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		bool			IsValid() const { return valid; }
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
 
+		// Sound functions
+		bool			CheckLink(const Zone *zone1, const Zone *zone2, bool recurse);
+		void			LinkZones(const Zone *zone1, const Zone *zone2, bool open);
+
 	private:
 		Plane	&NewPlane();
 		Trigger	&NewTrigger(unsigned int x, unsigned int y, unsigned int z);
 		void	ReadPlanesData();
+		void	SetupReject();
+		void	UnloadReject();
 
 		FString	map;
 
@@ -155,6 +167,8 @@ class GameMap
 		TArray<Thing>	things;
 		TArray<Trigger>	triggers;
 		TArray<Plane>	planes;
+
+		unsigned short***	zoneLinks;
 };
 
 typedef GameMap::Plane::Map *	MapSpot;
@@ -163,5 +177,6 @@ typedef GameMap::Plane::Map *	MapSpot;
 typedef GameMap::Sector			MapSector;
 typedef GameMap::Tile			MapTile;
 typedef GameMap::Trigger		MapTrigger;
+typedef GameMap::Zone			MapZone;
 
 #endif

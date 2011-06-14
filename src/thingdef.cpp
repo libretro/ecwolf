@@ -592,12 +592,18 @@ const ClassDef *ClassDef::DeclareNativeClass(const char* className, const ClassD
 
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
-AActor::AActor(const ClassDef *type) : classType(type), flags(0)
+AActor::AActor(const ClassDef *type) : classType(type), flags(0), soundZone(NULL)
 {
 }
 
 AActor::~AActor()
 {
+}
+
+void AActor::EnterZone(const MapZone *zone)
+{
+	if(zone)
+		soundZone = zone;
 }
 
 class AWeapon : public AActor

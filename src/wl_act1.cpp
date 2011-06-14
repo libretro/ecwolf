@@ -487,7 +487,7 @@ void CloseDoor (int door)
 		+doorobjlist[door].tilex)-AREATILE;
 	if (areabyplayer[area])
 	{
-		PlaySoundLocTile("doors/close",doorobjlist[door].tilex,doorobjlist[door].tiley); // JAB
+		//PlaySoundLocTile("doors/close",doorobjlist[door].tilex,doorobjlist[door].tiley); // JAB
 	}
 
 	doorobjlist[door].action = dr_closing;
@@ -601,8 +601,8 @@ void DoorOpening (int door)
 			if (player->areanumber < NUMAREAS)
 				ConnectAreas ();
 
-			if (areabyplayer[area1])
-				PlaySoundLocTile("doors/open",doorobjlist[door].tilex,doorobjlist[door].tiley);  // JAB
+			//if (areabyplayer[area1])
+			//	PlaySoundLocTile("doors/open",doorobjlist[door].tilex,doorobjlist[door].tiley);  // JAB
 		}
 	}
 

@@ -34,12 +34,13 @@
 
 #include "id_sd.h"
 #include "lnspec.h"
+#include "thingdef.h"
 using namespace Specials;
 
 #define DEFINE_SPECIAL(name,num,args) \
-	static int LN_##name(MapSpot spot, AActor *activator);
+	static int LN_##name(MapSpot spot, MapTrigger::Side direction, AActor *activator);
 #define FUNC(name) \
-	static int LN_##name(MapSpot spot, AActor *activator)
+	static int LN_##name(MapSpot spot, MapTrigger::Side direction, AActor *activator)
 
 DEFINE_SPECIAL(NOP, 0, 0)
 #include "lnspecials.h"
@@ -93,44 +94,137 @@ FUNC(NOP)
 
 class EVDoor : public Thinker
 {
+	DECLARE_THINKER(EVDoor)
+
 	public:
-		EVDoor(MapSpot spot) : Thinker(), state(Opening), spot(spot), amount(0) {}
+		EVDoor(MapSpot spot, MapTrigger::Side direction) : Thinker(), state(Closed), spot(spot), amount(0), direction(direction)
+		{
+			ChangeState(Opening);
+			spot->thinker = this;
+			if(direction > 1)
+				this->direction = direction%2;
+		}
+
+		void Destroy()
+		{
+			if(spot->thinker == this)
+				spot->thinker = NULL;
+			Thinker::Destroy();
+		}
 
 		void Tick()
 		{
+			static const unsigned int MOVE_AMOUNT = 1<<10;
 			switch(state)
 			{
+				default:
+					break;
 				case Opening:
+					// Connect sound
+					if(amount == 0)
+					{
+						const MapZone *zone1 = spot->GetAdjacent(MapTile::Side(direction))->zone;
+						const MapZone *zone2 = spot->GetAdjacent(MapTile::Side(direction), true)->zone;
+						map->LinkZones(zone1, zone2, true);
+
+						if(map->CheckLink(zone1, player->GetZone(), true))
+							PlaySoundLocMapSpot("doors/open", spot);
+					}
+
 					if(amount < 0xffff)
-						amount += 0xff;
-					spot->slideAmount[1] = spot->slideAmount[3] = amount;
-					if(amount == 0xffff)
-						state = Opened;
+						amount += MOVE_AMOUNT;
+					if(amount >= 0xffff)
+					{
+						amount = 0xffff;
+						ChangeState(Opened);
+					}
+					spot->slideAmount[direction] = spot->slideAmount[direction+2] = amount;
 					break;
 				case Opened:
-					state = Closing;
+					if(--wait == 0)
+						ChangeState(Closing);
 					break;
 				case Closing:
 					if(amount > 0)
-						amount -= 0xff;
-					spot->slideAmount[1] = spot->slideAmount[3] = amount;
-					if(amount == 0)
+						amount -= MOVE_AMOUNT;
+					if(amount <= 0)
+					{
+						amount = 0;
 						Destroy();
+
+						// Disconnect Sound
+						const MapZone *zone1 = spot->GetAdjacent(MapTile::Side(direction))->zone;
+						const MapZone *zone2 = spot->GetAdjacent(MapTile::Side(direction), true)->zone;
+						map->LinkZones(zone1, zone2, false);
+					}
+					spot->slideAmount[direction] = spot->slideAmount[direction+2] = amount;
+					break;
+			}
+		}
+
+		void Reactivate()
+		{
+			switch(state)
+			{
+				default:
+					ChangeState(Closing);
+					break;
+				case Closing:
+					ChangeState(Opening);
 					break;
 			}
 		}
 
 	private:
-		enum State { Opening, Opened, Closing } state;
+		enum State { Opening, Opened, Closing, Closed };
 
+		void ChangeState(State st)
+		{
+			static const unsigned int OPENTICS = 300;
+
+			if(st == state)
+				return;
+			state = st;
+
+			switch(state)
+			{
+				default:
+					break;
+				case Opened:
+					wait = OPENTICS;
+					break;
+				case Closing:
+					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, player->GetZone(), true))
+						PlaySoundLocMapSpot("doors/close", spot);
+					break;
+			}
+		}
+
+		State state;
 		MapSpot spot;
-		unsigned short amount;
+		int amount;
+		unsigned int wait;
+		unsigned short direction;
 };
+IMPLEMENT_THINKER(EVDoor)
 
 FUNC(Door_Open)
 {
-	new EVDoor(spot);
-	return 0;
+	if(buttonheld[bt_use])
+		return 0;
+
+	if(spot->thinker)
+	{
+		if(spot->thinker->IsThinkerType<EVDoor>())
+		{
+			static_cast<EVDoor *>(spot->thinker)->Reactivate();
+			return 1;
+		}
+		return 0;
+	}
+
+	new EVDoor(spot, direction);
+	return 1;
 }
 
 FUNC(Exit_Normal)

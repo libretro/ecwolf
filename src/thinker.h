@@ -36,18 +36,37 @@
 #ifndef __THINKER_H__
 #define __THINKER_H__
 
+#include "wl_def.h"
+#include "name.h"
+
 class Thinker;
 class ThinkerList;
 struct ThinkerRef;
 
+#define DECLARE_THINKER(type) \
+	public: \
+		static Thinker::__ThinkerInfo __StaticThinkerType; \
+	protected: \
+		virtual Thinker::__ThinkerInfo &__ThinkerType() const { return __StaticThinkerType; }
+#define IMPLEMENT_THINKER(type) \
+	Thinker::__ThinkerInfo type::__StaticThinkerType(#type);
+
 class Thinker
 {
 	public:
+		typedef const FName __ThinkerInfo;
+
 		Thinker();
 		virtual ~Thinker();
 
 		virtual void	Destroy();
+		template<class T>
+		bool			IsThinkerType() { __ThinkerType() == T::__StaticThinkerType; }
 		virtual void	Tick()=0;
+
+	protected:
+		// Use DECLARE_THINKER to implement
+		virtual __ThinkerInfo &__ThinkerType() const=0;
 
 	private:
 		friend class ThinkerList;

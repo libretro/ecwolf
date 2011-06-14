@@ -38,7 +38,7 @@
 #include "wl_def.h"
 #include "lnspec.h"
 
-GameMap::GameMap(const FString &map) : map(map), valid(false)
+GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
 {
 	markerLump = Wads.GetNumForName(map);
 	if(markerLump == -1)
@@ -80,14 +80,58 @@ GameMap::~GameMap()
 {
 	for(unsigned int i = 0;i < planes.Size();i++)
 		delete[] planes[i].map;
+	UnloadReject();
 }
 
-void GameMap::ActivateTrigger(Trigger &trig, AActor *activator)
+void GameMap::ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator)
 {
 	MapSpot spot = GetSpot(trig.x, trig.y, trig.z);
 
 	Specials::LineSpecialFunction func = Specials::LookupFunction(Specials::LineSpecials(trig.action));
-	func(spot, activator);
+	func(spot, direction, activator);
+}
+
+bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
+{
+	if(zone1 == NULL || zone2 == NULL)
+		return false;
+
+	// If we're doing a recursive check and the straight check passes use that
+	bool straightCheck = *zoneLinks[zone1->index][zone2->index] > 0;
+	if(!recurse || straightCheck)
+		return straightCheck;
+
+	// If doing a recursive check we need to make zone 1 the lower number that
+	// way we can check the top half of the table.
+	if(zone2->index < zone1->index)
+	{
+		const Zone *tmp = zone1;
+		zone1 = zone2;
+		zone2 = tmp;
+	}
+
+	for(unsigned int i = zone1->index+1;i < zonePalette.Size();++i)
+	{
+		if(*zoneLinks[zone1->index][i] > 0 &&
+			(i == zone2->index || CheckLink(&zonePalette[i], zone2, true)))
+				return true;
+	}
+	return false;
+}
+
+void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
+{
+	if(zone1 == zone2 || zone1 == NULL || zone2 == NULL)
+		return;
+
+	unsigned short &value = *zoneLinks[zone1->index][zone2->index];
+	if(!open)
+	{
+		if(value > 0)
+			--value;
+	}
+	else
+		++value;
 }
 
 GameMap::Plane &GameMap::NewPlane()
@@ -103,47 +147,11 @@ GameMap::Plane &GameMap::NewPlane()
 
 GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned int z)
 {
-	// Allow triggers to be binary searchable.
-
-	/*unsigned int max = triggers.Size();
-	unsigned int min = 0;
-	unsigned int mid = max/2;
-	if(max != 0)
-	{
-		do
-		{
-			int dir = 0;
-			Trigger &trig = triggers[mid];
-			if(z < trig.z)
-				dir = -1;
-			else if(z > trig.z)
-				dir = 1;
-			else if(y < trig.y)
-				dir = -1;
-			else if(y > trig.y)
-				dir = 1;
-			else if(x < trig.x)
-				dir = -1;
-			else if(x > trig.x)
-				dir = 1;
-
-			if(dir == 0)
-				break;
-			else if(dir < 0)
-				max = mid-1;
-			else if(dir > 0)
-				min = mid+1;
-			mid = min + (max-min)/2;
-		}
-		while(max > min);
-	}*/
-
 	MapSpot spot = GetSpot(x, y, z);
 	Trigger newTrig;
 	newTrig.x = x;
 	newTrig.y = y;
 	newTrig.z = z;
-	//triggers.Insert(mid, newTrig);
 	spot->triggers.Push(newTrig);
 	return spot->triggers[spot->triggers.Size()-1];
 }
@@ -206,6 +214,8 @@ void GameMap::ReadPlanesData()
 
 				tilePalette.Resize(NUM_WALLS+(DOOR_END-DOOR_START));
 				zonePalette.Resize(ZONE_END-ZONE_START);
+				for(unsigned int i = 0;i < zonePalette.Size();++i)
+					zonePalette[i].index = i;
 				TArray<WORD> altExitSpots;
 
 				// Import tiles
@@ -272,10 +282,38 @@ void GameMap::ReadPlanesData()
 						trig.playerUse = true;
 					}
 
-					if(oldplane[i] > ZONE_START && oldplane[i] < ZONE_END)
+					if(oldplane[i] >= ZONE_START && oldplane[i] < ZONE_END)
 						mapPlane.map[i].zone = &zonePalette[oldplane[i]-ZONE_START];
 					else
 						mapPlane.map[i].zone = NULL;
+				}
+
+				// Get a sound zone for ambush spots if possible
+				for(unsigned int i = 0;i < ambushSpots.Size();++i)
+				{
+					const int candidates[4] = {
+						ambushSpots[i] + 1,
+						ambushSpots[i] - UNIT,
+						ambushSpots[i] - 1,
+						ambushSpots[i] + UNIT
+					};
+					for(unsigned int j = 0;j < 4;++j)
+					{
+						// Ensure that all candidates are valid locations.
+						// In addition for moving left/right check to see that
+						// the new location is indeed in the same row.
+						if((candidates[j] < 0 || candidates[j] > size) ||
+							((j == Tile::East || j == Tile::West) &&
+							(candidates[j]%UNIT != altExitSpots[i]%UNIT)))
+							continue;
+
+						// First adjacent zone wins
+						if(mapPlane.map[candidates[j]].zone != NULL)
+						{
+							mapPlane.map[ambushSpots[i]].zone = mapPlane.map[candidates[j]].zone;
+							break;
+						}
+					}
 				}
 
 				for(unsigned int i = 0;i < altExitSpots.Size();++i)
@@ -289,9 +327,7 @@ void GameMap::ReadPlanesData()
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{
-						// Ensure that all candidates are valid locations.
-						// In addition for moving left/right check to see that
-						// the new location is indeed in the same row.
+						// Same as before
 						if((candidates[j] < 0 || candidates[j] > size) ||
 							((j == Trigger::East || j == Trigger::West) &&
 							(candidates[j]%UNIT != altExitSpots[i]%UNIT)))
@@ -347,9 +383,60 @@ void GameMap::ReadPlanesData()
 			}
 		}
 	}
+	SetupReject();
+}
+
+void GameMap::SetupReject()
+{
+	// Set up the table
+	zoneLinks = new unsigned short**[zonePalette.Size()];
+	for(unsigned int i = 0;i < zonePalette.Size();++i)
+	{
+		zoneLinks[i] = new unsigned short*[zonePalette.Size()];
+		for(unsigned int j = i;j < zonePalette.Size();++j)
+		{
+			zoneLinks[i][j] = new unsigned short;
+			*zoneLinks[i][j] = (i == j);
+		}
+	}
+
+	// Second half should just point to the first set.
+	for(unsigned int i = 1;i < zonePalette.Size();++i)
+	{
+		for(unsigned int j = 0;j < i;++j)
+		{
+			zoneLinks[i][j] = zoneLinks[j][i];
+		}
+	}
+}
+
+void GameMap::UnloadReject()
+{
+	// Make sure there's stuff to unload.
+	if(!zoneLinks)
+		return;
+
+	for(unsigned int i = 0;i < zonePalette.Size();++i)
+	{
+		for(unsigned int j = i;j < zonePalette.Size();++j)
+			delete zoneLinks[i][j];
+		delete[] zoneLinks[i];
+	}
+	delete[] zoneLinks;
+	zoneLinks = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+unsigned int GameMap::Plane::Map::GetX() const
+{
+	return static_cast<unsigned int>(this - plane->map)%plane->gm->GetHeader().width;
+}
+
+unsigned int GameMap::Plane::Map::GetY() const
+{
+	return static_cast<unsigned int>(this - plane->map)/plane->gm->GetHeader().width;
+}
 
 MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 {
@@ -357,8 +444,8 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 		dir = MapTile::Side((dir+2)%4);
 
 	const int pos = static_cast<int>(this - plane->map);
-	int x = pos%plane->gm->GetHeader().width;
-	int y = pos/plane->gm->GetHeader().width;
+	int x = GetX();
+	int y = GetY();
 	switch(dir)
 	{
 		case MapTile::North:

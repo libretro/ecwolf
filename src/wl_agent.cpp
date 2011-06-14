@@ -1065,6 +1065,7 @@ void Thrust (int angle, int32_t speed)
 
 	offset = (player->tiley<<mapshift)+player->tilex;
 	player->areanumber = *(mapsegs[0] + offset) -AREATILE;
+	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
 
 	if (*(mapsegs[1] + offset) == EXITTILE)
 		VictoryTile ();
@@ -1155,7 +1156,7 @@ void Cmd_Use (void)
 	{
 		MapTrigger &trig = spot->triggers[i];
 		if(trig.activate[direction] && trig.playerUse)
-			map->ActivateTrigger(trig, player);
+			map->ActivateTrigger(trig, direction, player);
 	}
 
 	doornum = tilemap[checkx][checky];
@@ -1202,6 +1203,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 	player->tilex = tilex;
 	player->tiley = tiley;
 	player->areanumber = (byte) *(mapsegs[0]+(player->tiley<<mapshift)+player->tilex);
+	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
 	player->x = ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2;
 	player->y = ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2;
 	player->state = &s_player;

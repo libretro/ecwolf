@@ -34,6 +34,7 @@
 
 #ifndef __THINGDEF_H__
 #define __THINGDEF_H__
+#include "gamemap.h"
 #include "scanner.h"
 #include "tarray.h"
 #include "wl_def.h"
@@ -88,10 +89,11 @@ typedef uint32_t flagstype_t;
 
 class AActor
 {
-	friend class ClassDef;
-
 	public:
 		~AActor();
+
+		const MapZone	*GetZone() { return soundZone; }
+		void			EnterZone(const MapZone *zone);
 
 		// Basic properties from objtype
 		flagstype_t flags;
@@ -120,6 +122,12 @@ class AActor
 		short       temp1,temp2,hidden;
 		AActor *next,*prev;
 
+	protected:
+		const MapZone *soundZone;
+
+	// ClassDef stuff
+	friend class ClassDef;
+	public:
 		static const ClassDef *__StaticClass;
 	protected:
 		AActor(const ClassDef *type);

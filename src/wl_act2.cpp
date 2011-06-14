@@ -857,9 +857,6 @@ statetype s_gretelshoot8        = {false,SPR_GRETEL_SHOOT1,10,NULL,NULL,&s_grete
 
 void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 {
-	word *map;
-	word tile;
-
 	switch (which)
 	{
 		case en_guard:
@@ -891,9 +888,11 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 			break;
 	}
 
+	MapSpot spot = map->GetSpot(tilex, tiley, 0);
+	newobj->EnterZone(spot->zone);
 
-	map = mapsegs[0]+(tiley<<mapshift)+tilex;
-	tile = *map;
+	word *map = mapsegs[0]+(tiley<<mapshift)+tilex;
+	word tile = *map;
 	if (tile == AMBUSHTILE)
 	{
 		tilemap[tilex][tiley] = 0;

@@ -101,6 +101,7 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 	actorat[tilex][tiley] = newobj;
 	newobj->areanumber =
 		*(mapsegs[0] + (newobj->tiley<<mapshift)+newobj->tilex) - AREATILE;
+	newobj->EnterZone(map->GetSpot(newobj->tilex, newobj->tiley, 0)->zone);
 }
 
 
@@ -357,6 +358,7 @@ boolean TryWalk (objtype *ob)
 
 	ob->areanumber =
 		*(mapsegs[0] + (ob->tiley<<mapshift)+ob->tilex) - AREATILE;
+	ob->EnterZone(map->GetSpot(ob->tilex, ob->tiley, 0)->zone);
 
 	ob->distance = TILEGLOBAL;
 	return true;
