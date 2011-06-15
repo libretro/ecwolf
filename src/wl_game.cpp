@@ -695,7 +695,7 @@ void SetupGameLevel (void)
 			{
 				// solid wall
 				tilemap[x][y] = (byte) tile;
-				actorat[x][y] = (objtype *)(uintptr_t) tile;
+				actorat[x][y] = 0;//(objtype *)(uintptr_t) tile;
 			}
 			else
 			{
@@ -712,38 +712,6 @@ void SetupGameLevel (void)
 	InitActorList ();                       // start spawning things with a clean slate
 	InitDoorList ();
 	InitStaticList ();
-
-	map = mapsegs[0];
-	for (y=0;y<mapheight;y++)
-	{
-		for (x=0;x<mapwidth;x++)
-		{
-			tile = *map++;
-			if (tile >= 90 && tile <= 101)
-			{
-				// door
-				switch (tile)
-				{
-					case 90:
-					case 92:
-					case 94:
-					case 96:
-					case 98:
-					case 100:
-						SpawnDoor (x,y,1,(tile-90)/2);
-						break;
-					case 91:
-					case 93:
-					case 95:
-					case 97:
-					case 99:
-					case 101:
-						SpawnDoor (x,y,0,(tile-91)/2);
-						break;
-				}
-			}
-		}
-	}
 
 //
 // spawn actors

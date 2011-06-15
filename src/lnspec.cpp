@@ -50,7 +50,7 @@ LineSpecialFunction lnspecFunctions[NUM_POSSIBLE_SPECIALS] =
 {
 	LN_NOP,
 	LN_Door_Open,
-	LN_NOP,
+	LN_Pushwall_Move,
 	LN_Exit_Normal,
 	LN_Exit_Secret,
 	LN_NOP
@@ -141,8 +141,41 @@ class EVDoor : public Thinker
 					spot->slideAmount[direction] = spot->slideAmount[direction+2] = amount;
 					break;
 				case Opened:
-					if(--wait == 0)
+					if(wait == 0)
+					{
+						if((spot->GetX() == player->tilex && spot->GetY() == player->tiley) ||
+							actorat[spot->GetX()][spot->GetY()] != NULL)
+							break;
+
+						if(direction == 0)
+						{
+							if(spot->GetY() == player->tiley &&
+								((player->x+MINDIST)>>TILESHIFT == spot->GetX() ||
+								(player->x-MINDIST)>>TILESHIFT == spot->GetX()))
+								break;
+							if((actorat[spot->GetX()-1][spot->GetY()] != NULL &&
+								(actorat[spot->GetX()-1][spot->GetY()]->x+MINDIST)>>TILESHIFT == spot->GetX()) ||
+								(actorat[spot->GetX()+1][spot->GetY()] != NULL &&
+								(actorat[spot->GetX()+1][spot->GetY()]->x-MINDIST)>>TILESHIFT == spot->GetX()))
+								break;
+						}
+						else
+						{
+							if(spot->GetX() == player->tilex &&
+								((player->y+MINDIST)>>TILESHIFT == spot->GetY() ||
+								(player->y-MINDIST)>>TILESHIFT == spot->GetY()))
+								break;
+							if((actorat[spot->GetX()][spot->GetY()-1] != NULL &&
+								(actorat[spot->GetX()][spot->GetY()-1]->y+MINDIST)>>TILESHIFT == spot->GetY()) ||
+								(actorat[spot->GetX()][spot->GetY()+1] != NULL &&
+								(actorat[spot->GetX()][spot->GetY()+1]->y-MINDIST)>>TILESHIFT == spot->GetY()))
+								break;
+						}
+
 						ChangeState(Closing);
+					}
+					else
+						--wait;
 					break;
 				case Closing:
 					if(amount > 0)
@@ -192,8 +225,10 @@ class EVDoor : public Thinker
 					break;
 				case Opened:
 					wait = OPENTICS;
+					spot->solid = false;
 					break;
 				case Closing:
+					spot->solid = true;
 					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, player->GetZone(), true))
 						PlaySoundLocMapSpot("doors/close", spot);
 					break;
@@ -224,6 +259,47 @@ FUNC(Door_Open)
 	}
 
 	new EVDoor(spot, direction);
+	return 1;
+}
+
+class EVPushwall : public Thinker
+{
+	DECLARE_THINKER(EVPushwall)
+
+	public:
+		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(), spot(spot), direction(direction)
+		{
+			spot->thinker = this;
+		}
+
+		void Destroy()
+		{
+			if(spot->thinker == this)
+				spot->thinker = NULL;
+			Thinker::Destroy();
+		}
+
+		void Tick()
+		{
+			static const unsigned int MOVE_AMOUNT = 1<<10;
+			Destroy();
+		}
+
+	private:
+
+		MapSpot spot;
+		unsigned short direction;
+};
+IMPLEMENT_THINKER(EVPushwall)
+
+FUNC(Pushwall_Move)
+{
+	if(spot->thinker)
+	{
+		return 0;
+	}
+
+	new EVPushwall(spot, direction);
 	return 1;
 }
 

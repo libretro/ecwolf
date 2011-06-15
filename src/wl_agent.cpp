@@ -875,6 +875,23 @@ boolean TryMove (objtype *ob)
 	{
 		for (x=xl;x<=xh;x++)
 		{
+			const bool checkLines[4] =
+			{
+				(ob->x+PLAYERSIZE) > ((x+1)<<TILESHIFT),
+				(ob->y-PLAYERSIZE) < (y<<TILESHIFT),
+				(ob->x-PLAYERSIZE) < (x<<TILESHIFT),
+				(ob->y+PLAYERSIZE) > ((y+1)<<TILESHIFT)
+			};
+			MapSpot spot = map->GetSpot(x, y, 0);
+			if(spot->tile)
+			{
+				for(unsigned short i = 0;i < 4;++i)
+				{
+					if(spot->slideAmount[i] != 0xffff && checkLines[i])
+						return false;
+				}
+			}
+
 			check = actorat[x][y];
 			if (check && !ISPOINTER(check))
 			{
@@ -1168,11 +1185,6 @@ void Cmd_Use (void)
 
 		PushWall (checkx,checky,dir);
 		return;
-	}
-	else if (!buttonheld[bt_use] && doornum & 0x80)
-	{
-		buttonheld[bt_use] = true;
-		OperateDoor (doornum & ~0x80);
 	}
 	else
 		SD_PlaySound ("misc/do_nothing");

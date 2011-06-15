@@ -1289,7 +1289,6 @@ void PlayLoop (void)
 //
 		madenoise = false;
 
-		MoveDoors ();
 		MovePWalls ();
 
 		for (unsigned int i = 0;i < tics;++i)
