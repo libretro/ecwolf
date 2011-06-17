@@ -304,7 +304,7 @@ void GameMap::ReadPlanesData()
 						// the new location is indeed in the same row.
 						if((candidates[j] < 0 || candidates[j] > size) ||
 							((j == Tile::East || j == Tile::West) &&
-							(candidates[j]%UNIT != altExitSpots[i]%UNIT)))
+							(candidates[j]%UNIT != ambushSpots[i]%UNIT)))
 							continue;
 
 						// First adjacent zone wins
@@ -351,6 +351,18 @@ void GameMap::ReadPlanesData()
 
 			case Plane_Object:
 			{
+				static const WORD PUSHWALL_TILE = 98;
+
+				for(unsigned int i = 0;i < size;++i)
+				{
+					if(oldplane[i] == PUSHWALL_TILE)
+					{
+						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						trig.action = Specials::Pushwall_Move;
+						trig.arg[0] = 1;
+						trig.playerUse = true;
+					}
+				}
 				break;
 			}
 
@@ -388,12 +400,17 @@ void GameMap::ReadPlanesData()
 
 void GameMap::SetupReject()
 {
+	// Might as well use the same pointer for each time x == y
+	unsigned short *one = new unsigned short;
+	*one = 1;
+
 	// Set up the table
 	zoneLinks = new unsigned short**[zonePalette.Size()];
 	for(unsigned int i = 0;i < zonePalette.Size();++i)
 	{
 		zoneLinks[i] = new unsigned short*[zonePalette.Size()];
-		for(unsigned int j = i;j < zonePalette.Size();++j)
+		zoneLinks[i][i] = one;
+		for(unsigned int j = i+1;j < zonePalette.Size();++j)
 		{
 			zoneLinks[i][j] = new unsigned short;
 			*zoneLinks[i][j] = (i == j);
@@ -416,9 +433,10 @@ void GameMap::UnloadReject()
 	if(!zoneLinks)
 		return;
 
+	delete zoneLinks[0][0];
 	for(unsigned int i = 0;i < zonePalette.Size();++i)
 	{
-		for(unsigned int j = i;j < zonePalette.Size();++j)
+		for(unsigned int j = i+1;j < zonePalette.Size();++j)
 			delete zoneLinks[i][j];
 		delete[] zoneLinks[i];
 	}
@@ -448,10 +466,10 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 	int y = GetY();
 	switch(dir)
 	{
-		case MapTile::North:
+		case MapTile::South:
 			++y;
 			break;
-		case MapTile::South:
+		case MapTile::North:
 			--y;
 			break;
 		case MapTile::West:

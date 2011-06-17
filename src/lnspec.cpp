@@ -225,10 +225,8 @@ class EVDoor : public Thinker
 					break;
 				case Opened:
 					wait = OPENTICS;
-					spot->solid = false;
 					break;
 				case Closing:
-					spot->solid = true;
 					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, player->GetZone(), true))
 						PlaySoundLocMapSpot("doors/close", spot);
 					break;
@@ -270,6 +268,7 @@ class EVPushwall : public Thinker
 		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(), spot(spot), direction(direction)
 		{
 			spot->thinker = this;
+			spot->pushDirection = MapTile::Side(direction);
 		}
 
 		void Destroy()
@@ -281,7 +280,10 @@ class EVPushwall : public Thinker
 
 		void Tick()
 		{
-			static const unsigned int MOVE_AMOUNT = 1<<10;
+			MapSpot moveTo = spot->GetAdjacent(MapTile::Side(direction));
+			moveTo->tile = spot->tile;
+			moveTo->pushReceptor = spot;
+			spot->pushAmount = (spot->pushAmount+1)%64;
 			Destroy();
 		}
 

@@ -110,7 +110,8 @@ class GameMap
 			unsigned int	depth;
 			struct Map
 			{
-				Map() : tile(NULL), sector(NULL), zone(NULL), thinker(NULL), solid(true)
+				Map() : tile(NULL), sector(NULL), zone(NULL), thinker(NULL),
+					pushAmount(0), pushReceptor(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
 				}
@@ -126,9 +127,11 @@ class GameMap
 				const Zone		*zone;
 
 				Thinker			*thinker;
-				bool			solid;
 				unsigned int	slideAmount[4];
 				TArray<Trigger>	triggers;
+				Tile::Side		pushDirection;
+				unsigned int	pushAmount;
+				Map				*pushReceptor;
 			}*	map;
 		};
 
