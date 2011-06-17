@@ -274,7 +274,7 @@ typedef enum
 	FL_DIR_VERT_FLAG    = 0x00000800,
 	FL_DIR_MASK         = 0x00000e00,
 #endif
-	// next free bit is   0x00001000
+	FL_ISMONSTER        = 0x00001000,
 } objflag_t;
 
 
@@ -1056,8 +1056,6 @@ extern  boolean     madenoise;
 extern  statobj_t   statobjlist[MAXSTATS];
 extern  statobj_t   *laststatobj;
 extern  objtype     *newobj,*killerobj;
-extern  doorobj_t   doorobjlist[MAXDOORS];
-extern  doorobj_t   *lastdoorobj;
 extern  int         godmode;
 
 extern  boolean     demorecord,demoplayback;

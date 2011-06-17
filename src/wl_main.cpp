@@ -228,8 +228,7 @@ boolean SaveTheGame(FILE *file,int x,int y)
 			sizeof(tilemap) +
 			sizeof(actorat) +
 			sizeof(laststatobj) +
-			sizeof(statobjlist) +
-			sizeof(doorposition);
+			sizeof(statobjlist);
 
 	if (avail < size)
 	{
@@ -310,8 +309,6 @@ boolean SaveTheGame(FILE *file,int x,int y)
 	fwrite (doorposition,sizeof(doorposition),1,file);
 	checksum = DoChecksum((byte *)doorposition,sizeof(doorposition),checksum);
 	DiskFlopAnim(x,y);
-	fwrite (doorobjlist,sizeof(doorobjlist),1,file);
-	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
 
 	DiskFlopAnim(x,y);
 
@@ -412,11 +409,6 @@ boolean LoadTheGame(FILE *file,int x,int y)
 	}
 
 	DiskFlopAnim(x,y);
-	fread (doorposition,sizeof(doorposition),1,file);
-	checksum = DoChecksum((byte *)doorposition,sizeof(doorposition),checksum);
-	DiskFlopAnim(x,y);
-	fread (doorobjlist,sizeof(doorobjlist),1,file);
-	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
 
 	DiskFlopAnim(x,y);
 	fread (&pwallstate,sizeof(pwallstate),1,file);

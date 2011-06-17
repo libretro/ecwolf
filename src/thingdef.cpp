@@ -49,6 +49,7 @@ const FlagDef flags[] =
 	DEFINE_FLAG(FL, NONMARK, AActor, flags),
 	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
 	DEFINE_FLAG(FL, VISABLE, AActor, flags),
+	DEFINE_FLAG(FL, ISMONSTER, AActor, flags)
 };
 extern const PropDef properties[NUM_PROPERTIES];
 

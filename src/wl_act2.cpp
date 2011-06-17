@@ -12,6 +12,40 @@
 #include "language.h"
 #include "thingdef.h"
 
+static inline bool CheckDoorMovement(AActor *actor)
+{
+	MapTile::Side direction;
+	switch(actor->dir)
+	{
+		default:
+			return false;
+		case north:
+			direction = MapTile::South;
+			break;
+		case south:
+			direction = MapTile::North;
+			break;
+		case east:
+			direction = MapTile::West;
+			break;
+		case west:
+			direction = MapTile::East;
+			break;
+	}
+
+	if(actor->distance < 0) // Waiting for door?
+	{
+		MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
+		spot = spot->GetAdjacent(direction, true);
+		if(spot->slideAmount[direction] != 0xffff)
+			return true;
+		// Door is open, go on
+		actor->distance = TILEGLOBAL;
+		TryWalk(actor);
+	}
+	return false;
+}
+
 /*
 =============================================================================
 
@@ -915,7 +949,7 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 	newobj->obclass = (classtype)(guardobj + which);
 	newobj->health = starthealth[gamestate.difficulty][which];
 	newobj->dir = (dirtype)(dir * 2);
-	newobj->flags |= FL_SHOOTABLE;
+	newobj->flags |= FL_SHOOTABLE|FL_ISMONSTER;
 }
 
 
@@ -957,7 +991,7 @@ void SpawnBoss (int tilex, int tiley)
 	newobj->obclass = bossobj;
 	newobj->health = starthealth[gamestate.difficulty][en_boss];
 	newobj->dir = nodir;
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -978,7 +1012,7 @@ void SpawnGretel (int tilex, int tiley)
 	newobj->obclass = gretelobj;
 	newobj->health = starthealth[gamestate.difficulty][en_gretel];
 	newobj->dir = nodir;
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -1036,7 +1070,7 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 	newobj->dir = (dirtype)(dir*2);
 	newobj->health = starthealth[gamestate.difficulty][which];
 	newobj->distance = TILEGLOBAL;
-	newobj->flags |= FL_SHOOTABLE;
+	newobj->flags |= FL_SHOOTABLE|FL_ISMONSTER;
 	newobj->active = ac_yes;
 
 	actorat[newobj->tilex][newobj->tiley] = NULL;           // don't use original spot
@@ -1270,7 +1304,7 @@ void SpawnTrans (int tilex, int tiley)
 	SpawnNewObj (tilex,tiley,&s_transstand);
 	newobj->obclass = transobj;
 	newobj->health = starthealth[gamestate.difficulty][en_trans];
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -1349,7 +1383,7 @@ void SpawnUber (int tilex, int tiley)
 	SpawnNewObj (tilex,tiley,&s_uberstand);
 	newobj->obclass = uberobj;
 	newobj->health = starthealth[gamestate.difficulty][en_uber];
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -1446,7 +1480,7 @@ void SpawnWill (int tilex, int tiley)
 	SpawnNewObj (tilex,tiley,&s_willstand);
 	newobj->obclass = willobj;
 	newobj->health = starthealth[gamestate.difficulty][en_will];
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -1506,17 +1540,8 @@ void T_Will (objtype *ob)
 
 	while (move)
 	{
-		if (ob->distance < 0)
-		{
-			//
-			// waiting for a door to open
-			//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-			TryWalk(ob);
-		}
+		if (CheckDoorMovement(ob))
+			return;
 
 		if (move < ob->distance)
 		{
@@ -1623,7 +1648,7 @@ void SpawnDeath (int tilex, int tiley)
 	SpawnNewObj (tilex,tiley,&s_deathstand);
 	newobj->obclass = deathobj;
 	newobj->health = starthealth[gamestate.difficulty][en_death];
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -1812,7 +1837,7 @@ void SpawnAngel (int tilex, int tiley)
 	SpawnNewObj (tilex,tiley,&s_angelstand);
 	newobj->obclass = angelobj;
 	newobj->health = starthealth[gamestate.difficulty][en_angel];
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -2231,7 +2256,7 @@ void SpawnSchabbs (int tilex, int tiley)
 	newobj->obclass = schabbobj;
 	newobj->health = starthealth[gamestate.difficulty][en_schabbs];
 	newobj->dir = nodir;
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -2258,7 +2283,7 @@ void SpawnGift (int tilex, int tiley)
 	newobj->obclass = giftobj;
 	newobj->health = starthealth[gamestate.difficulty][en_gift];
 	newobj->dir = nodir;
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -2285,7 +2310,7 @@ void SpawnFat (int tilex, int tiley)
 	newobj->obclass = fatobj;
 	newobj->health = starthealth[gamestate.difficulty][en_fat];
 	newobj->dir = nodir;
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -2422,17 +2447,8 @@ void T_Schabb (objtype *ob)
 
 	while (move)
 	{
-		if (ob->distance < 0)
-		{
-			//
-			// waiting for a door to open
-			//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-			TryWalk(ob);
-		}
+		if (CheckDoorMovement(ob))
+			return;
 
 		if (move < ob->distance)
 		{
@@ -2514,17 +2530,8 @@ void T_Gift (objtype *ob)
 
 	while (move)
 	{
-		if (ob->distance < 0)
-		{
-			//
-			// waiting for a door to open
-			//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-			TryWalk(ob);
-		}
+		if (CheckDoorMovement(ob))
+			return;
 
 		if (move < ob->distance)
 		{
@@ -2606,17 +2613,8 @@ void T_Fat (objtype *ob)
 
 	while (move)
 	{
-		if (ob->distance < 0)
-		{
-			//
-			// waiting for a door to open
-			//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-			TryWalk(ob);
-		}
+		if (CheckDoorMovement(ob))
+			return;
 
 		if (move < ob->distance)
 		{
@@ -2841,7 +2839,7 @@ void SpawnFakeHitler (int tilex, int tiley)
 	newobj->obclass = fakeobj;
 	newobj->health = starthealth[gamestate.difficulty][en_fake];
 	newobj->dir = nodir;
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -2869,7 +2867,7 @@ void SpawnHitler (int tilex, int tiley)
 	newobj->obclass = mechahitlerobj;
 	newobj->health = starthealth[gamestate.difficulty][en_hitler];
 	newobj->dir = nodir;
-	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	newobj->flags |= FL_SHOOTABLE|FL_AMBUSH|FL_ISMONSTER;
 	if (!loadedgame)
 		gamestate.killtotal++;
 }
@@ -3186,20 +3184,8 @@ void T_Chase (objtype *ob)
 
 	while (move)
 	{
-		if (ob->distance < 0)
-		{
-			//
-			// waiting for a door to open
-			//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-			DEMOIF_SDL
-			{
-				TryWalk(ob);
-			}
-		}
+		if (CheckDoorMovement(ob))
+			return;
 
 		if (move < ob->distance)
 		{
@@ -3413,20 +3399,8 @@ void T_Path (objtype *ob)
 
 	while (move)
 	{
-		if (ob->distance < 0)
-		{
-			//
-			// waiting for a door to open
-			//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;      // go ahead, the door is now open
-			DEMOIF_SDL
-			{
-				TryWalk(ob);
-			}
-		}
+		if (CheckDoorMovement(ob))
+			return;
 
 		if (move < ob->distance)
 		{

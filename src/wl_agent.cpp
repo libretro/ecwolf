@@ -885,39 +885,37 @@ boolean TryMove (objtype *ob)
 			MapSpot spot = map->GetSpot(x, y, 0);
 			if(spot->tile)
 			{
-				for(unsigned short i = 0;i < 4;++i)
+				// Check pushwall backs
+				if(spot->pushAmount != 0)
 				{
-					if(spot->slideAmount[i] != 0xffff && checkLines[i])
-						return false;
-				}
-			}
-
-			check = actorat[x][y];
-			if (check && !ISPOINTER(check))
-			{
-				/*if(tilemap[x][y]==64 && x==pwallx && y==pwally)   // back of moving pushwall?
-				{
-					switch(pwalldir)
+					switch(spot->pushDirection)
 					{
-						case di_north:
-							if(ob->y-PUSHWALLMINDIST<=(pwally<<TILESHIFT)+((63-pwallpos)<<10))
+						case MapTile::North:
+							if(ob->y-PUSHWALLMINDIST <= (y<<TILESHIFT)+((63-spot->pushAmount)<<10))
 								return false;
 							break;
-						case di_west:
-							if(ob->x-PUSHWALLMINDIST<=(pwallx<<TILESHIFT)+((63-pwallpos)<<10))
+						case MapTile::West:
+							if(ob->x-PUSHWALLMINDIST <= (x<<TILESHIFT)+((63-spot->pushAmount)<<10))
 								return false;
 							break;
-						case di_east:
-							if(ob->x+PUSHWALLMINDIST>=(pwallx<<TILESHIFT)+(pwallpos<<10))
+						case MapTile::East:
+							if(ob->x+PUSHWALLMINDIST >= (x<<TILESHIFT)+(spot->pushAmount<<10))
 								return false;
 							break;
-						case di_south:
-							if(ob->y+PUSHWALLMINDIST>=(pwally<<TILESHIFT)+(pwallpos<<10))
+						case MapTile::South:
+							if(ob->y+PUSHWALLMINDIST >= (y<<TILESHIFT)+(spot->pushAmount<<10))
 								return false;
 							break;
 					}
 				}
-				else */return false;
+				else
+				{
+					for(unsigned short i = 0;i < 4;++i)
+					{
+						if(spot->slideAmount[i] != 0xffff && checkLines[i])
+							return false;
+					}
+				}
 			}
 		}
 	}

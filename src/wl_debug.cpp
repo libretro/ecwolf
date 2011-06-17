@@ -98,9 +98,6 @@ void CountObjects (void)
 	}
 	US_PrintUnsigned (count);
 
-	US_Print ("\nDoors         :");
-	US_PrintUnsigned (doornum);
-
 	for (obj=player->next;obj;obj=obj->next)
 	{
 		if (obj->active)

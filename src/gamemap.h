@@ -138,7 +138,7 @@ class GameMap
 		GameMap(const FString &map);
 		~GameMap();
 
-		void			ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator);
+		bool			ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator);
 		const Header	&GetHeader() const { return header; }
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		bool			IsValid() const { return valid; }

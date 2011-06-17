@@ -284,12 +284,6 @@ Every time a door opens or closes the areabyplayer matrix gets recalculated.
 #define DOORWIDTH       0x7800
 #define OPENTICS        300
 
-doorobj_t       doorobjlist[MAXDOORS],*lastdoorobj;
-short           doornum;
-
-word            doorposition[MAXDOORS];             // leading edge of door 0=closed
-													// 0xffff = fully open
-
 byte            areaconnect[NUMAREAS][NUMAREAS];
 
 boolean         areabyplayer[NUMAREAS];
@@ -336,38 +330,4 @@ void InitAreas (void)
 }
 
 
-
-/*
-===============
-=
-= InitDoorList
-=
-===============
-*/
-
-void InitDoorList (void)
-{
-	memset (areabyplayer,0,sizeof(areabyplayer));
-	memset (areaconnect,0,sizeof(areaconnect));
-
-	lastdoorobj = &doorobjlist[0];
-	doornum = 0;
-}
-
-
-/*
-=====================
-=
-= OpenDoor
-=
-=====================
-*/
-
-void OpenDoor (int door)
-{/*
-	if (doorobjlist[door].action == dr_open)
-		doorobjlist[door].ticcount = 0;         // reset open time
-	else
-		doorobjlist[door].action = dr_opening;  // start it opening*/
-}
 

@@ -195,28 +195,33 @@ class EVDoor : public Thinker
 			}
 		}
 
-		void Reactivate()
+		bool Reactivate(bool ismonster)
 		{
 			switch(state)
 			{
+				case Opened:
+					if(ismonster) // Monsters can reset the door
+					{
+						wait = OPENTICS;
+						return false;
+					}
 				default:
-					ChangeState(Closing);
+					if(!ismonster)
+						return ChangeState(Closing);
 					break;
 				case Closing:
-					ChangeState(Opening);
-					break;
+					return ChangeState(Opening);
 			}
 		}
 
 	private:
+		static const unsigned int OPENTICS = 300;
 		enum State { Opening, Opened, Closing, Closed };
 
-		void ChangeState(State st)
+		bool ChangeState(State st)
 		{
-			static const unsigned int OPENTICS = 300;
-
 			if(st == state)
-				return;
+				return false;
 			state = st;
 
 			switch(state)
@@ -250,8 +255,7 @@ FUNC(Door_Open)
 	{
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
-			static_cast<EVDoor *>(spot->thinker)->Reactivate();
-			return 1;
+			return static_cast<EVDoor *>(spot->thinker)->Reactivate(activator->flags & FL_ISMONSTER);
 		}
 		return 0;
 	}

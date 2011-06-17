@@ -150,66 +150,58 @@ void NewState (objtype *ob, statetype *state)
 = ob->distance      = TILEGLOBAl, or -doornumber if a door is blocking the way
 =
 = If a door is in the way, an OpenDoor call is made to start it opening.
-= The actor code should wait until
-=       doorobjlist[-ob->distance].action = dr_open, meaning the door has been
-=       fully opened
+= The actor code should wait until the door has been fully opened
 =
 ==================================
 */
 
-#define CHECKDIAG(x,y)                              \
-{                                                   \
-	temp=(uintptr_t)actorat[x][y];                  \
-	if (temp)                                       \
-	{                                               \
-		if (temp<256)                               \
-			return false;                           \
-		if (((objtype *)temp)->flags&FL_SHOOTABLE)  \
-			return false;                           \
-	}                                               \
-}
-
-#ifdef PLAYDEMOLIKEORIGINAL
-	#define DOORCHECK                                   \
-			if(DEMOCOND_ORIG)                           \
-				doornum = temp&63;                      \
-			else                                        \
-			{                                           \
-				doornum = (int) temp & 127;             \
-				OpenDoor(doornum);                      \
-				ob->distance = -doornum - 1;            \
-				return true;                            \
+static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTrigger::Side dir, bool canuse)
+{
+	AActor *temp = actorat[x][y];
+	MapSpot spot = map->GetSpot(x, y, 0);
+	if(spot->tile)
+	{
+		if(canuse)
+		{
+			bool used = false;
+			for(unsigned int i = 0;i < spot->triggers.Size();++i)
+			{
+				if(spot->triggers[i].monsterUse && spot->triggers[i].activate[dir])
+				{
+					if(map->ActivateTrigger(spot->triggers[i], dir, ob))
+						used = true;
+				}
 			}
-#else
-	#define DOORCHECK                                   \
-			doornum = (int) temp & 127;                 \
-			OpenDoor(doornum);                          \
-			ob->distance = -doornum - 1;                \
-			return true;
-#endif
-
-#define CHECKSIDE(x,y)                                  \
-{                                                       \
-	temp=(uintptr_t)actorat[x][y];                      \
-	if (temp)                                           \
-	{                                                   \
-		if (temp<128)                                   \
-			return false;                               \
-		if (temp<256)                                   \
-		{                                               \
-			DOORCHECK                                   \
-		}                                               \
-		else if (((objtype *)temp)->flags&FL_SHOOTABLE) \
-			return false;                               \
-	}                                                   \
+			if(used)
+			{
+				ob->distance = -1;
+				return 1;
+			}
+		}
+		if(spot->slideAmount[dir] != 0xffff)
+			return 0;
+	}
+	if(temp && ((uintptr_t)temp == 64 || temp->flags&FL_SHOOTABLE))
+		return 0;
+	return -1;
 }
+#define CHECKSIDE(x,y,dir) \
+{ \
+	short _cs; \
+	if((_cs = CheckSide(ob, x, y, dir, true)) >= 0) \
+		return _cs; \
+}
+#define CHECKDIAG(x,y) \
+{ \
+	short _cs; \
+	if((_cs = CheckSide(ob, x, y, MapTrigger::North, false)) >= 0) \
+		return _cs; \
+}
+
 
 
 boolean TryWalk (objtype *ob)
 {
-	int       doornum = -1;
-	uintptr_t temp;
-
 	if (ob->obclass == inertobj)
 	{
 		switch (ob->dir)
@@ -256,14 +248,13 @@ boolean TryWalk (objtype *ob)
 		switch (ob->dir)
 		{
 			case north:
-				if (ob->obclass == dogobj || ob->obclass == fakeobj
-					|| ob->obclass == ghostobj || ob->obclass == spectreobj)
+				if (!(ob->flags & FL_ISMONSTER))
 				{
 					CHECKDIAG(ob->tilex,ob->tiley-1);
 				}
 				else
 				{
-					CHECKSIDE(ob->tilex,ob->tiley-1);
+					CHECKSIDE(ob->tilex,ob->tiley-1,MapTrigger::South);
 				}
 				ob->tiley--;
 				break;
@@ -277,14 +268,13 @@ boolean TryWalk (objtype *ob)
 				break;
 
 			case east:
-				if (ob->obclass == dogobj || ob->obclass == fakeobj
-					|| ob->obclass == ghostobj || ob->obclass == spectreobj)
+				if (!(ob->flags & FL_ISMONSTER))
 				{
 					CHECKDIAG(ob->tilex+1,ob->tiley);
 				}
 				else
 				{
-					CHECKSIDE(ob->tilex+1,ob->tiley);
+					CHECKSIDE(ob->tilex+1,ob->tiley,MapTrigger::West);
 				}
 				ob->tilex++;
 				break;
@@ -298,14 +288,13 @@ boolean TryWalk (objtype *ob)
 				break;
 
 			case south:
-				if (ob->obclass == dogobj || ob->obclass == fakeobj
-					|| ob->obclass == ghostobj || ob->obclass == spectreobj)
+				if (!(ob->flags & FL_ISMONSTER))
 				{
 					CHECKDIAG(ob->tilex,ob->tiley+1);
 				}
 				else
 				{
-					CHECKSIDE(ob->tilex,ob->tiley+1);
+					CHECKSIDE(ob->tilex,ob->tiley+1,MapTrigger::North);
 				}
 				ob->tiley++;
 				break;
@@ -319,14 +308,13 @@ boolean TryWalk (objtype *ob)
 				break;
 
 			case west:
-				if (ob->obclass == dogobj || ob->obclass == fakeobj
-					|| ob->obclass == ghostobj || ob->obclass == spectreobj)
+				if (!(ob->flags & FL_ISMONSTER))
 				{
 					CHECKDIAG(ob->tilex-1,ob->tiley);
 				}
 				else
 				{
-					CHECKSIDE(ob->tilex-1,ob->tiley);
+					CHECKSIDE(ob->tilex-1,ob->tiley,MapTrigger::East);
 				}
 				ob->tilex--;
 				break;
@@ -346,15 +334,6 @@ boolean TryWalk (objtype *ob)
 				Quit ("Walk: Bad dir");
 		}
 	}
-
-#ifdef PLAYDEMOLIKEORIGINAL
-	if (DEMOCOND_ORIG && doornum != -1)
-	{
-		OpenDoor(doornum);
-		ob->distance = -doornum-1;
-		return true;
-	}
-#endif
 
 	ob->areanumber =
 		*(mapsegs[0] + (ob->tiley<<mapshift)+ob->tilex) - AREATILE;
@@ -1082,7 +1061,8 @@ boolean CheckLine (objtype *ob)
 	int         partial,delta;
 	int32_t     ltemp;
 	int         xfrac,yfrac,deltafrac;
-	unsigned    value,intercept;
+	unsigned    intercept;
+	MapTile::Side	direction;
 
 	x1 = ob->x >> UNSIGNEDSHIFT;            // 1/256 tile precision
 	y1 = ob->y >> UNSIGNEDSHIFT;
@@ -1102,11 +1082,13 @@ boolean CheckLine (objtype *ob)
 		{
 			partial = 256-(x1&0xff);
 			xstep = 1;
+			direction = MapTile::East;
 		}
 		else
 		{
 			partial = x1&0xff;
 			xstep = -1;
+			direction = MapTile::West;
 		}
 
 		deltafrac = abs(x2-x1);
@@ -1127,22 +1109,18 @@ boolean CheckLine (objtype *ob)
 			y = yfrac>>8;
 			yfrac += ystep;
 
-			value = (unsigned)tilemap[x][y];
+			MapSpot spot = map->GetSpot(x, y, 0);
 			x += xstep;
 
-			if (!value)
-				continue;
-
-			if (value<128 || value>256)
+			if (spot->tile && spot->slideAmount[direction] == 0)
 				return false;
 
 			//
 			// see if the door is open enough
 			//
-			value &= ~0x80;
 			intercept = yfrac-ystep/2;
 
-			if (intercept>doorposition[value])
+			if (intercept>spot->slideAmount[direction])
 				return false;
 
 		} while (x != xt2);
@@ -1156,11 +1134,13 @@ boolean CheckLine (objtype *ob)
 		{
 			partial = 256-(y1&0xff);
 			ystep = 1;
+			direction = MapTile::South;
 		}
 		else
 		{
 			partial = y1&0xff;
 			ystep = -1;
+			direction = MapTile::North;
 		}
 
 		deltafrac = abs(y2-y1);
@@ -1181,22 +1161,18 @@ boolean CheckLine (objtype *ob)
 			x = xfrac>>8;
 			xfrac += xstep;
 
-			value = (unsigned)tilemap[x][y];
+			MapSpot spot = map->GetSpot(x, y, 0);
 			y += ystep;
 
-			if (!value)
-				continue;
-
-			if (value<128 || value>256)
+			if (spot->tile && spot->slideAmount[direction] == 0)
 				return false;
 
 			//
 			// see if the door is open enough
 			//
-			value &= ~0x80;
 			intercept = xfrac-xstep/2;
 
-			if (intercept>doorposition[value])
+			if (intercept>spot->slideAmount[direction])
 				return false;
 		} while (y != yt2);
 	}

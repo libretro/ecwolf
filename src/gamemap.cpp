@@ -83,12 +83,12 @@ GameMap::~GameMap()
 	UnloadReject();
 }
 
-void GameMap::ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator)
+bool GameMap::ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator)
 {
 	MapSpot spot = GetSpot(trig.x, trig.y, trig.z);
 
 	Specials::LineSpecialFunction func = Specials::LookupFunction(Specials::LineSpecials(trig.action));
-	func(spot, direction, activator);
+	return func(spot, direction, activator);
 }
 
 bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)

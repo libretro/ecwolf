@@ -713,7 +713,6 @@ void SetupGameLevel (void)
 // spawn doors
 //
 	InitActorList ();                       // start spawning things with a clean slate
-	InitDoorList ();
 	InitStaticList ();
 
 //
