@@ -1132,10 +1132,11 @@ vertentry:
 				}
 				else
 				{
+					bool isPushwall = tilehit->pushAmount != 0 || tilehit->pushReceptor;
 					if(tilehit->pushReceptor)
 						tilehit = tilehit->pushReceptor;
 
-					if(tilehit->pushAmount != 0)
+					if(isPushwall)
 					{
 						if(tilehit->pushDirection==MapTile::West || tilehit->pushDirection==MapTile::East)
 						{
@@ -1190,10 +1191,15 @@ vertentry:
 										goto passvert;
 
 									if(tilehit->pushDirection==MapTile::South)
+									{
 										yintercept=(yintercept&0xffff0000)+(pwallposi<<10);
+										xintercept=xintercept-((xstep*(64-pwallposi))>>6);
+									}
 									else
+									{
 										yintercept=(yintercept&0xffff0000)-TILEGLOBAL+(pwallposi<<10);
-									xintercept=xintercept-((xstep*pwallposi)>>6);
+										xintercept=xintercept-((xstep*pwallposi)>>6);
+									}
 									xtile = (short) (xintercept >> TILESHIFT);
 									HitHorizWall();
 								}
@@ -1221,10 +1227,15 @@ vertentry:
 										goto passvert;
 
 									if(tilehit->pushDirection==MapTile::South)
-										yintercept=(yintercept&0xffff0000)-(pwallposi<<10);
+									{
+										yintercept=(yintercept&0xffff0000)-TILEGLOBAL+(pwallposi<<10);
+										xintercept=xintercept-((xstep*pwallposi)>>6);
+									}
 									else
+									{
 										yintercept=(yintercept&0xffff0000)+(pwallposi<<10);
-									xintercept=xintercept-((xstep*(64-pwallposi))>>6);
+										xintercept=xintercept-((xstep*(64-pwallposi))>>6);
+									}
 									xtile = (short) (xintercept >> TILESHIFT);
 									HitHorizWall();
 								}
@@ -1286,10 +1297,11 @@ horizentry:
 				}
 				else
 				{
+					bool isPushwall = tilehit->pushAmount != 0 || tilehit->pushReceptor;
 					if(tilehit->pushReceptor)
 						tilehit = tilehit->pushReceptor;
 
-					if(tilehit->pushAmount != 0)
+					if(isPushwall)
 					{
 						if(tilehit->pushDirection==MapTile::North || tilehit->pushDirection==MapTile::South)
 						{
@@ -1344,10 +1356,15 @@ horizentry:
 										goto passhoriz;
 
 									if(tilehit->pushDirection==MapTile::East)
+									{
 										xintercept=(xintercept&0xffff0000)+(pwallposi<<10);
+										yintercept=yintercept-((ystep*(64-pwallposi))>>6);
+									}
 									else
+									{
 										xintercept=(xintercept&0xffff0000)-TILEGLOBAL+(pwallposi<<10);
-									yintercept=yintercept-((ystep*pwallposi)>>6);
+										yintercept=yintercept-((ystep*pwallposi)>>6);
+									}
 									ytile = (short) (yintercept >> TILESHIFT);
 									HitVertWall();
 								}
@@ -1375,10 +1392,15 @@ horizentry:
 										goto passhoriz;
 
 									if(tilehit->pushDirection==MapTile::East)
-										xintercept=(xintercept&0xffff0000)-(pwallposi<<10);
+									{
+										xintercept=(xintercept&0xffff0000)-TILEGLOBAL+(pwallposi<<10);
+										yintercept=yintercept-((ystep*pwallposi)>>6);
+									}
 									else
+									{
 										xintercept=(xintercept&0xffff0000)+(pwallposi<<10);
-									yintercept=yintercept-((ystep*(64-pwallposi))>>6);
+										yintercept=yintercept-((ystep*(64-pwallposi))>>6);
+									}
 									ytile = (short) (yintercept >> TILESHIFT);
 									HitVertWall();
 								}

@@ -895,7 +895,7 @@ boolean TryMove (objtype *ob)
 			check = actorat[x][y];
 			if (check && !ISPOINTER(check))
 			{
-				if(tilemap[x][y]==64 && x==pwallx && y==pwally)   // back of moving pushwall?
+				/*if(tilemap[x][y]==64 && x==pwallx && y==pwally)   // back of moving pushwall?
 				{
 					switch(pwalldir)
 					{
@@ -917,7 +917,7 @@ boolean TryMove (objtype *ob)
 							break;
 					}
 				}
-				else return false;
+				else */return false;
 			}
 		}
 	}
@@ -1133,7 +1133,7 @@ void Cmd_Fire (void)
 
 void Cmd_Use (void)
 {
-	int     checkx,checky,doornum,dir;
+	int     checkx,checky;
 	MapTrigger::Side direction;
 
 	//
@@ -1143,50 +1143,40 @@ void Cmd_Use (void)
 	{
 		checkx = player->tilex + 1;
 		checky = player->tiley;
-		dir = di_east;
 		direction = MapTrigger::East;
 	}
 	else if (player->angle < 3*ANGLES/8)
 	{
 		checkx = player->tilex;
 		checky = player->tiley-1;
-		dir = di_north;
 		direction = MapTrigger::North;
 	}
 	else if (player->angle < 5*ANGLES/8)
 	{
 		checkx = player->tilex - 1;
 		checky = player->tiley;
-		dir = di_west;
 		direction = MapTrigger::West;
 	}
 	else
 	{
 		checkx = player->tilex;
 		checky = player->tiley + 1;
-		dir = di_south;
 		direction = MapTrigger::South;
 	}
 
+	bool doNothing = true;
 	MapSpot spot = map->GetSpot(checkx, checky, 0);
 	for(unsigned int i = 0;i < spot->triggers.Size();++i)
 	{
 		MapTrigger &trig = spot->triggers[i];
 		if(trig.activate[direction] && trig.playerUse)
+		{
 			map->ActivateTrigger(trig, direction, player);
+			doNothing = false;
+		}
 	}
 
-	doornum = tilemap[checkx][checky];
-	if (*(mapsegs[1]+(checky<<mapshift)+checkx) == PUSHABLETILE)
-	{
-		//
-		// pushable wall
-		//
-
-		PushWall (checkx,checky,dir);
-		return;
-	}
-	else
+	if(doNothing)
 		SD_PlaySound ("misc/do_nothing");
 }
 

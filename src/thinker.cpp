@@ -70,29 +70,10 @@ ThinkerList::ThinkerList()
 
 ThinkerList::~ThinkerList()
 {
-	// Head is always pointing to NULL so we skip it.
-	ThinkerRef *pos = head->next;
-	while(pos)
-	{
-		if(pos->next == NULL)
-		{
-			// Now that we have no more thinker refs we shall delete the last
-			// one now.
-			pos->thinker->Destroy();
-			break;
-		}
-		else
-		{
-			// Destroy the previous thinker, which should in turn delete the ref
-			pos->prev->thinker->Destroy();
-			pos = pos->next;
-		}
-	}
-
-	CleanThinkers();
-	delete destroyHead;
+	DestroyAll();
 
 	// Get rid of the head ref, which isn't taken care of since it's NULL
+	delete destroyHead;
 	delete head;
 }
 
@@ -115,6 +96,29 @@ void ThinkerList::CleanThinkers()
 	}
 	destroyTail = destroyHead;
 	assert(destroyHead->next == NULL);
+}
+
+void ThinkerList::DestroyAll()
+{
+	// Head is always pointing to NULL so we skip it.
+	ThinkerRef *pos = head->next;
+	while(pos)
+	{
+		if(pos->next == NULL)
+		{
+			// Now that we have no more thinker refs we shall delete the last
+			// one now.
+			pos->thinker->Destroy();
+			break;
+		}
+		else
+		{
+			// Destroy the previous thinker, which should in turn delete the ref
+			pos->prev->thinker->Destroy();
+			pos = pos->next;
+		}
+	}
+	CleanThinkers();
 }
 
 void ThinkerList::Tick()

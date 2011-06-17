@@ -9,6 +9,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "w_wad.h"
+#include "thinker.h"
 #include "thingdef.h"
 #include <SDL_mixer.h>
 
@@ -651,9 +652,11 @@ void SetupGameLevel (void)
 			= gamestate.secretcount
 			= gamestate.killcount
 			= gamestate.treasurecount
-			= pwallstate = pwallpos = facetimes = 0;
+			= facetimes = 0;
 		LastAttacker = NULL;
 		killerobj = NULL;
+
+		thinkerList.DestroyAll();
 	}
 
 	if (demoplayback || demorecord)
@@ -1271,9 +1274,9 @@ void Died (void)
 			= gamestate.chosenweapon = wp_pistol;
 		gamestate.ammo = STARTAMMO;
 		gamestate.keys = 0;
-		pwallstate = pwallpos = 0;
 		gamestate.attackframe = gamestate.attackcount =
 			gamestate.weaponframe = 0;
+		thinkerList.DestroyAll();
 
 		if(viewsize != 21)
 		{

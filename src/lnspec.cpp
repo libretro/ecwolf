@@ -265,7 +265,8 @@ class EVPushwall : public Thinker
 	DECLARE_THINKER(EVPushwall)
 
 	public:
-		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(), spot(spot), direction(direction)
+		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(), spot(spot),
+			moveTo(NULL), direction(direction), position(0)
 		{
 			spot->thinker = this;
 			spot->pushDirection = MapTile::Side(direction);
@@ -280,17 +281,47 @@ class EVPushwall : public Thinker
 
 		void Tick()
 		{
-			MapSpot moveTo = spot->GetAdjacent(MapTile::Side(direction));
-			moveTo->tile = spot->tile;
-			moveTo->pushReceptor = spot;
-			spot->pushAmount = (spot->pushAmount+1)%64;
-			Destroy();
+			if(position == 0)
+				SD_PlaySound ("world/pushwall");
+
+			// TODO: Block pushwall movement with things and the player
+
+			// Setup the next tile to get ready to accept this tile.
+			if(moveTo == NULL)
+			{
+				moveTo = spot->GetAdjacent(MapTile::Side(direction));
+				moveTo->tile = spot->tile;
+				moveTo->pushReceptor = spot;
+				moveTo->pushDirection = spot->pushDirection;
+
+				// Try to get a sound zone.
+				if(spot->zone == NULL)
+					spot->zone = moveTo->zone;
+			}
+
+			// Move the tile a bit.
+			if((++position)%128 == 0)
+			{
+				spot->pushAmount = 0;
+				spot->tile = NULL;
+				spot->thinker = NULL;
+				moveTo->pushReceptor = NULL;
+				moveTo->thinker = this;
+				spot = moveTo;
+				moveTo = NULL;
+			}
+			else
+				spot->pushAmount = (position/2)%64;
+
+			if(position == 256)
+				Destroy();
 		}
 
 	private:
 
-		MapSpot spot;
-		unsigned short direction;
+		MapSpot spot, moveTo;
+		unsigned short	direction;
+		unsigned int	position;
 };
 IMPLEMENT_THINKER(EVPushwall)
 

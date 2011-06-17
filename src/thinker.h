@@ -80,6 +80,7 @@ extern class ThinkerList
 		ThinkerList();
 		~ThinkerList();
 
+		void	DestroyAll();
 		void	Tick();
 	protected:
 		void	CleanThinkers();

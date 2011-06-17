@@ -229,13 +229,7 @@ boolean SaveTheGame(FILE *file,int x,int y)
 			sizeof(actorat) +
 			sizeof(laststatobj) +
 			sizeof(statobjlist) +
-			sizeof(doorposition) +
-			sizeof(pwallstate) +
-			sizeof(pwalltile) +
-			sizeof(pwallx) +
-			sizeof(pwally) +
-			sizeof(pwalldir) +
-			sizeof(pwallpos);
+			sizeof(doorposition);
 
 	if (avail < size)
 	{
@@ -320,18 +314,6 @@ boolean SaveTheGame(FILE *file,int x,int y)
 	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
 
 	DiskFlopAnim(x,y);
-	fwrite (&pwallstate,sizeof(pwallstate),1,file);
-	checksum = DoChecksum((byte *)&pwallstate,sizeof(pwallstate),checksum);
-	fwrite (&pwalltile,sizeof(pwalltile),1,file);
-	checksum = DoChecksum((byte *)&pwalltile,sizeof(pwalltile),checksum);
-	fwrite (&pwallx,sizeof(pwallx),1,file);
-	checksum = DoChecksum((byte *)&pwallx,sizeof(pwallx),checksum);
-	fwrite (&pwally,sizeof(pwally),1,file);
-	checksum = DoChecksum((byte *)&pwally,sizeof(pwally),checksum);
-	fwrite (&pwalldir,sizeof(pwalldir),1,file);
-	checksum = DoChecksum((byte *)&pwalldir,sizeof(pwalldir),checksum);
-	fwrite (&pwallpos,sizeof(pwallpos),1,file);
-	checksum = DoChecksum((byte *)&pwallpos,sizeof(pwallpos),checksum);
 
 	//
 	// WRITE OUT CHECKSUM
