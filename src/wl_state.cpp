@@ -99,8 +99,6 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 	newobj->dir = nodir;
 
 	actorat[tilex][tiley] = newobj;
-	newobj->areanumber =
-		*(mapsegs[0] + (newobj->tiley<<mapshift)+newobj->tilex) - AREATILE;
 	newobj->EnterZone(map->GetSpot(newobj->tilex, newobj->tiley, 0)->zone);
 }
 
@@ -146,7 +144,6 @@ void NewState (objtype *ob, statetype *state)
 =
 = ob->tilex         = new destination
 = ob->tiley
-= ob->areanumber    = the floor tile number (0-(NUMAREAS-1)) of destination
 = ob->distance      = TILEGLOBAl, or -doornumber if a door is blocking the way
 =
 = If a door is in the way, an OpenDoor call is made to start it opening.
@@ -335,8 +332,6 @@ boolean TryWalk (objtype *ob)
 		}
 	}
 
-	ob->areanumber =
-		*(mapsegs[0] + (ob->tiley<<mapshift)+ob->tilex) - AREATILE;
 	ob->EnterZone(map->GetSpot(ob->tilex, ob->tiley, 0)->zone);
 
 	ob->distance = TILEGLOBAL;
@@ -362,7 +357,6 @@ boolean TryWalk (objtype *ob)
 = ob->distance      = TILEGLOBAL or -doornumber
 = ob->tilex         = new destination
 = ob->tiley
-= ob->areanumber    = the floor tile number (0-(NUMAREAS-1)) of destination
 =
 ==================================
 */
@@ -712,7 +706,7 @@ void MoveObj (objtype *ob, int32_t move)
 	//
 	// check to make sure it's not on top of player
 	//
-	if (areabyplayer[ob->areanumber])
+	if (map->CheckLink(ob->GetZone(), player->GetZone(), true))
 	{
 		deltax = ob->x - player->x;
 		if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
@@ -1112,6 +1106,8 @@ boolean CheckLine (objtype *ob)
 			MapSpot spot = map->GetSpot(x, y, 0);
 			x += xstep;
 
+			if (!spot->tile)
+				continue;
 			if (spot->tile && spot->slideAmount[direction] == 0)
 				return false;
 
@@ -1164,6 +1160,8 @@ boolean CheckLine (objtype *ob)
 			MapSpot spot = map->GetSpot(x, y, 0);
 			y += ystep;
 
+			if (!spot->tile)
+				continue;
 			if (spot->tile && spot->slideAmount[direction] == 0)
 				return false;
 
@@ -1204,7 +1202,7 @@ boolean CheckSight (objtype *ob)
 	//
 	// don't bother tracing a line if the area isn't connected to the player's
 	//
-	if (!areabyplayer[ob->areanumber])
+	if (!map->CheckLink(ob->GetZone(), player->GetZone(), true))
 		return false;
 
 	//
@@ -1451,7 +1449,7 @@ boolean SightPlayer (objtype *ob)
 	}
 	else
 	{
-		if (!areabyplayer[ob->areanumber])
+		if (!map->CheckLink(ob->GetZone(), player->GetZone(), true))
 			return false;
 
 		if (ob->flags & FL_AMBUSH)

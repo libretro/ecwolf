@@ -941,7 +941,6 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 			tile = *(map-1);
 
 		*map = tile;
-		newobj->areanumber = tile-AREATILE;
 
 		newobj->flags |= FL_AMBUSH;
 	}
@@ -2909,7 +2908,7 @@ void A_HitlerMorph (objtype *ob)
 ////////////////////////////////////////////////////////
 void A_MechaSound (objtype *ob)
 {
-	if (areabyplayer[ob->areanumber])
+	if (map->CheckLink(ob->GetZone(), player->GetZone(), true))
 		PlaySoundLocActor ("hitler/active",ob);
 }
 
@@ -3453,7 +3452,7 @@ void T_Shoot (objtype *ob)
 
 	hitchance = 128;
 
-	if (!areabyplayer[ob->areanumber])
+	if (!map->CheckLink(ob->GetZone(), player->GetZone(), true))
 		return;
 
 	if (CheckLine (ob))                    // player is not behind a wall

@@ -1152,7 +1152,7 @@ void DoActor (objtype * ob)
 {
 	void (*think) (objtype *);
 
-	if (!ob->active && !areabyplayer[ob->areanumber])
+	if (!ob->active && !map->CheckLink(ob->GetZone(), player->GetZone(), true))
 		return;
 
 	if (!(ob->flags & (FL_NONMARK | FL_NEVERMARK)))

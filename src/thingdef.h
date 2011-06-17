@@ -103,7 +103,6 @@ class AActor
 
 		fixed	x, y;
 		word	tilex, tiley;
-		byte	areanumber;
 
 		short	angle;
 		short	health;

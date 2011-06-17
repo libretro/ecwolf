@@ -917,6 +917,16 @@ boolean TryMove (objtype *ob)
 					}
 				}
 			}
+
+			// Static objects
+			if((uintptr_t)actorat[x][y] == 64)
+			{
+				for(unsigned short i = 0;i < 4;++i)
+				{
+					if(checkLines[i])
+						return false;
+				}
+			}
 		}
 	}
 
@@ -1079,7 +1089,6 @@ void Thrust (int angle, int32_t speed)
 	player->tiley = (short)(player->y >> TILESHIFT);
 
 	offset = (player->tiley<<mapshift)+player->tilex;
-	player->areanumber = *(mapsegs[0] + offset) -AREATILE;
 	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
 
 	if (*(mapsegs[1] + offset) == EXITTILE)
@@ -1202,7 +1211,6 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 	player->active = ac_yes;
 	player->tilex = tilex;
 	player->tiley = tiley;
-	player->areanumber = (byte) *(mapsegs[0]+(player->tiley<<mapshift)+player->tilex);
 	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
 	player->x = ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2;
 	player->y = ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2;
@@ -1212,8 +1220,6 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 		player->angle += ANGLES;
 	player->flags = FL_NEVERMARK;
 	Thrust (0,0);                           // set some variables
-
-	InitAreas ();
 }
 
 

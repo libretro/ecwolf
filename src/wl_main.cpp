@@ -267,9 +267,6 @@ boolean SaveTheGame(FILE *file,int x,int y)
 		}
 	}
 
-	fwrite (areaconnect,sizeof(areaconnect),1,file);
-	fwrite (areabyplayer,sizeof(areabyplayer),1,file);
-
 	// player object needs special treatment as it's in WL_AGENT.CPP and not in
 	// WL_ACT2.CPP which could cause problems for the relative addressing
 
@@ -372,9 +369,6 @@ boolean LoadTheGame(FILE *file,int x,int y)
 				actorat[i][j]=(objtype *)(uintptr_t) actnum;
 		}
 	}
-
-	fread (areaconnect,sizeof(areaconnect),1,file);
-	fread (areabyplayer,sizeof(areabyplayer),1,file);
 
 	InitActorList ();
 	DiskFlopAnim(x,y);

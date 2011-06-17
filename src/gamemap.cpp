@@ -304,7 +304,7 @@ void GameMap::ReadPlanesData()
 						// the new location is indeed in the same row.
 						if((candidates[j] < 0 || candidates[j] > size) ||
 							((j == Tile::East || j == Tile::West) &&
-							(candidates[j]%UNIT != ambushSpots[i]%UNIT)))
+							(candidates[j]/UNIT != ambushSpots[i]/UNIT)))
 							continue;
 
 						// First adjacent zone wins
@@ -330,7 +330,7 @@ void GameMap::ReadPlanesData()
 						// Same as before
 						if((candidates[j] < 0 || candidates[j] > size) ||
 							((j == Trigger::East || j == Trigger::West) &&
-							(candidates[j]%UNIT != altExitSpots[i]%UNIT)))
+							(candidates[j]/UNIT != altExitSpots[i]/UNIT)))
 							continue;
 
 						if(oldplane[candidates[j]] == EXIT_TILE)

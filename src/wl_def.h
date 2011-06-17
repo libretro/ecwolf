@@ -789,33 +789,6 @@ typedef struct doorstruct
 
 class AActor;
 typedef AActor objtype;
-/*typedef struct objstruct
-{
-	activetype  active;
-	short       ticcount;
-	classtype   obclass;
-	statetype   *state;
-
-	uint32_t    flags;              // FL_SHOOTABLE, etc
-
-	int32_t     distance;           // if negative, wait for that door to open
-	dirtype     dir;
-
-	fixed       x,y;
-	word        tilex,tiley;
-	byte        areanumber;
-
-	short       viewx;
-	word        viewheight;
-	fixed       transx,transy;      // in global coord
-
-	short       angle;
-	short       hitpoints;
-	int32_t     speed;
-
-	short       temp1,temp2,hidden;
-	struct objstruct *next,*prev;
-} objtype;*/
 
 enum Button
 {
