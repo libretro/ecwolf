@@ -46,7 +46,6 @@ objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
 boolean noclip, ammocheat;
 int godmode, singlestep, extravbls = 1; // to remove flicker (gray stuff at the bottom)
 
-byte tilemap[MAPSIZE][MAPSIZE]; // wall values only
 byte spotvis[MAPSIZE][MAPSIZE];
 objtype *actorat[MAPSIZE][MAPSIZE];
 

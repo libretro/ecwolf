@@ -929,8 +929,6 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 	word tile = *map;
 	if (tile == AMBUSHTILE)
 	{
-		tilemap[tilex][tiley] = 0;
-
 		if (*(map+1) >= AREATILE)
 			tile = *(map+1);
 		if (*(map-mapwidth) >= AREATILE)

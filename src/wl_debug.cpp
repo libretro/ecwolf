@@ -496,7 +496,7 @@ int DebugKeys (void)
 		US_Print (")\nA:");  US_PrintUnsigned (player->angle);
 		US_Print (" X:");    US_PrintUnsigned (player->tilex);
 		US_Print (" Y:");    US_PrintUnsigned (player->tiley);
-		US_Print ("\n1:");   US_PrintUnsigned (tilemap[player->tilex][player->tiley]);
+		//US_Print ("\n1:");   US_PrintUnsigned (tilemap[player->tilex][player->tiley]);
 		sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[player->tilex][player->tiley]); US_Print(str);
 		US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(player->tilex,player->tiley,1));
 		US_Print (" 3:");

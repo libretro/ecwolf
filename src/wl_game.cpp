@@ -686,28 +686,7 @@ void SetupGameLevel (void)
 //
 // copy the wall data to a data segment array
 //
-	memset (tilemap,0,sizeof(tilemap));
 	memset (actorat,0,sizeof(actorat));
-	map = mapsegs[0];
-	for (y=0;y<mapheight;y++)
-	{
-		for (x=0;x<mapwidth;x++)
-		{
-			tile = *map++;
-			if (tile<AREATILE)
-			{
-				// solid wall
-				tilemap[x][y] = (byte) tile;
-				actorat[x][y] = 0;//(objtype *)(uintptr_t) tile;
-			}
-			else
-			{
-				// area floor
-				tilemap[x][y] = 0;
-				actorat[x][y] = 0;
-			}
-		}
-	}
 
 //
 // spawn doors
@@ -732,7 +711,6 @@ void SetupGameLevel (void)
 			tile = *map++;
 			if (tile == AMBUSHTILE)
 			{
-				tilemap[x][y] = 0;
 				if ( (unsigned)(uintptr_t)actorat[x][y] == AMBUSHTILE)
 					actorat[x][y] = NULL;
 

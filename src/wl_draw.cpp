@@ -789,7 +789,7 @@ visobj_t *visptr,*visstep,*farthest;
 void DrawScaleds (void)
 {
 	int      i,least,numvisable,height;
-	byte     *tilespot,*visspot;
+	byte     *visspot;
 	unsigned spotloc;
 
 	statobj_t *statptr;
@@ -843,20 +843,29 @@ void DrawScaleds (void)
 
 		spotloc = (obj->tilex<<mapshift)+obj->tiley;   // optimize: keep in struct?
 		visspot = &spotvis[0][0]+spotloc;
-		tilespot = &tilemap[0][0]+spotloc;
+		MapSpot spot = map->GetSpot(spotloc%64, spotloc/64, 0);
+		MapSpot spots[8];
+		spots[0] = spot->GetAdjacent(MapTile::East);
+		spots[1] = spots[0]->GetAdjacent(MapTile::North);
+		spots[2] = spot->GetAdjacent(MapTile::North);
+		spots[3] = spots[2]->GetAdjacent(MapTile::West);
+		spots[4] = spot->GetAdjacent(MapTile::West);
+		spots[5] = spots[4]->GetAdjacent(MapTile::South);
+		spots[6] = spot->GetAdjacent(MapTile::South);
+		spots[7] = spots[6]->GetAdjacent(MapTile::East);
 
 		//
 		// could be in any of the nine surrounding tiles
 		//
 		if (*visspot
-			|| ( *(visspot-1) && !*(tilespot-1) )
-			|| ( *(visspot+1) && !*(tilespot+1) )
-			|| ( *(visspot-65) && !*(tilespot-65) )
-			|| ( *(visspot-64) && !*(tilespot-64) )
-			|| ( *(visspot-63) && !*(tilespot-63) )
-			|| ( *(visspot+65) && !*(tilespot+65) )
-			|| ( *(visspot+64) && !*(tilespot+64) )
-			|| ( *(visspot+63) && !*(tilespot+63) ) )
+			|| ( *(visspot-1) && !(spots[4] && spots[4]->tile) )
+			|| ( *(visspot+1) && !(spots[0] && spots[0]->tile) )
+			|| ( *(visspot-65) && !(spots[3] && spots[3]->tile) )
+			|| ( *(visspot-64) && !(spots[2] && spots[2]->tile) )
+			|| ( *(visspot-63) && !(spots[1] && spots[1]->tile) )
+			|| ( *(visspot+65) && !(spots[7] && spots[7]->tile) )
+			|| ( *(visspot+64) && !(spots[6] && spots[6]->tile) )
+			|| ( *(visspot+63) && !(spots[5] && spots[5]->tile) ) )
 		{
 			obj->active = ac_yes;
 			TransformActor (obj);
