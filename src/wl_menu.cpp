@@ -517,20 +517,6 @@ void CreateMenus()
 	}
 }
 
-static const int color_hlite[] = {
-	DEACTIVE,
-	HIGHLIGHT,
-	READHCOLOR,
-	0x67
-};
-
-static const int color_norml[] = {
-	DEACTIVE,
-	TEXTCOLOR,
-	READCOLOR,
-	0x6b
-};
-
 static int SoundStatus = 1;
 static int pickquick;
 static char SaveName[13] = "savegam?.";
