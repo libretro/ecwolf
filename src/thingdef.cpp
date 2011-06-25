@@ -166,7 +166,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			if(prevFrame != NULL)
 				prevFrame->next = thisFrame;
 
-			if(!thisStateDef.nextType == StateDefinition::NORMAL || i != thisStateDef.frames.Len()-1)
+			if(thisStateDef.nextType == StateDefinition::NORMAL || i != thisStateDef.frames.Len()-1)
 				prevFrame = thisFrame;
 			else
 				prevFrame = NULL;
@@ -635,7 +635,6 @@ class AActorProxy : public Thinker
 	public:
 		AActorProxy(AActor *parent) : parent(parent)
 		{
-			parent->actorRef = AActor::actors.Push(parent);
 		}
 
 		~AActorProxy()
@@ -655,7 +654,7 @@ IMPLEMENT_THINKER(AActorProxy)
 LinkedList<AActor *> AActor::actors;
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
-AActor::AActor(const ClassDef *type) : classType(type), flags(0), soundZone(NULL)
+AActor::AActor(const ClassDef *type) : classType(type), flags(0), dir(nodir), soundZone(NULL)
 {
 }
 
