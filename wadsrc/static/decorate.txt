@@ -1,62 +1,6 @@
-/*
-19 - Player 1 Start North
-20 - Player 1 Start East
-21 - Player 1 Start South
-22 - Player 1 Start West
-23:73 - Static Decorations
-98 - Secret Pushwall
-180:183 - Guard Easy (Standing)
-144:147 - Guard Medium (Standing)
-108:111 - Guard Hard (Standing)
-184:187 - Guard Easy (Walking)
-148:151 - Guard Medium (Walking)
-112:115 - Guard Hard (Walking)
-124 - Dead Guard
-188:191 - Officer Easy (Standing)
-152:155 - Officer Medium (Standing)
-116:119 - Officer Hard (Standing)
-192:195 - Officer Easy (Walking)
-156:159 - Officer Medium (Walking)
-120:123 - Officer Hard (Walking)
-198:201 - SS Easy (Standing)
-162:165 - SS Medium (Standing)
-126:129 - SS Hard (Standing)
-202:205 - SS Easy (Walking)
-166:169 - SS Medium (Walking)
-130:133 - SS Hard (Walking)
-206:209 - Dog Easy (Standing)
-170:173 - Dog Medium (Standing)
-134:137 - Dog Hard (Standing)
-210:213 - Dog Easy (Walking)
-174:177 - Dog Medium (Walking)
-138:141 - Dog Hard (Walking)
-214 - Hans
-197 - Gretel
-215 - Gift
-179 - Fat
-196 - Schabbs
-160 - Fake Hitler
-178 - Hitler
-106 - Spectre
-107 - Angel
-125 - Trans
-142 - Uber
-143 - Will
-161 - Death
-252:255 - Mutant Easy (Standing)
-234:237 - Mutant Medium (Standing)
-216:219 - Mutant Hard (Standing)
-256:259 - Mutant Easy (Walking)
-238:241 - Mutant Medium (Walking)
-220:223 - Mutant Hard (Walking)
-224 - Blinky
-225 - Clyde
-226 - Pinky
-227 - Inky
-*/
-
 actor Actor native
 {
+	sighttime 1
 	states
 	{
 		Spawn:
@@ -65,7 +9,11 @@ actor Actor native
 	}
 }
 
-actor Puddle
+actor PatrolPoint 10
+{
+}
+
+actor Puddle 33
 {
 	states
 	{
@@ -75,7 +23,7 @@ actor Puddle
 	}
 }
 
-actor GreenBarrel
+actor GreenBarrel 34
 {
 	states
 	{
@@ -85,7 +33,7 @@ actor GreenBarrel
 	}
 }
 
-actor TableWithChairs
+actor TableWithChairs 35
 {
 	states
 	{
@@ -95,7 +43,7 @@ actor TableWithChairs
 	}
 }
 
-actor FloorLamp
+actor FloorLamp 36
 {
 	+FULLBRIGHT
 	states
@@ -106,7 +54,7 @@ actor FloorLamp
 	}
 }
 
-actor Chandelier
+actor Chandelier 37
 {
 	+FULLBRIGHT
 	states
@@ -117,7 +65,7 @@ actor Chandelier
 	}
 }
 
-actor HangedMan
+actor HangedMan 38
 {
 	states
 	{
@@ -127,7 +75,7 @@ actor HangedMan
 	}
 }
 
-actor BadFood
+actor DogFood 39
 {
 	states
 	{
@@ -137,7 +85,7 @@ actor BadFood
 	}
 }
 
-actor RedPillar
+actor WhitePillar 40
 {
 	states
 	{
@@ -147,7 +95,7 @@ actor RedPillar
 	}
 }
 
-actor Tree
+actor GreenPlant 41
 {
 	states
 	{
@@ -157,7 +105,7 @@ actor Tree
 	}
 }
 
-actor SkeletonFlat
+actor SkeletonFlat 42
 {
 	states
 	{
@@ -167,7 +115,7 @@ actor SkeletonFlat
 	}
 }
 
-actor Sink
+actor Sink 43
 {
 	states
 	{
@@ -177,7 +125,7 @@ actor Sink
 	}
 }
 
-actor PottedPlant
+actor BrownPlant 44
 {
 	states
 	{
@@ -187,7 +135,7 @@ actor PottedPlant
 	}
 }
 
-actor Urn
+actor Vase 45
 {
 	states
 	{
@@ -197,7 +145,7 @@ actor Urn
 	}
 }
 
-actor BareTable
+actor BareTable 46
 {
 	states
 	{
@@ -207,7 +155,7 @@ actor BareTable
 	}
 }
 
-actor CeilingLight
+actor CeilingLight 47
 {
 	states
 	{
@@ -217,7 +165,7 @@ actor CeilingLight
 	}
 }
 
-actor KitchenStuff
+actor KitchenStuff 48
 {
 	states
 	{
@@ -227,7 +175,7 @@ actor KitchenStuff
 	}
 }
 
-actor SuitOfArmor
+actor SuitOfArmor 49
 {
 	states
 	{
@@ -237,7 +185,7 @@ actor SuitOfArmor
 	}
 }
 
-actor HangingCage
+actor HangingCage 50
 {
 	states
 	{
@@ -247,207 +195,17 @@ actor HangingCage
 	}
 }
 
-actor GoldKey
+actor SkeletonCage 51
 {
 	states
 	{
 		Spawn:
-			GKEY A -1
+			CAG2 A -1
 			stop
 	}
 }
 
-actor SilverKey
-{
-	states
-	{
-		Spawn:
-			SKEY A -1
-			stop
-	}
-}
-
-actor Stuff1
-{
-	states
-	{
-		Spawn:
-			BUNK A -1
-			stop
-	}
-}
-
-actor Stuff2
-{
-	states
-	{
-		Spawn:
-			BASK A -1
-			stop
-	}
-}
-
-actor GoodFood
-{
-	states
-	{
-		Spawn:
-			FOOD A -1
-			stop
-	}
-}
-
-actor Clip
-{
-	states
-	{
-		Spawn:
-			CLIP A -1
-			stop
-	}
-}
-
-actor MachineGun
-{
-	states
-	{
-		Spawn:
-			MGUN A -1
-			stop
-	}
-}
-
-actor GatlingGun
-{
-	states
-	{
-		Spawn:
-			CGUN A -1
-			stop
-	}
-}
-
-actor Cross
-{
-	states
-	{
-		Spawn:
-			CROS A -1
-			stop
-	}
-}
-
-actor Chalice
-{
-	states
-	{
-		Spawn:
-			CHAL A -1
-			stop
-	}
-}
-
-actor Bible
-{
-	states
-	{
-		Spawn:
-			JEWL A -1
-			stop
-	}
-}
-
-actor Crown
-{
-	states
-	{
-		Spawn:
-			CRWN A -1
-			stop
-	}
-}
-
-actor OneUp
-{
-	states
-	{
-		Spawn:
-			ONUP A -1
-			stop
-	}
-}
-
-actor Gibs
-{
-	states
-	{
-		Spawn:
-			GIBS A -1
-			stop
-	}
-}
-
-actor Barrel
-{
-	states
-	{
-		Spawn:
-			BARL A -1
-			stop
-	}
-}
-
-actor Well
-{
-	states
-	{
-		Spawn:
-			WEL1 A -1
-			stop
-	}
-}
-
-actor EmptyWell
-{
-	states
-	{
-		Spawn:
-			WEL2 A -1
-			stop
-	}
-}
-
-actor Gibs2
-{
-	states
-	{
-		Spawn:
-			BLUD A -1
-			stop
-	}
-}
-
-actor Flag
-{
-	states
-	{
-		Spawn:
-			FLAG A -1
-			stop
-	}
-}
-
-actor CallApogee
-{
-	states
-	{
-		Spawn:
-			AARD A -1
-			stop
-	}
-}
-
-actor Junk1
+actor Bones1 52
 {
 	states
 	{
@@ -457,7 +215,218 @@ actor Junk1
 	}
 }
 
-actor Junk2
+actor GoldKey 53
+{
+	states
+	{
+		Spawn:
+			GKEY A -1
+			stop
+	}
+}
+
+actor SilverKey 54
+{
+	states
+	{
+		Spawn:
+			SKEY A -1
+			stop
+	}
+}
+
+actor BunkBed 55
+{
+	states
+	{
+		Spawn:
+			BUNK A -1
+			stop
+	}
+}
+
+actor Basket 56
+{
+	states
+	{
+		Spawn:
+			BASK A -1
+			stop
+	}
+}
+
+actor Food 57
+{
+	states
+	{
+		Spawn:
+			FOOD A -1
+			stop
+	}
+}
+
+actor Medikit 58
+{
+	states
+	{
+		Spawn:
+			MEDI A -1
+			stop
+	}
+}
+
+actor Clip 59
+{
+	states
+	{
+		Spawn:
+			CLIP A -1
+			stop
+	}
+}
+
+actor MachineGun 60
+{
+	states
+	{
+		Spawn:
+			MGUN A -1
+			stop
+	}
+}
+
+actor GatlingGun 61
+{
+	states
+	{
+		Spawn:
+			CGUN A -1
+			stop
+	}
+}
+
+actor Cross 62
+{
+	states
+	{
+		Spawn:
+			CROS A -1
+			stop
+	}
+}
+
+actor Chalice 63
+{
+	states
+	{
+		Spawn:
+			CHAL A -1
+			stop
+	}
+}
+
+actor ChestofJewels 64
+{
+	states
+	{
+		Spawn:
+			JEWL A -1
+			stop
+	}
+}
+
+actor Crown 65
+{
+	states
+	{
+		Spawn:
+			CRWN A -1
+			stop
+	}
+}
+
+actor OneUp 66
+{
+	+FULLBRIGHT
+	states
+	{
+		Spawn:
+			ONUP A -1
+			stop
+	}
+}
+
+actor Gibs 67
+{
+	states
+	{
+		Spawn:
+			GIBS A -1
+			stop
+	}
+}
+
+actor Barrel 68
+{
+	states
+	{
+		Spawn:
+			BARL A -1
+			stop
+	}
+}
+
+actor Well 69
+{
+	states
+	{
+		Spawn:
+			WEL1 A -1
+			stop
+	}
+}
+
+actor EmptyWell 70
+{
+	states
+	{
+		Spawn:
+			WEL2 A -1
+			stop
+	}
+}
+
+actor Gibs2 71
+{
+	states
+	{
+		Spawn:
+			BLUD A -1
+			stop
+	}
+}
+
+actor Flag 72
+{
+	states
+	{
+		Spawn:
+			FLAG A -1
+			stop
+	}
+}
+
+actor CallApogee 73
+{
+	states
+	{
+		Spawn:
+			AARD A -1
+			stop
+	}
+}
+
+actor Bones2 74
 {
 	states
 	{
@@ -467,7 +436,7 @@ actor Junk2
 	}
 }
 
-actor Junk3
+actor Bones3 75
 {
 	states
 	{
@@ -477,7 +446,17 @@ actor Junk3
 	}
 }
 
-actor Pots
+actor Bones4 76
+{
+	states
+	{
+		Spawn:
+			BON4 A -1
+			stop
+	}
+}
+
+actor Pots 77
 {
 	states
 	{
@@ -487,7 +466,7 @@ actor Pots
 	}
 }
 
-actor Stove
+actor Stove 78
 {
 	states
 	{
@@ -497,7 +476,7 @@ actor Stove
 	}
 }
 
-actor Spears
+actor Spears 79
 {
 	states
 	{
@@ -507,7 +486,7 @@ actor Spears
 	}
 }
 
-actor Vines
+actor Vines 80
 {
 	states
 	{
@@ -532,6 +511,7 @@ actor Rocket
 
 actor Smoke
 {
+	+NEVERMARK
 	states
 	{
 		Spawn:
@@ -552,16 +532,19 @@ statetype s_hboom2              = {false,SPR_HBOOM_2,6,NULL,NULL,&s_hboom3};
 statetype s_hboom3              = {false,SPR_HBOOM_3,6,NULL,NULL,NULL};
 */
 
-actor Guard
+actor Guard 11
 {
 	health 25
-	speed 512
+	speed 1, 3
+	sighttime 1, 4
+	seesound "guard/sight"
 	+SHOOTABLE
+	+ISMONSTER
 	states
 	{
 		Spawn:
-			GARD A -1 T_Stand
-			goto Spawn
+			GARD A -1 NOP T_Stand
+			stop
 		Path:
 			GARD B 10 T_Path
 			GARD B 2.5
@@ -597,16 +580,7 @@ actor Guard
 	}
 }
 
-actor PatrolingGuard : Guard
-{
-	states
-	{
-		Spawn:
-			goto Path
-	}
-}
-
-actor DeadGuard
+actor DeadGuard 81
 {
 	states
 	{
@@ -616,8 +590,9 @@ actor DeadGuard
 	}
 }
 
-actor Blinky
+actor Blinky 29
 {
+	speed 2.93, 5.859
 	states
 	{
 		Spawn:
@@ -626,8 +601,9 @@ actor Blinky
 	}
 }
 
-actor Inky
+actor Inky 32
 {
+	speed 2.93, 5.859
 	states
 	{
 		Spawn:
@@ -636,8 +612,9 @@ actor Inky
 	}
 }
 
-actor Pinky
+actor Pinky 31
 {
+	speed 2.93, 5.859
 	states
 	{
 		Spawn:
@@ -646,8 +623,9 @@ actor Pinky
 	}
 }
 
-actor Clyde
+actor Clyde 30
 {
+	speed 2.93, 5.859
 	states
 	{
 		Spawn:
@@ -656,9 +634,13 @@ actor Clyde
 	}
 }
 
-actor Dog
+actor Dog 14
 {
 	health 1
+	sighttime 2.93, 5.859
+	seesound "dog/sight"
+	+SHOOTABLE
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -691,9 +673,14 @@ actor Dog
 	}
 }
 
-actor Officer
+actor Officer 12
 {
 	health 50
+	speed 1, 5
+	sighttime 2
+	seesound "officer/sight"
+	+SHOOTABLE
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -734,9 +721,13 @@ actor Officer
 	}
 }
 
-actor Mutant
+actor Mutant 15
 {
 	health 45, 55, 55, 65
+	speed 1, 3
+	sighttime 1, 6
+	+SHOOTABLE
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -772,9 +763,14 @@ actor Mutant
 	}
 }
 
-actor WolfensteinSS // ZDoom compatible name
+actor WolfensteinSS 13 // ZDoom compatible name
 {
 	health 100
+	speed 1, 4
+	sighttime 1, 6
+	seesound "wolfss/sight"
+	+SHOOTABLE
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -813,9 +809,14 @@ actor WolfensteinSS // ZDoom compatible name
 	}
 }
 
-actor Hans
+actor Hans 16
 {
 	health 850, 950, 1050, 1200
+	speed 1, 3
+	seesound "hans/sight"
+	+SHOOTABLE
+	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -842,9 +843,14 @@ actor Hans
 	}
 }
 
-actor Gretel
+actor Gretel 20
 {
 	health 850, 950, 1050, 1200
+	speed 1, 3
+	seesound "gretel/sight"
+	+SHOOTABLE
+	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -873,6 +879,7 @@ actor Gretel
 
 actor Needle
 {
+	+NEVERMARK
 	states
 	{
 		Spawn:
@@ -881,9 +888,14 @@ actor Needle
 	}
 }
 
-actor Schabbs
+actor Schabbs 17
 {
 	health 850, 950, 1550, 2400
+	speed 1, 3
+	seesound "schabbs/sight"
+	+SHOOTABLE
+	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -910,9 +922,14 @@ actor Schabbs
 	}
 }
 
-actor Gift
+actor Gift 21
 {
 	health 850, 950, 1050, 120
+	speed 1, 3
+	seesound "gift/sight"
+	+SHOOTABLE
+	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -939,11 +956,14 @@ actor Gift
 	}
 }
 
-actor Fat
+actor FatFace 22
 {
 	health 850, 950, 1050, 120
+	speed 1, 3
+	seesound "fat/sight"
 	+SHOOTABLE
 	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -971,9 +991,14 @@ actor Fat
 	}
 }
 
-actor FakeHitler
+actor FakeHitler 18
 {
 	health 200, 300, 400, 500
+	speed 1, 3
+	seesound "fake/sight"
+	+SHOOTABLE
+	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -999,8 +1024,9 @@ actor FakeHitler
 	}
 }
 
-actor Fire
+actor FireBall
 {
+	+NEVERMARK
 	states
 	{
 		Spawn:
@@ -1009,9 +1035,14 @@ actor Fire
 	}
 }
 
-actor MechaHitler
+actor MechaHitler 19
 {
 	health 850, 950, 1050, 1200
+	speed 1, 3
+	seesound "hitler/sight"
+	+SHOOTABLE
+	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -1041,6 +1072,11 @@ actor MechaHitler
 actor Hitler
 {
 	health 500, 700, 800, 900
+	speed 1, 5
+	seesound "hitler/sight"
+	+SHOOTABLE
+	+AMBUSH
+	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -1087,13 +1123,14 @@ actor BJRun
 
 actor BJPlayer
 {
+	+NEVERMARK
 	states
 	{
 		Spawn:
-			TNT1 A -1 T_Player
+			TNT1 A -1 NOP T_Player
 			stop
 		Missile:
-			TNT1 A -1 T_Shoot
+			TNT1 A -1 NOP T_Shoot
 			stop
 	}
 }

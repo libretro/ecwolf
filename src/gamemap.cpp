@@ -37,6 +37,7 @@
 #include "w_wad.h"
 #include "wl_def.h"
 #include "lnspec.h"
+#include "thingdef.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
 {
@@ -469,6 +470,7 @@ void GameMap::ReadPlanesData()
 				static const unsigned int NUM_XLAT_ENTRIES = sizeof(xlat)/sizeof(xlat[0]);
 
 				unsigned int ambushSpot = 0;
+				ambushSpots.Push(0); // Prevent uninitialized value errors. 
 
 				for(unsigned int i = 0;i < size;++i)
 				{
@@ -518,9 +520,10 @@ void GameMap::ReadPlanesData()
 							printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%UNIT, i/UNIT);
 
 						Thing thing;
-						thing.x = i%UNIT;
-						thing.y = i/UNIT;
+						thing.x = ((i%UNIT)<<FRACBITS)+(FRACUNIT/2);
+						thing.y = ((i/UNIT)<<FRACBITS)+(FRACUNIT/2);
 						thing.z = 0;
+						thing.type = xlat[type].newnum;
 						if(xlat[type].angles)
 						{
 							if(oldplane[i] >= PATROLPOINT && oldplane[i] < PATROLPOINT+8)
@@ -598,6 +601,42 @@ void GameMap::SetupReject()
 		for(unsigned int j = 0;j < i;++j)
 		{
 			zoneLinks[i][j] = zoneLinks[j][i];
+		}
+	}
+}
+
+void GameMap::SpawnThings() const
+{
+	for(unsigned int i = 0;i < things.Size();++i)
+	{
+		Thing &thing = things[i];
+		if(!thing.skill[gamestate.difficulty])
+			continue;
+
+		if(thing.type == 1)
+			SpawnPlayer(thing.x>>FRACBITS, thing.y>>FRACBITS, thing.angle);
+		else
+		{
+			// Spawn object
+			const ClassDef *cls = ClassDef::FindClass(thing.type);
+			if(cls == NULL)
+			{
+				printf("Unknown thing %d @ (%d, %d)\n", thing.type, thing.x>>FRACBITS, thing.y>>FRACBITS);
+				continue;
+			}
+
+			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0);
+			actor->angle = (thing.angle+270)%360;
+			if(thing.ambush)
+				actor->flags |= FL_AMBUSH;
+			if(thing.patrol)
+			{
+				const Frame * const path = actor->FindState("Path");
+				if(path)
+					actor->SetState(path, true);
+			}
+
+			actorat[thing.x>>FRACBITS][thing.y>>FRACBITS] = actor;
 		}
 	}
 }

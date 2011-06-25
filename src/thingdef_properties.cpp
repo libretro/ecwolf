@@ -60,16 +60,46 @@ HANDLE_PROPERTY(health)
 	}
 }
 
+HANDLE_PROPERTY(seesound)
+{
+	STRING_PARAM(snd, 0);
+	defaults->seesound = snd;
+}
+
+HANDLE_PROPERTY(sighttime)
+{
+	INT_PARAM(time, 0);
+	defaults->sighttime = time;
+
+	if(PARAM_COUNT == 2)
+	{
+		INT_PARAM(rnd, 1);
+		defaults->sightrandom = rnd <= 255 ? rnd : 0;
+	}
+	else
+		defaults->sightrandom = 0;
+}
+
 HANDLE_PROPERTY(speed)
 {
-	INT_PARAM(speed, 0);
+	// Speed = units per 2 tics (1/35 of second)
+	FLOAT_PARAM(speed, 0);
+	defaults->speed = int32_t(speed*FRACUNIT)/128;
 
-	defaults->speed = speed;
+	if(PARAM_COUNT == 2)
+	{
+		FLOAT_PARAM(runspeed, 1);
+		defaults->runspeed = int32_t(runspeed*FRACUNIT)/128;
+	}
+	else
+		defaults->runspeed = defaults->speed;
 }
 
 #define DEFINE_PROP(name, class, params) { class::__StaticClass, #name, #params, __Handler_##name }
 extern const PropDef properties[NUM_PROPERTIES] =
 {
 	DEFINE_PROP(health, AActor, I_IIIIIIII),
-	DEFINE_PROP(speed, AActor, I)
+	DEFINE_PROP(seesound, AActor, S),
+	DEFINE_PROP(sighttime, AActor, I_I),
+	DEFINE_PROP(speed, AActor, F_F)
 };

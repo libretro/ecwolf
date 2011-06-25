@@ -36,6 +36,12 @@
 #include "w_wad.h"
 #include "wl_def.h"
 #include "thingdef.h"
+#include "thinker.h"
+
+// Code pointer stuff
+void InitFunctionTable();
+void ReleaseFunctionTable();
+ActionPtr FindFunction(const FName &func);
 
 #define DEFINE_FLAG(prefix, flag, type, variable) { prefix##_##flag, #flag, typeoffsetof(type,variable) }
 const FlagDef flags[] =
@@ -45,19 +51,22 @@ const FlagDef flags[] =
 	DEFINE_FLAG(FL, BONUS, AActor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, AActor, flags),
 	DEFINE_FLAG(FL, FULLBRIGHT, AActor, flags),
+	DEFINE_FLAG(FL, ISMONSTER, AActor, flags),
 	DEFINE_FLAG(FL, NEVERMARK, AActor, flags),
 	DEFINE_FLAG(FL, NONMARK, AActor, flags),
 	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
-	DEFINE_FLAG(FL, VISABLE, AActor, flags),
-	DEFINE_FLAG(FL, ISMONSTER, AActor, flags)
+	DEFINE_FLAG(FL, VISABLE, AActor, flags)
 };
 extern const PropDef properties[NUM_PROPERTIES];
 
 TMap<FName, ClassDef *> ClassDef::classTable;
+TMap<int, ClassDef *> ClassDef::classNumTable;
 
-ClassDef::ClassDef() : defaultInstance(NULL)
+ClassDef::ClassDef()
 {
 	defaultInstance = new AActor(this);
+	defaultInstance->defaults = defaultInstance;
+	defaultInstance->Init(true);
 }
 
 ClassDef::~ClassDef()
@@ -69,7 +78,18 @@ ClassDef::~ClassDef()
 
 AActor *ClassDef::CreateInstance() const
 {
-	return defaultInstance->__NewNativeInstance(this);
+	AActor *newactor = defaultInstance->__NewNativeInstance(this);
+	*newactor = *defaultInstance;
+	newactor->Init();
+	return newactor;
+}
+
+const ClassDef *ClassDef::FindClass(unsigned int ednum)
+{
+	ClassDef **ret = classNumTable.CheckKey(ednum);
+	if(ret == NULL)
+		return NULL;
+	return *ret;
 }
 
 const ClassDef *ClassDef::FindClass(const FName &className)
@@ -80,11 +100,11 @@ const ClassDef *ClassDef::FindClass(const FName &className)
 	return *ret;
 }
 
-Frame *ClassDef::FindState(const char* stateName) const
+const Frame *ClassDef::FindState(const FName &stateName) const
 {
 	Frame *const *ret = stateList.CheckKey(stateName);
 	if(ret == NULL)
-		return NULL;
+		return (!parent ? NULL : parent->FindState(stateName));
 	return *ret;
 }
 
@@ -96,14 +116,6 @@ struct Goto
 };
 void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 {
-	// First populate the state index with that of the parent.
-	if(parent != NULL)
-	{
-		TMap<FName, Frame *>::ConstPair *pair;
-		for(TMap<FName, Frame *>::ConstIterator iter(parent->stateList);iter.NextPair(pair);)
-			stateList[pair->Key] = pair->Value;
-	}
-
 	// We need to resolve gotos after we install the states.
 	TArray<Goto> gotos;
 
@@ -133,8 +145,8 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
 			thisFrame->frame = thisStateDef.frames[i];
 			thisFrame->duration = thisStateDef.duration;
-			thisFrame->action = NULL;
-			thisFrame->thinker = NULL;
+			thisFrame->action = thisStateDef.functions[0];
+			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
 			if(i == thisStateDef.frames.Len()-1) // Handle nextType
 			{
@@ -166,7 +178,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	// Resolve Gotos
 	for(unsigned int iter = 0;iter < gotos.Size();++iter)
 	{
-		Frame *result = FindState(gotos[iter].label);
+		const Frame *result = FindState(gotos[iter].label);
 		gotos[iter].frame->next = result;
 	}
 }
@@ -188,12 +200,16 @@ void ClassDef::LoadActors()
 	printf("ClassDef: Loading actor definitions.\n");
 	atexit(&ClassDef::UnloadActors);
 
+	InitFunctionTable();
+
 	int lastLump = 0;
 	int lump = 0;
 	while((lump = Wads.FindLump("DECORATE", &lastLump)) != -1)
 	{
 		ParseDecorateLump(lump);
 	}
+
+	ReleaseFunctionTable();
 	DumpClasses();
 }
 
@@ -229,12 +245,18 @@ void ClassDef::ParseActor(Scanner &sc)
 		else
 			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.\n", sc->str.GetChars());
 	}
+	else if(sc.CheckToken(TK_IntConst))
+	{
+		classNumTable[sc->number] = newClass;
+	}
 	if(previouslyDefined && !native)
 		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
 		delete newClass->defaultInstance;
 		newClass->defaultInstance = newClass->parent->defaultInstance->__NewNativeInstance(newClass);
+		newClass->defaultInstance->defaults = newClass->defaultInstance;
+		newClass->defaultInstance->Init(true);
 	}
 
 	sc.MustGetToken('{');
@@ -315,6 +337,7 @@ void ClassDef::ParseActor(Scanner &sc)
 							else
 								sc.ScriptMessage(Scanner::ERROR, "Expected frame duration.");
 						}
+						thisState.functions[0] = thisState.functions[1] = NULL;
 
 						if(sc.CheckToken('}'))
 							goto FinishState;
@@ -351,10 +374,22 @@ void ClassDef::ParseActor(Scanner &sc)
 								}
 								else
 								{
-									if(sc.CheckToken('('))
+									if(sc->str.CompareNoCase("NOP") != 0)
 									{
-										while(!sc.CheckToken(')') && sc.TokensLeft())
-											sc.GetNextToken();
+										ActionPtr &ptr = thisState.functions[func];
+										ActionPtr func = FindFunction(sc->str);
+										if(func)
+										{
+											ptr = *func;
+										}
+										else
+											printf("Could not find function %s\n", sc->str.GetChars());
+
+										if(sc.CheckToken('('))
+										{
+											while(!sc.CheckToken(')') && sc.TokensLeft())
+												sc.GetNextToken();
+										}
 									}
 								}
 
@@ -586,11 +621,38 @@ const ClassDef *ClassDef::DeclareNativeClass(const char* className, const ClassD
 	definition->parent = parent;
 	delete definition->defaultInstance;
 	definition->defaultInstance = new T(definition);
+	definition->defaultInstance->defaults = definition->defaultInstance;
+	definition->defaultInstance->Init(true);
 	return definition;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// We can't make AActor a thinker since we create non-thinking objects.
+class AActorProxy : public Thinker
+{
+	DECLARE_THINKER(AActorProxy)
+	public:
+		AActorProxy(AActor *parent) : parent(parent)
+		{
+			parent->actorRef = AActor::actors.Push(parent);
+		}
+
+		~AActorProxy()
+		{
+			delete parent;
+		}
+
+		void Tick()
+		{
+			parent->Tick();
+		}
+	private:
+		AActor * const parent;
+};
+IMPLEMENT_THINKER(AActorProxy)
+
+LinkedList<AActor *> AActor::actors;
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
 AActor::AActor(const ClassDef *type) : classType(type), flags(0), soundZone(NULL)
@@ -599,12 +661,103 @@ AActor::AActor(const ClassDef *type) : classType(type), flags(0), soundZone(NULL
 
 AActor::~AActor()
 {
+	if(actorRef)
+		actors.Remove(actorRef);
+}
+
+void AActor::Destroy()
+{
+	assert(thinker != NULL);
+	thinker->Destroy();
+}
+
+void AActor::Die()
+{
+	const Frame *death = FindState("Death");
+	if(death)
+		SetState(death);
+	else
+		Destroy();
 }
 
 void AActor::EnterZone(const MapZone *zone)
 {
 	if(zone)
 		soundZone = zone;
+}
+
+const Frame *AActor::FindState(const FName &name) const
+{
+	return classType->FindState(name);
+}
+
+void AActor::Init(bool nothink)
+{
+	if(!nothink)
+	{
+		actorRef = actors.Push(this);
+		thinker = new AActorProxy(this);
+
+		SetState(FindState("Spawn"), true);
+	}
+	else
+	{
+		actorRef = NULL;
+		thinker = NULL;
+		state = NULL;
+	}
+}
+
+void AActor::SetState(const Frame *state, bool notic)
+{
+	this->state = state;
+	ticcount = state->duration;
+	if(!notic && state->action)
+		state->action(this);
+}
+
+void AActor::Tick()
+{
+	if(state == NULL)
+	{
+		Destroy();
+		return;
+	}
+
+	if(ticcount > 0)
+		--ticcount;
+
+	while(ticcount == 0)
+	{
+		if(!state->next)
+		{
+			Destroy();
+			return;
+		}
+		SetState(state->next);
+	}
+
+	if(state->thinker)
+		state->thinker(this);
+}
+
+AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
+{
+	if(type == NULL)
+	{
+		printf("Tried to spawn classless actor.\n");
+		return NULL;
+	}
+
+	AActor *actor = type->CreateInstance();
+	actor->x = x;
+	actor->y = y;
+	actor->tilex = x>>FRACBITS;
+	actor->tiley = y>>FRACBITS;
+
+	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
+	actor->EnterZone(spot->zone);
+	return actor;
 }
 
 class AWeapon : public AActor

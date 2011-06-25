@@ -144,6 +144,7 @@ class GameMap
 		bool			IsValid() const { return valid; }
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
+		void			SpawnThings() const;
 
 		// Sound functions
 		bool			CheckLink(const Zone *zone1, const Zone *zone2, bool recurse);

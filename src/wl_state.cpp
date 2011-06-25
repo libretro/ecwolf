@@ -4,6 +4,7 @@
 #include "wl_def.h"
 #include "id_sd.h"
 #include "id_us.h"
+#include "m_random.h"
 #include "thingdef.h"
 
 /*
@@ -52,7 +53,7 @@ void    KillActor (objtype *ob);
 void    DamageActor (objtype *ob, unsigned damage);
 
 boolean CheckLine (objtype *ob);
-void    FirstSighting (objtype *ob);
+void    FirstSighting (AActor *ob);
 boolean CheckSight (objtype *ob);
 
 /*
@@ -83,14 +84,13 @@ boolean CheckSight (objtype *ob);
 
 void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 {
-	GetNewActor ();
-	newobj->state = state;
+	/*newobj->state = state;
 	if (state->tictime)
 		newobj->ticcount = DEMOCHOOSE_ORIG_SDL(
 				US_RndT () % state->tictime,
 				US_RndT () % state->tictime + 1);     // Chris' moonwalk bugfix ;D
 	else
-		newobj->ticcount = 0;
+		newobj->ticcount = 0;*/
 
 	newobj->tilex = (short) tilex;
 	newobj->tiley = (short) tiley;
@@ -116,8 +116,8 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 
 void NewState (objtype *ob, statetype *state)
 {
-	ob->state = state;
-	ob->ticcount = state->tictime;
+//	ob->state = state;
+//	ob->ticcount = state->tictime;
 }
 
 
@@ -785,6 +785,7 @@ moveok:
 
 void DropItem (wl_stat_t itemtype, int tilex, int tiley)
 {
+#if 0
 	int     x,y,xl,xh,yl,yh;
 
 	//
@@ -812,6 +813,7 @@ void DropItem (wl_stat_t itemtype, int tilex, int tiley)
 			}
 		}
 	}
+#endif
 }
 
 
@@ -826,7 +828,8 @@ void DropItem (wl_stat_t itemtype, int tilex, int tiley)
 
 void KillActor (objtype *ob)
 {
-	int     tilex,tiley;
+	ob->Die();
+/*	int     tilex,tiley;
 
 	tilex = ob->tilex = (word)(ob->x >> TILESHIFT);         // drop item on center
 	tiley = ob->tiley = (word)(ob->y >> TILESHIFT);
@@ -957,7 +960,7 @@ void KillActor (objtype *ob)
 	gamestate.killcount++;
 	ob->flags &= ~FL_SHOOTABLE;
 	actorat[ob->tilex][ob->tiley] = NULL;
-	ob->flags |= FL_NONMARK;
+	ob->flags |= FL_NONMARK;*/
 }
 
 
@@ -977,7 +980,7 @@ void KillActor (objtype *ob)
 
 void DamageActor (objtype *ob, unsigned damage)
 {
-	madenoise = true;
+/*	madenoise = true;
 
 	//
 	// do double damage if shooting a non attack mode actor
@@ -1025,7 +1028,7 @@ void DamageActor (objtype *ob, unsigned damage)
 
 				break;
 		}
-	}
+	}*/
 }
 
 /*
@@ -1281,134 +1284,14 @@ boolean CheckSight (objtype *ob)
 ===============
 */
 
-void FirstSighting (objtype *ob)
+void FirstSighting (AActor *ob)
 {
-	//
-	// react to the player
-	//
-	switch (ob->obclass)
-	{
-		case guardobj:
-			PlaySoundLocActor("guard/sight",ob);
-			NewState (ob,&s_grdchase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
+	const Frame *chase = ob->FindState("Chase");
+	if(chase)
+		ob->SetState(chase);
 
-		case officerobj:
-			PlaySoundLocActor("officer/sight",ob);
-			NewState (ob,&s_ofcchase1);
-			ob->speed *= 5;                 // go faster when chasing player
-			break;
-
-		case mutantobj:
-			NewState (ob,&s_mutchase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
-
-		case ssobj:
-			PlaySoundLocActor("wolfss/sight",ob);
-			NewState (ob,&s_sschase1);
-			ob->speed *= 4;                 // go faster when chasing player
-			break;
-
-		case dogobj:
-			PlaySoundLocActor("dog/sight",ob);
-			NewState (ob,&s_dogchase1);
-			ob->speed *= 2;                 // go faster when chasing player
-			break;
-
-#ifndef SPEAR
-		case bossobj:
-			SD_PlaySound("hans/sight");
-			NewState (ob,&s_bosschase1);
-			ob->speed = SPDPATROL*3;        // go faster when chasing player
-			break;
-
-#ifndef APOGEE_1_0
-		case gretelobj:
-			SD_PlaySound("gretel/sight");
-			NewState (ob,&s_gretelchase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
-
-		case giftobj:
-			SD_PlaySound("gift/sight");
-			NewState (ob,&s_giftchase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
-
-		case fatobj:
-			SD_PlaySound("fat/sight");
-			NewState (ob,&s_fatchase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
-#endif
-
-		case schabbobj:
-			SD_PlaySound("schabbs/sight");
-			NewState (ob,&s_schabbchase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
-
-		case fakeobj:
-			SD_PlaySound("fake/sight");
-			NewState (ob,&s_fakechase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
-
-		case mechahitlerobj:
-			SD_PlaySound("hitler/sight");
-			NewState (ob,&s_mechachase1);
-			ob->speed *= 3;                 // go faster when chasing player
-			break;
-
-		case realhitlerobj:
-			SD_PlaySound("hitler/sight");
-			NewState (ob,&s_hitlerchase1);
-			ob->speed *= 5;                 // go faster when chasing player
-			break;
-
-		case ghostobj:
-			NewState (ob,&s_blinkychase1);
-			ob->speed *= 2;                 // go faster when chasing player
-			break;
-#else
-		case spectreobj:
-			SD_PlaySound("ghost/sight");
-			NewState (ob,&s_spectrechase1);
-			ob->speed = 800;                        // go faster when chasing player
-			break;
-
-		case angelobj:
-			SD_PlaySound("angel/sight");
-			NewState (ob,&s_angelchase1);
-			ob->speed = 1536;                       // go faster when chasing player
-			break;
-
-		case transobj:
-			SD_PlaySound("trans/sight");
-			NewState (ob,&s_transchase1);
-			ob->speed = 1536;                       // go faster when chasing player
-			break;
-
-		case uberobj:
-			NewState (ob,&s_uberchase1);
-			ob->speed = 3000;                       // go faster when chasing player
-			break;
-
-		case willobj:
-			SD_PlaySound("wilhelm/sight");
-			NewState (ob,&s_willchase1);
-			ob->speed = 2048;                       // go faster when chasing player
-			break;
-
-		case deathobj:
-			SD_PlaySound("deathknight/sight");
-			NewState (ob,&s_deathchase1);
-			ob->speed = 2048;                       // go faster when chasing player
-			break;
-#endif
-	}
+	PlaySoundLocActor(ob->seesound, ob);
+	ob->speed = ob->runspeed;
 
 	if (ob->distance < 0)
 		ob->distance = 0;       // ignore the door opening command
@@ -1432,20 +1315,25 @@ void FirstSighting (objtype *ob)
 ===============
 */
 
-boolean SightPlayer (objtype *ob)
+static FRandom pr_sight("SightPlayer");
+bool SightPlayer (AActor *ob)
 {
 	if (ob->flags & FL_ATTACKMODE)
 		Quit ("An actor in ATTACKMODE called SightPlayer!");
 
-	if (ob->temp2)
+	if (ob->sighttime != ob->defaults->sighttime)
 	{
 		//
 		// count down reaction time
 		//
-		ob->temp2 -= (short) tics;
-		if (ob->temp2 > 0)
+		if (ob->sightrandom)
+		{
+			--ob->sightrandom;
 			return false;
-		ob->temp2 = 0;                                  // time to react
+		}
+
+		if (--ob->sighttime > 0)
+			return false;
 	}
 	else
 	{
@@ -1464,42 +1352,10 @@ boolean SightPlayer (objtype *ob)
 				return false;
 		}
 
-
-		switch (ob->obclass)
-		{
-			case guardobj:
-				ob->temp2 = 1+US_RndT()/4;
-				break;
-			case officerobj:
-				ob->temp2 = 2;
-				break;
-			case mutantobj:
-				ob->temp2 = 1+US_RndT()/6;
-				break;
-			case ssobj:
-				ob->temp2 = 1+US_RndT()/6;
-				break;
-			case dogobj:
-				ob->temp2 = 1+US_RndT()/8;
-				break;
-
-			case bossobj:
-			case schabbobj:
-			case fakeobj:
-			case mechahitlerobj:
-			case realhitlerobj:
-			case gretelobj:
-			case giftobj:
-			case fatobj:
-			case spectreobj:
-			case angelobj:
-			case transobj:
-			case uberobj:
-			case willobj:
-			case deathobj:
-				ob->temp2 = 1;
-				break;
-		}
+		--ob->sighttime; // We need to somehow mark we started.
+		ob->sightrandom = 1; // Account for tic.
+		if(ob->defaults->sightrandom)
+			ob->sightrandom += pr_sight(255/ob->defaults->sightrandom);
 		return false;
 	}
 

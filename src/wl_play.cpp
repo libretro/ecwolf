@@ -40,7 +40,6 @@ exit_t playstate;
 
 static int DebugOk;
 
-AActor *objlist[MAXACTORS];
 objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
 
 boolean noclip, ammocheat;
@@ -150,7 +149,6 @@ int lastgamemusicoffset = 0;
 
 void CenterWindow (word w, word h);
 void InitObjList (void);
-void RemoveObj (objtype * gone);
 void PollControls (void);
 int StopMusic (void);
 void StartMusic (void);
@@ -747,148 +745,6 @@ void CheckKeys (void)
 //===========================================================================
 
 /*
-#############################################################################
-
-								The objlist data structure
-
-#############################################################################
-
-objlist containt structures for every actor currently playing.  The structure
-is accessed as a linked list starting at *player, ending when ob->next ==
-NULL.  GetNewObj inserts a new object at the end of the list, meaning that
-if an actor spawn another actor, the new one WILL get to think and react the
-same frame.  RemoveObj unlinks the given object and returns it to the free
-list, but does not damage the objects ->next pointer, so if the current object
-removes itself, a linked list following loop can still safely get to the
-next element.
-
-<backwardly linked free list>
-
-#############################################################################
-*/
-
-
-/*
-=========================
-=
-= InitActorList
-=
-= Call to clear out the actor object lists returning them all to the free
-= list.  Allocates a special spot for the player.
-=
-=========================
-*/
-
-int objcount;
-
-void InitActorList (void)
-{
-	int i;
-
-//
-// init the actor lists
-//
-	for (i = 0; i < MAXACTORS; i++)
-		objlist[i] = NATIVE_CLASS(Actor)->CreateInstance();
-	for (i = 0; i < MAXACTORS; i++)
-	{
-		objlist[i]->prev = objlist[i + 1];
-		objlist[i]->next = NULL;
-	}
-
-	objlist[MAXACTORS - 1]->prev = NULL;
-
-	objfreelist = objlist[0];
-	lastobj = NULL;
-
-	objcount = 0;
-
-//
-// give the player the first free spots
-//
-	GetNewActor ();
-	player = newobj;
-
-}
-
-//===========================================================================
-
-/*
-=========================
-=
-= GetNewActor
-=
-= Sets the global variable new to point to a free spot in objlist.
-= The free spot is inserted at the end of the liked list
-=
-= When the object list is full, the caller can either have it bomb out ot
-= return a dummy object pointer that will never get used
-=
-=========================
-*/
-
-void GetNewActor (void)
-{
-	if (!objfreelist)
-		Quit ("GetNewActor: No free spots in objlist!");
-
-	newobj = objfreelist;
-	objfreelist = newobj->prev;
-	memset (newobj, 0, sizeof (*newobj));
-
-	if (lastobj)
-		lastobj->next = newobj;
-	newobj->prev = lastobj;     // new->next is allready NULL from memset
-
-	newobj->active = ac_no;
-	lastobj = newobj;
-
-	objcount++;
-}
-
-//===========================================================================
-
-/*
-=========================
-=
-= RemoveObj
-=
-= Add the given object back into the free list, and unlink it from it's
-= neighbors
-=
-=========================
-*/
-
-void RemoveObj (objtype * gone)
-{
-	if (gone == player)
-		Quit ("RemoveObj: Tried to remove the player!");
-
-	gone->state = NULL;
-
-//
-// fix the next object's back link
-//
-	if (gone == lastobj)
-		lastobj = (objtype *) gone->prev;
-	else
-		gone->next->prev = gone->prev;
-
-//
-// fix the previous object's forward link
-//
-	gone->prev->next = gone->next;
-
-//
-// add it back in to the free list
-//
-	gone->prev = objfreelist;
-	objfreelist = gone;
-
-	objcount--;
-}
-
-/*
 =============================================================================
 
 												MUSIC STUFF
@@ -1146,7 +1002,7 @@ void FinishPaletteShifts (void)
 =
 =====================
 */
-
+#if 0
 void DoActor (objtype * ob)
 {
 	void (*think) (objtype *);
@@ -1241,6 +1097,7 @@ think:
 
 	actorat[ob->tilex][ob->tiley] = ob;
 }
+#endif
 
 //==========================================================================
 
@@ -1290,9 +1147,6 @@ void PlayLoop (void)
 
 		for (unsigned int i = 0;i < tics;++i)
 			thinkerList.Tick();
-
-		for (obj = player; obj; obj = obj->next)
-			DoActor (obj);
 
 		UpdatePaletteShifts ();
 

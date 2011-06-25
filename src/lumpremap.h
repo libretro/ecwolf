@@ -56,7 +56,7 @@ class LumpRemaper
 
 		static void			AddFile(const char* extension, FResourceFile *file, Type type);
 		// For Read This screens which reference VGAGraph entries by number.
-		static const char*	ConvertMusicIndexToLump(int num) { return musicReverseMap[num]; }
+		static const char*	ConvertSpriteIndexToLump(int num) { return spriteReverseMap[num]; }
 		static const char*	ConvertVGAIndexToLump(int num) { return vgaReverseMap[num]; }
 		static void			RemapAll();
 	protected:
@@ -73,7 +73,7 @@ class LumpRemaper
 		TArray<RemapFile>	files;
 
 		static TMap<FName, LumpRemaper>	remaps;
-		static TMap<int, FName>			musicReverseMap;
+		static TMap<int, FName>			spriteReverseMap;
 		static TMap<int, FName>			vgaReverseMap;
 };
 

@@ -17,6 +17,7 @@
 #include "thingdef.h"
 #include "id_ca.h"
 #include "gamemap.h"
+#include "lumpremap.h"
 
 /*
 =============================================================================
@@ -561,6 +562,12 @@ void VGAClearScreen (void)
 
 //==========================================================================
 
+FTexture *ShapeToTexture(int shapenum)
+{
+	const char* textureName = LumpRemaper::ConvertSpriteIndexToLump(shapenum+1);
+	return TexMan[textureName];
+}
+
 /*
 =====================
 =
@@ -588,9 +595,6 @@ int CalcRotate (objtype *ob)
 		angle-=ANGLES;
 	while (angle<0)
 		angle+=ANGLES;
-
-	if (ob->state->rotate == 2)             // 2 rotation pain frame
-		return 0;               // pain with shooting frame bugfix
 
 	return angle/(ANGLES/8);
 }
@@ -686,6 +690,7 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 
 void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 {
+	//FTexture *texture = ShapeToTexture(shapenum);
 	t_compshape   *shape;
 	unsigned scale,pixheight,pixwidth;
 	unsigned starty,endy;
@@ -793,52 +798,17 @@ void DrawScaleds (void)
 	unsigned spotloc;
 
 	statobj_t *statptr;
-	objtype   *obj;
 
 	visptr = &vislist[0];
 
 //
-// place static objects
-//
-	for (statptr = &statobjlist[0] ; statptr !=laststatobj ; statptr++)
-	{
-		if ((visptr->shapenum = statptr->shapenum) == -1)
-			continue;                                               // object has been deleted
-
-		if (!*statptr->visspot)
-			continue;                                               // not visable
-
-		if (TransformTile (statptr->tilex,statptr->tiley,
-			&visptr->viewx,&visptr->viewheight) && statptr->flags & FL_BONUS)
-		{
-			GetBonus (statptr);
-			if(statptr->shapenum == -1)
-				continue;                                           // object has been taken
-		}
-
-		if (!visptr->viewheight)
-			continue;                                               // to close to the object
-
-#ifdef USE_DIR3DSPR
-		if(statptr->flags & FL_DIR_MASK)
-			visptr->transsprite=statptr;
-		else
-			visptr->transsprite=NULL;
-#endif
-
-		if (visptr < &vislist[MAXVISABLE-1])    // don't let it overflow
-		{
-			visptr->flags = (short) statptr->flags;
-			visptr++;
-		}
-	}
-
-//
 // place active objects
 //
-	for (obj = player->next;obj;obj=obj->next)
+	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
 	{
-		if ((visptr->shapenum = obj->state->shapenum)==0)
+		AActor *obj = iter->Item();
+
+		if ((visptr->shapenum = 1)==0)
 			continue;                                               // no shape
 
 		spotloc = (obj->tilex<<mapshift)+obj->tiley;   // optimize: keep in struct?
@@ -874,11 +844,10 @@ void DrawScaleds (void)
 
 			visptr->viewx = obj->viewx;
 			visptr->viewheight = obj->viewheight;
-			if (visptr->shapenum == -1)
-				visptr->shapenum = obj->temp1;  // special shape
 
-			if (obj->state->rotate)
-				visptr->shapenum += CalcRotate (obj);
+			// TODO: Handle rotations
+			//if (obj->state->rotate)
+			//	visptr->shapenum += CalcRotate (obj);
 
 			if (visptr < &vislist[MAXVISABLE-1])    // don't let it overflow
 			{
@@ -951,8 +920,8 @@ void DrawPlayerWeapon (void)
 	if (gamestate.victoryflag)
 	{
 #ifndef APOGEE_1_0
-		if (player->state == &s_deathcam && (GetTimeCount()&32) )
-			SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
+	//	if (player->state == &s_deathcam && (GetTimeCount()&32) )
+	//		SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
 #endif
 		return;
 	}

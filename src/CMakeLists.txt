@@ -104,6 +104,7 @@ add_executable(ecwolf
 	sndinfo.cpp
 	thinker.cpp
 	thingdef.cpp
+	thingdef_codeptr.cpp
 	thingdef_properties.cpp
 	v_palette.cpp
 	v_video.cpp

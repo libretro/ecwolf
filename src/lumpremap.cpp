@@ -38,7 +38,7 @@
 #include "scanner.h"
 
 TMap<FName, LumpRemaper> LumpRemaper::remaps;
-TMap<int, FName> LumpRemaper::musicReverseMap;
+TMap<int, FName> LumpRemaper::spriteReverseMap;
 TMap<int, FName> LumpRemaper::vgaReverseMap;
 
 LumpRemaper::LumpRemaper(const char* extension) : mapLumpName(extension)
@@ -162,16 +162,16 @@ bool LumpRemaper::LoadMap()
 			map = &graphics;
 		}
 		else if(sc->str.Compare("sprites") == 0)
+		{
+			reverse = &spriteReverseMap;
 			map = &sprites;
+		}
 		else if(sc->str.Compare("sounds") == 0)
 			map = &sounds;
 		else if(sc->str.Compare("digitalsounds") == 0)
 			map = &digitalsounds;
 		else if(sc->str.Compare("music") == 0)
-		{
-			reverse = &musicReverseMap;
 			map = &music;
-		}
 		else if(sc->str.Compare("textures") == 0)
 			map = &textures;
 		else

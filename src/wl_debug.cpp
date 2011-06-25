@@ -74,43 +74,10 @@ void ViewMap (void);
 
 void CountObjects (void)
 {
-	int     i,total,count,active,inactive,doors;
-	objtype *obj;
-
 	CenterWindow (17,7);
-	active = inactive = count = doors = 0;
-
-	US_Print ("Total statics :");
-	total = (int)(laststatobj-&statobjlist[0]);
-	US_PrintUnsigned (total);
-
-	char str[60];
-	sprintf(str,"\nlaststatobj=%.8X",(int32_t)(uintptr_t)laststatobj);
-	US_Print(str);
-
-	US_Print ("\nIn use statics:");
-	for (i=0;i<total;i++)
-	{
-		if (statobjlist[i].shapenum != -1)
-			count++;
-		else
-			doors++;        //debug
-	}
-	US_PrintUnsigned (count);
-
-	for (obj=player->next;obj;obj=obj->next)
-	{
-		if (obj->active)
-			active++;
-		else
-			inactive++;
-	}
 
 	US_Print ("\nTotal actors  :");
-	US_PrintUnsigned (active+inactive);
-
-	US_Print ("\nActive actors :");
-	US_PrintUnsigned (active);
+	US_PrintUnsigned (AActor::actors.Size());
 
 	VW_UpdateScreen();
 	IN_Ack ();

@@ -1,5 +1,5 @@
 /*
-** thinker.cpp
+** thingdef_codeptr.cpp
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -32,82 +32,61 @@
 **
 */
 
-#include "thinker.h"
-#include "wl_def.h"
+#include "thingdef.h"
 
-ThinkerList thinkerList;
-
-ThinkerList::ThinkerList()
+static TArray<ActionInfo *> *actionFunctions = NULL;
+ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name)
 {
+	if(actionFunctions == NULL)
+		actionFunctions = new TArray<ActionInfo *>;
+	printf("Adding %s\n", name.GetChars());
+	actionFunctions->Push(this);
 }
 
-ThinkerList::~ThinkerList()
+int FunctionTableComp(const void *f1, const void *f2)
 {
-	DestroyAll();
+	const ActionInfo * const func1 = *((const ActionInfo **)f1);
+	const ActionInfo * const func2 = *((const ActionInfo **)f2);
+	if(func1->name < func2->name)
+		return -1;
+	else if(func1->name > func2->name)
+		return 1;
+	return 0;
 }
 
-void ThinkerList::CleanThinkers()
+void InitFunctionTable()
 {
-	LinkedList<Thinker *>::Node *iter = toDestroy.Head();
-	while(iter)
+	qsort(&(*actionFunctions)[0], actionFunctions->Size(), sizeof((*actionFunctions)[0]), FunctionTableComp);
+
+	/*for(unsigned int i = 0;i < actionFunctions->Size();++i)
 	{
-		delete iter->Item();
-		iter = iter->Next();
-	}
-	toDestroy.Clear();
+		printf("%s\t%d\n", actionFunctions->operator[](i)->name.GetChars(), actionFunctions->operator[](i)->name.GetIndex());
+	}*/
 }
 
-void ThinkerList::DestroyAll()
+void ReleaseFunctionTable()
 {
-	LinkedList<Thinker *>::Node *iter = thinkers.Head();
-	while(iter)
+	delete actionFunctions;
+}
+
+ActionPtr FindFunction(const FName &func)
+{
+	ActionInfo *inf;
+	unsigned int max = actionFunctions->Size()-1;
+	unsigned int min = 0;
+	unsigned int mid = max/2;
+	do
 	{
-		iter->Item()->Destroy();
-		iter = iter->Next();
+		inf = (*actionFunctions)[mid];
+		if(inf->name == func)
+			return inf->func;
+
+		if(inf->name > func)
+			max = mid-1;
+		else if(inf->name < func)
+			min = mid+1;
+		mid = (max+min)/2;
 	}
-	CleanThinkers();
-}
-
-void ThinkerList::Tick()
-{
-	CleanThinkers();
-
-	LinkedList<Thinker *>::Node *iter = thinkers.Head();
-	while(iter)
-	{
-		iter->Item()->Tick();
-		iter = iter->Next();
-	}
-}
-
-void ThinkerList::Register(Thinker *thinker)
-{
-	thinker->thinkerRef = thinkers.Push(thinker);
-}
-
-void ThinkerList::Deregister(Thinker *thinker)
-{
-	thinkers.Remove(thinker->thinkerRef);
-}
-
-void ThinkerList::MarkForCollection(Thinker *thinker)
-{
-	toDestroy.Push(thinker);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-Thinker::Thinker()
-{
-	thinkerList.Register(this);
-}
-
-Thinker::~Thinker()
-{
-	thinkerList.Deregister(this);
-}
-
-void Thinker::Destroy()
-{
-	thinkerList.MarkForCollection(this);
+	while(max >= min);
+	return NULL;
 }

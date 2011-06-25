@@ -55,12 +55,6 @@ objtype        *LastAttacker;
 */
 
 
-void    T_Player (objtype *ob);
-void    T_Attack (objtype *ob);
-
-statetype   s_player = {false,0,0,(statefunc) T_Player,NULL,NULL};
-statetype   s_attack = {false,0,0,(statefunc) T_Attack,NULL,NULL};
-
 struct atkinf
 {
 	int8_t    tics,attack,frame;              // attack is 1 for gun, 2 for knife
@@ -1022,7 +1016,7 @@ void ClipMove (objtype *ob, int32_t xmove, int32_t ymove)
 void VictoryTile (void)
 {
 #ifndef SPEAR
-	SpawnBJVictory ();
+//	SpawnBJVictory ();
 #endif
 
 	gamestate.victoryflag = true;
@@ -1119,7 +1113,8 @@ void Cmd_Fire (void)
 
 	gamestate.weaponframe = 0;
 
-	player->state = &s_attack;
+	static const Frame * const attack = player->FindState("Missile");
+	player->SetState(attack);
 
 	gamestate.attackframe = 0;
 	gamestate.attackcount =
@@ -1207,19 +1202,12 @@ void Cmd_Use (void)
 
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
-	player->obclass = playerobj;
-	player->active = ac_yes;
-	player->tilex = tilex;
-	player->tiley = tiley;
-	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
-	player->x = ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2;
-	player->y = ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2;
-	player->state = &s_player;
-	player->angle = (1-dir)*90;
+	static const ClassDef * const playerClass = ClassDef::FindClass("BJPlayer");
+	player = AActor::Spawn(playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
+	player->angle = (270+dir)%360;
 	if (player->angle<0)
 		player->angle += ANGLES;
-	player->flags = FL_NEVERMARK;
-	Thrust (0,0);                           // set some variables
+	Thrust (0,0); // set some variables
 }
 
 
@@ -1237,22 +1225,25 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 
 void    KnifeAttack (objtype *ob)
 {
-	objtype *check,*closest;
-	int32_t  dist;
+	AActor *closest;
+	int32_t dist;
 
 	SD_PlaySound ("weapon/knife/attack", SD_WEAPONS);
 	// actually fire
 	dist = 0x7fffffff;
 	closest = NULL;
-	for (check=ob->next; check; check=check->next)
+	for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
 	{
-		if ( (check->flags & FL_SHOOTABLE) && (check->flags & FL_VISABLE)
-			&& abs(check->viewx-centerx) < shootdelta)
+		if(check->Item() == ob)
+			continue;
+
+		if ( (check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
+			&& abs(check->Item()->viewx-centerx) < shootdelta)
 		{
-			if (check->transx < dist)
+			if (check->Item()->transx < dist)
 			{
-				dist = check->transx;
-				closest = check;
+				dist = check->Item()->transx;
+				closest = check->Item();
 			}
 		}
 	}
@@ -1271,7 +1262,7 @@ void    KnifeAttack (objtype *ob)
 
 void    GunAttack (objtype *ob)
 {
-	objtype *check,*closest,*oldclosest;
+	AActor *closest,*oldclosest;
 	int      damage;
 	int      dx,dy,dist;
 	int32_t  viewdist;
@@ -1301,15 +1292,18 @@ void    GunAttack (objtype *ob)
 	{
 		oldclosest = closest;
 
-		for (check=ob->next ; check ; check=check->next)
+		for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
 		{
-			if ((check->flags & FL_SHOOTABLE) && (check->flags & FL_VISABLE)
-				&& abs(check->viewx-centerx) < shootdelta)
+			if(check->Item() == ob)
+				continue;
+
+			if ((check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
+				&& abs(check->Item()->viewx-centerx) < shootdelta)
 			{
-				if (check->transx < viewdist)
+				if (check->Item()->transx < viewdist)
 				{
-					viewdist = check->transx;
-					closest = check;
+					viewdist = check->Item()->transx;
+					closest = check->Item();
 				}
 			}
 		}
@@ -1391,7 +1385,7 @@ void VictorySpin (void)
 ===============
 */
 
-void    T_Attack (objtype *ob)
+ACTION_FUNCTION(T_Attack)
 {
 	struct  atkinf  *cur;
 
@@ -1409,7 +1403,7 @@ void    T_Attack (objtype *ob)
 	if ( buttonstate[bt_attack] && !buttonheld[bt_attack])
 		buttonstate[bt_attack] = false;
 
-	ControlMovement (ob);
+	ControlMovement (self);
 	if (gamestate.victoryflag)              // watching the BJ actor
 		return;
 
@@ -1425,10 +1419,11 @@ void    T_Attack (objtype *ob)
 	while (gamestate.attackcount <= 0)
 	{
 		cur = &attackinfo[gamestate.weapon][gamestate.attackframe];
+		static const Frame * const spawn = player->FindState("Spawn");
 		switch (cur->attack)
 		{
 			case -1:
-				ob->state = &s_player;
+				player->SetState(spawn);
 				if (!gamestate.ammo)
 				{
 					gamestate.weapon = wp_knife;
@@ -1456,14 +1451,14 @@ void    T_Attack (objtype *ob)
 					gamestate.attackframe++;
 					break;
 				}
-				GunAttack (ob);
+				GunAttack (self);
 				if (!ammocheat)
 					gamestate.ammo--;
 				DrawAmmo ();
 				break;
 
 			case 2:
-				KnifeAttack (ob);
+				KnifeAttack (self);
 				break;
 
 			case 3:
@@ -1491,7 +1486,7 @@ void    T_Attack (objtype *ob)
 ===============
 */
 
-void    T_Player (objtype *ob)
+ACTION_FUNCTION(T_Player)
 {
 	if (gamestate.victoryflag)              // watching the BJ actor
 	{
@@ -1508,7 +1503,7 @@ void    T_Player (objtype *ob)
 	if ( buttonstate[bt_attack] && !buttonheld[bt_attack])
 		Cmd_Fire ();
 
-	ControlMovement (ob);
+	ControlMovement (self);
 	if (gamestate.victoryflag)              // watching the BJ actor
 		return;
 

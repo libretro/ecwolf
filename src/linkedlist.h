@@ -1,5 +1,5 @@
 /*
-** thinker.cpp
+** linkedlist.h
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -32,82 +32,107 @@
 **
 */
 
-#include "thinker.h"
-#include "wl_def.h"
+#ifndef __LINKEDLIST_H__
+#define __LINKEDLIST_H__
 
-ThinkerList thinkerList;
-
-ThinkerList::ThinkerList()
+template<class T> class LinkedList
 {
-}
+	public:
+		class Node
+		{
+			public:
+				Node(const T &item, Node *&head) : item(item), next(head), prev(NULL)
+				{
+					if(head != NULL)
+						head->prev = this;
+					head = this;
+				}
 
-ThinkerList::~ThinkerList()
-{
-	DestroyAll();
-}
+				T		&Item()
+				{
+					return item;
+				}
+				const T	&Item() const
+				{
+					return item;
+				}
 
-void ThinkerList::CleanThinkers()
-{
-	LinkedList<Thinker *>::Node *iter = toDestroy.Head();
-	while(iter)
-	{
-		delete iter->Item();
-		iter = iter->Next();
-	}
-	toDestroy.Clear();
-}
+				Node	*Next() const
+				{
+					return next;
+				}
 
-void ThinkerList::DestroyAll()
-{
-	LinkedList<Thinker *>::Node *iter = thinkers.Head();
-	while(iter)
-	{
-		iter->Item()->Destroy();
-		iter = iter->Next();
-	}
-	CleanThinkers();
-}
+				Node	*Prev() const
+				{
+					return prev;
+				}
 
-void ThinkerList::Tick()
-{
-	CleanThinkers();
+			private:
+				friend class LinkedList;
 
-	LinkedList<Thinker *>::Node *iter = thinkers.Head();
-	while(iter)
-	{
-		iter->Item()->Tick();
-		iter = iter->Next();
-	}
-}
+				T		item;
+				Node	*next;
+				Node	*prev;
+		};
 
-void ThinkerList::Register(Thinker *thinker)
-{
-	thinker->thinkerRef = thinkers.Push(thinker);
-}
+		LinkedList() : head(NULL)
+		{
+		}
+		~LinkedList()
+		{
+			Clear();
+		}
 
-void ThinkerList::Deregister(Thinker *thinker)
-{
-	thinkers.Remove(thinker->thinkerRef);
-}
+		void Clear()
+		{
+			if(!head)
+				return;
 
-void ThinkerList::MarkForCollection(Thinker *thinker)
-{
-	toDestroy.Push(thinker);
-}
+			Node *node = head;
+			Node *del = NULL;
+			do
+			{
+				delete del;
+				del = node;
+			}
+			while((node = node->next) != NULL);
+			delete del;
+			head = NULL;
+		}
 
-////////////////////////////////////////////////////////////////////////////////
+		Node *Head() const
+		{
+			return head;
+		}
 
-Thinker::Thinker()
-{
-	thinkerList.Register(this);
-}
+		Node *Push(const T &item)
+		{
+			++size;
+			return new Node(item, head);
+		}
 
-Thinker::~Thinker()
-{
-	thinkerList.Deregister(this);
-}
+		void Remove(Node *node)
+		{
+			if(node->next)
+				node->next->prev = node->prev;
 
-void Thinker::Destroy()
-{
-	thinkerList.MarkForCollection(this);
-}
+			if(node->prev)
+				node->prev->next = node->next;
+			else
+				head = head->next;
+
+			delete node;
+			--size;
+		}
+
+		unsigned int Size() const
+		{
+			return size;
+		}
+
+	private:
+		Node			*head;
+		unsigned int	size;
+};
+
+#endif

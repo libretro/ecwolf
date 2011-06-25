@@ -382,7 +382,7 @@ FRandom *FRandom::StaticFindRNG (const char *name)
 //
 //==========================================================================
 
-#define NDEBUG
+#if 0
 #ifndef NDEBUG
 void FRandom::StaticPrintSeeds ()
 {
@@ -400,5 +400,6 @@ CCMD (showrngs)
 {
 	FRandom::StaticPrintSeeds ();
 }
+#endif
 #endif
 

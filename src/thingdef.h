@@ -35,12 +35,29 @@
 #ifndef __THINGDEF_H__
 #define __THINGDEF_H__
 #include "gamemap.h"
+#include "linkedlist.h"
 #include "scanner.h"
 #include "tarray.h"
 #include "wl_def.h"
 #include "zstring.h"
 
+class AActor;
 class ClassDef;
+typedef void (*ActionPtr)(AActor *);
+
+class ActionInfo
+{
+	public:
+		ActionInfo(ActionPtr func, const FName &name);
+
+		ActionPtr func;
+		const FName name;
+};
+
+#define ACTION_FUNCTION(func) \
+	void __AF_##func(AActor *self); \
+	static const ActionInfo __AI_##func(__AF_##func, #func); \
+	void __AF_##func(AActor *self)
 
 struct StateDefinition
 {
@@ -61,17 +78,18 @@ struct StateDefinition
 		int			duration;
 		NextType	nextType;
 		FString		nextArg;
+		ActionPtr	functions[2];
 };
 
 struct Frame
 {
 	public:
-		char	sprite[4];
-		char	frame;
-		int		duration;
-		void	(*action);
-		void	(*thinker);
-		Frame	*next;
+		char		sprite[4];
+		char		frame;
+		int			duration;
+		ActionPtr	action;
+		ActionPtr	thinker;
+		const Frame	*next;
 };
 
 #define DECLARE_NATIVE_CLASS(name, parent) \
@@ -87,13 +105,22 @@ struct Frame
 
 typedef uint32_t flagstype_t;
 
+class AActorProxy;
 class AActor
 {
 	public:
 		~AActor();
 
-		const MapZone	*GetZone() { return soundZone; }
+		void			Destroy();
+		void			Die();
 		void			EnterZone(const MapZone *zone);
+		const Frame		*FindState(const FName &name) const;
+		const MapZone	*GetZone() const { return soundZone; }
+		void			SetState(const Frame *state, bool notic=false);
+		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
+		void			Tick();
+
+		const AActor	*defaults;
 
 		// Basic properties from objtype
 		flagstype_t flags;
@@ -107,22 +134,35 @@ class AActor
 		short	angle;
 		short	health;
 		short	defaultHealth[9];
-		int32_t	speed;
+		int32_t	speed, runspeed;
 
 		activetype  active;
 		short       ticcount;
 		classtype   obclass;
-		statetype   *state;
+		const Frame	*state;
 
 		short       viewx;
 		word        viewheight;
 		fixed       transx,transy;      // in global coord
 
-		short       temp1,temp2,hidden;
-		AActor *next,*prev;
+		uint16_t	sighttime;
+		uint8_t		sightrandom;
+		FName		seesound;
 
+		short       temp1,hidden;
+
+		typedef LinkedList<AActor *>::Node Iterator;
+		static LinkedList<AActor *>	actors;
+		LinkedList<AActor *>::Node	*actorRef;
+		static Iterator *GetIterator() { return actors.Head(); }
 	protected:
-		const MapZone *soundZone;
+		friend class AActorProxy;
+		void			Init(bool nothink=false);
+
+		const MapZone	*soundZone;
+		AActorProxy		*thinker;
+
+		const ClassDef	*classType;
 
 	// ClassDef stuff
 	friend class ClassDef;
@@ -131,8 +171,6 @@ class AActor
 	protected:
 		AActor(const ClassDef *type);
 		virtual AActor *__NewNativeInstance(const ClassDef *classType) { return new AActor(classType); }
-
-		const ClassDef	*classType;
 };
 
 struct FlagDef
@@ -159,7 +197,7 @@ struct PropDef
 		const char* const		params;
 		PropHandler				handler;
 };
-#define NUM_PROPERTIES 2
+#define NUM_PROPERTIES 4
 
 class ClassDef
 {
@@ -182,7 +220,9 @@ class ClassDef
 		 */
 		static void				DumpClasses();
 
+		static const ClassDef	*FindClass(unsigned int ednum);
 		static const ClassDef	*FindClass(const FName &className);
+		const Frame				*FindState(const FName &stateName) const;
 		static void				LoadActors();
 		static void				UnloadActors();
 
@@ -192,10 +232,10 @@ class ClassDef
 		static bool	SetFlag(ClassDef *newClass, const char* flagName, bool set);
 		static bool SetProperty(ClassDef *newClass, const char* propName, Scanner &sc);
 
-		Frame	*FindState(const char* stateName) const;
-		void	InstallStates(const TArray<StateDefinition> &stateDefs);
+		void		InstallStates(const TArray<StateDefinition> &stateDefs);
 
 		static TMap<FName, ClassDef *>	classTable;
+		static TMap<int, ClassDef *>	classNumTable;
 
 		FName			name;
 		const ClassDef	*parent;

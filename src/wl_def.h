@@ -1021,12 +1021,9 @@ extern  int             lastgamemusicoffset;
 //
 extern  int         controlx,controly;              // range from -100 to 100
 extern  boolean     buttonstate[NUMBUTTONS];
-extern  AActor      *objlist[MAXACTORS];
 extern  boolean     buttonheld[NUMBUTTONS];
 extern  exit_t      playstate;
 extern  boolean     madenoise;
-extern  statobj_t   statobjlist[MAXSTATS];
-extern  statobj_t   *laststatobj;
 extern  objtype     *newobj,*killerobj;
 extern  int         godmode;
 
@@ -1044,8 +1041,6 @@ extern  int         buttonscan[NUMBUTTONS];
 extern  int         buttonmouse[4];
 extern  int         buttonjoy[32];
 
-void    InitActorList (void);
-void    GetNewActor (void);
 void    PlayLoop (void);
 
 void    CenterWindow(word w,word h);
@@ -1053,7 +1048,6 @@ void    CenterWindow(word w,word h);
 void    InitRedShifts (void);
 void    FinishPaletteShifts (void);
 
-void    RemoveObj (objtype *gone);
 void    PollControls (void);
 int     StopMusic(void);
 void    StartMusic(void);
@@ -1158,7 +1152,7 @@ void    SelectChaseDir (objtype *ob);
 void    SelectDodgeDir (objtype *ob);
 void    SelectRunDir (objtype *ob);
 void    MoveObj (objtype *ob, int32_t move);
-boolean SightPlayer (objtype *ob);
+bool SightPlayer (AActor *ob);
 
 void    KillActor (objtype *ob);
 void    DamageActor (objtype *ob, unsigned damage);

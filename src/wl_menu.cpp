@@ -1642,7 +1642,7 @@ CheckForEpisodes (void)
 #endif
 #endif
 
-//	strcat (SaveName, extension);
-//	strcat (demoname, extension);
+	strcat (SaveName, extension);
+	strcat (demoname, extension);
 #endif
 }

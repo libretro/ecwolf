@@ -38,10 +38,10 @@
 
 #include "wl_def.h"
 #include "name.h"
+#include "linkedlist.h"
 
 class Thinker;
 class ThinkerList;
-struct ThinkerRef;
 
 #define DECLARE_THINKER(type) \
 	public: \
@@ -71,7 +71,7 @@ class Thinker
 	private:
 		friend class ThinkerList;
 
-		ThinkerRef	*thinkerRef;
+		LinkedList<Thinker *>::Node	*thinkerRef;
 };
 
 extern class ThinkerList
@@ -91,11 +91,8 @@ extern class ThinkerList
 		void	MarkForCollection(Thinker *thinker);
 
 	private:
-		ThinkerRef *head;
-		ThinkerRef *tail;
-
-		ThinkerRef *destroyHead;
-		ThinkerRef *destroyTail;
+		LinkedList<Thinker *>	thinkers;
+		LinkedList<Thinker *>	toDestroy;
 } thinkerList;
 
 #endif
