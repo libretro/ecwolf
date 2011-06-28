@@ -32,6 +32,7 @@
 **
 */
 
+#include "r_sprites.h"
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_def.h"
@@ -136,6 +137,8 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 
 		for(int i = 0;i < thisStateDef.frames.Len();i++)
 		{
+			R_LoadSprite(thisStateDef.sprite);
+
 			thisFrame = new Frame();
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
@@ -211,6 +214,8 @@ void ClassDef::LoadActors()
 
 	ReleaseFunctionTable();
 	DumpClasses();
+
+	R_InitSprites();
 }
 
 void ClassDef::ParseActor(Scanner &sc)
@@ -400,6 +405,7 @@ void ClassDef::ParseActor(Scanner &sc)
 					}
 					else
 					{
+						thisState.sprite[0] = 0;
 						needIdentifier = false;
 						if(infiniteLoopProtection)
 							sc.ScriptMessage(Scanner::ERROR, "Malformed script.");

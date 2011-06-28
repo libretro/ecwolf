@@ -1,5 +1,5 @@
 /*
-** linkedlist.h
+** r_sprites.h
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -32,116 +32,36 @@
 **
 */
 
-#ifndef __LINKEDLIST_H__
-#define __LINKEDLIST_H__
+#ifndef __R_SPRITES_H__
+#define __R_SPRITES_H__
 
-template<class T> class LinkedList
+#include "textures/textures.h"
+#include "tarray.h"
+#include "zstring.h"
+
+struct SpriteInfo
 {
-	public:
-		class Node
-		{
-			public:
-				Node(const T &item, Node *&head) : item(item), next(head), prev(NULL)
-				{
-					if(head != NULL)
-						head->prev = this;
-					head = this;
-				}
-
-				T		&Item()
-				{
-					return item;
-				}
-				const T	&Item() const
-				{
-					return item;
-				}
-
-				Node	*Next() const
-				{
-					return next;
-				}
-
-				Node	*Prev() const
-				{
-					return prev;
-				}
-
-			private:
-				friend class LinkedList;
-
-				T		item;
-				Node	*next;
-				Node	*prev;
-		};
-
-		LinkedList() : head(NULL), size(0)
-		{
-		}
-		LinkedList(const LinkedList &other) : head(NULL), size(0)
-		{
-			LinkedList::Node *iter = other.Head();
-			while(iter->Next())
-				iter = iter->Next();
-
-			for(;iter;iter = iter->Prev())
-				Push(iter->Item());
-		}
-		~LinkedList()
-		{
-			Clear();
-		}
-
-		void Clear()
-		{
-			if(!head)
-				return;
-
-			Node *node = head;
-			Node *del = NULL;
-			do
-			{
-				delete del;
-				del = node;
-			}
-			while((node = node->next) != NULL);
-			delete del;
-			head = NULL;
-		}
-
-		Node *Head() const
-		{
-			return head;
-		}
-
-		Node *Push(const T &item)
-		{
-			++size;
-			return new Node(item, head);
-		}
-
-		void Remove(Node *node)
-		{
-			if(node->next)
-				node->next->prev = node->prev;
-
-			if(node->prev)
-				node->prev->next = node->next;
-			else
-				head = head->next;
-
-			delete node;
-			--size;
-		}
-
-		unsigned int Size() const
-		{
-			return size;
-		}
-
-	private:
-		Node			*head;
-		unsigned int	size;
+	union
+	{
+		char 		name[5];
+		uint32_t	iname;
+	};
+	unsigned int	frames;
 };
+
+struct Sprite
+{
+	static const uint8_t NO_FRAMES = 255; // If rotations == NO_FRAMES
+
+	FTextureID	texture[8];
+	uint8_t		rotations;
+	uint16_t	mirror; // Mirroring bitfield
+};
+
+extern TArray<Sprite> spriteFrames;
+extern TArray<SpriteInfo> loadedSprites;
+
+void R_InitSprites();
+void R_LoadSprite(const FString &name);
 
 #endif

@@ -99,6 +99,7 @@ add_executable(ecwolf
 	m_random.cpp
 	m_png.cpp
 	name.cpp
+	r_sprites.cpp
 	r_translate.cpp
 	scanner.cpp
 	sndinfo.cpp

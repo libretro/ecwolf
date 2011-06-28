@@ -546,20 +546,20 @@ actor Guard 11
 			GARD A -1 NOP T_Stand
 			stop
 		Path:
-			GARD B 10 T_Path
+			GARD B 10 NOP T_Path
 			GARD B 2.5
-			GARD C 7.5 T_Path
-			GARD D 10 T_Path
+			GARD C 7.5 NOP T_Path
+			GARD D 10 NOP T_Path
 			GARD D 2.5
-			GARD E 7.5 T_Path
+			GARD E 7.5 NOP T_Path
 			loop
 		See:
-			GARD B 5 T_Chase
+			GARD B 5 NOP T_Chase
 			GARD B 1.5
-			GARD C 4 T_Chase
-			GARD D 5 T_Chase
+			GARD C 4 NOP T_Chase
+			GARD D 5 NOP T_Chase
 			GARD D 1.5
-			GARD E 4 T_Chase
+			GARD E 4 NOP T_Chase
 			loop
 		Missile:
 			GARD L 10

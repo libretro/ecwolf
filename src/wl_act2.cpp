@@ -1332,7 +1332,7 @@ CHASE
 =================
 */
 
-void T_Chase (objtype *ob)
+ACTION_FUNCTION(T_Chase)
 {
 	int32_t move,target;
 	int     dx,dy,dist,chance;
@@ -1342,23 +1342,13 @@ void T_Chase (objtype *ob)
 		return;
 
 	dodge = false;
-	if (CheckLine(ob))      // got a shot at player?
+	if (CheckLine(self))      // got a shot at player?
 	{
-		ob->hidden = false;
-		dx = abs(ob->tilex - player->tilex);
-		dy = abs(ob->tiley - player->tiley);
+		self->hidden = false;
+		dx = abs(self->tilex - player->tilex);
+		dy = abs(self->tiley - player->tiley);
 		dist = dx>dy ? dx : dy;
 
-#ifdef PLAYDEMOLIKEORIGINAL
-		if(DEMOCOND_ORIG)
-		{
-			if(!dist || (dist == 1 && ob->distance < 0x4000))
-				chance = 300;
-			else
-				chance = (tics<<4)/dist;
-		}
-		else
-#endif
 		{
 			if (dist)
 				chance = (tics<<4)/dist;
@@ -1367,10 +1357,10 @@ void T_Chase (objtype *ob)
 
 			if (dist == 1)
 			{
-				target = abs(ob->x - player->x);
+				target = abs(self->x - player->x);
 				if (target < 0x14000l)
 				{
-					target = abs(ob->y - player->y);
+					target = abs(self->y - player->y);
 					if (target < 0x14000l)
 						chance = 300;
 				}
@@ -1379,36 +1369,36 @@ void T_Chase (objtype *ob)
 
 		if ( US_RndT()<chance)
 		{
-			const Frame *attack = ob->FindState("Missile");
+			const Frame *attack = self->FindState("Missile");
 			if(attack != NULL)
-				ob->SetState(attack);
+				self->SetState(attack);
 			return;
 		}
 		dodge = true;
 	}
 	else
-		ob->hidden = true;
+		self->hidden = true;
 
-	if (ob->dir == nodir)
+	if (self->dir == nodir)
 	{
 		if (dodge)
-			SelectDodgeDir (ob);
+			SelectDodgeDir (self);
 		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
+			SelectChaseDir (self);
+		if (self->dir == nodir)
 			return;                                                 // object is blocked in
 	}
 
-	move = ob->speed*tics;
+	move = self->speed;
 
 	while (move)
 	{
-		if (CheckDoorMovement(ob))
+		if (CheckDoorMovement(self))
 			return;
 
-		if (move < ob->distance)
+		if (move < self->distance)
 		{
-			MoveObj (ob,move);
+			MoveObj (self,move);
 			break;
 		}
 
@@ -1419,17 +1409,17 @@ void T_Chase (objtype *ob)
 		//
 		// fix position to account for round off during moving
 		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+		self->x = ((int32_t)self->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		self->y = ((int32_t)self->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
-		move -= ob->distance;
+		move -= self->distance;
 
 		if (dodge)
-			SelectDodgeDir (ob);
+			SelectDodgeDir (self);
 		else
-			SelectChaseDir (ob);
+			SelectChaseDir (self);
 
-		if (ob->dir == nodir)
+		if (self->dir == nodir)
 			return;                                                 // object is blocked in
 	}
 }
@@ -1600,8 +1590,8 @@ void SelectPathDir (objtype *ob)
 ===============
 */
 
-//ACTION_FUNCTION(T_Path)
-/*{
+ACTION_FUNCTION(T_Path)
+{
 	int32_t    move;
 
 	if (SightPlayer (self))
@@ -1644,7 +1634,7 @@ void SelectPathDir (objtype *ob)
 		if (self->dir == nodir)
 			return;                                 // all movement is blocked
 	}
-}*/
+}
 
 
 /*

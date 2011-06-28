@@ -632,16 +632,16 @@ static void InitGame()
 	SetupSaveGames();
 
 //
-// Load Actors
-//
-
-	ClassDef::LoadActors();
-
-//
 // Init texture manager
 //
 
 	TexMan.Init();
+
+//
+// Load Actors
+//
+
+	ClassDef::LoadActors();
 
 //
 // draw intro screen stuff
