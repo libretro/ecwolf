@@ -146,7 +146,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 				loopPoint = thisFrame;
 			}
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
-			thisFrame->frame = thisStateDef.frames[i];
+			thisFrame->frame = thisStateDef.frames[i]-'A';
 			thisFrame->duration = thisStateDef.duration;
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];

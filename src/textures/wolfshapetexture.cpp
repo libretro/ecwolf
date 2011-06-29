@@ -128,8 +128,9 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 	file.Read(header, 4);
 	Width = LittleLong(header[1])-LittleLong(header[0]);
 	Height = 64;
-	LeftOffset = LittleLong(header[0]);
-	TopOffset = 0;
+	LeftOffset = 32-LittleLong(header[0]);
+	//LeftOffset = (64-Width)-LittleLong(header[0]);
+	TopOffset = 64;
 	CalcBitSize ();
 }
 

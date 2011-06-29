@@ -84,8 +84,12 @@ struct StateDefinition
 struct Frame
 {
 	public:
-		char		sprite[4];
-		char		frame;
+		union
+		{
+			char	sprite[4];
+			uint32_t isprite;
+		};
+		uint8_t		frame;
 		int			duration;
 		ActionPtr	action;
 		ActionPtr	thinker;

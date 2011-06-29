@@ -35,33 +35,12 @@
 #ifndef __R_SPRITES_H__
 #define __R_SPRITES_H__
 
-#include "textures/textures.h"
-#include "tarray.h"
+#include "thingdef.h"
 #include "zstring.h"
-
-struct SpriteInfo
-{
-	union
-	{
-		char 		name[5];
-		uint32_t	iname;
-	};
-	unsigned int	frames;
-};
-
-struct Sprite
-{
-	static const uint8_t NO_FRAMES = 255; // If rotations == NO_FRAMES
-
-	FTextureID	texture[8];
-	uint8_t		rotations;
-	uint16_t	mirror; // Mirroring bitfield
-};
-
-extern TArray<Sprite> spriteFrames;
-extern TArray<SpriteInfo> loadedSprites;
 
 void R_InitSprites();
 void R_LoadSprite(const FString &name);
+
+void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
 
 #endif

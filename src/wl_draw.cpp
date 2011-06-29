@@ -10,6 +10,7 @@
 #include "id_us.h"
 #include "textures/textures.h"
 #include "c_cvars.h"
+#include "r_sprites.h"
 
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
@@ -49,7 +50,7 @@ const RatioInformation AspectCorrection[] =
 	/* 5:4 */	{960,	640,	0x10000,	48*15/16}
 };
 
-static byte *vbuf = NULL;
+/*static*/ byte *vbuf = NULL;
 unsigned vbufPitch = 0;
 
 int32_t    lasttimecount;
@@ -80,7 +81,7 @@ fixed   viewsin,viewcos;
 void    TransformActor (objtype *ob);
 void    BuildTables (void);
 void    ClearScreen (void);
-int     CalcRotate (objtype *ob);
+int     CalcRotate (AActor *ob);
 void    DrawScaleds (void);
 void    CalcTics (void);
 void    ThreeDRefresh (void);
@@ -576,7 +577,7 @@ FTexture *ShapeToTexture(int shapenum)
 =====================
 */
 
-int CalcRotate (objtype *ob)
+int CalcRotate (AActor *ob)
 {
 	int angle, viewangle;
 
@@ -778,10 +779,12 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 
 typedef struct
 {
-	short      viewx,
-			viewheight,
-			shapenum;
-	short      flags;          // this must be changed to uint32_t, when you
+	AActor *actor;
+	short viewheight;
+	//short      viewx,
+	//		viewheight,
+	//		shapenum;
+	//short      flags;          // this must be changed to uint32_t, when you
 							// you need more than 16-flags for drawing
 #ifdef USE_DIR3DSPR
 	statobj_t *transsprite;
@@ -808,8 +811,8 @@ void DrawScaleds (void)
 	{
 		AActor *obj = iter->Item();
 
-		if ((visptr->shapenum = 1)==0)
-			continue;                                               // no shape
+		//if ((visptr->actor->shapenum = 1)==0)
+		//	continue;                                               // no shape
 
 		spotloc = (obj->tilex<<mapshift)+obj->tiley;   // optimize: keep in struct?
 		visspot = &spotvis[0][0]+spotloc;
@@ -842,16 +845,11 @@ void DrawScaleds (void)
 			if (!obj->viewheight)
 				continue;                                               // too close or far away
 
-			visptr->viewx = obj->viewx;
+			visptr->actor = obj;
 			visptr->viewheight = obj->viewheight;
-
-			// TODO: Handle rotations
-			//if (obj->state->rotate)
-			//	visptr->shapenum += CalcRotate (obj);
 
 			if (visptr < &vislist[MAXVISABLE-1])    // don't let it overflow
 			{
-				visptr->flags = (short) obj->flags;
 #ifdef USE_DIR3DSPR
 				visptr->transsprite = NULL;
 #endif
@@ -891,7 +889,7 @@ void DrawScaleds (void)
 			Scale3DShape(vbuf, vbufPitch, farthest->transsprite);
 		else
 #endif
-			ScaleShape(farthest->viewx, farthest->shapenum, farthest->viewheight, farthest->flags);
+			ScaleSprite(farthest->actor, farthest->actor->viewx, farthest->actor->state, farthest->viewheight);
 
 		farthest->viewheight = 32000;
 	}

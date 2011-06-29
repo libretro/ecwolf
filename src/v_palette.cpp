@@ -63,6 +63,7 @@
 extern "C" {
 FDynamicColormap NormalLight;
 }
+bool NormalLightHasFixedLights;
 FPalette GPalette;
 TArray<FSpecialColormap> SpecialColormaps;
 BYTE DesaturateColormap[31][256];

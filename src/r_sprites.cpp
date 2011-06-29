@@ -33,11 +33,34 @@
 */
 
 #include "textures/textures.h"
+#include "c_cvars.h"
 #include "r_sprites.h"
 #include "linkedlist.h"
 #include "tarray.h"
+#include "templates.h"
+#include "thingdef.h"
+#include "v_palette.h"
+#include "wl_shade.h"
+#include "zstring.h"
 
-static const uint8_t MAX_SPRITE_FRAMES = 29; // A-Z, [, \, ]
+struct SpriteInfo
+{
+	union
+	{
+		char 		name[5];
+		uint32_t	iname;
+	};
+	unsigned int	frames;
+};
+
+struct Sprite
+{
+	static const uint8_t NO_FRAMES = 255; // If rotations == NO_FRAMES
+
+	FTextureID	texture[8];
+	uint8_t		rotations;
+	uint16_t	mirror; // Mirroring bitfield
+};
 
 TArray<Sprite> spriteFrames;
 TArray<SpriteInfo> loadedSprites;
@@ -75,6 +98,8 @@ int SpriteCompare(const void *s1, const void *s2)
 
 void R_InitSprites()
 {
+	static const uint8_t MAX_SPRITE_FRAMES = 29; // A-Z, [, \, ]
+
 	// First sort the loaded sprites list
 	qsort(&loadedSprites[0], loadedSprites.Size(), sizeof(loadedSprites[0]), SpriteCompare);
 
@@ -167,6 +192,7 @@ void R_LoadSprite(const FString &name)
 
 	static uint32_t lastSprite = 0;
 	SpriteInfo sprInf;
+	sprInf.frames = 0;
 
 	strcpy(sprInf.name, name.GetChars());
 	if(loadedSprites.Size() > 0)
@@ -187,4 +213,98 @@ void R_LoadSprite(const FString &name)
 	lastSprite = sprInf.iname;
 
 	loadedSprites.Push(sprInf);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+// From wl_draw.cpp
+int CalcRotate(AActor *ob);
+extern byte* vbuf;
+extern unsigned vbufPitch;
+
+void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
+{
+	static const SpriteInfo *sprInf = NULL;
+
+	if(sprInf == NULL || sprInf->iname != frame->isprite)
+	{
+		sprInf = NULL;
+		// Look up sprite
+		unsigned int max = loadedSprites.Size()-1;
+		unsigned int min = 0;
+		unsigned int mid = max/2;
+		do
+		{
+			if(loadedSprites[mid].iname == frame->isprite)
+			{
+				sprInf = &loadedSprites[mid];
+				break;
+			}
+
+			if(loadedSprites[mid].iname > frame->isprite)
+				max = mid-1;
+			else if(loadedSprites[mid].iname < frame->isprite)
+				min = mid+1;
+			mid = (max+min)/2;
+		}
+		while(max >= min);
+
+		if(sprInf == NULL)
+			return;
+	}
+
+	Sprite &spr = spriteFrames[sprInf->frames+frame->frame];
+	FTexture *tex;
+	if(spr.rotations == 0)
+		tex = TexMan[spr.texture[0]];
+	else
+		tex = TexMan[spr.texture[(CalcRotate(actor)+4)%8]];
+	if(tex == NULL)
+		return;
+
+	const BYTE *colormap;
+	if(!r_depthfog || actor->flags & FL_FULLBRIGHT)
+		colormap = NormalLight.Maps;
+	else
+		colormap = &NormalLight.Maps[256*GetShade(height)];
+
+	unsigned int scale = height>>3; // Integer part of the height
+	if(scale == 0)
+		return;
+
+	double dyScale = CorrectHeightFactor(height/256.0);
+	double dxScale = height/256.0;
+
+	int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
+	int upperedge = (viewheight/2)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
+
+	const unsigned int startX = -MIN(actx, 0);
+	const unsigned int startY = -MIN(upperedge, 0);
+	const fixed xStep = (1/dxScale)*FRACUNIT;
+	const fixed yStep = (1/dyScale)*FRACUNIT;
+
+	const BYTE *src;
+	byte *dest;
+	unsigned int i, j;
+	fixed x, y;
+	for(i = startX, x = startX*xStep;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	{
+		src = tex->GetColumn(x>>FRACBITS, NULL);
+		dest = vbuf+actx+i;
+		if(actx+i > viewwidth)
+			break;
+		else if(wallheight[actx+i] > height)
+			continue;
+		if(upperedge > 0)
+			dest += vbufPitch*upperedge;
+
+		for(j = startY, y = startY*yStep;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		{
+			if(upperedge+j > viewheight)
+				break;
+			if(src[y>>FRACBITS] != 0)
+				*dest = colormap[src[y>>FRACBITS]];
+			dest += vbufPitch;
+		}
+	}
 }
