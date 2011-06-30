@@ -1206,6 +1206,8 @@ void CheckParameters(int argc, char *argv[])
 				}
 			}
 		}
+		else IFARG("--noadaptive")
+			noadaptive = true;
 		else IFARG("--nodblbuf")
 			usedoublebuffering = false;
 		else IFARG("--extravbls")
@@ -1303,6 +1305,7 @@ void CheckParameters(int argc, char *argv[])
 			" --resf <w> <h>         Sets any screen resolution >= 320x200\n"
 			"                        (which may result in graphic errors)\n"
 			" --aspect <aspect>      Sets the aspect ratio.\n"
+			" --noadaptive           Disables adaptive tics.\n"
 			" --bits <b>             Sets the screen color depth\n"
 			"                        (use this when you have palette/fading problems\n"
 			"                        allowed: 8, 16, 24, 32, default: \"best\" depth)\n"

@@ -51,6 +51,7 @@ objtype *actorat[MAPSIZE][MAPSIZE];
 //
 // replacing refresh manager
 //
+bool noadaptive = false;
 unsigned tics;
 
 //

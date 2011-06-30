@@ -296,7 +296,6 @@ class UWMFParser
 
 			EndParseBlock
 			gm->things.Push(thing);
-			printf("Here\n");
 		}
 
 		void ParseTile()

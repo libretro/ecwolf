@@ -396,6 +396,9 @@ static void DetermineHitDir(bool vertical)
 
 void HitVertWall (void)
 {
+	if(!tilehit)
+		return;
+
 	int wallpic;
 	int texture;
 
@@ -458,6 +461,9 @@ void HitVertWall (void)
 
 void HitHorizWall (void)
 {
+	if(!tilehit)
+		return;
+
 	int wallpic;
 	int texture;
 
@@ -586,10 +592,13 @@ int CalcRotate (AActor *ob)
 
 	viewangle = player->angle + (centerx - ob->viewx)/8;
 
-	if (ob->obclass == rocketobj || ob->obclass == hrocketobj)
-		angle = (viewangle-180) - ob->angle;
+	//if (ob->obclass == rocketobj || ob->obclass == hrocketobj)
+	//	angle = (viewangle-180) - ob->angle;
+	//else
+	if(ob->dir != nodir)
+		angle = viewangle - dirangle[ob->dir];
 	else
-		angle = (viewangle-180) - dirangle[ob->dir];
+		angle = (viewangle-90) - ob->angle;
 
 	angle+=ANGLES/16;
 	while (angle>=ANGLES)
@@ -963,6 +972,8 @@ void CalcTics (void)
 		SDL_Delay(((lasttimecount + 1) * 100) / 7 - curtime);
 		tics = 1;
 	}
+	else if(noadaptive)
+		tics = 1;
 
 	lasttimecount += tics;
 

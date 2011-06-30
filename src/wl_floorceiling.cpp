@@ -2,9 +2,6 @@
 #include "c_cvars.h"
 #include "id_ca.h"
 #include "gamemap.h"
-
-//#ifdef USE_FLOORCEILINGTEX
-
 #include "wl_def.h"
 #include "wl_shade.h"
 #include "v_palette.h"
@@ -18,8 +15,8 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	fixed tex_step;                            // global step per one screen pixel
 	fixed gu, gv, du, dv;                      // global texture coordinates
 	int u, v;                                  // local texture coordinates
-	const byte *toptex, *bottex;
-	FTextureID lasttoptex, lastbottex;
+	static const byte *toptex, *bottex;
+	static FTextureID lasttoptex, lastbottex;
 
 	int halfheight = viewheight >> 1;
 	int y0 = min_wallheight >> 3;              // starting y value
@@ -71,20 +68,10 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 					u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
-					if(r_depthfog)
-					{
-						if(curtoptex.isValid())
-							vbuf[top_add] = curshades[toptex[texoffs]];
-						if(curbottex.isValid())
-							vbuf[bot_add] = curshades[bottex[texoffs]];
-					}
-					else
-					{
-						if(curtoptex.isValid())
-							vbuf[top_add] = toptex[texoffs];
-						if(curbottex.isValid())
-							vbuf[bot_add] = bottex[texoffs];
-					}
+					if(curtoptex.isValid())
+						vbuf[top_add] = curshades[toptex[texoffs]];
+					if(curbottex.isValid())
+						vbuf[bot_add] = curshades[bottex[texoffs]];
 				}
 			}
 			gu += du;
@@ -92,5 +79,3 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 		}
 	}
 }
-
-//#endif

@@ -291,7 +291,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
 		dest = vbuf+actx+i;
-		if(actx+i > viewwidth)
+		if(actx+i >= viewwidth)
 			break;
 		else if(wallheight[actx+i] > height)
 			continue;
@@ -300,7 +300,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 
 		for(j = startY, y = startY*yStep;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
 		{
-			if(upperedge+j > viewheight)
+			if(upperedge+j >= viewheight)
 				break;
 			if(src[y>>FRACBITS] != 0)
 				*dest = colormap[src[y>>FRACBITS]];

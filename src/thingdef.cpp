@@ -527,7 +527,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 								done = true;
 								break;
 							}
-							params[paramc].s = new char[sc->str.Len()];
+							params[paramc].s = new char[sc->str.Len()+1];
 							strcpy(params[paramc].s, sc->str);
 							break;
 						default:
@@ -565,7 +565,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 								done = true;
 								break;
 							}
-							params[paramc].s = new char[sc->str.Len()];
+							params[paramc].s = new char[sc->str.Len()+1];
 							strcpy(params[paramc].s, sc->str);
 							break;
 					}

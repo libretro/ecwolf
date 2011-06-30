@@ -1009,6 +1009,7 @@ extern  objtype         *actorat[MAPSIZE][MAPSIZE];
 
 extern  objtype         *player;
 
+extern  bool noadaptive;
 extern  unsigned        tics;
 extern  int             viewsize;
 

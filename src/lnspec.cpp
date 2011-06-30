@@ -250,6 +250,7 @@ FUNC(Door_Open)
 {
 	if(buttonheld[bt_use])
 		return 0;
+	buttonheld[bt_use] = true;
 
 	if(spot->thinker)
 	{
