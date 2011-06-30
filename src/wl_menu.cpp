@@ -22,6 +22,7 @@
 #include "m_classes.h"
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_ca.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"

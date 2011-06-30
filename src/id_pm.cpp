@@ -1,4 +1,5 @@
 #include "wl_def.h"
+#include "id_ca.h"
 
 int ChunksInFile;
 int PMSpriteStart;
@@ -13,6 +14,16 @@ size_t PMPageDataSize;
 // ChunksInFile+1 pointers to page starts.
 // The last pointer points one byte after the last page.
 uint8_t **PMPages;
+
+static void CA_CannotOpen(const char *string)
+{
+	char str[30];
+
+	strcpy(str,"Can't open ");
+	strcat(str,string);
+	strcat(str,"!\n");
+	Quit (str);
+}
 
 void PM_Startup()
 {

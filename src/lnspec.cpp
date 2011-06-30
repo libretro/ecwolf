@@ -32,6 +32,7 @@
 **
 */
 
+#include "id_ca.h"
 #include "id_sd.h"
 #include "lnspec.h"
 #include "thingdef.h"

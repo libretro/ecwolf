@@ -116,8 +116,6 @@ word    xstep,ystep;
 word    xspot,yspot;
 int     texdelta;
 
-word horizwall[MAXWALLTILES],vertwall[MAXWALLTILES];
-
 
 /*
 ============================================================================

@@ -4,6 +4,7 @@
 #include "wl_act.h"
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_ca.h"
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
@@ -504,6 +505,21 @@ void StartDemoRecord (int levelnumber)
 =
 ==================
 */
+
+static bool CA_WriteFile (const char *filename, void *ptr, int32_t length)
+{
+	const int handle = open(filename, O_CREAT | O_WRONLY | O_BINARY, 777);
+	if (handle == -1)
+		return false;
+
+	if (!write (handle,ptr,length))
+	{
+		close (handle);
+		return false;
+	}
+	close (handle);
+	return true;
+}
 
 void FinishDemoRecord (void)
 {

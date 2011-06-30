@@ -43,7 +43,8 @@ static int DebugOk;
 objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
 
 boolean noclip, ammocheat;
-int godmode, singlestep, extravbls = 1; // to remove flicker (gray stuff at the bottom)
+int godmode, singlestep;
+unsigned int extravbls = 0; // to remove flicker (gray stuff at the bottom)
 
 byte spotvis[MAPSIZE][MAPSIZE];
 objtype *actorat[MAPSIZE][MAPSIZE];

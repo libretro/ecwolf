@@ -8,6 +8,7 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_ca.h"
 #include "id_pm.h"
 #include "id_sd.h"
 #include "id_vl.h"
@@ -359,34 +360,6 @@ void CalcProjection (int32_t focal)
 	}
 }
 
-
-
-//===========================================================================
-
-/*
-===================
-=
-= SetupWalls
-=
-= Map tile values to scaled pics
-=
-===================
-*/
-
-void SetupWalls (void)
-{
-	int     i;
-
-	horizwall[0]=0;
-	vertwall[0]=0;
-
-	for (i=1;i<MAXWALLTILES;i++)
-	{
-		horizwall[i]=(i-1)*2;
-		vertwall[i]=(i-1)*2+1;
-	}
-}
-
 //===========================================================================
 
 /*
@@ -655,7 +628,6 @@ static void InitGame()
 
 	LoadLatchMem ();
 	BuildTables ();          // trig tables
-	SetupWalls ();
 
 	NewViewSize (viewsize);
 

@@ -45,39 +45,6 @@ int     numEpisodesMissing = 0;
 
 char extension[5]; // Need a string, not constant to change cache files
 
-/*
-=============================================================================
-
-							LOW LEVEL ROUTINES
-
-=============================================================================
-*/
-
-/*
-==========================
-=
-= CA_WriteFile
-=
-= Writes a file from a memory buffer
-=
-==========================
-*/
-
-boolean CA_WriteFile (const char *filename, void *ptr, int32_t length)
-{
-	const int handle = open(filename, O_CREAT | O_WRONLY | O_BINARY, 777);
-	if (handle == -1)
-		return false;
-
-	if (!write (handle,ptr,length))
-	{
-		close (handle);
-		return false;
-	}
-	close (handle);
-	return true;
-}
-
 
 /*
 =============================================================================
@@ -105,14 +72,3 @@ void CA_CacheMap (int mapnum)
 	map = new GameMap(mapname);
 }
 
-//===========================================================================
-
-void CA_CannotOpen(const char *string)
-{
-	char str[30];
-
-	strcpy(str,"Can't open ");
-	strcat(str,string);
-	strcat(str,"!\n");
-	Quit (str);
-}

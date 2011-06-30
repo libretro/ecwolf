@@ -32,6 +32,7 @@
 **
 */
 
+#include "id_ca.h"
 #include "r_sprites.h"
 #include "scanner.h"
 #include "w_wad.h"

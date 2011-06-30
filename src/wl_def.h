@@ -94,8 +94,6 @@ enum ESSType
 
 void Quit(const char *errorStr, ...);
 
-#include "id_ca.h"
-
 #define SIGN(x)         ((x)>0?1:-1)
 #define ABS(x)          ((int)(x)>0?(x):-(x))
 #define LABS(x)         ((int32_t)(x)>0?(x):-(x))
@@ -116,11 +114,6 @@ void Quit(const char *errorStr, ...);
 
 #define MAXTICS 10
 #define DEMOTICS        4
-
-#define MAXACTORS       150         // max number of nazis, etc / map
-#define MAXSTATS        400         // max number of lamps, bonus, etc
-#define MAXDOORS        64          // max number of sliding doors
-#define MAXWALLTILES    64          // max number of wall tiles
 
 //
 // tile constants
@@ -890,7 +883,6 @@ typedef enum
 } exit_t;
 
 
-extern word *mapsegs[MAPPLANES];
 extern int mapon;
 
 /*
@@ -1061,7 +1053,8 @@ extern  int32_t     funnyticount;           // FOR FUNNY BJ FACE
 extern  objtype     *objfreelist;     // *obj,*player,*lastobj,
 
 extern  boolean     noclip,ammocheat;
-extern  int         singlestep, extravbls;
+extern  int         singlestep;
+extern  unsigned int extravbls;
 
 /*
 =============================================================================
