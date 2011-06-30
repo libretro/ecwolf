@@ -1,10 +1,13 @@
 #include "textures/textures.h"
 #include "c_cvars.h"
+#include "id_ca.h"
+#include "gamemap.h"
 
 //#ifdef USE_FLOORCEILINGTEX
 
 #include "wl_def.h"
 #include "wl_shade.h"
+#include "v_palette.h"
 
 // Textured Floor and Ceiling by DarkOne
 // With multi-textured floors and ceilings stored in lower and upper bytes of
@@ -16,7 +19,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	fixed gu, gv, du, dv;                      // global texture coordinates
 	int u, v;                                  // local texture coordinates
 	const byte *toptex, *bottex;
-	unsigned lasttoptex = 0xffffffff, lastbottex = 0xffffffff;
+	FTextureID lasttoptex, lastbottex;
 
 	int halfheight = viewheight >> 1;
 	int y0 = min_wallheight >> 3;              // starting y value
@@ -38,7 +41,11 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 		dv = -FixedMul(tex_step, viewcos);
 		gu -= (viewwidth >> 1) * du;
 		gv -= (viewwidth >> 1) * dv; // starting point (leftmost)
-		byte *curshades = shadetable[GetShade(y << 3)];
+		const BYTE *curshades;
+		if(r_depthfog)
+			curshades = &NormalLight.Maps[256*GetShade(y << 3)];
+		else
+			curshades = NormalLight.Maps;
 		for(int x = 0, bot_add = bot_offset, top_add = top_offset;
 			x < viewwidth; x++, bot_add++, top_add++)
 		{
@@ -46,36 +53,36 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 			{
 				int curx = (gu >> TILESHIFT) & (MAPSIZE - 1);
 				int cury = (-(gv >> TILESHIFT) - 1) & (MAPSIZE - 1);
-				unsigned curtex = MAPSPOT(curx, cury, 2);
-				if(curtex)
+				MapSpot spot = map->GetSpot(curx, cury, 0);
+				if(spot->sector)
 				{
-					unsigned curtoptex = curtex >> 8;
+					FTextureID curtoptex = spot->sector->texture[MapSector::Ceiling];
 					if (curtoptex != lasttoptex)
 					{
 						lasttoptex = curtoptex;
-						toptex = TexMan(TexMan.GetFlat(curtoptex, true))->GetPixels();
+						toptex = TexMan(curtoptex)->GetPixels();
 					}
-					unsigned curbottex = curtex & 0xff;
+					FTextureID curbottex = spot->sector->texture[MapSector::Floor];
 					if (curbottex != lastbottex)
 					{
 						lastbottex = curbottex;
-						bottex = TexMan(TexMan.GetFlat(curbottex, false))->GetPixels();
+						bottex = TexMan(curbottex)->GetPixels();
 					}
 					u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
 					if(r_depthfog)
 					{
-						if(curtoptex)
+						if(curtoptex.isValid())
 							vbuf[top_add] = curshades[toptex[texoffs]];
-						if(curbottex)
+						if(curbottex.isValid())
 							vbuf[bot_add] = curshades[bottex[texoffs]];
 					}
 					else
 					{
-						if(curtoptex)
+						if(curtoptex.isValid())
 							vbuf[top_add] = toptex[texoffs];
-						if(curbottex)
+						if(curbottex.isValid())
 							vbuf[bot_add] = bottex[texoffs];
 					}
 				}

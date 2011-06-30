@@ -285,23 +285,40 @@ actor Clip 59
 	}
 }
 
-actor MachineGun 60
+actor MachineGun : Weapon 60
 {
 	states
 	{
 		Spawn:
 			MGUN A -1
 			stop
+		Ready:
+			MCHG A 1 A_WeaponReady
+			loop
+		Fire:
+			MCHG B 3
+			MCHG C 3 A_MachineGun
+			MCHG D 3
+			MCHG E 3 A_ReFire
+			goto Spawn
 	}
 }
 
-actor GatlingGun 61
+actor GatlingGun : Weapon 61
 {
 	states
 	{
 		Spawn:
 			CGUN A -1
 			stop
+		Ready:
+			CHGG A 1 A_WeaponReady
+			loop
+		Fire:
+			CHGG B 3
+			CHGG CD 3 A_Chaingun
+			CHGG E 3 A_ReFire
+			goto Spawn
 	}
 }
 
@@ -565,7 +582,7 @@ actor Guard 11
 			GARD L 10
 			GARD M 10 T_Shoot
 			GARD N 10
-			loop
+			goto See
 		Pain:
 			GARD F 5
 			goto See
@@ -1130,7 +1147,37 @@ actor BJPlayer
 			TNT1 A -1 NOP T_Player
 			stop
 		Missile:
-			TNT1 A -1 NOP T_Shoot
+			TNT1 A -1 NOP T_Attack
 			stop
+	}
+}
+
+actor Knife : Weapon
+{
+	states
+	{
+		Ready:
+			KNIF A 1 A_WeaponReady
+			loop
+		Fire:
+			KNIF B 3
+			KNIF C 3 A_Knife
+			KNIF DE 3
+			goto Ready
+	}
+}
+
+actor Pistol : Weapon
+{
+	states
+	{
+		Ready:
+			PISG A 1 A_WeaponReady
+			loop
+		Fire:
+			PISG B 3
+			PISG C 3 A_Pistol
+			PISG DE 3
+			goto Ready
 	}
 }

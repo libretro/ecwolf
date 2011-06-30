@@ -253,7 +253,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 			return;
 	}
 
-	Sprite &spr = spriteFrames[sprInf->frames+frame->frame];
+	const Sprite &spr = spriteFrames[sprInf->frames+frame->frame];
 	FTexture *tex;
 	if(spr.rotations == 0)
 		tex = TexMan[spr.texture[0]];
@@ -268,15 +268,15 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	else
 		colormap = &NormalLight.Maps[256*GetShade(height)];
 
-	unsigned int scale = height>>3; // Integer part of the height
+	const unsigned int scale = height>>3; // Integer part of the height
 	if(scale == 0)
 		return;
 
-	double dyScale = CorrectHeightFactor(height/256.0);
-	double dxScale = height/256.0;
+	const double dyScale = CorrectHeightFactor(height/256.0);
+	const double dxScale = height/256.0;
 
-	int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
-	int upperedge = (viewheight/2)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
+	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
+	const int upperedge = (viewheight/2)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
 
 	const unsigned int startX = -MIN(actx, 0);
 	const unsigned int startY = -MIN(upperedge, 0);

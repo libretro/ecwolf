@@ -1386,7 +1386,7 @@ ACTION_FUNCTION(T_Chase)
 		else
 			SelectChaseDir (self);
 		if (self->dir == nodir)
-			return;                                                 // object is blocked in
+			return; // object is blocked in
 	}
 
 	move = self->speed;
@@ -1420,7 +1420,7 @@ ACTION_FUNCTION(T_Chase)
 			SelectChaseDir (self);
 
 		if (self->dir == nodir)
-			return;                                                 // object is blocked in
+			return; // object is blocked in
 	}
 }
 
@@ -1565,6 +1565,7 @@ void T_DogChase (objtype *ob)
 
 void SelectPathDir (objtype *ob)
 {
+#if 0
 	unsigned spot;
 
 	spot = MAPSPOT(ob->tilex,ob->tiley,1)-ICONARROWS;
@@ -1579,6 +1580,7 @@ void SelectPathDir (objtype *ob)
 
 	if (!TryWalk (ob))
 		ob->dir = nodir;
+#endif
 }
 
 

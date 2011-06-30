@@ -40,6 +40,7 @@
 #include "textures/textures.h"
 
 class Thinker;
+class UWMFParser;
 
 class GameMap
 {
@@ -151,15 +152,17 @@ class GameMap
 		void			LinkZones(const Zone *zone1, const Zone *zone2, bool open);
 
 	private:
+		friend class UWMFParser;
+
 		Plane	&NewPlane();
 		Trigger	&NewTrigger(unsigned int x, unsigned int y, unsigned int z);
 		void	ReadPlanesData();
-		void	SetupReject();
-		void	UnloadReject();
+		void	ReadUWMFData();
+		void	SetupLinks();
+		void	UnloadLinks();
 
 		FString	map;
 
-		bool	uwmf;
 		bool	valid;
 		int		markerLump;
 		int		numLumps;
@@ -179,7 +182,9 @@ class GameMap
 typedef GameMap::Plane::Map *	MapSpot;
 
 // The following are mainly for easy access to enums
+typedef GameMap::Plane			MapPlane;
 typedef GameMap::Sector			MapSector;
+typedef GameMap::Thing			MapThing;
 typedef GameMap::Tile			MapTile;
 typedef GameMap::Trigger		MapTrigger;
 typedef GameMap::Zone			MapZone;

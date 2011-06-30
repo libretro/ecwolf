@@ -165,7 +165,7 @@ void BasicOverhead (void)
 				if (spotvis[x][y]) color = 111;  // visable
 				else color = 0;  // nothing
 			}
-			else if (MAPSPOT(x,y,1) == PUSHABLETILE) color = 171;  // pushwall
+			//else if (MAPSPOT(x,y,1) == PUSHABLETILE) color = 171;  // pushwall
 			else if (tile == 64) color = 158; // solid obj
 			else if (tile < 128) color = 154;  // walls
 			else if (tile < 256) color = 146;  // doors
@@ -465,7 +465,7 @@ int DebugKeys (void)
 		US_Print (" Y:");    US_PrintUnsigned (player->tiley);
 		//US_Print ("\n1:");   US_PrintUnsigned (tilemap[player->tilex][player->tiley]);
 		sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[player->tilex][player->tiley]); US_Print(str);
-		US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(player->tilex,player->tiley,1));
+		//US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(player->tilex,player->tiley,1));
 		US_Print (" 3:");
 		if ((unsigned)(uintptr_t)actorat[player->tilex][player->tiley] < 256)
 			US_PrintUnsigned (spotvis[player->tilex][player->tiley]);

@@ -46,7 +46,7 @@ static const dirtype diagonal[9][9] =
 void    SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
 void    NewState (objtype *ob, statetype *state);
 
-boolean TryWalk (objtype *ob);
+bool TryWalk (AActor *ob);
 void    MoveObj (objtype *ob, int32_t move);
 
 void    KillActor (objtype *ob);
@@ -197,7 +197,7 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 
 
 
-boolean TryWalk (objtype *ob)
+bool TryWalk (AActor *ob)
 {
 	if (ob->obclass == inertobj)
 	{
@@ -1286,9 +1286,9 @@ boolean CheckSight (objtype *ob)
 
 void FirstSighting (AActor *ob)
 {
-	const Frame *chase = ob->FindState("Chase");
-	if(chase)
-		ob->SetState(chase);
+	const Frame * const see = ob->FindState("See");
+	if(see)
+		ob->SetState(see);
 
 	PlaySoundLocActor(ob->seesound, ob);
 	ob->speed = ob->runspeed;
@@ -1332,8 +1332,11 @@ bool SightPlayer (AActor *ob)
 			return false;
 		}
 
-		if (--ob->sighttime > 0)
+		if (ob->sighttime > 0)
+		{
+			--ob->sighttime;
 			return false;
+		}
 	}
 	else
 	{

@@ -96,8 +96,6 @@ void Quit(const char *errorStr, ...);
 
 #include "id_ca.h"
 
-#define MAPSPOT(x,y,plane) (mapsegs[plane][((y)<<mapshift)+(x)])
-
 #define SIGN(x)         ((x)>0?1:-1)
 #define ABS(x)          ((int)(x)>0?(x):-(x))
 #define LABS(x)         ((int32_t)(x)>0?(x):-(x))
@@ -1147,7 +1145,7 @@ void    InitHitRect (objtype *ob, unsigned radius);
 void    SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
 void    NewState (objtype *ob, statetype *state);
 
-boolean TryWalk (objtype *ob);
+bool TryWalk (AActor *ob);
 void    SelectChaseDir (objtype *ob);
 void    SelectDodgeDir (objtype *ob);
 void    SelectRunDir (objtype *ob);

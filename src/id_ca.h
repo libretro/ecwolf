@@ -10,7 +10,6 @@
 extern  int   mapon;
 
 extern  class GameMap *map;
-extern  word *mapsegs[MAPPLANES];
 
 extern  char  extension[5];
 

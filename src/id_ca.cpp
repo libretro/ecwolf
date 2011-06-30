@@ -32,7 +32,6 @@ loaded into the data segment
 int     mapon = -1;
 
 GameMap *map = NULL;
-word    *mapsegs[MAPPLANES] = {NULL, NULL, NULL};
 
 int     numEpisodesMissing = 0;
 
@@ -104,24 +103,6 @@ void CA_CacheMap (int mapnum)
 	sprintf(mapname, "MAP%02d", mapnum+1);
 	delete map;
 	map = new GameMap(mapname);
-	int lmp = Wads.GetNumForName(mapname);
-	FWadLump lump = Wads.OpenLumpNum(lmp+1);
-	lump.Seek(0, SEEK_SET);
-
-	WORD dimensions[2];
-	lump.Read(dimensions, 4);
-	LittleShort(dimensions[0]);
-	LittleShort(dimensions[1]);
-	DWORD size = dimensions[0]*dimensions[1]*2;
-	lump.Seek(20, SEEK_SET);
-
-	for (int plane = 0; plane<MAPPLANES; plane++)
-	{
-		if(mapsegs[plane] != NULL)
-			delete[] mapsegs[plane];
-		mapsegs[plane] = new word[size/2];
-		lump.Read(mapsegs[plane], size);
-	}
 }
 
 //===========================================================================

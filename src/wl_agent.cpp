@@ -1084,9 +1084,6 @@ void Thrust (int angle, int32_t speed)
 
 	offset = (player->tiley<<mapshift)+player->tilex;
 	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
-
-	if (*(mapsegs[1] + offset) == EXITTILE)
-		VictoryTile ();
 }
 
 
