@@ -174,6 +174,8 @@ class FVGAGraph : public FResourceFile
 			NumLumps = vgaheadReader.Tell()/3;
 			vgaheadReader.Seek(0, SEEK_SET);
 			lumps = new FVGALump[NumLumps];
+			//for(unsigned int i = 0;i < NumLumps;i++)
+			//	lumps[i].LumpSize = 0;
 			// The vgahead has 24-bit ints.
 			BYTE* data = new BYTE[NumLumps*3];
 			vgaheadReader.Read(data, NumLumps*3);
@@ -202,8 +204,9 @@ class FVGAGraph : public FResourceFile
 				}
 
 				Reader->Seek(lumps[i].position, SEEK_SET);
-				Reader->Read(&lumps[i].LumpSize, 4);
-				if(i == 1) // We must do this on the second lump do to how the position is filled.
+				if(!Reader->Read(&lumps[i].LumpSize, 4))
+					lumps[i].LumpSize = 0;
+				if(i == 1) // We must do this on the second lump to how the position is filled.
 				{
 					Reader->Seek(lumps[0].position+4, SEEK_SET);
 					numPictures = lumps[0].LumpSize/4;

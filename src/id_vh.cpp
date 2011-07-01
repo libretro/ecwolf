@@ -5,6 +5,7 @@
 #include "id_vh.h"
 #include "w_wad.h"
 #include "v_palette.h"
+#include "textures/textures.h"
 
 pictabletype	*pictable;
 SDL_Surface     *latchpics[NUMLATCHPICS];
@@ -158,25 +159,15 @@ void VWB_DrawTile8 (int x, int y, int tile)
 
 void VWB_DrawPic(int x, int y, const char* chunk, bool scaledCoord)
 {
-	int lumpNum = Wads.CheckNumForName(chunk, ns_graphics);
-	if(lumpNum == -1)
+	FTexture *tex = TexMan(chunk);
+	if(!tex)
 		return;
-	FWadLump lump = Wads.OpenLumpNum(lumpNum);
 
-	WORD width;
-	WORD height;
-	lump.Read(&width, 2);
-	lump.Read(&height, 2);
-
-	if(Wads.LumpLength(lumpNum) < (width*height) + 4)
-		return; // Malformed?
-	byte* data = new byte[width*height];
-	lump.Read(data, width*height);
-
+	BYTE *data = const_cast<BYTE *>(tex->GetPixels());
 	if(!scaledCoord)
-		VL_MemToScreen(data, width, height, x, y);
+		VL_MemToScreen(data, tex->GetScaledWidth(), tex->GetScaledHeight(), x, y);
 	else
-		VL_MemToScreenScaledCoord(data, width, height, x, y);
+		VL_MemToScreenScaledCoord(data, tex->GetScaledWidth(), tex->GetScaledHeight(), x, y);
 }
 
 void VWB_Bar (int x, int y, int width, int height, int color)

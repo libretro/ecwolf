@@ -1,6 +1,8 @@
 /*
 ** wolfpatchtexture.cpp
 ** Wolfenstein "Shape" support, somewhat similar to a doom patch.
+** Also supports Wolf's raw page files since I'm too lazy to make another
+** type of texture.
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -59,6 +61,7 @@ public:
 	void Unload ();
 
 protected:
+	bool raw;
 	BYTE *Pixels;
 	Span **Spans;
 
@@ -80,8 +83,12 @@ static bool CheckIfWolfShape(FileReader &file)
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 
-	WORD Width = LittleShort(header[1])-LittleShort(header[0]);
+	WORD Left = LittleShort(header[0]);
+	WORD Right = LittleShort(header[1]);
+	if(file.GetLength() == Left*Right+4) // Raw page
+		return true;
 
+	WORD Width = Right-Left;
 	if(Width <= 0 || Width > 256 || file.GetLength() < 4+Width*2)
 		return false;
 
@@ -123,14 +130,27 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 {
 	// left, right, offsets...
 	WORD header[2];
-
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
-	Width = LittleLong(header[1])-LittleLong(header[0]);
-	Height = 64;
-	LeftOffset = 32-LittleLong(header[0]);
-	//LeftOffset = (64-Width)-LittleLong(header[0]);
-	TopOffset = 64;
+	header[0] = LittleShort(header[0]);
+	header[1] = LittleShort(header[1]);
+
+	if(file.GetLength() != header[0]*header[1]+4)
+	{
+		raw = false;
+		Width = header[1]-header[0];
+		Height = 64;
+		LeftOffset = 32-LittleLong(header[0]);
+		TopOffset = 64;
+	}
+	else
+	{
+		raw = true;
+		Width = header[0];
+		Height = header[1];
+		LeftOffset = 0;
+		TopOffset = 0;
+	}
 	CalcBitSize ();
 }
 
@@ -229,18 +249,39 @@ void FWolfShapeTexture::MakeTexture ()
 	Pixels = new BYTE[Width*Height];
 	memset(Pixels, 0, Width*Height);
 
-	for(int x = 0;x < Width;x++)
+	if(!raw)
 	{
-		BYTE* out = Pixels+(x*Height);
-		const BYTE* column = data+ReadLittleShort(&data[4+x*2]);
-		int start, end;
-		while((end = ReadLittleShort(column)>>1) != 0)
+		for(int x = 0;x < Width;x++)
 		{
-			const BYTE* in = data+ReadLittleShort(column+2);
-			start = ReadLittleShort(column+4)>>1;
-			column += 6;
-			for(int y = start;y < end;y++)
-				out[y] = GPalette.Remap[in[y]];
+			BYTE* out = Pixels+(x*Height);
+			const BYTE* column = data+ReadLittleShort(&data[4+x*2]);
+			int start, end;
+			while((end = ReadLittleShort(column)) != 0)
+			{
+				end >>= 1;
+				const BYTE* in = data+int16_t(ReadLittleShort(column+2));
+				start = ReadLittleShort(column+4)>>1;
+				column += 6;
+				for(int y = start;y < end;y++)
+					out[y] = GPalette.Remap[in[y]];
+			}
+		}
+	}
+	else
+	{
+		data += 4;
+		if(Width == 320 && Height == 200)
+		{
+			for(unsigned int x = 0;x < 320;++x)
+			{
+				for(unsigned int y = 0;y < 200;++y)
+					Pixels[x*200+y] = GPalette.Remap[data[y*80+(x>>2) + (x&3)*80*200]];
+			}
+		}
+		else
+		{
+			for(unsigned int i = 0;i < Width*Height;++i)
+				Pixels[i] = GPalette.Remap[data[i]];
 		}
 	}
 }

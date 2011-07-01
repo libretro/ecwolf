@@ -863,7 +863,6 @@ void FTextureManager::AddTexturesForWad(int wadnum)
 	// Fourth step: Textures (TX_)
 	AddGroup(wadnum, ns_newtextures, FTexture::TEX_Override);
 
-#if 0
 	// Sixth step: Try to find any lump in the WAD that may be a texture and load as a TEX_MiscPatch
 	int firsttx = Wads.GetFirstLump(wadnum);
 	int lasttx = Wads.GetLastLump(wadnum);
@@ -885,17 +884,7 @@ void FTextureManager::AddTexturesForWad(int wadnum)
 			if (Wads.CheckLumpName(i, "")) continue;
 
 			// Ignore anything belonging to a map
-			if (Wads.CheckLumpName(i, "THINGS")) continue;
-			if (Wads.CheckLumpName(i, "LINEDEFS")) continue;
-			if (Wads.CheckLumpName(i, "SIDEDEFS")) continue;
-			if (Wads.CheckLumpName(i, "VERTEXES")) continue;
-			if (Wads.CheckLumpName(i, "SEGS")) continue;
-			if (Wads.CheckLumpName(i, "SSECTORS")) continue;
-			if (Wads.CheckLumpName(i, "NODES")) continue;
-			if (Wads.CheckLumpName(i, "SECTORS")) continue;
-			if (Wads.CheckLumpName(i, "REJECT")) continue;
-			if (Wads.CheckLumpName(i, "BLOCKMAP")) continue;
-			if (Wads.CheckLumpName(i, "BEHAVIOR")) continue;
+			if (Wads.CheckLumpName(i, "PLANES")) continue;
 
 			// Don't bother looking at this lump if something later overrides it.
 			if (Wads.CheckNumForName(name, ns_graphics) != i) continue;
@@ -919,11 +908,10 @@ void FTextureManager::AddTexturesForWad(int wadnum)
 			AddTexture (out);
 		}
 	}
-#endif
 
 	// Check for text based texture definitions
 	LoadTextureDefs(wadnum, "TEXTURES");
-	LoadTextureDefs(wadnum, "HIRESTEX");
+	//LoadTextureDefs(wadnum, "HIRESTEX");
 
 	// Seventh step: Check for hires replacements.
 	AddHiresTextures(wadnum);

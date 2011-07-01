@@ -551,6 +551,12 @@ static void InitGame()
 		exit(1);
 	}
 
+	//
+	// Init texture manager
+	//
+
+	TexMan.Init();
+
 	SignonScreen ();
 
 #if defined _WIN32
@@ -604,12 +610,6 @@ static void InitGame()
 
 	printf("SetupSaveGames: Looking for saves.\n");
 	SetupSaveGames();
-
-//
-// Init texture manager
-//
-
-	TexMan.Init();
 
 //
 // Load Actors
