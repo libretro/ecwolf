@@ -15,7 +15,7 @@
 #define BKGDCOLOR       0x9d
 //#define STRIPE                0x9c
 
-#define MenuFadeOut()   VL_FadeOut(0,255,0,0,51,10)
+#define MenuFadeOut()   VL_FadeOut(0,255,0,0,206,10)
 
 #else
 
@@ -25,7 +25,7 @@
 #define BKGDCOLOR       0x2d
 #define STRIPE          0x2c
 
-#define MenuFadeOut()   VL_FadeOut(0,255,43,0,0,10)
+#define MenuFadeOut()   VL_FadeOut(0,255,174,0,0,10)
 
 #endif
 

@@ -1047,7 +1047,7 @@ startplayloop:
 #ifndef SPEAR
 				VW_FadeOut ();
 #else
-				VL_FadeOut (0,255,0,17,17,300);
+				VL_FadeOut (0,255,0,68,68,300);
 #endif
 				ClearMemory ();
 

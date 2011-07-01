@@ -143,7 +143,7 @@ Victory (void)
 	VW_UpdateScreen ();
 	VW_WaitVBL (3 * 70);
 
-	VL_FadeOut (0, 255, 0, 17, 17, 5);
+	VL_FadeOut (0, 255, 0, 68, 68, 5);
 #endif
 
 	StartCPMusic ("URAHERO");

@@ -1659,35 +1659,35 @@ ACTION_FUNCTION(T_Path)
 ===============
 */
 
-void T_Shoot (objtype *ob)
+ACTION_FUNCTION(T_Shoot)
 {
 	int     dx,dy,dist;
 	int     hitchance,damage;
 
 	hitchance = 128;
 
-	if (!map->CheckLink(ob->GetZone(), player->GetZone(), true))
+	if (!map->CheckLink(self->GetZone(), player->GetZone(), true))
 		return;
 
-	if (CheckLine (ob))                    // player is not behind a wall
+	if (CheckLine (self))                    // player is not behind a wall
 	{
-		dx = abs(ob->tilex - player->tilex);
-		dy = abs(ob->tiley - player->tiley);
+		dx = abs(self->tilex - player->tilex);
+		dy = abs(self->tiley - player->tiley);
 		dist = dx>dy ? dx:dy;
 
-		if (ob->obclass == ssobj || ob->obclass == bossobj)
+		if (self->obclass == ssobj || self->obclass == bossobj)
 			dist = dist*2/3;                                        // ss are better shots
 
 		if (thrustspeed >= RUNSPEED)
 		{
-			if (ob->flags&FL_VISABLE)
+			if (self->flags&FL_VISABLE)
 				hitchance = 160-dist*16;                // player can see to dodge
 			else
 				hitchance = 160-dist*8;
 		}
 		else
 		{
-			if (ob->flags&FL_VISABLE)
+			if (self->flags&FL_VISABLE)
 				hitchance = 256-dist*16;                // player can see to dodge
 			else
 				hitchance = 256-dist*8;
@@ -1704,10 +1704,11 @@ void T_Shoot (objtype *ob)
 			else
 				damage = US_RndT()>>4;
 
-			TakeDamage (damage,ob);
+			TakeDamage (damage,self);
 		}
 	}
 
+#if 0
 	switch(ob->obclass)
 	{
 		case ssobj:
@@ -1735,8 +1736,9 @@ void T_Shoot (objtype *ob)
 		default:
 			PlaySoundLocActor("guard/attack",ob);
 	}
+#endif
 }
-
+void T_Shoot(AActor *self) { __AF_T_Shoot(self); }
 
 /*
 ===============

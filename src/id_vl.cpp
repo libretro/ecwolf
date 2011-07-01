@@ -4,6 +4,7 @@
 #include "wl_def.h"
 #include "id_vl.h"
 #include "w_wad.h"
+#include "v_palette.h"
 
 
 // Uncomment the following line, if you get destination out of bounds
@@ -45,11 +46,8 @@ unsigned curPitch;
 
 unsigned scaleFactor;
 
-boolean	 screenfaded;
+bool	 screenfaded;
 unsigned bordercolor;
-
-SDL_Color palette1[256], palette2[256];
-SDL_Color curpal[256];
 
 SDL_Color gamepal[256];
 
@@ -100,11 +98,7 @@ void	VL_Shutdown (void)
 void	VL_SetVGAPlaneMode (void)
 {
 #ifndef _arch_dreamcast
-#ifdef SPEAR
-	SDL_WM_SetCaption("Spear of Destiny", NULL);
-#else
-	SDL_WM_SetCaption("Wolfenstein 3D", NULL);
-#endif
+	SDL_WM_SetCaption("ECWolf", NULL);
 #endif
 
 	if(screenBits == -1)
@@ -127,8 +121,15 @@ void	VL_SetVGAPlaneMode (void)
 		usedoublebuffering = false;
 	SDL_ShowCursor(SDL_DISABLE);
 
-	SDL_SetColors(screen, gamepal, 0, 256);
-	memcpy(curpal, gamepal, sizeof(SDL_Color) * 256);
+	SDL_Color pal[256];
+	for(uint16_t i = 0;i < 256;++i)
+	{
+		pal[i].r = GPalette.BaseColors[i].r;
+		pal[i].g = GPalette.BaseColors[i].g;
+		pal[i].b = GPalette.BaseColors[i].b;
+	}
+
+	SDL_SetColors(screen, pal, 0, 256);
 
 	screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth,
 		screenHeight, 8, 0, 0, 0, 0);
@@ -137,7 +138,7 @@ void	VL_SetVGAPlaneMode (void)
 		printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
 		exit(1);
 	}
-	SDL_SetColors(screenBuffer, gamepal, 0, 256);
+	SDL_SetColors(screenBuffer, pal, 0, 256);
 
 	screenPitch = screen->pitch;
 	bufferPitch = screenBuffer->pitch;
@@ -218,70 +219,29 @@ void VL_ConvertPalette(const char* srcpal, SDL_Color *destpal)
 	delete[] data;
 }
 
-/*
-=================
-=
-= VL_FillPalette
-=
-=================
-*/
-
-void VL_FillPalette (int red, int green, int blue)
-{
-	int	i;
-	SDL_Color pal[256];
-
-	for(i=0; i<256; i++)
-	{
-		pal[i].r = red;
-		pal[i].g = green;
-		pal[i].b = blue;
-	}
-
-	VL_SetPalette(pal, true);
-}
-
 //===========================================================================
 
 /*
 =================
 =
-= VL_SetColor
+= VL_SetBlend
 =
 =================
 */
 
-void VL_SetColor	(int color, int red, int green, int blue)
+void DoBlending (const PalEntry *from, PalEntry *to, int count, int r, int g, int b, int a);
+void VL_SetBlend(uint8_t red, uint8_t green, uint8_t blue, int amount, bool forceupdate)
 {
-	SDL_Color col = { red, green, blue };
-	curpal[color] = col;
+	static PalEntry colors[256];
+	if(amount)
+	{
+		memcpy(colors, GPalette.BaseColors, sizeof(PalEntry)*256);
 
-	if(screenBits == 8)
-		SDL_SetPalette(screen, SDL_PHYSPAL, &col, color, 1);
+		DoBlending(GPalette.BaseColors, colors, 256, red, green, blue, amount);
+		VL_SetPalette(colors, forceupdate);
+	}
 	else
-	{
-		SDL_SetPalette(curSurface, SDL_LOGPAL, &col, color, 1);
-		SDL_BlitSurface(curSurface, NULL, screen, NULL);
-		SDL_Flip(screen);
-	}
-}
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_GetColor
-=
-=================
-*/
-
-void VL_GetColor	(int color, int *red, int *green, int *blue)
-{
-	SDL_Color *col = &curpal[color];
-	*red = col->r;
-	*green = col->g;
-	*blue = col->b;
+		VL_SetPalette(GPalette.BaseColors, forceupdate);
 }
 
 //===========================================================================
@@ -296,8 +256,6 @@ void VL_GetColor	(int color, int *red, int *green, int *blue)
 
 void VL_SetPalette (SDL_Color *palette, bool forceupdate)
 {
-	memcpy(curpal, palette, sizeof(SDL_Color) * 256);
-
 	if(screenBits == 8)
 		SDL_SetPalette(screen, SDL_PHYSPAL, palette, 0, 256);
 	else
@@ -311,20 +269,16 @@ void VL_SetPalette (SDL_Color *palette, bool forceupdate)
 	}
 }
 
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_GetPalette
-=
-=================
-*/
-
-void VL_GetPalette (SDL_Color *palette)
+void VL_SetPalette (PalEntry *palette, bool forceupdate)
 {
-	memcpy(palette, curpal, sizeof(SDL_Color) * 256);
+	static SDL_Color pal[256];
+	for(uint16_t i = 0;i < 256;++i)
+	{
+		pal[i].r = palette[i].r;
+		pal[i].g = palette[i].g;
+		pal[i].b = palette[i].b;
+	}
+	VL_SetPalette(pal, forceupdate);
 }
 
 
@@ -340,51 +294,36 @@ void VL_GetPalette (SDL_Color *palette)
 =================
 */
 
-void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
+static int fadeR = 0, fadeG = 0, fadeB = 0;
+void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 {
-	int		    i,j,orig,delta;
-	SDL_Color   *origptr, *newptr;
-
-	red = red * 255 / 63;
-	green = green * 255 / 63;
-	blue = blue * 255 / 63;
+	const int aStep = (end-start)/steps;
 
 	VL_WaitVBL(1);
-	VL_GetPalette(palette1);
-	memcpy(palette2, palette1, sizeof(SDL_Color) * 256);
 
 //
 // fade through intermediate frames
 //
-	for (i=0;i<steps;i++)
+	for (int a = start;(aStep < 0 ? a > end : a < end);a += aStep)
 	{
-		origptr = &palette1[start];
-		newptr = &palette2[start];
-		for (j=start;j<=end;j++)
-		{
-			orig = origptr->r;
-			delta = red-orig;
-			newptr->r = orig + delta * i / steps;
-			orig = origptr->g;
-			delta = green-orig;
-			newptr->g = orig + delta * i / steps;
-			orig = origptr->b;
-			delta = blue-orig;
-			newptr->b = orig + delta * i / steps;
-			origptr++;
-			newptr++;
-		}
-
 		if(!usedoublebuffering || screenBits == 8) VL_WaitVBL(1);
-		VL_SetPalette (palette2, true);
+		VL_SetBlend(red, green, blue, a, true);
 	}
 
 //
 // final color
 //
-	VL_FillPalette (red,green,blue);
+	VL_SetBlend (red,green,blue,end, true);
 
-	screenfaded = true;
+	screenfaded = end != 0;
+}
+
+void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
+{
+	fadeR = red;
+	fadeG = green;
+	fadeB = blue;
+	VL_Fade(start, end, red, green, blue, steps);
 }
 
 
@@ -398,36 +337,8 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 
 void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
 {
-	int i,j,delta;
-
-	VL_WaitVBL(1);
-	VL_GetPalette(palette1);
-	memcpy(palette2, palette1, sizeof(SDL_Color) * 256);
-
-//
-// fade through intermediate frames
-//
-	for (i=0;i<steps;i++)
-	{
-		for (j=start;j<=end;j++)
-		{
-			delta = palette[j].r-palette1[j].r;
-			palette2[j].r = palette1[j].r + delta * i / steps;
-			delta = palette[j].g-palette1[j].g;
-			palette2[j].g = palette1[j].g + delta * i / steps;
-			delta = palette[j].b-palette1[j].b;
-			palette2[j].b = palette1[j].b + delta * i / steps;
-		}
-
-		if(!usedoublebuffering || screenBits == 8) VL_WaitVBL(1);
-		VL_SetPalette(palette2, true);
-	}
-
-//
-// final color
-//
-	VL_SetPalette (palette, true);
-	screenfaded = false;
+	if(screenfaded)
+		VL_Fade(end, start, fadeR, fadeG, fadeB, steps);
 }
 
 /*

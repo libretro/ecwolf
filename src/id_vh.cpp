@@ -4,6 +4,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "w_wad.h"
+#include "v_palette.h"
 
 pictabletype	*pictable;
 SDL_Surface     *latchpics[NUMLATCHPICS];
@@ -339,8 +340,6 @@ static const uint32_t rndmasks[] = {
 static unsigned int rndbits_y;
 static unsigned int rndmask;
 
-extern SDL_Color curpal[256];
-
 // Returns the number of bits needed to represent the given value
 static int log2_ceil(uint32_t x)
 {
@@ -435,7 +434,7 @@ boolean FizzleFade (SDL_Surface *source, int x1, int y1,
 				else
 				{
 					byte col = *(srcptr + (y1 + y) * source->pitch + x1 + x);
-					uint32_t fullcol = SDL_MapRGB(screen->format, curpal[col].r, curpal[col].g, curpal[col].b);
+					uint32_t fullcol = SDL_MapRGB(screen->format, GPalette.BaseColors[col].r, GPalette.BaseColors[col].g, GPalette.BaseColors[col].b);
 					memcpy(destptr + (y1 + y) * screen->pitch + (x1 + x) * screen->format->BytesPerPixel,
 						&fullcol, screen->format->BytesPerPixel);
 				}

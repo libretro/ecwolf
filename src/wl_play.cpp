@@ -952,17 +952,17 @@ void UpdatePaletteShifts (void)
 
 	if (red)
 	{
-		VL_SetPalette (redshifts[red - 1], false);
+		VL_SetBlend(0xFF, 0x00, 0x00, red*(255/NUMREDSHIFTS));
 		palshifted = true;
 	}
 	else if (white)
 	{
-		VL_SetPalette (whiteshifts[white - 1], false);
+		VL_SetBlend(0xFF, 0xFF, 0xFF, white*(255/NUMWHITESHIFTS));
 		palshifted = true;
 	}
 	else if (palshifted)
 	{
-		VL_SetPalette (gamepal, false);        // back to normal
+		VL_SetBlend(0, 0, 0, 0);
 		palshifted = false;
 	}
 }
@@ -982,8 +982,8 @@ void FinishPaletteShifts (void)
 {
 	if (palshifted)
 	{
-		palshifted = 0;
-		VL_SetPalette (gamepal, true);
+		palshifted = false;
+		VL_SetBlend(0, 0, 0, 0);
 	}
 }
 
