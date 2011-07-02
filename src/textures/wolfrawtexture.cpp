@@ -1,6 +1,7 @@
 /*
-** wolfshapetexture.cpp
-** Wolfenstein "Shape" support, somewhat similar to a doom patch.
+** wolfrawtexture.cpp
+** Wolfenstein "raw" support.
+** So I copy/pasted the shape support and changed things up...
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -44,15 +45,15 @@
 
 //==========================================================================
 //
-// A texture that is a Wolfenstein "shape"
+// A texture that is a Wolfenstein "raw"
 //
 //==========================================================================
 
-class FWolfShapeTexture : public FTexture
+class FWolfRawTexture : public FTexture
 {
 public:
-	FWolfShapeTexture (int lumpnum, FileReader &file);
-	~FWolfShapeTexture ();
+	FWolfRawTexture (int lumpnum, FileReader &file);
+	~FWolfRawTexture ();
 
 	const BYTE *GetColumn (unsigned int column, const Span **spans_out);
 	const BYTE *GetPixels ();
@@ -68,37 +69,23 @@ protected:
 
 //==========================================================================
 //
-// Checks if the lump is a Wolfenstein "shape"
+// Checks if the lump is a Wolfenstein "raw"
 //
 //==========================================================================
 
-static bool CheckIfWolfShape(FileReader &file)
+static bool CheckIfWolfRaw(FileReader &file)
 {
-	if(file.GetLength() < 4) return false; // No header
+	if(file.GetLength() < 5) return false;
 	
 	WORD header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 
-	WORD Left = LittleShort(header[0]);
-	WORD Right = LittleShort(header[1]);
-
-	WORD Width = Right-Left;
-	if(Width <= 0 || Width > 256 || file.GetLength() < 4+Width*2)
-		return false;
-
-	WORD* offsets = new WORD[Width];
-	file.Read(offsets, Width*2);
-	for(int i = 0;i < Width;i++)
-	{
-		if(LittleLong(offsets[i]) >= file.GetLength())
-		{
-			delete[] offsets;
-			return false;
-		}
-	}
-	delete[] offsets;
-	return true;
+	WORD Width = LittleShort(header[0]);
+	WORD Height = LittleShort(header[1]);
+	if(file.GetLength() == Width*Height+4) // Raw page
+		return true;
+	return false;
 }
 
 //==========================================================================
@@ -107,11 +94,11 @@ static bool CheckIfWolfShape(FileReader &file)
 //
 //==========================================================================
 
-FTexture *WolfShapeTexture_TryCreate(FileReader &file, int lumpnum)
+FTexture *WolfRawTexture_TryCreate(FileReader &file, int lumpnum)
 {
-	if(!CheckIfWolfShape(file))
+	if(!CheckIfWolfRaw(file))
 		return NULL;
-	return new FWolfShapeTexture(lumpnum, file);
+	return new FWolfRawTexture(lumpnum, file);
 }
 
 //==========================================================================
@@ -120,20 +107,16 @@ FTexture *WolfShapeTexture_TryCreate(FileReader &file, int lumpnum)
 //
 //==========================================================================
 
-FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
+FWolfRawTexture::FWolfRawTexture(int lumpnum, FileReader &file)
 : FTexture(NULL, lumpnum), Pixels(0), Spans(0)
 {
-	// left, right, offsets...
 	WORD header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
-	header[0] = LittleShort(header[0]);
-	header[1] = LittleShort(header[1]);
-
-	Width = header[1]-header[0];
-	Height = 64;
-	LeftOffset = 32-LittleLong(header[0]);
-	TopOffset = 64;
+	Width = LittleShort(header[0]);
+	Height = LittleShort(header[1]);
+	LeftOffset = 0;
+	TopOffset = 0;
 	CalcBitSize ();
 }
 
@@ -143,7 +126,7 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 //
 //==========================================================================
 
-FWolfShapeTexture::~FWolfShapeTexture ()
+FWolfRawTexture::~FWolfRawTexture ()
 {
 	Unload ();
 	if (Spans != NULL)
@@ -159,7 +142,7 @@ FWolfShapeTexture::~FWolfShapeTexture ()
 //
 //==========================================================================
 
-void FWolfShapeTexture::Unload ()
+void FWolfRawTexture::Unload ()
 {
 	if(Pixels != NULL)
 	{
@@ -174,7 +157,7 @@ void FWolfShapeTexture::Unload ()
 //
 //==========================================================================
 
-const BYTE *FWolfShapeTexture::GetPixels ()
+const BYTE *FWolfRawTexture::GetPixels ()
 {
 	if (Pixels == NULL)
 	{
@@ -189,7 +172,7 @@ const BYTE *FWolfShapeTexture::GetPixels ()
 //
 //==========================================================================
 
-const BYTE *FWolfShapeTexture::GetColumn (unsigned int column, const Span **spans_out)
+const BYTE *FWolfRawTexture::GetColumn (unsigned int column, const Span **spans_out)
 {
 	if (Pixels == NULL)
 	{
@@ -224,27 +207,25 @@ const BYTE *FWolfShapeTexture::GetColumn (unsigned int column, const Span **span
 //
 //==========================================================================
 
-void FWolfShapeTexture::MakeTexture ()
+void FWolfRawTexture::MakeTexture ()
 {
 	FMemLump lump = Wads.ReadLump (SourceLump);
-	const BYTE* data = (const BYTE*)lump.GetMem();
+	const BYTE* data = ((const BYTE*)lump.GetMem())+4;
 
 	Pixels = new BYTE[Width*Height];
 	memset(Pixels, 0, Width*Height);
 
-	for(int x = 0;x < Width;x++)
+	if(Width == 320 && Height == 200)
 	{
-		BYTE* out = Pixels+(x*Height);
-		const BYTE* column = data+ReadLittleShort(&data[4+x*2]);
-		int start, end;
-		while((end = ReadLittleShort(column)) != 0)
+		for(unsigned int x = 0;x < 320;++x)
 		{
-			end >>= 1;
-			const BYTE* in = data+int16_t(ReadLittleShort(column+2));
-			start = ReadLittleShort(column+4)>>1;
-			column += 6;
-			for(int y = start;y < end;y++)
-				out[y] = GPalette.Remap[in[y]];
+			for(unsigned int y = 0;y < 200;++y)
+				Pixels[x*200+y] = GPalette.Remap[data[y*80+(x>>2) + (x&3)*80*200]];
 		}
+	}
+	else
+	{
+		for(unsigned int i = 0;i < Width*Height;++i)
+			Pixels[i] = GPalette.Remap[data[i]];
 	}
 }

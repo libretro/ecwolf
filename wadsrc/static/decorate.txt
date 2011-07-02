@@ -518,7 +518,7 @@ actor Rocket
 	states
 	{
 		Spawn:
-			ROCK A 1.5 T_Projectile A_Smoke
+			ROCK A 1.5 A_Smoke T_Projectile
 			loop
 		Death:
 			BOOM ABC 3
@@ -579,9 +579,8 @@ actor Guard 11
 			GARD E 4 NOP T_Chase
 			loop
 		Missile:
-			GARD L 10
-			GARD M 10 T_Shoot
-			GARD N 10
+			GARD LM 10
+			GARD N 10 T_Shoot
 			goto See
 		Pain:
 			GARD F 5
@@ -590,8 +589,9 @@ actor Guard 11
 			GARD J 5
 			goto See
 		Death:
-			GARD G 7.5 A_DeathScream
-			GARD HI 7.5
+			GARD G 7.5
+			GARD H 7.5 A_DeathScream
+			GARD I 7.5
 			GARD K -1
 			stop
 	}
@@ -613,7 +613,7 @@ actor Blinky 29
 	states
 	{
 		Spawn:
-			BLKY AB 5 T_Ghosts
+			BLKY AB 5 NOP T_Ghosts
 			loop
 	}
 }
@@ -624,7 +624,7 @@ actor Inky 32
 	states
 	{
 		Spawn:
-			INKY AB 5 T_Ghosts
+			INKY AB 5 NOP T_Ghosts
 			loop
 	}
 }
@@ -635,7 +635,7 @@ actor Pinky 31
 	states
 	{
 		Spawn:
-			PNKY AB 5 T_Ghosts
+			PNKY AB 5 NOP T_Ghosts
 			loop
 	}
 }
@@ -646,7 +646,7 @@ actor Clyde 30
 	states
 	{
 		Spawn:
-			CLYD AB 5 T_Ghosts
+			CLYD AB 5 NOP T_Ghosts
 			loop
 	}
 }
@@ -662,25 +662,25 @@ actor Dog 14
 	{
 		Spawn:
 		Path:
-			DOGY A 10 T_Path
+			DOGY A 10 NOP T_Path
 			DOGY A 2.5
-			DOGY B 7.5 T_Path
-			DOGY C 10 T_Path
+			DOGY B 7.5 NOP T_Path
+			DOGY C 10 NOP T_Path
 			DOGY C 2.5
-			DOGY D 7.5 T_Path
+			DOGY D 7.5 NOP T_Path
 			loop
 		Melee:
-			DOGY E 5
-			DOGY F 5 T_Bite
-			DOGY GEA 5
+			DOGY EF 5
+			DOGY G 5 T_Bite
+			DOGY EA 5
 			goto See
 		See:
-			DOGY A 5 T_DogChase
+			DOGY A 5 NOP T_DogChase
 			DOGY A 1.5
-			DOGY B 4 T_DogChase
-			DOGY C 5 T_DogChase
+			DOGY B 4 NOP T_DogChase
+			DOGY C 5 NOP T_DogChase
 			DOGY C 1.5
-			DOGY D 4 T_DogChase
+			DOGY D 4 NOP T_DogChase
 			loop
 		Death:
 			DOGY H 7.5 A_DeathScream
@@ -701,15 +701,15 @@ actor Officer 12
 	states
 	{
 		Spawn:
-			OFFI A -1 T_Stand
+			OFFI A -1 NOP T_Stand
 			stop
 		Path:
-			OFFI B 10 T_Path
+			OFFI B 10 NOP T_Path
 			OFFI B 2.5
-			OFFI C 7.5 T_Path
-			OFFI D 10 T_Path
+			OFFI C 7.5 NOP T_Path
+			OFFI D 10 NOP T_Path
 			OFFI D 2.5
-			OFFI E 7.5 T_Path
+			OFFI E 7.5 NOP T_Path
 			loop
 		Pain:
 			OFFI F 5
@@ -719,20 +719,21 @@ actor Officer 12
 			goto See
 		Missile:
 			OFFI H 3
-			OFFI I 10 T_Shoot
-			OFFI J 5
+			OFFI I 10
+			OFFI J 5 T_Shoot
 			goto See
 		See:
-			OFFI B 5 T_Chase
+			OFFI B 5 NOP T_Chase
 			OFFI B 1.5
-			OFFI C 4 T_Chase
-			OFFI D 5 T_Chase
+			OFFI C 4 NOP T_Chase
+			OFFI D 5 NOP T_Chase
 			OFFI D 1.5
-			OFFI E 4 T_Chase
+			OFFI E 4 NOP T_Chase
 			loop
 		Death:
-			OFFI K 5.5 A_DeathScream
-			OFFI LMN 5.5
+			OFFI K 5.5
+			OFFI L 5.5 A_DeathScream
+			OFFI MN 5.5
 			OFFI O -1
 			stop
 	}
@@ -748,15 +749,15 @@ actor Mutant 15
 	states
 	{
 		Spawn:
-			MTNT A -1 T_Stand
+			MTNT A -1 NOP T_Stand
 			stop
 		Path:
-			MTNT B 10 T_Path
+			MTNT B 10 NOP T_Path
 			MTNT B 2.5
-			MTNT C 7.5 T_Path
-			MTNT D 10 T_Path
+			MTNT C 7.5 NOP T_Path
+			MTNT D 10 NOP T_Path
 			MTNT D 2.5
-			MTNT E 7.5 T_Path
+			MTNT E 7.5 NOP T_Path
 			loop
 		Pain:
 			MTNT F 5
@@ -765,16 +766,17 @@ actor Mutant 15
 			MTNT G 5
 			goto See
 		See:
-			MTNT B 5 T_Chase
+			MTNT B 5 NOP T_Chase
 			MTNT B 1.5
-			MTNT C 4 T_Chase
-			MTNT D 5 T_Chase
+			MTNT C 4 NOP T_Chase
+			MTNT D 5 NOP T_Chase
 			MTNT D 1.5
-			MTNT E 4 T_Chase
+			MTNT E 4 NOP T_Chase
 			loop
 		Death:
-			MTNT H 3.5 A_DeathScream
-			MTNT IJK 3.5
+			MTNT H 3.5
+			MTNT I 3.5 A_DeathScream
+			MTNT JK 3.5
 			MTNT L -1
 			stop
 	}
@@ -791,15 +793,15 @@ actor WolfensteinSS 13 // ZDoom compatible name
 	states
 	{
 		Spawn:
-			SSWV W -1 T_Stand
+			SSWV W -1 NOP T_Stand
 			stop
 		Path:
-			SSWV A 10 T_Path
+			SSWV A 10 NOP T_Path
 			SSWV A 2.5
-			SSWV B 7.5 T_Path
-			SSWV C 10 T_Path
+			SSWV B 7.5 NOP T_Path
+			SSWV C 10 NOP T_Path
 			SSWV C 2.5
-			SSWV D 7.5 T_Path
+			SSWV D 7.5 NOP T_Path
 			loop
 		Pain:
 			SSWV H 5
@@ -809,18 +811,19 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			goto See
 		Missile:
 			SSWV E 10
-			SSWV F 10 T_Shoot
-			SSWV G 5
-			SSWV F 5 T_Shoot
-			SSWV G 5
-			SSWV F 5 T_Shoot
-			SSWV G 5
-			SSWV F 5 T_Shoot
-			SSWV G 5
+			SSWV F 10
+			SSWV G 5 T_Shoot
+			SSWV F 5
+			SSWV G 5 T_Shoot
+			SSWV F 5
+			SSWV G 5 T_Shoot
+			SSWV F 5
+			SSWV G 5 T_Shoot
 			goto See
 		Death:
-			SSWV J 7.5 A_DeathScream
-			SSWV KL 7.5
+			SSWV J 7.5
+			SSWV K 7.5 A_DeathScream
+			SSWV L 7.5
 			SSWV M -1
 			stop
 	}
@@ -837,24 +840,25 @@ actor Hans 16
 	states
 	{
 		Spawn:
-			HANS A -1 T_Stand
+			HANS A -1 NOP T_Stand
 			stop
 		See:
-			HANS A 5 T_Chase
+			HANS A 5 NOP T_Chase
 			HANS A 1.5
-			HANS B 4 T_Chase
-			HANS C 5 T_Chase
+			HANS B 4 NOP T_Chase
+			HANS C 5 NOP T_Chase
 			HANS C 1.5
-			HANS D 4 T_Chase
+			HANS D 4 NOP T_Chase
 			loop
 		Missile:
 			HANS E 15
-			HANS FGFGFG 5 T_Shoot
-			HANS E 5
+			HANS F 5
+			HANS FGFGFGE 5 T_Shoot
 			goto See
 		Death:
-			HANS H 7.5 A_DeathScream
-			HANS IJ 7.5
+			HANS H 7.5
+			HANS I 7.5 A_DeathScream
+			HANS J 7.5
 			HANS K -1
 			stop
 	}
@@ -871,24 +875,25 @@ actor Gretel 20
 	states
 	{
 		Spawn:
-			GRET A -1 T_Stand
+			GRET A -1 NOP T_Stand
 			stop
 		See:
-			GRET A 5 T_Chase
+			GRET A 5 NOP T_Chase
 			GRET A 1.5
-			GRET B 4 T_Chase
-			GRET C 5 T_Chase
+			GRET B 4 NOP T_Chase
+			GRET C 5 NOP T_Chase
 			GRET C 1.5
-			GRET D 4 T_Chase
+			GRET D 4 NOP T_Chase
 			loop
 		Missile:
 			GRET E 15
-			GRET FGFGFG 5 T_Shoot
-			GRET E 5
+			GRET F 5
+			GRET FGFGFGE 5 T_Shoot
 			goto See
 		Death:
-			GRET H 7.5 A_DeathScream
-			GRET IJ 7.5
+			GRET H 7.5
+			GRET I 7.5 A_DeathScream
+			GRET J 7.5
 			GRET K -1
 			stop
 	}
@@ -900,7 +905,7 @@ actor Needle
 	states
 	{
 		Spawn:
-			HYPO ABCD 3 T_Projectile
+			HYPO ABCD 3 NOP T_Projectile
 			loop
 	}
 }
@@ -916,23 +921,24 @@ actor Schabbs 17
 	states
 	{
 		Spawn:
-			SHAB A -1 T_Stand
+			SHAB A -1 NOP T_Stand
 			stop
 		See:
-			SHAB B 5 T_Schabb
+			SHAB B 5 NOP T_Schabb
 			SHAB B 1.5
-			SHAB C 4 T_Schabb
-			SHAB D 5 T_Schabb
+			SHAB C 4 NOP T_Schabb
+			SHAB D 5 NOP T_Schabb
 			SHAB D 1.5
-			SHAB E 4 T_Schabb
+			SHAB E 4 NOP T_Schabb
 			loop
 		Missile:
 			SHAB F 15
-			SHAB G 5 T_SchabbThrow
+			SHAB G 5
+			SHAB G 0 T_SchabbThrow
 			goto See
 		Death:
-			SHAB A 5 A_DeathScream
-			SHAB A 70
+			SHAB A 5
+			SHAB A 70 A_DeathScream
 			SHAB HIJ 5
 			SHAB K -1 A_StartDeathCam
 			stop
@@ -950,23 +956,24 @@ actor Gift 21
 	states
 	{
 		Spawn:
-			GIFT A -1 T_Stand
+			GIFT A -1 NOP T_Stand
 			stop
 		See:
-			GIFT A 5 T_Gift
+			GIFT A 5 NOP T_Gift
 			GIFT A 1.5
-			GIFT B 4 T_Gift
-			GIFT C 5 T_Gift
+			GIFT B 4 NOP T_Gift
+			GIFT C 5 NOP T_Gift
 			GIFT C 1.5
-			GIFT D 4 T_Gift
+			GIFT D 4 NOP T_Gift
 			loop
 		Missile:
 			GIFT E 15
-			GIFT F 5 T_GiftThrow
+			GIFT F 5
+			GIFT F 0 T_GiftThrow
 			goto See
 		Death:
-			GIFT A .5 A_DeathScream
-			GIFT A 70
+			GIFT A .5
+			GIFT A 70 A_DeathScream
 			GIFT GHI 5
 			GIFT J -1 A_StartDeathCam
 			stop
@@ -984,24 +991,26 @@ actor FatFace 22
 	states
 	{
 		Spawn:
-			FATF A -1 T_Stand
+			FATF A -1 NOP T_Stand
 			stop
 		See:
-			FATF A 5 T_Fat
+			FATF A 5 NOP T_Fat
 			FATF A 1.5
-			FATF B 4 T_Fat
-			FATF C 5 T_Fat
+			FATF B 4 NOP T_Fat
+			FATF C 5 NOP T_Fat
 			FATF C 1.5
-			FATF D 4 T_Fat
+			FATF D 4 NOP T_Fat
 			loop
 		Missile:
 			FATF E 15
-			FATF F 5 T_GiftThrow
-			FATF GHGH 5 T_Shoot
+			FATF F 5
+			FATF G 5 T_GiftThrow
+			FATF HGH 5 T_Shoot
+			FATF H 0 T_Shoot
 			goto See
 		Death:
-			FATF A .5 A_DeathScream
-			FATF A 70
+			FATF A .5
+			FATF A 70 A_DeathScream
 			FATF IJK 5
 			FATF L -1 A_StartDeathCam
 			stop
@@ -1019,23 +1028,24 @@ actor FakeHitler 18
 	states
 	{
 		Spawn:
-			FAKE A -1 T_Stand
+			FAKE A -1 NOP T_Stand
 			stop
 		See:
-			FAKE A 5 T_Fake
+			FAKE A 5 NOP T_Fake
 			FAKE A 1.5
-			FAKE B 4 T_Fake
-			FAKE C 5 T_Fake
+			FAKE B 4 NOP T_Fake
+			FAKE C 5 NOP T_Fake
 			FAKE C 1.5
-			FAKE D 4 T_Fake
+			FAKE D 4 NOP T_Fake
 			loop
 		Missile:
-			FAKE EEEEEEEE 4 T_FakeFire
 			FAKE E 4
+			FAKE EEEEEEEE 4 T_FakeFire
 			goto See
 		Death:
-			FAKE F 5 A_DeathScream
-			FAKE GHIJ 5
+			FAKE F 5
+			FAKE G 5 A_DeathScream
+			FAKE HIJ 5
 			FAKE K -1
 			stop
 	}
@@ -1047,7 +1057,7 @@ actor FireBall
 	states
 	{
 		Spawn:
-			FIRE AB 3 T_Projectile
+			FIRE AB 3 NOP T_Projectile
 			loop
 	}
 }
@@ -1063,25 +1073,27 @@ actor MechaHitler 19
 	states
 	{
 		Spawn:
-			MECH A -1 T_Stand
+			MECH A -1 NOP T_Stand
 			stop
 		See:
-			MECH A 5 T_Chase
+			MECH A 5 NOP T_Chase
 			MECH A 3
-			MECH B 4 T_Chase
-			MECH C 5 T_Chase
+			MECH B 4 NOP T_Chase
+			MECH C 5 NOP T_Chase
 			MECH C 3
-			MECH D 4 T_Chase
+			MECH D 4 NOP T_Chase
 			loop
 		Missile:
 			MECH E 15
-			MECH FGFGF 5 T_Shoot
+			MECH F 5
+			MECH GFGF 5 T_Shoot
+			MECH F 0 T_Shoot
 			goto See
 		Death:
-			MECH H 5 A_DeathScream
-			MECH I 5
-			MECH J 5 A_HitlerMorph
-			MECH K -1
+			MECH H 5
+			MECH I 5 A_DeathScream
+			MECH J 5
+			MECH K -1 A_HitlerMorph
 			stop
 	}
 }
@@ -1098,22 +1110,25 @@ actor Hitler
 	{
 		Spawn:
 		See:
-			HTLR A 3 T_Chase
+			HTLR A 3 NOP T_Chase
 			HTLR A 2
-			HTLR B 1 T_Chase
-			HTLR C 3 T_Chase
+			HTLR B 1 NOP T_Chase
+			HTLR C 3 NOP T_Chase
 			HTLR C 2
-			HTLR D 1 T_Chase
+			HTLR D 1 NOP T_Chase
 			loop
 		Missile:
 			HTLR E 15
-			HTLR FGFGF 5 T_Shoot
+			HTLR F 5
+			HTLR GFGF 5 T_Shoot
+			HTLR F 0 T_Shoot
 			goto See
 		Death:
-			HTLR A .5 A_DeathScream
-			HTLR A 70
-			HTLR H 5 A_Slurpie
-			HTLR IJKLMNO 5
+			HTLR A .5
+			HTLR A 70 A_DeathScream
+			HTLR H 5
+			HTLR I 5 A_Slurpie
+			HTLR JKLMNO 5
 			HTLR P -1 A_StartDeathCam
 			stop
 	}
@@ -1124,15 +1139,15 @@ actor BJRun
 	states
 	{
 		Spawn:
-			BLAZ A 6 T_BJRun
+			BLAZ A 6 NOP T_BJRun
 			BLAZ A 1.5
-			BLAZ B 4 T_BJRun
-			BLAZ C 6 T_BJRun
+			BLAZ B 4 NOP T_BJRun
+			BLAZ C 6 NOP T_BJRun
 			BLAZ C 1.5
-			BLAZ D 4 T_BJRun
+			BLAZ D 4 NOP T_BJRun
 			loop
 		Death:
-			BLAZ EFG 7 T_BJJump
+			BLAZ EFG 7 NOP T_BJJump
 			BLAZ H 150 T_BJDone
 			stop
 	}

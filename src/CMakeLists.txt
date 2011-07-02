@@ -76,6 +76,7 @@ add_executable(ecwolf
 	textures/texturemanager.cpp
 	textures/tgatexture.cpp
 	textures/warptexture.cpp
+	textures/wolfrawtexture.cpp
 	textures/wolfshapetexture.cpp
 	colormatcher.cpp
 	config.cpp
