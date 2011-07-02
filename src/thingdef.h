@@ -94,6 +94,8 @@ struct Frame
 		ActionPtr	action;
 		ActionPtr	thinker;
 		const Frame	*next;
+
+		unsigned int	spriteInf;
 };
 
 #define DECLARE_NATIVE_CLASS(name, parent) \
@@ -144,6 +146,7 @@ class AActor
 		short       ticcount;
 		classtype   obclass;
 		const Frame	*state;
+		unsigned int sprite;
 
 		short       viewx;
 		word        viewheight;

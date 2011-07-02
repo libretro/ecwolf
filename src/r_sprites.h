@@ -38,6 +38,14 @@
 #include "thingdef.h"
 #include "zstring.h"
 
+enum SpecialSprites
+{
+	SPR_NONE,
+
+	NUM_SPECIAL_SPRITES
+};
+
+unsigned int R_GetSprite(const char* spr);
 void R_InitSprites();
 void R_LoadSprite(const FString &name);
 

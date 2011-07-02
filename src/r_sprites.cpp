@@ -65,6 +65,47 @@ struct Sprite
 TArray<Sprite> spriteFrames;
 TArray<SpriteInfo> loadedSprites;
 
+// Cache sprite name lookups
+unsigned int R_GetSprite(const char* spr)
+{
+	static unsigned int mid = 0;
+
+	union
+	{
+		char 		name[4];
+		uint32_t	iname;
+	} tmp;
+	memcpy(tmp.name, spr, 4);
+
+	if(tmp.iname == loadedSprites[mid].iname)
+		return mid;
+
+	for(mid = 0;mid < NUM_SPECIAL_SPRITES;++mid)
+	{
+		if(tmp.iname == loadedSprites[mid].iname)
+			return mid;
+	}
+
+	unsigned int max = loadedSprites.Size()-1;
+	unsigned int min = NUM_SPECIAL_SPRITES;
+	mid = (min+max)/2;
+	do
+	{
+		if(tmp.iname == loadedSprites[mid].iname)
+			return mid;
+
+		if(tmp.iname < loadedSprites[mid].iname)
+			max = mid-1;
+		else if(tmp.iname > loadedSprites[mid].iname)
+			min = mid+1;
+		mid = (min+max)/2;
+	}
+	while(max >= min);
+
+	// I don't think this should ever happen, but if it does return no sprite.
+	return 0;
+}
+
 void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 {
 	if(dir < -1 || dir >= 8)
@@ -101,7 +142,7 @@ void R_InitSprites()
 	static const uint8_t MAX_SPRITE_FRAMES = 29; // A-Z, [, \, ]
 
 	// First sort the loaded sprites list
-	qsort(&loadedSprites[0], loadedSprites.Size(), sizeof(loadedSprites[0]), SpriteCompare);
+	qsort(&loadedSprites[NUM_SPECIAL_SPRITES], loadedSprites.Size()-NUM_SPECIAL_SPRITES, sizeof(loadedSprites[0]), SpriteCompare);
 
 	typedef LinkedList<FTexture*> SpritesList;
 	typedef TMap<uint32_t, SpritesList> SpritesMap;
@@ -120,7 +161,7 @@ void R_InitSprites()
 	}
 
 	// Now process the sprites if we need to load them
-	for(unsigned int i = 0;i < loadedSprites.Size();++i)
+	for(unsigned int i = NUM_SPECIAL_SPRITES;i < loadedSprites.Size();++i)
 	{
 		SpritesList &list = spritesMap[loadedSprites[i].iname];
 		if(list.Size() == 0)
@@ -184,6 +225,15 @@ void R_InitSprites()
 
 void R_LoadSprite(const FString &name)
 {
+	if(loadedSprites.Size() == 0)
+	{
+		// Make sure the special sprites are loaded
+		SpriteInfo sprInf;
+		sprInf.frames = 0;
+		strcpy(sprInf.name, "TNT1");
+		loadedSprites.Push(sprInf);
+	}
+
 	if(name.Len() != 4)
 	{
 		printf("Sprite name invalid.\n");
@@ -224,36 +274,10 @@ extern unsigned vbufPitch;
 
 void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
 {
-	static const SpriteInfo *sprInf = NULL;
+	if(actor->sprite == SPR_NONE)
+		return;
 
-	if(sprInf == NULL || sprInf->iname != frame->isprite)
-	{
-		sprInf = NULL;
-		// Look up sprite
-		unsigned int max = loadedSprites.Size()-1;
-		unsigned int min = 0;
-		unsigned int mid = max/2;
-		do
-		{
-			if(loadedSprites[mid].iname == frame->isprite)
-			{
-				sprInf = &loadedSprites[mid];
-				break;
-			}
-
-			if(loadedSprites[mid].iname > frame->isprite)
-				max = mid-1;
-			else if(loadedSprites[mid].iname < frame->isprite)
-				min = mid+1;
-			mid = (max+min)/2;
-		}
-		while(max >= min);
-
-		if(sprInf == NULL)
-			return;
-	}
-
-	const Sprite &spr = spriteFrames[sprInf->frames+frame->frame];
+	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
 	FTexture *tex;
 	if(spr.rotations == 0)
 		tex = TexMan[spr.texture[0]];

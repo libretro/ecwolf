@@ -138,8 +138,6 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 
 		for(int i = 0;i < thisStateDef.frames.Len();i++)
 		{
-			R_LoadSprite(thisStateDef.sprite);
-
 			thisFrame = new Frame();
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
@@ -152,6 +150,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
+			thisFrame->spriteInf = 0;
 			if(i == thisStateDef.frames.Len()-1) // Handle nextType
 			{
 				if(thisStateDef.nextType == StateDefinition::WAIT)
@@ -217,6 +216,15 @@ void ClassDef::LoadActors()
 	DumpClasses();
 
 	R_InitSprites();
+
+	TMap<FName, ClassDef *>::Iterator iter(classTable);
+	TMap<FName, ClassDef *>::Pair *pair;
+	while(iter.NextPair(pair))
+	{
+		ClassDef * const cls = pair->Value;
+		for(unsigned int i = 0;i < cls->frameList.Size();++i)
+			cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
+	}
 }
 
 void ClassDef::ParseActor(Scanner &sc)
@@ -322,8 +330,9 @@ void ClassDef::ParseActor(Scanner &sc)
 					{
 						infiniteLoopProtection = false;
 						if(invalidSprite) // We now know this is a frame so check sprite length
-							sc.ScriptMessage(Scanner::ERROR, "Frame must be exactly 4 characters long.");
+							sc.ScriptMessage(Scanner::ERROR, "Sprite name must be exactly 4 characters long.");
 
+						R_LoadSprite(thisState.sprite);
 						thisState.frames = sc->str;
 						if(sc.CheckToken('-'))
 						{
@@ -717,6 +726,7 @@ void AActor::Init(bool nothink)
 void AActor::SetState(const Frame *state, bool notic)
 {
 	this->state = state;
+	sprite = state->spriteInf;
 	ticcount = state->duration;
 	if(!notic && state->action)
 		state->action(this);
