@@ -200,137 +200,93 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 
 bool TryWalk (AActor *ob)
 {
-	if (ob->obclass == inertobj)
+	switch (ob->dir)
 	{
-		switch (ob->dir)
-		{
-			case north:
-				ob->tiley--;
-				break;
-
-			case northeast:
-				ob->tilex++;
-				ob->tiley--;
-				break;
-
-			case east:
-				ob->tilex++;
-				break;
-
-			case southeast:
-				ob->tilex++;
-				ob->tiley++;
-				break;
-
-			case south:
-				ob->tiley++;
-				break;
-
-			case southwest:
-				ob->tilex--;
-				ob->tiley++;
-				break;
-
-			case west:
-				ob->tilex--;
-				break;
-
-			case northwest:
-				ob->tilex--;
-				ob->tiley--;
-				break;
-		}
-	}
-	else
-	{
-		switch (ob->dir)
-		{
-			case north:
-				if (!(ob->flags & FL_ISMONSTER))
-				{
-					CHECKDIAG(ob->tilex,ob->tiley-1);
-				}
-				else
-				{
-					CHECKSIDE(ob->tilex,ob->tiley-1,MapTrigger::South);
-				}
-				ob->tiley--;
-				break;
-
-			case northeast:
-				CHECKDIAG(ob->tilex+1,ob->tiley-1);
-				CHECKDIAG(ob->tilex+1,ob->tiley);
+		case north:
+			if (!(ob->flags & FL_CANUSEWALLS))
+			{
 				CHECKDIAG(ob->tilex,ob->tiley-1);
-				ob->tilex++;
-				ob->tiley--;
-				break;
+			}
+			else
+			{
+				CHECKSIDE(ob->tilex,ob->tiley-1,MapTrigger::South);
+			}
+			ob->tiley--;
+			break;
 
-			case east:
-				if (!(ob->flags & FL_ISMONSTER))
-				{
-					CHECKDIAG(ob->tilex+1,ob->tiley);
-				}
-				else
-				{
-					CHECKSIDE(ob->tilex+1,ob->tiley,MapTrigger::West);
-				}
-				ob->tilex++;
-				break;
+		case northeast:
+			CHECKDIAG(ob->tilex+1,ob->tiley-1);
+			CHECKDIAG(ob->tilex+1,ob->tiley);
+			CHECKDIAG(ob->tilex,ob->tiley-1);
+			ob->tilex++;
+			ob->tiley--;
+			break;
 
-			case southeast:
-				CHECKDIAG(ob->tilex+1,ob->tiley+1);
+		case east:
+			if (!(ob->flags & FL_CANUSEWALLS))
+			{
 				CHECKDIAG(ob->tilex+1,ob->tiley);
+			}
+			else
+			{
+				CHECKSIDE(ob->tilex+1,ob->tiley,MapTrigger::West);
+			}
+			ob->tilex++;
+			break;
+
+		case southeast:
+			CHECKDIAG(ob->tilex+1,ob->tiley+1);
+			CHECKDIAG(ob->tilex+1,ob->tiley);
+			CHECKDIAG(ob->tilex,ob->tiley+1);
+			ob->tilex++;
+			ob->tiley++;
+			break;
+
+		case south:
+			if (!(ob->flags & FL_CANUSEWALLS))
+			{
 				CHECKDIAG(ob->tilex,ob->tiley+1);
-				ob->tilex++;
-				ob->tiley++;
-				break;
+			}
+			else
+			{
+				CHECKSIDE(ob->tilex,ob->tiley+1,MapTrigger::North);
+			}
+			ob->tiley++;
+			break;
 
-			case south:
-				if (!(ob->flags & FL_ISMONSTER))
-				{
-					CHECKDIAG(ob->tilex,ob->tiley+1);
-				}
-				else
-				{
-					CHECKSIDE(ob->tilex,ob->tiley+1,MapTrigger::North);
-				}
-				ob->tiley++;
-				break;
+		case southwest:
+			CHECKDIAG(ob->tilex-1,ob->tiley+1);
+			CHECKDIAG(ob->tilex-1,ob->tiley);
+			CHECKDIAG(ob->tilex,ob->tiley+1);
+			ob->tilex--;
+			ob->tiley++;
+			break;
 
-			case southwest:
-				CHECKDIAG(ob->tilex-1,ob->tiley+1);
+		case west:
+			if (!(ob->flags & FL_CANUSEWALLS))
+			{
 				CHECKDIAG(ob->tilex-1,ob->tiley);
-				CHECKDIAG(ob->tilex,ob->tiley+1);
-				ob->tilex--;
-				ob->tiley++;
-				break;
+			}
+			else
+			{
+				CHECKSIDE(ob->tilex-1,ob->tiley,MapTrigger::East);
+			}
+			ob->tilex--;
+			break;
 
-			case west:
-				if (!(ob->flags & FL_ISMONSTER))
-				{
-					CHECKDIAG(ob->tilex-1,ob->tiley);
-				}
-				else
-				{
-					CHECKSIDE(ob->tilex-1,ob->tiley,MapTrigger::East);
-				}
-				ob->tilex--;
-				break;
+		case northwest:
+			CHECKDIAG(ob->tilex-1,ob->tiley-1);
+			CHECKDIAG(ob->tilex-1,ob->tiley);
+			CHECKDIAG(ob->tilex,ob->tiley-1);
+			ob->tilex--;
+			ob->tiley--;
+			break;
 
-			case northwest:
-				CHECKDIAG(ob->tilex-1,ob->tiley-1);
-				CHECKDIAG(ob->tilex-1,ob->tiley);
-				CHECKDIAG(ob->tilex,ob->tiley-1);
-				ob->tilex--;
-				ob->tiley--;
-				break;
+		case nodir:
+			return false;
 
-			case nodir:
-				return false;
-
-			default:
-				Quit ("Walk: Bad dir");
-		}
+		default:
+			Quit ("Walk: Bad dir");
 	}
 
 	ob->EnterZone(map->GetSpot(ob->tilex, ob->tiley, 0)->zone);
@@ -1287,9 +1243,8 @@ boolean CheckSight (objtype *ob)
 
 void FirstSighting (AActor *ob)
 {
-	const Frame * const see = ob->FindState("See");
-	if(see)
-		ob->SetState(see);
+	if(ob->SeeState)
+		ob->SetState(ob->SeeState);
 
 	PlaySoundLocActor(ob->seesound, ob);
 	ob->speed = ob->runspeed;

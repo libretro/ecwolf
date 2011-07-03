@@ -51,6 +51,7 @@ const FlagDef flags[] =
 	DEFINE_FLAG(FL, AMBUSH, AActor, flags),
 	DEFINE_FLAG(FL, ATTACKMODE, AActor, flags),
 	DEFINE_FLAG(FL, BONUS, AActor, flags),
+	DEFINE_FLAG(FL, CANUSEWALLS, AActor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, AActor, flags),
 	DEFINE_FLAG(FL, FULLBRIGHT, AActor, flags),
 	DEFINE_FLAG(FL, ISMONSTER, AActor, flags),
@@ -80,6 +81,17 @@ ClassDef::~ClassDef()
 
 AActor *ClassDef::CreateInstance() const
 {
+	if(!defaultInstance->SpawnState)
+	{
+		defaultInstance->DeathState = FindState("Death");
+		defaultInstance->MeleeState = FindState("Melee");
+		defaultInstance->MissileState = FindState("Missile");
+		defaultInstance->PainState = FindState("Pain");
+		defaultInstance->PathState = FindState("Path");
+		defaultInstance->SpawnState = FindState("Spawn");
+		defaultInstance->SeeState = FindState("See");
+	}
+
 	AActor *newactor = defaultInstance->__NewNativeInstance(this);
 	*newactor = *defaultInstance;
 	newactor->Init();
@@ -514,78 +526,81 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 			bool done = false;
 			const char* p = properties[mid].params;
 			unsigned int paramc = 0;
-			do
+			if(*p != 0)
 			{
-				if(*p != 0)
+				do
 				{
-					while(*p == '_') // Optional
+					if(*p != 0)
 					{
-						optional = true;
+						while(*p == '_') // Optional
+						{
+							optional = true;
+							p++;
+						}
+
+						bool negate = false;
+						params[paramc].i = 0; // Try to default to 0
+
+						switch(*p)
+						{
+							case 'K':
+								if(!optional)
+									sc.MustGetToken(TK_Identifier);
+								else if(!sc.CheckToken(TK_Identifier))
+								{
+									done = true;
+									break;
+								}
+								params[paramc].s = new char[sc->str.Len()+1];
+								strcpy(params[paramc].s, sc->str);
+								break;
+							default:
+							case 'I':
+								if(sc.CheckToken('-'))
+									negate = true;
+
+								if(!optional) // Float also includes integers
+									sc.MustGetToken(TK_FloatConst);
+								else if(!sc.CheckToken(TK_FloatConst))
+								{
+									done = true;
+									break;
+								}
+								params[paramc].i = (negate ? -1 : 1) * static_cast<int64_t> (sc->decimal);
+								break;
+							case 'F':
+								if(sc.CheckToken('-'))
+									negate = true;
+
+								if(!optional)
+									sc.MustGetToken(TK_FloatConst);
+								else if(!sc.CheckToken(TK_FloatConst))
+								{
+									done = true;
+									break;
+								}
+								params[paramc].f = (negate ? -1 : 1) * sc->number;
+								break;
+							case 'S':
+								if(!optional)
+									sc.MustGetToken(TK_StringConst);
+								else if(!sc.CheckToken(TK_StringConst))
+								{
+									done = true;
+									break;
+								}
+								params[paramc].s = new char[sc->str.Len()+1];
+								strcpy(params[paramc].s, sc->str);
+								break;
+						}
+						paramc++;
 						p++;
 					}
-
-					bool negate = false;
-					params[paramc].i = 0; // Try to default to 0
-
-					switch(*p)
-					{
-						case 'K':
-							if(!optional)
-								sc.MustGetToken(TK_Identifier);
-							else if(!sc.CheckToken(TK_Identifier))
-							{
-								done = true;
-								break;
-							}
-							params[paramc].s = new char[sc->str.Len()+1];
-							strcpy(params[paramc].s, sc->str);
-							break;
-						default:
-						case 'I':
-							if(sc.CheckToken('-'))
-								negate = true;
-
-							if(!optional) // Float also includes integers
-								sc.MustGetToken(TK_FloatConst);
-							else if(!sc.CheckToken(TK_FloatConst))
-							{
-								done = true;
-								break;
-							}
-							params[paramc].i = (negate ? -1 : 1) * static_cast<int64_t> (sc->decimal);
-							break;
-						case 'F':
-							if(sc.CheckToken('-'))
-								negate = true;
-
-							if(!optional)
-								sc.MustGetToken(TK_FloatConst);
-							else if(!sc.CheckToken(TK_FloatConst))
-							{
-								done = true;
-								break;
-							}
-							params[paramc].f = (negate ? -1 : 1) * sc->number;
-							break;
-						case 'S':
-							if(!optional)
-								sc.MustGetToken(TK_StringConst);
-							else if(!sc.CheckToken(TK_StringConst))
-							{
-								done = true;
-								break;
-							}
-							params[paramc].s = new char[sc->str.Len()+1];
-							strcpy(params[paramc].s, sc->str);
-							break;
-					}
-					paramc++;
-					p++;
+					else
+						sc.GetNextToken();
 				}
-				else
-					sc.GetNextToken();
+				while(sc.CheckToken(','));
 			}
-			while(sc.CheckToken(','));
 			if(!optional && *p != 0 && *p != '_')
 				sc.ScriptMessage(Scanner::ERROR, "Not enough parameters.");
 
@@ -670,7 +685,8 @@ IMPLEMENT_THINKER(AActorProxy)
 LinkedList<AActor *> AActor::actors;
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
-AActor::AActor(const ClassDef *type) : classType(type), flags(0), dir(nodir), soundZone(NULL)
+AActor::AActor(const ClassDef *type) : classType(type), flags(0), distance(0),
+	dir(nodir), soundZone(NULL), SpawnState(NULL)
 {
 }
 
@@ -688,9 +704,8 @@ void AActor::Destroy()
 
 void AActor::Die()
 {
-	const Frame *death = FindState("Death");
-	if(death)
-		SetState(death);
+	if(DeathState)
+		SetState(DeathState);
 	else
 		Destroy();
 }
@@ -713,7 +728,13 @@ void AActor::Init(bool nothink)
 		actorRef = actors.Push(this);
 		thinker = new AActorProxy(this);
 
-		SetState(FindState("Spawn"), true);
+		if(SpawnState)
+			SetState(SpawnState, true);
+		else
+		{
+			state = NULL;
+			Destroy();
+		}
 	}
 	else
 	{
@@ -725,6 +746,9 @@ void AActor::Init(bool nothink)
 
 void AActor::SetState(const Frame *state, bool notic)
 {
+	if(state == NULL)
+		return;
+
 	this->state = state;
 	sprite = state->spriteInf;
 	ticcount = state->duration;

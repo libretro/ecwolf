@@ -367,112 +367,9 @@ void T_Projectile (AActor *ob)
 ==================
 */
 
-void A_DeathScream (objtype *ob)
+ACTION_FUNCTION(A_DeathScream)
 {
-#ifndef UPLOAD
-#ifndef SPEAR
-	if (mapon==9 && !US_RndT())
-#else
-	if ((mapon==18 || mapon==19) && !US_RndT())
-#endif
-	{
-		switch(ob->obclass)
-		{
-			case mutantobj:
-			case guardobj:
-			case officerobj:
-			case ssobj:
-			case dogobj:
-				PlaySoundLocActor("guard/death6",ob);
-				return;
-		}
-	}
-#endif
-
-	switch (ob->obclass)
-	{
-		case mutantobj:
-			PlaySoundLocActor("mutant/death",ob);
-			break;
-
-		case guardobj:
-		{
-			const char* sounds[9]={ "guard/death1",
-				"guard/death2",
-				"guard/death3",
-#ifndef APOGEE_1_0
-				"guard/death4",
-				"guard/death5",
-				"guard/death7",
-				"guard/death8",
-				"guard/death9"
-#endif
-			};
-
-#ifndef UPLOAD
-			PlaySoundLocActor(sounds[US_RndT()%8],ob);
-#else
-			PlaySoundLocActor(sounds[US_RndT()%2],ob);
-#endif
-			break;
-		}
-		case officerobj:
-			PlaySoundLocActor("officer/death",ob);
-			break;
-		case ssobj:
-			PlaySoundLocActor("wolfss/death",ob); // JAB
-			break;
-		case dogobj:
-			PlaySoundLocActor("dog/death",ob);      // JAB
-			break;
-#ifndef SPEAR
-		case bossobj:
-			SD_PlaySound("hans/death");                         // JAB
-			break;
-		case schabbobj:
-			SD_PlaySound("schabbs/death");
-			break;
-		case fakeobj:
-			SD_PlaySound("fake/death");
-			break;
-		case mechahitlerobj:
-			SD_PlaySound("hitler/mechadeath");
-			break;
-		case realhitlerobj:
-			SD_PlaySound("hitler/death");
-			break;
-#ifndef APOGEE_1_0
-		case gretelobj:
-			SD_PlaySound("gretel/death");
-			break;
-		case giftobj:
-			SD_PlaySound("gift/death");
-			break;
-		case fatobj:
-			SD_PlaySound("fat/death");
-			break;
-#endif
-#else
-		case spectreobj:
-			SD_PlaySound("ghost/fade");
-			break;
-		case angelobj:
-			SD_PlaySound("angel/death");
-			break;
-		case transobj:
-			SD_PlaySound("trans/death");
-			break;
-		case uberobj:
-			SD_PlaySound("uber/death");
-			break;
-		case willobj:
-			SD_PlaySound("wilhelm/death");
-			break;
-		case deathobj:
-			SD_PlaySound("deathknight/death");
-			break;
-#endif
-	}
+	PlaySoundLocActor(self->deathsound, self);
 }
 
 
@@ -534,9 +431,8 @@ void T_Will (objtype *ob)
 		ob->hidden = false;
 		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
 		{
-			const Frame *attack = ob->FindState("Missile");
-			if(attack != NULL)
-				ob->SetState(attack);
+			if(ob->MissileState)
+				ob->SetState(ob->MissileState);
 			return;
 		}
 		dodge = true;
@@ -1335,50 +1231,52 @@ CHASE
 
 ACTION_FUNCTION(T_Chase)
 {
-	int32_t move,target;
-	int     dx,dy,dist,chance;
-	boolean dodge;
+	int32_t	move,target;
+	int		dx,dy,dist,chance;
+	bool	dodge = true;
 
 	if (gamestate.victoryflag)
 		return;
 
-	dodge = false;
-	if (CheckLine(self))      // got a shot at player?
+	if(self->MissileState)
 	{
-		self->hidden = false;
-		dx = abs(self->tilex - player->tilex);
-		dy = abs(self->tiley - player->tiley);
-		dist = dx>dy ? dx : dy;
-
+		dodge = false;
+		if (CheckLine(self))      // got a shot at player?
 		{
-			if (dist)
-				chance = (tics<<4)/dist;
-			else
-				chance = 300;
+			self->hidden = false;
+			dx = abs(self->tilex - player->tilex);
+			dy = abs(self->tiley - player->tiley);
+			dist = dx>dy ? dx : dy;
 
-			if (dist == 1)
 			{
-				target = abs(self->x - player->x);
-				if (target < 0x14000l)
+				if (dist)
+					chance = (tics<<4)/dist;
+				else
+					chance = 300;
+
+				if (dist == 1)
 				{
-					target = abs(self->y - player->y);
+					target = abs(self->x - player->x);
 					if (target < 0x14000l)
-						chance = 300;
+					{
+						target = abs(self->y - player->y);
+						if (target < 0x14000l)
+							chance = 300;
+					}
 				}
 			}
-		}
 
-		if ( US_RndT()<chance)
-		{
-			const Frame *attack = self->FindState("Missile");
-			if(attack != NULL)
-				self->SetState(attack);
-			return;
+			if ( US_RndT()<chance)
+			{
+				if(self->MissileState)
+					self->SetState(self->MissileState);
+				return;
+			}
+			dodge = true;
 		}
-		dodge = true;
+		else
+			self->hidden = true;
 	}
-	else
-		self->hidden = true;
 
 	if (self->dir == nodir)
 	{
@@ -1396,6 +1294,23 @@ ACTION_FUNCTION(T_Chase)
 	{
 		if (CheckDoorMovement(self))
 			return;
+
+		//
+		// check for melee range
+		//
+		if(self->MeleeState)
+		{
+			dx = abs(player->x - self->x);
+			if (dx <= MINACTORDIST)
+			{
+				dy = abs(player->y - self->y);
+				if (dy <= MINACTORDIST)
+				{
+					self->SetState(self->MeleeState);
+					return;
+				}
+			}
+		}
 
 		if (move < self->distance)
 		{
@@ -1473,77 +1388,6 @@ void T_Ghosts (objtype *ob)
 			return;                                                 // object is blocked in
 	}
 }
-
-/*
-=================
-=
-= T_DogChase
-=
-=================
-*/
-#if 0
-void T_DogChase (objtype *ob)
-{
-	int32_t    move;
-	int32_t    dx,dy;
-
-
-	if (ob->dir == nodir)
-	{
-		SelectDodgeDir (ob);
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		//
-		// check for byte range
-		//
-		dx = player->x - ob->x;
-		if (dx<0)
-			dx = -dx;
-		dx -= move;
-		if (dx <= MINACTORDIST)
-		{
-			dy = player->y - ob->y;
-			if (dy<0)
-				dy = -dy;
-			dy -= move;
-			if (dy <= MINACTORDIST)
-			{
-				NewState (ob,&s_dogjump1);
-				return;
-			}
-		}
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		SelectDodgeDir (ob);
-
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-}
-#endif
 
 
 
@@ -1708,35 +1552,7 @@ ACTION_FUNCTION(T_Shoot)
 		}
 	}
 
-#if 0
-	switch(ob->obclass)
-	{
-		case ssobj:
-			PlaySoundLocActor("wolfss/attack",ob);
-			break;
-#ifndef SPEAR
-#ifndef APOGEE_1_0
-		case giftobj:
-		case fatobj:
-			PlaySoundLocActor("missile/fire",ob);
-			break;
-#endif
-		case mechahitlerobj:
-		case realhitlerobj:
-		case bossobj:
-			PlaySoundLocActorBoss("hans/attack",ob);
-			break;
-		case schabbobj:
-			PlaySoundLocActor("schabbs/throw",ob);
-			break;
-		case fakeobj:
-			PlaySoundLocActor("fake/attack",ob);
-			break;
-#endif
-		default:
-			PlaySoundLocActor("guard/attack",ob);
-	}
-#endif
+	PlaySoundLocActor(self->attacksound, self);
 }
 void T_Shoot(AActor *self) { __AF_T_Shoot(self); }
 

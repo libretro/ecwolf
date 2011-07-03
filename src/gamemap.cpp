@@ -212,9 +212,8 @@ void GameMap::SpawnThings() const
 				actor->flags |= FL_AMBUSH;
 			if(thing.patrol)
 			{
-				const Frame * const path = actor->FindState("Path");
-				if(path)
-					actor->SetState(path, true);
+				if(actor->PathState)
+					actor->SetState(actor->PathState, true);
 			}
 
 			actorat[thing.x>>FRACBITS][thing.y>>FRACBITS] = actor;

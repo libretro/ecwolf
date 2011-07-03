@@ -1416,11 +1416,10 @@ ACTION_FUNCTION(T_Attack)
 	while (gamestate.attackcount <= 0)
 	{
 		cur = &attackinfo[gamestate.weapon][gamestate.attackframe];
-		static const Frame * const spawn = player->FindState("Spawn");
 		switch (cur->attack)
 		{
 			case -1:
-				player->SetState(spawn);
+				player->SetState(player->SpawnState);
 				if (!gamestate.ammo)
 				{
 					gamestate.weapon = wp_knife;

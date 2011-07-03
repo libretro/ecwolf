@@ -1,6 +1,8 @@
 actor Actor native
 {
+	health 1000
 	sighttime 1
+	speed 0
 	states
 	{
 		Spawn:
@@ -554,9 +556,10 @@ actor Guard 11
 	health 25
 	speed 1, 3
 	sighttime 1, 4
+	attacksound "guard/attack"
+	deathsound "guard/death"
 	seesound "guard/sight"
-	+SHOOTABLE
-	+ISMONSTER
+	MONSTER
 	states
 	{
 		Spawn:
@@ -654,10 +657,13 @@ actor Clyde 30
 actor Dog 14
 {
 	health 1
+	speed 2.93, 5.859
 	sighttime 2.93, 5.859
+	attacksound "dog/attack"
+	deathsound "dog/death"
 	seesound "dog/sight"
-	+SHOOTABLE
-	+ISMONSTER
+	MONSTER
+	-CANUSEWALLS
 	states
 	{
 		Spawn:
@@ -675,12 +681,12 @@ actor Dog 14
 			DOGY EA 5
 			goto See
 		See:
-			DOGY A 5 NOP T_DogChase
+			DOGY A 5 NOP T_Chase
 			DOGY A 1.5
-			DOGY B 4 NOP T_DogChase
-			DOGY C 5 NOP T_DogChase
+			DOGY B 4 NOP T_Chase
+			DOGY C 5 NOP T_Chase
 			DOGY C 1.5
-			DOGY D 4 NOP T_DogChase
+			DOGY D 4 NOP T_Chase
 			loop
 		Death:
 			DOGY H 7.5 A_DeathScream
@@ -695,9 +701,10 @@ actor Officer 12
 	health 50
 	speed 1, 5
 	sighttime 2
+	attacksound "officer/attack"
+	deathsound "officer/death"
 	seesound "officer/sight"
-	+SHOOTABLE
-	+ISMONSTER
+	MONSTER
 	states
 	{
 		Spawn:
@@ -744,8 +751,9 @@ actor Mutant 15
 	health 45, 55, 55, 65
 	speed 1, 3
 	sighttime 1, 6
-	+SHOOTABLE
-	+ISMONSTER
+	attacksound "mutant/attack"
+	deathsound "mutant/death"
+	MONSTER
 	states
 	{
 		Spawn:
@@ -787,9 +795,10 @@ actor WolfensteinSS 13 // ZDoom compatible name
 	health 100
 	speed 1, 4
 	sighttime 1, 6
+	attacksound "wolfss/attack"
+	deathsound "wolfss/death"
 	seesound "wolfss/sight"
-	+SHOOTABLE
-	+ISMONSTER
+	MONSTER
 	states
 	{
 		Spawn:
@@ -802,6 +811,14 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			SSWV C 10 NOP T_Path
 			SSWV C 2.5
 			SSWV D 7.5 NOP T_Path
+			loop
+		See:
+			SSWV A 5 NOP T_Chase
+			SSWV A 1.5
+			SSWV B 4 NOP T_Chase
+			SSWV C 5 NOP T_Chase
+			SSWV C 1.5
+			SSWV D 4 NOP T_Chase
 			loop
 		Pain:
 			SSWV H 5
@@ -833,10 +850,11 @@ actor Hans 16
 {
 	health 850, 950, 1050, 1200
 	speed 1, 3
+	attacksound "hans/attack"
+	deathsound "hans/death"
 	seesound "hans/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -868,10 +886,11 @@ actor Gretel 20
 {
 	health 850, 950, 1050, 1200
 	speed 1, 3
+	attacksound "gretel/attack"
+	deathsound "gretel/death"
 	seesound "gretel/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -914,10 +933,11 @@ actor Schabbs 17
 {
 	health 850, 950, 1550, 2400
 	speed 1, 3
+	attacksound "schabbs/throw"
+	deathsound "schabbs/death"
 	seesound "schabbs/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -949,10 +969,11 @@ actor Gift 21
 {
 	health 850, 950, 1050, 120
 	speed 1, 3
+	attacksound "missile/fire"
+	deathsound "gift/death"
 	seesound "gift/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -984,10 +1005,11 @@ actor FatFace 22
 {
 	health 850, 950, 1050, 120
 	speed 1, 3
+	attacksound "missile/fire"
+	deathsound "fat/death"
 	seesound "fat/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -1021,10 +1043,10 @@ actor FakeHitler 18
 {
 	health 200, 300, 400, 500
 	speed 1, 3
+	deathsound "fake/death"
 	seesound "fake/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -1066,10 +1088,11 @@ actor MechaHitler 19
 {
 	health 850, 950, 1050, 1200
 	speed 1, 3
+	attacksound "hitler/attack"
+	deathsound "hitler/mechadeath"
 	seesound "hitler/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:
@@ -1102,10 +1125,11 @@ actor Hitler
 {
 	health 500, 700, 800, 900
 	speed 1, 5
+	attacksound "hitler/attack"
+	deathsound "hitler/death"
 	seesound "hitler/sight"
-	+SHOOTABLE
+	MONSTER
 	+AMBUSH
-	+ISMONSTER
 	states
 	{
 		Spawn:

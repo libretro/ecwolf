@@ -154,8 +154,9 @@ class AActor
 
 		uint16_t	sighttime;
 		uint8_t		sightrandom;
-		FName		seesound;
+		FName		attacksound, deathsound, seesound;
 
+		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState, *DeathState;
 		short       temp1,hidden;
 
 		typedef LinkedList<AActor *>::Node Iterator;
@@ -204,7 +205,7 @@ struct PropDef
 		const char* const		params;
 		PropHandler				handler;
 };
-#define NUM_PROPERTIES 4
+#define NUM_PROPERTIES 7
 
 class ClassDef
 {

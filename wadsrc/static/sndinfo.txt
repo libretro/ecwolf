@@ -90,6 +90,7 @@ hitler/mechadeath		{ DSHITSHI ALHITSHI PCHITSHI }
 gift/sight				{ DSOTOSIT ALOTOSIT PCOTOSIT }
 gift/death				{ DSOTODTH ALOTODTH PCOTODTH }
 
+gretel/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
 gretel/sight			{ DSGRTSIT ALGRTSIT PCGRTSIT }
 gretel/death			{ DSGRTDTH ALGRTDTH PCGRTDTH }
 

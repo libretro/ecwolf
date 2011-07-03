@@ -38,6 +38,18 @@
 #define FLOAT_PARAM(var, no) double var = params[no].f;
 #define STRING_PARAM(var, no) const char* var = params[no].s;
 
+HANDLE_PROPERTY(attacksound)
+{
+	STRING_PARAM(snd, 0);
+	defaults->attacksound = snd;
+}
+
+HANDLE_PROPERTY(deathsound)
+{
+	STRING_PARAM(snd, 0);
+	defaults->deathsound = snd;
+}
+
 HANDLE_PROPERTY(health)
 {
 	INT_PARAM(health, 0);
@@ -95,10 +107,22 @@ HANDLE_PROPERTY(speed)
 		defaults->runspeed = defaults->speed;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+HANDLE_PROPERTY(MONSTER)
+{
+	defaults->flags |= FL_ISMONSTER|FL_SHOOTABLE|FL_CANUSEWALLS;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 #define DEFINE_PROP(name, class, params) { class::__StaticClass, #name, #params, __Handler_##name }
 extern const PropDef properties[NUM_PROPERTIES] =
 {
+	DEFINE_PROP(attacksound, AActor, S),
+	DEFINE_PROP(deathsound, AActor, S),
 	DEFINE_PROP(health, AActor, I_IIIIIIII),
+	DEFINE_PROP(MONSTER, AActor,),
 	DEFINE_PROP(seesound, AActor, S),
 	DEFINE_PROP(sighttime, AActor, I_I),
 	DEFINE_PROP(speed, AActor, F_F)

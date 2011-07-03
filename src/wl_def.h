@@ -266,6 +266,7 @@ typedef enum
 	FL_DIR_MASK         = 0x00000e00,
 #endif
 	FL_ISMONSTER        = 0x00001000,
+	FL_CANUSEWALLS		= 0x00002000,
 } objflag_t;
 
 
