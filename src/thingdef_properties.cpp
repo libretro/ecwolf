@@ -107,11 +107,17 @@ HANDLE_PROPERTY(speed)
 		defaults->runspeed = defaults->speed;
 }
 
+HANDLE_PROPERTY(points)
+{
+	INT_PARAM(pts, 0);
+	defaults->points = pts;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 HANDLE_PROPERTY(MONSTER)
 {
-	defaults->flags |= FL_ISMONSTER|FL_SHOOTABLE|FL_CANUSEWALLS;
+	defaults->flags |= FL_ISMONSTER|FL_SHOOTABLE|FL_CANUSEWALLS|FL_COUNTKILL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +129,7 @@ extern const PropDef properties[NUM_PROPERTIES] =
 	DEFINE_PROP(deathsound, AActor, S),
 	DEFINE_PROP(health, AActor, I_IIIIIIII),
 	DEFINE_PROP(MONSTER, AActor,),
+	DEFINE_PROP(points, AActor, I),
 	DEFINE_PROP(seesound, AActor, S),
 	DEFINE_PROP(sighttime, AActor, I_I),
 	DEFINE_PROP(speed, AActor, F_F)

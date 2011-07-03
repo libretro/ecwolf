@@ -1257,9 +1257,9 @@ void    KnifeAttack (objtype *ob)
 
 
 
-void    GunAttack (objtype *ob)
+void GunAttack (AActor *ob)
 {
-	AActor *closest,*oldclosest;
+	AActor *closest=NULL,*oldclosest=NULL;
 	int      damage;
 	int      dx,dy,dist;
 	int32_t  viewdist;
@@ -1306,7 +1306,7 @@ void    GunAttack (objtype *ob)
 		}
 
 		if (closest == oldclosest)
-			return;                                         // no more targets, all missed
+			return; // no more targets, all missed
 
 		//
 		// trace a line from player to enemey

@@ -267,6 +267,7 @@ typedef enum
 #endif
 	FL_ISMONSTER        = 0x00001000,
 	FL_CANUSEWALLS		= 0x00002000,
+	FL_COUNTKILL		= 0x00004000,
 } objflag_t;
 
 
@@ -1147,8 +1148,7 @@ void    SelectRunDir (objtype *ob);
 void    MoveObj (objtype *ob, int32_t move);
 bool SightPlayer (AActor *ob);
 
-void    KillActor (objtype *ob);
-void    DamageActor (objtype *ob, unsigned damage);
+void    DamageActor (AActor *ob, unsigned damage);
 
 boolean CheckLine (objtype *ob);
 boolean CheckSight (objtype *ob);

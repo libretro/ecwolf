@@ -52,6 +52,7 @@ const FlagDef flags[] =
 	DEFINE_FLAG(FL, ATTACKMODE, AActor, flags),
 	DEFINE_FLAG(FL, BONUS, AActor, flags),
 	DEFINE_FLAG(FL, CANUSEWALLS, AActor, flags),
+	DEFINE_FLAG(FL, COUNTKILL, AActor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, AActor, flags),
 	DEFINE_FLAG(FL, FULLBRIGHT, AActor, flags),
 	DEFINE_FLAG(FL, ISMONSTER, AActor, flags),
@@ -704,6 +705,11 @@ void AActor::Destroy()
 
 void AActor::Die()
 {
+	GivePoints(points);
+	if(flags & FL_COUNTKILL)
+		gamestate.killcount++;
+	flags &= ~FL_SHOOTABLE;
+
 	if(DeathState)
 		SetState(DeathState);
 	else
@@ -797,6 +803,9 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);
+
+	if(actor->flags & FL_COUNTKILL)
+		++gamestate.killtotal;
 	return actor;
 }
 

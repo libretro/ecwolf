@@ -50,9 +50,6 @@ void    NewState (objtype *ob, statetype *state);
 bool TryWalk (AActor *ob);
 void    MoveObj (objtype *ob, int32_t move);
 
-void    KillActor (objtype *ob);
-void    DamageActor (objtype *ob, unsigned damage);
-
 boolean CheckLine (objtype *ob);
 void    FirstSighting (AActor *ob);
 boolean CheckSight (objtype *ob);
@@ -774,154 +771,6 @@ void DropItem (wl_stat_t itemtype, int tilex, int tiley)
 }
 
 
-
-/*
-===============
-=
-= KillActor
-=
-===============
-*/
-
-void KillActor (objtype *ob)
-{
-	ob->Die();
-/*	int     tilex,tiley;
-
-	tilex = ob->tilex = (word)(ob->x >> TILESHIFT);         // drop item on center
-	tiley = ob->tiley = (word)(ob->y >> TILESHIFT);
-
-	switch (ob->obclass)
-	{
-		case guardobj:
-			GivePoints (100);
-			NewState (ob,&s_grddie1);
-			PlaceItemType (bo_clip2,tilex,tiley);
-			break;
-
-		case officerobj:
-			GivePoints (400);
-			NewState (ob,&s_ofcdie1);
-			PlaceItemType (bo_clip2,tilex,tiley);
-			break;
-
-		case mutantobj:
-			GivePoints (700);
-			NewState (ob,&s_mutdie1);
-			PlaceItemType (bo_clip2,tilex,tiley);
-			break;
-
-		case ssobj:
-			GivePoints (500);
-			NewState (ob,&s_ssdie1);
-			if (gamestate.bestweapon < wp_machinegun)
-				PlaceItemType (bo_machinegun,tilex,tiley);
-			else
-				PlaceItemType (bo_clip2,tilex,tiley);
-			break;
-
-		case dogobj:
-			GivePoints (200);
-			NewState (ob,&s_dogdie1);
-			break;
-
-#ifndef SPEAR
-		case bossobj:
-			GivePoints (5000);
-			NewState (ob,&s_bossdie1);
-			PlaceItemType (bo_key1,tilex,tiley);
-			break;
-
-		case gretelobj:
-			GivePoints (5000);
-			NewState (ob,&s_greteldie1);
-			PlaceItemType (bo_key1,tilex,tiley);
-			break;
-
-		case giftobj:
-			GivePoints (5000);
-			gamestate.killx = player->x;
-			gamestate.killy = player->y;
-			NewState (ob,&s_giftdie1);
-			break;
-
-		case fatobj:
-			GivePoints (5000);
-			gamestate.killx = player->x;
-			gamestate.killy = player->y;
-			NewState (ob,&s_fatdie1);
-			break;
-
-		case schabbobj:
-			GivePoints (5000);
-			gamestate.killx = player->x;
-			gamestate.killy = player->y;
-			NewState (ob,&s_schabbdie1);
-			break;
-		case fakeobj:
-			GivePoints (2000);
-			NewState (ob,&s_fakedie1);
-			break;
-
-		case mechahitlerobj:
-			GivePoints (5000);
-			NewState (ob,&s_mechadie1);
-			break;
-		case realhitlerobj:
-			GivePoints (5000);
-			gamestate.killx = player->x;
-			gamestate.killy = player->y;
-			NewState (ob,&s_hitlerdie1);
-			break;
-#else
-		case spectreobj:
-			if (ob->flags&FL_BONUS)
-			{
-				GivePoints (200);       // Get points once for each
-				ob->flags &= ~FL_BONUS;
-			}
-			NewState (ob,&s_spectredie1);
-			break;
-
-		case angelobj:
-			GivePoints (5000);
-			NewState (ob,&s_angeldie1);
-			break;
-
-		case transobj:
-			GivePoints (5000);
-			NewState (ob,&s_transdie0);
-			PlaceItemType (bo_key1,tilex,tiley);
-			break;
-
-		case uberobj:
-			GivePoints (5000);
-			NewState (ob,&s_uberdie0);
-			PlaceItemType (bo_key1,tilex,tiley);
-			break;
-
-		case willobj:
-			GivePoints (5000);
-			NewState (ob,&s_willdie1);
-			PlaceItemType (bo_key1,tilex,tiley);
-			break;
-
-		case deathobj:
-			GivePoints (5000);
-			NewState (ob,&s_deathdie1);
-			PlaceItemType (bo_key1,tilex,tiley);
-			break;
-#endif
-	}
-
-	gamestate.killcount++;
-	ob->flags &= ~FL_SHOOTABLE;
-	actorat[ob->tilex][ob->tiley] = NULL;
-	ob->flags |= FL_NONMARK;*/
-}
-
-
-
 /*
 ===================
 =
@@ -935,9 +784,9 @@ void KillActor (objtype *ob)
 ===================
 */
 
-void DamageActor (objtype *ob, unsigned damage)
+void DamageActor (AActor *ob, unsigned damage)
 {
-/*	madenoise = true;
+	madenoise = true;
 
 	//
 	// do double damage if shooting a non attack mode actor
@@ -948,44 +797,15 @@ void DamageActor (objtype *ob, unsigned damage)
 	ob->health -= (short)damage;
 
 	if (ob->health<=0)
-		KillActor (ob);
+		ob->Die();
 	else
 	{
 		if (! (ob->flags & FL_ATTACKMODE) )
 			FirstSighting (ob);             // put into combat mode
 
-		switch (ob->obclass)                // dogs only have one hit point
-		{
-			case guardobj:
-				if (ob->health&1)
-					NewState (ob,&s_grdpain);
-				else
-					NewState (ob,&s_grdpain1);
-				break;
-
-			case officerobj:
-				if (ob->health&1)
-					NewState (ob,&s_ofcpain);
-				else
-					NewState (ob,&s_ofcpain1);
-				break;
-
-			case mutantobj:
-				if (ob->health&1)
-					NewState (ob,&s_mutpain);
-				else
-					NewState (ob,&s_mutpain1);
-				break;
-
-			case ssobj:
-				if (ob->health&1)
-					NewState (ob,&s_sspain);
-				else
-					NewState (ob,&s_sspain1);
-
-				break;
-		}
-	}*/
+		if(ob->PainState)
+			ob->SetState(ob->PainState);
+	}
 }
 
 /*
