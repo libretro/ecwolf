@@ -78,7 +78,7 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
 
 GameMap::~GameMap()
 {
-	for(unsigned int i = 0;i < planes.Size();i++)
+	for(unsigned int i = 0;i < planes.Size();++i)
 		delete[] planes[i].map;
 	UnloadLinks();
 }
@@ -89,6 +89,17 @@ bool GameMap::ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *ac
 
 	Specials::LineSpecialFunction func = Specials::LookupFunction(Specials::LineSpecials(trig.action));
 	return func(spot, direction, activator);
+}
+
+void GameMap::ClearVisibility()
+{
+	for(unsigned int i = 0;i < header.width*header.height;++i)
+	{
+		for(unsigned int p = 0;p < planes.Size();++p)
+			planes[p].map[i].visible = false;
+	}
+	if(player)
+		GetSpot(player->tilex, player->tiley, 0)->visible = true;
 }
 
 bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
@@ -215,8 +226,6 @@ void GameMap::SpawnThings() const
 				if(actor->PathState)
 					actor->SetState(actor->PathState, true);
 			}
-
-			actorat[thing.x>>FRACBITS][thing.y>>FRACBITS] = actor;
 		}
 	}
 }

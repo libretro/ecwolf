@@ -48,8 +48,8 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 		{
 			if(wallheight[x] >> 3 <= y)
 			{
-				int curx = (gu >> TILESHIFT) & (MAPSIZE - 1);
-				int cury = (-(gv >> TILESHIFT) - 1) & (MAPSIZE - 1);
+				int curx = (gu >> TILESHIFT)%map->GetHeader().width;
+				int cury = (-(gv >> TILESHIFT) - 1)%map->GetHeader().height;
 				MapSpot spot = map->GetSpot(curx, cury, 0);
 				if(spot->sector)
 				{

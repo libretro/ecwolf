@@ -162,7 +162,6 @@ void Quit(const char *errorStr, ...);
 
 #define GLOBAL1         (1l<<16)
 #define TILEGLOBAL      GLOBAL1
-#define PIXGLOBAL       (GLOBAL1/64)
 #define TILESHIFT       16l
 #define UNSIGNEDSHIFT   8
 
@@ -180,13 +179,6 @@ void Quit(const char *errorStr, ...);
 #define VANG360         (VANG90*4)
 
 #define MINDIST         (0x5800l)
-
-#define mapshift        6
-#define MAPSIZE         (1<<mapshift)
-#define maparea         MAPSIZE*MAPSIZE
-
-#define mapheight       MAPSIZE
-#define mapwidth        MAPSIZE
 
 #ifdef USE_HIRES
 
@@ -994,9 +986,6 @@ void UpdateSoundLoc(void);
 #define RUNTURN                 70
 
 #define JOYSCALE                2
-
-extern  byte            spotvis[MAPSIZE][MAPSIZE];
-extern  objtype         *actorat[MAPSIZE][MAPSIZE];
 
 extern  objtype         *player;
 

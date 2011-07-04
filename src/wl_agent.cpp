@@ -954,8 +954,8 @@ void ClipMove (objtype *ob, int32_t xmove, int32_t ymove)
 
 #ifndef REMDEBUG
 	if (noclip && ob->x > 2*TILEGLOBAL && ob->y > 2*TILEGLOBAL
-		&& ob->x < (((int32_t)(mapwidth-1))<<TILESHIFT)
-		&& ob->y < (((int32_t)(mapheight-1))<<TILESHIFT) )
+		&& ob->x < (((int32_t)(map->GetHeader().width-1))<<TILESHIFT)
+		&& ob->y < (((int32_t)(map->GetHeader().height-1))<<TILESHIFT) )
 		return;         // walk through walls
 #endif
 
@@ -1025,8 +1025,6 @@ static fixed FixedByFracOrig(fixed a, fixed b)
 void Thrust (int angle, int32_t speed)
 {
 	int32_t xmove,ymove;
-	unsigned offset;
-
 
 	//
 	// ZERO FUNNY COUNTER IF MOVED!
@@ -1055,7 +1053,6 @@ void Thrust (int angle, int32_t speed)
 	player->tilex = (short)(player->x >> TILESHIFT);                // scale to tile values
 	player->tiley = (short)(player->y >> TILESHIFT);
 
-	offset = (player->tiley<<mapshift)+player->tilex;
 	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
 }
 

@@ -127,6 +127,7 @@ class GameMap
 				const Sector	*sector;
 				const Zone		*zone;
 
+				bool			visible;
 				Thinker			*thinker;
 				unsigned int	slideAmount[4];
 				TArray<Trigger>	triggers;
@@ -140,6 +141,7 @@ class GameMap
 		~GameMap();
 
 		bool			ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator);
+		void			ClearVisibility();
 		const Header	&GetHeader() const { return header; }
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		bool			IsValid() const { return valid; }

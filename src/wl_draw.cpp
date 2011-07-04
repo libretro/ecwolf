@@ -33,6 +33,10 @@
 
 #define ACTORSIZE       0x4000
 
+#define mapheight (map->GetHeader().height)
+#define mapwidth (map->GetHeader().width)
+#define maparea (mapheight*mapwidth)
+
 /*
 =============================================================================
 
@@ -113,7 +117,6 @@ short   xtile,ytile;
 short   xtilestep,ytilestep;
 int32_t    xintercept,yintercept;
 word    xstep,ystep;
-word    xspot,yspot;
 int     texdelta;
 
 
@@ -818,12 +821,10 @@ void DrawScaleds (void)
 	{
 		AActor *obj = iter->Item();
 
-		//if ((visptr->actor->shapenum = 1)==0)
-		//	continue;                                               // no shape
+		if (obj->sprite == SPR_NONE)
+			continue;
 
-		spotloc = (obj->tilex<<mapshift)+obj->tiley;   // optimize: keep in struct?
-		visspot = &spotvis[0][0]+spotloc;
-		MapSpot spot = map->GetSpot(spotloc%64, spotloc/64, 0);
+		MapSpot spot = map->GetSpot(obj->tilex, obj->tiley, 0);
 		MapSpot spots[8];
 		spots[0] = spot->GetAdjacent(MapTile::East);
 		spots[1] = spots[0]->GetAdjacent(MapTile::North);
@@ -837,15 +838,15 @@ void DrawScaleds (void)
 		//
 		// could be in any of the nine surrounding tiles
 		//
-		if (*visspot
-			|| ( *(visspot-1) && !(spots[4] && spots[4]->tile) )
-			|| ( *(visspot+1) && !(spots[0] && spots[0]->tile) )
-			|| ( *(visspot-65) && !(spots[3] && spots[3]->tile) )
-			|| ( *(visspot-64) && !(spots[2] && spots[2]->tile) )
-			|| ( *(visspot-63) && !(spots[1] && spots[1]->tile) )
-			|| ( *(visspot+65) && !(spots[7] && spots[7]->tile) )
-			|| ( *(visspot+64) && !(spots[6] && spots[6]->tile) )
-			|| ( *(visspot+63) && !(spots[5] && spots[5]->tile) ) )
+		if (spot->visible
+			|| ( spots[0] && (spots[0]->visible && !spots[0]->tile) )
+			|| ( spots[1] && (spots[1]->visible && !spots[1]->tile) )
+			|| ( spots[2] && (spots[2]->visible && !spots[2]->tile) )
+			|| ( spots[3] && (spots[3]->visible && !spots[3]->tile) )
+			|| ( spots[4] && (spots[4]->visible && !spots[4]->tile) )
+			|| ( spots[5] && (spots[5]->visible && !spots[5]->tile) )
+			|| ( spots[6] && (spots[6]->visible && !spots[6]->tile) )
+			|| ( spots[7] && (spots[7]->visible && !spots[7]->tile) ) )
 		{
 			obj->active = ac_yes;
 			TransformActor (obj);
@@ -984,6 +985,7 @@ void CalcTics (void)
 
 void AsmRefresh()
 {
+	static word xspot[2],yspot[2];
 	int32_t xstep,ystep;
 	longword xpartial,ypartial;
 	MapSpot focalspot = map->GetSpot(focaltx, focalty, 0);
@@ -1032,10 +1034,12 @@ void AsmRefresh()
 		}
 		yintercept=FixedMul(ystep,xpartial)+viewy;
 		xtile=focaltx+xtilestep;
-		xspot=(word)((xtile<<mapshift)+((uint32_t)yintercept>>16));
+		xspot[0]=xtile;
+		xspot[1]=yintercept>>16;
 		xintercept=FixedMul(xstep,ypartial)+viewx;
 		ytile=focalty+ytilestep;
-		yspot=(word)((((uint32_t)xintercept>>16)<<mapshift)+ytile);
+		yspot[0]=xintercept>>16;
+		yspot[1]=ytile;
 		texdelta=0;
 
 		// Special treatment when player is in back tile of pushwall
@@ -1093,13 +1097,13 @@ vertentry:
 				else xtile=(short) (xintercept >> TILESHIFT);
 				if(yintercept<0) yintercept=0, ytile=0;
 				else if(yintercept>=(mapheight<<TILESHIFT)) yintercept=mapheight<<TILESHIFT, ytile=mapheight-1;
-				yspot=0xffff;
+				yspot[0]=0xffff;
 				tilehit=0;
 				HitHorizBorder();
 				break;
 			}
-			if(xspot>=maparea) break;
-			tilehit=map->GetSpot(xspot/MAPSIZE, xspot%MAPSIZE, 0);
+			if(xspot[0]>=mapwidth || xspot[1]>=mapheight) break;
+			tilehit=map->GetSpot(xspot[0], xspot[1], 0);
 			if(tilehit && tilehit->tile)
 			{
 				if(tilehit->tile->offsetVertical)
@@ -1237,10 +1241,11 @@ vertentry:
 				break;
 			}
 passvert:
-			*((byte *)spotvis+xspot)=1;
+			tilehit->visible=true;
 			xtile+=xtilestep;
 			yintercept+=ystep;
-			xspot=(word)((xtile<<mapshift)+((uint32_t)yintercept>>16));
+			xspot[0]=xtile;
+			xspot[1]=yintercept>>16;
 		}
 		while(1);
 		continue;
@@ -1258,13 +1263,13 @@ horizentry:
 				else ytile=(short) (yintercept >> TILESHIFT);
 				if(xintercept<0) xintercept=0, xtile=0;
 				else if(xintercept>=(mapwidth<<TILESHIFT)) xintercept=mapwidth<<TILESHIFT, xtile=mapwidth-1;
-				xspot=0xffff;
+				xspot[0]=0xffff;
 				tilehit=0;
 				HitVertBorder();
 				break;
 			}
-			if(yspot>=maparea) break;
-			tilehit=map->GetSpot(yspot/MAPSIZE, yspot%MAPSIZE, 0);
+			if(yspot[0]>=mapwidth || yspot[1]>=mapheight) break;
+			tilehit=map->GetSpot(yspot[0], yspot[1], 0);
 			if(tilehit && tilehit->tile)
 			{
 				if(tilehit->tile->offsetHorizontal)
@@ -1402,10 +1407,11 @@ horizentry:
 				break;
 			}
 passhoriz:
-			*((byte *)spotvis+yspot)=1;
+			tilehit->visible=true;
 			ytile+=ytilestep;
 			xintercept+=xstep;
-			yspot=(word)((((uint32_t)xintercept>>16)<<mapshift)+ytile);
+			yspot[0]=xintercept>>16;
+			yspot[1]=ytile;
 		}
 		while(1);
 	}
@@ -1463,8 +1469,7 @@ void    ThreeDRefresh (void)
 //
 // clear out the traced array
 //
-	memset(spotvis,0,maparea);
-	spotvis[player->tilex][player->tiley] = 1;       // Detect all sprites over player fix
+	map->ClearVisibility();
 
 	vbuf = VL_LockSurface(screenBuffer);
 	vbuf+=screenofs;

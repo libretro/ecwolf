@@ -96,7 +96,6 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 	newobj->y = ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2;
 	newobj->dir = nodir;
 
-	actorat[tilex][tiley] = newobj;
 	newobj->EnterZone(map->GetSpot(newobj->tilex, newobj->tiley, 0)->zone);
 }
 
@@ -152,7 +151,6 @@ void NewState (objtype *ob, statetype *state)
 
 static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTrigger::Side dir, bool canuse)
 {
-	AActor *temp = actorat[x][y];
 	MapSpot spot = map->GetSpot(x, y, 0);
 	if(spot->tile)
 	{
@@ -176,8 +174,13 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 		if(spot->slideAmount[dir] != 0xffff)
 			return 0;
 	}
-	if(temp && ((uintptr_t)temp == 64 || temp->flags&FL_SHOOTABLE))
-		return 0;
+	for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
+	{
+		if((iter->Item()->flags & FL_SOLID) &&
+			iter->Item()->tilex == x &&
+			iter->Item()->tiley == y)
+			return 0;
+	}
 	return -1;
 }
 #define CHECKSIDE(x,y,dir) \

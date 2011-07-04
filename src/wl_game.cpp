@@ -276,11 +276,6 @@ void SetupGameLevel (void)
 #endif
 
 //
-// copy the wall data to a data segment array
-//
-	memset (actorat,0,sizeof(actorat));
-
-//
 // spawn actors
 //
 	map->SpawnThings();

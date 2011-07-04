@@ -252,10 +252,10 @@ void A_Smoke (AActor *ob)
 
 #define PROJSIZE        0x2000
 
-boolean ProjectileTryMove (objtype *ob)
+bool ProjectileTryMove (AActor *ob)
 {
 	int      xl,yl,xh,yh,x,y;
-	objtype *check;
+	MapSpot check;
 
 	xl = (ob->x-PROJSIZE) >> TILESHIFT;
 	yl = (ob->y-PROJSIZE) >> TILESHIFT;
@@ -269,8 +269,8 @@ boolean ProjectileTryMove (objtype *ob)
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
-			check = actorat[x][y];
-			if (check && !ISPOINTER(check))
+			check = map->GetSpot(x, y, 0);
+			if (check->tile)
 				return false;
 		}
 
@@ -1300,7 +1300,7 @@ ACTION_FUNCTION(T_Chase)
 		//
 		if(self->MeleeState)
 		{
-			fixed r = player->radius + self->radius;
+			fixed r = player->radius + self->radius + 10000;
 			if(abs(player->x - self->x) <= r && abs(player->y - self->y) <= r)
 			{
 				self->SetState(self->MeleeState);
@@ -1461,7 +1461,7 @@ ACTION_FUNCTION(T_Path)
 			break;
 		}
 
-		if (self->tilex>MAPSIZE || self->tiley>MAPSIZE)
+		if (self->tilex>map->GetHeader().width || self->tiley>map->GetHeader().height)
 		{
 			sprintf (str, "T_Path hit a wall at %u,%u, dir %u",
 				self->tilex,self->tiley,self->dir);

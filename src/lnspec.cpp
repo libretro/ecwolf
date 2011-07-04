@@ -144,35 +144,30 @@ class EVDoor : public Thinker
 				case Opened:
 					if(wait == 0)
 					{
-						if((spot->GetX() == player->tilex && spot->GetY() == player->tiley) ||
-							actorat[spot->GetX()][spot->GetY()] != NULL)
+						bool hold = false;
+						for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
+						{
+							if(direction == 0)
+							{
+								if(spot->GetY() == iter->Item()->tiley &&
+									abs(((spot->GetX()<<FRACBITS)+(FRACUNIT/2))-iter->Item()->x) < FRACUNIT/2 + iter->Item()->radius)
+								{
+									hold = true;
+									break;
+								}
+							}
+							else
+							{
+								if(spot->GetX() == iter->Item()->tilex &&
+									abs(((spot->GetY()<<FRACBITS)+(FRACUNIT/2))-iter->Item()->y) < FRACUNIT/2 + iter->Item()->radius)
+								{
+									hold = true;
+									break;
+								}
+							}
+						}
+						if(hold)
 							break;
-
-						if(direction == 0)
-						{
-							if(spot->GetY() == player->tiley &&
-								((player->x+player->radius)>>TILESHIFT == spot->GetX() ||
-								(player->x-player->radius)>>TILESHIFT == spot->GetX()))
-								break;
-							if((actorat[spot->GetX()-1][spot->GetY()] != NULL &&
-								(actorat[spot->GetX()-1][spot->GetY()]->x+actorat[spot->GetX()-1][spot->GetY()]->radius)>>TILESHIFT == spot->GetX()) ||
-								(actorat[spot->GetX()+1][spot->GetY()] != NULL &&
-								(actorat[spot->GetX()+1][spot->GetY()]->x-actorat[spot->GetX()+1][spot->GetY()]->radius)>>TILESHIFT == spot->GetX()))
-								break;
-						}
-						else
-						{
-							if(spot->GetX() == player->tilex &&
-								((player->y+player->radius)>>TILESHIFT == spot->GetY() ||
-								(player->y-player->radius)>>TILESHIFT == spot->GetY()))
-								break;
-							if((actorat[spot->GetX()][spot->GetY()-1] != NULL &&
-								(actorat[spot->GetX()][spot->GetY()-1]->y+actorat[spot->GetX()][spot->GetY()-1]->radius)>>TILESHIFT == spot->GetY()) ||
-								(actorat[spot->GetX()][spot->GetY()+1] != NULL &&
-								(actorat[spot->GetX()][spot->GetY()+1]->y-actorat[spot->GetX()][spot->GetY()+1]->radius)>>TILESHIFT == spot->GetY()))
-								break;
-						}
-
 						ChangeState(Closing);
 					}
 					else

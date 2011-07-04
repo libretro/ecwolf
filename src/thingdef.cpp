@@ -96,6 +96,7 @@ AActor *ClassDef::CreateInstance() const
 
 	AActor *newactor = defaultInstance->__NewNativeInstance(this);
 	*newactor = *defaultInstance;
+	newactor->classType = this;
 	newactor->Init();
 	return newactor;
 }

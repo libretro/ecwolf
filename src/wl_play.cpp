@@ -46,9 +46,6 @@ boolean noclip, ammocheat;
 int godmode, singlestep;
 unsigned int extravbls = 0; // to remove flicker (gray stuff at the bottom)
 
-byte spotvis[MAPSIZE][MAPSIZE];
-objtype *actorat[MAPSIZE][MAPSIZE];
-
 //
 // replacing refresh manager
 //

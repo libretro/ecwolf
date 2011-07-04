@@ -130,6 +130,7 @@ void PictureGrabber (void)
 
 void BasicOverhead (void)
 {
+#if 0
 	int x, y, z, offx, offy;
 
 	z = 128/MAPSIZE; // zoom scale
@@ -184,6 +185,7 @@ void BasicOverhead (void)
 #ifdef MAPBORDER
 	NewViewSize(temp);
 	DrawPlayBorder();
+#endif
 #endif
 }
 
@@ -464,13 +466,13 @@ int DebugKeys (void)
 		US_Print (" X:");    US_PrintUnsigned (player->tilex);
 		US_Print (" Y:");    US_PrintUnsigned (player->tiley);
 		//US_Print ("\n1:");   US_PrintUnsigned (tilemap[player->tilex][player->tiley]);
-		sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[player->tilex][player->tiley]); US_Print(str);
+		//sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[player->tilex][player->tiley]); US_Print(str);
 		//US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(player->tilex,player->tiley,1));
-		US_Print (" 3:");
-		if ((unsigned)(uintptr_t)actorat[player->tilex][player->tiley] < 256)
-			US_PrintUnsigned (spotvis[player->tilex][player->tiley]);
-		else
-			US_PrintUnsigned (actorat[player->tilex][player->tiley]->flags);
+		//US_Print (" 3:");
+		//if ((unsigned)(uintptr_t)actorat[player->tilex][player->tiley] < 256)
+		//	US_PrintUnsigned (spotvis[player->tilex][player->tiley]);
+		//else
+		//	US_PrintUnsigned (actorat[player->tilex][player->tiley]->flags);
 		VW_UpdateScreen();
 		IN_Ack();
 		return 1;
