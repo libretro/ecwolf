@@ -151,25 +151,25 @@ class EVDoor : public Thinker
 						if(direction == 0)
 						{
 							if(spot->GetY() == player->tiley &&
-								((player->x+MINDIST)>>TILESHIFT == spot->GetX() ||
-								(player->x-MINDIST)>>TILESHIFT == spot->GetX()))
+								((player->x+player->radius)>>TILESHIFT == spot->GetX() ||
+								(player->x-player->radius)>>TILESHIFT == spot->GetX()))
 								break;
 							if((actorat[spot->GetX()-1][spot->GetY()] != NULL &&
-								(actorat[spot->GetX()-1][spot->GetY()]->x+MINDIST)>>TILESHIFT == spot->GetX()) ||
+								(actorat[spot->GetX()-1][spot->GetY()]->x+actorat[spot->GetX()-1][spot->GetY()]->radius)>>TILESHIFT == spot->GetX()) ||
 								(actorat[spot->GetX()+1][spot->GetY()] != NULL &&
-								(actorat[spot->GetX()+1][spot->GetY()]->x-MINDIST)>>TILESHIFT == spot->GetX()))
+								(actorat[spot->GetX()+1][spot->GetY()]->x-actorat[spot->GetX()+1][spot->GetY()]->radius)>>TILESHIFT == spot->GetX()))
 								break;
 						}
 						else
 						{
 							if(spot->GetX() == player->tilex &&
-								((player->y+MINDIST)>>TILESHIFT == spot->GetY() ||
-								(player->y-MINDIST)>>TILESHIFT == spot->GetY()))
+								((player->y+player->radius)>>TILESHIFT == spot->GetY() ||
+								(player->y-player->radius)>>TILESHIFT == spot->GetY()))
 								break;
 							if((actorat[spot->GetX()][spot->GetY()-1] != NULL &&
-								(actorat[spot->GetX()][spot->GetY()-1]->y+MINDIST)>>TILESHIFT == spot->GetY()) ||
+								(actorat[spot->GetX()][spot->GetY()-1]->y+actorat[spot->GetX()][spot->GetY()-1]->radius)>>TILESHIFT == spot->GetY()) ||
 								(actorat[spot->GetX()][spot->GetY()+1] != NULL &&
-								(actorat[spot->GetX()][spot->GetY()+1]->y-MINDIST)>>TILESHIFT == spot->GetY()))
+								(actorat[spot->GetX()][spot->GetY()+1]->y-actorat[spot->GetX()][spot->GetY()+1]->radius)>>TILESHIFT == spot->GetY()))
 								break;
 						}
 

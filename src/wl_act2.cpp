@@ -1300,15 +1300,11 @@ ACTION_FUNCTION(T_Chase)
 		//
 		if(self->MeleeState)
 		{
-			dx = abs(player->x - self->x);
-			if (dx <= MINACTORDIST)
+			fixed r = player->radius + self->radius;
+			if(abs(player->x - self->x) <= r && abs(player->y - self->y) <= r)
 			{
-				dy = abs(player->y - self->y);
-				if (dy <= MINACTORDIST)
-				{
-					self->SetState(self->MeleeState);
-					return;
-				}
+				self->SetState(self->MeleeState);
+				return;
 			}
 		}
 
@@ -1570,6 +1566,7 @@ void T_Bite (objtype *ob)
 
 	PlaySoundLocActor("dog/attack",ob);     // JAB
 
+#if 0
 	dx = player->x - ob->x;
 	if (dx<0)
 		dx = -dx;
@@ -1589,6 +1586,7 @@ void T_Bite (objtype *ob)
 			}
 		}
 	}
+#endif
 }
 
 
@@ -1723,16 +1721,16 @@ void T_BJDone (objtype *)
 ===============
 */
 
-boolean CheckPosition (objtype *ob)
+bool CheckPosition (AActor *ob)
 {
-	int     x,y,xl,yl,xh,yh;
-	objtype *check;
+	int x,y,xl,yl,xh,yh;
+	MapSpot check;
 
-	xl = (ob->x-PLAYERSIZE) >> TILESHIFT;
-	yl = (ob->y-PLAYERSIZE) >> TILESHIFT;
+	xl = (ob->x-player->radius) >> TILESHIFT;
+	yl = (ob->y-player->radius) >> TILESHIFT;
 
-	xh = (ob->x+PLAYERSIZE) >> TILESHIFT;
-	yh = (ob->y+PLAYERSIZE) >> TILESHIFT;
+	xh = (ob->x+player->radius) >> TILESHIFT;
+	yh = (ob->y+player->radius) >> TILESHIFT;
 
 	//
 	// check for solid walls
@@ -1741,8 +1739,8 @@ boolean CheckPosition (objtype *ob)
 	{
 		for (x=xl;x<=xh;x++)
 		{
-			check = actorat[x][y];
-			if (check && !ISPOINTER(check))
+			check = map->GetSpot(x, y, 0);
+			if (check->tile)
 				return false;
 		}
 	}

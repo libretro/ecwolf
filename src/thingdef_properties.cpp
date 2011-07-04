@@ -72,6 +72,12 @@ HANDLE_PROPERTY(health)
 	}
 }
 
+HANDLE_PROPERTY(radius)
+{
+	INT_PARAM(radius, 0);
+	defaults->radius = radius*FRACUNIT/64;
+}
+
 HANDLE_PROPERTY(seesound)
 {
 	STRING_PARAM(snd, 0);
@@ -117,7 +123,7 @@ HANDLE_PROPERTY(points)
 
 HANDLE_PROPERTY(MONSTER)
 {
-	defaults->flags |= FL_ISMONSTER|FL_SHOOTABLE|FL_CANUSEWALLS|FL_COUNTKILL;
+	defaults->flags |= FL_ISMONSTER|FL_SHOOTABLE|FL_CANUSEWALLS|FL_COUNTKILL|FL_SOLID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -130,6 +136,7 @@ extern const PropDef properties[NUM_PROPERTIES] =
 	DEFINE_PROP(health, AActor, I_IIIIIIII),
 	DEFINE_PROP(MONSTER, AActor,),
 	DEFINE_PROP(points, AActor, I),
+	DEFINE_PROP(radius, AActor, I),
 	DEFINE_PROP(seesound, AActor, S),
 	DEFINE_PROP(sighttime, AActor, I_I),
 	DEFINE_PROP(speed, AActor, F_F)

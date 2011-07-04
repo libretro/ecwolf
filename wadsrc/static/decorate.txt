@@ -1,5 +1,6 @@
 actor Actor native
 {
+	radius 20
 	health 1000
 	sighttime 1
 	speed 0
@@ -28,6 +29,8 @@ actor Puddle 33
 
 actor GreenBarrel 34
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -38,6 +41,8 @@ actor GreenBarrel 34
 
 actor TableWithChairs 35
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -48,6 +53,8 @@ actor TableWithChairs 35
 
 actor FloorLamp 36
 {
+	radius 32
+	+SOLID
 	+FULLBRIGHT
 	states
 	{
@@ -70,6 +77,8 @@ actor Chandelier 37
 
 actor HangedMan 38
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -90,6 +99,8 @@ actor DogFood 39
 
 actor WhitePillar 40
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -100,6 +111,8 @@ actor WhitePillar 40
 
 actor GreenPlant 41
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -120,6 +133,8 @@ actor SkeletonFlat 42
 
 actor Sink 43
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -130,6 +145,8 @@ actor Sink 43
 
 actor BrownPlant 44
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -140,6 +157,8 @@ actor BrownPlant 44
 
 actor Vase 45
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -150,6 +169,8 @@ actor Vase 45
 
 actor BareTable 46
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -170,6 +191,8 @@ actor CeilingLight 47
 
 actor KitchenStuff 48
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -180,6 +203,8 @@ actor KitchenStuff 48
 
 actor SuitOfArmor 49
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -190,6 +215,8 @@ actor SuitOfArmor 49
 
 actor HangingCage 50
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -200,6 +227,8 @@ actor HangingCage 50
 
 actor SkeletonCage 51
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -240,6 +269,8 @@ actor SilverKey 54
 
 actor BunkBed 55
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -250,6 +281,8 @@ actor BunkBed 55
 
 actor Basket 56
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -388,6 +421,8 @@ actor Gibs 67
 
 actor Barrel 68
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -398,6 +433,8 @@ actor Barrel 68
 
 actor Well 69
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -408,6 +445,8 @@ actor Well 69
 
 actor EmptyWell 70
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -428,6 +467,8 @@ actor Gibs2 71
 
 actor Flag 72
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -478,6 +519,8 @@ actor Bones4 76
 
 actor Pots 77
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -488,6 +531,8 @@ actor Pots 77
 
 actor Stove 78
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -498,6 +543,8 @@ actor Stove 78
 
 actor Spears 79
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -554,6 +601,7 @@ statetype s_hboom3              = {false,SPR_HBOOM_3,6,NULL,NULL,NULL};
 
 actor Guard 11
 {
+	radius 42
 	points 100
 	health 25
 	speed 1, 3
@@ -594,7 +642,7 @@ actor Guard 11
 			GARD J 5
 			goto See
 		Death:
-			GARD G 7.5
+			GARD G 7.5 A_Fall
 			GARD H 7.5 A_DeathScream
 			GARD I 7.5
 			GARD K -1
@@ -658,6 +706,7 @@ actor Clyde 30
 
 actor Dog 14
 {
+	radius 42
 	points 200
 	health 1
 	speed 2.93, 5.859
@@ -692,8 +741,9 @@ actor Dog 14
 			DOGY D 4 NOP T_Chase
 			loop
 		Death:
-			DOGY H 7.5 A_DeathScream
-			DOGY IJ 7.5
+			DOGY H 7.5 A_Fall
+			DOGY I 7.5 A_DeathScream
+			DOGY J 7.5
 			DOGY K -1
 			stop
 	}
@@ -701,6 +751,7 @@ actor Dog 14
 
 actor Officer 12
 {
+	radius 42
 	points 400
 	health 50
 	speed 1, 5
@@ -742,7 +793,7 @@ actor Officer 12
 			OFFI E 4 NOP T_Chase
 			loop
 		Death:
-			OFFI K 5.5
+			OFFI K 5.5 A_Fall
 			OFFI L 5.5 A_DeathScream
 			OFFI MN 5.5
 			OFFI O -1
@@ -752,6 +803,7 @@ actor Officer 12
 
 actor Mutant 15
 {
+	radius 42
 	points 700
 	health 45, 55, 55, 65
 	speed 1, 3
@@ -787,7 +839,7 @@ actor Mutant 15
 			MTNT E 4 NOP T_Chase
 			loop
 		Death:
-			MTNT H 3.5
+			MTNT H 3.5 A_Fall
 			MTNT I 3.5 A_DeathScream
 			MTNT JK 3.5
 			MTNT L -1
@@ -797,6 +849,7 @@ actor Mutant 15
 
 actor WolfensteinSS 13 // ZDoom compatible name
 {
+	radius 42
 	points 500
 	health 100
 	speed 1, 4
@@ -844,7 +897,7 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			SSWV G 5 T_Shoot
 			goto See
 		Death:
-			SSWV J 7.5
+			SSWV J 7.5 A_Fall
 			SSWV K 7.5 A_DeathScream
 			SSWV L 7.5
 			SSWV M -1
@@ -854,6 +907,7 @@ actor WolfensteinSS 13 // ZDoom compatible name
 
 actor Hans 16
 {
+	radius 42
 	points 5000
 	health 850, 950, 1050, 1200
 	speed 1, 3
@@ -881,7 +935,7 @@ actor Hans 16
 			HANS FGFGFGE 5 T_Shoot
 			goto See
 		Death:
-			HANS H 7.5
+			HANS H 7.5 A_Fall
 			HANS I 7.5 A_DeathScream
 			HANS J 7.5
 			HANS K -1
@@ -891,6 +945,7 @@ actor Hans 16
 
 actor Gretel 20
 {
+	radius 42
 	points 5000
 	health 850, 950, 1050, 1200
 	speed 1, 3
@@ -918,7 +973,7 @@ actor Gretel 20
 			GRET FGFGFGE 5 T_Shoot
 			goto See
 		Death:
-			GRET H 7.5
+			GRET H 7.5 A_Fall
 			GRET I 7.5 A_DeathScream
 			GRET J 7.5
 			GRET K -1
@@ -939,6 +994,7 @@ actor Needle
 
 actor Schabbs 17
 {
+	radius 42
 	points 5000
 	health 850, 950, 1550, 2400
 	speed 1, 3
@@ -966,7 +1022,7 @@ actor Schabbs 17
 			SHAB G 0 T_SchabbThrow
 			goto See
 		Death:
-			SHAB A 5
+			SHAB A 5 A_Fall
 			SHAB A 70 A_DeathScream
 			SHAB HIJ 5
 			SHAB K -1 A_StartDeathCam
@@ -976,6 +1032,7 @@ actor Schabbs 17
 
 actor Gift 21
 {
+	radius 42
 	points 5000
 	health 850, 950, 1050, 120
 	speed 1, 3
@@ -1003,7 +1060,7 @@ actor Gift 21
 			GIFT F 0 T_GiftThrow
 			goto See
 		Death:
-			GIFT A .5
+			GIFT A .5 A_Fall
 			GIFT A 70 A_DeathScream
 			GIFT GHI 5
 			GIFT J -1 A_StartDeathCam
@@ -1013,6 +1070,7 @@ actor Gift 21
 
 actor FatFace 22
 {
+	radius 42
 	points 5000
 	health 850, 950, 1050, 120
 	speed 1, 3
@@ -1042,7 +1100,7 @@ actor FatFace 22
 			FATF H 0 T_Shoot
 			goto See
 		Death:
-			FATF A .5
+			FATF A .5 A_Fall
 			FATF A 70 A_DeathScream
 			FATF IJK 5
 			FATF L -1 A_StartDeathCam
@@ -1052,6 +1110,7 @@ actor FatFace 22
 
 actor FakeHitler 18
 {
+	radius 42
 	points 2000
 	health 200, 300, 400, 500
 	speed 1, 3
@@ -1077,7 +1136,7 @@ actor FakeHitler 18
 			FAKE EEEEEEEE 4 T_FakeFire
 			goto See
 		Death:
-			FAKE F 5
+			FAKE F 5 A_Fall
 			FAKE G 5 A_DeathScream
 			FAKE HIJ 5
 			FAKE K -1
@@ -1098,6 +1157,7 @@ actor FireBall
 
 actor MechaHitler 19
 {
+	radius 42
 	points 5000
 	health 850, 950, 1050, 1200
 	speed 1, 3
@@ -1126,7 +1186,7 @@ actor MechaHitler 19
 			MECH F 0 T_Shoot
 			goto See
 		Death:
-			MECH H 5
+			MECH H 5 A_Fall
 			MECH I 5 A_DeathScream
 			MECH J 5
 			MECH K -1 A_HitlerMorph
@@ -1136,6 +1196,7 @@ actor MechaHitler 19
 
 actor Hitler
 {
+	radius 42
 	points 5000
 	health 500, 700, 800, 900
 	speed 1, 5
@@ -1162,7 +1223,7 @@ actor Hitler
 			HTLR F 0 T_Shoot
 			goto See
 		Death:
-			HTLR A .5
+			HTLR A .5 A_Fall
 			HTLR A 70 A_DeathScream
 			HTLR H 5
 			HTLR I 5 A_Slurpie
@@ -1193,6 +1254,7 @@ actor BJRun
 
 actor BJPlayer
 {
+	radius 22
 	+NEVERMARK
 	states
 	{

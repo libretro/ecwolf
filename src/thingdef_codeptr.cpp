@@ -90,3 +90,10 @@ ActionPtr FindFunction(const FName &func)
 	while(max >= min);
 	return NULL;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+ACTION_FUNCTION(A_Fall)
+{
+	self->flags &= ~FL_SOLID;
+}

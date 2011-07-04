@@ -154,10 +154,6 @@ void Quit(const char *errorStr, ...);
 	#define LRpack      20
 #endif
 
-#define PLAYERSIZE      MINDIST         // player radius
-#define MINACTORDIST    0x10000l        // minimum dist from player center
-										// to any actor center
-
 #define NUMLATCHPICS    100
 
 #undef M_PI
@@ -268,6 +264,7 @@ typedef enum
 	FL_ISMONSTER        = 0x00001000,
 	FL_CANUSEWALLS		= 0x00002000,
 	FL_COUNTKILL		= 0x00004000,
+	FL_SOLID			= 0x00008000,
 } objflag_t;
 
 
@@ -1132,10 +1129,6 @@ typedef struct
 
 =============================================================================
 */
-#define TURNTICS        10
-#define SPDPATROL       512
-#define SPDDOG          1500
-
 
 void    InitHitRect (objtype *ob, unsigned radius);
 void    SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);

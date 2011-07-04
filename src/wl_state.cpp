@@ -662,14 +662,8 @@ void MoveObj (objtype *ob, int32_t move)
 	//
 	if (map->CheckLink(ob->GetZone(), player->GetZone(), true))
 	{
-		deltax = ob->x - player->x;
-		if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
-			goto moveok;
-		deltay = ob->y - player->y;
-		if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
-			goto moveok;
-
-		if (ob->hidden)          // move closer until he meets CheckLine
+		fixed r = ob->radius + player->radius;
+		if (ob->hidden || abs(ob->x - player->x) > r || abs(ob->y - player->y) > r)
 			goto moveok;
 
 		if (ob->obclass == ghostobj || ob->obclass == spectreobj)

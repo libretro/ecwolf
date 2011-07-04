@@ -78,9 +78,6 @@ void SelectItem (void);
 
 //----------
 
-boolean TryMove (objtype *ob);
-void T_Player (objtype *ob);
-
 void ClipMove (objtype *ob, int32_t xmove, int32_t ymove);
 
 /*
@@ -848,19 +845,16 @@ void GetBonus (statobj_t *check)
 ===================
 */
 
-boolean TryMove (objtype *ob)
+bool TryMove (AActor *ob)
 {
-	int         xl,yl,xh,yh,x,y;
-	objtype    *check;
-	int32_t     deltax,deltay;
+	int xl,yl,xh,yh,x,y;
+	AActor *check;
 
-	xl = (ob->x-PLAYERSIZE) >>TILESHIFT;
-	yl = (ob->y-PLAYERSIZE) >>TILESHIFT;
+	xl = (ob->x-player->radius) >>TILESHIFT;
+	yl = (ob->y-player->radius) >>TILESHIFT;
 
-	xh = (ob->x+PLAYERSIZE) >>TILESHIFT;
-	yh = (ob->y+PLAYERSIZE) >>TILESHIFT;
-
-#define PUSHWALLMINDIST PLAYERSIZE
+	xh = (ob->x+player->radius) >>TILESHIFT;
+	yh = (ob->y+player->radius) >>TILESHIFT;
 
 	//
 	// check for solid walls
@@ -871,10 +865,10 @@ boolean TryMove (objtype *ob)
 		{
 			const bool checkLines[4] =
 			{
-				(ob->x+PLAYERSIZE) > ((x+1)<<TILESHIFT),
-				(ob->y-PLAYERSIZE) < (y<<TILESHIFT),
-				(ob->x-PLAYERSIZE) < (x<<TILESHIFT),
-				(ob->y+PLAYERSIZE) > ((y+1)<<TILESHIFT)
+				(ob->x+player->radius) > ((x+1)<<TILESHIFT),
+				(ob->y-player->radius) < (y<<TILESHIFT),
+				(ob->x-player->radius) < (x<<TILESHIFT),
+				(ob->y+player->radius) > ((y+1)<<TILESHIFT)
 			};
 			MapSpot spot = map->GetSpot(x, y, 0);
 			if(spot->tile)
@@ -885,19 +879,19 @@ boolean TryMove (objtype *ob)
 					switch(spot->pushDirection)
 					{
 						case MapTile::North:
-							if(ob->y-PUSHWALLMINDIST <= (y<<TILESHIFT)+((63-spot->pushAmount)<<10))
+							if(ob->y-ob->radius <= (y<<TILESHIFT)+((63-spot->pushAmount)<<10))
 								return false;
 							break;
 						case MapTile::West:
-							if(ob->x-PUSHWALLMINDIST <= (x<<TILESHIFT)+((63-spot->pushAmount)<<10))
+							if(ob->x-ob->radius <= (x<<TILESHIFT)+((63-spot->pushAmount)<<10))
 								return false;
 							break;
 						case MapTile::East:
-							if(ob->x+PUSHWALLMINDIST >= (x<<TILESHIFT)+(spot->pushAmount<<10))
+							if(ob->x+ob->radius >= (x<<TILESHIFT)+(spot->pushAmount<<10))
 								return false;
 							break;
 						case MapTile::South:
-							if(ob->y+PUSHWALLMINDIST >= (y<<TILESHIFT)+(spot->pushAmount<<10))
+							if(ob->y+ob->radius >= (y<<TILESHIFT)+(spot->pushAmount<<10))
 								return false;
 							break;
 					}
@@ -911,47 +905,26 @@ boolean TryMove (objtype *ob)
 					}
 				}
 			}
-
-			// Static objects
-			if((uintptr_t)actorat[x][y] == 64)
-			{
-				for(unsigned short i = 0;i < 4;++i)
-				{
-					if(checkLines[i])
-						return false;
-				}
-			}
 		}
 	}
 
 	//
 	// check for actors
 	//
-	if (yl>0)
-		yl--;
-	if (yh<MAPSIZE-1)
-		yh++;
-	if (xl>0)
-		xl--;
-	if (xh<MAPSIZE-1)
-		xh++;
-
-	for (y=yl;y<=yh;y++)
+	for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
 	{
-		for (x=xl;x<=xh;x++)
-		{
-			check = actorat[x][y];
-			if (ISPOINTER(check) && check != player && (check->flags & FL_SHOOTABLE) )
-			{
-				deltax = ob->x - check->x;
-				if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
-					continue;
-				deltay = ob->y - check->y;
-				if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
-					continue;
+		if(iter->Item() == ob)
+			continue;
 
-				return false;
-			}
+		check = iter->Item();
+		
+		if(check->flags & FL_SOLID)
+		{
+			fixed r = check->radius + ob->radius;
+			if(abs(ob->x - check->x) > r ||
+				abs(ob->y - check->y) > r)
+				continue;
+			return false;
 		}
 	}
 
@@ -1110,8 +1083,7 @@ void Cmd_Fire (void)
 
 	gamestate.weaponframe = 0;
 
-	static const Frame * const attack = player->FindState("Missile");
-	player->SetState(attack);
+	player->SetState(player->MissileState);
 
 	gamestate.attackframe = 0;
 	gamestate.attackcount =

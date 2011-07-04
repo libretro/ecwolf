@@ -142,6 +142,7 @@ class AActor
 		short	defaultHealth[9];
 		int32_t	speed, runspeed;
 		int		points;
+		fixed	radius;
 
 		activetype  active;
 		short       ticcount;
@@ -206,7 +207,7 @@ struct PropDef
 		const char* const		params;
 		PropHandler				handler;
 };
-#define NUM_PROPERTIES 8
+#define NUM_PROPERTIES 9
 
 class ClassDef
 {

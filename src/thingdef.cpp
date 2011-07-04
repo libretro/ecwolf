@@ -59,6 +59,7 @@ const FlagDef flags[] =
 	DEFINE_FLAG(FL, NEVERMARK, AActor, flags),
 	DEFINE_FLAG(FL, NONMARK, AActor, flags),
 	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
+	DEFINE_FLAG(FL, SOLID, AActor, flags),
 	DEFINE_FLAG(FL, VISABLE, AActor, flags)
 };
 extern const PropDef properties[NUM_PROPERTIES];
@@ -285,6 +286,9 @@ void ClassDef::ParseActor(Scanner &sc)
 		newClass->defaultInstance->defaults = newClass->defaultInstance;
 		newClass->defaultInstance->Init(true);
 	}
+	// Copy properties and flags.
+	if(newClass->parent != NULL)
+		*newClass->defaultInstance = *newClass->parent->defaultInstance;
 
 	sc.MustGetToken('{');
 	while(!sc.CheckToken('}'))
