@@ -189,6 +189,16 @@ actor CeilingLight 47
 	}
 }
 
+actor RedCeilingLight 85
+{
+	states
+	{
+		Spawn:
+			RLMP A -1
+			stop
+	}
+}
+
 actor KitchenStuff 48
 {
 	radius 32
@@ -317,6 +327,16 @@ actor Clip 59
 	{
 		Spawn:
 			CLIP A -1
+			stop
+	}
+}
+
+actor ClipBox : Clip 90
+{
+	states
+	{
+		Spawn:
+			AMMO A -1
 			stop
 	}
 }
@@ -563,6 +583,26 @@ actor Vines 80
 	}
 }
 
+actor TruckRear 91
+{
+	states
+	{
+		Spawn:
+			TRUK A -1
+			stop
+	}
+}
+
+actor SpearOfDestiny 92
+{
+	states
+	{
+		Spawn:
+			SPOD A -1
+			stop
+	}
+}
+
 actor Rocket
 {
 	states
@@ -587,17 +627,29 @@ actor Smoke
 	}
 }
 
-/* Spear of destiny NOTE
-statetype s_hrocket             = {true,SPR_HROCKET_1,3,(statefunc)T_Projectile,(statefunc)A_Smoke,&s_hrocket};
-statetype s_hsmoke1             = {false,SPR_HSMOKE_1,3,NULL,NULL,&s_hsmoke2};
-statetype s_hsmoke2             = {false,SPR_HSMOKE_2,3,NULL,NULL,&s_hsmoke3};
-statetype s_hsmoke3             = {false,SPR_HSMOKE_3,3,NULL,NULL,&s_hsmoke4};
-statetype s_hsmoke4             = {false,SPR_HSMOKE_4,3,NULL,NULL,NULL};
+actor HighRocket
+{
+	states
+	{
+		Spawn:
+			HRCK A 1.5 A_Smoke T_Projectile
+			loop
+		Death:
+			HBOM ABC 3
+			stop
+	}
+}
 
-statetype s_hboom1              = {false,SPR_HBOOM_1,6,NULL,NULL,&s_hboom2};
-statetype s_hboom2              = {false,SPR_HBOOM_2,6,NULL,NULL,&s_hboom3};
-statetype s_hboom3              = {false,SPR_HBOOM_3,6,NULL,NULL,NULL};
-*/
+actor HighSmoke
+{
+	+NEVERMARK
+	states
+	{
+		Spawn:
+			HSMK ABCD 3
+			stop
+	}
+}
 
 actor Guard 11
 {
@@ -632,20 +684,19 @@ actor Guard 11
 			GARD E 4 NOP T_Chase
 			loop
 		Missile:
-			GARD LM 10
-			GARD N 10 T_Shoot
+			GARD FG 10
+			GARD H 10 T_Shoot
 			goto See
 		Pain:
-			GARD F 5
+			GARD I 5
 			goto See
-		Pain2:
 			GARD J 5
 			goto See
 		Death:
-			GARD G 7.5 A_Fall
-			GARD H 7.5 A_DeathScream
-			GARD I 7.5
-			GARD K -1
+			GARD K 7.5 A_Fall
+			GARD L 7.5 A_DeathScream
+			GARD M 7.5
+			GARD N -1
 			stop
 	}
 }
@@ -655,7 +706,7 @@ actor DeadGuard 81
 	states
 	{
 		Spawn:
-			GARD K -1
+			GARD N -1
 			stop
 	}
 }
@@ -774,15 +825,14 @@ actor Officer 12
 			OFFI E 7.5 NOP T_Path
 			loop
 		Pain:
-			OFFI F 5
+			OFFI I 5
 			goto See
-		Pain2:
-			OFFI G 5
+			OFFI J 5
 			goto See
 		Missile:
-			OFFI H 3
-			OFFI I 10
-			OFFI J 5 T_Shoot
+			OFFI F 3
+			OFFI G 10
+			OFFI H 5 T_Shoot
 			goto See
 		See:
 			OFFI B 5 NOP T_Chase
@@ -825,10 +875,9 @@ actor Mutant 15
 			MTNT E 7.5 NOP T_Path
 			loop
 		Pain:
-			MTNT F 5
+			MTNT J 5
 			goto See
-		Pain2:
-			MTNT G 5
+			MTNT K 5
 			goto See
 		See:
 			MTNT B 5 NOP T_Chase
@@ -838,11 +887,17 @@ actor Mutant 15
 			MTNT D 1.5
 			MTNT E 4 NOP T_Chase
 			loop
+		Missile:
+			MTNT F 3
+			MTNT G 10 T_Shoot
+			MTNT H 5
+			MTNT I 10 T_Shoot
+			goto See
 		Death:
-			MTNT H 3.5 A_Fall
-			MTNT I 3.5 A_DeathScream
-			MTNT JK 3.5
-			MTNT L -1
+			MTNT L 3.5 A_Fall
+			MTNT M 3.5 A_DeathScream
+			MTNT MO 3.5
+			MTNT P -1
 			stop
 	}
 }
@@ -981,6 +1036,76 @@ actor Gretel 20
 	}
 }
 
+actor Trans 23
+{
+	radius 42
+	points 5000
+	health 850, 950, 1050, 1200
+	speed 1, 3
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			TRNS A -1 NOP T_Stand
+			stop
+		See:
+			TRNS A 5 NOP T_Chase
+			TRNS A 1.5
+			TRNS B 4 NOP T_Chase
+			TRNS C 5 NOP T_Chase
+			TRNS C 1.5
+			TRNS D 4 NOP T_Chase
+			loop
+		Missile:
+			TRNS E 15
+			TRNS F 5
+			TRNS GFGFGE 5 T_Shoot
+			goto See
+		Death:
+			TRNS A .5 A_Fall
+			TRNS A .5 A_DeathScream
+			TRNS HIJ 7.5
+			TRNS K -1
+			stop
+	}
+}
+
+actor UberMutant 24
+{
+	radius 42
+	points 5000
+	health 1050, 1150, 1250, 1400
+	speed 1, 5.859
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			UBER A -1 T_Stand
+			stop
+		See:
+			UBER A 5 NOP T_Chase
+			UBER A 1.5
+			UBER B 4 NOP T_Chase
+			UBER C 5 NOP T_Chase
+			UBER C 1.5
+			UBER D 4 NOP T_Chase
+			loop
+		Missile:
+			UBER E 15
+			UBER F 6
+			UBER GHGFE 6 T_UShoot
+			goto See
+		Death:
+			UBER A .5 A_Fall
+			UBER A .5 A_DeathScream
+			UBER HIJK 7.5
+			UBER L -1
+			stop
+	}
+}
+
 actor Needle
 {
 	+NEVERMARK
@@ -1108,6 +1233,81 @@ actor FatFace 22
 	}
 }
 
+actor Wilhelm 25
+{
+	radius 42
+	points 5000
+	health 950, 1050, 1150, 1300
+	speed 1, 4
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			WILL A -1
+			stop
+		See:
+			WILL A 5 NOP T_Will
+			WILL A 1.5
+			WILL B 4 NOP T_Will
+			WILL C 5 NOP T_Will
+			WILL C 1.5
+			WILL D 4 NOP T_Will
+			loop
+		Missile:
+			WILL E 15
+			WILL F 5
+			WILL G 5 T_Launch
+			WILL HGH 5 T_Shoot
+			WILL H 0 T_Shoot
+			goto See
+		Death:
+			WILL A .5 A_Fall
+			WILL A 5 A_DeathScream
+			WILL IJK 5
+			WILL L -1
+			stop
+	}
+}
+
+actor DeathKnight 26
+{
+	radius 42
+	points 5000
+	health 1250, 1350, 1450, 1600
+	speed 1, 4
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			DKNT A -1 NOP T_Stand
+			stop
+		See:
+			DKNT A 5 NOP T_Will
+			DKNT A 1.5
+			DKNT B 4 NOP T_Will
+			DKNT C 5 NOP T_Will
+			DKNT C 1.5
+			DKNT D 4 NOP T_Will
+			loop
+		Missile:
+			DKNT E 15
+			DKNT F 5
+			DKNT H 5 T_Launch
+			DKNT G 5 T_Shoot
+			DKNT H 5 T_Launch
+			DKNT H 0 T_Shoot
+			goto See
+		Death:
+			DKNT A .5 A_Fall
+			DKNT A 5 A_DeathScream
+			DKNT IJKLMN 5
+			DKNT O -1
+			stop
+	}
+}
+
 actor FakeHitler 18
 {
 	radius 42
@@ -1230,6 +1430,89 @@ actor Hitler
 			HTLR JKLMNO 5
 			HTLR P -1 A_StartDeathCam
 			stop
+	}
+}
+
+actor AngelOfDeath 27
+{
+	radius 42
+	points 5000
+	health 1450, 1550, 1650, 2000
+	speed 1, 3
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			ANGL A -1 NOP T_Stand
+			stop
+		See:
+			ANGL A 5 NOP T_Will
+			ANGL A 1.5
+			ANGL B 4 NOP T_Will
+			ANGL C 5 NOP T_Will
+			ANGL C 1.5
+			ANGL D 4 NOP T_Will
+			loop
+		Missile:
+			ANGL E 5
+			ANGL F 10 A_StartAttack
+		Launch:
+			ANGL E 5 T_Launch
+			ANGL E 0 A_Relaunch
+			goto Launch
+		Tired:
+			ANGL G 20 A_Breathing
+			ANGL H 20
+			ANGL G 20 A_Breathing
+			ANGL H 20
+			ANGL G 20 A_Breathing
+			ANGL H 20
+			ANGL G 20 A_Breathing
+			goto See
+		Death:
+			ANGL A .5 A_Fall
+			ANGL A .5 A_DeathScream
+			ANGL I 5
+			ANGL J 5 A_Slurpie
+			ANGL KLMNO 5
+			ANGL P -1 A_Victory
+			stop
+	}
+}
+
+actor Spark
+{
+	states
+	{
+		Spawn:
+			SPRK ABCD 3 NOP T_Projectile
+			loop
+	}
+}
+
+actor Spectre 28
+{
+	radius 42
+	points 200
+	health 5, 10, 15, 25
+	speed 1, 1.563
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			SPCT ABCD 5 NOP T_Stand
+			loop
+		See:
+			SPCT ABCD 5 NOP T_Ghosts
+			loop
+		Death:
+			SPCT EFG 5
+			SPCT H 150
+			SPCT I 5
+			SPCT I 5 A_Dormant
+			wait
 	}
 }
 

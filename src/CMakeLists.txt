@@ -114,7 +114,6 @@ add_executable(ecwolf
 	v_palette.cpp
 	v_video.cpp
 	w_wad.cpp
-	wl_act1.cpp
 	wl_act2.cpp
 	wl_agent.cpp
 	wl_atmos.cpp

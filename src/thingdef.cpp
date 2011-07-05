@@ -428,6 +428,12 @@ void ClassDef::ParseActor(Scanner &sc)
 
 								if(!sc.CheckToken(TK_Identifier))
 									break;
+								else if(sc.CheckToken(':'))
+								{
+									needIdentifier = false;
+									sc.Rewind();
+									break;
+								}
 							}
 						}
 					}
