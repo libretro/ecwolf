@@ -57,6 +57,7 @@ add_executable(ecwolf
 	resourcefiles/file_vswap.cpp
 	resourcefiles/file_wad.cpp
 	resourcefiles/file_zip.cpp
+	resources/colormaps.cpp
 	sfmt/SFMT.cpp
 	textures/anim_switches.cpp
 	textures/animations.cpp
@@ -102,7 +103,6 @@ add_executable(ecwolf
 	m_random.cpp
 	m_png.cpp
 	name.cpp
-	r_data.cpp
 	r_sprites.cpp
 	r_translate.cpp
 	scanner.cpp

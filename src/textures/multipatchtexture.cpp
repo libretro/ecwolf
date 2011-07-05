@@ -36,7 +36,6 @@
 #include <ctype.h>
 #include "wl_def.h"
 #include "files.h"
-//#include "r_data.h"
 #include "w_wad.h"
 //#include "i_system.h"
 //#include "gi.h"
@@ -49,6 +48,7 @@
 #include "v_palette.h"
 #include "v_video.h"
 #include "textures.h"
+#include "resources/colormaps.h"
 
 // On the Alpha, accessing the shorts directly if they aren't aligned on a
 // 4-byte boundary causes unaligned access warnings. Why it does this at

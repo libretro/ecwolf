@@ -36,7 +36,6 @@
 #include "wl_def.h"
 #include "files.h"
 #include "w_wad.h"
-//#include "r_data.h"
 #include "templates.h"
 //#include "i_system.h"
 #include "r_translate.h"

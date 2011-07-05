@@ -4,7 +4,7 @@
 #include "gamemap.h"
 #include "wl_def.h"
 #include "wl_shade.h"
-#include "v_palette.h"
+#include "resources/colormaps.h"
 
 // Textured Floor and Ceiling by DarkOne
 // With multi-textured floors and ceilings stored in lower and upper bytes of

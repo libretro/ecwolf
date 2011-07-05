@@ -42,6 +42,7 @@
 #include "v_palette.h"
 #include "wl_shade.h"
 #include "zstring.h"
+#include "resources/colormaps.h"
 
 struct SpriteInfo
 {

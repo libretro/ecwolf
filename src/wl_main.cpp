@@ -26,7 +26,7 @@
 #include "thingdef.h"
 #include "v_palette.h"
 #include "v_video.h"
-#include "r_data.h"
+#include "resources/colormaps.h"
 #include <SDL_syswm.h>
 
 // Wad Code Stuff
@@ -1391,7 +1391,8 @@ int main (int argc, char *argv[])
 	printf("VL_ReadPalette: Setting up the Palette...\n");
 	VL_ReadPalette();
 	InitPalette("WOLFPAL");
-	R_InitData();
+	R_InitColormaps();
+	atexit(R_DeinitColormaps);
 	printf("InitGame: Setting up the game...\n");
 	InitGame();
 	FinalReadConfig();

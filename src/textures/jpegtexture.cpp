@@ -36,7 +36,6 @@
 #include "wl_def.h"
 #include "m_swap.h"
 #include "files.h"
-//#include "r_data.h"
 #include "r_jpeg.h"
 #include "w_wad.h"
 //#include "v_text.h"
