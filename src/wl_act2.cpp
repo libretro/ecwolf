@@ -1229,6 +1229,12 @@ CHASE
 =================
 */
 
+bool CheckMeleeRange(AActor *actor1, AActor *actor2)
+{
+	fixed r = actor1->radius + actor2->radius;
+	return abs(actor2->x - actor1->x) <= r && abs(actor2->y - actor1->y) <= r;
+}
+
 ACTION_FUNCTION(T_Chase)
 {
 	int32_t	move,target;
@@ -1277,6 +1283,8 @@ ACTION_FUNCTION(T_Chase)
 		else
 			self->hidden = true;
 	}
+	else
+		self->hidden = true;
 
 	if (self->dir == nodir)
 	{
@@ -1298,14 +1306,10 @@ ACTION_FUNCTION(T_Chase)
 		//
 		// check for melee range
 		//
-		if(self->MeleeState)
+		if(self->MeleeState && CheckMeleeRange(self, player))
 		{
-			fixed r = player->radius + self->radius + 10000;
-			if(abs(player->x - self->x) <= r && abs(player->y - self->y) <= r)
-			{
-				self->SetState(self->MeleeState);
-				return;
-			}
+			self->SetState(self->MeleeState);
+			return;
 		}
 
 		if (move < self->distance)
@@ -1560,33 +1564,15 @@ void T_Shoot(AActor *self) { __AF_T_Shoot(self); }
 ===============
 */
 
-void T_Bite (objtype *ob)
+ACTION_FUNCTION(T_Bite)
 {
-	int32_t    dx,dy;
+	PlaySoundLocActor(self->attacksound, self);
 
-	PlaySoundLocActor("dog/attack",ob);     // JAB
-
-#if 0
-	dx = player->x - ob->x;
-	if (dx<0)
-		dx = -dx;
-	dx -= TILEGLOBAL;
-	if (dx <= MINACTORDIST)
+	if(CheckMeleeRange(self, player))
 	{
-		dy = player->y - ob->y;
-		if (dy<0)
-			dy = -dy;
-		dy -= TILEGLOBAL;
-		if (dy <= MINACTORDIST)
-		{
-			if (US_RndT()<180)
-			{
-				TakeDamage (US_RndT()>>4,ob);
-				return;
-			}
-		}
+		if(US_RndT()<180)
+			TakeDamage(US_RndT()>>4, self);
 	}
-#endif
 }
 
 
