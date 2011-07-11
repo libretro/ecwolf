@@ -26,7 +26,7 @@
 #include "thingdef.h"
 #include "v_palette.h"
 #include "v_video.h"
-#include "resources/colormaps.h"
+#include "r_data/colormaps.h"
 #include <SDL_syswm.h>
 
 // Wad Code Stuff
