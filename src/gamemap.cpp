@@ -37,7 +37,8 @@
 #include "w_wad.h"
 #include "wl_def.h"
 #include "lnspec.h"
-#include "thingdef.h"
+#include "actor.h"
+#include "thingdef/thingdef.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
 {

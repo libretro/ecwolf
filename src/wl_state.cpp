@@ -6,7 +6,7 @@
 #include "id_sd.h"
 #include "id_us.h"
 #include "m_random.h"
-#include "thingdef.h"
+#include "actor.h"
 
 /*
 =============================================================================

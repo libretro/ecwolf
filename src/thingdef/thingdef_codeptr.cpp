@@ -32,6 +32,7 @@
 **
 */
 
+#include "actor.h"
 #include "thingdef.h"
 
 static ActionTable *actionFunctions = NULL;

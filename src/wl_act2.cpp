@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include "actor.h"
 #include "wl_act.h"
 #include "wl_def.h"
 #include "wl_menu.h"
@@ -11,7 +12,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "language.h"
-#include "thingdef.h"
+#include "thingdef/thingdef.h"
 
 static inline bool CheckDoorMovement(AActor *actor)
 {

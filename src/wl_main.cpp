@@ -23,7 +23,7 @@
 #include "language.h"
 #include "textures/textures.h"
 #include "c_cvars.h"
-#include "thingdef.h"
+#include "thingdef/thingdef.h"
 #include "v_palette.h"
 #include "v_video.h"
 #include "r_data/colormaps.h"

@@ -34,16 +34,14 @@
 
 #ifndef __THINGDEF_H__
 #define __THINGDEF_H__
-#include "gamemap.h"
-#include "linkedlist.h"
+#include "actor.h"
 #include "scanner.h"
 #include "tarray.h"
 #include "wl_def.h"
 #include "zstring.h"
 
-class AActor;
 class ClassDef;
-typedef void (*ActionPtr)(AActor *);
+class Frame;
 
 class ActionInfo
 {
@@ -81,108 +79,6 @@ struct StateDefinition
 		NextType	nextType;
 		FString		nextArg;
 		ActionPtr	functions[2];
-};
-
-struct Frame
-{
-	public:
-		union
-		{
-			char	sprite[4];
-			uint32_t isprite;
-		};
-		uint8_t		frame;
-		int			duration;
-		ActionPtr	action;
-		ActionPtr	thinker;
-		const Frame	*next;
-
-		unsigned int	spriteInf;
-};
-
-#define DECLARE_NATIVE_CLASS(name, parent) \
-	friend class ClassDef; \
-	protected: \
-		A##name(const ClassDef *classType) : A##parent(classType) {} \
-		virtual AActor *__NewNativeInstance(const ClassDef *classType) { return new A##name(classType); } \
-	public: \
-		static const ClassDef *__StaticClass;
-#define IMPLEMENT_CLASS(name, parent) \
-	const ClassDef *A##name::__StaticClass = ClassDef::DeclareNativeClass<A##name>(#name, A##parent::__StaticClass);
-#define NATIVE_CLASS(name) A##name::__StaticClass
-
-typedef uint32_t flagstype_t;
-
-class AActorProxy;
-class AActor
-{
-	public:
-		~AActor();
-
-		void			Destroy();
-		void			Die();
-		void			EnterZone(const MapZone *zone);
-		const Frame		*FindState(const FName &name) const;
-		const MapZone	*GetZone() const { return soundZone; }
-		void			SetState(const Frame *state, bool notic=false);
-		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
-		void			Tick();
-
-		const AActor	*defaults;
-
-		// Basic properties from objtype
-		flagstype_t flags;
-
-		int32_t	distance; // if negative, wait for that door to open
-		dirtype	dir;
-
-		fixed	x, y;
-		word	tilex, tiley;
-
-		short	angle;
-		short	health;
-		short	defaultHealth[9];
-		int32_t	speed, runspeed;
-		int		points;
-		fixed	radius;
-
-		activetype  active;
-		short       ticcount;
-		classtype   obclass;
-		const Frame	*state;
-		unsigned int sprite;
-
-		short       viewx;
-		word        viewheight;
-		fixed       transx,transy;      // in global coord
-
-		uint16_t	sighttime;
-		uint8_t		sightrandom;
-		FName		attacksound, deathsound, seesound;
-
-		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState, *DeathState;
-		short       temp1,hidden;
-
-		typedef LinkedList<AActor *>::Node Iterator;
-		static LinkedList<AActor *>	actors;
-		LinkedList<AActor *>::Node	*actorRef;
-		static Iterator *GetIterator() { return actors.Head(); }
-	protected:
-		friend class AActorProxy;
-		void			Init(bool nothink=false);
-
-		const MapZone	*soundZone;
-		AActorProxy		*thinker;
-
-		const ClassDef	*classType;
-
-	// ClassDef stuff
-	friend class ClassDef;
-	public:
-		static const ClassDef *__StaticClass;
-	protected:
-		AActor(const ClassDef *type);
-		virtual AActor *__NewNativeInstance(const ClassDef *classType) { return new AActor(classType); }
 };
 
 struct FlagDef
@@ -224,7 +120,25 @@ class ClassDef
 		 * Use with IMPLEMENT_CLASS to add a natively defined class.
 		 */
 		template<class T>
-		static const ClassDef	*DeclareNativeClass(const char* className, const ClassDef *parent);
+		static const ClassDef	*DeclareNativeClass(const char* className, const ClassDef *parent)
+		{
+			ClassDef **definitionLookup = ClassTable().CheckKey(className);
+			ClassDef *definition = NULL;
+			if(definitionLookup == NULL)
+			{
+				definition = new ClassDef();
+				ClassTable()[className] = definition;
+			}
+			else
+				definition = *definitionLookup;
+			definition->name = className;
+			definition->parent = parent;
+			delete definition->defaultInstance;
+			definition->defaultInstance = new T(definition);
+			definition->defaultInstance->defaults = definition->defaultInstance;
+			definition->defaultInstance->Init(true);
+			return definition;
+		}
 
 		/**
 		 * Prints the implemented classes in a tree.  This is not designed to 
@@ -247,7 +161,8 @@ class ClassDef
 
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
 
-		static TMap<FName, ClassDef *>	classTable;
+		// We need to do this for proper initialization order.
+		static TMap<FName, ClassDef *>	&ClassTable();
 		static TMap<int, ClassDef *>	classNumTable;
 
 		FName			name;

@@ -35,7 +35,7 @@
 #ifndef __R_SPRITES_H__
 #define __R_SPRITES_H__
 
-#include "thingdef.h"
+#include "actor.h"
 #include "zstring.h"
 
 enum SpecialSprites

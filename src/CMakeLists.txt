@@ -79,6 +79,10 @@ add_executable(ecwolf
 	textures/warptexture.cpp
 	textures/wolfrawtexture.cpp
 	textures/wolfshapetexture.cpp
+	thingdef/thingdef.cpp
+	thingdef/thingdef_codeptr.cpp
+	thingdef/thingdef_properties.cpp
+	actor.cpp
 	colormatcher.cpp
 	config.cpp
 	c_cvars.cpp
@@ -108,9 +112,6 @@ add_executable(ecwolf
 	scanner.cpp
 	sndinfo.cpp
 	thinker.cpp
-	thingdef.cpp
-	thingdef_codeptr.cpp
-	thingdef_properties.cpp
 	v_palette.cpp
 	v_video.cpp
 	w_wad.cpp

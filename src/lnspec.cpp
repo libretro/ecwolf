@@ -35,7 +35,7 @@
 #include "id_ca.h"
 #include "id_sd.h"
 #include "lnspec.h"
-#include "thingdef.h"
+#include "actor.h"
 using namespace Specials;
 
 #define DEFINE_SPECIAL(name,num,args) \

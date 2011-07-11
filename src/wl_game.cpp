@@ -11,7 +11,7 @@
 #include "id_us.h"
 #include "w_wad.h"
 #include "thinker.h"
-#include "thingdef.h"
+#include "actor.h"
 #include <SDL_mixer.h>
 
 #ifdef MYPROFILE

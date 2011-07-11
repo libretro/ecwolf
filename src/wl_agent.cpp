@@ -7,7 +7,8 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
-#include "thingdef.h"
+#include "actor.h"
+#include "thingdef/thingdef.h"
 #include "lnspec.h"
 
 /*

@@ -32,6 +32,7 @@
 **
 */
 
+#include "actor.h"
 #include "thingdef.h"
 
 #define INT_PARAM(var, no) int64_t var = params[no].i

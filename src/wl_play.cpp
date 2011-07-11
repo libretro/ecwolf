@@ -13,7 +13,7 @@
 #include "language.h"
 #include "lumpremap.h"
 #include "thinker.h"
-#include "thingdef.h"
+#include "actor.h"
 #include "textures/textures.h"
 
 /*

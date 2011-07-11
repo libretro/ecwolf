@@ -32,6 +32,7 @@
 **
 */
 
+#include "actor.h"
 #include "id_ca.h"
 #include "r_sprites.h"
 #include "scanner.h"
@@ -64,7 +65,6 @@ const FlagDef flags[] =
 };
 extern const PropDef properties[NUM_PROPERTIES];
 
-TMap<FName, ClassDef *> ClassDef::classTable;
 TMap<int, ClassDef *> ClassDef::classNumTable;
 
 ClassDef::ClassDef()
@@ -79,6 +79,12 @@ ClassDef::~ClassDef()
 	for(unsigned int i = 0;i < frameList.Size();i++)
 		delete frameList[i];
 	delete defaultInstance;
+}
+
+TMap<FName, ClassDef *> &ClassDef::ClassTable()
+{
+	static TMap<FName, ClassDef *> classTable;
+	return classTable;
 }
 
 AActor *ClassDef::CreateInstance() const
@@ -111,7 +117,7 @@ const ClassDef *ClassDef::FindClass(unsigned int ednum)
 
 const ClassDef *ClassDef::FindClass(const FName &className)
 {
-	ClassDef **ret = classTable.CheckKey(className);
+	ClassDef **ret = ClassTable().CheckKey(className);
 	if(ret == NULL)
 		return NULL;
 	return *ret;
@@ -245,7 +251,7 @@ void ClassDef::LoadActors()
 
 	R_InitSprites();
 
-	TMap<FName, ClassDef *>::Iterator iter(classTable);
+	TMap<FName, ClassDef *>::Iterator iter(ClassTable());
 	TMap<FName, ClassDef *>::Pair *pair;
 	while(iter.NextPair(pair))
 	{
@@ -259,13 +265,13 @@ void ClassDef::ParseActor(Scanner &sc)
 {
 	// Read the header
 	sc.MustGetToken(TK_Identifier);
-	ClassDef **classRef = classTable.CheckKey(sc->str);
+	ClassDef **classRef = ClassTable().CheckKey(sc->str);
 	ClassDef *newClass;
 	bool previouslyDefined = classRef != NULL;
 	if(!previouslyDefined)
 	{
 		newClass = new ClassDef();
-		classTable[sc->str] = newClass;
+		ClassTable()[sc->str] = newClass;
 	}
 	else
 		newClass = *classRef;
@@ -668,189 +674,11 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 void ClassDef::UnloadActors()
 {
 	TMap<FName, ClassDef *>::Pair *pair;
-	for(TMap<FName, ClassDef *>::Iterator iter(classTable);iter.NextPair(pair);)
+	for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
 	{
 		delete pair->Value;
 	}
 }
-
-template<class T>
-const ClassDef *ClassDef::DeclareNativeClass(const char* className, const ClassDef *parent)
-{
-	ClassDef **definitionLookup = classTable.CheckKey(className);
-	ClassDef *definition = NULL;
-	if(definitionLookup == NULL)
-	{
-		definition = new ClassDef();
-		classTable[className] = definition;
-	}
-	else
-		definition = *definitionLookup;
-	definition->name = className;
-	definition->parent = parent;
-	delete definition->defaultInstance;
-	definition->defaultInstance = new T(definition);
-	definition->defaultInstance->defaults = definition->defaultInstance;
-	definition->defaultInstance->Init(true);
-	return definition;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-// We can't make AActor a thinker since we create non-thinking objects.
-class AActorProxy : public Thinker
-{
-	DECLARE_THINKER(AActorProxy)
-	public:
-		AActorProxy(AActor *parent) : parent(parent)
-		{
-		}
-
-		~AActorProxy()
-		{
-			delete parent;
-		}
-
-		void Tick()
-		{
-			parent->Tick();
-		}
-	private:
-		AActor * const parent;
-};
-IMPLEMENT_THINKER(AActorProxy)
-
-LinkedList<AActor *> AActor::actors;
-const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
-
-AActor::AActor(const ClassDef *type) : classType(type), flags(0), distance(0),
-	dir(nodir), soundZone(NULL), SpawnState(NULL)
-{
-}
-
-AActor::~AActor()
-{
-	if(actorRef)
-		actors.Remove(actorRef);
-}
-
-void AActor::Destroy()
-{
-	assert(thinker != NULL);
-	thinker->Destroy();
-}
-
-void AActor::Die()
-{
-	GivePoints(points);
-	if(flags & FL_COUNTKILL)
-		gamestate.killcount++;
-	flags &= ~FL_SHOOTABLE;
-
-	if(DeathState)
-		SetState(DeathState);
-	else
-		Destroy();
-}
-
-void AActor::EnterZone(const MapZone *zone)
-{
-	if(zone)
-		soundZone = zone;
-}
-
-const Frame *AActor::FindState(const FName &name) const
-{
-	return classType->FindState(name);
-}
-
-void AActor::Init(bool nothink)
-{
-	if(!nothink)
-	{
-		actorRef = actors.Push(this);
-		thinker = new AActorProxy(this);
-
-		if(SpawnState)
-			SetState(SpawnState, true);
-		else
-		{
-			state = NULL;
-			Destroy();
-		}
-	}
-	else
-	{
-		actorRef = NULL;
-		thinker = NULL;
-		state = NULL;
-	}
-}
-
-void AActor::SetState(const Frame *state, bool notic)
-{
-	if(state == NULL)
-		return;
-
-	this->state = state;
-	sprite = state->spriteInf;
-	ticcount = state->duration;
-	if(!notic && state->action)
-		state->action(this);
-}
-
-void AActor::Tick()
-{
-	if(state == NULL)
-	{
-		Destroy();
-		return;
-	}
-
-	if(ticcount > 0)
-		--ticcount;
-
-	while(ticcount == 0)
-	{
-		if(!state->next)
-		{
-			Destroy();
-			return;
-		}
-		SetState(state->next);
-	}
-
-	if(state->thinker)
-		state->thinker(this);
-}
-
-AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
-{
-	if(type == NULL)
-	{
-		printf("Tried to spawn classless actor.\n");
-		return NULL;
-	}
-
-	AActor *actor = type->CreateInstance();
-	actor->x = x;
-	actor->y = y;
-	actor->tilex = x>>FRACBITS;
-	actor->tiley = y>>FRACBITS;
-
-	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
-	actor->EnterZone(spot->zone);
-
-	if(actor->flags & FL_COUNTKILL)
-		++gamestate.killtotal;
-	return actor;
-}
-
-class AWeapon : public AActor
-{
-	DECLARE_NATIVE_CLASS(Weapon, Actor)
-};
-IMPLEMENT_CLASS(Weapon, Actor)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -863,7 +691,7 @@ void ClassDef::DumpClasses()
 			{
 				ClassTree **nextChild = &child;
 				TMap<FName, ClassDef *>::Pair *pair;
-				for(TMap<FName, ClassDef *>::Iterator iter(classTable);iter.NextPair(pair);)
+				for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
 				{
 					if(pair->Value->parent == classType)
 					{

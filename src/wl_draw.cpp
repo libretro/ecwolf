@@ -15,7 +15,7 @@
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
 #include "wl_shade.h"
-#include "thingdef.h"
+#include "actor.h"
 #include "id_ca.h"
 #include "gamemap.h"
 #include "lumpremap.h"
