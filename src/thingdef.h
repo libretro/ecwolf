@@ -54,6 +54,8 @@ class ActionInfo
 		const FName name;
 };
 
+typedef TArray<ActionInfo *> ActionTable;
+
 #define ACTION_FUNCTION(func) \
 	void __AF_##func(AActor *self); \
 	static const ActionInfo __AI_##func(__AF_##func, #func); \
@@ -232,6 +234,7 @@ class ClassDef
 
 		static const ClassDef	*FindClass(unsigned int ednum);
 		static const ClassDef	*FindClass(const FName &className);
+		const ActionPtr			FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
 		static void				LoadActors();
 		static void				UnloadActors();
@@ -252,6 +255,8 @@ class ClassDef
 
 		TMap<FName, Frame *>	stateList;
 		TArray<Frame *>			frameList;
+
+		ActionTable		actions;
 
 		AActor			*defaultInstance;
 };

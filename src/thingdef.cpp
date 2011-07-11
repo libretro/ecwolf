@@ -41,9 +41,9 @@
 #include "thinker.h"
 
 // Code pointer stuff
-void InitFunctionTable();
+void InitFunctionTable(ActionTable *table);
 void ReleaseFunctionTable();
-ActionPtr FindFunction(const FName &func);
+ActionInfo *LookupFunction(const FName &func, const ActionTable *table);
 
 #define DEFINE_FLAG(prefix, flag, type, variable) { prefix##_##flag, #flag, typeoffsetof(type,variable) }
 const FlagDef flags[] =
@@ -115,6 +115,19 @@ const ClassDef *ClassDef::FindClass(const FName &className)
 	if(ret == NULL)
 		return NULL;
 	return *ret;
+}
+
+const ActionPtr ClassDef::FindFunction(const FName &function) const
+{
+	if(actions.Size() != 0)
+	{
+		ActionInfo *func = LookupFunction(function, &actions);
+		if(func)
+			return func->func;
+	}
+	if(parent)
+		return parent->FindFunction(function);
+	return NULL;
 }
 
 const Frame *ClassDef::FindState(const FName &stateName) const
@@ -218,7 +231,7 @@ void ClassDef::LoadActors()
 	printf("ClassDef: Loading actor definitions.\n");
 	atexit(&ClassDef::UnloadActors);
 
-	InitFunctionTable();
+	InitFunctionTable(NULL);
 
 	int lastLump = 0;
 	int lump = 0;
@@ -313,6 +326,8 @@ void ClassDef::ParseActor(Scanner &sc)
 			sc.MustGetToken(TK_Identifier);
 			if(sc->str.CompareNoCase("states") == 0)
 			{
+				InitFunctionTable(&newClass->actions);
+
 				TArray<StateDefinition> stateDefs;
 
 				sc.MustGetToken('{');
@@ -410,7 +425,7 @@ void ClassDef::ParseActor(Scanner &sc)
 									if(sc->str.CompareNoCase("NOP") != 0)
 									{
 										ActionPtr &ptr = thisState.functions[func];
-										ActionPtr func = FindFunction(sc->str);
+										ActionPtr func = newClass->FindFunction(sc->str);
 										if(func)
 										{
 											ptr = *func;
@@ -451,6 +466,17 @@ void ClassDef::ParseActor(Scanner &sc)
 
 				newClass->InstallStates(stateDefs);
 			}
+			else if(sc->str.CompareNoCase("action") == 0)
+			{
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.CompareNoCase("native") != 0)
+					sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
+				sc.MustGetToken(TK_Identifier);
+				newClass->actions.Push(LookupFunction(sc->str, NULL));
+				sc.MustGetToken('(');
+				sc.MustGetToken(')');
+				sc.MustGetToken(';');
+			}
 			else
 			{
 				FString propertyName = sc->str;
@@ -466,7 +492,7 @@ void ClassDef::ParseActor(Scanner &sc)
 						sc.GetNextToken();
 					}
 					while(sc.CheckToken(','));
-					printf("Warning: Unkown property '%s' for actor '%s'.\n", propertyName.GetChars(), newClass->name.GetChars());
+					sc.ScriptMessage(Scanner::WARNING, "Unkown property '%s' for actor '%s'.\n", propertyName.GetChars(), newClass->name.GetChars());
 				}
 			}
 		}

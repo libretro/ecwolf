@@ -5,6 +5,15 @@ actor Actor native
 	sighttime 1
 	speed 0
 	points 0
+
+	action native A_DeathScream();
+	action native A_Fall();
+	action native T_Bite();
+	action native T_Chase();
+	action native T_Path();
+	action native T_Shoot();
+	action native T_Stand();
+
 	states
 	{
 		Spawn:
@@ -1539,6 +1548,10 @@ actor BJPlayer
 {
 	radius 22
 	+NEVERMARK
+
+	action native T_Attack();
+	action native T_Player();
+
 	states
 	{
 		Spawn:

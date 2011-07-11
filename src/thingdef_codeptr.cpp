@@ -34,11 +34,11 @@
 
 #include "thingdef.h"
 
-static TArray<ActionInfo *> *actionFunctions = NULL;
+static ActionTable *actionFunctions = NULL;
 ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name)
 {
 	if(actionFunctions == NULL)
-		actionFunctions = new TArray<ActionInfo *>;
+		actionFunctions = new ActionTable;
 	printf("Adding %s\n", name.GetChars());
 	actionFunctions->Push(this);
 }
@@ -54,14 +54,12 @@ int FunctionTableComp(const void *f1, const void *f2)
 	return 0;
 }
 
-void InitFunctionTable()
+void InitFunctionTable(ActionTable *table)
 {
-	qsort(&(*actionFunctions)[0], actionFunctions->Size(), sizeof((*actionFunctions)[0]), FunctionTableComp);
+	if(table == NULL)
+		table = actionFunctions;
 
-	/*for(unsigned int i = 0;i < actionFunctions->Size();++i)
-	{
-		printf("%s\t%d\n", actionFunctions->operator[](i)->name.GetChars(), actionFunctions->operator[](i)->name.GetIndex());
-	}*/
+	qsort(&(*table)[0], table->Size(), sizeof((*table)[0]), FunctionTableComp);
 }
 
 void ReleaseFunctionTable()
@@ -69,17 +67,20 @@ void ReleaseFunctionTable()
 	delete actionFunctions;
 }
 
-ActionPtr FindFunction(const FName &func)
+ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 {
+	if(table == NULL)
+		table = actionFunctions;
+
 	ActionInfo *inf;
-	unsigned int max = actionFunctions->Size()-1;
+	unsigned int max = table->Size()-1;
 	unsigned int min = 0;
 	unsigned int mid = max/2;
 	do
 	{
-		inf = (*actionFunctions)[mid];
+		inf = (*table)[mid];
 		if(inf->name == func)
-			return inf->func;
+			return inf;
 
 		if(inf->name > func)
 			max = mid-1;
