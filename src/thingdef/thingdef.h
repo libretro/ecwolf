@@ -42,6 +42,7 @@
 
 class ClassDef;
 class Frame;
+class Symbol;
 
 class ActionInfo
 {
@@ -150,6 +151,7 @@ class ClassDef
 		static const ClassDef	*FindClass(const FName &className);
 		const ActionPtr			FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
+		Symbol					*FindSymbol(const FName &symbol) const { return NULL; }
 		static void				LoadActors();
 		static void				UnloadActors();
 

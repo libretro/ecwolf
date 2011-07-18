@@ -81,7 +81,9 @@ add_executable(ecwolf
 	textures/wolfshapetexture.cpp
 	thingdef/thingdef.cpp
 	thingdef/thingdef_codeptr.cpp
+	thingdef/thingdef_expression.cpp
 	thingdef/thingdef_properties.cpp
+	thingdef/thingdef_type.cpp
 	actor.cpp
 	colormatcher.cpp
 	config.cpp
