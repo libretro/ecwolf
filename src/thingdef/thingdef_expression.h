@@ -45,12 +45,32 @@ class TypeHierarchy;
 class ExpressionNode
 {
 	public:
+		class Value
+		{
+			public:
+				void PerformOperation(const Value *other, const ExpressionOperator &op);
+
+				const Value &operator=(int64_t val) { i = val; d = val; isDouble = false; return *this; }
+				const Value &operator=(double val) { i = val; d = val; isDouble = true; return *this; }
+
+				int64_t GetInt() const { return isDouble ? d : i; }
+				double GetDouble() const { return isDouble ? d : i; }
+
+			private:
+				bool isDouble;
+				int64_t	i;
+				double	d;
+		};
+
 		~ExpressionNode();
 
+		const Value &Evaluate(AActor *self);
 		//void	DumpExpression(std::stringstream &out, std::string endLabel=std::string()) const;
 
 		static ExpressionNode	*ParseExpression(const ClassDef *cls, TypeHierarchy &types, Scanner &sc, ExpressionNode *root=NULL, unsigned char opLevel=255);
 	protected:
+		Value evaluation;
+
 		enum ValueType
 		{
 			CONSTANT,	// Resolved at compile time
@@ -65,18 +85,16 @@ class ExpressionNode
 		bool		CheckAssignment() const;
 
 		const ExpressionOperator	*op;
-		ExpressionNode				*term[3];
+		ExpressionNode				*term[2];
+		ExpressionNode				*subscript;
 		ExpressionNode				*parent;
 
 		ValueType					type;
 		const Type					*classType;
-		int							value;
+		Value						value;
 		FString						str;
 		FString						identifier;
 		Symbol						*symbol;
-
-		static unsigned int		nextJumpPoint;
-		static FString			GetJumpPoint();
 };
 
 #endif /* __EXPRESSION_H__ */

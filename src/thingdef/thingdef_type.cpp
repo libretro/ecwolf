@@ -70,7 +70,7 @@ void Type::MakePrimitive()
 
 TypeHierarchy::TypeHierarchy()
 {
-	static const char* primitives[NUM_TYPES] = {"void", "str", "char", "int", "fixed"};
+	static const char* primitives[NUM_TYPES] = {"void", "str", "char", "int", "float"};
 
 	for(unsigned int i = 0;i < NUM_TYPES;++i)
 	{

@@ -30,8 +30,6 @@
 #include "scanner.h"
 #include "thingdef/thingdef_type.h"
 
-unsigned int ExpressionNode::nextJumpPoint = 0;
-
 static const struct ExpressionOperator
 {
 	unsigned char		token;
@@ -86,18 +84,195 @@ static const struct ExpressionOperator
 	{ '\0', 255, "", 0, "", false }
 };
 
+void ExpressionNode::Value::PerformOperation(const ExpressionNode::Value *other, const ExpressionOperator &op)
+{
+	if(op.operands > 1)
+	{
+		if(!isDouble)
+		{
+			isDouble = other->isDouble;
+			d = i;
+		}
+
+		switch(op.token)
+		{
+			default:
+				break;
+			case '*':
+				if(isDouble) d *= other->GetDouble();
+				else i *= other->GetInt();
+				break;
+			case '/':
+				if(isDouble) d /= other->GetDouble();
+				else
+				{
+					isDouble = true;
+					d = double(i)/other->GetInt();
+				}
+				break;
+			case '%':
+				if(isDouble)
+				{
+					isDouble = false;
+					i = int64_t(d)%other->GetInt();
+				}
+				else i %= other->GetInt();
+				break;
+			case '+':
+				if(isDouble) d += other->GetDouble();
+				else i += other->GetInt();
+				break;
+			case '-':
+				if(isDouble) d -= other->GetDouble();
+				else i -= other->GetInt();
+				break;
+			case TK_ShiftLeft:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = int64_t(d)<<other->GetInt();
+				}
+				else i <<= other->GetInt();
+				break;
+			case TK_ShiftRight:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = int64_t(d)>>other->GetInt();
+				}
+				else i >>= other->GetInt();
+				break;
+			case '<':
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d < other->GetDouble();
+				}
+				else i = i < other->GetInt();
+				break;
+			case TK_LessEq:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d <= other->GetDouble();
+				}
+				else i = i <= other->GetInt();
+				break;
+			case '>':
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d > other->GetDouble();
+				}
+				else i = i > other->GetInt();
+				break;
+			case TK_GtrEq:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d >= other->GetDouble();
+				}
+				else i = i >= other->GetInt();
+				break;
+			case TK_EqEq:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d == other->GetDouble();
+				}
+				else i = i == other->GetInt();
+				break;
+			case TK_NotEq:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d != other->GetDouble();
+				}
+				else i = i != other->GetInt();
+				break;
+			case '&':
+				if(isDouble)
+				{
+					isDouble = false;
+					i = int64_t(d)&other->GetInt();
+				}
+				else i &= other->GetInt();
+				break;
+			case '|':
+				if(isDouble)
+				{
+					isDouble = false;
+					i = int64_t(d)|other->GetInt();
+				}
+				else i |= other->GetInt();
+				break;
+			case '^':
+				if(isDouble)
+				{
+					isDouble = false;
+					i = int64_t(d)^other->GetInt();
+				}
+				else i ^= other->GetInt();
+				break;
+			case TK_AndAnd:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d && other->GetDouble();
+				}
+				else i = i && other->GetInt();
+				break;
+			case TK_OrOr:
+				if(isDouble)
+				{
+					isDouble = false;
+					i = d || other->GetDouble();
+				}
+				else i = i || other->GetInt();
+				break;
+		}
+	}
+	else
+	{
+		switch(op.token)
+		{
+			default:
+				break;
+			case '-':
+				if(isDouble) d *= -1;
+				else i *= -1;
+				break;
+			case '!':
+				if(isDouble)
+				{
+					isDouble = false;
+					i != d;
+				}
+				else i != i;
+				break;
+			case '~':
+				if(isDouble)
+				{
+					isDouble = false;
+					i = ~int64_t(d);
+				}
+				else i = !i;
+				break;
+		}
+	}
+}
+
 ExpressionNode::ExpressionNode(ExpressionNode *parent) : op(&operators[0]), parent(parent), type(CONSTANT), classType(NULL)
 {
-	term[0] = term[1] = term[2] = NULL;
+	term[0] = term[1] = /* term[2] =*/ NULL;
+	subscript = NULL;
 }
 
 ExpressionNode::~ExpressionNode()
 {
-	for(unsigned char i = 0;i < 3;i++)
-	{
-		if(term[i] != NULL)
-			delete term[i];
-	}
+	for(unsigned char i = 0;i < 2;i++)
+		delete term[i];
+	delete subscript;
 }
 
 bool ExpressionNode::CheckAssignment() const
@@ -110,97 +285,40 @@ bool ExpressionNode::CheckAssignment() const
 		symbol->GetType() == term[1]->GetType();
 }
 
-#if 0
-void ExpressionNode::DumpExpression(stringstream &out, std::string endLabel) const
+const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)
 {
-	TypeRef argumentTypes[2];
-	bool writeEndLabel = endLabel.empty();
-	if(writeEndLabel)
-		endLabel = GetJumpPoint();
-
-	// [BL] Debug code to give a visual dump of the tree.
-#if 0
-	int level = 1;
-	for(const ExpressionNode *tmp=this;tmp->parent != NULL;tmp = tmp->parent, level++);
-	const Type *tmpType = GetType();
-	Print(ML_NOTICE, "%s%s (%s)", string(level, '\t').c_str(), op->instruction, tmpType ? tmpType->GetName().c_str() : "");
-#endif
-
-	// Check if we have a value or term to push (left)
 	if(term[0] == NULL)
 	{
 		if(type == CONSTANT)
-			out << "pushnumber " << value << "\n";
+			evaluation = value;
 		else if(type == SYMBOL)
 		{
-			// On an assignment operation we'll put the instruction after the
-			// expression is evaluated.
-			if(!CheckAssignment())
-				out << symbol->PushSymbol() << "\n";
 		}
 		else
-			out << "pushnumber " << identifier << "\n";
-		argumentTypes[0] = TypeRef(GetType());
+		{
+		}
 	}
 	else
 	{
-		term[0]->DumpExpression(out, endLabel);
-		argumentTypes[0] = TypeRef(term[0]->GetType());
+		term[0]->Evaluate(self);
+		evaluation = term[0]->evaluation;
 	}
 
-	// Short
-	if(op->token == TK_AndAnd)
-		out << "dup\nifnotgoto " << endLabel << "\n";
-	else if(op->token == TK_OrOr)
-		out << "dup\nifgoto " << endLabel << "\n";
+	if(op->token == TK_OrOr && evaluation.GetInt())
+		return (evaluation = int64_t(1));
+	else if(op->token == TK_AndAnd && !evaluation.GetInt())
+		return (evaluation = int64_t(0));
 
-	if(op->operands > 1)
+	if(op->operands > 1 && term[1] != NULL)
 	{
-		if(op->operands == 3) // Ternary
-		{
-			string elsePoint = GetJumpPoint();
-			string endPoint = writeEndLabel ? endLabel : GetJumpPoint();
+		term[1]->Evaluate(self);
 
-			out << op->instruction << " " << elsePoint << "\n";
-			if(term[1] != NULL)
-				term[1]->DumpExpression(out, endLabel);
-			out << "goto " << endPoint << "\n" << elsePoint << ":\n";
-			if(term[2] != NULL)
-				term[2]->DumpExpression(out, endLabel);
-			out << endPoint << ":\n";
-			return;
-		}
-
-		// right term
-		if(term[1] != NULL)
-		{
-			term[1]->DumpExpression(out, endLabel);
-			argumentTypes[1] = TypeRef(term[1]->GetType());
-		}
+		evaluation.PerformOperation(&term[1]->evaluation, *op);
 	}
-
-	// Print the instruction
-	if(op->token != '\0')// && op->instruction[0] != '\0')
-	{
-		if(CheckAssignment())
-		{
-			// Check to see if we're doing a multiple assignment.
-			if(parent != NULL && parent->CheckAssignment())
-				out << "dup\n";
-			out << symbol->AssignSymbol();
-		}
-
-		const Function *function = argumentTypes[0].GetType()->LookupFunction(FunctionPrototype(op->function, op->operands-1, argumentTypes+1));
-		if(!function && argumentTypes[0].GetType()->IsPrimitive() && (op->operands <= 1 || argumentTypes[1].GetType()->IsPrimitive()))
-			out << op->instruction << "\n";
-		else // TODO: Stuff
-			out << "callfunc\n";
-	}
-
-	if(writeEndLabel)
-		out << endLabel << ":\n";
+	else
+		evaluation.PerformOperation(NULL, *op);
+	return evaluation;
 }
-#endif
 
 const Type *ExpressionNode::GetType() const
 {
@@ -218,13 +336,6 @@ const Type *ExpressionNode::GetType() const
 	if(isOp)
 		function = argumentTypes[0].GetType()->LookupFunction(FunctionPrototype(op->function, op->operands-1, argumentTypes+1));
 	return function ? function->GetReturnType().GetType() : argumentTypes[0].GetType();
-}
-
-FString ExpressionNode::GetJumpPoint()
-{
-	char pointName[14];
-	sprintf(pointName, "Expr%09X", nextJumpPoint++);
-	return pointName;
 }
 
 ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarchy &types, Scanner &sc, ExpressionNode *root, unsigned char opLevel)
@@ -270,19 +381,19 @@ ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarc
 			else if(sc.CheckToken(TK_IntConst))
 			{
 				thisNode->classType = types.GetType(TypeHierarchy::INT);
-				thisNode->value = sc->number;
+				thisNode->value = (int64_t)sc->number;
 			}
 			else if(sc.CheckToken(TK_FloatConst))
 			{
-				thisNode->classType = types.GetType(TypeHierarchy::FIXED);
-				thisNode->value = static_cast<int>(sc->decimal*65536);
+				thisNode->classType = types.GetType(TypeHierarchy::FLOAT);
+				thisNode->value = sc->decimal;
 			}
-			else if(sc.CheckToken(TK_StringConst))
+			/*else if(sc.CheckToken(TK_StringConst))
 			{
 				thisNode->type = STRING;
 				thisNode->classType = types.GetType(TypeHierarchy::STRING);
 				thisNode->str = sc->str;
-			}
+			}*/
 			else if(sc.CheckToken(TK_Identifier))
 			{
 				Symbol *symbol = cls->FindSymbol(sc->str);
@@ -296,14 +407,12 @@ ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarc
 				{
 					if(symbol->IsArray())
 					{
-						// TODO: Implement array subscripts
-						ExpressionNode *node = new ExpressionNode(NULL);
-						ParseExpression(cls, types, sc, node);
-						delete node;
+						thisNode->subscript = new ExpressionNode(NULL);
+						ParseExpression(cls, types, sc, thisNode->subscript);
 						sc.MustGetToken(']');
 					}
 					else
-						sc.ScriptMessage(Scanner::ERROR, "Array subscript operator not yet supported.");
+						sc.ScriptMessage(Scanner::ERROR, "Symbol is not a valid array.");
 				}
 			}
 			else
@@ -313,13 +422,13 @@ ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarc
 		else
 		{
 			// ternary operator support.
-			if(thisNode->parent != NULL && thisNode->parent->op->operands == 3 && thisNode->parent->term[2] == NULL)
+			/*if(thisNode->parent != NULL && thisNode->parent->op->operands == 3 && thisNode->parent->term[2] == NULL)
 			{
 				sc.MustGetToken(':');
 				thisNode = thisNode->parent->term[2] = new ExpressionNode(thisNode);
 				awaitingTerm = true;
 			}
-			else
+			else*/
 			{
 				// Go through the operators list until we either hit the end or an
 				// operator that has too high of a priority (what I'm calling density)

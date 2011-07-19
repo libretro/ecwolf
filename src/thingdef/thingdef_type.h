@@ -119,7 +119,7 @@ class TypeHierarchy
 			STRING,
 			CHAR,
 			INT,
-			FIXED,
+			FLOAT,
 
 			NUM_TYPES
 		};

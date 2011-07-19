@@ -38,7 +38,9 @@
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_def.h"
-#include "thingdef.h"
+#include "thingdef/thingdef.h"
+#include "thingdef/thingdef_type.h"
+#include "thingdef/thingdef_expression.h"
 #include "thinker.h"
 
 // Code pointer stuff
@@ -442,7 +444,18 @@ void ClassDef::ParseActor(Scanner &sc)
 										if(sc.CheckToken('('))
 										{
 											while(!sc.CheckToken(')') && sc.TokensLeft())
-												sc.GetNextToken();
+											{
+												static TypeHierarchy types;
+												ExpressionNode *node = ExpressionNode::ParseExpression(newClass, types, sc);
+												const ExpressionNode::Value &val = node->Evaluate(NULL);
+												printf("Value %d %f\n", val.GetInt(), val.GetDouble());
+												delete node;
+												if(!sc.CheckToken(','))
+												{
+													sc.MustGetToken(')');
+													break;
+												}
+											}
 										}
 									}
 								}
