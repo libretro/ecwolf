@@ -79,7 +79,9 @@ ClassDef::ClassDef()
 ClassDef::~ClassDef()
 {
 	for(unsigned int i = 0;i < frameList.Size();i++)
+	{
 		delete frameList[i];
+	}
 	delete defaultInstance;
 }
 
@@ -125,13 +127,13 @@ const ClassDef *ClassDef::FindClass(const FName &className)
 	return *ret;
 }
 
-const ActionPtr ClassDef::FindFunction(const FName &function) const
+const ActionInfo *ClassDef::FindFunction(const FName &function) const
 {
 	if(actions.Size() != 0)
 	{
 		ActionInfo *func = LookupFunction(function, &actions);
 		if(func)
-			return func->func;
+			return func;
 	}
 	if(parent)
 		return parent->FindFunction(function);
@@ -187,6 +189,8 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
 			thisFrame->spriteInf = 0;
+			// Only free the action arguments if we are the last frame using them.
+			thisFrame->freeActionArgs = i == thisStateDef.frames.Len()-1;
 			if(i == thisStateDef.frames.Len()-1) // Handle nextType
 			{
 				if(thisStateDef.nextType == StateDefinition::WAIT)
@@ -393,7 +397,7 @@ void ClassDef::ParseActor(Scanner &sc)
 							else
 								sc.ScriptMessage(Scanner::ERROR, "Expected frame duration.");
 						}
-						thisState.functions[0] = thisState.functions[1] = NULL;
+						thisState.functions[0].pointer = thisState.functions[1].pointer = NULL;
 
 						if(sc.CheckToken('}'))
 							goto FinishState;
@@ -432,31 +436,57 @@ void ClassDef::ParseActor(Scanner &sc)
 								{
 									if(sc->str.CompareNoCase("NOP") != 0)
 									{
-										ActionPtr &ptr = thisState.functions[func];
-										ActionPtr func = newClass->FindFunction(sc->str);
-										if(func)
+										const ActionInfo *funcInf = newClass->FindFunction(sc->str);
+										if(funcInf)
 										{
-											ptr = *func;
+											thisState.functions[func].pointer = *funcInf->func;
+
+											CallArguments *&ca = thisState.functions[func].args;
+											ca = new CallArguments();
+											CallArguments::Value val;
+											unsigned int argc = 0;
+											if(sc.CheckToken('('))
+											{
+												if(funcInf->maxArgs == 0)
+													sc.MustGetToken(')');
+												else if(!(funcInf->minArgs == 0 && sc.CheckToken(')')))
+												{
+													do
+													{
+														val.isExpression = false;
+
+														const Type *argType = funcInf->types[argc];
+														if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
+															argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT))
+														{
+															val.isExpression = true;
+															if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
+																val.useType = CallArguments::Value::VAL_INTEGER;
+															else
+																val.useType = CallArguments::Value::VAL_DOUBLE;
+															val.expr = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
+														}
+														else
+														{
+															sc.MustGetToken(TK_StringConst);
+															val.useType = CallArguments::Value::VAL_STRING;
+															val.str = sc->str;
+														}
+														ca->AddArgument(val);
+														++argc;
+													}
+													while(sc.CheckToken(',') && argc <= funcInf->maxArgs);
+													if(argc < funcInf->minArgs)
+														sc.ScriptMessage(Scanner::ERROR, "Too few arguments.");
+													sc.MustGetToken(')');
+												}
+											}
+											// Push unused defaults.
+											while(argc < funcInf->maxArgs)
+												ca->AddArgument(funcInf->defaults[(argc++)-funcInf->minArgs]);
 										}
 										else
 											printf("Could not find function %s\n", sc->str.GetChars());
-
-										if(sc.CheckToken('('))
-										{
-											while(!sc.CheckToken(')') && sc.TokensLeft())
-											{
-												static TypeHierarchy types;
-												ExpressionNode *node = ExpressionNode::ParseExpression(newClass, types, sc);
-												const ExpressionNode::Value &val = node->Evaluate(NULL);
-												printf("Value %d %f\n", val.GetInt(), val.GetDouble());
-												delete node;
-												if(!sc.CheckToken(','))
-												{
-													sc.MustGetToken(')');
-													break;
-												}
-											}
-										}
 									}
 								}
 
@@ -491,9 +521,76 @@ void ClassDef::ParseActor(Scanner &sc)
 				if(sc->str.CompareNoCase("native") != 0)
 					sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
 				sc.MustGetToken(TK_Identifier);
-				newClass->actions.Push(LookupFunction(sc->str, NULL));
+				ActionInfo *funcInf = LookupFunction(sc->str, NULL);
+				newClass->actions.Push(funcInf);
 				sc.MustGetToken('(');
-				sc.MustGetToken(')');
+				if(!sc.CheckToken(')'))
+				{
+					bool optRequired = false;
+					do
+					{
+						sc.MustGetToken(TK_Identifier);
+						const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
+						if(type == NULL)
+							sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
+						funcInf->types.Push(type);
+
+						if(sc->str.CompareNoCase("class") == 0)
+						{
+							sc.MustGetToken('<');
+							sc.MustGetToken(TK_Identifier);
+							sc.MustGetToken('>');
+						}
+						sc.MustGetToken(TK_Identifier);
+						if(optRequired || sc.CheckToken('='))
+						{
+							if(optRequired)
+								sc.MustGetToken('=');
+							else
+								optRequired = true;
+
+							CallArguments::Value defVal;
+							defVal.isExpression = false;
+
+							if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
+								type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT)
+							)
+							{
+								ExpressionNode *node = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
+								const ExpressionNode::Value &val = node->Evaluate(NULL);
+								if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
+								{
+									defVal.useType = CallArguments::Value::VAL_INTEGER;
+									defVal.val.i = val.GetInt();
+								}
+								else
+								{
+									defVal.useType = CallArguments::Value::VAL_DOUBLE;
+									defVal.val.d = val.GetDouble();
+								}
+								delete node;
+							}
+							else if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
+							{
+								sc.MustGetToken(TK_BoolConst);
+								defVal.useType = CallArguments::Value::VAL_INTEGER;
+								defVal.val.i = sc->number;
+							}
+							else
+							{
+								sc.MustGetToken(TK_StringConst);
+								defVal.useType = CallArguments::Value::VAL_STRING;
+								defVal.str = sc->str;
+							}
+							funcInf->defaults.Push(defVal);
+						}
+						else
+							++funcInf->minArgs;
+						++funcInf->maxArgs;
+					}
+					while(sc.CheckToken(','));
+					sc.MustGetToken(')');
+				}
 				sc.MustGetToken(';');
 			}
 			else
@@ -740,4 +837,35 @@ void ClassDef::DumpClasses()
 
 	ClassTree root(FindClass("Actor"));
 	root.Dump(0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+CallArguments::~CallArguments()
+{
+	for(unsigned int i = 0;i < args.Size();++i)
+	{
+		if(args[i].isExpression)
+			delete args[i].expr;
+	}
+}
+
+void CallArguments::AddArgument(const CallArguments::Value &val)
+{
+	args.Push(val);
+}
+
+void CallArguments::Evaluate(AActor *self)
+{
+	for(unsigned int i = 0;i < args.Size();++i)
+	{
+		if(args[i].isExpression)
+		{
+			const ExpressionNode::Value &val = args[i].expr->Evaluate(self);
+			if(args[i].useType == Value::VAL_INTEGER)
+				args[i].val.i = val.GetInt();
+			else
+				args[i].val.d = val.GetDouble();
+		}
+	}
 }

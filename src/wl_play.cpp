@@ -1145,7 +1145,7 @@ void PlayLoop (void)
 		madenoise = false;
 
 		for (unsigned int i = 0;i < tics;++i)
-			thinkerList.Tick();
+			thinkerList->Tick();
 
 		UpdatePaletteShifts ();
 

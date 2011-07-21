@@ -248,7 +248,7 @@ void SetupGameLevel (void)
 		LastAttacker = NULL;
 		killerobj = NULL;
 
-		thinkerList.DestroyAll();
+		thinkerList->DestroyAll();
 	}
 
 	if (demoplayback || demorecord)
@@ -820,7 +820,7 @@ void Died (void)
 		gamestate.keys = 0;
 		gamestate.attackframe = gamestate.attackcount =
 			gamestate.weaponframe = 0;
-		thinkerList.DestroyAll();
+		thinkerList->DestroyAll();
 
 		if(viewsize != 21)
 		{

@@ -1435,7 +1435,11 @@ ACTION_FUNCTION(T_Shoot)
 
 	PlaySoundLocActor(self->attacksound, self);
 }
-void T_Shoot(AActor *self) { __AF_T_Shoot(self); }
+void T_Shoot(AActor *self)
+{
+	static CallArguments args;
+	__AF_T_Shoot(self, args);
+}
 
 /*
 ===============

@@ -1355,6 +1355,8 @@ unsigned int I_MakeRNGSeed();
 ==========================
 */
 
+void InitThinkerList();
+
 #include "lumpremap.h"
 int main (int argc, char *argv[])
 {
@@ -1387,6 +1389,8 @@ int main (int argc, char *argv[])
 	Wads.InitMultipleFiles(wadfiles);
 	language.SetupStrings();
 	LumpRemaper::RemapAll();
+
+	InitThinkerList();
 
 	printf("VL_ReadPalette: Setting up the Palette...\n");
 	VL_ReadPalette();

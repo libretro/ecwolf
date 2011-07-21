@@ -36,7 +36,8 @@
 #include "thingdef.h"
 
 static ActionTable *actionFunctions = NULL;
-ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name)
+ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name),
+	minArgs(0), maxArgs(0)
 {
 	if(actionFunctions == NULL)
 		actionFunctions = new ActionTable;

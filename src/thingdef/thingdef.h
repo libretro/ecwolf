@@ -43,6 +43,40 @@
 class ClassDef;
 class Frame;
 class Symbol;
+class ExpressionNode;
+class Type;
+
+class CallArguments
+{
+	public:
+		class Value
+		{
+			public:
+				enum
+				{
+					VAL_INTEGER,
+					VAL_DOUBLE,
+					VAL_STRING
+				} useType;
+				bool isExpression;
+
+				ExpressionNode	*expr;
+				union
+				{
+					int64_t	i;
+					double	d;
+				}				val;
+				FString			str;
+		};
+
+		~CallArguments();
+
+		void		AddArgument(const Value &val);
+		void		Evaluate(AActor *self);
+		const Value	&operator[] (unsigned int idx) const { return args[idx]; }
+	private:
+		TArray<Value> args;
+};
 
 class ActionInfo
 {
@@ -51,14 +85,25 @@ class ActionInfo
 
 		ActionPtr func;
 		const FName name;
+
+		unsigned int					minArgs;
+		unsigned int					maxArgs;
+		TArray<CallArguments::Value>	defaults;
+		TArray<const Type *>			types;
 };
 
 typedef TArray<ActionInfo *> ActionTable;
 
 #define ACTION_FUNCTION(func) \
-	void __AF_##func(AActor *self); \
+	void __AF_##func(AActor *self, const CallArguments &args); \
 	static const ActionInfo __AI_##func(__AF_##func, #func); \
-	void __AF_##func(AActor *self)
+	void __AF_##func(AActor *self, const CallArguments &args)
+#define ACTION_PARAM_INT(name, num) \
+	int name = args[num].val.i
+#define ACTION_PARAM_DOUBLE(name, num) \
+	double name = args[num].val.d
+#define ACTION_PARAM_STRING(name, num) \
+	FString name = args[num].str
 
 struct StateDefinition
 {
@@ -79,7 +124,7 @@ struct StateDefinition
 		int			duration;
 		NextType	nextType;
 		FString		nextArg;
-		ActionPtr	functions[2];
+		Frame::ActionCall	functions[2];
 };
 
 struct FlagDef
@@ -149,7 +194,7 @@ class ClassDef
 
 		static const ClassDef	*FindClass(unsigned int ednum);
 		static const ClassDef	*FindClass(const FName &className);
-		const ActionPtr			FindFunction(const FName &function) const;
+		const ActionInfo		*FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const { return NULL; }
 		static void				LoadActors();

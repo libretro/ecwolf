@@ -35,7 +35,18 @@
 #include "thinker.h"
 #include "wl_def.h"
 
-ThinkerList thinkerList;
+ThinkerList *thinkerList;
+
+void DeinitThinkerList()
+{
+	delete thinkerList;
+}
+
+void InitThinkerList()
+{
+	thinkerList = new ThinkerList();
+	atexit(DeinitThinkerList);
+}
 
 ThinkerList::ThinkerList()
 {
@@ -99,15 +110,15 @@ void ThinkerList::MarkForCollection(Thinker *thinker)
 
 Thinker::Thinker()
 {
-	thinkerList.Register(this);
+	thinkerList->Register(this);
 }
 
 Thinker::~Thinker()
 {
-	thinkerList.Deregister(this);
+	thinkerList->Deregister(this);
 }
 
 void Thinker::Destroy()
 {
-	thinkerList.MarkForCollection(this);
+	thinkerList->MarkForCollection(this);
 }

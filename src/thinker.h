@@ -93,6 +93,6 @@ extern class ThinkerList
 	private:
 		LinkedList<Thinker *>	thinkers;
 		LinkedList<Thinker *>	toDestroy;
-} thinkerList;
+} *thinkerList;
 
 #endif

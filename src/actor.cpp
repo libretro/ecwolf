@@ -38,6 +38,31 @@
 #include "thinker.h"
 #include "thingdef/thingdef.h"
 
+Frame::~Frame()
+{
+	if(freeActionArgs)
+	{
+		// We need to delete CallArguments objects. Since we don't default to
+		// NULL on these we need to check if a pointer has been set to know if
+		// we created an object.
+		if(action.pointer)
+			delete action.args;
+		if(thinker.pointer)
+			delete thinker.args;
+	}
+}
+
+void Frame::ActionCall::operator() (AActor *self) const
+{
+	if(pointer)
+	{
+		args->Evaluate(self);
+		pointer(self, *args);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 // We can't make AActor a thinker since we create non-thinking objects.
 class AActorProxy : public Thinker
 {
@@ -136,8 +161,7 @@ void AActor::SetState(const Frame *state, bool notic)
 	this->state = state;
 	sprite = state->spriteInf;
 	ticcount = state->duration;
-	if(!notic && state->action)
-		state->action(this);
+	state->action(this);
 }
 
 void AActor::Tick()
@@ -161,8 +185,7 @@ void AActor::Tick()
 		SetState(state->next);
 	}
 
-	if(state->thinker)
-		state->thinker(this);
+	state->thinker(this);
 }
 
 AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)

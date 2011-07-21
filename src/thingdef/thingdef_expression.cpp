@@ -280,9 +280,10 @@ bool ExpressionNode::CheckAssignment() const
 	// If both sides are primitives, the left is a symbol and we are assigning,
 	// we can simply call the instruction.  We need to do this since there is
 	// no easy way to handle this in assembly.  Oh well...
-	return type == SYMBOL && op->token == '=' && term[0] == NULL &&
-		symbol->GetType()->IsPrimitive() && term[1]->GetType()->IsPrimitive() &&
-		symbol->GetType() == term[1]->GetType();
+	return false;
+	//return type == SYMBOL && op->token == '=' && term[0] == NULL &&
+	//	symbol->GetType()->IsPrimitive() && term[1]->GetType()->IsPrimitive() &&
+	//	symbol->GetType() == term[1]->GetType();
 }
 
 const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)

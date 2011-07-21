@@ -51,12 +51,17 @@
 	const ClassDef *A##name::__StaticClass = ClassDef::DeclareNativeClass<A##name>(#name, A##parent::__StaticClass);
 #define NATIVE_CLASS(name) A##name::__StaticClass
 
+class CallArguments;
+class ExpressionNode;
+
 typedef uint32_t flagstype_t;
-typedef void (*ActionPtr)(AActor *);
+typedef void (*ActionPtr)(AActor *, const CallArguments &args);
 
 class Frame
 {
 	public:
+		~Frame();
+
 		union
 		{
 			char	sprite[4];
@@ -64,11 +69,19 @@ class Frame
 		};
 		uint8_t		frame;
 		int			duration;
-		ActionPtr	action;
-		ActionPtr	thinker;
+		class ActionCall
+		{
+			public:
+				ActionPtr		pointer;
+				CallArguments	*args;
+
+				void operator() (AActor *self) const;
+		} action, thinker;
 		const Frame	*next;
 
 		unsigned int	spriteInf;
+
+		bool	freeActionArgs;
 };
 
 class AActorProxy;

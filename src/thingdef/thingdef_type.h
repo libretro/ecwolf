@@ -43,7 +43,6 @@ class Type
 	public:
 		enum TypeStatus
 		{
-			PRIMITIVE,
 			FORWARD,
 			STRUCTURE
 		};
@@ -53,8 +52,6 @@ class Type
 		unsigned int	GetSize() const { return 1; }
 		bool			IsForwardDeclared() const { return status == FORWARD; }
 		bool			IsKindOf(const Type *other) const;
-		bool			IsPrimitive() const { return status == PRIMITIVE; }
-		void			MakePrimitive();
 
 	protected:
 		friend class TypeHierarchy;
@@ -113,11 +110,13 @@ class Function
 class TypeHierarchy
 {
 	public:
+		static TypeHierarchy staticTypes;
+
 		enum PrimitiveTypes
 		{
 			VOID,
 			STRING,
-			CHAR,
+			BOOL,
 			INT,
 			FLOAT,
 
@@ -127,13 +126,12 @@ class TypeHierarchy
 		TypeHierarchy();
 
 		Type		*CreateType(const FName &name, const Type *parent);
-		const Type	*GetType(PrimitiveTypes type) const { return primitiveTypes[type]; }
+		const Type	*GetType(PrimitiveTypes type) const;
 		const Type	*GetType(const FName &name) const;
 
 	protected:
 		typedef TMap<FName, Type> TypeMap;
 
-		Type	*primitiveTypes[NUM_TYPES];
 		TypeMap	types;
 };
 

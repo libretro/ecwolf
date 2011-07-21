@@ -61,22 +61,16 @@ bool Type::IsKindOf(const Type *other) const
 	return false;
 }
 
-void Type::MakePrimitive()
-{
-	status = PRIMITIVE;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
+
+TypeHierarchy TypeHierarchy::staticTypes;
 
 TypeHierarchy::TypeHierarchy()
 {
-	static const char* primitives[NUM_TYPES] = {"void", "str", "char", "int", "float"};
+	static const char* primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float"};
 
 	for(unsigned int i = 0;i < NUM_TYPES;++i)
-	{
-		primitiveTypes[i] = CreateType(primitives[i], NULL);
-		primitiveTypes[i]->MakePrimitive();
-	}
+		CreateType(primitives[i], NULL);
 }
 
 Type *TypeHierarchy::CreateType(const FName &name, const Type *parent)
@@ -96,6 +90,12 @@ Type *TypeHierarchy::CreateType(const FName &name, const Type *parent)
 const Type *TypeHierarchy::GetType(const FName &name) const
 {
 	return types.CheckKey(name);
+}
+
+const Type *TypeHierarchy::GetType(PrimitiveTypes type) const
+{
+	static const FName primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float"};
+	return GetType(primitives[type]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
