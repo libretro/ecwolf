@@ -112,7 +112,7 @@ class AActor
 		word	tilex, tiley;
 
 		short	angle;
-		short	health;
+		int32_t	health;
 		short	defaultHealth[9];
 		int32_t	speed, runspeed;
 		int		points;

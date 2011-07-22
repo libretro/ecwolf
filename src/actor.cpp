@@ -210,6 +210,8 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 	return actor;
 }
 
+DEFINE_SYMBOL(Actor, health)
+
 class AWeapon : public AActor
 {
 	DECLARE_NATIVE_CLASS(Weapon, Actor)

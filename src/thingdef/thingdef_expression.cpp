@@ -293,10 +293,11 @@ const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)
 		if(type == CONSTANT)
 			evaluation = value;
 		else if(type == SYMBOL)
-		{
-		}
+			symbol->FillValue(evaluation, self);
 		else
 		{
+			// At this time this shouldn't happen...
+			assert(type == SYMBOL || type == CONSTANT);
 		}
 	}
 	else

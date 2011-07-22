@@ -90,7 +90,7 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 			min = mid+1;
 		mid = (max+min)/2;
 	}
-	while(max >= min);
+	while(max >= min && max < table->Size());
 	return NULL;
 }
 

@@ -105,6 +105,19 @@ typedef TArray<ActionInfo *> ActionTable;
 #define ACTION_PARAM_STRING(name, num) \
 	FString name = args[num].str
 
+class SymbolInfo
+{
+	public:
+		SymbolInfo(const ClassDef *cls, const FName &var, const int offset);
+
+		const ClassDef	* const cls;
+		const FName		var;
+		const int		offset;
+};
+
+#define DEFINE_SYMBOL(cls, var) \
+	static const SymbolInfo __SI_##var(NATIVE_CLASS(cls), #var, typeoffsetof(A##cls,var));
+
 struct StateDefinition
 {
 	public:
@@ -153,6 +166,8 @@ struct PropDef
 };
 #define NUM_PROPERTIES 9
 
+typedef TArray<Symbol *> SymbolTable;
+
 class ClassDef
 {
 	public:
@@ -196,7 +211,7 @@ class ClassDef
 		static const ClassDef	*FindClass(const FName &className);
 		const ActionInfo		*FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
-		Symbol					*FindSymbol(const FName &symbol) const { return NULL; }
+		Symbol					*FindSymbol(const FName &symbol) const;
 		static void				LoadActors();
 		static void				UnloadActors();
 
@@ -211,6 +226,7 @@ class ClassDef
 		// We need to do this for proper initialization order.
 		static TMap<FName, ClassDef *>	&ClassTable();
 		static TMap<int, ClassDef *>	classNumTable;
+		static SymbolTable				globalSymbols;
 
 		FName			name;
 		const ClassDef	*parent;
@@ -219,6 +235,7 @@ class ClassDef
 		TArray<Frame *>			frameList;
 
 		ActionTable		actions;
+		SymbolTable		symbols;
 
 		AActor			*defaultInstance;
 };

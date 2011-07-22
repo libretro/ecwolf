@@ -127,14 +127,38 @@ bool Function::CheckPrototype(const FunctionPrototype &function) const
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Symbol::Symbol(unsigned int local, Scope scope, const FName &name, const TypeRef &type) :
-	name(name), isFunction(false), scope(scope), local(local), index(0),
+Symbol::Symbol(Scope scope, const FName &name, const TypeRef &type) :
+	name(name), isFunction(false), scope(scope),
 	type(type), func(NULL)
 {
 }
 
-Symbol::Symbol(unsigned int local, const FName &name, const Function *func) :
-	name(name), isFunction(true), scope(GLOBAL), local(local), index(0),
+Symbol::Symbol(const FName &name, const Function *func) :
+	name(name), isFunction(true), scope(GLOBAL),
 	type(NULL), func(func)
 {
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ConstantSymbol::ConstantSymbol(const FName &name, const TypeRef &type, const ExpressionNode::Value &value) :
+	Symbol(GLOBAL, name, type),
+	val(value)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+VariableSymbol::VariableSymbol(const FName &var, const TypeRef &type, const int offset) :
+	Symbol(ACTOR, var, type),
+	offset(offset)
+{
+}
+
+void VariableSymbol::FillValue(ExpressionNode::Value &val, AActor *self) const
+{
+	if(GetType() == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
+		val = int64_t(*(int32_t*)((uint8_t*)self+offset));
+	else
+		val = double(*(fixed*)((uint8_t*)self+offset))/FRACUNIT;
 }

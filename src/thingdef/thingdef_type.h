@@ -32,6 +32,7 @@
 #include "name.h"
 #include "tarray.h"
 #include "zstring.h"
+#include "thingdef/thingdef_expression.h"
 
 class Function;
 class FunctionPrototype;
@@ -140,31 +141,48 @@ class Symbol
 	public:
 		enum Scope
 		{
-			LOCAL,		// Script
-			MAP,		// Map
-			WORLD,		// Hub
-			GLOBAL,		// Game
-			MAPARRAY,
-			WORLDARRAY,
-			GLOBALARRAY
+			GLOBAL,
+			ACTOR
 		};
 
-		Symbol(unsigned int local, Scope scope, const FName &name, const TypeRef &type);
-		Symbol(unsigned int local, const FName &name, const Function *func);
+		Symbol(Scope scope, const FName &name, const TypeRef &type);
+		Symbol(const FName &name, const Function *func);
 
-		unsigned int	GetLocal() const { return local; }
+		virtual void	FillValue(ExpressionNode::Value &val, AActor *self=NULL) const=0;
+		const FName		&GetName() const { return name; }
 		const Type		*GetType() const { return isFunction ? func->GetReturnType().GetType() : type.GetType(); }
-		bool			IsArray() const { return !IsFunction() && scope >= MAPARRAY; }
+		bool			IsArray() const { return false; }
 		bool			IsFunction() const { return isFunction; }
 	protected:
 		FName			name;
 
 		bool			isFunction;
 		Scope			scope;
-		unsigned int	local;
-		unsigned int	index;
 		TypeRef			type;
 		const Function	*func;
+};
+
+class ConstantSymbol : public Symbol
+{
+	public:
+		ConstantSymbol(const FName &name, const TypeRef &type, const ExpressionNode::Value &value);
+
+		void FillValue(ExpressionNode::Value &val, AActor *self=NULL) const
+		{
+			val = this->val;
+		}
+	protected:
+		ExpressionNode::Value	val;
+};
+
+class VariableSymbol : public Symbol
+{
+	public:
+		VariableSymbol(const FName &var, const TypeRef &type, const int offset);
+
+		void FillValue(ExpressionNode::Value &val, AActor *self=NULL) const;
+	protected:
+		const int	offset;
 };
 
 #endif /* __TYPE_H__ */

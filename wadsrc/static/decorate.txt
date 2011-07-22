@@ -6,6 +6,8 @@ actor Actor native
 	speed 0
 	points 0
 
+	native int health;
+
 	action native A_DeathScream();
 	action native A_Fall();
 	action native T_Bite();

@@ -48,6 +48,8 @@ void InitFunctionTable(ActionTable *table);
 void ReleaseFunctionTable();
 ActionInfo *LookupFunction(const FName &func, const ActionTable *table);
 
+////////////////////////////////////////////////////////////////////////////////
+
 #define DEFINE_FLAG(prefix, flag, type, variable) { prefix##_##flag, #flag, typeoffsetof(type,variable) }
 const FlagDef flags[] =
 {
@@ -67,7 +69,33 @@ const FlagDef flags[] =
 };
 extern const PropDef properties[NUM_PROPERTIES];
 
+////////////////////////////////////////////////////////////////////////////////
+
+static TArray<const SymbolInfo *> *symbolPool = NULL;
+
+SymbolInfo::SymbolInfo(const ClassDef *cls, const FName &var, const int offset) :
+	cls(cls), var(var), offset(offset)
+{
+	if(symbolPool == NULL)
+		symbolPool = new TArray<const SymbolInfo *>();
+	symbolPool->Push(this);
+}
+
+int SymbolCompare(const void *s1, const void *s2)
+{
+	const Symbol * const sym1 = *((const Symbol **)s1);
+	const Symbol * const sym2 = *((const Symbol **)s2);
+	if(sym1->GetName() < sym2->GetName())
+		return -1;
+	else if(sym1->GetName() > sym2->GetName())
+		return 1;
+	return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 TMap<int, ClassDef *> ClassDef::classNumTable;
+SymbolTable ClassDef::globalSymbols;
 
 ClassDef::ClassDef()
 {
@@ -78,11 +106,11 @@ ClassDef::ClassDef()
 
 ClassDef::~ClassDef()
 {
-	for(unsigned int i = 0;i < frameList.Size();i++)
-	{
+	for(unsigned int i = 0;i < frameList.Size();++i)
 		delete frameList[i];
-	}
 	delete defaultInstance;
+	for(unsigned int i = 0;i < symbols.Size();++i)
+		delete symbols[i];
 }
 
 TMap<FName, ClassDef *> &ClassDef::ClassTable()
@@ -146,6 +174,51 @@ const Frame *ClassDef::FindState(const FName &stateName) const
 	if(ret == NULL)
 		return (!parent ? NULL : parent->FindState(stateName));
 	return *ret;
+}
+
+Symbol *ClassDef::FindSymbol(const FName &symbol) const
+{
+	unsigned int min = 0;
+	unsigned int max = symbols.Size()-1;
+	unsigned int mid = max/2;
+	if(symbols.Size() > 0)
+	{
+		do
+		{
+			if(symbols[mid]->GetName() == symbol)
+				return symbols[mid];
+
+			if(symbols[mid]->GetName() > symbol)
+				max = mid-1;
+			else if(symbols[mid]->GetName() < symbol)
+				min = max+1;
+			mid = (mid+max)/2;
+		}
+		while(max >= min && max < symbols.Size());
+	}
+
+	if(parent)
+		return parent->FindSymbol(symbol);
+	else if(globalSymbols.Size() > 0)
+	{
+		// Search globals.
+		min = 0;
+		max = globalSymbols.Size()-1;
+		mid = max/2;
+		do
+		{
+			if(globalSymbols[mid]->GetName() == symbol)
+				return globalSymbols[mid];
+
+			if(globalSymbols[mid]->GetName() > symbol)
+				max = mid-1;
+			else if(globalSymbols[mid]->GetName() < symbol)
+				min = max+1;
+			mid = (mid+max)/2;
+		}
+		while(max >= min && max < globalSymbols.Size());
+	}
+	return NULL;
 }
 
 struct Goto
@@ -253,6 +326,7 @@ void ClassDef::LoadActors()
 	}
 
 	ReleaseFunctionTable();
+	delete symbolPool;
 	DumpClasses();
 
 	R_InitSprites();
@@ -593,6 +667,31 @@ void ClassDef::ParseActor(Scanner &sc)
 				}
 				sc.MustGetToken(';');
 			}
+			else if(sc->str.CompareNoCase("native") == 0)
+			{
+				sc.MustGetToken(TK_Identifier);
+				const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
+				if(type == NULL)
+					sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
+				sc.MustGetToken(TK_Identifier);
+				FName varName(sc->str);
+				const SymbolInfo *symInf = NULL;
+				for(unsigned int i = 0;i < symbolPool->Size();++i)
+				{
+					// I think the symbol pool will be small enough to do a
+					// linear search on.
+					if((*symbolPool)[i]->cls == newClass && (*symbolPool)[i]->var == varName)
+					{
+						symInf = (*symbolPool)[i];
+						break;
+					}
+				}
+				if(symInf == NULL)
+					sc.ScriptMessage(Scanner::ERROR, "Could not identify symbol %s::%s.\n", newClass->name.GetChars(), varName.GetChars());
+				sc.MustGetToken(';');
+
+				newClass->symbols.Push(new VariableSymbol(varName, type, symInf->offset));
+			}
 			else
 			{
 				FString propertyName = sc->str;
@@ -613,6 +712,9 @@ void ClassDef::ParseActor(Scanner &sc)
 			}
 		}
 	}
+
+	// Now sort the symbol table.
+	qsort(&newClass->symbols[0], newClass->symbols.Size(), sizeof(newClass->symbols[0]), SymbolCompare);
 }
 
 void ClassDef::ParseDecorateLump(int lumpNum)
@@ -629,6 +731,46 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 		if(sc->str.CompareNoCase("actor") == 0)
 		{
 			ParseActor(sc);
+		}
+		else if(sc->str.CompareNoCase("const") == 0)
+		{
+			sc.MustGetToken(TK_Identifier);
+			const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
+			if(type == NULL)
+				sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
+			sc.MustGetToken(TK_Identifier);
+			FName constName(sc->str);
+			sc.MustGetToken('=');
+			ExpressionNode *expr = ExpressionNode::ParseExpression(NATIVE_CLASS(Actor), TypeHierarchy::staticTypes, sc);
+			ConstantSymbol *newSym = new ConstantSymbol(constName, type, expr->Evaluate(NULL));
+			delete expr;
+			sc.MustGetToken(';');
+
+			// We must insert the constant into the table at the proper place
+			// now since the next const may try to reference it.
+			if(globalSymbols.Size() > 0)
+			{
+				unsigned int min = 0;
+				unsigned int max = globalSymbols.Size()-1;
+				unsigned int mid = max/2;
+				if(max > 0)
+				{
+					do
+					{
+						if(globalSymbols[mid]->GetName() > constName)
+							max = mid-1;
+						else if(globalSymbols[mid]->GetName() < constName)
+							min = mid+1;
+						else
+							break;
+						mid = (min+max)/2;
+					}
+					while(max >= min && max < globalSymbols.Size());
+				}
+				globalSymbols.Insert(mid, newSym);
+			}
+			else
+				globalSymbols.Push(newSym);
 		}
 		else
 			sc.ScriptMessage(Scanner::ERROR, "Unknown thing section '%s'.", sc->str.GetChars());
@@ -788,6 +930,10 @@ void ClassDef::UnloadActors()
 	{
 		delete pair->Value;
 	}
+
+	// Also clear globals
+	for(unsigned int i = 0;i < globalSymbols.Size();++i)
+		delete globalSymbols[i];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
