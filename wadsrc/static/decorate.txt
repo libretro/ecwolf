@@ -6,6 +6,7 @@ actor Actor native
 	speed 0
 	points 0
 
+	native int angle;
 	native int health;
 
 	action native A_DeathScream();

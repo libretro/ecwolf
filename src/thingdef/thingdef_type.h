@@ -34,8 +34,6 @@
 #include "zstring.h"
 #include "thingdef/thingdef_expression.h"
 
-class Function;
-class FunctionPrototype;
 class TypeRef;
 class TypeHierarchy;
 
@@ -48,7 +46,6 @@ class Type
 			STRUCTURE
 		};
 
-		const Function	*LookupFunction(const FunctionPrototype &function) const;
 		const FName		&GetName() const { return name; }
 		unsigned int	GetSize() const { return 1; }
 		bool			IsForwardDeclared() const { return status == FORWARD; }
@@ -56,7 +53,6 @@ class Type
 
 	protected:
 		friend class TypeHierarchy;
-		typedef TMap<FName, Function> FunctionMap;
 
 		Type(const FName &name, const Type *parent);
 
@@ -64,8 +60,6 @@ class Type
 
 		TypeStatus	status;
 		FName		name;
-
-		FunctionMap	functions;
 };
 
 class TypeRef
@@ -78,34 +72,6 @@ class TypeRef
 		bool		operator!=(const TypeRef &other) const { return GetType() != other.GetType(); }
 	protected:
 		const Type	*type;
-};
-
-class FunctionPrototype
-{
-	public:
-		FunctionPrototype(FString name, unsigned int argc, const TypeRef* argt) : name(name), argc(argc), argt(argt) {}
-
-		unsigned int	GetArgCount() const { return argc; }
-		const TypeRef	&GetArgType(unsigned int i) const { return argt[i]; }
-		const FName		&GetName() const { return name; }
-		bool			operator==(const FunctionPrototype &other) const;
-	protected:
-		FName			name;
-		unsigned int	argc;
-		const TypeRef*	argt;
-};
-
-class Function
-{
-	public:
-		Function(const TypeRef &returnType, const FunctionPrototype &function);
-
-		bool			CheckPrototype(const FunctionPrototype &function) const;
-		const TypeRef	&GetReturnType() const { return returnType; }
-
-	protected:
-		TypeRef				returnType;
-		FunctionPrototype	prototype;
 };
 
 class TypeHierarchy
@@ -139,27 +105,16 @@ class TypeHierarchy
 class Symbol
 {
 	public:
-		enum Scope
-		{
-			GLOBAL,
-			ACTOR
-		};
-
-		Symbol(Scope scope, const FName &name, const TypeRef &type);
-		Symbol(const FName &name, const Function *func);
+		Symbol(const FName &name, const TypeRef &type);
 
 		virtual void	FillValue(ExpressionNode::Value &val, AActor *self=NULL) const=0;
 		const FName		&GetName() const { return name; }
-		const Type		*GetType() const { return isFunction ? func->GetReturnType().GetType() : type.GetType(); }
-		bool			IsArray() const { return false; }
-		bool			IsFunction() const { return isFunction; }
+		const Type		*GetType() const { return type.GetType(); }
+		virtual bool	IsArray() const { return false; }
+		virtual bool	IsFunction() const { return false; }
 	protected:
 		FName			name;
-
-		bool			isFunction;
-		Scope			scope;
 		TypeRef			type;
-		const Function	*func;
 };
 
 class ConstantSymbol : public Symbol
@@ -173,6 +128,26 @@ class ConstantSymbol : public Symbol
 		}
 	protected:
 		ExpressionNode::Value	val;
+};
+
+class FRandom;
+class FunctionSymbol : public Symbol
+{
+	public:
+		typedef void (*ExprFunction) (AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng);
+
+		FunctionSymbol(const FName &name, const TypeRef &ret, unsigned short args, ExprFunction function, bool takesRNG);
+
+		void CallFunction(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng) const;
+		void FillValue(ExpressionNode::Value &val, AActor *self=NULL) const;
+		unsigned short GetNumArgs() const { return args; }
+		bool IsArray() const { return takesRNG; }
+		bool IsFunction() const { return true; }
+
+	protected:
+		unsigned short	args;
+		bool			takesRNG;
+		ExprFunction	function;
 };
 
 class VariableSymbol : public Symbol

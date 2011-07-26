@@ -1360,9 +1360,6 @@ void InitThinkerList();
 #include "lumpremap.h"
 int main (int argc, char *argv[])
 {
-	rngseed = I_MakeRNGSeed();
-	FRandom::StaticClearRandom();
-
 	printf("ReadConfig: Reading the Configuration.\n");
 	config->LocateConfigFile(argc, argv);
 	ReadConfig();
@@ -1402,6 +1399,9 @@ int main (int argc, char *argv[])
 	FinalReadConfig();
 	printf("CreateMenus: Preparing the menu system...\n");
 	CreateMenus();
+
+	rngseed = I_MakeRNGSeed();
+	FRandom::StaticClearRandom();
 
 	printf("DemoLoop: Starting the game loop...\n");
 	DemoLoop();

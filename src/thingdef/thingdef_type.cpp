@@ -31,27 +31,6 @@ Type::Type(const FName &name, const Type *parent) : parent(parent), status(FORWA
 {
 }
 
-const Function *Type::LookupFunction(const FunctionPrototype &function) const
-{
-#if 0
-	string argumentProtocol;
-	for(int i = 0;i < function.GetArgCount();++i)
-	{
-		argumentProtocol += function.GetArgType(i).GetType()->GetName();
-		if(i != function.GetArgCount()-1)
-			argumentProtocol += ", ";
-	}
-	Print(ML_NOTICE, "Looking up function %s::%s(%s)", name.c_str(), function.GetName().c_str(), argumentProtocol.c_str());
-#endif
-
-	// Lookup the function.
-	// ECWolf Note: Unlike ACC++ we don't have to deal with overloading.
-	const Function *ret = functions.CheckKey(function.GetName());
-	if(ret != NULL)
-		return ret;
-	return NULL;
-}
-
 bool Type::IsKindOf(const Type *other) const
 {
 	if(other == this)
@@ -100,58 +79,22 @@ const Type *TypeHierarchy::GetType(PrimitiveTypes type) const
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool FunctionPrototype::operator==(const FunctionPrototype &other) const
-{
-	if(GetArgCount() != other.GetArgCount())
-		return false;
-
-	for(unsigned int i = 0;i < GetArgCount();++i)
-	{
-		if(other.GetArgType(i).GetType()->IsKindOf(GetArgType(i).GetType()))
-			return false;
-	}
-	return GetName() == other.GetName();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-Function::Function(const TypeRef &returnType, const FunctionPrototype &function) :
-	returnType(returnType), prototype(function)
-{
-}
-
-bool Function::CheckPrototype(const FunctionPrototype &function) const
-{
-	return prototype == function;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-Symbol::Symbol(Scope scope, const FName &name, const TypeRef &type) :
-	name(name), isFunction(false), scope(scope),
-	type(type), func(NULL)
-{
-}
-
-Symbol::Symbol(const FName &name, const Function *func) :
-	name(name), isFunction(true), scope(GLOBAL),
-	type(NULL), func(func)
+Symbol::Symbol(const FName &name, const TypeRef &type) :
+	name(name), type(type)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 ConstantSymbol::ConstantSymbol(const FName &name, const TypeRef &type, const ExpressionNode::Value &value) :
-	Symbol(GLOBAL, name, type),
-	val(value)
+	Symbol(name, type), val(value)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 VariableSymbol::VariableSymbol(const FName &var, const TypeRef &type, const int offset) :
-	Symbol(ACTOR, var, type),
-	offset(offset)
+	Symbol(var, type), offset(offset)
 {
 }
 
@@ -161,4 +104,21 @@ void VariableSymbol::FillValue(ExpressionNode::Value &val, AActor *self) const
 		val = int64_t(*(int32_t*)((uint8_t*)self+offset));
 	else
 		val = double(*(fixed*)((uint8_t*)self+offset))/FRACUNIT;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+FunctionSymbol::FunctionSymbol(const FName &name, const TypeRef &ret, unsigned short args, ExprFunction function, bool takesRNG) :
+	Symbol(name, ret), args(args), takesRNG(takesRNG), function(function)
+{
+}
+
+void FunctionSymbol::CallFunction(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng) const
+{
+	function(self, out, args, rng);
+}
+
+void FunctionSymbol::FillValue(ExpressionNode::Value &val, AActor *self) const
+{
+	printf("Called FillValue on Function symbol.\n");
 }

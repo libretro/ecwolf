@@ -111,7 +111,7 @@ class AActor
 		fixed	x, y;
 		word	tilex, tiley;
 
-		short	angle;
+		int32_t	angle;
 		int32_t	health;
 		short	defaultHealth[9];
 		int32_t	speed, runspeed;

@@ -34,6 +34,7 @@
 
 #include "actor.h"
 #include "id_ca.h"
+#include "m_random.h"
 #include "r_sprites.h"
 #include "scanner.h"
 #include "w_wad.h"
@@ -91,6 +92,54 @@ int SymbolCompare(const void *s1, const void *s2)
 		return 1;
 	return 0;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+void ExprSin(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
+{
+	out = double(sintable[args[0]->Evaluate(self).GetInt()%360])/FRACUNIT;
+}
+
+void ExprCos(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
+{
+	out = double(sintable[(args[0]->Evaluate(self).GetInt()+90)%360])/FRACUNIT;
+}
+
+void ExprRandom(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
+{
+	int min = args[0]->Evaluate(self).GetInt();
+	int max = args[1]->Evaluate(self).GetInt();
+	if(min > max)
+		out = int64_t(max+(*rng)(min-max));
+	else
+		out = int64_t(min+(*rng)(max-min));
+}
+
+void ExprFRandom(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
+{
+	static const unsigned int randomPrecision = 0x80000000;
+
+	double min = args[0]->Evaluate(self).GetDouble();
+	double max = args[1]->Evaluate(self).GetDouble();
+	out = min+(double((*rng)(randomPrecision))/randomPrecision)*(max-min);
+}
+
+static const struct ExpressionFunction
+{
+	const char* const				name;
+	int								ret;
+	unsigned short					args;
+	bool							takesRNG;
+	FunctionSymbol::ExprFunction	function;
+} functions[] =
+{
+	{ "cos",		TypeHierarchy::FLOAT,	1,	false,	ExprCos },
+	{ "frandom",	TypeHierarchy::FLOAT,	2,	true,	ExprFRandom },
+	{ "random",		TypeHierarchy::INT,		2,	true,	ExprRandom },
+	{ "sin",		TypeHierarchy::FLOAT,	1,	false,	ExprSin },
+
+	{ NULL, 0, false, NULL }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -191,8 +240,8 @@ Symbol *ClassDef::FindSymbol(const FName &symbol) const
 			if(symbols[mid]->GetName() > symbol)
 				max = mid-1;
 			else if(symbols[mid]->GetName() < symbol)
-				min = max+1;
-			mid = (mid+max)/2;
+				min = mid+1;
+			mid = (min+max)/2;
 		}
 		while(max >= min && max < symbols.Size());
 	}
@@ -213,8 +262,8 @@ Symbol *ClassDef::FindSymbol(const FName &symbol) const
 			if(globalSymbols[mid]->GetName() > symbol)
 				max = mid-1;
 			else if(globalSymbols[mid]->GetName() < symbol)
-				min = max+1;
-			mid = (mid+max)/2;
+				min = mid+1;
+			mid = (min+max)/2;
 		}
 		while(max >= min && max < globalSymbols.Size());
 	}
@@ -317,6 +366,15 @@ void ClassDef::LoadActors()
 	atexit(&ClassDef::UnloadActors);
 
 	InitFunctionTable(NULL);
+
+	// Add function symbols
+	const ExpressionFunction *func = functions;
+	do
+	{
+		globalSymbols.Push(new FunctionSymbol(func->name, TypeHierarchy::staticTypes.GetType(TypeHierarchy::PrimitiveTypes(func->ret)), func->args, func->function, func->takesRNG));
+	}
+	while((++func)->name != NULL);
+	qsort(&globalSymbols[0], globalSymbols.Size(), sizeof(globalSymbols[0]), SymbolCompare);
 
 	int lastLump = 0;
 	int lump = 0;
@@ -550,14 +608,17 @@ void ClassDef::ParseActor(Scanner &sc)
 														++argc;
 													}
 													while(sc.CheckToken(',') && argc <= funcInf->maxArgs);
-													if(argc < funcInf->minArgs)
-														sc.ScriptMessage(Scanner::ERROR, "Too few arguments.");
 													sc.MustGetToken(')');
 												}
 											}
-											// Push unused defaults.
-											while(argc < funcInf->maxArgs)
-												ca->AddArgument(funcInf->defaults[(argc++)-funcInf->minArgs]);
+											if(argc < funcInf->minArgs)
+												sc.ScriptMessage(Scanner::ERROR, "Too few arguments.");
+											else
+											{
+												// Push unused defaults.
+												while(argc < funcInf->maxArgs)
+													ca->AddArgument(funcInf->defaults[(argc++)-funcInf->minArgs]);
+											}
 										}
 										else
 											printf("Could not find function %s\n", sc->str.GetChars());

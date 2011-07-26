@@ -41,6 +41,7 @@ class Scanner;
 class Symbol;
 class Type;
 class TypeHierarchy;
+class FRandom;
 
 class ExpressionNode
 {
@@ -82,11 +83,12 @@ class ExpressionNode
 		ExpressionNode(ExpressionNode *parent=NULL);
 
 		const Type	*GetType() const;
-		bool		CheckAssignment() const;
 
 		const ExpressionOperator	*op;
 		ExpressionNode				*term[2];
-		ExpressionNode				*subscript;
+		//ExpressionNode				*subscript;
+		FRandom						*subscript; // Since we don't have any array variables yet.
+		ExpressionNode*				*args;
 		ExpressionNode				*parent;
 
 		ValueType					type;

@@ -25,10 +25,12 @@
 ** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "m_random.h"
 #include "thingdef/thingdef.h"
 #include "thingdef/thingdef_expression.h"
 #include "scanner.h"
 #include "thingdef/thingdef_type.h"
+#include "wl_def.h"
 
 static const struct ExpressionOperator
 {
@@ -272,18 +274,7 @@ ExpressionNode::~ExpressionNode()
 {
 	for(unsigned char i = 0;i < 2;i++)
 		delete term[i];
-	delete subscript;
-}
-
-bool ExpressionNode::CheckAssignment() const
-{
-	// If both sides are primitives, the left is a symbol and we are assigning,
-	// we can simply call the instruction.  We need to do this since there is
-	// no easy way to handle this in assembly.  Oh well...
-	return false;
-	//return type == SYMBOL && op->token == '=' && term[0] == NULL &&
-	//	symbol->GetType()->IsPrimitive() && term[1]->GetType()->IsPrimitive() &&
-	//	symbol->GetType() == term[1]->GetType();
+	//delete subscript;
 }
 
 const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)
@@ -293,7 +284,15 @@ const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)
 		if(type == CONSTANT)
 			evaluation = value;
 		else if(type == SYMBOL)
-			symbol->FillValue(evaluation, self);
+		{
+			if(symbol->IsFunction())
+			{
+				FunctionSymbol *fsymbol = reinterpret_cast<FunctionSymbol *>(symbol);
+				fsymbol->CallFunction(self, evaluation, args, subscript);
+			}
+			else
+				symbol->FillValue(evaluation, self);
+		}
 		else
 		{
 			// At this time this shouldn't happen...
@@ -325,8 +324,6 @@ const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)
 const Type *ExpressionNode::GetType() const
 {
 	bool isOp = op->token != '\0';
-	const Function *function = NULL;
-
 	TypeRef argumentTypes[2] = { TypeRef(classType), TypeRef(NULL) };
 	if(isOp && op->operands > 1)
 		argumentTypes[1] = TypeRef(term[1]->GetType());
@@ -335,9 +332,7 @@ const Type *ExpressionNode::GetType() const
 	{
 		argumentTypes[0] = TypeRef(term[0]->GetType());
 	}
-	if(isOp)
-		function = argumentTypes[0].GetType()->LookupFunction(FunctionPrototype(op->function, op->operands-1, argumentTypes+1));
-	return function ? function->GetReturnType().GetType() : argumentTypes[0].GetType();
+	return argumentTypes[0].GetType();
 }
 
 ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarchy &types, Scanner &sc, ExpressionNode *root, unsigned char opLevel)
@@ -409,12 +404,35 @@ ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarc
 				{
 					if(symbol->IsArray())
 					{
-						thisNode->subscript = new ExpressionNode(NULL);
-						ParseExpression(cls, types, sc, thisNode->subscript);
+						sc.MustGetToken(TK_Identifier);
+						thisNode->subscript = FRandom::StaticFindRNG(sc->str);
 						sc.MustGetToken(']');
 					}
 					else
 						sc.ScriptMessage(Scanner::ERROR, "Symbol is not a valid array.");
+				}
+
+				if(symbol->IsFunction())
+				{
+					if(thisNode->subscript == NULL && symbol->IsArray())
+					{
+						static FRandom pr_exrandom("Expression");
+						thisNode->subscript = &pr_exrandom;
+					}
+					assert(thisNode->subscript);
+					sc.MustGetToken('(');
+					FunctionSymbol *fsymbol = reinterpret_cast<FunctionSymbol *>(symbol);
+					thisNode->args = new ExpressionNode*[fsymbol->GetNumArgs()];
+					unsigned short argc = 0;
+					do
+					{
+						thisNode->args[argc++] = ExpressionNode::ParseExpression(cls, types, sc, NULL);
+					}
+					while(sc.CheckToken(','));
+					sc.MustGetToken(')');
+
+					if(argc != fsymbol->GetNumArgs())
+						sc.ScriptMessage(Scanner::ERROR, "Incorrect number of args for function call.\n");
 				}
 			}
 			else
