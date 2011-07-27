@@ -4,7 +4,13 @@ endif(COMMAND cmake_policy)
 
 include(CheckFunctionExists)
 
-include_directories(${ECWOLF_SOURCE_DIR}/src ${LZMA_INCLUDE_DIR} ${ECWOLF_SOURCE_DIR}/gdtoa ${CMAKE_BINARY_DIR}/gdtoa)
+include_directories(
+	${ECWOLF_SOURCE_DIR}/src
+	${ECWOLF_SOURCE_DIR}/src/g_shared
+	${LZMA_INCLUDE_DIR}
+	${ECWOLF_SOURCE_DIR}/gdtoa
+	${CMAKE_BINARY_DIR}/gdtoa
+)
 
 option(SPEAR "Spear of Destiny")
 option(SPEARDEMO "Spear of Destiny Demo")
@@ -43,6 +49,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(ecwolf
+	g_shared/a_inventory.cpp
 	r_data/colormaps.cpp
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp

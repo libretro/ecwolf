@@ -74,7 +74,8 @@ class AActorProxy : public Thinker
 
 		~AActorProxy()
 		{
-			delete parent;
+			parent->~AActor();
+			free(parent);
 		}
 
 		void Tick()
@@ -89,15 +90,22 @@ IMPLEMENT_THINKER(AActorProxy)
 LinkedList<AActor *> AActor::actors;
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
-AActor::AActor(const ClassDef *type) : classType(type), flags(0), distance(0),
-	dir(nodir), soundZone(NULL), SpawnState(NULL)
+AActor::AActor(const ClassDef *type) : classType(type), distance(0),
+	dir(nodir), soundZone(NULL)
 {
+	// This will be called for each actor AFTER copying the defaults.
+	// Use InitClean for any one time construction.
 }
 
 AActor::~AActor()
 {
 	if(actorRef)
 		actors.Remove(actorRef);
+}
+
+void AActor::AddInventory(AInventory *item)
+{
+	inventory.Push(item);
 }
 
 void AActor::Destroy()
@@ -128,6 +136,14 @@ void AActor::EnterZone(const MapZone *zone)
 const Frame *AActor::FindState(const FName &name) const
 {
 	return classType->FindState(name);
+}
+
+void AActor::InitClean()
+{
+	flags = 0;
+	SpawnState = NULL;
+
+	Init(true);
 }
 
 void AActor::Init(bool nothink)
@@ -213,8 +229,9 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 DEFINE_SYMBOL(Actor, angle)
 DEFINE_SYMBOL(Actor, health)
 
-class AWeapon : public AActor
+#include "g_shared/a_inventory.h"
+class AWeapon : public AInventory
 {
-	DECLARE_NATIVE_CLASS(Weapon, Actor)
+	DECLARE_NATIVE_CLASS(Weapon, Inventory)
 };
-IMPLEMENT_CLASS(Weapon, Actor)
+IMPLEMENT_CLASS(Weapon, Inventory)

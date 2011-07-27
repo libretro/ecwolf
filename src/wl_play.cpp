@@ -949,12 +949,13 @@ void UpdatePaletteShifts (void)
 
 	if (red)
 	{
-		VL_SetBlend(0xFF, 0x00, 0x00, red*(255/NUMREDSHIFTS));
+		VL_SetBlend(0xFF, 0x00, 0x00, red*(174/NUMREDSHIFTS));
 		palshifted = true;
 	}
 	else if (white)
 	{
-		VL_SetBlend(0xFF, 0xFF, 0xFF, white*(255/NUMWHITESHIFTS));
+		// [BL] More of a yellow if you ask me.
+		VL_SetBlend(0xFF, 0xF8, 0x00, white*(38/NUMWHITESHIFTS));
 		palshifted = true;
 	}
 	else if (palshifted)

@@ -118,35 +118,7 @@ class SymbolInfo
 #define DEFINE_SYMBOL(cls, var) \
 	static const SymbolInfo __SI_##var(NATIVE_CLASS(cls), #var, typeoffsetof(A##cls,var));
 
-struct StateDefinition
-{
-	public:
-		enum NextType
-		{
-			GOTO,
-			LOOP,
-			WAIT,
-			STOP,
-
-			NORMAL
-		};
-
-		FString		label;
-		char		sprite[5];
-		FString		frames;
-		int			duration;
-		NextType	nextType;
-		FString		nextArg;
-		Frame::ActionCall	functions[2];
-};
-
-struct FlagDef
-{
-	public:
-		const unsigned int	value;
-		const char* const	name;
-		const int			varOffset;
-};
+struct StateDefinition;
 
 union PropertyParam
 {
@@ -164,7 +136,7 @@ struct PropDef
 		const char* const		params;
 		PropHandler				handler;
 };
-#define NUM_PROPERTIES 9
+#define NUM_PROPERTIES 12
 
 typedef TArray<Symbol *> SymbolTable;
 
@@ -175,7 +147,7 @@ class ClassDef
 		~ClassDef();
 
 		AActor					*CreateInstance() const;
-		bool					IsDecendantOf(const ClassDef *parent) const;
+		bool					IsDescendantOf(const ClassDef *parent) const;
 
 		/**
 		 * Use with IMPLEMENT_CLASS to add a natively defined class.
@@ -194,10 +166,12 @@ class ClassDef
 				definition = *definitionLookup;
 			definition->name = className;
 			definition->parent = parent;
-			delete definition->defaultInstance;
-			definition->defaultInstance = new T(definition);
+			definition->defaultInstance->~AActor();
+			free(definition->defaultInstance);
+			definition->defaultInstance = (AActor *) malloc(sizeof(T));
+			definition->defaultInstance = new (definition->defaultInstance) T(definition);
 			definition->defaultInstance->defaults = definition->defaultInstance;
-			definition->defaultInstance->Init(true);
+			definition->defaultInstance->InitClean();
 			return definition;
 		}
 
@@ -219,7 +193,7 @@ class ClassDef
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
 		static bool	SetFlag(ClassDef *newClass, const char* flagName, bool set);
-		static bool SetProperty(ClassDef *newClass, const char* propName, Scanner &sc);
+		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
 

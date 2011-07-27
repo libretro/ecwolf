@@ -467,24 +467,6 @@ void TakeDamage (int points,objtype *attacker)
 #endif
 }
 
-/*
-===============
-=
-= HealSelf
-=
-===============
-*/
-
-void HealSelf (int points)
-{
-	gamestate.health += points;
-	if (gamestate.health>100)
-		gamestate.health = 100;
-
-	DrawHealth ();
-	DrawFace ();
-}
-
 
 //===========================================================================
 
@@ -702,140 +684,6 @@ void GiveKey (int key)
 =============================================================================
 */
 
-
-/*
-===================
-=
-= GetBonus
-=
-===================
-*/
-void GetBonus (statobj_t *check)
-{
-	switch (check->itemnumber)
-	{
-		case    bo_firstaid:
-			if (gamestate.health == 100)
-				return;
-
-			SD_PlaySound ("misc/medkit_pickup");
-			HealSelf (25);
-			break;
-
-		case    bo_key1:
-		case    bo_key2:
-		case    bo_key3:
-		case    bo_key4:
-			GiveKey (check->itemnumber - bo_key1);
-			SD_PlaySound ("misc/key_pickup");
-			break;
-
-		case    bo_cross:
-			SD_PlaySound ("treasure/cross/pickup");
-			GivePoints (100);
-			gamestate.treasurecount++;
-			break;
-		case    bo_chalice:
-			SD_PlaySound ("treasure/chalice/pickup");
-			GivePoints (500);
-			gamestate.treasurecount++;
-			break;
-		case    bo_bible:
-			SD_PlaySound ("treasure/bible/pickup");
-			GivePoints (1000);
-			gamestate.treasurecount++;
-			break;
-		case    bo_crown:
-			SD_PlaySound ("treasure/crown/pickup");
-			GivePoints (5000);
-			gamestate.treasurecount++;
-			break;
-
-		case    bo_clip:
-			if (gamestate.ammo == 99)
-				return;
-
-			SD_PlaySound ("misc/ammo_pickup");
-			GiveAmmo (8);
-			break;
-		case    bo_clip2:
-			if (gamestate.ammo == 99)
-				return;
-
-			SD_PlaySound ("misc/ammo_pickup");
-			GiveAmmo (4);
-			break;
-
-#ifdef SPEAR
-		case    bo_25clip:
-			if (gamestate.ammo == 99)
-				return;
-
-			SD_PlaySound ("misc/ammobox_pickup");
-			GiveAmmo (25);
-			break;
-#endif
-
-		case    bo_machinegun:
-			SD_PlaySound ("weapon/machine/pickup");
-			GiveWeapon (wp_machinegun);
-			break;
-		case    bo_chaingun:
-			SD_PlaySound ("weapon/gatling/pickup");
-			facetimes = 38;
-			GiveWeapon (wp_chaingun);
-
-			if(viewsize != 21)
-				StatusDrawFace ("STFEVL0");
-			facecount = 0;
-			break;
-
-		case    bo_fullheal:
-			SD_PlaySound ("misc/1up");
-			HealSelf (99);
-			GiveAmmo (25);
-			GiveExtraMan ();
-			gamestate.treasurecount++;
-			break;
-
-		case    bo_food:
-			if (gamestate.health == 100)
-				return;
-
-			SD_PlaySound ("misc/health_pickup");
-			HealSelf (10);
-			break;
-
-		case    bo_alpo:
-			if (gamestate.health == 100)
-				return;
-
-			SD_PlaySound ("misc/health_pickup");
-			HealSelf (4);
-			break;
-
-		case    bo_gibs:
-			if (gamestate.health >10)
-				return;
-
-			SD_PlaySound ("misc/slurpie");
-			HealSelf (1);
-			break;
-
-#ifdef SPEAR
-		case    bo_spear:
-			spearflag = true;
-			spearx = player->x;
-			speary = player->y;
-			spearangle = player->angle;
-			playstate = ex_completed;
-#endif
-	}
-
-	StartBonusFlash ();
-	check->shapenum = -1;                   // remove from list
-}
-
 /*
 ===================
 =
@@ -918,14 +766,20 @@ bool TryMove (AActor *ob)
 			continue;
 
 		check = iter->Item();
-		
+
+		fixed r = check->radius + ob->radius;
 		if(check->flags & FL_SOLID)
 		{
-			fixed r = check->radius + ob->radius;
 			if(abs(ob->x - check->x) > r ||
 				abs(ob->y - check->y) > r)
 				continue;
 			return false;
+		}
+		else
+		{
+			if(abs(ob->x - check->x) <= r &&
+				abs(ob->y - check->y) <= r)
+				check->Touch(ob);
 		}
 	}
 

@@ -25,6 +25,22 @@ actor Actor native
 	}
 }
 
+actor Inventory native
+{
+	inventory.amount 1
+	inventory.maxamount 1
+}
+
+actor Health : Inventory native
+{
+	inventory.amount 1
+	inventory.maxamount 0
+}
+
+actor Weapon : Inventory native
+{
+}
+
 actor PatrolPoint 10
 {
 }
@@ -99,8 +115,10 @@ actor HangedMan 38
 	}
 }
 
-actor DogFood 39
+actor DogFood : Health 39
 {
+	inventory.amount 4
+	inventory.pickupsound "misc/health_pickup"
 	states
 	{
 		Spawn:
@@ -269,8 +287,9 @@ actor Bones1 52
 	}
 }
 
-actor GoldKey 53
+actor GoldKey : Inventory 53
 {
+	inventory.pickupsound "misc/key_pickup"
 	states
 	{
 		Spawn:
@@ -279,8 +298,9 @@ actor GoldKey 53
 	}
 }
 
-actor SilverKey 54
+actor SilverKey : Inventory 54
 {
+	inventory.pickupsound "misc/key_pickup"
 	states
 	{
 		Spawn:
@@ -313,8 +333,10 @@ actor Basket 56
 	}
 }
 
-actor Food 57
+actor Food : Health 57
 {
+	inventory.amount 10
+	inventory.pickupsound "misc/health_pickup"
 	states
 	{
 		Spawn:
@@ -323,8 +345,10 @@ actor Food 57
 	}
 }
 
-actor Medikit 58
+actor Medikit : Health 58
 {
+	inventory.amount 25
+	inventory.pickupsound "misc/medkit_pickup"
 	states
 	{
 		Spawn:
@@ -333,8 +357,9 @@ actor Medikit 58
 	}
 }
 
-actor Clip 59
+actor Clip : Inventory 59
 {
+	inventory.pickupsound "misc/ammo_pickup"
 	states
 	{
 		Spawn:
@@ -345,6 +370,7 @@ actor Clip 59
 
 actor ClipBox : Clip 90
 {
+	inventory.pickupsound "misc/ammobox_pickup"
 	states
 	{
 		Spawn:
@@ -355,6 +381,7 @@ actor ClipBox : Clip 90
 
 actor MachineGun : Weapon 60
 {
+	inventory.pickupsound "weapon/machine/pickup"
 	states
 	{
 		Spawn:
@@ -374,6 +401,7 @@ actor MachineGun : Weapon 60
 
 actor GatlingGun : Weapon 61
 {
+	inventory.pickupsound "weapon/gatling/pickup"
 	states
 	{
 		Spawn:
@@ -390,8 +418,9 @@ actor GatlingGun : Weapon 61
 	}
 }
 
-actor Cross 62
+actor Cross : Inventory 62
 {
+	inventory.pickupsound "treasure/cross/pickup"
 	states
 	{
 		Spawn:
@@ -400,8 +429,9 @@ actor Cross 62
 	}
 }
 
-actor Chalice 63
+actor Chalice : Inventory 63
 {
+	inventory.pickupsound "treasure/chalice/pickup"
 	states
 	{
 		Spawn:
@@ -410,8 +440,9 @@ actor Chalice 63
 	}
 }
 
-actor ChestofJewels 64
+actor ChestofJewels : Inventory 64
 {
+	inventory.pickupsound "treasure/bible/pickup"
 	states
 	{
 		Spawn:
@@ -420,8 +451,9 @@ actor ChestofJewels 64
 	}
 }
 
-actor Crown 65
+actor Crown : Inventory 65
 {
+	inventory.pickupsound "treasure/crown/pickup"
 	states
 	{
 		Spawn:
@@ -430,8 +462,9 @@ actor Crown 65
 	}
 }
 
-actor OneUp 66
+actor OneUp : Inventory 66
 {
+	inventory.pickupsound "misc/1up"
 	+FULLBRIGHT
 	states
 	{
@@ -441,8 +474,11 @@ actor OneUp 66
 	}
 }
 
-actor Gibs 67
+actor Gibs : Health 67
 {
+	inventory.amount 1
+	inventory.maxamount 10
+	inventory.pickupsound "misc/slurpie"
 	states
 	{
 		Spawn:
@@ -605,7 +641,7 @@ actor TruckRear 91
 	}
 }
 
-actor SpearOfDestiny 92
+actor SpearOfDestiny : Inventory 92
 {
 	states
 	{
@@ -1549,6 +1585,7 @@ actor BJRun
 
 actor BJPlayer
 {
+	health 100
 	radius 22
 	+NEVERMARK
 

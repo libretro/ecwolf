@@ -1165,7 +1165,6 @@ void    GiveKey (int key);
 void    StatusDrawFace(unsigned picnum);
 void    DrawFace (void);
 void    DrawHealth (void);
-void    HealSelf (int points);
 void    DrawLevel (void);
 void    DrawLives (void);
 void    GiveExtraMan (void);

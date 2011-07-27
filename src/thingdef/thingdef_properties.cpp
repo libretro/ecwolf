@@ -34,10 +34,17 @@
 
 #include "actor.h"
 #include "thingdef.h"
+#include "a_inventory.h"
 
 #define INT_PARAM(var, no) int64_t var = params[no].i
 #define FLOAT_PARAM(var, no) double var = params[no].f;
 #define STRING_PARAM(var, no) const char* var = params[no].s;
+
+HANDLE_PROPERTY(amount)
+{
+	INT_PARAM(amt, 0);
+	((AInventory *)defaults)->amount = amt;
+}
 
 HANDLE_PROPERTY(attacksound)
 {
@@ -71,6 +78,24 @@ HANDLE_PROPERTY(health)
 	{
 		defaults->defaultHealth[i] = defaults->defaultHealth[i-1] + currentSlope;
 	}
+}
+
+HANDLE_PROPERTY(maxamount)
+{
+	INT_PARAM(maxamt, 0);
+	((AInventory *)defaults)->maxamount = maxamt;
+}
+
+HANDLE_PROPERTY(pickupsound)
+{
+	STRING_PARAM(snd, 0);
+	((AInventory *)defaults)->pickupsound = snd;
+}
+
+HANDLE_PROPERTY(points)
+{
+	INT_PARAM(pts, 0);
+	defaults->points = pts;
 }
 
 HANDLE_PROPERTY(radius)
@@ -114,12 +139,6 @@ HANDLE_PROPERTY(speed)
 		defaults->runspeed = defaults->speed;
 }
 
-HANDLE_PROPERTY(points)
-{
-	INT_PARAM(pts, 0);
-	defaults->points = pts;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 
 HANDLE_PROPERTY(MONSTER)
@@ -132,10 +151,13 @@ HANDLE_PROPERTY(MONSTER)
 #define DEFINE_PROP(name, class, params) { class::__StaticClass, #name, #params, __Handler_##name }
 extern const PropDef properties[NUM_PROPERTIES] =
 {
+	DEFINE_PROP(amount, AInventory, I),
 	DEFINE_PROP(attacksound, AActor, S),
 	DEFINE_PROP(deathsound, AActor, S),
 	DEFINE_PROP(health, AActor, I_IIIIIIII),
+	DEFINE_PROP(maxamount, AInventory, I),
 	DEFINE_PROP(MONSTER, AActor,),
+	DEFINE_PROP(pickupsound, AInventory, S),
 	DEFINE_PROP(points, AActor, I),
 	DEFINE_PROP(radius, AActor, I),
 	DEFINE_PROP(seesound, AActor, S),

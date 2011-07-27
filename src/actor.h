@@ -42,9 +42,12 @@
 
 #define DECLARE_NATIVE_CLASS(name, parent) \
 	friend class ClassDef; \
+	private: \
+		typedef A##parent Super; \
 	protected: \
 		A##name(const ClassDef *classType) : A##parent(classType) {} \
-		virtual AActor *__NewNativeInstance(const ClassDef *classType) { return new A##name(classType); } \
+		virtual size_t __GetSize() const { return sizeof(A##name); } \
+		virtual AActor *__NewNativeInstance(const ClassDef *classType, void *mem) { return new (mem) A##name(classType); } \
 	public: \
 		static const ClassDef *__StaticClass;
 #define IMPLEMENT_CLASS(name, parent) \
@@ -86,11 +89,13 @@ class Frame
 
 class AActorProxy;
 class ClassDef;
+class AInventory;
 class AActor
 {
 	public:
-		~AActor();
+		virtual ~AActor();
 
+		void			AddInventory(AInventory *item);
 		void			Destroy();
 		void			Die();
 		void			EnterZone(const MapZone *zone);
@@ -99,6 +104,7 @@ class AActor
 		void			SetState(const Frame *state, bool notic=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
 		void			Tick();
+		virtual void	Touch(AActor *toucher) {}
 
 		const AActor	*defaults;
 
@@ -135,12 +141,15 @@ class AActor
 		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState, *DeathState;
 		short       temp1,hidden;
 
+		LinkedList<AInventory *>	inventory;
+
 		typedef LinkedList<AActor *>::Node Iterator;
 		static LinkedList<AActor *>	actors;
 		LinkedList<AActor *>::Node	*actorRef;
 		static Iterator *GetIterator() { return actors.Head(); }
 	protected:
 		friend class AActorProxy;
+		virtual void	InitClean();
 		void			Init(bool nothink=false);
 
 		const MapZone	*soundZone;
@@ -154,7 +163,8 @@ class AActor
 		static const ClassDef *__StaticClass;
 	protected:
 		AActor(const ClassDef *type);
-		virtual AActor *__NewNativeInstance(const ClassDef *classType) { return new AActor(classType); }
+		virtual size_t __GetSize() const { return sizeof(AActor); }
+		virtual AActor *__NewNativeInstance(const ClassDef *classType, void *mem) { return new (mem) AActor(classType); }
 };
 
 #endif

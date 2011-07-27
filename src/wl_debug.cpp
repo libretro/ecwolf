@@ -507,7 +507,9 @@ int DebugKeys (void)
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
 		GivePoints (100000);
-		HealSelf (99);
+		gamestate.health = 100;
+		DrawHealth();
+		DrawFace();
 		if (gamestate.bestweapon<wp_chaingun)
 			GiveWeapon (gamestate.bestweapon+1);
 		gamestate.ammo += 50;

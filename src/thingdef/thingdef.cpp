@@ -52,7 +52,13 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table);
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DEFINE_FLAG(prefix, flag, type, variable) { prefix##_##flag, #flag, typeoffsetof(type,variable) }
-const FlagDef flags[] =
+const struct FlagDef
+{
+	public:
+		const unsigned int	value;
+		const char* const	name;
+		const int			varOffset;
+} flags[] =
 {
 	DEFINE_FLAG(FL, AMBUSH, AActor, flags),
 	DEFINE_FLAG(FL, ATTACKMODE, AActor, flags),
@@ -71,6 +77,28 @@ const FlagDef flags[] =
 extern const PropDef properties[NUM_PROPERTIES];
 
 ////////////////////////////////////////////////////////////////////////////////
+
+struct StateDefinition
+{
+	public:
+		enum NextType
+		{
+			GOTO,
+			LOOP,
+			WAIT,
+			STOP,
+
+			NORMAL
+		};
+
+		FString		label;
+		char		sprite[5];
+		FString		frames;
+		int			duration;
+		NextType	nextType;
+		FString		nextArg;
+		Frame::ActionCall	functions[2];
+};
 
 static TArray<const SymbolInfo *> *symbolPool = NULL;
 
@@ -148,7 +176,8 @@ SymbolTable ClassDef::globalSymbols;
 
 ClassDef::ClassDef()
 {
-	defaultInstance = new AActor(this);
+	defaultInstance = (AActor *) malloc(sizeof(AActor));
+	defaultInstance = new (defaultInstance) AActor(this);
 	defaultInstance->defaults = defaultInstance;
 	defaultInstance->Init(true);
 }
@@ -157,7 +186,8 @@ ClassDef::~ClassDef()
 {
 	for(unsigned int i = 0;i < frameList.Size();++i)
 		delete frameList[i];
-	delete defaultInstance;
+	defaultInstance->~AActor();
+	free(defaultInstance);
 	for(unsigned int i = 0;i < symbols.Size();++i)
 		delete symbols[i];
 }
@@ -181,8 +211,9 @@ AActor *ClassDef::CreateInstance() const
 		defaultInstance->SeeState = FindState("See");
 	}
 
-	AActor *newactor = defaultInstance->__NewNativeInstance(this);
-	*newactor = *defaultInstance;
+	AActor *newactor = (AActor *) malloc(defaultInstance->__GetSize());
+	memcpy(newactor, defaultInstance, defaultInstance->__GetSize());
+	defaultInstance->__NewNativeInstance(this, newactor);
 	newactor->classType = this;
 	newactor->Init();
 	return newactor;
@@ -348,7 +379,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	}
 }
 
-bool ClassDef::IsDecendantOf(const ClassDef *parent) const
+bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 {
 	const ClassDef *currentParent = parent;
 	while(currentParent != NULL)
@@ -439,8 +470,11 @@ void ClassDef::ParseActor(Scanner &sc)
 		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
-		delete newClass->defaultInstance;
-		newClass->defaultInstance = newClass->parent->defaultInstance->__NewNativeInstance(newClass);
+		newClass->defaultInstance->~AActor();
+		free(newClass->defaultInstance);
+		newClass->defaultInstance = (AActor *) malloc(newClass->parent->defaultInstance->__GetSize());
+		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
+		newClass->defaultInstance = newClass->parent->defaultInstance->__NewNativeInstance(newClass, newClass->defaultInstance);
 		newClass->defaultInstance->defaults = newClass->defaultInstance;
 		newClass->defaultInstance->Init(true);
 	}
@@ -755,13 +789,16 @@ void ClassDef::ParseActor(Scanner &sc)
 			}
 			else
 			{
+				FString className("actor");
 				FString propertyName = sc->str;
 				if(sc.CheckToken('.'))
 				{
+					className = propertyName;
 					sc.MustGetToken(TK_Identifier);
-					propertyName = FString(".") + sc->str;
+					propertyName = sc->str;
 				}
-				if(!SetProperty(newClass, propertyName, sc))
+
+				if(!SetProperty(newClass, className, propertyName, sc))
 				{
 					do
 					{
@@ -863,7 +900,7 @@ bool ClassDef::SetFlag(ClassDef *newClass, const char* flagName, bool set)
 	return false;
 }
 
-bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc)
+bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc)
 {
 	int min = 0;
 	int max = NUM_PROPERTIES - 1;
@@ -873,6 +910,10 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* propName, Scanner &sc
 		int ret = stricmp(properties[mid].name, propName);
 		if(ret == 0)
 		{
+			if(newClass->IsDescendantOf(properties[mid].className) &&
+				stricmp(properties[mid].className->name.GetChars(), className) != 0)
+				sc.ScriptMessage(Scanner::ERROR, "Property %s.%s not available in this scope.\n", properties[mid].className->name.GetChars(), propName);
+
 			PropertyParam* params = new PropertyParam[strlen(properties[mid].params)];
 			// Key:
 			//   K - Keyword (Identifier)

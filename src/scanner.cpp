@@ -526,9 +526,17 @@ bool Scanner::GetNextToken(bool expandState)
 		nextState.str = SCString(data+start, end-start);
 		if(nextState.token == TK_FloatConst)
 		{
-			nextState.decimal = atof(SCString_GetChars(nextState.str));
-			nextState.number = static_cast<int> (nextState.decimal);
-			nextState.boolean = (nextState.number != 0);
+			if(floatHasDecimal && SCString_Len(nextState.str) == 1)
+			{
+				// Don't treat a lone '.' as a decimal.
+				nextState.token = '.';
+			}
+			else
+			{
+				nextState.decimal = atof(SCString_GetChars(nextState.str));
+				nextState.number = static_cast<int> (nextState.decimal);
+				nextState.boolean = (nextState.number != 0);
+			}
 		}
 		else if(nextState.token == TK_IntConst)
 		{
