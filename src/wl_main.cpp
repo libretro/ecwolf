@@ -436,66 +436,16 @@ void FinishSignon (void)
 //===========================================================================
 
 Menu musicMenu(CTL_X, CTL_Y-6, 280, 32);
-static struct Song
-{
-	const char*		name;
-	const char*		track;
-} songList[] =
-{
-#ifndef SPEAR
-	{"Get Them!",			"GETTHEM"},
-	{"Searching",			"SEARCHN"},
-	{"P.O.W.",				"POW"},
-	{"Suspense",			"SUSPENSE"},
-	{"War March",			"WARMARCH"},
-	{"Around The Corner!",	"CORNER"},
-	{"Nazi Anthem (Title)",	"NAZI_NOR"},
-	{"Nazi Anthem",			"NAZI_OMI"},
-	{"Lurking...",			"PREGNANT"},
-	{"Going After Hitler",	"GOINGAFT"},
-	{"Pounding Headache",	"HEADACHE"},
-	{"Into the Dungeons",	"DUNGEON"},
-	{"Kill the S.O.B.",		"INTROCW3"},
-	{"The Nazi Rap",		"NAZI_RAP"},
-	{"Twelfth Hour",		"TWELFTH"},
-	{"Zero Hour",			"ZEROHOUR"},
-	{"Ultimate Conquest",	"ULTIMATE"},
-	{"Wolfpack",			"PACMAN"},
-	{"Hitler Waltz",		"HITLWLTZ"},
-	{"Salute",				"SALUTE"},
-	{"Victors",				"VICTORS"},
-	{"Wondering About My...",	"WONDERIN"},
-	{"Funk You",			"FUNKYOU"},
-	{"Intermission",		"ENDLEVEL"},
-	{"Roster",				"ROSTER"},
-	{"You're a Hero",		"URAHERO"},
-	{"Victory March",		"VICMARCH"},
-#else
-	{"Funky Colonel Bill",		"XFUNKIE"},
-	{"Death To The Nazis",		"XDEATH"},
-	{"Tiptoeing Around",		"XTIPTOE"},
-	{"Is This THE END?",		"XTHEEND"},
-	{"Evil Incarnate",			"XEVIL"},
-	{"Jazzin' Them Nazis",		"XJAZNAZI"},
-	{"Puttin' It To The Enemy",	"XPUTIT"},
-	{"The SS Gonna Get You",	"XGETYOU"},
-	{"Towering Above",			"XTOWER2"},
-#endif
+static TArray<FString> songList;
 
-	// End of list
-	{ NULL, NULL }
-};
 MENU_LISTENER(ChangeMusic)
 {
-	StartCPMusic(songList[which].track);
-	for(unsigned int i = 0;songList[i].name != NULL;i++)
-	{
+	StartCPMusic(songList[which]);
+	for(unsigned int i = 0;i < songList.Size();++i)
 		musicMenu[i]->setHighlighted(i == which);
-	}
 	musicMenu.draw();
 }
 
-#ifndef SPEARDEMO
 void DoJukebox(void)
 {
 	IN_ClearKeysDown();
@@ -506,13 +456,25 @@ void DoJukebox(void)
 
 	fontnumber=1;
 	ClearMScreen ();
-	musicMenu.setHeadText("Robert's Jukebox", true);
-	for(unsigned int i = 0;songList[i].name != NULL;i++)
-		musicMenu.addItem(new MenuItem(songList[i].name, ChangeMusic));
+	musicMenu.setHeadText(language["ROBSJUKEBOX"], true);
+	for(unsigned int i = 0;i < Wads.GetNumLumps();++i)
+	{
+		if(Wads.GetLumpNamespace(i) != ns_music)
+			continue;
+
+		FString langString;
+		langString.Format("MUS_%s", Wads.GetLumpFullName(i));
+		const char* trackName = language[langString];
+		if(trackName == langString.GetChars())
+			musicMenu.addItem(new MenuItem(Wads.GetLumpFullName(i), ChangeMusic));
+		else
+			musicMenu.addItem(new MenuItem(language[langString], ChangeMusic));
+		songList.Push(Wads.GetLumpFullName(i));
+		
+	}
 	musicMenu.show();
 	return;
 }
-#endif
 
 /*
 ==========================
@@ -621,6 +583,11 @@ static void InitGame()
 // draw intro screen stuff
 //
 	IntroScreen ();
+
+//
+// Finish with setting up through the config file.
+//
+	FinalReadConfig();
 
 //
 // load in and lock down some basic chunks
@@ -1396,7 +1363,6 @@ int main (int argc, char *argv[])
 	atexit(R_DeinitColormaps);
 	printf("InitGame: Setting up the game...\n");
 	InitGame();
-	FinalReadConfig();
 	printf("CreateMenus: Preparing the menu system...\n");
 	CreateMenus();
 

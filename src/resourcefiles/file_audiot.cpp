@@ -57,7 +57,7 @@ class FAudiot : public FUncompressedFile
 			if(!audiohedReader.Open(audiohedFile))
 				return false;
 			audiohedReader.Seek(0, SEEK_END);
-			NumLumps = audiohedReader.Tell()/4;
+			NumLumps = (audiohedReader.Tell()/4)-1;
 			audiohedReader.Seek(0, SEEK_SET);
 			Lumps = new FUncompressedLump[NumLumps];
 			// The vgahead has 24-bit ints.
