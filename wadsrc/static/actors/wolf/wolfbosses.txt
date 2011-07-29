@@ -25,7 +25,7 @@ actor Hans 16
 		Missile:
 			HANS E 15
 			HANS F 5
-			HANS FGFGFGE 5 T_Shoot
+			HANS FGFGFGE 5 A_WolfAttack(0, "*", 0.667)
 			goto See
 		Death:
 			HANS H 7.5 A_Fall
@@ -63,7 +63,7 @@ actor Gretel 20
 		Missile:
 			GRET E 15
 			GRET F 5
-			GRET FGFGFGE 5 T_Shoot
+			GRET FGFGFGE 5 A_WolfAttack
 			goto See
 		Death:
 			GRET H 7.5 A_Fall
@@ -189,8 +189,8 @@ actor FatFace 22
 			FATF E 15
 			FATF F 5
 			FATF G 5 T_GiftThrow
-			FATF HGH 5 T_Shoot
-			FATF H 0 T_Shoot
+			FATF HGH 5 A_WolfAttack
+			FATF H 0 A_WolfAttack
 			goto See
 		Death:
 			FATF A .5 A_Fall

@@ -1374,10 +1374,8 @@ GetYorN (int x, int y, int pic)
 	do
 	{
 		IN_WaitAndProcessEvents();
-#ifndef SPEAR
-		if (Keyboard[sc_Tab] && Keyboard[sc_P] && param_debugmode)
+		if (Keyboard[sc_Tab] && Keyboard[sc_P])
 			PicturePause ();
-#endif
 
 #ifdef SPANISH
 	}

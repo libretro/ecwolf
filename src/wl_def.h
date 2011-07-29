@@ -905,7 +905,6 @@ extern  char     str[80];
 //
 // Command line parameter variables
 //
-extern  boolean  param_debugmode;
 extern  boolean  param_nowait;
 extern  int      param_difficulty;
 extern  int      param_tedlevel;

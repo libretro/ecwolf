@@ -37,7 +37,6 @@
 =============================================================================
 */
 
-#ifdef DEBUGKEYS
 
 int DebugKeys (void);
 
@@ -836,5 +835,4 @@ void ViewMap (void)
 
 	IN_ClearKeysDown ();
 }
-#endif
 #endif

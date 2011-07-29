@@ -622,8 +622,7 @@ void CheckKeys (void)
 	//
 	// OPEN UP DEBUG KEYS
 	//
-#ifdef DEBUGKEYS
-	if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt] && param_debugmode)
+	if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt])
 	{
 		ClearMemory ();
 		ClearSplitVWB ();
@@ -635,7 +634,6 @@ void CheckKeys (void)
 		DrawPlayBorderSides ();
 		DebugOk = 1;
 	}
-#endif
 
 	//
 	// TRYING THE KEEN CHEAT CODE!
@@ -723,7 +721,6 @@ void CheckKeys (void)
 //
 // TAB-? debug keys
 //
-#ifdef DEBUGKEYS
 	if (Keyboard[sc_Tab] && DebugOk)
 	{
 		fontnumber = 0;
@@ -737,7 +734,6 @@ void CheckKeys (void)
 		lasttimecount = GetTimeCount();
 		return;
 	}
-#endif
 }
 
 

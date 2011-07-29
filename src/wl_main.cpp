@@ -106,7 +106,6 @@ int     mouseadjustment;
 //
 // Command line parameter variables
 //
-boolean param_debugmode = false;
 boolean param_nowait = false;
 int     param_difficulty = 1;           // default is "normal"
 int     param_tedlevel = -1;            // default is not to start a level
@@ -488,10 +487,6 @@ void DoJukebox(void)
 
 static void InitGame()
 {
-#ifndef SPEARDEMO
-	boolean didjukebox=false;
-#endif
-
 	// initialize SDL
 #if defined _WIN32
 	putenv("SDL_VIDEODRIVER=directx");
@@ -602,23 +597,15 @@ static void InitGame()
 // initialize variables
 //
 	InitRedShifts ();
-#ifndef SPEARDEMO
-	if(!didjukebox)
-#endif
-		FinishSignon();
+	FinishSignon();
 
 //
 // HOLDING DOWN 'M' KEY?
 //
 	IN_ProcessEvents();
 
-#ifndef SPEARDEMO
 	if (Keyboard[sc_M])
-	{
 		DoJukebox();
-		didjukebox=true;
-	}
-#endif
 
 #ifdef NOTYET
 	vdisp = (byte *) (0xa0000+PAGE1START);
@@ -943,14 +930,10 @@ static void DemoLoop()
 
 		VW_FadeOut ();
 
-#ifdef DEBUGKEYS
-		if (Keyboard[sc_Tab] && param_debugmode)
+		if (Keyboard[sc_Tab])
 			RecordDemo ();
 		else
 			US_ControlPanel (0);
-#else
-		US_ControlPanel (0);
-#endif
 
 		if (startgame || loadedgame)
 		{
@@ -1042,13 +1025,7 @@ void CheckParameters(int argc, char *argv[])
 	for(int i = 1; i < argc; i++)
 	{
 		char *arg = argv[i];
-#ifndef SPEAR
-		IFARG("--goobers")
-#else
-		IFARG("--debugmode")
-#endif
-			param_debugmode = true;
-		else IFARG("--baby")
+		IFARG("--baby")
 			param_difficulty = 0;
 		else IFARG("--easy")
 			param_difficulty = 1;

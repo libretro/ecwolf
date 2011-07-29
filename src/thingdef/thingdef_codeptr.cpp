@@ -33,7 +33,9 @@
 */
 
 #include "actor.h"
-#include "thingdef.h"
+#include "m_random.h"
+#include "thingdef/thingdef.h"
+#include "wl_def.h"
 
 static ActionTable *actionFunctions = NULL;
 ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name),
@@ -96,7 +98,22 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+bool CheckMeleeRange(AActor *actor1, AActor *actor2);
+
 ACTION_FUNCTION(A_Fall)
 {
 	self->flags &= ~FL_SOLID;
+}
+
+static FRandom pr_meleeattack("MeleeAccuracy");
+ACTION_FUNCTION(A_MeleeAttack)
+{
+	ACTION_PARAM_INT(damage, 0);
+	ACTION_PARAM_INT(accuracy, 1);
+
+	if(CheckMeleeRange(self, player))
+	{
+		if(pr_meleeattack() < accuracy*255)
+			TakeDamage(damage, self);
+	}
 }

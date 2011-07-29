@@ -32,7 +32,7 @@ actor Guard 11
 			loop
 		Missile:
 			GARD FG 10
-			GARD H 10 T_Shoot
+			GARD H 10 A_WolfAttack
 			goto See
 		Pain:
 			GARD I 5
@@ -83,7 +83,7 @@ actor Dog 14
 			loop
 		Melee:
 			DOGY EF 5
-			DOGY G 5 T_Bite
+			DOGY G 5 A_MeleeAttack(random(1,15))
 			DOGY EA 5
 			goto See
 		See:
@@ -135,7 +135,7 @@ actor Officer 12
 		Missile:
 			OFFI F 3
 			OFFI G 10
-			OFFI H 5 T_Shoot
+			OFFI H 5 A_WolfAttack
 			goto See
 		See:
 			OFFI B 5 NOP T_Chase
@@ -192,9 +192,9 @@ actor Mutant 15
 			loop
 		Missile:
 			MTNT F 3
-			MTNT G 10 T_Shoot
+			MTNT G 10 A_WolfAttack
 			MTNT H 5
-			MTNT I 10 T_Shoot
+			MTNT I 10 A_WolfAttack
 			goto See
 		Death:
 			MTNT L 3.5 A_Fall
@@ -246,13 +246,13 @@ actor WolfensteinSS 13 // ZDoom compatible name
 		Missile:
 			SSWV E 10
 			SSWV F 10
-			SSWV G 5 T_Shoot
+			SSWV G 5 A_WolfAttack(0, "*", 0.667)
 			SSWV F 5
-			SSWV G 5 T_Shoot
+			SSWV G 5 A_WolfAttack(0, "*", 0.667)
 			SSWV F 5
-			SSWV G 5 T_Shoot
+			SSWV G 5 A_WolfAttack(0, "*", 0.667)
 			SSWV F 5
-			SSWV G 5 T_Shoot
+			SSWV G 5 A_WolfAttack(0, "*", 0.667)
 			goto See
 		Death:
 			SSWV J 7.5 A_Fall

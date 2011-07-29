@@ -1,3 +1,5 @@
+const int WAF_NORANDOM = 1;
+
 actor Actor native
 {
 	radius 20
@@ -11,10 +13,10 @@ actor Actor native
 
 	action native A_DeathScream();
 	action native A_Fall();
-	action native T_Bite();
+	action native A_MeleeAttack(int damage, float accuracy = 0.6275);
+	action native A_WolfAttack(int flags = 0, string sound = "*", float snipe = 1.0, int maxdamage = 64, int blocksize = 128, int pointblank = 2, int longrange = 4, float runspeed = 160.0);
 	action native T_Chase();
 	action native T_Path();
-	action native T_Shoot();
 	action native T_Stand();
 
 	states

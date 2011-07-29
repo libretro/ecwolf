@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "actor.h"
+#include "m_random.h"
 #include "wl_act.h"
 #include "wl_def.h"
 #include "wl_menu.h"
@@ -261,28 +262,6 @@ ACTION_FUNCTION(A_DeathScream)
 
 =============================================================================
 */
-
-/*
-===============
-=
-= T_UShoot
-=
-===============
-*/
-
-void T_UShoot (objtype *ob)
-{
-	int     dx,dy,dist;
-
-	T_Shoot (ob);
-
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
-	dist = dx>dy ? dx : dy;
-	if (dist <= 1)
-		TakeDamage (10,ob);
-}
-
 
 //
 // will
@@ -1189,6 +1168,7 @@ ACTION_FUNCTION(T_Chase)
 		//
 		if(self->MeleeState && CheckMeleeRange(self, player))
 		{
+			PlaySoundLocActor(self->attacksound, self);
 			self->SetState(self->MeleeState);
 			return;
 		}
@@ -1384,26 +1364,41 @@ ACTION_FUNCTION(T_Path)
 ===============
 */
 
-ACTION_FUNCTION(T_Shoot)
+static FRandom pr_cabullet("CustomBullet");
+ACTION_FUNCTION(A_WolfAttack)
 {
-	int     dx,dy,dist;
-	int     hitchance,damage;
+	enum
+	{
+		WAF_NORANDOM = 1
+	};
 
-	hitchance = 128;
+	ACTION_PARAM_INT(flags, 0);
+	ACTION_PARAM_STRING(sound, 1);
+	ACTION_PARAM_DOUBLE(snipe, 2);
+	ACTION_PARAM_INT(maxdamage, 3);
+	ACTION_PARAM_INT(blocksize, 4);
+	ACTION_PARAM_INT(pointblank, 5);
+	ACTION_PARAM_INT(longrange, 6);
+	ACTION_PARAM_DOUBLE(runspeed, 7);
+
+	int     dx,dy,dist;
+	int     hitchance;
+
+	runspeed *= 37.5;
 
 	if (!map->CheckLink(self->GetZone(), player->GetZone(), true))
 		return;
 
 	if (CheckLine (self))                    // player is not behind a wall
 	{
-		dx = abs(self->tilex - player->tilex);
-		dy = abs(self->tiley - player->tiley);
+		dx = abs(self->x - player->x);
+		dy = abs(self->y - player->y);
 		dist = dx>dy ? dx:dy;
 
-		if (self->obclass == ssobj || self->obclass == bossobj)
-			dist = dist*2/3;                                        // ss are better shots
+		dist = FixedMul(dist, snipe*FRACUNIT);
+		dist /= blocksize<<9;
 
-		if (thrustspeed >= RUNSPEED)
+		if (thrustspeed >= runspeed)
 		{
 			if (self->flags&FL_VISABLE)
 				hitchance = 160-dist*16;                // player can see to dodge
@@ -1422,44 +1417,26 @@ ACTION_FUNCTION(T_Shoot)
 
 		if (US_RndT()<hitchance)
 		{
-			if (dist<2)
-				damage = US_RndT()>>2;
-			else if (dist<4)
-				damage = US_RndT()>>3;
-			else
-				damage = US_RndT()>>4;
+			int damage = flags & WAF_NORANDOM ? maxdamage : (1 + (pr_cabullet()%maxdamage));
+			if (dist>=pointblank)
+				damage >>= 1;
+			if (dist>=longrange)
+				damage >>= 1;
 
 			TakeDamage (damage,self);
 		}
 	}
 
-	PlaySoundLocActor(self->attacksound, self);
+	if(sound.Len() == 1 && sound[0] == '*')
+		PlaySoundLocActor(self->attacksound, self);
+	else
+		PlaySoundLocActor(sound, self);
 }
 void T_Shoot(AActor *self)
 {
 	static CallArguments args;
-	__AF_T_Shoot(self, args);
+	__AF_A_WolfAttack(self, args);
 }
-
-/*
-===============
-=
-= T_Bite
-=
-===============
-*/
-
-ACTION_FUNCTION(T_Bite)
-{
-	PlaySoundLocActor(self->attacksound, self);
-
-	if(CheckMeleeRange(self, player))
-	{
-		if(US_RndT()<180)
-			TakeDamage(US_RndT()>>4, self);
-	}
-}
-
 
 #ifndef SPEAR
 /*

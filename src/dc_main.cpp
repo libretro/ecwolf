@@ -393,13 +393,7 @@ void DC_CheckParameters()	{
 	result = strtok(buf, " ");
 
 	while(result != NULL) {
-#ifndef SPEAR
-		if(!strcmp(result, "--goobers"))
-#else
-		if(!strcmp(result, "--debugmode"))
-#endif
-			param_debugmode = true;
-		else if(!strcmp(result, "--baby"))
+		if(!strcmp(result, "--baby"))
             param_difficulty = 0;
 		else if(!strcmp(result, "--easy"))
             param_difficulty = 1;
