@@ -825,6 +825,20 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 
 	while(sc.TokensLeft())
 	{
+		if(sc.CheckToken('#'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			if(sc->str.CompareNoCase("include") != 0)
+				sc.ScriptMessage(Scanner::ERROR, "Expected 'include' got '%s' instead.", sc->str.GetChars());
+			sc.MustGetToken(TK_StringConst);
+
+			int lmp = Wads.GetNumForFullName(sc->str);
+			if(lmp == -1)
+				sc.ScriptMessage(Scanner::ERROR, "Could not find lump \"%s\".", sc->str.GetChars());
+			ParseDecorateLump(lmp);
+			continue;
+		}
+
 		sc.MustGetToken(TK_Identifier);
 		if(sc->str.CompareNoCase("actor") == 0)
 		{

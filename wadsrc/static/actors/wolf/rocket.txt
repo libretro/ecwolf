@@ -1,0 +1,47 @@
+actor Rocket
+{
+	states
+	{
+		Spawn:
+			ROCK A 1.5 A_Smoke T_Projectile
+			loop
+		Death:
+			BOOM ABC 3
+			stop
+	}
+}
+
+actor Smoke
+{
+	+NEVERMARK
+	states
+	{
+		Spawn:
+			SMOK ABCD 1.5
+			stop
+	}
+}
+
+actor HighRocket
+{
+	states
+	{
+		Spawn:
+			HRCK A 1.5 A_Smoke T_Projectile
+			loop
+		Death:
+			HBOM ABC 3
+			stop
+	}
+}
+
+actor HighSmoke
+{
+	+NEVERMARK
+	states
+	{
+		Spawn:
+			HSMK ABCD 3
+			stop
+	}
+}

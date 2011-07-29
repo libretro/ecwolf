@@ -1,0 +1,407 @@
+actor Puddle 33
+{
+	states
+	{
+		Spawn:
+			WATR A -1
+			stop
+	}
+}
+
+actor GreenBarrel 34
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			DRUM A -1
+			stop
+	}
+}
+
+actor TableWithChairs 35
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			TCHR A -1
+			stop
+	}
+}
+
+actor FloorLamp 36
+{
+	radius 32
+	+SOLID
+	+FULLBRIGHT
+	states
+	{
+		Spawn:
+			FLMP A -1
+			stop
+	}
+}
+
+actor Chandelier 37
+{
+	+FULLBRIGHT
+	states
+	{
+		Spawn:
+			CHAN A -1
+			stop
+	}
+}
+
+actor HangedMan 38
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			HANG A -1
+			stop
+	}
+}
+
+actor WhitePillar 40
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			COLU A -1
+			stop
+	}
+}
+
+actor GreenPlant 41
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			PLNT A -1
+			stop
+	}
+}
+
+actor SkeletonFlat 42
+{
+	states
+	{
+		Spawn:
+			SKEL A -1
+			stop
+	}
+}
+
+actor Sink 43
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			SINK A -1
+			stop
+	}
+}
+
+actor BrownPlant 44
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			BPNT A -1
+			stop
+	}
+}
+
+actor Vase 45
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			VASE A -1
+			stop
+	}
+}
+
+actor BareTable 46
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			TABL A -1
+			stop
+	}
+}
+
+actor CeilingLight 47
+{
+	states
+	{
+		Spawn:
+			GLMP A -1
+			stop
+	}
+}
+
+actor RedCeilingLight 85
+{
+	states
+	{
+		Spawn:
+			RLMP A -1
+			stop
+	}
+}
+
+actor KitchenStuff 48
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			POT1 A -1
+			stop
+	}
+}
+
+actor SuitOfArmor 49
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			ARMR A -1
+			stop
+	}
+}
+
+actor HangingCage 50
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CAG1 A -1
+			stop
+	}
+}
+
+actor SkeletonCage 51
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CAG2 A -1
+			stop
+	}
+}
+
+actor Bones1 52
+{
+	states
+	{
+		Spawn:
+			BON1 A -1
+			stop
+	}
+}
+
+actor BunkBed 55
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			BUNK A -1
+			stop
+	}
+}
+
+actor Basket 56
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			BASK A -1
+			stop
+	}
+}
+
+actor Barrel 68
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			BARL A -1
+			stop
+	}
+}
+
+actor Well 69
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			WEL1 A -1
+			stop
+	}
+}
+
+actor EmptyWell 70
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			WEL2 A -1
+			stop
+	}
+}
+
+actor Gibs2 71
+{
+	states
+	{
+		Spawn:
+			BLUD A -1
+			stop
+	}
+}
+
+actor Flag 72
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			FLAG A -1
+			stop
+	}
+}
+
+actor CallApogee 73
+{
+	states
+	{
+		Spawn:
+			AARD A -1
+			stop
+	}
+}
+
+actor Bones2 74
+{
+	states
+	{
+		Spawn:
+			BON2 A -1
+			stop
+	}
+}
+
+actor Bones3 75
+{
+	states
+	{
+		Spawn:
+			BON3 A -1
+			stop
+	}
+}
+
+actor Bones4 76
+{
+	states
+	{
+		Spawn:
+			BON4 A -1
+			stop
+	}
+}
+
+actor Pots 77
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			POT2 A -1
+			stop
+	}
+}
+
+actor Stove 78
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			STOV A -1
+			stop
+	}
+}
+
+actor Spears 79
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			RACK A -1
+			stop
+	}
+}
+
+actor Vines 80
+{
+	states
+	{
+		Spawn:
+			VINE A -1
+			stop
+	}
+}
+
+actor TruckRear 91
+{
+	states
+	{
+		Spawn:
+			TRUK A -1
+			stop
+	}
+}

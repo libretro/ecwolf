@@ -1,0 +1,46 @@
+actor Actor native
+{
+	radius 20
+	health 1000
+	sighttime 1
+	speed 0
+	points 0
+
+	native int angle;
+	native int health;
+
+	action native A_DeathScream();
+	action native A_Fall();
+	action native T_Bite();
+	action native T_Chase();
+	action native T_Path();
+	action native T_Shoot();
+	action native T_Stand();
+
+	states
+	{
+		Spawn:
+			TNT1 A -1
+			stop
+	}
+}
+
+actor Inventory native
+{
+	inventory.amount 1
+	inventory.maxamount 1
+}
+
+actor Ammo : Inventory native
+{
+}
+
+actor Health : Inventory native
+{
+	inventory.amount 1
+	inventory.maxamount 0
+}
+
+actor Weapon : Inventory native
+{
+}

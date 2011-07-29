@@ -1,0 +1,21 @@
+actor GoldKey : Inventory 53
+{
+	inventory.pickupsound "misc/key_pickup"
+	states
+	{
+		Spawn:
+			GKEY A -1
+			stop
+	}
+}
+
+actor SilverKey : Inventory 54
+{
+	inventory.pickupsound "misc/key_pickup"
+	states
+	{
+		Spawn:
+			SKEY A -1
+			stop
+	}
+}

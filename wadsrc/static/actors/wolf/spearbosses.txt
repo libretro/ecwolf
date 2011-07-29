@@ -1,0 +1,144 @@
+actor Trans 23
+{
+	radius 42
+	points 5000
+	health 850, 950, 1050, 1200
+	speed 1, 3
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			TRNS A -1 NOP T_Stand
+			stop
+		See:
+			TRNS A 5 NOP T_Chase
+			TRNS A 1.5
+			TRNS B 4 NOP T_Chase
+			TRNS C 5 NOP T_Chase
+			TRNS C 1.5
+			TRNS D 4 NOP T_Chase
+			loop
+		Missile:
+			TRNS E 15
+			TRNS F 5
+			TRNS GFGFGE 5 T_Shoot
+			goto See
+		Death:
+			TRNS A .5 A_Fall
+			TRNS A .5 A_DeathScream
+			TRNS HIJ 7.5
+			TRNS K -1
+			stop
+	}
+}
+
+actor UberMutant 24
+{
+	radius 42
+	points 5000
+	health 1050, 1150, 1250, 1400
+	speed 1, 5.859
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			UBER A -1 T_Stand
+			stop
+		See:
+			UBER A 5 NOP T_Chase
+			UBER A 1.5
+			UBER B 4 NOP T_Chase
+			UBER C 5 NOP T_Chase
+			UBER C 1.5
+			UBER D 4 NOP T_Chase
+			loop
+		Missile:
+			UBER E 15
+			UBER F 6
+			UBER GHGFE 6 T_UShoot
+			goto See
+		Death:
+			UBER A .5 A_Fall
+			UBER A .5 A_DeathScream
+			UBER HIJK 7.5
+			UBER L -1
+			stop
+	}
+}
+
+actor Wilhelm 25
+{
+	radius 42
+	points 5000
+	health 950, 1050, 1150, 1300
+	speed 1, 4
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			WILL A -1
+			stop
+		See:
+			WILL A 5 NOP T_Will
+			WILL A 1.5
+			WILL B 4 NOP T_Will
+			WILL C 5 NOP T_Will
+			WILL C 1.5
+			WILL D 4 NOP T_Will
+			loop
+		Missile:
+			WILL E 15
+			WILL F 5
+			WILL G 5 T_Launch
+			WILL HGH 5 T_Shoot
+			WILL H 0 T_Shoot
+			goto See
+		Death:
+			WILL A .5 A_Fall
+			WILL A 5 A_DeathScream
+			WILL IJK 5
+			WILL L -1
+			stop
+	}
+}
+
+actor DeathKnight 26
+{
+	radius 42
+	points 5000
+	health 1250, 1350, 1450, 1600
+	speed 1, 4
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			DKNT A -1 NOP T_Stand
+			stop
+		See:
+			DKNT A 5 NOP T_Will
+			DKNT A 1.5
+			DKNT B 4 NOP T_Will
+			DKNT C 5 NOP T_Will
+			DKNT C 1.5
+			DKNT D 4 NOP T_Will
+			loop
+		Missile:
+			DKNT E 15
+			DKNT F 5
+			DKNT H 5 T_Launch
+			DKNT G 5 T_Shoot
+			DKNT H 5 T_Launch
+			DKNT H 0 T_Shoot
+			goto See
+		Death:
+			DKNT A .5 A_Fall
+			DKNT A 5 A_DeathScream
+			DKNT IJKLMN 5
+			DKNT O -1
+			stop
+	}
+}

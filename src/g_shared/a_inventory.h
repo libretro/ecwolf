@@ -42,13 +42,23 @@ class AInventory : public AActor
 	DECLARE_NATIVE_CLASS(Inventory, Actor)
 
 	public:
-		void	Touch(AActor *toucher);
+		void			Touch(AActor *toucher);
+		virtual bool	Use();
 
 		FName			pickupsound;
 		unsigned int	amount;
 		unsigned int	maxamount;
 	protected:
-		virtual bool	TryPickup(AActor *toucher);
+		virtual AInventory	*CreateCopy(AActor *holder);
+		void				GoAwayAndDie();
+		bool				GoesAway();
+		virtual bool		HandlePickup(AInventory *item, bool &good);
+		virtual bool		TryPickup(AActor *toucher);
+};
+
+class AAmmo : public AInventory
+{
+	DECLARE_NATIVE_CLASS(Ammo, Inventory)
 };
 
 class AHealth : public AInventory
@@ -57,6 +67,11 @@ class AHealth : public AInventory
 
 	protected:
 		bool	TryPickup(AActor *toucher);
+};
+
+class AWeapon : public AInventory
+{
+	DECLARE_NATIVE_CLASS(Weapon, Inventory)
 };
 
 #endif

@@ -1,0 +1,264 @@
+actor Guard 11
+{
+	radius 42
+	points 100
+	health 25
+	speed 1, 3
+	sighttime 1, 4
+	attacksound "guard/attack"
+	deathsound "guard/death"
+	seesound "guard/sight"
+	MONSTER
+	states
+	{
+		Spawn:
+			GARD A -1 NOP T_Stand
+			stop
+		Path:
+			GARD B 10 NOP T_Path
+			GARD B 2.5
+			GARD C 7.5 NOP T_Path
+			GARD D 10 NOP T_Path
+			GARD D 2.5
+			GARD E 7.5 NOP T_Path
+			loop
+		See:
+			GARD B 5 NOP T_Chase
+			GARD B 1.5
+			GARD C 4 NOP T_Chase
+			GARD D 5 NOP T_Chase
+			GARD D 1.5
+			GARD E 4 NOP T_Chase
+			loop
+		Missile:
+			GARD FG 10
+			GARD H 10 T_Shoot
+			goto See
+		Pain:
+			GARD I 5
+			goto See
+			GARD J 5
+			goto See
+		Death:
+			GARD K 7.5 A_Fall
+			GARD L 7.5 A_DeathScream
+			GARD M 7.5
+			GARD N -1
+			stop
+	}
+}
+
+actor DeadGuard 81
+{
+	states
+	{
+		Spawn:
+			GARD N -1
+			stop
+	}
+}
+
+actor Dog 14
+{
+	radius 42
+	points 200
+	health 1
+	speed 2.93, 5.859
+	sighttime 2.93, 5.859
+	attacksound "dog/attack"
+	deathsound "dog/death"
+	seesound "dog/sight"
+	MONSTER
+	-CANUSEWALLS
+	states
+	{
+		Spawn:
+		Path:
+			DOGY A 10 NOP T_Path
+			DOGY A 2.5
+			DOGY B 7.5 NOP T_Path
+			DOGY C 10 NOP T_Path
+			DOGY C 2.5
+			DOGY D 7.5 NOP T_Path
+			loop
+		Melee:
+			DOGY EF 5
+			DOGY G 5 T_Bite
+			DOGY EA 5
+			goto See
+		See:
+			DOGY A 5 NOP T_Chase
+			DOGY A 1.5
+			DOGY B 4 NOP T_Chase
+			DOGY C 5 NOP T_Chase
+			DOGY C 1.5
+			DOGY D 4 NOP T_Chase
+			loop
+		Death:
+			DOGY H 7.5 A_Fall
+			DOGY I 7.5 A_DeathScream
+			DOGY J 7.5
+			DOGY K -1
+			stop
+	}
+}
+
+actor Officer 12
+{
+	radius 42
+	points 400
+	health 50
+	speed 1, 5
+	sighttime 2
+	attacksound "officer/attack"
+	deathsound "officer/death"
+	seesound "officer/sight"
+	MONSTER
+	states
+	{
+		Spawn:
+			OFFI A -1 NOP T_Stand
+			stop
+		Path:
+			OFFI B 10 NOP T_Path
+			OFFI B 2.5
+			OFFI C 7.5 NOP T_Path
+			OFFI D 10 NOP T_Path
+			OFFI D 2.5
+			OFFI E 7.5 NOP T_Path
+			loop
+		Pain:
+			OFFI I 5
+			goto See
+			OFFI J 5
+			goto See
+		Missile:
+			OFFI F 3
+			OFFI G 10
+			OFFI H 5 T_Shoot
+			goto See
+		See:
+			OFFI B 5 NOP T_Chase
+			OFFI B 1.5
+			OFFI C 4 NOP T_Chase
+			OFFI D 5 NOP T_Chase
+			OFFI D 1.5
+			OFFI E 4 NOP T_Chase
+			loop
+		Death:
+			OFFI K 5.5 A_Fall
+			OFFI L 5.5 A_DeathScream
+			OFFI MN 5.5
+			OFFI O -1
+			stop
+	}
+}
+
+actor Mutant 15
+{
+	radius 42
+	points 700
+	health 45, 55, 55, 65
+	speed 1, 3
+	sighttime 1, 6
+	attacksound "mutant/attack"
+	deathsound "mutant/death"
+	MONSTER
+	states
+	{
+		Spawn:
+			MTNT A -1 NOP T_Stand
+			stop
+		Path:
+			MTNT B 10 NOP T_Path
+			MTNT B 2.5
+			MTNT C 7.5 NOP T_Path
+			MTNT D 10 NOP T_Path
+			MTNT D 2.5
+			MTNT E 7.5 NOP T_Path
+			loop
+		Pain:
+			MTNT J 5
+			goto See
+			MTNT K 5
+			goto See
+		See:
+			MTNT B 5 NOP T_Chase
+			MTNT B 1.5
+			MTNT C 4 NOP T_Chase
+			MTNT D 5 NOP T_Chase
+			MTNT D 1.5
+			MTNT E 4 NOP T_Chase
+			loop
+		Missile:
+			MTNT F 3
+			MTNT G 10 T_Shoot
+			MTNT H 5
+			MTNT I 10 T_Shoot
+			goto See
+		Death:
+			MTNT L 3.5 A_Fall
+			MTNT M 3.5 A_DeathScream
+			MTNT MO 3.5
+			MTNT P -1
+			stop
+	}
+}
+
+actor WolfensteinSS 13 // ZDoom compatible name
+{
+	radius 42
+	points 500
+	health 100
+	speed 1, 4
+	sighttime 1, 6
+	attacksound "wolfss/attack"
+	deathsound "wolfss/death"
+	seesound "wolfss/sight"
+	MONSTER
+	states
+	{
+		Spawn:
+			SSWV W -1 NOP T_Stand
+			stop
+		Path:
+			SSWV A 10 NOP T_Path
+			SSWV A 2.5
+			SSWV B 7.5 NOP T_Path
+			SSWV C 10 NOP T_Path
+			SSWV C 2.5
+			SSWV D 7.5 NOP T_Path
+			loop
+		See:
+			SSWV A 5 NOP T_Chase
+			SSWV A 1.5
+			SSWV B 4 NOP T_Chase
+			SSWV C 5 NOP T_Chase
+			SSWV C 1.5
+			SSWV D 4 NOP T_Chase
+			loop
+		Pain:
+			SSWV H 5
+			goto See
+		Pain2:
+			SSWV I 5
+			goto See
+		Missile:
+			SSWV E 10
+			SSWV F 10
+			SSWV G 5 T_Shoot
+			SSWV F 5
+			SSWV G 5 T_Shoot
+			SSWV F 5
+			SSWV G 5 T_Shoot
+			SSWV F 5
+			SSWV G 5 T_Shoot
+			goto See
+		Death:
+			SSWV J 7.5 A_Fall
+			SSWV K 7.5 A_DeathScream
+			SSWV L 7.5
+			SSWV M -1
+			stop
+	}
+}

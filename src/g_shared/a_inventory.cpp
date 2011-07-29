@@ -39,6 +39,57 @@
 
 IMPLEMENT_CLASS(Inventory, Actor)
 
+// Either creates a copy if the item or returns itself if it is safe to place
+// in the actor's inventory.
+AInventory *AInventory::CreateCopy(AActor *holder)
+{
+	if(!GoesAway())
+		return this;
+
+	AInventory *copy = reinterpret_cast<AInventory *>(classType->CreateInstance());
+	copy->RemoveFromWorld();
+	copy->amount = amount;
+	copy->maxamount = maxamount;
+	return copy;
+}
+
+// Used for items which aren't placed into an inventory and don't respawn.
+void AInventory::GoAwayAndDie()
+{
+	if(GoesAway())
+	{
+		Destroy();
+	}
+}
+
+// Returns false if this is safe to place into inventory.  True if it will be
+// reused in the world.
+bool AInventory::GoesAway()
+{
+	return false;
+}
+
+// Returns true if the pickup was handled by an already existing inventory item.
+bool AInventory::HandlePickup(AInventory *item, bool &good)
+{
+	if(item->classType == classType)
+	{
+		if(amount < maxamount)
+		{
+			amount += item->amount;
+			if(amount > maxamount)
+				amount = maxamount;
+			good = true;
+		}
+		else
+			good = false;
+		return true;
+	}
+	else if(inventory)
+		return inventory->HandlePickup(item, good);
+	return false;
+}
+
 void AInventory::Touch(AActor *toucher)
 {
 	if(!TryPickup(toucher))
@@ -46,11 +97,32 @@ void AInventory::Touch(AActor *toucher)
 
 	PlaySoundLocActor(pickupsound, toucher);
 	StartBonusFlash();
-	Destroy();
 }
 
 bool AInventory::TryPickup(AActor *toucher)
 {
+	bool pickupGood = false;
+	if(toucher->inventory && toucher->inventory->HandlePickup(this, pickupGood))
+	{
+		// The actor has this item in their inventory and it has been handled.
+		if(!pickupGood)
+			return false;
+		GoAwayAndDie();
+	}
+	else
+	{
+		AInventory *invItem = CreateCopy(toucher);
+		if(invItem != this)
+			GoAwayAndDie();
+
+		toucher->AddInventory(invItem);
+	}
+	return true;
+}
+
+bool AInventory::Use()
+{
+	GivePoints(points);
 	return true;
 }
 
@@ -77,6 +149,15 @@ bool AHealth::TryPickup(AActor *toucher)
 			gamestate.health = max;
 		DrawHealth();
 		DrawFace();
+		Destroy();
 	}
 	return true;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+IMPLEMENT_CLASS(Ammo, Inventory)
+
+////////////////////////////////////////////////////////////////////////////////
+
+IMPLEMENT_CLASS(Weapon, Inventory)

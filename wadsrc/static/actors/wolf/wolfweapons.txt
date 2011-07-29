@@ -1,0 +1,68 @@
+actor Knife : Weapon
+{
+	states
+	{
+		Ready:
+			KNIF A 1 A_WeaponReady
+			loop
+		Fire:
+			KNIF B 3
+			KNIF C 3 A_Knife
+			KNIF DE 3
+			goto Ready
+	}
+}
+
+actor Pistol : Weapon
+{
+	states
+	{
+		Ready:
+			PISG A 1 A_WeaponReady
+			loop
+		Fire:
+			PISG B 3
+			PISG C 3 A_Pistol
+			PISG DE 3
+			goto Ready
+	}
+}
+
+actor MachineGun : Weapon 60
+{
+	inventory.pickupsound "weapon/machine/pickup"
+	states
+	{
+		Spawn:
+			MGUN A -1
+			stop
+		Ready:
+			MCHG A 1 A_WeaponReady
+			loop
+		Fire:
+			MCHG B 3
+			MCHG C 3 A_MachineGun
+			MCHG D 3
+			MCHG E 3 A_ReFire
+			goto Spawn
+	}
+}
+
+actor GatlingGun : Weapon 61
+{
+	inventory.pickupsound "weapon/gatling/pickup"
+	states
+	{
+		Spawn:
+			CGUN A -1
+			stop
+		Ready:
+			CHGG A 1 A_WeaponReady
+			loop
+		Fire:
+			CHGG B 3
+			CHGG CD 3 A_Chaingun
+			CHGG E 3 A_ReFire
+			goto Spawn
+	}
+}

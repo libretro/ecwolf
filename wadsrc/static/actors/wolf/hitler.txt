@@ -1,0 +1,124 @@
+actor FakeHitler 18
+{
+	radius 42
+	points 2000
+	health 200, 300, 400, 500
+	speed 1, 3
+	deathsound "fake/death"
+	seesound "fake/sight"
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			FAKE A -1 NOP T_Stand
+			stop
+		See:
+			FAKE A 5 NOP T_Fake
+			FAKE A 1.5
+			FAKE B 4 NOP T_Fake
+			FAKE C 5 NOP T_Fake
+			FAKE C 1.5
+			FAKE D 4 NOP T_Fake
+			loop
+		Missile:
+			FAKE E 4
+			FAKE EEEEEEEE 4 T_FakeFire
+			goto See
+		Death:
+			FAKE F 5 A_Fall
+			FAKE G 5 A_DeathScream
+			FAKE HIJ 5
+			FAKE K -1
+			stop
+	}
+}
+
+actor FireBall
+{
+	+NEVERMARK
+	states
+	{
+		Spawn:
+			FIRE AB 3 NOP T_Projectile
+			loop
+	}
+}
+
+actor MechaHitler 19
+{
+	radius 42
+	points 5000
+	health 850, 950, 1050, 1200
+	speed 1, 3
+	attacksound "hitler/attack"
+	deathsound "hitler/mechadeath"
+	seesound "hitler/sight"
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			MECH A -1 NOP T_Stand
+			stop
+		See:
+			MECH A 5 NOP T_Chase
+			MECH A 3
+			MECH B 4 NOP T_Chase
+			MECH C 5 NOP T_Chase
+			MECH C 3
+			MECH D 4 NOP T_Chase
+			loop
+		Missile:
+			MECH E 15
+			MECH F 5
+			MECH GFGF 5 T_Shoot
+			MECH F 0 T_Shoot
+			goto See
+		Death:
+			MECH H 5 A_Fall
+			MECH I 5 A_DeathScream
+			MECH J 5
+			MECH K -1 A_HitlerMorph
+			stop
+	}
+}
+
+actor Hitler
+{
+	radius 42
+	points 5000
+	health 500, 700, 800, 900
+	speed 1, 5
+	attacksound "hitler/attack"
+	deathsound "hitler/death"
+	seesound "hitler/sight"
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+		See:
+			HTLR A 3 NOP T_Chase
+			HTLR A 2
+			HTLR B 1 NOP T_Chase
+			HTLR C 3 NOP T_Chase
+			HTLR C 2
+			HTLR D 1 NOP T_Chase
+			loop
+		Missile:
+			HTLR E 15
+			HTLR F 5
+			HTLR GFGF 5 T_Shoot
+			HTLR F 0 T_Shoot
+			goto See
+		Death:
+			HTLR A .5 A_Fall
+			HTLR A 70 A_DeathScream
+			HTLR H 5
+			HTLR I 5 A_Slurpie
+			HTLR JKLMNO 5
+			HTLR P -1 A_StartDeathCam
+			stop
+	}
+}

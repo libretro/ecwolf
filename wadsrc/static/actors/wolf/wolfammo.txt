@@ -1,0 +1,29 @@
+actor Clip : Ammo 59
+{
+	inventory.pickupsound "misc/ammo_pickup"
+	inventory.amount 8
+	inventory.maxamount 99
+	states
+	{
+		Spawn:
+			CLIP A -1
+			stop
+	}
+}
+
+actor DroppedClip : Clip
+{
+	inventory.amount 4
+}
+
+actor ClipBox : Clip 90
+{
+	inventory.pickupsound "misc/ammobox_pickup"
+	inventory.amount 25
+	states
+	{
+		Spawn:
+			AMMO A -1
+			stop
+	}
+}

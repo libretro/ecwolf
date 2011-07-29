@@ -1,0 +1,9 @@
+actor SpearOfDestiny : Inventory 92
+{
+	states
+	{
+		Spawn:
+			SPOD A -1
+			stop
+	}
+}

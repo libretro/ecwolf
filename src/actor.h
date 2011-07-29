@@ -99,8 +99,10 @@ class AActor
 		void			Destroy();
 		void			Die();
 		void			EnterZone(const MapZone *zone);
+		AInventory		*FindInventory(const ClassDef *cls) const;
 		const Frame		*FindState(const FName &name) const;
 		const MapZone	*GetZone() const { return soundZone; }
+		void			RemoveFromWorld();
 		void			SetState(const Frame *state, bool notic=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
 		void			Tick();
@@ -141,7 +143,7 @@ class AActor
 		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState, *DeathState;
 		short       temp1,hidden;
 
-		LinkedList<AInventory *>	inventory;
+		AInventory	*inventory;
 
 		typedef LinkedList<AActor *>::Node Iterator;
 		static LinkedList<AActor *>	actors;

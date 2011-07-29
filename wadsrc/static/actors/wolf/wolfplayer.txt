@@ -1,0 +1,38 @@
+actor BJPlayer
+{
+	health 100
+	radius 22
+	+NEVERMARK
+
+	action native T_Attack();
+	action native T_Player();
+
+	states
+	{
+		Spawn:
+			TNT1 A -1 NOP T_Player
+			stop
+		Missile:
+			TNT1 A -1 NOP T_Attack
+			stop
+	}
+}
+
+actor BJRun
+{
+	states
+	{
+		Spawn:
+			BLAZ A 6 NOP T_BJRun
+			BLAZ A 1.5
+			BLAZ B 4 NOP T_BJRun
+			BLAZ C 6 NOP T_BJRun
+			BLAZ C 1.5
+			BLAZ D 4 NOP T_BJRun
+			loop
+		Death:
+			BLAZ EFG 7 NOP T_BJJump
+			BLAZ H 150 T_BJDone
+			stop
+	}
+}

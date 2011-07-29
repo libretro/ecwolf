@@ -1,0 +1,60 @@
+actor DogFood : Health 39
+{
+	inventory.amount 4
+	inventory.pickupsound "misc/health_pickup"
+	states
+	{
+		Spawn:
+			ALPO A -1
+			stop
+	}
+}
+
+actor Food : Health 57
+{
+	inventory.amount 10
+	inventory.pickupsound "misc/health_pickup"
+	states
+	{
+		Spawn:
+			FOOD A -1
+			stop
+	}
+}
+
+actor Medikit : Health 58
+{
+	inventory.amount 25
+	inventory.pickupsound "misc/medkit_pickup"
+	states
+	{
+		Spawn:
+			MEDI A -1
+			stop
+	}
+}
+
+actor OneUp : Inventory 66
+{
+	inventory.pickupsound "misc/1up"
+	+FULLBRIGHT
+	states
+	{
+		Spawn:
+			ONUP A -1
+			stop
+	}
+}
+
+actor Gibs : Health 67
+{
+	inventory.amount 1
+	inventory.maxamount 10
+	inventory.pickupsound "misc/slurpie"
+	states
+	{
+		Spawn:
+			GIBS A -1
+			stop
+	}
+}

@@ -1,0 +1,68 @@
+actor Blinky 29
+{
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			BLKY AB 5 NOP T_Ghosts
+			loop
+	}
+}
+
+actor Inky 32
+{
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			INKY AB 5 NOP T_Ghosts
+			loop
+	}
+}
+
+actor Pinky 31
+{
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			PNKY AB 5 NOP T_Ghosts
+			loop
+	}
+}
+
+actor Clyde 30
+{
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			CLYD AB 5 NOP T_Ghosts
+			loop
+	}
+}
+
+actor Spectre 28
+{
+	radius 42
+	points 200
+	health 5, 10, 15, 25
+	speed 1, 1.563
+	MONSTER
+	+AMBUSH
+	states
+	{
+		Spawn:
+			SPCT ABCD 5 NOP T_Stand
+			loop
+		See:
+			SPCT ABCD 5 NOP T_Ghosts
+			loop
+		Death:
+			SPCT EFG 5
+			SPCT H 150
+			SPCT I 5
+			SPCT I 5 A_Dormant
+			wait
+	}
+}

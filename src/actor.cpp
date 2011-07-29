@@ -33,6 +33,7 @@
 */
 
 #include "actor.h"
+#include "a_inventory.h"
 #include "gamemap.h"
 #include "id_ca.h"
 #include "thinker.h"
@@ -68,22 +69,32 @@ class AActorProxy : public Thinker
 {
 	DECLARE_THINKER(AActorProxy)
 	public:
-		AActorProxy(AActor *parent) : parent(parent)
+		AActorProxy(AActor *parent) : enabled(true), parent(parent)
 		{
 		}
 
 		~AActorProxy()
 		{
-			parent->~AActor();
-			free(parent);
+			if(enabled)
+			{
+				parent->~AActor();
+				free(parent);
+			}
+		}
+
+		void Disable()
+		{
+			enabled = false;
 		}
 
 		void Tick()
 		{
-			parent->Tick();
+			if(enabled)
+				parent->Tick();
 		}
 	private:
-		AActor * const parent;
+		bool			enabled;
+		AActor * const	parent;
 };
 IMPLEMENT_THINKER(AActorProxy)
 
@@ -91,7 +102,7 @@ LinkedList<AActor *> AActor::actors;
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
 AActor::AActor(const ClassDef *type) : classType(type), distance(0),
-	dir(nodir), soundZone(NULL)
+	dir(nodir), soundZone(NULL), inventory(NULL)
 {
 	// This will be called for each actor AFTER copying the defaults.
 	// Use InitClean for any one time construction.
@@ -99,19 +110,33 @@ AActor::AActor(const ClassDef *type) : classType(type), distance(0),
 
 AActor::~AActor()
 {
-	if(actorRef)
-		actors.Remove(actorRef);
+	RemoveFromWorld();
 }
 
 void AActor::AddInventory(AInventory *item)
 {
-	inventory.Push(item);
+	if(inventory == NULL)
+		inventory = item;
+	else
+	{
+		AInventory *next = inventory;
+		do
+		{
+			if(next->inventory == NULL)
+			{
+				next->inventory = next;
+				break;
+			}
+		}
+		while((item = item->inventory));
+	}
+	item->RemoveFromWorld();
 }
 
 void AActor::Destroy()
 {
-	assert(thinker != NULL);
-	thinker->Destroy();
+	if(thinker != NULL)
+		thinker->Destroy();
 }
 
 void AActor::Die()
@@ -131,6 +156,21 @@ void AActor::EnterZone(const MapZone *zone)
 {
 	if(zone)
 		soundZone = zone;
+}
+
+AInventory *AActor::FindInventory(const ClassDef *cls) const
+{
+	if(inventory == NULL)
+		return NULL;
+
+	AInventory *check = inventory;
+	do
+	{
+		if(check->classType == cls)
+			return check;
+	}
+	while((check = check->inventory));
+	return NULL;
 }
 
 const Frame *AActor::FindState(const FName &name) const
@@ -204,6 +244,20 @@ void AActor::Tick()
 	state->thinker(this);
 }
 
+// Remove an actor from the game world without destroying it.  This will allow
+// us to transfer items into inventory for example.
+void AActor::RemoveFromWorld()
+{
+	if(actorRef)
+		actors.Remove(actorRef);
+	if(thinker)
+	{
+		thinker->Disable();
+		thinker->Destroy();
+		thinker = NULL;
+	}
+}
+
 AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 {
 	if(type == NULL)
@@ -228,10 +282,3 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 
 DEFINE_SYMBOL(Actor, angle)
 DEFINE_SYMBOL(Actor, health)
-
-#include "g_shared/a_inventory.h"
-class AWeapon : public AInventory
-{
-	DECLARE_NATIVE_CLASS(Weapon, Inventory)
-};
-IMPLEMENT_CLASS(Weapon, Inventory)

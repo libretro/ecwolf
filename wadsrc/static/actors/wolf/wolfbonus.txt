@@ -1,0 +1,47 @@
+actor Cross : Inventory 62
+{
+	points 100
+	inventory.pickupsound "treasure/cross/pickup"
+	states
+	{
+		Spawn:
+			CROS A -1
+			stop
+	}
+}
+
+actor Chalice : Inventory 63
+{
+	points 500
+	inventory.pickupsound "treasure/chalice/pickup"
+	states
+	{
+		Spawn:
+			CHAL A -1
+			stop
+	}
+}
+
+actor ChestofJewels : Inventory 64
+{
+	points 1000
+	inventory.pickupsound "treasure/bible/pickup"
+	states
+	{
+		Spawn:
+			JEWL A -1
+			stop
+	}
+}
+
+actor Crown : Inventory 65
+{
+	points 5000
+	inventory.pickupsound "treasure/crown/pickup"
+	states
+	{
+		Spawn:
+			CRWN A -1
+			stop
+	}
+}
