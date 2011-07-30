@@ -92,6 +92,9 @@ bool AInventory::HandlePickup(AInventory *item, bool &good)
 
 void AInventory::Touch(AActor *toucher)
 {
+	if(!(toucher->flags & FL_PICKUP))
+		return;
+
 	if(!TryPickup(toucher))
 		return;
 

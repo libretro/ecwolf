@@ -70,6 +70,7 @@ const struct FlagDef
 	DEFINE_FLAG(FL, ISMONSTER, AActor, flags),
 	DEFINE_FLAG(FL, NEVERMARK, AActor, flags),
 	DEFINE_FLAG(FL, NONMARK, AActor, flags),
+	DEFINE_FLAG(FL, PICKUP, AActor, flags),
 	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
 	DEFINE_FLAG(FL, SOLID, AActor, flags),
 	DEFINE_FLAG(FL, VISABLE, AActor, flags)
@@ -455,16 +456,16 @@ void ClassDef::ParseActor(Scanner &sc)
 	}
 	else if(!previouslyDefined) // If no class was specified to inherit from, inherit from AActor, but not for AActor.
 		newClass->parent = NATIVE_CLASS(Actor);
+	if(sc.CheckToken(TK_IntConst))
+	{
+		classNumTable[sc->number] = newClass;
+	}
 	if(sc.CheckToken(TK_Identifier))
 	{
 		if(sc->str.CompareNoCase("native") == 0)
 			native = true;
 		else
 			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.\n", sc->str.GetChars());
-	}
-	else if(sc.CheckToken(TK_IntConst))
-	{
-		classNumTable[sc->number] = newClass;
 	}
 	if(previouslyDefined && !native)
 		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
@@ -968,6 +969,16 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 								break;
 							default:
 							case 'I':
+								if(sc.CheckToken('('))
+								{
+									params[paramc].isExpression = true;
+									params[paramc].expr = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc, NULL);
+									sc.MustGetToken(')');
+									break;
+								}
+								else
+									params[paramc].isExpression = false;
+
 								if(sc.CheckToken('-'))
 									negate = true;
 

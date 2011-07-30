@@ -593,13 +593,10 @@ int CalcRotate (AActor *ob)
 
 	viewangle = player->angle + (centerx - ob->viewx)/8;
 
-	//if (ob->obclass == rocketobj || ob->obclass == hrocketobj)
-	//	angle = (viewangle-180) - ob->angle;
-	//else
 	if(ob->dir != nodir)
 		angle = viewangle - dirangle[ob->dir];
 	else
-		angle = (viewangle-90) - ob->angle;
+		angle = viewangle - ob->angle;
 
 	angle+=ANGLES/16;
 	while (angle>=ANGLES)

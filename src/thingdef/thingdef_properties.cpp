@@ -35,8 +35,13 @@
 #include "actor.h"
 #include "thingdef.h"
 #include "a_inventory.h"
+#include "scanner.h"
+#include "thingdef/thingdef_type.h"
+#include "thingdef/thingdef_expression.h"
 
-#define INT_PARAM(var, no) int64_t var = params[no].i
+#define IS_EXPR(no) params[no].isExpression
+#define EXPR_PARAM(var, no) ExpressionNode *var = params[no].expr;
+#define INT_PARAM(var, no) int64_t var; if(IS_EXPR(no)) { var = params[no].expr->Evaluate(defaults).GetInt(); delete params[no].expr; } else var = params[no].i
 #define FLOAT_PARAM(var, no) double var = params[no].f;
 #define STRING_PARAM(var, no) const char* var = params[no].s;
 
@@ -50,6 +55,28 @@ HANDLE_PROPERTY(attacksound)
 {
 	STRING_PARAM(snd, 0);
 	defaults->attacksound = snd;
+}
+
+HANDLE_PROPERTY(damage)
+{
+	if(!IS_EXPR(0))
+	{
+		INT_PARAM(dmg, 0);
+		if(dmg == 0)
+			defaults->damage = NULL;
+		else
+		{
+			FString defFormula;
+			defFormula.Format("random(1,8)*%d", (int) dmg);
+			Scanner sc(defFormula.GetChars(), defFormula.Len());
+			defaults->damage = ExpressionNode::ParseExpression(defaults->GetClass(), TypeHierarchy::staticTypes, sc, NULL);
+		}
+	}
+	else
+	{
+		EXPR_PARAM(dmg, 0);
+		defaults->damage = dmg;
+	}
 }
 
 HANDLE_PROPERTY(deathsound)
@@ -153,6 +180,7 @@ extern const PropDef properties[NUM_PROPERTIES] =
 {
 	DEFINE_PROP(amount, AInventory, I),
 	DEFINE_PROP(attacksound, AActor, S),
+	DEFINE_PROP(damage, AActor, I),
 	DEFINE_PROP(deathsound, AActor, S),
 	DEFINE_PROP(health, AActor, I_IIIIIIII),
 	DEFINE_PROP(maxamount, AInventory, I),

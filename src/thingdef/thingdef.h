@@ -120,11 +120,16 @@ class SymbolInfo
 
 struct StateDefinition;
 
-union PropertyParam
+struct PropertyParam
 {
-	char	*s;
-	double	f;
-	int64_t	i;
+	bool isExpression;
+	union
+	{
+		ExpressionNode	*expr;
+		char			*s;
+		double			f;
+		int64_t			i;
+	};
 };
 typedef void (*PropHandler)(AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params);
 #define HANDLE_PROPERTY(property) void __Handler_##property(AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params)
@@ -136,7 +141,7 @@ struct PropDef
 		const char* const		params;
 		PropHandler				handler;
 };
-#define NUM_PROPERTIES 12
+#define NUM_PROPERTIES 13
 
 typedef TArray<Symbol *> SymbolTable;
 

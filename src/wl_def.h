@@ -257,6 +257,8 @@ typedef enum
 	FL_CANUSEWALLS		= 0x00002000,
 	FL_COUNTKILL		= 0x00004000,
 	FL_SOLID			= 0x00008000,
+	FL_PATHING			= 0x00010000,
+	FL_PICKUP			= 0x00020000,
 } objflag_t;
 
 
@@ -1131,8 +1133,8 @@ bool SightPlayer (AActor *ob);
 
 void    DamageActor (AActor *ob, unsigned damage);
 
-boolean CheckLine (objtype *ob);
-boolean CheckSight (objtype *ob);
+bool CheckLine (AActor *ob);
+bool CheckSight (AActor *ob);
 
 /*
 =============================================================================

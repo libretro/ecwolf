@@ -1025,7 +1025,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 {
 	static const ClassDef * const playerClass = ClassDef::FindClass("BJPlayer");
 	player = AActor::Spawn(playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
-	player->angle = (270+dir)%360;
+	player->angle = (450-dir)%360;
 	if (player->angle<0)
 		player->angle += ANGLES;
 	Thrust (0,0); // set some variables

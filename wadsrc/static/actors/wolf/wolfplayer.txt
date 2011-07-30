@@ -3,6 +3,7 @@ actor BJPlayer
 	health 100
 	radius 22
 	+NEVERMARK
+	+PICKUP
 
 	action native T_Attack();
 	action native T_Player();

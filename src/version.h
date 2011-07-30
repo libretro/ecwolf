@@ -38,8 +38,6 @@
 //#define USE_SNOW            // Enables snow support (see wl_atmos.cpp)
 //#define FIXRAINSNOWLEAKS    // Enables leaking ceilings fix (by Adam Biser, only needed if maps with rain/snow and ceilings exist)
 
-#define ARTSEXTERN
-#define DEMOSEXTERN
 #define PLAYDEMOLIKEORIGINAL  // When playing or recording demos, several bug fixes do not take
                               // effect to let the original demos work as in the original Wolf3D v1.4
                               // (actually better, as the second demo rarely worked)

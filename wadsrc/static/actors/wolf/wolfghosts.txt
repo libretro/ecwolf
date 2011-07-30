@@ -1,49 +1,54 @@
 actor Blinky 29
 {
+	damage (2)
 	speed 2.93, 5.859
 	states
 	{
 		Spawn:
-			BLKY AB 5 NOP T_Ghosts
+			BLKY AB 5 NOP T_Chase(CHF_DONTDODGE)
 			loop
 	}
 }
 
 actor Inky 32
 {
+	damage (2)
 	speed 2.93, 5.859
 	states
 	{
 		Spawn:
-			INKY AB 5 NOP T_Ghosts
+			INKY AB 5 NOP T_Chase(CHF_DONTDODGE)
 			loop
 	}
 }
 
 actor Pinky 31
 {
+	damage (2)
 	speed 2.93, 5.859
 	states
 	{
 		Spawn:
-			PNKY AB 5 NOP T_Ghosts
+			PNKY AB 5 NOP T_Chase(CHF_DONTDODGE)
 			loop
 	}
 }
 
 actor Clyde 30
 {
+	damage (2)
 	speed 2.93, 5.859
 	states
 	{
 		Spawn:
-			CLYD AB 5 NOP T_Ghosts
+			CLYD AB 5 NOP T_Chase(CHF_DONTDODGE)
 			loop
 	}
 }
 
 actor Spectre 28
 {
+	damage (2)
 	radius 42
 	points 200
 	health 5, 10, 15, 25
@@ -56,7 +61,7 @@ actor Spectre 28
 			SPCT ABCD 5 NOP T_Stand
 			loop
 		See:
-			SPCT ABCD 5 NOP T_Ghosts
+			SPCT ABCD 5 NOP T_Chase(CHF_DONTDODGE)
 			loop
 		Death:
 			SPCT EFG 5

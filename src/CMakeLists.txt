@@ -50,6 +50,7 @@ endif(WIN32)
 
 add_executable(ecwolf
 	g_shared/a_inventory.cpp
+	g_shared/a_patrolpoint.cpp
 	r_data/colormaps.cpp
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp

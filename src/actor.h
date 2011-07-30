@@ -96,6 +96,7 @@ class AActor
 		virtual ~AActor();
 
 		void			AddInventory(AInventory *item);
+		const ClassDef	*GetClass() const { return classType; }
 		void			Destroy();
 		void			Die();
 		void			EnterZone(const MapZone *zone);
@@ -125,6 +126,7 @@ class AActor
 		int32_t	speed, runspeed;
 		int		points;
 		fixed	radius;
+		ExpressionNode *damage;
 
 		activetype  active;
 		short       ticcount;

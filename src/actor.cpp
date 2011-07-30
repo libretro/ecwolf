@@ -124,11 +124,11 @@ void AActor::AddInventory(AInventory *item)
 		{
 			if(next->inventory == NULL)
 			{
-				next->inventory = next;
+				next->inventory = item;
 				break;
 			}
 		}
-		while((item = item->inventory));
+		while((next = next->inventory));
 	}
 	item->RemoveFromWorld();
 }
@@ -136,7 +136,10 @@ void AActor::AddInventory(AInventory *item)
 void AActor::Destroy()
 {
 	if(thinker != NULL)
+	{
 		thinker->Destroy();
+		thinker = NULL;
+	}
 }
 
 void AActor::Die()

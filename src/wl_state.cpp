@@ -7,6 +7,7 @@
 #include "id_us.h"
 #include "m_random.h"
 #include "actor.h"
+#include "thingdef/thingdef_expression.h"
 
 /*
 =============================================================================
@@ -50,9 +51,7 @@ void    NewState (objtype *ob, statetype *state);
 bool TryWalk (AActor *ob);
 void    MoveObj (objtype *ob, int32_t move);
 
-boolean CheckLine (objtype *ob);
 void    FirstSighting (AActor *ob);
-boolean CheckSight (objtype *ob);
 
 /*
 =============================================================================
@@ -669,8 +668,8 @@ void MoveObj (objtype *ob, int32_t move)
 		if (ob->hidden || abs(ob->x - player->x) > r || abs(ob->y - player->y) > r)
 			goto moveok;
 
-		if (ob->obclass == ghostobj || ob->obclass == spectreobj)
-			TakeDamage (tics*2,ob);
+		if (ob->damage)
+			TakeDamage (ob->damage->Evaluate(ob).GetInt(), ob);
 
 		//
 		// back up
@@ -713,6 +712,19 @@ void MoveObj (objtype *ob, int32_t move)
 	}
 moveok:
 	ob->distance -=move;
+
+	// Check for touching objects
+	for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
+	{
+		AActor *check = iter->Item();
+		if(check == ob || (check->flags & FL_SOLID))
+			continue;
+
+		fixed r = check->radius + ob->radius;
+		if(abs(ob->x - check->x) <= r &&
+			abs(ob->y - check->y) <= r)
+			check->Touch(ob);
+	}
 }
 
 /*
@@ -824,7 +836,7 @@ void DamageActor (AActor *ob, unsigned damage)
 =====================
 */
 
-boolean CheckLine (objtype *ob)
+bool CheckLine (AActor *ob)
 {
 	int         x1,y1,xt1,yt1,x2,y2,xt2,yt2;
 	int         x,y;
@@ -972,7 +984,7 @@ boolean CheckLine (objtype *ob)
 
 #define MINSIGHT        0x18000l
 
-boolean CheckSight (objtype *ob)
+bool CheckSight (AActor *ob)
 {
 	int32_t deltax,deltay;
 
@@ -995,7 +1007,7 @@ boolean CheckSight (objtype *ob)
 	//
 	// see if they are looking in the right direction
 	//
-	switch (ob->dir)
+	switch (ob->angle/45)
 	{
 		case north:
 			if (deltay > 0)
@@ -1135,6 +1147,7 @@ bool SightPlayer (AActor *ob)
 		return false;
 	}
 
+	ob->flags &= ~FL_PATHING;
 	FirstSighting (ob);
 
 	return true;

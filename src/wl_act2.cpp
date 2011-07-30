@@ -99,7 +99,6 @@ void    T_Schabb (objtype *ob);
 void    T_SchabbThrow (objtype *ob);
 void    T_Fake (objtype *ob);
 void    T_FakeFire (objtype *ob);
-void    T_Ghosts (objtype *ob);
 
 void A_Slurpie (objtype *ob);
 void A_HitlerMorph (objtype *ob);
@@ -1097,9 +1096,18 @@ bool CheckMeleeRange(AActor *actor1, AActor *actor2)
 
 ACTION_FUNCTION(T_Chase)
 {
+	enum
+	{
+		CHF_DONTDODGE = 1
+	};
+
+	ACTION_PARAM_INT(flags, 0);
+
 	int32_t	move,target;
 	int		dx,dy,dist,chance;
-	bool	dodge = true;
+	bool	dodge = !(flags & CHF_DONTDODGE);
+
+	self->flags &= ~FL_PATHING;
 
 	if (gamestate.victoryflag)
 		return;
@@ -1138,13 +1146,13 @@ ACTION_FUNCTION(T_Chase)
 					self->SetState(self->MissileState);
 				return;
 			}
-			dodge = true;
+			dodge = !(flags & CHF_DONTDODGE);
 		}
 		else
 			self->hidden = true;
 	}
 	else
-		self->hidden = true;
+		self->hidden = !CheckMeleeRange(self, player);
 
 	if (self->dir == nodir)
 	{
@@ -1201,57 +1209,6 @@ ACTION_FUNCTION(T_Chase)
 	}
 }
 
-
-/*
-=================
-=
-= T_Ghosts
-=
-=================
-*/
-
-void T_Ghosts (objtype *ob)
-{
-	int32_t move;
-
-	if (ob->dir == nodir)
-	{
-		SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-}
-
-
-
 /*
 ============================================================================
 
@@ -1269,24 +1226,12 @@ void T_Ghosts (objtype *ob)
 ===============
 */
 
-void SelectPathDir (objtype *ob)
+void SelectPathDir (AActor *ob)
 {
-#if 0
-	unsigned spot;
-
-	spot = MAPSPOT(ob->tilex,ob->tiley,1)-ICONARROWS;
-
-	if (spot<8)
-	{
-		// new direction
-		ob->dir = (dirtype)(spot);
-	}
-
 	ob->distance = TILEGLOBAL;
 
 	if (!TryWalk (ob))
 		ob->dir = nodir;
-#endif
 }
 
 
@@ -1313,6 +1258,7 @@ ACTION_FUNCTION(T_Path)
 	}
 
 
+	self->flags |= FL_PATHING;
 	move = self->speed;
 
 	while (move)
