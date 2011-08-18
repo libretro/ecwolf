@@ -25,7 +25,7 @@ actor Hans 16
 		Missile:
 			HANS E 15
 			HANS F 5
-			HANS FGFGFGE 5 A_WolfAttack(0, "*", 0.667)
+			HANS GFGFGE 5 A_WolfAttack(0, "*", 0.667)
 			goto See
 		Death:
 			HANS H 7.5 A_Fall
@@ -63,7 +63,7 @@ actor Gretel 20
 		Missile:
 			GRET E 15
 			GRET F 5
-			GRET FGFGFGE 5 A_WolfAttack
+			GRET GFGFGE 5 A_WolfAttack
 			goto See
 		Death:
 			GRET H 7.5 A_Fall
