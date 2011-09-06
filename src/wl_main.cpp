@@ -205,6 +205,7 @@ extern statetype s_player;
 
 boolean SaveTheGame(FILE *file,int x,int y)
 {
+	return false;
 }
 
 //===========================================================================
@@ -219,6 +220,7 @@ boolean SaveTheGame(FILE *file,int x,int y)
 
 boolean LoadTheGame(FILE *file,int x,int y)
 {
+	return false;
 }
 
 //===========================================================================
@@ -443,6 +445,7 @@ MENU_LISTENER(ChangeMusic)
 	for(unsigned int i = 0;i < songList.Size();++i)
 		musicMenu[i]->setHighlighted(i == which);
 	musicMenu.draw();
+	return true;
 }
 
 void DoJukebox(void)

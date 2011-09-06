@@ -1,5 +1,9 @@
 // WL_GAME.C
 
+#ifdef WINDOWS
+#include <io.h>
+#endif
+
 #include <math.h>
 #include "wl_act.h"
 #include "wl_def.h"

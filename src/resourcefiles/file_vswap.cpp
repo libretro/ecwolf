@@ -67,7 +67,7 @@ struct FVSwapSound : public FResourceLump
 			delete[] chunks;
 		}
 
-		int AddChunk(int offset, int length)
+		void AddChunk(int offset, int length)
 		{
 			LumpSize += length;
 

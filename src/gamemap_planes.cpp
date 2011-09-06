@@ -71,7 +71,7 @@ void GameMap::ReadPlanesData()
 
 	for(int plane = 0;plane < NUM_OLD_PLANES;++plane)
 	{
-		WORD oldplane[size];
+		WORD* oldplane = new WORD[size];
 		lump.Read(oldplane, size*2);
 
 		switch(plane)
@@ -451,6 +451,7 @@ void GameMap::ReadPlanesData()
 				break;
 			}
 		}
+		delete[] oldplane;
 	}
 	SetupLinks();
 }

@@ -182,6 +182,7 @@ MENU_LISTENER(EnterControlBase)
 	controlBase[3]->setEnabled(mouseenabled);
 	controlBase[4]->setEnabled(IN_JoyPresent());
 	controlBase.draw();
+	return true;
 }
 MENU_LISTENER(BeginEditSave)
 {
@@ -205,7 +206,7 @@ MENU_LISTENER(PerformSaveGame)
 			sprintf(file.filename, "savegam%u.%s", i, extension);
 			for(unsigned int j = 0;j < SaveFile::files.Size();j++)
 			{
-				if(strcasecmp(file.filename, SaveFile::files[j].filename) == 0)
+				if(stricmp(file.filename, SaveFile::files[j].filename) == 0)
 				{
 					nextSaveNumber = true;
 					continue;

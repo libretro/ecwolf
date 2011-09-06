@@ -48,7 +48,7 @@ if(WIN32)
 	)
 endif(WIN32)
 
-add_executable(ecwolf
+add_executable(ecwolf WIN32
 	g_shared/a_inventory.cpp
 	g_shared/a_patrolpoint.cpp
 	r_data/colormaps.cpp

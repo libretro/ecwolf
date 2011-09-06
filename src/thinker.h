@@ -61,7 +61,7 @@ class Thinker
 
 		virtual void	Destroy();
 		template<class T>
-		bool			IsThinkerType() { __ThinkerType() == T::__StaticThinkerType; }
+		bool			IsThinkerType() { return __ThinkerType() == T::__StaticThinkerType; }
 		virtual void	Tick()=0;
 
 	protected:
