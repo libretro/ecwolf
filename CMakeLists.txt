@@ -28,6 +28,10 @@ if(NOT JPEG_FOUND)
 	set(JPEG_LIBRARY jpeg)
 endif(NOT JPEG_FOUND)
 
+if(MSVC)
+	add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+endif(MSVC)
+
 add_subdirectory(tools/zipdir)
 add_subdirectory(wadsrc)
 

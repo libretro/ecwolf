@@ -1,7 +1,7 @@
 // WL_MAIN.C
 
 #ifdef _WIN32
-	#include <io.h>
+//	#include <io.h>
 #else
 	#include <unistd.h>
 #endif
@@ -27,7 +27,7 @@
 #include "v_palette.h"
 #include "v_video.h"
 #include "r_data/colormaps.h"
-#include <SDL_syswm.h>
+//#include <SDL_syswm.h>
 
 // Wad Code Stuff
 TArray<FString> wadfiles;
@@ -485,6 +485,10 @@ void DoJukebox(void)
 ==========================
 */
 
+#ifdef _WIN32
+void SetupWM();
+#endif
+
 static void InitGame()
 {
 	// initialize SDL
@@ -518,18 +522,7 @@ static void InitGame()
 
 #if defined _WIN32
 	if(!fullscreen)
-	{
-		struct SDL_SysWMinfo wmInfo;
-		SDL_VERSION(&wmInfo.version);
-
-		if(SDL_GetWMInfo(&wmInfo) != -1)
-		{
-			HWND hwndSDL = wmInfo.window;
-			DWORD style = GetWindowLong(hwndSDL, GWL_STYLE) & ~WS_SYSMENU;
-			SetWindowLong(hwndSDL, GWL_STYLE, style);
-			SetWindowPos(hwndSDL, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-		}
-	}
+		SetupWM();
 #endif
 	VW_UpdateScreen();
 

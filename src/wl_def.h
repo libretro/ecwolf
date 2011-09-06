@@ -62,15 +62,15 @@ typedef int16_t SWORD;
 typedef int32_t fixed;
 typedef fixed fixed_t;
 typedef uint32_t longword;
-#ifndef WINDOWS
+#ifndef USE_WINDOWS_DWORD
 typedef uint32_t DWORD;
-#else
-#include <windef.h>
 #endif
 typedef int32_t SDWORD;
 typedef uint64_t QWORD;
 typedef int64_t SQWORD;
+#ifndef USE_WINDOWS_BOOLEAN
 typedef int8_t boolean;
+#endif
 typedef void * memptr;
 typedef uint32_t uint32;
 typedef uint32_t BITFIELD;
@@ -99,6 +99,10 @@ void Quit(const char *errorStr, ...);
 #define LABS(x)         ((int32_t)(x)>0?(x):-(x))
 
 #define abs(x) ABS(x)
+
+#ifdef WINDOWS
+#define stricmp _stricmp
+#endif
 
 /*
 =============================================================================
@@ -1273,8 +1277,8 @@ static inline fixed FixedMul(fixed a, fixed b)
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 
 #ifdef _WIN32
-	#define strcasecmp stricmp
-	#define strncasecmp strnicmp
+	//#define strcasecmp stricmp
+	//#define strncasecmp strnicmp
 #else
 	static inline char* itoa(int value, char* string, int radix)
 	{

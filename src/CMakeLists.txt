@@ -29,7 +29,7 @@ endif(SPEAR)
 
 find_package(SDL REQUIRED)
 find_package(SDL_mixer REQUIRED)
-include_directories(${SDLMIXER_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDR_DIR})
+include_directories(${SDLMIXER_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
 
 check_function_exists(stricmp STRICMP_EXISTS)
 check_function_exists(strnicmp STRNICMP_EXISTS)

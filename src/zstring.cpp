@@ -1107,7 +1107,9 @@ void FString::ReallocBuffer (size_t newlen)
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
+#define DWORD W32_DWORD
 #include <windows.h>
+#undef DWORD
 
 static HANDLE StringHeap;
 const SIZE_T STRING_HEAP_SIZE = 64*1024;

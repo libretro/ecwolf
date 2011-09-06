@@ -37,9 +37,9 @@
 #include "zstring.h"
 #include "scanner.h"
 
-TMap<FName, LumpRemaper> LumpRemaper::remaps;
-TMap<int, FName> LumpRemaper::spriteReverseMap;
-TMap<int, FName> LumpRemaper::vgaReverseMap;
+TMap<FName, LumpRemaper> remaps;
+TMap<int, FName> spriteReverseMap;
+TMap<int, FName> vgaReverseMap;
 
 LumpRemaper::LumpRemaper(const char* extension) : mapLumpName(extension)
 {
@@ -66,6 +66,16 @@ void LumpRemaper::AddFile(FResourceFile *file, Type type)
 	rFile.file = file;
 	rFile.type = type;
 	files.Push(rFile);
+}
+
+const char* LumpRemaper::ConvertSpriteIndexToLump(int num)
+{
+	return spriteReverseMap[num];
+}
+
+const char* LumpRemaper::ConvertVGAIndexToLump(int num)
+{
+	return vgaReverseMap[num];
 }
 
 void LumpRemaper::DoRemap()

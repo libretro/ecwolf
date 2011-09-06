@@ -33,6 +33,8 @@
 */
 
 #ifdef WINDOWS
+#define USE_WINDOWS_DWORD
+#define USE_WINDOWS_BOOLEAN
 #include <windows.h>
 #else
 #include <sys/stat.h>

@@ -10,9 +10,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <wincrypt.h>
 
 #ifdef _WIN32_WCE
 # define DIR_SEPERATOR TEXT("\\")
@@ -31,6 +33,7 @@
 /* Include the SDL main definition header */
 #include "SDL.h"
 #include "SDL_main.h"
+#include "SDL_syswm.h"
 
 #ifdef main
 # ifndef _WIN32_WCE_EMULATION
@@ -373,6 +376,20 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
 	/* Hush little compiler, don't you cry... */
 	return 0;
+}
+
+void SetupWM()
+{
+	struct SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+
+	if(SDL_GetWMInfo(&wmInfo) != -1)
+	{
+		HWND hwndSDL = wmInfo.window;
+		DWORD style = GetWindowLong(hwndSDL, GWL_STYLE) & ~WS_SYSMENU;
+		SetWindowLong(hwndSDL, GWL_STYLE, style);
+		SetWindowPos(hwndSDL, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+	}
 }
 
 //==========================================================================

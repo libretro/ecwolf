@@ -164,7 +164,7 @@ class SoundIndex
 };
 
 #include "tarray.h"
-class FName;
+#include "name.h"
 class SoundInformation
 {
 	public:

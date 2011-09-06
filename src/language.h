@@ -36,9 +36,7 @@
 #define __LANGUAGE_H__
 
 #include "tarray.h"
-
-class FName;
-class FString;
+#include "zstring.h"
 
 class Language
 {
