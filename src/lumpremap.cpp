@@ -37,22 +37,22 @@
 #include "zstring.h"
 #include "scanner.h"
 
-TMap<FName, LumpRemaper> remaps;
+TMap<FName, LumpRemapper> remaps;
 TMap<int, FName> spriteReverseMap;
 TMap<int, FName> vgaReverseMap;
 
-LumpRemaper::LumpRemaper(const char* extension) : mapLumpName(extension)
+LumpRemapper::LumpRemapper(const char* extension) : mapLumpName(extension)
 {
 	mapLumpName.ToUpper();
 	mapLumpName += "MAP";
 }
 
-void LumpRemaper::AddFile(const char* extension, FResourceFile *file, Type type)
+void LumpRemapper::AddFile(const char* extension, FResourceFile *file, Type type)
 {
-	LumpRemaper *iter = remaps.CheckKey(extension);
+	LumpRemapper *iter = remaps.CheckKey(extension);
 	if(iter == NULL)
 	{
-		LumpRemaper remaper(extension);
+		LumpRemapper remaper(extension);
 		remaper.AddFile(file, type);
 		remaps.Insert(extension, remaper);
 		return;
@@ -60,7 +60,7 @@ void LumpRemaper::AddFile(const char* extension, FResourceFile *file, Type type)
 	iter->AddFile(file, type);
 }
 
-void LumpRemaper::AddFile(FResourceFile *file, Type type)
+void LumpRemapper::AddFile(FResourceFile *file, Type type)
 {
 	RemapFile rFile;
 	rFile.file = file;
@@ -68,17 +68,17 @@ void LumpRemaper::AddFile(FResourceFile *file, Type type)
 	files.Push(rFile);
 }
 
-const char* LumpRemaper::ConvertSpriteIndexToLump(int num)
+const char* LumpRemapper::ConvertSpriteIndexToLump(int num)
 {
 	return spriteReverseMap[num];
 }
 
-const char* LumpRemaper::ConvertVGAIndexToLump(int num)
+const char* LumpRemapper::ConvertVGAIndexToLump(int num)
 {
 	return vgaReverseMap[num];
 }
 
-void LumpRemaper::DoRemap()
+void LumpRemapper::DoRemap()
 {
 	if(!LoadMap())
 		return;
@@ -144,7 +144,7 @@ void LumpRemaper::DoRemap()
 	Wads.InitHashChains();
 }
 
-bool LumpRemaper::LoadMap()
+bool LumpRemapper::LoadMap()
 {
 	int lump = Wads.GetNumForName(mapLumpName);
 	if(lump == -1)
@@ -209,10 +209,10 @@ bool LumpRemaper::LoadMap()
 	return true;
 }
 
-void LumpRemaper::RemapAll()
+void LumpRemapper::RemapAll()
 {
-	TMap<FName, LumpRemaper>::Pair *pair;
-	for(TMap<FName, LumpRemaper>::Iterator iter(remaps);iter.NextPair(pair);)
+	TMap<FName, LumpRemapper>::Pair *pair;
+	for(TMap<FName, LumpRemapper>::Iterator iter(remaps);iter.NextPair(pair);)
 	{
 		pair->Value.DoRemap();
 	}

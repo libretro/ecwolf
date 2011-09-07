@@ -15,6 +15,7 @@
 #include "thinker.h"
 #include "actor.h"
 #include "textures/textures.h"
+#include "wl_agent.h"
 
 /*
 =============================================================================
@@ -40,7 +41,7 @@ exit_t playstate;
 
 static int DebugOk;
 
-objtype *newobj, *obj, *player, *lastobj, *objfreelist, *killerobj;
+objtype *newobj, *obj, *lastobj, *objfreelist, *killerobj;
 
 boolean noclip, ammocheat;
 int godmode, singlestep;
@@ -595,10 +596,10 @@ void CheckKeys (void)
 	//
 	if (Keyboard[sc_M] && Keyboard[sc_L] && Keyboard[sc_I])
 	{
-		gamestate.health = 100;
+		players[0].health = 100;
 		gamestate.ammo = 99;
 		gamestate.keys = 3;
-		gamestate.score = 0;
+		players[0].score = 0;
 		gamestate.TimeCount += 42000L;
 		GiveWeapon (wp_chaingun);
 		DrawWeapon ();

@@ -10,6 +10,7 @@
 #include "actor.h"
 #include "thingdef/thingdef.h"
 #include "lnspec.h"
+#include "wl_agent.h"
 
 /*
 =============================================================================
@@ -46,6 +47,8 @@ word            plux,pluy;          // player coordinates scaled to unsigned
 short           anglefrac;
 
 objtype        *LastAttacker;
+
+player_t		players[1];
 
 /*
 =============================================================================
@@ -152,7 +155,7 @@ void CheckWeaponChange (void)
 =
 = Takes controlx,controly, and buttonstate[bt_strafe]
 =
-= Changes the player's angle and position
+= Changes the players[0].mo's angle and position
 =
 = There is an angle hack because when going 70 fps, the roundoff becomes
 = significant
@@ -168,8 +171,8 @@ void ControlMovement (objtype *ob)
 
 	thrustspeed = 0;
 
-	oldx = player->x;
-	oldy = player->y;
+	oldx = players[0].mo->x;
+	oldy = players[0].mo->y;
 
 	if(buttonstate[bt_strafeleft])
 	{
@@ -308,14 +311,14 @@ void DrawFace (void)
 	if(viewsize == 21 && ingame) return;
 	if (GotChaingun())
 		StatusDrawFace("STFEVL0");
-	else if (gamestate.health)
+	else if (players[0].health)
 	{
 #ifdef SPEAR
 		if (godmode)
 			StatusDrawFace(godmode[gamestate.faceframe]);
 		else
 #endif
-			StatusDrawFace(animations[(100-gamestate.health)/16][gamestate.faceframe]);
+			StatusDrawFace(animations[(100-players[0].health)/16][gamestate.faceframe]);
 	}
 	else
 	{
@@ -418,7 +421,7 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number)
 void DrawHealth (void)
 {
 	if(viewsize == 21 && ingame) return;
-	LatchNumber (21,16,3,gamestate.health);
+	LatchNumber (21,16,3,players[0].health);
 }
 
 
@@ -440,11 +443,11 @@ void TakeDamage (int points,objtype *attacker)
 		points>>=2;
 
 	if (!godmode)
-		gamestate.health -= points;
+		players[0].health -= points;
 
-	if (gamestate.health<=0)
+	if (players[0].health<=0)
 	{
-		gamestate.health = 0;
+		players[0].health = 0;
 		playstate = ex_died;
 		killerobj = attacker;
 	}
@@ -459,7 +462,7 @@ void TakeDamage (int points,objtype *attacker)
 	// MAKE BJ'S EYES BUG IF MAJOR DAMAGE!
 	//
 #ifdef SPEAR
-	if (points > 30 && gamestate.health!=0 && !godmode && viewsize != 21)
+	if (points > 30 && players[0].health!=0 && !godmode && viewsize != 21)
 	{
 		StatusDrawFace("STFOUCH0");
 		facecount = 0;
@@ -504,7 +507,7 @@ void DrawLevel (void)
 void DrawLives (void)
 {
 	if(viewsize == 21 && ingame) return;
-	LatchNumber (14,16,1,gamestate.lives);
+	LatchNumber (14,16,1,players[0].lives);
 }
 
 
@@ -518,8 +521,8 @@ void DrawLives (void)
 
 void GiveExtraMan (void)
 {
-	if (gamestate.lives<9)
-		gamestate.lives++;
+	if (players[0].lives<9)
+		players[0].lives++;
 	DrawLives ();
 	SD_PlaySound ("misc/end_bonus1");
 }
@@ -537,7 +540,7 @@ void GiveExtraMan (void)
 void DrawScore (void)
 {
 	if(viewsize == 21 && ingame) return;
-	LatchNumber (6,16,6,gamestate.score);
+	LatchNumber (6,16,6,players[0].score);
 }
 
 /*
@@ -550,10 +553,10 @@ void DrawScore (void)
 
 void GivePoints (int32_t points)
 {
-	gamestate.score += points;
-	while (gamestate.score >= gamestate.nextextra)
+	players[0].score += points;
+	while (players[0].score >= players[0].nextextra)
 	{
-		gamestate.nextextra += EXTRAPOINTS;
+		players[0].nextextra += EXTRAPOINTS;
 		GiveExtraMan ();
 	}
 	DrawScore ();
@@ -699,11 +702,11 @@ bool TryMove (AActor *ob)
 	int xl,yl,xh,yh,x,y;
 	AActor *check;
 
-	xl = (ob->x-player->radius) >>TILESHIFT;
-	yl = (ob->y-player->radius) >>TILESHIFT;
+	xl = (ob->x-players[0].mo->radius) >>TILESHIFT;
+	yl = (ob->y-players[0].mo->radius) >>TILESHIFT;
 
-	xh = (ob->x+player->radius) >>TILESHIFT;
-	yh = (ob->y+player->radius) >>TILESHIFT;
+	xh = (ob->x+players[0].mo->radius) >>TILESHIFT;
+	yh = (ob->y+players[0].mo->radius) >>TILESHIFT;
 
 	//
 	// check for solid walls
@@ -714,10 +717,10 @@ bool TryMove (AActor *ob)
 		{
 			const bool checkLines[4] =
 			{
-				(ob->x+player->radius) > ((x+1)<<TILESHIFT),
-				(ob->y-player->radius) < (y<<TILESHIFT),
-				(ob->x-player->radius) < (x<<TILESHIFT),
-				(ob->y+player->radius) > ((y+1)<<TILESHIFT)
+				(ob->x+players[0].mo->radius) > ((x+1)<<TILESHIFT),
+				(ob->y-players[0].mo->radius) < (y<<TILESHIFT),
+				(ob->x-players[0].mo->radius) < (x<<TILESHIFT),
+				(ob->y+players[0].mo->radius) > ((y+1)<<TILESHIFT)
 			};
 			MapSpot spot = map->GetSpot(x, y, 0);
 			if(spot->tile)
@@ -858,7 +861,7 @@ void VictoryTile (void)
 ===================
 */
 
-// For player movement in demos exactly as in the original Wolf3D v1.4 source code
+// For players[0].mo movement in demos exactly as in the original Wolf3D v1.4 source code
 static fixed FixedByFracOrig(fixed a, fixed b)
 {
 	int sign = 0;
@@ -903,12 +906,12 @@ void Thrust (int angle, int32_t speed)
 				-FixedByFracOrig(speed, sintable[angle]),
 				-FixedMul(speed,sintable[angle]));
 
-	ClipMove(player,xmove,ymove);
+	ClipMove(players[0].mo,xmove,ymove);
 
-	player->tilex = (short)(player->x >> TILESHIFT);                // scale to tile values
-	player->tiley = (short)(player->y >> TILESHIFT);
+	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
+	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
 
-	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
+	players[0].mo->EnterZone(map->GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->zone);
 }
 
 
@@ -935,7 +938,7 @@ void Cmd_Fire (void)
 
 	gamestate.weaponframe = 0;
 
-	player->SetState(player->MissileState);
+	players[0].mo->SetState(players[0].mo->MissileState);
 
 	gamestate.attackframe = 0;
 	gamestate.attackcount =
@@ -962,28 +965,28 @@ void Cmd_Use (void)
 	//
 	// find which cardinal direction the player is facing
 	//
-	if (player->angle < ANGLES/8 || player->angle > 7*ANGLES/8)
+	if (players[0].mo->angle < ANGLES/8 || players[0].mo->angle > 7*ANGLES/8)
 	{
-		checkx = player->tilex + 1;
-		checky = player->tiley;
+		checkx = players[0].mo->tilex + 1;
+		checky = players[0].mo->tiley;
 		direction = MapTrigger::East;
 	}
-	else if (player->angle < 3*ANGLES/8)
+	else if (players[0].mo->angle < 3*ANGLES/8)
 	{
-		checkx = player->tilex;
-		checky = player->tiley-1;
+		checkx = players[0].mo->tilex;
+		checky = players[0].mo->tiley-1;
 		direction = MapTrigger::North;
 	}
-	else if (player->angle < 5*ANGLES/8)
+	else if (players[0].mo->angle < 5*ANGLES/8)
 	{
-		checkx = player->tilex - 1;
-		checky = player->tiley;
+		checkx = players[0].mo->tilex - 1;
+		checky = players[0].mo->tiley;
 		direction = MapTrigger::West;
 	}
 	else
 	{
-		checkx = player->tilex;
-		checky = player->tiley + 1;
+		checkx = players[0].mo->tilex;
+		checky = players[0].mo->tiley + 1;
 		direction = MapTrigger::South;
 	}
 
@@ -994,7 +997,7 @@ void Cmd_Use (void)
 		MapTrigger &trig = spot->triggers[i];
 		if(trig.activate[direction] && trig.playerUse)
 		{
-			map->ActivateTrigger(trig, direction, player);
+			map->ActivateTrigger(trig, direction, players[0].mo);
 			doNothing = false;
 		}
 	}
@@ -1011,6 +1014,25 @@ void Cmd_Use (void)
 =============================================================================
 */
 
+void player_t::Reborn()
+{
+	ReadyWeapon = NULL;
+	PendingWeapon = WP_NOCHANGE;
+
+	if(state == PST_ENTER)
+	{
+		lives = 3;
+		score = oldscore = 0;
+		nextextra = EXTRAPOINTS;
+		mo->GiveStartingInventory();
+	}
+
+	health = players[0].mo->maxhealth;
+
+	DrawFace();
+	DrawLives();
+	DrawHealth();
+}
 
 
 /*
@@ -1024,11 +1046,17 @@ void Cmd_Use (void)
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
 	static const ClassDef * const playerClass = ClassDef::FindClass("BJPlayer");
-	player = AActor::Spawn(playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
-	player->angle = (450-dir)%360;
-	if (player->angle<0)
-		player->angle += ANGLES;
+	players[0].mo = (APlayerPawn *) AActor::Spawn(playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
+	players[0].mo->angle = (450-dir)%360;
+	if (players[0].mo->angle<0)
+		players[0].mo->angle += ANGLES;
+	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables
+
+	if(players[0].state == player_t::PST_ENTER || players[0].state == player_t::PST_REBORN)
+		players[0].Reborn();
+
+	players[0].state = player_t::PST_LIVE;
 }
 
 
@@ -1142,8 +1170,8 @@ void GunAttack (AActor *ob)
 	//
 	// hit something
 	//
-	dx = ABS(closest->tilex - player->tilex);
-	dy = ABS(closest->tiley - player->tiley);
+	dx = ABS(closest->tilex - players[0].mo->tilex);
+	dy = ABS(closest->tiley - players[0].mo->tiley);
 	dist = dx>dy ? dx:dy;
 	if (dist<2)
 		damage = US_RndT() / 4;
@@ -1172,26 +1200,26 @@ void VictorySpin (void)
 {
 	int32_t    desty;
 
-	if (player->angle > 270)
+	if (players[0].mo->angle > 270)
 	{
-		player->angle -= (short)(tics * 3);
-		if (player->angle < 270)
-			player->angle = 270;
+		players[0].mo->angle -= (short)(tics * 3);
+		if (players[0].mo->angle < 270)
+			players[0].mo->angle = 270;
 	}
-	else if (player->angle < 270)
+	else if (players[0].mo->angle < 270)
 	{
-		player->angle += (short)(tics * 3);
-		if (player->angle > 270)
-			player->angle = 270;
+		players[0].mo->angle += (short)(tics * 3);
+		if (players[0].mo->angle > 270)
+			players[0].mo->angle = 270;
 	}
 
-	desty = (((int32_t)player->tiley-5)<<TILESHIFT)-0x3000;
+	desty = (((int32_t)players[0].mo->tiley-5)<<TILESHIFT)-0x3000;
 
-	if (player->y > desty)
+	if (players[0].mo->y > desty)
 	{
-		player->y -= tics*4096;
-		if (player->y < desty)
-			player->y = desty;
+		players[0].mo->y -= tics*4096;
+		if (players[0].mo->y < desty)
+			players[0].mo->y = desty;
 	}
 }
 
@@ -1228,10 +1256,10 @@ ACTION_FUNCTION(T_Attack)
 	if (gamestate.victoryflag)              // watching the BJ actor
 		return;
 
-	plux = (word) (player->x >> UNSIGNEDSHIFT);                     // scale to fit in unsigned
-	pluy = (word) (player->y >> UNSIGNEDSHIFT);
-	player->tilex = (short)(player->x >> TILESHIFT);                // scale to tile values
-	player->tiley = (short)(player->y >> TILESHIFT);
+	plux = (word) (players[0].mo->x >> UNSIGNEDSHIFT);                     // scale to fit in unsigned
+	pluy = (word) (players[0].mo->y >> UNSIGNEDSHIFT);
+	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
+	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
 
 	//
 	// change frame and fire
@@ -1243,7 +1271,7 @@ ACTION_FUNCTION(T_Attack)
 		switch (cur->attack)
 		{
 			case -1:
-				player->SetState(player->SpawnState);
+				players[0].mo->SetState(players[0].mo->SpawnState);
 				if (!gamestate.ammo)
 				{
 					gamestate.weapon = wp_knife;
@@ -1327,8 +1355,8 @@ ACTION_FUNCTION(T_Player)
 	if (gamestate.victoryflag)              // watching the BJ actor
 		return;
 
-	plux = (word) (player->x >> UNSIGNEDSHIFT);                     // scale to fit in unsigned
-	pluy = (word) (player->y >> UNSIGNEDSHIFT);
-	player->tilex = (short)(player->x >> TILESHIFT);                // scale to tile values
-	player->tiley = (short)(player->y >> TILESHIFT);
+	plux = (word) (players[0].mo->x >> UNSIGNEDSHIFT);                     // scale to fit in unsigned
+	pluy = (word) (players[0].mo->y >> UNSIGNEDSHIFT);
+	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
+	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
 }

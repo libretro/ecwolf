@@ -36,6 +36,7 @@
 #include "m_random.h"
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
+#include "wl_agent.h"
 
 static ActionTable *actionFunctions = NULL;
 ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name),
@@ -111,7 +112,7 @@ ACTION_FUNCTION(A_MeleeAttack)
 	ACTION_PARAM_INT(damage, 0);
 	ACTION_PARAM_INT(accuracy, 1);
 
-	if(CheckMeleeRange(self, player))
+	if(CheckMeleeRange(self, players[0].mo))
 	{
 		if(pr_meleeattack() < accuracy*255)
 			TakeDamage(damage, self);

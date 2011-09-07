@@ -36,6 +36,7 @@
 #include "id_sd.h"
 #include "lnspec.h"
 #include "actor.h"
+#include "wl_agent.h"
 using namespace Specials;
 
 #define DEFINE_SPECIAL(name,num,args) \
@@ -128,7 +129,7 @@ class EVDoor : public Thinker
 						const MapZone *zone2 = spot->GetAdjacent(MapTile::Side(direction), true)->zone;
 						map->LinkZones(zone1, zone2, true);
 
-						if(map->CheckLink(zone1, player->GetZone(), true))
+						if(map->CheckLink(zone1, players[0].mo->GetZone(), true))
 							PlaySoundLocMapSpot("doors/open", spot);
 					}
 
@@ -228,7 +229,7 @@ class EVDoor : public Thinker
 					wait = OPENTICS;
 					break;
 				case Closing:
-					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, player->GetZone(), true))
+					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[0].mo->GetZone(), true))
 						PlaySoundLocMapSpot("doors/close", spot);
 					break;
 			}

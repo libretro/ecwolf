@@ -27,7 +27,7 @@
 #include "v_palette.h"
 #include "v_video.h"
 #include "r_data/colormaps.h"
-//#include <SDL_syswm.h>
+#include "wl_agent.h"
 
 // Wad Code Stuff
 TArray<FString> wadfiles;
@@ -159,11 +159,10 @@ void NewGame (int difficulty,int episode)
 	gamestate.difficulty = difficulty;
 	gamestate.weapon = gamestate.bestweapon
 			= gamestate.chosenweapon = wp_pistol;
-	gamestate.health = 100;
 	gamestate.ammo = STARTAMMO;
-	gamestate.lives = 3;
-	gamestate.nextextra = EXTRAPOINTS;
 	gamestate.episode=episode;
+
+	players[0].state = player_t::PST_ENTER;
 
 	startgame = true;
 }
@@ -1325,7 +1324,7 @@ int main (int argc, char *argv[])
 	printf("W_Init: Init WADfiles.\n");
 	Wads.InitMultipleFiles(wadfiles);
 	language.SetupStrings();
-	LumpRemaper::RemapAll();
+	LumpRemapper::RemapAll();
 
 	InitThinkerList();
 

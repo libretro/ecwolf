@@ -87,12 +87,22 @@ class Frame
 		bool	freeActionArgs;
 };
 
+class player_t;
 class AActorProxy;
 class ClassDef;
 class AInventory;
 class AActor
 {
 	public:
+		struct DropItem
+		{
+			public:
+				FName			className;
+				unsigned int	amount;
+				uint8_t			probabilty;
+		};
+		typedef LinkedList<DropItem> DropList;
+
 		virtual ~AActor();
 
 		void			AddInventory(AInventory *item);
@@ -106,7 +116,7 @@ class AActor
 		void			RemoveFromWorld();
 		void			SetState(const Frame *state, bool notic=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
-		void			Tick();
+		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
 
 		const AActor	*defaults;
@@ -145,7 +155,12 @@ class AActor
 		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState, *DeathState;
 		short       temp1,hidden;
 
+		player_t	*player;	// Only valid with APlayerPawn
+
 		AInventory	*inventory;
+
+		bool		dropdefined;
+		DropList	*dropitems;
 
 		typedef LinkedList<AActor *>::Node Iterator;
 		static LinkedList<AActor *>	actors;

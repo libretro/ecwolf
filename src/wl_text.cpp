@@ -182,7 +182,7 @@ void TimedPicCommand (void)
 	//
 	// draw pic
 	//
-	VWB_DrawPic (picx&~7,picy,LumpRemaper::ConvertVGAIndexToLump(picnum));
+	VWB_DrawPic (picx&~7,picy,LumpRemapper::ConvertVGAIndexToLump(picnum));
 }
 
 
@@ -255,8 +255,8 @@ void HandleCommand (void)
 		case 'G':               // ^Gyyy,xxx,ppp draws graphic
 		{
 			ParsePicCommand ();
-			VWB_DrawPic (picx&~7,picy,LumpRemaper::ConvertVGAIndexToLump(picnum));
-			int lumpNum = Wads.CheckNumForName(LumpRemaper::ConvertVGAIndexToLump(picnum));
+			VWB_DrawPic (picx&~7,picy,LumpRemapper::ConvertVGAIndexToLump(picnum));
+			int lumpNum = Wads.CheckNumForName(LumpRemapper::ConvertVGAIndexToLump(picnum));
 			if(lumpNum == -1)
 				picwidth = picheight = 0;
 			else

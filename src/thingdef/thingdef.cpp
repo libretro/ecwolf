@@ -75,7 +75,7 @@ const struct FlagDef
 	DEFINE_FLAG(FL, SOLID, AActor, flags),
 	DEFINE_FLAG(FL, VISABLE, AActor, flags)
 };
-extern const PropDef properties[NUM_PROPERTIES];
+extern const PropDef properties[];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -917,6 +917,14 @@ bool ClassDef::SetFlag(ClassDef *newClass, const char* flagName, bool set)
 
 bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc)
 {
+	static unsigned int NUM_PROPERTIES = 0;
+	if(NUM_PROPERTIES == 0)
+	{
+		// Calculate NUM_PROPERTIES if needed.
+		while(properties[NUM_PROPERTIES++].name != NULL)
+			;
+	}
+
 	int min = 0;
 	int max = NUM_PROPERTIES - 1;
 	while(min <= max)

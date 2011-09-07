@@ -39,6 +39,7 @@
 #include "lnspec.h"
 #include "actor.h"
 #include "thingdef/thingdef.h"
+#include "wl_agent.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
 {
@@ -99,8 +100,8 @@ void GameMap::ClearVisibility()
 		for(unsigned int p = 0;p < planes.Size();++p)
 			planes[p].map[i].visible = false;
 	}
-	if(player)
-		GetSpot(player->tilex, player->tiley, 0)->visible = true;
+	if(players[0].mo)
+		GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->visible = true;
 }
 
 bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)

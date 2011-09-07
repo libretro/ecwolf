@@ -1,5 +1,5 @@
 /*
-** r_sprites.h
+** a_playerpawn.cpp
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -32,24 +32,85 @@
 **
 */
 
-#ifndef __R_SPRITES_H__
-#define __R_SPRITES_H__
+#include "a_inventory.h"
+#include "a_playerpawn.h"
+#include "thingdef/thingdef.h"
+#include "wl_agent.h"
 
-#include "actor.h"
-#include "zstring.h"
+IMPLEMENT_CLASS(PlayerPawn, Actor)
 
-enum SpecialSprites
+void GunAttack(AActor *ob);
+
+void APlayerPawn::GiveStartingInventory()
 {
-	SPR_NONE,
+	if(!startInventory)
+		return;
 
-	NUM_SPECIAL_SPRITES
-};
+	DropList::Node *item = startInventory->Head();
+	do
+	{
+		DropItem &inv = item->Item();
+		const ClassDef *cls = ClassDef::FindClass(inv.className);
+		if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
+			continue;
 
-unsigned int R_GetSprite(const char* spr);
-void R_InitSprites();
-void R_LoadSprite(const FString &name);
+		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0);
+		invItem->amount = inv.amount;
+		AddInventory(invItem);
 
-void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
-void SimpleScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
+		if(!player->ReadyWeapon && cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
+		{
+			player->ReadyWeapon = (AWeapon *)invItem;
+			player->ReadyWeapon->SetState(invItem->FindState("Ready"));
+		}
+	}
+	while((item = item->Next()));
 
+#if 1
+	AInventory *inv = inventory;
+	while(inv)
+	{
+		Printf("%s %d/%d\n", inv->GetClass()->GetName().GetChars(), inv->amount, inv->maxamount);
+		inv = inv->inventory;
+	}
 #endif
+}
+
+void APlayerPawn::InitClean()
+{
+	startInventory = NULL;
+	Super::InitClean();
+}
+
+void APlayerPawn::Tick()
+{
+	Super::Tick();
+
+	// Watching BJ
+	if(gamestate.victoryflag)
+	{
+		VictorySpin();
+		return;
+	}
+
+	UpdateFace();
+	CheckWeaponChange();
+
+	if(buttonstate[bt_use])
+		Cmd_Use();
+
+	if(buttonstate[bt_attack] && !buttonheld[bt_attack])
+	{
+		// Fire weapon
+		GunAttack(this);
+	}
+
+	ControlMovement(this);
+	if(gamestate.victoryflag)
+		return;
+
+	if(player->ReadyWeapon)
+	{
+		player->ReadyWeapon->Tick();
+	}
+}

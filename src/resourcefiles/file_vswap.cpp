@@ -179,7 +179,7 @@ class FVSwap : public FResourceFile
 			delete[] data;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
-			LumpRemaper::AddFile(extension, this, LumpRemaper::VSWAP);
+			LumpRemapper::AddFile(extension, this, LumpRemapper::VSWAP);
 			return true;
 		}
 

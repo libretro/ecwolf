@@ -141,7 +141,6 @@ struct PropDef
 		const char* const		params;
 		PropHandler				handler;
 };
-#define NUM_PROPERTIES 13
 
 typedef TArray<Symbol *> SymbolTable;
 
@@ -191,6 +190,7 @@ class ClassDef
 		const ActionInfo		*FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const;
+		const FName				&GetName() const { return name; }
 		static void				LoadActors();
 		static void				UnloadActors();
 

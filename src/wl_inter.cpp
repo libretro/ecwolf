@@ -7,6 +7,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "language.h"
+#include "wl_agent.h"
 
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;

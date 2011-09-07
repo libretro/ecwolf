@@ -1,5 +1,5 @@
 /*
-** r_sprites.h
+** a_playerpawn.h
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -32,24 +32,26 @@
 **
 */
 
-#ifndef __R_SPRITES_H__
-#define __R_SPRITES_H__
+#ifndef __A_PLAYERPAWN_H__
+#define __A_PLAYERPAWN_H__
 
 #include "actor.h"
-#include "zstring.h"
 
-enum SpecialSprites
+class AInventory;
+
+class APlayerPawn : public AActor
 {
-	SPR_NONE,
+	DECLARE_NATIVE_CLASS(PlayerPawn, Actor)
 
-	NUM_SPECIAL_SPRITES
+	public:
+		void	GiveStartingInventory();
+		void	Tick();
+
+		int32_t		maxhealth;
+		DropList	*startInventory;
+
+	protected:
+		void	InitClean();
 };
-
-unsigned int R_GetSprite(const char* spr);
-void R_InitSprites();
-void R_LoadSprite(const FString &name);
-
-void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
-void SimpleScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
 
 #endif

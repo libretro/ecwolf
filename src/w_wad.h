@@ -27,7 +27,7 @@
 #include "zstring.h"
 #include "tarray.h"
 
-class LumpRemaper;
+class LumpRemapper;
 class FResourceFile;
 struct FResourceLump;
 
@@ -227,7 +227,7 @@ protected:
 	void SkinHack (int baselump);
 	void InitHashChains ();								// [RH] Set up the lumpinfo hashing
 
-	friend class LumpRemaper;
+	friend class LumpRemapper;
 private:
 	void RenameSprites ();
 	void DeleteAll();

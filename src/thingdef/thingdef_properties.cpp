@@ -35,6 +35,7 @@
 #include "actor.h"
 #include "thingdef.h"
 #include "a_inventory.h"
+#include "a_playerpawn.h"
 #include "scanner.h"
 #include "thingdef/thingdef_type.h"
 #include "thingdef/thingdef_expression.h"
@@ -85,6 +86,40 @@ HANDLE_PROPERTY(deathsound)
 	defaults->deathsound = snd;
 }
 
+HANDLE_PROPERTY(dropitem)
+{
+	// NOTE: When used with inheritance the old list is wiped.
+	STRING_PARAM(item, 0);
+
+	if(!defaults->dropdefined)
+	{
+		defaults->dropdefined = true;
+		defaults->dropitems = new AActor::DropList();
+	}
+
+	AActor::DropItem drop;
+	drop.className = item;
+	drop.amount = 1;
+	drop.probabilty = 255;
+
+	if(PARAM_COUNT > 1)
+	{
+		INT_PARAM(amt, 1);
+		drop.amount = amt;
+		if(PARAM_COUNT > 2)
+		{
+			INT_PARAM(prb, 2);
+			if(prb > 255)
+				prb = 255;
+			else if(prb < 0)
+				prb = 0;
+			drop.probabilty = prb;
+		}
+	}
+
+	defaults->dropitems->Push(drop);
+}
+
 HANDLE_PROPERTY(health)
 {
 	INT_PARAM(health, 0);
@@ -111,6 +146,12 @@ HANDLE_PROPERTY(maxamount)
 {
 	INT_PARAM(maxamt, 0);
 	((AInventory *)defaults)->maxamount = maxamt;
+}
+
+HANDLE_PROPERTY(maxhealth)
+{
+	INT_PARAM(maxhealth, 0);
+	((APlayerPawn *)defaults)->maxhealth = maxhealth;
 }
 
 HANDLE_PROPERTY(pickupsound)
@@ -166,6 +207,30 @@ HANDLE_PROPERTY(speed)
 		defaults->runspeed = defaults->speed;
 }
 
+HANDLE_PROPERTY(startitem)
+{
+	// NOTE: This property is not inherited.
+	STRING_PARAM(item, 0);
+
+	APlayerPawn *def = (APlayerPawn *)defaults;
+
+	if(!def->startInventory)
+		def->startInventory = new AActor::DropList();
+
+	AActor::DropItem drop;
+	drop.className = item;
+	drop.amount = 1;
+	drop.probabilty = 255;
+
+	if(PARAM_COUNT > 1)
+	{
+		INT_PARAM(amt, 1);
+		drop.amount = amt;
+	}
+
+	def->startInventory->Push(drop);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 HANDLE_PROPERTY(MONSTER)
@@ -176,19 +241,24 @@ HANDLE_PROPERTY(MONSTER)
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DEFINE_PROP(name, class, params) { class::__StaticClass, #name, #params, __Handler_##name }
-extern const PropDef properties[NUM_PROPERTIES] =
+extern const PropDef properties[] =
 {
 	DEFINE_PROP(amount, AInventory, I),
 	DEFINE_PROP(attacksound, AActor, S),
 	DEFINE_PROP(damage, AActor, I),
 	DEFINE_PROP(deathsound, AActor, S),
+	DEFINE_PROP(dropitem, AActor, S_II),
 	DEFINE_PROP(health, AActor, I_IIIIIIII),
 	DEFINE_PROP(maxamount, AInventory, I),
+	DEFINE_PROP(maxhealth, APlayerPawn, I),
 	DEFINE_PROP(MONSTER, AActor,),
 	DEFINE_PROP(pickupsound, AInventory, S),
 	DEFINE_PROP(points, AActor, I),
 	DEFINE_PROP(radius, AActor, I),
 	DEFINE_PROP(seesound, AActor, S),
 	DEFINE_PROP(sighttime, AActor, I_I),
-	DEFINE_PROP(speed, AActor, F_F)
+	DEFINE_PROP(speed, AActor, F_F),
+	DEFINE_PROP(startitem, APlayerPawn, S_I),
+
+	{ NULL, NULL, NULL, NULL }
 };

@@ -17,6 +17,7 @@
 #include "thinker.h"
 #include "actor.h"
 #include <SDL_mixer.h>
+#include "wl_agent.h"
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -716,15 +717,15 @@ void Died (void)
 	}
 
 	gamestate.weapon = (weapontype) -1;                     // take away weapon
-	SD_PlaySound ("player/death");
+	SD_PlaySound ("players[0].mo/death");
 
 	//
 	// swing around to face attacker
 	//
 	if(killerobj)
 	{
-		dx = killerobj->x - player->x;
-		dy = player->y - killerobj->y;
+		dx = killerobj->x - players[0].mo->x;
+		dy = players[0].mo->y - killerobj->y;
 
 		fangle = (float) atan2((float) dy, (float) dx);     // returns -pi to pi
 		if (fangle<0)
@@ -734,22 +735,22 @@ void Died (void)
 	}
 	else
 	{
-		iangle = player->angle + ANGLES / 2;
+		iangle = players[0].mo->angle + ANGLES / 2;
 		if(iangle >= ANGLES) iangle -= ANGLES;
 	}
 
-	if (player->angle > iangle)
+	if (players[0].mo->angle > iangle)
 	{
-		counter = player->angle - iangle;
-		clockwise = ANGLES-player->angle + iangle;
+		counter = players[0].mo->angle - iangle;
+		clockwise = ANGLES-players[0].mo->angle + iangle;
 	}
 	else
 	{
-		clockwise = iangle - player->angle;
-		counter = player->angle + ANGLES-iangle;
+		clockwise = iangle - players[0].mo->angle;
+		counter = players[0].mo->angle + ANGLES-iangle;
 	}
 
-	curangle = player->angle;
+	curangle = players[0].mo->angle;
 
 	if (clockwise<counter)
 	{
@@ -765,9 +766,9 @@ void Died (void)
 				change = iangle-curangle;
 
 			curangle += change;
-			player->angle += change;
-			if (player->angle >= ANGLES)
-				player->angle -= ANGLES;
+			players[0].mo->angle += change;
+			if (players[0].mo->angle >= ANGLES)
+				players[0].mo->angle -= ANGLES;
 
 			ThreeDRefresh ();
 			CalcTics ();
@@ -787,9 +788,9 @@ void Died (void)
 				change = iangle-curangle;
 
 			curangle += change;
-			player->angle += change;
-			if (player->angle < 0)
-				player->angle += ANGLES;
+			players[0].mo->angle += change;
+			if (players[0].mo->angle < 0)
+				players[0].mo->angle += ANGLES;
 
 			ThreeDRefresh ();
 			CalcTics ();
@@ -813,11 +814,11 @@ void Died (void)
 	SD_WaitSoundDone ();
 	ClearMemory();
 
-	gamestate.lives--;
+	players[0].lives--;
 
-	if (gamestate.lives > -1)
+	if (players[0].lives > -1)
 	{
-		gamestate.health = 100;
+		players[0].state = player_t::PST_REBORN;
 		gamestate.weapon = gamestate.bestweapon
 			= gamestate.chosenweapon = wp_pistol;
 		gamestate.ammo = STARTAMMO;
@@ -864,7 +865,7 @@ restartgame:
 	do
 	{
 		if (!loadedgame)
-			gamestate.score = gamestate.oldscore;
+			players[0].score = players[0].oldscore;
 		if(!died || viewsize != 21) DrawScore();
 
 		startgame = false;
@@ -915,13 +916,13 @@ startplayloop:
 				SD_WaitSoundDone();
 
 			ClearMemory ();
-			gamestate.oldscore = gamestate.score;
+			players[0].oldscore = players[0].score;
 			gamestate.mapon = 20;
 			SetupGameLevel ();
 			StartMusic ();
-			player->x = spearx;
-			player->y = speary;
-			player->angle = (short)spearangle;
+			players[0].mo->x = spearx;
+			players[0].mo->y = speary;
+			players[0].mo->angle = (short)spearangle;
 			spearflag = false;
 			Thrust (0,0);
 			goto startplayloop;
@@ -960,7 +961,7 @@ startplayloop:
 
 					ClearMemory ();
 
-					CheckHighScore (gamestate.score,gamestate.mapon+1);
+					CheckHighScore (players[0].score,gamestate.mapon+1);
 					return;
 				}
 #endif
@@ -974,12 +975,12 @@ startplayloop:
 
 					ClearMemory ();
 
-					CheckHighScore (gamestate.score,gamestate.mapon+1);
+					CheckHighScore (players[0].score,gamestate.mapon+1);
 					return;
 				}
 #endif
 
-				gamestate.oldscore = gamestate.score;
+				players[0].oldscore = players[0].score;
 
 #ifndef SPEAR
 				//
@@ -1029,7 +1030,7 @@ startplayloop:
 				Died ();
 				died = true;                    // don't "get psyched!"
 
-				if (gamestate.lives > -1)
+				if (players[0].lives > -1)
 					break;                          // more lives left
 
 				VW_FadeOut ();
@@ -1038,7 +1039,7 @@ startplayloop:
 
 				ClearMemory ();
 
-				CheckHighScore (gamestate.score,gamestate.mapon+1);
+				CheckHighScore (players[0].score,gamestate.mapon+1);
 				return;
 
 			case ex_victorious:
@@ -1054,7 +1055,7 @@ startplayloop:
 
 				ClearMemory ();
 
-				CheckHighScore (gamestate.score,gamestate.mapon+1);
+				CheckHighScore (players[0].score,gamestate.mapon+1);
 				return;
 
 			default:

@@ -31,6 +31,7 @@
 #include "language.h"
 #include "w_wad.h"
 #include "c_cvars.h"
+#include "wl_agent.h"
 
 struct SaveFile
 {
@@ -762,7 +763,7 @@ CP_CheckQuick (ScanCode scancode)
 			{
 				playstate = ex_died;
 				killerobj = NULL;
-				pickquick = gamestate.lives = 0;
+				pickquick = players[0].lives = 0;
 			}
 
 			WindowH = 200;
@@ -887,7 +888,7 @@ CP_EndGame (int)
 	mainMenu.draw();
 	if(!res) return 0;
 
-	pickquick = gamestate.lives = 0;
+	pickquick = players[0].lives = 0;
 	playstate = ex_died;
 	killerobj = NULL;
 

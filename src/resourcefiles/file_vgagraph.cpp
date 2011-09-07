@@ -244,7 +244,7 @@ class FVGAGraph : public FResourceFile
 			delete[] data;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
-			LumpRemaper::AddFile(extension, this, LumpRemaper::VGAGRAPH);
+			LumpRemapper::AddFile(extension, this, LumpRemapper::VGAGRAPH);
 			return true;
 		}
 

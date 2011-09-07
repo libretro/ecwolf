@@ -39,7 +39,7 @@
 #include "tarray.h"
 #include "zstring.h"
 
-class LumpRemaper
+class LumpRemapper
 {
 	public:
 		enum Type
@@ -49,7 +49,7 @@ class LumpRemaper
 			VSWAP
 		};
 
-		LumpRemaper(const char* extension);
+		LumpRemapper(const char* extension);
 
 		void		AddFile(FResourceFile *file, Type type);
 		void		DoRemap();

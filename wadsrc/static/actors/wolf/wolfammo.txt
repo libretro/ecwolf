@@ -11,11 +11,6 @@ actor Clip : Ammo 59
 	}
 }
 
-actor DroppedClip : Clip
-{
-	inventory.amount 4
-}
-
 actor ClipBox : Clip 90
 {
 	inventory.pickupsound "misc/ammobox_pickup"

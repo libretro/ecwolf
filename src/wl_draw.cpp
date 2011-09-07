@@ -19,6 +19,8 @@
 #include "id_ca.h"
 #include "gamemap.h"
 #include "lumpremap.h"
+#include "wl_agent.h"
+#include "a_inventory.h"
 
 /*
 =============================================================================
@@ -572,7 +574,7 @@ void VGAClearScreen (void)
 
 FTexture *ShapeToTexture(int shapenum)
 {
-	const char* textureName = LumpRemaper::ConvertSpriteIndexToLump(shapenum+1);
+	const char* textureName = LumpRemapper::ConvertSpriteIndexToLump(shapenum+1);
 	return TexMan[textureName];
 }
 
@@ -591,7 +593,7 @@ int CalcRotate (AActor *ob)
 	// this isn't exactly correct, as it should vary by a trig value,
 	// but it is close enough with only eight rotations
 
-	viewangle = player->angle + (centerx - ob->viewx)/8;
+	viewangle = players[0].mo->angle + (centerx - ob->viewx)/8;
 
 	if(ob->dir != nodir)
 		angle = viewangle - dirangle[ob->dir];
@@ -915,15 +917,20 @@ void DrawScaleds (void)
 int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
 	SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
+#include "thingdef/thingdef.h"
 void DrawPlayerWeapon (void)
 {
-	int shapenum;
+	if(!players[0].ReadyWeapon)
+		return;
+
+	SimpleScaleSprite(players[0].ReadyWeapon, viewwidth/2, players[0].ReadyWeapon->state, viewheight+1);
+/*	int shapenum;
 
 #ifndef SPEAR
 	if (gamestate.victoryflag)
 	{
 #ifndef APOGEE_1_0
-	//	if (player->state == &s_deathcam && (GetTimeCount()&32) )
+	//	if (players[0].mo->state == &s_deathcam && (GetTimeCount()&32) )
 	//		SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
 #endif
 		return;
@@ -937,7 +944,7 @@ void DrawPlayerWeapon (void)
 	}
 
 	if (demorecord || demoplayback)
-		SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1);
+		SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1);*/
 }
 
 
@@ -1437,18 +1444,18 @@ void WallRefresh (void)
 
 void CalcViewVariables()
 {
-	viewangle = player->angle;
+	viewangle = players[0].mo->angle;
 	midangle = float(viewangle)*(float(FINEANGLES)/float(ANGLES));
 	viewsin = sintable[viewangle];
 	viewcos = costable[viewangle];
-	viewx = player->x - FixedMul(focallength,viewcos);
-	viewy = player->y + FixedMul(focallength,viewsin);
+	viewx = players[0].mo->x - FixedMul(focallength,viewcos);
+	viewy = players[0].mo->y + FixedMul(focallength,viewsin);
 
 	focaltx = (short)(viewx>>TILESHIFT);
 	focalty = (short)(viewy>>TILESHIFT);
 
-	viewtx = (short)(player->x >> TILESHIFT);
-	viewty = (short)(player->y >> TILESHIFT);
+	viewtx = (short)(players[0].mo->x >> TILESHIFT);
+	viewty = (short)(players[0].mo->y >> TILESHIFT);
 }
 
 //==========================================================================
@@ -1511,7 +1518,7 @@ void    ThreeDRefresh (void)
 		DrawSnow(vbuf, vbufPitch);
 #endif
 
-	DrawPlayerWeapon ();    // draw player's hands
+	DrawPlayerWeapon ();    // draw players[0].mo's hands
 
 	if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
 		ShowActStatus();

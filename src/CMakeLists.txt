@@ -51,6 +51,7 @@ endif(WIN32)
 add_executable(ecwolf WIN32
 	g_shared/a_inventory.cpp
 	g_shared/a_patrolpoint.cpp
+	g_shared/a_playerpawn.cpp
 	r_data/colormaps.cpp
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp

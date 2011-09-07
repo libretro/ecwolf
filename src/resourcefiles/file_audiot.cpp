@@ -114,7 +114,7 @@ class FAudiot : public FUncompressedFile
 			delete[] sizes;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
-			LumpRemaper::AddFile(extension, this, LumpRemaper::AUDIOT);
+			LumpRemapper::AddFile(extension, this, LumpRemapper::AUDIOT);
 			return true;
 		}
 

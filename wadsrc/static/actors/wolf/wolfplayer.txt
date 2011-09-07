@@ -1,20 +1,20 @@
-actor BJPlayer
+actor BJPlayer : PlayerPawn
 {
 	health 100
 	radius 22
+	player.startitem "Clip", 8
+	player.startitem "Pistol"
+	player.startitem "Knife"
 	+NEVERMARK
 	+PICKUP
-
-	action native T_Attack();
-	action native T_Player();
 
 	states
 	{
 		Spawn:
-			TNT1 A -1 NOP T_Player
+			TNT1 A -1 NOP
 			stop
 		Missile:
-			TNT1 A -1 NOP T_Attack
+			TNT1 A -1 NOP
 			stop
 	}
 }

@@ -14,6 +14,7 @@
 #include "id_us.h"
 #include "language.h"
 #include "thingdef/thingdef.h"
+#include "wl_agent.h"
 
 static inline bool CheckDoorMovement(AActor *actor)
 {
@@ -187,8 +188,8 @@ void T_Projectile (AActor *ob)
 	ob->x += deltax;
 	ob->y += deltay;
 
-	deltax = LABS(ob->x - player->x);
-	deltay = LABS(ob->y - player->y);
+	deltax = LABS(ob->x - players[0].mo->x);
+	deltay = LABS(ob->y - players[0].mo->y);
 
 	if (!ProjectileTryMove (ob))
 	{
@@ -213,7 +214,7 @@ void T_Projectile (AActor *ob)
 	}
 
 	if (deltax < PROJECTILESIZE && deltay < PROJECTILESIZE)
-	{       // hit the player
+	{       // hit the players[0].mo
 		switch (ob->obclass)
 		{
 		case needleobj:
@@ -281,11 +282,11 @@ void T_Will (objtype *ob)
 	boolean dodge;
 
 	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
+	dx = abs(ob->tilex - players[0].mo->tilex);
+	dy = abs(ob->tiley - players[0].mo->tiley);
 	dist = dx>dy ? dx : dy;
 
-	if (CheckLine(ob))                                              // got a shot at player?
+	if (CheckLine(ob))                                              // got a shot at players[0].mo?
 	{
 		ob->hidden = false;
 		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
@@ -366,8 +367,8 @@ void T_Launch (objtype *ob)
 	float   angle;
 	int     iangle;
 
-	deltax = player->x - ob->x;
-	deltay = ob->y - player->y;
+	deltax = players[0].mo->x - ob->x;
+	deltay = ob->y - players[0].mo->y;
 	angle = (float) atan2 ((float) deltay, (float) deltax);
 	if (angle<0)
 		angle = (float) (M_PI*2+angle);
@@ -507,10 +508,10 @@ void A_StartAttack (objtype *ob)
 	int         x,y;
 	uintptr_t   tile;
 
-	deltax = ob->x - player->x;
+	deltax = ob->x - players[0].mo->x;
 	if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
 		goto moveok;
-	deltay = ob->y - player->y;
+	deltay = ob->y - players[0].mo->y;
 	if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
 		goto moveok;
 
@@ -565,8 +566,8 @@ moveok:
 	float   angle;
 	int     iangle;
 
-	deltax = player->x - ob->x;
-	deltay = ob->y - player->y;
+	deltax = players[0].mo->x - ob->x;
+	deltay = ob->y - players[0].mo->y;
 	angle = (float) atan2((float) deltay, (float) deltax);
 	if (angle<0)
 		angle = (float) (M_PI*2+angle);
@@ -604,8 +605,8 @@ moveok:
 	float   angle;
 	int     iangle;
 
-	deltax = player->x - ob->x;
-	deltay = ob->y - player->y;
+	deltax = players[0].mo->x - ob->x;
+	deltay = ob->y - players[0].mo->y;
 	angle = (float) atan2((float) deltay, (float) deltax);
 	if (angle<0)
 		angle = (float) (M_PI*2+angle);
@@ -646,11 +647,11 @@ moveok:
 	boolean dodge;
 
 	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
+	dx = abs(ob->tilex - players[0].mo->tilex);
+	dy = abs(ob->tiley - players[0].mo->tiley);
 	dist = dx>dy ? dx : dy;
 
-	if (CheckLine(ob))                                              // got a shot at player?
+	if (CheckLine(ob))                                              // got a shot at players[0].mo?
 	{
 		ob->hidden = false;
 		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
@@ -729,11 +730,11 @@ moveok:
 	boolean dodge;
 
 	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
+	dx = abs(ob->tilex - players[0].mo->tilex);
+	dy = abs(ob->tiley - players[0].mo->tiley);
 	dist = dx>dy ? dx : dy;
 
-	if (CheckLine(ob))                                              // got a shot at player?
+	if (CheckLine(ob))                                              // got a shot at players[0].mo?
 	{
 		ob->hidden = false;
 		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
@@ -812,11 +813,11 @@ void T_Fat (objtype *ob)
 	boolean dodge;
 
 	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
+	dx = abs(ob->tilex - players[0].mo->tilex);
+	dy = abs(ob->tiley - players[0].mo->tiley);
 	dist = dx>dy ? dx : dy;
 
-	if (CheckLine(ob))                                              // got a shot at player?
+	if (CheckLine(ob))                                              // got a shot at players[0].mo?
 	{
 		ob->hidden = false;
 		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
@@ -930,7 +931,7 @@ void A_HitlerMorph (objtype *ob)
 ////////////////////////////////////////////////////////
 void A_MechaSound (objtype *ob)
 {
-	if (map->CheckLink(ob->GetZone(), player->GetZone(), true))
+	if (map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
 		PlaySoundLocActor ("hitler/active",ob);
 }
 
@@ -959,8 +960,8 @@ void T_FakeFire (objtype *ob)
 		return;
 	}
 
-	deltax = player->x - ob->x;
-	deltay = ob->y - player->y;
+	deltax = players[0].mo->x - ob->x;
+	deltay = ob->y - players[0].mo->y;
 	angle = (float) atan2((float) deltay, (float) deltax);
 	if (angle<0)
 		angle = (float)(M_PI*2+angle);
@@ -997,7 +998,7 @@ void T_Fake (objtype *ob)
 {
 	int32_t move;
 
-	if (CheckLine(ob))                      // got a shot at player?
+	if (CheckLine(ob))                      // got a shot at players[0].mo?
 	{
 		ob->hidden = false;
 		if ( (unsigned) US_RndT() < (tics<<1) && objfreelist)
@@ -1115,11 +1116,11 @@ ACTION_FUNCTION(T_Chase)
 	if(self->MissileState)
 	{
 		dodge = false;
-		if (CheckLine(self))      // got a shot at player?
+		if (CheckLine(self))      // got a shot at players[0].mo?
 		{
 			self->hidden = false;
-			dx = abs(self->tilex - player->tilex);
-			dy = abs(self->tiley - player->tiley);
+			dx = abs(self->tilex - players[0].mo->tilex);
+			dy = abs(self->tiley - players[0].mo->tiley);
 			dist = dx>dy ? dx : dy;
 
 			{
@@ -1130,10 +1131,10 @@ ACTION_FUNCTION(T_Chase)
 
 				if (dist == 1)
 				{
-					target = abs(self->x - player->x);
+					target = abs(self->x - players[0].mo->x);
 					if (target < 0x14000l)
 					{
-						target = abs(self->y - player->y);
+						target = abs(self->y - players[0].mo->y);
 						if (target < 0x14000l)
 							chance = 300;
 					}
@@ -1152,7 +1153,7 @@ ACTION_FUNCTION(T_Chase)
 			self->hidden = true;
 	}
 	else
-		self->hidden = !CheckMeleeRange(self, player);
+		self->hidden = !CheckMeleeRange(self, players[0].mo);
 
 	if (self->dir == nodir)
 	{
@@ -1174,7 +1175,7 @@ ACTION_FUNCTION(T_Chase)
 		//
 		// check for melee range
 		//
-		if(self->MeleeState && CheckMeleeRange(self, player))
+		if(self->MeleeState && CheckMeleeRange(self, players[0].mo))
 		{
 			PlaySoundLocActor(self->attacksound, self);
 			self->SetState(self->MeleeState);
@@ -1305,7 +1306,7 @@ ACTION_FUNCTION(T_Path)
 =
 = T_Shoot
 =
-= Try to damage the player, based on skill level and player's speed
+= Try to damage the players[0].mo, based on skill level and players[0].mo's speed
 =
 ===============
 */
@@ -1332,13 +1333,13 @@ ACTION_FUNCTION(A_WolfAttack)
 
 	runspeed *= 37.5;
 
-	if (!map->CheckLink(self->GetZone(), player->GetZone(), true))
+	if (!map->CheckLink(self->GetZone(), players[0].mo->GetZone(), true))
 		return;
 
-	if (CheckLine (self))                    // player is not behind a wall
+	if (CheckLine (self))                    // players[0].mo is not behind a wall
 	{
-		dx = abs(self->x - player->x);
-		dy = abs(self->y - player->y);
+		dx = abs(self->x - players[0].mo->x);
+		dy = abs(self->y - players[0].mo->y);
 		dist = dx>dy ? dx:dy;
 
 		dist = FixedMul(dist, snipe*FRACUNIT);
@@ -1347,14 +1348,14 @@ ACTION_FUNCTION(A_WolfAttack)
 		if (thrustspeed >= runspeed)
 		{
 			if (self->flags&FL_VISABLE)
-				hitchance = 160-dist*16;                // player can see to dodge
+				hitchance = 160-dist*16;                // players[0].mo can see to dodge
 			else
 				hitchance = 160-dist*8;
 		}
 		else
 		{
 			if (self->flags&FL_VISABLE)
-				hitchance = 256-dist*16;                // player can see to dodge
+				hitchance = 256-dist*16;                // players[0].mo can see to dodge
 			else
 				hitchance = 256-dist*8;
 		}
@@ -1409,9 +1410,9 @@ void T_Shoot(AActor *self)
 #if 0
 void SpawnBJVictory (void)
 {
-	SpawnNewObj (player->tilex,player->tiley+1,&s_bjrun1);
-	newobj->x = player->x;
-	newobj->y = player->y;
+	SpawnNewObj (players[0].mo->tilex,players[0].mo->tiley+1,&s_bjrun1);
+	newobj->x = players[0].mo->x;
+	newobj->y = players[0].mo->y;
 	newobj->obclass = bjobj;
 	newobj->dir = north;
 	newobj->temp1 = 6;                      // tiles to run forward
@@ -1520,11 +1521,11 @@ bool CheckPosition (AActor *ob)
 	int x,y,xl,yl,xh,yh;
 	MapSpot check;
 
-	xl = (ob->x-player->radius) >> TILESHIFT;
-	yl = (ob->y-player->radius) >> TILESHIFT;
+	xl = (ob->x-players[0].mo->radius) >> TILESHIFT;
+	yl = (ob->y-players[0].mo->radius) >> TILESHIFT;
 
-	xh = (ob->x+player->radius) >> TILESHIFT;
-	yh = (ob->y+player->radius) >> TILESHIFT;
+	xh = (ob->x+players[0].mo->radius) >> TILESHIFT;
+	yh = (ob->y+players[0].mo->radius) >> TILESHIFT;
 
 	//
 	// check for solid walls
@@ -1601,19 +1602,19 @@ void    A_StartDeathCam (objtype *ob)
 	//
 	// line angle up exactly
 	//
-	NewState (player,&s_deathcam);
+	NewState (players[0].mo,&s_deathcam);
 
-	player->x = gamestate.killx;
-	player->y = gamestate.killy;
+	players[0].mo->x = gamestate.killx;
+	players[0].mo->y = gamestate.killy;
 
-	dx = ob->x - player->x;
-	dy = player->y - ob->y;
+	dx = ob->x - players[0].mo->x;
+	dy = players[0].mo->y - ob->y;
 
 	fangle = (float) atan2((float) dy, (float) dx);          // returns -pi to pi
 	if (fangle<0)
 		fangle = (float) (M_PI*2+fangle);
 
-	player->angle = (short) (fangle/(M_PI*2)*ANGLES);
+	players[0].mo->angle = (short) (fangle/(M_PI*2)*ANGLES);
 
 	//
 	// try to position as close as possible without being in a wall
@@ -1621,18 +1622,18 @@ void    A_StartDeathCam (objtype *ob)
 	dist = 0x14000l;
 	do
 	{
-		xmove = FixedMul(dist,costable[player->angle]);
-		ymove = -FixedMul(dist,sintable[player->angle]);
+		xmove = FixedMul(dist,costable[players[0].mo->angle]);
+		ymove = -FixedMul(dist,sintable[players[0].mo->angle]);
 
-		player->x = ob->x - xmove;
-		player->y = ob->y - ymove;
+		players[0].mo->x = ob->x - xmove;
+		players[0].mo->y = ob->y - ymove;
 		dist += 0x1000;
 
-	} while (!CheckPosition (player));
-	plux = (word)(player->x >> UNSIGNEDSHIFT);                      // scale to fit in unsigned
-	pluy = (word)(player->y >> UNSIGNEDSHIFT);
-	player->tilex = (word)(player->x >> TILESHIFT);         // scale to tile values
-	player->tiley = (word)(player->y >> TILESHIFT);
+	} while (!CheckPosition (players[0].mo));
+	plux = (word)(players[0].mo->x >> UNSIGNEDSHIFT);                      // scale to fit in unsigned
+	pluy = (word)(players[0].mo->y >> UNSIGNEDSHIFT);
+	players[0].mo->tilex = (word)(players[0].mo->x >> TILESHIFT);         // scale to tile values
+	players[0].mo->tiley = (word)(players[0].mo->y >> TILESHIFT);
 
 	//
 	// go back to the game

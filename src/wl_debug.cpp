@@ -13,6 +13,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "actor.h"
+#include "wl_agent.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -174,7 +175,7 @@ void BasicOverhead (void)
 		}
 	}
 
-	VWB_Bar(player->tilex*z+offx,player->tiley*z+offy,z,z,15); // player
+	VWB_Bar(players[0].mo->tilex*z+offx,players[0].mo->tiley*z+offy,z,z,15); // players[0].mo
 
 	// resize the border to match
 
@@ -457,21 +458,21 @@ int DebugKeys (void)
 	{
 		char str[60];
 		CenterWindow (14,6);
-		US_Print ("x:");     US_PrintUnsigned (player->x);
-		US_Print (" (");     US_PrintUnsigned (player->x%65536);
-		US_Print (")\ny:");  US_PrintUnsigned (player->y);
-		US_Print (" (");     US_PrintUnsigned (player->y%65536);
-		US_Print (")\nA:");  US_PrintUnsigned (player->angle);
-		US_Print (" X:");    US_PrintUnsigned (player->tilex);
-		US_Print (" Y:");    US_PrintUnsigned (player->tiley);
-		//US_Print ("\n1:");   US_PrintUnsigned (tilemap[player->tilex][player->tiley]);
-		//sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[player->tilex][player->tiley]); US_Print(str);
-		//US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(player->tilex,player->tiley,1));
+		US_Print ("x:");     US_PrintUnsigned (players[0].mo->x);
+		US_Print (" (");     US_PrintUnsigned (players[0].mo->x%65536);
+		US_Print (")\ny:");  US_PrintUnsigned (players[0].mo->y);
+		US_Print (" (");     US_PrintUnsigned (players[0].mo->y%65536);
+		US_Print (")\nA:");  US_PrintUnsigned (players[0].mo->angle);
+		US_Print (" X:");    US_PrintUnsigned (players[0].mo->tilex);
+		US_Print (" Y:");    US_PrintUnsigned (players[0].mo->tiley);
+		//US_Print ("\n1:");   US_PrintUnsigned (tilemap[players[0].mo->tilex][players[0].mo->tiley]);
+		//sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[players[0].mo->tilex][players[0].mo->tiley]); US_Print(str);
+		//US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(players[0].mo->tilex,players[0].mo->tiley,1));
 		//US_Print (" 3:");
-		//if ((unsigned)(uintptr_t)actorat[player->tilex][player->tiley] < 256)
-		//	US_PrintUnsigned (spotvis[player->tilex][player->tiley]);
+		//if ((unsigned)(uintptr_t)actorat[players[0].mo->tilex][players[0].mo->tiley] < 256)
+		//	US_PrintUnsigned (spotvis[players[0].mo->tilex][players[0].mo->tiley]);
 		//else
-		//	US_PrintUnsigned (actorat[player->tilex][player->tiley]->flags);
+		//	US_PrintUnsigned (actorat[players[0].mo->tilex][players[0].mo->tiley]->flags);
 		VW_UpdateScreen();
 		IN_Ack();
 		return 1;
@@ -506,7 +507,7 @@ int DebugKeys (void)
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
 		GivePoints (100000);
-		gamestate.health = 100;
+		players[0].health = 100;
 		DrawHealth();
 		DrawFace();
 		if (gamestate.bestweapon<wp_chaingun)
@@ -791,12 +792,12 @@ void ViewMap (void)
 	//      button0held = false;
 
 
-	maporgx = player->tilex - VIEWTILEX/2;
+	maporgx = players[0].mo->tilex - VIEWTILEX/2;
 	if (maporgx<0)
 		maporgx = 0;
 	if (maporgx>MAPSIZE-VIEWTILEX)
 		maporgx=MAPSIZE-VIEWTILEX;
-	maporgy = player->tiley - VIEWTILEY/2;
+	maporgy = players[0].mo->tiley - VIEWTILEY/2;
 	if (maporgy<0)
 		maporgy = 0;
 	if (maporgy>MAPSIZE-VIEWTILEY)

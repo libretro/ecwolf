@@ -334,3 +334,56 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		}
 	}
 }
+
+void SimpleScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
+{
+	if(actor->sprite == SPR_NONE)
+		return;
+
+	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
+	FTexture *tex;
+	if(spr.rotations == 0)
+		tex = TexMan[spr.texture[0]];
+	else
+		tex = TexMan[spr.texture[(CalcRotate(actor)+4)%8]];
+	if(tex == NULL)
+		return;
+
+	const BYTE *colormap = NormalLight.Maps;
+
+	const unsigned int scale = height>>1;
+
+	const double dyScale = height/64.0;
+	const double dxScale = CorrectWidthFactor(height/64.0);
+
+	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
+	const int upperedge = (viewheight/2)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
+
+	const unsigned int startX = -MIN(actx, 0);
+	const unsigned int startY = -MIN(upperedge, 0);
+	const fixed xStep = (1/dxScale)*FRACUNIT;
+	const fixed yStep = (1/dyScale)*FRACUNIT;
+
+	const BYTE *src;
+	byte *dest;
+	unsigned int i, j;
+	fixed x, y;
+	for(i = startX, x = startX*xStep;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	{
+		src = tex->GetColumn(x>>FRACBITS, NULL);
+		dest = vbuf+actx+i;
+		if(actx+i >= viewwidth)
+			break;
+		if(upperedge > 0)
+			dest += vbufPitch*upperedge;
+
+		for(j = startY, y = startY*yStep;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		{
+			if(upperedge+j >= viewheight)
+				break;
+			if(src[y>>FRACBITS] != 0)
+				*dest = colormap[src[y>>FRACBITS]];
+			dest += vbufPitch;
+		}
+	}
+}

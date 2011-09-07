@@ -8,6 +8,7 @@
 #include "m_random.h"
 #include "actor.h"
 #include "thingdef/thingdef_expression.h"
+#include "wl_agent.h"
 
 /*
 =============================================================================
@@ -301,7 +302,7 @@ bool TryWalk (AActor *ob)
 = SelectDodgeDir
 =
 = Attempts to choose and initiate a movement for ob that sends it towards
-= the player while dodging
+= the players[0].mo while dodging
 =
 = If there is no possible move (ob is totally surrounded)
 =
@@ -336,8 +337,8 @@ void SelectDodgeDir (objtype *ob)
 	else
 		turnaround=opposite[ob->dir];
 
-	deltax = player->tilex - ob->tilex;
-	deltay = player->tiley - ob->tiley;
+	deltax = players[0].mo->tilex - ob->tilex;
+	deltay = players[0].mo->tiley - ob->tiley;
 
 	//
 	// arange 5 direction choices in order of preference
@@ -443,8 +444,8 @@ void SelectChaseDir (objtype *ob)
 	olddir=ob->dir;
 	turnaround=opposite[olddir];
 
-	deltax=player->tilex - ob->tilex;
-	deltay=player->tiley - ob->tiley;
+	deltax=players[0].mo->tilex - ob->tilex;
+	deltay=players[0].mo->tiley - ob->tiley;
 
 	d[1]=nodir;
 	d[2]=nodir;
@@ -550,8 +551,8 @@ void SelectRunDir (objtype *ob)
 	dirtype tdir;
 
 
-	deltax=player->tilex - ob->tilex;
-	deltay=player->tiley - ob->tiley;
+	deltax=players[0].mo->tilex - ob->tilex;
+	deltay=players[0].mo->tiley - ob->tiley;
 
 	if (deltax<0)
 		d[1]= east;
@@ -662,10 +663,10 @@ void MoveObj (objtype *ob, int32_t move)
 	//
 	// check to make sure it's not on top of player
 	//
-	if (map->CheckLink(ob->GetZone(), player->GetZone(), true))
+	if (map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
 	{
-		fixed r = ob->radius + player->radius;
-		if (ob->hidden || abs(ob->x - player->x) > r || abs(ob->y - player->y) > r)
+		fixed r = ob->radius + players[0].mo->radius;
+		if (ob->hidden || abs(ob->x - players[0].mo->x) > r || abs(ob->y - players[0].mo->y) > r)
 			goto moveok;
 
 		if (ob->damage)
@@ -854,8 +855,8 @@ bool CheckLine (AActor *ob)
 
 	x2 = plux;
 	y2 = pluy;
-	xt2 = player->tilex;
-	yt2 = player->tiley;
+	xt2 = players[0].mo->tilex;
+	yt2 = players[0].mo->tiley;
 
 	xdist = abs(xt2-xt1);
 
@@ -989,16 +990,16 @@ bool CheckSight (AActor *ob)
 	int32_t deltax,deltay;
 
 	//
-	// don't bother tracing a line if the area isn't connected to the player's
+	// don't bother tracing a line if the area isn't connected to the players[0].mo's
 	//
-	if (!map->CheckLink(ob->GetZone(), player->GetZone(), true))
+	if (!map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
 		return false;
 
 	//
-	// if the player is real close, sight is automatic
+	// if the players[0].mo is real close, sight is automatic
 	//
-	deltax = player->x - ob->x;
-	deltay = player->y - ob->y;
+	deltax = players[0].mo->x - ob->x;
+	deltay = players[0].mo->y - ob->y;
 
 	if (deltax > -MINSIGHT && deltax < MINSIGHT
 		&& deltay > -MINSIGHT && deltay < MINSIGHT)
@@ -1091,7 +1092,7 @@ void FirstSighting (AActor *ob)
 =
 = SightPlayer
 =
-= Called by actors that ARE NOT chasing the player.  If the player
+= Called by actors that ARE NOT chasing the players[0].  If the player
 = is detected (by sight, noise, or proximity), the actor is put into
 = it's combat frame and true is returned.
 =
@@ -1125,7 +1126,7 @@ bool SightPlayer (AActor *ob)
 	}
 	else
 	{
-		if (!map->CheckLink(ob->GetZone(), player->GetZone(), true))
+		if (!map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
 			return false;
 
 		if (ob->flags & FL_AMBUSH)

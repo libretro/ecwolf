@@ -38,6 +38,8 @@
 #include "id_ca.h"
 #include "thinker.h"
 #include "thingdef/thingdef.h"
+#include "wl_agent.h"
+#include "id_us.h"
 
 Frame::~Frame()
 {
@@ -102,7 +104,7 @@ LinkedList<AActor *> AActor::actors;
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
 AActor::AActor(const ClassDef *type) : classType(type), distance(0),
-	dir(nodir), soundZone(NULL), inventory(NULL)
+	dir(nodir), soundZone(NULL), inventory(NULL), dropdefined(false)
 {
 	// This will be called for each actor AFTER copying the defaults.
 	// Use InitClean for any one time construction.
@@ -111,6 +113,9 @@ AActor::AActor(const ClassDef *type) : classType(type), distance(0),
 AActor::~AActor()
 {
 	RemoveFromWorld();
+
+	if(dropdefined)
+		delete dropitems;
 }
 
 void AActor::AddInventory(AInventory *item)
@@ -148,6 +153,26 @@ void AActor::Die()
 	if(flags & FL_COUNTKILL)
 		gamestate.killcount++;
 	flags &= ~FL_SHOOTABLE;
+
+	if(dropitems)
+	{
+		DropList::Node *item = dropitems->Head();
+		do
+		{
+			DropItem &drop = item->Item();
+			if(US_RndT() < drop.probabilty)
+			{
+				const ClassDef *cls = ClassDef::FindClass(drop.className);
+				if(cls)
+				{
+					AActor *actor = AActor::Spawn(cls, (tilex<<TILESHIFT)+TILEGLOBAL/2, (tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
+					actor->angle = angle;
+					actor->dir = dir;
+				}
+			}
+		}
+		while((item = item->Next()));
+	}
 
 	if(DeathState)
 		SetState(DeathState);

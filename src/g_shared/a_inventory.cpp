@@ -36,6 +36,7 @@
 #include "id_sd.h"
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
+#include "wl_agent.h"
 
 IMPLEMENT_CLASS(Inventory, Actor)
 
@@ -140,16 +141,16 @@ bool AHealth::TryPickup(AActor *toucher)
 
 	unsigned int max = maxamount;
 	if(max == 0)
-		max = player->health;
-	printf("%d %d %d %d\n", amount, maxamount, player->health, gamestate.health);
+		max = toucher->health;
+	printf("%d %d %d %d\n", amount, maxamount, toucher->health, toucher->player->health);
 
-	if(gamestate.health >= max)
+	if(toucher->player->health >= max)
 		return false;
 	else
 	{
-		gamestate.health += amount;
-		if(gamestate.health > max)
-			gamestate.health = max;
+		toucher->player->health += amount;
+		if(toucher->player->health > max)
+			toucher->player->health = max;
 		DrawHealth();
 		DrawFace();
 		Destroy();
