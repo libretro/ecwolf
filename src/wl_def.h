@@ -158,8 +158,6 @@ void Quit(const char *errorStr, ...);
 	#define LRpack      20
 #endif
 
-#define NUMLATCHPICS    100
-
 #undef M_PI
 #define PI              3.141592657
 #define M_PI PI
@@ -940,7 +938,6 @@ void            ShutdownId (void);
 
 extern  gametype        gamestate;
 extern  byte            bordercol;
-extern  SDL_Surface     *latchpics[NUMLATCHPICS];
 extern  char            demoname[13];
 
 void    SetupGameLevel (void);

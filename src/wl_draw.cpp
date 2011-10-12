@@ -1476,7 +1476,9 @@ void    ThreeDRefresh (void)
 	map->ClearVisibility();
 
 	vbuf = VL_LockSurface(screenBuffer);
-	vbuf+=screenofs;
+	if(vbuf == NULL) return;
+
+	vbuf += screenofs;
 	vbufPitch = bufferPitch;
 
 	CalcViewVariables();

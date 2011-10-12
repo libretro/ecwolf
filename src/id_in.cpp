@@ -23,6 +23,7 @@
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
+#include "id_vh.h"
 
 
 /*
@@ -65,6 +66,7 @@ int JoyNumButtons;
 static int JoyNumHats;
 
 static bool GrabInput = false;
+static bool NeedRestore = false;
 
 /*
 =============================================================================
@@ -331,7 +333,24 @@ static void processEvent(SDL_Event *event)
 			break;
 		}
 
-#ifdef GP2X
+		case SDL_ACTIVEEVENT:
+		{
+			if(fullscreen && (event->active.state & SDL_APPACTIVE) != 0)
+			{
+					if(event->active.gain)
+					{
+						if(NeedRestore)
+						{
+							LoadLatchMem();
+						}
+
+						NeedRestore = false;
+					}
+					else NeedRestore = true;
+			}
+		}
+
+#if defined(GP2X)
 		case SDL_JOYBUTTONDOWN:
 			GP2X_ButtonDown(event->jbutton.button);
 			break;

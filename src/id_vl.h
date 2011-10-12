@@ -46,9 +46,6 @@ void VL_FadeIn      (int start, int end, SDL_Color *palette, int steps);
 byte *VL_LockSurface(SDL_Surface *surface);
 void VL_UnlockSurface(SDL_Surface *surface);
 
-#define LOCK() VL_LockSurface(curSurface)
-#define UNLOCK() VL_UnlockSurface(curSurface)
-
 byte VL_GetPixel        (int x, int y);
 void VL_Plot            (int x, int y, int color);
 void VL_Hlin            (unsigned x, unsigned y, unsigned width, int color);
