@@ -266,7 +266,7 @@ typedef struct{
 	unsigned int wavetable;
 
 	// ECWOLF ------------------------------------------------------------------
-	int		playVolume;
+	const int	*playVolume;
 } OPL_SLOT;
 
 typedef struct{
@@ -965,7 +965,7 @@ INLINE void OPL_CALC_CH( OPL_CH *CH )
 	SLOT++;
 	env = volume_calc(SLOT);
 	if( env < ENV_QUIET )
-		output[0] += op_calc(SLOT->Cnt, env, phase_modulation, SLOT->wavetable)*MULTIPLY_VOLUME(SLOT->playVolume);
+		output[0] += op_calc(SLOT->Cnt, env, phase_modulation, SLOT->wavetable)*MULTIPLY_VOLUME(*SLOT->playVolume);
 }
 
 /*
@@ -1351,9 +1351,9 @@ static void OPL_initalize(FM_OPL *OPL)
 
 }
 
-INLINE void FM_KEYON(OPL_SLOT *SLOT, UINT32 key_set, int volume=MAX_VOLUME)
+INLINE void FM_KEYON(OPL_SLOT *SLOT, UINT32 key_set, const int &volume)
 {
-	SLOT->playVolume = volume;
+	SLOT->playVolume = &volume;
 	if( !SLOT->key )
 	{
 		/* restart Phase Generator */
@@ -1476,7 +1476,7 @@ INLINE void set_sl_rr(FM_OPL *OPL,int slot,int v)
 
 
 /* write a value v to register r on OPL chip */
-static void OPLWriteReg(FM_OPL *OPL, int r, int v, int volume=MAX_VOLUME)
+static void OPLWriteReg(FM_OPL *OPL, int r, int v, const int &volume)
 {
 	OPL_CH *CH;
 	int slot;
@@ -1855,11 +1855,11 @@ static void OPLResetChip(FM_OPL *OPL)
 	OPL_STATUS_RESET(OPL,0x7f);
 
 	/* reset with register write */
-	OPLWriteReg(OPL,0x01,0); /* wavesel disable */
-	OPLWriteReg(OPL,0x02,0); /* Timer1 */
-	OPLWriteReg(OPL,0x03,0); /* Timer2 */
-	OPLWriteReg(OPL,0x04,0); /* IRQ mask clear */
-	for(i = 0xff ; i >= 0x20 ; i-- ) OPLWriteReg(OPL,i,0);
+	OPLWriteReg(OPL,0x01,0,MAX_VOLUME); /* wavesel disable */
+	OPLWriteReg(OPL,0x02,0,MAX_VOLUME); /* Timer1 */
+	OPLWriteReg(OPL,0x03,0,MAX_VOLUME); /* Timer2 */
+	OPLWriteReg(OPL,0x04,0,MAX_VOLUME); /* IRQ mask clear */
+	for(i = 0xff ; i >= 0x20 ; i-- ) OPLWriteReg(OPL,i,0,MAX_VOLUME);
 
 	/* reset operator parameters */
 	for( c = 0 ; c < 9 ; c++ )
@@ -1970,7 +1970,7 @@ static int OPLWrite(FM_OPL *OPL,int a,int v)
 	else
 	{	/* data port */
 		if(OPL->UpdateHandler) OPL->UpdateHandler(OPL->UpdateParam,0);
-		OPLWriteReg(OPL,OPL->address,v);
+		OPLWriteReg(OPL,OPL->address,v,MAX_VOLUME);
 	}
 	return OPL->status>>7;
 }
@@ -2044,8 +2044,8 @@ static unsigned char OPLRead(FM_OPL *OPL,int a)
 /* CSM Key Controll */
 INLINE void CSMKeyControll(OPL_CH *CH)
 {
-	FM_KEYON (&CH->SLOT[SLOT1], 4);
-	FM_KEYON (&CH->SLOT[SLOT2], 4);
+	FM_KEYON (&CH->SLOT[SLOT1], 4, MAX_VOLUME);
+	FM_KEYON (&CH->SLOT[SLOT2], 4, MAX_VOLUME);
 
 	/* The key off should happen exactly one sample later - not implemented correctly yet */
 
@@ -2129,7 +2129,7 @@ void YM3812ResetChip(int which)
 	OPLResetChip(OPL_YM3812[which]);
 }
 
-int YM3812Write(int which, int a, int v, int volume)
+int YM3812Write(int which, int a, int v, const int &volume)
 {
 	OPLWriteReg(OPL_YM3812[which], a, v, volume);
 	return (OPL_YM3812[which]->status>>7);

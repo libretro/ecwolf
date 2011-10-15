@@ -10,8 +10,8 @@
 
 #include "wl_def.h"
 
-#define alOut(n,b) 		YM3812Write(0, n, b, AdlibVolume)
-#define alOutMusic(n,b)	YM3812Write(0, n, b, MusicVolume)
+#define alOut(n,b) 		YM3812Write(oplChip, n, b, AdlibVolume)
+#define alOutMusic(n,b)	YM3812Write(oplChip, n, b, MusicVolume)
 
 #define TickBase        70      // 70Hz per tick - used as a base for timer 0
 
@@ -119,8 +119,11 @@ extern  boolean         AdLibPresent,
 extern  SDMode          SoundMode;
 extern  SDSMode         DigiMode;
 extern  SMMode          MusicMode;
-#define MAX_VOLUME		20
-#define MULTIPLY_VOLUME(v)((double(v)+0.3)/(MAX_VOLUME+0.3))
+static const int MAX_VOLUME = 20;
+static inline double MULTIPLY_VOLUME(const int &v)
+{
+	return (double(v)+0.3)/(MAX_VOLUME+0.3);
+}
 extern	int				AdlibVolume;
 extern	int				MusicVolume;
 extern	int				SoundVolume;

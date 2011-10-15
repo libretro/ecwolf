@@ -45,7 +45,7 @@ void VWB_DrawPropString(const char* string)
 		source = ((byte *)font)+font->location[ch];
 		while (width--)
 		{
-			for(int i=0;i<height;i++)
+			for(i=0; i<height; i++)
 			{
 				if(source[i*step])
 				{

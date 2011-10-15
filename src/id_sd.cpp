@@ -33,7 +33,11 @@
 #include "zstring.h"
 #pragma pack(1)
 #include "id_sd.h"
-#include "fmopl.h"
+#ifdef USE_GPL
+#include "dosbox/dbopl.h"
+#else
+#include "mame/fmopl.h"
+#endif
 
 #define ORIGSAMPLERATE 7042
 
@@ -109,6 +113,70 @@ static  int                     sqHackLen;
 static  int                     sqHackSeqLen;
 static  longword                sqHackTime;
 
+#ifdef USE_GPL
+
+DBOPL::Chip oplChip;
+
+static inline bool YM3812Init(int numChips, int clock, int rate)
+{
+	oplChip.Setup(rate);
+	return false;
+}
+
+static inline void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const int &volume)
+{
+	which.SetVolume(volume);
+	which.WriteReg(reg, val);
+}
+
+static inline void YM3812UpdateOne(DBOPL::Chip &which, int16_t *stream, int length)
+{
+	Bit32s buffer[512 * 2];
+	int i;
+
+	// length is at maximum samplesPerMusicTick = param_samplerate / 700
+	// so 512 is sufficient for a sample rate of 358.4 kHz (default 44.1 kHz)
+	if(length > 512)
+		length = 512;
+
+	if(which.opl3Active)
+	{
+		which.GenerateBlock3(length, buffer);
+
+		// GenerateBlock3 generates a number of "length" 32-bit stereo samples
+		// so we only need to convert them to 16-bit samples
+		for(i = 0; i < length * 2; i++)  // * 2 for left/right channel
+		{
+			// Multiply by 4 to match loudness of MAME emulator.
+			Bit32s sample = buffer[i] << 2;
+			if(sample > 32767) sample = 32767;
+			else if(sample < -32768) sample = -32768;
+			stream[i] = sample;
+		}
+	}
+	else
+	{
+		which.GenerateBlock2(length, buffer);
+
+		// GenerateBlock3 generates a number of "length" 32-bit mono samples
+		// so we need to convert them to 32-bit stereo samples
+		for(i = 0; i < length; i++)
+		{
+			// Multiply by 4 to match loudness of MAME emulator.
+			// Then upconvert to stereo.
+			Bit32s sample = buffer[i] << 2;
+			if(sample > 32767) sample = 32767;
+			else if(sample < -32768) sample = -32768;
+			stream[i * 2] = stream[i * 2 + 1] = (int16_t) sample;
+		}
+	}
+}
+
+#else
+
+static const int oplChip = 0;
+
+#endif
 
 static void SDL_SoundFinished(void)
 {
@@ -891,7 +959,7 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 {
 	int stereolen = len>>1;
 	int sampleslen = stereolen>>1;
-	INT16 *stream16 = (INT16 *) (void *) stream;    // expect correct alignment
+	int16_t *stream16 = (int16_t *) (void *) stream;    // expect correct alignment
 
 	while(1)
 	{
@@ -899,13 +967,13 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 		{
 			if(numreadysamples<sampleslen)
 			{
-				YM3812UpdateOne(0, stream16, numreadysamples);
+				YM3812UpdateOne(oplChip, stream16, numreadysamples);
 				stream16 += numreadysamples*2;
 				sampleslen -= numreadysamples;
 			}
 			else
 			{
-				YM3812UpdateOne(0, stream16, sampleslen);
+				YM3812UpdateOne(oplChip, stream16, sampleslen);
 				numreadysamples -= sampleslen;
 				return;
 			}
@@ -995,9 +1063,9 @@ SD_Startup(void)
 	}
 
 	for(i=1;i<0xf6;i++)
-		YM3812Write(0,i,0);
+		YM3812Write(oplChip,i,0,MAX_VOLUME);
 
-	YM3812Write(0,1,0x20); // Set WSE=1
+	YM3812Write(oplChip,1,0x20,MAX_VOLUME); // Set WSE=1
 //    YM3812Write(0,8,0); // Set CSM=0 & SEL=0		 // already set in for statement
 
 	Mix_HookMusic(SDL_IMFMusicPlayer, 0);

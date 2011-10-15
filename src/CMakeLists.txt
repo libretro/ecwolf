@@ -15,6 +15,7 @@ include_directories(
 option(SPEAR "Spear of Destiny")
 option(SPEARDEMO "Spear of Destiny Demo")
 option(WOLF3DSW "Wolfenstein 3D Shareware")
+option(GPL "Build GPL edition")
 
 if(SPEAR)
 	add_definitions(-DSPEAR)
@@ -26,6 +27,13 @@ else(SPEAR)
 		add_definitions(-DUPLOAD)
 	endif(WOLF3DSW)
 endif(SPEAR)
+
+if(GPL)
+	add_definitions(-DUSE_GPL)
+	set(OPL_SOURCES dosbox/dbopl.cpp)
+else(GPL)
+	set(OPL_SOURCES mame/fmopl.cpp)
+endif(GPL)
 
 find_package(SDL REQUIRED)
 find_package(SDL_mixer REQUIRED)
@@ -49,6 +57,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(ecwolf WIN32
+	${OPL_SOURCES}
 	g_shared/a_inventory.cpp
 	g_shared/a_patrolpoint.cpp
 	g_shared/a_playerpawn.cpp
@@ -99,7 +108,6 @@ add_executable(ecwolf WIN32
 	c_cvars.cpp
 	file.cpp
 	files.cpp
-	fmopl.cpp
 	gamemap.cpp
 	gamemap_planes.cpp
 	gamemap_uwmf.cpp
