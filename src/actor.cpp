@@ -277,7 +277,10 @@ void AActor::Tick()
 void AActor::RemoveFromWorld()
 {
 	if(actorRef)
+	{
 		actors.Remove(actorRef);
+		actorRef = NULL;
+	}
 	if(thinker)
 	{
 		thinker->Disable();
@@ -306,6 +309,11 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 	if(actor->flags & FL_COUNTKILL)
 		++gamestate.killtotal;
 	return actor;
+}
+
+AActor *AActor::__InPlaceConstructor(const ClassDef *classDef, void *mem)
+{
+	return new (mem) AActor(classDef);
 }
 
 DEFINE_SYMBOL(Actor, angle)

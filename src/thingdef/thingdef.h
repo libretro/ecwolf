@@ -137,6 +137,7 @@ struct PropDef
 {
 	public:
 		const ClassDef* const	className;
+		const char* const		prefix;
 		const char* const		name;
 		const char* const		params;
 		PropHandler				handler;
@@ -172,10 +173,9 @@ class ClassDef
 			definition->parent = parent;
 			definition->defaultInstance->~AActor();
 			free(definition->defaultInstance);
+			definition->defaultInstance = NULL;
 			definition->defaultInstance = (AActor *) malloc(sizeof(T));
-			definition->defaultInstance = new (definition->defaultInstance) T(definition);
-			definition->defaultInstance->defaults = definition->defaultInstance;
-			definition->defaultInstance->InitClean();
+			definition->ConstructNative = &T::__InPlaceConstructor;
 			return definition;
 		}
 
@@ -217,6 +217,7 @@ class ClassDef
 		SymbolTable		symbols;
 
 		AActor			*defaultInstance;
+		AActor			*(*ConstructNative)(const ClassDef *, void *);
 };
 
 #endif /* __THINGDEF_H__ */

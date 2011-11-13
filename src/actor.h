@@ -47,11 +47,12 @@
 	protected: \
 		A##name(const ClassDef *classType) : A##parent(classType) {} \
 		virtual size_t __GetSize() const { return sizeof(A##name); } \
-		virtual AActor *__NewNativeInstance(const ClassDef *classType, void *mem) { return new (mem) A##name(classType); } \
+		static AActor *__InPlaceConstructor(const ClassDef *classType, void *mem); \
 	public: \
 		static const ClassDef *__StaticClass;
 #define IMPLEMENT_CLASS(name, parent) \
-	const ClassDef *A##name::__StaticClass = ClassDef::DeclareNativeClass<A##name>(#name, A##parent::__StaticClass);
+	const ClassDef *A##name::__StaticClass = ClassDef::DeclareNativeClass<A##name>(#name, A##parent::__StaticClass); \
+	AActor *A##name::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new (mem) A##name(classType); }
 #define NATIVE_CLASS(name) A##name::__StaticClass
 
 class CallArguments;
@@ -183,7 +184,7 @@ class AActor
 	protected:
 		AActor(const ClassDef *type);
 		virtual size_t __GetSize() const { return sizeof(AActor); }
-		virtual AActor *__NewNativeInstance(const ClassDef *classType, void *mem) { return new (mem) AActor(classType); }
+		static AActor *__InPlaceConstructor(const ClassDef *classType, void *mem);
 };
 
 #endif

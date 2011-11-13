@@ -240,25 +240,27 @@ HANDLE_PROPERTY(MONSTER)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DEFINE_PROP(name, class, params) { class::__StaticClass, #name, #params, __Handler_##name }
+#define DEFINE_PROP_PREFIX(name, class, prefix, params) { A##class::__StaticClass, #prefix, #name, #params, __Handler_##name }
+#define DEFINE_PROP(name, class, params) DEFINE_PROP_PREFIX(name, class, class, params)
+
 extern const PropDef properties[] =
 {
-	DEFINE_PROP(amount, AInventory, I),
-	DEFINE_PROP(attacksound, AActor, S),
-	DEFINE_PROP(damage, AActor, I),
-	DEFINE_PROP(deathsound, AActor, S),
-	DEFINE_PROP(dropitem, AActor, S_II),
-	DEFINE_PROP(health, AActor, I_IIIIIIII),
-	DEFINE_PROP(maxamount, AInventory, I),
-	DEFINE_PROP(maxhealth, APlayerPawn, I),
-	DEFINE_PROP(MONSTER, AActor,),
-	DEFINE_PROP(pickupsound, AInventory, S),
-	DEFINE_PROP(points, AActor, I),
-	DEFINE_PROP(radius, AActor, I),
-	DEFINE_PROP(seesound, AActor, S),
-	DEFINE_PROP(sighttime, AActor, I_I),
-	DEFINE_PROP(speed, AActor, F_F),
-	DEFINE_PROP(startitem, APlayerPawn, S_I),
+	DEFINE_PROP(amount, Inventory, I),
+	DEFINE_PROP(attacksound, Actor, S),
+	DEFINE_PROP(damage, Actor, I),
+	DEFINE_PROP(deathsound, Actor, S),
+	DEFINE_PROP(dropitem, Actor, S_II),
+	DEFINE_PROP(health, Actor, I_IIIIIIII),
+	DEFINE_PROP(maxamount, Inventory, I),
+	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
+	DEFINE_PROP(MONSTER, Actor,),
+	DEFINE_PROP(pickupsound, Inventory, S),
+	DEFINE_PROP(points, Actor, I),
+	DEFINE_PROP(radius, Actor, I),
+	DEFINE_PROP(seesound, Actor, S),
+	DEFINE_PROP(sighttime, Actor, I_I),
+	DEFINE_PROP(speed, Actor, F_F),
+	DEFINE_PROP_PREFIX(startitem, PlayerPawn, Player, S_I),
 
 	{ NULL, NULL, NULL, NULL }
 };

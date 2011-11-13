@@ -214,7 +214,7 @@ AActor *ClassDef::CreateInstance() const
 
 	AActor *newactor = (AActor *) malloc(defaultInstance->__GetSize());
 	memcpy(newactor, defaultInstance, defaultInstance->__GetSize());
-	defaultInstance->__NewNativeInstance(this, newactor);
+	ConstructNative(this, newactor);
 	newactor->classType = this;
 	newactor->Init();
 	return newactor;
@@ -430,7 +430,7 @@ void ClassDef::LoadActors()
 			cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
 	}
 }
-
+#include "a_inventory.h"
 void ClassDef::ParseActor(Scanner &sc)
 {
 	// Read the header
@@ -454,8 +454,12 @@ void ClassDef::ParseActor(Scanner &sc)
 		if(newClass->parent == NULL)
 			sc.ScriptMessage(Scanner::ERROR, "Could not find parent actor '%s'\n", sc->str.GetChars());
 	}
-	else if(!previouslyDefined) // If no class was specified to inherit from, inherit from AActor, but not for AActor.
+	else
+	{
 		newClass->parent = NATIVE_CLASS(Actor);
+		if(newClass->parent == newClass) // If no class was specified to inherit from, inherit from AActor, but not for AActor.
+			newClass->parent = NULL;
+	}
 	if(sc.CheckToken(TK_IntConst))
 	{
 		classNumTable[sc->number] = newClass;
@@ -471,13 +475,26 @@ void ClassDef::ParseActor(Scanner &sc)
 		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
+		newClass->ConstructNative = newClass->parent->ConstructNative;
+
 		newClass->defaultInstance->~AActor();
 		free(newClass->defaultInstance);
 		newClass->defaultInstance = (AActor *) malloc(newClass->parent->defaultInstance->__GetSize());
 		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
-		newClass->defaultInstance = newClass->parent->defaultInstance->__NewNativeInstance(newClass, newClass->defaultInstance);
+		newClass->ConstructNative(newClass, newClass->defaultInstance);
 		newClass->defaultInstance->defaults = newClass->defaultInstance;
 		newClass->defaultInstance->Init(true);
+	}
+	else
+	{
+		// Copy the parents defaults for native classes
+		if(newClass->parent)
+			memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
+
+		// Initialize the default instance
+		newClass->ConstructNative(newClass, newClass->defaultInstance);
+		newClass->defaultInstance->defaults = newClass->defaultInstance;
+		newClass->defaultInstance->InitClean();
 	}
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
@@ -934,7 +951,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 		if(ret == 0)
 		{
 			if(newClass->IsDescendantOf(properties[mid].className) &&
-				stricmp(properties[mid].className->name.GetChars(), className) != 0)
+				stricmp(properties[mid].prefix, className) != 0)
 				sc.ScriptMessage(Scanner::ERROR, "Property %s.%s not available in this scope.\n", properties[mid].className->name.GetChars(), propName);
 
 			PropertyParam* params = new PropertyParam[strlen(properties[mid].params)];
