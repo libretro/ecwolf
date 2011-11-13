@@ -1039,8 +1039,8 @@ void CheckParameters(int argc, char *argv[])
 			}
 			else param_tedlevel = atoi(argv[i]);
 		}
-		else IFARG("--windowed")
-			fullscreen = false;
+		else IFARG("--fullscreen")
+			fullscreen = true;
 		else IFARG("--res")
 		{
 			if(i + 2 >= argc)
@@ -1210,7 +1210,7 @@ void CheckParameters(int argc, char *argv[])
 			" --normal               Sets the difficulty to normal for tedlevel\n"
 			" --hard                 Sets the difficulty to hard for tedlevel\n"
 			" --nowait               Skips intro screens\n"
-			" --windowed             Starts the game in a window\n"
+			" --fullscreen           Starts the game in fullscreen mode\n"
 			" --res <width> <height> Sets the screen resolution\n"
 			"                        (must be multiple of 320x200 or 320x240)\n"
 			" --resf <w> <h>         Sets any screen resolution >= 320x200\n"

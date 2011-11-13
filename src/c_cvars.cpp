@@ -42,7 +42,7 @@
 Aspect vid_aspect = ASPECT_4_3;
 boolean forcegrabmouse = false;
 boolean r_depthfog = false;
-boolean vid_fullscreen = true;
+boolean vid_fullscreen = false;
 
 void FinalReadConfig()
 {
@@ -98,7 +98,7 @@ void ReadConfig(void)
 	config->CreateSetting("MusicVolume", MAX_VOLUME);
 	config->CreateSetting("DigitizedVolume", MAX_VOLUME);
 	config->CreateSetting("R_DepthFog", false);
-	config->CreateSetting("Vid_FullScreen", true);
+	config->CreateSetting("Vid_FullScreen", false);
 
 #ifdef _arch_dreamcast
     DC_LoadFromVMU("ecwolf.cfg");
