@@ -151,7 +151,7 @@ class AActor
 
 		uint16_t	sighttime;
 		uint8_t		sightrandom;
-		FName		attacksound, deathsound, seesound;
+		FNameNoInit	attacksound, deathsound, seesound;
 
 		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState, *DeathState;
 		short       temp1,hidden;

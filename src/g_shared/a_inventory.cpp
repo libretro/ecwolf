@@ -44,7 +44,7 @@ IMPLEMENT_CLASS(Inventory, Actor)
 // in the actor's inventory.
 AInventory *AInventory::CreateCopy(AActor *holder)
 {
-	if(!GoesAway())
+	if(GoesAway())
 		return this;
 
 	AInventory *copy = reinterpret_cast<AInventory *>(classType->CreateInstance());
@@ -63,11 +63,11 @@ void AInventory::GoAwayAndDie()
 	}
 }
 
-// Returns false if this is safe to place into inventory.  True if it will be
+// Returns true if this is safe to place into inventory.  False if it will be
 // reused in the world.
 bool AInventory::GoesAway()
 {
-	return false;
+	return true;
 }
 
 // Returns true if the pickup was handled by an already existing inventory item.

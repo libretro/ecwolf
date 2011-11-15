@@ -45,7 +45,7 @@ class AInventory : public AActor
 		void			Touch(AActor *toucher);
 		virtual bool	Use();
 
-		FName			pickupsound;
+		FNameNoInit		pickupsound;
 		unsigned int	amount;
 		unsigned int	maxamount;
 	protected:
