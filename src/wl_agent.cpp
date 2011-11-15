@@ -42,8 +42,6 @@
 //
 int32_t         thrustspeed;
 
-word            plux,pluy;          // player coordinates scaled to unsigned
-
 short           anglefrac;
 
 objtype        *LastAttacker;
@@ -1256,8 +1254,6 @@ ACTION_FUNCTION(T_Attack)
 	if (gamestate.victoryflag)              // watching the BJ actor
 		return;
 
-	plux = (word) (players[0].mo->x >> UNSIGNEDSHIFT);                     // scale to fit in unsigned
-	pluy = (word) (players[0].mo->y >> UNSIGNEDSHIFT);
 	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
 	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
 
@@ -1355,8 +1351,6 @@ ACTION_FUNCTION(T_Player)
 	if (gamestate.victoryflag)              // watching the BJ actor
 		return;
 
-	plux = (word) (players[0].mo->x >> UNSIGNEDSHIFT);                     // scale to fit in unsigned
-	pluy = (word) (players[0].mo->y >> UNSIGNEDSHIFT);
 	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
 	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
 }

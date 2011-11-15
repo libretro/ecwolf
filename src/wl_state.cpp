@@ -853,8 +853,8 @@ bool CheckLine (AActor *ob)
 	xt1 = x1 >> 8;
 	yt1 = y1 >> 8;
 
-	x2 = plux;
-	y2 = pluy;
+	x2 = players[0].mo->x >> UNSIGNEDSHIFT;
+	y2 = players[0].mo->y >> UNSIGNEDSHIFT;
 	xt2 = players[0].mo->tilex;
 	yt2 = players[0].mo->tiley;
 

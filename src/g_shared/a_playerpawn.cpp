@@ -58,13 +58,14 @@ void APlayerPawn::GiveStartingInventory()
 		invItem->amount = inv.amount;
 		AddInventory(invItem);
 
-		if(!player->ReadyWeapon && cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
-		{
+		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
 			player->ReadyWeapon = (AWeapon *)invItem;
-			player->ReadyWeapon->SetState(invItem->FindState("Ready"));
-		}
 	}
 	while((item = item->Next()));
+
+	// Bring up weapon
+	if(player->ReadyWeapon)
+		player->ReadyWeapon->SetState(player->ReadyWeapon->FindState("Ready"));
 
 #if 1
 	AInventory *inv = inventory;

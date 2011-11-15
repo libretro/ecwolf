@@ -382,7 +382,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 
 bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 {
-	const ClassDef *currentParent = parent;
+	const ClassDef *currentParent = this->parent;
 	while(currentParent != NULL)
 	{
 		if(currentParent == parent)
@@ -430,7 +430,7 @@ void ClassDef::LoadActors()
 			cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
 	}
 }
-#include "a_inventory.h"
+
 void ClassDef::ParseActor(Scanner &sc)
 {
 	// Read the header

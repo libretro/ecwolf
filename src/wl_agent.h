@@ -14,7 +14,6 @@
 
 extern  short    anglefrac;
 extern  int      facecount, facetimes;
-extern  word     plux,pluy;         // player coordinates scaled to unsigned
 extern  int32_t  thrustspeed;
 extern  objtype  *LastAttacker;
 
