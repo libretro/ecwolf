@@ -36,7 +36,7 @@ actor FloorLamp 36
 {
 	radius 32
 	+SOLID
-	+FULLBRIGHT
+	+BRIGHT
 	states
 	{
 		Spawn:
@@ -47,7 +47,7 @@ actor FloorLamp 36
 
 actor Chandelier 37
 {
-	+FULLBRIGHT
+	+BRIGHT
 	states
 	{
 		Spawn:
@@ -152,6 +152,7 @@ actor BareTable 46
 
 actor CeilingLight 47
 {
+	+BRIGHT
 	states
 	{
 		Spawn:
@@ -162,6 +163,7 @@ actor CeilingLight 47
 
 actor RedCeilingLight 85
 {
+	+BRIGHT
 	states
 	{
 		Spawn:

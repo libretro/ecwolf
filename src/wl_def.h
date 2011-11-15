@@ -234,7 +234,7 @@ typedef enum
 	FL_FIRSTATTACK      = 0x00000020,
 	FL_AMBUSH           = 0x00000040,
 	FL_NONMARK          = 0x00000080,
-	FL_FULLBRIGHT       = 0x00000100,
+	FL_BRIGHT           = 0x00000100,
 #ifdef USE_DIR3DSPR
 	// you can choose one of the following values in wl_act1.cpp
 	// to make a static sprite a directional 3d sprite

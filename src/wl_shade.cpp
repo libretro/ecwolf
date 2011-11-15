@@ -5,6 +5,12 @@
 #include "wl_shade.h"
 #include "id_vl.h"
 
+#define SHADE_COUNT 32
+
+#define LSHADE_NOSHADING 0xff
+#define LSHADE_NORMAL 0
+#define LSHADE_FOG 5
+
 typedef struct {
 	uint8_t destRed, destGreen, destBlue;   // values between 0 and 255
 	uint8_t fogStrength;
@@ -133,7 +139,7 @@ void InitLevelShadeTable()
 
 int GetShade(int scale)
 {
-	int shade = (scale >> 1) / (((viewwidth * 3) >> 8) + 1 + LSHADE_flag);  // TODO: reconsider this...
+	int shade = (scale >> 1) / (((viewwidth * 4) >> 8) + 1 + LSHADE_flag);  // TODO: reconsider this...
 	if(shade > 32) shade = 32;
 	else if(shade < 1) shade = 1;
 	shade = 32 - shade;

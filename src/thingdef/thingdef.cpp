@@ -63,10 +63,10 @@ const struct FlagDef
 	DEFINE_FLAG(FL, AMBUSH, AActor, flags),
 	DEFINE_FLAG(FL, ATTACKMODE, AActor, flags),
 	DEFINE_FLAG(FL, BONUS, AActor, flags),
+	DEFINE_FLAG(FL, BRIGHT, AActor, flags),
 	DEFINE_FLAG(FL, CANUSEWALLS, AActor, flags),
 	DEFINE_FLAG(FL, COUNTKILL, AActor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, AActor, flags),
-	DEFINE_FLAG(FL, FULLBRIGHT, AActor, flags),
 	DEFINE_FLAG(FL, ISMONSTER, AActor, flags),
 	DEFINE_FLAG(FL, NEVERMARK, AActor, flags),
 	DEFINE_FLAG(FL, NONMARK, AActor, flags),
@@ -96,6 +96,7 @@ struct StateDefinition
 		char		sprite[5];
 		FString		frames;
 		int			duration;
+		bool			fullbright;
 		NextType	nextType;
 		FString		nextArg;
 		Frame::ActionCall	functions[2];
@@ -339,6 +340,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
 			thisFrame->frame = thisStateDef.frames[i]-'A';
 			thisFrame->duration = thisStateDef.duration;
+			thisFrame->fullbright = thisStateDef.fullbright;
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
@@ -582,11 +584,21 @@ void ClassDef::ParseActor(Scanner &sc)
 								sc.ScriptMessage(Scanner::ERROR, "Expected frame duration.");
 						}
 						thisState.functions[0].pointer = thisState.functions[1].pointer = NULL;
+						thisState.fullbright = false;
 
-						if(sc.CheckToken('}'))
-							goto FinishState;
-						else
-							sc.MustGetToken(TK_Identifier);
+						do
+						{
+							if(sc.CheckToken('}'))
+								goto FinishState;
+							else
+								sc.MustGetToken(TK_Identifier);
+
+							if(sc->str.CompareNoCase("bright") == 0)
+								thisState.fullbright = true;
+							else
+								break;
+						}
+						while(true);
 
 						if(thisState.nextType == StateDefinition::NORMAL)
 						{

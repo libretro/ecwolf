@@ -289,7 +289,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		return;
 
 	const BYTE *colormap;
-	if(!r_depthfog || actor->flags & FL_FULLBRIGHT)
+	if(!r_depthfog || (actor->flags & FL_BRIGHT) || frame->fullbright)
 		colormap = NormalLight.Maps;
 	else
 		colormap = &NormalLight.Maps[256*GetShade(height)];

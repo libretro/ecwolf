@@ -71,11 +71,11 @@ void Scale3DShaper(int x1, int x2, int shapenum, uint32_t flags, fixed ny1, fixe
 
 			if(wallheight[slinex]<(height>>12) && scale1 /*&& scale1<=maxscale*/)
 			{
-				byte *curshades;
-				if(flags & FL_FULLBRIGHT)
-					curshades = shadetable[0];
+				BYTE *curshades;
+				if(flags & FL_BRIGHT)
+					curshades = NormalLights.Maps;
 				else
-					curshades = shadetable[GetShade(scale1<<3)];
+					curshades = &NormalLights.Maps[256*GetShade(scale1<<3)];
 
 				pixheight=scale1*SPRITESCALEFACTOR;
 				upperedge=viewheight/2-scale1;

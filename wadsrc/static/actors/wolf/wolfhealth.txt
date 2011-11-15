@@ -37,7 +37,7 @@ actor Medikit : Health 58
 actor OneUp : Inventory 66
 {
 	inventory.pickupsound "misc/1up"
-	+FULLBRIGHT
+	+BRIGHT
 	states
 	{
 		Spawn:

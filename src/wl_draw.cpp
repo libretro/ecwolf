@@ -11,6 +11,7 @@
 #include "textures/textures.h"
 #include "c_cvars.h"
 #include "r_sprites.h"
+#include "r_data/colormaps.h"
 
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
@@ -310,7 +311,7 @@ void ScalePost()
 	int ywcount, yoffs, yw, yd, yendoffs;
 	byte col;
 
-	byte *curshades = shadetable[GetShade(wallheight[postx])];
+	BYTE *curshades = &NormalLight.Maps[256*GetShade(wallheight[postx])];
 
 	ywcount = yd = wallheight[postx] >> 3;
 	if(yd <= 0) yd = 100;
@@ -557,9 +558,9 @@ void VGAClearScreen (void)
 	if(r_depthfog)
 	{
 		for(y = 0; y < viewheight / 2; y++, ptr += vbufPitch)
-			memset(ptr, shadetable[GetShade((viewheight / 2 - y) << 3)][ceiling], viewwidth);
+			memset(ptr, NormalLight.Maps[(256*GetShade((viewheight / 2 - y) << 3)) + ceiling], viewwidth);
 		for(; y < viewheight; y++, ptr += vbufPitch)
-			memset(ptr, shadetable[GetShade((y - viewheight / 2) << 3)][0x19], viewwidth);
+			memset(ptr, NormalLight.Maps[(256*GetShade((y - viewheight / 2) << 3)) + 0x19], viewwidth);
 	}
 	else
 	{
@@ -624,11 +625,11 @@ void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
 	unsigned j;
 	byte col;
 
-	byte *curshades;
-	if(flags & FL_FULLBRIGHT)
-		curshades = shadetable[0];
+	BYTE *curshades;
+	if(flags & FL_BRIGHT)
+		curshades = NormalLight.Maps;
 	else
-		curshades = shadetable[GetShade(height)];
+		curshades = &NormalLight.Maps[256*GetShade(height)];
 
 	shape = (t_compshape *) PM_GetSprite(shapenum);
 
