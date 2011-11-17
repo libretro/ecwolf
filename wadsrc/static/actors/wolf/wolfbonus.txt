@@ -1,13 +1,6 @@
-actor Treasure : Inventory
+actor Cross : ScoreItem 62
 {
-	points 100
-	inventory.maxamount 0
-	+INVENTORY.AUTOACTIVATE
-}
-
-actor Cross : Treasure 62
-{
-	points 100
+	inventory.amount 100
 	inventory.pickupsound "treasure/cross/pickup"
 	states
 	{
@@ -17,9 +10,9 @@ actor Cross : Treasure 62
 	}
 }
 
-actor Chalice : Treasure 63
+actor Chalice : ScoreItem 63
 {
-	points 500
+	inventory.amount 500
 	inventory.pickupsound "treasure/chalice/pickup"
 	states
 	{
@@ -29,9 +22,9 @@ actor Chalice : Treasure 63
 	}
 }
 
-actor ChestofJewels : Treasure 64
+actor ChestofJewels : ScoreItem 64
 {
-	points 1000
+	inventory.amount 1000
 	inventory.pickupsound "treasure/bible/pickup"
 	states
 	{
@@ -41,9 +34,9 @@ actor ChestofJewels : Treasure 64
 	}
 }
 
-actor Crown : Treasure 65
+actor Crown : ScoreItem 65
 {
-	points 5000
+	inventory.amount 5000
 	inventory.pickupsound "treasure/crown/pickup"
 	states
 	{

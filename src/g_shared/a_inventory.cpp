@@ -151,8 +151,7 @@ bool AInventory::TryPickup(AActor *toucher)
 
 bool AInventory::Use()
 {
-	GivePoints(points);
-	return true;
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,3 +189,19 @@ IMPLEMENT_CLASS(Ammo, Inventory)
 ////////////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_CLASS(Weapon, Inventory)
+
+////////////////////////////////////////////////////////////////////////////////
+
+class AScoreItem : public AInventory
+{
+	DECLARE_NATIVE_CLASS(ScoreItem, Inventory)
+
+	protected:
+		bool TryPickup(AActor *toucher)
+		{
+			GivePoints(amount);
+			GoAwayAndDie();
+			return true;
+		}
+};
+IMPLEMENT_CLASS(ScoreItem, Inventory)

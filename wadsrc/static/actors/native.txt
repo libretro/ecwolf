@@ -46,6 +46,10 @@ actor Health : Inventory native
 	inventory.maxamount 0
 }
 
+actor ScoreItem : Inventory native
+{
+}
+
 actor Weapon : Inventory native
 {
 }
