@@ -136,7 +136,7 @@ typedef void (*PropHandler)(AActor *defaults, const unsigned int PARAM_COUNT, Pr
 struct PropDef
 {
 	public:
-		const ClassDef* const	className;
+		const ClassDef* const	&className;
 		const char* const		prefix;
 		const char* const		name;
 		const char* const		params;
@@ -197,7 +197,7 @@ class ClassDef
 	protected:
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
-		static bool	SetFlag(ClassDef *newClass, const char* flagName, bool set);
+		static bool	SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);

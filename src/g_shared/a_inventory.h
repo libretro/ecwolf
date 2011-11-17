@@ -43,7 +43,10 @@ class AInventory : public AActor
 
 	public:
 		void			Touch(AActor *toucher);
+		virtual bool	TryPickup(AActor *toucher);
 		virtual bool	Use();
+
+		flagstype_t		itemFlags;
 
 		FNameNoInit		pickupsound;
 		unsigned int	amount;
@@ -53,7 +56,7 @@ class AInventory : public AActor
 		void				GoAwayAndDie();
 		bool				GoesAway();
 		virtual bool		HandlePickup(AInventory *item, bool &good);
-		virtual bool		TryPickup(AActor *toucher);
+		void				InitClean();
 };
 
 class AAmmo : public AInventory

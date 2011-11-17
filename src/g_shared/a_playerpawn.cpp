@@ -55,8 +55,10 @@ void APlayerPawn::GiveStartingInventory()
 			continue;
 
 		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0);
+		invItem->RemoveFromWorld();
 		invItem->amount = inv.amount;
-		AddInventory(invItem);
+		if(!invItem->TryPickup(this))
+			invItem->Destroy();
 
 		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
 			player->ReadyWeapon = (AWeapon *)invItem;

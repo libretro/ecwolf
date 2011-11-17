@@ -116,6 +116,7 @@ class AActor
 		const Frame		*FindState(const FName &name) const;
 		const MapZone	*GetZone() const { return soundZone; }
 		void			RemoveFromWorld();
+		void			RemoveInventory(AInventory *item);
 		void			SetState(const Frame *state, bool notic=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
 		virtual void	Tick();

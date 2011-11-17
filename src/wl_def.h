@@ -261,6 +261,8 @@ typedef enum
 	FL_SOLID			= 0x00008000,
 	FL_PATHING			= 0x00010000,
 	FL_PICKUP			= 0x00020000,
+
+	IF_AUTOACTIVATE		= 0x00000001,
 } objflag_t;
 
 

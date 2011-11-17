@@ -135,7 +135,6 @@ void AActor::AddInventory(AInventory *item)
 		}
 		while((next = next->inventory));
 	}
-	item->RemoveFromWorld();
 }
 
 void AActor::Destroy()
@@ -287,6 +286,23 @@ void AActor::RemoveFromWorld()
 		thinker->Destroy();
 		thinker = NULL;
 	}
+}
+
+void AActor::RemoveInventory(AInventory *item)
+{
+	if(inventory == NULL)
+		return;
+
+	AInventory **next = &inventory;
+	do
+	{
+		if(*next == item)
+		{
+			*next = (*next)->inventory;
+			break;
+		}
+	}
+	while((next = &(*next)->inventory));
 }
 
 AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)

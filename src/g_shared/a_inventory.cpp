@@ -44,7 +44,7 @@ IMPLEMENT_CLASS(Inventory, Actor)
 // in the actor's inventory.
 AInventory *AInventory::CreateCopy(AActor *holder)
 {
-	if(GoesAway())
+	if(!GoesAway())
 		return this;
 
 	AInventory *copy = reinterpret_cast<AInventory *>(classType->CreateInstance());
@@ -57,17 +57,17 @@ AInventory *AInventory::CreateCopy(AActor *holder)
 // Used for items which aren't placed into an inventory and don't respawn.
 void AInventory::GoAwayAndDie()
 {
-	if(GoesAway())
+	if(!GoesAway())
 	{
 		Destroy();
 	}
 }
 
-// Returns true if this is safe to place into inventory.  False if it will be
-// reused in the world.
+// Returns false if this is safe to place into inventory.  True if it hides
+// itself to be reused later.
 bool AInventory::GoesAway()
 {
-	return true;
+	return false;
 }
 
 // Returns true if the pickup was handled by an already existing inventory item.
@@ -89,6 +89,12 @@ bool AInventory::HandlePickup(AInventory *item, bool &good)
 	else if(inventory)
 		return inventory->HandlePickup(item, good);
 	return false;
+}
+
+void AInventory::InitClean()
+{
+	Super::InitClean();
+	itemFlags = 0;
 }
 
 void AInventory::Touch(AActor *toucher)
@@ -113,6 +119,21 @@ bool AInventory::TryPickup(AActor *toucher)
 			return false;
 		GoAwayAndDie();
 	}
+	else if(maxamount == 0)
+	{
+		// We can add maxamount = 0 items if we can use them right away.
+		if(!(itemFlags & IF_AUTOACTIVATE))
+			return false;
+
+		toucher->AddInventory(this);
+		bool good = Use();
+		toucher->RemoveInventory(this);
+
+		if(good)
+			GoAwayAndDie();
+		else
+			return false;
+	}
 	else
 	{
 		AInventory *invItem = CreateCopy(toucher);
@@ -120,6 +141,10 @@ bool AInventory::TryPickup(AActor *toucher)
 			GoAwayAndDie();
 
 		toucher->AddInventory(invItem);
+		invItem->RemoveFromWorld();
+
+		if((itemFlags & IF_AUTOACTIVATE) && invItem->Use())
+			--invItem->amount;
 	}
 	return true;
 }

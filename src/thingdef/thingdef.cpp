@@ -33,6 +33,7 @@
 */
 
 #include "actor.h"
+#include "a_inventory.h"
 #include "id_ca.h"
 #include "m_random.h"
 #include "r_sprites.h"
@@ -51,29 +52,32 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DEFINE_FLAG(prefix, flag, type, variable) { prefix##_##flag, #flag, typeoffsetof(type,variable) }
+#define DEFINE_FLAG(prefix, flag, type, variable) { NATIVE_CLASS(type), prefix##_##flag, #type, #flag, typeoffsetof(A##type,variable) }
 const struct FlagDef
 {
 	public:
-		const unsigned int	value;
+		const ClassDef * const &cls;
+		const flagstype_t	value;
+		const char* const	prefix;
 		const char* const	name;
 		const int			varOffset;
 } flags[] =
 {
-	DEFINE_FLAG(FL, AMBUSH, AActor, flags),
-	DEFINE_FLAG(FL, ATTACKMODE, AActor, flags),
-	DEFINE_FLAG(FL, BONUS, AActor, flags),
-	DEFINE_FLAG(FL, BRIGHT, AActor, flags),
-	DEFINE_FLAG(FL, CANUSEWALLS, AActor, flags),
-	DEFINE_FLAG(FL, COUNTKILL, AActor, flags),
-	DEFINE_FLAG(FL, FIRSTATTACK, AActor, flags),
-	DEFINE_FLAG(FL, ISMONSTER, AActor, flags),
-	DEFINE_FLAG(FL, NEVERMARK, AActor, flags),
-	DEFINE_FLAG(FL, NONMARK, AActor, flags),
-	DEFINE_FLAG(FL, PICKUP, AActor, flags),
-	DEFINE_FLAG(FL, SHOOTABLE, AActor, flags),
-	DEFINE_FLAG(FL, SOLID, AActor, flags),
-	DEFINE_FLAG(FL, VISABLE, AActor, flags)
+	DEFINE_FLAG(FL, AMBUSH, Actor, flags),
+	DEFINE_FLAG(FL, ATTACKMODE, Actor, flags),
+	DEFINE_FLAG(IF, AUTOACTIVATE, Inventory, itemFlags),
+	DEFINE_FLAG(FL, BONUS, Actor, flags),
+	DEFINE_FLAG(FL, BRIGHT, Actor, flags),
+	DEFINE_FLAG(FL, CANUSEWALLS, Actor, flags),
+	DEFINE_FLAG(FL, COUNTKILL, Actor, flags),
+	DEFINE_FLAG(FL, FIRSTATTACK, Actor, flags),
+	DEFINE_FLAG(FL, ISMONSTER, Actor, flags),
+	DEFINE_FLAG(FL, NEVERMARK, Actor, flags),
+	DEFINE_FLAG(FL, NONMARK, Actor, flags),
+	DEFINE_FLAG(FL, PICKUP, Actor, flags),
+	DEFINE_FLAG(FL, SHOOTABLE, Actor, flags),
+	DEFINE_FLAG(FL, SOLID, Actor, flags),
+	DEFINE_FLAG(FL, VISABLE, Actor, flags)
 };
 extern const PropDef properties[];
 
@@ -508,15 +512,16 @@ void ClassDef::ParseActor(Scanner &sc)
 		if(sc.CheckToken('+') || sc.CheckToken('-'))
 		{
 			bool set = sc->token == '+';
-			FString flagName;
+			FString prefix;
 			sc.MustGetToken(TK_Identifier);
-			flagName = sc->str;
+			FString flagName = sc->str;
 			if(sc.CheckToken('.'))
 			{
+				prefix = flagName;
 				sc.MustGetToken(TK_Identifier);
-				flagName += FString(".") + sc->str;
+				flagName = sc->str;
 			}
-			if(!SetFlag(newClass, flagName, set))
+			if(!SetFlag(newClass, prefix, flagName, set))
 				printf("Warning: Unknown flag '%s' for actor '%s'.\n", flagName.GetChars(), newClass->name.GetChars());
 		}
 		else
@@ -920,23 +925,29 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 	delete[] data;
 }
 
-bool ClassDef::SetFlag(ClassDef *newClass, const char* flagName, bool set)
+bool ClassDef::SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set)
 {
 	int min = 0;
 	int max = sizeof(flags)/sizeof(FlagDef) - 1;
 	while(min <= max)
 	{
 		int mid = (min+max)/2;
-		int ret = stricmp(flags[mid].name, flagName);
+		int ret = flagName.CompareNoCase(flags[mid].name);
+		if(ret == 0 && !prefix.IsEmpty())
+			ret = prefix.CompareNoCase(flags[mid].prefix);
+
 		if(ret == 0)
 		{
+			if(!newClass->IsDescendantOf(flags[mid].cls))
+				return false;
+
 			if(set)
 				*reinterpret_cast<flagstype_t *>((int8_t*)newClass->defaultInstance + flags[mid].varOffset) |= flags[mid].value;
 			else
 				*reinterpret_cast<flagstype_t *>((int8_t*)newClass->defaultInstance + flags[mid].varOffset) &= ~flags[mid].value;
 			return true;
 		}
-		else if(ret > 0)
+		else if(ret < 0)
 			max = mid-1;
 		else
 			min = mid+1;
