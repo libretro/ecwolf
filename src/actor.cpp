@@ -164,7 +164,11 @@ void AActor::Die()
 				const ClassDef *cls = ClassDef::FindClass(drop.className);
 				if(cls)
 				{
-					AActor *actor = AActor::Spawn(cls, (tilex<<TILESHIFT)+TILEGLOBAL/2, (tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
+					// We can't use tilex/tiley since it's used primiarily by
+					// the AI, so it can be off by one.
+					static const fixed TILEMASK = ~(TILEGLOBAL-1);
+
+					AActor *actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0);
 					actor->angle = angle;
 					actor->dir = dir;
 				}
