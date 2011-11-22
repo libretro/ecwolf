@@ -1200,6 +1200,8 @@ void GP2X_ButtonUp(int button);
 =============================================================================
 */
 
+void atterm(void (*func)(void));
+
 extern const struct RatioInformation
 {
 	int baseWidth;

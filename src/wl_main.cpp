@@ -28,6 +28,8 @@
 #include "v_video.h"
 #include "r_data/colormaps.h"
 #include "wl_agent.h"
+#include "doomerrors.h"
+#include "lumpremap.h"
 
 // Wad Code Stuff
 TArray<FString> wadfiles;
@@ -502,7 +504,7 @@ static void InitGame()
 		printf("Unable to init SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
-	atexit(SDL_Quit);
+	atterm(SDL_Quit);
 
 	int numJoysticks = SDL_NumJoysticks();
 	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
@@ -1295,55 +1297,100 @@ unsigned int I_MakeRNGSeed();
 */
 
 void InitThinkerList();
+void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
+{
+	FString errorMessage;
+	errorMessage.VFormat(error, list);
 
-#include "lumpremap.h"
+	if(level == Scanner::ERROR)
+		throw CRecoverableError(errorMessage);
+	else
+		vfprintf(stderr, error, list);
+}
+
+// Basically from ZDoom
+// We are definting an atterm function so that we can control the exit behavior.
+static const unsigned int MAX_TERMS = 32;
+static void (*TermFuncs[MAX_TERMS])(void);
+static unsigned int NumTerms;
+void atterm(void (*func)(void))
+{
+	for(unsigned int i = 0;i < NumTerms;++i)
+	{
+		if(TermFuncs[i] == func)
+			return;
+	}
+
+	if(NumTerms < MAX_TERMS)
+		TermFuncs[NumTerms++] = func;
+	else
+		fprintf(stderr, "Failed to register atterm function!\n");
+}
+void CallTerminateFunctions()
+{
+	while(NumTerms > 0)
+		TermFuncs[--NumTerms]();
+}
+
 int main (int argc, char *argv[])
 {
-	printf("ReadConfig: Reading the Configuration.\n");
-	config->LocateConfigFile(argc, argv);
-	ReadConfig();
+	Scanner::SetMessageHandler(ScannerMessageHandler);
+	atexit(CallTerminateFunctions);
 
-	WL_AddFile("ecwolf.pk3");
+	try
+	{
+		printf("ReadConfig: Reading the Configuration.\n");
+		config->LocateConfigFile(argc, argv);
+		ReadConfig();
 
-	WL_AddFile("audiot.wl6");
-	WL_AddFile("gamemaps.wl6");
-	WL_AddFile("vgagraph.wl6");
-	WL_AddFile("vswap.wl6");
+		WL_AddFile("ecwolf.pk3");
+
+		WL_AddFile("audiot.wl6");
+		WL_AddFile("gamemaps.wl6");
+		WL_AddFile("vgagraph.wl6");
+		WL_AddFile("vswap.wl6");
 
 #if defined(_arch_dreamcast)
-	DC_Main();
-	DC_CheckParameters();
+		DC_Main();
+		DC_CheckParameters();
 #elif defined(GP2X)
-	GP2X_Init();
+		GP2X_Init();
 #else
-	CheckParameters(argc, argv);
+		CheckParameters(argc, argv);
 #endif
 
-	CheckForEpisodes();
+		CheckForEpisodes();
 
-	printf("W_Init: Init WADfiles.\n");
-	Wads.InitMultipleFiles(wadfiles);
-	language.SetupStrings();
-	LumpRemapper::RemapAll();
+		printf("W_Init: Init WADfiles.\n");
+		Wads.InitMultipleFiles(wadfiles);
+		language.SetupStrings();
+		LumpRemapper::RemapAll();
 
-	InitThinkerList();
+		InitThinkerList();
 
-	printf("VL_ReadPalette: Setting up the Palette...\n");
-	VL_ReadPalette();
-	InitPalette("WOLFPAL");
-	R_InitColormaps();
-	atexit(R_DeinitColormaps);
-	printf("InitGame: Setting up the game...\n");
-	InitGame();
-	printf("CreateMenus: Preparing the menu system...\n");
-	CreateMenus();
+		printf("VL_ReadPalette: Setting up the Palette...\n");
+		VL_ReadPalette();
+		InitPalette("WOLFPAL");
+		R_InitColormaps();
+		atterm(R_DeinitColormaps);
+		printf("InitGame: Setting up the game...\n");
+		InitGame();
+		printf("CreateMenus: Preparing the menu system...\n");
+		CreateMenus();
 
-	rngseed = I_MakeRNGSeed();
-	FRandom::StaticClearRandom();
+		rngseed = I_MakeRNGSeed();
+		FRandom::StaticClearRandom();
 
-	printf("DemoLoop: Starting the game loop...\n");
-	DemoLoop();
+		printf("DemoLoop: Starting the game loop...\n");
+		DemoLoop();
 
-	Quit("Demo loop exited???");
+		Quit("Demo loop exited???");
+	}
+	catch(class CDoomError &error)
+	{
+		if(error.GetMessage())
+			fprintf(stderr, "%s\n", error.GetMessage());
+		exit(-1);
+	}
 	return 1;
 }

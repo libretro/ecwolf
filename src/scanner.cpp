@@ -33,6 +33,8 @@
 #include "scanner_support.h"
 #include "scanner.h"
 
+void (*Scanner::messageHander)(MessageLevel, const char*, va_list) = NULL;
+
 static const char* const TokenNames[TK_NumSpecialTokens] =
 {
 	"Identifier",
@@ -624,10 +626,14 @@ void Scanner::ScriptMessage(MessageLevel level, const char* error, ...) const
 	sprintf(newMessage, "%s:%d:%d:%s: %s\n", SCString_GetChars(scriptIdentifier), GetLine(), GetLinePos(), messageLevel, error);
 	va_list list;
 	va_start(list, error);
-	vfprintf(stderr, newMessage, list);
+	if(messageHander)
+		messageHander(level, newMessage, list);
+	else
+		vfprintf(stderr, newMessage, list);
 	va_end(list);
+	delete[] newMessage;
 
-	if(level == ERROR)
+	if(!messageHander && level == ERROR)
 		exit(0);
 }
 

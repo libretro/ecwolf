@@ -401,7 +401,7 @@ bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 void ClassDef::LoadActors()
 {
 	printf("ClassDef: Loading actor definitions.\n");
-	atexit(&ClassDef::UnloadActors);
+	atterm(&ClassDef::UnloadActors);
 
 	InitFunctionTable(NULL);
 

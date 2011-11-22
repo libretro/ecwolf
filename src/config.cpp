@@ -55,7 +55,7 @@ void saveAtExit()
 
 Config::Config() : firstRun(false)
 {
-	atexit(saveAtExit);
+	atterm(saveAtExit);
 }
 
 Config::~Config()

@@ -103,7 +103,7 @@ class Scanner
 		bool			GetNextString();
 		bool			GetNextToken(bool expandState=true);
 		void			MustGetToken(char token);
-		void			Rewind(); /// Only can rewind one step.z
+		void			Rewind(); /// Only can rewind one step.
 		void			ScriptMessage(MessageLevel level, const char* error, ...) const;
 		void			SetScriptIdentifier(const SCString &ident) { scriptIdentifier = ident; }
 		int				SkipLine();
@@ -114,6 +114,9 @@ class Scanner
 		static const SCString	&Escape(SCString &str);
 		static const SCString	Escape(const char *str);
 		static const SCString	&Unescape(SCString &str);
+
+		static void		SetMessageHandler(void (*handler)(MessageLevel, const char*, va_list)) { messageHander = handler; }
+
 
 		ParserState		state;
 
@@ -134,6 +137,8 @@ class Scanner
 		bool			needNext; // If checkToken returns false this will be false.
 
 		SCString		scriptIdentifier;
+
+		static void		(*messageHander)(MessageLevel, const char*, va_list);
 };
 
 #endif /* __SCANNER_H__ */
