@@ -50,6 +50,6 @@ void R_InitSprites();
 void R_LoadSprite(const FString &name);
 
 void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
-void SimpleScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
+void R_DrawPlayerSprite(AActor *actor, const Frame *frame);
 
 #endif

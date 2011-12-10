@@ -37,9 +37,10 @@
 #include "zstring.h"
 #include "scanner.h"
 
-TMap<FName, LumpRemapper> remaps;
-TMap<int, FName> spriteReverseMap;
-TMap<int, FName> vgaReverseMap;
+static TMap<FName, LumpRemapper> remaps;
+static TMap<int, FName> spriteReverseMap;
+static TMap<int, FName> vgaReverseMap;
+static TArray<FString> psprites;
 
 LumpRemapper::LumpRemapper(const char* extension) : mapLumpName(extension)
 {
@@ -144,6 +145,16 @@ void LumpRemapper::DoRemap()
 	Wads.InitHashChains();
 }
 
+bool LumpRemapper::IsPSprite(int lumpnum)
+{
+	for(unsigned int i = 0;i < psprites.Size();++i)
+	{
+		if(Wads.CheckLumpName(lumpnum, psprites[i]))
+			return true;
+	}
+	return false;
+}
+
 bool LumpRemapper::LoadMap()
 {
 	int lump = Wads.GetNumForName(mapLumpName);
@@ -164,8 +175,9 @@ bool LumpRemapper::LoadMap()
 		if(!sc.CheckToken(TK_Identifier))
 			sc.ScriptMessage(Scanner::ERROR, "Expected identifier in map.\n");
 
+		bool parseSprites = false;
 		TMap<int, FName> *reverse = NULL;
-		TArray<FName> *map = NULL;
+		TArray<FString> *map = NULL;
 		if(sc->str.Compare("graphics") == 0)
 		{
 			reverse = &vgaReverseMap;
@@ -173,6 +185,7 @@ bool LumpRemapper::LoadMap()
 		}
 		else if(sc->str.Compare("sprites") == 0)
 		{
+			parseSprites = true;
 			reverse = &spriteReverseMap;
 			map = &sprites;
 		}
@@ -196,9 +209,18 @@ bool LumpRemapper::LoadMap()
 			{
 				if(!sc.CheckToken(TK_StringConst))
 					sc.ScriptMessage(Scanner::ERROR, "Expected string constant.\n");
+				const FString spriteName = sc->str;
 				if(reverse != NULL)
-					(*reverse)[i++] = sc->str;
-				map->Push(sc->str);
+					(*reverse)[i++] = spriteName;
+				map->Push(spriteName);
+				if(parseSprites && sc.CheckToken(':'))
+				{
+					sc.MustGetToken(TK_Identifier);
+					if(sc->str.Compare("pspr") == 0)
+						psprites.Push(spriteName);
+					else
+						sc.ScriptMessage(Scanner::ERROR, "Expected pspr modifier.\n");
+				}
 				if(sc.CheckToken('}'))
 					break;
 				if(!sc.CheckToken(','))

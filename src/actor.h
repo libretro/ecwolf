@@ -73,7 +73,7 @@ class Frame
 		};
 		uint8_t		frame;
 		int			duration;
-		bool			fullbright;
+		bool		fullbright;
 		class ActionCall
 		{
 			public:

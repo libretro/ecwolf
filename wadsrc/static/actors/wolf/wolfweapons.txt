@@ -1,4 +1,9 @@
-actor Knife : Weapon
+actor WolfWeapon : Weapon
+{
+	weapon.yadjust 16
+}
+
+actor Knife : WolfWeapon
 {
 	states
 	{
@@ -13,10 +18,16 @@ actor Knife : Weapon
 	}
 }
 
-actor Pistol : Weapon
+actor Pistol : WolfWeapon
 {
 	states
 	{
+		Select:
+			PISG A 1 A_Raise
+			loop
+		Deselect:
+			PISG A 1 A_Lower
+			loop
 		Ready:
 			PISG A 1 A_WeaponReady
 			loop
@@ -28,7 +39,7 @@ actor Pistol : Weapon
 	}
 }
 
-actor MachineGun : Weapon 60
+actor MachineGun : WolfWeapon 60
 {
 	inventory.pickupsound "weapon/machine/pickup"
 	states
@@ -41,6 +52,7 @@ actor MachineGun : Weapon 60
 			loop
 		Fire:
 			MCHG B 3
+		Hold:
 			MCHG C 3 A_MachineGun
 			MCHG D 3
 			MCHG E 3 A_ReFire
@@ -48,7 +60,7 @@ actor MachineGun : Weapon 60
 	}
 }
 
-actor GatlingGun : Weapon 61
+actor GatlingGun : WolfWeapon 61
 {
 	inventory.pickupsound "weapon/gatling/pickup"
 	states
@@ -61,6 +73,7 @@ actor GatlingGun : Weapon 61
 			loop
 		Fire:
 			CHGG B 3
+		Hold:
 			CHGG CD 3 A_Chaingun
 			CHGG E 3 A_ReFire
 			goto Spawn

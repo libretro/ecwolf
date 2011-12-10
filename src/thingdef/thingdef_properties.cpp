@@ -231,6 +231,14 @@ HANDLE_PROPERTY(startitem)
 	def->startInventory->Push(drop);
 }
 
+HANDLE_PROPERTY(yadjust)
+{
+	FLOAT_PARAM(adjust, 0);
+
+	AWeapon *def = (AWeapon *)defaults;
+	def->yadjust = adjust*FRACUNIT;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 HANDLE_PROPERTY(MONSTER)
@@ -261,6 +269,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(sighttime, Actor, I_I),
 	DEFINE_PROP(speed, Actor, F_F),
 	DEFINE_PROP_PREFIX(startitem, PlayerPawn, Player, S_I),
+	DEFINE_PROP(yadjust, Weapon, F),
 
 	{ NULL, NULL, NULL, NULL }
 };

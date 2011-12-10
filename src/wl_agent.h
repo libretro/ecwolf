@@ -56,6 +56,7 @@ extern class player_t
 {
 	public:
 		void	Reborn();
+		void	SetPSprite(const Frame *frame);
 
 		enum State
 		{
@@ -63,6 +64,11 @@ extern class player_t
 			PST_DEAD,
 			PST_REBORN,
 			PST_LIVE
+		};
+
+		enum PlayerFlags
+		{
+			PF_WEAPONREADY = 0x1
 		};
 
 		APlayerPawn	*mo;
@@ -73,7 +79,15 @@ extern class player_t
 
 		AWeapon		*ReadyWeapon;
 		AWeapon		*PendingWeapon;
+		struct
+		{
+			const Frame	*frame;
+			short		ticcount;
+			int16_t		sx;
+			int16_t		sy;
+		} psprite;
 
+		int32_t		flags;
 		State		state;
 } players[];
 

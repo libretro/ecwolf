@@ -37,7 +37,7 @@
 
 #include "actor.h"
 
-class AInventory;
+struct player_t;
 
 class APlayerPawn : public AActor
 {
@@ -52,6 +52,7 @@ class APlayerPawn : public AActor
 
 	protected:
 		void	InitClean();
+		void	TickPSprites();
 };
 
 #endif

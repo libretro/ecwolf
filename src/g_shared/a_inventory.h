@@ -47,6 +47,7 @@ class AInventory : public AActor
 		virtual bool	Use();
 
 		flagstype_t		itemFlags;
+		AActor			*owner;
 
 		FNameNoInit		pickupsound;
 		unsigned int	amount;
@@ -75,6 +76,14 @@ class AHealth : public AInventory
 class AWeapon : public AInventory
 {
 	DECLARE_NATIVE_CLASS(Weapon, Inventory)
+
+	public:
+		const Frame	*GetAtkState(bool hold) const;
+		const Frame	*GetDownState() const;
+		const Frame	*GetReadyState() const;
+		const Frame	*GetUpState() const;
+
+		fixed	yadjust;
 };
 
 #endif

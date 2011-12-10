@@ -58,6 +58,7 @@ class LumpRemapper
 		// For Read This screens which reference VGAGraph entries by number.
 		static const char*	ConvertSpriteIndexToLump(int num);
 		static const char*	ConvertVGAIndexToLump(int num);
+		static bool			IsPSprite(int lumpnum);
 		static void			RemapAll();
 	protected:
 		bool		LoadMap();
@@ -69,7 +70,7 @@ class LumpRemapper
 		};
 
 		FString				mapLumpName;
-		TArray<FName>		graphics, sprites, sounds, digitalsounds, music, textures;
+		TArray<FString>		graphics, sprites, sounds, digitalsounds, music, textures;
 		TArray<RemapFile>	files;
 };
 

@@ -92,8 +92,8 @@ graphics
 
 sprites
 {
-	"DEMO",
-	"DEATHCAM",
+	"DEMO":pspr,
+	"DEATHCAM":pspr,
 
 	"WATRA0",	"DRUMA0",	"TCHRA0",	"FLMPA0",
 	"CHANA0",	"HANGA0",	"ALPOA0",	"COLUA0",
@@ -224,14 +224,14 @@ sprites
 	"KNIFA0",	"KNIFB0",	"KNIFC0",	"KNIFD0",
 	"KNIFE0",
 
-	"PISGA0",	"PISGB0",	"PISGC0",	"PISGD0",
-	"PISGE0",
+	"PISGA0":pspr,	"PISGB0":pspr,	"PISGC0":pspr,	"PISGD0":pspr,
+	"PISGE0":pspr,
 
-	"MCHGA0",	"MCHGB0",	"MCHGC0",	"MCHGD0",
-	"MCHGE0",
+	"MCHGA0":pspr,	"MCHGB0":pspr,	"MCHGC0":pspr,	"MCHGD0":pspr,
+	"MCHGE0":pspr,
 
-	"CHGGA0",	"CHGGB0",	"CHGGC0",	"CHGGD0",
-	"CHGGE0"
+	"CHGGA0":pspr,	"CHGGB0":pspr,	"CHGGC0":pspr,	"CHGGD0":pspr,
+	"CHGGE0":pspr
 }
 
 sounds

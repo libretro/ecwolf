@@ -893,8 +893,11 @@ extern  int      viewscreenx, viewscreeny;
 extern  int      viewwidth;
 extern  int      viewheight;
 extern  short    centerx;
+extern  short    centerxwide;
 extern  int32_t  heightnumerator;
 extern  fixed    scale;
+extern  fixed    pspritexscale;
+extern  fixed    pspriteyscale;
 
 extern  int      dirangle[9];
 
@@ -923,7 +926,7 @@ extern  boolean  param_ignorenumchunks;
 void            NewGame (int difficulty,int episode);
 void            CalcProjection (int32_t focal);
 void            NewViewSize (int width);
-boolean         SetViewSize (unsigned width, unsigned height);
+void            SetViewSize (unsigned width, unsigned height);
 boolean         LoadTheGame(FILE *file,int x,int y);
 boolean         SaveTheGame(FILE *file,int x,int y);
 void            ShowViewSize (int width);
@@ -1208,6 +1211,7 @@ extern const struct RatioInformation
 	int baseHeight;
 	int viewGlobal;
 	int multiplier;
+	bool isWide;
 } AspectCorrection[];
 #define CorrectWidthFactor(x)	((x)*AspectCorrection[vid_aspect].multiplier/48)
 #define CorrectHeightFactor(x)	((x)*48/AspectCorrection[vid_aspect].multiplier)
@@ -1215,6 +1219,11 @@ extern const struct RatioInformation
 static inline fixed FixedMul(fixed a, fixed b)
 {
 	return (fixed)(((int64_t)a * b + 0x8000) >> 16);
+}
+
+static inline fixed FixedDiv(fixed a, fixed b)
+{
+	return (fixed)(((((int64_t)a)<<32) / b) >> 16);
 }
 
 #ifdef PLAYDEMOLIKEORIGINAL

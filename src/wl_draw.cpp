@@ -50,11 +50,11 @@
 
 const RatioInformation AspectCorrection[] =
 {
-	/* UNC */	{960,	600,	0x10000,	48},
-	/* 16:9 */	{1280,	450,	0x15555,	48*3/4},
-	/* 16:10 */	{1152,	500,	0x13333,	48*5/6},
-	/* 4:3 */	{960,	720,	0x10000,	48*5/6},
-	/* 5:4 */	{960,	640,	0x10000,	48*15/16}
+	/* UNC */	{960,	600,	0x10000,	48,			false},
+	/* 16:9 */	{1280,	450,	0x15555,	48*3/4,		true},
+	/* 16:10 */	{1152,	500,	0x13333,	48*5/6,		true},
+	/* 4:3 */	{960,	600,	0x10000,	48,			false},
+	/* 5:4 */	{960,	640,	0x10000,	48*15/16,	false}
 };
 
 /*static*/ byte *vbuf = NULL;
@@ -918,13 +918,12 @@ void DrawScaleds (void)
 int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
 	SPR_MACHINEGUNREADY, SPR_CHAINREADY};
 
-#include "thingdef/thingdef.h"
 void DrawPlayerWeapon (void)
 {
-	if(!players[0].ReadyWeapon)
+	if(!players[0].psprite.frame)
 		return;
 
-	SimpleScaleSprite(players[0].ReadyWeapon, viewwidth/2, players[0].ReadyWeapon->state, viewheight+1);
+	R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite.frame);
 /*	int shapenum;
 
 #ifndef SPEAR

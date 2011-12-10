@@ -52,6 +52,9 @@ actor ScoreItem : Inventory native
 
 actor Weapon : Inventory native
 {
+	weapon.yadjust 0
+
+	action native A_WeaponReady();
 }
 
 actor PlayerPawn native

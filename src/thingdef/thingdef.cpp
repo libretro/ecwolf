@@ -208,13 +208,13 @@ AActor *ClassDef::CreateInstance() const
 {
 	if(!defaultInstance->SpawnState)
 	{
-		defaultInstance->DeathState = FindState("Death");
-		defaultInstance->MeleeState = FindState("Melee");
-		defaultInstance->MissileState = FindState("Missile");
-		defaultInstance->PainState = FindState("Pain");
-		defaultInstance->PathState = FindState("Path");
-		defaultInstance->SpawnState = FindState("Spawn");
-		defaultInstance->SeeState = FindState("See");
+		defaultInstance->DeathState = FindState(NAME_Death);
+		defaultInstance->MeleeState = FindState(NAME_Melee);
+		defaultInstance->MissileState = FindState(NAME_Missile);
+		defaultInstance->PainState = FindState(NAME_Pain);
+		defaultInstance->PathState = FindState(NAME_Path);
+		defaultInstance->SpawnState = FindState(NAME_Spawn);
+		defaultInstance->SeeState = FindState(NAME_See);
 	}
 
 	AActor *newactor = (AActor *) malloc(defaultInstance->__GetSize());

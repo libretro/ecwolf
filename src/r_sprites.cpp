@@ -41,9 +41,11 @@
 #include "actor.h"
 #include "thingdef/thingdef.h"
 #include "v_palette.h"
+#include "wl_agent.h"
 #include "wl_shade.h"
 #include "zstring.h"
 #include "r_data/colormaps.h"
+#include "a_inventory.h"
 
 struct SpriteInfo
 {
@@ -335,12 +337,12 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	}
 }
 
-void SimpleScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
+void R_DrawPlayerSprite(AActor *actor, const Frame *frame)
 {
-	if(actor->sprite == SPR_NONE)
+	if(frame->spriteInf == SPR_NONE)
 		return;
 
-	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
+	const Sprite &spr = spriteFrames[loadedSprites[frame->spriteInf].frames+frame->frame];
 	FTexture *tex;
 	if(spr.rotations == 0)
 		tex = TexMan[spr.texture[0]];
@@ -351,19 +353,27 @@ void SimpleScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned 
 
 	const BYTE *colormap = NormalLight.Maps;
 
-	const unsigned int scale = height>>1;
+	const fixed scale = viewheight<<(FRACBITS-1);
 
-	const double dyScale = height/64.0;
-	const double dxScale = CorrectWidthFactor(height/64.0);
+	const fixed centeringOffset = (centerx - 2*centerxwide)<<FRACBITS;
+	const fixed leftedge = FixedMul((160<<FRACBITS) - fixed(tex->GetScaledLeftOffsetDouble()*FRACUNIT), pspritexscale) + centeringOffset;
+	fixed upperedge = ((100-32)<<FRACBITS) + fixed(tex->GetScaledTopOffsetDouble()*FRACUNIT);
+	if(viewsize == 21 && players[0].ReadyWeapon)
+	{
+		upperedge -= players[0].ReadyWeapon->yadjust;
+	}
+	upperedge = scale - FixedMul(upperedge, pspriteyscale);
 
-	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
-	const int upperedge = (viewheight/2)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
+	// startX and startY indicate where the sprite becomes visible, we only
+	// need to calculate the start since the end will be determined when we hit
+	// the view during drawing.
+	const unsigned int startX = -MIN(leftedge>>FRACBITS, 0);
+	const unsigned int startY = -MIN(upperedge>>FRACBITS, 0);
+	const fixed xStep = FixedDiv(tex->xScale, pspritexscale);
+	const fixed yStep = FixedDiv(tex->yScale, pspriteyscale);
 
-	const unsigned int startX = -MIN(actx, 0);
-	const unsigned int startY = -MIN(upperedge, 0);
-	const fixed xStep = (1/dxScale)*FRACUNIT;
-	const fixed yStep = (1/dyScale)*FRACUNIT;
-
+	const int x1 = leftedge>>FRACBITS;
+	const int y1 = upperedge>>FRACBITS;
 	const BYTE *src;
 	byte *dest;
 	unsigned int i, j;
@@ -371,15 +381,15 @@ void SimpleScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned 
 	for(i = startX, x = startX*xStep;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
-		dest = vbuf+actx+i;
-		if(actx+i >= viewwidth)
+		dest = vbuf+x1+i;
+		if(x1+i >= viewwidth)
 			break;
-		if(upperedge > 0)
-			dest += vbufPitch*upperedge;
+		if(y1 > 0)
+			dest += vbufPitch*y1;
 
 		for(j = startY, y = startY*yStep;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
 		{
-			if(upperedge+j >= viewheight)
+			if(y1+j >= viewheight)
 				break;
 			if(src[y>>FRACBITS] != 0)
 				*dest = colormap[src[y>>FRACBITS]];

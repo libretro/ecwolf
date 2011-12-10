@@ -67,7 +67,7 @@ void APlayerPawn::GiveStartingInventory()
 
 	// Bring up weapon
 	if(player->ReadyWeapon)
-		player->ReadyWeapon->SetState(player->ReadyWeapon->FindState("Ready"));
+		player->SetPSprite(player->ReadyWeapon->GetUpState());
 
 #if 1
 	AInventory *inv = inventory;
@@ -102,18 +102,34 @@ void APlayerPawn::Tick()
 	if(buttonstate[bt_use])
 		Cmd_Use();
 
-	if(buttonstate[bt_attack] && !buttonheld[bt_attack])
+	if((player->flags & player_t::PF_WEAPONREADY))
 	{
-		// Fire weapon
-		GunAttack(this);
+		if(buttonstate[bt_attack] && !buttonheld[bt_attack])
+			player->SetPSprite(player->ReadyWeapon->GetAtkState(false));
+		else if(player->PendingWeapon != WP_NOCHANGE)
+		{
+			player->ReadyWeapon = player->PendingWeapon;
+			player->SetPSprite(player->ReadyWeapon->GetReadyState());
+		}
 	}
 
 	ControlMovement(this);
 	if(gamestate.victoryflag)
 		return;
 
-	if(player->ReadyWeapon)
-	{
-		player->ReadyWeapon->Tick();
-	}
+	TickPSprites();
+}
+
+void APlayerPawn::TickPSprites()
+{
+	if(!player->psprite.frame)
+		return;
+
+	if(player->psprite.ticcount > 0)
+		--player->psprite.ticcount;
+
+	while(player->psprite.ticcount == 0)
+		player->SetPSprite(player->psprite.frame->next);
+
+	player->psprite.frame->thinker(this);
 }

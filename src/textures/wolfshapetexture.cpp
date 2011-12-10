@@ -41,6 +41,7 @@
 #include "templates.h"
 #include "v_palette.h"
 #include "textures.h"
+#include "lumpremap.h"
 
 //==========================================================================
 //
@@ -130,10 +131,22 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 	header[0] = LittleShort(header[0]);
 	header[1] = LittleShort(header[1]);
 
-	Width = header[1]-header[0];
+	Width = header[1]-header[0]+1;
 	Height = 64;
 	LeftOffset = 32-LittleLong(header[0]);
 	TopOffset = 64;
+	if(LumpRemapper::IsPSprite(lumpnum))
+	{
+		// Magic numbers!!!
+		// Set the offset of this sprite such that it would match what it would
+		// be for on a Doom player sprite.
+		// Also scale it up 2.5 times, which is about what is needed to emulate
+		// the size of vanilla wolf within precision limits.
+		TopOffset = 3;
+		LeftOffset = (-LeftOffset*2.5) - 40;
+		xScale = .4*FRACUNIT;
+		yScale = .4*FRACUNIT;
+	}
 	CalcBitSize ();
 }
 

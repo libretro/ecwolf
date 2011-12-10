@@ -94,8 +94,11 @@ int      viewscreenx, viewscreeny;
 int      viewwidth;
 int      viewheight;
 short    centerx;
+short    centerxwide;
 int      shootdelta;           // pixels away from centerx a target can be
 fixed    scale;
+fixed    pspritexscale;
+fixed    pspriteyscale;
 int32_t  heightnumerator;
 
 
@@ -620,11 +623,12 @@ static void InitGame()
 ==========================
 */
 
-boolean SetViewSize (unsigned width, unsigned height)
+void SetViewSize (unsigned width, unsigned height)
 {
 	viewwidth = width&~15;                  // must be divisable by 16
 	viewheight = height&~1;                 // must be even
 	centerx = viewwidth/2-1;
+	centerxwide = AspectCorrection[vid_aspect].isWide ? CorrectWidthFactor(centerx) : centerx;
 	shootdelta = viewwidth/10;
 	if((unsigned) viewheight == screenHeight)
 		viewscreenx = viewscreeny = screenofs = 0;
@@ -640,7 +644,16 @@ boolean SetViewSize (unsigned width, unsigned height)
 //
 	CalcProjection (FOCALLENGTH);
 
-	return true;
+	int virtheight = screenHeight;
+	int virtwidth = screenWidth;
+	if(AspectCorrection[vid_aspect].isWide)
+		virtwidth = CorrectWidthFactor(virtwidth);
+	else
+		virtheight = CorrectWidthFactor(virtheight);
+	fixed yaspect = FixedMul((320<<FRACBITS)/200,(virtheight<<FRACBITS)/virtwidth);
+
+	pspritexscale = (centerxwide<<FRACBITS)/160;
+	pspriteyscale = FixedMul(pspritexscale, yaspect);
 }
 
 

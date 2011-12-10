@@ -51,7 +51,7 @@ static inline const WORD SwapShort(WORD x)
 	return ((x&0xFF)<<8) | ((x>>8)&0xFF);
 }
 
-static inline const WORD SwapLong(DWORD x)
+static inline const DWORD SwapLong(DWORD x)
 {
 	return ((x&0xFF)<<24) |
 		(((x>>8)&0xFF)<<16) |

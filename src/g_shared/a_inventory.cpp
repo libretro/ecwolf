@@ -95,6 +95,7 @@ void AInventory::InitClean()
 {
 	Super::InitClean();
 	itemFlags = 0;
+	player = NULL;
 }
 
 void AInventory::Touch(AActor *toucher)
@@ -189,6 +190,61 @@ IMPLEMENT_CLASS(Ammo, Inventory)
 ////////////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_CLASS(Weapon, Inventory)
+
+const Frame *AWeapon::GetAtkState(bool hold) const
+{
+	const Frame *ret = NULL;
+	if(hold)
+		ret = FindState(NAME_Hold);
+	if(ret == NULL)
+		ret = FindState(NAME_Fire);
+	return ret;
+}
+
+const Frame *AWeapon::GetUpState() const
+{
+	return FindState(NAME_Select);
+}
+
+const Frame *AWeapon::GetDownState() const
+{
+	return FindState(NAME_Deselect);
+}
+
+const Frame *AWeapon::GetReadyState() const
+{
+	return FindState(NAME_Ready);
+}
+
+// Constants from ZDoom, supposedly the 0x6000 is for ensuring it gets off screen.
+const fixed RAISERANGE = 32*FRACUNIT + 0x6000;
+const fixed RAISESPEED = FRACUNIT*6;
+
+ACTION_FUNCTION(A_Raise)
+{
+	player_t *player = self->player;
+
+	if(player->PendingWeapon != WP_NOCHANGE)
+	{
+		player->SetPSprite(player->ReadyWeapon->GetDownState());
+		return;
+	}
+
+	player->psprite.sy -= RAISESPEED;
+	if(player->psprite.sy > 0)
+		return;
+	player->psprite.sy = 0;
+
+	if(player->ReadyWeapon)
+		player->SetPSprite(player->ReadyWeapon->GetReadyState());
+	else
+		player->psprite.frame = NULL;
+}
+
+ACTION_FUNCTION(A_WeaponReady)
+{
+	self->player->flags |= player_t::PF_WEAPONREADY;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

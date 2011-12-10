@@ -1016,6 +1016,7 @@ void player_t::Reborn()
 {
 	ReadyWeapon = NULL;
 	PendingWeapon = WP_NOCHANGE;
+	flags = 0;
 
 	if(state == PST_ENTER)
 	{
@@ -1032,6 +1033,17 @@ void player_t::Reborn()
 	DrawHealth();
 }
 
+void player_t::SetPSprite(const Frame *frame)
+{
+	flags &= ~player_t::PF_WEAPONREADY;
+	psprite.frame = frame;
+
+	if(frame)
+	{
+		psprite.ticcount = frame->duration;
+		frame->action(mo);
+	}
+}
 
 /*
 ===============
