@@ -1,6 +1,15 @@
 actor WolfWeapon : Weapon
 {
 	weapon.yadjust 16
+	states
+	{
+		Select:
+			TNT1 A 0 A_Raise
+			loop
+		Deselect:
+			TNT1 A 0 A_Lower
+			loop
+	}
 }
 
 actor Knife : WolfWeapon

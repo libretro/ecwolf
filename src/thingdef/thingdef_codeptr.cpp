@@ -44,7 +44,7 @@ ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(nam
 {
 	if(actionFunctions == NULL)
 		actionFunctions = new ActionTable;
-	printf("Adding %s\n", name.GetChars());
+	printf("Adding %s @ %d\n", name.GetChars(), actionFunctions->Size());
 	actionFunctions->Push(this);
 }
 
@@ -65,6 +65,8 @@ void InitFunctionTable(ActionTable *table)
 		table = actionFunctions;
 
 	qsort(&(*table)[0], table->Size(), sizeof((*table)[0]), FunctionTableComp);
+	for(int i = 1;i < table->Size();++i)
+		assert((*table)[i] > (*table)[i-1]);
 }
 
 void ReleaseFunctionTable()

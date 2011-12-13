@@ -61,13 +61,12 @@ void APlayerPawn::GiveStartingInventory()
 			invItem->Destroy();
 
 		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
-			player->ReadyWeapon = (AWeapon *)invItem;
+			player->PendingWeapon = (AWeapon *)invItem;
 	}
 	while((item = item->Next()));
 
 	// Bring up weapon
-	if(player->ReadyWeapon)
-		player->SetPSprite(player->ReadyWeapon->GetUpState());
+	player->BringUpWeapon();
 
 #if 1
 	AInventory *inv = inventory;
@@ -108,8 +107,7 @@ void APlayerPawn::Tick()
 			player->SetPSprite(player->ReadyWeapon->GetAtkState(false));
 		else if(player->PendingWeapon != WP_NOCHANGE)
 		{
-			player->ReadyWeapon = player->PendingWeapon;
-			player->SetPSprite(player->ReadyWeapon->GetReadyState());
+			player->SetPSprite(player->ReadyWeapon->GetDownState());
 		}
 	}
 

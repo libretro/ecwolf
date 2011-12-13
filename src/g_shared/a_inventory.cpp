@@ -216,31 +216,6 @@ const Frame *AWeapon::GetReadyState() const
 	return FindState(NAME_Ready);
 }
 
-// Constants from ZDoom, supposedly the 0x6000 is for ensuring it gets off screen.
-const fixed RAISERANGE = 32*FRACUNIT + 0x6000;
-const fixed RAISESPEED = FRACUNIT*6;
-
-ACTION_FUNCTION(A_Raise)
-{
-	player_t *player = self->player;
-
-	if(player->PendingWeapon != WP_NOCHANGE)
-	{
-		player->SetPSprite(player->ReadyWeapon->GetDownState());
-		return;
-	}
-
-	player->psprite.sy -= RAISESPEED;
-	if(player->psprite.sy > 0)
-		return;
-	player->psprite.sy = 0;
-
-	if(player->ReadyWeapon)
-		player->SetPSprite(player->ReadyWeapon->GetReadyState());
-	else
-		player->psprite.frame = NULL;
-}
-
 ACTION_FUNCTION(A_WeaponReady)
 {
 	self->player->flags |= player_t::PF_WEAPONREADY;

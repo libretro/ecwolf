@@ -143,7 +143,7 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 		// Also scale it up 2.5 times, which is about what is needed to emulate
 		// the size of vanilla wolf within precision limits.
 		TopOffset = 3;
-		LeftOffset = (-LeftOffset*2.5) - 40;
+		LeftOffset -= 64;
 		xScale = .4*FRACUNIT;
 		yScale = .4*FRACUNIT;
 	}

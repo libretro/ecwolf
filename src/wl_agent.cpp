@@ -1011,6 +1011,58 @@ void Cmd_Use (void)
 
 =============================================================================
 */
+#include "a_inventory.h"
+const fixed RAISERANGE = 96*FRACUNIT;
+const fixed RAISESPEED = FRACUNIT*6;
+
+void player_t::BringUpWeapon()
+{
+	psprite.sy = RAISERANGE;
+	psprite.sx = 0;
+
+	if(PendingWeapon != WP_NOCHANGE)
+	{
+		ReadyWeapon = PendingWeapon;
+		PendingWeapon = WP_NOCHANGE;
+		SetPSprite(ReadyWeapon->GetUpState());
+	}
+	else
+	{
+		ReadyWeapon = NULL;
+		SetPSprite(NULL);
+	}
+}
+ACTION_FUNCTION(A_Lower)
+{
+	player_t *player = self->player;
+
+	player->psprite.sy += RAISESPEED;
+	if(player->psprite.sy < RAISERANGE)
+		return;
+	player->psprite.sy = RAISERANGE;
+
+	player->BringUpWeapon();
+}
+ACTION_FUNCTION(A_Raise)
+{
+	player_t *player = self->player;
+
+	if(player->PendingWeapon != WP_NOCHANGE)
+	{
+		player->SetPSprite(player->ReadyWeapon->GetDownState());
+		return;
+	}
+
+	player->psprite.sy -= RAISESPEED;
+	if(player->psprite.sy > 0)
+		return;
+	player->psprite.sy = 0;
+
+	if(player->ReadyWeapon)
+		player->SetPSprite(player->ReadyWeapon->GetReadyState());
+	else
+		player->psprite.frame = NULL;
+}
 
 void player_t::Reborn()
 {
@@ -1023,10 +1075,10 @@ void player_t::Reborn()
 		lives = 3;
 		score = oldscore = 0;
 		nextextra = EXTRAPOINTS;
-		mo->GiveStartingInventory();
 	}
 
-	health = players[0].mo->maxhealth;
+	mo->GiveStartingInventory();
+	health = mo->maxhealth;
 
 	DrawFace();
 	DrawLives();

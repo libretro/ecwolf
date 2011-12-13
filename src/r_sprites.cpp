@@ -337,7 +337,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	}
 }
 
-void R_DrawPlayerSprite(AActor *actor, const Frame *frame)
+void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed offsetY)
 {
 	if(frame->spriteInf == SPR_NONE)
 		return;
@@ -356,8 +356,8 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame)
 	const fixed scale = viewheight<<(FRACBITS-1);
 
 	const fixed centeringOffset = (centerx - 2*centerxwide)<<FRACBITS;
-	const fixed leftedge = FixedMul((160<<FRACBITS) - fixed(tex->GetScaledLeftOffsetDouble()*FRACUNIT), pspritexscale) + centeringOffset;
-	fixed upperedge = ((100-32)<<FRACBITS) + fixed(tex->GetScaledTopOffsetDouble()*FRACUNIT);
+	const fixed leftedge = FixedMul((160<<FRACBITS) - fixed(tex->GetScaledLeftOffsetDouble()*FRACUNIT) + offsetX, pspritexscale) + centeringOffset;
+	fixed upperedge = ((100-32)<<FRACBITS) + fixed(tex->GetScaledTopOffsetDouble()*FRACUNIT) - offsetY;
 	if(viewsize == 21 && players[0].ReadyWeapon)
 	{
 		upperedge -= players[0].ReadyWeapon->yadjust;

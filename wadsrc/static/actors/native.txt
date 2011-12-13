@@ -54,6 +54,8 @@ actor Weapon : Inventory native
 {
 	weapon.yadjust 0
 
+	action native A_Lower();
+	action native A_Raise();
 	action native A_WeaponReady();
 }
 

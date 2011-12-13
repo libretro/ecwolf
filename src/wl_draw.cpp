@@ -923,7 +923,7 @@ void DrawPlayerWeapon (void)
 	if(!players[0].psprite.frame)
 		return;
 
-	R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite.frame);
+	R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite.frame, players[0].psprite.sx, players[0].psprite.sy);
 /*	int shapenum;
 
 #ifndef SPEAR

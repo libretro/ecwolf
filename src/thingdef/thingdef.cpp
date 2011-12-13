@@ -506,6 +506,7 @@ void ClassDef::ParseActor(Scanner &sc)
 	if(newClass->parent != NULL)
 		*newClass->defaultInstance = *newClass->parent->defaultInstance;
 
+	bool actionsSorted = true;
 	sc.MustGetToken('{');
 	while(!sc.CheckToken('}'))
 	{
@@ -529,7 +530,8 @@ void ClassDef::ParseActor(Scanner &sc)
 			sc.MustGetToken(TK_Identifier);
 			if(sc->str.CompareNoCase("states") == 0)
 			{
-				InitFunctionTable(&newClass->actions);
+				if(!actionsSorted)
+					InitFunctionTable(&newClass->actions);
 
 				TArray<StateDefinition> stateDefs;
 
@@ -721,6 +723,7 @@ void ClassDef::ParseActor(Scanner &sc)
 			}
 			else if(sc->str.CompareNoCase("action") == 0)
 			{
+				actionsSorted = false;
 				sc.MustGetToken(TK_Identifier);
 				if(sc->str.CompareNoCase("native") != 0)
 					sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
@@ -848,6 +851,8 @@ void ClassDef::ParseActor(Scanner &sc)
 
 	// Now sort the symbol table.
 	qsort(&newClass->symbols[0], newClass->symbols.Size(), sizeof(newClass->symbols[0]), SymbolCompare);
+	if(!actionsSorted)
+		InitFunctionTable(&newClass->actions);
 }
 
 void ClassDef::ParseDecorateLump(int lumpNum)

@@ -55,6 +55,7 @@ class AWeapon;
 extern class player_t
 {
 	public:
+		void	BringUpWeapon();
 		void	Reborn();
 		void	SetPSprite(const Frame *frame);
 
@@ -83,8 +84,8 @@ extern class player_t
 		{
 			const Frame	*frame;
 			short		ticcount;
-			int16_t		sx;
-			int16_t		sy;
+			fixed		sx;
+			fixed		sy;
 		} psprite;
 
 		int32_t		flags;
