@@ -5,6 +5,10 @@ actor BJPlayer : PlayerPawn
 	player.startitem "Clip", 8
 	player.startitem "Pistol"
 	player.startitem "Knife"
+	player.weaponslot 1, "Knife"
+	player.weaponslot 2, "Pistol"
+	player.weaponslot 3, "MachineGun"
+	player.weaponslot 4, "GatlingGun"
 	+NEVERMARK
 	+PICKUP
 

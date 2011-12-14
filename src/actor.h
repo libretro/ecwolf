@@ -115,6 +115,7 @@ class AActor
 		AInventory		*FindInventory(const ClassDef *cls) const;
 		const Frame		*FindState(const FName &name) const;
 		const MapZone	*GetZone() const { return soundZone; }
+		bool			IsKindOf(const ClassDef *type) const;
 		void			RemoveFromWorld();
 		void			RemoveInventory(AInventory *item);
 		void			SetState(const Frame *state, bool notic=false);

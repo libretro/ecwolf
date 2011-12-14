@@ -192,6 +192,22 @@ HANDLE_PROPERTY(sighttime)
 		defaults->sightrandom = 0;
 }
 
+HANDLE_PROPERTY(slotnumber)
+{
+	INT_PARAM(slot, 0);
+	if(slot < 0 || slot > 9)
+		I_Error("Valid slots range from 0 and 9.");
+
+	info->Class->Meta.SetMetaInt(AWMETA_SlotNumber, slot);
+}
+
+HANDLE_PROPERTY(slotpriority)
+{
+	FLOAT_PARAM(priority, 0);
+
+	info->Class->Meta.SetMetaFixed(AWMETA_SlotPriority, priority*FRACUNIT);
+}
+
 HANDLE_PROPERTY(speed)
 {
 	// Speed = units per 2 tics (1/35 of second)
@@ -231,6 +247,23 @@ HANDLE_PROPERTY(startitem)
 	def->startInventory->Push(drop);
 }
 
+HANDLE_PROPERTY(weaponslot)
+{
+	INT_PARAM(slot, 0);
+	if(slot < 0 || slot > 9)
+		I_Error("Valid slots range from 0 and 9.");
+
+	STRING_PARAM(firstWeapon, 1);
+	FString weaponsList = firstWeapon;
+	for(int i = 2;i < PARAM_COUNT;++i)
+	{
+		STRING_PARAM(weapon, i);
+		weaponsList << ' ' << weapon;
+	}
+
+	info->Class->Meta.SetMetaString(APMETA_Slot0 + slot, weaponsList);
+}
+
 HANDLE_PROPERTY(yadjust)
 {
 	FLOAT_PARAM(adjust, 0);
@@ -267,8 +300,11 @@ extern const PropDef properties[] =
 	DEFINE_PROP(radius, Actor, I),
 	DEFINE_PROP(seesound, Actor, S),
 	DEFINE_PROP(sighttime, Actor, I_I),
+	DEFINE_PROP(slotnumber, Weapon, I),
+	DEFINE_PROP(slotpriority, Weapon, F),
 	DEFINE_PROP(speed, Actor, F_F),
 	DEFINE_PROP_PREFIX(startitem, PlayerPawn, Player, S_I),
+	DEFINE_PROP_PREFIX(weaponslot, PlayerPawn, Player, IS_SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS),
 	DEFINE_PROP(yadjust, Weapon, F),
 
 	{ NULL, NULL, NULL, NULL }

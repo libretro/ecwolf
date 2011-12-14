@@ -119,6 +119,7 @@ class SymbolInfo
 	static const SymbolInfo __SI_##var(NATIVE_CLASS(cls), #var, typeoffsetof(A##cls,var));
 
 struct StateDefinition;
+class FActorInfo;
 
 struct PropertyParam
 {
@@ -131,8 +132,8 @@ struct PropertyParam
 		int64_t			i;
 	};
 };
-typedef void (*PropHandler)(AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params);
-#define HANDLE_PROPERTY(property) void __Handler_##property(AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params)
+typedef void (*PropHandler)(FActorInfo *info, AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params);
+#define HANDLE_PROPERTY(property) void __Handler_##property(FActorInfo *info, AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params)
 struct PropDef
 {
 	public:
@@ -144,6 +145,43 @@ struct PropDef
 };
 
 typedef TArray<Symbol *> SymbolTable;
+
+class FActorInfo
+{
+	public:
+		ClassDef	*Class;
+};
+
+class MetaTable
+{
+	public:
+		MetaTable();
+		MetaTable(const MetaTable &other);
+		~MetaTable();
+
+		enum Type
+		{
+			INTEGER,
+			FIXED,
+			STRING
+		};
+
+		int			GetMetaInt(uint32_t id, int def=0) const;
+		fixed		GetMetaFixed(uint32_t id, fixed def=0) const;
+		const char*	GetMetaString(uint32_t id) const;
+		void		SetMetaInt(uint32_t id, int value);
+		void		SetMetaFixed(uint32_t id, fixed value);
+		void		SetMetaString(uint32_t id, const char* value);
+
+	private:
+		class Data;
+
+		Data	*head;
+		Data	*FindMeta(uint32_t id) const;
+		Data	*FindMetaData(uint32_t id);
+
+		void	FreeTable();
+};
 
 class ClassDef
 {
@@ -179,6 +217,13 @@ class ClassDef
 			return definition;
 		}
 
+		typedef TMap<FName, ClassDef*>::ConstIterator	ClassIterator;
+		typedef TMap<FName, ClassDef*>::ConstPair		ClassPair;
+		static ClassIterator	GetClassIterator()
+		{
+			return ClassIterator(ClassTable());
+		}
+
 		/**
 		 * Prints the implemented classes in a tree.  This is not designed to 
 		 * be fast since it's debug information more than anything.
@@ -193,6 +238,9 @@ class ClassDef
 		const FName				&GetName() const { return name; }
 		static void				LoadActors();
 		static void				UnloadActors();
+
+		FActorInfo				*ActorInfo;
+		MetaTable				Meta;
 
 	protected:
 		static void	ParseActor(Scanner &sc);

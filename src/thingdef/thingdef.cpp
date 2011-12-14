@@ -177,11 +177,148 @@ static const struct ExpressionFunction
 
 ////////////////////////////////////////////////////////////////////////////////
 
+class MetaTable::Data
+{
+	public:
+		Data(MetaTable::Type type, uint32_t id) : id(id), type(type), next(NULL) {}
+		~Data()
+		{
+			SetType(MetaTable::INTEGER);
+		}
+
+		void	SetType(MetaTable::Type type)
+		{
+			if(this->type == type)
+				return;
+
+			if(this->type == MetaTable::STRING)
+			{
+				delete[] value.string;
+				value.string = NULL;
+			}
+
+			this->type = type;
+		}
+
+		uint32_t		id;
+		MetaTable::Type	type;
+		union
+		{
+			int			integer;
+			fixed		fixedPoint;
+			char*		string;
+		} value;
+		Data			*next;
+};
+
+MetaTable::MetaTable() : head(NULL)
+{
+}
+
+MetaTable::~MetaTable()
+{
+	FreeTable();
+}
+
+MetaTable::Data *MetaTable::FindMeta(uint32_t id) const
+{
+	Data *data = head;
+
+	while(data != NULL)
+	{
+		if(data->id == id)
+			break;
+
+		data = data->next;
+	}
+
+	return data;
+}
+
+MetaTable::Data *MetaTable::FindMetaData(uint32_t id)
+{
+	Data *data = FindMeta(id);
+	if(data == NULL)
+	{
+		data = new MetaTable::Data(MetaTable::INTEGER, id);
+		data->next = head;
+		head = data;
+	}
+
+	return data;
+}
+
+void MetaTable::FreeTable()
+{
+	Data *data = head;
+	while(data != NULL)
+	{
+		Data *prevData = data;
+		data = data->next;
+		delete prevData;
+	}
+}
+
+int MetaTable::GetMetaInt(uint32_t id, int def) const
+{
+	Data *data = FindMeta(id);
+	if(!data)
+		return def;
+	return data->value.integer;
+}
+
+fixed MetaTable::GetMetaFixed(uint32_t id, fixed def) const
+{
+	Data *data = FindMeta(id);
+	if(!data)
+		return def;
+	return data->value.fixedPoint;
+}
+
+const char* MetaTable::GetMetaString(uint32_t id) const
+{
+	Data *data = FindMeta(id);
+	if(!data)
+		return NULL;
+	return data->value.string;
+}
+
+void MetaTable::SetMetaInt(uint32_t id, int value)
+{
+	Data *data = FindMetaData(id);
+	data->SetType(MetaTable::INTEGER);
+	data->value.integer = value;
+}
+
+void MetaTable::SetMetaFixed(uint32_t id, fixed value)
+{
+	Data *data = FindMetaData(id);
+	data->SetType(MetaTable::FIXED);
+	data->value.fixedPoint = value;
+}
+
+void MetaTable::SetMetaString(uint32_t id, const char* value)
+{
+	Data *data = FindMetaData(id);
+	if(data->type == MetaTable::STRING && data->value.string != NULL)
+		delete[] data->value.string;
+	else
+		data->SetType(MetaTable::STRING);
+
+	data->value.string = new char[strlen(value)+1];
+	strcpy(data->value.string, value);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 TMap<int, ClassDef *> ClassDef::classNumTable;
 SymbolTable ClassDef::globalSymbols;
 
 ClassDef::ClassDef()
 {
+	ActorInfo = new FActorInfo();
+	ActorInfo->Class = this;
+
 	defaultInstance = (AActor *) malloc(sizeof(AActor));
 	defaultInstance = new (defaultInstance) AActor(this);
 	defaultInstance->defaults = defaultInstance;
@@ -504,7 +641,10 @@ void ClassDef::ParseActor(Scanner &sc)
 	}
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
+	{
 		*newClass->defaultInstance = *newClass->parent->defaultInstance;
+		newClass->defaultInstance->classType = newClass;
+	}
 
 	bool actionsSorted = true;
 	sc.MustGetToken('{');
@@ -1080,7 +1220,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 			if(!optional && *p != 0 && *p != '_')
 				sc.ScriptMessage(Scanner::ERROR, "Not enough parameters.");
 
-			properties[mid].handler(newClass->defaultInstance, paramc, params);
+			properties[mid].handler(newClass->ActorInfo, newClass->defaultInstance, paramc, params);
 
 			// Clean up
 			p = properties[mid].params;

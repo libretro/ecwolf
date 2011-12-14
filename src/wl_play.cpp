@@ -68,10 +68,16 @@ ControlScheme controlScheme[] =
 	{ bt_strafe,			"Strafe",		-1,	sc_Alt,			-1 },
 	{ bt_run,				"Run",			-1,	sc_LShift,		-1 },
 	{ bt_use,				"Use",			-1,	sc_Space,		-1 },
-	{ bt_readyknife,		"Slot 1",		-1,	sc_1,			-1 },
-	{ bt_readypistol,		"Slot 2", 		-1,	sc_2,			-1 },
-	{ bt_readymachinegun,	"Slot 3",		-1,	sc_3,			-1 },
-	{ bt_readychaingun,		"Slot 4",		-1,	sc_4,			-1 },
+	{ bt_slot1,				"Slot 1",		-1,	sc_1,			-1 },
+	{ bt_slot2,				"Slot 2", 		-1,	sc_2,			-1 },
+	{ bt_slot3,				"Slot 3",		-1,	sc_3,			-1 },
+	{ bt_slot4,				"Slot 4",		-1,	sc_4,			-1 },
+	{ bt_slot5,				"Slot 5",		-1,	sc_5,			-1 },
+	{ bt_slot6,				"Slot 6",		-1,	sc_6,			-1 },
+	{ bt_slot7,				"Slot 7",		-1,	sc_7,			-1 },
+	{ bt_slot8,				"Slot 8",		-1,	sc_8,			-1 },
+	{ bt_slot9,				"Slot 9",		-1,	sc_9,			-1 },
+	{ bt_slot0,				"Slot 0",		-1,	sc_0,			-1 },
 
 	// End of List
 	{ bt_nobutton,			NULL,			-1,	-1,				-1 }

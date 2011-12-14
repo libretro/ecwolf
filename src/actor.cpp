@@ -242,6 +242,11 @@ void AActor::Init(bool nothink)
 	}
 }
 
+bool AActor::IsKindOf(const ClassDef *type) const
+{
+	return GetClass()->IsDescendantOf(type);
+}
+
 void AActor::SetState(const Frame *state, bool notic)
 {
 	if(state == NULL)

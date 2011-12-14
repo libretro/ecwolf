@@ -65,6 +65,8 @@ void APlayerPawn::GiveStartingInventory()
 	}
 	while((item = item->Next()));
 
+	player->weapons.StandardSetup(GetClass());
+
 	// Bring up weapon
 	player->BringUpWeapon();
 

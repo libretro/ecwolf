@@ -134,6 +134,7 @@ add_executable(ecwolf WIN32
 	v_palette.cpp
 	v_video.cpp
 	w_wad.cpp
+	weaponslots.cpp
 	wl_act2.cpp
 	wl_agent.cpp
 	wl_atmos.cpp

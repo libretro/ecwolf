@@ -3,6 +3,7 @@
 
 #include "wl_def.h"
 #include "a_playerpawn.h"
+#include "weaponslots.h"
 
 /*
 =============================================================================
@@ -78,8 +79,9 @@ extern class player_t
 		short		lives;
 		int32_t		health;
 
-		AWeapon		*ReadyWeapon;
-		AWeapon		*PendingWeapon;
+		FWeaponSlots	weapons;
+		AWeapon			*ReadyWeapon;
+		AWeapon			*PendingWeapon;
 		struct
 		{
 			const Frame	*frame;

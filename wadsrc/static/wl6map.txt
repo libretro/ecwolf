@@ -221,8 +221,8 @@ sprites
 	"BLAZA0",	"BLAZB0",	"BLAZC0",	"BLAZD0",
 	"BLAZE0",	"BLAZF0",	"BLAZG0",	"BLAZH0",
 
-	"KNIFA0",	"KNIFB0",	"KNIFC0",	"KNIFD0",
-	"KNIFE0",
+	"KNIFA0":pspr,	"KNIFB0":pspr,	"KNIFC0":pspr,	"KNIFD0":pspr,
+	"KNIFE0":pspr,
 
 	"PISGA0":pspr,	"PISGB0":pspr,	"PISGC0":pspr,	"PISGD0":pspr,
 	"PISGE0":pspr,

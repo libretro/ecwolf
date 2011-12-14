@@ -73,11 +73,27 @@ class AHealth : public AInventory
 		bool	TryPickup(AActor *toucher);
 };
 
+enum
+{
+	AWMETA_Start = 0x01000,
+
+	AWMETA_SlotNumber,
+	AWMETA_SlotPriority
+};
+
 class AWeapon : public AInventory
 {
 	DECLARE_NATIVE_CLASS(Weapon, Inventory)
 
 	public:
+		enum FireMode
+		{
+			PrimaryFire,
+			AltFire,
+			EitherFire
+		};
+		bool		CheckAmmo(FireMode fireMode, bool autoSwitch, bool requireAmmo=false) { return true; }
+
 		const Frame	*GetAtkState(bool hold) const;
 		const Frame	*GetDownState() const;
 		const Frame	*GetReadyState() const;

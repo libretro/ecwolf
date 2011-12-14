@@ -39,6 +39,22 @@
 
 struct player_t;
 
+enum
+{
+	APMETA_Start = 0x02000,
+
+	APMETA_Slot0,
+	APMETA_Slot1,
+	APMETA_Slot2,
+	APMETA_Slot3,
+	APMETA_Slot4,
+	APMETA_Slot5,
+	APMETA_Slot6,
+	APMETA_Slot7,
+	APMETA_Slot8,
+	APMETA_Slot9
+};
+
 class APlayerPawn : public AActor
 {
 	DECLARE_NATIVE_CLASS(PlayerPawn, Actor)

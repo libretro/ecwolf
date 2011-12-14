@@ -11,6 +11,7 @@
 #include "thingdef/thingdef.h"
 #include "lnspec.h"
 #include "wl_agent.h"
+#include "a_inventory.h"
 
 /*
 =============================================================================
@@ -102,47 +103,30 @@ void ClipMove (objtype *ob, int32_t xmove, int32_t ymove);
 
 void CheckWeaponChange (void)
 {
-	int newWeapon = -1;
-
-	if (!gamestate.ammo)            // must use knife with no ammo
-		return;
-
-#ifdef _arch_dreamcast
-	int joyx, joyy;
-	IN_GetJoyFineDelta (&joyx, &joyy);
-	if(joyx < -64)
-		buttonstate[bt_prevweapon] = true;
-	else if(joyx > 64)
-		buttonstate[bt_nextweapon] = true;
-#endif
+	AWeapon *newWeapon = NULL;
 
 	if(buttonstate[bt_nextweapon] && !buttonheld[bt_nextweapon])
 	{
-		newWeapon = gamestate.weapon + 1;
-		if(newWeapon > gamestate.bestweapon) newWeapon = 0;
+		newWeapon = players[0].PendingWeapon = players[0].weapons.PickNextWeapon(&players[0]);
 	}
 	else if(buttonstate[bt_prevweapon] && !buttonheld[bt_prevweapon])
 	{
-		newWeapon = gamestate.weapon - 1;
-		if(newWeapon < 0) newWeapon = gamestate.bestweapon;
+		newWeapon = players[0].PendingWeapon = players[0].weapons.PickPrevWeapon(&players[0]);
 	}
 	else
 	{
-		for(int i = wp_knife; i <= gamestate.bestweapon; i++)
+		for(int i = 0;i <= 9;++i)
 		{
-			if (buttonstate[bt_readyknife + i - wp_knife])
+			if(buttonstate[bt_slot0 + i] && !buttonheld[bt_slot0 + i])
 			{
-				newWeapon = i;
+				newWeapon = players[0].weapons.Slots[i].PickWeapon(&players[0]);
 				break;
 			}
 		}
 	}
 
-	if(newWeapon != -1)
-	{
-		gamestate.weapon = gamestate.chosenweapon = (weapontype) newWeapon;
-		DrawWeapon();
-	}
+	if(newWeapon && newWeapon != players[0].ReadyWeapon)
+		players[0].PendingWeapon = newWeapon;
 }
 
 
@@ -1011,7 +995,7 @@ void Cmd_Use (void)
 
 =============================================================================
 */
-#include "a_inventory.h"
+
 const fixed RAISERANGE = 96*FRACUNIT;
 const fixed RAISESPEED = FRACUNIT*6;
 
