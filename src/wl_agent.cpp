@@ -592,7 +592,6 @@ void GiveAmmo (int ammo)
 	{
 		if (!gamestate.attackframe)
 		{
-			gamestate.weapon = gamestate.chosenweapon;
 			DrawWeapon ();
 		}
 	}

@@ -162,8 +162,6 @@ void NewGame (int difficulty,int episode)
 {
 	memset (&gamestate,0,sizeof(gamestate));
 	gamestate.difficulty = difficulty;
-	gamestate.weapon = gamestate.bestweapon
-			= gamestate.chosenweapon = wp_pistol;
 	gamestate.ammo = STARTAMMO;
 	gamestate.episode=episode;
 

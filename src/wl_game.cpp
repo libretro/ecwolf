@@ -716,8 +716,7 @@ void Died (void)
 		VW_FadeIn ();
 	}
 
-	gamestate.weapon = (weapontype) -1;                     // take away weapon
-	SD_PlaySound ("players[0].mo/death");
+	SD_PlaySound ("player/death");
 
 	//
 	// swing around to face attacker
@@ -819,8 +818,6 @@ void Died (void)
 	if (players[0].lives > -1)
 	{
 		players[0].state = player_t::PST_REBORN;
-		gamestate.weapon = gamestate.bestweapon
-			= gamestate.chosenweapon = wp_pistol;
 		gamestate.ammo = STARTAMMO;
 		gamestate.keys = 0;
 		gamestate.attackframe = gamestate.attackcount =

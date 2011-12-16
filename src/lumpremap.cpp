@@ -38,7 +38,6 @@
 #include "scanner.h"
 
 static TMap<FName, LumpRemapper> remaps;
-static TMap<int, FName> spriteReverseMap;
 static TMap<int, FName> vgaReverseMap;
 static TArray<FString> psprites;
 
@@ -67,11 +66,6 @@ void LumpRemapper::AddFile(FResourceFile *file, Type type)
 	rFile.file = file;
 	rFile.type = type;
 	files.Push(rFile);
-}
-
-const char* LumpRemapper::ConvertSpriteIndexToLump(int num)
-{
-	return spriteReverseMap[num];
 }
 
 const char* LumpRemapper::ConvertVGAIndexToLump(int num)
@@ -186,7 +180,6 @@ bool LumpRemapper::LoadMap()
 		else if(sc->str.Compare("sprites") == 0)
 		{
 			parseSprites = true;
-			reverse = &spriteReverseMap;
 			map = &sprites;
 		}
 		else if(sc->str.Compare("sounds") == 0)

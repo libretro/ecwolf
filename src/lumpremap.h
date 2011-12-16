@@ -56,7 +56,6 @@ class LumpRemapper
 
 		static void			AddFile(const char* extension, FResourceFile *file, Type type);
 		// For Read This screens which reference VGAGraph entries by number.
-		static const char*	ConvertSpriteIndexToLump(int num);
 		static const char*	ConvertVGAIndexToLump(int num);
 		static bool			IsPSprite(int lumpnum);
 		static void			RemapAll();

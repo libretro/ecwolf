@@ -496,17 +496,6 @@ struct ControlScheme
 
 extern ControlScheme controlScheme[];
 
-
-#define NUMWEAPONS      4
-typedef enum
-{
-	wp_knife,
-	wp_pistol,
-	wp_machinegun,
-	wp_chaingun
-} weapontype;
-
-
 enum
 {
 	gd_baby,
@@ -527,7 +516,6 @@ typedef struct
 	short       mapon;
 	short       ammo;
 	short       keys;
-	weapontype  bestweapon,weapon,chosenweapon;
 
 	short       faceframe;
 	short       attackframe,attackcount,weaponframe;

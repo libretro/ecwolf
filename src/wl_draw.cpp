@@ -573,12 +573,6 @@ void VGAClearScreen (void)
 
 //==========================================================================
 
-FTexture *ShapeToTexture(int shapenum)
-{
-	const char* textureName = LumpRemapper::ConvertSpriteIndexToLump(shapenum+1);
-	return TexMan[textureName];
-}
-
 /*
 =====================
 =
@@ -608,171 +602,6 @@ int CalcRotate (AActor *ob)
 		angle+=ANGLES;
 
 	return angle/(ANGLES/8);
-}
-
-void ScaleShape (int xcenter, int shapenum, unsigned height, uint32_t flags)
-{
-	t_compshape *shape;
-	unsigned scale,pixheight,pixwidth;
-	unsigned starty,endy;
-	word *cmdptr;
-	byte *cline;
-	byte *line;
-	byte *vmem;
-	int actx,i,upperedge;
-	short newstart;
-	int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
-	unsigned j;
-	byte col;
-
-	BYTE *curshades;
-	if(flags & FL_BRIGHT)
-		curshades = NormalLight.Maps;
-	else
-		curshades = &NormalLight.Maps[256*GetShade(height)];
-
-	shape = (t_compshape *) PM_GetSprite(shapenum);
-
-	scale=height>>3;                 // low three bits are fractional
-	if(!scale) return;   // too close or far away
-
-	pixwidth=CorrectWidthFactor(scale*SPRITESCALEFACTOR);
-	pixheight=scale*SPRITESCALEFACTOR;
-	actx=xcenter-CorrectWidthFactor(scale);
-	upperedge=(viewheight/2)-scale;
-
-	cmdptr=(word *) shape->dataofs;
-
-	for(i=shape->leftpix,pixcnt=i*pixwidth,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
-	{
-		lpix=rpix;
-		if(lpix>=viewwidth) break;
-		pixcnt+=pixwidth;
-		rpix=(pixcnt>>6)+actx;
-		if(lpix!=rpix && rpix>0)
-		{
-			if(lpix<0) lpix=0;
-			if(rpix>viewwidth) rpix=viewwidth,i=shape->rightpix+1;
-			cline=(byte *)shape + *cmdptr;
-			while(lpix<rpix)
-			{
-				if(wallheight[lpix]<=(int)height)
-				{
-					line=cline;
-					while((endy = READWORD(line)) != 0)
-					{
-						endy >>= 1;
-						newstart = READWORD(line);
-						starty = READWORD(line) >> 1;
-						j=starty;
-						ycnt=j*pixheight;
-						screndy=(ycnt>>6)+upperedge;
-						if(screndy<0) vmem=vbuf+lpix;
-						else vmem=vbuf+screndy*vbufPitch+lpix;
-						for(;j<endy;j++)
-						{
-							scrstarty=screndy;
-							ycnt+=pixheight;
-							screndy=(ycnt>>6)+upperedge;
-							if(scrstarty!=screndy && screndy>0)
-							{
-								if(r_depthfog)
-									col=curshades[((byte *)shape)[newstart+j]];
-								else
-									col=((byte *)shape)[newstart+j];
-								if(scrstarty<0) scrstarty=0;
-								if(screndy>viewheight) screndy=viewheight,j=endy;
-
-								while(scrstarty<screndy)
-								{
-									*vmem=col;
-									vmem+=vbufPitch;
-									scrstarty++;
-								}
-							}
-						}
-					}
-				}
-				lpix++;
-			}
-		}
-	}
-}
-
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
-{
-	//FTexture *texture = ShapeToTexture(shapenum);
-	t_compshape   *shape;
-	unsigned scale,pixheight,pixwidth;
-	unsigned starty,endy;
-	word *cmdptr;
-	byte *cline;
-	byte *line;
-	int actx,i,upperedge;
-	short newstart;
-	int scrstarty,screndy,lpix,rpix,pixcnt,ycnt;
-	unsigned j;
-	byte col;
-	byte *vmem;
-
-	shape = (t_compshape *) PM_GetSprite(shapenum);
-
-	scale=height>>1;
-	pixwidth=CorrectWidthFactor(scale*SPRITESCALEFACTOR);
-	pixheight=scale*SPRITESCALEFACTOR;
-	actx=xcenter-CorrectWidthFactor(scale);
-	upperedge=(viewheight/2)-scale;
-
-	cmdptr=shape->dataofs;
-
-	for(i=shape->leftpix,pixcnt=i*pixwidth,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
-	{
-		lpix=rpix;
-		if(lpix>=viewwidth) break;
-		pixcnt+=pixwidth;
-		rpix=(pixcnt>>6)+actx;
-		if(lpix!=rpix && rpix>0)
-		{
-			if(lpix<0) lpix=0;
-			if(rpix>viewwidth) rpix=viewwidth,i=shape->rightpix+1;
-			cline = (byte *)shape + *cmdptr;
-			while(lpix<rpix)
-			{
-				line=cline;
-				while((endy = READWORD(line)) != 0)
-				{
-					endy >>= 1;
-					newstart = READWORD(line);
-					starty = READWORD(line) >> 1;
-					j=starty;
-					ycnt=j*pixheight;
-					screndy=(ycnt>>6)+upperedge;
-					if(screndy<0) vmem=vbuf+lpix;
-					else vmem=vbuf+screndy*vbufPitch+lpix;
-					for(;j<endy;j++)
-					{
-						scrstarty=screndy;
-						ycnt+=pixheight;
-						screndy=(ycnt>>6)+upperedge;
-						if(scrstarty!=screndy && screndy>0)
-						{
-							col=((byte *)shape)[newstart+j];
-							if(scrstarty<0) scrstarty=0;
-							if(screndy>viewheight) screndy=viewheight,j=endy;
-
-							while(scrstarty<screndy)
-							{
-								*vmem=col;
-								vmem+=vbufPitch;
-								scrstarty++;
-							}
-						}
-					}
-				}
-				lpix++;
-			}
-		}
-	}
 }
 
 /*
@@ -1519,7 +1348,7 @@ void    ThreeDRefresh (void)
 
 	DrawPlayerWeapon ();    // draw players[0].mo's hands
 
-	if(Keyboard[sc_Tab] && viewsize == 21 && gamestate.weapon != -1)
+	if(Keyboard[sc_Tab] && viewsize == 21)
 		ShowActStatus();
 
 	VL_UnlockSurface(screenBuffer);

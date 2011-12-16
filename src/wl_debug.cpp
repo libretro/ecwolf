@@ -45,7 +45,6 @@ int DebugKeys (void);
 // from WL_DRAW.C
 
 void ScalePost();
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height);
 
 /*
 =============================================================================
@@ -285,7 +284,7 @@ void ShapeTest (void)
 				// draw the sprite
 				//
 				vbuf += 32*SCREENWIDTH;
-				SimpleScaleShape (160, i-PMSpriteStart, 64);
+				//SimpleScaleShape (160, i-PMSpriteStart, 64);
 				vbuf -= 32*SCREENWIDTH;
 			}
 			else if (i == ChunksInFile - 1)
