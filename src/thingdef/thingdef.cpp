@@ -316,9 +316,6 @@ SymbolTable ClassDef::globalSymbols;
 
 ClassDef::ClassDef()
 {
-	ActorInfo = new FActorInfo();
-	ActorInfo->Class = this;
-
 	defaultInstance = (AActor *) malloc(sizeof(AActor));
 	defaultInstance = new (defaultInstance) AActor(this);
 	defaultInstance->defaults = defaultInstance;
@@ -1220,7 +1217,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 			if(!optional && *p != 0 && *p != '_')
 				sc.ScriptMessage(Scanner::ERROR, "Not enough parameters.");
 
-			properties[mid].handler(newClass->ActorInfo, newClass->defaultInstance, paramc, params);
+			properties[mid].handler(newClass, newClass->defaultInstance, paramc, params);
 
 			// Clean up
 			p = properties[mid].params;

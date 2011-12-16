@@ -119,7 +119,6 @@ class SymbolInfo
 	static const SymbolInfo __SI_##var(NATIVE_CLASS(cls), #var, typeoffsetof(A##cls,var));
 
 struct StateDefinition;
-class FActorInfo;
 
 struct PropertyParam
 {
@@ -132,8 +131,8 @@ struct PropertyParam
 		int64_t			i;
 	};
 };
-typedef void (*PropHandler)(FActorInfo *info, AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params);
-#define HANDLE_PROPERTY(property) void __Handler_##property(FActorInfo *info, AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params)
+typedef void (*PropHandler)(ClassDef *info, AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params);
+#define HANDLE_PROPERTY(property) void __Handler_##property(ClassDef *cls, AActor *defaults, const unsigned int PARAM_COUNT, PropertyParam* params)
 struct PropDef
 {
 	public:
@@ -145,12 +144,6 @@ struct PropDef
 };
 
 typedef TArray<Symbol *> SymbolTable;
-
-class FActorInfo
-{
-	public:
-		ClassDef	*Class;
-};
 
 class MetaTable
 {
@@ -239,7 +232,6 @@ class ClassDef
 		static void				LoadActors();
 		static void				UnloadActors();
 
-		FActorInfo				*ActorInfo;
 		MetaTable				Meta;
 
 	protected:

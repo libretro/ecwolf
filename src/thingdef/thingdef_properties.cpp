@@ -198,14 +198,14 @@ HANDLE_PROPERTY(slotnumber)
 	if(slot < 0 || slot > 9)
 		I_Error("Valid slots range from 0 and 9.");
 
-	info->Class->Meta.SetMetaInt(AWMETA_SlotNumber, slot);
+	cls->Meta.SetMetaInt(AWMETA_SlotNumber, slot);
 }
 
 HANDLE_PROPERTY(slotpriority)
 {
 	FLOAT_PARAM(priority, 0);
 
-	info->Class->Meta.SetMetaFixed(AWMETA_SlotPriority, priority*FRACUNIT);
+	cls->Meta.SetMetaFixed(AWMETA_SlotPriority, priority*FRACUNIT);
 }
 
 HANDLE_PROPERTY(speed)
@@ -261,7 +261,7 @@ HANDLE_PROPERTY(weaponslot)
 		weaponsList << ' ' << weapon;
 	}
 
-	info->Class->Meta.SetMetaString(APMETA_Slot0 + slot, weaponsList);
+	cls->Meta.SetMetaString(APMETA_Slot0 + slot, weaponsList);
 }
 
 HANDLE_PROPERTY(yadjust)
