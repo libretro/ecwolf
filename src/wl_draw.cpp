@@ -915,9 +915,6 @@ void DrawScaleds (void)
 ==============
 */
 
-int weaponscale[NUMWEAPONS] = {SPR_KNIFEREADY, SPR_PISTOLREADY,
-	SPR_MACHINEGUNREADY, SPR_CHAINREADY};
-
 void DrawPlayerWeapon (void)
 {
 	if(!players[0].psprite.frame)

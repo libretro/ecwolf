@@ -607,7 +607,6 @@ void CheckKeys (void)
 		gamestate.keys = 3;
 		players[0].score = 0;
 		gamestate.TimeCount += 42000L;
-		GiveWeapon (wp_chaingun);
 		DrawWeapon ();
 		DrawHealth ();
 		DrawKeys ();

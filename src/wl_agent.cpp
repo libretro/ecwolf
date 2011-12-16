@@ -50,28 +50,6 @@ objtype        *LastAttacker;
 
 player_t		players[1];
 
-/*
-=============================================================================
-
-												LOCAL VARIABLES
-
-=============================================================================
-*/
-
-
-struct atkinf
-{
-	int8_t    tics,attack,frame;              // attack is 1 for gun, 2 for knife
-} attackinfo[4][14] =
-{
-	{ {6,0,1},{6,2,2},{6,0,3},{6,-1,4} },
-	{ {6,0,1},{6,1,2},{6,0,3},{6,-1,4} },
-	{ {6,0,1},{6,1,2},{6,3,3},{6,-1,4} },
-	{ {6,0,1},{6,1,2},{6,4,3},{6,-1,4} },
-};
-
-//===========================================================================
-
 //----------
 
 void Attack (void);
@@ -557,9 +535,8 @@ void GivePoints (int32_t points)
 
 void DrawWeapon (void)
 {
-	const char* weapons[] = { "KNIFE", "PISTOL", "MACHGUN", "GATLGUN" };
 	if(viewsize == 21 && ingame) return;
-	StatusDrawPic (32,8,weapons[gamestate.weapon]);
+	StatusDrawPic (32,8,"PISTOL");
 }
 
 
@@ -583,25 +560,6 @@ void DrawKeys (void)
 		StatusDrawPic (30,20,"SILVRKEY");
 	else
 		StatusDrawPic (30,20,"NOKEY");
-}
-
-/*
-==================
-=
-= GiveWeapon
-=
-==================
-*/
-
-void GiveWeapon (int weapon)
-{
-	GiveAmmo (6);
-
-	if (gamestate.bestweapon<weapon)
-		gamestate.bestweapon = gamestate.weapon
-		= gamestate.chosenweapon = (weapontype) weapon;
-
-	DrawWeapon ();
 }
 
 //===========================================================================
@@ -905,30 +863,6 @@ void Thrust (int angle, int32_t speed)
 
 =============================================================================
 */
-
-
-/*
-===============
-=
-= Cmd_Fire
-=
-===============
-*/
-
-void Cmd_Fire (void)
-{
-	buttonheld[bt_attack] = true;
-
-	gamestate.weaponframe = 0;
-
-	players[0].mo->SetState(players[0].mo->MissileState);
-
-	gamestate.attackframe = 0;
-	gamestate.attackcount =
-		attackinfo[gamestate.weapon][gamestate.attackframe].tics;
-	gamestate.weaponframe =
-		attackinfo[gamestate.weapon][gamestate.attackframe].frame;
-}
 
 //===========================================================================
 
