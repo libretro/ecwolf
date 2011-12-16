@@ -385,6 +385,11 @@ ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarc
 				thisNode->classType = types.GetType(TypeHierarchy::FLOAT);
 				thisNode->value = sc->decimal;
 			}
+			else if(sc.CheckToken(TK_BoolConst))
+			{
+				thisNode->classType = types.GetType(TypeHierarchy::BOOL);
+				thisNode->value = (int64_t)(sc->boolean ? 1 : 0);
+			}
 			/*else if(sc.CheckToken(TK_StringConst))
 			{
 				thisNode->type = STRING;

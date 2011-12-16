@@ -14,6 +14,7 @@ actor WolfWeapon : Weapon
 
 actor Knife : WolfWeapon
 {
+	attacksound "weapon/knife/attack"
 	states
 	{
 		Ready:
@@ -21,7 +22,7 @@ actor Knife : WolfWeapon
 			loop
 		Fire:
 			KNIF B 3
-			KNIF C 3 A_Knife
+			KNIF C 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
 			KNIF DE 3
 			goto Ready
 	}
@@ -29,6 +30,7 @@ actor Knife : WolfWeapon
 
 actor Pistol : WolfWeapon
 {
+	attacksound "weapon/pistol/attack"
 	states
 	{
 		Ready:
@@ -36,7 +38,7 @@ actor Pistol : WolfWeapon
 			loop
 		Fire:
 			PISG B 3
-			PISG C 3 A_Pistol
+			PISG C 3 A_GunAttack
 			PISG DE 3
 			goto Ready
 	}
@@ -44,6 +46,7 @@ actor Pistol : WolfWeapon
 
 actor MachineGun : WolfWeapon 60
 {
+	attacksound "weapon/machine/attack"
 	inventory.pickupsound "weapon/machine/pickup"
 	states
 	{
@@ -56,7 +59,7 @@ actor MachineGun : WolfWeapon 60
 		Fire:
 			MCHG B 3
 		Hold:
-			MCHG C 3 A_MachineGun
+			MCHG C 3 A_GunAttack
 			MCHG D 3
 			MCHG E 3 A_ReFire
 			goto Ready
@@ -65,6 +68,7 @@ actor MachineGun : WolfWeapon 60
 
 actor GatlingGun : WolfWeapon 61
 {
+	attacksound "weapon/gatling/attack"
 	inventory.pickupsound "weapon/gatling/pickup"
 	states
 	{
@@ -77,7 +81,7 @@ actor GatlingGun : WolfWeapon 61
 		Fire:
 			CHGG B 3
 		Hold:
-			CHGG CD 3 A_Chaingun
+			CHGG CD 3 A_GunAttack
 			CHGG E 3 A_ReFire
 			goto Ready
 	}

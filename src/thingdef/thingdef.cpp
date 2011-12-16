@@ -797,7 +797,8 @@ void ClassDef::ParseActor(Scanner &sc)
 
 														const Type *argType = funcInf->types[argc];
 														if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
-															argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT))
+															argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT) ||
+															argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
 														{
 															val.isExpression = true;
 															if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))

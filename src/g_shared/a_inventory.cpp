@@ -216,6 +216,16 @@ const Frame *AWeapon::GetReadyState() const
 	return FindState(NAME_Ready);
 }
 
+ACTION_FUNCTION(A_ReFire)
+{
+	player_t *player = self->player;
+	if(!player)
+		return;
+
+	if(buttonstate[bt_attack] && player->PendingWeapon == WP_NOCHANGE)
+		player->SetPSprite(player->ReadyWeapon->GetAtkState(true));
+}
+
 ACTION_FUNCTION(A_WeaponReady)
 {
 	self->player->flags |= player_t::PF_WEAPONREADY;

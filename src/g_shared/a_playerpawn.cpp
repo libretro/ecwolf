@@ -39,8 +39,6 @@
 
 IMPLEMENT_CLASS(PlayerPawn, Actor)
 
-void GunAttack(AActor *ob);
-
 void APlayerPawn::GiveStartingInventory()
 {
 	if(!startInventory)

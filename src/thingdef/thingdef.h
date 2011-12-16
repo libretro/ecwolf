@@ -98,6 +98,8 @@ typedef TArray<ActionInfo *> ActionTable;
 	void __AF_##func(AActor *self, const CallArguments &args); \
 	static const ActionInfo __AI_##func(__AF_##func, #func); \
 	void __AF_##func(AActor *self, const CallArguments &args)
+#define ACTION_PARAM_BOOL(name, num) \
+	bool name = args[num].val.i ? true : false
 #define ACTION_PARAM_INT(name, num) \
 	int name = args[num].val.i
 #define ACTION_PARAM_DOUBLE(name, num) \

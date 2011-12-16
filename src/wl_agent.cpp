@@ -12,6 +12,7 @@
 #include "lnspec.h"
 #include "wl_agent.h"
 #include "a_inventory.h"
+#include "m_random.h"
 
 /*
 =============================================================================
@@ -1118,18 +1119,34 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 ===============
 */
 
-void    KnifeAttack (objtype *ob)
+static FRandom pr_cwpunch("CustomWpPunch");
+ACTION_FUNCTION(A_CustomPunch)
 {
-	AActor *closest;
-	int32_t dist;
+	enum
+	{
+		CPF_ALWAYSPLAYSOUND = 1
+	};
 
-	SD_PlaySound ("weapon/knife/attack", SD_WEAPONS);
+	ACTION_PARAM_INT(damage, 0);
+	ACTION_PARAM_BOOL(norandom, 1);
+	ACTION_PARAM_INT(flags, 2);
+	ACTION_PARAM_STRING(pufftype, 3);
+	ACTION_PARAM_DOUBLE(range, 4);
+	ACTION_PARAM_DOUBLE(lifesteal, 5);
+
+	player_t *player = self->player;
+
+	if(flags & CPF_ALWAYSPLAYSOUND)
+		SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
+	if(range == 0)
+		range = 64;
+
 	// actually fire
-	dist = 0x7fffffff;
-	closest = NULL;
+	int dist = 0x7fffffff;
+	AActor *closest = NULL;
 	for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
 	{
-		if(check->Item() == ob)
+		if(check->Item() == self)
 			continue;
 
 		if ( (check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
@@ -1143,38 +1160,40 @@ void    KnifeAttack (objtype *ob)
 		}
 	}
 
-	if (!closest || dist > 0x18000l)
+	if (!closest || dist-(FRACUNIT/2) > (range/64)*FRACUNIT)
 	{
 		// missed
 		return;
 	}
 
+	if(!norandom)
+		damage *= pr_cwpunch()%8 + 1;
+
 	// hit something
-	DamageActor (closest,US_RndT() >> 4);
+	if(!(flags & CPF_ALWAYSPLAYSOUND))
+		SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
+	DamageActor(closest, damage);
+
+	if(lifesteal > 0 && player->health < self->health)
+	{
+		damage *= lifesteal;
+		player->health += damage;
+		if(player->health > self->health)
+			player->health = self->health;
+		DrawHealth();
+		DrawFace();
+	}
 }
 
-
-
-void GunAttack (AActor *ob)
+ACTION_FUNCTION(A_GunAttack)
 {
+	player_t *player = self->player;
 	AActor *closest=NULL,*oldclosest=NULL;
 	int      damage;
 	int      dx,dy,dist;
 	int32_t  viewdist;
 
-	switch (gamestate.weapon)
-	{
-		case wp_pistol:
-			SD_PlaySound ("weapon/pistol/attack", SD_WEAPONS);
-			break;
-		case wp_machinegun:
-			SD_PlaySound ("weapon/machine/attack", SD_WEAPONS);
-			break;
-		case wp_chaingun:
-			SD_PlaySound ("weapon/gatling/fire", SD_WEAPONS);
-			break;
-	}
-
+	SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
 	madenoise = true;
 
 	//
@@ -1189,7 +1208,7 @@ void GunAttack (AActor *ob)
 
 		for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
 		{
-			if(check->Item() == ob)
+			if(check->Item() == self)
 				continue;
 
 			if ((check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
@@ -1267,138 +1286,4 @@ void VictorySpin (void)
 		if (players[0].mo->y < desty)
 			players[0].mo->y = desty;
 	}
-}
-
-
-//===========================================================================
-
-/*
-===============
-=
-= T_Attack
-=
-===============
-*/
-
-ACTION_FUNCTION(T_Attack)
-{
-	struct  atkinf  *cur;
-
-	UpdateFace ();
-
-	if (gamestate.victoryflag)              // watching the BJ actor
-	{
-		VictorySpin ();
-		return;
-	}
-
-	if ( buttonstate[bt_use] && !buttonheld[bt_use] )
-		buttonstate[bt_use] = false;
-
-	if ( buttonstate[bt_attack] && !buttonheld[bt_attack])
-		buttonstate[bt_attack] = false;
-
-	ControlMovement (self);
-	if (gamestate.victoryflag)              // watching the BJ actor
-		return;
-
-	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
-	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
-
-	//
-	// change frame and fire
-	//
-	gamestate.attackcount -= (short) tics;
-	while (gamestate.attackcount <= 0)
-	{
-		cur = &attackinfo[gamestate.weapon][gamestate.attackframe];
-		switch (cur->attack)
-		{
-			case -1:
-				players[0].mo->SetState(players[0].mo->SpawnState);
-				if (!gamestate.ammo)
-				{
-					gamestate.weapon = wp_knife;
-					DrawWeapon ();
-				}
-				else
-				{
-					if (gamestate.weapon != gamestate.chosenweapon)
-					{
-						gamestate.weapon = gamestate.chosenweapon;
-						DrawWeapon ();
-					}
-				}
-				gamestate.attackframe = gamestate.weaponframe = 0;
-				return;
-
-			case 4:
-				if (!gamestate.ammo)
-					break;
-				if (buttonstate[bt_attack])
-					gamestate.attackframe -= 2;
-			case 1:
-				if (!gamestate.ammo)
-				{       // can only happen with chain gun
-					gamestate.attackframe++;
-					break;
-				}
-				GunAttack (self);
-				if (!ammocheat)
-					gamestate.ammo--;
-				DrawAmmo ();
-				break;
-
-			case 2:
-				KnifeAttack (self);
-				break;
-
-			case 3:
-				if (gamestate.ammo && buttonstate[bt_attack])
-					gamestate.attackframe -= 2;
-				break;
-		}
-
-		gamestate.attackcount += cur->tics;
-		gamestate.attackframe++;
-		gamestate.weaponframe =
-			attackinfo[gamestate.weapon][gamestate.attackframe].frame;
-	}
-}
-
-
-
-//===========================================================================
-
-/*
-===============
-=
-= T_Player
-=
-===============
-*/
-
-ACTION_FUNCTION(T_Player)
-{
-	if (gamestate.victoryflag)              // watching the BJ actor
-	{
-		VictorySpin ();
-		return;
-	}
-
-	UpdateFace ();
-	CheckWeaponChange ();
-
-	if ( buttonstate[bt_use] )
-		Cmd_Use ();
-
-	if ( buttonstate[bt_attack] && !buttonheld[bt_attack])
-		Cmd_Fire ();
-
-	ControlMovement (self);
-	if (gamestate.victoryflag)              // watching the BJ actor
-		return;
-
-	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
-	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
 }

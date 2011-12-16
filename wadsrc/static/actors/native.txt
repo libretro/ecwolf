@@ -1,5 +1,7 @@
 const int CHF_DONTDODGE = 1;
 
+const int CPF_ALWAYSPLAYSOUND = 1;
+
 const int WAF_NORANDOM = 1;
 
 actor Actor native
@@ -54,8 +56,11 @@ actor Weapon : Inventory native
 {
 	weapon.yadjust 0
 
+	action native A_CustomPunch(int damage, bool norandom=false, int flags=0, string pufftype="", float range=0, float lifesteal=0); 
+	action native A_GunAttack();
 	action native A_Lower();
 	action native A_Raise();
+	action native A_ReFire();
 	action native A_WeaponReady();
 }
 
