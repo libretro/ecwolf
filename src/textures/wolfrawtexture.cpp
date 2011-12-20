@@ -215,17 +215,9 @@ void FWolfRawTexture::MakeTexture ()
 	Pixels = new BYTE[Width*Height];
 	memset(Pixels, 0, Width*Height);
 
-	if(Width == 320 && Height == 200)
+	for(unsigned int x = 0;x < Width;++x)
 	{
-		for(unsigned int x = 0;x < 320;++x)
-		{
-			for(unsigned int y = 0;y < 200;++y)
-				Pixels[x*200+y] = GPalette.Remap[data[y*80+(x>>2) + (x&3)*80*200]];
-		}
-	}
-	else
-	{
-		for(unsigned int i = 0;i < Width*Height;++i)
-			Pixels[i] = GPalette.Remap[data[i]];
+		for(unsigned int y = 0;y < Height;++y)
+			Pixels[x*Height+y] = GPalette.Remap[data[y*(Width>>2)+(x>>2) + (x&3)*(Width>>2)*Height]];
 	}
 }

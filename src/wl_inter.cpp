@@ -943,9 +943,9 @@ PreloadGraphics (void)
 	DrawLevel ();
 	ClearSplitVWB ();           // set up for double buffering in split screen
 
-	VWB_BarScaledCoord (0, 0, screenWidth, screenHeight - scaleFactor * (STATUSLINES - 1), bordercol);
-	VWB_DrawPic(((screenWidth-scaleFactor*224)/16)*8,
-		(screenHeight-scaleFactor*(STATUSLINES+48))/2, "GETPSYCH", true);
+	VWB_Clear(bordercol, 0, 0, screenWidth, screenHeight);
+	DrawPlayScreen(true);
+	VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
 
 	WindowX = (screenWidth - scaleFactor*224)/2;
 	WindowY = (screenHeight - scaleFactor*(STATUSLINES+48))/2;
@@ -960,7 +960,7 @@ PreloadGraphics (void)
 	IN_UserInput (70);
 	VW_FadeOut ();
 
-	DrawPlayBorder ();
+	DrawPlayScreen ();
 	VW_UpdateScreen ();
 }
 

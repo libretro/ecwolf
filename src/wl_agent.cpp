@@ -50,16 +50,6 @@ objtype        *LastAttacker;
 
 player_t		players[1];
 
-//----------
-
-void Attack (void);
-void Use (void);
-void Search (objtype *ob);
-void SelectWeapon (void);
-void SelectItem (void);
-
-//----------
-
 void ClipMove (objtype *ob, int32_t xmove, int32_t ymove);
 
 /*
@@ -236,14 +226,15 @@ void ControlMovement (objtype *ob)
 
 void StatusDrawPic (unsigned x, unsigned y, const char* pic)
 {
-	VWB_DrawPic((screenWidth-scaleFactor*320)/16 + scaleFactor*(x*8), screenHeight-scaleFactor*(STATUSLINES-y), pic, true);
+	VWB_DrawGraphic(TexMan(pic), x*8, 200-(STATUSLINES-y));
 //    LatchDrawPicScaledCoord ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
 //        screenHeight-scaleFactor*(STATUSLINES-y),picnum);
 }
 
 void StatusDrawFace(const char* pic)
 {
-	StatusDrawPic(17, 4, pic);
+	VWB_DrawGraphic(TexMan(pic), 136, 164);
+//	StatusDrawPic(17, 4, TexMan(pic));
 	//StatusDrawLCD(picnum);
 }
 

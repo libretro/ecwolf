@@ -112,7 +112,6 @@ add_executable(ecwolf WIN32
 	gamemap_planes.cpp
 	gamemap_uwmf.cpp
 	id_ca.cpp
-	id_ca2.cpp
 	id_in.cpp
 	id_pm.cpp
 	id_sd.cpp

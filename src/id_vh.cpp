@@ -490,3 +490,175 @@ finished:
 	SDL_Flip(screen);
 	return false;
 }
+
+//==========================================================================
+/*
+** VirtualToRealCoords
+**
+**---------------------------------------------------------------------------
+** Copyright 1998-2008 Randy Heit
+** All rights reserved.
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions
+** are met:
+**
+** 1. Redistributions of source code must retain the above copyright
+**    notice, this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. The name of the author may not be used to endorse or promote products
+**    derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+** IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+** IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+** NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**---------------------------------------------------------------------------
+**
+*/
+
+#include "c_cvars.h"
+#include "textures/textures.h"
+#include "r_data/colormaps.h"
+void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect)
+{
+	int myratio = handleaspect ? vid_aspect : 0;
+	double right = x + w;
+	double bottom = y + h;
+
+	if (AspectCorrection[myratio].isWide)
+	{ // The target surface is either 16:9 or 16:10, so expand the
+	  // specified virtual size to avoid undesired stretching of the
+	  // image. Does not handle non-4:3 virtual sizes. I'll worry about
+	  // those if somebody expresses a desire to use them.
+		x = (x - vwidth * 0.5) * screenWidth * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screenWidth * 0.5;
+		w = (right - vwidth * 0.5) * screenWidth * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screenWidth * 0.5 - x;
+	}
+	else
+	{
+		x = x * screenWidth / vwidth;
+		w = right * screenWidth / vwidth - x;
+	}
+	if (AspectCorrection[myratio].tallscreen)
+	{ // The target surface is 5:4
+		y = (y - vheight * 0.5) * screenHeight * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screenHeight * 0.5;
+		h = (bottom - vheight * 0.5) * screenHeight * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screenHeight * 0.5 - y;
+		if (vbottom)
+		{
+			y += (screenHeight - screenHeight * AspectCorrection[myratio].multiplier / 48.0) * 0.5;
+		}
+	}
+	else
+	{
+		y = y * screenHeight / vheight;
+		h = bottom * screenHeight / vheight - y;
+	}
+}
+
+void VirtualToRealCoords(fixed &x, fixed &y, fixed &w, fixed &h, int vwidth, int vheight, bool vbottom, bool handleaspect)
+{
+	double dx, dy, dw, dh;
+	dx = (double)x/FRACUNIT;
+	dy = (double)y/FRACUNIT;
+	dw = (double)w/FRACUNIT;
+	dh = (double)h/FRACUNIT;
+	VirtualToRealCoords(dx, dy, dw, dh, vwidth, vheight, vbottom, handleaspect);
+	x = dx*FRACUNIT;
+	y = dy*FRACUNIT;
+	w = dw*FRACUNIT;
+	h = dh*FRACUNIT;
+}
+
+void VWB_Clear(int color, int x1, int y1, int x2, int y2)
+{
+	byte *vbuf = VL_LockSurface(screenBuffer);
+	for(int i = y1;i < y2;++i)
+		memset(vbuf+(i*bufferPitch)+x1, color, (x2-x1));
+	VL_UnlockSurface(screenBuffer);
+}
+
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy)
+{
+	byte *vbuf = VL_LockSurface(screenBuffer);
+
+	double xd = ix;
+	double yd = iy;
+	double wd = tex->GetScaledWidthDouble();
+	double hd = tex->GetScaledHeightDouble();
+	VirtualToRealCoords(xd, yd, wd, hd, 320, 200, true, true);
+
+	const int x1 = ceil(xd);
+	const int y1 = ceil(yd);
+	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
+	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
+
+	const BYTE *src;
+	byte *dest;
+	unsigned int i, j;
+	fixed x, y;
+	for(i = 0, x = 0;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	{
+		src = tex->GetColumn(x>>FRACBITS, NULL);
+		dest = vbuf+x1+i;
+		if(x1+i >= screenWidth)
+			break;
+		if(y1 > 0)
+			dest += bufferPitch*y1;
+
+		for(j = 0, y = 0;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		{
+			if(y1+j >= screenHeight)
+				break;
+			if(src[y>>FRACBITS] != 0)
+				*dest = NormalLight.Maps[src[y>>FRACBITS]];
+			dest += bufferPitch;
+		}
+	}
+
+	VL_UnlockSurface(screenBuffer);
+}
+
+void CA_CacheScreen(const char* chunk)
+{
+	FTexture *tex = TexMan(chunk);
+	if(!tex)
+		return;
+
+	VWB_Clear(0, 0, 0, screenWidth, screenHeight);
+	byte *vbuf = VL_LockSurface(curSurface);
+	if(!vbuf)
+		return;
+
+	double xd = 0;
+	double yd = 0;
+	double wd = 320;
+	double hd = 200;
+	VirtualToRealCoords(xd, yd, wd, hd, 320, 200, false, true);
+
+	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
+	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
+
+	const BYTE *src;
+	byte *dest;
+	unsigned int i, j;
+	fixed x, y;
+	for(i = xd, x = 0;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	{
+		src = tex->GetColumn(x>>FRACBITS, NULL);
+		dest = vbuf+i;
+		for(j = yd, y = 0;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		{
+			*dest = NormalLight.Maps[src[y>>FRACBITS]];
+			dest += bufferPitch;
+		}
+	}
+	VL_UnlockSurface(curSurface);
+}

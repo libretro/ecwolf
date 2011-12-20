@@ -93,12 +93,15 @@ unsigned screenofs;
 int      viewscreenx, viewscreeny;
 int      viewwidth;
 int      viewheight;
+int      statusbarx;
+int      statusbary;
 short    centerx;
 short    centerxwide;
 int      shootdelta;           // pixels away from centerx a target can be
 fixed    scale;
 fixed    pspritexscale;
 fixed    pspriteyscale;
+fixed    yaspect;
 int32_t  heightnumerator;
 
 
@@ -346,7 +349,7 @@ void CalcProjection (int32_t focal)
 	// divide heightnumerator by a posts distance to get the posts height for
 	// the heightbuffer.  The pixel height is height>>2
 	//
-	heightnumerator = CorrectHeightFactor((TILEGLOBAL*scale)>>6);
+	heightnumerator = ((TILEGLOBAL*scale)>>6)*(yaspect/65536.);
 
 	//
 	// calculate the angle offset from view angle of each pixel's ray
@@ -621,10 +624,40 @@ static void InitGame()
 ==========================
 */
 
-void SetViewSize (unsigned width, unsigned height)
+static void SetViewSize ()
 {
-	viewwidth = width&~15;                  // must be divisable by 16
-	viewheight = height&~1;                 // must be even
+	statusbarx = 0;
+	if(AspectCorrection[vid_aspect].isWide)
+		statusbarx = screenWidth*(48-AspectCorrection[vid_aspect].multiplier)/(48*2);
+
+	statusbary = 159;
+	if(AspectCorrection[vid_aspect].tallscreen)
+		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[vid_aspect].baseHeight + screenHeight/2;
+	else
+		statusbary = statusbary*screenHeight/200;
+
+	unsigned int width;
+	unsigned int height;
+	if(viewsize == 21)
+	{
+		width = screenWidth;
+		height = screenHeight;
+	}
+	else if(viewsize == 20)
+	{
+		width = screenWidth;
+		height = statusbary;
+	}
+	else
+	{
+		width = screenWidth - (20-viewsize)*16*screenWidth/320;
+		height = (statusbary+1) - (20-viewsize)*8*screenHeight/200;
+	}
+
+	//viewwidth = width&~15;                  // must be divisable by 16
+	//viewheight = height&~1;                 // must be even
+	viewwidth = width;
+	viewheight = height;
 	centerx = viewwidth/2-1;
 	centerxwide = AspectCorrection[vid_aspect].isWide ? CorrectWidthFactor(centerx) : centerx;
 	shootdelta = viewwidth/10;
@@ -633,14 +666,9 @@ void SetViewSize (unsigned width, unsigned height)
 	else
 	{
 		viewscreenx = (screenWidth-viewwidth) / 2;
-		viewscreeny = (screenHeight-scaleFactor*STATUSLINES-viewheight)/2;
+		viewscreeny = (statusbary-viewheight)/2;
 		screenofs = viewscreeny*screenWidth+viewscreenx;
 	}
-
-//
-// calculate trace angles and projection constants
-//
-	CalcProjection (FOCALLENGTH);
 
 	int virtheight = screenHeight;
 	int virtwidth = screenWidth;
@@ -648,10 +676,15 @@ void SetViewSize (unsigned width, unsigned height)
 		virtwidth = CorrectWidthFactor(virtwidth);
 	else
 		virtheight = CorrectWidthFactor(virtheight);
-	fixed yaspect = FixedMul((320<<FRACBITS)/200,(virtheight<<FRACBITS)/virtwidth);
+	yaspect = FixedMul((320<<FRACBITS)/200,(virtheight<<FRACBITS)/virtwidth);
 
 	pspritexscale = (centerxwide<<FRACBITS)/160;
 	pspriteyscale = FixedMul(pspritexscale, yaspect);
+
+	//
+	// calculate trace angles and projection constants
+	//
+	CalcProjection (FOCALLENGTH);
 }
 
 
@@ -676,8 +709,10 @@ void ShowViewSize (int width)
 	}
 	else
 	{
-		viewwidth = width*16*screenWidth/320;
-		viewheight = (int) (width*16*HEIGHTRATIO*screenHeight/200);
+	//	viewwidth = width*16*screenWidth/320;
+		viewwidth = screenWidth - (20-width)*16*screenWidth/320;
+	//	viewheight = (int) (width*16*HEIGHTRATIO*screenHeight/200);
+		viewheight = (screenHeight - 48) - (20-width)*8*screenHeight/200;
 		DrawPlayBorder ();
 	}
 
@@ -692,12 +727,7 @@ void NewViewSize (int width)
 		return;
 
 	viewsize = width;
-	if(viewsize == 21)
-		SetViewSize(screenWidth, screenHeight);
-	else if(viewsize == 20)
-		SetViewSize(screenWidth, screenHeight - scaleFactor * STATUSLINES);
-	else
-		SetViewSize(width*16*screenWidth/320, (unsigned) (width*16*HEIGHTRATIO*screenHeight/200));
+	SetViewSize();
 }
 
 

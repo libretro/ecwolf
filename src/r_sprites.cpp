@@ -357,7 +357,7 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 
 	const fixed centeringOffset = (centerx - 2*centerxwide)<<FRACBITS;
 	const fixed leftedge = FixedMul((160<<FRACBITS) - fixed(tex->GetScaledLeftOffsetDouble()*FRACUNIT) + offsetX, pspritexscale) + centeringOffset;
-	fixed upperedge = ((100-32)<<FRACBITS) + fixed(tex->GetScaledTopOffsetDouble()*FRACUNIT) - offsetY;
+	fixed upperedge = ((100-32)<<FRACBITS) + fixed(tex->GetScaledTopOffsetDouble()*FRACUNIT) - offsetY - AspectCorrection[vid_aspect].tallscreen;
 	if(viewsize == 21 && players[0].ReadyWeapon)
 	{
 		upperedge -= players[0].ReadyWeapon->yadjust;

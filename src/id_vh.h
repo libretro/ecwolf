@@ -45,6 +45,10 @@ extern	int             px,py;
 // regions marked in double buffer
 //
 
+class FTexture;
+void VWB_Clear(int color, int x1, int y1, int x2, int y2);
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy);
+
 void VWB_DrawPropString	 (const char *string);
 
 void VWB_DrawTile8 (int x, int y, int tile);

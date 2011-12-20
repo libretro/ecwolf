@@ -1,6 +1,6 @@
 actor WolfWeapon : Weapon
 {
-	weapon.yadjust 16
+	weapon.yadjust 19
 	states
 	{
 		Select:
