@@ -54,15 +54,15 @@ MENU_LISTENER(EnterSaveMenu);
 
 Menu loadGame(LSM_X, LSM_Y, LSM_W, 24, EnterLoadMenu);
 Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
-Menu optionsMenu(80, 85, 180, 24);
+Menu optionsMenu(80, 85, 180, 28);
 Menu saveGame(LSM_X, LSM_Y, LSM_W, 24, EnterSaveMenu);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(60, 95, 225, 56);
-Menu mouseSensitivity(10, 80, 300, 0);
+Menu mouseSensitivity(20, 80, 300, 0);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
-Menu controls(15, 75, 310, 24);
+Menu controls(15, 70, 310, 24);
 
 MENU_LISTENER(PlayDemosOrReturnToGame)
 {

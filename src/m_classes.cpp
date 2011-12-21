@@ -244,7 +244,7 @@ void MultipleChoiceMenuItem::activate()
 
 void MultipleChoiceMenuItem::draw()
 {
-	VWB_Bar(PrintX, PrintY, menu->getWidth()-menu->getIndent()-menu->getX(), 13, BKGDCOLOR);
+	DrawWindow(PrintX, PrintY, menu->getWidth()-menu->getIndent()-menu->getX(), 13, BKGDCOLOR, BKGDCOLOR, BKGDCOLOR);
 	MenuItem::draw();
 }
 
@@ -289,7 +289,7 @@ void TextInputMenuItem::activate()
 		fontnumber = 0;
 		char* buffer = new char[max+1];
 		if(clearFirst)
-			VWB_Bar(menu->getX() + menu->getIndent() + 1, PrintY + 1, menu->getWidth() - menu->getIndent() - 14, 8, BKGDCOLOR);
+			DrawWindow(menu->getX() + menu->getIndent(), PrintY-1, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, fontcolor, fontcolor);
 		bool accept = US_LineInput(menu->getX() + menu->getIndent() + 2, PrintY, buffer, clearFirst ? "" : getValue(), true, max, menu->getWidth() - menu->getIndent() - 16);
 		if(accept)
 			setValue(buffer);
@@ -300,7 +300,6 @@ void TextInputMenuItem::activate()
 		else
 		{
 			SD_PlaySound("menu/escape");
-			VWB_Bar(menu->getX() + menu->getIndent() + 1, PrintY + 1, menu->getWidth() - menu->getIndent() - 14, 10, BKGDCOLOR);
 			PrintY--;
 			draw();
 		}
@@ -310,7 +309,6 @@ void TextInputMenuItem::activate()
 void TextInputMenuItem::draw()
 {
 	setTextColor();
-	//DrawOutline(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, fontcolor, fontcolor);
 	DrawWindow(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, fontcolor, fontcolor);
 	PrintX = menu->getX() + menu->getIndent() + 2;
 	PrintY++;
@@ -371,8 +369,7 @@ ControlMenuItem::ControlMenuItem(ControlScheme &button) : MenuItem(button.name),
 
 void ControlMenuItem::activate()
 {
-	DrawOutline(159 + (52*column), PrintY, 49, 12, 0, HIGHLIGHT);
-	VWB_Bar(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR);
+	DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR, 0, HIGHLIGHT);
 	PrintX = 162 + (52*column);
 	US_Print("???");
 	VW_UpdateScreen();
@@ -448,12 +445,9 @@ void ControlMenuItem::activate()
 
 void ControlMenuItem::draw()
 {
-	VWB_Bar(159, PrintY, ((52)*3) - 1, 13, BKGDCOLOR);
+	DrawWindow(159, PrintY, ((52)*3) - 1, 13, BKGDCOLOR, BKGDCOLOR, BKGDCOLOR);
 	if(isSelected())
-	{
-		DrawOutline(159 + (52*column), PrintY, 49, 12, 0, HIGHLIGHT);
-		VWB_Bar(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR);
-	}
+		DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR, 0, HIGHLIGHT);
 
 	setTextColor();
 
@@ -509,7 +503,7 @@ void Menu::drawGun(int x, int &y, int basey)
 	eraseGun(x, y);
 	y = getY() + getHeight(curPos);
 	if(getIndent() != 0)
-		VWB_DrawGraphic (cursor, x, y, MENU_CENTER);
+		VWB_DrawGraphic (cursor, x, y-2, MENU_CENTER);
 
 	PrintX = getX() + getIndent();
 	PrintY = getY() + getHeight(curPos);
@@ -522,7 +516,7 @@ void Menu::drawGun(int x, int &y, int basey)
 
 void Menu::drawGunHalfStep(int x, int y)
 {
-	VWB_DrawGraphic (cursor, x, y, MENU_CENTER);
+	VWB_DrawGraphic (cursor, x, y-2, MENU_CENTER);
 	VW_UpdateScreen ();
 	SD_PlaySound ("menu/move1");
 	SDL_Delay (8 * 100 / 7);
@@ -530,7 +524,7 @@ void Menu::drawGunHalfStep(int x, int y)
 
 void Menu::eraseGun(int x, int y)
 {
-	unsigned int gx = x, gy = y, gw = cursor->GetScaledWidthDouble(), gh = cursor->GetScaledHeightDouble();
+	unsigned int gx = x, gy = y-2, gw = cursor->GetScaledWidthDouble(), gh = cursor->GetScaledHeightDouble();
 	MenuToRealCoords(gx, gy, gw, gh, MENU_CENTER);
 	VWB_Clear(BKGDCOLOR, gx, gy, gx+gw, gy+gh);
 
@@ -744,7 +738,7 @@ int Menu::handle()
 			lastBlinkTime = GetTimeCount();
 			TexMan.UpdateAnimations(lastBlinkTime*14);
 			cursor = TexMan("M_CURS1");
-			VWB_DrawGraphic (cursor, x, y, MENU_CENTER);
+			VWB_DrawGraphic (cursor, x, y-2, MENU_CENTER);
 			VW_UpdateScreen ();
 		}
 		else SDL_Delay(5);

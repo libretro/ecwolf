@@ -23,6 +23,8 @@ void VWB_DrawPropString(const char* string)
 	byte	    ch;
 	int i;
 	unsigned sx, sy;
+	int tmp1, tmp2;
+	MenuToRealCoords(px, py, tmp1, tmp2, MENU_CENTER);
 
 	const char* fonts[2] = { "FONT1", "FONT2" };
 	int lumpNum = Wads.CheckNumForName(fonts[fontnumber], ns_graphics);
@@ -37,7 +39,7 @@ void VWB_DrawPropString(const char* string)
 	lump.Read(fontData, Wads.LumpLength(lumpNum));
 	font = (fontstruct *) fontData;
 	height = font->height;
-	dest = vbuf + scaleFactor * (py * curPitch + px);
+	dest = vbuf + (py * curPitch + px);
 
 	while ((ch = (byte)*string++)!=0)
 	{
