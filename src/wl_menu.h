@@ -111,7 +111,7 @@ void SetupSaveGames();
 void CleanupControlPanel(void);
 
 void ClearMScreen(void);
-void DrawWindow(int x,int y,int w,int h,int wcolor);
+void DrawWindow(int x,int y,int w,int h,int wcolor, int color1=BORD2COLOR, int color2=DEACTIVE);
 void DrawOutline(int x,int y,int w,int h,int color1,int color2);
 void WaitKeyUp(void);
 void ReadAnyControl(ControlInfo *ci);

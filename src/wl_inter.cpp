@@ -287,9 +287,8 @@ void
 PG13 (void)
 {
 	VW_FadeOut ();
-	VWB_Bar (0, 0, 320, 200, 0x82);     // background
-
-	VWB_DrawPic (216, 110, "PG13");
+	VWB_Clear(0x82, 0, 0, screenWidth, screenHeight);
+	VWB_DrawGraphic(TexMan("PG13"), 216, 110);
 	VW_UpdateScreen ();
 
 	VW_FadeIn ();

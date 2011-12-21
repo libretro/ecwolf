@@ -5,6 +5,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "textures/textures.h"
 
 static const int color_hlite[] = {
     DEACTIVE,
@@ -21,6 +22,7 @@ static const int color_norml[] = {
 };
 
 bool 			Menu::close = false;
+FTexture		*Menu::cursor = NULL;
 unsigned int	Menu::lastIndexDrawn = 0;
 
 void MenuItem::setTextColor()
@@ -35,7 +37,9 @@ void MenuItem::setTextColor()
 	}
 }
 
-MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) : activateListener(activateListener), enabled(true), highlight(false), selected(false), visible(true), pictureX(-1), pictureY(-1)
+MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) :
+	activateListener(activateListener), enabled(true), highlight(false),
+	picture(NULL), selected(false), visible(true), pictureX(-1), pictureY(-1)
 {
 	setText(string);
 }
@@ -50,8 +54,8 @@ void MenuItem::draw()
 {
 	setTextColor();
 
-	if(!picture.IsEmpty())
-		VWB_DrawPic(pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, picture);
+	if(picture)
+		VWB_DrawGraphic(picture, pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, MENU_CENTER);
 
 	if(getActive())
 		US_Print(getString());
@@ -67,7 +71,7 @@ void MenuItem::draw()
 
 void MenuItem::setPicture(const char* picture, int x, int y)
 {
-	this->picture = picture;
+	this->picture = TexMan(picture);
 	pictureX = x;
 	pictureY = y;
 }
@@ -114,10 +118,11 @@ void BooleanMenuItem::activate()
 
 void BooleanMenuItem::draw()
 {
+	static FTexture *selected = TexMan("M_SELCT"), *deselected = TexMan("M_NSELCT");
 	if (value)
-		VWB_DrawPic (PrintX - 24, PrintY + 3, "M_SELCT");
+		VWB_DrawGraphic (selected, PrintX - 24, PrintY + 3, MENU_CENTER);
 	else
-		VWB_DrawPic (PrintX - 24, PrintY + 3, "M_NSELCT");
+		VWB_DrawGraphic (deselected, PrintX - 24, PrintY + 3, MENU_CENTER);
 	MenuItem::draw();
 }
 
@@ -159,15 +164,22 @@ void SliderMenuItem::draw()
 	}
 	PrintX += 8;
 
-	VWB_Bar(PrintX, PrintY + 1, width, 10, TEXTCOLOR);
-	DrawOutline(PrintX, PrintY + 1, width, 10, 0, HIGHLIGHT);
+	unsigned int bx = PrintX, by = PrintY+1, bw = width, bh = 10;
+	MenuToRealCoords(bx, by, bw, bh, MENU_CENTER);
+
+	DrawWindow(PrintX, PrintY+1, width, 10, TEXTCOLOR, 0, HIGHLIGHT);
 
 	//calc position
 	int x = int(ceil((double(width-20)/double(max))*double(value)));
 	x -= x+20 >= width ? 1 : 0;
 
-	DrawOutline(PrintX + x, PrintY + 1, 20, 10, 0, READCOLOR);
-	VWB_Bar(PrintX + 1 + x, PrintY + 2, 19, 9, READHCOLOR);
+	bx = PrintX + x;
+	by = PrintY + 1;
+	bw = 20;
+	bh = 10;
+	MenuToRealCoords(bx, by, bw, bh, MENU_CENTER);
+
+	DrawWindow(PrintX + x, PrintY + 1, 20, 10, READHCOLOR, 0, READCOLOR);
 
 	PrintX += width+8;
 	MenuItem::draw();
@@ -298,7 +310,8 @@ void TextInputMenuItem::activate()
 void TextInputMenuItem::draw()
 {
 	setTextColor();
-	DrawOutline(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, fontcolor, fontcolor);
+	//DrawOutline(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, fontcolor, fontcolor);
+	DrawWindow(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, fontcolor, fontcolor);
 	PrintX = menu->getX() + menu->getIndent() + 2;
 	PrintY++;
 	fontnumber = 0;
@@ -493,10 +506,10 @@ void ControlMenuItem::right()
 
 void Menu::drawGun(int x, int &y, int basey)
 {
-	VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
+	eraseGun(x, y);
 	y = getY() + getHeight(curPos);
 	if(getIndent() != 0)
-		VWB_DrawPic (x, y, "M_CURS1");
+		VWB_DrawGraphic (cursor, x, y, MENU_CENTER);
 
 	PrintX = getX() + getIndent();
 	PrintY = getY() + getHeight(curPos);
@@ -509,7 +522,7 @@ void Menu::drawGun(int x, int &y, int basey)
 
 void Menu::drawGunHalfStep(int x, int y)
 {
-	VWB_DrawPic (x, y, "M_CURS1");
+	VWB_DrawGraphic (cursor, x, y, MENU_CENTER);
 	VW_UpdateScreen ();
 	SD_PlaySound ("menu/move1");
 	SDL_Delay (8 * 100 / 7);
@@ -517,7 +530,9 @@ void Menu::drawGunHalfStep(int x, int y)
 
 void Menu::eraseGun(int x, int y)
 {
-	VWB_Bar(x - 1, y, 25, 16, BKGDCOLOR);
+	unsigned int gx = x, gy = y, gw = cursor->GetScaledWidthDouble(), gh = cursor->GetScaledHeightDouble();
+	MenuToRealCoords(gx, gy, gw, gh, MENU_CENTER);
+	VWB_Clear(BKGDCOLOR, gx, gy, gx+gw, gy+gh);
 
 	PrintX = getX() + getIndent();
 	PrintY = getY() + getHeight(curPos);
@@ -526,7 +541,9 @@ void Menu::eraseGun(int x, int y)
 	VW_UpdateScreen();
 }
 
-Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) : x(x), y(y), w(w), entryListener(entryListener), indent(indent), curPos(0), height(0), itemOffset(0), headTextInStripes(false)
+Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) :
+	x(x), y(y), w(w), entryListener(entryListener), indent(indent), curPos(0),
+	headPicture(NULL), height(0), itemOffset(0), headTextInStripes(false)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';
@@ -607,6 +624,9 @@ MenuItem *Menu::getIndex(int index) const
 
 void Menu::drawMenu() const
 {
+	if(cursor == NULL)
+		cursor = TexMan("M_CURS1");
+
 	lastIndexDrawn = 0;
 
 	WindowX = PrintX = getX() + getIndent();
@@ -646,13 +666,14 @@ void Menu::drawMenu() const
 
 void Menu::draw() const
 {
+	static FTexture * const mcontrol = TexMan("M_MCONTL");
 	ClearMScreen();
-	if(!headPicture.IsEmpty())
+	if(headPicture)
 	{
 		DrawStripes(10);
-		VWB_DrawPic(84, 0, headPicture);
+		VWB_DrawGraphic(headPicture, 160-headPicture->GetScaledWidth()/2, 0, MENU_TOP);
 	}
-	VWB_DrawPic(112, 184, "M_MCONTL");
+	VWB_DrawGraphic(mcontrol, 160-mcontrol->GetScaledWidth()/2, 200-mcontrol->GetScaledHeight(), MENU_BOTTOM);
 
 	SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
 	WindowX = 0;
@@ -696,11 +717,9 @@ int Menu::handle()
 		return -1;
 
 	x = getX() & -8;
-	basey = getY() - 2;
+	basey = getY();
 	y = basey + getHeight(curPos);
 
-	if(getIndent() != 0)
-		VWB_DrawPic (x, y, "M_CURS1");
 	if (redrawitem)
 	{
 		PrintX = getX() + getIndent();
@@ -710,7 +729,6 @@ int Menu::handle()
 	VW_UpdateScreen ();
 
 	shape = 0;
-	timer = 8;
 	exit = 0;
 	lastBlinkTime = GetTimeCount ();
 	IN_ClearKeysDown ();
@@ -721,20 +739,12 @@ int Menu::handle()
 		//
 		// CHANGE GUN SHAPE
 		//
-		if (getIndent() != 0 && (int32_t)GetTimeCount () - lastBlinkTime > timer)
+		if (getIndent() != 0 && lastBlinkTime != GetTimeCount())
 		{
-			lastBlinkTime = GetTimeCount ();
-			if (shape == 0)
-			{
-				shape = 1;
-				timer = 8;
-			}
-			else
-			{
-				shape = 0;
-				timer = 70;
-			}
-			VWB_DrawPic (x, y, shape == 0 ? "M_CURS1" : "M_CURS2");
+			lastBlinkTime = GetTimeCount();
+			TexMan.UpdateAnimations(lastBlinkTime*14);
+			cursor = TexMan("M_CURS1");
+			VWB_DrawGraphic (cursor, x, y, MENU_CENTER);
 			VW_UpdateScreen ();
 		}
 		else SDL_Delay(5);
@@ -919,7 +929,6 @@ int Menu::handle()
 	//
 	if (lastitem != curPos)
 	{
-		VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 		PrintX = getX() + getIndent();
 		PrintY = getY() + getHeight(curPos);
 		getIndex(curPos)->draw();
@@ -936,7 +945,6 @@ int Menu::handle()
 		case 1:
 			SD_PlaySound ("menu/activate");
 			getIndex(curPos)->activate();
-			VWB_Bar (x - 1, y, 25, 16, BKGDCOLOR);
 			PrintX = getX() + getIndent();
 			PrintY = getY() + getHeight(curPos);
 			getIndex(curPos)->draw();
@@ -949,6 +957,11 @@ int Menu::handle()
 	}
 
 	return 0;                   // JUST TO SHUT UP THE ERROR MESSAGES!
+}
+
+void Menu::setHeadPicture(const char* picture)
+{
+	headPicture = TexMan(picture);
 }
 
 void Menu::setHeadText(const char text[36], bool drawInStripes)

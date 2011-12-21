@@ -23,6 +23,7 @@
 // (read the docs to figure out when it is used.).)
 //////////////////////////////////////////////////////////////////////////////*/
 
+class FTexture;
 class Menu;
 
 #define MENU_LISTENER(name)				bool name(int which)
@@ -34,7 +35,7 @@ class MenuItem
 		bool		enabled;
 		int			height;
 		bool		highlight; // Makes the font a different color, not to be confused with the item being selected.
-		FString		picture;
+		FTexture	*picture;
 		int			pictureX;
 		int			pictureY;
 		bool		selected;
@@ -184,7 +185,7 @@ class Menu
 		static bool			close;
 		bool				controlHeaders;
 		int					curPos;
-		FString				headPicture;
+		FTexture			*headPicture;
 		char				headText[36];
 		bool				headTextInStripes;
 		int					height;
@@ -196,6 +197,8 @@ class Menu
 
 		unsigned int			itemOffset; // scrolling menus
 		static unsigned int		lastIndexDrawn;
+
+		static FTexture			*cursor;
 
 		void	drawGun(int x, int &y, int basey);
 		void	drawGunHalfStep(int x, int y);
@@ -225,7 +228,7 @@ class Menu
 		int				getX() const { return x; }
 		int				getY() const { return y; }
 		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : (position >= items.Size() ? items.Size()-1 : position); }
-		void			setHeadPicture(const char* picture) { headPicture = picture; }
+		void			setHeadPicture(const char* picture);
 		void			setHeadText(const char text[36], bool drawInStripes=false);
 		void			show();
 		/**

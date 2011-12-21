@@ -1026,9 +1026,9 @@ void
 ClearMScreen (void)
 {
 	if(Wads.CheckNumForName("BACKDROP", ns_graphics) == -1)
-		VWB_Bar (0, 0, 320, 200, BORDCOLOR);
+		VWB_Clear (BORDCOLOR, 0, 0, screenWidth, screenHeight);
 	else
-		VWB_DrawPic (0, 0, "BACKDROP", ns_graphics);
+		CA_CacheScreen ("BACKDROP");
 }
 
 
@@ -1037,23 +1037,24 @@ ClearMScreen (void)
 // Draw a window for a menu
 //
 ////////////////////////////////////////////////////////////////////
-void
-DrawWindow (int x, int y, int w, int h, int wcolor)
+void DrawWindow (int x, int y, int w, int h, int wcolor, int color1, int color2)
 {
-	VWB_Bar (x, y, w, h, wcolor);
-	DrawOutline (x, y, w, h, BORD2COLOR, DEACTIVE);
+	unsigned int wx = x, wy = y, ww = w, wh = h;
+	MenuToRealCoords(wx, wy, ww, wh, MENU_CENTER);
+
+	VWB_Clear (wcolor, wx, wy, wx+ww, wy+wh);
+	DrawOutline (x, y, w, h, color1, color2);
 }
 
-
-void
-DrawOutline (int x, int y, int w, int h, int color1, int color2)
+void DrawOutline (int x, int y, int w, int h, int color1, int color2)
 {
-	VWB_Hlin (x, x + w, y, color2);
-	VWB_Vlin (y, y + h, x, color2);
-	VWB_Hlin (x, x + w, y + h, color1);
-	VWB_Vlin (y, y + h, x + w, color1);
-}
+	MenuToRealCoords(x, y, w, h, MENU_CENTER);
 
+	VWB_Clear(color2, x-1, y, x+w+1, y+1);
+	VWB_Clear(color2, x-1, y, x, y+h);
+	VWB_Clear(color1, x-1, y+h, x+w+1, y+h+1);
+	VWB_Clear(color1, x+w, y, x+w+1, y+h);
+}
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -1515,16 +1516,22 @@ CheckPause (void)
 // DRAW SCREEN TITLE STRIPES
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-DrawStripes (int y)
+void DrawStripes (int y)
 {
-#ifndef SPEAR
-	VWB_Bar (0, y, 320, 24, 0);
-	VWB_Hlin (0, 319, y + 22, STRIPE);
-#else
-	VWB_Bar (0, y, 320, 22, 0);
-	VWB_Hlin (0, 319, y + 23, 0);
-#endif
+	static bool calcStripes = true;
+	static unsigned int sy = y, sh = 24;
+	static unsigned int ly = y+22, lh = 1;
+	if(calcStripes)
+	{
+		unsigned int dummyx = 0, dummyw = 320;
+		calcStripes = false;
+
+		MenuToRealCoords(dummyx, sy, dummyw, sh, MENU_TOP);
+		MenuToRealCoords(dummyx, ly, dummyw, lh, MENU_TOP);
+	}
+
+	VWB_Clear(0, 0, ceil(sy), screenWidth, ceil(sy+sh));
+	VWB_Clear(STRIPE, 0, ceil(ly), screenWidth, ceil(ly+lh));
 }
 
 void

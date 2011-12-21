@@ -563,20 +563,6 @@ void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwid
 	}
 }
 
-void VirtualToRealCoords(fixed &x, fixed &y, fixed &w, fixed &h, int vwidth, int vheight, bool vbottom, bool handleaspect)
-{
-	double dx, dy, dw, dh;
-	dx = (double)x/FRACUNIT;
-	dy = (double)y/FRACUNIT;
-	dw = (double)w/FRACUNIT;
-	dh = (double)h/FRACUNIT;
-	VirtualToRealCoords(dx, dy, dw, dh, vwidth, vheight, vbottom, handleaspect);
-	x = dx*FRACUNIT;
-	y = dy*FRACUNIT;
-	w = dw*FRACUNIT;
-	h = dh*FRACUNIT;
-}
-
 void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
@@ -585,7 +571,7 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 	VL_UnlockSurface(screenBuffer);
 }
 
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy)
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
 
@@ -593,7 +579,10 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy)
 	double yd = iy;
 	double wd = tex->GetScaledWidthDouble();
 	double hd = tex->GetScaledHeightDouble();
-	VirtualToRealCoords(xd, yd, wd, hd, 320, 200, true, true);
+	if(menu)
+		MenuToRealCoords(xd, yd, wd, hd, menu);
+	else
+		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, true, true);
 
 	const int x1 = ceil(xd);
 	const int y1 = ceil(yd);

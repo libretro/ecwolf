@@ -1,5 +1,10 @@
 // ID_VH.H
 
+#ifndef __ID_VH_H__
+#define __ID_VH_H__
+
+#include "id_vl.h"
+
 #define WHITE			15			// graphics mode independant colors
 #define BLACK			0
 #define FIRSTCOLOR		1
@@ -46,8 +51,34 @@ extern	int             px,py;
 //
 
 class FTexture;
+enum MenuOffset
+{
+	MENU_NONE = 0,
+	MENU_TOP = 1,
+	MENU_CENTER = 2,
+	MENU_BOTTOM = 3
+};
 void VWB_Clear(int color, int x1, int y1, int x2, int y2);
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy);
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu=MENU_NONE);
+void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect);
+template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offset)
+{
+	x = centerx + (x-160)*scaleFactor;
+	switch(offset)
+	{
+		default:
+			y = screenHeight/2 + (y-100)*scaleFactor;
+			break;
+		case MENU_TOP:
+			y *= scaleFactor;
+			break;
+		case MENU_BOTTOM:
+			y = screenHeight + (y-200)*scaleFactor;
+			break;
+	}
+	w *= scaleFactor;
+	h *= scaleFactor;
+}
 
 void VWB_DrawPropString	 (const char *string);
 
@@ -96,3 +127,5 @@ void    LoadLatchMem (void);
 void    VH_Startup();
 boolean FizzleFade (SDL_Surface *source, int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, boolean abortable);
+
+#endif

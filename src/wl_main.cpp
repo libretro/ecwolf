@@ -632,7 +632,8 @@ static void SetViewSize ()
 
 	statusbary = 159;
 	if(AspectCorrection[vid_aspect].tallscreen)
-		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[vid_aspect].baseHeight + screenHeight/2;
+		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[vid_aspect].baseHeight + screenHeight/2
+			+ (screenHeight - screenHeight*AspectCorrection[vid_aspect].multiplier/48)/2;
 	else
 		statusbary = statusbary*screenHeight/200;
 

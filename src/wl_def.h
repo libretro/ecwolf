@@ -566,6 +566,7 @@ extern  int32_t  heightnumerator;
 extern  fixed    scale;
 extern  fixed    pspritexscale;
 extern  fixed    pspriteyscale;
+extern  fixed    yaspect;
 
 extern  int      dirangle[9];
 

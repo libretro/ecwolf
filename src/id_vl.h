@@ -1,5 +1,8 @@
 // ID_VL.H
 
+#ifndef __ID_VL_H__
+#define __ID_VL_H__
+
 // wolf compatability
 
 void Quit (const char *error,...);
@@ -96,3 +99,5 @@ void inline VL_LatchToScreen (SDL_Surface *source, int x, int y)
 	VL_LatchToScreenScaledCoord(source,0,0,source->w,source->h,
 		scaleFactor*x,scaleFactor*y);
 }
+
+#endif
