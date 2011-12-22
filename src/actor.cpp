@@ -120,7 +120,7 @@ AActor::~AActor()
 
 void AActor::AddInventory(AInventory *item)
 {
-	item->owner = this;
+	item->AttachToOwner(this);
 
 	if(inventory == NULL)
 		inventory = item;
@@ -304,7 +304,7 @@ void AActor::RemoveInventory(AInventory *item)
 	if(inventory == NULL)
 		return;
 
-	item->owner = NULL;
+	item->DetachFromOwner();
 
 	AInventory **next = &inventory;
 	do

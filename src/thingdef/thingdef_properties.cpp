@@ -46,6 +46,24 @@
 #define FLOAT_PARAM(var, no) double var = params[no].f;
 #define STRING_PARAM(var, no) const char* var = params[no].s;
 
+HANDLE_PROPERTY(ammogive1)
+{
+	INT_PARAM(give, 0);
+	((AWeapon *)defaults)->ammogive1 = give;
+}
+
+HANDLE_PROPERTY(ammotype1)
+{
+	STRING_PARAM(type, 0);
+	((AWeapon *)defaults)->ammotype1 = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
+}
+
+HANDLE_PROPERTY(ammouse1)
+{
+	INT_PARAM(use, 0);
+	((AWeapon *)defaults)->ammouse1 = use;
+}
+
 HANDLE_PROPERTY(amount)
 {
 	INT_PARAM(amt, 0);
@@ -178,6 +196,12 @@ HANDLE_PROPERTY(seesound)
 	defaults->seesound = snd;
 }
 
+HANDLE_PROPERTY(selectionorder)
+{
+	INT_PARAM(order, 0);
+	cls->Meta.SetMetaInt(AWMETA_SelectionOrder, order);
+}
+
 HANDLE_PROPERTY(sighttime)
 {
 	INT_PARAM(time, 0);
@@ -286,6 +310,9 @@ HANDLE_PROPERTY(MONSTER)
 
 extern const PropDef properties[] =
 {
+	DEFINE_PROP(ammogive1, Weapon, I),
+	DEFINE_PROP(ammotype1, Weapon, S),
+	DEFINE_PROP(ammouse1, Weapon, I),
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
 	DEFINE_PROP(damage, Actor, I),
@@ -299,6 +326,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(radius, Actor, I),
 	DEFINE_PROP(seesound, Actor, S),
+	DEFINE_PROP(selectionorder, Weapon, I),
 	DEFINE_PROP(sighttime, Actor, I_I),
 	DEFINE_PROP(slotnumber, Weapon, I),
 	DEFINE_PROP(slotpriority, Weapon, F),

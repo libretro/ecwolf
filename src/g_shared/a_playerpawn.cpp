@@ -37,6 +37,8 @@
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
 
+#include <climits>
+
 IMPLEMENT_CLASS(PlayerPawn, Actor)
 
 void APlayerPawn::GiveStartingInventory()
@@ -55,11 +57,15 @@ void APlayerPawn::GiveStartingInventory()
 		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0);
 		invItem->RemoveFromWorld();
 		invItem->amount = inv.amount;
+		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
+		{
+			player->PendingWeapon = (AWeapon *)invItem;
+
+			// Empty weapon.
+			((AWeapon *)invItem)->ammogive1 = 0;
+		}
 		if(!invItem->TryPickup(this))
 			invItem->Destroy();
-
-		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
-			player->PendingWeapon = (AWeapon *)invItem;
 	}
 	while((item = item->Next()));
 
@@ -84,6 +90,37 @@ void APlayerPawn::InitClean()
 	Super::InitClean();
 }
 
+AWeapon *APlayerPawn::PickNewWeapon()
+{
+	AWeapon *best = NULL;
+	int order = INT_MAX;
+
+	for(AInventory *item = inventory;item != NULL;item = item->inventory)
+	{
+		if(!item->IsKindOf(NATIVE_CLASS(Weapon)))
+			continue;
+
+		const int thisOrder = item->GetClass()->Meta.GetMetaInt(AWMETA_SelectionOrder);
+		if(thisOrder > order)
+			continue;
+
+		AWeapon *weapon = static_cast<AWeapon *>(item);
+		if(!weapon->CheckAmmo(AWeapon::PrimaryFire, false))
+			continue;
+
+		order = thisOrder;
+		best = weapon;
+	}
+
+	if(best)
+	{
+		player->PendingWeapon = best;
+		player->SetPSprite(player->ReadyWeapon->GetDownState());
+	}
+
+	return best;
+}
+
 void APlayerPawn::Tick()
 {
 	Super::Tick();
@@ -103,7 +140,7 @@ void APlayerPawn::Tick()
 
 	if((player->flags & player_t::PF_WEAPONREADY))
 	{
-		if(buttonstate[bt_attack] && !buttonheld[bt_attack])
+		if(buttonstate[bt_attack] && !buttonheld[bt_attack] && player->ReadyWeapon->CheckAmmo(AWeapon::PrimaryFire, true))
 			player->SetPSprite(player->ReadyWeapon->GetAtkState(false));
 		else if(player->PendingWeapon != WP_NOCHANGE)
 		{

@@ -34,8 +34,8 @@
 
 #ifndef __THINGDEF_H__
 #define __THINGDEF_H__
+
 #include "actor.h"
-#include "scanner.h"
 #include "tarray.h"
 #include "wl_def.h"
 #include "zstring.h"
@@ -45,6 +45,7 @@ class Frame;
 class Symbol;
 class ExpressionNode;
 class Type;
+class Scanner;
 
 class CallArguments
 {
@@ -227,6 +228,7 @@ class ClassDef
 
 		static const ClassDef	*FindClass(unsigned int ednum);
 		static const ClassDef	*FindClass(const FName &className);
+		static const ClassDef	*FindClassTentative(const FName &className, const ClassDef *parent);
 		const ActionInfo		*FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const;
@@ -249,6 +251,7 @@ class ClassDef
 		static TMap<int, ClassDef *>	classNumTable;
 		static SymbolTable				globalSymbols;
 
+		bool			tentative;
 		FName			name;
 		const ClassDef	*parent;
 

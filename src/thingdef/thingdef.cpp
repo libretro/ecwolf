@@ -314,7 +314,7 @@ void MetaTable::SetMetaString(uint32_t id, const char* value)
 TMap<int, ClassDef *> ClassDef::classNumTable;
 SymbolTable ClassDef::globalSymbols;
 
-ClassDef::ClassDef()
+ClassDef::ClassDef() : tentative(false)
 {
 	defaultInstance = (AActor *) malloc(sizeof(AActor));
 	defaultInstance = new (defaultInstance) AActor(this);
@@ -373,6 +373,24 @@ const ClassDef *ClassDef::FindClass(const FName &className)
 	if(ret == NULL)
 		return NULL;
 	return *ret;
+}
+
+const ClassDef *ClassDef::FindClassTentative(const FName &className, const ClassDef *parent)
+{
+	const ClassDef *search = FindClass(className);
+	if(search)
+	{
+		if(!search->parent->IsDescendantOf(parent))
+			I_Error("%s does not inherit %s!", className.GetChars(), parent->GetName().GetChars());
+		return search;
+	}
+
+	ClassDef *newClass = new ClassDef();
+	ClassTable()[className] = newClass;
+
+	newClass->tentative = true;
+	newClass->name = className;
+	newClass->parent = parent;
 }
 
 const ActionInfo *ClassDef::FindFunction(const FName &function) const
@@ -522,7 +540,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 
 bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 {
-	const ClassDef *currentParent = this->parent;
+	const ClassDef *currentParent = this;
 	while(currentParent != NULL)
 	{
 		if(currentParent == parent)
@@ -590,9 +608,12 @@ void ClassDef::ParseActor(Scanner &sc)
 	if(sc.CheckToken(':'))
 	{
 		sc.MustGetToken(TK_Identifier);
-		newClass->parent = FindClass(sc->str);
-		if(newClass->parent == NULL)
+		const ClassDef *parent = FindClass(sc->str);
+		if(parent == NULL)
 			sc.ScriptMessage(Scanner::ERROR, "Could not find parent actor '%s'\n", sc->str.GetChars());
+		if(newClass->tentative && !parent->IsDescendantOf(newClass->parent))
+			sc.ScriptMessage(Scanner::ERROR, "Parent for actor expected to be '%s'\n", newClass->parent->GetName().GetChars());
+		newClass->parent = parent;
 	}
 	else
 	{
@@ -611,8 +632,10 @@ void ClassDef::ParseActor(Scanner &sc)
 		else
 			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.\n", sc->str.GetChars());
 	}
-	if(previouslyDefined && !native)
+	if(previouslyDefined && !native && !newClass->tentative)
 		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
+	else
+		newClass->tentative = false;
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
@@ -1116,7 +1139,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 		int ret = stricmp(properties[mid].name, propName);
 		if(ret == 0)
 		{
-			if(newClass->IsDescendantOf(properties[mid].className) &&
+			if(!newClass->IsDescendantOf(properties[mid].className) ||
 				stricmp(properties[mid].prefix, className) != 0)
 				sc.ScriptMessage(Scanner::ERROR, "Property %s.%s not available in this scope.\n", properties[mid].className->name.GetChars(), propName);
 

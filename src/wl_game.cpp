@@ -771,7 +771,6 @@ void Died (void)
 	if (players[0].lives > -1)
 	{
 		players[0].state = player_t::PST_REBORN;
-		gamestate.ammo = STARTAMMO;
 		gamestate.keys = 0;
 		gamestate.attackframe = gamestate.attackcount =
 			gamestate.weaponframe = 0;

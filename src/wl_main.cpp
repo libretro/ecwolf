@@ -30,6 +30,7 @@
 #include "wl_agent.h"
 #include "doomerrors.h"
 #include "lumpremap.h"
+#include "scanner.h"
 
 // Wad Code Stuff
 TArray<FString> wadfiles;
@@ -165,7 +166,6 @@ void NewGame (int difficulty,int episode)
 {
 	memset (&gamestate,0,sizeof(gamestate));
 	gamestate.difficulty = difficulty;
-	gamestate.ammo = STARTAMMO;
 	gamestate.episode=episode;
 
 	players[0].state = player_t::PST_ENTER;

@@ -565,31 +565,12 @@ void DrawKeys (void)
 
 void DrawAmmo (void)
 {
-	if(viewsize == 21 && ingame) return;
-	LatchNumber (27,16,2,gamestate.ammo);
-}
+	if((viewsize == 21 && ingame) ||
+		!players[0].ReadyWeapon || !players[0].ReadyWeapon->ammo1)
+		return;
 
-/*
-===============
-=
-= GiveAmmo
-=
-===============
-*/
-
-void GiveAmmo (int ammo)
-{
-	if (!gamestate.ammo)                            // knife was out
-	{
-		if (!gamestate.attackframe)
-		{
-			DrawWeapon ();
-		}
-	}
-	gamestate.ammo += ammo;
-	if (gamestate.ammo > 99)
-		gamestate.ammo = 99;
-	DrawAmmo ();
+	unsigned int amount = players[0].ReadyWeapon->ammo1->amount;
+	LatchNumber (27,16,2,amount);
 }
 
 //===========================================================================
@@ -1048,7 +1029,8 @@ ACTION_FUNCTION(A_CustomPunch)
 {
 	enum
 	{
-		CPF_ALWAYSPLAYSOUND = 1
+		CPF_USEAMMO = 1,
+		CPF_ALWAYSPLAYSOUND = 2
 	};
 
 	ACTION_PARAM_INT(damage, 0);
@@ -1098,6 +1080,13 @@ ACTION_FUNCTION(A_CustomPunch)
 		SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
 	DamageActor(closest, damage);
 
+	// Ammo is only used when hit
+	if(flags & CPF_USEAMMO)
+	{
+		if(!player->ReadyWeapon->DepleteAmmo())
+			return;
+	}
+
 	if(lifesteal > 0 && player->health < self->health)
 	{
 		damage *= lifesteal;
@@ -1116,6 +1105,9 @@ ACTION_FUNCTION(A_GunAttack)
 	int      damage;
 	int      dx,dy,dist;
 	int32_t  viewdist;
+
+	if(!player->ReadyWeapon->DepleteAmmo())
+		return;
 
 	SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
 	madenoise = true;

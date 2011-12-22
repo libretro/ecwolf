@@ -514,7 +514,6 @@ typedef struct
 {
 	short       difficulty;
 	short       mapon;
-	short       ammo;
 	short       keys;
 
 	short       faceframe;

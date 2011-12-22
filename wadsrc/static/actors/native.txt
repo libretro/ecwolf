@@ -1,6 +1,7 @@
 const int CHF_DONTDODGE = 1;
 
-const int CPF_ALWAYSPLAYSOUND = 1;
+const int CPF_USEAMMO = 1;
+const int CPF_ALWAYSPLAYSOUND = 2;
 
 const int WAF_NORANDOM = 1;
 

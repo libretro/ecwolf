@@ -603,7 +603,6 @@ void CheckKeys (void)
 	if (Keyboard[sc_M] && Keyboard[sc_L] && Keyboard[sc_I])
 	{
 		players[0].health = 100;
-		gamestate.ammo = 99;
 		gamestate.keys = 3;
 		players[0].score = 0;
 		gamestate.TimeCount += 42000L;
@@ -1174,6 +1173,7 @@ void PlayLoop (void)
 			VW_FadeIn ();
 
 		CheckKeys ();
+		DrawAmmo();
 
 //
 // debug aids

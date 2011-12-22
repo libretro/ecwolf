@@ -42,6 +42,8 @@ class AInventory : public AActor
 	DECLARE_NATIVE_CLASS(Inventory, Actor)
 
 	public:
+		virtual void	AttachToOwner(AActor *owner);
+		virtual void	DetachFromOwner();
 		void			Touch(AActor *toucher);
 		virtual bool	TryPickup(AActor *toucher);
 		virtual bool	Use();
@@ -77,6 +79,7 @@ enum
 {
 	AWMETA_Start = 0x01000,
 
+	AWMETA_SelectionOrder,
 	AWMETA_SlotNumber,
 	AWMETA_SlotPriority
 };
@@ -92,14 +95,23 @@ class AWeapon : public AInventory
 			AltFire,
 			EitherFire
 		};
-		bool		CheckAmmo(FireMode fireMode, bool autoSwitch, bool requireAmmo=false) { return true; }
+		void		AttachToOwner(AActor *owner);
+		bool		CheckAmmo(FireMode fireMode, bool autoSwitch, bool requireAmmo=false);
+		bool		DepleteAmmo();
 
 		const Frame	*GetAtkState(bool hold) const;
 		const Frame	*GetDownState() const;
 		const Frame	*GetReadyState() const;
 		const Frame	*GetUpState() const;
 
-		fixed	yadjust;
+		const ClassDef	*ammotype1;
+		unsigned int	ammogive1;
+		unsigned int	ammouse1;
+		fixed			yadjust;
+
+		// Inventory instance variables
+		FireMode		mode;
+		AAmmo			*ammo1;
 };
 
 #endif

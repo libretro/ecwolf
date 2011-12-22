@@ -38,6 +38,7 @@
 #include "actor.h"
 
 struct player_t;
+class AWeapon;
 
 enum
 {
@@ -61,6 +62,7 @@ class APlayerPawn : public AActor
 
 	public:
 		void	GiveStartingInventory();
+		AWeapon	*PickNewWeapon();
 		void	Tick();
 
 		int32_t		maxhealth;

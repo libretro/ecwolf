@@ -34,11 +34,17 @@
 
 #include "a_inventory.h"
 #include "id_sd.h"
+#include "templates.h"
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
 #include "wl_agent.h"
 
 IMPLEMENT_CLASS(Inventory, Actor)
+
+void AInventory::AttachToOwner(AActor *owner)
+{
+	this->owner = owner;
+}
 
 // Either creates a copy if the item or returns itself if it is safe to place
 // in the actor's inventory.
@@ -52,6 +58,11 @@ AInventory *AInventory::CreateCopy(AActor *holder)
 	copy->amount = amount;
 	copy->maxamount = maxamount;
 	return copy;
+}
+
+void AInventory::DetachFromOwner()
+{
+	owner = NULL;
 }
 
 // Used for items which aren't placed into an inventory and don't respawn.
@@ -167,7 +178,6 @@ bool AHealth::TryPickup(AActor *toucher)
 	unsigned int max = maxamount;
 	if(max == 0)
 		max = toucher->health;
-	printf("%d %d %d %d\n", amount, maxamount, toucher->health, toucher->player->health);
 
 	if(toucher->player->health >= max)
 		return false;
@@ -190,6 +200,60 @@ IMPLEMENT_CLASS(Ammo, Inventory)
 ////////////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_CLASS(Weapon, Inventory)
+
+void AWeapon::AttachToOwner(AActor *owner)
+{
+	Super::AttachToOwner(owner);
+
+	ammo1 = static_cast<AAmmo *>(owner->FindInventory(ammotype1));
+	if(!ammo1)
+	{
+		ammo1 = static_cast<AAmmo *>(Spawn(ammotype1, 0, 0, 0));
+		ammo1->amount = MIN(ammogive1, ammo1->maxamount);
+		owner->AddInventory(ammo1);
+		ammo1->RemoveFromWorld();
+	}
+	else if(ammo1->amount < ammo1->maxamount)
+	{
+		ammo1->amount += ammogive1;
+		if(ammo1->amount > ammo1->maxamount)
+			ammo1->amount = ammo1->maxamount;
+	}
+}
+
+bool AWeapon::CheckAmmo(AWeapon::FireMode fireMode, bool autoSwitch, bool requireAmmo)
+{
+	const unsigned int amount1 = ammo1 != NULL ? ammo1->amount : 0;
+
+	if(amount1 >= ammouse1)
+		return true;
+
+	if(autoSwitch)
+	{
+		static_cast<APlayerPawn *>(owner)->PickNewWeapon();
+	}
+
+	return false;
+}
+
+bool AWeapon::DepleteAmmo()
+{
+	if(!CheckAmmo(mode, false))
+		return false;
+
+	AAmmo * const ammo = ammo1;
+	const unsigned int ammouse = ammouse1;
+
+	if(ammo == NULL)
+		return true;
+
+	if(ammo->amount < ammouse1)
+		ammo->amount = 0;
+	else
+		ammo->amount -= ammouse;
+
+	return true;
+}
 
 const Frame *AWeapon::GetAtkState(bool hold) const
 {
@@ -220,6 +284,9 @@ ACTION_FUNCTION(A_ReFire)
 {
 	player_t *player = self->player;
 	if(!player)
+		return;
+
+	if(!player->ReadyWeapon->CheckAmmo(AWeapon::PrimaryFire, true))
 		return;
 
 	if(buttonstate[bt_attack] && player->PendingWeapon == WP_NOCHANGE)

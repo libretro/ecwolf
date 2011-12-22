@@ -1,5 +1,8 @@
 actor WolfWeapon : Weapon
 {
+	weapon.ammotype1 "Clip"
+	weapon.ammouse1 1
+	weapon.ammogive1 6
 	weapon.yadjust 19
 	states
 	{
@@ -14,6 +17,8 @@ actor WolfWeapon : Weapon
 
 actor Knife : WolfWeapon
 {
+	weapon.ammouse1 0
+	weapon.selectionorder 3700
 	attacksound "weapon/knife/attack"
 	states
 	{
@@ -30,6 +35,7 @@ actor Knife : WolfWeapon
 
 actor Pistol : WolfWeapon
 {
+	weapon.selectionorder 1900
 	attacksound "weapon/pistol/attack"
 	states
 	{
@@ -48,6 +54,7 @@ actor MachineGun : WolfWeapon 60
 {
 	attacksound "weapon/machine/attack"
 	inventory.pickupsound "weapon/machine/pickup"
+	weapon.selectionorder 1300
 	states
 	{
 		Spawn:
@@ -70,6 +77,7 @@ actor GatlingGun : WolfWeapon 61
 {
 	attacksound "weapon/gatling/attack"
 	inventory.pickupsound "weapon/gatling/pickup"
+	weapon.selectionorder 700
 	states
 	{
 		Spawn:

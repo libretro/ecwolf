@@ -509,9 +509,6 @@ int DebugKeys (void)
 		players[0].health = 100;
 		DrawHealth();
 		DrawFace();
-		gamestate.ammo += 50;
-		if (gamestate.ammo > 99)
-			gamestate.ammo = 99;
 		DrawAmmo ();
 		IN_Ack ();
 		return 1;
