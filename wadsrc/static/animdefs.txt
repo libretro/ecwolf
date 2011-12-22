@@ -1,0 +1,3 @@
+texture optional M_CURS1
+	pic M_CURS1 tics 35
+	pic M_CURS2 tics 4
