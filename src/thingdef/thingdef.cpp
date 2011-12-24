@@ -44,6 +44,7 @@
 #include "thingdef/thingdef_type.h"
 #include "thingdef/thingdef_expression.h"
 #include "thinker.h"
+#include "templates.h"
 
 // Code pointer stuff
 void InitFunctionTable(ActionTable *table);
@@ -740,7 +741,15 @@ void ClassDef::ParseActor(Scanner &sc)
 						else
 						{
 							if(sc.CheckToken(TK_FloatConst))
+							{
+								// Eliminate confusion about fractional frame delays
+								double ipart;
+								double fpart = modf(sc->decimal, &ipart);
+								if(MIN(fabs(fpart), fabs(0.5 - fpart)) > 0.0001)
+									sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
+
 								thisState.duration = static_cast<int> (sc->decimal*2);
+							}
 							else if(stricmp(thisState.sprite, "goto") == 0)
 							{
 								thisState.nextType = StateDefinition::GOTO;
