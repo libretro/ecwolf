@@ -105,23 +105,23 @@ actor Schabbs 17
 			SHAB A -1 NOP T_Stand
 			stop
 		See:
-			SHAB B 5 NOP T_Chase(CHF_BACKOFF)
-			SHAB B 1.5
-			SHAB C 4 NOP T_Chase(CHF_BACKOFF)
-			SHAB D 5 NOP T_Chase(CHF_BACKOFF)
-			SHAB D 1.5
-			SHAB E 4 NOP T_Chase(CHF_BACKOFF)
+			SHAB A 5 NOP T_Chase(CHF_BACKOFF)
+			SHAB A 1.5
+			SHAB B 4 NOP T_Chase(CHF_BACKOFF)
+			SHAB C 5 NOP T_Chase(CHF_BACKOFF)
+			SHAB C 1.5
+			SHAB D 4 NOP T_Chase(CHF_BACKOFF)
 			loop
 		Missile:
-			SHAB F 15
-			SHAB G 5
-			SHAB G 0 T_SchabbThrow
+			SHAB E 15
+			SHAB F 5
+			SHAB F 0 T_SchabbThrow
 			goto See
 		Death:
 			SHAB A 5 A_Fall
 			SHAB A 70 A_DeathScream
-			SHAB HIJ 5
-			SHAB K -1 A_StartDeathCam
+			SHAB GHI 5
+			SHAB J -1 A_StartDeathCam
 			stop
 	}
 }

@@ -63,10 +63,10 @@ actor MechaHitler 19
 			MECH A -1 NOP T_Stand
 			stop
 		See:
-			MECH A 5 NOP T_Chase
+			MECH A 5 A_PlaySound("hitler/active") T_Chase
 			MECH A 3
 			MECH B 4 NOP T_Chase
-			MECH C 5 NOP T_Chase
+			MECH C 5 A_PlaySound("hitler/active") T_Chase
 			MECH C 3
 			MECH D 4 NOP T_Chase
 			loop
@@ -117,7 +117,7 @@ actor Hitler
 			HTLR A .5 A_Fall
 			HTLR A 70 A_DeathScream
 			HTLR H 5
-			HTLR I 5 A_Slurpie
+			HTLR I 5 A_PlaySound("misc/slurpie") // TODO: Full volume with attenuation
 			HTLR JKLMNO 5
 			HTLR P -1 A_StartDeathCam
 			stop

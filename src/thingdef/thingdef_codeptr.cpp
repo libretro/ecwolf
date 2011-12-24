@@ -33,6 +33,7 @@
 */
 
 #include "actor.h"
+#include "id_sd.h"
 #include "m_random.h"
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
@@ -119,4 +120,11 @@ ACTION_FUNCTION(A_MeleeAttack)
 		if(pr_meleeattack() < accuracy*255)
 			TakeDamage(damage, self);
 	}
+}
+
+ACTION_FUNCTION(A_PlaySound)
+{
+	ACTION_PARAM_STRING(sound, 0);
+
+	PlaySoundLocActor(sound, self);
 }

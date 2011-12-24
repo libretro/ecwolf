@@ -91,19 +91,13 @@ void    A_StartDeathCam (objtype *ob);
 
 void    T_Path (objtype *ob);
 void    T_Shoot (objtype *ob);
-void    T_Bite (objtype *ob);
-void    T_DogChase (objtype *ob);
 void    T_Chase (objtype *ob);
 void    T_Projectile (objtype *ob);
 
-void    T_Schabb (objtype *ob);
 void    T_SchabbThrow (objtype *ob);
-void    T_Fake (objtype *ob);
 void    T_FakeFire (objtype *ob);
 
-void A_Slurpie (objtype *ob);
 void A_HitlerMorph (objtype *ob);
-void A_MechaSound (objtype *ob);
 
 /*
 =================
@@ -330,24 +324,6 @@ void T_Launch (objtype *ob)
 	newobj->speed = 0x2000l;
 	newobj->active = ac_yes;
 }
-
-
-
-//
-// angel
-//
-
-
-void A_Slurpie (objtype *)
-{
-	SD_PlaySound("misc/slurpie");
-}
-
-void A_Breathing (objtype *)
-{
-	SD_PlaySound("angel/breath");
-}
-
 
 /*
 =================
@@ -588,24 +564,6 @@ void A_HitlerMorph (objtype *ob)
 	newobj->health = health[gamestate.difficulty];
 }
 
-
-////////////////////////////////////////////////////////
-//
-// A_MechaSound
-// A_Slurpie
-//
-////////////////////////////////////////////////////////
-void A_MechaSound (objtype *ob)
-{
-	if (map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
-		PlaySoundLocActor ("hitler/active",ob);
-}
-
-void A_Slurpie (objtype *)
-{
-	SD_PlaySound("misc/slurpie");
-}
-
 /*
 =================
 =
@@ -807,7 +765,7 @@ ACTION_FUNCTION(T_Chase)
 
 		if ((flags & CHF_BACKOFF) && dist < 4)
 			SelectRunDir (self);
-		if (dodge)
+		else if (dodge)
 			SelectDodgeDir (self);
 		else
 			SelectChaseDir (self);
@@ -1080,21 +1038,6 @@ void T_BJJump (objtype *ob)
 	move = BJJUMPSPEED*tics;
 	MoveObj (ob,move);
 }
-
-
-/*
-===============
-=
-= T_BJYell
-=
-===============
-*/
-
-void T_BJYell (objtype *ob)
-{
-	PlaySoundLocActor("misc/yeah",ob);  // JAB
-}
-
 
 /*
 ===============

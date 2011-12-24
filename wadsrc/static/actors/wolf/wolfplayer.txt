@@ -36,7 +36,9 @@ actor BJRun
 			BLAZ D 4 NOP T_BJRun
 			loop
 		Death:
-			BLAZ EFG 7 NOP T_BJJump
+			BLAZ E 7 NOP T_BJJump
+			BLAZ F 7 A_PlaySound("misc/yeah") T_BJJump
+			BLAZ G 7 NOP T_BJJump
 			BLAZ H 150 T_BJDone
 			stop
 	}
