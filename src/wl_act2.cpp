@@ -263,91 +263,6 @@ ACTION_FUNCTION(A_DeathScream)
 =============================================================================
 */
 
-//
-// will
-//
-
-/*
-================
-=
-= T_Will
-=
-================
-*/
-
-void T_Will (objtype *ob)
-{
-	int32_t move;
-	int     dx,dy,dist;
-	boolean dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - players[0].mo->tilex);
-	dy = abs(ob->tiley - players[0].mo->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))                                              // got a shot at players[0].mo?
-	{
-		ob->hidden = false;
-		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-		{
-			if(ob->MissileState)
-				ob->SetState(ob->MissileState);
-			return;
-		}
-		dodge = true;
-	}
-	else
-		ob->hidden = true;
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (CheckDoorMovement(ob))
-			return;
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-}
-
 
 //
 // death
@@ -631,256 +546,7 @@ moveok:
 #endif
 }*/
 
-
-/*
-=================
-=
-= T_Schabb
-=
-=================
-*/
-
-/*void T_Schabb (objtype *ob)
-{
-	int32_t move;
-	int     dx,dy,dist;
-	boolean dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - players[0].mo->tilex);
-	dy = abs(ob->tiley - players[0].mo->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))                                              // got a shot at players[0].mo?
-	{
-		ob->hidden = false;
-		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-		{
-			//
-			// go into attack frame
-			//
-			NewState (ob,&s_schabbshoot1);
-			return;
-		}
-		dodge = true;
-	}
-	else
-		ob->hidden = true;
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (CheckDoorMovement(ob))
-			return;
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-}*/
-
-
-/*
-=================
-=
-= T_Gift
-=
-=================
-*/
-
-/*void T_Gift (objtype *ob)
-{
-	int32_t move;
-	int     dx,dy,dist;
-	boolean dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - players[0].mo->tilex);
-	dy = abs(ob->tiley - players[0].mo->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))                                              // got a shot at players[0].mo?
-	{
-		ob->hidden = false;
-		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-		{
-			//
-			// go into attack frame
-			//
-			NewState (ob,&s_giftshoot1);
-			return;
-		}
-		dodge = true;
-	}
-	else
-		ob->hidden = true;
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (CheckDoorMovement(ob))
-			return;
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-}*/
-
-
-/*
-=================
-=
-= T_Fat
-=
-=================
-*/
 #if 0
-void T_Fat (objtype *ob)
-{
-	int32_t move;
-	int     dx,dy,dist;
-	boolean dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - players[0].mo->tilex);
-	dy = abs(ob->tiley - players[0].mo->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))                                              // got a shot at players[0].mo?
-	{
-		ob->hidden = false;
-		if ( (unsigned) US_RndT() < (tics<<3) && objfreelist)
-		{
-			//
-			// go into attack frame
-			//
-			NewState (ob,&s_fatshoot1);
-			return;
-		}
-		dodge = true;
-	}
-	else
-		ob->hidden = true;
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (CheckDoorMovement(ob))
-			return;
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-}
-
-
 /*
 =============================================================================
 
@@ -983,71 +649,6 @@ void T_FakeFire (objtype *ob)
 
 	PlaySoundLocActor ("fake/attack",newobj);
 }
-
-
-
-/*
-=================
-=
-= T_Fake
-=
-=================
-*/
-
-void T_Fake (objtype *ob)
-{
-	int32_t move;
-
-	if (CheckLine(ob))                      // got a shot at players[0].mo?
-	{
-		ob->hidden = false;
-		if ( (unsigned) US_RndT() < (tics<<1) && objfreelist)
-		{
-			//
-			// go into attack frame
-			//
-			NewState (ob,&s_fakeshoot1);
-			return;
-		}
-	}
-	else
-		ob->hidden = true;
-
-	if (ob->dir == nodir)
-	{
-		SelectDodgeDir (ob);
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		SelectDodgeDir (ob);
-
-		if (ob->dir == nodir)
-			return;                                                 // object is blocked in
-	}
-}
 #endif
 
 /*
@@ -1099,7 +700,8 @@ ACTION_FUNCTION(T_Chase)
 {
 	enum
 	{
-		CHF_DONTDODGE = 1
+		CHF_DONTDODGE = 1,
+		CHF_BACKOFF = 2
 	};
 
 	ACTION_PARAM_INT(flags, 0);
@@ -1123,9 +725,10 @@ ACTION_FUNCTION(T_Chase)
 			dy = abs(self->tiley - players[0].mo->tiley);
 			dist = dx>dy ? dx : dy;
 
+			if(!(flags & CHF_BACKOFF))
 			{
 				if (dist)
-					chance = (tics<<4)/dist;
+					chance = self->missilechance/dist;
 				else
 					chance = 300;
 
@@ -1140,6 +743,8 @@ ACTION_FUNCTION(T_Chase)
 					}
 				}
 			}
+			else
+				chance = self->missilechance;
 
 			if ( US_RndT()<chance)
 			{
@@ -1200,6 +805,8 @@ ACTION_FUNCTION(T_Chase)
 
 		move -= self->distance;
 
+		if ((flags & CHF_BACKOFF) && dist < 4)
+			SelectRunDir (self);
 		if (dodge)
 			SelectDodgeDir (self);
 		else

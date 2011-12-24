@@ -1,4 +1,5 @@
 const int CHF_DONTDODGE = 1;
+const int CHF_BACKOFF = 2;
 
 const int CPF_USEAMMO = 1;
 const int CPF_ALWAYSPLAYSOUND = 2;
@@ -13,6 +14,7 @@ actor Actor native
 	sighttime 1
 	speed 0
 	points 0
+	missilechance 16
 
 	native int angle;
 	native int health;

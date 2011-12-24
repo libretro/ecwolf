@@ -7,6 +7,7 @@ actor Hans 16
 	attacksound "hans/attack"
 	deathsound "hans/death"
 	seesound "hans/sight"
+	dropitem "GoldKey"
 	MONSTER
 	+AMBUSH
 	states
@@ -45,6 +46,7 @@ actor Gretel 20
 	attacksound "gretel/attack"
 	deathsound "gretel/death"
 	seesound "gretel/sight"
+	dropitem "GoldKey"
 	MONSTER
 	+AMBUSH
 	states
@@ -91,6 +93,7 @@ actor Schabbs 17
 	points 5000
 	health 850, 950, 1550, 2400
 	speed 1, 3
+	missilechance 8
 	attacksound "schabbs/throw"
 	deathsound "schabbs/death"
 	seesound "schabbs/sight"
@@ -102,12 +105,12 @@ actor Schabbs 17
 			SHAB A -1 NOP T_Stand
 			stop
 		See:
-			SHAB B 5 NOP T_Schabb
+			SHAB B 5 NOP T_Chase(CHF_BACKOFF)
 			SHAB B 1.5
-			SHAB C 4 NOP T_Schabb
-			SHAB D 5 NOP T_Schabb
+			SHAB C 4 NOP T_Chase(CHF_BACKOFF)
+			SHAB D 5 NOP T_Chase(CHF_BACKOFF)
 			SHAB D 1.5
-			SHAB E 4 NOP T_Schabb
+			SHAB E 4 NOP T_Chase(CHF_BACKOFF)
 			loop
 		Missile:
 			SHAB F 15
@@ -129,6 +132,7 @@ actor Gift 21
 	points 5000
 	health 850, 950, 1050, 120
 	speed 1, 3
+	missilechance 8
 	attacksound "missile/fire"
 	deathsound "gift/death"
 	seesound "gift/sight"
@@ -140,12 +144,12 @@ actor Gift 21
 			GIFT A -1 NOP T_Stand
 			stop
 		See:
-			GIFT A 5 NOP T_Gift
+			GIFT A 5 NOP T_Chase(CHF_BACKOFF)
 			GIFT A 1.5
-			GIFT B 4 NOP T_Gift
-			GIFT C 5 NOP T_Gift
+			GIFT B 4 NOP T_Chase(CHF_BACKOFF)
+			GIFT C 5 NOP T_Chase(CHF_BACKOFF)
 			GIFT C 1.5
-			GIFT D 4 NOP T_Gift
+			GIFT D 4 NOP T_Chase(CHF_BACKOFF)
 			loop
 		Missile:
 			GIFT E 15
@@ -167,6 +171,7 @@ actor FatFace 22
 	points 5000
 	health 850, 950, 1050, 120
 	speed 1, 3
+	missilechance 8
 	attacksound "missile/fire"
 	deathsound "fat/death"
 	seesound "fat/sight"
@@ -178,12 +183,12 @@ actor FatFace 22
 			FATF A -1 NOP T_Stand
 			stop
 		See:
-			FATF A 5 NOP T_Fat
+			FATF A 5 NOP T_Chase(CHF_BACKOFF)
 			FATF A 1.5
-			FATF B 4 NOP T_Fat
-			FATF C 5 NOP T_Fat
+			FATF B 4 NOP T_Chase(CHF_BACKOFF)
+			FATF C 5 NOP T_Chase(CHF_BACKOFF)
 			FATF C 1.5
-			FATF D 4 NOP T_Fat
+			FATF D 4 NOP T_Chase(CHF_BACKOFF)
 			loop
 		Missile:
 			FATF E 15

@@ -172,6 +172,18 @@ HANDLE_PROPERTY(maxhealth)
 	((APlayerPawn *)defaults)->maxhealth = maxhealth;
 }
 
+HANDLE_PROPERTY(missilechance)
+{
+	INT_PARAM(chance, 0);
+
+	if(chance > 0xFFFF)
+		chance = 0xFFFF;
+	else if(chance < 0)
+		chance = 0;
+
+	defaults->missilechance = chance;
+}
+
 HANDLE_PROPERTY(pickupsound)
 {
 	STRING_PARAM(snd, 0);
@@ -321,6 +333,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
 	DEFINE_PROP(maxamount, Inventory, I),
 	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
+	DEFINE_PROP(missilechance, Actor, I),
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP(pickupsound, Inventory, S),
 	DEFINE_PROP(points, Actor, I),

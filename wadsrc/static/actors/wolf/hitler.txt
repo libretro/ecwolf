@@ -4,6 +4,7 @@ actor FakeHitler 18
 	points 2000
 	health 200, 300, 400, 500
 	speed 1, 3
+	missilechance 2
 	deathsound "fake/death"
 	seesound "fake/sight"
 	MONSTER
@@ -14,12 +15,12 @@ actor FakeHitler 18
 			FAKE A -1 NOP T_Stand
 			stop
 		See:
-			FAKE A 5 NOP T_Fake
+			FAKE A 5 NOP T_Chase
 			FAKE A 1.5
-			FAKE B 4 NOP T_Fake
-			FAKE C 5 NOP T_Fake
+			FAKE B 4 NOP T_Chase
+			FAKE C 5 NOP T_Chase
 			FAKE C 1.5
-			FAKE D 4 NOP T_Fake
+			FAKE D 4 NOP T_Chase
 			loop
 		Missile:
 			FAKE E 4
