@@ -25,20 +25,6 @@
 #	define O_BINARY 0
 #endif
 
-//#pragma pack(1)
-
-#ifndef SPEAR
-	#ifdef UPLOAD
-		#include "gfxv_apo.h"
-	#else
-		#ifndef GOODTIMES
-			#include "gfxv_apo.h"
-		#endif
-	#endif
-#else
-	#include "gfxv_sod.h"
-#endif
-
 #ifdef _arch_dreamcast
 typedef uint8 uint8_t;
 typedef uint16 uint16_t;
