@@ -2,7 +2,6 @@
 
 #include "wl_act.h"
 #include "wl_def.h"
-#include "id_pm.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -755,10 +754,8 @@ void DrawPlayerWeapon (void)
 #ifndef SPEAR
 	if (gamestate.victoryflag)
 	{
-#ifndef APOGEE_1_0
 	//	if (players[0].mo->state == &s_deathcam && (GetTimeCount()&32) )
 	//		SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
-#endif
 		return;
 	}
 #endif

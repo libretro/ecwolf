@@ -9,7 +9,6 @@
 #include "wl_def.h"
 #include "wl_menu.h"
 #include "id_ca.h"
-#include "id_pm.h"
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
@@ -244,7 +243,6 @@ void ShutdownId (void)
 {
 	US_Shutdown ();         // This line is completely useless...
 	SD_Shutdown ();
-	PM_Shutdown ();
 	IN_Shutdown ();
 	VW_Shutdown ();
 #if defined(GP2X)
@@ -537,7 +535,6 @@ static void InitGame()
 	GenerateLookupTables();
 	VH_Startup ();
 	IN_Startup ();
-	PM_Startup ();
 	SD_Startup ();
 	printf("US_Startup: Starting the User Manager.\n");
 	US_Startup ();

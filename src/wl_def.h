@@ -168,25 +168,12 @@ void Quit(const char *errorStr, ...);
 
 #define MINDIST         (0x5800l)
 
-#ifdef USE_HIRES
-
-#define TEXTURESHIFT    7
-#define TEXTURESIZE     (1<<TEXTURESHIFT)
-#define TEXTUREFROMFIXEDSHIFT 2
-#define TEXTUREMASK     (TEXTURESIZE*(TEXTURESIZE-1))
-
-#define SPRITESCALEFACTOR 1
-
-#else
-
 #define TEXTURESHIFT    6
 #define TEXTURESIZE     (1<<TEXTURESHIFT)
 #define TEXTUREFROMFIXEDSHIFT 4
 #define TEXTUREMASK     (TEXTURESIZE*(TEXTURESIZE-1))
 
 #define SPRITESCALEFACTOR 2
-
-#endif
 
 #define NORTH   0
 #define EAST    1

@@ -163,53 +163,38 @@ bool ProjectileTryMove (AActor *ob)
 =================
 */
 
-void T_Projectile (AActor *ob)
+void T_Projectile (AActor *self)
 {
 	int32_t deltax,deltay;
 	int     damage;
 	int32_t speed;
 
-	speed = (int32_t)ob->speed*tics;
+	speed = (int32_t)self->speed*tics;
 
-	deltax = FixedMul(speed,costable[ob->angle]);
-	deltay = -FixedMul(speed,sintable[ob->angle]);
+	deltax = FixedMul(speed,costable[self->angle]);
+	deltay = -FixedMul(speed,sintable[self->angle]);
 
 	if (deltax>0x10000l)
 		deltax = 0x10000l;
 	if (deltay>0x10000l)
 		deltay = 0x10000l;
 
-	ob->x += deltax;
-	ob->y += deltay;
+	self->x += deltax;
+	self->y += deltay;
 
-	deltax = LABS(ob->x - players[0].mo->x);
-	deltay = LABS(ob->y - players[0].mo->y);
+	deltax = LABS(self->x - players[0].mo->x);
+	deltay = LABS(self->y - players[0].mo->y);
 
-	if (!ProjectileTryMove (ob))
+	if (!ProjectileTryMove (self))
 	{
-#ifndef APOGEE_1_0          // actually the whole method is never reached in shareware 1.0
-		if (ob->obclass == rocketobj)
-		{
-			PlaySoundLocActor("missile/hit",ob);
-			ob->Die();
-		}
-#ifdef SPEAR
-		else if (ob->obclass == hrocketobj)
-		{
-			PlaySoundLocActor("missile/hit",ob);
-			ob->Die();
-		}
-#endif
-		else
-#endif
-			ob->Die();
-
+		PlaySoundLocActor(self->deathsound, self);
+		self->Die();
 		return;
 	}
 
 	if (deltax < PROJECTILESIZE && deltay < PROJECTILESIZE)
 	{       // hit the players[0].mo
-		switch (ob->obclass)
+		switch (self->obclass)
 		{
 		case needleobj:
 			damage = (US_RndT() >>3) + 20;
@@ -224,13 +209,13 @@ void T_Projectile (AActor *ob)
 			break;
 		}
 
-		TakeDamage (damage,ob);
-		ob->state = NULL;               // mark for removal
+		TakeDamage (damage,self);
+		self->state = NULL;               // mark for removal
 		return;
 	}
 
-	ob->tilex = (short)(ob->x >> TILESHIFT);
-	ob->tiley = (short)(ob->y >> TILESHIFT);
+	self->tilex = (short)(self->x >> TILESHIFT);
+	self->tiley = (short)(self->y >> TILESHIFT);
 }
 
 
@@ -517,9 +502,7 @@ moveok:
 	newobj->speed = 0x2000l;
 	newobj->active = ac_yes;
 
-#ifndef APOGEE_1_0          // T_GiftThrow will never be called in shareware v1.0
 	PlaySoundLocActor ("missile/fire",newobj);
-#endif
 }*/
 
 #if 0

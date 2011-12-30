@@ -27,7 +27,6 @@
 //                      NeedsMusic - load music?
 //
 #include "wl_def.h"
-#include "id_pm.h"
 #include <SDL_mixer.h>
 #include "w_wad.h"
 #include "zstring.h"

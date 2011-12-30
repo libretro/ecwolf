@@ -1,5 +1,6 @@
 actor Rocket
 {
+	deathsound "missile/hit"
 	states
 	{
 		Spawn:
@@ -24,6 +25,7 @@ actor Smoke
 
 actor HighRocket
 {
+	deathsound "missile/hit"
 	states
 	{
 		Spawn:

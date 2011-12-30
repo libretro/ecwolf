@@ -340,12 +340,10 @@ Write (int x, int y, const char *string)
 					nx += 8;
 					continue;
 
-#ifndef APOGEE_1_0
 				case '\'':
 					VWB_DrawPic (nx, ny, "FONTL039");
 					nx += 8;
 					continue;
-#endif
 
 				case ' ':
 					break;
@@ -993,13 +991,9 @@ DrawHighScores (void)
 #ifndef SPEAR
 	VWB_DrawPic (48, 0, "HGHSCORE");
 
-#ifndef APOGEE_1_0
 	VWB_DrawPic (4 * 8, 68, "M_NAME");
 	VWB_DrawPic (20 * 8, 68, "M_LEVEL");
 	VWB_DrawPic (28 * 8, 68, "M_SCORE");
-#else
-	VWB_DrawPic(35*8,68,"M_CODE");
-#endif
 	fontnumber = 0;
 
 #else
@@ -1075,7 +1069,7 @@ DrawHighScores (void)
 #endif
 		US_Print (buffer);
 
-#ifdef APOGEE_1_0
+/*#ifdef APOGEE_1_0
 //#ifndef UPLOAD
 #ifndef SPEAR
 		//
@@ -1100,7 +1094,7 @@ DrawHighScores (void)
 		}
 #endif
 //#endif
-#endif
+#endif*/
 	}
 
 	VW_UpdateScreen ();
