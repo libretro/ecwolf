@@ -590,6 +590,8 @@ Sint16 GetSample(float csample, byte *samples, int size)
 byte* SD_PrepareSound(int which)
 {
 	int size = Wads.LumpLength(which);
+	if(size == 0)
+		return NULL;
 
 	FWadLump soundLump = Wads.OpenLumpNum(which);
 	byte *origsamples = new byte[size];
@@ -1186,7 +1188,8 @@ SD_PlaySound(const char* sound, SoundChannel chan)
 //            SDL_PCPlaySound((PCSound *)s);
 			break;
 		case sdm_AdLib:
-			SDL_ALPlaySound((AdLibSound *)sindex.GetData(SoundIndex::ADLIB));
+			if(sindex.HasType(SoundIndex::ADLIB))
+				SDL_ALPlaySound((AdLibSound *)sindex.GetData(SoundIndex::ADLIB));
 			break;
 	}
 

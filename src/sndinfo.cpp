@@ -152,7 +152,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 			if(i == 0)
 			{
 				idx.data[i] = SD_PrepareSound(sndLump);
-				idx.length[i] = sizeof(Mix_Chunk);
+				idx.length[i] = idx.data[i] == NULL ? 0 : sizeof(Mix_Chunk);
 			}
 			else
 			{

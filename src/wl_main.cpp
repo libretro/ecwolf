@@ -1049,8 +1049,9 @@ Aspect CheckRatio (int width, int height)//, int *trueratio)
 
 #define IFARG(str) if(!strcmp(arg, (str)))
 
-void CheckParameters(int argc, char *argv[])
+FString CheckParameters(int argc, char *argv[])
 {
+	FString extension = "wl6";
 	bool hasError = false, showHelp = false;
 	bool sampleRateGiven = false, audioBufferGiven = false;
 	int defaultSampleRate = param_samplerate;
@@ -1232,6 +1233,14 @@ void CheckParameters(int argc, char *argv[])
 			param_ignorenumchunks = true;
 		else IFARG("--help")
 			showHelp = true;
+		else IFARG("--data")
+			if(++i >= argc)
+			{
+				printf("Expected main data extension!\n");
+				hasError = true;
+			}
+			else
+				extension = argv[i];
 		else
 			WL_AddFile(argv[i]);
 	}
@@ -1296,6 +1305,8 @@ void CheckParameters(int argc, char *argv[])
 #else
 		param_audiobuffer = 2048 / (44100 / param_samplerate);
 #endif
+
+	return extension;
 }
 
 #ifndef _WIN32
@@ -1383,11 +1394,7 @@ int main (int argc, char *argv[])
 		ReadConfig();
 
 		WL_AddFile("ecwolf.pk3");
-
-		WL_AddFile("audiot.wl6");
-		WL_AddFile("gamemaps.wl6");
-		WL_AddFile("vgagraph.wl6");
-		WL_AddFile("vswap.wl6");
+		FString extension;
 
 #if defined(_arch_dreamcast)
 		DC_Main();
@@ -1395,10 +1402,13 @@ int main (int argc, char *argv[])
 #elif defined(GP2X)
 		GP2X_Init();
 #else
-		CheckParameters(argc, argv);
+		extension = CheckParameters(argc, argv);
 #endif
 
-		CheckForEpisodes();
+		WL_AddFile(FString("audiot.") + extension);
+		WL_AddFile(FString("gamemaps.") + extension);
+		WL_AddFile(FString("vgagraph.") + extension);
+		WL_AddFile(FString("vswap.") + extension);
 
 		printf("W_Init: Init WADfiles.\n");
 		Wads.InitMultipleFiles(wadfiles);

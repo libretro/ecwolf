@@ -44,7 +44,6 @@ struct SaveFile
 TArray<SaveFile> SaveFile::files;
 
 extern int	lastgamemusicoffset;
-extern int	numEpisodesMissing;
 int			episode = 0;
 bool		quickSaveLoad = false;
 
@@ -204,7 +203,7 @@ MENU_LISTENER(PerformSaveGame)
 		bool nextSaveNumber = false;
 		for(unsigned int i = 0;i < 10000;i++)
 		{
-			sprintf(file.filename, "savegam%u.%s", i, extension);
+			sprintf(file.filename, "savegam%u.ecs", i);
 			for(unsigned int j = 0;j < SaveFile::files.Size();j++)
 			{
 				if(stricmp(file.filename, SaveFile::files[j].filename) == 0)
@@ -310,7 +309,7 @@ MENU_LISTENER(EnterSaveMenu)
 }
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
-	if(which >= 6-numEpisodesMissing)
+	/*if(which >= 6-numEpisodesMissing)
 	{
 		SD_PlaySound("player/usefail");
 		Message("Please select \"Read This!\"\n"
@@ -320,7 +319,7 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 		IN_Ack();
 		episodes.draw();
 		return false;
-	}
+	}*/
 
 	if(ingame)
 	{
@@ -416,9 +415,13 @@ void CreateMenus()
 	};
 	for(unsigned int i = 0;i < 6;i++)
 	{
+		FString checkMap;
+		checkMap.Format("MAP%02d", (i*10)+1);
+
 		MenuItem *tmp = new MenuSwitcherMenuItem(episodeText[i], skills, SetEpisodeAndSwitchToSkill);
 		tmp->setPicture(episodePicture[i]);
-		if(i >= 6-numEpisodesMissing)
+		printf("Checking for %s: %d\n", checkMap.GetChars(), Wads.CheckNumForName(checkMap));
+		if(Wads.CheckNumForName(checkMap) == -1)
 			tmp->setEnabled(false);
 		episodes.addItem(tmp);
 	}
@@ -1105,7 +1108,7 @@ void SetupSaveGames()
 		savegam[7] = 0;
 		extent[3] = 0;
 		// match pattern savegam%u.%s
-		if(strcasecmp("savegam", savegam) == 0 && dirent->name[filenameLen-4] == '.' && strcasecmp(extension, extent) == 0)
+		if(strcasecmp("savegam", savegam) == 0 && dirent->name[filenameLen-4] == '.' && strcasecmp("ecs", extent) == 0)
 		{
 			if(DC_LoadFromVMU(dirent->name) != -1)
 			{
@@ -1132,7 +1135,7 @@ void SetupSaveGames()
 		if(filename.Len() <= 11 ||
 			filename.Len() >= 15 ||
 			filename.Mid(0, 7).Compare("savegam") != 0 ||
-			filename.Mid(filename.Len()-3, 3).Compare(extension) != 0)
+			filename.Mid(filename.Len()-3, 3).Compare("ecs") != 0)
 			continue; // Too short or incorrect name
 
 		const int handle = open(filename, O_RDONLY | O_BINARY);
@@ -1538,119 +1541,4 @@ void
 ShootSnd (void)
 {
 	SD_PlaySound ("menu/activate");
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
-// CHECK FOR EPISODES
-//
-///////////////////////////////////////////////////////////////////////////
-void
-CheckForEpisodes (void)
-{
-	struct stat statbuf;
-
-//
-// JAPANESE VERSION
-//
-#ifdef JAPAN
-#ifdef JAPDEMO
-	if(!stat("vswap.wj1", &statbuf))
-	{
-		strcpy (extension, "wj1");
-		numEpisodesMissing = 5;
-#else
-	if(!stat("vswap.wj6", &statbuf))
-	{
-		strcpy (extension, "wj6");
-#endif
-		strcat (SaveName, extension);
-		strcat (demoname, extension);
-		EpisodeSelect[1] =
-			EpisodeSelect[2] = EpisodeSelect[3] = EpisodeSelect[4] = EpisodeSelect[5] = 1;
-	}
-	else
-		Quit ("NO JAPANESE WOLFENSTEIN 3-D DATA FILES to be found!");
-#else
-
-//
-// ENGLISH
-//
-#ifdef UPLOAD
-	if(!stat("vswap.wl1", &statbuf))
-	{
-		strcpy (extension, "wl1");
-		numEpisodesMissing = 5;
-	}
-	else
-		Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
-#else
-#ifndef SPEAR
-	if(!stat("vswap.wl6", &statbuf))
-	{
-		strcpy (extension, "wl6");
-	}
-	else
-	{
-		if(!stat("vswap.wl3", &statbuf))
-		{
-			strcpy (extension, "wl3");
-			numEpisodesMissing = 3;
-		}
-		else
-		{
-			if(!stat("vswap.wl1", &statbuf))
-			{
-				strcpy (extension, "wl1");
-				numEpisodesMissing = 5;
-			}
-			else
-				Quit ("NO WOLFENSTEIN 3-D DATA FILES to be found!");
-		}
-	}
-#endif
-#endif
-
-
-#ifdef SPEAR
-#ifndef SPEARDEMO
-	if(param_mission == 1)
-	{
-		if(!stat("vswap.sod", &statbuf))
-			strcpy (extension, "sod");
-		else
-			Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-	}
-	else if(param_mission == 2)
-	{
-		if(!stat("vswap.sd2", &statbuf))
-			strcpy (extension, "sd2");
-		else
-			Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-	}
-	else if(param_mission == 3)
-	{
-		if(!stat("vswap.sd3", &statbuf))
-			strcpy (extension, "sd3");
-		else
-			Quit ("NO SPEAR OF DESTINY DATA FILES TO BE FOUND!");
-	}
-	else
-		Quit ("UNSUPPORTED MISSION!");
-	strcpy (graphext, "sod");
-#else
-	if(!stat("vswap.sdm", &statbuf))
-	{
-		strcpy (extension, "sdm");
-	}
-	else
-		Quit ("NO SPEAR OF DESTINY DEMO DATA FILES TO BE FOUND!");
-	strcpy (graphext, "sdm");
-#endif
-#endif
-
-	strcat (SaveName, extension);
-	strcat (demoname, extension);
-#endif
 }

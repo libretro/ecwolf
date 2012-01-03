@@ -7,8 +7,6 @@ extern  int   mapon;
 
 extern  class GameMap *map;
 
-extern  char  extension[5];
-
 //===========================================================================
 
 void CA_CacheMap (int mapnum);

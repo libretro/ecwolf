@@ -81,8 +81,11 @@ template<class T> class LinkedList
 		LinkedList(const LinkedList &other) : head(NULL), size(0)
 		{
 			LinkedList::Node *iter = other.Head();
-			while(iter->Next())
-				iter = iter->Next();
+			if(iter != NULL)
+			{
+				while(iter->Next())
+					iter = iter->Next();
+			}
 
 			for(;iter;iter = iter->Prev())
 				Push(iter->Item());

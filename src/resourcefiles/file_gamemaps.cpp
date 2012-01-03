@@ -231,11 +231,15 @@ bool FGamemaps::Open(bool quiet)
 	mapheadReader.Read(offsets, NumPossibleMaps*4);
 	for(NumLumps = 0;offsets[NumLumps] != 0;++NumLumps);
 
-	Lumps = new FMapLump[NumLumps*2];
-	for(unsigned int i = 0;i < NumLumps;i++)
+	// We allocate 2 lumps per map so...
+	static const unsigned int NUM_MAP_LUMPS = 2;
+	NumLumps *= NUM_MAP_LUMPS;
+
+	Lumps = new FMapLump[NumLumps];
+	for(unsigned int i = 0;i < NumLumps/NUM_MAP_LUMPS;++i)
 	{
 		// Map marker
-		FMapLump &markerLump = Lumps[i*2];
+		FMapLump &markerLump = Lumps[i*NUM_MAP_LUMPS];
 		// Hey we don't need to use a temporary name here!
 		// First map is MAP01 and so forth.
 		char lumpname[7];
@@ -246,7 +250,7 @@ bool FGamemaps::Open(bool quiet)
 		markerLump.LumpSize = 0;
 
 		// Make the data lump
-		FMapLump &dataLump = Lumps[i*2+1];
+		FMapLump &dataLump = Lumps[i*NUM_MAP_LUMPS+1];
 		BYTE header[PLANES*6+20];
 		Reader->Seek(offsets[i], SEEK_SET);
 		Reader->Read(&header, PLANES*6+20);
