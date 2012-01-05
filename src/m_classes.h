@@ -34,7 +34,7 @@ class MenuItem
 		MENU_LISTENER_PROTOTYPE(activateListener);
 		bool		enabled;
 		int			height;
-		bool		highlight; // Makes the font a different color, not to be confused with the item being selected.
+		uint8_t		highlight; // Makes the font a different color, not to be confused with the item being selected.
 		FTexture	*picture;
 		int			pictureX;
 		int			pictureY;
@@ -49,7 +49,7 @@ class MenuItem
 				MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
 		virtual	~MenuItem() {}
 
-		const short	getActive() const { return enabled ? (highlight ? 2 : 1) : 0; }
+		const short	getActive() const { return enabled ? (highlight + 1) : 0; }
 		int			getHeight() const { return visible ? height : 0; }
 		const char	*getString() const { return string; }
 		bool		isEnabled() const { return enabled && visible; }
@@ -58,7 +58,7 @@ class MenuItem
 		bool		isVisible() const { return visible; }
 		void		setActivateListener(MENU_LISTENER_PROTOTYPE(activateListener)) { this->activateListener = activateListener; }
 		void		setEnabled(bool enabled=true) { this->enabled = enabled; }
-		void		setHighlighted(bool highlight=true) { this->highlight = highlight; }
+		void		setHighlighted(int highlight=1) { this->highlight = highlight; }
 		void		setMenu(const Menu *menu) { this->menu = menu; }
 		void		setPicture(const char* picture, int x=-1, int y=-1);
 		void		setSelected(bool selected=true) {this->selected = selected; }

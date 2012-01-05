@@ -309,7 +309,9 @@ MENU_LISTENER(EnterSaveMenu)
 }
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
-	/*if(which >= 6-numEpisodesMissing)
+	FString levelLump;
+	levelLump.Format("MAP%02d", which*10+1);
+	if(Wads.CheckNumForName(levelLump) == -1)
 	{
 		SD_PlaySound("player/usefail");
 		Message("Please select \"Read This!\"\n"
@@ -319,7 +321,7 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 		IN_Ack();
 		episodes.draw();
 		return false;
-	}*/
+	}
 
 	if(ingame)
 	{
@@ -420,9 +422,8 @@ void CreateMenus()
 
 		MenuItem *tmp = new MenuSwitcherMenuItem(episodeText[i], skills, SetEpisodeAndSwitchToSkill);
 		tmp->setPicture(episodePicture[i]);
-		printf("Checking for %s: %d\n", checkMap.GetChars(), Wads.CheckNumForName(checkMap));
 		if(Wads.CheckNumForName(checkMap) == -1)
-			tmp->setEnabled(false);
+			tmp->setHighlighted(2);
 		episodes.addItem(tmp);
 	}
 #endif
@@ -448,6 +449,7 @@ void CreateMenus()
 		tmp->setPicture(skillPicture[i], NM_X + 185, NM_Y + 7);
 		skills.addItem(tmp);
 	}
+	skills.setCurrentPosition(2);
 
 	optionsMenu.setHeadPicture("M_OPTION");
 	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_CL"], controlBase));
