@@ -526,8 +526,13 @@ void GivePoints (int32_t points)
 
 void DrawWeapon (void)
 {
-	if(viewsize == 21 && ingame) return;
-	StatusDrawPic (32,8,"PISTOL");
+	if((viewsize == 21 && ingame) ||
+		players[0].ReadyWeapon == NULL ||
+		players[0].ReadyWeapon->icon.isNull()
+	)
+		return;
+
+	VWB_DrawGraphic(TexMan(players[0].ReadyWeapon->icon), 256, 168);
 }
 
 

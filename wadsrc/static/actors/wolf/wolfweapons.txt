@@ -17,6 +17,7 @@ actor WolfWeapon : Weapon
 
 actor Knife : WolfWeapon
 {
+	inventory.icon "KNIFE"
 	weapon.ammouse1 0
 	weapon.selectionorder 3700
 	attacksound "weapon/knife/attack"
@@ -35,6 +36,7 @@ actor Knife : WolfWeapon
 
 actor Pistol : WolfWeapon
 {
+	inventory.icon "PISTOL"
 	weapon.selectionorder 1900
 	attacksound "weapon/pistol/attack"
 	states
@@ -53,6 +55,7 @@ actor Pistol : WolfWeapon
 actor MachineGun : WolfWeapon 60
 {
 	attacksound "weapon/machine/attack"
+	inventory.icon "MACHGUN"
 	inventory.pickupsound "weapon/machine/pickup"
 	weapon.selectionorder 1300
 	states
@@ -76,6 +79,7 @@ actor MachineGun : WolfWeapon 60
 actor GatlingGun : WolfWeapon 61
 {
 	attacksound "weapon/gatling/attack"
+	inventory.icon "GATLGUN"
 	inventory.pickupsound "weapon/gatling/pickup"
 	weapon.selectionorder 700
 	states

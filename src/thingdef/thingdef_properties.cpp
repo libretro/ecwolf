@@ -160,6 +160,13 @@ HANDLE_PROPERTY(health)
 	}
 }
 
+HANDLE_PROPERTY(icon)
+{
+	STRING_PARAM(icon, 0);
+
+	((AInventory *)defaults)->icon = TexMan.CheckForTexture(icon, FTexture::TEX_MiscPatch);
+}
+
 HANDLE_PROPERTY(maxamount)
 {
 	INT_PARAM(maxamt, 0);
@@ -331,6 +338,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
+	DEFINE_PROP(icon, Inventory, S),
 	DEFINE_PROP(maxamount, Inventory, I),
 	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
 	DEFINE_PROP(missilechance, Actor, I),

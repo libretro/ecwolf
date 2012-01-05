@@ -1174,6 +1174,7 @@ void PlayLoop (void)
 
 		CheckKeys ();
 		DrawAmmo();
+		DrawWeapon();
 
 //
 // debug aids

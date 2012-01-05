@@ -36,6 +36,7 @@
 #define __A_INVENTORY_H__
 
 #include "actor.h"
+#include "textures/textures.h"
 
 class AInventory : public AActor
 {
@@ -54,6 +55,7 @@ class AInventory : public AActor
 		FNameNoInit		pickupsound;
 		unsigned int	amount;
 		unsigned int	maxamount;
+		FTextureID		icon;
 	protected:
 		virtual AInventory	*CreateCopy(AActor *holder);
 		void				GoAwayAndDie();
