@@ -45,6 +45,7 @@ enum SpecialSprites
 	NUM_SPECIAL_SPRITES
 };
 
+bool R_CheckSpriteValid(unsigned int spr);
 unsigned int R_GetSprite(const char* spr);
 void R_InitSprites();
 void R_LoadSprite(const FString &name);

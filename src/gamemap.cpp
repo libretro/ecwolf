@@ -40,6 +40,7 @@
 #include "actor.h"
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
+#include "r_sprites.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
 {
@@ -228,6 +229,12 @@ void GameMap::SpawnThings() const
 			{
 				if(actor->PathState)
 					actor->SetState(actor->PathState, true);
+			}
+
+			// Check for valid frames
+			if(!actor->state || !R_CheckSpriteValid(actor->sprite))
+			{
+				printf("%s at (%d, %d) has no frames\n", cls->GetName().GetChars(), thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
 		}
 	}

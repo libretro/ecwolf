@@ -37,6 +37,11 @@ actor FakeHitler 18
 
 actor FireBall
 {
+	radius 11
+	speed 9
+	damage (random[MissileDamage](0, 31))
+	seesound "fake/attack"
+	PROJECTILE
 	+NEVERMARK
 	states
 	{

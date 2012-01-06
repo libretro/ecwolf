@@ -78,6 +78,11 @@ actor Gretel 20
 
 actor Needle
 {
+	radius 11
+	speed 16
+	damage (random[MissileDamage](20, 51))
+	seesound "schabbs/throw"
+	PROJECTILE
 	+NEVERMARK
 	states
 	{
@@ -94,7 +99,6 @@ actor Schabbs 17
 	health 850, 950, 1550, 2400
 	speed 1, 3
 	missilechance 8
-	attacksound "schabbs/throw"
 	deathsound "schabbs/death"
 	seesound "schabbs/sight"
 	MONSTER

@@ -69,6 +69,17 @@ struct Sprite
 TArray<Sprite> spriteFrames;
 TArray<SpriteInfo> loadedSprites;
 
+bool R_CheckSpriteValid(unsigned int spr)
+{
+	if(spr < NUM_SPECIAL_SPRITES)
+		return true;
+
+	SpriteInfo &sprite = loadedSprites[spr];
+	if(sprite.frames == 0)
+		return false;
+	return true;
+}
+
 // Cache sprite name lookups
 unsigned int R_GetSprite(const char* spr)
 {
@@ -169,10 +180,7 @@ void R_InitSprites()
 	{
 		SpritesList &list = spritesMap[loadedSprites[i].iname];
 		if(list.Size() == 0)
-		{
-			printf("Sprite '%s' has no frames.\n", loadedSprites[i].name);
 			continue;
-		}
 		loadedSprites[i].frames = spriteFrames.Size();
 
 		Sprite frames[MAX_SPRITE_FRAMES];

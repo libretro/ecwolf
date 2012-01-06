@@ -50,6 +50,10 @@ actor AngelOfDeath 27
 
 actor Spark
 {
+	speed 16
+	damage (random[MissileDamage](30, 62))
+	seesound "angel/attack"
+	PROJECTILE
 	states
 	{
 		Spawn:

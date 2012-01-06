@@ -73,6 +73,7 @@ const struct FlagDef
 	DEFINE_FLAG(FL, COUNTKILL, Actor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, Actor, flags),
 	DEFINE_FLAG(FL, ISMONSTER, Actor, flags),
+	DEFINE_FLAG(FL, MISSILE, Actor, flags),
 	DEFINE_FLAG(FL, NEVERMARK, Actor, flags),
 	DEFINE_FLAG(FL, NONMARK, Actor, flags),
 	DEFINE_FLAG(FL, PICKUP, Actor, flags),

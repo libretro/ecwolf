@@ -322,6 +322,11 @@ HANDLE_PROPERTY(MONSTER)
 	defaults->flags |= FL_ISMONSTER|FL_SHOOTABLE|FL_CANUSEWALLS|FL_COUNTKILL|FL_SOLID;
 }
 
+HANDLE_PROPERTY(PROJECTILE)
+{
+	defaults->flags |= FL_MISSILE;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DEFINE_PROP_PREFIX(name, class, prefix, params) { A##class::__StaticClass, #prefix, #name, #params, __Handler_##name }
@@ -345,6 +350,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP(pickupsound, Inventory, S),
 	DEFINE_PROP(points, Actor, I),
+	DEFINE_PROP(PROJECTILE, Actor,),
 	DEFINE_PROP(radius, Actor, I),
 	DEFINE_PROP(seesound, Actor, S),
 	DEFINE_PROP(selectionorder, Weapon, I),

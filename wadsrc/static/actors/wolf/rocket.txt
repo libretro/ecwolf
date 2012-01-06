@@ -1,6 +1,15 @@
 actor Rocket
 {
+	// Note: Wolfenstein 3D defines the projectile size twice.
+	// When doing collisions against walls it uses a radius of 8
+	// When doing collisions against the player the delta needs to be within 48
+	// So what to do?  I say we just copy Doom's radius for now.
+	radius 11
+	speed 16
+	damage (random[MissileDamage](30, 61)) // random(0, 31) + 30
+	seesound "missile/fire"
 	deathsound "missile/hit"
+	PROJECTILE
 	states
 	{
 		Spawn:
@@ -25,7 +34,12 @@ actor Smoke
 
 actor HighRocket
 {
+	radius 11
+	speed 16
+	damage (random[MissileDamage](30, 61))
+	seesound "missile/fire"
 	deathsound "missile/hit"
+	PROJECTILE
 	states
 	{
 		Spawn:
