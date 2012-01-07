@@ -12,7 +12,7 @@ actor FakeHitler 18
 	states
 	{
 		Spawn:
-			FAKE A -1 NOP T_Stand
+			FAKE A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			FAKE A 5 NOP T_Chase
@@ -69,7 +69,7 @@ actor MechaHitler 19
 	states
 	{
 		Spawn:
-			MECH A -1 NOP T_Stand
+			MECH A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			MECH A 5 A_PlaySound("hitler/active") T_Chase

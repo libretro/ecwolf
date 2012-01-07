@@ -13,7 +13,7 @@ actor Guard 11
 	states
 	{
 		Spawn:
-			GARD A -1 NOP T_Stand
+			GARD A -1 NOP A_Look
 			stop
 		Path:
 			GARD B 10 NOP T_Path
@@ -119,7 +119,7 @@ actor Officer 12
 	states
 	{
 		Spawn:
-			OFFI A -1 NOP T_Stand
+			OFFI A -1 NOP A_Look
 			stop
 		Path:
 			OFFI B 10 NOP T_Path
@@ -170,7 +170,7 @@ actor Mutant 15
 	states
 	{
 		Spawn:
-			MTNT A -1 NOP T_Stand
+			MTNT A -1 NOP A_Look
 			stop
 		Path:
 			MTNT B 10 NOP T_Path
@@ -223,7 +223,7 @@ actor WolfensteinSS 13 // ZDoom compatible name
 	states
 	{
 		Spawn:
-			SSWV W -1 NOP T_Stand
+			SSWV W -1 NOP A_Look
 			stop
 		Path:
 			SSWV A 10 NOP T_Path

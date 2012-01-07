@@ -13,7 +13,7 @@ actor Hans 16
 	states
 	{
 		Spawn:
-			HANS A -1 NOP T_Stand
+			HANS A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			HANS A 5 NOP T_Chase
@@ -52,7 +52,7 @@ actor Gretel 20
 	states
 	{
 		Spawn:
-			GRET A -1 NOP T_Stand
+			GRET A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			GRET A 5 NOP T_Chase
@@ -106,7 +106,7 @@ actor Schabbs 17
 	states
 	{
 		Spawn:
-			SHAB A -1 NOP T_Stand
+			SHAB A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			SHAB A 5 NOP T_Chase(CHF_BACKOFF)
@@ -145,7 +145,7 @@ actor Gift 21
 	states
 	{
 		Spawn:
-			GIFT A -1 NOP T_Stand
+			GIFT A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			GIFT A 5 NOP T_Chase(CHF_BACKOFF)
@@ -184,7 +184,7 @@ actor FatFace 22
 	states
 	{
 		Spawn:
-			FATF A -1 NOP T_Stand
+			FATF A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			FATF A 5 NOP T_Chase(CHF_BACKOFF)

@@ -10,7 +10,7 @@ actor AngelOfDeath 27
 	states
 	{
 		Spawn:
-			ANGL A -1 NOP T_Stand
+			ANGL A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			ANGL A 5 NOP T_Chase(CHF_BACKOFF)

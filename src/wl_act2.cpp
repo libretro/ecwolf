@@ -384,15 +384,28 @@ STAND
 /*
 ===============
 =
-= T_Stand
+= A_Look
 =
 ===============
 */
 
-ACTION_FUNCTION(T_Stand)
+ACTION_FUNCTION(A_Look)
 {
-	SightPlayer (self);
+	ACTION_PARAM_INT(flags, 0);
+	ACTION_PARAM_DOUBLE(minseedist, 1);
+	ACTION_PARAM_DOUBLE(maxseedist, 2);
+	ACTION_PARAM_DOUBLE(maxheardist, 3);
+	ACTION_PARAM_DOUBLE(fov, 4);
+
+	// FOV of 0 indicates default
+	if(fov < 0.00001)
+		fov = 180;
+
+	SightPlayer(self, minseedist, maxseedist, maxheardist, fov);
 }
+// Create A_LookEx as an alias to A_Look since we're technically emulating this
+// ZDoom function with A_Look.
+ACTION_ALIAS(A_Look, A_LookEx)
 
 
 /*
@@ -576,7 +589,7 @@ ACTION_FUNCTION(T_Path)
 {
 	int32_t    move;
 
-	if (SightPlayer (self))
+	if (SightPlayer (self, 0, 0, 0, 180))
 		return;
 
 	if (self->dir == nodir)

@@ -9,6 +9,7 @@
 #include "actor.h"
 #include "thingdef/thingdef_expression.h"
 #include "wl_agent.h"
+#include "templates.h"
 
 /*
 =============================================================================
@@ -983,12 +984,10 @@ bool CheckLine (AActor *ob)
 ================
 */
 
-#define MINSIGHT        0x18000l
+#define MINSIGHT (0x18000l*64)
 
-bool CheckSight (AActor *ob)
+static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
 {
-	int32_t deltax,deltay;
-
 	//
 	// don't bother tracing a line if the area isn't connected to the players[0].mo's
 	//
@@ -998,59 +997,39 @@ bool CheckSight (AActor *ob)
 	//
 	// if the players[0].mo is real close, sight is automatic
 	//
-	deltax = players[0].mo->x - ob->x;
-	deltay = players[0].mo->y - ob->y;
+	int32_t deltax = players[0].mo->x - ob->x;
+	int32_t deltay = players[0].mo->y - ob->y;
+	uint32_t distance = MAX(abs(deltax), abs(deltay))*64;
 
-	if (deltax > -MINSIGHT && deltax < MINSIGHT
-		&& deltay > -MINSIGHT && deltay < MINSIGHT)
+	if (!(ob->flags & FL_AMBUSH) && madenoise &&
+		(maxheardist < 0.00001 ||
+		distance < maxheardist))
 		return true;
 
-	//
-	// see if they are looking in the right direction
-	//
-	switch (ob->angle/45)
+	if (minseedist > 0.00001 &&
+		distance < minseedist)
+		return false;
+	if (maxseedist > 0.00001 &&
+		distance > maxseedist)
+		return false;
+
+	if (distance < MINSIGHT)
+		return true;
+
+	if(fov < 359.75)
 	{
-		case north:
-			if (deltay > 0)
-				return false;
-			break;
-
-		case east:
-			if (deltax < 0)
-				return false;
-			break;
-
-		case south:
-			if (deltay < 0)
-				return false;
-			break;
-
-		case west:
-			if (deltax > 0)
-				return false;
-			break;
-
-		// check diagonal moving guards fix
-
-		case northwest:
-			if (DEMOCOND_SDL && deltay > -deltax)
-				return false;
-			break;
-
-		case northeast:
-			if (DEMOCOND_SDL && deltay > deltax)
-				return false;
-			break;
-
-		case southwest:
-			if (DEMOCOND_SDL && deltax > deltay)
-				return false;
-			break;
-
-		case southeast:
-			if (DEMOCOND_SDL && -deltax > deltay)
-				return false;
-			break;
+		//
+		// see if they are looking in the right direction
+		//
+		fov /= 2;
+		float angle = (float) atan2 ((float) deltay, (float) deltax);
+		if (angle<0)
+			angle = (float) (M_PI*2+angle);
+		angle = 360-(angle*ANGLES/(M_PI*2));
+		float lowerAngle = MIN(angle, (float) ob->angle);
+		float upperAngle = MAX(angle, (float) ob->angle);
+		if(MIN(upperAngle - lowerAngle, 360 + lowerAngle - upperAngle) > fov)
+			return false;
 	}
 
 	//
@@ -1102,7 +1081,7 @@ void FirstSighting (AActor *ob)
 */
 
 static FRandom pr_sight("SightPlayer");
-bool SightPlayer (AActor *ob)
+bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
 {
 	if (ob->flags & FL_ATTACKMODE)
 		Quit ("An actor in ATTACKMODE called SightPlayer!");
@@ -1129,17 +1108,9 @@ bool SightPlayer (AActor *ob)
 		if (!map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
 			return false;
 
-		if (ob->flags & FL_AMBUSH)
-		{
-			if (!CheckSight (ob))
-				return false;
-			ob->flags &= ~FL_AMBUSH;
-		}
-		else
-		{
-			if (!madenoise && !CheckSight (ob))
-				return false;
-		}
+		if (!CheckSight (ob, minseedist, maxseedist, maxheardist, fov))
+			return false;
+		ob->flags &= ~FL_AMBUSH;
 
 		--ob->sighttime; // We need to somehow mark we started.
 		ob->sightrandom = 1; // Account for tic.

@@ -58,7 +58,7 @@ actor Spectre 28
 	states
 	{
 		Spawn:
-			SPCT ABCD 5 NOP T_Stand
+			SPCT ABCD 5 NOP A_Look(0, 0, 0, 0, 360)
 			loop
 		See:
 			SPCT ABCD 5 NOP T_Chase(CHF_DONTDODGE)

@@ -771,12 +771,11 @@ void    SelectChaseDir (objtype *ob);
 void    SelectDodgeDir (objtype *ob);
 void    SelectRunDir (objtype *ob);
 void    MoveObj (objtype *ob, int32_t move);
-bool SightPlayer (AActor *ob);
+bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov);
 
 void    DamageActor (AActor *ob, unsigned damage);
 
 bool CheckLine (AActor *ob);
-bool CheckSight (AActor *ob);
 
 /*
 =============================================================================

@@ -10,7 +10,7 @@ actor Trans 23
 	states
 	{
 		Spawn:
-			TRNS A -1 NOP T_Stand
+			TRNS A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			TRNS A 5 NOP T_Chase
@@ -46,7 +46,7 @@ actor UberMutant 24
 	states
 	{
 		Spawn:
-			UBER A -1 T_Stand
+			UBER A -1 A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			UBER A 5 NOP T_Chase
@@ -131,7 +131,7 @@ actor DeathKnight 26
 	states
 	{
 		Spawn:
-			DKNT A -1 NOP T_Stand
+			DKNT A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			DKNT A 5 NOP T_Chase(CHF_BACKOFF)
