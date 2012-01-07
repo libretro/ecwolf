@@ -105,7 +105,7 @@ actor Wilhelm 25
 		Missile:
 			WILL E 15
 			WILL F 5
-			WILL G 5 T_Launch
+			WILL G 5 A_CustomMissile("Rocket")
 			WILL HGH 5 A_WolfAttack
 			WILL H 0 A_WolfAttack
 			goto See
@@ -144,9 +144,11 @@ actor DeathKnight 26
 		Missile:
 			DKNT E 15
 			DKNT F 5
-			DKNT H 5 T_Launch
+			DKNT H 0 A_WolfAttack
+			DKNT H 5 A_CustomMissile("Rocket")
 			DKNT G 5 A_WolfAttack
-			DKNT H 5 T_Launch
+			DKNT H 0 A_WolfAttack
+			DKNT H 5 A_CustomMissile("Rocket")
 			DKNT H 0 A_WolfAttack
 			goto See
 		Death:

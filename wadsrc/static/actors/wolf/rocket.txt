@@ -13,7 +13,7 @@ actor Rocket
 	states
 	{
 		Spawn:
-			ROCK A 1.5 A_Smoke T_Projectile
+			ROCK A 1.5 A_Smoke
 			loop
 		Death:
 			BOOM ABC 3
@@ -37,13 +37,13 @@ actor HighRocket
 	radius 11
 	speed 16
 	damage (random[MissileDamage](30, 61))
-	seesound "missile/fire"
+	seesound "deathknight/attack"
 	deathsound "missile/hit"
 	PROJECTILE
 	states
 	{
 		Spawn:
-			HRCK A 1.5 A_Smoke T_Projectile
+			HRCK A 1.5 A_Smoke
 			loop
 		Death:
 			HBOM ABC 3

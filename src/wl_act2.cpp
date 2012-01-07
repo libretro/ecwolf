@@ -14,6 +14,7 @@
 #include "id_us.h"
 #include "language.h"
 #include "thingdef/thingdef.h"
+#include "thingdef/thingdef_expression.h"
 #include "wl_agent.h"
 
 static inline bool CheckDoorMovement(AActor *actor)
@@ -58,21 +59,8 @@ static inline bool CheckDoorMovement(AActor *actor)
 =============================================================================
 */
 
-#define PROJECTILESIZE  0xc000l
-
 #define BJRUNSPEED      2048
 #define BJJUMPSPEED     680
-
-
-/*
-=============================================================================
-
-							GLOBAL VARIABLES
-
-=============================================================================
-*/
-
-
 
 /*
 =============================================================================
@@ -92,10 +80,6 @@ void    A_StartDeathCam (objtype *ob);
 void    T_Path (objtype *ob);
 void    T_Shoot (objtype *ob);
 void    T_Chase (objtype *ob);
-void    T_Projectile (objtype *ob);
-
-void    T_SchabbThrow (objtype *ob);
-void    T_FakeFire (objtype *ob);
 
 void A_HitlerMorph (objtype *ob);
 
@@ -126,18 +110,16 @@ void A_Smoke (AActor *ob)
 ===================
 */
 
-#define PROJSIZE        0x2000
-
 bool ProjectileTryMove (AActor *ob)
 {
-	int      xl,yl,xh,yh,x,y;
+	int xl,yl,xh,yh,x,y;
 	MapSpot check;
 
-	xl = (ob->x-PROJSIZE) >> TILESHIFT;
-	yl = (ob->y-PROJSIZE) >> TILESHIFT;
+	xl = (ob->x-ob->radius) >> TILESHIFT;
+	yl = (ob->y-ob->radius) >> TILESHIFT;
 
-	xh = (ob->x+PROJSIZE) >> TILESHIFT;
-	yh = (ob->y+PROJSIZE) >> TILESHIFT;
+	xh = (ob->x+ob->radius) >> TILESHIFT;
+	yh = (ob->y+ob->radius) >> TILESHIFT;
 
 	//
 	// check for solid walls
@@ -150,10 +132,8 @@ bool ProjectileTryMove (AActor *ob)
 				return false;
 		}
 
-		return true;
+	return true;
 }
-
-
 
 /*
 =================
@@ -165,14 +145,8 @@ bool ProjectileTryMove (AActor *ob)
 
 void T_Projectile (AActor *self)
 {
-	int32_t deltax,deltay;
-	int     damage;
-	int32_t speed;
-
-	speed = (int32_t)self->speed*tics;
-
-	deltax = FixedMul(speed,costable[self->angle]);
-	deltay = -FixedMul(speed,sintable[self->angle]);
+	fixed deltax = FixedMul(self->speed,costable[self->angle]);
+	fixed deltay = -FixedMul(self->speed,sintable[self->angle]);
 
 	if (deltax>0x10000l)
 		deltax = 0x10000l;
@@ -184,6 +158,7 @@ void T_Projectile (AActor *self)
 
 	deltax = LABS(self->x - players[0].mo->x);
 	deltay = LABS(self->y - players[0].mo->y);
+	fixed radius = players[0].mo->radius + self->radius;
 
 	if (!ProjectileTryMove (self))
 	{
@@ -192,33 +167,16 @@ void T_Projectile (AActor *self)
 		return;
 	}
 
-	if (deltax < PROJECTILESIZE && deltay < PROJECTILESIZE)
-	{       // hit the players[0].mo
-		switch (self->obclass)
-		{
-		case needleobj:
-			damage = (US_RndT() >>3) + 20;
-			break;
-		case rocketobj:
-		case hrocketobj:
-		case sparkobj:
-			damage = (US_RndT() >>3) + 30;
-			break;
-		case fireobj:
-			damage = (US_RndT() >>3);
-			break;
-		}
-
-		TakeDamage (damage,self);
-		self->state = NULL;               // mark for removal
+	if (deltax < radius && deltay < radius)
+	{
+		TakeDamage (self->damage->Evaluate(self).GetInt(),self);
+		self->Die(); // TODO: XDeath
 		return;
 	}
 
 	self->tilex = (short)(self->x >> TILESHIFT);
 	self->tiley = (short)(self->y >> TILESHIFT);
 }
-
-
 
 /*
 ==================
@@ -233,81 +191,34 @@ ACTION_FUNCTION(A_DeathScream)
 	PlaySoundLocActor(self->deathsound, self);
 }
 
-
 /*
-=============================================================================
-
-								SPEAR ACTORS
-
-=============================================================================
+==================
+=
+= A_CustomMissile
+=
+==================
 */
 
-
-//
-// death
-//
-
-/*
-===============
-=
-= T_Launch
-=
-===============
-*/
-
-void T_Launch (objtype *ob)
+ACTION_FUNCTION(A_CustomMissile)
 {
+	ACTION_PARAM_STRING(missiletype, 0);
+
 	int32_t deltax,deltay;
 	float   angle;
 	int     iangle;
 
-	deltax = players[0].mo->x - ob->x;
-	deltay = ob->y - players[0].mo->y;
+	deltax = players[0].mo->x - self->x;
+	deltay = self->y - players[0].mo->y;
 	angle = (float) atan2 ((float) deltay, (float) deltax);
 	if (angle<0)
 		angle = (float) (M_PI*2+angle);
 	iangle = (int) (angle/(M_PI*2)*ANGLES);
-	if (ob->obclass == deathobj)
-	{
-		T_Shoot (ob);
-	/*	if (ob->state == &s_deathshoot2)
-		{
-			iangle-=4;
-			if (iangle<0)
-				iangle+=ANGLES;
-		}
-		else
-		{
-			iangle+=4;
-			if (iangle>=ANGLES)
-				iangle-=ANGLES;
-		}*/
-	}
 
-	static const ClassDef *cls = ClassDef::FindClass("Rocket");
+	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
 		return;
-	AActor *newobj = AActor::Spawn(cls, ob->x, ob->y, 0);
-	/*switch(ob->obclass)
-	{
-		case deathobj:
-			newobj->state = &s_hrocket;
-			newobj->obclass = hrocketobj;
-			PlaySoundLocActor ("deathknight/attack",newobj);
-			break;
-		case angelobj:
-			newobj->state = &s_spark1;
-			newobj->obclass = sparkobj;
-			PlaySoundLocActor ("angel/attack",newobj);
-			break;
-		default:
-			PlaySoundLocActor ("missile/fire",newobj);
-	}*/
-
-	newobj->dir = nodir;
+	AActor *newobj = AActor::Spawn(cls, self->x, self->y, 0);
 	newobj->angle = iangle;
-	newobj->speed = 0x2000l;
-	newobj->active = ac_yes;
 }
 
 /*
@@ -418,93 +329,6 @@ moveok:
 		NewState (ob,&s_spectrewait1);
 }*/
 
-
-/*
-=============================================================================
-
-							SCHABBS / GIFT / FAT
-
-=============================================================================
-*/
-
-
-/*
-=================
-=
-= T_SchabbThrow
-=
-=================
-*/
-
-/*void T_SchabbThrow (objtype *ob)
-{
-	int32_t deltax,deltay;
-	float   angle;
-	int     iangle;
-
-	deltax = players[0].mo->x - ob->x;
-	deltay = ob->y - players[0].mo->y;
-	angle = (float) atan2((float) deltay, (float) deltax);
-	if (angle<0)
-		angle = (float) (M_PI*2+angle);
-	iangle = (int) (angle/(M_PI*2)*ANGLES);
-
-	GetNewActor ();
-	newobj->state = &s_needle1;
-	newobj->ticcount = 1;
-
-	newobj->tilex = ob->tilex;
-	newobj->tiley = ob->tiley;
-	newobj->x = ob->x;
-	newobj->y = ob->y;
-	newobj->obclass = needleobj;
-	newobj->dir = nodir;
-	newobj->angle = iangle;
-	newobj->speed = 0x2000l;
-
-	newobj->active = ac_yes;
-
-	PlaySoundLocActor ("schabbs/throw",newobj);
-}*/
-
-/*
-=================
-=
-= T_GiftThrow
-=
-=================
-*/
-
-/*void T_GiftThrow (objtype *ob)
-{
-	int32_t deltax,deltay;
-	float   angle;
-	int     iangle;
-
-	deltax = players[0].mo->x - ob->x;
-	deltay = ob->y - players[0].mo->y;
-	angle = (float) atan2((float) deltay, (float) deltax);
-	if (angle<0)
-		angle = (float) (M_PI*2+angle);
-	iangle = (int) (angle/(M_PI*2)*ANGLES);
-
-	GetNewActor ();
-	newobj->state = &s_rocket;
-	newobj->ticcount = 1;
-
-	newobj->tilex = ob->tilex;
-	newobj->tiley = ob->tiley;
-	newobj->x = ob->x;
-	newobj->y = ob->y;
-	newobj->obclass = rocketobj;
-	newobj->dir = nodir;
-	newobj->angle = iangle;
-	newobj->speed = 0x2000l;
-	newobj->active = ac_yes;
-
-	PlaySoundLocActor ("missile/fire",newobj);
-}*/
-
 #if 0
 /*
 =============================================================================
@@ -545,50 +369,6 @@ void A_HitlerMorph (objtype *ob)
 
 	newobj->obclass = realhitlerobj;
 	newobj->health = health[gamestate.difficulty];
-}
-
-/*
-=================
-=
-= T_FakeFire
-=
-=================
-*/
-
-void T_FakeFire (objtype *ob)
-{
-	int32_t deltax,deltay;
-	float   angle;
-	int     iangle;
-
-	if (!objfreelist)       // stop shooting if over MAXACTORS
-	{
-		NewState (ob,&s_fakechase1);
-		return;
-	}
-
-	deltax = players[0].mo->x - ob->x;
-	deltay = ob->y - players[0].mo->y;
-	angle = (float) atan2((float) deltay, (float) deltax);
-	if (angle<0)
-		angle = (float)(M_PI*2+angle);
-	iangle = (int) (angle/(M_PI*2)*ANGLES);
-
-	GetNewActor ();
-	newobj->state = &s_fire1;
-	newobj->ticcount = 1;
-
-	newobj->tilex = ob->tilex;
-	newobj->tiley = ob->tiley;
-	newobj->x = ob->x;
-	newobj->y = ob->y;
-	newobj->dir = nodir;
-	newobj->angle = iangle;
-	newobj->obclass = fireobj;
-	newobj->speed = 0x1200l;
-	newobj->active = ac_yes;
-
-	PlaySoundLocActor ("fake/attack",newobj);
 }
 #endif
 

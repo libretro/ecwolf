@@ -618,7 +618,7 @@ void SelectRunDir (objtype *ob)
 =================
 */
 
-void MoveObj (objtype *ob, int32_t move)
+void MoveObj (AActor *ob, int32_t move)
 {
 	int32_t    deltax,deltay;
 

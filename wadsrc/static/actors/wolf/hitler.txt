@@ -24,7 +24,7 @@ actor FakeHitler 18
 			loop
 		Missile:
 			FAKE E 4
-			FAKE EEEEEEEE 4 T_FakeFire
+			FAKE EEEEEEEE 4 A_CustomMissile("FireBall")
 			goto See
 		Death:
 			FAKE F 5 A_Fall
@@ -37,6 +37,10 @@ actor FakeHitler 18
 
 actor FireBall
 {
+	// Due to a bug in the original code, the projectile movement was handled
+	// by the action function instead of the thinker function.  Because of this
+	// the speed of the fireball was framerate dependent.  On fast systems it
+	// would slow down to 1.5.
 	radius 11
 	speed 9
 	damage (random[MissileDamage](0, 31))
@@ -46,7 +50,7 @@ actor FireBall
 	states
 	{
 		Spawn:
-			FIRE AB 3 NOP T_Projectile
+			FIRE AB 3
 			loop
 	}
 }

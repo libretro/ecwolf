@@ -41,6 +41,10 @@
 #include "wl_agent.h"
 #include "id_us.h"
 
+void T_Projectile(AActor *self);
+
+////////////////////////////////////////////////////////////////////////////////
+
 Frame::~Frame()
 {
 	if(freeActionArgs)
@@ -154,6 +158,9 @@ void AActor::Die()
 	if(flags & FL_COUNTKILL)
 		gamestate.killcount++;
 	flags &= ~FL_SHOOTABLE;
+
+	if(flags & FL_MISSILE)
+		flags &= ~FL_MISSILE;
 
 	if(dropitems)
 	{
@@ -280,6 +287,9 @@ void AActor::Tick()
 	}
 
 	state->thinker(this);
+
+	if(flags & FL_MISSILE)
+		T_Projectile(this);
 }
 
 // Remove an actor from the game world without destroying it.  This will allow

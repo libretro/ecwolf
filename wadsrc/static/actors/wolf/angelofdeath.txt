@@ -24,7 +24,7 @@ actor AngelOfDeath 27
 			ANGL E 5
 			ANGL F 10 A_StartAttack
 		Launch:
-			ANGL E 5 T_Launch
+			ANGL E 5 A_CustomMissile("Spark")
 			ANGL E 0 A_Relaunch
 			goto Launch
 		Tired:
@@ -57,7 +57,7 @@ actor Spark
 	states
 	{
 		Spawn:
-			SPRK ABCD 3 NOP T_Projectile
+			SPRK ABCD 3
 			loop
 	}
 }
