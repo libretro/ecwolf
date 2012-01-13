@@ -676,7 +676,6 @@ void DrawScaleds (void)
 			|| ( spots[6] && (spots[6]->visible && !spots[6]->tile) )
 			|| ( spots[7] && (spots[7]->visible && !spots[7]->tile) ) )
 		{
-			obj->active = ac_yes;
 			TransformActor (obj);
 			if (!obj->viewheight)
 				continue;                                               // too close or far away

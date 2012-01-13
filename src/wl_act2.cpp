@@ -76,30 +76,26 @@ dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
 
 void    A_StartDeathCam (objtype *ob);
 
-
-void    T_Path (objtype *ob);
-void    T_Shoot (objtype *ob);
-void    T_Chase (objtype *ob);
-
 void A_HitlerMorph (objtype *ob);
 
 /*
 =================
 =
-= A_Smoke
+= A_SpawnItem
 =
 =================
 */
 
-void A_Smoke (AActor *ob)
+ACTION_FUNCTION(A_SpawnItem)
 {
-	static const ClassDef * const cls = ClassDef::FindClass("Smoke");
+	ACTION_PARAM_STRING(className, 0);
+
+	const ClassDef *cls = ClassDef::FindClass(className);
 	if(cls == NULL)
 		return;
 
-	AActor *newobj = AActor::Spawn(cls, ob->x, ob->y, 0);
+	AActor *newobj = AActor::Spawn(cls, self->x, self->y, 0);
 }
-
 
 /*
 ===================
@@ -324,53 +320,9 @@ moveok:
 
 		ob->flags |= FL_AMBUSH | FL_SHOOTABLE;
 		ob->flags &= ~FL_ATTACKMODE;
-		ob->flags &= ~FL_NONMARK;      // stuck bugfix 1
 		ob->dir = nodir;
 		NewState (ob,&s_spectrewait1);
 }*/
-
-#if 0
-/*
-=============================================================================
-
-									HITLERS
-
-=============================================================================
-*/
-
-
-//
-// fake
-//
-
-
-/*
-===============
-=
-= A_HitlerMorph
-=
-===============
-*/
-
-void A_HitlerMorph (objtype *ob)
-{
-	short health[4]={500,700,800,900};
-
-	SpawnNewObj (ob->tilex,ob->tiley,&s_hitlerchase1);
-	newobj->speed = SPDPATROL*5;
-
-	newobj->x = ob->x;
-	newobj->y = ob->y;
-
-	newobj->distance = ob->distance;
-	newobj->dir = ob->dir;
-	newobj->flags = ob->flags | FL_SHOOTABLE;
-	newobj->flags &= ~FL_NONMARK;   // hitler stuck with nodir fix
-
-	newobj->obclass = realhitlerobj;
-	newobj->health = health[gamestate.difficulty];
-}
-#endif
 
 /*
 ============================================================================
@@ -430,6 +382,22 @@ bool CheckMeleeRange(AActor *actor1, AActor *actor2)
 	return abs(actor2->x - actor1->x) <= r && abs(actor2->y - actor1->y) <= r;
 }
 
+/*
+===============
+=
+= SelectPathDir
+=
+===============
+*/
+
+void SelectPathDir (AActor *ob)
+{
+	ob->distance = TILEGLOBAL;
+
+	if (!TryWalk (ob))
+		ob->dir = nodir;
+}
+
 ACTION_FUNCTION(T_Chase)
 {
 	enum
@@ -443,60 +411,69 @@ ACTION_FUNCTION(T_Chase)
 	int32_t	move,target;
 	int		dx,dy,dist,chance;
 	bool	dodge = !(flags & CHF_DONTDODGE);
-
-	self->flags &= ~FL_PATHING;
+	bool	pathing = (self->flags & FL_PATHING) ? true : false;
 
 	if (gamestate.victoryflag)
 		return;
 
-	if(self->MissileState)
+	if(!pathing)
 	{
-		dodge = false;
-		if (CheckLine(self))      // got a shot at players[0].mo?
+		if(self->MissileState)
 		{
-			self->hidden = false;
-			dx = abs(self->tilex - players[0].mo->tilex);
-			dy = abs(self->tiley - players[0].mo->tiley);
-			dist = dx>dy ? dx : dy;
-
-			if(!(flags & CHF_BACKOFF))
+			dodge = false;
+			if (CheckLine(self)) // got a shot at players[0].mo?
 			{
-				if (dist)
-					chance = self->missilechance/dist;
-				else
-					chance = 300;
+				self->hidden = false;
+				dx = abs(self->tilex - players[0].mo->tilex);
+				dy = abs(self->tiley - players[0].mo->tiley);
+				dist = dx>dy ? dx : dy;
 
-				if (dist == 1)
+				if(!(flags & CHF_BACKOFF))
 				{
-					target = abs(self->x - players[0].mo->x);
-					if (target < 0x14000l)
+					if (dist)
+						chance = self->missilechance/dist;
+					else
+						chance = 300;
+
+					if (dist == 1)
 					{
-						target = abs(self->y - players[0].mo->y);
+						target = abs(self->x - players[0].mo->x);
 						if (target < 0x14000l)
-							chance = 300;
+						{
+							target = abs(self->y - players[0].mo->y);
+							if (target < 0x14000l)
+								chance = 300;
+						}
 					}
 				}
+				else
+					chance = self->missilechance;
+
+				if ( US_RndT()<chance)
+				{
+					if(self->MissileState)
+						self->SetState(self->MissileState);
+					return;
+				}
+				dodge = !(flags & CHF_DONTDODGE);
 			}
 			else
-				chance = self->missilechance;
-
-			if ( US_RndT()<chance)
-			{
-				if(self->MissileState)
-					self->SetState(self->MissileState);
-				return;
-			}
-			dodge = !(flags & CHF_DONTDODGE);
+				self->hidden = true;
 		}
 		else
-			self->hidden = true;
+			self->hidden = !CheckMeleeRange(self, players[0].mo);
 	}
 	else
-		self->hidden = !CheckMeleeRange(self, players[0].mo);
+	{
+		if (SightPlayer (self, 0, 0, 0, 180))
+			return;
+	}
 
 	if (self->dir == nodir)
 	{
-		if (dodge)
+		if (pathing)
+			SelectPathDir (self);
+		else if (dodge)
 			SelectDodgeDir (self);
 		else
 			SelectChaseDir (self);
@@ -511,14 +488,17 @@ ACTION_FUNCTION(T_Chase)
 		if (CheckDoorMovement(self))
 			return;
 
-		//
-		// check for melee range
-		//
-		if(self->MeleeState && CheckMeleeRange(self, players[0].mo))
+		if(!pathing)
 		{
-			PlaySoundLocActor(self->attacksound, self);
-			self->SetState(self->MeleeState);
-			return;
+			//
+			// check for melee range
+			//
+			if(self->MeleeState && CheckMeleeRange(self, players[0].mo))
+			{
+				PlaySoundLocActor(self->attacksound, self);
+				self->SetState(self->MeleeState);
+				return;
+			}
 		}
 
 		if (move < self->distance)
@@ -539,7 +519,9 @@ ACTION_FUNCTION(T_Chase)
 
 		move -= self->distance;
 
-		if ((flags & CHF_BACKOFF) && dist < 4)
+		if (pathing)
+			SelectPathDir (self);
+		else if ((flags & CHF_BACKOFF) && dist < 4)
 			SelectRunDir (self);
 		else if (dodge)
 			SelectDodgeDir (self);
@@ -550,88 +532,6 @@ ACTION_FUNCTION(T_Chase)
 			return; // object is blocked in
 	}
 }
-
-/*
-============================================================================
-
-									PATH
-
-============================================================================
-*/
-
-
-/*
-===============
-=
-= SelectPathDir
-=
-===============
-*/
-
-void SelectPathDir (AActor *ob)
-{
-	ob->distance = TILEGLOBAL;
-
-	if (!TryWalk (ob))
-		ob->dir = nodir;
-}
-
-
-/*
-===============
-=
-= T_Path
-=
-===============
-*/
-
-ACTION_FUNCTION(T_Path)
-{
-	int32_t    move;
-
-	if (SightPlayer (self, 0, 0, 0, 180))
-		return;
-
-	if (self->dir == nodir)
-	{
-		SelectPathDir (self);
-		if (self->dir == nodir)
-			return;                                 // all movement is blocked
-	}
-
-
-	self->flags |= FL_PATHING;
-	move = self->speed;
-
-	while (move)
-	{
-		if (CheckDoorMovement(self))
-			return;
-
-		if (move < self->distance)
-		{
-			MoveObj (self,move);
-			break;
-		}
-
-		if (self->tilex>map->GetHeader().width || self->tiley>map->GetHeader().height)
-		{
-			sprintf (str, "T_Path hit a wall at %u,%u, dir %u",
-				self->tilex,self->tiley,self->dir);
-			Quit (str);
-		}
-
-		self->x = ((int32_t)self->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		self->y = ((int32_t)self->tiley<<TILESHIFT)+TILEGLOBAL/2;
-		move -= self->distance;
-
-		SelectPathDir (self);
-
-		if (self->dir == nodir)
-			return;                                 // all movement is blocked
-	}
-}
-
 
 /*
 =============================================================================
@@ -645,7 +545,7 @@ ACTION_FUNCTION(T_Path)
 /*
 ===============
 =
-= T_Shoot
+= A_WolfAttack
 =
 = Try to damage the players[0].mo, based on skill level and players[0].mo's speed
 =
@@ -719,11 +619,6 @@ ACTION_FUNCTION(A_WolfAttack)
 		PlaySoundLocActor(self->attacksound, self);
 	else
 		PlaySoundLocActor(sound, self);
-}
-void T_Shoot(AActor *self)
-{
-	static CallArguments args;
-	__AF_A_WolfAttack(self, args);
 }
 
 #ifndef SPEAR

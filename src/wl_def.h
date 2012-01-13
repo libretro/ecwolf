@@ -201,12 +201,10 @@ typedef enum
 {
 	FL_SHOOTABLE        = 0x00000001,
 	FL_BONUS            = 0x00000002,
-	FL_NEVERMARK        = 0x00000004,
 	FL_VISABLE          = 0x00000008,
 	FL_ATTACKMODE       = 0x00000010,
 	FL_FIRSTATTACK      = 0x00000020,
 	FL_AMBUSH           = 0x00000040,
-	FL_NONMARK          = 0x00000080,
 	FL_BRIGHT           = 0x00000100,
 #ifdef USE_DIR3DSPR
 	// you can choose one of the following values in wl_act1.cpp
@@ -262,13 +260,6 @@ typedef enum {
 	dr_lock4,
 	dr_elevator
 } door_t;
-
-typedef enum {
-	ac_badobject = -1,
-	ac_no,
-	ac_yes,
-	ac_allways
-} activetype;
 
 typedef enum {
 	nothing,

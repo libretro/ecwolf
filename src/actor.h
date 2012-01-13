@@ -142,7 +142,6 @@ class AActor
 		fixed	radius;
 		ExpressionNode *damage;
 
-		activetype  active;
 		short       ticcount;
 		classtype   obclass;
 		const Frame	*state;

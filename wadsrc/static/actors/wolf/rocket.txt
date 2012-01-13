@@ -13,7 +13,7 @@ actor Rocket
 	states
 	{
 		Spawn:
-			ROCK A 1.5 A_Smoke
+			ROCK A 1.5 A_SpawnItem("Smoke")
 			loop
 		Death:
 			BOOM ABC 3
@@ -23,7 +23,6 @@ actor Rocket
 
 actor Smoke
 {
-	+NEVERMARK
 	states
 	{
 		Spawn:
@@ -43,7 +42,7 @@ actor HighRocket
 	states
 	{
 		Spawn:
-			HRCK A 1.5 A_Smoke
+			HRCK A 1.5 A_SpawnItem("Smoke")
 			loop
 		Death:
 			HBOM ABC 3
@@ -53,7 +52,6 @@ actor HighRocket
 
 actor HighSmoke
 {
-	+NEVERMARK
 	states
 	{
 		Spawn:

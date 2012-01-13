@@ -83,7 +83,6 @@ actor Needle
 	damage (random[MissileDamage](20, 51))
 	seesound "schabbs/throw"
 	PROJECTILE
-	+NEVERMARK
 	states
 	{
 		Spawn:

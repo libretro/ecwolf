@@ -74,8 +74,6 @@ const struct FlagDef
 	DEFINE_FLAG(FL, FIRSTATTACK, Actor, flags),
 	DEFINE_FLAG(FL, ISMONSTER, Actor, flags),
 	DEFINE_FLAG(FL, MISSILE, Actor, flags),
-	DEFINE_FLAG(FL, NEVERMARK, Actor, flags),
-	DEFINE_FLAG(FL, NONMARK, Actor, flags),
 	DEFINE_FLAG(FL, PICKUP, Actor, flags),
 	DEFINE_FLAG(FL, SHOOTABLE, Actor, flags),
 	DEFINE_FLAG(FL, SOLID, Actor, flags),
@@ -900,6 +898,8 @@ void ClassDef::ParseActor(Scanner &sc)
 					sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
 				sc.MustGetToken(TK_Identifier);
 				ActionInfo *funcInf = LookupFunction(sc->str, NULL);
+				if(!funcInf)
+					sc.ScriptMessage(Scanner::ERROR, "The specified function %s could not be located.", sc->str.GetChars());
 				newClass->actions.Push(funcInf);
 				sc.MustGetToken('(');
 				if(!sc.CheckToken(')'))

@@ -227,6 +227,7 @@ void GameMap::SpawnThings() const
 				actor->flags |= FL_AMBUSH;
 			if(thing.patrol)
 			{
+				actor->flags |= FL_PATHING;
 				if(actor->PathState)
 					actor->SetState(actor->PathState, true);
 			}

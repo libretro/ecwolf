@@ -46,7 +46,6 @@ actor FireBall
 	damage (random[MissileDamage](0, 31))
 	seesound "fake/attack"
 	PROJECTILE
-	+NEVERMARK
 	states
 	{
 		Spawn:
@@ -89,7 +88,7 @@ actor MechaHitler 19
 			MECH H 5 A_Fall
 			MECH I 5 A_DeathScream
 			MECH J 5
-			MECH K -1 A_HitlerMorph
+			MECH K -1 A_SpawnItem("Hitler")
 			stop
 	}
 }

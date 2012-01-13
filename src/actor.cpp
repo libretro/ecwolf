@@ -262,7 +262,8 @@ void AActor::SetState(const Frame *state, bool notic)
 	this->state = state;
 	sprite = state->spriteInf;
 	ticcount = state->duration;
-	state->action(this);
+	if(!notic)
+		state->action(this);
 }
 
 void AActor::Tick()
