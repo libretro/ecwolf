@@ -104,9 +104,31 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 
 bool CheckMeleeRange(AActor *actor1, AActor *actor2);
 
+ACTION_FUNCTION(A_BossDeath)
+{
+	// TODO: Check if all enemies of same type are dead and then call a defined function.
+	playstate = ex_victorious;
+}
+
 ACTION_FUNCTION(A_Fall)
 {
 	self->flags &= ~FL_SOLID;
+}
+
+static FRandom pr_cajump("CustomJump");
+ACTION_FUNCTION(A_Jump)
+{
+	ACTION_PARAM_INT(chance, 0);
+
+	if(chance >= 256 || pr_cajump() < chance)
+	{
+		ACTION_PARAM_STRING(label, (ACTION_PARAM_COUNT == 2 ? 1 : (1 + pr_cajump() % (ACTION_PARAM_COUNT - 1))));
+
+		StateLabel stateLabel(label, self->GetClass());
+		const Frame *frame = stateLabel.Resolve(self);
+		if(frame)
+			self->SetState(frame);
+	}
 }
 
 static FRandom pr_meleeattack("MeleeAccuracy");

@@ -217,60 +217,6 @@ ACTION_FUNCTION(A_CustomMissile)
 	newobj->angle = iangle;
 }
 
-/*
-=================
-=
-= A_Victory
-=
-=================
-*/
-
-void A_Victory (objtype *)
-{
-	playstate = ex_victorious;
-}
-
-
-/*
-=================
-=
-= A_StartAttack
-=
-=================
-*/
-
-void A_StartAttack (objtype *ob)
-{
-	ob->temp1 = 0;
-}
-
-
-/*
-=================
-=
-= A_Relaunch
-=
-=================
-*/
-
-/*void A_Relaunch (objtype *ob)
-{
-	if (++ob->temp1 == 3)
-	{
-		NewState (ob,&s_angeltired);
-		return;
-	}
-
-	if (US_RndT()&1)
-	{
-		NewState (ob,&s_angelchase1);
-		return;
-	}
-}*/
-
-
-
-
 //
 // spectre
 //
@@ -284,45 +230,23 @@ void A_StartAttack (objtype *ob)
 ===============
 */
 
-/*void A_Dormant (objtype *ob)
+ACTION_FUNCTION(A_Dormant)
 {
-	int32_t     deltax,deltay;
-	int         xl,xh,yl,yh;
-	int         x,y;
-	uintptr_t   tile;
+	AActor::Iterator *iter = AActor::GetIterator();
+	AActor *actor;
+	while((actor = iter->Next()->Item()) != NULL)
+	{
+		fixed radius = self->radius + actor->radius;
+		if(abs(self->x - actor->x) < radius ||
+			abs(self->y - actor->y) < radius)
+			return;
+	}
 
-	deltax = ob->x - players[0].mo->x;
-	if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
-		goto moveok;
-	deltay = ob->y - players[0].mo->y;
-	if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
-		goto moveok;
-
-	return;
-moveok:
-
-	xl = (ob->x-MINDIST) >> TILESHIFT;
-	xh = (ob->x+MINDIST) >> TILESHIFT;
-	yl = (ob->y-MINDIST) >> TILESHIFT;
-	yh = (ob->y+MINDIST) >> TILESHIFT;
-
-	for (y=yl ; y<=yh ; y++)
-		for (x=xl ; x<=xh ; x++)
-		{
-			tile = (uintptr_t)actorat[x][y];
-			if (!tile)
-				continue;
-			if (!ISPOINTER(tile))
-				return;
-			if (((objtype *)tile)->flags&FL_SHOOTABLE)
-				return;
-		}
-
-		ob->flags |= FL_AMBUSH | FL_SHOOTABLE;
-		ob->flags &= ~FL_ATTACKMODE;
-		ob->dir = nodir;
-		NewState (ob,&s_spectrewait1);
-}*/
+	self->flags |= FL_AMBUSH | FL_SHOOTABLE;
+	self->flags &= ~FL_ATTACKMODE;
+	self->dir = nodir;
+	self->SetState(self->SeeState);
+}
 
 /*
 ============================================================================
@@ -403,7 +327,8 @@ ACTION_FUNCTION(T_Chase)
 	enum
 	{
 		CHF_DONTDODGE = 1,
-		CHF_BACKOFF = 2
+		CHF_BACKOFF = 2,
+		CHF_NOSIGHTCHECK = 4
 	};
 
 	ACTION_PARAM_INT(flags, 0);
@@ -465,7 +390,7 @@ ACTION_FUNCTION(T_Chase)
 	}
 	else
 	{
-		if (SightPlayer (self, 0, 0, 0, 180))
+		if (!(flags & CHF_NOSIGHTCHECK) && SightPlayer (self, 0, 0, 0, 180))
 			return;
 	}
 
@@ -655,45 +580,6 @@ void SpawnBJVictory (void)
 }
 
 
-
-/*
-===============
-=
-= T_BJRun
-=
-===============
-*/
-
-void T_BJRun (objtype *ob)
-{
-	int32_t    move;
-
-	move = BJRUNSPEED*tics;
-
-	while (move)
-	{
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-
-		ob->x = ((int32_t)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((int32_t)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-		move -= ob->distance;
-
-		SelectPathDir (ob);
-
-		if ( !(--ob->temp1) )
-		{
-			NewState (ob,&s_bjjump1);
-			return;
-		}
-	}
-}
-
-
 /*
 ===============
 =
@@ -708,19 +594,6 @@ void T_BJJump (objtype *ob)
 
 	move = BJJUMPSPEED*tics;
 	MoveObj (ob,move);
-}
-
-/*
-===============
-=
-= T_BJDone
-=
-===============
-*/
-
-void T_BJDone (objtype *)
-{
-	playstate = ex_victorious;                              // exit castle tile
 }
 #endif
 

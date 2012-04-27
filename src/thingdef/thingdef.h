@@ -73,10 +73,29 @@ class CallArguments
 		~CallArguments();
 
 		void		AddArgument(const Value &val);
+		int			Count() const { return args.Size(); }
 		void		Evaluate(AActor *self);
 		const Value	&operator[] (unsigned int idx) const { return args[idx]; }
 	private:
 		TArray<Value> args;
+};
+
+class StateLabel
+{
+	public:
+		StateLabel() : isRelative(false) {}
+		StateLabel(const FString &str, const ClassDef *parent, bool noRelative=false);
+		StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative=false);
+
+		const Frame	*Resolve(AActor *self) const;
+
+	private:
+		void	Parse(Scanner &sc, const ClassDef *parent, bool noRelative=false);
+
+		const ClassDef	*cls;
+		FString 		label;
+		unsigned short	offset;
+		bool			isRelative;
 };
 
 class ActionInfo
@@ -104,6 +123,7 @@ typedef TArray<ActionInfo *> ActionTable;
 	{ \
 		__AF_##func(self, args); \
 	}
+#define ACTION_PARAM_COUNT args.Count()
 #define ACTION_PARAM_BOOL(name, num) \
 	bool name = args[num].val.i ? true : false
 #define ACTION_PARAM_INT(name, num) \
@@ -244,11 +264,14 @@ class ClassDef
 		MetaTable				Meta;
 
 	protected:
+		friend class StateLabel;
+
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
 		static bool	SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
+		const Frame * const *FindStateInList(const FName &stateName) const;
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
 
 		// We need to do this for proper initialization order.
@@ -260,7 +283,7 @@ class ClassDef
 		FName			name;
 		const ClassDef	*parent;
 
-		TMap<FName, Frame *>	stateList;
+		TMap<FName, unsigned int>	stateList;
 		TArray<Frame *>			frameList;
 
 		ActionTable		actions;

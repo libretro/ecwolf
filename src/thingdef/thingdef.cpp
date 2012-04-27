@@ -83,6 +83,81 @@ extern const PropDef properties[];
 
 ////////////////////////////////////////////////////////////////////////////////
 
+StateLabel::StateLabel(const FString &str, const ClassDef *parent, bool noRelative)
+{
+	Scanner sc(str.GetChars(), str.Len());
+	Parse(sc, parent, noRelative);
+}
+
+StateLabel::StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative)
+{
+	Parse(sc, parent, noRelative);
+}
+
+const Frame *StateLabel::Resolve(AActor *self) const
+{
+	if(isRelative)
+		return self->state + offset;
+
+	return *(cls->FindStateInList(label) + offset);
+}
+
+void StateLabel::Parse(Scanner &sc, const ClassDef *parent, bool noRelative)
+{
+	cls = parent;
+
+	if(!noRelative && sc.CheckToken(TK_IntConst))
+	{
+		isRelative = true;
+		offset = sc->number;
+		return;
+	}
+
+	isRelative = false;
+
+	sc.MustGetToken(TK_Identifier);
+	label = sc->str;
+	if(sc.CheckToken(TK_ScopeResolution))
+	{
+		if(label.CompareNoCase("Super") == 0)
+		{
+			// This should never happen in normal use, but just in case.
+			if(parent->parent == NULL)
+				sc.ScriptMessage(Scanner::ERROR, "This actor does not have a super class.");
+			cls = parent->parent;
+		}
+		else
+		{
+			do
+			{
+				cls = cls->parent;
+				if(cls == NULL)
+					sc.ScriptMessage(Scanner::ERROR, "%s is not a super class.", label.GetChars());
+			}
+			while(stricmp(cls->GetName().GetChars(), label.GetChars()) != 0);
+		}
+
+		sc.MustGetToken(TK_Identifier);
+		label = sc->str;
+	}
+
+	while(sc.CheckToken('.'))
+	{
+		sc.MustGetToken(TK_Identifier);
+		label = label + "." + sc->str;
+	}
+
+	if(sc.CheckToken('+'))
+	{
+		sc.MustGetToken(TK_IntConst);
+		offset = sc->number;
+	}
+	else
+		offset = 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 struct StateDefinition
 {
 	public:
@@ -103,6 +178,7 @@ struct StateDefinition
 		bool			fullbright;
 		NextType	nextType;
 		FString		nextArg;
+		StateLabel	jumpLabel;
 		Frame::ActionCall	functions[2];
 };
 
@@ -408,10 +484,16 @@ const ActionInfo *ClassDef::FindFunction(const FName &function) const
 
 const Frame *ClassDef::FindState(const FName &stateName) const
 {
-	Frame *const *ret = stateList.CheckKey(stateName);
+	const Frame * const *ret = FindStateInList(stateName);
+	return ret ? *ret : NULL;
+}
+
+const Frame * const *ClassDef::FindStateInList(const FName &stateName) const
+{
+	const unsigned int *ret = stateList.CheckKey(stateName);
 	if(ret == NULL)
-		return (!parent ? NULL : parent->FindState(stateName));
-	return *ret;
+		return (!parent ? NULL : parent->FindStateInList(stateName));
+	return &frameList[*ret];
 }
 
 Symbol *ClassDef::FindSymbol(const FName &symbol) const
@@ -462,8 +544,8 @@ Symbol *ClassDef::FindSymbol(const FName &symbol) const
 struct Goto
 {
 	public:
-		Frame	*frame;
-		FString	label;
+		Frame		*frame;
+		StateLabel	jumpLabel;
 };
 void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 {
@@ -490,7 +572,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame = new Frame();
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
-				stateList[thisStateDef.label] = thisFrame;
+				stateList[thisStateDef.label] = frameList.Size();
 				loopPoint = thisFrame;
 			}
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
@@ -514,7 +596,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 				{
 					Goto thisGoto;
 					thisGoto.frame = thisFrame;
-					thisGoto.label = thisStateDef.nextArg;
+					thisGoto.jumpLabel = thisStateDef.jumpLabel;
 					gotos.Push(thisGoto);
 				}
 			}
@@ -533,7 +615,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	// Resolve Gotos
 	for(unsigned int iter = 0;iter < gotos.Size();++iter)
 	{
-		const Frame *result = FindState(gotos[iter].label);
+		const Frame *result = gotos[iter].jumpLabel.Resolve(NULL);
 		gotos[iter].frame->next = result;
 	}
 }
@@ -783,9 +865,8 @@ void ClassDef::ParseActor(Scanner &sc)
 								{
 									if(sc->str.CompareNoCase("goto") == 0)
 									{
-										sc.MustGetToken(TK_Identifier);
+										thisState.jumpLabel = StateLabel(sc, newClass, true);
 										thisState.nextType = StateDefinition::GOTO;
-										thisState.nextArg = sc->str;
 									}
 									else if(sc->str.CompareNoCase("wait") == 0)
 									{

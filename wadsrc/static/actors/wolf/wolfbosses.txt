@@ -124,7 +124,7 @@ actor Schabbs 17
 			SHAB A 5 A_Fall
 			SHAB A 70 A_DeathScream
 			SHAB GHI 5
-			SHAB J -1 A_StartDeathCam
+			SHAB J -1 A_BossDeath
 			stop
 	}
 }
@@ -163,7 +163,7 @@ actor Gift 21
 			GIFT A .5 A_Fall
 			GIFT A 70 A_DeathScream
 			GIFT GHI 5
-			GIFT J -1 A_StartDeathCam
+			GIFT J -1 A_BossDeath
 			stop
 	}
 }
@@ -204,7 +204,7 @@ actor FatFace 22
 			FATF A .5 A_Fall
 			FATF A 70 A_DeathScream
 			FATF IJK 5
-			FATF L -1 A_StartDeathCam
+			FATF L -1 A_BossDeath
 			stop
 	}
 }

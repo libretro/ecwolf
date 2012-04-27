@@ -1,5 +1,6 @@
 const int CHF_DONTDODGE = 1;
 const int CHF_BACKOFF = 2;
+const int CHF_NOSIGHTCHECK = 4;
 
 const int CPF_USEAMMO = 1;
 const int CPF_ALWAYSPLAYSOUND = 2;
@@ -19,9 +20,12 @@ actor Actor native
 	native int angle;
 	native int health;
 
+	action native A_BossDeath();
 	action native A_CustomMissile(string missiletype);
 	action native A_DeathScream();
+	action native A_Dormant();
 	action native A_Fall();
+	action native A_Jump(int chance, string state);
 	action native A_Look(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180);
 	action native A_LookEx(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180); // Alias
 	action native A_MeleeAttack(int damage, float accuracy = 0.6275);
