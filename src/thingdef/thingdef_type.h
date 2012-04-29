@@ -86,6 +86,7 @@ class TypeHierarchy
 			BOOL,
 			INT,
 			FLOAT,
+			STATE,
 
 			NUM_TYPES
 		};

@@ -41,7 +41,7 @@
 
 static ActionTable *actionFunctions = NULL;
 ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name),
-	minArgs(0), maxArgs(0)
+	minArgs(0), maxArgs(0), varArgs(false)
 {
 	if(actionFunctions == NULL)
 		actionFunctions = new ActionTable;
@@ -122,10 +122,8 @@ ACTION_FUNCTION(A_Jump)
 
 	if(chance >= 256 || pr_cajump() < chance)
 	{
-		ACTION_PARAM_STRING(label, (ACTION_PARAM_COUNT == 2 ? 1 : (1 + pr_cajump() % (ACTION_PARAM_COUNT - 1))));
+		ACTION_PARAM_STATE(frame, (ACTION_PARAM_COUNT == 2 ? 1 : (1 + pr_cajump() % (ACTION_PARAM_COUNT - 1))));
 
-		StateLabel stateLabel(label, self->GetClass());
-		const Frame *frame = stateLabel.Resolve(self);
 		if(frame)
 			self->SetState(frame);
 	}

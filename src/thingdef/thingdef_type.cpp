@@ -46,7 +46,7 @@ TypeHierarchy TypeHierarchy::staticTypes;
 
 TypeHierarchy::TypeHierarchy()
 {
-	static const char* primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float"};
+	static const char* primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float", "state"};
 
 	for(unsigned int i = 0;i < NUM_TYPES;++i)
 		CreateType(primitives[i], NULL);
@@ -73,7 +73,7 @@ const Type *TypeHierarchy::GetType(const FName &name) const
 
 const Type *TypeHierarchy::GetType(PrimitiveTypes type) const
 {
-	static const FName primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float"};
+	static const FName primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float", "state"};
 	return GetType(primitives[type]);
 }
 

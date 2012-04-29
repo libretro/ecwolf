@@ -47,6 +47,25 @@ class ExpressionNode;
 class Type;
 class Scanner;
 
+class StateLabel
+{
+	public:
+		StateLabel() : isRelative(false) {}
+		StateLabel(const FString &str, const ClassDef *parent, bool noRelative=false);
+		StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative=false);
+
+		const Frame	*Resolve() const;
+		const Frame	*Resolve(AActor *self) const;
+
+	private:
+		void	Parse(Scanner &sc, const ClassDef *parent, bool noRelative=false);
+
+		const ClassDef	*cls;
+		FString 		label;
+		unsigned short	offset;
+		bool			isRelative;
+};
+
 class CallArguments
 {
 	public:
@@ -57,7 +76,8 @@ class CallArguments
 				{
 					VAL_INTEGER,
 					VAL_DOUBLE,
-					VAL_STRING
+					VAL_STRING,
+					VAL_STATE
 				} useType;
 				bool isExpression;
 
@@ -68,6 +88,7 @@ class CallArguments
 					double	d;
 				}				val;
 				FString			str;
+				StateLabel		label;
 		};
 
 		~CallArguments();
@@ -80,24 +101,6 @@ class CallArguments
 		TArray<Value> args;
 };
 
-class StateLabel
-{
-	public:
-		StateLabel() : isRelative(false) {}
-		StateLabel(const FString &str, const ClassDef *parent, bool noRelative=false);
-		StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative=false);
-
-		const Frame	*Resolve(AActor *self) const;
-
-	private:
-		void	Parse(Scanner &sc, const ClassDef *parent, bool noRelative=false);
-
-		const ClassDef	*cls;
-		FString 		label;
-		unsigned short	offset;
-		bool			isRelative;
-};
-
 class ActionInfo
 {
 	public:
@@ -108,6 +111,7 @@ class ActionInfo
 
 		unsigned int					minArgs;
 		unsigned int					maxArgs;
+		bool							varArgs;
 		TArray<CallArguments::Value>	defaults;
 		TArray<const Type *>			types;
 };
@@ -132,6 +136,8 @@ typedef TArray<ActionInfo *> ActionTable;
 	double name = args[num].val.d
 #define ACTION_PARAM_STRING(name, num) \
 	FString name = args[num].str
+#define ACTION_PARAM_STATE(name, num) \
+	const Frame *name = args[num].label.Resolve(self)
 
 class SymbolInfo
 {

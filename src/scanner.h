@@ -60,6 +60,7 @@ enum
 	TK_AndEq,			// &=
 	TK_OrEq,			// |=
 	TK_XorEq,			// ^=
+	TK_Ellipsis,		// ...
 
 	TK_NumSpecialTokens,
 

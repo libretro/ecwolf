@@ -94,12 +94,17 @@ StateLabel::StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative)
 	Parse(sc, parent, noRelative);
 }
 
+const Frame *StateLabel::Resolve() const
+{
+	return *(cls->FindStateInList(label) + offset);
+}
+
 const Frame *StateLabel::Resolve(AActor *self) const
 {
 	if(isRelative)
-		return self->state + offset;
+		return self->GetClass()->frameList[self->state->index + offset];
 
-	return *(cls->FindStateInList(label) + offset);
+	return *(self->GetClass()->FindStateInList(label) + offset);
 }
 
 void StateLabel::Parse(Scanner &sc, const ClassDef *parent, bool noRelative)
@@ -582,6 +587,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
+			thisFrame->index = frameList.Size();
 			thisFrame->spriteInf = 0;
 			// Only free the action arguments if we are the last frame using them.
 			thisFrame->freeActionArgs = i == thisStateDef.frames.Len()-1;
@@ -615,7 +621,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	// Resolve Gotos
 	for(unsigned int iter = 0;iter < gotos.Size();++iter)
 	{
-		const Frame *result = gotos[iter].jumpLabel.Resolve(NULL);
+		const Frame *result = gotos[iter].jumpLabel.Resolve();
 		gotos[iter].frame->next = result;
 	}
 }
@@ -919,6 +925,23 @@ void ClassDef::ParseActor(Scanner &sc)
 																val.useType = CallArguments::Value::VAL_DOUBLE;
 															val.expr = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
 														}
+														else if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
+														{
+															val.useType = CallArguments::Value::VAL_STATE;
+															if(sc.CheckToken(TK_IntConst))
+															{
+																if(thisState.frames.Len() > 1)
+																	sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed on multistate definitions.");
+																FString label;
+																label.Format("%d", sc->number);
+																val.label = StateLabel(label, newClass);
+															}
+															else
+															{
+																sc.MustGetToken(TK_StringConst);
+																val.label = StateLabel(sc->str, newClass);
+															}
+														}
 														else
 														{
 															sc.MustGetToken(TK_StringConst);
@@ -926,9 +949,25 @@ void ClassDef::ParseActor(Scanner &sc)
 															val.str = sc->str;
 														}
 														ca->AddArgument(val);
-														++argc;
+
+														// Check if we can or should take another argument
+														if(sc.CheckToken(','))
+														{
+															if(argc+1 < funcInf->maxArgs)
+															{
+																++argc;
+																continue;
+															}
+															else if(funcInf->varArgs)
+																continue;
+														}
+														else
+														{
+															++argc;
+															break;
+														}
 													}
-													while(sc.CheckToken(',') && argc <= funcInf->maxArgs);
+													while(true);
 													sc.MustGetToken(')');
 												}
 											}
@@ -988,6 +1027,13 @@ void ClassDef::ParseActor(Scanner &sc)
 					bool optRequired = false;
 					do
 					{
+						// If we have processed at least one argument, then we can take varArgs.
+						if(funcInf->minArgs > 0 && sc.CheckToken(TK_Ellipsis))
+						{
+							funcInf->varArgs = true;
+							break;
+						}
+
 						sc.MustGetToken(TK_Identifier);
 						const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
 						if(type == NULL)
@@ -1034,6 +1080,17 @@ void ClassDef::ParseActor(Scanner &sc)
 								sc.MustGetToken(TK_BoolConst);
 								defVal.useType = CallArguments::Value::VAL_INTEGER;
 								defVal.val.i = sc->number;
+							}
+							else if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
+							{
+								defVal.useType = CallArguments::Value::VAL_STATE;
+								if(sc.CheckToken(TK_IntConst))
+									sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed for defaults.");
+								else
+								{
+									sc.MustGetToken(TK_StringConst);
+									defVal.label = StateLabel(sc->str, newClass);
+								}
 							}
 							else
 							{

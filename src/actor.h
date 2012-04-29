@@ -83,6 +83,7 @@ class Frame
 				void operator() (AActor *self) const;
 		} action, thinker;
 		const Frame	*next;
+		unsigned int	index;
 
 		unsigned int	spriteInf;
 

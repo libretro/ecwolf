@@ -64,7 +64,8 @@ static const char* const TokenNames[TK_NumSpecialTokens] =
 	"Assign Right Shift",
 	"Assign Bitwise And",
 	"Assign Bitwise Or",
-	"Assign Exclusive Or"
+	"Assign Exclusive Or",
+	"Ellipsis"
 };
 
 Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
@@ -332,7 +333,7 @@ bool Scanner::GetNextToken(bool expandState)
 			integerBase = 8;
 		nextState.token = TK_IntConst;
 	}
-	else if(cur == '.')
+	else if(cur == '.' && scanPos < length && data[scanPos] != '.')
 	{
 		floatHasDecimal = true;
 		nextState.token = TK_FloatConst;
@@ -382,6 +383,12 @@ bool Scanner::GetNextToken(bool expandState)
 					nextState.token = TK_Decrement;
 				else if(next == '>')
 					nextState.token = TK_PointerMember;
+			}
+			else if(cur == '.' && next == '.' &&
+				scanPos+1 < length && data[scanPos+1] == '.')
+			{
+				nextState.token = TK_Ellipsis;
+				++scanPos;
 			}
 			else if(next == '=')
 			{
@@ -438,9 +445,6 @@ bool Scanner::GetNextToken(bool expandState)
 
 	if(start == end)
 	{
-		// Handle small tokens at the end of a file.
-		if(scanPos == length)
-			end = scanPos;
 		while(scanPos < length)
 		{
 			cur = data[scanPos];
@@ -520,6 +524,9 @@ bool Scanner::GetNextToken(bool expandState)
 			else
 				break;
 		}
+		// Handle small tokens at the end of a file.
+		if(scanPos == length)
+			end = scanPos;
 	}
 
 	nextState.scanPos = scanPos;
