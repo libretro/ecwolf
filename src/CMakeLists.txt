@@ -91,6 +91,7 @@ add_executable(ecwolf WIN32
 	textures/pcxtexture.cpp
 	textures/pngtexture.cpp
 	textures/rawpagetexture.cpp
+	textures/solidtexture.cpp
 	textures/texture.cpp
 	textures/texturemanager.cpp
 	textures/tgatexture.cpp

@@ -137,6 +137,7 @@ void FTextureManager::DeleteAll()
 //
 //==========================================================================
 
+FTexture *SolidTexture_TryCreate(const char *color);
 FTextureID FTextureManager::CheckForTexture (const char *name, int usetype, BITFIELD flags)
 {
 	int i;
@@ -201,6 +202,13 @@ FTextureID FTextureManager::CheckForTexture (const char *name, int usetype, BITF
 			}
 		}
 		i = Textures[i].HashNext;
+	}
+
+	if(name[0] == '#' && strlen(name) == 7)
+	{
+		FTexture *solidTex = SolidTexture_TryCreate(name+1);
+		solidTex->UseType = FTexture::TEX_Flat;
+		return AddTexture(solidTex);
 	}
 
 	if ((flags & TEXMAN_TryAny) && usetype != FTexture::TEX_Any)
