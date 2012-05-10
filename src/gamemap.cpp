@@ -91,7 +91,7 @@ bool GameMap::ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *ac
 	MapSpot spot = GetSpot(trig.x, trig.y, trig.z);
 
 	Specials::LineSpecialFunction func = Specials::LookupFunction(Specials::LineSpecials(trig.action));
-	return func(spot, direction, activator);
+	return func(spot, trig.arg, direction, activator);
 }
 
 void GameMap::ClearVisibility()

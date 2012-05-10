@@ -1,6 +1,5 @@
-actor GoldKey : Inventory 53
+actor GoldKey : Key 53
 {
-	inventory.pickupsound "misc/key_pickup"
 	states
 	{
 		Spawn:
@@ -9,9 +8,8 @@ actor GoldKey : Inventory 53
 	}
 }
 
-actor SilverKey : Inventory 54
+actor SilverKey : Key 54
 {
-	inventory.pickupsound "misc/key_pickup"
 	states
 	{
 		Spawn:

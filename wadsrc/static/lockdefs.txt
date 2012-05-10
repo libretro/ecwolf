@@ -1,0 +1,15 @@
+lock 1 
+{
+	GoldKey
+}
+
+lock 2
+{
+	SilverKey
+}
+
+lock 3
+{
+	GoldKey
+	SilverKey
+}

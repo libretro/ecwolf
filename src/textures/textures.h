@@ -9,7 +9,6 @@ class FBitmap;
 struct FRemapTable;
 struct FCopyInfo;
 class Scanner;
-struct PClass;
 class FArchive;
 
 // Texture IDs
@@ -20,7 +19,6 @@ class FTextureID
 {
 	friend class FTextureManager;
 	friend FArchive &operator<< (FArchive &arc, FTextureID &tex);
-	friend FTextureID GetHUDIcon(const PClass *cls);
 	friend void R_InitSpriteDefs ();
 
 public:

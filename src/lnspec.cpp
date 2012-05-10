@@ -37,12 +37,13 @@
 #include "lnspec.h"
 #include "actor.h"
 #include "wl_agent.h"
+#include "g_shared/a_keys.h"
 using namespace Specials;
 
-#define DEFINE_SPECIAL(name,num,args) \
-	static int LN_##name(MapSpot spot, MapTrigger::Side direction, AActor *activator);
+#define DEFINE_SPECIAL(name,num,argc) \
+	static int LN_##name(MapSpot spot, int args[], MapTrigger::Side direction, AActor *activator);
 #define FUNC(name) \
-	static int LN_##name(MapSpot spot, MapTrigger::Side direction, AActor *activator)
+	static int LN_##name(MapSpot spot, int args[], MapTrigger::Side direction, AActor *activator)
 
 DEFINE_SPECIAL(NOP, 0, 0)
 #include "lnspecials.h"
@@ -248,6 +249,12 @@ FUNC(Door_Open)
 	if(buttonheld[bt_use])
 		return 0;
 	buttonheld[bt_use] = true;
+
+	if(args[1] != 0)
+	{
+		if(!P_CheckKeys(activator, args[1], false))
+			return 0;
+	}
 
 	if(spot->thinker)
 	{

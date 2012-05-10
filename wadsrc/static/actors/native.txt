@@ -58,6 +58,11 @@ actor Health : Inventory native
 	inventory.maxamount 0
 }
 
+actor Key : Inventory native
+{
+	inventory.pickupsound "misc/k_pkup"
+}
+
 actor ScoreItem : Inventory native
 {
 }

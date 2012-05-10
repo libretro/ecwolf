@@ -41,7 +41,7 @@ class AActor;
 
 namespace Specials
 {
-	typedef int (*LineSpecialFunction)(MapSpot spot, MapTrigger::Side direction, AActor *activator);
+	typedef int (*LineSpecialFunction)(MapSpot spot, int args[], MapTrigger::Side direction, AActor *activator);
 
 	#define DEFINE_SPECIAL(name,num,args) name = num,
 	enum LineSpecials

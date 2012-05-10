@@ -30,6 +30,7 @@
 #include "doomerrors.h"
 #include "lumpremap.h"
 #include "scanner.h"
+#include "g_shared/a_keys.h"
 
 // Wad Code Stuff
 TArray<FString> wadfiles;
@@ -571,6 +572,13 @@ static void InitGame()
 //
 
 	ClassDef::LoadActors();
+
+//
+// Load Keys
+//
+
+	P_InitKeyMessages();
+	atterm(P_DeinitKeyMessages);
 
 //
 // draw intro screen stuff

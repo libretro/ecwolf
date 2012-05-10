@@ -249,6 +249,11 @@ void AActor::Init(bool nothink)
 	}
 }
 
+bool AActor::IsA(const ClassDef *type) const
+{
+	return GetClass() == type;
+}
+
 bool AActor::IsKindOf(const ClassDef *type) const
 {
 	return GetClass()->IsDescendantOf(type);

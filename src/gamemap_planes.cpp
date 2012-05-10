@@ -134,6 +134,7 @@ void GameMap::ReadPlanesData()
 						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
 						trig.action = Specials::Door_Open;
 						trig.arg[0] = 1;
+						trig.arg[1] = doorType >= 1 && doorType <= 4 ? doorType : 0;
 						trig.playerUse = true;
 						trig.monsterUse = true;
 						if(vertical)

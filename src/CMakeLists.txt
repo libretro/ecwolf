@@ -59,6 +59,7 @@ endif(WIN32)
 add_executable(ecwolf WIN32
 	${OPL_SOURCES}
 	g_shared/a_inventory.cpp
+	g_shared/a_keys.cpp
 	g_shared/a_patrolpoint.cpp
 	g_shared/a_playerpawn.cpp
 	r_data/colormaps.cpp

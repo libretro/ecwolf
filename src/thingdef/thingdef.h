@@ -263,6 +263,7 @@ class ClassDef
 		const ActionInfo		*FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const;
+		AActor					*GetDefault() const { return defaultInstance; }
 		const FName				&GetName() const { return name; }
 		static void				LoadActors();
 		static void				UnloadActors();

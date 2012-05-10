@@ -10,7 +10,7 @@ misc/do_nothing			{ NULL ALNOTHIN PCNOTHIN }
 misc/ammo_pickup		{ NULL ALAMMOUP PCAMMOUP }
 misc/health_pickup		{ NULL ALFOODUP PCFOODUP }
 misc/medkit_pickup		{ NULL ALMEDIUP PCMEDIUP }
-misc/key_pickup			{ NULL ALGETKEY PCGETKEY }
+misc/k_pkup				{ NULL ALGETKEY PCGETKEY }
 misc/end_bonus1			{ NULL ALENDBN1 PCENDBN1 }
 misc/end_bonus2			{ NULL ALENDBN2 PCENDBN2 }
 misc/no_bonus			{ NULL ALNOBNS PCNOBNS }
