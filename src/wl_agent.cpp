@@ -12,6 +12,7 @@
 #include "lnspec.h"
 #include "wl_agent.h"
 #include "a_inventory.h"
+#include "a_keys.h"
 #include "m_random.h"
 
 /*
@@ -547,12 +548,30 @@ void DrawWeapon (void)
 void DrawKeys (void)
 {
 	if(viewsize == 21 && ingame) return;
-	if (gamestate.keys & 1)
+
+	// Find keys in inventory
+	int presentKeys = 0;
+	if(players[0].mo)
+	{
+		for(AInventory *item = players[0].mo->inventory;item != NULL;item = item->inventory)
+		{
+			if(item->IsKindOf(NATIVE_CLASS(Key)))
+			{
+				int slot = static_cast<AKey *>(item)->KeyNumber;
+				if(slot == 1 || slot == 2)
+					presentKeys |= 1<<(slot-1);
+				if(presentKeys == 3)
+					break;
+			}
+		}
+	}
+
+	if (presentKeys & 1)
 		StatusDrawPic (30,4,"GOLDKEY");
 	else
 		StatusDrawPic (30,4,"NOKEY");
 
-	if (gamestate.keys & 2)
+	if (presentKeys & 2)
 		StatusDrawPic (30,20,"SILVRKEY");
 	else
 		StatusDrawPic (30,20,"NOKEY");
@@ -579,21 +598,6 @@ void DrawAmmo (void)
 }
 
 //===========================================================================
-
-/*
-==================
-=
-= GiveKey
-=
-==================
-*/
-
-void GiveKey (int key)
-{
-	gamestate.keys |= (1<<key);
-	DrawKeys ();
-}
-
 
 
 /*

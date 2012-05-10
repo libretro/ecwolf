@@ -1066,6 +1066,7 @@ void PlayLoop (void)
 
 		CheckKeys ();
 		DrawAmmo();
+		DrawKeys();
 		DrawWeapon();
 
 //

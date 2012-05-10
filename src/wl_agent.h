@@ -24,7 +24,6 @@ void    SpawnPlayer (int tilex, int tiley, int dir);
 void    TakeDamage (int points,objtype *attacker);
 void    GivePoints (int32_t points);
 void    GetBonus (statobj_t *check);
-void    GiveKey (int key);
 void    VictorySpin ();
 
 //
