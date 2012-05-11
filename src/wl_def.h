@@ -330,45 +330,6 @@ typedef enum {
 	nodir
 } dirtype;
 
-
-#define NUMENEMIES  22
-typedef enum {
-	en_guard,
-	en_officer,
-	en_ss,
-	en_dog,
-	en_boss,
-	en_schabbs,
-	en_fake,
-	en_hitler,
-	en_mutant,
-	en_blinky,
-	en_clyde,
-	en_pinky,
-	en_inky,
-	en_gretel,
-	en_gift,
-	en_fat,
-	en_spectre,
-	en_angel,
-	en_trans,
-	en_uber,
-	en_will,
-	en_death
-} enemy_t;
-
-typedef void (* statefunc) (void *);
-
-typedef struct statestruct
-{
-	boolean rotate;
-	short   shapenum;           // a shapenum of -1 means get from ob->temp1
-	short   tictime;
-	void    (*think) (void *),(*action) (void *);
-	struct  statestruct *next;
-} statetype;
-
-
 //---------------------
 //
 // trivial actor structure
@@ -413,7 +374,6 @@ typedef struct doorstruct
 //--------------------
 
 class AActor;
-typedef AActor objtype;
 
 enum Button
 {
@@ -574,6 +534,7 @@ void            ShutdownId (void);
 =============================================================================
 */
 
+extern  AActor          *killerobj;
 extern  gametype        gamestate;
 extern  byte            bordercol;
 extern  char            demoname[13];
@@ -638,7 +599,6 @@ extern  boolean     buttonstate[NUMBUTTONS];
 extern  boolean     buttonheld[NUMBUTTONS];
 extern  exit_t      playstate;
 extern  boolean     madenoise;
-extern  objtype     *newobj,*killerobj;
 extern  int         godmode;
 
 extern  boolean     demorecord,demoplayback;
@@ -673,29 +633,9 @@ void    StartBonusFlash (void);
 extern  int32_t     funnyticount;           // FOR FUNNY BJ FACE
 #endif
 
-extern  objtype     *objfreelist;     // *obj,*player,*lastobj,
-
 extern  boolean     noclip,ammocheat;
 extern  int         singlestep;
 extern  unsigned int extravbls;
-
-/*
-=============================================================================
-
-								WL_INTER
-
-=============================================================================
-*/
-
-void IntroScreen (void);
-void PG13(void);
-void DrawHighScores(void);
-void CheckHighScore (int32_t score,word other);
-void Victory (void);
-void LevelCompleted (void);
-void ClearSplitVWB (void);
-
-void PreloadGraphics(void);
 
 
 /*
@@ -754,15 +694,13 @@ typedef struct
 =============================================================================
 */
 
-void    InitHitRect (objtype *ob, unsigned radius);
-void    SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
-void    NewState (objtype *ob, statetype *state);
+void    InitHitRect (AActor *ob, unsigned radius);
 
 bool TryWalk (AActor *ob);
-void    SelectChaseDir (objtype *ob);
-void    SelectDodgeDir (objtype *ob);
-void    SelectRunDir (objtype *ob);
-void    MoveObj (objtype *ob, int32_t move);
+void    SelectChaseDir (AActor *ob);
+void    SelectDodgeDir (AActor *ob);
+void    SelectRunDir (AActor *ob);
+void    MoveObj (AActor *ob, int32_t move);
 bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov);
 
 void    DamageActor (AActor *ob, unsigned damage);

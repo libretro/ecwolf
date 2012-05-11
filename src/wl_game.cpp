@@ -19,6 +19,7 @@
 #include <SDL_mixer.h>
 #include "wl_agent.h"
 #include "g_mapinfo.h"
+#include "wl_inter.h"
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -42,6 +43,7 @@
 =============================================================================
 */
 
+AActor			*killerobj;
 boolean         ingame,fizzlein;
 gametype        gamestate;
 byte            bordercol=VIEWCOLOR;        // color of the Change View/Ingame border

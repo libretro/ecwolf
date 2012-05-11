@@ -33,6 +33,7 @@
 #include "c_cvars.h"
 #include "wl_agent.h"
 #include "g_mapinfo.h"
+#include "wl_inter.h"
 
 struct SaveFile
 {

@@ -44,15 +44,15 @@
 //
 // player state info
 //
-int32_t         thrustspeed;
+int32_t			thrustspeed;
 
-short           anglefrac;
+short			anglefrac;
 
-objtype        *LastAttacker;
+AActor			*LastAttacker;
 
 player_t		players[1];
 
-void ClipMove (objtype *ob, int32_t xmove, int32_t ymove);
+void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
 
 /*
 =============================================================================
@@ -116,7 +116,7 @@ void CheckWeaponChange (void)
 =======================
 */
 
-void ControlMovement (objtype *ob)
+void ControlMovement (AActor *ob)
 {
 	int32_t oldx,oldy;
 	int     angle;
@@ -387,7 +387,7 @@ void DrawHealth (void)
 ===============
 */
 
-void TakeDamage (int points,objtype *attacker)
+void TakeDamage (int points,AActor *attacker)
 {
 	LastAttacker = attacker;
 
@@ -715,7 +715,7 @@ bool TryMove (AActor *ob)
 ===================
 */
 
-void ClipMove (objtype *ob, int32_t xmove, int32_t ymove)
+void ClipMove (AActor *ob, int32_t xmove, int32_t ymove)
 {
 	int32_t    basex,basey;
 

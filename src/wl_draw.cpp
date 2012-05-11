@@ -84,7 +84,7 @@ fixed   viewx,viewy;                    // the focal point
 short   viewangle;
 fixed   viewsin,viewcos;
 
-void    TransformActor (objtype *ob);
+void    TransformActor (AActor *ob);
 void    BuildTables (void);
 void    ClearScreen (void);
 int     CalcRotate (AActor *ob);
@@ -153,7 +153,7 @@ int     texdelta;
 //
 // transform actor
 //
-void TransformActor (objtype *ob)
+void TransformActor (AActor *ob)
 {
 	fixed gx,gy,gxt,gyt,nx,ny;
 

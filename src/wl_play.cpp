@@ -16,6 +16,7 @@
 #include "actor.h"
 #include "textures/textures.h"
 #include "wl_agent.h"
+#include "wl_inter.h"
 
 /*
 =============================================================================
@@ -40,8 +41,6 @@ boolean madenoise;              // true when shooting or screaming
 exit_t playstate;
 
 static int DebugOk;
-
-objtype *newobj, *obj, *lastobj, *objfreelist, *killerobj;
 
 boolean noclip, ammocheat;
 int godmode, singlestep;
@@ -154,7 +153,6 @@ int lastgamemusicoffset = 0;
 
 
 void CenterWindow (word w, word h);
-void InitObjList (void);
 void PollControls (void);
 int StopMusic (void);
 void StartMusic (void);

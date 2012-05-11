@@ -8,6 +8,7 @@
 #include "id_us.h"
 #include "language.h"
 #include "wl_agent.h"
+#include "wl_inter.h"
 
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;
@@ -274,7 +275,6 @@ Victory (void)
 
 //==========================================================================
 
-#ifndef JAPAN
 /*
 ==================
 =
@@ -283,8 +283,7 @@ Victory (void)
 ==================
 */
 
-void
-PG13 (void)
+void PG13 (void)
 {
 	VW_FadeOut ();
 	VWB_Clear(0x82, 0, 0, screenWidth, screenHeight);
@@ -296,7 +295,6 @@ PG13 (void)
 
 	VW_FadeOut ();
 }
-#endif
 
 
 //==========================================================================
@@ -909,8 +907,7 @@ done:   itoa (kr, tempstr, 10);
 =================
 */
 
-boolean
-PreloadUpdate (unsigned current, unsigned total)
+bool PreloadUpdate (unsigned current, unsigned total)
 {
 	unsigned w = WindowW - scaleFactor * 10;
 
@@ -935,8 +932,7 @@ PreloadUpdate (unsigned current, unsigned total)
 	return (false);
 }
 
-void
-PreloadGraphics (void)
+void PreloadGraphics (void)
 {
 	DrawLevel ();
 	ClearSplitVWB ();           // set up for double buffering in split screen

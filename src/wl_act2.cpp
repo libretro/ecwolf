@@ -74,10 +74,6 @@ static inline bool CheckDoorMovement(AActor *actor)
 dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
 	southwest,south,southeast};
 
-void    A_StartDeathCam (objtype *ob);
-
-void A_HitlerMorph (objtype *ob);
-
 /*
 =================
 =

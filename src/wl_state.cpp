@@ -45,13 +45,8 @@ static const dirtype diagonal[9][9] =
 				{nodir,nodir,nodir,nodir,nodir,nodir,nodir,nodir,nodir}
 };
 
-
-
-void    SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state);
-void    NewState (objtype *ob, statetype *state);
-
 bool TryWalk (AActor *ob);
-void    MoveObj (objtype *ob, int32_t move);
+void    MoveObj (AActor *ob, int32_t move);
 
 void    FirstSighting (AActor *ob);
 
@@ -62,62 +57,6 @@ void    FirstSighting (AActor *ob);
 
 =============================================================================
 */
-
-
-
-//===========================================================================
-
-
-/*
-===================
-=
-= SpawnNewObj
-=
-= Spaws a new actor at the given TILE coordinates, with the given state, and
-= the given size in GLOBAL units.
-=
-= newobj = a pointer to an initialized new actor
-=
-===================
-*/
-
-void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
-{
-	/*newobj->state = state;
-	if (state->tictime)
-		newobj->ticcount = DEMOCHOOSE_ORIG_SDL(
-				US_RndT () % state->tictime,
-				US_RndT () % state->tictime + 1);     // Chris' moonwalk bugfix ;D
-	else
-		newobj->ticcount = 0;*/
-
-	newobj->tilex = (short) tilex;
-	newobj->tiley = (short) tiley;
-	newobj->x = ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2;
-	newobj->y = ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2;
-	newobj->dir = nodir;
-
-	newobj->EnterZone(map->GetSpot(newobj->tilex, newobj->tiley, 0)->zone);
-}
-
-
-
-/*
-===================
-=
-= NewState
-=
-= Changes ob to a new state, setting ticcount to the max for that state
-=
-===================
-*/
-
-void NewState (objtype *ob, statetype *state)
-{
-//	ob->state = state;
-//	ob->ticcount = state->tictime;
-}
-
 
 
 /*
@@ -319,7 +258,7 @@ bool TryWalk (AActor *ob)
 ==================================
 */
 
-void SelectDodgeDir (objtype *ob)
+void SelectDodgeDir (AActor *ob)
 {
 	int         deltax,deltay,i;
 	unsigned    absdx,absdy;
@@ -435,7 +374,7 @@ void SelectDodgeDir (objtype *ob)
 ============================
 */
 
-void SelectChaseDir (objtype *ob)
+void SelectChaseDir (AActor *ob)
 {
 	int     deltax,deltay;
 	dirtype d[3];
@@ -545,7 +484,7 @@ void SelectChaseDir (objtype *ob)
 ============================
 */
 
-void SelectRunDir (objtype *ob)
+void SelectRunDir (AActor *ob)
 {
 	int deltax,deltay;
 	dirtype d[3];

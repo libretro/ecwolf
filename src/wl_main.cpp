@@ -32,6 +32,7 @@
 #include "scanner.h"
 #include "g_shared/a_keys.h"
 #include "g_mapinfo.h"
+#include "wl_inter.h"
 
 // Wad Code Stuff
 TArray<FString> wadfiles;
@@ -207,9 +208,6 @@ int32_t DoChecksum(byte *source,unsigned size,int32_t checksum)
 =
 ==================
 */
-
-extern statetype s_grdstand;
-extern statetype s_player;
 
 boolean SaveTheGame(FILE *file,int x,int y)
 {
