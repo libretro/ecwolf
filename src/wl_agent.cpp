@@ -14,6 +14,7 @@
 #include "a_inventory.h"
 #include "a_keys.h"
 #include "m_random.h"
+#include "g_mapinfo.h"
 
 /*
 =============================================================================
@@ -438,12 +439,7 @@ void TakeDamage (int points,objtype *attacker)
 void DrawLevel (void)
 {
 	if(viewsize == 21 && ingame) return;
-#ifdef SPEAR
-	if (gamestate.mapon == 20)
-		LatchNumber (2,16,2,18);
-	else
-#endif
-		LatchNumber (2,16,2,gamestate.mapon+1);
+	LatchNumber (2,16,2,levelInfo->FloorNumber);
 }
 
 //===========================================================================

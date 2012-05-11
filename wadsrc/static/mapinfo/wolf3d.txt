@@ -6,58 +6,74 @@ defaultmap
 
 // Episode 1
 
+episode "MAP01"
+{
+	lookup = "WL_EPISODE1"
+	picname = "M_EPIS1"
+	key = "E"
+}
+
 map "MAP01"
 {
 	next = "MAP02"
 	secretnext = "MAP10"
+	floornumber = 1
 }
 
 map "MAP02"
 {
 	next = "MAP03"
 	secretnext = "MAP10"
+	floornumber = 2
 }
 
 map "MAP03"
 {
 	next = "MAP04"
 	secretnext = "MAP10"
+	floornumber = 3
 }
 
 map "MAP04"
 {
 	next = "MAP05"
 	secretnext = "MAP10"
+	floornumber = 4
 }
 
 map "MAP05"
 {
 	next = "MAP06"
 	secretnext = "MAP10"
+	floornumber = 5
 }
 
 map "MAP06"
 {
 	next = "MAP06"
 	secretnext = "MAP10"
+	floornumber = 6
 }
 
 map "MAP07"
 {
 	next = "MAP08"
 	secretnext = "MAP10"
+	floornumber = 7
 }
 
 map "MAP08"
 {
 	next = "MAP09"
 	secretnext = "MAP10"
+	floornumber = 8
 }
 
 map "MAP09"
 {
 	next = "EndGame1"
 	secretnext = "MAP10"
+	floornumber = 9
 }
 
 map "MAP10"
@@ -65,15 +81,24 @@ map "MAP10"
 	next = "MAP02"
 	secretnext = "MAP10"
 	defaultceiling = "#400040"
+	floornumber = 10
 }
 
 // Episode 2
+
+episode "MAP11"
+{
+	lookup = "WL_EPISODE2"
+	picname = "M_EPIS2"
+	key = "O"
+}
 
 map "MAP11"
 {
 	next = "MAP12"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
+	floornumber = 1
 }
 
 map "MAP12"
@@ -81,6 +106,7 @@ map "MAP12"
 	next = "MAP13"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
+	floornumber = 2
 }
 
 map "MAP13"
@@ -88,12 +114,14 @@ map "MAP13"
 	next = "MAP14"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
+	floornumber = 3
 }
 
 map "MAP14"
 {
 	next = "MAP15"
 	secretnext = "MAP20"
+	floornumber = 4
 }
 
 map "MAP15"
@@ -101,6 +129,7 @@ map "MAP15"
 	next = "MAP16"
 	secretnext = "MAP20"
 	defaultceiling = "#4040FC"
+	floornumber = 5
 }
 
 map "MAP16"
@@ -108,12 +137,14 @@ map "MAP16"
 	next = "MAP16"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
+	floornumber = 6
 }
 
 map "MAP17"
 {
 	next = "MAP18"
 	secretnext = "MAP20"
+	floornumber = 7
 }
 
 map "MAP18"
@@ -121,12 +152,14 @@ map "MAP18"
 	next = "MAP19"
 	secretnext = "MAP20"
 	defaultceiling = "#580000"
+	floornumber = 8
 }
 
 map "MAP19"
 {
 	next = "EndGame2"
 	secretnext = "MAP20"
+	floornumber = 9
 }
 
 map "MAP20"
@@ -134,38 +167,51 @@ map "MAP20"
 	next = "MAP12"
 	secretnext = "MAP20"
 	defaultceiling = "#4040FC"
+	floornumber = 10
 }
 
 // Episode 3
+
+episode "MAP21"
+{
+	lookup = "WL_EPISODE3"
+	picname = "M_EPIS3"
+	key = "D"
+}
 
 map "MAP21"
 {
 	next = "MAP22"
 	secretnext = "MAP30"
+	floornumber = 1
 }
 
 map "MAP22"
 {
 	next = "MAP23"
 	secretnext = "MAP30"
+	floornumber = 2
 }
 
 map "MAP23"
 {
 	next = "MAP24"
 	secretnext = "MAP30"
+	floornumber = 3
 }
 
 map "MAP24"
 {
 	next = "MAP25"
 	secretnext = "MAP30"
+	floornumber = 4
 }
 
 map "MAP25"
 {
 	next = "MAP26"
 	secretnext = "MAP30"
+	floornumber = 5
 }
 
 map "MAP26"
@@ -173,6 +219,7 @@ map "MAP26"
 	next = "MAP26"
 	secretnext = "MAP30"
 	defaultceiling = "#580000"
+	floornumber = 6
 }
 
 map "MAP27"
@@ -180,18 +227,21 @@ map "MAP27"
 	next = "MAP28"
 	secretnext = "MAP30"
 	defaultceiling = "#483818"
+	floornumber = 7
 }
 
 map "MAP28"
 {
 	next = "MAP29"
 	secretnext = "MAP30"
+	floornumber = 8
 }
 
 map "MAP29"
 {
 	next = "EndGame3"
 	secretnext = "MAP30"
+	floornumber = 9
 }
 
 map "MAP30"
@@ -199,14 +249,23 @@ map "MAP30"
 	next = "MAP28"
 	secretnext = "MAP30"
 	defaultceiling = "#000098"
+	floornumber = 10
 }
 
 // Episode 4
+
+episode "MAP31"
+{
+	lookup = "WL_EPISODE4"
+	picname = "M_EPIS4"
+	key = "A"
+}
 
 map "MAP31"
 {
 	next = "MAP32"
 	secretnext = "MAP40"
+	floornumber = 1
 }
 
 map "MAP32"
@@ -214,6 +273,7 @@ map "MAP32"
 	next = "MAP33"
 	secretnext = "MAP40"
 	defaultceiling = "#000058"
+	floornumber = 2
 }
 
 map "MAP33"
@@ -221,6 +281,7 @@ map "MAP33"
 	next = "MAP34"
 	secretnext = "MAP40"
 	defaultceiling = "#580000"
+	floornumber = 3
 }
 
 map "MAP34"
@@ -228,6 +289,7 @@ map "MAP34"
 	next = "MAP35"
 	secretnext = "MAP40"
 	defaultceiling = "#483818"
+	floornumber = 4
 }
 
 map "MAP35"
@@ -235,6 +297,7 @@ map "MAP35"
 	next = "MAP36"
 	secretnext = "MAP40"
 	defaultceiling = "#483818"
+	floornumber = 5
 }
 
 map "MAP36"
@@ -242,6 +305,7 @@ map "MAP36"
 	next = "MAP36"
 	secretnext = "MAP40"
 	defaultceiling = "#000058"
+	floornumber = 6
 }
 
 map "MAP37"
@@ -249,6 +313,7 @@ map "MAP37"
 	next = "MAP38"
 	secretnext = "MAP40"
 	defaultceiling = "#580000"
+	floornumber = 7
 }
 
 map "MAP38"
@@ -256,12 +321,14 @@ map "MAP38"
 	next = "MAP39"
 	secretnext = "MAP40"
 	defaultceiling = "#716D00"
+	floornumber = 8
 }
 
 map "MAP39"
 {
 	next = "EndGame4"
 	secretnext = "MAP10"
+	floornumber = 9
 }
 
 map "MAP40"
@@ -269,21 +336,31 @@ map "MAP40"
 	next = "MAP34"
 	secretnext = "MAP40"
 	defaultceiling = "#483818"
+	floornumber = 10
 }
 
 // Episode 5
+
+episode "MAP41"
+{
+	lookup = "WL_EPISODE5"
+	picname = "M_EPIS5"
+	key = "T"
+}
 
 map "MAP41"
 {
 	next = "MAP42"
 	secretnext = "MAP50"
 	defaultceiling = "#007070"
+	floornumber = 1
 }
 
 map "MAP42"
 {
 	next = "MAP43"
 	secretnext = "MAP50"
+	floornumber = 2
 }
 
 map "MAP43"
@@ -291,6 +368,7 @@ map "MAP43"
 	next = "MAP44"
 	secretnext = "MAP50"
 	defaultceiling = "#580000"
+	floornumber = 3
 }
 
 map "MAP44"
@@ -298,6 +376,7 @@ map "MAP44"
 	next = "MAP45"
 	secretnext = "MAP50"
 	defaultceiling = "#580000"
+	floornumber = 4
 }
 
 map "MAP45"
@@ -305,6 +384,7 @@ map "MAP45"
 	next = "MAP46"
 	secretnext = "MAP50"
 	defaultceiling = "#483818"
+	floornumber = 5
 }
 
 map "MAP46"
@@ -312,24 +392,28 @@ map "MAP46"
 	next = "MAP46"
 	secretnext = "MAP50"
 	defaultceiling = "#80502C"
+	floornumber = 6
 }
 
 map "MAP47"
 {
 	next = "MAP48"
 	secretnext = "MAP50"
+	floornumber = 7
 }
 
 map "MAP48"
 {
 	next = "MAP49"
 	secretnext = "MAP50"
+	floornumber = 8
 }
 
 map "MAP49"
 {
 	next = "EndGame5"
 	secretnext = "MAP50"
+	floornumber = 9
 }
 
 map "MAP50"
@@ -337,32 +421,44 @@ map "MAP50"
 	next = "MAP46"
 	secretnext = "MAP50"
 	defaultceiling = "#580000"
+	floornumber = 10
 }
 
 // Episode 6
+
+episode "MAP51"
+{
+	lookup = "WL_EPISODE6"
+	picname = "M_EPIS6"
+	key = "C"
+}
 
 map "MAP51"
 {
 	next = "MAP52"
 	secretnext = "MAP60"
+	floornumber = 1
 }
 
 map "MAP52"
 {
 	next = "MAP53"
 	secretnext = "MAP60"
+	floornumber = 2
 }
 
 map "MAP53"
 {
 	next = "MAP54"
 	secretnext = "MAP60"
+	floornumber = 3
 }
 
 map "MAP54"
 {
 	next = "MAP55"
 	secretnext = "MAP60"
+	floornumber = 4
 }
 
 map "MAP55"
@@ -370,6 +466,7 @@ map "MAP55"
 	next = "MAP56"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
+	floornumber = 5
 }
 
 map "MAP56"
@@ -377,6 +474,7 @@ map "MAP56"
 	next = "MAP56"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
+	floornumber = 6
 }
 
 map "MAP57"
@@ -384,6 +482,7 @@ map "MAP57"
 	next = "MAP58"
 	secretnext = "MAP60"
 	defaultceiling = "#007070"
+	floornumber = 7
 }
 
 map "MAP58"
@@ -391,6 +490,7 @@ map "MAP58"
 	next = "MAP59"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
+	floornumber = 8
 }
 
 map "MAP59"
@@ -398,6 +498,7 @@ map "MAP59"
 	next = "EndGame6"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
+	floornumber = 9
 }
 
 map "MAP60"
@@ -405,4 +506,5 @@ map "MAP60"
 	next = "MAP54"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
+	floornumber = 10
 }

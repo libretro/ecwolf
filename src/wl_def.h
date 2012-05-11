@@ -477,6 +477,7 @@ enum
 
 typedef struct
 {
+	char		mapname[9];
 	short       difficulty;
 	short       mapon;
 	short       keys;
@@ -546,7 +547,7 @@ extern  char     str[80];
 //
 extern  boolean  param_nowait;
 extern  int      param_difficulty;
-extern  int      param_tedlevel;
+extern  const char* param_tedlevel;
 extern  int      param_joystickindex;
 extern  int      param_joystickhat;
 extern  int      param_samplerate;
@@ -556,7 +557,7 @@ extern  boolean  param_goodtimes;
 extern  boolean  param_ignorenumchunks;
 
 
-void            NewGame (int difficulty,int episode);
+void            NewGame (int difficulty,const class FString &map);
 void            CalcProjection (int32_t focal);
 void            NewViewSize (int width);
 boolean         LoadTheGame(FILE *file,int x,int y);

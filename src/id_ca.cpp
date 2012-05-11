@@ -30,8 +30,6 @@ loaded into the data segment
 =============================================================================
 */
 
-int     mapon = -1;
-
 LevelInfo *levelInfo = NULL;
 GameMap *map = NULL;
 
@@ -52,12 +50,8 @@ GameMap *map = NULL;
 ======================
 */
 
-void CA_CacheMap (int mapnum)
+void CA_CacheMap (const FString &mapname)
 {
-	mapon = mapnum;
-
-	char mapname[9];
-	sprintf(mapname, "MAP%02d", mapnum+1);
 	delete map;
 
 	levelInfo = &LevelInfo::Find(mapname);

@@ -34,6 +34,7 @@
  
 #include "gamemap.h"
 #include "g_mapinfo.h"
+#include "language.h"
 #include "tarray.h"
 #include "scanner.h"
 #include "w_wad.h"
@@ -45,6 +46,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 {
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
+	FloorNumber = 1;
 }
 
 LevelInfo &LevelInfo::Find(const char* level)
@@ -57,19 +59,25 @@ LevelInfo &LevelInfo::Find(const char* level)
 	return defaultMap;
 }
 
-void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
+static void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
 {
 	if(parseHeader)
 	{
+		bool useLanguage = false;
 		if(sc.CheckToken(TK_Identifier))
 		{
 			if(sc->str.CompareNoCase("lookup") != 0)
 				sc.ScriptMessage(Scanner::ERROR, "Expected lookup keyword but got '%s' instead.", sc->str.GetChars());
+			else
+				useLanguage = true;
 		}
 		if(sc.CheckToken(TK_StringConst))
 		{
 			mapInfo.UseMapInfoName = true;
-			mapInfo.Name = sc->str;
+			if(useLanguage)
+				mapInfo.Name = language[sc->str];
+			else
+				mapInfo.Name = sc->str;
 		}
 	}
 
@@ -103,6 +111,11 @@ void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
 			sc.MustGetToken(TK_StringConst);
 			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(sc->str, FTexture::TEX_Flat);
 		}
+		else if(key.CompareNoCase("FloorNumber") == 0)
+		{
+			sc.MustGetToken(TK_IntConst);
+			mapInfo.FloorNumber = sc->number;
+		}
 		else
 		{
 			sc.ScriptMessage(Scanner::WARNING, "Unknown map property '%s'!", key.GetChars());
@@ -117,7 +130,90 @@ void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void ParseMapInfoLump(int lump)
+static TArray<EpisodeInfo> episodes;
+
+EpisodeInfo::EpisodeInfo() : Shortcut(0), NoSkill(false)
+{
+}
+
+unsigned int EpisodeInfo::GetNumEpisodes()
+{
+	return episodes.Size();
+}
+
+EpisodeInfo &EpisodeInfo::GetEpisode(unsigned int index)
+{
+	return episodes[index];
+}
+
+// Returns true if the episode should be added to the list
+static bool ParseEpisode(Scanner &sc, EpisodeInfo &episode)
+{
+	bool useEpisode = true;
+
+	sc.MustGetToken(TK_StringConst);
+	episode.StartMap = sc->str;
+
+	sc.MustGetToken('{');
+	while(!sc.CheckToken('}'))
+	{
+		sc.MustGetToken(TK_Identifier);
+		FString key = sc->str;
+
+		if(key.CompareNoCase("name") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			episode.StartMap = sc->str;
+		}
+		else if(key.CompareNoCase("lookup") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			episode.EpisodeName = language[sc->str];
+		}
+		else if(key.CompareNoCase("picname") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			episode.EpisodePicture = sc->str;
+		}
+		else if(key.CompareNoCase("key") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			episode.Shortcut = sc->str[0];
+		}
+		else if(key.CompareNoCase("remove") == 0)
+		{
+			useEpisode = false;
+		}
+		else if(key.CompareNoCase("noskillmenu") == 0)
+		{
+			episode.NoSkill = true;
+		}
+		else if(key.CompareNoCase("optional") == 0)
+		{
+			if(Wads.CheckNumForName(episode.StartMap) == -1)
+				useEpisode = false;
+		}
+		else
+		{
+			sc.ScriptMessage(Scanner::WARNING, "Unknown episode property '%s'!", key.GetChars());
+			do
+			{
+				sc.GetNextToken();
+			}
+			while(sc.CheckToken(','));
+		}
+	}
+
+	return useEpisode;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+static void ParseMapInfoLump(int lump)
 {
 	FMemLump data = Wads.ReadLump(lump);
 	Scanner sc((const char*)data.GetMem(), data.GetSize());
@@ -134,6 +230,12 @@ void ParseMapInfoLump(int lump)
 		else if(sc->str.CompareNoCase("adddefaultmap") == 0)
 		{
 			ParseMap(sc, defaultMap, false);
+		}
+		else if(sc->str.CompareNoCase("episode") == 0)
+		{
+			EpisodeInfo episode;
+			if(ParseEpisode(sc, episode))
+				episodes.Push(episode);
 		}
 		else if(sc->str.CompareNoCase("map") == 0)
 		{

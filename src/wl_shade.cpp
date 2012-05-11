@@ -42,8 +42,8 @@ static inline int GetShadeDefID()
 
 static int GetShadeDefID()
 {
-	int shadeID;
-	switch(gamestate.episode * 10 + mapon)
+	int shadeID = 3;
+	/*switch(gamestate.episode * 10 + mapon)
 	{
 		case  0: shadeID = 4; break;
 		case  1:
@@ -52,7 +52,7 @@ static int GetShadeDefID()
 		case  3: shadeID = 0; break;
 		case  5: shadeID = 2; break;
 		default: shadeID = 3; break;
-	}
+	}*/
 	assert(shadeID >= 0 && shadeID < lengthof(shadeDefs));
 	return shadeID;
 }

@@ -32,6 +32,7 @@
 #include "w_wad.h"
 #include "c_cvars.h"
 #include "wl_agent.h"
+#include "g_mapinfo.h"
 
 struct SaveFile
 {
@@ -44,7 +45,7 @@ struct SaveFile
 TArray<SaveFile> SaveFile::files;
 
 extern int	lastgamemusicoffset;
-int			episode = 0;
+EpisodeInfo	*episode = 0;
 bool		quickSaveLoad = false;
 
 MENU_LISTENER(EnterControlBase);
@@ -309,9 +310,9 @@ MENU_LISTENER(EnterSaveMenu)
 }
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
-	FString levelLump;
-	levelLump.Format("MAP%02d", which*10+1);
-	if(Wads.CheckNumForName(levelLump) == -1)
+	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
+
+	if(Wads.CheckNumForName(ep.StartMap) == -1)
 	{
 		SD_PlaySound("player/usefail");
 		Message("Please select \"Read This!\"\n"
@@ -332,12 +333,12 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 		}
 	}
 
-	episode = which;
+	episode = &ep;
 	return true;
 }
 MENU_LISTENER(StartNewGame)
 {
-	NewGame(which, episode);
+	NewGame(which, episode->StartMap);
 	Menu::closeMenus();
 	MenuFadeOut();
 
@@ -371,11 +372,12 @@ MENU_LISTENER(ToggleFullscreen)
 void CreateMenus()
 {
 	mainMenu.setHeadPicture("M_OPTION");
-#ifndef SPEAR
-	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], episodes));
-#else
-	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], skills));
-#endif
+
+	if(EpisodeInfo::GetNumEpisodes() > 1)
+		mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], episodes));
+	else
+		mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], skills));
+
 	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_OPTIONS"], optionsMenu));
 	MenuItem *lg = new MenuSwitcherMenuItem(language["STR_LG"], loadGame);
 	lg->setEnabled(SaveFile::files.Size() > 0);
@@ -395,38 +397,17 @@ void CreateMenus()
 	mainMenu.addItem(new MenuItem(language["STR_BD"], PlayDemosOrReturnToGame));
 	mainMenu.addItem(new MenuItem(language["STR_QT"], QuitGame));
 
-#ifndef SPEAR
 	episodes.setHeadText(language["STR_WHICHEPISODE"]);
-	const char* episodeText[6] =
+	for(unsigned int i = 0;i < EpisodeInfo::GetNumEpisodes();++i)
 	{
-		language["WL_EPISODE1"],
-		language["WL_EPISODE2"],
-		language["WL_EPISODE3"],
-		language["WL_EPISODE4"],
-		language["WL_EPISODE5"],
-		language["WL_EPISODE6"]
-	};
-	const char* episodePicture[6] =
-	{
-		"M_EPIS1",
-		"M_EPIS2",
-		"M_EPIS3",
-		"M_EPIS4",
-		"M_EPIS5",
-		"M_EPIS6"
-	};
-	for(unsigned int i = 0;i < 6;i++)
-	{
-		FString checkMap;
-		checkMap.Format("MAP%02d", (i*10)+1);
-
-		MenuItem *tmp = new MenuSwitcherMenuItem(episodeText[i], skills, SetEpisodeAndSwitchToSkill);
-		tmp->setPicture(episodePicture[i]);
-		if(Wads.CheckNumForName(checkMap) == -1)
+		EpisodeInfo &episode = EpisodeInfo::GetEpisode(i);
+		MenuItem *tmp = new MenuSwitcherMenuItem(episode.EpisodeName, skills, SetEpisodeAndSwitchToSkill);
+		if(!episode.EpisodePicture.IsEmpty())
+			tmp->setPicture(episode.EpisodePicture);
+		if(Wads.CheckNumForName(episode.StartMap) == -1)
 			tmp->setHighlighted(2);
 		episodes.addItem(tmp);
 	}
-#endif
 
 	skills.setHeadText(language["STR_HOWTOUGH"]);
 	const char* skillText[4] =

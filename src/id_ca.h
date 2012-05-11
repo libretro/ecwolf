@@ -3,14 +3,12 @@
 
 //===========================================================================
 
-extern  int   mapon;
-
 extern  class GameMap *map;
 extern	class LevelInfo *levelInfo;
 
 //===========================================================================
 
-void CA_CacheMap (int mapnum);
+void CA_CacheMap (const class FString &mapname);
 
 void CA_CacheScreen (const char* chunk);
 

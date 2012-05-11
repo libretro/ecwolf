@@ -118,7 +118,7 @@ int     mouseadjustment;
 //
 boolean param_nowait = false;
 int     param_difficulty = 1;           // default is "normal"
-int     param_tedlevel = -1;            // default is not to start a level
+const char* param_tedlevel = NULL;            // default is not to start a level
 int     param_joystickindex = 0;
 
 #if defined(_arch_dreamcast)
@@ -163,11 +163,13 @@ boolean param_ignorenumchunks = false;
 =====================
 */
 
-void NewGame (int difficulty,int episode)
+void NewGame (int difficulty, const FString &map)
 {
 	memset (&gamestate,0,sizeof(gamestate));
 	gamestate.difficulty = difficulty;
-	gamestate.episode=episode;
+	strncpy(gamestate.mapname, map, 8);
+	gamestate.mapname[8] = 0;
+	levelInfo = &LevelInfo::Find(map);
 
 	players[0].state = player_t::PST_ENTER;
 
@@ -855,18 +857,10 @@ static void DemoLoop()
 //
 // check for launch from ted
 //
-	if (param_tedlevel != -1)
+	if (param_tedlevel)
 	{
 		param_nowait = true;
-		NewGame(param_difficulty,0);
-
-#ifndef SPEAR
-		gamestate.episode = param_tedlevel/10;
-		gamestate.mapon = param_tedlevel%10;
-#else
-		gamestate.episode = 0;
-		gamestate.mapon = param_tedlevel;
-#endif
+		NewGame(param_difficulty,param_tedlevel);
 		GameLoop();
 		Quit (NULL);
 	}
@@ -1094,7 +1088,7 @@ FString CheckParameters(int argc, char *argv[])
 				printf("The tedlevel option is missing the level argument!\n");
 				hasError = true;
 			}
-			else param_tedlevel = atoi(argv[i]);
+			else param_tedlevel = argv[i];
 		}
 		else IFARG("--fullscreen")
 			fullscreen = true;

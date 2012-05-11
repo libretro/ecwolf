@@ -552,6 +552,7 @@ LevelCompleted (void)
 #endif
 	VWB_DrawPic (0, 16, "L_GUY1");
 
+	int mapon = 0;
 #ifndef SPEAR
 	if (mapon < 8)
 #else

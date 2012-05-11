@@ -38,19 +38,35 @@
 #include "textures/textures.h"
 #include "zstring.h"
 
-struct LevelInfo
+class LevelInfo
 {
 public:
 	LevelInfo();
 
-	char		NextMap[9];
-	char		NextSecret[9];
-	bool		UseMapInfoName;
-	FString		Name;
+	char			NextMap[9];
+	char			NextSecret[9];
+	bool			UseMapInfoName;
+	FString			Name;
+	unsigned int	FloorNumber;
 
-	FTextureID	DefaultTexture[2];
+	FTextureID		DefaultTexture[2];
 
 	static LevelInfo &Find(const char* level);
+};
+
+class EpisodeInfo
+{
+public:
+	EpisodeInfo();
+
+	FString		StartMap;
+	FString		EpisodeName;
+	FString		EpisodePicture;
+	char		Shortcut;
+	bool		NoSkill;
+
+	static unsigned int GetNumEpisodes();
+	static EpisodeInfo &GetEpisode(unsigned int index);
 };
 
 void G_ParseMapInfo();

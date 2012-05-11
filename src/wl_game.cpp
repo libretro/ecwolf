@@ -18,6 +18,7 @@
 #include "actor.h"
 #include <SDL_mixer.h>
 #include "wl_agent.h"
+#include "g_mapinfo.h"
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -263,8 +264,7 @@ void SetupGameLevel (void)
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapon+10*gamestate.episode);
-	mapon-=gamestate.episode*10;
+	CA_CacheMap (gamestate.mapname);
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer
@@ -435,7 +435,6 @@ void ShowActStatus()
 
 char    demoname[13] = "DEMO?.";
 
-#ifndef REMDEBUG
 #define MAXDEMOSIZE     8192
 
 void StartDemoRecord (int levelnumber)
@@ -522,44 +521,31 @@ void FinishDemoRecord (void)
 
 void RecordDemo (void)
 {
-	int level,esc,maps;
+	FString level;
+	int levelnum, esc,maps;
 
 	CenterWindow(26,3);
 	PrintY+=6;
 	fontnumber=0;
 	SETFONTCOLOR(0,15);
-#ifndef SPEAR
-#ifdef UPLOAD
-	US_Print("  Demo which level(1-10): "); maps = 10;
-#else
-	US_Print("  Demo which level(1-60): "); maps = 60;
-#endif
-#else
-	US_Print("  Demo which level(1-21): "); maps = 21;
-#endif
+	US_Print("  Demo which level (#): ");
 	VW_UpdateScreen();
 	VW_FadeIn ();
 	esc = !US_LineInput (px,py,str,NULL,true,2,0);
 	if (esc)
 		return;
 
-	level = atoi (str);
-	level--;
+	levelnum = atoi(str);
+	level.Format("MAP%02d", levelnum);
 
-	if (level >= maps || level < 0)
+	if (Wads.CheckNumForName(level) == -1)
 		return;
 
 	VW_FadeOut ();
 
-#ifndef SPEAR
-	NewGame (gd_hard,level/10);
-	gamestate.mapon = level%10;
-#else
-	NewGame (gd_hard,0);
-	gamestate.mapon = level;
-#endif
+	NewGame (gd_hard, level);
 
-	StartDemoRecord (level);
+	StartDemoRecord (levelnum);
 
 	DrawPlayScreen ();
 	VW_FadeIn ();
@@ -583,10 +569,6 @@ void RecordDemo (void)
 
 	FinishDemoRecord ();
 }
-#else
-void FinishDemoRecord (void) {return;}
-void RecordDemo (void) {return;}
-#endif
 
 
 
@@ -615,8 +597,10 @@ void PlayDemo (int demonumber)
 	int8_t* demoptr_freeme = demoptr; // Since I can't delete[] demoptr when the time comes.
 	lump.Read(demoptr, Wads.LumpLength(lumpNum));
 
-	NewGame (1,0);
-	gamestate.mapon = *demoptr++;
+	int mapon = *demoptr++;
+	FString level;
+	level.Format("MAP%02d", mapon);
+	NewGame (1,level);
 	gamestate.difficulty = gd_hard;
 	length = READWORD(*(uint8_t **)&demoptr);
 	// TODO: Seems like the original demo format supports 16 MB demos
@@ -821,14 +805,6 @@ restartgame:
 		if (!loadedgame)
 			SetupGameLevel ();
 
-#ifdef SPEAR
-		if (gamestate.mapon == 20)      // give them the key allways
-		{
-			gamestate.keys |= 1;
-			DrawKeys ();
-		}
-#endif
-
 		ingame = true;
 		if(loadedgame)
 		{
@@ -915,64 +891,13 @@ startplayloop:
 				}
 #endif
 
-#ifdef JAPDEMO
-				if (gamestate.mapon == 3)
-				{
-					died = true;                    // don't "get psyched!"
-
-					VW_FadeOut ();
-
-					ClearMemory ();
-
-					CheckHighScore (players[0].score,gamestate.mapon+1);
-					return;
-				}
-#endif
-
 				players[0].oldscore = players[0].score;
 
-#ifndef SPEAR
-				//
-				// COMING BACK FROM SECRET LEVEL
-				//
-				if (gamestate.mapon == 9)
-					gamestate.mapon = ElevatorBackTo[gamestate.episode];    // back from secret
+				if(playstate == ex_secretlevel)
+					strncpy(gamestate.mapname, levelInfo->NextSecret, 8);
 				else
-					//
-					// GOING TO SECRET LEVEL
-					//
-					if (playstate == ex_secretlevel)
-						gamestate.mapon = 9;
-#else
-
-#define FROMSECRET1             3
-#define FROMSECRET2             11
-
-				//
-				// GOING TO SECRET LEVEL
-				//
-				if (playstate == ex_secretlevel)
-					switch(gamestate.mapon)
-				{
-					case FROMSECRET1: gamestate.mapon = 18; break;
-					case FROMSECRET2: gamestate.mapon = 19; break;
-				}
-				else
-					//
-					// COMING BACK FROM SECRET LEVEL
-					//
-					if (gamestate.mapon == 18 || gamestate.mapon == 19)
-						switch(gamestate.mapon)
-					{
-						case 18: gamestate.mapon = FROMSECRET1+1; break;
-						case 19: gamestate.mapon = FROMSECRET2+1; break;
-					}
-#endif
-					else
-						//
-						// GOING TO NEXT LEVEL
-						//
-						gamestate.mapon++;
+					strncpy(gamestate.mapname, levelInfo->NextMap, 8);
+				gamestate.mapname[8] = 0;
 				break;
 
 			case ex_died:
