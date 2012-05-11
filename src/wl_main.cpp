@@ -31,6 +31,7 @@
 #include "lumpremap.h"
 #include "scanner.h"
 #include "g_shared/a_keys.h"
+#include "g_mapinfo.h"
 
 // Wad Code Stuff
 TArray<FString> wadfiles;
@@ -579,6 +580,12 @@ static void InitGame()
 
 	P_InitKeyMessages();
 	atterm(P_DeinitKeyMessages);
+
+//
+// Mapinfo
+//
+
+	G_ParseMapInfo();
 
 //
 // draw intro screen stuff

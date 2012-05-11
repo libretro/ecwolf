@@ -6,6 +6,7 @@
 extern  int   mapon;
 
 extern  class GameMap *map;
+extern	class LevelInfo *levelInfo;
 
 //===========================================================================
 

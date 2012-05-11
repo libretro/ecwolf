@@ -110,6 +110,7 @@ add_executable(ecwolf WIN32
 	c_cvars.cpp
 	file.cpp
 	files.cpp
+	g_mapinfo.cpp
 	gamemap.cpp
 	gamemap_planes.cpp
 	gamemap_uwmf.cpp

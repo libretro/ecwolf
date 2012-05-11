@@ -54,13 +54,13 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 				if(spot->sector)
 				{
 					FTextureID curtoptex = spot->sector->texture[MapSector::Ceiling];
-					if (curtoptex != lasttoptex)
+					if (curtoptex != lasttoptex && curtoptex.isValid())
 					{
 						lasttoptex = curtoptex;
 						toptex = TexMan(curtoptex)->GetPixels();
 					}
 					FTextureID curbottex = spot->sector->texture[MapSector::Floor];
-					if (curbottex != lastbottex)
+					if (curbottex != lastbottex && curbottex.isValid())
 					{
 						lastbottex = curbottex;
 						bottex = TexMan(curbottex)->GetPixels();

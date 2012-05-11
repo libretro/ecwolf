@@ -1,0 +1,408 @@
+defaultmap
+{
+	defaultfloor = "#717171"
+	defaultceiling = "#383838"
+}
+
+// Episode 1
+
+map "MAP01"
+{
+	next = "MAP02"
+	secretnext = "MAP10"
+}
+
+map "MAP02"
+{
+	next = "MAP03"
+	secretnext = "MAP10"
+}
+
+map "MAP03"
+{
+	next = "MAP04"
+	secretnext = "MAP10"
+}
+
+map "MAP04"
+{
+	next = "MAP05"
+	secretnext = "MAP10"
+}
+
+map "MAP05"
+{
+	next = "MAP06"
+	secretnext = "MAP10"
+}
+
+map "MAP06"
+{
+	next = "MAP06"
+	secretnext = "MAP10"
+}
+
+map "MAP07"
+{
+	next = "MAP08"
+	secretnext = "MAP10"
+}
+
+map "MAP08"
+{
+	next = "MAP09"
+	secretnext = "MAP10"
+}
+
+map "MAP09"
+{
+	next = "EndGame1"
+	secretnext = "MAP10"
+}
+
+map "MAP10"
+{
+	next = "MAP02"
+	secretnext = "MAP10"
+	defaultceiling = "#400040"
+}
+
+// Episode 2
+
+map "MAP11"
+{
+	next = "MAP12"
+	secretnext = "MAP20"
+	defaultceiling = "#585400"
+}
+
+map "MAP12"
+{
+	next = "MAP13"
+	secretnext = "MAP20"
+	defaultceiling = "#585400"
+}
+
+map "MAP13"
+{
+	next = "MAP14"
+	secretnext = "MAP20"
+	defaultceiling = "#585400"
+}
+
+map "MAP14"
+{
+	next = "MAP15"
+	secretnext = "MAP20"
+}
+
+map "MAP15"
+{
+	next = "MAP16"
+	secretnext = "MAP20"
+	defaultceiling = "#4040FC"
+}
+
+map "MAP16"
+{
+	next = "MAP16"
+	secretnext = "MAP20"
+	defaultceiling = "#585400"
+}
+
+map "MAP17"
+{
+	next = "MAP18"
+	secretnext = "MAP20"
+}
+
+map "MAP18"
+{
+	next = "MAP19"
+	secretnext = "MAP20"
+	defaultceiling = "#580000"
+}
+
+map "MAP19"
+{
+	next = "EndGame2"
+	secretnext = "MAP20"
+}
+
+map "MAP20"
+{
+	next = "MAP12"
+	secretnext = "MAP20"
+	defaultceiling = "#4040FC"
+}
+
+// Episode 3
+
+map "MAP21"
+{
+	next = "MAP22"
+	secretnext = "MAP30"
+}
+
+map "MAP22"
+{
+	next = "MAP23"
+	secretnext = "MAP30"
+}
+
+map "MAP23"
+{
+	next = "MAP24"
+	secretnext = "MAP30"
+}
+
+map "MAP24"
+{
+	next = "MAP25"
+	secretnext = "MAP30"
+}
+
+map "MAP25"
+{
+	next = "MAP26"
+	secretnext = "MAP30"
+}
+
+map "MAP26"
+{
+	next = "MAP26"
+	secretnext = "MAP30"
+	defaultceiling = "#580000"
+}
+
+map "MAP27"
+{
+	next = "MAP28"
+	secretnext = "MAP30"
+	defaultceiling = "#483818"
+}
+
+map "MAP28"
+{
+	next = "MAP29"
+	secretnext = "MAP30"
+}
+
+map "MAP29"
+{
+	next = "EndGame3"
+	secretnext = "MAP30"
+}
+
+map "MAP30"
+{
+	next = "MAP28"
+	secretnext = "MAP30"
+	defaultceiling = "#000098"
+}
+
+// Episode 4
+
+map "MAP31"
+{
+	next = "MAP32"
+	secretnext = "MAP40"
+}
+
+map "MAP32"
+{
+	next = "MAP33"
+	secretnext = "MAP40"
+	defaultceiling = "#000058"
+}
+
+map "MAP33"
+{
+	next = "MAP34"
+	secretnext = "MAP40"
+	defaultceiling = "#580000"
+}
+
+map "MAP34"
+{
+	next = "MAP35"
+	secretnext = "MAP40"
+	defaultceiling = "#483818"
+}
+
+map "MAP35"
+{
+	next = "MAP36"
+	secretnext = "MAP40"
+	defaultceiling = "#483818"
+}
+
+map "MAP36"
+{
+	next = "MAP36"
+	secretnext = "MAP40"
+	defaultceiling = "#000058"
+}
+
+map "MAP37"
+{
+	next = "MAP38"
+	secretnext = "MAP40"
+	defaultceiling = "#580000"
+}
+
+map "MAP38"
+{
+	next = "MAP39"
+	secretnext = "MAP40"
+	defaultceiling = "#716D00"
+}
+
+map "MAP39"
+{
+	next = "EndGame4"
+	secretnext = "MAP10"
+}
+
+map "MAP40"
+{
+	next = "MAP34"
+	secretnext = "MAP40"
+	defaultceiling = "#483818"
+}
+
+// Episode 5
+
+map "MAP41"
+{
+	next = "MAP42"
+	secretnext = "MAP50"
+	defaultceiling = "#007070"
+}
+
+map "MAP42"
+{
+	next = "MAP43"
+	secretnext = "MAP50"
+}
+
+map "MAP43"
+{
+	next = "MAP44"
+	secretnext = "MAP50"
+	defaultceiling = "#580000"
+}
+
+map "MAP44"
+{
+	next = "MAP45"
+	secretnext = "MAP50"
+	defaultceiling = "#580000"
+}
+
+map "MAP45"
+{
+	next = "MAP46"
+	secretnext = "MAP50"
+	defaultceiling = "#483818"
+}
+
+map "MAP46"
+{
+	next = "MAP46"
+	secretnext = "MAP50"
+	defaultceiling = "#80502C"
+}
+
+map "MAP47"
+{
+	next = "MAP48"
+	secretnext = "MAP50"
+}
+
+map "MAP48"
+{
+	next = "MAP49"
+	secretnext = "MAP50"
+}
+
+map "MAP49"
+{
+	next = "EndGame5"
+	secretnext = "MAP50"
+}
+
+map "MAP50"
+{
+	next = "MAP46"
+	secretnext = "MAP50"
+	defaultceiling = "#580000"
+}
+
+// Episode 6
+
+map "MAP51"
+{
+	next = "MAP52"
+	secretnext = "MAP60"
+}
+
+map "MAP52"
+{
+	next = "MAP53"
+	secretnext = "MAP60"
+}
+
+map "MAP53"
+{
+	next = "MAP54"
+	secretnext = "MAP60"
+}
+
+map "MAP54"
+{
+	next = "MAP55"
+	secretnext = "MAP60"
+}
+
+map "MAP55"
+{
+	next = "MAP56"
+	secretnext = "MAP60"
+	defaultceiling = "#483818"
+}
+
+map "MAP56"
+{
+	next = "MAP56"
+	secretnext = "MAP60"
+	defaultceiling = "#483818"
+}
+
+map "MAP57"
+{
+	next = "MAP58"
+	secretnext = "MAP60"
+	defaultceiling = "#007070"
+}
+
+map "MAP58"
+{
+	next = "MAP59"
+	secretnext = "MAP60"
+	defaultceiling = "#483818"
+}
+
+map "MAP59"
+{
+	next = "EndGame6"
+	secretnext = "MAP60"
+	defaultceiling = "#483818"
+}
+
+map "MAP60"
+{
+	next = "MAP54"
+	secretnext = "MAP60"
+	defaultceiling = "#483818"
+}

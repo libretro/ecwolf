@@ -442,8 +442,8 @@ void GameMap::ReadPlanesData()
 				while(iter.NextPair(pair))
 				{
 					Sector &sect = sectorPalette[pair->Value];
-					sect.texture[Sector::Floor] = TexMan.GetFlat(pair->Key&0xFF);
-					sect.texture[Sector::Ceiling] = TexMan.GetFlat(pair->Key>>8);
+					sect.texture[Sector::Floor] = TexMan.GetFlat(pair->Key&0xFF, Sector::Floor);
+					sect.texture[Sector::Ceiling] = TexMan.GetFlat(pair->Key>>8, Sector::Ceiling);
 				}
 
 				// Now link the sector data to map points!

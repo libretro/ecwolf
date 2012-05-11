@@ -48,6 +48,8 @@
 //#include "g_level.h"
 #include "textures.h"
 #include "zdoomsupport.h"
+#include "id_ca.h"
+#include "g_mapinfo.h"
 
 #define TEXTCOLOR_ORANGE
 
@@ -1174,7 +1176,7 @@ FTextureID FTextureManager::GetDoor(unsigned int tile, bool vertical, bool track
 	if(tile > 63)
 		tile = 63;
 	TileMap &tm = doorTiles[tile*2+vertical][track];
-	if(tm.texture.isNull() && tm.textureName.GetIndex() != 0)
+	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
 		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Wall);
 	return tm.texture;
 }
@@ -1183,8 +1185,10 @@ FTextureID FTextureManager::GetFlat(unsigned int tile, bool ceiling)
 	if(tile > 255)
 		tile = 255;
 	TileMap &tm = flatTiles[tile][ceiling];
-	if(tm.texture.isNull() && tm.textureName.GetIndex() != 0)
+	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
 		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Flat);
+	else
+		tm.texture = levelInfo->DefaultTexture[ceiling];
 	return tm.texture;
 }
 FTextureID FTextureManager::GetTile(unsigned int tile, bool vertical)
@@ -1192,7 +1196,7 @@ FTextureID FTextureManager::GetTile(unsigned int tile, bool vertical)
 	if(tile > 63)
 		tile = 63;
 	TileMap &tm = mapTiles[tile][vertical];
-	if(tm.texture.isNull() && tm.textureName.GetIndex() != 0)
+	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
 		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Wall);
 	return tm.texture;
 }

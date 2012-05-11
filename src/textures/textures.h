@@ -461,6 +461,11 @@ private:
 	struct TileMap
 	{
 		public:
+			TileMap()
+			{
+				texture.SetInvalid();
+			}
+
 			FName textureName;
 			FTextureID texture;
 	};

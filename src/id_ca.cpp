@@ -14,6 +14,7 @@ loaded into the data segment
 =============================================================================
 */
 
+#include "g_mapinfo.h"
 #include "gamemap.h"
 #include "wl_def.h"
 #include "id_sd.h"
@@ -31,6 +32,7 @@ loaded into the data segment
 
 int     mapon = -1;
 
+LevelInfo *levelInfo = NULL;
 GameMap *map = NULL;
 
 
@@ -57,6 +59,8 @@ void CA_CacheMap (int mapnum)
 	char mapname[9];
 	sprintf(mapname, "MAP%02d", mapnum+1);
 	delete map;
+
+	levelInfo = &LevelInfo::Find(mapname);
 	map = new GameMap(mapname);
 }
 

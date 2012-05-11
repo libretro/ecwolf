@@ -524,54 +524,6 @@ void HitHorizWall (void)
 
 //==========================================================================
 
-byte vgaCeiling[]=
-{
-#ifndef SPEAR
-0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0x1d,0xbf,
-0x4e,0x4e,0x4e,0x1d,0x8d,0x4e,0x1d,0x2d,0x1d,0x8d,
-0x1d,0x1d,0x1d,0x1d,0x1d,0x2d,0xdd,0x1d,0x1d,0x98,
-
-0x1d,0x9d,0x2d,0xdd,0xdd,0x9d,0x2d,0x4d,0x1d,0xdd,
-0x7d,0x1d,0x2d,0x2d,0xdd,0xd7,0x1d,0x1d,0x1d,0x2d,
-0x1d,0x1d,0x1d,0x1d,0xdd,0xdd,0x7d,0xdd,0xdd,0xdd
-#else
-0x6f,0x4f,0x1d,0xde,0xdf,0x2e,0x7f,0x9e,0xae,0x7f,
-0x1d,0xde,0xdf,0xde,0xdf,0xde,0xe1,0xdc,0x2e,0x1d,0xdc
-#endif
-};
-
-/*
-=====================
-=
-= VGAClearScreen
-=
-=====================
-*/
-
-void VGAClearScreen (void)
-{
-	byte ceiling=vgaCeiling[gamestate.episode*10+mapon];
-
-	int y;
-	byte *ptr = vbuf;
-	if(r_depthfog)
-	{
-		for(y = 0; y < viewheight / 2; y++, ptr += vbufPitch)
-			memset(ptr, NormalLight.Maps[(256*GetShade((viewheight / 2 - y) << 3)) + ceiling], viewwidth);
-		for(; y < viewheight; y++, ptr += vbufPitch)
-			memset(ptr, NormalLight.Maps[(256*GetShade((y - viewheight / 2) << 3)) + 0x19], viewwidth);
-	}
-	else
-	{
-		for(y = 0; y < viewheight / 2; y++, ptr += vbufPitch)
-			memset(ptr, ceiling, viewwidth);
-		for(; y < viewheight; y++, ptr += vbufPitch)
-			memset(ptr, 0x19, viewwidth);
-	}
-}
-
-//==========================================================================
-
 /*
 =====================
 =
@@ -1308,7 +1260,6 @@ void    ThreeDRefresh (void)
 //
 // follow the walls from there to the right, drawing as we go
 //
-	VGAClearScreen ();
 #if defined(USE_FEATUREFLAGS) && defined(USE_STARSKY)
 	if(GetFeatureFlags() & FF_STARSKY)
 		DrawStarSky(vbuf, vbufPitch);
