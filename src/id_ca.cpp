@@ -17,10 +17,8 @@ loaded into the data segment
 #include "g_mapinfo.h"
 #include "gamemap.h"
 #include "wl_def.h"
-#include "id_sd.h"
-#include "id_vl.h"
-#include "id_vh.h"
 #include "w_wad.h"
+#include "wl_main.h"
 
 /*
 =============================================================================

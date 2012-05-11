@@ -40,6 +40,7 @@
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_def.h"
+#include "wl_draw.h"
 #include "thingdef/thingdef.h"
 #include "thingdef/thingdef_type.h"
 #include "thingdef/thingdef_expression.h"

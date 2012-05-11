@@ -16,6 +16,9 @@
 #include "thingdef/thingdef.h"
 #include "thingdef/thingdef_expression.h"
 #include "wl_agent.h"
+#include "wl_draw.h"
+#include "wl_game.h"
+#include "wl_state.h"
 
 static inline bool CheckDoorMovement(AActor *actor)
 {

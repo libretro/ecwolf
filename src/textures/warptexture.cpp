@@ -38,6 +38,8 @@
 //#include "r_main.h"
 #include "templates.h"
 #include "textures.h"
+#include "wl_draw.h"
+#include "wl_game.h"
 
 
 FWarpTexture::FWarpTexture (FTexture *source)

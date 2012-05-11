@@ -37,6 +37,7 @@
 #else
 #include "mame/fmopl.h"
 #endif
+#include "wl_main.h"
 
 #define ORIGSAMPLERATE 7042
 

@@ -16,7 +16,11 @@
 #include "actor.h"
 #include "textures/textures.h"
 #include "wl_agent.h"
+#include "wl_debug.h"
+#include "wl_draw.h"
+#include "wl_game.h"
 #include "wl_inter.h"
+#include "wl_play.h"
 
 /*
 =============================================================================

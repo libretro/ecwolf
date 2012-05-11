@@ -4,6 +4,7 @@
 #define __ID_VH_H__
 
 #include "id_vl.h"
+#include "wl_main.h"
 
 #define WHITE			15			// graphics mode independant colors
 #define BLACK			0

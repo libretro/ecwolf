@@ -32,7 +32,10 @@
 #include "scanner.h"
 #include "g_shared/a_keys.h"
 #include "g_mapinfo.h"
+#include "wl_draw.h"
 #include "wl_inter.h"
+#include "wl_play.h"
+#include "wl_game.h"
 
 // Wad Code Stuff
 TArray<FString> wadfiles;

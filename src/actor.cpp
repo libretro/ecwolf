@@ -39,6 +39,7 @@
 #include "thinker.h"
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
+#include "wl_game.h"
 #include "id_us.h"
 
 void T_Projectile(AActor *self);

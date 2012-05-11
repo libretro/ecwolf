@@ -9,6 +9,8 @@
 #include "actor.h"
 #include "thingdef/thingdef_expression.h"
 #include "wl_agent.h"
+#include "wl_game.h"
+#include "wl_play.h"
 #include "templates.h"
 
 /*
@@ -675,50 +677,6 @@ moveok:
 
 =============================================================================
 */
-
-/*
-===============
-=
-= DropItem
-=
-= Tries to drop a bonus item somewhere in the tiles surrounding the
-= given tilex/tiley
-=
-===============
-*/
-
-void DropItem (wl_stat_t itemtype, int tilex, int tiley)
-{
-#if 0
-	int     x,y,xl,xh,yl,yh;
-
-	//
-	// find a free spot to put it in
-	//
-	if (!actorat[tilex][tiley])
-	{
-		PlaceItemType (itemtype, tilex,tiley);
-		return;
-	}
-
-	xl = tilex-1;
-	xh = tilex+1;
-	yl = tiley-1;
-	yh = tiley+1;
-
-	for (x=xl ; x<= xh ; x++)
-	{
-		for (y=yl ; y<= yh ; y++)
-		{
-			if (!actorat[x][y])
-			{
-				PlaceItemType (itemtype, x,y);
-				return;
-			}
-		}
-	}
-#endif
-}
 
 
 /*

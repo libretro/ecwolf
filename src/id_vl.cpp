@@ -5,6 +5,7 @@
 #include "id_vl.h"
 #include "w_wad.h"
 #include "v_palette.h"
+#include "wl_draw.h"
 
 
 // Uncomment the following line, if you get destination out of bounds

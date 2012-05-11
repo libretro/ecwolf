@@ -38,6 +38,8 @@
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
 #include "wl_agent.h"
+#include "wl_game.h"
+#include "wl_play.h"
 
 static ActionTable *actionFunctions = NULL;
 ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name),

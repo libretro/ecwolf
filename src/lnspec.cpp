@@ -37,6 +37,8 @@
 #include "lnspec.h"
 #include "actor.h"
 #include "wl_agent.h"
+#include "wl_game.h"
+#include "wl_play.h"
 #include "g_shared/a_keys.h"
 using namespace Specials;
 

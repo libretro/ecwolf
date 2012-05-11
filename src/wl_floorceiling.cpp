@@ -3,6 +3,8 @@
 #include "id_ca.h"
 #include "gamemap.h"
 #include "wl_def.h"
+#include "wl_draw.h"
+#include "wl_main.h"
 #include "wl_shade.h"
 #include "r_data/colormaps.h"
 

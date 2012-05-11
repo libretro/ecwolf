@@ -7,6 +7,8 @@
 #include "id_vh.h"
 #include "lumpremap.h"
 #include "w_wad.h"
+#include "wl_game.h"
+#include "wl_text.h"
 
 /*
 =============================================================================

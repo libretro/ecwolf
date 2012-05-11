@@ -145,7 +145,6 @@ class AActor
 		ExpressionNode *damage;
 
 		short       ticcount;
-		classtype   obclass;
 		const Frame	*state;
 		unsigned int sprite;
 

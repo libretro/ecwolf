@@ -38,6 +38,8 @@
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_us.h"
+#include "wl_main.h"
+#include "wl_play.h"
 
 Aspect vid_aspect = ASPECT_4_3;
 boolean forcegrabmouse = false;

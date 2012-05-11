@@ -36,6 +36,8 @@
 #include "a_playerpawn.h"
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
+#include "wl_game.h"
+#include "wl_play.h"
 
 #include <climits>
 

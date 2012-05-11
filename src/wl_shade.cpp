@@ -2,7 +2,9 @@
 
 //#ifdef USE_SHADING
 #include "wl_def.h"
+#include "wl_main.h"
 #include "wl_shade.h"
+#include "wl_play.h"
 #include "id_vl.h"
 
 #define SHADE_COUNT 32

@@ -40,6 +40,7 @@
 #include "actor.h"
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
+#include "wl_game.h"
 #include "r_sprites.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
