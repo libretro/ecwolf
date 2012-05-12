@@ -9,6 +9,7 @@ map "MAP01"
 	next = "MAP02"
 	secretnext = "MAP02"
 	defaultceiling = "#044000"
+	par = 90
 }
 
 map "MAP02"
@@ -16,12 +17,14 @@ map "MAP02"
 	next = "MAP03"
 	secretnext = "MAP03"
 	defaultceiling = "#404000"
+	par = 210
 }
 
 map "MAP03"
 {
 	next = "MAP04"
 	secretnext = "MAP04"
+	par = 225
 }
 
 map "MAP04"
@@ -29,6 +32,7 @@ map "MAP04"
 	next = "MAP05"
 	secretnext = "MAP19"
 	defaultceiling = "#382C14"
+	par = 210
 }
 
 map "MAP05"
@@ -43,6 +47,7 @@ map "MAP06"
 	next = "MAP07"
 	secretnext = "MAP07"
 	defaultceiling = "#4C0000"
+	par = 270
 }
 
 map "MAP07"
@@ -50,6 +55,7 @@ map "MAP07"
 	next = "MAP08"
 	secretnext = "MAP08"
 	defaultceiling = "#004040"
+	par = 195
 }
 
 map "MAP08"
@@ -57,6 +63,7 @@ map "MAP08"
 	next = "MAP09"
 	secretnext = "MAP09"
 	defaultceiling = "#4C0000"
+	par = 165
 }
 
 map "MAP09"
@@ -64,6 +71,7 @@ map "MAP09"
 	next = "MAP10"
 	secretnext = "MAP10"
 	defaultceiling = "#340058"
+	par = 285
 }
 
 map "MAP10"
@@ -77,6 +85,7 @@ map "MAP11"
 {
 	next = "MAP12"
 	secretnext = "MAP12"
+	par = 390
 }
 
 map "MAP12"
@@ -84,6 +93,7 @@ map "MAP12"
 	next = "MAP13"
 	secretnext = "MAP20"
 	defaultceiling = "#382C14"
+	par = 270
 }
 
 map "MAP13"
@@ -91,6 +101,7 @@ map "MAP13"
 	next = "MAP14"
 	secretnext = "MAP14"
 	defaultceiling = "#28200C"
+	par = 165
 }
 
 map "MAP14"
@@ -98,6 +109,7 @@ map "MAP14"
 	next = "MAP15"
 	secretnext = "MAP15"
 	defaultceiling = "#382C14"
+	par = 270
 }
 
 map "MAP15"
@@ -105,6 +117,7 @@ map "MAP15"
 	next = "MAP16"
 	secretnext = "MAP16"
 	defaultceiling = "#28200C"
+	par = 360
 }
 
 map "MAP16"
@@ -119,6 +132,7 @@ map "MAP17"
 	next = "MAP18"
 	secretnext = "MAP18"
 	defaultceiling = "#600064"
+	par = 360
 }
 
 map "MAP18"

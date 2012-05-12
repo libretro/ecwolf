@@ -647,6 +647,8 @@ void CA_CacheScreen(const char* chunk)
 		dest = vbuf+i;
 		for(j = yd, y = 0;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
 		{
+			if(j >= screenHeight)
+				break;
 			*dest = NormalLight.Maps[src[y>>FRACBITS]];
 			dest += bufferPitch;
 		}

@@ -50,6 +50,7 @@ public:
 	unsigned int	FloorNumber;
 
 	FTextureID		DefaultTexture[2];
+	unsigned int	Par;
 
 	static LevelInfo &Find(const char* level);
 };

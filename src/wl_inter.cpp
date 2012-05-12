@@ -2,6 +2,7 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_ca.h"
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
@@ -11,6 +12,7 @@
 #include "wl_game.h"
 #include "wl_inter.h"
 #include "wl_text.h"
+#include "g_mapinfo.h"
 
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;
@@ -301,8 +303,7 @@ void PG13 (void)
 
 //==========================================================================
 
-void
-Write (int x, int y, const char *string)
+void Write (int x, int y, const char *string)
 {
 	static const char* alpha[] = { "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052", "FONTL053",
 		"FONTL054", "FONTL055", "FONTL056", "FONTL057", "FONTL058", 0, 0, 0, 0, 0, 0, "FONTL065", "FONTL066",
@@ -336,12 +337,12 @@ Write (int x, int y, const char *string)
 			switch (string[i])
 			{
 				case '!':
-					VWB_DrawPic (nx, ny, "FONTL033");
+					VWB_DrawGraphic (TexMan("FONTL033"), nx, ny);
 					nx += 8;
 					continue;
 
 				case '\'':
-					VWB_DrawPic (nx, ny, "FONTL039");
+					VWB_DrawGraphic (TexMan("FONTL039"), nx, ny);
 					nx += 8;
 					continue;
 
@@ -349,18 +350,18 @@ Write (int x, int y, const char *string)
 					break;
 
 				case 0x3a:     // ':'
-					VWB_DrawPic (nx, ny, "FONTL058");
+					VWB_DrawGraphic (TexMan("FONTL058"), nx, ny);
 					nx += 8;
 					continue;
 
 				case '%':
-					VWB_DrawPic (nx, ny, "FONTL037");
+					VWB_DrawGraphic (TexMan("FONTL037"), nx, ny);
 					break;
 
 				default:
 					if(ch >= 43)
 						break;
-					VWB_DrawPic (nx, ny, alpha[ch]);
+					VWB_DrawGraphic (TexMan(alpha[ch]), nx, ny);
 			}
 			nx += 16;
 		}
@@ -371,18 +372,23 @@ Write (int x, int y, const char *string)
 //
 // Breathe Mr. BJ!!!
 //
-void
-BJ_Breathe (void)
+void BJ_Breathe (bool drawOnly=false)
 {
 	static int which = 0, max = 10;
-	const char* pics[2] = { "L_GUY1", "L_GUY2" };
+	static FTexture* const pics[2] = { TexMan("L_GUY1"), TexMan("L_GUY2") };
+
+	if(drawOnly)
+	{
+		VWB_DrawGraphic(pics[which], 0, 16);
+		return;
+	}
 
 	SDL_Delay(5);
 
 	if ((int32_t) GetTimeCount () - lastBreathTime > max)
 	{
 		which ^= 1;
-		VWB_DrawPic (0, 16, pics[which]);
+		VWB_DrawGraphic(pics[which], 0, 16);
 		VW_UpdateScreen ();
 		lastBreathTime = GetTimeCount();
 		max = 35;
@@ -410,129 +416,14 @@ LevelCompleted (void)
 #define VBLWAIT 30
 #define PAR_AMOUNT      500
 #define PERCENT100AMT   10000
-	typedef struct
-	{
-		float time;
-		char timestr[6];
-	} times;
 
 	int x, i, min, sec, ratio, kr, sr, tr;
 	char tempstr[10];
 	int32_t bonus, timeleft = 0;
-	times parTimes[] = {
-#ifndef SPEAR
-		//
-		// Episode One Par Times
-		//
-		{1.5, "01:30"},
-		{2, "02:00"},
-		{2, "02:00"},
-		{3.5, "03:30"},
-		{3, "03:00"},
-		{3, "03:00"},
-		{2.5, "02:30"},
-		{2.5, "02:30"},
-		{0, "??:??"},           // Boss level
-		{0, "??:??"},           // Secret level
-
-		//
-		// Episode Two Par Times
-		//
-		{1.5, "01:30"},
-		{3.5, "03:30"},
-		{3, "03:00"},
-		{2, "02:00"},
-		{4, "04:00"},
-		{6, "06:00"},
-		{1, "01:00"},
-		{3, "03:00"},
-		{0, "??:??"},
-		{0, "??:??"},
-
-		//
-		// Episode Three Par Times
-		//
-		{1.5, "01:30"},
-		{1.5, "01:30"},
-		{2.5, "02:30"},
-		{2.5, "02:30"},
-		{3.5, "03:30"},
-		{2.5, "02:30"},
-		{2, "02:00"},
-		{6, "06:00"},
-		{0, "??:??"},
-		{0, "??:??"},
-
-		//
-		// Episode Four Par Times
-		//
-		{2, "02:00"},
-		{2, "02:00"},
-		{1.5, "01:30"},
-		{1, "01:00"},
-		{4.5, "04:30"},
-		{3.5, "03:30"},
-		{2, "02:00"},
-		{4.5, "04:30"},
-		{0, "??:??"},
-		{0, "??:??"},
-
-		//
-		// Episode Five Par Times
-		//
-		{2.5, "02:30"},
-		{1.5, "01:30"},
-		{2.5, "02:30"},
-		{2.5, "02:30"},
-		{4, "04:00"},
-		{3, "03:00"},
-		{4.5, "04:30"},
-		{3.5, "03:30"},
-		{0, "??:??"},
-		{0, "??:??"},
-
-		//
-		// Episode Six Par Times
-		//
-		{6.5, "06:30"},
-		{4, "04:00"},
-		{4.5, "04:30"},
-		{6, "06:00"},
-		{5, "05:00"},
-		{5.5, "05:30"},
-		{5.5, "05:30"},
-		{8.5, "08:30"},
-		{0, "??:??"},
-		{0, "??:??"}
-#else
-		//
-		// SPEAR OF DESTINY TIMES
-		//
-		{1.5, "01:30"},
-		{3.5, "03:30"},
-		{2.75, "02:45"},
-		{3.5, "03:30"},
-		{0, "??:??"},           // Boss 1
-		{4.5, "04:30"},
-		{3.25, "03:15"},
-		{2.75, "02:45"},
-		{4.75, "04:45"},
-		{0, "??:??"},           // Boss 2
-		{6.5, "06:30"},
-		{4.5, "04:30"},
-		{2.75, "02:45"},
-		{4.5, "04:30"},
-		{6, "06:00"},
-		{0, "??:??"},           // Boss 3
-		{6, "06:00"},
-		{0, "??:??"},           // Boss 4
-		{0, "??:??"},           // Secret level 1
-		{0, "??:??"},           // Secret level 2
-#endif
-	};
 
 	ClearSplitVWB ();           // set up for double buffering in split screen
-	VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
+	VWB_Clear(VIEWCOLOR, 0, 0, screenWidth, screenHeight);
+	DrawPlayScreen(true);
 
 	if (bordercol != VIEWCOLOR)
 		DrawStatusBorder (VIEWCOLOR);
@@ -550,7 +441,7 @@ LevelCompleted (void)
 	VWB_DrawPic (0, 0, C_INTERMISSIONPIC);
 	UNCACHEGRCHUNK (C_INTERMISSIONPIC);
 #endif
-	VWB_DrawPic (0, 16, "L_GUY1");
+	BJ_Breathe(true);
 
 	int mapon = 0;
 #ifndef SPEAR
@@ -573,11 +464,9 @@ LevelCompleted (void)
 		Write (26, 2, itoa (gamestate.mapon + 1, tempstr, 10));
 #endif
 
-#ifdef SPANISH
-		Write (30, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
-#else
-		Write (26, 12, parTimes[gamestate.episode * 10 + mapon].timestr);
-#endif
+		FString timeString;
+		timeString.Format("%02d:%02d", levelInfo->Par/60, levelInfo->Par%60);
+		Write (26, 12, timeString);
 
 		//
 		// PRINT TIME
@@ -587,27 +476,13 @@ LevelCompleted (void)
 		if (sec > 99 * 60)      // 99 minutes max
 			sec = 99 * 60;
 
-		if (gamestate.TimeCount < parTimes[gamestate.episode * 10 + mapon].time * 4200)
-			timeleft = (int32_t) ((parTimes[gamestate.episode * 10 + mapon].time * 4200) / 70 - sec);
+		if (gamestate.TimeCount < levelInfo->Par * 70)
+			timeleft = (int32_t) (levelInfo->Par - sec);
 
 		min = sec / 60;
 		sec %= 60;
-
-#ifdef SPANISH
-		i = 30 * 8;
-#else
-		i = 26 * 8;
-#endif
-		const char* numericGraphics[10] = { "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052", "FONTL053", "FONTL054", "FONTL055", "FONTL056", "FONTL057" };
-		VWB_DrawPic (i, 10 * 8, numericGraphics[(min / 10)]);
-		i += 2 * 8;
-		VWB_DrawPic (i, 10 * 8, numericGraphics[(min % 10)]);
-		i += 2 * 8;
-		Write (i / 8, 10, ":");
-		i += 1 * 8;
-		VWB_DrawPic (i, 10 * 8, numericGraphics[(sec / 10)]);
-		i += 2 * 8;
-		VWB_DrawPic (i, 10 * 8, numericGraphics[(sec % 10)]);
+		timeString.Format("%02d:%02d", min, sec);
+		Write(26, 10, timeString);
 
 		VW_UpdateScreen ();
 		VW_FadeIn ();
@@ -985,19 +860,29 @@ DrawHighScores (void)
 	HighScore *s;
 
 	ClearMScreen ();
-	DrawStripes (10);
+
+	FTexture *highscores = TexMan("HGHSCORE");
+	if(highscores->GetScaledWidth() < 320)
+	{
+		DrawStripes (10);
+		VWB_DrawGraphic(highscores, 160-highscores->GetScaledWidth()/2, 0, MENU_TOP);
+	}
+	else
+		VWB_DrawGraphic(highscores, 0, 0);
 
 #ifndef SPEAR
-	VWB_DrawPic (48, 0, "HGHSCORE");
-
-	VWB_DrawPic (4 * 8, 68, "M_NAME");
-	VWB_DrawPic (20 * 8, 68, "M_LEVEL");
-	VWB_DrawPic (28 * 8, 68, "M_SCORE");
+	static FTextureID texName = TexMan.CheckForTexture("M_NAME", FTexture::TEX_Any);
+	static FTextureID texLevel = TexMan.CheckForTexture("M_LEVEL", FTexture::TEX_Any);
+	static FTextureID texScore = TexMan.CheckForTexture("M_SCORE", FTexture::TEX_Any);
+	if(texName.isValid())
+		VWB_DrawGraphic(TexMan(texName), 32, 68);
+	if(texLevel.isValid())
+		VWB_DrawGraphic(TexMan(texLevel), 160, 68);
+	if(texScore.isValid())
+		VWB_DrawGraphic(TexMan(texScore), 224, 68);
 	fontnumber = 0;
 
 #else
-	VWB_DrawPic (0, 0, "HGHSCORE");
-
 	fontnumber = 1;
 #endif
 

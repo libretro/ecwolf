@@ -18,6 +18,7 @@ map "MAP01"
 	next = "MAP02"
 	secretnext = "MAP10"
 	floornumber = 1
+	par = 90
 }
 
 map "MAP02"
@@ -25,6 +26,7 @@ map "MAP02"
 	next = "MAP03"
 	secretnext = "MAP10"
 	floornumber = 2
+	par = 120
 }
 
 map "MAP03"
@@ -32,6 +34,7 @@ map "MAP03"
 	next = "MAP04"
 	secretnext = "MAP10"
 	floornumber = 3
+	par = 120
 }
 
 map "MAP04"
@@ -39,6 +42,7 @@ map "MAP04"
 	next = "MAP05"
 	secretnext = "MAP10"
 	floornumber = 4
+	par = 210
 }
 
 map "MAP05"
@@ -46,6 +50,7 @@ map "MAP05"
 	next = "MAP06"
 	secretnext = "MAP10"
 	floornumber = 5
+	par = 180
 }
 
 map "MAP06"
@@ -53,6 +58,7 @@ map "MAP06"
 	next = "MAP06"
 	secretnext = "MAP10"
 	floornumber = 6
+	par = 180
 }
 
 map "MAP07"
@@ -60,6 +66,7 @@ map "MAP07"
 	next = "MAP08"
 	secretnext = "MAP10"
 	floornumber = 7
+	par = 150
 }
 
 map "MAP08"
@@ -67,6 +74,7 @@ map "MAP08"
 	next = "MAP09"
 	secretnext = "MAP10"
 	floornumber = 8
+	par = 150
 }
 
 map "MAP09"
@@ -99,6 +107,7 @@ map "MAP11"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
 	floornumber = 1
+	par = 90
 }
 
 map "MAP12"
@@ -107,6 +116,7 @@ map "MAP12"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
 	floornumber = 2
+	par = 210
 }
 
 map "MAP13"
@@ -115,6 +125,7 @@ map "MAP13"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
 	floornumber = 3
+	par = 180
 }
 
 map "MAP14"
@@ -122,6 +133,7 @@ map "MAP14"
 	next = "MAP15"
 	secretnext = "MAP20"
 	floornumber = 4
+	par = 120
 }
 
 map "MAP15"
@@ -130,6 +142,7 @@ map "MAP15"
 	secretnext = "MAP20"
 	defaultceiling = "#4040FC"
 	floornumber = 5
+	par = 240
 }
 
 map "MAP16"
@@ -138,6 +151,7 @@ map "MAP16"
 	secretnext = "MAP20"
 	defaultceiling = "#585400"
 	floornumber = 6
+	par = 360
 }
 
 map "MAP17"
@@ -145,6 +159,7 @@ map "MAP17"
 	next = "MAP18"
 	secretnext = "MAP20"
 	floornumber = 7
+	par = 60
 }
 
 map "MAP18"
@@ -153,6 +168,7 @@ map "MAP18"
 	secretnext = "MAP20"
 	defaultceiling = "#580000"
 	floornumber = 8
+	par = 180
 }
 
 map "MAP19"
@@ -184,6 +200,7 @@ map "MAP21"
 	next = "MAP22"
 	secretnext = "MAP30"
 	floornumber = 1
+	par = 90
 }
 
 map "MAP22"
@@ -191,6 +208,7 @@ map "MAP22"
 	next = "MAP23"
 	secretnext = "MAP30"
 	floornumber = 2
+	par = 90
 }
 
 map "MAP23"
@@ -198,6 +216,7 @@ map "MAP23"
 	next = "MAP24"
 	secretnext = "MAP30"
 	floornumber = 3
+	par = 150
 }
 
 map "MAP24"
@@ -205,6 +224,7 @@ map "MAP24"
 	next = "MAP25"
 	secretnext = "MAP30"
 	floornumber = 4
+	par = 150
 }
 
 map "MAP25"
@@ -212,6 +232,7 @@ map "MAP25"
 	next = "MAP26"
 	secretnext = "MAP30"
 	floornumber = 5
+	par = 210
 }
 
 map "MAP26"
@@ -220,6 +241,7 @@ map "MAP26"
 	secretnext = "MAP30"
 	defaultceiling = "#580000"
 	floornumber = 6
+	par = 150
 }
 
 map "MAP27"
@@ -228,6 +250,7 @@ map "MAP27"
 	secretnext = "MAP30"
 	defaultceiling = "#483818"
 	floornumber = 7
+	par = 120
 }
 
 map "MAP28"
@@ -235,6 +258,7 @@ map "MAP28"
 	next = "MAP29"
 	secretnext = "MAP30"
 	floornumber = 8
+	par = 360
 }
 
 map "MAP29"
@@ -266,6 +290,7 @@ map "MAP31"
 	next = "MAP32"
 	secretnext = "MAP40"
 	floornumber = 1
+	par = 120
 }
 
 map "MAP32"
@@ -274,6 +299,7 @@ map "MAP32"
 	secretnext = "MAP40"
 	defaultceiling = "#000058"
 	floornumber = 2
+	par = 120
 }
 
 map "MAP33"
@@ -282,6 +308,7 @@ map "MAP33"
 	secretnext = "MAP40"
 	defaultceiling = "#580000"
 	floornumber = 3
+	par = 90
 }
 
 map "MAP34"
@@ -290,6 +317,7 @@ map "MAP34"
 	secretnext = "MAP40"
 	defaultceiling = "#483818"
 	floornumber = 4
+	par = 60
 }
 
 map "MAP35"
@@ -298,6 +326,7 @@ map "MAP35"
 	secretnext = "MAP40"
 	defaultceiling = "#483818"
 	floornumber = 5
+	par = 270
 }
 
 map "MAP36"
@@ -306,6 +335,7 @@ map "MAP36"
 	secretnext = "MAP40"
 	defaultceiling = "#000058"
 	floornumber = 6
+	par = 210
 }
 
 map "MAP37"
@@ -314,6 +344,7 @@ map "MAP37"
 	secretnext = "MAP40"
 	defaultceiling = "#580000"
 	floornumber = 7
+	par = 120
 }
 
 map "MAP38"
@@ -322,6 +353,7 @@ map "MAP38"
 	secretnext = "MAP40"
 	defaultceiling = "#716D00"
 	floornumber = 8
+	par = 270
 }
 
 map "MAP39"
@@ -354,6 +386,7 @@ map "MAP41"
 	secretnext = "MAP50"
 	defaultceiling = "#007070"
 	floornumber = 1
+	par = 150
 }
 
 map "MAP42"
@@ -361,6 +394,7 @@ map "MAP42"
 	next = "MAP43"
 	secretnext = "MAP50"
 	floornumber = 2
+	par = 90
 }
 
 map "MAP43"
@@ -369,6 +403,7 @@ map "MAP43"
 	secretnext = "MAP50"
 	defaultceiling = "#580000"
 	floornumber = 3
+	par = 150
 }
 
 map "MAP44"
@@ -377,6 +412,7 @@ map "MAP44"
 	secretnext = "MAP50"
 	defaultceiling = "#580000"
 	floornumber = 4
+	par = 150
 }
 
 map "MAP45"
@@ -385,6 +421,7 @@ map "MAP45"
 	secretnext = "MAP50"
 	defaultceiling = "#483818"
 	floornumber = 5
+	par = 240
 }
 
 map "MAP46"
@@ -393,6 +430,7 @@ map "MAP46"
 	secretnext = "MAP50"
 	defaultceiling = "#80502C"
 	floornumber = 6
+	par = 180
 }
 
 map "MAP47"
@@ -400,6 +438,7 @@ map "MAP47"
 	next = "MAP48"
 	secretnext = "MAP50"
 	floornumber = 7
+	par = 270
 }
 
 map "MAP48"
@@ -407,6 +446,7 @@ map "MAP48"
 	next = "MAP49"
 	secretnext = "MAP50"
 	floornumber = 8
+	par = 210
 }
 
 map "MAP49"
@@ -438,6 +478,7 @@ map "MAP51"
 	next = "MAP52"
 	secretnext = "MAP60"
 	floornumber = 1
+	par = 390
 }
 
 map "MAP52"
@@ -445,6 +486,7 @@ map "MAP52"
 	next = "MAP53"
 	secretnext = "MAP60"
 	floornumber = 2
+	par = 240
 }
 
 map "MAP53"
@@ -452,6 +494,7 @@ map "MAP53"
 	next = "MAP54"
 	secretnext = "MAP60"
 	floornumber = 3
+	par = 270
 }
 
 map "MAP54"
@@ -459,6 +502,7 @@ map "MAP54"
 	next = "MAP55"
 	secretnext = "MAP60"
 	floornumber = 4
+	par = 360
 }
 
 map "MAP55"
@@ -467,6 +511,7 @@ map "MAP55"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
 	floornumber = 5
+	par = 300
 }
 
 map "MAP56"
@@ -475,6 +520,7 @@ map "MAP56"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
 	floornumber = 6
+	par = 330
 }
 
 map "MAP57"
@@ -483,6 +529,7 @@ map "MAP57"
 	secretnext = "MAP60"
 	defaultceiling = "#007070"
 	floornumber = 7
+	par = 330
 }
 
 map "MAP58"
@@ -491,6 +538,7 @@ map "MAP58"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
 	floornumber = 8
+	par = 810
 }
 
 map "MAP59"

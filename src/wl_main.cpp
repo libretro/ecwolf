@@ -385,63 +385,6 @@ void SignonScreen (void)                        // VGA version
 	CA_CacheScreen("WLFSGNON");
 }
 
-
-/*
-==========================
-=
-= FinishSignon
-=
-==========================
-*/
-
-void FinishSignon (void)
-{
-#ifndef SPEAR
-	VW_Bar (0,189,300,11,VL_GetPixel(0,0));
-	WindowX = 0;
-	WindowW = 320;
-	PrintY = 190;
-
-	#ifndef JAPAN
-	SETFONTCOLOR(14,4);
-
-	#ifdef SPANISH
-	US_CPrint ("Oprima una tecla");
-	#else
-	US_CPrint ("Press a key");
-	#endif
-
-	#endif
-
-	VH_UpdateScreen();
-
-	if (!param_nowait)
-		IN_Ack ();
-
-	#ifndef JAPAN
-	VW_Bar (0,189,300,11,VL_GetPixel(0,0));
-
-	PrintY = 190;
-	SETFONTCOLOR(10,4);
-
-	#ifdef SPANISH
-	US_CPrint ("pensando...");
-	#else
-	US_CPrint ("Working...");
-	#endif
-
-	VH_UpdateScreen();
-	#endif
-
-	SETFONTCOLOR(0,15);
-#else
-	VH_UpdateScreen();
-
-	if (!param_nowait)
-		VW_WaitVBL(3*70);
-#endif
-}
-
 //===========================================================================
 
 Menu musicMenu(CTL_X, CTL_Y-6, 280, 32);
@@ -613,7 +556,14 @@ static void InitGame()
 // initialize variables
 //
 	InitRedShifts ();
-	FinishSignon();
+
+//
+// Finish signon screen
+//
+	VH_UpdateScreen();
+
+	if (!param_nowait)
+		IN_Ack ();
 
 //
 // HOLDING DOWN 'M' KEY?

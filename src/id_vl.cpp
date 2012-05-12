@@ -32,7 +32,7 @@ unsigned screenHeight = 240;
 unsigned screenBits = 8;
 #else
 unsigned screenWidth = 640;
-unsigned screenHeight = 400;
+unsigned screenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
 #endif
 

@@ -47,6 +47,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
 	FloorNumber = 1;
+	Par = 0;
 }
 
 LevelInfo &LevelInfo::Find(const char* level)
@@ -115,6 +116,11 @@ static void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
 		{
 			sc.MustGetToken(TK_IntConst);
 			mapInfo.FloorNumber = sc->number;
+		}
+		else if(key.CompareNoCase("Par") == 0)
+		{
+			sc.MustGetToken(TK_IntConst);
+			mapInfo.Par = sc->number;
 		}
 		else
 		{

@@ -914,8 +914,12 @@ DrawLSAction (int which)
 // HANDLE INTRO SCREEN (SYSTEM CONFIG)
 //
 ////////////////////////////////////////////////////////////////////
-void
-IntroScreen (void)
+static void IntroFill (int color, double x, double y, double w, double h)
+{
+	VirtualToRealCoords(x, y, w, h, 320, 200, false, true);
+	VWB_Clear (color, x, y, x+w, y+h);
+}
+void IntroScreen (void)
 {
 #ifdef SPEAR
 
@@ -932,68 +936,33 @@ IntroScreen (void)
 #endif
 #define FILLCOLOR       14
 
-//      long memory;
-//      long emshere,xmshere;
 	int i;
-/*      int ems[10]={100,200,300,400,500,600,700,800,900,1000},
-				xms[10]={100,200,300,400,500,600,700,800,900,1000};
-		int main[10]={32,64,96,128,160,192,224,256,288,320};*/
-
 
 	//
 	// DRAW MAIN MEMORY
 	//
-#ifdef ABCAUS
-	memory = (1023l + mminfo.nearheap + mminfo.farheap) / 1024l;
 	for (i = 0; i < 10; i++)
-		if (memory >= main[i])
-			VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
-
-	//
-	// DRAW EMS MEMORY
-	//
-	if (EMSPresent)
-	{
-		emshere = 4l * EMSPagesAvail;
-		for (i = 0; i < 10; i++)
-			if (emshere >= ems[i])
-				VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
-	}
-
-	//
-	// DRAW XMS MEMORY
-	//
-	if (XMSPresent)
-	{
-		xmshere = 4l * XMSPagesAvail;
-		for (i = 0; i < 10; i++)
-			if (xmshere >= xms[i])
-				VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
-	}
-#else
+		IntroFill(MAINCOLOR - i, 49, 163 - 8 * i, 6, 5);
 	for (i = 0; i < 10; i++)
-		VWB_Bar (49, 163 - 8 * i, 6, 5, MAINCOLOR - i);
+		IntroFill(EMSCOLOR - i, 89, 163 - 8 * i, 6, 5);
 	for (i = 0; i < 10; i++)
-		VWB_Bar (89, 163 - 8 * i, 6, 5, EMSCOLOR - i);
-	for (i = 0; i < 10; i++)
-		VWB_Bar (129, 163 - 8 * i, 6, 5, XMSCOLOR - i);
-#endif
+		IntroFill(XMSCOLOR - i, 129, 163 - 8 * i, 6, 5);
 
 
 	//
 	// FILL BOXES
 	//
 	if (MousePresent)
-		VWB_Bar (164, 82, 12, 2, FILLCOLOR);
+		IntroFill(FILLCOLOR, 164, 82, 12, 2);
 
 	if (IN_JoyPresent())
-		VWB_Bar (164, 105, 12, 2, FILLCOLOR);
+		IntroFill(FILLCOLOR, 164, 105, 12, 2);
 
 	if (AdLibPresent && !SoundBlasterPresent)
-		VWB_Bar (164, 128, 12, 2, FILLCOLOR);
+		IntroFill(FILLCOLOR, 164, 128, 12, 2);
 
 	if (SoundBlasterPresent)
-		VWB_Bar (164, 151, 12, 2, FILLCOLOR);
+		IntroFill(FILLCOLOR, 164, 151, 12, 2);
 
 //    if (SoundSourcePresent)
 //        VWB_Bar (164, 174, 12, 2, FILLCOLOR);
@@ -1525,8 +1494,7 @@ void DrawStripes (int y)
 	VWB_Clear(STRIPE, 0, ceil(ly), screenWidth, ceil(ly+lh));
 }
 
-void
-ShootSnd (void)
+void ShootSnd (void)
 {
 	SD_PlaySound ("menu/activate");
 }
