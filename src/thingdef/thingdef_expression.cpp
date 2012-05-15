@@ -275,6 +275,14 @@ ExpressionNode::~ExpressionNode()
 	for(unsigned char i = 0;i < 2;i++)
 		delete term[i];
 	//delete subscript;
+
+	if(type == SYMBOL && symbol->IsFunction())
+	{
+		FunctionSymbol *fsymbol = static_cast<FunctionSymbol *>(symbol);
+		for(unsigned int i = 0;i < fsymbol->GetNumArgs();++i)
+			delete args[i];
+		delete[] args;
+	}
 }
 
 const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)
@@ -287,7 +295,7 @@ const ExpressionNode::Value &ExpressionNode::Evaluate(AActor *self)
 		{
 			if(symbol->IsFunction())
 			{
-				FunctionSymbol *fsymbol = reinterpret_cast<FunctionSymbol *>(symbol);
+				FunctionSymbol *fsymbol = static_cast<FunctionSymbol *>(symbol);
 				fsymbol->CallFunction(self, evaluation, args, subscript);
 			}
 			else
@@ -426,7 +434,7 @@ ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarc
 					}
 					assert(thisNode->subscript);
 					sc.MustGetToken('(');
-					FunctionSymbol *fsymbol = reinterpret_cast<FunctionSymbol *>(symbol);
+					FunctionSymbol *fsymbol = static_cast<FunctionSymbol *>(symbol);
 					thisNode->args = new ExpressionNode*[fsymbol->GetNumArgs()];
 					unsigned short argc = 0;
 					do

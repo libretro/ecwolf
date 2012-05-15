@@ -171,6 +171,7 @@ class FVSwap : public FResourceFile
 				for(unsigned int j = start;j < end && end + soundStart < numChunks;j++)
 					SoundLumps[i]->AddChunk(ReadLittleLong(&data[(soundStart+j)*4]), ReadLittleShort(&data[(soundStart+j)*2 + numChunks*4]));
 			}
+			delete[] soundMap;
 
 			// Number of lumps is not the number of chunks, but the number of
 			// chunks up to sounds + how many sounds are formed from the chunks.

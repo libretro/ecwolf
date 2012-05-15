@@ -223,6 +223,7 @@ class FVGAGraph : public FResourceFile
 						dimensions[j].width = ReadLittleShort(&out[j*4]);
 						dimensions[j].height = ReadLittleShort(&out[(j*4)+2]);
 					}
+					delete[] out;
 				}
 				else if(lumps[i].isImage)
 				{

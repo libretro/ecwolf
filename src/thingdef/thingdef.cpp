@@ -729,6 +729,7 @@ void ClassDef::ParseActor(Scanner &sc)
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
 
+		newClass->defaultInstance->defaults = NULL;
 		newClass->defaultInstance->~AActor();
 		free(newClass->defaultInstance);
 		newClass->defaultInstance = (AActor *) malloc(newClass->parent->defaultInstance->__GetSize());
@@ -753,7 +754,9 @@ void ClassDef::ParseActor(Scanner &sc)
 	{
 		*newClass->defaultInstance = *newClass->parent->defaultInstance;
 		newClass->defaultInstance->classType = newClass;
+		newClass->defaultInstance->defaults = newClass->defaultInstance;
 	}
+	assert(newClass->defaultInstance->defaults == newClass->defaultInstance);
 
 	bool actionsSorted = true;
 	sc.MustGetToken('{');

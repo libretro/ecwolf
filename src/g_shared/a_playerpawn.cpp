@@ -43,6 +43,15 @@
 
 IMPLEMENT_CLASS(PlayerPawn, Actor)
 
+APlayerPawn::~APlayerPawn()
+{
+	if(this == defaults)
+	{
+		if(startInventory)
+			delete startInventory;
+	}
+}
+
 void APlayerPawn::GiveStartingInventory()
 {
 	if(!startInventory)

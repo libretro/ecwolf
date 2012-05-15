@@ -109,11 +109,8 @@ HANDLE_PROPERTY(dropitem)
 	// NOTE: When used with inheritance the old list is wiped.
 	STRING_PARAM(item, 0);
 
-	if(!defaults->dropdefined)
-	{
-		defaults->dropdefined = true;
+	if(!defaults->dropitems)
 		defaults->dropitems = new AActor::DropList();
-	}
 
 	AActor::DropItem drop;
 	drop.className = item;

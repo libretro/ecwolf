@@ -38,6 +38,7 @@
 #include "id_ca.h"
 #include "thinker.h"
 #include "thingdef/thingdef.h"
+#include "thingdef/thingdef_expression.h"
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "id_us.h"
@@ -109,7 +110,7 @@ LinkedList<AActor *> AActor::actors;
 const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
 
 AActor::AActor(const ClassDef *type) : classType(type), distance(0),
-	dir(nodir), soundZone(NULL), inventory(NULL), dropdefined(false)
+	dir(nodir), soundZone(NULL), inventory(NULL)
 {
 	// This will be called for each actor AFTER copying the defaults.
 	// Use InitClean for any one time construction.
@@ -119,8 +120,13 @@ AActor::~AActor()
 {
 	RemoveFromWorld();
 
-	if(dropdefined)
-		delete dropitems;
+	if(this == defaults)
+	{
+		if(dropitems)
+			delete dropitems;
+		if(damage)
+			delete damage;
+	}
 
 	// Inventory items don't have a registered thinker so we must free them now
 	if(inventory)
@@ -237,6 +243,8 @@ void AActor::InitClean()
 {
 	flags = 0;
 	SpawnState = NULL;
+	damage = NULL;
+	dropitems = NULL;
 
 	Init(true);
 }

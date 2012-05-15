@@ -236,10 +236,11 @@ class ClassDef
 				definition = *definitionLookup;
 			definition->name = className;
 			definition->parent = parent;
+			definition->defaultInstance->defaults = NULL;
 			definition->defaultInstance->~AActor();
 			free(definition->defaultInstance);
-			definition->defaultInstance = NULL;
 			definition->defaultInstance = (AActor *) malloc(sizeof(T));
+			definition->defaultInstance->defaults = definition->defaultInstance;
 			definition->ConstructNative = &T::__InPlaceConstructor;
 			return definition;
 		}

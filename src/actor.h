@@ -165,7 +165,6 @@ class AActor
 
 		AInventory	*inventory;
 
-		bool		dropdefined;
 		DropList	*dropitems;
 
 		typedef LinkedList<AActor *>::Node Iterator;

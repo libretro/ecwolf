@@ -163,6 +163,7 @@ bool LumpRemapper::LoadMap()
 	mapLump.Read(mapData, Wads.LumpLength(lump));
 	Scanner sc(mapData, Wads.LumpLength(lump));
 	sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
+	delete[] mapData;
 
 	while(sc.TokensLeft() > 0)
 	{

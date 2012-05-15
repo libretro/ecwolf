@@ -107,6 +107,8 @@ void FResourceLump::LumpNameSetup(const char *iname)
 	}
 	uppercopy(Name, base);
 	Name[8] = 0;
+	if(FullName)
+		delete[] FullName;
 	FullName = new char[strlen(iname) + 1];
 	memcpy(FullName, iname, strlen(iname) + 1);
 

@@ -61,6 +61,8 @@ class APlayerPawn : public AActor
 	DECLARE_NATIVE_CLASS(PlayerPawn, Actor)
 
 	public:
+		~APlayerPawn();
+
 		void	GiveStartingInventory();
 		AWeapon	*PickNewWeapon();
 		void	Tick();

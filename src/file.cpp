@@ -90,6 +90,7 @@ File::File(const FString &filename) : filename(filename), existing(false), direc
 			while((file = readdir(direct)) != NULL)
 				files.Push(file->d_name);
 		}
+		closedir(direct);
 	}
 #endif
 }
