@@ -787,6 +787,8 @@ void Died (void)
 ===================
 */
 
+void StartTravel ();
+void FinishTravel ();
 void GameLoop (void)
 {
 	boolean died;
@@ -808,7 +810,10 @@ restartgame:
 
 		startgame = false;
 		if (!loadedgame)
+		{
 			SetupGameLevel ();
+			FinishTravel ();
+		}
 
 		ingame = true;
 		if(loadedgame)
@@ -879,6 +884,7 @@ startplayloop:
 
 				ClearMemory ();
 
+				StartTravel ();
 				LevelCompleted ();              // do the intermission
 				if(viewsize == 21) DrawPlayScreen();
 

@@ -41,7 +41,38 @@
 #include "linkedlist.h"
 
 class Thinker;
-class ThinkerList;
+extern class ThinkerList
+{
+	public:
+		enum Priority
+		{
+			TRAVEL,	// Doesn't think, preserved for later use
+
+			WORLD,	// High priority world manipulations
+			NORMAL,	// General purpose thinker
+
+			NUM_TYPES,
+			FIRST_TICKABLE = WORLD
+		};
+
+		ThinkerList();
+		~ThinkerList();
+
+		LinkedList<Thinker *>::Node *GetHead(Priority list) { return thinkers[list].Head(); }
+		void	DestroyAll(Priority start=FIRST_TICKABLE);
+		void	Tick();
+	protected:
+		void	CleanThinkers();
+
+		friend class Thinker;
+		void	Register(Thinker *thinker, Priority type=NORMAL);
+		void	Deregister(Thinker *thinker);
+		void	MarkForCollection(Thinker *thinker);
+
+	private:
+		LinkedList<Thinker *>	thinkers[NUM_TYPES];
+		LinkedList<Thinker *>	toDestroy;
+} *thinkerList;
 
 #define DECLARE_THINKER(type) \
 	public: \
@@ -56,12 +87,13 @@ class Thinker
 	public:
 		typedef const FName __ThinkerInfo;
 
-		Thinker();
+		Thinker(ThinkerList::Priority priority=ThinkerList::NORMAL);
 		virtual ~Thinker();
 
 		virtual void	Destroy();
 		template<class T>
 		bool			IsThinkerType() { return __ThinkerType() == T::__StaticThinkerType; }
+		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
 
 	protected:
@@ -71,28 +103,8 @@ class Thinker
 	private:
 		friend class ThinkerList;
 
+		ThinkerList::Priority		thinkerPriority;
 		LinkedList<Thinker *>::Node	*thinkerRef;
 };
-
-extern class ThinkerList
-{
-	public:
-		ThinkerList();
-		~ThinkerList();
-
-		void	DestroyAll();
-		void	Tick();
-	protected:
-		void	CleanThinkers();
-
-		friend class Thinker;
-		void	Register(Thinker *thinker);
-		void	Deregister(Thinker *thinker);
-		void	MarkForCollection(Thinker *thinker);
-
-	private:
-		LinkedList<Thinker *>	thinkers;
-		LinkedList<Thinker *>	toDestroy;
-} *thinkerList;
 
 #endif

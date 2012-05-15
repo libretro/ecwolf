@@ -29,6 +29,9 @@
 ** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **---------------------------------------------------------------------------
 **
+** Thinkers are given priorities, one of which (TRAVEL) allows us to transfer
+** actors between levels without it being collected.  This is similar to ZDoom's
+** system, which in turn, is supposedly based off build.
 **
 */
 
@@ -54,7 +57,7 @@ ThinkerList::ThinkerList()
 
 ThinkerList::~ThinkerList()
 {
-	DestroyAll();
+	DestroyAll(static_cast<Priority>(0));
 }
 
 void ThinkerList::CleanThinkers()
@@ -68,13 +71,16 @@ void ThinkerList::CleanThinkers()
 	toDestroy.Clear();
 }
 
-void ThinkerList::DestroyAll()
+void ThinkerList::DestroyAll(Priority start)
 {
-	LinkedList<Thinker *>::Node *iter = thinkers.Head();
-	while(iter)
+	for(unsigned int i = start;i < NUM_TYPES;++i)
 	{
-		iter->Item()->Destroy();
-		iter = iter->Next();
+		LinkedList<Thinker *>::Node *iter = thinkers[i].Head();
+		while(iter)
+		{
+			iter->Item()->Destroy();
+			iter = iter->Next();
+		}
 	}
 	CleanThinkers();
 }
@@ -83,22 +89,26 @@ void ThinkerList::Tick()
 {
 	CleanThinkers();
 
-	LinkedList<Thinker *>::Node *iter = thinkers.Head();
-	while(iter)
+	for(unsigned int i = FIRST_TICKABLE;i < NUM_TYPES;++i)
 	{
-		iter->Item()->Tick();
-		iter = iter->Next();
+		LinkedList<Thinker *>::Node *iter = thinkers[i].Head();
+		while(iter)
+		{
+			iter->Item()->Tick();
+			iter = iter->Next();
+		}
 	}
 }
 
-void ThinkerList::Register(Thinker *thinker)
+void ThinkerList::Register(Thinker *thinker, Priority type)
 {
-	thinker->thinkerRef = thinkers.Push(thinker);
+	thinker->thinkerRef = thinkers[type].Push(thinker);
+	thinker->thinkerPriority = type;
 }
 
 void ThinkerList::Deregister(Thinker *thinker)
 {
-	thinkers.Remove(thinker->thinkerRef);
+	thinkers[thinker->thinkerPriority].Remove(thinker->thinkerRef);
 }
 
 void ThinkerList::MarkForCollection(Thinker *thinker)
@@ -108,9 +118,9 @@ void ThinkerList::MarkForCollection(Thinker *thinker)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Thinker::Thinker()
+Thinker::Thinker(ThinkerList::Priority priority)
 {
-	thinkerList->Register(this);
+	thinkerList->Register(this, priority);
 }
 
 Thinker::~Thinker()
@@ -121,4 +131,10 @@ Thinker::~Thinker()
 void Thinker::Destroy()
 {
 	thinkerList->MarkForCollection(this);
+}
+
+void Thinker::SetPriority(ThinkerList::Priority priority)
+{
+	thinkerList->Deregister(this);
+	thinkerList->Register(this, priority);
 }

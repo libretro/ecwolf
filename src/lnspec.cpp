@@ -102,7 +102,8 @@ class EVDoor : public Thinker
 	DECLARE_THINKER(EVDoor)
 
 	public:
-		EVDoor(MapSpot spot, MapTrigger::Side direction) : Thinker(), state(Closed), spot(spot), amount(0), direction(direction)
+		EVDoor(MapSpot spot, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
+			state(Closed), spot(spot), amount(0), direction(direction)
 		{
 			ChangeState(Opening);
 			spot->thinker = this;
@@ -276,8 +277,8 @@ class EVPushwall : public Thinker
 	DECLARE_THINKER(EVPushwall)
 
 	public:
-		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(), spot(spot),
-			moveTo(NULL), direction(direction), position(0)
+		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
+			spot(spot), moveTo(NULL), direction(direction), position(0)
 		{
 			spot->thinker = this;
 			spot->pushDirection = MapTile::Side(direction);

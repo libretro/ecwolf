@@ -99,7 +99,7 @@ class AActorProxy : public Thinker
 			if(enabled)
 				parent->Tick();
 		}
-	private:
+
 		bool			enabled;
 		AActor * const	parent;
 };
@@ -121,6 +121,15 @@ AActor::~AActor()
 
 	if(dropdefined)
 		delete dropitems;
+
+	// Inventory items don't have a registered thinker so we must free them now
+	if(inventory)
+	{
+		assert(inventory->thinker == NULL);
+
+		inventory->~AActor();
+		free(inventory);
+	}
 }
 
 void AActor::AddInventory(AInventory *item)
@@ -217,6 +226,11 @@ AInventory *AActor::FindInventory(const ClassDef *cls) const
 const Frame *AActor::FindState(const FName &name) const
 {
 	return classType->FindState(name);
+}
+
+Thinker *AActor::GetThinker() const
+{
+	return thinker;
 }
 
 void AActor::InitClean()
@@ -364,3 +378,64 @@ AActor *AActor::__InPlaceConstructor(const ClassDef *classDef, void *mem)
 
 DEFINE_SYMBOL(Actor, angle)
 DEFINE_SYMBOL(Actor, health)
+
+//==============================================================================
+
+/*
+===================
+=
+= Player travel functions
+=
+===================
+*/
+
+void StartTravel ()
+{
+	// Set thinker priorities to TRAVEL so that they don't get wiped on level
+	// load.  We'll transfer them to a new actor.
+
+	AActor *player = players[0].mo;
+
+	player->GetThinker()->SetPriority(ThinkerList::TRAVEL);
+}
+
+void FinishTravel ()
+{
+	LinkedList<Thinker *>::Node *node = thinkerList->GetHead(ThinkerList::TRAVEL);
+	if(!node)
+		return;
+
+	do
+	{
+		if(node->Item()->IsThinkerType<AActorProxy>())
+		{
+			AActorProxy *proxy = static_cast<AActorProxy *>(node->Item());
+			if(proxy->parent->IsKindOf(NATIVE_CLASS(PlayerPawn)))
+			{
+				APlayerPawn *player = static_cast<APlayerPawn *>(proxy->parent);
+				if(player->player == &players[0])
+				{
+					AActor *playertmp = players[0].mo;
+					player->x = playertmp->x;
+					player->y = playertmp->y;
+					player->tilex = playertmp->tilex;
+					player->tiley = playertmp->tiley;
+					player->angle = playertmp->angle;
+					player->EnterZone(playertmp->GetZone());
+
+					players[0].mo = player;
+					playertmp->Destroy();
+
+					// We must move the linked list iterator here since we'll
+					// transfer to the new linked list at the SetPriority call
+					node = node->Next();
+					player->GetThinker()->SetPriority(ThinkerList::NORMAL);
+					continue;
+				}
+			}
+		}
+
+		node = node->Next();
+	}
+	while(node);
+}
