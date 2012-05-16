@@ -59,6 +59,7 @@ public:
 	bool			UseMapInfoName;
 	FString			Name;
 	unsigned int	FloorNumber;
+	FString			Music;
 
 	FTextureID		DefaultTexture[2];
 	unsigned int	Par;

@@ -118,6 +118,11 @@ static void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
 			sc.MustGetToken(TK_IntConst);
 			mapInfo.FloorNumber = sc->number;
 		}
+		else if(key.CompareNoCase("Music") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			mapInfo.Music = sc->str;
+		}
 		else if(key.CompareNoCase("Par") == 0)
 		{
 			sc.MustGetToken(TK_IntConst);

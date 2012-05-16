@@ -3,6 +3,7 @@
 #include "wl_act.h"
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_ca.h"
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
@@ -21,6 +22,7 @@
 #include "wl_game.h"
 #include "wl_inter.h"
 #include "wl_play.h"
+#include "g_mapinfo.h"
 
 /*
 =============================================================================
@@ -157,76 +159,6 @@ int StopMusic (void);
 void StartMusic (void);
 void ContinueMusic (int offs);
 void PlayLoop (void);
-
-/*
-=============================================================================
-
-												LOCAL VARIABLES
-
-=============================================================================
-*/
-
-//
-// LIST OF SONGS FOR EACH VERSION
-//
-const char* songs[] = {
-#ifndef SPEAR
-	//
-	// Episode One
-	//
-	"GETTHEM",	"SEARCHN",	"POW",		"SUSPENSE",	"GETTHEM",
-	"SEARCHN",	"POW",		"SUSPENSE",	"WARMARCH",	"CORNER",
-
-	//
-	// Episode Two
-	//
-	"NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
-	"PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
-
-	//
-	// Episode Three
-	//
-	"INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
-	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"PACMAN",
-
-	//
-	// Episode Four
-	//
-	"GETTHEM",	"SEARCHN",	"POW",		"SUSPENSE",	"GETTHEM",
-	"SEARCHN",	"POW",		"SUSPENSE",	"WARMARCH",	"CORNER",
-
-	//
-	// Episode Five
-	//
-	"NAZI_OMI",	"PREGNANT",	"GOINGAFT",	"HEADACHE",	"NAZI_OMI",
-	"PREGNANT",	"HEADACHE",	"GOINGAFT",	"WARMARCH",	"DUNGEON",
-
-	//
-	// Episode Six
-	//
-	"INTROCW3",	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"INTROCW3",
-	"NAZI_RAP",	"TWELFTH",	"ZEROHOUR",	"ULTIMATE",	"FUNKYOU"
-#else
-
-	//////////////////////////////////////////////////////////////
-	//
-	// SPEAR OF DESTINY TRACKS
-	//
-	//////////////////////////////////////////////////////////////
-	"XTIPTOE",	"XFUNKIE",	"XDEATH",	"XGETYOU",	"ULTIMATE",	// Trans Gr�sse
-
-	"DUNGEON",	"GOINGAFT",	"POW",		"TWELFTH",	"ULTIMATE",	// Barnacle Wilhelm BOSS
-
-	"NAZI_OMI",	"GETTHEM",	"SUSPENSE",	"SEARCHN",	"ZEROHOUR",	"ULTIMATE",	// Super Mutant BOSS
-
-	"XPUTIT",	"ULTIMATE",	// Death Knight BOSS
-
-	"XJAZNAZI",	"XFUNKIE",	// Secret level
-
-	"XEVIL"	// Angel of Death BOSS
-#endif
-};
-
 
 /*
 =============================================================================
@@ -778,13 +710,13 @@ int StopMusic (void)
 void StartMusic ()
 {
 	SD_MusicOff ();
-	SD_StartMusic(songs[gamestate.mapon + gamestate.episode * 10]);
+	SD_StartMusic(levelInfo->Music);
 }
 
 void ContinueMusic (int offs)
 {
 	SD_MusicOff ();
-	SD_ContinueMusic(songs[gamestate.mapon + gamestate.episode * 10], offs);
+	SD_ContinueMusic(levelInfo->Music, offs);
 }
 
 /*
