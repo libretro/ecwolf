@@ -55,6 +55,8 @@
 
 FTextureManager TexMan;
 
+//CVAR(Bool, vid_nopalsubstitutions, false, CVAR_ARCHIVE)
+
 //==========================================================================
 //
 // FTextureManager :: FTextureManager
@@ -802,7 +804,7 @@ void FTextureManager::AddPatches (int lumpnum)
 	{
 		file->Read (name, 8);
 
-		if (CheckForTexture (name, FTexture::TEX_WallPatch, false) == -1)
+		if (CheckForTexture (name, FTexture::TEX_WallPatch, 0) == -1)
 		{
 			CreateTexture (Wads.CheckNumForName (name, ns_patches), FTexture::TEX_WallPatch);
 		}
@@ -1018,6 +1020,58 @@ void FTextureManager::Init()
 	InitAnimDefs();
 	FixAnimations();
 	InitSwitchList();
+	InitPalettedVersions();
+}
+
+//==========================================================================
+//
+// FTextureManager :: InitPalettedVersions
+//
+//==========================================================================
+
+void FTextureManager::InitPalettedVersions()
+{
+	int lump, lastlump = 0;
+
+	PalettedVersions.Clear();
+	while ((lump = Wads.FindLump("PALVERS", &lastlump)) != -1)
+	{
+		FMemLump data = Wads.ReadLump(lump);
+		Scanner sc((const char*)data.GetMem(), data.GetSize());
+
+		while (sc.GetNextToken())
+		{
+			FTextureID pic1 = CheckForTexture(sc->str, FTexture::TEX_Any);
+			if (!pic1.isValid())
+			{
+				sc.ScriptMessage(Scanner::WARNING, "Unknown texture %s to replace", sc->str.GetChars());
+			}
+			sc.GetNextToken();
+			FTextureID pic2 = CheckForTexture(sc->str, FTexture::TEX_Any);
+			if (!pic2.isValid())
+			{
+				sc.ScriptMessage(Scanner::WARNING, "Unknown texture %s to use as replacement", sc->str.GetChars());
+			}
+			if (pic1.isValid() && pic2.isValid())
+			{
+				PalettedVersions[pic1.GetIndex()] = pic2.GetIndex();
+			}
+		}
+	}
+}
+
+//==========================================================================
+//
+// FTextureManager :: PalCheck
+//
+//==========================================================================
+
+FTextureID FTextureManager::PalCheck(FTextureID tex)
+{
+	//if (vid_nopalsubstitutions) return tex;
+	int *newtex = PalettedVersions.CheckKey(tex.GetIndex());
+	if (newtex == NULL || *newtex == 0) return tex;
+	return *newtex;
 }
 
 //==========================================================================

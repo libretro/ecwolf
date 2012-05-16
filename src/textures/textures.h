@@ -215,6 +215,7 @@ public:
 	virtual bool UseBasePalette();
 	virtual int GetSourceLump() { return SourceLump; }
 	virtual FTexture *GetRedirect(bool wantwarped);
+	virtual FTexture *GetRawTexture();		// for FMultiPatchTexture to override
 	FTextureID GetID() const { return id; }
 
 	virtual void Unload () = 0;
@@ -294,6 +295,7 @@ protected:
 		Rotations = other->Rotations;
 	}
 
+public:
 	static void FlipSquareBlock (BYTE *block, int x, int y);
 	static void FlipSquareBlockRemap (BYTE *block, int x, int y, const BYTE *remap);
 	static void FlipNonSquareBlock (BYTE *blockto, const BYTE *blockfrom, int x, int y, int srcpitch);
@@ -330,15 +332,20 @@ public:
 	FTexture *FindTexture(const char *texname, int usetype = FTexture::TEX_MiscPatch, BITFIELD flags = TEXMAN_TryAny);
 
 	// Get texture with translation
-	FTexture *operator() (FTextureID texnum)
+	FTexture *operator() (FTextureID texnum, bool withpalcheck=false)
 	{
 		if ((size_t)texnum.texnum >= Textures.Size()) return NULL;
-		return Textures[Translation[texnum.texnum]].Texture;
+		int picnum = Translation[texnum.texnum];
+		if (withpalcheck)
+		{
+			picnum = PalCheck(picnum).GetIndex();
+		}
+		return Textures[picnum].Texture;
 	}
 	FTexture *operator() (const char *texname)
 	{
 		FTextureID texnum = GetTexture (texname, FTexture::TEX_MiscPatch);
-		if (texnum.texnum==-1) return NULL;
+		if (texnum.texnum == -1) return NULL;
 		return Textures[Translation[texnum.texnum]].Texture;
 	}
 
@@ -347,6 +354,8 @@ public:
 		if (unsigned(i) >= Textures.Size()) return NULL;
 		return Textures[Translation[i]].Texture;
 	}
+
+	FTextureID PalCheck(FTextureID tex);
 
 	enum
 	{
@@ -434,6 +443,8 @@ private:
 	void SetTranslation (FTextureID fromtexnum, FTextureID totexnum);
 	void ParseAnimatedDoor(Scanner &sc);
 
+	void InitPalettedVersions();
+
 	// Switches
 
 	void InitSwitchList ();
@@ -452,6 +463,7 @@ private:
 	int HashFirst[HASH_SIZE];
 	FTextureID DefaultTexture;
 	TArray<int> FirstTextureForFile;
+	TMap<int,int> PalettedVersions;		// maps from normal -> paletted version
 
 	TArray<FAnimDef *> mAnimations;
 	TArray<FSwitchDef *> mSwitchDefs;
@@ -535,18 +547,21 @@ public:
 	const BYTE *GetPixels ();
 	void Unload ();
 	bool CheckModified ();
-	void RenderView (AActor *viewpoint, int fov);
 	void NeedUpdate() { bNeedsUpdate=true; }
+	void SetUpdated() { bNeedsUpdate = false; bDidUpdate = true; bFirstUpdate = false; }
+	DSimpleCanvas *GetCanvas() { return Canvas; }
+	void MakeTexture ();
 
 protected:
+
 	DSimpleCanvas *Canvas;
 	BYTE *Pixels;
 	Span DummySpans[2];
-	BYTE bNeedsUpdate:1;
-	BYTE bDidUpdate:1;
-	BYTE bFirstUpdate:1;
-
-	void MakeTexture ();
+	bool bNeedsUpdate;
+	bool bDidUpdate;
+	bool bPixelsAllocated;
+public:
+	bool bFirstUpdate;
 
 	friend struct FCanvasTextureInfo;
 };

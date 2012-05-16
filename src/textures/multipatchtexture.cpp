@@ -162,6 +162,8 @@ public:
 
 	int CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCopyInfo *inf = NULL);
 	int GetSourceLump() { return DefinitionLump; }
+	FTexture *GetRedirect(bool wantwarped);
+	FTexture *GetRawTexture();
 
 protected:
 	BYTE *Pixels;
@@ -187,7 +189,6 @@ protected:
 	bool bTranslucentPatches:1;
 
 	void MakeTexture ();
-	FTexture *GetRedirect(bool wantwarped);
 
 private:
 	void CheckForHacks ();
@@ -550,9 +551,26 @@ void FMultiPatchTexture::MakeTexture ()
 int FMultiPatchTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCopyInfo *inf)
 {
 	int retv = -1;
-	FCopyInfo info;
 
-	// When compositing a multipatch texture with multipatch parts
+	if (bRedirect)
+	{ // Redirect straight to the real texture's routine.
+		return Parts[0].Texture->CopyTrueColorPixels(bmp, x, y, rotate, inf);
+	}
+
+	if (rotate != 0 || (inf != NULL && inf->op != OP_OVERWRITE && inf->op != OP_COPY))
+	{ // We are doing some sort of fancy stuff to the destination bitmap, so composite to
+	  // a temporary bitmap, and copy that.
+		FBitmap tbmp;
+		if (tbmp.Create(Width, Height))
+		{
+			retv = MAX(retv, CopyTrueColorPixels(&tbmp, 0, 0, 0));
+			bmp->CopyPixelDataRGB(x, y, tbmp.GetPixels(), Width, Height,
+				4, tbmp.GetPitch(), rotate, CF_BGRA, inf);
+		}
+		return retv;
+	}
+
+	// When compositing a multipatch texture with multipatch parts,
 	// drawing must be restricted to the actual area which is covered by this texture.
 	FClipRect saved_cr = bmp->GetClipRect();
 	bmp->IntersectClipRect(x, y, Width, Height);
@@ -565,66 +583,47 @@ int FMultiPatchTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rota
 	for(int i = 0; i < NumParts; i++)
 	{
 		int ret = -1;
-		
+
+		FCopyInfo info;
+
 		if (Parts[i].Texture->bHasCanvas) continue;	// cannot use camera textures as patch.
 
-		// rotated multipatch parts cannot be composited directly
-		bool rotatedmulti = Parts[i].Rotate != 0 && Parts[i].Texture->bMultiPatch;
-
-		if ((!Parts[i].Texture->bComplex || inf == NULL) && !rotatedmulti)
+		memset (&info, 0, sizeof(info));
+		info.alpha = Parts[i].Alpha;
+		info.invalpha = FRACUNIT - info.alpha;
+		info.op = ECopyOp(Parts[i].op);
+		PalEntry b = Parts[i].Blend;
+		if (b.a == 0 && b != BLEND_NONE)
 		{
-			memset (&info, 0, sizeof (info));
-			info.alpha = Parts[i].Alpha;
-			info.invalpha = FRACUNIT - info.alpha;
-			info.op = ECopyOp(Parts[i].op);
-			if (Parts[i].Translation != NULL)
+			info.blend = EBlend(b.d);
+		}
+		else if (b.a != 0)
+		{
+			if (b.a == 255)
 			{
-				// Using a translation forces downconversion to the base palette
-				ret = Parts[i].Texture->CopyTrueColorTranslated(bmp, x+Parts[i].OriginX, y+Parts[i].OriginY, Parts[i].Rotate, Parts[i].Translation, &info);
+				info.blendcolor[0] = b.r * FRACUNIT / 255;
+				info.blendcolor[1] = b.g * FRACUNIT / 255;
+				info.blendcolor[2] = b.b * FRACUNIT / 255;
+				info.blend = BLEND_MODULATE;
 			}
 			else
 			{
-				PalEntry b = Parts[i].Blend;
-				if (b.a == 0 && b != BLEND_NONE)
-				{
-					info.blend = EBlend(b.d);
-				}
-				else if (b.a != 0)
-				{
-					if (b.a == 255)
-					{
-						info.blendcolor[0] = b.r * FRACUNIT / 255;
-						info.blendcolor[1] = b.g * FRACUNIT / 255;
-						info.blendcolor[2] = b.b * FRACUNIT / 255;
-						info.blend = BLEND_MODULATE;
-					}
-					else
-					{
-						info.blendcolor[3] = b.a * FRACUNIT / 255;
-						info.blendcolor[0] = b.r * (FRACUNIT-info.blendcolor[3]);
-						info.blendcolor[1] = b.g * (FRACUNIT-info.blendcolor[3]);
-						info.blendcolor[2] = b.b * (FRACUNIT-info.blendcolor[3]);
+				info.blendcolor[3] = b.a * FRACUNIT / 255;
+				info.blendcolor[0] = b.r * (FRACUNIT-info.blendcolor[3]);
+				info.blendcolor[1] = b.g * (FRACUNIT-info.blendcolor[3]);
+				info.blendcolor[2] = b.b * (FRACUNIT-info.blendcolor[3]);
 
-						info.blend = BLEND_OVERLAY;
-					}
-				}
-				ret = Parts[i].Texture->CopyTrueColorPixels(bmp, x+Parts[i].OriginX, y+Parts[i].OriginY, Parts[i].Rotate, &info);
+				info.blend = BLEND_OVERLAY;
 			}
+		}
+
+		if (Parts[i].Translation != NULL)
+		{ // Using a translation forces downconversion to the base palette
+			ret = Parts[i].Texture->CopyTrueColorTranslated(bmp, x+Parts[i].OriginX, y+Parts[i].OriginY, Parts[i].Rotate, Parts[i].Translation, &info);
 		}
 		else
 		{
-			// If the patch is a texture with some kind of processing involved
-			// and being drawn with additional processing
-			// the copying must be done in 2 steps: First create a complete image of the patch
-			// including all processing and then copy from that intermediate image to the destination
-			FBitmap bmp1;
-			if (bmp1.Create(Parts[i].Texture->GetWidth(), Parts[i].Texture->GetHeight()))
-			{
-				bmp1.Zero();
-				Parts[i].Texture->CopyTrueColorPixels(&bmp1, 0, 0);
-				bmp->CopyPixelDataRGB(x+Parts[i].OriginX, y+Parts[i].OriginY, bmp1.GetPixels(), 
-					bmp1.GetWidth(), bmp1.GetHeight(), 4, bmp1.GetPitch(), Parts[i].Rotate, CF_BGRA, inf);
-			}
+			ret = Parts[i].Texture->CopyTrueColorPixels(bmp, x+Parts[i].OriginX, y+Parts[i].OriginY, Parts[i].Rotate, &info);
 		}
 
 		if (ret > retv) retv = ret;
@@ -771,14 +770,32 @@ void FMultiPatchTexture::CheckForHacks ()
 
 //==========================================================================
 //
-// FMultiPatchTexture :: TexPart :: TexPart
+// FMultiPatchTexture :: GetRedirect
 //
 //==========================================================================
 
 FTexture *FMultiPatchTexture::GetRedirect(bool wantwarped)
 {
-	if (bRedirect) return Parts->Texture;
-	else return this;
+	return bRedirect ? Parts->Texture : this;
+}
+
+//==========================================================================
+//
+// FMultiPatchTexture :: GetRawTexture
+//
+// Doom ignored all compositing of mid-sided textures on two-sided lines.
+// Since these textures had to be single-patch in Doom, that essentially
+// means it ignores their Y offsets.
+//
+// If this texture is composed of only one patch, return that patch.
+// Otherwise, return this texture, since Doom wouldn't have been able to
+// draw it anyway.
+//
+//==========================================================================
+
+FTexture *FMultiPatchTexture::GetRawTexture()
+{
+	return NumParts == 1 ? Parts->Texture : this;
 }
 
 //==========================================================================
@@ -1170,7 +1187,7 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, bool silent, in
 			}
 			else if (sc->str.CompareNoCase("style") == 0)
 			{
-				static const char *styles[] = {"copy", "translucent", "add", "subtract", "reversesubtract", "modulate", "copyalpha", NULL };
+				static const char *styles[] = {"copy", "translucent", "add", "subtract", "reversesubtract", "modulate", "copyalpha", "copynewalpha", "overlay", NULL };
 				if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
 				for(part.op = 0;sc->str.CompareNoCase(styles[part.op]) != 0;)
 				{
@@ -1247,11 +1264,13 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 			{
 				sc.MustGetToken(TK_FloatConst);
 				xScale = FLOAT2FIXED(sc->decimal);
+				if (xScale == 0) sc.ScriptMessage(Scanner::ERROR, "Texture %s is defined with null x-scale\n", Name);
 			}
 			else if (sc->str.CompareNoCase("YScale") == 0)
 			{
 				sc.MustGetToken(TK_FloatConst);
 				yScale = FLOAT2FIXED(sc->decimal);
+				if (yScale == 0) sc.ScriptMessage(Scanner::ERROR, "Texture %s is defined with null y-scale\n", Name);
 			}
 			else if (sc->str.CompareNoCase("WorldPanning") == 0)
 			{
