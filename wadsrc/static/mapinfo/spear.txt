@@ -1,3 +1,12 @@
+gameinfo
+{
+	signon = "SODSGNON"
+	signoncolors = "FC FC 54", "40 40 00", "40 40 00", "40 40 00"
+	menufade = "00 00 CE"
+	menucolors = "00 00 88", "00 00 D4", "00 00 58", "48 48 48"
+	titlemusic = "XTOWER2"
+}
+
 defaultmap
 {
 	defaultfloor = "#717171"

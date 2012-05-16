@@ -8,26 +8,13 @@
 #include "id_in.h"
 
 #ifdef SPEAR
-
-#define BORDCOLOR       0x99
-#define BORD2COLOR      0x93
 #define DEACTIVE        0x9b
-#define BKGDCOLOR       0x9d
-//#define STRIPE                0x9c
-
-#define MenuFadeOut()   VL_FadeOut(0,255,0,0,206,10)
-
 #else
-
-#define BORDCOLOR       0x29
-#define BORD2COLOR      0x23
 #define DEACTIVE        0x2b
-#define BKGDCOLOR       0x2d
-#define STRIPE          0x2c
-
-#define MenuFadeOut()   VL_FadeOut(0,255,174,0,0,10)
-
 #endif
+
+extern int BORDCOLOR, BORD2COLOR, BKGDCOLOR, STRIPE;
+void MenuFadeOut();
 
 #define READCOLOR       0x4a
 #define READHCOLOR      0x47
@@ -38,12 +25,6 @@
 
 
 #define MENUSONG        "WONDERIN"
-
-#ifndef SPEAR
-#define INTROSONG       "NAZI_NOR"
-#else
-#define INTROSONG       "XTOWER2"
-#endif
 
 #define SENSITIVE       60
 #define CENTERX         ((int) screenWidth / 2)

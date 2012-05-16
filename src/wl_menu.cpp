@@ -38,6 +38,8 @@
 #include "wl_game.h"
 #include "wl_play.h"
 #include "wl_text.h"
+#include "v_palette.h"
+#include "colormatcher.h"
 
 struct SaveFile
 {
@@ -52,6 +54,7 @@ TArray<SaveFile> SaveFile::files;
 extern int	lastgamemusicoffset;
 EpisodeInfo	*episode = 0;
 bool		quickSaveLoad = false;
+int BORDCOLOR, BORD2COLOR, BKGDCOLOR, STRIPE;
 
 MENU_LISTENER(EnterControlBase);
 MENU_LISTENER(EnterLoadMenu);
@@ -73,7 +76,7 @@ MENU_LISTENER(PlayDemosOrReturnToGame)
 {
 	Menu::closeMenus();
 	if (!ingame)
-		StartCPMusic(INTROSONG);
+		StartCPMusic(gameinfo.TitleMusic);
 	VL_FadeOut(0, 255, 0, 0, 0, 10);
 	return true;
 }
@@ -364,6 +367,13 @@ MENU_LISTENER(ToggleFullscreen)
 
 void CreateMenus()
 {
+	// Extract the palette
+	BORDCOLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[0]), GPART(gameinfo.MenuColors[0]), BPART(gameinfo.MenuColors[0]));
+	BORD2COLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[1]), GPART(gameinfo.MenuColors[1]), BPART(gameinfo.MenuColors[1]));
+	BKGDCOLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[2]), GPART(gameinfo.MenuColors[2]), BPART(gameinfo.MenuColors[2]));
+	STRIPE = ColorMatcher.Pick(RPART(gameinfo.MenuColors[3]), GPART(gameinfo.MenuColors[3]), BPART(gameinfo.MenuColors[3]));
+
+	// Actually initialize the menus
 	mainMenu.setHeadPicture("M_OPTION");
 
 	if(EpisodeInfo::GetNumEpisodes() > 1)
@@ -899,34 +909,37 @@ static void IntroFill (int color, double x, double y, double w, double h)
 	VirtualToRealCoords(x, y, w, h, 320, 200, false, true);
 	VWB_Clear (color, x, y, x+w, y+h);
 }
+static void MemeoryFill (int color, int basex, int basey)
+{
+	// To make color picking simple, pick the darkest color and then fill the
+	// value component of the color.  This isn't exactly equivalent, but it's
+	// good enough I think.
+
+	float r = RPART(color), g = GPART(color), b = BPART(color);
+	float h, s, v;
+
+	RGBtoHSV(r, g, b, &h, &s, &v);
+	float vstep = (255.0f - v)/10.0f;
+
+	for (int i = 0; i < 10; ++i)
+	{
+		HSVtoRGB(&r, &g, &b, h, s, v);
+		int pal = ColorMatcher.Pick(r, g, b);
+		IntroFill(pal, basex, basey - 8 * i, 6, 5);
+		v += vstep;
+	}
+}
 void IntroScreen (void)
 {
-#ifdef SPEAR
-
-#define MAINCOLOR       0x4f
-#define EMSCOLOR        0x4f
-#define XMSCOLOR        0x4f
-
-#else
-
-#define MAINCOLOR       0x6c
-#define EMSCOLOR        0x6c    // 0x4f
-#define XMSCOLOR        0x6c    // 0x7f
-
-#endif
-#define FILLCOLOR       14
-
-	int i;
+	const int FILLCOLOR =
+		ColorMatcher.Pick(RPART(gameinfo.SignonColors[0]), GPART(gameinfo.SignonColors[0]), BPART(gameinfo.SignonColors[0]));
 
 	//
 	// DRAW MAIN MEMORY
 	//
-	for (i = 0; i < 10; i++)
-		IntroFill(MAINCOLOR - i, 49, 163 - 8 * i, 6, 5);
-	for (i = 0; i < 10; i++)
-		IntroFill(EMSCOLOR - i, 89, 163 - 8 * i, 6, 5);
-	for (i = 0; i < 10; i++)
-		IntroFill(XMSCOLOR - i, 129, 163 - 8 * i, 6, 5);
+	MemeoryFill(gameinfo.SignonColors[1], 49, 163);
+	MemeoryFill(gameinfo.SignonColors[2], 89, 163);
+	MemeoryFill(gameinfo.SignonColors[3], 129, 163);
 
 
 	//
@@ -1368,4 +1381,11 @@ void DrawStripes (int y)
 void ShootSnd (void)
 {
 	SD_PlaySound ("menu/activate");
+}
+
+void MenuFadeOut()
+{
+	VL_FadeOut(0, 255,
+		RPART(gameinfo.MenuFadeColor), GPART(gameinfo.MenuFadeColor), BPART(gameinfo.MenuFadeColor),
+		10);
 }

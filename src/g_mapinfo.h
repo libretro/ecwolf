@@ -38,6 +38,17 @@
 #include "textures/textures.h"
 #include "zstring.h"
 
+extern class GameInfo
+{
+public:
+	FString	SignonLump;
+	int		SignonColors[4];
+	int		MenuFadeColor;
+	int		MenuColors[4];
+
+	FString	TitleMusic;
+} gameinfo;
+
 class LevelInfo
 {
 public:

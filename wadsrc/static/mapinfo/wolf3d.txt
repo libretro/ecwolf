@@ -1,3 +1,12 @@
+gameinfo
+{
+	signon = "WLFSGNON"
+	signoncolors = "FC FC 54", "04 64 00", "04 64 00", "04 64 00"
+	menufade = "AE 00 00"
+	menucolors = "88 00 00", "D4 00 00", "58 00 00", "48 48 48"
+	titlemusic = "NAZI_NOR"
+}
+
 defaultmap
 {
 	defaultfloor = "#717171"

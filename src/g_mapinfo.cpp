@@ -38,6 +38,7 @@
 #include "tarray.h"
 #include "scanner.h"
 #include "w_wad.h"
+#include "v_video.h"
 
 static LevelInfo defaultMap;
 static TArray<LevelInfo> levelInfos;
@@ -121,6 +122,69 @@ static void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
 		{
 			sc.MustGetToken(TK_IntConst);
 			mapInfo.Par = sc->number;
+		}
+		else
+		{
+			sc.ScriptMessage(Scanner::WARNING, "Unknown map property '%s'!", key.GetChars());
+			do
+			{
+				sc.GetNextToken();
+			}
+			while(sc.CheckToken(','));
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+GameInfo gameinfo;
+
+void ParseGameInfo(Scanner &sc)
+{
+	sc.MustGetToken('{');
+	while(!sc.CheckToken('}'))
+	{
+		sc.MustGetToken(TK_Identifier);
+		FString key = sc->str;
+
+		sc.MustGetToken('=');
+
+		if(key.CompareNoCase("signon") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.SignonLump = sc->str;
+		}
+		else if(key.CompareNoCase("signoncolors") == 0)
+		{
+			// Fill, Main, EMS, XMS
+			for(int i = 0;i < 4;++i)
+			{
+				if(i != 0)
+					sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.SignonColors[i] = V_GetColorFromString(NULL, sc->str);
+			}
+		}
+		else if(key.CompareNoCase("menufade") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.MenuFadeColor = V_GetColorFromString(NULL, sc->str);
+		}
+		else if(key.CompareNoCase("menucolors") == 0)
+		{
+			// Border1, Border2, Background, Stripe
+			for(int i = 0;i < 4;++i)
+			{
+				if(i != 0)
+					sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.MenuColors[i] = V_GetColorFromString(NULL, sc->str);
+			}
+		}
+		else if(key.CompareNoCase("titlemusic") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.TitleMusic = sc->str;
 		}
 		else
 		{
@@ -236,6 +300,10 @@ static void ParseMapInfoLump(int lump)
 		else if(sc->str.CompareNoCase("adddefaultmap") == 0)
 		{
 			ParseMap(sc, defaultMap, false);
+		}
+		else if(sc->str.CompareNoCase("gameinfo") == 0)
+		{
+			ParseGameInfo(sc);
 		}
 		else if(sc->str.CompareNoCase("episode") == 0)
 		{

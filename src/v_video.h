@@ -5,4 +5,8 @@
 extern BYTE RGB32k[32][32][32];
 void GenerateLookupTables();
 
+// Returns the closest color to the one desired. String
+// should be of the form "rr gg bb".
+int V_GetColorFromString (const DWORD *palette, const char *colorstring);
+
 #endif /* __V_VIDEO_H__ */

@@ -369,7 +369,7 @@ void CalcProjection (int32_t focal)
 void SignonScreen (void)                        // VGA version
 {
 	VL_SetVGAPlaneMode ();
-	CA_CacheScreen("WLFSGNON");
+	CA_CacheScreen(gameinfo.SignonLump);
 }
 
 //===========================================================================
@@ -453,11 +453,23 @@ static void InitGame()
 		exit(1);
 	}
 
+	printf("VL_ReadPalette: Setting up the Palette...\n");
+	VL_ReadPalette();
+	InitPalette("WOLFPAL");
+	R_InitColormaps();
+	atterm(R_DeinitColormaps);
+
 	//
 	// Init texture manager
 	//
 
 	TexMan.Init();
+
+	//
+	// Mapinfo
+	//
+
+	G_ParseMapInfo();
 
 	SignonScreen ();
 
@@ -513,12 +525,6 @@ static void InitGame()
 
 	P_InitKeyMessages();
 	atterm(P_DeinitKeyMessages);
-
-//
-// Mapinfo
-//
-
-	G_ParseMapInfo();
 
 //
 // draw intro screen stuff
@@ -822,7 +828,7 @@ static void DemoLoop()
 		#endif
 	#endif
 
-	StartCPMusic(INTROSONG);
+	StartCPMusic(gameinfo.TitleMusic);
 
 #ifndef JAPAN
 	if (!param_nowait)
@@ -908,7 +914,7 @@ static void DemoLoop()
 			if(screenHeight % 200 != 0)
 				VL_ClearScreen(0);
 			if(demoPlayed)
-				StartCPMusic(INTROSONG);
+				StartCPMusic(gameinfo.TitleMusic);
 		}
 
 		VW_FadeOut ();
@@ -924,7 +930,7 @@ static void DemoLoop()
 			if(!param_nowait)
 			{
 				VW_FadeOut();
-				StartCPMusic(INTROSONG);
+				StartCPMusic(gameinfo.TitleMusic);
 			}
 		}
 	}
@@ -1349,11 +1355,6 @@ int main (int argc, char *argv[])
 
 		InitThinkerList();
 
-		printf("VL_ReadPalette: Setting up the Palette...\n");
-		VL_ReadPalette();
-		InitPalette("WOLFPAL");
-		R_InitColormaps();
-		atterm(R_DeinitColormaps);
 		printf("InitGame: Setting up the game...\n");
 		InitGame();
 		printf("CreateMenus: Preparing the menu system...\n");
