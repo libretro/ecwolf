@@ -404,52 +404,6 @@ typedef enum
 /*
 =============================================================================
 
-							DREAMCAST DEFINITIONS
-
-=============================================================================
-*/
-
-#ifdef _arch_dreamcast
-
-// defined in dc_main.cpp
-void DC_Main(void);
-void DC_CheckParameters(void);
-int DC_MousePresent(void);
-
-// defined in dc_vmu.cpp
-void StatusDrawLCD(int lcd_index);
-int DC_SaveToVMU(char *src, int tp);
-int DC_LoadFromVMU(char *dst);
-
-#else
-
-// ignore calls to this function
-#define StatusDrawLCD(x)
-
-#endif
-
-
-/*
-=============================================================================
-
-							GP2X DEFINITIONS
-
-=============================================================================
-*/
-
-#ifdef GP2X
-
-void GP2X_Init();
-void GP2X_Shutdown();
-void GP2X_ButtonDown(int button);
-void GP2X_ButtonUp(int button);
-
-#endif
-
-
-/*
-=============================================================================
-
 							MISC DEFINITIONS
 
 =============================================================================

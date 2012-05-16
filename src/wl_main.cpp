@@ -125,19 +125,9 @@ int     param_difficulty = 1;           // default is "normal"
 const char* param_tedlevel = NULL;            // default is not to start a level
 int     param_joystickindex = 0;
 
-#if defined(_arch_dreamcast)
-int     param_joystickhat = 0;
-int     param_samplerate = 11025;       // higher samplerates result in "out of memory"
-int     param_audiobuffer = 4096 / (44100 / param_samplerate);
-#elif defined(GP2X)
-int     param_joystickhat = -1;
-int     param_samplerate = 11025;       // higher samplerates result in "out of memory"
-int     param_audiobuffer = 128;
-#else
 int     param_joystickhat = -1;
 int     param_samplerate = 44100;
 int     param_audiobuffer = 2048 / (44100 / param_samplerate);
-#endif
 
 int     param_mission = 1;
 boolean param_goodtimes = false;
@@ -250,9 +240,6 @@ void ShutdownId (void)
 	SD_Shutdown ();
 	IN_Shutdown ();
 	VW_Shutdown ();
-#if defined(GP2X)
-	GP2X_Shutdown();
-#endif
 }
 
 
@@ -1238,11 +1225,7 @@ FString CheckParameters(int argc, char *argv[])
 			" --joystickhat <index>  Enables movement with the given coolie hat\n"
 			" --samplerate <rate>    Sets the sound sample rate (given in Hz, default: %i)\n"
 			" --audiobuffer <size>   Sets the size of the audio buffer (-> sound latency)\n"
-#ifdef _arch_dreamcast
-			"                        (given in bytes, default: 4096 / (44100 / samplerate))\n"
-#else
 			"                        (given in bytes, default: 2048 / (44100 / samplerate))\n"
-#endif
 			" --ignorenumchunks      Ignores the number of chunks in VGAHEAD.*\n"
 			"                        (may be useful for some broken mods)\n"
 #if defined(SPEAR) && !defined(SPEARDEMO)
@@ -1260,11 +1243,7 @@ FString CheckParameters(int argc, char *argv[])
 	}
 
 	if(sampleRateGiven && !audioBufferGiven)
-#ifdef _arch_dreamcast
-		param_audiobuffer = 4096 / (44100 / param_samplerate);
-#else
 		param_audiobuffer = 2048 / (44100 / param_samplerate);
-#endif
 
 	return extension;
 }
@@ -1356,14 +1335,7 @@ int main (int argc, char *argv[])
 		WL_AddFile("ecwolf.pk3");
 		FString extension;
 
-#if defined(_arch_dreamcast)
-		DC_Main();
-		DC_CheckParameters();
-#elif defined(GP2X)
-		GP2X_Init();
-#else
 		extension = CheckParameters(argc, argv);
-#endif
 
 		WL_AddFile(FString("audiot.") + extension);
 		WL_AddFile(FString("gamemaps.") + extension);

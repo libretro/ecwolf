@@ -233,15 +233,11 @@ void ControlMovement (AActor *ob)
 void StatusDrawPic (unsigned x, unsigned y, const char* pic)
 {
 	VWB_DrawGraphic(TexMan(pic), x*8, 200-(STATUSLINES-y));
-//    LatchDrawPicScaledCoord ((screenWidth-scaleFactor*320)/16 + scaleFactor*x,
-//        screenHeight-scaleFactor*(STATUSLINES-y),picnum);
 }
 
 void StatusDrawFace(const char* pic)
 {
 	VWB_DrawGraphic(TexMan(pic), 136, 164);
-//	StatusDrawPic(17, 4, TexMan(pic));
-	//StatusDrawLCD(picnum);
 }
 
 

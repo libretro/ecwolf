@@ -137,8 +137,6 @@ const char* endStrings[9] = {
 };
 
 	if(Confirm(endStrings[US_RndT() & 0x7 + (US_RndT() & 1)]))
-
-#endif
 	{
 		VW_UpdateScreen();
 		SD_MusicOff();
@@ -253,9 +251,6 @@ MENU_LISTENER(PerformSaveGame)
 		SaveTheGame(fileh, 0, 0);
 	}
 	fclose(fileh);
-#ifdef _arch_dreamcast
-	DC_SaveToVMU(file.filename, 2);
-#endif
 	if(!quickSaveLoad)
 		Menu::closeMenus(true);
 
@@ -263,9 +258,6 @@ MENU_LISTENER(PerformSaveGame)
 }
 MENU_LISTENER(LoadSaveGame)
 {
-#ifdef _arch_dreamcast
-	DC_LoadFromVMU(SaveFile::files[which].filename);
-#endif
 	FILE *file = fopen(SaveFile::files[which].filename, "rb");
 	fseek(file, 32, SEEK_SET);
 	if(!quickSaveLoad)
@@ -1034,44 +1026,6 @@ void SetupSaveGames()
 {
 	char name[13];
 
-#ifdef _arch_dreamcast
-	file_t dir;
-	dirent_t *dirent;
-
-	dir = fs_open("/vmu/a1", O_RDONLY | O_DIR);
-
-	strcpy(name, SaveName);
-	while((dirent = fs_readdir(dir)) && x < 10)
-	{
-		int filenameLen = strlen(dirent->name);
-		if(filenameLen < 12)
-			continue;
-		char savegam[8];
-		char extent[4];
-		memcpy(savegam, dirent->name, 7);
-		memcpy(extent, dirent->name+(filenameLen-3), 3);
-		savegam[7] = 0;
-		extent[3] = 0;
-		// match pattern savegam%u.%s
-		if(strcasecmp("savegam", savegam) == 0 && dirent->name[filenameLen-4] == '.' && strcasecmp("ecs", extent) == 0)
-		{
-			if(DC_LoadFromVMU(dirent->name) != -1)
-			{
-				const int handle = open(name, O_RDONLY);
-				if(handle >= 0)
-				{
-					SaveFile sFile;
-					read(handle, sFile.name, 32);
-					close(handle);
-					strcpy(sFile.filename, dirent->name);
-					SaveFile::files.push_back(sFile);
-				}
-				fs_unlink(name);
-			}
-		}
-	}
-	fs_close(dir);
-#else
 	File saveDirectory("./");
 	const TArray<FString> &files = saveDirectory.getFileList();
 	for(unsigned int i = 0;i < files.Size();i++)
@@ -1093,7 +1047,6 @@ void SetupSaveGames()
 			SaveFile::files.Push(sFile);
 		}
 	}
-#endif
 }
 
 ////////////////////////////////////////////////////////////////////

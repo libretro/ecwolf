@@ -102,10 +102,6 @@ void ReadConfig(void)
 	config->CreateSetting("R_DepthFog", false);
 	config->CreateSetting("Vid_FullScreen", false);
 
-#ifdef _arch_dreamcast
-    DC_LoadFromVMU("ecwolf.cfg");
-#endif
-
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
@@ -187,10 +183,6 @@ void ReadConfig(void)
 
 void WriteConfig(void)
 {
-#ifdef _arch_dreamcast
-    fs_unlink("ecwolf.cfg");
-#endif
-
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
@@ -244,8 +236,4 @@ void WriteConfig(void)
 		config->GetSetting(hsCompleted)->SetValue(Scores[i].completed);
 		config->GetSetting(hsEpisode)->SetValue(Scores[i].episode);
 	}
-
-#ifdef _arch_dreamcast
-    DC_SaveToVMU("ecwolf.cfg", 1);
-#endif
 }

@@ -22,19 +22,9 @@
 
 boolean fullscreen = true;
 boolean usedoublebuffering = true;
-#if defined(_arch_dreamcast)
-unsigned screenWidth = 320;
-unsigned screenHeight = 200;
-unsigned screenBits = 8;
-#elif defined(GP2X)
-unsigned screenWidth = 320;
-unsigned screenHeight = 240;
-unsigned screenBits = 8;
-#else
 unsigned screenWidth = 640;
 unsigned screenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
-#endif
 
 SDL_Surface *screen = NULL;
 unsigned screenPitch;
@@ -98,9 +88,7 @@ void	VL_Shutdown (void)
 
 void	VL_SetVGAPlaneMode (void)
 {
-#ifndef _arch_dreamcast
 	SDL_WM_SetCaption("ECWolf", NULL);
-#endif
 
 	if(screenBits == -1)
 	{
