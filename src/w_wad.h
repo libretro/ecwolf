@@ -73,6 +73,7 @@ typedef enum {
 	ns_patches,
 	ns_graphics,
 	ns_music,
+	ns_voxels,
 
 	ns_firstskin,
 } namespace_t;
