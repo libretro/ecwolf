@@ -568,8 +568,7 @@ void CheckKeys (void)
 	if(Paused)
 	{
 		int lastoffs = StopMusic();
-//        LatchDrawPic (20 - 4, 80 - 2 * 8, PAUSEDPIC);
-		VWB_DrawPic((20 - 4)*8, 80 - 2*8, "PAUSED");
+		VWB_DrawGraphic(TexMan("PAUSED"), (20 - 4)*8, 80 - 2*8);
 		VH_UpdateScreen();
 		IN_Ack ();
 		Paused = false;
@@ -583,10 +582,7 @@ void CheckKeys (void)
 //
 // F1-F7/ESC to enter control panel
 //
-	if (
-#ifndef DEBCHECK
-		scan == sc_F10 ||
-#endif
+	if (scan == sc_F10 ||
 		scan == sc_F9 || scan == sc_F7 || scan == sc_F8)     // pop up quit dialog
 	{
 		short oldmapon = gamestate.mapon;
