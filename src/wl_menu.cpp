@@ -112,10 +112,6 @@ MENU_LISTENER(ViewScoresOrEndGame)
 }
 MENU_LISTENER(QuitGame)
 {
-#ifdef JAPAN
-	if(GetYorN(7, 11, C_QUITMSGPIC))
-#else
-
 const char* endStrings[9] = {
 #ifndef SPEAR
 	language["ENDSTR10"],
@@ -746,11 +742,7 @@ CP_CheckQuick (ScanCode scancode)
 		//
 		case sc_F7:
 			WindowH = 160;
-#ifdef JAPAN
-			if (GetYorN (7, 8, C_JAPQUITPIC))
-#else
 			if (Confirm (language["ENDGAMESTR"]))
-#endif
 			{
 				playstate = ex_died;
 				killerobj = NULL;
@@ -871,11 +863,7 @@ int
 CP_EndGame (int)
 {
 	int res;
-#ifdef JAPAN
-	res = GetYorN (7, 8, C_JAPQUITPIC);
-#else
 	res = Confirm (language["ENDGAMESTR"]);
-#endif
 	mainMenu.draw();
 	if(!res) return 0;
 
@@ -1245,8 +1233,7 @@ ReadAnyControl (ControlInfo * ci)
 // DRAW DIALOG AND CONFIRM YES OR NO TO QUESTION
 //
 ////////////////////////////////////////////////////////////////////
-int
-Confirm (const char *string)
+int Confirm (const char *string)
 {
 	int xit = 0, x, y, tick = 0, lastBlinkTime;
 	const char* whichsnd[2] = { "menu/escape", "menu/activate" };
@@ -1272,8 +1259,15 @@ Confirm (const char *string)
 			switch (tick)
 			{
 				case 0:
-					VWB_Bar (x, y, 8, 13, TEXTCOLOR);
+				{
+					double dx = x;
+					double dy = y;
+					double dw = 8;
+					double dh = 13;
+					VirtualToRealCoords(dx, dy, dw, dh, 320, 200, false, true);
+					VWB_Clear(TEXTCOLOR, dx, dy, dx+dw, dy+dh);
 					break;
+				}
 				case 1:
 					PrintX = x;
 					PrintY = y;
@@ -1285,27 +1279,14 @@ Confirm (const char *string)
 		}
 		else SDL_Delay(5);
 
-#ifdef SPANISH
 	}
-	while (!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-#else
-	}
-	while (!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape] && !ci.button0 && !ci.button1);
-#endif
+	while (!Keyboard[sc_Y] && !Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape] && !ci.button0 && !ci.button1);
 
-#ifdef SPANISH
-	if (Keyboard[sc_S] || ci.button0)
+	if (Keyboard[sc_S] || Keyboard[sc_Y] || ci.button0)
 	{
 		xit = 1;
 		ShootSnd ();
 	}
-#else
-	if (Keyboard[sc_Y] || ci.button0)
-	{
-		xit = 1;
-		ShootSnd ();
-	}
-#endif
 
 	IN_ClearKeysDown ();
 	WaitKeyUp ();
@@ -1315,75 +1296,12 @@ Confirm (const char *string)
 	return xit;
 }
 
-#ifdef JAPAN
-////////////////////////////////////////////////////////////////////
-//
-// DRAW MESSAGE & GET Y OR N
-//
-////////////////////////////////////////////////////////////////////
-int
-GetYorN (int x, int y, int pic)
-{
-	int xit = 0;
-	const char* whichsnd[2] = { "menu/escape", "menu/activate" };
-
-
-	CA_CacheGrChunk (pic);
-	VWB_DrawPic (x * 8, y * 8, pic);
-	UNCACHEGRCHUNK (pic);
-	VW_UpdateScreen ();
-	IN_ClearKeysDown ();
-
-	do
-	{
-		IN_WaitAndProcessEvents();
-		if (Keyboard[sc_Tab] && Keyboard[sc_P])
-			PicturePause ();
-
-#ifdef SPANISH
-	}
-	while (!Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-#else
-	}
-	while (!Keyboard[sc_Y] && !Keyboard[sc_N] && !Keyboard[sc_Escape]);
-#endif
-
-#ifdef SPANISH
-	if (Keyboard[sc_S])
-	{
-		xit = 1;
-		ShootSnd ();
-	}
-
-	while (Keyboard[sc_S] || Keyboard[sc_N] || Keyboard[sc_Escape])
-		IN_WaitAndProcessEvents();
-
-#else
-
-	if (Keyboard[sc_Y])
-	{
-		xit = 1;
-		ShootSnd ();
-	}
-
-	while (Keyboard[sc_Y] || Keyboard[sc_N] || Keyboard[sc_Escape])
-		IN_WaitAndProcessEvents();
-#endif
-
-	IN_ClearKeysDown ();
-	SD_PlaySound (whichsnd[xit]);
-	return xit;
-}
-#endif
-
-
 ////////////////////////////////////////////////////////////////////
 //
 // PRINT A MESSAGE IN A WINDOW
 //
 ////////////////////////////////////////////////////////////////////
-void
-Message (const char *string)
+void Message (const char *string)
 {
 	int h = 0, w = 0, mw = 0, i, len = (int) strlen(string);
 	fontstruct *font;
