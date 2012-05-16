@@ -1003,10 +1003,10 @@ void DrawOutline (int x, int y, int w, int h, int color1, int color2)
 {
 	MenuToRealCoords(x, y, w, h, MENU_CENTER);
 
-	VWB_Clear(color2, x-1, y, x+w+1, y+1);
-	VWB_Clear(color2, x-1, y, x, y+h);
-	VWB_Clear(color1, x-1, y+h, x+w+1, y+h+1);
-	VWB_Clear(color1, x+w, y, x+w+1, y+h);
+	VWB_Clear(color2, x-scaleFactor, y, x+w+scaleFactor, y+scaleFactor);
+	VWB_Clear(color2, x-scaleFactor, y, x, y+h);
+	VWB_Clear(color1, x-scaleFactor, y+h, x+w+scaleFactor, y+h+scaleFactor);
+	VWB_Clear(color1, x+w, y, x+w+scaleFactor, y+h);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1230,7 +1230,7 @@ int Confirm (const char *string)
 					double dy = y;
 					double dw = 8;
 					double dh = 13;
-					VirtualToRealCoords(dx, dy, dw, dh, 320, 200, false, true);
+					MenuToRealCoords(dx, dy, dw, dh, MENU_CENTER);
 					VWB_Clear(TEXTCOLOR, dx, dy, dx+dw, dy+dh);
 					break;
 				}
