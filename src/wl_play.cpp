@@ -499,33 +499,6 @@ void CheckKeys (void)
 	else if(!Keyboard[sc_Equals] && !Keyboard[sc_Minus])
 		changeSize = true;
 
-#ifdef SPEAR
-	//
-	// SECRET CHEAT CODE: TAB-G-F10
-	//
-	if (Keyboard[sc_Tab] && Keyboard[sc_G] && Keyboard[sc_F10])
-	{
-		WindowH = 160;
-		if (godmode)
-		{
-			Message ("God mode OFF");
-			SD_PlaySound ("misc/no_bonus");
-		}
-		else
-		{
-			Message ("God mode ON");
-			SD_PlaySound ("misc/end_bonus2");
-		}
-
-		IN_Ack ();
-		godmode ^= 1;
-		DrawPlayBorderSides ();
-		IN_ClearKeysDown ();
-		return;
-	}
-#endif
-
-
 	//
 	// SECRET CHEAT CODE: 'MLI'
 	//
