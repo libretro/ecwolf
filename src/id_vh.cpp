@@ -24,7 +24,8 @@ void VWB_DrawPropString(const char* string)
 	int i;
 	unsigned sx, sy;
 	int tmp1, tmp2;
-	MenuToRealCoords(px, py, tmp1, tmp2, MENU_CENTER);
+	int cx = px, cy = py;
+	MenuToRealCoords(cx, cy, tmp1, tmp2, MENU_CENTER);
 
 	const char* fonts[2] = { "FONT1", "FONT2" };
 	int lumpNum = Wads.CheckNumForName(fonts[fontnumber], ns_graphics);
@@ -39,7 +40,7 @@ void VWB_DrawPropString(const char* string)
 	lump.Read(fontData, Wads.LumpLength(lumpNum));
 	font = (fontstruct *) fontData;
 	height = font->height;
-	dest = vbuf + (py * curPitch + px);
+	dest = vbuf + (cy * curPitch + cx);
 
 	while ((ch = (byte)*string++)!=0)
 	{
@@ -58,7 +59,7 @@ void VWB_DrawPropString(const char* string)
 			}
 
 			source++;
-			px++;
+			cx++;
 			dest+=scaleFactor;
 		}
 	}
@@ -573,6 +574,7 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 	VL_UnlockSurface(screenBuffer);
 }
 
+#include "templates.h"
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
@@ -599,14 +601,14 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
 		dest = vbuf+x1+i;
-		if(x1+i >= screenWidth)
+		if((signed)(x1+i) >= (signed)screenWidth)
 			break;
 		if(y1 > 0)
 			dest += bufferPitch*y1;
 
 		for(j = 0, y = 0;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
 		{
-			if(y1+j >= screenHeight)
+			if((signed)(y1+j) >= (signed)(screenHeight))
 				break;
 			if(src[y>>FRACBITS] != 0)
 				*dest = NormalLight.Maps[src[y>>FRACBITS]];

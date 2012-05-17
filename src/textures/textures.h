@@ -413,6 +413,7 @@ public:
 	FTextureID GetDoor(unsigned int tile, bool vertical, bool track=false);
 	FTextureID GetFlat(unsigned int tile, bool ceiling=false);
 	FTextureID GetTile(unsigned int tile, bool vertical);
+	FTextureID GetArtIndex(unsigned int index);
 private:
 
 	// texture counting
@@ -484,6 +485,7 @@ private:
 	TileMap mapTiles[64][2];
 	TileMap doorTiles[128][2]; // Door and track
 	TileMap flatTiles[256][2]; // floor/ceiling
+	TileMap	artIndex[256];
 };
 
 // A texture that doesn't really exist

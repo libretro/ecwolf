@@ -35,7 +35,6 @@ static int ParseHex(const char* hex)
 	}
 	while(i >= 0 && *hex != '\0');
 
-	Printf("%x\n", num);
 	return num;
 }
 

@@ -62,6 +62,7 @@ public:
 protected:
 	BYTE *Pixels;
 	Span **Spans;
+	int TopCrop;
 
 
 	virtual void MakeTexture ();
@@ -147,6 +148,32 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 		xScale = .4*FRACUNIT;
 		yScale = .4*FRACUNIT;
 	}
+
+	// Crop the height!
+	int minStart = 64;
+	int maxEnd = 0;
+	FMemLump lump = Wads.ReadLump (lumpnum);
+	const BYTE* data = (const BYTE*)lump.GetMem();
+	for(int x = 0;x < Width;x++)
+	{
+		const BYTE* column = data+ReadLittleShort(&data[4+x*2]);
+		int start, end;
+		while((end = ReadLittleShort(column)) != 0)
+		{
+			end >>= 1;
+			start = ReadLittleShort(column+4)>>1;
+			if(start < minStart)
+				minStart = start;
+			if(end > maxEnd)
+				maxEnd = end;
+			column += 6;
+		}
+	}
+
+	TopCrop = minStart;
+	Height = maxEnd-minStart;
+	TopOffset -= minStart;
+
 	CalcBitSize ();
 }
 
@@ -252,9 +279,9 @@ void FWolfShapeTexture::MakeTexture ()
 		int start, end;
 		while((end = ReadLittleShort(column)) != 0)
 		{
-			end >>= 1;
-			const BYTE* in = data+int16_t(ReadLittleShort(column+2));
-			start = ReadLittleShort(column+4)>>1;
+			end = (end>>1) - TopCrop;
+			const BYTE* in = data+int16_t(ReadLittleShort(column+2))+TopCrop;
+			start = (ReadLittleShort(column+4)>>1) - TopCrop;
 			column += 6;
 			for(int y = start;y < end;y++)
 				out[y] = GPalette.Remap[in[y]];

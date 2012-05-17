@@ -428,7 +428,7 @@ LevelCompleted (void)
 	if (bordercol != VIEWCOLOR)
 		DrawStatusBorder (VIEWCOLOR);
 
-	StartCPMusic ("ENDLEVEL");
+	StartCPMusic (gameinfo.IntermissionMusic);
 
 //
 // do the intermission

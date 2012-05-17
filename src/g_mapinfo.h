@@ -45,8 +45,13 @@ public:
 	int		SignonColors[4];
 	int		MenuFadeColor;
 	int		MenuColors[4];
+	bool	DrawReadThis;
 
 	FString	TitleMusic;
+	FString	MenuMusic;
+	FString	ScoresMusic;
+	FString	FinaleMusic;
+	FString	IntermissionMusic;
 } gameinfo;
 
 class LevelInfo

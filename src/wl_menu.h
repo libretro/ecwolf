@@ -23,9 +23,6 @@ void MenuFadeOut();
 #define HIGHLIGHT       0x13
 #define MenuFadeIn()    VL_FadeIn(0,255,gamepal,10)
 
-
-#define MENUSONG        "WONDERIN"
-
 #define SENSITIVE       60
 #define CENTERX         ((int) screenWidth / 2)
 #define CENTERY         ((int) screenHeight / 2)
@@ -103,7 +100,6 @@ void Message(const char *string);
 void CheckPause(void);
 void ShootSnd(void);
 void CheckSecretMissions(void);
-void BossKey(void);
 
 void DrawStripes(int y);
 

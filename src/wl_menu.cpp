@@ -55,6 +55,7 @@ extern int	lastgamemusicoffset;
 EpisodeInfo	*episode = 0;
 bool		quickSaveLoad = false;
 int BORDCOLOR, BORD2COLOR, BKGDCOLOR, STRIPE;
+static MenuItem	*readThis;
 
 MENU_LISTENER(EnterControlBase);
 MENU_LISTENER(EnterLoadMenu);
@@ -92,12 +93,8 @@ MENU_LISTENER(ViewScoresOrEndGame)
 		MenuFadeOut();
 	
 		fontnumber = 0;
-	
-#ifdef SPEAR
-		StartCPMusic(XAWARD_MUS);
-#else
-		StartCPMusic("ROSTER");
-#endif
+
+		StartCPMusic(gameinfo.ScoresMusic);
 	
 		DrawHighScores();
 		VW_UpdateScreen();
@@ -106,7 +103,7 @@ MENU_LISTENER(ViewScoresOrEndGame)
 	
 		IN_Ack();
 	
-		StartCPMusic(MENUSONG);
+		StartCPMusic(gameinfo.MenuMusic);
 		MenuFadeOut();
 		mainMenu.draw();
 		MenuFadeIn ();
@@ -175,7 +172,7 @@ MENU_LISTENER(SetMusic)
 	{
 		SD_SetMusicMode((which == 0 ? smm_Off : smm_AdLib));
 		if(which != 0)
-			StartCPMusic(MENUSONG);
+			StartCPMusic(gameinfo.MenuMusic);
 	}
 	return true;
 }
@@ -341,20 +338,16 @@ MENU_LISTENER(StartNewGame)
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR
 	//
-#ifndef SPEAR
-#ifndef GOODTIMES
-	mainMenu[mainMenu.countItems()-3]->setHighlighted(false);
-#endif
-#endif
+	readThis->setHighlighted(false);
 
 	return true;
 }
 MENU_LISTENER(ReadThis)
 {
 	MenuFadeOut();
-	StartCPMusic("CORNER");
+	StartCPMusic(gameinfo.FinaleMusic);
 	HelpScreens();
-	StartCPMusic(MENUSONG);
+	StartCPMusic(gameinfo.MenuMusic);
 	return true;
 }
 MENU_LISTENER(ToggleFullscreen)
@@ -388,14 +381,10 @@ void CreateMenus()
 	MenuItem *sg = new MenuSwitcherMenuItem(language["STR_SG"], saveGame);
 	sg->setEnabled(false);
 	mainMenu.addItem(sg);
-	MenuItem *rt = new MenuItem(language["STR_RT"], ReadThis);
-#if defined(SPEAR) || defined(GOODTIMES)
-	rt->setVisible(false);
-#else
-	rt->setVisible(true);
-#endif
-	rt->setHighlighted(true);
-	mainMenu.addItem(rt);
+	readThis = new MenuItem(language["STR_RT"], ReadThis);
+	readThis->setVisible(gameinfo.DrawReadThis);
+	readThis->setHighlighted(true);
+	mainMenu.addItem(readThis);
 	mainMenu.addItem(new MenuItem(language["STR_VS"], ViewScoresOrEndGame));
 	mainMenu.addItem(new MenuItem(language["STR_BD"], PlayDemosOrReturnToGame));
 	mainMenu.addItem(new MenuItem(language["STR_QT"], QuitGame));
@@ -528,10 +517,10 @@ US_ControlPanel (ScanCode scancode)
 	{
 		if (CP_CheckQuick (scancode))
 			return;
-		lastgamemusicoffset = StartCPMusic (MENUSONG);
+		lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
 	}
 	else
-		StartCPMusic (MENUSONG);
+		StartCPMusic (gameinfo.MenuMusic);
 	SetupControlPanel ();
 
 	//
@@ -541,15 +530,7 @@ US_ControlPanel (ScanCode scancode)
 	switch (scancode)
 	{
 		case sc_F1:
-#ifdef SPEAR
-			BossKey ();
-#else
-#ifdef GOODTIMES
-			BossKey ();
-#else
 			HelpScreens ();
-#endif
-#endif
 			goto finishup;
 
 		case sc_F2:
@@ -632,7 +613,7 @@ US_ControlPanel (ScanCode scancode)
 				VW_FadeOut ();
 	
 				mainMenu.draw();
-				StartCPMusic (MENUSONG);
+				StartCPMusic (gameinfo.MenuMusic);
 				MenuFadeIn ();
 			}
 		}*/
@@ -665,77 +646,12 @@ US_ControlPanel (ScanCode scancode)
 	// RETURN/START GAME EXECUTION
 }
 
-#ifdef GOODTIMES
-////////////////////////////////////////////////////////////////////
-//
-// BOSS KEY
-//
-////////////////////////////////////////////////////////////////////
-void
-BossKey (void)
-{
-#ifdef NOTYET
-	byte palette1[256][3];
-	SD_MusicOff ();
-/*       _AX = 3;
-		geninterrupt(0x10); */
-	_asm
-	{
-	mov eax, 3 int 0x10}
-	puts ("C>");
-	SetTextCursor (2, 0);
-//      while (!Keyboard[sc_Escape])
-	IN_Ack ();
-	IN_ClearKeysDown ();
-
-	SD_MusicOn ();
-	VL_SetVGAPlaneMode ();
-	for (int i = 0; i < 768; i++)
-		palette1[0][i] = 0;
-
-	VL_SetPalette (&palette1[0][0]);
-	LoadLatchMem ();
-#endif
-}
-#else
-#ifdef SPEAR
-void
-BossKey (void)
-{
-#ifdef NOTYET
-	byte palette1[256][3];
-	SD_MusicOff ();
-/*       _AX = 3;
-		geninterrupt(0x10); */
-	_asm
-	{
-	mov eax, 3 int 0x10}
-	puts ("C>");
-	SetTextCursor (2, 0);
-//      while (!Keyboard[sc_Escape])
-	IN_Ack ();
-	IN_ClearKeysDown ();
-
-	SD_MusicOn ();
-	VL_SetVGAPlaneMode ();
-	for (int i = 0; i < 768; i++)
-		palette1[0][i] = 0;
-
-	VL_SetPalette (&palette1[0][0]);
-	LoadLatchMem ();
-#endif
-}
-#endif
-#endif
-
-
 ////////////////////////////////////////////////////////////////////
 //
 // CHECK QUICK-KEYS & QUIT (WHILE IN A GAME)
 //
 ////////////////////////////////////////////////////////////////////
-int
-CP_CheckQuick (ScanCode scancode)
+int CP_CheckQuick (ScanCode scancode)
 {
 	switch (scancode)
 	{
@@ -771,7 +687,7 @@ CP_CheckQuick (ScanCode scancode)
 				if(screenHeight % 200 != 0)
 					VL_ClearScreen(0);
 
-				lastgamemusicoffset = StartCPMusic (MENUSONG);
+				lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
 				Menu::closeMenus(false);
 				saveGame.show();
 
@@ -814,7 +730,7 @@ CP_CheckQuick (ScanCode scancode)
 				if(screenHeight % 200 != 0)
 					VL_ClearScreen(0);
 
-				lastgamemusicoffset = StartCPMusic (MENUSONG);
+				lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
 				Menu::closeMenus(false);
 				loadGame.show();
 
@@ -861,8 +777,7 @@ CP_CheckQuick (ScanCode scancode)
 // END THE CURRENT GAME
 //
 ////////////////////////////////////////////////////////////////////
-int
-CP_EndGame (int)
+int CP_EndGame (int)
 {
 	int res;
 	res = Confirm (language["ENDGAMESTR"]);
@@ -884,7 +799,7 @@ DrawLSAction (int which)
 {
 	DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, TEXTCOLOR);
 	DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
-	VWB_DrawPic (LSA_X + 8, LSA_Y + 5, "M_LDING1");
+	VWB_DrawGraphic (TexMan("M_LDING1"), LSA_X + 8, LSA_Y + 5, MENU_CENTER);
 
 	fontnumber = 1;
 	SETFONTCOLOR (0, TEXTCOLOR);
@@ -975,8 +890,7 @@ void IntroScreen (void)
 // Clear Menu screens to dark red
 //
 ////////////////////////////////////////////////////////////////////
-void
-ClearMScreen (void)
+void ClearMScreen (void)
 {
 	if(Wads.CheckNumForName("BACKDROP", ns_graphics) == -1)
 		VWB_Clear (BORDCOLOR, 0, 0, screenWidth, screenHeight);
@@ -1014,8 +928,7 @@ void DrawOutline (int x, int y, int w, int h, int color1, int color2)
 // Setup Control Panel stuff - graphics, etc.
 //
 ////////////////////////////////////////////////////////////////////
-void
-SetupControlPanel (void)
+void SetupControlPanel (void)
 {
 	SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
 	fontnumber = 1;
@@ -1067,8 +980,7 @@ void SetupSaveGames()
 // Clean up all the Control Panel stuff
 //
 ////////////////////////////////////////////////////////////////////
-void
-CleanupControlPanel (void)
+void CleanupControlPanel (void)
 {
 	fontnumber = 0;
 }
@@ -1078,8 +990,7 @@ CleanupControlPanel (void)
 // DELAY FOR AN AMOUNT OF TICS OR UNTIL CONTROLS ARE INACTIVE
 //
 ////////////////////////////////////////////////////////////////////
-void
-TicDelay (int count)
+void TicDelay (int count)
 {
 	ControlInfo ci;
 
@@ -1097,8 +1008,7 @@ TicDelay (int count)
 // WAIT FOR CTRLKEY-UP OR BUTTON-UP
 //
 ////////////////////////////////////////////////////////////////////
-void
-WaitKeyUp (void)
+void WaitKeyUp (void)
 {
 	ControlInfo ci;
 	while (ReadAnyControl (&ci), ci.button0 |
@@ -1115,8 +1025,7 @@ WaitKeyUp (void)
 // READ KEYBOARD, JOYSTICK AND MOUSE FOR INPUT
 //
 ////////////////////////////////////////////////////////////////////
-void
-ReadAnyControl (ControlInfo * ci)
+void ReadAnyControl (ControlInfo * ci)
 {
 	int mouseactive = 0;
 
@@ -1316,8 +1225,7 @@ void Message (const char *string)
 ////////////////////////////////////////////////////////////////////
 static int lastmusic;
 
-int
-StartCPMusic (const char* song)
+int StartCPMusic (const char* song)
 {
 	int lastoffs;
 
@@ -1333,8 +1241,7 @@ StartCPMusic (const char* song)
 // CHECK FOR PAUSE KEY (FOR MUSIC ONLY)
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-CheckPause (void)
+void CheckPause (void)
 {
 	if (Paused)
 	{

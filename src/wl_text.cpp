@@ -5,10 +5,11 @@
 #include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
-#include "lumpremap.h"
+#include "v_palette.h"
 #include "w_wad.h"
 #include "wl_game.h"
 #include "wl_text.h"
+#include "textures/textures.h"
 
 /*
 =============================================================================
@@ -31,8 +32,6 @@ TEXT FORMATTING COMMANDS
 
 =============================================================================
 */
-
-#ifndef SPEAR
 
 #define BACKCOLOR       0x11
 
@@ -73,7 +72,6 @@ static boolean layoutdone;
 
 //===========================================================================
 
-#ifndef JAPAN
 /*
 =====================
 =
@@ -184,7 +182,8 @@ void TimedPicCommand (void)
 	//
 	// draw pic
 	//
-	VWB_DrawPic (picx&~7,picy,LumpRemapper::ConvertVGAIndexToLump(picnum));
+	if(TexMan.GetArtIndex(picnum).isValid())
+		VWB_DrawGraphic (TexMan(TexMan.GetArtIndex(picnum)), picx&~7, picy, MENU_CENTER);
 }
 
 
@@ -204,13 +203,16 @@ void HandleCommand (void)
 	switch (toupper(*++text))
 	{
 		case 'B':
-			picy=ParseNumber();
-			picx=ParseNumber();
-			picwidth=ParseNumber();
-			picheight=ParseNumber();
-			VWB_Bar(picx,picy,picwidth,picheight,BACKCOLOR);
+		{
+			double bx = ParseNumber();
+			double by = ParseNumber();
+			double bw = ParseNumber();
+			double bh = ParseNumber();
+			MenuToRealCoords(bx, by, bw, bh, MENU_CENTER);
+			VWB_Clear(BACKCOLOR, bx, by, bx+bw, by+bh);
 			RipToEOL();
 			break;
+		}
 		case ';':               // comment
 			RipToEOL();
 			break;
@@ -257,29 +259,24 @@ void HandleCommand (void)
 		case 'G':               // ^Gyyy,xxx,ppp draws graphic
 		{
 			ParsePicCommand ();
-			VWB_DrawPic (picx&~7,picy,LumpRemapper::ConvertVGAIndexToLump(picnum));
-			int lumpNum = Wads.CheckNumForName(LumpRemapper::ConvertVGAIndexToLump(picnum));
-			if(lumpNum == -1)
-				picwidth = picheight = 0;
-			else
-			{
-				FWadLump lump = Wads.OpenLumpNum(lumpNum);
-				lump.Read(&picwidth, 2);
-				lump.Read(&picheight, 2);
-			}
+			if(!TexMan.GetArtIndex(picnum).isValid())
+				break;
+			FTexture *picture = TexMan(TexMan.GetArtIndex(picnum));
+			VWB_DrawGraphic (picture, picx&~7,picy, MENU_CENTER);
+
 			//
 			// adjust margins
 			//
-			picmid = picx + picwidth/2;
+			picmid = picx + picture->GetScaledWidth()/2;
 			if (picmid > SCREENMID)
 				margin = picx-PICMARGIN;                        // new right margin
 			else
-				margin = picx+picwidth+PICMARGIN;       // new left margin
+				margin = picx+picture->GetScaledWidth()+PICMARGIN;       // new left margin
 
 			top = (picy-TOPMARGIN)/FONTHEIGHT;
 			if (top<0)
 				top = 0;
-			bottom = (picy+picheight-TOPMARGIN)/FONTHEIGHT;
+			bottom = (picy+picture->GetScaledHeight()-TOPMARGIN)/FONTHEIGHT;
 			if (bottom>=TEXTROWS)
 				bottom = TEXTROWS-1;
 
@@ -428,7 +425,7 @@ void HandleWord (void)
 =====================
 */
 
-void PageLayout (boolean shownumber)
+void PageLayout (bool shownumber)
 {
 	int     i,oldfontcolor;
 	char    ch;
@@ -440,12 +437,13 @@ void PageLayout (boolean shownumber)
 	//
 	// clear the screen
 	//
-	VWB_Bar (0,0,320,200,BACKCOLOR);
-	VWB_DrawPic (0,0,"TOPWINDW");
-	VWB_DrawPic (0,8,"LFTWINDW");
-	VWB_DrawPic (312,8,"RGTWINDW");
-	VWB_DrawPic (8,176,"BOTWINDW");
-
+	int clearx = 0, cleary = 0, clearw = 320, clearh = 200;
+	MenuToRealCoords(clearx, cleary, clearw, clearh, MENU_CENTER);
+	VWB_Clear(BACKCOLOR, clearx, cleary, clearx+clearw, cleary+clearh);
+	VWB_DrawGraphic(TexMan("TOPWINDW"), 0, 0, MENU_CENTER);
+	VWB_DrawGraphic(TexMan("LFTWINDW"), 0, 8, MENU_CENTER);
+	VWB_DrawGraphic(TexMan("RGTWINDW"), 312, 8, MENU_CENTER);
+	VWB_DrawGraphic(TexMan("BOTWINDW"), 8, 176, MENU_CENTER);
 
 	for (i=0; i<TEXTROWS; i++)
 	{
@@ -497,13 +495,8 @@ void PageLayout (boolean shownumber)
 
 	if (shownumber)
 	{
-#ifdef SPANISH
-		sprintf(str, "Hoja %d de %d", pagenum, numpages);
-		px = 208;
-#else
 		sprintf(str, "pg %d of %d", pagenum, numpages);
 		px = 213;
-#endif
 		py = 183;
 		fontcolor = 0x4f;                          //12^BACKCOLOR;
 
@@ -543,14 +536,14 @@ void BackPage (void)
 /*
 =====================
 =
-= CacheLayoutGraphics
+= CountPages
 =
 = Scans an entire layout file (until a ^E) marking all graphics used, and
 = counting pages, then caches the graphics in
 =
 =====================
 */
-void CacheLayoutGraphics (void)
+void CountPages (void)
 {
 	char    *bombpoint, *textstart;
 	char    ch;
@@ -568,19 +561,16 @@ void CacheLayoutGraphics (void)
 				numpages++;
 			if (ch == 'E')          // end of file, so load graphics and return
 			{
-				//                              CA_CacheMarks ();
 				text = textstart;
 				return;
 			}
 			if (ch == 'G')          // draw graphic command, so mark graphics
 			{
 				ParsePicCommand ();
-//                CA_CacheGrChunk (picnum);
 			}
 			if (ch == 'T')          // timed draw graphic command, so mark graphics
 			{
 				ParseTimedCommand ();
-//                CA_CacheGrChunk (picnum);
 			}
 		}
 		else
@@ -590,8 +580,6 @@ void CacheLayoutGraphics (void)
 
 	Quit ("CacheLayoutGraphics: No ^E to terminate file!");
 }
-#endif
-
 
 /*
 =====================
@@ -601,59 +589,17 @@ void CacheLayoutGraphics (void)
 =====================
 */
 
-#ifdef JAPAN
-void ShowArticle (int which)
-#else
 void ShowArticle (char *article)
-#endif
 {
-#ifdef JAPAN
-	int snames[10] = {
-		H_HELP1PIC,
-		H_HELP2PIC,
-		H_HELP3PIC,
-		H_HELP4PIC,
-		H_HELP5PIC,
-		H_HELP6PIC,
-		H_HELP7PIC,
-		H_HELP8PIC,
-		H_HELP9PIC,
-		H_HELP10PIC};
-	int enames[14] = {
-		0,0,
-#ifndef JAPDEMO
-		C_ENDGAME1APIC,
-		C_ENDGAME1BPIC,
-		C_ENDGAME2APIC,
-		C_ENDGAME2BPIC,
-		C_ENDGAME3APIC,
-		C_ENDGAME3BPIC,
-		C_ENDGAME4APIC,
-		C_ENDGAME4BPIC,
-		C_ENDGAME5APIC,
-		C_ENDGAME5BPIC,
-		C_ENDGAME6APIC,
-		C_ENDGAME6BPIC
-#endif
-	};
-#endif
 	unsigned    oldfontnumber;
 	boolean     newpage,firstpage;
 	ControlInfo ci;
 
-#ifdef JAPAN
-	pagenum = 1;
-	if (!which)
-		numpages = 10;
-	else
-		numpages = 2;
-#else
 	text = article;
 	oldfontnumber = fontnumber;
 	fontnumber = 0;
-	VWB_Bar (0,0,320,200,BACKCOLOR);
-	CacheLayoutGraphics ();
-#endif
+	VWB_Clear(GPalette.BlackIndex, 0, 0, screenWidth, screenHeight);
+	CountPages();
 
 	newpage = true;
 	firstpage = true;
@@ -663,14 +609,7 @@ void ShowArticle (char *article)
 		if (newpage)
 		{
 			newpage = false;
-#ifdef JAPAN
-			if (!which)
-				CA_CacheScreen(snames[pagenum - 1]);
-			else
-				CA_CacheScreen(enames[which*2 + pagenum - 1]);
-#else
 			PageLayout (true);
-#endif
 			VW_UpdateScreen ();
 			if (firstpage)
 			{
@@ -715,12 +654,8 @@ void ShowArticle (char *article)
 			case dir_West:
 				if (pagenum>1)
 				{
-#ifndef JAPAN
 					BackPage ();
 					BackPage ();
-#else
-				pagenum--;
-#endif
 					newpage = true;
 				}
 				TicDelay(20);
@@ -731,9 +666,6 @@ void ShowArticle (char *article)
 				if (pagenum<numpages)
 				{
 					newpage = true;
-#ifdef JAPAN
-					pagenum++;
-#endif
 				}
 				TicDelay(20);
 				break;
@@ -754,38 +686,21 @@ void ShowArticle (char *article)
 =
 =================
 */
-#ifndef SPEAR
 void HelpScreens (void)
 {
 	int     artnum;
 	char    *text;
 
-
-	//      CA_UpLevel ();
-	//      MM_SortMem ();
-#ifdef JAPAN
-	ShowArticle (0);
-	VW_FadeOut();
-	CA_DownLevel ();
-	MM_SortMem ();
-#else
-
 	int lumpNum = Wads.CheckNumForName("HELPART", ns_graphics);
 	if(lumpNum != -1)
 	{
-		FWadLump lump = Wads.OpenLumpNum(lumpNum);
-		text = new char[Wads.LumpLength(lumpNum)];
-		lump.Read(text, Wads.LumpLength(lumpNum));
+		FMemLump lump = Wads.ReadLump(lumpNum);
 
-		ShowArticle(text);
-
-		delete[] text;
+		ShowArticle((char*)lump.GetMem());
 	}
 
 	VW_FadeOut();
-#endif
 }
-#endif
 
 //
 // END ARTICLES
@@ -797,17 +712,6 @@ void EndText (void)
 	memptr  layout;
 
 	ClearMemory ();
-
-#ifdef JAPAN
-	ShowArticle(gamestate.episode + 1);
-
-	VW_FadeOut();
-
-	SETFONTCOLOR(0,15);
-	IN_ClearKeysDown();
-	if (MousePresent && IN_IsInputGrabbed())
-		IN_CenterMouse();  // Clear accumulated mouse movement
-#else
 
 	char lumpName[9];
 	sprintf(lumpName, "ENDART%d", gamestate.episode+1);
@@ -828,6 +732,4 @@ void EndText (void)
 	IN_ClearKeysDown();
 	if (MousePresent && IN_IsInputGrabbed())
 		IN_CenterMouse();  // Clear accumulated mouse movement
-#endif
 }
-#endif

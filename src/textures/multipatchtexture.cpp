@@ -1012,7 +1012,7 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, bool silent, in
 			}
 			else
 			{
-				part.Texture = FTexture::CreateTexture("", lumpnum, TEX_WallPatch);
+				part.Texture = FTexture::CreateTexture("", lumpnum, usetype);
 				TexMan.AddTexture(part.Texture);
 			}
 		}
@@ -1033,14 +1033,16 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, bool silent, in
 	}
 	if (part.Texture == NULL)
 	{
-		if (!silent) Printf("Unknown patch '%s' in texture '%s'\n", sc->str.GetChars(), Name);
+		if (!silent) Printf("Unknown patch '%s' in texture '%s' %d == %d\n", sc->str.GetChars(), Name, FTexture::TEX_MiscPatch, usetype);
 	}
 	sc.MustGetToken(',');
+	bool negative = sc.CheckToken('-');
 	sc.MustGetToken(TK_IntConst);
-	part.OriginX = sc->number;
+	part.OriginX = negative ? -sc->number : sc->number;
 	sc.MustGetToken(',');
+	negative = sc.CheckToken('-');
 	sc.MustGetToken(TK_IntConst);
-	part.OriginY = sc->number;
+	part.OriginY = negative ? -sc->number : sc->number;
 
 	if (sc.CheckToken('{'))
 	{

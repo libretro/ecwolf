@@ -154,7 +154,12 @@ void ParseGameInfo(Scanner &sc)
 
 		sc.MustGetToken('=');
 
-		if(key.CompareNoCase("signon") == 0)
+		if(key.CompareNoCase("drawreadthis") == 0)
+		{
+			sc.MustGetToken(TK_BoolConst);
+			gameinfo.DrawReadThis = sc->boolean;
+		}
+		else if(key.CompareNoCase("signon") == 0)
 		{
 			sc.MustGetToken(TK_StringConst);
 			gameinfo.SignonLump = sc->str;
@@ -190,6 +195,26 @@ void ParseGameInfo(Scanner &sc)
 		{
 			sc.MustGetToken(TK_StringConst);
 			gameinfo.TitleMusic = sc->str;
+		}
+		else if(key.CompareNoCase("menumusic") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.MenuMusic = sc->str;
+		}
+		else if(key.CompareNoCase("scoresmusic") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.ScoresMusic = sc->str;
+		}
+		else if(key.CompareNoCase("finalemusic") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.FinaleMusic = sc->str;
+		}
+		else if(key.CompareNoCase("intermissionmusic") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.IntermissionMusic = sc->str;
 		}
 		else
 		{
