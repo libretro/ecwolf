@@ -453,17 +453,17 @@ static void InitGame()
 		exit(1);
 	}
 
-	printf("VL_ReadPalette: Setting up the Palette...\n");
-	VL_ReadPalette();
-	InitPalette("WOLFPAL");
-	R_InitColormaps();
-	atterm(R_DeinitColormaps);
-
 	//
 	// Init texture manager
 	//
 
 	TexMan.Init();
+	printf("VL_ReadPalette: Setting up the Palette...\n");
+	VL_ReadPalette();
+	InitPalette("WOLFPAL");
+	R_InitColormaps();
+	atterm(R_DeinitColormaps);
+	GenerateLookupTables();
 
 	//
 	// Mapinfo
@@ -479,7 +479,6 @@ static void InitGame()
 #endif
 	VW_UpdateScreen();
 
-	GenerateLookupTables();
 	VH_Startup ();
 	IN_Startup ();
 	SD_Startup ();
@@ -985,7 +984,7 @@ Aspect CheckRatio (int width, int height)//, int *trueratio)
 
 #define IFARG(str) if(!strcmp(arg, (str)))
 
-FString CheckParameters(int argc, char *argv[])
+FString CheckParameters(int argc, char *argv[], TArray<char*> &files)
 {
 	FString extension = "wl6";
 	bool hasError = false, showHelp = false;
@@ -1178,7 +1177,7 @@ FString CheckParameters(int argc, char *argv[])
 			else
 				extension = argv[i];
 		else
-			WL_AddFile(argv[i]);
+			files.Push(argv[i]);
 	}
 	if(hasError || showHelp)
 	{
@@ -1323,13 +1322,16 @@ int main (int argc, char *argv[])
 
 		WL_AddFile("ecwolf.pk3");
 		FString extension;
+		TArray<char*> files;
 
-		extension = CheckParameters(argc, argv);
+		extension = CheckParameters(argc, argv, files);
 
 		WL_AddFile(FString("audiot.") + extension);
 		WL_AddFile(FString("gamemaps.") + extension);
 		WL_AddFile(FString("vgagraph.") + extension);
 		WL_AddFile(FString("vswap.") + extension);
+		for(unsigned int i = 0;i < files.Size();++i)
+			WL_AddFile(files[i]);
 
 		printf("W_Init: Init WADfiles.\n");
 		Wads.InitMultipleFiles(wadfiles);

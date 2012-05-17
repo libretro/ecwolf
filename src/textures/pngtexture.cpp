@@ -78,6 +78,8 @@ protected:
 	BYTE *PaletteMap;
 	int PaletteSize;
 	DWORD StartOfIDAT;
+	DWORD StartOftRNS;
+	DWORD StartOfPLTE;
 
 	void MakeTexture ();
 
@@ -200,15 +202,8 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 						  BYTE depth, BYTE colortype, BYTE interlace)
 : FTexture(NULL, lumpnum), SourceFile(filename), Pixels(0), Spans(0),
   BitDepth(depth), ColorType(colortype), Interlace(interlace),
-  PaletteMap(0), PaletteSize(0), StartOfIDAT(0)
+  PaletteMap(0), PaletteSize(0), StartOfIDAT(0), StartOftRNS(0)
 {
-	union
-	{
-		DWORD palette[256];
-		BYTE pngpal[256][3];
-	} p;
-	BYTE trans[256];
-	bool havetRNS = false;
 	DWORD len, id;
 	int i;
 
@@ -220,8 +215,6 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 	Width = width;
 	Height = height;
 	CalcBitSize ();
-
-	memset(trans, 255, 256);
 
 	// Parse pre-IDAT chunks. I skip the CRCs. Is that bad?
 	lump.Seek(33, SEEK_SET);
@@ -263,21 +256,13 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 			break;
 
 		case MAKE_ID('P','L','T','E'):
-			PaletteSize = MIN<int> (len / 3, 256);
-			lump.Read (p.pngpal, PaletteSize * 3);
-			if (PaletteSize * 3 != (int)len)
-			{
-				lump.Seek (len - PaletteSize * 3, SEEK_CUR);
-			}
-			for (i = PaletteSize - 1; i >= 0; --i)
-			{
-				p.palette[i] = MAKERGB(p.pngpal[i][0], p.pngpal[i][1], p.pngpal[i][2]);
-			}
+			StartOfPLTE = lump.Tell() - 8;
+			lump.Seek (len, SEEK_CUR);
 			break;
 
 		case MAKE_ID('t','R','N','S'):
-			lump.Read (trans, len);
-			havetRNS = true;
+			StartOftRNS = lump.Tell() - 8;
+			lump.Seek (len, SEEK_CUR);
 			break;
 
 		case MAKE_ID('a','l','P','h'):
@@ -297,37 +282,6 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 	case 4:		// Grayscale + Alpha
 		bMasked = true;
 		// intentional fall-through
-
-	case 0:		// Grayscale
-		if (!bAlphaTexture)
-		{
-			if (colortype == 0 && havetRNS && trans[0] != 0)
-			{
-				bMasked = true;
-				PaletteSize = 256;
-				PaletteMap = new BYTE[256];
-				memcpy (PaletteMap, GrayMap, 256);
-				PaletteMap[trans[0]] = 0;
-			}
-			else
-			{
-				PaletteMap = GrayMap;
-			}
-		}
-		break;
-
-	case 3:		// Paletted
-		PaletteMap = new BYTE[PaletteSize];
-		GPalette.MakeRemap (p.palette, PaletteMap, trans, PaletteSize);
-		for (i = 0; i < PaletteSize; ++i)
-		{
-			if (trans[i] == 0)
-			{
-				bMasked = true;
-				PaletteMap[i] = 0;
-			}
-		}
-		break;
 
 	case 6:		// RGB + Alpha
 		bMasked = true;
@@ -468,6 +422,75 @@ void FPNGTexture::MakeTexture ()
 	else
 	{
 		DWORD len, id;
+
+		// For Grayscale and Paletted we may need to read PLTE and tRNS
+		if (ColorType == 0 || ColorType == 3)
+		{
+			union
+			{
+				DWORD palette[256];
+				BYTE pngpal[256][3];
+			} p;
+			BYTE trans[256];
+			memset(trans, 255, 256);
+
+			if (StartOftRNS)
+			{
+				lump->Seek (StartOftRNS, SEEK_SET);
+				lump->Read (&len, 4);
+				lump->Read (&id, 4);
+				lump->Read (trans, len);
+			}
+
+			if (ColorType == 3) // Paletted
+			{
+				lump->Seek (StartOfPLTE, SEEK_SET);
+				lump->Read (&len, 4);
+				lump->Read (&id, 4);
+				len = BigLong((unsigned int)len);
+
+				PaletteSize = MIN<int> (len / 3, 256);
+				lump->Read (p.pngpal, PaletteSize * 3);
+				//if (PaletteSize * 3 != (int)len)
+				//{
+				//	lump.Seek (len - PaletteSize * 3, SEEK_CUR);
+				//}
+				for (int i = PaletteSize - 1; i >= 0; --i)
+				{
+					p.palette[i] = MAKERGB(p.pngpal[i][0], p.pngpal[i][1], p.pngpal[i][2]);
+				}
+
+				PaletteMap = new BYTE[PaletteSize];
+				GPalette.MakeRemap (p.palette, PaletteMap, trans, PaletteSize);
+				for (int i = 0; i < PaletteSize; ++i)
+				{
+					if (trans[i] == 0)
+					{
+						bMasked = true;
+						PaletteMap[i] = 0;
+					}
+				}
+			}
+			else // Grayscale
+			{
+				if (!bAlphaTexture)
+				{
+					if (ColorType == 0 && StartOftRNS && trans[0] != 0)
+					{
+						bMasked = true;
+						PaletteSize = 256;
+						PaletteMap = new BYTE[256];
+						memcpy (PaletteMap, GrayMap, 256);
+						PaletteMap[trans[0]] = 0;
+					}
+					else
+					{
+						PaletteMap = GrayMap;
+					}
+				}
+			}
+		}
+
 		lump->Seek (StartOfIDAT, SEEK_SET);
 		lump->Read(&len, 4);
 		lump->Read(&id, 4);

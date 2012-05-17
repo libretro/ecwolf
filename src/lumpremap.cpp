@@ -86,6 +86,7 @@ void LumpRemapper::DoRemap()
 		for(unsigned int i = 0;i < file.file->LumpCount();i++)
 		{
 			FResourceLump *lump = file.file->GetLump(i);
+			int oldNamespace = lump->Namespace;
 			switch(file.type)
 			{
 				case AUDIOT:
@@ -93,20 +94,17 @@ void LumpRemapper::DoRemap()
 					{
 						if(i < sounds.Size())
 							lump->LumpNameSetup(sounds[i]);
-						lump->Namespace = ns_sounds;
 						temp++;
 					}
 					else if(lump->Namespace == ns_music && i-temp < music.Size())
 					{
 						lump->LumpNameSetup(music[i-temp]);
-						lump->Namespace = ns_music;
 					}
 					break;
 				case VGAGRAPH:
 					if(i < graphics.Size())
 					{
 						lump->LumpNameSetup(graphics[i]);
-						lump->Namespace = ns_graphics;
 					}
 					break;
 				case VSWAP:
@@ -114,7 +112,6 @@ void LumpRemapper::DoRemap()
 					{
 						if(i < textures.Size())
 							lump->LumpNameSetup(textures[i]);
-						lump->Namespace = ns_flats;
 						temp++;
 						temp2++;
 					}
@@ -122,18 +119,17 @@ void LumpRemapper::DoRemap()
 					{
 						if(i-temp < sprites.Size())
 							lump->LumpNameSetup(sprites[i-temp]);
-						lump->Namespace = ns_sprites;
 						temp2++;
 					}
 					else if(lump->Namespace == ns_sounds && i-temp2 < digitalsounds.Size())
 					{
 						lump->LumpNameSetup(digitalsounds[i-temp2]);
-						lump->Namespace = ns_sounds;
 					}
 					break;
 				default:
 					break;
 			}
+			lump->Namespace = oldNamespace;
 		}
 	}
 	Wads.InitHashChains();
