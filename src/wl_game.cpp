@@ -406,13 +406,6 @@ void DrawPlayScreen (bool noborder)
 void ShowActStatus()
 {
 	// Draw status bar without borders
-//    byte *source = grsegs[STATUSBARPIC];
-/*    int	picnum = STATUSBARPIC - STARTPICS;
-	int width = pictable[picnum].width;
-	int height = pictable[picnum].height;
-	int destx = (screenWidth-scaleFactor*320)/2 + 9 * scaleFactor;
-	int desty = screenHeight - (height - 4) * scaleFactor;*/
-//    VL_MemToScreenScaledCoord(source, width, height, 9, 4, destx, desty, width - 18, height - 7);
 	VWB_DrawGraphic(TexMan("STBAR"), 0, 160);
 
 	ingame = false;

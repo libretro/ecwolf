@@ -4,7 +4,6 @@
 
 graphics
 {
-	"PICTABLE",
 	"FONT1",
 	"FONT2",
 

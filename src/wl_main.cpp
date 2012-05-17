@@ -716,23 +716,6 @@ void Quit (const char *errorStr, ...)
 	}
 	else error[0] = 0;
 
-/*    if (!pictable)  // don't try to display the red box before it's loaded
-	{
-		ShutdownId();
-		if (error && *error)
-		{
-#ifdef NOTYET
-			SetTextCursor(0,0);
-#endif
-			puts(error);
-#ifdef NOTYET
-			SetTextCursor(0,2);
-#endif
-			VW_WaitVBL(100);
-		}
-		exit(1);
-	}*/
-
 	if (error[0] == 0)
 	{
 #ifdef NOTYET

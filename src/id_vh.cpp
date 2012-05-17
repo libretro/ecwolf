@@ -7,8 +7,6 @@
 #include "v_palette.h"
 #include "textures/textures.h"
 
-pictabletype	*pictable;
-
 int	    px,py;
 byte	fontcolor,backcolor;
 int	    fontnumber;
@@ -287,31 +285,6 @@ void LoadLatchMem (void)
 		src += 64;
 	}
 	delete[] src_freeme;
-
-	//latchpics[1] = NULL;  // not used
-
-//
-// pics
-//
-/*	start = LATCHPICS_LUMP_START;
-	end = LATCHPICS_LUMP_END;
-
-	for (i=start;i<=end;i++)
-	{
-		width = pictable[i-STARTPICS].width;
-		height = pictable[i-STARTPICS].height;
-		surf = SDL_CreateRGBSurface(SDL_HWSURFACE, width, height, 8, 0, 0, 0, 0);
-		if(surf == NULL)
-		{
-			Quit("Unable to create surface for picture!");
-		}
-		SDL_SetColors(surf, gamepal, 0, 256);
-
-		latchpics[2+i-start] = surf;
-		//CA_CacheGrChunk (i);
-		//VL_MemToLatch (grsegs[i], width, height, surf, 0, 0);
-		//UNCACHEGRCHUNK(i);
-	}*/
 }
 
 //==========================================================================

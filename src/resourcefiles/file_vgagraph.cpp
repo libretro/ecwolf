@@ -243,6 +243,10 @@ class FVGAGraph : public FResourceFile
 			if(dimensions != NULL)
 				delete[] dimensions;
 			delete[] data;
+
+			// We don't care about the PICTABLE lump now so we can just skip
+			// over it.
+			--NumLumps;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
 			LumpRemapper::AddFile(extension, this, LumpRemapper::VGAGRAPH);
@@ -251,7 +255,7 @@ class FVGAGraph : public FResourceFile
 
 		FResourceLump *GetLump(int no)
 		{
-			return &lumps[no];
+			return &lumps[no+1];
 		}
 
 	private:
