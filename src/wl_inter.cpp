@@ -450,7 +450,6 @@ LevelCompleted (void)
 	if (mapon != 4 && mapon != 9 && mapon != 15 && mapon < 17)
 #endif
 	{
-#ifndef JAPAN
 		Write (14, 2, language["STR_FLOORCOMPLETED"]);
 
 		Write (14, 7, language["STR_BONUS"]);
@@ -462,7 +461,6 @@ LevelCompleted (void)
 		Write (1, 18, language["STR_RAT2TREASURE"]);
 
 		Write (26, 2, itoa (gamestate.mapon + 1, tempstr, 10));
-#endif
 
 		FString timeString;
 		timeString.Format("%02d:%02d", levelInfo->Par/60, levelInfo->Par%60);
@@ -491,7 +489,7 @@ LevelCompleted (void)
 		//
 		// FIGURE RATIOS OUT BEFOREHAND
 		//
-		kr = sr = tr = 0;
+		kr = sr = tr = 100;
 		if (gamestate.killtotal)
 			kr = (gamestate.killcount * 100) / gamestate.killtotal;
 		if (gamestate.secrettotal)

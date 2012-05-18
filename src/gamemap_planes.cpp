@@ -35,6 +35,7 @@
 #include "gamemap.h"
 #include "lnspec.h"
 #include "w_wad.h"
+#include "wl_game.h"
 
 // Reads old format maps
 void GameMap::ReadPlanesData()
@@ -137,6 +138,7 @@ void GameMap::ReadPlanesData()
 						trig.arg[1] = doorType >= 1 && doorType <= 4 ? doorType : 0;
 						trig.playerUse = true;
 						trig.monsterUse = true;
+						trig.repeatable = true;
 						if(vertical)
 							trig.activate[Trigger::North] = trig.activate[Trigger::South] = false;
 						else
@@ -371,6 +373,8 @@ void GameMap::ReadPlanesData()
 						trig.action = Specials::Pushwall_Move;
 						trig.arg[0] = 1;
 						trig.playerUse = true;
+						trig.isSecret = true;
+						++gamestate.secrettotal;
 					}
 					else
 					{

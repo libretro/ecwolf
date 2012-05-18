@@ -339,7 +339,7 @@ IMPLEMENT_THINKER(EVPushwall)
 
 FUNC(Pushwall_Move)
 {
-	if(spot->thinker)
+	if(spot->thinker || !spot->tile || spot->GetAdjacent(MapTile::Side(direction))->tile)
 	{
 		return 0;
 	}

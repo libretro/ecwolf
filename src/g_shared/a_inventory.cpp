@@ -119,6 +119,11 @@ void AInventory::Touch(AActor *toucher)
 	if(!TryPickup(toucher))
 		return;
 
+	if(flags & FL_COUNTITEM)
+		++gamestate.treasurecount;
+	if(flags & FL_COUNTSECRET)
+		++gamestate.secretcount;
+
 	PlaySoundLocActor(pickupsound, toucher);
 	StartBonusFlash();
 }

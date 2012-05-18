@@ -36,6 +36,7 @@
 #include "lnspec.h"
 #include "scanner.h"
 #include "w_wad.h"
+#include "wl_game.h"
 
 #define CheckKey(x) if(key.CompareNoCase(x) == 0)
 
@@ -419,6 +420,17 @@ class UWMFParser
 			{
 				sc.MustGetToken(TK_BoolConst);
 				trigger.monsterUse = sc->boolean;
+			}
+			else CheckKey("repeatable")
+			{
+				sc.MustGetToken(TK_BoolConst);
+				trigger.repeatable = sc->boolean;
+			}
+			else CheckKey("secret")
+			{
+				sc.MustGetToken(TK_BoolConst);
+				trigger.isSecret = sc->boolean;
+				++gamestate.secrettotal;
 			}
 
 			EndParseBlock
