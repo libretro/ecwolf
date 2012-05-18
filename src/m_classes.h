@@ -211,7 +211,7 @@ class Menu
 		void			addItem(MenuItem *item);
 		static bool		areMenusClosed() { return close; }
 		void			clear();
-		static void		closeMenus(bool close=true) { Menu::close = close; }
+		static void		closeMenus(bool close=true);
 		unsigned int	countItems() const;
 		void			drawMenu() const;
 		void			draw() const;

@@ -7,6 +7,9 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "textures/textures.h"
+#include "g_mapinfo.h"
+#include "v_palette.h"
+#include "colormatcher.h"
 
 static const int color_hlite[] = {
     DEACTIVE,
@@ -564,6 +567,18 @@ void Menu::clear()
 	items.Delete(0, items.Size());
 }
 
+void Menu::closeMenus(bool close)
+{
+	if(close)
+	{
+		MenuFadeOut();
+		VWB_Clear(ColorMatcher.Pick(RPART(gameinfo.MenuFadeColor), GPART(gameinfo.MenuFadeColor), BPART(gameinfo.MenuFadeColor)),
+			0, 0, screenWidth, screenHeight);
+	}
+
+	Menu::close = close;
+}
+
 unsigned int Menu::countItems() const
 {
 	unsigned int num = 0;
@@ -942,8 +957,11 @@ int Menu::handle()
 			getIndex(curPos)->activate();
 			PrintX = getX() + getIndent();
 			PrintY = getY() + getHeight(curPos);
-			getIndex(curPos)->draw();
-			VW_UpdateScreen();
+			if(!Menu::areMenusClosed())
+			{
+				getIndex(curPos)->draw();
+				VW_UpdateScreen();
+			}
 			return curPos;
 
 		case 2:
@@ -967,6 +985,9 @@ void Menu::setHeadText(const char text[36], bool drawInStripes)
 
 void Menu::show()
 {
+	if(Menu::areMenusClosed())
+		return;
+
 	if(entryListener != NULL)
 		entryListener(0);
 
@@ -982,5 +1003,6 @@ void Menu::show()
 	int item = 0;
 	while((item = handle()) != -1);
 
-	MenuFadeOut ();
+	if(!Menu::areMenusClosed())
+		MenuFadeOut ();
 }

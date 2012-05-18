@@ -78,7 +78,6 @@ MENU_LISTENER(PlayDemosOrReturnToGame)
 	Menu::closeMenus();
 	if (!ingame)
 		StartCPMusic(gameinfo.TitleMusic);
-	VL_FadeOut(0, 255, 0, 0, 0, 10);
 	return true;
 }
 MENU_LISTENER(ViewScoresOrEndGame)
@@ -331,9 +330,8 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 }
 MENU_LISTENER(StartNewGame)
 {
-	NewGame(which, episode->StartMap);
 	Menu::closeMenus();
-	MenuFadeOut();
+	NewGame(which, episode->StartMap);
 
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR
@@ -625,11 +623,7 @@ US_ControlPanel (ScanCode scancode)
 				break;
 
 			default:
-				if (!Menu::areMenusClosed())
-				{
-					mainMenu.draw();
-					MenuFadeIn ();
-				}
+				break;
 		}
 
 		//
@@ -983,6 +977,8 @@ void SetupSaveGames()
 void CleanupControlPanel (void)
 {
 	fontnumber = 0;
+	VWB_Clear(ColorMatcher.Pick(RPART(gameinfo.MenuFadeColor), GPART(gameinfo.MenuFadeColor), BPART(gameinfo.MenuFadeColor)),
+		0, 0, screenWidth, screenHeight);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1290,9 +1286,21 @@ void ShootSnd (void)
 	SD_PlaySound ("menu/activate");
 }
 
+static bool menusAreFaded = true; 
 void MenuFadeOut()
 {
+	assert(!menusAreFaded);
+	menusAreFaded = true;
+
 	VL_FadeOut(0, 255,
 		RPART(gameinfo.MenuFadeColor), GPART(gameinfo.MenuFadeColor), BPART(gameinfo.MenuFadeColor),
 		10);
+}
+
+void MenuFadeIn()
+{
+	assert(menusAreFaded);
+	menusAreFaded = false;
+
+	VL_FadeIn(0, 255, gamepal, 10);
 }
