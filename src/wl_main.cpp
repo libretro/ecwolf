@@ -573,7 +573,7 @@ static void SetViewSize ()
 	if(AspectCorrection[vid_aspect].isWide)
 		statusbarx = screenWidth*(48-AspectCorrection[vid_aspect].multiplier)/(48*2);
 
-	statusbary = 159;
+	statusbary = 200 - STATUSLINES - scaleFactor;
 	if(AspectCorrection[vid_aspect].tallscreen)
 		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[vid_aspect].baseHeight + screenHeight/2
 			+ (screenHeight - screenHeight*AspectCorrection[vid_aspect].multiplier/48)/2;
@@ -630,40 +630,6 @@ static void SetViewSize ()
 	//
 	CalcProjection (FOCALLENGTH);
 }
-
-
-void ShowViewSize (int width)
-{
-	int oldwidth,oldheight;
-
-	oldwidth = viewwidth;
-	oldheight = viewheight;
-
-	if(width == 21)
-	{
-		viewwidth = screenWidth;
-		viewheight = screenHeight;
-		VWB_BarScaledCoord (0, 0, screenWidth, screenHeight, 0);
-	}
-	else if(width == 20)
-	{
-		viewwidth = screenWidth;
-		viewheight = screenHeight - scaleFactor*STATUSLINES;
-		DrawPlayBorder ();
-	}
-	else
-	{
-	//	viewwidth = width*16*screenWidth/320;
-		viewwidth = screenWidth - (20-width)*16*screenWidth/320;
-	//	viewheight = (int) (width*16*HEIGHTRATIO*screenHeight/200);
-		viewheight = (screenHeight - 48) - (20-width)*8*screenHeight/200;
-		DrawPlayBorder ();
-	}
-
-	viewwidth = oldwidth;
-	viewheight = oldheight;
-}
-
 
 void NewViewSize (int width)
 {

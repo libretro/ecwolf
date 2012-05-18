@@ -30,7 +30,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 
 	// draw horizontal lines
 	for(int y = y0, bot_offset = bot_offset0, top_offset = top_offset0;
-		y < halfheight; y++, bot_offset += vbufPitch, top_offset -= vbufPitch)
+		y <= halfheight; y++, bot_offset += vbufPitch, top_offset -= vbufPitch)
 	{
 		dist = (heightnumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
@@ -70,7 +70,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 					u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
-					if(curtoptex.isValid())
+					if(curtoptex.isValid() && y < halfheight)
 						vbuf[top_add] = curshades[toptex[texoffs]];
 					if(curbottex.isValid())
 						vbuf[bot_add] = curshades[bottex[texoffs]];

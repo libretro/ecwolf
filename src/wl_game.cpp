@@ -311,13 +311,13 @@ void DrawPlayBorderSides(void)
 	// Draw frame
 	if(viewwidth != screenWidth)
 	{
-		VWB_Clear(0, viewscreenx-2, viewscreeny-2, viewscreenx+viewwidth+2, viewscreeny);
-		VWB_Clear(0, viewscreenx-2, viewscreeny, viewscreenx, viewscreeny+viewheight);
-		VWB_Clear(bordercol-2, viewscreenx+viewwidth, viewscreeny, viewscreenx+viewwidth+2, viewscreeny+viewheight);
-		VWB_Clear(bordercol-2, viewscreenx-2, viewscreeny+viewheight, viewscreenx+viewwidth+2, viewscreeny+viewheight+2);
+		VWB_Clear(0, viewscreenx-scaleFactor, viewscreeny-scaleFactor, viewscreenx+viewwidth+scaleFactor, viewscreeny);
+		VWB_Clear(0, viewscreenx-scaleFactor, viewscreeny, viewscreenx, viewscreeny+viewheight);
+		VWB_Clear(bordercol-scaleFactor, viewscreenx+viewwidth, viewscreeny, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight);
+		VWB_Clear(bordercol-scaleFactor, viewscreenx-scaleFactor, viewscreeny+viewheight, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight+2);
 	}
 	else
-		VWB_Clear(bordercol-2, 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+2);
+		VWB_Clear(bordercol-scaleFactor, 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+scaleFactor);
 }
 
 
