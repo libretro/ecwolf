@@ -3,6 +3,7 @@
 #ifdef WINDOWS
 #include <io.h>
 #endif
+#include <unistd.h>
 
 #include <math.h>
 #include "wl_act.h"
@@ -752,12 +753,6 @@ void Died (void)
 
 	if (players[0].lives > -1)
 	{
-		players[0].state = player_t::PST_REBORN;
-		gamestate.keys = 0;
-		gamestate.attackframe = gamestate.attackcount =
-			gamestate.weaponframe = 0;
-		thinkerList->DestroyAll();
-
 		if(viewsize != 21)
 		{
 			DrawKeys ();
@@ -767,6 +762,12 @@ void Died (void)
 			DrawFace ();
 			DrawLives ();
 		}
+
+		players[0].state = player_t::PST_REBORN;
+		gamestate.keys = 0;
+		gamestate.attackframe = gamestate.attackcount =
+			gamestate.weaponframe = 0;
+		thinkerList->DestroyAll();
 	}
 }
 
