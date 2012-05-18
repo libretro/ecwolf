@@ -56,6 +56,12 @@ if(WIN32)
 	)
 endif(WIN32)
 
+if(APPLE)
+	set(EXTRA_FILES
+		SDLMain.m
+	)
+endif(APPLE)
+
 add_executable(ecwolf WIN32
 	${OPL_SOURCES}
 	g_shared/a_inventory.cpp

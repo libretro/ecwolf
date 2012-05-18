@@ -80,7 +80,7 @@ template<class T> class LinkedList
 		}
 		LinkedList(const LinkedList &other) : head(NULL), size(0)
 		{
-			LinkedList::Node *iter = other.Head();
+			Node *iter = other.Head();
 			if(iter != NULL)
 			{
 				while(iter->Next())
