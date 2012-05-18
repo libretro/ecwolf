@@ -89,10 +89,20 @@ GameMap::~GameMap()
 
 bool GameMap::ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator)
 {
+	if(!trig.repeatable && !trig.active)
+		return false;
+
 	MapSpot spot = GetSpot(trig.x, trig.y, trig.z);
 
 	Specials::LineSpecialFunction func = Specials::LookupFunction(Specials::LineSpecials(trig.action));
-	return func(spot, trig.arg, direction, activator);
+	bool ret = func(spot, trig.arg, direction, activator);
+	if(ret)
+	{
+		if(trig.active && trig.isSecret)
+			++gamestate.secretcount;
+		trig.active = false;
+	}
+	return ret;
 }
 
 void GameMap::ClearVisibility()

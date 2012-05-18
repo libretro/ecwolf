@@ -69,7 +69,7 @@ void InitFunctionTable(ActionTable *table)
 
 	qsort(&(*table)[0], table->Size(), sizeof((*table)[0]), FunctionTableComp);
 	for(int i = 1;i < table->Size();++i)
-		assert((*table)[i] > (*table)[i-1]);
+		assert((*table)[i]->name > (*table)[i-1]->name);
 }
 
 void ReleaseFunctionTable()

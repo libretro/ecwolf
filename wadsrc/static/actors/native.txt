@@ -65,6 +65,8 @@ actor Key : Inventory native
 
 actor ScoreItem : Inventory native
 {
+	+COUNTITEM
+	inventory.amount 1
 }
 
 actor Weapon : Inventory native

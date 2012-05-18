@@ -890,8 +890,11 @@ void Cmd_Use (void)
 		MapTrigger &trig = spot->triggers[i];
 		if(trig.activate[direction] && trig.playerUse)
 		{
-			map->ActivateTrigger(trig, direction, players[0].mo);
-			doNothing = false;
+			if(map->ActivateTrigger(trig, direction, players[0].mo))
+			{
+				//buttonstate[bt_use] = false;
+				doNothing = false;
+			}
 		}
 	}
 

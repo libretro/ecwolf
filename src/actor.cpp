@@ -376,6 +376,10 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 
 	if(actor->flags & FL_COUNTKILL)
 		++gamestate.killtotal;
+	if(actor->flags & FL_COUNTITEM)
+		++gamestate.treasuretotal;
+	if(actor->flags & FL_COUNTSECRET)
+		++gamestate.secrettotal;
 	return actor;
 }
 

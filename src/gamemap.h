@@ -69,14 +69,18 @@ class GameMap
 		};
 		struct Trigger
 		{
-			Trigger() : x(0), y(0), z(0), action(0), playerUse(false),
-				monsterUse(false)
+			Trigger() : x(0), y(0), z(0), active(true), action(0),
+				playerUse(false), monsterUse(false), isSecret(false),
+				repeatable(false)
 			{
 				activate[0] = activate[1] = activate[2] = activate[3] = true;
 				arg[0] = arg[1] = arg[2] = arg[3] = arg[4] = arg[5] = 0;
 			}
 
 			unsigned int	x, y, z;
+			// Stores if the trigger hasn't been used yet.
+			// Note that this is set to false on for repeatable actions as well so that secrets are only accounted for once.
+			bool			active;
 
 			enum Side { East, North, West, South };
 			unsigned int	action;
@@ -85,6 +89,8 @@ class GameMap
 
 			bool			playerUse;
 			bool			monsterUse;
+			bool			isSecret;
+			bool			repeatable;
 		};
 		struct Tile
 		{
