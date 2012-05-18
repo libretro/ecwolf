@@ -116,7 +116,7 @@ void	VW_MeasurePropString (const char *string, word *width, word *height);
 void    LoadLatchMem (void);
 
 void    VH_Startup();
-boolean FizzleFade (SDL_Surface *source, int x1, int y1,
-	unsigned width, unsigned height, unsigned frames, boolean abortable);
+bool FizzleFade (SDL_Surface *source, int x1, int y1,
+	unsigned width, unsigned height, unsigned frames, bool abortable);
 
 #endif

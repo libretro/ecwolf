@@ -348,12 +348,12 @@ void VH_Startup()
 	rndmask = rndmasks[rndbits - 17];
 }
 
-boolean FizzleFade (SDL_Surface *source, int x1, int y1,
-	unsigned width, unsigned height, unsigned frames, boolean abortable)
+bool FizzleFade (SDL_Surface *source, int x1, int y1,
+	unsigned width, unsigned height, unsigned frames, bool abortable)
 {
 	unsigned x, y, frame, pixperframe;
 	int32_t  rndval, lastrndval;
-	int first = 1;
+	int      first = 1;
 
 	lastrndval = 0;
 	pixperframe = width * height / frames;
@@ -368,10 +368,10 @@ boolean FizzleFade (SDL_Surface *source, int x1, int y1,
 	{
 		IN_ProcessEvents();
 
-		if (abortable && IN_CheckAck ())
+		if(abortable && IN_CheckAck ())
 		{
 			VL_UnlockSurface(source);
-			SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
+			SDL_BlitSurface(source, NULL, screen, NULL);
 			SDL_Flip(screen);
 			return true;
 		}
@@ -404,7 +404,7 @@ boolean FizzleFade (SDL_Surface *source, int x1, int y1,
 					if(x >= width || y >= height)
 					{
 						if(rndval == 0)     // entire sequence has been completed
-								goto finished;
+							goto finished;
 						p--;
 						continue;
 					}
@@ -416,20 +416,18 @@ boolean FizzleFade (SDL_Surface *source, int x1, int y1,
 					if(screenBits == 8)
 					{
 						*(destptr + (y1 + y) * screen->pitch + x1 + x)
-								= *(srcptr + (y1 + y) * source->pitch + x1 + x);
+							= *(srcptr + (y1 + y) * source->pitch + x1 + x);
 					}
 					else
 					{
 						byte col = *(srcptr + (y1 + y) * source->pitch + x1 + x);
 						uint32_t fullcol = SDL_MapRGB(screen->format, GPalette.BaseColors[col].r, GPalette.BaseColors[col].g, GPalette.BaseColors[col].b);
 						memcpy(destptr + (y1 + y) * screen->pitch + (x1 + x) * screen->format->BytesPerPixel,
-								&fullcol, screen->format->BytesPerPixel);
+							&fullcol, screen->format->BytesPerPixel);
 					}
 
-					if(rndval == 0)
+					if(rndval == 0)		// entire sequence has been completed
 						goto finished;
-					p--;
-					continue;
 				}
 
 				if(!i || first) lastrndval = rndval;

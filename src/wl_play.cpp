@@ -879,8 +879,8 @@ void FinishPaletteShifts (void)
 {
 	if (palshifted)
 	{
+		VL_SetBlend(0, 0, 0, 0, true);
 		palshifted = false;
-		VL_SetBlend(0, 0, 0, 0);
 	}
 }
 
