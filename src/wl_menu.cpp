@@ -619,9 +619,11 @@ US_ControlPanel (ScanCode scancode)
 		switch (which)
 		{
 			case -1:
-				QuitGame(0);
+				if(!ingame)
+					QuitGame(0);
+				else
+					PlayDemosOrReturnToGame(0);
 				break;
-
 			default:
 				break;
 		}
