@@ -617,7 +617,7 @@ void CA_CacheScreen(const char* chunk)
 	for(i = xd, x = 0;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
-		dest = vbuf+i;
+		dest = vbuf+i+bufferPitch*static_cast<int>(yd);
 		for(j = yd, y = 0;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
 		{
 			if(j >= screenHeight)
