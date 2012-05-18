@@ -10,3 +10,6 @@ WL_EPISODE3 = "Episodio 3\nMuere, Fuhrer, Muere!";
 WL_EPISODE4 = "Episodio 4\nUn Negro Secreto";
 WL_EPISODE5 = "Episodio 5\nHuellas del Loco";
 WL_EPISODE6 = "Episodio 6\nConfrontacion";
+
+REGNOTICE_TITLE = "Atencion";
+REGNOTICE_MESSAGE = "Este juego NO es gratis y\nNO es Shareware; favor de\nno distribuirlo.\n\n        Id Software\n";

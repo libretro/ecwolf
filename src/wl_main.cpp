@@ -485,25 +485,6 @@ static void InitGame()
 	printf("US_Startup: Starting the User Manager.\n");
 	US_Startup ();
 
-	// TODO: Will any memory checking be needed someday??
-#ifdef NOTYET
-#ifndef SPEAR
-	if (mminfo.mainmem < 235000L)
-#else
-	if (mminfo.mainmem < 257000L && !MS_CheckParm("debugmode"))
-#endif
-	{
-		byte *screen;
-
-		CA_CacheGrChunk (ERRORSCREEN);
-		screen = grsegs[ERRORSCREEN];
-		ShutdownId();
-/*        memcpy((byte *)0xb8000,screen+7+7*160,17*160);
-		gotoxy (1,23);*/
-		exit(1);
-	}
-#endif
-
 
 //
 // build some tables
@@ -550,12 +531,17 @@ static void InitGame()
 	InitRedShifts ();
 
 //
+// initialize the menus
+	printf("CreateMenus: Preparing the menu system...\n");
+	CreateMenus();
+
+//
 // Finish signon screen
 //
 	VH_UpdateScreen();
 
 	if (!param_nowait)
-		IN_Ack ();
+		IN_UserInput(70*4);
 
 //
 // HOLDING DOWN 'M' KEY?
@@ -796,28 +782,13 @@ static void DemoLoop()
 // main game cycle
 //
 
-#ifndef DEMOTEST
-
-	#ifndef UPLOAD
-
-		#ifndef GOODTIMES
-		#ifndef SPEAR
-		#ifndef JAPAN
-		if (!param_nowait)
-			NonShareware();
-		#endif
-		#endif
-		#endif
-	#endif
+	if (!param_nowait)
+		NonShareware();
 
 	StartCPMusic(gameinfo.TitleMusic);
 
-#ifndef JAPAN
 	if (!param_nowait)
 		PG13 ();
-#endif
-
-#endif
 
 	while (1)
 	{
@@ -826,32 +797,27 @@ static void DemoLoop()
 //
 // title page
 //
-#ifndef DEMOTEST
-
-#ifdef SPEAR
+			bool useTitlePalette = !gameinfo.TitlePalette.IsEmpty();
 			SDL_Color pal[256];
-			VL_ConvertPalette("TITLEPAL", pal, 256);
+			if(useTitlePalette)
+				VL_ConvertPalette(gameinfo.TitlePalette, pal);
 
-			VWB_DrawPic (0,0,"TITLE1");
-
-			VWB_DrawPic (0,80,"TITLE2");
+			CA_CacheScreen(gameinfo.TitlePage);
 			VW_UpdateScreen ();
-			VL_FadeIn(0,255,pal,30);
-#else
-			CA_CacheScreen ("TITLEPIC");
-			VW_UpdateScreen ();
-			VW_FadeIn();
-#endif
-			if (IN_UserInput(TickBase*15))
+			if(useTitlePalette)
+				VL_FadeIn(0,255,pal,30);
+			else
+				VW_FadeIn();
+			if (IN_UserInput(TickBase*gameinfo.TitleTime))
 				break;
 			VW_FadeOut();
 //
 // credits page
 //
-			CA_CacheScreen ("CREDITS");
+			CA_CacheScreen (gameinfo.CreditPage);
 			VW_UpdateScreen();
 			VW_FadeIn ();
-			if (IN_UserInput(TickBase*10))
+			if (IN_UserInput(TickBase*gameinfo.PageTime))
 				break;
 			VW_FadeOut ();
 //
@@ -861,9 +827,8 @@ static void DemoLoop()
 			VW_UpdateScreen ();
 			VW_FadeIn ();
 
-			if (IN_UserInput(TickBase*10))
+			if (IN_UserInput(TickBase*gameinfo.PageTime))
 				break;
-#endif
 //
 // demo
 //
@@ -1216,10 +1181,6 @@ FString CheckParameters(int argc, char *argv[], TArray<char*> &files)
 			"                        (given in bytes, default: 2048 / (44100 / samplerate))\n"
 			" --ignorenumchunks      Ignores the number of chunks in VGAHEAD.*\n"
 			"                        (may be useful for some broken mods)\n"
-#if defined(SPEAR) && !defined(SPEARDEMO)
-			" --mission <mission>    Mission number to play (1-3)\n"
-			" --goodtimes            Disable copy protection quiz\n"
-#endif
 			, defaultSampleRate
 		);
 		exit(1);
@@ -1282,7 +1243,7 @@ void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_li
 	if(level == Scanner::ERROR)
 		throw CRecoverableError(errorMessage);
 	else
-		vfprintf(stderr, error, list);
+		printf("%s", error);
 }
 
 // Basically from ZDoom
@@ -1342,8 +1303,6 @@ int main (int argc, char *argv[])
 
 		printf("InitGame: Setting up the game...\n");
 		InitGame();
-		printf("CreateMenus: Preparing the menu system...\n");
-		CreateMenus();
 
 		rngseed = I_MakeRNGSeed();
 		FRandom::StaticClearRandom();

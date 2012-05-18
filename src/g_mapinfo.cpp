@@ -154,10 +154,20 @@ void ParseGameInfo(Scanner &sc)
 
 		sc.MustGetToken('=');
 
-		if(key.CompareNoCase("drawreadthis") == 0)
+		if(key.CompareNoCase("creditpage") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.CreditPage = sc->str;
+		}
+		else if(key.CompareNoCase("drawreadthis") == 0)
 		{
 			sc.MustGetToken(TK_BoolConst);
 			gameinfo.DrawReadThis = sc->boolean;
+		}
+		else if(key.CompareNoCase("gamepalette") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.GamePalette = sc->str;
 		}
 		else if(key.CompareNoCase("signon") == 0)
 		{
@@ -196,6 +206,26 @@ void ParseGameInfo(Scanner &sc)
 			sc.MustGetToken(TK_StringConst);
 			gameinfo.TitleMusic = sc->str;
 		}
+		else if(key.CompareNoCase("titlepalette") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.TitlePalette = sc->str;
+		}
+		else if(key.CompareNoCase("titlepage") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.TitlePage = sc->str;
+		}
+		else if(key.CompareNoCase("titletime") == 0)
+		{
+			sc.MustGetToken(TK_IntConst);
+			gameinfo.TitleTime = sc->number;
+		}
+		else if(key.CompareNoCase("pagetime") == 0)
+		{
+			sc.MustGetToken(TK_IntConst);
+			gameinfo.PageTime = sc->number;
+		}
 		else if(key.CompareNoCase("menumusic") == 0)
 		{
 			sc.MustGetToken(TK_StringConst);
@@ -218,7 +248,7 @@ void ParseGameInfo(Scanner &sc)
 		}
 		else
 		{
-			sc.ScriptMessage(Scanner::WARNING, "Unknown map property '%s'!", key.GetChars());
+			sc.ScriptMessage(Scanner::WARNING, "Unknown gameinfo property '%s'!", key.GetChars());
 			do
 			{
 				sc.GetNextToken();

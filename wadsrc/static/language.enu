@@ -146,3 +146,6 @@ MUS_XJAZNAZI = "Jazzin' Them Nazis";
 MUS_XPUTIT = "Puttin' It To The Enemy";
 MUS_XGETYOU = "The SS Gonna Get You";
 MUS_XTOWER2 = "Towering Above";
+
+REGNOTICE_TITLE = "Attention";
+REGNOTICE_MESSAGE = "This game is NOT shareware.\nPlease do not distribute it.\nThanks.\n\n        Id Software\n";

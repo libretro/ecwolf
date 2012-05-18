@@ -3,13 +3,19 @@ gameinfo
 	signon = "SODSGNON"
 	signoncolors = "FC FC 54", "40 40 00", "40 40 00", "40 40 00"
 	menufade = "00 00 CE"
-	menucolors = "00 00 88", "00 00 D4", "00 00 58", "48 48 48"
+	menucolors = "00 00 88", "00 00 D4", "00 00 58", "00 00 64"
 	titlemusic = "XTOWER2"
 	menumusic = "WONDERIN"
 	scoresmusic = "XAWARD"
 	finalemusic = "CORNER"
 	itermissionmusic = "ENDLEVEL"
 	drawreadthis = false
+	gamepalette = "SPEARPAL"
+	titlepalette = "TITLEPAL"
+	titlepage = "TITLESOD"
+	titletime = 15
+	creditpage = "CREDITS"
+	pagetime = 10
 }
 
 defaultmap

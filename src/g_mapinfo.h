@@ -47,7 +47,13 @@ public:
 	int		MenuColors[4];
 	bool	DrawReadThis;
 
+	int		PageTime;
+	int		TitleTime;
+	FString	CreditPage;
+	FString	GamePalette;
 	FString	TitleMusic;
+	FString	TitlePage;
+	FString	TitlePalette;
 	FString	MenuMusic;
 	FString	ScoresMusic;
 	FString	FinaleMusic;

@@ -1024,11 +1024,7 @@ CheckHighScore (int32_t score, word other)
 		}
 	}
 
-#ifdef SPEAR
-	StartCPMusic (XAWARD_MUS);
-#else
-	StartCPMusic ("ROSTER");
-#endif
+	StartCPMusic (gameinfo.ScoresMusic);
 	DrawHighScores ();
 
 	VW_FadeIn ();
@@ -1062,18 +1058,16 @@ CheckHighScore (int32_t score, word other)
 
 }
 
-
-#ifndef UPLOAD
-#ifndef SPEAR
-#ifndef JAPAN
 ////////////////////////////////////////////////////////
 //
 // NON-SHAREWARE NOTICE
 //
 ////////////////////////////////////////////////////////
-void
-NonShareware (void)
+void NonShareware (void)
 {
+	if(strlen(language["REGNOTICE_TITLE"]) == 0)
+		return;
+
 	VW_FadeOut ();
 
 	ClearMScreen ();
@@ -1085,32 +1079,16 @@ NonShareware (void)
 	PrintX = 110;
 	PrintY = 15;
 
-#ifdef SPANISH
-	US_Print ("Atencion");
-#else
-	US_Print ("Attention");
-#endif
+	US_Print (language["REGNOTICE_TITLE"]);
 
 	SETFONTCOLOR (HIGHLIGHT, BKGDCOLOR);
 	WindowX = PrintX = 40;
 	PrintY = 60;
-#ifdef SPANISH
-	US_Print ("Este juego NO es gratis y\n");
-	US_Print ("NO es Shareware; favor de\n");
-	US_Print ("no distribuirlo.\n\n");
-#else
-	US_Print ("This game is NOT shareware.\n");
-	US_Print ("Please do not distribute it.\n");
-	US_Print ("Thanks.\n\n");
-#endif
-	US_Print ("        Id Software\n");
+	US_Print (language["REGNOTICE_MESSAGE"]);
 
 	VW_UpdateScreen ();
 	VW_FadeIn ();
 	IN_Ack ();
 }
-#endif
-#endif
-#endif
 
 //===========================================================================

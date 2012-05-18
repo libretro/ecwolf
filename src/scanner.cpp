@@ -627,6 +627,7 @@ void Scanner::ScriptMessage(MessageLevel level, const char* error, ...) const
 			break;
 		case ERROR:
 			messageLevel = "Error";
+			break;
 	}
 
 	char* newMessage = new char[strlen(error) + SCString_Len(scriptIdentifier) + 25];
