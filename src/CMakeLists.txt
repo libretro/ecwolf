@@ -12,21 +12,7 @@ include_directories(
 	${CMAKE_BINARY_DIR}/gdtoa
 )
 
-option(SPEAR "Spear of Destiny")
-option(SPEARDEMO "Spear of Destiny Demo")
-option(WOLF3DSW "Wolfenstein 3D Shareware")
 option(GPL "Build GPL edition")
-
-if(SPEAR)
-	add_definitions(-DSPEAR)
-	if(SPEARDEMO)
-		add_definitions(-DSPEARDEMO)
-	endif(SPEARDEMO)
-else(SPEAR)
-	if(WOLF3DSW)
-		add_definitions(-DUPLOAD)
-	endif(WOLF3DSW)
-endif(SPEAR)
 
 if(GPL)
 	add_definitions(-DUSE_GPL)
