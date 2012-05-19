@@ -17,7 +17,7 @@
 #include "wl_atmos.h"
 #include "m_classes.h"
 #include "m_random.h"
-#include "config.hpp"
+#include "config.h"
 #include "w_wad.h"
 #include "language.h"
 #include "textures/textures.h"
@@ -37,20 +37,6 @@
 #include "wl_play.h"
 #include "wl_game.h"
 
-// Wad Code Stuff
-TArray<FString> wadfiles;
-void WL_AddFile(const char *file)
-{
-	wadfiles.Push(file);
-/*	wadlist_t *wad = (wadlist_t *)malloc(sizeof(*wad) + strlen(file));
-
-	*wadtail = wad;
-	wad->next = NULL;
-	strcpy(wad->name, file);
-	wadtail = &wad->next;*/
-}
-
-
 /*
 =============================================================================
 
@@ -62,8 +48,6 @@ void WL_AddFile(const char *file)
 
 =============================================================================
 */
-
-extern byte signon[];
 
 /*
 =============================================================================
@@ -915,7 +899,7 @@ Aspect CheckRatio (int width, int height)//, int *trueratio)
 
 #define IFARG(str) if(!strcmp(arg, (str)))
 
-FString CheckParameters(int argc, char *argv[], TArray<char*> &files)
+FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 {
 	FString extension = "wl6";
 	bool hasError = false, showHelp = false;
@@ -1247,23 +1231,25 @@ int main (int argc, char *argv[])
 		config->LocateConfigFile(argc, argv);
 		ReadConfig();
 
-		WL_AddFile("ecwolf.pk3");
-		FString extension;
-		TArray<char*> files;
+		{
+			FString extension;
+			TArray<FString> wadfiles, files;
+			files.Push("ecwolf.pk3");
 
-		extension = CheckParameters(argc, argv, files);
+			extension = CheckParameters(argc, argv, wadfiles);
 
-		WL_AddFile(FString("audiot.") + extension);
-		WL_AddFile(FString("gamemaps.") + extension);
-		WL_AddFile(FString("vgagraph.") + extension);
-		WL_AddFile(FString("vswap.") + extension);
-		for(unsigned int i = 0;i < files.Size();++i)
-			WL_AddFile(files[i]);
+			files.Push(FString("audiot.") + extension);
+			files.Push(FString("gamemaps.") + extension);
+			files.Push(FString("vgagraph.") + extension);
+			files.Push(FString("vswap.") + extension);
+			for(unsigned int i = 0;i < wadfiles.Size();++i)
+				wadfiles.Push(files[i]);
 
-		printf("W_Init: Init WADfiles.\n");
-		Wads.InitMultipleFiles(wadfiles);
-		language.SetupStrings();
-		LumpRemapper::RemapAll();
+			printf("W_Init: Init WADfiles.\n");
+			Wads.InitMultipleFiles(files);
+			language.SetupStrings();
+			LumpRemapper::RemapAll();
+		}
 
 		InitThinkerList();
 

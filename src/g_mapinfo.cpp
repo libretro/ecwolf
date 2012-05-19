@@ -40,6 +40,194 @@
 #include "w_wad.h"
 #include "v_video.h"
 
+////////////////////////////////////////////////////////////////////////////////
+// MapInfoBlockParser
+//
+// Base class to handle syntax of mapinfo lump for common types.
+
+class MapInfoBlockParser
+{
+public:
+	MapInfoBlockParser(Scanner &sc, const char* block) : sc(sc), block(block)
+	{
+	}
+
+	void Parse()
+	{
+		ParseHeader();
+		ParseBlock(block);
+	}
+
+protected:
+	virtual bool CheckKey(FString key)=0;
+	virtual void ParseHeader() {};
+
+	void ParseBoolAssignment(bool &dest)
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_BoolConst);
+		dest = sc->boolean;
+	}
+
+	void ParseColorAssignment(int &dest)
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_StringConst);
+		dest = V_GetColorFromString(NULL, sc->str);
+	}
+
+	void ParseColorArrayAssignment(TArray<int> &dest)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			sc.MustGetToken(TK_StringConst);
+			dest.Push(V_GetColorFromString(NULL, sc->str));
+		}
+		while(sc.CheckToken(','));
+	}
+
+	void ParseColorArrayAssignment(int *dest, unsigned int max)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			sc.MustGetToken(TK_StringConst);
+			*dest++ = V_GetColorFromString(NULL, sc->str);
+
+			if(--max == 0)
+				break;
+		}
+		while(sc.CheckToken(','));
+	}
+
+	void ParseIntAssignment(int &dest)
+	{
+		sc.MustGetToken('=');
+		bool negative = sc.CheckToken('-');
+		sc.MustGetToken(TK_IntConst);
+		dest = negative ? -sc->number : sc->number;
+	}
+
+	void ParseIntAssignment(unsigned int &dest)
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_IntConst);
+		dest = sc->number;
+	}
+
+	void ParseIntArrayAssignment(TArray<int> &dest)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			bool negative = sc.CheckToken('-');
+			sc.MustGetToken(TK_IntConst);
+			dest.Push(negative ? -sc->number : sc->number);
+		}
+		while(sc.CheckToken(','));
+	}
+
+	void ParseIntArrayAssignment(TArray<unsigned int> &dest)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			sc.MustGetToken(TK_IntConst);
+			dest.Push(sc->number);
+		}
+		while(sc.CheckToken(','));
+	}
+
+	void ParseIntArrayAssignment(int *dest, unsigned int max)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			bool negative = sc.CheckToken('-');
+			sc.MustGetToken(TK_IntConst);
+			*dest++ = negative ? -sc->number : sc->number;
+
+			if(--max == 0)
+				break;
+		}
+		while(sc.CheckToken(','));
+	}
+
+	void ParseIntArrayAssignment(unsigned int *dest, unsigned int max)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			sc.MustGetToken(TK_IntConst);
+			*dest++ = sc->number;
+
+			if(--max == 0)
+				break;
+		}
+		while(sc.CheckToken(','));
+	}
+
+	void ParseStringAssignment(FString &dest)
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_StringConst);
+		dest = sc->str;
+	}
+
+	void ParseStringArrayAssignment(TArray<FString> &dest)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			sc.MustGetToken(TK_StringConst);
+			dest.Push(sc->str);
+		}
+		while(sc.CheckToken(','));
+	}
+
+	void ParseStringArrayAssignment(FString *dest, unsigned int max)
+	{
+		sc.MustGetToken('=');
+		do
+		{
+			sc.MustGetToken(TK_StringConst);
+			*dest++ = sc->str;
+
+			if(--max == 0)
+				break;
+		}
+		while(sc.CheckToken(','));
+	}
+
+	Scanner &sc;
+	const char* const block;
+
+private:
+	void ParseBlock(const char* block)
+	{
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			if(!CheckKey(sc->str))
+			{
+				sc.ScriptMessage(Scanner::WARNING, "Unknown %s property '%s'.", block, sc->str.GetChars());
+				if(sc.CheckToken('='))
+				{
+					do
+					{
+						sc.GetNextToken();
+					}
+					while(sc.CheckToken(','));
+				}
+			}
+		}
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 static LevelInfo defaultMap;
 static TArray<LevelInfo> levelInfos;
 
@@ -61,10 +249,22 @@ LevelInfo &LevelInfo::Find(const char* level)
 	return defaultMap;
 }
 
-static void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
+class LevelInfoBlockParser : public MapInfoBlockParser
 {
-	if(parseHeader)
+private:
+	bool parseHeader;
+	LevelInfo &mapInfo;
+
+public:
+	LevelInfoBlockParser(Scanner &sc, LevelInfo &mapInfo, bool parseHeader) :
+		MapInfoBlockParser(sc, "map"), mapInfo(mapInfo), parseHeader(parseHeader) {}
+
+protected:
+	void ParseHeader()
 	{
+		if(!parseHeader)
+			return;
+
 		bool useLanguage = false;
 		if(sc.CheckToken(TK_Identifier))
 		{
@@ -83,180 +283,97 @@ static void ParseMap(Scanner &sc, LevelInfo &mapInfo, bool parseHeader=true)
 		}
 	}
 
-	sc.MustGetToken('{');
-	while(!sc.CheckToken('}'))
+	bool CheckKey(FString key)
 	{
-		sc.MustGetToken(TK_Identifier);
-		FString key = sc->str;
-
-		sc.MustGetToken('=');
-
 		if(key.CompareNoCase("next") == 0)
 		{
-			sc.MustGetToken(TK_StringConst);
-			strncpy(mapInfo.NextMap, sc->str.GetChars(), 8);
+			FString lump;
+			ParseStringAssignment(lump);
+			strncpy(mapInfo.NextMap, lump.GetChars(), 8);
 			mapInfo.NextMap[8] = 0;
 		}
 		else if(key.CompareNoCase("secretnext") == 0)
 		{
-			sc.MustGetToken(TK_StringConst);
-			strncpy(mapInfo.NextSecret, sc->str.GetChars(), 8);
+			FString lump;
+			ParseStringAssignment(lump);
+			strncpy(mapInfo.NextSecret, lump.GetChars(), 8);
 			mapInfo.NextSecret[8] = 0;
 		}
 		else if(key.CompareNoCase("defaultfloor") == 0)
 		{
-			sc.MustGetToken(TK_StringConst);
-			mapInfo.DefaultTexture[MapSector::Floor] = TexMan.GetTexture(sc->str, FTexture::TEX_Flat);
+			FString textureName;
+			ParseStringAssignment(textureName);
+			mapInfo.DefaultTexture[MapSector::Floor] = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
 		}
 		else if(key.CompareNoCase("defaultceiling") == 0)
 		{
-			sc.MustGetToken(TK_StringConst);
-			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(sc->str, FTexture::TEX_Flat);
+			FString textureName;
+			ParseStringAssignment(textureName);
+			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
 		}
 		else if(key.CompareNoCase("FloorNumber") == 0)
-		{
-			sc.MustGetToken(TK_IntConst);
-			mapInfo.FloorNumber = sc->number;
-		}
+			ParseIntAssignment(mapInfo.FloorNumber);
 		else if(key.CompareNoCase("Music") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			mapInfo.Music = sc->str;
-		}
+			ParseStringAssignment(mapInfo.Music);
 		else if(key.CompareNoCase("Par") == 0)
-		{
-			sc.MustGetToken(TK_IntConst);
-			mapInfo.Par = sc->number;
-		}
+			ParseIntAssignment(mapInfo.Par);
 		else
-		{
-			sc.ScriptMessage(Scanner::WARNING, "Unknown map property '%s'!", key.GetChars());
-			do
-			{
-				sc.GetNextToken();
-			}
-			while(sc.CheckToken(','));
-		}
+			return false;
+		return true;
 	}
-}
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
 GameInfo gameinfo;
 
-void ParseGameInfo(Scanner &sc)
+class GameInfoBlockParser : public MapInfoBlockParser
 {
-	sc.MustGetToken('{');
-	while(!sc.CheckToken('}'))
+public:
+	GameInfoBlockParser(Scanner &sc) : MapInfoBlockParser(sc, "gameinfo") {}
+
+protected:
+	bool CheckKey(FString key)
 	{
-		sc.MustGetToken(TK_Identifier);
-		FString key = sc->str;
-
-		sc.MustGetToken('=');
-
 		if(key.CompareNoCase("creditpage") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.CreditPage = sc->str;
-		}
+			ParseStringAssignment(gameinfo.CreditPage);
 		else if(key.CompareNoCase("drawreadthis") == 0)
-		{
-			sc.MustGetToken(TK_BoolConst);
-			gameinfo.DrawReadThis = sc->boolean;
-		}
+			ParseBoolAssignment(gameinfo.DrawReadThis);
 		else if(key.CompareNoCase("gamepalette") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.GamePalette = sc->str;
-		}
+			ParseStringAssignment(gameinfo.GamePalette);
 		else if(key.CompareNoCase("signon") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.SignonLump = sc->str;
-		}
+			ParseStringAssignment(gameinfo.SignonLump);
 		else if(key.CompareNoCase("signoncolors") == 0)
-		{
 			// Fill, Main, EMS, XMS
-			for(int i = 0;i < 4;++i)
-			{
-				if(i != 0)
-					sc.MustGetToken(',');
-				sc.MustGetToken(TK_StringConst);
-				gameinfo.SignonColors[i] = V_GetColorFromString(NULL, sc->str);
-			}
-		}
+			ParseColorArrayAssignment(gameinfo.SignonColors, 4);
 		else if(key.CompareNoCase("menufade") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.MenuFadeColor = V_GetColorFromString(NULL, sc->str);
-		}
+			ParseColorAssignment(gameinfo.MenuFadeColor);
 		else if(key.CompareNoCase("menucolors") == 0)
-		{
 			// Border1, Border2, Background, Stripe
-			for(int i = 0;i < 4;++i)
-			{
-				if(i != 0)
-					sc.MustGetToken(',');
-				sc.MustGetToken(TK_StringConst);
-				gameinfo.MenuColors[i] = V_GetColorFromString(NULL, sc->str);
-			}
-		}
+			ParseColorArrayAssignment(gameinfo.MenuColors, 4);
 		else if(key.CompareNoCase("titlemusic") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.TitleMusic = sc->str;
-		}
+			ParseStringAssignment(gameinfo.TitleMusic);
 		else if(key.CompareNoCase("titlepalette") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.TitlePalette = sc->str;
-		}
+			ParseStringAssignment(gameinfo.TitlePalette);
 		else if(key.CompareNoCase("titlepage") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.TitlePage = sc->str;
-		}
+			ParseStringAssignment(gameinfo.TitlePage);
 		else if(key.CompareNoCase("titletime") == 0)
-		{
-			sc.MustGetToken(TK_IntConst);
-			gameinfo.TitleTime = sc->number;
-		}
+			ParseIntAssignment(gameinfo.TitleTime);
 		else if(key.CompareNoCase("pagetime") == 0)
-		{
-			sc.MustGetToken(TK_IntConst);
-			gameinfo.PageTime = sc->number;
-		}
+			ParseIntAssignment(gameinfo.PageTime);
 		else if(key.CompareNoCase("menumusic") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.MenuMusic = sc->str;
-		}
+			ParseStringAssignment(gameinfo.MenuMusic);
 		else if(key.CompareNoCase("scoresmusic") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.ScoresMusic = sc->str;
-		}
+			ParseStringAssignment(gameinfo.ScoresMusic);
 		else if(key.CompareNoCase("finalemusic") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.FinaleMusic = sc->str;
-		}
+			ParseStringAssignment(gameinfo.FinaleMusic);
 		else if(key.CompareNoCase("intermissionmusic") == 0)
-		{
-			sc.MustGetToken(TK_StringConst);
-			gameinfo.IntermissionMusic = sc->str;
-		}
+			ParseStringAssignment(gameinfo.IntermissionMusic);
 		else
-		{
-			sc.ScriptMessage(Scanner::WARNING, "Unknown gameinfo property '%s'!", key.GetChars());
-			do
-			{
-				sc.GetNextToken();
-			}
-			while(sc.CheckToken(','));
-		}
+			return false;
+		return true;
 	}
-}
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -276,70 +393,57 @@ EpisodeInfo &EpisodeInfo::GetEpisode(unsigned int index)
 	return episodes[index];
 }
 
-// Returns true if the episode should be added to the list
-static bool ParseEpisode(Scanner &sc, EpisodeInfo &episode)
+class EpisodeBlockParser : public MapInfoBlockParser
 {
-	bool useEpisode = true;
+private:
+	EpisodeInfo &episode;
+	bool useEpisode;
 
-	sc.MustGetToken(TK_StringConst);
-	episode.StartMap = sc->str;
+public:
+	EpisodeBlockParser(Scanner &sc, EpisodeInfo &episode) :
+		MapInfoBlockParser(sc, "episode"), episode(episode), useEpisode(true)
+		{}
 
-	sc.MustGetToken('{');
-	while(!sc.CheckToken('}'))
+	bool UseEpisode() const { return useEpisode; }
+
+protected:
+	void ParseHeader()
 	{
-		sc.MustGetToken(TK_Identifier);
-		FString key = sc->str;
+		sc.MustGetToken(TK_StringConst);
+		episode.StartMap = sc->str;
+	}
 
+	bool CheckKey(FString key)
+	{
 		if(key.CompareNoCase("name") == 0)
-		{
-			sc.MustGetToken('=');
-			sc.MustGetToken(TK_StringConst);
-			episode.StartMap = sc->str;
-		}
+			ParseStringAssignment(episode.StartMap);
 		else if(key.CompareNoCase("lookup") == 0)
 		{
-			sc.MustGetToken('=');
-			sc.MustGetToken(TK_StringConst);
-			episode.EpisodeName = language[sc->str];
+			ParseStringAssignment(episode.EpisodeName);
+			episode.EpisodeName = language[episode.EpisodeName];
 		}
 		else if(key.CompareNoCase("picname") == 0)
-		{
-			sc.MustGetToken('=');
-			sc.MustGetToken(TK_StringConst);
-			episode.EpisodePicture = sc->str;
-		}
+			ParseStringAssignment(episode.EpisodePicture);
 		else if(key.CompareNoCase("key") == 0)
 		{
-			sc.MustGetToken('=');
-			sc.MustGetToken(TK_StringConst);
-			episode.Shortcut = sc->str[0];
+			FString tmp;
+			ParseStringAssignment(tmp);
+			episode.Shortcut = tmp[0];
 		}
 		else if(key.CompareNoCase("remove") == 0)
-		{
 			useEpisode = false;
-		}
 		else if(key.CompareNoCase("noskillmenu") == 0)
-		{
 			episode.NoSkill = true;
-		}
 		else if(key.CompareNoCase("optional") == 0)
 		{
 			if(Wads.CheckNumForName(episode.StartMap) == -1)
 				useEpisode = false;
 		}
 		else
-		{
-			sc.ScriptMessage(Scanner::WARNING, "Unknown episode property '%s'!", key.GetChars());
-			do
-			{
-				sc.GetNextToken();
-			}
-			while(sc.CheckToken(','));
-		}
+			return false;
+		return true;
 	}
-
-	return useEpisode;
-}
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -355,26 +459,28 @@ static void ParseMapInfoLump(int lump)
 		if(sc->str.CompareNoCase("defaultmap") == 0)
 		{
 			defaultMap = LevelInfo();
-			ParseMap(sc, defaultMap, false);
+			LevelInfoBlockParser(sc, defaultMap, false).Parse();
 		}
 		else if(sc->str.CompareNoCase("adddefaultmap") == 0)
 		{
-			ParseMap(sc, defaultMap, false);
+			LevelInfoBlockParser(sc, defaultMap, false).Parse();
 		}
 		else if(sc->str.CompareNoCase("gameinfo") == 0)
 		{
-			ParseGameInfo(sc);
+			GameInfoBlockParser(sc).Parse();
 		}
 		else if(sc->str.CompareNoCase("episode") == 0)
 		{
 			EpisodeInfo episode;
-			if(ParseEpisode(sc, episode))
+			EpisodeBlockParser parser(sc, episode);
+			parser.Parse();
+			if(parser.UseEpisode())
 				episodes.Push(episode);
 		}
 		else if(sc->str.CompareNoCase("map") == 0)
 		{
 			LevelInfo newMap = defaultMap;
-			ParseMap(sc, newMap);
+			LevelInfoBlockParser(sc, newMap, true).Parse();
 			levelInfos.Push(newMap);
 		}
 	}

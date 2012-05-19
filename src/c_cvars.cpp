@@ -33,7 +33,7 @@
 */
 
 #include "c_cvars.h"
-#include "config.hpp"
+#include "config.h"
 #include "wl_def.h"
 #include "id_sd.h"
 #include "id_in.h"
