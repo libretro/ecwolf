@@ -1243,7 +1243,7 @@ int main (int argc, char *argv[])
 			files.Push(FString("vgagraph.") + extension);
 			files.Push(FString("vswap.") + extension);
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
-				wadfiles.Push(files[i]);
+				files.Push(wadfiles[i]);
 
 			printf("W_Init: Init WADfiles.\n");
 			Wads.InitMultipleFiles(files);
