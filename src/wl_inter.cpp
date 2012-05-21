@@ -784,26 +784,24 @@ done:   itoa (kr, tempstr, 10);
 
 bool PreloadUpdate (unsigned current, unsigned total)
 {
-	unsigned w = WindowW - scaleFactor * 10;
 
-	VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
-		w, scaleFactor * 2, BLACK);
-	w = ((int32_t) w * current) / total;
-	if (w)
+	double x = 53;
+	double y = 101;
+	double w = 214.0*current/total;
+	double h = 3;
+	double ow = w - 1;
+	double oh = h - 1;
+	double ox = x, oy = y;
+	VirtualToRealCoords(x, y, w, h, 320, 200, false, true);
+	VirtualToRealCoords(ox, oy, ow, oh, 320, 200, false, true);
+
+	if (current)
 	{
-		VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
-			w, scaleFactor * 2, 0x37);       //SECONDCOLOR);
-		VWB_BarScaledCoord (WindowX + scaleFactor * 5, WindowY + WindowH - scaleFactor * 3,
-			w - scaleFactor * 1, scaleFactor * 1, 0x32);
+		VWB_Clear(0x37, x, y, x+w, y+h);
+		VWB_Clear(0x32, ox, oy, ox+ow, oy+oh);
 
 	}
 	VW_UpdateScreen ();
-//      if (LastScan == sc_Escape)
-//      {
-//              IN_ClearKeysDown();
-//              return(true);
-//      }
-//      else
 	return (false);
 }
 
