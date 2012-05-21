@@ -944,22 +944,6 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			{
 				screenWidth = atoi(argv[++i]);
 				screenHeight = atoi(argv[++i]);
-				unsigned factor = screenWidth / 320;
-				if(screenWidth % 320 || screenHeight != 200 * factor && screenHeight != 240 * factor)
-					printf("Screen size must be a multiple of 320x200 or 320x240!\n"), hasError = true;
-			}
-		}
-		else IFARG("--resf")
-		{
-			if(i + 2 >= argc)
-			{
-				printf("The resf option needs the width and/or the height argument!\n");
-				hasError = true;
-			}
-			else
-			{
-				screenWidth = atoi(argv[++i]);
-				screenHeight = atoi(argv[++i]);
 				if(screenWidth < 320)
 					printf("Screen width must be at least 320!\n"), hasError = true;
 				if(screenHeight < 200)
@@ -1091,6 +1075,11 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			}
 			else
 				extension = argv[i];
+		else IFARG("--file")
+		{
+			if(++i < argc)
+				files.Push(argv[++i]);
+		}
 		else
 			files.Push(argv[i]);
 	}
@@ -1104,6 +1093,7 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			"Usage: Wolf4SDL [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
+			" --file <file>          Loads an extra data file\n"
 			" --tedlevel <level>     Starts the game in the given level\n"
 			" --baby                 Sets the difficulty to baby for tedlevel\n"
 			" --easy                 Sets the difficulty to easy for tedlevel\n"
@@ -1113,8 +1103,6 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			" --fullscreen           Starts the game in fullscreen mode\n"
 			" --res <width> <height> Sets the screen resolution\n"
 			"                        (must be multiple of 320x200 or 320x240)\n"
-			" --resf <w> <h>         Sets any screen resolution >= 320x200\n"
-			"                        (which may result in graphic errors)\n"
 			" --aspect <aspect>      Sets the aspect ratio.\n"
 			" --noadaptive           Disables adaptive tics.\n"
 			" --bits <b>             Sets the screen color depth\n"
