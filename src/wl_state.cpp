@@ -958,6 +958,7 @@ void FirstSighting (AActor *ob)
 	if (ob->distance < 0)
 		ob->distance = 0;       // ignore the door opening command
 
+	ob->flags &= ~FL_PATHING;
 	ob->flags |= FL_ATTACKMODE|FL_FIRSTATTACK;
 }
 
@@ -981,7 +982,10 @@ static FRandom pr_sight("SightPlayer");
 bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
 {
 	if (ob->flags & FL_ATTACKMODE)
-		Quit ("An actor in ATTACKMODE called SightPlayer!");
+	{
+		Printf ("An actor in ATTACKMODE called SightPlayer!");
+		assert (!(ob->flags & FL_ATTACKMODE));
+	}
 
 	if (ob->sighttime != ob->defaults->sighttime)
 	{
@@ -1016,7 +1020,6 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 		return false;
 	}
 
-	ob->flags &= ~FL_PATHING;
 	FirstSighting (ob);
 
 	return true;
