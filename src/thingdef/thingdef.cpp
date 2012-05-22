@@ -411,7 +411,7 @@ ClassDef::ClassDef() : tentative(false)
 	defaultInstance = (AActor *) malloc(sizeof(AActor));
 	defaultInstance = new (defaultInstance) AActor(this);
 	defaultInstance->defaults = defaultInstance;
-	defaultInstance->Init(true);
+	defaultInstance->InitClean();
 }
 
 ClassDef::~ClassDef()
