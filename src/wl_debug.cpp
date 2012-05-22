@@ -18,6 +18,7 @@
 #include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_play.h"
+#include "w_wad.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -438,7 +439,7 @@ again:
 		US_Print("  Warp to which level: ");
 		VW_UpdateScreen();
 		esc = !US_LineInput (px,py,str,NULL,true,8,0);
-		if (!esc)
+		if (!esc && Wads.CheckNumForName(str) != -1)
 		{
 			strncpy(gamestate.mapname, str, 8);
 			gamestate.mapname[8] = 0;

@@ -806,7 +806,8 @@ restartgame:
 		if (!loadedgame)
 		{
 			SetupGameLevel ();
-			FinishTravel ();
+			if(playstate != ex_warped)
+				FinishTravel ();
 		}
 
 		ingame = true;
@@ -936,6 +937,10 @@ startplayloop:
 
 				CheckHighScore (players[0].score,gamestate.mapon+1);
 				return;
+
+			case ex_warped:
+				players[0].state = player_t::PST_ENTER;
+				break;
 
 			default:
 				if(viewsize == 21) DrawPlayScreen();
