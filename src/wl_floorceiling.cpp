@@ -72,7 +72,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 					unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
 					if(curtoptex.isValid() && y < halfheight)
 						vbuf[top_add] = curshades[toptex[texoffs]];
-					if(curbottex.isValid())
+					if(curbottex.isValid() && y+halfheight < viewheight)
 						vbuf[bot_add] = curshades[bottex[texoffs]];
 				}
 			}
