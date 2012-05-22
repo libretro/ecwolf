@@ -74,6 +74,7 @@ const struct FlagDef
 	DEFINE_FLAG(FL, COUNTKILL, Actor, flags),
 	DEFINE_FLAG(FL, COUNTITEM, Actor, flags),
 	DEFINE_FLAG(FL, COUNTSECRET, Actor, flags),
+	DEFINE_FLAG(FL, DROPBASEDONTARGET, Actor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, Actor, flags),
 	DEFINE_FLAG(FL, ISMONSTER, Actor, flags),
 	DEFINE_FLAG(FL, MISSILE, Actor, flags),

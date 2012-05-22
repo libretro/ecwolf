@@ -181,14 +181,31 @@ void AActor::Die()
 	if(dropitems)
 	{
 		DropList::Node *item = dropitems->Head();
+		DropItem *bestDrop = NULL; // For FL_DROPBASEDONTARGET
 		do
 		{
-			DropItem &drop = item->Item();
-			if(US_RndT() < drop.probabilty)
+			DropItem *drop = &item->Item();
+			if(US_RndT() < drop->probabilty)
 			{
-				const ClassDef *cls = ClassDef::FindClass(drop.className);
+				const ClassDef *cls = ClassDef::FindClass(drop->className);
 				if(cls)
 				{
+					if(flags & FL_DROPBASEDONTARGET)
+					{
+						AActor *target = players[0].mo;
+						AInventory *inv = target->FindInventory(cls);
+						if(!inv || !bestDrop)
+							bestDrop = drop;
+
+						if(item->Next() != NULL)
+							continue;
+						else
+						{
+							cls = ClassDef::FindClass(bestDrop->className);
+							drop = bestDrop;
+						}
+					}
+
 					// We can't use tilex/tiley since it's used primiarily by
 					// the AI, so it can be off by one.
 					static const fixed TILEMASK = ~(TILEGLOBAL-1);
@@ -196,6 +213,8 @@ void AActor::Die()
 					AActor *actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0);
 					actor->angle = angle;
 					actor->dir = dir;
+					if(cls->IsDescendantOf(NATIVE_CLASS(Ammo)))
+						static_cast<AAmmo *>(actor)->amount = drop->amount;
 				}
 			}
 		}

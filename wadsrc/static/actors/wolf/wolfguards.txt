@@ -215,11 +215,13 @@ actor WolfensteinSS 13 // ZDoom compatible name
 	health 100
 	speed 1, 4
 	sighttime 1, 6
+	dropitem "MachineGun"
 	dropitem "Clip", 4
 	attacksound "wolfss/attack"
 	deathsound "wolfss/death"
 	seesound "wolfss/sight"
 	MONSTER
+	+DROPBASEDONTARGET
 	states
 	{
 		Spawn:
