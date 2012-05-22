@@ -40,6 +40,7 @@
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_play.h"
+#include "wl_state.h"
 
 static ActionTable *actionFunctions = NULL;
 ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(name),
@@ -141,6 +142,25 @@ ACTION_FUNCTION(A_MeleeAttack)
 	{
 		if(pr_meleeattack() < accuracy*255)
 			TakeDamage(damage, self);
+	}
+}
+
+static FRandom pr_monsterrefire("MonsterRefire");
+ACTION_FUNCTION(A_MonsterRefire)
+{
+	ACTION_PARAM_INT(probability, 0);
+	ACTION_PARAM_STATE(jump, 1);
+
+	AActor *target = players[0].mo;
+
+	if(jump && (
+		pr_monsterrefire() >= probability ||
+		!(self->flags & FL_ATTACKMODE) || !target ||
+		target->health <= 0 ||
+		!CheckLine(self)
+	))
+	{
+		self->SetState(jump);
 	}
 }
 
