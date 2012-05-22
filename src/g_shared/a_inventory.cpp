@@ -287,6 +287,34 @@ const Frame *AWeapon::GetReadyState() const
 	return FindState(NAME_Ready);
 }
 
+bool AWeapon::HandlePickup(AInventory *item, bool &good)
+{
+	if(item->GetClass() == GetClass())
+	{
+		good = static_cast<AWeapon *>(item)->UseForAmmo(this);
+		return true;
+	}
+	else if(inventory)
+		return inventory->HandlePickup(item, good);
+	return false;
+}
+
+bool AWeapon::UseForAmmo(AWeapon *owned)
+{
+	AAmmo *ammo1 = owned->ammo1;
+	if(!ammo1 || ammogive1 <= 0)
+		return false;
+
+	if(ammo1->amount < ammo1->maxamount)
+	{
+		ammo1->amount += ammogive1;
+		if(ammo1->amount > ammo1->maxamount)
+			ammo1->amount = ammo1->maxamount;
+		return true;
+	}
+	return false;
+}
+
 ACTION_FUNCTION(A_ReFire)
 {
 	player_t *player = self->player;

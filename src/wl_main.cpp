@@ -1102,7 +1102,6 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			" --nowait               Skips intro screens\n"
 			" --fullscreen           Starts the game in fullscreen mode\n"
 			" --res <width> <height> Sets the screen resolution\n"
-			"                        (must be multiple of 320x200 or 320x240)\n"
 			" --aspect <aspect>      Sets the aspect ratio.\n"
 			" --noadaptive           Disables adaptive tics.\n"
 			" --bits <b>             Sets the screen color depth\n"

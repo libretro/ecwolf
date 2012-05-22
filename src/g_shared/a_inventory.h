@@ -45,6 +45,7 @@ class AInventory : public AActor
 	public:
 		virtual void	AttachToOwner(AActor *owner);
 		virtual void	DetachFromOwner();
+		virtual bool	HandlePickup(AInventory *item, bool &good);
 		void			Touch(AActor *toucher);
 		virtual bool	TryPickup(AActor *toucher);
 		virtual bool	Use();
@@ -60,7 +61,6 @@ class AInventory : public AActor
 		virtual AInventory	*CreateCopy(AActor *holder);
 		void				GoAwayAndDie();
 		bool				GoesAway();
-		virtual bool		HandlePickup(AInventory *item, bool &good);
 		void				InitClean();
 };
 
@@ -106,6 +106,8 @@ class AWeapon : public AInventory
 		const Frame	*GetReadyState() const;
 		const Frame	*GetUpState() const;
 
+		bool		HandlePickup(AInventory *item, bool &good);
+
 		const ClassDef	*ammotype1;
 		unsigned int	ammogive1;
 		unsigned int	ammouse1;
@@ -114,6 +116,9 @@ class AWeapon : public AInventory
 		// Inventory instance variables
 		FireMode		mode;
 		AAmmo			*ammo1;
+
+	protected:
+		bool	UseForAmmo(AWeapon *owned);
 };
 
 #endif
