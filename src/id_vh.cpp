@@ -7,7 +7,7 @@
 #include "v_palette.h"
 #include "textures/textures.h"
 
-int	    px,py;
+int	    pa=MENU_CENTER,px,py;
 byte	fontcolor,backcolor;
 int	    fontnumber;
 
@@ -23,7 +23,7 @@ void VWB_DrawPropString(const char* string)
 	unsigned sx, sy;
 	int tmp1, tmp2;
 	int cx = px, cy = py;
-	MenuToRealCoords(cx, cy, tmp1, tmp2, MENU_CENTER);
+	MenuToRealCoords(cx, cy, tmp1, tmp2, (MenuOffset)pa);
 
 	const char* fonts[2] = { "FONT1", "FONT2" };
 	int lumpNum = Wads.CheckNumForName(fonts[fontnumber], ns_graphics);

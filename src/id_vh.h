@@ -31,7 +31,7 @@ typedef struct
 
 extern  byte            fontcolor,backcolor;
 extern	int             fontnumber;
-extern	int             px,py;
+extern	int             pa,px,py;
 
 #define SETFONTCOLOR(f,b) fontcolor=f;backcolor=b;
 

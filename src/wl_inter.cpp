@@ -1075,7 +1075,9 @@ void NonShareware (void)
 	PrintX = 110;
 	PrintY = 15;
 
+	pa = MENU_TOP;
 	US_Print (language["REGNOTICE_TITLE"]);
+	pa = MENU_CENTER;
 
 	SETFONTCOLOR (HIGHLIGHT, BKGDCOLOR);
 	WindowX = PrintX = 40;
