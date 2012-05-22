@@ -125,7 +125,7 @@ ACTION_FUNCTION(A_Jump)
 
 	if(chance >= 256 || pr_cajump() < chance)
 	{
-		ACTION_PARAM_STATE(frame, (ACTION_PARAM_COUNT == 2 ? 1 : (1 + pr_cajump() % (ACTION_PARAM_COUNT - 1))));
+		ACTION_PARAM_STATE(frame, (ACTION_PARAM_COUNT == 2 ? 1 : (1 + pr_cajump() % (ACTION_PARAM_COUNT - 1))), NULL);
 
 		if(frame)
 			self->SetState(frame);
@@ -149,7 +149,7 @@ static FRandom pr_monsterrefire("MonsterRefire");
 ACTION_FUNCTION(A_MonsterRefire)
 {
 	ACTION_PARAM_INT(probability, 0);
-	ACTION_PARAM_STATE(jump, 1);
+	ACTION_PARAM_STATE(jump, 1, NULL);
 
 	AActor *target = players[0].mo;
 

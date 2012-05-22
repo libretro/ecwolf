@@ -321,7 +321,7 @@ void SelectPathDir (AActor *ob)
 		ob->dir = nodir;
 }
 
-ACTION_FUNCTION(T_Chase)
+ACTION_FUNCTION(A_Chase)
 {
 	enum
 	{
@@ -330,7 +330,9 @@ ACTION_FUNCTION(T_Chase)
 		CHF_NOSIGHTCHECK = 4
 	};
 
-	ACTION_PARAM_INT(flags, 0);
+	ACTION_PARAM_STATE(melee, 0, self->MeleeState);
+	ACTION_PARAM_STATE(missile, 1, self->MissileState);
+	ACTION_PARAM_INT(flags, 2);
 
 	int32_t	move,target;
 	int		dx,dy,dist,chance;
@@ -342,7 +344,7 @@ ACTION_FUNCTION(T_Chase)
 
 	if(!pathing)
 	{
-		if(self->MissileState)
+		if(missile)
 		{
 			dodge = false;
 			if (CheckLine(self)) // got a shot at players[0].mo?
@@ -375,8 +377,8 @@ ACTION_FUNCTION(T_Chase)
 
 				if ( US_RndT()<chance)
 				{
-					if(self->MissileState)
-						self->SetState(self->MissileState);
+					if(missile)
+						self->SetState(missile);
 					return;
 				}
 				dodge = !(flags & CHF_DONTDODGE);
@@ -417,10 +419,10 @@ ACTION_FUNCTION(T_Chase)
 			//
 			// check for melee range
 			//
-			if(self->MeleeState && CheckMeleeRange(self, players[0].mo))
+			if(melee && CheckMeleeRange(self, players[0].mo))
 			{
 				PlaySoundLocActor(self->attacksound, self);
-				self->SetState(self->MeleeState);
+				self->SetState(melee);
 				return;
 			}
 		}

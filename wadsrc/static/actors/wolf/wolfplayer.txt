@@ -30,12 +30,12 @@ actor BJRun
 	states
 	{
 		Spawn:
-			BLAZ A 6 NOP T_Chase(CHF_NOSIGHTCHECK)
+			BLAZ A 6 NOP A_Chase("*", "*", CHF_NOSIGHTCHECK)
 			BLAZ A 1.5
-			BLAZ B 4 NOP T_Chase(CHF_NOSIGHTCHECK)
-			BLAZ C 6 NOP T_Chase(CHF_NOSIGHTCHECK)
+			BLAZ B 4 NOP A_Chase("*", "*", CHF_NOSIGHTCHECK)
+			BLAZ C 6 NOP A_Chase("*", "*", CHF_NOSIGHTCHECK)
 			BLAZ C 1.5
-			BLAZ D 4 NOP T_Chase(CHF_NOSIGHTCHECK)
+			BLAZ D 4 NOP A_Chase("*", "*", CHF_NOSIGHTCHECK)
 			loop
 		Death:
 			BLAZ E 7 NOP T_BJJump

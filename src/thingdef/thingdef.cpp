@@ -102,12 +102,17 @@ const Frame *StateLabel::Resolve() const
 	return *(cls->FindStateInList(label) + offset);
 }
 
-const Frame *StateLabel::Resolve(AActor *self) const
+const Frame *StateLabel::Resolve(AActor *self, const Frame *def) const
 {
 	if(isRelative)
 		return self->GetClass()->frameList[self->state->index + offset];
+	else if(isDefault)
+		return def;
 
-	return *(self->GetClass()->FindStateInList(label) + offset);
+	const Frame * const *frame = self->GetClass()->FindStateInList(label);
+	if(frame)
+		return *(frame + offset);
+	return NULL;
 }
 
 void StateLabel::Parse(Scanner &sc, const ClassDef *parent, bool noRelative)
@@ -122,6 +127,9 @@ void StateLabel::Parse(Scanner &sc, const ClassDef *parent, bool noRelative)
 	}
 
 	isRelative = false;
+	isDefault = sc.CheckToken('*');
+	if(isDefault)
+		return;
 
 	sc.MustGetToken(TK_Identifier);
 	label = sc->str;

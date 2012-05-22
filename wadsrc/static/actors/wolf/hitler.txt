@@ -15,12 +15,12 @@ actor FakeHitler 18
 			FAKE A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			FAKE A 5 NOP T_Chase
+			FAKE A 5 NOP A_Chase
 			FAKE A 1.5
-			FAKE B 4 NOP T_Chase
-			FAKE C 5 NOP T_Chase
+			FAKE B 4 NOP A_Chase
+			FAKE C 5 NOP A_Chase
 			FAKE C 1.5
-			FAKE D 4 NOP T_Chase
+			FAKE D 4 NOP A_Chase
 			loop
 		Missile:
 			FAKE E 4
@@ -71,12 +71,12 @@ actor MechaHitler 19
 			MECH A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			MECH A 5 A_PlaySound("hitler/active") T_Chase
+			MECH A 5 A_PlaySound("hitler/active") A_Chase
 			MECH A 3
-			MECH B 4 NOP T_Chase
-			MECH C 5 A_PlaySound("hitler/active") T_Chase
+			MECH B 4 NOP A_Chase
+			MECH C 5 A_PlaySound("hitler/active") A_Chase
 			MECH C 3
-			MECH D 4 NOP T_Chase
+			MECH D 4 NOP A_Chase
 			loop
 		Missile:
 			MECH E 15
@@ -108,12 +108,12 @@ actor Hitler
 	{
 		Spawn:
 		See:
-			HTLR A 3 NOP T_Chase
+			HTLR A 3 NOP A_Chase
 			HTLR A 2
-			HTLR B 1 NOP T_Chase
-			HTLR C 3 NOP T_Chase
+			HTLR B 1 NOP A_Chase
+			HTLR C 3 NOP A_Chase
 			HTLR C 2
-			HTLR D 1 NOP T_Chase
+			HTLR D 1 NOP A_Chase
 			loop
 		Missile:
 			HTLR E 15

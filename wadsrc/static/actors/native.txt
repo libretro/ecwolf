@@ -21,6 +21,7 @@ actor Actor native
 	native int health;
 
 	action native A_BossDeath();
+	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype);
 	action native A_DeathScream();
 	action native A_Dormant();
@@ -33,7 +34,6 @@ actor Actor native
 	action native A_PlaySound(string soundname);
 	action native A_SpawnItem(string type);
 	action native A_WolfAttack(int flags = 0, string sound = "*", float snipe = 1.0, int maxdamage = 64, int blocksize = 128, int pointblank = 2, int longrange = 4, float runspeed = 160.0);
-	action native T_Chase(int flags = 0);
 
 	states
 	{

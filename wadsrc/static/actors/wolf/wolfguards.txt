@@ -16,20 +16,20 @@ actor Guard 11
 			GARD A -1 NOP A_Look
 			stop
 		Path:
-			GARD B 10 NOP T_Chase
+			GARD B 10 NOP A_Chase
 			GARD B 2.5
-			GARD C 7.5 NOP T_Chase
-			GARD D 10 NOP T_Chase
+			GARD C 7.5 NOP A_Chase
+			GARD D 10 NOP A_Chase
 			GARD D 2.5
-			GARD E 7.5 NOP T_Chase
+			GARD E 7.5 NOP A_Chase
 			loop
 		See:
-			GARD B 5 NOP T_Chase
+			GARD B 5 NOP A_Chase
 			GARD B 1.5
-			GARD C 4 NOP T_Chase
-			GARD D 5 NOP T_Chase
+			GARD C 4 NOP A_Chase
+			GARD D 5 NOP A_Chase
 			GARD D 1.5
-			GARD E 4 NOP T_Chase
+			GARD E 4 NOP A_Chase
 			loop
 		Missile:
 			GARD FG 10
@@ -75,12 +75,12 @@ actor Dog 14
 	{
 		Spawn:
 		Path:
-			DOGY A 10 NOP T_Chase
+			DOGY A 10 NOP A_Chase
 			DOGY A 2.5
-			DOGY B 7.5 NOP T_Chase
-			DOGY C 10 NOP T_Chase
+			DOGY B 7.5 NOP A_Chase
+			DOGY C 10 NOP A_Chase
 			DOGY C 2.5
-			DOGY D 7.5 NOP T_Chase
+			DOGY D 7.5 NOP A_Chase
 			loop
 		Melee:
 			DOGY EF 5
@@ -88,12 +88,12 @@ actor Dog 14
 			DOGY EA 5
 			goto See
 		See:
-			DOGY A 5 NOP T_Chase
+			DOGY A 5 NOP A_Chase
 			DOGY A 1.5
-			DOGY B 4 NOP T_Chase
-			DOGY C 5 NOP T_Chase
+			DOGY B 4 NOP A_Chase
+			DOGY C 5 NOP A_Chase
 			DOGY C 1.5
-			DOGY D 4 NOP T_Chase
+			DOGY D 4 NOP A_Chase
 			loop
 		Death:
 			DOGY H 7.5 A_Fall
@@ -122,12 +122,12 @@ actor Officer 12
 			OFFI A -1 NOP A_Look
 			stop
 		Path:
-			OFFI B 10 NOP T_Chase
+			OFFI B 10 NOP A_Chase
 			OFFI B 2.5
-			OFFI C 7.5 NOP T_Chase
-			OFFI D 10 NOP T_Chase
+			OFFI C 7.5 NOP A_Chase
+			OFFI D 10 NOP A_Chase
 			OFFI D 2.5
-			OFFI E 7.5 NOP T_Chase
+			OFFI E 7.5 NOP A_Chase
 			loop
 		Pain:
 			OFFI I 5
@@ -140,12 +140,12 @@ actor Officer 12
 			OFFI H 5 A_WolfAttack
 			goto See
 		See:
-			OFFI B 5 NOP T_Chase
+			OFFI B 5 NOP A_Chase
 			OFFI B 1.5
-			OFFI C 4 NOP T_Chase
-			OFFI D 5 NOP T_Chase
+			OFFI C 4 NOP A_Chase
+			OFFI D 5 NOP A_Chase
 			OFFI D 1.5
-			OFFI E 4 NOP T_Chase
+			OFFI E 4 NOP A_Chase
 			loop
 		Death:
 			OFFI K 5.5 A_Fall
@@ -173,12 +173,12 @@ actor Mutant 15
 			MTNT A -1 NOP A_Look
 			stop
 		Path:
-			MTNT B 10 NOP T_Chase
+			MTNT B 10 NOP A_Chase
 			MTNT B 2.5
-			MTNT C 7.5 NOP T_Chase
-			MTNT D 10 NOP T_Chase
+			MTNT C 7.5 NOP A_Chase
+			MTNT D 10 NOP A_Chase
 			MTNT D 2.5
-			MTNT E 7.5 NOP T_Chase
+			MTNT E 7.5 NOP A_Chase
 			loop
 		Pain:
 			MTNT J 5
@@ -186,12 +186,12 @@ actor Mutant 15
 			MTNT K 5
 			goto See
 		See:
-			MTNT B 5 NOP T_Chase
+			MTNT B 5 NOP A_Chase
 			MTNT B 1.5
-			MTNT C 4 NOP T_Chase
-			MTNT D 5 NOP T_Chase
+			MTNT C 4 NOP A_Chase
+			MTNT D 5 NOP A_Chase
 			MTNT D 1.5
-			MTNT E 4 NOP T_Chase
+			MTNT E 4 NOP A_Chase
 			loop
 		Missile:
 			MTNT F 3
@@ -226,20 +226,20 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			SSWV W -1 NOP A_Look
 			stop
 		Path:
-			SSWV A 10 NOP T_Chase
+			SSWV A 10 NOP A_Chase
 			SSWV A 2.5
-			SSWV B 7.5 NOP T_Chase
-			SSWV C 10 NOP T_Chase
+			SSWV B 7.5 NOP A_Chase
+			SSWV C 10 NOP A_Chase
 			SSWV C 2.5
-			SSWV D 7.5 NOP T_Chase
+			SSWV D 7.5 NOP A_Chase
 			loop
 		See:
-			SSWV A 5 NOP T_Chase
+			SSWV A 5 NOP A_Chase
 			SSWV A 1.5
-			SSWV B 4 NOP T_Chase
-			SSWV C 5 NOP T_Chase
+			SSWV B 4 NOP A_Chase
+			SSWV C 5 NOP A_Chase
 			SSWV C 1.5
-			SSWV D 4 NOP T_Chase
+			SSWV D 4 NOP A_Chase
 			loop
 		Pain:
 			SSWV H 5

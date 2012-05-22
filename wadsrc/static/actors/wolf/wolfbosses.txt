@@ -16,12 +16,12 @@ actor Hans 16
 			HANS A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			HANS A 5 NOP T_Chase
+			HANS A 5 NOP A_Chase
 			HANS A 1.5
-			HANS B 4 NOP T_Chase
-			HANS C 5 NOP T_Chase
+			HANS B 4 NOP A_Chase
+			HANS C 5 NOP A_Chase
 			HANS C 1.5
-			HANS D 4 NOP T_Chase
+			HANS D 4 NOP A_Chase
 			loop
 		Missile:
 			HANS E 15
@@ -55,12 +55,12 @@ actor Gretel 20
 			GRET A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			GRET A 5 NOP T_Chase
+			GRET A 5 NOP A_Chase
 			GRET A 1.5
-			GRET B 4 NOP T_Chase
-			GRET C 5 NOP T_Chase
+			GRET B 4 NOP A_Chase
+			GRET C 5 NOP A_Chase
 			GRET C 1.5
-			GRET D 4 NOP T_Chase
+			GRET D 4 NOP A_Chase
 			loop
 		Missile:
 			GRET E 15
@@ -108,12 +108,12 @@ actor Schabbs 17
 			SHAB A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			SHAB A 5 NOP T_Chase(CHF_BACKOFF)
+			SHAB A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			SHAB A 1.5
-			SHAB B 4 NOP T_Chase(CHF_BACKOFF)
-			SHAB C 5 NOP T_Chase(CHF_BACKOFF)
+			SHAB B 4 NOP A_Chase("*", "*", CHF_BACKOFF)
+			SHAB C 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			SHAB C 1.5
-			SHAB D 4 NOP T_Chase(CHF_BACKOFF)
+			SHAB D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
 			SHAB E 15
@@ -147,12 +147,12 @@ actor Gift 21
 			GIFT A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			GIFT A 5 NOP T_Chase(CHF_BACKOFF)
+			GIFT A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			GIFT A 1.5
-			GIFT B 4 NOP T_Chase(CHF_BACKOFF)
-			GIFT C 5 NOP T_Chase(CHF_BACKOFF)
+			GIFT B 4 NOP A_Chase("*", "*", CHF_BACKOFF)
+			GIFT C 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			GIFT C 1.5
-			GIFT D 4 NOP T_Chase(CHF_BACKOFF)
+			GIFT D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
 			GIFT E 15
@@ -186,12 +186,12 @@ actor FatFace 22
 			FATF A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			FATF A 5 NOP T_Chase(CHF_BACKOFF)
+			FATF A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			FATF A 1.5
-			FATF B 4 NOP T_Chase(CHF_BACKOFF)
-			FATF C 5 NOP T_Chase(CHF_BACKOFF)
+			FATF B 4 NOP A_Chase("*", "*", CHF_BACKOFF)
+			FATF C 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			FATF C 1.5
-			FATF D 4 NOP T_Chase(CHF_BACKOFF)
+			FATF D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
 			FATF E 15

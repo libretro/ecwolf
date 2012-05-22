@@ -13,12 +13,12 @@ actor Trans 23
 			TRNS A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			TRNS A 5 NOP T_Chase
+			TRNS A 5 NOP A_Chase
 			TRNS A 1.5
-			TRNS B 4 NOP T_Chase
-			TRNS C 5 NOP T_Chase
+			TRNS B 4 NOP A_Chase
+			TRNS C 5 NOP A_Chase
 			TRNS C 1.5
-			TRNS D 4 NOP T_Chase
+			TRNS D 4 NOP A_Chase
 			loop
 		Missile:
 			TRNS E 15
@@ -49,12 +49,12 @@ actor UberMutant 24
 			UBER A -1 A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			UBER A 5 NOP T_Chase
+			UBER A 5 NOP A_Chase
 			UBER A 1.5
-			UBER B 4 NOP T_Chase
-			UBER C 5 NOP T_Chase
+			UBER B 4 NOP A_Chase
+			UBER C 5 NOP A_Chase
 			UBER C 1.5
-			UBER D 4 NOP T_Chase
+			UBER D 4 NOP A_Chase
 			loop
 		Missile:
 			UBER E 15
@@ -95,12 +95,12 @@ actor Wilhelm 25
 			WILL A -1
 			stop
 		See:
-			WILL A 5 NOP T_Chase(CHF_BACKOFF)
+			WILL A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			WILL A 1.5
-			WILL B 4 NOP T_Chase(CHF_BACKOFF)
-			WILL C 5 NOP T_Chase(CHF_BACKOFF)
+			WILL B 4 NOP A_Chase("*", "*", CHF_BACKOFF)
+			WILL C 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			WILL C 1.5
-			WILL D 4 NOP T_Chase(CHF_BACKOFF)
+			WILL D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
 			WILL E 15
@@ -134,12 +134,12 @@ actor DeathKnight 26
 			DKNT A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			DKNT A 5 NOP T_Chase(CHF_BACKOFF)
+			DKNT A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			DKNT A 1.5
-			DKNT B 4 NOP T_Chase(CHF_BACKOFF)
-			DKNT C 5 NOP T_Chase(CHF_BACKOFF)
+			DKNT B 4 NOP A_Chase("*", "*", CHF_BACKOFF)
+			DKNT C 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			DKNT C 1.5
-			DKNT D 4 NOP T_Chase(CHF_BACKOFF)
+			DKNT D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
 			DKNT E 15

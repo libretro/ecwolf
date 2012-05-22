@@ -5,7 +5,7 @@ actor Blinky 29
 	states
 	{
 		Spawn:
-			BLKY AB 5 NOP T_Chase(CHF_DONTDODGE)
+			BLKY AB 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 	}
 }
@@ -17,7 +17,7 @@ actor Inky 32
 	states
 	{
 		Spawn:
-			INKY AB 5 NOP T_Chase(CHF_DONTDODGE)
+			INKY AB 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 	}
 }
@@ -29,7 +29,7 @@ actor Pinky 31
 	states
 	{
 		Spawn:
-			PNKY AB 5 NOP T_Chase(CHF_DONTDODGE)
+			PNKY AB 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 	}
 }
@@ -41,7 +41,7 @@ actor Clyde 30
 	states
 	{
 		Spawn:
-			CLYD AB 5 NOP T_Chase(CHF_DONTDODGE)
+			CLYD AB 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 	}
 }
@@ -61,7 +61,7 @@ actor Spectre 28
 			SPCT ABCD 5 NOP A_Look(0, 0, 0, 0, 360)
 			loop
 		See:
-			SPCT ABCD 5 NOP T_Chase(CHF_DONTDODGE)
+			SPCT ABCD 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 		Death:
 			SPCT EFG 5

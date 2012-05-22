@@ -13,12 +13,12 @@ actor AngelOfDeath 27
 			ANGL A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			ANGL A 5 NOP T_Chase(CHF_BACKOFF)
+			ANGL A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			ANGL A 1.5
-			ANGL B 4 NOP T_Chase(CHF_BACKOFF)
-			ANGL C 5 NOP T_Chase(CHF_BACKOFF)
+			ANGL B 4 NOP A_Chase("*", "*", CHF_BACKOFF)
+			ANGL C 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			ANGL C 1.5
-			ANGL D 4 NOP T_Chase(CHF_BACKOFF)
+			ANGL D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
 			ANGL E 5
