@@ -3,7 +3,7 @@ gameinfo
 	signon = "WLFSGNON"
 	signoncolors = "FC FC 54", "04 64 00", "04 64 00", "04 64 00"
 	menufade = "AE 00 00"
-	menucolors = "88 00 00", "D4 00 00", "58 00 00", "64 00 00"
+	menucolors = "88 00 00", "D4 00 00", "7D 00 00", "58 00 00", "64 00 00"
 	titlemusic = "NAZI_NOR"
 	menumusic = "WONDERIN"
 	scoresmusic = "ROSTER"

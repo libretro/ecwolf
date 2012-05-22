@@ -13,7 +13,7 @@
 #define DEACTIVE        0x2b
 #endif
 
-extern int BORDCOLOR, BORD2COLOR, BKGDCOLOR, STRIPE;
+extern int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE;
 void MenuFadeOut();
 void MenuFadeIn();
 
@@ -89,7 +89,7 @@ void SetupSaveGames();
 void CleanupControlPanel(void);
 
 void ClearMScreen(void);
-void DrawWindow(int x,int y,int w,int h,int wcolor, int color1=BORD2COLOR, int color2=DEACTIVE);
+void DrawWindow(int x,int y,int w,int h,int wcolor, int color1=BORD2COLOR, int color2=BORD3COLOR);
 void DrawOutline(int x,int y,int w,int h,int color1,int color2);
 void WaitKeyUp(void);
 void ReadAnyControl(ControlInfo *ci);

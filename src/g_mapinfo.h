@@ -44,7 +44,7 @@ public:
 	FString	SignonLump;
 	int		SignonColors[4];
 	int		MenuFadeColor;
-	int		MenuColors[4];
+	int		MenuColors[5];
 	bool	DrawReadThis;
 
 	int		PageTime;

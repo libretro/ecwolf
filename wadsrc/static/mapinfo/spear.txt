@@ -3,7 +3,7 @@ gameinfo
 	signon = "SODSGNON"
 	signoncolors = "FC FC 54", "40 40 00", "40 40 00", "40 40 00"
 	menufade = "00 00 CE"
-	menucolors = "00 00 88", "00 00 D4", "00 00 58", "00 00 64"
+	menucolors = "00 00 88", "00 00 D4", "00 00 7D", "00 00 58", "00 00 64"
 	titlemusic = "XTOWER2"
 	menumusic = "WONDERIN"
 	scoresmusic = "XAWARD"

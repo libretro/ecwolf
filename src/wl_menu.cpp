@@ -54,7 +54,7 @@ TArray<SaveFile> SaveFile::files;
 extern int	lastgamemusicoffset;
 EpisodeInfo	*episode = 0;
 bool		quickSaveLoad = false;
-int BORDCOLOR, BORD2COLOR, BKGDCOLOR, STRIPE;
+int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE;
 static MenuItem	*readThis;
 
 MENU_LISTENER(EnterControlBase);
@@ -361,8 +361,9 @@ void CreateMenus()
 	// Extract the palette
 	BORDCOLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[0]), GPART(gameinfo.MenuColors[0]), BPART(gameinfo.MenuColors[0]));
 	BORD2COLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[1]), GPART(gameinfo.MenuColors[1]), BPART(gameinfo.MenuColors[1]));
-	BKGDCOLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[2]), GPART(gameinfo.MenuColors[2]), BPART(gameinfo.MenuColors[2]));
-	STRIPE = ColorMatcher.Pick(RPART(gameinfo.MenuColors[3]), GPART(gameinfo.MenuColors[3]), BPART(gameinfo.MenuColors[3]));
+	BORD3COLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[2]), GPART(gameinfo.MenuColors[2]), BPART(gameinfo.MenuColors[2]));
+	BKGDCOLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[3]), GPART(gameinfo.MenuColors[3]), BPART(gameinfo.MenuColors[3]));
+	STRIPE = ColorMatcher.Pick(RPART(gameinfo.MenuColors[4]), GPART(gameinfo.MenuColors[4]), BPART(gameinfo.MenuColors[4]));
 
 	// Actually initialize the menus
 	mainMenu.setHeadPicture("M_OPTION");
