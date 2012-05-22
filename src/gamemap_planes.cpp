@@ -352,7 +352,7 @@ void GameMap::ReadPlanesData()
 				static const unsigned int NUM_XLAT_ENTRIES = sizeof(xlat)/sizeof(xlat[0]);
 
 				unsigned int ambushSpot = 0;
-				ambushSpots.Push(0); // Prevent uninitialized value errors. 
+				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors. 
 
 				for(unsigned int i = 0;i < size;++i)
 				{
