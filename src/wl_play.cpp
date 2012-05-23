@@ -913,7 +913,6 @@ void PlayLoop (void)
 	playstate = ex_stillplaying;
 	lasttimecount = GetTimeCount();
 	frameon = 0;
-	anglefrac = 0;
 	facecount = 0;
 	funnyticount = 0;
 	memset (buttonstate, 0, sizeof (buttonstate));

@@ -232,8 +232,9 @@ void GameMap::SpawnThings() const
 			}
 
 			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0);
-			actor->angle = thing.angle%360;
-			actor->dir = dirtype(actor->angle/45);
+			// This forumla helps us to avoid errors in roundoffs.
+			actor->angle = (thing.angle/45)*ANGLE_45 + (thing.angle%45)*ANGLE_1;
+			actor->dir = dirtype(thing.angle/45);
 			if(thing.ambush)
 				actor->flags |= FL_AMBUSH;
 			if(thing.patrol)

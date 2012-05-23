@@ -228,7 +228,8 @@ bool TryWalk (AActor *ob)
 			return false;
 
 		default:
-			Quit ("Walk: Bad dir");
+			Printf ("Walk: Bad dir");
+			assert(ob->dir <= nodir);
 	}
 
 	ob->EnterZone(map->GetSpot(ob->tilex, ob->tiley, 0)->zone);
@@ -599,7 +600,8 @@ void MoveObj (AActor *ob, int32_t move)
 			return;
 
 		default:
-			Quit ("MoveObj: bad dir!");
+			Printf ("MoveObj: bad dir!");
+			assert(ob->dir <= nodir);
 	}
 
 	//
@@ -922,13 +924,14 @@ static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double
 		float angle = (float) atan2 ((float) deltay, (float) deltax);
 		if (angle<0)
 			angle = (float) (M_PI*2+angle);
-		angle = 360-(angle*ANGLES/(M_PI*2));
-		float lowerAngle = MIN(angle, (float) ob->angle);
-		float upperAngle = MAX(angle, (float) ob->angle);
-		if(MIN(upperAngle - lowerAngle, 360 + lowerAngle - upperAngle) > fov)
+		angle_t iangle = 0-(angle_t)(angle*ANGLE_180/M_PI);
+		angle_t lowerAngle = MIN(iangle, ob->angle);
+		angle_t upperAngle = MAX(iangle, ob->angle);
+		if(MIN(upperAngle - lowerAngle, lowerAngle - upperAngle) > angle_t(fov*ANGLE_1))
 			return false;
 	}
 
+	return false;
 	//
 	// trace a line to check for blocking tiles (corners)
 	//

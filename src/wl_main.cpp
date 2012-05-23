@@ -72,8 +72,8 @@
 */
 
 char    str[80];
-int     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,
-					5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
+angle_t dirangle[9] = {0,ANGLE_45,2*ANGLE_45,3*ANGLE_45,4*ANGLE_45,
+					5*ANGLE_45,6*ANGLE_45,7*ANGLE_45,0};
 
 //
 // proejection variables
@@ -263,24 +263,14 @@ void BuildTables (void)
 	// ANGLES is assumed to be divisable by four
 	//
 
-	float angle=0;
-	float anglestep=(float)(PI/2/ANGLEQUAD);
-	for(i=0; i<ANGLEQUAD; i++)
-	{
-		fixed value=(int32_t)(GLOBAL1*sin(angle));
-		sintable[i]=sintable[i+ANGLES]=sintable[ANGLES/2-i]=value;
-		sintable[ANGLES-i]=sintable[ANGLES/2+i]=-value;
-		angle+=anglestep;
-	}
-	angle = 0;
-	anglestep = (float)(PI/2/ANG90);
+	float angle = 0;
+	float anglestep = (float)(PI/2/ANG90);
 	for(i=0; i<FINEANGLES; i++)
 	{
 		finesine[i]=fixed(GLOBAL1*sin(angle));
 		angle+=anglestep;
 	}
-	sintable[ANGLEQUAD] = 65536;
-	sintable[3*ANGLEQUAD] = -65536;
+	memcpy(&finesine[FINEANGLES], finesine, FINEANGLES*sizeof(fixed)/4);
 
 #if defined(USE_STARSKY) || defined(USE_RAIN) || defined(USE_SNOW)
 	Init3DPoints();

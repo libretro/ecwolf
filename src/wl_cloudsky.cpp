@@ -212,8 +212,8 @@ void DrawClouds(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 {
 	// Move clouds
 	fixed moveDist = tics * curSky->speed;
-	cloudx += FixedMul(moveDist,sintable[curSky->angle]);
-	cloudy -= FixedMul(moveDist,costable[curSky->angle]);
+	cloudx += FixedMul(moveDist,finesine[curSky->angle>>ANGLETOFINESHIFT]);
+	cloudy -= FixedMul(moveDist,finecosine[curSky->angle>>ANGLETOFINESHIFT]);
 
 	// Draw them
 	int y0, halfheight;

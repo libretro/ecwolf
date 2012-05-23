@@ -24,7 +24,7 @@ extern  fixed    pspritexscale;
 extern  fixed    pspriteyscale;
 extern  fixed    yaspect;
 
-extern  int      dirangle[9];
+extern	angle_t	dirangle[9];
 
 extern  int      mouseadjustment;
 extern  int      shootdelta;

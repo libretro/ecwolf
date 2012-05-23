@@ -76,15 +76,14 @@ int min_wallheight;
 //
 short *pixelangle;
 int32_t finetangent[FINEANGLES/4];
-fixed sintable[ANGLES+ANGLES/4];
-fixed finesine[FINEANGLES];
-fixed *costable = sintable+(ANGLES/4);
+fixed finesine[FINEANGLES+FINEANGLES/4];
+fixed *finecosine = finesine+ANG90;
 
 //
 // refresh variables
 //
 fixed   viewx,viewy;                    // the focal point
-short   viewangle;
+angle_t viewangle;
 fixed   viewsin,viewcos;
 
 void    TransformActor (AActor *ob);
@@ -537,7 +536,7 @@ void HitHorizWall (void)
 
 int CalcRotate (AActor *ob)
 {
-	int angle, viewangle;
+	angle_t angle, viewangle;
 
 	// this isn't exactly correct, as it should vary by a trig value,
 	// but it is close enough with only eight rotations
@@ -549,13 +548,9 @@ int CalcRotate (AActor *ob)
 	else
 		angle = viewangle - ob->angle;
 
-	angle+=ANGLES/16;
-	while (angle>=ANGLES)
-		angle-=ANGLES;
-	while (angle<0)
-		angle+=ANGLES;
+	angle+=ANGLE_45/2;
 
-	return angle/(ANGLES/8);
+	return angle/ANGLE_45;
 }
 
 /*
@@ -1222,9 +1217,9 @@ void WallRefresh (void)
 void CalcViewVariables()
 {
 	viewangle = players[0].mo->angle;
-	midangle = float(viewangle)*(float(FINEANGLES)/float(ANGLES));
-	viewsin = sintable[viewangle];
-	viewcos = costable[viewangle];
+	midangle = viewangle>>ANGLETOFINESHIFT;
+	viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
+	viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
 	viewx = players[0].mo->x - FixedMul(focallength,viewcos);
 	viewy = players[0].mo->y + FixedMul(focallength,viewsin);
 

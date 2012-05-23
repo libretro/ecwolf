@@ -47,7 +47,7 @@ class APatrolPoint : public AActor
 			if(toucher->distance <= toucher->speed && toucher->tilex == tilex && toucher->tiley == tiley)
 			{
 				toucher->angle = angle;
-				toucher->dir = dirtype(angle/45);
+				toucher->dir = dirtype(angle/ANGLE_45);
 			}
 		}
 };

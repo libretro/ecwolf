@@ -170,3 +170,50 @@ ACTION_FUNCTION(A_PlaySound)
 
 	PlaySoundLocActor(sound, self);
 }
+
+ACTION_FUNCTION(A_SpawnItem)
+{
+	ACTION_PARAM_STRING(className, 0);
+
+	const ClassDef *cls = ClassDef::FindClass(className);
+	if(cls == NULL)
+		return;
+
+	AActor *newobj = AActor::Spawn(cls, self->x, self->y, 0);
+}
+
+#if 0
+static FRandom pr_spawnitemex("SpawnItemEx");
+ACTION_FUNCTION(A_SpawnItemEx)
+{
+	enum
+	{
+		SXF_TRANSFERPOINTERS = 0x1
+	};
+
+	ACTION_PARAM_STRING(className, 0);
+	ACTION_PARAM_DOUBLE(xoffset, 1);
+	ACTION_PARAM_DOUBLE(yoffset, 2);
+	ACTION_PARAM_DOUBLE(zoffset, 3);
+	ACTION_PARAM_DOUBLE(xvel, 4);
+	ACTION_PARAM_DOUBLE(yvel, 5);
+	ACTION_PARAM_DOUBLE(zvel, 6);
+	ACTION_PARAM_DOUBLE(angle, 7);
+	ACTION_PARAM_INT(flags, 8);
+	ACTION_PARAM_INT(chance, 9);
+
+	if(chance > 0 && pr_spawnitemex() < chance)
+		return;
+
+	const ClassDef *cls = ClassDef::FindClass(className);
+	if(cls == NULL)
+		return;
+
+	fixed x = self->x;// + FixedMul(xoffset, finecosine[angle/FINEANGLES]) + FixedMul(yoffset, finesine[angle/FINEANGLES]);
+	fixed y = self->y;// + FixedMul(xoffset, finesine[angle/FINEANGLES]) - FixedMul(yoffset, finecosine[angle/FINEANGLES;
+	angle = angle/ANGLES + self->angle;
+
+	AActor *newobj = AActor::Spawn(cls, x, y, 0);
+	newobj->angle = angle;
+}
+#endif

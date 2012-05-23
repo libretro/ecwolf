@@ -14,9 +14,8 @@
 //
 extern  short *pixelangle;
 extern  int32_t finetangent[FINEANGLES/4];
-extern  fixed sintable[];
-extern  fixed finesine[FINEANGLES];
-extern  fixed *costable;
+extern	fixed finesine[FINEANGLES+FINEANGLES/4];
+extern	fixed* finecosine;
 extern  int *wallheight;
 extern  word horizwall[],vertwall[];
 extern  int32_t    lasttimecount;

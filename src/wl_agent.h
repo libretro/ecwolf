@@ -13,13 +13,12 @@
 =============================================================================
 */
 
-extern  short    anglefrac;
 extern  int      facecount, facetimes;
 extern  int32_t  thrustspeed;
 extern  AActor   *LastAttacker;
 
 void    Cmd_Use ();
-void    Thrust (int angle, int32_t speed);
+void    Thrust (angle_t angle, int32_t speed);
 void    SpawnPlayer (int tilex, int tiley, int dir);
 void    TakeDamage (int points,AActor *attacker);
 void    GivePoints (int32_t points);

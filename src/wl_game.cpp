@@ -638,13 +638,13 @@ void PlayDemo (int demonumber)
 ==================
 */
 
-#define DEATHROTATE 2
+#define DEATHROTATE (ANGLE_1*2)
 
 void Died (void)
 {
 	float   fangle;
 	int32_t dx,dy;
-	int     iangle,curangle,clockwise,counter,change;
+	angle_t iangle,curangle,clockwise,counter,change;
 
 	if (screenfaded)
 	{
@@ -666,23 +666,22 @@ void Died (void)
 		if (fangle<0)
 			fangle = (float) (M_PI*2+fangle);
 
-		iangle = (int) (fangle/(M_PI*2)*ANGLES);
+		iangle = (int) (fangle*ANGLE_180/M_PI);
 	}
 	else
 	{
-		iangle = players[0].mo->angle + ANGLES / 2;
-		if(iangle >= ANGLES) iangle -= ANGLES;
+		iangle = players[0].mo->angle + ANGLE_180;
 	}
 
 	if (players[0].mo->angle > iangle)
 	{
 		counter = players[0].mo->angle - iangle;
-		clockwise = ANGLES-players[0].mo->angle + iangle;
+		clockwise = players[0].mo->angle + iangle;
 	}
 	else
 	{
 		clockwise = iangle - players[0].mo->angle;
-		counter = players[0].mo->angle + ANGLES-iangle;
+		counter = players[0].mo->angle - iangle;
 	}
 
 	curangle = players[0].mo->angle;
@@ -692,8 +691,6 @@ void Died (void)
 		//
 		// rotate clockwise
 		//
-		if (curangle>iangle)
-			curangle -= ANGLES;
 		do
 		{
 			change = tics*DEATHROTATE;
@@ -702,8 +699,6 @@ void Died (void)
 
 			curangle += change;
 			players[0].mo->angle += change;
-			if (players[0].mo->angle >= ANGLES)
-				players[0].mo->angle -= ANGLES;
 
 			ThreeDRefresh ();
 			CalcTics ();
@@ -714,18 +709,14 @@ void Died (void)
 		//
 		// rotate counterclockwise
 		//
-		if (curangle<iangle)
-			curangle += ANGLES;
 		do
 		{
-			change = -(int)tics*DEATHROTATE;
-			if (curangle + change < iangle)
-				change = iangle-curangle;
+			change = tics*DEATHROTATE;
+			if (curangle - change < iangle)
+				change = curangle - iangle;
 
-			curangle += change;
-			players[0].mo->angle += change;
-			if (players[0].mo->angle < 0)
-				players[0].mo->angle += ANGLES;
+			curangle -= change;
+			players[0].mo->angle -= change;
 
 			ThreeDRefresh ();
 			CalcTics ();

@@ -50,8 +50,6 @@
 //
 int32_t			thrustspeed;
 
-short			anglefrac;
-
 AActor			*LastAttacker;
 
 player_t		players[1];
@@ -123,8 +121,7 @@ void CheckWeaponChange (void)
 void ControlMovement (AActor *ob)
 {
 	int32_t oldx,oldy;
-	int     angle;
-	int     angleunits;
+	angle_t angle;
 
 	thrustspeed = 0;
 
@@ -133,9 +130,7 @@ void ControlMovement (AActor *ob)
 
 	if(buttonstate[bt_strafeleft])
 	{
-		angle = ob->angle + ANGLES/4;
-		if(angle >= ANGLES)
-			angle -= ANGLES;
+		angle = ob->angle + ANGLE_90;
 		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
 			Thrust(angle, RUNMOVE * MOVESCALE * tics);
 		else
@@ -144,9 +139,7 @@ void ControlMovement (AActor *ob)
 
 	if(buttonstate[bt_straferight])
 	{
-		angle = ob->angle - ANGLES/4;
-		if(angle < 0)
-			angle += ANGLES;
+		angle = ob->angle - ANGLE_90;
 		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
 			Thrust(angle, RUNMOVE * MOVESCALE * tics );
 		else
@@ -164,16 +157,12 @@ void ControlMovement (AActor *ob)
 		//
 		if (controlx > 0)
 		{
-			angle = ob->angle - ANGLES/4;
-			if (angle < 0)
-				angle += ANGLES;
+			angle = ob->angle - ANGLE_90;
 			Thrust (angle,controlx*MOVESCALE);      // move to left
 		}
 		else if (controlx < 0)
 		{
-			angle = ob->angle + ANGLES/4;
-			if (angle >= ANGLES)
-				angle -= ANGLES;
+			angle = ob->angle + ANGLE_90;
 			Thrust (angle,-controlx*MOVESCALE);     // move to right
 		}
 	}
@@ -182,16 +171,7 @@ void ControlMovement (AActor *ob)
 		//
 		// not strafing
 		//
-		anglefrac += controlx;
-		angleunits = anglefrac/ANGLESCALE;
-		anglefrac -= angleunits*ANGLESCALE;
-		ob->angle -= angleunits;
-
-		if (ob->angle >= ANGLES)
-			ob->angle -= ANGLES;
-		if (ob->angle < 0)
-			ob->angle += ANGLES;
-
+		ob->angle -= controlx*(ANGLE_1/ANGLESCALE);
 	}
 
 	//
@@ -203,9 +183,7 @@ void ControlMovement (AActor *ob)
 	}
 	else if (controly > 0)
 	{
-		angle = ob->angle + ANGLES/2;
-		if (angle >= ANGLES)
-			angle -= ANGLES;
+		angle = ob->angle + ANGLE_180;
 		Thrust (angle,controly*BACKMOVESCALE);          // move backwards
 	}
 
@@ -778,26 +756,7 @@ void VictoryTile (void)
 ===================
 */
 
-// For players[0].mo movement in demos exactly as in the original Wolf3D v1.4 source code
-static fixed FixedByFracOrig(fixed a, fixed b)
-{
-	int sign = 0;
-	if(b == 65536) b = 65535;
-	else if(b == -65536) b = 65535, sign = 1;
-	else if(b < 0) b = (-b), sign = 1;
-
-	if(a < 0)
-	{
-		a = -a;
-		sign = !sign;
-	}
-	fixed res = (fixed)(((int64_t) a * b) >> 16);
-	if(sign)
-		res = -res;
-	return res;
-}
-
-void Thrust (int angle, int32_t speed)
+void Thrust (angle_t angle, int32_t speed)
 {
 	int32_t xmove,ymove;
 
@@ -816,12 +775,8 @@ void Thrust (int angle, int32_t speed)
 	if (speed >= MINDIST*2)
 		speed = MINDIST*2-1;
 
-	xmove = DEMOCHOOSE_ORIG_SDL(
-				FixedByFracOrig(speed, costable[angle]),
-				FixedMul(speed,costable[angle]));
-	ymove = DEMOCHOOSE_ORIG_SDL(
-				-FixedByFracOrig(speed, sintable[angle]),
-				-FixedMul(speed,sintable[angle]));
+	xmove = FixedMul(speed,finecosine[angle>>ANGLETOFINESHIFT]);
+	ymove = -FixedMul(speed,finesine[angle>>ANGLETOFINESHIFT]);
 
 	ClipMove(players[0].mo,xmove,ymove);
 
@@ -858,19 +813,19 @@ void Cmd_Use (void)
 	//
 	// find which cardinal direction the player is facing
 	//
-	if (players[0].mo->angle < ANGLES/8 || players[0].mo->angle > 7*ANGLES/8)
+	if (players[0].mo->angle < ANGLE_45 || players[0].mo->angle > 7*ANGLE_45)
 	{
 		checkx = players[0].mo->tilex + 1;
 		checky = players[0].mo->tiley;
 		direction = MapTrigger::East;
 	}
-	else if (players[0].mo->angle < 3*ANGLES/8)
+	else if (players[0].mo->angle < 3*ANGLE_45)
 	{
 		checkx = players[0].mo->tilex;
 		checky = players[0].mo->tiley-1;
 		direction = MapTrigger::North;
 	}
-	else if (players[0].mo->angle < 5*ANGLES/8)
+	else if (players[0].mo->angle < 5*ANGLE_45)
 	{
 		checkx = players[0].mo->tilex - 1;
 		checky = players[0].mo->tiley;
@@ -1007,9 +962,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 {
 	static const ClassDef * const playerClass = ClassDef::FindClass("BJPlayer");
 	players[0].mo = (APlayerPawn *) AActor::Spawn(playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
-	players[0].mo->angle = (450-dir)%360;
-	if (players[0].mo->angle<0)
-		players[0].mo->angle += ANGLES;
+	players[0].mo->angle = (450-dir)*ANGLE_1;
 	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables
 

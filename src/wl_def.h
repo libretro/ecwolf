@@ -153,18 +153,20 @@ void Quit(const char *errorStr, ...);
 #define TILESHIFT       16l
 #define UNSIGNEDSHIFT   8
 
-#define ANGLES          360             // must be divisable by 4
-#define ANGLEQUAD       (ANGLES/4)
+#define ANGLETOFINESHIFT 19
 #define FINEANGLES      8192
 #define FINEMASK        (FINEANGLES-1)
 #define ANG90           (FINEANGLES/4)
 #define ANG180          (ANG90*2)
 #define ANG270          (ANG90*3)
 #define ANG360          (ANG90*4)
-#define VANG90          (ANGLES/4)
-#define VANG180         (VANG90*2)
-#define VANG270         (VANG90*3)
-#define VANG360         (VANG90*4)
+#define ANGLE_45		(0x20000000u)
+#define ANGLE_90		(ANGLE_45*2)
+#define ANGLE_180		(ANGLE_45*4)
+#define ANGLE_270		(ANGLE_45*6)
+#define ANGLE_1			(ANGLE_45/45)
+#define ANGLE_60		(ANGLE_180/3)
+typedef uint32_t angle_t;
 
 #define MINDIST         (0x5800l)
 

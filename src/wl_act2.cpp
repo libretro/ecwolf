@@ -78,25 +78,6 @@ dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
 	southwest,south,southeast};
 
 /*
-=================
-=
-= A_SpawnItem
-=
-=================
-*/
-
-ACTION_FUNCTION(A_SpawnItem)
-{
-	ACTION_PARAM_STRING(className, 0);
-
-	const ClassDef *cls = ClassDef::FindClass(className);
-	if(cls == NULL)
-		return;
-
-	AActor *newobj = AActor::Spawn(cls, self->x, self->y, 0);
-}
-
-/*
 ===================
 =
 = ProjectileTryMove
@@ -140,8 +121,8 @@ bool ProjectileTryMove (AActor *ob)
 
 void T_Projectile (AActor *self)
 {
-	fixed deltax = FixedMul(self->speed,costable[self->angle]);
-	fixed deltay = -FixedMul(self->speed,sintable[self->angle]);
+	fixed deltax = FixedMul(self->speed,finecosine[self->angle>>ANGLETOFINESHIFT]);
+	fixed deltay = -FixedMul(self->speed,finesine[self->angle>>ANGLETOFINESHIFT]);
 
 	if (deltax>0x10000l)
 		deltax = 0x10000l;
@@ -207,7 +188,7 @@ ACTION_FUNCTION(A_CustomMissile)
 	angle = (float) atan2 ((float) deltay, (float) deltax);
 	if (angle<0)
 		angle = (float) (M_PI*2+angle);
-	iangle = (int) (angle/(M_PI*2)*ANGLES);
+	iangle = (int) (angle*ANGLE_180/M_PI);
 
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)

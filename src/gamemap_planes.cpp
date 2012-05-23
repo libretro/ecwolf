@@ -411,7 +411,7 @@ void GameMap::ReadPlanesData()
 						if(xlat[type].angles)
 						{
 							if(oldplane[i] >= PATROLPOINT && oldplane[i] < PATROLPOINT+8)
-								thing.angle = ((oldplane[i] - xlat[type].oldnum)*45) + (xlat[type].oldnum == PATROLPOINT ? 0 : 180);
+								thing.angle = ((oldplane[i] - xlat[type].oldnum)*45);// + (xlat[type].oldnum == PATROLPOINT ? 0 : 180);
 							else
 								thing.angle = (oldplane[i] - xlat[type].oldnum)*90;
 						}

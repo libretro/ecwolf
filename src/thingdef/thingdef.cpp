@@ -224,12 +224,12 @@ int SymbolCompare(const void *s1, const void *s2)
 
 void ExprSin(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
 {
-	out = double(sintable[args[0]->Evaluate(self).GetInt()%360])/FRACUNIT;
+	out = double(finesine[(args[0]->Evaluate(self).GetInt()%360)*FINEANGLES/360])/FRACUNIT;
 }
 
 void ExprCos(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
 {
-	out = double(sintable[(args[0]->Evaluate(self).GetInt()+90)%360])/FRACUNIT;
+	out = double(finecosine[(args[0]->Evaluate(self).GetInt()%360)*FINEANGLES/360])/FRACUNIT;
 }
 
 void ExprRandom(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
