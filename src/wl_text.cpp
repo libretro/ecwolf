@@ -691,7 +691,7 @@ void HelpScreens (void)
 	int     artnum;
 	char    *text;
 
-	int lumpNum = Wads.CheckNumForName("HELPART", ns_graphics);
+	int lumpNum = Wads.CheckNumForName("HELPART", ns_global);
 	if(lumpNum != -1)
 	{
 		FMemLump lump = Wads.ReadLump(lumpNum);
@@ -715,7 +715,7 @@ void EndText (void)
 
 	char lumpName[9];
 	sprintf(lumpName, "ENDART%d", gamestate.episode+1);
-	int lumpNum = Wads.CheckNumForName(lumpName, ns_graphics);
+	int lumpNum = Wads.CheckNumForName(lumpName, ns_global);
 	if(lumpNum != -1)
 	{
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);

@@ -15,12 +15,12 @@ actor FakeHitler 18
 			FAKE A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
-			FAKE A 5 NOP A_Chase
+			FAKE A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			FAKE A 1.5
-			FAKE B 4 NOP A_Chase
-			FAKE C 5 NOP A_Chase
+			FAKE B 4 NOP A_Chase("*", "*", CHF_BACKOFF)
+			FAKE C 5 NOP A_Chase("*", "*", CHF_BACKOFF)
 			FAKE C 1.5
-			FAKE D 4 NOP A_Chase
+			FAKE D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
 			FAKE E 4
@@ -126,8 +126,8 @@ actor Hitler
 			HTLR A 70 A_DeathScream
 			HTLR H 5
 			HTLR I 5 A_PlaySound("misc/slurpie") // TODO: Full volume with attenuation
-			HTLR JKLMNO 5
-			HTLR P -1 A_BossDeath
+			HTLR JKLMN 5
+			HTLR O -1 A_BossDeath
 			stop
 	}
 }

@@ -71,8 +71,8 @@ const struct FlagDef
 	DEFINE_FLAG(FL, BONUS, Actor, flags),
 	DEFINE_FLAG(FL, BRIGHT, Actor, flags),
 	DEFINE_FLAG(FL, CANUSEWALLS, Actor, flags),
-	DEFINE_FLAG(FL, COUNTKILL, Actor, flags),
 	DEFINE_FLAG(FL, COUNTITEM, Actor, flags),
+	DEFINE_FLAG(FL, COUNTKILL, Actor, flags),
 	DEFINE_FLAG(FL, COUNTSECRET, Actor, flags),
 	DEFINE_FLAG(FL, DROPBASEDONTARGET, Actor, flags),
 	DEFINE_FLAG(FL, FIRSTATTACK, Actor, flags),
@@ -562,6 +562,7 @@ struct Goto
 {
 	public:
 		Frame		*frame;
+		FString		remapLabel; // Label: goto Label2
 		StateLabel	jumpLabel;
 };
 void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
@@ -578,15 +579,37 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 		const StateDefinition &thisStateDef = stateDefs[iter];
 
 		// Special case, `Label: stop`, remove state.  Hmm... I wonder if ZDoom handles fall throughs on this.
-		if(!thisStateDef.label.IsEmpty() && thisStateDef.sprite[0] == 0 && thisStateDef.nextType == StateDefinition::STOP)
+		if(!thisStateDef.label.IsEmpty() && thisStateDef.sprite[0] == 0)
 		{
-			stateList.Remove(thisStateDef.label);
+			switch(thisStateDef.nextType)
+			{
+				case StateDefinition::STOP:
+					if(stateList.CheckKey(thisStateDef.label))
+						stateList.Remove(thisStateDef.label);
+					break;
+				case StateDefinition::NORMAL:
+					stateList[thisStateDef.label] = frameList.Size();
+					continue;
+				case StateDefinition::GOTO:
+				{
+					Goto thisGoto;
+					thisGoto.frame = NULL;
+					thisGoto.remapLabel = thisStateDef.label;
+					thisGoto.jumpLabel = thisStateDef.jumpLabel;
+					gotos.Push(thisGoto);
+					continue;
+				}
+				default:
+					Quit("Tried to use a loop on a frameless state.\n");
+					break;
+			}
 			continue;
 		}
 
 		for(int i = 0;i < thisStateDef.frames.Len();i++)
 		{
 			thisFrame = new Frame();
+
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
 				stateList[thisStateDef.label] = frameList.Size();
@@ -634,7 +657,10 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	for(unsigned int iter = 0;iter < gotos.Size();++iter)
 	{
 		const Frame *result = gotos[iter].jumpLabel.Resolve();
-		gotos[iter].frame->next = result;
+		if(gotos[iter].frame)
+			gotos[iter].frame->next = result;
+		else
+			stateList[gotos[iter].remapLabel] = result->index;
 	}
 }
 
@@ -822,12 +848,25 @@ void ClassDef::ParseActor(Scanner &sc)
 						if(sc.CheckToken('}'))
 							sc.ScriptMessage(Scanner::ERROR, "State defined with no frames.");
 						sc.MustGetToken(TK_Identifier);
+
+						if(sc->str.CompareNoCase("stop") == 0)
+						{
+							thisState.nextType = StateDefinition::STOP;
+							sc.MustGetToken(TK_Identifier);
+						}
+						else if(sc->str.CompareNoCase("goto") == 0)
+						{
+							thisState.jumpLabel = StateLabel(sc, newClass, true);
+							thisState.nextType = StateDefinition::GOTO;
+							sc.MustGetToken(TK_Identifier);
+						}
 					}
 
 					bool invalidSprite = (sc->str.Len() != 4);
 					strncpy(thisState.sprite, sc->str, 4);
 
-					if(sc.CheckToken(TK_Identifier) || sc.CheckToken(TK_StringConst))
+					if(thisState.nextType == StateDefinition::NORMAL &&
+						(sc.CheckToken(TK_Identifier) || sc.CheckToken(TK_StringConst)))
 					{
 						infiniteLoopProtection = false;
 						if(invalidSprite) // We now know this is a frame so check sprite length
