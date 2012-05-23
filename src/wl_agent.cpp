@@ -1106,18 +1106,36 @@ ACTION_FUNCTION(A_CustomPunch)
 	}
 }
 
+static FRandom pr_cwbullet("CustomWpBullet");
 ACTION_FUNCTION(A_GunAttack)
 {
+	enum
+	{
+		WAF_NORANDOM = 1
+	};
+
 	player_t *player = self->player;
 	AActor *closest=NULL,*oldclosest=NULL;
-	int      damage;
 	int      dx,dy,dist;
 	int32_t  viewdist;
+
+	ACTION_PARAM_INT(flags, 0);
+	ACTION_PARAM_STRING(sound, 1);
+	ACTION_PARAM_DOUBLE(snipe, 2);
+	ACTION_PARAM_INT(maxdamage, 3);
+	ACTION_PARAM_INT(blocksize, 4);
+	ACTION_PARAM_INT(pointblank, 5);
+	ACTION_PARAM_INT(longrange, 6);
+	ACTION_PARAM_INT(maxrange, 7);
 
 	if(!player->ReadyWeapon->DepleteAmmo())
 		return;
 
-	SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
+	if(sound.Len() == 1 && sound[0] == '*')
+		SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
+	else
+		SD_PlaySound(sound, SD_WEAPONS);
+
 	madenoise = true;
 
 	//
@@ -1159,18 +1177,20 @@ ACTION_FUNCTION(A_GunAttack)
 	//
 	// hit something
 	//
-	dx = ABS(closest->tilex - players[0].mo->tilex);
-	dy = ABS(closest->tiley - players[0].mo->tiley);
+	dx = ABS(closest->x - players[0].mo->x);
+	dy = ABS(closest->y - players[0].mo->y);
 	dist = dx>dy ? dx:dy;
-	if (dist<2)
-		damage = US_RndT() / 4;
-	else if (dist<4)
-		damage = US_RndT() / 6;
-	else
+
+	dist = FixedMul(dist, snipe*FRACUNIT);
+	dist /= blocksize<<9;
+
+	int damage = flags & WAF_NORANDOM ? maxdamage : (1 + (pr_cwbullet()%maxdamage));
+	if (dist >= pointblank)
+		damage = damage * 2 / 3;
+	if (dist >= longrange)
 	{
-		if ( (US_RndT() / 12) < dist)           // missed
+		if ( (pr_cwbullet() % maxrange) < dist)           // missed
 			return;
-		damage = US_RndT() / 6;
 	}
 	DamageActor (closest,damage);
 }
