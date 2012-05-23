@@ -346,6 +346,8 @@ MENU_LISTENER(ReadThis)
 	StartCPMusic(gameinfo.FinaleMusic);
 	HelpScreens();
 	StartCPMusic(gameinfo.MenuMusic);
+	mainMenu.draw();
+	MenuFadeIn();
 	return true;
 }
 MENU_LISTENER(ToggleFullscreen)
