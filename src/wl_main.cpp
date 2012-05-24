@@ -1170,7 +1170,7 @@ void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_li
 	if(level == Scanner::ERROR)
 		throw CRecoverableError(errorMessage);
 	else
-		printf("%s", error);
+		printf("%s", errorMessage.GetChars());
 }
 
 // Basically from ZDoom

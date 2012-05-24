@@ -525,7 +525,7 @@ bool Scanner::GetNextToken(bool expandState)
 				break;
 		}
 		// Handle small tokens at the end of a file.
-		if(scanPos == length)
+		if(scanPos == length && !stringFinished)
 			end = scanPos;
 	}
 

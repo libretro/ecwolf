@@ -812,7 +812,7 @@ void ClassDef::ParseActor(Scanner &sc)
 				flagName = sc->str;
 			}
 			if(!SetFlag(newClass, prefix, flagName, set))
-				printf("Warning: Unknown flag '%s' for actor '%s'.\n", flagName.GetChars(), newClass->name.GetChars());
+				sc.ScriptMessage(Scanner::WARNING, "Unknown flag '%s' for actor '%s'.", flagName.GetChars(), newClass->name.GetChars());
 		}
 		else
 		{
@@ -1035,7 +1035,7 @@ void ClassDef::ParseActor(Scanner &sc)
 											}
 										}
 										else
-											printf("Could not find function %s\n", sc->str.GetChars());
+											sc.ScriptMessage(Scanner::WARNING, "Could not find function %s.", sc->str.GetChars());
 									}
 								}
 
@@ -1206,7 +1206,7 @@ void ClassDef::ParseActor(Scanner &sc)
 						sc.GetNextToken();
 					}
 					while(sc.CheckToken(','));
-					sc.ScriptMessage(Scanner::WARNING, "Unkown property '%s' for actor '%s'.\n", propertyName.GetChars(), newClass->name.GetChars());
+					sc.ScriptMessage(Scanner::WARNING, "Unknown property '%s' for actor '%s'.", propertyName.GetChars(), newClass->name.GetChars());
 				}
 			}
 		}
@@ -1235,7 +1235,7 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 				sc.ScriptMessage(Scanner::ERROR, "Expected 'include' got '%s' instead.", sc->str.GetChars());
 			sc.MustGetToken(TK_StringConst);
 
-			int lmp = Wads.GetNumForFullName(sc->str);
+			int lmp = Wads.CheckNumForFullName(sc->str);
 			if(lmp == -1)
 				sc.ScriptMessage(Scanner::ERROR, "Could not find lump \"%s\".", sc->str.GetChars());
 			ParseDecorateLump(lmp);
