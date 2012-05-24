@@ -126,8 +126,8 @@ actor Hitler
 			HTLR A 70 A_DeathScream
 			HTLR H 5
 			HTLR I 5 A_PlaySound("misc/slurpie") // TODO: Full volume with attenuation
-			HTLR JKLMN 5
-			HTLR O -1 A_BossDeath
+			HTLR JKLM 5
+			HTLR N -1 A_BossDeath
 			stop
 	}
 }

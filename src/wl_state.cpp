@@ -931,7 +931,6 @@ static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double
 			return false;
 	}
 
-	return false;
 	//
 	// trace a line to check for blocking tiles (corners)
 	//

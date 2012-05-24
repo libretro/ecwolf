@@ -419,9 +419,9 @@ void GameMap::ReadPlanesData()
 						if(thing.ambush)
 							++ambushSpot;
 						thing.patrol = xlat[type].patrol;
-						thing.skill[0] = xlat[type].minskill <= 1;
-						thing.skill[1] = xlat[type].minskill <= 2;
-						thing.skill[2] = thing.skill[3] = xlat[type].minskill <= 3;
+						thing.skill[0] = thing.skill[1] = xlat[type].minskill <= 1;
+						thing.skill[2] = xlat[type].minskill <= 2;
+						thing.skill[3] = xlat[type].minskill <= 3;
 						things.Push(thing);
 					}
 				}
