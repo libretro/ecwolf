@@ -568,7 +568,7 @@ void DrawAmmo (void)
 		return;
 
 	unsigned int amount = players[0].ReadyWeapon->ammo1->amount;
-	LatchNumber (27,16,2,amount);
+	LatchNumber (26,16,3,amount);
 }
 
 //===========================================================================
