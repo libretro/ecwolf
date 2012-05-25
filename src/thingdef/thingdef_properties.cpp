@@ -164,6 +164,12 @@ HANDLE_PROPERTY(icon)
 	((AInventory *)defaults)->icon = TexMan.CheckForTexture(icon, FTexture::TEX_MiscPatch);
 }
 
+HANDLE_PROPERTY(interhubamount)
+{
+	INT_PARAM(amt, 0);
+	((AInventory *)defaults)->interhubamount = amt;
+}
+
 HANDLE_PROPERTY(maxamount)
 {
 	INT_PARAM(maxamt, 0);
@@ -341,6 +347,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(dropitem, Actor, S_II),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
 	DEFINE_PROP(icon, Inventory, S),
+	DEFINE_PROP(interhubamount, Inventory, I),
 	DEFINE_PROP(maxamount, Inventory, I),
 	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
 	DEFINE_PROP(missilechance, Actor, I),

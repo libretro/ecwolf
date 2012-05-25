@@ -240,6 +240,7 @@ typedef enum
 	FL_DROPBASEDONTARGET= 0x00200000,
 
 	IF_AUTOACTIVATE		= 0x00000001,
+	IF_INVBAR			= 0x00000002,
 } objflag_t;
 
 /*

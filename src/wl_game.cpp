@@ -24,6 +24,7 @@
 #include "wl_draw.h"
 #include "wl_play.h"
 #include "wl_game.h"
+#include "a_inventory.h"
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -842,6 +843,16 @@ startplayloop:
 			case ex_completed:
 			case ex_secretlevel:
 				if(viewsize == 21) DrawPlayScreen();
+
+				// Remove inventory items that don't transfer (keys for example)
+				for(AInventory *inv = players[0].mo->inventory;inv;inv = inv->inventory)
+				{
+					if(inv->interhubamount < 1)
+						inv->Destroy();
+					else if((inv->itemFlags & IF_INVBAR) && inv->amount > inv->interhubamount)
+						inv->amount = inv->interhubamount;
+				}
+
 				DrawStatusBar();
 				VW_FadeOut ();
 

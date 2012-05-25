@@ -67,6 +67,14 @@ void AInventory::DetachFromOwner()
 	owner = NULL;
 }
 
+void AInventory::Destroy()
+{
+	if(owner)
+		owner->RemoveInventory(this);
+
+	Super::Destroy();
+}
+
 // Used for items which aren't placed into an inventory and don't respawn.
 void AInventory::GoAwayAndDie()
 {
@@ -109,6 +117,7 @@ void AInventory::InitClean()
 	Super::InitClean();
 	itemFlags = 0;
 	player = NULL;
+	owner = NULL;
 }
 
 void AInventory::Touch(AActor *toucher)

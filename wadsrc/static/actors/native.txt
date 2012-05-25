@@ -47,6 +47,7 @@ actor Inventory native
 {
 	inventory.amount 1
 	inventory.maxamount 1
+	inventory.interhubamount 1
 }
 
 actor Ammo : Inventory native
@@ -62,6 +63,7 @@ actor Health : Inventory native
 actor Key : Inventory native
 {
 	inventory.pickupsound "misc/k_pkup"
+	inventory.interhubamount 0
 }
 
 actor ScoreItem : Inventory native

@@ -45,6 +45,7 @@ class AInventory : public AActor
 	public:
 		virtual void	AttachToOwner(AActor *owner);
 		virtual void	DetachFromOwner();
+		virtual void	Destroy();
 		virtual bool	HandlePickup(AInventory *item, bool &good);
 		void			Touch(AActor *toucher);
 		virtual bool	TryPickup(AActor *toucher);
@@ -56,6 +57,7 @@ class AInventory : public AActor
 		FNameNoInit		pickupsound;
 		unsigned int	amount;
 		unsigned int	maxamount;
+		unsigned int	interhubamount;
 		FTextureID		icon;
 	protected:
 		virtual AInventory	*CreateCopy(AActor *holder);

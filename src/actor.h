@@ -111,7 +111,7 @@ class AActor
 		void			AddInventory(AInventory *item);
 		const ClassDef	*GetClass() const { return classType; }
 		Thinker			*GetThinker() const;
-		void			Destroy();
+		virtual void	Destroy();
 		void			Die();
 		void			EnterZone(const MapZone *zone);
 		AInventory		*FindInventory(const ClassDef *cls) const;
