@@ -573,6 +573,19 @@ void DrawAmmo (void)
 
 //===========================================================================
 
+void DrawStatusBar()
+{
+	VWB_DrawGraphic(TexMan("STBAR"), 0, 160);
+	DrawFace ();
+	DrawHealth ();
+	DrawLives ();
+	DrawLevel ();
+	DrawAmmo ();
+	DrawKeys ();
+	DrawWeapon ();
+	DrawScore ();
+}
+
 
 /*
 =============================================================================

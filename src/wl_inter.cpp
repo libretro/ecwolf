@@ -726,7 +726,7 @@ done:   itoa (kr, tempstr, 10);
 	}
 
 
-	DrawScore ();
+	DrawStatusBar();
 	VW_UpdateScreen ();
 
 	lastBreathTime = GetTimeCount();
@@ -807,7 +807,7 @@ bool PreloadUpdate (unsigned current, unsigned total)
 
 void PreloadGraphics (void)
 {
-	DrawLevel ();
+	DrawStatusBar();
 	ClearSplitVWB ();           // set up for double buffering in split screen
 
 	VWB_Clear(bordercol, 0, 0, screenWidth, screenHeight);

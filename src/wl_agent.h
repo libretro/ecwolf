@@ -29,16 +29,9 @@ void    VictorySpin ();
 // player state info
 //
 
+void	DrawStatusBar();
 void    StatusDrawFace(unsigned picnum);
-void    DrawFace (void);
-void    DrawHealth (void);
-void    DrawLevel (void);
-void    DrawLives (void);
 void    GiveExtraMan (void);
-void    DrawScore (void);
-void    DrawWeapon (void);
-void    DrawKeys (void);
-void    DrawAmmo (void);
 void    UpdateFace ();
 void    CheckWeaponChange ();
 void    ControlMovement (AActor *self);

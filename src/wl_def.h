@@ -379,7 +379,6 @@ typedef struct
 	char		mapname[9];
 	short       difficulty;
 	short       mapon;
-	short       keys;
 
 	short       faceframe;
 	short       attackframe,attackcount,weaponframe;

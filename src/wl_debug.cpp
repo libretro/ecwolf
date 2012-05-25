@@ -314,9 +314,7 @@ int DebugKeys (void)
 		VW_UpdateScreen();
 		GivePoints (100000);
 		players[0].health = 100;
-		DrawHealth();
-		DrawFace();
-		DrawAmmo ();
+		DrawStatusBar();
 		IN_Ack ();
 		return 1;
 	}

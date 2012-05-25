@@ -550,8 +550,8 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
 
-	double xd = ix;
-	double yd = iy;
+	double xd = ix + tex->GetScaledLeftOffsetDouble();
+	double yd = iy + tex->GetScaledTopOffsetDouble();
 	double wd = tex->GetScaledWidthDouble();
 	double hd = tex->GetScaledHeightDouble();
 	if(menu)

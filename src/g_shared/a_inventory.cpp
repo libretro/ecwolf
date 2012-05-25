@@ -193,8 +193,7 @@ bool AHealth::TryPickup(AActor *toucher)
 		toucher->player->health += amount;
 		if(toucher->player->health > max)
 			toucher->player->health = max;
-		DrawHealth();
-		DrawFace();
+		DrawStatusBar();
 		Destroy();
 	}
 	return true;

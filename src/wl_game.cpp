@@ -393,15 +393,7 @@ void DrawPlayScreen (bool noborder)
 	if(!noborder)
 		DrawPlayBorder ();
 
-	VWB_DrawGraphic(TexMan("STBAR"), 0, 160);
-	DrawFace ();
-	DrawHealth ();
-	DrawLives ();
-	DrawLevel ();
-	DrawAmmo ();
-	DrawKeys ();
-	DrawWeapon ();
-	DrawScore ();
+	DrawStatusBar();
 }
 
 void ShowActStatus()
@@ -410,14 +402,7 @@ void ShowActStatus()
 	VWB_DrawGraphic(TexMan("STBAR"), 0, 160);
 
 	ingame = false;
-	DrawFace ();
-	DrawHealth ();
-	DrawLives ();
-	DrawLevel ();
-	DrawAmmo ();
-	DrawKeys ();
-	DrawWeapon ();
-	DrawScore ();
+	DrawStatusBar();
 	ingame = true;
 }
 
@@ -746,16 +731,10 @@ void Died (void)
 	{
 		if(viewsize != 21)
 		{
-			DrawKeys ();
-			DrawWeapon ();
-			DrawAmmo ();
-			DrawHealth ();
-			DrawFace ();
-			DrawLives ();
+			DrawStatusBar();
 		}
 
 		players[0].state = player_t::PST_REBORN;
-		gamestate.keys = 0;
 		gamestate.attackframe = gamestate.attackcount =
 			gamestate.weaponframe = 0;
 		thinkerList->DestroyAll();
@@ -791,7 +770,6 @@ restartgame:
 	{
 		if (!loadedgame)
 			players[0].score = players[0].oldscore;
-		if(!died || viewsize != 21) DrawScore();
 
 		startgame = false;
 		if (!loadedgame)
@@ -817,7 +795,7 @@ restartgame:
 			fizzlein = true;
 		}
 
-		DrawLevel ();
+		DrawStatusBar();
 
 #ifdef SPEAR
 startplayloop:
@@ -864,8 +842,7 @@ startplayloop:
 			case ex_completed:
 			case ex_secretlevel:
 				if(viewsize == 21) DrawPlayScreen();
-				gamestate.keys = 0;
-				DrawKeys ();
+				DrawStatusBar();
 				VW_FadeOut ();
 
 				ClearMemory ();
