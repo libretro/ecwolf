@@ -168,7 +168,7 @@ void R_InitSprites()
 	SpritesMap spritesMap;
 
 	// Collect potential sprite list (linked list of sprites by name)
-	for(unsigned int i = 0;i < TexMan.NumTextures();++i)
+	for(unsigned int i = TexMan.NumTextures();i-- > 0;)
 	{
 		FTexture *tex = TexMan.ByIndex(i);
 		if(tex->UseType == FTexture::TEX_Sprite && strlen(tex->Name) >= 6)
