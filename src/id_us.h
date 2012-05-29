@@ -47,7 +47,7 @@ typedef	struct
 		px,py;
 } WindowRec;	// Record used to save & restore screen windows
 
-extern	boolean		ingame,		// Set by game code if a game is in progress
+extern	bool		ingame,		// Set by game code if a game is in progress
 					loadedgame;	// Set if the current game was loaded
 extern	word		PrintX,PrintY;	// Current printing location in the window
 extern	word		WindowX,WindowY,// Current location of window

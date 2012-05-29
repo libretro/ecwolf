@@ -62,9 +62,9 @@ const RatioInformation AspectCorrection[] =
 /*static*/ byte *vbuf = NULL;
 unsigned vbufPitch = 0;
 
-int32_t    lasttimecount;
-int32_t    frameon;
-boolean fpscounter;
+int32_t	lasttimecount;
+int32_t	frameon;
+bool	fpscounter;
 
 int fps_frames=0, fps_time=0, fps=0;
 
@@ -1312,7 +1312,6 @@ void    ThreeDRefresh (void)
 	}
 	else
 	{
-#ifndef REMDEBUG
 		if (fpscounter)
 		{
 			fontnumber = 0;
@@ -1322,12 +1321,10 @@ void    ThreeDRefresh (void)
 			US_PrintSigned(fps);
 			US_Print(" fps");
 		}
-#endif
 		SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 		SDL_Flip(screen);
 	}
 
-#ifndef REMDEBUG
 	if (fpscounter)
 	{
 		fps_frames++;
@@ -1340,5 +1337,4 @@ void    ThreeDRefresh (void)
 			fps_frames=0;
 		}
 	}
-#endif
 }

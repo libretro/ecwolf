@@ -9,7 +9,7 @@
 =============================================================================
 */
 
-extern  boolean  loadedgame;
+extern  bool     loadedgame;
 extern  fixed    focallength;
 extern  int      viewscreenx, viewscreeny;
 extern  int      viewwidth;

@@ -132,18 +132,18 @@ void ControlMovement (AActor *ob)
 	{
 		angle = ob->angle + ANGLE_90;
 		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
-			Thrust(angle, RUNMOVE * MOVESCALE * tics);
+			Thrust(angle, RUNMOVE * MOVESCALE);
 		else
-			Thrust(angle, BASEMOVE * MOVESCALE * tics);
+			Thrust(angle, BASEMOVE * MOVESCALE);
 	}
 
 	if(buttonstate[bt_straferight])
 	{
 		angle = ob->angle - ANGLE_90;
 		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
-			Thrust(angle, RUNMOVE * MOVESCALE * tics );
+			Thrust(angle, RUNMOVE * MOVESCALE);
 		else
-			Thrust(angle, BASEMOVE * MOVESCALE * tics);
+			Thrust(angle, BASEMOVE * MOVESCALE);
 	}
 
 	//

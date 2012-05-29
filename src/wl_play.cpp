@@ -235,7 +235,7 @@ void PollJoystickButtons (void)
 
 void PollKeyboardMove (void)
 {
-	int delta = (!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]) ? RUNMOVE * tics : BASEMOVE * tics;
+	int delta = (!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]) ? RUNMOVE : BASEMOVE;
 
 	if(buttonstate[bt_moveforward])
 		controly -= delta;
@@ -287,7 +287,7 @@ void PollJoystickMove (void)
 
 	IN_GetJoyDelta (&joyx, &joyy);
 
-	int delta = buttonstate[bt_run] ? RUNMOVE * tics : BASEMOVE * tics;
+	int delta = buttonstate[bt_run] ? RUNMOVE : BASEMOVE;
 
 	if (joyx > 64 || buttonstate[bt_turnright])
 		controlx += delta;
@@ -364,9 +364,6 @@ void PollControls (void)
 		if (demoptr == lastdemoptr)
 			playstate = ex_completed;   // demo is done
 
-		controlx *= (int) tics;
-		controly *= (int) tics;
-
 		return;
 	}
 
@@ -413,9 +410,6 @@ void PollControls (void)
 		//
 		// save info out to demo buffer
 		//
-		controlx /= (int) tics;
-		controly /= (int) tics;
-
 		buttonbits = 0;
 
 		// TODO: Support 32-bit buttonbits
@@ -432,11 +426,6 @@ void PollControls (void)
 
 		if (demoptr >= lastdemoptr - 8)
 			playstate = ex_completed;
-		else
-		{
-			controlx *= (int) tics;
-			controly *= (int) tics;
-		}
 	}
 }
 

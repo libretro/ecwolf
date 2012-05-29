@@ -98,7 +98,7 @@ int32_t  heightnumerator;
 void    Quit (const char *error,...);
 
 boolean startgame;
-boolean loadedgame;
+bool    loadedgame;
 int     mouseadjustment;
 
 //

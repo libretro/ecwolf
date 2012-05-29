@@ -49,7 +49,7 @@
 */
 
 AActor			*killerobj;
-boolean         ingame,fizzlein;
+bool			ingame,fizzlein;
 gametype        gamestate;
 byte            bordercol=VIEWCOLOR;        // color of the Change View/Ingame border
 
