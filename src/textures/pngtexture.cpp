@@ -439,6 +439,7 @@ void FPNGTexture::MakeTexture ()
 				lump->Seek (StartOftRNS, SEEK_SET);
 				lump->Read (&len, 4);
 				lump->Read (&id, 4);
+				len = BigLong((unsigned int)len);
 				lump->Read (trans, len);
 			}
 
