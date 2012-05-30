@@ -1021,7 +1021,7 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 		--ob->sighttime; // We need to somehow mark we started.
 		ob->sightrandom = 1; // Account for tic.
 		if(ob->defaults->sightrandom)
-			ob->sightrandom += pr_sight(255/ob->defaults->sightrandom);
+			ob->sightrandom += pr_sight()/ob->defaults->sightrandom;
 		return false;
 	}
 

@@ -65,7 +65,7 @@ actor Dog 14
 	points 200
 	health 1
 	speed 2.93, 5.859
-	sighttime 2.93, 5.859
+	sighttime 1, 8
 	attacksound "dog/attack"
 	deathsound "dog/death"
 	seesound "dog/sight"
