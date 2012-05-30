@@ -68,7 +68,7 @@ static unsigned rowon;
 
 static int     picx;
 static int     picy;
-static int     picnum;
+static FTextureID picnum;
 static int     picdelay;
 static boolean layoutdone;
 
@@ -137,20 +137,53 @@ int ParseNumber (void)
 =====================
 */
 
-void ParsePicCommand (void)
+void ParsePicCommand (bool helphack, bool norip=false)
 {
 	picy=ParseNumber();
 	picx=ParseNumber();
-	picnum=ParseNumber();
-	RipToEOL ();
+
+	// Skip over whitespace
+	while(*text == ' ' || *text == '\t')
+		++text;
+
+	if(*text == '[')
+	{
+		const char* texName = text+1;
+		unsigned int len = 0;
+		while(*++text != ']')
+			++len;
+		picnum = TexMan.GetTexture(FString(texName, len), FTexture::TEX_Any);
+		++text;
+	}
+	else
+	{
+		int num=ParseNumber();
+
+		if(helphack)
+		{
+			switch(num)
+			{
+				case 5:
+					num = 11;
+					break;
+				case 11:
+					num = 5;
+					break;
+				default:
+					break;
+			}
+		}
+		picnum = TexMan.GetArtIndex(num);
+	}
+
+	if(!norip)
+		RipToEOL ();
 }
 
 
-void ParseTimedCommand (void)
+void ParseTimedCommand (bool helphack)
 {
-	picy=ParseNumber();
-	picx=ParseNumber();
-	picnum=ParseNumber();
+	ParsePicCommand(helphack, true);
 	picdelay=ParseNumber();
 	RipToEOL ();
 }
@@ -167,9 +200,9 @@ void ParseTimedCommand (void)
 =====================
 */
 
-void TimedPicCommand (void)
+void TimedPicCommand (bool helphack)
 {
-	ParseTimedCommand ();
+	ParseTimedCommand (helphack);
 
 	//
 	// update the screen, and wait for time delay
@@ -184,8 +217,8 @@ void TimedPicCommand (void)
 	//
 	// draw pic
 	//
-	if(TexMan.GetArtIndex(picnum).isValid())
-		VWB_DrawGraphic (TexMan(TexMan.GetArtIndex(picnum)), picx&~7, picy, MENU_CENTER);
+	if(picnum.isValid())
+		VWB_DrawGraphic (TexMan(picnum), picx&~7, picy, MENU_CENTER);
 }
 
 
@@ -197,7 +230,7 @@ void TimedPicCommand (void)
 =====================
 */
 
-void HandleCommand (void)
+void HandleCommand (bool helphack)
 {
 	int     i,margin,top,bottom;
 	int     picwidth,picheight,picmid;
@@ -255,15 +288,16 @@ void HandleCommand (void)
 			break;
 
 		case 'T':               // ^Tyyy,xxx,ppp,ttt waits ttt tics, then draws pic
-			TimedPicCommand ();
+			TimedPicCommand (helphack);
 			break;
 
 		case 'G':               // ^Gyyy,xxx,ppp draws graphic
 		{
-			ParsePicCommand ();
-			if(!TexMan.GetArtIndex(picnum).isValid())
+			ParsePicCommand (helphack);
+
+			if(!picnum.isValid())
 				break;
-			FTexture *picture = TexMan(TexMan.GetArtIndex(picnum));
+			FTexture *picture = TexMan(picnum);
 			VWB_DrawGraphic (picture, picx&~7,picy, MENU_CENTER);
 
 			//
@@ -427,7 +461,7 @@ void HandleWord (void)
 =====================
 */
 
-void PageLayout (bool shownumber)
+void PageLayout (bool shownumber, bool helphack)
 {
 	int     i,oldfontcolor;
 	char    ch;
@@ -479,7 +513,7 @@ void PageLayout (bool shownumber)
 		ch = *text;
 
 		if (ch == '^')
-			HandleCommand ();
+			HandleCommand (helphack);
 		else
 			if (ch == 9)
 			{
@@ -568,11 +602,11 @@ void CountPages (void)
 			}
 			if (ch == 'G')          // draw graphic command, so mark graphics
 			{
-				ParsePicCommand ();
+				ParsePicCommand (false);
 			}
 			if (ch == 'T')          // timed draw graphic command, so mark graphics
 			{
-				ParseTimedCommand ();
+				ParseTimedCommand (false);
 			}
 		}
 		else
@@ -591,7 +625,8 @@ void CountPages (void)
 =====================
 */
 
-void ShowArticle (const char *article)
+// Helphack switches index 11 and 5 so that the keyboard/blaze pics are reversed.
+void ShowArticle (const char *article, bool helphack=false)
 {
 	unsigned    oldfontnumber;
 	boolean     newpage,firstpage;
@@ -611,7 +646,7 @@ void ShowArticle (const char *article)
 		if (newpage)
 		{
 			newpage = false;
-			PageLayout (true);
+			PageLayout (true, helphack);
 			VW_UpdateScreen ();
 			if (firstpage)
 			{
@@ -698,7 +733,7 @@ void HelpScreens (void)
 	{
 		FMemLump lump = Wads.ReadLump(lumpNum);
 
-		ShowArticle((char*)lump.GetMem());
+		ShowArticle((char*)lump.GetMem(), true);
 	}
 
 	VW_FadeOut();
