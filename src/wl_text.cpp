@@ -9,6 +9,8 @@
 #include "w_wad.h"
 #include "wl_game.h"
 #include "wl_text.h"
+#include "g_mapinfo.h"
+#include "id_ca.h"
 #include "textures/textures.h"
 
 /*
@@ -61,7 +63,7 @@ static int numpages;
 
 static unsigned leftmargin[TEXTROWS];
 static unsigned rightmargin[TEXTROWS];
-static char*    text;
+static const char* text;
 static unsigned rowon;
 
 static int     picx;
@@ -545,7 +547,7 @@ void BackPage (void)
 */
 void CountPages (void)
 {
-	char    *bombpoint, *textstart;
+	const char    *bombpoint, *textstart;
 	char    ch;
 
 	textstart = text;
@@ -589,7 +591,7 @@ void CountPages (void)
 =====================
 */
 
-void ShowArticle (char *article)
+void ShowArticle (const char *article)
 {
 	unsigned    oldfontnumber;
 	boolean     newpage,firstpage;
@@ -712,20 +714,24 @@ void EndText (void)
 	memptr  layout;
 
 	ClearMemory ();
+	ClusterInfo &cluster = ClusterInfo::Find(levelInfo->Cluster);
 
-	char lumpName[9];
-	sprintf(lumpName, "ENDART%d", gamestate.episode+1);
-	int lumpNum = Wads.CheckNumForName(lumpName, ns_global);
-	if(lumpNum != -1)
+	if(cluster.ExitTextLookup)
 	{
-		FWadLump lump = Wads.OpenLumpNum(lumpNum);
-		text = new char[Wads.LumpLength(lumpNum)];
-		lump.Read(text, Wads.LumpLength(lumpNum));
+		int lumpNum = Wads.CheckNumForName(cluster.ExitText, ns_global);
+		if(lumpNum != -1)
+		{
+			FWadLump lump = Wads.OpenLumpNum(lumpNum);
+			text = new char[Wads.LumpLength(lumpNum)];
+			lump.Read(text, Wads.LumpLength(lumpNum));
 
-		ShowArticle(text);
+			ShowArticle(text);
 
-		delete[] text;
+			delete[] text;
+		}
 	}
+	else
+		ShowArticle(cluster.ExitText);
 
 	VW_FadeOut();
 	SETFONTCOLOR(0,15);

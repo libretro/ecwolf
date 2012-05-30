@@ -311,6 +311,8 @@ protected:
 			ParseStringAssignment(textureName);
 			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
 		}
+		else if(key.CompareNoCase("Cluster") == 0)
+			ParseIntAssignment(mapInfo.Cluster);
 		else if(key.CompareNoCase("FloorNumber") == 0)
 			ParseIntAssignment(mapInfo.FloorNumber);
 		else if(key.CompareNoCase("Music") == 0)
@@ -447,6 +449,56 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static TMap<unsigned int, ClusterInfo> clusters;
+
+ClusterInfo::ClusterInfo() : ExitTextLookup(false)
+{
+}
+
+ClusterInfo &ClusterInfo::Find(unsigned int index)
+{
+	return clusters[index];
+}
+
+class ClusterBlockParser : public MapInfoBlockParser
+{
+private:
+	ClusterInfo *cluster;
+
+public:
+	ClusterBlockParser(Scanner &sc) :
+		MapInfoBlockParser(sc, "cluster")
+		{}
+protected:
+	void ParseHeader()
+	{
+		sc.MustGetToken(TK_IntConst);
+		cluster = &ClusterInfo::Find(sc->number);
+	}
+
+	bool CheckKey(FString key)
+	{
+		if(key.CompareNoCase("exittext") == 0)
+		{
+			sc.MustGetToken('=');
+			if(sc.CheckToken(TK_Identifier))
+			{
+				if(sc->str.CompareNoCase("lookup") != 0)
+					sc.ScriptMessage(Scanner::ERROR, "Expected lookup but got '%s' instead.", sc->str.GetChars());
+				sc.MustGetToken(',');
+				cluster->ExitTextLookup = true;
+			}
+			sc.MustGetToken(TK_StringConst);
+			cluster->ExitText = sc->str;
+		}
+		else
+			return false;
+		return true;
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 static void ParseMapInfoLump(int lump)
 {
 	FMemLump data = Wads.ReadLump(lump);
@@ -468,6 +520,10 @@ static void ParseMapInfoLump(int lump)
 		else if(sc->str.CompareNoCase("gameinfo") == 0)
 		{
 			GameInfoBlockParser(sc).Parse();
+		}
+		else if(sc->str.CompareNoCase("cluster") == 0)
+		{
+			ClusterBlockParser(sc).Parse();
 		}
 		else if(sc->str.CompareNoCase("episode") == 0)
 		{

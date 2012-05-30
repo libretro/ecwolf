@@ -117,8 +117,7 @@ EndSpear (void)
 ==================
 */
 
-void
-Victory (void)
+void Victory (void)
 {
 #ifndef SPEARDEMO
 	int32_t sec;
@@ -178,9 +177,7 @@ Victory (void)
 
 #endif
 
-#ifndef JAPDEMO
-	VWB_DrawPic (8, 4, "L_BJWINS");
-#endif
+	VWB_DrawGraphic (TexMan("L_BJWINS"), 8, 4);
 
 
 	for (kr = sr = tr = sec = i = 0; i < LRpack; i++)
@@ -207,18 +204,9 @@ Victory (void)
 	if (min > 99)
 		min = sec = 99;
 
-	const char* numericGraphics[10] = { "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052", "FONTL053", "FONTL054", "FONTL055", "FONTL056", "FONTL057" };
-	i = TIMEX * 8 + 1;
-	VWB_DrawPic (i, TIMEY * 8, numericGraphics[(min / 10)]);
-	i += 2 * 8;
-	VWB_DrawPic (i, TIMEY * 8, numericGraphics[(min % 10)]);
-	i += 2 * 8;
-	Write (i / 8, TIMEY, ":");
-	i += 1 * 8;
-	VWB_DrawPic (i, TIMEY * 8, numericGraphics[(sec / 10)]);
-	i += 2 * 8;
-	VWB_DrawPic (i, TIMEY * 8, numericGraphics[(sec % 10)]);
-	VW_UpdateScreen ();
+	FString timeString;
+	timeString.Format("%02d:%02d", min, sec);
+	Write (TIMEX, TIMEY, timeString);
 
 	itoa (kr, tempstr, 10);
 	x = RATIOX + 24 - (int) strlen(tempstr) * 2;

@@ -32,6 +32,11 @@ episode "MAP01"
 	key = "E"
 }
 
+cluster 1
+{
+	exittext = lookup, "ENDART1"
+}
+
 map "MAP01"
 {
 	next = "MAP02"
@@ -39,6 +44,7 @@ map "MAP01"
 	floornumber = 1
 	par = 90
 	music = "GETTHEM"
+	cluster = 1
 }
 
 map "MAP02"
@@ -48,6 +54,7 @@ map "MAP02"
 	floornumber = 2
 	par = 120
 	music = "SEARCHN"
+	cluster = 1
 }
 
 map "MAP03"
@@ -57,6 +64,7 @@ map "MAP03"
 	floornumber = 3
 	par = 120
 	music = "POW"
+	cluster = 1
 }
 
 map "MAP04"
@@ -66,6 +74,7 @@ map "MAP04"
 	floornumber = 4
 	par = 210
 	music = "SUSPENSE"
+	cluster = 1
 }
 
 map "MAP05"
@@ -75,6 +84,7 @@ map "MAP05"
 	floornumber = 5
 	par = 180
 	music = "GETTHEM"
+	cluster = 1
 }
 
 map "MAP06"
@@ -84,6 +94,7 @@ map "MAP06"
 	floornumber = 6
 	par = 180
 	music = "SEARCHN"
+	cluster = 1
 }
 
 map "MAP07"
@@ -93,6 +104,7 @@ map "MAP07"
 	floornumber = 7
 	par = 150
 	music = "POW"
+	cluster = 1
 }
 
 map "MAP08"
@@ -102,6 +114,7 @@ map "MAP08"
 	floornumber = 8
 	par = 150
 	music = "SUSPENSE"
+	cluster = 1
 }
 
 map "MAP09"
@@ -110,6 +123,7 @@ map "MAP09"
 	secretnext = "MAP10"
 	floornumber = 9
 	music = "WARMARCH"
+	cluster = 1
 }
 
 map "MAP10"
@@ -119,6 +133,7 @@ map "MAP10"
 	defaultceiling = "#400040"
 	floornumber = 10
 	music = "CORNER"
+	cluster = 1
 }
 
 // Episode 2
@@ -130,6 +145,11 @@ episode "MAP11"
 	key = "O"
 }
 
+cluster 2
+{
+	exittext = lookup, "ENDART2"
+}
+
 map "MAP11"
 {
 	next = "MAP12"
@@ -138,6 +158,7 @@ map "MAP11"
 	floornumber = 1
 	par = 90
 	music = "NAZI_OMI"
+	cluster = 2
 }
 
 map "MAP12"
@@ -148,6 +169,7 @@ map "MAP12"
 	floornumber = 2
 	par = 210
 	music = "PREGNANT"
+	cluster = 2
 }
 
 map "MAP13"
@@ -158,6 +180,7 @@ map "MAP13"
 	floornumber = 3
 	par = 180
 	music = "GOINGAFT"
+	cluster = 2
 }
 
 map "MAP14"
@@ -167,6 +190,7 @@ map "MAP14"
 	floornumber = 4
 	par = 120
 	music = "HEADACHE"
+	cluster = 2
 }
 
 map "MAP15"
@@ -177,6 +201,7 @@ map "MAP15"
 	floornumber = 5
 	par = 240
 	music = "NAZI_OMI"
+	cluster = 2
 }
 
 map "MAP16"
@@ -187,6 +212,7 @@ map "MAP16"
 	floornumber = 6
 	par = 360
 	music = "PREGNANT"
+	cluster = 2
 }
 
 map "MAP17"
@@ -196,6 +222,7 @@ map "MAP17"
 	floornumber = 7
 	par = 60
 	music = "HEADACHE"
+	cluster = 2
 }
 
 map "MAP18"
@@ -206,6 +233,7 @@ map "MAP18"
 	floornumber = 8
 	par = 180
 	music = "GOINGAFT"
+	cluster = 2
 }
 
 map "MAP19"
@@ -214,6 +242,7 @@ map "MAP19"
 	secretnext = "MAP20"
 	floornumber = 9
 	music = "WARMARCH"
+	cluster = 2
 }
 
 map "MAP20"
@@ -223,6 +252,7 @@ map "MAP20"
 	defaultceiling = "#4040FC"
 	floornumber = 10
 	music = "DUNGEON"
+	cluster = 2
 }
 
 // Episode 3
@@ -234,6 +264,11 @@ episode "MAP21"
 	key = "D"
 }
 
+cluster 3
+{
+	exittext = lookup, "ENDART3"
+}
+
 map "MAP21"
 {
 	next = "MAP22"
@@ -241,6 +276,7 @@ map "MAP21"
 	floornumber = 1
 	par = 90
 	music = "INTROCW3"
+	cluster = 3
 }
 
 map "MAP22"
@@ -250,6 +286,7 @@ map "MAP22"
 	floornumber = 2
 	par = 90
 	music = "NAZI_RAP"
+	cluster = 3
 }
 
 map "MAP23"
@@ -259,6 +296,7 @@ map "MAP23"
 	floornumber = 3
 	par = 150
 	music = "TWELFTH"
+	cluster = 3
 }
 
 map "MAP24"
@@ -268,6 +306,7 @@ map "MAP24"
 	floornumber = 4
 	par = 150
 	music = "ZEROHOUR"
+	cluster = 3
 }
 
 map "MAP25"
@@ -277,6 +316,7 @@ map "MAP25"
 	floornumber = 5
 	par = 210
 	music = "INTROCW3"
+	cluster = 3
 }
 
 map "MAP26"
@@ -287,6 +327,7 @@ map "MAP26"
 	floornumber = 6
 	par = 150
 	music = "NAZI_RAP"
+	cluster = 3
 }
 
 map "MAP27"
@@ -297,6 +338,7 @@ map "MAP27"
 	floornumber = 7
 	par = 120
 	music = "TWELFTH"
+	cluster = 3
 }
 
 map "MAP28"
@@ -306,6 +348,7 @@ map "MAP28"
 	floornumber = 8
 	par = 360
 	music = "ZEROHOUR"
+	cluster = 3
 }
 
 map "MAP29"
@@ -314,6 +357,7 @@ map "MAP29"
 	secretnext = "MAP30"
 	floornumber = 9
 	music = "ULTIMATE"
+	cluster = 3
 }
 
 map "MAP30"
@@ -323,6 +367,7 @@ map "MAP30"
 	defaultceiling = "#000098"
 	floornumber = 10
 	music = "PACMAN"
+	cluster = 3
 }
 
 // Episode 4
@@ -334,6 +379,11 @@ episode "MAP31"
 	key = "A"
 }
 
+cluster 4
+{
+	exittext = lookup, "ENDART4"
+}
+
 map "MAP31"
 {
 	next = "MAP32"
@@ -341,6 +391,7 @@ map "MAP31"
 	floornumber = 1
 	par = 120
 	music = "GETTHEM"
+	cluster = 4
 }
 
 map "MAP32"
@@ -351,6 +402,7 @@ map "MAP32"
 	floornumber = 2
 	par = 120
 	music = "SEARCHN"
+	cluster = 4
 }
 
 map "MAP33"
@@ -361,6 +413,7 @@ map "MAP33"
 	floornumber = 3
 	par = 90
 	music = "POW"
+	cluster = 4
 }
 
 map "MAP34"
@@ -371,6 +424,7 @@ map "MAP34"
 	floornumber = 4
 	par = 60
 	music = "SUSPENSE"
+	cluster = 4
 }
 
 map "MAP35"
@@ -381,6 +435,7 @@ map "MAP35"
 	floornumber = 5
 	par = 270
 	music = "GETTHEM"
+	cluster = 4
 }
 
 map "MAP36"
@@ -391,6 +446,7 @@ map "MAP36"
 	floornumber = 6
 	par = 210
 	music = "SEARCHN"
+	cluster = 4
 }
 
 map "MAP37"
@@ -401,6 +457,7 @@ map "MAP37"
 	floornumber = 7
 	par = 120
 	music = "POW"
+	cluster = 4
 }
 
 map "MAP38"
@@ -411,6 +468,7 @@ map "MAP38"
 	floornumber = 8
 	par = 270
 	music = "SUSPENSE"
+	cluster = 4
 }
 
 map "MAP39"
@@ -419,6 +477,7 @@ map "MAP39"
 	secretnext = "MAP10"
 	floornumber = 9
 	music = "WARMARCH"
+	cluster = 4
 }
 
 map "MAP40"
@@ -428,6 +487,7 @@ map "MAP40"
 	defaultceiling = "#483818"
 	floornumber = 10
 	music = "CORNER"
+	cluster = 4
 }
 
 // Episode 5
@@ -439,6 +499,11 @@ episode "MAP41"
 	key = "T"
 }
 
+cluster 5
+{
+	exittext = lookup, "ENDART5"
+}
+
 map "MAP41"
 {
 	next = "MAP42"
@@ -447,6 +512,7 @@ map "MAP41"
 	floornumber = 1
 	par = 150
 	music = "NAZI_OMI"
+	cluster = 5
 }
 
 map "MAP42"
@@ -456,6 +522,7 @@ map "MAP42"
 	floornumber = 2
 	par = 90
 	music = "PREGNANT"
+	cluster = 5
 }
 
 map "MAP43"
@@ -466,6 +533,7 @@ map "MAP43"
 	floornumber = 3
 	par = 150
 	music = "GOINGAFT"
+	cluster = 5
 }
 
 map "MAP44"
@@ -476,6 +544,7 @@ map "MAP44"
 	floornumber = 4
 	par = 150
 	music = "HEADACHE"
+	cluster = 5
 }
 
 map "MAP45"
@@ -486,6 +555,7 @@ map "MAP45"
 	floornumber = 5
 	par = 240
 	music = "NAZI_OMI"
+	cluster = 5
 }
 
 map "MAP46"
@@ -496,6 +566,7 @@ map "MAP46"
 	floornumber = 6
 	par = 180
 	music = "PREGNANT"
+	cluster = 5
 }
 
 map "MAP47"
@@ -505,6 +576,7 @@ map "MAP47"
 	floornumber = 7
 	par = 270
 	music = "HEADACHE"
+	cluster = 5
 }
 
 map "MAP48"
@@ -514,6 +586,7 @@ map "MAP48"
 	floornumber = 8
 	par = 210
 	music = "GOINGAFT"
+	cluster = 5
 }
 
 map "MAP49"
@@ -522,6 +595,7 @@ map "MAP49"
 	secretnext = "MAP50"
 	floornumber = 9
 	music = "WARMARCH"
+	cluster = 5
 }
 
 map "MAP50"
@@ -531,6 +605,7 @@ map "MAP50"
 	defaultceiling = "#580000"
 	floornumber = 10
 	music = "DUNGEON"
+	cluster = 5
 }
 
 // Episode 6
@@ -542,6 +617,11 @@ episode "MAP51"
 	key = "C"
 }
 
+cluster 6
+{
+	exittext = lookup, "ENDART6"
+}
+
 map "MAP51"
 {
 	next = "MAP52"
@@ -549,6 +629,7 @@ map "MAP51"
 	floornumber = 1
 	par = 390
 	music = "INTROCW3"
+	cluster = 6
 }
 
 map "MAP52"
@@ -558,6 +639,7 @@ map "MAP52"
 	floornumber = 2
 	par = 240
 	music = "NAZI_RAP"
+	cluster = 6
 }
 
 map "MAP53"
@@ -567,6 +649,7 @@ map "MAP53"
 	floornumber = 3
 	par = 270
 	music = "TWELFTH"
+	cluster = 6
 }
 
 map "MAP54"
@@ -576,6 +659,7 @@ map "MAP54"
 	floornumber = 4
 	par = 360
 	music = "ZEROHOUR"
+	cluster = 6
 }
 
 map "MAP55"
@@ -586,6 +670,7 @@ map "MAP55"
 	floornumber = 5
 	par = 300
 	music = "INTROCW3"
+	cluster = 6
 }
 
 map "MAP56"
@@ -596,6 +681,7 @@ map "MAP56"
 	floornumber = 6
 	par = 330
 	music = "NAZI_RAP"
+	cluster = 6
 }
 
 map "MAP57"
@@ -606,6 +692,7 @@ map "MAP57"
 	floornumber = 7
 	par = 330
 	music = "TWELFTH"
+	cluster = 6
 }
 
 map "MAP58"
@@ -616,6 +703,7 @@ map "MAP58"
 	floornumber = 8
 	par = 810
 	music = "ZEROHOUR"
+	cluster = 6
 }
 
 map "MAP59"
@@ -625,6 +713,7 @@ map "MAP59"
 	defaultceiling = "#483818"
 	floornumber = 9
 	music = "ULTIMATE"
+	cluster = 6
 }
 
 map "MAP60"
@@ -634,4 +723,5 @@ map "MAP60"
 	defaultceiling = "#483818"
 	floornumber = 10
 	music = "FUNKYOU"
+	cluster = 6
 }

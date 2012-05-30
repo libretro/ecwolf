@@ -71,6 +71,7 @@ public:
 	FString			Name;
 	unsigned int	FloorNumber;
 	FString			Music;
+	unsigned int	Cluster;
 
 	FTextureID		DefaultTexture[2];
 	unsigned int	Par;
@@ -91,6 +92,17 @@ public:
 
 	static unsigned int GetNumEpisodes();
 	static EpisodeInfo &GetEpisode(unsigned int index);
+};
+
+class ClusterInfo
+{
+public:
+	ClusterInfo();
+
+	FString	ExitText;
+	bool	ExitTextLookup;
+
+	static ClusterInfo &Find(unsigned int index);
 };
 
 void G_ParseMapInfo();
