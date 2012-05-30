@@ -415,6 +415,18 @@ again:
 		}
 		return 1;
 	}
+	else if (Keyboard[sc_T])
+	{
+		notargetmode = !notargetmode;
+		CenterWindow (20,3);
+		if(notargetmode)
+			US_PrintCentered("No target mode ON");
+		else
+			US_PrintCentered("No target mode OFF");
+		VW_UpdateScreen();
+		IN_Ack ();
+		return 1;
+	}
 	else if (Keyboard[sc_V])        // V = extra VBLs
 	{
 		CenterWindow(30,3);

@@ -983,6 +983,9 @@ void FirstSighting (AActor *ob)
 static FRandom pr_sight("SightPlayer");
 bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
 {
+	if (notargetmode)
+		return false;
+
 	if (ob->flags & FL_ATTACKMODE)
 	{
 		Printf ("An actor in ATTACKMODE called SightPlayer!");
