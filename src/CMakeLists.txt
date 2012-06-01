@@ -55,6 +55,7 @@ add_executable(ecwolf WIN32
 	g_shared/a_patrolpoint.cpp
 	g_shared/a_playerpawn.cpp
 	r_data/colormaps.cpp
+	r_data/r_translate.cpp
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp
 	resourcefiles/file_7z.cpp
@@ -120,10 +121,10 @@ add_executable(ecwolf WIN32
 	m_png.cpp
 	name.cpp
 	r_sprites.cpp
-	r_translate.cpp
 	scanner.cpp
 	sndinfo.cpp
 	thinker.cpp
+	v_font.cpp
 	v_palette.cpp
 	v_video.cpp
 	w_wad.cpp

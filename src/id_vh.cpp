@@ -4,8 +4,11 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "w_wad.h"
+#include "v_font.h"
 #include "v_palette.h"
+#include "r_data/r_translate.h"
 #include "textures/textures.h"
+#include "templates.h"
 
 int	    pa=MENU_CENTER,px,py;
 byte	fontcolor,backcolor;
@@ -15,54 +18,41 @@ int	    fontnumber;
 
 void VWB_DrawPropString(const char* string)
 {
-	fontstruct  *font;
-	int		    width, step, height;
-	byte	    *source, *dest;
+	int		    width, height;
+	byte	    *dest;
+	FTexture	*source;
 	byte	    ch;
 	int i;
 	unsigned sx, sy;
 	int tmp1, tmp2;
 	int cx = px, cy = py;
-	MenuToRealCoords(cx, cy, tmp1, tmp2, (MenuOffset)pa);
+	//MenuToRealCoords(cx, cy, tmp1, tmp2, (MenuOffset)pa);
 
-	const char* fonts[2] = { "FONT1", "FONT2" };
-	int lumpNum = Wads.CheckNumForName(fonts[fontnumber], ns_graphics);
-	if(lumpNum == -1)
-		return;
-	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+	FFont *fonts[2] = { SmallFont, BigFont };
+	//const BYTE* transName = (const BYTE*)"[white]";
+	//EColorRange range = V_ParseFontColor(transName, CR_UNTRANSLATED, CR_UNTRANSLATED);
 
 	byte *vbuf = VL_LockSurface(curSurface);
 	if(vbuf == NULL) return;
 
-	byte* fontData = new byte[Wads.LumpLength(lumpNum)];
-	lump.Read(fontData, Wads.LumpLength(lumpNum));
-	font = (fontstruct *) fontData;
-	height = font->height;
+	FFont *font = fonts[fontnumber];
 	dest = vbuf + (cy * curPitch + cx);
+	height = font->GetHeight();
+	FRemapTable *remap = font->GetColorTranslation(CR_WHITE);
 
 	while ((ch = (byte)*string++)!=0)
 	{
-		width = step = font->width[ch];
-		source = ((byte *)font)+font->location[ch];
-		while (width--)
+		if(ch == '\n')
 		{
-			for(i=0; i<height; i++)
-			{
-				if(source[i*step])
-				{
-					for(sy=0; sy<scaleFactor; sy++)
-						for(sx=0; sx<scaleFactor; sx++)
-							dest[(scaleFactor*i+sy)*curPitch+sx]=fontcolor;
-				}
-			}
-
-			source++;
-			cx++;
-			dest+=scaleFactor;
+			cy += height;
+			cx = px;
+			continue;
 		}
-	}
 
-	delete[] fontData;
+		source = font->GetChar(ch, &width);
+		VWB_DrawGraphic(source, cx, cy, (MenuOffset)pa, remap);
+		cx += width;
+	}
 
 	VL_UnlockSurface(curSurface);
 }
@@ -112,27 +102,26 @@ void VL_MungePic (byte *source, unsigned width, unsigned height)
 	free(temp);
 }
 
-void VWL_MeasureString (const char *string, word *width, word *height, fontstruct *font)
-{
-	*height = font->height;
-	for (*width = 0;*string;string++)
-		*width += font->width[*((byte *)string)];	// proportional width
-}
-
 void VW_MeasurePropString (const char *string, word *width, word *height)
 {
-	const char* fonts[2] = { "FONT1", "FONT2" };
-	int lumpNum = Wads.CheckNumForName(fonts[fontnumber], ns_graphics);
-	if(lumpNum == -1)
-		return;
-	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+	int w = 0;
+	static FFont *fonts[2] = { SmallFont, BigFont };
+	FFont *font = fonts[fontnumber];
 
-	fontstruct *font = new fontstruct();
-	lump.Read(font, sizeof(fontstruct));
+	*height = font->GetHeight();
+	for(*width = 0;*string;++string)
+	{
+		if(*string == '\n')
+		{
+			w = 0;
+			*height += font->GetHeight();
+			continue;
+		}
 
-	VWL_MeasureString(string,width,height,font);
-
-	delete font;
+		w += font->GetCharWidth(*((byte *)string));
+		if(w > *width)
+			*width = w;
+	}
 }
 
 /*
@@ -545,8 +534,7 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 	VL_UnlockSurface(screenBuffer);
 }
 
-#include "templates.h"
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu)
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
 
@@ -564,6 +552,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu)
 	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
 	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
 
+	const BYTE *table = remap ? remap->Remap : NormalLight.Maps;
 	const BYTE *src;
 	byte *dest;
 	unsigned int i, j;
@@ -582,7 +571,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu)
 			if((signed)(y1+j) >= (signed)(screenHeight))
 				break;
 			if(src[y>>FRACBITS] != 0)
-				*dest = NormalLight.Maps[src[y>>FRACBITS]];
+				*dest = table[src[y>>FRACBITS]];
 			dest += bufferPitch;
 		}
 	}

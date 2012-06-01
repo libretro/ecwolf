@@ -23,6 +23,7 @@
 #include "textures/textures.h"
 #include "c_cvars.h"
 #include "thingdef/thingdef.h"
+#include "v_font.h"
 #include "v_palette.h"
 #include "v_video.h"
 #include "r_data/colormaps.h"
@@ -452,6 +453,13 @@ static void InitGame()
 		SetupWM();
 #endif
 	VW_UpdateScreen();
+
+//
+// Fonts
+//
+	V_InitFontColors();
+	V_InitFonts();
+	atterm(V_ClearFonts);
 
 	VH_Startup ();
 	IN_Startup ();

@@ -40,6 +40,8 @@
 #include "wl_text.h"
 #include "v_palette.h"
 #include "colormatcher.h"
+#include "v_font.h"
+#include "templates.h"
 
 struct SaveFile
 {
@@ -1179,44 +1181,24 @@ int Confirm (const char *string)
 ////////////////////////////////////////////////////////////////////
 void Message (const char *string)
 {
-	int h = 0, w = 0, mw = 0, i, len = (int) strlen(string);
-	fontstruct *font;
+	int i, len = (int) strlen(string);
+	FFont *font = BigFont;
+	word width, height;
 
-	fontnumber = 1;
-	int lumpNum = Wads.CheckNumForName("FONT2", ns_graphics);
-	if(lumpNum == -1)
-		return;
-	FWadLump lump = Wads.OpenLumpNum(lumpNum);
+	FString measureString;
+	measureString.Format("%s_", string);
+	VW_MeasurePropString(measureString, &width, &height);
+	width = MIN<int>(width, 320 - 10);
+	height = MIN<int>(height, 200 - 10);
 
-	font = new fontstruct();
-	lump.Read(font, sizeof(fontstruct));
-	h = font->height;
-	for (i = 0; i < len; i++)
-	{
-		if (string[i] == '\n')
-		{
-			if (w > mw)
-				mw = w;
-			w = 0;
-			h += font->height;
-		}
-		else
-			w += font->width[string[i]];
-	}
+	PrintY = (WindowH / 2) - height / 2;
+	PrintX = WindowX = 160 - width / 2;
 
-	if (w + 10 > mw)
-		mw = w + 10;
-
-	PrintY = (WindowH / 2) - h / 2;
-	PrintX = WindowX = 160 - mw / 2;
-
-	DrawWindow (WindowX - 5, PrintY - 5, mw + 10, h + 10, TEXTCOLOR);
-	DrawOutline (WindowX - 5, PrintY - 5, mw + 10, h + 10, 0, HIGHLIGHT);
+	DrawWindow (WindowX - 5, PrintY - 5, width + 10, height + 10, TEXTCOLOR);
+	DrawOutline (WindowX - 5, PrintY - 5, width + 10, height + 10, 0, HIGHLIGHT);
 	SETFONTCOLOR (0, TEXTCOLOR);
 	US_Print (string);
 	VW_UpdateScreen ();
-
-	delete font;
 }
 
 ////////////////////////////////////////////////////////////////////

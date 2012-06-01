@@ -21,7 +21,7 @@ inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s)); }
 #define M_Free free
 #define Printf printf
 #define I_Error Quit
-#define I_FatalError(a) printf(a);exit(0);
+#define I_FatalError Quit
 
 #define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
 #define MulScale16(x,y) (SDWORD((SQWORD(x)*SQWORD(y))>>16))

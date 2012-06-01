@@ -140,3 +140,30 @@ normal:
 	else
 		return MAKERGB(c[0], c[1], c[2]);
 }
+
+//==========================================================================
+//
+// V_GetColor
+//
+// Works like V_GetColorFromString(), but also understands X11 color names.
+//
+//==========================================================================
+
+int V_GetColor (const DWORD *palette, const char *str)
+{
+	return V_GetColorFromString(palette, str);
+#if 0
+	FString string = V_GetColorStringByName (str);
+	int res;
+
+	if (!string.IsEmpty())
+	{
+		res = V_GetColorFromString (palette, string);
+	}
+	else
+	{
+		res = V_GetColorFromString (palette, str);
+	}
+	return res;
+#endif
+}

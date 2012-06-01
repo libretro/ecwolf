@@ -1,0 +1,9 @@
+IntermissionFont
+{
+	Template "FONTL%03d"
+}
+
+HudFont
+{
+	Template "FONTN%03d"
+}

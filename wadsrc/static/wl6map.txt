@@ -4,8 +4,8 @@
 
 graphics
 {
-	"FONT1",
-	"FONT2",
+	"SMALLFNT",
+	"BIGFONT",
 
 	"BJPIC",
 	"CASTLE",
