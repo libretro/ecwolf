@@ -16,7 +16,7 @@ int	    fontnumber;
 
 //==========================================================================
 
-void VWB_DrawPropString(const char* string)
+void VWB_DrawPropString(const char* string, EColorRange translation)
 {
 	int		    width, height;
 	byte	    *dest;
@@ -26,11 +26,8 @@ void VWB_DrawPropString(const char* string)
 	unsigned sx, sy;
 	int tmp1, tmp2;
 	int cx = px, cy = py;
-	//MenuToRealCoords(cx, cy, tmp1, tmp2, (MenuOffset)pa);
 
 	FFont *fonts[2] = { SmallFont, BigFont };
-	//const BYTE* transName = (const BYTE*)"[white]";
-	//EColorRange range = V_ParseFontColor(transName, CR_UNTRANSLATED, CR_UNTRANSLATED);
 
 	byte *vbuf = VL_LockSurface(curSurface);
 	if(vbuf == NULL) return;
@@ -38,7 +35,7 @@ void VWB_DrawPropString(const char* string)
 	FFont *font = fonts[fontnumber];
 	dest = vbuf + (cy * curPitch + cx);
 	height = font->GetHeight();
-	FRemapTable *remap = font->GetColorTranslation(CR_WHITE);
+	FRemapTable *remap = font->GetColorTranslation(translation);
 
 	while ((ch = (byte)*string++)!=0)
 	{
@@ -50,7 +47,8 @@ void VWB_DrawPropString(const char* string)
 		}
 
 		source = font->GetChar(ch, &width);
-		VWB_DrawGraphic(source, cx, cy, (MenuOffset)pa, remap);
+		if(source)
+			VWB_DrawGraphic(source, cx, cy, (MenuOffset)pa, remap);
 		cx += width;
 	}
 

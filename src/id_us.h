@@ -53,9 +53,6 @@ extern	word		PrintX,PrintY;	// Current printing location in the window
 extern	word		WindowX,WindowY,// Current location of window
 					WindowW,WindowH;// Current size of window
 
-extern	void		(*USL_MeasureString)(const char *,word *,word *);
-extern void			(*USL_DrawString)(const char *);
-
 extern	boolean		(*USL_SaveGame)(int),(*USL_LoadGame)(int);
 extern	void		(*USL_ResetGame)(void);
 extern	SaveGame	Games[MaxSaveGames];
@@ -73,8 +70,6 @@ void			US_CenterWindow(word,word);
 void			US_SaveWindow(WindowRec *win),
 				US_RestoreWindow(WindowRec *win);
 void 			US_ClearWindow(void);
-void			US_SetPrintRoutines(void (*measure)(const char *,word *,word *),
-									void (*print)(const char *));
 void			US_PrintCentered(const char *s),
 				US_CPrint(const char *s),
 				US_CPrintLine(const char *s),

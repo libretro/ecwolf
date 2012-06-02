@@ -216,8 +216,8 @@ protected:
 
 struct TempParmInfo
 {
-	unsigned int StartParm[2];
-	unsigned int ParmLen[2];
+	unsigned int StartParm[3];
+	unsigned int ParmLen[3];
 	int Index;
 };
 struct TempColorInfo
@@ -1091,6 +1091,7 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, int length)
 	int16_t location[256];
 	int8_t width[256];
 	double luminosity[256];
+	BYTE identity[256];
 
 	// Copy header information and then do a sanity check
 	FontHeight = LittleShort(*(const int16_t *)data);
@@ -1101,9 +1102,6 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, int length)
 		location[i] = LittleShort(location[i]);
 		if(location[i] + FontHeight*width[i] >= length)
 			return false;
-
-		// Wolf fonts are 1bpp
-		luminosity[i] = i == 0 ? 0.0 : 1.0;
 	}
 
 	Chars = new CharData[256];
@@ -1116,9 +1114,12 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, int length)
 	{
 		Chars[i].Pic = new FFontChar2 (lump, NULL, location[i], width[i], FontHeight);
 		Chars[i].XMove = width[i];
+
+		luminosity[i] = i != 0 ? 0.5 : 0.0;
+		identity[i] = GPalette.BlackIndex;
 	}
 
-	BuildTranslations(luminosity, NULL, &TranslationParms[1][0], ActiveColors, NULL);
+	BuildTranslations(luminosity, identity, &TranslationParms[2][0], ActiveColors, NULL);
 
 	return true;
 }
@@ -2113,6 +2114,7 @@ void V_InitFontColors ()
 
 	TranslationParms[0].Clear();
 	TranslationParms[1].Clear();
+	TranslationParms[2].Clear();
 	TranslationLookup.Clear();
 	TranslationColors.Clear();
 
@@ -2155,8 +2157,8 @@ void V_InitFontColors ()
 
 			parmchoice = 0;
 			info.StartParm[0] = parms.Size();
-			info.StartParm[1] = 0;
-			info.ParmLen[1] = info.ParmLen[0] = 0;
+			info.StartParm[2] = info.StartParm[1] = 0;
+			info.ParmLen[2] = info.ParmLen[1] = info.ParmLen[0] = 0;
 			tparm.RangeEnd = tparm.RangeStart = -1;
 
 			if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
@@ -2164,19 +2166,34 @@ void V_InitFontColors ()
 			{
 				if (0 == sc->str.CompareNoCase ("Console:"))
 				{
-					if (parmchoice == 1)
+					if (info.ParmLen[1] != 0)
 					{
 						sc.ScriptMessage (Scanner::ERROR, "Each color may only have one set of console ranges");
 					}
-					parmchoice = 1;
 					info.StartParm[1] = parms.Size();
-					info.ParmLen[0] = info.StartParm[1] - info.StartParm[0];
+					info.ParmLen[parmchoice] = info.StartParm[1] - info.StartParm[parmchoice];
+					parmchoice = 1;
 					tparm.RangeEnd = tparm.RangeStart = -1;
 				}
 				else if (0 == sc->str.CompareNoCase ("Flat:"))
 				{
+					if (info.ParmLen[2] != 0)
+					{
+						sc.ScriptMessage (Scanner::ERROR, "Each color may only have one set of console ranges");
+					}
 					if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");;
 					logcolor = V_GetColor (NULL, sc->str);
+
+					// [BL] We want to be able to use Flat coloring in ECWolf
+					info.StartParm[2] = parms.Size();
+					info.ParmLen[parmchoice] = info.StartParm[2] - info.StartParm[parmchoice];
+					parmchoice = 2;
+					tparm.RangeEnd = 256;
+					tparm.RangeStart = 0;
+					tparm.Start[0] = tparm.End[0] = RPART(logcolor);
+					tparm.Start[1] = tparm.End[1] = GPART(logcolor);
+					tparm.Start[2] = tparm.End[2] = BPART(logcolor);
+					parms.Push (tparm);
 				}
 				else
 				{
@@ -2259,6 +2276,15 @@ void V_InitFontColors ()
 				info.StartParm[1] = parms.Push (tparm);
 				info.ParmLen[1] = 1;
 			}
+			if (info.ParmLen[2] == 0 && names[0] != NAME_Untranslated)
+			{ // [BL] Likewise do the same for the lack of a flat color
+				tparm.RangeStart = 0;
+				tparm.RangeEnd = 256;
+				tparm.Start[2] = tparm.Start[1] = tparm.Start[0] = 255;
+				tparm.End[2] = tparm.End[1] = tparm.End[0] = 255;
+				info.StartParm[2] = parms.Push (tparm);
+				info.ParmLen[2] = 1;
+			}
 			cinfo.ParmInfo = parminfo.Push (info);
 			// Record this color information for each name it goes by
 			for (i = 0; i < names.Size(); ++i)
@@ -2293,7 +2319,7 @@ void V_InitFontColors ()
 		if (pinfo->Index < 0)
 		{
 			// Write out the set of remappings for this color.
-			for (k = 0; k < 2; ++k)
+			for (k = 0; k < 3; ++k)
 			{
 				for (j = 0; j < pinfo->ParmLen[k]; ++j)
 				{
@@ -2310,6 +2336,7 @@ void V_InitFontColors ()
 	tparm.RangeStart = -1;
 	TranslationParms[0].Push (tparm);
 	TranslationParms[1].Push (tparm);
+	TranslationParms[2].Push (tparm);
 	// Sort the translation lookups for fast binary searching.
 	qsort (&TranslationLookup[0], TranslationLookup.Size(), sizeof(TranslationLookup[0]), TranslationMapCompare);
 

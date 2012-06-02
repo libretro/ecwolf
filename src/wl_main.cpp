@@ -429,22 +429,23 @@ static void InitGame()
 	}
 
 	//
+	// Mapinfo
+	//
+
+	V_InitFontColors();
+	G_ParseMapInfo();
+
+	//
 	// Init texture manager
 	//
 
 	TexMan.Init();
 	printf("VL_ReadPalette: Setting up the Palette...\n");
 	VL_ReadPalette();
-	InitPalette("WOLFPAL");
+	InitPalette(gameinfo.GamePalette);
 	R_InitColormaps();
 	atterm(R_DeinitColormaps);
 	GenerateLookupTables();
-
-	//
-	// Mapinfo
-	//
-
-	G_ParseMapInfo();
 
 	SignonScreen ();
 
@@ -457,7 +458,6 @@ static void InitGame()
 //
 // Fonts
 //
-	V_InitFontColors();
 	V_InitFonts();
 	atterm(V_ClearFonts);
 

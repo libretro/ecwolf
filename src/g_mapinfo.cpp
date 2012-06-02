@@ -200,6 +200,13 @@ protected:
 		while(sc.CheckToken(','));
 	}
 
+	void ParseFontColorAssignment(EColorRange &dest)
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_StringConst);
+		dest = V_FindFontColor(sc->str);
+	}
+
 	Scanner &sc;
 	const char* const block;
 
@@ -371,6 +378,22 @@ protected:
 			ParseStringAssignment(gameinfo.FinaleMusic);
 		else if(key.CompareNoCase("intermissionmusic") == 0)
 			ParseStringAssignment(gameinfo.IntermissionMusic);
+		else if(key.CompareNoCase("menufontcolor_title") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::TITLE]);
+		else if(key.CompareNoCase("menufontcolor_label") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::LABEL]);
+		else if(key.CompareNoCase("menufontcolor_selection") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::SELECTION]);
+		else if(key.CompareNoCase("menufontcolor_disabled") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::DISABLED]);
+		else if(key.CompareNoCase("menufontcolor_invalid") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::INVALID]);
+		else if(key.CompareNoCase("menufontcolor_invalidselection") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::INVALIDSELECTION]);
+		else if(key.CompareNoCase("menufontcolor_highlight") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::HIGHLIGHTED]);
+		else if(key.CompareNoCase("menufontcolor_highlightselection") == 0)
+			ParseFontColorAssignment(gameinfo.MenuFontColor[GameInfo::HIGHLIGHTSELECTION]);
 		else
 			return false;
 		return true;

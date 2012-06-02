@@ -15,6 +15,14 @@ gameinfo
 	titletime = 15
 	creditpage = "CREDITS"
 	pagetime = 10
+	menufontcolor_title = "Yellow"
+	menufontcolor_label = "DarkGrey"
+	menufontcolor_selection = "DarkGrey"
+	menufontcolor_disabled = "DarkRed"
+	menufontcolor_invalid = "DarkGreen"
+	menufontcolor_invalidselection = "Green"
+	menufontcolor_highlight = "Gold"
+	menufontcolor_highlightselection = "Yellow"
 }
 
 defaultmap

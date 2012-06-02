@@ -36,6 +36,7 @@
 #define __G_MAPINFO_H__
 
 #include "textures/textures.h"
+#include "v_font.h"
 #include "zstring.h"
 
 extern class GameInfo
@@ -58,6 +59,19 @@ public:
 	FString	ScoresMusic;
 	FString	FinaleMusic;
 	FString	IntermissionMusic;
+
+	enum FontColors
+	{
+		TITLE,
+		LABEL,
+		SELECTION,
+		DISABLED,
+		INVALID,
+		INVALIDSELECTION,
+		HIGHLIGHTED,//HIGHLIGHT,
+		HIGHLIGHTSELECTION
+	};
+	EColorRange	MenuFontColor[8];
 } gameinfo;
 
 class LevelInfo

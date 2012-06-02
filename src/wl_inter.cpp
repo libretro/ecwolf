@@ -898,10 +898,10 @@ DrawHighScores (void)
 #ifndef SPEAR
 		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		USL_MeasureString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, &w, &h);
 		PrintX = (22 * 8) - w;
 #else
-		USL_MeasureString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, &w, &h);
 		PrintX = 194 - w;
 #endif
 
@@ -929,10 +929,10 @@ DrawHighScores (void)
 #ifndef SPEAR
 		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		USL_MeasureString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, &w, &h);
 		PrintX = (34 * 8) - 8 - w;
 #else
-		USL_MeasureString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, &w, &h);
 		PrintX = 292 - w;
 #endif
 		US_Print (buffer);

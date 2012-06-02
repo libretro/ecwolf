@@ -5,6 +5,7 @@
 
 #include "id_vl.h"
 #include "wl_main.h"
+#include "v_font.h"
 
 #define WHITE			15			// graphics mode independant colors
 #define BLACK			0
@@ -71,7 +72,7 @@ template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offse
 	h *= scaleFactor;
 }
 
-void VWB_DrawPropString	 (const char *string);
+void VWB_DrawPropString	 (const char *string, EColorRange translation=CR_UNTRANSLATED);
 
 void VWB_DrawTile8 (int x, int y, int tile);
 //void VWB_DrawTile8M (int x, int y, int tile);

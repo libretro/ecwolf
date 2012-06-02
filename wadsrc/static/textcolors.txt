@@ -25,7 +25,8 @@ Console:
 	#272727  #8B8B8B    0 127
 	#505050  #FFFFFF  128 256
 Flat:
-	#CCCCCC
+	// [BL] Changed to wolf menu font color
+	#C0C0C0
 }
 
 Green
@@ -35,7 +36,8 @@ Console:
 	#000000  #007F00    0 127
 	#00FF00  #FEFFFE  128 256
 Flat:
-	#00CC00
+	// [BL] Changed to wolf menu font color
+	#04A400
 }
 
 Brown
@@ -165,7 +167,8 @@ Console:
 	#000000  #005800    0 127
 	#008C00  #DCFFDC  128 256
 Flat:
-	#008C00
+	// [BL] Changed to wolf menu font color
+	#047000
 }
 
 DarkRed "Dark Red"
@@ -175,7 +178,8 @@ Console:
 	#000000  #730000    0 127
 	#800000  #FFDCDC  128 255
 Flat:
-	#800000
+	// [BL] Changed to wolf menu font color
+	#700000
 }
 
 DarkBrown "Dark Brown"
@@ -205,7 +209,8 @@ Console:
 	#000000  #646464    0 127
 	#404040  #B4B4B4  128 256
 Flat:
-	#808080
+	// [BL] Changed to wolf menu font color
+	#8C8C8C
 }
 
 Cyan
