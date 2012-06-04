@@ -8,6 +8,8 @@
 #ifndef	__ID_US__
 #define	__ID_US__
 
+#include "v_font.h"
+
 #ifdef	__DEBUG__
 #define	__DEBUG_UserMgr__
 #endif
@@ -71,9 +73,9 @@ void			US_SaveWindow(WindowRec *win),
 				US_RestoreWindow(WindowRec *win);
 void 			US_ClearWindow(void);
 void			US_PrintCentered(const char *s),
-				US_CPrint(const char *s),
-				US_CPrintLine(const char *s),
-				US_Print(const char *s);
+				US_CPrint(const char *s, EColorRange translation=CR_UNTRANSLATED),
+				US_CPrintLine(const char *s, EColorRange translation=CR_UNTRANSLATED),
+				US_Print(const char *s, EColorRange translation=CR_UNTRANSLATED);
 void			US_Printf(const char *formatStr, ...);
 void			US_CPrintf(const char *formatStr, ...);
 

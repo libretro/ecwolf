@@ -117,11 +117,15 @@ US_Shutdown(void)
 //		supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_Print(const char *sorg)
+void US_Print(const char *sorg, EColorRange translation)
 {
+	static word width, height;
+
 	px = PrintX;
 	py = PrintY;
-	VWB_DrawPropString(sorg);
+	VW_MeasurePropString(sorg, &width, &height);
+	VWB_DrawPropString(sorg, translation);
+	PrintX = px + width;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -196,7 +200,7 @@ US_PrintCentered(const char *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrintLine(const char *s)
+US_CPrintLine(const char *s, EColorRange translation)
 {
 	word	w,h;
 
@@ -206,7 +210,7 @@ US_CPrintLine(const char *s)
 		Quit("US_CPrintLine() - String exceeds width");
 	px = WindowX + ((WindowW - w) / 2);
 	py = PrintY;
-	VWB_DrawPropString(s);
+	VWB_DrawPropString(s, translation);
 	PrintY += h;
 }
 
@@ -217,7 +221,7 @@ US_CPrintLine(const char *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrint(const char *sorg)
+US_CPrint(const char *sorg, EColorRange translation)
 {
 	char	c;
 	char *sstart = strdup(sorg);
@@ -231,7 +235,7 @@ US_CPrint(const char *sorg)
 			se++;
 		*se = '\0';
 
-		US_CPrintLine(s);
+		US_CPrintLine(s, translation);
 
 		s = se;
 		if (c)

@@ -3,6 +3,7 @@
 
 #include "tarray.h"
 #include "wl_def.h"
+#include "v_font.h"
 #include "zstring.h"
 
 /*//////////////////////////////////////////////////////////////////////////////
@@ -43,7 +44,7 @@ class MenuItem
 		bool		visible;
 		const Menu	*menu;
 
-		void		setTextColor();
+		EColorRange	getTextColor() const;
 
 	public:
 				MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)=NULL);

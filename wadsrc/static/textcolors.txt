@@ -57,7 +57,8 @@ Console:
 	#000000  #7FC040    0 127
 	#DFBF00  #DFFFFE  128 256
 Flat:
-	#FFCC00
+	// [BL] Changed to wolf menu font color
+	#FCF400
 }
 
 Red
@@ -113,7 +114,8 @@ Console:
 	#000000  #7F7F00    0 127
 	#FFFF00  #FFFFFF  128 256
 Flat:
-	#EEEE33
+	// [BL] Changed to wolf menu font color
+	#B4AC00
 }
 
 Untranslated
