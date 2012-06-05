@@ -475,7 +475,6 @@ void FinishDemoRecord (void)
 	CenterWindow(24,3);
 	PrintY+=6;
 	fontnumber=0;
-	SETFONTCOLOR(0,15);
 	US_Print(" Demo number (0-9): ");
 	VW_UpdateScreen();
 
@@ -512,7 +511,6 @@ void RecordDemo (void)
 	CenterWindow(26,3);
 	PrintY+=6;
 	fontnumber=0;
-	SETFONTCOLOR(0,15);
 	US_Print("  Demo which level (#): ");
 	VW_UpdateScreen();
 	VW_FadeIn ();
@@ -595,7 +593,6 @@ void PlayDemo (int demonumber)
 
 	VW_FadeOut ();
 
-	SETFONTCOLOR(0,15);
 	DrawPlayScreen ();
 
 	startgame = false;
@@ -763,7 +760,6 @@ void GameLoop (void)
 
 restartgame:
 	ClearMemory ();
-	SETFONTCOLOR(0,15);
 	VW_FadeOut();
 	DrawPlayScreen ();
 	died = false;

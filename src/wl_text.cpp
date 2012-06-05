@@ -424,7 +424,7 @@ void HandleWord (void)
 	//
 	// see if it fits on this line
 	//
-	VW_MeasurePropString (wword,&wwidth,&wheight);
+	VW_MeasurePropString (wword,wwidth,wheight);
 
 	while (px+wwidth > (int) rightmargin[rowon])
 	{
@@ -769,7 +769,6 @@ void EndText (void)
 		ShowArticle(cluster.ExitText);
 
 	VW_FadeOut();
-	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
 	if (MousePresent && IN_IsInputGrabbed())
 		IN_CenterMouse();  // Clear accumulated mouse movement

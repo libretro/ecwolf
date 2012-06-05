@@ -11,7 +11,7 @@
 #include "templates.h"
 
 int	    pa=MENU_CENTER,px,py;
-byte	fontcolor,backcolor;
+byte	fontcolor;
 int	    fontnumber;
 
 //==========================================================================
@@ -100,26 +100,29 @@ void VL_MungePic (byte *source, unsigned width, unsigned height)
 	free(temp);
 }
 
-void VW_MeasurePropString (const char *string, word *width, word *height)
+void VW_MeasurePropString (const char *string, word &width, word &height, word *finalWidth)
 {
 	int w = 0;
 	static FFont *fonts[2] = { SmallFont, BigFont };
 	FFont *font = fonts[fontnumber];
 
-	*height = font->GetHeight();
-	for(*width = 0;*string;++string)
+	height = font->GetHeight();
+	for(width = 0;*string;++string)
 	{
 		if(*string == '\n')
 		{
 			w = 0;
-			*height += font->GetHeight();
+			height += font->GetHeight();
 			continue;
 		}
 
 		w += font->GetCharWidth(*((byte *)string));
-		if(w > *width)
-			*width = w;
+		if(w > width)
+			width = w;
 	}
+
+	if(finalWidth)
+		*finalWidth = w;
 }
 
 /*

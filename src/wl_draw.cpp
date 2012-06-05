@@ -1315,7 +1315,6 @@ void    ThreeDRefresh (void)
 		if (fpscounter)
 		{
 			fontnumber = 0;
-			SETFONTCOLOR(7,127);
 			PrintX=4; PrintY=1;
 			VWB_Bar(0,0,50,10,bordercol);
 			US_PrintSigned(fps);

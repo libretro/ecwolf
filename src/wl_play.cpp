@@ -578,7 +578,6 @@ void CheckKeys (void)
 
 		DrawPlayBorderSides ();
 
-		SETFONTCOLOR (0, 15);
 		IN_ClearKeysDown ();
 		return;
 	}
@@ -591,7 +590,6 @@ void CheckKeys (void)
 
 		US_ControlPanel (buttonstate[bt_esc] ? sc_Escape : scan);
 
-		SETFONTCOLOR (0, 15);
 		IN_ClearKeysDown ();
 		VW_FadeOut();
 		if(viewsize != 21)
@@ -612,7 +610,6 @@ void CheckKeys (void)
 	if (Keyboard[sc_Tab] && DebugOk)
 	{
 		fontnumber = 0;
-		SETFONTCOLOR (0, 15);
 		if (DebugKeys () && viewsize < 20)
 			DrawPlayBorder ();       // dont let the blue borders flash
 

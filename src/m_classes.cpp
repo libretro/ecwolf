@@ -11,20 +11,6 @@
 #include "v_palette.h"
 #include "colormatcher.h"
 
-static const int color_hlite[] = {
-    DEACTIVE,
-    HIGHLIGHT,
-    READHCOLOR,
-    0x67
-};
-
-static const int color_norml[] = {
-    DEACTIVE,
-    TEXTCOLOR,
-    READCOLOR,
-    0x6b
-};
-
 bool 			Menu::close = false;
 FTexture		*Menu::cursor = NULL;
 unsigned int	Menu::lastIndexDrawn = 0;
@@ -37,14 +23,6 @@ EColorRange MenuItem::getTextColor() const
 		{GameInfo::DISABLED, GameInfo::SELECTION, GameInfo::HIGHLIGHTSELECTION, GameInfo::INVALIDSELECTION}
 	};
 	return gameinfo.MenuFontColor[colors[isSelected()][getActive()]];
-	/*if (isSelected())
-	{
-		SETFONTCOLOR(color_hlite[getActive()], BKGDCOLOR);
-	}
-	else
-	{
-		SETFONTCOLOR(color_norml[getActive()], BKGDCOLOR);
-	}*/
 }
 
 MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) :
@@ -458,11 +436,6 @@ void ControlMenuItem::draw()
 		char btn[8];
 		sprintf(btn, "JY%d", button.mouse);
 		US_Print(btn, getTextColor());
-	}
-
-	if(!getActive())
-	{
-		SETFONTCOLOR(TEXTCOLOR, BKGDCOLOR);
 	}
 
 	PrintX = menu->getX() + menu->getIndent();

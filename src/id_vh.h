@@ -30,11 +30,9 @@ typedef struct
 
 //===========================================================================
 
-extern  byte            fontcolor,backcolor;
+extern  byte            fontcolor;
 extern	int             fontnumber;
 extern	int             pa,px,py;
-
-#define SETFONTCOLOR(f,b) fontcolor=f;backcolor=b;
 
 //
 // mode independant routines
@@ -107,7 +105,7 @@ void VH_UpdateScreen();
 #define VW_FadeIn()		    VL_FadeIn(0,255,gamepal,30);
 #define VW_FadeOut()	    VL_FadeOut(0,255,0,0,0,30);
 #define VW_ScreenToScreen	VL_ScreenToScreen
-void	VW_MeasurePropString (const char *string, word *width, word *height);
+void	VW_MeasurePropString (const char *string, word &width, word &height, word *finalWidth=NULL);
 
 //#define LatchDrawChar(x,y,p) VL_LatchToScreen(latchpics[0],((p)&7)*8,((p)>>3)*8*64,8,8,x,y)
 //#define LatchDrawTile(x,y,p) VL_LatchToScreen(latchpics[1],(p)*64,0,16,16,x,y)

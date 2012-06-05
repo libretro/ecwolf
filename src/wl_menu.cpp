@@ -692,7 +692,6 @@ int CP_CheckQuick (ScanCode scancode)
 				Menu::closeMenus(false);
 				saveGame.show();
 
-				SETFONTCOLOR (0, 15);
 				IN_ClearKeysDown ();
 				VW_FadeOut();
 				if(viewsize != 21)
@@ -735,7 +734,6 @@ int CP_CheckQuick (ScanCode scancode)
 				Menu::closeMenus(false);
 				loadGame.show();
 
-				SETFONTCOLOR (0, 15);
 				IN_ClearKeysDown ();
 				VW_FadeOut();
 				if(viewsize != 21)
@@ -803,14 +801,13 @@ DrawLSAction (int which)
 	VWB_DrawGraphic (TexMan("M_LDING1"), LSA_X + 8, LSA_Y + 5, MENU_CENTER);
 
 	fontnumber = 1;
-	SETFONTCOLOR (0, TEXTCOLOR);
 	PrintX = LSA_X + 46;
 	PrintY = LSA_Y + 13;
 
 	if (!which)
-		US_Print (language["STR_LOADING"]);
+		US_Print (language["STR_LOADING"], gameinfo.MenuFontColor[GameInfo::LABEL]);
 	else
-		US_Print (language["STR_SAVING"]);
+		US_Print (language["STR_SAVING"], gameinfo.MenuFontColor[GameInfo::LABEL]);
 
 	VW_UpdateScreen ();
 }
@@ -931,7 +928,6 @@ void DrawOutline (int x, int y, int w, int h, int color1, int color2)
 ////////////////////////////////////////////////////////////////////
 void SetupControlPanel (void)
 {
-	SETFONTCOLOR (TEXTCOLOR, BKGDCOLOR);
 	fontnumber = 1;
 	WindowH = 200;
 	if(screenHeight % 200 != 0)
@@ -1182,12 +1178,13 @@ int Confirm (const char *string)
 void Message (const char *string)
 {
 	int i, len = (int) strlen(string);
+	fontnumber = 1;
 	FFont *font = BigFont;
 	word width, height;
 
 	FString measureString;
 	measureString.Format("%s_", string);
-	VW_MeasurePropString(measureString, &width, &height);
+	VW_MeasurePropString(measureString, width, height);
 	width = MIN<int>(width, 320 - 10);
 	height = MIN<int>(height, 200 - 10);
 
@@ -1196,8 +1193,7 @@ void Message (const char *string)
 
 	DrawWindow (WindowX - 5, PrintY - 5, width + 10, height + 10, TEXTCOLOR);
 	DrawOutline (WindowX - 5, PrintY - 5, width + 10, height + 10, 0, HIGHLIGHT);
-	SETFONTCOLOR (0, TEXTCOLOR);
-	US_Print (string);
+	US_Print (string, CR_UNTRANSLATED);
 	VW_UpdateScreen ();
 }
 

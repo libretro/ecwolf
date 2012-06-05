@@ -119,13 +119,15 @@ US_Shutdown(void)
 ///////////////////////////////////////////////////////////////////////////
 void US_Print(const char *sorg, EColorRange translation)
 {
-	static word width, height;
+	static word width, height, finalWidth, finalHeight;
 
 	px = PrintX;
 	py = PrintY;
-	VW_MeasurePropString(sorg, &width, &height);
+	VW_MeasurePropString("A", width, finalHeight);
+	VW_MeasurePropString(sorg, width, height, &finalWidth);
 	VWB_DrawPropString(sorg, translation);
-	PrintX = px + width;
+	PrintX = px + finalWidth;
+	PrintY = py + height - finalHeight;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -166,7 +168,7 @@ USL_PrintInCenter(const char *s,Rect r)
 	word	w,h,
 			rw,rh;
 
-	VW_MeasurePropString(s,&w,&h);
+	VW_MeasurePropString(s,w,h);
 	rw = r.lr.x - r.ul.x;
 	rh = r.lr.y - r.ul.y;
 
@@ -204,7 +206,7 @@ US_CPrintLine(const char *s, EColorRange translation)
 {
 	word	w,h;
 
-	VW_MeasurePropString(s,&w,&h);
+	VW_MeasurePropString(s,w,h);
 
 	if (w > WindowW)
 		Quit("US_CPrintLine() - String exceeds width");
@@ -399,7 +401,7 @@ USL_XORICursor(int x,int y,const char *s,word cursor)
 
 	strcpy(buf,s);
 	buf[cursor] = '\0';
-	VW_MeasurePropString(buf,&w,&h);
+	VW_MeasurePropString(buf,w,h);
 
 	px = x + w - 1;
 	py = y;
@@ -407,10 +409,10 @@ USL_XORICursor(int x,int y,const char *s,word cursor)
 		VWB_DrawPropString("\x80");
 	else
 	{
-		temp = fontcolor;
-		fontcolor = backcolor;
+		//temp = fontcolor;
+		//fontcolor = backcolor;
 		VWB_DrawPropString("\x80");
-		fontcolor = temp;
+		//fontcolor = temp;
 	}
 }
 
@@ -517,7 +519,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(s,&w,&h);
+						VW_MeasurePropString(s,w,h);
 						if(len >= maxchars || maxwidth && w >= maxwidth) break;
 
 						s[cursor] = ' ';
@@ -531,7 +533,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				case dir_North:
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(s,&w,&h);
+						VW_MeasurePropString(s,w,h);
 						if(len >= maxchars || maxwidth && w >= maxwidth) break;
 						s[cursor + 1] = 0;
 					}
@@ -543,7 +545,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				case dir_South:
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(s,&w,&h);
+						VW_MeasurePropString(s,w,h);
 						if(len >= maxchars || maxwidth && w >= maxwidth) break;
 						s[cursor + 1] = 0;
 					}
@@ -658,7 +660,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 			if (c)
 			{
 				len = (int) strlen(s);
-				VW_MeasurePropString(s,&w,&h);
+				VW_MeasurePropString(s,w,h);
 
 				if(isprint(c) && (len < MaxString - 1) && ((!maxchars) || (len < maxchars))
 					&& ((!maxwidth) || (w < maxwidth)))
@@ -675,10 +677,10 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 		{
 			px = x;
 			py = y;
-			temp = fontcolor;
-			fontcolor = backcolor;
+			//temp = fontcolor;
+			//fontcolor = backcolor;
 			VWB_DrawPropString(olds);
-			fontcolor = (byte) temp;
+			//fontcolor = (byte) temp;
 			strcpy(olds,s);
 
 			px = x;

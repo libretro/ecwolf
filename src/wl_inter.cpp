@@ -230,7 +230,6 @@ void Victory (void)
 	{
 		VWB_DrawPic (30 * 8, TIMEY * 8, "M_TIMECD");
 		fontnumber = 0;
-		fontcolor = READHCOLOR;
 		PrintX = 30 * 8 - 3;
 		PrintY = TIMEY * 8 + 8;
 		PrintX += 4;
@@ -238,7 +237,7 @@ void Victory (void)
 		tempstr[1] = (int) ((((sec / 10) ^ (sec % 10)) ^ 0xa) + 'A');
 		tempstr[2] = (tempstr[0] ^ tempstr[1]) + 'A';
 		tempstr[3] = 0;
-		US_Print (tempstr);
+		US_Print (tempstr, gameinfo.MenuFontColor[GameInfo::HIGHLIGHTSELECTION]);
 	}
 #endif
 #endif
@@ -871,11 +870,11 @@ DrawHighScores (void)
 #endif
 
 
-#ifndef SPEAR
+/*#ifndef SPEAR
 	SETFONTCOLOR (15, 0x29);
 #else
 	SETFONTCOLOR (HIGHLIGHT, 0x29);
-#endif
+#endif*/
 
 	for (i = 0, s = Scores; i < MaxScores; i++, s++)
 	{
@@ -898,10 +897,10 @@ DrawHighScores (void)
 #ifndef SPEAR
 		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		VW_MeasurePropString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, w, h);
 		PrintX = (22 * 8) - w;
 #else
-		VW_MeasurePropString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, w, h);
 		PrintX = 194 - w;
 #endif
 
@@ -929,10 +928,10 @@ DrawHighScores (void)
 #ifndef SPEAR
 		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		VW_MeasurePropString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, w, h);
 		PrintX = (34 * 8) - 8 - w;
 #else
-		VW_MeasurePropString (buffer, &w, &h);
+		VW_MeasurePropString (buffer, w, h);
 		PrintX = 292 - w;
 #endif
 		US_Print (buffer);
@@ -1021,7 +1020,6 @@ CheckHighScore (int32_t score, word other)
 		PrintY = 76 + (16 * n);
 #ifndef SPEAR
 		PrintX = 4 * 8;
-		backcolor = BORDCOLOR;
 		fontcolor = 15;
 		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 100);
 #else
@@ -1029,7 +1027,6 @@ CheckHighScore (int32_t score, word other)
 		fontnumber = 1;
 		VWB_Bar (PrintX - 2, PrintY - 2, 145, 15, 0x9c);
 		VW_UpdateScreen ();
-		backcolor = 0x9c;
 		fontcolor = 15;
 		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130);
 #endif
@@ -1059,18 +1056,16 @@ void NonShareware (void)
 
 	fontnumber = 1;
 
-	SETFONTCOLOR (READHCOLOR, BKGDCOLOR);
 	PrintX = 110;
 	PrintY = 15;
 
 	pa = MENU_TOP;
-	US_Print (language["REGNOTICE_TITLE"]);
+	US_Print (language["REGNOTICE_TITLE"], gameinfo.MenuFontColor[GameInfo::HIGHLIGHTSELECTION]);
 	pa = MENU_CENTER;
 
-	SETFONTCOLOR (HIGHLIGHT, BKGDCOLOR);
 	WindowX = PrintX = 40;
 	PrintY = 60;
-	US_Print (language["REGNOTICE_MESSAGE"]);
+	US_Print (language["REGNOTICE_MESSAGE"], gameinfo.MenuFontColor[GameInfo::SELECTION]);
 
 	VW_UpdateScreen ();
 	VW_FadeIn ();
