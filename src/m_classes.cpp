@@ -17,12 +17,12 @@ unsigned int	Menu::lastIndexDrawn = 0;
 
 EColorRange MenuItem::getTextColor() const
 {
-	static const GameInfo::FontColors colors[2][4] =
+	static const GameInfo::EFontColors colors[2][4] =
 	{
-		{GameInfo::DISABLED, GameInfo::LABEL, GameInfo::HIGHLIGHTED, GameInfo::INVALID},
-		{GameInfo::DISABLED, GameInfo::SELECTION, GameInfo::HIGHLIGHTSELECTION, GameInfo::INVALIDSELECTION}
+		{GameInfo::MENU_DISABLED, GameInfo::MENU_LABEL, GameInfo::MENU_HIGHLIGHT, GameInfo::MENU_INVALID},
+		{GameInfo::MENU_DISABLED, GameInfo::MENU_SELECTION, GameInfo::MENU_HIGHLIGHTSELECTION, GameInfo::MENU_INVALIDSELECTION}
 	};
-	return gameinfo.MenuFontColor[colors[isSelected()][getActive()]];
+	return gameinfo.FontColors[colors[isSelected()][getActive()]];
 }
 
 MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) :
@@ -78,7 +78,7 @@ void LabelMenuItem::draw()
 	int oldWindowY = WindowY;
 	WindowX = menu->getX();
 	WindowW = menu->getWidth();
-	US_CPrint(string, gameinfo.MenuFontColor[GameInfo::TITLE]);
+	US_CPrint(string, gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	WindowX = oldWindowX;
 	WindowY = oldWindowY;
 }
@@ -642,13 +642,13 @@ void Menu::draw() const
 	if(controlHeaders)
 	{
 		PrintX = getX() + getIndent();
-		US_Print("Control", gameinfo.MenuFontColor[GameInfo::TITLE]);
+		US_Print("Control", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 		PrintX = 168;
-		US_Print("Key", gameinfo.MenuFontColor[GameInfo::TITLE]);
+		US_Print("Key", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 		PrintX = 220;
-		US_Print("Mse", gameinfo.MenuFontColor[GameInfo::TITLE]);
+		US_Print("Mse", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 		PrintX = 272;
-		US_Print("Joy", gameinfo.MenuFontColor[GameInfo::TITLE]);
+		US_Print("Joy", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	}
 	else
 	{
@@ -657,7 +657,7 @@ void Menu::draw() const
 			DrawStripes(10);
 			PrintY = 15;
 		}
-		US_CPrint(headText, gameinfo.MenuFontColor[GameInfo::TITLE]);
+		US_CPrint(headText, gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	}
 
 	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);

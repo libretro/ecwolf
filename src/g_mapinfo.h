@@ -60,18 +60,21 @@ public:
 	FString	FinaleMusic;
 	FString	IntermissionMusic;
 
-	enum FontColors
+	enum EFontColors
 	{
-		TITLE,
-		LABEL,
-		SELECTION,
-		DISABLED,
-		INVALID,
-		INVALIDSELECTION,
-		HIGHLIGHTED,//HIGHLIGHT,
-		HIGHLIGHTSELECTION
+		MENU_TITLE,
+		MENU_LABEL,
+		MENU_SELECTION,
+		MENU_DISABLED,
+		MENU_INVALID,
+		MENU_INVALIDSELECTION,
+		MENU_HIGHLIGHT,
+		MENU_HIGHLIGHTSELECTION,
+		HIGHSCORES,
+
+		NUM_FONTCOLORS
 	};
-	EColorRange	MenuFontColor[8];
+	EColorRange	FontColors[NUM_FONTCOLORS];
 } gameinfo;
 
 class LevelInfo

@@ -437,7 +437,7 @@ void HandleWord (void)
 	// print it
 	//
 	newpos = px+wwidth;
-	VWB_DrawPropString (wword);
+	VWB_DrawPropString (wword, CR_UNTRANSLATED, true, fontcolor);
 	px = newpos;
 
 	//

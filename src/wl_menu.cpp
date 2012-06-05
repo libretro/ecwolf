@@ -805,9 +805,9 @@ DrawLSAction (int which)
 	PrintY = LSA_Y + 13;
 
 	if (!which)
-		US_Print (language["STR_LOADING"], gameinfo.MenuFontColor[GameInfo::LABEL]);
+		US_Print (language["STR_LOADING"]);
 	else
-		US_Print (language["STR_SAVING"], gameinfo.MenuFontColor[GameInfo::LABEL]);
+		US_Print (language["STR_SAVING"]);
 
 	VW_UpdateScreen ();
 }

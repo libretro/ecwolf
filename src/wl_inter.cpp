@@ -220,29 +220,6 @@ void Victory (void)
 	x = RATIOX + 24 - (int) strlen(tempstr) * 2;
 	Write (x, RATIOY + 4, tempstr);
 
-#ifndef SPANISH
-#ifndef UPLOAD
-#ifndef SPEAR
-	//
-	// TOTAL TIME VERIFICATION CODE
-	//
-	if (gamestate.difficulty >= gd_medium)
-	{
-		VWB_DrawPic (30 * 8, TIMEY * 8, "M_TIMECD");
-		fontnumber = 0;
-		PrintX = 30 * 8 - 3;
-		PrintY = TIMEY * 8 + 8;
-		PrintX += 4;
-		tempstr[0] = (((min / 10) ^ (min % 10)) ^ 0xa) + 'A';
-		tempstr[1] = (int) ((((sec / 10) ^ (sec % 10)) ^ 0xa) + 'A');
-		tempstr[2] = (tempstr[0] ^ tempstr[1]) + 'A';
-		tempstr[3] = 0;
-		US_Print (tempstr, gameinfo.MenuFontColor[GameInfo::HIGHLIGHTSELECTION]);
-	}
-#endif
-#endif
-#endif
-
 	fontnumber = 1;
 
 	VW_UpdateScreen ();
@@ -888,7 +865,7 @@ DrawHighScores (void)
 #else
 		PrintX = 16;
 #endif
-		US_Print (s->name);
+		US_Print (s->name, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 		//
 		// level
@@ -908,9 +885,9 @@ DrawHighScores (void)
 #ifndef SPEAR
 		PrintX -= 6;
 		itoa (s->episode + 1, buffer1, 10);
-		US_Print ("E");
-		US_Print (buffer1);
-		US_Print ("/L");
+		US_Print ("E", gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (buffer1, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print ("/L", gameinfo.FontColors[GameInfo::HIGHSCORES]);
 #endif
 #endif
 
@@ -919,7 +896,7 @@ DrawHighScores (void)
 			VWB_DrawPic (PrintX + 8, PrintY - 1, "M_WONSPR");
 		else
 #endif
-			US_Print (buffer);
+			US_Print (buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 		//
 		// score
@@ -931,10 +908,10 @@ DrawHighScores (void)
 		VW_MeasurePropString (buffer, w, h);
 		PrintX = (34 * 8) - 8 - w;
 #else
-		VW_MeasurePropString (buffer, w, h);
+		VW_MeasurePropString (buffer, w, h, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		PrintX = 292 - w;
 #endif
-		US_Print (buffer);
+		US_Print (buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 /*#ifdef APOGEE_1_0
 //#ifndef UPLOAD
@@ -1060,12 +1037,12 @@ void NonShareware (void)
 	PrintY = 15;
 
 	pa = MENU_TOP;
-	US_Print (language["REGNOTICE_TITLE"], gameinfo.MenuFontColor[GameInfo::HIGHLIGHTSELECTION]);
+	US_Print (language["REGNOTICE_TITLE"], gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION]);
 	pa = MENU_CENTER;
 
 	WindowX = PrintX = 40;
 	PrintY = 60;
-	US_Print (language["REGNOTICE_MESSAGE"], gameinfo.MenuFontColor[GameInfo::SELECTION]);
+	US_Print (language["REGNOTICE_MESSAGE"], gameinfo.FontColors[GameInfo::MENU_SELECTION]);
 
 	VW_UpdateScreen ();
 	VW_FadeIn ();

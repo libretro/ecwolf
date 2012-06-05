@@ -16,7 +16,7 @@ int	    fontnumber;
 
 //==========================================================================
 
-void VWB_DrawPropString(const char* string, EColorRange translation)
+void VWB_DrawPropString(const char* string, EColorRange translation, bool stencil, BYTE stencilcolor)
 {
 	int		    width, height;
 	byte	    *dest;
@@ -48,7 +48,7 @@ void VWB_DrawPropString(const char* string, EColorRange translation)
 
 		source = font->GetChar(ch, &width);
 		if(source)
-			VWB_DrawGraphic(source, cx, cy, (MenuOffset)pa, remap);
+			VWB_DrawGraphic(source, cx, cy, (MenuOffset)pa, remap, stencil, stencilcolor);
 		cx += width;
 	}
 
@@ -535,7 +535,7 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 	VL_UnlockSurface(screenBuffer);
 }
 
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap)
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
 
@@ -553,7 +553,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
 	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
 
-	const BYTE *table = remap ? remap->Remap : NormalLight.Maps;
+	const BYTE *table = !stencil && remap ? remap->Remap : NormalLight.Maps;
 	const BYTE *src;
 	byte *dest;
 	unsigned int i, j;
@@ -571,8 +571,13 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 		{
 			if((signed)(y1+j) >= (signed)(screenHeight))
 				break;
-			if(src[y>>FRACBITS] != 0)
-				*dest = table[src[y>>FRACBITS]];
+			if(src[y>>FRACBITS])
+			{
+				if(stencil)
+					*dest = table[stencilcolor];
+				else
+					*dest = table[src[y>>FRACBITS]];
+			}
 			dest += bufferPitch;
 		}
 	}
