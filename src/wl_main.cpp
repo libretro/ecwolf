@@ -433,7 +433,7 @@ static void InitGame()
 	//
 
 	V_InitFontColors();
-	G_ParseMapInfo();
+	G_ParseMapInfo(true);
 
 	//
 	// Init texture manager
@@ -454,6 +454,9 @@ static void InitGame()
 		SetupWM();
 #endif
 	VW_UpdateScreen();
+
+	// Parse non-gameinfo sections in MAPINFO
+	G_ParseMapInfo(false);
 
 //
 // Fonts

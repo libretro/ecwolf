@@ -119,6 +119,6 @@ public:
 	static ClusterInfo &Find(unsigned int index);
 };
 
-void G_ParseMapInfo();
+void G_ParseMapInfo(bool gameinfoPass);
 
 #endif

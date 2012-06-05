@@ -522,7 +522,15 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void ParseMapInfoLump(int lump)
+static void SkipBlock(Scanner &sc)
+{
+	// Skip header
+	while(sc.GetNextToken() && sc->token != '{');
+	// Skip content
+	while(sc.GetNextToken() && sc->token != '}');
+}
+
+static void ParseMapInfoLump(int lump, bool gameinfoPass)
 {
 	FMemLump data = Wads.ReadLump(lump);
 	Scanner sc((const char*)data.GetMem(), data.GetSize());
@@ -531,48 +539,61 @@ static void ParseMapInfoLump(int lump)
 	while(sc.TokensLeft())
 	{
 		sc.MustGetToken(TK_Identifier);
-		if(sc->str.CompareNoCase("defaultmap") == 0)
+		if(!gameinfoPass)
 		{
-			defaultMap = LevelInfo();
-			LevelInfoBlockParser(sc, defaultMap, false).Parse();
+			if(sc->str.CompareNoCase("defaultmap") == 0)
+			{
+				defaultMap = LevelInfo();
+				LevelInfoBlockParser(sc, defaultMap, false).Parse();
+			}
+			else if(sc->str.CompareNoCase("adddefaultmap") == 0)
+			{
+				LevelInfoBlockParser(sc, defaultMap, false).Parse();
+			}
+			else if(sc->str.CompareNoCase("cluster") == 0)
+			{
+				ClusterBlockParser(sc).Parse();
+			}
+			else if(sc->str.CompareNoCase("episode") == 0)
+			{
+				EpisodeInfo episode;
+				EpisodeBlockParser parser(sc, episode);
+				parser.Parse();
+				if(parser.UseEpisode())
+					episodes.Push(episode);
+			}
+			else if(sc->str.CompareNoCase("map") == 0)
+			{
+				LevelInfo newMap = defaultMap;
+				LevelInfoBlockParser(sc, newMap, true).Parse();
+				levelInfos.Push(newMap);
+			}
+			else
+				SkipBlock(sc);
 		}
-		else if(sc->str.CompareNoCase("adddefaultmap") == 0)
+		else
 		{
-			LevelInfoBlockParser(sc, defaultMap, false).Parse();
-		}
-		else if(sc->str.CompareNoCase("gameinfo") == 0)
-		{
-			GameInfoBlockParser(sc).Parse();
-		}
-		else if(sc->str.CompareNoCase("cluster") == 0)
-		{
-			ClusterBlockParser(sc).Parse();
-		}
-		else if(sc->str.CompareNoCase("episode") == 0)
-		{
-			EpisodeInfo episode;
-			EpisodeBlockParser parser(sc, episode);
-			parser.Parse();
-			if(parser.UseEpisode())
-				episodes.Push(episode);
-		}
-		else if(sc->str.CompareNoCase("map") == 0)
-		{
-			LevelInfo newMap = defaultMap;
-			LevelInfoBlockParser(sc, newMap, true).Parse();
-			levelInfos.Push(newMap);
+			if(sc->str.CompareNoCase("gameinfo") == 0)
+			{
+				GameInfoBlockParser(sc).Parse();
+			}
+			else
+				SkipBlock(sc);
 		}
 	}
 }
 
-void G_ParseMapInfo()
+void G_ParseMapInfo(bool gameinfoPass)
 {
 	int lastlump = 0;
 	int lump;
 
 	if((lump = Wads.GetNumForFullName("mapinfo/wolf3d.txt")) != -1)
-		ParseMapInfoLump(lump);
+		ParseMapInfoLump(lump, gameinfoPass);
+
+	while((lump = Wads.FindLump("MAPINFO", &lastlump)) != -1)
+		ParseMapInfoLump(lump, gameinfoPass);
 
 	while((lump = Wads.FindLump("ZMAPINFO", &lastlump)) != -1)
-		ParseMapInfoLump(lump);
+		ParseMapInfoLump(lump, gameinfoPass);
 }
