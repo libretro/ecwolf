@@ -461,6 +461,7 @@ static bool CA_WriteFile (const char *filename, void *ptr, int32_t length)
 void FinishDemoRecord (void)
 {
 	int32_t    length,level;
+	char str[80];
 
 	demorecord = false;
 
@@ -506,6 +507,7 @@ void RecordDemo (void)
 {
 	FString level;
 	int levelnum, esc,maps;
+	char str[80];
 
 	CenterWindow(26,3);
 	PrintY+=6;

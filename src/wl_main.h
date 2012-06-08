@@ -31,7 +31,6 @@ extern  int      shootdelta;
 extern  unsigned screenofs;
 
 extern  bool     startgame;
-extern  char     str[80];
 
 //
 // Command line parameter variables

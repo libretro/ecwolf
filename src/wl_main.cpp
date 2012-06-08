@@ -72,7 +72,6 @@
 =============================================================================
 */
 
-char    str[80];
 angle_t dirangle[9] = {0,ANGLE_45,2*ANGLE_45,3*ANGLE_45,4*ANGLE_45,
 					5*ANGLE_45,6*ANGLE_45,7*ANGLE_45,0};
 
@@ -919,6 +918,11 @@ Aspect CheckRatio (int width, int height)//, int *trueratio)
 	{
 		ratio = ASPECT_16_9;
 	}
+	// Consider 17:10 as well.
+	else if (abs (height * 17/10 - width) < 10)
+	{
+		ratio = ASPECT_17_10;
+	}
 	// 16:10 has more variance in the pixel dimensions. Grr.
 	else if (abs (height * 16/10 - width) < 60)
 	{
@@ -1010,6 +1014,8 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 				vid_aspect = ASPECT_4_3;
 			else if(strcmp(ratio, "16:10") == 0)
 				vid_aspect = ASPECT_16_10;
+			else if(strcmp(ratio, "17:10") == 0)
+				vid_aspect = ASPECT_17_10;
 			else if(strcmp(ratio, "16:9") == 0)
 				vid_aspect = ASPECT_16_9;
 			else if(strcmp(ratio, "5:4") == 0)

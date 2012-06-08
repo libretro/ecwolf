@@ -208,6 +208,7 @@ int DebugKeys (void)
 {
 	bool esc;
 	int level;
+	char str[80];
 
 	if (Keyboard[sc_B])             // B = border color
 	{
