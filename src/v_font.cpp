@@ -341,7 +341,7 @@ FFont *V_GetFont(const char *name)
 //
 //==========================================================================
 
-FFont::FFont (const char *name, const char *nametemplate, int first, int count, int start)
+FFont::FFont (const char *name, const char *nametemplate, int first, int count, int start, int spacewidth)
 {
 	int i;
 	FTextureID lump;
@@ -416,7 +416,11 @@ FFont::FFont (const char *name, const char *nametemplate, int first, int count, 
 		}
 	}
 
-	if ('N'-first >= 0 && 'N'-first < count && Chars['N' - first].Pic != NULL)
+	if (spacewidth != -1)
+	{
+		SpaceWidth = spacewidth;
+	}
+	else if ('N'-first >= 0 && 'N'-first < count && Chars['N' - first].Pic != NULL)
 	{
 		SpaceWidth = (Chars['N' - first].XMove + 1) / 2;
 	}
@@ -1958,6 +1962,7 @@ void V_InitCustomFonts()
 	int start;
 	int first;
 	int count;
+	int spacewidth;
 	char cursor = '_';
 
 	while ((llump = Wads.FindLump ("FONTDEFS", &lastlump)) != -1)
@@ -1974,6 +1979,7 @@ void V_InitCustomFonts()
 			start = 33;
 			first = 33;
 			count = 223;
+			spacewidth = -1;
 
 			sc.MustGetToken ('{');
 			while (!sc.CheckToken ('}'))
@@ -2011,6 +2017,13 @@ void V_InitCustomFonts()
 				{
 					if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");;
 					cursor = sc->str[0];
+				}
+				else if (0 == sc->str.CompareNoCase ("SPACEWIDTH"))
+				{
+					if (format == 2) WRONG;
+					sc.MustGetToken(TK_IntConst);
+					spacewidth = sc->number;
+					format = 1;
 				}
 				else if (0 == sc->str.CompareNoCase ("NOTRANSLATION"))
 				{
@@ -2055,7 +2068,7 @@ void V_InitCustomFonts()
 			}
 			if (format == 1)
 			{
-				FFont *fnt = new FFont (namebuffer, templatebuf, first, count, start);
+				FFont *fnt = new FFont (namebuffer, templatebuf, first, count, start, spacewidth);
 				fnt->SetCursor(cursor);
 			}
 			else if (format == 2)

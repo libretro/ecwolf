@@ -1,6 +1,7 @@
 IntermissionFont
 {
 	Template "FONTL%03d"
+	SpaceWidth 16
 }
 
 HudFont

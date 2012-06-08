@@ -17,7 +17,7 @@
 LRstruct LevelRatios[LRpack];
 int32_t lastBreathTime = 0;
 
-void Write (int x, int y, const char *string);
+static void Write (int x, int y, const char *string, bool rightAlign=false);
 
 //==========================================================================
 
@@ -170,9 +170,10 @@ void Victory (void)
 
 	Write (12, RATIOY - 2, "averages");
 
-	Write (RATIOX + 8, RATIOY, language["STR_RATKILL"]);
-	Write (RATIOX + 4, RATIOY + 2, language["STR_RATSECRET"]);
-	Write (RATIOX, RATIOY + 4, language["STR_RATTREASURE"]);
+	Write (RATIOX, RATIOY, language["STR_RATKILL"], true);
+	Write (RATIOX, RATIOY + 2, language["STR_RATSECRET"], true);
+	Write (RATIOX, RATIOY + 4, language["STR_RATTREASURE"], true);
+	Write (RATIOX+8, RATIOY, "%\n%\n%");
 
 #endif
 
@@ -239,68 +240,42 @@ void Victory (void)
 
 //==========================================================================
 
-void Write (int x, int y, const char *string)
+static void Write (int x, int y, const char *string, bool rightAlign)
 {
-	static const char* alpha[] = { "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052", "FONTL053",
-		"FONTL054", "FONTL055", "FONTL056", "FONTL057", "FONTL058", 0, 0, 0, 0, 0, 0, "FONTL065", "FONTL066",
-		"FONTL067", "FONTL068", "FONTL069", "FONTL070", "FONTL071", "FONTL072", "FONTL073", "FONTL074", "FONTL075",
-		"FONTL076", "FONTL077", "FONTL078", "FONTL079", "FONTL080", "FONTL081", "FONTL082", "FONTL083", "FONTL084",
-		"FONTL085", "FONTL086", "FONTL087", "FONTL088", "FONTL089", "FONTL090"
-	};
-
-	int i, ox, nx, ny, len = (int) strlen(string);
-	char ch;
-
-	ox = nx = x * 8;
-	ny = y * 8;
-	for (i = 0; i < len; i++)
+	static FFont *IntermissionFont = NULL;
+	static FRemapTable *remap = NULL;
+	if(!IntermissionFont)
 	{
-		if (string[i] == '\n')
+		IntermissionFont = V_GetFont("IntermissionFont");
+		remap = IntermissionFont->GetColorTranslation(CR_UNTRANSLATED);
+	}
+
+	int nx = x*8;
+	int ny = y*8;
+
+	if(rightAlign)
+	{
+		word width, height;
+		VW_MeasurePropString(IntermissionFont, string, width, height);
+		nx -= width;
+	}
+
+	int width;
+	while(*string != '\0')
+	{
+		if(*string != '\n')
 		{
-			nx = ox;
-			ny += 16;
+			FTexture *glyph = IntermissionFont->GetChar(*string, &width);
+			if(glyph)
+				VWB_DrawGraphic(glyph, nx, ny, MENU_NONE, remap);
+			nx += width;
 		}
 		else
 		{
-			ch = string[i];
-			if (ch >= 'a')
-				ch -= ('a' - 'A');
-			ch -= '0';
-
-			if(nx >= 320 || ny >= 200)
-				continue;
-
-			switch (string[i])
-			{
-				case '!':
-					VWB_DrawGraphic (TexMan("FONTL033"), nx, ny);
-					nx += 8;
-					continue;
-
-				case '\'':
-					VWB_DrawGraphic (TexMan("FONTL039"), nx, ny);
-					nx += 8;
-					continue;
-
-				case ' ':
-					break;
-
-				case 0x3a:     // ':'
-					VWB_DrawGraphic (TexMan("FONTL058"), nx, ny);
-					nx += 8;
-					continue;
-
-				case '%':
-					VWB_DrawGraphic (TexMan("FONTL037"), nx, ny);
-					break;
-
-				default:
-					if(ch >= 43)
-						break;
-					VWB_DrawGraphic (TexMan(alpha[ch]), nx, ny);
-			}
-			nx += 16;
+			nx = x*8;
+			ny += IntermissionFont->GetHeight();
 		}
+		++string;
 	}
 }
 
@@ -388,13 +363,14 @@ LevelCompleted (void)
 	{
 		Write (14, 2, language["STR_FLOORCOMPLETED"]);
 
-		Write (14, 7, language["STR_BONUS"]);
-		Write (16, 10, language["STR_TIME"]);
-		Write (16, 12, language["STR_PAR"]);
+		Write (24, 7, language["STR_BONUS"], true);
+		Write (24, 10, language["STR_TIME"], true);
+		Write (24, 12, language["STR_PAR"], true);
 
-		Write (9, 14, language["STR_RAT2KILL"]);
-		Write (5, 16, language["STR_RAT2SECRET"]);
-		Write (1, 18, language["STR_RAT2TREASURE"]);
+		Write (37, 14, "%\n%\n%");
+		Write (29, 14, language["STR_RAT2KILL"], true);
+		Write (29, 16, language["STR_RAT2SECRET"], true);
+		Write (29, 18, language["STR_RAT2TREASURE"], true);
 
 		Write (26, 2, itoa (gamestate.mapon + 1, tempstr, 10));
 

@@ -1142,10 +1142,12 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 	{
 		if(hasError) printf("\n");
 		printf(
-			"Wolf4SDL v1.7\n"
+			"ECWolf v1.0\n"
+			"http://maniacsvault.net/ecwolf/\n"
+			"Based on Wolf4SDL v1.7\n"
 			"Ported by Chaos-Software (http://www.chaos-software.de.vu)\n"
 			"Original Wolfenstein 3D by id Software\n\n"
-			"Usage: Wolf4SDL [options]\n"
+			"Usage: ecwolf [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
 			" --file <file>          Loads an extra data file\n"
@@ -1171,8 +1173,6 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			" --samplerate <rate>    Sets the sound sample rate (given in Hz, default: %i)\n"
 			" --audiobuffer <size>   Sets the size of the audio buffer (-> sound latency)\n"
 			"                        (given in bytes, default: 2048 / (44100 / samplerate))\n"
-			" --ignorenumchunks      Ignores the number of chunks in VGAHEAD.*\n"
-			"                        (may be useful for some broken mods)\n"
 			, defaultSampleRate
 		);
 		exit(1);
