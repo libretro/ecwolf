@@ -237,31 +237,6 @@ void Victory (void)
 #endif // SPEARDEMO
 }
 
-
-//==========================================================================
-
-/*
-==================
-=
-= PG13
-=
-==================
-*/
-
-void PG13 (void)
-{
-	VW_FadeOut ();
-	VWB_Clear(0x82, 0, 0, screenWidth, screenHeight);
-	VWB_DrawGraphic(TexMan("PG13"), 216, 110);
-	VW_UpdateScreen ();
-
-	VW_FadeIn ();
-	IN_UserInput (TickBase * 7);
-
-	VW_FadeOut ();
-}
-
-
 //==========================================================================
 
 void Write (int x, int y, const char *string)
@@ -1001,36 +976,3 @@ CheckHighScore (int32_t score, word other)
 	}
 
 }
-
-////////////////////////////////////////////////////////
-//
-// NON-SHAREWARE NOTICE
-//
-////////////////////////////////////////////////////////
-void NonShareware (void)
-{
-	if(strlen(language["REGNOTICE_TITLE"]) == 0)
-		return;
-
-	VW_FadeOut ();
-
-	ClearMScreen ();
-	DrawStripes (10);
-
-	PrintX = 110;
-	PrintY = 15;
-
-	pa = MENU_TOP;
-	US_Print (BigFont, language["REGNOTICE_TITLE"], gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION]);
-	pa = MENU_CENTER;
-
-	WindowX = PrintX = 40;
-	PrintY = 60;
-	US_Print (BigFont, language["REGNOTICE_MESSAGE"], gameinfo.FontColors[GameInfo::MENU_SELECTION]);
-
-	VW_UpdateScreen ();
-	VW_FadeIn ();
-	IN_Ack ();
-}
-
-//===========================================================================

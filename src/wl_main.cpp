@@ -98,14 +98,14 @@ int32_t  heightnumerator;
 
 void    Quit (const char *error,...);
 
-boolean startgame;
-bool    loadedgame;
-int     mouseadjustment;
+bool	startgame;
+bool	loadedgame;
+int		mouseadjustment;
 
 //
 // Command line parameter variables
 //
-boolean param_nowait = false;
+bool param_nowait = false;
 int     param_difficulty = 1;           // default is "normal"
 const char* param_tedlevel = NULL;            // default is not to start a level
 int     param_joystickindex = 0;
@@ -115,8 +115,6 @@ int     param_samplerate = 44100;
 int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 
 int     param_mission = 1;
-boolean param_goodtimes = false;
-boolean param_ignorenumchunks = false;
 
 /*
 =============================================================================
@@ -187,7 +185,7 @@ int32_t DoChecksum(byte *source,unsigned size,int32_t checksum)
 ==================
 */
 
-boolean SaveTheGame(FILE *file,int x,int y)
+bool SaveTheGame(FILE *file,int x,int y)
 {
 	return false;
 }
@@ -202,7 +200,7 @@ boolean SaveTheGame(FILE *file,int x,int y)
 ==================
 */
 
-boolean LoadTheGame(FILE *file,int x,int y)
+bool LoadTheGame(FILE *file,int x,int y)
 {
 	return false;
 }
@@ -699,8 +697,63 @@ void Quit (const char *errorStr, ...)
 	exit(0);
 }
 
+//==========================================================================
+
+/*
+==================
+=
+= PG13
+=
+==================
+*/
+
+static void PG13 (void)
+{
+	VW_FadeOut ();
+	VWB_Clear(0x82, 0, 0, screenWidth, screenHeight);
+	VWB_DrawGraphic(TexMan("PG13"), 216, 110);
+	VW_UpdateScreen ();
+
+	VW_FadeIn ();
+	IN_UserInput (TickBase * 7);
+
+	VW_FadeOut ();
+}
+
 //===========================================================================
 
+////////////////////////////////////////////////////////
+//
+// NON-SHAREWARE NOTICE
+//
+////////////////////////////////////////////////////////
+static void NonShareware (void)
+{
+	if(strlen(language["REGNOTICE_TITLE"]) == 0)
+		return;
+
+	VW_FadeOut ();
+
+	ClearMScreen ();
+	DrawStripes (10);
+
+	PrintX = 110;
+	PrintY = 15;
+
+	pa = MENU_TOP;
+	US_Print (BigFont, language["REGNOTICE_TITLE"], gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION]);
+	pa = MENU_CENTER;
+
+	WindowX = PrintX = 40;
+	PrintY = 60;
+	US_Print (BigFont, language["REGNOTICE_MESSAGE"], gameinfo.FontColors[GameInfo::MENU_SELECTION]);
+
+	VW_UpdateScreen ();
+	VW_FadeIn ();
+	IN_Ack ();
+}
+
+//===========================================================================
 
 
 /*
@@ -1061,10 +1114,6 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			}
 			else param_mission = atoi(argv[i]);
 		}
-		else IFARG("--goodtimes")
-			param_goodtimes = true;
-		else IFARG("--ignorenumchunks")
-			param_ignorenumchunks = true;
 		else IFARG("--help")
 			showHelp = true;
 		else IFARG("--data")

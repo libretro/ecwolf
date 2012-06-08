@@ -83,10 +83,10 @@ class LabelMenuItem : public MenuItem
 class BooleanMenuItem : public MenuItem
 {
 	protected:
-		boolean	&value;
+		bool	&value;
 
 	public:
-		BooleanMenuItem(const char string[36], boolean &value, MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
+		BooleanMenuItem(const char string[36], bool &value, MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
 
 		void	activate();
 		void	draw();

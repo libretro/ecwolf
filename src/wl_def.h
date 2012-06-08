@@ -54,9 +54,6 @@ typedef uint32_t DWORD;
 typedef int32_t SDWORD;
 typedef uint64_t QWORD;
 typedef int64_t SQWORD;
-#ifndef USE_WINDOWS_BOOLEAN
-typedef int8_t boolean;
-#endif
 typedef void * memptr;
 typedef uint32_t uint32;
 typedef uint32_t BITFIELD;
@@ -300,7 +297,7 @@ typedef enum
 typedef struct doorstruct
 {
 	byte     tilex,tiley;
-	boolean  vertical;
+	bool     vertical;
 	byte     lock;
 	doortype action;
 	short    ticcount;
@@ -388,7 +385,7 @@ typedef struct
 				secrettotal,treasuretotal,killtotal;
 	int32_t     TimeCount;
 	int32_t     killx,killy;
-	boolean     victoryflag;            // set during victory animations
+	bool        victoryflag;            // set during victory animations
 } gametype;
 
 

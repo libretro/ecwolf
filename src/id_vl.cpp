@@ -20,8 +20,8 @@
 #define assert_ret(x) assert(x)
 #endif
 
-boolean fullscreen = true;
-boolean usedoublebuffering = true;
+bool fullscreen = true;
+bool usedoublebuffering = true;
 unsigned screenWidth = 640;
 unsigned screenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL

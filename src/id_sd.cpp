@@ -71,26 +71,26 @@ typedef struct
 globalsoundpos channelSoundPos[MIX_CHANNELS];
 
 //      Global variables
-		boolean         AdLibPresent,
-						SoundBlasterPresent,SBProPresent,
-						SoundPositioned;
-		SDMode          SoundMode;
-		SMMode          MusicMode;
-		SDSMode         DigiMode;
-		int				AdlibVolume=MAX_VOLUME;
-		int				MusicVolume=MAX_VOLUME;
-		int				SoundVolume=MAX_VOLUME;
+bool	AdLibPresent,
+		SoundBlasterPresent,SBProPresent,
+		SoundPositioned;
+SDMode	SoundMode;
+SMMode	MusicMode;
+SDSMode	DigiMode;
+int		AdlibVolume=MAX_VOLUME;
+int		MusicVolume=MAX_VOLUME;
+int		SoundVolume=MAX_VOLUME;
 
 //      Internal variables
-static  boolean                 SD_Started;
-static  boolean                 nextsoundpos;
+static  bool					SD_Started;
+static  bool					nextsoundpos;
 static  FString                 SoundPlaying;
 static  word                    SoundPriority;
 static  word                    DigiPriority;
 static  int                     LeftPosition;
 static  int                     RightPosition;
 
-static  boolean                 DigiPlaying;
+static  bool					DigiPlaying;
 
 //      PC Sound variables
 static  volatile byte           pcLastSample;
@@ -105,7 +105,7 @@ static  longword                alTimeCount;
 static  Instrument              alZeroInst;
 
 //      Sequencer variables
-static  volatile boolean        sqActive;
+static  volatile bool			sqActive;
 static  word                   *sqHack;
 static	word					*sqHackFreeable=NULL;
 static  word                   *sqHackPtr;
@@ -332,7 +332,7 @@ void __interrupt SDL_t0SlowAsmService(void)
 				outp(0x20,0x20);
 }
 
-void SDL_IndicatePC(boolean ind)
+void SDL_IndicatePC(bool ind)
 {
 		pcindicate=ind;
 }
@@ -422,7 +422,7 @@ void
 #else
 static void
 #endif
-SDL_PCPlaySample(byte *data,longword len,boolean inIRQ)
+SDL_PCPlaySample(byte *data,longword len,bool inIRQ)
 {
 		if(!inIRQ)
 		{
@@ -675,7 +675,7 @@ void SD_ChannelFinished(int channel)
 void
 SD_SetDigiDevice(SDSMode mode)
 {
-	boolean devicenotpresent;
+	bool devicenotpresent;
 
 	if (mode == DigiMode)
 		return;
@@ -813,8 +813,7 @@ SDL_StartAL(void)
 //              emulating an AdLib) present
 //
 ///////////////////////////////////////////////////////////////////////////
-static boolean
-SDL_DetectAdLib(void)
+static bool SDL_DetectAdLib(void)
 {
 	for (int i = 1; i <= 0xf5; i++)       // Zero all the registers
 		alOut(i, 0);
@@ -882,10 +881,9 @@ SDL_StartDevice(void)
 //      SD_SetSoundMode() - Sets which sound hardware to use for sound effects
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean
-SD_SetSoundMode(SDMode mode)
+bool SD_SetSoundMode(SDMode mode)
 {
-	boolean result = false;
+	bool result = false;
 
 	SD_StopSound();
 
@@ -922,10 +920,9 @@ SD_SetSoundMode(SDMode mode)
 //      SD_SetMusicMode() - sets the device to use for background music
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean
-SD_SetMusicMode(SMMode mode)
+bool SD_SetMusicMode(SMMode mode)
 {
-	boolean result = false;
+	bool result = false;
 
 	SD_FadeOutMusic();
 	while (SD_MusicPlaying())
@@ -1122,10 +1119,9 @@ SD_PositionSound(int leftvol,int rightvol)
 //      SD_PlaySound() - plays the specified sound on the appropriate hardware
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean
-SD_PlaySound(const char* sound, SoundChannel chan)
+bool SD_PlaySound(const char* sound, SoundChannel chan)
 {
-	boolean         ispos;
+	bool            ispos;
 	int             lp,rp;
 
 	lp = LeftPosition;
@@ -1206,10 +1202,9 @@ SD_PlaySound(const char* sound, SoundChannel chan)
 //              no sound is playing
 //
 ///////////////////////////////////////////////////////////////////////////
-bool
-SD_SoundPlaying(void)
+bool SD_SoundPlaying(void)
 {
-	boolean result = false;
+	bool result = false;
 
 	switch (SoundMode)
 	{
@@ -1404,10 +1399,9 @@ SD_FadeOutMusic(void)
 //              not
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean
-SD_MusicPlaying(void)
+bool SD_MusicPlaying(void)
 {
-	boolean result;
+	bool result;
 
 	switch (MusicMode)
 	{

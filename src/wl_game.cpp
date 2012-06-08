@@ -56,7 +56,7 @@ byte            bordercol=VIEWCOLOR;        // color of the Change View/Ingame b
 #ifdef SPEAR
 int32_t         spearx,speary;
 unsigned        spearangle;
-boolean         spearflag;
+bool            spearflag;
 #endif
 
 #ifdef USE_FEATUREFLAGS
@@ -751,7 +751,7 @@ void StartTravel ();
 void FinishTravel ();
 void GameLoop (void)
 {
-	boolean died;
+	bool died;
 #ifdef MYPROFILE
 	clock_t start,end;
 #endif

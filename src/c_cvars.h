@@ -53,9 +53,9 @@ enum Aspect
 	ASPECT_5_4
 };
 
-extern boolean	forcegrabmouse;
-extern boolean	r_depthfog;
-extern boolean	vid_fullscreen;
+extern bool		forcegrabmouse;
+extern bool		r_depthfog;
+extern bool		vid_fullscreen;
 extern Aspect	vid_aspect;
 
 #endif /* __C_CVARS__ */

@@ -83,7 +83,7 @@ void LabelMenuItem::draw()
 	WindowY = oldWindowY;
 }
 
-BooleanMenuItem::BooleanMenuItem(const char string[36], boolean &value, MENU_LISTENER_PROTOTYPE(activateListener)) : MenuItem(string, activateListener), value(value)
+BooleanMenuItem::BooleanMenuItem(const char string[36], bool &value, MENU_LISTENER_PROTOTYPE(activateListener)) : MenuItem(string, activateListener), value(value)
 {
 }
 

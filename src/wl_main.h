@@ -30,13 +30,12 @@ extern  int      mouseadjustment;
 extern  int      shootdelta;
 extern  unsigned screenofs;
 
-extern  boolean  startgame;
+extern  bool     startgame;
 extern  char     str[80];
 
 //
 // Command line parameter variables
 //
-extern  boolean  param_nowait;
 extern  int      param_difficulty;
 extern  const char* param_tedlevel;
 extern  int      param_joystickindex;
@@ -44,15 +43,12 @@ extern  int      param_joystickhat;
 extern  int      param_samplerate;
 extern  int      param_audiobuffer;
 extern  int      param_mission;
-extern  boolean  param_goodtimes;
-extern  boolean  param_ignorenumchunks;
-
 
 void            NewGame (int difficulty,const class FString &map);
 void            CalcProjection (int32_t focal);
 void            NewViewSize (int width);
-boolean         LoadTheGame(FILE *file,int x,int y);
-boolean         SaveTheGame(FILE *file,int x,int y);
+bool            LoadTheGame(FILE *file,int x,int y);
+bool            SaveTheGame(FILE *file,int x,int y);
 void            ShutdownId (void);
 
 #endif

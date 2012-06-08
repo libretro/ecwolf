@@ -206,7 +206,7 @@ void BasicOverhead (void)
 
 int DebugKeys (void)
 {
-	boolean esc;
+	bool esc;
 	int level;
 
 	if (Keyboard[sc_B])             // B = border color

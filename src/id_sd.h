@@ -113,7 +113,7 @@ typedef struct
 extern globalsoundpos channelSoundPos[];
 
 // Global variables
-extern  boolean         AdLibPresent,
+extern  bool			AdLibPresent,
 						SoundBlasterPresent,
 						SoundPositioned;
 extern  SDMode          SoundMode;
@@ -197,7 +197,7 @@ extern  void    SD_Startup(void),
 				SD_Shutdown(void);
 
 extern  void    SD_PositionSound(int leftvol,int rightvol);
-extern  boolean SD_PlaySound(const char* sound,SoundChannel chan=SD_GENERIC);
+extern  bool	SD_PlaySound(const char* sound,SoundChannel chan=SD_GENERIC);
 extern  void    SD_SetPosition(int channel, int leftvol,int rightvol);
 extern  void    SD_StopSound(void),
 				SD_WaitSoundDone(void);
@@ -208,9 +208,9 @@ extern  void    SD_MusicOn(void),
 				SD_FadeOutMusic(void);
 extern  int     SD_MusicOff(void);
 
-extern  boolean SD_MusicPlaying(void);
-extern  boolean SD_SetSoundMode(SDMode mode);
-extern  boolean SD_SetMusicMode(SMMode mode);
+extern  bool	SD_MusicPlaying(void);
+extern  bool	SD_SetSoundMode(SDMode mode);
+extern  bool	SD_SetMusicMode(SMMode mode);
 extern  bool    SD_SoundPlaying(void);
 extern  bool    GotChaingun(void);
 

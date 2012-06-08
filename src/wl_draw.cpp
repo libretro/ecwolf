@@ -224,7 +224,7 @@ void TransformActor (AActor *ob)
 ========================
 */
 
-boolean TransformTile (int tx, int ty, short *dispx, short *dispheight)
+bool TransformTile (int tx, int ty, short *dispx, short *dispheight)
 {
 	fixed gx,gy,gxt,gyt,nx,ny;
 

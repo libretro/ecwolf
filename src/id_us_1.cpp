@@ -38,19 +38,19 @@
 //	Internal variables
 #define	ConfigVersion	1
 
-static	boolean		US_Started;
+static	bool		US_Started;
 
-		SaveGame	Games[MaxSaveGames];
-		HighScore	Scores[MaxScores] =
-					{
-						{"id software-'92",10000,1},
-						{"Adrian Carmack",10000,1},
-						{"John Carmack",10000,1},
-						{"Kevin Cloud",10000,1},
-						{"Tom Hall",10000,1},
-						{"John Romero",10000,1},
-						{"Jay Wilbur",10000,1},
-					};
+SaveGame	Games[MaxSaveGames];
+HighScore	Scores[MaxScores] =
+			{
+				{"id software-'92",10000,1},
+				{"Adrian Carmack",10000,1},
+				{"John Carmack",10000,1},
+				{"Kevin Cloud",10000,1},
+				{"Tom Hall",10000,1},
+				{"John Romero",10000,1},
+				{"Jay Wilbur",10000,1},
+			};
 
 int rndindex = 0;
 
@@ -356,7 +356,7 @@ US_RestoreWindow(WindowRec *win)
 static void
 USL_XORICursor(int x,int y,const char *s,word cursor)
 {
-	static	boolean	status;		// VGA doesn't XOR...
+	static	bool	status;		// VGA doesn't XOR...
 	char	buf[MaxString];
 	int		temp;
 	word	w,h;
@@ -406,11 +406,10 @@ char USL_RotateChar(char ch, int dir)
 //		returned
 //
 ///////////////////////////////////////////////////////////////////////////
-boolean
-US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
+bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 				int maxchars,int maxwidth)
 {
-	boolean		redraw,
+	bool		redraw,
 				cursorvis,cursormoved,
 				done,result, checkkey;
 	ScanCode	sc;

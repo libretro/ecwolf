@@ -71,7 +71,7 @@ static int     picx;
 static int     picy;
 static FTextureID picnum;
 static int     picdelay;
-static boolean layoutdone;
+static bool    layoutdone;
 
 //===========================================================================
 
@@ -629,7 +629,7 @@ void CountPages (void)
 // Helphack switches index 11 and 5 so that the keyboard/blaze pics are reversed.
 void ShowArticle (const char *article, bool helphack=false)
 {
-	boolean     newpage,firstpage;
+	bool newpage, firstpage;
 	ControlInfo ci;
 
 	text = article;

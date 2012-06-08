@@ -42,9 +42,9 @@
 #include "wl_play.h"
 
 Aspect vid_aspect = ASPECT_4_3;
-boolean forcegrabmouse = false;
-boolean r_depthfog = false;
-boolean vid_fullscreen = false;
+bool forcegrabmouse = false;
+bool r_depthfog = false;
+bool vid_fullscreen = false;
 
 void FinalReadConfig()
 {

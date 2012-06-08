@@ -26,22 +26,22 @@ extern  int             lastgamemusicoffset;
 // current user input
 //
 extern  int         controlx,controly;              // range from -100 to 100
-extern  boolean     buttonstate[NUMBUTTONS];
-extern  boolean     buttonheld[NUMBUTTONS];
+extern  bool        buttonstate[NUMBUTTONS];
+extern  bool        buttonheld[NUMBUTTONS];
 extern  exit_t      playstate;
-extern  boolean     madenoise;
+extern  bool        madenoise;
 extern  int         godmode;
 extern	bool		notargetmode;
 
-extern  boolean     demorecord,demoplayback;
+extern  bool        demorecord,demoplayback;
 extern  int8_t      *demoptr, *lastdemoptr;
 extern  memptr      demobuffer;
 
 //
 // control info
 //
-extern  boolean		alwaysrun;
-extern  boolean     mouseenabled,mouseyaxisdisabled,joystickenabled;
+extern  bool		alwaysrun;
+extern  bool		mouseenabled,mouseyaxisdisabled,joystickenabled;
 extern  int         dirscan[4];
 extern  int         buttonscan[NUMBUTTONS];
 extern  int         buttonmouse[4];
@@ -65,7 +65,7 @@ void    StartBonusFlash (void);
 extern  int32_t     funnyticount;           // FOR FUNNY BJ FACE
 #endif
 
-extern  boolean     noclip,ammocheat;
+extern  bool        noclip,ammocheat;
 extern  int         singlestep;
 extern  unsigned int extravbls;
 
