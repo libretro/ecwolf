@@ -117,15 +117,15 @@ US_Shutdown(void)
 //		supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_Print(const char *sorg, EColorRange translation)
+void US_Print(FFont *font, const char *sorg, EColorRange translation)
 {
 	static word width, height, finalWidth, finalHeight;
 
 	px = PrintX;
 	py = PrintY;
-	VW_MeasurePropString("A", width, finalHeight);
-	VW_MeasurePropString(sorg, width, height, &finalWidth);
-	VWB_DrawPropString(sorg, translation);
+	VW_MeasurePropString(font, "A", width, finalHeight);
+	VW_MeasurePropString(font, sorg, width, height, &finalWidth);
+	VWB_DrawPropString(font, sorg, translation);
 	PrintX = px + finalWidth;
 	PrintY = py + height - finalHeight;
 }
@@ -141,7 +141,7 @@ US_PrintUnsigned(longword n)
 	char	buffer[32];
 	sprintf(buffer, "%lu", static_cast<long unsigned int> (n));
 
-	US_Print(buffer);
+	US_Print(SmallFont, buffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -154,7 +154,7 @@ US_PrintSigned(int32_t n)
 {
 	char	buffer[32];
 
-	US_Print(ltoa(n,buffer,10));
+	US_Print(SmallFont, ltoa(n,buffer,10));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -168,13 +168,13 @@ USL_PrintInCenter(const char *s,Rect r)
 	word	w,h,
 			rw,rh;
 
-	VW_MeasurePropString(s,w,h);
+	VW_MeasurePropString(SmallFont, s,w,h);
 	rw = r.lr.x - r.ul.x;
 	rh = r.lr.y - r.ul.y;
 
 	px = r.ul.x + ((rw - w) / 2);
 	py = r.ul.y + ((rh - h) / 2);
-	VWB_DrawPropString(s);
+	VWB_DrawPropString(SmallFont, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -202,17 +202,17 @@ US_PrintCentered(const char *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrintLine(const char *s, EColorRange translation)
+US_CPrintLine(FFont *font, const char *s, EColorRange translation)
 {
 	word	w,h;
 
-	VW_MeasurePropString(s,w,h);
+	VW_MeasurePropString(font, s,w,h);
 
 	if (w > WindowW)
 		Quit("US_CPrintLine() - String exceeds width");
 	px = WindowX + ((WindowW - w) / 2);
 	py = PrintY;
-	VWB_DrawPropString(s, translation);
+	VWB_DrawPropString(font, s, translation);
 	PrintY += h;
 }
 
@@ -223,7 +223,7 @@ US_CPrintLine(const char *s, EColorRange translation)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrint(const char *sorg, EColorRange translation)
+US_CPrint(FFont *font, const char *sorg, EColorRange translation)
 {
 	char	c;
 	char *sstart = strdup(sorg);
@@ -237,7 +237,7 @@ US_CPrint(const char *sorg, EColorRange translation)
 			se++;
 		*se = '\0';
 
-		US_CPrintLine(s, translation);
+		US_CPrintLine(font, s, translation);
 
 		s = se;
 		if (c)
@@ -247,44 +247,6 @@ US_CPrint(const char *sorg, EColorRange translation)
 		}
 	}
 	free(sstart);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//  US_Printf() - Prints a formatted string in the current window.
-//      Newlines are supported.
-//
-///////////////////////////////////////////////////////////////////////////
-
-void US_Printf(const char *formatStr, ...)
-{
-	char strbuf[256];
-	va_list vlist;
-	va_start(vlist, formatStr);
-	int len = vsnprintf(strbuf, sizeof(strbuf), formatStr, vlist);
-	va_end(vlist);
-	if(len <= -1 || len >= sizeof(strbuf))
-		strbuf[sizeof(strbuf) - 1] = 0;
-	US_Print(strbuf);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//  US_CPrintf() - Prints a formatted string centered in the current window.
-//      Newlines are supported.
-//
-///////////////////////////////////////////////////////////////////////////
-
-void US_CPrintf(const char *formatStr, ...)
-{
-	char strbuf[256];
-	va_list vlist;
-	va_start(vlist, formatStr);
-	int len = vsnprintf(strbuf, sizeof(strbuf), formatStr, vlist);
-	va_end(vlist);
-	if(len <= -1 || len >= sizeof(strbuf))
-		strbuf[sizeof(strbuf) - 1] = 0;
-	US_CPrint(strbuf);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -401,17 +363,17 @@ USL_XORICursor(int x,int y,const char *s,word cursor)
 
 	strcpy(buf,s);
 	buf[cursor] = '\0';
-	VW_MeasurePropString(buf,w,h);
+ 	VW_MeasurePropString(SmallFont, buf,w,h);
 
 	px = x + w - 1;
 	py = y;
 	if (status^=1)
-		VWB_DrawPropString("\x80");
+		VWB_DrawPropString(SmallFont, "\x80");
 	else
 	{
 		//temp = fontcolor;
 		//fontcolor = backcolor;
-		VWB_DrawPropString("\x80");
+		VWB_DrawPropString(SmallFont, "\x80");
 		//fontcolor = temp;
 	}
 }
@@ -519,7 +481,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(s,w,h);
+						VW_MeasurePropString(SmallFont, s,w,h);
 						if(len >= maxchars || maxwidth && w >= maxwidth) break;
 
 						s[cursor] = ' ';
@@ -533,7 +495,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				case dir_North:
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(s,w,h);
+						VW_MeasurePropString(SmallFont, s,w,h);
 						if(len >= maxchars || maxwidth && w >= maxwidth) break;
 						s[cursor + 1] = 0;
 					}
@@ -545,7 +507,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 				case dir_South:
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(s,w,h);
+						VW_MeasurePropString(SmallFont, s,w,h);
 						if(len >= maxchars || maxwidth && w >= maxwidth) break;
 						s[cursor + 1] = 0;
 					}
@@ -660,7 +622,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 			if (c)
 			{
 				len = (int) strlen(s);
-				VW_MeasurePropString(s,w,h);
+				VW_MeasurePropString(SmallFont, s,w,h);
 
 				if(isprint(c) && (len < MaxString - 1) && ((!maxchars) || (len < maxchars))
 					&& ((!maxwidth) || (w < maxwidth)))
@@ -679,13 +641,13 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 			py = y;
 			//temp = fontcolor;
 			//fontcolor = backcolor;
-			VWB_DrawPropString(olds);
+			VWB_DrawPropString(SmallFont, olds);
 			//fontcolor = (byte) temp;
 			strcpy(olds,s);
 
 			px = x;
 			py = y;
-			VWB_DrawPropString(s);
+			VWB_DrawPropString(SmallFont, s);
 
 			redraw = false;
 		}
@@ -716,7 +678,7 @@ US_LineInput(int x,int y,char *buf,const char *def,boolean escok,
 	{
 		px = x;
 		py = y;
-		VWB_DrawPropString(olds);
+		VWB_DrawPropString(SmallFont, olds);
 	}
 	VW_UpdateScreen();
 

@@ -316,28 +316,24 @@ void UpdateFace (void)
 
 static void LatchNumber (int x, int y, unsigned width, int32_t number)
 {
-	unsigned length,c;
-	char    str[20];
-
-	ltoa (number,str,10);
-
-	length = (unsigned) strlen (str);
-
-	while (length<width)
+	static FFont *HudFont = NULL;
+	if(!HudFont)
 	{
-		StatusDrawPic (x,y,"FONTN032");
-		x++;
-		width--;
+		HudFont = V_GetFont("HudFont");
 	}
 
-	c = length <= width ? 0 : length-width;
+	x *= 8;
+	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
 
-	const char* numerics[10] = { "FONTN048", "FONTN049", "FONTN050", "FONTN051", "FONTN052", "FONTN053", "FONTN054", "FONTN055", "FONTN056", "FONTN057" };
-	while (c<length)
+	FString str;
+	str.Format("%*d", width, number);
+
+	int cwidth;
+	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
+	for(unsigned int i = 0;i < str.Len();++i)
 	{
-		StatusDrawPic (x,y,numerics[str[c]-'0']);
-		x++;
-		c++;
+		VWB_DrawGraphic(HudFont->GetChar(str[i], &cwidth), x, y, MENU_NONE, remap);
+		x += cwidth;
 	}
 }
 

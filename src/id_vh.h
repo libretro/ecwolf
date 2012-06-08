@@ -30,8 +30,6 @@ typedef struct
 
 //===========================================================================
 
-extern  byte            fontcolor;
-extern	int             fontnumber;
 extern	int             pa,px,py;
 
 //
@@ -70,7 +68,7 @@ template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offse
 	h *= scaleFactor;
 }
 
-void VWB_DrawPropString	 (const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
+void VWB_DrawPropString	 (FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
 
 void VWB_DrawTile8 (int x, int y, int tile);
 //void VWB_DrawTile8M (int x, int y, int tile);
@@ -105,7 +103,7 @@ void VH_UpdateScreen();
 #define VW_FadeIn()		    VL_FadeIn(0,255,gamepal,30);
 #define VW_FadeOut()	    VL_FadeOut(0,255,0,0,0,30);
 #define VW_ScreenToScreen	VL_ScreenToScreen
-void	VW_MeasurePropString (const char *string, word &width, word &height, word *finalWidth=NULL);
+void	VW_MeasurePropString (FFont *font, const char *string, word &width, word &height, word *finalWidth=NULL);
 
 //#define LatchDrawChar(x,y,p) VL_LatchToScreen(latchpics[0],((p)&7)*8,((p)>>3)*8*64,8,8,x,y)
 //#define LatchDrawTile(x,y,p) VL_LatchToScreen(latchpics[1],(p)*64,0,16,16,x,y)

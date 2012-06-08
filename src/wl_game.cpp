@@ -474,8 +474,7 @@ void FinishDemoRecord (void)
 	VW_FadeIn();
 	CenterWindow(24,3);
 	PrintY+=6;
-	fontnumber=0;
-	US_Print(" Demo number (0-9): ");
+	US_Print(SmallFont, " Demo number (0-9): ");
 	VW_UpdateScreen();
 
 	if (US_LineInput (px,py,str,NULL,true,1,0))
@@ -510,8 +509,7 @@ void RecordDemo (void)
 
 	CenterWindow(26,3);
 	PrintY+=6;
-	fontnumber=0;
-	US_Print("  Demo which level (#): ");
+	US_Print(SmallFont, "  Demo which level (#): ");
 	VW_UpdateScreen();
 	VW_FadeIn ();
 	esc = !US_LineInput (px,py,str,NULL,true,2,0);

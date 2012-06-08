@@ -43,7 +43,7 @@ void MenuItem::draw()
 	if(picture)
 		VWB_DrawGraphic(picture, pictureX == -1 ? menu->getX() + 32 : pictureX, pictureY == -1 ? PrintY : pictureY, MENU_CENTER);
 
-	US_Print(getString(), getTextColor());
+	US_Print(BigFont, getString(), getTextColor());
 	PrintX = menu->getX() + menu->getIndent();
 }
 
@@ -78,7 +78,7 @@ void LabelMenuItem::draw()
 	int oldWindowY = WindowY;
 	WindowX = menu->getX();
 	WindowW = menu->getWidth();
-	US_CPrint(string, gameinfo.FontColors[GameInfo::MENU_TITLE]);
+	US_CPrint(BigFont, string, gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	WindowX = oldWindowX;
 	WindowY = oldWindowY;
 }
@@ -129,7 +129,7 @@ SliderMenuItem::SliderMenuItem(int &value, int width, int max, const char begStr
 
 void SliderMenuItem::draw()
 {
-	US_Print(begString, getTextColor());
+	US_Print(BigFont, begString, getTextColor());
 	PrintX += 8;
 
 	unsigned int bx = PrintX, by = PrintY+1, bw = width, bh = 10;
@@ -253,16 +253,13 @@ void TextInputMenuItem::activate()
 {
 	if(preeditListener == NULL || preeditListener(menu->getCurrentPosition()))
 	{
-		//setTextColor();
-		fontnumber = 0;
 		char* buffer = new char[max+1];
 		if(clearFirst)
-			DrawWindow(menu->getX() + menu->getIndent(), PrintY-1, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, fontcolor, fontcolor);
+			DrawWindow(menu->getX() + menu->getIndent(), PrintY-1, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, TEXTCOLOR, TEXTCOLOR);
 		bool accept = US_LineInput(menu->getX() + menu->getIndent() + 2, PrintY, buffer, clearFirst ? "" : getValue(), true, max, menu->getWidth() - menu->getIndent() - 16);
 		if(accept)
 			setValue(buffer);
 		delete[] buffer;
-		fontnumber = 1;
 		if(accept)
 			MenuItem::activate();
 		else
@@ -276,12 +273,10 @@ void TextInputMenuItem::activate()
 
 void TextInputMenuItem::draw()
 {
-	DrawWindow(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, fontcolor, fontcolor);
+	DrawWindow(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, TEXTCOLOR, TEXTCOLOR);
 	PrintX = menu->getX() + menu->getIndent() + 2;
 	PrintY++;
-	fontnumber = 0;
-	US_Print(getValue(), getTextColor());
-	fontnumber = 1;
+	US_Print(SmallFont, getValue(), getTextColor());
 }
 
 int ControlMenuItem::column = 0;
@@ -338,7 +333,7 @@ void ControlMenuItem::activate()
 {
 	DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR, 0, HIGHLIGHT);
 	PrintX = 162 + (52*column);
-	US_Print("???");
+	US_Print(BigFont, "???");
 	VW_UpdateScreen();
 
 	IN_ClearKeysDown();
@@ -416,26 +411,26 @@ void ControlMenuItem::draw()
 	if(isSelected())
 		DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR, 0, HIGHLIGHT);
 
-	US_Print(getString(), getTextColor());
+	US_Print(BigFont, getString(), getTextColor());
 
 	if(button.keyboard != -1)
 	{
 		PrintX = 162;
-		US_Print(keyNames[button.keyboard], getTextColor());
+		US_Print(BigFont, keyNames[button.keyboard], getTextColor());
 	}
 	if(button.mouse != -1)
 	{
 		PrintX = 214;
 		char btn[8];
 		sprintf(btn, "MS%d", button.mouse);
-		US_Print(btn, getTextColor());
+		US_Print(BigFont, btn, getTextColor());
 	}
 	if(button.joystick != -1)
 	{
 		PrintX = 266;
 		char btn[8];
 		sprintf(btn, "JY%d", button.mouse);
-		US_Print(btn, getTextColor());
+		US_Print(BigFont, btn, getTextColor());
 	}
 
 	PrintX = menu->getX() + menu->getIndent();
@@ -642,13 +637,13 @@ void Menu::draw() const
 	if(controlHeaders)
 	{
 		PrintX = getX() + getIndent();
-		US_Print("Control", gameinfo.FontColors[GameInfo::MENU_TITLE]);
+		US_Print(BigFont, "Control", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 		PrintX = 168;
-		US_Print("Key", gameinfo.FontColors[GameInfo::MENU_TITLE]);
+		US_Print(BigFont, "Key", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 		PrintX = 220;
-		US_Print("Mse", gameinfo.FontColors[GameInfo::MENU_TITLE]);
+		US_Print(BigFont, "Mse", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 		PrintX = 272;
-		US_Print("Joy", gameinfo.FontColors[GameInfo::MENU_TITLE]);
+		US_Print(BigFont, "Joy", gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	}
 	else
 	{
@@ -657,7 +652,7 @@ void Menu::draw() const
 			DrawStripes(10);
 			PrintY = 15;
 		}
-		US_CPrint(headText, gameinfo.FontColors[GameInfo::MENU_TITLE]);
+		US_CPrint(BigFont, headText, gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	}
 
 	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);

@@ -73,11 +73,9 @@ void			US_SaveWindow(WindowRec *win),
 				US_RestoreWindow(WindowRec *win);
 void 			US_ClearWindow(void);
 void			US_PrintCentered(const char *s),
-				US_CPrint(const char *s, EColorRange translation=CR_UNTRANSLATED),
-				US_CPrintLine(const char *s, EColorRange translation=CR_UNTRANSLATED),
-				US_Print(const char *s, EColorRange translation=CR_UNTRANSLATED);
-void			US_Printf(const char *formatStr, ...);
-void			US_CPrintf(const char *formatStr, ...);
+				US_CPrint(FFont *font, const char *s, EColorRange translation=CR_UNTRANSLATED),
+				US_CPrintLine(FFont *font, const char *s, EColorRange translation=CR_UNTRANSLATED),
+				US_Print(FFont *font, const char *s, EColorRange translation=CR_UNTRANSLATED);
 
 void			US_PrintUnsigned(longword n);
 void			US_PrintSigned(int32_t n);

@@ -1314,11 +1314,10 @@ void    ThreeDRefresh (void)
 	{
 		if (fpscounter)
 		{
-			fontnumber = 0;
 			PrintX=4; PrintY=1;
 			VWB_Bar(0,0,50,10,bordercol);
 			US_PrintSigned(fps);
-			US_Print(" fps");
+			US_Print(SmallFont, " fps");
 		}
 		SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 		SDL_Flip(screen);

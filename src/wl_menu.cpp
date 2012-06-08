@@ -92,15 +92,12 @@ MENU_LISTENER(ViewScoresOrEndGame)
 	else
 	{
 		MenuFadeOut();
-	
-		fontnumber = 0;
 
 		StartCPMusic(gameinfo.ScoresMusic);
 	
 		DrawHighScores();
 		VW_UpdateScreen();
 		MenuFadeIn();
-		fontnumber = 1;
 	
 		IN_Ack();
 	
@@ -246,9 +243,7 @@ MENU_LISTENER(PerformSaveGame)
 	}
 	else
 	{
-		fontnumber = 1;
 		Message (language["STR_SAVING"]);
-		fontnumber = 0;
 		SaveTheGame(fileh, 0, 0);
 	}
 	fclose(fileh);
@@ -669,7 +664,6 @@ int CP_CheckQuick (ScanCode scancode)
 			}
 
 			WindowH = 200;
-			fontnumber = 0;
 			return 1;
 
 		//
@@ -718,10 +712,8 @@ int CP_CheckQuick (ScanCode scancode)
 				quickSaveLoad = true;
 				char string[100];
 				sprintf(string, "%s%s\"?", language["STR_LGC"], SaveFile::files[saveGame.getCurrentPosition()-1].name);
-				fontnumber = 1;
 				if(Confirm(string))
 					LoadSaveGame(saveGame.getCurrentPosition()-1);
-				fontnumber = 0;
 				quickSaveLoad = false;
 			}
 			else
@@ -763,7 +755,6 @@ int CP_CheckQuick (ScanCode scancode)
 
 			DrawPlayBorder ();
 			WindowH = 200;
-			fontnumber = 0;
 			return 1;
 	}
 
@@ -800,14 +791,13 @@ DrawLSAction (int which)
 	DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
 	VWB_DrawGraphic (TexMan("M_LDING1"), LSA_X + 8, LSA_Y + 5, MENU_CENTER);
 
-	fontnumber = 1;
 	PrintX = LSA_X + 46;
 	PrintY = LSA_Y + 13;
 
 	if (!which)
-		US_Print (language["STR_LOADING"]);
+		US_Print (BigFont, language["STR_LOADING"]);
 	else
-		US_Print (language["STR_SAVING"]);
+		US_Print (BigFont, language["STR_SAVING"]);
 
 	VW_UpdateScreen ();
 }
@@ -928,7 +918,6 @@ void DrawOutline (int x, int y, int w, int h, int color1, int color2)
 ////////////////////////////////////////////////////////////////////
 void SetupControlPanel (void)
 {
-	fontnumber = 1;
 	WindowH = 200;
 	if(screenHeight % 200 != 0)
 		VL_ClearScreen(0);
@@ -979,7 +968,6 @@ void SetupSaveGames()
 ////////////////////////////////////////////////////////////////////
 void CleanupControlPanel (void)
 {
-	fontnumber = 0;
 	VWB_Clear(ColorMatcher.Pick(RPART(gameinfo.MenuFadeColor), GPART(gameinfo.MenuFadeColor), BPART(gameinfo.MenuFadeColor)),
 		0, 0, screenWidth, screenHeight);
 }
@@ -1145,7 +1133,7 @@ int Confirm (const char *string)
 				case 1:
 					PrintX = x;
 					PrintY = y;
-					US_Print ("_");
+					US_Print (BigFont, "_");
 			}
 			VW_UpdateScreen ();
 			tick ^= 1;
@@ -1178,13 +1166,12 @@ int Confirm (const char *string)
 void Message (const char *string)
 {
 	int i, len = (int) strlen(string);
-	fontnumber = 1;
 	FFont *font = BigFont;
 	word width, height;
 
 	FString measureString;
 	measureString.Format("%s_", string);
-	VW_MeasurePropString(measureString, width, height);
+	VW_MeasurePropString(BigFont, measureString, width, height);
 	width = MIN<int>(width, 320 - 10);
 	height = MIN<int>(height, 200 - 10);
 
@@ -1193,7 +1180,7 @@ void Message (const char *string)
 
 	DrawWindow (WindowX - 5, PrintY - 5, width + 10, height + 10, TEXTCOLOR);
 	DrawOutline (WindowX - 5, PrintY - 5, width + 10, height + 10, 0, HIGHLIGHT);
-	US_Print (string, CR_UNTRANSLATED);
+	US_Print (BigFont, string, CR_UNTRANSLATED);
 	VW_UpdateScreen ();
 }
 

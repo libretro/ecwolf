@@ -74,8 +74,7 @@ EndSpear (void)
 	VW_UpdateScreen ();
 	VL_ConvertPalette("END3PAL", pal, 256);
 	VL_FadeIn (0, 255, pal, 30);
-	fontnumber = 0;
-	fontcolor = 0xd0;
+	//fontcolor = 0xd0;
 	WindowX = 0;
 	WindowW = 320;
 	PrintX = 0;
@@ -219,8 +218,6 @@ void Victory (void)
 	itoa (tr, tempstr, 10);
 	x = RATIOX + 24 - (int) strlen(tempstr) * 2;
 	Write (x, RATIOY + 4, tempstr);
-
-	fontnumber = 1;
 
 	VW_UpdateScreen ();
 	VW_FadeIn ();
@@ -840,10 +837,6 @@ DrawHighScores (void)
 		VWB_DrawGraphic(TexMan(texLevel), 160, 68);
 	if(texScore.isValid())
 		VWB_DrawGraphic(TexMan(texScore), 224, 68);
-	fontnumber = 0;
-
-#else
-	fontnumber = 1;
 #endif
 
 
@@ -865,7 +858,7 @@ DrawHighScores (void)
 #else
 		PrintX = 16;
 #endif
-		US_Print (s->name, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (SmallFont, s->name, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 		//
 		// level
@@ -874,10 +867,10 @@ DrawHighScores (void)
 #ifndef SPEAR
 		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		VW_MeasurePropString (buffer, w, h);
+		VW_MeasurePropString (BigFont, buffer, w, h);
 		PrintX = (22 * 8) - w;
 #else
-		VW_MeasurePropString (buffer, w, h);
+		VW_MeasurePropString (BigFont, buffer, w, h);
 		PrintX = 194 - w;
 #endif
 
@@ -885,9 +878,9 @@ DrawHighScores (void)
 #ifndef SPEAR
 		PrintX -= 6;
 		itoa (s->episode + 1, buffer1, 10);
-		US_Print ("E", gameinfo.FontColors[GameInfo::HIGHSCORES]);
-		US_Print (buffer1, gameinfo.FontColors[GameInfo::HIGHSCORES]);
-		US_Print ("/L", gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (SmallFont, "E", gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (SmallFont, buffer1, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (SmallFont, "/L", gameinfo.FontColors[GameInfo::HIGHSCORES]);
 #endif
 #endif
 
@@ -896,7 +889,7 @@ DrawHighScores (void)
 			VWB_DrawPic (PrintX + 8, PrintY - 1, "M_WONSPR");
 		else
 #endif
-			US_Print (buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+			US_Print (SmallFont, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 		//
 		// score
@@ -905,13 +898,13 @@ DrawHighScores (void)
 #ifndef SPEAR
 		for (str = buffer; *str; str++)
 			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		VW_MeasurePropString (buffer, w, h);
+		VW_MeasurePropString (BigFont, buffer, w, h);
 		PrintX = (34 * 8) - 8 - w;
 #else
-		VW_MeasurePropString (buffer, w, h, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		VW_MeasurePropString (BigFont, buffer, w, h, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		PrintX = 292 - w;
 #endif
-		US_Print (buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (SmallFont, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 /*#ifdef APOGEE_1_0
 //#ifndef UPLOAD
@@ -942,10 +935,6 @@ DrawHighScores (void)
 	}
 
 	VW_UpdateScreen ();
-
-#ifdef SPEAR
-	fontnumber = 0;
-#endif
 }
 
 //===========================================================================
@@ -997,14 +986,11 @@ CheckHighScore (int32_t score, word other)
 		PrintY = 76 + (16 * n);
 #ifndef SPEAR
 		PrintX = 4 * 8;
-		fontcolor = 15;
 		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 100);
 #else
 		PrintX = 16;
-		fontnumber = 1;
 		VWB_Bar (PrintX - 2, PrintY - 2, 145, 15, 0x9c);
 		VW_UpdateScreen ();
-		fontcolor = 15;
 		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130);
 #endif
 	}
@@ -1031,18 +1017,16 @@ void NonShareware (void)
 	ClearMScreen ();
 	DrawStripes (10);
 
-	fontnumber = 1;
-
 	PrintX = 110;
 	PrintY = 15;
 
 	pa = MENU_TOP;
-	US_Print (language["REGNOTICE_TITLE"], gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION]);
+	US_Print (BigFont, language["REGNOTICE_TITLE"], gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION]);
 	pa = MENU_CENTER;
 
 	WindowX = PrintX = 40;
 	PrintY = 60;
-	US_Print (language["REGNOTICE_MESSAGE"], gameinfo.FontColors[GameInfo::MENU_SELECTION]);
+	US_Print (BigFont, language["REGNOTICE_MESSAGE"], gameinfo.FontColors[GameInfo::MENU_SELECTION]);
 
 	VW_UpdateScreen ();
 	VW_FadeIn ();

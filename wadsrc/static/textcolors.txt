@@ -31,7 +31,8 @@ Flat:
 
 Green
 {
-	#0B1707  #77FF6F
+	#044000  #00FE00  0 191
+	#00FF00  #40FF40  192 256
 Console:
 	#000000  #007F00    0 127
 	#00FF00  #FEFFFE  128 256
@@ -103,18 +104,13 @@ Flat:
 	#DFDFDF
 }
 
-// This is designed to match the yellow Hexen font, which has a
-// gray outline filled with shades of yellow.
 Yellow
 {
-	#272727  #515151    0  64
-	#784918  #F3A718   65 207
-	#F3A82A  #FCD043  208 256
+	#232300  #D4D800
 Console:
 	#000000  #7F7F00    0 127
 	#FFFF00  #FFFFFF  128 256
 Flat:
-	// [BL] Changed to wolf menu font color
 	#B4AC00
 }
 
@@ -164,7 +160,7 @@ Flat:
 
 DarkGreen "Dark Green"
 {
-	#0B1707  #439337
+	#002800  #04A500
 Console:
 	#000000  #005800    0 127
 	#008C00  #DCFFDC  128 256
@@ -180,7 +176,6 @@ Console:
 	#000000  #730000    0 127
 	#800000  #FFDCDC  128 255
 Flat:
-	// [BL] Changed to wolf menu font color
 	#700000
 }
 
@@ -211,7 +206,6 @@ Console:
 	#000000  #646464    0 127
 	#404040  #B4B4B4  128 256
 Flat:
-	// [BL] Changed to wolf menu font color
 	#8C8C8C
 }
 
@@ -223,4 +217,15 @@ Console:
 	#00FFFF #FEFFFF   128 256
 Flat:
 	#00DDDD
+}
+
+// Since the for pg x of y
+DarkYellow
+{
+	#000000  #848400
+Console:
+	#000000  #7F7F00    0 127
+	#7F7F00  #7F7F7F  128 256
+Flat:
+	#404000
 }

@@ -369,7 +369,6 @@ void DoJukebox(void)
 
 	MenuFadeOut();
 
-	fontnumber=1;
 	ClearMScreen ();
 	musicMenu.setHeadText(language["ROBSJUKEBOX"], true);
 	for(unsigned int i = 0;i < Wads.GetNumLumps();++i)

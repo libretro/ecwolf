@@ -66,6 +66,7 @@ static unsigned rightmargin[TEXTROWS];
 static const char* text;
 static unsigned rowon;
 
+static byte    fontcolor;
 static int     picx;
 static int     picy;
 static FTextureID picnum;
@@ -424,7 +425,7 @@ void HandleWord (void)
 	//
 	// see if it fits on this line
 	//
-	VW_MeasurePropString (wword,wwidth,wheight);
+	VW_MeasurePropString (SmallFont, wword,wwidth,wheight);
 
 	while (px+wwidth > (int) rightmargin[rowon])
 	{
@@ -437,7 +438,7 @@ void HandleWord (void)
 	// print it
 	//
 	newpos = px+wwidth;
-	VWB_DrawPropString (wword, CR_UNTRANSLATED, true, fontcolor);
+	VWB_DrawPropString (SmallFont, wword, CR_UNTRANSLATED, true, fontcolor);
 	px = newpos;
 
 	//
@@ -531,12 +532,12 @@ void PageLayout (bool shownumber, bool helphack)
 
 	if (shownumber)
 	{
-		sprintf(str, "pg %d of %d", pagenum, numpages);
+		FString str;
+		str.Format("pg %d of %d", pagenum, numpages);
 		px = 213;
 		py = 183;
-		fontcolor = 0x4f;                          //12^BACKCOLOR;
 
-		VWB_DrawPropString (str);
+		VWB_DrawPropString (SmallFont, str, gameinfo.FontColors[GameInfo::PAGEINDEX]);
 	}
 
 	fontcolor = oldfontcolor;
@@ -628,13 +629,10 @@ void CountPages (void)
 // Helphack switches index 11 and 5 so that the keyboard/blaze pics are reversed.
 void ShowArticle (const char *article, bool helphack=false)
 {
-	unsigned    oldfontnumber;
 	boolean     newpage,firstpage;
 	ControlInfo ci;
 
 	text = article;
-	oldfontnumber = fontnumber;
-	fontnumber = 0;
 	VWB_Clear(GPalette.BlackIndex, 0, 0, screenWidth, screenHeight);
 	CountPages();
 
@@ -710,7 +708,6 @@ void ShowArticle (const char *article, bool helphack=false)
 	} while (LastScan != sc_Escape && !ci.button1);
 
 	IN_ClearKeysDown ();
-	fontnumber = oldfontnumber;
 }
 
 

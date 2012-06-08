@@ -24,6 +24,7 @@ gameinfo
 	menufontcolor_highlight = "Yellow"
 	menufontcolor_highlightselection = "Gold"
 	highscoresfontcolor = "White"
+	pageindexfontcolor = "DarkYellow"
 }
 
 defaultmap

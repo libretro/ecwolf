@@ -11,12 +11,10 @@
 #include "templates.h"
 
 int	    pa=MENU_CENTER,px,py;
-byte	fontcolor;
-int	    fontnumber;
 
 //==========================================================================
 
-void VWB_DrawPropString(const char* string, EColorRange translation, bool stencil, BYTE stencilcolor)
+void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation, bool stencil, BYTE stencilcolor)
 {
 	int		    width, height;
 	byte	    *dest;
@@ -27,12 +25,9 @@ void VWB_DrawPropString(const char* string, EColorRange translation, bool stenci
 	int tmp1, tmp2;
 	int cx = px, cy = py;
 
-	FFont *fonts[2] = { SmallFont, BigFont };
-
 	byte *vbuf = VL_LockSurface(curSurface);
 	if(vbuf == NULL) return;
 
-	FFont *font = fonts[fontnumber];
 	dest = vbuf + (cy * curPitch + cx);
 	height = font->GetHeight();
 	FRemapTable *remap = font->GetColorTranslation(translation);
@@ -100,11 +95,9 @@ void VL_MungePic (byte *source, unsigned width, unsigned height)
 	free(temp);
 }
 
-void VW_MeasurePropString (const char *string, word &width, word &height, word *finalWidth)
+void VW_MeasurePropString (FFont *font, const char *string, word &width, word &height, word *finalWidth)
 {
 	int w = 0;
-	static FFont *fonts[2] = { SmallFont, BigFont };
-	FFont *font = fonts[fontnumber];
 
 	height = font->GetHeight();
 	for(width = 0;*string;++string)

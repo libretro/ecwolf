@@ -609,7 +609,6 @@ void CheckKeys (void)
 //
 	if (Keyboard[sc_Tab] && DebugOk)
 	{
-		fontnumber = 0;
 		if (DebugKeys () && viewsize < 20)
 			DrawPlayBorder ();       // dont let the blue borders flash
 

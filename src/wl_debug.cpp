@@ -80,7 +80,7 @@ void CountObjects (void)
 {
 	CenterWindow (17,7);
 
-	US_Print ("\nTotal actors  :");
+	US_Print (BigFont, "\nTotal actors  :");
 	US_PrintUnsigned (AActor::actors.Size());
 
 	VW_UpdateScreen();
@@ -213,7 +213,7 @@ int DebugKeys (void)
 	{
 		CenterWindow(20,3);
 		PrintY+=6;
-		US_Print(" Border color (0-56): ");
+		US_Print(SmallFont, " Border color (0-56): ");
 		VW_UpdateScreen();
 		esc = !US_LineInput (px,py,str,NULL,true,2,0);
 		if (!esc)
@@ -264,13 +264,13 @@ int DebugKeys (void)
 	{
 		char str[60];
 		CenterWindow (14,6);
-		US_Print ("x:");     US_PrintUnsigned (players[0].mo->x);
-		US_Print (" (");     US_PrintUnsigned (players[0].mo->x%65536);
-		US_Print (")\ny:");  US_PrintUnsigned (players[0].mo->y);
-		US_Print (" (");     US_PrintUnsigned (players[0].mo->y%65536);
-		US_Print (")\nA:");  US_PrintUnsigned (players[0].mo->angle);
-		US_Print (" X:");    US_PrintUnsigned (players[0].mo->tilex);
-		US_Print (" Y:");    US_PrintUnsigned (players[0].mo->tiley);
+		US_Print (SmallFont, "x:");     US_PrintUnsigned (players[0].mo->x);
+		US_Print (SmallFont, " (");     US_PrintUnsigned (players[0].mo->x%65536);
+		US_Print (SmallFont, ")\ny:");  US_PrintUnsigned (players[0].mo->y);
+		US_Print (SmallFont, " (");     US_PrintUnsigned (players[0].mo->y%65536);
+		US_Print (SmallFont, ")\nA:");  US_PrintUnsigned (players[0].mo->angle);
+		US_Print (SmallFont, " X:");    US_PrintUnsigned (players[0].mo->tilex);
+		US_Print (SmallFont, " Y:");    US_PrintUnsigned (players[0].mo->tiley);
 		//US_Print ("\n1:");   US_PrintUnsigned (tilemap[players[0].mo->tilex][players[0].mo->tiley]);
 		//sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[players[0].mo->tilex][players[0].mo->tiley]); US_Print(str);
 		//US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(players[0].mo->tilex,players[0].mo->tiley,1));
@@ -322,7 +322,7 @@ int DebugKeys (void)
 	{
 		CenterWindow(16,3);
 		PrintY+=6;
-		US_Print("  Give Key (1-4): ");
+		US_Print(SmallFont, "  Give Key (1-4): ");
 		VW_UpdateScreen();
 		esc = !US_LineInput (px,py,str,NULL,true,1,0);
 		if (!esc)
@@ -404,7 +404,7 @@ again:
 	{
 		CenterWindow(30,3);
 		PrintY+=6;
-		US_Print(" Slow Motion steps (default 14): ");
+		US_Print(SmallFont, " Slow Motion steps (default 14): ");
 		VW_UpdateScreen();
 		esc = !US_LineInput (px,py,str,NULL,true,2,0);
 		if (!esc)
@@ -431,7 +431,7 @@ again:
 	{
 		CenterWindow(30,3);
 		PrintY+=6;
-		US_Print("  Add how many extra VBLs(0-8): ");
+		US_Print(SmallFont, "  Add how many extra VBLs(0-8): ");
 		VW_UpdateScreen();
 		esc = !US_LineInput (px,py,str,NULL,true,1,0);
 		if (!esc)
@@ -446,7 +446,7 @@ again:
 	{
 		CenterWindow(26,3);
 		PrintY+=6;
-		US_Print("  Warp to which level: ");
+		US_Print(SmallFont, "  Warp to which level: ");
 		VW_UpdateScreen();
 		esc = !US_LineInput (px,py,str,NULL,true,8,0);
 		if (!esc && Wads.CheckNumForName(str) != -1)
@@ -473,12 +473,12 @@ again:
 
 		CenterWindow(34,4);
 		PrintY+=6;
-		US_Print("  Recalculate sky with seek: ");
+		US_Print(SmallFont, "  Recalculate sky with seek: ");
 		int seekpx = px, seekpy = py;
 		US_PrintUnsigned(curSky->seed);
-		US_Print("\n  Use color map (0-");
+		US_Print(SmallFont, "\n  Use color map (0-");
 		US_PrintUnsigned(numColorMaps - 1);
-		US_Print("): ");
+		US_Print(SmallFont, "): ");
 		int mappx = px, mappy = py;
 		US_PrintUnsigned(curSky->colorMapIndex);
 		VW_UpdateScreen();

@@ -6,4 +6,6 @@ IntermissionFont
 HudFont
 {
 	Template "FONTN%03d"
+	First 32
+	Base 32
 }
