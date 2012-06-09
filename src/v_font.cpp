@@ -2543,6 +2543,7 @@ void V_InitFonts()
 	}
 	if (!(IntermissionFont = FFont::FindFont("IntermissionFont")))
 	{
+		IntermissionFont = new FSingleLumpFont ("IntermissionFont", Wads.GetNumForName ("INTERFNT"));
 #if 0
 		if (gameinfo.gametype & GAME_DoomChex)
 		{
