@@ -78,12 +78,13 @@ extern int NumTextColors;
 class FFont
 {
 public:
-	FFont (const char *fontname, const char *nametemplate, int first, int count, int base, int spacewidth=-1);
+	FFont (const char *fontname, const char *nametemplate, int first, int count, int base, int fdlump, int spacewidth=-1);
 	virtual ~FFont ();
 
 	virtual FTexture *GetChar (int code, int *const width) const;
 	virtual int GetCharWidth (int code) const;
 	FRemapTable *GetColorTranslation (EColorRange range) const;
+	int GetLump() const { return Lump; }
 	int GetSpaceWidth () const { return SpaceWidth; }
 	int GetHeight () const { return FontHeight; }
 	int GetDefaultKerning () const { return GlobalKerning; }
@@ -101,7 +102,7 @@ public:
 	void SetCursor(char c) { Cursor = c; }
 
 protected:
-	FFont ();
+	FFont (int lump);
 
 	void BuildTranslations (const double *luminosity, const BYTE *identity,
 		const void *ranges, int total_colors, const PalEntry *palette);
@@ -124,6 +125,7 @@ protected:
 	TArray<FRemapTable> Ranges;
 	BYTE *PatchRemap;
 
+	int Lump;
 	char *Name;
 	FFont *Next;
 

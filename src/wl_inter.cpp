@@ -173,7 +173,9 @@ void Victory (void)
 	Write (RATIOX, RATIOY, language["STR_RATKILL"], true);
 	Write (RATIOX, RATIOY + 2, language["STR_RATSECRET"], true);
 	Write (RATIOX, RATIOY + 4, language["STR_RATTREASURE"], true);
-	Write (RATIOX+8, RATIOY, "%\n%\n%");
+	Write (RATIOX+8, RATIOY, "%");
+	Write (RATIOX+8, RATIOY + 2, "%");
+	Write (RATIOX+8, RATIOY + 4, "%");
 
 #endif
 
@@ -367,7 +369,9 @@ LevelCompleted (void)
 		Write (24, 10, language["STR_TIME"], true);
 		Write (24, 12, language["STR_PAR"], true);
 
-		Write (37, 14, "%\n%\n%");
+		Write (37, 14, "%");
+		Write (37, 16, "%");
+		Write (37, 18, "%");
 		Write (29, 14, language["STR_RAT2KILL"], true);
 		Write (29, 16, language["STR_RAT2SECRET"], true);
 		Write (29, 18, language["STR_RAT2TREASURE"], true);

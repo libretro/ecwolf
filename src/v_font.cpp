@@ -172,7 +172,7 @@ protected:
 class FSpecialFont : public FFont
 {
 public:
-	FSpecialFont (const char *name, int first, int count, FTexture **lumplist, const bool *notranslate);
+	FSpecialFont (const char *name, int first, int count, FTexture **lumplist, const bool *notranslate, int lump);
 };
 
 // This is a font character that loads a texture and recolors it.
@@ -341,7 +341,7 @@ FFont *V_GetFont(const char *name)
 //
 //==========================================================================
 
-FFont::FFont (const char *name, const char *nametemplate, int first, int count, int start, int spacewidth)
+FFont::FFont (const char *name, const char *nametemplate, int first, int count, int start, int fdlump, int spacewidth)
 {
 	int i;
 	FTextureID lump;
@@ -352,6 +352,7 @@ FFont::FFont (const char *name, const char *nametemplate, int first, int count, 
 	int maxyoffs;
 	bool stcfn121 = false;
 
+	Lump = fdlump;
 	Chars = new CharData[count];
 	charlumps = new FTexture *[count];
 	PatchRemap = new BYTE[256];
@@ -863,8 +864,9 @@ void FFont::StaticPreloadFonts()
 //
 //==========================================================================
 
-FFont::FFont ()
+FFont::FFont (int lump)
 {
+	Lump = lump;
 	Chars = NULL;
 	PatchRemap = NULL;
 	Name = NULL;
@@ -878,7 +880,7 @@ FFont::FFont ()
 //
 //==========================================================================
 
-FSingleLumpFont::FSingleLumpFont (const char *name, int lump)
+FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 {
 	assert(lump >= 0);
 
@@ -1405,7 +1407,8 @@ void FSingleLumpFont::FixupPalette (BYTE *identity, double *luminosity, const BY
 //
 //==========================================================================
 
-FSinglePicFont::FSinglePicFont(const char *picname)
+FSinglePicFont::FSinglePicFont(const char *picname) :
+	FFont(-1) // Since lump is only needed for priority information we don't need to worry about this here.
 {
 	FTextureID picnum = TexMan.CheckForTexture (picname, FTexture::TEX_Any);
 
@@ -1793,7 +1796,7 @@ void FFontChar2::MakeTexture ()
 //
 //==========================================================================
 
-FSpecialFont::FSpecialFont (const char *name, int first, int count, FTexture **lumplist, const bool *notranslate)
+FSpecialFont::FSpecialFont (const char *name, int first, int count, FTexture **lumplist, const bool *notranslate, int lump) : FFont(lump)
 {
 	int i, j;
 	FTexture **charlumps;
@@ -2068,7 +2071,7 @@ void V_InitCustomFonts()
 			}
 			if (format == 1)
 			{
-				FFont *fnt = new FFont (namebuffer, templatebuf, first, count, start, spacewidth);
+				FFont *fnt = new FFont (namebuffer, templatebuf, first, count, start, llump, spacewidth);
 				fnt->SetCursor(cursor);
 			}
 			else if (format == 2)
@@ -2091,7 +2094,7 @@ void V_InitCustomFonts()
 				}
 				if (count > 0)
 				{
-					FFont *fnt = new FSpecialFont (namebuffer, first, count, &lumplist[first], notranslate);
+					FFont *fnt = new FSpecialFont (namebuffer, first, count, &lumplist[first], notranslate, llump);
 					fnt->SetCursor(cursor);
 				}
 			}
@@ -2485,76 +2488,32 @@ EColorRange V_ParseFontColor (const BYTE *&color_value, int normalcolor, int bol
 //
 //==========================================================================
 
+static FFont *FindNewestFont(const char* fullname, const char* lumpname)
+{
+	// Load either the FONTDEFS font or the single lump font based on whichever
+	// has a higher lump number.
+
+	FFont *font = FFont::FindFont(fullname);
+	int slLumpNum = Wads.CheckNumForName(lumpname);
+	if(slLumpNum >= 0 && (!font || slLumpNum > font->GetLump()))
+		font = new FSingleLumpFont(fullname, slLumpNum);
+	return font;
+}
+
 void V_InitFonts()
 {
 	V_InitCustomFonts ();
 
 	// load the heads-up font
-	if (!(SmallFont = FFont::FindFont("SmallFont")))
-	{
-		int i;
+	SmallFont = FindNewestFont("SmallFont", "SMALLFNT");
+	SmallFont2 = FindNewestFont("SmallFont2", "SMALLFN2");
+	if(!SmallFont2)
+		SmallFont2 = SmallFont;
+	BigFont = FindNewestFont("BigFont", "BIGFONT");
+	ConFont = FindNewestFont("ConsoleFont", "CONFONT");
+	IntermissionFont = FindNewestFont("IntermissionFont", "INTERFNT");
 
-		if ((i = Wads.CheckNumForName("SMALLFNT")) >= 0)
-		{
-			SmallFont = new FSingleLumpFont("SmallFont", i);
-		}
-		else if (Wads.CheckNumForName ("FONTA_S") >= 0)
-		{
-			SmallFont = new FFont ("SmallFont", "FONTA%02u", HU_FONTSTART, HU_FONTSIZE, 1);
-			SmallFont->SetCursor('[');
-		}
-		else
-		{
-			SmallFont = new FFont ("SmallFont", "STCFN%.3d", HU_FONTSTART, HU_FONTSIZE, HU_FONTSTART);
-		}
-	}
-	if (!(SmallFont2 = FFont::FindFont("SmallFont2")))	// Only used by Strife
-	{
-		if (Wads.CheckNumForName ("STBFN033", ns_graphics) >= 0)
-		{
-			SmallFont2 = new FFont ("SmallFont2", "STBFN%.3d", HU_FONTSTART, HU_FONTSIZE, HU_FONTSTART);
-		}
-		else
-		{
-			SmallFont2 = SmallFont;
-		}
-	}
-	if (!(BigFont = FFont::FindFont("BigFont")))
-	{
-		BigFont = new FSingleLumpFont ("BigFont", Wads.GetNumForName ("BIGFONT"));
-#if 0
-		if (gameinfo.gametype & GAME_DoomChex)
-		{
-			BigFont = new FSingleLumpFont ("BigFont", Wads.GetNumForName ("DBIGFONT"));
-		}
-		else if (gameinfo.gametype == GAME_Strife)
-		{
-			BigFont = new FSingleLumpFont ("BigFont", Wads.GetNumForName ("SBIGFONT"));
-		}
-		else
-		{
-			BigFont = new FFont ("BigFont", "FONTB%02u", HU_FONTSTART, HU_FONTSIZE, 1);
-		}
-#endif
-	}
-	if (!(ConFont = FFont::FindFont("ConsoleFont")))
-	{
-		ConFont = new FSingleLumpFont ("ConsoleFont", Wads.GetNumForName ("CONFONT"));
-	}
-	if (!(IntermissionFont = FFont::FindFont("IntermissionFont")))
-	{
-		IntermissionFont = new FSingleLumpFont ("IntermissionFont", Wads.GetNumForName ("INTERFNT"));
-#if 0
-		if (gameinfo.gametype & GAME_DoomChex)
-		{
-			IntermissionFont = FFont::FindFont("IntermissionFont_Doom");
-		}
-		if (IntermissionFont == NULL)
-		{
-			IntermissionFont = BigFont;
-		}
-#endif
-	}
+	assert(SmallFont && SmallFont2 && BigFont && ConFont && IntermissionFont);
 }
 
 void V_ClearFonts()

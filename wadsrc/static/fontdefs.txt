@@ -1,3 +1,8 @@
+SmallFont
+{
+	Template "STCFN%.3d"
+}
+
 IntermissionFont
 {
 	Template "FONTL%03d"
