@@ -78,6 +78,7 @@ The FON2 header is followed by variable length data:
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include "templates.h"
 #include "wl_def.h"

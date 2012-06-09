@@ -6,6 +6,8 @@
 #include "w_wad.h"
 #include "v_palette.h"
 #include "wl_draw.h"
+#include "wl_main.h"
+#include "wl_play.h"
 
 
 // Uncomment the following line, if you get destination out of bounds
@@ -142,6 +144,8 @@ void	VL_SetVGAPlaneMode (void)
 	CHECKMALLOCRESULT(pixelangle);
 	wallheight = (int *) malloc(screenWidth * sizeof(int));
 	CHECKMALLOCRESULT(wallheight);
+
+	NewViewSize(viewsize);
 }
 
 /*

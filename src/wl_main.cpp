@@ -504,8 +504,6 @@ static void InitGame()
 	LoadLatchMem ();
 	BuildTables ();          // trig tables
 
-	NewViewSize (viewsize);
-
 //
 // initialize variables
 //
