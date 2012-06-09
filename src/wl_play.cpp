@@ -930,7 +930,7 @@ void PlayLoop (void)
 		{
 			funnyticount = 0;
 			if(viewsize != 21)
-				StatusDrawFace(BJWAITING1PIC + (US_RndT () & 1));
+				StatusDrawFace(BJWAITING1PIC + (M_Random () & 1));
 			facecount = 0;
 		}
 #endif

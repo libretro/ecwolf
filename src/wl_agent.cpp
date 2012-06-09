@@ -290,10 +290,10 @@ void UpdateFace (void)
 	else if(GotChaingun())
 		return;
 
-	facecount += tics;
-	if (facecount > US_RndT())
+	++facecount;
+	if (facecount > M_Random())
 	{
-		gamestate.faceframe = (US_RndT()>>6);
+		gamestate.faceframe = (M_Random()>>6);
 		if (gamestate.faceframe==3)
 			gamestate.faceframe = 1;
 

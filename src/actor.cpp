@@ -42,6 +42,7 @@
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "id_us.h"
+#include "m_random.h"
 
 void T_Projectile(AActor *self);
 
@@ -168,6 +169,7 @@ void AActor::Destroy()
 	}
 }
 
+static FRandom pr_dropitem("DropItem");
 void AActor::Die()
 {
 	GivePoints(points);
@@ -185,7 +187,7 @@ void AActor::Die()
 		do
 		{
 			DropItem *drop = &item->Item();
-			if(US_RndT() < drop->probabilty)
+			if(pr_dropitem() < drop->probabilty)
 			{
 				const ClassDef *cls = ClassDef::FindClass(drop->className);
 				if(cls)

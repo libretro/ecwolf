@@ -261,6 +261,7 @@ bool TryWalk (AActor *ob)
 ==================================
 */
 
+static FRandom pr_newchasedir("NewChaseDir");
 void SelectDodgeDir (AActor *ob)
 {
 	int         deltax,deltay,i;
@@ -327,7 +328,7 @@ void SelectDodgeDir (AActor *ob)
 		dirtry[4] = tdir;
 	}
 
-	if (US_RndT() < 128)
+	if (pr_newchasedir() < 128)
 	{
 		tdir = dirtry[1];
 		dirtry[1] = dirtry[2];
@@ -438,7 +439,7 @@ void SelectChaseDir (AActor *ob)
 			return;
 	}
 
-	if (US_RndT()>128)      /*randomly determine direction of search*/
+	if (pr_newchasedir()>128)      /*randomly determine direction of search*/
 	{
 		for (tdir=north; tdir<=west; tdir=(dirtype)(tdir+1))
 		{
@@ -523,7 +524,7 @@ void SelectRunDir (AActor *ob)
 
 	/* there is no direct path to the player, so pick another direction */
 
-	if (US_RndT()>128)      /*randomly determine direction of search*/
+	if (pr_newchasedir()>128)      /*randomly determine direction of search*/
 	{
 		for (tdir=north; tdir<=west; tdir=(dirtype)(tdir+1))
 		{

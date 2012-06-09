@@ -20,6 +20,7 @@
 
 #include "file.h"
 #include "m_classes.h"
+#include "m_random.h"
 #include "wl_def.h"
 #include "wl_menu.h"
 #include "id_ca.h"
@@ -134,7 +135,7 @@ const char* endStrings[9] = {
 #endif
 };
 
-	if(Confirm(endStrings[US_RndT() & 0x7 + (US_RndT() & 1)]))
+	if(Confirm(endStrings[M_Random() & 0x7 + (M_Random() & 1)]))
 	{
 		VW_UpdateScreen();
 		SD_MusicOff();

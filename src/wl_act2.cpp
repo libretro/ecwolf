@@ -302,6 +302,7 @@ void SelectPathDir (AActor *ob)
 		ob->dir = nodir;
 }
 
+FRandom pr_chase("Chase");
 ACTION_FUNCTION(A_Chase)
 {
 	enum
@@ -356,7 +357,7 @@ ACTION_FUNCTION(A_Chase)
 				else
 					chance = self->missilechance;
 
-				if ( US_RndT()<chance)
+				if ( pr_chase()<chance)
 				{
 					if(missile)
 						self->SetState(missile);
@@ -510,7 +511,7 @@ ACTION_FUNCTION(A_WolfAttack)
 
 		// see if the shot was a hit
 
-		if (US_RndT()<hitchance)
+		if (pr_cabullet()<hitchance)
 		{
 			int damage = flags & WAF_NORANDOM ? maxdamage : (1 + (pr_cabullet()%maxdamage));
 			if (dist>=pointblank)

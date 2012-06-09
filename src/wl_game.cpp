@@ -263,10 +263,10 @@ void SetupGameLevel (void)
 		thinkerList->DestroyAll();
 	}
 
-	if (demoplayback || demorecord)
+	/*if (demoplayback || demorecord)
 		US_InitRndT (false);
 	else
-		US_InitRndT (true);
+		US_InitRndT (true);*/
 
 //
 // load the level
