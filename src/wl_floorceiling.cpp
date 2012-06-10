@@ -28,6 +28,9 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	unsigned bot_offset0 = vbufPitch * (halfheight + y0);
 	unsigned top_offset0 = vbufPitch * (halfheight - y0 - 1);
 
+	const unsigned mapwidth = map->GetHeader().width;
+	const unsigned mapheight = map->GetHeader().height;
+
 	// draw horizontal lines
 	for(int y = y0, bot_offset = bot_offset0, top_offset = top_offset0;
 		y <= halfheight; y++, bot_offset += vbufPitch, top_offset -= vbufPitch)
@@ -50,8 +53,8 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 		{
 			if(wallheight[x] >> 3 <= y)
 			{
-				int curx = (gu >> TILESHIFT)%map->GetHeader().width;
-				int cury = (-(gv >> TILESHIFT) - 1)%map->GetHeader().height;
+				int curx = (gu >> TILESHIFT)%mapwidth;
+				int cury = (-(gv >> TILESHIFT) - 1)%mapheight;
 				MapSpot spot = map->GetSpot(curx, cury, 0);
 				if(spot->sector)
 				{

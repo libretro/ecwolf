@@ -571,6 +571,9 @@ void DrawAmmo (void)
 
 void DrawStatusBar()
 {
+	if(viewsize == 21 && ingame)
+		return;
+
 	VWB_DrawGraphic(TexMan("STBAR"), 0, 160);
 	DrawFace ();
 	DrawHealth ();

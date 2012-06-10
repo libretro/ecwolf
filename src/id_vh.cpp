@@ -545,25 +545,20 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 	const int y1 = ceil(yd);
 	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
 	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
+	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(screenWidth-x1));
+	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(screenHeight-y1));
+	vbuf += x1 + (y1 > 0 ? bufferPitch*y1 : 0);
 
 	const BYTE *table = !stencil && remap ? remap->Remap : NormalLight.Maps;
 	const BYTE *src;
-	byte *dest;
-	unsigned int i, j;
+	byte *dest = vbuf;
 	fixed x, y;
-	for(i = 0, x = 0;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	for(x = 0;x < xRun;x += xStep)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
-		dest = vbuf+x1+i;
-		if((signed)(x1+i) >= (signed)screenWidth)
-			break;
-		if(y1 > 0)
-			dest += bufferPitch*y1;
 
-		for(j = 0, y = 0;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		for(y = 0;y < yRun;y += yStep)
 		{
-			if((signed)(y1+j) >= (signed)(screenHeight))
-				break;
 			if(src[y>>FRACBITS])
 			{
 				if(stencil)
@@ -573,6 +568,8 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 			}
 			dest += bufferPitch;
 		}
+
+		dest = ++vbuf;
 	}
 
 	VL_UnlockSurface(screenBuffer);

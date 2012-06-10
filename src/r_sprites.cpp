@@ -321,30 +321,28 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	const unsigned int startY = -MIN(upperedge, 0);
 	const fixed xStep = (1/dxScale)*FRACUNIT;
 	const fixed yStep = (1/dyScale)*FRACUNIT;
+	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(viewwidth-actx-startX));
+	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge-startY));
 
 	const BYTE *src;
-	byte *dest;
+	byte *destBase = vbuf + actx + startX + (upperedge > 0 ? vbufPitch*upperedge : 0);
+	byte *dest = destBase;
 	unsigned int i, j;
 	fixed x, y;
-	for(i = startX, x = startX*xStep;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	for(i = startX, x = startX*xStep;x < xRun;x += xStep, ++i)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
-		dest = vbuf+actx+i;
-		if(actx+i >= viewwidth)
-			break;
-		else if(wallheight[actx+i] > height)
+		if(wallheight[actx+i] > height)
 			continue;
-		if(upperedge > 0)
-			dest += vbufPitch*upperedge;
 
-		for(j = startY, y = startY*yStep;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		for(j = startY, y = startY*yStep;y < yRun;y += yStep, ++j)
 		{
-			if(upperedge+j >= viewheight)
-				break;
-			if(src[y>>FRACBITS] != 0)
+			if(src[y>>FRACBITS])
 				*dest = colormap[src[y>>FRACBITS]];
 			dest += vbufPitch;
 		}
+
+		dest = ++destBase;
 	}
 }
 
@@ -385,26 +383,23 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 
 	const int x1 = leftedge>>FRACBITS;
 	const int y1 = upperedge>>FRACBITS;
+	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(viewwidth-x1-startX));
+	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-y1-startY));
 	const BYTE *src;
-	byte *dest;
-	unsigned int i, j;
+	byte *destBase = vbuf+x1+startX + (y1 > 0 ? vbufPitch*y1 : 0);
+	byte *dest = destBase;
 	fixed x, y;
-	for(i = startX, x = startX*xStep;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	for(x = startX*xStep;x < xRun;x += xStep)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
-		dest = vbuf+x1+i;
-		if(x1+i >= viewwidth)
-			break;
-		if(y1 > 0)
-			dest += vbufPitch*y1;
 
-		for(j = startY, y = startY*yStep;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		for(y = startY*yStep;y < yRun;y += yStep)
 		{
-			if(y1+j >= viewheight)
-				break;
 			if(src[y>>FRACBITS] != 0)
 				*dest = colormap[src[y>>FRACBITS]];
 			dest += vbufPitch;
 		}
+
+		dest = ++destBase;
 	}
 }

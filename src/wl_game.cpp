@@ -399,9 +399,6 @@ void DrawPlayScreen (bool noborder)
 
 void ShowActStatus()
 {
-	// Draw status bar without borders
-	VWB_DrawGraphic(TexMan("STBAR"), 0, 160);
-
 	ingame = false;
 	DrawStatusBar();
 	ingame = true;
@@ -727,10 +724,7 @@ void Died (void)
 
 	if (players[0].lives > -1)
 	{
-		if(viewsize != 21)
-		{
-			DrawStatusBar();
-		}
+		DrawStatusBar();
 
 		players[0].state = player_t::PST_REBORN;
 		gamestate.attackframe = gamestate.attackcount =
