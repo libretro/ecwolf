@@ -329,11 +329,12 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	byte *dest = destBase;
 	unsigned int i, j;
 	fixed x, y;
-	for(i = startX, x = startX*xStep;x < xRun;x += xStep, ++i)
+	for(i = startX, x = startX*xStep;x < xRun;x += xStep, ++i, dest = ++destBase)
 	{
-		src = tex->GetColumn(x>>FRACBITS, NULL);
 		if(wallheight[actx+i] > height)
 			continue;
+
+		src = tex->GetColumn(x>>FRACBITS, NULL);
 
 		for(j = startY, y = startY*yStep;y < yRun;y += yStep, ++j)
 		{
@@ -341,8 +342,6 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 				*dest = colormap[src[y>>FRACBITS]];
 			dest += vbufPitch;
 		}
-
-		dest = ++destBase;
 	}
 }
 
