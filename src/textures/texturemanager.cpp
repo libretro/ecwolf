@@ -50,6 +50,7 @@
 #include "zdoomsupport.h"
 #include "id_ca.h"
 #include "g_mapinfo.h"
+#include "gamemap.h"
 
 #define TEXTCOLOR_ORANGE
 
@@ -1225,6 +1226,49 @@ int FTextureManager::CountLumpTextures (int lumpnum)
 		return int(numtex) >= 0 ? numtex : 0;
 	}
 	return 0;
+}
+
+//===========================================================================
+//
+// R_PrecacheLevel
+//
+// Preloads all relevant graphics for the level.
+//
+//===========================================================================
+
+void FTextureManager::PrecacheLevel (void)
+{
+	BYTE *hitlist;
+	int cnt = NumTextures();
+
+//	if (demoplayback)
+//		return;
+
+	hitlist = new BYTE[cnt];
+	memset (hitlist, 0, cnt);
+
+	map->GetHitlist(hitlist);
+	unsigned int numcached = 0;
+	for (int i = cnt - 1; i >= 0; i--)
+	{
+		FTexture *tex = ByIndex(i);
+		if(hitlist[i] & 1)
+		{
+			const FTexture::Span *spanp;
+			tex->GetColumn(0, &spanp);
+			++numcached;
+		}
+		else if(hitlist[i])
+		{
+			++numcached;
+			tex->GetPixels();
+		}
+		else
+			tex->Unload();
+	}
+
+	Printf("%d textures precached\n", numcached);
+	delete[] hitlist;
 }
 
 //===========================================================================

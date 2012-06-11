@@ -144,6 +144,35 @@ bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
 	return false;
 }
 
+// Get a list of textures to precache
+void GameMap::GetHitlist(BYTE* hitlist) const
+{
+	R_GetSpriteHitlist(hitlist);
+
+	for(unsigned int i = planes.Size();i-- > 0;)
+	{
+		Plane &plane = planes[i];
+		for(unsigned int j = GetHeader().width*GetHeader().height;j-- > 0;)
+		{
+			Plane::Map &spot = plane.map[j];
+
+			if(spot.tile)
+			{
+				hitlist[spot.tile->texture[Tile::East].GetIndex()] =
+					hitlist[spot.tile->texture[Tile::North].GetIndex()] =
+					hitlist[spot.tile->texture[Tile::West].GetIndex()] =
+					hitlist[spot.tile->texture[Tile::South].GetIndex()] |= 1;
+			}
+
+			if(spot.sector)
+			{
+				hitlist[spot.sector->texture[Sector::Floor].GetIndex()] =
+					hitlist[spot.sector->texture[Sector::Ceiling].GetIndex()] |= 2;
+			}
+		}
+	}
+}
+
 void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 {
 	if(zone1 == zone2 || zone1 == NULL || zone2 == NULL)

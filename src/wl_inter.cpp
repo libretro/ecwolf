@@ -726,7 +726,6 @@ void PreloadGraphics (void)
 	ClearSplitVWB ();           // set up for double buffering in split screen
 
 	VWB_Clear(bordercol, 0, 0, screenWidth, screenHeight);
-	DrawPlayScreen(true);
 	ShowActStatus();
 	VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
 
@@ -737,6 +736,10 @@ void PreloadGraphics (void)
 
 	VW_UpdateScreen ();
 	VW_FadeIn ();
+
+	PreloadUpdate (5, 10);
+
+	TexMan.PrecacheLevel();
 
 //      PM_Preload (PreloadUpdate);
 	PreloadUpdate (10, 10);

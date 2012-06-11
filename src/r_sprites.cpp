@@ -58,6 +58,7 @@ struct SpriteInfo
 		uint32_t	iname;
 	};
 	unsigned int	frames;
+	unsigned int	numFrames;
 };
 
 struct Sprite
@@ -69,8 +70,8 @@ struct Sprite
 	uint16_t	mirror; // Mirroring bitfield
 };
 
-TArray<Sprite> spriteFrames;
-TArray<SpriteInfo> loadedSprites;
+static TArray<Sprite> spriteFrames;
+static TArray<SpriteInfo> loadedSprites;
 
 bool R_CheckSpriteValid(unsigned int spr)
 {
@@ -142,6 +143,43 @@ void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 
 	frame.texture[dir] = tex->GetID();
 	frame.mirror |= 1<<dir;
+}
+
+void R_GetSpriteHitlist(BYTE* hitlist)
+{
+	// Start by getting a list of currently in use sprites and then tell the
+	// precacher to load them.
+
+	BYTE* sprites = new BYTE[loadedSprites.Size()];
+	memset(sprites, 0, loadedSprites.Size());
+
+	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	{
+		AActor *actor = iter->Item();
+		sprites[actor->state->spriteInf] = 1;
+	}
+
+	for(unsigned int i = loadedSprites.Size();i-- > 0;)
+	{
+		if(!sprites[i])
+			continue;
+
+		SpriteInfo &sprInf = loadedSprites[i];
+		Sprite *frame = &spriteFrames[sprInf.frames];
+		for(unsigned int j = sprInf.numFrames;j-- > 0;++frame)
+		{
+			if(frame->rotations == Sprite::NO_FRAMES)
+				continue;
+
+			for(unsigned int k = frame->rotations;k-- > 0;)
+			{
+				if(frame->texture[k].isValid())
+					hitlist[frame->texture[k].GetIndex()] |= 1;
+			}
+		}
+	}
+
+	delete[] sprites;
 }
 
 int SpriteCompare(const void *s1, const void *s2)
@@ -235,6 +273,8 @@ void R_InitSprites()
 
 			spriteFrames.Push(frames[j]);
 		}
+
+		loadedSprites[i].numFrames = maxframes;
 	}
 }
 

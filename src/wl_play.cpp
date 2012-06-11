@@ -928,7 +928,8 @@ void PlayLoop (void)
 			VW_FadeIn ();
 
 		CheckKeys ();
-		DrawStatusBar();
+		if((gamestate.TimeCount & 1) || !(tics & 1))
+			DrawStatusBar();
 //
 // debug aids
 //

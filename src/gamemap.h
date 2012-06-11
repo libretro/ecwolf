@@ -149,6 +149,7 @@ class GameMap
 		bool			ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator);
 		void			ClearVisibility();
 		const Header	&GetHeader() const { return header; }
+		void			GetHitlist(BYTE* hitlist) const;
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		bool			IsValid() const { return valid; }
 		unsigned int	NumPlanes() const { return planes.Size(); }
