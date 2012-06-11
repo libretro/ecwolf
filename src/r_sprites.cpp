@@ -159,7 +159,7 @@ void R_GetSpriteHitlist(BYTE* hitlist)
 		sprites[actor->state->spriteInf] = 1;
 	}
 
-	for(unsigned int i = loadedSprites.Size();i-- > 0;)
+	for(unsigned int i = loadedSprites.Size();i-- > NUM_SPECIAL_SPRITES;)
 	{
 		if(!sprites[i])
 			continue;
