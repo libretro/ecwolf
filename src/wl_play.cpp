@@ -317,7 +317,7 @@ void PollJoystickMove (void)
 
 void PollControls (void)
 {
-	int max, min, i;
+	int i;
 	byte buttonbits;
 
 	IN_ProcessEvents();
@@ -390,21 +390,6 @@ void PollControls (void)
 
 	if (joystickenabled)
 		PollJoystickMove ();
-
-//
-// bound movement to a maximum
-//
-	max = 100 * tics;
-	min = -max;
-	//if (controlx > max)
-	//    controlx = max;
-	//else if (controlx < min)
-	//    controlx = min;
-
-	//if (controly > max)
-	//    controly = max;
-	//else if (controly < min)
-	//    controly = min;
 
 	if (demorecord)
 	{

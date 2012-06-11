@@ -25,20 +25,22 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	if(y0 > halfheight)
 		return;                                // view obscured by walls
 	if(!y0) y0 = 1;                            // don't let division by zero
-	unsigned bot_offset0 = vbufPitch * (halfheight + y0);
-	unsigned top_offset0 = vbufPitch * (halfheight - y0 - 1);
+	byte* bot_offset = vbuf + vbufPitch * (halfheight + y0);
+	byte* top_offset = vbuf + vbufPitch * (halfheight - y0 - 1);
 
-	const unsigned mapwidth = map->GetHeader().width;
-	const unsigned mapheight = map->GetHeader().height;
+	const unsigned int mapwidth = map->GetHeader().width;
+	const unsigned int mapheight = map->GetHeader().height;
+
+	const unsigned int texDivisor = viewwidth*AspectCorrection[vid_aspect].multiplier*175/48;
 
 	// draw horizontal lines
-	for(int y = y0, bot_offset = bot_offset0, top_offset = top_offset0;
-		y <= halfheight; y++, bot_offset += vbufPitch, top_offset -= vbufPitch)
+	for(int y = y0;
+		y <= halfheight; ++y, bot_offset += vbufPitch, top_offset -= vbufPitch)
 	{
 		dist = (heightnumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
 		gv = -viewy + FixedMul(dist, viewsin);
-		tex_step = (dist << 8) / viewwidth / 175;
+		tex_step = (dist << 8) / texDivisor;
 		du =  FixedMul(tex_step, viewsin);
 		dv = -FixedMul(tex_step, viewcos);
 		gu -= (viewwidth >> 1) * du;
@@ -48,8 +50,8 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 			curshades = &NormalLight.Maps[256*GetShade(y << 3)];
 		else
 			curshades = NormalLight.Maps;
-		for(int x = 0, bot_add = bot_offset, top_add = top_offset;
-			x < viewwidth; x++, bot_add++, top_add++)
+		for(unsigned int x = 0, bot_add = 0, top_add = 0;
+			x < viewwidth; ++x, ++bot_add, ++top_add)
 		{
 			if(wallheight[x] >> 3 <= y)
 			{
@@ -73,10 +75,10 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 					u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
-					if(curtoptex.isValid() && y < halfheight)
-						vbuf[top_add] = curshades[toptex[texoffs]];
-					if(curbottex.isValid() && y+halfheight < viewheight)
-						vbuf[bot_add] = curshades[bottex[texoffs]];
+					if(toptex && y < halfheight)
+						top_offset[top_add] = curshades[toptex[texoffs]];
+					if(bottex && y+halfheight < viewheight)
+						bot_offset[bot_add] = curshades[bottex[texoffs]];
 				}
 			}
 			gu += du;

@@ -122,6 +122,7 @@ void ControlMovement (AActor *ob)
 {
 	int32_t oldx,oldy;
 	angle_t angle;
+	int strafe = 0;
 
 	thrustspeed = 0;
 
@@ -130,20 +131,18 @@ void ControlMovement (AActor *ob)
 
 	if(buttonstate[bt_strafeleft])
 	{
-		angle = ob->angle + ANGLE_90;
 		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
-			Thrust(angle, RUNMOVE * MOVESCALE);
+			strafe -= RUNMOVE;
 		else
-			Thrust(angle, BASEMOVE * MOVESCALE);
+			strafe -= BASEMOVE;
 	}
 
 	if(buttonstate[bt_straferight])
 	{
-		angle = ob->angle - ANGLE_90;
 		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
-			Thrust(angle, RUNMOVE * MOVESCALE);
+			strafe += RUNMOVE;
 		else
-			Thrust(angle, BASEMOVE * MOVESCALE);
+			strafe -= BASEMOVE;
 	}
 
 	//
@@ -155,16 +154,7 @@ void ControlMovement (AActor *ob)
 		// strafing
 		//
 		//
-		if (controlx > 0)
-		{
-			angle = ob->angle - ANGLE_90;
-			Thrust (angle,controlx*MOVESCALE);      // move to left
-		}
-		else if (controlx < 0)
-		{
-			angle = ob->angle + ANGLE_90;
-			Thrust (angle,-controlx*MOVESCALE);     // move to right
-		}
+		strafe += controlx;
 	}
 	else
 	{
@@ -172,6 +162,26 @@ void ControlMovement (AActor *ob)
 		// not strafing
 		//
 		ob->angle -= controlx*(ANGLE_1/ANGLESCALE);
+	}
+
+	if(strafe)
+	{
+		// Cap the speed
+		if (strafe > 100)
+			strafe = 100;
+		else if (strafe < -100)
+			strafe = -100;
+
+		if (strafe > 0)
+		{
+			angle = ob->angle - ANGLE_90;
+			Thrust (angle,strafe*MOVESCALE);      // move to left
+		}
+		else if (strafe < 0)
+		{
+			angle = ob->angle + ANGLE_90;
+			Thrust (angle,-strafe*MOVESCALE);     // move to right
+		}
 	}
 
 	//
