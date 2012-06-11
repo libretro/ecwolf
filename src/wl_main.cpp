@@ -298,7 +298,7 @@ void CalcProjection (int32_t focal)
 	double  facedist;
 
 	focallength = focal;
-	facedist = focal+MINDIST;
+	facedist = 2*FOCALLENGTH+0x100; // Used to be MINDIST (0x5800) which was 0x100 then the FOCALLENGTH (0x5700)
 	halfview = viewwidth/2;                                 // half view in pixels
 
 	//

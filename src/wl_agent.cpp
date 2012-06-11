@@ -142,7 +142,7 @@ void ControlMovement (AActor *ob)
 		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
 			strafe += RUNMOVE;
 		else
-			strafe -= BASEMOVE;
+			strafe += BASEMOVE;
 	}
 
 	//
@@ -955,9 +955,10 @@ void player_t::Reborn()
 	mo->GiveStartingInventory();
 	health = mo->maxhealth;
 
-	DrawFace();
-	DrawLives();
-	DrawHealth();
+	// Recalculate the projection here so that player classes with differing radii are supported.
+	CalcProjection(mo->radius);
+
+	DrawStatusBar();
 }
 
 void player_t::SetPSprite(const Frame *frame)
