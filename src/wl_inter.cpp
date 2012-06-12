@@ -123,7 +123,7 @@ void Victory (void)
 	int i, min, kr, sr, tr, x;
 	char tempstr[8];
 
-#define RATIOX  6
+#define RATIOX  22
 #define RATIOY  14
 #define TIMEX   14
 #define TIMEY   8
@@ -151,9 +151,9 @@ void Victory (void)
 #endif
 
 	StartCPMusic ("URAHERO");
-	ClearSplitVWB ();
+	VWB_Clear(VIEWCOLOR, 0, 0, screenWidth, screenHeight);
+	DrawPlayScreen(true);
 
-	VWB_Bar (0, 0, 320, screenHeight / scaleFactor - STATUSLINES + 1, VIEWCOLOR);
 	if (bordercol != VIEWCOLOR)
 		DrawStatusBorder (VIEWCOLOR);
 
@@ -168,7 +168,7 @@ void Victory (void)
 
 	Write (TIMEX, TIMEY - 2, language["STR_TOTALTIME"]);
 
-	Write (12, RATIOY - 2, "averages");
+	Write (12, RATIOY - 2, language["STR_AVERAGES"]);
 
 	Write (RATIOX, RATIOY, language["STR_RATKILL"], true);
 	Write (RATIOX, RATIOY + 2, language["STR_RATSECRET"], true);
@@ -211,15 +211,15 @@ void Victory (void)
 	Write (TIMEX, TIMEY, timeString);
 
 	itoa (kr, tempstr, 10);
-	x = RATIOX + 24 - (int) strlen(tempstr) * 2;
+	x = RATIOX + 8 - (int) strlen(tempstr) * 2;
 	Write (x, RATIOY, tempstr);
 
 	itoa (sr, tempstr, 10);
-	x = RATIOX + 24 - (int) strlen(tempstr) * 2;
+	x = RATIOX + 8 - (int) strlen(tempstr) * 2;
 	Write (x, RATIOY + 2, tempstr);
 
 	itoa (tr, tempstr, 10);
-	x = RATIOX + 24 - (int) strlen(tempstr) * 2;
+	x = RATIOX + 8 - (int) strlen(tempstr) * 2;
 	Write (x, RATIOY + 4, tempstr);
 
 	VW_UpdateScreen ();

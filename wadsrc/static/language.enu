@@ -49,6 +49,7 @@ STR_FAST = "Fast";
 STR_THINK = "Thinking";
 STR_YOUWIN = "you win!";
 STR_TOTALTIME = "total time";
+STR_AVERAGES = "averages";
 STR_BONUS = "bonus";
 STR_TIME = "time";
 STR_PAR = "par";
