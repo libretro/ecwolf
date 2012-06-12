@@ -341,42 +341,43 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	if(tex == NULL)
 		return;
 
-	const BYTE *colormap;
-	if(!r_depthfog || (actor->flags & FL_BRIGHT) || frame->fullbright)
-		colormap = NormalLight.Maps;
-	else
-		colormap = &NormalLight.Maps[256*GetShade(height)];
-
 	const unsigned int scale = height>>3; // Integer part of the height
 	if(scale == 0)
 		return;
 
 	const double dyScale = height/256.0;
-	const double dxScale = (height/256.0)/(yaspect/65536.);
-
-	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
 	const int upperedge = (viewheight/2)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
+	if(upperedge > viewheight)
+		return;
+
+	const double dxScale = (height/256.0)/(yaspect/65536.);
+	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
 
 	const unsigned int startX = -MIN(actx, 0);
 	const unsigned int startY = -MIN(upperedge, 0);
 	const fixed xStep = (1/dxScale)*FRACUNIT;
 	const fixed yStep = (1/dyScale)*FRACUNIT;
-	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(viewwidth-actx-startX));
-	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge-startY));
+	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(viewwidth-actx));
+	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
 
+	const BYTE *colormap;
+	if(!r_depthfog || (actor->flags & FL_BRIGHT) || frame->fullbright)
+		colormap = NormalLight.Maps;
+	else
+		colormap = &NormalLight.Maps[256*GetShade(height)];
 	const BYTE *src;
 	byte *destBase = vbuf + actx + startX + (upperedge > 0 ? vbufPitch*upperedge : 0);
 	byte *dest = destBase;
-	unsigned int i, j;
+	unsigned int i;
 	fixed x, y;
-	for(i = startX, x = startX*xStep;x < xRun;x += xStep, ++i, dest = ++destBase)
+	for(i = actx+startX, x = startX*xStep;x < xRun;x += xStep, ++i, dest = ++destBase)
 	{
-		if(wallheight[actx+i] > height)
+		if(wallheight[i] > height)
 			continue;
 
 		src = tex->GetColumn(x>>FRACBITS, NULL);
 
-		for(j = startY, y = startY*yStep;y < yRun;y += yStep, ++j)
+		for(y = startY*yStep;y < yRun;y += yStep)
 		{
 			if(src[y>>FRACBITS])
 				*dest = colormap[src[y>>FRACBITS]];

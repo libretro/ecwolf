@@ -297,7 +297,8 @@ void CalcProjection (int32_t focal)
 	int     halfview;
 	double  facedist;
 
-	focallength = focal;
+	// 0xFD17 is a magic number to convert the player's radius 0x5800 to FOCALLENGTH (0x5700)
+	focallength = FixedMul(focal, 0xFD17);
 	facedist = 2*FOCALLENGTH+0x100; // Used to be MINDIST (0x5800) which was 0x100 then the FOCALLENGTH (0x5700)
 	halfview = viewwidth/2;                                 // half view in pixels
 
