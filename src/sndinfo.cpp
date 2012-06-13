@@ -37,6 +37,7 @@
 #include "id_sd.h"
 #include "w_wad.h"
 #include "scanner.h"
+#include "zdoomsupport.h"
 #include <SDL_mixer.h>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,19 +46,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-SoundIndex::SoundIndex() : priority(50)
+SoundData::SoundData() : priority(50)
 {
 	data[0] = data[1] = data[2] = NULL;
 	lump[0] = lump[1] = lump[2] = -1;
 	length[0] = length[1] = length[2] = 0;
 }
 
-SoundIndex::SoundIndex(const SoundIndex &other)
+SoundData::SoundData(const SoundData &other)
 {
 	*this = other;
 }
 
-SoundIndex::~SoundIndex()
+SoundData::~SoundData()
 {
 	for(unsigned int i = 0;i < 3;i++)
 	{
@@ -66,8 +67,9 @@ SoundIndex::~SoundIndex()
 	}
 }
 
-const SoundIndex &SoundIndex::operator= (const SoundIndex &other)
+const SoundData &SoundData::operator= (const SoundData &other)
 {
+	logicalName = other.logicalName;
 	priority = other.priority;
 	for(unsigned int i = 0;i < 3;i++)
 	{
@@ -93,8 +95,65 @@ const SoundIndex &SoundIndex::operator= (const SoundIndex &other)
 
 SoundInformation SoundInfo;
 
-SoundInformation::SoundInformation()
+struct SoundInformation::HashIndex
 {
+	public:
+		static const unsigned int HASHTABLE_SIZE = 4096;
+
+		unsigned int	index;
+		HashIndex		*next;
+};
+
+SoundInformation::SoundInformation() : hashTable(NULL)
+{
+	sounds.Push(nullIndex);
+}
+
+SoundInformation::~SoundInformation()
+{
+	if(hashTable)
+	{
+		// Clean up hash table links
+		for(unsigned int i = 0;i < HashIndex::HASHTABLE_SIZE;++i)
+		{
+			HashIndex *index = hashTable[i].next;
+			while(index)
+			{
+				HashIndex *toDelete = index;
+				index = index->next;
+				delete toDelete;
+			}
+		}
+		delete[] hashTable;
+	}
+}
+
+void SoundInformation::CreateHashTable()
+{
+	hashTable = new HashIndex[HashIndex::HASHTABLE_SIZE];
+	memset(hashTable, 0, sizeof(HashIndex)*HashIndex::HASHTABLE_SIZE);
+
+	// Sound index 0 is nullIndex so we don't need to hash it.
+	// Use separate chaining to resolve collisions.
+	for(unsigned int i = 1;i < sounds.Size();++i)
+	{
+		SoundData &data = sounds[i];
+
+		HashIndex *tid = &hashTable[MakeKey(data.logicalName) % HashIndex::HASHTABLE_SIZE];
+		while(tid->index)
+		{
+			if(tid->next)
+				tid = tid->next;
+			else
+			{
+				tid->next = new HashIndex;
+				tid = tid->next;
+				memset(tid, 0, sizeof(HashIndex));
+			}
+		}
+
+		tid->index = i;
+	}
 }
 
 void SoundInformation::Init()
@@ -122,7 +181,8 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 		FName logicalName = sc->str;
 		assert(logicalName[0] != '}');
 
-		SoundIndex idx;
+		SoundData idx;
+		idx.logicalName = logicalName;
 		bool hasAlternatives = false;
 
 		if(sc.CheckToken('{'))
@@ -169,14 +229,24 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 		while(hasAlternatives && ++i < 3);
 
 		if(!idx.IsNull())
-			soundMap.Insert(logicalName, idx);
+			sounds.Push(idx);
 	}
+
+	CreateHashTable();
 }
 
-const SoundIndex &SoundInformation::operator[] (const char* logical) const
+const SoundData &SoundInformation::operator[] (const char* logical) const
 {
-	const SoundIndex *it = soundMap.CheckKey(logical);
-	if(it == NULL)
+	HashIndex *index = &hashTable[MakeKey(logical) % HashIndex::HASHTABLE_SIZE];
+	if(index->index == 0)
 		return nullIndex;
-	return *it;
+
+	while(sounds[index->index].logicalName.CompareNoCase(logical) != 0)
+	{
+		index = index->next;
+		if(index == NULL)
+			return nullIndex;
+	}
+
+	return sounds[index->index];
 }

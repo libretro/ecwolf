@@ -636,7 +636,7 @@ byte* SD_PrepareSound(int which)
 	return nout;
 }
 
-int SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChannel chan)
+int SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChannel chan)
 {
 	if (!DigiMode)
 		return 0;
@@ -653,7 +653,7 @@ int SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChann
 
 	DigiPlaying = true;
 
-	Mix_Chunk *sample = reinterpret_cast<Mix_Chunk*> (which.GetData(SoundIndex::DIGITAL));
+	Mix_Chunk *sample = reinterpret_cast<Mix_Chunk*> (which.GetData(SoundData::DIGITAL));
 	if(sample == NULL)
 		return 0;
 
@@ -1132,12 +1132,12 @@ bool SD_PlaySound(const char* sound, SoundChannel chan)
 	ispos = nextsoundpos;
 	nextsoundpos = false;
 
-	const SoundIndex &sindex = SoundInfo[sound];
+	const SoundData &sindex = SoundInfo[sound];
 
 	if ((SoundMode != sdm_Off) && sindex.IsNull())
 		return 0;
 
-	if ((DigiMode != sds_Off) && sindex.HasType(SoundIndex::DIGITAL))
+	if ((DigiMode != sds_Off) && sindex.HasType(SoundData::DIGITAL))
 	{
 		if ((DigiMode == sds_PC) && (SoundMode == sdm_PC))
 		{
@@ -1185,8 +1185,8 @@ bool SD_PlaySound(const char* sound, SoundChannel chan)
 //            SDL_PCPlaySound((PCSound *)s);
 			break;
 		case sdm_AdLib:
-			if(sindex.HasType(SoundIndex::ADLIB))
-				SDL_ALPlaySound((AdLibSound *)sindex.GetData(SoundIndex::ADLIB));
+			if(sindex.HasType(SoundData::ADLIB))
+				SDL_ALPlaySound((AdLibSound *)sindex.GetData(SoundData::ADLIB));
 			break;
 	}
 

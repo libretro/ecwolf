@@ -9,6 +9,7 @@
 #define __ID_SD__
 
 #include "wl_def.h"
+#include "sndinfo.h"
 
 #define alOut(n,b) 		YM3812Write(oplChip, n, b, AdlibVolume)
 #define alOutMusic(n,b)	YM3812Write(oplChip, n, b, MusicVolume)
@@ -135,56 +136,6 @@ enum SoundChannel
 	SD_BOSSWEAPONS
 };
 
-class SoundInformation;
-
-class SoundIndex
-{
-	public:
-		enum Type
-		{
-			DIGITAL,
-			ADLIB,
-			PCSPEAKER
-		};
-
-		SoundIndex();
-		SoundIndex(const SoundIndex &other);
-		~SoundIndex();
-
-		byte*			GetData(Type type=ADLIB) const { return data[type]; }
-		unsigned short	GetPriority() const { return priority; }
-		bool			HasType(Type type=ADLIB) const { return lump[type] != -1; }
-		bool			IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1; }
-
-		const SoundIndex &operator= (const SoundIndex &other);
-	protected:
-		byte*			data[3];
-		int				lump[3];
-		unsigned int	length[3];
-		unsigned short	priority;
-
-		friend class SoundInformation;
-};
-
-#include "tarray.h"
-#include "name.h"
-class SoundInformation
-{
-	public:
-		SoundInformation();
-
-		void				Init();
-		const SoundIndex	&operator[] (const char* logical) const;
-
-	protected:
-		void	ParseSoundInformation(int lumpNum);
-
-	private:
-		SoundIndex				nullIndex;
-		TMap<FName, SoundIndex>	soundMap;
-};
-extern SoundInformation	SoundInfo;
-
 #define GetTimeCount()  ((SDL_GetTicks()*7)/100)
 
 inline void Delay(int wolfticks)
@@ -216,7 +167,7 @@ extern  bool    GotChaingun(void);
 
 extern  void    SD_SetDigiDevice(SDSMode);
 extern  byte*	SD_PrepareSound(int which);
-extern  int     SD_PlayDigitized(const SoundIndex &which,int leftpos,int rightpos,SoundChannel chan=SD_GENERIC);
+extern  int     SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChannel chan=SD_GENERIC);
 extern  void    SD_StopDigitized(void);
 
 #endif

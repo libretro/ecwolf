@@ -49,7 +49,7 @@ struct Keygroup
 struct Lock
 {
 	TArray<Keygroup *> keylist;
-	TArray<SoundIndex> locksound;
+	TArray<SoundData> locksound;
 	FString Message;
 	FString RemoteMsg;
 	int	rgb;
@@ -392,7 +392,7 @@ void P_DeinitKeyMessages()
 bool P_CheckKeys (AActor *owner, int keynum, bool remote)
 {
 	const char *failtext = NULL;
-	SoundIndex *failsound;
+	SoundData *failsound;
 	int numfailsounds;
 
 	if (owner == NULL) return false;
@@ -400,7 +400,7 @@ bool P_CheckKeys (AActor *owner, int keynum, bool remote)
 	// Just a safety precaution. The messages should have been initialized upon game start.
 	if (!keysdone) P_InitKeyMessages();
 
-	SoundIndex failage[2] = { SoundInfo["*keytry"], SoundInfo["misc/keytry"] };
+	SoundData failage[2] = { SoundInfo["*keytry"], SoundInfo["misc/keytry"] };
 
 	if (!locks[keynum]) 
 	{
