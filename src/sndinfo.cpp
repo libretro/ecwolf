@@ -34,6 +34,7 @@
 
 #include "wl_def.h"
 #include "m_swap.h"
+#include "m_random.h"
 #include "id_sd.h"
 #include "w_wad.h"
 #include "scanner.h"
@@ -43,6 +44,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Sound Index
+//
+////////////////////////////////////////////////////////////////////////////////
+
+SoundIndex::SoundIndex(const char* logical)
+{
+	index = SoundInfo.FindSound(logical);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// Sound Data
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +83,8 @@ const SoundData &SoundData::operator= (const SoundData &other)
 {
 	logicalName = other.logicalName;
 	priority = other.priority;
+	isAlias = other.isAlias;
+	aliasLinks = other.aliasLinks;
 	for(unsigned int i = 0;i < 3;i++)
 	{
 		length[i] = other.length[i];
@@ -128,6 +142,24 @@ SoundInformation::~SoundInformation()
 	}
 }
 
+SoundData &SoundInformation::AddSound(const char* logical)
+{
+	// Look for an already defined sound.  The list isn't indexed so we have to
+	// do a linear search.
+	for(unsigned int i = 0;i < sounds.Size();++i)
+	{
+		if(sounds[i].logicalName.CompareNoCase(logical) == 0)
+			return sounds[i];
+	}
+
+	// Create new sound and set the logical name
+	unsigned int idx = sounds.Push(SoundData());
+	SoundData &data = sounds[idx];
+	data.logicalName = logical;
+	data.index = SoundIndex(idx);
+	return data;
+}
+
 void SoundInformation::CreateHashTable()
 {
 	hashTable = new HashIndex[HashIndex::HASHTABLE_SIZE];
@@ -138,6 +170,10 @@ void SoundInformation::CreateHashTable()
 	for(unsigned int i = 1;i < sounds.Size();++i)
 	{
 		SoundData &data = sounds[i];
+
+		// Don't hash empty sounds
+		if(data.IsNull())
+			continue;
 
 		HashIndex *tid = &hashTable[MakeKey(data.logicalName) % HashIndex::HASHTABLE_SIZE];
 		while(tid->index)
@@ -154,6 +190,22 @@ void SoundInformation::CreateHashTable()
 
 		tid->index = i;
 	}
+}
+
+SoundIndex SoundInformation::FindSound(const char* logical) const
+{
+	HashIndex *index = &hashTable[MakeKey(logical) % HashIndex::HASHTABLE_SIZE];
+	if(index->index == 0)
+		return SoundIndex();
+
+	while(sounds[index->index].logicalName.CompareNoCase(logical) != 0)
+	{
+		index = index->next;
+		if(index == NULL)
+			return SoundIndex();
+	}
+
+	return SoundIndex(index->index);
 }
 
 void SoundInformation::Init()
@@ -176,77 +228,95 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 	while(sc.TokensLeft() != 0)
 	{
-		if(!sc.GetNextString())
-			sc.ScriptMessage(Scanner::ERROR, "Expected logical name.\n");
-		FName logicalName = sc->str;
-		assert(logicalName[0] != '}');
-
-		SoundData idx;
-		idx.logicalName = logicalName;
-		bool hasAlternatives = false;
-
-		if(sc.CheckToken('{'))
-			hasAlternatives = true;
-
-		unsigned int i = 0;
-		do
+		if(sc.CheckToken('$'))
 		{
-			if(sc.CheckToken('}') || !sc.GetNextString())
+			sc.MustGetToken(TK_Identifier);
+			if(sc->str.CompareNoCase("alias") == 0 || sc->str.CompareNoCase("random") == 0)
 			{
-				if(i == 0)
-					sc.ScriptMessage(Scanner::ERROR, "Expected lump name for '%s'.\n", logicalName.GetChars());
-				else
-					break;
-			}
+				bool isRandom = sc->str.CompareNoCase("random") == 0;
 
-			if(sc->str.Compare("NULL") == 0)
-				continue;
-			int sndLump = Wads.CheckNumForName(sc->str, ns_sounds);
+				if(!sc.GetNextString())
+					sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
+				SoundData &alias = AddSound(sc->str);
+				alias.isAlias = true;
 
-			if(i == 2 && !sc.CheckToken('}'))
-				sc.ScriptMessage(Scanner::ERROR, "Expected '}'.\n");
-			if(sndLump == -1)
-				continue;
-
-			idx.lump[i] = sndLump;
-			if(i == 0)
-			{
-				idx.data[i] = SD_PrepareSound(sndLump);
-				idx.length[i] = idx.data[i] == NULL ? 0 : sizeof(Mix_Chunk);
+				if(isRandom)
+					sc.MustGetToken('{');
+				do
+				{
+					if(!sc.GetNextString())
+						sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
+					alias.aliasLinks.Push(AddSound(sc->str).index);
+				}
+				while(isRandom && !sc.CheckToken('}'));
 			}
 			else
-			{
-				idx.length[i] = Wads.LumpLength(sndLump);
-				idx.data[i] = new byte[idx.length[i]];
-
-				FWadLump soundReader = Wads.OpenLumpNum(sndLump);
-				soundReader.Read(idx.data[i], idx.length[i]);
-
-				if(i == 1 || idx.lump[1] == -1)
-					idx.priority = ReadLittleShort(&idx.data[i][4]);
-			}
+				sc.ScriptMessage(Scanner::ERROR, "Unknown command '%s'.", sc->str.GetChars());
 		}
-		while(hasAlternatives && ++i < 3);
+		else
+		{
+			if(!sc.GetNextString())
+				sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
+			assert(sc->str[0] != '}');
 
-		if(!idx.IsNull())
-			sounds.Push(idx);
+			SoundData &idx = AddSound(sc->str);
+			idx.isAlias = false;
+
+			bool hasAlternatives = false;
+
+			if(sc.CheckToken('{'))
+				hasAlternatives = true;
+
+			unsigned int i = 0;
+			do
+			{
+				if(sc.CheckToken('}') || !sc.GetNextString())
+				{
+					if(i == 0)
+						sc.ScriptMessage(Scanner::ERROR, "Expected lump name for '%s'.\n", idx.logicalName.GetChars());
+					else
+						break;
+				}
+
+				if(sc->str.Compare("NULL") == 0)
+					continue;
+				int sndLump = Wads.CheckNumForName(sc->str, ns_sounds);
+
+				if(i == 2 && !sc.CheckToken('}'))
+					sc.ScriptMessage(Scanner::ERROR, "Expected '}'.\n");
+				if(sndLump == -1)
+					continue;
+
+				idx.lump[i] = sndLump;
+				if(i == 0)
+				{
+					idx.data[i] = SD_PrepareSound(sndLump);
+					idx.length[i] = idx.data[i] == NULL ? 0 : sizeof(Mix_Chunk);
+				}
+				else
+				{
+					idx.length[i] = Wads.LumpLength(sndLump);
+					idx.data[i] = new byte[idx.length[i]];
+
+					FWadLump soundReader = Wads.OpenLumpNum(sndLump);
+					soundReader.Read(idx.data[i], idx.length[i]);
+
+					if(i == 1 || idx.lump[1] == -1)
+						idx.priority = ReadLittleShort(&idx.data[i][4]);
+				}
+			}
+			while(hasAlternatives && ++i < 3);
+		}
 	}
 
 	CreateHashTable();
 }
 
-const SoundData &SoundInformation::operator[] (const char* logical) const
+static FRandom pr_randsound("RandSound");
+const SoundData	&SoundInformation::operator[] (const SoundIndex &index) const
 {
-	HashIndex *index = &hashTable[MakeKey(logical) % HashIndex::HASHTABLE_SIZE];
-	if(index->index == 0)
-		return nullIndex;
-
-	while(sounds[index->index].logicalName.CompareNoCase(logical) != 0)
-	{
-		index = index->next;
-		if(index == NULL)
-			return nullIndex;
-	}
-
-	return sounds[index->index];
+	const SoundData &ret = sounds[index];
+	if(ret.isAlias)
+		return operator[](ret.aliasLinks[ret.aliasLinks.Size() > 1 ? pr_randsound() % ret.aliasLinks.Size() : 0]);
+	return ret;
 }

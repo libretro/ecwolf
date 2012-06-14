@@ -49,7 +49,7 @@ struct Keygroup
 struct Lock
 {
 	TArray<Keygroup *> keylist;
-	TArray<SoundData> locksound;
+	TArray<SoundIndex> locksound;
 	FString Message;
 	FString RemoteMsg;
 	int	rgb;
@@ -212,8 +212,8 @@ static void ParseLock(Scanner &sc)
 			delete locks[keynum];
 		}
 		locks[keynum] = lock;
-		locks[keynum]->locksound.Push(SoundInfo["*keytry"]);
-		locks[keynum]->locksound.Push(SoundInfo["misc/keytry"]);
+		locks[keynum]->locksound.Push(SoundInfo.FindSound("*keytry"));
+		locks[keynum]->locksound.Push(SoundInfo.FindSound("misc/keytry"));
 		ignorekey=false;
 	}
 	else if (keynum != -1)
@@ -259,7 +259,7 @@ static void ParseLock(Scanner &sc)
 			for (;;)
 			{
 				sc.MustGetToken(TK_StringConst);
-				lock->locksound.Push(SoundInfo[sc->str]);
+				lock->locksound.Push(SoundInfo.FindSound(sc->str));
 				if (!sc.CheckToken(','))
 				{
 					break;
@@ -392,7 +392,7 @@ void P_DeinitKeyMessages()
 bool P_CheckKeys (AActor *owner, int keynum, bool remote)
 {
 	const char *failtext = NULL;
-	SoundData *failsound;
+	SoundIndex *failsound;
 	int numfailsounds;
 
 	if (owner == NULL) return false;
@@ -400,7 +400,7 @@ bool P_CheckKeys (AActor *owner, int keynum, bool remote)
 	// Just a safety precaution. The messages should have been initialized upon game start.
 	if (!keysdone) P_InitKeyMessages();
 
-	SoundData failage[2] = { SoundInfo["*keytry"], SoundInfo["misc/keytry"] };
+	SoundIndex failage[2] = { SoundInfo.FindSound("*keytry"), SoundInfo.FindSound("misc/keytry") };
 
 	if (!locks[keynum]) 
 	{

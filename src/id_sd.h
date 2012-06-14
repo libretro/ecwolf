@@ -32,6 +32,7 @@ typedef enum
 	sds_Off,sds_PC,sds_SoundBlaster
 } SDSMode;
 
+#pragma pack(push, 1)
 typedef struct
 {
 	longword        length;
@@ -110,6 +111,7 @@ typedef struct
 	int valid;
 	fixed globalsoundx, globalsoundy;
 } globalsoundpos;
+#pragma pack(pop)
 
 extern globalsoundpos channelSoundPos[];
 

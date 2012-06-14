@@ -77,6 +77,8 @@ Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), logicalP
 	memcpy(this->data, data, length);
 
 	CheckForWhitespace();
+
+	state.scanPos = scanPos;
 }
 
 Scanner::~Scanner()

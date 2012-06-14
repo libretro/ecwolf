@@ -57,6 +57,7 @@ guard/death6			{ DSGDDTH6 ALGDDTH6 PCGDDTH6 }
 guard/death7			{ DSGDDTH7 ALGDDTH7 PCGDDTH7 }
 guard/death8			{ DSGDDTH8 ALGDDTH8 PCGDDTH8 }
 guard/death9			{ DSGDDTH9 ALGDDTH9 PCGDDTH9 }
+$random guard/death		{ guard/death1 guard/death2 guard/death3 guard/death4 guard/death5 guard/death6 guard/death7 guard/death8 guard/death9 }
 
 wolfss/attack			{ DSSSFIRE ALSSFIRE PCSSFIRE } // This is not the same as Doom 2 since it used the shotgun sound
 wolfss/death			{ DSSSDTH ALSSDTH PCSSDTH }

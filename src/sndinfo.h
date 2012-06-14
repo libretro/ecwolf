@@ -45,7 +45,7 @@ class SoundIndex
 {
 	public:
 		SoundIndex(int index = 0) : index(index) {}
-		SoundIndex(const class FName &str);
+		SoundIndex(const char* logical);
 
 		operator int() const { return index; }
 	private:
@@ -69,15 +69,19 @@ class SoundData
 		byte*			GetData(Type type=ADLIB) const { return data[type]; }
 		unsigned short	GetPriority() const { return priority; }
 		bool			HasType(Type type=ADLIB) const { return lump[type] != -1; }
-		bool			IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1; }
+		bool			IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1 && !isAlias; }
 
 		const SoundData &operator= (const SoundData &other);
 	protected:
 		FString			logicalName;
+		SoundIndex		index;
 		byte*			data[3];
 		int				lump[3];
 		unsigned int	length[3];
 		unsigned short	priority;
+
+		bool				isAlias;
+		TArray<SoundIndex>	aliasLinks;
 
 		friend class SoundInformation;
 };
@@ -88,13 +92,15 @@ class SoundInformation
 		SoundInformation();
 		~SoundInformation();
 
+		SoundIndex		FindSound(const char* logical) const;
 		void			Init();
-		const SoundData	&operator[] (const char* logical) const;
-		const SoundData	&operator[] (const SoundIndex &index) const { sounds[index]; }
+		const SoundData	&operator[] (const char* logical) const { return operator[](FindSound(logical)); }
+		const SoundData	&operator[] (const SoundIndex &index) const;
 
 	protected:
-		void	CreateHashTable();
-		void	ParseSoundInformation(int lumpNum);
+		SoundData	&AddSound(const char* logical);
+		void		CreateHashTable();
+		void		ParseSoundInformation(int lumpNum);
 
 	private:
 		SoundData			nullIndex;

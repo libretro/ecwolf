@@ -30,17 +30,18 @@
 #include <SDL_mixer.h>
 #include "w_wad.h"
 #include "zstring.h"
-#pragma pack(1)
-#include "id_sd.h"
+#include "sndinfo.h"
 #ifdef USE_GPL
 #include "dosbox/dbopl.h"
 #else
 #include "mame/fmopl.h"
 #endif
 #include "wl_main.h"
+#include "id_sd.h"
 
 #define ORIGSAMPLERATE 7042
 
+#pragma pack(push,1)
 typedef struct
 {
 	char RIFF[4];
@@ -67,6 +68,7 @@ typedef struct
 	uint32_t startpage;
 	uint32_t length;
 } digiinfo;
+#pragma pack(pop)
 
 globalsoundpos channelSoundPos[MIX_CHANNELS];
 
