@@ -39,37 +39,6 @@
 #include "wl_main.h"
 #include "id_sd.h"
 
-#define ORIGSAMPLERATE 7042
-
-#pragma pack(push,1)
-typedef struct
-{
-	char RIFF[4];
-	longword filelenminus8;
-	char WAVE[4];
-	char fmt_[4];
-	longword formatlen;
-	word val0x0001;
-	word channels;
-	longword samplerate;
-	longword bytespersec;
-	word bytespersample;
-	word bitspersample;
-} headchunk;
-
-typedef struct
-{
-	char chunkid[4];
-	longword chunklength;
-} wavechunk;
-
-typedef struct
-{
-	uint32_t startpage;
-	uint32_t length;
-} digiinfo;
-#pragma pack(pop)
-
 globalsoundpos channelSoundPos[MIX_CHANNELS];
 
 //      Global variables
@@ -573,63 +542,15 @@ void SD_SetPosition(int channel, int leftpos, int rightpos)
 	}
 }
 
-Sint16 GetSample(float csample, byte *samples, int size)
-{
-	float s0=0, s1=0, s2=0;
-	int cursample = (int) csample;
-	float sf = csample - (float) cursample;
-
-	if(cursample-1 >= 0) s0 = (float) (samples[cursample-1] - 128);
-	s1 = (float) (samples[cursample] - 128);
-	if(cursample+1 < size) s2 = (float) (samples[cursample+1] - 128);
-
-	float val = s0*sf*(sf-1)/2 - s1*(sf*sf-1) + s2*(sf+1)*sf/2;
-	int32_t intval = (int32_t) (val * 256);
-	if(intval < -32768) intval = -32768;
-	else if(intval > 32767) intval = 32767;
-	return (Sint16) intval;
-}
-
 byte* SD_PrepareSound(int which)
 {
 	int size = Wads.LumpLength(which);
 	if(size == 0)
 		return NULL;
 
-	FWadLump soundLump = Wads.OpenLumpNum(which);
-	byte *origsamples = new byte[size];
-	soundLump.Read(origsamples, size);
+	FMemLump soundLump = Wads.ReadLump(which);
 
-	int destsamples = (int) ((float) size * (float) param_samplerate
-		/ (float) ORIGSAMPLERATE);
-
-	byte *wavebuffer = (byte *) malloc(sizeof(headchunk) + sizeof(wavechunk)
-		+ destsamples * 2);     // dest are 16-bit samples
-	if(wavebuffer == NULL)
-		Quit("Unable to allocate wave buffer for sound %i!\n", which);
-
-	headchunk head = {{'R','I','F','F'}, 0, {'W','A','V','E'},
-		{'f','m','t',' '}, 0x10, 0x0001, 1, param_samplerate, param_samplerate*2, 2, 16};
-	wavechunk dhead = {{'d', 'a', 't', 'a'}, destsamples*2};
-	head.filelenminus8 = sizeof(head) + destsamples*2;  // (sizeof(dhead)-8 = 0)
-	memcpy(wavebuffer, &head, sizeof(head));
-	memcpy(wavebuffer+sizeof(head), &dhead, sizeof(dhead));
-
-	// alignment is correct, as wavebuffer comes from malloc
-	// and sizeof(headchunk) % 4 == 0 and sizeof(wavechunk) % 4 == 0
-	Sint16 *newsamples = (Sint16 *)(void *) (wavebuffer + sizeof(headchunk)
-		+ sizeof(wavechunk));
-	float cursample = 0.F;
-	float samplestep = (float) ORIGSAMPLERATE / (float) param_samplerate;
-	for(int i=0; i<destsamples; i++, cursample+=samplestep)
-	{
-		newsamples[i] = GetSample((float)size * (float)i / (float)destsamples,
-			origsamples, size);
-	}
-
-	delete[] origsamples;
-	byte* out = reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(wavebuffer, sizeof(headchunk) + sizeof(wavechunk) + destsamples * 2), 1));
-	free(wavebuffer);
+	byte* out = reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(soundLump.GetMem(), size), 1));
 
 	// TEMPORARY WORK AROUND FOR MEMORY ERROR
 	byte* nout = new byte[sizeof(Mix_Chunk)];

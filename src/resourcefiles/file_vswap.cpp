@@ -38,12 +38,16 @@
 #include "w_wad.h"
 #include "lumpremap.h"
 #include "zstring.h"
+#include "wl_main.h"
 
 // Some sounds in the VSwap file are multiparty so we need mean to concationate
 // them.
 struct FVSwapSound : public FResourceLump
 {
 	protected:
+		static const unsigned int ORIGSAMPLERATE = 7042;
+		static const char WAV_HEADER[44];
+
 		struct Chunk
 		{
 			public:
@@ -53,6 +57,7 @@ struct FVSwapSound : public FResourceLump
 
 		Chunk *chunks;
 		unsigned short numChunks;
+		unsigned int numOrigSamples;
 
 	public:
 		FVSwapSound(int maxNumChunks) : FResourceLump(), numChunks(0)
@@ -60,7 +65,6 @@ struct FVSwapSound : public FResourceLump
 			if(maxNumChunks < 0)
 				maxNumChunks = 0;
 			chunks = new Chunk[maxNumChunks];
-			LumpSize = 0;
 		}
 		~FVSwapSound()
 		{
@@ -76,18 +80,61 @@ struct FVSwapSound : public FResourceLump
 			numChunks++;
 		}
 
+		// Since SDL_mixer sucks, we need to resample our sounds at load time.
+		void CalculateLumpSize()
+		{
+			LumpSize = sizeof(WAV_HEADER);
+			numOrigSamples = 0;
+			for(unsigned int i = 0;i < numChunks;i++)
+				numOrigSamples += chunks[i].length;
+
+			LumpSize += double(numOrigSamples*2*param_samplerate)/ORIGSAMPLERATE;
+		}
+
 		int FillCache()
 		{
+			const unsigned int samples = (LumpSize - sizeof(WAV_HEADER))/2;
+
 			Cache = new char[LumpSize];
+
+			// Copy our template header and update various values
+			memcpy(Cache, WAV_HEADER, sizeof(WAV_HEADER));
+			*(DWORD*)(Cache+4) = LittleLong(samples*2 + sizeof(WAV_HEADER) - 8);
+			*(DWORD*)(Cache+24) = LittleLong(param_samplerate);
+			*(DWORD*)(Cache+28) = LittleLong(param_samplerate*2);
+			*(DWORD*)(Cache+sizeof(WAV_HEADER)-4) = LittleLong(samples*2);
+
+			// Read original data
+			BYTE* origdata = new BYTE[numOrigSamples];
 			unsigned int pos = 0;
-			for(unsigned int i = 0;i < numChunks;i++)
+			unsigned int i;
+			for(i = 0;i < numChunks;i++)
 			{
 				Owner->Reader->Seek(chunks[i].offset, SEEK_SET);
-				Owner->Reader->Read(Cache+pos, chunks[i].length);
+				Owner->Reader->Read(origdata+pos, chunks[i].length);
 				pos += chunks[i].length;
 			}
+
+			// Do resampling to param_samplerate 16-bit with linear interpolation
+			static const fixed sampleStep = ((double)ORIGSAMPLERATE / param_samplerate)*FRACUNIT;
+			SWORD* data = (SWORD*)(Cache+sizeof(WAV_HEADER));
+			i = 0;
+			for(fixed sample = 0;i++ < samples;sample += sampleStep)
+			{
+				SWORD curSample = (SWORD(origdata[(sample>>FRACBITS)]) - 128)<<8;
+				SWORD nextSample = (sample>>FRACBITS)+1 < numOrigSamples ? (SWORD(origdata[(sample>>FRACBITS)+1]) - 128)<<8 : curSample;
+
+				*data++ = curSample + (((sample&0xFFFF)*fixed(nextSample-curSample))>>FRACBITS);
+			}
+			delete[] origdata;
 			return 1;
 		}
+};
+const char FVSwapSound::WAV_HEADER[44] = {
+	'R','I','F','F',0,0,0,0,'W','A','V','E',
+	'f','m','t',' ',16,0,0,0,1,0,1,0,
+	0x82,0x17,0,0,0x37,0x04,0,0,1,0,16,0,
+	'd','a','t','a',0,0,0,0
 };
 
 class FVSwap : public FResourceFile
@@ -170,6 +217,7 @@ class FVSwap : public FResourceFile
 				SoundLumps[i]->Namespace = ns_sounds;
 				for(unsigned int j = start;j < end && end + soundStart < numChunks;j++)
 					SoundLumps[i]->AddChunk(ReadLittleLong(&data[(soundStart+j)*4]), ReadLittleShort(&data[(soundStart+j)*2 + numChunks*4]));
+				SoundLumps[i]->CalculateLumpSize();
 			}
 			delete[] soundMap;
 

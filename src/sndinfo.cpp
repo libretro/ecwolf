@@ -239,6 +239,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 					sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
 				SoundData &alias = AddSound(sc->str);
 				alias.isAlias = true;
+				alias.aliasLinks.Clear();
 
 				if(isRandom)
 					sc.MustGetToken('{');
@@ -260,7 +261,14 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 			assert(sc->str[0] != '}');
 
 			SoundData &idx = AddSound(sc->str);
+			// Initialize/clean in case we're replacing
 			idx.isAlias = false;
+			for(unsigned int i = 0;i < 3;++i)
+			{
+				delete[] idx.data[i];
+				idx.data[i] = NULL;
+				idx.length[i] = -1;
+			}
 
 			bool hasAlternatives = false;
 
