@@ -5,8 +5,17 @@
 
 #include "m_crc32.h"
 
-inline unsigned int MakeKey(const char *s, size_t len) { return CalcCRC32((const BYTE*)s, len); }
-inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s)); }
+static inline unsigned int MakeKey(const char *s, size_t len)
+{
+	BYTE* hashString = new BYTE[len];
+	memcpy(hashString, s, len);
+	for(size_t i = 0;i < len;++i)
+		hashString[i] = tolower(*s++);
+	const unsigned int ret = CalcCRC32(hashString, len);
+	delete[] hashString;
+	return ret;
+}
+static inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s)); }
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #ifndef __BIG_ENDIAN__

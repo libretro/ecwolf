@@ -67,6 +67,7 @@ static const char* text;
 static unsigned rowon;
 
 static byte    fontcolor;
+static EColorRange textcolor;
 static int     picx;
 static int     picy;
 static FTextureID picnum;
@@ -154,6 +155,7 @@ void ParsePicCommand (bool helphack, bool norip=false)
 		while(*++text != ']')
 			++len;
 		picnum = TexMan.GetTexture(FString(texName, len), FTexture::TEX_Any);
+		Printf("Looking up %s\n", FString(texName, len).GetChars());
 		++text;
 	}
 	else
@@ -260,18 +262,30 @@ void HandleCommand (bool helphack)
 
 		case 'C':               // ^c<hex digit> changes text color
 			i = toupper(*++text);
-			if (i>='0' && i<='9')
-				fontcolor = i-'0';
-			else if (i>='A' && i<='F')
-				fontcolor = i-'A'+10;
+			if(i == '[') // Textcolo translation
+			{
+				fontcolor = 255;
+				const BYTE *colorname = (const BYTE *)(text);
+				textcolor = V_ParseFontColor(colorname, CR_UNTRANSLATED, CR_UNTRANSLATED+1);
+				while(*text++ != ']');
+			}
+			else
+			{
+				textcolor = CR_UNTRANSLATED;
 
-			fontcolor *= 16;
-			i = toupper(*++text);
-			if (i>='0' && i<='9')
-				fontcolor += i-'0';
-			else if (i>='A' && i<='F')
-				fontcolor += i-'A'+10;
-			text++;
+				if (i>='0' && i<='9')
+					fontcolor = i-'0';
+				else if (i>='A' && i<='F')
+					fontcolor = i-'A'+10;
+
+				fontcolor *= 16;
+				i = toupper(*++text);
+				if (i>='0' && i<='9')
+					fontcolor += i-'0';
+				else if (i>='A' && i<='F')
+					fontcolor += i-'A'+10;
+				text++;
+			}
 			break;
 
 		case '>':
@@ -438,7 +452,10 @@ void HandleWord (void)
 	// print it
 	//
 	newpos = px+wwidth;
-	VWB_DrawPropString (SmallFont, wword, CR_UNTRANSLATED, true, fontcolor);
+	if(fontcolor == 255 || textcolor != CR_UNTRANSLATED)
+		VWB_DrawPropString (SmallFont, wword, textcolor);
+	else
+		VWB_DrawPropString (SmallFont, wword, CR_UNTRANSLATED, true, fontcolor);
 	px = newpos;
 
 	//
