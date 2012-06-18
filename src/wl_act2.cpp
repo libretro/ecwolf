@@ -181,14 +181,14 @@ ACTION_FUNCTION(A_CustomMissile)
 
 	int32_t deltax,deltay;
 	float   angle;
-	int     iangle;
+	angle_t iangle;
 
 	deltax = players[0].mo->x - self->x;
 	deltay = self->y - players[0].mo->y;
 	angle = (float) atan2 ((float) deltay, (float) deltax);
 	if (angle<0)
 		angle = (float) (M_PI*2+angle);
-	iangle = (int) (angle*ANGLE_180/M_PI);
+	iangle = (angle_t) (angle*ANGLE_180/M_PI);
 
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)

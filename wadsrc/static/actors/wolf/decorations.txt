@@ -175,7 +175,6 @@ actor RedCeilingLight 85
 actor KitchenStuff 48
 {
 	radius 32
-	+SOLID
 	states
 	{
 		Spawn:
@@ -245,7 +244,6 @@ actor BunkBed 55
 actor Basket 56
 {
 	radius 32
-	+SOLID
 	states
 	{
 		Spawn:
@@ -314,6 +312,8 @@ actor Flag 72
 
 actor CallApogee 73
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -355,7 +355,6 @@ actor Bones4 76
 actor Pots 77
 {
 	radius 32
-	+SOLID
 	states
 	{
 		Spawn:
