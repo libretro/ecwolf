@@ -646,7 +646,7 @@ void Died (void)
 		if (fangle<0)
 			fangle = (float) (M_PI*2+fangle);
 
-		iangle = (int) (fangle*ANGLE_180/M_PI);
+		iangle = (angle_t) (fangle*ANGLE_180/M_PI);
 	}
 	else
 	{

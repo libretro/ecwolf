@@ -116,7 +116,7 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 		if(spot->slideAmount[dir] != 0xffff)
 			return 0;
 	}
-	for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
+	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
 	{
 		if((iter->Item()->flags & FL_SOLID) &&
 			iter->Item()->tilex == x &&
@@ -660,8 +660,9 @@ moveok:
 	ob->distance -=move;
 
 	// Check for touching objects
-	for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
+	for(AActor::Iterator *next = NULL, *iter = AActor::GetIterator();iter;iter = next)
 	{
+		next = iter->Next();
 		AActor *check = iter->Item();
 		if(check == ob || (check->flags & FL_SOLID))
 			continue;

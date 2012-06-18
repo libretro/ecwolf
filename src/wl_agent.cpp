@@ -680,8 +680,9 @@ bool TryMove (AActor *ob)
 	//
 	// check for actors
 	//
-	for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
+	for(AActor::Iterator *next = NULL, *iter = AActor::GetIterator();iter;iter = next)
 	{
+		next = iter->Next();
 		if(iter->Item() == ob)
 			continue;
 

@@ -150,7 +150,7 @@ class EVDoor : public Thinker
 					if(wait == 0)
 					{
 						bool hold = false;
-						for(AActor::Iterator *iter = AActor::actors.Head();iter;iter = iter->Next())
+						for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
 						{
 							if(direction == 0)
 							{
