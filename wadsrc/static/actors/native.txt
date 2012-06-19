@@ -24,7 +24,7 @@ actor Actor native
 
 	action native A_BossDeath();
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
-	action native A_CustomMissile(string missiletype);
+	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0);
 	action native A_DeathScream();
 	action native A_Dormant();
 	action native A_Fall();

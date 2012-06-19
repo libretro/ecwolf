@@ -145,10 +145,10 @@ actor DeathKnight 26
 			DKNT E 15
 			DKNT F 5
 			DKNT H 0 A_WolfAttack
-			DKNT H 5 A_CustomMissile("Rocket")
+			DKNT H 5 A_CustomMissile("Rocket", 32, 0, 4)
 			DKNT G 5 A_WolfAttack
 			DKNT H 0 A_WolfAttack
-			DKNT H 5 A_CustomMissile("Rocket")
+			DKNT H 5 A_CustomMissile("Rocket", 32, 0, -4)
 			DKNT H 0 A_WolfAttack
 			goto See
 		Death:
