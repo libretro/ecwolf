@@ -544,10 +544,7 @@ int CalcRotate (AActor *ob)
 
 	viewangle = players[0].mo->angle + (centerx - ob->viewx)/8;
 
-	if(ob->dir != nodir)
-		angle = viewangle - dirangle[ob->dir];
-	else
-		angle = viewangle - ob->angle;
+	angle = viewangle - ob->angle;
 
 	angle+=ANGLE_45/2;
 

@@ -391,6 +391,8 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 	actor->y = y;
 	actor->tilex = x>>FRACBITS;
 	actor->tiley = y>>FRACBITS;
+	actor->velx = 0;
+	actor->vely = 0;
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);

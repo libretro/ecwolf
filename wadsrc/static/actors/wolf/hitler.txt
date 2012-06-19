@@ -88,7 +88,7 @@ actor MechaHitler 19
 			MECH H 5 A_Fall
 			MECH I 5 A_DeathScream
 			MECH J 5
-			MECH K -1 A_SpawnItem("Hitler")
+			MECH K -1 A_SpawnItemEx("Hitler", 0, 0, 0, 0, 0, 0, 0, SXF_TRANSFERPOINTERS)
 			stop
 	}
 }

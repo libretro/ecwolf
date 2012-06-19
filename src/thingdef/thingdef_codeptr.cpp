@@ -38,6 +38,7 @@
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
 #include "wl_agent.h"
+#include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_play.h"
 #include "wl_state.h"
@@ -174,15 +175,19 @@ ACTION_FUNCTION(A_PlaySound)
 ACTION_FUNCTION(A_SpawnItem)
 {
 	ACTION_PARAM_STRING(className, 0);
+	ACTION_PARAM_DOUBLE(distance, 1);
+	ACTION_PARAM_DOUBLE(zheight, 2);
 
 	const ClassDef *cls = ClassDef::FindClass(className);
 	if(cls == NULL)
 		return;
 
-	AActor *newobj = AActor::Spawn(cls, self->x, self->y, 0);
+	AActor *newobj = AActor::Spawn(cls,
+		self->x + fixed(distance*finecosine[self->angle>>ANGLETOFINESHIFT])/64,
+		self->y - fixed(distance*finesine[self->angle>>ANGLETOFINESHIFT])/64,
+		0);
 }
 
-#if 0
 static FRandom pr_spawnitemex("SpawnItemEx");
 ACTION_FUNCTION(A_SpawnItemEx)
 {
@@ -209,11 +214,25 @@ ACTION_FUNCTION(A_SpawnItemEx)
 	if(cls == NULL)
 		return;
 
-	fixed x = self->x;// + FixedMul(xoffset, finecosine[angle/FINEANGLES]) + FixedMul(yoffset, finesine[angle/FINEANGLES]);
-	fixed y = self->y;// + FixedMul(xoffset, finesine[angle/FINEANGLES]) - FixedMul(yoffset, finecosine[angle/FINEANGLES;
-	angle = angle/ANGLES + self->angle;
+	angle_t ang = self->angle>>ANGLETOFINESHIFT;
+
+	fixed x = self->x + fixed(xoffset*finecosine[ang])/64 + fixed(yoffset*finesine[ang])/64;
+	fixed y = self->y - fixed(xoffset*finesine[ang])/64 - fixed(yoffset*finecosine[ang])/64;
+	angle = angle_t((angle*ANGLE_45)/45) + self->angle;
 
 	AActor *newobj = AActor::Spawn(cls, x, y, 0);
+
+	if(flags & SXF_TRANSFERPOINTERS)
+	{
+		newobj->flags |= self->flags&(FL_ATTACKMODE|FL_FIRSTATTACK);
+		newobj->flags &= ~(~self->flags&(FL_PATHING));
+		if(newobj->flags & FL_ATTACKMODE)
+			newobj->speed = newobj->runspeed;
+	}
+
 	newobj->angle = angle;
+
+	//We divide by 128 here since Wolf is 70hz instead of 35.
+	newobj->velx = (fixed(xvel*finecosine[ang]) + fixed(yvel*finesine[ang]))/128;
+	newobj->vely = (-fixed(xvel*finesine[ang]) + fixed(yvel*finecosine[ang]))/128;
 }
-#endif

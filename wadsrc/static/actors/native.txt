@@ -7,6 +7,8 @@ const int CPF_ALWAYSPLAYSOUND = 2;
 
 const int WAF_NORANDOM = 1;
 
+const int SXF_TRANSFERPOINTERS = 1;
+
 actor Actor native
 {
 	damage 0
@@ -32,7 +34,8 @@ actor Actor native
 	action native A_MeleeAttack(int damage, float accuracy = 0.6275);
 	action native A_MonsterRefire(int chance, state abort);
 	action native A_PlaySound(string soundname);
-	action native A_SpawnItem(string type);
+	action native A_SpawnItem(string type, float distance = 0, float zheight = 0);
+	action native A_SpawnItemEx(string type, float xoffset = 0, float yoffset = 0, float zoffset = 0, float xvel = 0, float yvel = 0, float zvel = 0, float angle = 0, int flags = 0, int failchance = 0);
 	action native A_WolfAttack(int flags = 0, string sound = "*", float snipe = 1.0, int maxdamage = 64, int blocksize = 128, int pointblank = 2, int longrange = 4, float runspeed = 160.0);
 
 	states

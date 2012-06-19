@@ -135,6 +135,7 @@ class AActor
 		dirtype	dir;
 
 		fixed	x, y;
+		fixed	velx, vely;
 		word	tilex, tiley;
 
 		angle_t	angle;

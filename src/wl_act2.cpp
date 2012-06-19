@@ -121,19 +121,11 @@ bool ProjectileTryMove (AActor *ob)
 
 void T_Projectile (AActor *self)
 {
-	fixed deltax = FixedMul(self->speed,finecosine[self->angle>>ANGLETOFINESHIFT]);
-	fixed deltay = -FixedMul(self->speed,finesine[self->angle>>ANGLETOFINESHIFT]);
+	self->x += self->velx;
+	self->y += self->vely;
 
-	if (deltax>0x10000l)
-		deltax = 0x10000l;
-	if (deltay>0x10000l)
-		deltay = 0x10000l;
-
-	self->x += deltax;
-	self->y += deltay;
-
-	deltax = LABS(self->x - players[0].mo->x);
-	deltay = LABS(self->y - players[0].mo->y);
+	fixed deltax = LABS(self->x - players[0].mo->x);
+	fixed deltay = LABS(self->y - players[0].mo->y);
 	fixed radius = players[0].mo->radius + self->radius;
 
 	if (!ProjectileTryMove (self))
@@ -195,6 +187,9 @@ ACTION_FUNCTION(A_CustomMissile)
 		return;
 	AActor *newobj = AActor::Spawn(cls, self->x, self->y, 0);
 	newobj->angle = iangle;
+
+	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);
+	newobj->vely = -FixedMul(newobj->speed,finesine[iangle>>ANGLETOFINESHIFT]);
 }
 
 //
@@ -387,6 +382,8 @@ ACTION_FUNCTION(A_Chase)
 			SelectChaseDir (self);
 		if (self->dir == nodir)
 			return; // object is blocked in
+		else
+			self->angle = dirangle[self->dir];
 	}
 
 	move = self->speed;
@@ -438,6 +435,8 @@ ACTION_FUNCTION(A_Chase)
 
 		if (self->dir == nodir)
 			return; // object is blocked in
+		else
+			self->angle = dirangle[self->dir];
 	}
 }
 
