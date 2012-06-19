@@ -42,46 +42,128 @@
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "r_sprites.h"
+#include "resourcefiles/resourcefile.h"
 
-GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL)
+GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL), file(NULL)
 {
-	markerLump = Wads.GetNumForName(map);
-	if(markerLump == -1)
-		return;
+	lumps[0] = NULL;
 
-	if(strcmp(Wads.GetLumpFullName(markerLump+1), "PLANES") == 0)
+	// Find the map
+	markerLump = Wads.CheckNumForName(map);
+
+	// PK3 format maps
+	FString mapWad;
+	mapWad.Format("maps/%s.wad", map.GetChars());
+
+	int wadLump = Wads.CheckNumForFullName(mapWad);
+	if(wadLump > markerLump)
 	{
-		numLumps = 1;
-		ReadPlanesData();
+		isWad = true;
+		markerLump = wadLump;
+	}
+	else
+		isWad = false;
+
+	if(markerLump == -1)
+	{
+		Quit("Could not find map %s!", map.GetChars());
+		return;
+	}
+
+	// Hmm... What follows is some massive copy and paste, but I can't really
+	// think of a cleaner way to do this.
+	// Anyways, if we have a wad we need to open a resource file for it.
+	// Otherwise we open the relevent lumps.
+	if(isWad)
+	{
+		file = FResourceFile::OpenResourceFile(mapWad.GetChars(), Wads.ReopenLumpNum(markerLump), true);
+		if(!file || file->LumpCount() < 2) // Maps must be 2 lumps in size
+			return;
+
+		// First lump is assumed marker
+		FResourceLump *lump = file->GetLump(1);
+		if(stricmp(lump->Name, "PLANES") == 0)
+		{
+			numLumps = 1;
+			lumps[0] = lump->NewReader();
+			ReadPlanesData();
+		}
+		else
+		{
+			if(stricmp(lump->Name, "TEXTMAP") != 0)
+			{
+				Quit("Invalid map format for %s!", map.GetChars());
+				return;
+			}
+			else
+			{
+				lumps[0] = lump->NewReader();
+			}
+
+			for(unsigned int i = 2;i < file->LumpCount();++i)
+			{
+				lump = file->GetLump(i);
+				if(stricmp(lump->Name, "ENDMAP") == 0)
+				{
+					valid = true;
+					break;
+				}
+				numLumps++;
+			}
+			if(!valid)
+			{
+				Quit("ENDMAP not found for map %s!", map.GetChars());
+				return;
+			}
+			ReadUWMFData();
+		}
 	}
 	else
 	{
-		// Expect UWMF formatted map.
-		if(strcmp(Wads.GetLumpFullName(markerLump+1), "TEXTMAP") != 0)
+		if(strcmp(Wads.GetLumpFullName(markerLump+1), "PLANES") == 0)
 		{
-			Quit("Invalid map format for %s!\n", map.GetChars());
-			return;
+			numLumps = 1;
+			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			ReadPlanesData();
 		}
-		for(int i = 2;i < Wads.GetNumLumps();i++)
+		else
 		{
-			if(strcmp(Wads.GetLumpFullName(markerLump+i), "ENDMAP") == 0)
+			// Expect UWMF formatted map.
+			if(strcmp(Wads.GetLumpFullName(markerLump+1), "TEXTMAP") != 0)
 			{
-				valid = true;
-				break;
+				Quit("Invalid map format for %s!", map.GetChars());
+				return;
 			}
-			numLumps++;
+			else
+			{
+				lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			}
+
+			for(int i = 2;i < Wads.GetNumLumps();i++)
+			{
+				if(strcmp(Wads.GetLumpFullName(markerLump+i), "ENDMAP") == 0)
+				{
+					valid = true;
+					break;
+				}
+				numLumps++;
+			}
+			if(!valid)
+			{
+				Quit("ENDMAP not found for map %s!", map.GetChars());
+				return;
+			}
+			ReadUWMFData();
 		}
-		if(!valid)
-		{
-			Quit("ENDMAP not found for map %s!\n", map.GetChars());
-			return;
-		}
-		ReadUWMFData();
 	}
 }
 
 GameMap::~GameMap()
 {
+	if(isWad)
+		delete file;
+	delete lumps[0];
+
 	for(unsigned int i = 0;i < planes.Size();++i)
 		delete[] planes[i].map;
 	UnloadLinks();

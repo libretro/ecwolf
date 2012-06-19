@@ -1239,7 +1239,8 @@ int FTextureManager::CountLumpTextures (int lumpnum)
 void FTextureManager::PrecacheLevel (void)
 {
 	BYTE *hitlist;
-	int cnt = NumTextures();
+	// We use +1 to account for unknown textures
+	int cnt = NumTextures()+1;
 
 //	if (demoplayback)
 //		return;
@@ -1247,11 +1248,11 @@ void FTextureManager::PrecacheLevel (void)
 	hitlist = new BYTE[cnt];
 	memset (hitlist, 0, cnt);
 
-	map->GetHitlist(hitlist);
+	map->GetHitlist(hitlist+1);
 	unsigned int numcached = 0;
-	for (int i = cnt - 1; i >= 0; i--)
+	for (int i = cnt - 1; i > 0; i--)
 	{
-		FTexture *tex = ByIndex(i);
+		FTexture *tex = ByIndex(i-1);
 		if(hitlist[i] & 1)
 		{
 			const FTexture::Span *spanp;

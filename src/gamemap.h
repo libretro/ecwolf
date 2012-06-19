@@ -173,8 +173,12 @@ class GameMap
 		FString	map;
 
 		bool	valid;
+		bool	isWad;
 		int		markerLump;
 		int		numLumps;
+
+		class FResourceFile	*file;
+		class FileReader	*lumps[1];
 
 		// Actual map data
 		Header			header;

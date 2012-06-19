@@ -463,8 +463,11 @@ class UWMFParser
 
 void GameMap::ReadUWMFData()
 {
-	FMemLump lmp = Wads.ReadLump(markerLump+1);
-	Scanner sc((const char*)lmp.GetMem(), lmp.GetSize());
+	long size = lumps[0]->GetLength();
+	char *data = new char[size];
+	lumps[0]->Read(data, size);
+	Scanner sc(data, size);
+	delete[] data;
 
 	// Read TEXTMAP
 	UWMFParser parser(this, sc);

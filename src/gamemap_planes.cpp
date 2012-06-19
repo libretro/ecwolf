@@ -48,22 +48,22 @@ void GameMap::ReadPlanesData()
 	// Old format maps always have a tile size of 64
 	header.tileSize = UNIT;
 
-	FWadLump lump = Wads.OpenLumpNum(markerLump+1);
+	FileReader *lump = lumps[0];
 
 	// Read plane count
-	lump.Seek(10, SEEK_SET);
+	lump->Seek(10, SEEK_SET);
 	WORD numPlanes;
-	lump.Read(&numPlanes, 2);
+	lump->Read(&numPlanes, 2);
 	numPlanes = LittleShort(numPlanes);
 
-	lump.Seek(14, SEEK_SET);
+	lump->Seek(14, SEEK_SET);
 	char name[16];
-	lump.Read(name, 16);
+	lump->Read(name, 16);
 	header.name = name;
 
-	lump.Seek(30, SEEK_SET);
+	lump->Seek(30, SEEK_SET);
 	WORD dimensions[2];
-	lump.Read(dimensions, 4);
+	lump->Read(dimensions, 4);
 	dimensions[0] = LittleShort(dimensions[0]);
 	dimensions[1] = LittleShort(dimensions[1]);
 	DWORD size = dimensions[0]*dimensions[1];
@@ -80,7 +80,7 @@ void GameMap::ReadPlanesData()
 	for(int plane = 0;plane < numPlanes && plane < NUM_USABLE_PLANES;++plane)
 	{
 		WORD* oldplane = new WORD[size];
-		lump.Read(oldplane, size*2);
+		lump->Read(oldplane, size*2);
 
 		switch(plane)
 		{
