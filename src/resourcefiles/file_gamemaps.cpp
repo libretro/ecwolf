@@ -63,7 +63,7 @@ class FGamemaps : public FResourceFile
 };
 
 #define PLANES 3
-#define HEADERSIZE 20
+#define HEADERSIZE 34
 #define CARMACK_NEARTAG	static_cast<char>(0xA7)
 #define CARMACK_FARTAG	static_cast<char>(0xA8)
 
@@ -151,9 +151,11 @@ struct FMapLump : public FResourceLump
 			unsigned int PlaneSize = Header.Width*Header.Height*2;
 
 			Cache = new char[LumpSize];
-			WriteLittleShort((BYTE*)&Cache[0], Header.Width);
-			WriteLittleShort((BYTE*)&Cache[2], Header.Height);
-			memcpy(&Cache[4], Header.Name, 16);
+			strcpy(Cache, "WDC3.1");
+			WriteLittleShort((BYTE*)&Cache[10], 3);
+			WriteLittleShort((BYTE*)&Cache[HEADERSIZE-4], Header.Width);
+			WriteLittleShort((BYTE*)&Cache[HEADERSIZE-2], Header.Height);
+			memcpy(&Cache[14], Header.Name, 16);
 
 			// Read map data and expand it
 			for(unsigned int i = 0;i < PLANES;i++)

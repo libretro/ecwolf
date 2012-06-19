@@ -41,7 +41,7 @@
 void GameMap::ReadPlanesData()
 {
 	static const unsigned short UNIT = 64;
-	enum OldPlanes { Plane_Tiles, Plane_Object, Plane_Flats, NUM_OLD_PLANES };
+	enum OldPlanes { Plane_Tiles, Plane_Object, Plane_Flats, NUM_USABLE_PLANES };
 
 	valid = true;
 
@@ -49,19 +49,26 @@ void GameMap::ReadPlanesData()
 	header.tileSize = UNIT;
 
 	FWadLump lump = Wads.OpenLumpNum(markerLump+1);
-	lump.Seek(0, SEEK_SET);
 
-	WORD dimensions[2];
-	lump.Read(dimensions, 4);
-	LittleShort(dimensions[0]);
-	LittleShort(dimensions[1]);
-	DWORD size = dimensions[0]*dimensions[1];
-	header.width = dimensions[0];
-	header.height = dimensions[1];
+	// Read plane count
+	lump.Seek(10, SEEK_SET);
+	WORD numPlanes;
+	lump.Read(&numPlanes, 2);
+	numPlanes = LittleShort(numPlanes);
 
+	lump.Seek(14, SEEK_SET);
 	char name[16];
 	lump.Read(name, 16);
 	header.name = name;
+
+	lump.Seek(30, SEEK_SET);
+	WORD dimensions[2];
+	lump.Read(dimensions, 4);
+	dimensions[0] = LittleShort(dimensions[0]);
+	dimensions[1] = LittleShort(dimensions[1]);
+	DWORD size = dimensions[0]*dimensions[1];
+	header.width = dimensions[0];
+	header.height = dimensions[1];
 
 	Plane &mapPlane = NewPlane();
 	mapPlane.depth = UNIT;
@@ -70,7 +77,7 @@ void GameMap::ReadPlanesData()
 	// tiles plane instead of the objects plane.
 	TArray<WORD> ambushSpots;
 
-	for(int plane = 0;plane < NUM_OLD_PLANES;++plane)
+	for(int plane = 0;plane < numPlanes && plane < NUM_USABLE_PLANES;++plane)
 	{
 		WORD* oldplane = new WORD[size];
 		lump.Read(oldplane, size*2);
