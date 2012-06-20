@@ -217,7 +217,7 @@ ACTION_FUNCTION(A_SpawnItemEx)
 	angle_t ang = self->angle>>ANGLETOFINESHIFT;
 
 	fixed x = self->x + fixed(xoffset*finecosine[ang])/64 + fixed(yoffset*finesine[ang])/64;
-	fixed y = self->y - fixed(xoffset*finesine[ang])/64 - fixed(yoffset*finecosine[ang])/64;
+	fixed y = self->y - fixed(xoffset*finesine[ang])/64 + fixed(yoffset*finecosine[ang])/64;
 	angle = angle_t((angle*ANGLE_45)/45) + self->angle;
 
 	AActor *newobj = AActor::Spawn(cls, x, y, 0);

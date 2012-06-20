@@ -189,8 +189,8 @@ ACTION_FUNCTION(A_CustomMissile)
 	if(!cls)
 		return;
 	AActor *newobj = AActor::Spawn(cls,
-		self->x + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64,
-		self->y - spawnoffset*finesine[self->angle>>ANGLETOFINESHIFT]/64,
+		self->x + spawnoffset*finesine[self->angle>>ANGLETOFINESHIFT]/64,
+		self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64,
 		0);
 	newobj->angle = iangle;
 
