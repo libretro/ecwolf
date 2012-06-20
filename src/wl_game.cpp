@@ -623,7 +623,7 @@ void Died (void)
 {
 	float   fangle;
 	int32_t dx,dy;
-	angle_t iangle,curangle,clockwise,counter,change;
+	angle_t iangle,change;
 
 	if (screenfaded)
 	{
@@ -652,20 +652,9 @@ void Died (void)
 		iangle = players[0].mo->angle + ANGLE_180;
 	}
 
-	if (players[0].mo->angle > iangle)
-	{
-		counter = players[0].mo->angle - iangle;
-		clockwise = players[0].mo->angle + iangle;
-	}
-	else
-	{
-		clockwise = iangle - players[0].mo->angle;
-		counter = players[0].mo->angle - iangle;
-	}
+	angle_t &curangle = players[0].mo->angle;
 
-	curangle = players[0].mo->angle;
-
-	if (clockwise<counter)
+	if (curangle - iangle > ANGLE_180)
 	{
 		//
 		// rotate clockwise
@@ -673,11 +662,10 @@ void Died (void)
 		do
 		{
 			change = tics*DEATHROTATE;
-			if (curangle + change > iangle)
+			if (curangle - iangle < change)
 				change = iangle-curangle;
 
 			curangle += change;
-			players[0].mo->angle += change;
 
 			ThreeDRefresh ();
 			CalcTics ();
@@ -691,11 +679,10 @@ void Died (void)
 		do
 		{
 			change = tics*DEATHROTATE;
-			if (curangle - change < iangle)
+			if (curangle - iangle < change)
 				change = curangle - iangle;
 
 			curangle -= change;
-			players[0].mo->angle -= change;
 
 			ThreeDRefresh ();
 			CalcTics ();
