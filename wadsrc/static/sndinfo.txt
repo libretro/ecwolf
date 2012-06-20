@@ -38,6 +38,7 @@ weapon/pistol/attack	{ DSPISTOL ALPISTOL PCPISTOL }
 
 weapon/machine/attack	{ DSMGUN ALMGUN PCMGUN }
 weapon/machine/pickup	{ NULL ALMGUNUP PCMGUNUP }
+$alias misc/w_pkup		weapon/machine/pickup
 
 weapon/gatling/attack	{ DSCGUN ALCGUN PCCGUN }
 weapon/gatling/pickup	{ NULL ALCGUNUP PCCGUNUP }

@@ -55,7 +55,10 @@ HANDLE_PROPERTY(ammogive1)
 HANDLE_PROPERTY(ammotype1)
 {
 	STRING_PARAM(type, 0);
-	((AWeapon *)defaults)->ammotype1 = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
+	if(stricmp(type, "none") == 0 || *type == '\0')
+		((AWeapon *)defaults)->ammotype1 = NULL;
+	else
+		((AWeapon *)defaults)->ammotype1 = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
 }
 
 HANDLE_PROPERTY(ammouse1)

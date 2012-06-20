@@ -77,6 +77,10 @@ actor ScoreItem : Inventory native
 
 actor Weapon : Inventory native
 {
+	inventory.pickupsound "misc/w_pkup"
+	weapon.ammotype1 "None"
+	weapon.ammogive1 0
+	weapon.ammouse1 0
 	weapon.yadjust 0
 
 	action native A_CustomPunch(int damage, bool norandom=false, int flags=0, string pufftype="", float range=0, float lifesteal=0); 
