@@ -23,9 +23,6 @@ extern  fixed    scale;
 extern  fixed    pspritexscale;
 extern  fixed    pspriteyscale;
 extern  fixed    yaspect;
-
-extern	angle_t	dirangle[9];
-
 extern  int      mouseadjustment;
 extern  int      shootdelta;
 extern  unsigned screenofs;

@@ -24,8 +24,8 @@ actor Hans 16
 			HANS D 4 NOP A_Chase
 			loop
 		Missile:
-			HANS E 15
-			HANS F 5
+			HANS E 15 A_FaceTarget
+			HANS F 5 A_FaceTarget
 			HANS GFGFGE 5 A_WolfAttack(0, "*", 0.667)
 			goto See
 		Death:
@@ -63,8 +63,8 @@ actor Gretel 20
 			GRET D 4 NOP A_Chase
 			loop
 		Missile:
-			GRET E 15
-			GRET F 5
+			GRET E 15 A_FaceTarget
+			GRET F 5 A_FaceTarget
 			GRET GFGFGE 5 A_WolfAttack
 			goto See
 		Death:
@@ -116,8 +116,9 @@ actor Schabbs 17
 			SHAB D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
-			SHAB E 15
-			SHAB F 5
+			SHAB E 15 A_FaceTarget
+			SHAB F 5 A_FaceTarget
+			SHAB F 0 A_FaceTarget
 			SHAB F 0 A_CustomMissile("Needle")
 			goto See
 		Death:
@@ -155,8 +156,9 @@ actor Gift 21
 			GIFT D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
-			GIFT E 15
-			GIFT F 5
+			GIFT E 15 A_FaceTarget
+			GIFT F 5 A_FaceTarget
+			GIFT F 0 A_FaceTarget
 			GIFT F 0 A_CustomMissile("Rocket")
 			goto See
 		Death:
@@ -194,8 +196,9 @@ actor FatFace 22
 			FATF D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
-			FATF E 15
-			FATF F 5
+			FATF E 15 A_FaceTarget
+			FATF F 5 A_FaceTarget
+			FATF G 0 A_FaceTarget
 			FATF G 5 A_CustomMissile("Rocket")
 			FATF HGH 5 A_WolfAttack
 			FATF H 0 A_WolfAttack

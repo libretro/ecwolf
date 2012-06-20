@@ -72,9 +72,6 @@
 =============================================================================
 */
 
-angle_t dirangle[9] = {0,ANGLE_45,2*ANGLE_45,3*ANGLE_45,4*ANGLE_45,
-					5*ANGLE_45,6*ANGLE_45,7*ANGLE_45,0};
-
 //
 // proejection variables
 //

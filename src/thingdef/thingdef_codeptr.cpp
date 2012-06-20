@@ -36,6 +36,7 @@
 #include "id_sd.h"
 #include "m_random.h"
 #include "thingdef/thingdef.h"
+#include "wl_act.h"
 #include "wl_def.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
@@ -106,12 +107,18 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-bool CheckMeleeRange(AActor *actor1, AActor *actor2);
-
 ACTION_FUNCTION(A_BossDeath)
 {
 	// TODO: Check if all enemies of same type are dead and then call a defined function.
 	playstate = ex_victorious;
+}
+
+ACTION_FUNCTION(A_FaceTarget)
+{
+	ACTION_PARAM_DOUBLE(max_turn, 0);
+	ACTION_PARAM_DOUBLE(max_pitch, 1);
+
+	A_Face(self, players[0].mo, angle_t(max_turn*ANGLE_45/45));
 }
 
 ACTION_FUNCTION(A_Fall)
@@ -139,6 +146,7 @@ ACTION_FUNCTION(A_MeleeAttack)
 	ACTION_PARAM_INT(damage, 0);
 	ACTION_PARAM_INT(accuracy, 1);
 
+	A_Face(self, players[0].mo);
 	if(CheckMeleeRange(self, players[0].mo))
 	{
 		if(pr_meleeattack() < accuracy*255)
@@ -153,6 +161,7 @@ ACTION_FUNCTION(A_MonsterRefire)
 	ACTION_PARAM_STATE(jump, 1, NULL);
 
 	AActor *target = players[0].mo;
+	A_Face(self, target);
 
 	if(jump && (
 		pr_monsterrefire() >= probability ||

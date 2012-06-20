@@ -20,6 +20,9 @@
 #include "wl_game.h"
 #include "wl_state.h"
 
+static const angle_t dirangle[9] = {0,ANGLE_45,2*ANGLE_45,3*ANGLE_45,4*ANGLE_45,
+					5*ANGLE_45,6*ANGLE_45,7*ANGLE_45,0};
+
 static inline bool CheckDoorMovement(AActor *actor)
 {
 	MapTile::Side direction;
@@ -52,6 +55,34 @@ static inline bool CheckDoorMovement(AActor *actor)
 		TryWalk(actor);
 	}
 	return false;
+}
+
+void A_Face(AActor *self, AActor *target, angle_t maxturn)
+{
+	double angle = atan2 (target->x - self->x, target->y - self->y);
+	if (angle<0)
+		angle = (M_PI*2+angle);
+	angle_t iangle = (angle_t) (angle*ANGLE_180/M_PI) - ANGLE_90;
+
+	if(maxturn > 0 && maxturn < abs(self->angle - iangle))
+	{
+		if(self->angle > iangle)
+		{
+			if(self->angle - iangle < ANGLE_180)
+				self->angle -= maxturn;
+			else
+				self->angle += maxturn;
+		}
+		else
+		{
+			if(iangle - self->angle < ANGLE_180)
+				self->angle += maxturn;
+			else
+				self->angle -= maxturn;
+		}
+	}
+	else
+		self->angle = iangle;
 }
 
 /*
@@ -388,10 +419,9 @@ ACTION_FUNCTION(A_Chase)
 			SelectChaseDir (self);
 		if (self->dir == nodir)
 			return; // object is blocked in
-		else
-			self->angle = dirangle[self->dir];
 	}
 
+	self->angle = dirangle[self->dir];
 	move = self->speed;
 
 	while (move)
@@ -441,8 +471,6 @@ ACTION_FUNCTION(A_Chase)
 
 		if (self->dir == nodir)
 			return; // object is blocked in
-		else
-			self->angle = dirangle[self->dir];
 	}
 }
 
@@ -482,13 +510,15 @@ ACTION_FUNCTION(A_WolfAttack)
 	ACTION_PARAM_INT(longrange, 6);
 	ACTION_PARAM_DOUBLE(runspeed, 7);
 
+	if (!map->CheckLink(self->GetZone(), players[0].mo->GetZone(), true))
+		return;
+
 	int     dx,dy,dist;
 	int     hitchance;
 
 	runspeed *= 37.5;
 
-	if (!map->CheckLink(self->GetZone(), players[0].mo->GetZone(), true))
-		return;
+	A_Face(self, players[0].mo);
 
 	if (CheckLine (self))                    // players[0].mo is not behind a wall
 	{

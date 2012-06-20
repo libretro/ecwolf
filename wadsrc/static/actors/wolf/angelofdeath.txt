@@ -21,12 +21,15 @@ actor AngelOfDeath 27
 			ANGL D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
-			ANGL E 5
-			ANGL F 10
+			ANGL E 5 A_FaceTarget
+			ANGL F 10 A_FaceTarget
+			ANGL E 0 A_FaceTarget
 			ANGL E 5 A_CustomMissile("Spark")
 			ANGL E 0 A_Jump(127, "Chase")
+			ANGL E 0 A_FaceTarget
 			ANGL E 5 A_CustomMissile("Spark")
 			ANGL E 0 A_Jump(127, "Chase")
+			ANGL E 0 A_FaceTarget
 			ANGL E 5 A_CustomMissile("Spark")
 			// TODO: When sound attenuation is supported, make this play at full volume.
 			ANGL G 20 A_PlaySound("angel/breath")

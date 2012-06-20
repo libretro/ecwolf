@@ -27,6 +27,7 @@ actor Actor native
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0);
 	action native A_DeathScream();
 	action native A_Dormant();
+	action native A_FaceTarget(float max_turn = 0, float max_pitch = 270);
 	action native A_Fall();
 	action native A_Jump(int chance, state frame, ...);
 	action native A_Look(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180);

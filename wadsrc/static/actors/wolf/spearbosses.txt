@@ -21,8 +21,8 @@ actor Trans 23
 			TRNS D 4 NOP A_Chase
 			loop
 		Missile:
-			TRNS E 15
-			TRNS F 5
+			TRNS E 15 A_FaceTarget
+			TRNS F 5 A_FaceTarget
 			TRNS GFGFGE 5 A_WolfAttack
 			goto See
 		Death:
@@ -57,8 +57,8 @@ actor UberMutant 24
 			UBER D 4 NOP A_Chase
 			loop
 		Missile:
-			UBER E 15
-			UBER F 6
+			UBER E 15 A_FaceTarget
+			UBER F 6 A_FaceTarget
 			UBER G 0 A_MeleeAttack(10, 1.0)
 			UBER G 6 A_WolfAttack
 			UBER H 0 A_MeleeAttack(10, 1.0)
@@ -103,8 +103,9 @@ actor Wilhelm 25
 			WILL D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
-			WILL E 15
-			WILL F 5
+			WILL E 15 A_FaceTarget
+			WILL F 5 A_FaceTarget
+			WILL G 0 A_FaceTarget
 			WILL G 5 A_CustomMissile("Rocket")
 			WILL HGH 5 A_WolfAttack
 			WILL H 0 A_WolfAttack
@@ -142,8 +143,8 @@ actor DeathKnight 26
 			DKNT D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
-			DKNT E 15
-			DKNT F 5
+			DKNT E 15 A_FaceTarget
+			DKNT F 5 A_FaceTarget
 			DKNT H 0 A_WolfAttack
 			DKNT H 5 A_CustomMissile("Rocket", 32, 0, 4)
 			DKNT G 5 A_WolfAttack

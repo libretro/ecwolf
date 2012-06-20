@@ -23,7 +23,7 @@ actor FakeHitler 18
 			FAKE D 4 NOP A_Chase("*", "*", CHF_BACKOFF)
 			loop
 		Missile:
-			FAKE E 4
+			FAKE E 4 A_FaceTarget
 			FAKE EEEEEEEE 4 A_CustomMissile("FireBall")
 			goto See
 		Death:
@@ -79,8 +79,8 @@ actor MechaHitler 19
 			MECH D 4 NOP A_Chase
 			loop
 		Missile:
-			MECH E 15
-			MECH F 5
+			MECH E 15 A_FaceTarget
+			MECH F 5 A_FaceTarget
 			MECH GFGF 5 A_WolfAttack
 			MECH F 0 A_WolfAttack
 			goto See
@@ -116,8 +116,8 @@ actor Hitler
 			HTLR D 1 NOP A_Chase
 			loop
 		Missile:
-			HTLR E 15
-			HTLR F 5
+			HTLR E 15 A_FaceTarget
+			HTLR F 5 A_FaceTarget
 			HTLR GFGF 5 A_WolfAttack
 			HTLR F 0 A_WolfAttack
 			goto See
