@@ -63,6 +63,7 @@ extern class player_t
 		};
 
 		APlayerPawn	*mo;
+		TObjPtr<AActor>	killerobj;
 
 		int32_t		oldscore,score,nextextra;
 		short		lives;

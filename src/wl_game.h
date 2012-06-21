@@ -9,7 +9,6 @@
 =============================================================================
 */
 
-extern  AActor          *killerobj;
 extern  gametype        gamestate;
 extern  byte            bordercol;
 extern  char            demoname[13];

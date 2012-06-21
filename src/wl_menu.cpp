@@ -660,8 +660,8 @@ int CP_CheckQuick (ScanCode scancode)
 			if (Confirm (language["ENDGAMESTR"]))
 			{
 				playstate = ex_died;
-				killerobj = NULL;
 				pickquick = players[0].lives = 0;
+				players[0].killerobj = NULL;
 			}
 
 			WindowH = 200;
@@ -777,7 +777,7 @@ int CP_EndGame (int)
 
 	pickquick = players[0].lives = 0;
 	playstate = ex_died;
-	killerobj = NULL;
+	players[0].killerobj = NULL;
 
 	return 1;
 }

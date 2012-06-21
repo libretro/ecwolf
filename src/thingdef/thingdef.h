@@ -241,6 +241,7 @@ class ClassDef
 			definition->parent = parent;
 			definition->defaultInstance = (DObject *) malloc(sizeof(T));
 			definition->ConstructNative = &T::__InPlaceConstructor;
+			definition->needsConstruction = true;
 			return definition;
 		}
 
@@ -281,7 +282,7 @@ class ClassDef
 		static bool	SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
-		void		BuildFlatPointers() const;
+		void		BuildFlatPointers();
 		const Frame * const *FindStateInList(const FName &stateName) const;
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
 
@@ -291,6 +292,7 @@ class ClassDef
 		static SymbolTable				globalSymbols;
 
 		bool			tentative;
+		bool			needsConstruction;
 		FName			name;
 		const ClassDef	*parent;
 
@@ -300,13 +302,24 @@ class ClassDef
 		ActionTable		actions;
 		SymbolTable		symbols;
 
-		const size_t			*Pointers;		// object pointers defined by this class *only*
-		mutable const size_t	*FlatPointers;	// object pointers defined by this class and all its superclasses; not initialized by default
+		const size_t	*Pointers;		// object pointers defined by this class *only*
+		const size_t	*FlatPointers;	// object pointers defined by this class and all its superclasses; not initialized by default
 
 		DObject			*defaultInstance;
 		DObject			*(*ConstructNative)(const ClassDef *, void *);
 
 		static bool		bShutdown;
 };
+
+// Functions below are actually a part of dobject.h, but moved here for dependency reasons
+inline bool DObject::IsKindOf (const ClassDef *base) const
+{
+	return base->IsAncestorOf (GetClass ());
+}
+
+inline bool DObject::IsA (const ClassDef *type) const
+{
+	return (type == GetClass());
+}
 
 #endif /* __THINGDEF_H__ */

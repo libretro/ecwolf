@@ -86,8 +86,9 @@ class AActorProxy : public Thinker
 		{
 			if(enabled)
 			{
-				parent->~AActor();
-				free(parent);
+				parent->Destroy();
+			//	parent->~AActor();
+			//	free(parent);
 			}
 		}
 
@@ -119,23 +120,12 @@ IMPLEMENT_CLASS(Actor)
 
 AActor::~AActor()
 {
-	RemoveFromWorld();
-
 	if(this == GetDefault())
 	{
 		if(dropitems)
 			delete dropitems;
 		if(damage)
 			delete damage;
-	}
-
-	// Inventory items don't have a registered thinker so we must free them now
-	if(inventory)
-	{
-		assert(inventory->thinker == NULL);
-
-		inventory->~AActor();
-		free(inventory);
 	}
 }
 
@@ -167,6 +157,18 @@ void AActor::Destroy()
 		thinker->Destroy();
 		thinker = NULL;
 	}
+
+	RemoveFromWorld();
+
+	// Inventory items don't have a registered thinker so we must free them now
+	if(inventory)
+	{
+		assert(inventory->thinker == NULL);
+
+		inventory->Destroy();
+	}
+
+	Super::Destroy();
 }
 
 static FRandom pr_dropitem("DropItem");
@@ -277,6 +279,11 @@ void AActor::InitClean()
 
 void AActor::Init(bool nothink)
 {
+	distance = 0;
+	dir = nodir;
+	soundZone = NULL;
+	inventory = NULL;
+
 	if(!nothink)
 	{
 		actorRef = actors.Push(this);
@@ -296,16 +303,6 @@ void AActor::Init(bool nothink)
 		thinker = NULL;
 		state = NULL;
 	}
-}
-
-bool AActor::IsA(const ClassDef *type) const
-{
-	return GetClass() == type;
-}
-
-bool AActor::IsKindOf(const ClassDef *type) const
-{
-	return GetClass()->IsDescendantOf(type);
 }
 
 void AActor::SetState(const Frame *state, bool notic)

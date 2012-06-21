@@ -134,7 +134,7 @@ IMPLEMENT_INTERNAL_CLASS(DSectorMarker)
 
 // EXTERNAL DATA DECLARATIONS ----------------------------------------------
 
-extern DThinker *NextToThink;
+//extern DThinker *NextToThink;
 
 // PUBLIC DATA DEFINITIONS -------------------------------------------------
 

@@ -139,8 +139,6 @@ class AActor : public DObject
 		const Frame		*FindState(const FName &name) const;
 		const AActor	*GetDefault() const;
 		const MapZone	*GetZone() const { return soundZone; }
-		bool			IsA(const ClassDef *type) const;
-		bool			IsKindOf(const ClassDef *type) const;
 		void			RemoveFromWorld();
 		void			RemoveInventory(AInventory *item);
 		void			SetState(const Frame *state, bool notic=false);
@@ -194,8 +192,8 @@ class AActor : public DObject
 		static Iterator *GetIterator() { return actors.Head(); }
 	protected:
 		friend class AActorProxy;
-		virtual void	InitClean();
-		void			Init(bool nothink=false);
+		void	InitClean();
+		void	Init(bool nothink=false);
 
 		const MapZone	*soundZone;
 		AActorProxy		*thinker;

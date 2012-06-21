@@ -409,18 +409,18 @@ TMap<int, ClassDef *> ClassDef::classNumTable;
 SymbolTable ClassDef::globalSymbols;
 bool ClassDef::bShutdown = false;
 
-ClassDef::ClassDef() : tentative(false)
+ClassDef::ClassDef() : tentative(false), needsConstruction(false)
 {
 	defaultInstance = NULL;
-	Pointers = NULL;
+	FlatPointers = Pointers = NULL;
 }
 
 ClassDef::~ClassDef()
 {
 	for(unsigned int i = 0;i < frameList.Size();++i)
 		delete frameList[i];
-	defaultInstance->~DObject();
-	free(defaultInstance);
+	if(defaultInstance)
+		defaultInstance->Destroy();
 	for(unsigned int i = 0;i < symbols.Size();++i)
 		delete symbols[i];
 }
@@ -432,8 +432,7 @@ TMap<FName, ClassDef *> &ClassDef::ClassTable()
 }
 
 const size_t ClassDef::POINTER_END = ~(size_t)0;
-// [BL] Pulled from ZDoom more or less. FlatPointers was made mutable since it
-//      would be too much work to try to unconst ClassDef where needed
+// [BL] Pulled from ZDoom more or less.
 /*
 ** dobjtype.cpp
 ** Implements the type information class
@@ -471,7 +470,7 @@ const size_t ClassDef::POINTER_END = ~(size_t)0;
 // It comprises all the Pointers from superclasses plus this class's own Pointers.
 // If this class does not define any new Pointers, then FlatPointers will be set
 // to the same array as the super class's.
-void ClassDef::BuildFlatPointers() const
+void ClassDef::BuildFlatPointers()
 {
 	if (FlatPointers != NULL)
 	{ // Already built: Do nothing.
@@ -490,7 +489,7 @@ void ClassDef::BuildFlatPointers() const
 	}
 	else
 	{
-		parent->BuildFlatPointers ();
+		const_cast<ClassDef *>(parent)->BuildFlatPointers ();
 		if (Pointers == NULL)
 		{ // No new pointers: Just use the same FlatPointers as the parent.
 			FlatPointers = parent->FlatPointers;
@@ -535,7 +534,7 @@ AActor *ClassDef::CreateInstance() const
 	memcpy(newactor, defaultInstance, defaultInstance->__GetSize());
 	ConstructNative(this, newactor);
 	newactor->classType = this;
-	//newactor->Init();
+	newactor->Init();
 	return newactor;
 }
 
@@ -797,6 +796,15 @@ void ClassDef::LoadActors()
 	while(iter.NextPair(pair))
 	{
 		ClassDef * const cls = pair->Value;
+
+		// This is where we check to make sure native classes that aren't actors
+		// get constructed. (DObject for example)
+		if(cls->needsConstruction)
+		{
+			cls->needsConstruction = false;
+			cls->ConstructNative(cls, cls->defaultInstance);
+		}
+
 		for(unsigned int i = 0;i < cls->frameList.Size();++i)
 			cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
 	}
@@ -849,6 +857,8 @@ void ClassDef::ParseActor(Scanner &sc)
 		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
 	else
 		newClass->tentative = false;
+
+	newClass->needsConstruction = false;
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
@@ -856,7 +866,7 @@ void ClassDef::ParseActor(Scanner &sc)
 		newClass->defaultInstance = (DObject *) malloc(newClass->parent->defaultInstance->__GetSize());
 		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
 		newClass->ConstructNative(newClass, newClass->defaultInstance);
-		//newClass->defaultInstance->Init(true);
+		newClass->defaultInstance->Init(true);
 	}
 	else
 	{
@@ -866,7 +876,7 @@ void ClassDef::ParseActor(Scanner &sc)
 
 		// Initialize the default instance
 		newClass->ConstructNative(newClass, newClass->defaultInstance);
-		//newClass->defaultInstance->InitClean();
+		newClass->defaultInstance->InitClean();
 	}
 	// Copy properties and flags.
 	if(newClass->parent != NULL)

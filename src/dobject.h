@@ -41,43 +41,8 @@
 class ClassDef;
 
 class FArchive;
-
-class   DObject;
-class           DArgs;
-class           DCanvas;
-class           DConsoleCommand;
-class                   DConsoleAlias;
-class           DSeqNode;
-class                   DSeqActorNode;
-class                   DSeqPolyNode;
-class                   DSeqSectorNode;
-class           DThinker;
-class                   AActor;
-class                   DPolyAction;
-class                           DMovePoly;
-class                                   DPolyDoor;
-class                           DRotatePoly;
-class                   DPusher;
-class                   DScroller;
-class                   DSectorEffect;
-class                           DLighting;
-class                                   DFireFlicker;
-class                                   DFlicker;
-class                                   DGlow;
-class                                   DGlow2;
-class                                   DLightFlash;
-class                                   DPhased;
-class                                   DStrobe;
-class                           DMover;
-class                                   DElevator;
-class                                   DMovingCeiling;
-class                                           DCeiling;
-class                                           DDoor;
-class                                   DMovingFloor;
-class                                           DFloor;
-class                                           DFloorWaggle;
-class                                           DPlat;
-class                                   DPillar;
+class DObject;
+class AActor;
 
 enum EInPlace { EC_InPlace };
 
@@ -446,6 +411,9 @@ protected:
 	{
 		M_Free (mem);
 	}
+
+	virtual void	InitClean() {}
+	virtual void	Init(bool nothink=false) {}
 };
 
 static inline void GC::WriteBarrier(DObject *pointing, DObject *pointed)
@@ -463,19 +431,5 @@ static inline void GC::WriteBarrier(DObject *pointed)
 		Barrier(NULL, pointed);
 	}
 }
-
-#if 0
-#include "thingdef/thingdef.h"
-
-inline bool DObject::IsKindOf (const ClassDef *base) const
-{
-	return base->IsAncestorOf (GetClass ());
-}
-
-inline bool DObject::IsA (const ClassDef *type) const
-{
-	return (type == GetClass());
-}
-#endif
 
 #endif //__DOBJECT_H__

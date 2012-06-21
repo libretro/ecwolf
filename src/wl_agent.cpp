@@ -386,7 +386,7 @@ void TakeDamage (int points,AActor *attacker)
 	{
 		players[0].health = 0;
 		playstate = ex_died;
-		killerobj = attacker;
+		players[0].killerobj = attacker;
 	}
 
 	if (godmode != 2)

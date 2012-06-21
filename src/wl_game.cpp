@@ -47,7 +47,6 @@
 =============================================================================
 */
 
-AActor			*killerobj;
 bool			ingame,fizzlein;
 gametype        gamestate;
 byte            bordercol=VIEWCOLOR;        // color of the Change View/Ingame border
@@ -257,7 +256,7 @@ void SetupGameLevel (void)
 			= gamestate.treasurecount
 			= facetimes = 0;
 		LastAttacker = NULL;
-		killerobj = NULL;
+		players[0].killerobj = NULL;
 
 		thinkerList->DestroyAll();
 	}
@@ -636,10 +635,10 @@ void Died (void)
 	//
 	// swing around to face attacker
 	//
-	if(killerobj)
+	if(players[0].killerobj)
 	{
-		dx = killerobj->x - players[0].mo->x;
-		dy = players[0].mo->y - killerobj->y;
+		dx = players[0].killerobj->x - players[0].mo->x;
+		dy = players[0].mo->y - players[0].killerobj->y;
 
 		fangle = (float) atan2((float) dy, (float) dx);     // returns -pi to pi
 		if (fangle<0)
@@ -649,7 +648,7 @@ void Died (void)
 	}
 	else
 	{
-		iangle = players[0].mo->angle + ANGLE_180;
+		iangle = players[0].mo->angle;
 	}
 
 	angle_t &curangle = players[0].mo->angle;
