@@ -993,7 +993,7 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 		assert (!(ob->flags & FL_ATTACKMODE));
 	}
 
-	if (ob->sighttime != ob->defaults->sighttime)
+	if (ob->sighttime != ob->GetDefault()->sighttime)
 	{
 		//
 		// count down reaction time
@@ -1021,8 +1021,8 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 
 		--ob->sighttime; // We need to somehow mark we started.
 		ob->sightrandom = 1; // Account for tic.
-		if(ob->defaults->sightrandom)
-			ob->sightrandom += pr_sight()/ob->defaults->sightrandom;
+		if(ob->GetDefault()->sightrandom)
+			ob->sightrandom += pr_sight()/ob->GetDefault()->sightrandom;
 		return false;
 	}
 

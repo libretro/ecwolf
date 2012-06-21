@@ -218,6 +218,7 @@ class ClassDef
 		~ClassDef();
 
 		AActor					*CreateInstance() const;
+		bool					IsAncestorOf(const ClassDef *child) const { return child->IsDescendantOf(this); }
 		bool					IsDescendantOf(const ClassDef *parent) const;
 
 		/**
@@ -237,11 +238,9 @@ class ClassDef
 				definition = *definitionLookup;
 			definition->name = className;
 			definition->parent = parent;
-			definition->defaultInstance->defaults = NULL;
-			definition->defaultInstance->~AActor();
+			definition->defaultInstance->~DObject();
 			free(definition->defaultInstance);
-			definition->defaultInstance = (AActor *) malloc(sizeof(T));
-			definition->defaultInstance->defaults = definition->defaultInstance;
+			definition->defaultInstance = (DObject *) malloc(sizeof(T));
 			definition->ConstructNative = &T::__InPlaceConstructor;
 			return definition;
 		}
@@ -265,14 +264,16 @@ class ClassDef
 		const ActionInfo		*FindFunction(const FName &function) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const;
-		AActor					*GetDefault() const { return defaultInstance; }
+		AActor					*GetDefault() const { return (AActor*)defaultInstance; }
 		const FName				&GetName() const { return name; }
+		size_t					GetSize() const { return defaultInstance->__GetSize(); }
 		static void				LoadActors();
 		static void				UnloadActors();
 
 		MetaTable				Meta;
 
 	protected:
+		friend class DObject;
 		friend class StateLabel;
 
 		static void	ParseActor(Scanner &sc);
@@ -280,6 +281,7 @@ class ClassDef
 		static bool	SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
+		void		BuildFlatPointers() {}
 		const Frame * const *FindStateInList(const FName &stateName) const;
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
 
@@ -297,9 +299,13 @@ class ClassDef
 
 		ActionTable		actions;
 		SymbolTable		symbols;
+		const size_t	*Pointers;		// object pointers defined by this class *only*
+		const size_t	*FlatPointers;	// object pointers defined by this class and all its superclasses; not initialized by default
 
-		AActor			*defaultInstance;
-		AActor			*(*ConstructNative)(const ClassDef *, void *);
+		DObject			*defaultInstance;
+		DObject			*(*ConstructNative)(const ClassDef *, void *);
+
+		static bool		bShutdown;
 };
 
 #endif /* __THINGDEF_H__ */

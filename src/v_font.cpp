@@ -105,13 +105,6 @@ The FON2 header is followed by variable length data:
 
 // Calculate # of glyphs in font.
 #define HU_FONTSIZE		(HU_FONTEND - HU_FONTSTART + 1)
-static inline char* copystring(const char* src)
-{
-	char *dest = new char[strlen(src)+1];
-	strcpy(dest, src);
-	dest[strlen(src)] = 0;
-	return dest;
-}
 
 FFont *SmallFont, *SmallFont2, *BigFont, *ConFont, *IntermissionFont;
 

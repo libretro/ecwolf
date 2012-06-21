@@ -41,11 +41,11 @@
 
 #include <climits>
 
-IMPLEMENT_CLASS(PlayerPawn, Actor)
+IMPLEMENT_CLASS(PlayerPawn)
 
 APlayerPawn::~APlayerPawn()
 {
-	if(this == defaults)
+	if(this == GetDefault())
 	{
 		if(startInventory)
 			delete startInventory;

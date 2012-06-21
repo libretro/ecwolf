@@ -101,6 +101,8 @@ add_executable(ecwolf WIN32
 	colormatcher.cpp
 	config.cpp
 	c_cvars.cpp
+	dobject.cpp
+	dobjgc.cpp
 	file.cpp
 	files.cpp
 	g_mapinfo.cpp

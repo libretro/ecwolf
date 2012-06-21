@@ -8,7 +8,7 @@
 #include "g_shared/a_inventory.h"
 #include "g_shared/a_keys.h"
 
-IMPLEMENT_CLASS(Key, Inventory)
+IMPLEMENT_CLASS(Key)
 
 ////////////////////////////////////////////////////////////////////////////////
 //

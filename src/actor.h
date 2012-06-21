@@ -39,22 +39,37 @@
 #include "gamemap.h"
 #include "linkedlist.h"
 #include "name.h"
+#include "dobject.h"
 
-#define DECLARE_NATIVE_CLASS(name, parent) \
+#define DECLARE_CLASS(name, parent) \
 	friend class ClassDef; \
 	private: \
-		typedef A##parent Super; \
+		typedef parent Super; \
+		typedef name ThisClass; \
 	protected: \
-		A##name(const ClassDef *classType) : A##parent(classType) {} \
-		virtual size_t __GetSize() const { return sizeof(A##name); } \
-		static AActor *__InPlaceConstructor(const ClassDef *classType, void *mem); \
+		name(const ClassDef *classType) : parent(classType) {} \
+		virtual size_t __GetSize() const { return sizeof(name); } \
+		static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem); \
 	public: \
 		static const ClassDef *__StaticClass;
-#define IMPLEMENT_CLASS(name, parent) \
-	const ClassDef *A##name::__StaticClass = ClassDef::DeclareNativeClass<A##name>(#name, A##parent::__StaticClass); \
-	AActor *A##name::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new (mem) A##name(classType); }
+#define DECLARE_NATIVE_CLASS(name, parent) DECLARE_CLASS(A##name, A##parent)
+#define HAS_OBJECT_POINTERS \
+		static const size_t PointerOffsets[];
+#define IMPLEMENT_INTERNAL_CLASS(cls, name) \
+	const ClassDef *cls::__StaticClass = ClassDef::DeclareNativeClass<cls>(name, Super::__StaticClass); \
+	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new ((EInPlace *) mem) cls(classType); }
+#define IMPLEMENT_CLASS(name) \
+	IMPLEMENT_INTERNAL_CLASS(A##name, #name)
+#define IMPLEMENT_POINTY_CLASS(name) \
+	IMPLEMENT_CLASS(name) \
+	const size_t A##name::PointerOffsets[] = {
+// Similar to typeoffsetof, but doesn't cast to int.
+#define DECLARE_POINTER(ptr) \
+	(size_t)&((ThisClass*)1)->ptr - 1,
+#define END_POINTERS ~(size_t)0 };
 #define NATIVE_CLASS(name) A##name::__StaticClass
 
+class AActor;
 class CallArguments;
 class ExpressionNode;
 
@@ -94,8 +109,10 @@ class player_t;
 class AActorProxy;
 class ClassDef;
 class AInventory;
-class AActor
+class AActor : public DObject
 {
+	DECLARE_CLASS(AActor, DObject)
+
 	public:
 		struct DropItem
 		{
@@ -116,6 +133,7 @@ class AActor
 		void			EnterZone(const MapZone *zone);
 		AInventory		*FindInventory(const ClassDef *cls) const;
 		const Frame		*FindState(const FName &name) const;
+		const AActor	*GetDefault() const;
 		const MapZone	*GetZone() const { return soundZone; }
 		bool			IsA(const ClassDef *type) const;
 		bool			IsKindOf(const ClassDef *type) const;
@@ -125,8 +143,6 @@ class AActor
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
-
-		const AActor	*defaults;
 
 		// Basic properties from objtype
 		flagstype_t flags;
@@ -181,15 +197,6 @@ class AActor
 		AActorProxy		*thinker;
 
 		const ClassDef	*classType;
-
-	// ClassDef stuff
-	friend class ClassDef;
-	public:
-		static const ClassDef *__StaticClass;
-	protected:
-		AActor(const ClassDef *type);
-		virtual size_t __GetSize() const { return sizeof(AActor); }
-		static AActor *__InPlaceConstructor(const ClassDef *classType, void *mem);
 };
 
 #endif

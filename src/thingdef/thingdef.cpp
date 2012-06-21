@@ -407,20 +407,20 @@ void MetaTable::SetMetaString(uint32_t id, const char* value)
 
 TMap<int, ClassDef *> ClassDef::classNumTable;
 SymbolTable ClassDef::globalSymbols;
+bool ClassDef::bShutdown = false;
 
 ClassDef::ClassDef() : tentative(false)
 {
-	defaultInstance = (AActor *) malloc(sizeof(AActor));
-	defaultInstance = new (defaultInstance) AActor(this);
-	defaultInstance->defaults = defaultInstance;
-	defaultInstance->InitClean();
+	defaultInstance = (DObject *) malloc(sizeof(DObject));
+	defaultInstance = new ((EInPlace *)defaultInstance) DObject(this);
+	//defaultInstance->InitClean();
 }
 
 ClassDef::~ClassDef()
 {
 	for(unsigned int i = 0;i < frameList.Size();++i)
 		delete frameList[i];
-	defaultInstance->~AActor();
+	defaultInstance->~DObject();
 	free(defaultInstance);
 	for(unsigned int i = 0;i < symbols.Size();++i)
 		delete symbols[i];
@@ -434,22 +434,22 @@ TMap<FName, ClassDef *> &ClassDef::ClassTable()
 
 AActor *ClassDef::CreateInstance() const
 {
-	if(!defaultInstance->SpawnState)
+	if(IsDescendantOf(NATIVE_CLASS(Actor)) && !((AActor*)defaultInstance)->SpawnState)
 	{
-		defaultInstance->DeathState = FindState(NAME_Death);
-		defaultInstance->MeleeState = FindState(NAME_Melee);
-		defaultInstance->MissileState = FindState(NAME_Missile);
-		defaultInstance->PainState = FindState(NAME_Pain);
-		defaultInstance->PathState = FindState(NAME_Path);
-		defaultInstance->SpawnState = FindState(NAME_Spawn);
-		defaultInstance->SeeState = FindState(NAME_See);
+		((AActor*)defaultInstance)->DeathState = FindState(NAME_Death);
+		((AActor*)defaultInstance)->MeleeState = FindState(NAME_Melee);
+		((AActor*)defaultInstance)->MissileState = FindState(NAME_Missile);
+		((AActor*)defaultInstance)->PainState = FindState(NAME_Pain);
+		((AActor*)defaultInstance)->PathState = FindState(NAME_Path);
+		((AActor*)defaultInstance)->SpawnState = FindState(NAME_Spawn);
+		((AActor*)defaultInstance)->SeeState = FindState(NAME_See);
 	}
 
 	AActor *newactor = (AActor *) malloc(defaultInstance->__GetSize());
 	memcpy(newactor, defaultInstance, defaultInstance->__GetSize());
 	ConstructNative(this, newactor);
 	newactor->classType = this;
-	newactor->Init();
+	//newactor->Init();
 	return newactor;
 }
 
@@ -767,14 +767,12 @@ void ClassDef::ParseActor(Scanner &sc)
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
 
-		newClass->defaultInstance->defaults = NULL;
-		newClass->defaultInstance->~AActor();
+		newClass->defaultInstance->~DObject();
 		free(newClass->defaultInstance);
-		newClass->defaultInstance = (AActor *) malloc(newClass->parent->defaultInstance->__GetSize());
+		newClass->defaultInstance = (DObject *) malloc(newClass->parent->defaultInstance->__GetSize());
 		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
 		newClass->ConstructNative(newClass, newClass->defaultInstance);
-		newClass->defaultInstance->defaults = newClass->defaultInstance;
-		newClass->defaultInstance->Init(true);
+		//newClass->defaultInstance->Init(true);
 	}
 	else
 	{
@@ -784,17 +782,14 @@ void ClassDef::ParseActor(Scanner &sc)
 
 		// Initialize the default instance
 		newClass->ConstructNative(newClass, newClass->defaultInstance);
-		newClass->defaultInstance->defaults = newClass->defaultInstance;
-		newClass->defaultInstance->InitClean();
+		//newClass->defaultInstance->InitClean();
 	}
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
 	{
 		*newClass->defaultInstance = *newClass->parent->defaultInstance;
-		newClass->defaultInstance->classType = newClass;
-		newClass->defaultInstance->defaults = newClass->defaultInstance;
+		newClass->defaultInstance->Class = newClass;
 	}
-	assert(newClass->defaultInstance->defaults == newClass->defaultInstance);
 
 	bool actionsSorted = true;
 	sc.MustGetToken('{');
@@ -1444,7 +1439,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 			if(!optional && *p != 0 && *p != '_')
 				sc.ScriptMessage(Scanner::ERROR, "Not enough parameters.");
 
-			properties[mid].handler(newClass, newClass->defaultInstance, paramc, params);
+			properties[mid].handler(newClass, (AActor*)newClass->defaultInstance, paramc, params);
 
 			// Clean up
 			p = properties[mid].params;
@@ -1469,6 +1464,8 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 
 void ClassDef::UnloadActors()
 {
+	bShutdown = true;
+
 	TMap<FName, ClassDef *>::Pair *pair;
 	for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
 	{

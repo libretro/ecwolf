@@ -5,6 +5,25 @@
 
 #include "m_crc32.h"
 
+static inline char* copystring(const char* src)
+{
+	char *dest = new char[strlen(src)+1];
+	strcpy(dest, src);
+	dest[strlen(src)] = 0;
+	return dest;
+}
+
+static inline void ReplaceString(char* &ptr, const char* str)
+{
+	if(ptr)
+	{
+		if(ptr == str)
+			return;
+		delete[] ptr;
+	}
+	ptr = copystring(str);
+}
+
 static inline unsigned int MakeKey(const char *s, size_t len)
 {
 	BYTE* hashString = new BYTE[len];

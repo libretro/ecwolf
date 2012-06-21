@@ -41,7 +41,7 @@
 #include "wl_game.h"
 #include "wl_play.h"
 
-IMPLEMENT_CLASS(Inventory, Actor)
+IMPLEMENT_CLASS(Inventory)
 
 void AInventory::AttachToOwner(AActor *owner)
 {
@@ -184,7 +184,7 @@ bool AInventory::Use()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CLASS(Health, Inventory)
+IMPLEMENT_CLASS(Health)
 
 bool AHealth::TryPickup(AActor *toucher)
 {
@@ -209,11 +209,11 @@ bool AHealth::TryPickup(AActor *toucher)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CLASS(Ammo, Inventory)
+IMPLEMENT_CLASS(Ammo)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CLASS(Weapon, Inventory)
+IMPLEMENT_CLASS(Weapon)
 
 void AWeapon::AttachToOwner(AActor *owner)
 {
@@ -354,4 +354,4 @@ class AScoreItem : public AInventory
 			return true;
 		}
 };
-IMPLEMENT_CLASS(ScoreItem, Inventory)
+IMPLEMENT_CLASS(ScoreItem)

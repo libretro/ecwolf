@@ -51,4 +51,4 @@ class APatrolPoint : public AActor
 			}
 		}
 };
-IMPLEMENT_CLASS(PatrolPoint, Actor)
+IMPLEMENT_CLASS(PatrolPoint)

@@ -108,20 +108,20 @@ class AActorProxy : public Thinker
 IMPLEMENT_THINKER(AActorProxy)
 
 LinkedList<AActor *> AActor::actors;
-const ClassDef *AActor::__StaticClass = ClassDef::DeclareNativeClass<AActor>("Actor", NULL);
+IMPLEMENT_INTERNAL_CLASS(AActor, "Actor")
 
-AActor::AActor(const ClassDef *type) : classType(type), distance(0),
-	dir(nodir), soundZone(NULL), inventory(NULL)
-{
+//AActor::AActor(const ClassDef *type) : classType(type), distance(0),
+//	dir(nodir), soundZone(NULL), inventory(NULL)
+//{
 	// This will be called for each actor AFTER copying the defaults.
 	// Use InitClean for any one time construction.
-}
+//}
 
 AActor::~AActor()
 {
 	RemoveFromWorld();
 
-	if(this == defaults)
+	if(this == GetDefault())
 	{
 		if(dropitems)
 			delete dropitems;
@@ -253,6 +253,11 @@ AInventory *AActor::FindInventory(const ClassDef *cls) const
 const Frame *AActor::FindState(const FName &name) const
 {
 	return classType->FindState(name);
+}
+
+const AActor *AActor::GetDefault() const
+{
+	return classType->GetDefault();
 }
 
 Thinker *AActor::GetThinker() const
@@ -404,11 +409,6 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 	if(actor->flags & FL_COUNTSECRET)
 		++gamestate.secrettotal;
 	return actor;
-}
-
-AActor *AActor::__InPlaceConstructor(const ClassDef *classDef, void *mem)
-{
-	return new (mem) AActor(classDef);
 }
 
 DEFINE_SYMBOL(Actor, angle)
