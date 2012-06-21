@@ -200,15 +200,23 @@ ACTION_FUNCTION(A_DeathScream)
 
 ACTION_FUNCTION(A_CustomMissile)
 {
+	enum
+	{
+		CMF_AIMOFFSET = 1
+	};
+
 	ACTION_PARAM_STRING(missiletype, 0);
 	ACTION_PARAM_DOUBLE(spawnheight, 1);
 	ACTION_PARAM_INT(spawnoffset, 2);
 	ACTION_PARAM_DOUBLE(angleOffset, 3);
+	ACTION_PARAM_INT(flags, 4);
 
 	fixed newx = self->x + spawnoffset*finesine[self->angle>>ANGLETOFINESHIFT]/64;
 	fixed newy = self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64;
 
-	double angle = atan2 (newy - players[0].mo->y, players[0].mo->x - newx);
+	double angle = (flags & CMF_AIMOFFSET) ?
+		atan2 (self->y - players[0].mo->y, players[0].mo->x - self->x) :
+		atan2 (newy - players[0].mo->y, players[0].mo->x - newx);
 	if (angle<0)
 		angle = (M_PI*2+angle);
 	angle_t iangle = (angle_t) (angle*ANGLE_180/M_PI) + (angle_t) ((angleOffset*ANGLE_45)/45);
