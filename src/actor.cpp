@@ -108,7 +108,7 @@ class AActorProxy : public Thinker
 IMPLEMENT_THINKER(AActorProxy)
 
 LinkedList<AActor *> AActor::actors;
-IMPLEMENT_INTERNAL_CLASS(AActor, "Actor")
+IMPLEMENT_CLASS(Actor)
 
 //AActor::AActor(const ClassDef *type) : classType(type), distance(0),
 //	dir(nodir), soundZone(NULL), inventory(NULL)

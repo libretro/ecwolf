@@ -51,18 +51,22 @@
 		virtual size_t __GetSize() const { return sizeof(name); } \
 		static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem); \
 	public: \
-		static const ClassDef *__StaticClass;
+		static const ClassDef *__StaticClass; \
+		static const size_t __PointerOffsets[];
 #define DECLARE_NATIVE_CLASS(name, parent) DECLARE_CLASS(A##name, A##parent)
-#define HAS_OBJECT_POINTERS \
-		static const size_t PointerOffsets[];
-#define IMPLEMENT_INTERNAL_CLASS(cls, name) \
+#define HAS_OBJECT_POINTERS
+#define __IMPCLS(cls, name) \
 	const ClassDef *cls::__StaticClass = ClassDef::DeclareNativeClass<cls>(name, Super::__StaticClass); \
 	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new ((EInPlace *) mem) cls(classType); }
+#define IMPLEMENT_INTERNAL_CLASS(cls) \
+	__IMPCLS(cls, #cls) \
+	const size_t cls::__PointerOffsets[] = { ~(size_t)0 };
 #define IMPLEMENT_CLASS(name) \
-	IMPLEMENT_INTERNAL_CLASS(A##name, #name)
+	__IMPCLS(A##name, #name) \
+	const size_t A##name::__PointerOffsets[] = { ~(size_t)0 };
 #define IMPLEMENT_POINTY_CLASS(name) \
-	IMPLEMENT_CLASS(name) \
-	const size_t A##name::PointerOffsets[] = {
+	__IMPCLS(A##name, #name) \
+	const size_t A##name::__PointerOffsets[] = {
 // Similar to typeoffsetof, but doesn't cast to int.
 #define DECLARE_POINTER(ptr) \
 	(size_t)&((ThisClass*)1)->ptr - 1,

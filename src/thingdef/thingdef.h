@@ -236,10 +236,9 @@ class ClassDef
 			}
 			else
 				definition = *definitionLookup;
+			definition->Pointers = *T::__PointerOffsets == POINTER_END ? NULL : T::__PointerOffsets;
 			definition->name = className;
 			definition->parent = parent;
-			definition->defaultInstance->~DObject();
-			free(definition->defaultInstance);
 			definition->defaultInstance = (DObject *) malloc(sizeof(T));
 			definition->ConstructNative = &T::__InPlaceConstructor;
 			return definition;
@@ -275,13 +274,14 @@ class ClassDef
 	protected:
 		friend class DObject;
 		friend class StateLabel;
+		static const size_t POINTER_END;
 
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
 		static bool	SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
-		void		BuildFlatPointers() {}
+		void		BuildFlatPointers() const;
 		const Frame * const *FindStateInList(const FName &stateName) const;
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
 
@@ -299,8 +299,9 @@ class ClassDef
 
 		ActionTable		actions;
 		SymbolTable		symbols;
-		const size_t	*Pointers;		// object pointers defined by this class *only*
-		const size_t	*FlatPointers;	// object pointers defined by this class and all its superclasses; not initialized by default
+
+		const size_t			*Pointers;		// object pointers defined by this class *only*
+		mutable const size_t	*FlatPointers;	// object pointers defined by this class and all its superclasses; not initialized by default
 
 		DObject			*defaultInstance;
 		DObject			*(*ConstructNative)(const ClassDef *, void *);

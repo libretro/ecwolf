@@ -317,6 +317,7 @@ class DObject
 friend class ClassDef;
 public:
 	static const ClassDef *__StaticClass;
+	static const size_t __PointerOffsets[];
 protected:
 	virtual size_t __GetSize() const { return sizeof(DObject); }
 	static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem);

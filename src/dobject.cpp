@@ -232,6 +232,7 @@ CCMD (dumpclasses)
 #endif
 
 const ClassDef *DObject::__StaticClass = ClassDef::DeclareNativeClass<DObject>("DObject", NULL);
+const size_t DObject::__PointerOffsets[] = { ~(size_t)0 };
 DObject *DObject::__InPlaceConstructor(const ClassDef *classDef, void *mem)
 {
 	return new ((EInPlace *)mem) DObject(classDef);

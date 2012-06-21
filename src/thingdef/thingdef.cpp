@@ -411,9 +411,8 @@ bool ClassDef::bShutdown = false;
 
 ClassDef::ClassDef() : tentative(false)
 {
-	defaultInstance = (DObject *) malloc(sizeof(DObject));
-	defaultInstance = new ((EInPlace *)defaultInstance) DObject(this);
-	//defaultInstance->InitClean();
+	defaultInstance = NULL;
+	Pointers = NULL;
 }
 
 ClassDef::~ClassDef()
@@ -430,6 +429,93 @@ TMap<FName, ClassDef *> &ClassDef::ClassTable()
 {
 	static TMap<FName, ClassDef *> classTable;
 	return classTable;
+}
+
+const size_t ClassDef::POINTER_END = ~(size_t)0;
+// [BL] Pulled from ZDoom more or less. FlatPointers was made mutable since it
+//      would be too much work to try to unconst ClassDef where needed
+/*
+** dobjtype.cpp
+** Implements the type information class
+**
+**---------------------------------------------------------------------------
+** Copyright 1998-2008 Randy Heit
+** All rights reserved.
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions
+** are met:
+**
+** 1. Redistributions of source code must retain the above copyright
+**    notice, this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. The name of the author may not be used to endorse or promote products
+**    derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+** IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+** IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+** NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**---------------------------------------------------------------------------
+**
+*/
+// Create the FlatPointers array, if it doesn't exist already.
+// It comprises all the Pointers from superclasses plus this class's own Pointers.
+// If this class does not define any new Pointers, then FlatPointers will be set
+// to the same array as the super class's.
+void ClassDef::BuildFlatPointers() const
+{
+	if (FlatPointers != NULL)
+	{ // Already built: Do nothing.
+		return;
+	}
+	else if (parent == NULL)
+	{ // No parent: FlatPointers is the same as Pointers.
+		if (Pointers == NULL)
+		{ // No pointers: Make FlatPointers a harmless non-NULL.
+			FlatPointers = &POINTER_END;
+		}
+		else
+		{
+			FlatPointers = Pointers;
+		}
+	}
+	else
+	{
+		parent->BuildFlatPointers ();
+		if (Pointers == NULL)
+		{ // No new pointers: Just use the same FlatPointers as the parent.
+			FlatPointers = parent->FlatPointers;
+		}
+		else
+		{ // New pointers: Create a new FlatPointers array and add them.
+			int numPointers, numSuperPointers;
+
+			// Count pointers defined by this class.
+			for (numPointers = 0; Pointers[numPointers] != POINTER_END; numPointers++)
+			{ }
+			// Count pointers defined by superclasses.
+			for (numSuperPointers = 0; parent->FlatPointers[numSuperPointers] != POINTER_END; numSuperPointers++)
+			{ }
+
+			// Concatenate them into a new array
+			size_t *flat = new size_t[numPointers + numSuperPointers + 1];
+			if (numSuperPointers > 0)
+			{
+				memcpy (flat, parent->FlatPointers, sizeof(size_t)*numSuperPointers);
+			}
+			memcpy (flat + numSuperPointers, Pointers, sizeof(size_t)*(numPointers+1));
+			FlatPointers = flat;
+		}
+	}
 }
 
 AActor *ClassDef::CreateInstance() const
@@ -767,8 +853,6 @@ void ClassDef::ParseActor(Scanner &sc)
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
 
-		newClass->defaultInstance->~DObject();
-		free(newClass->defaultInstance);
 		newClass->defaultInstance = (DObject *) malloc(newClass->parent->defaultInstance->__GetSize());
 		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
 		newClass->ConstructNative(newClass, newClass->defaultInstance);
@@ -1464,12 +1548,39 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 
 void ClassDef::UnloadActors()
 {
+	// Also contains code from ZDoom
+
 	bShutdown = true;
 
+	TArray<size_t *> uniqueFPs;
 	TMap<FName, ClassDef *>::Pair *pair;
 	for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
 	{
-		delete pair->Value;
+		ClassDef *type = pair->Value;
+		if (type->FlatPointers != &POINTER_END && type->FlatPointers != type->Pointers)
+		{
+			// FlatPointers are shared by many classes, so we must check for
+			// duplicates and only delete those that are unique.
+			unsigned int j;
+			for (j = 0; j < uniqueFPs.Size(); ++j)
+			{
+				if (type->FlatPointers == uniqueFPs[j])
+				{
+					break;
+				}
+			}
+			if (j == uniqueFPs.Size())
+			{
+				uniqueFPs.Push(const_cast<size_t *>(type->FlatPointers));
+			}
+		}
+		type->FlatPointers = NULL;
+
+		delete type;
+	}
+	for (unsigned int i = 0; i < uniqueFPs.Size(); ++i)
+	{
+		delete[] uniqueFPs[i];
 	}
 
 	// Also clear globals
