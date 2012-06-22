@@ -284,6 +284,7 @@ public:
 	static const ClassDef *__StaticClass;
 	static const size_t __PointerOffsets[];
 protected:
+	virtual const ClassDef *__StaticType() const { return __StaticClass; }
 	virtual size_t __GetSize() const { return sizeof(DObject); }
 	static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem);
 	typedef DObject ThisClass;
@@ -325,7 +326,7 @@ public:
 		{
 			// Save a little time the next time somebody wants this object's type
 			// by recording it now.
-			const_cast<DObject *>(this)->Class = __StaticClass;
+			const_cast<DObject *>(this)->Class = __StaticType();
 		}
 		return Class;
 	}
@@ -412,8 +413,7 @@ protected:
 		M_Free (mem);
 	}
 
-	virtual void	InitClean() {}
-	virtual void	Init(bool nothink=false) {}
+	virtual void	Init() {}
 };
 
 static inline void GC::WriteBarrier(DObject *pointing, DObject *pointed)

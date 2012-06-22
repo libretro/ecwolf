@@ -39,6 +39,8 @@
 #include "wl_def.h"
 #include "name.h"
 #include "linkedlist.h"
+#include "actor.h"
+#include "dobject.h"
 
 class Thinker;
 extern class ThinkerList
@@ -58,47 +60,32 @@ extern class ThinkerList
 		ThinkerList();
 		~ThinkerList();
 
-		LinkedList<Thinker *>::Node *GetHead(Priority list) { return thinkers[list].Head(); }
+		typedef LinkedList<Thinker *>::Node *Iterator;
+
+		Iterator GetHead(Priority list) { return thinkers[list].Head(); }
 		void	DestroyAll(Priority start=FIRST_TICKABLE);
 		void	Tick();
 	protected:
-		void	CleanThinkers();
-
 		friend class Thinker;
 		void	Register(Thinker *thinker, Priority type=NORMAL);
 		void	Deregister(Thinker *thinker);
-		void	MarkForCollection(Thinker *thinker);
 
 	private:
 		LinkedList<Thinker *>	thinkers[NUM_TYPES];
-		LinkedList<Thinker *>	toDestroy;
 } *thinkerList;
 
-#define DECLARE_THINKER(type) \
-	public: \
-		static Thinker::__ThinkerInfo __StaticThinkerType; \
-	protected: \
-		virtual Thinker::__ThinkerInfo &__ThinkerType() const { return __StaticThinkerType; }
-#define IMPLEMENT_THINKER(type) \
-	Thinker::__ThinkerInfo type::__StaticThinkerType(#type);
-
-class Thinker
+class Thinker : public DObject
 {
-	public:
-		typedef const FName __ThinkerInfo;
+	DECLARE_CLASS(Thinker, DObject)
 
+	public:
 		Thinker(ThinkerList::Priority priority=ThinkerList::NORMAL);
 		virtual ~Thinker();
 
-		virtual void	Destroy();
 		template<class T>
-		bool			IsThinkerType() { return __ThinkerType() == T::__StaticThinkerType; }
+		bool			IsThinkerType() { return IsA(T::__StaticClass); }
 		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
-
-	protected:
-		// Use DECLARE_THINKER to implement
-		virtual __ThinkerInfo &__ThinkerType() const=0;
 
 	private:
 		friend class ThinkerList;

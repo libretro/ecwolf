@@ -76,7 +76,9 @@ void Frame::ActionCall::operator() (AActor *self) const
 // We can't make AActor a thinker since we create non-thinking objects.
 class AActorProxy : public Thinker
 {
-	DECLARE_THINKER(AActorProxy)
+	DECLARE_CLASS(AActorProxy, Thinker)
+	HAS_OBJECT_POINTERS
+
 	public:
 		AActorProxy(AActor *parent) : enabled(true), parent(parent)
 		{
@@ -84,7 +86,7 @@ class AActorProxy : public Thinker
 
 		~AActorProxy()
 		{
-			if(enabled)
+			if(enabled && parent)
 			{
 				parent->Destroy();
 			//	parent->~AActor();
@@ -104,9 +106,11 @@ class AActorProxy : public Thinker
 		}
 
 		bool			enabled;
-		AActor * const	parent;
+		TObjPtr<AActor>	parent;
 };
-IMPLEMENT_THINKER(AActorProxy)
+IMPLEMENT_INTERNAL_POINTY_CLASS(AActorProxy)
+	DECLARE_POINTER(parent)
+END_POINTERS
 
 LinkedList<AActor *> AActor::actors;
 IMPLEMENT_CLASS(Actor)
@@ -245,7 +249,7 @@ AInventory *AActor::FindInventory(const ClassDef *cls) const
 	AInventory *check = inventory;
 	do
 	{
-		if(check->classType == cls)
+		if(check->IsA(cls))
 			return check;
 	}
 	while((check = check->inventory));
@@ -254,12 +258,12 @@ AInventory *AActor::FindInventory(const ClassDef *cls) const
 
 const Frame *AActor::FindState(const FName &name) const
 {
-	return classType->FindState(name);
+	return GetClass()->FindState(name);
 }
 
 const AActor *AActor::GetDefault() const
 {
-	return classType->GetDefault();
+	return GetClass()->GetDefault();
 }
 
 Thinker *AActor::GetThinker() const
@@ -267,41 +271,22 @@ Thinker *AActor::GetThinker() const
 	return thinker;
 }
 
-void AActor::InitClean()
-{
-	flags = 0;
-	SpawnState = NULL;
-	damage = NULL;
-	dropitems = NULL;
-
-	Init(true);
-}
-
-void AActor::Init(bool nothink)
+void AActor::Init()
 {
 	distance = 0;
 	dir = nodir;
 	soundZone = NULL;
 	inventory = NULL;
 
-	if(!nothink)
-	{
-		actorRef = actors.Push(this);
-		thinker = new AActorProxy(this);
+	actorRef = actors.Push(this);
+	thinker = new AActorProxy(this);
 
-		if(SpawnState)
-			SetState(SpawnState, true);
-		else
-		{
-			state = NULL;
-			Destroy();
-		}
-	}
+	if(SpawnState)
+		SetState(SpawnState, true);
 	else
 	{
-		actorRef = NULL;
-		thinker = NULL;
 		state = NULL;
+		Destroy();
 	}
 }
 
@@ -433,7 +418,7 @@ void StartTravel ()
 
 void FinishTravel ()
 {
-	LinkedList<Thinker *>::Node *node = thinkerList->GetHead(ThinkerList::TRAVEL);
+	ThinkerList::Iterator node = thinkerList->GetHead(ThinkerList::TRAVEL);
 	if(!node)
 		return;
 
@@ -441,10 +426,10 @@ void FinishTravel ()
 	{
 		if(node->Item()->IsThinkerType<AActorProxy>())
 		{
-			AActorProxy *proxy = static_cast<AActorProxy *>(node->Item());
+			AActorProxy *proxy = static_cast<AActorProxy *>((Thinker*)node->Item());
 			if(proxy->parent->IsKindOf(NATIVE_CLASS(PlayerPawn)))
 			{
-				APlayerPawn *player = static_cast<APlayerPawn *>(proxy->parent);
+				APlayerPawn *player = static_cast<APlayerPawn *>((AActor*)proxy->parent);
 				if(player->player == &players[0])
 				{
 					AActor *playertmp = players[0].mo;

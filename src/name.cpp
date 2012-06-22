@@ -36,6 +36,7 @@
 #include "name.h"
 
 #include <cstdlib>
+#include "m_alloc.h"
 #include "m_crc32.h"
 #include "zdoomsupport.h"
 

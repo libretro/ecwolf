@@ -351,7 +351,7 @@ ACTION_FUNCTION(A_Chase)
 	ACTION_PARAM_INT(flags, 2);
 
 	int32_t	move,target;
-	int		dx,dy,dist,chance;
+	int		dx,dy,dist = INT_MAX,chance;
 	bool	dodge = !(flags & CHF_DONTDODGE);
 	bool	pathing = (self->flags & FL_PATHING) ? true : false;
 

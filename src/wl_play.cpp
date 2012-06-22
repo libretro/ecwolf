@@ -921,6 +921,7 @@ void PlayLoop (void)
 
 		gamestate.TimeCount += tics;
 		TexMan.UpdateAnimations(gamestate.TimeCount*14);
+		//GC::CheckGC();
 
 		UpdateSoundLoc ();      // JAB
 		if (screenfaded)

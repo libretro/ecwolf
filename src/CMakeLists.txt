@@ -118,6 +118,7 @@ add_executable(ecwolf WIN32
 	language.cpp
 	lnspec.cpp
 	lumpremap.cpp
+	m_alloc.cpp
 	m_classes.cpp
 	m_random.cpp
 	m_png.cpp

@@ -37,6 +37,7 @@
 #include "wl_inter.h"
 #include "wl_play.h"
 #include "wl_game.h"
+#include "dobject.h"
 
 /*
 =============================================================================
@@ -1258,6 +1259,12 @@ void CallTerminateFunctions()
 		TermFuncs[--NumTerms]();
 }
 
+static void CollectGC()
+{
+	GC::FullGC();
+	GC::DelSoftRootHead();
+}
+
 int main (int argc, char *argv[])
 {
 	Scanner::SetMessageHandler(ScannerMessageHandler);
@@ -1290,6 +1297,7 @@ int main (int argc, char *argv[])
 		}
 
 		InitThinkerList();
+		atterm(CollectGC);
 
 		printf("InitGame: Setting up the game...\n");
 		InitGame();

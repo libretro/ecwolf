@@ -239,7 +239,9 @@ class ClassDef
 			definition->Pointers = *T::__PointerOffsets == POINTER_END ? NULL : T::__PointerOffsets;
 			definition->name = className;
 			definition->parent = parent;
-			definition->defaultInstance = (DObject *) malloc(sizeof(T));
+			definition->size = sizeof(T);
+			definition->defaultInstance = (DObject *) M_Malloc(definition->size);
+			memset(definition->defaultInstance, 0, definition->size);
 			definition->ConstructNative = &T::__InPlaceConstructor;
 			definition->needsConstruction = true;
 			return definition;
@@ -266,7 +268,7 @@ class ClassDef
 		Symbol					*FindSymbol(const FName &symbol) const;
 		AActor					*GetDefault() const { return (AActor*)defaultInstance; }
 		const FName				&GetName() const { return name; }
-		size_t					GetSize() const { return defaultInstance->__GetSize(); }
+		size_t					GetSize() const { return size; }
 		static void				LoadActors();
 		static void				UnloadActors();
 
@@ -295,6 +297,7 @@ class ClassDef
 		bool			needsConstruction;
 		FName			name;
 		const ClassDef	*parent;
+		size_t			size;
 
 		TMap<FName, unsigned int>	stateList;
 		TArray<Frame *>			frameList;

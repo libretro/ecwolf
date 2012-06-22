@@ -55,7 +55,7 @@ AInventory *AInventory::CreateCopy(AActor *holder)
 	if(!GoesAway())
 		return this;
 
-	AInventory *copy = reinterpret_cast<AInventory *>(classType->CreateInstance());
+	AInventory *copy = reinterpret_cast<AInventory *>(GetClass()->CreateInstance());
 	copy->RemoveFromWorld();
 	copy->amount = amount;
 	copy->maxamount = maxamount;
@@ -94,7 +94,7 @@ bool AInventory::GoesAway()
 // Returns true if the pickup was handled by an already existing inventory item.
 bool AInventory::HandlePickup(AInventory *item, bool &good)
 {
-	if(item->classType == classType)
+	if(item->IsA(GetClass()))
 	{
 		if(amount < maxamount)
 		{
@@ -110,14 +110,6 @@ bool AInventory::HandlePickup(AInventory *item, bool &good)
 	else if(inventory)
 		return inventory->HandlePickup(item, good);
 	return false;
-}
-
-void AInventory::InitClean()
-{
-	Super::InitClean();
-	itemFlags = 0;
-	player = NULL;
-	owner = NULL;
 }
 
 void AInventory::Touch(AActor *toucher)

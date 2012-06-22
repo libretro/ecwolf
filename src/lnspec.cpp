@@ -40,6 +40,7 @@
 #include "wl_game.h"
 #include "wl_play.h"
 #include "g_shared/a_keys.h"
+#include "thingdef/thingdef.h"
 using namespace Specials;
 
 #define DEFINE_SPECIAL(name,num,argc) \
@@ -99,7 +100,7 @@ FUNC(NOP)
 
 class EVDoor : public Thinker
 {
-	DECLARE_THINKER(EVDoor)
+	DECLARE_CLASS(EVDoor, Thinker)
 
 	public:
 		EVDoor(MapSpot spot, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
@@ -115,7 +116,7 @@ class EVDoor : public Thinker
 		{
 			if(spot->thinker == this)
 				spot->thinker = NULL;
-			Thinker::Destroy();
+			Super::Destroy();
 		}
 
 		void Tick()
@@ -245,7 +246,7 @@ class EVDoor : public Thinker
 		unsigned int wait;
 		unsigned short direction;
 };
-IMPLEMENT_THINKER(EVDoor)
+IMPLEMENT_INTERNAL_CLASS(EVDoor)
 
 FUNC(Door_Open)
 {
@@ -261,9 +262,10 @@ FUNC(Door_Open)
 
 	if(spot->thinker)
 	{
+		Printf("%s isa %s -> %s\n", spot->thinker->GetClass()->GetName().GetChars(), EVDoor::__StaticClass->GetName().GetChars(), spot->thinker->IsThinkerType<EVDoor>() ? "true" : "false");
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
-			return static_cast<EVDoor *>(spot->thinker)->Reactivate(activator->flags & FL_ISMONSTER);
+			return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator->flags & FL_ISMONSTER);
 		}
 		return 0;
 	}
@@ -274,7 +276,7 @@ FUNC(Door_Open)
 
 class EVPushwall : public Thinker
 {
-	DECLARE_THINKER(EVPushwall)
+	DECLARE_CLASS(EVPushwall, Thinker)
 
 	public:
 		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
@@ -288,7 +290,7 @@ class EVPushwall : public Thinker
 		{
 			if(spot->thinker == this)
 				spot->thinker = NULL;
-			Thinker::Destroy();
+			Super::Destroy();
 		}
 
 		void Tick()
@@ -335,7 +337,7 @@ class EVPushwall : public Thinker
 		unsigned short	direction;
 		unsigned int	position;
 };
-IMPLEMENT_THINKER(EVPushwall)
+IMPLEMENT_INTERNAL_CLASS(EVPushwall)
 
 FUNC(Pushwall_Move)
 {

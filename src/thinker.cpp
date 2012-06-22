@@ -36,6 +36,7 @@
 */
 
 #include "thinker.h"
+#include "thingdef/thingdef.h"
 #include "wl_def.h"
 
 ThinkerList *thinkerList;
@@ -60,41 +61,30 @@ ThinkerList::~ThinkerList()
 	DestroyAll(static_cast<Priority>(0));
 }
 
-void ThinkerList::CleanThinkers()
-{
-	LinkedList<Thinker *>::Node *iter = toDestroy.Head();
-	while(iter)
-	{
-		delete iter->Item();
-		iter = iter->Next();
-	}
-	toDestroy.Clear();
-}
-
 void ThinkerList::DestroyAll(Priority start)
 {
 	for(unsigned int i = start;i < NUM_TYPES;++i)
 	{
-		LinkedList<Thinker *>::Node *iter = thinkers[i].Head();
+		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{
-			iter->Item()->Destroy();
+			if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+				iter->Item()->Destroy();
 			iter = iter->Next();
 		}
 	}
-	CleanThinkers();
+	GC::FullGC();
 }
 
 void ThinkerList::Tick()
 {
-	CleanThinkers();
-
 	for(unsigned int i = FIRST_TICKABLE;i < NUM_TYPES;++i)
 	{
-		LinkedList<Thinker *>::Node *iter = thinkers[i].Head();
+		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{
-			iter->Item()->Tick();
+			if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+				iter->Item()->Tick();
 			iter = iter->Next();
 		}
 	}
@@ -111,12 +101,9 @@ void ThinkerList::Deregister(Thinker *thinker)
 	thinkers[thinker->thinkerPriority].Remove(thinker->thinkerRef);
 }
 
-void ThinkerList::MarkForCollection(Thinker *thinker)
-{
-	toDestroy.Push(thinker);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
+
+IMPLEMENT_ABSTRACT_CLASS(Thinker)
 
 Thinker::Thinker(ThinkerList::Priority priority)
 {
@@ -126,11 +113,6 @@ Thinker::Thinker(ThinkerList::Priority priority)
 Thinker::~Thinker()
 {
 	thinkerList->Deregister(this);
-}
-
-void Thinker::Destroy()
-{
-	thinkerList->MarkForCollection(this);
 }
 
 void Thinker::SetPriority(ThinkerList::Priority priority)

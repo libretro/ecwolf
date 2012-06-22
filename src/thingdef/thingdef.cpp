@@ -420,7 +420,12 @@ ClassDef::~ClassDef()
 	for(unsigned int i = 0;i < frameList.Size();++i)
 		delete frameList[i];
 	if(defaultInstance)
-		defaultInstance->Destroy();
+	{
+		if(needsConstruction)
+			M_Free(defaultInstance);
+		else
+			defaultInstance->Destroy();
+	}
 	for(unsigned int i = 0;i < symbols.Size();++i)
 		delete symbols[i];
 }
@@ -530,10 +535,9 @@ AActor *ClassDef::CreateInstance() const
 		((AActor*)defaultInstance)->SeeState = FindState(NAME_See);
 	}
 
-	AActor *newactor = (AActor *) malloc(defaultInstance->__GetSize());
-	memcpy(newactor, defaultInstance, defaultInstance->__GetSize());
+	AActor *newactor = (AActor *) M_Malloc(size);
+	memcpy(newactor, defaultInstance, size);
 	ConstructNative(this, newactor);
-	newactor->classType = this;
 	newactor->Init();
 	return newactor;
 }
@@ -796,15 +800,6 @@ void ClassDef::LoadActors()
 	while(iter.NextPair(pair))
 	{
 		ClassDef * const cls = pair->Value;
-
-		// This is where we check to make sure native classes that aren't actors
-		// get constructed. (DObject for example)
-		if(cls->needsConstruction)
-		{
-			cls->needsConstruction = false;
-			cls->ConstructNative(cls, cls->defaultInstance);
-		}
-
 		for(unsigned int i = 0;i < cls->frameList.Size();++i)
 			cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
 	}
@@ -858,25 +853,20 @@ void ClassDef::ParseActor(Scanner &sc)
 	else
 		newClass->tentative = false;
 
-	newClass->needsConstruction = false;
+	newClass->needsConstruction = true;
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
+		newClass->size = newClass->parent->size;
 
-		newClass->defaultInstance = (DObject *) malloc(newClass->parent->defaultInstance->__GetSize());
-		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
-		newClass->ConstructNative(newClass, newClass->defaultInstance);
-		newClass->defaultInstance->Init(true);
+		newClass->defaultInstance = (DObject *) M_Malloc(newClass->parent->size);
+		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
 	}
 	else
 	{
 		// Copy the parents defaults for native classes
 		if(newClass->parent)
-			memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->defaultInstance->__GetSize());
-
-		// Initialize the default instance
-		newClass->ConstructNative(newClass, newClass->defaultInstance);
-		newClass->defaultInstance->InitClean();
+			memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
 	}
 	// Copy properties and flags.
 	if(newClass->parent != NULL)

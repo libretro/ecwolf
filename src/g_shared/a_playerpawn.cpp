@@ -95,12 +95,6 @@ void APlayerPawn::GiveStartingInventory()
 #endif
 }
 
-void APlayerPawn::InitClean()
-{
-	startInventory = NULL;
-	Super::InitClean();
-}
-
 AWeapon *APlayerPawn::PickNewWeapon()
 {
 	AWeapon *best = NULL;

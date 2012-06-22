@@ -44,9 +44,6 @@ static inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s))
 #endif
 
 #define MAXWIDTH 2560
-#define M_Realloc realloc
-#define M_Malloc malloc
-#define M_Free free
 #define Printf printf
 #define I_Error Quit
 #define I_FatalError Quit

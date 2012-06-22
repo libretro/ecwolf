@@ -71,7 +71,6 @@ class APlayerPawn : public AActor
 		DropList	*startInventory;
 
 	protected:
-		void	InitClean();
 		void	TickPSprites();
 };
 

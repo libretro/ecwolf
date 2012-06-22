@@ -38,6 +38,7 @@
 #include "tarray.h"
 #include "zstring.h"
 #include "textures/textures.h"
+#include "dobject.h"
 
 class Thinker;
 class UWMFParser;
@@ -134,7 +135,7 @@ class GameMap
 				const Zone		*zone;
 
 				bool			visible;
-				Thinker			*thinker;
+				TObjPtr<Thinker> thinker;
 				unsigned int	slideAmount[4];
 				TArray<Trigger>	triggers;
 				Tile::Side		pushDirection;

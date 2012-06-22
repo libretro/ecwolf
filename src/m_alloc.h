@@ -37,4 +37,21 @@
 #include <stdlib.h>
 #include "zdoomsupport.h"
 
+// These are the same as the same stdlib functions,
+// except they bomb out with a fatal error
+// when they can't get the memory.
+
+#if defined(_DEBUG)
+#define M_Malloc(s)		M_Malloc_Dbg(s, __FILE__, __LINE__)
+#define M_Realloc(p,s)	M_Realloc_Dbg(p, s, __FILE__, __LINE__)
+
+void *M_Malloc_Dbg (size_t size, const char *file, int lineno);
+void *M_Realloc_Dbg (void *memblock, size_t size, const char *file, int lineno);
+#else
+void *M_Malloc (size_t size);
+void *M_Realloc (void *memblock, size_t size);
+#endif
+
+void M_Free (void *memblock);
+
 #endif //__M_ALLOC_H__

@@ -63,7 +63,6 @@ class AInventory : public AActor
 		virtual AInventory	*CreateCopy(AActor *holder);
 		void				GoAwayAndDie();
 		bool				GoesAway();
-		void				InitClean();
 };
 
 class AAmmo : public AInventory

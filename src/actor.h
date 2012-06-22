@@ -48,19 +48,28 @@
 		typedef name ThisClass; \
 	protected: \
 		name(const ClassDef *classType) : parent(classType) {} \
-		virtual size_t __GetSize() const { return sizeof(name); } \
+		virtual const ClassDef *__StaticType() const { return __StaticClass; } \
 		static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem); \
 	public: \
 		static const ClassDef *__StaticClass; \
 		static const size_t __PointerOffsets[];
 #define DECLARE_NATIVE_CLASS(name, parent) DECLARE_CLASS(A##name, A##parent)
 #define HAS_OBJECT_POINTERS
+#define __IMPCLS_ABSTRACT(cls, name) \
+	const ClassDef *cls::__StaticClass = ClassDef::DeclareNativeClass<cls>(name, Super::__StaticClass);
 #define __IMPCLS(cls, name) \
-	const ClassDef *cls::__StaticClass = ClassDef::DeclareNativeClass<cls>(name, Super::__StaticClass); \
+	__IMPCLS_ABSTRACT(cls, name) \
 	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new ((EInPlace *) mem) cls(classType); }
+#define IMPLEMENT_ABSTRACT_CLASS(cls) \
+	__IMPCLS_ABSTRACT(cls, #cls) \
+	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return Super::__InPlaceConstructor(classType, mem); } \
+	const size_t cls::__PointerOffsets[] = { ~(size_t)0 };
 #define IMPLEMENT_INTERNAL_CLASS(cls) \
 	__IMPCLS(cls, #cls) \
 	const size_t cls::__PointerOffsets[] = { ~(size_t)0 };
+#define IMPLEMENT_INTERNAL_POINTY_CLASS(cls) \
+	__IMPCLS(cls, #cls) \
+	const size_t cls::__PointerOffsets[] = {
 #define IMPLEMENT_CLASS(name) \
 	__IMPCLS(A##name, #name) \
 	const size_t A##name::__PointerOffsets[] = { ~(size_t)0 };
@@ -130,7 +139,6 @@ class AActor : public DObject
 		virtual ~AActor();
 
 		void			AddInventory(AInventory *item);
-		const ClassDef	*GetClass() const { return classType; }
 		Thinker			*GetThinker() const;
 		virtual void	Destroy();
 		void			Die();
@@ -192,13 +200,10 @@ class AActor : public DObject
 		static Iterator *GetIterator() { return actors.Head(); }
 	protected:
 		friend class AActorProxy;
-		void	InitClean();
-		void	Init(bool nothink=false);
+		void	Init();
 
 		const MapZone	*soundZone;
 		AActorProxy		*thinker;
-
-		const ClassDef	*classType;
 };
 
 #endif
