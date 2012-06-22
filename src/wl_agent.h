@@ -46,6 +46,7 @@ extern class player_t
 {
 	public:
 		void	BringUpWeapon();
+		size_t	PropagateMark();
 		void	Reborn();
 		void	SetPSprite(const Frame *frame);
 

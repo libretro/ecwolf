@@ -56,7 +56,7 @@
 #define DECLARE_NATIVE_CLASS(name, parent) DECLARE_CLASS(A##name, A##parent)
 #define HAS_OBJECT_POINTERS
 #define __IMPCLS_ABSTRACT(cls, name) \
-	const ClassDef *cls::__StaticClass = ClassDef::DeclareNativeClass<cls>(name, Super::__StaticClass);
+	const ClassDef *cls::__StaticClass = ClassDef::DeclareNativeClass<cls>(name, &Super::__StaticClass);
 #define __IMPCLS(cls, name) \
 	__IMPCLS_ABSTRACT(cls, name) \
 	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new ((EInPlace *) mem) cls(classType); }
@@ -125,6 +125,7 @@ class AInventory;
 class AActor : public DObject
 {
 	DECLARE_CLASS(AActor, DObject)
+	HAS_OBJECT_POINTERS
 
 	public:
 		struct DropItem
@@ -143,7 +144,7 @@ class AActor : public DObject
 		virtual void	Destroy();
 		void			Die();
 		void			EnterZone(const MapZone *zone);
-		AInventory		*FindInventory(const ClassDef *cls) const;
+		AInventory		*FindInventory(const ClassDef *cls);
 		const Frame		*FindState(const FName &name) const;
 		const AActor	*GetDefault() const;
 		const MapZone	*GetZone() const { return soundZone; }
@@ -190,7 +191,7 @@ class AActor : public DObject
 
 		player_t	*player;	// Only valid with APlayerPawn
 
-		AInventory	*inventory;
+		TObjPtr<AInventory>	inventory;
 
 		DropList	*dropitems;
 

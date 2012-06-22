@@ -409,7 +409,7 @@ TMap<int, ClassDef *> ClassDef::classNumTable;
 SymbolTable ClassDef::globalSymbols;
 bool ClassDef::bShutdown = false;
 
-ClassDef::ClassDef() : tentative(false), needsConstruction(false)
+ClassDef::ClassDef() : tentative(false)
 {
 	defaultInstance = NULL;
 	FlatPointers = Pointers = NULL;
@@ -421,10 +421,7 @@ ClassDef::~ClassDef()
 		delete frameList[i];
 	if(defaultInstance)
 	{
-		if(needsConstruction)
-			M_Free(defaultInstance);
-		else
-			defaultInstance->Destroy();
+		M_Free(defaultInstance);
 	}
 	for(unsigned int i = 0;i < symbols.Size();++i)
 		delete symbols[i];
@@ -771,6 +768,21 @@ void ClassDef::LoadActors()
 	printf("ClassDef: Loading actor definitions.\n");
 	atterm(&ClassDef::UnloadActors);
 
+	// First iterate through the native classes and fix their parent pointers
+	// In order to keep things simple what I did was in DeclareNativeClass I
+	// force a const ClassDef ** into the parent, so we just need to cast back
+	// and get the value of the pointer.
+	{
+		TMap<FName, ClassDef *>::Iterator iter(ClassTable());
+		TMap<FName, ClassDef *>::Pair *pair;
+		while(iter.NextPair(pair))
+		{
+			ClassDef * const cls = pair->Value;
+			if(cls->parent)
+				cls->parent = *(const ClassDef **)cls->parent;
+		}
+	}
+
 	InitFunctionTable(NULL);
 
 	// Add function symbols
@@ -795,13 +807,15 @@ void ClassDef::LoadActors()
 
 	R_InitSprites();
 
-	TMap<FName, ClassDef *>::Iterator iter(ClassTable());
-	TMap<FName, ClassDef *>::Pair *pair;
-	while(iter.NextPair(pair))
 	{
-		ClassDef * const cls = pair->Value;
-		for(unsigned int i = 0;i < cls->frameList.Size();++i)
-			cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
+		TMap<FName, ClassDef *>::Iterator iter(ClassTable());
+		TMap<FName, ClassDef *>::Pair *pair;
+		while(iter.NextPair(pair))
+		{
+			ClassDef * const cls = pair->Value;
+			for(unsigned int i = 0;i < cls->frameList.Size();++i)
+				cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
+		}
 	}
 }
 
@@ -833,9 +847,9 @@ void ClassDef::ParseActor(Scanner &sc)
 	}
 	else
 	{
-		newClass->parent = NATIVE_CLASS(Actor);
-		if(newClass->parent == newClass) // If no class was specified to inherit from, inherit from AActor, but not for AActor.
-			newClass->parent = NULL;
+		// If no class was specified to inherit from, inherit from AActor, but not for AActor.
+		if(newClass != NATIVE_CLASS(Actor))
+			newClass->parent = NATIVE_CLASS(Actor);
 	}
 	if(sc.CheckToken(TK_IntConst))
 	{
@@ -853,7 +867,6 @@ void ClassDef::ParseActor(Scanner &sc)
 	else
 		newClass->tentative = false;
 
-	newClass->needsConstruction = true;
 	if(!native) // Initialize the default instance to the nearest native class.
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;

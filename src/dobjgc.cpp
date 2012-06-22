@@ -60,6 +60,7 @@
 #include "dobject.h"
 #include "templates.h"
 #include "m_alloc.h"
+#include "thinker.h"
 //#include "b_bot.h"
 //#include "p_local.h"
 //#include "g_game.h"
@@ -76,6 +77,7 @@
 #include "v_video.h"
 //#include "menu/menu.h"
 //#include "intermission/intermission.h"
+#include "wl_agent.h"
 #include "thingdef/thingdef.h"
 
 // MACROS ------------------------------------------------------------------
@@ -302,13 +304,15 @@ static void MarkRoot()
 	int i;
 
 	Gray = NULL;
+	if(thinkerList)
+		thinkerList->MarkRoots();
+	players[0].PropagateMark();
 #if 0
 	Mark(Args);
 	Mark(screen);
 	Mark(StatusBar);
 	Mark(DMenu::CurrentMenu);
 	Mark(DIntermissionController::CurrentIntermission);
-	DThinker::MarkRoots();
 	FCanvasTextureInfo::Mark();
 	Mark(DACSThinker::ActiveThinker);
 	// Mark dead bodies.

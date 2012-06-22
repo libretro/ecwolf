@@ -44,6 +44,7 @@ ThinkerList *thinkerList;
 void DeinitThinkerList()
 {
 	delete thinkerList;
+	thinkerList = NULL;
 }
 
 void InitThinkerList()
@@ -74,6 +75,23 @@ void ThinkerList::DestroyAll(Priority start)
 		}
 	}
 	GC::FullGC();
+}
+
+void ThinkerList::MarkRoots()
+{
+	for(unsigned int i = 0;i < NUM_TYPES;++i)
+	{
+		Iterator iter = thinkers[i].Head();
+		while(iter)
+		{
+			if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+			{
+				GC::Mark(iter->Item());
+				//break;
+			}
+			iter = iter->Next();
+		}
+	}
 }
 
 void ThinkerList::Tick()
@@ -113,6 +131,21 @@ Thinker::Thinker(ThinkerList::Priority priority)
 Thinker::~Thinker()
 {
 	thinkerList->Deregister(this);
+}
+
+size_t Thinker::PropagateMark()
+{
+#if 0
+	Printf("Propagating mark\n");
+	ThinkerList::Iterator iter = thinkerRef->Next();
+	if(iter && !(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+		GC::Mark(iter->Item());
+
+	iter = thinkerRef->Prev();
+	if(iter && !(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+		GC::Mark(iter->Item());
+#endif
+	return Super::PropagateMark();
 }
 
 void Thinker::SetPriority(ThinkerList::Priority priority)

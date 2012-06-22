@@ -939,6 +939,15 @@ ACTION_FUNCTION(A_Raise)
 		player->psprite.frame = NULL;
 }
 
+size_t player_t::PropagateMark()
+{
+	GC::Mark(mo);
+	GC::Mark(ReadyWeapon);
+	if(PendingWeapon != WP_NOCHANGE)
+		GC::Mark(PendingWeapon);
+	return sizeof(*this);
+}
+
 void player_t::Reborn()
 {
 	ReadyWeapon = NULL;

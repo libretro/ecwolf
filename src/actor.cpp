@@ -99,6 +99,13 @@ class AActorProxy : public Thinker
 			enabled = false;
 		}
 
+		size_t PropagateMark()
+		{
+			if(enabled)
+				GC::Mark(parent);
+			return Super::PropagateMark();
+		}
+
 		void Tick()
 		{
 			if(enabled)
@@ -113,14 +120,9 @@ IMPLEMENT_INTERNAL_POINTY_CLASS(AActorProxy)
 END_POINTERS
 
 LinkedList<AActor *> AActor::actors;
-IMPLEMENT_CLASS(Actor)
-
-//AActor::AActor(const ClassDef *type) : classType(type), distance(0),
-//	dir(nodir), soundZone(NULL), inventory(NULL)
-//{
-	// This will be called for each actor AFTER copying the defaults.
-	// Use InitClean for any one time construction.
-//}
+IMPLEMENT_POINTY_CLASS(Actor)
+	DECLARE_POINTER(inventory)
+END_POINTERS
 
 AActor::~AActor()
 {
@@ -241,7 +243,7 @@ void AActor::EnterZone(const MapZone *zone)
 		soundZone = zone;
 }
 
-AInventory *AActor::FindInventory(const ClassDef *cls) const
+AInventory *AActor::FindInventory(const ClassDef *cls)
 {
 	if(inventory == NULL)
 		return NULL;

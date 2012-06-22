@@ -225,7 +225,7 @@ class ClassDef
 		 * Use with IMPLEMENT_CLASS to add a natively defined class.
 		 */
 		template<class T>
-		static const ClassDef	*DeclareNativeClass(const char* className, const ClassDef *parent)
+		static const ClassDef	*DeclareNativeClass(const char* className, const ClassDef **parent)
 		{
 			ClassDef **definitionLookup = ClassTable().CheckKey(className);
 			ClassDef *definition = NULL;
@@ -238,12 +238,12 @@ class ClassDef
 				definition = *definitionLookup;
 			definition->Pointers = *T::__PointerOffsets == POINTER_END ? NULL : T::__PointerOffsets;
 			definition->name = className;
-			definition->parent = parent;
+			// We will get the real value of this later before we load the actors
+			definition->parent = (const ClassDef *)parent;
 			definition->size = sizeof(T);
 			definition->defaultInstance = (DObject *) M_Malloc(definition->size);
 			memset(definition->defaultInstance, 0, definition->size);
 			definition->ConstructNative = &T::__InPlaceConstructor;
-			definition->needsConstruction = true;
 			return definition;
 		}
 
@@ -294,7 +294,6 @@ class ClassDef
 		static SymbolTable				globalSymbols;
 
 		bool			tentative;
-		bool			needsConstruction;
 		FName			name;
 		const ClassDef	*parent;
 		size_t			size;

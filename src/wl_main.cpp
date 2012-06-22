@@ -400,6 +400,12 @@ void DoJukebox(void)
 void SetupWM();
 #endif
 
+static void CollectGC()
+{
+	GC::FullGC();
+	GC::DelSoftRootHead();
+}
+
 static void InitGame()
 {
 	// initialize SDL
@@ -478,6 +484,7 @@ static void InitGame()
 //
 
 	ClassDef::LoadActors();
+	atterm(CollectGC);
 
 //
 // Load Keys
@@ -1259,12 +1266,6 @@ void CallTerminateFunctions()
 		TermFuncs[--NumTerms]();
 }
 
-static void CollectGC()
-{
-	GC::FullGC();
-	GC::DelSoftRootHead();
-}
-
 int main (int argc, char *argv[])
 {
 	Scanner::SetMessageHandler(ScannerMessageHandler);
@@ -1297,7 +1298,6 @@ int main (int argc, char *argv[])
 		}
 
 		InitThinkerList();
-		atterm(CollectGC);
 
 		printf("InitGame: Setting up the game...\n");
 		InitGame();

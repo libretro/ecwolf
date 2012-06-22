@@ -65,6 +65,8 @@ extern class ThinkerList
 		Iterator GetHead(Priority list) { return thinkers[list].Head(); }
 		void	DestroyAll(Priority start=FIRST_TICKABLE);
 		void	Tick();
+
+		void	MarkRoots();
 	protected:
 		friend class Thinker;
 		void	Register(Thinker *thinker, Priority type=NORMAL);
@@ -86,6 +88,7 @@ class Thinker : public DObject
 		bool			IsThinkerType() { return IsA(T::__StaticClass); }
 		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
+		size_t			PropagateMark();
 
 	private:
 		friend class ThinkerList;
