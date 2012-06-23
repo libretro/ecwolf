@@ -75,7 +75,7 @@ class GameMap
 				repeatable(false)
 			{
 				activate[0] = activate[1] = activate[2] = activate[3] = true;
-				arg[0] = arg[1] = arg[2] = arg[3] = arg[4] = arg[5] = 0;
+				arg[0] = arg[1] = arg[2] = arg[3] = arg[4] = 0;
 			}
 
 			unsigned int	x, y, z;

@@ -92,7 +92,7 @@ void	VL_SetVGAPlaneMode (void)
 {
 	SDL_WM_SetCaption("ECWolf", NULL);
 
-	if(screenBits == -1)
+	if(screenBits == static_cast<unsigned>(-1))
 	{
 		const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
 		screenBits = vidInfo->vfmt->BitsPerPixel;
@@ -424,8 +424,8 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
 {
 	byte *ptr;
 
-	assert(x >= 0 && x + width <= screenWidth
-			&& y >= 0 && y < screenHeight
+	assert(x + width <= screenWidth
+			&& y < screenHeight
 			&& "VL_Hlin: Destination rectangle out of bounds!");
 
 	ptr = VL_LockSurface(curSurface);

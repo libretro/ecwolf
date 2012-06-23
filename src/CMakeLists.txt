@@ -34,6 +34,10 @@ if(NOT STRNICMP_EXISTS)
 	add_definitions(-Dstrnicmp=strncasecmp)
 endif(NOT STRNICMP_EXISTS)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+	set(CMAKE_CXX_FLAGS "-Wall -Wno-unused -Wno-unused-result -Wno-ignored-qualifiers -Wextra -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}")
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 if(WIN32)
 	add_definitions(-DWINDOWS)
 

@@ -390,7 +390,7 @@ LevelCompleted (void)
 		if (sec > 99 * 60)      // 99 minutes max
 			sec = 99 * 60;
 
-		if (gamestate.TimeCount < levelInfo->Par * 70)
+		if ((unsigned)gamestate.TimeCount < levelInfo->Par * 70)
 			timeleft = (int32_t) (levelInfo->Par - sec);
 
 		min = sec / 60;

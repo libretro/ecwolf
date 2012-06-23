@@ -77,7 +77,7 @@ void FWarpTexture::Unload ()
 
 bool FWarpTexture::CheckModified ()
 {
-	return gamestate.TimeCount != GenTime;
+	return (unsigned)gamestate.TimeCount != GenTime;
 }
 
 const BYTE *FWarpTexture::GetPixels ()

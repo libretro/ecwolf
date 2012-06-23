@@ -27,7 +27,7 @@ EColorRange MenuItem::getTextColor() const
 
 MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) :
 	activateListener(activateListener), enabled(true), highlight(false),
-	picture(NULL), selected(false), visible(true), pictureX(-1), pictureY(-1)
+	picture(NULL), pictureX(-1), pictureY(-1), selected(false), visible(true)
 {
 	setText(string);
 }
@@ -165,7 +165,8 @@ void SliderMenuItem::right()
 	SD_PlaySound("menu/move1");
 }
 
-MultipleChoiceMenuItem::MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, int numOptions, int curOption) : MenuItem("", changeListener), numOptions(numOptions), curOption(curOption)
+MultipleChoiceMenuItem::MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, unsigned int numOptions, int curOption) : MenuItem("", changeListener),
+	curOption(curOption), numOptions(numOptions)
 {
 	// Copy all of the options
 	this->options = new char *[numOptions];
@@ -183,7 +184,7 @@ MultipleChoiceMenuItem::MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeLis
 	// clamp current option
 	if(curOption < 0)
 		curOption = 0;
-	else if(curOption >= numOptions)
+	else if((unsigned)curOption >= numOptions)
 		curOption = numOptions-1;
 
 	while(options[curOption] == NULL)
@@ -235,7 +236,7 @@ void MultipleChoiceMenuItem::right()
 	do
 	{
 		curOption++;
-		if(curOption >= numOptions)
+		if((unsigned)curOption >= numOptions)
 			curOption = 0;
 	}
 	while(options[curOption] == NULL);
@@ -486,8 +487,9 @@ void Menu::eraseGun(int x, int y)
 }
 
 Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) :
-	x(x), y(y), w(w), entryListener(entryListener), indent(indent), curPos(0),
-	headPicture(NULL), height(0), itemOffset(0), headTextInStripes(false)
+	entryListener(entryListener), curPos(0), headPicture(NULL),
+	headTextInStripes(false), height(0), indent(indent), x(x), y(y), w(w),
+	itemOffset(0)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';
@@ -501,7 +503,7 @@ void Menu::addItem(MenuItem *item)
 {
 	item->setMenu(this);
 	items.Push(item);
-	if(!item->isEnabled() && items.Size()-1 == curPos)
+	if(!item->isEnabled() && (signed)items.Size()-1 == curPos)
 		curPos++;
 	height += item->getHeight();
 }
@@ -541,7 +543,7 @@ int Menu::getHeight(int position) const
 	// Make sure we have the position we think we have.
 	if(position != -1)
 	{
-		for(unsigned int i = 0;i < items.Size() && i < position;i++)
+		for(unsigned int i = 0;i < items.Size() && i < (unsigned)position;i++)
 		{
 			if(!items[i]->isVisible())
 				position++;
@@ -551,7 +553,7 @@ int Menu::getHeight(int position) const
 	unsigned int num = 0;
 	for(unsigned int i = itemOffset;i < items.Size();i++)
 	{
-		if(position == i)
+		if((unsigned)position == i)
 			break;
 
 		if(items[i]->isVisible())
@@ -596,7 +598,7 @@ void Menu::drawMenu() const
 
 	for (unsigned int i = itemOffset; i < countItems(); i++)
 	{
-		if(i == curPos)
+		if(i == (unsigned)curPos)
 			selectedY = y;
 		else
 		{
@@ -610,12 +612,12 @@ void Menu::drawMenu() const
 	}
 
 	// In order to draw the skill menu correctly we need to draw the selected option now
-	if(curPos >= itemOffset)
+	if(curPos >= (signed)itemOffset)
 	{
 		PrintY = selectedY;
 		getIndex(curPos)->setSelected(true);
 		getIndex(curPos)->draw();
-		if(curPos > lastIndexDrawn)
+		if(curPos > (signed)lastIndexDrawn)
 			lastIndexDrawn = curPos;
 	}
 }
@@ -664,7 +666,7 @@ int Menu::handle()
 {
 	char key;
 	static int redrawitem = 1, lastitem = -1;
-	int i, x, y, basey, exit, shape;
+	int x, y, basey, exit, shape;
 	int32_t lastBlinkTime, timer;
 	ControlInfo ci;
 
@@ -717,7 +719,7 @@ int Menu::handle()
 			if (key >= 'a')
 				key -= 'a' - 'A';
 
-			for (i = curPos + 1; i < countItems(); i++)
+			for (unsigned int i = curPos + 1; i < countItems(); i++)
 				if (getIndex(i)->isEnabled() && getIndex(i)->getString()[0] == key)
 				{
 					eraseGun(x, y);
@@ -733,7 +735,7 @@ int Menu::handle()
 			//
 			if (!ok)
 			{
-				for (i = 0; i < curPos; i++)
+				for (int i = 0; i < curPos; i++)
 				{
 					if (getIndex(i)->isEnabled() && getIndex(i)->getString()[0] == key)
 					{
@@ -753,6 +755,9 @@ int Menu::handle()
 		ReadAnyControl (&ci);
 		switch (ci.dir)
 		{
+			default:
+				break;
+
 				////////////////////////////////////////////////
 				//
 				// MOVE UP
@@ -766,12 +771,12 @@ int Menu::handle()
 				//
 				// ANIMATE HALF-STEP
 				//
-				if (curPos != itemOffset && getIndex(curPos - 1)->isEnabled())
+				if ((unsigned)curPos != itemOffset && getIndex(curPos - 1)->isEnabled())
 				{
 					y -= 6;
 					drawGunHalfStep(x, y);
 				}
-				if (curPos == itemOffset && curPos != 0)
+				if ((unsigned)curPos == itemOffset && curPos != 0)
 				{
 					itemOffset--;
 					draw();
@@ -815,12 +820,12 @@ int Menu::handle()
 				//
 				// ANIMATE HALF-STEP
 				//
-				if (curPos != lastIndexDrawn && curPos != countItems() - 1 && getIndex(curPos + 1)->isEnabled())
+				if ((unsigned)curPos != lastIndexDrawn && curPos != (signed)countItems() - 1 && getIndex(curPos + 1)->isEnabled())
 				{
 					y += 6;
 					drawGunHalfStep(x, y);
 				}
-				if (curPos == lastIndexDrawn && curPos != countItems() - 1)
+				if ((unsigned)curPos == lastIndexDrawn && curPos != (signed)countItems() - 1)
 				{
 					itemOffset++;
 					draw();
@@ -831,7 +836,7 @@ int Menu::handle()
 
 				do
 				{
-					if (curPos == countItems() - 1)
+					if (curPos == (signed)countItems() - 1)
 					{
 						curPos = 0;
 						itemOffset = 0;
@@ -870,7 +875,7 @@ int Menu::handle()
 		if (ci.button0 || Keyboard[sc_Space] || Keyboard[sc_Enter])
 			exit = 1;
 
-		if (ci.button1 && !Keyboard[sc_Alt] || Keyboard[sc_Escape])
+		if ((ci.button1 && !Keyboard[sc_Alt]) || Keyboard[sc_Escape])
 			exit = 2;
 
 	}
@@ -938,7 +943,7 @@ void Menu::show()
 
 	if(countItems() == 0) // Do nothing.
 		return;
-	if(curPos >= countItems())
+	if(curPos >= (signed)countItems())
 		curPos = countItems()-1;
 
 	draw();

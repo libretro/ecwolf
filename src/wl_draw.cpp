@@ -759,8 +759,8 @@ void CalcTics (void)
 void AsmRefresh()
 {
 	static word xspot[2],yspot[2];
-	int32_t xstep,ystep;
-	longword xpartial,ypartial;
+	int32_t xstep=0,ystep=0;
+	longword xpartial=0,ypartial=0;
 	MapSpot focalspot = map->GetSpot(focaltx, focalty, 0);
 	bool playerInPushwallBackTile = focalspot->pushAmount != 0 || focalspot->pushReceptor;
 
@@ -915,8 +915,8 @@ vertentry:
 								pwallposnorm = tilehit->pushAmount;
 								pwallposinv = 64-tilehit->pushAmount;
 							}
-							if(tilehit->pushDirection==MapTile::East && xtile==tilehit->GetX() && ((uint32_t)yintercept>>16)==tilehit->GetY()
-								|| tilehit->pushDirection==MapTile::West && !(xtile==tilehit->GetX() && ((uint32_t)yintercept>>16)==tilehit->GetY()))
+							if((tilehit->pushDirection==MapTile::East && xtile==(signed)tilehit->GetX() && ((uint32_t)yintercept>>16)==tilehit->GetY())
+								|| (tilehit->pushDirection==MapTile::West && !(xtile==(signed)tilehit->GetX() && ((uint32_t)yintercept>>16)==tilehit->GetY())))
 							{
 								yintbuf=yintercept+((ystep*pwallposnorm)>>6);
 								if((yintbuf>>16)!=(yintercept>>16))
@@ -943,13 +943,13 @@ vertentry:
 						{
 							int pwallposi = tilehit->pushAmount;
 							if(tilehit->pushDirection==MapTile::North) pwallposi = 64-tilehit->pushAmount;
-							if(tilehit->pushDirection==MapTile::South && (word)yintercept<(pwallposi<<10)
-								|| tilehit->pushDirection==MapTile::North && (word)yintercept>(pwallposi<<10))
+							if((tilehit->pushDirection==MapTile::South && (word)yintercept<(pwallposi<<10))
+								|| (tilehit->pushDirection==MapTile::North && (word)yintercept>(pwallposi<<10)))
 							{
-								if(((uint32_t)yintercept>>16)==tilehit->GetY() && xtile==tilehit->GetX())
+								if(((uint32_t)yintercept>>16)==tilehit->GetY() && xtile==(signed)tilehit->GetX())
 								{
-									if(tilehit->pushDirection==MapTile::South && (int32_t)((word)yintercept)+ystep<(pwallposi<<10)
-											|| tilehit->pushDirection==MapTile::North && (int32_t)((word)yintercept)+ystep>(pwallposi<<10))
+									if((tilehit->pushDirection==MapTile::South && (int32_t)((word)yintercept)+ystep<(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::North && (int32_t)((word)yintercept)+ystep>(pwallposi<<10)))
 										goto passvert;
 
 									if(tilehit->pushDirection==MapTile::South)
@@ -975,7 +975,7 @@ vertentry:
 							}
 							else
 							{
-								if(((uint32_t)yintercept>>16)==tilehit->GetY() && xtile==tilehit->GetX())
+								if(((uint32_t)yintercept>>16)==tilehit->GetY() && xtile==(signed)tilehit->GetX())
 								{
 									texdelta = -(pwallposi<<10);
 									xintercept=xtile<<TILESHIFT;
@@ -984,8 +984,8 @@ vertentry:
 								}
 								else
 								{
-									if(tilehit->pushDirection==MapTile::South && (int32_t)((word)yintercept)+ystep>(pwallposi<<10)
-											|| tilehit->pushDirection==MapTile::North && (int32_t)((word)yintercept)+ystep<(pwallposi<<10))
+									if((tilehit->pushDirection==MapTile::South && (int32_t)((word)yintercept)+ystep>(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::North && (int32_t)((word)yintercept)+ystep<(pwallposi<<10)))
 										goto passvert;
 
 									if(tilehit->pushDirection==MapTile::South)
@@ -1081,8 +1081,8 @@ horizentry:
 								pwallposnorm = tilehit->pushAmount;
 								pwallposinv = 64-tilehit->pushAmount;
 							}
-							if(tilehit->pushDirection == MapTile::South && ytile==tilehit->GetY() && ((uint32_t)xintercept>>16)==tilehit->GetX()
-								|| tilehit->pushDirection == MapTile::North && !(ytile==tilehit->GetY() && ((uint32_t)xintercept>>16)==tilehit->GetX()))
+							if((tilehit->pushDirection == MapTile::South && ytile==(signed)tilehit->GetY() && ((uint32_t)xintercept>>16)==tilehit->GetX())
+								|| (tilehit->pushDirection == MapTile::North && !(ytile==(signed)tilehit->GetY() && ((uint32_t)xintercept>>16)==tilehit->GetX())))
 							{
 								xintbuf=xintercept+((xstep*pwallposnorm)>>6);
 								if((xintbuf>>16)!=(xintercept>>16))
@@ -1109,13 +1109,13 @@ horizentry:
 						{
 							int pwallposi = tilehit->pushAmount;
 							if(tilehit->pushDirection==MapTile::West) pwallposi = 64-tilehit->pushAmount;
-							if(tilehit->pushDirection==MapTile::East && (word)xintercept<(pwallposi<<10)
-									|| tilehit->pushDirection==MapTile::West && (word)xintercept>(pwallposi<<10))
+							if((tilehit->pushDirection==MapTile::East && (word)xintercept<(pwallposi<<10))
+								|| (tilehit->pushDirection==MapTile::West && (word)xintercept>(pwallposi<<10)))
 							{
-								if(((uint32_t)xintercept>>16)==tilehit->GetX() && ytile==tilehit->GetY())
+								if(((uint32_t)xintercept>>16)==tilehit->GetX() && ytile==(signed)tilehit->GetY())
 								{
-									if(tilehit->pushDirection==MapTile::East && (int32_t)((word)xintercept)+xstep<(pwallposi<<10)
-											|| tilehit->pushDirection==MapTile::West && (int32_t)((word)xintercept)+xstep>(pwallposi<<10))
+									if((tilehit->pushDirection==MapTile::East && (int32_t)((word)xintercept)+xstep<(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::West && (int32_t)((word)xintercept)+xstep>(pwallposi<<10)))
 										goto passhoriz;
 
 									if(tilehit->pushDirection==MapTile::East)
@@ -1141,7 +1141,7 @@ horizentry:
 							}
 							else
 							{
-								if(((uint32_t)xintercept>>16)==tilehit->GetX() && ytile==tilehit->GetY())
+								if(((uint32_t)xintercept>>16)==tilehit->GetX() && ytile==(signed)tilehit->GetY())
 								{
 									texdelta = -(pwallposi<<10);
 									yintercept=ytile<<TILESHIFT;
@@ -1150,8 +1150,8 @@ horizentry:
 								}
 								else
 								{
-									if(tilehit->pushDirection==MapTile::East && (int32_t)((word)xintercept)+xstep>(pwallposi<<10)
-											|| tilehit->pushDirection==MapTile::West && (int32_t)((word)xintercept)+xstep<(pwallposi<<10))
+									if((tilehit->pushDirection==MapTile::East && (int32_t)((word)xintercept)+xstep>(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::West && (int32_t)((word)xintercept)+xstep<(pwallposi<<10)))
 										goto passhoriz;
 
 									if(tilehit->pushDirection==MapTile::East)

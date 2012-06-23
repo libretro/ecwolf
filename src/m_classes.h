@@ -125,15 +125,15 @@ class SliderMenuItem : public MenuItem
 class MultipleChoiceMenuItem : public MenuItem
 {
 	protected:
-		int			curOption;
-		const int	numOptions;
-		char**		options;
+		int					curOption;
+		const unsigned int	numOptions;
+		char**				options;
 
 	public:
 		/**
 		 * @param options Name of the possible options.  Use NULL to indicate a disabled option as to keep the positions correct.
 		 */
-		MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, int numOptions, int curOption=0);
+		MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, unsigned int numOptions, int curOption=0);
 		~MultipleChoiceMenuItem();
 
 		void	activate();
@@ -228,7 +228,7 @@ class Menu
 		int				getWidth() const { return w; }
 		int				getX() const { return x; }
 		int				getY() const { return y; }
-		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : (position >= items.Size() ? items.Size()-1 : position); }
+		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : ((unsigned)position >= items.Size() ? items.Size()-1 : position); }
 		void			setHeadPicture(const char* picture);
 		void			setHeadText(const char text[36], bool drawInStripes=false);
 		void			show();

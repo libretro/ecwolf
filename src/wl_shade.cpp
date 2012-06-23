@@ -55,7 +55,7 @@ static int GetShadeDefID()
 		case  5: shadeID = 2; break;
 		default: shadeID = 3; break;
 	}*/
-	assert(shadeID >= 0 && shadeID < lengthof(shadeDefs));
+	//assert(shadeID >= 0 && shadeID < lengthof(shadeDefs));
 	return shadeID;
 }
 

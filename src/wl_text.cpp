@@ -702,6 +702,8 @@ void ShowArticle (const char *article, bool helphack=false)
 
 		switch(dir)
 		{
+			default:
+				break;
 			case dir_North:
 			case dir_West:
 				if (pagenum>1)

@@ -135,7 +135,7 @@ const char* endStrings[9] = {
 #endif
 };
 
-	if(Confirm(endStrings[M_Random() & 0x7 + (M_Random() & 1)]))
+	if(Confirm(endStrings[(M_Random() & 0x7) + (M_Random() & 1)]))
 	{
 		VW_UpdateScreen();
 		SD_MusicOff();
@@ -436,7 +436,7 @@ void CreateMenus()
 	if(!AdLibPresent && !SoundBlasterPresent)
 	{
 		soundEffectsOptions[2] = NULL;
-		musicOptions[2] = NULL;
+		musicOptions[1] = NULL;
 	}
 	if(!SoundBlasterPresent)
 		digitizedOptions[1] = NULL;

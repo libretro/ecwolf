@@ -571,6 +571,7 @@ const ClassDef *ClassDef::FindClassTentative(const FName &className, const Class
 	newClass->tentative = true;
 	newClass->name = className;
 	newClass->parent = parent;
+	return newClass;
 }
 
 const ActionInfo *ClassDef::FindFunction(const FName &function) const
@@ -693,7 +694,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			continue;
 		}
 
-		for(int i = 0;i < thisStateDef.frames.Len();i++)
+		for(unsigned int i = 0;i < thisStateDef.frames.Len();i++)
 		{
 			thisFrame = new Frame();
 

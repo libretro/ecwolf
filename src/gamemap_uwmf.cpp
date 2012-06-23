@@ -442,6 +442,8 @@ class UWMFParser
 		void ParseZone()
 		{
 			MapZone zone;
+			zone.index = gm->zonePalette.Size();
+
 			StartParseBlock
 			if(false);
 			EndParseBlock

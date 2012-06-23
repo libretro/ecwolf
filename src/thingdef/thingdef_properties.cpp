@@ -304,7 +304,7 @@ HANDLE_PROPERTY(weaponslot)
 
 	STRING_PARAM(firstWeapon, 1);
 	FString weaponsList = firstWeapon;
-	for(int i = 2;i < PARAM_COUNT;++i)
+	for(unsigned int i = 2;i < PARAM_COUNT;++i)
 	{
 		STRING_PARAM(weapon, i);
 		weaponsList << ' ' << weapon;

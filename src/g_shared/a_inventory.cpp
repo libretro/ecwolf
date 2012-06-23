@@ -41,7 +41,9 @@
 #include "wl_game.h"
 #include "wl_play.h"
 
-IMPLEMENT_CLASS(Inventory)
+IMPLEMENT_POINTY_CLASS(Inventory)
+	DECLARE_POINTER(owner)
+END_POINTERS
 
 void AInventory::AttachToOwner(AActor *owner)
 {
@@ -183,7 +185,7 @@ bool AHealth::TryPickup(AActor *toucher)
 	//if(!Super::TryPickup(toucher))
 	//	return false;
 
-	unsigned int max = maxamount;
+	int max = maxamount;
 	if(max == 0)
 		max = toucher->health;
 
@@ -205,7 +207,9 @@ IMPLEMENT_CLASS(Ammo)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IMPLEMENT_CLASS(Weapon)
+IMPLEMENT_POINTY_CLASS(Weapon)
+	DECLARE_POINTER(ammo1)
+END_POINTERS
 
 void AWeapon::AttachToOwner(AActor *owner)
 {
@@ -236,7 +240,7 @@ bool AWeapon::CheckAmmo(AWeapon::FireMode fireMode, bool autoSwitch, bool requir
 
 	if(autoSwitch)
 	{
-		static_cast<APlayerPawn *>(owner)->PickNewWeapon();
+		static_cast<APlayerPawn *>((AActor*)owner)->PickNewWeapon();
 	}
 
 	return false;

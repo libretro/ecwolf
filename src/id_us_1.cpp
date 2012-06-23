@@ -386,11 +386,11 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 {
 	bool		redraw,
 				cursorvis,cursormoved,
-				done,result, checkkey;
+				done,result=false, checkkey;
 	ScanCode	sc;
 	char		c;
 	char		s[MaxString],olds[MaxString];
-	int         cursor,len;
+	int         cursor,len=0;
 	word		i,
 				w,h,
 				temp;
@@ -428,7 +428,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 		curtime = GetTimeCount();
 
 		// After each direction change accept the next change after 250 ms and then everz 125 ms
-		if(ci.dir != lastdir || curtime - lastdirtime > TickBase / 4 && curtime - lastdirmovetime > TickBase / 8)
+		if(ci.dir != lastdir || (curtime - lastdirtime > TickBase / 4 && curtime - lastdirmovetime > TickBase / 8))
 		{
 			if(ci.dir != lastdir)
 			{
@@ -439,6 +439,8 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 
 			switch(ci.dir)
 			{
+				default:
+					break;
 				case dir_West:
 					if(cursor)
 					{
@@ -456,7 +458,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					if(!s[cursor])
 					{
 						VW_MeasurePropString(SmallFont, s,w,h);
-						if(len >= maxchars || maxwidth && w >= maxwidth) break;
+						if(len >= maxchars || (maxwidth && w >= maxwidth)) break;
 
 						s[cursor] = ' ';
 						s[cursor + 1] = 0;
@@ -470,7 +472,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					if(!s[cursor])
 					{
 						VW_MeasurePropString(SmallFont, s,w,h);
-						if(len >= maxchars || maxwidth && w >= maxwidth) break;
+						if(len >= maxchars || (maxwidth && w >= maxwidth)) break;
 						s[cursor + 1] = 0;
 					}
 					s[cursor] = USL_RotateChar(s[cursor], 1);
@@ -482,7 +484,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					if(!s[cursor])
 					{
 						VW_MeasurePropString(SmallFont, s,w,h);
-						if(len >= maxchars || maxwidth && w >= maxwidth) break;
+						if(len >= maxchars || (maxwidth && w >= maxwidth)) break;
 						s[cursor + 1] = 0;
 					}
 					s[cursor] = USL_RotateChar(s[cursor], -1);

@@ -44,7 +44,7 @@
 #include "r_sprites.h"
 #include "resourcefiles/resourcefile.h"
 
-GameMap::GameMap(const FString &map) : map(map), valid(false), zoneLinks(NULL), file(NULL)
+GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneLinks(NULL)
 {
 	lumps[0] = NULL;
 
@@ -399,8 +399,8 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 		dir = MapTile::Side((dir+2)%4);
 
 	const int pos = static_cast<int>(this - plane->map);
-	int x = GetX();
-	int y = GetY();
+	unsigned int x = GetX();
+	unsigned int y = GetY();
 	switch(dir)
 	{
 		case MapTile::South:
@@ -416,7 +416,7 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 			++x;
 			break;
 	}
-	if(y < 0 || y >= plane->gm->GetHeader().height || x < 0 || x >= plane->gm->GetHeader().width)
+	if(y >= plane->gm->GetHeader().height || x >= plane->gm->GetHeader().width)
 		return NULL;
 	return &plane->map[y*plane->gm->GetHeader().width+x];
 }

@@ -214,6 +214,7 @@ class EVDoor : public Thinker
 				case Closing:
 					return ChangeState(Opening);
 			}
+			return false;
 		}
 
 	private:
@@ -238,6 +239,7 @@ class EVDoor : public Thinker
 						PlaySoundLocMapSpot("doors/close", spot);
 					break;
 			}
+			return true;
 		}
 
 		State state;

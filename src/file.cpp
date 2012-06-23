@@ -45,7 +45,7 @@
 #include "file.h"
 #include "zstring.h"
 
-File::File(const FString &filename) : filename(filename), existing(false), directory(false)
+File::File(const FString &filename) : filename(filename), directory(false), existing(false)
 {
 #ifdef WINDOWS
 	/* Windows, why must you be such a pain?

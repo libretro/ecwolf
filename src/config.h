@@ -47,8 +47,8 @@ struct SettingsData
 			ST_STR
 		};
 
-		SettingsData(int integer=0) : integer(0), str(""), type(ST_INT) { SetValue(integer); }
-		SettingsData(FString str) : integer(0), str(""), type(ST_STR) { SetValue(str); }
+		SettingsData(int integer=0) : type(ST_INT), integer(0), str("") { SetValue(integer); }
+		SettingsData(FString str) : type(ST_STR), integer(0), str("") { SetValue(str); }
 
 		const int			GetInteger() { return integer; }
 		const FString		GetString()	{ return str; }

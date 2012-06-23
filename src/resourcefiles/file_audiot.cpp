@@ -69,7 +69,7 @@ class FAudiot : public FUncompressedFile
 			// HACK: I'm using the fact that the IMFs have the string IMF near
 			//       the end of the files to identify them.
 			int musicStart = -1;
-			for(int i = NumLumps-1;i > 0;i--)
+			for(unsigned int i = NumLumps-1;i > 0;i--)
 			{
 				if(i != 0)
 					sizes[i-1] = positions[i] - positions[i-1];
@@ -106,7 +106,7 @@ class FAudiot : public FUncompressedFile
 				sprintf(lumpname, "AUD%05d", i);
 				Lumps[i].Owner = this;
 				Lumps[i].LumpNameSetup(lumpname);
-				Lumps[i].Namespace = i >= musicStart ? ns_music : ns_sounds;
+				Lumps[i].Namespace = i >= (unsigned int)musicStart ? ns_music : ns_sounds;
 				Lumps[i].Position = positions[i];
 				Lumps[i].LumpSize = sizes[i];
 			}

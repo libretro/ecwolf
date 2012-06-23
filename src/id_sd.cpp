@@ -516,6 +516,8 @@ SD_StopDigitized(void)
 
 	switch (DigiMode)
 	{
+		default:
+			break;
 		case sds_PC:
 //            SDL_PCStopSampleInIRQ();
 			break;
@@ -534,6 +536,8 @@ void SD_SetPosition(int channel, int leftpos, int rightpos)
 
 	switch (DigiMode)
 	{
+		default:
+			break;
 		case sds_SoundBlaster:
 //            SDL_PositionSBP(leftpos,rightpos);
 			Mix_SetPanning(channel, ((15 - leftpos) << 4) + 15,
@@ -608,6 +612,8 @@ SD_SetDigiDevice(SDSMode mode)
 	devicenotpresent = false;
 	switch (mode)
 	{
+		default:
+			break;
 		case sds_SoundBlaster:
 			if (!SoundBlasterPresent)
 				devicenotpresent = true;
@@ -757,6 +763,8 @@ SDL_ShutDevice(void)
 {
 	switch (SoundMode)
 	{
+		default:
+			break;
 		case sdm_PC:
 //            SDL_ShutPC();
 			break;
@@ -789,6 +797,8 @@ SDL_StartDevice(void)
 {
 	switch (SoundMode)
 	{
+		default:
+			break;
 		case sdm_AdLib:
 			SDL_StartAL();
 			break;
@@ -1104,6 +1114,8 @@ bool SD_PlaySound(const char* sound, SoundChannel chan)
 
 	switch (SoundMode)
 	{
+		default:
+			break;
 		case sdm_PC:
 //            SDL_PCPlaySound((PCSound *)s);
 			break;
@@ -1131,6 +1143,8 @@ bool SD_SoundPlaying(void)
 
 	switch (SoundMode)
 	{
+		default:
+			break;
 		case sdm_PC:
 			result = pcSound? true : false;
 			break;
@@ -1160,6 +1174,8 @@ SD_StopSound(void)
 
 	switch (SoundMode)
 	{
+		default:
+			break;
 		case sdm_PC:
 //            SDL_PCStopSound();
 			break;
@@ -1210,6 +1226,8 @@ SD_MusicOff(void)
 	sqActive = false;
 	switch (MusicMode)
 	{
+		default:
+			break;
 		case smm_AdLib:
 			alOut(alEffects, 0);
 			for (i = 0;i < sqMaxTracks;i++)
@@ -1309,6 +1327,8 @@ SD_FadeOutMusic(void)
 {
 	switch (MusicMode)
 	{
+		default:
+			break;
 		case smm_AdLib:
 			// DEBUG - quick hack to turn the music off
 			SD_MusicOff();

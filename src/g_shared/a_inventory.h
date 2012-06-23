@@ -41,6 +41,7 @@
 class AInventory : public AActor
 {
 	DECLARE_NATIVE_CLASS(Inventory, Actor)
+	HAS_OBJECT_POINTERS
 
 	public:
 		virtual void	AttachToOwner(AActor *owner);
@@ -52,7 +53,7 @@ class AInventory : public AActor
 		virtual bool	Use();
 
 		flagstype_t		itemFlags;
-		AActor			*owner;
+		TObjPtr<AActor>	owner;
 
 		FNameNoInit		pickupsound;
 		unsigned int	amount;
@@ -90,6 +91,7 @@ enum
 class AWeapon : public AInventory
 {
 	DECLARE_NATIVE_CLASS(Weapon, Inventory)
+	HAS_OBJECT_POINTERS
 
 	public:
 		enum FireMode
@@ -116,7 +118,7 @@ class AWeapon : public AInventory
 
 		// Inventory instance variables
 		FireMode		mode;
-		AAmmo			*ammo1;
+		TObjPtr<AAmmo>	ammo1;
 
 	protected:
 		bool	UseForAmmo(AWeapon *owned);

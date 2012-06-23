@@ -264,7 +264,7 @@ private:
 
 public:
 	LevelInfoBlockParser(Scanner &sc, LevelInfo &mapInfo, bool parseHeader) :
-		MapInfoBlockParser(sc, "map"), mapInfo(mapInfo), parseHeader(parseHeader) {}
+		MapInfoBlockParser(sc, "map"), parseHeader(parseHeader), mapInfo(mapInfo) {}
 
 protected:
 	void ParseHeader()

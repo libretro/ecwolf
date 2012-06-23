@@ -71,7 +71,7 @@ void InitFunctionTable(ActionTable *table)
 		table = actionFunctions;
 
 	qsort(&(*table)[0], table->Size(), sizeof((*table)[0]), FunctionTableComp);
-	for(int i = 1;i < table->Size();++i)
+	for(unsigned int i = 1;i < table->Size();++i)
 		assert((*table)[i]->name > (*table)[i-1]->name);
 }
 

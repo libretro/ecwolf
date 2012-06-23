@@ -287,12 +287,12 @@ static void processEvent(SDL_Event *event)
 
 			if(mod & (KMOD_SHIFT | KMOD_CAPS))
 			{
-				if(sym < lengthof(ShiftNames) && ShiftNames[sym])
+				if((unsigned)sym < lengthof(ShiftNames) && ShiftNames[sym])
 					LastASCII = ShiftNames[sym];
 			}
 			else
 			{
-				if(sym < lengthof(ASCIINames) && ASCIINames[sym])
+				if((unsigned)sym < lengthof(ASCIINames) && ASCIINames[sym])
 					LastASCII = ASCIINames[sym];
 			}
 			if(LastScan<SDLK_LAST)

@@ -2027,7 +2027,7 @@ void V_InitCustomFonts()
 					if (format == 1) WRONG;
 					while (sc.CheckToken(TK_IntConst))// && !sc.Crossed)
 					{
-						if (sc->number >= 0 && sc->number < 256)
+						if (sc->number < 256)
 							notranslate[sc->number] = true;
 					}
 					format = 2;
@@ -2227,7 +2227,7 @@ void V_InitFontColors ()
 						{
 							sc.ScriptMessage (Scanner::ERROR, "The first color range must start at position 0");
 						}
-						if (sc->number < 0 || sc->number > 256)
+						if (sc->number > 256)
 						{
 							sc.ScriptMessage (Scanner::ERROR, "The color range must be within positions [0,256]");
 						}
@@ -2238,7 +2238,7 @@ void V_InitFontColors ()
 						tparm.RangeStart = sc->number;
 
 						sc.MustGetToken(TK_IntConst);
-						if (sc->number < 0 || sc->number > 256)
+						if (sc->number > 256)
 						{
 							sc.ScriptMessage (Scanner::ERROR, "The color range must be within positions [0,256]");
 						}

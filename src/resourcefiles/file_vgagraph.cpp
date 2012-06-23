@@ -144,7 +144,7 @@ struct FVGALump : public FResourceLump
 class FVGAGraph : public FResourceFile
 {
 	public:
-		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), vgagraphFile(filename), lumps(NULL)
+		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), lumps(NULL), vgagraphFile(filename)
 		{
 			FString path(filename);
 			int lastSlash = path.LastIndexOfAny("/\\");
@@ -180,7 +180,7 @@ class FVGAGraph : public FResourceFile
 			BYTE* data = new BYTE[NumLumps*3];
 			vgaheadReader.Read(data, NumLumps*3);
 
-			int numPictures = 0;
+			unsigned int numPictures = 0;
 			Dimensions* dimensions = NULL;
 			for(unsigned int i = 0;i < NumLumps;i++)
 			{
@@ -218,7 +218,7 @@ class FVGAGraph : public FResourceFile
 					delete[] data;
 
 					dimensions = new Dimensions[numPictures];
-					for(int j = 0;j < numPictures;j++)
+					for(unsigned int j = 0;j < numPictures;j++)
 					{
 						dimensions[j].width = ReadLittleShort(&out[j*4]);
 						dimensions[j].height = ReadLittleShort(&out[(j*4)+2]);
@@ -234,8 +234,8 @@ class FVGAGraph : public FResourceFile
 			// HACK: For some reason id decided the tile8 lump will not tell
 			//       its size.  So we need to assume it's right after the
 			//       graphics and is 72 tiles long.
-			int tile8Position = 3+numPictures;
-			if(tile8Position < NumLumps && lumps[tile8Position].LumpSize > lumps[tile8Position].length)
+			unsigned int tile8Position = 3+numPictures;
+			if(tile8Position < NumLumps && (unsigned)lumps[tile8Position].LumpSize > lumps[tile8Position].length)
 			{
 				lumps[tile8Position].noSkip = true;
 				lumps[tile8Position].LumpSize = 64*72;

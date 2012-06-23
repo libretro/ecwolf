@@ -647,19 +647,19 @@ bool TryMove (AActor *ob)
 					switch(spot->pushDirection)
 					{
 						case MapTile::North:
-							if(ob->y-ob->radius <= (y<<TILESHIFT)+((63-spot->pushAmount)<<10))
+							if(ob->y-ob->radius <= static_cast<fixed>((y<<TILESHIFT)+((63-spot->pushAmount)<<10)))
 								return false;
 							break;
 						case MapTile::West:
-							if(ob->x-ob->radius <= (x<<TILESHIFT)+((63-spot->pushAmount)<<10))
+							if(ob->x-ob->radius <= static_cast<fixed>((x<<TILESHIFT)+((63-spot->pushAmount)<<10)))
 								return false;
 							break;
 						case MapTile::East:
-							if(ob->x+ob->radius >= (x<<TILESHIFT)+(spot->pushAmount<<10))
+							if(ob->x+ob->radius >= static_cast<fixed>((x<<TILESHIFT)+(spot->pushAmount<<10)))
 								return false;
 							break;
 						case MapTile::South:
-							if(ob->y+ob->radius >= (y<<TILESHIFT)+(spot->pushAmount<<10))
+							if(ob->y+ob->radius >= static_cast<fixed>((y<<TILESHIFT)+(spot->pushAmount<<10)))
 								return false;
 							break;
 					}

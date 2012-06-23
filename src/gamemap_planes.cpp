@@ -192,7 +192,7 @@ void GameMap::ReadPlanesData()
 						// Ensure that all candidates are valid locations.
 						// In addition for moving left/right check to see that
 						// the new location is indeed in the same row.
-						if((candidates[j] < 0 || candidates[j] > size) ||
+						if((candidates[j] < 0 || (unsigned)candidates[j] > size) ||
 							((j == Tile::East || j == Tile::West) &&
 							(candidates[j]/UNIT != ambushSpots[i]/UNIT)))
 							continue;
@@ -218,7 +218,7 @@ void GameMap::ReadPlanesData()
 					for(unsigned int j = 0;j < 4;++j)
 					{
 						// Same as before
-						if((candidates[j] < 0 || candidates[j] > size) ||
+						if((candidates[j] < 0 || (unsigned)candidates[j] > size) ||
 							((j == Trigger::East || j == Trigger::West) &&
 							(candidates[j]/UNIT != altExitSpots[i]/UNIT)))
 							continue;
@@ -228,8 +228,8 @@ void GameMap::ReadPlanesData()
 							// Look for any triggers matching the candidate
 							for(unsigned int k = 0;k < triggers.Size();++k)
 							{
-								if((triggers[k].x == candidates[j]%UNIT) &&
-									(triggers[k].y == candidates[j]/UNIT) &&
+								if((triggers[k].x == (unsigned)candidates[j]%UNIT) &&
+									(triggers[k].y == (unsigned)candidates[j]/UNIT) &&
 									(triggers[k].action == Specials::Exit_Normal))
 									triggers[k].action = Specials::Exit_Secret;
 							}

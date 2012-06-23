@@ -51,7 +51,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 		else
 			curshades = NormalLight.Maps;
 		for(unsigned int x = 0, bot_add = 0, top_add = 0;
-			x < viewwidth; ++x, ++bot_add, ++top_add)
+			x < (unsigned)viewwidth; ++x, ++bot_add, ++top_add)
 		{
 			if(wallheight[x] >> 3 <= y)
 			{

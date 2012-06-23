@@ -13,7 +13,6 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
-#pragma hdrstop
 #include "wl_atmos.h"
 #include "m_classes.h"
 #include "m_random.h"
@@ -352,7 +351,7 @@ MENU_LISTENER(ChangeMusic)
 {
 	StartCPMusic(songList[which]);
 	for(unsigned int i = 0;i < songList.Size();++i)
-		musicMenu[i]->setHighlighted(i == which);
+		musicMenu[i]->setHighlighted(i == (unsigned)which);
 	musicMenu.draw();
 	return true;
 }
@@ -367,7 +366,7 @@ void DoJukebox(void)
 
 	ClearMScreen ();
 	musicMenu.setHeadText(language["ROBSJUKEBOX"], true);
-	for(unsigned int i = 0;i < Wads.GetNumLumps();++i)
+	for(unsigned int i = 0;i < (unsigned)Wads.GetNumLumps();++i)
 	{
 		if(Wads.GetLumpNamespace(i) != ns_music)
 			continue;
@@ -1070,7 +1069,7 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			else
 			{
 				extravbls = atoi(argv[i]);
-				if(extravbls < 0)
+				if((signed)extravbls < 0)
 				{
 					printf("Extravbls must be positive!\n");
 					hasError = true;
