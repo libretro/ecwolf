@@ -42,7 +42,6 @@
 #include <malloc.h>
 #endif
 
-#include "i_system.h"
 #include "dobject.h"
 
 #ifndef _MSC_VER
