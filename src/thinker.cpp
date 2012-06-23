@@ -87,7 +87,7 @@ void ThinkerList::MarkRoots()
 			if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
 			{
 				GC::Mark(iter->Item());
-				//break;
+				break;
 			}
 			iter = iter->Next();
 		}
@@ -135,16 +135,27 @@ Thinker::~Thinker()
 
 size_t Thinker::PropagateMark()
 {
-#if 0
-	Printf("Propagating mark\n");
 	ThinkerList::Iterator iter = thinkerRef->Next();
-	if(iter && !(iter->Item()->ObjectFlags & OF_EuthanizeMe))
-		GC::Mark(iter->Item());
+	while(iter)
+	{
+		if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+		{
+			GC::Mark(iter->Item());
+			break;
+		}
+		iter = iter->Next();
+	}
 
 	iter = thinkerRef->Prev();
-	if(iter && !(iter->Item()->ObjectFlags & OF_EuthanizeMe))
-		GC::Mark(iter->Item());
-#endif
+	while(iter)
+	{
+		if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+		{
+			GC::Mark(iter->Item());
+			break;
+		}
+		iter = iter->Prev();
+	}
 	return Super::PropagateMark();
 }
 

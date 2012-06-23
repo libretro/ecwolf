@@ -262,7 +262,6 @@ FUNC(Door_Open)
 
 	if(spot->thinker)
 	{
-		Printf("%s isa %s -> %s\n", spot->thinker->GetClass()->GetName().GetChars(), EVDoor::__StaticClass->GetName().GetChars(), spot->thinker->IsThinkerType<EVDoor>() ? "true" : "false");
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
 			return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator->flags & FL_ISMONSTER);
