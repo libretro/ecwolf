@@ -163,9 +163,12 @@ ACTION_FUNCTION(A_MonsterRefire)
 	AActor *target = players[0].mo;
 	A_Face(self, target);
 
+	if(pr_monsterrefire() < probability)
+		return;
+
 	if(jump && (
-		pr_monsterrefire() >= probability ||
-		!(self->flags & FL_ATTACKMODE) || !target ||
+		!(self->flags & FL_ATTACKMODE) ||
+		!target ||
 		target->health <= 0 ||
 		!CheckLine(self)
 	))
