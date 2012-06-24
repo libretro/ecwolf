@@ -57,8 +57,9 @@ void GameMap::ReadPlanesData()
 	numPlanes = LittleShort(numPlanes);
 
 	lump->Seek(14, SEEK_SET);
-	char name[16];
+	char name[17];
 	lump->Read(name, 16);
+	name[16] = 0;
 	header.name = name;
 
 	lump->Seek(30, SEEK_SET);

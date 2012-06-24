@@ -225,13 +225,13 @@ bool FGamemaps::Open(bool quiet)
 	if(!mapheadReader.Open(mapheadFile))
 		return false;
 	mapheadReader.Seek(0, SEEK_END);
-	int NumPossibleMaps = (mapheadReader.Tell()-2)/4;
+	unsigned int NumPossibleMaps = (mapheadReader.Tell()-2)/4;
 	mapheadReader.Seek(0, SEEK_SET);
 	DWORD* offsets = new DWORD[NumPossibleMaps];
 	mapheadReader.Read(&rlewTag, 2);
 	LittleShort(rlewTag);
 	mapheadReader.Read(offsets, NumPossibleMaps*4);
-	for(NumLumps = 0;offsets[NumLumps] != 0;++NumLumps);
+	for(NumLumps = 0;NumLumps < NumPossibleMaps && offsets[NumLumps] != 0;++NumLumps);
 
 	// We allocate 2 lumps per map so...
 	static const unsigned int NUM_MAP_LUMPS = 2;
