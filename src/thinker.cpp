@@ -117,6 +117,13 @@ void ThinkerList::Register(Thinker *thinker, Priority type)
 {
 	thinker->thinkerRef = thinkers[type].Push(thinker);
 	thinker->thinkerPriority = type;
+
+	Iterator head;
+	if((head = thinker->thinkerRef->Next()))
+	{
+		GC::WriteBarrier(thinker, head->Item());
+		GC::WriteBarrier(head->Item(), thinker);
+	}
 }
 
 void ThinkerList::Deregister(Thinker *thinker)
