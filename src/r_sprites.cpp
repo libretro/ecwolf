@@ -235,7 +235,7 @@ void R_InitSprites()
 		for(SpritesList::Node *iter = list.Head();iter;iter = iter->Next())
 		{
 			FTexture *tex = iter->Item();
-			char frame = tex->Name[4] - 'A';
+			unsigned char frame = tex->Name[4] - 'A';
 			if(frame < MAX_SPRITE_FRAMES)
 			{
 				if(frame > maxframes)
@@ -372,7 +372,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	fixed x, y;
 	for(i = actx+startX, x = startX*xStep;x < xRun;x += xStep, ++i, dest = ++destBase)
 	{
-		if(wallheight[i] > height)
+		if(wallheight[i] > (signed)height)
 			continue;
 
 		src = tex->GetColumn(x>>FRACBITS, NULL);

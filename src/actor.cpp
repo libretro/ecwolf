@@ -89,21 +89,12 @@ class AActorProxy : public Thinker
 			if(enabled && parent)
 			{
 				parent->Destroy();
-			//	parent->~AActor();
-			//	free(parent);
 			}
 		}
 
 		void Disable()
 		{
 			enabled = false;
-		}
-
-		size_t PropagateMark()
-		{
-			if(enabled)
-				GC::Mark(parent);
-			return Super::PropagateMark();
 		}
 
 		void Tick()

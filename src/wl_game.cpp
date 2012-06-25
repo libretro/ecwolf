@@ -308,7 +308,7 @@ void DrawPlayBorderSides(void)
 	if(viewsize == 21) return;
 
 	// Draw frame
-	if(viewwidth != screenWidth)
+	if((unsigned)viewwidth != screenWidth)
 	{
 		VWB_Clear(0, viewscreenx-scaleFactor, viewscreeny-scaleFactor, viewscreenx+viewwidth+scaleFactor, viewscreeny);
 		VWB_Clear(0, viewscreenx-scaleFactor, viewscreeny, viewscreenx, viewscreeny+viewheight);

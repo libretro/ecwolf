@@ -82,8 +82,8 @@ class Thinker : public DObject
 
 	public:
 		Thinker(ThinkerList::Priority priority=ThinkerList::NORMAL);
-		virtual ~Thinker();
 
+		void			Destroy();
 		template<class T>
 		bool			IsThinkerType() { return IsA(T::__StaticClass); }
 		void			SetPriority(ThinkerList::Priority priority);
