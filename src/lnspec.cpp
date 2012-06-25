@@ -153,23 +153,10 @@ class EVDoor : public Thinker
 						bool hold = false;
 						for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
 						{
-							if(direction == 0)
+							if(!CheckClears(iter->Item()))
 							{
-								if(spot->GetY() == iter->Item()->tiley &&
-									abs(((spot->GetX()<<FRACBITS)+(FRACUNIT/2))-iter->Item()->x) < FRACUNIT/2 + iter->Item()->radius)
-								{
-									hold = true;
-									break;
-								}
-							}
-							else
-							{
-								if(spot->GetX() == iter->Item()->tilex &&
-									abs(((spot->GetY()<<FRACBITS)+(FRACUNIT/2))-iter->Item()->y) < FRACUNIT/2 + iter->Item()->radius)
-								{
-									hold = true;
-									break;
-								}
+								hold = true;
+								break;
 							}
 						}
 						if(hold)
@@ -197,7 +184,7 @@ class EVDoor : public Thinker
 			}
 		}
 
-		bool Reactivate(bool ismonster)
+		bool Reactivate(AActor *activator, bool ismonster)
 		{
 			switch(state)
 			{
@@ -208,7 +195,7 @@ class EVDoor : public Thinker
 						return false;
 					}
 				default:
-					if(!ismonster)
+					if(!ismonster && CheckClears(activator))
 						return ChangeState(Closing);
 					break;
 				case Closing:
@@ -220,6 +207,28 @@ class EVDoor : public Thinker
 	private:
 		static const unsigned int OPENTICS = 300;
 		enum State { Opening, Opened, Closing, Closed };
+
+		// Returns true if the actor isn't blocking the door.
+		bool CheckClears(AActor *obj)
+		{
+			if(direction == 0)
+			{
+				if(spot->GetY() == obj->tiley &&
+					abs(((spot->GetX()<<FRACBITS)+(FRACUNIT/2))-obj->x) < FRACUNIT/2 + obj->radius)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				if(spot->GetX() == obj->tilex &&
+					abs(((spot->GetY()<<FRACBITS)+(FRACUNIT/2))-obj->y) < FRACUNIT/2 + obj->radius)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 
 		bool ChangeState(State st)
 		{
@@ -266,7 +275,7 @@ FUNC(Door_Open)
 	{
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
-			return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator->flags & FL_ISMONSTER);
+			return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator, activator->flags & FL_ISMONSTER);
 		}
 		return 0;
 	}
