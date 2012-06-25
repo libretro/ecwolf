@@ -140,7 +140,7 @@ class AActor : public DObject
 		virtual ~AActor();
 
 		void			AddInventory(AInventory *item);
-		Thinker			*GetThinker() const;
+		Thinker			*GetThinker();
 		virtual void	Destroy();
 		void			Die();
 		void			EnterZone(const MapZone *zone);
@@ -204,7 +204,7 @@ class AActor : public DObject
 		void	Init();
 
 		const MapZone	*soundZone;
-		AActorProxy		*thinker;
+		TObjPtr<AActorProxy> thinker;
 };
 
 #endif

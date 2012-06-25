@@ -122,6 +122,7 @@ END_POINTERS
 LinkedList<AActor *> AActor::actors;
 IMPLEMENT_POINTY_CLASS(Actor)
 	DECLARE_POINTER(inventory)
+	DECLARE_POINTER(thinker)
 END_POINTERS
 
 AActor::~AActor()
@@ -268,9 +269,9 @@ const AActor *AActor::GetDefault() const
 	return GetClass()->GetDefault();
 }
 
-Thinker *AActor::GetThinker() const
+Thinker *AActor::GetThinker()
 {
-	return thinker;
+	return (AActorProxy*)thinker;
 }
 
 void AActor::Init()
