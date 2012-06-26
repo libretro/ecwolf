@@ -820,12 +820,21 @@ startplayloop:
 				if(viewsize == 21) DrawPlayScreen();
 
 				// Remove inventory items that don't transfer (keys for example)
-				for(AInventory *inv = players[0].mo->inventory;inv;inv = inv->inventory)
+				for(AInventory *inv = players[0].mo->inventory;inv;)
 				{
 					if(inv->interhubamount < 1)
-						inv->Destroy();
+					{
+						// Remove the inventory item and clean it up
+						AInventory *removeMe = inv;
+						inv = inv->inventory;
+						players[0].mo->RemoveInventory(removeMe);
+						removeMe->Destroy();
+						continue;
+					}
 					else if((inv->itemFlags & IF_INVBAR) && inv->amount > inv->interhubamount)
 						inv->amount = inv->interhubamount;
+
+					inv = inv->inventory;
 				}
 
 				DrawStatusBar();

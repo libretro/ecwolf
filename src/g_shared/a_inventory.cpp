@@ -67,6 +67,7 @@ AInventory *AInventory::CreateCopy(AActor *holder)
 void AInventory::DetachFromOwner()
 {
 	owner = NULL;
+	inventory = NULL;
 }
 
 void AInventory::Destroy()
