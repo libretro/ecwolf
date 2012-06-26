@@ -31,6 +31,7 @@ defaultmap
 {
 	defaultfloor = "#717171"
 	defaultceiling = "#383838"
+	translator = "xlat/wolf3d.txt"
 }
 
 // Episode 1

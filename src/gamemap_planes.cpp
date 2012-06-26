@@ -32,16 +32,174 @@
 **
 */
 
+#include "id_ca.h"
+#include "g_mapinfo.h"
 #include "gamemap.h"
 #include "lnspec.h"
+#include "scanner.h"
 #include "w_wad.h"
 #include "wl_game.h"
+
+class Xlat
+{
+public:
+	struct ThingXlat
+	{
+	public:
+		static int SortCompare(const void *t1, const void *t2)
+		{
+			unsigned short old1 = static_cast<const ThingXlat *>(t1)->oldnum;
+			unsigned short old2 = static_cast<const ThingXlat *>(t2)->oldnum;
+			if(old1 < old2)
+				return -1;
+			else if(old1 > old2)
+				return 1;
+			return 0;
+		}
+
+		unsigned short	oldnum;
+		unsigned short	newnum;
+		unsigned char	angles;
+		bool			patrol;
+		unsigned char	minskill;
+	};
+
+	Xlat() : lump(0)
+	{
+	}
+
+	WORD GetPushwallTile() const { return pushwall; }
+
+	void LoadXlat(int lump)
+	{
+		if(this->lump == lump)
+			return;
+		this->lump = lump;
+
+		FMemLump data = Wads.ReadLump(lump);
+		Scanner sc((const char*)data.GetMem(), data.GetSize());
+
+		while(sc.TokensLeft())
+		{
+			sc.MustGetToken(TK_Identifier);
+
+			if(sc->str.CompareNoCase("things") == 0)
+			{
+				LoadThingTable(sc);
+			}
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown xlat property '%s'.", sc->str.GetChars());
+		}
+	}
+
+	bool TranslateThing(MapThing &thing, unsigned short oldnum) const
+	{
+		bool valid = false;
+		unsigned int type = thingTable.Size()/2;
+		unsigned int max = thingTable.Size()-1;
+		unsigned int min = 0;
+		do
+		{
+			if(thingTable[type].oldnum == oldnum ||
+				(thingTable[type].angles && unsigned(oldnum - thingTable[type].oldnum) < thingTable[type].angles))
+			{
+				valid = true;
+				break;
+			}
+
+			if(thingTable[type].oldnum > oldnum)
+				max = type-1;
+			else if(thingTable[type].oldnum < oldnum)
+				min = type+1;
+
+			type = (max+min)/2;
+			
+		}
+		while(max >= min);
+
+		if(valid)
+		{
+			thing.type = thingTable[type].newnum;
+
+			if(thingTable[type].angles)
+				thing.angle = (oldnum - thingTable[type].oldnum)*(360/thingTable[type].angles);
+			else
+				thing.angle = 0;
+
+			thing.patrol = thingTable[type].patrol;
+			thing.skill[0] = thing.skill[1] = thingTable[type].minskill <= 1;
+			thing.skill[2] = thingTable[type].minskill <= 2;
+			thing.skill[3] = thingTable[type].minskill <= 3;
+		}
+
+		return valid;
+	}
+
+protected:
+	void LoadThingTable(Scanner &sc)
+	{
+		ThingXlat thing;
+
+		// Always start with an empty table
+		thingTable.Clear();
+
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			// Property
+			if(sc.CheckToken(TK_Identifier))
+			{
+				if(sc->str.CompareNoCase("pushwall") == 0)
+				{
+					sc.MustGetToken('=');
+					sc.MustGetToken(TK_IntConst);
+					pushwall = sc->number;
+				}
+				else
+					sc.ScriptMessage(Scanner::ERROR, "Unknown thing table property '%s'.", sc->str.GetChars());
+				sc.MustGetToken(';');
+				continue;
+			}
+
+			// Handle thing translation
+			sc.MustGetToken('{');
+			sc.MustGetToken(TK_IntConst);
+			thing.oldnum = sc->number;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_IntConst);
+			thing.newnum = sc->number;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_IntConst);
+			thing.angles = sc->number;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_BoolConst);
+			thing.patrol = sc->boolean;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_IntConst);
+			thing.minskill = sc->number;
+			sc.MustGetToken('}');
+			thingTable.Push(thing);
+		}
+
+		qsort(&thingTable[0], thingTable.Size(), sizeof(thingTable[0]), ThingXlat::SortCompare);
+	}
+
+private:
+	int lump;
+
+	WORD pushwall;
+	WORD patrolpoint;
+	TArray<ThingXlat> thingTable;
+};
 
 // Reads old format maps
 void GameMap::ReadPlanesData()
 {
+	static Xlat xlat;
 	static const unsigned short UNIT = 64;
 	enum OldPlanes { Plane_Tiles, Plane_Object, Plane_Flats, NUM_USABLE_PLANES };
+
+	xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator));
 
 	valid = true;
 
@@ -242,123 +400,6 @@ void GameMap::ReadPlanesData()
 
 			case Plane_Object:
 			{
-				// Will need to consider externalizing some of these
-				static const struct ThingXlat
-				{
-					unsigned short	oldnum;
-					unsigned short	newnum;
-					unsigned char	angles;
-					bool			patrol;
-					unsigned char	minskill;
-				} xlat[] =
-				{
-					{19,	1,	4,	false,	0},
-					{23,	33,	0,	false,	0},
-					{24,	34,	0,	false,	0},
-					{25,	35,	0,	false,	0},
-					{26,	36,	0,	false,	0},
-					{27,	37,	0,	false,	0},
-					{28,	38,	0,	false,	0},
-					{29,	39,	0,	false,	0},
-					{30,	40,	0,	false,	0},
-					{31,	41,	0,	false,	0},
-					{32,	42,	0,	false,	0},
-					{33,	43,	0,	false,	0},
-					{34,	44,	0,	false,	0},
-					{35,	45,	0,	false,	0},
-					{36,	46,	0,	false,	0},
-					{37,	47,	0,	false,	0},
-					{38,	48,	0,	false,	0},
-					{39,	49,	0,	false,	0},
-					{40,	50,	0,	false,	0},
-					{41,	51,	0,	false,	0},
-					{42,	52,	0,	false,	0},
-					{43,	53,	0,	false,	0},
-					{44,	54,	0,	false,	0},
-					{45,	55,	0,	false,	0},
-					{46,	56,	0,	false,	0},
-					{47,	57,	0,	false,	0},
-					{48,	58,	0,	false,	0},
-					{49,	59,	0,	false,	0},
-					{50,	60,	0,	false,	0},
-					{51,	61,	0,	false,	0},
-					{52,	62,	0,	false,	0},
-					{53,	63,	0,	false,	0},
-					{54,	64,	0,	false,	0},
-					{55,	65,	0,	false,	0},
-					{56,	66,	0,	false,	0},
-					{57,	67,	0,	false,	0},
-					{58,	68,	0,	false,	0},
-					{59,	69,	0,	false,	0},
-					{60,	70,	0,	false,	0},
-					{61,	71,	0,	false,	0},
-					{62,	72,	0,	false,	0},
-					{63,	73,	0,	false,	0},
-					{64,	74,	0,	false,	0},
-					{65,	75,	0,	false,	0},
-					{66,	76,	0,	false,	0},
-					{67,	77,	0,	false,	0},
-					{68,	78,	0,	false,	0},
-					{69,	79,	0,	false,	0},
-					{70,	80,	0,	false,	0},
-					{71,	81,	0,	false,	0},
-					{72,	82,	0,	false,	0},
-					{73,	91,	0,	false,	0},
-					{74,	92,	0,	false,	0},
-					{90,	10,	8,	false,	0}, // Patrol point
-					{106,	28,	0,	false,	0},
-					{107,	27,	0,	false,	0},
-					{108,	11,	4,	false,	1},
-					{112,	11,	4,	true,	1},
-					{116,	12,	4,	false,	1},
-					{120,	12,	4,	true,	1},
-					{124,	81,	0,	false,	0},
-					{125,	23,	0,	false,	0},
-					{126,	13,	4,	false,	1},
-					{130,	13,	4,	true,	1},
-					{134,	14,	4,	false,	1},
-					{138,	14,	4,	true,	1},
-					{142,	24,	0,	false,	0},
-					{143,	25,	0,	false,	0},
-					{144,	11,	4,	false,	2},
-					{148,	11,	4,	true,	2},
-					{152,	12,	4,	false,	2},
-					{156,	12,	4,	true,	2},
-					{160,	18,	0,	false,	0},
-					{161,	26,	0,	false,	0},
-					{162,	13,	4,	false,	2},
-					{166,	13,	4,	true,	2},
-					{170,	14,	4,	false,	2},
-					{174,	14,	4,	true,	2},
-					{178,	19,	0,	false,	0},
-					{179,	22,	0,	false,	0},
-					{180,	11,	4,	false,	3},
-					{184,	11,	4,	true,	3},
-					{188,	12,	4,	false,	3},
-					{192,	12,	4,	true,	3},
-					{196,	17,	0,	false,	0},
-					{197,	20,	0,	false,	0},
-					{198,	13,	4,	false,	3},
-					{202,	13,	4,	true,	3},
-					{206,	14,	4,	false,	3},
-					{210,	14,	4,	true,	3},
-					{214,	16,	0,	false,	0},
-					{215,	21,	0,	false,	0},
-					{216,	15,	4,	false,	1},
-					{220,	15,	4,	true,	1},
-					{224,	29,	0,	false,	0},
-					{225,	30,	0,	false,	0},
-					{226,	31,	0,	false,	0},
-					{227,	32,	0,	false,	0},
-					{234,	15,	4,	false,	2},
-					{238,	15,	4,	true,	2},
-					{252,	15,	4,	false,	3},
-					{256,	15,	4,	true,	3}
-				};
-				static const WORD PUSHWALL_TILE = 98,
-					PATROLPOINT = 90;
-				static const unsigned int NUM_XLAT_ENTRIES = sizeof(xlat)/sizeof(xlat[0]);
-
 				unsigned int ambushSpot = 0;
 				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors. 
 
@@ -372,7 +413,7 @@ void GameMap::ReadPlanesData()
 						continue;
 					}
 
-					if(oldplane[i] == PUSHWALL_TILE)
+					if(oldplane[i] == xlat.GetPushwallTile())
 					{
 						if(ambushSpots[ambushSpot] == i)
 							++ambushSpot;
@@ -386,51 +427,18 @@ void GameMap::ReadPlanesData()
 					}
 					else
 					{
-						bool valid = false;
-						unsigned int type = NUM_XLAT_ENTRIES/2;
-						unsigned int max = NUM_XLAT_ENTRIES;
-						unsigned int min = 0;
-						do
-						{
-							if(xlat[type].oldnum == oldplane[i] ||
-								(xlat[type].angles && unsigned(oldplane[i] - xlat[type].oldnum) < xlat[type].angles))
-							{
-								valid = true;
-								break;
-							}
-
-							if(xlat[type].oldnum > oldplane[i])
-								max = type-1;
-							else if(xlat[type].oldnum < oldplane[i])
-								min = type+1;
-
-							type = (max+min)/2;
-							
-						}
-						while(max >= min);
-						if(!valid)
-							printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%UNIT, i/UNIT);
-
 						Thing thing;
 						thing.x = ((i%UNIT)<<FRACBITS)+(FRACUNIT/2);
 						thing.y = ((i/UNIT)<<FRACBITS)+(FRACUNIT/2);
 						thing.z = 0;
-						thing.type = xlat[type].newnum;
-						if(xlat[type].angles)
-						{
-							if(oldplane[i] >= PATROLPOINT && oldplane[i] < PATROLPOINT+8)
-								thing.angle = ((oldplane[i] - xlat[type].oldnum)*45);// + (xlat[type].oldnum == PATROLPOINT ? 0 : 180);
-							else
-								thing.angle = (oldplane[i] - xlat[type].oldnum)*90;
-						}
 						thing.ambush = ambushSpots[ambushSpot] == i;
 						if(thing.ambush)
 							++ambushSpot;
-						thing.patrol = xlat[type].patrol;
-						thing.skill[0] = thing.skill[1] = xlat[type].minskill <= 1;
-						thing.skill[2] = xlat[type].minskill <= 2;
-						thing.skill[3] = xlat[type].minskill <= 3;
-						things.Push(thing);
+
+						if(!xlat.TranslateThing(thing, oldplane[i]))
+							printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%UNIT, i/UNIT);
+						else
+							things.Push(thing);
 					}
 				}
 				break;

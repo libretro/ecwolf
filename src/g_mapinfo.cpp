@@ -326,6 +326,8 @@ protected:
 			ParseStringAssignment(mapInfo.Music);
 		else if(key.CompareNoCase("Par") == 0)
 			ParseIntAssignment(mapInfo.Par);
+		else if(key.CompareNoCase("Translator") == 0)
+			ParseStringAssignment(mapInfo.Translator);
 		else
 			return false;
 		return true;
