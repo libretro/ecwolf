@@ -73,6 +73,9 @@ extern class ThinkerList
 		void	Deregister(Thinker *thinker);
 
 	private:
+		// nxetThinker allows us to skip over thinkers that we were about to
+		// think, but end up being destroyed.
+		Iterator				nextThinker;
 		LinkedList<Thinker *>	thinkers[NUM_TYPES];
 } *thinkerList;
 

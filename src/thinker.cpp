@@ -102,13 +102,15 @@ void ThinkerList::Tick()
 		while(iter)
 		{
 			Thinker *thinker = iter->Item();
-			iter = iter->Next();
+			nextThinker = iter->Next();
 
 			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
 			{
 				thinker->Tick();
 				GC::CheckGC();
 			}
+
+			iter = nextThinker;
 		}
 	}
 }
@@ -135,6 +137,11 @@ void ThinkerList::Deregister(Thinker *thinker)
 {
 	Iterator prev = thinker->thinkerRef->Prev();
 	Iterator next = thinker->thinkerRef->Next();
+
+	// If we're about to think this thinker then we should probably skip it.
+	if(nextThinker == thinker->thinkerRef)
+		nextThinker = next;
+
 	thinkers[thinker->thinkerPriority].Remove(thinker->thinkerRef);
 	if(prev && next)
 	{
