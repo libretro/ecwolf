@@ -427,7 +427,8 @@ void HitVertWall (void)
 		}
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
-		postsource+=texture-lasttexture;
+		if(postsource)
+			postsource+=texture-lasttexture;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -449,7 +450,7 @@ void HitVertWall (void)
 	else
 		source = TexMan(tilehit->tile->texture[hitdir]);
 
-	postsource = source->GetColumn(texture/64, NULL);
+	postsource = source ? source->GetColumn(texture/64, NULL) : NULL;
 }
 
 
@@ -494,7 +495,8 @@ void HitHorizWall (void)
 		}
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
-		postsource+=texture-lasttexture;
+		if(postsource)
+			postsource+=texture-lasttexture;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -516,7 +518,7 @@ void HitHorizWall (void)
 	else
 		source = TexMan(tilehit->tile->texture[hitdir]);
 
-	postsource = source->GetColumn(texture/64, NULL);
+	postsource = source ? source->GetColumn(texture/64, NULL) : NULL;
 }
 
 //==========================================================================
