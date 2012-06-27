@@ -85,7 +85,7 @@ void			US_CheckHighScore(int32_t score,word other);
 void			US_DisplayHighScores(int which);
 extern	bool	US_UpdateCursor(void);
 bool			US_LineInput(int x,int y,char *buf,const char *def,bool escok,
-							int maxchars,int maxwidth);
+							int maxchars,int maxwidth, EColorRange translation=CR_UNTRANSLATED);
 
 void	        USL_PrintInCenter(const char *s,Rect r);
 char 	        *USL_GiveSaveName(word game);

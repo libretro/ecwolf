@@ -56,6 +56,7 @@ TArray<SaveFile> SaveFile::files;
 
 static bool quickSaveLoad = false;
 
+#define MAX_SAVENAME 31
 #define LSM_X   85
 #define LSM_Y   55
 #define LSM_W   175
@@ -107,15 +108,15 @@ static void DrawLSAction (int which)
 ////////////////////////////////////////////////////////////////////
 void SetupSaveGames()
 {
-	char title[65];
+	char title[MAX_SAVENAME+1];
 
 	File saveDirectory("./");
 	const TArray<FString> &files = saveDirectory.getFileList();
+
 	for(unsigned int i = 0;i < files.Size();i++)
 	{
 		const FString &filename = files[i];
-		if(filename.Len() <= 11 ||
-			filename.Len() >= 15 ||
+		if(filename.Len() < 5 ||
 			filename.Mid(filename.Len()-4, 4).Compare(".ecs") != 0)
 			continue; // Too short or incorrect name
 
@@ -127,7 +128,7 @@ void SetupSaveGames()
 			{
 				SaveFile sFile;
 				sFile.filename = filename;
-				if(!M_GetPNGText(png, "Title", title, 64))
+				if(!M_GetPNGText(png, "Title", title, MAX_SAVENAME))
 				{
 					sFile.name = title;
 					SaveFile::files.Push(sFile);

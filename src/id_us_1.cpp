@@ -329,7 +329,7 @@ US_RestoreWindow(WindowRec *win)
 //
 ///////////////////////////////////////////////////////////////////////////
 static void
-USL_XORICursor(int x,int y,const char *s,word cursor)
+USL_XORICursor(int x,int y,const char *s,word cursor,EColorRange translation)
 {
 	static	bool	status;		// VGA doesn't XOR...
 	char	buf[MaxString];
@@ -343,14 +343,7 @@ USL_XORICursor(int x,int y,const char *s,word cursor)
 	px = x + w - 1;
 	py = y;
 	if (status^=1)
-		VWB_DrawPropString(SmallFont, "\x80");
-	else
-	{
-		//temp = fontcolor;
-		//fontcolor = backcolor;
-		VWB_DrawPropString(SmallFont, "\x80");
-		//fontcolor = temp;
-	}
+		VWB_DrawPropString(SmallFont, "\x80", translation);
 }
 
 char USL_RotateChar(char ch, int dir)
@@ -382,10 +375,9 @@ char USL_RotateChar(char ch, int dir)
 //
 ///////////////////////////////////////////////////////////////////////////
 bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
-				int maxchars,int maxwidth)
+				int maxchars,int maxwidth, EColorRange translation)
 {
-	bool		redraw,
-				cursorvis,cursormoved,
+	bool		cursorvis,cursormoved,
 				done,result=false, checkkey;
 	ScanCode	sc;
 	char		c;
@@ -398,13 +390,16 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 	ControlInfo ci;
 	Direction   lastdir = dir_None;
 
+	double clearx = x-1, cleary = y, clearw = maxwidth, clearh = SmallFont->GetHeight();
+	MenuToRealCoords(clearx, cleary, clearw, clearh, MENU_CENTER);
+
 	if (def)
 		strcpy(s,def);
 	else
 		*s = '\0';
 	*olds = '\0';
 	cursor = (int) strlen(s);
-	cursormoved = redraw = true;
+	cursormoved = true;
 
 	cursorvis = done = false;
 	lasttime = lastdirtime = lastdirmovetime = GetTimeCount();
@@ -417,7 +412,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 		ReadAnyControl(&ci);
 
 		if (cursorvis)
-			USL_XORICursor(x,y,s,cursor);
+			USL_XORICursor(x,y,s,cursor,translation);
 
 		sc = LastScan;
 		LastScan = sc_None;
@@ -476,7 +471,6 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 						s[cursor + 1] = 0;
 					}
 					s[cursor] = USL_RotateChar(s[cursor], 1);
-					redraw = true;
 					checkkey = false;
 					break;
 
@@ -488,7 +482,6 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 						s[cursor + 1] = 0;
 					}
 					s[cursor] = USL_RotateChar(s[cursor], -1);
-					redraw = true;
 					checkkey = false;
 					break;
 			}
@@ -516,7 +509,6 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 				{
 					strcpy(s + cursor - 1,s + cursor);
 					cursor--;
-					redraw = true;
 				}
 				cursormoved = true;
 				checkkey = false;
@@ -570,7 +562,6 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					{
 						strcpy(s + cursor - 1,s + cursor);
 						cursor--;
-						redraw = true;
 					}
 					c = key_None;
 					cursormoved = true;
@@ -579,7 +570,6 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					if (s[cursor])
 					{
 						strcpy(s + cursor,s + cursor + 1);
-						redraw = true;
 					}
 					c = key_None;
 					cursormoved = true;
@@ -606,27 +596,18 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					for (i = len + 1;i > cursor;i--)
 						s[i] = s[i - 1];
 					s[cursor++] = c;
-					redraw = true;
 				}
 			}
 		}
 
-		if (redraw)
-		{
-			px = x;
-			py = y;
-			//temp = fontcolor;
-			//fontcolor = backcolor;
-			VWB_DrawPropString(SmallFont, olds);
-			//fontcolor = (byte) temp;
-			strcpy(olds,s);
+		px = x;
+		py = y;
+		VWB_Clear(BKGDCOLOR, clearx, cleary, clearx+clearw, cleary+clearh);
+		strcpy(olds,s);
 
-			px = x;
-			py = y;
-			VWB_DrawPropString(SmallFont, s);
-
-			redraw = false;
-		}
+		px = x;
+		py = y;
+		VWB_DrawPropString(SmallFont, s, translation);
 
 		if (cursormoved)
 		{
@@ -643,18 +624,18 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 		}
 		else SDL_Delay(5);
 		if (cursorvis)
-			USL_XORICursor(x,y,s,cursor);
+			USL_XORICursor(x,y,s,cursor,translation);
 
 		VW_UpdateScreen();
 	}
 
 	if (cursorvis)
-		USL_XORICursor(x,y,s,cursor);
+		USL_XORICursor(x,y,s,cursor,translation);
 	if (!result)
 	{
 		px = x;
 		py = y;
-		VWB_DrawPropString(SmallFont, olds);
+		VWB_DrawPropString(SmallFont, olds, translation);
 	}
 	VW_UpdateScreen();
 
