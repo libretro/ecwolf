@@ -84,6 +84,11 @@ bool R_CheckSpriteValid(unsigned int spr)
 	return true;
 }
 
+uint32_t R_GetNameForSprite(unsigned int index)
+{
+	return loadedSprites[index].iname;
+}
+
 // Cache sprite name lookups
 unsigned int R_GetSprite(const char* spr)
 {
@@ -143,6 +148,11 @@ void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 
 	frame.texture[dir] = tex->GetID();
 	frame.mirror |= 1<<dir;
+}
+
+unsigned int R_GetNumLoadedSprites()
+{
+	return loadedSprites.Size();
 }
 
 void R_GetSpriteHitlist(BYTE* hitlist)

@@ -1,8 +1,8 @@
 /*
-** r_sprites.h
+** wl_loadsave.h
 **
 **---------------------------------------------------------------------------
-** Copyright 2011 Braden Obrzut
+** Copyright 2012 Braden Obrzut
 ** All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
@@ -32,30 +32,24 @@
 **
 */
 
-#ifndef __R_SPRITES_H__
-#define __R_SPRITES_H__
+#ifndef __WL_LOADSAVE_H__
+#define __WL_LOADSAVE_H__
 
-#include "actor.h"
-#include "zstring.h"
+class Menu;
+class MenuItem;
 
-enum SpecialSprites
+namespace GameSave
 {
-	SPR_NONE,
+	Menu		&GetLoadMenu();
+	MenuItem	*GetLoadMenuItem();
+	Menu		&GetSaveMenu();
+	MenuItem	*GetSaveMenuItem();
+	void		InitMenus();
+	void		QuickLoad();
+	void		QuickSave();
 
-	NUM_SPECIAL_SPRITES
-};
-
-bool R_CheckSpriteValid(unsigned int spr);
-unsigned int R_GetSprite(const char* spr);
-void R_GetSpriteHitlist(BYTE* hitlist);
-void R_InitSprites();
-void R_LoadSprite(const FString &name);
-
-void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height);
-void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed offsetY);
-
-// For FArchive
-unsigned int R_GetNumLoadedSprites();
-uint32_t R_GetNameForSprite(unsigned int index);
+	bool		Load();
+	bool		Save();
+}
 
 #endif

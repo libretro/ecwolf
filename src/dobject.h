@@ -277,6 +277,8 @@ template<class T> inline void GC::Mark(TObjPtr<T> &obj)
 	GC::Mark(&obj.o);
 }
 
+#define RUNTIME_CLASS(cls) cls::__StaticClass
+
 class DObject
 {
 friend class ClassDef;

@@ -253,6 +253,7 @@ class ClassDef
 		{
 			return ClassIterator(ClassTable());
 		}
+		static unsigned int		GetNumClasses() { return ClassTable().CountUsed(); }
 
 		/**
 		 * Prints the implemented classes in a tree.  This is not designed to 
@@ -272,6 +273,7 @@ class ClassDef
 		static void				LoadActors();
 		static void				UnloadActors();
 
+		unsigned int			ClassIndex;
 		MetaTable				Meta;
 
 	protected:

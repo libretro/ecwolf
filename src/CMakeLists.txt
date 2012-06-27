@@ -107,6 +107,7 @@ add_executable(ecwolf WIN32
 	c_cvars.cpp
 	dobject.cpp
 	dobjgc.cpp
+	farchive.cpp
 	file.cpp
 	files.cpp
 	g_mapinfo.cpp
@@ -145,6 +146,7 @@ add_executable(ecwolf WIN32
 	wl_floorceiling.cpp
 	wl_game.cpp
 	wl_inter.cpp
+	wl_loadsave.cpp
 	wl_main.cpp
 	wl_menu.cpp
 	wl_parallax.cpp

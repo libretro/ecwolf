@@ -43,8 +43,6 @@ extern  int      param_mission;
 void            NewGame (int difficulty,const class FString &map);
 void            CalcProjection (int32_t focal);
 void            NewViewSize (int width);
-bool            LoadTheGame(FILE *file,int x,int y);
-bool            SaveTheGame(FILE *file,int x,int y);
 void            ShutdownId (void);
 
 #endif

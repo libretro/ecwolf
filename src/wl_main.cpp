@@ -172,35 +172,6 @@ int32_t DoChecksum(byte *source,unsigned size,int32_t checksum)
 	return checksum;
 }
 
-
-/*
-==================
-=
-= SaveTheGame
-=
-==================
-*/
-
-bool SaveTheGame(FILE *file,int x,int y)
-{
-	return false;
-}
-
-//===========================================================================
-
-/*
-==================
-=
-= LoadTheGame
-=
-==================
-*/
-
-bool LoadTheGame(FILE *file,int x,int y)
-{
-	return false;
-}
-
 //===========================================================================
 
 /*
@@ -469,14 +440,6 @@ static void InitGame()
 	SD_Startup ();
 	printf("US_Startup: Starting the User Manager.\n");
 	US_Startup ();
-
-
-//
-// build some tables
-//
-
-	printf("SetupSaveGames: Looking for saves.\n");
-	SetupSaveGames();
 
 //
 // Load Actors

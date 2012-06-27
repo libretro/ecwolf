@@ -809,11 +809,15 @@ void ClassDef::LoadActors()
 	R_InitSprites();
 
 	{
+		unsigned int index = 0;
+
 		TMap<FName, ClassDef *>::Iterator iter(ClassTable());
 		TMap<FName, ClassDef *>::Pair *pair;
 		while(iter.NextPair(pair))
 		{
 			ClassDef * const cls = pair->Value;
+
+			cls->ClassIndex = index++;
 			for(unsigned int i = 0;i < cls->frameList.Size();++i)
 				cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
 		}

@@ -55,11 +55,6 @@ void MenuFadeIn();
 #define CTL_W   284
 #define CTL_H   75
 
-#define LSM_X   85
-#define LSM_Y   55
-#define LSM_W   175
-#define LSM_H   10*13+10
-
 #define NM_X    50
 #define NM_Y    100
 #define NM_W    225
@@ -85,7 +80,6 @@ void CreateMenus();
 void US_ControlPanel(ScanCode);
 
 void SetupControlPanel(void);
-void SetupSaveGames();
 void CleanupControlPanel(void);
 
 void ClearMScreen(void);
@@ -100,6 +94,7 @@ void Message(const char *string);
 void CheckPause(void);
 void ShootSnd(void);
 void CheckSecretMissions(void);
+void ShowMenu(class Menu &menu);
 
 void DrawStripes(int y);
 

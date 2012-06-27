@@ -5,20 +5,6 @@
 //
 ////////////////////////////////////////////////////////////////////
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#ifdef _WIN32
-	#include <io.h>
-#else
-	#include <unistd.h>
-#endif
-
-#define LSA_X	96
-#define LSA_Y	80
-#define LSA_W	130
-#define LSA_H	42
-
-#include "file.h"
 #include "m_classes.h"
 #include "m_random.h"
 #include "wl_def.h"
@@ -43,31 +29,17 @@
 #include "colormatcher.h"
 #include "v_font.h"
 #include "templates.h"
-
-struct SaveFile
-{
-	public:
-		static TArray<SaveFile>	files;
-
-		char	name[32]; // Displayed on the menu.
-		char	filename[15];
-};
-TArray<SaveFile> SaveFile::files;
+#include "wl_loadsave.h"
 
 extern int	lastgamemusicoffset;
 EpisodeInfo	*episode = 0;
-bool		quickSaveLoad = false;
 int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE;
 static MenuItem	*readThis;
 
 MENU_LISTENER(EnterControlBase);
-MENU_LISTENER(EnterLoadMenu);
-MENU_LISTENER(EnterSaveMenu);
 
-Menu loadGame(LSM_X, LSM_Y, LSM_W, 24, EnterLoadMenu);
 Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
 Menu optionsMenu(80, 85, 180, 28);
-Menu saveGame(LSM_X, LSM_Y, LSM_W, 24, EnterSaveMenu);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(60, 95, 225, 56);
@@ -183,121 +155,6 @@ MENU_LISTENER(EnterControlBase)
 	controlBase.draw();
 	return true;
 }
-MENU_LISTENER(BeginEditSave)
-{
-	bool ret = Confirm(language["GAMESVD"]);
-	saveGame.draw();
-	return ret;
-}
-MENU_LISTENER(PerformSaveGame)
-{
-	SaveFile file;
-
-	// Copy the name
-	strcpy(file.name, static_cast<TextInputMenuItem *> (saveGame[which])->getValue());
-	if(which == 0) // New
-	{
-		// Locate a available filename.  I don't want to assume savegamX.yza so this
-		// might not be the fastest way to do things.
-		bool nextSaveNumber = false;
-		for(unsigned int i = 0;i < 10000;i++)
-		{
-			sprintf(file.filename, "savegam%u.ecs", i);
-			for(unsigned int j = 0;j < SaveFile::files.Size();j++)
-			{
-				if(stricmp(file.filename, SaveFile::files[j].filename) == 0)
-				{
-					nextSaveNumber = true;
-					continue;
-				}
-			}
-			if(nextSaveNumber)
-			{
-				nextSaveNumber = false;
-				continue;
-			}
-			break;
-		}
-
-		SaveFile::files.Push(file);
-
-		saveGame[0]->setHighlighted(false);
-		saveGame.setCurrentPosition(1);
-		loadGame.setCurrentPosition(0);
-
-		mainMenu[2]->setEnabled(true);
-	}
-	else
-	{
-		strcpy(file.filename, SaveFile::files[which-1].filename);
-		SaveFile::files[which-1] = file;
-		loadGame.setCurrentPosition(which-1);
-	}
-
-	FILE *fileh = fopen(file.filename, "wb");
-	fwrite(file.name, 32, 1, fileh);
-	fseek(fileh, 32, SEEK_SET);
-	if(!quickSaveLoad)
-	{
-		DrawLSAction(1);
-		SaveTheGame(fileh, LSA_X + 8, LSA_Y + 5);
-	}
-	else
-	{
-		Message (language["STR_SAVING"]);
-		SaveTheGame(fileh, 0, 0);
-	}
-	fclose(fileh);
-	if(!quickSaveLoad)
-		Menu::closeMenus(true);
-
-	return true;
-}
-MENU_LISTENER(LoadSaveGame)
-{
-	FILE *file = fopen(SaveFile::files[which].filename, "rb");
-	fseek(file, 32, SEEK_SET);
-	if(!quickSaveLoad)
-		DrawLSAction(0);
-	loadedgame = true;
-	if(!quickSaveLoad)
-		LoadTheGame(file, LSA_X + 8, LSA_Y + 5);
-	else
-		LoadTheGame(file, 0, 0);
-	fclose(file);
-	ShootSnd();
-	if(!quickSaveLoad)
-		Menu::closeMenus(true);
-
-	saveGame.setCurrentPosition(which+1);
-	return false;
-}
-MENU_LISTENER(EnterLoadMenu)
-{
-	if(saveGame.getNumItems() == 0)
-		EnterSaveMenu(which); // This is needed so that there are no crashes on quick save/load
-
-	loadGame.clear();
-
-	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
-		loadGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
-
-	return true;
-}
-MENU_LISTENER(EnterSaveMenu)
-{
-	// Create the menu now
-	saveGame.clear();
-
-	MenuItem *newSave = new TextInputMenuItem("    - NEW SAVE -", 31, NULL, PerformSaveGame, true);
-	newSave->setHighlighted(true);
-	saveGame.addItem(newSave);
-
-	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
-		saveGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame));
-
-	return true;
-}
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
@@ -366,6 +223,8 @@ void CreateMenus()
 	STRIPE = ColorMatcher.Pick(RPART(gameinfo.MenuColors[4]), GPART(gameinfo.MenuColors[4]), BPART(gameinfo.MenuColors[4]));
 
 	// Actually initialize the menus
+	GameSave::InitMenus();
+
 	mainMenu.setHeadPicture("M_OPTION");
 
 	if(EpisodeInfo::GetNumEpisodes() > 1)
@@ -374,12 +233,8 @@ void CreateMenus()
 		mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], skills));
 
 	mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_OPTIONS"], optionsMenu));
-	MenuItem *lg = new MenuSwitcherMenuItem(language["STR_LG"], loadGame);
-	lg->setEnabled(SaveFile::files.Size() > 0);
-	mainMenu.addItem(lg);
-	MenuItem *sg = new MenuSwitcherMenuItem(language["STR_SG"], saveGame);
-	sg->setEnabled(false);
-	mainMenu.addItem(sg);
+	mainMenu.addItem(GameSave::GetLoadMenuItem());
+	mainMenu.addItem(GameSave::GetSaveMenuItem());
 	readThis = new MenuItem(language["STR_RT"], ReadThis);
 	readThis->setVisible(gameinfo.DrawReadThis);
 	readThis->setHighlighted(true);
@@ -483,9 +338,6 @@ void CreateMenus()
 	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
 	displayMenu.addItem(new BooleanMenuItem(language["STR_DEPTHFOG"], r_depthfog));
 
-	loadGame.setHeadPicture("M_LOADGM");
-	saveGame.setHeadPicture("M_SAVEGM");
-
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEADJ"]));
 	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
 
@@ -533,11 +385,11 @@ US_ControlPanel (ScanCode scancode)
 			goto finishup;
 
 		case sc_F2:
-			saveGame.show();
+			GameSave::GetSaveMenu().show();
 			goto finishup;
 
 		case sc_F3:
-			loadGame.show();
+			GameSave::GetLoadMenu().show();
 			goto finishup;
 
 		case sc_F4:
@@ -671,78 +523,14 @@ int CP_CheckQuick (ScanCode scancode)
 		// QUICKSAVE
 		//
 		case sc_F8:
-			if(saveGame.getCurrentPosition() != 0)
-			{
-				quickSaveLoad = true;
-				PerformSaveGame(saveGame.getCurrentPosition());
-				quickSaveLoad = false;
-			}
-			else
-			{
-				VW_FadeOut ();
-				if(screenHeight % 200 != 0)
-					VL_ClearScreen(0);
-
-				lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
-				Menu::closeMenus(false);
-				saveGame.show();
-
-				IN_ClearKeysDown ();
-				VW_FadeOut();
-				if(viewsize != 21)
-					DrawPlayScreen ();
-
-				if (!startgame && !loadedgame)
-					ContinueMusic (lastgamemusicoffset);
-
-				if (loadedgame)
-					playstate = ex_abort;
-				lasttimecount = GetTimeCount ();
-
-				if (MousePresent && IN_IsInputGrabbed())
-					IN_CenterMouse();     // Clear accumulated mouse movement
-			}
+			GameSave::QuickSave();
 			return 1;
 
 		//
 		// QUICKLOAD
 		//
 		case sc_F9:
-			if(saveGame.getCurrentPosition() != 0)
-			{
-				quickSaveLoad = true;
-				char string[100];
-				sprintf(string, "%s%s\"?", language["STR_LGC"], SaveFile::files[saveGame.getCurrentPosition()-1].name);
-				if(Confirm(string))
-					LoadSaveGame(saveGame.getCurrentPosition()-1);
-				quickSaveLoad = false;
-			}
-			else
-			{
-				VW_FadeOut ();
-				if(screenHeight % 200 != 0)
-					VL_ClearScreen(0);
-
-				lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
-				Menu::closeMenus(false);
-				loadGame.show();
-
-				IN_ClearKeysDown ();
-				VW_FadeOut();
-				if(viewsize != 21)
-					DrawPlayScreen ();
-
-				if (!startgame && !loadedgame)
-					ContinueMusic (lastgamemusicoffset);
-
-				if (loadedgame)
-					playstate = ex_abort;
-
-				lasttimecount = GetTimeCount ();
-
-				if (MousePresent && IN_IsInputGrabbed())
-					IN_CenterMouse();     // Clear accumulated mouse movement
-			}
+			GameSave::QuickLoad();
 			return 1;
 
 		//
@@ -780,27 +568,6 @@ int CP_EndGame (int)
 	players[0].killerobj = NULL;
 
 	return 1;
-}
-
-//
-// DRAW LOAD/SAVE IN PROGRESS
-//
-void
-DrawLSAction (int which)
-{
-	DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, TEXTCOLOR);
-	DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
-	VWB_DrawGraphic (TexMan("M_LDING1"), LSA_X + 8, LSA_Y + 5, MENU_CENTER);
-
-	PrintX = LSA_X + 46;
-	PrintY = LSA_Y + 13;
-
-	if (!which)
-		US_Print (BigFont, language["STR_LOADING"]);
-	else
-		US_Print (BigFont, language["STR_SAVING"]);
-
-	VW_UpdateScreen ();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -928,38 +695,6 @@ void SetupControlPanel (void)
 	//
 	if(IN_IsInputGrabbed())
 		IN_CenterMouse();
-}
-
-////////////////////////////////////////////////////////////////////
-//
-// SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
-//
-////////////////////////////////////////////////////////////////////
-void SetupSaveGames()
-{
-	char name[13];
-
-	File saveDirectory("./");
-	const TArray<FString> &files = saveDirectory.getFileList();
-	for(unsigned int i = 0;i < files.Size();i++)
-	{
-		const FString &filename = files[i];
-		if(filename.Len() <= 11 ||
-			filename.Len() >= 15 ||
-			filename.Mid(0, 7).Compare("savegam") != 0 ||
-			filename.Mid(filename.Len()-3, 3).Compare("ecs") != 0)
-			continue; // Too short or incorrect name
-
-		const int handle = open(filename, O_RDONLY | O_BINARY);
-		if(handle >= 0)
-		{
-			SaveFile sFile;
-			read(handle, sFile.name, 32);
-			close(handle);
-			strcpy(sFile.filename, filename);
-			SaveFile::files.Push(sFile);
-		}
-	}
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1274,4 +1009,31 @@ void MenuFadeIn()
 	menusAreFaded = false;
 
 	VL_FadeIn(0, 255, gamepal, 10);
+}
+
+void ShowMenu(Menu &menu)
+{
+	VW_FadeOut ();
+	if(screenHeight % 200 != 0)
+		VL_ClearScreen(0);
+
+	lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
+	Menu::closeMenus(false);
+	menu.show();
+
+	IN_ClearKeysDown ();
+	VW_FadeOut();
+	if(viewsize != 21)
+		DrawPlayScreen ();
+
+	if (!startgame && !loadedgame)
+		ContinueMusic (lastgamemusicoffset);
+
+	if (loadedgame)
+		playstate = ex_abort;
+
+	lasttimecount = GetTimeCount ();
+
+	if (MousePresent && IN_IsInputGrabbed())
+		IN_CenterMouse();     // Clear accumulated mouse movement
 }
