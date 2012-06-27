@@ -604,13 +604,13 @@ void DrawScaleds (void)
 		MapSpot spot = map->GetSpot(obj->tilex, obj->tiley, 0);
 		MapSpot spots[8];
 		spots[0] = spot->GetAdjacent(MapTile::East);
-		spots[1] = spots[0]->GetAdjacent(MapTile::North);
+		spots[1] = spots[0] ? spots[0]->GetAdjacent(MapTile::North) : NULL;
 		spots[2] = spot->GetAdjacent(MapTile::North);
-		spots[3] = spots[2]->GetAdjacent(MapTile::West);
+		spots[3] = spots[2] ? spots[2]->GetAdjacent(MapTile::West) : NULL;
 		spots[4] = spot->GetAdjacent(MapTile::West);
-		spots[5] = spots[4]->GetAdjacent(MapTile::South);
+		spots[5] = spots[4] ? spots[4]->GetAdjacent(MapTile::South) : NULL;
 		spots[6] = spot->GetAdjacent(MapTile::South);
-		spots[7] = spots[6]->GetAdjacent(MapTile::East);
+		spots[7] = spots[6] ? spots[6]->GetAdjacent(MapTile::East) : NULL;
 
 		//
 		// could be in any of the nine surrounding tiles

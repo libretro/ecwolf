@@ -78,6 +78,7 @@ public:
 
 		FMemLump data = Wads.ReadLump(lump);
 		Scanner sc((const char*)data.GetMem(), data.GetSize());
+		sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
 
 		while(sc.TokensLeft())
 		{

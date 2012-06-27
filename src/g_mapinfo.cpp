@@ -551,6 +551,7 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 			{
 				defaultMap = LevelInfo();
 				LevelInfoBlockParser(sc, defaultMap, false).Parse();
+				Printf("Translator = %s\n", defaultMap.Translator.GetChars());
 			}
 			else if(sc->str.CompareNoCase("adddefaultmap") == 0)
 			{
@@ -572,7 +573,12 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 			{
 				LevelInfo newMap = defaultMap;
 				LevelInfoBlockParser(sc, newMap, true).Parse();
-				levelInfos.Push(newMap);
+
+				LevelInfo &existing = LevelInfo::Find(newMap.Name);
+				if(&existing != &defaultMap)
+					existing = newMap;
+				else
+					levelInfos.Push(newMap);
 			}
 			else
 				SkipBlock(sc);
