@@ -48,7 +48,6 @@
 //#include "stats.h"
 //#include "a_sharedglobal.h"
 //#include "dsectoreffect.h"
-//#include "farchive.h"
 #include "thingdef/thingdef.h"
 #include "zdoomsupport.h"
 

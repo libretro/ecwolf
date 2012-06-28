@@ -48,6 +48,7 @@
 #include "doomerrors.h"
 //#include "i_system.h"
 #include "w_wad.h"
+#include "farchive.h"
 
 //#include "gi.h"
 //#include "stats.h"
@@ -189,7 +190,7 @@ bool FRemapTable::operator==(const FRemapTable &o)
 //
 //----------------------------------------------------------------------------
 
-/*void FRemapTable::Serialize(FArchive &arc)
+void FRemapTable::Serialize(FArchive &arc)
 {
 	int n = NumEntries;
 
@@ -211,7 +212,7 @@ bool FRemapTable::operator==(const FRemapTable &o)
 	{
 		arc << Palette[j];
 	}
-}*/
+}
 
 //----------------------------------------------------------------------------
 //

@@ -258,10 +258,10 @@ void TextInputMenuItem::activate()
 		if(clearFirst)
 		{
 			int color = ColorMatcher.Pick(V_LogColorFromColorRange(getTextColor()));
-			DrawWindow(menu->getX() + menu->getIndent(), PrintY-1, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, color, color);
+			DrawWindow(menu->getX() + menu->getIndent(), PrintY-scaleFactor, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, color, color);
 		}
 		bool accept = US_LineInput(
-			menu->getX() + menu->getIndent() + 2,
+			menu->getX() + menu->getIndent() + 2*scaleFactor,
 			PrintY, buffer,
 			clearFirst ? "" : getValue(), true, max, menu->getWidth() - menu->getIndent() - 16,
 			getTextColor()
@@ -275,7 +275,7 @@ void TextInputMenuItem::activate()
 		else
 		{
 			SD_PlaySound("menu/escape");
-			PrintY--;
+			PrintY -= scaleFactor;
 			draw();
 		}
 	}
@@ -286,8 +286,8 @@ void TextInputMenuItem::draw()
 	int color = ColorMatcher.Pick(V_LogColorFromColorRange(getTextColor()));
 
 	DrawWindow(menu->getX() + menu->getIndent(), PrintY, menu->getWidth() - menu->getIndent() - 12, 11, BKGDCOLOR, color, color);
-	PrintX = menu->getX() + menu->getIndent() + 2;
-	PrintY++;
+	PrintX = menu->getX() + menu->getIndent() + 2*scaleFactor;
+	PrintY += scaleFactor;
 	US_Print(SmallFont, getValue(), getTextColor());
 }
 

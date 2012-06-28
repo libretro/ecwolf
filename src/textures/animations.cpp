@@ -45,6 +45,7 @@
 #include "w_wad.h"
 //#include "g_level.h"
 #include "textures.h"
+#include "farchive.h"
 
 // MACROS ------------------------------------------------------------------
 
@@ -928,7 +929,7 @@ void FTextureManager::UpdateAnimations (DWORD mstime)
 //
 //==========================================================================
 
-/*template<> FArchive &operator<< (FArchive &arc, FDoorAnimation* &Doorani)
+template<> FArchive &operator<< (FArchive &arc, FDoorAnimation* &Doorani)
 {
 	if (arc.IsStoring())
 	{
@@ -941,5 +942,5 @@ void FTextureManager::UpdateAnimations (DWORD mstime)
 		Doorani = TexMan.FindAnimatedDoor(tex);
 	}
 	return arc;
-}*/
+}
 

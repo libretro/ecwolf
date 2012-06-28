@@ -43,6 +43,7 @@
 //#include "cmdlib.h"
 #include "scanner.h"
 //#include "gi.h"
+#include "farchive.h"
 
 #define STACK_ARGS
 
@@ -409,7 +410,7 @@ FSwitchDef *FTextureManager::FindSwitch (FTextureID texture)
 //
 //==========================================================================
 
-/*template<> FArchive &operator<< (FArchive &arc, FSwitchDef* &Switch)
+template<> FArchive &operator<< (FArchive &arc, FSwitchDef* &Switch)
 {
 	if (arc.IsStoring())
 	{
@@ -422,5 +423,5 @@ FSwitchDef *FTextureManager::FindSwitch (FTextureID texture)
 		Switch = TexMan.FindSwitch(tex);
 	}
 	return arc;
-}*/
+}
 

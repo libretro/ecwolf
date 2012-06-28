@@ -51,6 +51,7 @@
 #include "id_ca.h"
 #include "g_mapinfo.h"
 #include "gamemap.h"
+#include "farchive.h"
 
 #define TEXTCOLOR_ORANGE
 
@@ -1089,7 +1090,7 @@ FTextureID FTextureManager::PalCheck(FTextureID tex)
 //
 //==========================================================================
 
-/*void FTextureManager::WriteTexture (FArchive &arc, int picnum)
+void FTextureManager::WriteTexture (FArchive &arc, int picnum)
 {
 	FTexture *pic;
 
@@ -1109,7 +1110,7 @@ FTextureID FTextureManager::PalCheck(FTextureID tex)
 
 	arc.WriteName (pic->Name);
 	arc.WriteCount (pic->UseType);
-}*/
+}
 
 //==========================================================================
 //
@@ -1117,7 +1118,7 @@ FTextureID FTextureManager::PalCheck(FTextureID tex)
 //
 //==========================================================================
 
-/*int FTextureManager::ReadTexture (FArchive &arc)
+int FTextureManager::ReadTexture (FArchive &arc)
 {
 	int usetype;
 	const char *name;
@@ -1129,7 +1130,7 @@ FTextureID FTextureManager::PalCheck(FTextureID tex)
 		return GetTexture (name, usetype).GetIndex();
 	}
 	else return -1;
-}*/
+}
 
 //===========================================================================
 //
@@ -1324,7 +1325,7 @@ FTextureID FTextureManager::GetArtIndex(unsigned int index)
 //
 //==========================================================================
 
-/*FArchive &operator<< (FArchive &arc, FTextureID &tex)
+FArchive &operator<< (FArchive &arc, FTextureID &tex)
 {
 	if (arc.IsStoring())
 	{
@@ -1335,7 +1336,7 @@ FTextureID FTextureManager::GetArtIndex(unsigned int index)
 		tex.texnum = TexMan.ReadTexture(arc);
 	}
 	return arc;
-}*/
+}
 
 //==========================================================================
 //

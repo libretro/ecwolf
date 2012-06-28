@@ -90,7 +90,7 @@ The FON2 header is followed by variable length data:
 //#include "cmdlib.h"
 #include "scanner.h"
 //#include "hu_stuff.h"
-//#include "farchive.h"
+#include "farchive.h"
 #include "textures/textures.h"
 #include "r_data/r_translate.h"
 #include "colormatcher.h"
@@ -305,7 +305,7 @@ FFont *V_GetFont(const char *name)
 //
 //==========================================================================
 
-/*FArchive &SerializeFFontPtr (FArchive &arc, FFont* &font)
+FArchive &SerializeFFontPtr (FArchive &arc, FFont* &font)
 {
 	if (arc.IsStoring ())
 	{
@@ -325,7 +325,7 @@ FFont *V_GetFont(const char *name)
 		delete[] name;
 	}
 	return arc;
-}*/
+}
 
 //==========================================================================
 //
