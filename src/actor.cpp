@@ -370,8 +370,6 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
 	AActor *actor = type->CreateInstance();
 	actor->x = x;
 	actor->y = y;
-	actor->tilex = x>>FRACBITS;
-	actor->tiley = y>>FRACBITS;
 	actor->velx = 0;
 	actor->vely = 0;
 
@@ -429,8 +427,6 @@ void FinishTravel ()
 					AActor *playertmp = players[0].mo;
 					player->x = playertmp->x;
 					player->y = playertmp->y;
-					player->tilex = playertmp->tilex;
-					player->tiley = playertmp->tiley;
 					player->angle = playertmp->angle;
 					player->EnterZone(playertmp->GetZone());
 

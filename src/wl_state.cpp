@@ -141,6 +141,9 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 
 bool TryWalk (AActor *ob)
 {
+	word zonex = ob->tilex;
+	word zoney = ob->tiley;
+
 	switch (ob->dir)
 	{
 		case north:
@@ -152,15 +155,15 @@ bool TryWalk (AActor *ob)
 			{
 				CHECKSIDE(ob->tilex,ob->tiley-1,MapTrigger::South);
 			}
-			ob->tiley--;
+			zoney--;
 			break;
 
 		case northeast:
 			CHECKDIAG(ob->tilex+1,ob->tiley-1);
 			CHECKDIAG(ob->tilex+1,ob->tiley);
 			CHECKDIAG(ob->tilex,ob->tiley-1);
-			ob->tilex++;
-			ob->tiley--;
+			zonex++;
+			zoney--;
 			break;
 
 		case east:
@@ -172,15 +175,15 @@ bool TryWalk (AActor *ob)
 			{
 				CHECKSIDE(ob->tilex+1,ob->tiley,MapTrigger::West);
 			}
-			ob->tilex++;
+			zonex++;
 			break;
 
 		case southeast:
 			CHECKDIAG(ob->tilex+1,ob->tiley+1);
 			CHECKDIAG(ob->tilex+1,ob->tiley);
 			CHECKDIAG(ob->tilex,ob->tiley+1);
-			ob->tilex++;
-			ob->tiley++;
+			zonex++;
+			zoney++;
 			break;
 
 		case south:
@@ -192,15 +195,15 @@ bool TryWalk (AActor *ob)
 			{
 				CHECKSIDE(ob->tilex,ob->tiley+1,MapTrigger::North);
 			}
-			ob->tiley++;
+			zoney++;
 			break;
 
 		case southwest:
 			CHECKDIAG(ob->tilex-1,ob->tiley+1);
 			CHECKDIAG(ob->tilex-1,ob->tiley);
 			CHECKDIAG(ob->tilex,ob->tiley+1);
-			ob->tilex--;
-			ob->tiley++;
+			zonex--;
+			zoney++;
 			break;
 
 		case west:
@@ -212,15 +215,15 @@ bool TryWalk (AActor *ob)
 			{
 				CHECKSIDE(ob->tilex-1,ob->tiley,MapTrigger::East);
 			}
-			ob->tilex--;
+			zonex--;
 			break;
 
 		case northwest:
 			CHECKDIAG(ob->tilex-1,ob->tiley-1);
 			CHECKDIAG(ob->tilex-1,ob->tiley);
 			CHECKDIAG(ob->tilex,ob->tiley-1);
-			ob->tilex--;
-			ob->tiley--;
+			zonex--;
+			zoney--;
 			break;
 
 		case nodir:

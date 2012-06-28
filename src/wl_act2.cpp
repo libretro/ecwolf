@@ -172,9 +172,6 @@ void T_Projectile (AActor *self)
 		self->Die(); // TODO: XDeath
 		return;
 	}
-
-	self->tilex = (short)(self->x >> TILESHIFT);
-	self->tiley = (short)(self->y >> TILESHIFT);
 }
 
 /*

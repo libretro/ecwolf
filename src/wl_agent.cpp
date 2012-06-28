@@ -802,9 +802,6 @@ void Thrust (angle_t angle, int32_t speed)
 
 	ClipMove(players[0].mo,xmove,ymove);
 
-	players[0].mo->tilex = (short)(players[0].mo->x >> TILESHIFT);                // scale to tile values
-	players[0].mo->tiley = (short)(players[0].mo->y >> TILESHIFT);
-
 	players[0].mo->EnterZone(map->GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->zone);
 }
 
