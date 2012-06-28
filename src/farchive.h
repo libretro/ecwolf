@@ -187,9 +187,9 @@ virtual void Read (void *mem, unsigned int len);
 		FArchive& operator<< (FName &n);
 		FArchive& operator<< (FString &str);
 		FArchive& SerializePointer (void *ptrbase, BYTE **ptr, DWORD elemSize);
-		FArchive& SerializeObject (DObject *&object, ClassDef *type);
+		FArchive& SerializeObject (DObject *&object, const ClassDef *type);
 		FArchive& WriteObject (DObject *obj);
-		FArchive& ReadObject (DObject *&obj, ClassDef *wanttype);
+		FArchive& ReadObject (DObject *&obj, const ClassDef *wanttype);
 
 		void WriteName (const char *name);
 		const char *ReadName ();	// The returned name disappears with the archive, unlike strings

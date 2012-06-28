@@ -34,6 +34,7 @@
 
 #include "actor.h"
 #include "a_inventory.h"
+#include "farchive.h"
 #include "gamemap.h"
 #include "id_ca.h"
 #include "thinker.h"
@@ -101,6 +102,12 @@ class AActorProxy : public Thinker
 		{
 			if(enabled)
 				parent->Tick();
+		}
+
+		void Serialize(FArchive &arc)
+		{
+			arc << enabled << parent;
+			Super::Serialize(arc);
 		}
 
 		bool			enabled;

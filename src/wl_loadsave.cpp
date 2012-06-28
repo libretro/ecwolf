@@ -32,12 +32,18 @@
 **
 */
 
+#include "farchive.h"
 #include "file.h"
 #include "id_us.h"
 #include "id_vh.h"
 #include "language.h"
 #include "m_classes.h"
 #include "m_png.h"
+#include "m_random.h"
+#include "thinker.h"
+#include "w_wad.h"
+#include "wl_game.h"
+#include "wl_loadsave.h"
 #include "wl_main.h"
 #include "wl_menu.h"
 #include "textures/textures.h"
@@ -122,13 +128,14 @@ void SetupSaveGames()
 
 		PNGHandle *png;
 		FILE *file = fopen(filename, "rb");
+		Printf("Opening %s\n", filename.GetChars());
 		if(file)
 		{
 			if((png = M_VerifyPNG(file)))
 			{
 				SaveFile sFile;
 				sFile.filename = filename;
-				if(!M_GetPNGText(png, "Title", title, MAX_SAVENAME))
+				if(M_GetPNGText(png, "Title", title, MAX_SAVENAME))
 				{
 					sFile.name = title;
 					SaveFile::files.Push(sFile);
@@ -222,20 +229,8 @@ MENU_LISTENER(PerformSaveGame)
 		loadGame.setCurrentPosition(which-1);
 	}
 
-	FILE *fileh = fopen(file.filename, "wb");
-	fwrite(file.name, 32, 1, fileh);
-	fseek(fileh, 32, SEEK_SET);
-	if(!quickSaveLoad)
-	{
-		DrawLSAction(1);
-		//SaveTheGame(fileh, LSA_X + 8, LSA_Y + 5);
-	}
-	else
-	{
-		Message (language["STR_SAVING"]);
-		//SaveTheGame(fileh, 0, 0);
-	}
-	fclose(fileh);
+	Save(file.filename, file.name);
+
 	if(!quickSaveLoad)
 		Menu::closeMenus(true);
 
@@ -244,16 +239,9 @@ MENU_LISTENER(PerformSaveGame)
 
 MENU_LISTENER(LoadSaveGame)
 {
-	FILE *file = fopen(SaveFile::files[which].filename, "rb");
-	fseek(file, 32, SEEK_SET);
-	if(!quickSaveLoad)
-		DrawLSAction(0);
 	loadedgame = true;
-	/*if(!quickSaveLoad)
-		LoadTheGame(file, LSA_X + 8, LSA_Y + 5);
-	else
-		LoadTheGame(file, 0, 0);*/
-	fclose(file);
+	Load(SaveFile::files[which].filename);
+	
 	ShootSnd();
 	if(!quickSaveLoad)
 		Menu::closeMenus(true);
@@ -304,6 +292,93 @@ void QuickLoad()
 	}
 
 	ShowMenu(loadGame);
+}
+
+static void Serialize(FArchive &arc)
+{
+	arc << gamestate.difficulty
+		<< gamestate.secretcount
+		<< gamestate.treasurecount
+		<< gamestate.killcount
+		<< gamestate.secrettotal
+		<< gamestate.treasuretotal
+		<< gamestate.killtotal
+		<< gamestate.TimeCount
+		<< gamestate.victoryflag;
+
+	thinkerList->Serialize(arc);
+}
+
+#define SNAP_ID MAKE_ID('s','n','A','p')
+
+bool Load(const FString &filename)
+{
+	FILE *fileh = fopen(filename, "rb");
+	PNGHandle *png = M_VerifyPNG(fileh);
+	if(png == NULL)
+	{
+		fclose(fileh);
+		return false;
+	}
+
+	if(!quickSaveLoad)
+		DrawLSAction(0);
+
+	{
+		unsigned int chunkLength = M_FindPNGChunk(png, SNAP_ID);
+		FPNGChunkArchive arc(fileh, SNAP_ID, chunkLength);
+		FCompressedMemFile snapshot;
+		snapshot.Serialize(arc);
+		FArchive snarc(snapshot);
+		Serialize(snarc);
+	}
+
+	FRandom::StaticReadRNGState(png);
+
+	delete png;
+	fclose(fileh);
+	return true;
+}
+
+bool Save(const FString &filename, const FString &title)
+{
+#define GAMESIG "ECWOLF"
+
+	FILE *fileh = fopen(filename, "wb");
+
+	if(!quickSaveLoad)
+		DrawLSAction(1);
+	else
+		Message (language["STR_SAVING"]);
+
+	// If we get hubs this will need to be moved so that we can have multiple of them
+	FCompressedMemFile snapshot;
+	snapshot.Open();
+	{
+		FArchive arc(snapshot);
+		Serialize(arc);
+	}
+
+	M_CreateDummyPNG(fileh);
+	M_AppendPNGText(fileh, "Software", "ECWolf");
+	M_AppendPNGText(fileh, "Engine", GAMESIG);
+	M_AppendPNGText(fileh, "ECWolf Save Version", GAMESIG);
+	M_AppendPNGText(fileh, "Title", title);
+	// TODO: Write map name (MAP01)
+
+	M_AppendPNGText(fileh, "Game WAD", Wads.GetWadName(FWadCollection::IWAD_FILENUM));
+	// TODO: Also write WAD that the map resides in
+
+	FRandom::StaticWriteRNGState(fileh);
+
+	{
+		FPNGChunkArchive snapshotArc(fileh, SNAP_ID);
+		snapshot.Serialize(snapshotArc);
+	}
+
+	M_FinishPNG(fileh);
+	fclose(fileh);
+	return true;
 }
 
 /* end namespace */ }

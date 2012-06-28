@@ -69,6 +69,7 @@
 //#include "i_system.h"
 //#include "c_dispatch.h"
 #include "files.h"
+#include "farchive.h"
 
 // MACROS ------------------------------------------------------------------
 
@@ -260,7 +261,7 @@ DWORD FRandom::StaticSumSeeds ()
 
 void FRandom::StaticWriteRNGState (FILE *file)
 {
-/*	FRandom *rng;
+	FRandom *rng;
 	FPNGChunkArchive arc (file, RAND_ID);
 
 	arc << rngseed;
@@ -276,7 +277,7 @@ void FRandom::StaticWriteRNGState (FILE *file)
 				arc << rng->sfmt.u[i];
 			}
 		}
-	}*/
+	}
 }
 
 //==========================================================================
@@ -290,7 +291,7 @@ void FRandom::StaticWriteRNGState (FILE *file)
 
 void FRandom::StaticReadRNGState (PNGHandle *png)
 {
-/*	FRandom *rng;
+	FRandom *rng;
 
 	size_t len = M_FindPNGChunk (png, RAND_ID);
 
@@ -333,7 +334,7 @@ void FRandom::StaticReadRNGState (PNGHandle *png)
 			}
 		}
 		png->File->ResetFilePtr();
-	}*/
+	}
 }
 
 //==========================================================================

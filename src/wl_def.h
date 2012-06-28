@@ -379,7 +379,6 @@ typedef struct
 	short       mapon;
 
 	short       faceframe;
-	short       attackframe,attackcount,weaponframe;
 
 	short       episode,secretcount,treasurecount,killcount,
 				secrettotal,treasuretotal,killtotal;

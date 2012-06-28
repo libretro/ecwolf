@@ -35,6 +35,7 @@
 #ifndef __WL_LOADSAVE_H__
 #define __WL_LOADSAVE_H__
 
+class FString;
 class Menu;
 class MenuItem;
 
@@ -48,8 +49,8 @@ namespace GameSave
 	void		QuickLoad();
 	void		QuickSave();
 
-	bool		Load();
-	bool		Save();
+	bool		Load(const FString &filename);
+	bool		Save(const FString &filename, const FString &title);
 }
 
 #endif

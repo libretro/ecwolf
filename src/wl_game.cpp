@@ -712,8 +712,6 @@ void Died (void)
 		DrawStatusBar();
 
 		players[0].state = player_t::PST_REBORN;
-		gamestate.attackframe = gamestate.attackcount =
-			gamestate.weaponframe = 0;
 		thinkerList->DestroyAll();
 	}
 }

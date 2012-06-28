@@ -1069,7 +1069,7 @@ FArchive &FArchive::SerializePointer (void *ptrbase, BYTE **ptr, DWORD elemSize)
 	return *this;
 }
 
-FArchive &FArchive::SerializeObject (DObject *&object, ClassDef *type)
+FArchive &FArchive::SerializeObject (DObject *&object, const ClassDef *type)
 {
 	if (IsStoring ())
 	{
@@ -1183,7 +1183,7 @@ FArchive &FArchive::WriteObject (DObject *obj)
 	return *this;
 }
 
-FArchive &FArchive::ReadObject (DObject* &obj, ClassDef *wanttype)
+FArchive &FArchive::ReadObject (DObject* &obj, const ClassDef *wanttype)
 {
 	BYTE objHead;
 	const ClassDef *type;

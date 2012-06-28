@@ -35,6 +35,7 @@
 **
 */
 
+#include "farchive.h"
 #include "thinker.h"
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
@@ -111,6 +112,40 @@ void ThinkerList::Tick()
 			}
 
 			iter = nextThinker;
+		}
+	}
+}
+
+void ThinkerList::Serialize(FArchive &arc)
+{
+	if(arc.IsStoring())
+	{
+		for(unsigned int i = 0;i < NUM_TYPES;i++)
+		{
+			Iterator iter = thinkers[i].Head();
+			while(iter)
+			{
+				arc << iter->Item();
+				iter = iter->Next();
+			}
+
+			Thinker *terminator = NULL;
+			arc << terminator; // Terminate list
+		}
+	}
+	else
+	{
+		DestroyAll();
+
+		for(unsigned int i = 0;i < NUM_TYPES;i++)
+		{
+			Thinker *thinker;
+			arc << thinker;
+			while(thinker)
+			{
+				Register(thinker, static_cast<Priority>(i));
+				arc << thinker;
+			}
 		}
 	}
 }
