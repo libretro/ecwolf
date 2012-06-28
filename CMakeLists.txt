@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.4)
-project(ECWOLF)
+project(ECWolf)
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWolf.")
 

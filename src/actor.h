@@ -161,9 +161,18 @@ class AActor : public DObject
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;
 
-		fixed	x, y;
+		// TODO: These needs to handle endianess
+		union
+		{
+			fixed x;
+			struct { const word fracx; const word tilex; };
+		};
+		union
+		{
+			fixed y;
+			struct { const word fracy; const word tiley; };
+		};
 		fixed	velx, vely;
-		word	tilex, tiley;
 
 		angle_t	angle;
 		int32_t	health;
