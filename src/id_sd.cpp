@@ -559,7 +559,6 @@ byte* SD_PrepareSound(int which)
 	// TEMPORARY WORK AROUND FOR MEMORY ERROR
 	byte* nout = new byte[sizeof(Mix_Chunk)];
 	memcpy(nout, out, sizeof(Mix_Chunk));
-	free(out);
 	return nout;
 }
 
