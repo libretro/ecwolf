@@ -59,7 +59,7 @@ static inline bool CheckDoorMovement(AActor *actor)
 
 void A_Face(AActor *self, AActor *target, angle_t maxturn)
 {
-	double angle = atan2 (target->x - self->x, target->y - self->y);
+	double angle = atan2 ((double) (target->x - self->x), (double) (target->y - self->y));
 	if (angle<0)
 		angle = (M_PI*2+angle);
 	angle_t iangle = (angle_t) (angle*ANGLE_180/M_PI) - ANGLE_90;
@@ -215,8 +215,8 @@ ACTION_FUNCTION(A_CustomMissile)
 	fixed newy = self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64;
 
 	double angle = (flags & CMF_AIMOFFSET) ?
-		atan2 (self->y - players[0].mo->y, players[0].mo->x - self->x) :
-		atan2 (newy - players[0].mo->y, players[0].mo->x - newx);
+		atan2 ((double) (self->y - players[0].mo->y), (double) (players[0].mo->x - self->x)) :
+		atan2 ((double) (newy - players[0].mo->y), (double) (players[0].mo->x - newx));
 	if (angle<0)
 		angle = (M_PI*2+angle);
 	angle_t iangle = (angle_t) (angle*ANGLE_180/M_PI) + (angle_t) ((angleOffset*ANGLE_45)/45);

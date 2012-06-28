@@ -5,10 +5,10 @@ endif(COMMAND cmake_policy)
 include(CheckFunctionExists)
 
 include_directories(
-	${ECWOLF_SOURCE_DIR}/src
-	${ECWOLF_SOURCE_DIR}/src/g_shared
+	${ECWolf_SOURCE_DIR}/src
+	${ECWolf_SOURCE_DIR}/src/g_shared
 	${LZMA_INCLUDE_DIR}
-	${ECWOLF_SOURCE_DIR}/gdtoa
+	${ECWolf_SOURCE_DIR}/gdtoa
 	${CMAKE_BINARY_DIR}/gdtoa
 )
 

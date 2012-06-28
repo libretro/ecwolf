@@ -1248,8 +1248,8 @@ void DrawStripes (int y)
 		MenuToRealCoords(dummyx, ly, dummyw, lh, MENU_TOP);
 	}
 
-	VWB_Clear(0, 0, ceil(sy), screenWidth, ceil(sy+sh));
-	VWB_Clear(STRIPE, 0, ceil(ly), screenWidth, ceil(ly+lh));
+	VWB_Clear(0, 0, sy, screenWidth, sy+sh);
+	VWB_Clear(STRIPE, 0, ly, screenWidth, ly+lh);
 }
 
 void ShootSnd (void)

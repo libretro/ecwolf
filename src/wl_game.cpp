@@ -2,8 +2,9 @@
 
 #ifdef WINDOWS
 #include <io.h>
-#endif
+#else
 #include <unistd.h>
+#endif
 
 #include <math.h>
 #include "wl_def.h"
