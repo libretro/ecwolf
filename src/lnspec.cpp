@@ -204,6 +204,20 @@ class EVDoor : public Thinker
 			return false;
 		}
 
+		void Serialize(FArchive &arc)
+		{
+			BYTE state = this->state;
+			arc << state;
+			this->state = static_cast<State>(state);
+
+			arc << spot
+				<< amount
+				<< wait
+				<< direction;
+
+			Super::Serialize(arc);
+		}
+
 	private:
 		static const unsigned int OPENTICS = 300;
 		enum State { Opening, Opened, Closing, Closed };
@@ -339,6 +353,16 @@ class EVPushwall : public Thinker
 
 			if(position == 256)
 				Destroy();
+		}
+
+		void Serialize(FArchive &arc)
+		{
+			arc << spot
+				<< moveTo
+				<< direction
+				<< position;
+
+			Super::Serialize(arc);
 		}
 
 	private:

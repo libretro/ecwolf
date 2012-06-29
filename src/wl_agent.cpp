@@ -967,6 +967,24 @@ void player_t::Reborn()
 	DrawStatusBar();
 }
 
+void player_t::Serialize(FArchive &arc)
+{
+	BYTE state = this->state;
+	arc << state;
+	this->state = static_cast<State>(state);
+
+	arc << mo
+		<< killerobj
+		<< oldscore
+		<< score
+		<< nextextra
+		<< lives
+		<< health
+		<< ReadyWeapon
+		<< PendingWeapon
+		<< flags;
+}
+
 void player_t::SetPSprite(const Frame *frame)
 {
 	flags &= ~player_t::PF_WEAPONREADY;
@@ -977,6 +995,11 @@ void player_t::SetPSprite(const Frame *frame)
 		psprite.ticcount = frame->duration;
 		frame->action(mo);
 	}
+}
+
+FArchive &operator<< (FArchive &arc, player_t *&player)
+{
+	return arc.SerializePointer(players, (BYTE**)&player, sizeof(players[0]));
 }
 
 /*

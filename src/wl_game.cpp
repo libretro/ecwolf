@@ -242,10 +242,6 @@ void UpdateSoundLoc(void)
 
 void SetupGameLevel (void)
 {
-	int  x,y;
-	word tile;
-
-
 	if (!loadedgame)
 	{
 		gamestate.TimeCount
@@ -261,11 +257,6 @@ void SetupGameLevel (void)
 
 		thinkerList->DestroyAll();
 	}
-
-	/*if (demoplayback || demorecord)
-		US_InitRndT (false);
-	else
-		US_InitRndT (true);*/
 
 //
 // load the level
@@ -288,7 +279,8 @@ void SetupGameLevel (void)
 //
 // spawn actors
 //
-	map->SpawnThings();
+	if(!loadedgame)
+		map->SpawnThings();
 }
 
 

@@ -150,6 +150,7 @@ class AActor : public DObject
 		const MapZone	*GetZone() const { return soundZone; }
 		void			RemoveFromWorld();
 		void			RemoveInventory(AInventory *item);
+		void			Serialize(FArchive &arc);
 		void			SetState(const Frame *state, bool notic=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
 		virtual void	Tick();

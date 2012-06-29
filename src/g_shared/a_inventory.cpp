@@ -115,6 +115,19 @@ bool AInventory::HandlePickup(AInventory *item, bool &good)
 	return false;
 }
 
+void AInventory::Serialize(FArchive &arc)
+{
+	arc << itemFlags
+		<< owner
+		<< pickupsound
+		<< amount
+		<< maxamount
+		<< interhubamount
+		<< icon;
+
+	Super::Serialize(arc);
+}
+
 void AInventory::Touch(AActor *toucher)
 {
 	if(!(toucher->flags & FL_PICKUP))
@@ -301,6 +314,21 @@ bool AWeapon::HandlePickup(AInventory *item, bool &good)
 	else if(inventory)
 		return inventory->HandlePickup(item, good);
 	return false;
+}
+
+void AWeapon::Serialize(FArchive &arc)
+{
+	BYTE mode = this->mode;
+	arc << mode;
+	this->mode = static_cast<FireMode>(mode);
+
+	arc << ammotype1
+		<< ammogive1
+		<< ammouse1
+		<< yadjust
+		<< ammo1;
+
+	Super::Serialize(arc);
 }
 
 bool AWeapon::UseForAmmo(AWeapon *owned)

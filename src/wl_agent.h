@@ -48,6 +48,7 @@ extern class player_t
 		void	BringUpWeapon();
 		size_t	PropagateMark();
 		void	Reborn();
+		void	Serialize(FArchive &arc);
 		void	SetPSprite(const Frame *frame);
 
 		enum State
@@ -84,5 +85,7 @@ extern class player_t
 		int32_t		flags;
 		State		state;
 } players[];
+
+FArchive &operator<< (FArchive &arc, player_t *&player);
 
 #endif

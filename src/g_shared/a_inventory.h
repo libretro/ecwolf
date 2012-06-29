@@ -48,6 +48,7 @@ class AInventory : public AActor
 		virtual void	DetachFromOwner();
 		virtual void	Destroy();
 		virtual bool	HandlePickup(AInventory *item, bool &good);
+		void			Serialize(FArchive &arc);
 		void			Touch(AActor *toucher);
 		virtual bool	TryPickup(AActor *toucher);
 		virtual bool	Use();
@@ -110,6 +111,7 @@ class AWeapon : public AInventory
 		const Frame	*GetUpState() const;
 
 		bool		HandlePickup(AInventory *item, bool &good);
+		void		Serialize(FArchive &arc);
 
 		const ClassDef	*ammotype1;
 		unsigned int	ammogive1;

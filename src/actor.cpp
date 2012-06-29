@@ -291,6 +291,43 @@ void AActor::Init()
 	}
 }
 
+void AActor::Serialize(FArchive &arc)
+{
+	if(arc.IsStoring())
+		arc.WriteSprite(sprite);
+	else
+		sprite = arc.ReadSprite();
+
+	arc << flags
+		<< distance
+		<< x
+		<< y
+		<< velx
+		<< vely
+		<< angle
+		<< health
+		<< speed
+		<< runspeed
+		<< points
+		<< radius
+		<< ticcount
+		<< viewx
+		<< viewheight
+		<< transx
+		<< transy
+		<< sighttime
+		<< sightrandom
+		<< missilechance
+		<< attacksound
+		<< deathsound
+		<< seesound
+		<< player
+		<< inventory
+		<< thinker;
+
+	Super::Serialize(arc);
+}
+
 void AActor::SetState(const Frame *state, bool notic)
 {
 	if(state == NULL)

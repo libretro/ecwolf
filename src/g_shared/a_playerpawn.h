@@ -65,6 +65,7 @@ class APlayerPawn : public AActor
 
 		void	GiveStartingInventory();
 		AWeapon	*PickNewWeapon();
+		void	Serialize(FArchive &arc);
 		void	Tick();
 
 		int32_t		maxhealth;

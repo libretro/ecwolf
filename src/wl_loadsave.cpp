@@ -42,6 +42,7 @@
 #include "m_random.h"
 #include "thinker.h"
 #include "w_wad.h"
+#include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_loadsave.h"
 #include "wl_main.h"
@@ -307,6 +308,8 @@ static void Serialize(FArchive &arc)
 		<< gamestate.victoryflag;
 
 	thinkerList->Serialize(arc);
+
+	players[0].Serialize(arc);
 }
 
 #define SNAP_ID MAKE_ID('s','n','A','p')
@@ -329,6 +332,7 @@ bool Load(const FString &filename)
 		FPNGChunkArchive arc(fileh, SNAP_ID, chunkLength);
 		FCompressedMemFile snapshot;
 		snapshot.Serialize(arc);
+		snapshot.Reopen();
 		FArchive snarc(snapshot);
 		Serialize(snarc);
 	}

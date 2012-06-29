@@ -32,6 +32,8 @@
 **
 */
 
+#include "id_ca.h"
+#include "farchive.h"
 #include "gamemap.h"
 #include "tarray.h"
 #include "w_wad.h"
@@ -419,4 +421,26 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 	if(y >= plane->gm->GetHeader().height || x >= plane->gm->GetHeader().width)
 		return NULL;
 	return &plane->map[y*plane->gm->GetHeader().width+x];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+FArchive &operator<< (FArchive &arc, MapSpot &spot)
+{
+	if(arc.IsStoring())
+	{
+		unsigned int x = spot->GetX();
+		unsigned int y = spot->GetY();
+
+		arc << x << y;
+	}
+	else
+	{
+		unsigned int x, y;
+		arc << x << y;
+
+		spot = map->GetSpot(x, y, 0);
+	}
+
+	return arc;
 }

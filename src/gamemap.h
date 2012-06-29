@@ -203,4 +203,7 @@ typedef GameMap::Tile			MapTile;
 typedef GameMap::Trigger		MapTrigger;
 typedef GameMap::Zone			MapZone;
 
+#include "farchive.h"
+FArchive &operator<< (FArchive &arc, MapSpot &spot);
+
 #endif

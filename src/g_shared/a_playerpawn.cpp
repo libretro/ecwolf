@@ -126,6 +126,13 @@ AWeapon *APlayerPawn::PickNewWeapon()
 	return best;
 }
 
+void APlayerPawn::Serialize(FArchive &arc)
+{
+	arc << maxhealth;
+
+	Super::Serialize(arc);
+}
+
 void APlayerPawn::Tick()
 {
 	Super::Tick();
