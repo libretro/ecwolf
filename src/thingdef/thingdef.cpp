@@ -764,6 +764,18 @@ bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 	return false;
 }
 
+bool ClassDef::IsStateOwner(const Frame *frame) const
+{
+	// OK this is really going to be slow way to do things, but this is really
+	// only for the save game code so I guess it's not too bad.
+	for(unsigned int i = 0;i < frameList.Size();++i)
+	{
+		if(frame == frameList[i])
+			return true;
+	}
+	return false;
+}
+
 void ClassDef::LoadActors()
 {
 	printf("ClassDef: Loading actor definitions.\n");

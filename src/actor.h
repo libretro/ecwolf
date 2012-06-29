@@ -117,6 +117,7 @@ class Frame
 
 		bool	freeActionArgs;
 };
+FArchive &operator<< (FArchive &arc, const Frame *&frame);
 
 class player_t;
 class AActorProxy;

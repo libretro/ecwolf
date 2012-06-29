@@ -72,6 +72,39 @@ void Frame::ActionCall::operator() (AActor *self) const
 	}
 }
 
+FArchive &operator<< (FArchive &arc, const Frame *&frame)
+{
+	if(arc.IsStoring())
+	{
+		// Find a class which held this state.
+		// This should always be able to be found.
+		const ClassDef *cls;
+		ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
+		ClassDef::ClassPair *pair;
+		while(iter.NextPair(pair))
+		{
+			cls = pair->Value;
+			if(cls->IsStateOwner(frame))
+				break;
+		}
+
+		arc << cls;
+		arc << const_cast<Frame *>(frame)->index;
+	}
+	else
+	{
+		const ClassDef *cls;
+		unsigned int frameIndex;
+
+		arc << cls;
+		arc << frameIndex;
+
+		frame = cls->GetState(frameIndex);
+	}
+
+	return arc;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 // We can't make AActor a thinker since we create non-thinking objects.
@@ -311,6 +344,8 @@ void AActor::Serialize(FArchive &arc)
 		<< points
 		<< radius
 		<< ticcount
+		<< state
+		<< sprite
 		<< viewx
 		<< viewheight
 		<< transx
