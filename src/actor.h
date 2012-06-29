@@ -161,17 +161,26 @@ class AActor : public DObject
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;
 
-		// TODO: These needs to handle endianess
+#pragma pack(push, 1)
 		union
 		{
 			fixed x;
+#ifdef __BIG_ENDIAN__
+			struct { const word tilex; const word fracx; };
+#else
 			struct { const word fracx; const word tilex; };
+#endif
 		};
 		union
 		{
 			fixed y;
+#ifdef __BIG_ENDIAN__
+			struct { const word tiley; const word fracy; };
+#else
 			struct { const word fracy; const word tiley; };
+#endif
 		};
+#pragma pack(pop)
 		fixed	velx, vely;
 
 		angle_t	angle;

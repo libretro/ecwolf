@@ -59,10 +59,16 @@ static inline const DWORD SwapLong(DWORD x)
 		((x>>24)&0xFF);
 }
 
-// TODO: Actually change these for Little/Big endian
+#ifdef __BIG_ENDIAN__
+#define BigShort(x) (x)
+#define BigLong(x) (x)
+#define LittleShort SwapShort
+#define LittleLong SwapLong
+#else
 #define BigShort SwapShort
 #define BigLong SwapLong
 #define LittleShort(x) (x)
 #define LittleLong(x) (x)
+#endif
 
 #endif /* __M_SWAP__ */
