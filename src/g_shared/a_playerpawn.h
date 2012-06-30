@@ -37,7 +37,7 @@
 
 #include "actor.h"
 
-struct player_t;
+class player_t;
 class AWeapon;
 
 enum

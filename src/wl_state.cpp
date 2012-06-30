@@ -128,13 +128,13 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 { \
 	short _cs; \
 	if((_cs = CheckSide(ob, x, y, dir, true)) >= 0) \
-		return _cs; \
+		return _cs != 0; \
 }
 #define CHECKDIAG(x,y) \
 { \
 	short _cs; \
 	if((_cs = CheckSide(ob, x, y, MapTrigger::North, false)) >= 0) \
-		return _cs; \
+		return _cs != 0; \
 }
 
 
@@ -566,8 +566,6 @@ void SelectRunDir (AActor *ob)
 
 void MoveObj (AActor *ob, int32_t move)
 {
-	int32_t    deltax,deltay;
-
 	switch (ob->dir)
 	{
 		case north:

@@ -53,6 +53,10 @@ static wchar_t stderrPath[MAX_PATH];
 static char stdoutPath[MAX_PATH];
 static char stderrPath[MAX_PATH];
 # endif
+#else
+#ifdef _MSC_VER
+#define WinMain Unused_WinMain
+#endif
 #endif
 
 #if defined(_WIN32_WCE) && _WIN32_WCE < 300

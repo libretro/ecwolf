@@ -50,7 +50,7 @@ class FGamemaps : public FResourceFile
 		bool Open(bool quiet);
 
 	protected:
-		friend class FMapLump;
+		friend struct FMapLump;
 
 		WORD		rlewTag;
 

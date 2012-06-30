@@ -39,7 +39,7 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 
 if(WIN32)
-	add_definitions(-DWINDOWS)
+	add_definitions(-DWINDOWS -DNO_STDIO_REDIRECT)
 
 	set(EXTRA_FILES
 		sdl_winmain.cpp
@@ -52,7 +52,7 @@ if(APPLE)
 	)
 endif(APPLE)
 
-add_executable(ecwolf WIN32
+add_executable(ecwolf #WIN32
 	${OPL_SOURCES}
 	g_shared/a_inventory.cpp
 	g_shared/a_keys.cpp

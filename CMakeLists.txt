@@ -33,7 +33,7 @@ if(NOT JPEG_FOUND OR INTERNAL_JPEG)
 endif(NOT JPEG_FOUND OR INTERNAL_JPEG)
 
 if(MSVC)
-	add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
+	add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
 endif(MSVC)
 
 add_subdirectory(tools/zipdir)
