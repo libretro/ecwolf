@@ -332,6 +332,10 @@ void AActor::Serialize(FArchive &arc)
 	else
 		sprite = arc.ReadSprite();
 
+	BYTE dir = this->dir;
+	arc << dir;
+	this->dir = static_cast<dirtype>(dir);
+
 	arc << flags
 		<< distance
 		<< x
@@ -357,6 +361,8 @@ void AActor::Serialize(FArchive &arc)
 		<< attacksound
 		<< deathsound
 		<< seesound
+		<< temp1
+		<< hidden
 		<< player
 		<< inventory
 		<< thinker;

@@ -983,6 +983,11 @@ void player_t::Serialize(FArchive &arc)
 		<< ReadyWeapon
 		<< PendingWeapon
 		<< flags;
+
+	arc << psprite.frame
+		<< psprite.ticcount
+		<< psprite.sx
+		<< psprite.sy;
 }
 
 void player_t::SetPSprite(const Frame *frame)
