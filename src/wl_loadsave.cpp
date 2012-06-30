@@ -74,13 +74,11 @@ static bool quickSaveLoad = false;
 #define LSA_H	42
 
 MENU_LISTENER(BeginEditSave);
-MENU_LISTENER(EnterLoadMenu);
-MENU_LISTENER(EnterSaveMenu);
 MENU_LISTENER(LoadSaveGame);
 MENU_LISTENER(PerformSaveGame);
 
-static Menu loadGame(LSM_X, LSM_Y, LSM_W, 24, EnterLoadMenu);
-static Menu saveGame(LSM_X, LSM_Y, LSM_W, 24, EnterSaveMenu);
+static Menu loadGame(LSM_X, LSM_Y, LSM_W, 24);
+static Menu saveGame(LSM_X, LSM_Y, LSM_W, 24);
 static MenuItem *loadItem, *saveItem;
 
 Menu &GetLoadMenu() { return loadGame; }
@@ -148,24 +146,8 @@ void SetupSaveGames()
 			fclose(file);
 		}
 	}
-}
-
-MENU_LISTENER(EnterLoadMenu)
-{
-	if(saveGame.getNumItems() == 0)
-		EnterSaveMenu(which); // This is needed so that there are no crashes on quick save/load
 
 	loadGame.clear();
-
-	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
-		loadGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
-
-	return true;
-}
-
-MENU_LISTENER(EnterSaveMenu)
-{
-	// Create the menu now
 	saveGame.clear();
 
 	MenuItem *newSave = new TextInputMenuItem("    - NEW SAVE -", 31, NULL, PerformSaveGame, true);
@@ -173,9 +155,10 @@ MENU_LISTENER(EnterSaveMenu)
 	saveGame.addItem(newSave);
 
 	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
+	{
+		loadGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
 		saveGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame));
-
-	return true;
+	}
 }
 
 MENU_LISTENER(BeginEditSave)
@@ -217,9 +200,11 @@ MENU_LISTENER(PerformSaveGame)
 
 		SaveFile::files.Push(file);
 
-		saveGame[0]->setHighlighted(false);
-		saveGame.setCurrentPosition(1);
-		loadGame.setCurrentPosition(0);
+		loadGame.addItem(new TextInputMenuItem(file.name, 31, LoadSaveGame));
+		saveGame.addItem(new TextInputMenuItem(file.name, 31, BeginEditSave, PerformSaveGame));
+
+		saveGame.setCurrentPosition(saveGame.getNumItems()-1);
+		loadGame.setCurrentPosition(saveGame.getNumItems()-1);
 
 		mainMenu[2]->setEnabled(true);
 	}
