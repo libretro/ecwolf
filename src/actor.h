@@ -164,22 +164,30 @@ class AActor : public DObject
 		dirtype	dir;
 
 #pragma pack(push, 1)
+// MSVC and older versions of GCC don't support constant union parts
+// We do this instead of just using a regular word since writing to tilex/y
+// indicates an error.
+#if !defined(_MSC_VER) && (__GNUC__ > 4 || __GNUC_MINOR__ >= 6)
+#define COORD_PART const word
+#else
+#define COORD_PART word
+#endif
 		union
 		{
 			fixed x;
 #ifdef __BIG_ENDIAN__
-			struct { const word tilex; const word fracx; };
+			struct { COORD_PART tilex; COORD_PART fracx; };
 #else
-			struct { const word fracx; const word tilex; };
+			struct { COORD_PART fracx; COORD_PART tilex; };
 #endif
 		};
 		union
 		{
 			fixed y;
 #ifdef __BIG_ENDIAN__
-			struct { const word tiley; const word fracy; };
+			struct { COORD_PART tiley; COORD_PART fracy; };
 #else
-			struct { const word fracy; const word tiley; };
+			struct { COORD_PART fracy; COORD_PART tiley; };
 #endif
 		};
 #pragma pack(pop)
