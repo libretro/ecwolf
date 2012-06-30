@@ -899,7 +899,10 @@ void PlayLoop (void)
 		madenoise = false;
 
 		for (unsigned int i = 0;i < tics;++i)
+		{
+			++gamestate.TimeCount;
 			thinkerList->Tick();
+		}
 
 		UpdatePaletteShifts ();
 
@@ -919,7 +922,6 @@ void PlayLoop (void)
 		}
 #endif
 
-		gamestate.TimeCount += tics;
 		TexMan.UpdateAnimations(gamestate.TimeCount*14);
 		GC::CheckGC();
 

@@ -313,7 +313,8 @@ void AActor::Init()
 	inventory = NULL;
 
 	actorRef = actors.Push(this);
-	thinker = new AActorProxy(this);
+	if(!loadedgame)
+		thinker = new AActorProxy(this);
 
 	if(SpawnState)
 		SetState(SpawnState, true);
