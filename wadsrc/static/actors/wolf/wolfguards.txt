@@ -137,7 +137,7 @@ actor Officer 12
 		Missile:
 			OFFI F 3 A_FaceTarget
 			OFFI G 10 A_FaceTarget
-			OFFI H 5
+			OFFI H 5 A_WolfAttack
 			goto See
 		See:
 			OFFI B 5 NOP A_Chase

@@ -1,6 +1,7 @@
 // WL_ACT2.C
 
 #include <stdio.h>
+#include <climits>
 #include <math.h>
 #include "actor.h"
 #include "m_random.h"
