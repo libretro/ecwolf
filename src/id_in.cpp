@@ -75,44 +75,6 @@ static bool NeedRestore = false;
 
 =============================================================================
 */
-byte        ASCIINames[] =		// Unshifted ASCII for scan codes       // TODO: keypad
-{
-//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,8  ,9  ,0  ,0  ,0  ,13 ,0  ,0  ,	// 0
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,27 ,0  ,0  ,0  ,	// 1
-	' ',0  ,0  ,0  ,0  ,0  ,0  ,39 ,0  ,0  ,'*','+',',','-','.','/',	// 2
-	'0','1','2','3','4','5','6','7','8','9',0  ,';',0  ,'=',0  ,0  ,	// 3
-	'`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',	// 4
-	'p','q','r','s','t','u','v','w','x','y','z','[',92 ,']',0  ,0  ,	// 5
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
-};
-byte ShiftNames[] =		// Shifted ASCII for scan codes
-{
-//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,8  ,9  ,0  ,0  ,0  ,13 ,0  ,0  ,	// 0
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,27 ,0  ,0  ,0  ,	// 1
-	' ',0  ,0  ,0  ,0  ,0  ,0  ,34 ,0  ,0  ,'*','+','<','_','>','?',	// 2
-	')','!','@','#','$','%','^','&','*','(',0  ,':',0  ,'+',0  ,0  ,	// 3
-	'~','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',	// 4
-	'P','Q','R','S','T','U','V','W','X','Y','Z','{','|','}',0  ,0  ,	// 5
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
-};
-byte SpecialNames[] =	// ASCII for 0xe0 prefixed codes
-{
-//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 0
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,13 ,0  ,0  ,0  ,	// 1
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 2
-	0  ,0  ,0  ,0  ,0  ,'/',0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 3
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 4
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 5
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
-	0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0   	// 7
-};
-
-
 static	bool		IN_Started;
 
 static	Direction	DirTable[] =		// Quick lookup for total direction
@@ -248,6 +210,31 @@ static void processEvent(SDL_Event *event)
 		// check for keypresses
 		case SDL_KEYDOWN:
 		{
+			static const byte ASCIINames[] = // Unshifted ASCII for scan codes       // TODO: keypad
+			{
+			//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,8  ,9  ,0  ,0  ,0  ,13 ,0  ,0  ,	// 0
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,27 ,0  ,0  ,0  ,	// 1
+				' ',0  ,0  ,0  ,0  ,0  ,0  ,39 ,0  ,0  ,'*','+',',','-','.','/',	// 2
+				'0','1','2','3','4','5','6','7','8','9',0  ,';',0  ,'=',0  ,0  ,	// 3
+				'`','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',	// 4
+				'p','q','r','s','t','u','v','w','x','y','z','[',92 ,']',0  ,0  ,	// 5
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
+			};
+			static const byte ShiftNames[] = // Shifted ASCII for scan codes
+			{
+			//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,8  ,9  ,0  ,0  ,0  ,13 ,0  ,0  ,	// 0
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,27 ,0  ,0  ,0  ,	// 1
+				' ',0  ,0  ,0  ,0  ,0  ,0  ,34 ,0  ,0  ,'*','+','<','_','>','?',	// 2
+				')','!','@','#','$','%','^','&','*','(',0  ,':',0  ,'+',0  ,0  ,	// 3
+				'~','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',	// 4
+				'P','Q','R','S','T','U','V','W','X','Y','Z','{','|','}',0  ,0  ,	// 5
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
+				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
+			};
+
 			if(event->key.keysym.sym==SDLK_SCROLLOCK || event->key.keysym.sym==SDLK_F12)
 			{
 				GrabInput = !GrabInput;
@@ -285,7 +272,7 @@ static void processEvent(SDL_Event *event)
 			if(sym >= 'a' && sym <= 'z')
 				sym -= 32;  // convert to uppercase
 
-			if(mod & (KMOD_SHIFT | KMOD_CAPS))
+			if(mod & KMOD_SHIFT)
 			{
 				if((unsigned)sym < lengthof(ShiftNames) && ShiftNames[sym])
 					LastASCII = ShiftNames[sym];
@@ -295,6 +282,9 @@ static void processEvent(SDL_Event *event)
 				if((unsigned)sym < lengthof(ASCIINames) && ASCIINames[sym])
 					LastASCII = ASCIINames[sym];
 			}
+			if(LastASCII && sym >= 'A' && sym <= 'Z' && (mod & KMOD_CAPS))
+				LastASCII ^= 0x20;
+
 			if(LastScan<SDLK_LAST)
 				Keyboard[LastScan] = 1;
 			if(LastScan == SDLK_PAUSE)
