@@ -764,7 +764,7 @@ void AsmRefresh()
 	int32_t xstep=0,ystep=0;
 	longword xpartial=0,ypartial=0;
 	MapSpot focalspot = map->GetSpot(focaltx, focalty, 0);
-	bool playerInPushwallBackTile = focalspot->pushAmount != 0 || focalspot->pushReceptor;
+	bool playerInPushwallBackTile = focalspot->pushAmount != 0;
 
 	for(pixx=0;pixx<viewwidth;pixx++)
 	{
@@ -826,7 +826,7 @@ void AsmRefresh()
 			if((focalspot->pushDirection == MapTile::East && xtilestep == 1) ||
 				(focalspot->pushDirection == MapTile::West && xtilestep == -1))
 			{
-				int32_t yintbuf = yintercept - ((ystep * (64 - focalspot->pushAmount)) >> 6);
+				int32_t yintbuf = yintercept - ytilestep*(abs(ystep * (64 - focalspot->pushAmount)) >> 6);
 				if((yintbuf >> 16) == focalty)   // ray hits pushwall back?
 				{
 					if(focalspot->pushDirection == MapTile::East)
@@ -843,7 +843,7 @@ void AsmRefresh()
 			else if((focalspot->pushDirection == MapTile::South && ytilestep == 1) ||
 				(focalspot->pushDirection == MapTile::North && ytilestep == -1))
 			{
-				int32_t xintbuf = xintercept - ((xstep * (64 - focalspot->pushAmount)) >> 6);
+				int32_t xintbuf = xintercept - xtilestep*(abs(xstep * (64 - focalspot->pushAmount)) >> 6);
 				if((xintbuf >> 16) == focaltx)   // ray hits pushwall back?
 				{
 					xintercept = xintbuf;
