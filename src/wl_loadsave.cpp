@@ -34,6 +34,8 @@
 
 #include "farchive.h"
 #include "file.h"
+#include "gamemap.h"
+#include "id_ca.h"
 #include "id_us.h"
 #include "id_vh.h"
 #include "language.h"
@@ -293,6 +295,8 @@ static void Serialize(FArchive &arc)
 		<< gamestate.victoryflag;
 
 	thinkerList->Serialize(arc);
+
+	arc << map;
 
 	players[0].Serialize(arc);
 }

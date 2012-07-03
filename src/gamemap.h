@@ -152,6 +152,7 @@ class GameMap
 		const Header	&GetHeader() const { return header; }
 		void			GetHitlist(BYTE* hitlist) const;
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
+		const Zone		&GetZone(unsigned int index) { return zonePalette[index]; }
 		bool			IsValid() const { return valid; }
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
@@ -163,6 +164,7 @@ class GameMap
 
 	private:
 		friend class UWMFParser;
+		friend FArchive &operator<< (FArchive &, GameMap *&);
 
 		Plane	&NewPlane();
 		Trigger	&NewTrigger(unsigned int x, unsigned int y, unsigned int z);
@@ -204,6 +206,8 @@ typedef GameMap::Trigger		MapTrigger;
 typedef GameMap::Zone			MapZone;
 
 #include "farchive.h"
+FArchive &operator<< (FArchive &arc, GameMap *&gm);
 FArchive &operator<< (FArchive &arc, MapSpot &spot);
+FArchive &operator<< (FArchive &arc, const MapZone *&zone);
 
 #endif

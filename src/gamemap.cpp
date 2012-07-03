@@ -32,6 +32,7 @@
 **
 */
 
+#include <climits>
 #include "id_ca.h"
 #include "farchive.h"
 #include "gamemap.h"
@@ -423,6 +424,61 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 	return &plane->map[y*plane->gm->GetHeader().width+x];
 }
 
+FArchive &operator<< (FArchive &arc, GameMap *&gm)
+{
+	arc << gm->header.name
+		<< gm->header.width
+		<< gm->header.height
+		<< gm->header.tileSize;
+
+	// zoneLinks
+	{
+		uint32_t packing = 0;
+		unsigned short shift = 0;
+		unsigned int x = 0;
+		unsigned int y = 1;
+		unsigned int max = 1;
+
+		if(!arc.IsStoring())
+			arc << packing;
+
+		do
+		{
+			if(arc.IsStoring())
+			{
+				if(*gm->zoneLinks[x][y])
+					packing |= 1<<shift;
+				++shift;
+			}
+			else
+			{
+				*gm->zoneLinks[x][y] = (packing>>(shift++))&1;
+			}
+
+			if(++x >= max)
+			{
+				x = 0;
+				++y;
+				++max;
+			}
+
+			if(shift == sizeof(packing)*8)
+			{
+				arc << packing;
+				shift = 0;
+				if(arc.IsStoring())
+					packing = 0;
+			}
+		}
+		while(y < gm->zonePalette.Size());
+
+		if(shift && arc.IsStoring())
+			arc << packing;
+	}
+
+	return arc;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 FArchive &operator<< (FArchive &arc, MapSpot &spot)
@@ -440,6 +496,32 @@ FArchive &operator<< (FArchive &arc, MapSpot &spot)
 		arc << x << y;
 
 		spot = map->GetSpot(x, y, 0);
+	}
+
+	return arc;
+}
+
+FArchive &operator<< (FArchive &arc, const MapZone *&zone)
+{
+	if(arc.IsStoring())
+	{
+		unsigned int index;
+		if(zone)
+			index = zone->index;
+		else
+			index = INT_MAX;
+
+		arc << index;
+	}
+	else
+	{
+		unsigned int index;
+		arc << index;
+
+		if(index != INT_MAX)
+			zone = &map->GetZone(index);
+		else
+			zone = NULL;
 	}
 
 	return arc;

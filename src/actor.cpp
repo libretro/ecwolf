@@ -365,6 +365,7 @@ void AActor::Serialize(FArchive &arc)
 		<< hidden
 		<< player
 		<< inventory
+		<< soundZone
 		<< thinker;
 
 	Super::Serialize(arc);
