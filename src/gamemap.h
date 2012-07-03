@@ -162,6 +162,12 @@ class GameMap
 		bool			CheckLink(const Zone *zone1, const Zone *zone2, bool recurse);
 		void			LinkZones(const Zone *zone1, const Zone *zone2, bool open);
 
+		// Save lookups
+		const Tile		*GetTile(unsigned int index) const;
+		unsigned int	GetTileIndex(const Tile *tile) const;
+		const Sector	*GetSector(unsigned int index) const;
+		unsigned int	GetSectorIndex(const Sector *sector) const;
+
 	private:
 		friend class UWMFParser;
 		friend FArchive &operator<< (FArchive &, GameMap *&);
@@ -208,6 +214,8 @@ typedef GameMap::Zone			MapZone;
 #include "farchive.h"
 FArchive &operator<< (FArchive &arc, GameMap *&gm);
 FArchive &operator<< (FArchive &arc, MapSpot &spot);
+FArchive &operator<< (FArchive &arc, const MapSector *&tile);
+FArchive &operator<< (FArchive &arc, const MapTile *&tile);
 FArchive &operator<< (FArchive &arc, const MapZone *&zone);
 
 #endif

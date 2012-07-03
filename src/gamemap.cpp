@@ -37,6 +37,7 @@
 #include "farchive.h"
 #include "gamemap.h"
 #include "tarray.h"
+#include "thinker.h"
 #include "w_wad.h"
 #include "wl_def.h"
 #include "lnspec.h"
@@ -258,6 +259,36 @@ void GameMap::GetHitlist(BYTE* hitlist) const
 	}
 }
 
+const GameMap::Tile *GameMap::GetTile(unsigned int index) const
+{
+	if(index == INT_MAX)
+		return NULL;
+	return &tilePalette[index];
+}
+
+unsigned int GameMap::GetTileIndex(const GameMap::Tile *tile) const
+{
+	if(!tile)
+		return INT_MAX;
+
+	return tile - &tilePalette[0];
+}
+
+const GameMap::Sector *GameMap::GetSector(unsigned int index) const
+{
+	if(index == INT_MAX)
+		return NULL;
+	return &sectorPalette[index];
+}
+
+unsigned int GameMap::GetSectorIndex(const GameMap::Sector *sector) const
+{
+	if(!sector)
+		return INT_MAX;
+
+	return sector - &sectorPalette[0];
+}
+
 void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 {
 	if(zone1 == zone2 || zone1 == NULL || zone2 == NULL)
@@ -476,6 +507,35 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			arc << packing;
 	}
 
+	// Serialize any map information that may change
+	for(unsigned int p = 0;p < gm->NumPlanes();++p)
+	{
+		MapPlane &plane = gm->planes[p];
+
+		arc << plane.depth;
+		if(!arc.IsStoring())
+			plane.gm = gm;
+
+		for(unsigned int i = 0;i < gm->GetHeader().width*gm->GetHeader().height;++i)
+		{
+			BYTE pushdir = plane.map[i].pushDirection;
+			arc << pushdir;
+			plane.map[i].pushDirection = static_cast<MapTile::Side>(pushdir);
+
+			arc << plane.map[i].visible
+				<< plane.map[i].thinker
+				<< plane.map[i].slideAmount[0] << plane.map[i].slideAmount[1] << plane.map[i].slideAmount[2] << plane.map[i].slideAmount[3]
+				<< plane.map[i].pushAmount
+				<< plane.map[i].tile
+				<< plane.map[i].sector
+				<< plane.map[i].zone
+				<< plane.map[i].pushReceptor;
+
+			if(!arc.IsStoring())
+				plane.map[i].plane = &plane;
+		}
+	}
+
 	return arc;
 }
 
@@ -485,8 +545,13 @@ FArchive &operator<< (FArchive &arc, MapSpot &spot)
 {
 	if(arc.IsStoring())
 	{
-		unsigned int x = spot->GetX();
-		unsigned int y = spot->GetY();
+		unsigned int x = INT_MAX;
+		unsigned int y = INT_MAX;
+		if(spot)
+		{
+			x = spot->GetX();
+			y = spot->GetY();
+		}
 
 		arc << x << y;
 	}
@@ -495,9 +560,46 @@ FArchive &operator<< (FArchive &arc, MapSpot &spot)
 		unsigned int x, y;
 		arc << x << y;
 
-		spot = map->GetSpot(x, y, 0);
+		if(x == INT_MAX || y == INT_MAX)
+			spot = NULL;
+		else
+			spot = map->GetSpot(x, y, 0);
 	}
 
+	return arc;
+}
+
+FArchive &operator<< (FArchive &arc, const MapSector *&sector)
+{
+	if(arc.IsStoring())
+	{
+		unsigned int index = map->GetSectorIndex(sector);
+		arc << index;
+	}
+	else
+	{
+		unsigned int index;
+		arc << index;
+
+		sector = map->GetSector(index);
+	}
+	return arc;
+}
+
+FArchive &operator<< (FArchive &arc, const MapTile *&tile)
+{
+	if(arc.IsStoring())
+	{
+		unsigned int index = map->GetTileIndex(tile);
+		arc << index;
+	}
+	else
+	{
+		unsigned int index;
+		arc << index;
+
+		tile = map->GetTile(index);
+	}
 	return arc;
 }
 
