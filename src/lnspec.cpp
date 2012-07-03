@@ -328,6 +328,14 @@ class EVPushwall : public Thinker
 			if(moveTo == NULL)
 			{
 				moveTo = spot->GetAdjacent(MapTile::Side(direction));
+
+				if(moveTo->tile)
+				{
+					// Hit a wall so we're done.
+					Destroy();
+					return;
+				}
+
 				moveTo->tile = spot->tile;
 				moveTo->pushReceptor = spot;
 				moveTo->pushDirection = spot->pushDirection;
