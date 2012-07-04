@@ -118,8 +118,9 @@ class GameMap
 			unsigned int	depth;
 			struct Map
 			{
-				Map() : tile(NULL), sector(NULL), zone(NULL), thinker(NULL),
-					pushAmount(0), pushReceptor(NULL)
+				Map() : tile(NULL), sector(NULL), zone(NULL), visible(false),
+					thinker(NULL), pushDirection(Tile::East), pushAmount(0),
+					pushReceptor(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
 				}
@@ -217,5 +218,6 @@ FArchive &operator<< (FArchive &arc, MapSpot &spot);
 FArchive &operator<< (FArchive &arc, const MapSector *&tile);
 FArchive &operator<< (FArchive &arc, const MapTile *&tile);
 FArchive &operator<< (FArchive &arc, const MapZone *&zone);
+FArchive &operator<< (FArchive &arc, MapTrigger &trigger);
 
 #endif

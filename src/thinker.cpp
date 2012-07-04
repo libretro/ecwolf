@@ -54,7 +54,7 @@ void InitThinkerList()
 	atexit(DeinitThinkerList);
 }
 
-ThinkerList::ThinkerList()
+ThinkerList::ThinkerList() : nextThinker(NULL)
 {
 }
 
@@ -70,9 +70,11 @@ void ThinkerList::DestroyAll(Priority start)
 		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{
-			if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
-				iter->Item()->Destroy();
+			Thinker *thinker = iter->Item();
 			iter = iter->Next();
+
+			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
+				thinker->Destroy();
 		}
 	}
 	GC::FullGC();

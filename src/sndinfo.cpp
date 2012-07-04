@@ -237,9 +237,16 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 				if(!sc.GetNextString())
 					sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
-				SoundData &alias = AddSound(sc->str);
-				alias.isAlias = true;
-				alias.aliasLinks.Clear();
+				SoundIndex aliasIndex;
+				{
+					// Adding sounds may change the location of the SoundData
+					// memory so we must look it up again after we're done.
+					SoundData &alias = AddSound(sc->str);
+					alias.isAlias = true;
+					aliasIndex = alias.index;
+				}
+
+				TArray<SoundIndex> aliasLinks;
 
 				if(isRandom)
 					sc.MustGetToken('{');
@@ -247,9 +254,11 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 				{
 					if(!sc.GetNextString())
 						sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
-					alias.aliasLinks.Push(AddSound(sc->str).index);
+					aliasLinks.Push(AddSound(sc->str).index);
 				}
 				while(isRandom && !sc.CheckToken('}'));
+
+				sounds[aliasIndex].aliasLinks = aliasLinks;
 			}
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown command '%s'.", sc->str.GetChars());

@@ -118,11 +118,14 @@ class AActorProxy : public Thinker
 		{
 		}
 
-		~AActorProxy()
+		void Destroy()
 		{
+			Super::Destroy();
+
 			if(enabled && parent)
 			{
 				parent->Destroy();
+				parent = NULL;
 			}
 		}
 
@@ -204,6 +207,7 @@ void AActor::Destroy()
 		assert(inventory->thinker == NULL);
 
 		inventory->Destroy();
+		inventory = NULL;
 	}
 
 	Super::Destroy();
@@ -327,6 +331,8 @@ void AActor::Init()
 
 void AActor::Serialize(FArchive &arc)
 {
+	bool hasActorRef = actorRef != NULL;
+
 	if(arc.IsStoring())
 		arc.WriteSprite(sprite);
 	else
@@ -366,7 +372,17 @@ void AActor::Serialize(FArchive &arc)
 		<< player
 		<< inventory
 		<< soundZone
-		<< thinker;
+		<< thinker
+		<< hasActorRef;
+
+	if(!arc.IsStoring())
+	{
+		if(!hasActorRef)
+		{
+			actors.Remove(actorRef);
+			actorRef = NULL;
+		}
+	}
 
 	Super::Serialize(arc);
 }
@@ -432,8 +448,6 @@ void AActor::RemoveInventory(AInventory *item)
 	if(inventory == NULL)
 		return;
 
-	item->DetachFromOwner();
-
 	AInventory **next = &inventory;
 	do
 	{
@@ -444,6 +458,8 @@ void AActor::RemoveInventory(AInventory *item)
 		}
 	}
 	while((next = &(*next)->inventory));
+
+	item->DetachFromOwner();
 }
 
 AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)

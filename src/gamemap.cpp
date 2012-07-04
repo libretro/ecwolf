@@ -525,6 +525,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			arc << plane.map[i].visible
 				<< plane.map[i].thinker
 				<< plane.map[i].slideAmount[0] << plane.map[i].slideAmount[1] << plane.map[i].slideAmount[2] << plane.map[i].slideAmount[3]
+				<< plane.map[i].triggers
 				<< plane.map[i].pushAmount
 				<< plane.map[i].tile
 				<< plane.map[i].sector
@@ -625,6 +626,22 @@ FArchive &operator<< (FArchive &arc, const MapZone *&zone)
 		else
 			zone = NULL;
 	}
+
+	return arc;
+}
+
+FArchive &operator<< (FArchive &arc, MapTrigger &trigger)
+{
+	arc << trigger.x
+		<< trigger.y
+		<< trigger.z
+		<< trigger.active
+		<< trigger.activate[0] << trigger.activate[1] << trigger.activate[2] << trigger.activate[3]
+		<< trigger.arg[0] << trigger.arg[1] << trigger.arg[2] << trigger.arg[3] << trigger.arg[4]
+		<< trigger.playerUse
+		<< trigger.monsterUse
+		<< trigger.isSecret
+		<< trigger.repeatable;
 
 	return arc;
 }
