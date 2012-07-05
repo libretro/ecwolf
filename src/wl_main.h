@@ -1,6 +1,8 @@
 #ifndef __WL_MAIN_H__
 #define __WL_MAIN_H__
 
+#include "id_vl.h"
+
 /*
 =============================================================================
 
@@ -42,7 +44,7 @@ extern  int      param_mission;
 
 void            NewGame (int difficulty,const class FString &map);
 void            CalcProjection (int32_t focal);
-void            NewViewSize (int width);
+void            NewViewSize (int width, unsigned int scrWidth=screenWidth, unsigned int scrHeight=screenHeight);
 void            ShutdownId (void);
 
 #endif

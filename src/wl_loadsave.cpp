@@ -32,8 +32,10 @@
 **
 */
 
+#include "c_cvars.h"
 #include "farchive.h"
 #include "file.h"
+#include "g_mapinfo.h"
 #include "gamemap.h"
 #include "id_ca.h"
 #include "id_us.h"
@@ -45,11 +47,17 @@
 #include "thinker.h"
 #include "w_wad.h"
 #include "wl_agent.h"
+#include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_loadsave.h"
 #include "wl_main.h"
 #include "wl_menu.h"
+#include "wl_play.h"
 #include "textures/textures.h"
+
+void R_RenderView();
+extern byte* vbuf;
+extern int vbufPitch;
 
 namespace GameSave {
 
@@ -66,14 +74,69 @@ TArray<SaveFile> SaveFile::files;
 static bool quickSaveLoad = false;
 
 #define MAX_SAVENAME 31
-#define LSM_X   85
 #define LSM_Y   55
 #define LSM_W   175
+#define LSM_X   (320-LSM_W-10)
 #define LSM_H   10*13+10
 #define LSA_X	96
 #define LSA_Y	80
 #define LSA_W	130
 #define LSA_H	42
+
+class SaveSlotMenuItem : public TextInputMenuItem
+{
+public:
+	SaveSlotMenuItem(const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false)
+		: TextInputMenuItem(text, max, preeditListener, posteditListener, clearFirst)
+	{
+	}
+
+	void draw()
+	{
+		TextInputMenuItem::draw();
+
+		if(isSelected())
+		{
+			static const unsigned int SAVEPICX = 10;
+			static const unsigned int SAVEPICY = LSM_Y;
+			static const unsigned int SAVEPICW = 108;
+			static const unsigned int SAVEPICH = 81;
+			static const unsigned int INFOY = SAVEPICY + SAVEPICH + 5;
+
+			DrawWindow(SAVEPICX - 1, SAVEPICY - 1, SAVEPICW + 2, SAVEPICH + 2, BKGDCOLOR);
+			DrawWindow(SAVEPICX - 1, INFOY, SAVEPICW + 2, 200 - INFOY - 11, BKGDCOLOR);
+
+			int curPos = menu->getCurrentPosition();
+			if((unsigned)menu->getNumItems() > SaveFile::files.Size())
+				--curPos;
+
+			if(curPos >= 0)
+			{
+				SaveFile &saveFile = SaveFile::files[curPos];
+				PNGHandle *png;
+				FILE *file = fopen(saveFile.filename, "rb");
+				if(file && (png = M_VerifyPNG(file)))
+				{
+					FTexture *savePicture = PNGTexture_CreateFromFile(png, saveFile.filename);
+					VWB_DrawGraphic(savePicture, SAVEPICX, SAVEPICY, SAVEPICW, SAVEPICH, MENU_CENTER);
+
+					delete png;
+				}
+				if(file)
+					fclose(file);
+			}
+			else
+			{
+				word width, height;
+				VW_MeasurePropString(SmallFont, language["MNU_NOPICTURE"], width, height);
+
+				px = SAVEPICX + (SAVEPICW - width)/2;
+				py = SAVEPICY + (SAVEPICH - height)/2;
+				VWB_DrawPropString(SmallFont, language["MNU_NOPICTURE"], gameinfo.FontColors[GameInfo::MENU_HIGHLIGHT]);
+			}
+		}
+	}
+};
 
 MENU_LISTENER(BeginEditSave);
 MENU_LISTENER(LoadSaveGame);
@@ -152,14 +215,14 @@ void SetupSaveGames()
 	loadGame.clear();
 	saveGame.clear();
 
-	MenuItem *newSave = new TextInputMenuItem("    - NEW SAVE -", 31, NULL, PerformSaveGame, true);
+	MenuItem *newSave = new SaveSlotMenuItem("    - NEW SAVE -", 31, NULL, PerformSaveGame, true);
 	newSave->setHighlighted(true);
 	saveGame.addItem(newSave);
 
 	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
 	{
-		loadGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
-		saveGame.addItem(new TextInputMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame));
+		loadGame.addItem(new SaveSlotMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
+		saveGame.addItem(new SaveSlotMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame));
 	}
 }
 
@@ -175,7 +238,7 @@ MENU_LISTENER(PerformSaveGame)
 	SaveFile file;
 
 	// Copy the name
-	file.name = static_cast<TextInputMenuItem *> (saveGame[which])->getValue();
+	file.name = static_cast<SaveSlotMenuItem *> (saveGame[which])->getValue();
 	if(which == 0) // New
 	{
 		// Locate a available filename.  I don't want to assume savegamX.yza so this
@@ -202,8 +265,8 @@ MENU_LISTENER(PerformSaveGame)
 
 		SaveFile::files.Push(file);
 
-		loadGame.addItem(new TextInputMenuItem(file.name, 31, LoadSaveGame));
-		saveGame.addItem(new TextInputMenuItem(file.name, 31, BeginEditSave, PerformSaveGame));
+		loadGame.addItem(new SaveSlotMenuItem(file.name, 31, LoadSaveGame));
+		saveGame.addItem(new SaveSlotMenuItem(file.name, 31, BeginEditSave, PerformSaveGame));
 
 		saveGame.setCurrentPosition(saveGame.getNumItems()-1);
 		loadGame.setCurrentPosition(saveGame.getNumItems()-1);
@@ -333,6 +396,31 @@ bool Load(const FString &filename)
 	return true;
 }
 
+void SaveScreenshot(FILE *file)
+{
+	static const int SAVEPICWIDTH = 216;
+	static const int SAVEPICHEIGHT = 162;
+
+	vbuf = new byte[SAVEPICHEIGHT*SAVEPICWIDTH];
+	vbufPitch = SAVEPICWIDTH;
+
+	int oldviewsize = viewsize;
+	Aspect oldaspect = vid_aspect;
+
+	vid_aspect = ASPECT_4_3;
+	NewViewSize(21, SAVEPICWIDTH, SAVEPICHEIGHT);
+	CalcProjection(players[0].mo->radius);
+	R_RenderView();
+
+	M_CreatePNG(file, vbuf, GPalette.BaseColors, SS_PAL, SAVEPICWIDTH, SAVEPICHEIGHT, vbufPitch);
+
+	delete[] vbuf;
+	vbuf = NULL;
+
+	vid_aspect = oldaspect;
+	NewViewSize(oldviewsize); // Restore
+}
+
 bool Save(const FString &filename, const FString &title)
 {
 #define GAMESIG "ECWOLF"
@@ -352,7 +440,7 @@ bool Save(const FString &filename, const FString &title)
 		Serialize(arc);
 	}
 
-	M_CreateDummyPNG(fileh);
+	SaveScreenshot(fileh);
 	M_AppendPNGText(fileh, "Software", "ECWolf");
 	M_AppendPNGText(fileh, "Engine", GAMESIG);
 	M_AppendPNGText(fileh, "ECWolf Save Version", GAMESIG);

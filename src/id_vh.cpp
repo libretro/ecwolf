@@ -528,14 +528,12 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 	VL_UnlockSurface(screenBuffer);
 }
 
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
 
 	double xd = (double)ix - tex->GetScaledLeftOffsetDouble();
 	double yd = (double)iy - tex->GetScaledTopOffsetDouble();
-	double wd = tex->GetScaledWidthDouble();
-	double hd = tex->GetScaledHeightDouble();
 	if(menu)
 		MenuToRealCoords(xd, yd, wd, hd, menu);
 	else
@@ -573,6 +571,12 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 	}
 
 	VL_UnlockSurface(screenBuffer);
+}
+
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
+{
+	VWB_DrawGraphic(tex, ix, iy, tex->GetScaledWidthDouble(), tex->GetScaledHeightDouble(),
+		menu, remap, stencil, stencilcolor);
 }
 
 void CA_CacheScreen(const char* chunk)

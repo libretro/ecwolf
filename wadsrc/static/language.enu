@@ -2,6 +2,8 @@
 
 [enu default]
 
+MNU_NOPICTURE = "No Picture";
+
 QUITSUR = "Are you sure you want\nto quit this great game?";
 CURGAME = "You are currently in\na game. Continuing will\nerase old game. Ok?";
 GAMESVD = "There's already a game\nsaved at this position.\n      Overwrite?";

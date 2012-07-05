@@ -47,6 +47,7 @@ enum MenuOffset
 	MENU_BOTTOM = 3
 };
 void VWB_Clear(int color, int x1, int y1, int x2, int y2);
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, BYTE stencilcolor=0);
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, BYTE stencilcolor=0);
 void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect);
 template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offset)

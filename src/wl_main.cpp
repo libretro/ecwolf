@@ -514,7 +514,7 @@ static void InitGame()
 ==========================
 */
 
-static void SetViewSize ()
+static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 {
 	statusbarx = 0;
 	if(AspectCorrection[vid_aspect].isWide)
@@ -575,16 +575,19 @@ static void SetViewSize ()
 	//
 	// calculate trace angles and projection constants
 	//
-	CalcProjection (FOCALLENGTH);
+	if(players[0].mo)
+		CalcProjection(players[0].mo->radius);
+	else
+		CalcProjection (FOCALLENGTH);
 }
 
-void NewViewSize (int width)
+void NewViewSize (int width, unsigned int scrWidth, unsigned int scrHeight)
 {
 	if(width < 4 || width > 21)
 		return;
 
 	viewsize = width;
-	SetViewSize();
+	SetViewSize(scrWidth, scrHeight);
 }
 
 

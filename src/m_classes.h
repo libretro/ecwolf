@@ -215,7 +215,7 @@ class Menu
 		static void		closeMenus(bool close=true);
 		unsigned int	countItems() const;
 		void			drawMenu() const;
-		void			draw() const;
+		virtual void	draw() const;
 		int				handle();
 		int				getCurrentPosition() const { return curPos; }
 		/**

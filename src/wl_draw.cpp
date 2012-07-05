@@ -1231,27 +1231,8 @@ void CalcViewVariables()
 
 //==========================================================================
 
-/*
-========================
-=
-= ThreeDRefresh
-=
-========================
-*/
-
-void    ThreeDRefresh (void)
+void R_RenderView()
 {
-//
-// clear out the traced array
-//
-	map->ClearVisibility();
-
-	vbuf = VL_LockSurface(screenBuffer);
-	if(vbuf == NULL) return;
-
-	vbuf += screenofs;
-	vbufPitch = bufferPitch;
-
 	CalcViewVariables();
 
 //
@@ -1294,6 +1275,30 @@ void    ThreeDRefresh (void)
 
 	if(Keyboard[sc_Tab] && viewsize == 21)
 		ShowActStatus();
+}
+
+/*
+========================
+=
+= ThreeDRefresh
+=
+========================
+*/
+
+void    ThreeDRefresh (void)
+{
+//
+// clear out the traced array
+//
+	map->ClearVisibility();
+
+	vbuf = VL_LockSurface(screenBuffer);
+	if(vbuf == NULL) return;
+
+	vbuf += screenofs;
+	vbufPitch = bufferPitch;
+
+	R_RenderView();
 
 	VL_UnlockSurface(screenBuffer);
 	vbuf = NULL;
