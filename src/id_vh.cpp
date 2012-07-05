@@ -50,6 +50,49 @@ void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation
 	VL_UnlockSurface(curSurface);
 }
 
+// Prints a string with word wrapping
+void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char* string, EColorRange translation, bool stencil, BYTE stencilcolor)
+{
+	const char* lineStart = string;
+	const char* lastBreak = string;
+	unsigned int lastBreakX = 0;
+	unsigned int cx = 0;
+	char ch;
+
+	while ((ch = (byte)*string++)!=0)
+	{
+		if(ch == '\n')
+		{
+			cx = 0;
+			continue;
+		}
+		else if(ch == ' ' || ch == '\t')
+		{
+			lastBreak = string;
+			lastBreakX = cx;
+		}
+
+		cx += font->GetCharWidth(ch);
+		if(cx > wrapWidth)
+		{
+			FString part(lineStart, static_cast<int>(lastBreak-lineStart));
+			VWB_DrawPropString(font, part, translation, stencil, stencilcolor);
+
+			lineStart = lastBreak;
+			cx -= lastBreakX;
+			lastBreakX = 0;
+			py += font->GetHeight();
+
+			if((unsigned)py >= wrapHeight)
+				break;
+		}
+	}
+
+	// Flush the rest of the string.
+	VWB_DrawPropString(font, lineStart, translation, stencil, stencilcolor);
+	py += font->GetHeight();
+}
+
 /*
 =================
 =

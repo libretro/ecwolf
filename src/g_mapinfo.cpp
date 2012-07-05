@@ -246,11 +246,18 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	Par = 0;
 }
 
+FString LevelInfo::GetName(const GameMap *gm) const
+{
+	if(UseMapInfoName)
+		return Name;
+	return gm->GetHeader().name;
+}
+
 LevelInfo &LevelInfo::Find(const char* level)
 {
 	for(unsigned int i = 0;i < levelInfos.Size();++i)
 	{
-		if(levelInfos[i].Name.CompareNoCase(level) == 0)
+		if(stricmp(levelInfos[i].MapName, level) == 0)
 			return levelInfos[i];
 	}
 	return defaultMap;
@@ -271,6 +278,10 @@ protected:
 	{
 		if(!parseHeader)
 			return;
+
+		sc.MustGetToken(TK_StringConst);
+		strncpy(mapInfo.MapName, sc->str, 8);
+		mapInfo.MapName[8] = 0;
 
 		bool useLanguage = false;
 		if(sc.CheckToken(TK_Identifier))
@@ -574,7 +585,7 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 				LevelInfo newMap = defaultMap;
 				LevelInfoBlockParser(sc, newMap, true).Parse();
 
-				LevelInfo &existing = LevelInfo::Find(newMap.Name);
+				LevelInfo &existing = LevelInfo::Find(newMap.MapName);
 				if(&existing != &defaultMap)
 					existing = newMap;
 				else

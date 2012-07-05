@@ -82,11 +82,11 @@ class LevelInfo
 {
 public:
 	LevelInfo();
+	FString GetName(const class GameMap *gm) const;
 
+	char			MapName[9];
 	char			NextMap[9];
 	char			NextSecret[9];
-	bool			UseMapInfoName;
-	FString			Name;
 	unsigned int	FloorNumber;
 	FString			Music;
 	unsigned int	Cluster;
@@ -96,6 +96,12 @@ public:
 	unsigned int	Par;
 
 	static LevelInfo &Find(const char* level);
+
+protected:
+	friend class LevelInfoBlockParser;
+
+	bool			UseMapInfoName;
+	FString			Name;
 };
 
 class EpisodeInfo

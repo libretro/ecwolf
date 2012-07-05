@@ -69,7 +69,8 @@ template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offse
 	h *= scaleFactor;
 }
 
-void VWB_DrawPropString	 (FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
+void VWB_DrawPropString(FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
+void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
 
 void VWB_DrawTile8 (int x, int y, int tile);
 //void VWB_DrawTile8M (int x, int y, int tile);

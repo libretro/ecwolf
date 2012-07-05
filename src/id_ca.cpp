@@ -17,6 +17,7 @@ loaded into the data segment
 #include "g_mapinfo.h"
 #include "gamemap.h"
 #include "wl_def.h"
+#include "wl_game.h"
 #include "w_wad.h"
 #include "wl_main.h"
 
@@ -52,6 +53,7 @@ void CA_CacheMap (const FString &mapname)
 {
 	delete map;
 
+	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
 	map = new GameMap(mapname);
 }

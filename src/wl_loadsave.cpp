@@ -32,6 +32,7 @@
 **
 */
 
+#include <ctime>
 #include "c_cvars.h"
 #include "farchive.h"
 #include "file.h"
@@ -97,14 +98,16 @@ public:
 
 		if(isSelected())
 		{
+			static const EColorRange textColor = gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION];
 			static const unsigned int SAVEPICX = 10;
-			static const unsigned int SAVEPICY = LSM_Y;
+			static const unsigned int SAVEPICY = LSM_Y - 1;
 			static const unsigned int SAVEPICW = 108;
-			static const unsigned int SAVEPICH = 81;
+			static const unsigned int SAVEPICH = 67;
 			static const unsigned int INFOY = SAVEPICY + SAVEPICH + 5;
+			static const unsigned int INFOH = 200 - INFOY - 11;
 
 			DrawWindow(SAVEPICX - 1, SAVEPICY - 1, SAVEPICW + 2, SAVEPICH + 2, BKGDCOLOR);
-			DrawWindow(SAVEPICX - 1, INFOY, SAVEPICW + 2, 200 - INFOY - 11, BKGDCOLOR);
+			DrawWindow(SAVEPICX - 1, INFOY, SAVEPICW + 2, INFOH, BKGDCOLOR);
 
 			int curPos = menu->getCurrentPosition();
 			if((unsigned)menu->getNumItems() > SaveFile::files.Size())
@@ -120,6 +123,23 @@ public:
 					FTexture *savePicture = PNGTexture_CreateFromFile(png, saveFile.filename);
 					VWB_DrawGraphic(savePicture, SAVEPICX, SAVEPICY, SAVEPICW, SAVEPICH, MENU_CENTER);
 
+					char* creationTime = M_GetPNGText(png, "Creation Time");
+					char* comment = M_GetPNGText(png, "Comment");
+					px = SAVEPICX;
+					py = INFOY;
+					if(creationTime)
+					{
+						VWB_DrawPropStringWrap(SAVEPICW, INFOH, SmallFont, creationTime, textColor);
+						px = SAVEPICX;
+						py += 5; // Space the strings a little.
+						delete[] creationTime;
+					}
+					if(comment)
+					{
+						VWB_DrawPropStringWrap(SAVEPICW, INFOH, SmallFont, comment, textColor);
+						delete[] comment;
+					}
+
 					delete png;
 				}
 				if(file)
@@ -132,7 +152,7 @@ public:
 
 				px = SAVEPICX + (SAVEPICW - width)/2;
 				py = SAVEPICY + (SAVEPICH - height)/2;
-				VWB_DrawPropString(SmallFont, language["MNU_NOPICTURE"], gameinfo.FontColors[GameInfo::MENU_HIGHLIGHT]);
+				VWB_DrawPropString(SmallFont, language["MNU_NOPICTURE"], textColor);
 			}
 		}
 	}
@@ -379,6 +399,10 @@ bool Load(const FString &filename)
 	if(!quickSaveLoad)
 		DrawLSAction(0);
 
+	char level[9];
+	M_GetPNGText(png, "Current Map", level, 8);
+	CA_CacheMap(level);
+
 	{
 		unsigned int chunkLength = M_FindPNGChunk(png, SNAP_ID);
 		FPNGChunkArchive arc(fileh, SNAP_ID, chunkLength);
@@ -407,7 +431,7 @@ void SaveScreenshot(FILE *file)
 	int oldviewsize = viewsize;
 	Aspect oldaspect = vid_aspect;
 
-	vid_aspect = ASPECT_4_3;
+	vid_aspect = ASPECT_16_10;
 	NewViewSize(21, SAVEPICWIDTH, SAVEPICHEIGHT);
 	CalcProjection(players[0].mo->radius);
 	R_RenderView();
@@ -445,7 +469,25 @@ bool Save(const FString &filename, const FString &title)
 	M_AppendPNGText(fileh, "Engine", GAMESIG);
 	M_AppendPNGText(fileh, "ECWolf Save Version", GAMESIG);
 	M_AppendPNGText(fileh, "Title", title);
-	// TODO: Write map name (MAP01)
+	M_AppendPNGText(fileh, "Current Map", levelInfo->MapName);
+
+	FString comment;
+	// Creation Time
+	{
+		time_t currentTime;
+		struct tm *timeInfo;
+
+		time(&currentTime);
+		timeInfo = localtime(&currentTime);
+		M_AppendPNGText(fileh, "Creation Time", asctime(timeInfo));
+	}
+
+	unsigned int gametime = gamestate.TimeCount/70;
+	FString mapname = gamestate.mapname;
+	mapname.ToUpper();
+	comment.Format("%s - %s\nTime: %02d:%02d:%02d", mapname.GetChars(), levelInfo->GetName(map).GetChars(),
+		gametime/3600, (gametime%3600)/60, gametime%60);
+	M_AppendPNGText(fileh, "Comment", comment);
 
 	M_AppendPNGText(fileh, "Game WAD", Wads.GetWadName(FWadCollection::IWAD_FILENUM));
 	// TODO: Also write WAD that the map resides in
