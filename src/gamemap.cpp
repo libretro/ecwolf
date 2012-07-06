@@ -198,8 +198,8 @@ void GameMap::ClearVisibility()
 		for(unsigned int p = 0;p < planes.Size();++p)
 			planes[p].map[i].visible = false;
 	}
-	if(players[0].mo)
-		GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->visible = true;
+	if(players[0].camera)
+		GetSpot(players[0].camera->tilex, players[0].camera->tiley, 0)->visible = true;
 }
 
 bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)

@@ -54,6 +54,7 @@ endif(APPLE)
 
 add_executable(ecwolf #WIN32
 	${OPL_SOURCES}
+	g_shared/a_deathcam.cpp
 	g_shared/a_inventory.cpp
 	g_shared/a_keys.cpp
 	g_shared/a_patrolpoint.cpp

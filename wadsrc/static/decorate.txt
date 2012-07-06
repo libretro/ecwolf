@@ -1,3 +1,4 @@
+#include "actors/deathcam.txt"
 #include "actors/native.txt"
 #include "actors/patrolpoint.txt"
 #include "actors/wolf/angelofdeath.txt"

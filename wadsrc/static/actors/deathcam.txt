@@ -1,0 +1,12 @@
+actor DeathCam native
+{
+	action native A_FinishDeathCam();
+
+	states
+	{
+		Spawn:
+			TNT1 A 57
+			TNT1 A -1 A_FinishDeathCam
+			stop
+	}
+}

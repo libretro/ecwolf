@@ -939,6 +939,7 @@ ACTION_FUNCTION(A_Raise)
 size_t player_t::PropagateMark()
 {
 	GC::Mark(mo);
+	GC::Mark(camera);
 	GC::Mark(ReadyWeapon);
 	if(PendingWeapon != WP_NOCHANGE)
 		GC::Mark(PendingWeapon);
@@ -974,6 +975,7 @@ void player_t::Serialize(FArchive &arc)
 	this->state = static_cast<State>(state);
 
 	arc << mo
+		<< camera
 		<< killerobj
 		<< oldscore
 		<< score
@@ -989,8 +991,11 @@ void player_t::Serialize(FArchive &arc)
 		<< psprite.sx
 		<< psprite.sy;
 
-	mo->SetupWeaponSlots();
-	CalcProjection(mo->radius);
+	if(arc.IsLoading())
+	{
+		mo->SetupWeaponSlots();
+		CalcProjection(mo->radius);
+	}
 }
 
 void player_t::SetPSprite(const Frame *frame)
@@ -1029,6 +1034,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 	if(players[0].state == player_t::PST_ENTER || players[0].state == player_t::PST_REBORN)
 		players[0].Reborn();
 
+	players[0].camera = players[0].mo;
 	players[0].state = player_t::PST_LIVE;
 }
 

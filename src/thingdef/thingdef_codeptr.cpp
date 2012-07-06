@@ -107,10 +107,18 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "g_shared/a_deathcam.h"
 ACTION_FUNCTION(A_BossDeath)
 {
 	// TODO: Check if all enemies of same type are dead and then call a defined function.
-	playstate = ex_victorious;
+
+	if(!gamestate.victoryflag)
+	{
+		ADeathCam *dc = (ADeathCam*)AActor::Spawn(NATIVE_CLASS(DeathCam), 0, 0, 0);
+		dc->SetupDeathCam(self, players[0].mo);
+	}
+	else
+		playstate = ex_victorious;
 }
 
 ACTION_FUNCTION(A_FaceTarget)

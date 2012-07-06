@@ -65,6 +65,7 @@ extern class player_t
 		};
 
 		APlayerPawn	*mo;
+		TObjPtr<AActor>	camera;
 		TObjPtr<AActor>	killerobj;
 
 		int32_t		oldscore,score,nextextra;

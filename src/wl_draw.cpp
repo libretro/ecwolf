@@ -543,7 +543,7 @@ int CalcRotate (AActor *ob)
 	// this isn't exactly correct, as it should vary by a trig value,
 	// but it is close enough with only eight rotations
 
-	viewangle = players[0].mo->angle + (centerx - ob->viewx)/8;
+	viewangle = players[0].camera->angle + (centerx - ob->viewx)/8;
 
 	angle = viewangle - ob->angle;
 
@@ -1215,18 +1215,18 @@ void WallRefresh (void)
 
 void CalcViewVariables()
 {
-	viewangle = players[0].mo->angle;
+	viewangle = players[0].camera->angle;
 	midangle = viewangle>>ANGLETOFINESHIFT;
 	viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
 	viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
-	viewx = players[0].mo->x - FixedMul(focallength,viewcos);
-	viewy = players[0].mo->y + FixedMul(focallength,viewsin);
+	viewx = players[0].camera->x - FixedMul(focallength,viewcos);
+	viewy = players[0].camera->y + FixedMul(focallength,viewsin);
 
 	focaltx = (short)(viewx>>TILESHIFT);
 	focalty = (short)(viewy>>TILESHIFT);
 
-	viewtx = (short)(players[0].mo->x >> TILESHIFT);
-	viewty = (short)(players[0].mo->y >> TILESHIFT);
+	viewtx = (short)(players[0].camera->x >> TILESHIFT);
+	viewty = (short)(players[0].camera->y >> TILESHIFT);
 }
 
 //==========================================================================
