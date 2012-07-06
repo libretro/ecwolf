@@ -356,7 +356,6 @@ void AActor::Serialize(FArchive &arc)
 		<< radius
 		<< ticcount
 		<< state
-		<< sprite
 		<< viewx
 		<< viewheight
 		<< transx

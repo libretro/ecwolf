@@ -1459,6 +1459,15 @@ const ClassDef *FArchive::ReadClass ()
 	FName zaname(typeName.val, true);
 	if (zaname != NAME_None)
 	{
+		const ClassDef *cls = ClassDef::FindClass(zaname);
+		if(cls)
+		{
+			m_TypeMap[cls->ClassIndex].toArchive = m_ClassCount;
+			m_TypeMap[m_ClassCount].toCurrent = cls;
+			m_ClassCount++;
+			return cls;
+		}
+#if 0
 		ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
 		ClassDef::ClassPair *pair;
 		while(iter.NextPair(pair))
@@ -1473,6 +1482,7 @@ const ClassDef *FArchive::ReadClass ()
 				return cls;
 			}
 		}
+#endif
 	}
 	I_Error ("Unknown class '%s'\n", typeName.val);
 	return NULL;
