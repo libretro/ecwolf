@@ -35,10 +35,12 @@
 #include "gamemap.h"
 #include "g_mapinfo.h"
 #include "language.h"
+#include "lnspec.h"
 #include "tarray.h"
 #include "scanner.h"
 #include "w_wad.h"
 #include "v_video.h"
+#include "thingdef/thingdef.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // MapInfoBlockParser
@@ -242,6 +244,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 {
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
+	DeathCam = false;
 	FloorNumber = 1;
 	Par = 0;
 }
@@ -329,8 +332,31 @@ protected:
 			ParseStringAssignment(textureName);
 			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
 		}
+		else if(key.CompareNoCase("SpecialAction") == 0)
+		{
+			LevelInfo::SpecialAction action;
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			action.Class = ClassDef::FindClassTentative(sc->str, NATIVE_CLASS(Actor));
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_StringConst);
+			action.Special = Specials::LookupFunctionNum(sc->str);
+
+			unsigned int i;
+			for(i = 0;i < 5 && sc.CheckToken(',');++i)
+			{
+				sc.MustGetToken(TK_IntConst);
+				action.Args[i] = sc->number;
+			}
+			while(i < 5)
+				action.Args[i++] = 0;
+
+			mapInfo.SpecialActions.Push(action);
+		}
 		else if(key.CompareNoCase("Cluster") == 0)
 			ParseIntAssignment(mapInfo.Cluster);
+		else if(key.CompareNoCase("DeathCam") == 0)
+			ParseBoolAssignment(mapInfo.DeathCam);
 		else if(key.CompareNoCase("FloorNumber") == 0)
 			ParseIntAssignment(mapInfo.FloorNumber);
 		else if(key.CompareNoCase("Music") == 0)

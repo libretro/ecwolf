@@ -39,6 +39,8 @@
 #include "v_font.h"
 #include "zstring.h"
 
+class ClassDef;
+
 extern class GameInfo
 {
 public:
@@ -94,6 +96,17 @@ public:
 
 	FTextureID		DefaultTexture[2];
 	unsigned int	Par;
+
+	bool			DeathCam;
+
+	struct SpecialAction
+	{
+	public:
+		const ClassDef	*Class;
+		unsigned int	Special;
+		int				Args[5];
+	};
+	TArray<SpecialAction>	SpecialActions;
 
 	static LevelInfo &Find(const char* level);
 

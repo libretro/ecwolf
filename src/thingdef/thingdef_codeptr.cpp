@@ -33,7 +33,11 @@
 */
 
 #include "actor.h"
+#include "id_ca.h"
 #include "id_sd.h"
+#include "g_mapinfo.h"
+#include "g_shared/a_deathcam.h"
+#include "lnspec.h"
 #include "m_random.h"
 #include "thingdef/thingdef.h"
 #include "wl_act.h"
@@ -107,18 +111,59 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "g_shared/a_deathcam.h"
 ACTION_FUNCTION(A_BossDeath)
 {
 	// TODO: Check if all enemies of same type are dead and then call a defined function.
+	bool deathcamRun = false;
+	bool alldead = true;
+	AActor::Iterator *iter = AActor::GetIterator();
+	while(iter)
+	{
+		AActor * const other = iter->Item();
 
-	if(!gamestate.victoryflag)
+		if(other != self)
+		{
+			if(other->GetClass() == NATIVE_CLASS(DeathCam))
+				deathcamRun = true;
+			else if(other->GetClass() == self->GetClass())
+			{
+				if(other->health > 0)
+				{
+					alldead = false;
+					break;
+				}
+			}
+		}
+		iter = iter->Next();
+	}
+
+	if(!alldead)
+		return;
+
+	if(levelInfo->DeathCam && !deathcamRun)
 	{
 		ADeathCam *dc = (ADeathCam*)AActor::Spawn(NATIVE_CLASS(DeathCam), 0, 0, 0);
 		dc->SetupDeathCam(self, players[0].mo);
 	}
 	else
-		playstate = ex_victorious;
+	{
+		for(unsigned int i = 0;i < levelInfo->SpecialActions.Size();++i)
+		{
+			const LevelInfo::SpecialAction &action = levelInfo->SpecialActions[i];
+			if(action.Class == self->GetClass())
+			{
+				const Specials::LineSpecials special = static_cast<Specials::LineSpecials>(action.Special);
+				Specials::LineSpecialFunction function = Specials::LookupFunction(special);
+				function(map->GetSpot(self->tilex, self->tiley, 0), action.Args, MapTrigger::East, self);
+			}
+		}
+	}
+
+	if(deathcamRun && playstate == ex_stillplaying)
+	{
+		// Return the camera to the player if we're still going
+		players[0].camera = players[0].mo;
+	}
 }
 
 ACTION_FUNCTION(A_FaceTarget)

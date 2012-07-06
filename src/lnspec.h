@@ -41,7 +41,7 @@ class AActor;
 
 namespace Specials
 {
-	typedef int (*LineSpecialFunction)(MapSpot spot, int args[], MapTrigger::Side direction, AActor *activator);
+	typedef int (*LineSpecialFunction)(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator);
 
 	#define DEFINE_SPECIAL(name,num,args) name = num,
 	enum LineSpecials
@@ -52,8 +52,12 @@ namespace Specials
 	};
 	#undef DEFINE_SPECIAL
 
-	LineSpecialFunction LookupFunction(const char* const function);
+	LineSpecials LookupFunctionNum(const char* const function);
 	LineSpecialFunction LookupFunction(LineSpecials function);
+	static inline LineSpecialFunction LookupFunction(const char* const function)
+	{
+		return LookupFunction(LookupFunctionNum(function));
+	}
 }
 
 #endif

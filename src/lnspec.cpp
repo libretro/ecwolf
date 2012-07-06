@@ -44,9 +44,9 @@
 using namespace Specials;
 
 #define DEFINE_SPECIAL(name,num,argc) \
-	static int LN_##name(MapSpot spot, int args[], MapTrigger::Side direction, AActor *activator);
+	static int LN_##name(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator);
 #define FUNC(name) \
-	static int LN_##name(MapSpot spot, int args[], MapTrigger::Side direction, AActor *activator)
+	static int LN_##name(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator)
 
 DEFINE_SPECIAL(NOP, 0, 0)
 #include "lnspecials.h"
@@ -73,19 +73,22 @@ const struct LineSpecialMeta
 	{ NULL, 0, 0 }
 };
 
-LineSpecialFunction Specials::LookupFunction(const char* const function)
+LineSpecials Specials::LookupFunctionNum(const char* const function)
 {
 	const LineSpecialMeta *func = lnspecMeta;
 	do
 	{
 		if(stricmp(func->name, function) == 0)
-			return lnspecFunctions[func->num];
+			return static_cast<LineSpecials> (func->num);
 	}
 	while((++func)->name != NULL);
-	return LN_NOP;
+	return NUM_POSSIBLE_SPECIALS;
 }
 LineSpecialFunction Specials::LookupFunction(LineSpecials function)
 {
+	if(function >= NUM_POSSIBLE_SPECIALS)
+		return LN_NOP;
+
 	return lnspecFunctions[function];
 }
 

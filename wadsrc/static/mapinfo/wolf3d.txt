@@ -32,6 +32,11 @@ defaultmap
 	defaultfloor = "#717171"
 	defaultceiling = "#383838"
 	translator = "xlat/wolf3d.txt"
+	deathcam = true
+	specialaction = "Schabbs", "Exit_Normal"
+	specialaction = "Gift", "Exit_Normal"
+	specialaction = "FatFace", "Exit_Normal"
+	specialaction = "Hitler", "Exit_Normal"
 }
 
 // Episode 1
