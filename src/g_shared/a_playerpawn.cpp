@@ -80,7 +80,7 @@ void APlayerPawn::GiveStartingInventory()
 	}
 	while((item = item->Next()));
 
-	player->weapons.StandardSetup(GetClass());
+	SetupWeaponSlots();
 
 	// Bring up weapon
 	player->BringUpWeapon();
@@ -131,6 +131,11 @@ void APlayerPawn::Serialize(FArchive &arc)
 	arc << maxhealth;
 
 	Super::Serialize(arc);
+}
+
+void APlayerPawn::SetupWeaponSlots()
+{
+	players[0].weapons.StandardSetup(GetClass());
 }
 
 void APlayerPawn::Tick()

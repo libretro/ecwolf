@@ -988,6 +988,9 @@ void player_t::Serialize(FArchive &arc)
 		<< psprite.ticcount
 		<< psprite.sx
 		<< psprite.sy;
+
+	mo->SetupWeaponSlots();
+	CalcProjection(mo->radius);
 }
 
 void player_t::SetPSprite(const Frame *frame)
