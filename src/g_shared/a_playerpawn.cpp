@@ -142,6 +142,8 @@ void APlayerPawn::Tick()
 {
 	Super::Tick();
 
+	TickPSprites();
+
 	// Watching BJ
 	if(gamestate.victoryflag)
 	{
@@ -166,10 +168,6 @@ void APlayerPawn::Tick()
 	}
 
 	ControlMovement(this);
-	if(gamestate.victoryflag)
-		return;
-
-	TickPSprites();
 }
 
 void APlayerPawn::TickPSprites()

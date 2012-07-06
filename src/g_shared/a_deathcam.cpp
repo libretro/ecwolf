@@ -71,11 +71,11 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	gamestate.victoryflag = true;
 
 	double fadex = 0;
-	double fadey = 0;
+	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;;
 	double fadew = 320;
-	double fadeh = viewsize != 21 ? 200-STATUSLINES : 200;
-	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, false, true);
-	VWB_Clear(bordercol, 0, 0, screenWidth, fadeh);
+	double fadeh = 200;
+	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
+	VWB_Clear(bordercol, 0, 0, screenWidth, fadey);
 
 	word width, height;
 	VW_MeasurePropString(IntermissionFont, language["STR_SEEAGAIN"], width, height);
@@ -106,6 +106,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	IN_UserInput(300);
 
 	players[0].camera = cam;
+	players[0].SetPSprite(cam->FindState("Ready"));
 	cam->actor->SetState(cam->actor->DeathState);
 
 	DrawPlayScreen();

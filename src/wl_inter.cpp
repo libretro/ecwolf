@@ -708,8 +708,8 @@ bool PreloadUpdate (unsigned current, unsigned total)
 	double ow = w - 1;
 	double oh = h - 1;
 	double ox = x, oy = y;
-	VirtualToRealCoords(x, y, w, h, 320, 200, false, true);
-	VirtualToRealCoords(ox, oy, ow, oh, 320, 200, false, true);
+	VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
+	VirtualToRealCoords(ox, oy, ow, oh, 320, 200, true, true);
 
 	if (current)
 	{

@@ -5,8 +5,12 @@ actor DeathCam native
 	states
 	{
 		Spawn:
-			TNT1 A 57
+			TNT1 A 1 // Small delay for the sake of animation.
 			TNT1 A -1 A_FinishDeathCam
 			stop
+		Ready:
+			DCAM A 16
+			TNT1 A 16
+			loop
 	}
 }

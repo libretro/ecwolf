@@ -91,8 +91,8 @@ graphics
 
 sprites
 {
-	"DEMO":pspr,
-	"DEATHCAM":pspr,
+	"DEMOA0":pspr,
+	"DCAMA0":pspr,
 
 	"WATRA0",	"DRUMA0",	"TCHRA0",	"FLMPA0",
 	"CHANA0",	"HANGA0",	"ALPOA0",	"COLUA0",
