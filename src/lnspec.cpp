@@ -32,6 +32,7 @@
 **
 */
 
+#include "doomerrors.h"
 #include "id_ca.h"
 #include "id_sd.h"
 #include "lnspec.h"
@@ -306,8 +307,9 @@ class EVPushwall : public Thinker
 	DECLARE_CLASS(EVPushwall, Thinker)
 
 	public:
-		EVPushwall(MapSpot spot, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
-			spot(spot), moveTo(NULL), direction(direction), position(0)
+		EVPushwall(MapSpot spot, unsigned int speed, MapTrigger::Side direction, unsigned int distance) :
+			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
+			speed(speed), distance(distance)
 		{
 			spot->thinker = this;
 			spot->pushDirection = MapTile::Side(direction);
@@ -332,6 +334,18 @@ class EVPushwall : public Thinker
 			{
 				moveTo = spot->GetAdjacent(MapTile::Side(direction));
 
+				if(moveTo == NULL)
+				{
+					Destroy();
+					return;
+					// Maybe in the future this can be a flag or something
+					#if 0
+					FString error;
+					error.Format("\"I'm free!\" -Pushwall @ (%d, %d)", spot->GetX(), spot->GetY());
+					throw CRecoverableError(error);
+					#endif
+				}
+
 				if(moveTo->tile)
 				{
 					// Hit a wall so we're done.
@@ -349,8 +363,9 @@ class EVPushwall : public Thinker
 			}
 
 			// Move the tile a bit.
-			if((++position)%128 == 0)
+			if((position += speed) > 256)
 			{
+				position -= 256;
 				spot->pushAmount = 0;
 				spot->tile = NULL;
 				spot->thinker = NULL;
@@ -360,10 +375,13 @@ class EVPushwall : public Thinker
 				moveTo = NULL;
 			}
 			else
-				spot->pushAmount = (position/2)%64;
+				spot->pushAmount = position/4;
 
-			if(position == 256)
-				Destroy();
+			if(!moveTo)
+			{
+				if(--distance == 0)
+					Destroy();
+			}
 		}
 
 		void Serialize(FArchive &arc)
@@ -381,6 +399,8 @@ class EVPushwall : public Thinker
 		MapSpot spot, moveTo;
 		unsigned short	direction;
 		unsigned int	position;
+		unsigned int	speed;
+		unsigned int	distance;
 };
 IMPLEMENT_INTERNAL_CLASS(EVPushwall)
 
@@ -391,7 +411,7 @@ FUNC(Pushwall_Move)
 		return 0;
 	}
 
-	new EVPushwall(spot, direction);
+	new EVPushwall(spot, args[0], MapTrigger::Side((direction + 3 + args[1])%4), args[2]);
 	return 1;
 }
 
