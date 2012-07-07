@@ -533,6 +533,7 @@ void FinishTravel ()
 					player->EnterZone(playertmp->GetZone());
 
 					players[0].mo = player;
+					players[0].camera = player;
 					playertmp->Destroy();
 
 					// We must move the linked list iterator here since we'll
