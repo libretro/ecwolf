@@ -376,7 +376,7 @@ LevelCompleted (void)
 		Write (29, 16, language["STR_RAT2SECRET"], true);
 		Write (29, 18, language["STR_RAT2TREASURE"], true);
 
-		Write (26, 2, itoa (gamestate.mapon + 1, tempstr, 10));
+		Write (26, 2, itoa (levelInfo->FloorNumber, tempstr, 10));
 
 		FString timeString;
 		timeString.Format("%02d:%02d", levelInfo->Par/60, levelInfo->Par%60);
