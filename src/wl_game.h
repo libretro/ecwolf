@@ -9,7 +9,26 @@
 =============================================================================
 */
 
-extern  gametype        gamestate;
+//---------------
+//
+// gamestate structure
+//
+//---------------
+
+extern struct gametype
+{
+	char		mapname[9];
+	short       difficulty;
+	short       mapon;
+
+	short       faceframe;
+
+	short       episode,secretcount,treasurecount,killcount,
+				secrettotal,treasuretotal,killtotal;
+	int32_t     TimeCount;
+	bool        victoryflag;            // set during victory animations
+} gamestate;
+
 extern  byte            bordercol;
 extern  char            demoname[13];
 

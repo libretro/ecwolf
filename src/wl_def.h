@@ -366,28 +366,6 @@ enum
 	gd_hard
 };
 
-//---------------
-//
-// gamestate structure
-//
-//---------------
-
-typedef struct
-{
-	char		mapname[9];
-	short       difficulty;
-	short       mapon;
-
-	short       faceframe;
-
-	short       episode,secretcount,treasurecount,killcount,
-				secrettotal,treasuretotal,killtotal;
-	int32_t     TimeCount;
-	int32_t     killx,killy;
-	bool        victoryflag;            // set during victory animations
-} gametype;
-
-
 typedef enum
 {
 	ex_stillplaying,
@@ -451,10 +429,7 @@ static inline fixed FixedDiv(fixed a, fixed b)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 
-#ifdef _WIN32
-	//#define strcasecmp stricmp
-	//#define strncasecmp strnicmp
-#else
+#ifndef _WIN32
 	static inline char* itoa(int value, char* string, int radix)
 	{
 		sprintf(string, "%d", value);

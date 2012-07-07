@@ -615,14 +615,21 @@ void DrawStatusBar()
 
 bool TryMove (AActor *ob)
 {
+	if (noclip)
+	{
+		return (ob->x-ob->radius >= 0 && ob->y-ob->radius >= 0
+			&& ob->x+ob->radius < (((int32_t)(map->GetHeader().width))<<TILESHIFT)
+			&& ob->y+ob->radius < (((int32_t)(map->GetHeader().height))<<TILESHIFT) );
+	}
+
 	int xl,yl,xh,yh,x,y;
 	AActor *check;
 
-	xl = (ob->x-players[0].mo->radius) >>TILESHIFT;
-	yl = (ob->y-players[0].mo->radius) >>TILESHIFT;
+	xl = (ob->x-ob->radius) >>TILESHIFT;
+	yl = (ob->y-ob->radius) >>TILESHIFT;
 
-	xh = (ob->x+players[0].mo->radius) >>TILESHIFT;
-	yh = (ob->y+players[0].mo->radius) >>TILESHIFT;
+	xh = (ob->x+ob->radius) >>TILESHIFT;
+	yh = (ob->y+ob->radius) >>TILESHIFT;
 
 	//
 	// check for solid walls
@@ -633,10 +640,10 @@ bool TryMove (AActor *ob)
 		{
 			const bool checkLines[4] =
 			{
-				(ob->x+players[0].mo->radius) > ((x+1)<<TILESHIFT),
-				(ob->y-players[0].mo->radius) < (y<<TILESHIFT),
-				(ob->x-players[0].mo->radius) < (x<<TILESHIFT),
-				(ob->y+players[0].mo->radius) > ((y+1)<<TILESHIFT)
+				(ob->x+ob->radius) > ((x+1)<<TILESHIFT),
+				(ob->y-ob->radius) < (y<<TILESHIFT),
+				(ob->x-ob->radius) < (x<<TILESHIFT),
+				(ob->y+ob->radius) > ((y+1)<<TILESHIFT)
 			};
 			MapSpot spot = map->GetSpot(x, y, 0);
 			if(spot->tile)
@@ -717,22 +724,14 @@ bool TryMove (AActor *ob)
 
 void ClipMove (AActor *ob, int32_t xmove, int32_t ymove)
 {
-	int32_t    basex,basey;
-
-	basex = ob->x;
-	basey = ob->y;
+	fixed basex = ob->x;
+	fixed basey = ob->y;
 
 	ob->x = basex+xmove;
 	ob->y = basey+ymove;
+
 	if (TryMove (ob))
 		return;
-
-#ifndef REMDEBUG
-	if (noclip && ob->x > 2*TILEGLOBAL && ob->y > 2*TILEGLOBAL
-		&& ob->x < (((int32_t)(map->GetHeader().width-1))<<TILESHIFT)
-		&& ob->y < (((int32_t)(map->GetHeader().height-1))<<TILESHIFT) )
-		return;         // walk through walls
-#endif
 
 	if (!SD_SoundPlaying())
 		SD_PlaySound ("world/hitwall");
