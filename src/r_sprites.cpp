@@ -79,7 +79,7 @@ bool R_CheckSpriteValid(unsigned int spr)
 		return true;
 
 	SpriteInfo &sprite = loadedSprites[spr];
-	if(sprite.frames == 0)
+	if(sprite.numFrames == 0)
 		return false;
 	return true;
 }
