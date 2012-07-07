@@ -353,9 +353,6 @@ ACTION_FUNCTION(A_Chase)
 	bool	dodge = !(flags & CHF_DONTDODGE);
 	bool	pathing = (self->flags & FL_PATHING) ? true : false;
 
-	if (gamestate.victoryflag)
-		return;
-
 	if(!pathing)
 	{
 		if(missile)
@@ -563,56 +560,3 @@ ACTION_FUNCTION(A_WolfAttack)
 	else
 		PlaySoundLocActor(sound, self);
 }
-
-#ifndef SPEAR
-/*
-============================================================================
-
-									BJ VICTORY
-
-============================================================================
-*/
-
-
-//
-// BJ victory
-//
-
-
-/*
-===============
-=
-= SpawnBJVictory
-=
-===============
-*/
-#if 0
-void SpawnBJVictory (void)
-{
-	SpawnNewObj (players[0].mo->tilex,players[0].mo->tiley+1,&s_bjrun1);
-	newobj->x = players[0].mo->x;
-	newobj->y = players[0].mo->y;
-	newobj->obclass = bjobj;
-	newobj->dir = north;
-	newobj->temp1 = 6;                      // tiles to run forward
-}
-
-
-/*
-===============
-=
-= T_BJJump
-=
-===============
-*/
-
-void T_BJJump (objtype *ob)
-{
-	int32_t    move;
-
-	move = BJJUMPSPEED*tics;
-	MoveObj (ob,move);
-}
-#endif
-
-#endif

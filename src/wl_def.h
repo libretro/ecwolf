@@ -267,43 +267,6 @@ typedef enum {
 	nodir
 } dirtype;
 
-//---------------------
-//
-// trivial actor structure
-//
-//---------------------
-
-typedef struct statstruct
-{
-	byte      tilex,tiley;
-	short     shapenum;           // if shapenum == -1 the obj has been removed
-	byte      *visspot;
-	uint32_t  flags;
-	byte      itemnumber;
-} statobj_t;
-
-
-//---------------------
-//
-// door actor structure
-//
-//---------------------
-
-typedef enum
-{
-	dr_open,dr_closed,dr_opening,dr_closing
-} doortype;
-
-typedef struct doorstruct
-{
-	byte     tilex,tiley;
-	bool     vertical;
-	byte     lock;
-	doortype action;
-	short    ticcount;
-} doorobj_t;
-
-
 //--------------------
 //
 // thinking actor structure

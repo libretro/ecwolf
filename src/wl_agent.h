@@ -22,8 +22,6 @@ void    Thrust (angle_t angle, int32_t speed);
 void    SpawnPlayer (int tilex, int tiley, int dir);
 void    TakeDamage (int points,AActor *attacker);
 void    GivePoints (int32_t points);
-void    GetBonus (statobj_t *check);
-void    VictorySpin ();
 
 //
 // player state info

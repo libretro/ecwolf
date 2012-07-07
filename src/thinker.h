@@ -50,11 +50,12 @@ extern class ThinkerList
 		{
 			TRAVEL,	// Doesn't think, preserved for later use
 
+			VICTORY,// Think even if the victory flag is set
 			WORLD,	// High priority world manipulations
 			NORMAL,	// General purpose thinker
 
 			NUM_TYPES,
-			FIRST_TICKABLE = WORLD
+			FIRST_TICKABLE = VICTORY
 		};
 
 		ThinkerList();

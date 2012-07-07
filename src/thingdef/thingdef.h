@@ -264,7 +264,7 @@ class ClassDef
 		static const ClassDef	*FindClass(unsigned int ednum);
 		static const ClassDef	*FindClass(const FName &className);
 		static const ClassDef	*FindClassTentative(const FName &className, const ClassDef *parent);
-		const ActionInfo		*FindFunction(const FName &function) const;
+		const ActionInfo		*FindFunction(const FName &function, int &specialNum) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const;
 		AActor					*GetDefault() const { return (AActor*)defaultInstance; }

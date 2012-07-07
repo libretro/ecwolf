@@ -37,7 +37,9 @@
 #include "id_sd.h"
 #include "lnspec.h"
 #include "actor.h"
+#include "wl_act.h"
 #include "wl_agent.h"
+#include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_play.h"
 #include "g_shared/a_keys.h"
@@ -60,7 +62,8 @@ LineSpecialFunction lnspecFunctions[NUM_POSSIBLE_SPECIALS] =
 	LN_Pushwall_Move,
 	LN_Exit_Normal,
 	LN_Exit_Secret,
-	LN_NOP
+	LN_NOP,
+	LN_Exit_VictorySpin
 };
 
 #define DEFINE_SPECIAL(name,num,args) { #name, num, args},
@@ -389,7 +392,9 @@ class EVPushwall : public Thinker
 			arc << spot
 				<< moveTo
 				<< direction
-				<< position;
+				<< position
+				<< speed
+				<< distance;
 
 			Super::Serialize(arc);
 		}
@@ -436,5 +441,100 @@ FUNC(Exit_Secret)
 	playstate = ex_secretlevel;
 	SD_PlaySound ("world/level_done");
 	SD_WaitSoundDone();
+	return 1;
+}
+
+class EVVictorySpin : public Thinker
+{
+	DECLARE_CLASS(EVVictorySpin, Thinker)
+	HAS_OBJECT_POINTERS
+	public:
+		// Note that we trigger slightly a half unit before wolf3d did
+		EVVictorySpin(AActor *activator, MapTrigger::Side direction) : Thinker(ThinkerList::VICTORY),
+			doturn(true), dist(6*FRACUNIT + FRACUNIT/2), activator(activator)
+		{
+			gamestate.victoryflag = true;
+			players[0].SetPSprite(NULL);
+
+			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0);
+			runner->flags |= FL_PATHING;
+			runner->angle = ((direction+2)%4)*ANGLE_90;
+			runner->dir = static_cast<dirtype>(runner->angle/ANGLE_45);
+			runner->GetThinker()->SetPriority(ThinkerList::VICTORY);
+		}
+
+		void Serialize(FArchive &arc)
+		{
+			arc << doturn
+				<< dist
+				<< activator
+				<< runner;
+
+			Super::Serialize(arc);
+		}
+
+		void Tick()
+		{
+			if(doturn)
+			{
+				angle_t oldangle = activator->angle;
+				A_Face(activator, runner, 3*ANGLE_1);
+				if(activator->angle == oldangle)
+					doturn = false;
+			}
+
+			if(dist > 0)
+			{
+				static const unsigned int speed = 4096;
+
+				if(dist <= speed)
+				{
+					activator->x += FixedMul(dist, finecosine[runner->angle>>ANGLETOFINESHIFT]);
+					activator->y -= FixedMul(dist, finesine[runner->angle>>ANGLETOFINESHIFT]);
+					dist = 0;
+				}
+				else
+				{
+					activator->x += FixedMul(speed, finecosine[runner->angle>>ANGLETOFINESHIFT]);
+					activator->y -= FixedMul(speed, finesine[runner->angle>>ANGLETOFINESHIFT]);
+					dist -= speed;
+				}
+			}
+			else
+			{
+				// This is the gross part, we must do a "collision" check.
+				// If it passes we're done here, but we must first make the
+				// runner a projectile and then make sure it doesn't try to
+				// explode on us.
+				fixed radius = runner->radius + activator->radius + runner->speed;
+				if(abs(activator->x - runner->x) <= radius &&
+					abs(activator->y - runner->y) <= radius)
+				{
+					runner->Die();
+					runner->velx = FixedMul(runner->runspeed, finecosine[runner->angle>>ANGLETOFINESHIFT]);
+					runner->vely = -FixedMul(runner->runspeed, finesine[runner->angle>>ANGLETOFINESHIFT]);
+					runner->flags |= FL_MISSILE;
+					runner->radius = 1;
+					Destroy();
+				}
+			}
+		}
+
+		bool			doturn;
+		unsigned int	dist;
+		TObjPtr<AActor>	activator;
+		TObjPtr<AActor>	runner;
+};
+IMPLEMENT_INTERNAL_POINTY_CLASS(EVVictorySpin)
+	DECLARE_POINTER(activator)
+	DECLARE_POINTER(runner)
+END_POINTERS
+FUNC(Exit_VictorySpin)
+{
+	if(buttonheld[bt_use])
+		return 0;
+	buttonheld[bt_use] = true;
+
+	new EVVictorySpin(activator, direction);
 	return 1;
 }

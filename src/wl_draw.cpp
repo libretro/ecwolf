@@ -587,8 +587,6 @@ void DrawScaleds (void)
 	byte     *visspot;
 	unsigned spotloc;
 
-	statobj_t *statptr;
-
 	visptr = &vislist[0];
 
 //

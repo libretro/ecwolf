@@ -39,6 +39,7 @@
 #include "thinker.h"
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
+#include "wl_game.h"
 
 ThinkerList *thinkerList;
 
@@ -101,6 +102,9 @@ void ThinkerList::Tick()
 {
 	for(unsigned int i = FIRST_TICKABLE;i < NUM_TYPES;++i)
 	{
+		if(gamestate.victoryflag && i > VICTORY)
+			break;
+
 		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{

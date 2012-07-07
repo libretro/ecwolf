@@ -71,8 +71,8 @@ class GameMap
 		struct Trigger
 		{
 			Trigger() : x(0), y(0), z(0), active(true), action(0),
-				playerUse(false), monsterUse(false), isSecret(false),
-				repeatable(false)
+				playerUse(false), walkUse(false), monsterUse(false),
+				isSecret(false), repeatable(false)
 			{
 				activate[0] = activate[1] = activate[2] = activate[3] = true;
 				arg[0] = arg[1] = arg[2] = arg[3] = arg[4] = 0;
@@ -89,6 +89,7 @@ class GameMap
 			int				arg[5];
 
 			bool			playerUse;
+			bool			walkUse;
 			bool			monsterUse;
 			bool			isSecret;
 			bool			repeatable;

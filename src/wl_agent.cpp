@@ -613,7 +613,7 @@ void DrawStatusBar()
 ===================
 */
 
-bool TryMove (AActor *ob)
+static bool TryMove (AActor *ob)
 {
 	if (noclip)
 	{
@@ -713,6 +713,42 @@ bool TryMove (AActor *ob)
 	return true;
 }
 
+static void ExecuteWalkTriggers(MapSpot spot, MapTrigger::Side dir)
+{
+	if(!spot)
+		return;
+
+	for(unsigned int i = spot->triggers.Size();i-- > 0;)
+	{
+		MapTrigger &trigger = spot->triggers[i];
+		if(trigger.walkUse && trigger.activate[dir])
+			map->ActivateTrigger(trigger, dir, players[0].mo);
+	}
+}
+
+static void CheckWalkTriggers(AActor *ob, int32_t xmove, int32_t ymove)
+{
+	MapSpot spot;
+
+	if(ob->fracx <= abs(xmove) || ob->fracx >= 0xFFFF-abs(xmove))
+	{
+		spot = map->GetSpot((ob->x-xmove)>>FRACBITS, ob->y>>FRACBITS, 0);
+		if(xmove > 0)
+			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::East), MapTrigger::West);
+		else if(xmove < 0)
+			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::West), MapTrigger::East);
+	}
+
+	if(ob->fracy <= abs(ymove) || ob->fracy >= 0xFFFF-abs(ymove))
+	{
+		spot = map->GetSpot(ob->x>>FRACBITS, (ob->y-ymove)>>FRACBITS, 0);
+		if(ymove > 0)
+			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::South), MapTrigger::North);
+		else if(ymove < 0)
+			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::North), MapTrigger::South);
+	}
+}
+
 
 /*
 ===================
@@ -731,7 +767,10 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove)
 	ob->y = basey+ymove;
 
 	if (TryMove (ob))
+	{
+		CheckWalkTriggers(ob, xmove, ymove);
 		return;
+	}
 
 	if (!SD_SoundPlaying())
 		SD_PlaySound ("world/hitwall");
@@ -739,12 +778,18 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove)
 	ob->x = basex+xmove;
 	ob->y = basey;
 	if (TryMove (ob))
+	{
+		CheckWalkTriggers(ob, xmove, 0);
 		return;
+	}
 
 	ob->x = basex;
 	ob->y = basey+ymove;
 	if (TryMove (ob))
+	{
+		CheckWalkTriggers(ob, 0, ymove);
 		return;
+	}
 
 	ob->x = basex;
 	ob->y = basey;
@@ -1211,41 +1256,4 @@ ACTION_FUNCTION(A_GunAttack)
 			return;
 	}
 	DamageActor (closest,damage);
-}
-
-//===========================================================================
-
-/*
-===============
-=
-= VictorySpin
-=
-===============
-*/
-
-void VictorySpin (void)
-{
-	int32_t    desty;
-
-	if (players[0].mo->angle > 270)
-	{
-		players[0].mo->angle -= (short)(tics * 3);
-		if (players[0].mo->angle < 270)
-			players[0].mo->angle = 270;
-	}
-	else if (players[0].mo->angle < 270)
-	{
-		players[0].mo->angle += (short)(tics * 3);
-		if (players[0].mo->angle > 270)
-			players[0].mo->angle = 270;
-	}
-
-	desty = (((int32_t)players[0].mo->tiley-5)<<TILESHIFT)-0x3000;
-
-	if (players[0].mo->y > desty)
-	{
-		players[0].mo->y -= tics*4096;
-		if (players[0].mo->y < desty)
-			players[0].mo->y = desty;
-	}
 }

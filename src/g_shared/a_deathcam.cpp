@@ -6,6 +6,7 @@
 #include "language.h"
 #include "gamemap.h"
 #include "thingdef/thingdef.h"
+#include "thinker.h"
 #include "wl_act.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
@@ -56,6 +57,9 @@ void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
 {
 	this->actor = actor;
 	this->killer = killer;
+
+	GetThinker()->SetPriority(ThinkerList::VICTORY);
+	actor->GetThinker()->SetPriority(ThinkerList::VICTORY);
 }
 
 ACTION_FUNCTION(A_FinishDeathCam)

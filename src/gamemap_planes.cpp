@@ -428,6 +428,15 @@ void GameMap::ReadPlanesData()
 						trig.isSecret = true;
 						++gamestate.secrettotal;
 					}
+					else if(oldplane[i] == 99)
+					{
+						if(ambushSpots[ambushSpot] == i)
+							++ambushSpot;
+
+						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						trig.action = Specials::Exit_VictorySpin;
+						trig.walkUse = true;
+					}
 					else
 					{
 						Thing thing;

@@ -146,10 +146,7 @@ void APlayerPawn::Tick()
 
 	// Watching BJ
 	if(gamestate.victoryflag)
-	{
-		VictorySpin();
 		return;
-	}
 
 	UpdateFace();
 	CheckWeaponChange();

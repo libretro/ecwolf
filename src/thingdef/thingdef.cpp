@@ -35,6 +35,7 @@
 #include "actor.h"
 #include "a_inventory.h"
 #include "id_ca.h"
+#include "lnspec.h"
 #include "m_random.h"
 #include "r_sprites.h"
 #include "scanner.h"
@@ -574,8 +575,15 @@ const ClassDef *ClassDef::FindClassTentative(const FName &className, const Class
 	return newClass;
 }
 
-const ActionInfo *ClassDef::FindFunction(const FName &function) const
+const ActionInfo *ClassDef::FindFunction(const FName &function, int &specialNum) const
 {
+	Specials::LineSpecials special = Specials::LookupFunctionNum(function);
+	if(special != Specials::NUM_POSSIBLE_SPECIALS)
+	{
+		specialNum = special;
+		return FindFunction("A_CallSpecial", specialNum);
+	}
+
 	if(actions.Size() != 0)
 	{
 		ActionInfo *func = LookupFunction(function, &actions);
@@ -583,7 +591,7 @@ const ActionInfo *ClassDef::FindFunction(const FName &function) const
 			return func;
 	}
 	if(parent)
-		return parent->FindFunction(function);
+		return parent->FindFunction(function, specialNum);
 	return NULL;
 }
 
@@ -1058,7 +1066,8 @@ void ClassDef::ParseActor(Scanner &sc)
 								{
 									if(sc->str.CompareNoCase("NOP") != 0)
 									{
-										const ActionInfo *funcInf = newClass->FindFunction(sc->str);
+										int specialNum = -1;
+										const ActionInfo *funcInf = newClass->FindFunction(sc->str, specialNum);
 										if(funcInf)
 										{
 											thisState.functions[func].pointer = *funcInf->func;
@@ -1067,6 +1076,17 @@ void ClassDef::ParseActor(Scanner &sc)
 											ca = new CallArguments();
 											CallArguments::Value val;
 											unsigned int argc = 0;
+
+											// When using a line special we have to inject a parameter.
+											if(specialNum >= 0)
+											{
+												val.useType == CallArguments::Value::VAL_INTEGER;
+												val.isExpression = false;
+												val.val.i = specialNum;
+												ca->AddArgument(val);
+												++argc;
+											}
+				
 											if(sc.CheckToken('('))
 											{
 												if(funcInf->maxArgs == 0)

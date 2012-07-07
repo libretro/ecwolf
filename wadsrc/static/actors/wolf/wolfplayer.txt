@@ -24,9 +24,9 @@ actor BJPlayer : PlayerPawn
 
 actor BJRun
 {
-	// TODO: Run for 6 tiles then go to Death state.
-	// TODO: On Death set speed to 1.328 or about 33%
-	speed 4
+	// GROSS HACK
+	radius 80
+	speed 4, 1.328
 	states
 	{
 		Spawn:
@@ -38,10 +38,11 @@ actor BJRun
 			BLAZ D 4 NOP A_Chase("*", "*", CHF_NOSIGHTCHECK)
 			loop
 		Death:
-			BLAZ E 7 NOP T_BJJump
-			BLAZ F 7 A_PlaySound("misc/yeah") T_BJJump
-			BLAZ G 7 NOP T_BJJump
-			BLAZ H 150 A_BossDeath
+			BLAZ E 7
+			BLAZ F 7 A_PlaySound("misc/yeah")
+			BLAZ G 7
+			BLAZ H 150 A_Stop
+			BLAZ H -1 Exit_Normal
 			stop
 	}
 }

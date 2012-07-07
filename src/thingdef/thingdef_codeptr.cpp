@@ -111,6 +111,23 @@ ActionInfo *LookupFunction(const FName &func, const ActionTable *table)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+ACTION_FUNCTION(A_CallSpecial)
+{
+	ACTION_PARAM_INT(special, 0);
+	ACTION_PARAM_INT(arg1, 1);
+	ACTION_PARAM_INT(arg2, 2);
+	ACTION_PARAM_INT(arg3, 3);
+	ACTION_PARAM_INT(arg4, 4);
+	ACTION_PARAM_INT(arg5, 5);
+
+	int specialArgs[5] = {arg1, arg2, arg3, arg4, arg5};
+
+	Specials::LineSpecialFunction function = Specials::LookupFunction(static_cast<Specials::LineSpecials>(special));
+	function(map->GetSpot(self->tilex, self->tiley, 0), specialArgs, MapTrigger::East, self);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 ACTION_FUNCTION(A_BossDeath)
 {
 	// TODO: Check if all enemies of same type are dead and then call a defined function.
@@ -300,4 +317,11 @@ ACTION_FUNCTION(A_SpawnItemEx)
 	//We divide by 128 here since Wolf is 70hz instead of 35.
 	newobj->velx = (fixed(xvel*finecosine[ang]) + fixed(yvel*finesine[ang]))/128;
 	newobj->vely = (-fixed(xvel*finesine[ang]) + fixed(yvel*finecosine[ang]))/128;
+}
+
+ACTION_FUNCTION(A_Stop)
+{
+	self->velx = 0;
+	self->vely = 0;
+	self->dir = nodir;
 }
