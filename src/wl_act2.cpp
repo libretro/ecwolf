@@ -182,7 +182,7 @@ void T_Projectile (AActor *self)
 
 	if (deltax < radius && deltay < radius)
 	{
-		TakeDamage (self->damage->Evaluate(self).GetInt(),self);
+		TakeDamage (self->GetDamage(),self);
 		self->Die(); // TODO: XDeath
 		return;
 	}

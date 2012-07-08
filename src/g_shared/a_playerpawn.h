@@ -53,7 +53,8 @@ enum
 	APMETA_Slot6,
 	APMETA_Slot7,
 	APMETA_Slot8,
-	APMETA_Slot9
+	APMETA_Slot9,
+	APMETA_StartInventory
 };
 
 class APlayerPawn : public AActor
@@ -61,16 +62,16 @@ class APlayerPawn : public AActor
 	DECLARE_NATIVE_CLASS(PlayerPawn, Actor)
 
 	public:
-		~APlayerPawn();
+		DropList	*GetStartInventory();
+		void		GiveStartingInventory();
+		AWeapon		*PickNewWeapon();
+		void		Serialize(FArchive &arc);
+		void		SetupWeaponSlots();
+		void		Tick();
 
-		void	GiveStartingInventory();
-		AWeapon	*PickNewWeapon();
-		void	Serialize(FArchive &arc);
-		void	SetupWeaponSlots();
-		void	Tick();
+		static PointerIndexTable<DropList> startInventory;
 
 		int32_t		maxhealth;
-		DropList	*startInventory;
 
 	protected:
 		void	TickPSprites();

@@ -43,21 +43,22 @@
 
 IMPLEMENT_CLASS(PlayerPawn)
 
-APlayerPawn::~APlayerPawn()
+PointerIndexTable<AActor::DropList> APlayerPawn::startInventory;
+
+AActor::DropList *APlayerPawn::GetStartInventory()
 {
-	if(this == GetDefault())
-	{
-		if(startInventory)
-			delete startInventory;
-	}
+	int index = GetClass()->Meta.GetMetaInt(APMETA_StartInventory);
+	if(index >= 0)
+		return startInventory[index];
+	return NULL;
 }
 
 void APlayerPawn::GiveStartingInventory()
 {
-	if(!startInventory)
+	if(!GetStartInventory())
 		return;
 
-	DropList::Node *item = startInventory->Head();
+	DropList::Node *item = GetStartInventory()->Head();
 	do
 	{
 		DropItem &inv = item->Item();

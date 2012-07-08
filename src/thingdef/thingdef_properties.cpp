@@ -85,19 +85,20 @@ HANDLE_PROPERTY(damage)
 	{
 		INT_PARAM(dmg, 0);
 		if(dmg == 0)
-			defaults->damage = NULL;
+			cls->Meta.SetMetaInt(AMETA_Damage, -1);
 		else
 		{
 			FString defFormula;
 			defFormula.Format("random(1,8)*%d", (int) dmg);
 			Scanner sc(defFormula.GetChars(), defFormula.Len());
-			defaults->damage = ExpressionNode::ParseExpression(defaults->GetClass(), TypeHierarchy::staticTypes, sc, NULL);
+			cls->Meta.SetMetaInt(AMETA_Damage,
+				AActor::damageExpressions.Push(ExpressionNode::ParseExpression(defaults->GetClass(), TypeHierarchy::staticTypes, sc, NULL)));
 		}
 	}
 	else
 	{
 		EXPR_PARAM(dmg, 0);
-		defaults->damage = dmg;
+		cls->Meta.SetMetaInt(AMETA_Damage, AActor::damageExpressions.Push(dmg));
 	}
 }
 
@@ -112,8 +113,8 @@ HANDLE_PROPERTY(dropitem)
 	// NOTE: When used with inheritance the old list is wiped.
 	STRING_PARAM(item, 0);
 
-	if(!defaults->dropitems)
-		defaults->dropitems = new AActor::DropList();
+	if(cls->Meta.GetMetaInt(AMETA_DropItems, -1) == -1)
+		cls->Meta.SetMetaInt(AMETA_DropItems, AActor::dropItems.Push(new AActor::DropList()));
 
 	AActor::DropItem drop;
 	drop.className = item;
@@ -135,7 +136,7 @@ HANDLE_PROPERTY(dropitem)
 		}
 	}
 
-	defaults->dropitems->Push(drop);
+	AActor::dropItems[cls->Meta.GetMetaInt(AMETA_DropItems)]->Push(drop);
 }
 
 HANDLE_PROPERTY(health)
@@ -279,8 +280,8 @@ HANDLE_PROPERTY(startitem)
 
 	APlayerPawn *def = (APlayerPawn *)defaults;
 
-	if(!def->startInventory)
-		def->startInventory = new AActor::DropList();
+	if(cls->Meta.GetMetaInt(APMETA_StartInventory, -1) == -1)
+		cls->Meta.SetMetaInt(APMETA_StartInventory, APlayerPawn::startInventory.Push(new AActor::DropList()));
 
 	AActor::DropItem drop;
 	drop.className = item;
@@ -293,7 +294,7 @@ HANDLE_PROPERTY(startitem)
 		drop.amount = amt;
 	}
 
-	def->startInventory->Push(drop);
+	APlayerPawn::startInventory[cls->Meta.GetMetaInt(APMETA_StartInventory)]->Push(drop);
 }
 
 HANDLE_PROPERTY(weaponslot)

@@ -1634,6 +1634,8 @@ void ClassDef::UnloadActors()
 	}
 
 	// Also clear globals
+	// but first clear the damage expression table since it relies on some of the symbols.
+	AActor::damageExpressions.Clear();
 	for(unsigned int i = 0;i < globalSymbols.Size();++i)
 		delete globalSymbols[i];
 }

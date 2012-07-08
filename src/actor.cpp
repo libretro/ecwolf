@@ -154,21 +154,12 @@ IMPLEMENT_INTERNAL_POINTY_CLASS(AActorProxy)
 END_POINTERS
 
 LinkedList<AActor *> AActor::actors;
+PointerIndexTable<ExpressionNode> AActor::damageExpressions;
+PointerIndexTable<AActor::DropList> AActor::dropItems;
 IMPLEMENT_POINTY_CLASS(Actor)
 	DECLARE_POINTER(inventory)
 	DECLARE_POINTER(thinker)
 END_POINTERS
-
-AActor::~AActor()
-{
-	if(this == GetDefault())
-	{
-		if(dropitems)
-			delete dropitems;
-		if(damage)
-			delete damage;
-	}
-}
 
 void AActor::AddInventory(AInventory *item)
 {
@@ -224,8 +215,11 @@ void AActor::Die()
 	if(flags & FL_MISSILE)
 		flags &= ~FL_MISSILE;
 
-	if(dropitems)
+	int dropitemsIndex = GetClass()->Meta.GetMetaInt(AMETA_DropItems, -1);
+	if(dropitemsIndex >= 0)
 	{
+		DropList *dropitems = dropItems[dropitemsIndex];
+
 		DropList::Node *item = dropitems->Head();
 		DropItem *bestDrop = NULL; // For FL_DROPBASEDONTARGET
 		do
@@ -297,6 +291,11 @@ AInventory *AActor::FindInventory(const ClassDef *cls)
 const Frame *AActor::FindState(const FName &name) const
 {
 	return GetClass()->FindState(name);
+}
+
+int AActor::GetDamage()
+{
+	return damageExpressions[GetClass()->Meta.GetMetaInt(AMETA_Damage, -1)]->Evaluate(this).GetInt();
 }
 
 const AActor *AActor::GetDefault() const

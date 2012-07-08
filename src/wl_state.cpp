@@ -6,7 +6,7 @@
 #include "id_us.h"
 #include "m_random.h"
 #include "actor.h"
-#include "thingdef/thingdef_expression.h"
+#include "thingdef/thingdef.h"
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_play.h"
@@ -614,8 +614,8 @@ void MoveObj (AActor *ob, int32_t move)
 		if (ob->hidden || abs(ob->x - players[0].mo->x) > r || abs(ob->y - players[0].mo->y) > r)
 			goto moveok;
 
-		if (ob->damage)
-			TakeDamage (ob->damage->Evaluate(ob).GetInt(), ob);
+		if (ob->GetClass()->Meta.GetMetaInt(AMETA_Damage) >= 0)
+			TakeDamage (ob->GetDamage(), ob);
 
 		//
 		// back up

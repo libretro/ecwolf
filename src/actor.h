@@ -119,6 +119,45 @@ class Frame
 };
 FArchive &operator<< (FArchive &arc, const Frame *&frame);
 
+// This class allows us to store pointers into the meta table and ensures that
+// the pointers get deleted when the game exits.
+template<class T>
+class PointerIndexTable
+{
+public:
+	~PointerIndexTable()
+	{
+		Clear();
+	}
+
+	void Clear()
+	{
+		for(unsigned int i = 0;i < objects.Size();++i)
+			delete objects[i];
+		objects.Clear();
+	}
+
+	unsigned int Push(T *object)
+	{
+		return objects.Push(object);
+	}
+
+	T *operator[] (unsigned int index)
+	{
+		return objects[index];
+	}
+private:
+	TArray<T*>	objects;
+};
+
+enum
+{
+	AMETA_BASE = 0x12000,
+
+	AMETA_Damage,
+	AMETA_DropItems
+};
+
 class player_t;
 class AActorProxy;
 class ClassDef;
@@ -138,8 +177,6 @@ class AActor : public DObject
 		};
 		typedef LinkedList<DropItem> DropList;
 
-		virtual ~AActor();
-
 		void			AddInventory(AInventory *item);
 		Thinker			*GetThinker();
 		virtual void	Destroy();
@@ -147,6 +184,7 @@ class AActor : public DObject
 		void			EnterZone(const MapZone *zone);
 		AInventory		*FindInventory(const ClassDef *cls);
 		const Frame		*FindState(const FName &name) const;
+		int				GetDamage();
 		const AActor	*GetDefault() const;
 		const MapZone	*GetZone() const { return soundZone; }
 		void			RemoveFromWorld();
@@ -156,6 +194,9 @@ class AActor : public DObject
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
+
+		static PointerIndexTable<ExpressionNode> damageExpressions;
+		static PointerIndexTable<DropList> dropItems;
 
 		// Basic properties from objtype
 		flagstype_t flags;
@@ -199,7 +240,6 @@ class AActor : public DObject
 		int32_t	speed, runspeed;
 		int		points;
 		fixed	radius;
-		ExpressionNode *damage;
 
 		short       ticcount;
 		const Frame	*state;
@@ -220,8 +260,6 @@ class AActor : public DObject
 		player_t	*player;	// Only valid with APlayerPawn
 
 		TObjPtr<AInventory>	inventory;
-
-		DropList	*dropitems;
 
 		typedef LinkedList<AActor *>::Node Iterator;
 		static LinkedList<AActor *>	actors;
