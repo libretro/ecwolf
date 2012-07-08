@@ -135,9 +135,22 @@ bool ProjectileTryMove (AActor *ob)
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
+			const bool checkLines[4] =
+			{
+				(ob->x+ob->radius) > ((x+1)<<TILESHIFT),
+				(ob->y-ob->radius) < (y<<TILESHIFT),
+				(ob->x-ob->radius) < (x<<TILESHIFT),
+				(ob->y+ob->radius) > ((y+1)<<TILESHIFT)
+			};
 			check = map->GetSpot(x, y, 0);
 			if (check->tile)
-				return false;
+			{
+				for(unsigned short i = 0;i < 4;++i)
+				{
+					if(check->slideAmount[i] != 0xFFFF && checkLines[i])
+						return false;
+				}
+			}
 		}
 
 	return true;
