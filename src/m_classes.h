@@ -39,7 +39,6 @@ class MenuItem
 		FTexture	*picture;
 		int			pictureX;
 		int			pictureY;
-		bool		selected;
 		char		string[36];
 		bool		visible;
 		const Menu	*menu;
@@ -55,14 +54,13 @@ class MenuItem
 		const char	*getString() const { return string; }
 		bool		isEnabled() const { return enabled && visible; }
 		bool		isHighlighted() const { return highlight; }
-		bool		isSelected() const { return selected; }
+		bool		isSelected() const;
 		bool		isVisible() const { return visible; }
 		void		setActivateListener(MENU_LISTENER_PROTOTYPE(activateListener)) { this->activateListener = activateListener; }
 		void		setEnabled(bool enabled=true) { this->enabled = enabled; }
 		void		setHighlighted(int highlight=1) { this->highlight = highlight; }
 		void		setMenu(const Menu *menu) { this->menu = menu; }
 		void		setPicture(const char* picture, int x=-1, int y=-1);
-		void		setSelected(bool selected=true) {this->selected = selected; }
 		void		setText(const char string[36]);
 		void		setVisible(bool visible=true) { this->visible = visible; }
 
@@ -183,6 +181,7 @@ class Menu
 {
 	protected:
 		MENU_LISTENER_PROTOTYPE(entryListener);
+		bool				animating;
 		static bool			close;
 		bool				controlHeaders;
 		int					curPos;
@@ -201,7 +200,6 @@ class Menu
 
 		static FTexture			*cursor;
 
-		void	drawGun(int x, int &y, int basey);
 		void	drawGunHalfStep(int x, int y);
 		void	eraseGun(int x, int y);
 
@@ -228,6 +226,7 @@ class Menu
 		int				getWidth() const { return w; }
 		int				getX() const { return x; }
 		int				getY() const { return y; }
+		bool			isAnimating() const { return animating; }
 		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : ((unsigned)position >= items.Size() ? items.Size()-1 : position); }
 		void			setHeadPicture(const char* picture);
 		void			setHeadText(const char text[36], bool drawInStripes=false);
