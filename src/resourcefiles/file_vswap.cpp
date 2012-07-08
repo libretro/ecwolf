@@ -88,7 +88,10 @@ struct FVSwapSound : public FResourceLump
 			for(unsigned int i = 0;i < numChunks;i++)
 				numOrigSamples += chunks[i].length;
 
-			LumpSize += double(numOrigSamples*2*param_samplerate)/ORIGSAMPLERATE;
+			if(numOrigSamples == 0)
+				LumpSize = 0;
+			else
+				LumpSize += double(numOrigSamples*2*param_samplerate)/ORIGSAMPLERATE;
 		}
 
 		int FillCache()
@@ -96,6 +99,8 @@ struct FVSwapSound : public FResourceLump
 			const unsigned int samples = (LumpSize - sizeof(WAV_HEADER))/2;
 
 			Cache = new char[LumpSize];
+			if(LumpSize == 0)
+				return 1;
 
 			// Copy our template header and update various values
 			memcpy(Cache, WAV_HEADER, sizeof(WAV_HEADER));
