@@ -312,39 +312,6 @@ void DrawPlayBorderSides(void)
 		VWB_Clear(bordercol-scaleFactor, 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+scaleFactor);
 }
 
-
-/*
-===================
-=
-= DrawStatusBorder
-=
-===================
-*/
-
-void DrawStatusBorder (byte color)
-{
-	int statusborderw = (screenWidth-scaleFactor*320)/2;
-
-	VWB_BarScaledCoord (0,0,screenWidth,screenHeight-scaleFactor*(STATUSLINES-3),color);
-	VWB_BarScaledCoord (0,screenHeight-scaleFactor*(STATUSLINES-3),
-		statusborderw+scaleFactor*8,scaleFactor*(STATUSLINES-4),color);
-	VWB_BarScaledCoord (0,screenHeight-scaleFactor*2,screenWidth,scaleFactor*2,color);
-	VWB_BarScaledCoord (screenWidth-statusborderw-scaleFactor*8, screenHeight-scaleFactor*(STATUSLINES-3),
-		statusborderw+scaleFactor*8,scaleFactor*(STATUSLINES-4),color);
-
-	VWB_BarScaledCoord (statusborderw+scaleFactor*9, screenHeight-scaleFactor*3,
-		scaleFactor*97, scaleFactor*1, color-1);
-	VWB_BarScaledCoord (statusborderw+scaleFactor*106, screenHeight-scaleFactor*3,
-		scaleFactor*161, scaleFactor*1, color-2);
-	VWB_BarScaledCoord (statusborderw+scaleFactor*267, screenHeight-scaleFactor*3,
-		scaleFactor*44, scaleFactor*1, color-3);
-	VWB_BarScaledCoord (screenWidth-statusborderw-scaleFactor*9, screenHeight-scaleFactor*(STATUSLINES-4),
-		scaleFactor*1, scaleFactor*20, color-2);
-	VWB_BarScaledCoord (screenWidth-statusborderw-scaleFactor*9, screenHeight-scaleFactor*(STATUSLINES/2-4),
-		scaleFactor*1, scaleFactor*14, color-3);
-}
-
-
 /*
 ===================
 =
@@ -355,18 +322,20 @@ void DrawStatusBorder (byte color)
 
 void DrawPlayBorder (void)
 {
+	FTexture *borderTex = TexMan(levelInfo->GetBorderTexture());
+
 	//TODO Highlight of bordercol-3 in lower left.
-	VWB_Clear(bordercol, 0, 0, screenWidth, viewscreeny);
-	VWB_Clear(bordercol, 0, viewscreeny, viewscreenx, viewheight + viewscreeny);
-	VWB_Clear(bordercol, viewwidth + viewscreenx, viewscreeny, screenWidth, viewheight + viewscreeny);
-	VWB_Clear(bordercol, 0, viewscreeny + viewheight, screenWidth, statusbary);
+	VWB_DrawFill(borderTex, 0, 0, screenWidth, viewscreeny);
+	VWB_DrawFill(borderTex, 0, viewscreeny, viewscreenx, viewheight + viewscreeny);
+	VWB_DrawFill(borderTex, viewwidth + viewscreenx, viewscreeny, screenWidth, viewheight + viewscreeny);
+	VWB_DrawFill(borderTex, 0, viewscreeny + viewheight, screenWidth, statusbary);
 	if(statusbarx)
 	{
-		VWB_Clear(bordercol, 0, statusbary, statusbarx, screenHeight);
-		VWB_Clear(bordercol, screenWidth-statusbarx, statusbary, screenWidth, screenHeight);
+		VWB_DrawFill(borderTex, 0, statusbary, statusbarx, screenHeight);
+		VWB_DrawFill(borderTex, screenWidth-statusbarx, statusbary, screenWidth, screenHeight);
 	}
 	// Complete border
-	VWB_Clear(bordercol, statusbarx, statusbary, screenWidth-statusbarx, screenHeight);
+	VWB_DrawFill(borderTex, statusbarx, statusbary, screenWidth-statusbarx, screenHeight);
 
 	DrawPlayBorderSides();
 }

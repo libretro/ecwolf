@@ -648,10 +648,11 @@ void IntroScreen (void)
 ////////////////////////////////////////////////////////////////////
 void ClearMScreen (void)
 {
-	if(Wads.CheckNumForName("BACKDROP", ns_graphics) == -1)
+	static FTextureID backdropID = TexMan.CheckForTexture("BACKDROP", FTexture::TEX_Any);
+	if(!backdropID.isValid())
 		VWB_Clear (BORDCOLOR, 0, 0, screenWidth, screenHeight);
 	else
-		CA_CacheScreen ("BACKDROP");
+		CA_CacheScreen(TexMan(backdropID), true);
 }
 
 

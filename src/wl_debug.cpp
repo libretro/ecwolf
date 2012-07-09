@@ -230,9 +230,6 @@ int DebugKeys (void)
 
 				bordercol=level*4+3;
 
-				if (bordercol == VIEWCOLOR)
-					DrawStatusBorder(bordercol);
-
 				DrawPlayBorder();
 
 				return 0;

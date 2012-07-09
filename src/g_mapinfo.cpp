@@ -242,11 +242,20 @@ static TArray<LevelInfo> levelInfos;
 
 LevelInfo::LevelInfo() : UseMapInfoName(false)
 {
+	BorderTexture.SetInvalid();
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
 	DeathCam = false;
 	FloorNumber = 1;
 	Par = 0;
+}
+
+FTextureID LevelInfo::GetBorderTexture() const
+{
+	static FTextureID BorderFlat = TexMan.GetTexture(gameinfo.BorderFlat, FTexture::TEX_Flat);
+	if(!BorderTexture.isValid())
+		return BorderFlat;
+	return BorderTexture;
 }
 
 FString LevelInfo::GetName(const GameMap *gm) const
@@ -320,6 +329,12 @@ protected:
 			strncpy(mapInfo.NextSecret, lump.GetChars(), 8);
 			mapInfo.NextSecret[8] = 0;
 		}
+		else if(key.CompareNoCase("bordertexture") == 0)
+		{
+			FString textureName;
+			ParseStringAssignment(textureName);
+			mapInfo.BorderTexture = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
+		}
 		else if(key.CompareNoCase("defaultfloor") == 0)
 		{
 			FString textureName;
@@ -383,7 +398,9 @@ public:
 protected:
 	bool CheckKey(FString key)
 	{
-		if(key.CompareNoCase("creditpage") == 0)
+		if(key.CompareNoCase("borderflat") == 0)
+			ParseStringAssignment(gameinfo.BorderFlat);
+		else if(key.CompareNoCase("creditpage") == 0)
 			ParseStringAssignment(gameinfo.CreditPage);
 		else if(key.CompareNoCase("drawreadthis") == 0)
 			ParseBoolAssignment(gameinfo.DrawReadThis);

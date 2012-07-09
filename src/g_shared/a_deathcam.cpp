@@ -5,6 +5,7 @@
 #include "id_vh.h"
 #include "language.h"
 #include "gamemap.h"
+#include "g_mapinfo.h"
 #include "thingdef/thingdef.h"
 #include "thinker.h"
 #include "wl_act.h"
@@ -79,7 +80,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	double fadew = 320;
 	double fadeh = 200;
 	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
-	VWB_Clear(bordercol, 0, 0, screenWidth, fadey);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, fadey);
 
 	word width, height;
 	VW_MeasurePropString(IntermissionFont, language["STR_SEEAGAIN"], width, height);

@@ -52,6 +52,7 @@ public:
 
 	int		PageTime;
 	int		TitleTime;
+	FString	BorderFlat;
 	FString	CreditPage;
 	FString	GamePalette;
 	FString	TitleMusic;
@@ -84,6 +85,7 @@ class LevelInfo
 {
 public:
 	LevelInfo();
+	FTextureID GetBorderTexture() const;
 	FString GetName(const class GameMap *gm) const;
 
 	char			MapName[9];
@@ -94,6 +96,7 @@ public:
 	unsigned int	Cluster;
 	FString			Translator;
 
+	FTextureID		BorderTexture;
 	FTextureID		DefaultTexture[2];
 	unsigned int	Par;
 

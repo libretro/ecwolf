@@ -10,6 +10,6 @@ extern	class LevelInfo *levelInfo;
 
 void CA_CacheMap (const class FString &mapname);
 
-void CA_CacheScreen (const char* chunk);
+void CA_CacheScreen (class FTexture *tex, bool noaspect=false);
 
 #endif

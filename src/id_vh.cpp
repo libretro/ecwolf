@@ -571,6 +571,34 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 	VL_UnlockSurface(screenBuffer);
 }
 
+void VWB_DrawFill(FTexture *tex, unsigned int ix, unsigned int iy, unsigned int iw, unsigned int ih)
+{
+	byte *vbuf = VL_LockSurface(screenBuffer) + ix + (iy * bufferPitch);
+
+	const unsigned int width = tex->GetWidth();
+	const unsigned int height = tex->GetHeight();
+
+	const BYTE *table = NormalLight.Maps;
+	const BYTE* src;
+	byte* dest = vbuf;
+	unsigned int x, y, sy;
+	for(x = ix;x < iw;++x)
+	{
+		src = tex->GetColumn(x%width, NULL);
+		for(y = iy, sy = iy%height;y < ih;++y)
+		{
+			if(src[sy])
+				*dest = table[src[sy]];
+			sy = (sy+1)%height;
+			dest += bufferPitch;
+		}
+
+		dest = ++vbuf;
+	}
+
+	VL_UnlockSurface(screenBuffer);
+}
+
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
 	byte *vbuf = VL_LockSurface(screenBuffer);
@@ -622,9 +650,8 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 		menu, remap, stencil, stencilcolor);
 }
 
-void CA_CacheScreen(const char* chunk)
+void CA_CacheScreen(FTexture* tex, bool noaspect)
 {
-	FTexture *tex = TexMan(chunk);
 	if(!tex)
 		return;
 
@@ -635,9 +662,19 @@ void CA_CacheScreen(const char* chunk)
 
 	double xd = 0;
 	double yd = 0;
-	double wd = 320;
-	double hd = 200;
-	VirtualToRealCoords(xd, yd, wd, hd, 320, 200, false, true);
+	double wd;
+	double hd;
+	if(noaspect)
+	{
+		wd = screenWidth;
+		hd = screenHeight;
+	}
+	else
+	{
+		wd = 320;
+		hd = 200;
+		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, false, true);
+	}
 
 	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
 	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;

@@ -53,7 +53,7 @@ void
 EndScreen (const char* palette, const char* screen)
 {
 	SDL_Color pal[256];
-	CA_CacheScreen (screen);
+	CA_CacheScreen (TexMan(screen));
 	VW_UpdateScreen ();
 	VL_ConvertPalette(palette, pal, 256);
 	VL_FadeIn (0, 255, pal, 30);
@@ -70,7 +70,7 @@ EndSpear (void)
 
 	EndScreen ("END1PAL", "ENDSCR11");
 
-	CA_CacheScreen ("ENDSCR3");
+	CA_CacheScreen (TexMan("ENDSCR3"));
 	VW_UpdateScreen ();
 	VL_ConvertPalette("END3PAL", pal, 256);
 	VL_FadeIn (0, 255, pal, 30);
@@ -151,11 +151,8 @@ void Victory (void)
 #endif
 
 	StartCPMusic ("URAHERO");
-	VWB_Clear(VIEWCOLOR, 0, 0, screenWidth, screenHeight);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
 	DrawPlayScreen(true);
-
-	if (bordercol != VIEWCOLOR)
-		DrawStatusBorder (VIEWCOLOR);
 
 #ifdef JAPAN
 #ifndef JAPDEMO
@@ -335,11 +332,8 @@ LevelCompleted (void)
 	int32_t bonus, timeleft = 0;
 
 	ClearSplitVWB ();           // set up for double buffering in split screen
-	VWB_Clear(VIEWCOLOR, 0, 0, screenWidth, screenHeight);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
 	DrawPlayScreen(true);
-
-	if (bordercol != VIEWCOLOR)
-		DrawStatusBorder (VIEWCOLOR);
 
 	StartCPMusic (gameinfo.IntermissionMusic);
 
@@ -725,7 +719,7 @@ void PreloadGraphics (void)
 {
 	ClearSplitVWB ();           // set up for double buffering in split screen
 
-	VWB_Clear(bordercol, 0, 0, screenWidth, screenHeight);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
 	ShowActStatus();
 	VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
 

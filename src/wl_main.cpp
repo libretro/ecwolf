@@ -310,7 +310,7 @@ void CalcProjection (int32_t focal)
 void SignonScreen (void)                        // VGA version
 {
 	VL_SetVGAPlaneMode ();
-	CA_CacheScreen(gameinfo.SignonLump);
+	CA_CacheScreen(TexMan(gameinfo.SignonLump));
 }
 
 //===========================================================================
@@ -773,7 +773,7 @@ static void DemoLoop()
 			if(useTitlePalette)
 				VL_ConvertPalette(gameinfo.TitlePalette, pal);
 
-			CA_CacheScreen(gameinfo.TitlePage);
+			CA_CacheScreen(TexMan(gameinfo.TitlePage));
 			VW_UpdateScreen ();
 			if(useTitlePalette)
 				VL_FadeIn(0,255,pal,30);
@@ -785,7 +785,7 @@ static void DemoLoop()
 //
 // credits page
 //
-			CA_CacheScreen (gameinfo.CreditPage);
+			CA_CacheScreen (TexMan(gameinfo.CreditPage));
 			VW_UpdateScreen();
 			VW_FadeIn ();
 			if (IN_UserInput(TickBase*gameinfo.PageTime))
