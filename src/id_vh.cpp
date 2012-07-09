@@ -25,10 +25,6 @@ void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation
 	int tmp1, tmp2;
 	int cx = px, cy = py;
 
-	byte *vbuf = VL_LockSurface(curSurface);
-	if(vbuf == NULL) return;
-
-	dest = vbuf + (cy * curPitch + cx);
 	height = font->GetHeight();
 	FRemapTable *remap = font->GetColorTranslation(translation);
 
@@ -46,8 +42,6 @@ void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation
 			VWB_DrawGraphic(source, cx, cy, (MenuOffset)pa, remap, stencil, stencilcolor);
 		cx += width;
 	}
-
-	VL_UnlockSurface(curSurface);
 }
 
 // Prints a string with word wrapping

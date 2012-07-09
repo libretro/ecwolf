@@ -1316,10 +1316,20 @@ void    ThreeDRefresh (void)
 	{
 		if (fpscounter)
 		{
-			PrintX=4; PrintY=1;
-			VWB_Bar(0,0,50,10,bordercol);
-			US_PrintSigned(fps);
-			US_Print(SmallFont, " fps");
+			FString fpsDisplay;
+			fpsDisplay.Format("%2u fps", fps);
+
+			word x = 0;
+			word y = 0;
+			word width, height;
+			VW_MeasurePropString(ConFont, fpsDisplay, width, height);
+			MenuToRealCoords(x, y, width, height, MENU_TOP);
+			VWB_Clear(0, x, y, x+width+1, y+height+1);
+			px = 0;
+			py = 0;
+			pa = MENU_TOP;
+			VWB_DrawPropString(ConFont, fpsDisplay, CR_WHITE);
+			pa = MENU_CENTER;
 		}
 		SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 		SDL_Flip(screen);
