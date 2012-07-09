@@ -33,7 +33,7 @@
 
 extern int	lastgamemusicoffset;
 EpisodeInfo	*episode = 0;
-int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE;
+int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG;
 static MenuItem	*readThis;
 
 MENU_LISTENER(EnterControlBase);
@@ -221,6 +221,7 @@ void CreateMenus()
 	BORD3COLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[2]), GPART(gameinfo.MenuColors[2]), BPART(gameinfo.MenuColors[2]));
 	BKGDCOLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[3]), GPART(gameinfo.MenuColors[3]), BPART(gameinfo.MenuColors[3]));
 	STRIPE = ColorMatcher.Pick(RPART(gameinfo.MenuColors[4]), GPART(gameinfo.MenuColors[4]), BPART(gameinfo.MenuColors[4]));
+	STRIPEBG = ColorMatcher.Pick(RPART(gameinfo.MenuColors[5]), GPART(gameinfo.MenuColors[5]), BPART(gameinfo.MenuColors[5]));
 
 	// Actually initialize the menus
 	GameSave::InitMenus();
@@ -984,7 +985,7 @@ void DrawStripes (int y)
 		MenuToRealCoords(dummyx, ly, dummyw, lh, MENU_TOP);
 	}
 
-	VWB_Clear(0, 0, sy, screenWidth, sy+sh);
+	VWB_Clear(STRIPEBG, 0, sy, screenWidth, sy+sh);
 	VWB_Clear(STRIPE, 0, ly, screenWidth, ly+lh);
 }
 

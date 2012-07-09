@@ -414,8 +414,8 @@ protected:
 		else if(key.CompareNoCase("menufade") == 0)
 			ParseColorAssignment(gameinfo.MenuFadeColor);
 		else if(key.CompareNoCase("menucolors") == 0)
-			// Border1, Border2, Border3, Background, Stripe
-			ParseColorArrayAssignment(gameinfo.MenuColors, 5);
+			// Border1, Border2, Border3, Background, Stripe, StripeBG
+			ParseColorArrayAssignment(gameinfo.MenuColors, 6);
 		else if(key.CompareNoCase("titlemusic") == 0)
 			ParseStringAssignment(gameinfo.TitleMusic);
 		else if(key.CompareNoCase("titlepalette") == 0)
