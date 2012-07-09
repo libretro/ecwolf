@@ -1324,7 +1324,7 @@ void    ThreeDRefresh (void)
 			word width, height;
 			VW_MeasurePropString(ConFont, fpsDisplay, width, height);
 			MenuToRealCoords(x, y, width, height, MENU_TOP);
-			VWB_Clear(0, x, y, x+width+1, y+height+1);
+			VWB_Clear(GPalette.BlackIndex, x, y, x+width+1, y+height+1);
 			px = 0;
 			py = 0;
 			pa = MENU_TOP;

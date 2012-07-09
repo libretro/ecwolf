@@ -649,7 +649,9 @@ void CA_CacheScreen(FTexture* tex, bool noaspect)
 	if(!tex)
 		return;
 
-	VWB_Clear(0, 0, 0, screenWidth, screenHeight);
+	if(!noaspect)
+		VWB_Clear(GPalette.BlackIndex, 0, 0, screenWidth, screenHeight);
+
 	byte *vbuf = VL_LockSurface(curSurface);
 	if(!vbuf)
 		return;
