@@ -57,6 +57,7 @@ namespace IWad
 		TArray<FString> Ident;
 	};
 
+	const IWadData &GetGame();
 	void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad);
 }
 

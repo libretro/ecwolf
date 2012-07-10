@@ -39,6 +39,7 @@
 #include "tarray.h"
 #include "scanner.h"
 #include "w_wad.h"
+#include "wl_iwad.h"
 #include "v_video.h"
 #include "thingdef/thingdef.h"
 
@@ -653,7 +654,7 @@ void G_ParseMapInfo(bool gameinfoPass)
 	int lastlump = 0;
 	int lump;
 
-	if((lump = Wads.GetNumForFullName("mapinfo/wolf3d.txt")) != -1)
+	if((lump = Wads.GetNumForFullName(IWad::GetGame().Mapinfo)) != -1)
 		ParseMapInfoLump(lump, gameinfoPass);
 
 	while((lump = Wads.FindLump("MAPINFO", &lastlump)) != -1)

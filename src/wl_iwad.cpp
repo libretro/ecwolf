@@ -55,6 +55,7 @@ namespace IWad {
 #endif
 
 static TArray<IWadData> iwadTypes;
+static const IWadData *selectedGame;
 
 static bool SplitFilename(const FString &filename, FString &name, FString &extension)
 {
@@ -110,6 +111,11 @@ static int CheckData(WadStuff &wad)
 	}
 	delete[] valid;
 	return wad.Type;
+}
+
+const IWadData &GetGame()
+{
+	return *selectedGame;
 }
 
 enum
@@ -328,6 +334,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	config->GetSetting("DefaultIWad")->SetValue(pick);
 
 	WadStuff &base = basefiles[pick];
+	selectedGame = &iwadTypes[base.Type];
 
 	wadfiles.Push("ecwolf.pk3");
 	for(unsigned int i = 0;i < base.Path.Size();++i)
