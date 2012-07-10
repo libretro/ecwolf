@@ -11,8 +11,6 @@
 int I_PickIWad_Cocoa (WadStuff *wads, int numwads, bool showwin, int defaultiwad);
 #endif
 
-static bool queryiwad = false;
-
 #ifndef NO_GTK
 extern bool GtkAvailable;
 

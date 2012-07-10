@@ -33,6 +33,7 @@
 */
 
 #include "resourcefiles/resourcefile.h"
+#include "config.h"
 #include "file.h"
 #include "lumpremap.h"
 #include "scanner.h"
@@ -40,6 +41,8 @@
 #include "w_wad.h"
 #include "wl_iwad.h"
 #include "zstring.h"
+
+static bool queryiwad = true;
 
 #include "wl_iwad_picker.cpp"
 
@@ -272,6 +275,11 @@ static void ParseIWadInfo(FResourceFile *res)
 
 void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad)
 {
+	config->CreateSetting("DefaultIWad", 0);
+	config->CreateSetting("ShowIWadPicker", 1);
+	bool showPicker = config->GetSetting("ShowIWadPicker")->GetInteger() != 0;
+	int defaultIWad = config->GetSetting("DefaultIWad")->GetInteger();
+
 	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL, true);
 	if(!datawadRes)
 		I_Error("Could not open %s!", datawad);
@@ -307,12 +315,17 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	if(pick < 0)
 	{
 		if(basefiles.Size() > 1)
-			pick = I_PickIWad(&basefiles[0], basefiles.Size(), true, 0);
+		{
+			pick = I_PickIWad(&basefiles[0], basefiles.Size(), showPicker, defaultIWad);
+			config->GetSetting("ShowIWadPicker")->SetValue(queryiwad);
+		}
 		else
 			pick = 0;
 	}
 	if(pick < 0)
 		Quit("");
+
+	config->GetSetting("DefaultIWad")->SetValue(pick);
 
 	WadStuff &base = basefiles[pick];
 
