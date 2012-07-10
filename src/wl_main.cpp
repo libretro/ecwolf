@@ -725,6 +725,7 @@ static void DemoLoop()
 	if (!param_nowait)
 		PG13 ();
 
+	bool reloadPalette = false;
 	while (1)
 	{
 		while (!param_nowait)
@@ -735,17 +736,22 @@ static void DemoLoop()
 			bool useTitlePalette = !gameinfo.TitlePalette.IsEmpty();
 			SDL_Color pal[256];
 			if(useTitlePalette)
-				VL_ConvertPalette(gameinfo.TitlePalette, pal);
+			{
+				reloadPalette = true;
+				InitPalette(gameinfo.TitlePalette);
+			}
 
 			CA_CacheScreen(TexMan(gameinfo.TitlePage));
 			VW_UpdateScreen ();
-			if(useTitlePalette)
-				VL_FadeIn(0,255,pal,30);
-			else
-				VW_FadeIn();
+			VW_FadeIn();
 			if (IN_UserInput(TickBase*gameinfo.TitleTime))
 				break;
 			VW_FadeOut();
+			if(useTitlePalette)
+			{
+				InitPalette(gameinfo.GamePalette);
+				reloadPalette = false;
+			}
 //
 // credits page
 //
@@ -800,6 +806,11 @@ static void DemoLoop()
 		}
 
 		VW_FadeOut ();
+		if(reloadPalette)
+		{
+			InitPalette(gameinfo.GamePalette);
+			reloadPalette = false;
+		}
 
 		if (Keyboard[sc_Tab])
 			RecordDemo ();

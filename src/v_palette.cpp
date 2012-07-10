@@ -156,9 +156,20 @@ FPalette::FPalette (const BYTE *colors)
 
 void FPalette::SetPalette (const BYTE *colors)
 {
+	// [BL] First check for Wolf style palette (all colors <= 63)
+	double factor = 255.0/63.0;
+	for (int i = 0; i < 768; i++)
+	{
+		if(colors[i] > 63)
+		{
+			factor = 1.0;
+			break;
+		}
+	}
+
 	for (int i = 0; i < 256; i++, colors += 3)
 	{
-		BaseColors[i] = PalEntry (colors[0], colors[1], colors[2]);
+		BaseColors[i] = PalEntry ((BYTE)(colors[0]*factor), (BYTE)(colors[1]*factor), (BYTE)(colors[2]*factor));
 		Remap[i] = i;
 	}
 

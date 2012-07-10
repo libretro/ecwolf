@@ -59,8 +59,8 @@ doortile 5, "DOOR2_1", "DOOR2_2", "SLOT1_1", "SLOT1_2"
 
 graphic optional "TITLESOD", 320, 200
 {
-	patch "TITLE1", 0, 0
-	patch "TITLE2", 0, 80
+	graphic "TITLE1", 0, 0
+	graphic "TITLE2", 0, 80
 }
 
 graphic optional "HEALPIC", 88, 16

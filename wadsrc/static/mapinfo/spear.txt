@@ -3,12 +3,12 @@ gameinfo
 	signon = "SODSGNON"
 	signoncolors = "FC FC 54", "40 40 00", "40 40 00", "40 40 00"
 	menufade = "00 00 CE"
-	menucolors = "00 00 88", "00 00 D4", "00 00 7D", "00 00 58", "00 00 64"
+	menucolors = "00 00 88", "00 00 D4", "00 00 7D", "00 00 58", "00 00 64", "00 00 00"
 	titlemusic = "XTOWER2"
 	menumusic = "WONDERIN"
 	scoresmusic = "XAWARD"
 	finalemusic = "CORNER"
-	itermissionmusic = "ENDLEVEL"
+	intermissionmusic = "ENDLEVEL"
 	drawreadthis = false
 	gamepalette = "SPEARPAL"
 	titlepalette = "TITLEPAL"
@@ -16,12 +16,24 @@ gameinfo
 	titletime = 15
 	creditpage = "CREDITS"
 	pagetime = 10
+	menufontcolor_title = "Gold"
+	menufontcolor_label = "DarkGrey"
+	menufontcolor_selection = "Grey"
+	menufontcolor_disabled = "DarkBlue"
+	menufontcolor_invalid = "DarkGreen"
+	menufontcolor_invalidselection = "Green"
+	menufontcolor_highlight = "Yellow"
+	menufontcolor_highlightselection = "Gold"
+	highscoresfontcolor = "White"
+	pageindexfontcolor = "DarkYellow"
+	borderflat = "#004040"
 }
 
 defaultmap
 {
 	defaultfloor = "#717171"
 	defaultceiling = "#383838"
+	translator = "xlat/wolf3d.txt"
 }
 
 map "MAP01"

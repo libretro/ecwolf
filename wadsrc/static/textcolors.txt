@@ -179,6 +179,16 @@ Flat:
 	#700000
 }
 
+DarkBlue "Dark Blue"
+{
+	#00002B  #2B2BAF
+Console:
+	#000000  #000073    0 127
+	#800000  #DCDCFF  128 255
+Flat:
+	#000070
+}
+
 DarkBrown "Dark Brown"
 {
 	#1F170B  #A36B3F
