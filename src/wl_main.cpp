@@ -34,6 +34,7 @@
 #include "g_mapinfo.h"
 #include "wl_draw.h"
 #include "wl_inter.h"
+#include "wl_iwad.h"
 #include "wl_play.h"
 #include "wl_game.h"
 #include "dobject.h"
@@ -110,20 +111,6 @@ int     param_joystickhat = -1;
 int     param_samplerate = 44100;
 int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 
-int     param_mission = 1;
-
-/*
-=============================================================================
-
-							LOCAL VARIABLES
-
-=============================================================================
-*/
-
-
-
-
-
 //===========================================================================
 
 /*
@@ -147,29 +134,6 @@ void NewGame (int difficulty, const FString &map)
 	players[0].state = player_t::PST_ENTER;
 
 	startgame = true;
-}
-
-//===========================================================================
-
-void DiskFlopAnim(int x,int y)
-{
-	static int8_t which=0;
-	if (!x && !y)
-		return;
-	VWB_DrawPic(x,y,which == 0 ? "M_LDING1" : "M_LDING2");
-	VW_UpdateScreen();
-	which^=1;
-}
-
-
-int32_t DoChecksum(byte *source,unsigned size,int32_t checksum)
-{
-	unsigned i;
-
-	for (i=0;i<size-1;i++)
-	checksum += source[i]^source[i+1];
-
-	return checksum;
 }
 
 //===========================================================================
@@ -925,9 +889,9 @@ Aspect CheckRatio (int width, int height)//, int *trueratio)
 
 #define IFARG(str) if(!strcmp(arg, (str)))
 
-FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
+static const char* CheckParameters(int argc, char *argv[], TArray<FString> &files)
 {
-	FString extension = "wl6";
+	const char* extension = NULL;
 	bool hasError = false, showHelp = false;
 	bool sampleRateGiven = false, audioBufferGiven = false;
 	int defaultSampleRate = param_samplerate;
@@ -1080,15 +1044,6 @@ FString CheckParameters(int argc, char *argv[], TArray<FString> &files)
 			else param_audiobuffer = atoi(argv[i]);
 			audioBufferGiven = true;
 		}
-		else IFARG("--mission")
-		{
-			if(++i >= argc)
-			{
-				printf("The mission option is missing the mission argument!\n");
-				hasError = true;
-			}
-			else param_mission = atoi(argv[i]);
-		}
 		else IFARG("--help")
 			showHelp = true;
 		else IFARG("--data")
@@ -1231,8 +1186,16 @@ void CallTerminateFunctions()
 		TermFuncs[--NumTerms]();
 }
 
+#ifndef NO_GTK
+#include <gtk/gtk.h>
+bool GtkAvailable;
+#endif
 int main (int argc, char *argv[])
 {
+#ifndef NO_GTK
+	GtkAvailable = gtk_init_check(&argc, &argv);
+#endif
+
 	Scanner::SetMessageHandler(ScannerMessageHandler);
 	atexit(CallTerminateFunctions);
 
@@ -1243,16 +1206,11 @@ int main (int argc, char *argv[])
 		ReadConfig();
 
 		{
-			FString extension;
 			TArray<FString> wadfiles, files;
-			files.Push("ecwolf.pk3");
 
-			extension = CheckParameters(argc, argv, wadfiles);
+			const char* extension = CheckParameters(argc, argv, wadfiles);
+			IWad::SelectGame(files, extension, "ecwolf.pk3");
 
-			files.Push(FString("audiot.") + extension);
-			files.Push(FString("gamemaps.") + extension);
-			files.Push(FString("vgagraph.") + extension);
-			files.Push(FString("vswap.") + extension);
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
 				files.Push(wadfiles[i]);
 

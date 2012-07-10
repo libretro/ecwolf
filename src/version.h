@@ -1,6 +1,10 @@
 #ifndef _VERSION_H_
 #define _VERSION_H_
 
+#define GAMESIG "ECWOLF"
+#define DOTVERSIONSTR_NOREV "0.9999"
+#define DOTVERSIONSTR DOTVERSIONSTR_NOREV
+
 #ifndef VERSIONALREADYCHOSEN              // used for batch compiling
 
 /* Defines used for different versions */

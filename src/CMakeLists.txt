@@ -3,6 +3,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 include(CheckFunctionExists)
+include(FindPkgConfig)
 
 include_directories(
 	${ECWolf_SOURCE_DIR}/src
@@ -39,12 +40,33 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 endif(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 
 if(WIN32)
+	set(NO_GTK ON)
+	set(GTK2_LIBRARIES)
 	add_definitions(-DWINDOWS -DNO_STDIO_REDIRECT)
 
 	set(EXTRA_FILES
 		sdl_winmain.cpp
 	)
+else(WIN32)
+	option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
+
+	# Use GTK+ for the IWAD picker, if available.
+	if( NOT NO_GTK )
+		pkg_check_modules( GTK2 gtk+-2.0 )
+		if( GTK2_FOUND )
+			set( ZDOOM_LIBS ${ZDOOM_LIBS} ${GTK2_LIBRARIES} )
+			include_directories( ${GTK2_INCLUDE_DIRS} )
+		else( GTK2_FOUND )
+			set( NO_GTK ON )
+		endif( GTK2_FOUND )
+	else( NOT NO_GTK)
+		set(GTK2_LIBRARIES)
+	endif( NOT NO_GTK )
 endif(WIN32)
+
+if(NO_GTK)
+	add_definitions(-DNO_GTK=1)
+endif(NO_GTK)
 
 if(APPLE)
 	set(EXTRA_FILES
@@ -147,6 +169,7 @@ add_executable(ecwolf #WIN32
 	wl_floorceiling.cpp
 	wl_game.cpp
 	wl_inter.cpp
+	wl_iwad.cpp
 	wl_loadsave.cpp
 	wl_main.cpp
 	wl_menu.cpp
@@ -161,5 +184,5 @@ add_executable(ecwolf #WIN32
 )
 
 add_dependencies(ecwolf lzma gdtoa)
-target_link_libraries(ecwolf ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
+target_link_libraries(ecwolf ${GTK2_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
 set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})

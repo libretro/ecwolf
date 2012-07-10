@@ -38,10 +38,9 @@
 #include "scanner.h"
 
 static TMap<FName, LumpRemapper> remaps;
-static TMap<int, FName> vgaReverseMap;
 static TArray<FString> psprites;
 
-LumpRemapper::LumpRemapper(const char* extension) : mapLumpName(extension)
+LumpRemapper::LumpRemapper(const char* extension) : loaded(false), mapLumpName(extension)
 {
 	mapLumpName.ToUpper();
 	mapLumpName += "MAP";
@@ -66,11 +65,6 @@ void LumpRemapper::AddFile(FResourceFile *file, Type type)
 	rFile.file = file;
 	rFile.type = type;
 	files.Push(rFile);
-}
-
-const char* LumpRemapper::ConvertVGAIndexToLump(int num)
-{
-	return vgaReverseMap[num];
 }
 
 void LumpRemapper::DoRemap()
@@ -147,6 +141,9 @@ bool LumpRemapper::IsPSprite(int lumpnum)
 
 bool LumpRemapper::LoadMap()
 {
+	if(loaded)
+		return true;
+
 	int lump = Wads.GetNumForName(mapLumpName);
 	if(lump == -1)
 	{
@@ -161,19 +158,50 @@ bool LumpRemapper::LoadMap()
 	sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
 	delete[] mapData;
 
+	ParseMap(sc);
+
+	loaded = true;
+	return true;
+}
+
+void LumpRemapper::LoadMap(const char* name, const char* data, unsigned int length)
+{
+	if(loaded)
+		return;
+
+	Scanner sc(data, length);
+	sc.SetScriptIdentifier(name);
+
+	ParseMap(sc);
+
+	loaded = true;
+}
+
+void LumpRemapper::LoadMap(const char* extension, const char* name, const char* data, unsigned int length)
+{
+	LumpRemapper *iter = remaps.CheckKey(extension);
+	if(iter == NULL)
+	{
+		LumpRemapper remaper(extension);
+		remaper.LoadMap(name, data, length);
+		remaps.Insert(extension, remaper);
+		return;
+	}
+
+	iter->LoadMap(name, data, length);
+}
+
+void LumpRemapper::ParseMap(Scanner &sc)
+{
 	while(sc.TokensLeft() > 0)
 	{
 		if(!sc.CheckToken(TK_Identifier))
 			sc.ScriptMessage(Scanner::ERROR, "Expected identifier in map.\n");
 
 		bool parseSprites = false;
-		TMap<int, FName> *reverse = NULL;
 		TArray<FString> *map = NULL;
 		if(sc->str.Compare("graphics") == 0)
-		{
-			reverse = &vgaReverseMap;
 			map = &graphics;
-		}
 		else if(sc->str.Compare("sprites") == 0)
 		{
 			parseSprites = true;
@@ -200,8 +228,6 @@ bool LumpRemapper::LoadMap()
 				if(!sc.CheckToken(TK_StringConst))
 					sc.ScriptMessage(Scanner::ERROR, "Expected string constant.\n");
 				const FString spriteName = sc->str;
-				if(reverse != NULL)
-					(*reverse)[i++] = spriteName;
 				map->Push(spriteName);
 				if(parseSprites && sc.CheckToken(':'))
 				{
@@ -218,7 +244,6 @@ bool LumpRemapper::LoadMap()
 			}
 		}
 	}
-	return true;
 }
 
 void LumpRemapper::RemapAll()
@@ -227,6 +252,7 @@ void LumpRemapper::RemapAll()
 	for(TMap<FName, LumpRemapper>::Iterator iter(remaps);iter.NextPair(pair);)
 	{
 		pair->Value.DoRemap();
+		pair->Value.files.Clear();
 	}
 }
 

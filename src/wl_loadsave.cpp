@@ -447,8 +447,6 @@ void SaveScreenshot(FILE *file)
 
 bool Save(const FString &filename, const FString &title)
 {
-#define GAMESIG "ECWOLF"
-
 	FILE *fileh = fopen(filename, "wb");
 
 	if(!quickSaveLoad)

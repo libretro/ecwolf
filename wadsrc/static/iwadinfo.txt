@@ -1,0 +1,27 @@
+IWad
+{
+	Name = "Wolfenstein 3D"
+	Mapinfo = "mapinfo/wolf3d.txt"
+	MustContain = "BJPIC", "MAP22"
+}
+
+IWad
+{
+	Name = "Spear of Destiny"
+	Mapinfo = "mapinfo/spear.txt"
+	MustContain = "BACKDROP", "MAP11"
+}
+
+IWad
+{
+	Name = "Wolfenstein 3D Shareware"
+	Mapinfo = "mapinfo/wolf3d.txt"
+	MustContain = "BJPIC"
+}
+
+IWad
+{
+	Name = "Spear of Destiny Demo"
+	Mapinfo = "mapinfo/spear.txt"
+	MustContain = "BACKDROP"
+}

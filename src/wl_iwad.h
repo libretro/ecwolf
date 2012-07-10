@@ -1,8 +1,8 @@
 /*
-** lumpremap.h
+** wl_iwad.h
 **
 **---------------------------------------------------------------------------
-** Copyright 2011 Braden Obrzut
+** Copyright 2012 Braden Obrzut
 ** All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
@@ -32,47 +32,19 @@
 **
 */
 
-#ifndef __LUMPREMAP_H__
-#define __LUMPREMAP_H__
+#ifndef __WL_IWAD_H__
+#define __WL_IWAD_H__
 
-#include "resourcefiles/resourcefile.h"
-#include "tarray.h"
-#include "zstring.h"
-
-class LumpRemapper
+namespace IWad
 {
-	public:
-		enum Type
-		{
-			AUDIOT,
-			VGAGRAPH,
-			VSWAP
-		};
+	struct IWadData
+	{
+		FString Name;
+		FString Mapinfo;
+		TArray<FString> Ident;
+	};
 
-		LumpRemapper(const char* extension);
-
-		void		AddFile(FResourceFile *file, Type type);
-		void		DoRemap();
-
-		static void	AddFile(const char* extension, FResourceFile *file, Type type);
-		static void	LoadMap(const char* extension, const char* name, const char* data, unsigned int length);
-		static bool	IsPSprite(int lumpnum);
-		static void	RemapAll();
-	protected:
-		bool		LoadMap();
-		void		LoadMap(const char* name, const char* data, unsigned int length);
-		void		ParseMap(class Scanner &sc);
-	private:
-		struct RemapFile
-		{
-			FResourceFile	*file;
-			Type			type;
-		};
-
-		bool				loaded;
-		FString				mapLumpName;
-		TArray<FString>		graphics, sprites, sounds, digitalsounds, music, textures;
-		TArray<RemapFile>	files;
-};
+	void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad);
+}
 
 #endif
