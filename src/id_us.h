@@ -14,6 +14,15 @@
 #define	__DEBUG_UserMgr__
 #endif
 
+typedef struct
+{
+	int x,y;
+} Point;
+typedef struct
+{
+	Point ul,lr;
+} Rect;
+
 //#define	HELPTEXTLINKED
 
 #define	MaxX	320

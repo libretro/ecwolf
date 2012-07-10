@@ -35,6 +35,19 @@
 #ifndef __WL_IWAD_H__
 #define __WL_IWAD_H__
 
+#include "zstring.h"
+
+// For IWad Pickers so not in namespace
+struct WadStuff
+{
+	WadStuff() : Type(0) {}
+
+	TArray<FString> Path;
+	FString Extension;
+	FString Name;
+	int Type;
+};
+
 namespace IWad
 {
 	struct IWadData

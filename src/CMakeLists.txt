@@ -47,6 +47,9 @@ if(WIN32)
 	set(EXTRA_FILES
 		sdl_winmain.cpp
 	)
+elseif(APPLE)
+	set(NO_GTK ON)
+	set(GTK2_LIBRARIES)
 else(WIN32)
 	option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
 
@@ -71,6 +74,7 @@ endif(NO_GTK)
 if(APPLE)
 	set(EXTRA_FILES
 		SDLMain.m
+		wl_iwad_picker_cocoa.mm
 	)
 endif(APPLE)
 

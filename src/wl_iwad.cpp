@@ -41,16 +41,6 @@
 #include "wl_iwad.h"
 #include "zstring.h"
 
-struct WadStuff
-{
-	WadStuff() : Type(0) {}
-
-	TArray<FString> Path;
-	FString Extension;
-	FString Name;
-	int Type;
-};
-
 #include "wl_iwad_picker.cpp"
 
 namespace IWad {

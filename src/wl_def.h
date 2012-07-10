@@ -58,15 +58,6 @@ typedef void * memptr;
 typedef uint32_t uint32;
 typedef uint32_t BITFIELD;
 
-typedef struct
-{
-	int x,y;
-} Point;
-typedef struct
-{
-	Point ul,lr;
-} Rect;
-
 // Screenshot buffer image data types
 enum ESSType
 {

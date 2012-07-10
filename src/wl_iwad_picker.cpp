@@ -7,6 +7,10 @@
 #include <gdk/gdkkeysyms.h>
 #endif
 
+#ifdef __APPLE__
+int I_PickIWad_Cocoa (WadStuff *wads, int numwads, bool showwin, int defaultiwad);
+#endif
+
 static bool queryiwad = false;
 
 #ifndef NO_GTK
@@ -267,9 +271,8 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 	{
 		return I_PickIWad_Gtk (wads, numwads, showwin, defaultiwad);
 	}
-//#elif defined(__APPLE__)
-//	return I_PickIWad_Cocoa (wads, numwads, showwin, defaultiwad);
-//#endif
+#elif defined(__APPLE__)
+	return I_PickIWad_Cocoa (wads, numwads, showwin, defaultiwad);
 #endif
 	
 	printf ("Please select a game wad (or 0 to exit):\n");
