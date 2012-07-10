@@ -166,7 +166,7 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 		for(unsigned int j = 0;j < foundFiles.Size();++j)
 		{
 			#if ISCASEINSENSITIVE
-			if(foundFiles[i].extension.CompareNoCase(extension) == 0)
+			if(foundFiles[j].extension.CompareNoCase(extension) == 0)
 			#else
 			if(foundFiles[j].extension.Compare(extension) == 0)
 			#endif
@@ -315,7 +315,12 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		}
 	}
 	if(pick < 0)
-		pick = I_PickIWad(&basefiles[0], basefiles.Size(), true, 0);
+	{
+		if(basefiles.Size() > 1)
+			pick = I_PickIWad(&basefiles[0], basefiles.Size(), true, 0);
+		else
+			pick = 0;
+	}
 	if(pick < 0)
 		Quit("");
 
