@@ -62,6 +62,7 @@ public:
 	FString	ScoresMusic;
 	FString	FinaleMusic;
 	FString	IntermissionMusic;
+	FString	HighScoresFont;
 
 	enum EFontColors
 	{

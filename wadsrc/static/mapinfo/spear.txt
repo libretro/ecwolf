@@ -24,6 +24,7 @@ gameinfo
 	menufontcolor_invalidselection = "Green"
 	menufontcolor_highlight = "Yellow"
 	menufontcolor_highlightselection = "Gold"
+	highscoresfont = "BigFont"
 	highscoresfontcolor = "White"
 	pageindexfontcolor = "DarkYellow"
 	borderflat = "#004040"

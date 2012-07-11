@@ -734,15 +734,12 @@ void PreloadGraphics (void)
 void
 DrawHighScores (void)
 {
-	char buffer[16];
-#ifndef SPEAR
-	char *str;
-#ifndef UPLOAD
-	char buffer1[5];
-#endif
-#endif
+	FString buffer;
+
 	word i, w, h;
 	HighScore *s;
+
+	FFont *font = V_GetFont(gameinfo.HighScoresFont);
 
 	ClearMScreen ();
 
@@ -755,84 +752,47 @@ DrawHighScores (void)
 	else
 		VWB_DrawGraphic(highscores, 0, 0);
 
-#ifndef SPEAR
 	static FTextureID texName = TexMan.CheckForTexture("M_NAME", FTexture::TEX_Any);
 	static FTextureID texLevel = TexMan.CheckForTexture("M_LEVEL", FTexture::TEX_Any);
 	static FTextureID texScore = TexMan.CheckForTexture("M_SCORE", FTexture::TEX_Any);
 	if(texName.isValid())
-		VWB_DrawGraphic(TexMan(texName), 32, 68);
+		VWB_DrawGraphic(TexMan(texName), 16, 68);
 	if(texLevel.isValid())
-		VWB_DrawGraphic(TexMan(texLevel), 160, 68);
+		VWB_DrawGraphic(TexMan(texLevel), 194 - TexMan(texLevel)->GetScaledWidth()/2, 68);
 	if(texScore.isValid())
-		VWB_DrawGraphic(TexMan(texScore), 224, 68);
-#endif
-
-
-/*#ifndef SPEAR
-	SETFONTCOLOR (15, 0x29);
-#else
-	SETFONTCOLOR (HIGHLIGHT, 0x29);
-#endif*/
+		VWB_DrawGraphic(TexMan(texScore), 240, 68);
 
 	for (i = 0, s = Scores; i < MaxScores; i++, s++)
 	{
-		PrintY = 76 + (16 * i);
+		PrintY = 76 + ((font->GetHeight() + 3) * i);
 
 		//
 		// name
 		//
-#ifndef SPEAR
-		PrintX = 4 * 8;
-#else
 		PrintX = 16;
-#endif
-		US_Print (SmallFont, s->name, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (font, s->name, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 		//
 		// level
 		//
-		itoa (s->completed, buffer, 10);
-#ifndef SPEAR
-		for (str = buffer; *str; str++)
-			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		VW_MeasurePropString (BigFont, buffer, w, h);
-		PrintX = (22 * 8) - w;
-#else
-		VW_MeasurePropString (BigFont, buffer, w, h);
+		buffer.Format("%d", s->completed);
+		VW_MeasurePropString (font, buffer, w, h);
 		PrintX = 194 - w;
-#endif
-
-#ifndef UPLOAD
-#ifndef SPEAR
-		PrintX -= 6;
-		itoa (s->episode + 1, buffer1, 10);
-		US_Print (SmallFont, "E", gameinfo.FontColors[GameInfo::HIGHSCORES]);
-		US_Print (SmallFont, buffer1, gameinfo.FontColors[GameInfo::HIGHSCORES]);
-		US_Print (SmallFont, "/L", gameinfo.FontColors[GameInfo::HIGHSCORES]);
-#endif
-#endif
 
 #ifdef SPEAR
 		if (s->completed == 21)
 			VWB_DrawPic (PrintX + 8, PrintY - 1, "M_WONSPR");
 		else
 #endif
-			US_Print (SmallFont, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+			US_Print (font, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 		//
 		// score
 		//
-		itoa (s->score, buffer, 10);
-#ifndef SPEAR
-		for (str = buffer; *str; str++)
-			*str = *str + (129 - '0');  // Used fixed-width numbers (129...)
-		VW_MeasurePropString (BigFont, buffer, w, h);
-		PrintX = (34 * 8) - 8 - w;
-#else
-		VW_MeasurePropString (BigFont, buffer, w, h, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		buffer.Format("%d", s->score);
+		VW_MeasurePropString (font, buffer, w, h);
 		PrintX = 292 - w;
-#endif
-		US_Print (SmallFont, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
+		US_Print (font, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 	}
 
 	VW_UpdateScreen ();
@@ -849,8 +809,7 @@ DrawHighScores (void)
 =======================
 */
 
-void
-CheckHighScore (int32_t score, word other)
+void CheckHighScore (int32_t score, word other)
 {
 	word i, j;
 	int n;
@@ -858,7 +817,6 @@ CheckHighScore (int32_t score, word other)
 
 	strcpy (myscore.name, "");
 	myscore.score = score;
-	myscore.episode = gamestate.episode;
 	myscore.completed = other;
 
 	for (i = 0, n = -1; i < MaxScores; i++)
@@ -881,19 +839,14 @@ CheckHighScore (int32_t score, word other)
 
 	if (n != -1)
 	{
+		FFont *font = V_GetFont(gameinfo.HighScoresFont);
+
 		//
 		// got a high score
 		//
-		PrintY = 76 + (16 * n);
-#ifndef SPEAR
-		PrintX = 4 * 8;
-		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 100);
-#else
+		PrintY = 76 + ((font->GetHeight() + 3) * n);
 		PrintX = 16;
-		VWB_Bar (PrintX - 2, PrintY - 2, 145, 15, 0x9c);
-		VW_UpdateScreen ();
-		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130);
-#endif
+		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130, CR_WHITE);
 	}
 	else
 	{

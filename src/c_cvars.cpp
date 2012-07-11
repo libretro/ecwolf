@@ -142,23 +142,19 @@ void ReadConfig(void)
 	char hsName[50];
 	char hsScore[50];
 	char hsCompleted[50];
-	char hsEpisode[50];
 	for(unsigned int i = 0;i < MaxScores;i++)
 	{
 		sprintf(hsName, "HighScore%u_Name", i);
 		sprintf(hsScore, "HighScore%u_Score", i);
 		sprintf(hsCompleted, "HighScore%u_Completed", i);
-		sprintf(hsEpisode, "HighScore%u_Episode", i);
 
 		config->CreateSetting(hsName, Scores[i].name);
 		config->CreateSetting(hsScore, Scores[i].score);
 		config->CreateSetting(hsCompleted, Scores[i].completed);
-		config->CreateSetting(hsEpisode, Scores[i].episode);
 
 		strcpy(Scores[i].name, config->GetSetting(hsName)->GetString());
 		Scores[i].score = config->GetSetting(hsScore)->GetInteger();
 		Scores[i].completed = config->GetSetting(hsCompleted)->GetInteger();
-		Scores[i].episode = config->GetSetting(hsEpisode)->GetInteger();
 	}
 
 	// make sure values are correct
@@ -223,17 +219,14 @@ void WriteConfig(void)
 	char hsName[50];
 	char hsScore[50];
 	char hsCompleted[50];
-	char hsEpisode[50];
 	for(unsigned int i = 0;i < MaxScores;i++)
 	{
 		sprintf(hsName, "HighScore%u_Name", i);
 		sprintf(hsScore, "HighScore%u_Score", i);
 		sprintf(hsCompleted, "HighScore%u_Completed", i);
-		sprintf(hsEpisode, "HighScore%u_Episode", i);
 
 		config->GetSetting(hsName)->SetValue(Scores[i].name);
 		config->GetSetting(hsScore)->SetValue(Scores[i].score);
 		config->GetSetting(hsCompleted)->SetValue(Scores[i].completed);
-		config->GetSetting(hsEpisode)->SetValue(Scores[i].episode);
 	}
 }

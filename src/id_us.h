@@ -36,7 +36,7 @@ typedef	struct
 {
 	char	name[MaxHighName + 1];
 	int32_t	score;
-	word	completed,episode;
+	word	completed;
 } HighScore;
 
 #define	MaxGameName		32

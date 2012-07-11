@@ -792,7 +792,7 @@ startplayloop:
 
 					ClearMemory ();
 
-					CheckHighScore (players[0].score,gamestate.mapon+1);
+					CheckHighScore (players[0].score,levelInfo->FloorNumber);
 					return;
 				}
 
@@ -832,7 +832,7 @@ startplayloop:
 
 					ClearMemory ();
 
-					CheckHighScore (players[0].score,gamestate.mapon+1);
+					CheckHighScore (players[0].score,levelInfo->FloorNumber);
 					return;
 				}
 #endif
@@ -860,7 +860,7 @@ startplayloop:
 
 				ClearMemory ();
 
-				CheckHighScore (players[0].score,gamestate.mapon+1);
+				CheckHighScore (players[0].score,levelInfo->FloorNumber);
 				return;
 
 			case ex_warped:

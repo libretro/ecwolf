@@ -456,6 +456,8 @@ protected:
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::MENU_HIGHLIGHT]);
 		else if(key.CompareNoCase("menufontcolor_highlightselection") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION]);
+		else if(key.CompareNoCase("highscoresfont") == 0)
+			ParseStringAssignment(gameinfo.HighScoresFont);
 		else if(key.CompareNoCase("highscoresfontcolor") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		else if(key.CompareNoCase("pageindexfontcolor") == 0)
