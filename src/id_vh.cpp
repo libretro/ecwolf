@@ -87,51 +87,6 @@ void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFo
 	py += font->GetHeight();
 }
 
-/*
-=================
-=
-= VL_MungePic
-=
-=================
-*/
-
-void VL_MungePic (byte *source, unsigned width, unsigned height)
-{
-	unsigned x,y,plane,size,pwidth;
-	byte *temp, *dest, *srcline;
-
-	size = width*height;
-
-	if (width&0x3f)
-		Quit ("VL_MungePic: Not divisable by 4!");
-
-//
-// copy the pic to a temp buffer
-//
-	temp=(byte *) malloc(size);
-	CHECKMALLOCRESULT(temp);
-	memcpy (temp,source,size);
-
-//
-// munge it back into the original buffer
-//
-	dest = source;
-	pwidth = width/4;
-
-	for (plane=0;plane<4;plane++)
-	{
-		srcline = temp;
-		for (y=0;y<height;y++)
-		{
-			for (x=0;x<pwidth;x++)
-				*dest++ = *(srcline+x*4+plane);
-			srcline+=width;
-		}
-	}
-
-	free(temp);
-}
-
 void VW_MeasurePropString (FFont *font, const char *string, word &width, word &height, word *finalWidth)
 {
 	int w = 0;
@@ -169,41 +124,9 @@ void VH_UpdateScreen()
 	SDL_Flip(screen);
 }
 
-
-void VWB_DrawTile8 (int x, int y, int tile)
-{
-//	LatchDrawChar(x,y,tile);
-}
-
-/*void VWB_DrawTile8M (int x, int y, int tile)
-{
-	VL_MemToScreen (((byte *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
-}*/
-
-void VWB_DrawPic(int x, int y, const char* chunk, bool scaledCoord)
-{
-	FTexture *tex = TexMan(chunk);
-	if(!tex)
-		return;
-
-	BYTE *data = const_cast<BYTE *>(tex->GetPixels());
-	if(!scaledCoord)
-		VL_MemToScreen(data, tex->GetScaledWidth(), tex->GetScaledHeight(), x, y);
-	else
-		VL_MemToScreenScaledCoord(data, tex->GetScaledWidth(), tex->GetScaledHeight(), x, y);
-}
-
 void VWB_Bar (int x, int y, int width, int height, int color)
 {
 	VW_Bar (x,y,width,height,color);
-}
-
-void VWB_Plot (int x, int y, int color)
-{
-	if(scaleFactor == 1)
-		VW_Plot(x,y,color);
-	else
-		VW_Bar(x, y, 1, 1, color);
 }
 
 void VWB_Hlin (int x1, int x2, int y, int color)
@@ -230,82 +153,6 @@ void VWB_Vlin (int y1, int y2, int x, int color)
 
 =============================================================================
 */
-
-/*
-=====================
-=
-= LatchDrawPic
-=
-=====================
-*/
-
-/*void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
-{
-	VL_LatchToScreen (latchpics[2+picnum-LATCHPICS_LUMP_START], x*8, y);
-}*/
-
-/*void LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum)
-{
-	VL_LatchToScreenScaledCoord (latchpics[2+picnum-LATCHPICS_LUMP_START], scx*8, scy);
-}*/
-
-
-//==========================================================================
-
-/*void FreeLatchMem()
-{
-	int i;
-	for(i = 0; i < 2 + LATCHPICS_LUMP_END - LATCHPICS_LUMP_START; i++)
-	{
-		SDL_FreeSurface(latchpics[i]);
-		latchpics[i] = NULL;
-	}
-}*/
-
-/*
-===================
-=
-= LoadLatchMem
-=
-===================
-*/
-
-void LoadLatchMem (void)
-{
-	int	i,width,height,start,end;
-	byte *src;
-	SDL_Surface *surf;
-
-//
-// tile 8s
-//
-	surf = SDL_CreateRGBSurface(SDL_HWSURFACE, 8*8,
-		((72 + 7) / 8) * 8, 8, 0, 0, 0, 0);
-	if(surf == NULL)
-	{
-		Quit("Unable to create surface for tiles!");
-	}
-	SDL_SetColors(surf, gamepal, 0, 256);
-
-	//latchpics[0] = surf;
-	int lumpNum = Wads.GetNumForName("TILE8", ns_graphics);
-	if(lumpNum == -1)
-	{
-		printf("\n");
-		exit(0);
-	}
-	FWadLump lump = Wads.OpenLumpNum(lumpNum);
-	src = new byte[Wads.LumpLength(lumpNum)];
-	byte* src_freeme = src; // Wolf likes to play with pointers
-	lump.Read(src, Wads.LumpLength(lumpNum));
-
-	for (i=0;i<72;i++)
-	{
-		VL_MemToLatch (src, 8, 8, surf, (i & 7) * 8, (i >> 3) * 8);
-		src += 64;
-	}
-	delete[] src_freeme;
-}
 
 //==========================================================================
 

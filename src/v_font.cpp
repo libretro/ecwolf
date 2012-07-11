@@ -106,7 +106,7 @@ The FON2 header is followed by variable length data:
 // Calculate # of glyphs in font.
 #define HU_FONTSIZE		(HU_FONTEND - HU_FONTSTART + 1)
 
-FFont *SmallFont, *SmallFont2, *BigFont, *ConFont, *IntermissionFont;
+FFont *SmallFont, *SmallFont2, *BigFont, *ConFont, *IntermissionFont, *Tile8Font;
 
 // MACROS ------------------------------------------------------------------
 
@@ -143,6 +143,7 @@ protected:
 	void LoadFON1 (int lump, const BYTE *data);
 	void LoadFON2 (int lump, const BYTE *data);
 	void LoadBMF (int lump, const BYTE *data);
+	void LoadTile8 (int lump, const BYTE *data);
 	bool LoadWolfFont (int lump, const BYTE *data, int length);
 	void CreateFontFromPic (FTextureID picnum);
 
@@ -205,6 +206,18 @@ protected:
 	Span **Spans;
 	const BYTE *SourceRemap;
 
+	virtual void MakeTexture ();
+};
+
+class FTile8Char : public FFontChar2
+{
+public:
+	FTile8Char (int sourcelump, const BYTE *sourceremap, int sourcepos, int width, int height, int leftofs=0, int topofs=0) :
+		FFontChar2(sourcelump, sourceremap, sourcepos, width, height, leftofs)
+	{
+	}
+
+protected:
 	void MakeTexture ();
 };
 
@@ -890,7 +903,12 @@ FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 	else if (data[0] != 'F' || data[1] != 'O' || data[2] != 'N' ||
 		(data[3] != '1' && data[3] != '2'))
 	{
-		if(!LoadWolfFont(lump, data, data1.GetSize()))
+		// Tile 8 should be 72*64 but Wolf's is 72*64 + 1
+		if(abs(data1.GetSize() - 72*64) <= 1)
+		{
+			LoadTile8(lump, data);
+		}
+		else if(!LoadWolfFont(lump, data, data1.GetSize()))
 			I_FatalError ("%s is not a recognizable font", name);
 	}
 	else
@@ -1076,6 +1094,56 @@ void FSingleLumpFont::LoadFON2 (int lump, const BYTE *data)
 	delete[] widths2;
 }
 
+//==========================================================================
+//
+// FSingleLumpFont :: LoadTile8
+//
+//==========================================================================
+
+void FSingleLumpFont::LoadTile8(int lump, const BYTE *data)
+{
+	BYTE colorsused[256];
+	BYTE translation[256];
+	BYTE tempIdentity[256];
+	BYTE identity[256];
+	double luminosity[256];
+	double* tempLuminosity;
+
+	FontHeight = 8;
+	SpaceWidth = 8;
+	FirstChar = ' '-8;
+	LastChar = 'z';
+	GlobalKerning = 0;
+	ActiveColors = 256;
+
+	unsigned int count = LastChar - FirstChar + 1;
+	Chars = new CharData[count];
+
+	for(unsigned int i = 0;i < count;++i)
+	{
+		if(i <= 7)
+			Chars[i].Pic = new FTile8Char (lump, NULL, i*64, SpaceWidth, FontHeight);
+		else if(i >= (unsigned int)('0'-FirstChar) && i <= (unsigned int)('9'-FirstChar))
+			Chars[i].Pic = new FTile8Char (lump, NULL, (i-('0'-FirstChar)+9)*64, SpaceWidth, FontHeight);
+		else if(i >= (unsigned int)('A'-FirstChar))
+			Chars[i].Pic = new FTile8Char (lump, NULL, (i-('A'-FirstChar)+19)*64, SpaceWidth, FontHeight);
+		else
+			Chars[i].Pic = new FTile8Char (lump, NULL, 8*64, SpaceWidth, FontHeight);
+		RecordTextureColors(Chars[i].Pic, colorsused);
+
+		Chars[i].XMove = 8;
+
+		identity[i] = i;
+		luminosity[i] = 0;
+	}
+
+	unsigned int tempColors = SimpleTranslation(colorsused, translation, tempIdentity, &tempLuminosity);
+	while(tempColors-- > 0)
+		luminosity[tempIdentity[tempColors]] = tempLuminosity[tempColors];
+	delete[] tempLuminosity;
+
+	BuildTranslations(luminosity, identity, &TranslationParms[0][0], ActiveColors, NULL);
+}
 
 //==========================================================================
 //
@@ -1781,6 +1849,41 @@ void FFontChar2::MakeTexture ()
 		Wads.GetLumpName (name, SourceLump);
 		name[8] = 0;
 		I_FatalError ("The font %s is corrupt", name);
+	}
+}
+
+void FTile8Char::MakeTexture()
+{
+	FWadLump lump = Wads.OpenLumpNum (SourceLump);
+	int destSize = Width * Height;
+
+	lump.Seek (SourcePos, SEEK_SET);
+
+	Pixels = new BYTE[destSize];
+
+	int runlen = 0, setlen = 0;
+	BYTE setval = 0;  // Shut up, GCC!
+	BYTE *dest_p = Pixels;
+	int dest_adv = Height*4;
+	int dest_rew = destSize - 1;
+
+	for (int p = 16;p != 0;--p)
+	{
+		for (int y = Height/4; y != 0; --y)
+		{
+			for (int x = Width/4; x != 0; --x)
+			{
+				BYTE color;
+				lump >> color;
+				if (SourceRemap != NULL)
+				{
+					color = SourceRemap[color];
+				}
+				*dest_p = color;
+				dest_p += dest_adv;
+			}
+			dest_p -= dest_rew;
+		}
 	}
 }
 
@@ -2506,6 +2609,7 @@ void V_InitFonts()
 	BigFont = FindNewestFont("BigFont", "BIGFONT");
 	ConFont = FindNewestFont("ConsoleFont", "CONFONT");
 	IntermissionFont = FindNewestFont("IntermissionFont", "INTERFNT");
+	Tile8Font = FindNewestFont("Tile8", "TILE8");
 
 	assert(SmallFont && SmallFont2 && BigFont && ConFont && IntermissionFont);
 }

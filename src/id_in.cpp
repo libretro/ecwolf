@@ -324,11 +324,6 @@ static void processEvent(SDL_Event *event)
 			{
 					if(event->active.gain)
 					{
-						if(NeedRestore)
-						{
-							LoadLatchMem();
-						}
-
 						NeedRestore = false;
 					}
 					else NeedRestore = true;

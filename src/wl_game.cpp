@@ -69,7 +69,6 @@ int ffDataTopLeft, ffDataTopRight, ffDataBottomLeft, ffDataBottomRight;
 int ElevatorBackTo[]={1,1,7,3,5,3};
 
 void SetupGameLevel (void);
-void LoadLatchMem (void);
 void GameLoop (void);
 
 /*

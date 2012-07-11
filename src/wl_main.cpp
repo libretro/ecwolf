@@ -433,7 +433,6 @@ static void InitGame()
 // load in and lock down some basic chunks
 //
 
-	LoadLatchMem ();
 	BuildTables ();          // trig tables
 
 //

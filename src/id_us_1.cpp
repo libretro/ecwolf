@@ -233,7 +233,7 @@ US_CPrint(FFont *font, const char *sorg, EColorRange translation)
 void
 US_ClearWindow(void)
 {
-	VWB_Bar(WindowX,WindowY,WindowW,WindowH,WHITE);
+	VWB_Clear(GPalette.WhiteIndex, WindowX, WindowY, WindowX+WindowW, WindowY+WindowH);
 	PrintX = WindowX;
 	PrintY = WindowY;
 }
@@ -243,34 +243,59 @@ US_ClearWindow(void)
 //	US_DrawWindow() - Draws a frame and sets the current window parms
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_DrawWindow(word x,word y,word w,word h)
+void US_DrawWindow(word x,word y,word w,word h)
 {
-	word	i,
-			sx,sy,sw,sh;
+	enum
+	{
+		BOX_UPPERLEFT,
+		BOX_UPPER,
+		BOX_UPPERRIGHT,
+		BOX_LEFT,
+		BOX_RIGHT,
+		BOX_LOWERLEFT,
+		BOX_LOWER,
+		BOX_LOWERRIGHT,
 
-	WindowX = x * 8;
-	WindowY = y * 8;
-	WindowW = w * 8;
-	WindowH = h * 8;
+		BOX_START = 24
+	};
 
-	PrintX = WindowX;
-	PrintY = WindowY;
+	WindowX = x*8;
+	WindowY = y*8;
+	WindowW = w*8;
+	WindowH = h*8;
 
-	sx = (x - 1) * 8;
-	sy = (y - 1) * 8;
-	sw = (w + 1) * 8;
-	sh = (h + 1) * 8;
+	w += 2;
+	h += 2;
 
-	US_ClearWindow();
+	const unsigned int strSize = w*h + h;
+	char* windowString = new char[strSize];
+	memset(windowString, ' ', strSize);
 
-	VWB_DrawTile8(sx,sy,0),VWB_DrawTile8(sx,sy + sh,5);
-	for (i = sx + 8;i <= sx + sw - 8;i += 8)
-		VWB_DrawTile8(i,sy,1),VWB_DrawTile8(i,sy + sh,6);
-	VWB_DrawTile8(i,sy,2),VWB_DrawTile8(i,sy + sh,7);
+	for(unsigned int p = 0;p < strSize;p += w+1)
+	{
+		windowString[p] = BOX_START+BOX_LEFT;
+		windowString[p+w-1] = BOX_START+BOX_RIGHT;
 
-	for (i = sy + 8;i <= sy + sh - 8;i += 8)
-		VWB_DrawTile8(sx,i,3),VWB_DrawTile8(sx + sw,i,4);
+		windowString[p+w] = '\n';
+	}
+	windowString[0] = BOX_START+BOX_UPPERLEFT;
+	windowString[w-1] = BOX_START+BOX_UPPERRIGHT;
+	windowString[strSize-w-1] = BOX_START+BOX_LOWERLEFT;
+	windowString[strSize-2] = BOX_START+BOX_LOWERRIGHT;
+	windowString[strSize-1] = 0;
+	memset(windowString+1, BOX_START+BOX_UPPER, w-2);
+	memset(windowString+strSize-w, BOX_START+BOX_LOWER, w-2);
+
+	py = y*8 - Tile8Font->GetHeight();
+	px = x*8 - Tile8Font->GetCharWidth(BOX_START+BOX_UPPERLEFT);
+	VWB_DrawPropString(Tile8Font, windowString, CR_UNTRANSLATED);
+
+	unsigned int cx = WindowX;
+	unsigned int cy = WindowY;
+	unsigned int cw = WindowW;
+	unsigned int ch = WindowH;
+	MenuToRealCoords(cx, cy, cw, ch, MENU_CENTER);
+	VWB_Clear(GPalette.WhiteIndex, cx, cy, cx+cw, cy+ch);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -279,8 +304,7 @@ US_DrawWindow(word x,word y,word w,word h)
 //		middle of the screen
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_CenterWindow(word w,word h)
+void US_CenterWindow(word w,word h)
 {
 	US_DrawWindow(((MaxX / 8) - w) / 2,((MaxY / 8) - h) / 2,w,h);
 }
