@@ -249,6 +249,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	DeathCam = false;
 	FloorNumber = 1;
 	Par = 0;
+	LevelBonus = -1;
 }
 
 FTextureID LevelInfo::GetBorderTexture() const
@@ -371,10 +372,14 @@ protected:
 		}
 		else if(key.CompareNoCase("Cluster") == 0)
 			ParseIntAssignment(mapInfo.Cluster);
+		else if(key.CompareNoCase("CompletionString") == 0)
+			ParseStringAssignment(mapInfo.CompletionString);
 		else if(key.CompareNoCase("DeathCam") == 0)
 			ParseBoolAssignment(mapInfo.DeathCam);
 		else if(key.CompareNoCase("FloorNumber") == 0)
 			ParseIntAssignment(mapInfo.FloorNumber);
+		else if(key.CompareNoCase("LevelBonus") == 0)
+			ParseIntAssignment(mapInfo.LevelBonus);
 		else if(key.CompareNoCase("Music") == 0)
 			ParseStringAssignment(mapInfo.Music);
 		else if(key.CompareNoCase("Par") == 0)

@@ -99,6 +99,8 @@ public:
 	FTextureID		BorderTexture;
 	FTextureID		DefaultTexture[2];
 	unsigned int	Par;
+	FString			CompletionString;
+	int				LevelBonus;
 
 	bool			DeathCam;
 

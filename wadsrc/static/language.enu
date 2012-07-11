@@ -72,7 +72,8 @@ STR_SOFT = "Soft";
 STR_LOUD = "Loud";
 STR_ALWAYSRUN = "Always Run";
 STR_CHEATER = "You now have 100% Health,\n99 Ammo and both Keys!\n\nNote that you have basically\neliminated your chances of\ngetting a high score!";
-STR_FLOORCOMPLETED = "floor\ncompleted";
+STR_FLOORCOMPLETED = "floor %d\ncompleted";
+STR_SECRETCOMPLETED = "\nsecret floor\n completed";
 
 STR_WHICHEPISODE = "Which episode to play?";
 WL_EPISODE1 = "Episode 1\nEscape from Wolfenstein";

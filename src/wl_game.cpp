@@ -779,7 +779,22 @@ startplayloop:
 		{
 			case ex_completed:
 			case ex_secretlevel:
+			{
 				if(viewsize == 21) DrawPlayScreen();
+
+				const char* next = playstate == ex_completed ? levelInfo->NextMap : levelInfo->NextSecret;
+				if(stricmp(next, "EndTitle") == 0)
+				{
+					VW_FadeOut ();
+					ClearMemory ();
+
+					Victory ();
+
+					ClearMemory ();
+
+					CheckHighScore (players[0].score,gamestate.mapon+1);
+					return;
+				}
 
 				// Remove inventory items that don't transfer (keys for example)
 				for(AInventory *inv = players[0].mo->inventory;inv;)
@@ -830,6 +845,7 @@ startplayloop:
 					strncpy(gamestate.mapname, levelInfo->NextMap, 8);
 				gamestate.mapname[8] = 0;
 				break;
+			}
 
 			case ex_died:
 				Died ();
@@ -841,22 +857,6 @@ startplayloop:
 				VW_FadeOut ();
 				if(screenHeight % 200 != 0)
 					VL_ClearScreen(0);
-
-				ClearMemory ();
-
-				CheckHighScore (players[0].score,gamestate.mapon+1);
-				return;
-
-			case ex_victorious:
-				if(viewsize == 21) DrawPlayScreen();
-#ifndef SPEAR
-				VW_FadeOut ();
-#else
-				VL_FadeOut (0,255,0,68,68,300);
-#endif
-				ClearMemory ();
-
-				Victory ();
 
 				ClearMemory ();
 

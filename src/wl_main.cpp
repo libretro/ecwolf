@@ -708,8 +708,6 @@ static void DemoLoop()
 	{
 		param_nowait = true;
 		NewGame(param_difficulty,param_tedlevel);
-		GameLoop();
-		Quit (NULL);
 	}
 
 
@@ -805,20 +803,24 @@ static void DemoLoop()
 				StartCPMusic(gameinfo.TitleMusic);
 		}
 
-		VW_FadeOut ();
-		if(reloadPalette)
+		if(!param_tedlevel)
 		{
-			InitPalette(gameinfo.GamePalette);
-			reloadPalette = false;
+			VW_FadeOut ();
+			if(reloadPalette)
+			{
+				InitPalette(gameinfo.GamePalette);
+				reloadPalette = false;
+			}
+
+			if (Keyboard[sc_Tab])
+				RecordDemo ();
+			else
+				US_ControlPanel (0);
 		}
 
-		if (Keyboard[sc_Tab])
-			RecordDemo ();
-		else
-			US_ControlPanel (0);
-
-		if (startgame || loadedgame)
+		if (param_tedlevel || startgame || loadedgame)
 		{
+			param_tedlevel = false;
 			GameLoop ();
 			if(!param_nowait)
 			{

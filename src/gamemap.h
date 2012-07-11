@@ -197,7 +197,6 @@ class GameMap
 		TArray<Sector>	sectorPalette;
 		TArray<Zone>	zonePalette;
 		TArray<Thing>	things;
-		TArray<Trigger>	triggers;
 		TArray<Plane>	planes;
 
 		unsigned short***	zoneLinks;

@@ -328,7 +328,6 @@ typedef enum
 	ex_warped,
 	ex_resetgame,
 	ex_loadedgame,
-	ex_victorious,
 	ex_abort,
 	ex_demodone,
 	ex_secretlevel

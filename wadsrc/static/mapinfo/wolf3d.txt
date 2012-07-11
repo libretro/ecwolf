@@ -136,7 +136,7 @@ map "MAP08"
 
 map "MAP09"
 {
-	next = "EndGame1"
+	next = "EndTitle"
 	secretnext = "MAP10"
 	floornumber = 9
 	music = "WARMARCH"
@@ -151,6 +151,8 @@ map "MAP10"
 	floornumber = 10
 	music = "CORNER"
 	cluster = 1
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 // Episode 2
@@ -255,7 +257,7 @@ map "MAP18"
 
 map "MAP19"
 {
-	next = "EndGame2"
+	next = "EndTitle"
 	secretnext = "MAP20"
 	floornumber = 9
 	music = "WARMARCH"
@@ -270,6 +272,8 @@ map "MAP20"
 	floornumber = 10
 	music = "DUNGEON"
 	cluster = 2
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 // Episode 3
@@ -370,7 +374,7 @@ map "MAP28"
 
 map "MAP29"
 {
-	next = "EndGame3"
+	next = "EndTitle"
 	secretnext = "MAP30"
 	floornumber = 9
 	music = "ULTIMATE"
@@ -385,6 +389,8 @@ map "MAP30"
 	floornumber = 10
 	music = "PACMAN"
 	cluster = 3
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 // Episode 4
@@ -490,7 +496,7 @@ map "MAP38"
 
 map "MAP39"
 {
-	next = "EndGame4"
+	next = "EndTitle"
 	secretnext = "MAP10"
 	floornumber = 9
 	music = "WARMARCH"
@@ -505,6 +511,8 @@ map "MAP40"
 	floornumber = 10
 	music = "CORNER"
 	cluster = 4
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 // Episode 5
@@ -608,7 +616,7 @@ map "MAP48"
 
 map "MAP49"
 {
-	next = "EndGame5"
+	next = "EndTitle"
 	secretnext = "MAP50"
 	floornumber = 9
 	music = "WARMARCH"
@@ -623,6 +631,8 @@ map "MAP50"
 	floornumber = 10
 	music = "DUNGEON"
 	cluster = 5
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 // Episode 6
@@ -725,7 +735,7 @@ map "MAP58"
 
 map "MAP59"
 {
-	next = "EndGame6"
+	next = "EndTitle"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
 	floornumber = 9
@@ -741,4 +751,6 @@ map "MAP60"
 	floornumber = 10
 	music = "FUNKYOU"
 	cluster = 6
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }

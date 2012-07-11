@@ -14,8 +14,16 @@
 #include "wl_text.h"
 #include "g_mapinfo.h"
 
-LRstruct LevelRatios[LRpack];
-int32_t lastBreathTime = 0;
+static struct LRstruct
+{
+	unsigned int killratio;
+	unsigned int secretsratio;
+	unsigned int treasureratio;
+	unsigned int numLevels;
+	unsigned int time;
+} LevelRatios;
+
+static int32_t lastBreathTime = 0;
 
 static void Write (int x, int y, const char *string, bool rightAlign=false);
 
@@ -118,15 +126,11 @@ EndSpear (void)
 
 void Victory (void)
 {
-#ifndef SPEARDEMO
 	int32_t sec;
-	int i, min, kr, sr, tr, x;
+	int i, min, kr = 0, sr = 0, tr = 0, x;
 	char tempstr[8];
 
-#define RATIOX  22
-#define RATIOY  14
-#define TIMEX   14
-#define TIMEY   8
+	static const unsigned int RATIOX = 22, RATIOY = 14, TIMEX = 14, TIMEY = 8;
 
 
 #ifdef SPEAR
@@ -154,13 +158,6 @@ void Victory (void)
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
 	DrawPlayScreen(true);
 
-#ifdef JAPAN
-#ifndef JAPDEMO
-	CA_CacheGrChunk (C_ENDRATIOSPIC);
-	VWB_DrawPic (0, 0, C_ENDRATIOSPIC);
-	UNCACHEGRCHUNK (C_ENDRATIOSPIC);
-#endif
-#else
 	Write (18, 2, language["STR_YOUWIN"]);
 
 	Write (TIMEX, TIMEY - 2, language["STR_TOTALTIME"]);
@@ -174,28 +171,15 @@ void Victory (void)
 	Write (RATIOX+8, RATIOY + 2, "%");
 	Write (RATIOX+8, RATIOY + 4, "%");
 
-#endif
-
 	VWB_DrawGraphic (TexMan("L_BJWINS"), 8, 4);
 
-
-	for (kr = sr = tr = sec = i = 0; i < LRpack; i++)
+	sec = LevelRatios.time;
+	if(LevelRatios.numLevels)
 	{
-		sec += LevelRatios[i].time;
-		kr += LevelRatios[i].kill;
-		sr += LevelRatios[i].secret;
-		tr += LevelRatios[i].treasure;
+		kr = LevelRatios.killratio / LevelRatios.numLevels;
+		sr = LevelRatios.secretsratio / LevelRatios.numLevels;
+		tr = LevelRatios.treasureratio / LevelRatios.numLevels;
 	}
-
-#ifndef SPEAR
-	kr /= LRpack;
-	sr /= LRpack;
-	tr /= LRpack;
-#else
-	kr /= 14;
-	sr /= 14;
-	tr /= 14;
-#endif
 
 	min = sec / 60;
 	sec %= 60;
@@ -233,8 +217,6 @@ void Victory (void)
 #else
 	EndSpear ();
 #endif
-
-#endif // SPEARDEMO
 }
 
 //==========================================================================
@@ -320,12 +302,11 @@ void BJ_Breathe (bool drawOnly=false)
 ==================
 */
 
-void
-LevelCompleted (void)
+void LevelCompleted (void)
 {
-#define VBLWAIT 30
-#define PAR_AMOUNT      500
-#define PERCENT100AMT   10000
+	static const unsigned int VBLWAIT = 30;
+	static const unsigned int PAR_AMOUNT = 500;
+	static const unsigned int PERCENT100AMT = 10000;
 
 	int x, i, min, sec, ratio, kr, sr, tr;
 	char tempstr[10];
@@ -343,22 +324,23 @@ LevelCompleted (void)
 	IN_ClearKeysDown ();
 	IN_StartAck ();
 
-#ifdef JAPAN
-	CA_CacheGrChunk (C_INTERMISSIONPIC);
-	VWB_DrawPic (0, 0, C_INTERMISSIONPIC);
-	UNCACHEGRCHUNK (C_INTERMISSIONPIC);
-#endif
 	BJ_Breathe(true);
 
-	int mapon = 0;
-#ifndef SPEAR
-	if (mapon < 8)
-#else
-	if (mapon != 4 && mapon != 9 && mapon != 15 && mapon < 17)
-#endif
+	FString completedString;
+	if(!levelInfo->CompletionString.IsEmpty())
 	{
-		Write (14, 2, language["STR_FLOORCOMPLETED"]);
+		if(levelInfo->CompletionString[0] == '$')
+			completedString = language[levelInfo->CompletionString.Mid(1)];
+		else
+			completedString = levelInfo->CompletionString;
+	}
+	else
+		completedString = language["STR_FLOORCOMPLETED"];
+	completedString.Format(completedString, levelInfo->FloorNumber);
+	Write (14, 2, completedString);
 
+	if(levelInfo->LevelBonus == -1)
+	{
 		Write (24, 7, language["STR_BONUS"], true);
 		Write (24, 10, language["STR_TIME"], true);
 		Write (24, 12, language["STR_PAR"], true);
@@ -369,8 +351,6 @@ LevelCompleted (void)
 		Write (29, 14, language["STR_RAT2KILL"], true);
 		Write (29, 16, language["STR_RAT2SECRET"], true);
 		Write (29, 18, language["STR_RAT2TREASURE"], true);
-
-		Write (26, 2, itoa (levelInfo->FloorNumber, tempstr, 10));
 
 		FString timeString;
 		timeString.Format("%02d:%02d", levelInfo->Par/60, levelInfo->Par%60);
@@ -435,12 +415,7 @@ LevelCompleted (void)
 				BJ_Breathe ();
 		}
 
-
-#ifdef SPANISH
-#define RATIOXX                33
-#else
-#define RATIOXX                37
-#endif
+		static const unsigned int RATIOXX = 37;
 		//
 		// KILL RATIO
 		//
@@ -592,10 +567,11 @@ done:   itoa (kr, tempstr, 10);
 		//
 		// SAVE RATIO INFORMATION FOR ENDGAME
 		//
-		LevelRatios[mapon].kill = kr;
-		LevelRatios[mapon].secret = sr;
-		LevelRatios[mapon].treasure = tr;
-		LevelRatios[mapon].time = min * 60 + sec;
+		LevelRatios.killratio += kr;
+		LevelRatios.secretsratio += sr;
+		LevelRatios.treasureratio += tr;
+		LevelRatios.time += min * 60 + sec;
+		++LevelRatios.numLevels;
 	}
 	else
 	{
@@ -623,16 +599,16 @@ done:   itoa (kr, tempstr, 10);
 				break;
 		}
 #endif
-#else
-		Write (14, 4, "secret floor\n completed!");
 #endif
 
-		Write (10, 16, "15000 bonus!");
+		FString bonusString;
+		bonusString.Format("%d bonus!", levelInfo->LevelBonus);
+		Write (34, 16, bonusString, true);
 
 		VW_UpdateScreen ();
 		VW_FadeIn ();
 
-		GivePoints (15000);
+		GivePoints (levelInfo->LevelBonus);
 	}
 
 
@@ -857,33 +833,6 @@ DrawHighScores (void)
 		PrintX = 292 - w;
 #endif
 		US_Print (SmallFont, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
-
-/*#ifdef APOGEE_1_0
-//#ifndef UPLOAD
-#ifndef SPEAR
-		//
-		// verification #
-		//
-		if (!i)
-		{
-			char temp = (((s->score >> 28) & 0xf) ^ ((s->score >> 24) & 0xf)) + 'A';
-			char temp1 = (((s->score >> 20) & 0xf) ^ ((s->score >> 16) & 0xf)) + 'A';
-			char temp2 = (((s->score >> 12) & 0xf) ^ ((s->score >> 8) & 0xf)) + 'A';
-			char temp3 = (((s->score >> 4) & 0xf) ^ ((s->score >> 0) & 0xf)) + 'A';
-
-			SETFONTCOLOR (0x49, 0x29);
-			PrintX = 35 * 8;
-			buffer[0] = temp;
-			buffer[1] = temp1;
-			buffer[2] = temp2;
-			buffer[3] = temp3;
-			buffer[4] = 0;
-			US_Print (buffer);
-			SETFONTCOLOR (15, 0x29);
-		}
-#endif
-//#endif
-#endif*/
 	}
 
 	VW_UpdateScreen ();

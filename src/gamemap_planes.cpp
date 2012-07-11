@@ -385,6 +385,7 @@ void GameMap::ReadPlanesData()
 
 						if(oldplane[candidates[j]] == EXIT_TILE)
 						{
+							TArray<Trigger> &triggers = mapPlane.map[candidates[j]].triggers;
 							// Look for any triggers matching the candidate
 							for(unsigned int k = 0;k < triggers.Size();++k)
 							{
