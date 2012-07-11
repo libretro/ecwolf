@@ -9,11 +9,6 @@ void Quit (const char *error,...);
 
 //===========================================================================
 
-#define CHARWIDTH		2
-#define TILEWIDTH		4
-
-//===========================================================================
-
 extern SDL_Surface *screen, *screenBuffer, *curSurface;
 
 extern  bool	fullscreen, usedoublebuffering;
@@ -37,9 +32,7 @@ void VL_ReadPalette();
 
 void VL_SetVGAPlaneMode (void);
 void VL_SetTextMode (void);
-void VL_Shutdown (void);
 
-void VL_ConvertPalette(const char* srcpal, SDL_Color *destpal);
 void VL_SetBlend(uint8_t red, uint8_t green, uint8_t blue, int amount, bool forceupdate=false);
 void VL_SetPalette  (struct PalEntry *palette, bool forceupdate);
 void VL_SetPalette  (SDL_Color *palette, bool forceupdate);
@@ -49,10 +42,6 @@ void VL_FadeIn      (int start, int end, SDL_Color *palette, int steps);
 byte *VL_LockSurface(SDL_Surface *surface);
 void VL_UnlockSurface(SDL_Surface *surface);
 
-byte VL_GetPixel        (int x, int y);
-void VL_Plot            (int x, int y, int color);
-void VL_Hlin            (unsigned x, unsigned y, unsigned width, int color);
-void VL_Vlin            (int x, int y, int height, int color);
 void VL_BarScaledCoord  (int scx, int scy, int scwidth, int scheight, int color);
 void inline VL_Bar      (int x, int y, int width, int height, int color)
 {

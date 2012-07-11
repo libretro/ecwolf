@@ -65,21 +65,6 @@ void VL_ReadPalette()
 	}
 }
 
-
-/*
-=======================
-=
-= VL_Shutdown
-=
-=======================
-*/
-
-void	VL_Shutdown (void)
-{
-	//VL_SetTextMode ();
-}
-
-
 /*
 =======================
 =
@@ -157,62 +142,6 @@ void	VL_SetVGAPlaneMode (void)
 
 =============================================================================
 */
-
-/*
-=================
-=
-= VL_ConvertPalette
-=
-=================
-*/
-
-// [BL] HACK: In order to preserve compatibility with the VGAGRAPH files, 
-//            palettes containing only bytes with a value <= 63 will have the
-//            colors increased in brightness.
-void VL_ConvertPalette(const char* srcpal, SDL_Color *destpal)
-{
-	int lumpNum = Wads.CheckNumForName(srcpal);
-	if(lumpNum == -1)
-		return;
-	FWadLump lump = Wads.OpenLumpNum(lumpNum);
-	int length = Wads.LumpLength(lumpNum);
-	byte* data = new byte[length];
-	lump.Read(data, length);
-
-	// Determine number of colors
-	int numColors = length/3;
-	if(numColors > 256)
-		numColors = 256;
-
-	bool newFormat = false;
-	for(int i = 0;i < length;i++)
-	{
-		if(data[i] > 63)
-		{
-			newFormat = true;
-			break;
-		}
-	}
-
-	for(int i = 0;i < numColors;i++)
-	{
-		if(newFormat)
-		{
-			destpal[i].r = data[i*3];
-			destpal[i].g = data[(i*3)+1];
-			destpal[i].b = data[(i*3)+2];
-		}
-		else
-		{
-			destpal[i].r = data[i*3] * 255/63;
-			destpal[i].g = data[(i*3)+1] * 255/63;
-			destpal[i].b = data[(i*3)+2] * 255/63;
-		}
-	}
-	delete[] data;
-}
-
-//===========================================================================
 
 /*
 =================
@@ -359,113 +288,6 @@ void VL_UnlockSurface(SDL_Surface *surface)
 		SDL_UnlockSurface(surface);
 	}
 }
-
-/*
-=================
-=
-= VL_Plot
-=
-=================
-*/
-
-void VL_Plot (int x, int y, int color)
-{
-	byte *ptr;
-
-	assert(x >= 0 && (unsigned) x < screenWidth
-			&& y >= 0 && (unsigned) y < screenHeight
-			&& "VL_Plot: Pixel out of bounds!");
-
-	ptr = VL_LockSurface(curSurface);
-	if(ptr == NULL) return;
-
-	ptr[y * curPitch + x] = color;
-
-	VL_UnlockSurface(curSurface);
-}
-
-/*
-=================
-=
-= VL_GetPixel
-=
-=================
-*/
-
-byte VL_GetPixel (int x, int y)
-{
-	byte *ptr;
-	byte col;
-
-	assert_ret(x >= 0 && (unsigned) x < screenWidth
-			&& y >= 0 && (unsigned) y < screenHeight
-			&& "VL_GetPixel: Pixel out of bounds!");
-
-	ptr = VL_LockSurface(curSurface);
-	if(ptr == NULL) return 0;
-
-	col = ((byte *) curSurface->pixels)[y * curPitch + x];
-
-	VL_UnlockSurface(curSurface);
-
-	return col;
-}
-
-
-/*
-=================
-=
-= VL_Hlin
-=
-=================
-*/
-
-void VL_Hlin (unsigned x, unsigned y, unsigned width, int color)
-{
-	byte *ptr;
-
-	assert(x + width <= screenWidth
-			&& y < screenHeight
-			&& "VL_Hlin: Destination rectangle out of bounds!");
-
-	ptr = VL_LockSurface(curSurface);
-	if(ptr == NULL) return;
-
-	memset(ptr + y * curPitch + x, color, width);
-
-	VL_UnlockSurface(curSurface);
-}
-
-
-/*
-=================
-=
-= VL_Vlin
-=
-=================
-*/
-
-void VL_Vlin (int x, int y, int height, int color)
-{
-	byte *ptr;
-
-	assert(x >= 0 && (unsigned) x < screenWidth
-			&& y >= 0 && (unsigned) y + height <= screenHeight
-			&& "VL_Vlin: Destination rectangle out of bounds!");
-
-	ptr = VL_LockSurface(curSurface);
-	if(ptr == NULL) return;
- 
-	ptr += y * curPitch + x;
-
-	while (height--)
-	{
-		*ptr = color;
-		ptr += curPitch;
-	}
-	VL_UnlockSurface(curSurface);
-}
-
 
 /*
 =================

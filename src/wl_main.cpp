@@ -153,7 +153,6 @@ void ShutdownId (void)
 	US_Shutdown ();         // This line is completely useless...
 	SD_Shutdown ();
 	IN_Shutdown ();
-	VW_Shutdown ();
 }
 
 
