@@ -32,6 +32,8 @@ actor Actor native
 	action native A_Dormant();
 	action native A_FaceTarget(float max_turn = 0, float max_pitch = 270);
 	action native A_Fall();
+	action native A_GiveExtraMan(int amount = 1);
+	action native A_GiveInventory(string type, int amount = 0);
 	action native A_Jump(int chance, state frame, ...);
 	action native A_Look(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180);
 	action native A_LookEx(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180); // Alias
@@ -59,6 +61,10 @@ actor Inventory native
 }
 
 actor Ammo : Inventory native
+{
+}
+
+actor CustomInventory : Inventory native
 {
 }
 

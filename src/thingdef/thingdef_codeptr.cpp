@@ -37,6 +37,7 @@
 #include "id_sd.h"
 #include "g_mapinfo.h"
 #include "g_shared/a_deathcam.h"
+#include "g_shared/a_inventory.h"
 #include "lnspec.h"
 #include "m_random.h"
 #include "thingdef/thingdef.h"
@@ -197,6 +198,37 @@ ACTION_FUNCTION(A_FaceTarget)
 ACTION_FUNCTION(A_Fall)
 {
 	self->flags &= ~FL_SOLID;
+}
+
+ACTION_FUNCTION(A_GiveExtraMan)
+{
+	ACTION_PARAM_INT(amount, 0);
+
+	GiveExtraMan(amount);
+}
+
+ACTION_FUNCTION(A_GiveInventory)
+{
+	ACTION_PARAM_STRING(className, 0);
+	ACTION_PARAM_INT(amount, 1);
+
+	const ClassDef *cls = ClassDef::FindClass(className);
+
+	if(amount == 0)
+		amount = 1;
+
+	if(cls && cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
+	{
+		AInventory *inv = (AInventory *)AActor::Spawn(cls, 0, 0, 0);
+		if(inv->IsKindOf(NATIVE_CLASS(Health)))
+			inv->amount *= amount;
+		else
+			inv->amount = amount;
+
+		inv->RemoveFromWorld();
+		if(!inv->TryPickup(self))
+			inv->Destroy();
+	}
 }
 
 static FRandom pr_cajump("CustomJump");

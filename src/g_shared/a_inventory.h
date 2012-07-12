@@ -72,6 +72,17 @@ class AAmmo : public AInventory
 	DECLARE_NATIVE_CLASS(Ammo, Inventory)
 };
 
+class ACustomInventory : public AInventory
+{
+	DECLARE_NATIVE_CLASS(CustomInventory, Inventory)
+
+	public:
+		bool	TryPickup(AActor *toucher);
+
+	protected:
+		bool	ExecuteState(AActor *context, const Frame *frame);
+};
+
 class AHealth : public AInventory
 {
 	DECLARE_NATIVE_CLASS(Health, Inventory)

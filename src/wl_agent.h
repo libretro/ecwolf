@@ -29,7 +29,7 @@ void    GivePoints (int32_t points);
 
 void	DrawStatusBar();
 void    StatusDrawFace(unsigned picnum);
-void    GiveExtraMan (void);
+void    GiveExtraMan (int amount);
 void    UpdateFace ();
 void    CheckWeaponChange ();
 void    ControlMovement (AActor *self);

@@ -86,11 +86,11 @@ void LumpRemapper::DoRemap()
 				case AUDIOT:
 					if(lump->Namespace == ns_sounds)
 					{
-						if(i < sounds.Size())
+						if(i < sounds.Size() && lump->LumpSize > 0)
 							lump->LumpNameSetup(sounds[i]);
 						temp++;
 					}
-					else if(lump->Namespace == ns_music && i-temp < music.Size())
+					else if(lump->Namespace == ns_music && i-temp < music.Size() && lump->LumpSize > 0)
 					{
 						lump->LumpNameSetup(music[i-temp]);
 					}
@@ -104,20 +104,21 @@ void LumpRemapper::DoRemap()
 				case VSWAP:
 					if(lump->Namespace == ns_flats)
 					{
-						if(i < textures.Size())
+						if(i < textures.Size() && lump->LumpSize > 0)
 							lump->LumpNameSetup(textures[i]);
 						temp++;
 						temp2++;
 					}
 					else if(lump->Namespace == ns_sprites)
 					{
-						if(i-temp < sprites.Size())
+						if(i-temp < sprites.Size() && lump->LumpSize > 0)
 							lump->LumpNameSetup(sprites[i-temp]);
 						temp2++;
 					}
 					else if(lump->Namespace == ns_sounds && i-temp2 < digitalsounds.Size())
 					{
-						lump->LumpNameSetup(digitalsounds[i-temp2]);
+						if(lump->LumpSize > 0)
+							lump->LumpNameSetup(digitalsounds[i-temp2]);
 					}
 					break;
 				default:

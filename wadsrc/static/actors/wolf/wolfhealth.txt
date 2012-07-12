@@ -34,14 +34,23 @@ actor Medikit : Health 58
 	}
 }
 
-actor OneUp : Inventory 66
+actor OneUpHealth : Health
+{
+	inventory.amount 99
+}
+actor OneUp : CustomInventory 66
 {
 	inventory.pickupsound "misc/1up"
-	+BRIGHT
+	+COUNTITEM
 	states
 	{
 		Spawn:
-			ONUP A -1
+			ONUP A -1 bright
+			stop
+		Pickup:
+			TNT1 A 0 A_GiveExtraMan
+			TNT1 A 0 A_GiveInventory("Clip", 25)
+			TNT1 A 0 A_GiveInventory("OneUpHealth")
 			stop
 	}
 }

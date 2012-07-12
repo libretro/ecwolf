@@ -221,6 +221,32 @@ IMPLEMENT_CLASS(Ammo)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+IMPLEMENT_CLASS(CustomInventory)
+
+bool ACustomInventory::TryPickup(AActor *toucher)
+{
+	const Frame *pickup = FindState("Pickup");
+	ExecuteState(toucher, pickup);
+	return Super::TryPickup(toucher);
+}
+
+bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
+{
+	while(frame)
+	{
+		// Execute both functions since why not.
+		frame->action(context);
+		frame->thinker(context);
+
+		if(frame == frame->next)
+			break;
+		frame = frame->next;
+	}
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 IMPLEMENT_POINTY_CLASS(Weapon)
 	DECLARE_POINTER(ammo1)
 END_POINTERS

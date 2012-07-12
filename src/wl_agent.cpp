@@ -451,10 +451,13 @@ void DrawLives (void)
 ===============
 */
 
-void GiveExtraMan (void)
+void GiveExtraMan (int amount)
 {
-	if (players[0].lives<9)
-		players[0].lives++;
+	players[0].lives += amount;
+	if (players[0].lives < 0)
+		players[0].lives = 0;
+	else if(players[0].lives > 9)
+		players[0].lives = 9;
 	DrawLives ();
 	SD_PlaySound ("misc/end_bonus1");
 }
@@ -489,7 +492,7 @@ void GivePoints (int32_t points)
 	while (players[0].score >= players[0].nextextra)
 	{
 		players[0].nextextra += EXTRAPOINTS;
-		GiveExtraMan ();
+		GiveExtraMan (1);
 	}
 	DrawScore ();
 }

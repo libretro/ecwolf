@@ -36,22 +36,20 @@ actor FloorLamp 36
 {
 	radius 32
 	+SOLID
-	+BRIGHT
 	states
 	{
 		Spawn:
-			FLMP A -1
+			FLMP A -1 bright
 			stop
 	}
 }
 
 actor Chandelier 37
 {
-	+BRIGHT
 	states
 	{
 		Spawn:
-			CHAN A -1
+			CHAN A -1 bright
 			stop
 	}
 }
@@ -152,22 +150,20 @@ actor BareTable 46
 
 actor CeilingLight 47
 {
-	+BRIGHT
 	states
 	{
 		Spawn:
-			GLMP A -1
+			GLMP A -1 bright
 			stop
 	}
 }
 
 actor RedCeilingLight 85
 {
-	+BRIGHT
 	states
 	{
 		Spawn:
-			RLMP A -1
+			RLMP A -1 bright
 			stop
 	}
 }

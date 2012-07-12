@@ -1289,7 +1289,7 @@ FTextureID FTextureManager::GetDoor(unsigned int tile, bool vertical, bool track
 		tile = 63;
 	TileMap &tm = doorTiles[tile*2+vertical][track];
 	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
-		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Wall);
+		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Wall);
 	return tm.texture;
 }
 FTextureID FTextureManager::GetFlat(unsigned int tile, bool ceiling)
@@ -1298,7 +1298,7 @@ FTextureID FTextureManager::GetFlat(unsigned int tile, bool ceiling)
 		tile = 255;
 	TileMap &tm = flatTiles[tile][ceiling];
 	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
-		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Flat);
+		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Flat);
 	else
 		tm.texture = levelInfo->DefaultTexture[ceiling];
 	return tm.texture;
@@ -1309,7 +1309,7 @@ FTextureID FTextureManager::GetTile(unsigned int tile, bool vertical)
 		tile = 63;
 	TileMap &tm = mapTiles[tile][vertical];
 	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
-		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Wall);
+		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Wall);
 	return tm.texture;
 }
 FTextureID FTextureManager::GetArtIndex(unsigned int index)
