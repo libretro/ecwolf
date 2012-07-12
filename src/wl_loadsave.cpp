@@ -96,7 +96,8 @@ public:
 	{
 		TextInputMenuItem::draw();
 
-		if(isSelected())
+		// We use this instead of isSelected() so that the info is drawn during animations.
+		if(menu->getIndex(menu->getCurrentPosition()) == this)
 		{
 			static const EColorRange textColor = gameinfo.FontColors[GameInfo::MENU_HIGHLIGHTSELECTION];
 			static const unsigned int SAVEPICX = 10;

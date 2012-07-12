@@ -369,7 +369,10 @@ USL_XORICursor(int x,int y,const char *s,word cursor,EColorRange translation)
 	px = x + w - 1;
 	py = y;
 	if (status^=1)
-		VWB_DrawPropString(SmallFont, "\x80", translation);
+	{
+		const char cursorString[2] = {SmallFont->GetCursor(), 0};
+		VWB_DrawPropString(SmallFont, cursorString, translation);
+	}
 }
 
 char USL_RotateChar(char ch, int dir)
@@ -433,6 +436,8 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 	LastASCII = key_None;
 	LastScan = sc_None;
 
+	int cursorWidth = SmallFont->GetCharWidth(SmallFont->GetCursor());
+
 	while (!done)
 	{
 		ReadAnyControl(&ci);
@@ -466,8 +471,8 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					if(cursor)
 					{
 						// Remove trailing whitespace if cursor is at end of string
-						if(s[cursor] == ' ' && s[cursor + 1] == 0)
-							s[cursor] = 0;
+						if(s[cursor-1] == ' ' && s[cursor] == 0)
+							s[cursor-1] = 0;
 						cursor--;
 					}
 					cursormoved = true;
@@ -478,11 +483,15 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(SmallFont, s,w,h);
-						if(len >= maxchars || (maxwidth && w >= maxwidth)) break;
-
 						s[cursor] = ' ';
 						s[cursor + 1] = 0;
+
+						VW_MeasurePropString(SmallFont, s,w,h);
+						if(len >= maxchars || (maxwidth && w+cursorWidth >= maxwidth))
+						{
+							s[cursor] = 0;
+							break;
+						}
 					}
 					cursor++;
 					cursormoved = true;
@@ -493,7 +502,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					if(!s[cursor])
 					{
 						VW_MeasurePropString(SmallFont, s,w,h);
-						if(len >= maxchars || (maxwidth && w >= maxwidth)) break;
+						if(len >= maxchars || (maxwidth && w+cursorWidth >= maxwidth)) break;
 						s[cursor + 1] = 0;
 					}
 					s[cursor] = USL_RotateChar(s[cursor], 1);
@@ -504,7 +513,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					if(!s[cursor])
 					{
 						VW_MeasurePropString(SmallFont, s,w,h);
-						if(len >= maxchars || (maxwidth && w >= maxwidth)) break;
+						if(len >= maxchars || (maxwidth && w+cursorWidth >= maxwidth)) break;
 						s[cursor + 1] = 0;
 					}
 					s[cursor] = USL_RotateChar(s[cursor], -1);
@@ -617,11 +626,18 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 				VW_MeasurePropString(SmallFont, s,w,h);
 
 				if(isprint(c) && (len < MaxString - 1) && ((!maxchars) || (len < maxchars))
-					&& ((!maxwidth) || (w < maxwidth)))
+					&& ((!maxwidth) || (w+cursorWidth < maxwidth)))
 				{
 					for (i = len + 1;i > cursor;i--)
 						s[i] = s[i - 1];
 					s[cursor++] = c;
+				}
+
+				VW_MeasurePropString(SmallFont, s,w,h);
+				if(w+cursorWidth >= maxwidth)
+				{
+					strcpy(s, olds);
+					--cursor;
 				}
 			}
 		}
