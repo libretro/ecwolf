@@ -209,7 +209,7 @@ MENU_LISTENER(ReadThis)
 }
 MENU_LISTENER(ToggleFullscreen)
 {
-	fullscreen = ~fullscreen;
+	fullscreen = vid_fullscreen;
 	VL_SetVGAPlaneMode();
 	displayMenu.draw();
 	return true;
@@ -274,7 +274,7 @@ MENU_LISTENER(SetResolution)
 {
 	MenuFadeOut();
 
-	if(!vid_fullscreen)
+	if(!fullscreen)
 	{
 		screenWidth = WinModes[which].Width;
 		screenHeight = WinModes[which].Height;
@@ -299,7 +299,7 @@ MENU_LISTENER(EnterResolutionSelection)
 	resolutionMenu.clear();
 	FString resolution;
 
-	if(!vid_fullscreen)
+	if(!fullscreen)
 	{
 		for(unsigned int i = 0;i < countof(WinModes);++i)
 		{
@@ -322,7 +322,7 @@ MENU_LISTENER(EnterResolutionSelection)
 		while(*modes)
 		{
 			resolution.Format("%dx%d", (*modes)->w, (*modes)->h);
-			MenuItem *item = new MenuItem(resolution);
+			MenuItem *item = new MenuItem(resolution, SetResolution);
 			resolutionMenu.addItem(item);
 
 			if((*modes)->w == screenWidth && (*modes)->h == screenHeight)

@@ -916,8 +916,13 @@ void Menu::setCurrentPosition(int position)
 		itemOffset = curPos;
 		unsigned int accumulatedHeight = getY();
 		while((accumulatedHeight += getIndex(itemOffset)->getHeight()) + 6 < 200)
+		{
+			if(itemOffset == 0)
+				break;
 			--itemOffset;
-		++itemOffset;
+		}
+		if(itemOffset > 0)
+			++itemOffset;
 	}
 	else // Somewhere in the middle
 	{
