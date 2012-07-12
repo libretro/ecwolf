@@ -38,6 +38,7 @@
 #include "wl_play.h"
 #include "wl_game.h"
 #include "dobject.h"
+#include "colormatcher.h"
 
 /*
 =============================================================================
@@ -640,8 +641,15 @@ void Quit (const char *errorStr, ...)
 static void PG13 (void)
 {
 	VW_FadeOut ();
-	VWB_Clear(0x82, 0, 0, screenWidth, screenHeight);
-	VWB_DrawGraphic(TexMan("PG13"), 216, 110);
+
+	if(gameinfo.AdvisoryPic.IsEmpty())
+		return;
+
+	BYTE color = ColorMatcher.Pick(RPART(gameinfo.AdvisoryColor), GPART(gameinfo.AdvisoryColor), BPART(gameinfo.AdvisoryColor));
+
+	VWB_Clear(color, 0, 0, screenWidth, screenHeight);
+	FTexture *tex = TexMan(gameinfo.AdvisoryPic);
+	VWB_DrawGraphic(tex, 304-tex->GetScaledWidth(), 174-tex->GetScaledHeight());
 	VW_UpdateScreen ();
 
 	VW_FadeIn ();
@@ -713,7 +721,7 @@ static void DemoLoop()
 // main game cycle
 //
 
-	if (!param_nowait)
+	if (!param_nowait && (IWad::GetGame().Flags & IWad::REGISTERED))
 		NonShareware();
 
 	StartCPMusic(gameinfo.TitleMusic);

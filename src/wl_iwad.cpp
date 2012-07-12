@@ -223,6 +223,7 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 static void ParseIWad(Scanner &sc)
 {
 	IWadData iwad;
+	iwad.Flags = 0;
 
 	sc.MustGetToken('{');
 	while(!sc.CheckToken('}'))
@@ -230,7 +231,19 @@ static void ParseIWad(Scanner &sc)
 		sc.MustGetToken(TK_Identifier);
 		FString key = sc->str;
 		sc.MustGetToken('=');
-		if(key.CompareNoCase("Name") == 0)
+		if(key.CompareNoCase("Flags") == 0)
+		{
+			do
+			{
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.CompareNoCase("Registered") == 0)
+					iwad.Flags |= IWad::REGISTERED;
+				else
+					sc.ScriptMessage(Scanner::ERROR, "Unknown flag %s.", sc->str.GetChars());
+			}
+			while(sc.CheckToken(','));
+		}
+		else if(key.CompareNoCase("Name") == 0)
 		{
 			sc.MustGetToken(TK_StringConst);
 			iwad.Name = sc->str;

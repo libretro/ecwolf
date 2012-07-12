@@ -1318,7 +1318,7 @@ FTextureID FTextureManager::GetArtIndex(unsigned int index)
 		index = 255;
 	TileMap &tm = artIndex[index];
 	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
-		tm.texture = GetTexture(tm.textureName, FTexture::TEX_Any);
+		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Any);
 	return tm.texture;
 }
 

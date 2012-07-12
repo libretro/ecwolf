@@ -58,7 +58,7 @@
 
 void R_RenderView();
 extern byte* vbuf;
-extern int vbufPitch;
+extern unsigned vbufPitch;
 
 namespace GameSave {
 

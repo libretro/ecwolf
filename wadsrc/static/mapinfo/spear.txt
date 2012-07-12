@@ -28,6 +28,8 @@ gameinfo
 	highscoresfontcolor = "White"
 	pageindexfontcolor = "DarkYellow"
 	borderflat = "#004040"
+	advisorycolor = "20 A8 FC"
+	advisorypic = "PG13"
 }
 
 defaultmap

@@ -12,7 +12,7 @@ graphics
 	"KEYBOARD",
 	"JOYSTICK",
 	"HEALPIC",
-	"TEASITEM",
+	"TREASPIC",
 	"GUNPIC",
 	"KEYPIC",
 	"BLAZE",

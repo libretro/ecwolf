@@ -3,6 +3,7 @@ IWad
 	Name = "Wolfenstein 3D"
 	Mapinfo = "mapinfo/wolf3d.txt"
 	MustContain = "BJPIC", "MAP22"
+	Flags = Registered
 }
 
 IWad

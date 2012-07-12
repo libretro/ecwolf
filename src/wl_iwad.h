@@ -50,11 +50,17 @@ struct WadStuff
 
 namespace IWad
 {
+	enum Flags
+	{
+		REGISTERED = 1
+	};
+
 	struct IWadData
 	{
 		FString Name;
 		FString Mapinfo;
 		TArray<FString> Ident;
+		unsigned int Flags;
 	};
 
 	const IWadData &GetGame();

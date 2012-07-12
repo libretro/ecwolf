@@ -404,7 +404,11 @@ public:
 protected:
 	bool CheckKey(FString key)
 	{
-		if(key.CompareNoCase("borderflat") == 0)
+		if(key.CompareNoCase("advisorycolor") == 0)
+			ParseColorAssignment(gameinfo.AdvisoryColor);
+		else if(key.CompareNoCase("advisorypic") == 0)
+			ParseStringAssignment(gameinfo.AdvisoryPic);
+		else if(key.CompareNoCase("borderflat") == 0)
 			ParseStringAssignment(gameinfo.BorderFlat);
 		else if(key.CompareNoCase("creditpage") == 0)
 			ParseStringAssignment(gameinfo.CreditPage);

@@ -48,6 +48,7 @@ public:
 	int		SignonColors[4];
 	int		MenuFadeColor;
 	int		MenuColors[6];
+	int		AdvisoryColor;
 	bool	DrawReadThis;
 
 	int		PageTime;
@@ -63,6 +64,7 @@ public:
 	FString	FinaleMusic;
 	FString	IntermissionMusic;
 	FString	HighScoresFont;
+	FString	AdvisoryPic;
 
 	enum EFontColors
 	{
