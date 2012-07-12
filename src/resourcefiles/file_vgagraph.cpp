@@ -70,6 +70,7 @@ struct FVGALump : public FResourceLump
 
 			byte* data = new byte[length];
 			byte* out = new byte[LumpSize];
+			memset(out, 0, LumpSize);
 			Owner->Reader->Read(data, length);
 			HuffExpand(data, out);
 			delete[] data;

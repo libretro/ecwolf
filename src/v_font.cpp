@@ -903,8 +903,8 @@ FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 	else if (data[0] != 'F' || data[1] != 'O' || data[2] != 'N' ||
 		(data[3] != '1' && data[3] != '2'))
 	{
-		// Tile 8 should be 72*64 but Wolf's is 72*64 + 1
-		if(abs(data1.GetSize() - 72*64) <= 1)
+		// FMemLump adds one to GetSize so account for it.
+		if(data1.GetSize() - 1 == 72*64)
 		{
 			LoadTile8(lump, data);
 		}
@@ -1109,10 +1109,12 @@ void FSingleLumpFont::LoadTile8(int lump, const BYTE *data)
 	double luminosity[256];
 	double* tempLuminosity;
 
+	memset(colorsused, 0, 256);
+
 	FontHeight = 8;
 	SpaceWidth = 8;
 	FirstChar = ' '-8;
-	LastChar = 'z';
+	LastChar = 'u';
 	GlobalKerning = 0;
 	ActiveColors = 256;
 
@@ -1132,7 +1134,10 @@ void FSingleLumpFont::LoadTile8(int lump, const BYTE *data)
 		RecordTextureColors(Chars[i].Pic, colorsused);
 
 		Chars[i].XMove = 8;
+	}
 
+	for(unsigned int i = 0;i < 256;++i)
+	{
 		identity[i] = i;
 		luminosity[i] = 0;
 	}
@@ -1850,7 +1855,7 @@ void FFontChar2::MakeTexture ()
 		Wads.GetLumpName (name, SourceLump);
 		name[8] = 0;
 		I_FatalError ("The font %s is corrupt", name);
-	}
+ 	}
 }
 
 void FTile8Char::MakeTexture()
