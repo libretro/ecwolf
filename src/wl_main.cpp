@@ -237,7 +237,7 @@ void CalcProjection (int32_t focal)
 	// calculate scale value for vertical height calculations
 	// and sprite x calculations
 	//
-	scale = (fixed) (halfview*facedist/(AspectCorrection[vid_aspect].viewGlobal/2));
+	scale = (fixed) (halfview*facedist/(AspectCorrection[r_ratio].viewGlobal/2));
 
 	//
 	// divide heightnumerator by a posts distance to get the posts height for
@@ -252,7 +252,7 @@ void CalcProjection (int32_t focal)
 	for (i=0;i<halfview;i++)
 	{
 		// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (int32_t)i*AspectCorrection[vid_aspect].viewGlobal/viewwidth/facedist;
+		tang = (int32_t)i*AspectCorrection[r_ratio].viewGlobal/viewwidth/facedist;
 		angle = (float) atan(tang);
 		intang = (int) (angle*radtoint);
 		pixelangle[halfview-1-i] = intang;
@@ -479,13 +479,13 @@ static void InitGame()
 static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 {
 	statusbarx = 0;
-	if(AspectCorrection[vid_aspect].isWide)
-		statusbarx = screenWidth*(48-AspectCorrection[vid_aspect].multiplier)/(48*2);
+	if(AspectCorrection[r_ratio].isWide)
+		statusbarx = screenWidth*(48-AspectCorrection[r_ratio].multiplier)/(48*2);
 
 	statusbary = 200 - STATUSLINES - scaleFactor;
-	if(AspectCorrection[vid_aspect].tallscreen)
-		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[vid_aspect].baseHeight + screenHeight/2
-			+ (screenHeight - screenHeight*AspectCorrection[vid_aspect].multiplier/48)/2;
+	if(AspectCorrection[r_ratio].tallscreen)
+		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[r_ratio].baseHeight + screenHeight/2
+			+ (screenHeight - screenHeight*AspectCorrection[r_ratio].multiplier/48)/2;
 	else
 		statusbary = statusbary*screenHeight/200;
 
@@ -512,7 +512,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	viewwidth = width;
 	viewheight = height;
 	centerx = viewwidth/2-1;
-	centerxwide = AspectCorrection[vid_aspect].isWide ? CorrectWidthFactor(centerx) : centerx;
+	centerxwide = AspectCorrection[r_ratio].isWide ? CorrectWidthFactor(centerx) : centerx;
 	shootdelta = viewwidth/10;
 	if((unsigned) viewheight == screenHeight)
 		viewscreenx = viewscreeny = screenofs = 0;
@@ -525,7 +525,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 
 	int virtheight = screenHeight;
 	int virtwidth = screenWidth;
-	if(AspectCorrection[vid_aspect].isWide)
+	if(AspectCorrection[r_ratio].isWide)
 		virtwidth = CorrectWidthFactor(virtwidth);
 	else
 		virtheight = CorrectWidthFactor(virtheight);
@@ -836,16 +836,16 @@ static void DemoLoop()
 //
 // Tries to guess the physical dimensions of the screen based on the
 // screen's pixel dimensions.
-Aspect CheckRatio (int width, int height)//, int *trueratio)
+int CheckRatio (int width, int height)//, int *trueratio)
 {
-	//int fakeratio = -1;
+	int fakeratio = -1;
 	Aspect ratio;
 
-	/*if ((vid_aspect >=1) && (vid_aspect <=4))
+	if (vid_aspect != ASPECT_NONE)
 	{
 		// [SP] User wants to force aspect ratio; let them.
-		fakeratio = vid_aspect == 3? 0: int(vid_aspect);
-	}*/
+		fakeratio = vid_aspect;
+	}
 	/*if (vid_nowidescreen)
 	{
 		if (!vid_tft)
@@ -895,7 +895,7 @@ Aspect CheckRatio (int width, int height)//, int *trueratio)
 	{
 		*trueratio = ratio;
 	}*/
-	return /*(fakeratio >= 0) ? fakeratio :*/ ratio;
+	return (fakeratio >= 0) ? fakeratio : ratio;
 }
 
 #define IFARG(str) if(!strcmp(arg, (str)))
@@ -906,7 +906,6 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 	bool hasError = false, showHelp = false;
 	bool sampleRateGiven = false, audioBufferGiven = false;
 	int defaultSampleRate = param_samplerate;
-	bool needRatio = true;
 
 	fullscreen = vid_fullscreen;
 
@@ -969,7 +968,6 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 				printf("Unknown aspect ratio %s!\n", ratio);
 				hasError = true;
 			}
-			needRatio = false;
 		}
 		else IFARG("--bits")
 		{
@@ -1113,10 +1111,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 		exit(1);
 	}
 
-	if(needRatio)
-	{
-		vid_aspect = CheckRatio(screenWidth, screenHeight);
-	}
+	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
 
 	if(sampleRateGiven && !audioBufferGiven)
 		param_audiobuffer = 2048 / (44100 / param_samplerate);

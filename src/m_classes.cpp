@@ -903,6 +903,47 @@ int Menu::handle()
 	return 0;                   // JUST TO SHUT UP THE ERROR MESSAGES!
 }
 
+void Menu::setCurrentPosition(int position)
+{
+	if(position <= 0) // At start
+	{
+		curPos = 0;
+		itemOffset = 0;
+	}
+	else if((unsigned) position >= items.Size()-1) // At end
+	{
+		curPos = items.Size()-1;
+		itemOffset = curPos;
+		unsigned int accumulatedHeight = getY();
+		while((accumulatedHeight += getIndex(itemOffset)->getHeight()) + 6 < 200)
+			--itemOffset;
+		++itemOffset;
+	}
+	else // Somewhere in the middle
+	{
+		curPos = position;
+		itemOffset = curPos;
+		unsigned int accumulatedHeight = getY() + getIndex(itemOffset)->getHeight();
+		unsigned int lastIndex = curPos;
+		while(accumulatedHeight + 6 < 200)
+		{
+			if(lastIndex < items.Size()-1)
+			{
+				accumulatedHeight += getIndex(++lastIndex)->getHeight();
+				if(accumulatedHeight + 6 >= 200)
+					break;
+			}
+
+			if(itemOffset > 0)
+				accumulatedHeight += getIndex(--itemOffset)->getHeight();
+			else
+				break;
+		}
+		if(itemOffset > 0)
+			++itemOffset;
+	}
+}
+
 void Menu::setHeadPicture(const char* picture)
 {
 	headPicture = TexMan(picture);

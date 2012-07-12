@@ -47,6 +47,7 @@ Menu mouseSensitivity(20, 80, 300, 0);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
 Menu controls(15, 70, 310, 24);
+Menu resolutionMenu(90, 25, 150, 24);
 
 MENU_LISTENER(PlayDemosOrReturnToGame)
 {
@@ -213,6 +214,130 @@ MENU_LISTENER(ToggleFullscreen)
 	displayMenu.draw();
 	return true;
 }
+MENU_LISTENER(SetAspectRatio)
+{
+	vid_aspect = static_cast<Aspect>(which);
+	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
+	NewViewSize(viewsize);
+	displayMenu.draw();
+	return true;
+}
+
+// Dummy screen sizes to pass when windowed
+static struct MiniModeInfo
+{
+	WORD Width, Height;
+} WinModes[] =
+{
+	{ 320, 200 },
+	{ 320, 240 },
+	{ 400, 225 },	// 16:9
+	{ 400, 300 },
+	{ 480, 270 },	// 16:9
+	{ 480, 360 },
+	{ 512, 288 },	// 16:9
+	{ 512, 384 },
+	{ 640, 360 },	// 16:9
+	{ 640, 400 },
+	{ 640, 480 },
+	{ 720, 480 },	// 16:10
+	{ 720, 540 },
+	{ 800, 450 },	// 16:9
+	{ 800, 500 },	// 16:10
+	{ 800, 600 },
+	{ 848, 480 },	// 16:9
+	{ 960, 600 },	// 16:10
+	{ 960, 720 },
+	{ 1024, 576 },	// 16:9
+	{ 1024, 600 },	// 17:10
+	{ 1024, 640 },	// 16:10
+	{ 1024, 768 },
+	{ 1088, 612 },	// 16:9
+	{ 1152, 648 },	// 16:9
+	{ 1152, 720 },	// 16:10
+	{ 1152, 864 },
+	{ 1280, 720 },	// 16:9
+	{ 1280, 800 },	// 16:10
+	{ 1280, 960 },
+	{ 1280, 1024 },	// 5:4
+	{ 1360, 768 },	// 16:9
+	{ 1400, 787 },	// 16:9
+	{ 1400, 875 },	// 16:10
+	{ 1400, 1050 },
+	{ 1600, 900 },	// 16:9
+	{ 1600, 1000 },	// 16:10
+	{ 1600, 1200 },
+	{ 1920, 1080 },
+};
+MENU_LISTENER(EnterResolutionSelection);
+MENU_LISTENER(SetResolution)
+{
+	MenuFadeOut();
+
+	if(!vid_fullscreen)
+	{
+		screenWidth = WinModes[which].Width;
+		screenHeight = WinModes[which].Height;
+	}
+	else
+	{
+		SDL_Rect **modes = SDL_ListModes (NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+		screenWidth = modes[which]->w;
+		screenHeight = modes[which]->h;
+	}
+
+	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
+	VL_SetVGAPlaneMode();
+	EnterResolutionSelection(which);
+	resolutionMenu.draw();
+	MenuFadeIn();
+	return true;
+}
+MENU_LISTENER(EnterResolutionSelection)
+{
+	int selected = 0;
+	resolutionMenu.clear();
+	FString resolution;
+
+	if(!vid_fullscreen)
+	{
+		for(unsigned int i = 0;i < countof(WinModes);++i)
+		{
+			resolution.Format("%dx%d", WinModes[i].Width, WinModes[i].Height);
+			MenuItem *item = new MenuItem(resolution, SetResolution);
+			resolutionMenu.addItem(item);
+			if(WinModes[i].Width == screenWidth && WinModes[i].Height == screenHeight)
+			{
+				selected = resolutionMenu.countItems()-1;
+				item->setHighlighted(true);
+			}
+		}
+	}
+	else
+	{
+		SDL_Rect **modes = SDL_ListModes (NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+		if(modes == NULL)
+			return false;
+
+		while(*modes)
+		{
+			resolution.Format("%dx%d", (*modes)->w, (*modes)->h);
+			MenuItem *item = new MenuItem(resolution);
+			resolutionMenu.addItem(item);
+
+			if((*modes)->w == screenWidth && (*modes)->h == screenHeight)
+			{
+				selected = resolutionMenu.countItems()-1;
+				item->setHighlighted(true);
+			}
+
+			++modes;
+		}
+	}
+
+	resolutionMenu.setCurrentPosition(selected);
+	return true;
+}
 
 void CreateMenus()
 {
@@ -336,9 +461,14 @@ void CreateMenus()
 	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
 
+	const char* aspectOptions[] = {"Aspect: Auto", "Aspect: 16:9", "Aspect: 16:10", "Aspect: 17:10", "Aspect: 4:3", "Aspect: 5:4"};
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
 	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
 	displayMenu.addItem(new BooleanMenuItem(language["STR_DEPTHFOG"], r_depthfog));
+	displayMenu.addItem(new MultipleChoiceMenuItem(SetAspectRatio, aspectOptions, 6, vid_aspect));
+	displayMenu.addItem(new MenuSwitcherMenuItem(language["STR_SELECTRES"], resolutionMenu, EnterResolutionSelection));
+
+	resolutionMenu.setHeadText(language["STR_SELECTRES"]);
 
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEADJ"]));
 	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
@@ -974,13 +1104,17 @@ void CheckPause (void)
 ///////////////////////////////////////////////////////////////////////////
 void DrawStripes (int y)
 {
-	static bool calcStripes = true;
-	static unsigned int sy = y, sh = 24;
-	static unsigned int ly = y+22, lh = 1;
-	if(calcStripes)
+	static unsigned int calcStripes = INT_MAX;
+	static unsigned int sy, sh;
+	static unsigned int ly, lh;
+	if(calcStripes != scaleFactor)
 	{
 		unsigned int dummyx = 0, dummyw = 320;
-		calcStripes = false;
+		sy = y;
+		sh = 24;
+		ly = y+22;
+		lh = 1;
+		calcStripes = scaleFactor;
 
 		MenuToRealCoords(dummyx, sy, dummyw, sh, MENU_TOP);
 		MenuToRealCoords(dummyx, ly, dummyw, lh, MENU_TOP);

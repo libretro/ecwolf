@@ -43,6 +43,7 @@ extern  int      param_audiobuffer;
 
 void            NewGame (int difficulty,const class FString &map);
 void            CalcProjection (int32_t focal);
+int				CheckRatio (int width, int height);
 void            NewViewSize (int width, unsigned int scrWidth=screenWidth, unsigned int scrHeight=screenHeight);
 void            ShutdownId (void);
 

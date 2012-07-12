@@ -31,7 +31,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	const unsigned int mapwidth = map->GetHeader().width;
 	const unsigned int mapheight = map->GetHeader().height;
 
-	const unsigned int texDivisor = viewwidth*AspectCorrection[vid_aspect].multiplier*175/48;
+	const unsigned int texDivisor = viewwidth*AspectCorrection[r_ratio].multiplier*175/48;
 
 	// draw horizontal lines
 	for(int y = y0;

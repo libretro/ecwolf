@@ -354,7 +354,7 @@ finished:
 #include "r_data/colormaps.h"
 void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect)
 {
-	int myratio = handleaspect ? vid_aspect : 0;
+	int myratio = handleaspect ? r_ratio : 0;
 	double right = x + w;
 	double bottom = y + h;
 

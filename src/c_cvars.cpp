@@ -41,7 +41,7 @@
 #include "wl_main.h"
 #include "wl_play.h"
 
-Aspect vid_aspect = ASPECT_4_3;
+Aspect r_ratio = ASPECT_4_3, vid_aspect = ASPECT_NONE;
 bool forcegrabmouse = false;
 bool r_depthfog = false;
 bool vid_fullscreen = false;
@@ -101,6 +101,9 @@ void ReadConfig(void)
 	config->CreateSetting("DigitizedVolume", MAX_VOLUME);
 	config->CreateSetting("R_DepthFog", false);
 	config->CreateSetting("Vid_FullScreen", false);
+	config->CreateSetting("Vid_Aspect", ASPECT_NONE);
+	config->CreateSetting("ScreenWidth", screenWidth);
+	config->CreateSetting("ScreenHeight", screenHeight);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -138,6 +141,9 @@ void ReadConfig(void)
 	SoundVolume = config->GetSetting("DigitizedVolume")->GetInteger();
 	r_depthfog = config->GetSetting("R_DepthFog")->GetInteger() != 0;
 	vid_fullscreen = config->GetSetting("Vid_FullScreen")->GetInteger() != 0;
+	vid_aspect = static_cast<Aspect>(config->GetSetting("Vid_Aspect")->GetInteger());
+	screenWidth = config->GetSetting("ScreenWidth")->GetInteger();
+	screenHeight = config->GetSetting("ScreenHeight")->GetInteger();
 
 	char hsName[50];
 	char hsScore[50];
@@ -215,6 +221,9 @@ void WriteConfig(void)
 	config->GetSetting("DigitizedVolume")->SetValue(SoundVolume);
 	config->GetSetting("R_DepthFog")->SetValue(r_depthfog);
 	config->GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
+	config->GetSetting("Vid_Aspect")->SetValue(vid_aspect);
+	config->GetSetting("ScreenWidth")->SetValue(screenWidth);
+	config->GetSetting("ScreenHeight")->SetValue(screenHeight);
 
 	char hsName[50];
 	char hsScore[50];

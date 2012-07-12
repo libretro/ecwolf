@@ -44,7 +44,7 @@ void FinalReadConfig();
 void ReadConfig();
 void WriteConfig();
 
-enum Aspect
+extern enum Aspect
 {
 	ASPECT_NONE,
 	ASPECT_16_9,
@@ -52,7 +52,7 @@ enum Aspect
 	ASPECT_17_10,
 	ASPECT_4_3,
 	ASPECT_5_4
-};
+} r_ratio;
 
 extern bool		forcegrabmouse;
 extern bool		r_depthfog;

@@ -227,7 +227,7 @@ class Menu
 		int				getX() const { return x; }
 		int				getY() const { return y; }
 		bool			isAnimating() const { return animating; }
-		void			setCurrentPosition(int position) { curPos = position < 0 ? 0 : ((unsigned)position >= items.Size() ? items.Size()-1 : position); }
+		void			setCurrentPosition(int position);
 		void			setHeadPicture(const char* picture);
 		void			setHeadText(const char text[36], bool drawInStripes=false);
 		void			show();

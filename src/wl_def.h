@@ -352,8 +352,8 @@ extern const struct RatioInformation
 	int multiplier;
 	bool isWide;
 } AspectCorrection[];
-#define CorrectWidthFactor(x)	((x)*AspectCorrection[vid_aspect].multiplier/48)
-#define CorrectHeightFactor(x)	((x)*48/AspectCorrection[vid_aspect].multiplier)
+#define CorrectWidthFactor(x)	((x)*AspectCorrection[r_ratio].multiplier/48)
+#define CorrectHeightFactor(x)	((x)*48/AspectCorrection[r_ratio].multiplier)
 
 static inline fixed FixedMul(fixed a, fixed b)
 {
