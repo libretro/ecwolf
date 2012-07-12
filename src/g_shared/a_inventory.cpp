@@ -243,6 +243,9 @@ void AWeapon::AttachToOwner(AActor *owner)
 		if(ammo1->amount > ammo1->maxamount)
 			ammo1->amount = ammo1->maxamount;
 	}
+
+	// Autoswitch
+	owner->player->PendingWeapon = this;
 }
 
 bool AWeapon::CheckAmmo(AWeapon::FireMode fireMode, bool autoSwitch, bool requireAmmo)
