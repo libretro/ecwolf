@@ -356,7 +356,7 @@ class EVPushwall : public Thinker
 					return;
 				}
 
-				moveTo->tile = spot->tile;
+				moveTo->SetTile(spot->tile);
 				moveTo->pushReceptor = spot;
 				moveTo->pushDirection = spot->pushDirection;
 
@@ -370,7 +370,7 @@ class EVPushwall : public Thinker
 			{
 				position -= 256;
 				spot->pushAmount = 0;
-				spot->tile = NULL;
+				spot->SetTile(NULL);
 				spot->thinker = NULL;
 				moveTo->pushReceptor = NULL;
 				moveTo->thinker = this;
