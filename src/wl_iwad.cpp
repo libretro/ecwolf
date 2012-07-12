@@ -236,7 +236,9 @@ static void ParseIWad(Scanner &sc)
 			do
 			{
 				sc.MustGetToken(TK_Identifier);
-				if(sc->str.CompareNoCase("Registered") == 0)
+				if(sc->str.CompareNoCase("HelpHack") == 0)
+					iwad.Flags |= IWad::HELPHACK;
+				else if(sc->str.CompareNoCase("Registered") == 0)
 					iwad.Flags |= IWad::REGISTERED;
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown flag %s.", sc->str.GetChars());

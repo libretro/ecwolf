@@ -8,6 +8,7 @@
 #include "v_palette.h"
 #include "w_wad.h"
 #include "wl_game.h"
+#include "wl_iwad.h"
 #include "wl_text.h"
 #include "g_mapinfo.h"
 #include "id_ca.h"
@@ -749,7 +750,7 @@ void HelpScreens (void)
 	{
 		FMemLump lump = Wads.ReadLump(lumpNum);
 
-		ShowArticle((char*)lump.GetMem(), true);
+		ShowArticle((char*)lump.GetMem());
 	}
 
 	VW_FadeOut();
@@ -776,13 +777,13 @@ void EndText (void)
 			text = new char[Wads.LumpLength(lumpNum)];
 			lump.Read(text, Wads.LumpLength(lumpNum));
 
-			ShowArticle(text);
+			ShowArticle(text, (IWad::GetGame().Flags & IWad::HELPHACK));
 
 			delete[] text;
 		}
 	}
 	else
-		ShowArticle(cluster.ExitText);
+		ShowArticle(cluster.ExitText, (IWad::GetGame().Flags & IWad::HELPHACK));
 
 	VW_FadeOut();
 	IN_ClearKeysDown();
