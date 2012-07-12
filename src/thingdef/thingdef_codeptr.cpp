@@ -54,7 +54,10 @@ ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(nam
 {
 	if(actionFunctions == NULL)
 		actionFunctions = new ActionTable;
+#if 0
+	// Debug code - Show registered action functions
 	printf("Adding %s @ %d\n", name.GetChars(), actionFunctions->Size());
+#endif
 	actionFunctions->Push(this);
 }
 

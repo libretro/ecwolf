@@ -14,14 +14,7 @@
 #include "wl_text.h"
 #include "g_mapinfo.h"
 
-static struct LRstruct
-{
-	unsigned int killratio;
-	unsigned int secretsratio;
-	unsigned int treasureratio;
-	unsigned int numLevels;
-	unsigned int time;
-} LevelRatios;
+LRstruct LevelRatios;
 
 static int32_t lastBreathTime = 0;
 
@@ -846,7 +839,7 @@ void CheckHighScore (int32_t score, word other)
 		//
 		PrintY = 76 + ((font->GetHeight() + 3) * n);
 		PrintX = 16;
-		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130, CR_WHITE);
+		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130, BKGDCOLOR, CR_WHITE);
 	}
 	else
 	{

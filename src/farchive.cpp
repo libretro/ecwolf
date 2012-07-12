@@ -61,8 +61,6 @@
 #include "thingdef/thingdef.h"
 #include "zdoomsupport.h"
 
-#define DPrintf Printf
-
 // These are special tokens found in the data stream of an archive.
 // Whenever a new object is encountered, it gets created using new and
 // is then asked to serialize itself before processing of the previous

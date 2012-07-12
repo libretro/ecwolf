@@ -15,6 +15,7 @@ class AKey : public AInventory
 void P_InitKeyMessages();
 void P_DeinitKeyMessages();
 bool P_CheckKeys (AActor *owner, int keynum, bool remote);
+bool P_GiveKeys (AActor *owner, int keynum);
 
 #endif
  

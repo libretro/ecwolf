@@ -173,7 +173,7 @@ SetSoundLoc(fixed gx,fixed gy)
 	rightchannel = righttable[x][y + ATABLEMAX];
 
 #if 0
-	CenterWindow(8,1);
+	US_CenterWindow(8,1);
 	US_PrintSigned(leftchannel);
 	US_Print(",");
 	US_PrintSigned(rightchannel);
@@ -430,12 +430,12 @@ void FinishDemoRecord (void)
 	demoptr[2] = 0;
 
 	VW_FadeIn();
-	CenterWindow(24,3);
+	US_CenterWindow(24,3);
 	PrintY+=6;
 	US_Print(SmallFont, " Demo number (0-9): ");
 	VW_UpdateScreen();
 
-	if (US_LineInput (px,py,str,NULL,true,1,0))
+	if (US_LineInput (px,py,str,NULL,true,1,0,GPalette.WhiteIndex))
 	{
 		level = atoi (str);
 		if (level>=0 && level<=9)
@@ -466,12 +466,12 @@ void RecordDemo (void)
 	int levelnum, esc,maps;
 	char str[80];
 
-	CenterWindow(26,3);
+	US_CenterWindow(26,3);
 	PrintY+=6;
 	US_Print(SmallFont, "  Demo which level (#): ");
 	VW_UpdateScreen();
 	VW_FadeIn ();
-	esc = !US_LineInput (px,py,str,NULL,true,2,0);
+	esc = !US_LineInput (px,py,str,NULL,true,2,0,GPalette.WhiteIndex);
 	if (esc)
 		return;
 

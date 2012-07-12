@@ -49,8 +49,6 @@ extern  int         buttonjoy[32];
 
 void    PlayLoop (void);
 
-void    CenterWindow(word w,word h);
-
 void    InitRedShifts (void);
 void    FinishPaletteShifts (void);
 

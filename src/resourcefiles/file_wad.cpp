@@ -38,7 +38,6 @@
 
 #define TEXTCOLOR_YELLOW
 #define TEXTCOLOR_BLUE
-#define DPrintf printf
 #define isdigit(x) (x > '0' && x < '9')
 
 //==========================================================================

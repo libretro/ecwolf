@@ -307,6 +307,8 @@ void US_DrawWindow(word x,word y,word w,word h)
 void US_CenterWindow(word w,word h)
 {
 	US_DrawWindow(((MaxX / 8) - w) / 2,((MaxY / 8) - h) / 2,w,h);
+	PrintX = WindowX;
+	PrintY = WindowY;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -399,7 +401,7 @@ char USL_RotateChar(char ch, int dir)
 //
 ///////////////////////////////////////////////////////////////////////////
 bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
-				int maxchars,int maxwidth, EColorRange translation)
+				int maxchars,int maxwidth, byte clearcolor, EColorRange translation)
 {
 	bool		cursorvis,cursormoved,
 				done,result=false, checkkey;
@@ -626,7 +628,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 
 		px = x;
 		py = y;
-		VWB_Clear(BKGDCOLOR, clearx, cleary, clearx+clearw, cleary+clearh);
+		VWB_Clear(clearcolor, clearx, cleary, clearx+clearw, cleary+clearh);
 		strcpy(olds,s);
 
 		px = x;

@@ -269,7 +269,7 @@ void TextInputMenuItem::activate()
 			menu->getX() + menu->getIndent() + 2*scaleFactor,
 			PrintY, buffer,
 			clearFirst ? "" : getValue(), true, max, menu->getWidth() - menu->getIndent() - 16,
-			getTextColor()
+			BKGDCOLOR, getTextColor()
 		);
 
 		if(accept)

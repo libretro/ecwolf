@@ -444,3 +444,28 @@ bool P_CheckKeys (AActor *owner, int keynum, bool remote)
 	return false;
 }
 
+bool P_GiveKeys (AActor *owner, int keynum)
+{
+	if (owner == NULL) return false;
+	if (keynum<=0 || keynum>255) return false;
+
+	Lock *lock = locks[keynum];
+	if(!lock)
+		return false;
+
+	for(unsigned int i = lock->keylist.Size();i-- > 0;)
+	{
+		for(unsigned int j = lock->keylist[i]->anykeylist.Size();j-- > 0;)
+		{
+			OneKey &key = lock->keylist[i]->anykeylist[j];
+			if(!key.check(owner))
+			{
+				AKey *newKey = (AKey*) AActor::Spawn(key.key, 0, 0, 0);
+				newKey->RemoveFromWorld();
+				if(!newKey->TryPickup(owner))
+					newKey->Destroy();
+			}
+		}
+	}
+	return true;
+}

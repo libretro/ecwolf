@@ -357,7 +357,10 @@ void GameMap::SetupLinks()
 
 void GameMap::SpawnThings() const
 {
+#if 0
+	// Debug code - Show the number of things spawned at map start.
 	printf("Spawning %d things\n", things.Size());
+#endif
 	for(unsigned int i = 0;i < things.Size();++i)
 	{
 		Thing &thing = things[i];

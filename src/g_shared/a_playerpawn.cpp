@@ -86,7 +86,7 @@ void APlayerPawn::GiveStartingInventory()
 	// Bring up weapon
 	player->BringUpWeapon();
 
-#if 1
+#if 0
 	AInventory *inv = inventory;
 	while(inv)
 	{

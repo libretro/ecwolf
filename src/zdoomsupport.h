@@ -36,6 +36,8 @@ static inline unsigned int MakeKey(const char *s, size_t len)
 }
 static inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s)); }
 
+static void DPrintf(const char* fmt, ...) {}
+
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #ifndef __BIG_ENDIAN__
 #define MAKE_ID(a,b,c,d)	((DWORD)((a)|((b)<<8)|((c)<<16)|((d)<<24)))

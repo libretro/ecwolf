@@ -8,16 +8,21 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "id_ca.h"
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
+#include "g_mapinfo.h"
 #include "actor.h"
 #include "wl_agent.h"
 #include "wl_debug.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_inter.h"
 #include "wl_play.h"
 #include "w_wad.h"
+#include "thingdef/thingdef.h"
+#include "g_shared/a_keys.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -68,28 +73,6 @@ void ViewMap (void);
 //===========================================================================
 
 /*
-==================
-=
-= CountObjects
-=
-==================
-*/
-
-void CountObjects (void)
-{
-	CenterWindow (17,7);
-
-	US_Print (BigFont, "\nTotal actors  :");
-	US_PrintUnsigned (AActor::actors.Size());
-
-	VW_UpdateScreen();
-	IN_Ack ();
-}
-
-
-//===========================================================================
-
-/*
 ===================
 =
 = PictureGrabber
@@ -114,7 +97,7 @@ void PictureGrabber (void)
 
 	SDL_SaveBMP(curSurface, fname);
 
-	CenterWindow (18,2);
+	US_CenterWindow (18,2);
 	US_PrintCentered ("Screenshot taken");
 	VW_UpdateScreen();
 	IN_Ack();
@@ -211,25 +194,17 @@ int DebugKeys (void)
 
 	if (Keyboard[sc_B])             // B = border color
 	{
-		CenterWindow(20,3);
+		US_CenterWindow(22,3);
 		PrintY+=6;
-		US_Print(SmallFont, " Border color (0-56): ");
+		US_Print(SmallFont, " Border texture: ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,2,0);
+		esc = !US_LineInput (PrintX,py,str,NULL,true,8,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
-			level = atoi (str);
-			if (level>=0 && level<=99)
+			FTextureID texID = TexMan.CheckForTexture(str, FTexture::TEX_Any);
+			if (texID.isValid())
 			{
-				if (level<30) level += 31;
-				else
-				{
-					if (level > 56) level=31;
-					else level -= 26;
-				}
-
-				bordercol=level*4+3;
-
+				levelInfo->BorderTexture = texID;
 				DrawPlayBorder();
 
 				return 0;
@@ -239,12 +214,20 @@ int DebugKeys (void)
 	}
 	if (Keyboard[sc_C])             // C = count objects
 	{
-		CountObjects();
+		US_CenterWindow (17,4);
+
+		FString actorCount;
+		actorCount.Format("\nTotal actors : %d", AActor::actors.Size());
+
+		US_Print (SmallFont, actorCount);
+
+		VW_UpdateScreen();
+		IN_Ack ();
 		return 1;
 	}
 	if (Keyboard[sc_D])             // D = Darkone's FPS counter
 	{
-		CenterWindow (22,2);
+		US_CenterWindow (22,2);
 		if (fpscounter)
 			US_PrintCentered ("Darkone's FPS Counter OFF");
 		else
@@ -259,23 +242,15 @@ int DebugKeys (void)
 
 	if (Keyboard[sc_F])             // F = facing spot
 	{
+		FString position;
+		position.Format("X: %d\nY: %d\nA: %d",
+			players[0].mo->x >> 10,
+			players[0].mo->y >> 10,
+			players[0].mo->angle/ANGLE_1
+		);
 		char str[60];
-		CenterWindow (14,6);
-		US_Print (SmallFont, "x:");     US_PrintUnsigned (players[0].mo->x);
-		US_Print (SmallFont, " (");     US_PrintUnsigned (players[0].mo->x%65536);
-		US_Print (SmallFont, ")\ny:");  US_PrintUnsigned (players[0].mo->y);
-		US_Print (SmallFont, " (");     US_PrintUnsigned (players[0].mo->y%65536);
-		US_Print (SmallFont, ")\nA:");  US_PrintUnsigned (players[0].mo->angle);
-		US_Print (SmallFont, " X:");    US_PrintUnsigned (players[0].mo->tilex);
-		US_Print (SmallFont, " Y:");    US_PrintUnsigned (players[0].mo->tiley);
-		//US_Print ("\n1:");   US_PrintUnsigned (tilemap[players[0].mo->tilex][players[0].mo->tiley]);
-		//sprintf(str," 2:%.8X",(unsigned)(uintptr_t)actorat[players[0].mo->tilex][players[0].mo->tiley]); US_Print(str);
-		//US_Print (" 2:");    US_PrintUnsigned (MAPSPOT(players[0].mo->tilex,players[0].mo->tiley,1));
-		//US_Print (" 3:");
-		//if ((unsigned)(uintptr_t)actorat[players[0].mo->tilex][players[0].mo->tiley] < 256)
-		//	US_PrintUnsigned (spotvis[players[0].mo->tilex][players[0].mo->tiley]);
-		//else
-		//	US_PrintUnsigned (actorat[players[0].mo->tilex][players[0].mo->tiley]->flags);
+		US_CenterWindow (14,6);
+		US_PrintCentered(position);
 		VW_UpdateScreen();
 		IN_Ack();
 		return 1;
@@ -283,7 +258,7 @@ int DebugKeys (void)
 
 	if (Keyboard[sc_G])             // G = god mode
 	{
-		CenterWindow (12,2);
+		US_CenterWindow (12,2);
 		if (godmode == 0)
 			US_PrintCentered ("God mode ON");
 		else if (godmode == 1)
@@ -306,9 +281,28 @@ int DebugKeys (void)
 	}
 	else if (Keyboard[sc_I])        // I = item cheat
 	{
-		CenterWindow (12,3);
+		US_CenterWindow (12,3);
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
+		// Give Weapons and Max out ammo
+		ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
+		ClassDef::ClassPair *pair;
+		while(iter.NextPair(pair))
+		{
+			const ClassDef *cls = pair->Value;
+			AInventory *inv = NULL;
+			if((cls->IsDescendantOf(NATIVE_CLASS(Weapon)) && cls != NATIVE_CLASS(Weapon)) ||
+				(cls->GetParent() == NATIVE_CLASS(Ammo))
+			)
+			{
+				inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0);
+				inv->RemoveFromWorld();
+				if(cls->GetParent() == NATIVE_CLASS(Ammo))
+					inv->amount = inv->maxamount;
+				if(!inv->TryPickup(players[0].mo))
+					inv->Destroy();
+			}
+		}
 		GivePoints (100000);
 		players[0].health = 100;
 		DrawStatusBar();
@@ -317,66 +311,49 @@ int DebugKeys (void)
 	}
 	else if (Keyboard[sc_K])        // K = give keys
 	{
-		CenterWindow(16,3);
+		US_CenterWindow(16,3);
 		PrintY+=6;
-		US_Print(SmallFont, "  Give Key (1-4): ");
+		US_Print(SmallFont, "  Give Key (#): ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,1,0);
+		esc = !US_LineInput (PrintX,py,str,NULL,true,3,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			level = atoi (str);
-			if (level>0 && level<5)
-			{}//GiveKey(level-1);
+			P_GiveKeys(players[0].mo, level);
 		}
 		return 1;
 	}
 	else if (Keyboard[sc_L])        // L = level ratios
 	{
-/*		byte x,start,end=LRpack;
-
-		if (end == 8)   // wolf3d
+		int ak = 0, as = 0, at = 0;
+		if(LevelRatios.numLevels)
 		{
-			CenterWindow(17,10);
-			start = 0;
+			ak = LevelRatios.killratio / LevelRatios.numLevels;
+			as = LevelRatios.secretsratio / LevelRatios.numLevels;
+			at = LevelRatios.treasureratio / LevelRatios.numLevels;
 		}
-		else            // sod
-		{
-			CenterWindow(17,12);
-			start = 0; end = 10;
-		}
-again:
-		for(x=start;x<end;x++)
-		{
-			US_PrintUnsigned(x+1);
-			US_Print(" ");
-			US_PrintUnsigned(LevelRatios[x].time/60);
-			US_Print(":");
-			if (LevelRatios[x].time%60 < 10)
-				US_Print("0");
-			US_PrintUnsigned(LevelRatios[x].time%60);
-			US_Print(" ");
-			US_PrintUnsigned(LevelRatios[x].kill);
-			US_Print("% ");
-			US_PrintUnsigned(LevelRatios[x].secret);
-			US_Print("% ");
-			US_PrintUnsigned(LevelRatios[x].treasure);
-			US_Print("%\n");
-		}
+		FString ratios;
+		ratios.Format(
+			"Current Level: %02d:%02d\nKills: %d%%\nSecrets: %d%%\nTreasure: %d%%\n\n"
+			"Averages: %02d:%02d\nKills: %d%%\nSecrets: %d%%\nTreasure: %d%%",
+			gamestate.TimeCount/4200, (gamestate.TimeCount/70)%60,
+			gamestate.killcount*100/gamestate.killtotal,
+			gamestate.secretcount*100/gamestate.secrettotal,
+			gamestate.treasurecount*100/gamestate.treasuretotal,
+			LevelRatios.time/60, LevelRatios.time%60,
+			ak, as, at
+ 		);
+		US_CenterWindow(17, 12);
+		US_PrintCentered(ratios);
 		VW_UpdateScreen();
 		IN_Ack();
-		if (end == 10 && gamestate.mapon > 9)
-		{
-			start = 10; end = 20;
-			CenterWindow(17,12);
-			goto again;
-		}*/
 
 		return 1;
 	}
 	else if (Keyboard[sc_N])        // N = no clip
 	{
 		noclip^=1;
-		CenterWindow (18,3);
+		US_CenterWindow (18,3);
 		if (noclip)
 			US_PrintCentered ("No clipping ON");
 		else
@@ -399,11 +376,11 @@ again:
 		Quit (NULL);
 	else if (Keyboard[sc_S])        // S = slow motion
 	{
-		CenterWindow(30,3);
+		US_CenterWindow(30,3);
 		PrintY+=6;
 		US_Print(SmallFont, " Slow Motion steps (default 14): ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,2,0);
+		esc = !US_LineInput (PrintX,py,str,NULL,true,2,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -415,7 +392,7 @@ again:
 	else if (Keyboard[sc_T])
 	{
 		notargetmode = !notargetmode;
-		CenterWindow (20,3);
+		US_CenterWindow (20,3);
 		if(notargetmode)
 			US_PrintCentered("No target mode ON");
 		else
@@ -426,11 +403,11 @@ again:
 	}
 	else if (Keyboard[sc_V])        // V = extra VBLs
 	{
-		CenterWindow(30,3);
+		US_CenterWindow(30,3);
 		PrintY+=6;
 		US_Print(SmallFont, "  Add how many extra VBLs(0-8): ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,1,0);
+		esc = !US_LineInput (PrintX,py,str,NULL,true,1,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -441,11 +418,11 @@ again:
 	}
 	else if (Keyboard[sc_W])        // W = warp to level
 	{
-		CenterWindow(26,3);
+		US_CenterWindow(26,3);
 		PrintY+=6;
 		US_Print(SmallFont, "  Warp to which level: ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,8,0);
+		esc = !US_LineInput (PrintX,py,str,NULL,true,8,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc && Wads.CheckNumForName(str) != -1)
 		{
 			strncpy(gamestate.mapname, str, 8);
@@ -456,11 +433,22 @@ again:
 	}
 	else if (Keyboard[sc_X])        // X = item cheat
 	{
-		CenterWindow (12,3);
-		US_PrintCentered ("Extra stuff!");
+		US_CenterWindow (22,3);
+		PrintY += 6;
+		US_Print (SmallFont, "Give: ");
 		VW_UpdateScreen();
-		// DEBUG: put stuff here
-		IN_Ack ();
+		esc = !US_LineInput (PrintX,py,str,NULL,true,22,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		if (!esc)
+		{
+			const ClassDef *cls = ClassDef::FindClass(str);
+			if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
+				return 1;
+
+			AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0);
+			inv->RemoveFromWorld();
+			if(!inv->TryPickup(players[0].mo))
+				inv->Destroy();
+		}
 		return 1;
 	}
 #ifdef USE_CLOUDSKY
@@ -468,7 +456,7 @@ again:
 	{
 		char defstr[15];
 
-		CenterWindow(34,4);
+		US_CenterWindow(34,4);
 		PrintY+=6;
 		US_Print(SmallFont, "  Recalculate sky with seek: ");
 		int seekpx = px, seekpy = py;
@@ -481,12 +469,12 @@ again:
 		VW_UpdateScreen();
 
 		sprintf(defstr, "%u", curSky->seed);
-		esc = !US_LineInput(seekpx, seekpy, str, defstr, true, 10, 0);
+		esc = !US_LineInput(seekpx, seekpy, str, defstr, true, 10, 0,GPalette.WhiteIndex);
 		if(esc) return 0;
 		curSky->seed = (uint32_t) atoi(str);
 
 		sprintf(defstr, "%u", curSky->colorMapIndex);
-		esc = !US_LineInput(mappx, mappy, str, defstr, true, 10, 0);
+		esc = !US_LineInput(mappx, mappy, str, defstr, true, 10, 0,GPalette.WhiteIndex);
 		if(esc) return 0;
 		uint32_t newInd = (uint32_t) atoi(str);
 		if(newInd < (uint32_t) numColorMaps)
@@ -496,7 +484,7 @@ again:
 		}
 		else
 		{
-			CenterWindow (18,3);
+			US_CenterWindow (18,3);
 			US_PrintCentered ("Illegal color map!");
 			VW_UpdateScreen();
 			IN_Ack ();

@@ -269,6 +269,7 @@ class ClassDef
 		Symbol					*FindSymbol(const FName &symbol) const;
 		AActor					*GetDefault() const { return (AActor*)defaultInstance; }
 		const FName				&GetName() const { return name; }
+		const ClassDef			*GetParent() const { return parent; }
 		size_t					GetSize() const { return size; }
 		const Frame				*GetState(unsigned int index) const { return frameList[index]; }
 		static void				LoadActors();

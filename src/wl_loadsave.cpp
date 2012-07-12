@@ -212,7 +212,6 @@ void SetupSaveGames()
 
 		PNGHandle *png;
 		FILE *file = fopen(filename, "rb");
-		Printf("Opening %s\n", filename.GetChars());
 		if(file)
 		{
 			if((png = M_VerifyPNG(file)))
