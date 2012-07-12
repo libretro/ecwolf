@@ -129,12 +129,16 @@ class GameMap
 				unsigned int	GetX() const;
 				unsigned int	GetY() const;
 				Map				*GetAdjacent(Tile::Side dir, bool opposite=false) const;
+				void			SetTile(const Tile *tile);
 
 				const Plane		*plane;
 
 				const Tile		*tile;
 				const Sector	*sector;
 				const Zone		*zone;
+
+				// So that the textures can change.
+				FTextureID		texture[4];
 
 				bool			visible;
 				TObjPtr<Thinker> thinker;

@@ -155,6 +155,7 @@ add_executable(ecwolf #WIN32
 	m_random.cpp
 	m_png.cpp
 	name.cpp
+	p_switch.cpp
 	r_sprites.cpp
 	scanner.cpp
 	sndinfo.cpp

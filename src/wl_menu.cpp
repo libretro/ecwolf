@@ -151,7 +151,8 @@ MENU_LISTENER(EnterControlBase)
 {
 	controlBase[2]->setEnabled(mouseenabled);
 	controlBase[3]->setEnabled(mouseenabled);
-	controlBase[4]->setEnabled(IN_JoyPresent());
+	controlBase[4]->setEnabled(mouseenabled);
+	controlBase[5]->setEnabled(IN_JoyPresent());
 	controlBase.draw();
 	return true;
 }

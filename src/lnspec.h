@@ -39,6 +39,9 @@
 
 class AActor;
 
+// p_switch.cpp
+bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, BYTE special, bool *quest=NULL);
+
 namespace Specials
 {
 	typedef int (*LineSpecialFunction)(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator);

@@ -156,7 +156,7 @@ class UWMFParser
 				PMData* pdata = data[i];
 				for(unsigned int j = 0;j < size;++j)
 				{
-					plane.map[j].tile = pdata[j].tile < 0 ? NULL : &gm->tilePalette[pdata[j].tile];
+					plane.map[j].SetTile(pdata[j].tile < 0 ? NULL : &gm->tilePalette[pdata[j].tile]);
 					plane.map[j].sector = pdata[j].sector < 0 ? NULL : &gm->sectorPalette[pdata[j].sector];
 					plane.map[j].zone = pdata[j].zone < 0 ? NULL : &gm->zonePalette[pdata[j].zone];
 				}

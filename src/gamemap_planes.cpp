@@ -114,9 +114,8 @@ public:
 				min = type+1;
 
 			type = (max+min)/2;
-			
 		}
-		while(max >= min);
+		while(max >= min && max < thingTable.Size());
 
 		if(valid)
 		{
@@ -294,12 +293,12 @@ void GameMap::ReadPlanesData()
 				for(unsigned int i = 0;i < size;++i)
 				{
 					if(oldplane[i] < NUM_WALLS)
-						mapPlane.map[i].tile = &tilePalette[oldplane[i]];
+						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]]);
 					else if(oldplane[i] >= DOOR_START && oldplane[i] < DOOR_END)
 					{
 						const bool vertical = oldplane[i]%2 == 0;
 						const unsigned int doorType = (oldplane[i]-DOOR_START)/2;
-						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
 						trig.action = Specials::Door_Open;
 						trig.arg[0] = 4;
 						trig.arg[1] = doorType >= 1 && doorType <= 4 ? doorType : 0;
@@ -311,10 +310,10 @@ void GameMap::ReadPlanesData()
 						else
 							trig.activate[Trigger::East] = trig.activate[Trigger::West] = false;
 
-						mapPlane.map[i].tile = &tilePalette[oldplane[i]-DOOR_START+NUM_WALLS];
+						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]-DOOR_START+NUM_WALLS]);
 					}
 					else
-						mapPlane.map[i].tile = NULL;
+						mapPlane.map[i].SetTile(NULL);
 
 					// We'll be moving the ambush flag to the actor itself.
 					if(oldplane[i] == AMBUSH_TILE)
@@ -326,7 +325,7 @@ void GameMap::ReadPlanesData()
 					else if(oldplane[i] == EXIT_TILE)
 					{
 						// Add exit trigger
-						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
 						trig.action = Specials::Exit_Normal;
 						trig.activate[Trigger::North] = trig.activate[Trigger::South] = false;
 						trig.playerUse = true;
@@ -343,9 +342,9 @@ void GameMap::ReadPlanesData()
 				{
 					const int candidates[4] = {
 						ambushSpots[i] + 1,
-						ambushSpots[i] - UNIT,
+						ambushSpots[i] - header.width,
 						ambushSpots[i] - 1,
-						ambushSpots[i] + UNIT
+						ambushSpots[i] + header.width
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{
@@ -354,7 +353,7 @@ void GameMap::ReadPlanesData()
 						// the new location is indeed in the same row.
 						if((candidates[j] < 0 || (unsigned)candidates[j] > size) ||
 							((j == Tile::East || j == Tile::West) &&
-							(candidates[j]/UNIT != ambushSpots[i]/UNIT)))
+							(candidates[j]/header.width != ambushSpots[i]/header.width)))
 							continue;
 
 						// First adjacent zone wins
@@ -371,16 +370,16 @@ void GameMap::ReadPlanesData()
 					// Look for and switch exit triggers.
 					const int candidates[4] = {
 						altExitSpots[i] + 1,
-						altExitSpots[i] - UNIT,
+						altExitSpots[i] - header.width,
 						altExitSpots[i] - 1,
-						altExitSpots[i] + UNIT
+						altExitSpots[i] + header.width
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{
 						// Same as before
 						if((candidates[j] < 0 || (unsigned)candidates[j] > size) ||
 							((j == Trigger::East || j == Trigger::West) &&
-							(candidates[j]/UNIT != altExitSpots[i]/UNIT)))
+							(candidates[j]/header.width != altExitSpots[i]/header.width)))
 							continue;
 
 						if(oldplane[candidates[j]] == EXIT_TILE)
@@ -389,8 +388,8 @@ void GameMap::ReadPlanesData()
 							// Look for any triggers matching the candidate
 							for(unsigned int k = 0;k < triggers.Size();++k)
 							{
-								if((triggers[k].x == (unsigned)candidates[j]%UNIT) &&
-									(triggers[k].y == (unsigned)candidates[j]/UNIT) &&
+								if((triggers[k].x == (unsigned)candidates[j]%header.width) &&
+									(triggers[k].y == (unsigned)candidates[j]/header.width) &&
 									(triggers[k].action == Specials::Exit_Normal))
 									triggers[k].action = Specials::Exit_Secret;
 							}
@@ -420,7 +419,7 @@ void GameMap::ReadPlanesData()
 						if(ambushSpots[ambushSpot] == i)
 							++ambushSpot;
 
-						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
 						trig.action = Specials::Pushwall_Move;
 						trig.arg[0] = 2;
 						trig.arg[1] = 1;
@@ -434,22 +433,22 @@ void GameMap::ReadPlanesData()
 						if(ambushSpots[ambushSpot] == i)
 							++ambushSpot;
 
-						Trigger &trig = NewTrigger(i%UNIT, i/UNIT, 0);
+						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
 						trig.action = Specials::Exit_VictorySpin;
 						trig.walkUse = true;
 					}
 					else
 					{
 						Thing thing;
-						thing.x = ((i%UNIT)<<FRACBITS)+(FRACUNIT/2);
-						thing.y = ((i/UNIT)<<FRACBITS)+(FRACUNIT/2);
+						thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
+						thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
 						thing.z = 0;
 						thing.ambush = ambushSpots[ambushSpot] == i;
 						if(thing.ambush)
 							++ambushSpot;
 
 						if(!xlat.TranslateThing(thing, oldplane[i]))
-							printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%UNIT, i/UNIT);
+							printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 						else
 							things.Push(thing);
 					}

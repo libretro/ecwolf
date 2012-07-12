@@ -427,7 +427,7 @@ FUNC(Exit_Normal)
 	buttonheld[bt_use] = true;
 
 	playstate = ex_completed;
-	SD_PlaySound ("world/level_done");
+	SD_PlaySound ("switches/exitbutn");
 	SD_WaitSoundDone();
 	return 1;
 }
@@ -439,7 +439,7 @@ FUNC(Exit_Secret)
 	buttonheld[bt_use] = true;
 
 	playstate = ex_secretlevel;
-	SD_PlaySound ("world/level_done");
+	SD_PlaySound ("switches/exitbutn");
 	SD_WaitSoundDone();
 	return 1;
 }

@@ -458,6 +458,18 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 	return &plane->map[y*plane->gm->GetHeader().width+x];
 }
 
+void GameMap::Plane::Map::SetTile(const MapTile *tile)
+{
+	this->tile = tile;
+	for(unsigned int i = 0;i < 4;++i)
+	{
+		if(tile)
+			texture[i] = tile->texture[i];
+		else
+			texture[i].SetInvalid();
+	}
+}
+
 FArchive &operator<< (FArchive &arc, GameMap *&gm)
 {
 	arc << gm->header.name
@@ -525,7 +537,8 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			arc << pushdir;
 			plane.map[i].pushDirection = static_cast<MapTile::Side>(pushdir);
 
-			arc << plane.map[i].visible
+			arc << plane.map[i].texture[0] << plane.map[i].texture[1] << plane.map[i].texture[2] << plane.map[i].texture[3]
+				<< plane.map[i].visible
 				<< plane.map[i].thinker
 				<< plane.map[i].slideAmount[0] << plane.map[i].slideAmount[1] << plane.map[i].slideAmount[2] << plane.map[i].slideAmount[3]
 				<< plane.map[i].triggers

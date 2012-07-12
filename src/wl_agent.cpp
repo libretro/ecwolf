@@ -222,9 +222,9 @@ void StatusDrawPic (unsigned x, unsigned y, const char* pic)
 	VWB_DrawGraphic(TexMan(pic), x*8, 200-(STATUSLINES-y));
 }
 
-void StatusDrawFace(const char* pic)
+static void StatusDrawFace(FTexture *pic)
 {
-	VWB_DrawGraphic(TexMan(pic), 136, 164);
+	VWB_DrawGraphic(pic, 136, 164);
 }
 
 
@@ -238,20 +238,20 @@ void StatusDrawFace(const char* pic)
 
 void DrawFace (void)
 {
-	const char* godmode[3] = { "STFGOD0", "STFGOD1", "STFGOD2" };
-	const char* animations[7][3] =
+	//static FTexture *godmode[3] = { TexMan("STFGOD0"), TexMan("STFGOD1"), TexMan("STFGOD2") };
+	static FTexture *animations[7][3] =
 	{
-		{ "STFST00", "STFST01", "STFST02" },
-		{ "STFST10", "STFST11", "STFST12" },
-		{ "STFST20", "STFST21", "STFST22" },
-		{ "STFST30", "STFST31", "STFST32" },
-		{ "STFST40", "STFST41", "STFST42" },
-		{ "STFST50", "STFST51", "STFST52" },
-		{ "STFST60", "STFST61", "STFST62" },
+		{ TexMan("STFST00"), TexMan("STFST01"), TexMan("STFST02") },
+		{ TexMan("STFST10"), TexMan("STFST11"), TexMan("STFST12") },
+		{ TexMan("STFST20"), TexMan("STFST21"), TexMan("STFST22") },
+		{ TexMan("STFST30"), TexMan("STFST31"), TexMan("STFST32") },
+		{ TexMan("STFST40"), TexMan("STFST41"), TexMan("STFST42") },
+		{ TexMan("STFST50"), TexMan("STFST51"), TexMan("STFST52") },
+		{ TexMan("STFST60"), TexMan("STFST61"), TexMan("STFST62") },
 	};
 	if(viewsize == 21 && ingame) return;
 	if (GotChaingun())
-		StatusDrawFace("STFEVL0");
+		StatusDrawFace(TexMan("STFEVL0"));
 	else if (players[0].health)
 	{
 #ifdef SPEAR
@@ -263,12 +263,12 @@ void DrawFace (void)
 	}
 	else
 	{
-#ifndef SPEAR
-		//if (LastAttacker && LastAttacker->obclass == needleobj)
-		//	StatusDrawFace("STFMUT0");
-		//else
-#endif
-			StatusDrawFace("STFDEAD0");
+		// TODO: Make this work based on damage types.
+		static const ClassDef *needle = ClassDef::FindClass("Needle");
+		if (players[0].killerobj && players[0].killerobj->GetClass() == needle)
+			StatusDrawFace(TexMan("STFMUT0"));
+		else
+			StatusDrawFace(TexMan("STFDEAD0"));
 	}
 }
 
@@ -910,6 +910,7 @@ void Cmd_Use (void)
 		{
 			if(map->ActivateTrigger(trig, direction, players[0].mo))
 			{
+				P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>((direction+2)%4), trig.repeatable, trig.action);
 				//buttonstate[bt_use] = false;
 				doNothing = false;
 			}

@@ -2,8 +2,10 @@ doors/open				{ DSDROPN ALDROPN PCDROPN }
 doors/close				{ DSDRCLS ALDRCLS PCDRCLS }
 
 world/hitwall			{ NULL ALHITWAL PCHITWAL }
-world/level_done		{ DSSWITCH ALSWITCH PCSWITCH }
 world/pushwall			{ DSPSHWAL ALPSHWAL PCPSHWAL }
+
+switches/normbutn		{ DSSWITCH ALSWITCH PCSWITCH }
+switches/exitbutn		{ DSSWITCH ALSWITCH PCSWITCH }
 
 misc/1up				{ NULL ALBNS1UP PCBNS1UP }
 misc/do_nothing			{ NULL ALNOTHIN PCNOTHIN }
