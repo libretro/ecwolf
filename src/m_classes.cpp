@@ -761,10 +761,15 @@ int Menu::handle()
 				int oldPos = curPos;
 				do
 				{
-					if (curPos == 0 && lastIndexDrawn != 0)
+					if (curPos == 0)
 					{
 						curPos = countItems() - 1;
 						itemOffset = curPos - lastIndexDrawn;
+					}
+					else if (itemOffset > 0 && (unsigned)curPos == itemOffset+1)
+					{
+						--itemOffset;
+						--curPos;
 					}
 					else
 						--curPos;
@@ -799,10 +804,16 @@ int Menu::handle()
 				int oldPos = curPos;
 				do
 				{
-					if (curPos == (signed)countItems() - 1)
+					unsigned int lastPos = countItems() - 1;
+					if ((unsigned)curPos == lastPos)
 					{
 						curPos = 0;
 						itemOffset = 0;
+					}
+					else if (lastIndexDrawn != lastPos && (unsigned)curPos == lastIndexDrawn-1)
+					{
+						++itemOffset;
+						++curPos;
 					}
 					else
 						++curPos;

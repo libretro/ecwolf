@@ -296,7 +296,7 @@ void DoJukebox(void)
 	if (!AdLibPresent && !SoundBlasterPresent)
 		return;
 
-	MenuFadeOut();
+	VW_FadeOut ();
 
 	ClearMScreen ();
 	musicMenu.setHeadText(language["ROBSJUKEBOX"], true);
