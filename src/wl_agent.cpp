@@ -307,7 +307,6 @@ void UpdateFace (void)
 			gamestate.faceframe = 1;
 
 		facecount = 0;
-		DrawFace ();
 	}
 }
 
@@ -392,8 +391,7 @@ void TakeDamage (int points,AActor *attacker)
 	if (godmode != 2)
 		StartDamageFlash (points);
 
-	DrawHealth ();
-	DrawFace ();
+	DrawStatusBar();
 
 	//
 	// MAKE BJ'S EYES BUG IF MAJOR DAMAGE!
