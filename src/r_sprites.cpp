@@ -308,6 +308,7 @@ void R_LoadSprite(const FString &name)
 	static uint32_t lastSprite = 0;
 	SpriteInfo sprInf;
 	sprInf.frames = 0;
+	sprInf.numFrames = 0;
 
 	strcpy(sprInf.name, name.GetChars());
 	if(loadedSprites.Size() > 0)
@@ -339,7 +340,7 @@ extern unsigned vbufPitch;
 
 void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
 {
-	if(actor->sprite == SPR_NONE)
+	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
 		return;
 
 	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
@@ -398,7 +399,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 
 void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed offsetY)
 {
-	if(frame->spriteInf == SPR_NONE)
+	if(frame->spriteInf == SPR_NONE || loadedSprites[frame->spriteInf].numFrames == 0)
 		return;
 
 	const Sprite &spr = spriteFrames[loadedSprites[frame->spriteInf].frames+frame->frame];

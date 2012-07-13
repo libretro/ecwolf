@@ -51,7 +51,7 @@ graphics
 	"PG13",
 	"CREDITS",
 	"KNIFE",
-	"GUN",
+	"PISTOL",
 	"MACHGUN",
 	"GATLGUN",
 	"NOKEY",

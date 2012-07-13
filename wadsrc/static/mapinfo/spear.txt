@@ -39,6 +39,10 @@ defaultmap
 	translator = "xlat/wolf3d.txt"
 }
 
+episode "MAP01"
+{
+}
+
 map "MAP01"
 {
 	next = "MAP02"

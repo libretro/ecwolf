@@ -187,6 +187,9 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 }
 MENU_LISTENER(StartNewGame)
 {
+	if(episode == NULL)
+		episode = &EpisodeInfo::GetEpisode(0);
+
 	Menu::closeMenus();
 	NewGame(which, episode->StartMap);
 

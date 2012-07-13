@@ -106,3 +106,14 @@ actor PlayerPawn native
 {
 	player.maxhealth 100
 }
+
+actor Unknown
+{
+	radius 32
+	states
+	{
+		Spawn:
+			UNKN A -1
+			stop
+	}
+}

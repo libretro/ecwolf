@@ -513,7 +513,7 @@ protected:
 	bool CheckKey(FString key)
 	{
 		if(key.CompareNoCase("name") == 0)
-			ParseStringAssignment(episode.StartMap);
+			ParseStringAssignment(episode.EpisodeName);
 		else if(key.CompareNoCase("lookup") == 0)
 		{
 			ParseStringAssignment(episode.EpisodeName);
@@ -622,6 +622,10 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 			{
 				LevelInfoBlockParser(sc, defaultMap, false).Parse();
 			}
+			else if(sc->str.CompareNoCase("clearepisodes") == 0)
+			{
+				episodes.Clear();
+			}
 			else if(sc->str.CompareNoCase("cluster") == 0)
 			{
 				ClusterBlockParser(sc).Parse();
@@ -654,6 +658,8 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 			{
 				GameInfoBlockParser(sc).Parse();
 			}
+			// Regular key words
+			else if(sc->str.CompareNoCase("clearepisodes") == 0) {}
 			else
 				SkipBlock(sc);
 		}
@@ -673,4 +679,7 @@ void G_ParseMapInfo(bool gameinfoPass)
 
 	while((lump = Wads.FindLump("ZMAPINFO", &lastlump)) != -1)
 		ParseMapInfoLump(lump, gameinfoPass);
+
+	if(!gameinfoPass && episodes.Size() == 0)
+		Quit("At least 1 episode must be defined.");
 }

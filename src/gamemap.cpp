@@ -371,12 +371,13 @@ void GameMap::SpawnThings() const
 			SpawnPlayer(thing.x>>FRACBITS, thing.y>>FRACBITS, thing.angle);
 		else
 		{
+			static const ClassDef *unknownClass = ClassDef::FindClass("Unknown");
 			// Spawn object
 			const ClassDef *cls = ClassDef::FindClass(thing.type);
 			if(cls == NULL)
 			{
+				cls = unknownClass;
 				printf("Unknown thing %d @ (%d, %d)\n", thing.type, thing.x>>FRACBITS, thing.y>>FRACBITS);
-				continue;
 			}
 
 			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0);
@@ -395,6 +396,9 @@ void GameMap::SpawnThings() const
 			// Check for valid frames
 			if(!actor->state || !R_CheckSpriteValid(actor->sprite))
 			{
+				actor->Destroy();
+				actor = AActor::Spawn(unknownClass, thing.x, thing.y, 0);
+
 				printf("%s at (%d, %d) has no frames\n", cls->GetName().GetChars(), thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
 		}
