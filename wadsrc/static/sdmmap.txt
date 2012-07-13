@@ -95,11 +95,11 @@ sprites
 	// End NULL data
 	"COLUA0",	"PLNTA0",
 	// Begin NULL data
-	"SKELA0",	"STATK0",
+	"SKELA0",	"SINKA0",
 	// End NULL data
 	"BPNTA0",	"VASEA0",	"TABLA0",	"GLMPA0",
 	// Begin NULL data
-	"STATP0",
+	"BUNKA0",
 	// End NULL data
 	"ARMRA0",	"CAG1A0",	"CAG2A0",	"BON1A0",
 	"GKEYA0",	"SKEYA0",
@@ -119,11 +119,11 @@ sprites
 	"FLAGA0",	"RLMPA0",	"BON2A0",	"BON3A0",
 	"BON4A0",
 	// Begin NULL data
-	"STT2O0",	"STT2P0",	"STT2Q0",
+	"GIB3A0",	"STOVA0",	"RACKA0",
 	// End NULL data
 	"VINEA0",
 	// Begin NULL data
-	"STT2S0",
+	"COL2A0",
 	// End NULL data
 	"AMMOA0",
 	// Begin NULL data
@@ -342,10 +342,13 @@ sounds
 music
 {
 	"XFUNKIE",
+	// Begin NULL data
 	"DUNGEON",
 	"XDEATH",
 	"GETTHEM",
+	// End NULL data
 	"XTIPTOE",
+	// Begin NULL data
 	"GOINGAFT",
 	"URAHERO",
 	"XTHEEND",
@@ -355,15 +358,22 @@ music
 	"SEARCHN",
 	"SUSPENSE",
 	"ZEROHOUR",
+	// End NULL data
 	"WONDERIN",
+	// Start NULL data
 	"ULTIMATE",
+	// End NULL data
 	"ENDLEVEL",
+	// Start NULL data
 	"XEVIL",
 	"XJAZNAZI",
 	"COPYPRO",
+	// End NULL data
 	"XAWARD",
+	// Start NULL data
 	"XPUTIT",
 	"XGETYOU",
+	// End NULL data
 	"XTOWER2"
 }
 
@@ -487,40 +497,40 @@ textures
 	// End NULL data
 	"GRYHTLR1",	// Gray Brick Hitler N/S
 	"GRYHTLR2",	// Gray Brick Hitler E/W
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
+	"COBBLEA1",	// Brown Cobble 1 N/S
+	"COBBLEA2",	// Brown Cobble 1 E/W
+	"COBBLEB1",	// Brown Cobble 2 N/S
+	"COBBLEB2",	// Brown Cobble 2 E/W
+	"COBFLAG1",	// Brown Cobble Flag N/S
+	"COBFLAG2",	// Brown Cobble Flag E/W
 	// Begin NULL data
-	"",
-	"",
+	"COBWRTH1",	// Brown Cobble Wreath N/S
+	"COBWRTH2",	// Brown Cobble Wreath E/W
 	// End NULL data
-	"",
-	"",
-	"",
-	"",
+	"BOLDERA1",	// Gray Boulders 1 N/S
+	"BOLDERA2",	// Gray Boulders 1 E/W
+	"BOLDERB1",	// Gray Boulders 2 N/S
+	"BOLDERB2",	// Gray Boulders 2 E/W
 	// Begin NULL data
-	"",
-	"",
+	"HELLWAL1",	// Hell Wall N/S
+	"HELLWAL2",	// Hell Wall E/W
 	// End NULL data
-	"",
-	"",
+	"GRAYCAV1",	// Gray Cave N/S
+	"GRAYCAV2",	// Gray Cave E/W
 	// Begin NULL data
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
+	"RAMPRTA1",	// Ramparts 1 N/S
+	"RAMPRTA2",	// Ramparts 1 E/W
+	"RAMPRTB1",	// Ramparts 2 N/S
+	"RAMPRTB2",	// Ramparts 2 E/W
+	"ELEV3_1",	// Elevator Wall N/S
+	"ELEV3_2",	// Elevator Wall E/W
+	"WHITWAL1",	// White Wall N/S
+	"WHITWAL2",	// White Wall E/W
 	// End NULL data
-	"",
-	"",
-	"",
-	"",
+	"BRWNVIN1",	// Brown Vine N/S
+	"BRWNVIN2",	// Brown Vine E/W
+	"PINKBRK1",	// Ugly Pink Brick N/S
+	"PINKBRK2",	// Ugly Pink Brick E/W
 	"DOOR1_1",	// Door N/S
 	"DOOR1_2",	// Door E/W
 	"SLOT1_1",	// Doorjamb N/S
