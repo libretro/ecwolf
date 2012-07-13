@@ -85,48 +85,77 @@ graphics
 
 sprites
 {
-	"DEMO",
-	"DEATHCAM",
+	"DEMOA0":pspr,
+	"DCAMA0":pspr,
 
-	"STATA0",	"STATB0",	"STATC0",	"STATD0",
-	"STATE0",	"STATF0",	"STATG0",	"STATH0",
-	"STATI0",	"STATJ0",	"STATK0",	"STATL0",
-	"STATM0",	"STATN0",	"STATO0",	"STATP0",
-	"STATQ0",	"STATR0",	"STATS0",	"STATT0",
-	"STATU0",	"STATV0",	"STATW0",	"STATX0",
-	"STATY0",	"STATZ0",	"STAT[0",	"STAT^0",
-	"STAT]0",	"STT2A0",	"STT2B0",	"STT2C0",
-	"STT2C0",	"STT2D0",	"STT2E0",	"STT2F0",
-	"STT2G0",	"STT2H0",	"STT2I0",	"STT2J0",
-	"STT2K0",	"STT2L0",	"STT2M0",	"STT2N0",
-	"STT2O0",	"STT2P0",	"STT2Q0",	"STT2R0",
-	"STT2S0",	"STT2T0",	"STT2U0",	"STT2V0",
-	"STT2W0",	"STT2X0",	"STT2Y0",	"STT2Z0",
+	"WATRA0",	"DRUMA0",	"TCHRA0",	"FLMPA0",
+	"CHANA0",
+	// Begin NULL data
+	"HANGA0",	"ALPOA0",
+	// End NULL data
+	"COLUA0",	"PLNTA0",
+	// Begin NULL data
+	"SKELA0",	"STATK0",
+	// End NULL data
+	"BPNTA0",	"VASEA0",	"TABLA0",	"GLMPA0",
+	// Begin NULL data
+	"STATP0",
+	// End NULL data
+	"ARMRA0",	"CAG1A0",	"CAG2A0",	"BON1A0",
+	"GKEYA0",	"SKEYA0",
+	// Begin NULL data
+	"STATW0",
+	// End NULL data
+	"BASKA0",	"FOODA0",	"MEDIA0",	"CLIPA0",
+	"MGUNA0",	"CGUNA0",	"CROSA0",	"CHALA0",	"JEWLA0",
+	"CRWNA0",	"ONUPA0",
+	// Begin NULL data
+	"GIBSA0",
+	// End NULL data
+	"BARLA0",	"WEL1A0",	"WEL2A0",
+	// Begin NULL data
+	"BLUDA0",
+	// End NULL data
+	"FLAGA0",	"RLMPA0",	"BON2A0",	"BON3A0",
+	"BON4A0",
+	// Begin NULL data
+	"STT2O0",	"STT2P0",	"STT2Q0",
+	// End NULL data
+	"VINEA0",
+	// Begin NULL data
+	"STT2S0",
+	// End NULL data
+	"AMMOA0",
+	// Begin NULL data
+	"TRUKA0",	"SPODA0",
+	// End NULL data
 
-	"GRD0A1",	"GRD0A2",	"GRD0A3",	"GRD0A4",
-	"GRD0A5",	"GRD0A6",	"GRD0A7",	"GRD0A8",
-	"GRD0B1",	"GRD0B2",	"GRD0B3",	"GRD0B4",
-	"GRD0B5",	"GRD0B6",	"GRD0B7",	"GRD0B8",
-	"GRD0C1",	"GRD0C2",	"GRD0C3",	"GRD0C4",
-	"GRD0C5",	"GRD0C6",	"GRD0C7",	"GRD0C8",
-	"GRD0D1",	"GRD0D2",	"GRD0D3",	"GRD0D4",
-	"GRD0D5",	"GRD0D6",	"GRD0D7",	"GRD0D8",
-	"GRD0E1",	"GRD0E2",	"GRD0E3",	"GRD0E4",
-	"GRD0E5",	"GRD0E6",	"GRD0E7",	"GRD0E8",
-	"GRD0F0",	"GRD0G0",	"GRD0H0",	"GRD0I0",
-	"GRD0J0",	"GRD0K0",
-	"GRD0L0",	"GRD0M0",	"GRD0N0",
+	"GARDA1",	"GARDA2",	"GARDA3",	"GARDA4",
+	"GARDA5",	"GARDA6",	"GARDA7",	"GARDA8",
+	"GARDB1",	"GARDB2",	"GARDB3",	"GARDB4",
+	"GARDB5",	"GARDB6",	"GARDB7",	"GARDB8",
+	"GARDC1",	"GARDC2",	"GARDC3",	"GARDC4",
+	"GARDC5",	"GARDC6",	"GARDC7",	"GARDC8",
+	"GARDD1",	"GARDD2",	"GARDD3",	"GARDD4",
+	"GARDD5",	"GARDD6",	"GARDD7",	"GARDD8",
+	"GARDE1",	"GARDE2",	"GARDE3",	"GARDE4",
+	"GARDE5",	"GARDE6",	"GARDE7",	"GARDE8",
+	"GARDI0",	"GARDK0",	"GARDL0",	"GARDM0",
+	"GARDJ0",	"GARDN0",
+	"GARDF0",	"GARDG0",	"GARDH0",
 
-	"DOG0A1",	"DOG0A2",	"DOG0A3",	"DOG0A4",
-	"DOG0A5",	"DOG0A6",	"DOG0A7",	"DOG0A8",
-	"DOG0B1",	"DOG0B2",	"DOG0B3",	"DOG0B4",
-	"DOG0B5",	"DOG0B6",	"DOG0B7",	"DOG0B8",
-	"DOG0C1",	"DOG0C2",	"DOG0C3",	"DOG0C4",
-	"DOG0C5",	"DOG0C6",	"DOG0C7",	"DOG0C8",
-	"DOG0D1",	"DOG0D2",	"DOG0D3",	"DOG0D4",
-	"DOG0D5",	"DOG0D6",	"DOG0D7",	"DOG0D8",
-	"DOG0E0",	"DOG0F0",	"DOG0G0",	"DOG0H0",
-	"DOG0I0",	"DOG0J0",	"DOG0K0",
+	// Begin NULL data
+	"DOGYA1",	"DOGYA2",	"DOGYA3",	"DOGYA4",
+	"DOGYA5",	"DOGYA6",	"DOGYA7",	"DOGYA8",
+	"DOGYB1",	"DOGYB2",	"DOGYB3",	"DOGYB4",
+	"DOGYB5",	"DOGYB6",	"DOGYB7",	"DOGYB8",
+	"DOGYC1",	"DOGYC2",	"DOGYC3",	"DOGYC4",
+	"DOGYC5",	"DOGYC6",	"DOGYC7",	"DOGYC8",
+	"DOGYD1",	"DOGYD2",	"DOGYD3",	"DOGYD4",
+	"DOGYD5",	"DOGYD6",	"DOGYD7",	"DOGYD8",
+	"DOGYH0",	"DOGYI0",	"DOGYJ0",	"DOGYK0",
+	"DOGYE0",	"DOGYF0",	"DOGYG0",
+	// End NULL data
 
 	"SSWVW1",	"SSWVW2",	"SSWVW3",	"SSWVW4",
 	"SSWVW5",	"SSWVW6",	"SSWVW7",	"SSWVW8",
@@ -142,33 +171,34 @@ sprites
 	"SSWVH0",	"SSWVM0",
 	"SSWVE0",	"SSWVF0",	"SSWVG0",
 
-	"MUT0A1",	"MUT0A2",	"MUT0A3",	"MUT0A3",
-	"MUT0A5",	"MUT0A6",	"MUT0A7",	"MUT0A8",
-	"MUT0B1",	"MUT0B2",	"MUT0B3",	"MUT0B3",
-	"MUT0B5",	"MUT0B6",	"MUT0B7",	"MUT0B8",
-	"MUT0C1",	"MUT0C2",	"MUT0C3",	"MUT0C3",
-	"MUT0C5",	"MUT0C6",	"MUT0C7",	"MUT0C8",
-	"MUT0D1",	"MUT0D2",	"MUT0D3",	"MUT0D3",
-	"MUT0D5",	"MUT0D6",	"MUT0D7",	"MUT0D8",
-	"MUT0E1",	"MUT0E2",	"MUT0E3",	"MUT0E3",
-	"MUT0E5",	"MUT0E6",	"MUT0E7",	"MUT0E8",
-	"MUT0F0",	"MUT0G0",	"MUT0H0",	"MUT0I0",
-	"MUT0J0",	"MUT0K0",	"MUT0L0",
-	"MUT0M0",	"MUT0N0",	"MUT0O0",	"MUT0P0",
+	// Begin NULL data
+	"MTNTA1",	"MTNTA2",	"MTNTA3",	"MTNTA4",
+	"MTNTA5",	"MTNTA6",	"MTNTA7",	"MTNTA8",
+	"MTNTB1",	"MTNTB2",	"MTNTB3",	"MTNTB4",
+	"MTNTB5",	"MTNTB6",	"MTNTB7",	"MTNTB8",
+	"MTNTC1",	"MTNTC2",	"MTNTC3",	"MTNTC4",
+	"MTNTC5",	"MTNTC6",	"MTNTC7",	"MTNTC8",
+	"MTNTD1",	"MTNTD2",	"MTNTD3",	"MTNTD4",
+	"MTNTD5",	"MTNTD6",	"MTNTD7",	"MTNTD8",
+	"MTNTE1",	"MTNTE2",	"MTNTE3",	"MTNTE4",
+	"MTNTE5",	"MTNTE6",	"MTNTE7",	"MTNTE8",
+	"MTNTJ0",	"MTNTL0",	"MTNTM0",	"MTNTN0",
+	"MTNTK0",	"MTNTO0",	"MTNTP0",
+	"MTNTF0",	"MTNTG0",	"MTNTH0",	"MTNTI0",
 
-	"OFC0A1",	"OFC0A2",	"OFC0A3",	"OFC0A4",
-	"OFC0A5",	"OFC0A6",	"OFC0A7",	"OFC0A8",
-	"OFC0B1",	"OFC0B2",	"OFC0B3",	"OFC0B4",
-	"OFC0B5",	"OFC0B6",	"OFC0B7",	"OFC0B8",
-	"OFC0C1",	"OFC0C2",	"OFC0C3",	"OFC0C4",
-	"OFC0C5",	"OFC0C6",	"OFC0C7",	"OFC0C8",
-	"OFC0D1",	"OFC0D2",	"OFC0D3",	"OFC0D4",
-	"OFC0D5",	"OFC0D6",	"OFC0D7",	"OFC0D8",
-	"OFC0E1",	"OFC0E2",	"OFC0E3",	"OFC0E4",
-	"OFC0E5",	"OFC0E6",	"OFC0E7",	"OFC0E8",
-	"OFC0F0",	"OFC0G0",	"OFC0H0",	"OFC0I0",
-	"OFC0J0",	"OFC0K0",	"OFC0L0",
-	"OFC0M0",	"OFC0N0",	"OFC0O0",
+	"OFFIA1",	"OFFIA2",	"OFFIA3",	"OFFIA4",
+	"OFFIA5",	"OFFIA6",	"OFFIA7",	"OFFIA8",
+	"OFFIB1",	"OFFIB2",	"OFFIB3",	"OFFIB4",
+	"OFFIB5",	"OFFIB6",	"OFFIB7",	"OFFIB8",
+	"OFFIC1",	"OFFIC2",	"OFFIC3",	"OFFIC4",
+	"OFFIC5",	"OFFIC6",	"OFFIC7",	"OFFIC8",
+	"OFFID1",	"OFFID2",	"OFFID3",	"OFFID4",
+	"OFFID5",	"OFFID6",	"OFFID7",	"OFFID8",
+	"OFFIE1",	"OFFIE2",	"OFFIE3",	"OFFIE4",
+	"OFFIE5",	"OFFIE6",	"OFFIE7",	"OFFIE8",
+	"OFFII0",	"OFFIK0",	"OFFIL0",	"OFFIM0",
+	"OFFIJ0",	"OFFIN0",	"OFFIO0",
+	"OFFIF0",	"OFFIG0",	"OFFIH0",
 
 	"ROCKA1",	"ROCKA2",	"ROCKA3",	"ROCKA4",
 	"ROCKA5",	"ROCKA6",	"ROCKA7",	"ROCKA8",
@@ -185,8 +215,8 @@ sprites
 	"SPRKA0",	"SPRKB0",	"SPRKC0",	"SPRKD0",
 
 	"TRNSA0",	"TRNSB0",	"TRNSC0",	"TRNSD0",
-	"TRNSE0",	"TRNSF0",	"TRNSG0",	"TRNSH0",
-	"TRNSI0",	"TRNSJ0",	"TRNSK0",
+	"TRNSE0",	"TRNSF0",	"TRNSG0",	"TRNSK0",
+	"TRNSH0",	"TRNSI0",	"TRNSJ0",
 
 	"WILLA0",	"WILLB0",	"WILLC0",	"WILLD0",
 	"WILLE0",	"WILLF0",	"WILLG0",	"WILLH0",
@@ -195,25 +225,33 @@ sprites
 	"UBERA0",	"UBERB0",	"UBERC0",	"UBERD0",
 	"UBERE0",	"UBERF0",	"UBERG0",	"UBERH0",
 	"UBERI0",	"UBERJ0",	"UBERK0",	"UBERL0",
-	"UBERM0",	"UBERN0",	"UBERO0",
+	"UBERM0",
+
+	"DKNTA0",	"DKNTB0",	"DKNTC0",	"DKNTD0",
+	"DKNTE0",	"DKNTF0",	"DKNTG0",	"DKNTH0",
+	"DKNTI0",	"DKNTJ0",	"DKNTK0",	"DKNTL0",
+	"DKNTM0",	"DKNTN0",	"DKNTO0",
 
 	"SPCTA0",	"SPCTB0",	"SPCTC0",	"SPCTD0",
 	"SPCTE0",	"SPCTF0",	"SPCTG0",	"SPCTH0",
 
 	"ANGLA0",	"ANGLB0",	"ANGLC0",	"ANGLD0",
 	"ANGLE0",	"ANGLF0",	"ANGLG0",	"ANGLH0",
+	"ANGLI0",	"ANGLJ0",	"ANGLK0",	"ANGLL0",
+	"ANGLM0",	"ANGLN0",	"ANGLO0",	"ANGLP0",
+	// End NULL data
 
-	"KNIFA0",	"KNIFB0",	"KNIFC0",	"KNIFD0",
-	"KNIFE0",
+	"KNIFA0":pspr,	"KNIFB0":pspr,	"KNIFC0":pspr,	"KNIFD0":pspr,
+	"KNIFE0":pspr,
 
-	"PISGA0",	"PISGB0",	"PISGC0",	"PISGD0",
-	"PISGE0",
+	"PISGA0":pspr,	"PISGB0":pspr,	"PISGC0":pspr,	"PISGD0":pspr,
+	"PISGE0":pspr,
 
-	"MCHGA0",	"MCHGB0",	"MCHGC0",	"MCHGD0",
-	"MCHGE0",
+	"MCHGA0":pspr,	"MCHGB0":pspr,	"MCHGC0":pspr,	"MCHGD0":pspr,
+	"MCHGE0":pspr,
 
-	"CHGGA0",	"CHGGB0",	"CHGGC0",	"CHGGD0",
-	"CHGGE0"
+	"CHGGA0":pspr,	"CHGGB0":pspr,	"CHGGC0":pspr,	"CHGGD0":pspr,
+	"CHGGE0":pspr
 }
 
 sounds
@@ -327,4 +365,168 @@ music
 	"XPUTIT",
 	"XGETYOU",
 	"XTOWER2"
+}
+
+textures
+{
+	"GSTONEA1",	// Gray Stone 1 N/S
+	"GSTONEA2",	// Gray Stone 1 E/W
+	"GSTONEB1",	// Gray Stone 2 N/S
+	"GSTONEB2",	// Gray Stone 2 E/W
+	// Begin NULL data
+	"GSTFLAG1",	// Gray Stone Flag N/S
+	"GSTFLAG2",	// Gray Stone Flag E/W
+	// End NULL data
+	"GSTHTLR1",	// Gray Stone Hitler N/S
+	"GSTHTLR2",	// Gray Stone Hitler E/W
+	// Begin NULL data
+	"BSTCELA1",	// Blue Stone Empty Cell N/S
+	"BSTCELA2",	// Blue Stone Empty Cell E/W
+	// End NULL data
+	"GSTEAGL1",	// Gray Stone Eagle N/S
+	"GSTEAGL2",	// Gray Stone Eagle E/W
+	// Begin NULL data
+	"BSTCELB1",	// Blue Stone Cell w/ Skeleton N/S
+	"BSTCELB2",	// Blue Stone Cell w/ Skeleton E/W
+	"BSTONEA1",	// Blue Stone 1 N/S
+	"BSTONEA2",	// Blue Stone 1 E/W
+	"BSTONEB1",	// Blue Stone 2 N/S
+	"BSTONEB2",	// Blue Stone 2 E/W
+	"WODEAGL1",	// Wood Eagle N/S
+	"WODEAGL2",	// Wood Eagle E/W
+	"WODHTLR1",	// Wood Hitler N/S
+	"WODHTLR2",	// Wood Hitler E/W
+	// End NULL data
+	"WOOD1",		// Wood N/S
+	"WOOD2",		// Wood E/W
+	// Begin NULL data
+	"FAKEDOR1",	// Entrance to level N/S
+	"FAKEDOR2",	// Entrance to level E/W
+	"METLSGN1",	// Steel Panel Sign N/S
+	"METLSGN2",	// Steel Panel Sign E/W
+	"METAL1",	 // Steel Panel Sign N/S
+	"METAL2",	 // Steel Panel Sign E/W
+	// End NULL data
+	"SKY1",		 // Sky N/S
+	"SKY2",		 // Sky E/W
+	"BRICK1",	 // Red Brick N/S
+	"BRICK2",	 // Red Brick E/W
+	"BRIKWRT1",	// Red Brick Wreath N/S
+	"BRIKWRT2",	// Red Brick Wreath E/W
+	// Begin NULL data
+	"PURPLE1",	// Purple Wall N/S
+	"PURPLE2",	// Purple Wall E/W
+	// End NULL data
+	"BRIKEGL1",	// Red Brick Eagle N/S
+	"BRIKEGL2",	// Red Brick Eagle E/W
+	"ELEV1_1",	// Elevator 1 N/S
+	"ELEV1_2",	// Elevator 1 E/W
+	"ELEV2_1",	// Elevator 2 N/S
+	"ELEV2_2",	// Elevator 2 E/W
+	// Begin NULL data
+	"WODCROS1",	// Wood Cross N/S
+	"WODCROS2",	// Wood Cross E/W
+	// End NULL data
+	"GSTSLME1",	// Gray Stone Slime N/S
+	"GSTSLME2",	// Gray Stone Slime E/W
+	// Begin NULL data
+	"PURPBLD1",	// Purple Blood 1
+	"PURPBLD2",	// Purple Blood 2
+	// End NULL data
+	"GSTLSLM1",	// Gray Stone Slime 2 N/S
+	"GSTLSLM2",	// Gray Stone Slime 2 E/W
+	"GSTONEC1",	// Gray Stone 3 N/S
+	"GSTONEC2",	// Gray Stone 3 E/W
+	"GSTSIGN1",	// Gray Stone Sign N/S
+	"GSTSIGN2",	// Gray Stone Sign E/W
+	"CHIP1",		// Chipped Rock N/S
+	"CHIP2",		// Chipped Rock E/W
+	"CHPBLDA1",	// Chipped Rock Blood 1 N/S
+	"CHPBLDA2",	// Chipped Rock Blood 1 E/W
+	"CHPBLDB1",	// Chipped Rock Blood 2 N/S
+	"CHPBLDB2",	// Chipped Rock Blood 2 E/W
+	"CHPBLDC1",	// Chipped Rock Blood 3 N/S
+	"CHPBLDC2",	// Chipped Rock Blood 3 E/W
+	// Begin NULL data
+	"GLASS1",	 // Stained Glass N/S
+	"GLASS2",	 // Stained Glass E/W
+	// End NULL data
+	"BLUSKUL1",	// Blue Skull N/S
+	"BLUSKUL2",	// Blue Skull E/W
+	"GRYBRIK1",	// Gray Brick N/S
+	"GRYBRIK2",	// Gray Brick E/W
+	"BLUSWAS1",	// Blue Swastika N/S
+	"BLUSWAS2",	// Blue Swastika E/W
+	"GRYVENT1",	// Gray Stone Vent N/S
+	"GRYVENT2",	// Gray Stone Vent E/W
+	"BRIKODD1",	// Odd Bricks N/S
+	"BRIKODD2",	// Odd Bricks E/W
+	"GRYCRAK1",	// Gray Brick Crack N/S
+	"GRYCRAK2",	// Gray Brick Crack E/W
+	"BLUWALL1",	// Blue Wall N/S
+	"BLUWALL2",	// Blue Wall E/W
+	// Begin NULL data
+	"BSTSIGN1",	// Blue Stone Sign N/S
+	"BSTSIGN2",	// Blue Stone Sign E/W
+	// End NULL data
+	"MARB1_1",	// Brown Marble 1 N/S
+	"MARB1_2",	// Brown Marble 1 E/W
+	// Begin NULl data
+	"GRYMAPS1",	// Gray Brick Map N/S
+	"GRYMAPS2",	// Gray Brick Map E/W
+	"BRNSTNA1",	// Brown Stone 1 N/S
+	"BRNSTNA2",	// Brown Stone 1 E/W
+	"BRNSTNB1",	// Brown Stone 2 N/S
+	"BRNSTNB2",	// Brown Stone 2 E/W
+	"MARB2_1",	// Brown Marble 2 N/S
+	"MARB2_2",	// Brown Marble 2 E/W
+	"MARB3_1",	// Brown Marble Flag N/S
+	"MARB3_2",	// Brown Marble Flag E/W
+	"PLASTER1",	// Plaster N/S
+	"PLASTER2",	// Plaster E/W
+	// End NULL data
+	"GRYHTLR1",	// Gray Brick Hitler N/S
+	"GRYHTLR2",	// Gray Brick Hitler E/W
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	// Begin NULL data
+	"",
+	"",
+	// End NULL data
+	"",
+	"",
+	"",
+	"",
+	// Begin NULL data
+	"",
+	"",
+	// End NULL data
+	"",
+	"",
+	// Begin NULL data
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	"",
+	// End NULL data
+	"",
+	"",
+	"",
+	"",
+	"DOOR1_1",	// Door N/S
+	"DOOR1_2",	// Door E/W
+	"SLOT1_1",	// Doorjamb N/S
+	"SLOT1_2",	// Doorjamb E/W
+	"DOOR2_1",	// Elevator Door N/S
+	"DOOR2_2",	// Elevator Door E/W
+	"DOOR3_1",	// Locked Door N/S
+	"DOOR3_2"	 // Locked Door E/W
 }
