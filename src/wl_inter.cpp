@@ -737,13 +737,11 @@ DrawHighScores (void)
 	ClearMScreen ();
 
 	FTexture *highscores = TexMan("HGHSCORE");
+	DrawStripes (10);
 	if(highscores->GetScaledWidth() < 320)
-	{
-		DrawStripes (10);
 		VWB_DrawGraphic(highscores, 160-highscores->GetScaledWidth()/2, 0, MENU_TOP);
-	}
 	else
-		VWB_DrawGraphic(highscores, 0, 0);
+		VWB_DrawGraphic(highscores, 0, 0, MENU_TOP);
 
 	static FTextureID texName = TexMan.CheckForTexture("M_NAME", FTexture::TEX_Any);
 	static FTextureID texLevel = TexMan.CheckForTexture("M_LEVEL", FTexture::TEX_Any);
