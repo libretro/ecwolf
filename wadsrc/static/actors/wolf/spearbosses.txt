@@ -4,6 +4,9 @@ actor Trans 23
 	points 5000
 	health 850, 950, 1050, 1200
 	speed 1, 3
+	seesound "trans/sight"
+	deathsound "trans/death"
+	attacksound "trans/attack"
 	dropitem "GoldKey"
 	MONSTER
 	+AMBUSH
@@ -40,6 +43,8 @@ actor UberMutant 24
 	points 5000
 	health 1050, 1150, 1250, 1400
 	speed 1, 5.859
+	deathsound "uber/death"
+	attacksound "uber/attack"
 	dropitem "GoldKey"
 	MONSTER
 	+AMBUSH
@@ -86,13 +91,16 @@ actor Wilhelm 25
 	health 950, 1050, 1150, 1300
 	speed 1, 4
 	missilechance 8
+	seesound "will/sight"
+	deathsound "will/death"
+	attacksound "will/attack"
 	dropitem "GoldKey"
 	MONSTER
 	+AMBUSH
 	states
 	{
 		Spawn:
-			WILL A -1
+			WILL A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			WILL A 5 NOP A_Chase("*", "*", CHF_BACKOFF)
@@ -126,6 +134,9 @@ actor DeathKnight 26
 	health 1250, 1350, 1450, 1600
 	speed 1, 4
 	missilechance 8
+	seesound "knight/sight"
+	deathsound "knight/death"
+	attacksound "knight/attack"
 	dropitem "GoldKey"
 	MONSTER
 	+AMBUSH

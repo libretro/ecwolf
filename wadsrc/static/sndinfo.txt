@@ -85,7 +85,7 @@ fake/sight				{ DSFAKSIT ALFAKSIT PCFAKSIT }
 fake/attack				{ NULL ALFAKFIR PCFAKFIR }
 fake/death				{ DSFAKDTH ALFAKDTH PCFAKDTH }
 
-hitler/attack			{ NULL ALBOSSFR PCBOSSFR }
+hitler/attack			{ DSBOSSFR ALBOSSFR PCBOSSFR }
 hitler/active			{ DSMCHSTP ALMCHSTP PCMCHSTP }
 hitler/sight			{ DSHITSIT ALHITSIT PCHITSIT }
 hitler/death			{ DSHITDTH ALHITDTH PCHITDTH }
@@ -103,3 +103,27 @@ fat/death				{ DSFATDTH ALFATDTH PCFATDTH }
 
 missile/fire			{ NULL ALRLAUNC PCRLAUNC }
 missile/hit				{ NULL ALBAREXP PCBAREXP }
+
+trans/attack			{ DSBOSSFR ALBOSSFR PCBOSSFR }
+trans/sight				{ DSTRASIT ALTRASIT PCTRASIT }
+trans/death				{ DSTRADTH ALTRADTH PCTRADTH }
+
+will/attack				{ DSBOSSFR ALBOSSFR PCBOSSFR }
+will/sight				{ DSWILSIT ALWILSIT PCWILSIT }
+will/death				{ DSWILDTH ALWILDTH PCWILDTH }
+
+uber/attack				{ DSBOSSFR ALBOSSFR PCBOSSFR }
+uber/death				{ DSUBRDTH ALUBRDTH PCUBRDTH }
+
+knight/attack			{ DSBOSSFR ALBOSSFR PCBOSSFR }
+knight/sight			{ DSKNTSIT ALKNTSIT PCKNTSIT }
+knight/death			{ DSKNTDTH ALKNTDTH PCKNTDTH }
+
+angel/breath			{ NULL ALAGLBTH PCAGLBTH }
+angel/sight				{ DSAGLSIT ALAGLSIT PCAGLSIT }
+angel/death				{ DSAGLDTH ALAGLDTH PCAGLDTH }
+
+ghost/sight				{ NULL PCGHTSIT ALGHTSIT }
+ghost/death				{ NULL ALGHTDTH ALGHTDTH }
+
+treasure/spear/pickup	{ DSSPEAR ALSPEAR PCSPEAR }

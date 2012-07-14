@@ -126,12 +126,6 @@ void Quit(const char *errorStr, ...);
 #define FLASHCOLOR      5
 #define FLASHTICS       4
 
-#ifndef SPEAR
-	#define LRpack      8       // # of levels to store in endgame
-#else
-	#define LRpack      20
-#endif
-
 #undef M_PI
 #define PI              3.141592657
 #define M_PI PI

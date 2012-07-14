@@ -801,23 +801,6 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove)
 /*
 ===================
 =
-= VictoryTile
-=
-===================
-*/
-
-void VictoryTile (void)
-{
-#ifndef SPEAR
-//	SpawnBJVictory ();
-#endif
-
-	gamestate.victoryflag = true;
-}
-
-/*
-===================
-=
 = Thrust
 =
 ===================

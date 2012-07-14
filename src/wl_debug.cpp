@@ -299,6 +299,12 @@ int DebugKeys (void)
 				inv->RemoveFromWorld();
 				if(cls->GetParent() == NATIVE_CLASS(Ammo))
 					inv->amount = inv->maxamount;
+				else if(!cls->FindState("Ready"))
+				{ // Only give valid weapons
+					inv->Destroy();
+					continue;
+				}
+
 				if(!inv->TryPickup(players[0].mo))
 					inv->Destroy();
 			}

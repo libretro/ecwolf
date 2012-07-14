@@ -7,12 +7,6 @@
 
 #include "id_in.h"
 
-#ifdef SPEAR
-#define DEACTIVE        0x9b
-#else
-#define DEACTIVE        0x2b
-#endif
-
 extern int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE;
 void MenuFadeOut();
 void MenuFadeIn();

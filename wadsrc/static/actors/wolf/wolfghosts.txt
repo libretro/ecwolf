@@ -53,6 +53,8 @@ actor Spectre 28
 	points 200
 	health 5, 10, 15, 25
 	speed 1, 1.563
+	seesound "ghost/sight"
+	deathsound "ghost/death"
 	MONSTER
 	+AMBUSH
 	states

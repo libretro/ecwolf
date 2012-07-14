@@ -695,25 +695,6 @@ void DrawPlayerWeapon (void)
 		return;
 
 	R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite.frame, players[0].psprite.sx, players[0].psprite.sy);
-/*	int shapenum;
-
-#ifndef SPEAR
-	if (gamestate.victoryflag)
-	{
-	//	if (players[0].mo->state == &s_deathcam && (GetTimeCount()&32) )
-	//		SimpleScaleShape(viewwidth/2,SPR_DEATHCAM,viewheight+1);
-		return;
-	}
-#endif
-
-	if (gamestate.weapon != -1)
-	{
-		shapenum = weaponscale[gamestate.weapon]+gamestate.weaponframe;
-		SimpleScaleShape(viewwidth/2,shapenum,viewheight+1);
-	}
-
-	if (demorecord || demoplayback)
-		SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1);*/
 }
 
 
