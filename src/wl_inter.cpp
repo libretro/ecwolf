@@ -724,8 +724,7 @@ void PreloadGraphics (void)
 ==================
 */
 
-void
-DrawHighScores (void)
+void DrawHighScores (void)
 {
 	FString buffer;
 
@@ -837,7 +836,7 @@ void CheckHighScore (int32_t score, word other)
 		//
 		PrintY = 76 + ((font->GetHeight() + 3) * n);
 		PrintX = 16;
-		US_LineInput (PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130, BKGDCOLOR, CR_WHITE);
+		US_LineInput (font,PrintX, PrintY, Scores[n].name, 0, true, MaxHighName, 130, BKGDCOLOR, CR_WHITE);
 	}
 	else
 	{

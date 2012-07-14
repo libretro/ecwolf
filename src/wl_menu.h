@@ -24,15 +24,6 @@ void MenuFadeIn();
 #define MENU_X  76
 #define MENU_Y  55
 #define MENU_W  178
-#ifndef SPEAR
-#ifndef GOODTIMES
-#define MENU_H  13*10+6
-#else
-#define MENU_H  13*9+6
-#endif
-#else
-#define MENU_H  13*9+6
-#endif
 
 #define SM_X    48
 #define SM_W    250

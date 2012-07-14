@@ -198,7 +198,7 @@ int DebugKeys (void)
 		PrintY+=6;
 		US_Print(SmallFont, " Border texture: ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (PrintX,py,str,NULL,true,8,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,8,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			FTextureID texID = TexMan.CheckForTexture(str, FTexture::TEX_Any);
@@ -321,7 +321,7 @@ int DebugKeys (void)
 		PrintY+=6;
 		US_Print(SmallFont, "  Give Key (#): ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (PrintX,py,str,NULL,true,3,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,3,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -386,7 +386,7 @@ int DebugKeys (void)
 		PrintY+=6;
 		US_Print(SmallFont, " Slow Motion steps (default 14): ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (PrintX,py,str,NULL,true,2,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,2,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -413,7 +413,7 @@ int DebugKeys (void)
 		PrintY+=6;
 		US_Print(SmallFont, "  Add how many extra VBLs(0-8): ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (PrintX,py,str,NULL,true,1,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,1,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -428,7 +428,7 @@ int DebugKeys (void)
 		PrintY+=6;
 		US_Print(SmallFont, "  Warp to which level: ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (PrintX,py,str,NULL,true,8,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,8,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc && Wads.CheckNumForName(str) != -1)
 		{
 			strncpy(gamestate.mapname, str, 8);
@@ -443,7 +443,7 @@ int DebugKeys (void)
 		PrintY += 6;
 		US_Print (SmallFont, "Give: ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (PrintX,py,str,NULL,true,22,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,22,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			const ClassDef *cls = ClassDef::FindClass(str);
@@ -475,12 +475,12 @@ int DebugKeys (void)
 		VW_UpdateScreen();
 
 		sprintf(defstr, "%u", curSky->seed);
-		esc = !US_LineInput(seekpx, seekpy, str, defstr, true, 10, 0,GPalette.WhiteIndex);
+		esc = !US_LineInput(SmallFont,seekpx, seekpy, str, defstr, true, 10, 0,GPalette.WhiteIndex);
 		if(esc) return 0;
 		curSky->seed = (uint32_t) atoi(str);
 
 		sprintf(defstr, "%u", curSky->colorMapIndex);
-		esc = !US_LineInput(mappx, mappy, str, defstr, true, 10, 0,GPalette.WhiteIndex);
+		esc = !US_LineInput(SmallFont,mappx, mappy, str, defstr, true, 10, 0,GPalette.WhiteIndex);
 		if(esc) return 0;
 		uint32_t newInd = (uint32_t) atoi(str);
 		if(newInd < (uint32_t) numColorMaps)

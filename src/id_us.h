@@ -93,7 +93,7 @@ void			US_StartCursor(void),
 void			US_CheckHighScore(int32_t score,word other);
 void			US_DisplayHighScores(int which);
 extern	bool	US_UpdateCursor(void);
-bool			US_LineInput(int x,int y,char *buf,const char *def,bool escok,
+bool			US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 							int maxchars,int maxwidth, byte clearcolor, EColorRange translation=CR_UNTRANSLATED);
 
 void	        USL_PrintInCenter(const char *s,Rect r);

@@ -435,7 +435,7 @@ void FinishDemoRecord (void)
 	US_Print(SmallFont, " Demo number (0-9): ");
 	VW_UpdateScreen();
 
-	if (US_LineInput (px,py,str,NULL,true,1,0,GPalette.WhiteIndex))
+	if (US_LineInput (SmallFont,px,py,str,NULL,true,1,0,GPalette.WhiteIndex))
 	{
 		level = atoi (str);
 		if (level>=0 && level<=9)
@@ -471,7 +471,7 @@ void RecordDemo (void)
 	US_Print(SmallFont, "  Demo which level (#): ");
 	VW_UpdateScreen();
 	VW_FadeIn ();
-	esc = !US_LineInput (px,py,str,NULL,true,2,0,GPalette.WhiteIndex);
+	esc = !US_LineInput (SmallFont,px,py,str,NULL,true,2,0,GPalette.WhiteIndex);
 	if (esc)
 		return;
 

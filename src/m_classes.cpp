@@ -261,7 +261,7 @@ void TextInputMenuItem::activate()
 	{
 		PrintY = menu->getHeight(menu->getCurrentPosition()) + menu->getY() + 1 + (5-SmallFont->GetHeight()/2);
 		char* buffer = new char[max+1];
-		bool accept = US_LineInput(
+		bool accept = US_LineInput(SmallFont,
 			menu->getX() + menu->getIndent() + 2,
 			PrintY, buffer,
 			clearFirst ? "" : getValue(), true, max, menu->getWidth() - menu->getIndent() - 16,

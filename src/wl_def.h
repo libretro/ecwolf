@@ -359,17 +359,6 @@ static inline fixed FixedDiv(fixed a, fixed b)
 	return (fixed)(((((int64_t)a)<<32) / b) >> 16);
 }
 
-#ifdef PLAYDEMOLIKEORIGINAL
-	#define DEMOCHOOSE_ORIG_SDL(orig, sdl) ((demorecord || demoplayback) ? (orig) : (sdl))
-	#define DEMOCOND_ORIG                  (demorecord || demoplayback)
-	#define DEMOIF_SDL                     if(DEMOCOND_SDL)
-#else
-	#define DEMOCHOOSE_ORIG_SDL(orig, sdl) (sdl)
-	#define DEMOCOND_ORIG                  false
-	#define DEMOIF_SDL
-#endif
-#define DEMOCOND_SDL                   (!DEMOCOND_ORIG)
-
 #define GetTicks() ((SDL_GetTicks()*7)/100)
 
 #define ISPOINTER(x) ((((uintptr_t)(x)) & ~0xffff) != 0)
@@ -445,10 +434,6 @@ static inline longword READLONGWORD(byte *&ptr)
 		return ffDataTopRight;
 	}
 
-#endif
-
-#ifdef USE_FLOORCEILINGTEX
-	void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight);
 #endif
 
 #ifdef USE_PARALLAX

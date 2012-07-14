@@ -354,8 +354,7 @@ US_RestoreWindow(WindowRec *win)
 //	USL_XORICursor() - XORs the I-bar text cursor. Used by US_LineInput()
 //
 ///////////////////////////////////////////////////////////////////////////
-static void
-USL_XORICursor(int x,int y,const char *s,word cursor,EColorRange translation)
+static void USL_XORICursor(FFont *font, int x,int y,const char *s,word cursor,EColorRange translation)
 {
 	static	bool	status;		// VGA doesn't XOR...
 	char	buf[MaxString];
@@ -364,14 +363,14 @@ USL_XORICursor(int x,int y,const char *s,word cursor,EColorRange translation)
 
 	strcpy(buf,s);
 	buf[cursor] = '\0';
- 	VW_MeasurePropString(SmallFont, buf,w,h);
+ 	VW_MeasurePropString(font, buf,w,h);
 
 	px = x + w - 1;
 	py = y;
 	if (status^=1)
 	{
-		const char cursorString[2] = {SmallFont->GetCursor(), 0};
-		VWB_DrawPropString(SmallFont, cursorString, translation);
+		const char cursorString[2] = {font->GetCursor(), 0};
+		VWB_DrawPropString(font, cursorString, translation);
 	}
 }
 
@@ -403,7 +402,7 @@ char USL_RotateChar(char ch, int dir)
 //		returned
 //
 ///////////////////////////////////////////////////////////////////////////
-bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
+bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 				int maxchars,int maxwidth, byte clearcolor, EColorRange translation)
 {
 	bool		cursorvis,cursormoved,
@@ -419,7 +418,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 	ControlInfo ci;
 	Direction   lastdir = dir_None;
 
-	double clearx = x-1, cleary = y, clearw = maxwidth, clearh = SmallFont->GetHeight();
+	double clearx = x-1, cleary = y, clearw = maxwidth, clearh = font->GetHeight();
 	MenuToRealCoords(clearx, cleary, clearw, clearh, MENU_CENTER);
 
 	if (def)
@@ -436,14 +435,14 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 	LastASCII = key_None;
 	LastScan = sc_None;
 
-	int cursorWidth = SmallFont->GetCharWidth(SmallFont->GetCursor());
+	int cursorWidth = font->GetCharWidth(font->GetCursor());
 
 	while (!done)
 	{
 		ReadAnyControl(&ci);
 
 		if (cursorvis)
-			USL_XORICursor(x,y,s,cursor,translation);
+			USL_XORICursor(font,x,y,s,cursor,translation);
 
 		sc = LastScan;
 		LastScan = sc_None;
@@ -486,7 +485,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 						s[cursor] = ' ';
 						s[cursor + 1] = 0;
 
-						VW_MeasurePropString(SmallFont, s,w,h);
+						VW_MeasurePropString(font, s,w,h);
 						if(len >= maxchars || (maxwidth && w+cursorWidth >= maxwidth))
 						{
 							s[cursor] = 0;
@@ -501,7 +500,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 				case dir_North:
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(SmallFont, s,w,h);
+						VW_MeasurePropString(font, s,w,h);
 						if(len >= maxchars || (maxwidth && w+cursorWidth >= maxwidth)) break;
 						s[cursor + 1] = 0;
 					}
@@ -512,7 +511,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 				case dir_South:
 					if(!s[cursor])
 					{
-						VW_MeasurePropString(SmallFont, s,w,h);
+						VW_MeasurePropString(font, s,w,h);
 						if(len >= maxchars || (maxwidth && w+cursorWidth >= maxwidth)) break;
 						s[cursor + 1] = 0;
 					}
@@ -623,7 +622,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 			if (c)
 			{
 				len = (int) strlen(s);
-				VW_MeasurePropString(SmallFont, s,w,h);
+				VW_MeasurePropString(font, s,w,h);
 
 				if(isprint(c) && (len < MaxString - 1) && ((!maxchars) || (len < maxchars))
 					&& ((!maxwidth) || (w+cursorWidth < maxwidth)))
@@ -633,7 +632,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 					s[cursor++] = c;
 				}
 
-				VW_MeasurePropString(SmallFont, s,w,h);
+				VW_MeasurePropString(font, s,w,h);
 				if(w+cursorWidth >= maxwidth)
 				{
 					strcpy(s, olds);
@@ -649,7 +648,7 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 
 		px = x;
 		py = y;
-		VWB_DrawPropString(SmallFont, s, translation);
+		VWB_DrawPropString(font, s, translation);
 
 		if (cursormoved)
 		{
@@ -666,18 +665,18 @@ bool US_LineInput(int x,int y,char *buf,const char *def,bool escok,
 		}
 		else SDL_Delay(5);
 		if (cursorvis)
-			USL_XORICursor(x,y,s,cursor,translation);
+			USL_XORICursor(font,x,y,s,cursor,translation);
 
 		VW_UpdateScreen();
 	}
 
 	if (cursorvis)
-		USL_XORICursor(x,y,s,cursor,translation);
+		USL_XORICursor(font,x,y,s,cursor,translation);
 	if (!result)
 	{
 		px = x;
 		py = y;
-		VWB_DrawPropString(SmallFont, olds, translation);
+		VWB_DrawPropString(font, olds, translation);
 	}
 	VW_UpdateScreen();
 

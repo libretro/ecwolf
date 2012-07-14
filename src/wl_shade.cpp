@@ -1,6 +1,5 @@
 //#include "version.h"
 
-//#ifdef USE_SHADING
 #include "wl_def.h"
 #include "wl_main.h"
 #include "wl_shade.h"
@@ -148,5 +147,3 @@ int GetShade(int scale)
 
 	return shade;
 }
-
-//#endif

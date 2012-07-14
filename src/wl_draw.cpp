@@ -49,6 +49,8 @@
 =============================================================================
 */
 
+void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight);
+
 const RatioInformation AspectCorrection[] =
 {
 	/* UNC */	{960,	600,	0x10000,	0,				48,			false},
@@ -1232,9 +1234,7 @@ void R_RenderView()
 	if(GetFeatureFlags() & FF_CLOUDSKY)
 		DrawClouds(vbuf, vbufPitch, min_wallheight);
 #endif
-#ifdef USE_FLOORCEILINGTEX
 	DrawFloorAndCeiling(vbuf, vbufPitch, min_wallheight);
-#endif
 
 //
 // draw all the scaled images
