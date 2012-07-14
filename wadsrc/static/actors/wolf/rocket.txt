@@ -42,7 +42,7 @@ actor HighRocket
 	states
 	{
 		Spawn:
-			HRCK A 1.5 A_SpawnItem("Smoke")
+			HRCK A 1.5 A_SpawnItem("HighSmoke")
 			loop
 		Death:
 			HBOM ABC 3

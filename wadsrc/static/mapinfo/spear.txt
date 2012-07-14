@@ -36,7 +36,7 @@ defaultmap
 {
 	defaultfloor = "#717171"
 	defaultceiling = "#383838"
-	translator = "xlat/sod.txt"
+	translator = "xlat/spear.txt"
 }
 
 episode "MAP01"
@@ -50,6 +50,7 @@ map "MAP01"
 	defaultceiling = "#044000"
 	par = 90
 	music = "XTIPTOE"
+	floornumber = 1
 }
 
 map "MAP02"
@@ -59,6 +60,7 @@ map "MAP02"
 	defaultceiling = "#404000"
 	par = 210
 	music = "XFUNKIE"
+	floornumber = 2
 }
 
 map "MAP03"
@@ -67,6 +69,7 @@ map "MAP03"
 	secretnext = "MAP04"
 	par = 225
 	music = "XDEATH"
+	floornumber = 3
 }
 
 map "MAP04"
@@ -76,6 +79,7 @@ map "MAP04"
 	defaultceiling = "#382C14"
 	par = 210
 	music = "XGETYOU"
+	floornumber = 4
 }
 
 map "MAP05"
@@ -84,6 +88,7 @@ map "MAP05"
 	secretnext = "MAP06"
 	defaultceiling = "#28200C"
 	music = "ULTIMATE"
+	floornumber = 5
 }
 
 map "MAP06"
@@ -93,6 +98,7 @@ map "MAP06"
 	defaultceiling = "#4C0000"
 	par = 270
 	music = "DUNGEON"
+	floornumber = 6
 }
 
 map "MAP07"
@@ -102,6 +108,7 @@ map "MAP07"
 	defaultceiling = "#004040"
 	par = 195
 	music = "GOINGAFT"
+	floornumber = 7
 }
 
 map "MAP08"
@@ -111,6 +118,7 @@ map "MAP08"
 	defaultceiling = "#4C0000"
 	par = 165
 	music = "POW"
+	floornumber = 8
 }
 
 map "MAP09"
@@ -120,6 +128,7 @@ map "MAP09"
 	defaultceiling = "#340058"
 	par = 285
 	music = "TWELFTH"
+	floornumber = 9
 }
 
 map "MAP10"
@@ -128,6 +137,7 @@ map "MAP10"
 	secretnext = "MAP11"
 	defaultceiling = "#004040"
 	music = "ULTIMATE"
+	floornumber = 10
 }
 
 map "MAP11"
@@ -136,6 +146,7 @@ map "MAP11"
 	secretnext = "MAP12"
 	par = 390
 	music = "NAZI_OMI"
+	floornumber = 11
 }
 
 map "MAP12"
@@ -145,6 +156,7 @@ map "MAP12"
 	defaultceiling = "#382C14"
 	par = 270
 	music = "GETTHEM"
+	floornumber = 12
 }
 
 map "MAP13"
@@ -154,6 +166,7 @@ map "MAP13"
 	defaultceiling = "#28200C"
 	par = 165
 	music = "SUSPENSE"
+	floornumber = 13
 }
 
 map "MAP14"
@@ -163,6 +176,7 @@ map "MAP14"
 	defaultceiling = "#382C14"
 	par = 270
 	music = "SEARCHN"
+	floornumber = 14
 }
 
 map "MAP15"
@@ -172,6 +186,7 @@ map "MAP15"
 	defaultceiling = "#28200C"
 	par = 360
 	music = "ZEROHOUR"
+	floornumber = 15
 }
 
 map "MAP16"
@@ -180,6 +195,7 @@ map "MAP16"
 	secretnext = "MAP17"
 	defaultceiling = "#382C14"
 	music = "XPUTIT"
+	floornumber = 16
 }
 
 map "MAP17"
@@ -189,6 +205,7 @@ map "MAP17"
 	defaultceiling = "#600064"
 	par = 360
 	music = "ULTIMATE"
+	floornumber = 17
 }
 
 map "MAP18"
@@ -197,6 +214,7 @@ map "MAP18"
 	secretnext = "MAP21"
 	defaultceiling = "#483818"
 	music = "XEVIL"
+	floornumber = 18
 }
 
 map "MAP19"
@@ -205,6 +223,7 @@ map "MAP19"
 	secretnext = "MAP05"
 	defaultceiling = "#4C0000"
 	music = "XJAZNAZI"
+	floornumber = 19
 }
 
 map "MAP20"
@@ -212,6 +231,7 @@ map "MAP20"
 	next = "MAP13"
 	secretnext = "MAP13"
 	music = "XFUNKIE"
+	floornumber = 20
 }
 
 map "MAP21"
@@ -220,4 +240,5 @@ map "MAP21"
 	secretnext = "EndGame1"
 	defaultceiling = "#483818"
 	music = "XEVIL"
+	floornumber = 18
 }
