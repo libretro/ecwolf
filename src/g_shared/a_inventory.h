@@ -70,6 +70,12 @@ class AInventory : public AActor
 class AAmmo : public AInventory
 {
 	DECLARE_NATIVE_CLASS(Ammo, Inventory)
+
+	public:
+		bool	HandlePickup(AInventory *item, bool &good);
+
+	protected:
+		AInventory	*CreateCopy(AActor *holder);
 };
 
 class ACustomInventory : public AInventory

@@ -62,6 +62,7 @@ class APlayerPawn : public AActor
 	DECLARE_NATIVE_CLASS(PlayerPawn, Actor)
 
 	public:
+		void		CheckWeaponSwitch(const ClassDef *ammo);
 		DropList	*GetStartInventory();
 		void		GiveStartingInventory();
 		AWeapon		*PickNewWeapon();
@@ -74,6 +75,7 @@ class APlayerPawn : public AActor
 		int32_t		maxhealth;
 
 	protected:
+		AWeapon	*BestWeapon(const ClassDef *ammo=NULL);
 		void	TickPSprites();
 };
 

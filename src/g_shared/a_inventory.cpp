@@ -219,6 +219,51 @@ bool AHealth::TryPickup(AActor *toucher)
 
 IMPLEMENT_CLASS(Ammo)
 
+AInventory *AAmmo::CreateCopy(AActor *holder)
+{
+	const ClassDef *ammoClass = GetClass();
+	while(ammoClass->GetParent() != NATIVE_CLASS(Ammo))
+		ammoClass = ammoClass->GetParent();
+
+	if(ammoClass == GetClass())
+		return Super::CreateCopy(holder);
+
+	if(!GoesAway())
+		Destroy();
+
+	AInventory *copy = reinterpret_cast<AInventory *>(ammoClass->CreateInstance());
+	copy->RemoveFromWorld();
+	copy->amount = amount;
+	copy->maxamount = maxamount;
+	return copy;
+}
+
+bool AAmmo::HandlePickup(AInventory *item, bool &good)
+{
+	if(item->GetClass() == GetClass() ||
+		(item->IsKindOf(NATIVE_CLASS(Ammo)) && GetClass()->GetParent() == NATIVE_CLASS(Ammo)))
+	{
+		if(amount < maxamount)
+		{
+			bool regainedAmmo = amount == 0;
+
+			amount += item->amount;
+			if(amount > maxamount)
+				amount = maxamount;
+			good = true;
+
+			if(regainedAmmo && owner && owner->player)
+			{
+				barrier_cast<APlayerPawn*>(owner)->CheckWeaponSwitch(GetClass());
+			}
+		}
+		else
+			good = false;
+		return true;
+	}
+	return Super::HandlePickup(item, good);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_CLASS(CustomInventory)

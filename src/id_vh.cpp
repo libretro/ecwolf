@@ -425,6 +425,9 @@ void VWB_DrawFill(FTexture *tex, unsigned int ix, unsigned int iy, unsigned int 
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
+	if(!tex)
+		return;
+
 	byte *vbuf = VL_LockSurface(screenBuffer);
 
 	double xd = (double)ix - tex->GetScaledLeftOffsetDouble();
@@ -470,6 +473,9 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
+	if(!tex)
+		return;
+
 	VWB_DrawGraphic(tex, ix, iy, tex->GetScaledWidthDouble(), tex->GetScaledHeightDouble(),
 		menu, remap, stencil, stencilcolor);
 }

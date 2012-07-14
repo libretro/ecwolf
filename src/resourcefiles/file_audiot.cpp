@@ -61,15 +61,16 @@ class FAudiot : public FUncompressedFile
 			audiohedReader.Seek(0, SEEK_SET);
 			Lumps = new FUncompressedLump[NumLumps];
 			// The vgahead has 24-bit ints.
-			DWORD* positions = new DWORD[NumLumps];
+			DWORD* positions = new DWORD[NumLumps+1];
 			DWORD* sizes = new DWORD[NumLumps];
-			audiohedReader.Read(positions, NumLumps*4);
+			audiohedReader.Read(positions, (NumLumps+1)*4);
 
 			// Since the music is at the end and is easy to identify we'll look for the end of the music.
 			// HACK: I'm using the fact that the IMFs have the string IMF near
 			//       the end of the files to identify them.
 			int musicStart = -1;
-			for(unsigned int i = NumLumps-1;i > 0;i--)
+			sizes[NumLumps-1] = positions[NumLumps] - positions[NumLumps-1];
+			for(unsigned int i = NumLumps;i-- > 0;)
 			{
 				if(i != 0)
 					sizes[i-1] = positions[i] - positions[i-1];

@@ -45,6 +45,48 @@ IMPLEMENT_CLASS(PlayerPawn)
 
 PointerIndexTable<AActor::DropList> APlayerPawn::startInventory;
 
+AWeapon *APlayerPawn::BestWeapon(const ClassDef *ammo)
+{
+	AWeapon *best = NULL;
+	int order = INT_MAX;
+
+	for(AInventory *item = inventory;item != NULL;item = item->inventory)
+	{
+		if(!item->IsKindOf(NATIVE_CLASS(Weapon)))
+			continue;
+
+		const int thisOrder = item->GetClass()->Meta.GetMetaInt(AWMETA_SelectionOrder);
+		if(thisOrder > order)
+			continue;
+
+		AWeapon *weapon = static_cast<AWeapon *>(item);
+		if(ammo && weapon->ammo1->GetClass() != ammo)
+			continue;
+		if(!weapon->CheckAmmo(AWeapon::PrimaryFire, false))
+			continue;
+
+		order = thisOrder;
+		best = weapon;
+	}
+
+	return best;
+}
+
+void APlayerPawn::CheckWeaponSwitch(const ClassDef *ammo)
+{
+	if(player->PendingWeapon != WP_NOCHANGE)
+		return;
+
+	AWeapon *weapon = BestWeapon(ammo);
+	if(!weapon)
+		return;
+
+	const int selectionOrder = weapon->GetClass()->Meta.GetMetaInt(AWMETA_SelectionOrder);
+	const int currentOrder = player->ReadyWeapon ? player->ReadyWeapon->GetClass()->Meta.GetMetaInt(AWMETA_SelectionOrder) : 0;
+	if(selectionOrder < currentOrder)
+		player->PendingWeapon = weapon;
+}
+
 AActor::DropList *APlayerPawn::GetStartInventory()
 {
 	int index = GetClass()->Meta.GetMetaInt(APMETA_StartInventory);
@@ -98,25 +140,7 @@ void APlayerPawn::GiveStartingInventory()
 
 AWeapon *APlayerPawn::PickNewWeapon()
 {
-	AWeapon *best = NULL;
-	int order = INT_MAX;
-
-	for(AInventory *item = inventory;item != NULL;item = item->inventory)
-	{
-		if(!item->IsKindOf(NATIVE_CLASS(Weapon)))
-			continue;
-
-		const int thisOrder = item->GetClass()->Meta.GetMetaInt(AWMETA_SelectionOrder);
-		if(thisOrder > order)
-			continue;
-
-		AWeapon *weapon = static_cast<AWeapon *>(item);
-		if(!weapon->CheckAmmo(AWeapon::PrimaryFire, false))
-			continue;
-
-		order = thisOrder;
-		best = weapon;
-	}
+	AWeapon *best = BestWeapon();
 
 	if(best)
 	{
