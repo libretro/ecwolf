@@ -95,16 +95,16 @@ sprites
 	// End NULL data
 	"COLUA0",	"PLNTA0",
 	// Begin NULL data
-	"SKELA0",	"SINKA0",
+	"SKELA0",	"SKWRA0",
 	// End NULL data
 	"BPNTA0",	"VASEA0",	"TABLA0",	"GLMPA0",
 	// Begin NULL data
-	"BUNKA0",
+	"CAG3A0",
 	// End NULL data
 	"ARMRA0",	"CAG1A0",	"CAG2A0",	"BON1A0",
 	"GKEYA0",	"SKEYA0",
 	// Begin NULL data
-	"STATW0",
+	"CAG4A0",
 	// End NULL data
 	"BASKA0",	"FOODA0",	"MEDIA0",	"CLIPA0",
 	"MGUNA0",	"CGUNA0",	"CROSA0",	"CHALA0",	"JEWLA0",
@@ -119,7 +119,7 @@ sprites
 	"FLAGA0",	"RLMPA0",	"BON2A0",	"BON3A0",
 	"BON4A0",
 	// Begin NULL data
-	"GIB3A0",	"STOVA0",	"RACKA0",
+	"COWCA0",	"WEL3A0",	"STATA0",
 	// End NULL data
 	"VINEA0",
 	// Begin NULL data

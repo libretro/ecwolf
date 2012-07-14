@@ -395,6 +395,8 @@ actor Vines 80
 
 actor TruckRear 91
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:
@@ -402,3 +404,89 @@ actor TruckRear 91
 			stop
 	}
 }
+
+actor CageWithSkulls 84
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CAG4 A -1
+			stop
+	}
+}
+
+actor CageWithGore 83
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CAG3 A -1
+			stop
+	}
+}
+
+actor Skewer 82
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			SKWR A -1
+			stop
+	}
+}
+
+actor CowCarcass 86
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			COWC A -1
+			stop
+	}
+}
+
+
+actor WellWithBlood 87
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CAG3 A -1
+			stop
+	}
+}
+
+actor SatanStatue 88
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			STAT A -1
+			stop
+	}
+}
+
+actor BrownColumn 89
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			COL2 A -1
+			stop
+	}
+}
+
