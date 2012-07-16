@@ -221,6 +221,8 @@ typedef enum
 	FL_COUNTSECRET		= 0x00100000,
 	FL_DROPBASEDONTARGET= 0x00200000,
 
+	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
+
 	IF_AUTOACTIVATE		= 0x00000001,
 	IF_INVBAR			= 0x00000002,
 } objflag_t;

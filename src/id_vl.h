@@ -42,12 +42,6 @@ void VL_FadeIn      (int start, int end, SDL_Color *palette, int steps);
 byte *VL_LockSurface(SDL_Surface *surface);
 void VL_UnlockSurface(SDL_Surface *surface);
 
-void VL_BarScaledCoord  (int scx, int scy, int scwidth, int scheight, int color);
-void inline VL_Bar      (int x, int y, int width, int height, int color)
-{
-	VL_BarScaledCoord(scaleFactor*x, scaleFactor*y,
-		scaleFactor*width, scaleFactor*height, color);
-}
 void inline VL_ClearScreen(int color)
 {
 	SDL_FillRect(curSurface, NULL, color);

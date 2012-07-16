@@ -288,32 +288,3 @@ void VL_UnlockSurface(SDL_Surface *surface)
 		SDL_UnlockSurface(surface);
 	}
 }
-
-/*
-=================
-=
-= VL_Bar
-=
-=================
-*/
-
-void VL_BarScaledCoord (int scx, int scy, int scwidth, int scheight, int color)
-{
-	byte *ptr;
-
-	assert(scx >= 0 && (unsigned) scx + scwidth <= screenWidth
-			&& scy >= 0 && (unsigned) scy + scheight <= screenHeight
-			&& "VL_BarScaledCoord: Destination rectangle out of bounds!");
-
-	ptr = VL_LockSurface(curSurface);
-	if(ptr == NULL) return;
- 
-	ptr += scy * curPitch + scx;
-
-	while (scheight--)
-	{
-		memset(ptr, color, scwidth);
-		ptr += curPitch;
-	}
-	VL_UnlockSurface(curSurface);
-}

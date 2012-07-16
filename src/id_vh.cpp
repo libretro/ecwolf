@@ -124,11 +124,6 @@ void VH_UpdateScreen()
 	SDL_Flip(screen);
 }
 
-void VWB_Bar (int x, int y, int width, int height, int color)
-{
-	VW_Bar (x,y,width,height,color);
-}
-
 /*
 =============================================================================
 

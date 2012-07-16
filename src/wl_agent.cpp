@@ -1242,3 +1242,31 @@ ACTION_FUNCTION(A_GunAttack)
 	}
 	DamageActor (closest,damage);
 }
+
+ACTION_FUNCTION(A_FireCustomMissile)
+{
+	ACTION_PARAM_STRING(missiletype, 0);
+	ACTION_PARAM_DOUBLE(angleOffset, 1);
+	ACTION_PARAM_BOOL(useammo, 2);
+	ACTION_PARAM_INT(spawnoffset, 3);
+	ACTION_PARAM_INT(spawnheight, 4);
+	ACTION_PARAM_BOOL(aim, 5);
+
+	if(useammo && !players[0].ReadyWeapon->DepleteAmmo())
+		return;
+
+	fixed newx = self->x + spawnoffset*finesine[self->angle>>ANGLETOFINESHIFT]/64;
+	fixed newy = self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64;
+
+	angle_t iangle = self->angle + (angle_t) ((angleOffset*ANGLE_45)/45);
+
+	const ClassDef *cls = ClassDef::FindClass(missiletype);
+	if(!cls)
+		return;
+	AActor *newobj = AActor::Spawn(cls, newx, newy, 0);
+	newobj->flags |= FL_PLAYERMISSILE;
+	newobj->angle = iangle;
+
+	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);
+	newobj->vely = -FixedMul(newobj->speed,finesine[iangle>>ANGLETOFINESHIFT]);
+}

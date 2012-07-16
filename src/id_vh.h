@@ -50,9 +50,6 @@ template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offse
 void VWB_DrawPropString(FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
 void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
 
-void VWB_Bar (int x, int y, int width, int height, int color);
-#define VWB_BarScaledCoord VL_BarScaledCoord
-
 void VH_UpdateScreen();
 #define VW_UpdateScreen VH_UpdateScreen
 
@@ -60,8 +57,6 @@ void VH_UpdateScreen();
 // wolfenstein EGA compatability stuff
 //
 
-#define VW_Bar			    VL_Bar
-#define VW_DrawPic		    VH_DrawPic
 #define VW_WaitVBL		    VL_WaitVBL
 #define VW_FadeIn()		    VL_FadeIn(0,255,gamepal,30);
 #define VW_FadeOut()	    VL_FadeOut(0,255,0,0,0,30);

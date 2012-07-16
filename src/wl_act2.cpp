@@ -169,10 +169,6 @@ void T_Projectile (AActor *self)
 	self->x += self->velx;
 	self->y += self->vely;
 
-	fixed deltax = LABS(self->x - players[0].mo->x);
-	fixed deltay = LABS(self->y - players[0].mo->y);
-	fixed radius = players[0].mo->radius + self->radius;
-
 	if (!ProjectileTryMove (self))
 	{
 		PlaySoundLocActor(self->deathsound, self);
@@ -180,11 +176,38 @@ void T_Projectile (AActor *self)
 		return;
 	}
 
-	if (deltax < radius && deltay < radius)
+	if(!(self->flags & FL_PLAYERMISSILE))
 	{
-		TakeDamage (self->GetDamage(),self);
-		self->Die(); // TODO: XDeath
-		return;
+		fixed deltax = LABS(self->x - players[0].mo->x);
+		fixed deltay = LABS(self->y - players[0].mo->y);
+		fixed radius = players[0].mo->radius + self->radius;
+		if (deltax < radius && deltay < radius)
+		{
+			TakeDamage (self->GetDamage(),self);
+			self->Die(); // TODO: XDeath
+			return;
+		}
+	}
+	else
+	{
+		AActor::Iterator *iter = AActor::GetIterator();
+		while(iter)
+		{
+			AActor *check = iter->Item();
+			if((check->flags & FL_SHOOTABLE))
+			{
+				fixed deltax = LABS(self->x - check->x);
+				fixed deltay = LABS(self->y - check->y);
+				fixed radius = check->radius + self->radius;
+				if(deltax < radius && deltay < radius)
+				{
+					DamageActor(check, self->GetDamage());
+					self->Die();
+					return;
+				}
+			}
+			iter = iter->Next();
+		}
 	}
 }
 

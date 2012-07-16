@@ -95,6 +95,7 @@ actor Weapon : Inventory native
 	weapon.yadjust 0
 
 	action native A_CustomPunch(int damage, bool norandom=false, int flags=0, string pufftype="", float range=0, float lifesteal=0); 
+	action native A_FireCustomMissile(string missiletype, float angle=0, bool useammo=true, int spawnoffset=0, int spawnheight=0, bool aim=false, float pitch=0);
 	action native A_GunAttack(int flags = 0, string sound = "*", float snipe = 1.0, int maxdamage = 64, int blocksize = 128, int pointblank = 2, int longrange = 4, int maxrange = 21);
 	action native A_Lower();
 	action native A_Raise();
