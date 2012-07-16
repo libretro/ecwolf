@@ -1297,10 +1297,13 @@ FTextureID FTextureManager::GetFlat(unsigned int tile, bool ceiling)
 	if(tile > 255)
 		tile = 255;
 	TileMap &tm = flatTiles[tile][ceiling];
-	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
-		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Flat);
-	else
-		tm.texture = levelInfo->DefaultTexture[ceiling];
+	if(!tm.texture.isValid())
+	{
+		if(tm.textureName.GetIndex() != 0)
+			tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Flat);
+		else
+			tm.texture = levelInfo->DefaultTexture[ceiling];
+	}
 	return tm.texture;
 }
 FTextureID FTextureManager::GetTile(unsigned int tile, bool vertical)
