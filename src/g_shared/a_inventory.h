@@ -75,7 +75,8 @@ class AAmmo : public AInventory
 		bool	HandlePickup(AInventory *item, bool &good);
 
 	protected:
-		AInventory	*CreateCopy(AActor *holder);
+		const ClassDef	*GetAmmoType();
+		AInventory		*CreateCopy(AActor *holder);
 };
 
 class ACustomInventory : public AInventory

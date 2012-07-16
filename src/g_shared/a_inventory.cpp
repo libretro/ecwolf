@@ -238,10 +238,18 @@ AInventory *AAmmo::CreateCopy(AActor *holder)
 	return copy;
 }
 
+const ClassDef *AAmmo::GetAmmoType()
+{
+	const ClassDef *cls = GetClass();
+	while(cls->GetParent() != NATIVE_CLASS(Ammo))
+		cls = cls->GetParent();
+	return cls;
+}
+
 bool AAmmo::HandlePickup(AInventory *item, bool &good)
 {
 	if(item->GetClass() == GetClass() ||
-		(item->IsKindOf(NATIVE_CLASS(Ammo)) && GetClass()->GetParent() == NATIVE_CLASS(Ammo)))
+		(item->IsKindOf(NATIVE_CLASS(Ammo)) && ((AAmmo*)item)->GetAmmoType() == GetClass()))
 	{
 		if(amount < maxamount)
 		{
