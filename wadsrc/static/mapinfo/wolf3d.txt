@@ -1,3 +1,5 @@
+include "mapinfo/wolfcommon.txt"
+
 gameinfo
 {
 	signon = "WLFSGNON"
@@ -5,36 +7,16 @@ gameinfo
 	menufade = "AE 00 00"
 	menucolors = "88 00 00", "D4 00 00", "7D 00 00", "58 00 00", "64 00 00", "00 00 00"
 	titlemusic = "NAZI_NOR"
-	menumusic = "WONDERIN"
 	scoresmusic = "ROSTER"
-	finalemusic = "CORNER"
-	intermissionmusic = "ENDLEVEL"
 	drawreadthis = true
 	gamepalette = "WOLFPAL"
 	titlepage = "TITLEPIC"
-	titletime = 15
-	creditpage = "CREDITS"
-	pagetime = 10
-	menufontcolor_title = "Gold"
-	menufontcolor_label = "DarkGrey"
-	menufontcolor_selection = "Grey"
 	menufontcolor_disabled = "DarkRed"
-	menufontcolor_invalid = "DarkGreen"
-	menufontcolor_invalidselection = "Green"
-	menufontcolor_highlight = "Yellow"
-	menufontcolor_highlightselection = "Gold"
 	highscoresfont = "SmallFont"
-	highscoresfontcolor = "White"
-	pageindexfontcolor = "DarkYellow"
-	borderflat = "#004040"
-	advisorycolor = "20 A8 FC"
-	advisorypic = "PG13"
 }
 
-defaultmap
+adddefaultmap
 {
-	defaultfloor = "#717171"
-	defaultceiling = "#383838"
 	translator = "xlat/wolf3d.txt"
 	deathcam = true
 	specialaction = "Schabbs", "Exit_Normal"
@@ -54,7 +36,8 @@ episode "MAP01"
 
 cluster 1
 {
-	exittext = lookup, "ENDART1"
+	exittext = "ENDART1"
+	exittextislump
 }
 
 map "MAP01"
@@ -169,7 +152,8 @@ episode "MAP11"
 
 cluster 2
 {
-	exittext = lookup, "ENDART2"
+	exittext = "ENDART2"
+	exittextislump
 }
 
 map "MAP11"
@@ -290,7 +274,8 @@ episode "MAP21"
 
 cluster 3
 {
-	exittext = lookup, "ENDART3"
+	exittext = "ENDART3"
+	exittextislump
 }
 
 map "MAP21"
@@ -407,7 +392,8 @@ episode "MAP31"
 
 cluster 4
 {
-	exittext = lookup, "ENDART4"
+	exittext = "ENDART4"
+	exittextislump
 }
 
 map "MAP31"
@@ -529,7 +515,8 @@ episode "MAP41"
 
 cluster 5
 {
-	exittext = lookup, "ENDART5"
+	exittext = "ENDART5"
+	exittextislump
 }
 
 map "MAP41"
@@ -649,7 +636,8 @@ episode "MAP51"
 
 cluster 6
 {
-	exittext = lookup, "ENDART6"
+	exittext = "ENDART6"
+	exittextislump
 }
 
 map "MAP51"

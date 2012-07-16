@@ -1,3 +1,5 @@
+include "mapinfo/wolfcommon.txt"
+
 gameinfo
 {
 	signon = "SODSGNON"
@@ -5,41 +7,31 @@ gameinfo
 	menufade = "00 00 CE"
 	menucolors = "00 00 88", "00 00 D4", "00 00 7D", "00 00 58", "00 00 64", "00 00 00"
 	titlemusic = "XTOWER2"
-	menumusic = "WONDERIN"
 	scoresmusic = "XAWARD"
-	finalemusic = "CORNER"
-	intermissionmusic = "ENDLEVEL"
 	drawreadthis = false
 	gamepalette = "SPEARPAL"
 	titlepalette = "TITLEPAL"
 	titlepage = "TITLESOD"
-	titletime = 15
-	creditpage = "CREDITS"
-	pagetime = 10
-	menufontcolor_title = "Gold"
-	menufontcolor_label = "DarkGrey"
-	menufontcolor_selection = "Grey"
 	menufontcolor_disabled = "DarkBlue"
-	menufontcolor_invalid = "DarkGreen"
-	menufontcolor_invalidselection = "Green"
-	menufontcolor_highlight = "Yellow"
-	menufontcolor_highlightselection = "Gold"
 	highscoresfont = "BigFont"
-	highscoresfontcolor = "White"
-	pageindexfontcolor = "DarkYellow"
-	borderflat = "#004040"
-	advisorycolor = "20 A8 FC"
-	advisorypic = "PG13"
 }
 
-defaultmap
+adddefaultmap
 {
-	defaultfloor = "#717171"
-	defaultceiling = "#383838"
 	translator = "xlat/spear.txt"
 }
 
 episode "MAP01"
+{
+}
+
+// Demo cluster
+cluster 1
+{
+}
+
+// Registered cluster
+cluster 2
 {
 }
 
@@ -51,6 +43,7 @@ map "MAP01"
 	par = 90
 	music = "XTIPTOE"
 	floornumber = 1
+	cluster = 1
 }
 
 map "MAP02"
@@ -61,6 +54,7 @@ map "MAP02"
 	par = 210
 	music = "XFUNKIE"
 	floornumber = 2
+	cluster = 1
 }
 
 map "MAP03"
@@ -70,6 +64,7 @@ map "MAP03"
 	par = 225
 	music = "XDEATH"
 	floornumber = 3
+	cluster = 2
 }
 
 map "MAP04"
@@ -80,6 +75,7 @@ map "MAP04"
 	par = 210
 	music = "XGETYOU"
 	floornumber = 4
+	cluster = 2
 }
 
 map "MAP05"
@@ -89,6 +85,7 @@ map "MAP05"
 	defaultceiling = "#28200C"
 	music = "ULTIMATE"
 	floornumber = 5
+	cluster = 2
 }
 
 map "MAP06"
@@ -99,6 +96,7 @@ map "MAP06"
 	par = 270
 	music = "DUNGEON"
 	floornumber = 6
+	cluster = 2
 }
 
 map "MAP07"
@@ -109,6 +107,7 @@ map "MAP07"
 	par = 195
 	music = "GOINGAFT"
 	floornumber = 7
+	cluster = 2
 }
 
 map "MAP08"
@@ -119,6 +118,7 @@ map "MAP08"
 	par = 165
 	music = "POW"
 	floornumber = 8
+	cluster = 2
 }
 
 map "MAP09"
@@ -129,6 +129,7 @@ map "MAP09"
 	par = 285
 	music = "TWELFTH"
 	floornumber = 9
+	cluster = 2
 }
 
 map "MAP10"
@@ -138,6 +139,7 @@ map "MAP10"
 	defaultceiling = "#004040"
 	music = "ULTIMATE"
 	floornumber = 10
+	cluster = 2
 }
 
 map "MAP11"
@@ -147,6 +149,7 @@ map "MAP11"
 	par = 390
 	music = "NAZI_OMI"
 	floornumber = 11
+	cluster = 2
 }
 
 map "MAP12"
@@ -157,6 +160,7 @@ map "MAP12"
 	par = 270
 	music = "GETTHEM"
 	floornumber = 12
+	cluster = 2
 }
 
 map "MAP13"
@@ -167,6 +171,7 @@ map "MAP13"
 	par = 165
 	music = "SUSPENSE"
 	floornumber = 13
+	cluster = 2
 }
 
 map "MAP14"
@@ -177,6 +182,7 @@ map "MAP14"
 	par = 270
 	music = "SEARCHN"
 	floornumber = 14
+	cluster = 2
 }
 
 map "MAP15"
@@ -187,6 +193,7 @@ map "MAP15"
 	par = 360
 	music = "ZEROHOUR"
 	floornumber = 15
+	cluster = 2
 }
 
 map "MAP16"
@@ -196,6 +203,7 @@ map "MAP16"
 	defaultceiling = "#382C14"
 	music = "XPUTIT"
 	floornumber = 16
+	cluster = 2
 }
 
 map "MAP17"
@@ -206,6 +214,7 @@ map "MAP17"
 	par = 360
 	music = "ULTIMATE"
 	floornumber = 17
+	cluster = 2
 }
 
 map "MAP18"
@@ -215,6 +224,7 @@ map "MAP18"
 	defaultceiling = "#483818"
 	music = "XEVIL"
 	floornumber = 18
+	cluster = 2
 }
 
 map "MAP19"
@@ -224,6 +234,7 @@ map "MAP19"
 	defaultceiling = "#4C0000"
 	music = "XJAZNAZI"
 	floornumber = 19
+	cluster = 2
 }
 
 map "MAP20"
@@ -232,6 +243,7 @@ map "MAP20"
 	secretnext = "MAP13"
 	music = "XFUNKIE"
 	floornumber = 20
+	cluster = 2
 }
 
 map "MAP21"
@@ -241,4 +253,5 @@ map "MAP21"
 	defaultceiling = "#483818"
 	music = "XEVIL"
 	floornumber = 18
+	cluster = 2
 }

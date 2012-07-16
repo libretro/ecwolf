@@ -1,0 +1,27 @@
+gameinfo
+{
+	menumusic = "WONDERIN"
+	finalemusic = "CORNER"
+	intermissionmusic = "ENDLEVEL"
+	titletime = 15
+	creditpage = "CREDITS"
+	pagetime = 10
+	menufontcolor_title = "Gold"
+	menufontcolor_label = "DarkGrey"
+	menufontcolor_selection = "Grey"
+	menufontcolor_invalid = "DarkGreen"
+	menufontcolor_invalidselection = "Green"
+	menufontcolor_highlight = "Yellow"
+	menufontcolor_highlightselection = "Gold"
+	highscoresfontcolor = "White"
+	pageindexfontcolor = "DarkYellow"
+	borderflat = "#004040"
+	advisorycolor = "20 A8 FC"
+	advisorypic = "PG13"
+}
+
+defaultmap
+{
+	defaultfloor = "#717171"
+	defaultceiling = "#383838"
+}

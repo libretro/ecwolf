@@ -205,11 +205,7 @@ void Victory (void)
 	if(screenHeight % 200 != 0)
 		VL_ClearScreen(0);
 
-#ifndef SPEAR
 	EndText ();
-#else
-	EndSpear ();
-#endif
 }
 
 //==========================================================================
@@ -612,38 +608,6 @@ done:   itoa (kr, tempstr, 10);
 	IN_StartAck ();
 	while (!IN_CheckAck ())
 		BJ_Breathe ();
-
-//
-// done
-//
-#ifdef SPEARDEMO
-	if (gamestate.mapon == 1)
-	{
-		SD_PlaySound ("misc/1up");
-
-		Message ("This concludes your demo\n"
-				"of Spear of Destiny! Now,\n" "go to your local software\n" "store and buy it!");
-
-		IN_ClearKeysDown ();
-		IN_Ack ();
-	}
-#endif
-
-#ifdef JAPDEMO
-	if (gamestate.mapon == 3)
-	{
-		SD_PlaySound ("misc/1up");
-
-		Message ("This concludes your demo\n"
-				"of Wolfenstein 3-D! Now,\n" "go to your local software\n" "store and buy it!");
-
-		IN_ClearKeysDown ();
-		IN_Ack ();
-	}
-#endif
-
-	VW_FadeOut ();
-	DrawPlayBorder();
 }
 
 

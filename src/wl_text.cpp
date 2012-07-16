@@ -767,8 +767,20 @@ void EndText (void)
 
 	ClearMemory ();
 	ClusterInfo &cluster = ClusterInfo::Find(levelInfo->Cluster);
+	if(cluster.ExitText.IsEmpty())
+		return;
 
-	if(cluster.ExitTextLookup)
+	if(cluster.ExitTextType == ClusterInfo::EXIT_MESSAGE)
+	{
+		SD_PlaySound ("misc/1up");
+
+		Message (cluster.ExitText);
+
+		IN_ClearKeysDown ();
+		IN_Ack ();
+		return;
+	}
+	else if(cluster.ExitTextType == ClusterInfo::EXIT_LUMP)
 	{
 		int lumpNum = Wads.CheckNumForName(cluster.ExitText, ns_global);
 		if(lumpNum != -1)

@@ -143,10 +143,17 @@ public:
 class ClusterInfo
 {
 public:
+	enum ExitType
+	{
+		EXIT_STRING,
+		EXIT_LUMP,
+		EXIT_MESSAGE
+	};
+
 	ClusterInfo();
 
-	FString	ExitText;
-	bool	ExitTextLookup;
+	FString		ExitText;
+	ExitType	ExitTextType;
 
 	static ClusterInfo &Find(unsigned int index);
 };

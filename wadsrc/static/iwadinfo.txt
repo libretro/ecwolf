@@ -23,6 +23,6 @@ IWad
 IWad
 {
 	Name = "Spear of Destiny Demo"
-	Mapinfo = "mapinfo/spear.txt"
+	Mapinfo = "mapinfo/speardemo.txt"
 	MustContain = "BACKDROP"
 }

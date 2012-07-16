@@ -250,6 +250,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	FloorNumber = 1;
 	Par = 0;
 	LevelBonus = -1;
+	Cluster = 0;
 }
 
 FTextureID LevelInfo::GetBorderTexture() const
@@ -546,7 +547,7 @@ protected:
 
 static TMap<unsigned int, ClusterInfo> clusters;
 
-ClusterInfo::ClusterInfo() : ExitTextLookup(false)
+ClusterInfo::ClusterInfo() : ExitTextType(ClusterInfo::EXIT_STRING)
 {
 }
 
@@ -576,15 +577,24 @@ protected:
 		if(key.CompareNoCase("exittext") == 0)
 		{
 			sc.MustGetToken('=');
+			bool lookup = false;
 			if(sc.CheckToken(TK_Identifier))
 			{
 				if(sc->str.CompareNoCase("lookup") != 0)
 					sc.ScriptMessage(Scanner::ERROR, "Expected lookup but got '%s' instead.", sc->str.GetChars());
 				sc.MustGetToken(',');
-				cluster->ExitTextLookup = true;
+				lookup = true;
 			}
 			sc.MustGetToken(TK_StringConst);
-			cluster->ExitText = sc->str;
+			cluster->ExitText = lookup ? FString(language[sc->str]) : sc->str;
+		}
+		else if(key.CompareNoCase("exittextislump") == 0)
+		{
+			cluster->ExitTextType = ClusterInfo::EXIT_LUMP;
+		}
+		else if(key.CompareNoCase("exittextismessage") == 0)
+		{
+			cluster->ExitTextType = ClusterInfo::EXIT_MESSAGE;
 		}
 		else
 			return false;
@@ -611,6 +621,16 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 	while(sc.TokensLeft())
 	{
 		sc.MustGetToken(TK_Identifier);
+		if(sc->str.CompareNoCase("include") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			int includeLump = Wads.GetNumForFullName(sc->str);
+			if(includeLump != -1)
+				ParseMapInfoLump(includeLump, gameinfoPass);
+
+			continue;
+		}
+
 		if(!gameinfoPass)
 		{
 			if(sc->str.CompareNoCase("defaultmap") == 0)

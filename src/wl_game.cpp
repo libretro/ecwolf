@@ -24,6 +24,7 @@
 #include "wl_draw.h"
 #include "wl_play.h"
 #include "wl_game.h"
+#include "wl_text.h"
 #include "a_inventory.h"
 #include "colormatcher.h"
 
@@ -820,28 +821,24 @@ startplayloop:
 
 				StartTravel ();
 				LevelCompleted ();              // do the intermission
+
+				LevelInfo &nextLevel = LevelInfo::Find(next);
+				if(nextLevel.Cluster != levelInfo->Cluster)
+					EndText ();
+
+				VW_FadeOut ();
+				DrawPlayBorder();
 				if(viewsize == 21) DrawPlayScreen();
 
-#ifdef SPEARDEMO
-				if (gamestate.mapon == 1)
+				if(stricmp(next, "EndDemo") == 0)
 				{
-					died = true;                    // don't "get psyched!"
-
-					VW_FadeOut ();
-
-					ClearMemory ();
-
 					CheckHighScore (players[0].score,levelInfo->FloorNumber);
 					return;
 				}
-#endif
 
 				players[0].oldscore = players[0].score;
 
-				if(playstate == ex_secretlevel)
-					strncpy(gamestate.mapname, levelInfo->NextSecret, 8);
-				else
-					strncpy(gamestate.mapname, levelInfo->NextMap, 8);
+				strncpy(gamestate.mapname, next, 8);
 				gamestate.mapname[8] = 0;
 				break;
 			}
