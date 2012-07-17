@@ -37,6 +37,7 @@ if(MSVC)
 endif(MSVC)
 
 add_subdirectory(tools/zipdir)
+add_subdirectory(tools/updaterevision)
 add_subdirectory(wadsrc)
 
 add_subdirectory(gdtoa)

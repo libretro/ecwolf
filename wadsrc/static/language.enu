@@ -3,6 +3,7 @@
 [enu default]
 
 MNU_NOPICTURE = "No Picture";
+MNU_DIFFVERSION = "Different\nVersion";
 
 QUITSUR = "Are you sure you want\nto quit this great game?";
 CURGAME = "You are currently in\na game. Continuing will\nerase old game. Ok?";

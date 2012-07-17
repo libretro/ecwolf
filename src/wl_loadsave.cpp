@@ -67,6 +67,7 @@ struct SaveFile
 	public:
 		static TArray<SaveFile>	files;
 
+		bool	oldVersion;
 		FString	name; // Displayed on the menu.
 		FString	filename;
 };
@@ -117,34 +118,47 @@ public:
 			if(curPos >= 0)
 			{
 				SaveFile &saveFile = SaveFile::files[curPos];
-				PNGHandle *png;
-				FILE *file = fopen(saveFile.filename, "rb");
-				if(file && (png = M_VerifyPNG(file)))
+
+				if(saveFile.oldVersion)
 				{
-					FTexture *savePicture = PNGTexture_CreateFromFile(png, saveFile.filename);
-					VWB_DrawGraphic(savePicture, SAVEPICX, SAVEPICY, SAVEPICW, SAVEPICH, MENU_CENTER);
+					word width, height;
+					VW_MeasurePropString(SmallFont, language["MNU_DIFFVERSION"], width, height);
 
-					char* creationTime = M_GetPNGText(png, "Creation Time");
-					char* comment = M_GetPNGText(png, "Comment");
-					px = SAVEPICX;
-					py = INFOY;
-					if(creationTime)
-					{
-						VWB_DrawPropStringWrap(SAVEPICW, INFOH, SmallFont, creationTime, textColor);
-						px = SAVEPICX;
-						py += 5; // Space the strings a little.
-						delete[] creationTime;
-					}
-					if(comment)
-					{
-						VWB_DrawPropStringWrap(SAVEPICW, INFOH, SmallFont, comment, textColor);
-						delete[] comment;
-					}
-
-					delete png;
+					px = SAVEPICX + (SAVEPICW - width)/2;
+					py = SAVEPICY + (SAVEPICH - height)/2;
+					VWB_DrawPropString(SmallFont, language["MNU_DIFFVERSION"], textColor);
 				}
-				if(file)
-					fclose(file);
+				else
+				{
+					PNGHandle *png;
+					FILE *file = fopen(saveFile.filename, "rb");
+					if(file && (png = M_VerifyPNG(file)))
+					{
+						FTexture *savePicture = PNGTexture_CreateFromFile(png, saveFile.filename);
+						VWB_DrawGraphic(savePicture, SAVEPICX, SAVEPICY, SAVEPICW, SAVEPICH, MENU_CENTER);
+
+						char* creationTime = M_GetPNGText(png, "Creation Time");
+						char* comment = M_GetPNGText(png, "Comment");
+						px = SAVEPICX;
+						py = INFOY;
+						if(creationTime)
+						{
+							VWB_DrawPropStringWrap(SAVEPICW, INFOH, SmallFont, creationTime, textColor);
+							px = SAVEPICX;
+							py += 5; // Space the strings a little.
+							delete[] creationTime;
+						}
+						if(comment)
+						{
+							VWB_DrawPropStringWrap(SAVEPICW, INFOH, SmallFont, comment, textColor);
+							delete[] comment;
+						}
+
+						delete png;
+					}
+					if(file)
+						fclose(file);
+				}
 			}
 			else
 			{
@@ -219,6 +233,22 @@ void SetupSaveGames()
 			{
 				SaveFile sFile;
 				sFile.filename = filename;
+
+				char* savesig = M_GetPNGText(png, "ECWolf Save Version");
+				if(savesig)
+				{
+					if(strncmp(savesig, SAVESIG, 10) != 0 || // Should be "ECWOLFSAVE"
+						atoi(savesig+10) < MINSAVEVER)
+					{
+						sFile.oldVersion = true;
+					}
+					else
+						sFile.oldVersion = false;
+					delete[] savesig;
+				}
+				else
+					sFile.oldVersion = true;
+
 				if(M_GetPNGText(png, "Title", title, MAX_SAVENAME))
 				{
 					sFile.name = title;
@@ -241,8 +271,15 @@ void SetupSaveGames()
 
 	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
 	{
-		loadGame.addItem(new SaveSlotMenuItem(SaveFile::files[i].name, 31, LoadSaveGame));
-		saveGame.addItem(new SaveSlotMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame));
+		MenuItem *item = new SaveSlotMenuItem(SaveFile::files[i].name, 31, LoadSaveGame);
+		if(SaveFile::files[i].oldVersion)
+			item->setHighlighted(2);
+		loadGame.addItem(item);
+
+		item = new SaveSlotMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame);
+		if(SaveFile::files[i].oldVersion)
+			item->setHighlighted(2);
+		saveGame.addItem(item);
 	}
 }
 
@@ -259,6 +296,7 @@ MENU_LISTENER(PerformSaveGame)
 
 	// Copy the name
 	file.name = static_cast<SaveSlotMenuItem *> (saveGame[which])->getValue();
+	file.oldVersion = false;
 	if(which == 0) // New
 	{
 		// Locate a available filename.  I don't want to assume savegamX.yza so this
@@ -311,6 +349,9 @@ MENU_LISTENER(PerformSaveGame)
 MENU_LISTENER(LoadSaveGame)
 {
 	loadedgame = true;
+	if(SaveFile::files[which].oldVersion)
+		return false;
+
 	Load(SaveFile::files[which].filename);
 	
 	ShootSnd();
@@ -465,7 +506,7 @@ bool Save(const FString &filename, const FString &title)
 	SaveScreenshot(fileh);
 	M_AppendPNGText(fileh, "Software", "ECWolf");
 	M_AppendPNGText(fileh, "Engine", GAMESIG);
-	M_AppendPNGText(fileh, "ECWolf Save Version", GAMESIG);
+	M_AppendPNGText(fileh, "ECWolf Save Version", SAVESIG);
 	M_AppendPNGText(fileh, "Title", title);
 	M_AppendPNGText(fileh, "Current Map", levelInfo->MapName);
 

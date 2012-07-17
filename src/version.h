@@ -1,10 +1,23 @@
 #ifndef _VERSION_H_
 #define _VERSION_H_
 
+#include "svnrevision.h"
+
 #define GAMENAME "ECWolf"
 #define GAMESIG "ECWOLF"
 #define DOTVERSIONSTR_NOREV "0.9999"
-#define DOTVERSIONSTR DOTVERSIONSTR_NOREV
+#define DOTVERSIONSTR DOTVERSIONSTR_NOREV " (r" SVN_REVISION_STRING ")"
+
+#define MINSAVEVER	1342515471
+
+#define __GETSAVESIG(x) #x
+#define GETSAVESIG(x) "ECWOLFSAVE" __GETSAVESIG(x)
+#if SVN_REVISION_NUMBER < MINSAVEVER
+#define SAVEVER	99999999999
+#else
+#define SAVEVER	SVN_REVISION_NUMBER
+#endif
+#define SAVESIG	GETSAVESIG(SAVEVER)
 
 //#define USE_FEATUREFLAGS    // Enables the level feature flags (see bottom of wl_def.h)
 //#define USE_DIR3DSPR        // Enables directional 3d sprites (see wl_dir3dspr.cpp)

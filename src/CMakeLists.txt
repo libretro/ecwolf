@@ -2,6 +2,14 @@ if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+get_target_property( UPDATEREVISION_EXE updaterevision LOCATION )
+
+add_custom_target(revision_check ALL
+	COMMAND ${UPDATEREVISION_EXE} . ${CMAKE_CURRENT_SOURCE_DIR}/svnrevision.h
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	DEPENDS updaterevision
+)
+
 include(CheckFunctionExists)
 include(FindPkgConfig)
 
@@ -188,6 +196,6 @@ add_executable(ecwolf #WIN32
 	${EXTRA_FILES}
 )
 
-add_dependencies(ecwolf lzma gdtoa)
+add_dependencies(ecwolf lzma gdtoa revision_check)
 target_link_libraries(ecwolf ${GTK2_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
 set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
