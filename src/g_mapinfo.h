@@ -66,6 +66,8 @@ public:
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
 
+	TArray<FString>	QuitMessages;
+
 	enum EFontColors
 	{
 		MENU_TITLE,

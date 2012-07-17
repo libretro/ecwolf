@@ -13,6 +13,7 @@ gameinfo
 	titlepage = "TITLEPIC"
 	menufontcolor_disabled = "DarkRed"
 	highscoresfont = "SmallFont"
+	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
 }
 
 adddefaultmap

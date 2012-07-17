@@ -467,6 +467,8 @@ protected:
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		else if(key.CompareNoCase("pageindexfontcolor") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::PAGEINDEX]);
+		else if(key.CompareNoCase("quitmessages") == 0)
+			ParseStringArrayAssignment(gameinfo.QuitMessages);
 		else
 			return false;
 		return true;

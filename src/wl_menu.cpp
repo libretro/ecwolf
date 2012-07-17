@@ -84,31 +84,11 @@ MENU_LISTENER(ViewScoresOrEndGame)
 }
 MENU_LISTENER(QuitGame)
 {
-const char* endStrings[9] = {
-#ifndef SPEAR
-	language["ENDSTR10"],
-	language["ENDSTR11"],
-	language["ENDSTR12"],
-	language["ENDSTR13"],
-	language["ENDSTR14"],
-	language["ENDSTR15"],
-	language["ENDSTR16"],
-	language["ENDSTR17"],
-	language["ENDSTR18"]
-#else
-	language["ENDSTR01"],
-	language["ENDSTR02"],
-	language["ENDSTR03"],
-	language["ENDSTR04"],
-	language["ENDSTR05"],
-	language["ENDSTR06"],
-	language["ENDSTR07"],
-	language["ENDSTR08"],
-	language["ENDSTR09"]
-#endif
-};
+	FString endString = gameinfo.QuitMessages[M_Random()%gameinfo.QuitMessages.Size()];
+	if(endString[0] == '$')
+		endString = language[endString.Mid(1)];
 
-	if(Confirm(endStrings[(M_Random() & 0x7) + (M_Random() & 1)]))
+	if(Confirm(endString))
 	{
 		VW_UpdateScreen();
 		SD_MusicOff();
