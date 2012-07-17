@@ -42,6 +42,7 @@ actor OneUp : CustomInventory 66
 {
 	inventory.pickupsound "misc/1up"
 	+COUNTITEM
+	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:

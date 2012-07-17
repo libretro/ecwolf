@@ -151,7 +151,7 @@ bool AInventory::TryPickup(AActor *toucher)
 	if(toucher->inventory && toucher->inventory->HandlePickup(this, pickupGood))
 	{
 		// The actor has this item in their inventory and it has been handled.
-		if(!pickupGood)
+		if(!pickupGood && !(itemFlags & IF_ALWAYSPICKUP))
 			return false;
 		GoAwayAndDie();
 	}
@@ -159,7 +159,11 @@ bool AInventory::TryPickup(AActor *toucher)
 	{
 		// We can add maxamount = 0 items if we can use them right away.
 		if(!(itemFlags & IF_AUTOACTIVATE))
+		{
+			if(itemFlags & IF_ALWAYSPICKUP)
+				GoAwayAndDie();
 			return false;
+		}
 
 		toucher->AddInventory(this);
 		bool good = Use();
