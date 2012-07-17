@@ -478,7 +478,6 @@ void GiveExtraMan (int amount)
 		players[0].lives = 0;
 	else if(players[0].lives > 9)
 		players[0].lives = 9;
-	DrawLives ();
 	SD_PlaySound ("misc/end_bonus1");
 }
 
