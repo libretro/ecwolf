@@ -549,6 +549,7 @@ void DrawWeapon (void)
 void DrawKeys (void)
 {
 	if(viewsize == 21 && ingame) return;
+	static bool extendedKeysGraphics = TexMan.CheckForTexture("STKEYS3", FTexture::TEX_Any).isValid();
 
 	// Find keys in inventory
 	int presentKeys = 0;
@@ -559,20 +560,28 @@ void DrawKeys (void)
 			if(item->IsKindOf(NATIVE_CLASS(Key)))
 			{
 				int slot = static_cast<AKey *>(item)->KeyNumber;
-				if(slot == 1 || slot == 2)
+				if(slot <= 4)
 					presentKeys |= 1<<(slot-1);
-				if(presentKeys == 3)
+				if(presentKeys == 15)
 					break;
 			}
 		}
 	}
 
-	if (presentKeys & 1)
+	if (extendedKeysGraphics && (presentKeys & (1|4)) == (1|4))
+		StatusDrawPic (30,4,"STKEYS5");
+	else if(extendedKeysGraphics && (presentKeys & 4))
+		StatusDrawPic (30,4,"STKEYS3");
+	else if(presentKeys & 1)
 		StatusDrawPic (30,4,"STKEYS1");
 	else
 		StatusDrawPic (30,4,"STKEYS0");
 
-	if (presentKeys & 2)
+	if (extendedKeysGraphics && (presentKeys & (2|8)) == (2|8))
+		StatusDrawPic (30,20,"STKEYS6");
+	else if (extendedKeysGraphics && (presentKeys & 8))
+		StatusDrawPic (30,20,"STKEYS4");
+	else if (presentKeys & 2)
 		StatusDrawPic (30,20,"STKEYS2");
 	else
 		StatusDrawPic (30,20,"STKEYS0");
