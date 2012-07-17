@@ -131,6 +131,7 @@ class AWeapon : public AInventory
 		bool		HandlePickup(AInventory *item, bool &good);
 		void		Serialize(FArchive &arc);
 
+		flagstype_t		weaponFlags;
 		const ClassDef	*ammotype1;
 		unsigned int	ammogive1;
 		unsigned int	ammouse1;

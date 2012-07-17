@@ -165,7 +165,6 @@ extern  bool	SD_MusicPlaying(void);
 extern  bool	SD_SetSoundMode(SDMode mode);
 extern  bool	SD_SetMusicMode(SMMode mode);
 extern  bool    SD_SoundPlaying(void);
-extern  bool    GotChaingun(void);
 
 extern  void    SD_SetDigiDevice(SDSMode);
 extern  byte*	SD_PrepareSound(int which);

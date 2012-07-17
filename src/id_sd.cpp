@@ -1158,8 +1158,6 @@ bool SD_SoundPlaying(void)
 		return false;
 }
 
-bool GotChaingun() { return SoundPlaying.Compare("weapon/gatling/pickup") == 0; }
-
 ///////////////////////////////////////////////////////////////////////////
 //
 //      SD_StopSound() - if a sound is playing, stops it

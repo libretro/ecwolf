@@ -1,6 +1,8 @@
 #ifndef __WL_GAME_H__
 #define __WL_GAME_H__
 
+#include "textures/textures.h"
+
 /*
 =============================================================================
 
@@ -21,7 +23,7 @@ extern struct gametype
 	short       difficulty;
 	short       mapon;
 
-	short       faceframe;
+	FTextureID  faceframe;
 
 	short       episode,secretcount,treasurecount,killcount,
 				secrettotal,treasuretotal,killtotal;

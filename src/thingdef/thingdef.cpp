@@ -80,6 +80,7 @@ const struct FlagDef
 	DEFINE_FLAG(IF, INVBAR, Inventory, itemFlags),
 	DEFINE_FLAG(FL, ISMONSTER, Actor, flags),
 	DEFINE_FLAG(FL, MISSILE, Actor, flags),
+	DEFINE_FLAG(WF, NOGRIN, Weapon, weaponFlags),
 	DEFINE_FLAG(FL, PICKUP, Actor, flags),
 	DEFINE_FLAG(FL, SHOOTABLE, Actor, flags),
 	DEFINE_FLAG(FL, SOLID, Actor, flags),

@@ -325,6 +325,10 @@ void AWeapon::AttachToOwner(AActor *owner)
 
 	// Autoswitch
 	owner->player->PendingWeapon = this;
+
+	// Grin
+	if(!(weaponFlags & WF_NOGRIN) && owner->player->mo == players[0].camera)
+		WeaponGrin();
 }
 
 bool AWeapon::CheckAmmo(AWeapon::FireMode fireMode, bool autoSwitch, bool requireAmmo)

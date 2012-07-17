@@ -891,16 +891,7 @@ void PlayLoop (void)
 		//
 		// MAKE FUNNY FACE IF BJ DOESN'T MOVE FOR AWHILE
 		//
-#ifdef SPEAR
 		funnyticount += tics;
-		if (funnyticount > 30l * 70)
-		{
-			funnyticount = 0;
-			if(viewsize != 21)
-				StatusDrawFace(BJWAITING1PIC + (M_Random () & 1));
-			facecount = 0;
-		}
-#endif
 
 		TexMan.UpdateAnimations(gamestate.TimeCount*14);
 		GC::CheckGC();

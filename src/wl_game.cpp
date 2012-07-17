@@ -251,8 +251,7 @@ void SetupGameLevel (void)
 			= gamestate.treasuretotal
 			= gamestate.secretcount
 			= gamestate.killcount
-			= gamestate.treasurecount
-			= facetimes = 0;
+			= gamestate.treasurecount;
 		LastAttacker = NULL;
 		players[0].killerobj = NULL;
 

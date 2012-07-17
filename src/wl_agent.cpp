@@ -238,29 +238,13 @@ static void StatusDrawFace(FTexture *pic)
 
 void DrawFace (void)
 {
-	//static FTexture *godmode[3] = { TexMan("STFGOD0"), TexMan("STFGOD1"), TexMan("STFGOD2") };
-	static FTexture *animations[7][3] =
-	{
-		{ TexMan("STFST00"), TexMan("STFST01"), TexMan("STFST02") },
-		{ TexMan("STFST10"), TexMan("STFST11"), TexMan("STFST12") },
-		{ TexMan("STFST20"), TexMan("STFST21"), TexMan("STFST22") },
-		{ TexMan("STFST30"), TexMan("STFST31"), TexMan("STFST32") },
-		{ TexMan("STFST40"), TexMan("STFST41"), TexMan("STFST42") },
-		{ TexMan("STFST50"), TexMan("STFST51"), TexMan("STFST52") },
-		{ TexMan("STFST60"), TexMan("STFST61"), TexMan("STFST62") },
-	};
 	if(viewsize == 21 && ingame) return;
-	if (GotChaingun())
-		StatusDrawFace(TexMan("STFEVL0"));
-	else if (players[0].health)
-	{
-#ifdef SPEAR
-		if (godmode)
-			StatusDrawFace(godmode[gamestate.faceframe]);
-		else
-#endif
-			StatusDrawFace(animations[(100-players[0].health)/16][gamestate.faceframe]);
-	}
+
+	if(!gamestate.faceframe.isValid())
+		UpdateFace();
+
+	if (players[0].health)
+		StatusDrawFace(TexMan(gamestate.faceframe));
 	else
 	{
 		// TODO: Make this work based on damage types.
@@ -283,30 +267,68 @@ void DrawFace (void)
 */
 
 int facecount = 0;
-int facetimes = 0;
+
+void WeaponGrin ()
+{
+	static FTextureID grin = TexMan.CheckForTexture("STFEVL0", FTexture::TEX_Any);
+	gamestate.faceframe = grin;
+	facecount = 140;
+}
 
 void UpdateFace (void)
 {
-	// don't make demo depend on sound playback
-	if(demoplayback || demorecord)
+	static bool noGodFace = false;
+	static FTextureID godmodeFace[3] = { TexMan.CheckForTexture("STFGOD0", FTexture::TEX_Any), TexMan.CheckForTexture("STFGOD1", FTexture::TEX_Any), TexMan.CheckForTexture("STFGOD2", FTexture::TEX_Any) };
+	static FTextureID waitFace[2] = { TexMan.CheckForTexture("STFWAIT0", FTexture::TEX_Any), TexMan.CheckForTexture("STFWAIT1", FTexture::TEX_Any) };
+	static FTextureID animations[7][3] =
 	{
-		if(facetimes > 0)
+		{ TexMan.CheckForTexture("STFST00", FTexture::TEX_Any), TexMan.CheckForTexture("STFST01", FTexture::TEX_Any), TexMan.CheckForTexture("STFST02", FTexture::TEX_Any) },
+		{ TexMan.CheckForTexture("STFST10", FTexture::TEX_Any), TexMan.CheckForTexture("STFST11", FTexture::TEX_Any), TexMan.CheckForTexture("STFST12", FTexture::TEX_Any) },
+		{ TexMan.CheckForTexture("STFST20", FTexture::TEX_Any), TexMan.CheckForTexture("STFST21", FTexture::TEX_Any), TexMan.CheckForTexture("STFST22", FTexture::TEX_Any) },
+		{ TexMan.CheckForTexture("STFST30", FTexture::TEX_Any), TexMan.CheckForTexture("STFST31", FTexture::TEX_Any), TexMan.CheckForTexture("STFST32", FTexture::TEX_Any) },
+		{ TexMan.CheckForTexture("STFST40", FTexture::TEX_Any), TexMan.CheckForTexture("STFST41", FTexture::TEX_Any), TexMan.CheckForTexture("STFST42", FTexture::TEX_Any) },
+		{ TexMan.CheckForTexture("STFST50", FTexture::TEX_Any), TexMan.CheckForTexture("STFST51", FTexture::TEX_Any), TexMan.CheckForTexture("STFST52", FTexture::TEX_Any) },
+		{ TexMan.CheckForTexture("STFST60", FTexture::TEX_Any), TexMan.CheckForTexture("STFST61", FTexture::TEX_Any), TexMan.CheckForTexture("STFST62", FTexture::TEX_Any) },
+	};
+
+	// OK Wolf apparently did something more along the lines of ++facecount > M_Random()
+	// This doesn't seem to work as well with the new random generator, so lets take a different approach.
+	if (--facecount <= 0)
+	{
+		facecount = ((M_Random()>>3)|0xF);
+
+		if (funnyticount > 301 * 70)
 		{
-			facetimes--;
-			return;
+			funnyticount = 0;
+			FTextureID pickedID = waitFace[M_Random() & 1];
+			if(pickedID.isValid())
+			{
+				gamestate.faceframe = pickedID;
+				facecount = 17;
+				return;
+			}
 		}
-	}
-	else if(GotChaingun())
-		return;
 
-	++facecount;
-	if (facecount > M_Random())
-	{
-		gamestate.faceframe = (M_Random()>>6);
-		if (gamestate.faceframe==3)
-			gamestate.faceframe = 1;
+		unsigned int facePick = M_Random()%3;
 
-		facecount = 0;
+		if(godmode && !noGodFace)
+		{
+			gamestate.faceframe = godmodeFace[facePick];
+
+			if(!gamestate.faceframe.isValid())
+			{
+				if(!godmodeFace[0].isValid())
+					noGodFace = true;
+				godmodeFace[1] = godmodeFace[2] = godmodeFace[0];
+			}
+			else
+				return;
+		}
+
+		if(players[0].mo)
+			gamestate.faceframe = animations[(100-players[0].health)/16][facePick];
+		else
+			gamestate.faceframe = animations[0][0];
 	}
 }
 
@@ -391,18 +413,18 @@ void TakeDamage (int points,AActor *attacker)
 	if (godmode != 2)
 		StartDamageFlash (points);
 
-	DrawStatusBar();
-
-	//
-	// MAKE BJ'S EYES BUG IF MAJOR DAMAGE!
-	//
-#ifdef SPEAR
-	if (points > 30 && players[0].health!=0 && !godmode && viewsize != 21)
+	static FTextureID ouchFace = TexMan.CheckForTexture("STFOUCH0", FTexture::TEX_Any);
+	if(ouchFace.isValid() && points > 30 && players[0].health != 0)
 	{
-		StatusDrawFace("STFOUCH0");
-		facecount = 0;
+		gamestate.faceframe = ouchFace;
+		facecount = 17;
 	}
-#endif
+	else
+	{
+		facecount = 0;
+		UpdateFace();
+	}
+	DrawStatusBar();
 }
 
 
@@ -492,7 +514,6 @@ void GivePoints (int32_t points)
 		players[0].nextextra += EXTRAPOINTS;
 		GiveExtraMan (1);
 	}
-	DrawScore ();
 }
 
 //===========================================================================
@@ -547,14 +568,14 @@ void DrawKeys (void)
 	}
 
 	if (presentKeys & 1)
-		StatusDrawPic (30,4,"GOLDKEY");
+		StatusDrawPic (30,4,"STKEYS1");
 	else
-		StatusDrawPic (30,4,"NOKEY");
+		StatusDrawPic (30,4,"STKEYS0");
 
 	if (presentKeys & 2)
-		StatusDrawPic (30,20,"SILVRKEY");
+		StatusDrawPic (30,20,"STKEYS2");
 	else
-		StatusDrawPic (30,20,"NOKEY");
+		StatusDrawPic (30,20,"STKEYS0");
 }
 
 //===========================================================================
@@ -813,10 +834,8 @@ void Thrust (angle_t angle, int32_t speed)
 	//
 	// ZERO FUNNY COUNTER IF MOVED!
 	//
-#ifdef SPEAR
 	if (speed)
 		funnyticount = 0;
-#endif
 
 	thrustspeed += speed;
 	//
@@ -1149,8 +1168,6 @@ ACTION_FUNCTION(A_CustomPunch)
 		player->health += damage;
 		if(player->health > self->health)
 			player->health = self->health;
-		DrawHealth();
-		DrawFace();
 	}
 }
 

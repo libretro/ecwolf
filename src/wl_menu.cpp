@@ -493,11 +493,10 @@ static char SaveName[13] = "savegam?.";
 // Wolfenstein Control Panel!  Ta Da!
 //
 ////////////////////////////////////////////////////////////////////
-void
-US_ControlPanel (ScanCode scancode)
+void US_ControlPanel (ScanCode scancode)
 {
 	int which;
-	bool idEasterEgg = Wads.CheckNumForName("IDGUYS1", ns_graphics) != -1;
+	bool idEasterEgg = Wads.CheckNumForName("IDGUYPAL") != -1;
 
 	if (ingame)
 	{
@@ -568,7 +567,7 @@ US_ControlPanel (ScanCode scancode)
 	{
 		which = mainMenu.handle();
 
-/*		if(idEasterEgg)
+		if(idEasterEgg)
 		{
 			IN_ProcessEvents();
 	
@@ -577,32 +576,30 @@ US_ControlPanel (ScanCode scancode)
 			//
 			if (Keyboard[sc_I] && Keyboard[sc_D])
 			{
-				VW_FadeOut ();
-				StartCPMusic (XJAZNAZI_MUS);
+				MenuFadeOut ();
+				StartCPMusic ("XJAZNAZI");
 				ClearMemory ();
-	
-	
-				VWB_DrawPic (0, 0, "IDGUYS1");
-				VWB_DrawPic (0, 80, "IDGUYS2");
-	
+				InitPalette("IDGUYPAL");
+
+				CA_CacheScreen(TexMan("IDGUYS"));
+
 				VW_UpdateScreen ();
-	
-				SDL_Color pal[256];
-				VL_ConvertPalette("IDGUYPAL", pal, 256);
-				VL_FadeIn (0, 255, pal, 30);
-	
+
+				VW_FadeIn();
+
 				while (Keyboard[sc_I] || Keyboard[sc_D])
 					IN_WaitAndProcessEvents();
 				IN_ClearKeysDown ();
 				IN_Ack ();
 	
 				VW_FadeOut ();
-	
+				InitPalette(gameinfo.GamePalette);
+
 				mainMenu.draw();
 				StartCPMusic (gameinfo.MenuMusic);
 				MenuFadeIn ();
 			}
-		}*/
+		}
 
 		switch (which)
 		{

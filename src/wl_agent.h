@@ -13,7 +13,7 @@
 =============================================================================
 */
 
-extern  int      facecount, facetimes;
+extern  int      facecount;
 extern  int32_t  thrustspeed;
 extern  AActor   *LastAttacker;
 
@@ -31,6 +31,7 @@ void	DrawStatusBar();
 void    StatusDrawFace(unsigned picnum);
 void    GiveExtraMan (int amount);
 void    UpdateFace ();
+void	WeaponGrin ();
 void    CheckWeaponChange ();
 void    ControlMovement (AActor *self);
 

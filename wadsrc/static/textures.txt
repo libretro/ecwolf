@@ -77,6 +77,12 @@ graphic optional "TITLESOD", 320, 200
 	graphic "TITLE2", 0, 80
 }
 
+graphic optional "IDGUYS", 320, 200
+{
+	graphic "IDGUYS1", 0, 0
+	graphic "IDGUYS2", 0, 80
+}
+
 graphic optional "HEALPIC", 88, 16
 {
 	patch "#DCDCDC", 0, 0

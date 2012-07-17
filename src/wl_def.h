@@ -225,6 +225,8 @@ typedef enum
 
 	IF_AUTOACTIVATE		= 0x00000001,
 	IF_INVBAR			= 0x00000002,
+
+	WF_NOGRIN			= 0x00000001,
 } objflag_t;
 
 /*

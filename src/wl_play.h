@@ -59,9 +59,7 @@ void    ContinueMusic(int offs);
 void    StartDamageFlash (int damage);
 void    StartBonusFlash (void);
 
-#ifdef SPEAR
 extern  int32_t     funnyticount;           // FOR FUNNY BJ FACE
-#endif
 
 extern  bool        noclip,ammocheat;
 extern  int         singlestep;
