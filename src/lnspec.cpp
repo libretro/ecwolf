@@ -282,14 +282,17 @@ IMPLEMENT_INTERNAL_CLASS(EVDoor)
 
 FUNC(Door_Open)
 {
-	if(buttonheld[bt_use])
-		return 0;
-	buttonheld[bt_use] = true;
-
-	if(args[1] != 0)
+	if(activator->player)
 	{
-		if(!P_CheckKeys(activator, args[1], false))
+		if(buttonheld[bt_use])
 			return 0;
+		buttonheld[bt_use] = true;
+
+		if(args[1] != 0)
+		{
+			if(!P_CheckKeys(activator, args[1], false))
+				return 0;
+		}
 	}
 
 	if(spot->thinker)

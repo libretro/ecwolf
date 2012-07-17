@@ -506,21 +506,21 @@ void CA_CacheScreen(FTexture* tex, bool noaspect)
 	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
 	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
 
+	vbuf += static_cast<int>(xd) + bufferPitch*static_cast<int>(yd);
 	const BYTE *src;
-	byte *dest;
+	byte *dest = vbuf;
 	unsigned int i, j;
 	fixed x, y;
-	for(i = xd, x = 0;x < tex->GetWidth()<<FRACBITS;x += xStep, ++i)
+	for(i = xd, x = 0;x < tex->GetWidth()<<FRACBITS && i < screenWidth;x += xStep, ++i)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
-		dest = vbuf+i+bufferPitch*static_cast<int>(yd);
-		for(j = yd, y = 0;y < tex->GetHeight()<<FRACBITS;y += yStep, ++j)
+		for(j = yd, y = 0;y < tex->GetHeight()<<FRACBITS && j < screenHeight;y += yStep, ++j)
 		{
-			if(j >= screenHeight)
-				break;
 			*dest = NormalLight.Maps[src[y>>FRACBITS]];
 			dest += bufferPitch;
 		}
+
+		dest = ++vbuf;
 	}
 	VL_UnlockSurface(curSurface);
 }
