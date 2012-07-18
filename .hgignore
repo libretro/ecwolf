@@ -2,3 +2,5 @@
 ^build/
 /build/
 .orig$
+syntax: glob
+src/svnrevision.h

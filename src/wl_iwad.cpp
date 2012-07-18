@@ -38,6 +38,7 @@
 #include "lumpremap.h"
 #include "scanner.h"
 #include "tarray.h"
+#include "version.h"
 #include "w_wad.h"
 #include "wl_iwad.h"
 #include "zstring.h"
@@ -56,6 +57,7 @@ namespace IWad {
 
 static TArray<IWadData> iwadTypes;
 static const IWadData *selectedGame;
+static unsigned int NumIWads;
 
 static bool SplitFilename(const FString &filename, FString &name, FString &extension)
 {
@@ -116,6 +118,11 @@ static int CheckData(WadStuff &wad)
 const IWadData &GetGame()
 {
 	return *selectedGame;
+}
+
+unsigned int GetNumIWads()
+{
+	return NumIWads;
 }
 
 enum
@@ -356,6 +363,8 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	{
 		wadfiles.Push(base.Path[i]);
 	}
+
+	NumIWads = base.Path.Size();
 }
 
 }

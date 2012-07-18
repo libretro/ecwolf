@@ -157,6 +157,7 @@ class GameMap
 		void			ClearVisibility();
 		const Header	&GetHeader() const { return header; }
 		void			GetHitlist(BYTE* hitlist) const;
+		int				GetMarketLumpNum() const { return markerLump; }
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		const Zone		&GetZone(unsigned int index) { return zonePalette[index]; }
 		bool			IsValid() const { return valid; }

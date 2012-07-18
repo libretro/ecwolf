@@ -46,10 +46,12 @@
 #include "m_png.h"
 #include "m_random.h"
 #include "thinker.h"
+#include "version.h"
 #include "w_wad.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_iwad.h"
 #include "wl_loadsave.h"
 #include "wl_main.h"
 #include "wl_menu.h"
@@ -67,6 +69,7 @@ struct SaveFile
 	public:
 		static TArray<SaveFile>	files;
 
+		bool	hasFiles;
 		bool	oldVersion;
 		FString	name; // Displayed on the menu.
 		FString	filename;
@@ -233,6 +236,7 @@ void SetupSaveGames()
 			{
 				SaveFile sFile;
 				sFile.filename = filename;
+				sFile.hasFiles = true;
 
 				char* savesig = M_GetPNGText(png, "ECWolf Save Version");
 				if(savesig)
@@ -249,7 +253,36 @@ void SetupSaveGames()
 				else
 					sFile.oldVersion = true;
 
-				if(M_GetPNGText(png, "Title", title, MAX_SAVENAME))
+				char* checkFile = M_GetPNGText(png, "Map WAD");
+				if(checkFile)
+				{
+					if(Wads.CheckIfWadLoaded(checkFile) < 0)
+						sFile.hasFiles = false;
+					delete[] checkFile;
+				}
+
+				checkFile = M_GetPNGText(png, "Game WAD");
+				bool hasGameWad = true;
+				if(checkFile)
+				{
+					FString checkString(checkFile);
+					int lastIndex = 0;
+					int nextIndex = 0;
+					do
+					{
+						nextIndex = checkString.IndexOf(';', lastIndex);
+						if(Wads.CheckIfWadLoaded(checkString.Mid(lastIndex, nextIndex-lastIndex)) < 0)
+						{
+							hasGameWad = false;
+							break;
+						}
+						lastIndex = nextIndex + 1;
+					}
+					while(nextIndex != -1);
+					delete[] checkFile;
+				}
+
+				if(hasGameWad && M_GetPNGText(png, "Title", title, MAX_SAVENAME))
 				{
 					sFile.name = title;
 					SaveFile::files.Push(sFile);
@@ -272,12 +305,12 @@ void SetupSaveGames()
 	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
 	{
 		MenuItem *item = new SaveSlotMenuItem(SaveFile::files[i].name, 31, LoadSaveGame);
-		if(SaveFile::files[i].oldVersion)
+		if(SaveFile::files[i].oldVersion || !SaveFile::files[i].hasFiles)
 			item->setHighlighted(2);
 		loadGame.addItem(item);
 
 		item = new SaveSlotMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame);
-		if(SaveFile::files[i].oldVersion)
+		if(SaveFile::files[i].oldVersion || !SaveFile::files[i].hasFiles)
 			item->setHighlighted(2);
 		saveGame.addItem(item);
 	}
@@ -297,6 +330,7 @@ MENU_LISTENER(PerformSaveGame)
 	// Copy the name
 	file.name = static_cast<SaveSlotMenuItem *> (saveGame[which])->getValue();
 	file.oldVersion = false;
+	file.hasFiles = true;
 	if(which == 0) // New
 	{
 		// Locate a available filename.  I don't want to assume savegamX.yza so this
@@ -336,6 +370,10 @@ MENU_LISTENER(PerformSaveGame)
 		file.filename = SaveFile::files[which-1].filename;
 		SaveFile::files[which-1] = file;
 		loadGame.setCurrentPosition(which-1);
+
+		// Ungreen
+		saveGame.getIndex(which)->setHighlighted(0);
+		loadGame.getIndex(which-1)->setHighlighted(0);
 	}
 
 	Save(file.filename, file.name);
@@ -349,7 +387,7 @@ MENU_LISTENER(PerformSaveGame)
 MENU_LISTENER(LoadSaveGame)
 {
 	loadedgame = true;
-	if(SaveFile::files[which].oldVersion)
+	if(SaveFile::files[which].oldVersion || !SaveFile::files[which].hasFiles)
 		return false;
 
 	Load(SaveFile::files[which].filename);
@@ -528,8 +566,16 @@ bool Save(const FString &filename, const FString &title)
 		gametime/3600, (gametime%3600)/60, gametime%60);
 	M_AppendPNGText(fileh, "Comment", comment);
 
-	M_AppendPNGText(fileh, "Game WAD", Wads.GetWadName(FWadCollection::IWAD_FILENUM));
-	// TODO: Also write WAD that the map resides in
+	FString gameWadString;
+	for(unsigned int i = 0;i < IWad::GetNumIWads();++i)
+	{
+		if(i)
+			gameWadString += ';';
+
+		gameWadString += Wads.GetWadName(FWadCollection::IWAD_FILENUM + i);
+	}
+	M_AppendPNGText(fileh, "Game WAD", gameWadString);
+	M_AppendPNGText(fileh, "Map WAD", Wads.GetWadName(Wads.GetLumpFile(map->GetMarketLumpNum())));
 
 	FRandom::StaticWriteRNGState(fileh);
 
