@@ -18,6 +18,7 @@ LRstruct LevelRatios;
 
 static int32_t lastBreathTime = 0;
 
+static void Erase (int x, int y, const char *string, bool rightAlign=false);
 static void Write (int x, int y, const char *string, bool rightAlign=false);
 
 //==========================================================================
@@ -210,15 +211,28 @@ void Victory (void)
 
 //==========================================================================
 
+static void Erase (int x, int y, const char *string, bool rightAlign)
+{
+	double nx = x*8;
+	double ny = y*8;
+
+	word width, height;
+	VW_MeasurePropString(IntermissionFont, string, width, height);
+
+	if(rightAlign)
+		nx -= width;
+
+	double fw = width;
+	double fh = height;
+	VirtualToRealCoords(nx, ny, fw, fh, 320, 200, true, true);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), nx, ny, nx+fw, ny+fh);
+}
+
 static void Write (int x, int y, const char *string, bool rightAlign)
 {
-	static FFont *IntermissionFont = NULL;
 	static FRemapTable *remap = NULL;
-	if(!IntermissionFont)
-	{
-		IntermissionFont = V_GetFont("IntermissionFont");
+	if(!remap)
 		remap = IntermissionFont->GetColorTranslation(CR_UNTRANSLATED);
-	}
 
 	int nx = x*8;
 	int ny = y*8;
@@ -298,6 +312,7 @@ void LevelCompleted (void)
 	static const unsigned int PERCENT100AMT = 10000;
 
 	int x, i, min, sec, ratio, kr, sr, tr;
+	char bonusstr[10];
 	char tempstr[10];
 	int32_t bonus, timeleft = 0;
 
@@ -385,9 +400,9 @@ void LevelCompleted (void)
 		{
 			for (i = 0; i <= timeleft; i++)
 			{
-				ltoa ((int32_t) i * PAR_AMOUNT, tempstr, 10);
-				x = 36 - (int) strlen(tempstr) * 2;
-				Write (x, 7, tempstr);
+				if(i) Erase (36, 7, bonusstr, true);
+				ltoa ((int32_t) i * PAR_AMOUNT, bonusstr, 10);
+				Write (36, 7, bonusstr, true);
 				if (!(i % (PAR_AMOUNT / 10)))
 					SD_PlaySound ("misc/end_bonus1");
 				if(!usedoublebuffering || !(i % (PAR_AMOUNT / 50))) VW_UpdateScreen ();
@@ -411,9 +426,9 @@ void LevelCompleted (void)
 		ratio = kr;
 		for (i = 0; i <= ratio; i++)
 		{
+			if(i) Erase (RATIOXX, 14, tempstr, true);
 			itoa (i, tempstr, 10);
-			x = RATIOXX - (int) strlen(tempstr) * 2;
-			Write (x, 14, tempstr);
+			Write (RATIOXX, 14, tempstr, true);
 			if (!(i % 10))
 				SD_PlaySound ("misc/end_bonus1");
 			if(!usedoublebuffering || !(i & 1)) VW_UpdateScreen ();
@@ -428,9 +443,9 @@ void LevelCompleted (void)
 			VW_WaitVBL (VBLWAIT);
 			SD_StopSound ();
 			bonus += PERCENT100AMT;
-			ltoa (bonus, tempstr, 10);
-			x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-			Write (x, 7, tempstr);
+			Erase (36, 7, bonusstr, true);
+			ltoa (bonus, bonusstr, 10);
+			Write (36, 7, bonusstr, true);
 			VW_UpdateScreen ();
 			SD_PlaySound ("misc/100percent");
 		}
@@ -453,9 +468,9 @@ void LevelCompleted (void)
 		ratio = sr;
 		for (i = 0; i <= ratio; i++)
 		{
+			if(i) Erase (RATIOXX, 16, tempstr, true);
 			itoa (i, tempstr, 10);
-			x = RATIOXX - (int) strlen(tempstr) * 2;
-			Write (x, 16, tempstr);
+			Write (RATIOXX, 16, tempstr, true);
 			if (!(i % 10))
 				SD_PlaySound ("misc/end_bonus1");
 			if(!usedoublebuffering || !(i & 1)) VW_UpdateScreen ();
@@ -470,9 +485,9 @@ void LevelCompleted (void)
 			VW_WaitVBL (VBLWAIT);
 			SD_StopSound ();
 			bonus += PERCENT100AMT;
-			ltoa (bonus, tempstr, 10);
-			x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-			Write (x, 7, tempstr);
+			Erase (36, 7, bonusstr, true);
+			ltoa (bonus, bonusstr, 10);
+			Write (36, 7, bonusstr, true);
 			VW_UpdateScreen ();
 			SD_PlaySound ("misc/100percent");
 		}
@@ -494,9 +509,9 @@ void LevelCompleted (void)
 		ratio = tr;
 		for (i = 0; i <= ratio; i++)
 		{
+			if(i) Erase (RATIOXX, 18, tempstr, true);
 			itoa (i, tempstr, 10);
-			x = RATIOXX - (int) strlen(tempstr) * 2;
-			Write (x, 18, tempstr);
+			Write (RATIOXX, 18, tempstr, true);
 			if (!(i % 10))
 				SD_PlaySound ("misc/end_bonus1");
 			if(!usedoublebuffering || !(i & 1)) VW_UpdateScreen ();
@@ -510,9 +525,9 @@ void LevelCompleted (void)
 			VW_WaitVBL (VBLWAIT);
 			SD_StopSound ();
 			bonus += PERCENT100AMT;
+			Erase (36, 7, bonusstr, true);
 			ltoa (bonus, tempstr, 10);
-			x = (RATIOXX - 1) - (int) strlen(tempstr) * 2;
-			Write (x, 7, tempstr);
+			Write (36, 7, tempstr, true);
 			VW_UpdateScreen ();
 			SD_PlaySound ("misc/100percent");
 		}
@@ -533,25 +548,25 @@ void LevelCompleted (void)
 		// JUMP STRAIGHT HERE IF KEY PRESSED
 		//
 done:   itoa (kr, tempstr, 10);
-		x = RATIOXX - (int) strlen(tempstr) * 2;
-		Write (x, 14, tempstr);
+		Erase (RATIOXX, 14, tempstr, true);
+		Write (RATIOXX, 14, tempstr, true);
 
 		itoa (sr, tempstr, 10);
-		x = RATIOXX - (int) strlen(tempstr) * 2;
-		Write (x, 16, tempstr);
+		Erase (RATIOXX, 16, tempstr, true);
+		Write (RATIOXX, 16, tempstr, true);
 
 		itoa (tr, tempstr, 10);
-		x = RATIOXX - (int) strlen(tempstr) * 2;
-		Write (x, 18, tempstr);
+		Erase (RATIOXX, 18, tempstr, true);
+		Write (RATIOXX, 18, tempstr, true);
 
 		bonus = (int32_t) timeleft *PAR_AMOUNT +
 			(PERCENT100AMT * (kr >= 100)) +
 			(PERCENT100AMT * (sr >= 100)) + (PERCENT100AMT * (tr >= 100));
 
 		GivePoints (bonus);
-		ltoa (bonus, tempstr, 10);
-		x = 36 - (int) strlen(tempstr) * 2;
-		Write (x, 7, tempstr);
+		Erase (36, 7, bonusstr, true);
+		ltoa (bonus, bonusstr, 10);
+		Write (36, 7, bonusstr, true);
 
 		//
 		// SAVE RATIO INFORMATION FOR ENDGAME
