@@ -276,6 +276,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 			{
 				delete[] idx.data[i];
 				idx.data[i] = NULL;
+				idx.lump[i] = -1;
 				idx.length[i] = -1;
 			}
 
