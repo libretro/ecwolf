@@ -106,6 +106,7 @@ public:
 	unsigned int	Par;
 	FString			CompletionString;
 	int				LevelBonus;
+	unsigned int	LevelNumber;
 
 	bool			DeathCam;
 
@@ -119,6 +120,7 @@ public:
 	TArray<SpecialAction>	SpecialActions;
 
 	static LevelInfo &Find(const char* level);
+	static LevelInfo &FindByNumber(unsigned int num);
 
 protected:
 	friend class LevelInfoBlockParser;

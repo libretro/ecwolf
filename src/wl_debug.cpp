@@ -429,11 +429,32 @@ int DebugKeys (void)
 		US_Print(SmallFont, "  Warp to which level: ");
 		VW_UpdateScreen();
 		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,8,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
-		if (!esc && Wads.CheckNumForName(str) != -1)
+		if (!esc && str[0])
 		{
-			strncpy(gamestate.mapname, str, 8);
-			gamestate.mapname[8] = 0;
-			playstate = ex_warped;
+			// Check if a number was provided
+			bool isNumber = true;
+			for(unsigned int i = strlen(str);i-- > 0;)
+			{
+				if(str[i] < '0' || str[i] > '9')
+				{
+					isNumber = false;
+					break;
+				}
+			}
+			if(isNumber)
+			{
+				int num = atoi(str);
+				LevelInfo &info = LevelInfo::FindByNumber(num + 1);
+				if(info.MapName[0])
+					strcpy(str, info.MapName);
+			}
+
+			if(Wads.CheckNumForName(str) != -1)
+			{
+				strncpy(gamestate.mapname, str, 8);
+				gamestate.mapname[8] = 0;
+				playstate = ex_warped;
+			}
 		}
 		return 1;
 	}

@@ -241,7 +241,10 @@ void DrawFace (void)
 	if(viewsize == 21 && ingame) return;
 
 	if(!gamestate.faceframe.isValid())
+	{
+		facecount = 0;
 		UpdateFace();
+	}
 
 	if (players[0].health)
 		StatusDrawFace(TexMan(gamestate.faceframe));

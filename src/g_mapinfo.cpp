@@ -243,6 +243,7 @@ static TArray<LevelInfo> levelInfos;
 
 LevelInfo::LevelInfo() : UseMapInfoName(false)
 {
+	MapName[0] = 0;
 	BorderTexture.SetInvalid();
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
@@ -250,6 +251,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	FloorNumber = 1;
 	Par = 0;
 	LevelBonus = -1;
+	LevelNumber = 0;
 	Cluster = 0;
 }
 
@@ -278,6 +280,16 @@ LevelInfo &LevelInfo::Find(const char* level)
 	return defaultMap;
 }
 
+LevelInfo &LevelInfo::FindByNumber(unsigned int num)
+{
+	for(unsigned int i = 0;i < levelInfos.Size();++i)
+	{
+		if(levelInfos[i].LevelNumber == num)
+			return levelInfos[i];
+	}
+	return defaultMap;
+}
+
 class LevelInfoBlockParser : public MapInfoBlockParser
 {
 private:
@@ -298,6 +310,16 @@ protected:
 		strncpy(mapInfo.MapName, sc->str, 8);
 		mapInfo.MapName[8] = 0;
 
+		if(strnicmp(mapInfo.MapName, "MAP", 3) == 0)
+		{
+			int num = atoi(mapInfo.MapName+3);
+			if(num > 0) // Zero is the default so no need to do anything.
+			{
+				ClearLevelNumber(num);
+				mapInfo.LevelNumber = num;
+			}
+		}
+
 		bool useLanguage = false;
 		if(sc.CheckToken(TK_Identifier))
 		{
@@ -314,6 +336,13 @@ protected:
 			else
 				mapInfo.Name = sc->str;
 		}
+	}
+
+	void ClearLevelNumber(unsigned int num)
+	{
+		LevelInfo &other = LevelInfo::FindByNumber(num);
+		if(other.MapName[0] != 0)
+			other.LevelNumber = 0;
 	}
 
 	bool CheckKey(FString key)
@@ -381,6 +410,14 @@ protected:
 			ParseIntAssignment(mapInfo.FloorNumber);
 		else if(key.CompareNoCase("LevelBonus") == 0)
 			ParseIntAssignment(mapInfo.LevelBonus);
+		else if(key.CompareNoCase("LevelNum") == 0)
+		{
+			// Get the number and then remove any other map from this slot.
+			unsigned int num;
+			ParseIntAssignment(num);
+			ClearLevelNumber(num);
+			mapInfo.LevelNumber = num;
+		}
 		else if(key.CompareNoCase("Music") == 0)
 			ParseStringAssignment(mapInfo.Music);
 		else if(key.CompareNoCase("Par") == 0)
