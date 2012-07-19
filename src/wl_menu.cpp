@@ -35,6 +35,7 @@ extern int	lastgamemusicoffset;
 EpisodeInfo	*episode = 0;
 int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG;
 static MenuItem	*readThis;
+static bool menusAreFaded = true;
 
 MENU_LISTENER(EnterControlBase);
 
@@ -93,7 +94,10 @@ MENU_LISTENER(QuitGame)
 		VW_UpdateScreen();
 		SD_MusicOff();
 		SD_StopSound();
-		MenuFadeOut();
+		if(!menusAreFaded)
+			MenuFadeOut();
+		else
+			VW_FadeOut();
 		Quit(NULL);
 	}
 
@@ -654,7 +658,7 @@ int CP_CheckQuick (ScanCode scancode)
 			WindowH = 160;
 			QuitGame(-1);
 
-			DrawPlayBorder ();
+			DrawPlayScreen ();
 			WindowH = 200;
 			return 1;
 	}
@@ -1109,7 +1113,6 @@ void ShootSnd (void)
 	SD_PlaySound ("menu/activate");
 }
 
-static bool menusAreFaded = true; 
 void MenuFadeOut()
 {
 	assert(!menusAreFaded);
