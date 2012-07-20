@@ -46,6 +46,7 @@ class Scanner;
 class TextMapParser
 {
 	protected:
+		static void ParseTile(Scanner &sc, MapTile &tile);
 		static void ParseTrigger(Scanner &sc, MapTrigger &trigger);
 };
 

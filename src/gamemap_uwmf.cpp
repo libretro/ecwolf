@@ -54,6 +54,44 @@
 			sc.ScriptMessage(Scanner::ERROR, "Invalid syntax.\n"); \
 	}
 
+void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
+{
+	StartParseBlock
+
+	CheckKey("texturenorth")
+	{
+		sc.MustGetToken(TK_StringConst);
+		tile.texture[MapTile::North] = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
+	else CheckKey("texturesouth")
+	{
+		sc.MustGetToken(TK_StringConst);
+		tile.texture[MapTile::South] = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
+	else CheckKey("texturewest")
+	{
+		sc.MustGetToken(TK_StringConst);
+		tile.texture[MapTile::West] = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
+	else CheckKey("textureeast")
+	{
+		sc.MustGetToken(TK_StringConst);
+		tile.texture[MapTile::East] = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
+	else CheckKey("offsetvertical")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.offsetVertical = sc->boolean;
+	}
+	else CheckKey("offsethorizontal")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.offsetHorizontal = sc->boolean;
+	}
+
+	EndParseBlock
+}
+
 void TextMapParser::ParseTrigger(Scanner &sc, MapTrigger &trigger)
 {
 	StartParseBlock
@@ -402,40 +440,8 @@ class UWMFParser : public TextMapParser
 		void ParseTile()
 		{
 			MapTile tile;
-			StartParseBlock
+			TextMapParser::ParseTile(sc, tile);
 
-			CheckKey("texturenorth")
-			{
-				sc.MustGetToken(TK_StringConst);
-				tile.texture[MapTile::North] = TexMan.GetTexture(sc->str, FTexture::TEX_Wall);
-			}
-			else CheckKey("texturesouth")
-			{
-				sc.MustGetToken(TK_StringConst);
-				tile.texture[MapTile::South] = TexMan.GetTexture(sc->str, FTexture::TEX_Wall);
-			}
-			else CheckKey("texturewest")
-			{
-				sc.MustGetToken(TK_StringConst);
-				tile.texture[MapTile::West] = TexMan.GetTexture(sc->str, FTexture::TEX_Wall);
-			}
-			else CheckKey("textureeast")
-			{
-				sc.MustGetToken(TK_StringConst);
-				tile.texture[MapTile::East] = TexMan.GetTexture(sc->str, FTexture::TEX_Wall);
-			}
-			else CheckKey("offsetvertical")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				tile.offsetVertical = sc->boolean;
-			}
-			else CheckKey("offsethorizontal")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				tile.offsetHorizontal = sc->boolean;
-			}
-
-			EndParseBlock
 			gm->tilePalette.Push(tile);
 		}
 

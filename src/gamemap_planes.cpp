@@ -99,6 +99,40 @@ public:
 		}
 	}
 
+	WORD GetTilePalette(TArray<MapTile> &tilePalette)
+	{
+		WORD max = 0;
+		WORD min = 0xFFFF;
+
+		TMap<WORD, MapTile>::Iterator iter(this->tilePalette);
+		TMap<WORD, MapTile>::Pair *pair;
+		while(iter.NextPair(pair))
+		{
+			if(pair->Key > max)
+				max = pair->Key;
+			if(pair->Key < min)
+				min = pair->Key;
+		}
+		if(min > max)
+			Quit("No tiles found for translation!");
+
+		tilePalette.Resize(max-min+1);
+
+		iter.Reset();
+		while(iter.NextPair(pair))
+		{
+			tilePalette[pair->Key - min] = pair->Value;
+		}
+		return min;
+	}
+	bool IsValidTile(unsigned short tile)
+	{
+		MapTile *item = tilePalette.CheckKey(tile);
+		if(item)
+			return true;
+		return false;
+	}
+
 	FTextureID TranslateFlat(unsigned int index, bool ceiling)
 	{
 		if(flatTable[index][ceiling].isValid())
@@ -226,6 +260,16 @@ protected:
 				sc.MustGetToken('{');
 				TextMapParser::ParseTrigger(sc, trigger);
 			}
+			else if(sc->str.CompareNoCase("tile") == 0)
+			{
+				sc.MustGetToken(TK_IntConst);
+				if(sc->number > 0xFFFF)
+					sc.ScriptMessage(Scanner::ERROR, "Tile number out of range.");
+
+				MapTile &tile = tilePalette[sc->number];
+				sc.MustGetToken('{');
+				TextMapParser::ParseTile(sc, tile);
+			}
 		}
 	}
 
@@ -288,6 +332,7 @@ private:
 	WORD pushwall;
 	WORD patrolpoint;
 	TArray<ThingXlat> thingTable;
+	TMap<WORD, MapTile> tilePalette;
 	TMap<WORD, MapTrigger> tileTriggers;
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 };
@@ -359,43 +404,17 @@ void GameMap::ReadPlanesData()
 					ZONE_START = 108,
 					ZONE_END = ZONE_START + 36;
 
-				tilePalette.Resize(NUM_WALLS+(DOOR_END-DOOR_START));
+				WORD tileStart = xlat.GetTilePalette(tilePalette);
 				zonePalette.Resize(ZONE_END-ZONE_START);
 				for(unsigned int i = 0;i < zonePalette.Size();++i)
 					zonePalette[i].index = i;
 				TArray<WORD> altExitSpots;
-
-				// Import tiles
-				for(unsigned int i = 0;i < NUM_WALLS;++i)
-				{
-					Tile &tile = tilePalette[i];
-					tile.texture[Tile::North] = tile.texture[Tile::South] = TexMan.GetTile(i, false);
-					tile.texture[Tile::East] = tile.texture[Tile::West] = TexMan.GetTile(i, true);
-				}
-				for(unsigned int i = 0;i < DOOR_END-DOOR_START;i++)
-				{
-					Tile &tile = tilePalette[i+NUM_WALLS];
-					tile.offsetVertical = i%2 == 0;
-					tile.offsetHorizontal = i%2 == 1;
-					if(i%2 == 0)
-					{
-						tile.texture[Tile::North] = tile.texture[Tile::South] = TexMan.GetDoor(i/2, true, true);
-						tile.texture[Tile::East] = tile.texture[Tile::West] = TexMan.GetDoor(i/2, true, false);
-					}
-					else
-					{
-						tile.texture[Tile::North] = tile.texture[Tile::South] = TexMan.GetDoor(i/2, false, false);
-						tile.texture[Tile::East] = tile.texture[Tile::West] = TexMan.GetDoor(i/2, false, true);
-					}
-				}
 				
 
 				for(unsigned int i = 0;i < size;++i)
 				{
-					if(oldplane[i] < NUM_WALLS)
-						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]]);
-					else if(oldplane[i] >= DOOR_START && oldplane[i] < DOOR_END)
-						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]-DOOR_START+NUM_WALLS]);
+					if(xlat.IsValidTile(oldplane[i]))
+						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]-tileStart]);
 					else
 						mapPlane.map[i].SetTile(NULL);
 
