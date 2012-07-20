@@ -88,7 +88,9 @@ public:
 		{
 			sc.MustGetToken(TK_Identifier);
 
-			if(sc->str.CompareNoCase("things") == 0)
+			if(sc->str.CompareNoCase("tiles") == 0)
+				LoadTilesTable(sc);
+			else if(sc->str.CompareNoCase("things") == 0)
 				LoadThingTable(sc);
 			else if(sc->str.CompareNoCase("flats") == 0)
 				LoadFlatsTable(sc);
@@ -102,6 +104,17 @@ public:
 		if(flatTable[index][ceiling].isValid())
 			return flatTable[index][ceiling];
 		return levelInfo->DefaultTexture[ceiling];
+	}
+
+	bool TranslateTileTrigger(unsigned short tile, MapTrigger &trigger)
+	{
+		MapTrigger *item = tileTriggers.CheckKey(tile);
+		if(item)
+		{
+			trigger = *item;
+			return true;
+		}
+		return false;
 	}
 
 	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, unsigned short oldnum) const
@@ -195,6 +208,27 @@ protected:
 		}
 	}
 
+	void LoadTilesTable(Scanner &sc)
+	{
+		tileTriggers.Clear();
+
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			if(sc->str.CompareNoCase("trigger") == 0)
+			{
+				sc.MustGetToken(TK_IntConst);
+				if(sc->number > 0xFFFF)
+					sc.ScriptMessage(Scanner::ERROR, "Trigger number out of range.");
+
+				MapTrigger &trigger = tileTriggers[sc->number];
+				sc.MustGetToken('{');
+				TextMapParser::ParseTrigger(sc, trigger);
+			}
+		}
+	}
+
 	void LoadThingTable(Scanner &sc)
 	{
 		// Always start with an empty table
@@ -254,6 +288,7 @@ private:
 	WORD pushwall;
 	WORD patrolpoint;
 	TArray<ThingXlat> thingTable;
+	TMap<WORD, MapTrigger> tileTriggers;
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 };
 
@@ -360,25 +395,20 @@ void GameMap::ReadPlanesData()
 					if(oldplane[i] < NUM_WALLS)
 						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]]);
 					else if(oldplane[i] >= DOOR_START && oldplane[i] < DOOR_END)
-					{
-						const bool vertical = oldplane[i]%2 == 0;
-						const unsigned int doorType = (oldplane[i]-DOOR_START)/2;
-						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
-						trig.action = Specials::Door_Open;
-						trig.arg[0] = 4;
-						trig.arg[1] = doorType >= 1 && doorType <= 4 ? doorType : 0;
-						trig.playerUse = true;
-						trig.monsterUse = true;
-						trig.repeatable = true;
-						if(vertical)
-							trig.activate[Trigger::North] = trig.activate[Trigger::South] = false;
-						else
-							trig.activate[Trigger::East] = trig.activate[Trigger::West] = false;
-
 						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]-DOOR_START+NUM_WALLS]);
-					}
 					else
 						mapPlane.map[i].SetTile(NULL);
+
+					MapTrigger templateTrigger;
+					if(xlat.TranslateTileTrigger(oldplane[i], templateTrigger))
+					{
+						templateTrigger.x = i%header.width;
+						templateTrigger.y = i/header.width;
+						templateTrigger.z = 0;
+
+						Trigger &trig = NewTrigger(templateTrigger.x, templateTrigger.y, templateTrigger.z);
+						trig = templateTrigger;
+					}
 
 					// We'll be moving the ambush flag to the actor itself.
 					if(oldplane[i] == AMBUSH_TILE)
@@ -387,14 +417,6 @@ void GameMap::ReadPlanesData()
 					// are done with this pass.
 					else if(oldplane[i] == ALT_EXIT)
 						altExitSpots.Push(i);
-					else if(oldplane[i] == EXIT_TILE)
-					{
-						// Add exit trigger
-						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
-						trig.action = Specials::Exit_Normal;
-						trig.activate[Trigger::North] = trig.activate[Trigger::South] = false;
-						trig.playerUse = true;
-					}
 
 					if(oldplane[i] >= ZONE_START && oldplane[i] < ZONE_END)
 						mapPlane.map[i].zone = &zonePalette[oldplane[i]-ZONE_START];

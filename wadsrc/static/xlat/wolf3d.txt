@@ -1,3 +1,142 @@
+tiles
+{
+	trigger 21
+	{
+		action = 3;
+		playeruse = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 90
+	{
+		action = 1;
+		arg0 = 4;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 91
+	{
+		action = 1;
+		arg0 = 4;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 92
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 93
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 94
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 95
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 96
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 97
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 98
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 4;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 99
+	{
+		action = 1;
+		arg0 = 4;
+		arg1 = 4;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 100
+	{
+		action = 1;
+		arg0 = 4;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 101
+	{
+		action = 1;
+		arg0 = 4;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+}
+
 things
 {
 	trigger 98

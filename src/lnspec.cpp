@@ -110,11 +110,12 @@ class EVDoor : public Thinker
 	DECLARE_CLASS(EVDoor, Thinker)
 
 	public:
-		EVDoor(MapSpot spot, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
+		EVDoor(MapSpot spot, unsigned int speed, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
 			state(Closed), spot(spot), amount(0), direction(direction)
 		{
 			ChangeState(Opening);
 			spot->thinker = this;
+			this->speed = 256*speed;
 			if(direction > 1)
 				this->direction = direction%2;
 		}
@@ -128,7 +129,6 @@ class EVDoor : public Thinker
 
 		void Tick()
 		{
-			static const unsigned int MOVE_AMOUNT = 1<<10;
 			switch(state)
 			{
 				default:
@@ -146,7 +146,7 @@ class EVDoor : public Thinker
 					}
 
 					if(amount < 0xffff)
-						amount += MOVE_AMOUNT;
+						amount += speed;
 					if(amount >= 0xffff)
 					{
 						amount = 0xffff;
@@ -175,7 +175,7 @@ class EVDoor : public Thinker
 					break;
 				case Closing:
 					if(amount > 0)
-						amount -= MOVE_AMOUNT;
+						amount -= speed;
 					if(amount <= 0)
 					{
 						amount = 0;
@@ -218,6 +218,7 @@ class EVDoor : public Thinker
 			this->state = static_cast<State>(state);
 
 			arc << spot
+				<< speed
 				<< amount
 				<< wait
 				<< direction;
@@ -274,6 +275,7 @@ class EVDoor : public Thinker
 
 		State state;
 		MapSpot spot;
+		unsigned int speed;
 		int amount;
 		unsigned int wait;
 		unsigned short direction;
@@ -304,7 +306,7 @@ FUNC(Door_Open)
 		return 0;
 	}
 
-	new EVDoor(spot, direction);
+	new EVDoor(spot, args[0], direction);
 	return 1;
 }
 
