@@ -89,12 +89,19 @@ public:
 			sc.MustGetToken(TK_Identifier);
 
 			if(sc->str.CompareNoCase("things") == 0)
-			{
 				LoadThingTable(sc);
-			}
+			else if(sc->str.CompareNoCase("flats") == 0)
+				LoadFlatsTable(sc);
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown xlat property '%s'.", sc->str.GetChars());
 		}
+	}
+
+	FTextureID TranslateFlat(unsigned int index, bool ceiling)
+	{
+		if(flatTable[index][ceiling].isValid())
+			return flatTable[index][ceiling];
+		return levelInfo->DefaultTexture[ceiling];
 	}
 
 	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, unsigned short oldnum) const
@@ -148,6 +155,46 @@ public:
 	}
 
 protected:
+	void LoadFlatsTable(Scanner &sc)
+	{
+		// Clear out old data
+		for(unsigned int i = 0;i < 256;++i)
+		{
+			flatTable[i][0].SetInvalid();
+			flatTable[i][1].SetInvalid();
+		}
+
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			bool ceiling = sc->str.CompareNoCase("ceiling") == 0;
+			if(!ceiling && sc->str.CompareNoCase("floor") != 0)
+				sc.ScriptMessage(Scanner::ERROR, "Unknown flat section '%s'.", sc->str.GetChars());
+
+			sc.MustGetToken('{');
+			unsigned int index = 0;
+			do
+			{
+				sc.MustGetToken(TK_StringConst);
+				FTextureID texID = TexMan.GetTexture(sc->str, FTexture::TEX_Flat);
+				if(sc.CheckToken('='))
+				{
+					sc.MustGetToken(TK_IntConst);
+					index = sc->number;
+					if(index > 255)
+						index = 255;
+				}
+				flatTable[index++][ceiling] = texID;
+
+				if(index == 256)
+					break;
+			}
+			while(sc.CheckToken(','));
+			sc.MustGetToken('}');
+		}
+	}
+
 	void LoadThingTable(Scanner &sc)
 	{
 		// Always start with an empty table
@@ -207,6 +254,7 @@ private:
 	WORD pushwall;
 	WORD patrolpoint;
 	TArray<ThingXlat> thingTable;
+	FTextureID flatTable[256][2]; // Floor/ceiling textures
 };
 
 // Reads old format maps
@@ -482,8 +530,8 @@ void GameMap::ReadPlanesData()
 				while(iter.NextPair(pair))
 				{
 					Sector &sect = sectorPalette[pair->Value];
-					sect.texture[Sector::Floor] = TexMan.GetFlat(pair->Key&0xFF, Sector::Floor);
-					sect.texture[Sector::Ceiling] = TexMan.GetFlat(pair->Key>>8, Sector::Ceiling);
+					sect.texture[Sector::Floor] = xlat.TranslateFlat(pair->Key&0xFF, Sector::Floor);
+					sect.texture[Sector::Ceiling] = xlat.TranslateFlat(pair->Key>>8, Sector::Ceiling);
 				}
 
 				// Now link the sector data to map points!

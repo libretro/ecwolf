@@ -736,11 +736,9 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 				{
 					ParseXTexture(sc, FTexture::TEX_MiscPatch);
 				}
-				else if(sc->str.Compare("maptile") == 0 || sc->str.Compare("floortile") == 0 || sc->str.Compare("ceilingtile") == 0 || sc->str.Compare("artindex") == 0)
+				else if(sc->str.Compare("maptile") == 0 || sc->str.Compare("artindex") == 0)
 				{
-					const int type = sc->str.Compare("maptile") == 0 ? 0 :
-						(sc->str.Compare("floortile") == 0  ? 1 :
-						(sc->str.Compare("ceilingtile") == 0 ? 2 : 3));
+					const int type = sc->str.Compare("maptile") == 0 ? 0 : 3;
 
 					sc.MustGetToken(TK_IntConst);
 					int index = sc->number;
@@ -756,12 +754,6 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 							sc.MustGetToken(',');
 							sc.MustGetToken(TK_StringConst);
 							mapTiles[index][1].textureName = sc->str;
-							break;
-						case 1:
-						case 2:
-							if(index > 255)
-								sc.ScriptMessage(Scanner::ERROR, "Can't assign floor or ceiling tile over 255.\n");
-							flatTiles[index][type-1].textureName = sc->str;
 							break;
 						case 3:
 							if(index > 255)
@@ -1290,20 +1282,6 @@ FTextureID FTextureManager::GetDoor(unsigned int tile, bool vertical, bool track
 	TileMap &tm = doorTiles[tile*2+vertical][track];
 	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
 		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Wall);
-	return tm.texture;
-}
-FTextureID FTextureManager::GetFlat(unsigned int tile, bool ceiling)
-{
-	if(tile > 255)
-		tile = 255;
-	TileMap &tm = flatTiles[tile][ceiling];
-	if(!tm.texture.isValid())
-	{
-		if(tm.textureName.GetIndex() != 0)
-			tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Flat);
-		else
-			tm.texture = levelInfo->DefaultTexture[ceiling];
-	}
 	return tm.texture;
 }
 FTextureID FTextureManager::GetTile(unsigned int tile, bool vertical)
