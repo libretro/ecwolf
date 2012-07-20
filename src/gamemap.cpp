@@ -659,7 +659,7 @@ FArchive &operator<< (FArchive &arc, MapTrigger &trigger)
 		<< trigger.activate[0] << trigger.activate[1] << trigger.activate[2] << trigger.activate[3]
 		<< trigger.arg[0] << trigger.arg[1] << trigger.arg[2] << trigger.arg[3] << trigger.arg[4]
 		<< trigger.playerUse
-		<< trigger.walkUse
+		<< trigger.playerCross
 		<< trigger.monsterUse
 		<< trigger.isSecret
 		<< trigger.repeatable;

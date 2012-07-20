@@ -33,6 +33,7 @@
 */
 
 #include "gamemap.h"
+#include "gamemap_common.h"
 #include "lnspec.h"
 #include "scanner.h"
 #include "w_wad.h"
@@ -53,7 +54,106 @@
 			sc.ScriptMessage(Scanner::ERROR, "Invalid syntax.\n"); \
 	}
 
-class UWMFParser
+void TextMapParser::ParseTrigger(Scanner &sc, MapTrigger &trigger)
+{
+	StartParseBlock
+
+	CheckKey("x")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.x = sc->number;
+	}
+	else CheckKey("y")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.y = sc->number;
+	}
+	else CheckKey("z")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.z = sc->number;
+	}
+	else CheckKey("activatenorth")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.activate[MapTrigger::North] = sc->boolean;
+	}
+	else CheckKey("activatesouth")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.activate[MapTrigger::South] = sc->boolean;
+	}
+	else CheckKey("activateeast")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.activate[MapTrigger::East] = sc->boolean;
+	}
+	else CheckKey("activatewest")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.activate[MapTrigger::West] = sc->boolean;
+	}
+	else CheckKey("action")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.action = sc->number;
+	}
+	else CheckKey("arg0")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.arg[0] = sc->number;
+	}
+	else CheckKey("arg1")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.arg[1] = sc->number;
+	}
+	else CheckKey("arg2")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.arg[2] = sc->number;
+	}
+	else CheckKey("arg3")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.arg[3] = sc->number;
+	}
+	else CheckKey("arg4")
+	{
+		sc.MustGetToken(TK_IntConst);
+		trigger.arg[4] = sc->number;
+	}
+	else CheckKey("playeruse")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.playerUse = sc->boolean;
+	}
+	else CheckKey("playercross")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.playerCross = sc->boolean;
+	}
+	else CheckKey("monsteruse")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.monsterUse = sc->boolean;
+	}
+	else CheckKey("repeatable")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.repeatable = sc->boolean;
+	}
+	else CheckKey("secret")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		trigger.isSecret = sc->boolean;
+		++gamestate.secrettotal;
+	}
+
+	EndParseBlock
+}
+
+class UWMFParser : public TextMapParser
 {
 	public:
 		UWMFParser(GameMap *gm, Scanner &sc) : gm(gm), sc(sc)
@@ -344,96 +444,7 @@ class UWMFParser
 			// Since we can't know the x,y,z yet we need to create a temp and
 			// copy it later.
 			MapTrigger trigger;
-			StartParseBlock
-
-			CheckKey("x")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.x = sc->number;
-			}
-			else CheckKey("y")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.y = sc->number;
-			}
-			else CheckKey("z")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.z = sc->number;
-			}
-			else CheckKey("activatenorth")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.activate[MapTrigger::North] = sc->boolean;
-			}
-			else CheckKey("activatesouth")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.activate[MapTrigger::South] = sc->boolean;
-			}
-			else CheckKey("activateeast")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.activate[MapTrigger::East] = sc->boolean;
-			}
-			else CheckKey("activatewest")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.activate[MapTrigger::West] = sc->boolean;
-			}
-			else CheckKey("action")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.action = sc->number;
-			}
-			else CheckKey("arg0")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.arg[0] = sc->number;
-			}
-			else CheckKey("arg1")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.arg[1] = sc->number;
-			}
-			else CheckKey("arg2")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.arg[2] = sc->number;
-			}
-			else CheckKey("arg3")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.arg[3] = sc->number;
-			}
-			else CheckKey("arg4")
-			{
-				sc.MustGetToken(TK_IntConst);
-				trigger.arg[4] = sc->number;
-			}
-			else CheckKey("playeruse")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.playerUse = sc->boolean;
-			}
-			else CheckKey("monsteruse")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.monsterUse = sc->boolean;
-			}
-			else CheckKey("repeatable")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.repeatable = sc->boolean;
-			}
-			else CheckKey("secret")
-			{
-				sc.MustGetToken(TK_BoolConst);
-				trigger.isSecret = sc->boolean;
-				++gamestate.secrettotal;
-			}
-
-			EndParseBlock
+			TextMapParser::ParseTrigger(sc, trigger);
 
 			MapTrigger &trig = gm->NewTrigger(trigger.x, trigger.y, trigger.z);
 			trig = trigger;

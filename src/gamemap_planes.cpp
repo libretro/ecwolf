@@ -35,12 +35,13 @@
 #include "id_ca.h"
 #include "g_mapinfo.h"
 #include "gamemap.h"
+#include "gamemap_common.h"
 #include "lnspec.h"
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_game.h"
 
-class Xlat
+class Xlat : public TextMapParser
 {
 public:
 	struct ThingXlat
@@ -58,17 +59,20 @@ public:
 		}
 
 		unsigned short	oldnum;
+		bool			isTrigger;
+
+
 		unsigned short	newnum;
 		unsigned char	angles;
 		bool			patrol;
 		unsigned char	minskill;
+
+		MapTrigger		templateTrigger;
 	};
 
 	Xlat() : lump(0)
 	{
 	}
-
-	WORD GetPushwallTile() const { return pushwall; }
 
 	void LoadXlat(int lump)
 	{
@@ -93,7 +97,7 @@ public:
 		}
 	}
 
-	bool TranslateThing(MapThing &thing, unsigned short oldnum) const
+	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, unsigned short oldnum) const
 	{
 		bool valid = false;
 		unsigned int type = thingTable.Size()/2;
@@ -119,17 +123,25 @@ public:
 
 		if(valid)
 		{
-			thing.type = thingTable[type].newnum;
-
-			if(thingTable[type].angles)
-				thing.angle = (oldnum - thingTable[type].oldnum)*(360/thingTable[type].angles);
+			isTrigger = thingTable[type].isTrigger;
+			if(isTrigger)
+			{
+				trigger = thingTable[type].templateTrigger;
+			}
 			else
-				thing.angle = 0;
+			{
+				thing.type = thingTable[type].newnum;
 
-			thing.patrol = thingTable[type].patrol;
-			thing.skill[0] = thing.skill[1] = thingTable[type].minskill <= 1;
-			thing.skill[2] = thingTable[type].minskill <= 2;
-			thing.skill[3] = thingTable[type].minskill <= 3;
+				if(thingTable[type].angles)
+					thing.angle = (oldnum - thingTable[type].oldnum)*(360/thingTable[type].angles);
+				else
+					thing.angle = 0;
+
+				thing.patrol = thingTable[type].patrol;
+				thing.skill[0] = thing.skill[1] = thingTable[type].minskill <= 1;
+				thing.skill[2] = thingTable[type].minskill <= 2;
+				thing.skill[3] = thingTable[type].minskill <= 3;
+			}
 		}
 
 		return valid;
@@ -138,46 +150,51 @@ public:
 protected:
 	void LoadThingTable(Scanner &sc)
 	{
-		ThingXlat thing;
-
 		// Always start with an empty table
 		thingTable.Clear();
 
 		sc.MustGetToken('{');
 		while(!sc.CheckToken('}'))
 		{
+			ThingXlat thing;
+
 			// Property
 			if(sc.CheckToken(TK_Identifier))
 			{
-				if(sc->str.CompareNoCase("pushwall") == 0)
+				if(sc->str.CompareNoCase("trigger") == 0)
 				{
-					sc.MustGetToken('=');
 					sc.MustGetToken(TK_IntConst);
-					pushwall = sc->number;
+					thing.isTrigger = true;
+					thing.oldnum = sc->number;
+
+					sc.MustGetToken('{');
+					TextMapParser::ParseTrigger(sc, thing.templateTrigger);
 				}
 				else
-					sc.ScriptMessage(Scanner::ERROR, "Unknown thing table property '%s'.", sc->str.GetChars());
-				sc.MustGetToken(';');
-				continue;
+					sc.ScriptMessage(Scanner::ERROR, "Unknown thing table block '%s'.", sc->str.GetChars());
+			}
+			else
+			{
+				// Handle thing translation
+				thing.isTrigger = false;
+				sc.MustGetToken('{');
+				sc.MustGetToken(TK_IntConst);
+				thing.oldnum = sc->number;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_IntConst);
+				thing.newnum = sc->number;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_IntConst);
+				thing.angles = sc->number;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_BoolConst);
+				thing.patrol = sc->boolean;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_IntConst);
+				thing.minskill = sc->number;
+				sc.MustGetToken('}');
 			}
 
-			// Handle thing translation
-			sc.MustGetToken('{');
-			sc.MustGetToken(TK_IntConst);
-			thing.oldnum = sc->number;
-			sc.MustGetToken(',');
-			sc.MustGetToken(TK_IntConst);
-			thing.newnum = sc->number;
-			sc.MustGetToken(',');
-			sc.MustGetToken(TK_IntConst);
-			thing.angles = sc->number;
-			sc.MustGetToken(',');
-			sc.MustGetToken(TK_BoolConst);
-			thing.patrol = sc->boolean;
-			sc.MustGetToken(',');
-			sc.MustGetToken(TK_IntConst);
-			thing.minskill = sc->number;
-			sc.MustGetToken('}');
 			thingTable.Push(thing);
 		}
 
@@ -414,44 +431,35 @@ void GameMap::ReadPlanesData()
 						continue;
 					}
 
-					if(oldplane[i] == xlat.GetPushwallTile())
-					{
-						if(ambushSpots[ambushSpot] == i)
-							++ambushSpot;
+					Thing thing;
+					Trigger trigger;
+					bool isTrigger;
 
-						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
-						trig.action = Specials::Pushwall_Move;
-						trig.arg[0] = 2;
-						trig.arg[1] = 1;
-						trig.arg[2] = 2;
-						trig.playerUse = true;
-						trig.isSecret = true;
-						++gamestate.secrettotal;
-					}
-					else if(oldplane[i] == 99)
-					{
-						if(ambushSpots[ambushSpot] == i)
-							++ambushSpot;
-
-						Trigger &trig = NewTrigger(i%header.width, i/header.width, 0);
-						trig.action = Specials::Exit_VictorySpin;
-						trig.walkUse = true;
-					}
+					if(!xlat.TranslateThing(thing, trigger, isTrigger, oldplane[i]))
+						printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 					else
 					{
-						Thing thing;
-						thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
-						thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
-						thing.z = 0;
-						thing.ambush = ambushSpots[ambushSpot] == i;
-						if(thing.ambush)
-							++ambushSpot;
+						if(isTrigger)
+						{
+							trigger.x = i%header.width;
+							trigger.y = i/header.width;
+							trigger.z = 0;
 
-						if(!xlat.TranslateThing(thing, oldplane[i]))
-							printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
+							Trigger &mapTrigger = NewTrigger(trigger.x, trigger.y, trigger.z);
+							mapTrigger = trigger;
+						}
 						else
+						{
+							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
+							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
+							thing.z = 0;
+							thing.ambush = ambushSpots[ambushSpot] == i;
 							things.Push(thing);
+						}
 					}
+
+					if(ambushSpots[ambushSpot] == i)
+						++ambushSpot;
 				}
 				break;
 			}

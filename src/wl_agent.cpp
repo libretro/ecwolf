@@ -754,7 +754,7 @@ static void ExecuteWalkTriggers(MapSpot spot, MapTrigger::Side dir)
 	for(unsigned int i = spot->triggers.Size();i-- > 0;)
 	{
 		MapTrigger &trigger = spot->triggers[i];
-		if(trigger.walkUse && trigger.activate[dir])
+		if(trigger.playerCross && trigger.activate[dir])
 			map->ActivateTrigger(trigger, dir, players[0].mo);
 	}
 }

@@ -1,6 +1,20 @@
 things
 {
-	pushwall = 98;
+	trigger 98
+	{
+		action = 2;
+		arg0 = 2;
+		arg1 = 1;
+		arg2 = 2;
+		playeruse = true;
+		secret = true;
+	}
+
+	trigger 99
+	{
+		action = 6;
+		playercross = true;
+	}
 
 	// oldnum, newnum, angles, patrol, minskill
 	{19,	1,	4,	false,	0}
