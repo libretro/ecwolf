@@ -33,7 +33,7 @@ actor Guard 11
 			loop
 		Missile:
 			GARD FG 10 A_FaceTarget
-			GARD H 10 A_WolfAttack
+			GARD H 10 bright A_WolfAttack
 			goto See
 		Pain:
 			GARD I 5
@@ -137,7 +137,7 @@ actor Officer 12
 		Missile:
 			OFFI F 3 A_FaceTarget
 			OFFI G 10 A_FaceTarget
-			OFFI H 5 A_WolfAttack
+			OFFI H 5 bright A_WolfAttack
 			goto See
 		See:
 			OFFI B 5 NOP A_Chase
@@ -195,9 +195,9 @@ actor Mutant 15
 			loop
 		Missile:
 			MTNT F 3 A_FaceTarget
-			MTNT G 10 A_WolfAttack
+			MTNT G 10 bright A_WolfAttack
 			MTNT H 5 A_FaceTarget
-			MTNT I 10 A_WolfAttack
+			MTNT I 10 bright A_WolfAttack
 			goto See
 		Death:
 			MTNT L 3.5 A_Fall
@@ -251,13 +251,13 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			goto See
 		Missile:
 			SSWV EF 10 A_FaceTarget
-			SSWV G 5 A_WolfAttack(0, "*", 0.667)
+			SSWV G 5 bright A_WolfAttack(0, "*", 0.667)
 			SSWV F 5 A_FaceTarget
-			SSWV G 5 A_WolfAttack(0, "*", 0.667)
+			SSWV G 5 bright A_WolfAttack(0, "*", 0.667)
 			SSWV F 5 A_FaceTarget
-			SSWV G 5 A_WolfAttack(0, "*", 0.667)
+			SSWV G 5 bright A_WolfAttack(0, "*", 0.667)
 			SSWV F 5 A_FaceTarget
-			SSWV G 5 A_WolfAttack(0, "*", 0.667)
+			SSWV G 5 bright A_WolfAttack(0, "*", 0.667)
 			goto See
 		Death:
 			SSWV J 7.5 A_Fall

@@ -26,7 +26,7 @@ actor Hans 16
 		Missile:
 			HANS E 15 A_FaceTarget
 			HANS F 5 A_FaceTarget
-			HANS GFGFGE 5 A_WolfAttack(0, "*", 0.667)
+			HANS GFGFGE 5 bright A_WolfAttack(0, "*", 0.667)
 			goto See
 		Death:
 			HANS H 7.5 A_Fall
@@ -64,8 +64,8 @@ actor Gretel 20
 			loop
 		Missile:
 			GRET E 15 A_FaceTarget
-			GRET F 5 A_FaceTarget
-			GRET GFGFGE 5 A_WolfAttack
+			GRET F 5 bright A_FaceTarget
+			GRET GFGFGE 5 bright A_WolfAttack
 			goto See
 		Death:
 			GRET H 7.5 A_Fall
@@ -157,9 +157,9 @@ actor Gift 21
 			loop
 		Missile:
 			GIFT E 15 A_FaceTarget
-			GIFT F 5 A_FaceTarget
-			GIFT F 0 A_FaceTarget
-			GIFT F 0 A_CustomMissile("Rocket")
+			GIFT F 5 bright A_FaceTarget
+			GIFT F 0 bright A_FaceTarget
+			GIFT F 0 bright A_CustomMissile("Rocket")
 			goto See
 		Death:
 			GIFT A .5 A_Fall
@@ -197,11 +197,11 @@ actor FatFace 22
 			loop
 		Missile:
 			FATF E 15 A_FaceTarget
-			FATF F 5 A_FaceTarget
-			FATF G 0 A_FaceTarget
-			FATF G 5 A_CustomMissile("Rocket")
-			FATF HGH 5 A_WolfAttack
-			FATF H 0 A_WolfAttack
+			FATF F 5 bright A_FaceTarget
+			FATF G 0 bright A_FaceTarget
+			FATF G 5 bright A_CustomMissile("Rocket")
+			FATF HGH 5 bright A_WolfAttack
+			FATF H 0 bright A_WolfAttack
 			goto See
 		Death:
 			FATF A .5 A_Fall

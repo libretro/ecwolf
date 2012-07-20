@@ -47,7 +47,7 @@ actor Pistol : WolfWeapon
 			loop
 		Fire:
 			PISG B 3
-			PISG C 3 A_GunAttack
+			PISG C 3 bright A_GunAttack
 			PISG DE 3
 			goto Ready
 	}
@@ -70,7 +70,7 @@ actor MachineGun : WolfWeapon 60
 		Fire:
 			MCHG B 3
 		Hold:
-			MCHG C 3 A_GunAttack
+			MCHG C 3 bright A_GunAttack
 			MCHG D 3
 			MCHG E 3 A_ReFire
 			goto Ready
@@ -95,7 +95,7 @@ actor GatlingGun : WolfWeapon 61
 		Fire:
 			CHGG B 3
 		Hold:
-			CHGG CD 3 A_GunAttack
+			CHGG CD 3 bright A_GunAttack
 			CHGG E 3 A_ReFire
 			goto Ready
 	}

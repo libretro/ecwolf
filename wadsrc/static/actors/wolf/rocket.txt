@@ -13,10 +13,10 @@ actor Rocket
 	states
 	{
 		Spawn:
-			ROCK A 1.5 A_SpawnItem("Smoke")
+			ROCK A 1.5 bright A_SpawnItem("Smoke")
 			loop
 		Death:
-			BOOM ABC 3
+			BOOM ABC 3 bright
 			stop
 	}
 }
@@ -42,10 +42,10 @@ actor HighRocket
 	states
 	{
 		Spawn:
-			HRCK A 1.5 A_SpawnItem("HighSmoke")
+			HRCK A 1.5 bright A_SpawnItem("HighSmoke")
 			loop
 		Death:
-			HBOM ABC 3
+			HBOM ABC 3 bright
 			stop
 	}
 }

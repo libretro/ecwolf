@@ -60,7 +60,7 @@ actor Spark
 	states
 	{
 		Spawn:
-			SPRK ABCD 3
+			SPRK ABCD 3 bright
 			loop
 	}
 }
