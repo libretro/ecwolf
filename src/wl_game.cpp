@@ -251,7 +251,7 @@ void SetupGameLevel (void)
 			= gamestate.treasuretotal
 			= gamestate.secretcount
 			= gamestate.killcount
-			= gamestate.treasurecount;
+			= gamestate.treasurecount = 0;
 		gamestate.faceframe.SetInvalid();
 		LastAttacker = NULL;
 		players[0].killerobj = NULL;
