@@ -202,7 +202,7 @@ map "MAP16"
 	next = "MAP17"
 	secretnext = "MAP17"
 	defaultceiling = "#382C14"
-	music = "XPUTIT"
+	music = "ULTIMATE"
 	floornumber = 16
 	cluster = 2
 }
@@ -213,7 +213,7 @@ map "MAP17"
 	secretnext = "MAP18"
 	defaultceiling = "#600064"
 	par = 360
-	music = "ULTIMATE"
+	music = "XPUTIT"
 	floornumber = 17
 	cluster = 2
 }
@@ -223,7 +223,7 @@ map "MAP18"
 	next = "MAP21"
 	secretnext = "MAP21"
 	defaultceiling = "#483818"
-	music = "XEVIL"
+	music = "ULTIMATE"
 	floornumber = 18
 	cluster = 2
 }

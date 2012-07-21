@@ -44,13 +44,19 @@ void    ShowActStatus();
 void    PlayDemo (int demonumber);
 void    RecordDemo (void);
 
-
-#ifdef SPEAR
-extern  int32_t            spearx,speary;
-extern  unsigned        spearangle;
-extern  bool            spearflag;
-#endif
-
+enum
+{
+	NEWMAP_KEEPFACING = 1,
+	NEWMAP_KEEPPOSITION = 2
+};
+extern struct NewMap_t
+{
+	fixed x;
+	fixed y;
+	angle_t angle;
+	int newmap;
+	int flags;
+} NewMap;
 
 #define ClearMemory SD_StopDigitized
 

@@ -326,7 +326,8 @@ typedef enum
 	ex_loadedgame,
 	ex_abort,
 	ex_demodone,
-	ex_secretlevel
+	ex_secretlevel,
+	ex_newmap
 } exit_t;
 
 /*

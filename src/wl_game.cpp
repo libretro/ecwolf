@@ -54,11 +54,7 @@ bool			ingame,fizzlein;
 gametype        gamestate;
 byte            bordercol=VIEWCOLOR;        // color of the Change View/Ingame border
 
-#ifdef SPEAR
-int32_t         spearx,speary;
-unsigned        spearangle;
-bool            spearflag;
-#endif
+NewMap_t NewMap;
 
 #ifdef USE_FEATUREFLAGS
 int ffDataTopLeft, ffDataTopRight, ffDataBottomLeft, ffDataBottomRight;
@@ -682,6 +678,27 @@ void Died (void)
 
 //==========================================================================
 
+static void StripInventory(AActor *actor)
+{
+	// Remove inventory items that don't transfer (keys for example)
+	for(AInventory *inv = actor->inventory;inv;)
+	{
+		if(inv->interhubamount < 1)
+		{
+			// Remove the inventory item and clean it up
+			AInventory *removeMe = inv;
+			inv = inv->inventory;
+			players[0].mo->RemoveInventory(removeMe);
+			removeMe->Destroy();
+			continue;
+		}
+		else if((inv->itemFlags & IF_INVBAR) && inv->amount > inv->interhubamount)
+			inv->amount = inv->interhubamount;
+
+		inv = inv->inventory;
+	}
+}
+
 /*
 ===================
 =
@@ -735,36 +752,34 @@ restartgame:
 
 		DrawStatusBar();
 
-#ifdef SPEAR
 startplayloop:
-#endif
 		PlayLoop ();
 
-#ifdef SPEAR
-		if (spearflag)
+		if (playstate == ex_newmap)
 		{
-			SD_StopSound();
-			SD_PlaySound("misc/spear_pickup");
-			if (DigiMode != sds_Off)
+			LevelInfo &newLevel = LevelInfo::FindByNumber(NewMap.newmap);
+			if(newLevel.MapName[0] != 0)
 			{
-				Delay(150);
-			}
-			else
-				SD_WaitSoundDone();
+				NewMap.x = players[0].mo->x;
+				NewMap.y = players[0].mo->y;
+				NewMap.angle = players[0].mo->angle;
 
-			ClearMemory ();
-			players[0].oldscore = players[0].score;
-			gamestate.mapon = 20;
-			SetupGameLevel ();
-			StartMusic ();
-			players[0].mo->x = spearx;
-			players[0].mo->y = speary;
-			players[0].mo->angle = (short)spearangle;
-			spearflag = false;
-			Thrust (0,0);
+				strcpy(gamestate.mapname, newLevel.MapName);
+				StartTravel();
+				StripInventory(players[0].mo);
+				SetupGameLevel();
+				StartMusic();
+				FinishTravel();
+				if(NewMap.flags & NEWMAP_KEEPPOSITION)
+				{
+					players[0].mo->x = NewMap.x;
+					players[0].mo->y = NewMap.y;
+				}
+				if(NewMap.flags & NEWMAP_KEEPFACING)
+					players[0].mo->angle = NewMap.angle;
+			}
 			goto startplayloop;
 		}
-#endif
 
 		StopMusic ();
 		ingame = false;
@@ -796,23 +811,7 @@ startplayloop:
 					return;
 				}
 
-				// Remove inventory items that don't transfer (keys for example)
-				for(AInventory *inv = players[0].mo->inventory;inv;)
-				{
-					if(inv->interhubamount < 1)
-					{
-						// Remove the inventory item and clean it up
-						AInventory *removeMe = inv;
-						inv = inv->inventory;
-						players[0].mo->RemoveInventory(removeMe);
-						removeMe->Destroy();
-						continue;
-					}
-					else if((inv->itemFlags & IF_INVBAR) && inv->amount > inv->interhubamount)
-						inv->amount = inv->interhubamount;
-
-					inv = inv->inventory;
-				}
+				StripInventory(players[0].mo);
 
 				DrawStatusBar();
 				VW_FadeOut ();

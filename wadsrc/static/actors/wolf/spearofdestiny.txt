@@ -1,9 +1,13 @@
-actor SpearOfDestiny : Inventory 92
+actor SpearOfDestiny : CustomInventory 92
 {
+	inventory.pickupsound "misc/spear_pickup"
 	states
 	{
 		Spawn:
 			SPOD A -1
+			stop
+		Pickup:
+			TNT1 A 0 Teleport_NewMap(21, 0, 3)
 			stop
 	}
 }

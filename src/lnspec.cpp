@@ -62,7 +62,7 @@ LineSpecialFunction lnspecFunctions[NUM_POSSIBLE_SPECIALS] =
 	LN_Pushwall_Move,
 	LN_Exit_Normal,
 	LN_Exit_Secret,
-	LN_NOP,
+	LN_Teleport_NewMap,
 	LN_Exit_VictorySpin
 };
 
@@ -446,6 +446,18 @@ FUNC(Exit_Secret)
 	playstate = ex_secretlevel;
 	SD_PlaySound ("switches/exitbutn");
 	SD_WaitSoundDone();
+	return 1;
+}
+
+FUNC(Teleport_NewMap)
+{
+	if(buttonheld[bt_use])
+		return 0;
+	buttonheld[bt_use] = true;
+
+	playstate = ex_newmap;
+	NewMap.newmap = args[0];
+	NewMap.flags = args[2];
 	return 1;
 }
 
