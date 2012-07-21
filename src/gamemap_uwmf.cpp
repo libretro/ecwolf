@@ -185,7 +185,6 @@ void TextMapParser::ParseTrigger(Scanner &sc, MapTrigger &trigger)
 	{
 		sc.MustGetToken(TK_BoolConst);
 		trigger.isSecret = sc->boolean;
-		++gamestate.secrettotal;
 	}
 
 	EndParseBlock
@@ -461,6 +460,9 @@ class UWMFParser : public TextMapParser
 
 			MapTrigger &trig = gm->NewTrigger(trigger.x, trigger.y, trigger.z);
 			trig = trigger;
+
+			if(trig.isSecret)
+				++gamestate.secrettotal;
 		}
 
 		void ParseZone()

@@ -525,6 +525,8 @@ void GameMap::ReadPlanesData()
 
 						Trigger &trig = NewTrigger(templateTrigger.x, templateTrigger.y, templateTrigger.z);
 						trig = templateTrigger;
+						if(trig.isSecret)
+							++gamestate.secrettotal;
 					}
 
 					int zoneIndex;
@@ -605,6 +607,8 @@ void GameMap::ReadPlanesData()
 								// Only enable the activation in the direction we're changing.
 								newTrigger.activate[0] = newTrigger.activate[1] = newTrigger.activate[2] = newTrigger.activate[3] = false;
 								newTrigger.activate[j] = true;
+								if(newTrigger.isSecret)
+									++gamestate.secrettotal;
 							}
 						}
 					}
@@ -643,6 +647,8 @@ void GameMap::ReadPlanesData()
 
 							Trigger &mapTrigger = NewTrigger(trigger.x, trigger.y, trigger.z);
 							mapTrigger = trigger;
+							if(mapTrigger.isSecret)
+								++gamestate.secrettotal;
 						}
 						else
 						{
