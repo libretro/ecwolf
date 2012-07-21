@@ -580,96 +580,96 @@ tiles
 	tile 90
 	{
 		texturenorth = "SLOT1_1";
-		texturesouth = "SLOT1_2";
-		textureeast = "DOOR1_1";
+		texturesouth = "SLOT1_1";
+		textureeast = "DOOR1_2";
 		texturewest = "DOOR1_2";
 		offsetvertical = true;
 	}
 	tile 91
 	{
 		texturenorth = "DOOR1_1";
-		texturesouth = "DOOR1_2";
-		textureeast = "SLOT1_1";
+		texturesouth = "DOOR1_1";
+		textureeast = "SLOT1_2";
 		texturewest = "SLOT1_2";
 		offsethorizontal = true;
 	}
 	tile 92
 	{
 		texturenorth = "SLOT1_1";
-		texturesouth = "SLOT1_2";
-		textureeast = "DOOR3_1";
+		texturesouth = "SLOT1_1";
+		textureeast = "DOOR3_2";
 		texturewest = "DOOR3_2";
 		offsetvertical = true;
 	}
 	tile 93
 	{
 		texturenorth = "DOOR3_1";
-		texturesouth = "DOOR3_2";
-		textureeast = "SLOT1_1";
+		texturesouth = "DOOR3_1";
+		textureeast = "SLOT1_2";
 		texturewest = "SLOT1_2";
 		offsethorizontal = true;
 	}
 	tile 94
 	{
 		texturenorth = "SLOT1_1";
-		texturesouth = "SLOT1_2";
-		textureeast = "DOOR3_1";
+		texturesouth = "SLOT1_1";
+		textureeast = "DOOR3_2";
 		texturewest = "DOOR3_2";
 		offsetvertical = true;
 	}
 	tile 95
 	{
 		texturenorth = "DOOR3_1";
-		texturesouth = "DOOR3_2";
-		textureeast = "SLOT1_1";
+		texturesouth = "DOOR3_1";
+		textureeast = "SLOT1_2";
 		texturewest = "SLOT1_2";
 		offsethorizontal = true;
 	}
 	tile 96
 	{
 		texturenorth = "SLOT1_1";
-		texturesouth = "SLOT1_2";
-		textureeast = "DOOR3_1";
+		texturesouth = "SLOT1_1";
+		textureeast = "DOOR3_2";
 		texturewest = "DOOR3_2";
 		offsetvertical = true;
 	}
 	tile 97
 	{
 		texturenorth = "DOOR3_1";
-		texturesouth = "DOOR3_2";
-		textureeast = "SLOT1_1";
+		texturesouth = "DOOR3_1";
+		textureeast = "SLOT1_2";
 		texturewest = "SLOT1_2";
 		offsethorizontal = true;
 	}
 	tile 98
 	{
 		texturenorth = "SLOT1_1";
-		texturesouth = "SLOT1_2";
-		textureeast = "DOOR3_1";
+		texturesouth = "SLOT1_1";
+		textureeast = "DOOR3_2";
 		texturewest = "DOOR3_2";
 		offsetvertical = true;
 	}
 	tile 99
 	{
 		texturenorth = "DOOR3_1";
-		texturesouth = "DOOR3_2";
-		textureeast = "SLOT1_1";
+		texturesouth = "DOOR3_1";
+		textureeast = "SLOT1_2";
 		texturewest = "SLOT1_2";
 		offsethorizontal = true;
 	}
 	tile 100
 	{
 		texturenorth = "SLOT1_1";
-		texturesouth = "SLOT1_2";
-		textureeast = "DOOR2_1";
+		texturesouth = "SLOT1_1";
+		textureeast = "DOOR2_2";
 		texturewest = "DOOR2_2";
 		offsetvertical = true;
 	}
 	tile 101
 	{
 		texturenorth = "DOOR2_1";
-		texturesouth = "DOOR2_2";
-		textureeast = "SLOT1_1";
+		texturesouth = "DOOR2_1";
+		textureeast = "SLOT1_2";
 		texturewest = "SLOT1_2";
 		offsethorizontal = true;
 	}
@@ -682,6 +682,43 @@ tiles
 		activatenorth = false;
 		activatesouth = false;
 	}
+
+	zone 108 {}
+	zone 109 {}
+	zone 110 {}
+	zone 111 {}
+	zone 112 {}
+	zone 113 {}
+	zone 114 {}
+	zone 115 {}
+	zone 116 {}
+	zone 117 {}
+	zone 118 {}
+	zone 119 {}
+	zone 120 {}
+	zone 121 {}
+	zone 122 {}
+	zone 123 {}
+	zone 124 {}
+	zone 125 {}
+	zone 126 {}
+	zone 127 {}
+	zone 128 {}
+	zone 129 {}
+	zone 130 {}
+	zone 131 {}
+	zone 132 {}
+	zone 133 {}
+	zone 134 {}
+	zone 135 {}
+	zone 136 {}
+	zone 137 {}
+	zone 138 {}
+	zone 139 {}
+	zone 140 {}
+	zone 141 {}
+	zone 142 {}
+	zone 143 {}
 }
 
 things

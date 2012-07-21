@@ -191,6 +191,13 @@ void TextMapParser::ParseTrigger(Scanner &sc, MapTrigger &trigger)
 	EndParseBlock
 }
 
+void TextMapParser::ParseZone(Scanner &sc, MapZone &zone)
+{
+	StartParseBlock
+	if(false);
+	EndParseBlock
+}
+
 class UWMFParser : public TextMapParser
 {
 	public:
@@ -461,9 +468,7 @@ class UWMFParser : public TextMapParser
 			MapZone zone;
 			zone.index = gm->zonePalette.Size();
 
-			StartParseBlock
-			if(false);
-			EndParseBlock
+			TextMapParser::ParseZone(sc, zone);
 			gm->zonePalette.Push(zone);
 		}
 

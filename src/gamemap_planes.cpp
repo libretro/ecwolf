@@ -141,6 +141,16 @@ public:
 		}
 		return min;
 	}
+	void GetZonePalette(TArray<MapZone> &zonePalette)
+	{
+		TMap<WORD, MapZone>::Iterator iter(this->zonePalette);
+		TMap<WORD, MapZone>::Pair *pair;
+		while(iter.NextPair(pair))
+		{
+			pair->Value.index = zonePalette.Size();
+			zonePalette.Push(pair->Value);
+		}
+	}
 	bool GetModZone(unsigned short tile, ModZone &modZone)
 	{
 		ModZone *item = modZones.CheckKey(tile);
@@ -227,6 +237,14 @@ public:
 		return valid;
 	}
 
+	int TranslateZone(unsigned short tile)
+	{
+		MapZone *zone = zonePalette.CheckKey(tile);
+		if(zone)
+			return zone->index;
+		return -1;
+	}
+
 protected:
 	void LoadFlatsTable(Scanner &sc)
 	{
@@ -302,7 +320,8 @@ protected:
 				if(sc->number > 0xFFFF)
 					sc.ScriptMessage(Scanner::ERROR, "Modzone number out of range.");
 
-				ModZone &zone = modZones[sc->number];
+				unsigned int zoneIndex = sc->number;
+				ModZone &zone = modZones[zoneIndex];
 				sc.MustGetToken(TK_Identifier);
 				if(sc->str.CompareNoCase("fillzone") == 0)
 				{
@@ -310,7 +329,10 @@ protected:
 					sc.MustGetToken(TK_Identifier);
 				}
 				else
+				{
+					zonePalette[zoneIndex] = MapZone();
 					zone.fillZone = false;
+				}
 
 				if(sc->str.CompareNoCase("ambush") == 0)
 				{
@@ -328,6 +350,14 @@ protected:
 				}
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown modzone type.");
+			}
+			else if(sc->str.CompareNoCase("zone") == 0)
+			{
+				sc.MustGetToken(TK_IntConst);
+
+				MapZone &zone = zonePalette[sc->number];
+				sc.MustGetToken('{');
+				TextMapParser::ParseZone(sc, zone);
 			}
 		}
 	}
@@ -349,6 +379,7 @@ protected:
 				{
 					sc.MustGetToken(TK_IntConst);
 					thing.isTrigger = true;
+					thing.angles = 0;
 					thing.oldnum = sc->number;
 
 					sc.MustGetToken('{');
@@ -394,6 +425,7 @@ private:
 	TMap<WORD, MapTile> tilePalette;
 	TMap<WORD, MapTrigger> tileTriggers;
 	TMap<WORD, ModZone> modZones;
+	TMap<WORD, MapZone> zonePalette;
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 };
 
@@ -453,15 +485,9 @@ void GameMap::ReadPlanesData()
 
 			case Plane_Tiles:
 			{
-				// Yay for magic numbers!
-				static const WORD
-					ZONE_START = 108,
-					ZONE_END = ZONE_START + 36;
-
 				WORD tileStart = xlat.GetTilePalette(tilePalette);
-				zonePalette.Resize(ZONE_END-ZONE_START);
-				for(unsigned int i = 0;i < zonePalette.Size();++i)
-					zonePalette[i].index = i;
+				xlat.GetZonePalette(zonePalette);
+
 				TArray<WORD> fillSpots;
 				TMap<WORD, Xlat::ModZone> changeTriggerSpots;
 				
@@ -471,24 +497,23 @@ void GameMap::ReadPlanesData()
 					if(xlat.IsValidTile(oldplane[i]))
 						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]-tileStart]);
 					else
-					{
-						Xlat::ModZone zone;
-						if(xlat.GetModZone(oldplane[i], zone))
-						{
-							if(zone.fillZone)
-								fillSpots.Push(i);
-
-							switch(zone.type)
-							{
-								case Xlat::ModZone::AMBUSH:
-									ambushSpots.Push(i);
-									break;
-								case Xlat::ModZone::CHANGETRIGGER:
-									changeTriggerSpots[i] = zone;
-									break;
-							}
-						}
 						mapPlane.map[i].SetTile(NULL);
+
+					Xlat::ModZone zone;
+					if(xlat.GetModZone(oldplane[i], zone))
+					{
+						if(zone.fillZone)
+							fillSpots.Push(i);
+
+						switch(zone.type)
+						{
+							case Xlat::ModZone::AMBUSH:
+								ambushSpots.Push(i);
+								break;
+							case Xlat::ModZone::CHANGETRIGGER:
+								changeTriggerSpots[i] = zone;
+								break;
+						}
 					}
 
 					MapTrigger templateTrigger;
@@ -502,8 +527,9 @@ void GameMap::ReadPlanesData()
 						trig = templateTrigger;
 					}
 
-					if(oldplane[i] >= ZONE_START && oldplane[i] < ZONE_END)
-						mapPlane.map[i].zone = &zonePalette[oldplane[i]-ZONE_START];
+					int zoneIndex;
+					if((zoneIndex = xlat.TranslateZone(oldplane[i])) != -1)
+						mapPlane.map[i].zone = &zonePalette[zoneIndex];
 					else
 						mapPlane.map[i].zone = NULL;
 				}

@@ -48,6 +48,7 @@ class TextMapParser
 	protected:
 		static void ParseTile(Scanner &sc, MapTile &tile);
 		static void ParseTrigger(Scanner &sc, MapTrigger &trigger);
+		static void ParseZone(Scanner &sc, MapZone &zone);
 };
 
 #endif
