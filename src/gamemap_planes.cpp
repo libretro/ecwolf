@@ -70,6 +70,22 @@ public:
 		MapTrigger		templateTrigger;
 	};
 
+	struct ModZone
+	{
+	public:
+		enum Type
+		{
+			AMBUSH,
+			CHANGETRIGGER
+		};
+
+		Type			type;
+		bool			fillZone;
+
+		unsigned int	oldTrigger;
+		MapTrigger		triggerTemplate;
+	};
+
 	Xlat() : lump(0)
 	{
 	}
@@ -124,6 +140,16 @@ public:
 			tilePalette[pair->Key - min] = pair->Value;
 		}
 		return min;
+	}
+	bool GetModZone(unsigned short tile, ModZone &modZone)
+	{
+		ModZone *item = modZones.CheckKey(tile);
+		if(item)
+		{
+			modZone = *item;
+			return true;
+		}
+		return false;
 	}
 	bool IsValidTile(unsigned short tile)
 	{
@@ -270,6 +296,39 @@ protected:
 				sc.MustGetToken('{');
 				TextMapParser::ParseTile(sc, tile);
 			}
+			else if(sc->str.CompareNoCase("modzone") == 0)
+			{
+				sc.MustGetToken(TK_IntConst);
+				if(sc->number > 0xFFFF)
+					sc.ScriptMessage(Scanner::ERROR, "Modzone number out of range.");
+
+				ModZone &zone = modZones[sc->number];
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.CompareNoCase("fillzone") == 0)
+				{
+					zone.fillZone = true;
+					sc.MustGetToken(TK_Identifier);
+				}
+				else
+					zone.fillZone = false;
+
+				if(sc->str.CompareNoCase("ambush") == 0)
+				{
+					zone.type = ModZone::AMBUSH;
+					sc.MustGetToken(';');
+				}
+				else if(sc->str.CompareNoCase("changetrigger") == 0)
+				{
+					sc.MustGetToken(TK_IntConst);
+					zone.type = ModZone::CHANGETRIGGER;
+					zone.oldTrigger = sc->number;
+
+					sc.MustGetToken('{');
+					TextMapParser::ParseTrigger(sc, zone.triggerTemplate);
+				}
+				else
+					sc.ScriptMessage(Scanner::ERROR, "Unknown modzone type.");
+			}
 		}
 	}
 
@@ -334,6 +393,7 @@ private:
 	TArray<ThingXlat> thingTable;
 	TMap<WORD, MapTile> tilePalette;
 	TMap<WORD, MapTrigger> tileTriggers;
+	TMap<WORD, ModZone> modZones;
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 };
 
@@ -395,12 +455,6 @@ void GameMap::ReadPlanesData()
 			{
 				// Yay for magic numbers!
 				static const WORD
-					NUM_WALLS = 64,
-					EXIT_TILE = 21,
-					DOOR_START = 90,
-					DOOR_END = DOOR_START + 6*2,
-					AMBUSH_TILE = 106,
-					ALT_EXIT = 107,
 					ZONE_START = 108,
 					ZONE_END = ZONE_START + 36;
 
@@ -408,7 +462,8 @@ void GameMap::ReadPlanesData()
 				zonePalette.Resize(ZONE_END-ZONE_START);
 				for(unsigned int i = 0;i < zonePalette.Size();++i)
 					zonePalette[i].index = i;
-				TArray<WORD> altExitSpots;
+				TArray<WORD> fillSpots;
+				TMap<WORD, Xlat::ModZone> changeTriggerSpots;
 				
 
 				for(unsigned int i = 0;i < size;++i)
@@ -416,7 +471,25 @@ void GameMap::ReadPlanesData()
 					if(xlat.IsValidTile(oldplane[i]))
 						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]-tileStart]);
 					else
+					{
+						Xlat::ModZone zone;
+						if(xlat.GetModZone(oldplane[i], zone))
+						{
+							if(zone.fillZone)
+								fillSpots.Push(i);
+
+							switch(zone.type)
+							{
+								case Xlat::ModZone::AMBUSH:
+									ambushSpots.Push(i);
+									break;
+								case Xlat::ModZone::CHANGETRIGGER:
+									changeTriggerSpots[i] = zone;
+									break;
+							}
+						}
 						mapPlane.map[i].SetTile(NULL);
+					}
 
 					MapTrigger templateTrigger;
 					if(xlat.TranslateTileTrigger(oldplane[i], templateTrigger))
@@ -429,28 +502,20 @@ void GameMap::ReadPlanesData()
 						trig = templateTrigger;
 					}
 
-					// We'll be moving the ambush flag to the actor itself.
-					if(oldplane[i] == AMBUSH_TILE)
-						ambushSpots.Push(i);
-					// For the alt exit we need to change the triggers after we
-					// are done with this pass.
-					else if(oldplane[i] == ALT_EXIT)
-						altExitSpots.Push(i);
-
 					if(oldplane[i] >= ZONE_START && oldplane[i] < ZONE_END)
 						mapPlane.map[i].zone = &zonePalette[oldplane[i]-ZONE_START];
 					else
 						mapPlane.map[i].zone = NULL;
 				}
 
-				// Get a sound zone for ambush spots if possible
-				for(unsigned int i = 0;i < ambushSpots.Size();++i)
+				// Get a sound zone for modzones that aren't valid sound zones.
+				for(unsigned int i = 0;i < fillSpots.Size();++i)
 				{
 					const int candidates[4] = {
-						ambushSpots[i] + 1,
-						ambushSpots[i] - header.width,
-						ambushSpots[i] - 1,
-						ambushSpots[i] + header.width
+						fillSpots[i] + 1,
+						fillSpots[i] - header.width,
+						fillSpots[i] - 1,
+						fillSpots[i] + header.width
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{
@@ -459,45 +524,61 @@ void GameMap::ReadPlanesData()
 						// the new location is indeed in the same row.
 						if((candidates[j] < 0 || (unsigned)candidates[j] > size) ||
 							((j == Tile::East || j == Tile::West) &&
-							(candidates[j]/header.width != ambushSpots[i]/header.width)))
+							(candidates[j]/header.width != fillSpots[i]/header.width)))
 							continue;
 
 						// First adjacent zone wins
 						if(mapPlane.map[candidates[j]].zone != NULL)
 						{
-							mapPlane.map[ambushSpots[i]].zone = mapPlane.map[candidates[j]].zone;
+							mapPlane.map[fillSpots[i]].zone = mapPlane.map[candidates[j]].zone;
 							break;
 						}
 					}
 				}
 
-				for(unsigned int i = 0;i < altExitSpots.Size();++i)
+				TMap<WORD, Xlat::ModZone>::Iterator iter(changeTriggerSpots);
+				TMap<WORD, Xlat::ModZone>::Pair *pair;
+				while(iter.NextPair(pair))
 				{
 					// Look for and switch exit triggers.
 					const int candidates[4] = {
-						altExitSpots[i] + 1,
-						altExitSpots[i] - header.width,
-						altExitSpots[i] - 1,
-						altExitSpots[i] + header.width
+						pair->Key + 1,
+						pair->Key - header.width,
+						pair->Key - 1,
+						pair->Key + header.width
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{
-						// Same as before
+						// Same as before, only this time we check if our
+						// replacement trigger activates at the line between
+						// this tile and the cadidate.
 						if((candidates[j] < 0 || (unsigned)candidates[j] > size) ||
 							((j == Trigger::East || j == Trigger::West) &&
-							(candidates[j]/header.width != altExitSpots[i]/header.width)))
+							(candidates[j]/header.width != pair->Key/header.width)) ||
+							!pair->Value.triggerTemplate.activate[j])
 							continue;
 
-						if(oldplane[candidates[j]] == EXIT_TILE)
+						TArray<Trigger> &triggers = mapPlane.map[candidates[j]].triggers;
+						// Look for any triggers matching the candidate
+						for(unsigned int k = 0;k < triggers.Size();++k)
 						{
-							TArray<Trigger> &triggers = mapPlane.map[candidates[j]].triggers;
-							// Look for any triggers matching the candidate
-							for(unsigned int k = 0;k < triggers.Size();++k)
+							if(triggers[k].action == pair->Value.oldTrigger &&
+								triggers[k].x == (unsigned)candidates[j]%header.width &&
+								triggers[k].y == (unsigned)candidates[j]/header.width)
 							{
-								if((triggers[k].x == (unsigned)candidates[j]%header.width) &&
-									(triggers[k].y == (unsigned)candidates[j]/header.width) &&
-									(triggers[k].action == Specials::Exit_Normal))
-									triggers[k].action = Specials::Exit_Secret;
+								// Disable
+								triggers[k].activate[j] = false;
+
+								Trigger &triggerTemplate = pair->Value.triggerTemplate;
+								triggerTemplate.x = triggers[k].x;
+								triggerTemplate.y = triggers[k].y;
+								triggerTemplate.z = triggers[k].z;
+								Trigger &newTrigger = NewTrigger(triggerTemplate.x, triggerTemplate.y, triggerTemplate.z);
+								newTrigger = triggerTemplate;
+
+								// Only enable the activation in the direction we're changing.
+								newTrigger.activate[0] = newTrigger.activate[1] = newTrigger.activate[2] = newTrigger.activate[3] = false;
+								newTrigger.activate[j] = true;
 							}
 						}
 					}

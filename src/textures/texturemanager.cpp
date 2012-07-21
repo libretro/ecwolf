@@ -736,48 +736,15 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 				{
 					ParseXTexture(sc, FTexture::TEX_MiscPatch);
 				}
-				else if(sc->str.Compare("maptile") == 0 || sc->str.Compare("artindex") == 0)
-				{
-					const int type = sc->str.Compare("maptile") == 0 ? 0 : 3;
-
-					sc.MustGetToken(TK_IntConst);
-					int index = sc->number;
-					sc.MustGetToken(',');
-					sc.MustGetToken(TK_StringConst);
-					switch(type)
-					{
-						default:
-						case 0:
-							if(index > 63)
-								sc.ScriptMessage(Scanner::ERROR, "Can't assign map tile over 63.\n");
-							mapTiles[index][0].textureName = sc->str;
-							sc.MustGetToken(',');
-							sc.MustGetToken(TK_StringConst);
-							mapTiles[index][1].textureName = sc->str;
-							break;
-						case 3:
-							if(index > 255)
-								sc.ScriptMessage(Scanner::ERROR, "Can't assign art index over 255.\n");
-							artIndex[index].textureName = sc->str;
-							break;
-					}
-				}
-				else if(sc->str.Compare("doortile") == 0)
+				else if(sc->str.Compare("artindex") == 0)
 				{
 					sc.MustGetToken(TK_IntConst);
 					int index = sc->number;
 					sc.MustGetToken(',');
 					sc.MustGetToken(TK_StringConst);
-					doorTiles[index*2][0].textureName = sc->str;
-					sc.MustGetToken(',');
-					sc.MustGetToken(TK_StringConst);
-					doorTiles[index*2+1][0].textureName = sc->str;
-					sc.MustGetToken(',');
-					sc.MustGetToken(TK_StringConst);
-					doorTiles[index*2][1].textureName = sc->str;
-					sc.MustGetToken(',');
-					sc.MustGetToken(TK_StringConst);
-					doorTiles[index*2+1][1].textureName = sc->str;
+					if(index > 255)
+						sc.ScriptMessage(Scanner::ERROR, "Can't assign art index over 255.\n");
+					artIndex[index].textureName = sc->str;
 				}
 				else
 				{
@@ -1275,24 +1242,6 @@ void FTextureManager::PrecacheLevel (void)
 //
 //===========================================================================
 
-FTextureID FTextureManager::GetDoor(unsigned int tile, bool vertical, bool track)
-{
-	if(tile > 63)
-		tile = 63;
-	TileMap &tm = doorTiles[tile*2+vertical][track];
-	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
-		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Wall);
-	return tm.texture;
-}
-FTextureID FTextureManager::GetTile(unsigned int tile, bool vertical)
-{
-	if(tile > 63)
-		tile = 63;
-	TileMap &tm = mapTiles[tile][vertical];
-	if(!tm.texture.isValid() && tm.textureName.GetIndex() != 0)
-		tm.texture = CheckForTexture(tm.textureName, FTexture::TEX_Wall);
-	return tm.texture;
-}
 FTextureID FTextureManager::GetArtIndex(unsigned int index)
 {
 	if(index > 255)

@@ -673,6 +673,15 @@ tiles
 		texturewest = "SLOT1_2";
 		offsethorizontal = true;
 	}
+
+	modzone 106 fillzone ambush;
+	modzone 107 changetrigger 3
+	{
+		action = 4;
+		playeruse = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
 }
 
 things
