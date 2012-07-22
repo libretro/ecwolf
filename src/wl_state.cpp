@@ -889,11 +889,11 @@ bool CheckLine (AActor *ob)
 
 static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
 {
-	//
-	// don't bother tracing a line if the area isn't connected to the players[0].mo's
-	//
-	if (!map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
-		return false;
+	bool heardnoise = madenoise;
+
+	// Check if we can hear the player's noise
+	if (heardnoise && !map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
+		heardnoise = false;
 
 	//
 	// if the players[0].mo is real close, sight is automatic
@@ -902,7 +902,7 @@ static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double
 	int32_t deltay = players[0].mo->y - ob->y;
 	uint32_t distance = MAX(abs(deltax), abs(deltay))*64;
 
-	if (!(ob->flags & FL_AMBUSH) && madenoise &&
+	if (!(ob->flags & FL_AMBUSH) && heardnoise &&
 		(maxheardist < 0.00001 ||
 		distance < maxheardist))
 		return true;
@@ -1013,9 +1013,6 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 	}
 	else
 	{
-		if (!map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
-			return false;
-
 		if (!CheckSight (ob, minseedist, maxseedist, maxheardist, fov))
 			return false;
 		ob->flags &= ~FL_AMBUSH;

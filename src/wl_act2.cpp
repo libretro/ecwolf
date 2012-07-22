@@ -543,9 +543,6 @@ ACTION_FUNCTION(A_WolfAttack)
 	ACTION_PARAM_INT(longrange, 6);
 	ACTION_PARAM_DOUBLE(runspeed, 7);
 
-	if (!map->CheckLink(self->GetZone(), players[0].mo->GetZone(), true))
-		return;
-
 	int     dx,dy,dist;
 	int     hitchance;
 
