@@ -253,6 +253,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	LevelBonus = -1;
 	LevelNumber = 0;
 	Cluster = 0;
+	NoIntermission = false;
 }
 
 FTextureID LevelInfo::GetBorderTexture() const
@@ -420,6 +421,8 @@ protected:
 		}
 		else if(key.CompareNoCase("Music") == 0)
 			ParseStringAssignment(mapInfo.Music);
+		else if(key.CompareNoCase("NoIntermission") == 0)
+			mapInfo.NoIntermission = true;
 		else if(key.CompareNoCase("Par") == 0)
 			ParseIntAssignment(mapInfo.Par);
 		else if(key.CompareNoCase("Translator") == 0)

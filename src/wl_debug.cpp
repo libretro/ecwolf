@@ -238,7 +238,10 @@ int DebugKeys (void)
 		return 1;
 	}
 	if (Keyboard[sc_E])             // E = quit level
+	{
 		playstate = ex_completed;
+		IN_ClearKeysDown();
+	}
 
 	if (Keyboard[sc_F])             // F = facing spot
 	{

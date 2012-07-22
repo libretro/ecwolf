@@ -107,6 +107,7 @@ public:
 	FString			CompletionString;
 	int				LevelBonus;
 	unsigned int	LevelNumber;
+	bool			NoIntermission;
 
 	bool			DeathCam;
 

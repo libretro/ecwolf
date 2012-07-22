@@ -25,6 +25,6 @@ void Victory (void);
 void LevelCompleted (void);
 void ClearSplitVWB (void);
 
-void PreloadGraphics(void);
+void PreloadGraphics(bool showPsych);
 
 #endif

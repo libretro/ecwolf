@@ -226,6 +226,7 @@ map "MAP18"
 	music = "ULTIMATE"
 	floornumber = 18
 	cluster = 2
+	nointermission
 }
 
 map "MAP19"

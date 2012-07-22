@@ -712,15 +712,14 @@ void FinishTravel ();
 void GameLoop (void)
 {
 	bool died;
-#ifdef MYPROFILE
-	clock_t start,end;
-#endif
+	bool dointermission;
 
 restartgame:
 	ClearMemory ();
 	VW_FadeOut();
 	DrawPlayScreen ();
 	died = false;
+	dointermission = true;
 	do
 	{
 		if (!loadedgame)
@@ -731,7 +730,19 @@ restartgame:
 		{
 			SetupGameLevel ();
 			if(playstate != ex_warped)
+			{
 				FinishTravel ();
+				if(playstate == ex_newmap)
+				{
+					if(NewMap.flags & NEWMAP_KEEPPOSITION)
+					{
+						players[0].mo->x = NewMap.x;
+						players[0].mo->y = NewMap.y;
+					}
+					if(NewMap.flags & NEWMAP_KEEPFACING)
+						players[0].mo->angle = NewMap.angle;
+				}
+			}
 		}
 
 		ingame = true;
@@ -743,7 +754,7 @@ restartgame:
 		else StartMusic ();
 
 		if (!died)
-			PreloadGraphics ();             // TODO: Let this do something useful!
+			PreloadGraphics (dointermission);
 		else
 		{
 			died = false;
@@ -752,34 +763,9 @@ restartgame:
 
 		DrawStatusBar();
 
-startplayloop:
+		dointermission = true;
+
 		PlayLoop ();
-
-		if (playstate == ex_newmap)
-		{
-			LevelInfo &newLevel = LevelInfo::FindByNumber(NewMap.newmap);
-			if(newLevel.MapName[0] != 0)
-			{
-				NewMap.x = players[0].mo->x;
-				NewMap.y = players[0].mo->y;
-				NewMap.angle = players[0].mo->angle;
-
-				strcpy(gamestate.mapname, newLevel.MapName);
-				StartTravel();
-				StripInventory(players[0].mo);
-				SetupGameLevel();
-				StartMusic();
-				FinishTravel();
-				if(NewMap.flags & NEWMAP_KEEPPOSITION)
-				{
-					players[0].mo->x = NewMap.x;
-					players[0].mo->y = NewMap.y;
-				}
-				if(NewMap.flags & NEWMAP_KEEPFACING)
-					players[0].mo->angle = NewMap.angle;
-			}
-			goto startplayloop;
-		}
 
 		StopMusic ();
 		ingame = false;
@@ -794,39 +780,59 @@ startplayloop:
 		{
 			case ex_completed:
 			case ex_secretlevel:
+			case ex_newmap:
 			{
 				if(viewsize == 21) DrawPlayScreen();
 
-				const char* next = playstate == ex_completed ? levelInfo->NextMap : levelInfo->NextSecret;
-				if(stricmp(next, "EndTitle") == 0)
+				dointermission = !levelInfo->NoIntermission;
+
+				const char* next;
+				if(playstate != ex_newmap)
 				{
-					VW_FadeOut ();
-					ClearMemory ();
+					next = playstate == ex_completed ? levelInfo->NextMap : levelInfo->NextSecret;
+					if(stricmp(next, "EndTitle") == 0)
+					{
+						VW_FadeOut ();
+						ClearMemory ();
 
-					Victory ();
+						Victory ();
 
-					ClearMemory ();
+						ClearMemory ();
 
-					CheckHighScore (players[0].score,levelInfo->FloorNumber);
-					return;
+						CheckHighScore (players[0].score,levelInfo->FloorNumber);
+						return;
+					}
+				}
+				else
+				{
+					NewMap.x = players[0].mo->x;
+					NewMap.y = players[0].mo->y;
+					NewMap.angle = players[0].mo->angle;
+
+					LevelInfo &teleportMap = LevelInfo::FindByNumber(NewMap.newmap);
+					if(teleportMap.MapName[0] == 0)
+						Quit("Tried to teleport to unkown map.");
+					next = teleportMap.MapName;
 				}
 
 				StripInventory(players[0].mo);
 
 				DrawStatusBar();
-				VW_FadeOut ();
+				if(dointermission)
+					VW_FadeOut ();
 
 				ClearMemory ();
 
 				StartTravel ();
-				LevelCompleted ();              // do the intermission
+				if(dointermission)
+					LevelCompleted ();              // do the intermission
 
 				LevelInfo &nextLevel = LevelInfo::Find(next);
 				if(nextLevel.Cluster != levelInfo->Cluster)
 					EndText ();
 
-				VW_FadeOut ();
-				DrawPlayBorder();
+				if(dointermission)
+					VW_FadeOut ();
 				if(viewsize == 21) DrawPlayScreen();
 
 				if(stricmp(next, "EndDemo") == 0)

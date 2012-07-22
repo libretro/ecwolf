@@ -663,33 +663,38 @@ bool PreloadUpdate (unsigned current, unsigned total)
 	return (false);
 }
 
-void PreloadGraphics (void)
+void PreloadGraphics (bool showPsych)
 {
-	ClearSplitVWB ();           // set up for double buffering in split screen
+	if(showPsych)
+	{
+		ClearSplitVWB ();           // set up for double buffering in split screen
 
-	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
-	ShowActStatus();
-	VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
+		VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
+		ShowActStatus();
+		VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
 
-	WindowX = (screenWidth - scaleFactor*224)/2;
-	WindowY = (screenHeight - scaleFactor*(STATUSLINES+48))/2;
-	WindowW = scaleFactor * 28 * 8;
-	WindowH = scaleFactor * 48;
+		WindowX = (screenWidth - scaleFactor*224)/2;
+		WindowY = (screenHeight - scaleFactor*(STATUSLINES+48))/2;
+		WindowW = scaleFactor * 28 * 8;
+		WindowH = scaleFactor * 48;
 
-	VW_UpdateScreen ();
-	VW_FadeIn ();
+		VW_UpdateScreen ();
+		VW_FadeIn ();
 
-	PreloadUpdate (5, 10);
+		PreloadUpdate (5, 10);
+	}
 
 	TexMan.PrecacheLevel();
 
-//      PM_Preload (PreloadUpdate);
-	PreloadUpdate (10, 10);
-	IN_UserInput (70);
-	VW_FadeOut ();
+	if(showPsych)
+	{
+		PreloadUpdate (10, 10);
+		IN_UserInput (70);
+		VW_FadeOut ();
 
-	DrawPlayScreen ();
-	VW_UpdateScreen ();
+		DrawPlayScreen ();
+		VW_UpdateScreen ();
+	}
 }
 
 
