@@ -41,6 +41,7 @@
 #include "w_wad.h"
 #include "wl_iwad.h"
 #include "v_video.h"
+#include "g_shared/a_inventory.h"
 #include "thingdef/thingdef.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -405,6 +406,19 @@ protected:
 			ParseIntAssignment(mapInfo.Cluster);
 		else if(key.CompareNoCase("CompletionString") == 0)
 			ParseStringAssignment(mapInfo.CompletionString);
+		else if(key.CompareNoCase("EnsureInventory") == 0)
+		{
+			TArray<FString> classNames;
+			ParseStringArrayAssignment(classNames);
+
+			for(unsigned int i = 0;i < classNames.Size();++i)
+			{
+				const ClassDef *cls = ClassDef::FindClass(classNames[i]);
+				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
+					sc.ScriptMessage(Scanner::ERROR, "Class %s doesn't appear to be a kind of Inventory.", classNames[i].GetChars());
+				mapInfo.EnsureInventory.Push(cls);
+			}
+		}
 		else if(key.CompareNoCase("DeathCam") == 0)
 			ParseBoolAssignment(mapInfo.DeathCam);
 		else if(key.CompareNoCase("FloorNumber") == 0)

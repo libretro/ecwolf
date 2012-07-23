@@ -390,6 +390,13 @@ static void InitGame()
 #endif
 	VW_UpdateScreen();
 
+//
+// Load Actors
+//
+
+	ClassDef::LoadActors();
+	atterm(CollectGC);
+
 	// Parse non-gameinfo sections in MAPINFO
 	G_ParseMapInfo(false);
 
@@ -404,13 +411,6 @@ static void InitGame()
 	SD_Startup ();
 	printf("US_Startup: Starting the User Manager.\n");
 	US_Startup ();
-
-//
-// Load Actors
-//
-
-	ClassDef::LoadActors();
-	atterm(CollectGC);
 
 //
 // Load Keys

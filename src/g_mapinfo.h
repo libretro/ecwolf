@@ -111,6 +111,8 @@ public:
 
 	bool			DeathCam;
 
+	TArray<const ClassDef *>	EnsureInventory;
+
 	struct SpecialAction
 	{
 	public:

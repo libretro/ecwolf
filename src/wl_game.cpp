@@ -743,6 +743,20 @@ restartgame:
 						players[0].mo->angle = NewMap.angle;
 				}
 			}
+
+			if(levelInfo->EnsureInventory.Size() > 0)
+			{
+				for(unsigned int i = 0;i < levelInfo->EnsureInventory.Size();++i)
+				{
+					if(players[0].mo->FindInventory(levelInfo->EnsureInventory[i]))
+						continue;
+
+					AInventory *item = (AInventory*)AActor::Spawn(levelInfo->EnsureInventory[i], 0, 0, 0);
+					item->RemoveFromWorld();
+					if(!item->TryPickup(players[0].mo))
+						item->Destroy();
+				}
+			}
 		}
 
 		ingame = true;

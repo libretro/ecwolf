@@ -256,4 +256,5 @@ map "MAP21"
 	music = "XEVIL"
 	floornumber = 18
 	cluster = 2
+	ensureinventory = "GoldKey"
 }
