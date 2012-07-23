@@ -87,6 +87,8 @@ map "MAP05"
 	music = "ULTIMATE"
 	floornumber = 5
 	cluster = 2
+	completionstring = "$STR_TRANSDEFEATED"
+	levelbonus = 15000
 }
 
 map "MAP06"
@@ -141,6 +143,8 @@ map "MAP10"
 	music = "ULTIMATE"
 	floornumber = 10
 	cluster = 2
+	completionstring = "$STR_WILHELMDEFEATED"
+	levelbonus = 15000
 }
 
 map "MAP11"
@@ -205,6 +209,8 @@ map "MAP16"
 	music = "ULTIMATE"
 	floornumber = 16
 	cluster = 2
+	completionstring = "$STR_UBERDEFEATED"
+	levelbonus = 15000
 }
 
 map "MAP17"
@@ -237,6 +243,8 @@ map "MAP19"
 	music = "XJAZNAZI"
 	floornumber = 19
 	cluster = 2
+	completionstring = "$STR_SECRETTUNNELCOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP20"
@@ -246,6 +254,8 @@ map "MAP20"
 	music = "XFUNKIE"
 	floornumber = 20
 	cluster = 2
+	completionstring = "$STR_SECRETCASTLECOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP21"

@@ -75,6 +75,11 @@ STR_ALWAYSRUN = "Always Run";
 STR_CHEATER = "You now have 100% Health,\n99 Ammo and both Keys!\n\nNote that you have basically\neliminated your chances of\ngetting a high score!";
 STR_FLOORCOMPLETED = "floor %d\ncompleted";
 STR_SECRETCOMPLETED = "\nsecret floor\n completed";
+STR_TRANSDEFEATED = "\n trans\n grosse\ndefeated!";
+STR_WILHELMDEFEATED = "\nbarnacle\nwilhelm\ndefeated!";
+STR_UBERDEFEATED = "\nubermutant\ndefeated!";
+STR_SECRETTUNNELCOMPLETED = "\nsecret tunnel\n    area\n  completed!";
+STR_SECRETCASTLECOMPLETED = "\nsecret castle\n    area\n  completed!";
 STR_SELECTRES = "Screen Resolution";
 
 STR_DEMOCOMPLETED = "This concludes your demo\nof Spear of Destiny! Now,\ngo to your local software\nstore and buy it!";
