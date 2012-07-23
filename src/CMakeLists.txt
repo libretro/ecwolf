@@ -93,6 +93,7 @@ add_executable(ecwolf #WIN32
 	g_shared/a_keys.cpp
 	g_shared/a_patrolpoint.cpp
 	g_shared/a_playerpawn.cpp
+	g_wolf/a_spearofdestiny.cpp
 	r_data/colormaps.cpp
 	r_data/r_translate.cpp
 	resourcefiles/resourcefile.cpp

@@ -198,7 +198,7 @@ class FVSwap : public FResourceFile
 			// Now for sounds we need to get the last Chunk and read the sound information.
 			int soundMapOffset = ReadLittleLong(&data[(numChunks-1)*4]);
 			int soundMapSize = ReadLittleShort(&data[(numChunks-1)*2 + 4*numChunks]);
-			unsigned int numDigi = soundMapSize/4 - 1;
+			unsigned int numDigi = soundMapSize/4;
 			byte* soundMap = new byte[soundMapSize];
 			SoundLumps = new FVSwapSound*[numDigi];
 			vswapReader.Seek(soundMapOffset, SEEK_SET);
@@ -206,7 +206,7 @@ class FVSwap : public FResourceFile
 			for(unsigned int i = 0;i < numDigi;i++)
 			{
 				WORD start = ReadLittleShort(&soundMap[i*4]);
-				WORD end = ReadLittleShort(&soundMap[i*4 + 4]);
+				WORD end = i == numDigi - 1 ? numChunks - soundStart - 1 : ReadLittleShort(&soundMap[i*4 + 4]);
 
 				if(start + soundStart > numChunks - 1)
 				{ // Read past end of chunks.
