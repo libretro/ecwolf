@@ -94,8 +94,8 @@ public:
 	FString GetName(const class GameMap *gm) const;
 
 	char			MapName[9];
-	char			NextMap[9];
-	char			NextSecret[9];
+	FString			NextMap;
+	FString			NextSecret;
 	unsigned int	FloorNumber;
 	FString			Music;
 	unsigned int	Cluster;

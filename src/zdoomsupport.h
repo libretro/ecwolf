@@ -4,6 +4,17 @@
 #define __ZDOOM_SUPPORT__
 
 #include "m_crc32.h"
+#include "templates.h"
+
+// Ensures that a double is a whole number or a half
+static inline bool CheckTicsValid(double tics)
+{
+	double ipart;
+	double fpart = modf(tics, &ipart);
+	if(MIN(fabs(fpart), fabs(0.5 - fpart)) > 0.0001)
+		return false;
+	return true;
+}
 
 static inline char* copystring(const char* src)
 {

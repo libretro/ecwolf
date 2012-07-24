@@ -1,5 +1,36 @@
 include "mapinfo/wolfcommon.txt"
 
+intermission SpearEnding
+{
+	Fader
+	{
+		Music = "XTHEEND"
+		Background = "#004545"
+		Draw = "BJCOLPS1", 124, 44
+		FadeType = FadeIn
+		Time = -2
+	}
+	Image
+	{
+		Background = "#004545"
+		Draw = "BJCOLPS2", 124, 44
+		Time = 52.5
+	}
+	Image
+	{
+		Background = "#004545"
+		Draw = "BJCOLPS3", 124, 44
+		Time = 52.5
+	}
+	Fader
+	{
+		Background = "#004545"
+		Draw = "BJCOLPS4", 124, 44
+		FadeType = FadeOut
+		Time = -3
+	}
+}
+
 gameinfo
 {
 	signon = "SODSGNON"
@@ -20,6 +51,7 @@ gameinfo
 adddefaultmap
 {
 	translator = "xlat/spear.txt"
+	specialaction = "AngelOfDeath", "Exit_Normal"
 }
 
 episode "MAP01"
@@ -260,8 +292,8 @@ map "MAP20"
 
 map "MAP21"
 {
-	next = "EndGame1"
-	secretnext = "EndGame1"
+	next = EndSequence, "SpearEnding"
+	secretnext = EndSequence, "SpearEnding"
 	defaultceiling = "#483818"
 	music = "XEVIL"
 	floornumber = 18

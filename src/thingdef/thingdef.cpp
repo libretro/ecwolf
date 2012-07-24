@@ -1007,9 +1007,7 @@ void ClassDef::ParseActor(Scanner &sc)
 							if(sc.CheckToken(TK_FloatConst))
 							{
 								// Eliminate confusion about fractional frame delays
-								double ipart;
-								double fpart = modf(sc->decimal, &ipart);
-								if(MIN(fabs(fpart), fabs(0.5 - fpart)) > 0.0001)
+								if(!CheckTicsValid(sc->decimal))
 									sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
 
 								thisState.duration = static_cast<int> (sc->decimal*2);

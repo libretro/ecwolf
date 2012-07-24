@@ -33,6 +33,7 @@
 */
  
 #include "gamemap.h"
+#include "g_intermission.h"
 #include "g_mapinfo.h"
 #include "language.h"
 #include "lnspec.h"
@@ -347,22 +348,33 @@ protected:
 			other.LevelNumber = 0;
 	}
 
+	void ParseNext(FString &next)
+	{
+		sc.MustGetToken('=');
+		if(sc.CheckToken(TK_Identifier))
+		{
+			if(sc->str.CompareNoCase("EndSequence") == 0)
+			{
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				next.Format("EndSequence:%s", sc->str.GetChars());
+			}
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Expected EndSequence.");
+		}
+		else
+		{
+			sc.MustGetToken(TK_StringConst);
+			next = sc->str;
+		}
+	}
+
 	bool CheckKey(FString key)
 	{
 		if(key.CompareNoCase("next") == 0)
-		{
-			FString lump;
-			ParseStringAssignment(lump);
-			strncpy(mapInfo.NextMap, lump.GetChars(), 8);
-			mapInfo.NextMap[8] = 0;
-		}
+			ParseNext(mapInfo.NextMap);
 		else if(key.CompareNoCase("secretnext") == 0)
-		{
-			FString lump;
-			ParseStringAssignment(lump);
-			strncpy(mapInfo.NextSecret, lump.GetChars(), 8);
-			mapInfo.NextSecret[8] = 0;
-		}
+			ParseNext(mapInfo.NextSecret);
 		else if(key.CompareNoCase("bordertexture") == 0)
 		{
 			FString textureName;
@@ -660,12 +672,149 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+class IntermissionBlockParser : public MapInfoBlockParser
+{
+private:
+	IntermissionInfo *intermission;
+
+public:
+	IntermissionBlockParser(Scanner &sc) : MapInfoBlockParser(sc, "intermission")
+	{
+	}
+
+protected:
+	void ParseHeader()
+	{
+		sc.MustGetToken(TK_Identifier);
+
+		intermission = &IntermissionInfo::Find(sc->str);
+	}
+
+	bool CheckKey(FString key)
+	{
+		IntermissionInfo::Action action;
+		if(key.CompareNoCase("Fader") == 0)
+		{
+			FaderIntermissionAction *fader = new FaderIntermissionAction();
+
+			action.type = IntermissionInfo::FADER;
+			action.action = fader;
+
+			if(!ParseFader(fader))
+			{
+				delete fader;
+				return false;
+			}
+		}
+		else if(key.CompareNoCase("Image") == 0)
+		{
+			action.type = IntermissionInfo::IMAGE;
+			action.action = new IntermissionAction();
+
+			sc.MustGetToken('{');
+			while(!sc.CheckToken('}'))
+			{
+				sc.MustGetToken(TK_Identifier);
+				if(!CheckStandardKey(action.action, sc->str))
+				{
+					delete action.action;
+					return false;
+				}
+			}
+		}
+		else
+			return false;
+
+		intermission->Actions.Push(action);
+		return true;
+	}
+
+	bool CheckStandardKey(IntermissionAction *action, const FString &key)
+	{
+		if(key.CompareNoCase("Draw") == 0)
+		{
+			IntermissionAction::DrawData data;
+
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			data.Image = TexMan.CheckForTexture(sc->str, FTexture::TEX_Any);
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_IntConst);
+			data.X = sc->number;
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_IntConst);
+			data.Y = sc->number;
+
+			action->Draw.Push(data);
+		}
+		else if(key.CompareNoCase("Background") == 0)
+		{
+			FString tex;
+			ParseStringAssignment(tex);
+			action->Background = TexMan.CheckForTexture(tex, FTexture::TEX_Any);
+		}
+		else if(key.CompareNoCase("Music") == 0)
+			ParseStringAssignment(action->Music);
+		else if(key.CompareNoCase("Time") == 0)
+		{
+			sc.MustGetToken('=');
+
+			bool inSeconds = sc.CheckToken('-');
+			sc.MustGetToken(TK_FloatConst);
+			if(!CheckTicsValid(sc->decimal))
+				sc.ScriptMessage(Scanner::ERROR, "Invalid tic duration.");
+
+			action->Time = static_cast<unsigned int>(sc->decimal*2);
+			if(inSeconds)
+				action->Time *= 35;
+		}
+		else
+			return false;
+		return true;
+	}
+
+	bool ParseFader(FaderIntermissionAction *fader)
+	{
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			if(CheckStandardKey(fader, sc->str))
+				continue;
+
+			if(sc->str.CompareNoCase("FadeType") == 0)
+			{
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.CompareNoCase("FadeIn") == 0)
+					fader->Fade = FaderIntermissionAction::FADEIN;
+				else if(sc->str.CompareNoCase("FadeOut") == 0)
+					fader->Fade = FaderIntermissionAction::FADEOUT;
+				else
+					sc.ScriptMessage(Scanner::ERROR, "Unknown fade type.");
+			}
+			else
+				return false;
+		}
+		return true;
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 static void SkipBlock(Scanner &sc)
 {
 	// Skip header
 	while(sc.GetNextToken() && sc->token != '{');
 	// Skip content
-	while(sc.GetNextToken() && sc->token != '}');
+	unsigned int level = 0;
+	while(sc.GetNextToken() && (level != 0 || sc->token != '}'))
+	{
+		if(sc->token == '{')
+			++level;
+		else if(sc->token == '}')
+			--level;
+	}
 }
 
 static void ParseMapInfoLump(int lump, bool gameinfoPass)
@@ -713,6 +862,10 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 				parser.Parse();
 				if(parser.UseEpisode())
 					episodes.Push(episode);
+			}
+			else if(sc->str.CompareNoCase("intermission") == 0)
+			{
+				IntermissionBlockParser(sc).Parse();
 			}
 			else if(sc->str.CompareNoCase("map") == 0)
 			{

@@ -19,6 +19,7 @@
 #include "actor.h"
 #include <SDL_mixer.h>
 #include "wl_agent.h"
+#include "g_intermission.h"
 #include "g_mapinfo.h"
 #include "wl_inter.h"
 #include "wl_draw.h"
@@ -800,11 +801,21 @@ restartgame:
 
 				dointermission = !levelInfo->NoIntermission;
 
-				const char* next;
+				FString next;
 				if(playstate != ex_newmap)
 				{
 					next = playstate == ex_completed ? levelInfo->NextMap : levelInfo->NextSecret;
-					if(stricmp(next, "EndTitle") == 0)
+
+					if(next.IndexOf("EndSequence:") == 0)
+					{
+						VW_FadeOut();
+						ClearMemory();
+
+						IntermissionInfo &intermission = IntermissionInfo::Find(next.Mid(12));
+						ShowIntermission(intermission);
+						return;
+					}
+					else if(next.CompareNoCase("EndTitle") == 0)
 					{
 						VW_FadeOut ();
 						ClearMemory ();
@@ -849,7 +860,7 @@ restartgame:
 					VW_FadeOut ();
 				if(viewsize == 21) DrawPlayScreen();
 
-				if(stricmp(next, "EndDemo") == 0)
+				if(next.CompareNoCase("EndDemo") == 0)
 				{
 					CheckHighScore (players[0].score,levelInfo->FloorNumber);
 					return;

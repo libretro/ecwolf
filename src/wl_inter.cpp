@@ -579,32 +579,6 @@ done:   itoa (kr, tempstr, 10);
 	}
 	else
 	{
-#ifdef SPEAR
-#ifndef SPEARDEMO
-		switch (mapon)
-		{
-			case 4:
-				Write (14, 4, " trans\n" " grosse\n" "defeated!");
-				break;
-			case 9:
-				Write (14, 4, "barnacle\n" "wilhelm\n" "defeated!");
-				break;
-			case 15:
-				Write (14, 4, "ubermutant\n" "defeated!");
-				break;
-			case 17:
-				Write (14, 4, " death\n" " knight\n" "defeated!");
-				break;
-			case 18:
-				Write (13, 4, "secret tunnel\n" "    area\n" "  completed!");
-				break;
-			case 19:
-				Write (13, 4, "secret castle\n" "    area\n" "  completed!");
-				break;
-		}
-#endif
-#endif
-
 		FString bonusString;
 		bonusString.Format("%d bonus!", levelInfo->LevelBonus);
 		Write (34, 16, bonusString, true);

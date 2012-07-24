@@ -146,6 +146,7 @@ add_executable(ecwolf #WIN32
 	farchive.cpp
 	file.cpp
 	files.cpp
+	g_intermission.cpp
 	g_mapinfo.cpp
 	gamemap.cpp
 	gamemap_planes.cpp
