@@ -563,7 +563,7 @@ void US_ControlPanel (ScanCode scancode)
 				MenuFadeOut ();
 				StartCPMusic ("XJAZNAZI");
 				ClearMemory ();
-				InitPalette("IDGUYPAL");
+				VL_ReadPalette("IDGUYPAL");
 
 				CA_CacheScreen(TexMan("IDGUYS"));
 
@@ -577,7 +577,7 @@ void US_ControlPanel (ScanCode scancode)
 				IN_Ack ();
 	
 				VW_FadeOut ();
-				InitPalette(gameinfo.GamePalette);
+				VL_ReadPalette(gameinfo.GamePalette);
 
 				mainMenu.draw();
 				StartCPMusic (gameinfo.MenuMusic);

@@ -376,9 +376,7 @@ static void InitGame()
 
 	TexMan.Init();
 	printf("VL_ReadPalette: Setting up the Palette...\n");
-	VL_ReadPalette();
-	InitPalette(gameinfo.GamePalette);
-	R_InitColormaps();
+	VL_ReadPalette(gameinfo.GamePalette);
 	atterm(R_DeinitColormaps);
 	GenerateLookupTables();
 
@@ -738,11 +736,10 @@ static void DemoLoop()
 // title page
 //
 			bool useTitlePalette = !gameinfo.TitlePalette.IsEmpty();
-			SDL_Color pal[256];
 			if(useTitlePalette)
 			{
 				reloadPalette = true;
-				InitPalette(gameinfo.TitlePalette);
+				VL_ReadPalette(gameinfo.TitlePalette);
 			}
 
 			CA_CacheScreen(TexMan(gameinfo.TitlePage));
@@ -753,7 +750,7 @@ static void DemoLoop()
 			VW_FadeOut();
 			if(useTitlePalette)
 			{
-				InitPalette(gameinfo.GamePalette);
+				VL_ReadPalette(gameinfo.GamePalette);
 				reloadPalette = false;
 			}
 //
@@ -814,7 +811,7 @@ static void DemoLoop()
 			VW_FadeOut ();
 			if(reloadPalette)
 			{
-				InitPalette(gameinfo.GamePalette);
+				VL_ReadPalette(gameinfo.GamePalette);
 				reloadPalette = false;
 			}
 

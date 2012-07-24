@@ -722,6 +722,13 @@ protected:
 				}
 			}
 		}
+		else if(key.CompareNoCase("VictoryStats") == 0)
+		{
+			action.type = IntermissionInfo::VICTORYSTATS;
+			action.action = new IntermissionAction();
+			sc.MustGetToken('{');
+			sc.MustGetToken('}');
+		}
 		else
 			return false;
 
@@ -755,6 +762,8 @@ protected:
 		}
 		else if(key.CompareNoCase("Music") == 0)
 			ParseStringAssignment(action->Music);
+		else if(key.CompareNoCase("Palette") == 0)
+			ParseStringAssignment(action->Palette);
 		else if(key.CompareNoCase("Time") == 0)
 		{
 			sc.MustGetToken('=');

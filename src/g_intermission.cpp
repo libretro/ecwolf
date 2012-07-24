@@ -34,9 +34,11 @@
 
 #include "wl_def.h"
 #include "id_ca.h"
+#include "id_in.h"
 #include "id_vh.h"
 #include "g_intermission.h"
 #include "tarray.h"
+#include "wl_inter.h"
 
 static TMap<FName, IntermissionInfo> intermissions;
 
@@ -47,8 +49,26 @@ IntermissionInfo &IntermissionInfo::Find(const FName &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static void WaitIntermission(unsigned int time)
+{
+	if(time)
+	{
+		VL_WaitVBL(time);
+	}
+	else
+	{
+		IN_ClearKeysDown ();
+		IN_Ack ();
+	}
+}
+
 static void ShowImage(IntermissionAction *image, bool nowait)
 {
+	if(!image->Palette.IsEmpty())
+	{
+		VL_ReadPalette(image->Palette);
+	}
+
 	CA_CacheScreen(TexMan(image->Background));
 	for(unsigned int i = 0;i < image->Draw.Size();++i)
 	{
@@ -57,7 +77,7 @@ static void ShowImage(IntermissionAction *image, bool nowait)
 	VW_UpdateScreen();
 
 	if(!nowait)
-		VL_WaitVBL(image->Time);
+		WaitIntermission(image->Time);
 }
 
 static void ShowFader(FaderIntermissionAction *fader)
@@ -68,10 +88,10 @@ static void ShowFader(FaderIntermissionAction *fader)
 	{
 		case FaderIntermissionAction::FADEIN:
 			VW_FadeIn();
-			VL_WaitVBL(fader->Time);
+			WaitIntermission(fader->Time);
 			break;
 		case FaderIntermissionAction::FADEOUT:
-			VL_WaitVBL(fader->Time);
+			WaitIntermission(fader->Time);
 			VW_FadeOut();
 			break;
 	}
@@ -90,6 +110,11 @@ void ShowIntermission(const IntermissionInfo &intermission)
 			case IntermissionInfo::FADER:
 				ShowFader((FaderIntermissionAction*)intermission.Actions[i].action);
 				break;
+			case IntermissionInfo::VICTORYSTATS:
+				Victory();
+				break;
 		}
 	}
+
+	VL_ReadPalette(gameinfo.GamePalette);
 }

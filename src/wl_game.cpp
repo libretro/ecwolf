@@ -813,6 +813,10 @@ restartgame:
 
 						IntermissionInfo &intermission = IntermissionInfo::Find(next.Mid(12));
 						ShowIntermission(intermission);
+
+						ClearMemory();
+
+						CheckHighScore (players[0].score,levelInfo->FloorNumber);
 						return;
 					}
 					else if(next.CompareNoCase("EndTitle") == 0)

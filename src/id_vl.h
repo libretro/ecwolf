@@ -28,7 +28,7 @@ extern SDL_Color gamepal[256];
 
 #define VL_WaitVBL(a) SDL_Delay((a)*8)
 
-void VL_ReadPalette();
+void VL_ReadPalette(const char* lump);
 
 void VL_SetVGAPlaneMode (void);
 void VL_SetTextMode (void);

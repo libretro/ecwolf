@@ -4,6 +4,7 @@
 #include "wl_def.h"
 #include "id_vl.h"
 #include "w_wad.h"
+#include "r_data/colormaps.h"
 #include "v_palette.h"
 #include "wl_draw.h"
 #include "wl_main.h"
@@ -46,23 +47,11 @@ SDL_Color gamepal[256];
 
 //===========================================================================
 
-void VL_ReadPalette()
+void VL_ReadPalette(const char* lump)
 {
-	int lump = Wads.GetNumForName("WOLFPAL");
-	if(lump == -1 || Wads.LumpLength(lump) < 768)
-	{
-		printf("ERROR: Valid palette data not found.\n");
-		exit(0);
-	}
-
-	FWadLump palette = Wads.OpenLumpNum(lump);
-	unsigned char data[768];
-	palette.Read(data, 768);
-	for(unsigned int i = 0;i < 768;i += 3)
-	{
-		SDL_Color color = {data[i], data[i+1], data[i+2], 0};
-		gamepal[i/3] = color;
-	}
+	InitPalette(lump);
+	VL_SetPalette(GPalette.BaseColors, false);
+	R_InitColormaps();
 }
 
 /*

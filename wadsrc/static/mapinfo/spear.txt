@@ -29,6 +29,61 @@ intermission SpearEnding
 		FadeType = FadeOut
 		Time = -3
 	}
+	VictoryStats {}
+	Fader
+	{
+		Palette = "END1PAL"
+		Background = "ENDSCR1"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END3PAL"
+		Background = "ENDSCR3"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END4PAL"
+		Background = "ENDSCR4"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END5PAL"
+		Background = "ENDSCR5"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END6PAL"
+		Background = "ENDSCR6"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END7PAL"
+		Background = "ENDSCR7"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END8PAL"
+		Background = "ENDSCR8"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END9PAL"
+		Background = "ENDSCR9"
+		FadeType = FadeIn
+	}
+	Fader
+	{
+		Palette = "END2PAL"
+		Background = "ENDSCR2"
+		FadeType = FadeIn
+	}
 }
 
 gameinfo

@@ -51,6 +51,7 @@ public:
 	FTextureID			Background;
 	TArray<DrawData>	Draw;
 	FString				Music;
+	FString				Palette;
 	unsigned int		Time;
 };
 
@@ -74,7 +75,8 @@ public:
 	enum ActionType
 	{
 		IMAGE,
-		FADER
+		FADER,
+		VICTORYSTATS
 	};
 
 	struct Action
