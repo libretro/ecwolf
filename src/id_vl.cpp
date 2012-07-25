@@ -45,12 +45,20 @@ unsigned bordercolor;
 
 SDL_Color gamepal[256];
 
+static struct
+{
+	uint8_t r,g,b;
+	int amount;
+} currentBlend;
+
 //===========================================================================
 
 void VL_ReadPalette(const char* lump)
 {
 	InitPalette(lump);
 	VL_SetPalette(GPalette.BaseColors, false);
+	if(currentBlend.amount)
+		VL_SetBlend(currentBlend.r, currentBlend.g, currentBlend.b, currentBlend.amount, false);
 	R_InitColormaps();
 }
 
@@ -144,6 +152,12 @@ void DoBlending (const PalEntry *from, PalEntry *to, int count, int r, int g, in
 void VL_SetBlend(uint8_t red, uint8_t green, uint8_t blue, int amount, bool forceupdate)
 {
 	static PalEntry colors[256];
+
+	currentBlend.r = red;
+	currentBlend.g = green;
+	currentBlend.b = blue;
+	currentBlend.amount = amount;
+
 	if(amount)
 	{
 		memcpy(colors, GPalette.BaseColors, sizeof(PalEntry)*256);
