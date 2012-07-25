@@ -988,37 +988,40 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 	if (notargetmode)
 		return false;
 
-	if(!(ob->flags & FL_ATTACKMODE))
+	if (ob->flags & FL_ATTACKMODE)
 	{
-		if (ob->sighttime != ob->GetDefault()->sighttime)
-		{
-			//
-			// count down reaction time
-			//
-			if (ob->sightrandom)
-			{
-				--ob->sightrandom;
-				return false;
-			}
+		ob->sighttime = ob->GetDefault()->sighttime;
+		ob->flags &= ~FL_ATTACKMODE;
+	}
 
-			if (ob->sighttime > 0)
-			{
-				--ob->sighttime;
-				return false;
-			}
-		}
-		else
+	if (ob->sighttime != ob->GetDefault()->sighttime)
+	{
+		//
+		// count down reaction time
+		//
+		if (ob->sightrandom)
 		{
-			if (!CheckSight (ob, minseedist, maxseedist, maxheardist, fov))
-				return false;
-			ob->flags &= ~FL_AMBUSH;
-
-			--ob->sighttime; // We need to somehow mark we started.
-			ob->sightrandom = 1; // Account for tic.
-			if(ob->GetDefault()->sightrandom)
-				ob->sightrandom += pr_sight()/ob->GetDefault()->sightrandom;
+			--ob->sightrandom;
 			return false;
 		}
+
+		if (ob->sighttime > 0)
+		{
+			--ob->sighttime;
+			return false;
+		}
+	}
+	else
+	{
+		if (!CheckSight (ob, minseedist, maxseedist, maxheardist, fov))
+			return false;
+		ob->flags &= ~FL_AMBUSH;
+
+		--ob->sighttime; // We need to somehow mark we started.
+		ob->sightrandom = 1; // Account for tic.
+		if(ob->GetDefault()->sightrandom)
+			ob->sightrandom += pr_sight()/ob->GetDefault()->sightrandom;
+		return false;
 	}
 
 	FirstSighting (ob);
