@@ -67,7 +67,7 @@ int ffDataTopLeft, ffDataTopRight, ffDataBottomLeft, ffDataBottomRight;
 int ElevatorBackTo[]={1,1,7,3,5,3};
 
 void SetupGameLevel (void);
-void GameLoop (void);
+bool GameLoop (void);
 
 /*
 =============================================================================
@@ -710,7 +710,7 @@ static void StripInventory(AActor *actor)
 
 void StartTravel ();
 void FinishTravel ();
-void GameLoop (void)
+bool GameLoop (void)
 {
 	bool died;
 	bool dointermission;
@@ -806,30 +806,31 @@ restartgame:
 				{
 					next = playstate == ex_completed ? levelInfo->NextMap : levelInfo->NextSecret;
 
-					if(next.IndexOf("EndSequence:") == 0)
+					if(next.IndexOf("EndSequence:") == 0 || next.CompareNoCase("EndTitle") == 0)
 					{
+						bool endSequence = next.IndexOf("EndSequence:") == 0;
+
 						VW_FadeOut();
 						ClearMemory();
 
-						IntermissionInfo &intermission = IntermissionInfo::Find(next.Mid(12));
-						ShowIntermission(intermission);
+						if(dointermission)
+						{
+							Victory (false);
+
+							ClearMemory ();
+						}
+
+						bool gotoMenu = false;
+						if(endSequence)
+						{
+							IntermissionInfo &intermission = IntermissionInfo::Find(next.Mid(12));
+							gotoMenu = ShowIntermission(intermission);
+						}
 
 						ClearMemory();
 
 						CheckHighScore (players[0].score,levelInfo->FloorNumber);
-						return;
-					}
-					else if(next.CompareNoCase("EndTitle") == 0)
-					{
-						VW_FadeOut ();
-						ClearMemory ();
-
-						Victory ();
-
-						ClearMemory ();
-
-						CheckHighScore (players[0].score,levelInfo->FloorNumber);
-						return;
+						return gotoMenu;
 					}
 				}
 				else
@@ -867,7 +868,7 @@ restartgame:
 				if(next.CompareNoCase("EndDemo") == 0)
 				{
 					CheckHighScore (players[0].score,levelInfo->FloorNumber);
-					return;
+					return false;
 				}
 
 				players[0].oldscore = players[0].score;
@@ -891,7 +892,7 @@ restartgame:
 				ClearMemory ();
 
 				CheckHighScore (players[0].score,levelInfo->FloorNumber);
-				return;
+				return false;
 
 			case ex_warped:
 				players[0].state = player_t::PST_ENTER;
@@ -903,4 +904,5 @@ restartgame:
 				break;
 		}
 	} while (1);
+	return false;
 }

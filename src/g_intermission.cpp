@@ -37,8 +37,11 @@
 #include "id_in.h"
 #include "id_vh.h"
 #include "g_intermission.h"
+#include "language.h"
 #include "tarray.h"
 #include "wl_inter.h"
+#include "wl_menu.h"
+#include "wl_play.h"
 
 static TMap<FName, IntermissionInfo> intermissions;
 
@@ -53,7 +56,7 @@ static void WaitIntermission(unsigned int time)
 {
 	if(time)
 	{
-		VL_WaitVBL(time);
+		IN_UserInput(time);
 	}
 	else
 	{
@@ -62,44 +65,94 @@ static void WaitIntermission(unsigned int time)
 	}
 }
 
-static void ShowImage(IntermissionAction *image, bool nowait)
+static void ShowImage(IntermissionAction *image, bool drawonly)
 {
-	if(!image->Palette.IsEmpty())
-	{
-		VL_ReadPalette(image->Palette);
-	}
+	if(!image->Music.IsEmpty())
+		StartCPMusic(image->Music);
 
-	CA_CacheScreen(TexMan(image->Background));
+	if(!image->Palette.IsEmpty())
+		VL_ReadPalette(image->Palette);
+
+	static FTextureID background;
+	if(image->Background.isValid())
+		background = image->Background;
+	CA_CacheScreen(TexMan(background));
+
 	for(unsigned int i = 0;i < image->Draw.Size();++i)
 	{
 		VWB_DrawGraphic(TexMan(image->Draw[i].Image), image->Draw[i].X, image->Draw[i].Y);
 	}
-	VW_UpdateScreen();
 
-	if(!nowait)
+	if(!drawonly)
+	{
+		VW_UpdateScreen();
 		WaitIntermission(image->Time);
+	}
 }
 
 static void ShowFader(FaderIntermissionAction *fader)
 {
-	ShowImage(fader, true);
-
 	switch(fader->Fade)
 	{
 		case FaderIntermissionAction::FADEIN:
-			VW_FadeIn();
-			WaitIntermission(fader->Time);
+			ShowImage(fader, true);
+			VL_FadeIn(0, 255, gamepal, fader->Time);
 			break;
 		case FaderIntermissionAction::FADEOUT:
-			WaitIntermission(fader->Time);
-			VW_FadeOut();
+			// We want to hold whatever may have been drawn in the previous page during the fade, so we don't need to draw.
+			VL_FadeOut(0, 255, 0, 0, 0, fader->Time);
 			break;
 	}
 }
 
-void ShowIntermission(const IntermissionInfo &intermission)
+static void ShowTextScreen(TextScreenIntermissionAction *textscreen)
 {
-	for(unsigned int i = 0;i < intermission.Actions.Size();++i)
+	if(textscreen->TextSpeed)
+		Printf("Warning: Text screen has a non-zero textspeed which isn't supported at this time.\n");
+
+	ShowImage(textscreen, true);
+
+	if(textscreen->TextDelay)
+		WaitIntermission(textscreen->TextDelay);
+
+	pa = MENU_BOTTOM;
+	py = textscreen->PrintY;
+	for(unsigned int i = 0;i < textscreen->Text.Size();++i)
+	{
+		FString line = textscreen->Text[i];
+		if(line[0] == '$')
+			line = language[line.Mid(1)];
+
+		word width, height;
+		VW_MeasurePropString(SmallFont, line, width, height);
+
+		switch(textscreen->Alignment)
+		{
+			default:
+				px = textscreen->PrintX;
+				break;
+			case TextScreenIntermissionAction::RIGHT:
+				px = textscreen->PrintX - width;
+				break;
+			case TextScreenIntermissionAction::CENTER:
+				px = textscreen->PrintX - width/2;
+				break;
+		}
+
+		VWB_DrawPropString(SmallFont, line, textscreen->TextColor);
+
+		py += SmallFont->GetHeight();
+	}
+	pa = MENU_CENTER;
+
+	VW_UpdateScreen();
+	WaitIntermission(textscreen->Time);
+}
+
+bool ShowIntermission(const IntermissionInfo &intermission)
+{
+	bool gototitle = false;
+	for(unsigned int i = 0;!gototitle && i < intermission.Actions.Size();++i)
 	{
 		switch(intermission.Actions[i].type)
 		{
@@ -110,11 +163,32 @@ void ShowIntermission(const IntermissionInfo &intermission)
 			case IntermissionInfo::FADER:
 				ShowFader((FaderIntermissionAction*)intermission.Actions[i].action);
 				break;
+			case IntermissionInfo::GOTOTITLE:
+				gototitle = true;
+				break;
+			case IntermissionInfo::TEXTSCREEN:
+				ShowTextScreen((TextScreenIntermissionAction*)intermission.Actions[i].action);
+				break;
 			case IntermissionInfo::VICTORYSTATS:
-				Victory();
+				Victory(true);
 				break;
 		}
 	}
 
+	if(!gototitle)
+	{
+		// Hold at the final page until esc is pressed
+		IN_ClearKeysDown();
+
+		ControlInfo ci;
+		do
+		{
+			LastScan = 0;
+			ReadAnyControl(&ci);
+		}
+		while(LastScan != sc_Escape && !ci.button1);
+	}
+
 	VL_ReadPalette(gameinfo.GamePalette);
+	return !gototitle;
 }

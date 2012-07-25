@@ -118,7 +118,7 @@ EndSpear (void)
 ==================
 */
 
-void Victory (void)
+void Victory (bool fromIntermission)
 {
 	int32_t sec;
 	int i, min, kr = 0, sr = 0, tr = 0, x;
@@ -150,7 +150,8 @@ void Victory (void)
 
 	StartCPMusic ("URAHERO");
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
-	DrawPlayScreen(true);
+	if(!fromIntermission)
+		DrawPlayScreen(true);
 
 	Write (18, 2, language["STR_YOUWIN"]);
 

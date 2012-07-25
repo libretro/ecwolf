@@ -67,6 +67,30 @@ public:
 	FadeType	Fade;
 };
 
+class TextScreenIntermissionAction : public IntermissionAction
+{
+public:
+	enum Alignment
+	{
+		LEFT,
+		CENTER,
+		RIGHT
+	};
+
+	TextScreenIntermissionAction() : IntermissionAction(),
+		Alignment(LEFT), TextColor(CR_UNTRANSLATED), TextDelay(20), TextSpeed(4)
+	{
+	}
+
+	unsigned int	PrintX;
+	unsigned int	PrintY;
+	Alignment		Alignment;
+	TArray<FString>	Text;
+	EColorRange		TextColor;
+	unsigned int	TextDelay;
+	unsigned int	TextSpeed;
+};
+
 class IntermissionInfo
 {
 public:
@@ -76,6 +100,8 @@ public:
 	{
 		IMAGE,
 		FADER,
+		GOTOTITLE,
+		TEXTSCREEN,
 		VICTORYSTATS
 	};
 
@@ -87,4 +113,5 @@ public:
 	TArray<Action>	Actions;
 };
 
-void ShowIntermission(const IntermissionInfo &intermission);
+// Returns true if the game should return to the menu instead of the title screen.
+bool ShowIntermission(const IntermissionInfo &intermission);

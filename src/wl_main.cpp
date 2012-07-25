@@ -728,9 +728,10 @@ static void DemoLoop()
 		PG13 ();
 
 	bool reloadPalette = false;
+	bool gotoMenu = false;
 	while (1)
 	{
-		while (!param_nowait)
+		while (!param_nowait && !gotoMenu)
 		{
 //
 // title page
@@ -808,6 +809,8 @@ static void DemoLoop()
 
 		if(!param_tedlevel)
 		{
+			gotoMenu = false;
+
 			VW_FadeOut ();
 			if(reloadPalette)
 			{
@@ -824,8 +827,10 @@ static void DemoLoop()
 		if (param_tedlevel || startgame || loadedgame)
 		{
 			param_tedlevel = false;
-			GameLoop ();
-			if(!param_nowait)
+			if(GameLoop ())
+				gotoMenu = true;
+
+			if(!param_nowait && !gotoMenu)
 			{
 				VW_FadeOut();
 				StartCPMusic(gameinfo.TitleMusic);

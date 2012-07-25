@@ -8,26 +8,33 @@ intermission SpearEnding
 		Background = "#004545"
 		Draw = "BJCOLPS1", 124, 44
 		FadeType = FadeIn
+		Time = 15
+	}
+	Image
+	{
+		Draw = "BJCOLPS1", 124, 44
 		Time = -2
 	}
 	Image
 	{
-		Background = "#004545"
 		Draw = "BJCOLPS2", 124, 44
 		Time = 52.5
 	}
 	Image
 	{
-		Background = "#004545"
 		Draw = "BJCOLPS3", 124, 44
 		Time = 52.5
 	}
+	Image
+	{
+		Draw = "BJCOLPS4", 124, 44
+		Time = -3
+	}
 	Fader
 	{
-		Background = "#004545"
 		Draw = "BJCOLPS4", 124, 44
 		FadeType = FadeOut
-		Time = -3
+		Time = 2.5
 	}
 	VictoryStats {}
 	Fader
@@ -35,55 +42,138 @@ intermission SpearEnding
 		Palette = "END1PAL"
 		Background = "ENDSCR1"
 		FadeType = FadeIn
+		Time = 15
 	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
+	}
+
 	Fader
 	{
 		Palette = "END3PAL"
 		Background = "ENDSCR3"
 		FadeType = FadeIn
+		Time = 15
 	}
+	TextScreen
+	{
+		Position = 160, 180
+		Text = "$STR_ENDGAME1", "$STR_ENDGAME2"
+		TextAlignment = Center
+		TextColor = "Cream"
+		TextSpeed = 0
+		TextDelay = 0
+	}
+	TextScreen
+	{
+		Position = 160, 180
+		Text = "$STR_ENDGAME3", "$STR_ENDGAME4"
+		TextAlignment = Center
+		TextColor = "Cream"
+		TextSpeed = 0
+		TextDelay = 0
+	}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
+	}
+
 	Fader
 	{
 		Palette = "END4PAL"
 		Background = "ENDSCR4"
 		FadeType = FadeIn
+		Time = 15
+	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
 	}
 	Fader
 	{
 		Palette = "END5PAL"
 		Background = "ENDSCR5"
 		FadeType = FadeIn
+		Time = 15
+	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
 	}
 	Fader
 	{
 		Palette = "END6PAL"
 		Background = "ENDSCR6"
 		FadeType = FadeIn
+		Time = 15
+	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
 	}
 	Fader
 	{
 		Palette = "END7PAL"
 		Background = "ENDSCR7"
 		FadeType = FadeIn
+		Time = 15
+	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
 	}
 	Fader
 	{
 		Palette = "END8PAL"
 		Background = "ENDSCR8"
 		FadeType = FadeIn
+		Time = 15
+	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
 	}
 	Fader
 	{
 		Palette = "END9PAL"
 		Background = "ENDSCR9"
 		FadeType = FadeIn
+		Time = 15
+	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
 	}
 	Fader
 	{
 		Palette = "END2PAL"
 		Background = "ENDSCR2"
 		FadeType = FadeIn
+		Time = 15
 	}
+	Image {}
+	Fader
+	{
+		FadeType = FadeOut
+		Time = 15
+	}
+	GotoTitle {}
 }
 
 gameinfo
@@ -354,4 +444,5 @@ map "MAP21"
 	floornumber = 18
 	cluster = 2
 	ensureinventory = "GoldKey"
+	nointermission
 }

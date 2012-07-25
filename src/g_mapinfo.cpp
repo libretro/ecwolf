@@ -121,6 +121,16 @@ protected:
 		dest = sc->number;
 	}
 
+	void ParseTicAssignment(unsigned int &tics)
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_FloatConst);
+		if(!CheckTicsValid(sc->decimal))
+			sc.ScriptMessage(Scanner::ERROR, "Invalid tic duration.");
+
+		tics = static_cast<unsigned int>(sc->decimal*2);
+	}
+
 	void ParseIntArrayAssignment(TArray<int> &dest)
 	{
 		sc.MustGetToken('=');
@@ -706,6 +716,13 @@ protected:
 				return false;
 			}
 		}
+		else if(key.CompareNoCase("GotoTitle") == 0)
+		{
+			action.type = IntermissionInfo::GOTOTITLE;
+			action.action = new IntermissionAction();
+			sc.MustGetToken('{');
+			sc.MustGetToken('}');
+		}
 		else if(key.CompareNoCase("Image") == 0)
 		{
 			action.type = IntermissionInfo::IMAGE;
@@ -720,6 +737,19 @@ protected:
 					delete action.action;
 					return false;
 				}
+			}
+		}
+		else if(key.CompareNoCase("TextScreen") == 0)
+		{
+			TextScreenIntermissionAction *textscreen = new TextScreenIntermissionAction();
+
+			action.type = IntermissionInfo::TEXTSCREEN;
+			action.action = textscreen;
+
+			if(!ParseTextScreen(textscreen))
+			{
+				delete textscreen;
+				return false;
 			}
 		}
 		else if(key.CompareNoCase("VictoryStats") == 0)
@@ -801,6 +831,51 @@ protected:
 					fader->Fade = FaderIntermissionAction::FADEOUT;
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown fade type.");
+			}
+			else
+				return false;
+		}
+		return true;
+	}
+
+	bool ParseTextScreen(TextScreenIntermissionAction *textscreen)
+	{
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			if(CheckStandardKey(textscreen, sc->str))
+				continue;
+
+			if(sc->str.CompareNoCase("Text") == 0)
+				ParseStringArrayAssignment(textscreen->Text);
+			else if(sc->str.CompareNoCase("TextAlignment") == 0)
+			{
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.CompareNoCase("left") == 0)
+					textscreen->Alignment = TextScreenIntermissionAction::LEFT;
+				else if(sc->str.CompareNoCase("center") == 0)
+					textscreen->Alignment = TextScreenIntermissionAction::CENTER;
+				else if(sc->str.CompareNoCase("right") == 0)
+					textscreen->Alignment = TextScreenIntermissionAction::RIGHT;
+				else
+					sc.ScriptMessage(Scanner::ERROR, "Unknown alignment.");
+			}
+			else if(sc->str.CompareNoCase("TextColor") == 0)
+				ParseFontColorAssignment(textscreen->TextColor);
+			else if(sc->str.CompareNoCase("TextDelay") == 0)
+				ParseTicAssignment(textscreen->TextDelay);
+			else if(sc->str.CompareNoCase("TextSpeed") == 0)
+				ParseTicAssignment(textscreen->TextSpeed);
+			else if(sc->str.CompareNoCase("Position") == 0)
+			{
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_IntConst);
+				textscreen->PrintX = sc->number;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_IntConst);
+				textscreen->PrintY = sc->number;
 			}
 			else
 				return false;
