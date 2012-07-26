@@ -171,9 +171,25 @@ void SoundInformation::CreateHashTable()
 	{
 		SoundData &data = sounds[i];
 
-		// Don't hash empty sounds
-		if(data.IsNull())
-			continue;
+		if(data.isAlias)
+		{
+			// Clean up undefined links
+			for(unsigned int j = data.aliasLinks.Size();j-- > 0;)
+			{
+				if(operator[](data.aliasLinks[j]).IsNull())
+					data.aliasLinks.Delete(j);
+			}
+
+			// No links?  No hash.
+			if(data.aliasLinks.Size() == 0)
+				continue;
+		}
+		else
+		{
+			// Don't hash empty sounds
+			if(data.IsNull())
+				continue;
+		}
 
 		HashIndex *tid = &hashTable[MakeKey(data.logicalName) % HashIndex::HASHTABLE_SIZE];
 		while(tid->index)
