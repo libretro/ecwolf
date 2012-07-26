@@ -172,9 +172,10 @@ void TransformActor (AActor *ob)
 //
 	gxt = FixedMul(gx,viewcos);
 	gyt = FixedMul(gy,viewsin);
-	nx = gxt-gyt-ACTORSIZE;         // fudge the shape forward a bit, because
-									// the midpoint could put parts of the shape
-									// into an adjacent wall
+	// Wolf4SDL used 0x2000 for statics and 0x4000 for moving actors, but since
+	// we no longer tell the difference, use the smaller fudging value since
+	// the larger one will just look ugly in general.
+	nx = gxt-gyt-0x2000;
 
 //
 // calculate newy
@@ -201,74 +202,6 @@ void TransformActor (AActor *ob)
 // calculate height (heightnumerator/(nx>>8))
 //
 	ob->viewheight = (word)(heightnumerator/(nx>>8));
-}
-
-//==========================================================================
-
-/*
-========================
-=
-= TransformTile
-=
-= Takes paramaters:
-=   tx,ty               : tile the object is centered in
-=
-= globals:
-=   viewx,viewy         : point of view
-=   viewcos,viewsin     : sin/cos of viewangle
-=   scale               : conversion from global value to screen value
-=
-= sets:
-=   screenx,transx,transy,screenheight: projected edge location and size
-=
-= Returns true if the tile is withing getting distance
-=
-========================
-*/
-
-bool TransformTile (int tx, int ty, short *dispx, short *dispheight)
-{
-	fixed gx,gy,gxt,gyt,nx,ny;
-
-//
-// translate point to view centered coordinates
-//
-	gx = ((int32_t)tx<<TILESHIFT)+0x8000-viewx;
-	gy = ((int32_t)ty<<TILESHIFT)+0x8000-viewy;
-
-//
-// calculate newx
-//
-	gxt = FixedMul(gx,viewcos);
-	gyt = FixedMul(gy,viewsin);
-	nx = gxt-gyt-0x2000;            // 0x2000 is size of object
-
-//
-// calculate newy
-//
-	gxt = FixedMul(gx,viewsin);
-	gyt = FixedMul(gy,viewcos);
-	ny = gyt+gxt;
-
-
-//
-// calculate height / perspective ratio
-//
-	if (nx<MINDIST)                 // too close, don't overflow the divide
-		*dispheight = 0;
-	else
-	{
-		*dispx = (short)(centerx + ny*scale/nx);
-		*dispheight = (short)(heightnumerator/(nx>>8));
-	}
-
-//
-// see if it should be grabbed
-//
-	if (nx<TILEGLOBAL && ny>-TILEGLOBAL/2 && ny<TILEGLOBAL/2)
-		return true;
-	else
-		return false;
 }
 
 //==========================================================================
