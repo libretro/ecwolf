@@ -28,6 +28,7 @@
 #include "wl_text.h"
 #include "a_inventory.h"
 #include "colormatcher.h"
+#include "thingdef/thingdef.h"
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -749,10 +750,35 @@ restartgame:
 			{
 				for(unsigned int i = 0;i < levelInfo->EnsureInventory.Size();++i)
 				{
-					if(players[0].mo->FindInventory(levelInfo->EnsureInventory[i]))
+					const ClassDef *ensure = levelInfo->EnsureInventory[i];
+					AInventory *holding = players[0].mo->FindInventory(ensure);
+
+					if(ensure->IsDescendantOf(NATIVE_CLASS(Ammo)))
+					{
+						// For ammo ensure we have the proper amount
+						AAmmo *ammo = static_cast<AAmmo*>(AActor::Spawn(ensure, 0, 0, 0));
+						ammo->RemoveFromWorld();
+
+						if(!holding)
+							holding = players[0].mo->FindInventory(ammo->GetAmmoType());
+
+						if(holding && holding->amount < ammo->amount)
+							ammo->amount -= holding->amount;
+						else if(holding && holding->amount >= ammo->amount)
+						{
+							ammo->Destroy();
+							ammo = NULL;
+						}
+
+						if(ammo && !ammo->TryPickup(players[0].mo))
+								ammo->Destroy();
+						continue;
+					}
+
+					if(holding)
 						continue;
 
-					AInventory *item = (AInventory*)AActor::Spawn(levelInfo->EnsureInventory[i], 0, 0, 0);
+					AInventory *item = static_cast<AInventory*>(AActor::Spawn(ensure, 0, 0, 0));
 					item->RemoveFromWorld();
 					if(!item->TryPickup(players[0].mo))
 						item->Destroy();

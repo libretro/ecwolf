@@ -18,7 +18,7 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	fixed gu, gv, du, dv;                      // global texture coordinates
 	int u, v;                                  // local texture coordinates
 	static const byte *toptex, *bottex;
-	static FTextureID lasttoptex, lastbottex;
+	FTextureID lasttoptex, lastbottex;
 
 	int halfheight = viewheight >> 1;
 	int y0 = min_wallheight >> 3;              // starting y value

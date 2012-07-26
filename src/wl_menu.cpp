@@ -31,6 +31,8 @@
 #include "templates.h"
 #include "wl_loadsave.h"
 
+#include <climits>
+
 extern int	lastgamemusicoffset;
 EpisodeInfo	*episode = 0;
 int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG;

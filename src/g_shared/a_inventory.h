@@ -72,10 +72,10 @@ class AAmmo : public AInventory
 	DECLARE_NATIVE_CLASS(Ammo, Inventory)
 
 	public:
-		bool	HandlePickup(AInventory *item, bool &good);
+		const ClassDef	*GetAmmoType();
+		bool			HandlePickup(AInventory *item, bool &good);
 
 	protected:
-		const ClassDef	*GetAmmoType();
 		AInventory		*CreateCopy(AActor *holder);
 };
 
