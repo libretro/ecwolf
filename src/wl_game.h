@@ -21,11 +21,10 @@ extern struct gametype
 {
 	char		mapname[9];
 	short       difficulty;
-	short       mapon;
 
 	FTextureID  faceframe;
 
-	short       episode,secretcount,treasurecount,killcount,
+	short       secretcount,treasurecount,killcount,
 				secrettotal,treasuretotal,killtotal;
 	int32_t     TimeCount;
 	bool        victoryflag;            // set during victory animations

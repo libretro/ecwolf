@@ -66,6 +66,7 @@ intermission SpearEnding
 		TextColor = "Cream"
 		TextSpeed = 0
 		TextDelay = 0
+		Time = 350
 	}
 	TextScreen
 	{
@@ -75,6 +76,7 @@ intermission SpearEnding
 		TextColor = "Cream"
 		TextSpeed = 0
 		TextDelay = 0
+		Time = 350
 	}
 	Fader
 	{
@@ -444,5 +446,6 @@ map "MAP21"
 	floornumber = 18
 	cluster = 2
 	ensureinventory = "GoldKey"
+	highscoresgraphic = "M_WONSPR"
 	nointermission
 }

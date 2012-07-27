@@ -37,17 +37,8 @@ typedef	struct
 	char	name[MaxHighName + 1];
 	int32_t	score;
 	word	completed;
+	char	graphic[9];
 } HighScore;
-
-#define	MaxGameName		32
-#define	MaxSaveGames	6
-typedef	struct
-{
-	char	signature[4];
-	word	*oldtest;
-	bool	present;
-	char	name[MaxGameName + 1];
-} SaveGame;
 
 #define	MaxString	128	// Maximum input string size
 
@@ -66,7 +57,6 @@ extern	word		WindowX,WindowY,// Current location of window
 
 extern	bool		(*USL_SaveGame)(int),(*USL_LoadGame)(int);
 extern	void		(*USL_ResetGame)(void);
-extern	SaveGame	Games[MaxSaveGames];
 extern	HighScore	Scores[];
 
 #define	US_HomeWindow()	{PrintX = WindowX; PrintY = WindowY;}

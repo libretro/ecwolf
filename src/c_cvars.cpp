@@ -148,19 +148,24 @@ void ReadConfig(void)
 	char hsName[50];
 	char hsScore[50];
 	char hsCompleted[50];
+	char hsGraphic[50];
 	for(unsigned int i = 0;i < MaxScores;i++)
 	{
 		sprintf(hsName, "HighScore%u_Name", i);
 		sprintf(hsScore, "HighScore%u_Score", i);
 		sprintf(hsCompleted, "HighScore%u_Completed", i);
+		sprintf(hsGraphic, "HighScore%u_Graphic", i);
 
 		config->CreateSetting(hsName, Scores[i].name);
 		config->CreateSetting(hsScore, Scores[i].score);
 		config->CreateSetting(hsCompleted, Scores[i].completed);
+		config->CreateSetting(hsGraphic, Scores[i].graphic);
 
 		strcpy(Scores[i].name, config->GetSetting(hsName)->GetString());
 		Scores[i].score = config->GetSetting(hsScore)->GetInteger();
 		Scores[i].completed = config->GetSetting(hsCompleted)->GetInteger();
+		strncpy(Scores[i].graphic, config->GetSetting(hsGraphic)->GetString(), 8);
+		Scores[i].graphic[8] = 0;
 	}
 
 	// make sure values are correct
@@ -228,14 +233,17 @@ void WriteConfig(void)
 	char hsName[50];
 	char hsScore[50];
 	char hsCompleted[50];
+	char hsGraphic[50];
 	for(unsigned int i = 0;i < MaxScores;i++)
 	{
 		sprintf(hsName, "HighScore%u_Name", i);
 		sprintf(hsScore, "HighScore%u_Score", i);
 		sprintf(hsCompleted, "HighScore%u_Completed", i);
+		sprintf(hsGraphic, "HighScore%u_Graphic", i);
 
 		config->GetSetting(hsName)->SetValue(Scores[i].name);
 		config->GetSetting(hsScore)->SetValue(Scores[i].score);
 		config->GetSetting(hsCompleted)->SetValue(Scores[i].completed);
+		config->GetSetting(hsGraphic)->SetValue(Scores[i].graphic);
 	}
 }

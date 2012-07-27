@@ -445,6 +445,12 @@ protected:
 			ParseBoolAssignment(mapInfo.DeathCam);
 		else if(key.CompareNoCase("FloorNumber") == 0)
 			ParseIntAssignment(mapInfo.FloorNumber);
+		else if(key.CompareNoCase("HighScoresGraphic") == 0)
+		{
+			FString texName;
+			ParseStringAssignment(texName);
+			mapInfo.HighScoresGraphic = TexMan.CheckForTexture(texName, FTexture::TEX_Any);
+		}
 		else if(key.CompareNoCase("LevelBonus") == 0)
 			ParseIntAssignment(mapInfo.LevelBonus);
 		else if(key.CompareNoCase("LevelNum") == 0)

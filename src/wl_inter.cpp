@@ -40,74 +40,6 @@ ClearSplitVWB (void)
 	WindowH = 160;
 }
 
-
-//==========================================================================
-
-#ifdef SPEAR
-#ifndef SPEARDEMO
-////////////////////////////////////////////////////////
-//
-// End of Spear of Destiny
-//
-////////////////////////////////////////////////////////
-
-void
-EndScreen (const char* palette, const char* screen)
-{
-	SDL_Color pal[256];
-	CA_CacheScreen (TexMan(screen));
-	VW_UpdateScreen ();
-	VL_ConvertPalette(palette, pal, 256);
-	VL_FadeIn (0, 255, pal, 30);
-	IN_ClearKeysDown ();
-	IN_Ack ();
-	VW_FadeOut ();
-}
-
-
-void
-EndSpear (void)
-{
-	SDL_Color pal[256];
-
-	EndScreen ("END1PAL", "ENDSCR11");
-
-	CA_CacheScreen (TexMan("ENDSCR3"));
-	VW_UpdateScreen ();
-	VL_ConvertPalette("END3PAL", pal, 256);
-	VL_FadeIn (0, 255, pal, 30);
-	//fontcolor = 0xd0;
-	WindowX = 0;
-	WindowW = 320;
-	PrintX = 0;
-	PrintY = 180;
-	US_CPrint (language["STR_ENDGAME1"]);
-	US_CPrint (language["STR_ENDGAME2"]);
-	VW_UpdateScreen ();
-	IN_UserInput(700);
-
-	PrintX = 0;
-	PrintY = 180;
-	VWB_Bar (0, 180, 320, 20, 0);
-	US_CPrint (language["STR_ENDGAME3"]);
-	US_CPrint (language["STR_ENDGAME4"]);
-	VW_UpdateScreen ();
-	IN_UserInput(700);
-
-	VW_FadeOut ();
-
-	EndScreen ("END4PAL", "ENDSCR4");
-	EndScreen ("END5PAL", "ENDSCR5");
-	EndScreen ("END6PAL", "ENDSCR6");
-	EndScreen ("END7PAL", "ENDSCR7");
-	EndScreen ("END8PAL", "ENDSCR8");
-	EndScreen ("END9PAL", "ENDSCR9");
-
-	EndScreen ("END2PAL", "ENDSCR12");
-}
-#endif
-#endif
-
 //==========================================================================
 
 /*
@@ -125,28 +57,6 @@ void Victory (bool fromIntermission)
 	char tempstr[8];
 
 	static const unsigned int RATIOX = 22, RATIOY = 14, TIMEX = 14, TIMEY = 8;
-
-
-#ifdef SPEAR
-	StartCPMusic (XTHEEND_MUS);
-
-	VWB_Bar (0, 0, 320, 200, VIEWCOLOR);
-	VWB_DrawPic (124, 44, "BJCOLPS1");
-	VW_UpdateScreen ();
-	VW_FadeIn ();
-	VW_WaitVBL (2 * 70);
-	VWB_DrawPic (124, 44, "BJCOLPS2");
-	VW_UpdateScreen ();
-	VW_WaitVBL (105);
-	VWB_DrawPic (124, 44, "BJCOLPS3");
-	VW_UpdateScreen ();
-	VW_WaitVBL (105);
-	VWB_DrawPic (124, 44, "BJCOLPS4");
-	VW_UpdateScreen ();
-	VW_WaitVBL (3 * 70);
-
-	VL_FadeOut (0, 255, 0, 68, 68, 5);
-#endif
 
 	StartCPMusic ("URAHERO");
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
@@ -728,11 +638,20 @@ void DrawHighScores (void)
 		VW_MeasurePropString (font, buffer, w, h);
 		PrintX = 194 - w;
 
-#ifdef SPEAR
-		if (s->completed == 21)
-			VWB_DrawPic (PrintX + 8, PrintY - 1, "M_WONSPR");
-		else
-#endif
+		bool drawNumber = true;
+		if (s->graphic[0])
+		{
+			FTextureID graphic = TexMan.CheckForTexture(s->graphic, FTexture::TEX_Any);
+			if(graphic.isValid())
+			{
+				FTexture *tex = TexMan(graphic);
+
+				drawNumber = false;
+				VWB_DrawGraphic (tex, 194 - tex->GetScaledWidth(), PrintY - 1, MENU_CENTER);
+			}
+		}
+
+		if(drawNumber)
 			US_Print (font, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);
 
 		//
@@ -767,6 +686,13 @@ void CheckHighScore (int32_t score, word other)
 	strcpy (myscore.name, "");
 	myscore.score = score;
 	myscore.completed = other;
+	if(levelInfo->HighScoresGraphic.isValid())
+	{
+		strncpy(myscore.graphic, TexMan[levelInfo->HighScoresGraphic]->Name, 8);
+		myscore.graphic[8] = 0;
+	}
+	else
+		myscore.graphic[0] = 0;
 
 	for (i = 0, n = -1; i < MaxScores; i++)
 	{

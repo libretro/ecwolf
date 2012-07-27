@@ -105,6 +105,7 @@ public:
 	FTextureID		DefaultTexture[2];
 	unsigned int	Par;
 	FString			CompletionString;
+	FTextureID		HighScoresGraphic;
 	int				LevelBonus;
 	unsigned int	LevelNumber;
 	bool			NoIntermission;

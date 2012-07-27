@@ -42,7 +42,7 @@ actor AngelOfDeath 27
 			goto See
 		Death:
 			ANGL A .5 A_Fall
-			ANGL A .5 A_DeathScream
+			ANGL A 52.5 A_DeathScream
 			ANGL I 5
 			ANGL J 5 A_PlaySound("misc/slurpie")
 			ANGL KLMNO 5
