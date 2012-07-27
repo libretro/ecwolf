@@ -5,6 +5,7 @@
 #include "id_vl.h"
 #include "w_wad.h"
 #include "r_data/colormaps.h"
+#include "v_font.h"
 #include "v_palette.h"
 #include "wl_draw.h"
 #include "wl_main.h"
@@ -60,6 +61,7 @@ void VL_ReadPalette(const char* lump)
 	if(currentBlend.amount)
 		VL_SetBlend(currentBlend.r, currentBlend.g, currentBlend.b, currentBlend.amount, false);
 	R_InitColormaps();
+	V_RetranslateFonts();
 }
 
 /*

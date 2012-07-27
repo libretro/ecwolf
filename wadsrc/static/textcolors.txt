@@ -145,7 +145,7 @@ Console:
 	#2B230F  #BF7B4B    0 127
 	#FFB383  #FFFFFF  128 256
 Flat:
-	#FFCC99
+	#FFEADE
 }
 
 Olive
