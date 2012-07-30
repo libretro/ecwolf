@@ -224,7 +224,10 @@ void VL_SetPalette (PalEntry *palette, bool forceupdate)
 static int fadeR = 0, fadeG = 0, fadeB = 0;
 void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 {
-	const int aStep = (end-start)/steps;
+	end <<= FRACBITS;
+	start <<= FRACBITS;
+
+	const fixed aStep = (end-start)/steps;
 
 	VL_WaitVBL(1);
 
@@ -234,13 +237,13 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 	for (int a = start;(aStep < 0 ? a > end : a < end);a += aStep)
 	{
 		if(!usedoublebuffering || screenBits == 8) VL_WaitVBL(1);
-		VL_SetBlend(red, green, blue, a, true);
+		VL_SetBlend(red, green, blue, a>>FRACBITS, true);
 	}
 
 //
 // final color
 //
-	VL_SetBlend (red,green,blue,end, true);
+	VL_SetBlend (red,green,blue,end>>FRACBITS, true);
 
 	screenfaded = end != 0;
 }

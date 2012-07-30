@@ -260,6 +260,8 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
 	DeathCam = false;
+	ExitFadeColor = 0;
+	ExitFadeDuration = 30;
 	FloorNumber = 1;
 	Par = 0;
 	LevelBonus = -1;
@@ -440,6 +442,15 @@ protected:
 					sc.ScriptMessage(Scanner::ERROR, "Class %s doesn't appear to be a kind of Inventory.", classNames[i].GetChars());
 				mapInfo.EnsureInventory.Push(cls);
 			}
+		}
+		else if(key.CompareNoCase("ExitFade") == 0)
+		{
+			ParseColorAssignment(mapInfo.ExitFadeColor);
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_FloatConst);
+			if(!CheckTicsValid(sc->decimal))
+				sc.ScriptMessage(Scanner::ERROR, "Invalid tic duration.");
+			mapInfo.ExitFadeDuration = static_cast<unsigned int>(sc->decimal*2);
 		}
 		else if(key.CompareNoCase("DeathCam") == 0)
 			ParseBoolAssignment(mapInfo.DeathCam);

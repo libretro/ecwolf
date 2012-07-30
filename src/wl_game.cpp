@@ -836,7 +836,7 @@ restartgame:
 					{
 						bool endSequence = next.IndexOf("EndSequence:") == 0;
 
-						VW_FadeOut();
+						VL_FadeOut(0, 255, RPART(levelInfo->ExitFadeColor), GPART(levelInfo->ExitFadeColor), BPART(levelInfo->ExitFadeColor), levelInfo->ExitFadeDuration);
 						ClearMemory();
 
 						if(dointermission)
@@ -875,7 +875,7 @@ restartgame:
 
 				DrawStatusBar();
 				if(dointermission)
-					VW_FadeOut ();
+					VL_FadeOut(0, 255, RPART(levelInfo->ExitFadeColor), GPART(levelInfo->ExitFadeColor), BPART(levelInfo->ExitFadeColor), levelInfo->ExitFadeDuration);
 
 				ClearMemory ();
 

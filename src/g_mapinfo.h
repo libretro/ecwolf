@@ -103,6 +103,8 @@ public:
 
 	FTextureID		BorderTexture;
 	FTextureID		DefaultTexture[2];
+	int				ExitFadeColor;
+	unsigned int	ExitFadeDuration;
 	unsigned int	Par;
 	FString			CompletionString;
 	FTextureID		HighScoresGraphic;

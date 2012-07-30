@@ -448,4 +448,5 @@ map "MAP21"
 	ensureinventory = "GoldKey"
 	highscoresgraphic = "M_WONSPR"
 	nointermission
+	exitfade = "00 45 45", 150
 }
