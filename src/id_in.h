@@ -174,6 +174,8 @@ void    IN_WaitAndProcessEvents();
 void    IN_ProcessEvents();
 
 int     IN_MouseButtons (void);
+void	IN_ReleaseMouse();
+void	IN_GrabMouse();
 
 bool	IN_JoyPresent();
 void    IN_SetJoyCurrent(int joyIndex);

@@ -519,7 +519,9 @@ void CheckKeys (void)
 		int lastoffs = StopMusic();
 		VWB_DrawGraphic(TexMan("PAUSED"), (20 - 4)*8, 80 - 2*8);
 		VH_UpdateScreen();
+		IN_ReleaseMouse();
 		IN_Ack ();
+		IN_GrabMouse();
 		Paused = false;
 		ContinueMusic(lastoffs);
 		if (MousePresent && IN_IsInputGrabbed())

@@ -141,6 +141,11 @@ MENU_LISTENER(EnterControlBase)
 	controlBase[4]->setEnabled(mouseenabled);
 	controlBase[5]->setEnabled(IN_JoyPresent());
 	controlBase.draw();
+
+	if(forcegrabmouse)
+		IN_GrabMouse();
+	else if(!fullscreen)
+		IN_ReleaseMouse();
 	return true;
 }
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
