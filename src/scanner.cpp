@@ -239,8 +239,8 @@ bool Scanner::GetNextString()
 	if(scanPos >= length)
 		return false;
 
-	int start = scanPos;
-	int end = scanPos;
+	unsigned int start = scanPos;
+	unsigned int end = scanPos;
 	bool quoted = data[scanPos] == '"';
 	if(quoted) // String Constant
 	{
@@ -270,6 +270,9 @@ bool Scanner::GetNextString()
 			{
 				default:
 					break;
+				case ',':
+					if(scanPos == start)
+						break;
 				case ' ':
 				case '\t':
 				case '\n':
@@ -318,8 +321,8 @@ bool Scanner::GetNextToken(bool expandState)
 		return false;
 	}
 
-	int start = scanPos;
-	int end = scanPos;
+	unsigned int start = scanPos;
+	unsigned int end = scanPos;
 	int integerBase = 10;
 	bool floatHasDecimal = false;
 	bool floatHasExponent = false;
@@ -595,11 +598,11 @@ void Scanner::MustGetToken(char token)
 	{
 		ExpandState();
 		if(token < TK_NumSpecialTokens && state.token < TK_NumSpecialTokens)
-			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%s' instead.", TokenNames[token], TokenNames[state.token]);
+			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%s' instead.", TokenNames[(int)token], TokenNames[(int)state.token]);
 		else if(token < TK_NumSpecialTokens && state.token >= TK_NumSpecialTokens)
-			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%c' instead.", TokenNames[token], state.token);
+			ScriptMessage(Scanner::ERROR, "Expected '%s' but got '%c' instead.", TokenNames[(int)token], state.token);
 		else if(token >= TK_NumSpecialTokens && state.token < TK_NumSpecialTokens)
-			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%s' instead.", token, TokenNames[state.token]);
+			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%s' instead.", token, TokenNames[(int)state.token]);
 		else
 			ScriptMessage(Scanner::ERROR, "Expected '%c' but got '%c' instead.", token, state.token);
 	}
