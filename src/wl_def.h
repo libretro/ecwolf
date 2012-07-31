@@ -217,6 +217,7 @@ typedef enum
 	FL_COUNTITEM		= 0x00080000,
 	FL_COUNTSECRET		= 0x00100000,
 	FL_DROPBASEDONTARGET= 0x00200000,
+	FL_REQUIREKEYS		= 0x00400000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
 

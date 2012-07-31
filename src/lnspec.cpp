@@ -289,7 +289,10 @@ FUNC(Door_Open)
 		if(buttonheld[bt_use])
 			return 0;
 		buttonheld[bt_use] = true;
+	}
 
+	if(activator->player || (activator->flags & FL_REQUIREKEYS))
+	{
 		if(args[1] != 0)
 		{
 			if(!P_CheckKeys(activator, args[1], false))
