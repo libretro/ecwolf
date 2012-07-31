@@ -188,6 +188,7 @@ class Menu
 		FTexture			*headPicture;
 		char				headText[36];
 		bool				headTextInStripes;
+		bool				headPictureIsAlternate;
 		int					height;
 		const int			indent;
 		TArray<MenuItem *>	items;
@@ -228,7 +229,7 @@ class Menu
 		int				getY() const { return y; }
 		bool			isAnimating() const { return animating; }
 		void			setCurrentPosition(int position);
-		void			setHeadPicture(const char* picture);
+		void			setHeadPicture(const char* picture, bool isAlt=false);
 		void			setHeadText(const char text[36], bool drawInStripes=false);
 		void			show();
 		/**

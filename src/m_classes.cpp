@@ -478,8 +478,8 @@ void Menu::eraseGun(int x, int y)
 
 Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) :
 	entryListener(entryListener), curPos(0), headPicture(NULL),
-	headTextInStripes(false), height(0), indent(indent), x(x), y(y), w(w),
-	itemOffset(0)
+	headTextInStripes(false), headPictureIsAlternate(false), height(0),
+	indent(indent), x(x), y(y), w(w), itemOffset(0)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';
@@ -615,7 +615,7 @@ void Menu::draw() const
 {
 	static FTexture * const mcontrol = TexMan("M_MCONTL");
 	ClearMScreen();
-	if(headPicture)
+	if(headPicture && !headPictureIsAlternate)
 	{
 		DrawStripes(10);
 		VWB_DrawGraphic(headPicture, 160-headPicture->GetScaledWidth()/2, 0, MENU_TOP);
@@ -643,7 +643,11 @@ void Menu::draw() const
 			DrawStripes(10);
 			PrintY = 15;
 		}
-		US_CPrint(BigFont, headText, gameinfo.FontColors[GameInfo::MENU_TITLE]);
+
+		if(headPictureIsAlternate && headPicture)
+			VWB_DrawGraphic(headPicture, 160-headPicture->GetScaledWidth()/2, PrintY, MENU_CENTER);
+		else
+			US_CPrint(BigFont, headText, gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	}
 
 	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);
@@ -949,9 +953,10 @@ void Menu::setCurrentPosition(int position)
 	}
 }
 
-void Menu::setHeadPicture(const char* picture)
+void Menu::setHeadPicture(const char* picture, bool isAlt)
 {
 	headPicture = TexMan(picture);
+	headPictureIsAlternate = isAlt;
 }
 
 void Menu::setHeadText(const char text[36], bool drawInStripes)

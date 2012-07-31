@@ -399,6 +399,7 @@ void CreateMenus()
 	}
 
 	skills.setHeadText(language["STR_HOWTOUGH"]);
+	skills.setHeadPicture("M_HOWTGH", true);
 	const char* skillText[4] =
 	{
 		language["STR_DADDY"],
