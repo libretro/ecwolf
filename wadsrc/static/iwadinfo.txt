@@ -1,23 +1,15 @@
 IWad
 {
-	Name = "Wolfenstein 3D"
-	Mapinfo = "mapinfo/wolf3d.txt"
-	MustContain = "BJPIC", "MAP22"
-	Flags = Registered, HelpHack
-}
-
-IWad
-{
 	Name = "Spear of Destiny"
 	Mapinfo = "mapinfo/spear.txt"
-	MustContain = "BACKDROP", "MAP11"
+	MustContain = "BACKDROP", "ENDSCR1"
 }
 
 IWad
 {
 	Name = "Wolfenstein 3D Shareware"
 	Mapinfo = "mapinfo/wolf3d.txt"
-	MustContain = "BJPIC"
+	MustContain = "BJPIC", "VISACARD"
 }
 
 IWad
@@ -25,4 +17,12 @@ IWad
 	Name = "Spear of Destiny Demo"
 	Mapinfo = "mapinfo/speardemo.txt"
 	MustContain = "BACKDROP"
+}
+
+IWad
+{
+	Name = "Wolfenstein 3D"
+	Mapinfo = "mapinfo/wolf3d.txt"
+	MustContain = "BJPIC"
+	Flags = Registered, HelpHack
 }
