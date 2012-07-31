@@ -18,6 +18,7 @@ gameinfo
 	borderflat = "#004040"
 	advisorycolor = "20 A8 FC"
 	advisorypic = "PG13"
+	playerclasses = "BJPlayer"
 }
 
 defaultmap

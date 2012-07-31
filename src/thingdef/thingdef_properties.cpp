@@ -108,6 +108,13 @@ HANDLE_PROPERTY(deathsound)
 	defaults->deathsound = snd;
 }
 
+HANDLE_PROPERTY(displayname)
+{
+	STRING_PARAM(name, 0);
+
+	cls->Meta.SetMetaString(APMETA_DisplayName, name);
+}
+
 HANDLE_PROPERTY(dropitem)
 {
 	// NOTE: When used with inheritance the old list is wiped.
@@ -348,6 +355,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(attacksound, Actor, S),
 	DEFINE_PROP(damage, Actor, I),
 	DEFINE_PROP(deathsound, Actor, S),
+	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
 	DEFINE_PROP(icon, Inventory, S),

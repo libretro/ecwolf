@@ -124,12 +124,16 @@ int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 =====================
 */
 
-void NewGame (int difficulty, const FString &map)
+void NewGame (int difficulty, const FString &map, const ClassDef *playerClass)
 {
+	if(!playerClass)
+		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
+
 	memset (&gamestate,0,sizeof(gamestate));
 	gamestate.difficulty = difficulty;
 	strncpy(gamestate.mapname, map, 8);
 	gamestate.mapname[8] = 0;
+	gamestate.playerClass = playerClass;
 	levelInfo = &LevelInfo::Find(map);
 
 	players[0].state = player_t::PST_ENTER;

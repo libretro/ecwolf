@@ -29,11 +29,13 @@
 #include "colormatcher.h"
 #include "v_font.h"
 #include "templates.h"
+#include "thingdef/thingdef.h"
 #include "wl_loadsave.h"
 
 #include <climits>
 
 extern int	lastgamemusicoffset;
+const ClassDef *playerClass = NULL;
 EpisodeInfo	*episode = 0;
 int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG;
 static MenuItem	*readThis;
@@ -47,6 +49,7 @@ Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(60, 95, 225, 56);
 Menu mouseSensitivity(20, 80, 300, 0);
+Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
 Menu controls(15, 70, 310, 24);
@@ -148,6 +151,12 @@ MENU_LISTENER(EnterControlBase)
 		IN_ReleaseMouse();
 	return true;
 }
+MENU_LISTENER(SetPlayerClassAndSwitch)
+{
+	playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[which]);
+
+	return true;
+}
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
@@ -180,9 +189,11 @@ MENU_LISTENER(StartNewGame)
 {
 	if(episode == NULL)
 		episode = &EpisodeInfo::GetEpisode(0);
+	if(playerClass == NULL)
+		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
 
 	Menu::closeMenus();
-	NewGame(which, episode->StartMap);
+	NewGame(which, episode->StartMap, playerClass);
 
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR
@@ -348,7 +359,10 @@ void CreateMenus()
 
 	mainMenu.setHeadPicture("M_OPTION");
 
-	if(EpisodeInfo::GetNumEpisodes() > 1)
+	const bool useEpisodeMenu = EpisodeInfo::GetNumEpisodes() > 1;
+	if(gameinfo.PlayerClasses.Size() > 1)
+		mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], playerClasses));
+	else if(useEpisodeMenu)
 		mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], episodes));
 	else
 		mainMenu.addItem(new MenuSwitcherMenuItem(language["STR_NG"], skills));
@@ -363,6 +377,14 @@ void CreateMenus()
 	mainMenu.addItem(new MenuItem(language["STR_VS"], ViewScoresOrEndGame));
 	mainMenu.addItem(new MenuItem(language["STR_BD"], PlayDemosOrReturnToGame));
 	mainMenu.addItem(new MenuItem(language["STR_QT"], QuitGame));
+
+	playerClasses.setHeadText(language["STR_PLAYERCLASS"]);
+	for(unsigned int i = 0;i < gameinfo.PlayerClasses.Size();++i)
+	{
+		const ClassDef *cls = ClassDef::FindClass(gameinfo.PlayerClasses[i]);
+		MenuItem *tmp = new MenuSwitcherMenuItem(cls->Meta.GetMetaString(APMETA_DisplayName), useEpisodeMenu ? episodes : skills, SetPlayerClassAndSwitch);
+		playerClasses.addItem(tmp);
+	}
 
 	episodes.setHeadText(language["STR_WHICHEPISODE"]);
 	for(unsigned int i = 0;i < EpisodeInfo::GetNumEpisodes();++i)

@@ -66,6 +66,7 @@ public:
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
 
+	TArray<FName>	PlayerClasses;
 	TArray<FString>	QuitMessages;
 
 	enum EFontColors

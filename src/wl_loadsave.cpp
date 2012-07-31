@@ -447,6 +447,7 @@ void QuickLoad()
 static void Serialize(FArchive &arc)
 {
 	arc << gamestate.difficulty
+		<< gamestate.playerClass
 		<< gamestate.secretcount
 		<< gamestate.treasurecount
 		<< gamestate.killcount

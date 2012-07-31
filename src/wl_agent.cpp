@@ -1084,8 +1084,7 @@ FArchive &operator<< (FArchive &arc, player_t *&player)
 
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
-	static const ClassDef * const playerClass = ClassDef::FindClass("BJPlayer");
-	players[0].mo = (APlayerPawn *) AActor::Spawn(playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
+	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
 	players[0].mo->angle = (450-dir)*ANGLE_1;
 	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables

@@ -43,6 +43,7 @@
 #include "wl_iwad.h"
 #include "v_video.h"
 #include "g_shared/a_inventory.h"
+#include "g_shared/a_playerpawn.h"
 #include "thingdef/thingdef.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -560,6 +561,18 @@ protected:
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		else if(key.CompareNoCase("pageindexfontcolor") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::PAGEINDEX]);
+		else if(key.CompareNoCase("playerclasses") == 0)
+		{
+			sc.MustGetToken('=');
+			gameinfo.PlayerClasses.Clear();
+			do
+			{
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.PlayerClasses.Push(sc->str);
+				
+			}
+			while(sc.CheckToken(','));
+		}
 		else if(key.CompareNoCase("quitmessages") == 0)
 			ParseStringArrayAssignment(gameinfo.QuitMessages);
 		else
@@ -1010,6 +1023,17 @@ void G_ParseMapInfo(bool gameinfoPass)
 	while((lump = Wads.FindLump("ZMAPINFO", &lastlump)) != -1)
 		ParseMapInfoLump(lump, gameinfoPass);
 
-	if(!gameinfoPass && episodes.Size() == 0)
-		Quit("At least 1 episode must be defined.");
+	// Sanity checks!
+	if(!gameinfoPass)
+	{
+		if(episodes.Size() == 0)
+			Quit("At least 1 episode must be defined.");
+
+		for(unsigned int i = 0;i < gameinfo.PlayerClasses.Size();++i)
+		{
+			const ClassDef *cls = ClassDef::FindClass(gameinfo.PlayerClasses[i]);
+			if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(PlayerPawn)))
+				Quit("'%s' is not a valid player class!", gameinfo.PlayerClasses[i].GetChars());
+		}
+	}
 }

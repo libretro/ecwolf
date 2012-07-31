@@ -21,6 +21,7 @@ extern struct gametype
 {
 	char		mapname[9];
 	short       difficulty;
+	const class ClassDef *playerClass;
 
 	FTextureID  faceframe;
 
