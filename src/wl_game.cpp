@@ -756,7 +756,7 @@ restartgame:
 					if(ensure->IsDescendantOf(NATIVE_CLASS(Ammo)))
 					{
 						// For ammo ensure we have the proper amount
-						AAmmo *ammo = static_cast<AAmmo*>(AActor::Spawn(ensure, 0, 0, 0));
+						AAmmo *ammo = static_cast<AAmmo*>(AActor::Spawn(ensure, 0, 0, 0, false));
 						ammo->RemoveFromWorld();
 
 						if(!holding)
@@ -778,7 +778,7 @@ restartgame:
 					if(holding)
 						continue;
 
-					AInventory *item = static_cast<AInventory*>(AActor::Spawn(ensure, 0, 0, 0));
+					AInventory *item = static_cast<AInventory*>(AActor::Spawn(ensure, 0, 0, 0, false));
 					item->RemoveFromWorld();
 					if(!item->TryPickup(players[0].mo))
 						item->Destroy();

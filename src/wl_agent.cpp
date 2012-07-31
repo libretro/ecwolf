@@ -1084,7 +1084,7 @@ FArchive &operator<< (FArchive &arc, player_t *&player)
 
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
-	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0);
+	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, false);
 	players[0].mo->angle = (450-dir)*ANGLE_1;
 	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables
@@ -1290,7 +1290,7 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
 		return;
-	AActor *newobj = AActor::Spawn(cls, newx, newy, 0);
+	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, true);
 	newobj->flags |= FL_PLAYERMISSILE;
 	newobj->angle = iangle;
 

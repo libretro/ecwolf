@@ -315,7 +315,7 @@ void AWeapon::AttachToOwner(AActor *owner)
 	ammo1 = static_cast<AAmmo *>(owner->FindInventory(ammotype1));
 	if(!ammo1)
 	{
-		ammo1 = static_cast<AAmmo *>(Spawn(ammotype1, 0, 0, 0));
+		ammo1 = static_cast<AAmmo *>(Spawn(ammotype1, 0, 0, 0, false));
 		ammo1->amount = MIN(ammogive1, ammo1->maxamount);
 		owner->AddInventory(ammo1);
 		ammo1->RemoveFromWorld();

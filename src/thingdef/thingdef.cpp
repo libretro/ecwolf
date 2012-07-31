@@ -417,6 +417,7 @@ ClassDef::ClassDef() : tentative(false)
 {
 	defaultInstance = NULL;
 	FlatPointers = Pointers = NULL;
+	replacement = replacee = NULL;
 }
 
 ClassDef::~ClassDef()
@@ -882,8 +883,29 @@ void ClassDef::ParseActor(Scanner &sc)
 		if(newClass != NATIVE_CLASS(Actor))
 			newClass->parent = NATIVE_CLASS(Actor);
 	}
+
+	// Handle class replacements
+	if(sc.CheckToken(TK_Identifier))
+	{
+		if(sc->str.CompareNoCase("replaces") == 0)
+		{
+			sc.MustGetToken(TK_Identifier);
+
+			if(sc->str.CompareNoCase(newClass->name) == 0)
+				sc.ScriptMessage(Scanner::ERROR, "Actor '%s' attempting to replace itself!", sc->str.GetChars());
+
+			ClassDef *replacee = const_cast<ClassDef *>(FindClassTentative(sc->str, NATIVE_CLASS(Actor)));
+			replacee->replacement = newClass;
+			newClass->replacee = replacee;
+		}
+		else
+			sc.Rewind();
+	}
+
 	if(sc.CheckToken(TK_IntConst))
 	{
+		if(classNumTable.CheckKey(sc->number) != NULL)
+			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, classNumTable[sc->number]->GetName().GetChars());
 		classNumTable[sc->number] = newClass;
 	}
 	if(sc.CheckToken(TK_Identifier))

@@ -380,7 +380,7 @@ void GameMap::SpawnThings() const
 				printf("Unknown thing %d @ (%d, %d)\n", thing.type, thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
 
-			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0);
+			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, true);
 			// This forumla helps us to avoid errors in roundoffs.
 			actor->angle = (thing.angle/45)*ANGLE_45 + (thing.angle%45)*ANGLE_1;
 			actor->dir = dirtype(thing.angle/45);
@@ -397,7 +397,7 @@ void GameMap::SpawnThings() const
 			if(!actor->state || !R_CheckSpriteValid(actor->sprite))
 			{
 				actor->Destroy();
-				actor = AActor::Spawn(unknownClass, thing.x, thing.y, 0);
+				actor = AActor::Spawn(unknownClass, thing.x, thing.y, 0, true);
 
 				printf("%s at (%d, %d) has no frames\n", cls->GetName().GetChars(), thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}

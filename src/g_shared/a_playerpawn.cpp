@@ -108,7 +108,7 @@ void APlayerPawn::GiveStartingInventory()
 		if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 			continue;
 
-		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0);
+		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0, false);
 		invItem->RemoveFromWorld();
 		invItem->amount = inv.amount;
 		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))

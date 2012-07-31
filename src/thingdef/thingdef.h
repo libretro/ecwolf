@@ -270,6 +270,7 @@ class ClassDef
 		AActor					*GetDefault() const { return (AActor*)defaultInstance; }
 		const FName				&GetName() const { return name; }
 		const ClassDef			*GetParent() const { return parent; }
+		const ClassDef			*GetReplacement() const { return replacement ? replacement : this; }
 		size_t					GetSize() const { return size; }
 		const Frame				*GetState(unsigned int index) const { return frameList[index]; }
 		static void				LoadActors();
@@ -302,6 +303,9 @@ class ClassDef
 		FName			name;
 		const ClassDef	*parent;
 		size_t			size;
+
+		const ClassDef	*replacement;
+		const ClassDef	*replacee;
 
 		TMap<FName, unsigned int>	stateList;
 		TArray<Frame *>			frameList;

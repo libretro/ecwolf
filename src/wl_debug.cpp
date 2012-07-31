@@ -298,7 +298,7 @@ int DebugKeys (void)
 				(cls->GetParent() == NATIVE_CLASS(Ammo))
 			)
 			{
-				inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0);
+				inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
 				inv->RemoveFromWorld();
 				if(cls->GetParent() == NATIVE_CLASS(Ammo))
 					inv->amount = inv->maxamount;
@@ -474,7 +474,7 @@ int DebugKeys (void)
 			if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 				return 1;
 
-			AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0);
+			AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
 			inv->RemoveFromWorld();
 			if(!inv->TryPickup(players[0].mo))
 				inv->Destroy();

@@ -258,7 +258,7 @@ ACTION_FUNCTION(A_CustomMissile)
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
 		return;
-	AActor *newobj = AActor::Spawn(cls, newx, newy, 0);
+	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, true);
 	newobj->angle = iangle;
 
 	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);

@@ -476,7 +476,7 @@ class EVVictorySpin : public Thinker
 			gamestate.victoryflag = true;
 			players[0].SetPSprite(NULL);
 
-			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0);
+			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0, true);
 			runner->flags |= FL_PATHING;
 			runner->angle = ((direction+2)%4)*ANGLE_90;
 			runner->dir = static_cast<dirtype>(runner->angle/ANGLE_45);

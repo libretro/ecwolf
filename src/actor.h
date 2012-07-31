@@ -191,7 +191,7 @@ class AActor : public DObject
 		void			RemoveInventory(AInventory *item);
 		void			Serialize(FArchive &arc);
 		void			SetState(const Frame *state, bool notic=false);
-		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z);
+		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allowreplacement);
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
 

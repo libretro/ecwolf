@@ -460,7 +460,7 @@ bool P_GiveKeys (AActor *owner, int keynum)
 			OneKey &key = lock->keylist[i]->anykeylist[j];
 			if(!key.check(owner))
 			{
-				AKey *newKey = (AKey*) AActor::Spawn(key.key, 0, 0, 0);
+				AKey *newKey = (AKey*) AActor::Spawn(key.key, 0, 0, 0, false);
 				newKey->RemoveFromWorld();
 				if(!newKey->TryPickup(owner))
 					newKey->Destroy();

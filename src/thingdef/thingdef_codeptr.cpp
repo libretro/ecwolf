@@ -163,7 +163,7 @@ ACTION_FUNCTION(A_BossDeath)
 
 	if(levelInfo->DeathCam && !deathcamRun)
 	{
-		ADeathCam *dc = (ADeathCam*)AActor::Spawn(NATIVE_CLASS(DeathCam), 0, 0, 0);
+		ADeathCam *dc = (ADeathCam*)AActor::Spawn(NATIVE_CLASS(DeathCam), 0, 0, 0, true);
 		dc->SetupDeathCam(self, players[0].mo);
 	}
 	else
@@ -219,7 +219,7 @@ ACTION_FUNCTION(A_GiveInventory)
 
 	if(cls && cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 	{
-		AInventory *inv = (AInventory *)AActor::Spawn(cls, 0, 0, 0);
+		AInventory *inv = (AInventory *)AActor::Spawn(cls, 0, 0, 0, true);
 		if(inv->IsKindOf(NATIVE_CLASS(Health)))
 			inv->amount *= amount;
 		else
@@ -302,7 +302,7 @@ ACTION_FUNCTION(A_SpawnItem)
 	AActor *newobj = AActor::Spawn(cls,
 		self->x + fixed(distance*finecosine[self->angle>>ANGLETOFINESHIFT])/64,
 		self->y - fixed(distance*finesine[self->angle>>ANGLETOFINESHIFT])/64,
-		0);
+		0, true);
 }
 
 static FRandom pr_spawnitemex("SpawnItemEx");
@@ -337,7 +337,7 @@ ACTION_FUNCTION(A_SpawnItemEx)
 	fixed y = self->y - fixed(xoffset*finesine[ang])/64 + fixed(yoffset*finecosine[ang])/64;
 	angle = angle_t((angle*ANGLE_45)/45) + self->angle;
 
-	AActor *newobj = AActor::Spawn(cls, x, y, 0);
+	AActor *newobj = AActor::Spawn(cls, x, y, 0, true);
 
 	if(flags & SXF_TRANSFERPOINTERS)
 	{

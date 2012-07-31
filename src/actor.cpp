@@ -250,7 +250,7 @@ void AActor::Die()
 					// the AI, so it can be off by one.
 					static const fixed TILEMASK = ~(TILEGLOBAL-1);
 
-					AActor *actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0);
+					AActor *actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0, true);
 					actor->angle = angle;
 					actor->dir = dir;
 					if(cls->IsDescendantOf(NATIVE_CLASS(Ammo)))
@@ -463,13 +463,16 @@ void AActor::RemoveInventory(AInventory *item)
 	item->DetachFromOwner();
 }
 
-AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z)
+AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allowreplacement)
 {
 	if(type == NULL)
 	{
 		printf("Tried to spawn classless actor.\n");
 		return NULL;
 	}
+
+	if(allowreplacement)
+		type = type->GetReplacement();
 
 	AActor *actor = type->CreateInstance();
 	actor->x = x;
