@@ -457,23 +457,7 @@ void CheckKeys (void)
 	// SECRET CHEAT CODE: 'MLI'
 	//
 	if (Keyboard[sc_M] && Keyboard[sc_L] && Keyboard[sc_I])
-	{
-		players[0].health = 100;
-		players[0].score = 0;
-		gamestate.TimeCount += 42000L;
-		DrawStatusBar();
-
-		ClearMemory ();
-		ClearSplitVWB ();
-
-		Message (language["STR_CHEATER"]);
-
-		IN_ClearKeysDown ();
-		IN_Ack ();
-
-		if (viewsize < 17)
-			DrawPlayBorder ();
-	}
+		DebugMLI();
 
 	//
 	// OPEN UP DEBUG KEYS

@@ -9,11 +9,13 @@
 #include "wl_def.h"
 #include "wl_menu.h"
 #include "id_ca.h"
+#include "id_sd.h"
 #include "id_vl.h"
 #include "id_vh.h"
 #include "id_us.h"
 #include "g_mapinfo.h"
 #include "actor.h"
+#include "language.h"
 #include "wl_agent.h"
 #include "wl_debug.h"
 #include "wl_draw.h"
@@ -178,6 +180,35 @@ void BasicOverhead (void)
 //===========================================================================
 
 
+static void GiveAllWeaponsAndAmmo()
+{
+	// Give Weapons and Max out ammo
+	ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
+	ClassDef::ClassPair *pair;
+	while(iter.NextPair(pair))
+	{
+		const ClassDef *cls = pair->Value;
+		AInventory *inv = NULL;
+		if((cls->IsDescendantOf(NATIVE_CLASS(Weapon)) && cls != NATIVE_CLASS(Weapon)) ||
+			(cls->GetParent() == NATIVE_CLASS(Ammo))
+		)
+		{
+			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
+			inv->RemoveFromWorld();
+			if(cls->GetParent() == NATIVE_CLASS(Ammo))
+				inv->amount = inv->maxamount;
+			else if(!cls->FindState("Ready"))
+			{ // Only give valid weapons
+				inv->Destroy();
+				continue;
+			}
+
+			if(!inv->TryPickup(players[0].mo))
+				inv->Destroy();
+		}
+	}
+}
+
 /*
 ================
 =
@@ -287,31 +318,7 @@ int DebugKeys (void)
 		US_CenterWindow (12,3);
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
-		// Give Weapons and Max out ammo
-		ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
-		ClassDef::ClassPair *pair;
-		while(iter.NextPair(pair))
-		{
-			const ClassDef *cls = pair->Value;
-			AInventory *inv = NULL;
-			if((cls->IsDescendantOf(NATIVE_CLASS(Weapon)) && cls != NATIVE_CLASS(Weapon)) ||
-				(cls->GetParent() == NATIVE_CLASS(Ammo))
-			)
-			{
-				inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
-				inv->RemoveFromWorld();
-				if(cls->GetParent() == NATIVE_CLASS(Ammo))
-					inv->amount = inv->maxamount;
-				else if(!cls->FindState("Ready"))
-				{ // Only give valid weapons
-					inv->Destroy();
-					continue;
-				}
-
-				if(!inv->TryPickup(players[0].mo))
-					inv->Destroy();
-			}
-		}
+		GiveAllWeaponsAndAmmo();
 		GivePoints (100000);
 		players[0].health = 100;
 		DrawStatusBar();
@@ -523,6 +530,26 @@ int DebugKeys (void)
 #endif
 
 	return 0;
+}
+
+void DebugMLI()
+{
+	players[0].health = 100;
+	players[0].score = 0;
+	gamestate.TimeCount += 42000L;
+	GiveAllWeaponsAndAmmo();
+	P_GiveKeys(players[0].mo, 101);
+	DrawPlayScreen();
+
+	ClearMemory ();
+	ClearSplitVWB ();
+
+	Message (language["STR_CHEATER"]);
+
+	IN_ClearKeysDown ();
+	IN_Ack ();
+
+	DrawPlayScreen();
 }
 
 

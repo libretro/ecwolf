@@ -10,5 +10,6 @@
 */
 
 int DebugKeys (void);
+void DebugMLI();
 
 #endif
