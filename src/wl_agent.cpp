@@ -278,8 +278,9 @@ void WeaponGrin ()
 	facecount = 140;
 }
 
-void UpdateFace (void)
+void UpdateFace (bool damageUpdate)
 {
+	static int oldHealth = 100;
 	static bool noGodFace = false;
 	static FTextureID godmodeFace[3] = { TexMan.CheckForTexture("STFGOD0", FTexture::TEX_Any), TexMan.CheckForTexture("STFGOD1", FTexture::TEX_Any), TexMan.CheckForTexture("STFGOD2", FTexture::TEX_Any) };
 	static FTextureID waitFace[2] = { TexMan.CheckForTexture("STFWAIT0", FTexture::TEX_Any), TexMan.CheckForTexture("STFWAIT1", FTexture::TEX_Any) };
@@ -293,6 +294,15 @@ void UpdateFace (void)
 		{ TexMan.CheckForTexture("STFST50", FTexture::TEX_Any), TexMan.CheckForTexture("STFST51", FTexture::TEX_Any), TexMan.CheckForTexture("STFST52", FTexture::TEX_Any) },
 		{ TexMan.CheckForTexture("STFST60", FTexture::TEX_Any), TexMan.CheckForTexture("STFST61", FTexture::TEX_Any), TexMan.CheckForTexture("STFST62", FTexture::TEX_Any) },
 	};
+
+	if(damageUpdate)
+	{
+		// Update the face only if we've changed damage levels.
+		if((100-players[0].health)/16 == (100-oldHealth)/16)
+			return;
+		facecount = 0;
+	}
+	oldHealth = players[0].health;
 
 	// OK Wolf apparently did something more along the lines of ++facecount > M_Random()
 	// This doesn't seem to work as well with the new random generator, so lets take a different approach.
@@ -423,10 +433,7 @@ void TakeDamage (int points,AActor *attacker)
 		facecount = 17;
 	}
 	else
-	{
-		facecount = 0;
-		UpdateFace();
-	}
+		UpdateFace(true);
 	DrawStatusBar();
 }
 
