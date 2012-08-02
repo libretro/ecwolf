@@ -454,7 +454,7 @@ int DebugKeys (void)
 			if(isNumber)
 			{
 				int num = atoi(str);
-				LevelInfo &info = LevelInfo::FindByNumber(num + 1);
+				LevelInfo &info = LevelInfo::FindByNumber(num);
 				if(info.MapName[0])
 					strcpy(str, info.MapName);
 			}
