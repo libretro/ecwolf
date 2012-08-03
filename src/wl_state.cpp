@@ -92,6 +92,9 @@ void    FirstSighting (AActor *ob);
 
 static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTrigger::Side dir, bool canuse)
 {
+	static const int deltax[9] = { 1, 1, 0, -1, -1, -1, 0, 1, 0 };
+	static const int deltay[9] = { 0, -1, -1, -1, 0, 1, 1, 1, 0 };
+
 	MapSpot spot = map->GetSpot(x, y, 0);
 	if(spot->tile)
 	{
@@ -117,9 +120,11 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 	}
 	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
 	{
-		if((iter->Item()->flags & FL_SOLID) &&
-			iter->Item()->tilex == x &&
-			iter->Item()->tiley == y)
+		// We want to check where the actor is heading instead of the exact
+		// tile it exists in since this is essentially how Wolf3D handled things
+		if(iter->Item() != ob && (iter->Item()->flags & FL_SOLID) &&
+			static_cast<unsigned int>(iter->Item()->tilex+deltax[iter->Item()->dir]) == x &&
+			static_cast<unsigned int>(iter->Item()->tiley+deltay[iter->Item()->dir]) == y)
 			return 0;
 	}
 	return -1;

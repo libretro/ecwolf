@@ -1575,7 +1575,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 									done = true;
 									break;
 								}
-								params[paramc].f = (negate ? -1 : 1) * sc->number;
+								params[paramc].f = (negate ? -1 : 1) * sc->decimal;
 								break;
 							case 'S':
 								if(!optional)
