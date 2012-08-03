@@ -485,7 +485,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	if(AspectCorrection[r_ratio].isWide)
 		statusbarx = screenWidth*(48-AspectCorrection[r_ratio].multiplier)/(48*2);
 
-	statusbary = 200 - STATUSLINES - scaleFactor;
+	statusbary = 200 - STATUSLINES - 1;
 	if(AspectCorrection[r_ratio].tallscreen)
 		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[r_ratio].baseHeight + screenHeight/2
 			+ (screenHeight - screenHeight*AspectCorrection[r_ratio].multiplier/48)/2;

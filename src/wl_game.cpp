@@ -340,6 +340,8 @@ void DrawPlayBorderSides(void)
 			VWB_Clear(colors[1], viewscreenx+viewwidth, viewscreeny-scaleFactor, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight);
 			VWB_Clear(colors[2], viewscreenx-scaleFactor, viewscreeny+viewheight, viewscreenx, viewscreeny+viewheight+scaleFactor);
 		}
+		else
+			VWB_Clear(colors[1], 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+scaleFactor);
 	}
 }
 
