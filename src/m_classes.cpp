@@ -955,8 +955,12 @@ void Menu::setCurrentPosition(int position)
 
 void Menu::setHeadPicture(const char* picture, bool isAlt)
 {
-	headPicture = TexMan(picture);
-	headPictureIsAlternate = isAlt;
+	FTextureID picID = TexMan.CheckForTexture(picture, FTexture::TEX_Any);
+	if(picID.isValid())
+	{
+		headPicture = TexMan(picID);
+		headPictureIsAlternate = isAlt;
+	}
 }
 
 void Menu::setHeadText(const char text[36], bool drawInStripes)

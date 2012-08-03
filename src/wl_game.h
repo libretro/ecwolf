@@ -31,7 +31,6 @@ extern struct gametype
 	bool        victoryflag;            // set during victory animations
 } gamestate;
 
-extern  byte            bordercol;
 extern  char            demoname[13];
 
 void    SetupGameLevel (void);

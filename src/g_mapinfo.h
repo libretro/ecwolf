@@ -85,6 +85,20 @@ public:
 		NUM_FONTCOLORS
 	};
 	EColorRange	FontColors[NUM_FONTCOLORS];
+
+	struct BorderTextures
+	{
+		bool issolid;
+
+		int topcolor;
+		int bottomcolor;
+		int highlightcolor;
+
+		int offset;
+		FString tl, t, tr;
+		FString l, r;
+		FString bl, b, br;
+	} Border;
 } gameinfo;
 
 class LevelInfo

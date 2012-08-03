@@ -13,7 +13,6 @@ void MenuFadeIn();
 
 #define READCOLOR       0x4a
 #define READHCOLOR      0x47
-#define VIEWCOLOR       0x7f
 #define TEXTCOLOR       0x17
 #define HIGHLIGHT       0x13
 

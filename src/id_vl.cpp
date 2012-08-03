@@ -42,7 +42,6 @@ unsigned curPitch;
 unsigned scaleFactor;
 
 bool	 screenfaded;
-unsigned bordercolor;
 
 SDL_Color gamepal[256];
 

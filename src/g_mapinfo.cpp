@@ -503,6 +503,57 @@ protected:
 			ParseColorAssignment(gameinfo.AdvisoryColor);
 		else if(key.CompareNoCase("advisorypic") == 0)
 			ParseStringAssignment(gameinfo.AdvisoryPic);
+		else if(key.CompareNoCase("border") == 0)
+		{
+			sc.MustGetToken('=');
+			if(sc.CheckToken(TK_Identifier))
+			{
+				gameinfo.Border.issolid = true;
+				if(!sc->str.CompareNoCase("inset") == 0)
+					sc.ScriptMessage(Scanner::ERROR, "Expected 'inset' got '%s' instead.", sc->str.GetChars());
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.topcolor = V_GetColorFromString(NULL, sc->str);
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.bottomcolor = V_GetColorFromString(NULL, sc->str);
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.highlightcolor = V_GetColorFromString(NULL, sc->str);
+			}
+			else
+			{
+				gameinfo.Border.issolid = false;
+				sc.MustGetToken(TK_IntConst);
+				gameinfo.Border.offset = sc->number;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_IntConst); // Unused
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.tl = sc->str;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.t = sc->str;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.tr = sc->str;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.l = sc->str;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.r = sc->str;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.bl = sc->str;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.b = sc->str;
+				sc.MustGetToken(',');
+				sc.MustGetToken(TK_StringConst);
+				gameinfo.Border.br = sc->str;
+			}
+		}
 		else if(key.CompareNoCase("borderflat") == 0)
 			ParseStringAssignment(gameinfo.BorderFlat);
 		else if(key.CompareNoCase("creditpage") == 0)

@@ -390,8 +390,42 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 	VL_UnlockSurface(screenBuffer);
 }
 
-void VWB_DrawFill(FTexture *tex, unsigned int ix, unsigned int iy, unsigned int iw, unsigned int ih)
+void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local)
 {
+	if(iw < 0 || ih < 0)
+		return;
+	if(static_cast<unsigned int>(iw) > screenWidth)
+		iw = screenWidth;
+	if(static_cast<unsigned int>(ih) > screenHeight)
+		ih = screenHeight;
+
+	// origin
+	unsigned int ox = 0, oy = 0;
+	if(local)
+	{
+		if(ix < 0)
+		{
+			ox = -ix;
+			ix = 0;
+		}
+		else
+			ox = ix;
+		if(iy < 0)
+		{
+			oy = -iy;
+			iy = 0;
+		}
+		else
+			oy = iy;
+	}
+	else
+	{
+		if(ix < 0)
+			ix = 0;
+		if(iy < 0)
+			iy = 0;
+	}
+
 	byte *vbuf = VL_LockSurface(screenBuffer) + ix + (iy * bufferPitch);
 
 	const unsigned int width = tex->GetWidth();
@@ -401,10 +435,10 @@ void VWB_DrawFill(FTexture *tex, unsigned int ix, unsigned int iy, unsigned int 
 	const BYTE* src;
 	byte* dest = vbuf;
 	unsigned int x, y, sy;
-	for(x = ix;x < iw;++x)
+	for(x = ix;x < static_cast<unsigned int>(iw);++x)
 	{
-		src = tex->GetColumn(x%width, NULL);
-		for(y = iy, sy = iy%height;y < ih;++y)
+		src = tex->GetColumn((x+ox)%width, NULL);
+		for(y = iy, sy = (iy+oy)%height;y < static_cast<unsigned int>(ih);++y)
 		{
 			if(src[sy])
 				*dest = table[src[sy]];

@@ -119,7 +119,6 @@ void Quit(const char *errorStr, ...);
 
 #define HEIGHTRATIO     0.50            // also defined in id_mm.c
 
-#define BORDERCOLOR     3
 #define FLASHCOLOR      5
 #define FLASHTICS       4
 

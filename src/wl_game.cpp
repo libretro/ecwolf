@@ -54,7 +54,6 @@
 
 bool			ingame,fizzlein;
 gametype        gamestate;
-byte            bordercol=VIEWCOLOR;        // color of the Change View/Ingame border
 
 NewMap_t NewMap;
 
@@ -299,16 +298,49 @@ void DrawPlayBorderSides(void)
 {
 	if(viewsize == 21) return;
 
-	// Draw frame
-	if((unsigned)viewwidth != screenWidth)
+	if(!gameinfo.Border.issolid)
 	{
-		VWB_Clear(0, viewscreenx-scaleFactor, viewscreeny-scaleFactor, viewscreenx+viewwidth+scaleFactor, viewscreeny);
-		VWB_Clear(0, viewscreenx-scaleFactor, viewscreeny, viewscreenx, viewscreeny+viewheight);
-		VWB_Clear(bordercol-scaleFactor, viewscreenx+viewwidth, viewscreeny, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight);
-		VWB_Clear(bordercol-scaleFactor, viewscreenx-scaleFactor, viewscreeny+viewheight, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight+2);
+		static FTexture * const BorderTextures[8] =
+		{
+			TexMan(gameinfo.Border.tl), TexMan(gameinfo.Border.t), TexMan(gameinfo.Border.tr),
+			TexMan(gameinfo.Border.l), TexMan(gameinfo.Border.r),
+			TexMan(gameinfo.Border.bl), TexMan(gameinfo.Border.b), TexMan(gameinfo.Border.br)
+		};
+		const int offset = gameinfo.Border.offset;
+
+		// Draw frame
+		if((unsigned)viewwidth != screenWidth)
+		{
+			VWB_DrawFill(BorderTextures[0], viewscreenx-offset, viewscreeny-offset, viewscreenx, viewscreeny, true);
+			VWB_DrawFill(BorderTextures[1], viewscreenx, viewscreeny-BorderTextures[1]->GetHeight(), viewscreenx+viewwidth, viewscreeny, true);
+			VWB_DrawFill(BorderTextures[2], viewscreenx, viewscreeny-offset, viewscreenx+viewwidth+offset, viewscreeny, true);
+			VWB_DrawFill(BorderTextures[3], viewscreenx-BorderTextures[3]->GetWidth(), viewscreeny, viewscreenx, viewscreeny+viewheight, true);
+			VWB_DrawFill(BorderTextures[4], viewscreenx+viewwidth, viewscreeny, viewscreenx+viewwidth+BorderTextures[4]->GetWidth(), viewscreeny+viewheight, true);
+			VWB_DrawFill(BorderTextures[5], viewscreenx-offset, viewscreeny+viewheight, viewscreenx, viewscreeny+viewheight+offset, true);
+			VWB_DrawFill(BorderTextures[6], viewscreenx, viewscreeny+viewheight, viewscreenx+viewwidth, viewscreeny+viewheight+BorderTextures[3]->GetHeight(), true);
+			VWB_DrawFill(BorderTextures[7], viewscreenx+viewwidth, viewscreeny+viewheight, viewscreenx+viewwidth+offset, viewscreeny+viewheight+offset, true);
+		}
+		else
+			VWB_DrawFill(BorderTextures[6], 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+BorderTextures[6]->GetHeight(), true);
 	}
 	else
-		VWB_Clear(bordercol-scaleFactor, 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+scaleFactor);
+	{
+		byte colors[3] =
+		{
+			ColorMatcher.Pick(RPART(gameinfo.Border.topcolor), GPART(gameinfo.Border.topcolor), BPART(gameinfo.Border.topcolor)),
+			ColorMatcher.Pick(RPART(gameinfo.Border.bottomcolor), GPART(gameinfo.Border.bottomcolor), BPART(gameinfo.Border.bottomcolor)),
+			ColorMatcher.Pick(RPART(gameinfo.Border.highlightcolor), GPART(gameinfo.Border.highlightcolor), BPART(gameinfo.Border.highlightcolor))
+		};
+
+		if((unsigned)viewwidth != screenWidth)
+		{
+			VWB_Clear(colors[0], viewscreenx-scaleFactor, viewscreeny-scaleFactor, viewscreenx+viewwidth, viewscreeny);
+			VWB_Clear(colors[0], viewscreenx-scaleFactor, viewscreeny, viewscreenx, viewscreeny+viewheight);
+			VWB_Clear(colors[1], viewscreenx, viewscreeny+viewheight, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight+scaleFactor);
+			VWB_Clear(colors[1], viewscreenx+viewwidth, viewscreeny-scaleFactor, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight);
+			VWB_Clear(colors[2], viewscreenx-scaleFactor, viewscreeny+viewheight, viewscreenx, viewscreeny+viewheight+scaleFactor);
+		}
+	}
 }
 
 /*
