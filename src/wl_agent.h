@@ -44,6 +44,8 @@ class AWeapon;
 extern class player_t
 {
 	public:
+		player_t();
+
 		void	BringUpWeapon();
 		size_t	PropagateMark();
 		void	Reborn();
@@ -81,6 +83,12 @@ extern class player_t
 			fixed		sx;
 			fixed		sy;
 		} psprite;
+
+		// Attackheld is similar to buttonheld[bt_attack] only it only gets set
+		// to true when an attack is registered. If the button is released and
+		// then pressed again it should initiate a second attack even if
+		// NOAUTOFIRE is set.
+		bool		attackheld;
 
 		int32_t		flags;
 		State		state;

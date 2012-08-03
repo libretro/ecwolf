@@ -950,6 +950,10 @@ void Cmd_Use (void)
 =============================================================================
 */
 
+player_t::player_t() : attackheld(false)
+{
+}
+
 const fixed RAISERANGE = 96*FRACUNIT;
 const fixed RAISESPEED = FRACUNIT*6;
 

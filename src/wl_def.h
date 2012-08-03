@@ -226,6 +226,7 @@ typedef enum
 	IF_ALWAYSPICKUP		= 0x00000004,
 
 	WF_NOGRIN			= 0x00000001,
+	WF_NOAUTOFIRE		= 0x00000002,
 } objflag_t;
 
 /*

@@ -22,6 +22,7 @@ actor Knife : WolfWeapon
 	weapon.ammouse1 0
 	weapon.selectionorder 3700
 	attacksound "weapon/knife/attack"
+	+WEAPON.NOAUTOFIRE
 	states
 	{
 		Ready:
@@ -40,6 +41,7 @@ actor Pistol : WolfWeapon
 	inventory.icon "PISTOL"
 	weapon.selectionorder 1900
 	attacksound "weapon/pistol/attack"
+	+WEAPON.NOAUTOFIRE
 	states
 	{
 		Ready:

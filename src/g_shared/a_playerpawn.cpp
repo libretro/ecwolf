@@ -181,13 +181,23 @@ void APlayerPawn::Tick()
 
 	if((player->flags & player_t::PF_WEAPONREADY))
 	{
-		if(buttonstate[bt_attack] && !buttonheld[bt_attack] && player->ReadyWeapon->CheckAmmo(AWeapon::PrimaryFire, true))
-			player->SetPSprite(player->ReadyWeapon->GetAtkState(false));
+		if(buttonstate[bt_attack] && player->ReadyWeapon->CheckAmmo(AWeapon::PrimaryFire, true))
+		{
+			if(!buttonheld[bt_attack])
+				player->attackheld = false;
+			if(!(player->ReadyWeapon->weaponFlags & WF_NOAUTOFIRE) || !player->attackheld)
+			{
+				player->attackheld = true;
+				player->SetPSprite(player->ReadyWeapon->GetAtkState(false));
+			}
+		}
 		else if(player->PendingWeapon != WP_NOCHANGE)
 		{
 			player->SetPSprite(player->ReadyWeapon->GetDownState());
 		}
 	}
+	else if(player->attackheld)
+		player->attackheld = buttonstate[bt_attack];
 
 	ControlMovement(this);
 }
