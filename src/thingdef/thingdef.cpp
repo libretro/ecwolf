@@ -931,6 +931,11 @@ void ClassDef::ParseActor(Scanner &sc)
 	}
 	else
 	{
+		// This could happen if a non-native actor is declared native or
+		// possibly in the case of a stuck dependency.
+		if(!newClass->defaultInstance)
+			sc.ScriptMessage(Scanner::ERROR, "Uninitialized default instance for '%s'.", newClass->GetName().GetChars());
+
 		// Copy the parents defaults for native classes
 		if(newClass->parent)
 			memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
@@ -938,7 +943,7 @@ void ClassDef::ParseActor(Scanner &sc)
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
 	{
-		*newClass->defaultInstance = *newClass->parent->defaultInstance;
+		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
 		newClass->defaultInstance->Class = newClass;
 	}
 

@@ -44,9 +44,8 @@ using namespace std;
 #ifdef WINDOWS
 #include <direct.h>
 #define mkdir(file,mode) _mkdir(file)
-#else
-#include <sys/stat.h>
 #endif
+#include <sys/stat.h>
 
 #include "zstring.h"
 
@@ -71,11 +70,27 @@ Config::~Config()
 
 void Config::LocateConfigFile(int argc, char* argv[])
 {
+	// Look for --config parameter
+	for(int i = 0;i < argc-1;++i)
+	{
+		if(strcmp(argv[i], "--config") == 0)
+		{
+			configFile = argv[i+1];
+			ReadConfig();
+			return;
+		}
+	}
+
+	// Nothing explicitly set so go to the home directory.
 	FString configDir;
 #ifdef WINDOWS
-	configDir = argv[0];
-	int pos = configDir.LastIndexOfAny("/\\");
-	configDir = configDir.Mid(0, pos+1);
+	char *home = getenv("APPDATA");
+	if(home == NULL || *home == '\0')
+	{
+		printf("Please set your APPDATA environment variable.\n");
+		return;
+	}
+	configDir.Format("%s\\ecwolf", home);
 #else
 	char *home = getenv("HOME");
 	if(home == NULL || *home == '\0')
@@ -83,7 +98,9 @@ void Config::LocateConfigFile(int argc, char* argv[])
 		printf("Please set your HOME environment variable.\n");
 		return;
 	}
-	configDir = FString(home) + "/.config/ecwolf/";
+	configDir.Format("%s/.config/ecwolf", home);
+#endif
+
 	struct stat dirStat;
 	if(stat(configDir, &dirStat) == -1)
 	{
@@ -93,8 +110,12 @@ void Config::LocateConfigFile(int argc, char* argv[])
 			return;
 		}
 	}
+
+#ifdef WINDOWS
+	configFile = configDir + "\\ecwolf.cfg";
+#else
+	configFile = configDir + "/ecwolf.cfg";
 #endif
-	configFile = configDir + "ecwolf.cfg";
 
 	ReadConfig();
 }

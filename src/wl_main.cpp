@@ -1082,6 +1082,11 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			if(++i < argc)
 				files.Push(argv[++i]);
 		}
+		else IFARG("--config")
+		{
+			// The config code will handle this itself, so ignore it here.
+			++i;
+		}
 		else
 			files.Push(argv[i]);
 	}
@@ -1097,6 +1102,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			"Usage: ecwolf [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
+			" --config <file>        Use an explicit location for the config file\n"
 			" --file <file>          Loads an extra data file\n"
 			" --tedlevel <level>     Starts the game in the given level\n"
 			" --baby                 Sets the difficulty to baby for tedlevel\n"
