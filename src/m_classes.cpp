@@ -663,7 +663,7 @@ int Menu::handle()
 	char key;
 	static int redrawitem = 1, lastitem = -1;
 	int x, y, basey, exit, shape;
-	int32_t lastBlinkTime, timer;
+	uint32_t lastBlinkTime;
 	ControlInfo ci;
 
 	if(close)
@@ -685,7 +685,6 @@ int Menu::handle()
 	exit = 0;
 	lastBlinkTime = GetTimeCount ();
 	IN_ClearKeysDown ();
-
 
 	do
 	{
@@ -897,10 +896,16 @@ int Menu::handle()
 				getIndex(curPos)->draw();
 				VW_UpdateScreen();
 			}
+
+			// Check for mouse up
+			do { ReadAnyControl(&ci); } while(ci.button0);
 			return curPos;
 
 		case 2:
 			SD_PlaySound("menu/escape");
+
+			// Check for mouse up
+			do { ReadAnyControl(&ci); } while(ci.button1);
 			return -1;
 	}
 
