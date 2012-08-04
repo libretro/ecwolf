@@ -383,12 +383,13 @@ void GameMap::SpawnThings() const
 			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, true);
 			// This forumla helps us to avoid errors in roundoffs.
 			actor->angle = (thing.angle/45)*ANGLE_45 + (thing.angle%45)*ANGLE_1;
-			actor->dir = dirtype(thing.angle/45);
+			actor->dir = nodir;
 			if(thing.ambush)
 				actor->flags |= FL_AMBUSH;
 			if(thing.patrol)
 			{
 				actor->flags |= FL_PATHING;
+				actor->dir = dirtype(actor->angle/ANGLE_45);
 				if(actor->PathState)
 					actor->SetState(actor->PathState, true);
 			}
