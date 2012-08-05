@@ -387,6 +387,7 @@ MENU_LISTENER(PerformSaveGame)
 MENU_LISTENER(LoadSaveGame)
 {
 	loadedgame = true;
+
 	if(SaveFile::files[which].oldVersion || !SaveFile::files[which].hasFiles)
 		return false;
 
@@ -395,6 +396,8 @@ MENU_LISTENER(LoadSaveGame)
 	ShootSnd();
 	if(!quickSaveLoad)
 		Menu::closeMenus(true);
+	else
+		loadedgame = false;
 
 	saveGame.setCurrentPosition(which+1);
 	return false;
