@@ -41,9 +41,11 @@
 #include <cstring>
 using namespace std;
 
-#ifdef WINDOWS
+#if defined(WINDOWS)
 #include <direct.h>
 #define mkdir(file,mode) _mkdir(file)
+#elif defined(__APPLE__)
+#include <CoreServices/CoreServices.h>
 #endif
 #include <sys/stat.h>
 
@@ -83,7 +85,7 @@ void Config::LocateConfigFile(int argc, char* argv[])
 
 	// Nothing explicitly set so go to the home directory.
 	FString configDir;
-#ifdef WINDOWS
+#if defined(WINDOWS)
 	char *home = getenv("APPDATA");
 	if(home == NULL || *home == '\0')
 	{
@@ -91,6 +93,17 @@ void Config::LocateConfigFile(int argc, char* argv[])
 		return;
 	}
 	configDir.Format("%s\\ecwolf", home);
+#elif defined(__APPLE__)
+	UInt8 home[PATH_MAX];
+	FSRef folder;
+
+	if(FSFindFolder(kUserDomain, kPreferencesFolderType, kCreateFolder, &folder) != noErr ||
+		FSRefMakePath(&folder, home, PATH_MAX) != noErr)
+	{
+		printf("Could not create your preferences files.\n");
+		return;
+	}
+	configDir = reinterpret_cast<const char*>(home);	
 #else
 	char *home = getenv("HOME");
 	if(home == NULL || *home == '\0')
