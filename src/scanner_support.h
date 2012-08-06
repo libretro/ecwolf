@@ -27,7 +27,7 @@ inline void SCString_Unescape(SCString &obj, SCString_Index pos, const char chr)
 #include "zstring.h"
 
 typedef FString	SCString;
-typedef int		SCString_Index;
+typedef long	SCString_Index;
 
 inline SCString &SCString_AppendChar(SCString &obj, const char chr) { return obj += chr; }
 inline int SCString_Compare(const SCString &obj, const char *other) { return obj.Compare(other); }

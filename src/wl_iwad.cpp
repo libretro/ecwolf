@@ -32,8 +32,14 @@
 **
 */
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #include <CoreServices/CoreServices.h>
+#elif defined(WINDOWS)
+#define WIN32_LEAN_AND_MEAN
+#define USE_WINDOWS_DWORD
+#define ERROR WINERROR
+#include <windows.h>
+#undef ERROR
 #endif
 
 #include "resourcefiles/resourcefile.h"
@@ -305,6 +311,100 @@ static void ParseIWadInfo(FResourceFile *res)
 	}
 }
 
+#ifdef WINDOWS
+/*
+** i_system.cpp
+** Timers, pre-console output, IWAD selection, and misc system routines.
+**
+**---------------------------------------------------------------------------
+** Copyright 1998-2009 Randy Heit
+** All rights reserved.
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions
+** are met:
+**
+** 1. Redistributions of source code must retain the above copyright
+**    notice, this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. The name of the author may not be used to endorse or promote products
+**    derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+** IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+** IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+** NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**---------------------------------------------------------------------------
+**
+*/
+//==========================================================================
+//
+// QueryPathKey
+//
+// Returns the value of a registry key into the output variable value.
+//
+//==========================================================================
+
+static bool QueryPathKey(HKEY key, const char *keypath, const char *valname, FString &value)
+{
+	HKEY steamkey;
+	DWORD pathtype;
+	DWORD pathlen;
+	LONG res;
+
+	if(ERROR_SUCCESS == RegOpenKeyEx(key, keypath, 0, KEY_QUERY_VALUE, &steamkey))
+	{
+		if (ERROR_SUCCESS == RegQueryValueEx(steamkey, valname, 0, &pathtype, NULL, &pathlen) &&
+			pathtype == REG_SZ && pathlen != 0)
+		{
+			// Don't include terminating null in count
+			char *chars = value.LockNewBuffer(pathlen - 1);
+			res = RegQueryValueEx(steamkey, valname, 0, NULL, (LPBYTE)chars, &pathlen);
+			value.UnlockBuffer();
+			if (res != ERROR_SUCCESS)
+			{
+				value = "";
+			}
+		}
+		RegCloseKey(steamkey);
+	}
+	return value.IsNotEmpty();
+}
+
+//==========================================================================
+//
+// I_GetSteamPath
+//
+// Check the registry for the path to Steam, so that we can search for
+// IWADs that were bought with Steam.
+//
+//==========================================================================
+
+FString I_GetSteamPath()
+{
+	FString path;
+
+	if (QueryPathKey(HKEY_CURRENT_USER, "Software\\Valve\\Steam", "SteamPath", path))
+	{
+		return path;
+	}
+	if (QueryPathKey(HKEY_LOCAL_MACHINE, "Software\\Valve\\Steam", "InstallPath", path))
+	{
+		return path;
+	}
+	path = "";
+	return path;
+}
+#endif
+
 void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad)
 {
 	config->CreateSetting("DefaultIWad", 0);
@@ -324,7 +424,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	{
 		dataPaths = ".";
 #if !defined(__APPLE__)
-		dataPaths += ":" + config->GetConfigDir();
+		dataPaths += FString(":") + config->GetConfigDir();
 #else
 		UInt8 dataDirBase[PATH_MAX];
 		FSRef folder;
@@ -363,6 +463,22 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		split = newSplit+1;
 	}
 	while(split != 0);
+
+#if WINDOWS
+	// Look for a steam install. (Basically from ZDoom)
+	FString steamPath = I_GetSteamPath();
+	if(!steamPath.IsEmpty())
+	{
+		static const char* const steamDirs[] =
+		{
+			"Wolfenstein 3D/base",
+			"Spear of Destiny/base"
+		};
+		steamPath += "/SteamApps/common/";
+		for(unsigned int i = 0;i < countof(steamDirs);++i)
+			LookForGameData(datawadRes, basefiles, steamPath + steamDirs[i]);
+	}
+#endif
 
 	delete datawadRes;
 
