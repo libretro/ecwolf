@@ -74,6 +74,7 @@ class Config
 		 */
 		void			CreateSetting(const FName index, unsigned int defaultInt);
 		void			CreateSetting(const FName index, FString defaultString);
+		FString			GetConfigDir() const { return configDir; }
 		/**
 		 * Gets the specified setting.  Will return NULL if the setting does 
 		 * not exist.
@@ -109,6 +110,7 @@ class Config
 		bool			FindIndex(const FName index, SettingsData *&data);
 
 		bool						firstRun;
+		FString						configDir;
 		FString						configFile;
 		TMap<FName, SettingsData *>	settings;
 };

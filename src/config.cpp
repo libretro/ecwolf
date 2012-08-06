@@ -84,7 +84,6 @@ void Config::LocateConfigFile(int argc, char* argv[])
 	}
 
 	// Nothing explicitly set so go to the home directory.
-	FString configDir;
 #if defined(WINDOWS)
 	char *home = getenv("APPDATA");
 	if(home == NULL || *home == '\0')
@@ -257,8 +256,9 @@ void Config::CreateSetting(const FName index, FString defaultString)
 SettingsData *Config::GetSetting(const FName index)
 {
 	SettingsData *data;
-	FindIndex(index, data);
-	return data;
+	if(FindIndex(index, data))
+		return data;
+	return NULL;
 }
 
 bool Config::FindIndex(const FName index, SettingsData *&data)

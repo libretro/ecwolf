@@ -89,8 +89,8 @@ static int CheckData(WadStuff &wad)
 					for(unsigned int l = iwadTypes[k].Ident.Size();l-- > 0;)
 					{
 						if(iwadTypes[k].Ident[l].CompareNoCase(lump->Name) == 0 ||
-							(strnicmp(lump->FullName, "maps/", 5) == 0 &&
-							iwadTypes[k].Ident[l].CompareNoCase(FString(lump->FullName+5, strcspn(lump->FullName+5, ".")))))
+							(lump->FullName && (strnicmp(lump->FullName, "maps/", 5) == 0 &&
+							iwadTypes[k].Ident[l].CompareNoCase(FString(lump->FullName+5, strcspn(lump->FullName+5, "."))))))
 						{
 							valid[k] |= 1<<l;
 						}
@@ -194,7 +194,7 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 		{
 			if(name.CompareNoCase(BaseFileNames[baseName]) == 0)
 			{
-				base->filename[baseName] = files[i];
+				base->filename[baseName].Format("%s/%s", directory, files[i].GetChars());
 				base->isValid |= 1<<baseName;
 				break;
 			}
@@ -314,8 +314,42 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 	ParseIWadInfo(datawadRes);
 
+	// Get a list of potential data paths
+	FString dataPaths;
+	if(config->GetSetting("BaseDataPaths") == NULL)
+	{
+		Printf("Here\n");
+		dataPaths = ".";
+#if !defined(__APPLE__)
+		dataPaths += ":" + config->GetConfigDir();
+#endif
+
+		config->CreateSetting("BaseDataPaths", dataPaths);
+	}
+	dataPaths = config->GetSetting("BaseDataPaths")->GetString();
+
 	TArray<WadStuff> basefiles;
-	LookForGameData(datawadRes, basefiles, ".");
+	long split = 0;
+	do
+	{
+		long newSplit = dataPaths.IndexOf(':', split);
+		FString path = dataPaths.Mid(split, newSplit-split);
+		// Check for environment variable
+		if(path[0] == '$')
+		{
+			char* value = getenv(path.Mid(1));
+			if(value)
+				path = value;
+			else
+				path = "";
+		}
+
+		// Skip empty paths
+		if(!path.IsEmpty())
+			LookForGameData(datawadRes, basefiles, path);
+		split = newSplit+1;
+	}
+	while(split != 0);
 
 	delete datawadRes;
 
