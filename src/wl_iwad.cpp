@@ -32,6 +32,10 @@
 **
 */
 
+#ifdef __APPLE__
+#include <CoreServices/CoreServices.h>
+#endif
+
 #include "resourcefiles/resourcefile.h"
 #include "config.h"
 #include "file.h"
@@ -318,10 +322,19 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	FString dataPaths;
 	if(config->GetSetting("BaseDataPaths") == NULL)
 	{
-		Printf("Here\n");
 		dataPaths = ".";
 #if !defined(__APPLE__)
 		dataPaths += ":" + config->GetConfigDir();
+#else
+		UInt8 dataDirBase[PATH_MAX];
+		FSRef folder;
+
+		if(FSFindFolder(kUserDomain, kDocumentsFolderType, kCreateFolder, &folder) == noErr &&
+			FSRefMakePath(&folder, dataDirBase, PATH_MAX) == noErr)
+			dataPaths += FString(":") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
+		if(FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &folder) == noErr &&
+			FSRefMakePath(&folder, dataDirBase, PATH_MAX) == noErr)
+			dataPaths += FString(":") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
 #endif
 
 		config->CreateSetting("BaseDataPaths", dataPaths);
