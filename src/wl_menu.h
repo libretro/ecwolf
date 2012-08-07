@@ -35,7 +35,7 @@ void MenuFadeIn();
 #define SM_H3   3*13-7
 
 #define CTL_X   24
-#define CTL_Y   86
+#define CTL_Y   60
 #define CTL_W   284
 #define CTL_H   75
 

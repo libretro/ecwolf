@@ -45,6 +45,7 @@ Aspect r_ratio = ASPECT_4_3, vid_aspect = ASPECT_NONE;
 bool forcegrabmouse = false;
 bool r_depthfog = false;
 bool vid_fullscreen = false;
+bool quitonescape = false;
 
 void FinalReadConfig()
 {
@@ -104,6 +105,7 @@ void ReadConfig(void)
 	config->CreateSetting("Vid_Aspect", ASPECT_NONE);
 	config->CreateSetting("ScreenWidth", screenWidth);
 	config->CreateSetting("ScreenHeight", screenHeight);
+	config->CreateSetting("QuitOnEscape", quitonescape);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -144,6 +146,7 @@ void ReadConfig(void)
 	vid_aspect = static_cast<Aspect>(config->GetSetting("Vid_Aspect")->GetInteger());
 	screenWidth = config->GetSetting("ScreenWidth")->GetInteger();
 	screenHeight = config->GetSetting("ScreenHeight")->GetInteger();
+	quitonescape = config->GetSetting("QuitOnEscape")->GetInteger() != 0;
 
 	char hsName[50];
 	char hsScore[50];
@@ -229,6 +232,7 @@ void WriteConfig(void)
 	config->GetSetting("Vid_Aspect")->SetValue(vid_aspect);
 	config->GetSetting("ScreenWidth")->SetValue(screenWidth);
 	config->GetSetting("ScreenHeight")->SetValue(screenHeight);
+	config->GetSetting("QuitOnEscape")->SetValue(quitonescape);
 
 	char hsName[50];
 	char hsScore[50];

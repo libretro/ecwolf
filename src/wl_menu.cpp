@@ -145,7 +145,7 @@ MENU_LISTENER(EnterControlBase)
 	controlBase[5]->setEnabled(IN_JoyPresent());
 	controlBase.draw();
 
-	if(forcegrabmouse)
+	if(forcegrabmouse || (fullscreen && mouseenabled))
 		IN_GrabMouse();
 	else if(!fullscreen)
 		IN_ReleaseMouse();
@@ -477,6 +477,7 @@ void CreateMenus()
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_SENS"], mouseSensitivity));
 	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
+	controlBase.addItem(new BooleanMenuItem(language["STR_ESCQUIT"], quitonescape));
 
 	const char* aspectOptions[] = {"Aspect: Auto", "Aspect: 16:9", "Aspect: 16:10", "Aspect: 17:10", "Aspect: 4:3", "Aspect: 5:4"};
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
@@ -618,7 +619,7 @@ void US_ControlPanel (ScanCode scancode)
 		switch (which)
 		{
 			case -1:
-				if(!ingame)
+				if(!ingame || quitonescape)
 					QuitGame(0);
 				else
 					PlayDemosOrReturnToGame(0);

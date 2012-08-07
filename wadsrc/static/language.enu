@@ -82,6 +82,7 @@ STR_SECRETTUNNELCOMPLETED = "\nsecret tunnel\n    area\n  completed!";
 STR_SECRETCASTLECOMPLETED = "\nsecret castle\n    area\n  completed!";
 STR_SELECTRES = "Screen Resolution";
 STR_PLAYERCLASS = "Choose Player";
+STR_ESCQUIT = "Don't Return on Escape";
 
 STR_DEMOCOMPLETED = "This concludes your demo\nof Spear of Destiny! Now,\ngo to your local software\nstore and buy it!";
 
