@@ -215,11 +215,9 @@ void AActor::Die()
 	if(flags & FL_MISSILE)
 		flags &= ~FL_MISSILE;
 
-	int dropitemsIndex = GetClass()->Meta.GetMetaInt(AMETA_DropItems, -1);
-	if(dropitemsIndex >= 0)
+	DropList *dropitems = GetDropList();
+	if(dropitems)
 	{
-		DropList *dropitems = dropItems[dropitemsIndex];
-
 		DropList::Node *item = dropitems->Head();
 		DropItem *bestDrop = NULL; // For FL_DROPBASEDONTARGET
 		do
@@ -299,6 +297,21 @@ int AActor::GetDamage()
 	if(expression >= 0)
 		return damageExpressions[expression]->Evaluate(this).GetInt();
 	return 0;
+}
+
+AActor::DropList *AActor::GetDropList() const
+{
+	const ClassDef *cls = GetClass();
+	int dropitemsIndex;
+	do
+	{
+		dropitemsIndex = cls->Meta.GetMetaInt(AMETA_DropItems, -1);
+	}
+	while(dropitemsIndex == -1 && (cls = cls->GetParent()));
+
+	if(dropitemsIndex == -1)
+		return NULL;
+	return dropItems[dropitemsIndex];
 }
 
 const AActor *AActor::GetDefault() const

@@ -47,6 +47,7 @@
 #include "thingdef/thingdef_expression.h"
 #include "thinker.h"
 #include "templates.h"
+#include "g_mapinfo.h"
 
 // Code pointer stuff
 void InitFunctionTable(ActionTable *table);
@@ -657,6 +658,18 @@ Symbol *ClassDef::FindSymbol(const FName &symbol) const
 		while(max >= min && max < globalSymbols.Size());
 	}
 	return NULL;
+}
+
+const ClassDef *ClassDef::GetReplacement(bool respectMapinfo) const
+{
+	if(respectMapinfo && levelInfo)
+	{
+		const ClassDef **levelReplacement = levelInfo->Replacements.CheckKey(this);
+		if(levelReplacement)
+			return *levelReplacement;
+	}
+
+	return replacement ? replacement->GetReplacement(false) : this;
 }
 
 struct Goto

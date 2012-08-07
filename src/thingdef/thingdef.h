@@ -270,7 +270,7 @@ class ClassDef
 		AActor					*GetDefault() const { return (AActor*)defaultInstance; }
 		const FName				&GetName() const { return name; }
 		const ClassDef			*GetParent() const { return parent; }
-		const ClassDef			*GetReplacement() const { return replacement ? replacement : this; }
+		const ClassDef			*GetReplacement(bool respectMapinfo=true) const;
 		size_t					GetSize() const { return size; }
 		const Frame				*GetState(unsigned int index) const { return frameList[index]; }
 		static void				LoadActors();

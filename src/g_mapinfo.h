@@ -130,6 +130,7 @@ public:
 	bool			DeathCam;
 
 	TArray<const ClassDef *>	EnsureInventory;
+	TMap<const ClassDef *, const ClassDef *>	Replacements;
 
 	struct SpecialAction
 	{

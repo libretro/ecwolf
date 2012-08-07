@@ -186,6 +186,7 @@ class AActor : public DObject
 		const Frame		*FindState(const FName &name) const;
 		int				GetDamage();
 		const AActor	*GetDefault() const;
+		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
 		void			RemoveFromWorld();
 		void			RemoveInventory(AInventory *item);
