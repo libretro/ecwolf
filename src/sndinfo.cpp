@@ -176,7 +176,8 @@ void SoundInformation::CreateHashTable()
 			// Clean up undefined links
 			for(unsigned int j = data.aliasLinks.Size();j-- > 0;)
 			{
-				if(operator[](data.aliasLinks[j]).IsNull())
+				SoundData &link = sounds[data.aliasLinks[j]];
+				if(link.IsNull())
 					data.aliasLinks.Delete(j);
 			}
 

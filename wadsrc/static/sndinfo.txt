@@ -19,6 +19,7 @@ misc/no_bonus			{ NULL ALNOBNS PCNOBNS }
 misc/100percent			{ NULL ALPRC100 PCPRC100 }
 misc/slurpie			{ DSSLURPE ALSLURPE PCSLURPE }
 misc/yeah				{ DSYEAH ALYEAH PCYEAH }
+misc/fart				{ DSFART ALFART PCFART }
 
 treasure/cross/pickup	{ NULL ALBONUS1 PCBONUS1 }
 treasure/chalice/pickup	{ NULL ALBONUS2 PCBONUS2 }
@@ -45,10 +46,6 @@ $alias misc/w_pkup		weapon/machine/pickup
 weapon/gatling/attack	{ DSCGUN ALCGUN PCCGUN }
 weapon/gatling/pickup	{ NULL ALCGUNUP PCCGUNUP }
 
-dog/sight				{ DSDOGSIT ALDOGSIT PCDOGSIT }
-dog/attack				{ DSDOGATK ALDOGATK PCDOGATK }
-dog/death				{ DSDOGDTH ALDOGDTH PCDOGDTH }
-
 guard/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
 guard/sight				{ DSGRDSIT ALGRDSIT PCGRDSIT }
 guard/death1			{ DSGDDTH1 ALGDDTH1 PCGDDTH1 }
@@ -59,19 +56,34 @@ guard/death5			{ DSGDDTH5 ALGDDTH5 PCGDDTH5 }
 guard/death6			{ DSGDDTH6 ALGDDTH6 PCGDDTH6 }
 guard/death7			{ DSGDDTH7 ALGDDTH7 PCGDDTH7 }
 guard/death8			{ DSGDDTH8 ALGDDTH8 PCGDDTH8 }
-guard/death9			{ DSGDDTH9 ALGDDTH9 PCGDDTH9 } // This sound is never played in vanilla under normal circumstances
 $random guard/death		{ guard/death1 guard/death2 guard/death3 guard/death4 guard/death5 guard/death6 guard/death7 guard/death8 }
+// Guards have a 1/256 chance of farting on death in map 10 of wolfenstein and the secret levels of SOD
+// We're using two random sounds here since otherwise I would have to have an array of 256 of these to get the same net result
+$random guard/fart16	{ misc/fart guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death }  // 1 / 16
+$random guard/fart		{ guard/fart16 guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death } // 1 / 256
+
+dog/sight				{ DSDOGSIT ALDOGSIT PCDOGSIT }
+dog/attack				{ DSDOGATK ALDOGATK PCDOGATK }
+dog/death				{ DSDOGDTH ALDOGDTH PCDOGDTH }
+$random dog/fart16		{ misc/fart dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death }
+$random dog/fart		{ misc/fart16 dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death }
 
 wolfss/attack			{ DSSSFIRE ALSSFIRE PCSSFIRE } // This is not the same as Doom 2 since it used the shotgun sound
 wolfss/death			{ DSSSDTH ALSSDTH PCSSDTH }
 wolfss/sight			{ DSSSSIT ALSSSIT PCSSSIT }
+$random wolfss/fart16	{ misc/fart wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death }
+$random wolfss/fart		{ wolfss/fart16 wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death }
 
 mutant/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
 mutant/death			{ DSMUTDTH ALMUTDTH PCMUTDTH }
+$random mutant/fart16	{ misc/fart mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death }
+$random mutant/fart		{ misc/fart16 mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death }
 
 officer/sight			{ DSOFFSIT ALOFFSIT PCOFFSIT }
 officer/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
 officer/death			{ DSOFFDTH ALOFFDTH PCOFFDTH }
+$random officer/fart16	{ misc/fart officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death }
+$random officer/fart	{ officer/fart16 officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death }
 
 hans/attack				{ DSBOSSFR ALBOSSFR PCBOSSFR }
 hans/sight				{ DSHANSIT ALHANSIT PCHANSIT }
