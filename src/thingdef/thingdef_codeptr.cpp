@@ -245,6 +245,15 @@ ACTION_FUNCTION(A_Jump)
 	}
 }
 
+ACTION_FUNCTION(A_JumpIf)
+{
+	ACTION_PARAM_BOOL(expr, 0);
+	ACTION_PARAM_STATE(frame, 1, NULL);
+
+	if(expr && frame)
+		self->SetState(frame);
+}
+
 static FRandom pr_meleeattack("MeleeAccuracy");
 ACTION_FUNCTION(A_MeleeAttack)
 {

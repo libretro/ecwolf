@@ -37,7 +37,7 @@ actor Guard 11
 			GARD H 10 bright A_WolfAttack
 			goto See
 		Pain:
-			GARD I 5
+			GARD I 5 A_JumpIf(health & 1, 1)
 			goto See
 			GARD J 5
 			goto See
@@ -134,7 +134,7 @@ actor Officer 12
 			OFFI E 7.5 NOP A_Chase
 			loop
 		Pain:
-			OFFI I 5
+			OFFI I 5 A_JumpIf(health & 1, 1)
 			goto See
 			OFFI J 5
 			goto See
@@ -186,7 +186,7 @@ actor Mutant 15
 			MTNT E 7.5 NOP A_Chase
 			loop
 		Pain:
-			MTNT J 5
+			MTNT J 5 A_JumpIf(health & 1, 1)
 			goto See
 			MTNT K 5
 			goto See
@@ -250,9 +250,8 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			SSWV D 4 NOP A_Chase
 			loop
 		Pain:
-			SSWV H 5
+			SSWV H 5 A_JumpIf(health & 1, 1)
 			goto See
-		Pain2:
 			SSWV I 5
 			goto See
 		Missile:
