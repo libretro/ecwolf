@@ -223,6 +223,12 @@ HANDLE_PROPERTY(radius)
 	defaults->radius = radius*FRACUNIT/64;
 }
 
+HANDLE_PROPERTY(secretdeathsound)
+{
+	STRING_PARAM(snd, 0);
+	cls->Meta.SetMetaString(AMETA_SecretDeathSound, snd);
+}
+
 HANDLE_PROPERTY(seesound)
 {
 	STRING_PARAM(snd, 0);
@@ -368,6 +374,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(PROJECTILE, Actor,),
 	DEFINE_PROP(radius, Actor, I),
+	DEFINE_PROP(secretdeathsound, Actor, S),
 	DEFINE_PROP(seesound, Actor, S),
 	DEFINE_PROP(selectionorder, Weapon, I),
 	DEFINE_PROP(sighttime, Actor, I_I),

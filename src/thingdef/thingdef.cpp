@@ -662,13 +662,6 @@ Symbol *ClassDef::FindSymbol(const FName &symbol) const
 
 const ClassDef *ClassDef::GetReplacement(bool respectMapinfo) const
 {
-	if(respectMapinfo && levelInfo)
-	{
-		const ClassDef **levelReplacement = levelInfo->Replacements.CheckKey(this);
-		if(levelReplacement)
-			return *levelReplacement;
-	}
-
 	return replacement ? replacement->GetReplacement(false) : this;
 }
 

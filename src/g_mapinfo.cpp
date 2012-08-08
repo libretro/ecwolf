@@ -269,6 +269,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	LevelNumber = 0;
 	Cluster = 0;
 	NoIntermission = false;
+	SecretDeathSounds = false;
 }
 
 FTextureID LevelInfo::GetBorderTexture() const
@@ -479,20 +480,8 @@ protected:
 			mapInfo.NoIntermission = true;
 		else if(key.CompareNoCase("Par") == 0)
 			ParseIntAssignment(mapInfo.Par);
-		else if(key.CompareNoCase("ReplaceActor") == 0)
-		{
-			sc.MustGetToken('=');
-			sc.MustGetToken(TK_StringConst);
-			const ClassDef *replacee = ClassDef::FindClass(sc->str);
-			if(!replacee)
-				sc.ScriptMessage(Scanner::ERROR, "Undefined replacee class '%s'.", sc->str.GetChars());
-			sc.MustGetToken(',');
-			sc.MustGetToken(TK_StringConst);
-			const ClassDef *replacement = ClassDef::FindClass(sc->str);
-			if(!replacement)
-				sc.ScriptMessage(Scanner::ERROR, "Undefined replacement class '%s'.", sc->str.GetChars());
-			mapInfo.Replacements[replacee] = replacement;
-		}
+		else if(key.CompareNoCase("SecretDeathSounds") == 0)
+			ParseBoolAssignment(mapInfo.SecretDeathSounds);
 		else if(key.CompareNoCase("Translator") == 0)
 			ParseStringAssignment(mapInfo.Translator);
 		else

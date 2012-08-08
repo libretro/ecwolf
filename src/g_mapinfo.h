@@ -128,9 +128,9 @@ public:
 	bool			NoIntermission;
 
 	bool			DeathCam;
+	bool			SecretDeathSounds;
 
 	TArray<const ClassDef *>	EnsureInventory;
-	TMap<const ClassDef *, const ClassDef *>	Replacements;
 
 	struct SpecialAction
 	{

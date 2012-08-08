@@ -36,6 +36,7 @@
 #include "a_inventory.h"
 #include "farchive.h"
 #include "gamemap.h"
+#include "g_mapinfo.h"
 #include "id_ca.h"
 #include "thinker.h"
 #include "thingdef/thingdef.h"
@@ -502,6 +503,13 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 		++gamestate.treasuretotal;
 	if(actor->flags & FL_COUNTSECRET)
 		++gamestate.secrettotal;
+
+	if(levelInfo && levelInfo->SecretDeathSounds)
+	{
+		const char* snd = type->Meta.GetMetaString(AMETA_SecretDeathSound);
+		if(snd)
+			actor->deathsound = snd;
+	}
 	return actor;
 }
 

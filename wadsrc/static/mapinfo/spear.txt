@@ -424,11 +424,7 @@ map "MAP19"
 	cluster = 2
 	completionstring = "$STR_SECRETTUNNELCOMPLETED"
 	levelbonus = 15000
-	replaceactor = "Dog", "FartingDog"
-	replaceactor = "Guard", "FartingGuard"
-	replaceactor = "Mutant", "FartingMutant"
-	replaceactor = "Officer", "FartingOfficer"
-	replaceactor = "WolfensteinSS", "FartingWolfensteinSS"
+	secretdeathsounds = true
 }
 
 map "MAP20"
@@ -440,11 +436,7 @@ map "MAP20"
 	cluster = 2
 	completionstring = "$STR_SECRETCASTLECOMPLETED"
 	levelbonus = 15000
-	replaceactor = "Dog", "FartingDog"
-	replaceactor = "Guard", "FartingGuard"
-	replaceactor = "Mutant", "FartingMutant"
-	replaceactor = "Officer", "FartingOfficer"
-	replaceactor = "WolfensteinSS", "FartingWolfensteinSS"
+	secretdeathsounds = true
 }
 
 map "MAP21"

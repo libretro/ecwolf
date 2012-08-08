@@ -1181,7 +1181,7 @@ void FSingleLumpFont::LoadFON2 (int lump, const BYTE *data)
 		SpaceWidth = totalwidth * 2 / (3 * count);
 	}
 
-	memcpy(PaletteData, palette, 768);
+	memcpy(PaletteData, palette, (ActiveColors+1)*3);
 
 	data_p = palette + (ActiveColors+1)*3;
 
@@ -2043,7 +2043,7 @@ void FTile8Char::MakeTexture()
 
 FSpecialFont::FSpecialFont (const char *name, int first, int count, FTexture **lumplist, const bool *notranslate, int lump) : FFont(lump)
 {
-	int i, j;
+	int i;
 	FTexture **charlumps;
 	int maxyoffs;
 	FTexture *pic;

@@ -8,6 +8,7 @@ actor Guard 11
 	dropitem "Clip", 4
 	attacksound "guard/attack"
 	deathsound "guard/death"
+	secretdeathsound "guard/fart"
 	seesound "guard/sight"
 	MONSTER
 	states
@@ -48,10 +49,6 @@ actor Guard 11
 			stop
 	}
 }
-actor FartingGuard : Guard
-{
-	deathsound "guard/fart"
-}
 
 actor DeadGuard 81
 {
@@ -72,6 +69,7 @@ actor Dog 14
 	sighttime 1, 8
 	attacksound "dog/attack"
 	deathsound "dog/death"
+	secretdeathsound "dog/fart"
 	seesound "dog/sight"
 	MONSTER
 	-CANUSEWALLS
@@ -107,10 +105,6 @@ actor Dog 14
 			stop
 	}
 }
-actor FartingDog : Dog
-{
-	deathsound "dog/fart"
-}
 
 actor Officer 12
 {
@@ -122,6 +116,7 @@ actor Officer 12
 	dropitem "Clip", 4
 	attacksound "officer/attack"
 	deathsound "officer/death"
+	secretdeathsound "officer/fart"
 	seesound "officer/sight"
 	MONSTER
 	states
@@ -163,10 +158,6 @@ actor Officer 12
 			stop
 	}
 }
-actor FartingOfficer : Officer
-{
-	deathsound "officer/fart"
-}
 
 actor Mutant 15
 {
@@ -178,6 +169,7 @@ actor Mutant 15
 	dropitem "Clip", 4
 	attacksound "mutant/attack"
 	deathsound "mutant/death"
+	secretdeathsound "mutant/fart"
 	MONSTER
 	states
 	{
@@ -219,10 +211,6 @@ actor Mutant 15
 			stop
 	}
 }
-actor FartingMutant : Mutant
-{
-	deathsound "mutant/fart"
-}
 
 actor WolfensteinSS 13 // ZDoom compatible name
 {
@@ -235,6 +223,7 @@ actor WolfensteinSS 13 // ZDoom compatible name
 	dropitem "Clip", 4
 	attacksound "wolfss/attack"
 	deathsound "wolfss/death"
+	secretdeathsound "wolfss/fart"
 	seesound "wolfss/sight"
 	MONSTER
 	+DROPBASEDONTARGET
@@ -282,8 +271,4 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			SSWV M -1
 			stop
 	}
-}
-actor FartingWolfensteinSS : WolfensteinSS
-{
-	deathsound "wolfss/fart"
 }

@@ -155,7 +155,8 @@ enum
 	AMETA_BASE = 0x12000,
 
 	AMETA_Damage,
-	AMETA_DropItems
+	AMETA_DropItems,
+	AMETA_SecretDeathSound
 };
 
 class player_t;

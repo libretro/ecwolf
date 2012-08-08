@@ -140,11 +140,7 @@ map "MAP10"
 	cluster = 1
 	completionstring = "$STR_SECRETCOMPLETED"
 	levelbonus = 15000
-	replaceactor = "Dog", "FartingDog"
-	replaceactor = "Guard", "FartingGuard"
-	replaceactor = "Mutant", "FartingMutant"
-	replaceactor = "Officer", "FartingOfficer"
-	replaceactor = "WolfensteinSS", "FartingWolfensteinSS"
+	secretdeathsounds = true
 }
 
 // Episode 2
