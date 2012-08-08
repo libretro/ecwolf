@@ -168,6 +168,14 @@ HANDLE_PROPERTY(health)
 	}
 }
 
+HANDLE_PROPERTY(height)
+{
+	INT_PARAM(height, 0);
+
+	// Dummy property so using it doesn't print an error/warning.
+	// For forwards compatibility solid actors should have a height of 64
+}
+
 HANDLE_PROPERTY(icon)
 {
 	STRING_PARAM(icon, 0);
@@ -364,6 +372,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
+	DEFINE_PROP(height, Actor, I),
 	DEFINE_PROP(icon, Inventory, S),
 	DEFINE_PROP(interhubamount, Inventory, I),
 	DEFINE_PROP(maxamount, Inventory, I),
