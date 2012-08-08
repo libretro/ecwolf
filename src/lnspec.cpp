@@ -326,6 +326,35 @@ class EVPushwall : public Thinker
 			spot->pushDirection = MapTile::Side(direction);
 		}
 
+		static bool CheckSpotFree(MapSpot spot)
+		{
+			if(spot->tile)
+			{
+				// Hit a wall so we're done.
+				return false;
+			}
+
+			// Check for any blocking actors
+			AActor::Iterator *iter = AActor::GetIterator();
+			int movex = spot->GetX();
+			int movey = spot->GetY();
+			while(iter)
+			{
+				AActor *actor = iter->Item();
+				if((actor->flags&FL_ISMONSTER) || actor->player)
+				{
+					if(actor->tilex+dirdeltax[actor->dir] == movex &&
+						actor->tiley+dirdeltay[actor->dir] == movey)
+					{
+						// Blocked!
+						return false;
+					}
+				}
+				iter = iter->Next();
+			}
+			return true;
+		}
+
 		void Destroy()
 		{
 			if(spot->thinker == this)
@@ -337,8 +366,6 @@ class EVPushwall : public Thinker
 		{
 			if(position == 0)
 				SD_PlaySound ("world/pushwall");
-
-			// TODO: Block pushwall movement with things and the player
 
 			// Setup the next tile to get ready to accept this tile.
 			if(moveTo == NULL)
@@ -357,9 +384,8 @@ class EVPushwall : public Thinker
 					#endif
 				}
 
-				if(moveTo->tile)
+				if(!CheckSpotFree(moveTo))
 				{
-					// Hit a wall so we're done.
 					Destroy();
 					return;
 				}

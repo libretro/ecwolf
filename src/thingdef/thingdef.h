@@ -293,6 +293,7 @@ class ClassDef
 		void		BuildFlatPointers();
 		const Frame * const *FindStateInList(const FName &stateName) const;
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
+		const Frame * const *ResolveStateIndex(unsigned int index) const;
 
 		// We need to do this for proper initialization order.
 		static TMap<FName, ClassDef *>	&ClassTable();

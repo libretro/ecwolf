@@ -612,7 +612,9 @@ const Frame * const *ClassDef::FindStateInList(const FName &stateName) const
 	const unsigned int *ret = stateList.CheckKey(stateName);
 	if(ret == NULL)
 		return (!parent ? NULL : parent->FindStateInList(stateName));
-	return &frameList[*ret];
+
+	// Change the frameLists
+	return ResolveStateIndex(*ret);
 }
 
 Symbol *ClassDef::FindSymbol(const FName &symbol) const
@@ -691,8 +693,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			switch(thisStateDef.nextType)
 			{
 				case StateDefinition::STOP:
-					if(stateList.CheckKey(thisStateDef.label))
-						stateList.Remove(thisStateDef.label);
+					stateList[thisStateDef.label] = INT_MAX;
 					break;
 				case StateDefinition::NORMAL:
 					stateList[thisStateDef.label] = frameList.Size();
@@ -767,7 +768,16 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 		if(gotos[iter].frame)
 			gotos[iter].frame->next = result;
 		else
-			stateList[gotos[iter].remapLabel] = result->index;
+		{
+			unsigned int frameIndex = result->index;
+			const ClassDef *owner = this;
+			while(!owner->IsStateOwner(result))
+			{
+				frameIndex += owner->frameList.Size();
+				owner = owner->parent;
+			}
+			stateList[gotos[iter].remapLabel] = frameIndex;
+		}
 	}
 }
 
@@ -1010,22 +1020,26 @@ void ClassDef::ParseActor(Scanner &sc)
 						if(sc->str.CompareNoCase("stop") == 0)
 						{
 							thisState.nextType = StateDefinition::STOP;
-							sc.MustGetToken(TK_Identifier);
+							if(!sc.CheckToken('}'))
+								sc.MustGetToken(TK_Identifier);
 						}
 						else if(sc->str.CompareNoCase("goto") == 0)
 						{
 							thisState.jumpLabel = StateLabel(sc, newClass, true);
 							thisState.nextType = StateDefinition::GOTO;
-							sc.MustGetToken(TK_Identifier);
+							if(!sc.CheckToken('}'))
+								sc.MustGetToken(TK_Identifier);
 						}
-					}
 
-					bool invalidSprite = (sc->str.Len() != 4);
-					strncpy(thisState.sprite, sc->str, 4);
+						stateString = sc->str;
+					}
 
 					if(thisState.nextType == StateDefinition::NORMAL &&
 						(sc.CheckToken(TK_Identifier) || sc.CheckToken(TK_StringConst)))
 					{
+						bool invalidSprite = (stateString.Len() != 4);
+						strncpy(thisState.sprite, stateString, 4);
+
 						infiniteLoopProtection = false;
 						if(invalidSprite) // We now know this is a frame so check sprite length
 							sc.ScriptMessage(Scanner::ERROR, "Sprite name must be exactly 4 characters long.");
@@ -1459,6 +1473,15 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 			sc.ScriptMessage(Scanner::ERROR, "Unknown thing section '%s'.", sc->str.GetChars());
 	}
 	delete[] data;
+}
+
+const Frame * const *ClassDef::ResolveStateIndex(unsigned int index) const
+{
+	if(index == INT_MAX) // Deleted state (Label: stop)
+		return NULL;
+	if(index > frameList.Size() && parent)
+		return parent->ResolveStateIndex(index - frameList.Size());
+	return &frameList[index];
 }
 
 bool ClassDef::SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set)

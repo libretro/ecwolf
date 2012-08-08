@@ -52,6 +52,7 @@ actor Guard 11
 
 actor DeadGuard 81
 {
+	+ISMONSTER // Blocks pushwalls
 	states
 	{
 		Spawn:

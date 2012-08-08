@@ -255,6 +255,9 @@ typedef enum {
 	nodir
 } dirtype;
 
+static const int dirdeltax[9] = { 1, 1, 0, -1, -1, -1, 0, 1, 0 };
+static const int dirdeltay[9] = { 0, -1, -1, -1, 0, 1, 1, 1, 0 };
+
 //--------------------
 //
 // thinking actor structure
