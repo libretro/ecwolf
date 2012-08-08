@@ -15,6 +15,7 @@ actor Actor native
 {
 	damage 0
 	radius 20
+	height 16
 	health 1000
 	sighttime 1
 	speed 0

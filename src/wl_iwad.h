@@ -61,6 +61,7 @@ namespace IWad
 		FString Name;
 		FString Mapinfo;
 		TArray<FString> Ident;
+		FString Required;
 		unsigned int Flags;
 	};
 

@@ -4,7 +4,8 @@
 
 sprites
 {
-	"DEMOA0":pspr,
+	"MISPK2",
+	//"DEMOA0":pspr,
 	"DCAMA0":pspr,
 
 	"WATRA0",	"DRUMA0",	"TCHRA0",	"FLMPA0",

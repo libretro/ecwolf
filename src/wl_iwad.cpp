@@ -214,25 +214,51 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 
 	for(unsigned int i = 0;i < foundFiles.Size();++i)
 	{
-		if(foundFiles[i].isValid == 0xFF)
-		{
-			WadStuff wadStuff;
-			wadStuff.Extension = foundFiles[i].extension;
-			for(unsigned int j = 0;LoadableBaseFiles[j] != BASEFILES;++j)
-				wadStuff.Path.Push(foundFiles[i].filename[LoadableBaseFiles[j]]);
+		if(!foundFiles[i].isValid)
+			continue;
 
-			// Before checking the data we must load the remap file.
-			FString mapFile;
-			mapFile.Format("%sMAP", foundFiles[i].extension.GetChars());
-			for(unsigned int j = res->LumpCount();j-- > 0;)
+		WadStuff wadStuff;
+		wadStuff.Extension = foundFiles[i].extension;
+		for(unsigned int j = 0;LoadableBaseFiles[j] != BASEFILES;++j)
+		{
+			if((foundFiles[i].isValid & (1<<LoadableBaseFiles[j])))
+				wadStuff.Path.Push(foundFiles[i].filename[LoadableBaseFiles[j]]);
+		}
+
+		// Before checking the data we must load the remap file.
+		FString mapFile;
+		mapFile.Format("%sMAP", foundFiles[i].extension.GetChars());
+		for(unsigned int j = res->LumpCount();j-- > 0;)
+		{
+			FResourceLump *lump = res->GetLump(j);
+			if(mapFile.CompareNoCase(lump->Name) == 0)
+				LumpRemapper::LoadMap(foundFiles[i].extension, lump->FullName, (const char*) lump->CacheLump(), lump->LumpSize);
+		}
+
+		if(CheckData(wadStuff) > -1)
+			iwads.Push(wadStuff);
+	}
+
+	for(unsigned int i = iwads.Size();i-- > 0;)
+	{
+		const FString &req = iwadTypes[iwads[i].Type].Required;
+		if(!req.IsEmpty())
+		{
+			bool reqSatisfied = false;
+
+			for(unsigned int j = 0;j < iwads.Size();++j)
 			{
-				FResourceLump *lump = res->GetLump(j);
-				if(mapFile.CompareNoCase(lump->Name) == 0)
-					LumpRemapper::LoadMap(foundFiles[i].extension, lump->FullName, (const char*) lump->CacheLump(), lump->LumpSize);
+				if(iwadTypes[iwads[j].Type].Name.Compare(req) == 0)
+				{
+					for(unsigned int k = iwads[j].Path.Size();k-- > 0;)
+						iwads[i].Path.Insert(0, iwads[j].Path[k]);
+					reqSatisfied = true;
+					break;
+				}
 			}
 
-			if(CheckData(wadStuff) > -1)
-				iwads.Push(wadStuff);
+			if(!reqSatisfied)
+				iwads.Delete(i);
 		}
 	}
 }
@@ -280,6 +306,11 @@ static void ParseIWad(Scanner &sc)
 				iwad.Ident.Push(sc->str);
 			}
 			while(sc.CheckToken(','));
+		}
+		else if(key.CompareNoCase("Required") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			iwad.Required = sc->str;
 		}
 	}
 

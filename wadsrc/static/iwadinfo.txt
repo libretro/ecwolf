@@ -26,3 +26,19 @@ IWad
 	MustContain = "BJPIC"
 	Flags = Registered, HelpHack
 }
+
+IWad
+{
+	Name = "Mission 2: Return to Danger"
+	Required = "Spear of Destiny"
+	Mapinfo = "mapinfo/spear.txt"
+	MustContain = "MISPK2"
+}
+
+IWad
+{
+	Name = "Mission 3: Ultimate Challenge"
+	Required = "Spear of Destiny"
+	Mapinfo = "mapinfo/spear.txt"
+	MustContain = "MISPK3"
+}
