@@ -20,6 +20,19 @@ actor Rocket
 			stop
 	}
 }
+// So it may not be a Chemical Rocket, but it's more original than Cyan Rocket :P
+actor ChemicalRocket : Rocket
+{
+	states
+	{
+		Spawn:
+			CRCK A 1.5 bright A_SpawnItem("ChemicalSmoke")
+			loop
+		Death:
+			CBOM ABC 3 bright
+			stop
+	}
+}
 
 actor Smoke
 {
@@ -27,6 +40,15 @@ actor Smoke
 	{
 		Spawn:
 			SMOK ABCD 1.5
+			stop
+	}
+}
+actor ChemicalSmoke : Smoke
+{
+	states
+	{
+		Spawn:
+			CSMK ABCD 1.5
 			stop
 	}
 }
@@ -49,6 +71,18 @@ actor HighRocket
 			stop
 	}
 }
+actor HighChemicalRocket : HighRocket
+{
+	states
+	{
+		Spawn:
+			CHRK A 1.5 bright A_SpawnItem("HighChemicalSmoke")
+			loop
+		Death:
+			CHBM ABC 3 bright
+			stop
+	}
+}
 
 actor HighSmoke
 {
@@ -56,6 +90,15 @@ actor HighSmoke
 	{
 		Spawn:
 			HSMK ABCD 3
+			stop
+	}
+}
+actor HighChemicalSmoke : HighSmoke
+{
+	states
+	{
+		Spawn:
+			CHSK ABCD 3
 			stop
 	}
 }

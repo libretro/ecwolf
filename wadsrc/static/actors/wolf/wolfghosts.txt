@@ -73,3 +73,21 @@ actor Spectre 28
 			wait
 	}
 }
+actor GhoulishGhost : Spectre 104
+{
+	states
+	{
+		Spawn:
+			GHUL ABCD 5 NOP A_Look(0, 0, 0, 0, 360)
+			loop
+		See:
+			GHUL ABCD 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
+			loop
+		Death:
+			GHUL EFG 5
+			GHUL H 150
+			GHUL I 5
+			GHUL I 5 A_Dormant
+			wait
+	}
+}

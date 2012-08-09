@@ -1,0 +1,8 @@
+include "mapinfo/spear.txt"
+
+adddefaultmap
+{
+	translator = "xlat/lostep.txt"
+}
+
+include "mapinfo/spearmaps.txt"

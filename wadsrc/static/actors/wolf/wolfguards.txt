@@ -49,6 +49,46 @@ actor Guard 11
 			stop
 	}
 }
+actor GreenGuard : Guard 93
+{
+	states
+	{
+		Spawn:
+			GGRD A -1 NOP A_Look
+			stop
+		Path:
+			GGRD B 10 NOP A_Chase
+			GGRD B 2.5
+			GGRD C 7.5 NOP A_Chase
+			GGRD D 10 NOP A_Chase
+			GGRD D 2.5
+			GGRD E 7.5 NOP A_Chase
+			loop
+		See:
+			GGRD B 5 NOP A_Chase
+			GGRD B 1.5
+			GGRD C 4 NOP A_Chase
+			GGRD D 5 NOP A_Chase
+			GGRD D 1.5
+			GGRD E 4 NOP A_Chase
+			loop
+		Missile:
+			GGRD FG 10 A_FaceTarget
+			GGRD H 10 bright A_WolfAttack
+			goto See
+		Pain:
+			GGRD I 5 A_JumpIf(health & 1, 1)
+			goto See
+			GGRD J 5
+			goto See
+		Death:
+			GGRD K 7.5 A_Fall
+			GGRD L 7.5 A_DeathScream
+			GGRD M 7.5
+			GGRD N -1
+			stop
+	}
+}
 
 actor DeadGuard 81
 {
@@ -57,6 +97,15 @@ actor DeadGuard 81
 	{
 		Spawn:
 			GARD N -1
+			stop
+	}
+}
+actor DeadGreenGuard : DeadGuard 98
+{
+	states
+	{
+		Spawn:
+			GGRD N -1
 			stop
 	}
 }
@@ -103,6 +152,40 @@ actor Dog 14
 			DOGY I 7.5 A_DeathScream
 			DOGY J 7.5
 			DOGY K -1
+			stop
+	}
+}
+actor Doberman : Dog 95
+{
+	states
+	{
+		Spawn:
+		Path:
+			DOBR A 10 NOP A_Chase
+			DOBR A 2.5
+			DOBR B 7.5 NOP A_Chase
+			DOBR C 10 NOP A_Chase
+			DOBR C 2.5
+			DOBR D 7.5 NOP A_Chase
+			loop
+		Melee:
+			DOBR EF 5 A_FaceTarget
+			DOBR G 5 A_MeleeAttack(random(1,15))
+			DOBR EA 5
+			goto See
+		See:
+			DOBR A 5 NOP A_Chase
+			DOBR A 1.5
+			DOBR B 4 NOP A_Chase
+			DOBR C 5 NOP A_Chase
+			DOBR C 1.5
+			DOBR D 4 NOP A_Chase
+			loop
+		Death:
+			DOBR H 7.5 A_Fall
+			DOBR I 7.5 A_DeathScream
+			DOBR J 7.5
+			DOBR K -1
 			stop
 	}
 }
@@ -159,6 +242,47 @@ actor Officer 12
 			stop
 	}
 }
+actor LostOfficer : Officer 97
+{
+	states
+	{
+		Spawn:
+			LOFF A -1 NOP A_Look
+			stop
+		Path:
+			LOFF B 10 NOP A_Chase
+			LOFF B 2.5
+			LOFF C 7.5 NOP A_Chase
+			LOFF D 10 NOP A_Chase
+			LOFF D 2.5
+			LOFF E 7.5 NOP A_Chase
+			loop
+		Pain:
+			LOFF I 5 A_JumpIf(health & 1, 1)
+			goto See
+			LOFF J 5
+			goto See
+		Missile:
+			LOFF F 3 A_FaceTarget
+			LOFF G 10 A_FaceTarget
+			LOFF H 5 bright A_WolfAttack
+			goto See
+		See:
+			LOFF B 5 NOP A_Chase
+			LOFF B 1.5
+			LOFF C 4 NOP A_Chase
+			LOFF D 5 NOP A_Chase
+			LOFF D 1.5
+			LOFF E 4 NOP A_Chase
+			loop
+		Death:
+			LOFF K 5.5 A_Fall
+			LOFF L 5.5 A_DeathScream
+			LOFF MN 5.5
+			LOFF O -1
+			stop
+	}
+}
 
 actor Mutant 15
 {
@@ -209,6 +333,48 @@ actor Mutant 15
 			MTNT M 3.5 A_DeathScream
 			MTNT MO 3.5
 			MTNT P -1
+			stop
+	}
+}
+actor GunBat : Mutant 96
+{
+	states
+	{
+		Spawn:
+			GBAT A -1 NOP A_Look
+			stop
+		Path:
+			GBAT B 10 NOP A_Chase
+			GBAT B 2.5
+			GBAT C 7.5 NOP A_Chase
+			GBAT D 10 NOP A_Chase
+			GBAT D 2.5
+			GBAT E 7.5 NOP A_Chase
+			loop
+		Pain:
+			GBAT J 5 A_JumpIf(health & 1, 1)
+			goto See
+			GBAT K 5
+			goto See
+		See:
+			GBAT B 5 NOP A_Chase
+			GBAT B 1.5
+			GBAT C 4 NOP A_Chase
+			GBAT D 5 NOP A_Chase
+			GBAT D 1.5
+			GBAT E 4 NOP A_Chase
+			loop
+		Missile:
+			GBAT F 3 A_FaceTarget
+			GBAT G 10 bright A_WolfAttack
+			GBAT H 5 A_FaceTarget
+			GBAT I 10 bright A_WolfAttack
+			goto See
+		Death:
+			GBAT L 3.5 A_Fall
+			GBAT M 3.5 A_DeathScream
+			GBAT MO 3.5
+			GBAT P -1
 			stop
 	}
 }
@@ -269,6 +435,52 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			SSWV K 7.5 A_DeathScream
 			SSWV L 7.5
 			SSWV M -1
+			stop
+	}
+}
+actor Schutzstafell : WolfensteinSS 94
+{
+	states
+	{
+		Spawn:
+			SSFL W -1 NOP A_Look
+			stop
+		Path:
+			SSFL A 10 NOP A_Chase
+			SSFL A 2.5
+			SSFL B 7.5 NOP A_Chase
+			SSFL C 10 NOP A_Chase
+			SSFL C 2.5
+			SSFL D 7.5 NOP A_Chase
+			loop
+		See:
+			SSFL A 5 NOP A_Chase
+			SSFL A 1.5
+			SSFL B 4 NOP A_Chase
+			SSFL C 5 NOP A_Chase
+			SSFL C 1.5
+			SSFL D 4 NOP A_Chase
+			loop
+		Pain:
+			SSFL H 5 A_JumpIf(health & 1, 1)
+			goto See
+			SSFL I 5
+			goto See
+		Missile:
+			SSFL EF 10 A_FaceTarget
+			SSFL G 5 bright A_WolfAttack(0, "*", 0.667)
+			SSFL F 5 A_FaceTarget
+			SSFL G 5 bright A_WolfAttack(0, "*", 0.667)
+			SSFL F 5 A_FaceTarget
+			SSFL G 5 bright A_WolfAttack(0, "*", 0.667)
+			SSFL F 5 A_FaceTarget
+			SSFL G 5 bright A_WolfAttack(0, "*", 0.667)
+			goto See
+		Death:
+			SSFL J 7.5 A_Fall
+			SSFL K 7.5 A_DeathScream
+			SSFL L 7.5
+			SSFL M -1
 			stop
 	}
 }
