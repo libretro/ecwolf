@@ -51,6 +51,7 @@ actor Guard 11
 }
 actor GreenGuard : Guard 93
 {
+	dropitem "BlueClip", 4
 	states
 	{
 		Spawn:
@@ -244,6 +245,7 @@ actor Officer 12
 }
 actor LostOfficer : Officer 97
 {
+	dropitem "BlueClip", 4
 	states
 	{
 		Spawn:
@@ -338,6 +340,7 @@ actor Mutant 15
 }
 actor GunBat : Mutant 96
 {
+	dropitem "BlueClip", 4
 	states
 	{
 		Spawn:
@@ -440,6 +443,8 @@ actor WolfensteinSS 13 // ZDoom compatible name
 }
 actor Schutzstafell : WolfensteinSS 94
 {
+	dropitem "BlueAK47"
+	dropitem "BlueClip", 4
 	states
 	{
 		Spawn:

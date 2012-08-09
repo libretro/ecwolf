@@ -23,3 +23,12 @@ actor SpearOfDestiny : Inventory 92 native
 			stop
 	}
 }
+actor SpearOfDestiny2 : SpearOfDestiny 138
+{
+	states
+	{
+		Spawn:
+			SOD2 A -1
+			stop
+	}
+}

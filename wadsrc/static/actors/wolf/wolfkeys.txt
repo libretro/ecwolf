@@ -8,12 +8,32 @@ actor GoldKey : Key 53
 	}
 }
 
+actor YellowKey : Key 154
+{
+	states
+	{
+		Spawn:
+			YKEY A -1
+			stop
+	}
+}
+
 actor SilverKey : Key 54
 {
 	states
 	{
 		Spawn:
 			SKEY A -1
+			stop
+	}
+}
+
+actor CyanKey : Key 155
+{
+	states
+	{
+		Spawn:
+			CKEY A -1
 			stop
 	}
 }

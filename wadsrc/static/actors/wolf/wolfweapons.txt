@@ -79,6 +79,16 @@ actor MachineGun : WolfWeapon 60
 	}
 }
 
+actor BlueAK47 141
+{
+	states
+	{
+		Spawn:
+			MGUN A -1
+			stop
+	}
+}
+
 actor GatlingGun : WolfWeapon 61
 {
 	attacksound "weapon/gatling/attack"
@@ -100,5 +110,15 @@ actor GatlingGun : WolfWeapon 61
 			CHGG CD 3 bright A_GunAttack
 			CHGG E 3 A_ReFire
 			goto Ready
+	}
+}
+
+actor BlueGatlingGun 156
+{
+	states
+	{
+		Spawn:
+			CGUN A -1
+			stop
 	}
 }

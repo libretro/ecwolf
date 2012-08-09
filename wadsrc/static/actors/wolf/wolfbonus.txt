@@ -9,6 +9,15 @@ actor Cross : ScoreItem 62
 			stop
 	}
 }
+actor Radio : Cross 146
+{
+	states
+	{
+		Spawn:
+			RDIO A -1
+			stop
+	}
+}
 
 actor Chalice : ScoreItem 63
 {
@@ -18,6 +27,15 @@ actor Chalice : ScoreItem 63
 	{
 		Spawn:
 			CHAL A -1
+			stop
+	}
+}
+actor Plutonium : Chalice 147
+{
+	states
+	{
+		Spawn:
+			PLUT A -1
 			stop
 	}
 }
@@ -33,6 +51,15 @@ actor ChestofJewels : ScoreItem 64
 			stop
 	}
 }
+actor ControlPanel : ChestofJewels 148
+{
+	states
+	{
+		Spawn:
+			CPNL A -1
+			stop
+	}
+}
 
 actor Crown : ScoreItem 65
 {
@@ -42,6 +69,15 @@ actor Crown : ScoreItem 65
 	{
 		Spawn:
 			CRWN A -1
+			stop
+	}
+}
+actor Bomb : Crown 149
+{
+	states
+	{
+		Spawn:
+			BOMB A -1
 			stop
 	}
 }

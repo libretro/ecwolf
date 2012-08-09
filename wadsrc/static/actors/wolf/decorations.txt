@@ -7,6 +7,15 @@ actor Puddle 33
 			stop
 	}
 }
+actor Puddle2 : Puddle 105
+{
+	states
+	{
+		Spawn:
+			WTR2 A -1
+			stop
+	}
+}
 
 actor GreenBarrel 34
 {
@@ -16,6 +25,15 @@ actor GreenBarrel 34
 	{
 		Spawn:
 			DRUM A -1
+			stop
+	}
+}
+actor HorizontalGreenBarrel : GreenBarrel 106
+{
+	states
+	{
+		Spawn:
+			HDRM A -1
 			stop
 	}
 }
@@ -31,6 +49,15 @@ actor TableWithChairs 35
 			stop
 	}
 }
+actor TableWithChairs2 : TableWithChairs 107
+{
+	states
+	{
+		Spawn:
+			TCR2 A -1
+			stop
+	}
+}
 
 actor FloorLamp 36
 {
@@ -43,6 +70,15 @@ actor FloorLamp 36
 			stop
 	}
 }
+actor TallFloorLamp : FloorLamp 108
+{
+	states
+	{
+		Spawn:
+			LMP2 A -1 bright
+			stop
+	}
+}
 
 actor Chandelier 37
 {
@@ -50,6 +86,15 @@ actor Chandelier 37
 	{
 		Spawn:
 			CHAN A -1 bright
+			stop
+	}
+}
+actor Chandelier2 : Chandelier 109
+{
+	states
+	{
+		Spawn:
+			CHN2 A -1 bright
 			stop
 	}
 }
@@ -65,6 +110,15 @@ actor HangedMan 38
 			stop
 	}
 }
+actor HangedMan2 : HangedMan 110
+{
+	states
+	{
+		Spawn:
+			HNG2 A -1
+			stop
+	}
+}
 
 actor WhitePillar 40
 {
@@ -74,6 +128,15 @@ actor WhitePillar 40
 	{
 		Spawn:
 			COLU A -1
+			stop
+	}
+}
+actor CrackedPillar : WhitePillar 112
+{
+	states
+	{
+		Spawn:
+			COL3 A -1
 			stop
 	}
 }
@@ -89,6 +152,15 @@ actor GreenPlant 41
 			stop
 	}
 }
+actor GreenPlant2 : GreenPlant 113
+{
+	states
+	{
+		Spawn:
+			PNT2 A -1
+			stop
+	}
+}
 
 actor SkeletonFlat 42
 {
@@ -96,6 +168,15 @@ actor SkeletonFlat 42
 	{
 		Spawn:
 			SKEL A -1
+			stop
+	}
+}
+actor SkeletonFlat2 : SkeletonFlat 114
+{
+	states
+	{
+		Spawn:
+			SKL2 A -1
 			stop
 	}
 }
@@ -123,6 +204,15 @@ actor BrownPlant 44
 			stop
 	}
 }
+actor BrownPlant2 : BrownPlant 115
+{
+	states
+	{
+		Spawn:
+			BPL3 A -1
+			stop
+	}
+}
 
 actor Vase 45
 {
@@ -132,6 +222,15 @@ actor Vase 45
 	{
 		Spawn:
 			VASE A -1
+			stop
+	}
+}
+actor Vase2 : Vase 116
+{
+	states
+	{
+		Spawn:
+			VAS2 A -1
 			stop
 	}
 }
@@ -147,6 +246,15 @@ actor BareTable 46
 			stop
 	}
 }
+actor MetalTable : BareTable 117
+{
+	states
+	{
+		Spawn:
+			MTBL A -1
+			stop
+	}
+}
 
 actor CeilingLight 47
 {
@@ -157,6 +265,15 @@ actor CeilingLight 47
 			stop
 	}
 }
+actor CeilingLight2 : CeilingLight 118
+{
+	states
+	{
+		Spawn:
+			GLP2 A -1 bright
+			stop
+	}
+}
 
 actor RedCeilingLight 85
 {
@@ -164,6 +281,15 @@ actor RedCeilingLight 85
 	{
 		Spawn:
 			RLMP A -1 bright
+			stop
+	}
+}
+actor RedCeilingLight2 : RedCeilingLight 128
+{
+	states
+	{
+		Spawn:
+			RLP2 A -1 bright
 			stop
 	}
 }
@@ -190,6 +316,15 @@ actor SuitOfArmor 49
 			stop
 	}
 }
+actor SuitOfArmor2 : SuitOfArmor 120
+{
+	states
+	{
+		Spawn:
+			ARM2 A -1
+			stop
+	}
+}
 
 actor HangingCage 50
 {
@@ -199,6 +334,15 @@ actor HangingCage 50
 	{
 		Spawn:
 			CAG1 A -1
+			stop
+	}
+}
+actor HangingCage2 : HangingCage 121
+{
+	states
+	{
+		Spawn:
+			CAG6 A -1
 			stop
 	}
 }
@@ -214,6 +358,15 @@ actor SkeletonCage 51
 			stop
 	}
 }
+actor BrokenCage : SkeletonCage 122
+{
+	states
+	{
+		Spawn:
+			CAG7 A -1
+			stop
+	}
+}
 
 actor Bones1 52
 {
@@ -221,6 +374,15 @@ actor Bones1 52
 	{
 		Spawn:
 			BON1 A -1
+			stop
+	}
+}
+actor Bones5 : Bones1 123
+{
+	states
+	{
+		Spawn:
+			BON5 A -1
 			stop
 	}
 }
@@ -247,6 +409,15 @@ actor Basket 56
 			stop
 	}
 }
+actor DeadRat : Basket 125
+{
+	states
+	{
+		Spawn:
+			DRAT A -1
+			stop
+	}
+}
 
 actor Barrel 68
 {
@@ -256,6 +427,15 @@ actor Barrel 68
 	{
 		Spawn:
 			BARL A -1
+			stop
+	}
+}
+actor HorizontalBarrel : Barrel 151
+{
+	states
+	{
+		Spawn:
+			HBRL A -1
 			stop
 	}
 }
@@ -271,6 +451,15 @@ actor Well 69
 			stop
 	}
 }
+actor Well2 : Well 152
+{
+	states
+	{
+		Spawn:
+			WEL4 A -1
+			stop
+	}
+}
 
 actor EmptyWell 70
 {
@@ -283,13 +472,31 @@ actor EmptyWell 70
 			stop
 	}
 }
-
-actor Gibs2 71
+actor EmptyWell2 : EmptyWell 153
 {
 	states
 	{
 		Spawn:
-			BLUD A -1
+			WEL5 A -1
+			stop
+	}
+}
+
+actor Gibs 71
+{
+	states
+	{
+		Spawn:
+			GIBS A -1
+			stop
+	}
+}
+actor Gibs2 : Gibs 126
+{
+	states
+	{
+		Spawn:
+			GIB2 A -1
 			stop
 	}
 }
@@ -302,6 +509,15 @@ actor Flag 72
 	{
 		Spawn:
 			FLAG A -1
+			stop
+	}
+}
+actor TeslaCoil 127
+{
+	states
+	{
+		Spawn:
+			COIL A -1
 			stop
 	}
 }
@@ -327,6 +543,15 @@ actor Bones2 74
 			stop
 	}
 }
+actor Bones6 : Bones2 129
+{
+	states
+	{
+		Spawn:
+			BON6 A -1
+			stop
+	}
+}
 
 actor Bones3 75
 {
@@ -337,6 +562,15 @@ actor Bones3 75
 			stop
 	}
 }
+actor BareLightBulb : Bones3 130
+{
+	states
+	{
+		Spawn:
+			BULB A -1
+			stop
+	}
+}
 
 actor Bones4 76
 {
@@ -344,6 +578,15 @@ actor Bones4 76
 	{
 		Spawn:
 			BON4 A -1
+			stop
+	}
+}
+actor GreenSlime : Bones4 131
+{
+	states
+	{
+		Spawn:
+			SLIM A -1
 			stop
 	}
 }
@@ -392,6 +635,15 @@ actor Vines 80
 			stop
 	}
 }
+actor Bubbles : Vines 135
+{
+	states
+	{
+		Spawn:
+			BUBL A -1
+			stop
+	}
+}
 
 actor TruckRear 91
 {
@@ -401,6 +653,15 @@ actor TruckRear 91
 	{
 		Spawn:
 			TRUK A -1
+			stop
+	}
+}
+actor BJWasHere : TruckRear 137
+{
+	states
+	{
+		Spawn:
+			BJWH A -1
 			stop
 	}
 }
@@ -416,6 +677,15 @@ actor CageWithSkulls 84
 			stop
 	}
 }
+actor CageWithRat 124
+{
+	states
+	{
+		Spawn:
+			CAG8 A -1
+			stop
+	}
+}
 
 actor CageWithGore 83
 {
@@ -425,6 +695,15 @@ actor CageWithGore 83
 	{
 		Spawn:
 			CAG3 A -1
+			stop
+	}
+}
+actor CageWithGore2 : CageWithGore 119
+{
+	states
+	{
+		Spawn:
+			CAG5 A -1
 			stop
 	}
 }
@@ -440,6 +719,15 @@ actor Skewer 82
 			stop
 	}
 }
+actor SkullPile : Skewer 150
+{
+	states
+	{
+		Spawn:
+			SKPI A -1
+			stop
+	}
+}
 
 actor CowCarcass 86
 {
@@ -449,6 +737,15 @@ actor CowCarcass 86
 	{
 		Spawn:
 			COWC A -1
+			stop
+	}
+}
+actor ChemicalTable : CowCarcass 132
+{
+	states
+	{
+		Spawn:
+			CHEM A -1
 			stop
 	}
 }
@@ -465,6 +762,15 @@ actor WellWithBlood 87
 			stop
 	}
 }
+actor NuclearBarrel : WellWithBlood 133
+{
+	states
+	{
+		Spawn:
+			NUKE A -1
+			stop
+	}
+}
 
 actor SatanStatue 88
 {
@@ -474,6 +780,15 @@ actor SatanStatue 88
 	{
 		Spawn:
 			STAT A -1
+			stop
+	}
+}
+actor BlueColumn : SatanStatue 134
+{
+	states
+	{
+		Spawn:
+			COL4 A -1
 			stop
 	}
 }
@@ -489,4 +804,12 @@ actor BrownColumn 89
 			stop
 	}
 }
-
+actor DevilStatue : BrownColumn 136
+{
+	states
+	{
+		Spawn:
+			STT2 A -1
+			stop
+	}
+}

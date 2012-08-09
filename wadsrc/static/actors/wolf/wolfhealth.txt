@@ -9,6 +9,15 @@ actor DogFood : Health 39
 			stop
 	}
 }
+actor DogFood2 : DogFood 111
+{
+	states
+	{
+		Spawn:
+			ALP2 A -1
+			stop
+	}
+}
 
 actor Food : Health 57
 {
@@ -21,6 +30,15 @@ actor Food : Health 57
 			stop
 	}
 }
+actor Food2 : Food 142
+{
+	states
+	{
+		Spawn:
+			FOD2 A -1
+			stop
+	}
+}
 
 actor Medikit : Health 58
 {
@@ -30,6 +48,15 @@ actor Medikit : Health 58
 	{
 		Spawn:
 			MEDI A -1
+			stop
+	}
+}
+actor Medikit2 : Medikit 143
+{
+	states
+	{
+		Spawn:
+			MED2 A -1
 			stop
 	}
 }
@@ -55,8 +82,17 @@ actor OneUp : CustomInventory 66
 			stop
 	}
 }
+actor OneUpPill : OneUp 144
+{
+	states
+	{
+		Spawn:
+			PILL A -1 bright
+			stop
+	}
+}
 
-actor Gibs : Health 67
+actor Blood : Health 67
 {
 	inventory.amount 1
 	inventory.maxamount 10
@@ -64,7 +100,16 @@ actor Gibs : Health 67
 	states
 	{
 		Spawn:
-			GIBS A -1
+			BLUD A -1
+			stop
+	}
+}
+actor Blood2 : Blood 145
+{
+	states
+	{
+		Spawn:
+			BLD2 A -1
 			stop
 	}
 }

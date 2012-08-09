@@ -22,3 +22,23 @@ actor ClipBox : Clip 90
 			stop
 	}
 }
+
+actor BlueClip : Clip 139
+{
+	states
+	{
+		Spawn:
+			CLP2 A -1
+			stop
+	}
+}
+
+actor ClipBox2 : ClipBox 140
+{
+	states
+	{
+		Spawn:
+			AMO2 A -1
+			stop
+	}
+}
