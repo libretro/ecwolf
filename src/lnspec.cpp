@@ -42,6 +42,7 @@
 #include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_play.h"
+#include "g_mapinfo.h"
 #include "g_shared/a_keys.h"
 #include "thingdef/thingdef.h"
 using namespace Specials;
@@ -100,6 +101,49 @@ LineSpecialFunction Specials::LookupFunction(LineSpecials function)
 
 #include "thinker.h"
 
+// Temporary function until sound sequences are supported
+static void PlaySoundSequence(MapSpot spot, bool door, bool open)
+{
+	// Valid squences:
+	// DoorNormal
+	// DoorMetal (Lost Episodes)
+	// PushwallNormal
+	// PushwallHeavy (Lost Episodes)
+
+	FName sequence = door ? gameinfo.DoorSoundSequence : gameinfo.PushwallSoundSequence;
+
+	if(open)
+	{
+		switch(sequence)
+		{
+			case NAME_DoorNormal:
+				PlaySoundLocMapSpot("doors/open", spot);
+				break;
+			case NAME_DoorMetal:
+				PlaySoundLocMapSpot("doors/metal_open", spot);
+				break;
+			case NAME_PushwallNormal:
+				PlaySoundLocMapSpot("world/pushwall", spot);
+				break;
+			case NAME_PushwallHeavy:
+				PlaySoundLocMapSpot("world/pushwall_heavy", spot);
+				break;
+		}
+	}
+	else
+	{
+		switch(sequence)
+		{
+			case NAME_DoorNormal:
+				PlaySoundLocMapSpot("doors/close", spot);
+				break;
+			case NAME_DoorMetal:
+				PlaySoundLocMapSpot("doors/metal_close", spot);
+				break;
+		}
+	}
+}
+
 FUNC(NOP)
 {
 	return 0;
@@ -142,7 +186,7 @@ class EVDoor : public Thinker
 						map->LinkZones(zone1, zone2, true);
 
 						if(map->CheckLink(zone1, players[0].mo->GetZone(), true))
-							PlaySoundLocMapSpot("doors/open", spot);
+							PlaySoundSequence(spot, true, true);
 					}
 
 					if(amount < 0xffff)
@@ -267,7 +311,7 @@ class EVDoor : public Thinker
 					break;
 				case Closing:
 					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[0].mo->GetZone(), true))
-						PlaySoundLocMapSpot("doors/close", spot);
+						PlaySoundSequence(spot, true, false);
 					break;
 			}
 			return true;
@@ -365,7 +409,7 @@ class EVPushwall : public Thinker
 		void Tick()
 		{
 			if(position == 0)
-				SD_PlaySound ("world/pushwall");
+				PlaySoundSequence(spot, false, true);
 
 			// Setup the next tile to get ready to accept this tile.
 			if(moveTo == NULL)
@@ -461,7 +505,6 @@ FUNC(Exit_Normal)
 	buttonheld[bt_use] = true;
 
 	playstate = ex_completed;
-	SD_PlaySound ("switches/exitbutn");
 	SD_WaitSoundDone();
 	return 1;
 }
@@ -473,7 +516,6 @@ FUNC(Exit_Secret)
 	buttonheld[bt_use] = true;
 
 	playstate = ex_secretlevel;
-	SD_PlaySound ("switches/exitbutn");
 	SD_WaitSoundDone();
 	return 1;
 }

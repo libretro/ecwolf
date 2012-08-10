@@ -57,6 +57,8 @@ xx(DoorMetal)
 xx(DoorCreak)
 xx(DoorMetal2)
 xx(Wind)
+xx(PushwallNormal)
+xx(PushwallHeavy)
 
 xx(PointPusher)
 xx(PointPuller)

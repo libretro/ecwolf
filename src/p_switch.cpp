@@ -50,6 +50,9 @@
 #include "gamemap.h"
 #include "thinker.h"
 #include "thingdef/thingdef.h"
+#include "lnspec.h"
+#include "id_sd.h"
+#include "wl_game.h"
 
 //#include "gi.h"
 
@@ -214,10 +217,12 @@ bool P_CheckSwitchRange(AActor *user, line_t *line, int sideno)
 //
 //==========================================================================
 
+// Temp function
+static inline ENamedName S_FindSound(FName sound) { return (ENamedName)(int)sound; }
 bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, BYTE special, bool *quest)
 {
 //	int texture;
-	int sound;
+	ENamedName sound;
 	FSwitchDef *Switch;
 
 #if 0
@@ -248,21 +253,19 @@ bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, BYTE
 #endif
 
 	// EXIT SWITCH?
-#if 0
 	if (Switch->Sound != 0)
 	{
-		sound = Switch->Sound;
+		sound = (ENamedName)Switch->Sound;
 	}
 	else
 	{
 		sound = S_FindSound (
-			special == Exit_Normal ||
-			special == Exit_Secret ||
-			special == Teleport_NewMap ||
-			special == Teleport_EndGame
+			special == Specials::Exit_Normal ||
+			special == Specials::Exit_Secret ||
+			special == Specials::Teleport_NewMap// ||
+			//special == Specials::Teleport_EndGame
 		   ? "switches/exitbutn" : "switches/normbutn");
 	}
-#endif
 
 	// [RH] The original code played the sound at buttonlist->soundorg,
 	//		which wasn't necessarily anywhere near the switch if it was
@@ -282,12 +285,13 @@ bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, BYTE
 	{
 		playsound = true;
 	}
-#if 0
 	if (playsound)
 	{
-		S_Sound (pt[0], pt[1], 0, CHAN_VOICE|CHAN_LISTENERZ, sound, 1, ATTN_STATIC);
+		//FName test = "switches/normbutn";
+		//Printf("Here %d %s %d %s\n", (int)test, test.GetChars(), (int)sound, sound.GetChars());
+		SD_PlaySound(FName(sound).GetChars());
+		//PlaySoundLocMapSpot(FName(sound), spot);
 	}
-#endif
 	if (quest != NULL)
 	{
 		*quest = Switch->QuestPanel;

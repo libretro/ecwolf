@@ -65,6 +65,8 @@ public:
 	FString	IntermissionMusic;
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
+	FName	DoorSoundSequence;
+	FName	PushwallSoundSequence;
 
 	TArray<FName>	PlayerClasses;
 	TArray<FString>	QuitMessages;

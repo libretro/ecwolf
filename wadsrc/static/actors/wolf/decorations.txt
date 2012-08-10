@@ -209,7 +209,7 @@ actor BrownPlant2 : BrownPlant 115
 	states
 	{
 		Spawn:
-			BPL3 A -1
+			BPL2 A -1
 			stop
 	}
 }

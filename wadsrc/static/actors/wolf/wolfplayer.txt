@@ -21,7 +21,7 @@ actor BJPlayer : PlayerPawn
 	}
 }
 
-actor LostBJPlayer : PlayerPawn
+actor LostBJPlayer : BJPlayer
 {
 	player.displayname "BJ Blazkowicz"
 	player.startitem "BlueClip", 8

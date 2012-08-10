@@ -2,11 +2,11 @@ doors/open				{ DSDROPN ALDROPN PCDROPN }
 doors/close				{ DSDRCLS ALDRCLS PCDRCLS }
 
 doors/metal_open		{ DSMDROPN ALDROPN PCDROPN }
-doors/metal_open		{ DSMDRCLS ALDRCLS PCDRCLS }
+doors/metal_close		{ DSMDRCLS ALDRCLS PCDRCLS }
 
 world/hitwall			{ NULL ALHITWAL PCHITWAL }
 world/pushwall			{ DSPSHWAL ALPSHWAL PCPSHWAL }
-world/pushwall2			{ DSLPHWAL ALPSHWAL PCPSHWAL }
+world/pushwall_heavy	{ DSLPHWAL ALPSHWAL PCPSHWAL }
 
 switches/normbutn		{ DSSWITCH ALSWITCH PCSWITCH }
 $alias switches/exitbutn switches/normbutn
@@ -15,6 +15,7 @@ switches/elevbutn		{ DSPLATFM ALSWITCH PCSWITCH }
 misc/1up				{ NULL ALBNS1UP PCBNS1UP }
 misc/do_nothing			{ NULL ALNOTHIN PCNOTHIN }
 misc/ammo_pickup		{ NULL ALAMMOUP PCAMMOUP }
+misc/ammobox_pickup		{ NULL ALAMBXUP PCAMBXUP }
 misc/health_pickup		{ NULL ALFOODUP PCFOODUP }
 misc/medkit_pickup		{ NULL ALMEDIUP PCMEDIUP }
 misc/k_pkup				{ NULL ALGETKEY PCGETKEY }

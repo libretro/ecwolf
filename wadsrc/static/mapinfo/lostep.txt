@@ -3,6 +3,8 @@ include "mapinfo/spear.txt"
 gameinfo
 {
 	playerclasses = "LostBJPlayer"
+	doorsoundsequence = "DoorMetal"
+	pushwallsoundsequence = "PushwallHeavy"
 }
 
 adddefaultmap

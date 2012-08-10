@@ -191,6 +191,13 @@ protected:
 		dest = sc->str;
 	}
 
+	void ParseNameAssignment(FName &dest)
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_StringConst);
+		dest = sc->str;
+	}
+
 	void ParseStringArrayAssignment(TArray<FString> &dest)
 	{
 		sc.MustGetToken('=');
@@ -561,6 +568,8 @@ protected:
 			ParseStringAssignment(gameinfo.BorderFlat);
 		else if(key.CompareNoCase("creditpage") == 0)
 			ParseStringAssignment(gameinfo.CreditPage);
+		else if(key.CompareNoCase("doorsoundsequence") == 0)
+			ParseNameAssignment(gameinfo.DoorSoundSequence);
 		else if(key.CompareNoCase("drawreadthis") == 0)
 			ParseBoolAssignment(gameinfo.DrawReadThis);
 		else if(key.CompareNoCase("gamepalette") == 0)
@@ -587,6 +596,8 @@ protected:
 			ParseIntAssignment(gameinfo.PageTime);
 		else if(key.CompareNoCase("menumusic") == 0)
 			ParseStringAssignment(gameinfo.MenuMusic);
+		else if(key.CompareNoCase("pushwallsoundsequence") == 0)
+			ParseNameAssignment(gameinfo.PushwallSoundSequence);
 		else if(key.CompareNoCase("scoresmusic") == 0)
 			ParseStringAssignment(gameinfo.ScoresMusic);
 		else if(key.CompareNoCase("finalemusic") == 0)

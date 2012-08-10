@@ -226,7 +226,7 @@ void FTextureManager::ProcessSwitchDef (Scanner &sc)
 
 FSwitchDef *FTextureManager::ParseSwitchDef (Scanner &sc, bool ignoreBad)
 {
-	typedef int FSoundID; // For now
+	typedef FName FSoundID; // For now
 	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	FSwitchDef *def;
 	TArray<FSwitchDef::frame> frames;
@@ -241,13 +241,13 @@ FSwitchDef *FTextureManager::ParseSwitchDef (Scanner &sc, bool ignoreBad)
 	{
 		if (sc->str.Compare ("sound") == 0)
 		{
-			if (sound != 0)
+			if ((int)sound != 0)
 			{
 				sc.ScriptMessage (Scanner::ERROR, "Switch state already has a sound");
 			}
 			if(!sc.GetNextString ())
 				sc.ScriptMessage(Scanner::ERROR, "Expected string.");
-			sound = 1;//sc.String;
+			sound = sc->str;
 		}
 		else if (sc->str.Compare ("pic") == 0)
 		{
