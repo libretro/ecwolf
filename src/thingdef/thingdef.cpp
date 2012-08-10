@@ -424,8 +424,6 @@ ClassDef::ClassDef() : tentative(false)
 
 ClassDef::~ClassDef()
 {
-	for(unsigned int i = 0;i < frameList.Size();++i)
-		delete frameList[i];
 	if(defaultInstance)
 	{
 		M_Free(defaultInstance);
@@ -1659,12 +1657,21 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 
 void ClassDef::UnloadActors()
 {
+	TMap<FName, ClassDef *>::Pair *pair;
+
+	// Clean up the frames in case any expressions use the symbols
+	for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
+	{
+		ClassDef *type = pair->Value;
+		for(unsigned int i = 0;i < type->frameList.Size();++i)
+			delete type->frameList[i];
+	}
+
 	// Also contains code from ZDoom
 
 	bShutdown = true;
 
 	TArray<size_t *> uniqueFPs;
-	TMap<FName, ClassDef *>::Pair *pair;
 	for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
 	{
 		ClassDef *type = pair->Value;

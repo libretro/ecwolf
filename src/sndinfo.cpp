@@ -58,7 +58,7 @@ SoundIndex::SoundIndex(const char* logical)
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-SoundData::SoundData() : priority(50)
+SoundData::SoundData() : priority(50), isAlias(false)
 {
 	data[0] = data[1] = data[2] = NULL;
 	lump[0] = lump[1] = lump[2] = -1;
