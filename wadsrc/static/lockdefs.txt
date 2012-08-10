@@ -1,15 +1,15 @@
 lock 1 
 {
-	GoldKey
+	Any { GoldKey YellowKey }
 }
 
 lock 2
 {
-	SilverKey
+	Any { SilverKey CyanKey }
 }
 
 lock 101
 {
-	GoldKey
-	SilverKey
+	Any { GoldKey YellowKey }
+	Any { SilverKey CyanKey }
 }
