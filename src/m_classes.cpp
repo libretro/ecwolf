@@ -344,6 +344,13 @@ ControlMenuItem::ControlMenuItem(ControlScheme &button) : MenuItem(button.name),
 
 void ControlMenuItem::activate()
 {
+	if(mouseenabled)
+	{
+		// Check for mouse up
+		ControlInfo ci;
+		do { ReadAnyControl(&ci); } while(ci.button0 || ci.button1);
+	}
+
 	DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR, 0, HIGHLIGHT);
 	PrintX = 162 + (52*column);
 	US_Print(BigFont, "???");
@@ -370,6 +377,7 @@ void ControlMenuItem::activate()
 				}
 				break;
 			case 1:
+			{
 				if(!mouseenabled)
 				{
 					exit = true;
@@ -385,7 +393,9 @@ void ControlMenuItem::activate()
 						exit = true;
 					}
 				}
+
 				break;
+			}
 			case 2:
 				if(!joystickenabled)
 				{
@@ -416,6 +426,13 @@ void ControlMenuItem::activate()
 
 	// Setting one vale could affect another
 	menu->draw();
+
+	if(mouseenabled)
+	{
+		// Check for mouse up
+		ControlInfo ci;
+		do { ReadAnyControl(&ci); } while(ci.button0 || ci.button1);
+	}
 }
 
 void ControlMenuItem::draw()
