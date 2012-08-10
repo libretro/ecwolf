@@ -10,8 +10,6 @@ actor BJPlayer : PlayerPawn
 	player.weaponslot 2, "Pistol"
 	player.weaponslot 3, "MachineGun"
 	player.weaponslot 4, "GatlingGun"
-	+PICKUP
-
 	states
 	{
 		Spawn:
@@ -21,6 +19,18 @@ actor BJPlayer : PlayerPawn
 			TNT1 A -1
 			stop
 	}
+}
+
+actor LostBJPlayer : PlayerPawn
+{
+	player.displayname "BJ Blazkowicz"
+	player.startitem "BlueClip", 8
+	player.startitem "BluePistol"
+	player.startitem "Knife2"
+	player.weaponslot 1, "Knife2"
+	player.weaponslot 2, "BluePistol"
+	player.weaponslot 3, "BlueAK47"
+	player.weaponslot 4, "BlueGatlingGun"
 }
 
 actor BJRun

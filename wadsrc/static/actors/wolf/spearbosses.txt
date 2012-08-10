@@ -38,6 +38,9 @@ actor Trans 23
 }
 actor SubmarineWilly : Trans 99
 {
+	seesound "subwilly/sight"
+	deathsound "subwilly/death"
+	attacksound "subwilly/attack"
 	states
 	{
 		Spawn:
@@ -113,6 +116,8 @@ actor UberMutant 24
 }
 actor TheAxe : UberMutant 101
 {
+	deathsound "theaxe/death"
+	attacksound "theaxe/attack"
 	states
 	{
 		Spawn:
@@ -193,6 +198,9 @@ actor Wilhelm 25
 }
 actor ProfessorQuarkblitz : Wilhelm 100
 {
+	seesound "professor/sight"
+	deathsound "professor/death"
+	attacksound "professor/attack"
 	states
 	{
 		Spawn:
@@ -269,6 +277,9 @@ actor DeathKnight 26
 }
 actor Robot : DeathKnight 102
 {
+	seesound "robot/sight"
+	deathsound "robot/death"
+	attacksound "robot/attack"
 	states
 	{
 		Spawn:

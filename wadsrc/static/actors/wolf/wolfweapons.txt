@@ -36,6 +36,21 @@ actor Knife : WolfWeapon
 	}
 }
 
+actor Knife2 : Knife
+{
+	states
+	{
+		Ready:
+			KNF2 A 1 A_WeaponReady
+			loop
+		Fire:
+			KNF2 B 3
+			KNF2 C 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
+			KNF2 DE 3
+			goto Ready
+	}
+}
+
 actor Pistol : WolfWeapon
 {
 	inventory.icon "PISTOL"
@@ -51,6 +66,22 @@ actor Pistol : WolfWeapon
 			PISG B 3
 			PISG C 3 bright A_GunAttack
 			PISG DE 3
+			goto Ready
+	}
+}
+
+actor BluePistol : Pistol
+{
+	attacksound "weapon/bluepistol/attack"
+	states
+	{
+		Ready:
+			BPSG A 1 A_WeaponReady
+			loop
+		Fire:
+			BPSG B 3
+			BPSG C 3 bright A_GunAttack
+			BPSG DE 3
 			goto Ready
 	}
 }
@@ -79,13 +110,25 @@ actor MachineGun : WolfWeapon 60
 	}
 }
 
-actor BlueAK47 141
+actor BlueAK47 : MachineGun 141
 {
+	attacksound "weapon/blueak47/attack"
+	inventory.pickupsound "weapon/blueak47/pickup"
 	states
 	{
 		Spawn:
-			MGUN A -1
+			BAKP A -1
 			stop
+		Ready:
+			BAKG A 1 A_WeaponReady
+			loop
+		Fire:
+			BAKG B 3
+		Hold:
+			BAKG C 3 bright A_GunAttack
+			BAKG D 3
+			BAKG E 3 A_ReFire
+			goto Ready
 	}
 }
 
@@ -113,12 +156,23 @@ actor GatlingGun : WolfWeapon 61
 	}
 }
 
-actor BlueGatlingGun 156
+actor BlueGatlingGun : WolfWeapon 156
 {
+	attacksound "weapon/bluegatling/attack"
+	inventory.pickupsound "weapon/bluegatling/pickup"
 	states
 	{
 		Spawn:
-			CGUN A -1
+			BGUN A -1
 			stop
+		Ready:
+			BGTG A 1 A_WeaponReady
+			loop
+		Fire:
+			BGTG B 3
+		Hold:
+			BGTG CD 3 bright A_GunAttack
+			BGTG E 3 A_ReFire
+			goto Ready
 	}
 }

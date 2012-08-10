@@ -106,6 +106,7 @@ actor Blood : Health 67
 }
 actor Blood2 : Blood 145
 {
+	inventory.pickupsound "misc/slurpie2"
 	states
 	{
 		Spawn:

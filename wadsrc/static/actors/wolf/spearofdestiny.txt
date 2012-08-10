@@ -25,6 +25,7 @@ actor SpearOfDestiny : Inventory 92 native
 }
 actor SpearOfDestiny2 : SpearOfDestiny 138
 {
+	inventory.pickupsound "treasure/spear2/pickup"
 	states
 	{
 		Spawn:

@@ -51,6 +51,10 @@ actor Guard 11
 }
 actor GreenGuard : Guard 93
 {
+	attacksound "greenguard/attack"
+	deathsound "greenguard/death"
+	secretdeathsound "greenguard/crash"
+	seesound "greenguard/sight"
 	dropitem "BlueClip", 4
 	states
 	{
@@ -158,6 +162,10 @@ actor Dog 14
 }
 actor Doberman : Dog 95
 {
+	attacksound "doberman/attack"
+	deathsound "doberman/death"
+	secretdeathsound "doberman/crash"
+	seesound "doberman/sight"
 	states
 	{
 		Spawn:
@@ -246,6 +254,10 @@ actor Officer 12
 actor LostOfficer : Officer 97
 {
 	dropitem "BlueClip", 4
+	attacksound "lostofficer/attack"
+	deathsound "lostofficer/death"
+	secretdeathsound "lostofficer/crash"
+	seesound "lostofficer/sight"
 	states
 	{
 		Spawn:
@@ -340,6 +352,9 @@ actor Mutant 15
 }
 actor GunBat : Mutant 96
 {
+	attacksound "bat/attack"
+	deathsound "bat/death"
+	secretdeathsound "bat/fart"
 	dropitem "BlueClip", 4
 	states
 	{
@@ -443,6 +458,10 @@ actor WolfensteinSS 13 // ZDoom compatible name
 }
 actor Schutzstafell : WolfensteinSS 94
 {
+	attacksound "ss/attack"
+	deathsound "ss/death"
+	secretdeathsound "ss/fart"
+	seesound "ss/sight"
 	dropitem "BlueAK47"
 	dropitem "BlueClip", 4
 	states

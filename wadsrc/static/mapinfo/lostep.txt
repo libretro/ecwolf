@@ -1,5 +1,10 @@
 include "mapinfo/spear.txt"
 
+gameinfo
+{
+	playerclasses = "LostBJPlayer"
+}
+
 adddefaultmap
 {
 	translator = "xlat/lostep.txt"

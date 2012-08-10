@@ -108,6 +108,7 @@ actor Weapon : Inventory native
 actor PlayerPawn native
 {
 	player.maxhealth 100
+	+PICKUP
 }
 
 actor Unknown

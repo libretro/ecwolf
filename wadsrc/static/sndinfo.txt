@@ -1,11 +1,16 @@
 doors/open				{ DSDROPN ALDROPN PCDROPN }
 doors/close				{ DSDRCLS ALDRCLS PCDRCLS }
 
+doors/metal_open		{ DSMDROPN ALDROPN PCDROPN }
+doors/metal_open		{ DSMDRCLS ALDRCLS PCDRCLS }
+
 world/hitwall			{ NULL ALHITWAL PCHITWAL }
 world/pushwall			{ DSPSHWAL ALPSHWAL PCPSHWAL }
+world/pushwall2			{ DSLPHWAL ALPSHWAL PCPSHWAL }
 
 switches/normbutn		{ DSSWITCH ALSWITCH PCSWITCH }
-switches/exitbutn		{ DSSWITCH ALSWITCH PCSWITCH }
+$alias switches/exitbutn switches/normbutn
+switches/elevbutn		{ DSPLATFM ALSWITCH PCSWITCH }
 
 misc/1up				{ NULL ALBNS1UP PCBNS1UP }
 misc/do_nothing			{ NULL ALNOTHIN PCNOTHIN }
@@ -18,8 +23,10 @@ misc/end_bonus2			{ NULL ALENDBN2 PCENDBN2 }
 misc/no_bonus			{ NULL ALNOBNS PCNOBNS }
 misc/100percent			{ NULL ALPRC100 PCPRC100 }
 misc/slurpie			{ DSSLURPE ALSLURPE PCSLURPE }
+misc/slurpie2			{ DSLSLURP ALSLURPE PCSLURPE }
 misc/yeah				{ DSYEAH ALYEAH PCYEAH }
 misc/fart				{ DSFART ALFART PCFART }
+misc/crash				{ DSCRASH ALFART PCFART }
 
 treasure/cross/pickup	{ NULL ALBONUS1 PCBONUS1 }
 treasure/chalice/pickup	{ NULL ALBONUS2 PCBONUS2 }
@@ -32,19 +39,27 @@ menu/move1				{ NULL ALMVGUN1 PCMVGUN1 }
 menu/move2				{ NULL ALMVGUN2 PCMVGUN2 }
 
 player/death			{ NULL ALPLDETH PCPYDETH }
-player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN }
+player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN } // Unused in Wolf
 player/usefail			{ NULL ALNOWAY PCNOWAY }
 
 weapon/knife/attack		{ NULL ALKNFSWG PCKNFSWG }
 
 weapon/pistol/attack	{ DSPISTOL ALPISTOL PCPISTOL }
 
+weapon/bluepistol/attack { DSBLUEPS ALPISTOL PCPISTOL }
+
 weapon/machine/attack	{ DSMGUN ALMGUN PCMGUN }
 weapon/machine/pickup	{ NULL ALMGUNUP PCMGUNUP }
 $alias misc/w_pkup		weapon/machine/pickup
 
+weapon/blueak47/attack	{ DSAK47 ALMGUN PCMGUN }
+weapon/blueak47/pickup	{ NULL ALMGUNUP PCMGUNUP }
+
 weapon/gatling/attack	{ DSCGUN ALCGUN PCCGUN }
-weapon/gatling/pickup	{ NULL ALCGUNUP PCCGUNUP }
+weapon/gatling/pickup	{ DSCGUNUP ALCGUNUP PCCGUNUP }
+
+weapon/bluegatling/attack	{ DSBGTGUN ALCGUN PCCGUN }
+weapon/bluegatling/pickup	{ DSGTGNUP ALCGUNUP PCCGUNUP }
 
 guard/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
 guard/sight				{ DSGRDSIT ALGRDSIT PCGRDSIT }
@@ -62,11 +77,31 @@ $random guard/death		{ guard/death1 guard/death2 guard/death3 guard/death4 guard
 $random guard/fart16	{ misc/fart guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death }  // 1 / 16
 $random guard/fart		{ guard/fart16 guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death guard/death } // 1 / 256
 
+greenguard/attack			{ DSGGDFIR ALGRDFIR PCGRDFIR }
+greenguard/sight			{ DSGGDSIT ALGRDSIT PCGRDSIT }
+greenguard/death1			{ DSGGDTH1 ALGDDTH1 PCGDDTH1 }
+greenguard/death2			{ DSGGDTH2 ALGDDTH2 PCGDDTH2 }
+greenguard/death3			{ DSGGDTH2 ALGDDTH3 PCGDDTH3 } // Intentionally play the 2nd sound with digital
+greenguard/death4			{ DSGGDTH4 ALGDDTH4 PCGDDTH4 }
+greenguard/death5			{ DSGGDTH5 ALGDDTH5 PCGDDTH5 }
+greenguard/death6			{ DSGGDTH6 ALGDDTH6 PCGDDTH6 }
+greenguard/death7			{ DSGGDTH7 ALGDDTH7 PCGDDTH7 }
+greenguard/death8			{ DSGGDTH8 ALGDDTH8 PCGDDTH8 }
+$random greenguard/death	{ greenguard/death1 greenguard/death2 greenguard/death3 greenguard/death4 greenguard/death5 greenguard/death6 greenguard/death7 greenguard/death8 }
+$random greenguard/crash16	{ misc/crash greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death }
+$random greenguard/crash	{ greenguard/crash16 greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death greenguard/death }
+
 dog/sight				{ DSDOGSIT ALDOGSIT PCDOGSIT }
 dog/attack				{ DSDOGATK ALDOGATK PCDOGATK }
 dog/death				{ DSDOGDTH ALDOGDTH PCDOGDTH }
 $random dog/fart16		{ misc/fart dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death }
 $random dog/fart		{ misc/fart16 dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death dog/death }
+
+doberman/sight			{ DSDOBSIT ALDOGSIT PCDOGSIT }
+doberman/attack			{ DSDOBATK ALDOGATK PCDOGATK }
+doberman/death			{ DSDOBDTH ALDOGDTH PCDOGDTH }
+$random doberman/crash16 { misc/crash doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death }
+$random doberman/crash	{ misc/crash16 doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death doberman/death }
 
 wolfss/attack			{ DSSSFIRE ALSSFIRE PCSSFIRE } // This is not the same as Doom 2 since it used the shotgun sound
 wolfss/death			{ DSSSDTH ALSSDTH PCSSDTH }
@@ -74,16 +109,33 @@ wolfss/sight			{ DSSSSIT ALSSSIT PCSSSIT }
 $random wolfss/fart16	{ misc/fart wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death }
 $random wolfss/fart		{ wolfss/fart16 wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death wolfss/death }
 
+ss/attack				{ DSLSSFRE ALSSFIRE PCSSFIRE }
+ss/death				{ DSLSSDTH ALSSDTH PCSSDTH }
+ss/sight				{ DSLSSSIT ALSSSIT PCSSSIT }
+$random ss/crash16		{ misc/crash ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death }
+$random ss/crash		{ ss/crash16 ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death ss/death }
+
 mutant/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
 mutant/death			{ DSMUTDTH ALMUTDTH PCMUTDTH }
 $random mutant/fart16	{ misc/fart mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death }
 $random mutant/fart		{ misc/fart16 mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death mutant/death }
+
+bat/attack				{ DSGRDFIR ALGRDFIR PCGRDFIR }
+bat/death				{ DSBATDTH ALMUTDTH PCMUTDTH }
+$random bat/crash16		{ misc/crash bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death }
+$random bat/crash		{ misc/crash16 bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death bat/death }
 
 officer/sight			{ DSOFFSIT ALOFFSIT PCOFFSIT }
 officer/attack			{ DSGRDFIR ALGRDFIR PCGRDFIR }
 officer/death			{ DSOFFDTH ALOFFDTH PCOFFDTH }
 $random officer/fart16	{ misc/fart officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death }
 $random officer/fart	{ officer/fart16 officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death officer/death }
+
+lostofficer/sight		{ DSOF2SIT ALOFFSIT PCOFFSIT }
+lostofficer/attack		{ DSGGDFIR ALGRDFIR PCGRDFIR }
+lostofficer/death		{ DSOF2DTH ALOFFDTH PCOFFDTH }
+$random lostofficer/crash16	{ misc/crash lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death }
+$random lostofficer/crash	{ lostofficer/crash16 lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death lostofficer/death }
 
 hans/attack				{ DSBOSSFR ALBOSSFR PCBOSSFR }
 hans/sight				{ DSHANSIT ALHANSIT PCHANSIT }
@@ -135,7 +187,27 @@ angel/breath			{ NULL ALAGLBTH PCAGLBTH }
 angel/sight				{ DSAGLSIT ALAGLSIT PCAGLSIT }
 angel/death				{ DSAGLDTH ALAGLDTH PCAGLDTH }
 
+subwilly/attack			{ DSLBSSFR ALBOSSFR PCBOSSFR }
+subwilly/sight			{ DSSUBSIT ALTRASIT PCTRASIT }
+subwilly/death			{ DSSUBDTH ALTRADTH PCTRADTH }
+
+professor/attack		{ DSLBSSFR ALBOSSFR PCBOSSFR }
+professor/sight			{ DSPRFSIT ALWILSIT PCWILSIT }
+professor/death			{ DSPRFDTH ALWILDTH PCWILDTH }
+
+theaxe/attack			{ DSLBSSFR ALBOSSFR PCBOSSFR }
+theaxe/death			{ DSAXEDTH ALUBRDTH PCUBRDTH }
+
+robot/attack			{ DSLBSSFR ALBOSSFR PCBOSSFR }
+robot/sight				{ DSROBSIT ALKNTSIT PCKNTSIT }
+robot/death				{ DSROBDTH ALKNTDTH PCKNTDTH }
+
+devil/breath			{ NULL ALAGLBTH PCAGLBTH }
+devil/sight				{ DSDVLSIT ALAGLSIT PCAGLSIT }
+devil/death				{ DSDVLDTH ALAGLDTH PCAGLDTH }
+
 ghost/sight				{ NULL PCGHTSIT ALGHTSIT }
 ghost/death				{ NULL ALGHTDTH ALGHTDTH }
 
 treasure/spear/pickup	{ DSSPEAR ALSPEAR PCSPEAR }
+treasure/spear2/pickup	{ DSSPEAR2 ALSPEAR PCSPEAR }

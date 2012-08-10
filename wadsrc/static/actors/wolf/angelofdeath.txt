@@ -5,6 +5,8 @@ actor AngelOfDeath 27
 	health 1450, 1550, 1650, 2000
 	speed 1, 3
 	missilechance 8
+	seesound "angel/sight"
+	deathsound "angel/death"
 	MONSTER
 	+AMBUSH
 	states
@@ -52,6 +54,8 @@ actor AngelOfDeath 27
 }
 actor DevilIncarnate : AngelOfDeath 103
 {
+	seesound "devil/sight"
+	deathsound "devil/death"
 	states
 	{
 		Spawn:
@@ -89,7 +93,7 @@ actor DevilIncarnate : AngelOfDeath 103
 			DEVL A .5 A_Fall
 			DEVL A 52.5 A_DeathScream
 			DEVL I 5
-			DEVL J 5 A_PlaySound("misc/slurpie")
+			DEVL J 5 A_PlaySound("misc/slurpie2")
 			DEVL KLMNO 5
 			DEVL P -1 A_BossDeath
 			stop
