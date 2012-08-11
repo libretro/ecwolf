@@ -282,15 +282,20 @@ ACTION_FUNCTION(A_Dormant)
 {
 	AActor::Iterator *iter = AActor::GetIterator();
 	AActor *actor;
-	while((actor = iter->Next()->Item()) != NULL)
+	while(iter)
 	{
+		actor = iter->Item();
+		iter = iter->Next();
+		if(actor == self || !(actor->flags&(FL_SHOOTABLE|FL_SOLID)))
+			continue;
+
 		fixed radius = self->radius + actor->radius;
-		if(abs(self->x - actor->x) < radius ||
+		if(abs(self->x - actor->x) < radius &&
 			abs(self->y - actor->y) < radius)
 			return;
 	}
 
-	self->flags |= FL_AMBUSH | FL_SHOOTABLE;
+	self->flags |= FL_AMBUSH | FL_SHOOTABLE | FL_SOLID;
 	self->flags &= ~FL_ATTACKMODE;
 	self->dir = nodir;
 	self->SetState(self->SeeState);

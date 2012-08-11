@@ -20,6 +20,9 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	static const byte *toptex, *bottex;
 	FTextureID lasttoptex, lastbottex;
 
+	lastbottex.SetInvalid();
+	lasttoptex.SetInvalid();
+
 	int halfheight = viewheight >> 1;
 	int y0 = min_wallheight >> 3;              // starting y value
 	if(y0 > halfheight)

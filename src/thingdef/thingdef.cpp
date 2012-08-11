@@ -1089,6 +1089,13 @@ void ClassDef::ParseActor(Scanner &sc)
 						{
 							for(int func = 0;func <= 2;func++)
 							{
+								if(sc.CheckToken(':'))
+								{
+									// We have a state label!
+									needIdentifier = false;
+									sc.Rewind();
+									break;
+								}
 								if(sc->str.Len() == 4 || func == 2)
 								{
 									if(sc->str.CompareNoCase("goto") == 0)

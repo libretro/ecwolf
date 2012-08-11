@@ -66,10 +66,10 @@ actor Spectre 28
 			SPCT ABCD 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 		Death:
-			SPCT EFG 5
-			SPCT H 150
-			SPCT I 5
-			SPCT I 5 A_Dormant
+			SPCT E 5 A_Fall
+			SPCT FG 5
+			SPCT H 155
+			SPCT H 5 A_Dormant
 			wait
 	}
 }
@@ -84,10 +84,10 @@ actor GhoulishGhost : Spectre 104
 			GHUL ABCD 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 		Death:
-			GHUL EFG 5
-			GHUL H 150
-			GHUL I 5
-			GHUL I 5 A_Dormant
+			GHUL E 5 A_Fall
+			GHUL FG 5
+			GHUL H 155
+			GHUL H 5 A_Dormant
 			wait
 	}
 }
@@ -103,10 +103,10 @@ actor RadioactiveMist : Spectre 157
 			MIST ABCD 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
 			loop
 		Death:
-			MIST EFG 5
-			MIST H 150
-			MIST I 5
-			MIST I 5 A_Dormant
+			MIST E 5 A_Fall
+			MIST FG 5
+			MIST H 155
+			MIST H 5 A_Dormant
 			wait
 	}
 }
