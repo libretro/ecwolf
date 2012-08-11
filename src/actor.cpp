@@ -294,9 +294,14 @@ const Frame *AActor::FindState(const FName &name) const
 
 int AActor::GetDamage()
 {
-	int expression = GetClass()->Meta.GetMetaInt(AMETA_Damage, -1);
-	if(expression >= 0)
-		return damageExpressions[expression]->Evaluate(this).GetInt();
+	const ClassDef *cls = GetClass();
+	do
+	{
+		int expression = cls->Meta.GetMetaInt(AMETA_Damage, -1);
+		if(expression >= 0)
+			return damageExpressions[expression]->Evaluate(this).GetInt();
+	}
+	while((cls = cls->GetParent()));
 	return 0;
 }
 
