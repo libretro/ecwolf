@@ -261,7 +261,7 @@ ACTION_FUNCTION(A_MeleeAttack)
 	ACTION_PARAM_INT(accuracy, 1);
 
 	A_Face(self, players[0].mo);
-	if(CheckMeleeRange(self, players[0].mo))
+	if(CheckMeleeRange(self, players[0].mo, self->speed))
 	{
 		if(pr_meleeattack() < accuracy*255)
 			TakeDamage(damage, self);

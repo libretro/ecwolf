@@ -353,9 +353,9 @@ CHASE
 =================
 */
 
-bool CheckMeleeRange(AActor *actor1, AActor *actor2)
+bool CheckMeleeRange(AActor *actor1, AActor *actor2, fixed range)
 {
-	fixed r = actor1->radius + actor2->radius;
+	fixed r = actor1->radius + actor2->radius + range;
 	return abs(actor2->x - actor1->x) <= r && abs(actor2->y - actor1->y) <= r;
 }
 
@@ -439,7 +439,7 @@ ACTION_FUNCTION(A_Chase)
 				self->hidden = true;
 		}
 		else
-			self->hidden = !CheckMeleeRange(self, players[0].mo);
+			self->hidden = !CheckMeleeRange(self, players[0].mo, self->speed);
 	}
 	else
 	{
@@ -472,7 +472,7 @@ ACTION_FUNCTION(A_Chase)
 			//
 			// check for melee range
 			//
-			if(melee && CheckMeleeRange(self, players[0].mo))
+			if(melee && CheckMeleeRange(self, players[0].mo, self->speed))
 			{
 				PlaySoundLocActor(self->attacksound, self);
 				self->SetState(melee);
