@@ -31,14 +31,14 @@ IWad
 {
 	Name = "Mission 2: Return to Danger"
 	Required = "Spear of Destiny"
-	Mapinfo = "mapinfo/lostep.txt"
-	MustContain = "MISPK2"
+	Mapinfo = "mapinfo/danger.txt"
+	MustContain = "GHULA0"
 }
 
 IWad
 {
 	Name = "Mission 3: Ultimate Challenge"
 	Required = "Spear of Destiny"
-	Mapinfo = "mapinfo/lostep.txt"
-	MustContain = "MISPK3"
+	Mapinfo = "mapinfo/challenge.txt"
+	MustContain = "MISTA0"
 }

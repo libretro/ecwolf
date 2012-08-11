@@ -9,7 +9,7 @@ gameinfo
 
 adddefaultmap
 {
-	translator = "xlat/lostep.txt"
+	translator = "xlat/challenge.txt"
 }
 
 include "mapinfo/spearmaps.txt"

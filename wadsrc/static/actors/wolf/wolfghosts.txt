@@ -91,3 +91,22 @@ actor GhoulishGhost : Spectre 104
 			wait
 	}
 }
+
+actor RadioactiveMist : Spectre 157
+{
+	states
+	{
+		Spawn:
+			MIST ABCD 5 NOP A_Look(0, 0, 0, 0, 360)
+			loop
+		See:
+			MIST ABCD 5 NOP A_Chase("*", "*", CHF_DONTDODGE)
+			loop
+		Death:
+			MIST EFG 5
+			MIST H 150
+			MIST I 5
+			MIST I 5 A_Dormant
+			wait
+	}
+}
