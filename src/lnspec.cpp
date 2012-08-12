@@ -159,7 +159,7 @@ class EVDoor : public Thinker
 		{
 			ChangeState(Opening);
 			spot->thinker = this;
-			this->speed = 256*speed;
+			this->speed = 64*speed;
 			if(direction > 1)
 				this->direction = direction%2;
 		}
@@ -444,9 +444,9 @@ class EVPushwall : public Thinker
 			}
 
 			// Move the tile a bit.
-			if((position += speed) > 256)
+			if((position += speed) > 1024)
 			{
-				position -= 256;
+				position -= 1024;
 				spot->pushAmount = 0;
 				spot->SetTile(NULL);
 				spot->thinker = NULL;
@@ -456,7 +456,7 @@ class EVPushwall : public Thinker
 				moveTo = NULL;
 			}
 			else
-				spot->pushAmount = position/4;
+				spot->pushAmount = position/16;
 
 			if(!moveTo)
 			{

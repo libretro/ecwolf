@@ -10,7 +10,7 @@ tiles
 	trigger 90
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -20,7 +20,7 @@ tiles
 	trigger 91
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -30,7 +30,7 @@ tiles
 	trigger 92
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		arg1 = 1;
 		playeruse = true;
 		monsteruse = true;
@@ -41,7 +41,7 @@ tiles
 	trigger 93
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		arg1 = 1;
 		playeruse = true;
 		monsteruse = true;
@@ -52,7 +52,7 @@ tiles
 	trigger 94
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 164;
 		arg1 = 2;
 		playeruse = true;
 		monsteruse = true;
@@ -63,7 +63,7 @@ tiles
 	trigger 95
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		arg1 = 2;
 		playeruse = true;
 		monsteruse = true;
@@ -74,7 +74,7 @@ tiles
 	trigger 96
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		arg1 = 3;
 		playeruse = true;
 		monsteruse = true;
@@ -85,7 +85,7 @@ tiles
 	trigger 97
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		arg1 = 3;
 		playeruse = true;
 		monsteruse = true;
@@ -96,7 +96,7 @@ tiles
 	trigger 98
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		arg1 = 4;
 		playeruse = true;
 		monsteruse = true;
@@ -107,7 +107,7 @@ tiles
 	trigger 99
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		arg1 = 4;
 		playeruse = true;
 		monsteruse = true;
@@ -118,7 +118,7 @@ tiles
 	trigger 100
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -128,7 +128,7 @@ tiles
 	trigger 101
 	{
 		action = 1;
-		arg0 = 4;
+		arg0 = 16;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -726,7 +726,7 @@ things
 	trigger 98
 	{
 		action = 2;
-		arg0 = 2;
+		arg0 = 8;
 		arg1 = 1;
 		arg2 = 2;
 		playeruse = true;
