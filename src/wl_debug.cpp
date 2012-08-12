@@ -25,6 +25,7 @@
 #include "w_wad.h"
 #include "thingdef/thingdef.h"
 #include "g_shared/a_keys.h"
+#include "r_sprites.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -195,9 +196,10 @@ static void GiveAllWeaponsAndAmmo()
 		{
 			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
 			inv->RemoveFromWorld();
+			const Frame * const readyState = cls->FindState("Ready");
 			if(cls->GetParent() == NATIVE_CLASS(Ammo))
 				inv->amount = inv->maxamount;
-			else if(!cls->FindState("Ready"))
+			else if(!readyState || !R_CheckSpriteValid(readyState->spriteInf))
 			{ // Only give valid weapons
 				inv->Destroy();
 				continue;
