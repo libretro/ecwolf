@@ -58,7 +58,27 @@ void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 {
 	StartParseBlock
 
-	CheckKey("texturenorth")
+	CheckKey("blockingnorth")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.sideSolid[MapTile::North] = sc->boolean;
+	}
+	else CheckKey("blockingsouth")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.sideSolid[MapTile::South] = sc->boolean;
+	}
+	else CheckKey("blockingeast")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.sideSolid[MapTile::East] = sc->boolean;
+	}
+	else CheckKey("blockingwest")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.sideSolid[MapTile::West] = sc->boolean;
+	}
+	else CheckKey("texturenorth")
 	{
 		sc.MustGetToken(TK_StringConst);
 		tile.texture[MapTile::North] = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);

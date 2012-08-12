@@ -715,7 +715,7 @@ static bool TryMove (AActor *ob)
 				{
 					for(unsigned short i = 0;i < 4;++i)
 					{
-						if(spot->slideAmount[i] != 0xffff && checkLines[i])
+						if(spot->sideSolid[i] && spot->slideAmount[i] != 0xffff && checkLines[i])
 							return false;
 					}
 				}

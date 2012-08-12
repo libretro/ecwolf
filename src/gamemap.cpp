@@ -469,9 +469,15 @@ void GameMap::Plane::Map::SetTile(const MapTile *tile)
 	for(unsigned int i = 0;i < 4;++i)
 	{
 		if(tile)
+		{
+			sideSolid[i] = tile->sideSolid[i];
 			texture[i] = tile->texture[i];
+		}
 		else
+		{
+			sideSolid[i] = false;
 			texture[i].SetInvalid();
+		}
 	}
 }
 
@@ -546,6 +552,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 				<< plane.map[i].visible
 				<< plane.map[i].thinker
 				<< plane.map[i].slideAmount[0] << plane.map[i].slideAmount[1] << plane.map[i].slideAmount[2] << plane.map[i].slideAmount[3]
+				<< plane.map[i].sideSolid[0] << plane.map[i].sideSolid[1] << plane.map[i].sideSolid[2] << plane.map[i].sideSolid[3]
 				<< plane.map[i].triggers
 				<< plane.map[i].pushAmount
 				<< plane.map[i].tile

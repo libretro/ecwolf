@@ -96,10 +96,14 @@ class GameMap
 		};
 		struct Tile
 		{
-			Tile() : offsetVertical(false), offsetHorizontal(false) {}
+			Tile() : offsetVertical(false), offsetHorizontal(false)
+			{
+				sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
+			}
 
 			enum Side { East, North, West, South };
 			FTextureID		texture[4];
+			bool			sideSolid[4];
 			bool			offsetVertical;
 			bool			offsetHorizontal;
 		};
@@ -124,6 +128,7 @@ class GameMap
 					pushReceptor(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
+					sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
 				}
 
 				unsigned int	GetX() const;
@@ -143,6 +148,7 @@ class GameMap
 				bool			visible;
 				TObjPtr<Thinker> thinker;
 				unsigned int	slideAmount[4];
+				bool			sideSolid[4];
 				TArray<Trigger>	triggers;
 				Tile::Side		pushDirection;
 				unsigned int	pushAmount;
