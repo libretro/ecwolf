@@ -280,7 +280,7 @@ static const struct ExpressionFunction
 class MetaTable::Data
 {
 	public:
-		Data(MetaTable::Type type, uint32_t id) : id(id), type(type), next(NULL) {}
+		Data(MetaTable::Type type, uint32_t id) : id(id), type(type), inherited(false), next(NULL) {}
 		~Data()
 		{
 			SetType(MetaTable::INTEGER);
@@ -288,6 +288,8 @@ class MetaTable::Data
 
 		void	SetType(MetaTable::Type type)
 		{
+			// As soon as we try to change the value consider the meta data new
+			inherited = false;
 			if(this->type == type)
 				return;
 
@@ -300,8 +302,32 @@ class MetaTable::Data
 			this->type = type;
 		}
 
+		const Data &operator= (const Data &other)
+		{
+			id = other.id;
+			SetType(other.type);
+			inherited = true;
+
+			switch(type)
+			{
+				case MetaTable::INTEGER:
+					value.integer = other.value.integer;
+					break;
+				case MetaTable::STRING:
+					value.string = new char[strlen(other.value.string)+1];
+					strcpy(value.string, other.value.string);
+					break;
+				case MetaTable::FIXED:
+					value.fixedPoint = other.value.fixedPoint;
+					break;
+			}
+
+			return other;
+		}
+
 		uint32_t		id;
 		MetaTable::Type	type;
+		bool			inherited;
 		union
 		{
 			int			integer;
@@ -318,6 +344,18 @@ MetaTable::MetaTable() : head(NULL)
 MetaTable::~MetaTable()
 {
 	FreeTable();
+}
+
+void MetaTable::CopyMeta(const MetaTable &other)
+{
+	Data *data = other.head;
+	while(data)
+	{
+		Data *copyData = FindMetaData(data->id);
+		*copyData = *data;
+
+		data = data->next;
+	}
 }
 
 MetaTable::Data *MetaTable::FindMeta(uint32_t id) const
@@ -381,6 +419,12 @@ const char* MetaTable::GetMetaString(uint32_t id) const
 	if(!data)
 		return NULL;
 	return data->value.string;
+}
+
+bool MetaTable::IsInherited(uint32_t id)
+{
+	Data *data = FindMetaData(id);
+	return data->inherited;	
 }
 
 void MetaTable::SetMetaInt(uint32_t id, int value)
@@ -959,6 +1003,7 @@ void ClassDef::ParseActor(Scanner &sc)
 	{
 		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
 		newClass->defaultInstance->Class = newClass;
+		newClass->Meta = newClass->parent->Meta;
 	}
 
 	bool actionsSorted = true;

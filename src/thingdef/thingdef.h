@@ -197,9 +197,12 @@ class MetaTable
 		int			GetMetaInt(uint32_t id, int def=0) const;
 		fixed		GetMetaFixed(uint32_t id, fixed def=0) const;
 		const char*	GetMetaString(uint32_t id) const;
+		bool		IsInherited(uint32_t id);
 		void		SetMetaInt(uint32_t id, int value);
 		void		SetMetaFixed(uint32_t id, fixed value);
 		void		SetMetaString(uint32_t id, const char* value);
+
+		const MetaTable &operator= (const MetaTable &other) { CopyMeta(other); return *this; }
 
 	private:
 		class Data;
@@ -208,6 +211,7 @@ class MetaTable
 		Data	*FindMeta(uint32_t id) const;
 		Data	*FindMetaData(uint32_t id);
 
+		void	CopyMeta(const MetaTable &other);
 		void	FreeTable();
 };
 

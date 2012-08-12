@@ -38,6 +38,7 @@ actor Knife : WolfWeapon
 
 actor Knife2 : Knife
 {
+	weapon.selectionorder 3690
 	states
 	{
 		Ready:
@@ -73,6 +74,7 @@ actor Pistol : WolfWeapon
 actor BluePistol : Pistol
 {
 	attacksound "weapon/bluepistol/attack"
+	weapon.selectionorder 1890
 	states
 	{
 		Ready:
@@ -114,6 +116,7 @@ actor BlueAK47 : MachineGun 141
 {
 	attacksound "weapon/blueak47/attack"
 	inventory.pickupsound "weapon/blueak47/pickup"
+	weapon.selectionorder 1290
 	states
 	{
 		Spawn:
@@ -160,6 +163,7 @@ actor BlueGatlingGun : GatlingGun 156
 {
 	attacksound "weapon/bluegatling/attack"
 	inventory.pickupsound "weapon/bluegatling/pickup"
+	weapon.selectionorder 690
 	states
 	{
 		Spawn:

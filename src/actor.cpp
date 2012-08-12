@@ -294,27 +294,15 @@ const Frame *AActor::FindState(const FName &name) const
 
 int AActor::GetDamage()
 {
-	const ClassDef *cls = GetClass();
-	do
-	{
-		int expression = cls->Meta.GetMetaInt(AMETA_Damage, -1);
-		if(expression >= 0)
-			return damageExpressions[expression]->Evaluate(this).GetInt();
-	}
-	while((cls = cls->GetParent()));
+	int expression = GetClass()->Meta.GetMetaInt(AMETA_Damage, -1);
+	if(expression >= 0)
+		return damageExpressions[expression]->Evaluate(this).GetInt();
 	return 0;
 }
 
 AActor::DropList *AActor::GetDropList() const
 {
-	const ClassDef *cls = GetClass();
-	int dropitemsIndex;
-	do
-	{
-		dropitemsIndex = cls->Meta.GetMetaInt(AMETA_DropItems, -1);
-	}
-	while(dropitemsIndex == -1 && (cls = cls->GetParent()));
-
+	int dropitemsIndex = GetClass()->Meta.GetMetaInt(AMETA_DropItems, -1);
 	if(dropitemsIndex == -1)
 		return NULL;
 	return dropItems[dropitemsIndex];

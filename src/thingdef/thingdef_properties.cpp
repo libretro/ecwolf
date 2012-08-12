@@ -120,7 +120,7 @@ HANDLE_PROPERTY(dropitem)
 	// NOTE: When used with inheritance the old list is wiped.
 	STRING_PARAM(item, 0);
 
-	if(cls->Meta.GetMetaInt(AMETA_DropItems, -1) == -1)
+	if(cls->Meta.GetMetaInt(AMETA_DropItems, -1) == -1 || cls->Meta.IsInherited(AMETA_DropItems))
 		cls->Meta.SetMetaInt(AMETA_DropItems, AActor::dropItems.Push(new AActor::DropList()));
 
 	AActor::DropItem drop;
@@ -301,7 +301,7 @@ HANDLE_PROPERTY(startitem)
 
 	APlayerPawn *def = (APlayerPawn *)defaults;
 
-	if(cls->Meta.GetMetaInt(APMETA_StartInventory, -1) == -1)
+	if(cls->Meta.GetMetaInt(APMETA_StartInventory, -1) == -1 || cls->Meta.IsInherited(APMETA_StartInventory))
 		cls->Meta.SetMetaInt(APMETA_StartInventory, APlayerPawn::startInventory.Push(new AActor::DropList()));
 
 	AActor::DropItem drop;

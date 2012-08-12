@@ -5,6 +5,7 @@
 #else
 	#include <unistd.h>
 #endif
+#include <climits>
 
 #include "wl_def.h"
 #include "wl_menu.h"
@@ -184,6 +185,9 @@ void BasicOverhead (void)
 static void GiveAllWeaponsAndAmmo()
 {
 	// Give Weapons and Max out ammo
+	const ClassDef *bestWeapon = NULL;
+	int bestWeaponOrder = players[0].ReadyWeapon ? players[0].ReadyWeapon->GetClass()->Meta.GetMetaInt(AWMETA_SelectionOrder) : INT_MAX;
+
 	ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
 	ClassDef::ClassPair *pair;
 	while(iter.NextPair(pair))
@@ -204,11 +208,30 @@ static void GiveAllWeaponsAndAmmo()
 				inv->Destroy();
 				continue;
 			}
+			else // Should be a weapon that we're giving
+			{
+				int selectionOrder = cls->Meta.GetMetaInt(AWMETA_SelectionOrder);
+				if(selectionOrder < bestWeaponOrder)
+				{
+					bestWeapon = cls;
+					bestWeaponOrder = selectionOrder;
+				}
+			}
 
 			if(!inv->TryPickup(players[0].mo))
 				inv->Destroy();
 		}
 	}
+
+	// Switch to best weapon
+	if(bestWeapon)
+	{
+		AWeapon *weapon = static_cast<AWeapon *>(players[0].mo->FindInventory(bestWeapon));
+		if(weapon)
+			players[0].PendingWeapon = weapon;
+	}
+	else
+		players[0].PendingWeapon = WP_NOCHANGE;
 }
 
 /*
