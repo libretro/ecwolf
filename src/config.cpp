@@ -51,16 +51,10 @@ using namespace std;
 
 #include "zstring.h"
 
-Config *config = new Config();
-void saveAtExit()
-{
-	config->SaveConfig();
-	delete config;
-}
+Config config;
 
 Config::Config() : firstRun(false)
 {
-	atterm(saveAtExit);
 }
 
 Config::~Config()

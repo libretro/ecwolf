@@ -53,9 +53,9 @@ void FinalReadConfig()
 	SMMode  sm;
 	SDSMode sds;
 
-	sd = static_cast<SDMode> (config->GetSetting("SoundDevice")->GetInteger());
-	sm = static_cast<SMMode> (config->GetSetting("MusicDevice")->GetInteger());
-	sds = static_cast<SDSMode> (config->GetSetting("DigitalSoundDevice")->GetInteger());
+	sd = static_cast<SDMode> (config.GetSetting("SoundDevice")->GetInteger());
+	sm = static_cast<SMMode> (config.GetSetting("MusicDevice")->GetInteger());
+	sds = static_cast<SDSMode> (config.GetSetting("DigitalSoundDevice")->GetInteger());
 
 	if ((sd == sdm_AdLib || sm == smm_AdLib) && !AdLibPresent
 			&& !SoundBlasterPresent)
@@ -87,32 +87,32 @@ void FinalReadConfig()
 
 void ReadConfig(void)
 {
-	config->CreateSetting("ForceGrabMouse", false);
-	config->CreateSetting("MouseEnabled", 1);
-	config->CreateSetting("JoystickEnabled", 0);
-	config->CreateSetting("ViewSize", 19);
-	config->CreateSetting("MouseAdjustment", 5);
-	config->CreateSetting("SoundDevice", sdm_AdLib);
-	config->CreateSetting("MusicDevice", smm_AdLib);
-	config->CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
-	config->CreateSetting("AlwaysRun", 0);
-	config->CreateSetting("MouseYAxisDisabled", 0);
-	config->CreateSetting("SoundVolume", MAX_VOLUME);
-	config->CreateSetting("MusicVolume", MAX_VOLUME);
-	config->CreateSetting("DigitizedVolume", MAX_VOLUME);
-	config->CreateSetting("R_DepthFog", false);
-	config->CreateSetting("Vid_FullScreen", false);
-	config->CreateSetting("Vid_Aspect", ASPECT_NONE);
-	config->CreateSetting("ScreenWidth", screenWidth);
-	config->CreateSetting("ScreenHeight", screenHeight);
-	config->CreateSetting("QuitOnEscape", quitonescape);
+	config.CreateSetting("ForceGrabMouse", false);
+	config.CreateSetting("MouseEnabled", 1);
+	config.CreateSetting("JoystickEnabled", 0);
+	config.CreateSetting("ViewSize", 19);
+	config.CreateSetting("MouseAdjustment", 5);
+	config.CreateSetting("SoundDevice", sdm_AdLib);
+	config.CreateSetting("MusicDevice", smm_AdLib);
+	config.CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
+	config.CreateSetting("AlwaysRun", 0);
+	config.CreateSetting("MouseYAxisDisabled", 0);
+	config.CreateSetting("SoundVolume", MAX_VOLUME);
+	config.CreateSetting("MusicVolume", MAX_VOLUME);
+	config.CreateSetting("DigitizedVolume", MAX_VOLUME);
+	config.CreateSetting("R_DepthFog", false);
+	config.CreateSetting("Vid_FullScreen", false);
+	config.CreateSetting("Vid_Aspect", ASPECT_NONE);
+	config.CreateSetting("ScreenWidth", screenWidth);
+	config.CreateSetting("ScreenHeight", screenHeight);
+	config.CreateSetting("QuitOnEscape", quitonescape);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
-	forcegrabmouse = config->GetSetting("ForceGrabMouse")->GetInteger() != 0;
-	mouseenabled = config->GetSetting("MouseEnabled")->GetInteger() != 0;
-	joystickenabled = config->GetSetting("JoystickEnabled")->GetInteger() != 0;
+	forcegrabmouse = config.GetSetting("ForceGrabMouse")->GetInteger() != 0;
+	mouseenabled = config.GetSetting("MouseEnabled")->GetInteger() != 0;
+	joystickenabled = config.GetSetting("JoystickEnabled")->GetInteger() != 0;
 	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)
 	{
 		sprintf(joySettingName, "Joystick_%s", controlScheme[i].name);
@@ -127,26 +127,26 @@ void ReadConfig(void)
 			if(mseSettingName[j] == ' ')
 				mseSettingName[j] = '_';
 		}
-		config->CreateSetting(joySettingName, controlScheme[i].joystick);
-		config->CreateSetting(keySettingName, controlScheme[i].keyboard);
-		config->CreateSetting(mseSettingName, controlScheme[i].mouse);
-		controlScheme[i].joystick = config->GetSetting(joySettingName)->GetInteger();
-		controlScheme[i].keyboard = config->GetSetting(keySettingName)->GetInteger();
-		controlScheme[i].mouse = config->GetSetting(mseSettingName)->GetInteger();
+		config.CreateSetting(joySettingName, controlScheme[i].joystick);
+		config.CreateSetting(keySettingName, controlScheme[i].keyboard);
+		config.CreateSetting(mseSettingName, controlScheme[i].mouse);
+		controlScheme[i].joystick = config.GetSetting(joySettingName)->GetInteger();
+		controlScheme[i].keyboard = config.GetSetting(keySettingName)->GetInteger();
+		controlScheme[i].mouse = config.GetSetting(mseSettingName)->GetInteger();
 	}
-	viewsize = config->GetSetting("ViewSize")->GetInteger();
-	mouseadjustment = config->GetSetting("MouseAdjustment")->GetInteger();
-	mouseyaxisdisabled = config->GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
-	alwaysrun = config->GetSetting("AlwaysRun")->GetInteger() != 0;
-	AdlibVolume = config->GetSetting("SoundVolume")->GetInteger();
-	MusicVolume = config->GetSetting("MusicVolume")->GetInteger();
-	SoundVolume = config->GetSetting("DigitizedVolume")->GetInteger();
-	r_depthfog = config->GetSetting("R_DepthFog")->GetInteger() != 0;
-	vid_fullscreen = config->GetSetting("Vid_FullScreen")->GetInteger() != 0;
-	vid_aspect = static_cast<Aspect>(config->GetSetting("Vid_Aspect")->GetInteger());
-	screenWidth = config->GetSetting("ScreenWidth")->GetInteger();
-	screenHeight = config->GetSetting("ScreenHeight")->GetInteger();
-	quitonescape = config->GetSetting("QuitOnEscape")->GetInteger() != 0;
+	viewsize = config.GetSetting("ViewSize")->GetInteger();
+	mouseadjustment = config.GetSetting("MouseAdjustment")->GetInteger();
+	mouseyaxisdisabled = config.GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
+	alwaysrun = config.GetSetting("AlwaysRun")->GetInteger() != 0;
+	AdlibVolume = config.GetSetting("SoundVolume")->GetInteger();
+	MusicVolume = config.GetSetting("MusicVolume")->GetInteger();
+	SoundVolume = config.GetSetting("DigitizedVolume")->GetInteger();
+	r_depthfog = config.GetSetting("R_DepthFog")->GetInteger() != 0;
+	vid_fullscreen = config.GetSetting("Vid_FullScreen")->GetInteger() != 0;
+	vid_aspect = static_cast<Aspect>(config.GetSetting("Vid_Aspect")->GetInteger());
+	screenWidth = config.GetSetting("ScreenWidth")->GetInteger();
+	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
+	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 
 	char hsName[50];
 	char hsScore[50];
@@ -159,15 +159,15 @@ void ReadConfig(void)
 		sprintf(hsCompleted, "HighScore%u_Completed", i);
 		sprintf(hsGraphic, "HighScore%u_Graphic", i);
 
-		config->CreateSetting(hsName, Scores[i].name);
-		config->CreateSetting(hsScore, Scores[i].score);
-		config->CreateSetting(hsCompleted, Scores[i].completed);
-		config->CreateSetting(hsGraphic, Scores[i].graphic);
+		config.CreateSetting(hsName, Scores[i].name);
+		config.CreateSetting(hsScore, Scores[i].score);
+		config.CreateSetting(hsCompleted, Scores[i].completed);
+		config.CreateSetting(hsGraphic, Scores[i].graphic);
 
-		strcpy(Scores[i].name, config->GetSetting(hsName)->GetString());
-		Scores[i].score = config->GetSetting(hsScore)->GetInteger();
-		Scores[i].completed = config->GetSetting(hsCompleted)->GetInteger();
-		strncpy(Scores[i].graphic, config->GetSetting(hsGraphic)->GetString(), 8);
+		strcpy(Scores[i].name, config.GetSetting(hsName)->GetString());
+		Scores[i].score = config.GetSetting(hsScore)->GetInteger();
+		Scores[i].completed = config.GetSetting(hsCompleted)->GetInteger();
+		strncpy(Scores[i].graphic, config.GetSetting(hsGraphic)->GetString(), 8);
 		Scores[i].graphic[8] = 0;
 	}
 
@@ -196,9 +196,9 @@ void WriteConfig(void)
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
-	config->GetSetting("ForceGrabMouse")->SetValue(forcegrabmouse);
-	config->GetSetting("MouseEnabled")->SetValue(mouseenabled);
-	config->GetSetting("JoystickEnabled")->SetValue(joystickenabled);
+	config.GetSetting("ForceGrabMouse")->SetValue(forcegrabmouse);
+	config.GetSetting("MouseEnabled")->SetValue(mouseenabled);
+	config.GetSetting("JoystickEnabled")->SetValue(joystickenabled);
 	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)
 	{
 		sprintf(joySettingName, "Joystick_%s", controlScheme[i].name);
@@ -213,26 +213,26 @@ void WriteConfig(void)
 			if(mseSettingName[j] == ' ')
 				mseSettingName[j] = '_';
 		}
-		config->GetSetting(joySettingName)->SetValue(controlScheme[i].joystick);
-		config->GetSetting(keySettingName)->SetValue(controlScheme[i].keyboard);
-		config->GetSetting(mseSettingName)->SetValue(controlScheme[i].mouse);
+		config.GetSetting(joySettingName)->SetValue(controlScheme[i].joystick);
+		config.GetSetting(keySettingName)->SetValue(controlScheme[i].keyboard);
+		config.GetSetting(mseSettingName)->SetValue(controlScheme[i].mouse);
 	}
-	config->GetSetting("ViewSize")->SetValue(viewsize);
-	config->GetSetting("MouseAdjustment")->SetValue(mouseadjustment);
-	config->GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
-	config->GetSetting("AlwaysRun")->SetValue(alwaysrun);
-	config->GetSetting("SoundDevice")->SetValue(SoundMode);
-	config->GetSetting("MusicDevice")->SetValue(MusicMode);
-	config->GetSetting("DigitalSoundDevice")->SetValue(DigiMode);
-	config->GetSetting("SoundVolume")->SetValue(AdlibVolume);
-	config->GetSetting("MusicVolume")->SetValue(MusicVolume);
-	config->GetSetting("DigitizedVolume")->SetValue(SoundVolume);
-	config->GetSetting("R_DepthFog")->SetValue(r_depthfog);
-	config->GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
-	config->GetSetting("Vid_Aspect")->SetValue(vid_aspect);
-	config->GetSetting("ScreenWidth")->SetValue(screenWidth);
-	config->GetSetting("ScreenHeight")->SetValue(screenHeight);
-	config->GetSetting("QuitOnEscape")->SetValue(quitonescape);
+	config.GetSetting("ViewSize")->SetValue(viewsize);
+	config.GetSetting("MouseAdjustment")->SetValue(mouseadjustment);
+	config.GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
+	config.GetSetting("AlwaysRun")->SetValue(alwaysrun);
+	config.GetSetting("SoundDevice")->SetValue(SoundMode);
+	config.GetSetting("MusicDevice")->SetValue(MusicMode);
+	config.GetSetting("DigitalSoundDevice")->SetValue(DigiMode);
+	config.GetSetting("SoundVolume")->SetValue(AdlibVolume);
+	config.GetSetting("MusicVolume")->SetValue(MusicVolume);
+	config.GetSetting("DigitizedVolume")->SetValue(SoundVolume);
+	config.GetSetting("R_DepthFog")->SetValue(r_depthfog);
+	config.GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
+	config.GetSetting("Vid_Aspect")->SetValue(vid_aspect);
+	config.GetSetting("ScreenWidth")->SetValue(screenWidth);
+	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
+	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
 
 	char hsName[50];
 	char hsScore[50];
@@ -245,9 +245,11 @@ void WriteConfig(void)
 		sprintf(hsCompleted, "HighScore%u_Completed", i);
 		sprintf(hsGraphic, "HighScore%u_Graphic", i);
 
-		config->GetSetting(hsName)->SetValue(Scores[i].name);
-		config->GetSetting(hsScore)->SetValue(Scores[i].score);
-		config->GetSetting(hsCompleted)->SetValue(Scores[i].completed);
-		config->GetSetting(hsGraphic)->SetValue(Scores[i].graphic);
+		config.GetSetting(hsName)->SetValue(Scores[i].name);
+		config.GetSetting(hsScore)->SetValue(Scores[i].score);
+		config.GetSetting(hsCompleted)->SetValue(Scores[i].completed);
+		config.GetSetting(hsGraphic)->SetValue(Scores[i].graphic);
 	}
+
+	config.SaveConfig();
 }

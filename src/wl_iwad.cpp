@@ -438,10 +438,10 @@ FString I_GetSteamPath()
 
 void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad)
 {
-	config->CreateSetting("DefaultIWad", 0);
-	config->CreateSetting("ShowIWadPicker", 1);
-	bool showPicker = config->GetSetting("ShowIWadPicker")->GetInteger() != 0;
-	int defaultIWad = config->GetSetting("DefaultIWad")->GetInteger();
+	config.CreateSetting("DefaultIWad", 0);
+	config.CreateSetting("ShowIWadPicker", 1);
+	bool showPicker = config.GetSetting("ShowIWadPicker")->GetInteger() != 0;
+	int defaultIWad = config.GetSetting("DefaultIWad")->GetInteger();
 
 	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL, true);
 	if(!datawadRes)
@@ -451,11 +451,11 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 	// Get a list of potential data paths
 	FString dataPaths;
-	if(config->GetSetting("BaseDataPaths") == NULL)
+	if(config.GetSetting("BaseDataPaths") == NULL)
 	{
 		dataPaths = ".";
 #if !defined(__APPLE__)
-		dataPaths += FString(":") + config->GetConfigDir();
+		dataPaths += FString(":") + config.GetConfigDir();
 #else
 		UInt8 dataDirBase[PATH_MAX];
 		FSRef folder;
@@ -468,9 +468,9 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 			dataPaths += FString(":") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
 #endif
 
-		config->CreateSetting("BaseDataPaths", dataPaths);
+		config.CreateSetting("BaseDataPaths", dataPaths);
 	}
-	dataPaths = config->GetSetting("BaseDataPaths")->GetString();
+	dataPaths = config.GetSetting("BaseDataPaths")->GetString();
 
 	TArray<WadStuff> basefiles;
 	long split = 0;
@@ -539,7 +539,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		if(basefiles.Size() > 1)
 		{
 			pick = I_PickIWad(&basefiles[0], basefiles.Size(), showPicker, defaultIWad);
-			config->GetSetting("ShowIWadPicker")->SetValue(queryiwad);
+			config.GetSetting("ShowIWadPicker")->SetValue(queryiwad);
 		}
 		else
 			pick = 0;
@@ -547,7 +547,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	if(pick < 0)
 		Quit("");
 
-	config->GetSetting("DefaultIWad")->SetValue(pick);
+	config.GetSetting("DefaultIWad")->SetValue(pick);
 
 	WadStuff &base = basefiles[pick];
 	selectedGame = &iwadTypes[base.Type];

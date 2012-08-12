@@ -115,6 +115,6 @@ class Config
 		TMap<FName, SettingsData *>	settings;
 };
 
-extern Config *config;
+extern Config config;
 
 #endif /* __CONFIG_HPP__ */

@@ -1228,7 +1228,7 @@ int main (int argc, char *argv[])
 	try
 	{
 		printf("ReadConfig: Reading the Configuration.\n");
-		config->LocateConfigFile(argc, argv);
+		config.LocateConfigFile(argc, argv);
 		ReadConfig();
 
 		{
