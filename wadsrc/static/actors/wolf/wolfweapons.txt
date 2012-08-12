@@ -156,7 +156,7 @@ actor GatlingGun : WolfWeapon 61
 	}
 }
 
-actor BlueGatlingGun : WolfWeapon 156
+actor BlueGatlingGun : GatlingGun 156
 {
 	attacksound "weapon/bluegatling/attack"
 	inventory.pickupsound "weapon/bluegatling/pickup"

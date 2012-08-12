@@ -82,6 +82,10 @@ actor Key : Inventory native
 	inventory.interhubamount 0
 }
 
+actor KeyGiver : Inventory native
+{
+}
+
 actor ScoreItem : Inventory native
 {
 	+COUNTITEM

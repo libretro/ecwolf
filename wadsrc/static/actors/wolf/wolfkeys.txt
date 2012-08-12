@@ -8,8 +8,9 @@ actor GoldKey : Key 53
 	}
 }
 
-actor YellowKey : Key 154
+actor YellowKey : KeyGiver 154
 {
+	dropitem "GoldKey"
 	states
 	{
 		Spawn:
@@ -28,8 +29,9 @@ actor SilverKey : Key 54
 	}
 }
 
-actor CyanKey : Key 155
+actor CyanKey : KeyGiver 155
 {
+	dropitem "SilverKey"
 	states
 	{
 		Spawn:

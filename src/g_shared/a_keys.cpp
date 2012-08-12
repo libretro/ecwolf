@@ -10,6 +10,41 @@
 
 IMPLEMENT_CLASS(Key)
 
+class AKeyGiver : public AInventory
+{
+	DECLARE_NATIVE_CLASS(KeyGiver, Inventory)
+
+	public:
+		bool TryPickup(AActor *toucher)
+		{
+			bool pickedup = true;
+
+			DropList *list = GetDropList();
+			DropList::Node *item = list->Head();
+			while(item)
+			{
+				const ClassDef *cls = ClassDef::FindClass(item->Item().className);
+				item = item->Next();
+
+				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Key)))
+				{
+					pickedup = false;
+					continue;
+				}
+
+				AInventory *item = static_cast<AInventory *>(AActor::Spawn(cls, 0, 0, 0, true));
+				item->RemoveFromWorld();
+				if(!item->TryPickup(toucher))
+				{
+					pickedup = false;
+					item->Destroy();
+				}
+			}
+			return pickedup;
+		}
+};
+IMPLEMENT_CLASS(KeyGiver)
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // From ZDoom a_keys.cpp below this line

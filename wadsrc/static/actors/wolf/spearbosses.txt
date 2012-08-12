@@ -41,6 +41,7 @@ actor SubmarineWilly : Trans 99
 	seesound "subwilly/sight"
 	deathsound "subwilly/death"
 	attacksound "subwilly/attack"
+	dropitem "YellowKey"
 	states
 	{
 		Spawn:
@@ -118,6 +119,7 @@ actor TheAxe : UberMutant 101
 {
 	deathsound "theaxe/death"
 	attacksound "theaxe/attack"
+	dropitem "YellowKey"
 	states
 	{
 		Spawn:
@@ -201,6 +203,7 @@ actor ProfessorQuarkblitz : Wilhelm 100
 	seesound "professor/sight"
 	deathsound "professor/death"
 	attacksound "professor/attack"
+	dropitem "YellowKey"
 	states
 	{
 		Spawn:
@@ -280,6 +283,7 @@ actor Robot : DeathKnight 102
 	seesound "robot/sight"
 	deathsound "robot/death"
 	attacksound "robot/attack"
+	dropitem "YellowKey"
 	states
 	{
 		Spawn:

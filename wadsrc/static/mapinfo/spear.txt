@@ -199,6 +199,7 @@ adddefaultmap
 {
 	translator = "xlat/spear.txt"
 	specialaction = "AngelOfDeath", "Exit_Normal"
+	specialaction = "DevilIncarnate", "Exit_Normal"
 }
 
 episode "MAP01"
