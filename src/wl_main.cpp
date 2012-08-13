@@ -707,8 +707,6 @@ static void NonShareware (void)
 
 static void DemoLoop()
 {
-	int LastDemo = 0;
-
 //
 // check for launch from ted
 //
@@ -779,7 +777,7 @@ static void DemoLoop()
 //
 // demo
 //
-
+#if 0
 			bool demoPlayed = false;
 			do // This basically loops twice at most.  If the lump exists it plays the demo if not it goes to DEMO0.
 			{  // PlayDemo will actually play the demo picked if it exists otherwise it will immediately return.
@@ -801,14 +799,13 @@ static void DemoLoop()
 				}
 			}
 			while(true);
+#endif
 
 			if (playstate == ex_abort)
 				break;
 			VW_FadeOut();
 			if(screenHeight % 200 != 0)
 				VL_ClearScreen(0);
-			if(demoPlayed)
-				StartCPMusic(gameinfo.TitleMusic);
 		}
 
 		if(!param_tedlevel)
