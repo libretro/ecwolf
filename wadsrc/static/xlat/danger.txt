@@ -406,8 +406,8 @@ tiles
 	{
 		texturenorth = "GBRCRAK1";
 		texturesouth = "GBRCRAK1";
-		textureeast = "GBRCRAK1";
-		texturewest = "GBRCRAK1";
+		textureeast = "GBRCRAK2";
+		texturewest = "GBRCRAK2";
 	}
 	tile 40
 	{

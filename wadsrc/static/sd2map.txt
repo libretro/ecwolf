@@ -220,7 +220,7 @@ textures
 	"GBRICK1",	// Gray Brick N/S
 	"GBRICK2",	// Gray Brick E/W
 	"GBRCRAK1",	// Gray Brick w/ Cracks N/S
-	"GBRCRAK1",	// Gray Brick w/ Cracks E/W
+	"GBRCRAK2",	// Gray Brick w/ Cracks E/W
 	"GBRPIC1",	// Gray Brick w/ Picture N/S
 	"GBRPIC2",	// Gray Brick w/ Picture E/W
 	"GBRHITR1",	// Gray Brick w/ Hitler N/S
