@@ -49,6 +49,8 @@
 #include "templates.h"
 #include "g_mapinfo.h"
 
+#include <climits>
+
 // Code pointer stuff
 void InitFunctionTable(ActionTable *table);
 void ReleaseFunctionTable();
