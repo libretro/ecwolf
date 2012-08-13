@@ -39,6 +39,7 @@
 #include "wl_game.h"
 #include "dobject.h"
 #include "colormatcher.h"
+#include "version.h"
 
 /*
 =============================================================================
@@ -328,6 +329,19 @@ static void CollectGC()
 	GC::DelSoftRootHead();
 }
 
+static void DrawStartupConsole()
+{
+	static const char* const tempString = "        " GAMENAME " " DOTVERSIONSTR_NOREV "\n\n\nTo be replaced with console...\n\n  The memory thing was just\n     for show anyways.";
+
+	CA_CacheScreen(TexMan(gameinfo.SignonLump));
+
+	word width, height;
+	VW_MeasurePropString(ConFont, tempString, width, height);
+	px = 160-width/2;
+	py = 76+62-height/2;
+	VWB_DrawPropString(ConFont, tempString, CR_GRAY);
+}
+
 static void InitGame()
 {
 	// initialize SDL
@@ -368,9 +382,15 @@ static void InitGame()
 	atterm(R_DeinitColormaps);
 	GenerateLookupTables();
 
+	//
+	// Fonts
+	//
+	V_InitFonts();
+	atterm(V_ClearFonts);
+
 	// Setup a temporary window so if we have to terminate we don't do extra mode sets
 	VL_SetVGAPlaneMode (true);
-	CA_CacheScreen(TexMan(gameinfo.SignonLump));
+	DrawStartupConsole();
 
 #if defined _WIN32
 	if(!fullscreen)
@@ -391,9 +411,6 @@ static void InitGame()
 //
 // Fonts
 //
-	V_InitFonts();
-	atterm(V_ClearFonts);
-
 	VH_Startup ();
 	IN_Startup ();
 	SD_Startup ();
@@ -406,11 +423,6 @@ static void InitGame()
 
 	P_InitKeyMessages();
 	atterm(P_DeinitKeyMessages);
-
-//
-// draw intro screen stuff
-//
-	IntroScreen ();
 
 //
 // Finish with setting up through the config file.
@@ -437,7 +449,7 @@ static void InitGame()
 // Finish signon screen
 //
 	VL_SetVGAPlaneMode();
-	CA_CacheScreen(TexMan(gameinfo.SignonLump));
+	DrawStartupConsole();
 	VH_UpdateScreen();
 
 	if (!param_nowait)

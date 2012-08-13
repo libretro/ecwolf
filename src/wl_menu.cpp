@@ -718,69 +718,6 @@ int CP_EndGame (int)
 }
 
 ////////////////////////////////////////////////////////////////////
-//
-// HANDLE INTRO SCREEN (SYSTEM CONFIG)
-//
-////////////////////////////////////////////////////////////////////
-static void IntroFill (int color, double x, double y, double w, double h)
-{
-	VirtualToRealCoords(x, y, w, h, 320, 200, false, true);
-	VWB_Clear (color, x, y, x+w, y+h);
-}
-static void MemeoryFill (int color, int basex, int basey)
-{
-	// To make color picking simple, pick the darkest color and then fill the
-	// value component of the color.  This isn't exactly equivalent, but it's
-	// good enough I think.
-
-	float r = RPART(color), g = GPART(color), b = BPART(color);
-	float h, s, v;
-
-	RGBtoHSV(r, g, b, &h, &s, &v);
-	float vstep = (255.0f - v)/10.0f;
-
-	for (int i = 0; i < 10; ++i)
-	{
-		HSVtoRGB(&r, &g, &b, h, s, v);
-		int pal = ColorMatcher.Pick(r, g, b);
-		IntroFill(pal, basex, basey - 8 * i, 6, 5);
-		v += vstep;
-	}
-}
-void IntroScreen (void)
-{
-	const int FILLCOLOR =
-		ColorMatcher.Pick(RPART(gameinfo.SignonColors[0]), GPART(gameinfo.SignonColors[0]), BPART(gameinfo.SignonColors[0]));
-
-	//
-	// DRAW MAIN MEMORY
-	//
-	MemeoryFill(gameinfo.SignonColors[1], 49, 163);
-	MemeoryFill(gameinfo.SignonColors[2], 89, 163);
-	MemeoryFill(gameinfo.SignonColors[3], 129, 163);
-
-
-	//
-	// FILL BOXES
-	//
-	if (MousePresent)
-		IntroFill(FILLCOLOR, 164, 82, 12, 2);
-
-	if (IN_JoyPresent())
-		IntroFill(FILLCOLOR, 164, 105, 12, 2);
-
-	if (AdLibPresent && !SoundBlasterPresent)
-		IntroFill(FILLCOLOR, 164, 128, 12, 2);
-
-	if (SoundBlasterPresent)
-		IntroFill(FILLCOLOR, 164, 151, 12, 2);
-
-//    if (SoundSourcePresent)
-//        VWB_Bar (164, 174, 12, 2, FILLCOLOR);
-}
-
-
-////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
 //
 // SUPPORT ROUTINES

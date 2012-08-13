@@ -576,9 +576,6 @@ protected:
 			ParseStringAssignment(gameinfo.GamePalette);
 		else if(key.CompareNoCase("signon") == 0)
 			ParseStringAssignment(gameinfo.SignonLump);
-		else if(key.CompareNoCase("signoncolors") == 0)
-			// Fill, Main, EMS, XMS
-			ParseColorArrayAssignment(gameinfo.SignonColors, 4);
 		else if(key.CompareNoCase("menufade") == 0)
 			ParseColorAssignment(gameinfo.MenuFadeColor);
 		else if(key.CompareNoCase("menucolors") == 0)

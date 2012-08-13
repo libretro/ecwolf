@@ -18,7 +18,6 @@ extern struct LRstruct
 	unsigned int time;
 } LevelRatios;
 
-void IntroScreen (void);
 void DrawHighScores(void);
 void CheckHighScore (int32_t score,word other);
 void Victory (bool fromIntermission);
