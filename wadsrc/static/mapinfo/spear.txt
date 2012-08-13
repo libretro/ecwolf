@@ -214,3 +214,5 @@ cluster 1
 cluster 2
 {
 }
+
+include "mapinfo/spearmaps.txt"
