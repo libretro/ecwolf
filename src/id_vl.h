@@ -29,7 +29,7 @@ extern SDL_Color gamepal[256];
 
 void VL_ReadPalette(const char* lump);
 
-void VL_SetVGAPlaneMode (void);
+void VL_SetVGAPlaneMode (bool forSignon=false);
 void VL_SetTextMode (void);
 
 void VL_SetBlend(uint8_t red, uint8_t green, uint8_t blue, int amount, bool forceupdate=false);

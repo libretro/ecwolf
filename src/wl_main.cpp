@@ -267,22 +267,6 @@ void CalcProjection (int32_t focal)
 
 //===========================================================================
 
-/*
-==========================
-=
-= SignonScreen
-=
-==========================
-*/
-
-void SignonScreen (void)                        // VGA version
-{
-	VL_SetVGAPlaneMode ();
-	CA_CacheScreen(TexMan(gameinfo.SignonLump));
-}
-
-//===========================================================================
-
 Menu musicMenu(CTL_X, CTL_Y-6, 280, 32);
 static TArray<FString> songList;
 
@@ -384,7 +368,9 @@ static void InitGame()
 	atterm(R_DeinitColormaps);
 	GenerateLookupTables();
 
-	SignonScreen ();
+	// Setup a temporary window so if we have to terminate we don't do extra mode sets
+	VL_SetVGAPlaneMode (true);
+	CA_CacheScreen(TexMan(gameinfo.SignonLump));
 
 #if defined _WIN32
 	if(!fullscreen)
@@ -450,6 +436,8 @@ static void InitGame()
 //
 // Finish signon screen
 //
+	VL_SetVGAPlaneMode();
+	CA_CacheScreen(TexMan(gameinfo.SignonLump));
 	VH_UpdateScreen();
 
 	if (!param_nowait)

@@ -71,7 +71,7 @@ void VL_ReadPalette(const char* lump)
 =======================
 */
 
-void	VL_SetVGAPlaneMode (void)
+void	VL_SetVGAPlaneMode (bool forSignon)
 {
 	SDL_WM_SetCaption("ECWolf", NULL);
 
@@ -84,7 +84,7 @@ void	VL_SetVGAPlaneMode (void)
 	screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
 		(usedoublebuffering ? SDL_HWSURFACE | SDL_DOUBLEBUF : 0) |
 		(screenBits == 8 ? SDL_HWPALETTE : 0) |
-		(fullscreen ? SDL_FULLSCREEN : 0));
+		(fullscreen && !forSignon ? SDL_FULLSCREEN : 0));
 	if(!screen)
 	{
 		printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
@@ -105,6 +105,7 @@ void	VL_SetVGAPlaneMode (void)
 
 	SDL_SetColors(screen, pal, 0, 256);
 
+	SDL_FreeSurface(screenBuffer);
 	screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth,
 		screenHeight, 8, 0, 0, 0, 0);
 	if(!screenBuffer)
