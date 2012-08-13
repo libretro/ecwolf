@@ -143,140 +143,140 @@ sprites
 
 textures
 {
-	"GSTONEA1",	// Gray Stone 1 N/S
-	"GSTONEA2",	// Gray Stone 1 E/W
-	"GSTONEB1",	// Gray Stone 2 N/S
-	"GSTONEB2",	// Gray Stone 2 E/W
-	"GSTFLAG1",	// Gray Stone Flag N/S
-	"GSTFLAG2",	// Gray Stone Flag E/W
-	"GSTHTLR1",	// Gray Stone Hitler N/S
-	"GSTHTLR2",	// Gray Stone Hitler E/W
-	"BSTCELA1",	// Blue Stone Empty Cell N/S
-	"BSTCELA2",	// Blue Stone Empty Cell E/W
-	"GSTEAGL1",	// Gray Stone Eagle N/S
-	"GSTEAGL2",	// Gray Stone Eagle E/W
-	"BSTCELB1",	// Blue Stone Cell w/ Skeleton N/S
-	"BSTCELB2",	// Blue Stone Cell w/ Skeleton E/W
-	"BSTONEA1",	// Blue Stone 1 N/S
-	"BSTONEA2",	// Blue Stone 1 E/W
-	"BSTONEB1",	// Blue Stone 2 N/S
-	"BSTONEB2",	// Blue Stone 2 E/W
-	"WODEAGL1",	// Wood Eagle N/S
-	"WODEAGL2",	// Wood Eagle E/W
-	"WODHTLR1",	// Wood Hitler N/S
-	"WODHTLR2",	// Wood Hitler E/W
-	"WOOD1",		// Wood N/S
-	"WOOD2",		// Wood E/W
-	"FAKEDOR1",	// Entrance to level N/S
-	"FAKEDOR2",	// Entrance to level E/W
-	"METLSGN1",	// Steel Panel Sign N/S
-	"METLSGN2",	// Steel Panel Sign E/W
-	"METAL1",	 // Steel Panel Sign N/S
-	"METAL2",	 // Steel Panel Sign E/W
-	"SKY1",		 // Sky N/S
-	"SKY2",		 // Sky E/W
-	"BRICK1",	 // Red Brick N/S
-	"BRICK2",	 // Red Brick E/W
-	"BRIKWRT1",	// Red Brick Wreath N/S
-	"BRIKWRT2",	// Red Brick Wreath E/W
-	"PURPLE1",	// Purple Wall N/S
-	"PURPLE2",	// Purple Wall E/W
-	"BRIKEGL1",	// Red Brick Eagle N/S
-	"BRIKEGL2",	// Red Brick Eagle E/W
-	"ELEV1_1",	// Elevator 1 N/S
-	"ELEV1_2",	// Elevator 1 E/W
-	"ELEV2_1",	// Elevator 2 N/S
-	"ELEV2_2",	// Elevator 2 E/W
-	"WODCROS1",	// Wood Cross N/S
-	"WODCROS2",	// Wood Cross E/W
-	"GSTSLME1",	// Gray Stone Slime N/S
-	"GSTSLME2",	// Gray Stone Slime E/W
-	"PURPBLD1",	// Purple Blood 1
-	"PURPBLD2",	// Purple Blood 2
-	"GSTLSLM1",	// Gray Stone Slime 2 N/S
-	"GSTLSLM2",	// Gray Stone Slime 2 E/W
-	"GSTONEC1",	// Gray Stone 3 N/S
-	"GSTONEC2",	// Gray Stone 3 E/W
-	"GSTSIGN1",	// Gray Stone Sign N/S
-	"GSTSIGN2",	// Gray Stone Sign E/W
-	"CHIP1",		// Chipped Rock N/S
-	"CHIP2",		// Chipped Rock E/W
-	"CHPBLDA1",	// Chipped Rock Blood 1 N/S
-	"CHPBLDA2",	// Chipped Rock Blood 1 E/W
-	"CHPBLDB1",	// Chipped Rock Blood 2 N/S
-	"CHPBLDB2",	// Chipped Rock Blood 2 E/W
-	"CHPBLDC1",	// Chipped Rock Blood 3 N/S
-	"CHPBLDC2",	// Chipped Rock Blood 3 E/W
-	"GLASS1",	 // Stained Glass N/S
-	"GLASS2",	 // Stained Glass E/W
-	"BLUSKUL1",	// Blue Skull N/S
-	"BLUSKUL2",	// Blue Skull E/W
-	"GRYBRIK1",	// Gray Brick N/S
-	"GRYBRIK2",	// Gray Brick E/W
-	"BLUSWAS1",	// Blue Swastika N/S
-	"BLUSWAS2",	// Blue Swastika E/W
-	"GRYVENT1",	// Gray Stone Vent N/S
-	"GRYVENT2",	// Gray Stone Vent E/W
-	"BRIKODD1",	// Odd Bricks N/S
-	"BRIKODD2",	// Odd Bricks E/W
-	"GRYCRAK1",	// Gray Brick Crack N/S
-	"GRYCRAK2",	// Gray Brick Crack E/W
-	"BLUWALL1",	// Blue Wall N/S
-	"BLUWALL2",	// Blue Wall E/W
-	"BSTSIGN1",	// Blue Stone Sign N/S
-	"BSTSIGN2",	// Blue Stone Sign E/W
-	"MARB1_1",	// Brown Marble 1 N/S
-	"MARB1_2",	// Brown Marble 1 E/W
-	"GRYMAPS1",	// Gray Brick Map N/S
-	"GRYMAPS2",	// Gray Brick Map E/W
-	"BRNSTNA1",	// Brown Stone 1 N/S
-	"BRNSTNA2",	// Brown Stone 1 E/W
-	"BRNSTNB1",	// Brown Stone 2 N/S
-	"BRNSTNB2",	// Brown Stone 2 E/W
-	"MARB2_1",	// Brown Marble 2 N/S
-	"MARB2_2",	// Brown Marble 2 E/W
-	"MARB3_1",	// Brown Marble Flag N/S
-	"MARB3_2",	// Brown Marble Flag E/W
-	"PLASTER1",	// Plaster N/S
-	"PLASTER2",	// Plaster E/W
-	"GRYHTLR1",	// Gray Brick Hitler N/S
-	"GRYHTLR2",	// Gray Brick Hitler E/W
-	"COBBLEA1",	// Brown Cobble 1 N/S
-	"COBBLEA2",	// Brown Cobble 1 E/W
-	"COBBLEB1",	// Brown Cobble 2 N/S
-	"COBBLEB2",	// Brown Cobble 2 E/W
-	"COBFLAG1",	// Brown Cobble Flag N/S
-	"COBFLAG2",	// Brown Cobble Flag E/W
-	"COBWRTH1",	// Brown Cobble Wreath N/S
-	"COBWRTH2",	// Brown Cobble Wreath E/W
-	"BOLDERA1",	// Gray Boulders 1 N/S
-	"BOLDERA2",	// Gray Boulders 1 E/W
-	"BOLDERB1",	// Gray Boulders 2 N/S
-	"BOLDERB2",	// Gray Boulders 2 E/W
-	"HELLWAL1",	// Hell Wall N/S
-	"HELLWAL2",	// Hell Wall E/W
-	"GRAYCAV1",	// Gray Cave N/S
-	"GRAYCAV2",	// Gray Cave E/W
-	"RAMPRTA1",	// Ramparts 1 N/S
-	"RAMPRTA2",	// Ramparts 1 E/W
-	"RAMPRTB1",	// Ramparts 2 N/S
-	"RAMPRTB2",	// Ramparts 2 E/W
-	"ELEV3_1",	// Elevator Wall N/S
-	"ELEV3_2",	// Elevator Wall E/W
-	"WHITWAL1",	// White Wall N/S
-	"WHITWAL2",	// White Wall E/W
-	"BRWNVIN1",	// Brown Vine N/S
-	"BRWNVIN2",	// Brown Vine E/W
-	"PINKBRK1",	// Ugly Pink Brick N/S
-	"PINKBRK2",	// Ugly Pink Brick E/W
-	"DOOR1_1",	// Door N/S
-	"DOOR1_2",	// Door E/W
-	"SLOT1_1",	// Doorjamb N/S
-	"SLOT1_2",	// Doorjamb E/W
-	"DOOR2_1",	// Elevator Door N/S
-	"DOOR2_2",	// Elevator Door E/W
-	"DOOR3_1",	// Locked Door N/S
-	"DOOR3_2"	 // Locked Door E/W
+	"GRYROCK1",	// Gray Rock N/S
+	"GRYROCK2",	// Gray Rock E/W
+	"GRYBUMP1",	// Gray Bumpy Wall N/S
+	"GRYBUMP2", // Gray Bumpy Wall E/W
+	"GSTWALL1",	// Gray Stone Wall N/S
+	"GSTWALL2",	// Gray Stone Wall E/W
+	"GRYRSWB1",	// Gray Rock w/ Swastika Sign N/S
+	"GRYRSWB2",	// Gray Rock w/ Swastika Sign E/W
+	"SEWER1",	// Sewer Landscape N/S
+	"SEWER2",	// Sewer Landscape E/W
+	"GRYRSWS1",	// Gray Rock w/ Swastika N/S
+	"GRYRSWS2",	// Gray Rock w/ Swastika E/W
+	"GRYRPIC1",	// Gray Rock w/ Picture N/S
+	"GRYRPIC2",	// Gray Rock w/ Picture E/W
+	"GRYREGL1",	// Gray Rock w/ Eagle N/S
+	"GRYREGL2",	// Gray Rock w/ Eagle E/W
+	"GRYDARK1",	// Dark Gray Wall N/S
+	"GRYDARK2",	// Dark Gray Wall E/W
+	"GRYSWAS1",	// Gray Swastika N/S
+	"GRYSWAS2",	// Gray Swastika E/W
+	"LITWALL1",	// Lit Wall N/S
+	"LITWALL2",	// Lit Wall E/W
+	"LITHTLR1",	// Lit Hitler N/S
+	"LITHTLR2",	// Lit Hitler E/W
+	"FAKEDRB1",	// Entrance to level 2 N/S
+	"FAKEDRB2",	// Entrance to level 2 E/W
+	"DSTEELA1",	// Dark Steel N/S
+	"DSTEELA2",	// Dark Steel E/W
+	"DSTSIGN1",	// Dark Steel w/ Sign N/S
+	"DSTSIGN2",	// Dark Steel w/ Sign E/W
+	"GRYWALL1",	// Gray Wall N/S
+	"GRYWALL2",	// Gray Wall E/W
+	"GRYSKUL1",	// Gray Skull N/S
+	"GRYSKUL2",	// Gray Skull E/W
+	"GRYWSWS1",	// Gray Swastika N/S
+	"GRYWSWS2",	// Gray Swastika E/W
+	"REDNOIS1",	// Red Noisy Wall N/S
+	"REDNOIS2",	// Red Noisy Wall E/W
+	"REDNSWS1",	// Red Noisy Wall w/ Swastika N/S
+	"REDNSWS2",	// Red Noisy Wall w/ Swastika E/W
+	"ELEV4_1",	// Elevator 4 N/S
+	"ELEV4_2",	// Elevator 4 E/W
+	"ELEV5_1",	// Elevator 5 N/S
+	"ELEV5_2",	// Elevator 5 E/W
+	"SEWER1",	// Sewer Landscape N/S
+	"SEWER2",	// Sewer Landscape E/W
+	"SEWER1",	// Sewer Landscape N/S
+	"SEWER2",	// Sewer Landscape E/W
+	"SEWER1",	// Sewer Landscape N/S
+	"SEWER2",	// Sewer Landscape E/W
+	"BLUWALB1",	// Blue Wall 2 N/S
+	"BLUWALB2",	// Blue Wall 2 E/W
+	"BLUSWSB1",	// Blue Wall w/ Swastika 2 N/S
+	"BLUSWSB2",	// Blue Wall w/ Swastika 2 E/W
+	"BLUSKLB1",	// Blue Wall w/ Skull 2 N/S
+	"BLUSKLB2",	// Blue Wall w/ Skull 2 E/W
+	"BLUNOIS1",	// Blue Noisy Wall N/S
+	"BLUNOIS2",	// Blue Noisy Wall E/W
+	"BLUNSWS1",	// Blue Noisy Wall w/ Swastika N/S
+	"BLUNSWS2",	// Blue Noisy Wall w/ Swastika E/W
+	"VOLROCK1",	// Volcanic Rock N/S
+	"VOLROCK2",	// Volcanic Rock E/W
+	"BLUTILE1",	// Blue Tile N/S
+	"BLUTILE2",	// Blue Tile E/W
+	"BLULITE1",	// Blue Tile w/ Lights N/S
+	"BLULITE2",	// Blue Tile w/ Lights E/W
+	"GRYTILE1",	// Gray Tile N/S
+	"GRYTILE2",	// Gray Tile E/W
+	"LITSTEL1",	// Lit Steel N/S
+	"LITSTEL2",	// Lit Steel E/W
+	"BBRICK1",	// Blue Brick N/S
+	"BBRICK2",	// Blue Brick E/W
+	"BBRSIGN1",	// Blue Brick w/ Sign N/S
+	"BBRSIGN2",	// Blue Brick w/ Sign E/W
+	"BBRCELA1",	// Blue Brick w/ Cell N/S
+	"BBRCELA2",	// Blue Brick w/ Cell E/W
+	"BBRCELB1",	// Blue Brick w/ Cell 2 N/S
+	"BBRCELB2",	// Blue Brick w/ Cell 2 E/W
+	"BLUSIGN1",	// Blue Wall w/ Sign N/S
+	"BLUSIGN2",	// Blue Wall w/ Sign E/W
+	"LITSTON1",	// Lit Stones N/S
+	"LITSTON2",	// Lit Stones E/W
+	"LITBSTN1",	// Lit Blue Stones N/S
+	"LITBSTN2",	// Lit Blue Stones E/W
+	"PURTILE1",	// Purple Tile N/S
+	"PURTILE2",	// Purple Tile E/W
+	"BVLROCK1",	// Blue Volcanic Rock N/S
+	"BVLROCK2",	// Blue Volcanic Rock E/W
+	"COMPDVL1",	// Computer w/ Devil N/S
+	"COMPDVL2",	// Computer w/ Devil E/W
+	"GBRICK1",	// Gray Brick N/S
+	"GBRICK2",	// Gray Brick E/W
+	"GBRVENT1",	// Gray Brick w/ Vent N/S
+	"GBRVENT2",	// Gray Brick w/ Vent E/W
+	"GBRCRAK1",	// Gray Brick w/ Cracks N/S
+	"GBRCRAK2",	// Gray Brick w/ Cracks E/W
+	"GBRHITR1",	// Gray Brick w/ Hitler N/S
+	"GBRHITR2",	// Gray Brick w/ Hitler E/W
+	"GBRPIC1",	// Gray Brick w/ Picture N/S
+	"GBRPIC2",	// Gray Brick w/ Picture E/W
+	"RFBRICK1", // Fine Red Brick N/S
+	"RFBRICK2",	// Fine Red Brick E/W
+	"RFBSWAS1",	// Fine Red Brick w/ Swastika N/S
+	"RFBSWAS2",	// Fine Red Brick w/ Swastika E/W
+	"RFBEAGL1",	// Fine Red Brick w/ Eagle N/S
+	"RFBEAGL2",	// Fine Red Brick w/ Eagle E/W
+	"GRYPNL1",	// Gray Paneling N/S
+	"GRYPNL2",	// Gray Paneling E/W
+	"LITGPNL1",	// Lit Gray Paneling N/S
+	"LITGPNL2",	// Lit Gray Paneling E/W
+	"COMPGRN1",	// Futuristic Green N/S
+	"COMPGRN2",	// Futuristic Green E/W
+	"COMPRED1",	// Futuristic Red N/S
+	"COMPRED2",	// Futuristic Red E/W
+	"COMPBLU1",	// Futuristic Blue N/S
+	"COMPBLU2",	// Futuristic Blue E/W
+	"COMPMAR1",	// Computer w/ Mars N/S
+	"COMPMAR2",	// Computer w/ Mars E/W
+	"ELEV6_1",	// Elevator 6 N/S
+	"ELEV6_2",	// Elevator 6 E/W
+	"SEWER1",	// Sewer Landscape N/S
+	"SEWER2",	// Sewer Landscape E/W
+	"GMARBL1",	// Gray Marbled Wall N/S
+	"GMARBL2",	// Gray Marbled Wall E/W
+	"COMPMTL1",	// Futuristic Metal N/S
+	"COMPMTL2",	// Futuristic Metal E/W
+	"DOOR4_1",	// Door N/S
+	"DOOR4_2",	// Door E/W
+	"SLOT2_1",	// Doorjamb N/S
+	"SLOT2_2",	// Doorjamb E/W
+	"DOOR5_1",	// Elevator Door N/S
+	"DOOR5_2",	// Elevator Door E/W
+	"DOOR6_1",	// Locked Door N/S
+	"DOOR6_2"	 // Locked Door E/W
 }
 
 digitalsounds

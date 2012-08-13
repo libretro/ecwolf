@@ -3,3 +3,4 @@ texture optional M_CURS1
 	pic M_CURS2 tics 4
 
 switch ELEV1_2 on pic ELEV2_2 tics 0
+switch ELEV4_2 on sound switches/elevbutn pic ELEV5_2 tics 0
