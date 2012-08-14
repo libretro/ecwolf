@@ -52,6 +52,7 @@ extern class ThinkerList
 
 			VICTORY,// Think even if the victory flag is set
 			WORLD,	// High priority world manipulations
+			PLAYER,	// Player actors
 			NORMAL,	// General purpose thinker
 
 			NUM_TYPES,

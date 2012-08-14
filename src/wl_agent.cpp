@@ -14,6 +14,7 @@
 #include "a_keys.h"
 #include "m_random.h"
 #include "g_mapinfo.h"
+#include "thinker.h"
 #include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_state.h"
@@ -1099,6 +1100,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 	players[0].mo->angle = (450-dir)*ANGLE_1;
 	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables
+	players[0].mo->GetThinker()->SetPriority(ThinkerList::PLAYER);
 
 	if(players[0].state == player_t::PST_ENTER || players[0].state == player_t::PST_REBORN)
 		players[0].Reborn();

@@ -550,6 +550,7 @@ void FinishTravel ()
 					player->y = playertmp->y;
 					player->angle = playertmp->angle;
 					player->EnterZone(playertmp->GetZone());
+					player->GetThinker()->SetPriority(ThinkerList::PLAYER);
 
 					players[0].mo = player;
 					players[0].camera = player;
