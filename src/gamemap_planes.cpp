@@ -44,6 +44,12 @@
 class Xlat : public TextMapParser
 {
 public:
+	enum
+	{
+		TF_PATHING = 1,
+		TF_HOLOWALL = 2
+	};
+
 	struct ThingXlat
 	{
 	public:
@@ -64,7 +70,7 @@ public:
 
 		unsigned short	newnum;
 		unsigned char	angles;
-		bool			patrol;
+		uint32_t		flags;
 		unsigned char	minskill;
 
 		MapTrigger		templateTrigger;
@@ -187,7 +193,7 @@ public:
 		return false;
 	}
 
-	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, unsigned short oldnum) const
+	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, uint32_t &flags, unsigned short oldnum) const
 	{
 		bool valid = false;
 		unsigned int type = thingTable.Size()/2;
@@ -220,6 +226,8 @@ public:
 			}
 			else
 			{
+				flags = thingTable[type].flags;
+
 				thing.type = thingTable[type].newnum;
 
 				if(thingTable[type].angles)
@@ -227,7 +235,7 @@ public:
 				else
 					thing.angle = 0;
 
-				thing.patrol = thingTable[type].patrol;
+				thing.patrol = flags&Xlat::TF_PATHING;
 				thing.skill[0] = thing.skill[1] = thingTable[type].minskill <= 1;
 				thing.skill[2] = thingTable[type].minskill <= 2;
 				thing.skill[3] = thingTable[type].minskill <= 3;
@@ -402,8 +410,23 @@ protected:
 				sc.MustGetToken(TK_IntConst);
 				thing.angles = sc->number;
 				sc.MustGetToken(',');
-				sc.MustGetToken(TK_BoolConst);
-				thing.patrol = sc->boolean;
+				if(sc.CheckToken(TK_IntConst))
+					thing.flags = sc->number;
+				else
+				{
+					thing.flags = 0;
+					do
+					{
+						sc.MustGetToken(TK_Identifier);
+						if(sc->str.CompareNoCase("PATHING") == 0)
+							thing.flags |= TF_PATHING;
+						else if(sc->str.CompareNoCase("HOLOWALL") == 0)
+							thing.flags |= TF_HOLOWALL;
+						else
+							sc.ScriptMessage(Scanner::ERROR, "Unknown flag '%s'.", sc->str.GetChars());
+					}
+					while(sc.CheckToken('|'));
+				}
 				sc.MustGetToken(',');
 				sc.MustGetToken(TK_IntConst);
 				thing.minskill = sc->number;
@@ -634,8 +657,9 @@ void GameMap::ReadPlanesData()
 					Thing thing;
 					Trigger trigger;
 					bool isTrigger;
+					uint32_t flags = 0;
 
-					if(!xlat.TranslateThing(thing, trigger, isTrigger, oldplane[i]))
+					if(!xlat.TranslateThing(thing, trigger, isTrigger, flags, oldplane[i]))
 						printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 					else
 					{
@@ -652,6 +676,22 @@ void GameMap::ReadPlanesData()
 						}
 						else
 						{
+							if(flags & Xlat::TF_HOLOWALL)
+							{
+								MapSpot spot = &mapPlane.map[i];
+								if(spot->tile)
+								{
+									spot->sideSolid[0] = spot->sideSolid[1] = spot->sideSolid[2] = spot->sideSolid[3] = false;
+									if(flags & Xlat::TF_PATHING)
+									{
+										// If we created a holowall and we path into another wall it should also become non-solid.
+										spot = spot->GetAdjacent(MapTile::Side(thing.angle/90));
+										if(spot->tile)
+											spot->sideSolid[0] = spot->sideSolid[1] = spot->sideSolid[2] = spot->sideSolid[3] = false;
+									}
+								}
+							}
+
 							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.z = 0;
