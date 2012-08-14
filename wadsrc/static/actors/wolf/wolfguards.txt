@@ -5,7 +5,7 @@ actor Guard 11
 	health 25
 	speed 1, 3
 	sighttime 1, 4
-	dropitem "Clip", 4
+	dropitem "Clip"
 	attacksound "guard/attack"
 	deathsound "guard/death"
 	secretdeathsound "guard/fart"
@@ -55,7 +55,7 @@ actor GreenGuard : Guard 93
 	deathsound "greenguard/death"
 	secretdeathsound "greenguard/crash"
 	seesound "greenguard/sight"
-	dropitem "BlueClip", 4
+	dropitem "BlueClip"
 	states
 	{
 		Spawn:
@@ -206,7 +206,7 @@ actor Officer 12
 	health 50
 	speed 1, 5
 	sighttime 2
-	dropitem "Clip", 4
+	dropitem "Clip"
 	attacksound "officer/attack"
 	deathsound "officer/death"
 	secretdeathsound "officer/fart"
@@ -253,7 +253,7 @@ actor Officer 12
 }
 actor LostOfficer : Officer 97
 {
-	dropitem "BlueClip", 4
+	dropitem "BlueClip"
 	attacksound "lostofficer/attack"
 	deathsound "lostofficer/death"
 	secretdeathsound "lostofficer/crash"
@@ -305,7 +305,7 @@ actor Mutant 15
 	health 45, 55, 55, 65
 	speed 1, 3
 	sighttime 1, 6
-	dropitem "Clip", 4
+	dropitem "Clip"
 	attacksound "mutant/attack"
 	deathsound "mutant/death"
 	secretdeathsound "mutant/fart"
@@ -355,7 +355,7 @@ actor GunBat : Mutant 96
 	attacksound "bat/attack"
 	deathsound "bat/death"
 	secretdeathsound "bat/fart"
-	dropitem "BlueClip", 4
+	dropitem "BlueClip"
 	states
 	{
 		Spawn:
@@ -405,7 +405,7 @@ actor WolfensteinSS 13 // ZDoom compatible name
 	speed 1, 4
 	sighttime 1, 6
 	dropitem "MachineGun"
-	dropitem "Clip", 4
+	dropitem "Clip"
 	attacksound "wolfss/attack"
 	deathsound "wolfss/death"
 	secretdeathsound "wolfss/fart"
@@ -463,7 +463,7 @@ actor Schutzstafell : WolfensteinSS 94
 	secretdeathsound "ss/fart"
 	seesound "ss/sight"
 	dropitem "BlueAK47"
-	dropitem "BlueClip", 4
+	dropitem "BlueClip"
 	states
 	{
 		Spawn:

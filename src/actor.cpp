@@ -224,7 +224,7 @@ void AActor::Die()
 		do
 		{
 			DropItem *drop = &item->Item();
-			if(pr_dropitem() < drop->probabilty)
+			if(pr_dropitem() <= drop->probabilty)
 			{
 				const ClassDef *cls = ClassDef::FindClass(drop->className);
 				if(cls)
@@ -249,11 +249,27 @@ void AActor::Die()
 					// the AI, so it can be off by one.
 					static const fixed TILEMASK = ~(TILEGLOBAL-1);
 
-					AActor *actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0, true);
+					AActor * const actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0, true);
 					actor->angle = angle;
 					actor->dir = dir;
-					if(cls->IsDescendantOf(NATIVE_CLASS(Ammo)))
-						static_cast<AAmmo *>(actor)->amount = drop->amount;
+
+					if(cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
+					{
+						AInventory * const inv = static_cast<AInventory *>(actor);
+
+						// Ammo is multiplied by 0.5
+						if(drop->amount > 0)
+						{
+							// TODO: When a dropammofactor is specified it should
+							// apply here too.
+							inv->amount = drop->amount;
+						}
+						else if(cls->IsDescendantOf(NATIVE_CLASS(Ammo)) && inv->amount > 1)
+							inv->amount /= 2;
+
+						// TODO: In ZDoom dropped weapons have their ammo multiplied as well
+						// but in Wolf3D weapons always have 6 bullets.
+					}
 				}
 			}
 		}
