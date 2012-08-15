@@ -566,7 +566,6 @@ void FinishTravel ()
 					player->y = playertmp->y;
 					player->angle = playertmp->angle;
 					player->EnterZone(playertmp->GetZone());
-					player->GetThinker()->SetPriority(ThinkerList::PLAYER);
 
 					players[0].mo = player;
 					players[0].camera = player;
@@ -575,7 +574,7 @@ void FinishTravel ()
 					// We must move the linked list iterator here since we'll
 					// transfer to the new linked list at the SetPriority call
 					node = node->Next();
-					player->GetThinker()->SetPriority(ThinkerList::NORMAL);
+					player->GetThinker()->SetPriority(ThinkerList::PLAYER);
 					continue;
 				}
 			}
