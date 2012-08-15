@@ -64,6 +64,8 @@ extern unsigned vbufPitch;
 
 namespace GameSave {
 
+static const char* const NEW_SAVE = "    - NEW SAVE -";
+
 struct SaveFile
 {
 	public:
@@ -298,7 +300,7 @@ void SetupSaveGames()
 	loadGame.clear();
 	saveGame.clear();
 
-	MenuItem *newSave = new SaveSlotMenuItem("    - NEW SAVE -", 31, NULL, PerformSaveGame, true);
+	MenuItem *newSave = new SaveSlotMenuItem(NEW_SAVE, 31, NULL, PerformSaveGame, true);
 	newSave->setHighlighted(true);
 	saveGame.addItem(newSave);
 
@@ -333,6 +335,8 @@ MENU_LISTENER(PerformSaveGame)
 	file.hasFiles = true;
 	if(which == 0) // New
 	{
+		static_cast<SaveSlotMenuItem *> (saveGame[which])->setValue(NEW_SAVE);
+
 		// Locate a available filename.  I don't want to assume savegamX.yza so this
 		// might not be the fastest way to do things.
 		bool nextSaveNumber = false;
@@ -370,6 +374,7 @@ MENU_LISTENER(PerformSaveGame)
 		file.filename = SaveFile::files[which-1].filename;
 		SaveFile::files[which-1] = file;
 		loadGame.setCurrentPosition(which-1);
+		static_cast<SaveSlotMenuItem *> (loadGame.getIndex(which-1))->setValue(file.name);
 
 		// Ungreen
 		saveGame.getIndex(which)->setHighlighted(0);
