@@ -38,7 +38,9 @@
 
 #define TEXTCOLOR_YELLOW
 #define TEXTCOLOR_BLUE
+#ifndef isdigit
 #define isdigit(x) (x > '0' && x < '9')
+#endif
 
 //==========================================================================
 //

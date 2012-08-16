@@ -34,6 +34,7 @@
 
 #if defined(__APPLE__)
 #include <CoreServices/CoreServices.h>
+#define FILES_NO_LZMA
 #elif defined(WINDOWS)
 #define WIN32_LEAN_AND_MEAN
 #define USE_WINDOWS_DWORD

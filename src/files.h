@@ -4,13 +4,11 @@
 #include <stdio.h>
 #include <zlib.h>
 #include "bzlib.h"
+#ifndef FILES_NO_LZMA
 #include "LzmaDec.h"
-#include "wl_def.h"
-
-#ifndef WORDS_BIGENDIAN
-#define LittleShort(x)	(x)
-#define LittleLong(x)	(x)
 #endif
+#include "wl_def.h"
+#include "m_swap.h"
 
 class FileReader
 {
@@ -209,6 +207,7 @@ private:
 	FileReaderBZ2 &operator= (const FileReaderBZ2 &) { return *this; }
 };
 
+#ifndef FILES_NO_LZMA
 // Wraps around a FileReader to decompress a lzma stream
 class FileReaderLZMA
 {
@@ -273,6 +272,7 @@ private:
 
 	FileReaderLZMA &operator= (const FileReaderLZMA &) { return *this; }
 };
+#endif
 
 class MemoryReader : public FileReader
 {

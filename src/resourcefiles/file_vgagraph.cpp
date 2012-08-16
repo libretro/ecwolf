@@ -80,7 +80,9 @@ struct FVGALump : public FResourceLump
 				memcpy(Cache, out, LumpSize);
 			else
 			{
-				memcpy(Cache, &dimensions, 4);
+				// We flip again on big endian so that the code that reads the data makes sense
+				*(WORD*)Cache = LittleShort(dimensions.width);
+				*((WORD*)(Cache+2)) = LittleShort(dimensions.height);
 				memcpy(Cache+4, out, LumpSize-4);
 			}
 			delete[] out;
@@ -167,6 +169,11 @@ class FVGAGraph : public FResourceFile
 			if(!vgadictReader.Open(vgadictFile))
 				return false;
 			vgadictReader.Read(huffman, sizeof(huffman));
+			for(unsigned int i = 0;i < 255;++i)
+			{
+				huffman[i].bit0 = LittleShort(huffman[i].bit0);
+				huffman[i].bit1 = LittleShort(huffman[i].bit1);
+			}
 
 			FileReader vgaheadReader;
 			if(!vgaheadReader.Open(vgaheadFile))
@@ -207,6 +214,9 @@ class FVGAGraph : public FResourceFile
 				Reader->Seek(lumps[i].position, SEEK_SET);
 				if(!Reader->Read(&lumps[i].LumpSize, 4))
 					lumps[i].LumpSize = 0;
+				else
+					lumps[i].LumpSize = LittleLong(lumps[i].LumpSize);
+
 				if(i == 1) // We must do this on the second lump to how the position is filled.
 				{
 					Reader->Seek(lumps[0].position+4, SEEK_SET);

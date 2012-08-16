@@ -93,7 +93,7 @@ static bool CheckIfWolfShape(FileReader &file)
 	file.Read(offsets, Width*2);
 	for(int i = 0;i < Width;i++)
 	{
-		if(LittleLong(offsets[i]) >= file.GetLength())
+		if(LittleShort(offsets[i]) >= file.GetLength())
 		{
 			delete[] offsets;
 			return false;
@@ -134,7 +134,7 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 
 	Width = header[1]-header[0]+1;
 	Height = 64;
-	LeftOffset = 32-LittleLong(header[0]);
+	LeftOffset = 32-header[0];
 	TopOffset = 64;
 	if(LumpRemapper::IsPSprite(lumpnum))
 	{

@@ -517,6 +517,8 @@ void GameMap::ReadPlanesData()
 
 				for(unsigned int i = 0;i < size;++i)
 				{
+					oldplane[i] = LittleShort(oldplane[i]);
+
 					if(xlat.IsValidTile(oldplane[i]))
 						mapPlane.map[i].SetTile(&tilePalette[oldplane[i]-tileStart]);
 					else
@@ -646,6 +648,8 @@ void GameMap::ReadPlanesData()
 
 				for(unsigned int i = 0;i < size;++i)
 				{
+					oldplane[i] = LittleShort(oldplane[i]);
+
 					if(oldplane[i] == 0)
 					{
 						// In case of malformed maps we need to always check this.
@@ -713,6 +717,8 @@ void GameMap::ReadPlanesData()
 				TMap<WORD, WORD> flatMap;
 				for(unsigned int i = 0;i < size;++i)
 				{
+					oldplane[i] = LittleShort(oldplane[i]);
+
 					if(!flatMap.CheckKey(oldplane[i]))
 						flatMap[oldplane[i]] = type++;
 				}

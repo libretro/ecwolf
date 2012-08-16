@@ -64,6 +64,8 @@ class FAudiot : public FUncompressedFile
 			DWORD* positions = new DWORD[NumLumps+1];
 			DWORD* sizes = new DWORD[NumLumps];
 			audiohedReader.Read(positions, (NumLumps+1)*4);
+			for(unsigned int i = NumLumps;i-- > 0;)
+				positions[i] = LittleLong(positions[i]);
 
 			// Since the music is at the end and is easy to identify we'll look for the end of the music.
 			// HACK: I'm using the fact that the IMFs have the string IMF near
