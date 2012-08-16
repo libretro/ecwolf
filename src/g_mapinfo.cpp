@@ -574,6 +574,12 @@ protected:
 			ParseBoolAssignment(gameinfo.DrawReadThis);
 		else if(key.CompareNoCase("gamepalette") == 0)
 			ParseStringAssignment(gameinfo.GamePalette);
+		else if(key.CompareNoCase("gibfactor") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_FloatConst);
+			gameinfo.GibFactor = static_cast<fixed>(sc->decimal*FRACUNIT);
+		}
 		else if(key.CompareNoCase("signon") == 0)
 			ParseStringAssignment(gameinfo.SignonLump);
 		else if(key.CompareNoCase("menufade") == 0)

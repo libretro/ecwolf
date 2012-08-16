@@ -112,7 +112,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 
 	players[0].camera = cam;
 	players[0].SetPSprite(cam->FindState("Ready"));
-	cam->actor->SetState(cam->actor->DeathState);
+	cam->actor->SetState(cam->actor->FindState(NAME_Death));
 
 	DrawPlayScreen();
 

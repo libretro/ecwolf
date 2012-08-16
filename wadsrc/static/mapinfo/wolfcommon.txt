@@ -22,6 +22,7 @@ gameinfo
 	border = inset, "00 00 00", "00 70 70", "00 84 84"
 	doorsoundsequence = "DoorNormal"
 	pushwallsoundsequence = "PushwallNormal"
+	gibfactor = 1
 }
 
 defaultmap

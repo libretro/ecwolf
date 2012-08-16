@@ -574,7 +574,6 @@ AActor *ClassDef::CreateInstance() const
 {
 	if(IsDescendantOf(NATIVE_CLASS(Actor)) && !((AActor*)defaultInstance)->SpawnState)
 	{
-		((AActor*)defaultInstance)->DeathState = FindState(NAME_Death);
 		((AActor*)defaultInstance)->MeleeState = FindState(NAME_Melee);
 		((AActor*)defaultInstance)->MissileState = FindState(NAME_Missile);
 		((AActor*)defaultInstance)->PainState = FindState(NAME_Pain);

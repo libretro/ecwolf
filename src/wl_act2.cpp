@@ -164,6 +164,25 @@ bool ProjectileTryMove (AActor *ob)
 =================
 */
 
+void T_ExplodeProjectile(AActor *self, AActor *target)
+{
+	PlaySoundLocActor(self->deathsound, self);
+
+	const Frame *deathstate = NULL;
+	if(target && (target->flags & FL_SHOOTABLE)) // Fleshy!
+		deathstate = self->FindState(NAME_XDeath);
+	if(!deathstate)
+		deathstate = self->FindState(NAME_Death);
+
+	if(deathstate)
+	{
+		self->flags &= ~FL_MISSILE;
+		self->SetState(deathstate);
+	}
+	else
+		self->Destroy();
+}
+
 void T_Projectile (AActor *self)
 {
 	self->x += self->velx;
@@ -171,8 +190,7 @@ void T_Projectile (AActor *self)
 
 	if (!ProjectileTryMove (self))
 	{
-		PlaySoundLocActor(self->deathsound, self);
-		self->Die();
+		T_ExplodeProjectile(self, NULL);
 		return;
 	}
 
@@ -184,7 +202,7 @@ void T_Projectile (AActor *self)
 		if (deltax < radius && deltay < radius)
 		{
 			TakeDamage (self->GetDamage(),self);
-			self->Die(); // TODO: XDeath
+			T_ExplodeProjectile(self, players[0].mo);
 			return;
 		}
 	}
@@ -202,7 +220,7 @@ void T_Projectile (AActor *self)
 				if(deltax < radius && deltay < radius)
 				{
 					DamageActor(check, self->GetDamage());
-					self->Die();
+					T_ExplodeProjectile(self, check);
 					return;
 				}
 			}

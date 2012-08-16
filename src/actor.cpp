@@ -46,6 +46,7 @@
 #include "id_us.h"
 #include "m_random.h"
 
+void T_ExplodeProjectile(AActor *self, AActor *target);
 void T_Projectile(AActor *self);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -214,7 +215,10 @@ void AActor::Die()
 	flags &= ~FL_SHOOTABLE;
 
 	if(flags & FL_MISSILE)
-		flags &= ~FL_MISSILE;
+	{
+		T_ExplodeProjectile(this, NULL);
+		return;
+	}
 
 	DropList *dropitems = GetDropList();
 	if(dropitems)
@@ -276,8 +280,14 @@ void AActor::Die()
 		while((item = item->Next()));
 	}
 
-	if(DeathState)
-		SetState(DeathState);
+	bool isExtremelyDead = health < -GetClass()->Meta.GetMetaInt(AMETA_GibHealth, (GetDefault()->health*gameinfo.GibFactor)>>FRACBITS);
+	const Frame *deathstate = NULL;
+	if(isExtremelyDead)
+		deathstate = FindState(NAME_XDeath);
+	if(!deathstate)
+		deathstate = FindState(NAME_Death);
+	if(deathstate)
+		SetState(deathstate);
 	else
 		Destroy();
 }

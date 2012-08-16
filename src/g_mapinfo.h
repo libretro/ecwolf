@@ -66,6 +66,7 @@ public:
 	FString	AdvisoryPic;
 	FName	DoorSoundSequence;
 	FName	PushwallSoundSequence;
+	fixed	GibFactor;
 
 	TArray<FName>	PlayerClasses;
 	TArray<FString>	QuitMessages;

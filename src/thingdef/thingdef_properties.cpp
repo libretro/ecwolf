@@ -146,6 +146,13 @@ HANDLE_PROPERTY(dropitem)
 	AActor::dropItems[cls->Meta.GetMetaInt(AMETA_DropItems)]->Push(drop);
 }
 
+HANDLE_PROPERTY(gibhealth)
+{
+	INT_PARAM(health, 0);
+
+	cls->Meta.SetMetaInt(AMETA_GibHealth, health);
+}
+
 HANDLE_PROPERTY(health)
 {
 	INT_PARAM(health, 0);
@@ -388,6 +395,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
+	DEFINE_PROP(gibhealth, Actor, I),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
 	DEFINE_PROP(height, Actor, I),
 	DEFINE_PROP(icon, Inventory, S),

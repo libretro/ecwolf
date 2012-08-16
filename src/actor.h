@@ -156,7 +156,8 @@ enum
 
 	AMETA_Damage,
 	AMETA_DropItems,
-	AMETA_SecretDeathSound
+	AMETA_SecretDeathSound,
+	AMETA_GibHealth
 };
 
 class player_t;
@@ -257,7 +258,7 @@ class AActor : public DObject
 		uint16_t	painchance;
 		FNameNoInit	attacksound, deathsound, painsound, seesound;
 
-		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState, *DeathState;
+		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState;
 		short       temp1,hidden;
 
 		player_t	*player;	// Only valid with APlayerPawn
