@@ -1009,7 +1009,7 @@ void FSingleLumpFont::LoadTranslations()
 	PalEntry local_palette[256];
 	bool useidentity = true;
 	bool usepalette = false;
-	const void* ranges;
+	const void* ranges = NULL;
 	unsigned int count = LastChar - FirstChar + 1;
 
 	switch(FontType)

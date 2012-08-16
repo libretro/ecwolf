@@ -782,10 +782,10 @@ vertentry:
 			if((uint32_t)yintercept>mapheight*65536-1 || (word)xtile>=mapwidth)
 			{
 				if(xtile<0) xintercept=0, xtile=0;
-				else if(xtile>=mapwidth) xintercept=mapwidth<<TILESHIFT, xtile=mapwidth-1;
+				else if((unsigned)xtile>=mapwidth) xintercept=mapwidth<<TILESHIFT, xtile=mapwidth-1;
 				else xtile=(short) (xintercept >> TILESHIFT);
 				if(yintercept<0) yintercept=0, ytile=0;
-				else if(yintercept>=(mapheight<<TILESHIFT)) yintercept=mapheight<<TILESHIFT, ytile=mapheight-1;
+				else if((unsigned)yintercept>=(mapheight<<TILESHIFT)) yintercept=mapheight<<TILESHIFT, ytile=mapheight-1;
 				yspot[0]=0xffff;
 				tilehit=0;
 				HitHorizBorder();
@@ -948,10 +948,10 @@ horizentry:
 			if((uint32_t)xintercept>mapwidth*65536-1 || (word)ytile>=mapheight)
 			{
 				if(ytile<0) yintercept=0, ytile=0;
-				else if(ytile>=mapheight) yintercept=mapheight<<TILESHIFT, ytile=mapheight-1;
+				else if((unsigned)ytile>=mapheight) yintercept=mapheight<<TILESHIFT, ytile=mapheight-1;
 				else ytile=(short) (yintercept >> TILESHIFT);
 				if(xintercept<0) xintercept=0, xtile=0;
-				else if(xintercept>=(mapwidth<<TILESHIFT)) xintercept=mapwidth<<TILESHIFT, xtile=mapwidth-1;
+				else if((unsigned)xintercept>=(mapwidth<<TILESHIFT)) xintercept=mapwidth<<TILESHIFT, xtile=mapwidth-1;
 				xspot[0]=0xffff;
 				tilehit=0;
 				HitVertBorder();
