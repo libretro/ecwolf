@@ -213,6 +213,23 @@ HANDLE_PROPERTY(missilechance)
 	defaults->missilechance = chance;
 }
 
+HANDLE_PROPERTY(painchance)
+{
+	INT_PARAM(chance, 0);
+
+	if(chance > 256)
+		chance = 256;
+	else if(chance < 0)
+		chance = 0;
+	defaults->painchance = chance;
+}
+
+HANDLE_PROPERTY(painsound)
+{
+	STRING_PARAM(snd, 0);
+	defaults->painsound = snd;
+}
+
 HANDLE_PROPERTY(pickupsound)
 {
 	STRING_PARAM(snd, 0);
@@ -379,6 +396,8 @@ extern const PropDef properties[] =
 	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
 	DEFINE_PROP(missilechance, Actor, I),
 	DEFINE_PROP(MONSTER, Actor,),
+	DEFINE_PROP(painchance, Actor, I),
+	DEFINE_PROP(painsound, Actor, S),
 	DEFINE_PROP(pickupsound, Inventory, S),
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(PROJECTILE, Actor,),

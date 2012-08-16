@@ -6,6 +6,7 @@ actor Guard 11
 	speed 1, 3
 	sighttime 1, 4
 	dropitem "Clip"
+	painchance 256
 	attacksound "guard/attack"
 	deathsound "guard/death"
 	secretdeathsound "guard/fart"
@@ -43,7 +44,7 @@ actor Guard 11
 			goto See
 		Death:
 			GARD K 7.5 A_Fall
-			GARD L 7.5 A_DeathScream
+			GARD L 7.5 A_Scream
 			GARD M 7.5
 			GARD N -1
 			stop
@@ -88,7 +89,7 @@ actor GreenGuard : Guard 93
 			goto See
 		Death:
 			GGRD K 7.5 A_Fall
-			GGRD L 7.5 A_DeathScream
+			GGRD L 7.5 A_Scream
 			GGRD M 7.5
 			GGRD N -1
 			stop
@@ -122,6 +123,7 @@ actor Dog 14
 	health 1
 	speed 2.93, 5.859
 	sighttime 1, 8
+	painchance 256
 	attacksound "dog/attack"
 	deathsound "dog/death"
 	secretdeathsound "dog/fart"
@@ -154,7 +156,7 @@ actor Dog 14
 			loop
 		Death:
 			DOGY H 7.5 A_Fall
-			DOGY I 7.5 A_DeathScream
+			DOGY I 7.5 A_Scream
 			DOGY J 7.5
 			DOGY K -1
 			stop
@@ -192,7 +194,7 @@ actor Doberman : Dog 95
 			loop
 		Death:
 			DOBR H 7.5 A_Fall
-			DOBR I 7.5 A_DeathScream
+			DOBR I 7.5 A_Scream
 			DOBR J 7.5
 			DOBR K -1
 			stop
@@ -206,6 +208,7 @@ actor Officer 12
 	health 50
 	speed 1, 5
 	sighttime 2
+	painchance 256
 	dropitem "Clip"
 	attacksound "officer/attack"
 	deathsound "officer/death"
@@ -245,7 +248,7 @@ actor Officer 12
 			loop
 		Death:
 			OFFI K 5.5 A_Fall
-			OFFI L 5.5 A_DeathScream
+			OFFI L 5.5 A_Scream
 			OFFI MN 5.5
 			OFFI O -1
 			stop
@@ -291,7 +294,7 @@ actor LostOfficer : Officer 97
 			loop
 		Death:
 			LOFF K 5.5 A_Fall
-			LOFF L 5.5 A_DeathScream
+			LOFF L 5.5 A_Scream
 			LOFF MN 5.5
 			LOFF O -1
 			stop
@@ -305,6 +308,7 @@ actor Mutant 15
 	health 45, 55, 55, 65
 	speed 1, 3
 	sighttime 1, 6
+	painchance 256
 	dropitem "Clip"
 	attacksound "mutant/attack"
 	deathsound "mutant/death"
@@ -344,7 +348,7 @@ actor Mutant 15
 			goto See
 		Death:
 			MTNT L 3.5 A_Fall
-			MTNT M 3.5 A_DeathScream
+			MTNT M 3.5 A_Scream
 			MTNT MO 3.5
 			MTNT P -1
 			stop
@@ -390,7 +394,7 @@ actor GunBat : Mutant 96
 			goto See
 		Death:
 			GBAT L 3.5 A_Fall
-			GBAT M 3.5 A_DeathScream
+			GBAT M 3.5 A_Scream
 			GBAT MO 3.5
 			GBAT P -1
 			stop
@@ -404,6 +408,7 @@ actor WolfensteinSS 13 // ZDoom compatible name
 	health 100
 	speed 1, 4
 	sighttime 1, 6
+	painchance 256
 	dropitem "MachineGun"
 	dropitem "Clip"
 	attacksound "wolfss/attack"
@@ -450,7 +455,7 @@ actor WolfensteinSS 13 // ZDoom compatible name
 			goto See
 		Death:
 			SSWV J 7.5 A_Fall
-			SSWV K 7.5 A_DeathScream
+			SSWV K 7.5 A_Scream
 			SSWV L 7.5
 			SSWV M -1
 			stop
@@ -502,7 +507,7 @@ actor Schutzstafell : WolfensteinSS 94
 			goto See
 		Death:
 			SSFL J 7.5 A_Fall
-			SSFL K 7.5 A_DeathScream
+			SSFL K 7.5 A_Scream
 			SSFL L 7.5
 			SSFL M -1
 			stop

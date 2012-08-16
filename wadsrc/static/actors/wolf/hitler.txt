@@ -28,7 +28,7 @@ actor FakeHitler 18
 			goto See
 		Death:
 			FAKE F 5 A_Fall
-			FAKE G 5 A_DeathScream
+			FAKE G 5 A_Scream
 			FAKE HIJ 5
 			FAKE K -1
 			stop
@@ -86,7 +86,7 @@ actor MechaHitler 19
 			goto See
 		Death:
 			MECH H 5 A_Fall
-			MECH I 5 A_DeathScream
+			MECH I 5 A_Scream
 			MECH J 5
 			MECH K -1 A_SpawnItemEx("Hitler", 0, 0, 0, 0, 0, 0, 0, SXF_TRANSFERPOINTERS)
 			stop
@@ -123,7 +123,7 @@ actor Hitler
 			goto See
 		Death:
 			HTLR A .5 A_Fall
-			HTLR A 70 A_DeathScream
+			HTLR A 70 A_Scream
 			HTLR H 5
 			HTLR I 5 A_PlaySound("misc/slurpie") // TODO: Full volume with attenuation
 			HTLR JKLM 5

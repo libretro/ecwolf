@@ -29,7 +29,6 @@ actor Actor native
 	action native A_CallSpecial(int special, int arg1=0, int arg2=0, int arg3=0, int arg4=0, int arg5=0);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0, int aimflags = 0);
-	action native A_DeathScream();
 	action native A_Dormant();
 	action native A_FaceTarget(float max_turn = 0, float max_pitch = 270);
 	action native A_Fall();
@@ -41,7 +40,9 @@ actor Actor native
 	action native A_LookEx(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180); // Alias
 	action native A_MeleeAttack(int damage, float accuracy = 0.6275);
 	action native A_MonsterRefire(int chance, state abort);
+	action native A_Pain();
 	action native A_PlaySound(string soundname);
+	action native A_Scream();
 	action native A_SpawnItem(string type, float distance = 0, float zheight = 0);
 	action native A_SpawnItemEx(string type, float xoffset = 0, float yoffset = 0, float zoffset = 0, float xvel = 0, float yvel = 0, float zvel = 0, float angle = 0, int flags = 0, int failchance = 0);
 	action native A_Stop();

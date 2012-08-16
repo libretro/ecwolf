@@ -291,6 +291,11 @@ ACTION_FUNCTION(A_MonsterRefire)
 	}
 }
 
+ACTION_FUNCTION(A_Pain)
+{
+	PlaySoundLocActor(self->painsound, self);
+}
+
 ACTION_FUNCTION(A_PlaySound)
 {
 	ACTION_PARAM_STRING(sound, 0);

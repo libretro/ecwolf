@@ -214,12 +214,12 @@ void T_Projectile (AActor *self)
 /*
 ==================
 =
-= A_DeathScream
+= A_Scream
 =
 ==================
 */
 
-ACTION_FUNCTION(A_DeathScream)
+ACTION_FUNCTION(A_Scream)
 {
 	PlaySoundLocActor(self->deathsound, self);
 }

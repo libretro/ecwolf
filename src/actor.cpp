@@ -388,9 +388,11 @@ void AActor::Serialize(FArchive &arc)
 		<< sighttime
 		<< sightrandom
 		<< missilechance
+		<< painchance
 		<< attacksound
 		<< deathsound
 		<< seesound
+		<< painsound
 		<< temp1
 		<< hidden
 		<< player

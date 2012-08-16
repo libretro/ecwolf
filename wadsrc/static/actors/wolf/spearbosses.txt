@@ -30,7 +30,7 @@ actor Trans 23
 			goto See
 		Death:
 			TRNS A .5 A_Fall
-			TRNS A 52.5 A_DeathScream
+			TRNS A 52.5 A_Scream
 			TRNS HIJ 7.5
 			TRNS K -1
 			stop
@@ -62,7 +62,7 @@ actor SubmarineWilly : Trans 99
 			goto See
 		Death:
 			SUBW A .5 A_Fall
-			SUBW A 52.5 A_DeathScream
+			SUBW A 52.5 A_Scream
 			SUBW HIJ 7.5
 			SUBW K -1
 			stop
@@ -109,7 +109,7 @@ actor UberMutant 24
 			goto See
 		Death:
 			UBER A .5 A_Fall
-			UBER A 35 A_DeathScream
+			UBER A 35 A_Scream
 			UBER HIJK 7.5
 			UBER L -1
 			stop
@@ -149,7 +149,7 @@ actor TheAxe : UberMutant 101
 			goto See
 		Death:
 			MAXE A .5 A_Fall
-			MAXE A 35 A_DeathScream
+			MAXE A 35 A_Scream
 			MAXE HIJK 7.5
 			MAXE L -1
 			stop
@@ -192,7 +192,7 @@ actor Wilhelm 25
 			goto See
 		Death:
 			WILL A .5 A_Fall
-			WILL A 35 A_DeathScream
+			WILL A 35 A_Scream
 			WILL IJK 5
 			WILL L -1
 			stop
@@ -227,7 +227,7 @@ actor ProfessorQuarkblitz : Wilhelm 100
 			goto See
 		Death:
 			PROF A .5 A_Fall
-			PROF A 35 A_DeathScream
+			PROF A 35 A_Scream
 			PROF IJK 5
 			PROF L -1
 			stop
@@ -272,7 +272,7 @@ actor DeathKnight 26
 			goto See
 		Death:
 			DKNT A .5 A_Fall
-			DKNT A 52.5 A_DeathScream
+			DKNT A 52.5 A_Scream
 			DKNT IJKLMN 5
 			DKNT O -1
 			stop
@@ -309,7 +309,7 @@ actor Robot : DeathKnight 102
 			goto See
 		Death:
 			ROBO A .5 A_Fall
-			ROBO A 52.5 A_DeathScream
+			ROBO A 52.5 A_Scream
 			ROBO IJKLMN 5
 			ROBO O -1
 			stop

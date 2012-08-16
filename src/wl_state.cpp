@@ -698,6 +698,7 @@ moveok:
 ===================
 */
 
+static FRandom pr_damagemobj("ActorTakeDamage");
 void DamageActor (AActor *ob, unsigned damage)
 {
 	madenoise = true;
@@ -717,7 +718,7 @@ void DamageActor (AActor *ob, unsigned damage)
 		if (! (ob->flags & FL_ATTACKMODE) )
 			FirstSighting (ob);             // put into combat mode
 
-		if(ob->PainState)
+		if(ob->PainState && pr_damagemobj() < ob->painchance)
 			ob->SetState(ob->PainState);
 	}
 }

@@ -44,7 +44,7 @@ actor AngelOfDeath 27
 			goto See
 		Death:
 			ANGL A .5 A_Fall
-			ANGL A 52.5 A_DeathScream
+			ANGL A 52.5 A_Scream
 			ANGL I 5
 			ANGL J 5 A_PlaySound("misc/slurpie")
 			ANGL KLMNO 5
@@ -91,7 +91,7 @@ actor DevilIncarnate : AngelOfDeath 103
 			goto See
 		Death:
 			DEVL A .5 A_Fall
-			DEVL A 52.5 A_DeathScream
+			DEVL A 52.5 A_Scream
 			DEVL I 5
 			DEVL J 5 A_PlaySound("misc/slurpie2")
 			DEVL KLMNO 5

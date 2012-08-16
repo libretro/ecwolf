@@ -30,7 +30,7 @@ actor Hans 16
 			goto See
 		Death:
 			HANS H 7.5 A_Fall
-			HANS I 7.5 A_DeathScream
+			HANS I 7.5 A_Scream
 			HANS J 7.5
 			HANS K -1
 			stop
@@ -69,7 +69,7 @@ actor Gretel 20
 			goto See
 		Death:
 			GRET H 7.5 A_Fall
-			GRET I 7.5 A_DeathScream
+			GRET I 7.5 A_Scream
 			GRET J 7.5
 			GRET K -1
 			stop
@@ -123,7 +123,7 @@ actor Schabbs 17
 			goto See
 		Death:
 			SHAB A 5 A_Fall
-			SHAB A 70 A_DeathScream
+			SHAB A 70 A_Scream
 			SHAB GHI 5
 			SHAB J -1 A_BossDeath
 			stop
@@ -163,7 +163,7 @@ actor Gift 21
 			goto See
 		Death:
 			GIFT A .5 A_Fall
-			GIFT A 70 A_DeathScream
+			GIFT A 70 A_Scream
 			GIFT GHI 5
 			GIFT J -1 A_BossDeath
 			stop
@@ -205,7 +205,7 @@ actor FatFace 22
 			goto See
 		Death:
 			FATF A .5 A_Fall
-			FATF A 70 A_DeathScream
+			FATF A 70 A_Scream
 			FATF IJK 5
 			FATF L -1 A_BossDeath
 			stop
