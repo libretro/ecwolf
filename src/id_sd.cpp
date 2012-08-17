@@ -555,6 +555,8 @@ byte* SD_PrepareSound(int which)
 	FMemLump soundLump = Wads.ReadLump(which);
 
 	byte* out = reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(soundLump.GetMem(), size), 1));
+	if(!out)
+		return NULL;
 
 	// TEMPORARY WORK AROUND FOR MEMORY ERROR
 	byte* nout = new byte[sizeof(Mix_Chunk)];
