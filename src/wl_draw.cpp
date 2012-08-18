@@ -124,6 +124,11 @@ short   xtilestep,ytilestep;
 int32_t    xintercept,yintercept;
 word    xstep,ystep;
 int     texdelta;
+int		texheight;
+
+#define TEXTUREBASE 0x4000000
+fixed	texxscale;
+fixed	texyscale;
 
 
 /*
@@ -257,11 +262,11 @@ void ScalePost()
 	yoffs += postx;
 
 	yendoffs = viewheight / 2 + ywcount - 1;
-	yw=TEXTURESIZE-1;
+	yw=texyscale-1;
 
 	while(yendoffs >= viewheight)
 	{
-		ywcount -= TEXTURESIZE/2;
+		ywcount -= texyscale/2;
 		while(ywcount <= 0)
 		{
 			ywcount += yd;
@@ -279,7 +284,7 @@ void ScalePost()
 	while(yoffs <= yendoffs)
 	{
 		vbuf[yendoffs] = col;
-		ywcount -= TEXTURESIZE/2;
+		ywcount -= texyscale/2;
 		if(ywcount <= 0)
 		{
 			do
@@ -344,15 +349,17 @@ void HitVertWall (void)
 
 	DetermineHitDir(true);
 
-	texture = ((yintercept+texdelta-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
+	texture = (yintercept+texdelta-tilehit->slideAmount[hitdir])&(FRACUNIT-1);
 	if (xtilestep == -1 && !tilehit->tile->offsetVertical)
 	{
-		texture = TEXTUREMASK-texture;
+		texture = (FRACUNIT - texture - texxscale)&(FRACUNIT-1);
 		xintercept += TILEGLOBAL;
 	}
 
 	if(lastside==1 && lastintercept==xtile && lasttilehit==tilehit && !(lasttilehit->tile->offsetVertical))
 	{
+		texture -= texture%texxscale;
+
 		if((pixx&3) && texture == lasttexture)
 		{
 			ScalePost();
@@ -363,7 +370,7 @@ void HitVertWall (void)
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		if(postsource)
-			postsource+=texture-lasttexture;
+			postsource+=(texture-lasttexture)*texheight/texxscale;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -374,7 +381,6 @@ void HitVertWall (void)
 	lastside=1;
 	lastintercept=xtile;
 	lasttilehit=tilehit;
-	lasttexture=texture;
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
 	FTexture *source = NULL;
@@ -385,7 +391,19 @@ void HitVertWall (void)
 	else
 		source = TexMan(tilehit->texture[hitdir]);
 
-	postsource = source ? source->GetColumn(texture/64, NULL) : NULL;
+	if(source)
+	{
+		texheight = source->GetHeight();
+		texxscale = TEXTUREBASE/source->xScale;
+		texyscale = (64*source->yScale)>>FRACBITS;
+		texture -= texture%texxscale;
+
+		postsource = source->GetColumn(texture/texxscale, NULL);
+	}
+	else
+		postsource = NULL;
+
+	lasttexture=texture;
 }
 
 
@@ -410,17 +428,19 @@ void HitHorizWall (void)
 
 	DetermineHitDir(false);
 
-	texture = ((xintercept+texdelta-tilehit->slideAmount[hitdir])>>TEXTUREFROMFIXEDSHIFT)&TEXTUREMASK;
+	texture = (xintercept+texdelta-tilehit->slideAmount[hitdir])&(FRACUNIT-1);
 	if(!tilehit->tile->offsetHorizontal)
 	{
 		if (ytilestep == -1)
 			yintercept += TILEGLOBAL;
 		else
-			texture = TEXTUREMASK-texture;
+			texture = (FRACUNIT - texture - texxscale)&(FRACUNIT-1);
 	}
 
 	if(lastside==0 && lastintercept==ytile && lasttilehit==tilehit && !(lasttilehit->tile->offsetHorizontal))
 	{
+		texture -= texture%texxscale;
+
 		if((pixx&3) && texture == lasttexture)
 		{
 			ScalePost();
@@ -431,7 +451,7 @@ void HitHorizWall (void)
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		if(postsource)
-			postsource+=texture-lasttexture;
+			postsource+=(texture-lasttexture)*texheight/texxscale;
 		postx=pixx;
 		lasttexture=texture;
 		return;
@@ -442,7 +462,6 @@ void HitHorizWall (void)
 	lastside=0;
 	lastintercept=ytile;
 	lasttilehit=tilehit;
-	lasttexture=texture;
 	wallheight[pixx] = CalcHeight();
 	postx = pixx;
 	FTexture *source = NULL;
@@ -453,7 +472,19 @@ void HitHorizWall (void)
 	else
 		source = TexMan(tilehit->texture[hitdir]);
 
-	postsource = source ? source->GetColumn(texture/64, NULL) : NULL;
+	if(source)
+	{
+		texheight = source->GetHeight();
+		texxscale = TEXTUREBASE/source->xScale;
+		texyscale = (64*source->yScale)>>FRACBITS;
+		texture -= texture%texxscale;
+
+		postsource = source->GetColumn(texture/texxscale, NULL);
+	}
+	else
+		postsource = NULL;
+
+	lasttexture=texture;
 }
 
 //==========================================================================
