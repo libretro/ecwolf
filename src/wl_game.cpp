@@ -655,6 +655,9 @@ void Died (void)
 		//
 		do
 		{
+			for(unsigned int t = tics;t-- > 0;)
+				players[0].mo->Tick();
+
 			change = tics*DEATHROTATE;
 			if (curangle - iangle < change)
 				change = iangle-curangle;
@@ -672,6 +675,9 @@ void Died (void)
 		//
 		do
 		{
+			for(unsigned int t = tics;t-- > 0;)
+				players[0].mo->Tick();
+
 			change = tics*DEATHROTATE;
 			if (curangle - iangle < change)
 				change = curangle - iangle;
@@ -681,6 +687,16 @@ void Died (void)
 			ThreeDRefresh ();
 			CalcTics ();
 		} while (curangle != iangle);
+	}
+
+	// Wait for weapon to drop
+	while(players[0].psprite.frame)
+	{
+		for(unsigned int t = tics;t-- > 0;)
+			players[0].mo->Tick();
+
+		ThreeDRefresh();
+		CalcTics();
 	}
 
 	//

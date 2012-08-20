@@ -64,6 +64,7 @@ class APlayerPawn : public AActor
 
 	public:
 		void		CheckWeaponSwitch(const ClassDef *ammo);
+		void		Die();
 		DropList	*GetStartInventory();
 		void		GiveStartingInventory();
 		AWeapon		*PickNewWeapon();

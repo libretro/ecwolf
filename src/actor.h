@@ -182,7 +182,7 @@ class AActor : public DObject
 		void			AddInventory(AInventory *item);
 		Thinker			*GetThinker();
 		virtual void	Destroy();
-		void			Die();
+		virtual void	Die();
 		void			EnterZone(const MapZone *zone);
 		AInventory		*FindInventory(const ClassDef *cls);
 		const Frame		*FindState(const FName &name) const;

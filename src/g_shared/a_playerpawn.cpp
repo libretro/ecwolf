@@ -87,6 +87,12 @@ void APlayerPawn::CheckWeaponSwitch(const ClassDef *ammo)
 		player->PendingWeapon = weapon;
 }
 
+void APlayerPawn::Die()
+{
+	if(player->ReadyWeapon)
+		player->SetPSprite(player->ReadyWeapon->GetDownState());
+}
+
 AActor::DropList *APlayerPawn::GetStartInventory()
 {
 	int index = GetClass()->Meta.GetMetaInt(APMETA_StartInventory);
@@ -210,8 +216,9 @@ void APlayerPawn::TickPSprites()
 	if(player->psprite.ticcount > 0)
 		--player->psprite.ticcount;
 
-	while(player->psprite.ticcount == 0)
+	while(player->psprite.frame && player->psprite.ticcount == 0)
 		player->SetPSprite(player->psprite.frame->next);
 
-	player->psprite.frame->thinker(this);
+	if(player->psprite.frame)
+		player->psprite.frame->thinker(this);
 }

@@ -420,6 +420,7 @@ void TakeDamage (int points,AActor *attacker)
 
 	if (players[0].health<=0)
 	{
+		players[0].mo->Die();
 		players[0].health = 0;
 		playstate = ex_died;
 		players[0].killerobj = attacker;
