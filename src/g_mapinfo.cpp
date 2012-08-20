@@ -277,6 +277,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	Cluster = 0;
 	NoIntermission = false;
 	SecretDeathSounds = false;
+	HighScoresGraphic.SetInvalid();
 }
 
 FTextureID LevelInfo::GetBorderTexture() const
