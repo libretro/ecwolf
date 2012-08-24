@@ -172,6 +172,9 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 	TArray<BaseFile> foundFiles;
 
 	File dir(directory);
+	if(!dir.exists())
+		return;
+
 	TArray<FString> files = dir.getFileList();
 	for(unsigned int i = 0;i < files.Size();++i)
 	{
@@ -456,17 +459,17 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	{
 		dataPaths = ".";
 #if !defined(__APPLE__)
-		dataPaths += FString(":") + config.GetConfigDir();
+		dataPaths += FString(";") + config.GetConfigDir();
 #else
 		UInt8 dataDirBase[PATH_MAX];
 		FSRef folder;
 
 		if(FSFindFolder(kUserDomain, kDocumentsFolderType, kCreateFolder, &folder) == noErr &&
 			FSRefMakePath(&folder, dataDirBase, PATH_MAX) == noErr)
-			dataPaths += FString(":") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
+			dataPaths += FString(";") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
 		if(FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &folder) == noErr &&
 			FSRefMakePath(&folder, dataDirBase, PATH_MAX) == noErr)
-			dataPaths += FString(":") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
+			dataPaths += FString(";") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
 #endif
 
 		config.CreateSetting("BaseDataPaths", dataPaths);
@@ -477,7 +480,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	long split = 0;
 	do
 	{
-		long newSplit = dataPaths.IndexOf(':', split);
+		long newSplit = dataPaths.IndexOf(';', split);
 		FString path = dataPaths.Mid(split, newSplit-split);
 		// Check for environment variable
 		if(path[0] == '$')
