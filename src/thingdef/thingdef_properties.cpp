@@ -136,7 +136,7 @@ HANDLE_PROPERTY(dropitem)
 
 	if(PARAM_COUNT > 1)
 	{
-		INT_PARAM(prb, 2);
+		INT_PARAM(prb, 1);
 		if(prb > 255)
 			prb = 255;
 		else if(prb < 0)
@@ -144,7 +144,7 @@ HANDLE_PROPERTY(dropitem)
 		drop.probabilty = prb;
 		if(PARAM_COUNT > 2)
 		{
-			INT_PARAM(amt, 1);
+			INT_PARAM(amt, 2);
 			drop.amount = amt;
 		}
 	}
