@@ -530,7 +530,7 @@ ACTION_FUNCTION(A_Chase)
 			return; // object is blocked in
 	}
 
-	if(!(flags & CHF_NOPLAYACTIVE) && !(self->flags & FL_PATHING) &&
+	if(!(flags & CHF_NOPLAYACTIVE) &&
 		self->activesound != NAME_None && pr_chase() < 3)
 	{
 		PlaySoundLocActor(self->activesound, self);
