@@ -132,6 +132,11 @@ ACTION_FUNCTION(A_CallSpecial)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+ACTION_FUNCTION(A_ActiveSound)
+{
+	PlaySoundLocActor(self->activesound, self);
+}
+
 ACTION_FUNCTION(A_BossDeath)
 {
 	// TODO: Check if all enemies of same type are dead and then call a defined function.

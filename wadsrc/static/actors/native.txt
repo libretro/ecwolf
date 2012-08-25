@@ -1,6 +1,7 @@
 const int CHF_DONTDODGE = 1;
 const int CHF_BACKOFF = 2;
 const int CHF_NOSIGHTCHECK = 4;
+const int CHF_NOPLAYACTIVE = 8;
 
 const int CMF_AIMOFFSET = 1;
 
@@ -25,6 +26,7 @@ actor Actor native
 	native int angle;
 	native int health;
 
+	action native A_ActiveSound();
 	action native A_BossDeath();
 	action native A_CallSpecial(int special, int arg1=0, int arg2=0, int arg3=0, int arg4=0, int arg5=0);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);

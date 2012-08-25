@@ -400,7 +400,8 @@ ACTION_FUNCTION(A_Chase)
 	{
 		CHF_DONTDODGE = 1,
 		CHF_BACKOFF = 2,
-		CHF_NOSIGHTCHECK = 4
+		CHF_NOSIGHTCHECK = 4,
+		CHF_NOPLAYACTIVE = 8
 	};
 
 	ACTION_PARAM_STATE(melee, 0, self->MeleeState);
@@ -529,8 +530,11 @@ ACTION_FUNCTION(A_Chase)
 			return; // object is blocked in
 	}
 
-	if(!(self->flags & FL_PATHING) && self->activesound != NAME_None && pr_chase() < 3)
+	if(!(flags & CHF_NOPLAYACTIVE) && !(self->flags & FL_PATHING) &&
+		self->activesound != NAME_None && pr_chase() < 3)
+	{
 		PlaySoundLocActor(self->activesound, self);
+	}
 }
 
 /*
