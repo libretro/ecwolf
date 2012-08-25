@@ -46,6 +46,12 @@
 #define FLOAT_PARAM(var, no) double var = params[no].f;
 #define STRING_PARAM(var, no) const char* var = params[no].s;
 
+HANDLE_PROPERTY(activesound)
+{
+	STRING_PARAM(snd, 0);
+	defaults->activesound = snd;
+}
+
 HANDLE_PROPERTY(ammogive1)
 {
 	INT_PARAM(give, 0);
@@ -386,6 +392,7 @@ HANDLE_PROPERTY(PROJECTILE)
 
 extern const PropDef properties[] =
 {
+	DEFINE_PROP(activesound, Actor, S),
 	DEFINE_PROP(ammogive1, Weapon, I),
 	DEFINE_PROP(ammotype1, Weapon, S),
 	DEFINE_PROP(ammouse1, Weapon, I),

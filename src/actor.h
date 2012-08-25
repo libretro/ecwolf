@@ -256,7 +256,7 @@ class AActor : public DObject
 		uint8_t		sightrandom;
 		uint16_t	missilechance;
 		uint16_t	painchance;
-		FNameNoInit	attacksound, deathsound, painsound, seesound;
+		FNameNoInit	activesound, attacksound, deathsound, painsound, seesound;
 
 		const Frame *SpawnState, *SeeState, *PathState, *PainState, *MeleeState, *MissileState;
 		short       temp1,hidden;

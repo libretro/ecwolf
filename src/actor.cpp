@@ -399,6 +399,7 @@ void AActor::Serialize(FArchive &arc)
 		<< sightrandom
 		<< missilechance
 		<< painchance
+		<< activesound
 		<< attacksound
 		<< deathsound
 		<< seesound

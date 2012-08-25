@@ -528,6 +528,9 @@ ACTION_FUNCTION(A_Chase)
 		if (self->dir == nodir)
 			return; // object is blocked in
 	}
+
+	if(!(self->flags & FL_PATHING) && self->activesound != NAME_None && pr_chase() < 3)
+		PlaySoundLocActor(self->activesound, self);
 }
 
 /*
