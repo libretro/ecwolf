@@ -212,7 +212,7 @@ void T_Projectile (AActor *self)
 		while(iter)
 		{
 			AActor *check = iter->Item();
-			if((check->flags & FL_SHOOTABLE))
+			if(check != players[0].mo && (check->flags & FL_SHOOTABLE))
 			{
 				fixed deltax = LABS(self->x - check->x);
 				fixed deltay = LABS(self->y - check->y);

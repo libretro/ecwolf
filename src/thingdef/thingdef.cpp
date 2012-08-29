@@ -973,10 +973,10 @@ void ClassDef::ParseActor(Scanner &sc)
 		if(sc->str.CompareNoCase("native") == 0)
 			native = true;
 		else
-			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.\n", sc->str.GetChars());
+			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.", sc->str.GetChars());
 	}
 	if(previouslyDefined && !native && !newClass->tentative)
-		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.\n", newClass->name.GetChars());
+		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.", newClass->name.GetChars());
 	else
 		newClass->tentative = false;
 
