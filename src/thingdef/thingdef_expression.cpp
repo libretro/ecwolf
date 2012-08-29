@@ -481,19 +481,26 @@ ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarc
 						}
 						else
 						{
-							// We need to relink our tree to fit the new node.
-							ExpressionNode *newRoot = new ExpressionNode(root->parent);
-							if(root->parent != NULL)
+							// Go up the tree to find where we can insert this operation
+							ExpressionNode *floatCheck = thisNode;
+							ExpressionNode **floatRoot = &thisNode->parent;
+							bool rightSide = *floatRoot ? (*floatRoot)->term[1] == floatCheck : false;
+							while(*floatRoot && operators[i].density > (*floatRoot)->op->density)
 							{
-								// Figure out if we were on the left or right side.
-								root->parent->term[root->parent->term[1] == root ? 1 : 0] = newRoot;
+								floatCheck = *floatRoot;
+								floatRoot = &(*floatRoot)->parent;
+								rightSide = *floatRoot ? (*floatRoot)->term[1] == floatCheck : false;
 							}
-							root->parent = newRoot;
-							newRoot->term[0] = root;
+
+							// We need to relink our tree to fit the new node.
+							ExpressionNode *newRoot = new ExpressionNode(*floatRoot);
+							if(*floatRoot != NULL)
+								(*floatRoot)->term[rightSide] = newRoot;
+							floatCheck->parent = newRoot;
+							newRoot->term[0] = floatCheck;
 							newRoot->term[1] = new ExpressionNode(newRoot);
 							newRoot->op = &operators[i];
 							ParseExpression(cls, types, sc, newRoot->term[1], operators[i].density);
-							root = newRoot;
 						}
 						break;
 					}
