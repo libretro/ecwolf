@@ -969,13 +969,13 @@ void player_t::BringUpWeapon()
 	{
 		ReadyWeapon = PendingWeapon;
 		PendingWeapon = WP_NOCHANGE;
-		SetPSprite(ReadyWeapon->GetUpState());
+		if(ReadyWeapon != NULL)
+			SetPSprite(ReadyWeapon->GetUpState());
+		else
+			SetPSprite(NULL);
 	}
 	else
-	{
-		ReadyWeapon = NULL;
 		SetPSprite(NULL);
-	}
 }
 ACTION_FUNCTION(A_Lower)
 {
