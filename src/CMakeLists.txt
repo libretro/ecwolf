@@ -99,9 +99,18 @@ if(APPLE)
 		SDLMain.m
 		wl_iwad_picker_cocoa.mm
 	)
+
+	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.txt)
+
+	option(BUILD_BUNDLE "Build a app bundle on Mac OS X" OFF)
+	if(BUILD_BUNDLE)
+		set(PLATFORM_EXE_FLAGS MACOSX_BUNDLE)
+	endif(BUILD_BUNDLE)
+else(APPLE)
+	set(PLATFORM_EXE_FLAGS "")
 endif(APPLE)
 
-add_executable(ecwolf #WIN32
+add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	${OPL_SOURCES}
 	g_shared/a_deathcam.cpp
 	g_shared/a_inventory.cpp
@@ -216,3 +225,6 @@ add_executable(ecwolf #WIN32
 add_dependencies(ecwolf lzma gdtoa revision_check)
 target_link_libraries(ecwolf ${GTK2_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
 set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+
+# Install
+install(TARGETS ecwolf BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION bin COMPONENT Runtime)
