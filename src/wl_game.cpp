@@ -611,13 +611,11 @@ void PlayDemo (int demonumber)
 ==================
 */
 
-#define DEATHROTATE (ANGLE_1*2)
-
 void Died (void)
 {
 	float   fangle;
 	int32_t dx,dy;
-	angle_t iangle,change;
+	angle_t iangle;
 
 	if (screenfaded)
 	{
@@ -646,48 +644,25 @@ void Died (void)
 		iangle = players[0].mo->angle;
 	}
 
+	static const angle_t DEATHROTATE = ANGLE_1*2;
 	angle_t &curangle = players[0].mo->angle;
+	const int rotate = curangle - iangle > ANGLE_180 ? 1 : -1;
 
-	if (curangle - iangle > ANGLE_180)
+	do
 	{
-		//
-		// rotate clockwise
-		//
-		do
+		for(unsigned int t = tics;t-- > 0;)
 		{
-			for(unsigned int t = tics;t-- > 0;)
-				players[0].mo->Tick();
+			players[0].mo->Tick();
 
-			change = tics*DEATHROTATE;
-			if (curangle - iangle < change)
-				change = iangle-curangle;
+			if (curangle - iangle < DEATHROTATE)
+				curangle = iangle;
+			else
+				curangle += rotate*DEATHROTATE;
+		}
 
-			curangle += change;
-
-			ThreeDRefresh ();
-			CalcTics ();
-		} while (curangle != iangle);
-	}
-	else
-	{
-		//
-		// rotate counterclockwise
-		//
-		do
-		{
-			for(unsigned int t = tics;t-- > 0;)
-				players[0].mo->Tick();
-
-			change = tics*DEATHROTATE;
-			if (curangle - iangle < change)
-				change = curangle - iangle;
-
-			curangle -= change;
-
-			ThreeDRefresh ();
-			CalcTics ();
-		} while (curangle != iangle);
-	}
+		ThreeDRefresh ();
+		CalcTics ();
+	} while (curangle != iangle);
 
 	// Wait for weapon to drop
 	while(players[0].psprite.frame)
