@@ -292,6 +292,7 @@ MENU_LISTENER(SetResolution)
 	}
 
 	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
+	VH_Startup(); // Recalculate fizzlefade stuff.
 	VL_SetVGAPlaneMode();
 	EnterResolutionSelection(which);
 	resolutionMenu.draw();
