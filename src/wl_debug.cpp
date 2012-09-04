@@ -493,23 +493,36 @@ int DebugKeys (void)
 		}
 		return 1;
 	}
-	else if (Keyboard[sc_X])        // X = item cheat
+	else if (Keyboard[sc_X] || Keyboard[sc_Z])        // X = item cheat, Z = summon
 	{
+		bool summon = Keyboard[sc_Z];
 		US_CenterWindow (22,3);
 		PrintY += 6;
-		US_Print (SmallFont, "Give: ");
+		US_Print (SmallFont, summon ? "Summon: " : "Give: ");
 		VW_UpdateScreen();
-		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,22,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
+		esc = !US_LineInput (SmallFont,PrintX,py,str,NULL,true,summon ? 20 : 22,WindowX+WindowW-PrintX,GPalette.WhiteIndex);
 		if (!esc)
 		{
 			const ClassDef *cls = ClassDef::FindClass(str);
-			if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
-				return 1;
+			if(summon && cls)
+			{
+				fixed distance = FixedMul(cls->GetDefault()->radius + players[0].mo->radius, 0x16A0A); // sqrt(2)
+				AActor *newobj = AActor::Spawn(cls,
+					players[0].mo->x + FixedMul(distance, finecosine[players[0].mo->angle>>ANGLETOFINESHIFT]),
+					players[0].mo->y - FixedMul(distance, finesine[players[0].mo->angle>>ANGLETOFINESHIFT]),
+					0, false);
+				newobj->angle = players[0].mo->angle;
+			}
+			else
+			{
+				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
+					return 1;
 
-			AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
-			inv->RemoveFromWorld();
-			if(!inv->TryPickup(players[0].mo))
-				inv->Destroy();
+				AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
+				inv->RemoveFromWorld();
+				if(!inv->TryPickup(players[0].mo))
+					inv->Destroy();
+			}
 		}
 		return 1;
 	}
