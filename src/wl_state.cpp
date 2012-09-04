@@ -119,7 +119,8 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 	{
 		// We want to check where the actor is heading instead of the exact
 		// tile it exists in since this is essentially how Wolf3D handled things
-		if(iter->Item() != ob && (iter->Item()->flags & FL_SOLID) &&
+		// Players need not be checked
+		if(iter->Item() != ob && !iter->Item()->player && (iter->Item()->flags & FL_SOLID) &&
 			static_cast<unsigned int>(iter->Item()->tilex+dirdeltax[iter->Item()->dir]) == x &&
 			static_cast<unsigned int>(iter->Item()->tiley+dirdeltax[iter->Item()->dir]) == y)
 			return 0;

@@ -543,6 +543,8 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		if(basefiles.Size() > 1)
 		{
 			pick = I_PickIWad(&basefiles[0], basefiles.Size(), showPicker, defaultIWad);
+			if((unsigned int) pick >= basefiles.Size()) // keep the pick within bounds
+				pick = basefiles.Size()-1;
 			config.GetSetting("ShowIWadPicker")->SetValue(queryiwad);
 		}
 		else
