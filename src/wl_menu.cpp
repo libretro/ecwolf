@@ -383,7 +383,10 @@ void CreateMenus()
 	for(unsigned int i = 0;i < gameinfo.PlayerClasses.Size();++i)
 	{
 		const ClassDef *cls = ClassDef::FindClass(gameinfo.PlayerClasses[i]);
-		MenuItem *tmp = new MenuSwitcherMenuItem(cls->Meta.GetMetaString(APMETA_DisplayName), useEpisodeMenu ? episodes : skills, SetPlayerClassAndSwitch);
+		const char* displayName = cls->Meta.GetMetaString(APMETA_DisplayName);
+		if(!displayName)
+			Quit("Player class %s has no display name.", cls->GetName().GetChars());
+		MenuItem *tmp = new MenuSwitcherMenuItem(displayName, useEpisodeMenu ? episodes : skills, SetPlayerClassAndSwitch);
 		playerClasses.addItem(tmp);
 	}
 
