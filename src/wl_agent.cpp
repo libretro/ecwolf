@@ -121,6 +121,9 @@ void CheckWeaponChange (void)
 
 void ControlMovement (AActor *ob)
 {
+	if(playstate == ex_died)
+		return;
+
 	int32_t oldx,oldy;
 	angle_t angle;
 	int strafe = 0;
