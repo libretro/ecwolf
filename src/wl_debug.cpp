@@ -366,21 +366,25 @@ int DebugKeys (void)
 	}
 	else if (Keyboard[sc_L])        // L = level ratios
 	{
-		int ak = 0, as = 0, at = 0;
+		int ak = 0, as = 0, at = 0, kr = 100, sr = 100, tr = 100;
 		if(LevelRatios.numLevels)
 		{
 			ak = LevelRatios.killratio / LevelRatios.numLevels;
 			as = LevelRatios.secretsratio / LevelRatios.numLevels;
 			at = LevelRatios.treasureratio / LevelRatios.numLevels;
 		}
+		if(gamestate.killtotal)
+			kr = gamestate.killcount*100/gamestate.killtotal;
+		if(gamestate.secrettotal)
+			sr = gamestate.secretcount*100/gamestate.secrettotal;
+		if(gamestate.treasuretotal)
+			tr = gamestate.treasurecount*100/gamestate.treasuretotal;
 		FString ratios;
 		ratios.Format(
 			"Current Level: %02d:%02d\nKills: %d%%\nSecrets: %d%%\nTreasure: %d%%\n\n"
 			"Averages: %02d:%02d\nKills: %d%%\nSecrets: %d%%\nTreasure: %d%%",
 			gamestate.TimeCount/4200, (gamestate.TimeCount/70)%60,
-			gamestate.killcount*100/gamestate.killtotal,
-			gamestate.secretcount*100/gamestate.secrettotal,
-			gamestate.treasurecount*100/gamestate.treasuretotal,
+			kr, sr, tr,
 			LevelRatios.time/60, LevelRatios.time%60,
 			ak, as, at
  		);
