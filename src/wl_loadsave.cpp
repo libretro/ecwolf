@@ -51,6 +51,7 @@
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_inter.h"
 #include "wl_iwad.h"
 #include "wl_loadsave.h"
 #include "wl_main.h"
@@ -463,7 +464,12 @@ static void Serialize(FArchive &arc)
 		<< gamestate.treasuretotal
 		<< gamestate.killtotal
 		<< gamestate.TimeCount
-		<< gamestate.victoryflag;
+		<< gamestate.victoryflag
+		<< LevelRatios.killratio
+		<< LevelRatios.secretsratio
+		<< LevelRatios.treasureratio
+		<< LevelRatios.numLevels
+		<< LevelRatios.time;
 
 	thinkerList->Serialize(arc);
 

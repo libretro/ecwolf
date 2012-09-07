@@ -137,6 +137,10 @@ void NewGame (int difficulty, const FString &map, const ClassDef *playerClass)
 	gamestate.playerClass = playerClass;
 	levelInfo = &LevelInfo::Find(map);
 
+	// Clear LevelRatios
+	LevelRatios.killratio = LevelRatios.secretsratio = LevelRatios.treasureratio =
+		LevelRatios.numLevels = LevelRatios.time = 0;
+
 	players[0].state = player_t::PST_ENTER;
 
 	startgame = true;
