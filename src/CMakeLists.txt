@@ -63,7 +63,7 @@ if(WIN32)
 
 		set(EXTRA_FILES windows.o)
 	else(CMAKE_COMPILER_IS_GNUCXX)
-		set(EXTRA_FILES ${ECWOLF_SOURCE_DIR}/src/win32/windows.rc)
+		set(EXTRA_FILES ${ECWolf_SOURCE_DIR}/src/win32/windows.rc)
 	endif(CMAKE_COMPILER_IS_GNUCXX)
 
 	set(EXTRA_FILES

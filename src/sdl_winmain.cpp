@@ -232,7 +232,7 @@ int console_main(int argc, char *argv[])
 	SDL_SetModuleHandle(GetModuleHandle(NULL));
 
 	/* Run the application main() code */
-	status = SDL_main(argc, argv);
+	//status = SDL_main(argc, argv);
 
 	/* Exit cleanly, calling atexit() functions */
 	exit(status);

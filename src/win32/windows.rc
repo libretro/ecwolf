@@ -1,1 +1,5 @@
+#if _MSC_VER > 1400
 IDI_ICON1	ICON	DISCARDABLE	"icon.ico"
+#else
+IDI_ICON1	ICON	DISCARDABLE "icon9x.ico"
+#endif

@@ -1217,6 +1217,9 @@ void CallTerminateFunctions()
 #include <gtk/gtk.h>
 bool GtkAvailable;
 #endif
+#ifdef main
+#undef main
+#endif
 int main (int argc, char *argv[])
 {
 #ifndef NO_GTK
