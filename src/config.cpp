@@ -82,10 +82,13 @@ void Config::LocateConfigFile(int argc, char* argv[])
 	char *home = getenv("APPDATA");
 	if(home == NULL || *home == '\0')
 	{
-		printf("Please set your APPDATA environment variable.\n");
-		return;
+		printf("APPDATA environment variable not set, falling back.\n");
+		configDir = argv[0];
+		int pos = configDir.LastIndexOfAny("/\\");
+		configDir = configDir.Mid(0, pos);
 	}
-	configDir.Format("%s\\ecwolf", home);
+	else
+		configDir.Format("%s\\ecwolf", home);
 #elif defined(__APPLE__)
 	UInt8 home[PATH_MAX];
 	FSRef folder;
