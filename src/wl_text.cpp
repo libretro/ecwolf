@@ -156,7 +156,6 @@ void ParsePicCommand (bool helphack, bool norip=false)
 		while(*++text != ']')
 			++len;
 		picnum = TexMan.GetTexture(FString(texName, len), FTexture::TEX_Any);
-		Printf("Looking up %s\n", FString(texName, len).GetChars());
 		++text;
 	}
 	else
