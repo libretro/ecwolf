@@ -265,6 +265,8 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 				iwads.Delete(i);
 		}
 	}
+
+	LumpRemapper::ClearRemaps();
 }
 
 static void ParseIWad(Scanner &sc)

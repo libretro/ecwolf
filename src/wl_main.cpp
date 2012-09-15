@@ -1238,6 +1238,7 @@ int main (int argc, char *argv[])
 		{
 			TArray<FString> wadfiles, files;
 
+			Printf("IWad: Selecting base game data.\n");
 			const char* extension = CheckParameters(argc, argv, wadfiles);
 			IWad::SelectGame(files, extension, "ecwolf.pk3");
 

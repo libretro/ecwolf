@@ -55,6 +55,7 @@ class LumpRemapper
 		void		DoRemap();
 
 		static void	AddFile(const char* extension, FResourceFile *file, Type type);
+		static void ClearRemaps();
 		static void	LoadMap(const char* extension, const char* name, const char* data, unsigned int length);
 		static bool	IsPSprite(int lumpnum);
 		static void	RemapAll();

@@ -67,6 +67,11 @@ void LumpRemapper::AddFile(FResourceFile *file, Type type)
 	files.Push(rFile);
 }
 
+void LumpRemapper::ClearRemaps()
+{
+	remaps.Clear();
+}
+
 void LumpRemapper::DoRemap()
 {
 	if(!LoadMap())
@@ -144,6 +149,8 @@ bool LumpRemapper::LoadMap()
 {
 	if(loaded)
 		return true;
+	if(Wads.GetNumLumps() == 0)
+		return false;
 
 	int lump = Wads.GetNumForName(mapLumpName);
 	if(lump == -1)
