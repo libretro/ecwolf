@@ -146,6 +146,81 @@ struct OldDataSet
 			{3349085516u, 320209, "audiot.wl6", NULL, NULLP, false},
 			{2913323047u, 150652, "gamemaps.wl6", NULL, NULLP, false},
 			{22545385u, 402, "maphead.wl6", NULL, NULLP, false},
+			{199389440u, 1024, "vgadict.wl6", NULL, P(vgadict14regap), false},
+			{1789003941u, 334506, "vgagraph.wl6", NULL, P(vgagraph14regap), false},
+			{3990717432u, 486, "vgahead.wl6", NULL, P(vgahead14regap), false},
+			{2241761276u, 1545400, "vswap.wl6", NULL, P(vswap14regap), false},
+			{2140233287u, 110715, "wolf3d.exe", NULL, P(wolf3d14regap), true},
+		},
+		"Wolfenstein 3D Registered Apogee v1.4"
+	},
+	{
+		9,
+		{
+			{792447856u, 1156, "audiohed.wl6", NULL, NULLP, false},
+			{3349085516u, 320209, "audiot.wl6", NULL, NULLP, false},
+			{2913323047u, 150652, "gamemaps.wl6", NULL, NULLP, false},
+			{22545385u, 402, "maphead.wl6", NULL, NULLP, false},
+			{199389440u, 1024, "vgadict.wl6", NULL, P(vgadict14regap), false},
+			{1789003941u, 334506, "vgagraph.wl6", NULL, P(vgagraph14regap), false},
+			{3990717432u, 486, "vgahead.wl6", NULL, P(vgahead14regap), false},
+			{2241761276u, 1545400, "vswap.wl6", NULL, P(vswap14regap), false},
+			{4225834675u, 110715, "Wolf3d.exe", NULL, P(wolf3d14regapg), true},
+		},
+		"Wolfenstein 3D Registered Apogee v1.4g"
+	},
+	{
+		9,
+		{
+			{792447856u, 1156, "audiohed.wl6", NULL, NULLP, false},
+			{3349085516u, 320209, "audiot.wl6", NULL, NULLP, false},
+			{2913323047u, 150652, "gamemaps.wl6", NULL, NULLP, false},
+			{22545385u, 402, "maphead.wl6", NULL, NULLP, false},
+			{2336936184u, 1024, "vgadict.wl6", NULL, P(vgadict14reggt1), false},
+			{3772718752u, 276096, "vgagraph.wl6", NULL, P(vgagraph14reggt1), false},
+			{669923268u, 450, "vgahead.wl6", NULL, P(vgahead14reggt1), false},
+			{2241761276u, 1545400, "vswap.wl6", NULL, P(vswap14regap), false},
+			{3479572251u, 259310, "wolf3d.exe", NULL, P(wolf3d14reggt1), true},
+		},
+		"Wolfenstein 3D Registered GT #1 1.4"
+	},
+	{
+		9,
+		{
+			{792447856u, 1156, "audiohed.wl6", NULL, NULLP, false},
+			{3349085516u, 320209, "audiot.wl6", NULL, NULLP, false},
+			{2913323047u, 150652, "gamemaps.wl6", NULL, NULLP, false},
+			{22545385u, 402, "maphead.wl6", NULL, NULLP, false},
+			{2336936184u, 1024, "vgadict.wl6", NULL, P(vgadict14reggt1), false},
+			{3772718752u, 276096, "vgagraph.wl6", NULL, P(vgagraph14reggt1), false},
+			{669923268u, 450, "vgahead.wl6", NULL, P(vgahead14reggt1), false},
+			{2241761276u, 1545400, "vswap.wl6", NULL, P(vswap14regap), false},
+			{3738828655u, 259310, "wolf3d.exe", NULL, P(wolf3d14regid), true},
+		},
+		"Wolfenstein 3D Registered ID Software 1.4"
+	},
+	{
+		9,
+		{
+			{792447856u, 1156, "audiohed.wl6", NULL, NULLP, false},
+			{3349085516u, 320209, "audiot.wl6", NULL, NULLP, false},
+			{2913323047u, 150652, "gamemaps.wl6", NULL, NULLP, false},
+			{22545385u, 402, "maphead.wl6", NULL, NULLP, false},
+			{2854356302u, 1024, "vgadict.wl6", NULL, NULLP, false},
+			{2763120157u, 275774, "vgagraph.wl6", NULL, NULLP, false},
+			{2871739603u, 450, "vgahead.wl6", NULL, NULLP, false},
+			{3859859044u, 1544376, "vswap.wl6", NULL, NULLP, false},
+			{4242494513u, 109589, "wolf3d.exe", NULL, P(wolf3d14reggt2), true},
+		},
+		"Wolfenstein 3D Registered GT #2 1.4"
+	},
+	{
+		9,
+		{
+			{792447856u, 1156, "audiohed.wl6", NULL, NULLP, false},
+			{3349085516u, 320209, "audiot.wl6", NULL, NULLP, false},
+			{2913323047u, 150652, "gamemaps.wl6", NULL, NULLP, false},
+			{22545385u, 402, "maphead.wl6", NULL, NULLP, false},
 			{2854356302u, 1024, "vgadict.wl6", NULL, NULLP, false},
 			{2763120157u, 275774, "vgagraph.wl6", NULL, NULLP, false},
 			{2871739603u, 450, "vgahead.wl6", NULL, NULLP, false},
