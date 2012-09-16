@@ -7,10 +7,13 @@
 #include <list>
 #endif
 
+#include <cstdlib>
+#include <cstdarg>
+#include <cstdio>
 #include <zlib.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
-#include <dirent.h>
+//#include <sys/mman.h>
+//#include <dirent.h>
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #define START(x) static const unsigned char x[] = {
@@ -24,6 +27,40 @@ using namespace std;
 
 extern "C" int diff(int argc, char* argv[]);
 extern "C" int patch(const unsigned char* data, unsigned int dataSize, const char* filename, const char* newfilename);
+
+#ifdef _WIN32
+extern "C" {
+
+FILE *fmemopen(void *data, size_t size, const char* mode)
+{
+	FILE *patchFile = fopen("patch.tmp", "wb");
+	if(patchFile == NULL)
+		return NULL;
+	fwrite(data, 1, size, patchFile);
+	fclose(patchFile);
+
+	return fopen("patch.tmp", mode);
+}
+
+void errx(int eval, const char* error, ...)
+{
+	va_list list;
+	va_start(list, error);
+	vfprintf(stderr, error, list);
+	va_end(list);
+	exit(eval);
+}
+void err(int eval, const char* error, ...)
+{
+	va_list list;
+	va_start(list, error);
+	vfprintf(stderr, error, list);
+	va_end(list);
+	exit(eval);
+}
+
+}
+#endif
 
 struct PatchData
 {

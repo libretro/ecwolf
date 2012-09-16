@@ -41,6 +41,7 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.c,v 1.1 2005/08/06 01:59:
 #define fseeko fseek
 extern void errx(int, const char*, ...);
 extern void err(int, const char*, ...);
+typedef unsigned char u_char;
 #else
 #define O_BINARY 0
 #define O_NOINHERIT 0
