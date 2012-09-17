@@ -68,6 +68,7 @@ class MenuItem
 		virtual void	draw();
 		virtual void	left() {}
 		virtual void	right() {}
+		virtual bool	playActivateSound() { return true; }
 };
 
 class LabelMenuItem : public MenuItem
@@ -118,6 +119,7 @@ class SliderMenuItem : public MenuItem
 		void	draw();
 		void	left();
 		void	right();
+		bool	playActivateSound() { return false; }
 };
 
 class MultipleChoiceMenuItem : public MenuItem

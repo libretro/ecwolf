@@ -212,8 +212,7 @@ MultipleChoiceMenuItem::~MultipleChoiceMenuItem()
 
 void MultipleChoiceMenuItem::activate()
 {
-	if(activateListener != NULL)
-		activateListener(curOption);
+	right();
 }
 
 void MultipleChoiceMenuItem::draw()
@@ -232,7 +231,8 @@ void MultipleChoiceMenuItem::left()
 	}
 	while(options[curOption] == NULL);
 	setText(options[curOption]);
-	activate();
+	if(activateListener != NULL)
+		activateListener(curOption);
 	SD_PlaySound("menu/move1");
 }
 
@@ -246,7 +246,8 @@ void MultipleChoiceMenuItem::right()
 	}
 	while(options[curOption] == NULL);
 	setText(options[curOption]);
-	activate();
+	if(activateListener != NULL)
+		activateListener(curOption);
 	SD_PlaySound("menu/move1");
 }
 
@@ -736,6 +737,7 @@ int Menu::handle()
 				{
 					curPos = i;
 					ok = 1;
+					SD_PlaySound("menu/move1");
 					IN_ClearKeysDown ();
 					break;
 				}
@@ -750,6 +752,7 @@ int Menu::handle()
 					if (getIndex(i)->isEnabled() && getIndex(i)->getString()[0] == key)
 					{
 						curPos = i;
+						SD_PlaySound("menu/move1");
 						IN_ClearKeysDown ();
 						break;
 					}
@@ -904,7 +907,8 @@ int Menu::handle()
 	switch (exit)
 	{
 		case 1:
-			SD_PlaySound ("menu/activate");
+			if(getIndex(curPos)->playActivateSound())
+				SD_PlaySound ("menu/activate");
 			getIndex(curPos)->activate();
 			PrintX = getX() + getIndent();
 			PrintY = getY() + getHeight(curPos);
