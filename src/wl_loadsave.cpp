@@ -392,11 +392,10 @@ MENU_LISTENER(PerformSaveGame)
 
 MENU_LISTENER(LoadSaveGame)
 {
-	loadedgame = true;
-
 	if(SaveFile::files[which].oldVersion || !SaveFile::files[which].hasFiles)
 		return false;
 
+	loadedgame = true;
 	Load(SaveFile::files[which].filename);
 	
 	ShootSnd();
