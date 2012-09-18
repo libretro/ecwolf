@@ -28,10 +28,10 @@ using namespace std;
 extern "C" int diff(int argc, char* argv[]);
 extern "C" int patch(const unsigned char* data, unsigned int dataSize, const char* filename, const char* newfilename);
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
 extern "C" {
 
-FILE *fmemopen(void *data, size_t size, const char* mode)
+FILE *fmemopen_wrapper(void *data, size_t size, const char* mode)
 {
 	FILE *patchFile = fopen("patch.tmp", "wb");
 	if(patchFile == NULL)
@@ -39,9 +39,10 @@ FILE *fmemopen(void *data, size_t size, const char* mode)
 	fwrite(data, 1, size, patchFile);
 	fclose(patchFile);
 
-	return fopen("patch.tmp", mode);
+	return fopen("patch.tmp", "rb");
 }
 
+#ifdef _WIN32
 void errx(int eval, const char* error, ...)
 {
 	va_list list;
@@ -58,6 +59,7 @@ void err(int eval, const char* error, ...)
 	va_end(list);
 	exit(eval);
 }
+#endif
 
 }
 #endif

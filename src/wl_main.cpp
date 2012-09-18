@@ -1217,7 +1217,7 @@ void CallTerminateFunctions()
 #include <gtk/gtk.h>
 bool GtkAvailable;
 #endif
-#ifdef main
+#if defined(main) && !defined(__APPLE__)
 #undef main
 #endif
 int main (int argc, char *argv[])

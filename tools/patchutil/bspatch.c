@@ -36,12 +36,18 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.c,v 1.1 2005/08/06 01:59:
 #include <unistd.h>
 #include <fcntl.h>
 
+#if defined(_WIN32) || defined(__APPLE__)
+typedef unsigned char u_char;
+
+FILE *fmemopen_wrapper(void *data, size_t size, const char* mode);
+#define fmemopen fmemopen_wrapper
+#endif
+
 #ifdef _WIN32
 #define ftello ftell
 #define fseeko fseek
 extern void errx(int, const char*, ...);
 extern void err(int, const char*, ...);
-typedef unsigned char u_char;
 #else
 #define O_BINARY 0
 #define O_NOINHERIT 0
