@@ -442,14 +442,20 @@ FString I_GetSteamPath()
 }
 #endif
 
-void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad)
+void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad, const FString &progdir)
 {
 	config.CreateSetting("DefaultIWad", 0);
 	config.CreateSetting("ShowIWadPicker", 1);
 	bool showPicker = config.GetSetting("ShowIWadPicker")->GetInteger() != 0;
 	int defaultIWad = config.GetSetting("DefaultIWad")->GetInteger();
 
+	bool useProgdir = false;
 	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL, true);
+	if(!datawadRes)
+	{
+		useProgdir = true;
+		datawadRes = FResourceFile::OpenResourceFile(progdir + "/" + datawad, NULL, true);
+	}
 	if(!datawadRes)
 		I_Error("Could not open %s!", datawad);
 
@@ -487,11 +493,17 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		// Check for environment variable
 		if(path[0] == '$')
 		{
-			char* value = getenv(path.Mid(1));
-			if(value)
-				path = value;
+			FString envvar = path.Mid(1);
+			if(envvar.CompareNoCase("PROGDIR") == 0)
+				path = progdir;
 			else
-				path = "";
+			{
+				char* value = getenv(envvar);
+				if(value)
+					path = value;
+				else
+					path = "";
+			}
 		}
 
 		// Skip empty paths
@@ -560,7 +572,10 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	WadStuff &base = basefiles[pick];
 	selectedGame = &iwadTypes[base.Type];
 
-	wadfiles.Push("ecwolf.pk3");
+	if(!useProgdir)
+		wadfiles.Push("ecwolf.pk3");
+	else
+		wadfiles.Push(progdir + "/ecwolf.pk3");
 	for(unsigned int i = 0;i < base.Path.Size();++i)
 	{
 		wadfiles.Push(base.Path[i]);

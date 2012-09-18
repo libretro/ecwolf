@@ -38,8 +38,8 @@
 #include <cstring>
 #include "files.h"
 
-#define I_Error printf
-#define I_FatalError(a,b) printf(a,b);exit(0);
+#include "doomerrors.h"
+#include "zstring.h"
 
 //==========================================================================
 //
@@ -65,7 +65,10 @@ FileReader::FileReader (const char *filename)
 {
 	if (!Open(filename))
 	{
-		I_Error ("Could not open %s", filename);
+		//I_Error ("Could not open %s", filename);
+		FString error;
+		error.Format("Could not open %s", filename);
+		throw CRecoverableError(error);
 	}
 }
 

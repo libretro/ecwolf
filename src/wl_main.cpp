@@ -1226,6 +1226,12 @@ int main (int argc, char *argv[])
 	GtkAvailable = gtk_init_check(&argc, &argv);
 #endif
 
+	// Find the program directory.
+	FString progdir(".");
+	int pos = FString(argv[0]).LastIndexOfAny("/\\");
+	if(pos != -1)
+		progdir = FString(argv[0]).Mid(0, pos);
+
 	Scanner::SetMessageHandler(ScannerMessageHandler);
 	atexit(CallTerminateFunctions);
 
@@ -1240,7 +1246,7 @@ int main (int argc, char *argv[])
 
 			Printf("IWad: Selecting base game data.\n");
 			const char* extension = CheckParameters(argc, argv, wadfiles);
-			IWad::SelectGame(files, extension, "ecwolf.pk3");
+			IWad::SelectGame(files, extension, "ecwolf.pk3", progdir);
 
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
 				files.Push(wadfiles[i]);
