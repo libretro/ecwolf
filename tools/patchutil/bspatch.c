@@ -91,7 +91,7 @@ int patch(const unsigned char* data, unsigned int dataSize, const char* filename
 	/* Open patch file */
 	//if ((f = fopen(argv[3], "r")) == NULL)
 	//	err(1, "fopen(%s)", argv[3]);
-	if ((f = fmemopen((void*)data, dataSize, "r")) == NULL)
+	if ((f = fmemopen((void*)data, dataSize, "rb")) == NULL)
 		err(1, "fmemopen()");
 
 	/*
@@ -129,21 +129,21 @@ int patch(const unsigned char* data, unsigned int dataSize, const char* filename
 	/* Close patch file and re-open it via libbzip2 at the right places */
 	if (fclose(f))
 		err(1, "fclose()");
-	if ((cpf = fmemopen((void*)data, dataSize, "r")) == NULL)
+	if ((cpf = fmemopen((void*)data, dataSize, "rb")) == NULL)
 		err(1, "fmemopen()");
 	if (fseeko(cpf, 32, SEEK_SET))
 		err(1, "fseeko(%lld)",
 		    (long long)32);
 	if ((cpfbz2 = BZ2_bzReadOpen(&cbz2err, cpf, 0, 0, NULL, 0)) == NULL)
 		errx(1, "BZ2_bzReadOpen, bz2err = %d", cbz2err);
-	if ((dpf = fmemopen((void*)data, dataSize, "r")) == NULL)
+	if ((dpf = fmemopen((void*)data, dataSize, "rb")) == NULL)
 		err(1, "fopen()");
 	if (fseeko(dpf, 32 + bzctrllen, SEEK_SET))
 		err(1, "fseeko(%lld)",
 		    (long long)(32 + bzctrllen));
 	if ((dpfbz2 = BZ2_bzReadOpen(&dbz2err, dpf, 0, 0, NULL, 0)) == NULL)
 		errx(1, "BZ2_bzReadOpen, bz2err = %d", dbz2err);
-	if ((epf = fmemopen((void*)data, dataSize, "r")) == NULL)
+	if ((epf = fmemopen((void*)data, dataSize, "rb")) == NULL)
 		err(1, "fopen()");
 	if (fseeko(epf, 32 + bzctrllen + bzdatalen, SEEK_SET))
 		err(1, "fseeko(%lld)",
