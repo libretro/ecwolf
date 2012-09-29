@@ -71,16 +71,13 @@ const struct FlagDef
 {
 	DEFINE_FLAG(IF, ALWAYSPICKUP, Inventory, itemFlags),
 	DEFINE_FLAG(FL, AMBUSH, Actor, flags),
-	DEFINE_FLAG(FL, ATTACKMODE, Actor, flags),
 	DEFINE_FLAG(IF, AUTOACTIVATE, Inventory, itemFlags),
-	DEFINE_FLAG(FL, BONUS, Actor, flags),
 	DEFINE_FLAG(FL, BRIGHT, Actor, flags),
 	DEFINE_FLAG(FL, CANUSEWALLS, Actor, flags),
 	DEFINE_FLAG(FL, COUNTITEM, Actor, flags),
 	DEFINE_FLAG(FL, COUNTKILL, Actor, flags),
 	DEFINE_FLAG(FL, COUNTSECRET, Actor, flags),
 	DEFINE_FLAG(FL, DROPBASEDONTARGET, Actor, flags),
-	DEFINE_FLAG(FL, FIRSTATTACK, Actor, flags),
 	DEFINE_FLAG(IF, INVBAR, Inventory, itemFlags),
 	DEFINE_FLAG(FL, ISMONSTER, Actor, flags),
 	DEFINE_FLAG(FL, MISSILE, Actor, flags),
@@ -89,8 +86,7 @@ const struct FlagDef
 	DEFINE_FLAG(FL, PICKUP, Actor, flags),
 	DEFINE_FLAG(FL, REQUIREKEYS, Actor, flags),
 	DEFINE_FLAG(FL, SHOOTABLE, Actor, flags),
-	DEFINE_FLAG(FL, SOLID, Actor, flags),
-	DEFINE_FLAG(FL, VISABLE, Actor, flags)
+	DEFINE_FLAG(FL, SOLID, Actor, flags)
 };
 extern const PropDef properties[];
 
