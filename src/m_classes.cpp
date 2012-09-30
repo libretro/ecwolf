@@ -311,7 +311,7 @@ const char* const ControlMenuItem::keyNames[SDLK_LAST] =
 	"`","a","b","c","d","e","f","h",                                //  96
 	"h","i","j","k","l","m","n","o",                                // 104
 	"p","q","r","s","t","u","v","w",                                // 112
-	"x","y","z","{","|","}","~","?",                                // 120
+	"x","y","z","{","|","}","~","Del",                              // 120
 	"?","?","?","?","?","?","?","?",                                // 128
 	"?","?","?","?","?","?","?","?",                                // 136
 	"?","?","?","?","?","?","?","?",                                // 144
@@ -328,15 +328,15 @@ const char* const ControlMenuItem::keyNames[SDLK_LAST] =
 	"?","?","?","?","?","?","?","?",                                // 232
 	"?","?","?","?","?","?","?","?",                                // 240
 	"?","?","?","?","?","?","?","?",                                // 248
-	"?","?","?","?","?","?","?","?",                                // 256
-	"?","?","?","?","?","?","?","Entr",                            // 264
-	"?","Up","Down","Rght","Left","Ins","Home","End",              // 272
+	"KP0","KP1","KP2","KP3","KP4","KP5","KP6","KP7",                // 256
+	"KP8","KP9","Perd","Divd","Mult","Plus","Mins","Entr",          // 264
+	"Equl","Up","Down","Rght","Left","Ins","Home","End",            // 272
 	"PgUp","PgDn","F1","F2","F3","F4","F5","F6",                    // 280
-	"F7","F8","F9","F10","F11","F12","?","?",                       // 288
-	"?","?","?","?","NmLk","CpLk","ScLk","RShf",              // 296
-	"Shft","RCtl","Ctrl","RAlt","Alt","?","?","?",                // 304
-	"?","?","?","?","PrtS","?","?","?",                            // 312
-	"?","?"                                                         // 320
+	"F7","F8","F9","F10","F11","F12","F13","F14",                   // 288
+	"F15","?","?","?","NmLk","CpLk","ScLk","RShf",                  // 296
+	"Shft","RCtl","Ctrl","RAlt","Alt","RMet","Meta","Supr",         // 304
+	"RSpr","Mode","Comp","Help","PrtS","Brk","Pwr","Euro",          // 312
+	"Undo","?"                                                      // 320
 };
 
 ControlMenuItem::ControlMenuItem(ControlScheme &button) : MenuItem(button.name), button(button)

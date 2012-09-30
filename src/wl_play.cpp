@@ -83,6 +83,8 @@ ControlScheme controlScheme[] =
 	{ bt_slot8,				"Slot 8",		-1,	sc_8,			-1 },
 	{ bt_slot9,				"Slot 9",		-1,	sc_9,			-1 },
 	{ bt_slot0,				"Slot 0",		-1,	sc_0,			-1 },
+	{ bt_nextweapon,		"Next Weapon",	-1,	-1,				-1 },
+	{ bt_prevweapon,		"Prev Weapon",	-1, -1,				-1 },
 
 	// End of List
 	{ bt_nobutton,			NULL,			-1,	-1,				-1 }
@@ -123,15 +125,6 @@ void ControlScheme::setMouse(ControlScheme* scheme, Button button, int value)
 
 bool alwaysrun;
 bool mouseenabled, mouseyaxisdisabled, joystickenabled;
-int dirscan[4] = { sc_UpArrow, sc_RightArrow, sc_DownArrow, sc_LeftArrow };
-int buttonscan[NUMBUTTONS] = { sc_Control, sc_Alt, sc_LShift, sc_Space, sc_1, sc_2, sc_3, sc_4 };
-int buttonmouse[4] = { bt_attack, bt_strafe, bt_use, bt_nobutton };
-int buttonjoy[32] = {
-	bt_attack, bt_strafe, bt_use, bt_run, bt_strafeleft, bt_straferight, bt_esc, bt_pause,
-	bt_prevweapon, bt_nextweapon, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
-	bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton,
-	bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton, bt_nobutton
-};
 
 int viewsize;
 

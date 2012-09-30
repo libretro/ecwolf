@@ -42,10 +42,6 @@ extern  memptr      demobuffer;
 //
 extern  bool		alwaysrun;
 extern  bool		mouseenabled,mouseyaxisdisabled,joystickenabled;
-extern  int         dirscan[4];
-extern  int         buttonscan[NUMBUTTONS];
-extern  int         buttonmouse[4];
-extern  int         buttonjoy[32];
 
 void    PlayLoop (void);
 
