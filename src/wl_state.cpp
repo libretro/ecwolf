@@ -130,13 +130,13 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 #define CHECKSIDE(x,y,dir) \
 { \
 	short _cs; \
-	if((_cs = CheckSide(ob, x, y, dir, true)) >= 0) \
+	if((_cs = CheckSide(ob, x, y, dir, (ob->flags & FL_CANUSEWALLS))) >= 0) \
 		return _cs != 0; \
 }
-#define CHECKDIAG(x,y) \
+#define CHECKDIAG(x,y,dir) \
 { \
 	short _cs; \
-	if((_cs = CheckSide(ob, x, y, MapTrigger::North, false)) >= 0) \
+	if((_cs = CheckSide(ob, x, y, dir, false)) >= 0) \
 		return _cs != 0; \
 }
 
@@ -150,81 +150,53 @@ bool TryWalk (AActor *ob)
 	switch (ob->dir)
 	{
 		case north:
-			if (!(ob->flags & FL_CANUSEWALLS))
-			{
-				CHECKDIAG(ob->tilex,ob->tiley-1);
-			}
-			else
-			{
-				CHECKSIDE(ob->tilex,ob->tiley-1,MapTrigger::South);
-			}
+			CHECKSIDE(ob->tilex,ob->tiley-1,MapTrigger::South);
 			zoney--;
 			break;
 
 		case northeast:
-			CHECKDIAG(ob->tilex+1,ob->tiley-1);
-			CHECKDIAG(ob->tilex+1,ob->tiley);
-			CHECKDIAG(ob->tilex,ob->tiley-1);
+			CHECKDIAG(ob->tilex+1,ob->tiley-1,MapTrigger::South);
+			CHECKDIAG(ob->tilex+1,ob->tiley,MapTrigger::West);
+			CHECKDIAG(ob->tilex,ob->tiley-1,MapTrigger::South);
 			zonex++;
 			zoney--;
 			break;
 
 		case east:
-			if (!(ob->flags & FL_CANUSEWALLS))
-			{
-				CHECKDIAG(ob->tilex+1,ob->tiley);
-			}
-			else
-			{
-				CHECKSIDE(ob->tilex+1,ob->tiley,MapTrigger::West);
-			}
+			CHECKSIDE(ob->tilex+1,ob->tiley,MapTrigger::West);
 			zonex++;
 			break;
 
 		case southeast:
-			CHECKDIAG(ob->tilex+1,ob->tiley+1);
-			CHECKDIAG(ob->tilex+1,ob->tiley);
-			CHECKDIAG(ob->tilex,ob->tiley+1);
+			CHECKDIAG(ob->tilex+1,ob->tiley+1,MapTrigger::North);
+			CHECKDIAG(ob->tilex+1,ob->tiley,MapTrigger::West);
+			CHECKDIAG(ob->tilex,ob->tiley+1,MapTrigger::North);
 			zonex++;
 			zoney++;
 			break;
 
 		case south:
-			if (!(ob->flags & FL_CANUSEWALLS))
-			{
-				CHECKDIAG(ob->tilex,ob->tiley+1);
-			}
-			else
-			{
-				CHECKSIDE(ob->tilex,ob->tiley+1,MapTrigger::North);
-			}
+			CHECKSIDE(ob->tilex,ob->tiley+1,MapTrigger::North);
 			zoney++;
 			break;
 
 		case southwest:
-			CHECKDIAG(ob->tilex-1,ob->tiley+1);
-			CHECKDIAG(ob->tilex-1,ob->tiley);
-			CHECKDIAG(ob->tilex,ob->tiley+1);
+			CHECKDIAG(ob->tilex-1,ob->tiley+1,MapTrigger::North);
+			CHECKDIAG(ob->tilex-1,ob->tiley,MapTrigger::East);
+			CHECKDIAG(ob->tilex,ob->tiley+1,MapTrigger::North);
 			zonex--;
 			zoney++;
 			break;
 
 		case west:
-			if (!(ob->flags & FL_CANUSEWALLS))
-			{
-				CHECKDIAG(ob->tilex-1,ob->tiley);
-			}
-			else
-			{
-				CHECKSIDE(ob->tilex-1,ob->tiley,MapTrigger::East);
-			}
+			CHECKSIDE(ob->tilex-1,ob->tiley,MapTrigger::East);
 			zonex--;
 			break;
 
 		case northwest:
-			CHECKDIAG(ob->tilex-1,ob->tiley-1);
-			CHECKDIAG(ob->tilex-1,ob->tiley);
-			CHECKDIAG(ob->tilex,ob->tiley-1);
+			CHECKDIAG(ob->tilex-1,ob->tiley-1,MapTrigger::South);
+			CHECKDIAG(ob->tilex-1,ob->tiley,MapTrigger::East);
+			CHECKDIAG(ob->tilex,ob->tiley-1,MapTrigger::South);
 			zonex--;
 			zoney--;
 			break;
