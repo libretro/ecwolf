@@ -34,6 +34,7 @@
 
 #include "actor.h"
 #include "a_inventory.h"
+#include "doomerrors.h"
 #include "id_ca.h"
 #include "lnspec.h"
 #include "m_random.h"
@@ -899,6 +900,13 @@ void ClassDef::LoadActors()
 		while(iter.NextPair(pair))
 		{
 			ClassDef * const cls = pair->Value;
+
+			if(cls->tentative)
+			{
+				FString error;
+				error.Format("The actor '%s' is referenced but never defined.", cls->GetName().GetChars());
+				throw CFatalError(error);
+			}
 
 			cls->ClassIndex = index++;
 			for(unsigned int i = 0;i < cls->frameList.Size();++i)
