@@ -1204,7 +1204,8 @@ ACTION_FUNCTION(A_GunAttack)
 {
 	enum
 	{
-		WAF_NORANDOM = 1
+		GAF_NORANDOM = 1,
+		GAF_NOAMMO = 2
 	};
 
 	player_t *player = self->player;
@@ -1221,8 +1222,11 @@ ACTION_FUNCTION(A_GunAttack)
 	ACTION_PARAM_INT(longrange, 6);
 	ACTION_PARAM_INT(maxrange, 7);
 
-	if(!player->ReadyWeapon->DepleteAmmo())
-		return;
+	if(!(flags & GAF_NOAMMO))
+	{
+		if(!player->ReadyWeapon->DepleteAmmo())
+			return;
+	}
 
 	if(sound.Len() == 1 && sound[0] == '*')
 		SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
@@ -1277,7 +1281,7 @@ ACTION_FUNCTION(A_GunAttack)
 	dist = FixedMul(dist, snipe*FRACUNIT);
 	dist /= blocksize<<9;
 
-	int damage = flags & WAF_NORANDOM ? maxdamage : (1 + (pr_cwbullet()%maxdamage));
+	int damage = flags & GAF_NORANDOM ? maxdamage : (1 + (pr_cwbullet()%maxdamage));
 	if (dist >= pointblank)
 		damage = damage * 2 / 3;
 	if (dist >= longrange)
