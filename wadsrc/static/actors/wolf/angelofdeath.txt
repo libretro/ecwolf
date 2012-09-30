@@ -25,22 +25,24 @@ actor AngelOfDeath 27
 		Missile:
 			ANGL E 5 A_FaceTarget
 			ANGL F 10 A_FaceTarget
-			ANGL E 0 A_FaceTarget
 			ANGL E 5 A_CustomMissile("Spark")
-			ANGL E 0 A_Jump(127, "Chase")
-			ANGL E 0 A_FaceTarget
+			ANGL E 0 A_Jump(127, "See")
+			ANGL E 5 A_FaceTarget
+			ANGL F 10 A_FaceTarget
 			ANGL E 5 A_CustomMissile("Spark")
-			ANGL E 0 A_Jump(127, "Chase")
-			ANGL E 0 A_FaceTarget
+			ANGL E 0 A_Jump(127, "See")
+			ANGL E 5 A_FaceTarget
+			ANGL F 10 A_FaceTarget
 			ANGL E 5 A_CustomMissile("Spark")
 			// TODO: When sound attenuation is supported, make this play at full volume.
-			ANGL G 20 A_PlaySound("angel/breath")
-			ANGL H 20
-			ANGL G 20 A_PlaySound("angel/breath")
-			ANGL H 20
-			ANGL G 20 A_PlaySound("angel/breath")
-			ANGL H 20
-			ANGL G 20 A_PlaySound("angel/breath")
+			ANGL G 20
+			ANGL H 20 A_PlaySound("angel/breath")
+			ANGL G 20
+			ANGL H 20 A_PlaySound("angel/breath")
+			ANGL G 20
+			ANGL H 20 A_PlaySound("angel/breath")
+			ANGL G 20
+			ANGL G 0 A_PlaySound("angel/breath")
 			goto See
 		Death:
 			ANGL A .5 A_Fall
@@ -72,22 +74,24 @@ actor DevilIncarnate : AngelOfDeath 103
 		Missile:
 			DEVL E 5 A_FaceTarget
 			DEVL F 10 A_FaceTarget
-			DEVL E 0 A_FaceTarget
 			DEVL E 5 A_CustomMissile("EnergyBall")
-			DEVL E 0 A_Jump(127, "Chase")
-			DEVL E 0 A_FaceTarget
+			DEVL E 0 A_Jump(127, "See")
+			DEVL E 5 A_FaceTarget
+			DEVL F 10 A_FaceTarget
 			DEVL E 5 A_CustomMissile("EnergyBall")
-			DEVL E 0 A_Jump(127, "Chase")
-			DEVL E 0 A_FaceTarget
+			DEVL E 0 A_Jump(127, "See")
+			DEVL E 5 A_FaceTarget
+			DEVL F 10 A_FaceTarget
 			DEVL E 5 A_CustomMissile("EnergyBall")
 			// TODO: When sound attenuation is supported, make this play at full volume.
-			DEVL G 20 A_PlaySound("angel/breath")
-			DEVL H 20
-			DEVL G 20 A_PlaySound("angel/breath")
-			DEVL H 20
-			DEVL G 20 A_PlaySound("angel/breath")
-			DEVL H 20
-			DEVL G 20 A_PlaySound("angel/breath")
+			DEVL G 20
+			DEVL H 20 A_PlaySound("angel/breath")
+			DEVL G 20
+			DEVL H 20 A_PlaySound("angel/breath")
+			DEVL G 20
+			DEVL H 20 A_PlaySound("angel/breath")
+			DEVL G 20
+			DEVL G 0 A_PlaySound("angel/breath")
 			goto See
 		Death:
 			DEVL A .5 A_Fall
