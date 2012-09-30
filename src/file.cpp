@@ -94,3 +94,24 @@ File::File(const FString &filename) : filename(filename), directory(false), exis
 	}
 #endif
 }
+
+FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtension) const
+{
+#if defined(WINDOWS) || defined(__APPLE__)
+	// Insensitive filesystem, so just return the filename
+	return filename;
+#else
+	const TArray<FString> &files = getFileList();
+	FString extension = filename.Mid(filename.LastIndexOf('.')+1);
+
+	for(unsigned int i = 0;i < files.Size();++i)
+	{
+		if(files[i].CompareNoCase(filename) == 0)
+		{
+			if(!sensitiveExtension || files[i].Mid(files[i].LastIndexOf('.')+1).Compare(extension) == 0)
+				return files[i];
+		}
+	}
+	return FString();
+#endif
+}

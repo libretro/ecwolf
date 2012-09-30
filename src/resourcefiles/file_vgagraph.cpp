@@ -32,6 +32,8 @@
 **
 */
 
+#include "doomerrors.h"
+#include "file.h"
 #include "wl_def.h"
 #include "m_swap.h"
 #include "resourcefile.h"
@@ -154,8 +156,15 @@ class FVGAGraph : public FResourceFile
 			extension = path.Mid(lastSlash+10);
 			path = path.Left(lastSlash+1);
 
-			vgadictFile = path + "vgadict." + extension;
-			vgaheadFile = path + "vgahead." + extension;
+			File directory(path.Len() > 0 ? path : ".");
+			vgadictFile = directory.getInsensitiveFile(FString("vgadict.") + extension, true);
+			if(vgadictFile.IsEmpty())
+				vgadictFile = FString("vgadict.") + extension;
+			vgadictFile = path + vgadictFile;
+			vgaheadFile = directory.getInsensitiveFile(FString("vgahead.") + extension, true);
+			if(vgaheadFile.IsEmpty())
+				vgaheadFile = FString("vgahead.") + extension;
+			vgaheadFile = path + vgaheadFile;
 		}
 		~FVGAGraph()
 		{
@@ -167,7 +176,11 @@ class FVGAGraph : public FResourceFile
 		{
 			FileReader vgadictReader;
 			if(!vgadictReader.Open(vgadictFile))
-				return false;
+			{
+				FString error;
+				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
+				throw CRecoverableError(error);
+			}
 			vgadictReader.Read(huffman, sizeof(huffman));
 			for(unsigned int i = 0;i < 255;++i)
 			{
@@ -177,7 +190,11 @@ class FVGAGraph : public FResourceFile
 
 			FileReader vgaheadReader;
 			if(!vgaheadReader.Open(vgaheadFile))
-				return false;
+			{
+				FString error;
+				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
+				throw CRecoverableError(error);
+			}
 			vgaheadReader.Seek(0, SEEK_END);
 			NumLumps = vgaheadReader.Tell()/3;
 			vgaheadReader.Seek(0, SEEK_SET);

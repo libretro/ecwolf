@@ -32,6 +32,8 @@
 **
 */
 
+#include "file.h"
+#include "doomerrors.h"
 #include "wl_def.h"
 #include "resourcefile.h"
 #include "w_wad.h"
@@ -48,14 +50,22 @@ class FAudiot : public FUncompressedFile
 			extension = path.Mid(lastSlash+8);
 			path = path.Left(lastSlash+1);
 
-			audiohedFile = path + "audiohed." + extension;
+			File directory(path.Len() > 0 ? path : ".");
+			audiohedFile = directory.getInsensitiveFile(FString("audiohed.") + extension, true);
+			if(audiohedFile.IsEmpty())
+				audiohedFile = FString("audiohed.") + extension;
+			audiohedFile = path + audiohedFile;
 		}
 
 		bool Open(bool quiet)
 		{
 			FileReader audiohedReader;
 			if(!audiohedReader.Open(audiohedFile))
-				return false;
+			{
+				FString error;
+				error.Format("Could not open audiot since %s is missing.", audiohedFile.GetChars());
+				throw CRecoverableError(error);
+			}
 			audiohedReader.Seek(0, SEEK_END);
 			NumLumps = (audiohedReader.Tell()/4)-1;
 			audiohedReader.Seek(0, SEEK_SET);

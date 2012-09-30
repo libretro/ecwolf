@@ -335,7 +335,7 @@ static void CollectGC()
 
 static void DrawStartupConsole()
 {
-	static const char* const tempString = "        " GAMENAME " " DOTVERSIONSTR_NOREV "\n\n\nTo be replaced with console...\n\n  The memory thing was just\n     for show anyways.";
+	static const char* const tempString = "          " GAMENAME " " DOTVERSIONSTR_NOREV "\n\n\nTo be replaced with console...\n\n  The memory thing was just\n     for show anyways.";
 
 	CA_CacheScreen(TexMan(gameinfo.SignonLump));
 

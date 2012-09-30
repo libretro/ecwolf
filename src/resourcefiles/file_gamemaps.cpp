@@ -32,6 +32,8 @@
 **
 */
 
+#include "file.h"
+#include "doomerrors.h"
 #include "wl_def.h"
 #include "resourcefile.h"
 #include "w_wad.h"
@@ -201,7 +203,11 @@ FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(fil
 	extension = path.Mid(lastSlash+10);
 	path = path.Left(lastSlash+1);
 
-	mapheadFile = path + "maphead." + extension;
+	File directory(path.Len() > 0 ? path : ".");
+	mapheadFile = directory.getInsensitiveFile(FString("maphead.") + extension, true);
+	if(mapheadFile.IsEmpty())
+		mapheadFile = FString("maphead.") + extension;
+	mapheadFile = path + mapheadFile;
 }
 
 FGamemaps::~FGamemaps()
@@ -223,7 +229,11 @@ bool FGamemaps::Open(bool quiet)
 	// hit a 0 offset.
 	FileReader mapheadReader;
 	if(!mapheadReader.Open(mapheadFile))
-		return false;
+	{
+		FString error;
+		error.Format("Could not open gamemaps since %s is missing.", mapheadFile.GetChars());
+		throw CRecoverableError(error);
+	}
 	mapheadReader.Seek(0, SEEK_END);
 	unsigned int NumPossibleMaps = (mapheadReader.Tell()-2)/4;
 	mapheadReader.Seek(0, SEEK_SET);
