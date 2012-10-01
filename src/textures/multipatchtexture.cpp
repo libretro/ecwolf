@@ -1304,11 +1304,13 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 			}
 			else if (sc->str.CompareNoCase("Offset") == 0)
 			{
+				bool negative = sc.CheckToken('-');
 				sc.MustGetToken(TK_IntConst);
-				LeftOffset = sc->number;
+				LeftOffset = negative ? -sc->number : sc->number;
 				sc.MustGetToken(',');
+				negative = sc.CheckToken('-');
 				sc.MustGetToken(TK_IntConst);
-				TopOffset = sc->number;
+				TopOffset = negative ? -sc->number : sc->number;
 			}
 			else
 			{
