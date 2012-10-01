@@ -193,10 +193,14 @@ void ControlMovement (AActor *ob)
 	//
 	if (controly < 0)
 	{
+		if(controly < -RUNMOVE)
+			controly = -RUNMOVE;
 		Thrust (ob->angle,-controly*MOVESCALE); // move forwards
 	}
 	else if (controly > 0)
 	{
+		if(controly > RUNMOVE)
+			controly = RUNMOVE;
 		angle = ob->angle + ANGLE_180;
 		Thrust (angle,controly*BACKMOVESCALE);          // move backwards
 	}
