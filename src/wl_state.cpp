@@ -929,9 +929,6 @@ static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double
 
 void FirstSighting (AActor *ob)
 {
-	if(ob->SeeState)
-		ob->SetState(ob->SeeState);
-
 	PlaySoundLocActor(ob->seesound, ob);
 	ob->speed = ob->runspeed;
 
@@ -940,6 +937,9 @@ void FirstSighting (AActor *ob)
 
 	ob->flags &= ~FL_PATHING;
 	ob->flags |= FL_ATTACKMODE|FL_FIRSTATTACK;
+
+	if(ob->SeeState)
+		ob->SetState(ob->SeeState);
 }
 
 
