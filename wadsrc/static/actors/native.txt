@@ -104,6 +104,10 @@ actor Weapon : Inventory native
 	weapon.ammotype1 "None"
 	weapon.ammogive1 0
 	weapon.ammouse1 0
+	weapon.bobrangex 1.0
+	weapon.bobrangey 1.0
+	weapon.bobspeed 1.0
+	weapon.bobstyle "Normal"
 	weapon.yadjust 0
 
 	action native A_CustomPunch(int damage, bool norandom=false, int flags=0, string pufftype="", float range=0, float lifesteal=0); 

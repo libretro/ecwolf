@@ -430,7 +430,7 @@ bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 
 	cursorvis = done = false;
 	lasttime = lastdirtime = lastdirmovetime = GetTimeCount();
-	lastbuttontime = lasttime + TickBase / 4;	// 250 ms => first button press accepted after 500 ms
+	lastbuttontime = lasttime + TICRATE / 4;	// 250 ms => first button press accepted after 500 ms
 	LastASCII = key_None;
 	LastScan = sc_None;
 
@@ -452,7 +452,7 @@ bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 		curtime = GetTimeCount();
 
 		// After each direction change accept the next change after 250 ms and then everz 125 ms
-		if(ci.dir != lastdir || (curtime - lastdirtime > TickBase / 4 && curtime - lastdirmovetime > TickBase / 8))
+		if(ci.dir != lastdir || (curtime - lastdirtime > TICRATE / 4 && curtime - lastdirmovetime > TICRATE / 8))
 		{
 			if(ci.dir != lastdir)
 			{
@@ -520,7 +520,7 @@ bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 			}
 		}
 
-		if((int)(curtime - lastbuttontime) > TickBase / 4)   // 250 ms
+		if((int)(curtime - lastbuttontime) > TICRATE / 4)   // 250 ms
 		{
 			if(ci.button0)             // acts as return
 			{
@@ -652,11 +652,11 @@ bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 		if (cursormoved)
 		{
 			cursorvis = false;
-			lasttime = curtime - TickBase;
+			lasttime = curtime - TICRATE;
 
 			cursormoved = false;
 		}
-		if (curtime - lasttime > TickBase / 2)    // 500 ms
+		if (curtime - lasttime > TICRATE / 2)    // 500 ms
 		{
 			lasttime = curtime;
 

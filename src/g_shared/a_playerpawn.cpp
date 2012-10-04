@@ -206,6 +206,11 @@ void APlayerPawn::Tick()
 		player->attackheld = buttonstate[bt_attack];
 
 	ControlMovement(this);
+
+	static const fixed MAXBOB = 0x100000;
+	player->bob = thrustspeed << 8;
+	if(player->bob > MAXBOB)
+		player->bob = MAXBOB;
 }
 
 void APlayerPawn::TickPSprites()

@@ -5,6 +5,7 @@ actor WolfWeapon : Weapon
 	weapon.ammogive1 6
 	weapon.yadjust 19
 	+WEAPON.NOGRIN
+	+WEAPON.DONTBOB
 	states
 	{
 		Select:

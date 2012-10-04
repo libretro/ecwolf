@@ -452,7 +452,7 @@ ACTION_FUNCTION(A_ReFire)
 
 ACTION_FUNCTION(A_WeaponReady)
 {
-	self->player->flags |= player_t::PF_WEAPONREADY;
+	self->player->flags |= player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

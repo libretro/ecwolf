@@ -119,6 +119,17 @@ class AWeapon : public AInventory
 			AltFire,
 			EitherFire
 		};
+
+		enum EBobStyle
+		{
+			BobNormal,
+			BobInverse,
+			BobAlpha,
+			BobInverseAlpha,
+			BobSmooth,
+			BobInverseSmooth
+		};
+
 		void		AttachToOwner(AActor *owner);
 		bool		CheckAmmo(FireMode fireMode, bool autoSwitch, bool requireAmmo=false);
 		bool		DepleteAmmo();
@@ -140,6 +151,11 @@ class AWeapon : public AInventory
 		// Inventory instance variables
 		FireMode		mode;
 		TObjPtr<AAmmo>	ammo1;
+
+		// Bob
+		EBobStyle	BobStyle;
+		fixed		BobRangeX, BobRangeY;
+		fixed		BobSpeed;
 
 	protected:
 		bool	UseForAmmo(AWeapon *owned);

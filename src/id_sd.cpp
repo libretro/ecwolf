@@ -324,8 +324,8 @@ SDL_SetTimer0(word speed)
 		outp(0x40,(byte)speed);
 		outp(0x40,speed >> 8);
 		// Kludge to handle special case for digitized PC sounds
-		if (TimerDivisor == (1192030 / (TickBase * 100)))
-				TimerDivisor = (1192030 / (TickBase * 10));
+		if (TimerDivisor == (1192030 / (TICRATE * 100)))
+				TimerDivisor = (1192030 / (TICRATE * 10));
 		else
 				TimerDivisor = speed;
 
@@ -357,17 +357,17 @@ SDL_SetTimerSpeed(void)
 
 		if ((DigiMode == sds_PC) && DigiPlaying)
 		{
-				rate = TickBase * 100;
+				rate = TICRATE * 100;
 				isr = SDL_t0ExtremeAsmService;
 		}
 		else if ((MusicMode == smm_AdLib) || ((DigiMode == sds_SoundSource) && DigiPlaying)     )
 		{
-				rate = TickBase * 10;
+				rate = TICRATE * 10;
 				isr = SDL_t0FastAsmService;
 		}
 		else
 		{
-				rate = TickBase * 2;
+				rate = TICRATE * 2;
 				isr = SDL_t0SlowAsmService;
 		}
 

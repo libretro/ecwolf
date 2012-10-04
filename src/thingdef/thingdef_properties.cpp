@@ -85,6 +85,45 @@ HANDLE_PROPERTY(attacksound)
 	defaults->attacksound = snd;
 }
 
+HANDLE_PROPERTY(bobrangex)
+{
+	FLOAT_PARAM(rangex, 0);
+	((AWeapon*)defaults)->BobRangeX = fixed(rangex*FRACUNIT);
+}
+
+HANDLE_PROPERTY(bobrangey)
+{
+	FLOAT_PARAM(rangey, 0);
+	((AWeapon*)defaults)->BobRangeY = fixed(rangey*FRACUNIT);
+}
+
+HANDLE_PROPERTY(bobspeed)
+{
+	FLOAT_PARAM(speed, 0);
+	((AWeapon*)defaults)->BobSpeed = fixed(speed*FRACUNIT);
+}
+
+HANDLE_PROPERTY(bobstyle)
+{
+	STRING_PARAM(style, 0);
+
+	AWeapon::EBobStyle &BobStyle = ((AWeapon*)defaults)->BobStyle;
+	if(stricmp(style, "Normal") == 0)
+		BobStyle = AWeapon::BobNormal;
+	else if(stricmp(style, "Inverse") == 0)
+		BobStyle = AWeapon::BobInverse;
+	else if(stricmp(style, "Alpha") == 0)
+		BobStyle = AWeapon::BobAlpha;
+	else if(stricmp(style, "InverseAlpha") == 0)
+		BobStyle = AWeapon::BobInverseAlpha;
+	else if(stricmp(style, "Smooth") == 0)
+		BobStyle = AWeapon::BobSmooth;
+	else if(stricmp(style, "InverseSmooth") == 0)
+		BobStyle = AWeapon::BobInverseSmooth;
+	else
+		I_Error("Invalid bob style '%s'.", style);
+}
+
 HANDLE_PROPERTY(damage)
 {
 	if(!IS_EXPR(0))
@@ -398,6 +437,10 @@ extern const PropDef properties[] =
 	DEFINE_PROP(ammouse1, Weapon, I),
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
+	DEFINE_PROP(bobrangex, Weapon, F),
+	DEFINE_PROP(bobrangey, Weapon, F),
+	DEFINE_PROP(bobspeed, Weapon, F),
+	DEFINE_PROP(bobstyle, Weapon, S),
 	DEFINE_PROP(damage, Actor, I),
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),

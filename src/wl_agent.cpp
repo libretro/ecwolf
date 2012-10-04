@@ -960,8 +960,112 @@ void Cmd_Use (void)
 =============================================================================
 */
 
-player_t::player_t() : attackheld(false)
+player_t::player_t() : bob(0), attackheld(false)
 {
+}
+
+// P_BobWeapon From ZDoom
+//============================================================================
+//
+// P_BobWeapon
+//
+// [RH] Moved this out of A_WeaponReady so that the weapon can bob every
+// tic and not just when A_WeaponReady is called. Not all weapons execute
+// A_WeaponReady every tic, and it looks bad if they don't bob smoothly.
+//
+// [XA] Added new bob styles and exposed bob properties. Thanks, Ryan Cordell!
+//
+//============================================================================
+
+void player_t::BobWeapon (fixed *x, fixed *y)
+{
+	static fixed_t curbob = 0;
+
+	AWeapon *weapon;
+	fixed bobtarget;
+
+	weapon = ReadyWeapon;
+
+	if (weapon == NULL || weapon->weaponFlags & WF_DONTBOB)
+	{
+		*x = *y = 0;
+		return;
+	}
+
+	// [XA] Get the current weapon's bob properties.
+	int bobstyle = weapon->BobStyle;
+	int bobspeed = (weapon->BobSpeed * 128) >> 16;
+	fixed rangex = weapon->BobRangeX;
+	fixed rangey = weapon->BobRangeY;
+
+	// Bob the weapon based on movement speed.
+	int angle = (bobspeed*35/TICRATE*gamestate.TimeCount)&FINEMASK;
+
+	// [RH] Smooth transitions between bobbing and not-bobbing frames.
+	// This also fixes the bug where you can "stick" a weapon off-center by
+	// shooting it when it's at the peak of its swing.
+	bobtarget = (flags & PF_WEAPONBOBBING) ? bob : 0;
+	if (curbob != bobtarget)
+	{
+		if (abs (bobtarget - curbob) <= 1*FRACUNIT)
+		{
+			curbob = bobtarget;
+		}
+		else
+		{
+			fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
+			if (curbob > bobtarget)
+			{
+				curbob -= zoom;
+			}
+			else
+			{
+				curbob += zoom;
+			}
+		}
+	}
+
+	if (curbob != 0)
+	{
+		fixed_t bobx = FixedMul(curbob, rangex);
+		fixed_t boby = FixedMul(curbob, rangey);
+		switch (bobstyle)
+		{
+		case AWeapon::BobNormal:
+			*x = FixedMul(bobx, finecosine[angle]);
+			*y = FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
+			break;
+			
+		case AWeapon::BobInverse:
+			*x = FixedMul(bobx, finecosine[angle]);
+			*y = boby - FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
+			break;
+			
+		case AWeapon::BobAlpha:
+			*x = FixedMul(bobx, finesine[angle]);
+			*y = FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
+			break;
+			
+		case AWeapon::BobInverseAlpha:
+			*x = FixedMul(bobx, finesine[angle]);
+			*y = boby - FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
+			break;
+			
+		case AWeapon::BobSmooth:
+			*x = FixedMul(bobx, finecosine[angle]);
+			*y = (boby - FixedMul(boby, finecosine[angle*2 & (FINEANGLES-1)])) / 2;
+			break;
+
+		case AWeapon::BobInverseSmooth:
+			*x = FixedMul(bobx, finecosine[angle]);
+			*y = (FixedMul(boby, finecosine[angle*2 & (FINEANGLES-1)]) + boby) / 2;
+		}
+	}
+	else
+	{
+		*x = 0;
+		*y = 0;
+	}
 }
 
 const fixed RAISERANGE = 96*FRACUNIT;
@@ -1080,7 +1184,7 @@ void player_t::Serialize(FArchive &arc)
 
 void player_t::SetPSprite(const Frame *frame)
 {
-	flags &= ~player_t::PF_WEAPONREADY;
+	flags &= ~(player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING);
 	psprite.frame = frame;
 
 	if(frame)

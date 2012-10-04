@@ -87,6 +87,7 @@ void Quit(const char *errorStr, ...);
 #define BODYQUESIZE		32
 #define NUMCOLORMAPS	32
 
+#define TICRATE 70
 #define MAXTICS 10
 #define DEMOTICS        4
 
@@ -225,6 +226,7 @@ typedef enum
 
 	WF_NOGRIN			= 0x00000001,
 	WF_NOAUTOFIRE		= 0x00000002,
+	WF_DONTBOB			= 0x00000004,
 } objflag_t;
 
 /*

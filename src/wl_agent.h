@@ -46,6 +46,7 @@ extern class player_t
 	public:
 		player_t();
 
+		void	BobWeapon(fixed_t *x, fixed_t *y);
 		void	BringUpWeapon();
 		size_t	PropagateMark();
 		void	Reborn();
@@ -62,7 +63,8 @@ extern class player_t
 
 		enum PlayerFlags
 		{
-			PF_WEAPONREADY = 0x1
+			PF_WEAPONREADY = 0x1,
+			PF_WEAPONBOBBING = 0x2,
 		};
 
 		APlayerPawn	*mo;
@@ -83,6 +85,7 @@ extern class player_t
 			fixed		sx;
 			fixed		sy;
 		} psprite;
+		fixed			bob;
 
 		// Attackheld is similar to buttonheld[bt_attack] only it only gets set
 		// to true when an attack is registered. If the button is released and

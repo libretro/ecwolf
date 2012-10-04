@@ -659,7 +659,7 @@ static void PG13 (void)
 	VW_UpdateScreen ();
 
 	VW_FadeIn ();
-	IN_UserInput (TickBase * 7);
+	IN_UserInput (TICRATE * 7);
 
 	VW_FadeOut ();
 }
@@ -752,7 +752,7 @@ static void DemoLoop()
 			CA_CacheScreen(TexMan(gameinfo.TitlePage));
 			VW_UpdateScreen ();
 			VW_FadeIn();
-			if (IN_UserInput(TickBase*gameinfo.TitleTime))
+			if (IN_UserInput(TICRATE*gameinfo.TitleTime))
 				break;
 			VW_FadeOut();
 			if(useTitlePalette)
@@ -766,7 +766,7 @@ static void DemoLoop()
 			CA_CacheScreen (TexMan(gameinfo.CreditPage));
 			VW_UpdateScreen();
 			VW_FadeIn ();
-			if (IN_UserInput(TickBase*gameinfo.PageTime))
+			if (IN_UserInput(TICRATE*gameinfo.PageTime))
 				break;
 			VW_FadeOut ();
 //
@@ -776,7 +776,7 @@ static void DemoLoop()
 			VW_UpdateScreen ();
 			VW_FadeIn ();
 
-			if (IN_UserInput(TickBase*gameinfo.PageTime))
+			if (IN_UserInput(TICRATE*gameinfo.PageTime))
 				break;
 //
 // demo

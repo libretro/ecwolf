@@ -660,7 +660,10 @@ void DrawPlayerWeapon (void)
 	if(!players[0].psprite.frame)
 		return;
 
-	R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite.frame, players[0].psprite.sx, players[0].psprite.sy);
+	fixed xoffset, yoffset;
+	players[0].BobWeapon(&xoffset, &yoffset);
+
+	R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite.frame, players[0].psprite.sx+xoffset, players[0].psprite.sy+yoffset);
 }
 
 

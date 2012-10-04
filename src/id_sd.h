@@ -14,8 +14,6 @@
 #define alOut(n,b) 		YM3812Write(oplChip, n, b, AdlibVolume)
 #define alOutMusic(n,b)	YM3812Write(oplChip, n, b, MusicVolume)
 
-#define TickBase        70      // 70Hz per tick - used as a base for timer 0
-
 typedef enum
 {
 	sdm_Off,
