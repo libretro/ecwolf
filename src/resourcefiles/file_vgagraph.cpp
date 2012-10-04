@@ -93,7 +93,7 @@ struct FVGALump : public FResourceLump
 			return 1;
 		}
 
-		void HuffExpand(byte* source, byte* dest)
+		byte *HuffExpand(byte* source, byte* dest)
 		{
 			byte *end, *send;
 			Huffnode *headptr, *huffptr;
@@ -101,7 +101,7 @@ struct FVGALump : public FResourceLump
 			if(!LumpSize || !dest)
 			{
 				Quit("length or dest is null!");
-				return;
+				return NULL;
 			}
 		
 			headptr = huffman+254;        // head node is always node 254
@@ -141,6 +141,8 @@ struct FVGALump : public FResourceLump
 					huffptr = huffman + (nodeval - 256);
 				}
 			}
+
+			return dest;
 		}
 };
 
@@ -236,14 +238,23 @@ class FVGAGraph : public FResourceFile
 
 				if(i == 1) // We must do this on the second lump to how the position is filled.
 				{
+					// It looks like editors often neglect to give proper sizes
+					// for the pictable. If we can at least assume that the
+					// compression code will work fine then we can make up a
+					// maximum length. We will get the actual length based off
+					// where the decoder ends. (Wolf3D hard coded the number of
+					// pictures so it just used that for the size.)
 					Reader->Seek(lumps[0].position+4, SEEK_SET);
-					numPictures = lumps[0].LumpSize/4;
+					lumps[0].LumpSize = (NumLumps-3)*4;
 
 					byte* data = new byte[lumps[0].length];
-					byte* out = new byte[lumps[0].LumpSize];
+					byte* out = new byte[(NumLumps-3)*4];//lumps[0].LumpSize];
 					Reader->Read(data, lumps[0].length);
-					lumps[0].HuffExpand(data, out);
+					byte* endPtr = lumps[0].HuffExpand(data, out);
 					delete[] data;
+
+					lumps[0].LumpSize = (unsigned int)(endPtr - out);
+					numPictures = lumps[0].LumpSize/4;
 
 					dimensions = new Dimensions[numPictures];
 					for(unsigned int j = 0;j < numPictures;j++)
