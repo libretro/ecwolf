@@ -207,8 +207,8 @@ devil/breath			{ NULL ALAGLBTH PCAGLBTH }
 devil/sight				{ DSDVLSIT ALAGLSIT PCAGLSIT }
 devil/death				{ DSDVLDTH ALAGLDTH PCAGLDTH }
 
-ghost/sight				{ NULL PCGHTSIT ALGHTSIT }
-ghost/death				{ NULL ALGHTDTH ALGHTDTH }
+ghost/sight				{ NULL ALGHTSIT PCGHTSIT }
+ghost/death				{ NULL ALGHTDTH PCGHTDTH }
 
 treasure/spear/pickup	{ DSSPEAR ALSPEAR PCSPEAR }
 treasure/spear2/pickup	{ DSSPEAR2 ALSPEAR PCSPEAR }
