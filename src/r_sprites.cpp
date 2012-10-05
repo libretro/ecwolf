@@ -435,7 +435,7 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 	const int x1 = leftedge>>FRACBITS;
 	const int y1 = upperedge>>FRACBITS;
 	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(viewwidth-x1-startX));
-	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-y1-startY));
+	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-y1));
 	const BYTE *src;
 	byte *destBase = vbuf+x1+startX + (y1 > 0 ? vbufPitch*y1 : 0);
 	byte *dest = destBase;
