@@ -147,7 +147,8 @@ void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 		frame.rotations = 8;
 
 	frame.texture[dir] = tex->GetID();
-	frame.mirror |= 1<<dir;
+	if(mirror)
+		frame.mirror |= 1<<dir;
 }
 
 unsigned int R_GetNumLoadedSprites()
@@ -343,12 +344,17 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
 		return;
 
+	bool flip = false;
 	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
 	FTexture *tex;
 	if(spr.rotations == 0)
 		tex = TexMan[spr.texture[0]];
 	else
-		tex = TexMan[spr.texture[(CalcRotate(actor)+4)%8]];
+	{
+		int rot = (CalcRotate(actor)+4)%8;
+		tex = TexMan[spr.texture[rot]];
+		flip = (spr.mirror>>rot)&1;
+	}
 	if(tex == NULL)
 		return;
 
@@ -364,11 +370,12 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	const double dxScale = (height/256.0)/(yaspect/65536.);
 	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
 
+	const unsigned int texWidth = tex->GetWidth();
 	const unsigned int startX = -MIN(actx, 0);
 	const unsigned int startY = -MIN(upperedge, 0);
 	const fixed xStep = (1/dxScale)*FRACUNIT;
 	const fixed yStep = (1/dyScale)*FRACUNIT;
-	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(viewwidth-actx));
+	const fixed xRun = MIN<fixed>(texWidth<<FRACBITS, xStep*(viewwidth-actx));
 	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
 
 	const BYTE *colormap;
@@ -386,7 +393,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		if(wallheight[i] > (signed)height)
 			continue;
 
-		src = tex->GetColumn(x>>FRACBITS, NULL);
+		src = tex->GetColumn(flip ? texWidth - (x>>FRACBITS) : (x>>FRACBITS), NULL);
 
 		for(y = startY*yStep;y < yRun;y += yStep)
 		{
