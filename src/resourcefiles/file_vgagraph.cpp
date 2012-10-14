@@ -263,7 +263,8 @@ class FVGAGraph : public FResourceFile
 						dimensions[j].height = ReadLittleShort(&out[(j*4)+2]);
 
 						// More correction due to bad vgagraphs
-						if(dimensions[j].width > 640 || dimensions[j].height > 480)
+						if(dimensions[j].width > 640 || dimensions[j].height > 480 ||
+							dimensions[j].width == 0 || dimensions[j].height == 0)
 							numPictures = j;
 					}
 					delete[] out;
