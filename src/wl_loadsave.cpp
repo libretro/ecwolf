@@ -65,6 +65,8 @@ extern unsigned vbufPitch;
 
 namespace GameSave {
 
+int SaveVersion = SAVEVER;
+
 static const char* const NEW_SAVE = "    - NEW SAVE -";
 
 struct SaveFile
@@ -492,6 +494,10 @@ bool Load(const FString &filename)
 	if(!quickSaveLoad)
 		DrawLSAction(0);
 
+	char* savesig = M_GetPNGText(png, "ECWolf Save Version");
+	SaveVersion = atoi(savesig+10);
+	delete[] savesig;
+
 	char level[9];
 	M_GetPNGText(png, "Current Map", level, 8);
 	CA_CacheMap(level);
@@ -546,6 +552,8 @@ bool Save(const FString &filename, const FString &title)
 		DrawLSAction(1);
 	else
 		Message (language["STR_SAVING"]);
+
+	SaveVersion = SAVEVER;
 
 	// If we get hubs this will need to be moved so that we can have multiple of them
 	FCompressedMemFile snapshot;

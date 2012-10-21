@@ -47,6 +47,7 @@
 #include "wl_game.h"
 #include "r_sprites.h"
 #include "resourcefiles/resourcefile.h"
+#include "wl_loadsave.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneLinks(NULL)
 {
@@ -663,8 +664,12 @@ FArchive &operator<< (FArchive &arc, MapTrigger &trigger)
 	arc << trigger.x
 		<< trigger.y
 		<< trigger.z
-		<< trigger.active
-		<< trigger.activate[0] << trigger.activate[1] << trigger.activate[2] << trigger.activate[3]
+		<< trigger.active;
+
+	if(GameSave::SaveVersion >= 1350238078)
+		arc << trigger.action;
+
+	arc << trigger.activate[0] << trigger.activate[1] << trigger.activate[2] << trigger.activate[3]
 		<< trigger.arg[0] << trigger.arg[1] << trigger.arg[2] << trigger.arg[3] << trigger.arg[4]
 		<< trigger.playerUse
 		<< trigger.playerCross
