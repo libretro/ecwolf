@@ -57,7 +57,7 @@ void    StartBonusFlash (void);
 
 extern  int32_t     funnyticount;           // FOR FUNNY BJ FACE
 
-extern  bool        noclip,ammocheat;
+extern  bool        noclip,ammocheat,mouselook;
 extern  int         singlestep;
 extern  unsigned int extravbls;
 

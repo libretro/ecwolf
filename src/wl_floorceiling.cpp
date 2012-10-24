@@ -8,6 +8,8 @@
 #include "wl_shade.h"
 #include "r_data/colormaps.h"
 
+extern int viewshift;
+
 // Textured Floor and Ceiling by DarkOne
 // With multi-textured floors and ceilings stored in lower and upper bytes of
 // according tile in third mapplane, respectively.
@@ -24,21 +26,23 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 	lasttoptex.SetInvalid();
 
 	int halfheight = viewheight >> 1;
+	halfheight -= viewshift;
 	int y0 = min_wallheight >> 3;              // starting y value
+	y0 -= abs(viewshift);
 	if(y0 > halfheight)
 		return;                                // view obscured by walls
-	if(!y0) y0 = 1;                            // don't let division by zero
-	byte* bot_offset = vbuf + vbufPitch * (halfheight + y0);
-	byte* top_offset = vbuf + vbufPitch * (halfheight - y0 - 1);
+	if(y0 <= 0) y0 = 1;                            // don't let division by zero
+	byte* bot_offset = vbuf + (signed)vbufPitch * (halfheight + y0);
+	byte* top_offset = vbuf + (signed)vbufPitch * (halfheight - y0 - 1);
 
 	const unsigned int mapwidth = map->GetHeader().width;
 	const unsigned int mapheight = map->GetHeader().height;
 
 	const unsigned int texDivisor = viewwidth*AspectCorrection[r_ratio].multiplier*175/48;
 
+	bool floordone = false, ceilingdone = false;
 	// draw horizontal lines
-	for(int y = y0;
-		y <= halfheight; ++y, bot_offset += vbufPitch, top_offset -= vbufPitch)
+	for(int y = y0;!(floordone && ceilingdone); ++y, bot_offset += vbufPitch, top_offset -= vbufPitch)
 	{
 		dist = (heightnumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
@@ -78,10 +82,20 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 					u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
 					unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
-					if(toptex && y < halfheight)
-						top_offset[top_add] = curshades[toptex[texoffs]];
-					if(bottex && y+halfheight < viewheight)
-						bot_offset[bot_add] = curshades[bottex[texoffs]];
+					if(!ceilingdone && y >= halfheight - viewheight)
+					{
+						if(y >= halfheight)
+							ceilingdone = true;
+						else if(toptex)
+							top_offset[top_add] = curshades[toptex[texoffs]];
+					}
+					if(!floordone && y+halfheight >= 0)
+					{
+						if(y+halfheight >= viewheight)
+							floordone = true;
+						else if(bottex)
+							bot_offset[bot_add] = curshades[bottex[texoffs]];
+					}
 				}
 			}
 			gu += du;

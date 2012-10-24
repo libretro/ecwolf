@@ -87,6 +87,7 @@ fixed *finecosine = finesine+ANG90;
 fixed   viewx,viewy;                    // the focal point
 angle_t viewangle;
 fixed   viewsin,viewcos;
+int viewshift = 0;
 
 void    TransformActor (AActor *ob);
 void    BuildTables (void);
@@ -254,14 +255,14 @@ void ScalePost()
 
 	BYTE *curshades = &NormalLight.Maps[256*GetShade(wallheight[postx])];
 
-	ywcount = yd = wallheight[postx] >> 3;
+	ywcount = yd = (wallheight[postx] >> 3);
 	if(yd <= 0) yd = 100;
 
-	yoffs = (viewheight / 2 - ywcount) * vbufPitch;
+	yoffs = (viewheight / 2 - ywcount - viewshift) * vbufPitch;
 	if(yoffs < 0) yoffs = 0;
 	yoffs += postx;
 
-	yendoffs = viewheight / 2 + ywcount - 1;
+	yendoffs = viewheight / 2 + ywcount - 1 - viewshift;
 	yw=texyscale-1;
 
 	while(yendoffs >= viewheight)
@@ -293,7 +294,7 @@ void ScalePost()
 				yw--;
 			}
 			while(ywcount <= 0);
-			if(yw < 0) break;
+			//if(yw < 0) break;
 			if(r_depthfog)
 				col = curshades[postsource[yw]];
 			else

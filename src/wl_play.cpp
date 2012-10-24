@@ -47,7 +47,7 @@ exit_t playstate;
 
 static int DebugOk;
 
-bool noclip, ammocheat;
+bool noclip, ammocheat, mouselook = false;
 int godmode, singlestep;
 bool notargetmode = false;
 unsigned int extravbls = 0; // to remove flicker (gray stuff at the bottom)
@@ -225,7 +225,7 @@ void PollJoystickButtons (void)
 =
 ===================
 */
-
+extern int viewshift;
 void PollKeyboardMove (void)
 {
 	int delta = (!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]) ? RUNMOVE : BASEMOVE;
@@ -263,6 +263,8 @@ void PollMouseMove (void)
 	controlx += mousexmove * 20 / (21 - mouseadjustment);
 	if(!mouseyaxisdisabled)
 		controly += mouseymove * 40 / (21 - mouseadjustment);
+	else if(mouselook)
+		viewshift += mouseymove * 5 / (21 - mouseadjustment);
 }
 
 

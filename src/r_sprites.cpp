@@ -338,6 +338,7 @@ void R_LoadSprite(const FString &name)
 int CalcRotate(AActor *ob);
 extern byte* vbuf;
 extern unsigned vbufPitch;
+extern int viewshift;
 
 void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
 {
@@ -359,13 +360,11 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		return;
 
 	const unsigned int scale = height>>3; // Integer part of the height
-	if(scale == 0)
+	if(scale == 0 || -(viewheight/2 - viewshift) >= (signed)scale)
 		return;
 
 	const double dyScale = height/256.0;
-	const int upperedge = (viewheight/2)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
-	if(upperedge > viewheight)
-		return;
+	const int upperedge = (viewheight/2 - viewshift)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
 
 	const double dxScale = (height/256.0)/(yaspect/65536.);
 	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
@@ -377,6 +376,8 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	const fixed yStep = (1/dyScale)*FRACUNIT;
 	const fixed xRun = MIN<fixed>(texWidth<<FRACBITS, xStep*(viewwidth-actx));
 	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
+	if((fixed)startY < viewscreeny)
+		return;
 
 	const BYTE *colormap;
 	if(!r_depthfog || (actor->flags & FL_BRIGHT) || frame->fullbright)

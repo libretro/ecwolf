@@ -395,6 +395,18 @@ int DebugKeys (void)
 
 		return 1;
 	}
+	else if (Keyboard[sc_M]) // M = Mouse look
+	{
+		mouselook ^= 1;
+		US_CenterWindow (17,3);
+		if (mouselook)
+			US_PrintCentered ("Mouse look ON");
+		else
+			US_PrintCentered ("Mouse look OFF");
+		VW_UpdateScreen();
+		IN_Ack ();
+		return 1;
+	}
 	else if (Keyboard[sc_N])        // N = no clip
 	{
 		noclip^=1;
