@@ -79,6 +79,7 @@
 // proejection variables
 //
 fixed    focallength;
+fixed    focallengthy;
 unsigned screenofs;
 int      viewscreenx, viewscreeny;
 int      viewwidth;
@@ -190,11 +191,11 @@ void BuildTables (void)
 	//
 
 	int i;
-	for(i=0;i<FINEANGLES/8;i++)
+	for(i=0;i<FINEANGLES/2;i++)
 	{
 		double tang=tan((i+0.5)/radtoint);
 		finetangent[i]=(int32_t)(tang*GLOBAL1);
-		finetangent[FINEANGLES/4-1-i]=(int32_t)((1/tang)*GLOBAL1);
+		//finetangent[FINEANGLES/4-1-i]=(int32_t)((1/tang)*GLOBAL1);
 	}
 
 	//
@@ -242,6 +243,11 @@ void CalcProjection (int32_t focal)
 	focallength = FixedMul(focal, 0xFD17);
 	facedist = 2*FOCALLENGTH+0x100; // Used to be MINDIST (0x5800) which was 0x100 then the FOCALLENGTH (0x5700)
 	halfview = viewwidth/2;                                 // half view in pixels
+	focallengthy = (centerx<<FRACBITS)/finetangent[FINEANGLES/2+(ANGLE_45>>ANGLETOFINESHIFT)];
+
+	/*fixed* viewTangent = finetangent+FINEANGLES/4;
+	fixed FocalTangent = viewTangent[FINEANGLES/4+(ANGLE_45>>ANGLETOFINESHIFT)];
+	fixed FocalLengthY = (centerx<<FRACBITS)/FocalTangent;*/
 
 	//
 	// calculate scale value for vertical height calculations
@@ -392,6 +398,12 @@ static void InitGame()
 	V_InitFonts();
 	atterm(V_ClearFonts);
 
+//
+// load in and lock down some basic chunks
+//
+
+	BuildTables ();          // trig tables
+
 	// Setup a temporary window so if we have to terminate we don't do extra mode sets
 	VL_SetVGAPlaneMode (true);
 	DrawStartupConsole();
@@ -434,18 +446,12 @@ static void InitGame()
 	FinalReadConfig();
 
 //
-// load in and lock down some basic chunks
-//
-
-	BuildTables ();          // trig tables
-
-//
 // initialize variables
 //
 	InitRedShifts ();
 
 //
-// initialize the menus
+// initialize the menusalcProjection
 	printf("CreateMenus: Preparing the menu system...\n");
 	CreateMenus();
 

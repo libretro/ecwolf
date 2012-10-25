@@ -225,7 +225,7 @@ void PollJoystickButtons (void)
 =
 ===================
 */
-extern int viewshift;
+
 void PollKeyboardMove (void)
 {
 	int delta = (!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]) ? RUNMOVE : BASEMOVE;
@@ -264,7 +264,13 @@ void PollMouseMove (void)
 	if(!mouseyaxisdisabled)
 		controly += mouseymove * 40 / (21 - mouseadjustment);
 	else if(mouselook)
-		viewshift += mouseymove * 5 / (21 - mouseadjustment);
+	{
+		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseadjustment));
+		if(players[0].mo->pitch+ANGLE_180 > 236*ANGLE_1)
+			players[0].mo->pitch = 56*ANGLE_1;
+		else if(players[0].mo->pitch+ANGLE_180 < 124*ANGLE_1)
+			players[0].mo->pitch = 304*ANGLE_1;
+	}
 }
 
 

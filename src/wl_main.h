@@ -13,6 +13,7 @@
 
 extern  bool     loadedgame;
 extern  fixed    focallength;
+extern  fixed    focallengthy;
 extern  int      viewscreenx, viewscreeny;
 extern  int      viewwidth;
 extern  int      viewheight;

@@ -77,7 +77,7 @@ int min_wallheight;
 // math tables
 //
 short *pixelangle;
-int32_t finetangent[FINEANGLES/4];
+int32_t finetangent[FINEANGLES/2];
 fixed finesine[FINEANGLES+FINEANGLES/4];
 fixed *finecosine = finesine+ANG90;
 
@@ -1158,6 +1158,7 @@ void WallRefresh (void)
 
 	min_wallheight = viewheight;
 	lastside = -1;                  // the first pixel is on a new wall
+	viewshift = FixedMul(focallengthy, finetangent[(ANGLE_180+players[0].camera->pitch)>>ANGLETOFINESHIFT]);
 	AsmRefresh ();
 	ScalePost ();                   // no more optimization on last post
 }

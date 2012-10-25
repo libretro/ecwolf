@@ -13,7 +13,7 @@
 // math tables
 //
 extern  short *pixelangle;
-extern  int32_t finetangent[FINEANGLES/4];
+extern  int32_t finetangent[FINEANGLES/2];
 extern	fixed finesine[FINEANGLES+FINEANGLES/4];
 extern	fixed* finecosine;
 extern  int *wallheight;

@@ -238,6 +238,7 @@ class AActor : public DObject
 		fixed	velx, vely;
 
 		angle_t	angle;
+		angle_t pitch;
 		int32_t	health;
 		short	defaultHealth[9];
 		int32_t	speed, runspeed;

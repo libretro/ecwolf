@@ -43,6 +43,7 @@
 #include "thingdef/thingdef_expression.h"
 #include "wl_agent.h"
 #include "wl_game.h"
+#include "wl_loadsave.h"
 #include "id_us.h"
 #include "m_random.h"
 
@@ -383,8 +384,12 @@ void AActor::Serialize(FArchive &arc)
 		<< y
 		<< velx
 		<< vely
-		<< angle
-		<< health
+		<< angle;
+
+	if(GameSave::SaveVersion >= 1351084906)
+		arc << pitch;
+
+	arc << health
 		<< speed
 		<< runspeed
 		<< points
