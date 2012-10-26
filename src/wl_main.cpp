@@ -191,12 +191,15 @@ void BuildTables (void)
 	//
 
 	int i;
-	for(i=0;i<FINEANGLES/2;i++)
+	for(i=0;i<FINEANGLES/8;i++)
 	{
 		double tang=tan((i+0.5)/radtoint);
-		finetangent[i]=(int32_t)(tang*GLOBAL1);
-		//finetangent[FINEANGLES/4-1-i]=(int32_t)((1/tang)*GLOBAL1);
+		finetangent[i + FINEANGLES/2] = finetangent[i]=(fixed)(tang*FRACUNIT);
+		finetangent[FINEANGLES/4-1-i]=(fixed)((1/tang)*FRACUNIT);
+		finetangent[FINEANGLES/4+i]=-finetangent[FINEANGLES/4-1-i];
+		finetangent[FINEANGLES/2-1-i]=-finetangent[i];
 	}
+	memcpy(finetangent + FINEANGLES/2, finetangent, sizeof(fixed)*ANG180);
 
 	//
 	// costable overlays sintable with a quarter phase shift
@@ -207,7 +210,7 @@ void BuildTables (void)
 	float anglestep = (float)(PI/2/ANG90);
 	for(i=0; i<FINEANGLES; i++)
 	{
-		finesine[i]=fixed(GLOBAL1*sin(angle));
+		finesine[i]=fixed(FRACUNIT*sin(angle));
 		angle+=anglestep;
 	}
 	memcpy(&finesine[FINEANGLES], finesine, FINEANGLES*sizeof(fixed)/4);

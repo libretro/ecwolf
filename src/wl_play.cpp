@@ -266,10 +266,10 @@ void PollMouseMove (void)
 	else if(mouselook)
 	{
 		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseadjustment));
-		if(players[0].mo->pitch+ANGLE_180 > 236*ANGLE_1)
+		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
 			players[0].mo->pitch = 56*ANGLE_1;
-		else if(players[0].mo->pitch+ANGLE_180 < 124*ANGLE_1)
-			players[0].mo->pitch = 304*ANGLE_1;
+		else if(players[0].mo->pitch+ANGLE_180 < ANGLE_180-56*ANGLE_1)
+			players[0].mo->pitch = -56*ANGLE_1;
 	}
 }
 
