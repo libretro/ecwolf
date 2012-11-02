@@ -88,6 +88,7 @@ fixed   viewx,viewy;                    // the focal point
 angle_t viewangle;
 fixed   viewsin,viewcos;
 int viewshift = 0;
+fixed viewz = 32;
 
 void    TransformActor (AActor *ob);
 void    BuildTables (void);
@@ -258,12 +259,17 @@ void ScalePost()
 	ywcount = yd = (wallheight[postx] >> 3);
 	if(yd <= 0) yd = 100;
 
-	yoffs = (viewheight / 2 - ywcount - viewshift) * vbufPitch;
-	if(yoffs < 0) yoffs = 0;
-	yoffs += postx;
+	{
+		const int topoffset = ywcount*viewz/(32<<FRACBITS);
+		const int botoffset = ywcount*(viewz - (64<<FRACBITS))/(32<<FRACBITS);
 
-	yendoffs = viewheight / 2 + ywcount - 1 - viewshift;
-	yw=texyscale-1;
+		yoffs = (viewheight / 2 - topoffset - viewshift) * vbufPitch;
+		if(yoffs < 0) yoffs = 0;
+		yoffs += postx;
+
+		yendoffs = viewheight / 2 - botoffset - 1 - viewshift;
+		yw=texyscale-1;
+	}
 
 	while(yendoffs >= viewheight)
 	{
@@ -1159,7 +1165,35 @@ void WallRefresh (void)
 	min_wallheight = viewheight;
 	lastside = -1;                  // the first pixel is on a new wall
 	viewshift = FixedMul(focallengthy, finetangent[(ANGLE_180+players[0].camera->pitch)>>ANGLETOFINESHIFT]);
-	AsmRefresh ();
+
+	static fixed curbob = 0;
+	angle_t bobangle = ((gamestate.TimeCount<<13)/(20*TICRATE/35)) & FINEMASK;
+	// [RH] Smooth transitions between bobbing and not-bobbing frames.
+	// This also fixes the bug where you can "stick" a weapon off-center by
+	// shooting it when it's at the peak of its swing.
+	fixed bobtarget = FixedMul(players[0].bob>>1, finesine[bobangle])/2;
+	if (curbob != bobtarget)
+	{
+		if (abs (bobtarget - curbob) <= 1*FRACUNIT)
+		{
+			curbob = bobtarget;
+		}
+		else
+		{
+			fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
+			if (curbob > bobtarget)
+			{
+				curbob -= zoom;
+			}
+			else
+			{
+				curbob += zoom;
+			}
+		}
+	}
+	viewz = (32<<FRACBITS) + curbob;
+
+	AsmRefresh();
 	ScalePost ();                   // no more optimization on last post
 }
 
