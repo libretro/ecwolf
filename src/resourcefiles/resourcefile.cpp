@@ -96,21 +96,13 @@ FResourceLump::~FResourceLump()
 
 void FResourceLump::LumpNameSetup(const char *iname)
 {
-	char base[256];
 	const char *lname = strrchr(iname,'/');
 	lname = (lname == NULL) ? iname : lname + 1;
-	strcpy(base, lname);
-	char *dot = strrchr(base, '.');
-	if (dot != NULL)
-	{
-		*dot = 0;
-	}
+	FString base = lname;
+	base = base.Left(base.LastIndexOf('.'));
 	uppercopy(Name, base);
 	Name[8] = 0;
-	if(FullName)
-		delete[] FullName;
-	FullName = new char[strlen(iname) + 1];
-	memcpy(FullName, iname, strlen(iname) + 1);
+	FullName = copystring(iname);
 
 	// Map some directories to WAD namespaces.
 	// Note that some of these namespaces don't exist in WADS.

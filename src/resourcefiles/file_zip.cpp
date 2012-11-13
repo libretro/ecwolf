@@ -58,7 +58,7 @@ static DWORD Zip_FindCentralDir(FileReader * fin)
 	fin->Seek(0, SEEK_END);
 
 	FileSize = fin->Tell();
-	uMaxBack = FileSize > 0xffff ? 0xffff : FileSize;
+	uMaxBack = MIN<DWORD>(0xffff, FileSize);
 
 	uBackRead = 4;
 	while (uBackRead < uMaxBack)
@@ -71,7 +71,7 @@ static DWORD Zip_FindCentralDir(FileReader * fin)
 			uBackRead += BUFREADCOMMENT;
 		uReadPos = FileSize - uBackRead;
 
-		uReadSize = (BUFREADCOMMENT + 4) < (FileSize - uReadPos) ? (BUFREADCOMMENT + 4) : (FileSize - uReadPos);
+		uReadSize = MIN<DWORD>((BUFREADCOMMENT + 4), (FileSize - uReadPos));
 
 		if (fin->Seek(uReadPos, SEEK_SET) != 0) break;
 
@@ -206,11 +206,8 @@ bool FZipFile::Open(bool quiet)
 	{
 		FZipCentralDirectoryInfo *zip_fh = (FZipCentralDirectoryInfo *)dirptr;
 
-		char name[256];
-
 		int len = LittleShort(zip_fh->NameLength);
-		strncpy(name, dirptr + sizeof(FZipCentralDirectoryInfo), len < 255 ? len : 255);
-		name[len] = 0;
+		FString name(dirptr + sizeof(FZipCentralDirectoryInfo), len);
 		dirptr += sizeof(FZipCentralDirectoryInfo) + 
 				  LittleShort(zip_fh->NameLength) + 
 				  LittleShort(zip_fh->ExtraLength) + 
@@ -232,7 +229,7 @@ bool FZipFile::Open(bool quiet)
 			zip_fh->Method != METHOD_IMPLODE &&
 			zip_fh->Method != METHOD_SHRINK)
 		{
-			if (!quiet) Printf("\n%s: '%s' uses an unsupported compression algorithm (#%d).\n", Filename, name, zip_fh->Method);
+			if (!quiet) Printf("\n%s: '%s' uses an unsupported compression algorithm (#%d).\n", Filename, name.GetChars(), zip_fh->Method);
 			skipped++;
 			continue;
 		}
@@ -240,15 +237,13 @@ bool FZipFile::Open(bool quiet)
 		zip_fh->Flags = LittleShort(zip_fh->Flags);
 		if (zip_fh->Flags & ZF_ENCRYPTED)
 		{
-			if (!quiet) Printf("\n%s: '%s' is encrypted. Encryption is not supported.\n", Filename, name);
+			if (!quiet) Printf("\n%s: '%s' is encrypted. Encryption is not supported.\n", Filename, name.GetChars());
 			skipped++;
 			continue;
 		}
 
-		FString fsName = name;
-		fsName.ReplaceChars('\\','/');
-		fsName.ToLower();
-		strcpy(name, fsName.GetChars());
+		FixPathSeperator(name);
+		name.ToLower();
 
 		lump_p->LumpNameSetup(name);
 		lump_p->LumpSize = LittleLong(zip_fh->UncompressedSize);

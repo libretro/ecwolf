@@ -47,6 +47,10 @@ static inline unsigned int MakeKey(const char *s, size_t len)
 }
 static inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s)); }
 
+// Technically T should always be FString, but we use a template to avoid a
+// circular dependency issue.
+template<class T> void FixPathSeperator (T &path) { path.ReplaceChars('\\', '/'); }
+
 static void DPrintf(const char* fmt, ...) {}
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))

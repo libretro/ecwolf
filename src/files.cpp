@@ -33,13 +33,9 @@
 **
 */
 
-#include <cstdlib>
-#include <cassert>
-#include <cstring>
 #include "files.h"
-
-#include "doomerrors.h"
-#include "zstring.h"
+#include "templates.h"
+#include "zdoomsupport.h"
 
 //==========================================================================
 //
@@ -65,10 +61,7 @@ FileReader::FileReader (const char *filename)
 {
 	if (!Open(filename))
 	{
-		//I_Error ("Could not open %s", filename);
-		FString error;
-		error.Format("Could not open %s", filename);
-		throw CRecoverableError(error);
+		I_Error ("Could not open %s", filename);
 	}
 }
 
@@ -139,6 +132,8 @@ long FileReader::Seek (long offset, int origin)
 
 long FileReader::Read (void *buffer, long len)
 {
+	assert(len >= 0);
+	if (len <= 0) return 0;
 	if (FilePos + len > StartPos + Length)
 	{
 		len = Length - FilePos + StartPos;
@@ -150,11 +145,16 @@ long FileReader::Read (void *buffer, long len)
 
 char *FileReader::Gets(char *strbuf, int len)
 {
-	if (len <= 0) return 0;
+	if (len <= 0 || FilePos >= StartPos + Length) return NULL;
 	char *p = fgets(strbuf, len, File);
 	if (p != NULL)
 	{
-		FilePos = ftell(File) - StartPos;
+		int old = FilePos;
+		FilePos = ftell(File);
+		if (FilePos - StartPos > Length)
+		{
+			strbuf[Length - old + StartPos] = 0;
+		}
 	}
 	return p;
 }
@@ -509,11 +509,7 @@ long MemoryReader::Seek (long offset, int origin)
 		break;
 
 	}
-	FilePos=offset;
-	if(FilePos < 0)
-		FilePos = 0;
-	else if(FilePos > Length-1)
-		FilePos = Length-1;
+	FilePos=clamp<long>(offset,0,Length-1);
 	return 0;
 }
 
