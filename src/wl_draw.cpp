@@ -58,7 +58,7 @@ const RatioInformation AspectCorrection[] =
 	/* 16:10 */	{1152,	500,	0x13333,	0,				48*5/6,		true},
 	/* 17:10 */ {1224,	471,	0x14666,	0,				48*40/51,	true},
 	/* 4:3 */	{960,	600,	0x10000,	0,				48,			false},
-	/* 5:4 */	{960,	640,	0x10000,	6.5*FRACUNIT,	48*15/16,	false}
+	/* 5:4 */	{960,	640,	0x10000,(fixed)6.5*FRACUNIT,	48*15/16,	false}
 };
 
 /*static*/ byte *vbuf = NULL;
@@ -1171,7 +1171,7 @@ void WallRefresh (void)
 	// [RH] Smooth transitions between bobbing and not-bobbing frames.
 	// This also fixes the bug where you can "stick" a weapon off-center by
 	// shooting it when it's at the peak of its swing.
-	fixed bobtarget = FixedMul(players[0].bob>>1, finesine[bobangle])/2;
+	fixed bobtarget = FixedMul(players[0].bob>>1, finesine[bobangle]);
 	if (curbob != bobtarget)
 	{
 		if (abs (bobtarget - curbob) <= 1*FRACUNIT)

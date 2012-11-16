@@ -13,7 +13,7 @@
 extern fixed viewshift;
 extern fixed viewz;
 
-void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int y0, int halfheight, fixed planeheight)
+static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int halfheight, fixed planeheight)
 {
 	fixed dist;                                // distance to row projection
 	fixed tex_step;                            // global step per one screen pixel
@@ -21,6 +21,12 @@ void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int y0, int halfheight, fixed p
 	int u, v;                                  // local texture coordinates
 	const byte *tex = NULL;
 	FTextureID lasttex;
+
+	const fixed heightFactor = abs(planeheight/32);
+	int y0 = (((min_wallheight >> 3)*heightFactor)>>FRACBITS) - abs(viewshift);
+	if(y0 > halfheight)
+		return; // view obscured by walls
+	if(y0 <= 0) y0 = 1; // don't let division by zero
 
 	lasttex.SetInvalid();
 
@@ -40,8 +46,6 @@ void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int y0, int halfheight, fixed p
 	}
 	else
 		tex_offset = vbuf + (signed)vbufPitch * (halfheight - y0 - 1);
-
-	fixed heightFactor = abs(planeheight/32);
 
 	int oldmapx = INT_MAX, oldmapy = INT_MAX;
 	// draw horizontal lines
@@ -129,14 +133,8 @@ void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int y0, int halfheight, fixed p
 // according tile in third mapplane, respectively.
 void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 {
-	int halfheight = viewheight >> 1;
-	halfheight -= viewshift;
-	int y0 = min_wallheight >> 3;              // starting y value
-	y0 -= abs(viewshift);
-	if(y0 > halfheight)
-		return;                                // view obscured by walls
-	if(y0 <= 0) y0 = 1;                            // don't let division by zero
+	const int halfheight = (viewheight >> 1) - viewshift;
 
-	R_DrawPlane(vbuf, vbufPitch, y0, halfheight, viewz-(64<<FRACBITS));
-	R_DrawPlane(vbuf, vbufPitch, y0, halfheight, viewz);
+	R_DrawPlane(vbuf, vbufPitch, min_wallheight, halfheight, viewz-(64<<FRACBITS));
+	R_DrawPlane(vbuf, vbufPitch, min_wallheight, halfheight, viewz);
 }
