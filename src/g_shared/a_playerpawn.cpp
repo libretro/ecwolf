@@ -207,10 +207,43 @@ void APlayerPawn::Tick()
 
 	ControlMovement(this);
 
-	static const fixed MAXBOB = 0x100000;
-	player->bob = thrustspeed << 8;
-	if(player->bob > MAXBOB)
-		player->bob = MAXBOB;
+	// [RH] Smooth transitions between bobbing and not-bobbing frames.
+	// This also fixes the bug where you can "stick" a weapon off-center by
+	// shooting it when it's at the peak of its swing.
+	static fixed curbob = 0;
+	const fixed movebob = GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
+
+	if(movebob)
+	{
+		static const fixed MAXBOB = 0x100000;
+		fixed bobtarget = FixedMul(thrustspeed << 8, movebob);
+		if(bobtarget > MAXBOB)
+			bobtarget = MAXBOB;
+
+		if (curbob != bobtarget)
+		{
+			if (abs (bobtarget - curbob) <= 1*FRACUNIT)
+			{
+				curbob = bobtarget;
+			}
+			else
+			{
+				fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
+				if (curbob > bobtarget)
+				{
+					curbob -= zoom;
+				}
+				else
+				{
+					curbob += zoom;
+				}
+			}
+		}
+	}
+	else
+		curbob = 0;
+
+	player->bob = curbob;
 }
 
 void APlayerPawn::TickPSprites()

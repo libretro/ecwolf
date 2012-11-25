@@ -265,6 +265,13 @@ HANDLE_PROPERTY(missilechance)
 	defaults->missilechance = chance;
 }
 
+HANDLE_PROPERTY(movebob)
+{
+	FLOAT_PARAM(strength, 0);
+
+	cls->Meta.SetMetaFixed(APMETA_MoveBob, strength*FRACUNIT);
+}
+
 HANDLE_PROPERTY(painchance)
 {
 	INT_PARAM(chance, 0);
@@ -454,6 +461,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
 	DEFINE_PROP(missilechance, Actor, I),
 	DEFINE_PROP(MONSTER, Actor,),
+	DEFINE_PROP_PREFIX(movebob, PlayerPawn, Player, F),
 	DEFINE_PROP(painchance, Actor, I),
 	DEFINE_PROP(painsound, Actor, S),
 	DEFINE_PROP(pickupsound, Inventory, S),

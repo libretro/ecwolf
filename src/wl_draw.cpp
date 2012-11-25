@@ -1166,31 +1166,10 @@ void WallRefresh (void)
 	lastside = -1;                  // the first pixel is on a new wall
 	viewshift = FixedMul(focallengthy, finetangent[(ANGLE_180+players[0].camera->pitch)>>ANGLETOFINESHIFT]);
 
-	static fixed curbob = 0;
+	
 	angle_t bobangle = ((gamestate.TimeCount<<13)/(20*TICRATE/35)) & FINEMASK;
-	// [RH] Smooth transitions between bobbing and not-bobbing frames.
-	// This also fixes the bug where you can "stick" a weapon off-center by
-	// shooting it when it's at the peak of its swing.
-	fixed bobtarget = FixedMul(players[0].bob>>1, finesine[bobangle]);
-	if (curbob != bobtarget)
-	{
-		if (abs (bobtarget - curbob) <= 1*FRACUNIT)
-		{
-			curbob = bobtarget;
-		}
-		else
-		{
-			fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
-			if (curbob > bobtarget)
-			{
-				curbob -= zoom;
-			}
-			else
-			{
-				curbob += zoom;
-			}
-		}
-	}
+	fixed curbob = FixedMul(players[0].bob>>1, finesine[bobangle]);
+	
 	viewz = (32<<FRACBITS) + curbob;
 
 	AsmRefresh();

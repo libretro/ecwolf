@@ -979,8 +979,6 @@ player_t::player_t() : bob(0), attackheld(false)
 
 void player_t::BobWeapon (fixed *x, fixed *y)
 {
-	static fixed_t curbob = 0;
-
 	AWeapon *weapon;
 	fixed bobtarget;
 
@@ -1000,30 +998,7 @@ void player_t::BobWeapon (fixed *x, fixed *y)
 
 	// Bob the weapon based on movement speed.
 	int angle = (bobspeed*35/TICRATE*gamestate.TimeCount)&FINEMASK;
-
-	// [RH] Smooth transitions between bobbing and not-bobbing frames.
-	// This also fixes the bug where you can "stick" a weapon off-center by
-	// shooting it when it's at the peak of its swing.
-	bobtarget = (flags & PF_WEAPONBOBBING) ? bob : 0;
-	if (curbob != bobtarget)
-	{
-		if (abs (bobtarget - curbob) <= 1*FRACUNIT)
-		{
-			curbob = bobtarget;
-		}
-		else
-		{
-			fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
-			if (curbob > bobtarget)
-			{
-				curbob -= zoom;
-			}
-			else
-			{
-				curbob += zoom;
-			}
-		}
-	}
+	fixed curbob = (flags & PF_WEAPONBOBBING) ? bob : 0;
 
 	if (curbob != 0)
 	{

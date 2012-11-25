@@ -55,7 +55,8 @@ enum
 	APMETA_Slot8,
 	APMETA_Slot9,
 	APMETA_StartInventory,
-	APMETA_DisplayName
+	APMETA_DisplayName,
+	APMETA_MoveBob
 };
 
 class APlayerPawn : public AActor

@@ -122,6 +122,7 @@ actor Weapon : Inventory native
 actor PlayerPawn native
 {
 	player.maxhealth 100
+	player.movebob 1.0
 	+SOLID
 	+SHOOTABLE
 	+PICKUP
