@@ -840,7 +840,7 @@ static void DemoLoop()
 
 		if (param_tedlevel || startgame || loadedgame)
 		{
-			param_tedlevel = false;
+			param_tedlevel = NULL;
 			if(GameLoop ())
 				gotoMenu = true;
 

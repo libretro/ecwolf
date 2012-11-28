@@ -107,6 +107,7 @@ class Symbol
 {
 	public:
 		Symbol(const FName &name, const TypeRef &type);
+		virtual ~Symbol() {}
 
 		virtual void	FillValue(ExpressionNode::Value &val, AActor *self=NULL) const=0;
 		const FName		&GetName() const { return name; }

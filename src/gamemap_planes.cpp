@@ -566,9 +566,9 @@ void GameMap::ReadPlanesData()
 				{
 					const int candidates[4] = {
 						fillSpots[i] + 1,
-						fillSpots[i] - header.width,
+						fillSpots[i] - (int)header.width,
 						fillSpots[i] - 1,
-						fillSpots[i] + header.width
+						fillSpots[i] + (int)header.width
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{
@@ -596,9 +596,9 @@ void GameMap::ReadPlanesData()
 					// Look for and switch exit triggers.
 					const int candidates[4] = {
 						pair->Key + 1,
-						pair->Key - header.width,
+						pair->Key - (int)header.width,
 						pair->Key - 1,
-						pair->Key + header.width
+						pair->Key + (int)header.width
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{

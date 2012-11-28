@@ -138,7 +138,7 @@ struct FVSwapSound : public FResourceLump
 const char FVSwapSound::WAV_HEADER[44] = {
 	'R','I','F','F',0,0,0,0,'W','A','V','E',
 	'f','m','t',' ',16,0,0,0,1,0,1,0,
-	0x82,0x17,0,0,0x37,0x04,0,0,1,0,16,0,
+	(char)0x82,0x17,0,0,0x37,0x04,0,0,1,0,16,0,
 	'd','a','t','a',0,0,0,0
 };
 
