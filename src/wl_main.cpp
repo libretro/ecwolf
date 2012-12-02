@@ -523,10 +523,9 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 		height = (statusbary+1) - (20-viewsize)*8*screenHeight/200;
 	}
 
-	//viewwidth = width&~15;                  // must be divisable by 16
-	//viewheight = height&~1;                 // must be even
-	viewwidth = width;
-	viewheight = height;
+	// Some code assumes these are even.
+	viewwidth = width&~1;
+	viewheight = height&~1;
 	centerx = viewwidth/2-1;
 	centerxwide = AspectCorrection[r_ratio].isWide ? CorrectWidthFactor(centerx) : centerx;
 	shootdelta = viewwidth/10;
@@ -536,7 +535,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	{
 		viewscreenx = (screenWidth-viewwidth) / 2;
 		viewscreeny = (statusbary-viewheight)/2;
-		screenofs = viewscreeny*screenWidth+viewscreenx;
+		screenofs = viewscreeny*bufferPitch+viewscreenx;
 	}
 
 	int virtheight = screenHeight;

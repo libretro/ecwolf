@@ -302,7 +302,7 @@ void ScalePost()
 				yw--;
 			}
 			while(ywcount <= 0);
-			//if(yw < 0) break;
+			if(yw < 0) break;
 			if(r_depthfog)
 				col = curshades[postsource[yw]];
 			else
