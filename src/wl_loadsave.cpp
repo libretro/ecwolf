@@ -33,6 +33,7 @@
 */
 
 #include <ctime>
+#include "config.h"
 #include "c_cvars.h"
 #include "farchive.h"
 #include "file.h"
@@ -66,6 +67,7 @@ extern unsigned vbufPitch;
 namespace GameSave {
 
 int SaveVersion = SAVEVER;
+const char* savedir = NULL;
 
 static const char* const NEW_SAVE = "    - NEW SAVE -";
 
@@ -82,6 +84,18 @@ struct SaveFile
 TArray<SaveFile> SaveFile::files;
 
 static bool quickSaveLoad = false;
+
+static inline FILE *OpenSaveFile(const FString &filename, const char* mode)
+{
+	FString dir = savedir ? FString(savedir) : config.GetConfigDir();
+#ifdef _WIN32
+	dir += "\\";
+#else
+	dir += "/";
+#endif
+
+	return fopen(dir + filename, mode);
+}
 
 #define MAX_SAVENAME 31
 #define LSM_Y   55
@@ -139,7 +153,7 @@ public:
 				else
 				{
 					PNGHandle *png;
-					FILE *file = fopen(saveFile.filename, "rb");
+					FILE *file = OpenSaveFile(saveFile.filename, "rb");
 					if(file && (png = M_VerifyPNG(file)))
 					{
 						FTexture *savePicture = PNGTexture_CreateFromFile(png, saveFile.filename);
@@ -234,7 +248,7 @@ void SetupSaveGames()
 			continue; // Too short or incorrect name
 
 		PNGHandle *png;
-		FILE *file = fopen(filename, "rb");
+		FILE *file = OpenSaveFile(filename, "rb");
 		if(file)
 		{
 			if((png = M_VerifyPNG(file)))
@@ -483,7 +497,7 @@ static void Serialize(FArchive &arc)
 
 bool Load(const FString &filename)
 {
-	FILE *fileh = fopen(filename, "rb");
+	FILE *fileh = OpenSaveFile(filename, "rb");
 	PNGHandle *png = M_VerifyPNG(fileh);
 	if(png == NULL)
 	{
@@ -546,7 +560,7 @@ void SaveScreenshot(FILE *file)
 
 bool Save(const FString &filename, const FString &title)
 {
-	FILE *fileh = fopen(filename, "wb");
+	FILE *fileh = OpenSaveFile(filename, "wb");
 
 	if(!quickSaveLoad)
 		DrawLSAction(1);

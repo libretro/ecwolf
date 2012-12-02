@@ -37,6 +37,7 @@
 #include "wl_iwad.h"
 #include "wl_play.h"
 #include "wl_game.h"
+#include "wl_loadsave.h"
 #include "dobject.h"
 #include "colormatcher.h"
 #include "version.h"
@@ -1089,12 +1090,17 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 		else IFARG("--file")
 		{
 			if(++i < argc)
-				files.Push(argv[++i]);
+				files.Push(argv[i]);
 		}
 		else IFARG("--config")
 		{
 			// The config code will handle this itself, so ignore it here.
 			++i;
+		}
+		else IFARG("--savedir")
+		{
+			if(++i < argc)
+				GameSave::savedir = argv[i];
 		}
 		else
 			files.Push(argv[i]);
@@ -1112,6 +1118,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			"Options:\n"
 			" --help                 This help page\n"
 			" --config <file>        Use an explicit location for the config file\n"
+			" --savedir <dir>        Use an explicit location for save games\n"
 			" --file <file>          Loads an extra data file\n"
 			" --tedlevel <level>     Starts the game in the given level\n"
 			" --baby                 Sets the difficulty to baby for tedlevel\n"
