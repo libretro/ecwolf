@@ -147,8 +147,6 @@ void Quit(const char *errorStr, ...);
 #define ANGLE_60		(ANGLE_180/3)
 typedef uint32_t angle_t;
 
-#define MINDIST         (0x5800l)
-
 #define TEXTURESHIFT    6
 #define TEXTURESIZE     (1<<TEXTURESHIFT)
 #define TEXTUREFROMFIXEDSHIFT 4

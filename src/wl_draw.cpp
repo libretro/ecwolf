@@ -32,10 +32,7 @@
 =============================================================================
 */
 
-// the door is the last picture before the sprites
-#define DOORWALL        (PMSpriteStart-8)
-
-#define ACTORSIZE       0x4000
+#define MINDIST         (0x4000l)
 
 #define mapheight (map->GetHeader().height)
 #define mapwidth (map->GetHeader().width)
@@ -257,11 +254,15 @@ void ScalePost()
 	BYTE *curshades = &NormalLight.Maps[256*GetShade(wallheight[postx])];
 
 	ywcount = yd = (wallheight[postx] >> 3);
-	if(yd <= 0) yd = 100;
+	if(yd <= 0)
+		yd = 100;
 
+	// Calculate starting and ending offsets
 	{
-		const int topoffset = ywcount*viewz/(32<<FRACBITS);
-		const int botoffset = ywcount*(viewz - (64<<FRACBITS))/(32<<FRACBITS);
+		// ywcount can be large enough to cause an overflow if we don't reduce
+		// fixed point precision here
+		const int topoffset = ywcount*(viewz>>8)/(32<<(FRACBITS-8));
+		const int botoffset = ywcount*((viewz - (64<<FRACBITS))>>8)/(32<<(FRACBITS-8));
 
 		yoffs = (viewheight / 2 - topoffset - viewshift) * vbufPitch;
 		if(yoffs < 0) yoffs = 0;
@@ -281,7 +282,8 @@ void ScalePost()
 		}
 		yendoffs--;
 	}
-	if(yw < 0) return;
+	if(yw < 0)
+		return;
 
 	if(r_depthfog)
 		col = curshades[postsource[yw]];

@@ -859,6 +859,7 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove)
 
 void Thrust (angle_t angle, int32_t speed)
 {
+	static const int MAXTHRUST = 0x5800l * 2;
 	int32_t xmove,ymove;
 
 	//
@@ -871,8 +872,8 @@ void Thrust (angle_t angle, int32_t speed)
 	//
 	// moving bounds speed
 	//
-	if (speed >= MINDIST*2)
-		speed = MINDIST*2-1;
+	if (speed >= MAXTHRUST)
+		speed = MAXTHRUST-1;
 
 	xmove = FixedMul(speed,finecosine[angle>>ANGLETOFINESHIFT]);
 	ymove = -FixedMul(speed,finesine[angle>>ANGLETOFINESHIFT]);
