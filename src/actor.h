@@ -87,7 +87,7 @@ class CallArguments;
 class ExpressionNode;
 
 typedef uint32_t flagstype_t;
-typedef void (*ActionPtr)(AActor *, const CallArguments &args);
+typedef void (*ActionPtr)(AActor *, AActor *, const class Frame * const, const CallArguments &);
 
 class Frame
 {
@@ -108,7 +108,7 @@ class Frame
 				ActionPtr		pointer;
 				CallArguments	*args;
 
-				void operator() (AActor *self) const;
+				void operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const;
 		} action, thinker;
 		const Frame	*next;
 		unsigned int	index;
@@ -191,7 +191,7 @@ class AActor : public DObject
 		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
 		void			RemoveFromWorld();
-		void			RemoveInventory(AInventory *item);
+		virtual void	RemoveInventory(AInventory *item);
 		void			Serialize(FArchive &arc);
 		void			SetState(const Frame *state, bool notic=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allowreplacement);

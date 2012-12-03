@@ -152,10 +152,24 @@ AWeapon *APlayerPawn::PickNewWeapon()
 	if(best)
 	{
 		player->PendingWeapon = best;
-		player->SetPSprite(player->ReadyWeapon->GetDownState());
+		if(player->ReadyWeapon)
+			player->SetPSprite(player->ReadyWeapon->GetDownState());
 	}
 
 	return best;
+}
+
+void APlayerPawn::RemoveInventory(AInventory *item)
+{
+	if(item == player->PendingWeapon)
+		player->PendingWeapon = WP_NOCHANGE;
+	else if(item == player->ReadyWeapon)
+	{
+		if(player->PendingWeapon == WP_NOCHANGE)
+			PickNewWeapon();
+	}
+
+	Super::RemoveInventory(item);
 }
 
 void APlayerPawn::Serialize(FArchive &arc)
@@ -259,5 +273,5 @@ void APlayerPawn::TickPSprites()
 		player->SetPSprite(player->psprite.frame->next);
 
 	if(player->psprite.frame)
-		player->psprite.frame->thinker(this);
+		player->psprite.frame->thinker(this, player->ReadyWeapon, player->psprite.frame);
 }

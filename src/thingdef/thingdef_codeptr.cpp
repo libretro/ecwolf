@@ -29,6 +29,8 @@
 ** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **---------------------------------------------------------------------------
 **
+** Some action pointer code may closely resemble ZDoom code since they
+** should behave the same.
 **
 */
 
@@ -236,6 +238,24 @@ ACTION_FUNCTION(A_GiveInventory)
 	}
 }
 
+#define STATE_JUMP(frame) DoStateJump(frame, self, caller, args)
+static void DoStateJump(const Frame *frame, AActor *self, const Frame * const caller, const CallArguments &args)
+{
+	if(!frame)
+		return;
+
+	if(self->player)
+	{
+		if(self->player->psprite.frame == caller)
+		{
+			self->player->SetPSprite(frame);
+			return;
+		}
+	}
+
+	self->SetState(frame);
+}
+
 static FRandom pr_cajump("CustomJump");
 ACTION_FUNCTION(A_Jump)
 {
@@ -245,8 +265,7 @@ ACTION_FUNCTION(A_Jump)
 	{
 		ACTION_PARAM_STATE(frame, (ACTION_PARAM_COUNT == 2 ? 1 : (1 + pr_cajump() % (ACTION_PARAM_COUNT - 1))), NULL);
 
-		if(frame)
-			self->SetState(frame);
+		STATE_JUMP(frame);
 	}
 }
 
@@ -255,8 +274,47 @@ ACTION_FUNCTION(A_JumpIf)
 	ACTION_PARAM_BOOL(expr, 0);
 	ACTION_PARAM_STATE(frame, 1, NULL);
 
-	if(expr && frame)
-		self->SetState(frame);
+	if(expr)
+		STATE_JUMP(frame);
+}
+
+ACTION_FUNCTION(A_JumpIfCloser)
+{
+	ACTION_PARAM_DOUBLE(distance, 0);
+	ACTION_PARAM_STATE(frame, 1, NULL);
+
+	AActor *check;
+	if(self->player)
+		check = self->player->FindTarget();
+	else
+		check = players[0].mo;
+
+	// << 6 - Adjusts to Doom scale
+	if(check && P_AproxDistance((self->x-check->x)<<6, (self->y-check->y)<<6) < (fixed)(distance*FRACUNIT))
+	{
+		STATE_JUMP(frame);
+	}
+}
+
+ACTION_FUNCTION(A_JumpIfInventory)
+{
+	ACTION_PARAM_STRING(className, 0);
+	ACTION_PARAM_INT(amount, 1);
+	ACTION_PARAM_STATE(frame, 2, NULL);
+
+	const ClassDef *cls = ClassDef::FindClass(className);
+	AInventory *inv = self->FindInventory(cls);
+
+	if(!inv)
+		return;
+
+	// Amount of 0 means check if the amount is the maxamount.
+	// Otherwise check if we have at least that amount.
+	if((amount == 0 && inv->amount == inv->maxamount) ||
+		inv->amount >= static_cast<unsigned int>(amount))
+	{
+		STATE_JUMP(frame);
+	}
 }
 
 static FRandom pr_meleeattack("MeleeAccuracy");
@@ -292,7 +350,7 @@ ACTION_FUNCTION(A_MonsterRefire)
 		!CheckLine(self)
 	))
 	{
-		self->SetState(jump);
+		STATE_JUMP(jump);
 	}
 }
 
@@ -378,4 +436,21 @@ ACTION_FUNCTION(A_Stop)
 	self->velx = 0;
 	self->vely = 0;
 	self->dir = nodir;
+}
+
+ACTION_FUNCTION(A_TakeInventory)
+{
+	ACTION_PARAM_STRING(className, 0);
+	ACTION_PARAM_INT(amount, 1);
+
+	const ClassDef *cls = ClassDef::FindClass(className);
+	AInventory *inv = self->FindInventory(cls);
+	if(inv)
+	{
+		// Taking an amount of 0 mean take all
+		if(amount == 0 || amount >= static_cast<int>(inv->amount))
+			inv->Destroy();
+		else
+			inv->amount -= amount;
+	}
 }

@@ -86,6 +86,22 @@ void A_Face(AActor *self, AActor *target, angle_t maxturn)
 		self->angle = iangle;
 }
 
+//==========================================================================
+//
+// P_AproxDistance
+//
+// Gives an estimation of distance (not exact)
+// From Doom.
+// 
+//==========================================================================
+
+fixed P_AproxDistance (fixed dx, fixed dy)
+{
+	dx = abs(dx);
+	dy = abs(dy);
+	return (dx < dy) ? dx+dy-(dx>>1) : dx+dy-(dy>>1);
+}
+
 /*
 =============================================================================
 

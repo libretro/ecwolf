@@ -48,6 +48,7 @@ extern class player_t
 
 		void	BobWeapon(fixed_t *x, fixed_t *y);
 		void	BringUpWeapon();
+		AActor	*FindTarget();
 		size_t	PropagateMark();
 		void	Reborn();
 		void	Serialize(FArchive &arc);

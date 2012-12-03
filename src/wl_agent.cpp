@@ -1098,6 +1098,49 @@ ACTION_FUNCTION(A_Raise)
 		player->psprite.frame = NULL;
 }
 
+// Finds the target closest to the player within shooting range.
+AActor *player_t::FindTarget()
+{
+	//
+	// find potential targets
+	//
+
+	int32_t viewdist = 0x7fffffffl;
+	AActor *closest = NULL, *oldclosest = NULL;
+
+	while (1)
+	{
+		oldclosest = closest;
+
+		for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
+		{
+			if(check->Item() == mo)
+				continue;
+
+			if ((check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
+				&& abs(check->Item()->viewx-centerx) < shootdelta)
+			{
+				if (check->Item()->transx < viewdist)
+				{
+					viewdist = check->Item()->transx;
+					closest = check->Item();
+				}
+			}
+		}
+
+		if (closest == oldclosest)
+			return NULL; // no more targets, all missed
+
+		//
+		// trace a line from player to enemey
+		//
+		if (CheckLine(closest))
+			break;
+	}
+
+	return closest;
+}
+
 size_t player_t::PropagateMark()
 {
 	GC::Mark(mo);
@@ -1168,7 +1211,7 @@ void player_t::SetPSprite(const Frame *frame)
 	if(frame)
 	{
 		psprite.ticcount = frame->duration;
-		frame->action(mo);
+		frame->action(mo, ReadyWeapon, frame);
 	}
 }
 
@@ -1295,9 +1338,7 @@ ACTION_FUNCTION(A_GunAttack)
 	};
 
 	player_t *player = self->player;
-	AActor *closest=NULL,*oldclosest=NULL;
 	int      dx,dy,dist;
-	int32_t  viewdist;
 
 	ACTION_PARAM_INT(flags, 0);
 	ACTION_PARAM_STRING(sound, 1);
@@ -1321,41 +1362,7 @@ ACTION_FUNCTION(A_GunAttack)
 
 	madenoise = true;
 
-	//
-	// find potential targets
-	//
-	viewdist = 0x7fffffffl;
-	closest = NULL;
-
-	while (1)
-	{
-		oldclosest = closest;
-
-		for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
-		{
-			if(check->Item() == self)
-				continue;
-
-			if ((check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
-				&& abs(check->Item()->viewx-centerx) < shootdelta)
-			{
-				if (check->Item()->transx < viewdist)
-				{
-					viewdist = check->Item()->transx;
-					closest = check->Item();
-				}
-			}
-		}
-
-		if (closest == oldclosest)
-			return; // no more targets, all missed
-
-		//
-		// trace a line from player to enemey
-		//
-		if (CheckLine(closest))
-			break;
-	}
+	AActor *closest = players[0].FindTarget();
 
 	//
 	// hit something

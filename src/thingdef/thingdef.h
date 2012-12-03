@@ -55,7 +55,7 @@ class StateLabel
 		StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative=false);
 
 		const Frame	*Resolve() const;
-		const Frame	*Resolve(AActor *self, const Frame *def=NULL) const;
+		const Frame	*Resolve(AActor *self, AActor *owner, const Frame *def=NULL) const;
 
 	private:
 		void	Parse(Scanner &sc, const ClassDef *parent, bool noRelative=false);
@@ -120,13 +120,13 @@ class ActionInfo
 typedef TArray<ActionInfo *> ActionTable;
 
 #define ACTION_FUNCTION(func) \
-	void __AF_##func(AActor *self, const CallArguments &args); \
+	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &); \
 	static const ActionInfo __AI_##func(__AF_##func, #func); \
-	void __AF_##func(AActor *self, const CallArguments &args)
+	void __AF_##func(AActor *self, AActor *stateOwner, const Frame * const caller, const CallArguments &args)
 #define ACTION_ALIAS(func, alias) \
 	ACTION_FUNCTION(alias) \
 	{ \
-		__AF_##func(self, args); \
+		__AF_##func(self, stateOwner, caller, args); \
 	}
 #define ACTION_PARAM_COUNT args.Count()
 #define ACTION_PARAM_BOOL(name, num) \
@@ -138,7 +138,7 @@ typedef TArray<ActionInfo *> ActionTable;
 #define ACTION_PARAM_STRING(name, num) \
 	FString name = args[num].str
 #define ACTION_PARAM_STATE(name, num, def) \
-	const Frame *name = args[num].label.Resolve(self, def)
+	const Frame *name = args[num].label.Resolve(self, stateOwner, def)
 
 class SymbolInfo
 {

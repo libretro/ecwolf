@@ -292,8 +292,8 @@ bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
 	while(frame)
 	{
 		// Execute both functions since why not.
-		frame->action(context);
-		frame->thinker(context);
+		frame->action(context, this, frame);
+		frame->thinker(context, this, frame);
 
 		if(frame == frame->next)
 			break;

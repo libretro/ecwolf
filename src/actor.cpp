@@ -66,12 +66,12 @@ Frame::~Frame()
 	}
 }
 
-void Frame::ActionCall::operator() (AActor *self) const
+void Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const
 {
 	if(pointer)
 	{
 		args->Evaluate(self);
-		pointer(self, *args);
+		pointer(self, stateOwner, caller, *args);
 	}
 }
 
@@ -438,7 +438,7 @@ void AActor::SetState(const Frame *state, bool notic)
 	sprite = state->spriteInf;
 	ticcount = state->duration;
 	if(!notic)
-		state->action(this);
+		state->action(this, this, state);
 }
 
 void AActor::Tick()
@@ -462,7 +462,7 @@ void AActor::Tick()
 		SetState(state->next);
 	}
 
-	state->thinker(this);
+	state->thinker(this, this, state);
 
 	if(flags & FL_MISSILE)
 		T_Projectile(this);
@@ -499,7 +499,7 @@ void AActor::RemoveInventory(AInventory *item)
 			break;
 		}
 	}
-	while((next = &(*next)->inventory));
+	while(*next && (next = &(*next)->inventory));
 
 	item->DetachFromOwner();
 }

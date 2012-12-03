@@ -69,6 +69,7 @@ class APlayerPawn : public AActor
 		DropList	*GetStartInventory();
 		void		GiveStartingInventory();
 		AWeapon		*PickNewWeapon();
+		void		RemoveInventory(AInventory *item);
 		void		Serialize(FArchive &arc);
 		void		SetupWeaponSlots();
 		void		Tick();
