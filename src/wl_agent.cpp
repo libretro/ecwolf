@@ -1363,6 +1363,8 @@ ACTION_FUNCTION(A_GunAttack)
 	madenoise = true;
 
 	AActor *closest = players[0].FindTarget();
+	if(!closest)
+		return;
 
 	//
 	// hit something
