@@ -171,7 +171,7 @@ HANDLE_PROPERTY(dropitem)
 	AActor::DropItem drop;
 	drop.className = item;
 	drop.amount = 0;
-	drop.probabilty = 255;
+	drop.probability = 255;
 
 	if(PARAM_COUNT > 1)
 	{
@@ -180,7 +180,7 @@ HANDLE_PROPERTY(dropitem)
 			prb = 255;
 		else if(prb < 0)
 			prb = 0;
-		drop.probabilty = prb;
+		drop.probability = prb;
 		if(PARAM_COUNT > 2)
 		{
 			INT_PARAM(amt, 2);
@@ -383,7 +383,7 @@ HANDLE_PROPERTY(startitem)
 	AActor::DropItem drop;
 	drop.className = item;
 	drop.amount = 1;
-	drop.probabilty = 255;
+	drop.probability = 255;
 
 	if(PARAM_COUNT > 1)
 	{

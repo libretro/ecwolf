@@ -140,7 +140,17 @@ class AActorProxy : public Thinker
 		void Tick()
 		{
 			if(enabled)
+			{
+				if(parent->ObjectFlags & OF_JustSpawned)
+				{
+					ObjectFlags &= ~OF_JustSpawned;
+					parent->PostBeginPlay();
+					if(!parent)
+						return;
+				}
+
 				parent->Tick();
+			}
 		}
 
 		void Serialize(FArchive &arc)
@@ -229,7 +239,7 @@ void AActor::Die()
 		do
 		{
 			DropItem *drop = &item->Item();
-			if(pr_dropitem() <= drop->probabilty)
+			if(pr_dropitem() <= drop->probability)
 			{
 				const ClassDef *cls = ClassDef::FindClass(drop->className);
 				if(cls)
@@ -347,6 +357,8 @@ Thinker *AActor::GetThinker()
 
 void AActor::Init()
 {
+	ObjectFlags |= OF_JustSpawned;
+
 	distance = 0;
 	dir = nodir;
 	soundZone = NULL;
@@ -523,6 +535,11 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);
+
+	// Execute begin play hook and then check if the actor is still alive.
+	actor->BeginPlay();
+	if(actor->ObjectFlags & OF_EuthanizeMe)
+		return NULL;
 
 	if(actor->flags & FL_COUNTKILL)
 		++gamestate.killtotal;

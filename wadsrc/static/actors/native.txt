@@ -131,6 +131,10 @@ actor PlayerPawn native
 	+PICKUP
 }
 
+actor RandomSpawner native
+{
+}
+
 actor Unknown
 {
 	radius 32

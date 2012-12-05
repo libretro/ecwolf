@@ -128,6 +128,9 @@ typedef TArray<ActionInfo *> ActionTable;
 	{ \
 		__AF_##func(self, stateOwner, caller, args); \
 	}
+#define CALL_ACTION(func, self) \
+	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &); \
+	__AF_##func(self, self, NULL, CallArguments());
 #define ACTION_PARAM_COUNT args.Count()
 #define ACTION_PARAM_BOOL(name, num) \
 	bool name = args[num].val.i ? true : false

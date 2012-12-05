@@ -175,11 +175,12 @@ class AActor : public DObject
 			public:
 				FName			className;
 				unsigned int	amount;
-				uint8_t			probabilty;
+				uint8_t			probability;
 		};
 		typedef LinkedList<DropItem> DropList;
 
 		void			AddInventory(AInventory *item);
+		virtual void	BeginPlay() {}
 		Thinker			*GetThinker();
 		virtual void	Destroy();
 		virtual void	Die();
@@ -190,6 +191,7 @@ class AActor : public DObject
 		const AActor	*GetDefault() const;
 		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
+		virtual void	PostBeginPlay() {}
 		void			RemoveFromWorld();
 		virtual void	RemoveInventory(AInventory *item);
 		void			Serialize(FArchive &arc);
