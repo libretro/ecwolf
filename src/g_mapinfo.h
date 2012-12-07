@@ -47,6 +47,8 @@ public:
 	FString	SignonLump;
 	int		MenuFadeColor;
 	int		MenuColors[6];
+	int		MessageColors[3];
+	int		MenuWindowColors[6];
 	int		AdvisoryColor;
 	bool	DrawReadThis;
 

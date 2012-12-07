@@ -140,7 +140,7 @@ void SliderMenuItem::draw()
 	unsigned int bx = PrintX, by = PrintY+1, bw = width, bh = 10;
 	MenuToRealCoords(bx, by, bw, bh, MENU_CENTER);
 
-	DrawWindow(PrintX, PrintY+1, width, 10, TEXTCOLOR, 0, HIGHLIGHT);
+	DrawWindow(PrintX, PrintY+1, width, 10, MENUWIN_BACKGROUND, MENUWIN_BOTBORDER, MENUWIN_TOPBORDER);
 
 	//calc position
 	int x = int(ceil((double(width-20)/double(max))*double(value)));
@@ -152,7 +152,7 @@ void SliderMenuItem::draw()
 	bh = 10;
 	MenuToRealCoords(bx, by, bw, bh, MENU_CENTER);
 
-	DrawWindow(PrintX + x, PrintY + 1, 20, 10, READHCOLOR, 0, READCOLOR);
+	DrawWindow(PrintX + x, PrintY + 1, 20, 10, MENUWINHGLT_BACKGROUND, MENUWINHGLT_BOTBORDER, MENUWINHGLT_TOPBORDER);
 
 	PrintX += width+8;
 	MenuItem::draw();
@@ -352,7 +352,7 @@ void ControlMenuItem::activate()
 		do { ReadAnyControl(&ci); } while(ci.button0 || ci.button1);
 	}
 
-	DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR, 0, HIGHLIGHT);
+	DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, MENUWIN_BACKGROUND, MENUWIN_BOTBORDER, MENUWINHGLT_TOPBORDER);
 	PrintX = 162 + (52*column);
 	US_Print(BigFont, "???");
 	VW_UpdateScreen();
@@ -440,7 +440,7 @@ void ControlMenuItem::draw()
 {
 	DrawWindow(159, PrintY, ((52)*3) - 1, 13, BKGDCOLOR, BKGDCOLOR, BKGDCOLOR);
 	if(isSelected())
-		DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, TEXTCOLOR, 0, HIGHLIGHT);
+		DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, MENUWIN_BACKGROUND, MENUWIN_BOTBORDER, MENUWIN_TOPBORDER);
 
 	US_Print(BigFont, getString(), getTextColor());
 

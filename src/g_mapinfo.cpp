@@ -588,6 +588,9 @@ protected:
 		else if(key.CompareNoCase("menucolors") == 0)
 			// Border1, Border2, Border3, Background, Stripe, StripeBG
 			ParseColorArrayAssignment(gameinfo.MenuColors, 6);
+		else if(key.CompareNoCase("messagecolors") == 0)
+			// Background, Top Color, Bottom Color
+			ParseColorArrayAssignment(gameinfo.MessageColors, 3);
 		else if(key.CompareNoCase("titlemusic") == 0)
 			ParseStringAssignment(gameinfo.TitleMusic);
 		else if(key.CompareNoCase("titlepalette") == 0)
@@ -604,6 +607,9 @@ protected:
 			ParseNameAssignment(gameinfo.PushwallSoundSequence);
 		else if(key.CompareNoCase("scoresmusic") == 0)
 			ParseStringAssignment(gameinfo.ScoresMusic);
+		else if(key.CompareNoCase("menuwindowcolors") == 0)
+			// Background, Top color, bottom color, Index background, Index top, Index bottom
+			ParseColorArrayAssignment(gameinfo.MenuWindowColors, 6);
 		else if(key.CompareNoCase("finalemusic") == 0)
 			ParseStringAssignment(gameinfo.FinaleMusic);
 		else if(key.CompareNoCase("intermissionmusic") == 0)

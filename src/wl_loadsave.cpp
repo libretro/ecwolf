@@ -213,8 +213,8 @@ MenuItem *GetSaveMenuItem() { return saveItem; }
 //
 static void DrawLSAction (int which)
 {
-	DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, TEXTCOLOR);
-	DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, HIGHLIGHT);
+	DrawWindow (LSA_X, LSA_Y, LSA_W, LSA_H, MENUWIN_BACKGROUND);
+	DrawOutline (LSA_X, LSA_Y, LSA_W, LSA_H, 0, MENUWIN_TOPBORDER);
 	VWB_DrawGraphic (TexMan("M_LDING1"), LSA_X + 8, LSA_Y + 5, MENU_CENTER);
 
 	PrintX = LSA_X + 46;
