@@ -2,6 +2,7 @@ gameinfo
 {
 	menumusic = "WONDERIN"
 	finalemusic = "CORNER"
+	finaleflat = "#DCDCDC"
 	intermissionmusic = "ENDLEVEL"
 	titletime = 15
 	creditpage = "CREDITS"

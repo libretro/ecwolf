@@ -610,6 +610,8 @@ protected:
 		else if(key.CompareNoCase("menuwindowcolors") == 0)
 			// Background, Top color, bottom color, Index background, Index top, Index bottom
 			ParseColorArrayAssignment(gameinfo.MenuWindowColors, 6);
+		else if(key.CompareNoCase("finaleflat") == 0)
+			ParseStringAssignment(gameinfo.FinaleFlat);
 		else if(key.CompareNoCase("finalemusic") == 0)
 			ParseStringAssignment(gameinfo.FinaleMusic);
 		else if(key.CompareNoCase("intermissionmusic") == 0)
@@ -779,6 +781,8 @@ protected:
 		{
 			cluster->ExitTextType = ClusterInfo::EXIT_MESSAGE;
 		}
+		else if(key.CompareNoCase("flat") == 0)
+			ParseStringAssignment(cluster->Flat);
 		else
 			return false;
 		return true;

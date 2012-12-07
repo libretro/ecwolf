@@ -36,9 +36,6 @@ TEXT FORMATTING COMMANDS
 =============================================================================
 */
 
-#define BACKCOLOR       0x11
-
-
 #define WORDLIMIT       80
 #define FONTHEIGHT      10
 #define TOPMARGIN       16
@@ -72,6 +69,7 @@ static EColorRange textcolor;
 static int     picx;
 static int     picy;
 static FTextureID picnum;
+static FTexture *backgroundFlat = NULL;
 static int     picdelay;
 static bool    layoutdone;
 
@@ -247,7 +245,7 @@ void HandleCommand (bool helphack)
 			double bw = ParseNumber();
 			double bh = ParseNumber();
 			MenuToRealCoords(bx, by, bw, bh, MENU_CENTER);
-			VWB_Clear(BACKCOLOR, bx, by, bx+bw, by+bh);
+			VWB_DrawFill(backgroundFlat, bx, by, bx+bw, by+bh);
 			RipToEOL();
 			break;
 		}
@@ -493,7 +491,7 @@ void PageLayout (bool shownumber, bool helphack)
 	//
 	int clearx = 0, cleary = 0, clearw = 320, clearh = 200;
 	MenuToRealCoords(clearx, cleary, clearw, clearh, MENU_CENTER);
-	VWB_Clear(BACKCOLOR, clearx, cleary, clearx+clearw, cleary+clearh);
+	VWB_DrawFill(backgroundFlat, clearx, cleary, clearx+clearw, cleary+clearh);
 	VWB_DrawGraphic(TexMan("TOPWINDW"), 0, 0, MENU_CENTER);
 	VWB_DrawGraphic(TexMan("LFTWINDW"), 0, 8, MENU_CENTER);
 	VWB_DrawGraphic(TexMan("RGTWINDW"), 312, 8, MENU_CENTER);
@@ -749,6 +747,7 @@ void HelpScreens (void)
 	{
 		FMemLump lump = Wads.ReadLump(lumpNum);
 
+		backgroundFlat = TexMan(gameinfo.FinaleFlat);
 		ShowArticle((char*)lump.GetMem());
 	}
 
@@ -768,6 +767,10 @@ void EndText (void)
 	ClusterInfo &cluster = ClusterInfo::Find(levelInfo->Cluster);
 	if(cluster.ExitText.IsEmpty())
 		return;
+
+	// Use cluster background if set.
+	if(!cluster.Flat.IsEmpty())
+		backgroundFlat = TexMan(cluster.Flat);
 
 	if(cluster.ExitTextType == ClusterInfo::EXIT_MESSAGE)
 	{

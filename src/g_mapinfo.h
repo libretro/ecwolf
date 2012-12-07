@@ -66,6 +66,7 @@ public:
 	FString	IntermissionMusic;
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
+	FString FinaleFlat;
 	FName	DoorSoundSequence;
 	FName	PushwallSoundSequence;
 	fixed	GibFactor;
@@ -184,6 +185,7 @@ public:
 
 	FString		ExitText;
 	ExitType	ExitTextType;
+	FString		Flat;
 
 	static ClusterInfo &Find(unsigned int index);
 };
