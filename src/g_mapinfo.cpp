@@ -759,7 +759,7 @@ protected:
 
 	bool CheckKey(FString key)
 	{
-		if(key.CompareNoCase("exittext") == 0)
+		if(key.CompareNoCase("exittext") == 0 || key.CompareNoCase("entertext") == 0)
 		{
 			sc.MustGetToken('=');
 			bool lookup = false;
@@ -771,7 +771,9 @@ protected:
 				lookup = true;
 			}
 			sc.MustGetToken(TK_StringConst);
-			cluster->ExitText = lookup ? FString(language[sc->str]) : sc->str;
+
+			FString &text = key.CompareNoCase("exittext") == 0 ? cluster->ExitText : cluster->EnterText;
+			text = lookup ? FString(language[sc->str]) : sc->str;
 		}
 		else if(key.CompareNoCase("exittextislump") == 0)
 		{

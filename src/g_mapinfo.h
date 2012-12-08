@@ -183,7 +183,7 @@ public:
 
 	ClusterInfo();
 
-	FString		ExitText;
+	FString		EnterText, ExitText;
 	ExitType	ExitTextType;
 	FString		Flat;
 

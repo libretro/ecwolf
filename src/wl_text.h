@@ -10,6 +10,8 @@
 */
 
 extern  void    HelpScreens(void);
-extern  void    EndText(void);
+
+// Returns true if a screen as displayed.
+extern  bool    EndText(int exitClusterNum, int enterClusterNum=-1);
 
 #endif

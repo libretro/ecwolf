@@ -113,11 +113,9 @@ void Victory (bool fromIntermission)
 
 	IN_Ack ();
 
-	VW_FadeOut ();
-	if(screenHeight % 200 != 0)
-		VL_ClearScreen(0);
+	EndText (levelInfo->Cluster);
 
-	EndText ();
+	VW_FadeOut();
 }
 
 //==========================================================================

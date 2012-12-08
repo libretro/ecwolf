@@ -917,7 +917,7 @@ restartgame:
 
 				LevelInfo &nextLevel = LevelInfo::Find(next);
 				if(nextLevel.Cluster != levelInfo->Cluster)
-					EndText ();
+					EndText (levelInfo->Cluster, nextLevel.Cluster);
 
 				if(dointermission)
 					VW_FadeOut ();

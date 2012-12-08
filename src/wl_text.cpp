@@ -375,6 +375,11 @@ void NewLine (void)
 					return;
 				}
 			}
+			else if (*text == '\0')
+			{
+				layoutdone = true;
+				return;
+			}
 			text++;
 		} while (1);
 	}
@@ -510,15 +515,17 @@ void PageLayout (bool shownumber, bool helphack)
 
 	//
 	// make sure we are starting layout text (^P first command)
+	// [BL] Why? How about assuming ^P?
 	//
 	while (*text <= 32)
 		text++;
 
-	if (*text != '^' || toupper(*++text) != 'P')
-		Quit ("PageLayout: Text not headed with ^P");
-
-	while (*text++ != '\n')
-		;
+	if (*text == '^' && toupper(*(text+1)) == 'P')
+	{
+		++text;
+		while (*text++ != '\n')
+			;
+	}
 
 
 	//
@@ -530,6 +537,11 @@ void PageLayout (bool shownumber, bool helphack)
 
 		if (ch == '^')
 			HandleCommand (helphack);
+		else if(ch == '\0')
+		{
+			// Simulate ^E if one does not exist.
+			layoutdone = true;
+		}
 		else
 			if (ch == 9)
 			{
@@ -625,6 +637,11 @@ void CountPages (void)
 				ParseTimedCommand (false);
 			}
 		}
+		else if (*text == '\0')
+		{
+			text = textstart;
+			return;
+		}
 		else
 			text++;
 
@@ -653,6 +670,8 @@ void ShowArticle (const char *article, bool helphack=false)
 
 	newpage = true;
 	firstpage = true;
+	fontcolor = 255;
+	textcolor = CR_UNTRANSLATED;
 
 	do
 	{
@@ -757,50 +776,88 @@ void HelpScreens (void)
 //
 // END ARTICLES
 //
-void EndText (void)
+bool EndText (int exitClusterNum, int enterClusterNum)
 {
 	int     artnum;
 	char    *text;
 	memptr  layout;
 
 	ClearMemory ();
-	ClusterInfo &cluster = ClusterInfo::Find(levelInfo->Cluster);
-	if(cluster.ExitText.IsEmpty())
-		return;
 
-	// Use cluster background if set.
-	if(!cluster.Flat.IsEmpty())
-		backgroundFlat = TexMan(cluster.Flat);
+	// Determine if we're using an exit text or enter text. The enter text
+	// overrides the exit text since it's mainly used for entering secret levels.
+	// Also collect any information
+	FString exitText;
+	FString flat;
+	ClusterInfo::ExitType type;
 
-	if(cluster.ExitTextType == ClusterInfo::EXIT_MESSAGE)
+	if(enterClusterNum >= 0)
 	{
-		SD_PlaySound ("misc/1up");
-
-		Message (cluster.ExitText);
-
-		IN_ClearKeysDown ();
-		IN_Ack ();
-		return;
-	}
-	else if(cluster.ExitTextType == ClusterInfo::EXIT_LUMP)
-	{
-		int lumpNum = Wads.CheckNumForName(cluster.ExitText, ns_global);
-		if(lumpNum != -1)
+		ClusterInfo &enterCluster = ClusterInfo::Find(enterClusterNum);
+		if(!enterCluster.EnterText.IsEmpty())
 		{
-			FWadLump lump = Wads.OpenLumpNum(lumpNum);
-			text = new char[Wads.LumpLength(lumpNum)];
-			lump.Read(text, Wads.LumpLength(lumpNum));
-
-			ShowArticle(text, (IWad::GetGame().Flags & IWad::HELPHACK));
-
-			delete[] text;
+			exitText = enterCluster.EnterText;
+			flat = enterCluster.Flat;
+			type = ClusterInfo::EXIT_STRING;
 		}
 	}
-	else
-		ShowArticle(cluster.ExitText, (IWad::GetGame().Flags & IWad::HELPHACK));
+	if(enterClusterNum < 0 || exitText.IsEmpty())
+	{
+		ClusterInfo &exitCluster = ClusterInfo::Find(exitClusterNum);
+		exitText = exitCluster.ExitText;
+		flat = exitCluster.Flat;
+		type = exitCluster.ExitTextType;
+	}
 
-	VW_FadeOut();
+	// If there was no text then just carry on
+	if(exitText.IsEmpty())
+		return false;
+
+	// Use cluster background if set.
+	if(!flat.IsEmpty())
+		backgroundFlat = TexMan(flat);
+	if(!backgroundFlat) // Get default if needed
+		backgroundFlat = TexMan(gameinfo.FinaleFlat);
+
+	switch(type)
+	{
+		case ClusterInfo::EXIT_MESSAGE:
+			SD_PlaySound ("misc/1up");
+
+			Message (exitText);
+
+			IN_ClearKeysDown ();
+			IN_Ack ();
+			return false;
+	
+		case ClusterInfo::EXIT_LUMP:
+		{
+			VW_FadeOut ();
+
+			int lumpNum = Wads.CheckNumForName(exitText, ns_global);
+			if(lumpNum != -1)
+			{
+				FWadLump lump = Wads.OpenLumpNum(lumpNum);
+				text = new char[Wads.LumpLength(lumpNum)];
+				lump.Read(text, Wads.LumpLength(lumpNum));
+
+				ShowArticle(text, (IWad::GetGame().Flags & IWad::HELPHACK));
+
+				delete[] text;
+			}
+
+			break;
+		}
+
+		default:
+			VW_FadeOut ();
+			ShowArticle(exitText, (IWad::GetGame().Flags & IWad::HELPHACK));
+			break;
+	}
+
 	IN_ClearKeysDown();
 	if (MousePresent && IN_IsInputGrabbed())
 		IN_CenterMouse();  // Clear accumulated mouse movement
+
+	return true;
 }
