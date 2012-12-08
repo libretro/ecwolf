@@ -48,6 +48,7 @@
 #include "r_sprites.h"
 #include "resourcefiles/resourcefile.h"
 #include "wl_loadsave.h"
+#include "doomerrors.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneLinks(NULL)
 {
@@ -83,7 +84,11 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneL
 	{
 		file = FResourceFile::OpenResourceFile(mapWad.GetChars(), Wads.ReopenLumpNum(markerLump), true);
 		if(!file || file->LumpCount() < 2) // Maps must be 2 lumps in size
-			return;
+		{
+			FString error;
+			error.Format("Map %s is in an unknown format.", map.GetChars());
+			throw CRecoverableError(error);
+		}
 
 		// First lump is assumed marker
 		FResourceLump *lump = file->GetLump(1);

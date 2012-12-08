@@ -29,6 +29,7 @@
 #include "a_inventory.h"
 #include "colormatcher.h"
 #include "thingdef/thingdef.h"
+#include "doomerrors.h"
 
 #ifdef MYPROFILE
 #include <TIME.H>
@@ -278,7 +279,13 @@ void SetupGameLevel (void)
 // spawn actors
 //
 	if(!loadedgame)
+	{
 		map->SpawnThings();
+
+		// Check to see if a player spawned
+		if(players[0].mo == NULL)
+			throw CRecoverableError("No player 1 start!");
+	}
 }
 
 
