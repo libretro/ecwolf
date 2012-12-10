@@ -798,7 +798,7 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 		{
 			exitText = enterCluster.EnterText;
 			flat = enterCluster.Flat;
-			type = ClusterInfo::EXIT_STRING;
+			type = enterCluster.EnterTextType;
 		}
 	}
 	if(enterClusterNum < 0 || exitText.IsEmpty())

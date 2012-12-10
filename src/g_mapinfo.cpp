@@ -775,14 +775,14 @@ protected:
 			FString &text = key.CompareNoCase("exittext") == 0 ? cluster->ExitText : cluster->EnterText;
 			text = lookup ? FString(language[sc->str]) : sc->str;
 		}
+		else if(key.CompareNoCase("entertextislump") == 0)
+			cluster->EnterTextType = ClusterInfo::EXIT_LUMP;
 		else if(key.CompareNoCase("exittextislump") == 0)
-		{
 			cluster->ExitTextType = ClusterInfo::EXIT_LUMP;
-		}
+		else if(key.CompareNoCase("entertextismessage") == 0)
+			cluster->EnterTextType = ClusterInfo::EXIT_MESSAGE;
 		else if(key.CompareNoCase("exittextismessage") == 0)
-		{
 			cluster->ExitTextType = ClusterInfo::EXIT_MESSAGE;
-		}
 		else if(key.CompareNoCase("flat") == 0)
 			ParseStringAssignment(cluster->Flat);
 		else

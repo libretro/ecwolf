@@ -184,7 +184,7 @@ public:
 	ClusterInfo();
 
 	FString		EnterText, ExitText;
-	ExitType	ExitTextType;
+	ExitType	EnterTextType, ExitTextType;
 	FString		Flat;
 
 	static ClusterInfo &Find(unsigned int index);
