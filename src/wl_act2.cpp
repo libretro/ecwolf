@@ -431,7 +431,9 @@ ACTION_FUNCTION(A_Chase)
 
 	if(!pathing)
 	{
-		if(missile)
+		bool inMeleeRange = melee ? CheckMeleeRange(self, players[0].mo, self->speed) : false;
+
+		if(!inMeleeRange && missile)
 		{
 			dodge = false;
 			if (CheckLine(self)) // got a shot at players[0].mo?
@@ -448,10 +450,12 @@ ACTION_FUNCTION(A_Chase)
 					else
 						chance = 300;
 
-					if (dist == 1)
+					// If we have a combo attack monster, we want to skip this
+					// check as the monster should try to get melee in.
+					if (dist == 1 && !melee)
 					{
 						target = abs(self->x - players[0].mo->x);
-						if (target < 0x14000l)
+						if (target < 0x14000l) //  < 1.25 tiles or 80 units
 						{
 							target = abs(self->y - players[0].mo->y);
 							if (target < 0x14000l)
@@ -474,7 +478,7 @@ ACTION_FUNCTION(A_Chase)
 				self->hidden = true;
 		}
 		else
-			self->hidden = !CheckMeleeRange(self, players[0].mo, self->speed);
+			self->hidden = !inMeleeRange;
 	}
 	else
 	{
