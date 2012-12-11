@@ -258,6 +258,7 @@ class AActor : public DObject
 		uint16_t	sighttime;
 		uint8_t		sightrandom;
 		uint16_t	missilechance;
+		fixed		meleerange;
 		uint16_t	painchance;
 		FNameNoInit	activesound, attacksound, deathsound, painsound, seesound;
 

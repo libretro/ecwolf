@@ -1,13 +1,11 @@
-actor AngelOfDeath 27
+actor AngelOfDeath : WolfensteinMonster 27
 {
-	radius 42
 	points 5000
 	health 1450, 1550, 1650, 2000
 	speed 1, 3
 	missilechance 8
 	seesound "angel/sight"
 	deathsound "angel/death"
-	MONSTER
 	+AMBUSH
 	states
 	{

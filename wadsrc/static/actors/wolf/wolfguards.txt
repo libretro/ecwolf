@@ -1,17 +1,26 @@
-actor Guard 11
+// Helper actor which makes a monster that behaves like one in Wolfenstein
+// If defining monsters wolfenstein style monsters it is recommeneded to
+// inherit from this actor for best forwards compatibility.
+actor WolfensteinMonster
 {
+	height 64
 	radius 42
+	painchance 256
+	meleerange 42
+	MONSTER
+}
+
+actor Guard : WolfensteinMonster 11
+{
 	points 100
 	health 25
 	speed 1, 3
 	sighttime 1, 4
 	dropitem "Clip"
-	painchance 256
 	attacksound "guard/attack"
 	deathsound "guard/death"
 	secretdeathsound "guard/fart"
 	seesound "guard/sight"
-	MONSTER
 	states
 	{
 		Spawn:
@@ -116,19 +125,16 @@ actor DeadGreenGuard : DeadGuard 98
 	}
 }
 
-actor Dog 14
+actor Dog : WolfensteinMonster 14
 {
-	radius 42
 	points 200
 	health 1
 	speed 2.93, 5.859
 	sighttime 1, 8
-	painchance 256
 	attacksound "dog/attack"
 	deathsound "dog/death"
 	secretdeathsound "dog/fart"
 	seesound "dog/sight"
-	MONSTER
 	-CANUSEWALLS
 	states
 	{
@@ -201,20 +207,17 @@ actor Doberman : Dog 95
 	}
 }
 
-actor Officer 12
+actor Officer : WolfensteinMonster 12
 {
-	radius 42
 	points 400
 	health 50
 	speed 1, 5
 	sighttime 2
-	painchance 256
 	dropitem "Clip"
 	attacksound "officer/attack"
 	deathsound "officer/death"
 	secretdeathsound "officer/fart"
 	seesound "officer/sight"
-	MONSTER
 	states
 	{
 		Spawn:
@@ -301,19 +304,16 @@ actor LostOfficer : Officer 97
 	}
 }
 
-actor Mutant 15
+actor Mutant : WolfensteinMonster 15
 {
-	radius 42
 	points 700
 	health 45, 55, 55, 65
 	speed 1, 3
 	sighttime 1, 6
-	painchance 256
 	dropitem "Clip"
 	attacksound "mutant/attack"
 	deathsound "mutant/death"
 	secretdeathsound "mutant/fart"
-	MONSTER
 	states
 	{
 		Spawn:
@@ -401,21 +401,18 @@ actor GunBat : Mutant 96
 	}
 }
 
-actor WolfensteinSS 13 // ZDoom compatible name
+actor WolfensteinSS : WolfensteinMonster 13 // ZDoom compatible name
 {
-	radius 42
 	points 500
 	health 100
 	speed 1, 4
 	sighttime 1, 6
-	painchance 256
 	dropitem "MachineGun"
 	dropitem "Clip"
 	attacksound "wolfss/attack"
 	deathsound "wolfss/death"
 	secretdeathsound "wolfss/fart"
 	seesound "wolfss/sight"
-	MONSTER
 	+DROPBASEDONTARGET
 	states
 	{

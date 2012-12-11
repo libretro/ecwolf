@@ -25,6 +25,7 @@ actor Actor native
 	speed 0
 	points 0
 	missilechance 16
+	meleerange 44
 
 	native int angle;
 	native int health;

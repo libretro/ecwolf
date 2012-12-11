@@ -387,10 +387,10 @@ CHASE
 =================
 */
 
-bool CheckMeleeRange(AActor *actor1, AActor *actor2, fixed range)
+bool CheckMeleeRange(AActor *inflictor, AActor *inflictee, fixed range)
 {
-	fixed r = actor1->radius + actor2->radius + range;
-	return abs(actor2->x - actor1->x) <= r && abs(actor2->y - actor1->y) <= r;
+	fixed r = inflictor->meleerange + inflictee->radius + range;
+	return abs(inflictee->x - inflictor->x) <= r && abs(inflictee->y - inflictor->y) <= r;
 }
 
 /*
@@ -501,7 +501,7 @@ ACTION_FUNCTION(A_Chase)
 	self->angle = dirangle[self->dir];
 	move = self->speed;
 
-	while (move)
+	do
 	{
 		if (CheckDoorMovement(self))
 			return;
@@ -549,6 +549,7 @@ ACTION_FUNCTION(A_Chase)
 		if (self->dir == nodir)
 			return; // object is blocked in
 	}
+	while(move);
 
 	if(!(flags & CHF_NOPLAYACTIVE) &&
 		self->activesound != NAME_None && pr_chase() < 3)

@@ -253,6 +253,12 @@ HANDLE_PROPERTY(maxhealth)
 	((APlayerPawn *)defaults)->maxhealth = maxhealth;
 }
 
+HANDLE_PROPERTY(meleerange)
+{
+	INT_PARAM(range, 0);
+	defaults->meleerange = range*(FRACUNIT/64);
+}
+
 HANDLE_PROPERTY(missilechance)
 {
 	INT_PARAM(chance, 0);
@@ -459,6 +465,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(interhubamount, Inventory, I),
 	DEFINE_PROP(maxamount, Inventory, I),
 	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
+	DEFINE_PROP(meleerange, Actor, I),
 	DEFINE_PROP(missilechance, Actor, I),
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP_PREFIX(movebob, PlayerPawn, Player, F),

@@ -1,6 +1,5 @@
-actor Trans 23
+actor Trans : WolfensteinMonster 23
 {
-	radius 42
 	points 5000
 	health 850, 950, 1050, 1200
 	speed 1, 3
@@ -8,7 +7,6 @@ actor Trans 23
 	deathsound "trans/death"
 	attacksound "trans/attack"
 	dropitem "GoldKey"
-	MONSTER
 	+AMBUSH
 	states
 	{
@@ -69,16 +67,14 @@ actor SubmarineWilly : Trans 99
 	}
 }
 
-actor UberMutant 24
+actor UberMutant : WolfensteinMonster 24
 {
-	radius 42
 	points 5000
 	health 1050, 1150, 1250, 1400
 	speed 1, 5.859
 	deathsound "uber/death"
 	attacksound "uber/attack"
 	dropitem "GoldKey"
-	MONSTER
 	+AMBUSH
 	states
 	{
@@ -156,9 +152,8 @@ actor TheAxe : UberMutant 101
 	}
 }
 
-actor Wilhelm 25
+actor Wilhelm : WolfensteinMonster 25
 {
-	radius 42
 	points 5000
 	health 950, 1050, 1150, 1300
 	speed 1, 4
@@ -167,7 +162,6 @@ actor Wilhelm 25
 	deathsound "will/death"
 	attacksound "will/attack"
 	dropitem "GoldKey"
-	MONSTER
 	+AMBUSH
 	states
 	{
@@ -234,9 +228,8 @@ actor ProfessorQuarkblitz : Wilhelm 100
 	}
 }
 
-actor DeathKnight 26
+actor DeathKnight : WolfensteinMonster 26
 {
-	radius 42
 	points 5000
 	health 1250, 1350, 1450, 1600
 	speed 1, 4
@@ -245,7 +238,6 @@ actor DeathKnight 26
 	deathsound "knight/death"
 	attacksound "knight/attack"
 	dropitem "GoldKey"
-	MONSTER
 	+AMBUSH
 	states
 	{

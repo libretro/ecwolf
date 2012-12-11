@@ -1,6 +1,5 @@
-actor Hans 16
+actor Hans : WolfensteinMonster 16
 {
-	radius 42
 	points 5000
 	health 850, 950, 1050, 1200
 	speed 1, 3
@@ -8,7 +7,6 @@ actor Hans 16
 	deathsound "hans/death"
 	seesound "hans/sight"
 	dropitem "GoldKey"
-	MONSTER
 	+AMBUSH
 	states
 	{
@@ -37,9 +35,8 @@ actor Hans 16
 	}
 }
 
-actor Gretel 20
+actor Gretel : WolfensteinMonster 20
 {
-	radius 42
 	points 5000
 	health 850, 950, 1050, 1200
 	speed 1, 3
@@ -47,7 +44,6 @@ actor Gretel 20
 	deathsound "gretel/death"
 	seesound "gretel/sight"
 	dropitem "GoldKey"
-	MONSTER
 	+AMBUSH
 	states
 	{
@@ -91,16 +87,14 @@ actor Needle
 	}
 }
 
-actor Schabbs 17
+actor Schabbs : WolfensteinMonster 17
 {
-	radius 42
 	points 5000
 	health 850, 950, 1550, 2400
 	speed 1, 3
 	missilechance 8
 	deathsound "schabbs/death"
 	seesound "schabbs/sight"
-	MONSTER
 	+AMBUSH
 	states
 	{
@@ -130,9 +124,8 @@ actor Schabbs 17
 	}
 }
 
-actor Gift 21
+actor Gift : WolfensteinMonster 21
 {
-	radius 42
 	points 5000
 	health 850, 950, 1050, 120
 	speed 1, 3
@@ -140,7 +133,6 @@ actor Gift 21
 	attacksound "missile/fire"
 	deathsound "gift/death"
 	seesound "gift/sight"
-	MONSTER
 	+AMBUSH
 	states
 	{
@@ -170,9 +162,8 @@ actor Gift 21
 	}
 }
 
-actor FatFace 22
+actor FatFace : WolfensteinMonster 22
 {
-	radius 42
 	points 5000
 	health 850, 950, 1050, 120
 	speed 1, 3
@@ -180,7 +171,6 @@ actor FatFace 22
 	attacksound "missile/fire"
 	deathsound "fat/death"
 	seesound "fat/sight"
-	MONSTER
 	+AMBUSH
 	states
 	{
