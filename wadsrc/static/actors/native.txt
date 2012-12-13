@@ -36,6 +36,7 @@ actor Actor native
 	action native A_ActiveSound(int chance=256);
 	action native A_BossDeath();
 	action native A_CallSpecial(int special, int arg1=0, int arg2=0, int arg3=0, int arg4=0, int arg5=0);
+	action native A_ChangeFlag(string flag, bool value);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0, int aimflags = 0);
 	action native A_Dormant();

@@ -200,6 +200,49 @@ ACTION_FUNCTION(A_BossDeath)
 	}
 }
 
+// Sets or unsets a flag on an actor.
+ACTION_FUNCTION(A_ChangeFlag)
+{
+	ACTION_PARAM_STRING(flag, 0);
+	ACTION_PARAM_BOOL(value, 1);
+
+	// We'll also want to keep the counts consistant
+	const bool countedKill = self->flags & FL_COUNTKILL;
+	const bool countedSecret = self->flags & FL_COUNTSECRET;
+	const bool countedItem = self->flags & FL_COUNTITEM;
+
+	FString prefix;
+	if(flag.IndexOf(".") != -1)
+	{
+		prefix = flag.Left(flag.IndexOf("."));
+		flag = flag.Mid(flag.IndexOf(".")+1);
+	}
+	if(!ClassDef::SetFlag(self->GetClass(), self, prefix, flag, value))
+	{
+		Printf("A_ChangeFlag: Attempt to change unknown flag '%s'.\n", (prefix.IsEmpty() ? flag.GetChars() : (prefix + "." + flag).GetChars()));
+		return;
+	}
+
+	const bool countsKill = self->flags & FL_COUNTKILL;
+	const bool countsSecret = self->flags & FL_COUNTSECRET;
+	const bool countsItem = self->flags & FL_COUNTITEM;
+	if(countedKill != countsKill)
+	{
+		if(countsKill) ++gamestate.killtotal;
+		else --gamestate.killtotal;
+	}
+	if(countedItem != countsItem)
+	{
+		if(countsItem) ++gamestate.treasuretotal;
+		else --gamestate.treasuretotal;
+	}
+	if(countedSecret != countsSecret)
+	{
+		if(countsSecret) ++gamestate.secrettotal;
+		else --gamestate.secrettotal;
+	}
+}
+
 ACTION_FUNCTION(A_FaceTarget)
 {
 	ACTION_PARAM_DOUBLE(max_turn, 0);

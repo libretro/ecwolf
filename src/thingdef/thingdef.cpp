@@ -1029,7 +1029,7 @@ void ClassDef::ParseActor(Scanner &sc)
 				sc.MustGetToken(TK_Identifier);
 				flagName = sc->str;
 			}
-			if(!SetFlag(newClass, prefix, flagName, set))
+			if(!SetFlag(newClass, (AActor*)newClass->defaultInstance, prefix, flagName, set))
 				sc.ScriptMessage(Scanner::WARNING, "Unknown flag '%s' for actor '%s'.", flagName.GetChars(), newClass->name.GetChars());
 		}
 		else
@@ -1541,7 +1541,7 @@ const Frame * const *ClassDef::ResolveStateIndex(unsigned int index) const
 	return &frameList[index];
 }
 
-bool ClassDef::SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set)
+bool ClassDef::SetFlag(const ClassDef *newClass, AActor *instance, const FString &prefix, const FString &flagName, bool set)
 {
 	int min = 0;
 	int max = sizeof(flags)/sizeof(FlagDef) - 1;
@@ -1558,9 +1558,9 @@ bool ClassDef::SetFlag(ClassDef *newClass, const FString &prefix, const FString 
 				return false;
 
 			if(set)
-				*reinterpret_cast<flagstype_t *>((int8_t*)newClass->defaultInstance + flags[mid].varOffset) |= flags[mid].value;
+				*reinterpret_cast<flagstype_t *>((int8_t*)instance + flags[mid].varOffset) |= flags[mid].value;
 			else
-				*reinterpret_cast<flagstype_t *>((int8_t*)newClass->defaultInstance + flags[mid].varOffset) &= ~flags[mid].value;
+				*reinterpret_cast<flagstype_t *>((int8_t*)instance + flags[mid].varOffset) &= ~flags[mid].value;
 			return true;
 		}
 		else if(ret < 0)

@@ -287,6 +287,7 @@ class ClassDef
 		unsigned int			ClassIndex;
 		MetaTable				Meta;
 
+		static bool	SetFlag(const ClassDef *newClass, AActor *instance, const FString &prefix, const FString &flagName, bool set);
 	protected:
 		friend class DObject;
 		friend class StateLabel;
@@ -294,7 +295,6 @@ class ClassDef
 
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
-		static bool	SetFlag(ClassDef *newClass, const FString &prefix, const FString &flagName, bool set);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
 		void		BuildFlatPointers();
