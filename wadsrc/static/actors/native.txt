@@ -15,6 +15,8 @@ const int GAF_NOAMMO = 2;
 
 const int SXF_TRANSFERPOINTERS = 1;
 
+const int ASP_CHASE = 3;
+
 actor Actor native
 {
 	damage 0
@@ -31,7 +33,7 @@ actor Actor native
 	native int angle;
 	native int health;
 
-	action native A_ActiveSound();
+	action native A_ActiveSound(int chance=256);
 	action native A_BossDeath();
 	action native A_CallSpecial(int special, int arg1=0, int arg2=0, int arg3=0, int arg4=0, int arg5=0);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);

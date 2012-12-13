@@ -134,9 +134,15 @@ ACTION_FUNCTION(A_CallSpecial)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+extern FRandom pr_chase;
 ACTION_FUNCTION(A_ActiveSound)
 {
-	PlaySoundLocActor(self->activesound, self);
+	ACTION_PARAM_INT(chance, 0);
+
+	// If chance == 3 this has the same chance as A_Chase. Useful for giving
+	// wolfenstein style monsters activesounds without making it 8x as likely
+	if(chance >= 256 || pr_chase() < chance)
+		PlaySoundLocActor(self->activesound, self);
 }
 
 ACTION_FUNCTION(A_BossDeath)
