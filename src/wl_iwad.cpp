@@ -80,6 +80,8 @@ static bool SplitFilename(const FString &filename, FString &name, FString &exten
 	return true;
 }
 
+// Identifies the IWAD by examining the lumps against the possible requirements.
+// Returns -1 if it isn't identifiable.
 static int CheckData(WadStuff &wad)
 {
 	unsigned int* valid = new unsigned int[iwadTypes.Size()];
@@ -240,7 +242,20 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 		}
 
 		if(CheckData(wadStuff) > -1)
-			iwads.Push(wadStuff);
+		{
+			// Check to ensure there are no duplicates
+			bool doPush = true;
+			for(unsigned int j = 0;j < iwads.Size();++j)
+			{
+				if(iwads[j].Type == wadStuff.Type)
+				{
+					doPush = false;
+					break;
+				}
+			}
+			if(doPush)
+				iwads.Push(wadStuff);
+		}
 	}
 
 	for(unsigned int i = iwads.Size();i-- > 0;)
