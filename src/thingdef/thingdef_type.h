@@ -87,6 +87,7 @@ class TypeHierarchy
 			INT,
 			FLOAT,
 			STATE,
+			ANGLE_T,
 
 			NUM_TYPES
 		};

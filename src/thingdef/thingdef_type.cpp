@@ -46,7 +46,7 @@ TypeHierarchy TypeHierarchy::staticTypes;
 
 TypeHierarchy::TypeHierarchy()
 {
-	static const char* primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float", "state"};
+	static const char* primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float", "state", "angle_t"};
 
 	for(unsigned int i = 0;i < NUM_TYPES;++i)
 		CreateType(primitives[i], NULL);
@@ -73,7 +73,7 @@ const Type *TypeHierarchy::GetType(const FName &name) const
 
 const Type *TypeHierarchy::GetType(PrimitiveTypes type) const
 {
-	static const FName primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float", "state"};
+	static const FName primitives[NUM_TYPES] = {"void", "string", "bool", "int", "float", "state", "angle_t"};
 	return GetType(primitives[type]);
 }
 
@@ -102,6 +102,8 @@ void VariableSymbol::FillValue(ExpressionNode::Value &val, AActor *self) const
 {
 	if(GetType() == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
 		val = int64_t(*(int32_t*)((uint8_t*)self+offset));
+	else if(GetType() == TypeHierarchy::staticTypes.GetType(TypeHierarchy::ANGLE_T))
+		val = double((*(angle_t*)((uint8_t*)self+offset)) * 90.0 / ANGLE_90); // ANGLE_1 is not exact
 	else
 		val = double(*(fixed*)((uint8_t*)self+offset))/FRACUNIT;
 }

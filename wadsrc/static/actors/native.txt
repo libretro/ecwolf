@@ -30,7 +30,7 @@ actor Actor native
 	missilefrequency 1.0
 	meleerange 44
 
-	native int angle;
+	native angle_t angle;
 	native int health;
 
 	action native A_ActiveSound(int chance=256);
