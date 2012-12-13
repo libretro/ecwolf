@@ -429,6 +429,27 @@ ACTION_FUNCTION(A_Chase)
 	bool	dodge = !(flags & CHF_DONTDODGE);
 	bool	pathing = (self->flags & FL_PATHING) ? true : false;
 
+	if (self->dir == nodir)
+	{
+		if (pathing)
+			SelectPathDir (self);
+		else if (dodge)
+			SelectDodgeDir (self);
+		else
+			SelectChaseDir (self);
+
+		self->movecount = pr_chase() & 15;
+
+		if (self->dir == nodir)
+			return; // object is blocked in
+	}
+	// Movecount is an approximation of Doom's movecount which would keep the
+	// monster moving in some direction for a random amount of time (contrarily
+	// to wolfensteins block based movement). This is simulated since it also
+	// determines when a monster attempts to attack
+	else if(--self->movecount < 0)
+		self->movecount = pr_chase() & 15;
+
 	if(!pathing)
 	{
 		bool inMeleeRange = melee ? CheckMeleeRange(self, players[0].mo, self->speed) : false;
@@ -436,19 +457,32 @@ ACTION_FUNCTION(A_Chase)
 		if(!inMeleeRange && missile)
 		{
 			dodge = false;
-			if (CheckLine(self)) // got a shot at players[0].mo?
+			if (((self->flags & FL_ALWAYSFAST) || self->movecount == 0) && CheckLine(self)) // got a shot at players[0].mo?
 			{
 				self->hidden = false;
 				dx = abs(self->tilex - players[0].mo->tilex);
 				dy = abs(self->tiley - players[0].mo->tiley);
 				dist = dx>dy ? dx : dy;
+				// If we only do ranged attacks, be more aggressive
+				if(!melee)
+				{
+					if(self->missilefrequency >= FRACUNIT)
+						dist -= 2;
+					else
+						// For frequencies less than 1.0 scale back the boost
+						// in aggressiveness. Through the magic that is integer
+						// math, this will become 0 at wolfensteins's frequency
+						// This allows us to approximate Doom's aggressiveness
+						// while not tampering the Wolf probability
+						dist -= (2*self->missilefrequency)>>FRACBITS;
+				}
 
 				if(!(flags & CHF_BACKOFF))
 				{
-					if (dist)
-						chance = self->missilechance/dist;
+					if (dist > 0)
+						chance = 256 - ((208*self->missilefrequency/dist)>>FRACBITS);
 					else
-						chance = 300;
+						chance = 0;
 
 					// If we have a combo attack monster, we want to skip this
 					// check as the monster should try to get melee in.
@@ -459,14 +493,14 @@ ACTION_FUNCTION(A_Chase)
 						{
 							target = abs(self->y - players[0].mo->y);
 							if (target < 0x14000l)
-								chance = 300;
+								chance = 0;
 						}
 					}
 				}
 				else
-					chance = self->missilechance;
+					chance = 256 - ((208*self->missilefrequency)>>FRACBITS);
 
-				if ( pr_chase()<chance)
+				if ( pr_chase() >= MIN<int>(chance, self->minmissilechance))
 				{
 					if(missile)
 						self->SetState(missile);
@@ -484,18 +518,6 @@ ACTION_FUNCTION(A_Chase)
 	{
 		if (!(flags & CHF_NOSIGHTCHECK) && SightPlayer (self, 0, 0, 0, 180))
 			return;
-	}
-
-	if (self->dir == nodir)
-	{
-		if (pathing)
-			SelectPathDir (self);
-		else if (dodge)
-			SelectDodgeDir (self);
-		else
-			SelectChaseDir (self);
-		if (self->dir == nodir)
-			return; // object is blocked in
 	}
 
 	self->angle = dirangle[self->dir];

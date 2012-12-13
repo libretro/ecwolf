@@ -157,7 +157,7 @@ actor Wilhelm : WolfensteinMonster 25
 	points 5000
 	health 950, 1050, 1150, 1300
 	speed 1, 4
-	missilechance 8
+	missilefrequency 0.04
 	seesound "will/sight"
 	deathsound "will/death"
 	attacksound "will/attack"
@@ -233,7 +233,7 @@ actor DeathKnight : WolfensteinMonster 26
 	points 5000
 	health 1250, 1350, 1450, 1600
 	speed 1, 4
-	missilechance 8
+	missilefrequency 0.04
 	seesound "knight/sight"
 	deathsound "knight/death"
 	attacksound "knight/attack"

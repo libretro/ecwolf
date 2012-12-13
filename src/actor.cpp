@@ -414,11 +414,15 @@ void AActor::Serialize(FArchive &arc)
 		<< transy
 		<< sighttime
 		<< sightrandom
-		<< missilechance
+		<< minmissilechance
 		<< painchance;
 
 	if(GameSave::SaveVersion >= 1355183339)
-		arc << meleerange;
+	{
+		arc << missilefrequency
+			<< movecount
+		    << meleerange;
+	}
 
 	arc << activesound
 		<< attacksound

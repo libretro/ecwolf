@@ -3,11 +3,14 @@
 // inherit from this actor for best forwards compatibility.
 actor WolfensteinMonster
 {
+	missilefrequency 0.08
+	minmissilechance 256
 	height 64
 	radius 42
 	painchance 256
 	meleerange 42
 	MONSTER
+	+ALWAYSFAST
 }
 
 actor Guard : WolfensteinMonster 11

@@ -259,16 +259,24 @@ HANDLE_PROPERTY(meleerange)
 	defaults->meleerange = range*(FRACUNIT/64);
 }
 
-HANDLE_PROPERTY(missilechance)
+
+HANDLE_PROPERTY(missilefrequency)
+{
+	FLOAT_PARAM(chance, 0);
+
+	defaults->missilefrequency = fixed(chance*FRACUNIT);
+}
+
+HANDLE_PROPERTY(minmissilechance)
 {
 	INT_PARAM(chance, 0);
 
-	if(chance > 0xFFFF)
-		chance = 0xFFFF;
+	if(chance > 256)
+		chance = 256;
 	else if(chance < 0)
 		chance = 0;
 
-	defaults->missilechance = chance;
+	defaults->minmissilechance = chance;
 }
 
 HANDLE_PROPERTY(movebob)
@@ -466,7 +474,8 @@ extern const PropDef properties[] =
 	DEFINE_PROP(maxamount, Inventory, I),
 	DEFINE_PROP_PREFIX(maxhealth, PlayerPawn, Player, I),
 	DEFINE_PROP(meleerange, Actor, I),
-	DEFINE_PROP(missilechance, Actor, I),
+	DEFINE_PROP(minmissilechance, Actor, I),
+	DEFINE_PROP(missilefrequency, Actor, F),
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP_PREFIX(movebob, PlayerPawn, Player, F),
 	DEFINE_PROP(painchance, Actor, I),

@@ -24,7 +24,8 @@ actor Actor native
 	sighttime 1
 	speed 0
 	points 0
-	missilechance 16
+	minmissilechance 200
+	missilefrequency 1.0
 	meleerange 44
 
 	native int angle;

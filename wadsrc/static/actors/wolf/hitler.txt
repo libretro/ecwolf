@@ -3,7 +3,7 @@ actor FakeHitler : WolfensteinMonster 18
 	points 2000
 	health 200, 300, 400, 500
 	speed 1, 3
-	missilechance 2
+	missilefrequency 0.01
 	deathsound "fake/death"
 	seesound "fake/sight"
 	+AMBUSH
