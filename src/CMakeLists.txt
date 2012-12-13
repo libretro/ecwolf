@@ -96,8 +96,8 @@ endif(NO_GTK)
 
 if(APPLE)
 	set(EXTRA_FILES
-		SDLMain.m
-		wl_iwad_picker_cocoa.mm
+		macosx/SDLMain.m
+		macosx/wl_iwad_picker_cocoa.mm
 	)
 
 	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.txt)

@@ -643,6 +643,17 @@ void Quit (const char *errorStr, ...)
 	exit(0);
 }
 
+void I_Error(const char* format, ...)
+{
+	va_list vlist;
+	va_start(vlist, format);
+	FString error;
+	error.VFormat(format, vlist);
+	va_end(vlist);
+
+	throw CRecoverableError(error);
+}
+
 //==========================================================================
 
 /*

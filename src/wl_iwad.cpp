@@ -465,7 +465,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	FString dataPaths;
 	if(config.GetSetting("BaseDataPaths") == NULL)
 	{
-		dataPaths = ".";
+		dataPaths = ".;$PROGDIR";
 #if !defined(__APPLE__)
 		dataPaths += FString(";") + config.GetConfigDir();
 #else
