@@ -47,7 +47,7 @@ static const dirtype diagonal[9][9] =
 };
 
 bool TryWalk (AActor *ob);
-void    MoveObj (AActor *ob, int32_t move);
+bool MoveObj (AActor *ob, int32_t move);
 
 void    FirstSighting (AActor *ob);
 
@@ -539,7 +539,7 @@ void SelectRunDir (AActor *ob)
 =================
 */
 
-void MoveObj (AActor *ob, int32_t move)
+bool MoveObj (AActor *ob, int32_t move)
 {
 	switch (ob->dir)
 	{
@@ -573,7 +573,7 @@ void MoveObj (AActor *ob, int32_t move)
 			break;
 
 		case nodir:
-			return;
+			return true;
 
 		default:
 			Printf ("MoveObj: bad dir!");
@@ -586,7 +586,7 @@ void MoveObj (AActor *ob, int32_t move)
 	if (map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
 	{
 		fixed r = ob->radius + players[0].mo->radius;
-		if (ob->hidden || abs(ob->x - players[0].mo->x) > r || abs(ob->y - players[0].mo->y) > r)
+		if (abs(ob->x - players[0].mo->x) > r || abs(ob->y - players[0].mo->y) > r)
 			goto moveok;
 
 		if (ob->GetClass()->Meta.GetMetaInt(AMETA_Damage) >= 0)
@@ -627,9 +627,9 @@ void MoveObj (AActor *ob, int32_t move)
 				break;
 
 			case nodir:
-				return;
+				return false;
 		}
-		return;
+		return false;
 	}
 moveok:
 	ob->distance -=move;
@@ -647,6 +647,8 @@ moveok:
 			abs(ob->y - check->y) <= r)
 			check->Touch(ob);
 	}
+
+	return true;
 }
 
 /*

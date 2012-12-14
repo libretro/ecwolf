@@ -15,7 +15,7 @@ bool TryWalk (AActor *ob);
 void    SelectChaseDir (AActor *ob);
 void    SelectDodgeDir (AActor *ob);
 void    SelectRunDir (AActor *ob);
-void    MoveObj (AActor *ob, int32_t move);
+bool MoveObj (AActor *ob, int32_t move);
 bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov);
 
 void    DamageActor (AActor *ob, unsigned damage);

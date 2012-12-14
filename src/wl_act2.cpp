@@ -502,8 +502,7 @@ ACTION_FUNCTION(A_Chase)
 
 				if ( pr_chase() >= MIN<int>(chance, self->minmissilechance))
 				{
-					if(missile)
-						self->SetState(missile);
+					self->SetState(missile);
 					return;
 				}
 				dodge = !(flags & CHF_DONTDODGE);
@@ -543,7 +542,12 @@ ACTION_FUNCTION(A_Chase)
 
 		if (move < self->distance)
 		{
-			MoveObj (self,move);
+			if(!MoveObj (self,move) && !(flags & CHF_DONTDODGE))
+			{
+				// Touched the player so turn around!
+				self->dir = dirtype((self->dir+4)%8);
+				self->distance = FRACUNIT-self->distance;
+			}
 			break;
 		}
 
@@ -559,6 +563,9 @@ ACTION_FUNCTION(A_Chase)
 
 		move -= self->distance;
 
+		dx = abs(self->tilex - players[0].mo->tilex);
+		dy = abs(self->tiley - players[0].mo->tiley);
+		dist = dx>dy ? dx : dy;
 		if (pathing)
 			SelectPathDir (self);
 		else if ((flags & CHF_BACKOFF) && dist < 4)
