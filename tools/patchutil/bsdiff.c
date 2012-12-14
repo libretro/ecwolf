@@ -44,22 +44,7 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c,v 1.1 2005/08/06 01:59:05
 #include <stdarg.h>
 #define ftello ftell
 #define fseeko fseek
-void errx(int ec, const char* message, ...)
-{
-	va_list args;
-	va_start(args, message);
-	vfprintf(stderr, message, args);
-	va_end(args);
-	exit(ec);
-}
-void err(int ec, const char* message, ...)
-{
-	va_list args;
-	va_start(args, message);
-	vfprintf(stderr, message, args);
-	va_end(args);
-	exit(ec);
-}
+typedef unsigned char u_char;
 #else
 #define O_BINARY 0
 #define O_NOINHERIT 0
@@ -271,7 +256,7 @@ int diff(int argc,char *argv[])
 	eblen=0;
 
 	/* Create the patch file */
-	if ((pf = fopen(argv[3], "w")) == NULL)
+	if ((pf = fopen(argv[3], "wb")) == NULL)
 		err(1, "%s", argv[3]);
 
 	/* Header is

@@ -13,7 +13,7 @@
 #include <zlib.h>
 #include <sys/stat.h>
 //#include <sys/mman.h>
-//#include <dirent.h>
+#include <dirent.h>
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #define START(x) static const unsigned char x[] = {
@@ -323,42 +323,38 @@ int main(int argc, char* argv[])
 			out << "\t\t{" << crc << ", " << (int) fileInfo->st_size << ", \"" << file->d_name << "\"},\n";
 			delete fileInfo;
 		}
-		out << "\t},\n\t-1,\n\t\"" << argv[2] << "\"\n}\n";
+		out << "\t},\n\t\"" << argv[2] << "\"\n}\n";
+		out.close();
 
 		closedir(oldDir);
 
+		FILE *outf = fopen("patch.txt", "ab");
 		const char* dargs[4] = {"patchutil", "", "", "tmp"};
 		for(list<string>::const_iterator iter = fileList.begin();iter != fileList.end();iter++)
 		{
-			out << "//" << *iter << "\n";
+			fprintf(outf, "//%s\n", iter->c_str());
 			string oldFile = string("old/") + *iter;
 			string newFile = string("new/") + *iter;
 			dargs[1] = oldFile.c_str();
 			dargs[2] = newFile.c_str();
 			diff(4, (char**)dargs);
 
-			fstream in("tmp", ios_base::in|ios_base::binary);
+			FILE *in = fopen("tmp", "rb");
 			char data[4096];
-			short position = 0;
-			while(!in.eof())
+			while(feof(in) == 0)
 			{
-				in.read(data, 4096);
-				for(int i = 0;i < in.gcount();i++)
+				size_t byteCount = fread(data, 1, 4096, in);
+				for(int i = 0;i < byteCount;i++)
 				{
-					short initPosition = position;
-					position += 2 + (data[i] == 0 ? 0 : static_cast<int>(log10((unsigned char)(data[i]))));
-					if(position > 80)
-					{
-						out << "\n";
-						position -= initPosition;
-					}
-					out << (unsigned int)(unsigned char)data[i] << ",";
+					fprintf(outf, "0x%02X,", (unsigned char)data[i]);
+					if(i%16 == 15)
+						fprintf(outf, "\n");
 				}
 			}
-			in.close();
-			out << "\n";
+			fclose(in);
+			fprintf(outf, "\n");
 		}
-		out.close();
+		fclose(outf);
 		return 0;
 	}
 #endif
