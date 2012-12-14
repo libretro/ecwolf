@@ -591,6 +591,8 @@ protected:
 		else if(key.CompareNoCase("messagecolors") == 0)
 			// Background, Top Color, Bottom Color
 			ParseColorArrayAssignment(gameinfo.MessageColors, 3);
+		else if(key.CompareNoCase("messagefontcolor") == 0)
+			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::MESSAGEFONT]);
 		else if(key.CompareNoCase("titlemusic") == 0)
 			ParseStringAssignment(gameinfo.TitleMusic);
 		else if(key.CompareNoCase("titlepalette") == 0)

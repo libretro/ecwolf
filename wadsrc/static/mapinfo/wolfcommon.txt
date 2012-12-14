@@ -22,6 +22,7 @@ gameinfo
 	playerclasses = "BJPlayer"
 	border = inset, "00 00 00", "00 70 70", "00 84 84"
 	messagecolors = "8C 8C 8C", "D0 D0 D0", "0 0 0"
+	messagefontcolor = "Black"
 	menuwindowcolors = "8C 8C 8C", "D0 D0 D0", "0 0 0", "FC F4 00", "B4 AC 00", "0 0 0"
 	doorsoundsequence = "DoorNormal"
 	pushwallsoundsequence = "PushwallNormal"

@@ -966,7 +966,7 @@ int Confirm (const char *string)
 				case 1:
 					PrintX = x;
 					PrintY = y;
-					US_Print (BigFont, "_");
+					US_Print (BigFont, "_", gameinfo.FontColors[GameInfo::MESSAGEFONT]);
 			}
 			VW_UpdateScreen ();
 			tick ^= 1;
@@ -1018,7 +1018,7 @@ void Message (const char *string)
 
 	DrawWindow (WindowX - 5, PrintY - 5, width + 10, height + 10, MESSAGE_BG);
 	DrawOutline (WindowX - 5, PrintY - 5, width + 10, height + 10, BOTBRDR, TOPBRDR);
-	US_Print (BigFont, string, CR_UNTRANSLATED);
+	US_Print (BigFont, string, gameinfo.FontColors[GameInfo::MESSAGEFONT]);
 	VW_UpdateScreen ();
 }
 
