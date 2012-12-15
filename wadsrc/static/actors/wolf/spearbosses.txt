@@ -79,7 +79,7 @@ actor UberMutant : WolfensteinMonster 24
 	states
 	{
 		Spawn:
-			UBER A -1 A_Look(0, 0, 0, 0, 360)
+			UBER A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			UBER A 5 NOP A_Chase
