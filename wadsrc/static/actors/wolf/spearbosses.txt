@@ -119,7 +119,7 @@ actor TheAxe : UberMutant 101
 	states
 	{
 		Spawn:
-			MAXE A -1 A_Look(0, 0, 0, 0, 360)
+			MAXE A -1 NOP A_Look(0, 0, 0, 0, 360)
 			stop
 		See:
 			MAXE A 5 NOP A_Chase
