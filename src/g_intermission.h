@@ -48,6 +48,12 @@ public:
 		unsigned int	Y;
 	};
 
+	IntermissionAction()
+	{
+		// Invalid background means use previous.
+		Background.SetInvalid();
+	}
+
 	FTextureID			Background;
 	TArray<DrawData>	Draw;
 	FString				Music;
