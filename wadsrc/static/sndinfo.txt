@@ -184,9 +184,10 @@ knight/attack			{ DSBOSSFR ALBOSSFR PCBOSSFR }
 knight/sight			{ DSKNTSIT ALKNTSIT PCKNTSIT }
 knight/death			{ DSKNTDTH ALKNTDTH PCKNTDTH }
 
-angel/breath			{ NULL ALAGLBTH PCAGLBTH }
+angel/breath			{ NULL ALAGLACT PCAGLACT }
 angel/sight				{ DSAGLSIT ALAGLSIT PCAGLSIT }
 angel/death				{ DSAGLDTH ALAGLDTH PCAGLDTH }
+angel/attack			{ NULL ALAGLATK PCAGLATK }
 
 subwilly/attack			{ DSLBSSFR ALBOSSFR PCBOSSFR }
 subwilly/sight			{ DSSUBSIT ALTRASIT PCTRASIT }
@@ -203,7 +204,8 @@ robot/attack			{ DSLBSSFR ALBOSSFR PCBOSSFR }
 robot/sight				{ DSROBSIT ALKNTSIT PCKNTSIT }
 robot/death				{ DSROBDTH ALKNTDTH PCKNTDTH }
 
-devil/breath			{ NULL ALAGLBTH PCAGLBTH }
+$alias devil/breath angel/breath
+$alias devil/attack angel/attack
 devil/sight				{ DSDVLSIT ALAGLSIT PCAGLSIT }
 devil/death				{ DSDVLDTH ALAGLDTH PCAGLDTH }
 

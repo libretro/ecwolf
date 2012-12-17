@@ -83,13 +83,13 @@ actor DevilIncarnate : AngelOfDeath 103
 			DEVL E 5 A_CustomMissile("EnergyBall")
 			// TODO: When sound attenuation is supported, make this play at full volume.
 			DEVL G 20
-			DEVL H 20 A_PlaySound("angel/breath")
+			DEVL H 20 A_PlaySound("devil/breath")
 			DEVL G 20
-			DEVL H 20 A_PlaySound("angel/breath")
+			DEVL H 20 A_PlaySound("devil/breath")
 			DEVL G 20
-			DEVL H 20 A_PlaySound("angel/breath")
+			DEVL H 20 A_PlaySound("devil/breath")
 			DEVL G 20
-			DEVL G 0 A_PlaySound("angel/breath")
+			DEVL G 0 A_PlaySound("devil/breath")
 			goto See
 		Death:
 			DEVL A .5 A_Fall
@@ -117,6 +117,7 @@ actor Spark
 }
 actor EnergyBall : Spark
 {
+	seesound "devil/attack"
 	states
 	{
 		Spawn:

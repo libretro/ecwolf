@@ -38,6 +38,7 @@
 #include "gamemap.h"
 #include "g_mapinfo.h"
 #include "id_ca.h"
+#include "id_sd.h"
 #include "thinker.h"
 #include "thingdef/thingdef.h"
 #include "thingdef/thingdef_expression.h"
@@ -562,6 +563,10 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 		if(snd)
 			actor->deathsound = snd;
 	}
+
+	if(actor->flags & FL_MISSILE)
+		PlaySoundLocActor(actor->seesound, actor);
+
 	return actor;
 }
 
