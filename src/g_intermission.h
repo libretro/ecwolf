@@ -48,7 +48,7 @@ public:
 		unsigned int	Y;
 	};
 
-	IntermissionAction()
+	IntermissionAction() : Time(0)
 	{
 		// Invalid background means use previous.
 		Background.SetInvalid();
