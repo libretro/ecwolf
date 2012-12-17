@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <zlib.h>
 #include "bzlib.h"
+#ifndef FILES_NO_LZMA
 #include "LzmaDec.h"
+#endif
 #include "wl_def.h"
 #include "m_swap.h"
 
@@ -254,6 +256,7 @@ private:
 	FileReaderBZ2 &operator= (const FileReaderBZ2 &) { return *this; }
 };
 
+#ifndef FILES_NO_LZMA
 // Wraps around a FileReader to decompress a lzma stream
 class FileReaderLZMA : public FileReaderBase
 {
@@ -318,6 +321,7 @@ private:
 
 	FileReaderLZMA &operator= (const FileReaderLZMA &) { return *this; }
 };
+#endif
 
 class MemoryReader : public FileReader
 {
