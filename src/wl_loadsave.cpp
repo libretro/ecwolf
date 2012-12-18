@@ -237,7 +237,7 @@ void SetupSaveGames()
 {
 	char title[MAX_SAVENAME+1];
 
-	File saveDirectory("./");
+	File saveDirectory(savedir);
 	const TArray<FString> &files = saveDirectory.getFileList();
 
 	for(unsigned int i = 0;i < files.Size();i++)
