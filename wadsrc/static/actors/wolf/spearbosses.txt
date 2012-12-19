@@ -106,8 +106,8 @@ actor UberMutant : WolfensteinMonster 24
 		Death:
 			UBER A .5 A_Fall
 			UBER A 35 A_Scream
-			UBER HIJK 7.5
-			UBER L -1
+			UBER IJKL 7.5
+			UBER M -1
 			stop
 	}
 }
@@ -146,8 +146,8 @@ actor TheAxe : UberMutant 101
 		Death:
 			MAXE A .5 A_Fall
 			MAXE A 35 A_Scream
-			MAXE HIJK 7.5
-			MAXE L -1
+			MAXE IJKL 7.5
+			MAXE M -1
 			stop
 	}
 }
