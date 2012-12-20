@@ -90,6 +90,7 @@ void    FirstSighting (AActor *ob);
 ==================================
 */
 
+// Returns 1 - Wait for Door, 0 - Blocked, -1 - Continue checks
 static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTrigger::Side dir, bool canuse)
 {
 	MapSpot spot = map->GetSpot(x, y, 0);
@@ -119,10 +120,15 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 	{
 		// We want to check where the actor is heading instead of the exact
 		// tile it exists in since this is essentially how Wolf3D handled things
+		// We must first determine if the monster has moved into the destination
+		// tile or not.  (Half way to destination.)
+
+		const dirtype offsetDir = iter->Item()->distance >= TILEGLOBAL/2 ? iter->Item()->dir : nodir;
+
 		// Players need not be checked
 		if(iter->Item() != ob && !iter->Item()->player && (iter->Item()->flags & FL_SOLID) &&
-			static_cast<unsigned int>(iter->Item()->tilex+dirdeltax[iter->Item()->dir]) == x &&
-			static_cast<unsigned int>(iter->Item()->tiley+dirdeltax[iter->Item()->dir]) == y)
+			static_cast<unsigned int>(iter->Item()->tilex+dirdeltax[offsetDir]) == x &&
+			static_cast<unsigned int>(iter->Item()->tiley+dirdeltay[offsetDir]) == y)
 			return 0;
 	}
 	return -1;
@@ -209,7 +215,7 @@ bool TryWalk (AActor *ob)
 			assert(ob->dir <= nodir);
 	}
 
-	ob->EnterZone(map->GetSpot(ob->tilex, ob->tiley, 0)->zone);
+	ob->EnterZone(map->GetSpot(zonex, zoney, 0)->zone);
 
 	ob->distance = TILEGLOBAL;
 	return true;

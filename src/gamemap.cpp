@@ -396,6 +396,10 @@ void GameMap::SpawnThings() const
 			{
 				actor->flags |= FL_PATHING;
 				actor->dir = dirtype(actor->angle/ANGLE_45);
+
+				// Pathing monsters should take at least a one tile step.
+				// Otherwise the paths will break early.
+				actor->distance = TILEGLOBAL;
 				if(actor->PathState)
 					actor->SetState(actor->PathState, true);
 			}

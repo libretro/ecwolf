@@ -403,8 +403,6 @@ bool CheckMeleeRange(AActor *inflictor, AActor *inflictee, fixed range)
 
 void SelectPathDir (AActor *ob)
 {
-	ob->distance = TILEGLOBAL;
-
 	if (!TryWalk (ob))
 		ob->dir = nodir;
 }
