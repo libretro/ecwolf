@@ -512,7 +512,6 @@ void CreateMenus()
 }
 
 static int SoundStatus = 1;
-static int pickquick;
 static char SaveName[13] = "savegam?.";
 
 ////////////////////////////////////////////////////////////////////
@@ -671,7 +670,7 @@ int CP_CheckQuick (ScanCode scancode)
 			if (Confirm (language["ENDGAMESTR"]))
 			{
 				playstate = ex_died;
-				pickquick = players[0].lives = 0;
+				players[0].lives = 0;
 				players[0].killerobj = NULL;
 			}
 
@@ -722,9 +721,10 @@ int CP_EndGame (int)
 	mainMenu.draw();
 	if(!res) return 0;
 
-	pickquick = players[0].lives = 0;
+	players[0].lives = 0;
 	playstate = ex_died;
 	players[0].killerobj = NULL;
+	players[0].mo->Die();
 
 	return 1;
 }

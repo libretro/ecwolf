@@ -86,16 +86,20 @@ TArray<SaveFile> SaveFile::files;
 
 static bool quickSaveLoad = false;
 
-static inline FILE *OpenSaveFile(const FString &filename, const char* mode)
+static inline FString GetFullSaveFileName(const FString &filename)
 {
-	FString dir = savedir ? FString(savedir) : config.GetConfigDir();
+	static FString dir = savedir ? FString(savedir) : config.GetConfigDir();
 #ifdef _WIN32
 	dir += "\\";
 #else
 	dir += "/";
 #endif
 
-	return fopen(dir + filename, mode);
+	return dir + filename;
+}
+static inline FILE *OpenSaveFile(const FString &filename, const char* mode)
+{
+	return fopen(GetFullSaveFileName(filename), mode);
 }
 
 #define MAX_SAVENAME 31
@@ -159,7 +163,7 @@ public:
 					FILE *file = OpenSaveFile(saveFile.filename, "rb");
 					if(file && (png = M_VerifyPNG(file)))
 					{
-						FTexture *savePicture = PNGTexture_CreateFromFile(png, saveFile.filename);
+						FTexture *savePicture = PNGTexture_CreateFromFile(png, GetFullSaveFileName(saveFile.filename));
 						VWB_DrawGraphic(savePicture, SAVEPICX, SAVEPICY, SAVEPICW, SAVEPICH, MENU_CENTER);
 
 						char* creationTime = M_GetPNGText(png, "Creation Time");
@@ -240,7 +244,7 @@ void SetupSaveGames()
 {
 	char title[MAX_SAVENAME+1];
 
-	File saveDirectory(savedir);
+	File saveDirectory(savedir ? FString(savedir) : config.GetConfigDir());
 	const TArray<FString> &files = saveDirectory.getFileList();
 
 	for(unsigned int i = 0;i < files.Size();i++)
@@ -362,7 +366,6 @@ MENU_LISTENER(PerformSaveGame)
 		// Locate a available filename.  I don't want to assume savegamX.yza so this
 		// might not be the fastest way to do things.
 		bool nextSaveNumber = false;
-		File saveDirectory(savedir);
 		for(unsigned int i = 0;i < 10000;i++)
 		{
 			file.filename.Format("savegam%u.ecs", i);
