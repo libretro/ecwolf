@@ -76,6 +76,7 @@ struct SaveFile
 	public:
 		static TArray<SaveFile>	files;
 
+		bool	hide;
 		bool	hasFiles;
 		bool	oldVersion;
 		FString	name; // Displayed on the menu.
@@ -110,8 +111,10 @@ static inline FILE *OpenSaveFile(const FString &filename, const char* mode)
 class SaveSlotMenuItem : public TextInputMenuItem
 {
 public:
-	SaveSlotMenuItem(const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false)
-		: TextInputMenuItem(text, max, preeditListener, posteditListener, clearFirst)
+	const unsigned int slotIndex;
+
+	SaveSlotMenuItem(unsigned int slotIndex, const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false)
+		: TextInputMenuItem(text, max, preeditListener, posteditListener, clearFirst), slotIndex(slotIndex)
 	{
 	}
 
@@ -139,7 +142,7 @@ public:
 
 			if(curPos >= 0)
 			{
-				SaveFile &saveFile = SaveFile::files[curPos];
+				SaveFile &saveFile = SaveFile::files[slotIndex];
 
 				if(saveFile.oldVersion)
 				{
@@ -281,7 +284,7 @@ void SetupSaveGames()
 				}
 
 				checkFile = M_GetPNGText(png, "Game WAD");
-				bool hasGameWad = true;
+				sFile.hide = false;
 				if(checkFile)
 				{
 					FString checkString(checkFile);
@@ -292,7 +295,7 @@ void SetupSaveGames()
 						nextIndex = checkString.IndexOf(';', lastIndex);
 						if(Wads.CheckIfWadLoaded(checkString.Mid(lastIndex, nextIndex-lastIndex)) < 0)
 						{
-							hasGameWad = false;
+							sFile.hide = true;
 							break;
 						}
 						lastIndex = nextIndex + 1;
@@ -301,7 +304,7 @@ void SetupSaveGames()
 					delete[] checkFile;
 				}
 
-				if(hasGameWad && M_GetPNGText(png, "Title", title, MAX_SAVENAME))
+				if(M_GetPNGText(png, "Title", title, MAX_SAVENAME))
 				{
 					sFile.name = title;
 					SaveFile::files.Push(sFile);
@@ -317,20 +320,22 @@ void SetupSaveGames()
 	loadGame.clear();
 	saveGame.clear();
 
-	MenuItem *newSave = new SaveSlotMenuItem(NEW_SAVE, 31, NULL, PerformSaveGame, true);
+	MenuItem *newSave = new SaveSlotMenuItem(0, NEW_SAVE, 31, NULL, PerformSaveGame, true);
 	newSave->setHighlighted(true);
 	saveGame.addItem(newSave);
 
 	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
 	{
-		MenuItem *item = new SaveSlotMenuItem(SaveFile::files[i].name, 31, LoadSaveGame);
+		MenuItem *item = new SaveSlotMenuItem(i, SaveFile::files[i].name, 31, LoadSaveGame);
 		if(SaveFile::files[i].oldVersion || !SaveFile::files[i].hasFiles)
 			item->setHighlighted(2);
+		item->setVisible(!SaveFile::files[i].hide);
 		loadGame.addItem(item);
 
-		item = new SaveSlotMenuItem(SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame);
+		item = new SaveSlotMenuItem(i, SaveFile::files[i].name, 31, BeginEditSave, PerformSaveGame);
 		if(SaveFile::files[i].oldVersion || !SaveFile::files[i].hasFiles)
 			item->setHighlighted(2);
+		item->setVisible(!SaveFile::files[i].hide);
 		saveGame.addItem(item);
 	}
 }
@@ -357,6 +362,7 @@ MENU_LISTENER(PerformSaveGame)
 		// Locate a available filename.  I don't want to assume savegamX.yza so this
 		// might not be the fastest way to do things.
 		bool nextSaveNumber = false;
+		File saveDirectory(savedir);
 		for(unsigned int i = 0;i < 10000;i++)
 		{
 			file.filename.Format("savegam%u.ecs", i);
@@ -378,8 +384,9 @@ MENU_LISTENER(PerformSaveGame)
 
 		SaveFile::files.Push(file);
 
-		loadGame.addItem(new SaveSlotMenuItem(file.name, 31, LoadSaveGame));
-		saveGame.addItem(new SaveSlotMenuItem(file.name, 31, BeginEditSave, PerformSaveGame));
+		unsigned int slotIndex = loadGame.getNumItems();
+		loadGame.addItem(new SaveSlotMenuItem(slotIndex, file.name, 31, LoadSaveGame));
+		saveGame.addItem(new SaveSlotMenuItem(slotIndex, file.name, 31, BeginEditSave, PerformSaveGame));
 
 		saveGame.setCurrentPosition(saveGame.getNumItems()-1);
 		loadGame.setCurrentPosition(saveGame.getNumItems()-1);
@@ -388,10 +395,12 @@ MENU_LISTENER(PerformSaveGame)
 	}
 	else
 	{
-		file.filename = SaveFile::files[which-1].filename;
-		SaveFile::files[which-1] = file;
+		SaveSlotMenuItem *menuItem = static_cast<SaveSlotMenuItem *> (loadGame.getIndex(which-1));
+
+		file.filename = SaveFile::files[menuItem->slotIndex].filename;
+		SaveFile::files[menuItem->slotIndex] = file;
 		loadGame.setCurrentPosition(which-1);
-		static_cast<SaveSlotMenuItem *> (loadGame.getIndex(which-1))->setValue(file.name);
+		menuItem->setValue(file.name);
 
 		// Ungreen
 		saveGame.getIndex(which)->setHighlighted(0);
@@ -408,11 +417,13 @@ MENU_LISTENER(PerformSaveGame)
 
 MENU_LISTENER(LoadSaveGame)
 {
-	if(SaveFile::files[which].oldVersion || !SaveFile::files[which].hasFiles)
+	SaveSlotMenuItem *menuItem = static_cast<SaveSlotMenuItem *> (loadGame.getIndex(which));
+
+	if(SaveFile::files[menuItem->slotIndex].oldVersion || !SaveFile::files[menuItem->slotIndex].hasFiles)
 		return false;
 
 	loadedgame = true;
-	Load(SaveFile::files[which].filename);
+	Load(SaveFile::files[menuItem->slotIndex].filename);
 	
 	ShootSnd();
 	if(!quickSaveLoad)

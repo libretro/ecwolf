@@ -397,12 +397,9 @@ void AActor::Serialize(FArchive &arc)
 		<< y
 		<< velx
 		<< vely
-		<< angle;
-
-	if(GameSave::SaveVersion >= 1351084906)
-		arc << pitch;
-
-	arc << health
+		<< angle
+		<< pitch
+		<< health
 		<< speed
 		<< runspeed
 		<< points
@@ -416,16 +413,11 @@ void AActor::Serialize(FArchive &arc)
 		<< sighttime
 		<< sightrandom
 		<< minmissilechance
-		<< painchance;
-
-	if(GameSave::SaveVersion >= 1355183339)
-	{
-		arc << missilefrequency
-			<< movecount
-		    << meleerange;
-	}
-
-	arc << activesound
+		<< painchance
+		<< missilefrequency
+		<< movecount
+		<< meleerange
+		<< activesound
 		<< attacksound
 		<< deathsound
 		<< seesound
