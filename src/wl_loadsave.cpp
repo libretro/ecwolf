@@ -88,7 +88,7 @@ static bool quickSaveLoad = false;
 
 static inline FString GetFullSaveFileName(const FString &filename)
 {
-	static FString dir = savedir ? FString(savedir) : config.GetConfigDir();
+	FString dir = savedir ? FString(savedir) : config.GetConfigDir();
 #ifdef _WIN32
 	dir += "\\";
 #else
@@ -240,8 +240,9 @@ static void DrawLSAction (int which)
 // SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
 //
 ////////////////////////////////////////////////////////////////////
-void SetupSaveGames()
+bool SetupSaveGames()
 {
+	bool canLoad = false;
 	char title[MAX_SAVENAME+1];
 
 	File saveDirectory(savedir ? FString(savedir) : config.GetConfigDir());
@@ -302,6 +303,8 @@ void SetupSaveGames()
 							sFile.hide = true;
 							break;
 						}
+						else
+							canLoad = true;
 						lastIndex = nextIndex + 1;
 					}
 					while(nextIndex != -1);
@@ -342,6 +345,8 @@ void SetupSaveGames()
 		item->setVisible(!SaveFile::files[i].hide);
 		saveGame.addItem(item);
 	}
+
+	return canLoad;
 }
 
 MENU_LISTENER(BeginEditSave)
@@ -440,13 +445,13 @@ MENU_LISTENER(LoadSaveGame)
 
 void InitMenus()
 {
-	SetupSaveGames();
+	bool canLoad = SetupSaveGames();
 
 	loadGame.setHeadPicture("M_LOADGM");
 	saveGame.setHeadPicture("M_SAVEGM");
 
 	loadItem = new MenuSwitcherMenuItem(language["STR_LG"], GameSave::GetLoadMenu());
-	loadItem->setEnabled(SaveFile::files.Size() > 0);
+	loadItem->setEnabled(canLoad);
 	saveItem = new MenuSwitcherMenuItem(language["STR_SG"], GameSave::GetSaveMenu());
 	saveItem->setEnabled(false);
 }
