@@ -437,9 +437,6 @@ ACTION_FUNCTION(A_Chase)
 			SelectChaseDir (self);
 
 		self->movecount = pr_chase() & 15;
-
-		if (self->dir == nodir)
-			return; // object is blocked in
 	}
 	// Movecount is an approximation of Doom's movecount which would keep the
 	// monster moving in some direction for a random amount of time (contrarily
@@ -516,6 +513,9 @@ ACTION_FUNCTION(A_Chase)
 		if (!(flags & CHF_NOSIGHTCHECK) && SightPlayer (self, 0, 0, 0, 180))
 			return;
 	}
+
+	if(self->dir == nodir)
+		return; // object is blocked in
 
 	self->angle = dirangle[self->dir];
 	move = self->speed;
