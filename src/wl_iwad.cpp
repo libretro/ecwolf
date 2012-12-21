@@ -258,6 +258,14 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 		}
 	}
 
+	LumpRemapper::ClearRemaps();
+}
+
+/**
+ * Remove any iwads which depend on another, but the other isn't present.
+ */
+static void CheckForExpansionRequirements(TArray<WadStuff> &iwads)
+{
 	for(unsigned int i = iwads.Size();i-- > 0;)
 	{
 		const FString &req = iwadTypes[iwads[i].Type].Required;
@@ -280,8 +288,6 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 				iwads.Delete(i);
 		}
 	}
-
-	LumpRemapper::ClearRemaps();
 }
 
 static void ParseIWad(Scanner &sc)
@@ -545,6 +551,10 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 #endif
 
 	delete datawadRes;
+
+	// Check requirements now as opposed to with LookForGameData so that reqs
+	// don't get loaded multiple times.
+	CheckForExpansionRequirements(basefiles);
 
 	if(basefiles.Size() == 0)
 	{
