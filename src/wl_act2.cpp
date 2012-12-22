@@ -540,7 +540,7 @@ ACTION_FUNCTION(A_Chase)
 
 		if (move < self->distance)
 		{
-			if(!MoveObj (self,move) && !(flags & CHF_DONTDODGE))
+			if(!MoveObj (self,move) && !(flags & CHF_DONTDODGE) && !(self->flags & FL_PATHING))
 			{
 				// Touched the player so turn around!
 				self->dir = dirtype((self->dir+4)%8);

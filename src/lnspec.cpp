@@ -571,6 +571,20 @@ class EVVictorySpin : public Thinker
 					doturn = false;
 			}
 
+			// Keep the runner in line with the player (A_Chase will try to tile align)
+			switch(runner->dir)
+			{
+				case north:
+				case south:
+					runner->x = activator->x;
+					break;
+				case east:
+				case west:
+					runner->y = activator->y;
+					break;
+				default: break;
+			}
+
 			if(dist > 0)
 			{
 				static const unsigned int speed = 4096;
