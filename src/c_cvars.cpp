@@ -46,6 +46,7 @@ bool forcegrabmouse = false;
 bool r_depthfog = false;
 bool vid_fullscreen = false;
 bool quitonescape = false;
+fixed movebob = FRACUNIT;
 
 void FinalReadConfig()
 {
@@ -106,6 +107,7 @@ void ReadConfig(void)
 	config.CreateSetting("ScreenWidth", screenWidth);
 	config.CreateSetting("ScreenHeight", screenHeight);
 	config.CreateSetting("QuitOnEscape", quitonescape);
+	config.CreateSetting("MoveBob", FRACUNIT);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -147,6 +149,7 @@ void ReadConfig(void)
 	screenWidth = config.GetSetting("ScreenWidth")->GetInteger();
 	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
+	movebob = config.GetSetting("MoveBob")->GetInteger();
 
 	char hsName[50];
 	char hsScore[50];
@@ -233,6 +236,7 @@ void WriteConfig(void)
 	config.GetSetting("ScreenWidth")->SetValue(screenWidth);
 	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
+	config.GetSetting("MoveBob")->SetValue(movebob);
 
 	char hsName[50];
 	char hsScore[50];

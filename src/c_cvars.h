@@ -59,5 +59,6 @@ extern bool		r_depthfog;
 extern bool		vid_fullscreen;
 extern Aspect	vid_aspect;
 extern bool		quitonescape;
+extern fixed	movebob;
 
 #endif /* __C_CVARS__ */

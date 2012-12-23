@@ -34,6 +34,7 @@
 
 #include "a_inventory.h"
 #include "a_playerpawn.h"
+#include "c_cvars.h"
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
 #include "wl_game.h"
@@ -226,12 +227,12 @@ void APlayerPawn::Tick()
 	// This also fixes the bug where you can "stick" a weapon off-center by
 	// shooting it when it's at the peak of its swing.
 	static fixed curbob = 0;
-	const fixed movebob = GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
+	const fixed playerMovebob = GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
 
-	if(movebob)
+	if(playerMovebob)
 	{
 		static const fixed MAXBOB = 0x100000;
-		fixed bobtarget = FixedMul(thrustspeed << 8, movebob);
+		fixed bobtarget = FixedMul(FixedMul(thrustspeed << 8, playerMovebob), movebob);
 		if(bobtarget > MAXBOB)
 			bobtarget = MAXBOB;
 
