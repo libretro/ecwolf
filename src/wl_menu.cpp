@@ -667,12 +667,7 @@ int CP_CheckQuick (ScanCode scancode)
 		//
 		case sc_F7:
 			WindowH = 160;
-			if (Confirm (language["ENDGAMESTR"]))
-			{
-				playstate = ex_died;
-				players[0].lives = 0;
-				players[0].killerobj = NULL;
-			}
+			CP_EndGame(0);
 
 			WindowH = 200;
 			return 1;
