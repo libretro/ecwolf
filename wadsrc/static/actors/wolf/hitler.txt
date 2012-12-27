@@ -120,8 +120,8 @@ actor Hitler : WolfensteinMonster
 			HTLR A 70 A_Scream
 			HTLR H 5
 			HTLR I 5 A_PlaySound("misc/slurpie") // TODO: Full volume with attenuation
-			HTLR JKLM 5
-			HTLR N -1 A_BossDeath
+			HTLR JKLMN 5
+			HTLR O -1 A_BossDeath
 			stop
 	}
 }
