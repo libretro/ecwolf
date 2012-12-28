@@ -758,7 +758,7 @@ actor WellWithBlood 87
 	states
 	{
 		Spawn:
-			CAG3 A -1
+			WEL3 A -1
 			stop
 	}
 }
