@@ -1,4 +1,5 @@
 #include "g_shared/a_deathcam.h"
+#include "g_shared/a_playerpawn.h"
 #include "actor.h"
 #include "id_ca.h"
 #include "id_in.h"
@@ -61,6 +62,17 @@ void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
 
 	GetThinker()->SetPriority(ThinkerList::VICTORY);
 	actor->GetThinker()->SetPriority(ThinkerList::VICTORY);
+}
+
+void ADeathCam::Tick()
+{
+	if(gamestate.victoryflag)
+	{
+		if(killer->player)
+			barrier_cast<APlayerPawn *>(killer)->TickPSprites();
+	}
+
+	Super::Tick();
 }
 
 ACTION_FUNCTION(A_FinishDeathCam)

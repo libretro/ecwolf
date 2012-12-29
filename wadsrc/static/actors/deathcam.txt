@@ -5,7 +5,10 @@ actor DeathCam native
 	states
 	{
 		Spawn:
-			TNT1 A 1 // Small delay for the sake of animation.
+			// This delays the start of the deathcam sequence. Like vanilla
+			// we have a delay of 10 before calling BossDeath and then we wait
+			// 50 more tics here.
+			TNT1 A 50
 			TNT1 A -1 A_FinishDeathCam
 			stop
 		Ready:

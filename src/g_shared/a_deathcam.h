@@ -9,6 +9,7 @@ class ADeathCam : public AActor
 	HAS_OBJECT_POINTERS
 	public:
 		void	SetupDeathCam(AActor *actor, AActor *killer);
+		void	Tick();
 
 		TObjPtr<AActor>	actor;
 		TObjPtr<AActor>	killer;

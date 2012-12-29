@@ -119,6 +119,7 @@ actor Schabbs : WolfensteinMonster 17
 			SHAB A 5 A_Fall
 			SHAB A 70 A_Scream
 			SHAB GHI 5
+			SHAB J 10
 			SHAB J -1 A_BossDeath
 			stop
 	}
@@ -157,6 +158,7 @@ actor Gift : WolfensteinMonster 21
 			GIFT A .5 A_Fall
 			GIFT A 70 A_Scream
 			GIFT GHI 5
+			GIFT J 10
 			GIFT J -1 A_BossDeath
 			stop
 	}
@@ -197,6 +199,7 @@ actor FatFace : WolfensteinMonster 22
 			FATF A .5 A_Fall
 			FATF A 70 A_Scream
 			FATF IJK 5
+			FATF L 10
 			FATF L -1 A_BossDeath
 			stop
 	}
