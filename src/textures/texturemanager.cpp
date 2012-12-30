@@ -720,27 +720,27 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 					}				
 					//else Printf("Unable to define hires texture '%s'\n", tex->Name);
 				}
-				else */if (sc->str.Compare("texture") == 0)
+				else */if (sc->str.CompareNoCase("texture") == 0)
 				{
 					ParseXTexture(sc, FTexture::TEX_Override);
 				}
-				else if (sc->str.Compare("sprite") == 0)
+				else if (sc->str.CompareNoCase("sprite") == 0)
 				{
 					ParseXTexture(sc, FTexture::TEX_Sprite);
 				}
-				else if (sc->str.Compare("walltexture") == 0)
+				else if (sc->str.CompareNoCase("walltexture") == 0)
 				{
 					ParseXTexture(sc, FTexture::TEX_Wall);
 				}
-				else if (sc->str.Compare("flat") == 0)
+				else if (sc->str.CompareNoCase("flat") == 0)
 				{
 					ParseXTexture(sc, FTexture::TEX_Flat);
 				}
-				else if (sc->str.Compare("graphic") == 0)
+				else if (sc->str.CompareNoCase("graphic") == 0)
 				{
 					ParseXTexture(sc, FTexture::TEX_MiscPatch);
 				}
-				else if(sc->str.Compare("artindex") == 0)
+				else if(sc->str.CompareNoCase("artindex") == 0)
 				{
 					sc.MustGetToken(TK_IntConst);
 					int index = sc->number;
