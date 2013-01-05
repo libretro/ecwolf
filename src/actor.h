@@ -247,9 +247,10 @@ class AActor : public DObject
 		int		points;
 		fixed	radius;
 
-		short       ticcount;
-		const Frame	*state;
-		unsigned int sprite;
+		const Frame		*state;
+		unsigned int	sprite;
+		fixed			scaleX, scaleY;
+		short			ticcount;
 
 		short       viewx;
 		word        viewheight;

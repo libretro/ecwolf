@@ -321,6 +321,24 @@ HANDLE_PROPERTY(radius)
 	defaults->radius = radius*FRACUNIT/64;
 }
 
+HANDLE_PROPERTY(scale)
+{
+	FLOAT_PARAM(scale, 0);
+	defaults->scaleX = defaults->scaleY = scale*FRACUNIT;
+}
+
+HANDLE_PROPERTY(xscale)
+{
+	FLOAT_PARAM(scale, 0);
+	defaults->scaleX = scale*FRACUNIT;
+}
+
+HANDLE_PROPERTY(yscale)
+{
+	FLOAT_PARAM(scale, 0);
+	defaults->scaleY = scale*FRACUNIT;
+}
+
 HANDLE_PROPERTY(secretdeathsound)
 {
 	STRING_PARAM(snd, 0);
@@ -484,6 +502,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(PROJECTILE, Actor,),
 	DEFINE_PROP(radius, Actor, I),
+	DEFINE_PROP(scale, Actor, F),
 	DEFINE_PROP(secretdeathsound, Actor, S),
 	DEFINE_PROP(seesound, Actor, S),
 	DEFINE_PROP(selectionorder, Weapon, I),
@@ -493,7 +512,9 @@ extern const PropDef properties[] =
 	DEFINE_PROP(speed, Actor, F_F),
 	DEFINE_PROP_PREFIX(startitem, PlayerPawn, Player, S_I),
 	DEFINE_PROP_PREFIX(weaponslot, PlayerPawn, Player, IS_SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS),
+	DEFINE_PROP(xscale, Actor, F),
 	DEFINE_PROP(yadjust, Weapon, F),
+	DEFINE_PROP(yscale, Actor, F),
 
 	{ NULL, NULL, NULL, NULL }
 };

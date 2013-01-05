@@ -29,6 +29,7 @@ actor Actor native
 	minmissilechance 200
 	missilefrequency 1.0
 	meleerange 44
+	scale 1.0
 
 	native angle_t angle;
 	native int health;

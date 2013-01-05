@@ -365,10 +365,10 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	if(scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
 		return;
 
-	const double dyScale = height/256.0;
+	const double dyScale = (height/256.0)*(actor->scaleY/65536.);
 	const int upperedge = (viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
 
-	const double dxScale = (height/256.0)/(yaspect/65536.);
+	const double dxScale = (height/256.0)/(yaspect/actor->scaleX);
 	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
 
 	const unsigned int texWidth = tex->GetWidth();
