@@ -124,13 +124,14 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp
 	resourcefiles/file_7z.cpp
+	resourcefiles/file_audiot.cpp
 	resourcefiles/file_directory.cpp
+	resourcefiles/file_gamemaps.cpp
 	resourcefiles/file_grp.cpp
 	resourcefiles/file_pak.cpp
 	resourcefiles/file_rff.cpp
 	resourcefiles/file_lump.cpp
-	resourcefiles/file_audiot.cpp
-	resourcefiles/file_gamemaps.cpp
+	resourcefiles/file_macbin.cpp
 	resourcefiles/file_vgagraph.cpp
 	resourcefiles/file_vswap.cpp
 	resourcefiles/file_wad.cpp

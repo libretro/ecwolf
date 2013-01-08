@@ -259,9 +259,10 @@ FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 FResourceFile *CheckVSwap(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckGamemaps(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckMacBin(const char *filename, FileReader *file, bool quiet);
 
-#define COUNTOF_FUNCS 11
-static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF, CheckAudiot, CheckVGAGraph, CheckVSwap, CheckGamemaps, CheckLump };
+#define COUNTOF_FUNCS 12
+static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF, CheckMacBin, CheckAudiot, CheckVGAGraph, CheckVSwap, CheckGamemaps, CheckLump };
 
 FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader *file, bool quiet)
 {
