@@ -1051,20 +1051,18 @@ const fixed RAISESPEED = FRACUNIT*6;
 
 void player_t::BringUpWeapon()
 {
+	if(PendingWeapon == WP_NOCHANGE)
+	{
+		SetPSprite(ReadyWeapon ? ReadyWeapon->GetReadyState() : NULL);
+		return;
+	}
+
 	psprite.sy = RAISERANGE;
 	psprite.sx = 0;
 
-	if(PendingWeapon != WP_NOCHANGE)
-	{
-		ReadyWeapon = PendingWeapon;
-		PendingWeapon = WP_NOCHANGE;
-		if(ReadyWeapon != NULL)
-			SetPSprite(ReadyWeapon->GetUpState());
-		else
-			SetPSprite(NULL);
-	}
-	else
-		SetPSprite(NULL);
+	ReadyWeapon = PendingWeapon;
+	PendingWeapon = WP_NOCHANGE;
+	SetPSprite(ReadyWeapon ? ReadyWeapon->GetUpState() : NULL);
 }
 ACTION_FUNCTION(A_Lower)
 {
@@ -1241,6 +1239,11 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 
 	players[0].camera = players[0].mo;
 	players[0].state = player_t::PST_LIVE;
+
+	// Re-raise the weapon like Doom if we don't have the flag set in mapinfo.
+	if(!levelInfo->SpawnWithWeaponRaised && players[0].PendingWeapon == WP_NOCHANGE)
+		players[0].PendingWeapon = players[0].ReadyWeapon;
+	players[0].BringUpWeapon();
 }
 
 

@@ -490,6 +490,8 @@ protected:
 			ParseIntAssignment(mapInfo.Par);
 		else if(key.CompareNoCase("SecretDeathSounds") == 0)
 			ParseBoolAssignment(mapInfo.SecretDeathSounds);
+		else if(key.CompareNoCase("SpawnWithWeaponRaised") == 0)
+			mapInfo.SpawnWithWeaponRaised = true;
 		else if(key.CompareNoCase("Translator") == 0)
 			ParseStringAssignment(mapInfo.Translator);
 		else

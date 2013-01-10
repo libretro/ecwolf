@@ -135,6 +135,7 @@ public:
 
 	bool			DeathCam;
 	bool			SecretDeathSounds;
+	bool			SpawnWithWeaponRaised;
 
 	TArray<const ClassDef *>	EnsureInventory;
 

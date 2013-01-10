@@ -133,9 +133,6 @@ void APlayerPawn::GiveStartingInventory()
 
 	SetupWeaponSlots();
 
-	// Bring up weapon
-	player->BringUpWeapon();
-
 #if 0
 	AInventory *inv = inventory;
 	while(inv)

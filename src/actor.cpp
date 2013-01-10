@@ -587,6 +587,8 @@ void StartTravel ()
 
 void FinishTravel ()
 {
+	gamestate.victoryflag = false;
+
 	ThinkerList::Iterator node = thinkerList->GetHead(ThinkerList::TRAVEL);
 	if(!node)
 		return;
