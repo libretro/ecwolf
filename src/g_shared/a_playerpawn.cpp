@@ -191,6 +191,44 @@ void APlayerPawn::Tick()
 
 	TickPSprites();
 
+	// [RH] Smooth transitions between bobbing and not-bobbing frames.
+	// This also fixes the bug where you can "stick" a weapon off-center by
+	// shooting it when it's at the peak of its swing.
+	static fixed curbob = 0;
+	const fixed playerMovebob = GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
+
+	if(playerMovebob)
+	{
+		static const fixed MAXBOB = 0x100000;
+		fixed bobtarget = gamestate.victoryflag ? 0 : FixedMul(FixedMul(thrustspeed << 8, playerMovebob), movebob);
+		if(bobtarget > MAXBOB)
+			bobtarget = MAXBOB;
+
+		if (curbob != bobtarget)
+		{
+			if (abs (bobtarget - curbob) <= 1*FRACUNIT)
+			{
+				curbob = bobtarget;
+			}
+			else
+			{
+				fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
+				if (curbob > bobtarget)
+				{
+					curbob -= zoom;
+				}
+				else
+				{
+					curbob += zoom;
+				}
+			}
+		}
+	}
+	else
+		curbob = 0;
+
+	player->bob = curbob;
+
 	// Watching BJ
 	if(gamestate.victoryflag)
 		return;
@@ -222,44 +260,6 @@ void APlayerPawn::Tick()
 		player->attackheld = buttonstate[bt_attack];
 
 	ControlMovement(this);
-
-	// [RH] Smooth transitions between bobbing and not-bobbing frames.
-	// This also fixes the bug where you can "stick" a weapon off-center by
-	// shooting it when it's at the peak of its swing.
-	static fixed curbob = 0;
-	const fixed playerMovebob = GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
-
-	if(playerMovebob)
-	{
-		static const fixed MAXBOB = 0x100000;
-		fixed bobtarget = FixedMul(FixedMul(thrustspeed << 8, playerMovebob), movebob);
-		if(bobtarget > MAXBOB)
-			bobtarget = MAXBOB;
-
-		if (curbob != bobtarget)
-		{
-			if (abs (bobtarget - curbob) <= 1*FRACUNIT)
-			{
-				curbob = bobtarget;
-			}
-			else
-			{
-				fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
-				if (curbob > bobtarget)
-				{
-					curbob -= zoom;
-				}
-				else
-				{
-					curbob += zoom;
-				}
-			}
-		}
-	}
-	else
-		curbob = 0;
-
-	player->bob = curbob;
 }
 
 void APlayerPawn::TickPSprites()
