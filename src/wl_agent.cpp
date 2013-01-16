@@ -1073,6 +1073,8 @@ ACTION_FUNCTION(A_Lower)
 		return;
 	player->psprite.sy = RAISERANGE;
 
+	if(player->PendingWeapon == WP_NOCHANGE)
+		player->PendingWeapon = NULL;
 	player->BringUpWeapon();
 }
 ACTION_FUNCTION(A_Raise)
