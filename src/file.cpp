@@ -39,14 +39,34 @@
 #else
 #include <sys/stat.h>
 #include <dirent.h>
+#include <unistd.h>
 #endif
 
 #include <cstdio>
 #include "file.h"
 #include "zstring.h"
 
-File::File(const FString &filename) : filename(filename), directory(false), existing(false)
+File::File(const FString &filename)
 {
+	init(filename);
+}
+
+File::File(const File &dir, const FString &filename)
+{
+#ifdef WINDOWS
+	init(dir.getDirectory() + '\\' + filename);
+#else
+	init(dir.getDirectory() + '/' + filename);
+#endif
+}
+
+void File::init(const FString &filename)
+{
+	this->filename = filename;
+	directory = false;
+	existing = false;
+	writable = false;
+
 #ifdef WINDOWS
 	/* Windows, why must you be such a pain?
 	 * Why must you require me to add a '*' to my filename?
@@ -73,26 +93,51 @@ File::File(const FString &filename) : filename(filename), directory(false), exis
 			}
 		}
 	}
+
+	// Can't find an easy way to test writability on Windows so
+	writable = true;
 #else
 	struct stat statRet;
 	if(stat(filename, &statRet) == 0)
 		existing = true;
 
-	if(existing && (statRet.st_mode & S_IFDIR))
+	if(existing)
 	{
-		directory = true;
-
-		// Populate a base list.
-		DIR *direct = opendir(filename);
-		if(direct != NULL)
+		if((statRet.st_mode & S_IFDIR))
 		{
-			dirent *file = NULL;
-			while((file = readdir(direct)) != NULL)
-				files.Push(file->d_name);
+			directory = true;
+
+			// Populate a base list.
+			DIR *direct = opendir(filename);
+			if(direct != NULL)
+			{
+				dirent *file = NULL;
+				while((file = readdir(direct)) != NULL)
+					files.Push(file->d_name);
+			}
+			closedir(direct);
 		}
-		closedir(direct);
+
+		// Check writable
+		if(access(filename, W_OK) == 0)
+			writable = true;
 	}
 #endif
+}
+
+FString File::getDirectory() const
+{
+	if(directory)
+	{
+		if(filename[filename.Len()-1] == '\\' || filename[filename.Len()-1] == '/')
+			return filename.Left(filename.Len()-1);
+		return filename;
+	}
+
+	long dirSepPos = MAX(filename.LastIndexOf('/'), filename.LastIndexOf('\\'));
+	if(dirSepPos != -1)
+		return filename.Left(dirSepPos);
+	return FString(".");
 }
 
 FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtension) const
@@ -112,6 +157,17 @@ FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtensio
 				return files[i];
 		}
 	}
-	return FString();
+	return filename;
 #endif
+}
+
+void File::rename(const FString &newname)
+{
+#ifdef WINDOWS
+	FString dirName = getDirectory() + '\\';
+#else
+	FString dirName = getDirectory() + '/';
+#endif
+
+	::rename(filename, dirName + newname);
 }

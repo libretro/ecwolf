@@ -51,10 +51,7 @@ class FAudiot : public FUncompressedFile
 			path = path.Left(lastSlash+1);
 
 			File directory(path.Len() > 0 ? path : ".");
-			audiohedFile = directory.getInsensitiveFile(FString("audiohed.") + extension, true);
-			if(audiohedFile.IsEmpty())
-				audiohedFile = FString("audiohed.") + extension;
-			audiohedFile = path + audiohedFile;
+			audiohedFile = path + directory.getInsensitiveFile(FString("audiohed.") + extension, true);
 		}
 
 		bool Open(bool quiet)

@@ -159,14 +159,8 @@ class FVGAGraph : public FResourceFile
 			path = path.Left(lastSlash+1);
 
 			File directory(path.Len() > 0 ? path : ".");
-			vgadictFile = directory.getInsensitiveFile(FString("vgadict.") + extension, true);
-			if(vgadictFile.IsEmpty())
-				vgadictFile = FString("vgadict.") + extension;
-			vgadictFile = path + vgadictFile;
-			vgaheadFile = directory.getInsensitiveFile(FString("vgahead.") + extension, true);
-			if(vgaheadFile.IsEmpty())
-				vgaheadFile = FString("vgahead.") + extension;
-			vgaheadFile = path + vgaheadFile;
+			vgadictFile = path + directory.getInsensitiveFile(FString("vgadict.") + extension, true);
+			vgaheadFile = path + directory.getInsensitiveFile(FString("vgahead.") + extension, true);
 		}
 		~FVGAGraph()
 		{

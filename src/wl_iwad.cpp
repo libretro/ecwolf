@@ -157,6 +157,49 @@ struct BaseFile
 	FString	filename[BASEFILES];
 	BYTE	isValid;
 };
+/* Steam ships Spear of Destiny in the mission pack 3 state, so we need to go
+ * and correct steam installs.
+ *
+ * Returns true if the install was fine (needs no correction)
+ */
+static bool VerifySpearInstall(const char* directory)
+{
+	const FString MissionFiles[3] =
+	{
+		"gamemaps.",
+		"maphead.",
+		"vswap."
+	};
+
+	File dir(directory);
+	if(!dir.isWritable())
+		return true;
+
+	// Check for gamemaps.sd1, if it doesn't exist assume we're good
+	if(!File(dir, dir.getInsensitiveFile("gamemaps.sd1", false)).exists())
+		return true;
+
+	int currentMission;
+	if(!File(dir, dir.getInsensitiveFile("gamemaps.sd3", false)).exists())
+		currentMission = 3;
+	else if(!File(dir, dir.getInsensitiveFile("gamemaps.sd2", false)).exists())
+		currentMission = 2;
+	else if(File(dir, dir.getInsensitiveFile("gamemaps.sod", false)).exists())
+		return true;
+
+	Printf("Reseting Spear of Destiny: %s\n", directory);
+	for(unsigned int i = 0;i < 3;++i)
+	{
+		File srcFile(dir, dir.getInsensitiveFile(MissionFiles[i] + "sod", false));
+		File sd1File(dir, dir.getInsensitiveFile(MissionFiles[i] + "sd1", false));
+
+		srcFile.rename(MissionFiles[i] + "sd" + ('0' + currentMission));
+		sd1File.rename(MissionFiles[i] + "sod");
+	}
+
+	return false;
+}
+
 /* Find valid game data.  Due to the nature of WOlf3D we must collect
  * information by extensions.  An extension is considered valid if it has all
  * files needed.  If the OS is case sensitive then the case sensitivity only
@@ -176,6 +219,9 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 	File dir(directory);
 	if(!dir.exists())
 		return;
+
+	if(!VerifySpearInstall(directory))
+		dir = File(directory); // Repopulate the file list
 
 	TArray<FString> files = dir.getFileList();
 	for(unsigned int i = 0;i < files.Size();++i)

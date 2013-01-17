@@ -42,20 +42,27 @@ class File
 {
 	public:
 		File(const FString &filename);
+		File(const File &dir, const FString &filename);
 		~File() {}
 
 		bool					exists() const { return existing; }
+		FString					getDirectory() const;
 		const TArray<FString>	&getFileList() const { return files; }
 		FString					getInsensitiveFile(const FString &filename, bool sensitiveExtension) const;
 		bool					isDirectory() const { return directory; }
 		bool					isFile() const { return !directory; }
+		bool					isWritable() const { return writable; }
+		void					rename(const FString &newname);
 
 	protected:
+		void					init(const FString &filename);
+
 		FString	filename;
 
 		TArray<FString>	files;
 		bool			directory;
 		bool			existing;
+		bool			writable;
 };
 
 #endif /* __FILE_H__ */

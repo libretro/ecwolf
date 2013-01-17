@@ -204,10 +204,7 @@ FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(fil
 	path = path.Left(lastSlash+1);
 
 	File directory(path.Len() > 0 ? path : ".");
-	mapheadFile = directory.getInsensitiveFile(FString("maphead.") + extension, true);
-	if(mapheadFile.IsEmpty())
-		mapheadFile = FString("maphead.") + extension;
-	mapheadFile = path + mapheadFile;
+	mapheadFile = path + directory.getInsensitiveFile(FString("maphead.") + extension, true);
 }
 
 FGamemaps::~FGamemaps()
