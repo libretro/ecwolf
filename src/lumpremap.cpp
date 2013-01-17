@@ -201,7 +201,7 @@ void LumpRemapper::LoadMap(const char* extension, const char* name, const char* 
 
 void LumpRemapper::ParseMap(Scanner &sc)
 {
-	while(sc.TokensLeft() > 0)
+	while(sc.TokensLeft())
 	{
 		if(!sc.CheckToken(TK_Identifier))
 			sc.ScriptMessage(Scanner::ERROR, "Expected identifier in map.\n");

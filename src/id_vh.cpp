@@ -17,12 +17,8 @@ int	    pa=MENU_CENTER,px,py;
 void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation, bool stencil, BYTE stencilcolor)
 {
 	int		    width, height;
-	byte	    *dest;
 	FTexture	*source;
 	byte	    ch;
-	int i;
-	unsigned sx, sy;
-	int tmp1, tmp2;
 	int cx = px, cy = py;
 
 	height = font->GetHeight();

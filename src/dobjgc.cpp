@@ -301,7 +301,7 @@ void Mark(DObject **obj)
 
 static void MarkRoot()
 {
-	int i;
+	//int i;
 
 	Gray = NULL;
 	if(thinkerList)
@@ -638,7 +638,7 @@ void DelSoftRoot(DObject *obj)
 
 size_t DSectorMarker::PropagateMark()
 {
-	int i;
+	//int i;
 	int marked = 0;
 	bool moretodo = false;
 

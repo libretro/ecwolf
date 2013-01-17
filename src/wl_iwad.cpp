@@ -193,7 +193,7 @@ static bool VerifySpearInstall(const char* directory)
 		File srcFile(dir, dir.getInsensitiveFile(MissionFiles[i] + "sod", false));
 		File sd1File(dir, dir.getInsensitiveFile(MissionFiles[i] + "sd1", false));
 
-		srcFile.rename(MissionFiles[i] + "sd" + ('0' + currentMission));
+		srcFile.rename(MissionFiles[i] + "sd" + (char)('0' + currentMission));
 		sd1File.rename(MissionFiles[i] + "sod");
 	}
 

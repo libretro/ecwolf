@@ -307,7 +307,6 @@ int DebugKeys (void)
 			players[0].mo->y >> 10,
 			players[0].mo->angle/ANGLE_1
 		);
-		char str[60];
 		US_CenterWindow (14,6);
 		US_PrintCentered(position);
 		VW_UpdateScreen();

@@ -350,7 +350,7 @@ size_t DObject::StaticPointerSubstitution (DObject *old, DObject *notOld)
 {
 	DObject *probe;
 	size_t changed = 0;
-	int i;
+	//int i;
 
 	// Go through all objects.
 	for (probe = GC::Root; probe != NULL; probe = probe->ObjNext)

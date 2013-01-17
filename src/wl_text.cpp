@@ -234,7 +234,7 @@ void TimedPicCommand (bool helphack)
 void HandleCommand (bool helphack)
 {
 	int     i,margin,top,bottom;
-	int     picwidth,picheight,picmid;
+	int     picmid;
 
 	switch (toupper(*++text))
 	{
@@ -245,7 +245,7 @@ void HandleCommand (bool helphack)
 			double bw = ParseNumber();
 			double bh = ParseNumber();
 			MenuToRealCoords(bx, by, bw, bh, MENU_CENTER);
-			VWB_DrawFill(backgroundFlat, bx, by, bx+bw, by+bh);
+			VWB_DrawFill(backgroundFlat, (int)bx, (int)by, (int)(bx+bw), (int)(by+bh));
 			RipToEOL();
 			break;
 		}
@@ -758,9 +758,6 @@ void ShowArticle (const char *article, bool helphack=false)
 */
 void HelpScreens (void)
 {
-	int     artnum;
-	char    *text;
-
 	int lumpNum = Wads.CheckNumForName("HELPART", ns_global);
 	if(lumpNum != -1)
 	{
@@ -778,9 +775,7 @@ void HelpScreens (void)
 //
 bool EndText (int exitClusterNum, int enterClusterNum)
 {
-	int     artnum;
 	char    *text;
-	memptr  layout;
 
 	ClearMemory ();
 
@@ -841,7 +836,7 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 				text = new char[Wads.LumpLength(lumpNum)];
 				lump.Read(text, Wads.LumpLength(lumpNum));
 
-				ShowArticle(text, (IWad::GetGame().Flags & IWad::HELPHACK));
+				ShowArticle(text, !!(IWad::GetGame().Flags & IWad::HELPHACK));
 
 				delete[] text;
 			}
@@ -851,7 +846,7 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 
 		default:
 			VW_FadeOut ();
-			ShowArticle(exitText, (IWad::GetGame().Flags & IWad::HELPHACK));
+			ShowArticle(exitText, !!(IWad::GetGame().Flags & IWad::HELPHACK));
 			break;
 	}
 

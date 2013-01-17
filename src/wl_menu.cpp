@@ -998,7 +998,7 @@ void Message (const char *string)
 		TOPBRDR = ColorMatcher.Pick(RPART(gameinfo.MessageColors[1]), GPART(gameinfo.MessageColors[1]), BPART(gameinfo.MessageColors[1])),
 		BOTBRDR = ColorMatcher.Pick(RPART(gameinfo.MessageColors[2]), GPART(gameinfo.MessageColors[2]), BPART(gameinfo.MessageColors[2]));
 
-	int i, len = (int) strlen(string);
+	int len = (int) strlen(string);
 	FFont *font = BigFont;
 	word width, height;
 

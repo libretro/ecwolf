@@ -115,7 +115,7 @@ void FTextureManager::ProcessSwitchDef (Scanner &sc)
 	FString picname;
 	FSwitchDef *def1, *def2;
 	FTextureID picnum;
-	int gametype;
+	//int gametype;
 	bool quest = false;
 
 	def1 = def2 = NULL;

@@ -194,7 +194,7 @@ int console_main(int argc, char *argv[])
 {
 	size_t n;
 	char *bufp, *appname;
-	int status;
+	int status = 0;
 
 	/* Get the class name from argv[0] */
 	appname = argv[0];

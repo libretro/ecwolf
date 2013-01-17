@@ -983,7 +983,6 @@ player_t::player_t() : bob(0), attackheld(false)
 void player_t::BobWeapon (fixed *x, fixed *y)
 {
 	AWeapon *weapon;
-	fixed bobtarget;
 
 	weapon = ReadyWeapon;
 

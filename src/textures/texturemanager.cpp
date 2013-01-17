@@ -598,9 +598,9 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 {
 	int remapLump, lastLump;
 	char src[9];
-	bool is32bit;
-	int width, height;
-	int type, mode;
+	//bool is32bit;
+	//int width, height;
+	//int type, mode;
 	TArray<FTextureID> tlist;
 
 	lastLump = 0;

@@ -53,7 +53,7 @@ ClearSplitVWB (void)
 void Victory (bool fromIntermission)
 {
 	int32_t sec;
-	int i, min, kr = 0, sr = 0, tr = 0, x;
+	int min, kr = 0, sr = 0, tr = 0, x;
 	char tempstr[8];
 
 	static const unsigned int RATIOX = 22, RATIOY = 14, TIMEX = 14, TIMEY = 8;
@@ -220,7 +220,7 @@ void LevelCompleted (void)
 	static const unsigned int PAR_AMOUNT = 500;
 	static const unsigned int PERCENT100AMT = 10000;
 
-	int x, i, min, sec, ratio, kr, sr, tr;
+	int i, min, sec, ratio, kr, sr, tr;
 	char bonusstr[10];
 	char tempstr[10];
 	int32_t bonus, timeleft = 0;

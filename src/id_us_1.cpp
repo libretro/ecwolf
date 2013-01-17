@@ -357,7 +357,6 @@ static void USL_XORICursor(FFont *font, int x,int y,const char *s,word cursor,EC
 {
 	static	bool	status;		// VGA doesn't XOR...
 	char	buf[MaxString];
-	int		temp;
 	word	w,h;
 
 	strcpy(buf,s);
@@ -410,9 +409,7 @@ bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 	char		c;
 	char		s[MaxString],olds[MaxString];
 	int         cursor,len=0;
-	word		i,
-				w,h,
-				temp;
+	word		i,w,h;
 	longword	curtime, lasttime, lastdirtime, lastbuttontime, lastdirmovetime;
 	ControlInfo ci;
 	Direction   lastdir = dir_None;

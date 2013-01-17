@@ -1189,7 +1189,7 @@ void ClassDef::ParseActor(Scanner &sc)
 											// When using a line special we have to inject a parameter.
 											if(specialNum >= 0)
 											{
-												val.useType == CallArguments::Value::VAL_INTEGER;
+												val.useType = CallArguments::Value::VAL_INTEGER;
 												val.isExpression = false;
 												val.val.i = specialNum;
 												ca->AddArgument(val);
