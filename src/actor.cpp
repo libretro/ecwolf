@@ -334,7 +334,7 @@ int AActor::GetDamage()
 {
 	int expression = GetClass()->Meta.GetMetaInt(AMETA_Damage, -1);
 	if(expression >= 0)
-		return damageExpressions[expression]->Evaluate(this).GetInt();
+		return static_cast<int>(damageExpressions[expression]->Evaluate(this).GetInt());
 	return 0;
 }
 

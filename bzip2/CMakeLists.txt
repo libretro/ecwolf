@@ -5,6 +5,10 @@ if( CMAKE_COMPILER_IS_GNUC )
 endif( CMAKE_COMPILER_IS_GNUC )
 
 #add_definitions( -DBZ_NO_STDIO )
+if(MSVC)
+	add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
+endif(MSVC)
+
 add_library( bz2
     blocksort.c
     bzlib.c

@@ -92,7 +92,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	double fadew = 320;
 	double fadeh = 200;
 	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
-	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, fadey);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., 0., screenWidth, fadey);
 
 	word width, height;
 	VW_MeasurePropString(IntermissionFont, language["STR_SEEAGAIN"], width, height);

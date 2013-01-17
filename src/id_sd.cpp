@@ -1099,7 +1099,7 @@ bool SD_PlaySound(const char* sound, SoundChannel chan)
 			SoundPositioned = ispos;
 			DigiPriority = sindex.GetPriority();
 			SoundPlaying = sound;
-			return channel + 1;
+			return true;
 		}
 
 		return(true);

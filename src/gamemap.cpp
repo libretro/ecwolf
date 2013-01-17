@@ -187,7 +187,7 @@ bool GameMap::ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *ac
 	MapSpot spot = GetSpot(trig.x, trig.y, trig.z);
 
 	Specials::LineSpecialFunction func = Specials::LookupFunction(Specials::LineSpecials(trig.action));
-	bool ret = func(spot, trig.arg, direction, activator);
+	bool ret = func(spot, trig.arg, direction, activator) != 0;
 	if(ret)
 	{
 		if(trig.active && trig.isSecret)

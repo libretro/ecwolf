@@ -91,7 +91,7 @@ struct FVSwapSound : public FResourceLump
 			if(numOrigSamples == 0)
 				LumpSize = 0;
 			else
-				LumpSize += double(numOrigSamples*2*param_samplerate)/ORIGSAMPLERATE;
+				LumpSize += static_cast<int>(double(numOrigSamples*2*param_samplerate)/ORIGSAMPLERATE);
 		}
 
 		int FillCache()
@@ -121,7 +121,7 @@ struct FVSwapSound : public FResourceLump
 			}
 
 			// Do resampling to param_samplerate 16-bit with linear interpolation
-			static const fixed sampleStep = ((double)ORIGSAMPLERATE / param_samplerate)*FRACUNIT;
+			static const fixed sampleStep = static_cast<fixed>(((double)ORIGSAMPLERATE / param_samplerate)*FRACUNIT);
 			SWORD* data = (SWORD*)(Cache+sizeof(WAV_HEADER));
 			i = 0;
 			for(fixed sample = 0;i++ < samples;sample += sampleStep)

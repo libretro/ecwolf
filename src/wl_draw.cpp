@@ -111,7 +111,7 @@ int     lasttexture;
 short    focaltx,focalty,viewtx,viewty;
 longword xpartialup,xpartialdown,ypartialup,ypartialdown;
 
-float   midangle;
+short   midangle;
 short   angle;
 
 MapTile::Side hitdir;
@@ -353,7 +353,6 @@ void HitVertWall (void)
 	if(!tilehit)
 		return;
 
-	int wallpic;
 	int texture;
 
 	DetermineHitDir(true);
@@ -432,7 +431,6 @@ void HitHorizWall (void)
 	if(!tilehit)
 		return;
 
-	int wallpic;
 	int texture;
 
 	DetermineHitDir(false);
@@ -559,8 +557,6 @@ visobj_t *visptr,*visstep,*farthest;
 void DrawScaleds (void)
 {
 	int      i,least,numvisable,height;
-	byte     *visspot;
-	unsigned spotloc;
 
 	visptr = &vislist[0];
 
@@ -783,7 +779,7 @@ void AsmRefresh()
 			if((focalspot->pushDirection == MapTile::East && xtilestep == 1) ||
 				(focalspot->pushDirection == MapTile::West && xtilestep == -1))
 			{
-				int32_t yintbuf = yintercept - ytilestep*(abs(ystep * (64 - focalspot->pushAmount)) >> 6);
+				int32_t yintbuf = yintercept - ytilestep*(abs(ystep * signed(64 - focalspot->pushAmount)) >> 6);
 				if((yintbuf >> 16) == focalty)   // ray hits pushwall back?
 				{
 					if(focalspot->pushDirection == MapTile::East)
@@ -800,7 +796,7 @@ void AsmRefresh()
 			else if((focalspot->pushDirection == MapTile::South && ytilestep == 1) ||
 				(focalspot->pushDirection == MapTile::North && ytilestep == -1))
 			{
-				int32_t xintbuf = xintercept - xtilestep*(abs(xstep * (64 - focalspot->pushAmount)) >> 6);
+				int32_t xintbuf = xintercept - xtilestep*(abs(xstep * signed(64 - focalspot->pushAmount)) >> 6);
 				if((xintbuf >> 16) == focaltx)   // ray hits pushwall back?
 				{
 					xintercept = xintbuf;

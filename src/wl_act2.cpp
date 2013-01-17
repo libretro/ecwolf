@@ -65,7 +65,7 @@ void A_Face(AActor *self, AActor *target, angle_t maxturn)
 		angle = (M_PI*2+angle);
 	angle_t iangle = (angle_t) (angle*ANGLE_180/M_PI) - ANGLE_90;
 
-	if(maxturn > 0 && maxturn < abs(self->angle - iangle))
+	if(maxturn > 0 && maxturn < self->angle - iangle)
 	{
 		if(self->angle > iangle)
 		{
@@ -614,7 +614,7 @@ ACTION_FUNCTION(A_WolfAttack)
 
 	ACTION_PARAM_INT(flags, 0);
 	ACTION_PARAM_STRING(sound, 1);
-	ACTION_PARAM_DOUBLE(snipe, 2);
+	ACTION_PARAM_FIXED(snipe, 2);
 	ACTION_PARAM_INT(maxdamage, 3);
 	ACTION_PARAM_INT(blocksize, 4);
 	ACTION_PARAM_INT(pointblank, 5);
@@ -634,7 +634,7 @@ ACTION_FUNCTION(A_WolfAttack)
 		dy = abs(self->y - players[0].mo->y);
 		dist = dx>dy ? dx:dy;
 
-		dist = FixedMul(dist, snipe*FRACUNIT);
+		dist = FixedMul(dist, snipe);
 		dist /= blocksize<<9;
 
 		if (thrustspeed >= runspeed)

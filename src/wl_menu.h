@@ -70,7 +70,7 @@ void WaitKeyUp(void);
 void ReadAnyControl(ControlInfo *ci);
 void TicDelay(int count);
 int StartCPMusic(const char* song);
-int  Confirm(const char *string);
+bool Confirm(const char *string);
 void Message(const char *string);
 void CheckPause(void);
 void ShootSnd(void);

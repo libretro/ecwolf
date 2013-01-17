@@ -207,9 +207,9 @@ ACTION_FUNCTION(A_ChangeFlag)
 	ACTION_PARAM_BOOL(value, 1);
 
 	// We'll also want to keep the counts consistant
-	const bool countedKill = self->flags & FL_COUNTKILL;
-	const bool countedSecret = self->flags & FL_COUNTSECRET;
-	const bool countedItem = self->flags & FL_COUNTITEM;
+	const bool countedKill = !!(self->flags & FL_COUNTKILL);
+	const bool countedSecret = !!(self->flags & FL_COUNTSECRET);
+	const bool countedItem = !!(self->flags & FL_COUNTITEM);
 
 	FString prefix;
 	if(flag.IndexOf(".") != -1)
@@ -223,9 +223,9 @@ ACTION_FUNCTION(A_ChangeFlag)
 		return;
 	}
 
-	const bool countsKill = self->flags & FL_COUNTKILL;
-	const bool countsSecret = self->flags & FL_COUNTSECRET;
-	const bool countsItem = self->flags & FL_COUNTITEM;
+	const bool countsKill = !!(self->flags & FL_COUNTKILL);
+	const bool countsSecret = !!(self->flags & FL_COUNTSECRET);
+	const bool countsItem = !!(self->flags & FL_COUNTITEM);
 	if(countedKill != countsKill)
 	{
 		if(countsKill) ++gamestate.killtotal;
@@ -473,7 +473,7 @@ ACTION_FUNCTION(A_SpawnItemEx)
 			newobj->speed = newobj->runspeed;
 	}
 
-	newobj->angle = angle;
+	newobj->angle = static_cast<angle_t>(angle);
 
 	//We divide by 128 here since Wolf is 70hz instead of 35.
 	newobj->velx = (fixed(xvel*finecosine[ang]) + fixed(yvel*finesine[ang]))/128;

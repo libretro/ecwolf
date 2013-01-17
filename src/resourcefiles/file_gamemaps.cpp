@@ -66,8 +66,8 @@ class FGamemaps : public FResourceFile
 
 #define PLANES 3
 #define HEADERSIZE 34
-#define CARMACK_NEARTAG	static_cast<char>(0xA7)
-#define CARMACK_FARTAG	static_cast<char>(0xA8)
+#define CARMACK_NEARTAG	static_cast<unsigned char>(0xA7)
+#define CARMACK_FARTAG	static_cast<unsigned char>(0xA8)
 
 struct FMapLump : public FResourceLump
 {
@@ -75,13 +75,13 @@ struct FMapLump : public FResourceLump
 		// Only important thing to remember is that both
 		// Compression methods work on WORDs rather than bytes.
 
-		void ExpandCarmack(const char* in, char* out)
+		void ExpandCarmack(const unsigned char* in, unsigned char* out)
 		{
-			const char* const end = out + ReadLittleShort((const BYTE*)in);
-			const char* const start = out;
+			const unsigned char* const end = out + ReadLittleShort((const BYTE*)in);
+			const unsigned char* const start = out;
 			in += 2;
 
-			const char* copy;
+			const unsigned char* copy;
 			BYTE length;
 			while(out < end)
 			{
@@ -95,7 +95,7 @@ struct FMapLump : public FResourceLump
 				}
 				else if(*in == CARMACK_NEARTAG)
 				{
-					copy = out-(static_cast<unsigned char>(in[1])*2);
+					copy = out-(in[1]*2);
 					in += 2;
 				}
 				else if(*in == CARMACK_FARTAG)
@@ -119,9 +119,9 @@ struct FMapLump : public FResourceLump
 			}
 		}
 
-		void ExpandRLEW(const char* in, char* out, const WORD rlewTag)
+		void ExpandRLEW(const unsigned char* in, unsigned char* out, const WORD rlewTag)
 		{
-			const char* const end = out + ReadLittleShort((const BYTE*)in);
+			const unsigned char* const end = out + ReadLittleShort((const BYTE*)in);
 			in += 2;
 
 			while(out < end)
@@ -162,11 +162,11 @@ struct FMapLump : public FResourceLump
 			// Read map data and expand it
 			for(unsigned int i = 0;i < PLANES;i++)
 			{
-				char* output = Cache+HEADERSIZE+i*PlaneSize;
-				char* input = new char[Header.PlaneLength[i]];
+				unsigned char* output = reinterpret_cast<unsigned char*>(Cache+HEADERSIZE+i*PlaneSize);
+				unsigned char* input = new unsigned char[Header.PlaneLength[i]];
 				Owner->Reader->Seek(Header.PlaneOffset[i], SEEK_SET);
 				Owner->Reader->Read(input, Header.PlaneLength[i]);
-				char* tempOut = new char[ReadLittleShort((BYTE*)input)];
+				unsigned char* tempOut = new unsigned char[ReadLittleShort((BYTE*)input)];
 
 				ExpandCarmack(input, tempOut);
 				ExpandRLEW(tempOut, output, ((FGamemaps*)Owner)->rlewTag);

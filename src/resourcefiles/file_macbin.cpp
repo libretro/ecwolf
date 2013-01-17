@@ -283,7 +283,8 @@ FResourceFile *CheckMacBin(const char *filename, FileReader *file, bool quiet)
 		file->Read(&sizes, 8);
 		file->Seek(0, SEEK_SET);
 
-		if((strncmp(type, "APPLWOLF", 8) == 0 || strncmp(type, "MAPSWOLF", 8) == 0)&& BigLong(sizes[0]) + BigLong(sizes[1]) < file->GetLength())
+		if((strncmp(type, "APPLWOLF", 8) == 0 || strncmp(type, "MAPSWOLF", 8) == 0) &&
+			BigLong(sizes[0]) + BigLong(sizes[1]) < static_cast<unsigned>(file->GetLength()))
 		{
 			FResourceFile *rf = new FMacBin(filename, file);
 			if(rf->Open(quiet)) return rf;

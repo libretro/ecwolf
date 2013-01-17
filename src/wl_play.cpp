@@ -269,7 +269,7 @@ void PollMouseMove (void)
 		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
 			players[0].mo->pitch = 56*ANGLE_1;
 		else if(players[0].mo->pitch+ANGLE_180 < ANGLE_180-56*ANGLE_1)
-			players[0].mo->pitch = -56*ANGLE_1;
+			players[0].mo->pitch = ANGLE_NEG(56*ANGLE_1);
 	}
 }
 

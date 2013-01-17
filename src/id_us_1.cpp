@@ -289,10 +289,7 @@ void US_DrawWindow(word x,word y,word w,word h)
 	px = x*8 - Tile8Font->GetCharWidth(BOX_START+BOX_UPPERLEFT);
 	VWB_DrawPropString(Tile8Font, windowString, CR_UNTRANSLATED);
 
-	unsigned int cx = WindowX;
-	unsigned int cy = WindowY;
-	unsigned int cw = WindowW;
-	unsigned int ch = WindowH;
+	int cx = WindowX, cy = WindowY, cw = WindowW, ch = WindowH;
 	MenuToRealCoords(cx, cy, cw, ch, MENU_CENTER);
 	VWB_Clear(GPalette.WhiteIndex, cx, cy, cx+cw, cy+ch);
 }

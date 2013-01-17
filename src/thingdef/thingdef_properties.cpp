@@ -42,8 +42,9 @@
 
 #define IS_EXPR(no) params[no].isExpression
 #define EXPR_PARAM(var, no) ExpressionNode *var = params[no].expr;
-#define INT_PARAM(var, no) int64_t var; if(IS_EXPR(no)) { var = params[no].expr->Evaluate(defaults).GetInt(); delete params[no].expr; } else var = params[no].i
+#define INT_PARAM(var, no) int var; if(IS_EXPR(no)) { var = static_cast<int>(params[no].expr->Evaluate(defaults).GetInt()); delete params[no].expr; } else var = static_cast<int>(params[no].i)
 #define FLOAT_PARAM(var, no) double var = params[no].f;
+#define FIXED_PARAM(var, no) fixed var = static_cast<fixed>(params[no].f*FRACUNIT)
 #define STRING_PARAM(var, no) const char* var = params[no].s;
 
 HANDLE_PROPERTY(activesound)
@@ -87,20 +88,20 @@ HANDLE_PROPERTY(attacksound)
 
 HANDLE_PROPERTY(bobrangex)
 {
-	FLOAT_PARAM(rangex, 0);
-	((AWeapon*)defaults)->BobRangeX = fixed(rangex*FRACUNIT);
+	FIXED_PARAM(rangex, 0);
+	((AWeapon*)defaults)->BobRangeX = rangex;
 }
 
 HANDLE_PROPERTY(bobrangey)
 {
-	FLOAT_PARAM(rangey, 0);
-	((AWeapon*)defaults)->BobRangeY = fixed(rangey*FRACUNIT);
+	FIXED_PARAM(rangey, 0);
+	((AWeapon*)defaults)->BobRangeY = rangey;
 }
 
 HANDLE_PROPERTY(bobspeed)
 {
-	FLOAT_PARAM(speed, 0);
-	((AWeapon*)defaults)->BobSpeed = fixed(speed*FRACUNIT);
+	FIXED_PARAM(speed, 0);
+	((AWeapon*)defaults)->BobSpeed = speed;
 }
 
 HANDLE_PROPERTY(bobstyle)
@@ -262,9 +263,9 @@ HANDLE_PROPERTY(meleerange)
 
 HANDLE_PROPERTY(missilefrequency)
 {
-	FLOAT_PARAM(chance, 0);
+	FIXED_PARAM(chance, 0);
 
-	defaults->missilefrequency = fixed(chance*FRACUNIT);
+	defaults->missilefrequency = chance;
 }
 
 HANDLE_PROPERTY(minmissilechance)
@@ -281,9 +282,9 @@ HANDLE_PROPERTY(minmissilechance)
 
 HANDLE_PROPERTY(movebob)
 {
-	FLOAT_PARAM(strength, 0);
+	FIXED_PARAM(strength, 0);
 
-	cls->Meta.SetMetaFixed(APMETA_MoveBob, strength*FRACUNIT);
+	cls->Meta.SetMetaFixed(APMETA_MoveBob, strength);
 }
 
 HANDLE_PROPERTY(painchance)
@@ -323,20 +324,20 @@ HANDLE_PROPERTY(radius)
 
 HANDLE_PROPERTY(scale)
 {
-	FLOAT_PARAM(scale, 0);
-	defaults->scaleX = defaults->scaleY = scale*FRACUNIT;
+	FIXED_PARAM(scale, 0);
+	defaults->scaleX = defaults->scaleY = scale;
 }
 
 HANDLE_PROPERTY(xscale)
 {
-	FLOAT_PARAM(scale, 0);
-	defaults->scaleX = scale*FRACUNIT;
+	FIXED_PARAM(scale, 0);
+	defaults->scaleX = scale;
 }
 
 HANDLE_PROPERTY(yscale)
 {
-	FLOAT_PARAM(scale, 0);
-	defaults->scaleY = scale*FRACUNIT;
+	FIXED_PARAM(scale, 0);
+	defaults->scaleY = scale;
 }
 
 HANDLE_PROPERTY(secretdeathsound)
@@ -382,21 +383,21 @@ HANDLE_PROPERTY(slotnumber)
 
 HANDLE_PROPERTY(slotpriority)
 {
-	FLOAT_PARAM(priority, 0);
+	FIXED_PARAM(priority, 0);
 
-	cls->Meta.SetMetaFixed(AWMETA_SlotPriority, priority*FRACUNIT);
+	cls->Meta.SetMetaFixed(AWMETA_SlotPriority, priority);
 }
 
 HANDLE_PROPERTY(speed)
 {
 	// Speed = units per 2 tics (1/35 of second)
-	FLOAT_PARAM(speed, 0);
-	defaults->speed = int32_t(speed*FRACUNIT)/128;
+	FIXED_PARAM(speed, 0);
+	defaults->speed = speed/128;
 
 	if(PARAM_COUNT == 2)
 	{
-		FLOAT_PARAM(runspeed, 1);
-		defaults->runspeed = int32_t(runspeed*FRACUNIT)/128;
+		FIXED_PARAM(runspeed, 1);
+		defaults->runspeed = runspeed/128;
 	}
 	else
 		defaults->runspeed = defaults->speed;
@@ -445,10 +446,10 @@ HANDLE_PROPERTY(weaponslot)
 
 HANDLE_PROPERTY(yadjust)
 {
-	FLOAT_PARAM(adjust, 0);
+	FIXED_PARAM(adjust, 0);
 
 	AWeapon *def = (AWeapon *)defaults;
-	def->yadjust = adjust*FRACUNIT;
+	def->yadjust = adjust;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

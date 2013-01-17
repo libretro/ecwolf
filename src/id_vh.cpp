@@ -462,10 +462,10 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 	else
 		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, true, true);
 
-	const int x1 = ceil(xd);
-	const int y1 = ceil(yd);
-	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
-	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
+	const int x1 = static_cast<int>(ceil(xd));
+	const int y1 = static_cast<int>(ceil(yd));
+	const fixed xStep = static_cast<fixed>((tex->GetWidth()/wd)*FRACUNIT);
+	const fixed yStep = static_cast<fixed>((tex->GetHeight()/hd)*FRACUNIT);
 	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(screenWidth-x1));
 	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(screenHeight-y1));
 	vbuf += x1 + (y1 > 0 ? bufferPitch*y1 : 0);
@@ -533,18 +533,18 @@ void CA_CacheScreen(FTexture* tex, bool noaspect)
 		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, false, true);
 	}
 
-	const fixed xStep = (tex->GetWidth()/wd)*FRACUNIT;
-	const fixed yStep = (tex->GetHeight()/hd)*FRACUNIT;
+	const fixed xStep = static_cast<fixed>((tex->GetWidth()/wd)*FRACUNIT);
+	const fixed yStep = static_cast<fixed>((tex->GetHeight()/hd)*FRACUNIT);
 
 	vbuf += static_cast<int>(xd) + bufferPitch*static_cast<int>(yd);
 	const BYTE *src;
 	byte *dest = vbuf;
 	unsigned int i, j;
 	fixed x, y;
-	for(i = xd, x = 0;x < tex->GetWidth()<<FRACBITS && i < screenWidth;x += xStep, ++i)
+	for(i = (unsigned int)xd, x = 0;x < tex->GetWidth()<<FRACBITS && i < screenWidth;x += xStep, ++i)
 	{
 		src = tex->GetColumn(x>>FRACBITS, NULL);
-		for(j = yd, y = 0;y < tex->GetHeight()<<FRACBITS && j < screenHeight;y += yStep, ++j)
+		for(j = (unsigned int)yd, y = 0;y < tex->GetHeight()<<FRACBITS && j < screenHeight;y += yStep, ++j)
 		{
 			*dest = NormalLight.Maps[src[y>>FRACBITS]];
 			dest += bufferPitch;

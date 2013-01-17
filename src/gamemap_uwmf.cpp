@@ -406,17 +406,17 @@ class UWMFParser : public TextMapParser
 			CheckKey("x")
 			{
 				sc.MustGetToken(TK_FloatConst);
-				thing.x = sc->decimal*FRACUNIT;
+				thing.x = static_cast<fixed>(sc->decimal*FRACUNIT);
 			}
 			else CheckKey("y")
 			{
 				sc.MustGetToken(TK_FloatConst);
-				thing.y = sc->decimal*FRACUNIT;
+				thing.y = static_cast<fixed>(sc->decimal*FRACUNIT);
 			}
 			else CheckKey("z")
 			{
 				sc.MustGetToken(TK_FloatConst);
-				thing.z = sc->decimal*FRACUNIT;
+				thing.z = static_cast<fixed>(sc->decimal*FRACUNIT);
 			}
 			else CheckKey("angle")
 			{

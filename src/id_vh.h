@@ -24,7 +24,15 @@ enum MenuOffset
 	MENU_BOTTOM = 3
 };
 void VWB_Clear(int color, int x1, int y1, int x2, int y2);
+static inline void VWB_Clear(int color, double x1, double y1, double x2, double y2)
+{
+	VWB_Clear(color, static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2));
+}
 void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local=false);
+static inline void VWB_DrawFill(FTexture *tex, double x, double y, double w, double h, bool local=false)
+{
+	VWB_DrawFill(tex, static_cast<int>(x), static_cast<int>(y), static_cast<int>(w), static_cast<int>(h), local);
+}
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, BYTE stencilcolor=0);
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, BYTE stencilcolor=0);
 void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect);

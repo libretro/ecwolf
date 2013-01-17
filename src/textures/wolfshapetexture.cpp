@@ -145,8 +145,8 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 		// the size of vanilla wolf within precision limits.
 		TopOffset = 4;
 		LeftOffset -= 64;
-		xScale = .4*FRACUNIT;
-		yScale = .4*FRACUNIT;
+		xScale = 2*FRACUNIT/5;
+		yScale = 2*FRACUNIT/5;
 	}
 
 	// Crop the height!

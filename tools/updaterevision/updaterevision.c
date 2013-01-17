@@ -5,7 +5,9 @@
  * a header file so that it can be used as a project's build number.
  */
 
+#ifndef _CRT_SECURE_NO_DEPRECATE
 #define _CRT_SECURE_NO_DEPRECATE
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -163,7 +165,7 @@ int main(int argc, char **argv)
 		}
 		// [BB] Use hgdate as revision number.
 		if ( hgdate )
-			urev = hgdate;
+			urev = (unsigned long)hgdate;
 		else
 			urev = strtoul(rev, NULL, 10);
 		fprintf (stream,

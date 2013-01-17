@@ -73,7 +73,7 @@ class Scanner
 		struct ParserState
 		{
 			SCString		str;
-			unsigned int	number;
+			int				number;
 			double			decimal;
 			bool			boolean;
 			char			token;

@@ -136,7 +136,7 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 #define CHECKSIDE(x,y,dir) \
 { \
 	short _cs; \
-	if((_cs = CheckSide(ob, x, y, dir, (ob->flags & FL_CANUSEWALLS))) >= 0) \
+	if((_cs = CheckSide(ob, x, y, dir, !!(ob->flags & FL_CANUSEWALLS))) >= 0) \
 		return _cs != 0; \
 }
 #define CHECKDIAG(x,y,dir) \

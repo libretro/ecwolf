@@ -53,7 +53,7 @@ class MenuItem
 		int			getHeight() const { return visible ? height : 0; }
 		const char	*getString() const { return string; }
 		bool		isEnabled() const { return enabled && visible; }
-		bool		isHighlighted() const { return highlight; }
+		bool		isHighlighted() const { return highlight != 0; }
 		bool		isSelected() const;
 		bool		isVisible() const { return visible; }
 		void		setActivateListener(MENU_LISTENER_PROTOTYPE(activateListener)) { this->activateListener = activateListener; }

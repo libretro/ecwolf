@@ -366,16 +366,16 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		return;
 
 	const double dyScale = (height/256.0)*(actor->scaleY/65536.);
-	const int upperedge = (viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale;
+	const int upperedge = static_cast<int>((viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale);
 
 	const double dxScale = (height/256.0)/(yaspect/actor->scaleX);
-	const int actx = xcenter - tex->GetScaledLeftOffsetDouble()*dxScale;
+	const int actx = static_cast<int>(xcenter - tex->GetScaledLeftOffsetDouble()*dxScale);
 
 	const unsigned int texWidth = tex->GetWidth();
 	const unsigned int startX = -MIN(actx, 0);
 	const unsigned int startY = -MIN(upperedge, 0);
-	const fixed xStep = tex->xScale/dxScale;
-	const fixed yStep = tex->yScale/dyScale;
+	const fixed xStep = static_cast<fixed>(tex->xScale/dxScale);
+	const fixed yStep = static_cast<fixed>(tex->yScale/dyScale);
 	const fixed xRun = MIN<fixed>(texWidth<<FRACBITS, xStep*(viewwidth-actx));
 	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
 

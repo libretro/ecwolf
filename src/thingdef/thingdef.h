@@ -135,9 +135,11 @@ typedef TArray<ActionInfo *> ActionTable;
 #define ACTION_PARAM_BOOL(name, num) \
 	bool name = args[num].val.i ? true : false
 #define ACTION_PARAM_INT(name, num) \
-	int name = args[num].val.i
+	int name = static_cast<int>(args[num].val.i)
 #define ACTION_PARAM_DOUBLE(name, num) \
 	double name = args[num].val.d
+#define ACTION_PARAM_FIXED(name, num) \
+	fixed name = static_cast<fixed>(args[num].val.d*FRACUNIT)
 #define ACTION_PARAM_STRING(name, num) \
 	FString name = args[num].str
 #define ACTION_PARAM_STATE(name, num, def) \

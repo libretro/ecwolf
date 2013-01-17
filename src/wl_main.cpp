@@ -263,7 +263,7 @@ void CalcProjection (int32_t focal)
 	// divide heightnumerator by a posts distance to get the posts height for
 	// the heightbuffer.  The pixel height is height>>2
 	//
-	heightnumerator = ((TILEGLOBAL*scale)>>6)*(yaspect/65536.);
+	heightnumerator = FixedMul(((TILEGLOBAL*scale)>>6), yaspect);
 
 	//
 	// calculate the angle offset from view angle of each pixel's ray

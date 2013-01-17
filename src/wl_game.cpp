@@ -503,7 +503,7 @@ void FinishDemoRecord (void)
 void RecordDemo (void)
 {
 	FString level;
-	int levelnum, esc,maps;
+	int levelnum, esc;
 	char str[80];
 
 	US_CenterWindow(26,3);

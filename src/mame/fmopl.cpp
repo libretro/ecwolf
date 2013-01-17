@@ -965,7 +965,7 @@ INLINE void OPL_CALC_CH( OPL_CH *CH )
 	SLOT++;
 	env = volume_calc(SLOT);
 	if( env < ENV_QUIET )
-		output[0] += op_calc(SLOT->Cnt, env, phase_modulation, SLOT->wavetable)*MULTIPLY_VOLUME(*SLOT->playVolume);
+		output[0] += static_cast<int>(op_calc(SLOT->Cnt, env, phase_modulation, SLOT->wavetable)*MULTIPLY_VOLUME(*SLOT->playVolume));
 }
 
 /*

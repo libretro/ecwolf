@@ -5,8 +5,8 @@
 
 static inline const WORD ReadLittleShort(const BYTE * const ptr)
 {
-	return DWORD(BYTE(*ptr)) |
-		(DWORD(BYTE(*(ptr+1)))<<8);
+	return WORD(BYTE(*ptr)) |
+		(WORD(BYTE(*(ptr+1)))<<8);
 }
 
 static inline const DWORD ReadLittle24(const BYTE * const ptr)

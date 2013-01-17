@@ -1292,7 +1292,7 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, int length)
 	LastChar = 255;
 	GlobalKerning = 0;
 	ActiveColors = 256;
-	Cursor = 0x80;
+	Cursor = (char)0x80;
 	for(int i = 0;i < 256;++i)
 	{
 		Chars[i].Pic = new FFontChar2 (lump, location[i], width[i], FontHeight);

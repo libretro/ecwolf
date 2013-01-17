@@ -1274,7 +1274,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	ACTION_PARAM_INT(flags, 2);
 	ACTION_PARAM_STRING(pufftype, 3);
 	ACTION_PARAM_DOUBLE(range, 4);
-	ACTION_PARAM_DOUBLE(lifesteal, 5);
+	ACTION_PARAM_FIXED(lifesteal, 5);
 
 	player_t *player = self->player;
 
@@ -1346,7 +1346,7 @@ ACTION_FUNCTION(A_GunAttack)
 
 	ACTION_PARAM_INT(flags, 0);
 	ACTION_PARAM_STRING(sound, 1);
-	ACTION_PARAM_DOUBLE(snipe, 2);
+	ACTION_PARAM_FIXED(snipe, 2);
 	ACTION_PARAM_INT(maxdamage, 3);
 	ACTION_PARAM_INT(blocksize, 4);
 	ACTION_PARAM_INT(pointblank, 5);
@@ -1377,7 +1377,7 @@ ACTION_FUNCTION(A_GunAttack)
 	dy = ABS(closest->y - players[0].mo->y);
 	dist = dx>dy ? dx:dy;
 
-	dist = FixedMul(dist, snipe*FRACUNIT);
+	dist = FixedMul(dist, snipe);
 	dist /= blocksize<<9;
 
 	int damage = flags & GAF_NORANDOM ? maxdamage : (1 + (pr_cwbullet()%maxdamage));

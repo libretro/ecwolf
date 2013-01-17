@@ -242,12 +242,12 @@ void ExprCos(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *ar
 
 void ExprRandom(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
 {
-	int min = args[0]->Evaluate(self).GetInt();
-	int max = args[1]->Evaluate(self).GetInt();
+	int64_t min = args[0]->Evaluate(self).GetInt();
+	int64_t max = args[1]->Evaluate(self).GetInt();
 	if(min > max)
-		out = int64_t(max+(*rng)(min-max));
+		out = max+(*rng)((int)(min-max));
 	else
-		out = int64_t(min+(*rng)(max-min));
+		out = min+(*rng)((int)(max-min));
 }
 
 void ExprFRandom(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)

@@ -280,7 +280,7 @@ class EVDoor : public Thinker
 			if(direction == 0)
 			{
 				if(spot->GetY() == obj->tiley &&
-					abs(((spot->GetX()<<FRACBITS)+(FRACUNIT/2))-obj->x) < static_cast<unsigned int>(FRACUNIT/2 + obj->radius))
+					abs((((fixed)spot->GetX()<<FRACBITS)+(FRACUNIT/2))-obj->x) < FRACUNIT/2 + obj->radius)
 				{
 					return false;
 				}
@@ -288,7 +288,7 @@ class EVDoor : public Thinker
 			else
 			{
 				if(spot->GetX() == obj->tilex &&
-					abs(((spot->GetY()<<FRACBITS)+(FRACUNIT/2))-obj->y) < static_cast<unsigned int>(FRACUNIT/2 + obj->radius))
+					abs((((fixed)spot->GetY()<<FRACBITS)+(FRACUNIT/2))-obj->y) < FRACUNIT/2 + obj->radius)
 				{
 					return false;
 				}
@@ -348,7 +348,7 @@ FUNC(Door_Open)
 	{
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
-			return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator, activator->flags & FL_ISMONSTER);
+			return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
 		}
 		return 0;
 	}

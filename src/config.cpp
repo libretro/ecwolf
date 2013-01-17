@@ -141,7 +141,7 @@ void Config::ReadConfig()
 		stream.seekg(0, ios_base::end);
 		if(stream.fail())
 			return;
-		unsigned int size = stream.tellg();
+		unsigned int size = static_cast<unsigned int>(stream.tellg());
 		stream.seekg(0, ios_base::beg);
 		if(stream.fail())
 			return;

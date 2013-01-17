@@ -110,7 +110,20 @@ else(APPLE)
 	set(PLATFORM_EXE_FLAGS "")
 endif(APPLE)
 
+# Glob for the header files so project generation can include them
+file(GLOB HEADER_FILES
+	g_shared/*.h
+	g_wolf/*.h
+	r_data/*.h
+	resourcefiles/*.h
+	sfmt/*.h
+	textures/*.h
+	thingdef/*.h
+	*.h
+)
+
 add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
+	${HEADER_FILES}
 	${OPL_SOURCES}
 	g_shared/a_deathcam.cpp
 	g_shared/a_inventory.cpp

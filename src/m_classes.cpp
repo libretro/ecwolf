@@ -489,7 +489,7 @@ void Menu::drawGunHalfStep(int x, int y)
 
 void Menu::eraseGun(int x, int y)
 {
-	unsigned int gx = x, gy = y, gw = cursor->GetScaledWidthDouble(), gh = cursor->GetScaledHeightDouble();
+	int gx = x, gy = y, gw = cursor->GetScaledWidth(), gh = cursor->GetScaledHeight();
 	MenuToRealCoords(gx, gy, gw, gh, MENU_CENTER);
 	VWB_Clear(BKGDCOLOR, gx, gy, gx+gw, gy+gh);
 }

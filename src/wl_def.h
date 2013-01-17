@@ -145,6 +145,7 @@ void Quit(const char *errorStr, ...);
 #define ANGLE_270		(ANGLE_45*6)
 #define ANGLE_1			(ANGLE_45/45)
 #define ANGLE_60		(ANGLE_180/3)
+#define ANGLE_NEG(x)	(static_cast<angle_t>(0xFFFFFFFFu-x+1u))
 typedef uint32_t angle_t;
 
 #define TEXTURESHIFT    6

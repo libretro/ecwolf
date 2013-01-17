@@ -754,7 +754,7 @@ void ClearMScreen (void)
 ////////////////////////////////////////////////////////////////////
 void DrawWindow (int x, int y, int w, int h, int wcolor, int color1, int color2)
 {
-	unsigned int wx = x, wy = y, ww = w, wh = h;
+	int wx = x, wy = y, ww = w, wh = h;
 	MenuToRealCoords(wx, wy, ww, wh, MENU_CENTER);
 
 	VWB_Clear (wcolor, wx, wy, wx+ww, wy+wh);
@@ -883,9 +883,9 @@ void ReadAnyControl (ControlInfo * ci)
 
 		if (buttons)
 		{
-			ci->button0 = buttons & 1;
-			ci->button1 = buttons & 2;
-			ci->button2 = buttons & 4;
+			ci->button0 = !!(buttons & 1);
+			ci->button1 = !!(buttons & 2);
+			ci->button2 = !!(buttons & 4);
 			ci->button3 = false;
 			mouseactive = 1;
 		}
@@ -909,10 +909,10 @@ void ReadAnyControl (ControlInfo * ci)
 		jb = IN_JoyButtons ();
 		if (jb)
 		{
-			ci->button0 = jb & 1;
-			ci->button1 = jb & 2;
-			ci->button2 = jb & 4;
-			ci->button3 = jb & 8;
+			ci->button0 = !!(jb & 1);
+			ci->button1 = !!(jb & 2);
+			ci->button2 = !!(jb & 4);
+			ci->button3 = !!(jb & 8);
 		}
 	}
 }
@@ -923,9 +923,10 @@ void ReadAnyControl (ControlInfo * ci)
 // DRAW DIALOG AND CONFIRM YES OR NO TO QUESTION
 //
 ////////////////////////////////////////////////////////////////////
-int Confirm (const char *string)
+bool Confirm (const char *string)
 {
-	int xit = 0, x, y, tick = 0, lastBlinkTime;
+	bool xit = false;
+	int x, y, tick = 0, lastBlinkTime;
 	const char* whichsnd[2] = { "menu/escape", "menu/activate" };
 	ControlInfo ci;
 
@@ -955,7 +956,7 @@ int Confirm (const char *string)
 					double dw = 8;
 					double dh = 13;
 					MenuToRealCoords(dx, dy, dw, dh, MENU_CENTER);
-					VWB_Clear(MENUWIN_BACKGROUND, dx, dy, dx+dw, dy+dh);
+					VWB_Clear(MENUWIN_BACKGROUND, (int)dx, (int)dy, (int)(dx+dw), (int)(dy+dh));
 					break;
 				}
 				case 1:
@@ -974,7 +975,7 @@ int Confirm (const char *string)
 
 	if (Keyboard[sc_S] || Keyboard[sc_Y] || ci.button0)
 	{
-		xit = 1;
+		xit = true;
 		ShootSnd ();
 	}
 

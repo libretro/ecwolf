@@ -205,7 +205,7 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
   PaletteMap(0), PaletteSize(0), StartOfIDAT(0), StartOftRNS(0)
 {
 	DWORD len, id;
-	int i;
+	//int i;
 
 	UseType = TEX_MiscPatch;
 	LeftOffset = 0;

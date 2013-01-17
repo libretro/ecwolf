@@ -93,7 +93,7 @@ void ExpressionNode::Value::PerformOperation(const ExpressionNode::Value *other,
 		if(!isDouble)
 		{
 			isDouble = other->isDouble;
-			d = i;
+			d = static_cast<double>(i);
 		}
 
 		switch(op.token)
@@ -248,9 +248,9 @@ void ExpressionNode::Value::PerformOperation(const ExpressionNode::Value *other,
 				if(isDouble)
 				{
 					isDouble = false;
-					i != d;
+					i = !d;
 				}
-				else i != i;
+				else i = !i;
 				break;
 			case '~':
 				if(isDouble)
@@ -258,7 +258,7 @@ void ExpressionNode::Value::PerformOperation(const ExpressionNode::Value *other,
 					isDouble = false;
 					i = ~int64_t(d);
 				}
-				else i = !i;
+				else i = ~i;
 				break;
 		}
 	}
