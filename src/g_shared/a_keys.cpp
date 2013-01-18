@@ -40,7 +40,10 @@ class AKeyGiver : public AInventory
 					item->Destroy();
 				}
 			}
-			return pickedup;
+
+			if(!pickedup)
+				return false;
+			return Super::TryPickup(toucher);
 		}
 };
 IMPLEMENT_CLASS(KeyGiver)

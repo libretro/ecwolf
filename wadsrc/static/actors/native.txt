@@ -99,6 +99,7 @@ actor Key : Inventory native
 
 actor KeyGiver : Inventory native
 {
+	inventory.pickupsound "misc/k_pkup"
 }
 
 actor ScoreItem : Inventory native
