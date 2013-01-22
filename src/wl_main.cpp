@@ -1246,10 +1246,17 @@ bool GtkAvailable;
 #if defined(main) && !defined(__APPLE__)
 #undef main
 #endif
+#ifdef _WIN32
+bool CheckIsRunningFromCommandPrompt();
+#endif
 int main (int argc, char *argv[])
 {
 #ifndef NO_GTK
 	GtkAvailable = gtk_init_check(&argc, &argv);
+#endif
+
+#ifdef _WIN32
+	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
 #endif
 
 	// Find the program directory.
@@ -1298,8 +1305,21 @@ int main (int argc, char *argv[])
 	}
 	catch(class CDoomError &error)
 	{
+		SDL_Quit();
+
 		if(error.GetMessage())
 			fprintf(stderr, "%s\n", error.GetMessage());
+
+#ifdef _WIN32
+		// When running from Windows explorer, wait for user dismissal
+		if(waitForConsoleInput)
+		{
+			fprintf(stderr, "An error has occured (press enter to dismiss)");
+			fseek(stdin, 0, SEEK_END);
+			getchar();
+		}
+#endif
+
 		exit(-1);
 	}
 	return 1;

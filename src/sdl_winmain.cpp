@@ -64,6 +64,15 @@ static char stderrPath[MAX_PATH];
 #define isspace(a) (((CHAR)a == ' ') || ((CHAR)a == '\t'))
 #endif /* _WIN32_WCE < 300 */
 
+bool CheckIsRunningFromCommandPrompt()
+{
+	HANDLE stdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	if(!GetConsoleScreenBufferInfo(stdOutput, &info))
+		return false;
+	return info.dwCursorPosition.X != 0 || info.dwCursorPosition.Y != 0;
+}
+
 /* Parse a command line buffer into arguments */
 static int ParseCommandLine(char *cmdline, char **argv)
 {
