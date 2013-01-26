@@ -37,6 +37,10 @@
 #define USE_WINDOWS_BOOLEAN
 #include <windows.h>
 #else
+#ifdef __APPLE__
+#include <sys/attr.h>
+#include <sys/mount.h>
+#endif
 #include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
@@ -142,10 +146,35 @@ FString File::getDirectory() const
 
 FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtension) const
 {
-#if defined(WINDOWS) || defined(__APPLE__)
+#ifdef WINDOWS
 	// Insensitive filesystem, so just return the filename
 	return filename;
 #else
+#ifdef __APPLE__
+	{
+		// Mac supports both case insensitive and sensitive file systems
+		attrlist pathAttr = {
+			ATTR_BIT_MAP_COUNT, 0,
+			0, ATTR_VOL_CAPABILITIES, 0, 0, 0
+		};
+		struct statfs fs;
+		struct
+		{
+			u_int32_t length;
+			vol_capabilities_attr_t cap;
+		} __attribute__((aligned(4), packed)) vol;
+
+		int attrError = -1;
+		if(statfs(this->filename, &fs) == 0)
+			attrError = getattrlist(fs.f_mntonname, &pathAttr, &vol, sizeof(vol), 0);
+		if(attrError || !(vol.cap.capabilities[0] & vol.cap.valid[0] & VOL_CAP_FMT_CASE_SENSITIVE))
+		{
+			// We assume case insensitive (since it's the default) unless the volcap tells us otherwise
+			return filename;
+		}
+	}
+#endif
+
 	const TArray<FString> &files = getFileList();
 	FString extension = filename.Mid(filename.LastIndexOf('.')+1);
 
