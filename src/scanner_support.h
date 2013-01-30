@@ -30,7 +30,9 @@ typedef FString	SCString;
 typedef long	SCString_Index;
 
 inline SCString &SCString_AppendChar(SCString &obj, const char chr) { return obj += chr; }
-inline int SCString_Compare(const SCString &obj, const char *other) { return obj.Compare(other); }
+// This is normally case sensitive, but for ZDoom stuff we're usually case insensitive.
+// Hopefully I don't end up needing this for something strictly case sensitive and forget about this! :P
+inline int SCString_Compare(const SCString &obj, const char *other) { return obj.CompareNoCase(other); }
 inline const char* SCString_GetChars(const SCString &obj) { return obj; }
 inline SCString_Index SCString_IndexOf(const SCString &obj, const char chr, SCString_Index spos) { return obj.IndexOf(chr, spos); }
 inline SCString_Index SCString_IndexOfSeq(const SCString &obj, const SCString &seq, SCString_Index spos) { return obj.IndexOf(seq, spos); }
