@@ -32,7 +32,7 @@ class AKeyGiver : public AInventory
 					continue;
 				}
 
-				AInventory *item = static_cast<AInventory *>(AActor::Spawn(cls, 0, 0, 0, true));
+				AInventory *item = static_cast<AInventory *>(AActor::Spawn(cls, 0, 0, 0, false));
 				item->RemoveFromWorld();
 				if(!item->TryPickup(toucher))
 				{
