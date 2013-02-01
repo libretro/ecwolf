@@ -1,15 +1,9 @@
-include "mapinfo/spearcommon.txt"
+include "mapinfo/spear.txt"
 
 gameinfo
 {
 	playerclasses = "LostBJPlayer"
 	doorsoundsequence = "DoorMetal"
 	pushwallsoundsequence = "PushwallHeavy"
-}
-
-adddefaultmap
-{
 	translator = "xlat/danger.txt"
 }
-
-include "mapinfo/spearmaps.txt"

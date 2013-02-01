@@ -17,7 +17,6 @@ gameinfo
 
 adddefaultmap
 {
-	translator = "xlat/wolf3d.txt"
 	deathcam = true
 	specialaction = "Schabbs", "Exit_Normal"
 	specialaction = "Gift", "Exit_Normal"

@@ -1,5 +1,4 @@
-include "mapinfo/spearcommon.txt"
-include "mapinfo/spearmaps.txt"
+include "mapinfo/spear.txt"
 
 cluster 1
 {

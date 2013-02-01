@@ -67,6 +67,7 @@ public:
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
 	FString FinaleFlat;
+	FString	Translator;
 	FName	DoorSoundSequence;
 	FName	PushwallSoundSequence;
 	fixed	GibFactor;

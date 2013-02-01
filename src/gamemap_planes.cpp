@@ -459,7 +459,7 @@ void GameMap::ReadPlanesData()
 	static const unsigned short UNIT = 64;
 	enum OldPlanes { Plane_Tiles, Plane_Object, Plane_Flats, NUM_USABLE_PLANES };
 
-	xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator));
+	xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator.IsEmpty() ? gameinfo.Translator : levelInfo->Translator));
 
 	valid = true;
 
