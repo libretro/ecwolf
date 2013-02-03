@@ -604,7 +604,11 @@ protected:
 		else if(key.CompareNoCase("titletime") == 0)
 			ParseIntAssignment(gameinfo.TitleTime);
 		else if(key.CompareNoCase("translator") == 0)
-			ParseStringAssignment(gameinfo.Translator);
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			gameinfo.Translator.Push(sc->str);
+		}
 		else if(key.CompareNoCase("pagetime") == 0)
 			ParseIntAssignment(gameinfo.PageTime);
 		else if(key.CompareNoCase("menumusic") == 0)

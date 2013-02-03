@@ -126,8 +126,8 @@ int     texdelta;
 int		texheight;
 
 #define TEXTUREBASE 0x4000000
-fixed	texxscale;
-fixed	texyscale;
+fixed	texxscale = FRACUNIT;
+fixed	texyscale = FRACUNIT;
 
 
 /*

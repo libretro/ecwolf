@@ -96,11 +96,28 @@ public:
 	{
 	}
 
-	void LoadXlat(int lump)
+	void ClearTables()
 	{
-		if(this->lump == lump)
-			return;
-		this->lump = lump;
+		// Clear out old data (to be called before initial load)
+		for(unsigned int i = 0;i < 256;++i)
+		{
+			flatTable[i][0].SetInvalid();
+			flatTable[i][1].SetInvalid();
+		}
+		tileTriggers.Clear();
+		thingTable.Clear();
+	}
+
+	void LoadXlat(int lump, const GameInfo::FStringStack *baseStack, bool included=false)
+	{
+		if(!included)
+		{
+			if(this->lump == lump)
+				return;
+			this->lump = lump;
+
+			ClearTables();
+		}
 
 		FMemLump data = Wads.ReadLump(lump);
 		Scanner sc((const char*)data.GetMem(), data.GetSize());
@@ -116,6 +133,26 @@ public:
 				LoadThingTable(sc);
 			else if(sc->str.CompareNoCase("flats") == 0)
 				LoadFlatsTable(sc);
+			else if(sc->str.CompareNoCase("include") == 0)
+			{
+				sc.MustGetToken(TK_StringConst);
+
+				// "$base" is used to include the previous translator in the stack
+				FString lumpName = sc->str;
+				const GameInfo::FStringStack *baseStackNext = baseStack;
+				if(lumpName.CompareNoCase("$base") == 0)
+				{
+					if(baseStack == NULL)
+						sc.ScriptMessage(Scanner::ERROR, "$base is empty.");
+					lumpName = baseStack->str;
+					baseStackNext = baseStack->Next();
+				}
+
+				int includeLump = Wads.GetNumForFullName(lumpName);
+				if(includeLump == -1)
+					sc.ScriptMessage(Scanner::ERROR, "Could not open '%s'.", sc->str.GetChars());
+				LoadXlat(includeLump, baseStackNext);
+			}
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown xlat property '%s'.", sc->str.GetChars());
 		}
@@ -256,13 +293,6 @@ public:
 protected:
 	void LoadFlatsTable(Scanner &sc)
 	{
-		// Clear out old data
-		for(unsigned int i = 0;i < 256;++i)
-		{
-			flatTable[i][0].SetInvalid();
-			flatTable[i][1].SetInvalid();
-		}
-
 		sc.MustGetToken('{');
 		while(!sc.CheckToken('}'))
 		{
@@ -296,8 +326,6 @@ protected:
 
 	void LoadTilesTable(Scanner &sc)
 	{
-		tileTriggers.Clear();
-
 		sc.MustGetToken('{');
 		while(!sc.CheckToken('}'))
 		{
@@ -372,9 +400,6 @@ protected:
 
 	void LoadThingTable(Scanner &sc)
 	{
-		// Always start with an empty table
-		thingTable.Clear();
-
 		sc.MustGetToken('{');
 		while(!sc.CheckToken('}'))
 		{
@@ -459,7 +484,10 @@ void GameMap::ReadPlanesData()
 	static const unsigned short UNIT = 64;
 	enum OldPlanes { Plane_Tiles, Plane_Object, Plane_Flats, NUM_USABLE_PLANES };
 
-	xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator.IsEmpty() ? gameinfo.Translator : levelInfo->Translator));
+	if(levelInfo->Translator.IsEmpty())
+		xlat.LoadXlat(Wads.GetNumForFullName(gameinfo.Translator.str), gameinfo.Translator.Next());
+	else
+		xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator), &gameinfo.Translator);
 
 	valid = true;
 

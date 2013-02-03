@@ -67,7 +67,26 @@ public:
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
 	FString FinaleFlat;
-	FString	Translator;
+	// Special stack for strings like the default translator.
+	// This will allow the previous default to be included.
+	class FStringStack
+	{
+	public:
+		FStringStack() : next(NULL) {}
+		~FStringStack() { delete next; }
+
+		const FStringStack *Next() const { return next; }
+		void Push(const FString &str)
+		{
+			if(!this->str.IsEmpty())
+				next = new FStringStack(*this);
+			this->str = str;
+		}
+
+		FString str;
+	private:
+		FStringStack *next;
+	} Translator;
 	FName	DoorSoundSequence;
 	FName	PushwallSoundSequence;
 	fixed	GibFactor;

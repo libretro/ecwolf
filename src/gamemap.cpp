@@ -267,7 +267,7 @@ void GameMap::GetHitlist(BYTE* hitlist) const
 
 const GameMap::Tile *GameMap::GetTile(unsigned int index) const
 {
-	if(index == INT_MAX)
+	if(index > tilePalette.Size())
 		return NULL;
 	return &tilePalette[index];
 }
@@ -282,7 +282,7 @@ unsigned int GameMap::GetTileIndex(const GameMap::Tile *tile) const
 
 const GameMap::Sector *GameMap::GetSector(unsigned int index) const
 {
-	if(index == INT_MAX)
+	if(index > sectorPalette.Size())
 		return NULL;
 	return &sectorPalette[index];
 }
