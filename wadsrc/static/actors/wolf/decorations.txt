@@ -512,7 +512,7 @@ actor Flag 72
 			stop
 	}
 }
-actor TeslaCoil 127
+actor TeslaCoil : Flag 127
 {
 	states
 	{
@@ -677,7 +677,7 @@ actor CageWithSkulls 84
 			stop
 	}
 }
-actor CageWithRat 124
+actor CageWithRat : CageWithSkulls 124
 {
 	states
 	{
