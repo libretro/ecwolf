@@ -13,6 +13,7 @@ class ADeathCam : public AActor
 
 		TObjPtr<AActor>	actor;
 		TObjPtr<AActor>	killer;
+		bool camFinished;
 };
 
 #endif

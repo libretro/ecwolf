@@ -57,6 +57,7 @@ static bool CheckPosition (AActor *ob)
 
 void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
 {
+	camFinished = false;
 	this->actor = actor;
 	this->killer = killer;
 
@@ -78,6 +79,13 @@ void ADeathCam::Tick()
 ACTION_FUNCTION(A_FinishDeathCam)
 {
 	ADeathCam *cam = (ADeathCam *)self;
+	if(cam->camFinished)
+	{
+		// Allow the game to continue if we don't exit.
+		gamestate.victoryflag = false;
+		CALL_ACTION(A_BossDeath, cam->actor);
+		return;
+	}
 
 	cam->x = cam->killer->x;
 	cam->y = cam->killer->y;
@@ -86,6 +94,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	FinishPaletteShifts();
 
 	gamestate.victoryflag = true;
+	cam->camFinished = true;
 
 	double fadex = 0;
 	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;;

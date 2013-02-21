@@ -147,8 +147,16 @@ ACTION_FUNCTION(A_ActiveSound)
 
 ACTION_FUNCTION(A_BossDeath)
 {
-	// TODO: Check if all enemies of same type are dead and then call a defined function.
-	bool deathcamRun = false;
+	// Deathcam involves a little bit of spaghetti code. To sum it up:
+	// 1.) This function creates the death cam and lets it's spawn state run.
+	//     Victory flag is set by the death cam.
+	// 2.) After the actor's death state runs again this function should be
+	//     called. It will restart the spawn state for timing.
+	// 3.) The deathcam signals this function for the third time with the
+	//     victory flag removed. We'll call the action specials and then if
+	//     we're still in the game, return control to the player.
+	ADeathCam *deathcam = NULL;
+
 	bool alldead = true;
 	AActor::Iterator *iter = AActor::GetIterator();
 	while(iter)
@@ -158,7 +166,7 @@ ACTION_FUNCTION(A_BossDeath)
 		if(other != self)
 		{
 			if(other->GetClass() == NATIVE_CLASS(DeathCam))
-				deathcamRun = true;
+				deathcam = static_cast<ADeathCam *> (other);
 			else if(other->GetClass() == self->GetClass())
 			{
 				if(other->health > 0)
@@ -174,10 +182,18 @@ ACTION_FUNCTION(A_BossDeath)
 	if(!alldead)
 		return;
 
-	if(levelInfo->DeathCam && !deathcamRun)
+	if(levelInfo->DeathCam && (!deathcam || gamestate.victoryflag))
 	{
-		ADeathCam *dc = (ADeathCam*)AActor::Spawn(NATIVE_CLASS(DeathCam), 0, 0, 0, true);
-		dc->SetupDeathCam(self, players[0].mo);
+		if(!deathcam)
+		{
+			ADeathCam *dc = (ADeathCam*)AActor::Spawn(NATIVE_CLASS(DeathCam), 0, 0, 0, true);
+			dc->SetupDeathCam(self, players[0].mo);
+		}
+		else
+		{
+			// Let the deathcam reanimate
+			deathcam->SetState(deathcam->SpawnState);
+		}
 	}
 	else
 	{
@@ -191,12 +207,13 @@ ACTION_FUNCTION(A_BossDeath)
 				function(map->GetSpot(self->tilex, self->tiley, 0), action.Args, MapTrigger::East, self);
 			}
 		}
-	}
 
-	if(deathcamRun && playstate == ex_stillplaying)
-	{
-		// Return the camera to the player if we're still going
-		players[0].camera = players[0].mo;
+		if(deathcam && playstate == ex_stillplaying)
+		{
+			// Return the camera to the player if we're still going
+			players[0].camera = players[0].mo;
+			players[0].BringUpWeapon();
+		}
 	}
 }
 
