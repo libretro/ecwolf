@@ -292,6 +292,6 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 	printf ("Which one? ");
 	scanf ("%d", &i);
 	if (i > numwads)
-		return -1;
+		return numwads-1;
 	return i-1;
 }

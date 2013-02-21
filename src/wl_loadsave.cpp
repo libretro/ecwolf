@@ -295,6 +295,7 @@ bool SetupSaveGames()
 					FString checkString(checkFile);
 					int lastIndex = 0;
 					int nextIndex = 0;
+					int expectedIwads = IWad::GetNumIWads();
 					do
 					{
 						nextIndex = checkString.IndexOf(';', lastIndex);
@@ -304,10 +305,20 @@ bool SetupSaveGames()
 							break;
 						}
 						else
+						{
+							--expectedIwads;
 							canLoad = true;
+						}
 						lastIndex = nextIndex + 1;
 					}
 					while(nextIndex != -1);
+
+					// See if we don't have the right number of iwads loaded.
+					if(canLoad && expectedIwads != 0)
+					{
+						sFile.hide = true;
+						canLoad = false;
+					}
 					delete[] checkFile;
 				}
 
