@@ -81,11 +81,13 @@ void CheckWeaponChange (void)
 
 	if(buttonstate[bt_nextweapon] && !buttonheld[bt_nextweapon])
 	{
-		newWeapon = players[0].PendingWeapon = players[0].weapons.PickNextWeapon(&players[0]);
+		newWeapon = players[0].weapons.PickNextWeapon(&players[0]);
+		buttonheld[bt_nextweapon] = true;
 	}
 	else if(buttonstate[bt_prevweapon] && !buttonheld[bt_prevweapon])
 	{
-		newWeapon = players[0].PendingWeapon = players[0].weapons.PickPrevWeapon(&players[0]);
+		newWeapon = players[0].weapons.PickPrevWeapon(&players[0]);
+		buttonheld[bt_prevweapon] = true;
 	}
 	else
 	{
@@ -94,6 +96,7 @@ void CheckWeaponChange (void)
 			if(buttonstate[bt_slot0 + i] && !buttonheld[bt_slot0 + i])
 			{
 				newWeapon = players[0].weapons.Slots[i].PickWeapon(&players[0]);
+				buttonheld[bt_slot0 + i] = true;
 				break;
 			}
 		}
