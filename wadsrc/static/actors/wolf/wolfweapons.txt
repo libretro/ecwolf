@@ -136,7 +136,7 @@ actor BlueAK47 : MachineGun 141
 	}
 }
 
-actor GatlingGun : WolfWeapon 61
+actor GatlingGun : WolfWeapon
 {
 	attacksound "weapon/gatling/attack"
 	inventory.icon "GATLGUN"
@@ -160,7 +160,7 @@ actor GatlingGun : WolfWeapon 61
 	}
 }
 
-actor BlueGatlingGun : GatlingGun 156
+actor BlueGatlingGun : GatlingGun
 {
 	attacksound "weapon/bluegatling/attack"
 	inventory.pickupsound "weapon/bluegatling/pickup"
@@ -179,5 +179,30 @@ actor BlueGatlingGun : GatlingGun 156
 			BGTG CD 3 bright A_GunAttack
 			BGTG E 3 A_ReFire
 			goto Ready
+	}
+}
+
+actor GatlingGunUpgrade : WeaponGiver 61
+{
+	inventory.pickupsound "weapon/gatling/pickup"
+	weapon.ammogive1 6
+	dropitem "GatlingGun"
+	dropitem "MachineGun"
+	states
+	{
+		Spawn:
+			CGUN A -1
+			stop
+	}
+}
+actor BlueGatlingGunUpgrade : GatlingGunUpgrade 156
+{
+	dropitem "BlueGatlingGun"
+	dropitem "BlueAK47"
+	states
+	{
+		Spawn:
+			BGUN A -1
+			stop
 	}
 }

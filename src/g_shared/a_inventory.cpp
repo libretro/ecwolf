@@ -315,10 +315,13 @@ void AWeapon::AttachToOwner(AActor *owner)
 	ammo1 = static_cast<AAmmo *>(owner->FindInventory(ammotype1));
 	if(!ammo1)
 	{
-		ammo1 = static_cast<AAmmo *>(Spawn(ammotype1, 0, 0, 0, false));
-		ammo1->amount = MIN(ammogive1, ammo1->maxamount);
-		owner->AddInventory(ammo1);
-		ammo1->RemoveFromWorld();
+		if(ammotype1)
+		{
+			ammo1 = static_cast<AAmmo *>(Spawn(ammotype1, 0, 0, 0, false));
+			ammo1->amount = MIN<unsigned int>(ammogive1, ammo1->maxamount);
+			owner->AddInventory(ammo1);
+			ammo1->RemoveFromWorld();
+		}
 	}
 	else if(ammo1->amount < ammo1->maxamount)
 	{
@@ -454,6 +457,69 @@ ACTION_FUNCTION(A_WeaponReady)
 {
 	self->player->flags |= player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING;
 }
+
+class AWeaponGiver : public AWeapon
+{
+	DECLARE_NATIVE_CLASS(WeaponGiver, Weapon)
+
+	protected:
+		bool TryPickup(AActor *toucher)
+		{
+			bool pickedup = true;
+			AWeapon *switchTo = toucher->player->PendingWeapon;
+			DropList *drops = GetDropList();
+
+			// Get the tail since that will be the primary weapon.
+			DropList::Node *item = drops->Head();
+			while(item->Next())
+				item = item->Next();
+
+			for(;item;item = item->Prev())
+			{
+				// Only the first item in the list should give ammo
+				bool noammo = item->Next() != NULL;
+				const ClassDef *cls = ClassDef::FindClass(item->Item().className);
+				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
+					continue;
+
+				AWeapon *weap = static_cast<AWeapon *>(AActor::Spawn(cls, 0, 0, 0, false));
+				weap->RemoveFromWorld();
+
+				if(noammo)
+				{
+					weap->ammogive1 = 0;
+				}
+				else
+				{
+					if(ammogive1 >= 0)
+						weap->ammogive1 = ammogive1;
+				}
+
+				if(!weap->TryPickup(toucher))
+				{
+					pickedup = false;
+					weap->Destroy();
+
+					// If main weapon isn't picked up, don't continue.
+					if(!noammo)
+						break;
+				}
+				else if(!noammo)
+				{
+					// Main weapon picked up!
+					GoAwayAndDie();
+					if(toucher->player->PendingWeapon == weap)
+						switchTo = weap;
+				}
+			}
+
+			// Ensure the right weapon is autoswitched.
+			toucher->player->PendingWeapon = switchTo;
+
+			return pickedup;
+		}
+};
+IMPLEMENT_CLASS(WeaponGiver)
 
 ////////////////////////////////////////////////////////////////////////////////
 

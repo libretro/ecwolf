@@ -144,7 +144,7 @@ class AWeapon : public AInventory
 
 		flagstype_t		weaponFlags;
 		const ClassDef	*ammotype1;
-		unsigned int	ammogive1;
+		int				ammogive1;
 		unsigned int	ammouse1;
 		fixed			yadjust;
 

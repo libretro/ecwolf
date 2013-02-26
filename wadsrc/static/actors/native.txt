@@ -129,6 +129,11 @@ actor Weapon : Inventory native
 	action native A_WeaponReady();
 }
 
+actor WeaponGiver : Weapon native
+{
+	weapon.ammogive1 -1
+}
+
 actor PlayerPawn native
 {
 	player.maxhealth 100
