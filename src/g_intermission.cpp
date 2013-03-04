@@ -74,9 +74,16 @@ static void ShowImage(IntermissionAction *image, bool drawonly)
 		VL_ReadPalette(image->Palette);
 
 	static FTextureID background;
+	static bool tileBackground = false;
 	if(image->Background.isValid())
+	{
 		background = image->Background;
-	CA_CacheScreen(TexMan(background));
+		tileBackground = image->BackgroundTile;
+	}
+	if(!tileBackground)
+		CA_CacheScreen(TexMan(background));
+	else
+		VWB_DrawFill(TexMan(background), 0, 0, screenWidth, screenHeight);
 
 	for(unsigned int i = 0;i < image->Draw.Size();++i)
 	{

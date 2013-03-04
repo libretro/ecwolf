@@ -48,7 +48,7 @@ public:
 		unsigned int	Y;
 	};
 
-	IntermissionAction() : Time(0)
+	IntermissionAction() : Time(0), BackgroundTile(false)
 	{
 		// Invalid background means use previous.
 		Background.SetInvalid();
@@ -59,6 +59,7 @@ public:
 	FString				Music;
 	FString				Palette;
 	unsigned int		Time;
+	bool				BackgroundTile;
 };
 
 class FaderIntermissionAction : public IntermissionAction

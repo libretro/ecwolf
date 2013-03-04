@@ -910,11 +910,20 @@ protected:
 			FString tex;
 			ParseStringAssignment(tex);
 			action->Background = TexMan.CheckForTexture(tex, FTexture::TEX_Any);
+			if(sc.CheckToken(','))
+			{
+				if(!sc.CheckToken(TK_BoolConst))
+					sc.MustGetToken(TK_IntConst);
+				action->BackgroundTile = sc->boolean;
+				if(sc.CheckToken(','))
+				{
+					sc.MustGetToken(TK_StringConst);
+					action->Palette = sc->str;
+				}
+			}
 		}
 		else if(key.CompareNoCase("Music") == 0)
 			ParseStringAssignment(action->Music);
-		else if(key.CompareNoCase("Palette") == 0)
-			ParseStringAssignment(action->Palette);
 		else if(key.CompareNoCase("Time") == 0)
 		{
 			sc.MustGetToken('=');
