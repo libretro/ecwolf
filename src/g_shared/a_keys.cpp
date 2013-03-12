@@ -39,11 +39,11 @@ class AKeyGiver : public AInventory
 					pickedup = false;
 					item->Destroy();
 				}
+				else
+					GoAwayAndDie();
 			}
 
-			if(!pickedup)
-				return false;
-			return Super::TryPickup(toucher);
+			return pickedup;
 		}
 };
 IMPLEMENT_CLASS(KeyGiver)
