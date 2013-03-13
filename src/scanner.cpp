@@ -68,7 +68,7 @@ static const char* const TokenNames[TK_NumSpecialTokens] =
 	"Ellipsis"
 };
 
-Scanner::Scanner(const char* data, int length) : line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
+Scanner::Scanner(const char* data, size_t length) : line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
 {
 	if(length == -1)
 		length = strlen(data);

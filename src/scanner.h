@@ -89,7 +89,7 @@ class Scanner
 			NOTICE
 		};
 
-		Scanner(const char* data, int length=-1);
+		Scanner(const char* data, size_t length=-1);
 		~Scanner();
 
 		void			CheckForMeta();
@@ -127,8 +127,8 @@ class Scanner
 	private:
 		ParserState		nextState, prevState;
 
-		char*			data;
-		unsigned int	length;
+		char*	data;
+		size_t	length;
 
 		unsigned int	line;
 		unsigned int	lineStart;

@@ -145,7 +145,7 @@ protected:
 	void LoadFON2 (int lump, const BYTE *data);
 	void LoadBMF (int lump, const BYTE *data);
 	void LoadTile8 (int lump, const BYTE *data);
-	bool LoadWolfFont (int lump, const BYTE *data, int length);
+	bool LoadWolfFont (int lump, const BYTE *data, size_t length);
 	void CreateFontFromPic (FTextureID picnum);
 
 	static int STACK_ARGS BMFCompare(const void *a, const void *b);
@@ -1265,7 +1265,7 @@ void FSingleLumpFont::LoadTile8(int lump, const BYTE *data)
 //
 //==========================================================================
 
-bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, int length)
+bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 {
 	if(length < 770)
 		return false;

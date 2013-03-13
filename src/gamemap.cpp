@@ -277,7 +277,7 @@ unsigned int GameMap::GetTileIndex(const GameMap::Tile *tile) const
 	if(!tile)
 		return INT_MAX;
 
-	return tile - &tilePalette[0];
+	return static_cast<unsigned int>(tile - &tilePalette[0]);
 }
 
 const GameMap::Sector *GameMap::GetSector(unsigned int index) const
@@ -292,7 +292,7 @@ unsigned int GameMap::GetSectorIndex(const GameMap::Sector *sector) const
 	if(!sector)
 		return INT_MAX;
 
-	return sector - &sectorPalette[0];
+	return static_cast<unsigned int>(sector - &sectorPalette[0]);
 }
 
 void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)

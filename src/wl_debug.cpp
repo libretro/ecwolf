@@ -483,7 +483,7 @@ int DebugKeys (void)
 		{
 			// Check if a number was provided
 			bool isNumber = true;
-			for(unsigned int i = strlen(str);i-- > 0;)
+			for(size_t i = strlen(str);i-- > 0;)
 			{
 				if(str[i] < '0' || str[i] > '9')
 				{

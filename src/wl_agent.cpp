@@ -387,7 +387,7 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number)
 
 	int cwidth;
 	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
-	for(unsigned int i = MAX<unsigned int>(0, str.Len()-width);i < str.Len();++i)
+	for(size_t i = MAX<size_t>(0, str.Len()-width);i < str.Len();++i)
 	{
 		VWB_DrawGraphic(HudFont->GetChar(str[i], &cwidth), x, y, MENU_NONE, remap);
 		x += cwidth;

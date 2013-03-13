@@ -223,7 +223,7 @@ public:
 		while(AvailOut && Stream.State != STREAM_FINAL);
 
 		assert(AvailOut == 0);
-		return Out - (BYTE*)buffer;
+		return static_cast<long>(Out - (BYTE*)buffer);
 	}
 };
 

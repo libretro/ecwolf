@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 			// [BB] Find the date the revision of the working copy was created.
 			if ( ( svnCheckout == 0 ) &&
 				( system("hg log -r. --template \"{date|hgdate} {node|short}\"") == 0 ) &&
-				( fseek(stream, strlen(currev), SEEK_SET) == 0 ) &&
+				( fseek(stream, (long)strlen(currev), SEEK_SET) == 0 ) &&
 				( fgets(hgdateString, sizeof ( hgdateString ), stream) == hgdateString ) )
 			{
 				// [BB] Find the hash in the output and store it.

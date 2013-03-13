@@ -41,7 +41,7 @@ static inline unsigned int MakeKey(const char *s, size_t len)
 	memcpy(hashString, s, len);
 	for(size_t i = 0;i < len;++i)
 		hashString[i] = tolower(*s++);
-	const unsigned int ret = CalcCRC32(hashString, len);
+	const DWORD ret = CalcCRC32(hashString, static_cast<unsigned int>(len));
 	delete[] hashString;
 	return ret;
 }
