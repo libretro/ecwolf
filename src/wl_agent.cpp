@@ -308,7 +308,7 @@ void UpdateFace (bool damageUpdate)
 	};
 
 	const int maxHealth = players[0].mo ? players[0].mo->maxhealth : 100;
-	const int damageLevel = MIN(6, players[0].health > maxHealth ? 0 : (maxHealth-players[0].health)/(maxHealth/7));
+	const int damageLevel = MIN(6, players[0].health > maxHealth ? 0 : (maxHealth-players[0].health)/(maxHealth/6));
 	if(damageUpdate)
 	{
 		// Update the face only if we've changed damage levels.

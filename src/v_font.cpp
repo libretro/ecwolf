@@ -1270,8 +1270,8 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 	if(length < 770)
 		return false;
 
-	int16_t location[256];
-	int8_t width[256];
+	uint16_t location[256];
+	uint8_t width[256];
 
 	// Copy header information and then do a sanity check
 	FontHeight = LittleShort(*(const int16_t *)data);
@@ -1280,7 +1280,7 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 	for(int i = 0;i < 256;++i)
 	{
 		location[i] = LittleShort(location[i]);
-		if(location[i] + FontHeight*width[i] >= length)
+		if(location[i] + (unsigned)FontHeight*width[i] >= length)
 			return false;
 	}
 
