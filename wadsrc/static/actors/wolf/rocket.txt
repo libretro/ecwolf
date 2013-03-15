@@ -98,7 +98,7 @@ actor HighChemicalSmoke : HighSmoke
 	states
 	{
 		Spawn:
-			CHSK ABCD 3
+			CHSM ABCD 3
 			stop
 	}
 }
