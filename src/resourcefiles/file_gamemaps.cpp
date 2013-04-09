@@ -39,6 +39,7 @@
 #include "w_wad.h"
 #include "m_swap.h"
 #include "zstring.h"
+#include "wolfmapcommon.h"
 
 struct FMapLump;
 
@@ -51,149 +52,12 @@ class FGamemaps : public FResourceFile
 		FResourceLump *GetLump(int lump);
 		bool Open(bool quiet);
 
-	protected:
-		friend struct FMapLump;
-
-		WORD		rlewTag;
-
 	private:
 		FMapLump*	Lumps;
 
 		FString		extension;
 		FString		gamemapsFile;
 		FString		mapheadFile;
-};
-
-#define PLANES 3
-#define HEADERSIZE 34
-#define CARMACK_NEARTAG	static_cast<unsigned char>(0xA7)
-#define CARMACK_FARTAG	static_cast<unsigned char>(0xA8)
-
-struct FMapLump : public FResourceLump
-{
-	protected:
-		// Only important thing to remember is that both
-		// Compression methods work on WORDs rather than bytes.
-
-		void ExpandCarmack(const unsigned char* in, unsigned char* out)
-		{
-			const unsigned char* const end = out + ReadLittleShort((const BYTE*)in);
-			const unsigned char* const start = out;
-			in += 2;
-
-			const unsigned char* copy;
-			BYTE length;
-			while(out < end)
-			{
-				length = *in++;
-				if(length == 0 && (*in == CARMACK_NEARTAG || *in == CARMACK_FARTAG))
-				{
-					*out++ = in[1];
-					*out++ = in[0];
-					in += 2;
-					continue;
-				}
-				else if(*in == CARMACK_NEARTAG)
-				{
-					copy = out-(in[1]*2);
-					in += 2;
-				}
-				else if(*in == CARMACK_FARTAG)
-				{
-					copy = start+(ReadLittleShort((const BYTE*)(in+1))*2);
-					in += 3;
-				}
-				else
-				{
-					*out++ = length;
-					*out++ = *in++;
-					continue;
-				}
-				if(out+(length*2) > end)
-					break;
-				while(length-- > 0)
-				{
-					*out++ = *copy++;
-					*out++ = *copy++;
-				}
-			}
-		}
-
-		void ExpandRLEW(const unsigned char* in, unsigned char* out, const WORD rlewTag)
-		{
-			const unsigned char* const end = out + ReadLittleShort((const BYTE*)in);
-			in += 2;
-
-			while(out < end)
-			{
-				if(ReadLittleShort((const BYTE*)in) != rlewTag)
-				{
-					*out++ = *in++;
-					*out++ = *in++;
-				}
-				else
-				{
-					WORD count = ReadLittleShort((const BYTE*)(in+2));
-					WORD input = ReadLittleShort((const BYTE*)(in+4));
-					in += 6;
-					while(count-- > 0)
-					{
-						WriteLittleShort((BYTE*)out, input);
-						out += 2;
-					}
-				}
-			}
-		}
-
-		int FillCache()
-		{
-			if(LumpSize == 0)
-				return 1;
-
-			unsigned int PlaneSize = Header.Width*Header.Height*2;
-
-			Cache = new char[LumpSize];
-			strcpy(Cache, "WDC3.1");
-			WriteLittleShort((BYTE*)&Cache[10], 3);
-			WriteLittleShort((BYTE*)&Cache[HEADERSIZE-4], Header.Width);
-			WriteLittleShort((BYTE*)&Cache[HEADERSIZE-2], Header.Height);
-			memcpy(&Cache[14], Header.Name, 16);
-
-			// Read map data and expand it
-			for(unsigned int i = 0;i < PLANES;i++)
-			{
-				unsigned char* output = reinterpret_cast<unsigned char*>(Cache+HEADERSIZE+i*PlaneSize);
-				unsigned char* input = new unsigned char[Header.PlaneLength[i]];
-				Owner->Reader->Seek(Header.PlaneOffset[i], SEEK_SET);
-				Owner->Reader->Read(input, Header.PlaneLength[i]);
-				unsigned char* tempOut = new unsigned char[ReadLittleShort((BYTE*)input)];
-
-				ExpandCarmack(input, tempOut);
-				ExpandRLEW(tempOut, output, ((FGamemaps*)Owner)->rlewTag);
-
-				delete[] input;
-				delete[] tempOut;
-			}
-			return 1;
-		}
-
-	public:
-		struct
-		{
-			DWORD	PlaneOffset[PLANES];
-			WORD	PlaneLength[PLANES];
-			WORD	Width;
-			WORD	Height;
-			char	Name[16];
-		} Header;
-
-		FMapLump() : FResourceLump()
-		{
-			LumpSize = HEADERSIZE;
-		}
-		~FMapLump()
-		{
-		}
 };
 
 FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(filename, file), Lumps(NULL), gamemapsFile(filename)
@@ -220,6 +84,8 @@ FResourceLump *FGamemaps::GetLump(int lump)
 
 bool FGamemaps::Open(bool quiet)
 {
+	WORD rlewTag;
+
 	// Read the map head.
 	// First two bytes is the tag for the run length encoding
 	// Followed by offsets in the gamemaps file, we'll count until we
@@ -261,6 +127,7 @@ bool FGamemaps::Open(bool quiet)
 
 		// Make the data lump
 		FMapLump &dataLump = Lumps[i*NUM_MAP_LUMPS+1];
+		dataLump.rlewTag = rlewTag;
 		BYTE header[PLANES*6+20];
 		Reader->Seek(offsets[i], SEEK_SET);
 		Reader->Read(&header, PLANES*6+20);

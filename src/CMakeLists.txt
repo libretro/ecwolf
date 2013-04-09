@@ -143,12 +143,14 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	resourcefiles/file_grp.cpp
 	resourcefiles/file_pak.cpp
 	resourcefiles/file_rff.cpp
+	resourcefiles/file_rtl.cpp
 	resourcefiles/file_lump.cpp
 	resourcefiles/file_macbin.cpp
 	resourcefiles/file_vgagraph.cpp
 	resourcefiles/file_vswap.cpp
 	resourcefiles/file_wad.cpp
 	resourcefiles/file_zip.cpp
+	resourcefiles/wolfmapcommon.cpp
 	sfmt/SFMT.cpp
 	textures/anim_switches.cpp
 	textures/animations.cpp
