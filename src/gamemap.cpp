@@ -50,7 +50,7 @@
 #include "wl_loadsave.h"
 #include "doomerrors.h"
 
-GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneLinks(NULL)
+GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false), file(NULL), zoneLinks(NULL)
 {
 	lumps[0] = NULL;
 
@@ -72,8 +72,9 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneL
 
 	if(markerLump == -1)
 	{
-		Quit("Could not find map %s!", map.GetChars());
-		return;
+		FString error;
+		error.Format("Could not find map %s!", map.GetChars());
+		throw CRecoverableError(error);
 	}
 
 	// Hmm... What follows is some massive copy and paste, but I can't really
@@ -95,20 +96,21 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneL
 		if(stricmp(lump->Name, "PLANES") == 0)
 		{
 			numLumps = 1;
+			isUWMF = false;
+			valid = true;
 			lumps[0] = lump->NewReader();
-			ReadPlanesData();
 		}
 		else
 		{
 			if(stricmp(lump->Name, "TEXTMAP") != 0)
 			{
-				Quit("Invalid map format for %s!", map.GetChars());
-				return;
+				FString error;
+				error.Format("Invalid map format for %s!", map.GetChars());
+				throw CRecoverableError(error);
 			}
-			else
-			{
-				lumps[0] = lump->NewReader();
-			}
+
+			isUWMF = true;
+			lumps[0] = lump->NewReader();
 
 			for(unsigned int i = 2;i < file->LumpCount();++i)
 			{
@@ -122,10 +124,10 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneL
 			}
 			if(!valid)
 			{
-				Quit("ENDMAP not found for map %s!", map.GetChars());
-				return;
+				FString error;
+				error.Format("ENDMAP not found for map %s!", map.GetChars());
+				throw CRecoverableError(error);
 			}
-			ReadUWMFData();
 		}
 	}
 	else
@@ -133,21 +135,22 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneL
 		if(strcmp(Wads.GetLumpFullName(markerLump+1), "PLANES") == 0)
 		{
 			numLumps = 1;
+			isUWMF = false;
+			valid = true;
 			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
-			ReadPlanesData();
 		}
 		else
 		{
 			// Expect UWMF formatted map.
 			if(strcmp(Wads.GetLumpFullName(markerLump+1), "TEXTMAP") != 0)
 			{
-				Quit("Invalid map format for %s!", map.GetChars());
-				return;
+				FString error;
+				error.Format("Invalid map format for %s!", map.GetChars());
+				throw CRecoverableError(error);
 			}
-			else
-			{
-				lumps[0] = Wads.ReopenLumpNum(markerLump+1);
-			}
+
+			isUWMF = true;
+			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
 
 			for(int i = 2;i < Wads.GetNumLumps();i++)
 			{
@@ -160,10 +163,10 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), file(NULL), zoneL
 			}
 			if(!valid)
 			{
-				Quit("ENDMAP not found for map %s!", map.GetChars());
-				return;
+				FString error;
+				error.Format("ENDMAP not found for map %s!", map.GetChars());
+				throw CRecoverableError(error);
 			}
-			ReadUWMFData();
 		}
 	}
 }
@@ -206,6 +209,19 @@ void GameMap::ClearVisibility()
 	}
 	if(players[0].camera)
 		GetSpot(players[0].camera->tilex, players[0].camera->tiley, 0)->visible = true;
+}
+
+bool GameMap::CheckMapExists(const FString &map)
+{
+	try
+	{
+		GameMap gm(map);
+		return true;
+	}
+	catch(CRecoverableError &)
+	{
+		return false;
+	}
 }
 
 bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
@@ -308,6 +324,17 @@ void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 	}
 	else
 		++value;
+}
+
+void GameMap::LoadMap()
+{
+	if(!valid)
+		throw CRecoverableError("Tried to load invalid map!");
+
+	if(isUWMF)
+		ReadUWMFData();
+	else
+		ReadPlanesData();
 }
 
 GameMap::Plane &GameMap::NewPlane()

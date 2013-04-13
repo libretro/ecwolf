@@ -32,6 +32,7 @@
 **
 */
 
+#include "doomerrors.h"
 #include "id_ca.h"
 #include "g_mapinfo.h"
 #include "gamemap.h"
@@ -173,7 +174,7 @@ public:
 				min = pair->Key;
 		}
 		if(min > max)
-			Quit("No tiles found for translation!");
+			throw CRecoverableError("No tiles found for translation!");
 
 		tilePalette.Resize(max-min+1);
 
@@ -488,8 +489,6 @@ void GameMap::ReadPlanesData()
 		xlat.LoadXlat(Wads.GetNumForFullName(gameinfo.Translator.str), gameinfo.Translator.Next());
 	else
 		xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator), &gameinfo.Translator);
-
-	valid = true;
 
 	// Old format maps always have a tile size of 64
 	header.tileSize = UNIT;

@@ -167,6 +167,7 @@ class GameMap
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
 		const Zone		&GetZone(unsigned int index) { return zonePalette[index]; }
 		bool			IsValid() const { return valid; }
+		void			LoadMap();
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
 		void			SpawnThings() const;
@@ -180,6 +181,8 @@ class GameMap
 		unsigned int	GetTileIndex(const Tile *tile) const;
 		const Sector	*GetSector(unsigned int index) const;
 		unsigned int	GetSectorIndex(const Sector *sector) const;
+
+		static bool		CheckMapExists(const FString &map);
 
 	private:
 		friend class UWMFParser;
@@ -196,6 +199,7 @@ class GameMap
 
 		bool	valid;
 		bool	isWad;
+		bool	isUWMF;
 		int		markerLump;
 		int		numLumps;
 

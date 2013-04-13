@@ -499,7 +499,7 @@ int DebugKeys (void)
 					strcpy(str, info.MapName);
 			}
 
-			if(Wads.CheckNumForName(str) != -1)
+			if(GameMap::CheckMapExists(str))
 			{
 				strncpy(gamestate.mapname, str, 8);
 				gamestate.mapname[8] = 0;

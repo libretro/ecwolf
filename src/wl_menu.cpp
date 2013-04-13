@@ -163,7 +163,7 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
 
-	if(Wads.CheckNumForName(ep.StartMap) == -1)
+	if(!GameMap::CheckMapExists(ep.StartMap))
 	{
 		SD_PlaySound("player/usefail");
 		Message("Please select \"Read This!\"\n"
@@ -405,7 +405,7 @@ void CreateMenus()
 		MenuItem *tmp = new MenuSwitcherMenuItem(episode.EpisodeName, skills, SetEpisodeAndSwitchToSkill);
 		if(!episode.EpisodePicture.IsEmpty())
 			tmp->setPicture(episode.EpisodePicture);
-		if(Wads.CheckNumForName(episode.StartMap) == -1)
+		if(!GameMap::CheckMapExists(episode.StartMap))
 			tmp->setHighlighted(2);
 		episodes.addItem(tmp);
 	}

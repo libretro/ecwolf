@@ -56,5 +56,6 @@ void CA_CacheMap (const FString &mapname)
 	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
 	map = new GameMap(mapname);
+	map->LoadMap();
 }
 
