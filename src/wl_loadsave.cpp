@@ -317,6 +317,7 @@ bool SetupSaveGames()
 						canLoad = true;
 					delete[] checkFile;
 				}
+				canLoad = true;
 
 				if(M_GetPNGText(png, "Title", title, MAX_SAVENAME))
 				{

@@ -114,10 +114,46 @@ void VW_MeasurePropString (FFont *font, const char *string, word &width, word &h
 =============================================================================
 */
 
-void VH_UpdateScreen()
+#if SDL_VERSION_ATLEAST(2,0,0)
+void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
 {
+	void* pixels;
+	int pitch;
+	if(!SDL_LockTexture(tex, NULL, &pixels, &pitch))
+	{
+		if(!SDL_LockSurface(surf))
+		{
+			const SDL_Color* colors = surf->format->palette->colors;
+			DWORD* dest = reinterpret_cast<DWORD*>(pixels);
+			BYTE* src = reinterpret_cast<BYTE*>(surf->pixels);
+			for(unsigned int y = 0;y < screenHeight;++y)
+			{
+				for(unsigned int x = 0;x < screenWidth;++x, ++src)
+					*dest++ = (colors[*src].r<<16)|(colors[*src].g<<8)|(colors[*src].b);
+				src += (screenWidth-surf->pitch);
+				dest += (screenWidth-pitch/4);
+			}
+			SDL_UnlockSurface(surf);
+		}
+		else
+			Printf("Can't lock surface!\n");
+		SDL_UnlockTexture(tex);
+	}
+	else
+		Printf("Can't lock texture!\n");
+}
+#endif
+
+void VH_UpdateScreen(SDL_Surface * const screenBuffer)
+{
+#if SDL_VERSION_ATLEAST(2,0,0)
+	Blit8BitSurfaceToTexture(screen, screenBuffer);
+	SDL_RenderCopy(screenRenderer, screen, NULL, NULL);
+	SDL_RenderPresent(screenRenderer);
+#else
 	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
 	SDL_Flip(screen);
+#endif
 }
 
 /*
@@ -189,12 +225,19 @@ void VH_Startup()
 	rndmask = rndmasks[rndbits - 17];
 }
 
+SDL_Surface *fizzleSurface = NULL;
+void FizzleFadeStart()
+{
+	fizzleSurface = SDL_ConvertSurface(screenBuffer, screenBuffer->format, 0);
+}
 bool FizzleFade (SDL_Surface *source, int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, bool abortable)
 {
 	unsigned x, y, frame, pixperframe;
 	int32_t  rndval=0, lastrndval;
 	int      first = 1;
+
+	assert(fizzleSurface != NULL);
 
 	lastrndval = 0;
 	pixperframe = width * height / frames;
@@ -203,7 +246,12 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 
 	frame = GetTimeCount();
 	byte *srcptr = VL_LockSurface(source);
-	if(srcptr == NULL) return false;
+	if(srcptr == NULL)
+	{
+		SDL_FreeSurface(fizzleSurface);
+		fizzleSurface = NULL;
+		return false;
+	}
 
 	do
 	{
@@ -212,12 +260,13 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 		if(abortable && IN_CheckAck ())
 		{
 			VL_UnlockSurface(source);
-			SDL_BlitSurface(source, NULL, screen, NULL);
-			SDL_Flip(screen);
+			VH_UpdateScreen(source);
+			SDL_FreeSurface(fizzleSurface);
+			fizzleSurface = NULL;
 			return true;
 		}
 
-		byte *destptr = VL_LockSurface(screen);
+		byte *destptr = VL_LockSurface(fizzleSurface);
 
 		if(destptr != NULL)
 		{
@@ -256,15 +305,15 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 
 					if(screenBits == 8)
 					{
-						*(destptr + (y1 + y) * screen->pitch + x1 + x)
+						*(destptr + (y1 + y) * fizzleSurface->pitch + x1 + x)
 							= *(srcptr + (y1 + y) * source->pitch + x1 + x);
 					}
 					else
 					{
 						byte col = *(srcptr + (y1 + y) * source->pitch + x1 + x);
-						uint32_t fullcol = SDL_MapRGB(screen->format, GPalette.BaseColors[col].r, GPalette.BaseColors[col].g, GPalette.BaseColors[col].b);
-						memcpy(destptr + (y1 + y) * screen->pitch + (x1 + x) * screen->format->BytesPerPixel,
-							&fullcol, screen->format->BytesPerPixel);
+						uint32_t fullcol = SDL_MapRGB(fizzleSurface->format, GPalette.BaseColors[col].r, GPalette.BaseColors[col].g, GPalette.BaseColors[col].b);
+						memcpy(destptr + (y1 + y) * fizzleSurface->pitch + (x1 + x) * fizzleSurface->format->BytesPerPixel,
+							&fullcol, fizzleSurface->format->BytesPerPixel);
 					}
 
 					if(rndval == 0)		// entire sequence has been completed
@@ -277,8 +326,8 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 			// If there is no double buffering, we always use the "first frame" case
 			if(usedoublebuffering) first = 0;
 
-			VL_UnlockSurface(screen);
-			SDL_Flip(screen);
+			VL_UnlockSurface(fizzleSurface);
+			VH_UpdateScreen(fizzleSurface);
 		}
 		else
 		{
@@ -300,9 +349,10 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 
 finished:
 	VL_UnlockSurface(source);
-	VL_UnlockSurface(screen);
-	SDL_BlitSurface(source, NULL, screen, NULL);
-	SDL_Flip(screen);
+	VL_UnlockSurface(screenBuffer);
+	VH_UpdateScreen(source);
+	SDL_FreeSurface(fizzleSurface);
+	fizzleSurface = NULL;
 	return false;
 }
 

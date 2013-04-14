@@ -784,7 +784,7 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 	// Also collect any information
 	FString exitText;
 	FString flat;
-	ClusterInfo::ExitType type;
+	ClusterInfo::ExitType type = ClusterInfo::EXIT_STRING;
 
 	if(enterClusterNum >= 0)
 	{

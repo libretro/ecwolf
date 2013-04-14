@@ -58,7 +58,7 @@ template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offse
 void VWB_DrawPropString(FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
 void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
 
-void VH_UpdateScreen();
+void VH_UpdateScreen(struct SDL_Surface * const screenBuf=screenBuffer);
 #define VW_UpdateScreen VH_UpdateScreen
 
 //
@@ -71,6 +71,7 @@ void VH_UpdateScreen();
 void	VW_MeasurePropString (FFont *font, const char *string, word &width, word &height, word *finalWidth=NULL);
 
 void    VH_Startup();
+void FizzleFadeStart();
 bool FizzleFade (SDL_Surface *source, int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, bool abortable);
 

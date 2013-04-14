@@ -1246,6 +1246,9 @@ void R_RenderView()
 
 void    ThreeDRefresh (void)
 {
+	if (fizzlein)
+		FizzleFadeStart();
+
 //
 // clear out the traced array
 //
@@ -1292,8 +1295,7 @@ void    ThreeDRefresh (void)
 			VWB_DrawPropString(ConFont, fpsDisplay, CR_WHITE);
 			pa = MENU_CENTER;
 		}
-		SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-		SDL_Flip(screen);
+		VH_UpdateScreen();
 	}
 
 	if (fpscounter)

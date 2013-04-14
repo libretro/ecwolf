@@ -294,7 +294,7 @@ void TextInputMenuItem::draw()
 }
 
 int ControlMenuItem::column = 0;
-const char* const ControlMenuItem::keyNames[SDLK_LAST] =
+const char* const ControlMenuItem::keyNames[512] =
 {
 	"?","?","?","?","?","?","?","?",                                //   0
 	"BkSp","Tab","?","?","?","Ret","?","?",                      //   8

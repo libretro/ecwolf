@@ -602,7 +602,6 @@ bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
 					cursormoved = true;
 					break;
 
-				case SDLK_KP5: //0x4c:	// Keypad 5 // TODO: hmmm...
 				case sc_UpArrow:
 				case sc_DownArrow:
 				case sc_PgUp:

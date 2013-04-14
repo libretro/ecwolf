@@ -9,10 +9,17 @@ void Quit (const char *error,...);
 
 //===========================================================================
 
-extern SDL_Surface *screen, *screenBuffer, *curSurface;
+#if SDL_VERSION_ATLEAST(2,0,0)
+extern SDL_Window *window;
+extern SDL_Renderer *screenRenderer;
+extern SDL_Texture *screen;
+#else
+extern SDL_Surface *screen;
+#endif
+extern SDL_Surface *screenBuffer, *curSurface;
 
 extern  bool	fullscreen, usedoublebuffering;
-extern  unsigned screenWidth, screenHeight, screenBits, screenPitch, bufferPitch, curPitch;
+extern  unsigned screenWidth, screenHeight, screenBits, bufferPitch, curPitch;
 extern  unsigned scaleFactor;
 
 extern	bool  screenfaded;

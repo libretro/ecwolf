@@ -96,6 +96,8 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	gamestate.victoryflag = true;
 	cam->camFinished = true;
 
+	FizzleFadeStart();
+
 	double fadex = 0;
 	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;;
 	double fadew = 320;

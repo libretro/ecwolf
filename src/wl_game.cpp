@@ -688,7 +688,9 @@ void Died (void)
 
 	if(usedoublebuffering) VH_UpdateScreen();
 
-	
+
+	FizzleFadeStart();
+
 	VWB_Clear(ColorMatcher.Pick(0xAA,0x00,0x00), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
 
 	IN_ClearKeysDown ();

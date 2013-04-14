@@ -168,7 +168,7 @@ class ControlMenuItem : public MenuItem
 	protected:
 		ControlScheme				&button;
 		static int					column;
-		static const char* const	keyNames[SDLK_LAST];
+		static const char* const	keyNames[512];
 
 	public:
 		ControlMenuItem(ControlScheme &button);

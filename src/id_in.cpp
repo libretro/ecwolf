@@ -26,6 +26,33 @@
 #include "id_vh.h"
 
 
+#if SDL_VERSION_ATLEAST(2,0,0)
+// TODO: Remove this dependency!
+#define SDLK_LAST 512
+#else
+#define SDLK_KP_0 SDLK_KP0
+#define SDLK_KP_1 SDLK_KP1
+#define SDLK_KP_2 SDLK_KP2
+#define SDLK_KP_3 SDLK_KP3
+#define SDLK_KP_4 SDLK_KP4
+#define SDLK_KP_5 SDLK_KP5
+#define SDLK_KP_6 SDLK_KP6
+#define SDLK_KP_7 SDLK_KP7
+#define SDLK_KP_8 SDLK_KP8
+#define SDLK_KP_9 SDLK_KP9
+#define SDLK_SCROLLLOCK SDLK_SCROLLOCK
+typedef SDLMod SDL_Keymod;
+
+inline void SDL_SetRelativeMouseMode(bool enabled)
+{
+	SDL_WM_GrabInput(enabled ? SDL_GRAB_ON : SDL_GRAB_OFF);
+}
+inline void SDL_WarpMouseInWindow(struct SDL_Window* window, int x, int y)
+{
+	SDL_WarpMouse(x, y);
+}
+#endif
+
 /*
 =============================================================================
 
@@ -42,12 +69,11 @@ bool MousePresent;
 
 
 // 	Global variables
-volatile bool		Keyboard[SDLK_LAST];
+volatile bool		Keyboard[SCANCODE_UNMASK(SDLK_LAST)];
 volatile bool		Paused;
 volatile char		LastASCII;
 volatile ScanCode	LastScan;
 
-//KeyboardDef	KbdDefs = {0x1d,0x38,0x47,0x48,0x49,0x4b,0x4d,0x4f,0x50,0x51};
 static KeyboardDef KbdDefs = {
 	sc_Control,             // button0
 	sc_Alt,                 // button1
@@ -235,35 +261,35 @@ static void processEvent(SDL_Event *event)
 				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
 			};
 
-			if(event->key.keysym.sym==SDLK_SCROLLOCK || event->key.keysym.sym==SDLK_F12)
+			if(event->key.keysym.sym==SDLK_SCROLLLOCK || event->key.keysym.sym==SDLK_F12)
 			{
 				GrabInput = !GrabInput;
-				SDL_WM_GrabInput(GrabInput ? SDL_GRAB_ON : SDL_GRAB_OFF);
+				SDL_SetRelativeMouseMode(GrabInput ? SDL_TRUE : SDL_FALSE);
 				return;
 			}
 
-			LastScan = event->key.keysym.sym;
-			SDLMod mod = SDL_GetModState();
+			LastScan = SCANCODE_UNMASK(event->key.keysym.sym);
+			SDL_Keymod mod = SDL_GetModState();
 			if(Keyboard[sc_Alt])
 			{
-				if(LastScan==SDLK_F4)
+				if(LastScan==SCANCODE_UNMASK(SDLK_F4))
 					Quit(NULL);
 			}
 
-			if(LastScan == SDLK_KP_ENTER) LastScan = SDLK_RETURN;
-			else if(LastScan == SDLK_RSHIFT) LastScan = SDLK_LSHIFT;
-			else if(LastScan == SDLK_RALT) LastScan = SDLK_LALT;
-			else if(LastScan == SDLK_RCTRL) LastScan = SDLK_LCTRL;
+			if(LastScan == SCANCODE_UNMASK(SDLK_KP_ENTER)) LastScan = SCANCODE_UNMASK(SDLK_RETURN);
+			else if(LastScan == SCANCODE_UNMASK(SDLK_RSHIFT)) LastScan = SCANCODE_UNMASK(SDLK_LSHIFT);
+			else if(LastScan == SCANCODE_UNMASK(SDLK_RALT)) LastScan = SCANCODE_UNMASK(SDLK_LALT);
+			else if(LastScan == SCANCODE_UNMASK(SDLK_RCTRL)) LastScan = SCANCODE_UNMASK(SDLK_LCTRL);
 			else
 			{
 				if((mod & KMOD_NUM) == 0)
 				{
 					switch(LastScan)
 					{
-						case SDLK_KP2: LastScan = SDLK_DOWN; break;
-						case SDLK_KP4: LastScan = SDLK_LEFT; break;
-						case SDLK_KP6: LastScan = SDLK_RIGHT; break;
-						case SDLK_KP8: LastScan = SDLK_UP; break;
+						case SCANCODE_UNMASK(SDLK_KP_2): LastScan = SCANCODE_UNMASK(SDLK_DOWN); break;
+						case SCANCODE_UNMASK(SDLK_KP_4): LastScan = SCANCODE_UNMASK(SDLK_LEFT); break;
+						case SCANCODE_UNMASK(SDLK_KP_6): LastScan = SCANCODE_UNMASK(SDLK_RIGHT); break;
+						case SCANCODE_UNMASK(SDLK_KP_8): LastScan = SCANCODE_UNMASK(SDLK_UP); break;
 					}
 				}
 			}
@@ -285,9 +311,9 @@ static void processEvent(SDL_Event *event)
 			if(LastASCII && sym >= 'A' && sym <= 'Z' && (mod & KMOD_CAPS))
 				LastASCII ^= 0x20;
 
-			if(LastScan<SDLK_LAST)
+			if(LastScan<SCANCODE_UNMASK(SDLK_LAST))
 				Keyboard[LastScan] = 1;
-			if(LastScan == SDLK_PAUSE)
+			if(LastScan == SCANCODE_UNMASK(SDLK_PAUSE))
 				Paused = true;
 			break;
 		}
@@ -305,20 +331,20 @@ static void processEvent(SDL_Event *event)
 				{
 					switch(key)
 					{
-						case SDLK_KP2: key = SDLK_DOWN; break;
-						case SDLK_KP4: key = SDLK_LEFT; break;
-						case SDLK_KP6: key = SDLK_RIGHT; break;
-						case SDLK_KP8: key = SDLK_UP; break;
+						case SDLK_KP_2: key = SDLK_DOWN; break;
+						case SDLK_KP_4: key = SDLK_LEFT; break;
+						case SDLK_KP_6: key = SDLK_RIGHT; break;
+						case SDLK_KP_8: key = SDLK_UP; break;
 					}
 				}
 			}
 
-			if(key<SDLK_LAST)
-				Keyboard[key] = 0;
+			if(SCANCODE_UNMASK(key)<SDLK_LAST)
+				Keyboard[SCANCODE_UNMASK(key)] = 0;
 			break;
 		}
 
-		case SDL_ACTIVEEVENT:
+		/*case SDL_ACTIVEEVENT:
 		{
 			if(fullscreen && (event->active.state & SDL_APPACTIVE) != 0)
 			{
@@ -328,7 +354,7 @@ static void processEvent(SDL_Event *event)
 					}
 					else NeedRestore = true;
 			}
-		}
+		}*/
 	}
 }
 
@@ -639,7 +665,7 @@ int IN_MouseButtons (void)
 void IN_ReleaseMouse()
 {
 	GrabInput = false;
-	SDL_WM_GrabInput(SDL_GRAB_OFF);
+	SDL_SetRelativeMouseMode(SDL_FALSE);
 }
 
 void IN_GrabMouse()
@@ -647,7 +673,7 @@ void IN_GrabMouse()
 	if(fullscreen || forcegrabmouse)
 	{
 		GrabInput = true;
-		SDL_WM_GrabInput(SDL_GRAB_ON);
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
 }
 
@@ -658,5 +684,5 @@ bool IN_IsInputGrabbed()
 
 void IN_CenterMouse()
 {
-	SDL_WarpMouse(screenWidth / 2, screenHeight / 2);
+	SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
 }
