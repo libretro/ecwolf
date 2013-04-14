@@ -36,12 +36,16 @@ include_directories(${SDLMIXER_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DI
 
 check_function_exists(stricmp STRICMP_EXISTS)
 check_function_exists(strnicmp STRNICMP_EXISTS)
+check_function_exists(atoll ATOLL_EXISTS)
 if(NOT STRICMP_EXISTS)
 	add_definitions(-Dstricmp=strcasecmp)
 endif(NOT STRICMP_EXISTS)
 if(NOT STRNICMP_EXISTS)
 	add_definitions(-Dstrnicmp=strncasecmp)
 endif(NOT STRNICMP_EXISTS)
+if(NOT ATOLL_EXISTS)
+	add_definitions(-Datoll=_atoi64)
+endif(NOT ATOLL_EXISTS)
 
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 	set(CMAKE_CXX_FLAGS "-Wall -Wno-unused -Wno-unused-result -Wno-ignored-qualifiers -Wextra -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}")
