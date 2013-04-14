@@ -66,7 +66,7 @@ extern unsigned vbufPitch;
 
 namespace GameSave {
 
-int SaveVersion = SAVEVER;
+long long SaveVersion = SAVEVER;
 const char* savedir = NULL;
 
 static const char* const NEW_SAVE = "    - NEW SAVE -";
@@ -268,13 +268,25 @@ bool SetupSaveGames()
 				char* savesig = M_GetPNGText(png, "ECWolf Save Version");
 				if(savesig)
 				{
-					if(strncmp(savesig, SAVESIG, 10) != 0 || // Should be "ECWOLFSAVE"
-						atoi(savesig+10) < MINSAVEVER)
-					{
+					if(strncmp(savesig, SAVESIG, 10) != 0) // Should be "ECWOLFSAVE"
 						sFile.oldVersion = true;
-					}
 					else
-						sFile.oldVersion = false;
+					{
+						long long savever = atoll(savesig+10);
+						char *prodver = M_GetPNGText(png, "ECWolf Save Product Version");
+						// If the build was done in the revision control tree, then
+						// savever should be used for better precision.  Otherwise
+						// we must compare the version number itself.
+						if((savever == SAVEVERUNDEFINED &&
+							atoll(prodver) < MINSAVEPRODVER) ||
+							savever < MINSAVEVER)
+						{
+							sFile.oldVersion = true;
+						}
+						else
+							sFile.oldVersion = false;
+						delete[] prodver;
+					}
 					delete[] savesig;
 				}
 				else
@@ -536,7 +548,7 @@ bool Load(const FString &filename)
 		DrawLSAction(0);
 
 	char* savesig = M_GetPNGText(png, "ECWolf Save Version");
-	SaveVersion = atoi(savesig+10);
+	SaveVersion = atoll(savesig+10);
 	delete[] savesig;
 
 	char level[9];
@@ -608,6 +620,11 @@ bool Save(const FString &filename, const FString &title)
 	M_AppendPNGText(fileh, "Software", "ECWolf");
 	M_AppendPNGText(fileh, "Engine", GAMESIG);
 	M_AppendPNGText(fileh, "ECWolf Save Version", SAVESIG);
+	{
+		char saveprodver[11];
+		sprintf(saveprodver, "%u", SAVEPRODVER);
+		M_AppendPNGText(fileh, "ECWolf Save Product Version", saveprodver);
+	}
 	M_AppendPNGText(fileh, "Title", title);
 	M_AppendPNGText(fileh, "Current Map", levelInfo->MapName);
 

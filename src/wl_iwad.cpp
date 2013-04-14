@@ -178,7 +178,7 @@ static bool VerifySpearInstall(const char* directory)
 	if(!File(dir, dir.getInsensitiveFile("gamemaps.sd1", false)).exists())
 		return true;
 
-	int currentMission;
+	int currentMission = 1;
 	if(!File(dir, dir.getInsensitiveFile("gamemaps.sd3", false)).exists())
 		currentMission = 3;
 	else if(!File(dir, dir.getInsensitiveFile("gamemaps.sd2", false)).exists())

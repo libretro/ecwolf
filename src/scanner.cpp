@@ -70,7 +70,7 @@ static const char* const TokenNames[TK_NumSpecialTokens] =
 
 Scanner::Scanner(const char* data, size_t length) : line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
 {
-	if(length == -1)
+	if(length == 0 && *data != 0)
 		length = strlen(data);
 	this->length = length;
 	this->data = new char[length];

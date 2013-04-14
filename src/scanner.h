@@ -89,7 +89,7 @@ class Scanner
 			NOTICE
 		};
 
-		Scanner(const char* data, size_t length=-1);
+		Scanner(const char* data, size_t length=0);
 		~Scanner();
 
 		void			CheckForMeta();

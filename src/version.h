@@ -7,13 +7,17 @@
 #define GAMESIG "ECWOLF"
 #define DOTVERSIONSTR_NOREV "1.1.9999"
 #define DOTVERSIONSTR DOTVERSIONSTR_NOREV " (r" SVN_REVISION_STRING ")"
+#define SAVEPRODVER 0x001001FF // 0xMMMmmmrr in hex
 
 #define MINSAVEVER	1355980878
+// The following will be used as a less accurate fallback for non-version control builds
+#define MINSAVEPRODVER 0x00100101
 
+#define SAVEVERUNDEFINED 99999999999
 #define __GETSAVESIG(x) #x
 #define GETSAVESIG(x) "ECWOLFSAVE" __GETSAVESIG(x)
 #if SVN_REVISION_NUMBER < MINSAVEVER
-#define SAVEVER	99999999999
+#define SAVEVER	SAVEVERUNDEFINED
 #else
 #define SAVEVER	SVN_REVISION_NUMBER
 #endif
