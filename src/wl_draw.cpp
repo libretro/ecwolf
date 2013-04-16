@@ -251,7 +251,9 @@ void ScalePost()
 	int ywcount, yoffs, yw, yd, yendoffs;
 	byte col;
 
-	BYTE *curshades = &NormalLight.Maps[256*GetShade(wallheight[postx])];
+	const int shade = LIGHT2SHADE(192);
+	const int tz = FixedMul(r_depthvisibility<<8, wallheight[postx]);
+	BYTE *curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 
 	ywcount = yd = (wallheight[postx] >> 3);
 	if(yd <= 0)

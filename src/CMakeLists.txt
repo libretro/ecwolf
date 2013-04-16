@@ -235,7 +235,6 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	wl_menu.cpp
 	wl_parallax.cpp
 	wl_play.cpp
-	wl_shade.cpp
 	wl_state.cpp
 	wl_text.cpp
 	zstrformat.cpp

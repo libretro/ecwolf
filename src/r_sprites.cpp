@@ -383,7 +383,11 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	if(!r_depthfog || (actor->flags & FL_BRIGHT) || frame->fullbright)
 		colormap = NormalLight.Maps;
 	else
-		colormap = &NormalLight.Maps[256*GetShade(height)];
+	{
+		const int shade = LIGHT2SHADE(192);
+		const int tz = FixedMul(r_depthvisibility<<8, height);
+		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
+	}
 	const BYTE *src;
 	byte *destBase = vbuf + actx + startX + (upperedge > 0 ? vbufPitch*upperedge : 0);
 	byte *dest = destBase;

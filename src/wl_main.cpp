@@ -81,6 +81,7 @@
 //
 fixed    focallength;
 fixed    focallengthy;
+fixed    r_depthvisibility;
 unsigned screenofs;
 int      viewscreenx, viewscreeny;
 int      viewwidth;
@@ -247,7 +248,8 @@ void CalcProjection (int32_t focal)
 	focallength = FixedMul(focal, 0xFD17);
 	facedist = 2*FOCALLENGTH+0x100; // Used to be MINDIST (0x5800) which was 0x100 then the FOCALLENGTH (0x5700)
 	halfview = viewwidth/2;                                 // half view in pixels
-	focallengthy = (centerx<<FRACBITS)/finetangent[FINEANGLES/2+(ANGLE_45>>ANGLETOFINESHIFT)];
+	focallengthy = centerx*yaspect/finetangent[FINEANGLES/2+(ANGLE_45>>ANGLETOFINESHIFT)];
+	r_depthvisibility = FixedDiv(FixedMul((160*FRACUNIT),8<<FRACBITS),focallengthy<<16);
 
 	/*fixed* viewTangent = finetangent+FINEANGLES/4;
 	fixed FocalTangent = viewTangent[FINEANGLES/4+(ANGLE_45>>ANGLETOFINESHIFT)];
