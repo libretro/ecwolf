@@ -268,8 +268,17 @@ public:
 
 				thing.type = thingTable[type].newnum;
 
+				// The player has a weird rotation pattern. It's 450-angle.
+				bool playerRotation = false;
+				if(thing.type == 1)
+					playerRotation = true;
+
 				if(thingTable[type].angles)
+				{
 					thing.angle = (oldnum - thingTable[type].oldnum)*(360/thingTable[type].angles);
+					if(playerRotation)
+						thing.angle = (360 + 360/thingTable[type].angles)-thing.angle;
+				}
 				else
 					thing.angle = 0;
 

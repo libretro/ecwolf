@@ -1233,7 +1233,7 @@ FArchive &operator<< (FArchive &arc, player_t *&player)
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
 	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, false);
-	players[0].mo->angle = (450-dir)*ANGLE_1;
+	players[0].mo->angle = dir*ANGLE_1;
 	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables
 	players[0].mo->GetThinker()->SetPriority(ThinkerList::PLAYER);
