@@ -325,6 +325,17 @@ class UWMFParser : public TextMapParser
 					plane.map[j].zone = pdata[j].zone < 0 ? NULL : &gm->zonePalette[pdata[j].zone];
 				}
 			}
+
+			// Load in the triggers since they can depend on plane data
+			for(unsigned int i = 0;i < triggers.Size();++i)
+			{
+				MapTrigger &src = triggers[i];
+				MapTrigger &trig = gm->NewTrigger(src.x, src.y, src.z);
+				trig = src;
+
+				if(trig.isSecret)
+					++gamestate.secrettotal;
+			}
 		}
 
 		void ParsePlaneMap()
@@ -478,11 +489,7 @@ class UWMFParser : public TextMapParser
 			MapTrigger trigger;
 			TextMapParser::ParseTrigger(sc, trigger);
 
-			MapTrigger &trig = gm->NewTrigger(trigger.x, trigger.y, trigger.z);
-			trig = trigger;
-
-			if(trig.isSecret)
-				++gamestate.secrettotal;
+			triggers.Push(trigger);
 		}
 
 		void ParseZone()
@@ -505,6 +512,7 @@ class UWMFParser : public TextMapParser
 		GameMap * const gm;
 		Scanner &sc;
 		TArray<PMData*> data;
+		TArray<MapTrigger> triggers;
 };
 
 void GameMap::ReadUWMFData()

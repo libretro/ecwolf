@@ -350,6 +350,9 @@ GameMap::Plane &GameMap::NewPlane()
 
 GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned int z)
 {
+	if(z >= planes.Size())
+		throw CRecoverableError("Trigger assigned to non-existant plane!");
+
 	MapSpot spot = GetSpot(x, y, z);
 	Trigger newTrig;
 	newTrig.x = x;
