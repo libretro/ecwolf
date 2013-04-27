@@ -181,6 +181,7 @@ uber/attack				{ DSBOSSFR ALBOSSFR PCBOSSFR }
 uber/death				{ DSUBRDTH ALUBRDTH PCUBRDTH }
 
 knight/attack			{ DSBOSSFR ALBOSSFR PCBOSSFR }
+knight/missile			{ NULL ALKNTATK PCKNTATK }
 knight/sight			{ DSKNTSIT ALKNTSIT PCKNTSIT }
 knight/death			{ DSKNTDTH ALKNTDTH PCKNTDTH }
 

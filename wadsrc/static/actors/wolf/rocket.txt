@@ -58,7 +58,7 @@ actor HighRocket
 	radius 11
 	speed 16
 	damage (random[MissileDamage](30, 61))
-	seesound "deathknight/attack"
+	seesound "knight/missile"
 	deathsound "missile/hit"
 	PROJECTILE
 	states
