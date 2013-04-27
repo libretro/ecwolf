@@ -298,7 +298,7 @@ digitalsounds
 	"DSDOBDTH",
 	"DSBATDTH",
 	"DSLSSDTH",
-	"DSBGDFIR",
+	"DSGGDFIR",
 	"DSLSLURP",
 	"DSOF2SIT",
 	"DSOF2DTH",
