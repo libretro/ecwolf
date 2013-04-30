@@ -18,9 +18,11 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	fixed dist;                                // distance to row projection
 	fixed tex_step;                            // global step per one screen pixel
 	fixed gu, gv, du, dv;                      // global texture coordinates
-	int u, v;                                  // local texture coordinates
 	const byte *tex = NULL;
+	int texwidth, texheight;
+	fixed texxscale, texyscale;
 	FTextureID lasttex;
+	byte *tex_offset;
 
 	const fixed heightFactor = abs(planeheight/32);
 	int y0 = (((min_wallheight >> 3)*heightFactor)>>FRACBITS) - abs(viewshift);
@@ -36,13 +38,11 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	const unsigned int texDivisor = viewwidth*AspectCorrection[r_ratio].multiplier*175/48;
 
 	int planenumerator = FixedMul(heightnumerator, planeheight)/32;
-	bool floor = false;
-	byte *tex_offset;
-	if(planenumerator < 0)
+	const bool floor = planenumerator < 0;
+	if(floor)
 	{
 		tex_offset = vbuf + (signed)vbufPitch * (halfheight + y0);
 		planenumerator *= -1;
-		floor = true;
 	}
 	else
 		tex_offset = vbuf + (signed)vbufPitch * (halfheight - y0 - 1);
@@ -86,42 +86,42 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 
 				if(spot->sector)
 				{
-					u = (gu >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
-					v = (gv >> (TILESHIFT - TEXTURESHIFT)) & (TEXTURESIZE - 1);
-					unsigned texoffs = (u << TEXTURESHIFT) + (TEXTURESIZE - 1) - v;
+
+#define CHECKTEXTURE(side, termcond) \
+{ \
+	FTextureID curtex = spot->sector->texture[side]; \
+	if (curtex != lasttex && curtex.isValid()) \
+	{ \
+		FTexture * const texture = TexMan(curtex); \
+		lasttex = curtex; \
+		tex = texture->GetPixels(); \
+		texwidth = texture->GetWidth(); \
+		texheight = texture->GetHeight(); \
+		texxscale = FixedDiv(1<<26, texture->xScale); \
+		texyscale = -FixedDiv(1<<26, texture->yScale); \
+	} \
+} \
+if(termcond) return; \
+else if(tex) \
+{ \
+	const int u = (FixedDiv(gu, texxscale)) % texwidth; \
+	const int v = (FixedDiv(gv, texyscale) - 1) % texheight; \
+	const unsigned texoffs = ((u+1) * texheight) - v - 1; \
+	tex_offset[x] = curshades[tex[texoffs]]; \
+}
 
 					if(floor)
 					{
 						if(y+halfheight >= 0)
 						{
-							FTextureID curtex = spot->sector->texture[MapSector::Floor];
-							if (curtex != lasttex && curtex.isValid())
-							{
-								lasttex = curtex;
-								tex = TexMan(curtex)->GetPixels();
-							}
-
-							if(y+halfheight >= viewheight)
-								return;
-							else if(tex)
-								tex_offset[x] = curshades[tex[texoffs]];
+							CHECKTEXTURE(MapSector::Floor, y+halfheight >= viewheight);
 						}
 					}
 					else
 					{
 						if(y >= halfheight - viewheight)
 						{
-							FTextureID curtex = spot->sector->texture[MapSector::Ceiling];
-							if (curtex != lasttex && curtex.isValid())
-							{
-								lasttex = curtex;
-								tex = TexMan(curtex)->GetPixels();
-							}
-
-							if(y >= halfheight)
-								return;
-							else if(tex)
-								tex_offset[x] = curshades[tex[texoffs]];
+							CHECKTEXTURE(MapSector::Ceiling, y >= halfheight);
 						}
 					}
 				}
