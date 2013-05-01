@@ -97,16 +97,16 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		tex = texture->GetPixels(); \
 		texwidth = texture->GetWidth(); \
 		texheight = texture->GetHeight(); \
-		texxscale = FixedDiv(1<<26, texture->xScale); \
-		texyscale = -FixedDiv(1<<26, texture->yScale); \
+		texxscale = texture->xScale>>10; \
+		texyscale = -texture->yScale>>10; \
 	} \
 } \
 if(termcond) return; \
 else if(tex) \
 { \
-	const int u = (FixedDiv(gu, texxscale)) % texwidth; \
-	const int v = (FixedDiv(gv, texyscale) - 1) % texheight; \
-	const unsigned texoffs = ((u+1) * texheight) - v - 1; \
+	const int u = (FixedMul(gu-512, texxscale)) & (texwidth-1); \
+	const int v = (FixedMul(gv+512, texyscale)) & (texheight-1); \
+	const unsigned texoffs = (u * texheight) + v; \
 	tex_offset[x] = curshades[tex[texoffs]]; \
 }
 
