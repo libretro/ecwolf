@@ -39,17 +39,23 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 
 	int planenumerator = FixedMul(heightnumerator, planeheight)/32;
 	const bool floor = planenumerator < 0;
+	int tex_offsetPitch;
 	if(floor)
 	{
 		tex_offset = vbuf + (signed)vbufPitch * (halfheight + y0);
+		tex_offsetPitch = vbufPitch-viewwidth;
 		planenumerator *= -1;
 	}
 	else
+	{
 		tex_offset = vbuf + (signed)vbufPitch * (halfheight - y0 - 1);
+		tex_offsetPitch = -viewwidth-vbufPitch;
+	}
 
-	int oldmapx = INT_MAX, oldmapy = INT_MAX;
+	unsigned int oldmapx = INT_MAX, oldmapy = INT_MAX;
+	const byte* curshades = NormalLight.Maps;
 	// draw horizontal lines
-	for(int y = y0;true; ++y, floor ? tex_offset += vbufPitch : tex_offset -= vbufPitch)
+	for(int y = y0;true; ++y, tex_offset += tex_offsetPitch)
 	{
 		dist = (planenumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
@@ -59,69 +65,68 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		dv = -FixedMul(tex_step, viewcos);
 		gu -= (viewwidth >> 1) * du;
 		gv -= (viewwidth >> 1) * dv; // starting point (leftmost)
-		const BYTE *curshades;
 		if(r_depthfog)
 		{
 			const int shade = LIGHT2SHADE(192);
 			const int tz = FixedMul(FixedDiv(r_depthvisibility, abs(planeheight)), abs(((halfheight)<<16) - ((halfheight-y)<<16)));
 			curshades = &NormalLight.Maps[GETPALOOKUP(tz, shade)<<8];
 		}
-		else
-			curshades = NormalLight.Maps;
 
-		MapSpot spot = NULL;
-		for(unsigned int x = 0;x < (unsigned)viewwidth; ++x)
+		for(unsigned int x = 0;x < (unsigned)viewwidth; ++x, ++tex_offset)
 		{
 			if(((wallheight[x] >> 3)*heightFactor)>>FRACBITS <= y)
 			{
-				int curx = (gu >> TILESHIFT)%mapwidth;
-				int cury = (-(gv >> TILESHIFT) - 1)%mapheight;
+				unsigned int curx = (gu >> TILESHIFT);
+				unsigned int cury = (-(gv >> TILESHIFT) - 1);
 
-				if(spot == NULL || curx != oldmapx || cury != oldmapy)
+				if(curx != oldmapx || cury != oldmapy)
 				{
 					oldmapx = curx;
 					oldmapy = cury;
-					spot = map->GetSpot(curx, cury, 0);
+					const MapSpot spot = map->GetSpot(oldmapx%mapwidth, oldmapy%mapheight, 0);
+
+					if(spot->sector)
+					{
+						FTextureID curtex = spot->sector->texture[floor ? MapSector::Floor : MapSector::Ceiling];
+						if (curtex != lasttex && curtex.isValid())
+						{
+							FTexture * const texture = TexMan(curtex);
+							lasttex = curtex;
+							tex = texture->GetPixels();
+							texwidth = texture->GetWidth();
+							texheight = texture->GetHeight();
+							texxscale = texture->xScale>>10;
+							texyscale = -texture->yScale>>10;
+						}
+					}
+					else
+						tex = NULL;
 				}
 
-				if(spot->sector)
+				if(tex)
 				{
 
-#define CHECKTEXTURE(side, termcond) \
-{ \
-	FTextureID curtex = spot->sector->texture[side]; \
-	if (curtex != lasttex && curtex.isValid()) \
-	{ \
-		FTexture * const texture = TexMan(curtex); \
-		lasttex = curtex; \
-		tex = texture->GetPixels(); \
-		texwidth = texture->GetWidth(); \
-		texheight = texture->GetHeight(); \
-		texxscale = texture->xScale>>10; \
-		texyscale = -texture->yScale>>10; \
-	} \
-} \
+#define CHECKTEXTURE(termcond) \
 if(termcond) return; \
-else if(tex) \
 { \
 	const int u = (FixedMul(gu-512, texxscale)) & (texwidth-1); \
 	const int v = (FixedMul(gv+512, texyscale)) & (texheight-1); \
 	const unsigned texoffs = (u * texheight) + v; \
-	tex_offset[x] = curshades[tex[texoffs]]; \
+	*tex_offset = curshades[tex[texoffs]]; \
 }
 
 					if(floor)
 					{
 						if(y+halfheight >= 0)
 						{
-							CHECKTEXTURE(MapSector::Floor, y+halfheight >= viewheight);
+							CHECKTEXTURE(y+halfheight >= viewheight);
 						}
 					}
 					else
 					{
 						if(y >= halfheight - viewheight)
 						{
-							CHECKTEXTURE(MapSector::Ceiling, y >= halfheight);
+							CHECKTEXTURE(y >= halfheight);
 						}
 					}
 				}
