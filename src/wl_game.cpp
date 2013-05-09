@@ -856,6 +856,7 @@ restartgame:
 			case ex_completed:
 			case ex_secretlevel:
 			case ex_newmap:
+			case ex_victorious:
 			{
 				if(viewsize == 21) DrawPlayScreen();
 
@@ -864,7 +865,20 @@ restartgame:
 				FString next;
 				if(playstate != ex_newmap)
 				{
-					next = playstate == ex_completed ? levelInfo->NextMap : levelInfo->NextSecret;
+					switch(playstate)
+					{
+						case ex_secretlevel:
+							next = levelInfo->NextSecret;
+							break;
+						case ex_victorious:
+							if(!levelInfo->NextVictory.IsEmpty())
+							{
+								next = levelInfo->NextVictory;
+								break;
+							}
+						default:
+							next = levelInfo->NextMap;
+					}
 
 					if(next.IndexOf("EndSequence:") == 0 || next.CompareNoCase("EndTitle") == 0)
 					{

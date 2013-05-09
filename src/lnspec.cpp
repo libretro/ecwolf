@@ -59,12 +59,10 @@ DEFINE_SPECIAL(NOP, 0, 0)
 LineSpecialFunction lnspecFunctions[NUM_POSSIBLE_SPECIALS] =
 {
 	LN_NOP,
-	LN_Door_Open,
-	LN_Pushwall_Move,
-	LN_Exit_Normal,
-	LN_Exit_Secret,
-	LN_Teleport_NewMap,
-	LN_Exit_VictorySpin
+
+#define DEFINE_SPECIAL(name,num,argc) LN_##name,
+#include "lnspecials.h"
+#undef DEFINE_SPECIAL
 };
 
 #define DEFINE_SPECIAL(name,num,args) { #name, num, args},
@@ -516,6 +514,17 @@ FUNC(Exit_Secret)
 	buttonheld[bt_use] = true;
 
 	playstate = ex_secretlevel;
+	SD_WaitSoundDone();
+	return 1;
+}
+
+FUNC(Exit_Victory)
+{
+	if(buttonheld[bt_use])
+		return 0;
+	buttonheld[bt_use] = true;
+
+	playstate = ex_victorious;
 	SD_WaitSoundDone();
 	return 1;
 }

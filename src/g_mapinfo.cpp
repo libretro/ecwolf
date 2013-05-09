@@ -398,6 +398,8 @@ protected:
 			ParseNext(mapInfo.NextMap);
 		else if(key.CompareNoCase("secretnext") == 0)
 			ParseNext(mapInfo.NextSecret);
+		else if(key.CompareNoCase("victorynext") == 0)
+			ParseNext(mapInfo.NextVictory);
 		else if(key.CompareNoCase("bordertexture") == 0)
 		{
 			FString textureName;

@@ -18,10 +18,10 @@ gameinfo
 adddefaultmap
 {
 	deathcam = true
-	specialaction = "Schabbs", "Exit_Normal"
-	specialaction = "Gift", "Exit_Normal"
-	specialaction = "FatFace", "Exit_Normal"
-	specialaction = "Hitler", "Exit_Normal"
+	specialaction = "Schabbs", "Exit_Victory"
+	specialaction = "Gift", "Exit_Victory"
+	specialaction = "FatFace", "Exit_Victory"
+	specialaction = "Hitler", "Exit_Victory"
 }
 
 // Episode 1
@@ -121,7 +121,7 @@ map "MAP08"
 
 map "MAP09"
 {
-	next = "EndTitle"
+	next = "MAP10"
 	secretnext = "MAP10"
 	floornumber = 9
 	music = "WARMARCH"
@@ -244,7 +244,7 @@ map "MAP18"
 
 map "MAP19"
 {
-	next = "EndTitle"
+	next = "MAP20"
 	secretnext = "MAP20"
 	floornumber = 9
 	music = "WARMARCH"
@@ -362,7 +362,7 @@ map "MAP28"
 
 map "MAP29"
 {
-	next = "EndTitle"
+	next = "MAP30"
 	secretnext = "MAP30"
 	floornumber = 9
 	music = "ULTIMATE"
@@ -485,8 +485,8 @@ map "MAP38"
 
 map "MAP39"
 {
-	next = "EndTitle"
-	secretnext = "MAP10"
+	next = "MAP40"
+	secretnext = "MAP40"
 	floornumber = 9
 	music = "WARMARCH"
 	cluster = 4
@@ -606,7 +606,7 @@ map "MAP48"
 
 map "MAP49"
 {
-	next = "EndTitle"
+	next = "MAP50"
 	secretnext = "MAP50"
 	floornumber = 9
 	music = "WARMARCH"
@@ -726,7 +726,7 @@ map "MAP58"
 
 map "MAP59"
 {
-	next = "EndTitle"
+	next = "MAP60"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
 	floornumber = 9

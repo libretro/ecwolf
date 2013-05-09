@@ -137,6 +137,7 @@ public:
 	char			MapName[9];
 	FString			NextMap;
 	FString			NextSecret;
+	FString			NextVictory;
 	unsigned int	FloorNumber;
 	FString			Music;
 	unsigned int	Cluster;

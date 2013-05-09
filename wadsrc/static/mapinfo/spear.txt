@@ -188,8 +188,9 @@ gameinfo
 
 adddefaultmap
 {
-	specialaction = "AngelOfDeath", "Exit_Normal"
-	specialaction = "DevilIncarnate", "Exit_Normal"
+	victorynext = EndSequence, "SpearEnding"
+	specialaction = "AngelOfDeath", "Exit_Victory"
+	specialaction = "DevilIncarnate", "Exit_Victory"
 }
 
 episode "MAP01"

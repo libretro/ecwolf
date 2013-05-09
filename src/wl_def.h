@@ -332,7 +332,8 @@ typedef enum
 	ex_abort,
 	ex_demodone,
 	ex_secretlevel,
-	ex_newmap
+	ex_newmap,
+	ex_victorious
 } exit_t;
 
 /*

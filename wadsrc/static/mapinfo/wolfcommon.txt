@@ -34,4 +34,5 @@ defaultmap
 {
 	defaultfloor = "#717171"
 	defaultceiling = "#383838"
+	victorynext = "EndTitle"
 }

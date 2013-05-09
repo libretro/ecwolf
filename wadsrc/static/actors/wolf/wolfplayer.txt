@@ -54,7 +54,7 @@ actor BJRun
 			BLAZ F 7 A_PlaySound("misc/yeah")
 			BLAZ G 7
 			BLAZ H 150 A_Stop
-			BLAZ H -1 Exit_Normal
+			BLAZ H -1 Exit_Victory
 			stop
 	}
 }
