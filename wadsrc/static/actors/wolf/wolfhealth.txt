@@ -95,7 +95,7 @@ actor OneUpPill : OneUp 144
 actor Blood : Health 67
 {
 	inventory.amount 1
-	inventory.maxamount 10
+	inventory.maxamount 11
 	inventory.pickupsound "misc/slurpie"
 	states
 	{
@@ -111,6 +111,29 @@ actor Blood2 : Blood 145
 	{
 		Spawn:
 			BLD2 A -1
+			stop
+	}
+}
+
+actor Gibs : Health 71
+{
+	inventory.amount 1
+	inventory.maxamount 11
+	inventory.pickupsound "misc/slurpie"
+	states
+	{
+		Spawn:
+			GIBS A -1
+			stop
+	}
+}
+actor Gibs2 : Gibs 126
+{
+	inventory.pickupsound "misc/slurpie2"
+	states
+	{
+		Spawn:
+			GIB2 A -1
 			stop
 	}
 }

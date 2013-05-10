@@ -482,25 +482,6 @@ actor EmptyWell2 : EmptyWell 153
 	}
 }
 
-actor Gibs 71
-{
-	states
-	{
-		Spawn:
-			GIBS A -1
-			stop
-	}
-}
-actor Gibs2 : Gibs 126
-{
-	states
-	{
-		Spawn:
-			GIB2 A -1
-			stop
-	}
-}
-
 actor Flag 72
 {
 	radius 32
