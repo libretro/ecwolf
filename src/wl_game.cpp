@@ -804,7 +804,7 @@ restartgame:
 							ammo = NULL;
 						}
 
-						if(ammo && !ammo->TryPickup(players[0].mo))
+						if(ammo && !ammo->CallTryPickup(players[0].mo))
 								ammo->Destroy();
 						continue;
 					}
@@ -814,7 +814,7 @@ restartgame:
 
 					AInventory *item = static_cast<AInventory*>(AActor::Spawn(ensure, 0, 0, 0, false));
 					item->RemoveFromWorld();
-					if(!item->TryPickup(players[0].mo))
+					if(!item->CallTryPickup(players[0].mo))
 						item->Destroy();
 				}
 			}

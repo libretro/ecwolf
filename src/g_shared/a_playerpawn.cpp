@@ -126,7 +126,7 @@ void APlayerPawn::GiveStartingInventory()
 			// Empty weapon.
 			((AWeapon *)invItem)->ammogive1 = 0;
 		}
-		if(!invItem->TryPickup(this))
+		if(!invItem->CallTryPickup(this))
 			invItem->Destroy();
 	}
 	while((item = item->Next()));

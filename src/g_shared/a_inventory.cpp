@@ -50,6 +50,21 @@ void AInventory::AttachToOwner(AActor *owner)
 	this->owner = owner;
 }
 
+// This is so we can handle certain things (flags) without requiring all of
+// TryPickup to be called.
+bool AInventory::CallTryPickup(AActor *toucher)
+{
+	bool ret = TryPickup(toucher);
+
+	if(!ret && (itemFlags & IF_ALWAYSPICKUP))
+	{
+		ret = true;
+		GoAwayAndDie();
+	}
+
+	return ret;
+}
+
 // Either creates a copy if the item or returns itself if it is safe to place
 // in the actor's inventory.
 AInventory *AInventory::CreateCopy(AActor *holder)
@@ -133,7 +148,7 @@ void AInventory::Touch(AActor *toucher)
 	if(!(toucher->flags & FL_PICKUP))
 		return;
 
-	if(!TryPickup(toucher))
+	if(!CallTryPickup(toucher))
 		return;
 
 	if(flags & FL_COUNTITEM)
@@ -151,7 +166,7 @@ bool AInventory::TryPickup(AActor *toucher)
 	if(toucher->inventory && toucher->inventory->HandlePickup(this, pickupGood))
 	{
 		// The actor has this item in their inventory and it has been handled.
-		if(!pickupGood && !(itemFlags & IF_ALWAYSPICKUP))
+		if(!pickupGood)
 			return false;
 		GoAwayAndDie();
 	}
@@ -159,11 +174,7 @@ bool AInventory::TryPickup(AActor *toucher)
 	{
 		// We can add maxamount = 0 items if we can use them right away.
 		if(!(itemFlags & IF_AUTOACTIVATE))
-		{
-			if(itemFlags & IF_ALWAYSPICKUP)
-				GoAwayAndDie();
 			return false;
-		}
 
 		toucher->AddInventory(this);
 		bool good = Use();
@@ -483,6 +494,7 @@ class AWeaponGiver : public AWeapon
 					continue;
 
 				AWeapon *weap = static_cast<AWeapon *>(AActor::Spawn(cls, 0, 0, 0, false));
+				weap->itemFlags &= ~IF_ALWAYSPICKUP;
 				weap->RemoveFromWorld();
 
 				if(noammo)
@@ -495,14 +507,16 @@ class AWeaponGiver : public AWeapon
 						weap->ammogive1 = ammogive1;
 				}
 
-				if(!weap->TryPickup(toucher))
+				if(!weap->CallTryPickup(toucher))
 				{
-					pickedup = false;
 					weap->Destroy();
 
 					// If main weapon isn't picked up, don't continue.
 					if(!noammo)
+					{
+						pickedup = false;
 						break;
+					}
 				}
 				else if(!noammo)
 				{

@@ -45,12 +45,12 @@ class AInventory : public AActor
 
 	public:
 		virtual void	AttachToOwner(AActor *owner);
+		bool			CallTryPickup(AActor *toucher);
 		virtual void	DetachFromOwner();
 		virtual void	Destroy();
 		virtual bool	HandlePickup(AInventory *item, bool &good);
 		void			Serialize(FArchive &arc);
 		void			Touch(AActor *toucher);
-		virtual bool	TryPickup(AActor *toucher);
 		virtual bool	Use();
 
 		flagstype_t		itemFlags;
@@ -65,6 +65,7 @@ class AInventory : public AActor
 		virtual AInventory	*CreateCopy(AActor *holder);
 		void				GoAwayAndDie();
 		bool				GoesAway();
+		virtual bool		TryPickup(AActor *toucher);
 };
 
 class AAmmo : public AInventory

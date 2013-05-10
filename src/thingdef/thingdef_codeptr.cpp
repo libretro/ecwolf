@@ -299,7 +299,7 @@ ACTION_FUNCTION(A_GiveInventory)
 			inv->amount = amount;
 
 		inv->RemoveFromWorld();
-		if(!inv->TryPickup(self))
+		if(!inv->CallTryPickup(self))
 			inv->Destroy();
 	}
 }

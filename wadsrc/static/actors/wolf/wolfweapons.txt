@@ -95,6 +95,7 @@ actor MachineGun : WolfWeapon 60
 	inventory.icon "MACHGUN"
 	inventory.pickupsound "weapon/machine/pickup"
 	weapon.selectionorder 1300
+	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
@@ -143,6 +144,7 @@ actor GatlingGun : WolfWeapon
 	inventory.pickupsound "weapon/gatling/pickup"
 	weapon.selectionorder 700
 	-WEAPON.NOGRIN
+	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
@@ -188,6 +190,7 @@ actor GatlingGunUpgrade : WeaponGiver 61
 	weapon.ammogive1 6
 	dropitem "GatlingGun"
 	dropitem "MachineGun"
+	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:

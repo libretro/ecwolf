@@ -218,7 +218,7 @@ static void GiveAllWeaponsAndAmmo()
 				}
 			}
 
-			if(!inv->TryPickup(players[0].mo))
+			if(!inv->CallTryPickup(players[0].mo))
 				inv->Destroy();
 		}
 	}
@@ -535,7 +535,7 @@ int DebugKeys (void)
 
 				AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
 				inv->RemoveFromWorld();
-				if(!inv->TryPickup(players[0].mo))
+				if(!inv->CallTryPickup(players[0].mo))
 					inv->Destroy();
 			}
 		}
