@@ -87,10 +87,10 @@ void AInventory::DetachFromOwner()
 
 void AInventory::Destroy()
 {
-	Super::Destroy();
-
 	if(owner)
 		owner->RemoveInventory(this);
+
+	Super::Destroy();
 }
 
 // Used for items which aren't placed into an inventory and don't respawn.

@@ -159,15 +159,19 @@ AWeapon *APlayerPawn::PickNewWeapon()
 
 void APlayerPawn::RemoveInventory(AInventory *item)
 {
+	bool pickWeap = false;
 	if(item == player->PendingWeapon)
 		player->PendingWeapon = WP_NOCHANGE;
 	else if(item == player->ReadyWeapon)
 	{
 		if(player->PendingWeapon == WP_NOCHANGE)
-			PickNewWeapon();
+			pickWeap = true;
 	}
 
 	Super::RemoveInventory(item);
+
+	if(pickWeap)
+		PickNewWeapon();
 }
 
 void APlayerPawn::Serialize(FArchive &arc)
