@@ -57,5 +57,7 @@ void CA_CacheMap (const FString &mapname)
 	levelInfo = &LevelInfo::Find(mapname);
 	map = new GameMap(mapname);
 	map->LoadMap();
+
+	CalcVisibility(8<<FRACBITS);
 }
 

@@ -224,6 +224,10 @@ void BuildTables (void)
 
 //===========================================================================
 
+void CalcVisibility(fixed vis)
+{
+	r_depthvisibility = FixedDiv(FixedMul((160*FRACUNIT),8<<FRACBITS),focallengthy<<16);
+}
 
 /*
 ====================
@@ -249,7 +253,6 @@ void CalcProjection (int32_t focal)
 	facedist = 2*FOCALLENGTH+0x100; // Used to be MINDIST (0x5800) which was 0x100 then the FOCALLENGTH (0x5700)
 	halfview = viewwidth/2;                                 // half view in pixels
 	focallengthy = centerx*yaspect/finetangent[FINEANGLES/2+(ANGLE_45>>ANGLETOFINESHIFT)];
-	r_depthvisibility = FixedDiv(FixedMul((160*FRACUNIT),8<<FRACBITS),focallengthy<<16);
 
 	/*fixed* viewTangent = finetangent+FINEANGLES/4;
 	fixed FocalTangent = viewTangent[FINEANGLES/4+(ANGLE_45>>ANGLETOFINESHIFT)];

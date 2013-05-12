@@ -127,10 +127,11 @@ bool FRtlFile::Open(bool quiet)
 		}
 		dataLump.rlewTag = LittleLong(header[i].rlewTag);
 		dataLump.carmackCompressed = false;
+		dataLump.rtlMap = true;
 		dataLump.Header.Width = 128;
 		dataLump.Header.Height = 128;
 		memcpy(dataLump.Header.Name, header[i].name, 24);
-		dataLump.LumpSize += dataLump.Header.Width*dataLump.Header.Height*PLANES*2;
+		dataLump.LumpSize += dataLump.Header.Width*dataLump.Header.Height*RTLCONVERTEDPLANES*2;
 	}
 	if(!quiet) Printf(", %d lumps\n", NumLumps);
 	return true;

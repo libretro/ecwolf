@@ -416,6 +416,8 @@ void R_SetDefaultColormap (const char *name)
 		else
 		{
 			FWadLump lumpr = Wads.OpenLumpNum (lump);
+			// ROTT colormap has fog fades at the top
+			bool maybeRott = lumpr.GetLength() == NUMCOLORMAPS*256;
 
 			// [RH] The colormap may not have been designed for the specific
 			// palette we are using, so remap it to match the current palette.
@@ -435,6 +437,24 @@ void R_SetDefaultColormap (const char *name)
 				for (j = 0; j < 256; ++j)
 				{
 					map2[j] = remap[map[unremap[j]]];
+
+					// To detect a ROTT colormap see if the first map is all the same color
+					if(maybeRott && i == 0 && j > 0)
+					{
+						if(map2[j] != map2[0])
+							maybeRott = false;
+					}
+				}
+			}
+
+			// OK, looks like we have a ROTT colormap, so remove the fog map
+			if(maybeRott)
+			{
+				for(i = 0;i < NUMCOLORMAPS/2;++i)
+				{
+					memcpy(&realcolormaps[i*2*256], &realcolormaps[(i+16)*256], 256);
+					if(i != 15)
+						memcpy(&realcolormaps[(i*2+1)*256], &realcolormaps[(i+16)*256], 256);
 				}
 			}
 		}

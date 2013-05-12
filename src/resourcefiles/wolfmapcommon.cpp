@@ -112,16 +112,17 @@ int FMapLump::FillCache()
 		return 1;
 
 	unsigned int PlaneSize = Header.Width*Header.Height*2;
+	unsigned int NumPlanes = rtlMap ? 4 : 3;
 
 	Cache = new char[LumpSize];
 	strcpy(Cache, "WDC3.1");
-	WriteLittleShort((BYTE*)&Cache[10], 3);
+	WriteLittleShort((BYTE*)&Cache[10], NumPlanes);
 	WriteLittleShort((BYTE*)&Cache[HEADERSIZE-4], Header.Width);
 	WriteLittleShort((BYTE*)&Cache[HEADERSIZE-2], Header.Height);
 	memcpy(&Cache[14], Header.Name, 16);
 
 	// Read map data and expand it
-	for(unsigned int i = 0;i < PLANES;i++)
+	for(unsigned int i = 0;i < NumPlanes;++i)
 	{
 		unsigned char* output = reinterpret_cast<unsigned char*>(Cache+HEADERSIZE+i*PlaneSize);
 		unsigned char* input = new unsigned char[Header.PlaneLength[i]];
@@ -139,6 +140,20 @@ int FMapLump::FillCache()
 			ExpandRLEW(input, output, PlaneSize, rlewTag);
 
 		delete[] input;
+
+		// RTL maps don't have a floor/ceiling texture plane so insert one
+		// We do this after the things plane has been read
+		if(rtlMap && i == 1)
+		{
+			const WORD floorTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE))-0xB4;
+			const WORD ceilingTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE+2))-0xC6;
+			const WORD fill = (floorTex&0xFF)|((ceilingTex&0xFF)<<8);
+			WORD *out = (WORD*)(Cache+HEADERSIZE+2*PlaneSize);
+			for(unsigned int j = 0;j < PlaneSize/2;++j)
+				*out++ = fill;
+
+			++i;
+		}
 	}
 	return 1;
 }

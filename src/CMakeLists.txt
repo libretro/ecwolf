@@ -170,6 +170,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	textures/pcxtexture.cpp
 	textures/pngtexture.cpp
 	textures/rawpagetexture.cpp
+	textures/rottflattexture.cpp
 	textures/solidtexture.cpp
 	textures/texture.cpp
 	textures/texturemanager.cpp

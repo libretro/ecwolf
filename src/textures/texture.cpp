@@ -72,6 +72,7 @@ FTexture *DDSTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *PCXTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *TGATexture_TryCreate(FileReader &, int lumpnum);
 FTexture *RawPageTexture_TryCreate(FileReader &, int lumpnum);
+FTexture *RottFlatTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *FlatTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *PatchTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *EmptyTexture_TryCreate(FileReader &, int lumpnum);
@@ -92,6 +93,7 @@ FTexture * FTexture::CreateTexture (int lumpnum, int usetype)
 		{ PCXTexture_TryCreate,			TEX_Any },
 		{ TGATexture_TryCreate,			TEX_Any },
 		{ RawPageTexture_TryCreate,		TEX_MiscPatch },
+		{ RottFlatTexture_TryCreate,	TEX_Flat },
 		{ FlatTexture_TryCreate,		TEX_Flat },
 		{ PatchTexture_TryCreate,		TEX_Any },
 		{ WolfShapeTexture_TryCreate,	TEX_Any },

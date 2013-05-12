@@ -38,6 +38,7 @@
 #include "files.h"
 #include "resourcefile.h"
 
+#define RTLCONVERTEDPLANES 4
 #define PLANES 3
 #define HEADERSIZE 34
 #define CARMACK_NEARTAG	static_cast<unsigned char>(0xA7)
@@ -61,11 +62,13 @@ struct FMapLump : public FResourceLump
 		} Header;
 		WORD rlewTag;
 		bool carmackCompressed;
+		bool rtlMap;
 
 		FMapLump() : FResourceLump()
 		{
 			LumpSize = HEADERSIZE;
 			carmackCompressed = true;
+			rtlMap = false;
 		}
 		~FMapLump()
 		{

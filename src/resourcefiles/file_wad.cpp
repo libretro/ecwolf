@@ -288,10 +288,17 @@ public:
 
 class FWadFile : public FResourceFile
 {
+	enum NSHackMode
+	{
+		HACK_NONE,
+		HACK_FLAT,
+		HACK_ROTT
+	};
+
 	FWadFileLump *Lumps;
 
 	bool IsMarker(int lump, const char *marker);
-	void SetNamespace(const char *startmarker, const char *endmarker, namespace_t space, bool flathack=false);
+	void SetNamespace(const char *startmarker, const char *endmarker, namespace_t space, NSHackMode flathack=HACK_NONE);
 	void SkinHack ();
 
 public:
@@ -376,13 +383,18 @@ bool FWadFile::Open(bool quiet)
 
 		// don't bother with namespaces here. We won't need them.
 		SetNamespace("S_START", "S_END", ns_sprites);
-		SetNamespace("F_START", "F_END", ns_flats, true);
+		SetNamespace("F_START", "F_END", ns_flats, HACK_FLAT);
 		SetNamespace("C_START", "C_END", ns_colormaps);
 		SetNamespace("A_START", "A_END", ns_acslibrary);
 		SetNamespace("TX_START", "TX_END", ns_newtextures);
 		SetNamespace("V_START", "V_END", ns_strifevoices);
 		SetNamespace("HI_START", "HI_END", ns_hires);
 		SetNamespace("VX_START", "VX_END", ns_voxels);
+
+		// ROTT Namespaces
+		SetNamespace("WALLSTRT", "WALLSTOP", ns_flats, HACK_ROTT);
+		SetNamespace("UPDNSTRT", "UPDNSTOP", ns_flats);
+
 		SkinHack();
 	}
 	return true;
@@ -425,7 +437,7 @@ struct Marker
 	unsigned int index;
 };
 
-void FWadFile::SetNamespace(const char *startmarker, const char *endmarker, namespace_t space, bool flathack)
+void FWadFile::SetNamespace(const char *startmarker, const char *endmarker, namespace_t space, FWadFile::NSHackMode flathack)
 {
 	bool warned = false;
 	int numstartmarkers = 0, numendmarkers = 0;
@@ -455,7 +467,7 @@ void FWadFile::SetNamespace(const char *startmarker, const char *endmarker, name
 		Printf(TEXTCOLOR_YELLOW"WARNING: %s marker without corresponding %s found.\n", endmarker, startmarker);
 
 		
-		if (flathack)
+		if (flathack == HACK_FLAT)
 		{
 			// We have found no F_START but one or more F_END markers.
 			// mark all lumps before the last F_END marker as potential flats.
@@ -468,6 +480,7 @@ void FWadFile::SetNamespace(const char *startmarker, const char *endmarker, name
 					// it needs to be flagged for the texture manager.
 					DPrintf("Marking %s as potential flat\n", Lumps[i].Name);
 					Lumps[i].Flags |= LUMPF_MAYBEFLAT;
+					
 				}
 			}
 		}
@@ -534,6 +547,10 @@ void FWadFile::SetNamespace(const char *startmarker, const char *endmarker, name
 			else
 			{
 				Lumps[j].Namespace = space;
+				if(flathack == HACK_ROTT)
+				{
+					Lumps[j].Flags |= LUMPF_DONTFLIPFLAT;
+				}
 			}
 		}
 	}
