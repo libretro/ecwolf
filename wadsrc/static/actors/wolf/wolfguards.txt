@@ -352,7 +352,7 @@ actor Mutant : WolfensteinMonster 15
 		Death:
 			MTNT L 3.5 A_Fall
 			MTNT M 3.5 A_Scream
-			MTNT MO 3.5
+			MTNT NO 3.5
 			MTNT P -1
 			stop
 	}
@@ -398,7 +398,7 @@ actor GunBat : Mutant 96
 		Death:
 			GBAT L 3.5 A_Fall
 			GBAT M 3.5 A_Scream
-			GBAT MO 3.5
+			GBAT NO 3.5
 			GBAT P -1
 			stop
 	}
