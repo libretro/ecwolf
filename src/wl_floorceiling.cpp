@@ -55,7 +55,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	unsigned int oldmapx = INT_MAX, oldmapy = INT_MAX;
 	const byte* curshades = NormalLight.Maps;
 	// draw horizontal lines
-	for(int y = y0;true; ++y, tex_offset += tex_offsetPitch)
+	for(int y = y0;floor ? y+halfheight < viewheight : y < halfheight; ++y, tex_offset += tex_offsetPitch)
 	{
 		dist = (planenumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
@@ -106,27 +106,24 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 				if(tex)
 				{
 
-#define CHECKTEXTURE(termcond) \
-if(termcond) return; \
-{ \
+#define CHECKTEXTURE \
 	const int u = (FixedMul(gu-512, texxscale)) & (texwidth-1); \
 	const int v = (FixedMul(gv+512, texyscale)) & (texheight-1); \
 	const unsigned texoffs = (u * texheight) + v; \
 	*tex_offset = curshades[tex[texoffs]]; \
-}
 
 					if(floor)
 					{
 						if(y+halfheight >= 0)
 						{
-							CHECKTEXTURE(y+halfheight >= viewheight);
+							CHECKTEXTURE
 						}
 					}
 					else
 					{
 						if(y >= halfheight - viewheight)
 						{
-							CHECKTEXTURE(y >= halfheight);
+							CHECKTEXTURE
 						}
 					}
 				}
