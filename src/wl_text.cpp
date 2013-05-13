@@ -788,7 +788,7 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 	// Determine if we're using an exit text or enter text. The enter text
 	// overrides the exit text since it's mainly used for entering secret levels.
 	// Also collect any information
-	FString EnterSlideshow, ExitSlideshow;
+	FString exitSlideshow;
 	FString exitText;
 	FString flat;
 	ClusterInfo::ExitType type = ClusterInfo::EXIT_STRING;
@@ -803,21 +803,20 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 			type = enterCluster.EnterTextType;
 		}
 
-		EnterSlideshow = enterCluster.EnterSlideshow;
-	}
-	if(enterClusterNum < 0 || exitText.IsEmpty())
-	{
-		ClusterInfo &exitCluster = ClusterInfo::Find(exitClusterNum);
-		exitText = exitCluster.ExitText;
-		flat = exitCluster.Flat;
-		type = exitCluster.ExitTextType;
-		ExitSlideshow = exitCluster.ExitSlideshow;
+		exitSlideshow = enterCluster.EnterSlideshow;
 	}
 
-	if(!ExitSlideshow.IsEmpty())
+	if(exitText.IsEmpty() || exitSlideshow.IsEmpty())
 	{
-		IntermissionInfo &intermission = IntermissionInfo::Find(ExitSlideshow);
-		ShowIntermission(intermission);
+		ClusterInfo &exitCluster = ClusterInfo::Find(exitClusterNum);
+		if(exitText.IsEmpty())
+		{
+			exitText = exitCluster.ExitText;
+			flat = exitCluster.Flat;
+			type = exitCluster.ExitTextType;
+		}
+		if(exitSlideshow.IsEmpty())
+			exitSlideshow = exitCluster.ExitSlideshow;
 	}
 
 	// If there was no text then just carry on
@@ -873,9 +872,9 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 			IN_CenterMouse();  // Clear accumulated mouse movement
 	}
 
-	if(!EnterSlideshow.IsEmpty())
+	if(!exitSlideshow.IsEmpty())
 	{
-		IntermissionInfo &intermission = IntermissionInfo::Find(EnterSlideshow);
+		IntermissionInfo &intermission = IntermissionInfo::Find(exitSlideshow);
 		ShowIntermission(intermission);
 	}
 
