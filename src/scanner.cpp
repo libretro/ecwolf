@@ -230,12 +230,19 @@ void Scanner::ExpandState()
 
 bool Scanner::GetNextString()
 {
+	if(!needNext)
+	{
+		int prevLine = line;
+		scanPos = state.scanPos;
+		CheckForWhitespace();
+		line = prevLine;
+	}
+	else
+		CheckForWhitespace();
+
 	nextState.tokenLine = line;
 	nextState.tokenLinePosition = scanPos - lineStart;
 	nextState.token = TK_NoToken;
-	if(!needNext)
-		scanPos = state.scanPos;
-	CheckForWhitespace();
 	if(scanPos >= length)
 		return false;
 
@@ -284,6 +291,9 @@ bool Scanner::GetNextString()
 				break;
 			scanPos++;
 		}
+
+		if(scanPos == length)
+			end = scanPos;
 	}
 	if(end-start > 0)
 	{
@@ -297,7 +307,6 @@ bool Scanner::GetNextString()
 		needNext = true;
 		return true;
 	}
-	CheckForWhitespace();
 	return false;
 }
 
