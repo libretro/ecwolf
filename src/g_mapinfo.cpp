@@ -772,7 +772,11 @@ protected:
 
 	bool CheckKey(FString key)
 	{
-		if(key.CompareNoCase("exittext") == 0 || key.CompareNoCase("entertext") == 0)
+		if(key.CompareNoCase("enterslideshow") == 0)
+			ParseStringAssignment(cluster->EnterSlideshow);
+		else if(key.CompareNoCase("exitslideshow") == 0)
+			ParseStringAssignment(cluster->ExitSlideshow);
+		else if(key.CompareNoCase("exittext") == 0 || key.CompareNoCase("entertext") == 0)
 		{
 			sc.MustGetToken('=');
 			bool lookup = false;

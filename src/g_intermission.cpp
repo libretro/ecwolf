@@ -193,7 +193,7 @@ bool ShowIntermission(const IntermissionInfo &intermission)
 			LastScan = 0;
 			ReadAnyControl(&ci);
 		}
-		while(LastScan != sc_Escape && !ci.button1);
+		while(LastScan != sc_Escape && LastScan != sc_Enter && !ci.button1);
 	}
 
 	VL_ReadPalette(gameinfo.GamePalette);

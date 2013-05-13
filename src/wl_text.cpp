@@ -10,6 +10,7 @@
 #include "wl_game.h"
 #include "wl_iwad.h"
 #include "wl_text.h"
+#include "g_intermission.h"
 #include "g_mapinfo.h"
 #include "id_ca.h"
 #include "textures/textures.h"
@@ -775,13 +776,19 @@ void HelpScreens (void)
 //
 bool EndText (int exitClusterNum, int enterClusterNum)
 {
+	static bool EndTextInProgress = false;
 	char    *text;
+
+	if(EndTextInProgress)
+		return false;
+	EndTextInProgress = true;
 
 	ClearMemory ();
 
 	// Determine if we're using an exit text or enter text. The enter text
 	// overrides the exit text since it's mainly used for entering secret levels.
 	// Also collect any information
+	FString EnterSlideshow, ExitSlideshow;
 	FString exitText;
 	FString flat;
 	ClusterInfo::ExitType type = ClusterInfo::EXIT_STRING;
@@ -795,6 +802,8 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 			flat = enterCluster.Flat;
 			type = enterCluster.EnterTextType;
 		}
+
+		EnterSlideshow = enterCluster.EnterSlideshow;
 	}
 	if(enterClusterNum < 0 || exitText.IsEmpty())
 	{
@@ -802,57 +811,74 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 		exitText = exitCluster.ExitText;
 		flat = exitCluster.Flat;
 		type = exitCluster.ExitTextType;
+		ExitSlideshow = exitCluster.ExitSlideshow;
+	}
+
+	if(!ExitSlideshow.IsEmpty())
+	{
+		IntermissionInfo &intermission = IntermissionInfo::Find(ExitSlideshow);
+		ShowIntermission(intermission);
 	}
 
 	// If there was no text then just carry on
-	if(exitText.IsEmpty())
-		return false;
-
-	// Use cluster background if set.
-	if(!flat.IsEmpty())
-		backgroundFlat = TexMan(flat);
-	if(!backgroundFlat) // Get default if needed
-		backgroundFlat = TexMan(gameinfo.FinaleFlat);
-
-	switch(type)
+	bool ret = false;
+	if(!exitText.IsEmpty())
 	{
-		case ClusterInfo::EXIT_MESSAGE:
-			SD_PlaySound ("misc/1up");
+		ret = true;
 
-			Message (exitText);
+		// Use cluster background if set.
+		if(!flat.IsEmpty())
+			backgroundFlat = TexMan(flat);
+		if(!backgroundFlat) // Get default if needed
+			backgroundFlat = TexMan(gameinfo.FinaleFlat);
 
-			IN_ClearKeysDown ();
-			IN_Ack ();
-			return false;
-	
-		case ClusterInfo::EXIT_LUMP:
+		switch(type)
 		{
-			VW_FadeOut ();
+			case ClusterInfo::EXIT_MESSAGE:
+				SD_PlaySound ("misc/1up");
 
-			int lumpNum = Wads.CheckNumForName(exitText, ns_global);
-			if(lumpNum != -1)
+				Message (exitText);
+
+				IN_ClearKeysDown ();
+				IN_Ack ();
+				return false;
+		
+			case ClusterInfo::EXIT_LUMP:
 			{
-				FWadLump lump = Wads.OpenLumpNum(lumpNum);
-				text = new char[Wads.LumpLength(lumpNum)];
-				lump.Read(text, Wads.LumpLength(lumpNum));
+				VW_FadeOut ();
 
-				ShowArticle(text, !!(IWad::GetGame().Flags & IWad::HELPHACK));
+				int lumpNum = Wads.CheckNumForName(exitText, ns_global);
+				if(lumpNum != -1)
+				{
+					FWadLump lump = Wads.OpenLumpNum(lumpNum);
+					text = new char[Wads.LumpLength(lumpNum)];
+					lump.Read(text, Wads.LumpLength(lumpNum));
 
-				delete[] text;
+					ShowArticle(text, !!(IWad::GetGame().Flags & IWad::HELPHACK));
+
+					delete[] text;
+				}
+
+				break;
 			}
 
-			break;
+			default:
+				VW_FadeOut ();
+				ShowArticle(exitText, !!(IWad::GetGame().Flags & IWad::HELPHACK));
+				break;
 		}
 
-		default:
-			VW_FadeOut ();
-			ShowArticle(exitText, !!(IWad::GetGame().Flags & IWad::HELPHACK));
-			break;
+		IN_ClearKeysDown();
+		if (MousePresent && IN_IsInputGrabbed())
+			IN_CenterMouse();  // Clear accumulated mouse movement
 	}
 
-	IN_ClearKeysDown();
-	if (MousePresent && IN_IsInputGrabbed())
-		IN_CenterMouse();  // Clear accumulated mouse movement
+	if(!EnterSlideshow.IsEmpty())
+	{
+		IntermissionInfo &intermission = IntermissionInfo::Find(EnterSlideshow);
+		ShowIntermission(intermission);
+	}
 
-	return true;
+	EndTextInProgress = false;
+	return ret;
 }

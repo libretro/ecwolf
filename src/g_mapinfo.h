@@ -206,6 +206,7 @@ public:
 
 	ClusterInfo();
 
+	FString		EnterSlideshow, ExitSlideshow;
 	FString		EnterText, ExitText;
 	ExitType	EnterTextType, ExitTextType;
 	FString		Flat;
