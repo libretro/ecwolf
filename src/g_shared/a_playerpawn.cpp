@@ -189,6 +189,8 @@ void APlayerPawn::SetupWeaponSlots()
 void APlayerPawn::Tick()
 {
 	Super::Tick();
+	if(!player)
+		return;
 
 	TickPSprites();
 
