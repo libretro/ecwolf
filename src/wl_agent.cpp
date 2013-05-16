@@ -237,14 +237,14 @@ static struct StatusBarConfig_t
 	// The following don't use the digits
 	LatchConfig Mugshot, Keys, Weapon;
 } StatusBarConfig = {
-	{1, 2, 2, 16},
-	{1, 6, 6, 16},
-	{1, 1, 14, 16},
-	{1, 3, 21, 16},
-	{1, 3, 26, 16},
-	{1, 0, 136, 164},
-	{1, 0, 30, 4},
-	{1, 0, 256, 168}
+	{1, 2, 16, 16},
+	{1, 6, 48, 16},
+	{1, 1, 112, 16},
+	{1, 3, 168, 16},
+	{1, 3, 208, 16},
+	{1, 0, 136, 4},
+	{1, 0, 240, 4},
+	{1, 0, 256, 8}
 };
 
 /*
@@ -257,12 +257,12 @@ static struct StatusBarConfig_t
 
 void StatusDrawPic (unsigned x, unsigned y, const char* pic)
 {
-	VWB_DrawGraphic(TexMan(pic), x*8, 200-(STATUSLINES-y));
+	VWB_DrawGraphic(TexMan(pic), x, 200-(STATUSLINES-y));
 }
 
 static void StatusDrawFace(FTexture *pic)
 {
-	VWB_DrawGraphic(pic, StatusBarConfig.Mugshot.X, StatusBarConfig.Mugshot.Y);
+	VWB_DrawGraphic(pic, StatusBarConfig.Mugshot.X, 200-(STATUSLINES-StatusBarConfig.Mugshot.Y));
 }
 
 
@@ -405,7 +405,6 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number)
 		HudFont = V_GetFont("HudFont");
 	}
 
-	x *= 8;
 	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
 
 	FString str;
@@ -584,7 +583,7 @@ void DrawWeapon (void)
 	)
 		return;
 
-	VWB_DrawGraphic(TexMan(players[0].ReadyWeapon->icon), StatusBarConfig.Weapon.X, StatusBarConfig.Weapon.Y);
+	VWB_DrawGraphic(TexMan(players[0].ReadyWeapon->icon), StatusBarConfig.Weapon.X, 200-(STATUSLINES-StatusBarConfig.Weapon.Y));
 }
 
 
@@ -656,7 +655,7 @@ void DrawAmmo (void)
 		return;
 
 	unsigned int amount = players[0].ReadyWeapon->ammo1->amount;
-	LatchNumber (26,16,3,amount);
+	LatchNumber (StatusBarConfig.Ammo.X,StatusBarConfig.Ammo.Y,StatusBarConfig.Ammo.Digits,amount);
 }
 
 //===========================================================================
