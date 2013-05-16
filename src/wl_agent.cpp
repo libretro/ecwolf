@@ -714,6 +714,11 @@ void SetupStatusbar()
 				extrakey = key.Mid(5);
 				var = &StatusBarConfig.Floor;
 			}
+			else if(key.IndexOf("health") == 0)
+			{
+				extrakey = key.Mid(6);
+				var = &StatusBarConfig.Health;
+			}
 			else if(key.IndexOf("keys") == 0)
 			{
 				extrakey = key.Mid(4);
