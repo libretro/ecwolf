@@ -79,6 +79,8 @@ Scanner::Scanner(const char* data, size_t length) : line(1), lineStart(0), logic
 	CheckForWhitespace();
 
 	state.scanPos = scanPos;
+	state.tokenLine = 0;
+	state.tokenLinePosition = 0;
 }
 
 Scanner::~Scanner()

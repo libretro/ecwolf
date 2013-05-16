@@ -27,6 +27,7 @@ void    GivePoints (int32_t points);
 // player state info
 //
 
+void	SetupStatusbar();
 void	DrawStatusBar();
 void    StatusDrawFace(unsigned picnum);
 void    GiveExtraMan (int amount);

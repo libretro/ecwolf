@@ -456,6 +456,9 @@ static void InitGame()
 //
 	InitRedShifts ();
 
+// Temporary status bar config
+	SetupStatusbar();
+
 //
 // initialize the menusalcProjection
 	printf("CreateMenus: Preparing the menu system...\n");

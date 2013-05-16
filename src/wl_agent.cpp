@@ -21,6 +21,9 @@
 #include "wl_play.h"
 #include "templates.h"
 
+#include "w_wad.h"
+#include "scanner.h"
+
 /*
 =============================================================================
 
@@ -220,6 +223,29 @@ void ControlMovement (AActor *ob)
 =============================================================================
 */
 
+struct LatchConfig
+{
+	unsigned int Enabled;
+	unsigned int Digits;
+	unsigned int X;
+	unsigned int Y;
+};
+static struct StatusBarConfig_t
+{
+	LatchConfig Floor, Score, Lives, Health, Ammo;
+
+	// The following don't use the digits
+	LatchConfig Mugshot, Keys, Weapon;
+} StatusBarConfig = {
+	{1, 2, 2, 16},
+	{1, 6, 6, 16},
+	{1, 1, 14, 16},
+	{1, 3, 21, 16},
+	{1, 3, 26, 16},
+	{1, 0, 136, 164},
+	{1, 0, 30, 4},
+	{1, 0, 256, 168}
+};
 
 /*
 ==================
@@ -236,7 +262,7 @@ void StatusDrawPic (unsigned x, unsigned y, const char* pic)
 
 static void StatusDrawFace(FTexture *pic)
 {
-	VWB_DrawGraphic(pic, 136, 164);
+	VWB_DrawGraphic(pic, StatusBarConfig.Mugshot.X, StatusBarConfig.Mugshot.Y);
 }
 
 
@@ -250,7 +276,7 @@ static void StatusDrawFace(FTexture *pic)
 
 void DrawFace (void)
 {
-	if(viewsize == 21 && ingame) return;
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Mugshot.Enabled) return;
 
 	if(!gamestate.faceframe.isValid())
 	{
@@ -405,8 +431,8 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number)
 
 void DrawHealth (void)
 {
-	if(viewsize == 21 && ingame) return;
-	LatchNumber (21,16,3,players[0].health);
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Health.Enabled) return;
+	LatchNumber (StatusBarConfig.Health.X,StatusBarConfig.Health.Y,StatusBarConfig.Health.Digits,players[0].health);
 }
 
 
@@ -466,8 +492,8 @@ void TakeDamage (int points,AActor *attacker)
 
 void DrawLevel (void)
 {
-	if(viewsize == 21 && ingame) return;
-	LatchNumber (2,16,2,levelInfo->FloorNumber);
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
+	LatchNumber (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,levelInfo->FloorNumber);
 }
 
 //===========================================================================
@@ -483,8 +509,8 @@ void DrawLevel (void)
 
 void DrawLives (void)
 {
-	if(viewsize == 21 && ingame) return;
-	LatchNumber (14,16,1,players[0].lives);
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Lives.Enabled) return;
+	LatchNumber (StatusBarConfig.Lives.X,StatusBarConfig.Lives.Y,StatusBarConfig.Lives.Digits,players[0].lives);
 }
 
 
@@ -518,8 +544,8 @@ void GiveExtraMan (int amount)
 
 void DrawScore (void)
 {
-	if(viewsize == 21 && ingame) return;
-	LatchNumber (6,16,6,players[0].score);
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Score.Enabled) return;
+	LatchNumber (StatusBarConfig.Score.X,StatusBarConfig.Score.Y,StatusBarConfig.Score.Digits,players[0].score);
 }
 
 /*
@@ -552,13 +578,13 @@ void GivePoints (int32_t points)
 
 void DrawWeapon (void)
 {
-	if((viewsize == 21 && ingame) ||
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Weapon.Enabled ||
 		players[0].ReadyWeapon == NULL ||
 		players[0].ReadyWeapon->icon.isNull()
 	)
 		return;
 
-	VWB_DrawGraphic(TexMan(players[0].ReadyWeapon->icon), 256, 168);
+	VWB_DrawGraphic(TexMan(players[0].ReadyWeapon->icon), StatusBarConfig.Weapon.X, StatusBarConfig.Weapon.Y);
 }
 
 
@@ -572,7 +598,7 @@ void DrawWeapon (void)
 
 void DrawKeys (void)
 {
-	if(viewsize == 21 && ingame) return;
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Keys.Enabled) return;
 	static bool extendedKeysGraphics = TexMan.CheckForTexture("STKEYS3", FTexture::TEX_Any).isValid();
 
 	// Find keys in inventory
@@ -592,23 +618,25 @@ void DrawKeys (void)
 		}
 	}
 
+	const unsigned int x = StatusBarConfig.Keys.X;
+	const unsigned int y = StatusBarConfig.Keys.Y;
 	if (extendedKeysGraphics && (presentKeys & (1|4)) == (1|4))
-		StatusDrawPic (30,4,"STKEYS5");
+		StatusDrawPic (x,y,"STKEYS5");
 	else if(extendedKeysGraphics && (presentKeys & 4))
-		StatusDrawPic (30,4,"STKEYS3");
+		StatusDrawPic (x,y,"STKEYS3");
 	else if(presentKeys & 1)
-		StatusDrawPic (30,4,"STKEYS1");
+		StatusDrawPic (x,y,"STKEYS1");
 	else
-		StatusDrawPic (30,4,"STKEYS0");
+		StatusDrawPic (x,y,"STKEYS0");
 
 	if (extendedKeysGraphics && (presentKeys & (2|8)) == (2|8))
-		StatusDrawPic (30,20,"STKEYS6");
+		StatusDrawPic (x,y+16,"STKEYS6");
 	else if (extendedKeysGraphics && (presentKeys & 8))
-		StatusDrawPic (30,20,"STKEYS4");
+		StatusDrawPic (x,y+16,"STKEYS4");
 	else if (presentKeys & 2)
-		StatusDrawPic (30,20,"STKEYS2");
+		StatusDrawPic (x,y+16,"STKEYS2");
 	else
-		StatusDrawPic (30,20,"STKEYS0");
+		StatusDrawPic (x,y+16,"STKEYS0");
 }
 
 //===========================================================================
@@ -623,7 +651,7 @@ void DrawKeys (void)
 
 void DrawAmmo (void)
 {
-	if((viewsize == 21 && ingame) ||
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Ammo.Enabled ||
 		!players[0].ReadyWeapon || !players[0].ReadyWeapon->ammo1)
 		return;
 
@@ -649,6 +677,85 @@ void DrawStatusBar()
 	DrawScore ();
 }
 
+//===========================================================================
+
+void SetupStatusbar()
+{
+	// Temporary configuration lump so that some mods can be ported to ECWolf
+	// before a proper solution is created.
+	// ---> WILL BE REMOVED <---
+
+	int lastLump = 0;
+	int lumpnum = 0;
+	while((lumpnum = Wads.FindLump("LATCHCFG", &lastLump)) != -1)
+	{
+		FMemLump lump = Wads.ReadLump(lumpnum);
+		Scanner sc((const char*)(lump.GetMem()), lump.GetSize());
+		sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpnum));
+		sc.ScriptMessage(Scanner::WARNING, "Utilizing temporary status bar configuration script.");
+
+		while(sc.TokensLeft())
+		{
+			sc.MustGetToken(TK_Identifier);
+			FString key = sc->str;
+			key.ToLower();
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_IntConst);
+			unsigned int value = sc->number;
+
+			LatchConfig *var = NULL;
+			FString extrakey;
+			if(key.IndexOf("ammo") == 0)
+			{
+				extrakey = key.Mid(4);
+				var = &StatusBarConfig.Ammo;
+			}
+			else if(key.IndexOf("floor") == 0)
+			{
+				extrakey = key.Mid(5);
+				var = &StatusBarConfig.Floor;
+			}
+			else if(key.IndexOf("keys") == 0)
+			{
+				extrakey = key.Mid(4);
+				var = &StatusBarConfig.Keys;
+			}
+			else if(key.IndexOf("lives") == 0)
+			{
+				extrakey = key.Mid(5);
+				var = &StatusBarConfig.Lives;
+			}
+			else if(key.IndexOf("mugshot") == 0)
+			{
+				extrakey = key.Mid(7);
+				var = &StatusBarConfig.Mugshot;
+			}
+			else if(key.IndexOf("score") == 0)
+			{
+				extrakey = key.Mid(5);
+				var = &StatusBarConfig.Score;
+			}
+			else if(key.IndexOf("weapon") == 0)
+			{
+				extrakey = key.Mid(6);
+				var = &StatusBarConfig.Weapon;
+			}
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key.GetChars());
+
+			if(extrakey.Compare("enabled") == 0)
+				var->Enabled = value;
+			else if(extrakey.Compare("digits") == 0)
+				var->Digits = value;
+			else if(extrakey.Compare("x") == 0)
+				var->X = value;
+			else if(extrakey.Compare("y") == 0)
+				var->Y = value;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key.GetChars());
+		}
+	}
+}
 
 /*
 =============================================================================
