@@ -226,7 +226,7 @@ void BuildTables (void)
 
 void CalcVisibility(fixed vis)
 {
-	r_depthvisibility = FixedDiv(FixedMul((160*FRACUNIT),8<<FRACBITS),focallengthy<<16);
+	r_depthvisibility = FixedDiv(FixedMul((160*FRACUNIT),vis),focallengthy<<16);
 }
 
 /*

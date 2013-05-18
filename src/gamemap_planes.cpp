@@ -41,6 +41,12 @@
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_game.h"
+#include "wl_shade.h"
+
+static const char* const FeatureFlagNames[] = {
+	"lightlevels",
+	NULL
+};
 
 class Xlat : public TextMapParser
 {
@@ -49,6 +55,11 @@ public:
 	{
 		TF_PATHING = 1,
 		TF_HOLOWALL = 2
+	};
+
+	enum EFeatureFlags
+	{
+		FF_LIGHTLEVELS = 1
 	};
 
 	struct ThingXlat
@@ -116,6 +127,7 @@ public:
 			if(this->lump == lump)
 				return;
 			this->lump = lump;
+			FeatureFlags = static_cast<EFeatureFlags>(0);
 
 			ClearTables();
 		}
@@ -154,10 +166,31 @@ public:
 					sc.ScriptMessage(Scanner::ERROR, "Could not open '%s'.", sc->str.GetChars());
 				LoadXlat(includeLump, baseStackNext);
 			}
+			else if(sc->str.CompareNoCase("enable") == 0 || sc->str.CompareNoCase("disable") == 0)
+			{
+				bool enable = sc->str.CompareNoCase("enable") == 0;
+				sc.MustGetToken(TK_Identifier);
+				unsigned int i = 0;
+				do
+				{
+					if(sc->str.CompareNoCase(FeatureFlagNames[i]) == 0)
+					{
+						if(enable)
+							FeatureFlags = static_cast<EFeatureFlags>(FeatureFlags|(1<<i));
+						else
+							FeatureFlags = static_cast<EFeatureFlags>(FeatureFlags|(~(1<<i)));
+						break;
+					}
+				}
+				while(FeatureFlagNames[++i]);
+				sc.MustGetToken(';');
+			}
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown xlat property '%s'.", sc->str.GetChars());
 		}
 	}
+
+	EFeatureFlags GetFeatureFlags() const { return FeatureFlags; }
 
 	WORD GetTilePalette(TArray<MapTile> &tilePalette)
 	{
@@ -485,6 +518,7 @@ private:
 	TMap<WORD, ModZone> modZones;
 	TMap<WORD, MapZone> zonePalette;
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
+	EFeatureFlags FeatureFlags;
 };
 
 // Reads old format maps
@@ -498,6 +532,8 @@ void GameMap::ReadPlanesData()
 		xlat.LoadXlat(Wads.GetNumForFullName(gameinfo.Translator.str), gameinfo.Translator.Next());
 	else
 		xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator), &gameinfo.Translator);
+
+	Xlat::EFeatureFlags FeatureFlags = xlat.GetFeatureFlags();
 
 	// Old format maps always have a tile size of 64
 	header.tileSize = UNIT;
@@ -674,6 +710,28 @@ void GameMap::ReadPlanesData()
 						}
 					}
 				}
+
+				if(FeatureFlags & Xlat::FF_LIGHTLEVELS)
+				{
+					// Visibility is roughly exponential
+					static const fixed visTable[16] = {
+						0x8888, 0xDDDD, 2<<FRACBITS,
+						3<<FRACBITS, 8<<FRACBITS, 15<<FRACBITS,
+						29<<FRACBITS, 56<<FRACBITS, 108<<FRACBITS,
+						// After this point we basically max out the depth fog any way
+						200<<FRACBITS, 200<<FRACBITS, 200<<FRACBITS,
+						200<<FRACBITS, 200<<FRACBITS, 200<<FRACBITS,
+						200<<FRACBITS
+					};
+
+					gLevelVisibility = visTable[clamp(oldplane[3] - 0xFC, 0, 15)];
+					gLevelLight = clamp(oldplane[2] - 0xD8, 0, 7)*8 + 130; // Seems to be approx accurate for every even number lighting (0, 2, 4, 6)
+				}
+				else
+				{
+					gLevelVisibility = VISIBILITY_DEFAULT;
+					gLevelLight = LIGHTLEVEL_DEFAULT;
+				}
 				break;
 			}
 
@@ -700,7 +758,7 @@ void GameMap::ReadPlanesData()
 					uint32_t flags = 0;
 
 					if(!xlat.TranslateThing(thing, trigger, isTrigger, flags, oldplane[i]))
-						printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
+						;//printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 					else
 					{
 						if(isTrigger)

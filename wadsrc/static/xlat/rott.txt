@@ -1,3 +1,5 @@
+enable lightlevels;
+
 tiles
 {
 	tile 1

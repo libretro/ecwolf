@@ -67,7 +67,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		gv -= (viewwidth >> 1) * dv; // starting point (leftmost)
 		if(r_depthfog)
 		{
-			const int shade = LIGHT2SHADE(192);
+			const int shade = LIGHT2SHADE(gLevelLight);
 			const int tz = FixedMul(FixedDiv(r_depthvisibility, abs(planeheight)), abs(((halfheight)<<16) - ((halfheight-y)<<16)));
 			curshades = &NormalLight.Maps[GETPALOOKUP(tz, shade)<<8];
 		}

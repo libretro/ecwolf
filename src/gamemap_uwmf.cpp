@@ -38,6 +38,7 @@
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_game.h"
+#include "wl_shade.h"
 
 #define CheckKey(x) if(key.CompareNoCase(x) == 0)
 
@@ -517,6 +518,10 @@ class UWMFParser : public TextMapParser
 
 void GameMap::ReadUWMFData()
 {
+	// TODO: Make these accessible from UWMF
+	gLevelVisibility = VISIBILITY_DEFAULT;
+	gLevelLight = LIGHTLEVEL_DEFAULT;
+
 	long size = lumps[0]->GetLength();
 	char *data = new char[size];
 	lumps[0]->Read(data, size);

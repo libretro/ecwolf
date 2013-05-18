@@ -384,7 +384,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		colormap = NormalLight.Maps;
 	else
 	{
-		const int shade = LIGHT2SHADE(192);
+		const int shade = LIGHT2SHADE(gLevelLight);
 		const int tz = FixedMul(r_depthvisibility<<8, height);
 		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 	}

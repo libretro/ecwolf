@@ -18,4 +18,9 @@
 
 #define MINZ			(2048*4)
 
+#define VISIBILITY_DEFAULT (8<<FRACBITS)
+#define LIGHTLEVEL_DEFAULT 256
+extern fixed gLevelVisibility;
+extern int gLevelLight;
+
 #endif

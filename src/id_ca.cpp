@@ -20,6 +20,7 @@ loaded into the data segment
 #include "wl_game.h"
 #include "w_wad.h"
 #include "wl_main.h"
+#include "wl_shade.h"
 
 /*
 =============================================================================
@@ -58,6 +59,6 @@ void CA_CacheMap (const FString &mapname)
 	map = new GameMap(mapname);
 	map->LoadMap();
 
-	CalcVisibility(8<<FRACBITS);
+	CalcVisibility(gLevelVisibility);
 }
 

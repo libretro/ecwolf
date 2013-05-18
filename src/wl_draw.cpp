@@ -87,6 +87,9 @@ fixed   viewsin,viewcos;
 int viewshift = 0;
 fixed viewz = 32;
 
+fixed gLevelVisibility = VISIBILITY_DEFAULT;
+int gLevelLight = LIGHTLEVEL_DEFAULT;
+
 void    TransformActor (AActor *ob);
 void    BuildTables (void);
 void    ClearScreen (void);
@@ -251,7 +254,7 @@ void ScalePost()
 	int ywcount, yoffs, yw, yd, yendoffs;
 	byte col;
 
-	const int shade = LIGHT2SHADE(192);
+	const int shade = LIGHT2SHADE(gLevelLight);
 	const int tz = FixedMul(r_depthvisibility<<8, wallheight[postx]);
 	BYTE *curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 
