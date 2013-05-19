@@ -600,7 +600,7 @@ void DrawScaleds (void)
 			|| ( spots[7] && (spots[7]->visible && !spots[7]->tile) ) )
 		{
 			TransformActor (obj);
-			if (!obj->viewheight)
+			if (!obj->viewheight || (gamestate.victoryflag && obj == players[0].mo))
 				continue;                                               // too close or far away
 
 			visptr->actor = obj;
