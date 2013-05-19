@@ -90,9 +90,13 @@ void APlayerPawn::CheckWeaponSwitch(const ClassDef *ammo)
 
 void APlayerPawn::Die()
 {
-	player->PendingWeapon = WP_NOCHANGE;
-	if(player->ReadyWeapon)
-		player->SetPSprite(player->ReadyWeapon->GetDownState());
+	if(player)
+	{
+		player->PendingWeapon = WP_NOCHANGE;
+		if(player->ReadyWeapon)
+			player->SetPSprite(player->ReadyWeapon->GetDownState());
+	}
+	Super::Die();
 }
 
 AActor::DropList *APlayerPawn::GetStartInventory()

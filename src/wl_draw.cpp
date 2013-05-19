@@ -1171,7 +1171,7 @@ void WallRefresh (void)
 
 	
 	angle_t bobangle = ((gamestate.TimeCount<<13)/(20*TICRATE/35)) & FINEMASK;
-	fixed curbob = FixedMul(players[0].bob>>1, finesine[bobangle]);
+	fixed curbob = gamestate.victoryflag ? 0 : FixedMul(players[0].bob>>1, finesine[bobangle]);
 	
 	viewz = (32<<FRACBITS) + curbob;
 

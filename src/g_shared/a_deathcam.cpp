@@ -99,7 +99,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	FizzleFadeStart();
 
 	double fadex = 0;
-	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;;
+	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;
 	double fadew = 320;
 	double fadeh = 200;
 	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
