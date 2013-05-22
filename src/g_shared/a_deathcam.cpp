@@ -81,9 +81,8 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	ADeathCam *cam = (ADeathCam *)self;
 	if(cam->camFinished)
 	{
-		// Allow the game to continue if we don't exit.
-		gamestate.victoryflag = false;
 		CALL_ACTION(A_BossDeath, cam->actor);
+		cam->Destroy();
 		return;
 	}
 

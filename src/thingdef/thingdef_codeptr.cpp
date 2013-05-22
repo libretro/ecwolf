@@ -182,7 +182,7 @@ ACTION_FUNCTION(A_BossDeath)
 	if(!alldead)
 		return;
 
-	if(levelInfo->DeathCam && (!deathcam || gamestate.victoryflag))
+	if(levelInfo->DeathCam && (!deathcam || (!deathcam->ObjectFlags & OF_EuthanizeMe)))
 	{
 		if(!deathcam)
 		{
@@ -213,6 +213,7 @@ ACTION_FUNCTION(A_BossDeath)
 			// Return the camera to the player if we're still going
 			players[0].camera = players[0].mo;
 			players[0].BringUpWeapon();
+			gamestate.victoryflag = false;
 		}
 	}
 }
