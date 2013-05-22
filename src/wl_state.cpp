@@ -693,7 +693,11 @@ void DamageActor (AActor *ob, unsigned damage)
 	ob->health -= (short)damage;
 
 	if (ob->health<=0)
+	{
+		ob->killerx = players[0].mo->x;
+		ob->killery = players[0].mo->y;
 		ob->Die();
+	}
 	else
 	{
 		if (! (ob->flags & FL_ATTACKMODE) )

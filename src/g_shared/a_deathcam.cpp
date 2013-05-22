@@ -33,11 +33,11 @@ static bool CheckPosition (AActor *ob)
 	int x,y,xl,yl,xh,yh;
 	MapSpot check;
 
-	xl = (ob->x-ob->radius) >> TILESHIFT;
-	yl = (ob->y-ob->radius) >> TILESHIFT;
+	xl = MAX<int>(0, (ob->x-ob->radius) >> TILESHIFT);
+	yl = MAX<int>(0, (ob->y-ob->radius) >> TILESHIFT);
 
-	xh = (ob->x+ob->radius) >> TILESHIFT;
-	yh = (ob->y+ob->radius) >> TILESHIFT;
+	xh = MIN<int>(map->GetHeader().width, (ob->x+ob->radius) >> TILESHIFT);
+	yh = MIN<int>(map->GetHeader().height, (ob->y+ob->radius) >> TILESHIFT);
 
 	//
 	// check for solid walls
@@ -52,7 +52,7 @@ static bool CheckPosition (AActor *ob)
 		}
 	}
 
-	return true;
+	return yl <= yh && xl <= xh;
 }
 
 void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
@@ -86,8 +86,8 @@ ACTION_FUNCTION(A_FinishDeathCam)
 		return;
 	}
 
-	cam->x = cam->killer->x;
-	cam->y = cam->killer->y;
+	cam->x = cam->actor->killerx;
+	cam->y = cam->actor->killery;
 	cam->radius = cam->killer->radius;
 
 	FinishPaletteShifts();
