@@ -201,48 +201,71 @@ void T_ExplodeProjectile(AActor *self, AActor *target)
 
 void T_Projectile (AActor *self)
 {
-	self->x += self->velx;
-	self->y += self->vely;
+	int steps = 1;
+	fixed movex = self->velx;
+	fixed movey = self->vely;
 
-	if (!ProjectileTryMove (self))
+	// Projectiles can't move faster than their radius in a tic or collision
+	// detection can be off.
 	{
-		T_ExplodeProjectile(self, NULL);
-		return;
+		fixed maxmove = self->radius - FRACUNIT/64;
+		if(maxmove <= 0) // Really small projectile? Prevent problems with division
+			maxmove = FRACUNIT/2;
+
+		fixed vel = MAX(abs(movex), abs(movey));
+		if(vel > maxmove)
+			steps = 1 + vel / maxmove;
+
+		movex /= steps;
+		movey /= steps;
 	}
 
-	if(!(self->flags & FL_PLAYERMISSILE))
+	do
 	{
-		fixed deltax = LABS(self->x - players[0].mo->x);
-		fixed deltay = LABS(self->y - players[0].mo->y);
-		fixed radius = players[0].mo->radius + self->radius;
-		if (deltax < radius && deltay < radius)
+		self->x += movex;
+		self->y += movey;
+
+		if (!ProjectileTryMove (self))
 		{
-			TakeDamage (self->GetDamage(),self);
-			T_ExplodeProjectile(self, players[0].mo);
+			T_ExplodeProjectile(self, NULL);
 			return;
 		}
-	}
-	else
-	{
-		AActor::Iterator *iter = AActor::GetIterator();
-		while(iter)
+
+		if(!(self->flags & FL_PLAYERMISSILE))
 		{
-			AActor *check = iter->Item();
-			if(check != players[0].mo && (check->flags & FL_SHOOTABLE))
+			fixed deltax = LABS(self->x - players[0].mo->x);
+			fixed deltay = LABS(self->y - players[0].mo->y);
+			fixed radius = players[0].mo->radius + self->radius;
+			if (deltax < radius && deltay < radius)
 			{
-				fixed deltax = LABS(self->x - check->x);
-				fixed deltay = LABS(self->y - check->y);
-				fixed radius = check->radius + self->radius;
-				if(deltax < radius && deltay < radius)
-				{
-					DamageActor(check, self->GetDamage());
-					T_ExplodeProjectile(self, check);
-					return;
-				}
+				TakeDamage (self->GetDamage(),self);
+				T_ExplodeProjectile(self, players[0].mo);
+				return;
 			}
-			iter = iter->Next();
+		}
+		else
+		{
+			AActor::Iterator *iter = AActor::GetIterator();
+			while(iter)
+			{
+				AActor *check = iter->Item();
+				if(check != players[0].mo && (check->flags & FL_SHOOTABLE))
+				{
+					fixed deltax = LABS(self->x - check->x);
+					fixed deltay = LABS(self->y - check->y);
+					fixed radius = check->radius + self->radius;
+					if(deltax < radius && deltay < radius)
+					{
+						DamageActor(check, self->GetDamage());
+						T_ExplodeProjectile(self, check);
+						return;
+					}
+				}
+				iter = iter->Next();
+			}
 		}
 	}
+	while(--steps);
 }
 
 /*
