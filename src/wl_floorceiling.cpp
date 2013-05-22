@@ -23,6 +23,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	fixed texxscale, texyscale;
 	FTextureID lasttex;
 	byte *tex_offset;
+	bool useOptimized = false;
 
 	const fixed heightFactor = abs(planeheight/32);
 	int y0 = (((min_wallheight >> 3)*heightFactor)>>FRACBITS) - abs(viewshift);
@@ -57,6 +58,12 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	// draw horizontal lines
 	for(int y = y0;floor ? y+halfheight < viewheight : y < halfheight; ++y, tex_offset += tex_offsetPitch)
 	{
+		if(floor ? (y+halfheight < 0) : (y < halfheight - viewheight))
+		{
+			tex_offset += viewwidth;
+			continue;
+		}
+
 		dist = (planenumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
 		gv = -viewy + FixedMul(dist, viewsin);
@@ -65,6 +72,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		dv = -FixedMul(tex_step, viewcos);
 		gu -= (viewwidth >> 1) * du;
 		gv -= (viewwidth >> 1) * dv; // starting point (leftmost)
+
 		if(r_depthfog)
 		{
 			const int shade = LIGHT2SHADE(gLevelLight);
@@ -97,6 +105,8 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 							texheight = texture->GetHeight();
 							texxscale = texture->xScale>>10;
 							texyscale = -texture->yScale>>10;
+
+							useOptimized = texwidth == 64 && texheight == 64 && texxscale == FRACUNIT>>10 && texyscale == -FRACUNIT>>10;
 						}
 					}
 					else
@@ -105,26 +115,19 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 
 				if(tex)
 				{
-
-#define CHECKTEXTURE \
-	const int u = (FixedMul(gu-512, texxscale)) & (texwidth-1); \
-	const int v = (FixedMul(gv+512, texyscale)) & (texheight-1); \
-	const unsigned texoffs = (u * texheight) + v; \
-	*tex_offset = curshades[tex[texoffs]]; \
-
-					if(floor)
+					if(useOptimized)
 					{
-						if(y+halfheight >= 0)
-						{
-							CHECKTEXTURE
-						}
+						const int u = (gu>>10) & 63;
+						const int v = (-gv>>10) & 63;
+						const unsigned texoffs = (u * 64) + v;
+						*tex_offset = curshades[tex[u * 64 + v]];
 					}
 					else
 					{
-						if(y >= halfheight - viewheight)
-						{
-							CHECKTEXTURE
-						}
+						const int u = (FixedMul(gu-512, texxscale)) & (texwidth-1);
+						const int v = (FixedMul(gv+512, texyscale)) & (texheight-1);
+						const unsigned texoffs = (u * texheight) + v;
+						*tex_offset = curshades[tex[texoffs]];
 					}
 				}
 			}
