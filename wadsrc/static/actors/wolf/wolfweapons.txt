@@ -144,6 +144,7 @@ actor GatlingGun : WolfWeapon
 	inventory.pickupsound "weapon/gatling/pickup"
 	weapon.selectionorder 700
 	-WEAPON.NOGRIN
+	+WEAPON.ALWAYSGRIN
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{

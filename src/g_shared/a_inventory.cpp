@@ -413,6 +413,10 @@ bool AWeapon::HandlePickup(AInventory *item, bool &good)
 	if(item->GetClass() == GetClass())
 	{
 		good = static_cast<AWeapon *>(item)->UseForAmmo(this);
+
+		// Grin any way
+		if(weaponFlags & WF_ALWAYSGRIN)
+			WeaponGrin();
 		return true;
 	}
 	else if(inventory)

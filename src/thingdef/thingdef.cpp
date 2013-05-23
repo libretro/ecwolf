@@ -71,6 +71,7 @@ const struct FlagDef
 } flags[] =
 {
 	DEFINE_FLAG(FL, ALWAYSFAST, Actor, flags),
+	DEFINE_FLAG(WF, ALWAYSGRIN, Weapon, weaponFlags),
 	DEFINE_FLAG(IF, ALWAYSPICKUP, Inventory, itemFlags),
 	DEFINE_FLAG(FL, AMBUSH, Actor, flags),
 	DEFINE_FLAG(IF, AUTOACTIVATE, Inventory, itemFlags),
