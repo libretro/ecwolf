@@ -41,6 +41,8 @@
 #include "wl_main.h"
 #include "wl_play.h"
 
+static bool doWriteConfig = false;
+
 Aspect r_ratio = ASPECT_4_3, vid_aspect = ASPECT_NONE;
 bool forcegrabmouse = false;
 bool r_depthfog = false;
@@ -76,6 +78,8 @@ void FinalReadConfig()
 		mouseenabled = false;
 	if (!IN_JoyPresent())
 		joystickenabled = false;
+
+	doWriteConfig = true;
 }
 
 /*
@@ -196,6 +200,9 @@ void ReadConfig(void)
 
 void WriteConfig(void)
 {
+	if(!doWriteConfig)
+		return;
+
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
