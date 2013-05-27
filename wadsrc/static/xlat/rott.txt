@@ -579,9 +579,8 @@ things
 	trigger 72
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 8;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activateeast = false;
@@ -591,9 +590,8 @@ things
 	trigger 73
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 9;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activateeast = false;
@@ -602,9 +600,8 @@ things
 	trigger 74
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 10;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activateeast = false;
@@ -614,9 +611,8 @@ things
 	trigger 75
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 11;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activatenorth = false;
@@ -625,9 +621,8 @@ things
 	trigger 76
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 12;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activatenorth = false;
@@ -637,9 +632,8 @@ things
 	trigger 77
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 13;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activatewest = false;
@@ -648,9 +642,8 @@ things
 	trigger 78
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 14;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activateeast = false;
@@ -660,9 +653,8 @@ things
 	trigger 79
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 15;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 		activateeast = false;
@@ -672,9 +664,8 @@ things
 	trigger 80
 	{
 		action = 2;
-		arg1 = 8;
+		arg1 = 16;
 		arg2 = 2;
-		arg3 = 2;
 		playeruse = true;
 		secret = true;
 	}

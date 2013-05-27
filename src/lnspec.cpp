@@ -387,6 +387,9 @@ class EVPushwall : public Thinker
 			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
 			speed(speed), distance(distance)
 		{
+			if(distance == 0) // ROTT style pushwall, move until blocked
+				distance = 0xFFFF;
+
 			spot->thinker = this;
 			spot->pushDirection = MapTile::Side(direction);
 		}
