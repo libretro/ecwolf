@@ -116,6 +116,9 @@ FTexture * FTexture::CreateTexture (int lumpnum, int usetype)
 			if (tex != NULL) 
 			{
 				tex->UseType = usetype;
+
+				// [BL] Don't need to repeat mistakes :)
+#if 0
 				if (usetype == FTexture::TEX_Flat) 
 				{
 					int w = tex->GetWidth();
@@ -135,6 +138,7 @@ FTexture * FTexture::CreateTexture (int lumpnum, int usetype)
 						tex->bWorldPanning = true;
 					}
 				}
+#endif
 				return tex;
 			}
 		}
