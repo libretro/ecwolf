@@ -1028,25 +1028,25 @@ void Cmd_Use (void)
 	{
 		checkx = players[0].mo->tilex + 1;
 		checky = players[0].mo->tiley;
-		direction = MapTrigger::East;
+		direction = MapTrigger::West;
 	}
 	else if (players[0].mo->angle < 3*ANGLE_45)
 	{
 		checkx = players[0].mo->tilex;
 		checky = players[0].mo->tiley-1;
-		direction = MapTrigger::North;
+		direction = MapTrigger::South;
 	}
 	else if (players[0].mo->angle < 5*ANGLE_45)
 	{
 		checkx = players[0].mo->tilex - 1;
 		checky = players[0].mo->tiley;
-		direction = MapTrigger::West;
+		direction = MapTrigger::East;
 	}
 	else
 	{
 		checkx = players[0].mo->tilex;
 		checky = players[0].mo->tiley + 1;
-		direction = MapTrigger::South;
+		direction = MapTrigger::North;
 	}
 
 	bool doNothing = true;
@@ -1058,7 +1058,7 @@ void Cmd_Use (void)
 		{
 			if(map->ActivateTrigger(trig, direction, players[0].mo))
 			{
-				P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>((direction+2)%4), trig.repeatable, trig.action);
+				P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), trig.repeatable, trig.action);
 				//buttonstate[bt_use] = false;
 				doNothing = false;
 			}

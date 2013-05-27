@@ -125,7 +125,7 @@ class GameMap
 			{
 				Map() : tile(NULL), sector(NULL), zone(NULL), visible(false),
 					thinker(NULL), pushDirection(Tile::East), pushAmount(0),
-					pushReceptor(NULL)
+					pushReceptor(NULL), tag(0), nexttag(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
 					sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
@@ -153,6 +153,9 @@ class GameMap
 				Tile::Side		pushDirection;
 				unsigned int	pushAmount;
 				Map				*pushReceptor;
+
+				unsigned int	tag;
+				Plane::Map		*nexttag;
 			}*	map;
 		};
 
@@ -164,7 +167,8 @@ class GameMap
 		const Header	&GetHeader() const { return header; }
 		void			GetHitlist(BYTE* hitlist) const;
 		int				GetMarketLumpNum() const { return markerLump; }
-		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) { return &GetPlane(z).map[y*header.width+x]; }
+		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) const { return &GetPlane(z).map[y*header.width+x]; }
+		Plane::Map		*GetSpotByTag(unsigned int tag, Plane::Map *start) const;
 		const Zone		&GetZone(unsigned int index) { return zonePalette[index]; }
 		bool			IsValid() const { return valid; }
 		void			LoadMap();
@@ -192,6 +196,7 @@ class GameMap
 		Trigger	&NewTrigger(unsigned int x, unsigned int y, unsigned int z);
 		void	ReadPlanesData();
 		void	ReadUWMFData();
+		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
 		void	SetupLinks();
 		void	UnloadLinks();
 
@@ -213,6 +218,7 @@ class GameMap
 		TArray<Zone>	zonePalette;
 		TArray<Thing>	things;
 		TArray<Plane>	planes;
+		TMap<unsigned int, Plane::Map *> tagMap;
 
 		unsigned short***	zoneLinks;
 };

@@ -281,6 +281,25 @@ void GameMap::GetHitlist(BYTE* hitlist) const
 	}
 }
 
+// Looks up the MapSpot by tag number.  If spot is NULL then the first spot
+// in the chain is returned.
+// Technically at the moment further spots could be found by just using nexttag
+// but the implementation details could change.
+MapSpot GameMap::GetSpotByTag(unsigned int tag, MapSpot spot) const
+{
+	if(!spot)
+	{
+		const MapSpot *starttag = tagMap.CheckKey(tag);
+		if(!starttag)
+			return NULL;
+		spot = *starttag;
+	}
+	else
+		spot = spot->nexttag;
+
+	return spot;
+}
+
 const GameMap::Tile *GameMap::GetTile(unsigned int index) const
 {
 	if(index > tilePalette.Size())
@@ -360,6 +379,23 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	newTrig.z = z;
 	spot->triggers.Push(newTrig);
 	return spot->triggers[spot->triggers.Size()-1];
+}
+
+// Adds the spot to the tag list. The linked chain is stored in the tile itself.
+void GameMap::SetSpotTag(MapSpot spot, unsigned int tag)
+{
+	spot->tag = tag;
+
+	MapSpot *chainPtr = tagMap.CheckKey(tag);
+	if(chainPtr)
+	{
+		MapSpot chain = *chainPtr;
+		while(chain->nexttag)
+			chain = chain->nexttag;
+		chain->nexttag = spot;
+	}
+	else
+		tagMap.Insert(tag, spot);
 }
 
 void GameMap::SetupLinks()

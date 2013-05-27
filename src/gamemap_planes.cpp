@@ -567,9 +567,24 @@ void GameMap::ReadPlanesData()
 	// We need to store the spots marked for ambush since it's stored in the
 	// tiles plane instead of the objects plane.
 	TArray<WORD> ambushSpots;
+	TArray<MapTrigger> triggers;
+
+	// Read and store the info plane so we can reference it
+	WORD* infoplane = new WORD[size];
+	if(numPlanes > 3)
+	{
+		lump->Seek(size*2*3, SEEK_CUR);
+		lump->Read(infoplane, size*2);
+		lump->Seek(34, SEEK_SET);
+	}
+	else
+		memset(infoplane, 0, size*2);
 
 	for(int plane = 0;plane < numPlanes && plane < NUM_USABLE_PLANES;++plane)
 	{
+		if(plane == 3) // Info plane is already read
+			continue;
+
 		WORD* oldplane = new WORD[size];
 		lump->Read(oldplane, size*2);
 
@@ -620,10 +635,7 @@ void GameMap::ReadPlanesData()
 						templateTrigger.y = i/header.width;
 						templateTrigger.z = 0;
 
-						Trigger &trig = NewTrigger(templateTrigger.x, templateTrigger.y, templateTrigger.z);
-						trig = templateTrigger;
-						if(trig.isSecret)
-							++gamestate.secrettotal;
+						triggers.Push(templateTrigger);
 					}
 
 					int zoneIndex;
@@ -666,11 +678,13 @@ void GameMap::ReadPlanesData()
 				while(iter.NextPair(pair))
 				{
 					// Look for and switch exit triggers.
+					// NOTE: We're modifying the adjacent tile so the directions here are reversed.
+					//       That is to say the tile to the east modifies the west wall.
 					const int candidates[4] = {
-						pair->Key + 1,
-						pair->Key - (int)header.width,
 						pair->Key - 1,
-						pair->Key + (int)header.width
+						pair->Key + (int)header.width,
+						pair->Key + 1,
+						pair->Key - (int)header.width
 					};
 					for(unsigned int j = 0;j < 4;++j)
 					{
@@ -683,9 +697,8 @@ void GameMap::ReadPlanesData()
 							!pair->Value.triggerTemplate.activate[j])
 							continue;
 
-						TArray<Trigger> &triggers = mapPlane.map[candidates[j]].triggers;
 						// Look for any triggers matching the candidate
-						for(unsigned int k = 0;k < triggers.Size();++k)
+						for(int k = triggers.Size()-1;k >= 0;--k)
 						{
 							if(triggers[k].action == pair->Value.oldTrigger &&
 								triggers[k].x == (unsigned)candidates[j]%header.width &&
@@ -698,14 +711,12 @@ void GameMap::ReadPlanesData()
 								triggerTemplate.x = triggers[k].x;
 								triggerTemplate.y = triggers[k].y;
 								triggerTemplate.z = triggers[k].z;
-								Trigger &newTrigger = NewTrigger(triggerTemplate.x, triggerTemplate.y, triggerTemplate.z);
-								newTrigger = triggerTemplate;
 
 								// Only enable the activation in the direction we're changing.
-								newTrigger.activate[0] = newTrigger.activate[1] = newTrigger.activate[2] = newTrigger.activate[3] = false;
-								newTrigger.activate[j] = true;
-								if(newTrigger.isSecret)
-									++gamestate.secrettotal;
+								triggerTemplate.activate[0] = triggerTemplate.activate[1] = triggerTemplate.activate[2] = triggerTemplate.activate[3] = false;
+								triggerTemplate.activate[j] = true;
+
+								triggers.Push(triggerTemplate);
 							}
 						}
 					}
@@ -758,7 +769,7 @@ void GameMap::ReadPlanesData()
 					uint32_t flags = 0;
 
 					if(!xlat.TranslateThing(thing, trigger, isTrigger, flags, oldplane[i]))
-						;//printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
+						printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 					else
 					{
 						if(isTrigger)
@@ -767,10 +778,7 @@ void GameMap::ReadPlanesData()
 							trigger.y = i/header.width;
 							trigger.z = 0;
 
-							Trigger &mapTrigger = NewTrigger(trigger.x, trigger.y, trigger.z);
-							mapTrigger = trigger;
-							if(mapTrigger.isSecret)
-								++gamestate.secrettotal;
+							triggers.Push(trigger);
 						}
 						else
 						{
@@ -836,5 +844,46 @@ void GameMap::ReadPlanesData()
 		}
 		delete[] oldplane;
 	}
+
 	SetupLinks();
+
+	// Install triggers
+	for(unsigned int i = 0;i < triggers.Size();++i)
+	{
+		Trigger &templateTrigger = triggers[i];
+
+		// Check the info plane and if set move the activation point to a switch ot touch plate
+		const WORD info = infoplane[templateTrigger.y*header.width + templateTrigger.x];
+		if(info)
+		{
+			MapSpot target = GetSpot(templateTrigger.x, templateTrigger.y, 0);
+			unsigned int tag = (templateTrigger.x<<8)|templateTrigger.y;
+			SetSpotTag(target, tag);
+
+			// Activated by touch plate or switch
+			templateTrigger.arg[0] = tag;
+			templateTrigger.x = (info>>8)&0xFF;
+			templateTrigger.y = info&0xFF;
+
+			MapSpot spot = GetSpot(templateTrigger.x, templateTrigger.y, 0);
+			if(spot->tile) // Switch
+			{
+				templateTrigger.playerCross = false;
+				templateTrigger.playerUse = true;
+			}
+			else // Touch plate
+			{
+				templateTrigger.playerCross = true;
+				templateTrigger.playerUse = false;
+			}
+			templateTrigger.activate[0] = templateTrigger.activate[1] = templateTrigger.activate[2] = templateTrigger.activate[3] = true;
+		}
+
+		Trigger &trig = NewTrigger(templateTrigger.x, templateTrigger.y, templateTrigger.z);
+		trig = templateTrigger;
+
+		if(trig.isSecret)
+			++gamestate.secrettotal;
+	}
+	delete[] infoplane;
 }

@@ -152,14 +152,12 @@ class EVDoor : public Thinker
 	DECLARE_CLASS(EVDoor, Thinker)
 
 	public:
-		EVDoor(MapSpot spot, unsigned int speed, MapTrigger::Side direction) : Thinker(ThinkerList::WORLD),
-			state(Closed), spot(spot), amount(0), direction(direction)
+		EVDoor(MapSpot spot, unsigned int speed, unsigned int opentics, bool direction) : Thinker(ThinkerList::WORLD),
+			state(Closed), spot(spot), amount(0), opentics(opentics), direction(direction)
 		{
 			ChangeState(Opening);
 			spot->thinker = this;
 			this->speed = 64*speed;
-			if(direction > 1)
-				this->direction = direction%2;
 		}
 
 		void Destroy()
@@ -240,7 +238,7 @@ class EVDoor : public Thinker
 				case Opened:
 					if(ismonster) // Monsters can reset the door
 					{
-						wait = OPENTICS;
+						wait = opentics;
 						return false;
 					}
 				default:
@@ -269,7 +267,6 @@ class EVDoor : public Thinker
 		}
 
 	private:
-		static const unsigned int OPENTICS = 300;
 		enum State { Opening, Opened, Closing, Closed };
 
 		// Returns true if the actor isn't blocking the door.
@@ -305,7 +302,7 @@ class EVDoor : public Thinker
 				default:
 					break;
 				case Opened:
-					wait = OPENTICS;
+					wait = opentics;
 					break;
 				case Closing:
 					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[0].mo->GetZone(), true))
@@ -319,13 +316,16 @@ class EVDoor : public Thinker
 		MapSpot spot;
 		unsigned int speed;
 		int amount;
+		unsigned int opentics;
 		unsigned int wait;
-		unsigned short direction;
+		bool direction;
 };
 IMPLEMENT_INTERNAL_CLASS(EVDoor)
 
 FUNC(Door_Open)
 {
+	static const unsigned int DOOR_TYPE_DIRECTION = 0x1;
+
 	if(activator->player)
 	{
 		if(buttonheld[bt_use])
@@ -335,23 +335,46 @@ FUNC(Door_Open)
 
 	if(activator->player || (activator->flags & FL_REQUIREKEYS))
 	{
-		if(args[1] != 0)
+		if(args[3] != 0)
 		{
-			if(!P_CheckKeys(activator, args[1], false))
+			if(!P_CheckKeys(activator, args[3], false))
 				return 0;
 		}
 	}
 
-	if(spot->thinker)
+	if(args[0] == 0)
 	{
-		if(spot->thinker->IsThinkerType<EVDoor>())
+		if(spot->thinker)
 		{
-			return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+			if(spot->thinker->IsThinkerType<EVDoor>())
+			{
+				return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+			}
+			return 0;
 		}
-		return 0;
-	}
 
-	new EVDoor(spot, args[0], direction);
+		new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION);
+	}
+	else
+	{
+		bool activated = false;
+		MapSpot door = NULL;
+		while((door = map->GetSpotByTag(args[0], door)))
+		{
+			if(door->thinker)
+			{
+				if(door->thinker->IsThinkerType<EVDoor>())
+				{
+					return static_cast<EVDoor *>((Thinker*)door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+				}
+				continue;
+			}
+
+			activated = true;
+			new EVDoor(door, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION);
+		}
+		return activated;
+	}
 	return 1;
 }
 
@@ -487,12 +510,40 @@ IMPLEMENT_INTERNAL_CLASS(EVPushwall)
 
 FUNC(Pushwall_Move)
 {
-	if(spot->thinker || !spot->tile || spot->GetAdjacent(MapTile::Side(direction))->tile)
-	{
-		return 0;
-	}
+	static const unsigned int PUSHWALL_DIR_DIAGONAL = 0x1;
+	static const unsigned int PUSHWALL_DIR_ABSOLUTE = 0x8;
 
-	new EVPushwall(spot, args[0], MapTrigger::Side((direction + 3 + args[1])%4), args[2]);
+	if(args[2] & PUSHWALL_DIR_DIAGONAL)
+		throw CRecoverableError("Diagonal pushwalls not yet supported!");
+
+	bool absolute = !!(args[2]&PUSHWALL_DIR_ABSOLUTE);
+	MapTrigger::Side dir = absolute ? MapTrigger::Side((args[2]>>1)&0x3) : MapTrigger::Side((direction + 1 + (args[2]>>1))&0x3);
+
+	if(args[0] == 0)
+	{
+		if(spot->thinker || !spot->tile || spot->GetAdjacent(MapTile::Side(dir))->tile)
+		{
+			return 0;
+		}
+
+		new EVPushwall(spot, args[1], dir, args[3]);
+	}
+	else
+	{
+		bool activated = false;
+		MapSpot pwall = NULL;
+		while((pwall = map->GetSpotByTag(args[0], pwall)))
+		{
+			if(pwall->thinker || !pwall->tile || pwall->GetAdjacent(MapTile::Side(dir))->tile)
+			{
+				continue;
+			}
+
+			activated = true;
+			new EVPushwall(pwall, args[1], dir, args[3]);
+		}
+		return activated;
+	}
 	return 1;
 }
 

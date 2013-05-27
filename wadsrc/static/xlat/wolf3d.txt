@@ -10,7 +10,8 @@ tiles
 	trigger 90
 	{
 		action = 1;
-		arg0 = 16;
+		arg1 = 16;
+		arg2 = 300;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -20,7 +21,9 @@ tiles
 	trigger 91
 	{
 		action = 1;
-		arg0 = 16;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 1;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -30,8 +33,9 @@ tiles
 	trigger 92
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 1;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -41,8 +45,10 @@ tiles
 	trigger 93
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 1;
+		arg4 = 1;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -52,8 +58,9 @@ tiles
 	trigger 94
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 2;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 2;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -63,8 +70,10 @@ tiles
 	trigger 95
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 2;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 2;
+		arg4 = 1;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -74,8 +83,9 @@ tiles
 	trigger 96
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 3;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 3;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -85,8 +95,10 @@ tiles
 	trigger 97
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 3;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 3;
+		arg4 = 1;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -96,8 +108,9 @@ tiles
 	trigger 98
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 4;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 4;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -107,8 +120,10 @@ tiles
 	trigger 99
 	{
 		action = 1;
-		arg0 = 16;
-		arg1 = 4;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 4;
+		arg4 = 1;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -118,7 +133,8 @@ tiles
 	trigger 100
 	{
 		action = 1;
-		arg0 = 16;
+		arg1 = 16;
+		arg2 = 300;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -128,7 +144,9 @@ tiles
 	trigger 101
 	{
 		action = 1;
-		arg0 = 16;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 1;
 		playeruse = true;
 		monsteruse = true;
 		repeatable = true;
@@ -726,9 +744,9 @@ things
 	trigger 98
 	{
 		action = 2;
-		arg0 = 8;
-		arg1 = 1;
+		arg1 = 8;
 		arg2 = 2;
+		arg3 = 2;
 		playeruse = true;
 		secret = true;
 	}
