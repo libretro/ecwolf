@@ -275,6 +275,7 @@ static struct MiniModeInfo
 	{ 1600, 1000 },	// 16:10
 	{ 1600, 1200 },
 	{ 1920, 1080 },
+	{ 1920, 1200 },
 };
 MENU_LISTENER(EnterResolutionSelection);
 MENU_LISTENER(SetResolution)
@@ -822,10 +823,10 @@ void DrawOutline (int x, int y, int w, int h, int color1, int color2)
 {
 	MenuToRealCoords(x, y, w, h, MENU_CENTER);
 
-	VWB_Clear(color2, x-scaleFactor, y, x+w+scaleFactor, y+scaleFactor);
-	VWB_Clear(color2, x-scaleFactor, y, x, y+h);
-	VWB_Clear(color1, x-scaleFactor, y+h, x+w+scaleFactor, y+h+scaleFactor);
-	VWB_Clear(color1, x+w, y, x+w+scaleFactor, y+h);
+	VWB_Clear(color2, x-scaleFactorX, y, x+w+scaleFactorX, y+scaleFactorY);
+	VWB_Clear(color2, x-scaleFactorX, y, x, y+h);
+	VWB_Clear(color1, x-scaleFactorX, y+h, x+w+scaleFactorX, y+h+scaleFactorY);
+	VWB_Clear(color1, x+w, y, x+w+scaleFactorX, y+h);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1129,14 +1130,14 @@ void DrawStripes (int y)
 	static unsigned int calcStripes = INT_MAX;
 	static unsigned int sy, sh;
 	static unsigned int ly, lh;
-	if(calcStripes != scaleFactor)
+	if(calcStripes != scaleFactorY)
 	{
 		unsigned int dummyx = 0, dummyw = 320;
 		sy = y;
 		sh = 24;
 		ly = y+22;
 		lh = 1;
-		calcStripes = scaleFactor;
+		calcStripes = scaleFactorY;
 
 		MenuToRealCoords(dummyx, sy, dummyw, sh, MENU_TOP);
 		MenuToRealCoords(dummyx, ly, dummyw, lh, MENU_TOP);

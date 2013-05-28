@@ -45,7 +45,7 @@ unsigned bufferPitch;
 SDL_Surface *curSurface = NULL;
 unsigned curPitch;
 
-unsigned scaleFactor;
+unsigned scaleFactorX, scaleFactorY;
 
 bool	 screenfaded;
 
@@ -157,8 +157,19 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 	curSurface = screenBuffer;
 	curPitch = bufferPitch;
 
-	scaleFactor = screenWidth/320;
-	if(screenHeight/200 < scaleFactor) scaleFactor = screenHeight/200;
+	scaleFactorY = screenHeight/200;
+	scaleFactorX = screenWidth/320;
+	// 1600x1200 can do clean aspect correction so why not?
+	if(scaleFactorY % 6 == 0)
+	{
+		unsigned newXfactor = scaleFactorY - scaleFactorY/6;
+		if(newXfactor <= scaleFactorX)
+			scaleFactorX = newXfactor;
+		else
+			scaleFactorY = scaleFactorX;
+	}
+	else
+		scaleFactorX = scaleFactorY = MIN(scaleFactorX, scaleFactorY);
 
 	pixelangle = (short *) malloc(screenWidth * sizeof(short));
 	CHECKMALLOCRESULT(pixelangle);

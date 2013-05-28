@@ -342,14 +342,14 @@ void DrawPlayBorderSides(void)
 
 		if((unsigned)viewwidth != screenWidth)
 		{
-			VWB_Clear(colors[0], viewscreenx-scaleFactor, viewscreeny-scaleFactor, viewscreenx+viewwidth, viewscreeny);
-			VWB_Clear(colors[0], viewscreenx-scaleFactor, viewscreeny, viewscreenx, viewscreeny+viewheight);
-			VWB_Clear(colors[1], viewscreenx, viewscreeny+viewheight, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight+scaleFactor);
-			VWB_Clear(colors[1], viewscreenx+viewwidth, viewscreeny-scaleFactor, viewscreenx+viewwidth+scaleFactor, viewscreeny+viewheight);
-			VWB_Clear(colors[2], viewscreenx-scaleFactor, viewscreeny+viewheight, viewscreenx, viewscreeny+viewheight+scaleFactor);
+			VWB_Clear(colors[0], viewscreenx-scaleFactorX, viewscreeny-scaleFactorY, viewscreenx+viewwidth, viewscreeny);
+			VWB_Clear(colors[0], viewscreenx-scaleFactorX, viewscreeny, viewscreenx, viewscreeny+viewheight);
+			VWB_Clear(colors[1], viewscreenx, viewscreeny+viewheight, viewscreenx+viewwidth+scaleFactorX, viewscreeny+viewheight+scaleFactorY);
+			VWB_Clear(colors[1], viewscreenx+viewwidth, viewscreeny-scaleFactorY, viewscreenx+viewwidth+scaleFactorX, viewscreeny+viewheight);
+			VWB_Clear(colors[2], viewscreenx-scaleFactorX, viewscreeny+viewheight, viewscreenx, viewscreeny+viewheight+scaleFactorY);
 		}
 		else
-			VWB_Clear(colors[1], 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+scaleFactor);
+			VWB_Clear(colors[1], 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+scaleFactorY);
 	}
 }
 

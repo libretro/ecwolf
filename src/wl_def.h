@@ -153,8 +153,6 @@ typedef uint32_t angle_t;
 #define TEXTUREFROMFIXEDSHIFT 4
 #define TEXTUREMASK     (TEXTURESIZE*(TEXTURESIZE-1))
 
-#define SPRITESCALEFACTOR 2
-
 #define NORTH   0
 #define EAST    1
 #define SOUTH   2

@@ -38,21 +38,21 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu=MENU_NONE, s
 void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect);
 template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offset)
 {
-	x = screenWidth/2 + (x-160)*scaleFactor;
+	x = screenWidth/2 + (x-160)*scaleFactorX;
 	switch(offset)
 	{
 		default:
-			y = screenHeight/2 + (y-100)*scaleFactor;
+			y = screenHeight/2 + (y-100)*scaleFactorY;
 			break;
 		case MENU_TOP:
-			y *= scaleFactor;
+			y *= scaleFactorY;
 			break;
 		case MENU_BOTTOM:
-			y = screenHeight + (y-200)*scaleFactor;
+			y = screenHeight + (y-200)*scaleFactorY;
 			break;
 	}
-	w *= scaleFactor;
-	h *= scaleFactor;
+	w *= scaleFactorX;
+	h *= scaleFactorY;
 }
 
 void VWB_DrawPropString(FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);

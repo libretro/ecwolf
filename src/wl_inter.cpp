@@ -556,10 +556,10 @@ void PreloadGraphics (bool showPsych)
 		ShowActStatus();
 		VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
 
-		WindowX = (screenWidth - scaleFactor*224)/2;
-		WindowY = (screenHeight - scaleFactor*(STATUSLINES+48))/2;
-		WindowW = scaleFactor * 28 * 8;
-		WindowH = scaleFactor * 48;
+		WindowX = (screenWidth - scaleFactorX*224)/2;
+		WindowY = (screenHeight - scaleFactorY*(STATUSLINES+48))/2;
+		WindowW = scaleFactorX * 28 * 8;
+		WindowH = scaleFactorY * 48;
 
 		VW_UpdateScreen ();
 		VW_FadeIn ();
