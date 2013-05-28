@@ -577,6 +577,8 @@ void US_ControlPanel (ScanCode scancode)
 		if (CP_CheckQuick (scancode))
 			return;
 		lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
+
+		VW_FadeOut();
 	}
 	else
 		StartCPMusic (gameinfo.MenuMusic);
@@ -710,6 +712,12 @@ int CP_CheckQuick (ScanCode scancode)
 {
 	switch (scancode)
 	{
+		// Check to see if we have anything to open
+		case sc_F1:
+			if(Wads.CheckNumForName("HELPART", ns_global) == -1)
+				return 1;
+			break;
+
 		//
 		// END GAME
 		//
@@ -717,6 +725,7 @@ int CP_CheckQuick (ScanCode scancode)
 			WindowH = 160;
 			CP_EndGame(0);
 
+			DrawPlayScreen();
 			WindowH = 200;
 			return 1;
 

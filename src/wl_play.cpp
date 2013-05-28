@@ -535,21 +535,30 @@ void CheckKeys (void)
 	{
 		int lastoffs = StopMusic ();
 		ClearMemory ();
-		VW_FadeOut ();
 
 		US_ControlPanel (buttonstate[bt_esc] ? sc_Escape : scan);
 
-		IN_ClearKeysDown ();
-		VW_FadeOut();
-		if(viewsize != 21)
-			DrawPlayScreen ();
-		if (!startgame && !loadedgame)
+		if(screenfaded)
+		{
+			IN_ClearKeysDown ();
+			if (!startgame && !loadedgame)
+			{
+				VW_FadeOut();
+				ContinueMusic (lastoffs);
+				if(viewsize != 21)
+					DrawPlayScreen ();
+			}
+			if (loadedgame)
+				playstate = ex_abort;
+			lasttimecount = GetTimeCount();
+			if (MousePresent && IN_IsInputGrabbed())
+				IN_CenterMouse();     // Clear accumulated mouse movement
+		}
+		else
+		{
+			IN_ClearKeysDown();
 			ContinueMusic (lastoffs);
-		if (loadedgame)
-			playstate = ex_abort;
-		lasttimecount = GetTimeCount();
-		if (MousePresent && IN_IsInputGrabbed())
-			IN_CenterMouse();     // Clear accumulated mouse movement
+		}
 		return;
 	}
 

@@ -11,15 +11,6 @@ actor BJPlayer : PlayerPawn
 	player.weaponslot 2, "Pistol"
 	player.weaponslot 3, "MachineGun"
 	player.weaponslot 4, "GatlingGun"
-	states
-	{
-		Spawn:
-			TNT1 A -1
-			stop
-		Missile:
-			TNT1 A -1
-			stop
-	}
 }
 
 actor LostBJPlayer : BJPlayer

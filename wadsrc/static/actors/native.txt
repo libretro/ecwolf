@@ -141,6 +141,13 @@ actor PlayerPawn native
 	+SOLID
 	+SHOOTABLE
 	+PICKUP
+	states
+	{
+		// ZDoom doesn't do this, but since invisible player classes are likely here, we need this state.
+		Death:
+			GARD A -1 A_Fall
+			stop
+	}
 }
 
 actor RandomSpawner native
