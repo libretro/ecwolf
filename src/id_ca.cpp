@@ -54,10 +54,14 @@ void CA_CacheMap (const FString &mapname)
 {
 	delete map;
 
+	Printf("\n");
+
 	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
 	map = new GameMap(mapname);
 	map->LoadMap();
+
+	Printf("\n%s - %s\n\n", mapname.GetChars(), map->GetHeader().name.GetChars());
 
 	CalcVisibility(gLevelVisibility);
 }
