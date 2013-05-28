@@ -705,3 +705,22 @@ FUNC(Exit_VictorySpin)
 	new EVVictorySpin(activator, direction);
 	return 1;
 }
+
+// Executes all triggers on a particular map spot
+// Useful for making events happen in binary format maps
+FUNC(Trigger_Execute)
+{
+	if(!map->IsValidTileCoordinate(args[0], args[1], args[2]))
+		return 0;
+
+	MapSpot target = map->GetSpot(args[0], args[1], args[2]);
+
+	bool activated = false;
+	for(unsigned int i = target->triggers.Size();i-- > 0;)
+	{
+		if(map->ActivateTrigger(target->triggers[i], MapTrigger::East, activator))
+			activated = true;
+	}
+
+	return activated;
+}

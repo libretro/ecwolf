@@ -171,6 +171,7 @@ class GameMap
 		Plane::Map		*GetSpotByTag(unsigned int tag, Plane::Map *start) const;
 		const Zone		&GetZone(unsigned int index) { return zonePalette[index]; }
 		bool			IsValid() const { return valid; }
+		bool			IsValidTileCoordinate(unsigned int x, unsigned int y, unsigned int z) const { return x < header.width && y < header.height && z < NumPlanes(); }
 		void			LoadMap();
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
