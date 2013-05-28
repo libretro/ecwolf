@@ -243,6 +243,7 @@ void SetupGameLevel (void)
 {
 	if (!loadedgame)
 	{
+		gamestate.victoryflag = false;
 		gamestate.TimeCount
 			= gamestate.secrettotal
 			= gamestate.killtotal
