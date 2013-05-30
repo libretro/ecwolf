@@ -167,11 +167,7 @@ void ThinkerList::Register(Thinker *thinker, Priority type)
 		GC::WriteBarrier(thinker, head->Item());
 		GC::WriteBarrier(head->Item(), thinker);
 	}
-	else
-	{
-		// This thinker has become a "root" so mark it
-		GC::Mark(thinker);
-	}
+	GC::WriteBarrier(thinker);
 }
 
 void ThinkerList::Deregister(Thinker *thinker)

@@ -198,12 +198,7 @@ void AActor::AddInventory(AInventory *item)
 
 void AActor::Destroy()
 {
-	if(thinker != NULL)
-	{
-		thinker->Destroy();
-		thinker = NULL;
-	}
-
+	Super::Destroy();
 	RemoveFromWorld();
 
 	// Inventory items don't have a registered thinker so we must free them now
@@ -214,8 +209,6 @@ void AActor::Destroy()
 		inventory->Destroy();
 		inventory = NULL;
 	}
-
-	Super::Destroy();
 }
 
 static FRandom pr_dropitem("DropItem");
