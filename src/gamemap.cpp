@@ -49,6 +49,7 @@
 #include "resourcefiles/resourcefile.h"
 #include "wl_loadsave.h"
 #include "doomerrors.h"
+#include "m_random.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false), file(NULL), zoneLinks(NULL)
 {
@@ -427,6 +428,7 @@ void GameMap::SetupLinks()
 	}
 }
 
+extern FRandom pr_spawnmobj;
 void GameMap::SpawnThings() const
 {
 #if 0
@@ -467,7 +469,11 @@ void GameMap::SpawnThings() const
 				// Otherwise the paths will break early.
 				actor->distance = TILEGLOBAL;
 				if(actor->PathState)
+				{
 					actor->SetState(actor->PathState, true);
+					if(actor->flags & FL_RANDOMIZE)
+						actor->ticcount = pr_spawnmobj() % actor->ticcount;
+				}
 			}
 
 			// Check for valid frames

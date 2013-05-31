@@ -510,6 +510,7 @@ void AActor::RemoveInventory(AInventory *item)
 	item->DetachFromOwner();
 }
 
+FRandom pr_spawnmobj("SpawnActor");
 AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allowreplacement)
 {
 	if(type == NULL)
@@ -550,7 +551,20 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 	}
 
 	if(actor->flags & FL_MISSILE)
+	{
 		PlaySoundLocActor(actor->seesound, actor);
+		if((actor->flags & FL_RANDOMIZE) && actor->ticcount > 0)
+		{
+			actor->ticcount -= pr_spawnmobj() & 7;
+			if(actor->ticcount < 1)
+				actor->ticcount = 1;
+		}
+	}
+	else
+	{
+		if((actor->flags & FL_RANDOMIZE) && actor->ticcount > 0)
+			actor->ticcount = pr_spawnmobj() % actor->ticcount;
+	}
 
 	return actor;
 }

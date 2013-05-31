@@ -82,7 +82,9 @@ actor Needle
 	states
 	{
 		Spawn:
-			HYPO ABCD 3
+			HYPO A .5
+		Loop:
+			HYPO BCDA 3
 			loop
 	}
 }

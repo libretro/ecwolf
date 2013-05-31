@@ -85,11 +85,9 @@
 
 // EXTERNAL DATA DECLARATIONS ----------------------------------------------
 
-/*extern FRandom pr_spawnmobj;
-extern FRandom pr_acs;
+extern FRandom pr_spawnmobj;
 extern FRandom pr_chase;
-extern FRandom pr_lost;
-extern FRandom pr_slam;
+/*extern FRandom pr_acs;
 extern FRandom pr_exrandom;*/
 
 // PUBLIC DATA DEFINITIONS -------------------------------------------------
@@ -243,12 +241,8 @@ void FRandom::Init(DWORD seed)
 
 DWORD FRandom::StaticSumSeeds ()
 {
-	return 0;
-/*		pr_spawnmobj.sfmt.u[0] + pr_spawnmobj.idx +
-		pr_acs.sfmt.u[0] + pr_acs.idx +
-		pr_chase.sfmt.u[0] + pr_chase.idx +
-		pr_lost.sfmt.u[0] + pr_lost.idx +
-		pr_slam.sfmt.u[0] + pr_slam.idx;*/
+	return pr_spawnmobj.sfmt.u[0] + pr_spawnmobj.idx +
+		pr_chase.sfmt.u[0] + pr_chase.idx;
 }
 
 //==========================================================================

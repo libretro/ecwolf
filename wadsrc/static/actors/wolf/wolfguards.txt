@@ -11,6 +11,7 @@ actor WolfensteinMonster
 	meleerange 42
 	MONSTER
 	+ALWAYSFAST
+	+RANDOMIZE
 }
 
 actor Guard : WolfensteinMonster 11

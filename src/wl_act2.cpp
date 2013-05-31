@@ -180,6 +180,7 @@ bool ProjectileTryMove (AActor *ob)
 =================
 */
 
+static FRandom pr_explodemissile("ExplodeMissile");
 void T_ExplodeProjectile(AActor *self, AActor *target)
 {
 	PlaySoundLocActor(self->deathsound, self);
@@ -194,6 +195,13 @@ void T_ExplodeProjectile(AActor *self, AActor *target)
 	{
 		self->flags &= ~FL_MISSILE;
 		self->SetState(deathstate);
+
+		if((self->flags & FL_RANDOMIZE) && self->ticcount > 0)
+		{
+			self->ticcount -= pr_explodemissile() & 7;
+			if(self->ticcount < 1)
+				self->ticcount = 1;
+		}
 	}
 	else
 		self->Destroy();

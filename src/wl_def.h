@@ -215,6 +215,7 @@ typedef enum
 	FL_DROPBASEDONTARGET= 0x00200000,
 	FL_REQUIREKEYS		= 0x00400000,
 	FL_ALWAYSFAST		= 0x00800000,
+	FL_RANDOMIZE		= 0x01000000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
 

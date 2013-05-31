@@ -47,7 +47,10 @@ actor FireBall
 	states
 	{
 		Spawn:
-			FIRE AB 3 bright
+			// When spawning a new projectile Wolf3D set ticcount to 1 for first frame
+			FIRE A .5 bright
+		Loop:
+			FIRE BA 3 bright
 			loop
 	}
 }
