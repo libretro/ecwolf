@@ -197,17 +197,12 @@ class EVDoor : public Thinker
 				case Opened:
 					if(wait == 0)
 					{
-						bool hold = false;
-						for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+						if(CheckJammed())
 						{
-							if(!CheckClears(iter->Item()))
-							{
-								hold = true;
-								break;
-							}
-						}
-						if(hold)
+							// Might as well reset the door timer, chances are the actor isn't going any where
+							wait = opentics;
 							break;
+						}
 						ChangeState(Closing);
 					}
 					else
@@ -242,7 +237,7 @@ class EVDoor : public Thinker
 						return false;
 					}
 				default:
-					if(!ismonster && CheckClears(activator))
+					if(!ismonster && !CheckJammed())
 						return ChangeState(Closing);
 					break;
 				case Closing:
@@ -270,7 +265,7 @@ class EVDoor : public Thinker
 		enum State { Opening, Opened, Closing, Closed };
 
 		// Returns true if the actor isn't blocking the door.
-		bool CheckClears(AActor *obj)
+		bool CheckClears(AActor *obj) const
 		{
 			if(direction == 0)
 			{
@@ -289,6 +284,16 @@ class EVDoor : public Thinker
 				}
 			}
 			return true;
+		}
+
+		bool CheckJammed() const
+		{
+			for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+			{
+				if(!CheckClears(iter->Item()))
+					return true;
+			}
+			return false;
 		}
 
 		bool ChangeState(State st)
