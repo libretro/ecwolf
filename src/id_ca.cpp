@@ -61,7 +61,7 @@ void CA_CacheMap (const FString &mapname)
 	map = new GameMap(mapname);
 	map->LoadMap();
 
-	Printf("\n%s - %s\n\n", mapname.GetChars(), map->GetHeader().name.GetChars());
+	Printf("\n%s - %s\n\n", mapname.GetChars(), levelInfo->GetName(map).GetChars());
 
 	CalcVisibility(gLevelVisibility);
 }
