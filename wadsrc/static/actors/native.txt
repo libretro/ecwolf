@@ -17,6 +17,8 @@ const int SXF_TRANSFERPOINTERS = 1;
 
 const int ASP_CHASE = 3;
 
+const int XF_HURTSOURCE = 1;
+
 actor Actor native
 {
 	damage 0
@@ -35,12 +37,14 @@ actor Actor native
 	native int health;
 
 	action native A_ActiveSound(int chance=256);
+	action native A_AlertMonsters();
 	action native A_BossDeath();
 	action native A_CallSpecial(int special, int arg1=0, int arg2=0, int arg3=0, int arg4=0, int arg5=0);
 	action native A_ChangeFlag(string flag, bool value);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0, int aimflags = 0);
 	action native A_Dormant();
+	action native A_Explode(int damage = 128, int radius = 128, int flags = XF_HURTSOURCE, bool alert = false, int fulldamageradius = 0);
 	action native A_FaceTarget(float max_turn = 0, float max_pitch = 270);
 	action native A_Fall();
 	action native A_GiveExtraMan(int amount = 1);

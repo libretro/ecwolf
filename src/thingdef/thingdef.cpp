@@ -85,6 +85,7 @@ const struct FlagDef
 	DEFINE_FLAG(IF, INVBAR, Inventory, itemFlags),
 	DEFINE_FLAG(FL, ISMONSTER, Actor, flags),
 	DEFINE_FLAG(FL, MISSILE, Actor, flags),
+	DEFINE_FLAG(WF, NOALERT, Weapon, weaponFlags),
 	DEFINE_FLAG(WF, NOAUTOFIRE, Weapon, weaponFlags),
 	DEFINE_FLAG(WF, NOGRIN, Weapon, weaponFlags),
 	DEFINE_FLAG(FL, PICKUP, Actor, flags),
@@ -1373,7 +1374,7 @@ void ClassDef::ParseActor(Scanner &sc)
 							{
 								sc.MustGetToken(TK_BoolConst);
 								defVal.useType = CallArguments::Value::VAL_INTEGER;
-								defVal.val.i = sc->number;
+								defVal.val.i = sc->boolean;
 							}
 							else if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
 							{

@@ -24,6 +24,7 @@ actor Knife : WolfWeapon
 	weapon.selectionorder 3700
 	attacksound "weapon/knife/attack"
 	+WEAPON.NOAUTOFIRE
+	+WEAPON.NOALERT
 	states
 	{
 		Ready:

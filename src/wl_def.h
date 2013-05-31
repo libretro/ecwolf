@@ -226,6 +226,7 @@ typedef enum
 	WF_NOAUTOFIRE		= 0x00000002,
 	WF_DONTBOB			= 0x00000004,
 	WF_ALWAYSGRIN		= 0x00000008,
+	WF_NOALERT			= 0x00000010,
 } objflag_t;
 
 /*

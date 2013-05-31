@@ -1397,6 +1397,9 @@ ACTION_FUNCTION(A_CustomPunch)
 	if(range == 0)
 		range = 64;
 
+	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
+		madenoise = true;
+
 	// actually fire
 	int dist = 0x7fffffff;
 	AActor *closest = NULL;
@@ -1478,7 +1481,8 @@ ACTION_FUNCTION(A_GunAttack)
 	else
 		SD_PlaySound(sound, SD_WEAPONS);
 
-	madenoise = true;
+	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
+		madenoise = true;
 
 	AActor *closest = players[0].FindTarget();
 	if(!closest)
@@ -1516,6 +1520,9 @@ ACTION_FUNCTION(A_FireCustomMissile)
 
 	if(useammo && !players[0].ReadyWeapon->DepleteAmmo())
 		return;
+
+	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
+		madenoise = true;
 
 	fixed newx = self->x + spawnoffset*finesine[self->angle>>ANGLETOFINESHIFT]/64;
 	fixed newy = self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64;

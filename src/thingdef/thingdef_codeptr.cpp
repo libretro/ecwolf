@@ -145,6 +145,11 @@ ACTION_FUNCTION(A_ActiveSound)
 		PlaySoundLocActor(self->activesound, self);
 }
 
+ACTION_FUNCTION(A_AlertMonsters)
+{
+	madenoise = true;
+}
+
 ACTION_FUNCTION(A_BossDeath)
 {
 	// Deathcam involves a little bit of spaghetti code. To sum it up:
@@ -258,6 +263,49 @@ ACTION_FUNCTION(A_ChangeFlag)
 	{
 		if(countsSecret) ++gamestate.secrettotal;
 		else --gamestate.secrettotal;
+	}
+}
+
+ACTION_FUNCTION(A_Explode)
+{
+	enum
+	{
+		XF_HURTSOURCE = 1
+	};
+
+	ACTION_PARAM_INT(damage, 0);
+	ACTION_PARAM_INT(radius, 1);
+	ACTION_PARAM_INT(flags, 2);
+	ACTION_PARAM_BOOL(alert, 3);
+	ACTION_PARAM_INT(fulldamageradius, 4);
+
+	if(alert)
+		madenoise = true;
+
+	const double rolloff = 1.0/static_cast<double>(radius - fulldamageradius);
+	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	{
+		AActor * const target = iter->Item();
+		const fixed dist = MAX(ABS(target->x - self->x), ABS(target->y - self->y)) >> (FRACBITS - 6);
+
+		// First check if the target is in range (also don't mess with ourself)
+		if(dist >= radius || target == self || !(target->flags & FL_SHOOTABLE))
+			continue;
+		// Next see if we should damage the target
+		if(!(flags&XF_HURTSOURCE) &&
+			!(!!(self->flags & FL_PLAYERMISSILE) ^ (target == players[0].mo)))
+			continue;
+
+		double output = damage;
+		if(dist > fulldamageradius)
+			output *= static_cast<double>(dist - fulldamageradius)*rolloff;
+		if(output <= 0.0)
+			continue;
+
+		if(target->player)
+			TakeDamage(output, self);
+		else
+			DamageActor(target, output);
 	}
 }
 
