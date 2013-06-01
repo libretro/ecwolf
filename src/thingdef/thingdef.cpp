@@ -114,10 +114,10 @@ const Frame *StateLabel::Resolve() const
 	return *(cls->FindStateInList(label) + offset);
 }
 
-const Frame *StateLabel::Resolve(AActor *self, AActor *owner, const Frame *def) const
+const Frame *StateLabel::Resolve(AActor *owner, const Frame *caller, const Frame *def) const
 {
 	if(isRelative)
-		return self->GetClass()->frameList[self->state->index + offset];
+		return owner->GetClass()->frameList[caller->index + offset];
 	else if(isDefault)
 		return def;
 

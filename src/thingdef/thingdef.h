@@ -55,7 +55,7 @@ class StateLabel
 		StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative=false);
 
 		const Frame	*Resolve() const;
-		const Frame	*Resolve(AActor *self, AActor *owner, const Frame *def=NULL) const;
+		const Frame	*Resolve(AActor *owner, const Frame *caller, const Frame *def=NULL) const;
 
 	private:
 		void	Parse(Scanner &sc, const ClassDef *parent, bool noRelative=false);
@@ -143,7 +143,7 @@ typedef TArray<ActionInfo *> ActionTable;
 #define ACTION_PARAM_STRING(name, num) \
 	FString name = args[num].str
 #define ACTION_PARAM_STATE(name, num, def) \
-	const Frame *name = args[num].label.Resolve(self, stateOwner, def)
+	const Frame *name = args[num].label.Resolve(stateOwner, caller, def)
 
 class SymbolInfo
 {
