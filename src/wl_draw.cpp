@@ -661,13 +661,16 @@ void DrawScaleds (void)
 
 void DrawPlayerWeapon (void)
 {
-	if(!players[0].psprite.frame)
-		return;
+	for(unsigned int i = 0;i < player_t::NUM_PSPRITES;++i)
+	{
+		if(!players[0].psprite[i].frame)
+			return;
 
-	fixed xoffset, yoffset;
-	players[0].BobWeapon(&xoffset, &yoffset);
+		fixed xoffset, yoffset;
+		players[0].BobWeapon(&xoffset, &yoffset);
 
-	R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite.frame, players[0].psprite.sx+xoffset, players[0].psprite.sy+yoffset);
+		R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite[i].frame, players[0].psprite[i].sx+xoffset, players[0].psprite[i].sy+yoffset);
+	}
 }
 
 

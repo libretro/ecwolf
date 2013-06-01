@@ -465,7 +465,7 @@ ACTION_FUNCTION(A_ReFire)
 		return;
 
 	if(buttonstate[bt_attack] && player->PendingWeapon == WP_NOCHANGE)
-		player->SetPSprite(player->ReadyWeapon->GetAtkState(true));
+		player->SetPSprite(player->ReadyWeapon->GetAtkState(true), player_t::ps_weapon);
 }
 
 ACTION_FUNCTION(A_WeaponReady)

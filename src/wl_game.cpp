@@ -673,7 +673,7 @@ void Died (void)
 	} while (curangle != iangle);
 
 	// Wait for weapon to drop
-	while(players[0].psprite.frame)
+	while(players[0].psprite[player_t::ps_weapon].frame)
 	{
 		for(unsigned int t = tics;t-- > 0;)
 			players[0].mo->Tick();

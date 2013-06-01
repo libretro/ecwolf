@@ -1173,28 +1173,30 @@ void player_t::BringUpWeapon()
 {
 	if(PendingWeapon == WP_NOCHANGE)
 	{
-		SetPSprite(ReadyWeapon ? ReadyWeapon->GetReadyState() : NULL);
+		SetPSprite(ReadyWeapon ? ReadyWeapon->GetReadyState() : NULL, player_t::ps_weapon);
 		return;
 	}
 
-	psprite.sy = RAISERANGE;
-	psprite.sx = 0;
+	psprite[player_t::ps_weapon].sy = RAISERANGE;
+	psprite[player_t::ps_weapon].sx = 0;
 
 	ReadyWeapon = PendingWeapon;
 	PendingWeapon = WP_NOCHANGE;
-	SetPSprite(ReadyWeapon ? ReadyWeapon->GetUpState() : NULL);
+	SetPSprite(ReadyWeapon ? ReadyWeapon->GetUpState() : NULL, player_t::ps_weapon);
 }
 ACTION_FUNCTION(A_Lower)
 {
 	player_t *player = self->player;
 
-	player->psprite.sy += RAISESPEED;
-	if(player->psprite.sy < RAISERANGE)
+	player->psprite[player_t::ps_weapon].sy += RAISESPEED;
+	if(player->psprite[player_t::ps_weapon].sy < RAISERANGE)
 		return;
-	player->psprite.sy = RAISERANGE;
+	player->psprite[player_t::ps_weapon].sy = RAISERANGE;
 
 	if(player->PendingWeapon == WP_NOCHANGE)
 		player->PendingWeapon = NULL;
+
+	player->SetPSprite(NULL, player_t::ps_flash);
 	player->BringUpWeapon();
 }
 ACTION_FUNCTION(A_Raise)
@@ -1203,19 +1205,19 @@ ACTION_FUNCTION(A_Raise)
 
 	if(player->PendingWeapon != WP_NOCHANGE)
 	{
-		player->SetPSprite(player->ReadyWeapon->GetDownState());
+		player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
 		return;
 	}
 
-	player->psprite.sy -= RAISESPEED;
-	if(player->psprite.sy > 0)
+	player->psprite[player_t::ps_weapon].sy -= RAISESPEED;
+	if(player->psprite[player_t::ps_weapon].sy > 0)
 		return;
-	player->psprite.sy = 0;
+	player->psprite[player_t::ps_weapon].sy = 0;
 
 	if(player->ReadyWeapon)
-		player->SetPSprite(player->ReadyWeapon->GetReadyState());
+		player->SetPSprite(player->ReadyWeapon->GetReadyState(), player_t::ps_weapon);
 	else
-		player->psprite.frame = NULL;
+		player->psprite[player_t::ps_weapon].frame = NULL;
 }
 
 // Finds the target closest to the player within shooting range.
@@ -1311,10 +1313,13 @@ void player_t::Serialize(FArchive &arc)
 		<< PendingWeapon
 		<< flags;
 
-	arc << psprite.frame
-		<< psprite.ticcount
-		<< psprite.sx
-		<< psprite.sy;
+	for(unsigned int i = 0;i < NUM_PSPRITES;++i)
+	{
+		arc << psprite[i].frame
+			<< psprite[i].ticcount
+			<< psprite[i].sx
+			<< psprite[i].sy;
+	}
 
 	if(arc.IsLoading())
 	{
@@ -1323,14 +1328,14 @@ void player_t::Serialize(FArchive &arc)
 	}
 }
 
-void player_t::SetPSprite(const Frame *frame)
+void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 {
 	flags &= ~(player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING);
-	psprite.frame = frame;
+	psprite[layer].frame = frame;
 
 	if(frame)
 	{
-		psprite.ticcount = frame->duration;
+		psprite[layer].ticcount = frame->duration;
 		frame->action(mo, ReadyWeapon, frame);
 	}
 }

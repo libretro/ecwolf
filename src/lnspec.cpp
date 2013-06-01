@@ -610,7 +610,7 @@ class EVVictorySpin : public Thinker
 			doturn(true), dist(6*FRACUNIT + FRACUNIT/2), activator(activator)
 		{
 			gamestate.victoryflag = true;
-			players[0].SetPSprite(NULL);
+			players[0].SetPSprite(NULL, player_t::ps_weapon);
 
 			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0, true);
 			runner->flags |= FL_PATHING;

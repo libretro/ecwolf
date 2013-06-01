@@ -423,7 +423,14 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 	if(tex == NULL)
 		return;
 
-	const BYTE *colormap = NormalLight.Maps;
+	const BYTE *colormap;
+	if(frame->fullbright)
+		colormap = NormalLight.Maps;
+	else
+	{
+		const int shade = LIGHT2SHADE(gLevelLight);
+		colormap = &NormalLight.Maps[GETPALOOKUP(MINZ, shade)<<8];
+	}
 
 	const fixed scale = viewheight<<(FRACBITS-1);
 

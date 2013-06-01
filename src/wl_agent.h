@@ -45,6 +45,14 @@ class AWeapon;
 extern class player_t
 {
 	public:
+		enum PSprite
+		{
+			ps_weapon,
+			ps_flash,
+
+			NUM_PSPRITES
+		};
+
 		player_t();
 
 		void	BobWeapon(fixed_t *x, fixed_t *y);
@@ -53,7 +61,7 @@ extern class player_t
 		size_t	PropagateMark();
 		void	Reborn();
 		void	Serialize(FArchive &arc);
-		void	SetPSprite(const Frame *frame);
+		void	SetPSprite(const Frame *frame, PSprite layer);
 
 		enum State
 		{
@@ -86,7 +94,7 @@ extern class player_t
 			short		ticcount;
 			fixed		sx;
 			fixed		sy;
-		} psprite;
+		} psprite[NUM_PSPRITES];
 		fixed			bob;
 
 		// Attackheld is similar to buttonheld[bt_attack] only it only gets set

@@ -94,7 +94,7 @@ void APlayerPawn::Die()
 	{
 		player->PendingWeapon = WP_NOCHANGE;
 		if(player->ReadyWeapon)
-			player->SetPSprite(player->ReadyWeapon->GetDownState());
+			player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
 	}
 	Super::Die();
 }
@@ -155,7 +155,7 @@ AWeapon *APlayerPawn::PickNewWeapon()
 	{
 		player->PendingWeapon = best;
 		if(player->ReadyWeapon)
-			player->SetPSprite(player->ReadyWeapon->GetDownState());
+			player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
 	}
 
 	return best;
@@ -255,12 +255,12 @@ void APlayerPawn::Tick()
 			if(!(player->ReadyWeapon->weaponFlags & WF_NOAUTOFIRE) || !player->attackheld)
 			{
 				player->attackheld = true;
-				player->SetPSprite(player->ReadyWeapon->GetAtkState(false));
+				player->SetPSprite(player->ReadyWeapon->GetAtkState(false), player_t::ps_weapon);
 			}
 		}
 		else if(player->PendingWeapon != WP_NOCHANGE)
 		{
-			player->SetPSprite(player->ReadyWeapon->GetDownState());
+			player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
 		}
 	}
 	else if(player->attackheld)
@@ -271,15 +271,18 @@ void APlayerPawn::Tick()
 
 void APlayerPawn::TickPSprites()
 {
-	if(!player->psprite.frame)
-		return;
+	for(unsigned int layer = 0;layer < player_t::NUM_PSPRITES;++layer)
+	{
+		if(!player->psprite[layer].frame)
+			return;
 
-	if(player->psprite.ticcount > 0)
-		--player->psprite.ticcount;
+		if(player->psprite[layer].ticcount > 0)
+			--player->psprite[layer].ticcount;
 
-	while(player->psprite.frame && player->psprite.ticcount == 0)
-		player->SetPSprite(player->psprite.frame->next);
+		while(player->psprite[layer].frame && player->psprite[layer].ticcount == 0)
+			player->SetPSprite(player->psprite[layer].frame->next, static_cast<player_t::PSprite>(layer));
 
-	if(player->psprite.frame)
-		player->psprite.frame->thinker(this, player->ReadyWeapon, player->psprite.frame);
+		if(player->psprite[layer].frame)
+			player->psprite[layer].frame->thinker(this, player->ReadyWeapon, player->psprite[layer].frame);
+	}
 }

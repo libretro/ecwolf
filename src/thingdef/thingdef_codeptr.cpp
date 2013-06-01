@@ -353,6 +353,16 @@ ACTION_FUNCTION(A_GiveInventory)
 	}
 }
 
+ACTION_FUNCTION(A_GunFlash)
+{
+	ACTION_PARAM_STATE(flash, 0, NULL);
+
+	if(!self->player)
+		return;
+
+	self->player->SetPSprite(flash, player_t::ps_flash);
+}
+
 #define STATE_JUMP(frame) DoStateJump(frame, self, caller, args)
 static void DoStateJump(const Frame *frame, AActor *self, const Frame * const caller, const CallArguments &args)
 {
@@ -361,9 +371,14 @@ static void DoStateJump(const Frame *frame, AActor *self, const Frame * const ca
 
 	if(self->player)
 	{
-		if(self->player->psprite.frame == caller)
+		if(self->player->psprite[player_t::ps_weapon].frame == caller)
 		{
-			self->player->SetPSprite(frame);
+			self->player->SetPSprite(frame, player_t::ps_weapon);
+			return;
+		}
+		else if(self->player->psprite[player_t::ps_flash].frame == caller)
+		{
+			self->player->SetPSprite(frame, player_t::ps_flash);
 			return;
 		}
 	}
