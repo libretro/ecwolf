@@ -192,6 +192,19 @@ HANDLE_PROPERTY(dropitem)
 	AActor::dropItems[cls->Meta.GetMetaInt(AMETA_DropItems)]->Push(drop);
 }
 
+HANDLE_PROPERTY(forwardmove)
+{
+	FIXED_PARAM(forwardmove1, 0);
+
+	APlayerPawn *player = (APlayerPawn*)defaults;
+	player->forwardmove[0] = player->forwardmove[1] = forwardmove1;
+	if(PARAM_COUNT == 2)
+	{
+		FIXED_PARAM(forwardmove2, 1);
+		player->forwardmove[1] = forwardmove2;
+	}
+}
+
 HANDLE_PROPERTY(gibhealth)
 {
 	INT_PARAM(health, 0);
@@ -358,6 +371,19 @@ HANDLE_PROPERTY(selectionorder)
 	cls->Meta.SetMetaInt(AWMETA_SelectionOrder, order);
 }
 
+HANDLE_PROPERTY(sidemove)
+{
+	FIXED_PARAM(sidemove1, 0);
+
+	APlayerPawn *player = (APlayerPawn*)defaults;
+	player->sidemove[0] = player->sidemove[1] = sidemove1;
+	if(PARAM_COUNT == 2)
+	{
+		FIXED_PARAM(sidemove2, 1);
+		player->sidemove[1] = sidemove2;
+	}
+}
+
 HANDLE_PROPERTY(sighttime)
 {
 	INT_PARAM(time, 0);
@@ -427,6 +453,12 @@ HANDLE_PROPERTY(startitem)
 	APlayerPawn::startInventory[cls->Meta.GetMetaInt(APMETA_StartInventory)]->Push(drop);
 }
 
+HANDLE_PROPERTY(viewheight)
+{
+	FIXED_PARAM(height, 0);
+	((APlayerPawn *)defaults)->viewheight = height;
+}
+
 HANDLE_PROPERTY(weaponslot)
 {
 	INT_PARAM(slot, 0);
@@ -485,6 +517,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
+	DEFINE_PROP_PREFIX(forwardmove, PlayerPawn, Player, F_F),
 	DEFINE_PROP(gibhealth, Actor, I),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
 	DEFINE_PROP(height, Actor, I),
@@ -507,11 +540,13 @@ extern const PropDef properties[] =
 	DEFINE_PROP(secretdeathsound, Actor, S),
 	DEFINE_PROP(seesound, Actor, S),
 	DEFINE_PROP(selectionorder, Weapon, I),
+	DEFINE_PROP_PREFIX(sidemove, PlayerPawn, Player, F_F),
 	DEFINE_PROP(sighttime, Actor, I_I),
 	DEFINE_PROP(slotnumber, Weapon, I),
 	DEFINE_PROP(slotpriority, Weapon, F),
 	DEFINE_PROP(speed, Actor, F_F),
 	DEFINE_PROP_PREFIX(startitem, PlayerPawn, Player, S_I),
+	DEFINE_PROP_PREFIX(viewheight, PlayerPawn, Player, F),
 	DEFINE_PROP_PREFIX(weaponslot, PlayerPawn, Player, IS_SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS),
 	DEFINE_PROP(xscale, Actor, F),
 	DEFINE_PROP(yadjust, Weapon, F),

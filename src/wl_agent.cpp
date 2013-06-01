@@ -36,7 +36,6 @@
 
 
 #define MOVESCALE       150l
-#define BACKMOVESCALE   100l
 #define ANGLESCALE      20
 
 /*
@@ -182,6 +181,8 @@ void ControlMovement (AActor *ob)
 		else if (strafe < -100)
 			strafe = -100;
 
+		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[ABS(strafe) >= RUNMOVE]));
+
 		if (strafe > 0)
 		{
 			angle = ob->angle - ANGLE_90;
@@ -199,16 +200,22 @@ void ControlMovement (AActor *ob)
 	//
 	if (controly < 0)
 	{
-		if(controly < -RUNMOVE)
-			controly = -RUNMOVE;
+		if(controly < -100)
+			controly = -100;
+
+		controly = FixedMul(players[0].mo->speed<<7, FixedMul(controly, players[0].mo->forwardmove[controly <= -RUNMOVE]));
+
 		Thrust (ob->angle,-controly*MOVESCALE); // move forwards
 	}
 	else if (controly > 0)
 	{
-		if(controly > RUNMOVE)
-			controly = RUNMOVE;
+		if(controly > 100)
+			controly = 100;
+
+		controly = FixedMul(players[0].mo->speed<<7, FixedMul(controly, players[0].mo->forwardmove[controly >= RUNMOVE]));
+
 		angle = ob->angle + ANGLE_180;
-		Thrust (angle,controly*BACKMOVESCALE);          // move backwards
+		Thrust (angle,controly*MOVESCALE*2/3);          // move backwards
 	}
 
 	if (gamestate.victoryflag)              // watching the BJ actor

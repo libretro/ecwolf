@@ -1172,8 +1172,8 @@ void WallRefresh (void)
 	
 	angle_t bobangle = ((gamestate.TimeCount<<13)/(20*TICRATE/35)) & FINEMASK;
 	fixed curbob = gamestate.victoryflag ? 0 : FixedMul(players[0].bob>>1, finesine[bobangle]);
-	
-	viewz = (32<<FRACBITS) + curbob;
+
+	viewz = (64<<FRACBITS) - players[0].mo->viewheight + curbob;
 
 	AsmRefresh();
 	ScalePost ();                   // no more optimization on last post

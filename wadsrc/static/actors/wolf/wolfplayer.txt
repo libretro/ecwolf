@@ -3,6 +3,7 @@ actor BJPlayer : PlayerPawn
 	health 100
 	radius 22
 	player.movebob 0
+	player.viewheight 32
 	player.displayname "BJ Blazkowicz"
 	player.startitem "Clip", 8
 	player.startitem "Pistol"

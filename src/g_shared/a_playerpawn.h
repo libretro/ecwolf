@@ -78,6 +78,9 @@ class APlayerPawn : public AActor
 		static PointerIndexTable<DropList> startInventory;
 
 		int32_t		maxhealth;
+		fixed		forwardmove[2];
+		fixed		sidemove[2];
+		fixed		viewheight;
 
 	protected:
 		AWeapon	*BestWeapon(const ClassDef *ammo=NULL);
