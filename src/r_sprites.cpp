@@ -380,7 +380,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
 
 	const BYTE *colormap;
-	if(!r_depthfog || (actor->flags & FL_BRIGHT) || frame->fullbright)
+	if((actor->flags & FL_BRIGHT) || frame->fullbright)
 		colormap = NormalLight.Maps;
 	else
 	{

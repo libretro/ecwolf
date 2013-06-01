@@ -290,10 +290,7 @@ void ScalePost()
 	if(yw < 0)
 		return;
 
-	if(r_depthfog)
-		col = curshades[postsource[yw]];
-	else
-		col = postsource[yw];
+	col = curshades[postsource[yw]];
 	yendoffs = yendoffs * vbufPitch + postx;
 	while(yoffs <= yendoffs)
 	{
@@ -308,10 +305,7 @@ void ScalePost()
 			}
 			while(ywcount <= 0);
 			if(yw < 0) break;
-			if(r_depthfog)
-				col = curshades[postsource[yw]];
-			else
-				col = postsource[yw];
+			col = curshades[postsource[yw]];
 		}
 		yendoffs -= vbufPitch;
 	}
