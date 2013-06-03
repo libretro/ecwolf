@@ -128,6 +128,7 @@ actor Weapon : Inventory native
 	action native A_FireCustomMissile(string missiletype, float angle=0, bool useammo=true, int spawnoffset=0, int spawnheight=0, bool aim=false, float pitch=0);
 	action native A_GunAttack(int flags = 0, string sound = "*", float snipe = 1.0, int maxdamage = 64, int blocksize = 128, int pointblank = 2, int longrange = 4, int maxrange = 21);
 	action native A_GunFlash(state frame="Flash");
+	action native A_Light(int level);
 	action native A_Lower();
 	action native A_Raise();
 	action native A_ReFire();

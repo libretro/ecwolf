@@ -20,6 +20,7 @@ extern  int *wallheight;
 extern  word horizwall[],vertwall[];
 extern  int32_t    lasttimecount;
 extern  int32_t    frameon;
+extern	int r_extralight;
 
 extern  unsigned screenloc[3];
 

@@ -447,6 +447,13 @@ ACTION_FUNCTION(A_JumpIfInventory)
 	}
 }
 
+ACTION_FUNCTION(A_Light)
+{
+	ACTION_PARAM_INT(level, 0);
+
+	self->player->extralight = clamp(level, -20, 20);
+}
+
 static FRandom pr_meleeattack("MeleeAccuracy");
 ACTION_FUNCTION(A_MeleeAttack)
 {

@@ -17,6 +17,7 @@
 #include "thinker.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_loadsave.h"
 #include "wl_state.h"
 #include "wl_play.h"
 #include "templates.h"
@@ -1313,6 +1314,9 @@ void player_t::Serialize(FArchive &arc)
 		<< PendingWeapon
 		<< flags;
 
+	if(GameSave::SaveVersion >= 1355980878)
+		arc << extralight;
+
 	for(unsigned int i = 0;i < NUM_PSPRITES;++i)
 	{
 		arc << psprite[i].frame
@@ -1366,6 +1370,7 @@ void SpawnPlayer (int tilex, int tiley, int dir)
 
 	players[0].camera = players[0].mo;
 	players[0].state = player_t::PST_LIVE;
+	players[0].extralight = 0;
 
 	// Re-raise the weapon like Doom if we don't have the flag set in mapinfo.
 	if(!levelInfo->SpawnWithWeaponRaised && players[0].PendingWeapon == WP_NOCHANGE)

@@ -102,6 +102,7 @@ extern class player_t
 		// then pressed again it should initiate a second attack even if
 		// NOAUTOFIRE is set.
 		bool		attackheld;
+		short		extralight;
 
 		int32_t		flags;
 		State		state;

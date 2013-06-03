@@ -92,6 +92,7 @@ void APlayerPawn::Die()
 {
 	if(player)
 	{
+		player->extralight = 0;
 		player->PendingWeapon = WP_NOCHANGE;
 		if(player->ReadyWeapon)
 			player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);

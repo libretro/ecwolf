@@ -64,6 +64,7 @@ unsigned vbufPitch = 0;
 int32_t	lasttimecount;
 int32_t	frameon;
 bool	fpscounter;
+int		r_extralight;
 
 int fps_frames=0, fps_time=0, fps=0;
 
@@ -254,7 +255,7 @@ void ScalePost()
 	int ywcount, yoffs, yw, yd, yendoffs;
 	byte col;
 
-	const int shade = LIGHT2SHADE(gLevelLight);
+	const int shade = LIGHT2SHADE(gLevelLight + r_extralight);
 	const int tz = FixedMul(r_depthvisibility<<8, wallheight[postx]);
 	BYTE *curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 
@@ -1190,6 +1191,11 @@ void CalcViewVariables()
 
 	viewtx = (short)(players[0].camera->x >> TILESHIFT);
 	viewty = (short)(players[0].camera->y >> TILESHIFT);
+
+	if(players[0].camera->player)
+		r_extralight = players[0].camera->player->extralight << 3;
+	else
+		r_extralight = 0;
 }
 
 //==========================================================================
