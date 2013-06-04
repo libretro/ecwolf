@@ -398,7 +398,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		if(wallheight[i] > (signed)height)
 			continue;
 
-		src = tex->GetColumn(flip ? texWidth - (x>>FRACBITS) : (x>>FRACBITS), NULL);
+		src = tex->GetColumn(flip ? texWidth - (x>>FRACBITS) - 1 : (x>>FRACBITS), NULL);
 
 		for(y = startY*yStep;y < yRun;y += yStep)
 		{
