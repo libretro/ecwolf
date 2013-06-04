@@ -55,6 +55,13 @@
 			sc.ScriptMessage(Scanner::ERROR, "Invalid syntax.\n"); \
 	}
 
+static inline int MustGetSignedInteger(Scanner &sc)
+{
+	bool neg = sc.CheckToken('-');
+	sc.MustGetToken(TK_IntConst);
+	return neg ? -sc->number : sc->number;
+}
+
 void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 {
 	StartParseBlock
@@ -159,28 +166,23 @@ void TextMapParser::ParseTrigger(Scanner &sc, MapTrigger &trigger)
 	}
 	else CheckKey("arg0")
 	{
-		sc.MustGetToken(TK_IntConst);
-		trigger.arg[0] = sc->number;
+		trigger.arg[0] = MustGetSignedInteger(sc);
 	}
 	else CheckKey("arg1")
 	{
-		sc.MustGetToken(TK_IntConst);
-		trigger.arg[1] = sc->number;
+		trigger.arg[1] = MustGetSignedInteger(sc);
 	}
 	else CheckKey("arg2")
 	{
-		sc.MustGetToken(TK_IntConst);
-		trigger.arg[2] = sc->number;
+		trigger.arg[2] = MustGetSignedInteger(sc);
 	}
 	else CheckKey("arg3")
 	{
-		sc.MustGetToken(TK_IntConst);
-		trigger.arg[3] = sc->number;
+		trigger.arg[3] = MustGetSignedInteger(sc);
 	}
 	else CheckKey("arg4")
 	{
-		sc.MustGetToken(TK_IntConst);
-		trigger.arg[4] = sc->number;
+		trigger.arg[4] = MustGetSignedInteger(sc);
 	}
 	else CheckKey("playeruse")
 	{
@@ -349,20 +351,12 @@ class UWMFParser : public TextMapParser
 			// Different syntax
 			while(!sc.CheckToken('}'))
 			{
-				bool negative;
-
 				sc.MustGetToken('{');
-				negative = sc.CheckToken('-');
-				sc.MustGetToken(TK_IntConst);
-				pdata[i].tile = negative ? -sc->number : sc->number;
+				pdata[i].tile = MustGetSignedInteger(sc);
 				sc.MustGetToken(',');
-				negative = sc.CheckToken('-');
-				sc.MustGetToken(TK_IntConst);
-				pdata[i].sector = negative ? -sc->number : sc->number;
+				pdata[i].sector = MustGetSignedInteger(sc);
 				sc.MustGetToken(',');
-				negative = sc.CheckToken('-');
-				sc.MustGetToken(TK_IntConst);
-				pdata[i].zone = negative ? -sc->number : sc->number;
+				pdata[i].zone = MustGetSignedInteger(sc);
 				sc.MustGetToken('}');
 				if(++i != size)
 					sc.MustGetToken(',');

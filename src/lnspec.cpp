@@ -152,10 +152,18 @@ class EVDoor : public Thinker
 	DECLARE_CLASS(EVDoor, Thinker)
 
 	public:
-		EVDoor(MapSpot spot, unsigned int speed, unsigned int opentics, bool direction) : Thinker(ThinkerList::WORLD),
+		EVDoor(MapSpot spot, unsigned int speed, int opentics, bool direction) : Thinker(ThinkerList::WORLD),
 			state(Closed), spot(spot), amount(0), opentics(opentics), direction(direction)
 		{
-			ChangeState(Opening);
+			if(spot->slideAmount[direction] == 0 && spot->slideAmount[direction+2] == 0)
+				ChangeState(Opening);
+			else
+			{
+				// This should occur if we have a negative duration door
+				// allow manual closing.
+				amount = spot->slideAmount[direction];
+				ChangeState(Closing);
+			}
 			spot->thinker = this;
 			this->speed = 64*speed;
 		}
@@ -190,7 +198,10 @@ class EVDoor : public Thinker
 					if(amount >= 0xffff)
 					{
 						amount = 0xffff;
-						ChangeState(Opened);
+						if(opentics < 0) // Negative delay means stay open
+							Destroy();
+						else
+							ChangeState(Opened);
 					}
 					spot->slideAmount[direction] = spot->slideAmount[direction+2] = amount;
 					break;
@@ -321,7 +332,7 @@ class EVDoor : public Thinker
 		MapSpot spot;
 		unsigned int speed;
 		int amount;
-		unsigned int opentics;
+		int opentics;
 		unsigned int wait;
 		bool direction;
 };
