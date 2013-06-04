@@ -132,28 +132,12 @@ void ControlMovement (AActor *ob)
 
 	int32_t oldx,oldy;
 	angle_t angle;
-	int strafe = 0;
+	int strafe = controlstrafe;
 
 	thrustspeed = 0;
 
 	oldx = players[0].mo->x;
 	oldy = players[0].mo->y;
-
-	if(buttonstate[bt_strafeleft])
-	{
-		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
-			strafe -= RUNMOVE;
-		else
-			strafe -= BASEMOVE;
-	}
-
-	if(buttonstate[bt_straferight])
-	{
-		if((!alwaysrun && buttonstate[bt_run]) || (alwaysrun && !buttonstate[bt_run]))
-			strafe += RUNMOVE;
-		else
-			strafe += BASEMOVE;
-	}
 
 	//
 	// side to side move

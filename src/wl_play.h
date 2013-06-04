@@ -25,7 +25,7 @@ extern  int             lastgamemusicoffset;
 //
 // current user input
 //
-extern  int         controlx,controly;              // range from -100 to 100
+extern  int         controlx,controly, controlstrafe;              // range from -100 to 100
 extern  bool        buttonstate[NUMBUTTONS];
 extern  bool        buttonheld[NUMBUTTONS];
 extern  exit_t      playstate;

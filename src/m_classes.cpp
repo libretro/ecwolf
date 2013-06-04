@@ -405,12 +405,27 @@ void ControlMenuItem::activate()
 				}
 
 				btn = IN_JoyButtons();
-				for(int i = 0;btn != 0 && i < 32;i++)
+				if(btn != 0)
 				{
-					if(btn & (1<<i))
+					for(int i = 0;btn != 0 && i < 32;i++)
 					{
-						ControlScheme::setJoystick(controlScheme, button.button, i);
-						exit = true;
+						if(btn & (1<<i))
+						{
+							ControlScheme::setJoystick(controlScheme, button.button, i);
+							exit = true;
+						}
+					}
+				}
+				else
+				{
+					btn = IN_JoyAxes();
+					for(int i = 0;btn != 0 && i < 32;i++)
+					{
+						if(btn & (1<<i))
+						{
+							ControlScheme::setJoystick(controlScheme, button.button, i+32);
+							exit = true;
+						}
 					}
 				}
 				break;
@@ -460,7 +475,10 @@ void ControlMenuItem::draw()
 	{
 		PrintX = 266;
 		char btn[8];
-		sprintf(btn, "JY%d", button.mouse);
+		if(button.joystick < 32)
+			sprintf(btn, "JY%d", button.joystick);
+		else
+			sprintf(btn, "A%d%c", (button.joystick-32)/2, (button.joystick&1) ? 'D' : 'U');
 		US_Print(BigFont, btn, getTextColor());
 	}
 

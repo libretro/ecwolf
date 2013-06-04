@@ -111,6 +111,12 @@ void ThinkerList::Tick()
 			Thinker *thinker = iter->Item();
 			nextThinker = iter->Next();
 
+			if(thinker->ObjectFlags & OF_JustSpawned)
+			{
+				thinker->ObjectFlags &= ~OF_JustSpawned;
+				thinker->PostBeginPlay();
+			}
+
 			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
 			{
 				thinker->Tick();

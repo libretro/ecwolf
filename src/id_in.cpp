@@ -89,6 +89,7 @@ static KeyboardDef KbdDefs = {
 
 static SDL_Joystick *Joystick;
 int JoyNumButtons;
+int JoyNumAxes;
 static int JoyNumHats;
 
 static bool GrabInput = false;
@@ -171,6 +172,11 @@ void IN_GetJoyDelta(int *dx,int *dy)
 	*dy = y;
 }
 
+int IN_GetJoyAxis(int axis)
+{
+	return SDL_JoystickGetAxis(Joystick, axis);
+}
+
 ///////////////////////////////////////////////////////////////////////////
 //
 //	IN_GetJoyFineDelta() - Returns the relative movement of the specified
@@ -215,8 +221,41 @@ int IN_JoyButtons()
 	SDL_JoystickUpdate();
 
 	int res = 0;
-	for(int i = 0; i < JoyNumButtons && i < 32; i++)
+	int i;
+	for(i = 0; i < JoyNumButtons && i < 32; i++)
 		res |= SDL_JoystickGetButton(Joystick, i) << i;
+
+	// Need four buttons for hat
+	if(i < 28 && param_joystickhat != -1)
+	{
+		uint8_t hatState = SDL_JoystickGetHat(Joystick, param_joystickhat);
+		if(hatState & SDL_HAT_UP)
+			res |= 0x1 << i;
+		else if(hatState & SDL_HAT_DOWN)
+			res |= 0x4 << i;
+		if(hatState & SDL_HAT_RIGHT)
+			res |= 0x2 << i;
+		else if(hatState & SDL_HAT_LEFT)
+			res |= 0x8 << i;
+	}
+	return res;
+}
+
+int IN_JoyAxes()
+{
+	if(!Joystick) return 0;
+
+	SDL_JoystickUpdate();
+
+	int res = 0;
+	for(int i = 0; i < JoyNumAxes && i < 16; ++i)
+	{
+		SWORD pos = SDL_JoystickGetAxis(Joystick, i);
+		if(pos <= -64)
+			res |= 1 << (i*2);
+		else if(pos >= 64)
+			res |= 1 << (i*2+1);
+	}
 	return res;
 }
 
@@ -400,9 +439,12 @@ IN_Startup(void)
 		{
 			JoyNumButtons = SDL_JoystickNumButtons(Joystick);
 			if(JoyNumButtons > 32) JoyNumButtons = 32;      // only up to 32 buttons are supported
+			JoyNumAxes = SDL_JoystickNumAxes(Joystick);
 			JoyNumHats = SDL_JoystickNumHats(Joystick);
-			if(param_joystickhat < -1 || param_joystickhat >= JoyNumHats)
+			if(param_joystickhat >= JoyNumHats)
 				Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
+			else if(param_joystickhat < 0 && JoyNumHats > 0) // Default to hat 0
+				param_joystickhat = 0;
 		}
 	}
 

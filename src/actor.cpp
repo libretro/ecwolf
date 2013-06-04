@@ -141,17 +141,13 @@ class AActorProxy : public Thinker
 		void Tick()
 		{
 			if(enabled)
-			{
-				if(parent->ObjectFlags & OF_JustSpawned)
-				{
-					ObjectFlags &= ~OF_JustSpawned;
-					parent->PostBeginPlay();
-					if(!parent)
-						return;
-				}
-
 				parent->Tick();
-			}
+		}
+
+		void PostBeginPlay()
+		{
+			if(enabled)
+				parent->PostBeginPlay();
 		}
 
 		void Serialize(FArchive &arc)

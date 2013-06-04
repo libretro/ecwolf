@@ -61,33 +61,34 @@ unsigned tics;
 //
 // control info
 //
+#define JoyAx(x) (32+(x<<1))
 ControlScheme controlScheme[] =
 {
-	{ bt_moveforward,		"Forward",		-1,	sc_UpArrow,		-1 },
-	{ bt_movebackward,		"Backward",		-1,	sc_DownArrow,	-1 },
-	{ bt_strafeleft,		"Strafe Left",	-1,	sc_Comma,		-1 },
-	{ bt_straferight,		"Strafe Right",	-1,	sc_Peroid,		-1 },
-	{ bt_turnleft,			"Turn Left",	-1,	sc_LeftArrow,	-1 },
-	{ bt_turnright,			"Turn Right",	-1,	sc_RightArrow,	-1 },
-	{ bt_attack,			"Attack",		-1,	sc_Control,		-1 },
-	{ bt_strafe,			"Strafe",		-1,	sc_Alt,			-1 },
-	{ bt_run,				"Run",			-1,	sc_LShift,		-1 },
-	{ bt_use,				"Use",			-1,	sc_Space,		-1 },
-	{ bt_slot1,				"Slot 1",		-1,	sc_1,			-1 },
-	{ bt_slot2,				"Slot 2", 		-1,	sc_2,			-1 },
-	{ bt_slot3,				"Slot 3",		-1,	sc_3,			-1 },
-	{ bt_slot4,				"Slot 4",		-1,	sc_4,			-1 },
-	{ bt_slot5,				"Slot 5",		-1,	sc_5,			-1 },
-	{ bt_slot6,				"Slot 6",		-1,	sc_6,			-1 },
-	{ bt_slot7,				"Slot 7",		-1,	sc_7,			-1 },
-	{ bt_slot8,				"Slot 8",		-1,	sc_8,			-1 },
-	{ bt_slot9,				"Slot 9",		-1,	sc_9,			-1 },
-	{ bt_slot0,				"Slot 0",		-1,	sc_0,			-1 },
-	{ bt_nextweapon,		"Next Weapon",	-1,	-1,				-1 },
-	{ bt_prevweapon,		"Prev Weapon",	-1, -1,				-1 },
+	{ bt_moveforward,		"Forward",		JoyAx(1),	sc_UpArrow,		-1, &controly, 1 },
+	{ bt_movebackward,		"Backward",		JoyAx(1)+1,	sc_DownArrow,	-1, &controly, 0 },
+	{ bt_strafeleft,		"Strafe Left",	JoyAx(0),	sc_Comma,		-1, &controlstrafe, 1 },
+	{ bt_straferight,		"Strafe Right",	JoyAx(0)+1,	sc_Peroid,		-1, &controlstrafe, 0 },
+	{ bt_turnleft,			"Turn Left",	JoyAx(3),	sc_LeftArrow,	-1, &controlx, 1 },
+	{ bt_turnright,			"Turn Right",	JoyAx(3)+1,	sc_RightArrow,	-1, &controlx, 0 },
+	{ bt_attack,			"Attack",		0,			sc_Control,		0,  NULL, 0},
+	{ bt_strafe,			"Strafe",		3,			sc_Alt,			-1, NULL, 0 },
+	{ bt_run,				"Run",			2,			sc_LShift,		-1, NULL, 0 },
+	{ bt_use,				"Use",			1,			sc_Space,		-1, NULL, 0 },
+	{ bt_slot1,				"Slot 1",		-1,			sc_1,			-1, NULL, 0 },
+	{ bt_slot2,				"Slot 2", 		-1,			sc_2,			-1, NULL, 0 },
+	{ bt_slot3,				"Slot 3",		-1,			sc_3,			-1, NULL, 0 },
+	{ bt_slot4,				"Slot 4",		-1,			sc_4,			-1, NULL, 0 },
+	{ bt_slot5,				"Slot 5",		-1,			sc_5,			-1, NULL, 0 },
+	{ bt_slot6,				"Slot 6",		-1,			sc_6,			-1, NULL, 0 },
+	{ bt_slot7,				"Slot 7",		-1,			sc_7,			-1, NULL, 0 },
+	{ bt_slot8,				"Slot 8",		-1,			sc_8,			-1, NULL, 0 },
+	{ bt_slot9,				"Slot 9",		-1,			sc_9,			-1, NULL, 0 },
+	{ bt_slot0,				"Slot 0",		-1,			sc_0,			-1, NULL, 0 },
+	{ bt_nextweapon,		"Next Weapon",	4,			-1,				-1, NULL, 0 },
+	{ bt_prevweapon,		"Prev Weapon",	5, 			-1,				-1, NULL, 0 },
 
 	// End of List
-	{ bt_nobutton,			NULL,			-1,	-1,				-1 }
+	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
 };
 
 void ControlScheme::setKeyboard(ControlScheme* scheme, Button button, int value)
@@ -137,7 +138,7 @@ memptr demobuffer;
 //
 // current user input
 //
-int controlx, controly;         // range from -100 to 100 per tic
+int controlx, controly, controlstrafe;         // range from -100 to 100 per tic
 bool buttonstate[NUMBUTTONS];
 
 int lastgamemusicoffset = 0;
@@ -210,10 +211,16 @@ void PollMouseButtons (void)
 void PollJoystickButtons (void)
 {
 	int buttons = IN_JoyButtons();
+	int axes = IN_JoyAxes();
 	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
 	{
-		if(controlScheme[i].joystick != -1 && (buttons & (1<<controlScheme[i].joystick)))
-			buttonstate[controlScheme[i].button] = true;
+		if(controlScheme[i].joystick != -1)
+		{
+			if(controlScheme[i].joystick < 32 && (buttons & (1<<controlScheme[i].joystick)))
+				buttonstate[controlScheme[i].button] = true;
+			else if(controlScheme[i].axis == NULL && controlScheme[i].joystick >= 32 && (axes & (1<<(controlScheme[i].joystick-32))))
+				buttonstate[controlScheme[i].button] = true;
+		}
 	}
 }
 
@@ -238,6 +245,10 @@ void PollKeyboardMove (void)
 		controlx -= delta;
 	if(buttonstate[bt_turnright])
 		controlx += delta;
+	if(buttonstate[bt_strafeleft])
+		controlstrafe -= delta;
+	if(buttonstate[bt_straferight])
+		controlstrafe += delta;
 }
 
 
@@ -284,20 +295,16 @@ void PollMouseMove (void)
 
 void PollJoystickMove (void)
 {
-	int joyx, joyy;
-
-	IN_GetJoyDelta (&joyx, &joyy);
-
-	int delta = buttonstate[bt_run] ? RUNMOVE : BASEMOVE;
-
-	if (joyx > 64 || buttonstate[bt_turnright])
-		controlx += delta;
-	else if (joyx < -64  || buttonstate[bt_turnleft])
-		controlx -= delta;
-	if (joyy > 64 || buttonstate[bt_movebackward])
-		controly += delta;
-	else if (joyy < -64 || buttonstate[bt_moveforward])
-		controly -= delta;
+	for(int i = 0;controlScheme[i].axis;i++)
+	{
+		if(controlScheme[i].joystick >= 32)
+		{
+			// Scale to -100 - 100
+			const int axis = (((IN_GetJoyAxis((controlScheme[i].joystick-32)>>1))+1)*100)>>15;
+			if((controlScheme[i].joystick&1) ^ (axis < 0))
+				*controlScheme[i].axis += controlScheme[i].negative ? -ABS(axis) : ABS(axis);
+		}
+	}
 }
 
 /*
@@ -344,6 +351,7 @@ void PollControls (void)
 
 	controlx = 0;
 	controly = 0;
+	controlstrafe = 0;
 	memcpy (buttonheld, buttonstate, sizeof (buttonstate));
 	memset (buttonstate, 0, sizeof (buttonstate));
 

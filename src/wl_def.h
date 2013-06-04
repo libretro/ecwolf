@@ -310,6 +310,8 @@ struct ControlScheme
 		int			joystick;
 		int			keyboard;
 		int			mouse;
+		int			*axis;
+		bool		negative;
 };
 
 extern ControlScheme controlScheme[];

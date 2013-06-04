@@ -94,6 +94,7 @@ class Thinker : public DObject
 		bool			IsThinkerType() { return IsA(T::__StaticClass); }
 		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
+		virtual void	PostBeginPlay() {}
 		size_t			PropagateMark();
 
 	private:
