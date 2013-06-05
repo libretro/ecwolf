@@ -453,6 +453,11 @@ ACTION_FUNCTION(A_Light)
 
 	self->player->extralight = clamp(level, -20, 20);
 }
+// Might as well support these as well since they're far more popular than the
+// generic version and don't require much code.
+ACTION_FUNCTION(A_Light0) { self->player->extralight = 0; }
+ACTION_FUNCTION(A_Light1) { self->player->extralight = 1; }
+ACTION_FUNCTION(A_Light2) { self->player->extralight = 2; }
 
 static FRandom pr_meleeattack("MeleeAccuracy");
 ACTION_FUNCTION(A_MeleeAttack)
