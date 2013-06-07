@@ -194,7 +194,8 @@ static void GiveAllWeaponsAndAmmo()
 	{
 		const ClassDef *cls = pair->Value;
 		AInventory *inv = NULL;
-		if((cls->IsDescendantOf(NATIVE_CLASS(Weapon)) && cls != NATIVE_CLASS(Weapon)) ||
+		// Don't give replaced weapons or ammo sub-classes
+		if((cls->IsDescendantOf(NATIVE_CLASS(Weapon)) && cls != NATIVE_CLASS(Weapon) && cls->GetReplacement() == cls) ||
 			(cls->GetParent() == NATIVE_CLASS(Ammo))
 		)
 		{
