@@ -234,6 +234,7 @@ class UWMFParser : public TextMapParser
 
 		void Parse()
 		{
+			bool ecwolf12Namespace = false;
 			bool canChangeHeader = true;
 			gm->header.width = 64;
 			gm->header.height = 64;
@@ -248,8 +249,10 @@ class UWMFParser : public TextMapParser
 					CheckKey("namespace")
 					{
 						sc.MustGetToken(TK_StringConst);
-						if(sc->str.Compare("Wolf3D") != 0)
-							sc.ScriptMessage(Scanner::WARNING, "Wolf3D is the only supported namespace.\n");
+						// Experimental namespace
+						ecwolf12Namespace = sc->str.Compare("ECWolf-v12") == 0;
+						if(sc->str.Compare("Wolf3D") != 0 && !ecwolf12Namespace)
+							sc.ScriptMessage(Scanner::WARNING, "Wolf3D and ECWolf-v12 are the only supported namespaces.\n");
 					}
 					else CheckKey("tilesize")
 					{
@@ -274,6 +277,23 @@ class UWMFParser : public TextMapParser
 							sc.ScriptMessage(Scanner::ERROR, "Changing dimensions after dependent data.\n");
 						sc.MustGetToken(TK_IntConst);
 						gm->header.height = sc->number;
+					}
+					// Defaultlightlevel and defaultvisibility may be merged
+					// into the UWMF spec once the values from ROTT are set in
+					// stone.
+					else CheckKey("defaultlightlevel")
+					{
+						if(!ecwolf12Namespace)
+							sc.ScriptMessage(Scanner::WARNING, "Setting defaultlightlevel on Wolf3D namespace not standard, use ECWolf-v12\n");
+						sc.MustGetToken(TK_IntConst);
+						gLevelLight = sc->number;
+					}
+					else CheckKey("defaultvisibility")
+					{
+						if(!ecwolf12Namespace)
+							sc.ScriptMessage(Scanner::WARNING, "Setting defaultvisibility on Wolf3D namespace not standard, use ECWolf-v12\n");
+						sc.MustGetToken(TK_FloatConst);
+						gLevelVisibility = static_cast<fixed>(sc->decimal*65536.);
 					}
 					else
 						sc.GetNextToken();
@@ -512,7 +532,6 @@ class UWMFParser : public TextMapParser
 
 void GameMap::ReadUWMFData()
 {
-	// TODO: Make these accessible from UWMF
 	gLevelVisibility = VISIBILITY_DEFAULT;
 	gLevelLight = LIGHTLEVEL_DEFAULT;
 
