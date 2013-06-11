@@ -5,9 +5,9 @@
 
 #define GAMENAME "ECWolf"
 #define GAMESIG "ECWOLF"
-#define DOTVERSIONSTR_NOREV "1.1.9999"
+#define DOTVERSIONSTR_NOREV "1.2"
 #define DOTVERSIONSTR DOTVERSIONSTR_NOREV " (r" SVN_REVISION_STRING ")"
-#define SAVEPRODVER 0x001001FF // 0xMMMmmmrr in hex
+#define SAVEPRODVER 0x00100200 // 0xMMMmmmrr in hex
 
 #define MINSAVEVER	1355980878
 // The following will be used as a less accurate fallback for non-version control builds
