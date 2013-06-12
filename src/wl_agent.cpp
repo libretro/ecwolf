@@ -1296,10 +1296,8 @@ void player_t::Serialize(FArchive &arc)
 		<< health
 		<< ReadyWeapon
 		<< PendingWeapon
-		<< flags;
-
-	if(GameSave::SaveVersion >= 1355980878)
-		arc << extralight;
+		<< flags
+		<< extralight;
 
 	for(unsigned int i = 0;i < NUM_PSPRITES;++i)
 	{

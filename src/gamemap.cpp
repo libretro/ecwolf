@@ -745,12 +745,9 @@ FArchive &operator<< (FArchive &arc, MapTrigger &trigger)
 	arc << trigger.x
 		<< trigger.y
 		<< trigger.z
-		<< trigger.active;
-
-	if(GameSave::SaveVersion >= 1350238078)
-		arc << trigger.action;
-
-	arc << trigger.activate[0] << trigger.activate[1] << trigger.activate[2] << trigger.activate[3]
+		<< trigger.active
+		<< trigger.action
+		<< trigger.activate[0] << trigger.activate[1] << trigger.activate[2] << trigger.activate[3]
 		<< trigger.arg[0] << trigger.arg[1] << trigger.arg[2] << trigger.arg[3] << trigger.arg[4]
 		<< trigger.playerUse
 		<< trigger.playerCross

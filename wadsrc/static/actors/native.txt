@@ -158,7 +158,7 @@ actor PlayerPawn native
 	{
 		// ZDoom doesn't do this, but since invisible player classes are likely here, we need this state.
 		Death:
-			GARD A -1 A_Fall
+			TNT1 A -1 A_Fall
 			stop
 	}
 }

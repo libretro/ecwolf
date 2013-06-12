@@ -82,18 +82,25 @@ FArchive &operator<< (FArchive &arc, const Frame *&frame)
 	{
 		// Find a class which held this state.
 		// This should always be able to be found.
-		const ClassDef *cls;
-		ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
-		ClassDef::ClassPair *pair;
-		while(iter.NextPair(pair))
+		const ClassDef *cls = NULL;
+		if(frame)
 		{
-			cls = pair->Value;
-			if(cls->IsStateOwner(frame))
-				break;
-		}
+			ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
+			ClassDef::ClassPair *pair;
+			while(iter.NextPair(pair))
+			{
+				cls = pair->Value;
+				if(cls->IsStateOwner(frame))
+					break;
+			}
 
-		arc << cls;
-		arc << const_cast<Frame *>(frame)->index;
+			arc << cls;
+			arc << const_cast<Frame *>(frame)->index;
+		}
+		else
+		{
+			arc << cls;
+		}
 	}
 	else
 	{
@@ -101,9 +108,14 @@ FArchive &operator<< (FArchive &arc, const Frame *&frame)
 		unsigned int frameIndex;
 
 		arc << cls;
-		arc << frameIndex;
+		if(cls)
+		{
+			arc << frameIndex;
 
-		frame = cls->GetState(frameIndex);
+			frame = cls->GetState(frameIndex);
+		}
+		else
+			frame = NULL;
 	}
 
 	return arc;
