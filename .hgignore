@@ -1,6 +1,6 @@
 ~$
-^build/
-/build/
 .orig$
 syntax: glob
 src/svnrevision.h
+syntax: regexp
+^build[a-zA-Z0-9_\-]*/

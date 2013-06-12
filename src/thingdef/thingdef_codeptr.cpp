@@ -187,7 +187,7 @@ ACTION_FUNCTION(A_BossDeath)
 	if(!alldead)
 		return;
 
-	if(levelInfo->DeathCam && (!deathcam || (!deathcam->ObjectFlags & OF_EuthanizeMe)))
+	if(levelInfo->DeathCam && (!deathcam || !(deathcam->ObjectFlags & OF_EuthanizeMe)))
 	{
 		if(!deathcam)
 		{
@@ -305,9 +305,9 @@ ACTION_FUNCTION(A_Explode)
 			continue;
 
 		if(target->player)
-			TakeDamage(output, self);
+			TakeDamage(static_cast<int>(output), self);
 		else
-			DamageActor(target, output);
+			DamageActor(target, static_cast<unsigned int>(output));
 	}
 }
 
