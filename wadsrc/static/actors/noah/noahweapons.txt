@@ -40,7 +40,7 @@ actor Slingshot : WolfWeapon
 	}
 }
 
-actor SuperSlingshot : WolfWeapon
+actor SuperSlingshot : WolfWeapon 181
 {
 	attacksound "weapon/machine/attack"
 	inventory.pickupsound "weapon/machine/pickup"
@@ -50,7 +50,7 @@ actor SuperSlingshot : WolfWeapon
 	states
 	{
 		Spawn:
-			MGUN A -1
+			SSGG A -1
 			stop
 		Ready:
 			SSLG A 1 A_WeaponReady
@@ -65,7 +65,7 @@ actor SuperSlingshot : WolfWeapon
 	}
 }
 
-actor AutoSlingshot : WolfWeapon
+actor AutoSlingshot : WolfWeapon 182
 {
 	attacksound "weapon/gatling/attack"
 	inventory.pickupsound "weapon/gatling/pickup"
@@ -77,7 +77,7 @@ actor AutoSlingshot : WolfWeapon
 	states
 	{
 		Spawn:
-			CGUN A -1
+			ASGG A -1
 			stop
 		Ready:
 			ASLG A 1 A_WeaponReady
@@ -93,13 +93,16 @@ actor AutoSlingshot : WolfWeapon
 	}
 }
 
-actor CoconutSlingshot : WolfWeapon
+actor CoconutSlingshot : WolfWeapon 190
 {
 	weapon.ammotype1 "CoconutAmmo"
 	+INVENTORY.ALWAYSPICKUP
 	+WEAPON.NOAUTOFIRE
 	states
 	{
+		Spawn:
+			CSGG A -1
+			stop
 		Ready:
 			CSLG A 1 A_WeaponReady
 			loop
@@ -111,13 +114,16 @@ actor CoconutSlingshot : WolfWeapon
 	}
 }
 
-actor MelonSlingshot : WolfWeapon
+actor MelonSlingshot : WolfWeapon 192
 {
 	weapon.ammotype1 "MelonAmmo"
 	+INVENTORY.ALWAYSPICKUP
 	+WEAPON.NOAUTOFIRE
 	states
 	{
+		Spawn:
+			MSGG A -1
+			stop
 		Ready:
 			MSLG A 1 A_WeaponReady
 			loop

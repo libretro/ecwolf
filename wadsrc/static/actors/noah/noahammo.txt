@@ -1,4 +1,4 @@
-actor Feed : Ammo
+actor Feed : Ammo 180
 {
 	inventory.pickupsound "misc/ammo_pickup"
 	inventory.amount 8
@@ -6,12 +6,12 @@ actor Feed : Ammo
 	states
 	{
 		Spawn:
-			CLIP A -1
+			FEED A -1
 			stop
 	}
 }
 
-actor CoconutAmmo : Ammo
+actor CoconutAmmo : Ammo 191
 {
 	inventory.pickupsound "misc/ammo_pickup"
 	inventory.amount 8
@@ -19,12 +19,12 @@ actor CoconutAmmo : Ammo
 	states
 	{
 		Spawn:
-			CLIP A -1
+			CNTS A -1
 			stop
 	}
 }
 
-actor MelonAmmo : Ammo
+actor MelonAmmo : Ammo 193
 {
 	inventory.pickupsound "misc/ammo_pickup"
 	inventory.amount 8
@@ -32,7 +32,7 @@ actor MelonAmmo : Ammo
 	states
 	{
 		Spawn:
-			CLIP A -1
+			MLNS A -1
 			stop
 	}
 }
