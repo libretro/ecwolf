@@ -1,0 +1,38 @@
+actor Feed : Ammo
+{
+	inventory.pickupsound "misc/ammo_pickup"
+	inventory.amount 8
+	inventory.maxamount 99
+	states
+	{
+		Spawn:
+			CLIP A -1
+			stop
+	}
+}
+
+actor CoconutAmmo : Ammo
+{
+	inventory.pickupsound "misc/ammo_pickup"
+	inventory.amount 8
+	inventory.maxamount 99
+	states
+	{
+		Spawn:
+			CLIP A -1
+			stop
+	}
+}
+
+actor MelonAmmo : Ammo
+{
+	inventory.pickupsound "misc/ammo_pickup"
+	inventory.amount 8
+	inventory.maxamount 99
+	states
+	{
+		Spawn:
+			CLIP A -1
+			stop
+	}
+}

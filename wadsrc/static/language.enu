@@ -94,6 +94,13 @@ WL_EPISODE4 = "Episode 4\nA Dark Secret";
 WL_EPISODE5 = "Episode 5\nTrail of the Madman";
 WL_EPISODE6 = "Episode 6\nConfrontation";
 
+NA_EPISODE1 = "Carl the Camel\nStart at level 1-1";
+NA_EPISODE2 = "Ginny the Giraffe\nStart at level 2-1";
+NA_EPISODE3 = "Melvin the Monkey\nStart at level 3-1";
+NA_EPISODE4 = "Kerry the Kangaroo\nStart at level 4-1";
+NA_EPISODE5 = "Ernie the Elephant\nStart at level 5-1";
+NA_EPISODE6 = "Burt the Bear\nStart at level 6-1";
+
 SOD_EPISODE1 = "Episode 1\nSpear of Destiny";
 SOD_EPISODE2 = "Episode 2\nReturn to Danger";
 SOD_EPISODE3 = "Episode 3\nThe Ultimate Challenge";

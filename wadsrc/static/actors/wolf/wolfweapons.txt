@@ -32,8 +32,9 @@ actor Knife : WolfWeapon
 			loop
 		Fire:
 			KNIF B 3
-			KNIF C 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
-			KNIF DE 3
+			KNIF C 3
+			KNIF D 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
+			KNIF E 3
 			goto Ready
 	}
 }
@@ -48,8 +49,9 @@ actor Knife2 : Knife
 			loop
 		Fire:
 			KNF2 B 3
-			KNF2 C 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
-			KNF2 DE 3
+			KNF2 C 3
+			KNF2 D 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
+			KNF2 E 3
 			goto Ready
 	}
 }
@@ -67,8 +69,9 @@ actor Pistol : WolfWeapon
 			loop
 		Fire:
 			PISG B 3
-			PISG C 3 bright A_GunAttack
-			PISG DE 3
+			PISG C 3 bright
+			PISG D 3 A_GunAttack
+			PISG E 3
 			goto Ready
 	}
 }
@@ -84,8 +87,9 @@ actor BluePistol : Pistol
 			loop
 		Fire:
 			BPSG B 3
-			BPSG C 3 bright A_GunAttack
-			BPSG DE 3
+			BPSG C 3 bright
+			BPSG D 3 A_GunAttack
+			BPSG E 3
 			goto Ready
 	}
 }
@@ -108,8 +112,8 @@ actor MachineGun : WolfWeapon 60
 		Fire:
 			MCHG B 3
 		Hold:
-			MCHG C 3 bright A_GunAttack
-			MCHG D 3
+			MCHG C 3 bright
+			MCHG D 3 A_GunAttack
 			MCHG E 3 A_ReFire
 			goto Ready
 	}
@@ -131,8 +135,8 @@ actor BlueAK47 : MachineGun 141
 		Fire:
 			BAKG B 3
 		Hold:
-			BAKG C 3 bright A_GunAttack
-			BAKG D 3
+			BAKG C 3 bright
+			BAKG D 3 A_GunAttack
 			BAKG E 3 A_ReFire
 			goto Ready
 	}
@@ -158,7 +162,9 @@ actor GatlingGun : WolfWeapon
 		Fire:
 			CHGG B 3
 		Hold:
-			CHGG CD 3 bright A_GunAttack
+			CHGG C 3 bright
+			CHGG D 3 bright A_GunAttack
+			CHGG D 0 bright A_GunAttack
 			CHGG E 3 A_ReFire
 			goto Ready
 	}
@@ -180,7 +186,9 @@ actor BlueGatlingGun : GatlingGun
 		Fire:
 			BGTG B 3
 		Hold:
-			BGTG CD 3 bright A_GunAttack
+			BGTG C 3 bright
+			BGTG D 3 bright A_GunAttack
+			BGTG D 0 bright
 			BGTG E 3 A_ReFire
 			goto Ready
 	}

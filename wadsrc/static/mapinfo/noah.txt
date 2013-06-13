@@ -1,0 +1,488 @@
+include "mapinfo/wolfcommon.txt"
+
+gameinfo
+{
+	border = inset, "39 2D 14", "5E 42 21", "6F 4A 25"
+	borderflat = "#4A3918"
+	drawreadthis = true
+	gamepalette = "NOAHPAL"
+	titlepalette = "TITLEPAL"
+	finaleflat = "#B5B5B5"
+	menufade = "56 3D 1C"
+	menucolors = "56 3D 1C", "6F 4A 25", "32 31 10", "29 21 0C", "56 3D 1C", "56 3D 1C"
+	messagecolors = "D6 84 52", "FF BD 94", "00 00 00"
+	menuwindowcolors = "D6 84 52", "FF BD 94", "00 00 00", "FF FF FF", "FF FF 00", "0 0 0"
+	menufontcolor_title = "Gold"
+	menufontcolor_label = "NoahDarkCream"
+	menufontcolor_selection = "NoahCream"
+	menufontcolor_invalid = "DarkGreen"
+	menufontcolor_invalidselection = "Green"
+	menufontcolor_highlight = "NoahDarkCream"
+	menufontcolor_highlightselection = "NoahCream"
+	menufontcolor_disabled = "NoahDarkBrown"
+	messagefontcolor = "Black"
+	translator = "xlat/noah.txt"
+	playerclasses = "NoahPlayer"
+
+	signon = "WLFSGNON"
+	titlemusic = "NAZI_NOR"
+	scoresmusic = "ROSTER"
+	titlepage = "TITLEPIC"
+	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
+}
+
+adddefaultmap
+{
+	defaultfloor = "FLOOR1"
+	defaultceiling = "CEILING1"
+}
+
+// Episode 1
+
+episode "MAP01"
+{
+	lookup = "NA_EPISODE1"
+	picname = "M_EPIS1"
+	key = "C"
+}
+
+cluster 1
+{
+	exittext = "ENDART1"
+	exittextislump
+}
+
+map "MAP01"
+{
+	next = "MAP02"
+	secretnext = "MAP02"
+	floornumber = 1
+	par = 30
+	music = "GETTHEM"
+	cluster = 1
+}
+
+map "MAP02"
+{
+	next = "MAP03"
+	secretnext = "MAP03"
+	floornumber = 2
+	par = 60
+	music = "SEARCHN"
+	cluster = 1
+}
+
+map "MAP03"
+{
+	next = "MAP04"
+	secretnext = "MAP04"
+	floornumber = 3
+	par = 60
+	music = "POW"
+	cluster = 1
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+// Episode 2
+
+episode "MAP04"
+{
+	lookup = "NA_EPISODE2"
+	picname = "M_EPIS2"
+	key = "G"
+}
+
+cluster 2
+{
+	exittext = "ENDART2"
+	exittextislump
+}
+
+map "MAP04"
+{
+	next = "MAP05"
+	secretnext = "MAP05"
+	floornumber = 4
+	par = 120
+	music = "SUSPENSE"
+	cluster = 2
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP05"
+{
+	next = "MAP06"
+	secretnext = "MAP06"
+	floornumber = 5
+	par = 105
+	music = "GETTHEM"
+	cluster = 2
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP06"
+{
+	next = "MAP07"
+	secretnext = "MAP07"
+	floornumber = 6
+	par = 90
+	music = "SEARCHN"
+	cluster = 2
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP07"
+{
+	next = "MAP08"
+	secretnext = "MAP08"
+	floornumber = 7
+	par = 105
+	music = "POW"
+	cluster = 2
+}
+
+// Episode 3
+
+episode "MAP08"
+{
+	lookup = "NA_EPISODE3"
+	picname = "M_EPIS3"
+	key = "M"
+}
+
+cluster 3
+{
+	exittext = "ENDART3"
+	exittextislump
+}
+
+map "MAP08"
+{
+	next = "MAP09"
+	secretnext = "MAP12"
+	floornumber = 8
+	par = 105
+	music = "SUSPENSE"
+	cluster = 3
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP09"
+{
+	next = "MAP10"
+	secretnext = "MAP10"
+	floornumber = 9
+	music = "WARMARCH"
+	cluster = 3
+	par = 120
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP10"
+{
+	next = "MAP11"
+	secretnext = "MAP11"
+	floornumber = 10
+	music = "CORNER"
+	cluster = 3
+	par = 135
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP11"
+{
+	next = "MAP13"
+	secretnext = "MAP13"
+	floornumber = 1
+	par = 60
+	music = "NAZI_OMI"
+	cluster = 3
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP12"
+{
+	next = "MAP09"
+	secretnext = "MAP09"
+	floornumber = 2
+	par = 120
+	music = "PREGNANT"
+	cluster = 3
+	defaultfloor = "FLOOR4"
+	defaultceiling = "CEILING4"
+}
+
+// Episode 4
+
+episode "MAP13"
+{
+	lookup = "NA_EPISODE4"
+	picname = "M_EPIS4"
+	key = "K"
+}
+
+cluster 4
+{
+	exittext = "ENDART4"
+	exittextislump
+}
+
+map "MAP13"
+{
+	next = "MAP14"
+	secretnext = "MAP14"
+	floornumber = 3
+	par = 210
+	music = "GOINGAFT"
+	cluster = 4
+}
+
+map "MAP14"
+{
+	next = "MAP15"
+	secretnext = "MAP15"
+	floornumber = 4
+	par = 150
+	music = "HEADACHE"
+	cluster = 4
+}
+
+map "MAP15"
+{
+	next = "MAP16"
+	secretnext = "MAP16"
+	floornumber = 5
+	par = 240
+	music = "NAZI_OMI"
+	cluster = 4
+}
+
+map "MAP16"
+{
+	next = "MAP17"
+	secretnext = "MAP17"
+	floornumber = 6
+	par = 135
+	music = "PREGNANT"
+	cluster = 4
+}
+
+map "MAP17"
+{
+	next = "MAP18"
+	secretnext = "MAP18"
+	floornumber = 7
+	par = 210
+	music = "HEADACHE"
+	cluster = 4
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+// Episode 5
+
+episode "MAP18"
+{
+	lookup = "NA_EPISODE5"
+	picname = "M_EPIS5"
+	key = "E"
+}
+
+cluster 5
+{
+	exittext = "ENDART5"
+	exittextislump
+}
+
+map "MAP18"
+{
+	next = "MAP19"
+	secretnext = "MAP19"
+	floornumber = 8
+	par = 150
+	music = "GOINGAFT"
+	cluster = 5
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP19"
+{
+	next = "MAP20"
+	secretnext = "MAP20"
+	floornumber = 9
+	music = "WARMARCH"
+	cluster = 165
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP20"
+{
+	next = "MAP21"
+	secretnext = "MAP21"
+	floornumber = 10
+	music = "DUNGEON"
+	cluster = 5
+	par = 180
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP21"
+{
+	next = "MAP22"
+	secretnext = "MAP22"
+	floornumber = 1
+	par = 210
+	music = "INTROCW3"
+	cluster = 5
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP22"
+{
+	next = "MAP23"
+	secretnext = "MAP33"
+	floornumber = 2
+	par = 180
+	music = "NAZI_RAP"
+	cluster = 5
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP23"
+{
+	next = "MAP24"
+	secretnext = "MAP24"
+	floornumber = 3
+	par = 180
+	music = "TWELFTH"
+	cluster = 5
+}
+
+// Episode 6
+
+episode "MAP24"
+{
+	lookup = "NA_EPISODE6"
+	picname = "M_EPIS6"
+	key = "B"
+}
+
+cluster 6
+{
+	exittext = "ENDART6"
+	exittextislump
+}
+
+map "MAP24"
+{
+	next = "MAP25"
+	secretnext = "MAP25"
+	floornumber = 4
+	par = 105
+	music = "ZEROHOUR"
+	cluster = 6
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP25"
+{
+	next = "MAP26"
+	secretnext = "MAP26"
+	floornumber = 5
+	par = 180
+	music = "INTROCW3"
+	cluster = 6
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP26"
+{
+	next = "MAP27"
+	secretnext = "MAP30"
+	floornumber = 6
+	par = 180
+	music = "NAZI_RAP"
+	cluster = 6
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP27"
+{
+	next = "MAP28"
+	secretnext = "MAP38"
+	floornumber = 7
+	par = 90
+	music = "TWELFTH"
+	cluster = 6
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP28"
+{
+	next = "MAP29"
+	secretnext = "MAP29"
+	floornumber = 8
+	par = 150
+	music = "ZEROHOUR"
+	cluster = 6
+	par = 90
+	defaultfloor = "FLOOR3"
+	defaultceiling = "CEILING3"
+}
+
+map "MAP29"
+{
+	next = "MAP31"
+	secretnext = "MAP31"
+	floornumber = 9
+	music = "ULTIMATE"
+	cluster = 6
+	par = 191
+	defaultfloor = "FLOOR2"
+	defaultceiling = "CEILING2"
+}
+
+map "MAP30"
+{
+	next = "MAP27"
+	secretnext = "MAP27"
+	floornumber = 10
+	music = "PACMAN"
+	cluster = 6
+	par = 120
+	defaultfloor = "FLOOR4"
+	defaultceiling = "CEILING4"
+}
+
+// Final map is in own cluster
+cluster 7
+{
+}
+
+map "MAP31"
+{
+	next = "MAP31"
+	secretnext = "MAP31"
+	floornumber = 1
+	music = "GETTHEM"
+	cluster = 7
+	defaultfloor = "FLOOR4"
+	defaultceiling = "CEILING4"
+}

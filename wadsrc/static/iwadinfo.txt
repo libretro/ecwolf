@@ -1,5 +1,12 @@
 IWad
 {
+	Name = "Super 3D Noah's Ark"
+	Mapinfo = "mapinfo/noah.txt"
+	MustContain = "ZZZSA0"
+}
+
+IWad
+{
 	Name = "Spear of Destiny"
 	Mapinfo = "mapinfo/spear.txt"
 	MustContain = "BACKDROP", "ENDSCR1"

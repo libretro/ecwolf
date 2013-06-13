@@ -39,14 +39,14 @@ class MenuItem
 		FTexture	*picture;
 		int			pictureX;
 		int			pictureY;
-		char		string[36];
+		char		string[80];
 		bool		visible;
 		const Menu	*menu;
 
 		EColorRange	getTextColor() const;
 
 	public:
-				MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
+				MenuItem(const char string[80], MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
 		virtual	~MenuItem() {}
 
 		const short	getActive() const { return enabled ? (highlight + 1) : 0; }
@@ -61,7 +61,7 @@ class MenuItem
 		void		setHighlighted(int highlight=1) { this->highlight = highlight; }
 		void		setMenu(const Menu *menu) { this->menu = menu; }
 		void		setPicture(const char* picture, int x=-1, int y=-1);
-		void		setText(const char string[36]);
+		void		setText(const char string[80]);
 		void		setVisible(bool visible=true) { this->visible = visible; }
 
 		virtual void	activate();

@@ -25,7 +25,7 @@ EColorRange MenuItem::getTextColor() const
 	return gameinfo.FontColors[colors[isSelected()][getActive()]];
 }
 
-MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) :
+MenuItem::MenuItem(const char string[80], MENU_LISTENER_PROTOTYPE(activateListener)) :
 	activateListener(activateListener), enabled(true), highlight(false),
 	picture(NULL), pictureX(-1), pictureY(-1), visible(true)
 {
@@ -59,11 +59,11 @@ void MenuItem::setPicture(const char* picture, int x, int y)
 	pictureY = y;
 }
 
-void MenuItem::setText(const char string[36])
+void MenuItem::setText(const char string[80])
 {
 	height = 13;
 	strcpy(this->string, string);
-	for(unsigned int i = 0;i < 36;i++)
+	for(unsigned int i = 0;i < 80;i++)
 	{
 		if(string[i] == '\n')
 			height += 13;

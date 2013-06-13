@@ -239,3 +239,34 @@ Console:
 Flat:
 	#404000
 }
+
+// Noah's Ark Menu Colors
+NoahDarkCream
+{
+	#B57346  #EF8C5A
+Console:
+	#000000  #7F4000    0 127
+	#432F1F  #FFE7CF  128 256
+Flat:
+	#D68452
+}
+
+NoahDarkBrown
+{
+	#29210C  #774E29
+Console:
+	#2B230F  #773000    0 127
+	#735743  #F7BD58  128 256
+Flat:
+	#423118
+}
+
+NoahCream
+{
+	#DE8C56  #FFDEC6
+Console:
+	#2B230F  #BF7B4B    0 127
+	#FFB383  #FFFFFF  128 256
+Flat:
+	#FFBD94
+}

@@ -1,0 +1,13 @@
+actor NoahPlayer : BJPlayer
+{
+	player.displayname "Noah"
+	player.startitem "Feed", 8
+	player.startitem "Slingshot"
+	player.startitem "HandFeed"
+	player.weaponslot 1, "HandFeed"
+	player.weaponslot 2, "Slingshot"
+	player.weaponslot 3, "SuperSlingshot"
+	player.weaponslot 4, "AutoSlingshot"
+	player.weaponslot 5, "CoconutSlingshot"
+	player.weaponslot 6, "MelonSlingshot"
+}
