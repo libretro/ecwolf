@@ -1,8 +1,10 @@
 actor Feed : Ammo 180
 {
 	inventory.pickupsound "misc/ammo_pickup"
-	inventory.amount 8
+	inventory.amount 5
 	inventory.maxamount 99
+	ammo.backpackamount 10
+	ammo.backpackmaxamount 299
 	states
 	{
 		Spawn:
@@ -11,11 +13,24 @@ actor Feed : Ammo 180
 	}
 }
 
+actor FeedTrough : Feed 177
+{
+	inventory.amount 25
+	states
+	{
+		Spawn:
+			FTRH A -1
+			stop
+	}
+}
+
 actor CoconutAmmo : Ammo 191
 {
 	inventory.pickupsound "misc/ammo_pickup"
-	inventory.amount 8
+	inventory.amount 14
 	inventory.maxamount 99
+	ammo.backpackamount 1
+	ammo.backpackmaxamount 99
 	states
 	{
 		Spawn:
@@ -27,8 +42,10 @@ actor CoconutAmmo : Ammo 191
 actor MelonAmmo : Ammo 193
 {
 	inventory.pickupsound "misc/ammo_pickup"
-	inventory.amount 8
+	inventory.amount 5
 	inventory.maxamount 99
+	ammo.backpackamount 1
+	ammo.backpackmaxamount 99
 	states
 	{
 		Spawn:

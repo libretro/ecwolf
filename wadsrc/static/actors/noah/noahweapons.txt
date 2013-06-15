@@ -96,6 +96,7 @@ actor AutoSlingshot : WolfWeapon 182
 actor CoconutSlingshot : WolfWeapon 190
 {
 	weapon.ammotype1 "CoconutAmmo"
+	weapon.ammogive1 20
 	+INVENTORY.ALWAYSPICKUP
 	+WEAPON.NOAUTOFIRE
 	states
@@ -117,6 +118,7 @@ actor CoconutSlingshot : WolfWeapon 190
 actor MelonSlingshot : WolfWeapon 192
 {
 	weapon.ammotype1 "MelonAmmo"
+	weapon.ammogive1 5
 	+INVENTORY.ALWAYSPICKUP
 	+WEAPON.NOAUTOFIRE
 	states

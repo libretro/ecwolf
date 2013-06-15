@@ -208,18 +208,6 @@ actor FeedSack 176
 	}
 }
 
-actor ArkFeedTrough 177
-{
-	radius 32
-	+SOLID
-	states
-	{
-		Spawn:
-			FTRH A -1
-			stop
-	}
-}
-
 actor SmallBandage 178
 {
 	states
