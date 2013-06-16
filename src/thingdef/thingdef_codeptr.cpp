@@ -300,7 +300,7 @@ ACTION_FUNCTION(A_Explode)
 
 		double output = damage;
 		if(dist > fulldamageradius)
-			output *= static_cast<double>(dist - fulldamageradius)*rolloff;
+			output *= 1.0 - static_cast<double>(dist - fulldamageradius)*rolloff;
 		if(output <= 0.0)
 			continue;
 
