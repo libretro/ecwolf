@@ -33,7 +33,7 @@ actor Knife : WolfWeapon
 		Fire:
 			KNIF B 3
 			KNIF C 3
-			KNIF D 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
+			KNIF D 3 A_CustomPunch(random(0,15), true, CPF_ALWAYSPLAYSOUND)
 			KNIF E 3
 			goto Ready
 	}
@@ -50,7 +50,7 @@ actor Knife2 : Knife
 		Fire:
 			KNF2 B 3
 			KNF2 C 3
-			KNF2 D 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
+			KNF2 D 3 A_CustomPunch(random(0,15), true, CPF_ALWAYSPLAYSOUND)
 			KNF2 E 3
 			goto Ready
 	}

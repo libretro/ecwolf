@@ -1454,7 +1454,8 @@ ACTION_FUNCTION(A_GunAttack)
 	enum
 	{
 		GAF_NORANDOM = 1,
-		GAF_NOAMMO = 2
+		GAF_NOAMMO = 2,
+		GAF_MACDAMAGE = 4
 	};
 
 	player_t *player = self->player;
@@ -1499,7 +1500,7 @@ ACTION_FUNCTION(A_GunAttack)
 
 	int damage = flags & GAF_NORANDOM ? maxdamage : (1 + (pr_cwbullet()%maxdamage));
 	if (dist >= pointblank)
-		damage = damage * 2 / 3;
+		damage = (flags & GAF_MACDAMAGE) ? damage >> 1 : damage * 2 / 3;
 	if (dist >= longrange)
 	{
 		if ( (pr_cwbullet() % maxrange) < dist)           // missed

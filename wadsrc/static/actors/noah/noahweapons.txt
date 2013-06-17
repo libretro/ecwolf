@@ -13,7 +13,7 @@ actor HandFeed : WolfWeapon
 			loop
 		Fire:
 			HAND BC 3
-			HAND D 3 A_CustomPunch(1, false, CPF_ALWAYSPLAYSOUND)
+			HAND D 3 A_CustomPunch(random(0,3), true, CPF_ALWAYSPLAYSOUND) //Damage: US_RndT()&3
 			HAND E 3
 			// In Noah's Ark weapons automatically refired, but it took at least one tic
 			HAND A 1
@@ -33,7 +33,7 @@ actor Slingshot : WolfWeapon
 			loop
 		Fire:
 			SLNG B 3
-			SLNG C 3 A_GunAttack
+			SLNG C 3 A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, 0xF)
 			SLNG DE 3
 			SLNG A 1
 			goto Ready
@@ -59,7 +59,7 @@ actor SuperSlingshot : WolfWeapon 181
 			SSLG B 3
 		Hold:
 			SSLG C 3
-			SSLG D 3 A_GunAttack
+			SSLG D 3 A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, 0xF)
 			SSLG E 3 A_ReFire
 			goto Ready
 	}
@@ -86,8 +86,8 @@ actor AutoSlingshot : WolfWeapon 182
 			ASLG B 3
 		Hold:
 			ASLG C 3
-			ASLG D 3 A_GunAttack
-			ASLG D 0 A_GunAttack
+			ASLG D 3 A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, 0xF)
+			ASLG D 0 A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, 0xF)
 			ASLG E 3 A_ReFire
 			goto Ready
 	}
