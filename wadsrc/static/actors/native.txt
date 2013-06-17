@@ -12,6 +12,7 @@ const int WAF_NORANDOM = 1;
 
 const int GAF_NORANDOM = 1;
 const int GAF_NOAMMO = 2;
+const int GAF_MACDAMAGE = 4;
 
 const int SXF_TRANSFERPOINTERS = 1;
 
