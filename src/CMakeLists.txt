@@ -53,7 +53,7 @@ endif(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 
 if(WIN32)
 	set(NO_GTK ON)
-	set(GTK2_LIBRARIES)
+	set(EXTRA_LIBRARIES comctl32)
 	add_definitions(-DWINDOWS -DNO_STDIO_REDIRECT)
 
 	# RC file
@@ -72,11 +72,13 @@ if(WIN32)
 
 	set(EXTRA_FILES
 		${EXTRA_FILES}
+		win32/i_crash.cpp
+		win32/i_main.cpp
 		sdl_winmain.cpp
 	)
 elseif(APPLE)
 	set(NO_GTK ON)
-	set(GTK2_LIBRARIES)
+	set(EXTRA_LIBRARIES)
 else(WIN32)
 	option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
 
@@ -84,13 +86,13 @@ else(WIN32)
 	if( NOT NO_GTK )
 		pkg_check_modules( GTK2 gtk+-2.0 )
 		if( GTK2_FOUND )
-			set( ZDOOM_LIBS ${ZDOOM_LIBS} ${GTK2_LIBRARIES} )
+			set( EXTRA_LIBRARIES ${GTK2_LIBRARIES} )
 			include_directories( ${GTK2_INCLUDE_DIRS} )
 		else( GTK2_FOUND )
 			set( NO_GTK ON )
 		endif( GTK2_FOUND )
 	else( NOT NO_GTK)
-		set(GTK2_LIBRARIES)
+		set(EXTRA_LIBRARIES)
 	endif( NOT NO_GTK )
 endif(WIN32)
 
@@ -244,7 +246,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 )
 
 add_dependencies(ecwolf lzma gdtoa revision_check)
-target_link_libraries(ecwolf ${GTK2_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
+target_link_libraries(ecwolf ${EXTRA_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
 set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
 # Install
