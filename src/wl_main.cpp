@@ -1253,6 +1253,7 @@ bool GtkAvailable;
 #endif
 #ifdef _WIN32
 bool CheckIsRunningFromCommandPrompt();
+void StartupWin32();
 #endif
 int main (int argc, char *argv[])
 {
@@ -1261,6 +1262,7 @@ int main (int argc, char *argv[])
 #endif
 
 #ifdef _WIN32
+	StartupWin32();
 	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
 #endif
 
