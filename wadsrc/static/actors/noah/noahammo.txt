@@ -24,7 +24,7 @@ actor FeedTrough : Feed 177
 	}
 }
 
-actor CoconutAmmo : Ammo 191
+actor CantaloupeAmmo : Ammo 191
 {
 	inventory.pickupsound "misc/ammo_pickup"
 	inventory.amount 14
@@ -34,7 +34,7 @@ actor CoconutAmmo : Ammo 191
 	states
 	{
 		Spawn:
-			CNTS A -1
+			CTLS A -1
 			stop
 	}
 }

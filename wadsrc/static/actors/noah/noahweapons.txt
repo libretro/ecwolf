@@ -93,9 +93,29 @@ actor AutoSlingshot : WolfWeapon 182
 	}
 }
 
+actor Cantaloupe
+{
+	radius 11
+	speed 24
+	damage (random[MissileDamage](1, 16))
+	PROJECTILE
+	states
+	{
+		Spawn:
+			CTLP A 1.5
+			loop
+		Death:
+			// The state table has three identical states with a duration of 6
+			// (3 in DECORATE terms), but the code sets the first state to 1
+			// (0.5 in DECORATE terms).
+			CTLP B 6.5
+			stop
+	}
+}
+
 actor CoconutSlingshot : WolfWeapon 190
 {
-	weapon.ammotype1 "CoconutAmmo"
+	weapon.ammotype1 "CantaloupeAmmo"
 	weapon.ammogive1 20
 	+INVENTORY.ALWAYSPICKUP
 	+WEAPON.NOAUTOFIRE
@@ -109,9 +129,26 @@ actor CoconutSlingshot : WolfWeapon 190
 			loop
 		Fire:
 			CSLG BC 3.5
-			CSLG D 3.5 // A_FireCustomMissile
-			CSLG E 3.5 // A_FireCustomMissile
+			CSLG D 3.5 A_FireCustomMissile("Cantaloupe")
+			CSLG E 3.5 A_FireCustomMissile("Cantaloupe")
 			goto Ready
+	}
+}
+
+actor Watermelon
+{
+	radius 11
+	speed 24
+	damage (random[MissileDamage](0, 3)<<4)
+	PROJECTILE
+	states
+	{
+		Spawn:
+			WMLN A 1.5
+			loop
+		Death:
+			WMLN B 6.5
+			stop
 	}
 }
 
@@ -131,7 +168,7 @@ actor MelonSlingshot : WolfWeapon 192
 			loop
 		Fire:
 			MSLG BCD 3
-			MSLG E 3 //A_FireCustomMissile
+			MSLG E 3 A_FireCustomMissile("Watermelon")
 			goto Ready
 	}
 }
