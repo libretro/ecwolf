@@ -1,0 +1,25 @@
+// TODO: Make these separate key types with separate locks
+
+actor ArkGoldKeyRing : KeyGiver 174
+{
+	dropitem "GoldKey"
+	+INVENTORY.ALWAYSPICKUP
+	states
+	{
+		Spawn:
+			GKYR A -1
+			stop
+	}
+}
+
+actor ArkSilverKeyRing : KeyGiver 175
+{
+	dropitem "SilverKey"
+	+INVENTORY.ALWAYSPICKUP
+	states
+	{
+		Spawn:
+			SKYR A -1
+			stop
+	}
+}

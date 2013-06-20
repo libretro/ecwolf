@@ -1,0 +1,38 @@
+actor SmallBandage : Health 178
+{
+	inventory.amount 10
+	states
+	{
+		Spawn:
+			SMBD A -1
+			stop
+	}
+}
+
+actor LargeBandage : Health 179
+{
+	inventory.amount 25
+	states
+	{
+		Spawn:
+			LGBD A -1
+			stop
+	}
+}
+
+actor ArkOneUp : CustomInventory 187
+{
+	inventory.pickupsound "misc/1up"
+	+COUNTITEM
+	+INVENTORY.ALWAYSPICKUP
+	states
+	{
+		Spawn:
+			EXLF A -1 bright
+			stop
+		Pickup:
+			TNT1 A 0 A_GiveExtraMan
+			TNT1 A 0 A_GiveInventory("OneUpHealth")
+			stop
+	}
+}

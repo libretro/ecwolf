@@ -54,16 +54,6 @@ actor ArkScraps 162
 	}
 }
 
-actor BibleQuiz 163
-{
-	states
-	{
-		Spawn:
-			QUIZ A -1
-			stop
-	}
-}
-
 actor FeedBucket 164
 {
 	radius 32
@@ -178,106 +168,6 @@ actor CandlePole 173
 	}
 }
 
-actor ArkGoldKeyRing 174
-{
-	states
-	{
-		Spawn:
-			GKYR A -1
-			stop
-	}
-}
-
-actor ArkSilverKeyRing 175
-{
-	states
-	{
-		Spawn:
-			SKYR A -1
-			stop
-	}
-}
-
-actor FeedSack 176
-{
-	states
-	{
-		Spawn:
-			SACK A -1
-			stop
-	}
-}
-
-actor SmallBandage 178
-{
-	states
-	{
-		Spawn:
-			SMBD A -1
-			stop
-	}
-}
-
-actor LargeBandage 179
-{
-	states
-	{
-		Spawn:
-			LGBD A -1
-			stop
-	}
-}
-
-actor ArkBanana 183
-{
-	states
-	{
-		Spawn:
-			BNNA A -1
-			stop
-	}
-}
-
-actor ArkApple 184
-{
-	states
-	{
-		Spawn:
-			APPL A -1
-			stop
-	}
-}
-
-actor ArkGrapes 185
-{
-	states
-	{
-		Spawn:
-			GRPE A -1
-			stop
-	}
-}
-
-actor ArkPeach 186
-{
-	states
-	{
-		Spawn:
-			PECH A -1
-			stop
-	}
-}
-
-actor ArkOneUp 187
-{
-	states
-	{
-		Spawn:
-			EXLF A -1 bright
-			stop
-	}
-}
-
 actor ArkMetalCage 188
 {
 	radius 32
@@ -298,16 +188,6 @@ actor PlainColumn 189
 	{
 		Spawn:
 			PCOL A -1
-			stop
-	}
-}
-
-actor ArkMap 194
-{
-	states
-	{
-		Spawn:
-			AMAP A -1
 			stop
 	}
 }

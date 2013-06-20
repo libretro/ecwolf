@@ -45,9 +45,9 @@ graphics
 	"L_GUY3",
 	"FONTL058", "FONTL048", "FONTL049", "FONTL050", "FONTL051", "FONTL052",
 	"FONTL053", "FONTL054", "FONTL055", "FONTL056", "FONTL057", "FONTL037",
-	"FONTL065", "FONTL066", "FONTL067",
-	"FONTL068", "FONTL069", "FONTL070", "FONTL071", "FONTL072", "FONTL073",
-	"FONTL074", "FONTL075", "FONTL076", "FONTL077",
+	"FONTL045", "FONTL033", "FONTL039",
+	"FONTY048", "FONTY049", "FONTY050", "FONTY051", "FONTY052", "FONTY053",
+	"FONTY054", "FONTY055", "FONTY056", "FONTY057",
 	"BONUS", "PERFECT", "RATING", "LEVEL", "FLOOR", "FINISHED", "ANIMALS",
 	"FRUIT", "SECRETS", "TIME", "PAR", "SECRET",
 	"STBAR",
@@ -440,95 +440,50 @@ digitalsounds
 
 music
 {
-	"CORNER",
-	"DUNGEON",
-	"WARMARCH",
-	"GETTHEM",
-	"HEADACHE",
-	"HITLWLTZ",
-	"INTROCW3",
-	"NAZI_NOR",
-	"NAZI_OMI",
-	"POW",
-	"SALUTE",
-	"SEARCHN",
-	"SUSPENSE",
-	"VICTORS",
-	"WONDERIN",
-	"FUNKYOU",
-	"ENDLEVEL",
-	"GOINGAFT",
-	"PREGNANT",
-	"ULTIMATE",
-	"NAZI_RAP",
-	"ZEROHOUR",
-	"TWELFTH",
-	"ROSTER",
-	"URAHERO",
-	"VICMARCH",
-	"PACMAN"
+	"SONG1",
+	"ALLGOOD",
+	"SONG3",
+	"SONG4",
+	"FEEDTIME",
+	"SONG6",
+	"SONG7",
+	"SONG8",
+	"SONG9",
+	"HAPPYSNG",
+	"SONG11"
 }
 
 textures
 {
-	"GSTONEA1",	// Gray Stone 1 N/S
-	"GSTONEA2",	// Gray Stone 1 E/W
-	"GSTONEB1",	// Gray Stone 2 N/S
-	"GSTONEB2",	// Gray Stone 2 E/W
-	"GSTFLAG1",	// Gray Stone Flag N/S
-	"GSTFLAG2",	// Gray Stone Flag E/W
-	"GSTHTLR1",	// Gray Stone Hitler N/S
-	"GSTHTLR2",	// Gray Stone Hitler E/W
-	"BSTCELA1",	// Blue Stone Empty Cell N/S
-	"BSTCELA2",	// Blue Stone Empty Cell E/W
-	"GSTEAGL1",	// Gray Stone Eagle N/S
-	"GSTEAGL2",	// Gray Stone Eagle E/W
-	"BSTCELB1",	// Blue Stone Cell w/ Skeleton N/S
-	"BSTCELB2",	// Blue Stone Cell w/ Skeleton E/W
-	"BSTONEA1",	// Blue Stone 1 N/S
-	"BSTONEA2",	// Blue Stone 1 E/W
-	"BSTONEB1",	// Blue Stone 2 N/S
-	"BSTONEB2",	// Blue Stone 2 E/W
-	"WODEAGL1",	// Wood Eagle N/S
-	"WODEAGL2",	// Wood Eagle E/W
-	"WODHTLR1",	// Wood Hitler N/S
-	"WODHTLR2",	// Wood Hitler E/W
-	"WOOD1",		// Wood N/S
-	"WOOD2",		// Wood E/W
-	"FAKEDOR1",	// Entrance to level N/S
-	"FAKEDOR2",	// Entrance to level E/W
-	"METLSGN1",	// Steel Panel Sign N/S
-	"METLSGN2",	// Steel Panel Sign E/W
-	"METAL1",	 // Steel Panel Sign N/S
-	"METAL2",	 // Steel Panel Sign E/W
-	"SKY1",		 // Sky N/S
-	"SKY2",		 // Sky E/W
-	"BRICK1",	 // Red Brick N/S
-	"BRICK2",	 // Red Brick E/W
-	"BRIKWRT1",	// Red Brick Wreath N/S
-	"BRIKWRT2",	// Red Brick Wreath E/W
-	"PURPLE1",	// Purple Wall N/S
-	"PURPLE2",	// Purple Wall E/W
-	"BRIKEGL1",	// Red Brick Eagle N/S
-	"BRIKEGL2",	// Red Brick Eagle E/W
-	"ELEV1_1",	// Elevator 1 N/S
-	"ELEV1_2",	// Elevator 1 E/W
-	"ELEV2_1",	// Elevator 2 N/S
-	"ELEV2_2",	// Elevator 2 E/W
-	"WODCROS1",	// Wood Cross N/S
-	"WODCROS2",	// Wood Cross E/W
-	"GSTSLME1",	// Gray Stone Slime N/S
-	"GSTSLME2",	// Gray Stone Slime E/W
-	"PURPBLD1",	// Purple Blood 1
-	"PURPBLD2",	// Purple Blood 2
-	"GSTLSLM1",	// Gray Stone Slime 2 N/S
-	"GSTLSLM2",	// Gray Stone Slime 2 E/W
-	"GSTONEC1",	// Gray Stone 3 N/S
-	"GSTONEC2",	// Gray Stone 3 E/W
-	"GSTSIGN1",	// Gray Stone Sign N/S
-	"GSTSIGN2",	// Gray Stone Sign E/W
-	"CHIP1",		// Chipped Rock N/S
-	"CHIP2",		// Chipped Rock E/W
+	"ARKWODA1", "ARKWODA2",	// Wood
+	"ARKWODB1",	"ARKWODB2",	// Wood (Mossy)
+	"ARKCURT1",	"ARKCURT2",	// Wood with Yellow Curtain
+	"ARKMELV1",	"ARKMELV2",	// Wood with Melvin
+	"LOGWALL1",	"LOGWALL2",	// Logs
+	"LOGNOAH1",	"LOGNOAH2",	// Logs with Noah Picture
+	"LOGCURT1",	"LOGCURT2",	// Logs with Red Curtain
+	"LOGDUCK1",	"LOGDUCK2",	// Logs with Sleeping Duck Picture
+	"KNLWODA1", "KNLWODA2",	// Gray Kennel with Brown Wood
+	"KNLBWOD1",	"KNLBWOD2",	// Broken wooden kennel
+	"KNLWODB1",	"KNLWODB2",	// Gray Kennel
+	"KNLBMET1",	"KNLBMET2",	// Broken metal kennel
+	"CABPANL1",	"CABPANL2", // Wooden panel
+	"CABLARG1",	"CABLARG2",	// Wooden cabinet (large)
+	"STAIRWY1",	"STAIRWY2",	// Staircase
+	"FLOOD1",	"FLOOD2",	// View of the food (day/night)
+	"WODPANL1",	"WODPANL2",	// (Entry) wood panel
+	"WODNAMH1",	"WODNAMH2",	// Wood panel with Naamah picture
+	"ABRICK1",	"ABRICK2",	// Brick wall
+	"ABRKNH1",	"ABRKNH2",	// Brick wall with Naoh sign
+	"GRYWOOD1",	"GRYWOOD2",	// Gray wood
+	"GRYCURT1",	"GRYCURT2",	// Gray wood with Blue Curtain
+	"LGTPANL1",	"LGTPANL2",	// Light wooden panel
+	"LGTCHLK1",	"LGTCHLK2",	// Light wooden panel with Chalk board
+	"YELWALL1",	"YELWALL2",	// Yellow wall
+	"CABFOOD1",	"CABFOOD2",	// Wooden cabinet with fruit
+	"REDWALL1",	"REDWALL2",	// Red wall
+	"CABSMAL1",	"CABSMAL2",	// Smaller wooden cabinets
+	"PURWALL1",	"PURWALL2",	// Purple wall
 	"DOOR1",	// Door
 	"DOOR2",	// Gold key door
 	"DOOR3",	// Silver key door
