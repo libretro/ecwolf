@@ -49,6 +49,7 @@ struct FResourceLump
 	virtual FileReader *NewReader();
 	virtual int GetFileOffset() { return -1; }
 	virtual int GetIndexNum() const { return 0; }
+	virtual void DoFinishRemap() {} // For handling any changes that may happen after the WL6 remapper takes action
 	void LumpNameSetup(const char *iname);
 	void CheckEmbedded();
 

@@ -57,6 +57,7 @@ class LumpRemapper
 		static void	AddFile(const char* extension, FResourceFile *file, Type type);
 		static void ClearRemaps();
 		static void	LoadMap(const char* extension, const char* name, const char* data, unsigned int length);
+		static unsigned int LumpSampleRate(FResourceFile *Owner);
 		static bool	IsPSprite(int lumpnum);
 		static void	RemapAll();
 	protected:
@@ -70,6 +71,7 @@ class LumpRemapper
 			Type			type;
 		};
 
+		unsigned int		digiTimerValue;
 		bool				loaded;
 		FString				mapLumpName;
 		TArray<FString>		graphics, sprites, sounds, digitalsounds, music, textures;

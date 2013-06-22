@@ -388,7 +388,7 @@ sounds
 	"ALBAREXP"
 }
 
-digitalsounds
+digitalsounds(timervalue = 166)
 {
 	"DSGRDSIT",
 	"DSDOGSIT",

@@ -45,7 +45,6 @@
 struct FVSwapSound : public FResourceLump
 {
 	protected:
-		static const unsigned int ORIGSAMPLERATE = 7042;
 		static const char WAV_HEADER[44];
 
 		struct Chunk
@@ -58,9 +57,10 @@ struct FVSwapSound : public FResourceLump
 		Chunk *chunks;
 		unsigned short numChunks;
 		unsigned int numOrigSamples;
+		unsigned int origSampleRate;
 
 	public:
-		FVSwapSound(int maxNumChunks) : FResourceLump(), numChunks(0)
+		FVSwapSound(int maxNumChunks) : FResourceLump(), numChunks(0), origSampleRate(0)
 		{
 			if(maxNumChunks < 0)
 				maxNumChunks = 0;
@@ -81,8 +81,13 @@ struct FVSwapSound : public FResourceLump
 		}
 
 		// Since SDL_mixer sucks, we need to resample our sounds at load time.
+		// Unfortunately it's difficult to tell just how big the sound is until
+		// we finish remapping.
 		void CalculateLumpSize()
 		{
+			// Get the sample rate.
+			origSampleRate = LumpRemapper::LumpSampleRate(Owner);
+
 			LumpSize = sizeof(WAV_HEADER);
 			numOrigSamples = 0;
 			for(unsigned int i = 0;i < numChunks;i++)
@@ -91,7 +96,13 @@ struct FVSwapSound : public FResourceLump
 			if(numOrigSamples == 0)
 				LumpSize = 0;
 			else
-				LumpSize += static_cast<int>(double(numOrigSamples*2*param_samplerate)/ORIGSAMPLERATE);
+				LumpSize += static_cast<int>(double(numOrigSamples*2*param_samplerate)/origSampleRate);
+		}
+
+		void DoFinishRemap()
+		{
+			// Sample rate may have changed, recalculate size
+			CalculateLumpSize();
 		}
 
 		int FillCache()
@@ -121,7 +132,7 @@ struct FVSwapSound : public FResourceLump
 			}
 
 			// Do resampling to param_samplerate 16-bit with linear interpolation
-			static const fixed sampleStep = static_cast<fixed>(((double)ORIGSAMPLERATE / param_samplerate)*FRACUNIT);
+			static const fixed sampleStep = static_cast<fixed>(((double)origSampleRate / param_samplerate)*FRACUNIT);
 			SWORD* data = (SWORD*)(Cache+sizeof(WAV_HEADER));
 			i = 0;
 			for(fixed sample = 0;i++ < samples;sample += sampleStep)
