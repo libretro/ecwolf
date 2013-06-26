@@ -27,6 +27,9 @@ actor ArkSheep : WolfensteinMonster 195
 	speed 1, 3
 	sighttime 1, 4
 	dropitem "Feed", 256, 5
+	attacksound "sheep/attack"
+	deathsound "sheep/death"
+	seesound "sheep/sight"
 	states
 	{
 		Spawn:
@@ -73,6 +76,9 @@ actor ArkOstrich : WolfensteinMonster 196
 	speed 1, 5
 	sighttime 2
 	dropitem "Feed", 256, 5
+	attacksound "ostrich/attack"
+	deathsound "ostrich/death"
+	seesound "ostrich/sight"
 	states
 	{
 		Spawn:
@@ -120,6 +126,9 @@ actor ArkAntelope : WolfensteinMonster 197
 	speed 1, 4
 	sighttime 1, 6
 	dropitem "Feed", 256, 5
+	attacksound "antelope/attack"
+	deathsound "antelope/death"
+	seesound "antelope/sight"
 	states
 	{
 		Spawn:
@@ -171,6 +180,9 @@ actor ArkGoat : WolfensteinMonster 198
 	health 1
 	speed 2.93, 5.859
 	sighttime 1, 8
+	attacksound "goat/attack"
+	deathsound "goat/death"
+	seesound "goat/sight"
 	-CANUSEWALLS
 	states
 	{
@@ -215,6 +227,9 @@ actor ArkOx : WolfensteinMonster 199
 	speed 1, 3
 	sighttime 1, 6
 	dropitem "Feed", 256, 5
+	attacksound "oxen/attack"
+	deathsound "oxen/death"
+	seesound "oxen/sight"
 	states
 	{
 		Spawn:
@@ -262,6 +277,9 @@ actor CarlTheCamel : WolfensteinMonster 200
 	speed 1, 3
 	sighttime 1
 	dropitem "ArkGoldKeyRing"
+	attacksound "carl/attack"
+	deathsound "carl/death"
+	seesound "carl/sight"
 	states
 	{
 		Spawn:
@@ -294,6 +312,8 @@ actor Coconut
 	radius 11
 	speed 16
 	damage (random[MissileDamage](30, 61))
+	seesound "coconut/fire"
+	deathsound "coconut/hit"
 	PROJECTILE
 	states
 	{
@@ -317,6 +337,8 @@ actor MelvinTheMonkey : WolfensteinMonster 201
 	speed 1, 3
 	sighttime 1
 	dropitem "ArkGoldKeyRing"
+	deathsound "melvin/death"
+	seesound "melvin/sight"
 	states
 	{
 		Spawn:
@@ -352,6 +374,9 @@ actor GinnyTheGiraffe : WolfensteinMonster 202
 	speed 1, 3
 	sighttime 1
 	dropitem "ArkGoldKeyRing"
+	attacksound "ginny/attack"
+	deathsound "ginny/death"
+	seesound "ginny/sight"
 	states
 	{
 		Spawn:
@@ -386,6 +411,8 @@ actor KerryTheKangaroo : WolfensteinMonster 203
 	speed 1, 3
 	sighttime 1
 	dropitem "ArkGoldKeyRing"
+	deathsound "kerry/death"
+	seesound "kerry/sight"
 	states
 	{
 		Spawn:
@@ -421,6 +448,9 @@ actor ErnieTheElephant : WolfensteinMonster 204
 	speed 1, 3
 	sighttime 1
 	dropitem "ArkGoldKeyRing"
+	attacksound "ernie/attack"
+	deathsound "ernie/death"
+	seesound "ernie/sight"
 	states
 	{
 		Spawn:
@@ -458,6 +488,9 @@ actor DisguisedBurt : WolfensteinMonster 205
 	health 500
 	speed 1, 3
 	sighttime 1
+	attacksound "burt/attack"
+	deathsound "burt/death"
+	seesound "burt/sight"
 	states
 	{
 		Spawn:
@@ -493,6 +526,8 @@ actor BurtTheBear : WolfensteinMonster
 	health 500, 700, 800, 900
 	speed 1, 5
 	sighttime 1
+	attacksound "burt/attack"
+	deathsound "burt/death"
 	states
 	{
 		Spawn:

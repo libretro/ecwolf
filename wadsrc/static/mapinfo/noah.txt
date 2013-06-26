@@ -58,7 +58,7 @@ map "MAP01"
 	secretnext = "MAP02"
 	floornumber = 1
 	par = 30
-	music = "GETTHEM"
+	music = "SONG1"
 	cluster = 1
 }
 
@@ -68,7 +68,7 @@ map "MAP02"
 	secretnext = "MAP03"
 	floornumber = 2
 	par = 60
-	music = "SEARCHN"
+	music = "ALLGOOD"
 	cluster = 1
 }
 
@@ -78,7 +78,7 @@ map "MAP03"
 	secretnext = "MAP04"
 	floornumber = 3
 	par = 60
-	music = "POW"
+	music = "SONG7"
 	cluster = 1
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
@@ -105,7 +105,7 @@ map "MAP04"
 	secretnext = "MAP05"
 	floornumber = 4
 	par = 120
-	music = "SUSPENSE"
+	music = "SONG3"
 	cluster = 2
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -117,7 +117,7 @@ map "MAP05"
 	secretnext = "MAP06"
 	floornumber = 5
 	par = 105
-	music = "GETTHEM"
+	music = "SONG1"
 	cluster = 2
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -129,7 +129,7 @@ map "MAP06"
 	secretnext = "MAP07"
 	floornumber = 6
 	par = 90
-	music = "SEARCHN"
+	music = "ALLGOOD"
 	cluster = 2
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -141,7 +141,7 @@ map "MAP07"
 	secretnext = "MAP08"
 	floornumber = 7
 	par = 105
-	music = "POW"
+	music = "SONG7"
 	cluster = 2
 }
 
@@ -166,7 +166,7 @@ map "MAP08"
 	secretnext = "MAP12"
 	floornumber = 8
 	par = 105
-	music = "SUSPENSE"
+	music = "SONG4"
 	cluster = 3
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
@@ -177,7 +177,7 @@ map "MAP09"
 	next = "MAP10"
 	secretnext = "MAP10"
 	floornumber = 9
-	music = "WARMARCH"
+	music = "SONG3"
 	cluster = 3
 	par = 120
 	defaultfloor = "FLOOR3"
@@ -189,7 +189,7 @@ map "MAP10"
 	next = "MAP11"
 	secretnext = "MAP11"
 	floornumber = 10
-	music = "CORNER"
+	music = "SONG1"
 	cluster = 3
 	par = 135
 	defaultfloor = "FLOOR3"
@@ -202,7 +202,7 @@ map "MAP11"
 	secretnext = "MAP13"
 	floornumber = 1
 	par = 60
-	music = "NAZI_OMI"
+	music = "SONG7"
 	cluster = 3
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -214,7 +214,7 @@ map "MAP12"
 	secretnext = "MAP09"
 	floornumber = 2
 	par = 120
-	music = "PREGNANT"
+	music = "SONG9"
 	cluster = 3
 	defaultfloor = "FLOOR4"
 	defaultceiling = "CEILING4"
@@ -241,7 +241,7 @@ map "MAP13"
 	secretnext = "MAP14"
 	floornumber = 3
 	par = 210
-	music = "GOINGAFT"
+	music = "SONG6"
 	cluster = 4
 }
 
@@ -251,7 +251,7 @@ map "MAP14"
 	secretnext = "MAP15"
 	floornumber = 4
 	par = 150
-	music = "HEADACHE"
+	music = "SONG4"
 	cluster = 4
 }
 
@@ -261,7 +261,7 @@ map "MAP15"
 	secretnext = "MAP16"
 	floornumber = 5
 	par = 240
-	music = "NAZI_OMI"
+	music = "ALLGOOD"
 	cluster = 4
 }
 
@@ -271,7 +271,7 @@ map "MAP16"
 	secretnext = "MAP17"
 	floornumber = 6
 	par = 135
-	music = "PREGNANT"
+	music = "SONG3"
 	cluster = 4
 }
 
@@ -281,7 +281,7 @@ map "MAP17"
 	secretnext = "MAP18"
 	floornumber = 7
 	par = 210
-	music = "HEADACHE"
+	music = "SONG7"
 	cluster = 4
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
@@ -308,7 +308,7 @@ map "MAP18"
 	secretnext = "MAP19"
 	floornumber = 8
 	par = 150
-	music = "GOINGAFT"
+	music = "SONG8"
 	cluster = 5
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -319,7 +319,7 @@ map "MAP19"
 	next = "MAP20"
 	secretnext = "MAP20"
 	floornumber = 9
-	music = "WARMARCH"
+	music = "SONG1"
 	cluster = 165
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -330,7 +330,7 @@ map "MAP20"
 	next = "MAP21"
 	secretnext = "MAP21"
 	floornumber = 10
-	music = "DUNGEON"
+	music = "SONG6"
 	cluster = 5
 	par = 180
 	defaultfloor = "FLOOR2"
@@ -343,7 +343,7 @@ map "MAP21"
 	secretnext = "MAP22"
 	floornumber = 1
 	par = 210
-	music = "INTROCW3"
+	music = "SONG4"
 	cluster = 5
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -355,7 +355,7 @@ map "MAP22"
 	secretnext = "MAP33"
 	floornumber = 2
 	par = 180
-	music = "NAZI_RAP"
+	music = "HAPPYSNG"
 	cluster = 5
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
@@ -367,7 +367,7 @@ map "MAP23"
 	secretnext = "MAP24"
 	floornumber = 3
 	par = 180
-	music = "TWELFTH"
+	music = "SONG7"
 	cluster = 5
 }
 
@@ -392,7 +392,7 @@ map "MAP24"
 	secretnext = "MAP25"
 	floornumber = 4
 	par = 105
-	music = "ZEROHOUR"
+	music = "SONG11"
 	cluster = 6
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
@@ -404,7 +404,7 @@ map "MAP25"
 	secretnext = "MAP26"
 	floornumber = 5
 	par = 180
-	music = "INTROCW3"
+	music = "ALLGOOD"
 	cluster = 6
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
@@ -416,7 +416,7 @@ map "MAP26"
 	secretnext = "MAP30"
 	floornumber = 6
 	par = 180
-	music = "NAZI_RAP"
+	music = "SONG3"
 	cluster = 6
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
@@ -428,7 +428,7 @@ map "MAP27"
 	secretnext = "MAP38"
 	floornumber = 7
 	par = 90
-	music = "TWELFTH"
+	music = "SONG8"
 	cluster = 6
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
@@ -440,7 +440,7 @@ map "MAP28"
 	secretnext = "MAP29"
 	floornumber = 8
 	par = 150
-	music = "ZEROHOUR"
+	music = "SONG6"
 	cluster = 6
 	par = 90
 	defaultfloor = "FLOOR3"
@@ -452,7 +452,7 @@ map "MAP29"
 	next = "MAP31"
 	secretnext = "MAP31"
 	floornumber = 9
-	music = "ULTIMATE"
+	music = "SONG7"
 	cluster = 6
 	par = 191
 	defaultfloor = "FLOOR2"
@@ -464,7 +464,7 @@ map "MAP30"
 	next = "MAP27"
 	secretnext = "MAP27"
 	floornumber = 10
-	music = "PACMAN"
+	music = "SONG9"
 	cluster = 6
 	par = 120
 	defaultfloor = "FLOOR4"
@@ -481,7 +481,7 @@ map "MAP31"
 	next = "MAP31"
 	secretnext = "MAP31"
 	floornumber = 1
-	music = "GETTHEM"
+	music = "ALLGOOD"
 	cluster = 7
 	defaultfloor = "FLOOR4"
 	defaultceiling = "CEILING4"

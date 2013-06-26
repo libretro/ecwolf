@@ -8,6 +8,6 @@ actor NoahPlayer : BJPlayer
 	player.weaponslot 2, "Slingshot"
 	player.weaponslot 3, "SuperSlingshot"
 	player.weaponslot 4, "AutoSlingshot"
-	player.weaponslot 5, "CoconutSlingshot"
+	player.weaponslot 5, "CantaloupeSlingshot"
 	player.weaponslot 6, "MelonSlingshot"
 }

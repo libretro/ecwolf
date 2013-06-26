@@ -25,7 +25,7 @@ actor Slingshot : WolfWeapon
 {
 	weapon.ammotype1 "Feed"
 	weapon.selectionorder 1900
-	attacksound "weapon/pistol/attack"
+	attacksound "weapon/sling/attack"
 	states
 	{
 		Ready:
@@ -42,8 +42,7 @@ actor Slingshot : WolfWeapon
 
 actor SuperSlingshot : WolfWeapon 181
 {
-	attacksound "weapon/machine/attack"
-	inventory.pickupsound "weapon/machine/pickup"
+	attacksound "weapon/supersling/attack"
 	weapon.ammotype1 "Feed"
 	weapon.selectionorder 1300
 	+INVENTORY.ALWAYSPICKUP
@@ -67,8 +66,7 @@ actor SuperSlingshot : WolfWeapon 181
 
 actor AutoSlingshot : WolfWeapon 182
 {
-	attacksound "weapon/gatling/attack"
-	inventory.pickupsound "weapon/gatling/pickup"
+	attacksound "weapon/autosling/attack"
 	weapon.ammotype1 "Feed"
 	weapon.selectionorder 700
 	-WEAPON.NOGRIN
@@ -98,6 +96,8 @@ actor Cantaloupe
 	radius 11
 	speed 24
 	damage (random[MissileDamage](1, 16))
+	seesound "cantaloupe/fire"
+	deathsound "cantaloupe/hit"
 	PROJECTILE
 	states
 	{
@@ -113,7 +113,7 @@ actor Cantaloupe
 	}
 }
 
-actor CoconutSlingshot : WolfWeapon 190
+actor CantaloupeSlingshot : WolfWeapon 190
 {
 	weapon.ammotype1 "CantaloupeAmmo"
 	weapon.ammogive1 20
@@ -140,6 +140,8 @@ actor Watermelon
 	radius 11
 	speed 24
 	damage (random[MissileDamage](0, 3)<<4)
+	seesound "watermelon/fire"
+	deathsound "watermelon/hit"
 	PROJECTILE
 	states
 	{

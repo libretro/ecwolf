@@ -80,6 +80,7 @@ actor Inventory native
 	inventory.amount 1
 	inventory.maxamount 1
 	inventory.interhubamount 1
+	inventory.pickupsound "misc/i_pkup"
 }
 
 actor Ammo : Inventory native

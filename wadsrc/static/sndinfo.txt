@@ -20,7 +20,7 @@ misc/health_pickup		{ NULL ALFOODUP PCFOODUP }
 misc/medkit_pickup		{ NULL ALMEDIUP PCMEDIUP }
 misc/k_pkup				{ NULL ALGETKEY PCGETKEY }
 misc/end_bonus1			{ NULL ALENDBN1 PCENDBN1 }
-misc/end_bonus2			{ NULL ALENDBN2 PCENDBN2 }
+misc/end_bonus2			{ DSENDBN2 ALENDBN2 PCENDBN2 }
 misc/no_bonus			{ NULL ALNOBNS PCNOBNS }
 misc/100percent			{ NULL ALPRC100 PCPRC100 }
 misc/slurpie			{ DSSLURPE ALSLURPE PCSLURPE }
@@ -215,3 +215,63 @@ ghost/death				{ NULL ALGHTDTH PCGHTDTH }
 
 treasure/spear/pickup	{ DSSPEAR ALSPEAR PCSPEAR }
 treasure/spear2/pickup	{ DSSPEAR2 ALSPEAR PCSPEAR }
+
+
+// ------ Super 3D Noah's Ark ------
+
+misc/i_pkup				{ DSITEMUP ALITEMUP PCITEMUP }
+
+weapon/sling/attack			{ DSSLING ALSLING PCSLING }
+weapon/supersling/attack	{ DSSSLING ALSSLING PCSSLING }
+weapon/autosling/attack		{ DSASLING ALASLING PCASLING }
+
+cantaloupe/fire			{ DSTHROW ALTHROW PCTHROW }
+cantaloupe/hit			{ DSSPLAT ALSPLAT PCSPLAT }
+watermelon/fire			{ DSMELON ALMELON PCMELON }
+watermelon/hit			{ DSSPLAT ALSPLAT PCSPLAT }
+
+sheep/sight				{ DSSHPSIT ALSHPSIT PCSHPSIT }
+sheep/attack			{ DSSPIT ALSPIT PCSPIT }
+sheep/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+ostrich/sight			{ DSOSTSIT ALOSTSIT PCOSTSIT }
+ostrich/attack			{ DSSPIT ALSPIT PCSPIT }
+ostrich/death			{ DSSLEEP ALSLEEP PCSLEEP }
+
+antelope/sight			{ DSATLSIT ALATLSIT PCATLSIT }
+antelope/attack			{ DSSPIT ALSPIT PCSPIT }
+antelope/death			{ DSSLEEP ALSLEEP PCSLEEP }
+
+goat/sight				{ DSGOTSIT ALGOTSIT PCGOTSIT }
+goat/attack				{ DSGOTATK ALGOTATK PCGOTATK }
+goat/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+oxen/sight				{ DSOXNSIT ALOXNSIT PCOXNSIT }
+oxen/attack				{ DSSPIT ALSPIT PCSPIT }
+oxen/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+carl/sight				{ DSCRLSIT ALCRLSIT PCCRLSIT }
+carl/attack				{ DSSPIT ALSPIT PCSPIT }
+carl/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+coconut/fire			{ DSTHROW ALTHROW PCTHROW }
+coconut/hit				{ DSSPLAT ALSPLAT PCSPLAT }
+
+melvin/sight			{ DSMLVSIT ALMLVSIT PCMLVSIT }
+melvin/death			{ DSSLEEP ALSLEEP PCSLEEP }
+
+ginny/sight				{ DSGNYSIT ALGNYSIT PCGNYSIT }
+ginny/attack			{ DSSPIT ALSPIT PCSPIT }
+ginny/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+kerry/sight				{ DSKRYSIT ALKRYSIT PCKRYSIT }
+kerry/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+ernie/sight				{ DSERNSIT ALERNSIT PCERNSIT }
+ernie/attack			{ DSSPIT ALSPIT PCSPIT }
+ernie/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+burt/sight				{ DSBRTSIT ALBRTSIT PCBRTSIT }
+burt/active				{ DSBRTSTP ALBRTSTP PCBRTSTP }
+burt/attack				{ DSSPIT ALSPIT PCSPIT }
+burt/death				{ DSSLEEP ALSLEEP PCSLEEP }
