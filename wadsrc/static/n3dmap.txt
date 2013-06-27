@@ -219,7 +219,7 @@ sounds
 	"PCSPLAT",
 	"PCTHROW",
 	"PCGOTATK",
-	"PCSND08",
+	"PCGULP", // Unused gulping sound, probably was for the bread static
 	"PCSLEEP",
 	"PCERNSIT",
 	"PCBNS1UP",
@@ -243,18 +243,18 @@ sounds
 	"PCSHPSIT",
 	"PCSSLING",
 	"PCSPIT",
-	"PCSND32",
+	"PCMSPLAT",
 	"PCMELON",
 	"PCNOWAY",
 	"PCESCPRS",
 	"PCMVGUN1",
 	"PCMVGUN2",
-	"PCSND38",
+	"PCHITWAL", // Only called from EnterCtrlData, not ClipMove
 	"PCSELECT",
-	"PCSND40",
+	"PCSHTDOR", // Called from EnterCtrlData as in Wolf3D
 	"ALENDBN1", // Also Quiz correct
-	"PCSND42",
-	"PCSND43",
+	"PCBELL", // Three rings of a bell (Unused)
+	"PCPOWER", // Generic powerup noise (Unused)
 
 	"ALATLSIT",
 	"ALBRTSIT",
@@ -264,7 +264,7 @@ sounds
 	"ALSPLAT",
 	"ALTHROW",
 	"ALGOTATK",
-	"ALSND08",
+	"ALGULP",
 	"ALSLEEP",
 	"ALERNSIT",
 	"ALBNS1UP",
@@ -288,18 +288,18 @@ sounds
 	"ALSHPSIT",
 	"ALSSLING",
 	"ALSPIT",
-	"ALSND32",
+	"ALMSPLAT",
 	"ALMELON",
 	"ALNOWAY",
 	"ALESCPRS",
 	"ALMVGUN1",
 	"ALMVGUN2",
-	"ALSND38",
+	"ALHITWAL",
 	"ALSELECT",
-	"ALSND40",
+	"ALSHTDOR",
 	"ALENDBN1",
-	"ALSND42",
-	"ALSND43"
+	"ALBELL",
+	"ALPOWER"
 }
 
 digitalsounds(timervalue = 166)
@@ -312,7 +312,7 @@ digitalsounds(timervalue = 166)
 	"DSSPLAT",
 	"DSTHROW",
 	"DSGOTATK",
-	"DSSND08",
+	"DSGULP",
 	"DSSLEEP",
 	"DSERNSIT",
 	"DSBNS1UP",
@@ -336,7 +336,7 @@ digitalsounds(timervalue = 166)
 	"DSSHPSIT",
 	"DSSSLING",
 	"DSSPIT",
-	"DSSND32",
+	"DSMSPLAT",
 	"DSMELON"
 }
 

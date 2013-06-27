@@ -228,7 +228,7 @@ weapon/autosling/attack		{ DSASLING ALASLING PCASLING }
 cantaloupe/fire			{ DSTHROW ALTHROW PCTHROW }
 cantaloupe/hit			{ DSSPLAT ALSPLAT PCSPLAT }
 watermelon/fire			{ DSMELON ALMELON PCMELON }
-watermelon/hit			{ DSSPLAT ALSPLAT PCSPLAT }
+watermelon/hit			{ DSMSPLAT ALMSPLAT PCMSPLAT }
 
 sheep/sight				{ DSSHPSIT ALSHPSIT PCSHPSIT }
 sheep/attack			{ DSSPIT ALSPIT PCSPIT }
