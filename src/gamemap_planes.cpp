@@ -120,8 +120,16 @@ public:
 		thingTable.Clear();
 	}
 
-	void LoadXlat(int lump, const GameInfo::FStringStack *baseStack, bool included=false)
+	void LoadXlat(const FString &baseLumpName, const GameInfo::FStringStack *baseStack, bool included=false)
 	{
+		int lump = Wads.CheckNumForFullName(baseLumpName, true);
+		if(lump == -1)
+		{
+			FString error;
+			error.Format("Could not open map translator '%s'.", baseLumpName.GetChars());
+			throw CRecoverableError(error);
+		}
+
 		if(!included)
 		{
 			if(this->lump == lump)
@@ -161,10 +169,7 @@ public:
 					baseStackNext = baseStack->Next();
 				}
 
-				int includeLump = Wads.GetNumForFullName(lumpName);
-				if(includeLump == -1)
-					sc.ScriptMessage(Scanner::ERROR, "Could not open '%s'.", sc->str.GetChars());
-				LoadXlat(includeLump, baseStackNext);
+				LoadXlat(lumpName, baseStackNext, true);
 			}
 			else if(sc->str.CompareNoCase("enable") == 0 || sc->str.CompareNoCase("disable") == 0)
 			{
@@ -529,9 +534,9 @@ void GameMap::ReadPlanesData()
 	enum OldPlanes { Plane_Tiles, Plane_Object, Plane_Flats, NUM_USABLE_PLANES };
 
 	if(levelInfo->Translator.IsEmpty())
-		xlat.LoadXlat(Wads.GetNumForFullName(gameinfo.Translator.str), gameinfo.Translator.Next());
+		xlat.LoadXlat(gameinfo.Translator.str, gameinfo.Translator.Next());
 	else
-		xlat.LoadXlat(Wads.GetNumForFullName(levelInfo->Translator), &gameinfo.Translator);
+		xlat.LoadXlat(levelInfo->Translator, &gameinfo.Translator);
 
 	Xlat::EFeatureFlags FeatureFlags = xlat.GetFeatureFlags();
 
