@@ -1477,7 +1477,7 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 				sc.ScriptMessage(Scanner::ERROR, "Expected 'include' got '%s' instead.", sc->str.GetChars());
 			sc.MustGetToken(TK_StringConst);
 
-			int lmp = Wads.CheckNumForFullName(sc->str);
+			int lmp = Wads.CheckNumForFullName(sc->str, true);
 			if(lmp == -1)
 				sc.ScriptMessage(Scanner::ERROR, "Could not find lump \"%s\".", sc->str.GetChars());
 			ParseDecorateLump(lmp);
