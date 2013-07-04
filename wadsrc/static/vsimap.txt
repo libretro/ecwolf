@@ -1,0 +1,713 @@
+/* VSI Map
+ * Gives names to VSI data.
+ */
+
+graphics
+{
+	"SMALLFNT",
+	"BIGFONT",
+	"FONT3",
+	"FONT4",
+	"FONT5",
+
+	"TELETOP", "TELEBOT",
+	"TELEON01",	"TELEON02",	"TELEON03",	"TELEON04",	"TELEON05",
+	"TELEON06",	"TELEON07",	"TELEON08",	"TELEON09",	"TELEON10",
+	"TELEON11",	"TELEON12",	"TELEON13",	"TELEON14",	"TELEON15",
+	"TELEON16",	"TELEON17",	"TELEON18",	"TELEON19",	"TELEON20",
+	"TELEUPON",	"TELEDNON",	"TELEUPOF",	"TELEDNOF",
+	"TELEOF01",	"TELEOF02",	"TELEOF03",	"TELEOF04",	"TELEOF05",
+	"TELEOF06",	"TELEOF07",	"TELEOF08",	"TELEOF09",	"TELEOF10",
+	"TELEOF11",	"TELEOF12",	"TELEOF13",	"TELEOF14",	"TELEOF15",
+	"TELEOF16",	"TELEOF17",	"TELEOF18",	"TELEOF19",	"TELEOF20",
+
+	"BACKDROP",
+	"APOGEE",
+	"PC13",
+	"LOSEPIC",
+	"STATSPIC",
+	"AUTOMP1X", "AUTOMP2X", "AUTOMP4X",
+
+	"H_KALT", "H_KCTRL", "H_KSPACE", "H_KPAUSE", "H_KESC", "H_KLTARW",
+	"H_KUPARW", "H_KDNARW",	"H_KRTARW", "H_KENTER", "H_KQ", "H_KW", "H_KE",
+	"H_KI", "H_KH", "H_K1", "H_K2", "H_K3", "H_K4", "H_K5", "H_KF1", "H_KF2",
+	"H_KF3", "H_KF4", "H_KF5", "H_KF6", "H_KF7", "H_KF8", "H_KF9", "H_KF10",
+	"H_KTAB", "H_KC", "H_KF", "H_KP", "H_KL", "H_KSHIFT", "H_K6", "H_KTILDE",
+	"H_KPLUS", "H_KMINUS",
+	"H_APOGEE", "H_VISA", "H_MSTRCD", "H_FAX",
+	"TOPWINDW", "LFTWINDW", "RGTWINDW", "BOTWINDW",
+
+	"M_NSELCT", "M_SELCT",
+	"M_HNSLCT", "M_HSELCT",
+	"M_BABY",
+	"M_EASY",
+	"M_NORMAL",
+	"M_HARD",
+	"M_EPIS1",
+	"M_EPIS2",
+	"M_EPIS3",
+	"M_EPIS4",
+	"M_EPIS5",
+	"M_EPIS6",
+
+	"H_BGLDST",
+	"H_STARLG",
+	"H_BLAKEG",
+	"H_STARIN",
+	"H_MEDHON",
+	"H_SGLDST",
+	"H_BLAKEW",
+	"H_SHTLEX",
+	"H_PLANET",
+	"H_MOUSE",
+	"H_JOYSTK",
+	"H_GRAVIS",
+	"H_STARPT",
+	"H_BOSS",
+	"H_TPLAN",
+	"H_SOLSYS",
+	"H_AOGEND",
+	"H_GFLOGO",
+	"H_BLAKEH",
+	"H_PORJFD",
+
+	"TITLE1",
+	"TITLE2",
+
+	"STWEAP1", "STWEAP2", "STWEAP3", "STWEAP4", "STWEAP5", "STWEAP6", "STWEAP7",
+	"STCWEAP1", "STCWEAP2", "STCWEAP3", "STCWEAP4", "STCWEAP5", "STCWEAP6", "STCWEAP7",
+	"STWAIT", "STREADY",
+	"STFNA032",
+	"STFNA048", "STFNA049", "STFNA050",	"STFNA051",	"STFNA052",
+	"STFNA053", "STFNA054",	"STFNA055",	"STFNA056",	"STFNA057",
+	"STFNA082",	"STFNA079",	"STFNA076", "STFNA045",
+	"STFNG032",
+	"STFNG048", "STFNG049", "STFNG050",	"STFNG051",	"STFNG052",
+	"STFNG053", "STFNG054",	"STFNG055",	"STFNG056",	"STFNG057",
+	"STDIMLGT", "STBRILGT",
+	"STINFO",
+	"STTOP",
+	"STBAR",
+	"STMAG1X", "STMAG2X", "STMAG4X",
+	"STKEYS0", "STKEYS1", "STKEYS2", "STKEYS3",
+
+	"TILE8",
+	"POWERBAL",
+
+	"PIRATPAL",
+	"APOGEPAL",
+	"ENDPAL",
+	"TITLEPAL",
+
+	"ORDERSCR",
+	"ERRORSCR",
+	"NO386SCR",
+
+	"MUSTEXT",
+	"RADARTEXT",
+	"TICSTEXT",
+
+	"DEMO0", "DEMO1", "DEMO2", "DEMO3", "DEMO4", "DEMO5",
+
+	"HINTINFR", "HINTNSCI", "HINTMSCI",
+	"BRIEFW1", "BREIFI1",
+	"LEVELDSC",
+	"DECOY1", "DECOY2", "DECOY3", "DECOY4",
+	"HELPART", "SAGAART", "LOSEART", "ORDERART", "CREDART",
+	"MUSTB386",
+
+	"QUIKINF1", "QUIKINF2", "BADINFO",
+	"CALJOY1", "CALJOY2", "READTHIS",
+	"ELEVMSG0", "ELEVMSG1", "ELEVMSG4", "ELEVMSG5", "FLOORMSG",
+	"YOUWIN", "CHANGEVW", "DIZERROR", "BADLEVELS", "BADSAVE"
+}
+
+sprites
+{
+	"HACKA0",
+
+	"S000A0",	"S001A0",	"S002A0",	"S003A0",
+	"S004A0",	"S005A0",	"S006A0",	"S007A0",
+	"S008A0",	"S009A0",
+	"S010A0",	"S011A0",	"S012A0",	"S013A0",
+	"S014A0",	"S015A0",	"S016A0",	"S017A0",
+	"S018A0",	"S019A0",
+	"S020A0",	"S021A0",	"S022A0",	"S023A0",
+	"S024A0",	"S025A0",	"S026A0",	"S027A0",
+	"S028A0",	"S029A0",
+	"S030A0",	"S031A0",	"S032A0",	"S033A0",
+	"S034A0",	"S035A0",	"S036A0",	"S037A0",
+	"S038A0",	"S039A0",
+	"S040A0",	"S041A0",	"S042A0",	"S043A0",
+	"S044A0",	"S045A0",	"S046A0",	"S047A0",
+	"S048A0",	"S049A0",
+	"S050A0",	"S051A0",	"S052A0",	"S053A0",
+	"S054A0",	"S055A0",	"S056A0",
+	"CRATA0",	"CRATB0",	"CRATC0",
+	"S057A0",	"S058A0",	"S059A0",
+	"S060A0",	"S061A0",	"S062A0",	"S063A0",
+	"S064A0",	"S065A0",	"S066A0",	"S067A0",
+	"S068A0",	"S069A0",
+	"S070A0",	"S071A0",	"S072A0",	"S073A0",
+	"S074A0",	"S075A0",	"S076A0",	"S077A0",
+	"S078A0",	"S079A0",
+
+	"DBOMA0",	"DBOMB0", // DOORBOMB
+	"RUBLA0", // RUBBLE
+	"BONZA0", // BONZI_TREE
+	"AUTOA0", // AUTOMAPPER
+	"POTPA0", // POT_PLANT
+	"TUBPA0", // TUBE_PLANT
+	"HTCHA0", // HITECH_CHAIR
+
+	"AVNTA0",
+	"AVNTB0", "AVNTC0", "AVNTD0", "AVNTE0", // Blood
+	"AVNTF0", "AVNTG0", "AVNTH0", "AVNTI0", // Water
+
+	"ARCLA0", "ARCLB0", "ARCLC0",
+
+	"GRATA0", "GRATB0", "GRATC0", "GRATD0", "GRATE0",
+
+	// I don't think this is what the source says it is?
+	"PIPEA0", "PIPEB0", "PIPEC0", "PIPED0", "PIPEE0",
+
+	"DRNTA0", "DPROA0", "DSWTA0",
+
+	// Rent-A-Cop
+	"RENTA1",	"RENTA2",	"RENTA3",	"RENTA4",
+	"RENTA5",	"RENTA6",	"RENTA7",	"RENTA8",
+	"RENTB1",	"RENTB2",	"RENTB3",	"RENTB4",
+	"RENTB5",	"RENTB6",	"RENTB7",	"RENTB8",
+	"RENTC1",	"RENTC2",	"RENTC3",	"RENTC4",
+	"RENTC5",	"RENTC6",	"RENTC7",	"RENTC8",
+	"RENTD1",	"RENTD2",	"RENTD3",	"RENTD4",
+	"RENTD5",	"RENTD6",	"RENTD7",	"RENTD8",
+	"RENTE1",	"RENTE2",	"RENTE3",	"RENTE4",
+	"RENTE5",	"RENTE6",	"RENTE7",	"RENTE8",
+	"RENTJ0",	"RENTK0",	"RENTL0",	"RENTM0",
+	"RENTI0",	"RENTN0",
+	"RENTF0",	"RENTG0",	"RENTH0",
+
+	// Pro-Guard
+	"PROGA1",	"PROGA2",	"PROGA3",	"PROGA4",
+	"PROGA5",	"PROGA6",	"PROGA7",	"PROGA8",
+	"PROGB1",	"PROGB2",	"PROGB3",	"PROGB4",
+	"PROGB5",	"PROGB6",	"PROGB7",	"PROGB8",
+	"PROGC1",	"PROGC2",	"PROGC3",	"PROGC4",
+	"PROGC5",	"PROGC6",	"PROGC7",	"PROGC8",
+	"PROGD1",	"PROGD2",	"PROGD3",	"PROGD4",
+	"PROGD5",	"PROGD6",	"PROGD7",	"PROGD8",
+	"PROGE1",	"PROGE2",	"PROGE3",	"PROGE4",
+	"PROGE5",	"PROGE6",	"PROGE7",	"PROGE8",
+	"PROGI0",	"PROGK0",	"PROGL0",	"PROGM0",
+	"PROGJ0",	"PROGN0",	"PROGO0",
+	"PROGF0",	"PROGG0",	"PROGH0",
+
+	// Swat
+	"SWATA1",	"SWATA2",	"SWATA3",	"SWATA4",
+	"SWATA5",	"SWATA6",	"SWATA7",	"SWATA8",
+	"SWATB1",	"SWATB2",	"SWATB3",	"SWATB4",
+	"SWATB5",	"SWATB6",	"SWATB7",	"SWATB8",
+	"SWATC1",	"SWATC2",	"SWATC3",	"SWATC4",
+	"SWATC5",	"SWATC6",	"SWATC7",	"SWATC8",
+	"SWATD1",	"SWATD2",	"SWATD3",	"SWATD4",
+	"SWATD5",	"SWATD6",	"SWATD7",	"SWATD8",
+	"SWATE1",	"SWATE2",	"SWATE3",	"SWATE4",
+	"SWATE5",	"SWATE6",	"SWATE7",	"SWATE8",
+	"SWATI0",	"SWATP0",	"SWATQ0",	"SWATR0",
+	"SWATJ0",	"SWATS0",	"SWATT0",
+	"SWATF0",	"SWATG0",	"SWATH0",
+	"SWATK0",	"SWATL0",	"SWATM0",	"SWATN0",
+
+	// General Scientist
+	"GSCIA1",	"GSCIA2",	"GSCIA3",	"GSCIA4",
+	"GSCIA5",	"GSCIA6",	"GSCIA7",	"GSCIA8",
+	"GSCIB1",	"GSCIB2",	"GSCIB3",	"GSCIB4",
+	"GSCIB5",	"GSCIB6",	"GSCIB7",	"GSCIB8",
+	"GSCIC1",	"GSCIC2",	"GSCIC3",	"GSCIC4",
+	"GSCIC5",	"GSCIC6",	"GSCIC7",	"GSCIC8",
+	"GSCID1",	"GSCID2",	"GSCID3",	"GSCID4",
+	"GSCID5",	"GSCID6",	"GSCID7",	"GSCID8",
+	"GSCIE1",	"GSCIE2",	"GSCIE3",	"GSCIE4",
+	"GSCIE5",	"GSCIE6",	"GSCIE7",	"GSCIE8",
+	"GSCII0",	"GSCIK0",	"GSCIL0",	"GSCIM0",
+	"GSCIJ0",	"GSCIN0",	"GSCIO0",
+	"GSCIF0",	"GSCIG0",	"GSCIH0",
+
+	// Dr. Goldstern
+	"DGLDA1",	"DGLDA2",	"DGLDA3",	"DGLDA4",
+	"DGLDA5",	"DGLDA6",	"DGLDA7",	"DGLDA8",
+	"DGLDB1",	"DGLDB2",	"DGLDB3",	"DGLDB4",
+	"DGLDB5",	"DGLDB6",	"DGLDB7",	"DGLDB8",
+	"DGLDC1",	"DGLDC2",	"DGLDC3",	"DGLDC4",
+	"DGLDC5",	"DGLDC6",	"DGLDC7",	"DGLDC8",
+	"DGLDD1",	"DGLDD2",	"DGLDD3",	"DGLDD4",
+	"DGLDD5",	"DGLDD6",	"DGLDD7",	"DGLDD8",
+	"DGLDE1",	"DGLDE2",	"DGLDE3",	"DGLDE4",
+	"DGLDE5",	"DGLDE6",	"DGLDE7",	"DGLDE8",
+	"DGLDI0",
+	"DGLDJ0", "DGLDK0",
+	"DGLDF0", "DGLDG0", "DGLDH0",
+	"DGLDL0", "DGLDM0", "DGLDN0", "DGLDO0", "DGLDP0",
+	"MGLDJ0", "MGLDK0", "MGLDL0", "MGLDM0", "MGLDN0",
+	"MGLDI0",
+	"DGLDQ0", "DGLDR0", "DGLDS0", "DGLDT0",
+	"DGLDU0", "DGLDV0", "DGLDW0", "DGLDX0",
+	"MGLDA0", "MGLDB0", "MGLDC0", "MGLDD0",
+	"MGLDE0", "MGLDF0", "MGLDG0", "MGLDH0",
+
+	"MSHTA0", "MSHTB0", "MSHTC0", "MSHTD0",
+	"MSHTE0", "MSHTF0", "MSHTG0", "MSHTH0",
+
+	// Ground Scout
+	"GSCTA1",	"GSCTA2",	"GSCTA3",	"GSCTA4",
+	"GSCTA5",	"GSCTA6",	"GSCTA7",	"GSCTA8",
+	"GSCTB1",	"GSCTB2",	"GSCTB3",	"GSCTB4",
+	"GSCTB5",	"GSCTB6",	"GSCTB7",	"GSCTB8",
+	"GSCTC1",	"GSCTC2",	"GSCTC3",	"GSCTC4",
+	"GSCTC5",	"GSCTC6",	"GSCTC7",	"GSCTC8",
+	"GSCTD1",	"GSCTD2",	"GSCTD3",	"GSCTD4",
+	"GSCTD5",	"GSCTD6",	"GSCTD7",	"GSCTD8",
+	"GSCTE0",	"GSCTF0",	"GSCTG0",	"GSCTH0",
+	"GSCTI0",	"GSCTJ0",	"GSCTK0",	"GSCTL0",
+	"GSCTM0",
+
+	// Floating Scout
+	"FSCTA1",	"FSCTA2",	"FSCTA3",	"FSCTA4",
+	"FSCTA5",	"FSCTA6",	"FSCTA7",	"FSCTA8",
+	"FSCTB1",	"FSCTB2",	"FSCTB3",	"FSCTB4",
+	"FSCTB5",	"FSCTB6",	"FSCTB7",	"FSCTB8",
+	"FSCTC1",	"FSCTC2",	"FSCTC3",	"FSCTC4",
+	"FSCTC5",	"FSCTC6",	"FSCTC7",	"FSCTC8",
+	"FSCTD1",	"FSCTD2",	"FSCTD3",	"FSCTD4",
+	"FSCTD5",	"FSCTD6",	"FSCTD7",	"FSCTD8",
+	"FSCTE0",	"FSCTF0",	"FSCTG0",	"FSCTH0",
+	"FSCTI0",	"FSCTJ0",	"FSCTK0",	"FSCTL0",
+
+	// Explosion
+	"EXPLA0",	"EXPLB0",	"EXPLC0",	"EXPLD0",	"EXPLE0",
+
+	// Rotating Cube
+	"CUBEA0",	"CUBEB0",	"CUBEC0",	"CUBED0",	"CUBEE0",
+	"CUBEF0",	"CUBEG0",	"CUBEH0",	"CUBEI0",	"CUBEJ0",
+	"CUBEK0",	"CUBEL0",	"CUBEM0",	"CUBEN0",
+	"CUBEO0",	"CUBEP0",	"CUBEQ0",	"CUBER0",	"CUBES0",
+
+	// Security Light
+	"SECLA0",	"SUCLB0",
+
+	// POD Alien
+	"PODAA0",	"PODAB0",	"PODAC0",	"PODAD0",
+	"PODAE0",	"PODAF0",	"PODAG0",	"PODAH0",
+	"PODAI0",	"PODAJ0",	"PODAJ0",
+	"PODAN0",
+	"PODAO0",	"PODAP0",	"PODAQ0",
+	"PODAK0",	"PODAL0",	"PODAM0",
+
+	// Electro Alien
+	"ELCAA0",	"ELCAB0",	"ELCAC0",
+	"ELCAD0",	"ELCAE0",	"ELCAF0",	"ELCAG0",
+	"ELCAH0",	"ELCAI0",	"ELCAJ0",
+	"ELCAK0",
+	"ELCAL0",	"ELCAM0",	"ELCAN0",
+
+	"ELCSA0",	"ELCSB0",
+	"ELCSC0",	"ELCSD0",
+
+	// Electrosphere
+	"ESPRA0",	"ESPRB0",	"ESPRC0",
+	"ESPRE0",
+	"ESPRF0",	"ESPRG0",	"ESPRH0",	"ESPRI0",
+
+	// Genetic Guard
+	"GENGA0",	"GENGB0",	"GENGC0",	"GENGD0",
+	"GENGE0",	"GENGF0",	"GENGH0",
+	"GENGQ0",
+	"GENGM0",	"GENGN0",	"GENGO0",	"GENGP0",
+	"GENGL0",
+	"GENGI0",	"GENGJ0",	"GENGK0",
+
+	// Mutant Human Type 1 (Also not really fitting, more of a robot)
+	// (Seems to be unfinished as well?)
+	"MUT2A0",	"MUT2B0",	"MUT2C0",	"MUT2D0",
+	"MUT2E0",	"MUT2F0",	"MUT2G0",
+	"MUT2P0",
+	"MUT2L0",	"MUT2M0",	"MUT2N0",	"MUT2O0",
+	"MUT2K0",
+	"MUT2H0",	"MUT2I0",	"MUT2J0",
+
+	// Mutant Human Type 2
+	"MHUMA0",	"MHUMB0",	"MHUMC0",	"MHUMD0",
+	"MHUME0",	"MHUMF0",	"MHUMG0",
+	"MHUMP0",
+	"MHUML0",	"MHUMM0",	"MHUMN0",	"MHUMO0",
+	"MHUMK0",
+	"MHUMH0",	"MHUMI0",	"MHUMJ0",
+	"MHUMP0",	"MHUMQ0",	"MHUMR0",	"MHUMS0",
+	"MHUMT0",	"MHUMU0",	"MHUMV0",	"MHUMW0",
+	"MHUMX0",
+}
+
+sounds
+{
+	"PCHITWAL",
+	"PCSLCTWN",
+	"PCSLCTIT",
+	"PCHARTBT",
+	"PCMVGUN2",
+	"PCMVGUN1",
+	"PCNOWAY",
+	"PCNAZIHT",
+	"PCSCBATK",
+	"PCPLDETH",
+	"PCDOGDTH",
+	"PCCGUN",
+	"PCGETKEY",
+	"PCNOITEM",
+	"PCWALK1",
+	"PCWALK2",
+	"PCPLPAIN",
+	"PCGMOVER",
+	"PCDOROPN",
+	"PCDORCLS",
+	"PCNOTHIN",
+	"PCGRDSIT",
+	"PCGDDTH1",
+	"PCKNFSWG",
+	"PCPISTOL",
+	"PCGDDTH2",
+	"PCMGUN",
+	"PCNAZPAI",
+	"PCSHTDOR",
+	"PCGDDTH3",
+	"PCMGUNUP",
+	"PCAMMOUP",
+	"PCSELECT",
+	"PCFOODUP",
+	"PCMEDIUP",
+	"PCBONUS1",
+	"PCBONUS2",
+	"PCBONUS3",
+	"PCCGUNUP",
+	"PCESCPRS",
+	"PCSWITCH",
+	"PCDOGSIT",
+	"PCENDBN1",
+	"PCENDBN2",
+	"PCBNS1UP",
+	"PCBONUS4",
+	"PCPSHWAL",
+	"PCNOBNS",
+	"PCPRC100",
+	"PCBOSSIT",
+	"PCHANDTH",
+	"PCSSSIT",
+	"PCMUTDTH",
+	"PCHITSIT",
+	"PCHITDTH",
+	"PCHANSIT",
+	"PCSSDTH",
+	"PCHITSHI",
+	"PCGRDFIR",
+	"PCBOSSFR",
+	"PCSSFIRE",
+	"PCSLURPE",
+	"PCFAKSIT",
+	"PCSCBDTH",
+	"PCSCBSIT",
+	"PCFAKDTH",
+	"PCOFFSIT",
+	"PCOFFDTH",
+	"PCDOGATK",
+	"PCFAKFIR",
+	"PCMCHSTP",
+	"PCGOOB",
+	"PCYEAH",
+	"PCGDDTH4",
+	"PCGDDTH5",
+	"PCFART",
+	"PCGDDTH6",
+	"PCGDDTH7",
+	"PCGDDTH8",
+	"PCOTODTH",
+	"PCOTOSIT",
+	"PCFATSIT",
+	"PCGRTSIT",
+	"PCGRTDTH",
+	"PCFATDTH",
+	"PCRLAUNC",
+	"PCBAREXP",
+
+	"ALHITWAL",
+	"ALSLCTWN",
+	"ALSLCTIT",
+	"ALHARTBT",
+	"ALMVGUN2",
+	"ALMVGUN1",
+	"ALNOWAY",
+	"ALNAZIHT",
+	"ALSCBATK",
+	"ALPLDETH",
+	"ALDOGDTH",
+	"ALCGUN",
+	"ALGETKEY",
+	"ALNOITEM",
+	"ALWALK1",
+	"ALWALK2",
+	"ALPLPAIN",
+	"ALGMOVER",
+	"ALDOROPN",
+	"ALDORCLS",
+	"ALNOTHIN",
+	"ALGRDSIT",
+	"ALGDDTH1",
+	"ALKNFSWG",
+	"ALPISTOL",
+	"ALGDDTH2",
+	"ALMGUN",
+	"ALNAZPAI",
+	"ALSHTDOR",
+	"ALGDDTH3",
+	"ALMGUNUP",
+	"ALAMMOUP",
+	"ALSELECT",
+	"ALFOODUP",
+	"ALMEDIUP",
+	"ALBONUS1",
+	"ALBONUS2",
+	"ALBONUS3",
+	"ALCGUNUP",
+	"ALESCPRS",
+	"ALSWITCH",
+	"ALDOGSIT",
+	"ALENDBN1",
+	"ALENDBN2",
+	"ALBNS1UP",
+	"ALBONUS4",
+	"ALPSHWAL",
+	"ALNOBNS",
+	"ALPRC100",
+	"ALBOSSIT",
+	"ALHANDTH",
+	"ALSSSIT",
+	"ALMUTDTH",
+	"ALHITSIT",
+	"ALHITDTH",
+	"ALHANSIT",
+	"ALSSDTH",
+	"ALHITSHI",
+	"ALGRDFIR",
+	"ALBOSSFR",
+	"ALSSFIRE",
+	"ALSLURPE",
+	"ALFAKSIT",
+	"ALSCBDTH",
+	"ALSCBSIT",
+	"ALFAKDTH",
+	"ALOFFSIT",
+	"ALOFFDTH",
+	"ALDOGATK",
+	"ALFAKFIR",
+	"ALMCHSTP",
+	"ALGOOB",
+	"ALYEAH",
+	"ALGDDTH4",
+	"ALGDDTH5",
+	"ALFART",
+	"ALGDDTH6",
+	"ALGDDTH7",
+	"ALGDDTH8",
+	"ALOTODTH",
+	"ALOTOSIT",
+	"ALFATSIT",
+	"ALGRTSIT",
+	"ALGRTDTH",
+	"ALFATDTH",
+	"ALRLAUNC",
+	"ALBAREXP"
+}
+
+digitalsounds
+{
+	"DSGRDSIT",
+	"DSDOGSIT",
+	"DSDRCLS",
+	"DSDROPN",
+	"DSMGUN",
+	"DSPISTOL",
+	"DSCGUN",
+	"DSSSSIT",
+	"DSHANSIT",
+	"DSHANDTH",
+	"DSBOSSFR",
+	"DSSSFIRE",
+	"DSGDDTH1",
+	"DSGDDTH2",
+	"DSPLPAIN",
+	"DSPSHWAL",
+	"DSDOGDTH",
+	"DSMUTDTH",
+	"DSHITSIT",
+	"DSHITDTH",
+	"DSSSDTH",
+	"DSGRDFIR",
+	"DSSLURPE",
+	"DSFAKSIT",
+	"DSSCBDTH",
+	"DSSCBSIT",
+	"DSFAKDTH",
+	"DSOFFSIT",
+	"DSOFFDTH",
+	"DSDOGATK",
+	"DSSWITCH",
+	"DSMCHSTP",
+	"DSYEAH",
+	"DSHITSHI",
+	"DSGDDTH4",
+	"DSGDDTH5",
+	"DSOTODTH",
+	"DSOTOSIT",
+	"DSFATSIT",
+	"DSFART",
+	"DSGDDTH6",
+	"DSGDDTH7",
+	"DSGDDTH8",
+	"DSGRTSIT",
+	"DSGRTDTH",
+	"DSFATDTH"
+}
+
+music
+{
+	"CATACOMB",
+	"STICKS",
+	"APOGFNFM",
+	"PLOT",
+	"CIRCLES",
+	"LASTLAFF",
+	"TOHELL",
+	"FORTRESS",
+	"GIVING",
+	"HARTBEAT",
+	"LURKING",
+	"MAJMIN",
+	"VACCINAP",
+	"DARKNESS",
+	"MONASTRY",
+	"TOMBP",
+	"TIME",
+	"MOURNING",
+	"SERPENT",
+	"HISCORE",
+	"THEME"
+}
+
+textures
+{
+	"GSTONEA1",	// Gray Stone 1 N/S
+	"GSTONEA2",	// Gray Stone 1 E/W
+	"GSTONEB1",	// Gray Stone 2 N/S
+	"GSTONEB2",	// Gray Stone 2 E/W
+	"GSTFLAG1",	// Gray Stone Flag N/S
+	"GSTFLAG2",	// Gray Stone Flag E/W
+	"GSTHTLR1",	// Gray Stone Hitler N/S
+	"GSTHTLR2",	// Gray Stone Hitler E/W
+	"BSTCELA1",	// Blue Stone Empty Cell N/S
+	"BSTCELA2",	// Blue Stone Empty Cell E/W
+	"GSTEAGL1",	// Gray Stone Eagle N/S
+	"GSTEAGL2",	// Gray Stone Eagle E/W
+	"BSTCELB1",	// Blue Stone Cell w/ Skeleton N/S
+	"BSTCELB2",	// Blue Stone Cell w/ Skeleton E/W
+	"BSTONEA1",	// Blue Stone 1 N/S
+	"BSTONEA2",	// Blue Stone 1 E/W
+	"BSTONEB1",	// Blue Stone 2 N/S
+	"BSTONEB2",	// Blue Stone 2 E/W
+	"WODEAGL1",	// Wood Eagle N/S
+	"WODEAGL2",	// Wood Eagle E/W
+	"WODHTLR1",	// Wood Hitler N/S
+	"WODHTLR2",	// Wood Hitler E/W
+	"WOOD1",		// Wood N/S
+	"WOOD2",		// Wood E/W
+	"FAKEDOR1",	// Entrance to level N/S
+	"FAKEDOR2",	// Entrance to level E/W
+	"METLSGN1",	// Steel Panel Sign N/S
+	"METLSGN2",	// Steel Panel Sign E/W
+	"METAL1",	 // Steel Panel Sign N/S
+	"METAL2",	 // Steel Panel Sign E/W
+	"SKY1",		 // Sky N/S
+	"SKY2",		 // Sky E/W
+	"BRICK1",	 // Red Brick N/S
+	"BRICK2",	 // Red Brick E/W
+	"BRIKWRT1",	// Red Brick Wreath N/S
+	"BRIKWRT2",	// Red Brick Wreath E/W
+	"PURPLE1",	// Purple Wall N/S
+	"PURPLE2",	// Purple Wall E/W
+	"BRIKEGL1",	// Red Brick Eagle N/S
+	"BRIKEGL2",	// Red Brick Eagle E/W
+	"ELEV1_1",	// Elevator 1 N/S
+	"ELEV1_2",	// Elevator 1 E/W
+	"ELEV2_1",	// Elevator 2 N/S
+	"ELEV2_2",	// Elevator 2 E/W
+	"WODCROS1",	// Wood Cross N/S
+	"WODCROS2",	// Wood Cross E/W
+	"GSTSLME1",	// Gray Stone Slime N/S
+	"GSTSLME2",	// Gray Stone Slime E/W
+	"PURPBLD1",	// Purple Blood 1
+	"PURPBLD2",	// Purple Blood 2
+	"GSTLSLM1",	// Gray Stone Slime 2 N/S
+	"GSTLSLM2",	// Gray Stone Slime 2 E/W
+	"GSTONEC1",	// Gray Stone 3 N/S
+	"GSTONEC2",	// Gray Stone 3 E/W
+	"GSTSIGN1",	// Gray Stone Sign N/S
+	"GSTSIGN2",	// Gray Stone Sign E/W
+	"CHIP1",		// Chipped Rock N/S
+	"CHIP2",		// Chipped Rock E/W
+	"CHPBLDA1",	// Chipped Rock Blood 1 N/S
+	"CHPBLDA2",	// Chipped Rock Blood 1 E/W
+	"CHPBLDB1",	// Chipped Rock Blood 2 N/S
+	"CHPBLDB2",	// Chipped Rock Blood 2 E/W
+	"CHPBLDC1",	// Chipped Rock Blood 3 N/S
+	"CHPBLDC2",	// Chipped Rock Blood 3 E/W
+	"GLASS1",	 // Stained Glass N/S
+	"GLASS2",	 // Stained Glass E/W
+	"BLUSKUL1",	// Blue Skull N/S
+	"BLUSKUL2",	// Blue Skull E/W
+	"GRYBRIK1",	// Gray Brick N/S
+	"GRYBRIK2",	// Gray Brick E/W
+	"BLUSWAS1",	// Blue Swastika N/S
+	"BLUSWAS2",	// Blue Swastika E/W
+	"GRYVENT1",	// Gray Stone Vent N/S
+	"GRYVENT2",	// Gray Stone Vent E/W
+	"BRIKODD1",	// Odd Bricks N/S
+	"BRIKODD2",	// Odd Bricks E/W
+	"GRYCRAK1",	// Gray Brick Crack N/S
+	"GRYCRAK2",	// Gray Brick Crack E/W
+	"BLUWALL1",	// Blue Wall N/S
+	"BLUWALL2",	// Blue Wall E/W
+	"BSTSIGN1",	// Blue Stone Sign N/S
+	"BSTSIGN2",	// Blue Stone Sign E/W
+	"MARB1_1",	// Brown Marble 1 N/S
+	"MARB1_2",	// Brown Marble 1 E/W
+	"GRYMAPS1",	// Gray Brick Map N/S
+	"GRYMAPS2",	// Gray Brick Map E/W
+	"BRNSTNA1",	// Brown Stone 1 N/S
+	"BRNSTNA2",	// Brown Stone 1 E/W
+	"BRNSTNB1",	// Brown Stone 2 N/S
+	"BRNSTNB2",	// Brown Stone 2 E/W
+	"MARB2_1",	// Brown Marble 2 N/S
+	"MARB2_2",	// Brown Marble 2 E/W
+	"MARB3_1",	// Brown Marble Flag N/S
+	"MARB3_2",	// Brown Marble Flag E/W
+	"PLASTER1",	// Plaster N/S
+	"PLASTER2",	// Plaster E/W
+	"GRYHTLR1",	// Gray Brick Hitler N/S
+	"GRYHTLR2",	// Gray Brick Hitler E/W
+	"DOOR1_1",	// Door N/S
+	"DOOR1_2",	// Door E/W
+	"SLOT1_1",	// Doorjamb N/S
+	"SLOT1_2",	// Doorjamb E/W
+	"DOOR2_1",	// Elevator Door N/S
+	"DOOR2_2",	// Elevator Door E/W
+	"DOOR3_1",	// Locked Door N/S
+	"DOOR3_2"	 // Locked Door E/W
+}

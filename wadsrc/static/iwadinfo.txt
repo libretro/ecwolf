@@ -7,6 +7,13 @@ IWad
 
 IWad
 {
+	Name = "Planet Strike"
+	Mapinfo = "mapinfo/planet.txt"
+	MustContain = "S000A0"
+}
+
+IWad
+{
 	Name = "Spear of Destiny"
 	Mapinfo = "mapinfo/spear.txt"
 	MustContain = "BACKDROP", "ENDSCR1"
