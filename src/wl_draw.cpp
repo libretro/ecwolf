@@ -360,7 +360,7 @@ void HitVertWall (void)
 	texture = (yintercept+texdelta-tilehit->slideAmount[hitdir])&(FRACUNIT-1);
 	if (xtilestep == -1 && !tilehit->tile->offsetVertical)
 	{
-		texture = (FRACUNIT - texture - texxscale)&(FRACUNIT-1);
+		texture = (FRACUNIT - texture)&(FRACUNIT-1);
 		xintercept += TILEGLOBAL;
 	}
 
@@ -441,7 +441,7 @@ void HitHorizWall (void)
 		if (ytilestep == -1)
 			yintercept += TILEGLOBAL;
 		else
-			texture = (FRACUNIT - texture - texxscale)&(FRACUNIT-1);
+			texture = (FRACUNIT - texture)&(FRACUNIT-1);
 	}
 
 	if(lastside==0 && lastintercept==ytile && lasttilehit==tilehit && !(lasttilehit->tile->offsetHorizontal))
