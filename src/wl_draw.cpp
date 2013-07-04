@@ -1254,6 +1254,10 @@ void R_RenderView()
 
 void    ThreeDRefresh (void)
 {
+	// Ensure we have a valid camera
+	if(players[0].camera == NULL)
+		players[0].camera = players[0].mo;
+
 	if (fizzlein)
 		FizzleFadeStart();
 

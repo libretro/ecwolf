@@ -13,7 +13,12 @@ class ADeathCam : public AActor
 
 		TObjPtr<AActor>	actor;
 		TObjPtr<AActor>	killer;
-		bool camFinished;
+		enum
+		{
+			CAM_STARTED,
+			CAM_ACTIVE,
+			CAM_FINISHED
+		} camState;
 };
 
 #endif

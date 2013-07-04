@@ -57,7 +57,7 @@ static bool CheckPosition (AActor *ob)
 
 void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
 {
-	camFinished = false;
+	camState = CAM_STARTED;
 	this->actor = actor;
 	this->killer = killer;
 
@@ -67,6 +67,12 @@ void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
 
 void ADeathCam::Tick()
 {
+	if(camState == ADeathCam::CAM_FINISHED)
+	{
+		Destroy();
+		return;
+	}
+
 	if(gamestate.victoryflag)
 	{
 		if(killer->player)
@@ -79,10 +85,10 @@ void ADeathCam::Tick()
 ACTION_FUNCTION(A_FinishDeathCam)
 {
 	ADeathCam *cam = (ADeathCam *)self;
-	if(cam->camFinished)
+	if(cam->camState != ADeathCam::CAM_STARTED)
 	{
+		cam->camState = ADeathCam::CAM_FINISHED;
 		CALL_ACTION(A_BossDeath, cam->actor);
-		cam->Destroy();
 		return;
 	}
 
@@ -93,7 +99,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	FinishPaletteShifts();
 
 	gamestate.victoryflag = true;
-	cam->camFinished = true;
+	cam->camState = ADeathCam::CAM_ACTIVE;
 
 	FizzleFadeStart();
 

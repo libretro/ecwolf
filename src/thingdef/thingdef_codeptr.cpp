@@ -187,7 +187,7 @@ ACTION_FUNCTION(A_BossDeath)
 	if(!alldead)
 		return;
 
-	if(levelInfo->DeathCam && (!deathcam || !(deathcam->ObjectFlags & OF_EuthanizeMe)))
+	if(levelInfo->DeathCam && (!deathcam || deathcam->camState != ADeathCam::CAM_FINISHED))
 	{
 		if(!deathcam)
 		{
