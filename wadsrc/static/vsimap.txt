@@ -346,6 +346,180 @@ sprites
 	"MHUMP0",	"MHUMQ0",	"MHUMR0",	"MHUMS0",
 	"MHUMT0",	"MHUMU0",	"MHUMV0",	"MHUMW0",
 	"MHUMX0",
+
+	// Contained Alien
+	"CNTAA0",	"CNTAB0",	"CNTAC0",	"CNTAD0",	"CNTAE0",
+	"CNTAF0",	"CNTAG0",	"CNTAH0",	"CNTAI0",
+	"CNTAJ0",	"CNTAK0",	"CNTAL0",
+	"CNTAU0",	"CNTAQ0",	"CNTAR0",	"CNTAS0",	"CNTAT0",
+	"CNTAP0",
+	"CNTAM0",	"CNTAN0",	"CNTAO0",
+
+	// Canister Alien
+	"CNSAA0",	"CNSAB0",	"CNSAC0",	"CNSAD0",	"CNSAE0",
+	"CNSAF0",	"CNSAG0",	"CNSAH0",	"CNSAI0",
+	"CNSAJ0",	"CNSAK0",	"CNSAL0",
+	"CNSAU0",	"CNSAQ0",	"CNSAR0",	"CNSAS0",	"CNSAT0",
+	"CNSAP0",
+	"CNSAM0",	"CNSAN0",	"CNSAO0",
+
+	// Gurney Mutant
+	"MGURA0",	"MGURB0",	"MGURC0",	"MGURD0",	"MGURE0",
+	"MGURF0",	"MGURG0",	"MGURH0",	"MGURI0",
+	"MGURJ0",	"MGURK0",	"MGURL0",
+	"MGURR0",	"MGURN0",	"MGURO0",	"MGURP0",	"MGURQ0",
+	"MGURM0",
+
+	// Liquid Alien
+	"LIQAA0",	"LIQAB0",	"LIQAC0",
+	"LIQAD0",	"LIQAE0",	"LIQAF0",	"LIQAG0",
+	"LIQAH0",	"LIQAI0",	"LIQAJ0",
+	"LIQAK0",
+	"LIQAL0",	"LIQAM0",	"LIQAN0",	"LIQAO0",	"LIQAP0",
+
+	"LIQSA0",	"LIQSB0",	"LIQSC0",
+	"LIQSD0",	"LIQSE0",	"LIQSF0",
+
+	// Spit
+	"SPT1A0",	"SPT1B0",	"SPT1C0",
+	"SPT1D0",	"SPT1E0",	"SPT1F0",
+	"SPT2A0",	"SPT2B0",	"SPT2C0",
+	"SPT2D0",	"SPT2E0",	"SPT2F0",
+	"SPT3A0",	"SPT3B0",	"SPT3C0",
+	"SPT3D0",	"SPT3E0",	"SPT3F0",
+
+	// Hanging Turret
+	"TURRA1",	"TURRA2",	"TURRA3",	"TURRA4",
+	"TURRA5",	"TURRA6",	"TURRA7",	"TURRA8",
+	"TURRB0",	"TURRC0",
+	"TURRD0",	"TURRE0",	"TURRF0",	"TURRG0",	"TURRH0",
+
+	// Auto-charge Pistol
+	"ACPGA0":pspr,	"ACPGB0":pspr,	"ACPGC0":pspr,	"ACPGD0":pspr,	"ACPGE0":pspr,
+	// Slow Fire Protector
+	"SFPGA0":pspr,	"SFPGB0":pspr,	"SFPGC0":pspr,	"SFPGD0":pspr,	"SFPGE0":pspr,
+	// Rapid Assault Weapon
+	"RAWGA0":pspr,	"RAWGB0":pspr,	"RAWGC0":pspr,	"RAWGD0":pspr,	"RAWGE0":pspr,
+	// Dual Neutron Disruptor
+	"DNDGA0":pspr,	"DNDGB0":pspr,	"DNDGC0":pspr,	"DNDGD0":pspr,	"DNDGE0":pspr,
+	// Plasma Discharge Unit
+	"PDUGA0":pspr,	"PDUGB0":pspr,	"PDUGC0":pspr,	"PDUGD0":pspr,	"PDUGE0":pspr,
+
+	"GRENA0",	"GRENB0",	"GRENC0",	"GREND0",
+	"GRENE0",	"GRENF0",	"GRENG0",	"GRENH0",	"GRENI0",
+
+	"ELCKA0",	"ELCKB0",	"ELCKC0",	"ELCKD0", // Electric Arc
+	"ELCPA0",	"ELCPB0",	"ELCPC0",	"ELCPD0", // Electric Post
+
+	// Vertial Post
+	"VPSTA0",	"VPSTB0",	"VPSTC0",	"VPSTD0",
+	"VPSTE0",	"VPSTF0",	"VPSTG0",	"VPSTH0",
+
+	// Vertical Spike
+	"VSPKA0",	"VSPKB0",	"VSPKC0",	"VSPKD0",
+	"VSPKE0",	"VSPKF0",	"VSPKG0",	"VSPKH0",
+
+	// Oozes
+	"OOZ1A0",	"OOZ1B0",	"OOZ1C0",
+	"OOZ2A0",	"OOZ2B0",	"OOZ2C0",
+	"OOZ3A0",	"OOZ3B0",	"OOZ3C0",
+	"OOZ4A0",	"OOZ4B0",	"OOZ4C0",
+
+	"CNDYA0",	"CNDYB0", // Candy (Wrapper)
+	"SNDWA0",	"SNDWB0", // Sandwhich (Wrapper)
+
+	"BLKEA0",	"BLKEB0",	"BLKEC0",	"BLKED0",
+
+	// Super Mutant
+	"MSUPA0",	"MSUPB0",	"MSUPC0",	"MSUPD0",
+	"MSUPE0",	"MSUPF0",	"MSUPG0",
+	"MSUPM0",	"MSUPI0",	"MSUPJ0",	"MSUPK0",	"MSUPL0",
+	"MSUPH0",
+
+	"MSPRA0",	"MSPRB0",	"MSPRC0",
+	"MSPRD0",	"MSPRE0",	"MSPRF0",
+
+	"MSUPN0",	"MSUPO0",	"MSUPP0",	"MSUPQ0",
+	"MSUPR0",	"MSUPS0",	"MSUPT0",	"MSUPU0",
+	"MSUPV0",
+
+	// Breather Beast
+	"BBSTA0",	"BBSTB0",	"BBSTC0",	"BBSTD0",
+	"BBSTE0",	"BBSTF0",	"BBSTG0",
+	"BBSTM0",	"BBSTI0",	"BBSTJ0",	"BBSTK0",	"BBSTL0",
+	"BBSTH0",
+
+	// Cyborg Warrior
+	"CYBWA0",	"CYBWB0",	"CYBWC0",	"CYBWD0",
+	"CYBWE0",	"CYBWF0",	"CYBWG0",
+	"CYBWM0",	"CYBWI0",	"CYBWJ0",	"CYBWK0",	"CYBWL0",
+	"CYBWH0",
+
+	// Reptilian Warrior
+	"REPWA0",	"REPWB0",	"REPWC0",	"REPWD0",
+	"REPWE0",	"REPWF0",	"REPWG0",
+	"REPWM0",	"REPWI0",	"REPWJ0",	"REPWK0",	"REPWL0",
+	"REPWH0",
+	"REPWN0",	"REPWO0",	"REPWP0",	"REPWQ0",
+	"REPWR0",	"REPWS0",	"REPWT0",	"REPWU0",
+	"REPWV0",
+
+	// Acid Dragon
+	"ADRGA0",	"ADRGB0",	"ADRGC0",	"ADRGD0",
+	"ADRGE0",	"ADRGF0",	"ADRGG0",
+	"ADRGM0",	"ADRGI0",	"ADRGJ0",	"ADRGK0",	"ADRGL0",
+	"ADRGH0",
+
+	"ADPRA0",	"ADPRB0",	"ADPRC0",
+	"ADPRE0",	"ADPRF0",	"ADPRG0",
+
+	// Bio-Mech Guardian
+	"BIOMA0",	"BIOMB0",	"BIOMC0",	"BIOMD0",
+	"BIOME0",	"BIOMF0",	"BIOMG0",
+	"BIOMM0",	"BIOMI0",	"BIOMJ0",	"BIOMK0",	"BIOML0",
+	"BIOMH0",
+
+	// Giant Stalker
+	"STLKA0",	"STLKB0",	"STLKC0",	"STLKD0",
+	"STLKE0",	"STLKF0",	"STLKG0",
+	"STLKM0",	"STLKI0",	"STLKJ0",	"STLKK0",	"STLKL0",
+	"STLKH0",
+
+	// Spector Demon
+	"SPECA0",	"SPECB0",	"SPECC0",	"SPECD0",
+	"SPECE0",	"SPECF0",	"SPECG0",
+	"SPECI0",	"SPECJ0",	"SPECK0",	"SPECL0",	"SPECM0",
+	"SPECH0",
+
+	// Armored Stalker
+	"ARSTA0",	"ARSTB0",	"ARSTC0",	"ARSTD0",
+	"ARSTE0",	"ARSTF0",	"ARSTG0",
+	"ARSTM0",	"ARSTI0",	"ARSTJ0",	"ARSTK0",	"ARSTL0",
+	"ARSTH0",
+
+	// Crawler Beast
+	"CRWLA0",	"CRWLB0",	"CRWLC0",	"CRWLD0",
+	"CRWLE0",	"CRWLF0",	"CRWLG0",
+	"CRWLM0",	"CRWLI0",	"CRWLJ0",	"CRWLK0",	"CRWLL0",
+	"CRWLH0",
+
+	"SPT4A0",	"SPT4B0",	"SPT4C0",
+	"SPT4D0",	"SPT4E0",	"SPT4F0",
+
+	// Plasma Detonator Explosion
+	"PEXPA0",	"PEXPB0",	"PEXPC0",	"PEXPD0",
+	"PEXPE0",	"PEXPF0",	"PEXPG0",	"PEXPH0",
+
+	// Clip Explosion
+	"CEXPA0",	"CEXPB0",	"CEXPC0",	"CEXPD0",
+	"CEXPE0",	"CEXPF0",	"CEXPG0",	"CEXPH0",
+
+	// Anti-Plasma Cannon
+	"APCGA0":pspr,	"APCGB0":pspr,	"APCGC0":pspr,	"APCGD0":pspr,	"APCGE0":pspr,
+
+	"APCSA0",	"APCSB0",	"APCSC0",
+	"APCSE0",	"APCSF0",	"APCSG0",	"APCSH0",
+	"APCSI0",	"APCSJ0",	"APCSK0",	"APCSL0"
 }
 
 sounds
