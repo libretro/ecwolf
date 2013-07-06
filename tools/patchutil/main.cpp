@@ -22,6 +22,7 @@
 
 #include "patchdata.cpp"
 #include "patchdata_reg.cpp"
+#include "patchdata_bs6.cpp"
 
 using namespace std;
 
@@ -81,13 +82,102 @@ struct FileChecksum
 	bool			optional;
 };
 
+#define MAX_FILES 15
 struct OldDataSet
 {
 	int				numFiles;
-	FileChecksum	fileChecksum[9];
+	FileChecksum	fileChecksum[MAX_FILES];
 	const char*		setName;
 } dataSets[] =
 {
+	{
+		14,
+		{
+			{3006928850u, 267636, "audiot.bs6", NULL, NULLP, false},
+			//{2332524962u, 219918, "ganim.bs6", NULL, NULLP, false},
+			//{3189561458u, 18977, "ianim.bs6", NULL, NULLP, false},
+			{3848338552u, 520920, "maptemp.bs6", NULL, P(maptemp10bsreg), false},
+			{501261956u, 9799, "jm_error.h", NULL, P(jm_error10bsreg), true},
+			{2763409265u, 8939, "bshint.exe", "bs-hint.exe", P(bshint10bsreg), true},
+			{2476200822u, 1280, "audiohed.bs6", NULL, NULLP, false},
+			{3335382708u, 596336, "vgagraph.bs6", NULL, P(vgagraph10bsreg), false},
+			{4237374826u, 127402, "bs_aog.exe", NULL, P(bs_aog10bsreg), true},
+			//{91985267u, 186221, "eanim.bs6", NULL, NULLP},
+			{3963407722u, 12203, "bshelp.exe", "bs-help.exe", P(bshelp10bsreg), true},
+			{2822521763u, 639, "vgahead.bs6", NULL, P(vgahead10bsreg), false},
+			{3911856855u, 1024, "vgadict.bs6", NULL, P(vgadict10bsreg), false},
+			{1453722105u, 10748, "jamerr.exe", NULL, P(jamerr10bsreg), true},
+			//{4041681913u, 101, "bstone.bat", NULL, NULLP, true},
+			{3784759483u, 834, "maphead.bs6", NULL, P(maphead10bsreg), false},
+			{2668177633u, 2878696, "svswap.bs6", NULL, P(svswap10bsreg), false},
+			{3139577876u, 2767592, "vswap.bs6", NULL, P(vswap10bsreg), false}
+			//{241924712u, 276784, "sanim.bs6", NULL, NULLP, false}
+		},
+		"Blake Stone: Aliens of Gold v1.0"
+	},
+	{
+		15,
+		{
+			{3006928850u, 267636, "audiot.bs6", NULL, NULLP, false},
+			{1943305533u, 526196, "maptemp.bs6", NULL, NULLP, false},
+			{1076595203u, 9883, "jm_error.h", NULL, NULLP, true},
+			{2948904724u, 9275, "bs-hint.exe", NULL, P(bshint20bsreg), true},
+			{2476200822u, 1280, "audiohed.bs6", NULL, NULLP, false},
+			{1397588851u, 599393, "vgagraph.bs6", NULL, P(vgagraph20bsreg), false},
+			{4135401649u, 139197, "bs_aog.exe", NULL, P(bs_aog20bsreg), true},
+			{2649321649u, 17323, "bs-help.exe", NULL, P(bshelp20bsreg), true},
+			{1977437756u, 672, "vgahead.bs6", NULL, P(vgahead20bsreg), false},
+			{3563729630u, 1024, "vgadict.bs6", NULL, P(vgadict20bsreg), false},
+			{968162678u, 20786, "jamerr.exe", NULL, P(jamerr20bsreg), true},
+			{3639110956u, 834, "maphead.bs6", NULL, NULLP, false},
+			{193603092u, 2878696, "svswap.bs6", NULL, NULLP, false},
+			{111090996u, 2767080, "vswap.bs6", NULL, NULLP, false},
+			{1317237958u, 73724, "setblast.exe", NULL, NULLP, true}
+		},
+		"Blake Stone: Aliens of Gold v2.0"
+	},
+	{
+		15,
+		{
+			{3006928850u, 267636, "audiot.bs6", NULL, NULLP, false},
+			{1943305533u, 526196, "maptemp.bs6", NULL, NULLP, false},
+			{1076595203u, 9883, "jm_error.h", NULL, NULLP, true},
+			{2066597924u, 9499, "bs-hint.exe", NULL, NULLP, true},
+			{2476200822u, 1280, "audiohed.bs6", NULL, NULLP, false},
+			{2912368398u, 599397, "vgagraph.bs6", NULL, P(vgagraph21bsreg), false},
+			{601520986u, 139809, "bs_aog.exe", NULL, P(bs_aog21bsreg), true},
+			{3628097170u, 17563, "bs-help.exe", NULL, P(bshelp21bsreg), true},
+			{654457892u, 672, "vgahead.bs6", NULL, P(vgahead21bsreg), false},
+			{91230768u, 1024, "vgadict.bs6", NULL, P(vgadict21bsreg), false},
+			{1214717625u, 11212, "jamerr.exe", NULL, NULLP, true},
+			{3639110956u, 834, "maphead.bs6", NULL, NULLP, false},
+			{193603092u, 2878696, "svswap.bs6", NULL, NULLP, false},
+			{111090996u, 2767080, "vswap.bs6", NULL, NULLP, false},
+			{1317237958u, 73724, "setblast.exe", NULL, P(setblast21bsreg), true}
+		},
+		"Blake Stone: Aliens of Gold v2.1"
+	},
+	{
+		15,
+		{
+			{3006928850u, 267636, "audiot.bs6", NULL, NULLP, false},
+			{1943305533u, 526196, "maptemp.bs6", NULL, NULLP, false},
+			{1076595203u, 9883, "jm_error.h", NULL, NULLP, true},
+			{2066597924u, 9499, "bs-hint.exe", NULL, NULLP, true},
+			{2476200822u, 1280, "audiohed.bs6", NULL, NULLP, false},
+			{2590218198u, 709440, "vgagraph.bs6", NULL, NULLP, false},
+			{2084573591u, 139809, "bs_aog.exe", NULL, NULLP, true},
+			{3038859855u, 17650, "bs-help.exe", NULL, NULLP, true},
+			{2723953638u, 678, "vgahead.bs6", NULL, NULLP, false},
+			{4254323192u, 1024, "vgadict.bs6", NULL, NULLP, false},
+			{1214717625u, 11212, "jamerr.exe", NULL, NULLP, true},
+			{3639110956u, 834, "maphead.bs6", NULL, NULLP, false},
+			{193603092u, 2878696, "svswap.bs6", NULL, NULLP, false},
+			{111090996u, 2767080, "vswap.bs6", NULL, NULLP, false},
+			{4014968045u, 76751, "setblast.exe", NULL, NULLP, true}
+		},
+		"Blake Stone: Aliens of Gold v3.0"
+	},
 	{
 		9,
 		{
@@ -398,7 +488,8 @@ int main(int argc, char* argv[])
 	for(int i = 0;i < countof(dataSets);++i)
 	{
 		bool identified = true;
-		bool noOptional = false;
+		bool applyPatch[MAX_FILES];
+		memset(applyPatch, 1, MAX_FILES*sizeof(bool));
 		struct stat *fileInfo = new struct stat;
 		for(int f = 0;f < dataSets[i].numFiles;f++)
 		{
@@ -406,7 +497,7 @@ int main(int argc, char* argv[])
 			{
 				if(dataSets[i].fileChecksum[f].optional)
 				{
-					noOptional = true;
+					applyPatch[f] = false;
 					continue;
 				}
 				identified = false;
@@ -414,12 +505,22 @@ int main(int argc, char* argv[])
 			}
 			if(fileInfo->st_size != dataSets[i].fileChecksum[f].size)
 			{
+				if(dataSets[i].fileChecksum[f].optional)
+				{
+					applyPatch[f] = false;
+					continue;
+				}
 				identified = false;
 				break;
 			}
 			unsigned int crc = calcCrc32(dataSets[i].fileChecksum[f].filename, fileInfo->st_size);
 			if(crc != dataSets[i].fileChecksum[f].crc)
 			{
+				if(dataSets[i].fileChecksum[f].optional)
+				{
+					applyPatch[f] = false;
+					continue;
+				}
 				identified = false;
 				break;
 			}
@@ -432,7 +533,7 @@ int main(int argc, char* argv[])
 		cout << "Patching: " << dataSets[i].setName << "\n";
 		for(int f = 0;f < dataSets[i].numFiles;f++)
 		{
-			if(dataSets[i].fileChecksum[f].patchData.data == NULL || (noOptional && dataSets[i].fileChecksum[f].optional))
+			if(dataSets[i].fileChecksum[f].patchData.data == NULL || !applyPatch[f])
 				continue;
 			cout << "\t->" << dataSets[i].fileChecksum[f].filename << "\n";
 			patch(dataSets[i].fileChecksum[f].patchData.data, dataSets[i].fileChecksum[f].patchData.size, dataSets[i].fileChecksum[f].filename, dataSets[i].fileChecksum[f].newFilename ? dataSets[i].fileChecksum[f].newFilename : dataSets[i].fileChecksum[f].filename);
