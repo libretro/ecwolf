@@ -359,7 +359,43 @@ int main(int argc, char* argv[])
 	}
 #endif
 
-	for(int i = 0;i < countof(dataSets);i++)
+	cout << "Wolfenstein 3D Universal Patching Utility\n\n"
+		"This utility recognizes the following (X marks latest):\n";
+	for(int i = 0;i < countof(dataSets);++i)
+	{
+		bool latest = true;
+		for(int j = 0;j < dataSets[i].numFiles;++j)
+		{
+			if(dataSets[i].fileChecksum[j].patchData.data)
+			{
+				latest = false;
+				break;
+			}
+		}
+		if(latest)
+			cout << "  X " << dataSets[i].setName << "\n\n";
+		else
+			cout << "  * " << dataSets[i].setName << "\n";
+	}
+	cout << "This program will identify if you have an old version of a supported game, if\n"
+		"so it will patch up to the version considered to be the latest. To patch, only\n"
+		"the game data files are needed. Optionally, if the game executable are present\n"
+		"they will be patched as well.\n\n"
+		"This patch should be run in the same directory as the data you wish to patch.\n\n";
+
+	char response;
+	do
+	{
+		cout << "Continue? [Y/N] ";
+		response = cin.get();
+		if(response != '\n')
+			cin.ignore(4096, '\n');
+		if(response == 'n' || response == 'N')
+			exit(0);
+	}
+	while(response != 'y' && response != 'Y');
+
+	for(int i = 0;i < countof(dataSets);++i)
 	{
 		bool identified = true;
 		bool noOptional = false;
@@ -402,5 +438,12 @@ int main(int argc, char* argv[])
 			patch(dataSets[i].fileChecksum[f].patchData.data, dataSets[i].fileChecksum[f].patchData.size, dataSets[i].fileChecksum[f].filename, dataSets[i].fileChecksum[f].newFilename ? dataSets[i].fileChecksum[f].newFilename : dataSets[i].fileChecksum[f].filename);
 		}
 	}
+
+	cout << "\nPatching complete! If you do not see any lines above that read \"Patching: ...\"\n"
+			"then your data was not recognized. This probably indicates that your data is\n"
+			"modified or otherwise corrupted and needs to be reinstalled.\n\n"
+			"Press enter to dismiss...";
+	cin.get();
+
 	return 0;
 }
