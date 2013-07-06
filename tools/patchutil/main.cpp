@@ -22,6 +22,7 @@
 
 #include "patchdata.cpp"
 #include "patchdata_reg.cpp"
+#include "patchdata_bs1.cpp"
 #include "patchdata_bs6.cpp"
 
 using namespace std;
@@ -90,6 +91,84 @@ struct OldDataSet
 	const char*		setName;
 } dataSets[] =
 {
+	{
+		12,
+		{
+			{2636647909u, 1280, "audiohed.bs1", NULL, NULLP, false},
+			{4257831234u, 1024, "vgadict.bs1", NULL, P(vgadict10bssw), false},
+			//{241924712u, 276784, "sanim.bs1", NULL, NULLP, false},
+			//{3189561458u, 18977, "ianim.bs1", NULL, NULLP, false},
+			{501261956u, 9799, "jm_error.h", NULL, P(jm_error10bssw), true},
+			{4293568872u, 600, "vgahead.bs1", NULL, P(vgahead10bssw), false},
+			{387229244u, 124507, "bs_aog.exe", NULL, P(bs_aog10bssw), true},
+			{3963407722u, 12203, "bs-help.exe", NULL, P(bshelp10bssw), true},
+			{31637588u, 162268, "audiot.bs1", NULL, NULLP, false},
+			{367123052u, 10748, "jamerr.exe", NULL, P(jamerr10bssw), true},
+			//{4041681913u, 101, "bstone.bat", NULL, NULLP, true},
+			{2920060064u, 620645, "vgagraph.bs1", NULL, P(vgagraph10bssw), false},
+			{232286169u, 1996008, "vswap.bs1", NULL, P(vswap10bssw), false},
+			{2383999590u, 91100, "maptemp.bs1", NULL, P(maptemp10bssw), false},
+			{1223831186u, 834, "maphead.bs1", NULL, P(maphead10bssw), false}
+		},
+		"Blake Stone Shareware v1.0"
+	},
+	{
+		13,
+		{
+			{2636647909u, 1280, "audiohed.bs1", NULL, P(audiohed20bssw), false},
+			{2527841072u, 1024, "vgadict.bs1", NULL, P(vgadict20bssw), false},
+			{1076595203u, 9883, "jm_error.h", NULL, NULLP, true},
+			{1940699079u, 633, "vgahead.bs1", NULL, P(vgahead20bssw), false},
+			{744711291u, 137680, "bs_aog.exe", NULL, P(bs_aog20bssw), true},
+			{2649321649u, 17323, "bs-help.exe", NULL, P(bshelp20bssw), true},
+			{31637588u, 162268, "audiot.bs1", NULL, P(audiot20bssw), false},
+			{968162678u, 20786, "jamerr.exe", NULL, P(jamerr20bssw), true},
+			{2489463136u, 623655, "vgagraph.bs1", NULL, P(vgagraph20bssw), false},
+			{466066612u, 1996008, "vswap.bs1", NULL, NULLP, false},
+			{1317237958u, 73724, "setblast.exe", NULL, NULLP, true},
+			{1566297908u, 90786, "maptemp.bs1", NULL, NULLP, false},
+			{1215957204u, 834, "maphead.bs1", NULL, NULLP, false}
+		},
+		"Blake Stone Shareware v2.0"
+	},
+	{
+		13,
+		{
+			{2476200822u, 1280, "audiohed.bs1", NULL, NULLP, false},
+			{3930217900u, 1024, "vgadict.bs1", NULL, P(vgadict21bssw), false},
+			{1076595203u, 9883, "jm_error.h", NULL, NULLP, true},
+			{3063551610u, 633, "vgahead.bs1", NULL, P(vgahead21bssw), false},
+			{3208303576u, 138308, "bs_aog.exe", NULL, P(bs_aog21bssw), true},
+			{3628097170u, 17563, "bs-help.exe", NULL, P(bshelp21bssw), true},
+			{3006928850u, 267636, "audiot.bs1", NULL, NULLP, false},
+			{1214717625u, 11212, "jamerr.exe", NULL, NULLP, true},
+			{169675525u, 623562, "vgagraph.bs1", NULL, P(vgagraph21bssw), false},
+			{466066612u, 1996008, "vswap.bs1", NULL, NULLP, false},
+			{1317237958u, 73724, "setblast.exe", NULL, P(setblast21bssw), true},
+			{1566297908u, 90786, "maptemp.bs1", NULL, NULLP, false},
+			{1215957204u, 834, "maphead.bs1", NULL, NULLP, false}
+		},
+		"Blake Stone Shareware v2.1"
+	},
+	{
+		13,
+		{
+			{2476200822u, 1280, "audiohed.bs1", NULL, NULLP, false},
+			{3542687473u, 1024, "vgadict.bs1", NULL, NULLP, false},
+			{1076595203u, 9883, "jm_error.h", NULL, NULLP, true},
+			{3984136128u, 639, "vgahead.bs1", NULL, NULLP, false},
+			{2977874630u, 138340, "bs_aog.exe", NULL, NULLP, true},
+			{3038859855u, 17650, "bs-help.exe", NULL, NULLP, true},
+			{3006928850u, 267636, "audiot.bs1", NULL, NULLP, false},
+			{1214717625u, 11212, "jamerr.exe", NULL, NULLP, true},
+			{1548084969u, 729462, "vgagraph.bs1", NULL, NULLP, false},
+			{466066612u, 1996008, "vswap.bs1", NULL, NULLP, false},
+			{4014968045u, 76751, "setblast.exe", NULL, NULLP, true},
+			{1566297908u, 90786, "maptemp.bs1", NULL, NULLP, false},
+			{1215957204u, 834, "maphead.bs1", NULL, NULLP, false}
+		},
+		"Blake Stone Shareware v3.0"
+	},
 	{
 		14,
 		{
@@ -229,7 +308,7 @@ struct OldDataSet
 			{898283639u, 1024, "vgadict.wl1", NULL, NULLP, false},
 			{3428045633u, 27425, "gamemaps.wl1", NULL, NULLP, false},
 			{2277491609u, 132613, "audiot.wl1", NULL, NULLP, false},
-			{557669750u, 109959, "wolf3d.exe", NULL, NULLP, true},
+			{1706878953u, 109959, "wolf3d.exe", NULL, P(wolf3d14sw), true},
 			{2785712368u, 471, "vgahead.wl1", NULL, NULLP, false},
 			{143619409u, 402, "maphead.wl1", NULL, NULLP, false},
 			{2247076949u, 742912, "vswap.wl1", NULL, NULLP, false},
@@ -237,6 +316,21 @@ struct OldDataSet
 			{1376992708u, 1156, "audiohed.wl1", NULL, NULLP, false},
 		},
 		"Wolfenstein 3D Shareware v1.4"
+	},
+	{
+		9,
+		{
+			{898283639u, 1024, "vgadict.wl1", NULL, NULLP, false},
+			{3428045633u, 27425, "gamemaps.wl1", NULL, NULLP, false},
+			{2277491609u, 132613, "audiot.wl1", NULL, NULLP, false},
+			{557669750u, 109959, "wolf3d.exe", NULL, NULLP, true},
+			{2785712368u, 471, "vgahead.wl1", NULL, NULLP, false},
+			{143619409u, 402, "maphead.wl1", NULL, NULLP, false},
+			{2247076949u, 742912, "vswap.wl1", NULL, NULLP, false},
+			{1953343984u, 326568, "vgagraph.wl1", NULL, NULLP, false},
+			{1376992708u, 1156, "audiohed.wl1", NULL, NULLP, false},
+		},
+		"Wolfenstein 3D Shareware v1.4g"
 	},
 	{
 		9,
@@ -311,7 +405,7 @@ struct OldDataSet
 			{2241761276u, 1545400, "vswap.wl6", NULL, NULLP, false},
 			{3479572251u, 259310, "wolf3d.exe", NULL, P(wolf3d14reggt1), true},
 		},
-		"Wolfenstein 3D Registered GT #1 1.4"
+		"Wolfenstein 3D Registered GT #1 v1.4"
 	},
 	{
 		9,
@@ -326,7 +420,7 @@ struct OldDataSet
 			{2241761276u, 1545400, "vswap.wl6", NULL, P(vswap14regid), false},
 			{3738828655u, 259310, "wolf3d.exe", NULL, P(wolf3d14regid), true},
 		},
-		"Wolfenstein 3D Registered ID Software 1.4"
+		"Wolfenstein 3D Registered ID Software v1.4"
 	},
 	{
 		9,
@@ -341,7 +435,7 @@ struct OldDataSet
 			{3859859044u, 1544376, "vswap.wl6", NULL, NULLP, false},
 			{4242494513u, 109589, "wolf3d.exe", NULL, P(wolf3d14reggt2), true},
 		},
-		"Wolfenstein 3D Registered GT #2 1.4"
+		"Wolfenstein 3D Registered GT #2 v1.4"
 	},
 	{
 		9,
