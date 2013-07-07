@@ -779,110 +779,206 @@ music
 
 textures
 {
-	"GSTONEA1",	// Gray Stone 1 N/S
-	"GSTONEA2",	// Gray Stone 1 E/W
-	"GSTONEB1",	// Gray Stone 2 N/S
-	"GSTONEB2",	// Gray Stone 2 E/W
-	"GSTFLAG1",	// Gray Stone Flag N/S
-	"GSTFLAG2",	// Gray Stone Flag E/W
-	"GSTHTLR1",	// Gray Stone Hitler N/S
-	"GSTHTLR2",	// Gray Stone Hitler E/W
-	"BSTCELA1",	// Blue Stone Empty Cell N/S
-	"BSTCELA2",	// Blue Stone Empty Cell E/W
-	"GSTEAGL1",	// Gray Stone Eagle N/S
-	"GSTEAGL2",	// Gray Stone Eagle E/W
-	"BSTCELB1",	// Blue Stone Cell w/ Skeleton N/S
-	"BSTCELB2",	// Blue Stone Cell w/ Skeleton E/W
-	"BSTONEA1",	// Blue Stone 1 N/S
-	"BSTONEA2",	// Blue Stone 1 E/W
-	"BSTONEB1",	// Blue Stone 2 N/S
-	"BSTONEB2",	// Blue Stone 2 E/W
-	"WODEAGL1",	// Wood Eagle N/S
-	"WODEAGL2",	// Wood Eagle E/W
-	"WODHTLR1",	// Wood Hitler N/S
-	"WODHTLR2",	// Wood Hitler E/W
-	"WOOD1",		// Wood N/S
-	"WOOD2",		// Wood E/W
-	"FAKEDOR1",	// Entrance to level N/S
-	"FAKEDOR2",	// Entrance to level E/W
-	"METLSGN1",	// Steel Panel Sign N/S
-	"METLSGN2",	// Steel Panel Sign E/W
-	"METAL1",	 // Steel Panel Sign N/S
-	"METAL2",	 // Steel Panel Sign E/W
-	"SKY1",		 // Sky N/S
-	"SKY2",		 // Sky E/W
-	"BRICK1",	 // Red Brick N/S
-	"BRICK2",	 // Red Brick E/W
-	"BRIKWRT1",	// Red Brick Wreath N/S
-	"BRIKWRT2",	// Red Brick Wreath E/W
-	"PURPLE1",	// Purple Wall N/S
-	"PURPLE2",	// Purple Wall E/W
-	"BRIKEGL1",	// Red Brick Eagle N/S
-	"BRIKEGL2",	// Red Brick Eagle E/W
-	"ELEV1_1",	// Elevator 1 N/S
-	"ELEV1_2",	// Elevator 1 E/W
-	"ELEV2_1",	// Elevator 2 N/S
-	"ELEV2_2",	// Elevator 2 E/W
-	"WODCROS1",	// Wood Cross N/S
-	"WODCROS2",	// Wood Cross E/W
-	"GSTSLME1",	// Gray Stone Slime N/S
-	"GSTSLME2",	// Gray Stone Slime E/W
-	"PURPBLD1",	// Purple Blood 1
-	"PURPBLD2",	// Purple Blood 2
-	"GSTLSLM1",	// Gray Stone Slime 2 N/S
-	"GSTLSLM2",	// Gray Stone Slime 2 E/W
-	"GSTONEC1",	// Gray Stone 3 N/S
-	"GSTONEC2",	// Gray Stone 3 E/W
-	"GSTSIGN1",	// Gray Stone Sign N/S
-	"GSTSIGN2",	// Gray Stone Sign E/W
-	"CHIP1",		// Chipped Rock N/S
-	"CHIP2",		// Chipped Rock E/W
-	"CHPBLDA1",	// Chipped Rock Blood 1 N/S
-	"CHPBLDA2",	// Chipped Rock Blood 1 E/W
-	"CHPBLDB1",	// Chipped Rock Blood 2 N/S
-	"CHPBLDB2",	// Chipped Rock Blood 2 E/W
-	"CHPBLDC1",	// Chipped Rock Blood 3 N/S
-	"CHPBLDC2",	// Chipped Rock Blood 3 E/W
-	"GLASS1",	 // Stained Glass N/S
-	"GLASS2",	 // Stained Glass E/W
-	"BLUSKUL1",	// Blue Skull N/S
-	"BLUSKUL2",	// Blue Skull E/W
-	"GRYBRIK1",	// Gray Brick N/S
-	"GRYBRIK2",	// Gray Brick E/W
-	"BLUSWAS1",	// Blue Swastika N/S
-	"BLUSWAS2",	// Blue Swastika E/W
-	"GRYVENT1",	// Gray Stone Vent N/S
-	"GRYVENT2",	// Gray Stone Vent E/W
-	"BRIKODD1",	// Odd Bricks N/S
-	"BRIKODD2",	// Odd Bricks E/W
-	"GRYCRAK1",	// Gray Brick Crack N/S
-	"GRYCRAK2",	// Gray Brick Crack E/W
-	"BLUWALL1",	// Blue Wall N/S
-	"BLUWALL2",	// Blue Wall E/W
-	"BSTSIGN1",	// Blue Stone Sign N/S
-	"BSTSIGN2",	// Blue Stone Sign E/W
-	"MARB1_1",	// Brown Marble 1 N/S
-	"MARB1_2",	// Brown Marble 1 E/W
-	"GRYMAPS1",	// Gray Brick Map N/S
-	"GRYMAPS2",	// Gray Brick Map E/W
-	"BRNSTNA1",	// Brown Stone 1 N/S
-	"BRNSTNA2",	// Brown Stone 1 E/W
-	"BRNSTNB1",	// Brown Stone 2 N/S
-	"BRNSTNB2",	// Brown Stone 2 E/W
-	"MARB2_1",	// Brown Marble 2 N/S
-	"MARB2_2",	// Brown Marble 2 E/W
-	"MARB3_1",	// Brown Marble Flag N/S
-	"MARB3_2",	// Brown Marble Flag E/W
-	"PLASTER1",	// Plaster N/S
-	"PLASTER2",	// Plaster E/W
-	"GRYHTLR1",	// Gray Brick Hitler N/S
-	"GRYHTLR2",	// Gray Brick Hitler E/W
-	"DOOR1_1",	// Door N/S
-	"DOOR1_2",	// Door E/W
-	"SLOT1_1",	// Doorjamb N/S
-	"SLOT1_2",	// Doorjamb E/W
-	"DOOR2_1",	// Elevator Door N/S
-	"DOOR2_2",	// Elevator Door E/W
-	"DOOR3_1",	// Locked Door N/S
-	"DOOR3_2"	 // Locked Door E/W
+	"WALL0001", // 0
+	"WALL0002",
+	"WALL0011", // 2
+	"WALL0012",
+	"WALL0021", // 4
+	"WALL0022",
+	"WALL0031", // 6
+	"WALL0032",
+	"WALL0041", // 8
+	"WALL0042",
+	"WALL0051", // 10
+	"WALL0052",
+	"WALL0061", // 12
+	"WALL0062",
+	"WALL0071", // 14
+	"WALL0072",
+	"WALL0081", // 16
+	"WALL0082",
+	"WALL0091", // 18
+	"WALL0092",
+	"WALL0101", // 20
+	"WALL0102",
+	"WALL0111", // 22
+	"WALL0112",
+	"WALL0121", // 24
+	"WALL0122",
+	"WALL0131", // 26
+	"WALL0132",
+	"WALL0141", // 28
+	"WALL0142",
+	"WALL0151", // 30
+	"WALL0152",
+	"WALL0161", // 32
+	"WALL0162",
+	"WALL0171", // 34
+	"WALL0172",
+	"WALL0181", // 36
+	"WALL0182",
+	"WALL0191", // 38
+	"WALL0192",
+	"WALL0201", // 40
+	"WALL0202",
+	"WALL0211", // 42
+	"WALL0212",
+	"WALL0221", // 44
+	"WALL0222",
+	"WALL0231", // 46
+	"WALL0232",
+	"WALL0241", // 48
+	"WALL0242",
+	"WALL0251", // 50
+	"WALL0252",
+	"WALL0261", // 52
+	"WALL0262",
+	"WALL0271", // 54
+	"WALL0272",
+	"WALL0281", // 56
+	"WALL0282",
+	"WALL0291", // 58
+	"WALL0292",
+	"WALL0301", // 60
+	"WALL0302",
+	"WALL0311", // 62
+	"WALL0312",
+	"WALL0321", // 64
+	"WALL0322",
+	"WALL0331", // 66
+	"WALL0332",
+	"WALL0341", // 68
+	"WALL0342",
+	"WALL0351", // 70
+	"WALL0352",
+	"WALL0361", // 72
+	"WALL0362",
+	"WALL0371", // 74
+	"WALL0372",
+	"WALL0381", // 76
+	"WALL0382",
+	"WALL0391", // 78
+	"WALL0392",
+	"WALL0401", // 80
+	"WALL0402",
+	"WALL0411", // 82
+	"WALL0412",
+	"WALL0421", // 84
+	"WALL0422",
+	"WALL0431", // 86
+	"WALL0432",
+	"WALL0441", // 88
+	"WALL0442",
+	"WALL0451", // 90
+	"WALL0452",
+	"WALL0461", // 92
+	"WALL0462",
+	"WALL0471", // 94
+	"WALL0472",
+	"WALL0481", // 96
+	"WALL0482",
+	"WALL0491", // 98
+	"WALL0492",
+	"WALL0501", // 100
+	"WALL0502",
+	"WALL0511", // 102
+	"WALL0512",
+	"WALL0521", // 104
+	"WALL0522",
+	"WALL0531", // 106
+	"WALL0532",
+	"WALL0541", // 108
+	"WALL0542",
+	"WALL0551", // 110
+	"WALL0552",
+	"WALL0561", // 112
+	"WALL0562",
+	"WALL0571", // 114
+	"WALL0572",
+	"WALL0581", // 116
+	"WALL0582",
+	"WALL0591", // 118
+	"WALL0592",
+	"WALL0601", // 120
+	"WALL0602",
+	"WALL0611", // 122
+	"WALL0612",
+	"WALL0621", // 124
+	"WALL0622",
+	"FLAT0001", // 126
+	"FLAT0002",
+	"FLAT0003",
+	"FLAT0004",
+	"FLAT0005",
+	"FLAT0006",
+	"FLAT0007",
+	"FLAT0008",
+	"FLAT0009",
+	"FLAT0010",
+	"FLAT0011", // 136
+	"FLAT0012",
+	"FLAT0013",
+	"FLAT0014",
+	"FLAT0015",
+	"FLAT0016",
+	"FLAT0017",
+	"FLAT0018",
+	"FLAT0019",
+	"FLAT0020",
+	"FLAT0021", // 146
+	"FLAT0022",
+	"FLAT0023",
+	"FLAT0024",
+	"FLAT0025",
+	"FLAT0026",
+	"FLAT0027",
+	"FLAT0028",
+	"FLAT0029",
+	"FLAT0030",
+	"FLAT0031", // 156
+	"FLAT0032",
+	"DMETALL1", // Metal Door Locked
+	"DMETALL2",
+	"DBIOL1", // Bio Door Locked
+	"DBIOL2",
+	"DELEVL1", // Elevator Door Locked
+	"DELEVL2",
+	"DSPACEL1", // Space Door Locked
+	"DSPACEL2",
+	"DPRISNL1", // Prison Door Locked
+	"DPRISNL2",
+	"DHSECL1", // High Security Door Locked
+	"DHSECL2",
+	"DONEWYL1", // One Way Door Locked
+	"DONEWYL2",
+	"DOFFICL1", // Office Door Locked
+	"DOFFICL2",
+	"DMETALU1", // Metal Door Unlocked
+	"DMETALU2",
+	"DBIOU1", // Bio Door Unlocked
+	"DBIOU2",
+	"DELEVU1", // Elevator Door Unlocked
+	"DELEVU2",
+	"DSPACEU1", // Space Door Unlocked
+	"DSPACEU2",
+	"DPRISNU1", // Prison Door Unlocked
+	"DPRISNU2",
+	"DHSECU1", // High Security Door Unlocked
+	"DHSECU2",
+	"DONEWYU1", // One Way Door Unlocked
+	"DONEWYU2",
+	"DOFFICU1", // Office Door Unlocked
+	"DOFFICU2",
+	"DOWEXIT1", // One Way Exit
+	"DOWEXIT2",
+	"JAMSTEL1", // Door Jam Steel
+	"JAMSTEL2",
+	"JAMSPCA1", // Door Jam Space (Type 1)
+	"JAMSPCA2",
+	"JAMOFFC1", // Door Jam Office
+	"JAMOFFC2",
+	"JAMBIO1", // Door Jam Bio
+	"JAMBIO2",
+	"JAMSPCB1", // Door Jam Space (Type 2)
+	"JAMSPCB2"
 }

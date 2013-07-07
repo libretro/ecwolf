@@ -3,4 +3,5 @@ include "mapinfo/wolf3d.txt"
 gameinfo
 {
 	gamepalette = "BLAKEPAL"
+	translator = "xlat/planet.txt"
 }

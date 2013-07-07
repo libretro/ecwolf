@@ -1,0 +1,643 @@
+tiles
+{
+	tile 1
+	{
+		texturenorth = "WALL0001";
+		texturesouth = "WALL0001";
+		textureeast = "WALL0002";
+		texturewest = "WALL0002";
+	}
+	tile 2
+	{
+		texturenorth = "WALL0011";
+		texturesouth = "WALL0011";
+		textureeast = "WALL0012";
+		texturewest = "WALL0012";
+	}
+	tile 3
+	{
+		texturenorth = "WALL0021";
+		texturesouth = "WALL0021";
+		textureeast = "WALL0022";
+		texturewest = "WALL0022";
+	}
+	tile 4
+	{
+		texturenorth = "WALL0031";
+		texturesouth = "WALL0031";
+		textureeast = "WALL0032";
+		texturewest = "WALL0032";
+	}
+	tile 5
+	{
+		texturenorth = "WALL0041";
+		texturesouth = "WALL0041";
+		textureeast = "WALL0042";
+		texturewest = "WALL0042";
+	}
+	tile 6
+	{
+		texturenorth = "WALL0051";
+		texturesouth = "WALL0051";
+		textureeast = "WALL0052";
+		texturewest = "WALL0052";
+	}
+	tile 7
+	{
+		texturenorth = "WALL0061";
+		texturesouth = "WALL0061";
+		textureeast = "WALL0062";
+		texturewest = "WALL0062";
+	}
+	tile 8
+	{
+		texturenorth = "WALL0071";
+		texturesouth = "WALL0071";
+		textureeast = "WALL0072";
+		texturewest = "WALL0072";
+	}
+	tile 9
+	{
+		texturenorth = "WALL0081";
+		texturesouth = "WALL0081";
+		textureeast = "WALL0082";
+		texturewest = "WALL0082";
+	}
+	tile 10
+	{
+		texturenorth = "WALL0091";
+		texturesouth = "WALL0091";
+		textureeast = "WALL0092";
+		texturewest = "WALL0092";
+	}
+	tile 11
+	{
+		texturenorth = "WALL0101";
+		texturesouth = "WALL0101";
+		textureeast = "WALL0102";
+		texturewest = "WALL0102";
+	}
+	tile 12
+	{
+		texturenorth = "WALL0111";
+		texturesouth = "WALL0111";
+		textureeast = "WALL0112";
+		texturewest = "WALL0112";
+	}
+	tile 13
+	{
+		texturenorth = "WALL0121";
+		texturesouth = "WALL0121";
+		textureeast = "WALL0122";
+		texturewest = "WALL0122";
+	}
+	tile 14
+	{
+		texturenorth = "WALL0131";
+		texturesouth = "WALL0131";
+		textureeast = "WALL0132";
+		texturewest = "WALL0132";
+	}
+	tile 15
+	{
+		texturenorth = "WALL0141";
+		texturesouth = "WALL0141";
+		textureeast = "WALL0142";
+		texturewest = "WALL0142";
+	}
+	tile 16
+	{
+		texturenorth = "WALL0151";
+		texturesouth = "WALL0151";
+		textureeast = "WALL0152";
+		texturewest = "WALL0152";
+	}
+	tile 17
+	{
+		texturenorth = "WALL0161";
+		texturesouth = "WALL0161";
+		textureeast = "WALL0162";
+		texturewest = "WALL0162";
+	}
+	tile 18
+	{
+		texturenorth = "WALL0171";
+		texturesouth = "WALL0171";
+		textureeast = "WALL0172";
+		texturewest = "WALL0172";
+	}
+	tile 19
+	{
+		texturenorth = "WALL0181";
+		texturesouth = "WALL0181";
+		textureeast = "WALL0182";
+		texturewest = "WALL0182";
+	}
+	tile 20
+	{
+		texturenorth = "WALL0191";
+		texturesouth = "WALL0191";
+		textureeast = "WALL0192";
+		texturewest = "WALL0192";
+	}
+	tile 21
+	{
+		texturenorth = "WALL0201";
+		texturesouth = "WALL0201";
+		textureeast = "WALL0202";
+		texturewest = "WALL0202";
+	}
+	tile 22
+	{
+		texturenorth = "WALL0211";
+		texturesouth = "WALL0211";
+		textureeast = "WALL0212";
+		texturewest = "WALL0212";
+	}
+	tile 23
+	{
+		texturenorth = "WALL0221";
+		texturesouth = "WALL0221";
+		textureeast = "WALL0222";
+		texturewest = "WALL0222";
+	}
+	tile 24
+	{
+		texturenorth = "WALL0231";
+		texturesouth = "WALL0231";
+		textureeast = "WALL0232";
+		texturewest = "WALL0232";
+	}
+	tile 25
+	{
+		texturenorth = "WALL0241";
+		texturesouth = "WALL0241";
+		textureeast = "WALL0242";
+		texturewest = "WALL0242";
+	}
+	tile 26
+	{
+		texturenorth = "WALL0251";
+		texturesouth = "WALL0251";
+		textureeast = "WALL0252";
+		texturewest = "WALL0252";
+	}
+	tile 27
+	{
+		texturenorth = "WALL0261";
+		texturesouth = "WALL0261";
+		textureeast = "WALL0262";
+		texturewest = "WALL0262";
+	}
+	tile 28
+	{
+		texturenorth = "WALL0271";
+		texturesouth = "WALL0271";
+		textureeast = "WALL0272";
+		texturewest = "WALL0272";
+	}
+	tile 29
+	{
+		texturenorth = "WALL0281";
+		texturesouth = "WALL0281";
+		textureeast = "WALL0282";
+		texturewest = "WALL0282";
+	}
+	tile 30
+	{
+		texturenorth = "WALL0291";
+		texturesouth = "WALL0291";
+		textureeast = "WALL0292";
+		texturewest = "WALL0292";
+	}
+	tile 31
+	{
+		texturenorth = "WALL0301";
+		texturesouth = "WALL0301";
+		textureeast = "WALL0302";
+		texturewest = "WALL0302";
+	}
+	tile 32
+	{
+		texturenorth = "WALL0311";
+		texturesouth = "WALL0311";
+		textureeast = "WALL0312";
+		texturewest = "WALL0312";
+	}
+	tile 33
+	{
+		texturenorth = "WALL0321";
+		texturesouth = "WALL0321";
+		textureeast = "WALL0322";
+		texturewest = "WALL0322";
+	}
+	tile 34
+	{
+		texturenorth = "WALL0331";
+		texturesouth = "WALL0331";
+		textureeast = "WALL0332";
+		texturewest = "WALL0332";
+	}
+	tile 35
+	{
+		texturenorth = "WALL0341";
+		texturesouth = "WALL0341";
+		textureeast = "WALL0342";
+		texturewest = "WALL0342";
+	}
+	tile 36
+	{
+		texturenorth = "WALL0351";
+		texturesouth = "WALL0351";
+		textureeast = "WALL0352";
+		texturewest = "WALL0352";
+	}
+	tile 37
+	{
+		texturenorth = "WALL0361";
+		texturesouth = "WALL0361";
+		textureeast = "WALL0362";
+		texturewest = "WALL0362";
+	}
+	tile 38
+	{
+		texturenorth = "WALL0371";
+		texturesouth = "WALL0371";
+		textureeast = "WALL0372";
+		texturewest = "WALL0372";
+	}
+	tile 39
+	{
+		texturenorth = "WALL0381";
+		texturesouth = "WALL0381";
+		textureeast = "WALL0382";
+		texturewest = "WALL0382";
+	}
+	tile 40
+	{
+		texturenorth = "WALL0391";
+		texturesouth = "WALL0391";
+		textureeast = "WALL0392";
+		texturewest = "WALL0392";
+	}
+	tile 41
+	{
+		texturenorth = "WALL0401";
+		texturesouth = "WALL0401";
+		textureeast = "WALL0402";
+		texturewest = "WALL0402";
+	}
+	tile 42
+	{
+		texturenorth = "WALL0411";
+		texturesouth = "WALL0411";
+		textureeast = "WALL0412";
+		texturewest = "WALL0412";
+	}
+	tile 43
+	{
+		texturenorth = "WALL0421";
+		texturesouth = "WALL0421";
+		textureeast = "WALL0422";
+		texturewest = "WALL0422";
+	}
+	tile 44
+	{
+		texturenorth = "WALL0431";
+		texturesouth = "WALL0431";
+		textureeast = "WALL0432";
+		texturewest = "WALL0432";
+	}
+	tile 45
+	{
+		texturenorth = "WALL0441";
+		texturesouth = "WALL0441";
+		textureeast = "WALL0442";
+		texturewest = "WALL0442";
+	}
+	tile 46
+	{
+		texturenorth = "WALL0451";
+		texturesouth = "WALL0451";
+		textureeast = "WALL0452";
+		texturewest = "WALL0452";
+	}
+	tile 47
+	{
+		texturenorth = "WALL0461";
+		texturesouth = "WALL0461";
+		textureeast = "WALL0462";
+		texturewest = "WALL0462";
+	}
+	tile 48
+	{
+		texturenorth = "WALL0471";
+		texturesouth = "WALL0471";
+		textureeast = "WALL0472";
+		texturewest = "WALL0472";
+	}
+	tile 49
+	{
+		texturenorth = "WALL0481";
+		texturesouth = "WALL0481";
+		textureeast = "WALL0482";
+		texturewest = "WALL0482";
+	}
+	tile 50
+	{
+		texturenorth = "WALL0491";
+		texturesouth = "WALL0491";
+		textureeast = "WALL0492";
+		texturewest = "WALL0492";
+	}
+	tile 51
+	{
+		texturenorth = "WALL0501";
+		texturesouth = "WALL0501";
+		textureeast = "WALL0502";
+		texturewest = "WALL0502";
+	}
+	tile 52
+	{
+		texturenorth = "WALL0511";
+		texturesouth = "WALL0511";
+		textureeast = "WALL0512";
+		texturewest = "WALL0512";
+	}
+	tile 53
+	{
+		texturenorth = "WALL0521";
+		texturesouth = "WALL0521";
+		textureeast = "WALL0522";
+		texturewest = "WALL0522";
+	}
+	tile 54
+	{
+		texturenorth = "WALL0531";
+		texturesouth = "WALL0531";
+		textureeast = "WALL0532";
+		texturewest = "WALL0532";
+	}
+	tile 55
+	{
+		texturenorth = "WALL0541";
+		texturesouth = "WALL0541";
+		textureeast = "WALL0542";
+		texturewest = "WALL0542";
+	}
+	tile 56
+	{
+		texturenorth = "WALL0551";
+		texturesouth = "WALL0551";
+		textureeast = "WALL0552";
+		texturewest = "WALL0552";
+	}
+	tile 57
+	{
+		texturenorth = "WALL0561";
+		texturesouth = "WALL0561";
+		textureeast = "WALL0562";
+		texturewest = "WALL0562";
+	}
+	tile 58
+	{
+		texturenorth = "WALL0571";
+		texturesouth = "WALL0571";
+		textureeast = "WALL0572";
+		texturewest = "WALL0572";
+	}
+	tile 59
+	{
+		texturenorth = "WALL0581";
+		texturesouth = "WALL0581";
+		textureeast = "WALL0582";
+		texturewest = "WALL0582";
+	}
+	tile 60
+	{
+		texturenorth = "WALL0591";
+		texturesouth = "WALL0591";
+		textureeast = "WALL0592";
+		texturewest = "WALL0592";
+	}
+	tile 61
+	{
+		texturenorth = "WALL0601";
+		texturesouth = "WALL0601";
+		textureeast = "WALL0602";
+		texturewest = "WALL0602";
+	}
+	tile 62
+	{
+		texturenorth = "WALL0611";
+		texturesouth = "WALL0611";
+		textureeast = "WALL0612";
+		texturewest = "WALL0612";
+	}
+	tile 63
+	{
+		texturenorth = "WALL0621";
+		texturesouth = "WALL0621";
+		textureeast = "WALL0622";
+		texturewest = "WALL0622";
+	}
+	tile 88
+	{
+		texturenorth = "JAMBIO1";
+		texturesouth = "JAMBIO1";
+		textureeast = "DBIOU2";
+		texturewest = "DBIOU2";
+		offsetvertical = true;
+	}
+	tile 89
+	{
+		texturenorth = "DBIOU1";
+		texturesouth = "DBIOU1";
+		textureeast = "JAMBIO2";
+		texturewest = "JAMBIO2";
+		offsethorizontal = true;
+	}
+	tile 90
+	{
+		texturenorth = "JAMSPCB1";
+		texturesouth = "JAMSPCB1";
+		textureeast = "DMETALU2";
+		texturewest = "DMETALU2";
+		offsetvertical = true;
+	}
+	tile 91
+	{
+		texturenorth = "DMETALU1";
+		texturesouth = "DMETALU1";
+		textureeast = "JAMSPCB2";
+		texturewest = "JAMSPCB2";
+		offsethorizontal = true;
+	}
+	tile 92
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DPRISNU2";
+		texturewest = "DPRISNU2";
+		offsetvertical = true;
+	}
+	tile 93
+	{
+		texturenorth = "DPRISNU1";
+		texturesouth = "DPRISNU1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 94
+	{
+		texturenorth = "JAMSPCB1";
+		texturesouth = "JAMSPCB1";
+		textureeast = "DELEVU2";
+		texturewest = "DELEVU2";
+		offsetvertical = true;
+	}
+	tile 95
+	{
+		texturenorth = "DELEVU1";
+		texturesouth = "DELEVU1";
+		textureeast = "JAMSPCB2";
+		texturewest = "JAMSPCB2";
+		offsethorizontal = true;
+	}
+	tile 96
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DHSECU2";
+		texturewest = "DHSECU2";
+		offsetvertical = true;
+	}
+	tile 97
+	{
+		texturenorth = "DHSECU1";
+		texturesouth = "DHSECU1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 98
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DONEWYU2";
+		texturewest = "DOWEXIT2";
+		offsetvertical = true;
+	}
+	tile 99
+	{
+		texturenorth = "DOWEXIT1";
+		texturesouth = "DONEWYU1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 100
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DOWEXIT2";
+		texturewest = "DONEWYU2";
+		offsetvertical = true;
+	}
+	tile 101
+	{
+		texturenorth = "DONEWYU1";
+		texturesouth = "DOWEXIT1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 102
+	{
+		texturenorth = "JAMOFFC1";
+		texturesouth = "JAMOFFC1";
+		textureeast = "DOFFICU2";
+		texturewest = "DOFFICU2";
+		offsetvertical = true;
+	}
+	tile 103
+	{
+		texturenorth = "DOFFICU1";
+		texturesouth = "DOFFICU1";
+		textureeast = "JAMOFFC2";
+		texturewest = "JAMOFFC2";
+		offsethorizontal = true;
+	}
+	tile 104
+	{
+		texturenorth = "JAMSPCA1";
+		texturesouth = "JAMSPCA1";
+		textureeast = "DSPACEU2";
+		texturewest = "DSPACEU2";
+		offsetvertical = true;
+	}
+	tile 105
+	{
+		texturenorth = "DSPACEU1";
+		texturesouth = "DSPACEU1";
+		textureeast = "JAMSPCA2";
+		texturewest = "JAMSPCA2";
+		offsethorizontal = true;
+	}
+
+	modzone 106 fillzone ambush;
+
+	zone 108 {}
+	zone 109 {}
+	zone 110 {}
+	zone 111 {}
+	zone 112 {}
+	zone 113 {}
+	zone 114 {}
+	zone 115 {}
+	zone 116 {}
+	zone 117 {}
+	zone 118 {}
+	zone 119 {}
+	zone 120 {}
+	zone 121 {}
+	zone 122 {}
+	zone 123 {}
+	zone 124 {}
+	zone 125 {}
+	zone 126 {}
+	zone 127 {}
+	zone 128 {}
+	zone 129 {}
+	zone 130 {}
+	zone 131 {}
+	zone 132 {}
+	zone 133 {}
+	zone 134 {}
+	zone 135 {}
+	zone 136 {}
+	zone 137 {}
+	zone 138 {}
+	zone 139 {}
+	zone 140 {}
+	zone 141 {}
+	zone 142 {}
+	zone 143 {}
+	zone 144 {}
+	zone 145 {}
+	zone 146 {}
+	zone 147 {}
+	zone 148 {}
+	zone 149 {}
+	zone 150 {}
+	zone 151 {}
+	zone 152 {}
+}
+
+things
+{
+	// oldnum, newnum, angles, patrol, minskill
+	{19,	1,	4,	0,	0}
+}
+ 
