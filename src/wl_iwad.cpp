@@ -414,7 +414,7 @@ static void ParseIWadInfo(FResourceFile *res)
 	}
 }
 
-#ifdef WINDOWS
+#ifdef _WIN32
 /*
 ** i_system.cpp
 ** Timers, pre-console output, IWAD selection, and misc system routines.
@@ -481,6 +481,7 @@ static bool QueryPathKey(HKEY key, const char *keypath, const char *valname, FSt
 	}
 	return value.IsNotEmpty();
 }
+#endif
 
 //==========================================================================
 //
@@ -489,8 +490,14 @@ static bool QueryPathKey(HKEY key, const char *keypath, const char *valname, FSt
 // Check the registry for the path to Steam, so that we can search for
 // IWADs that were bought with Steam.
 //
+// Defined in macosx/filesystem.mm for Mac
+// If any of the games end up supported on Linux it looks like one would
+// need to read the ~/.steam/registry.vdf file to find the SteamApps dir.
+// Or maybe ~/.steam/steam/config/config.vdf
+//
 //==========================================================================
 
+#ifdef _WIN32
 FString I_GetSteamPath()
 {
 	FString path;
@@ -579,15 +586,22 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	}
 	while(split != 0);
 
-#if WINDOWS
+#if defined(_WIN32) || defined(__APPLE__)
 	// Look for a steam install. (Basically from ZDoom)
 	FString steamPath = I_GetSteamPath();
 	if(!steamPath.IsEmpty())
 	{
 		static const char* const steamDirs[] =
 		{
+#if defiend(_WIN32)
 			"Wolfenstein 3D/base",
-			"Spear of Destiny/base"
+			"Spear of Destiny/base",
+			"The Apogee Throwback Pack/Blake Stone",
+			"The Apogee Throwback Pack/Planet Strike"
+#elif defined(__APPLE__)
+			"The Apogee Throwback Pack/Blake Stone AOG.app/Contents/Resources/BlakestoneAOG",
+			"The Apogee Throwback Pack/Blake Stone PS.app/Contents/Resources/BlakestonePS"
+#endif
 		};
 		steamPath += "/SteamApps/common/";
 		for(unsigned int i = 0;i < countof(steamDirs);++i)

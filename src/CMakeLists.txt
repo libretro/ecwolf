@@ -102,6 +102,7 @@ endif(NO_GTK)
 
 if(APPLE)
 	set(EXTRA_FILES
+		macosx/filesystem.mm
 		macosx/SDLMain.m
 		macosx/wl_iwad_picker_cocoa.mm
 	)
