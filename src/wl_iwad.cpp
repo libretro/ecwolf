@@ -148,7 +148,9 @@ enum
 	FILE_VGAGRAPH,
 	FILE_VSWAP,
 
-	BASEFILES
+	BASEFILES,
+
+	FILE_REQMASK = (1<<BASEFILES)-1
 };
 struct BaseFile
 {
@@ -207,11 +209,11 @@ static bool VerifySpearInstall(const char* directory)
 static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const char* directory)
 {
 	static const unsigned int LoadableBaseFiles[] = { FILE_AUDIOT, FILE_GAMEMAPS, FILE_VGAGRAPH, FILE_VSWAP, BASEFILES };
-	static const char* const BaseFileNames[BASEFILES] = {
-		"audiohed", "audiot",
-		"gamemaps", "maphead",
-		"vgadict", "vgahead", "vgagraph",
-		"vswap"
+	static const char* const BaseFileNames[BASEFILES][3] = {
+		{"audiohed", NULL}, {"audiot", NULL},
+		{"gamemaps", "maptemp", NULL}, {"maphead", NULL},
+		{"vgadict", NULL}, {"vgahead", NULL}, {"vgagraph", NULL},
+		{"vswap", NULL}
 	};
 	TArray<BaseFile> foundFiles;
 
@@ -253,11 +255,16 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 		unsigned int baseName = 0;
 		do
 		{
-			if(name.CompareNoCase(BaseFileNames[baseName]) == 0)
+			for(const char* const * nameCheck = BaseFileNames[baseName];*nameCheck;++nameCheck)
 			{
-				base->filename[baseName].Format("%s/%s", directory, files[i].GetChars());
-				base->isValid |= 1<<baseName;
-				break;
+				if(name.CompareNoCase(*nameCheck) == 0)
+				{
+					base->filename[baseName].Format("%s/%s", directory, files[i].GetChars());
+					base->isValid |= 1<<baseName;
+
+					baseName = BASEFILES;
+					break;
+				}
 			}
 		}
 		while(++baseName < BASEFILES);
@@ -299,7 +306,13 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 				}
 			}
 			if(doPush)
-				iwads.Push(wadStuff);
+			{
+				if(!iwadTypes[wadStuff.Type].Required.IsEmpty() ||
+					(foundFiles[i].isValid & FILE_REQMASK) == FILE_REQMASK)
+				{
+					iwads.Push(wadStuff);
+				}
+			}
 		}
 	}
 

@@ -9,7 +9,7 @@ IWad
 {
 	Name = "Planet Strike"
 	Mapinfo = "mapinfo/planet.txt"
-	MustContain = "S000A0"
+	MustContain = "APCPA0"
 }
 
 IWad
