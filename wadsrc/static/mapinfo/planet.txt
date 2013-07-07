@@ -1,1 +1,6 @@
 include "mapinfo/wolf3d.txt"
+
+gameinfo
+{
+	gamepalette = "BLAKEPAL"
+}
