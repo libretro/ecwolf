@@ -195,13 +195,12 @@ class FVGAGraph : public FResourceFile
 			NumLumps = vgaheadReader.Tell()/3;
 			vgaheadReader.Seek(0, SEEK_SET);
 			lumps = new FVGALump[NumLumps];
-			//for(unsigned int i = 0;i < NumLumps;i++)
-			//	lumps[i].LumpSize = 0;
 			// The vgahead has 24-bit ints.
 			BYTE* data = new BYTE[NumLumps*3];
 			vgaheadReader.Read(data, NumLumps*3);
 
 			unsigned int numPictures = 0;
+			unsigned int numFonts = 0;
 			Dimensions* dimensions = NULL;
 			for(unsigned int i = 0;i < NumLumps;i++)
 			{
@@ -212,7 +211,7 @@ class FVGAGraph : public FResourceFile
 				lumps[i].LumpNameSetup(lumpname);
 
 				lumps[i].noSkip = false;
-				lumps[i].isImage = (i >= 3 && i-3 < numPictures);
+				lumps[i].isImage = (i > numFonts+2 && i-numFonts-1 < numPictures);
 				lumps[i].Namespace = lumps[i].isImage ? ns_graphics : ns_global;
 				lumps[i].position = ReadLittle24(&data[i*3]);
 				lumps[i].huffman = huffman;
@@ -230,7 +229,7 @@ class FVGAGraph : public FResourceFile
 				else
 					lumps[i].LumpSize = LittleLong(lumps[i].LumpSize);
 
-				if(i == 1) // We must do this on the second lump to how the position is filled.
+				if(i == 1) // We must do this starting with the second lump due to how the position is filled.
 				{
 					// It looks like editors often neglect to give proper sizes
 					// for the pictable. If we can at least assume that the
@@ -239,10 +238,10 @@ class FVGAGraph : public FResourceFile
 					// where the decoder ends. (Wolf3D hard coded the number of
 					// pictures so it just used that for the size.)
 					Reader->Seek(lumps[0].position+4, SEEK_SET);
-					lumps[0].LumpSize = (NumLumps-3)*4;
+					lumps[0].LumpSize = (NumLumps-1)*4;
 
 					byte* data = new byte[lumps[0].length];
-					byte* out = new byte[(NumLumps-3)*4];//lumps[0].LumpSize];
+					byte* out = new byte[lumps[0].LumpSize];
 					Reader->Read(data, lumps[0].length);
 					byte* endPtr = lumps[0].HuffExpand(data, out);
 					delete[] data;
@@ -263,16 +262,58 @@ class FVGAGraph : public FResourceFile
 					}
 					delete[] out;
 				}
-				else if(lumps[i].isImage)
+				// Check if the last lump is a font, but only until we hit a
+				// lump we determined was not a font.
+				else if(i == numFonts+2)
 				{
-					lumps[i].dimensions = dimensions[i-3];
+					// First check if it's large enough for the font header
+					if(lumps[i-1].LumpSize > 770)
+					{
+						Reader->Seek(lumps[i-1].position+4, SEEK_SET);
+
+						byte* data = new byte[lumps[i-1].length];
+						byte* out = new byte[lumps[i-1].LumpSize];
+						Reader->Read(data, lumps[i-1].length);
+						byte* endPtr = lumps[i-1].HuffExpand(data, out);
+						delete[] data;
+
+						WORD height = ReadLittleShort(out);
+						for(unsigned int c = 0;c < 256;++c)
+						{
+							WORD offset = ReadLittleShort(&out[c*2+2]);
+							BYTE width = out[c+514];
+
+							if(offset + width*height/8 > lumps[i-1].LumpSize)
+							{
+								lumps[i-1].isImage = lumps[i].isImage = true;
+								break;
+							}
+						}
+						delete[] out;
+
+						if(!lumps[i].isImage)
+							++numFonts;
+					}
+					else
+						lumps[i-1].isImage = lumps[i].isImage = true;
+
+					if(lumps[i-1].isImage)
+					{
+						lumps[i].dimensions = dimensions[0];
+						lumps[i].LumpSize += 4;
+					}
+				}
+
+				if(lumps[i].isImage)
+				{
+					lumps[i].dimensions = dimensions[i-numFonts-1];
 					lumps[i].LumpSize += 4;
 				}
 			}
 			// HACK: For some reason id decided the tile8 lump will not tell
 			//       its size.  So we need to assume it's right after the
 			//       graphics and is 72 tiles long.
-			unsigned int tile8Position = 3+numPictures;
+			unsigned int tile8Position = 1+numFonts+numPictures;
 			if(tile8Position < NumLumps && (unsigned)lumps[tile8Position].LumpSize > lumps[tile8Position].length)
 			{
 				lumps[tile8Position].noSkip = true;
