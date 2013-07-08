@@ -451,11 +451,6 @@ static void InitGame()
 //
 	FinalReadConfig();
 
-//
-// initialize variables
-//
-	InitRedShifts ();
-
 // Temporary status bar config
 	SetupStatusbar();
 
