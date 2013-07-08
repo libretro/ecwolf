@@ -89,9 +89,9 @@ static int CheckData(WadStuff &wad)
 	for(unsigned int i = 0;i < wad.Path.Size();++i)
 	{
 		FResourceFile *file = FResourceFile::OpenResourceFile(wad.Path[i], NULL, true);
-		LumpRemapper::RemapAll(); // Fix lump names if needed
 		if(file)
 		{
+			LumpRemapper::RemapAll(); // Fix lump names if needed
 			for(unsigned int j = file->LumpCount();j-- > 0;)
 			{
 				FResourceLump *lump = file->GetLump(j);

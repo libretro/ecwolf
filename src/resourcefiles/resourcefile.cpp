@@ -307,6 +307,7 @@ FResourceFile::FResourceFile(const char *filename, FileReader *r)
 	}
 	else Filename = NULL;
 	Reader = r;
+	FirstLump = 0;
 }
 
 
