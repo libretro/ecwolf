@@ -527,3 +527,755 @@ actor VerticalPostStatic 254
 			stop
 	}
 }
+
+actor GurneyMutantStatic 255
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			MGUR A -1
+			stop
+	}
+}
+
+actor LargeAlienCanisterStatic 256
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CNTA A -1
+			stop
+	}
+}
+
+actor SmallAlienCanisterStatic 257
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CNSA A -1
+			stop
+	}
+}
+
+actor GurneyMutantEmpty 258
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			MGUR E -1
+			stop
+	}
+}
+
+actor LargeAlienCanisterEmpty 259
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CNTA E -1
+			stop
+	}
+}
+
+actor SmallAlienCanisterEmpty 260
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CNSA E -1
+			stop
+	}
+}
+
+actor DeadGenericScientist 261
+{
+	states
+	{
+		Spawn:
+			GSCI O -1
+			stop
+	}
+}
+
+actor PlainAirVent 262
+{
+	states
+	{
+		Spawn:
+			AVNT A -1
+			stop
+	}
+}
+
+actor BloodAirVent 263
+{
+	states
+	{
+		Spawn:
+			AVNT A -1
+			stop
+	}
+}
+
+actor WaterAirVent 264
+{
+	states
+	{
+		Spawn:
+			AVNT A -1
+			stop
+	}
+}
+
+actor FloorGrate 265
+{
+	states
+	{
+		Spawn:
+			GRAT A -1
+			stop
+	}
+}
+
+actor SteamPipe 266
+{
+	states
+	{
+		Spawn:
+			PIPE A -1
+			stop
+	}
+}
+
+actor MoneyBag 267
+{
+	states
+	{
+		Spawn:
+			MBAG A -1
+			stop
+	}
+}
+
+actor Loot 268
+{
+	states
+	{
+		Spawn:
+			LOOT A -1
+			stop
+	}
+}
+
+actor Gold5Bars 269
+{
+	states
+	{
+		Spawn:
+			GLD5 A -1
+			stop
+	}
+}
+
+actor XylanOrb 270
+{
+	states
+	{
+		Spawn:
+			XORB A -1
+			stop
+	}
+}
+
+actor GreekPost 271
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			GRPS A -1
+			stop
+	}
+}
+
+actor BluePost 272
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			BLPS A -1
+			stop
+	}
+}
+
+actor HiTechPost 273
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			HTPS A -1
+			stop
+	}
+}
+
+actor BlakeCeilingLight2 274
+{
+	states
+	{
+		Spawn:
+			CLT2 A -1
+			stop
+	}
+}
+
+actor BlakeCeilingLight3 275
+{
+	states
+	{
+		Spawn:
+			CLT3 A -1
+			stop
+	}
+}
+
+actor BodyParts 276
+{
+	states
+	{
+		Spawn:
+			BDYP A -1
+			stop
+	}
+}
+
+actor OverheadLamp 277
+{
+	states
+	{
+		Spawn:
+			ORLP A -1
+			stop
+	}
+}
+
+actor OfficeSink 278
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			OSNK A -1
+			stop
+	}
+}
+
+actor CandyBar 279
+{
+	states
+	{
+		Spawn:
+			CNDY A -1
+			stop
+	}
+}
+
+actor Sandwich 280
+{
+	states
+	{
+		Spawn:
+			SNDW A -1
+			stop
+	}
+}
+
+actor BlakeCrate1 281
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CRT1 A -1
+			stop
+	}
+}
+
+actor BlakeCrate2 282
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CRT2 A -1
+			stop
+	}
+}
+
+actor BlakeCrate3 283
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			CRT3 A -1
+			stop
+	}
+}
+
+actor BlakeTable 284
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			STBL A -1
+			stop
+	}
+}
+
+actor BlakeChair 285
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			SCHR A -1
+			stop
+	}
+}
+
+actor BlakeStool 286
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			SSTL A -1
+			stop
+	}
+}
+
+actor BlakeGore 287
+{
+	states
+	{
+		Spawn:
+			BDY2 A -1
+			stop
+	}
+}
+
+actor Gold3Bars 288
+{
+	states
+	{
+		Spawn:
+			GLD3 A -1
+			stop
+	}
+}
+
+actor Gold2Bars 289
+{
+	states
+	{
+		Spawn:
+			GLD2 A -1
+			stop
+	}
+}
+
+actor Gold1Bar 290
+{
+	states
+	{
+		Spawn:
+			GLD1 A -1
+			stop
+	}
+}
+
+actor BlueRedPost 291
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			BRPS A -1
+			stop
+	}
+}
+
+actor GreenPost 292
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			GRPS A -1
+			stop
+	}
+}
+
+actor GeneratorPost 293
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			GNPS A -1
+			stop
+	}
+}
+
+actor TallDecorativeColumn 294
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			TDCL A -1
+			stop
+	}
+}
+
+actor ShortDecorativeColumn 295
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			SDCL A -1
+			stop
+	}
+}
+
+actor BlakeDebris1 296
+{
+	states
+	{
+		Spawn:
+			DBR1 A -1
+			stop
+	}
+}
+
+actor BlakeDebris2 297
+{
+	states
+	{
+		Spawn:
+			DBR2 A -1
+			stop
+	}
+}
+
+actor BlakeDebris3 298
+{
+	states
+	{
+		Spawn:
+			DBR3 A -1
+			stop
+	}
+}
+
+actor BlakeDebris4 299
+{
+	states
+	{
+		Spawn:
+			DBR4 A -1
+			stop
+	}
+}
+
+actor DeadSectorGuard 300
+{
+	states
+	{
+		Spawn:
+			SECG N -1
+			stop
+	}
+}
+
+actor DeadTechWarrior 301
+{
+	states
+	{
+		Spawn:
+			TECW O -1
+			stop
+	}
+}
+
+actor DeadAlienProtector 302
+{
+	states
+	{
+		Spawn:
+			PROT T -1
+			stop
+	}
+}
+
+actor DeadGroundScout 303
+{
+	states
+	{
+		Spawn:
+			GSCT M -1
+			stop
+	}
+}
+
+actor DeadFloatingScout 304
+{
+	states
+	{
+		Spawn:
+			FSCT L -1
+			stop
+	}
+}
+
+actor DeadMechSentinel 305
+{
+	states
+	{
+		Spawn:
+			MSEN P -1
+			stop
+	}
+}
+
+actor DeadMutantHuman 306
+{
+	states
+	{
+		Spawn:
+			MHUM P -1
+			stop
+	}
+}
+
+actor DeadContainedAlien 307
+{
+	states
+	{
+		Spawn:
+			CNTA U -1
+			stop
+	}
+}
+
+actor DeadCanisterAlien 308
+{
+	states
+	{
+		Spawn:
+			CNSA U -1
+			stop
+	}
+}
+
+actor DeadGurneyMutant 309
+{
+	states
+	{
+		spawn:
+			MGUR R -1
+			stop
+	}
+}
+
+actor DeadHangingTurret 310
+{
+	states
+	{
+		Spawn:
+			TURR H -1
+			stop
+	}
+}
+
+actor DeadPODAlien 311
+{
+	states
+	{
+		Spawn:
+			PODA Q -1
+			stop
+	}
+}
+
+actor CocessionCoin 312
+{
+	states
+	{
+		Spawn:
+			CON1 A -1
+			stop
+	}
+}
+
+actor ConcessionCoin5 313
+{
+	states
+	{
+		Spawn:
+			CON5 A -1
+			stop
+	}
+}
+
+actor AutoChargePistol 314
+{
+	states
+	{
+		Spawn:
+			ACPP A -1
+			stop
+	}
+}
+
+actor PlasmaDetonator 315
+{
+	states
+	{
+		Spawn:
+			DBOM A -1
+			stop
+	}
+}
+
+actor BlakeRubble 316
+{
+	states
+	{
+		Spawn:
+			RUBL A -1
+			stop
+	}
+}
+
+actor AutoMapper 317
+{
+	states
+	{
+		Spawn:
+			AUTO A -1
+			stop
+	}
+}
+
+actor BonziTree 318
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			BONZ A -1
+			stop
+	}
+}
+
+actor YellowPottedPlant 319
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			POTP A -1
+			stop
+	}
+}
+
+actor TubePlant 320
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			TUBP A -1
+			stop
+	}
+}
+
+actor HiTechTableAndChairs 321
+{
+	radius 32
+	+SOLID
+	states
+	{
+		Spawn:
+			HTCH A -1
+			stop
+	}
+}
+
+actor DeadSectorPatrol 322
+{
+	states
+	{
+		Spawn:
+			RENT N -1
+			stop
+	}
+}
+
+actor DeadStarSentinel 323
+{
+	states
+	{
+		Spawn:
+			PROG O -1
+			stop
+	}
+}
+
+actor DeadStarTrooper 324
+{
+	states
+	{
+		Spawn:
+			SWAT T -1
+			stop
+	}
+}
+
+

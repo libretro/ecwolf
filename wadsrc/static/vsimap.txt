@@ -328,16 +328,15 @@ sprites
 	"GENGL0",
 	"GENGI0",	"GENGJ0",	"GENGK0",
 
-	// Mutant Human Type 1 (Also not really fitting, more of a robot)
-	// (Seems to be unfinished as well?)
-	"MUT2A0",	"MUT2B0",	"MUT2C0",	"MUT2D0",
-	"MUT2E0",	"MUT2F0",	"MUT2G0",
-	"MUT2P0",
-	"MUT2L0",	"MUT2M0",	"MUT2N0",	"MUT2O0",
-	"MUT2K0",
-	"MUT2H0",	"MUT2I0",	"MUT2J0",
+	// Mech Sentinel
+	"MSENA0",	"MSENB0",	"MSENC0",	"MSEND0",
+	"MSENE0",	"MSENF0",	"MSENG0",
+	"MSENP0",
+	"MSENL0",	"MSENM0",	"MSENN0",	"MSENO0",
+	"MSENK0",
+	"MSENH0",	"MSENI0",	"MSENJ0",
 
-	// Mutant Human Type 2
+	// Mutant Human
 	"MHUMA0",	"MHUMB0",	"MHUMC0",	"MHUMD0",
 	"MHUME0",	"MHUMF0",	"MHUMG0",
 	"MHUMP0",
@@ -427,7 +426,7 @@ sprites
 	"OOZ4A0",	"OOZ4B0",	"OOZ4C0",
 
 	"CNDYA0",	"CNDYB0", // Candy (Wrapper)
-	"SNDWA0",	"SNDWB0", // Sandwhich (Wrapper)
+	"SNDWA0",	"SNDWB0", // Sandwich (Wrapper)
 
 	"BLKEA0",	"BLKEB0",	"BLKEC0",	"BLKED0",
 
