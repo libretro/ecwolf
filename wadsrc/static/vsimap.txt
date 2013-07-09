@@ -761,7 +761,7 @@ digitalsounds
 	"DSSCIDT3", // Scientist Death 3
 	"DSSPITAT", // Spit Attack
 	"DSCLAWAT", // Claw Attack
-	"DSFISTAT"  // Fist Attack
+	"DSFISTAT"  // Fist Attack
 }
 
 music
@@ -833,8 +833,8 @@ textures
 	"METWALL2",
 	"TELEMAP1", // Teleport Map
 	"TELEMAP2",
-	"ELEVWALA", // Elevator Wall 1
-	"ELEVWALB", // Elevator Wall 2
+	"ELEVWAL1", // Elevator Wall 1
+	"ELEVWAL2", // Elevator Wall 2
 	"CONSWIR1", // Console Wires
 	"CONSWIR2",
 	"PLASMSP1", // Plasma Alien Spawner
@@ -859,8 +859,8 @@ textures
 	"INSDANG2",
 	"SHCRATE1", // Shipping Crate
 	"SHCRATE2",
-	"Biotech1", // Biotech Wall w/ Gold Deco
-	"Biotech2",
+	"BIOTECH1", // Biotech Wall w/ Gold Deco
+	"BIOTECH2",
 	"BIOEMBL1", // Biotech Wall w/ Emblem
 	"BIOEMBL2",
 	"PRIVENB1", // Prison Vent w/ Blood
