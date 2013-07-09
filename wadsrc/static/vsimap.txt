@@ -704,52 +704,64 @@ sounds
 
 digitalsounds
 {
-	"DSGRDSIT",
-	"DSDOGSIT",
-	"DSDRCLS",
-	"DSDROPN",
-	"DSMGUN",
-	"DSPISTOL",
-	"DSCGUN",
-	"DSSSSIT",
-	"DSHANSIT",
-	"DSHANDTH",
-	"DSBOSSFR",
-	"DSSSFIRE",
-	"DSGDDTH1",
-	"DSGDDTH2",
-	"DSPLPAIN",
-	"DSPSHWAL",
-	"DSDOGDTH",
-	"DSMUTDTH",
-	"DSHITSIT",
-	"DSHITDTH",
-	"DSSSDTH",
-	"DSGRDFIR",
-	"DSSLURPE",
-	"DSFAKSIT",
-	"DSSCBDTH",
-	"DSSCBSIT",
-	"DSFAKDTH",
-	"DSOFFSIT",
-	"DSOFFDTH",
-	"DSDOGATK",
-	"DSSWITCH",
-	"DSMCHSTP",
-	"DSYEAH",
-	"DSHITSHI",
-	"DSGDDTH4",
-	"DSGDDTH5",
-	"DSOTODTH",
-	"DSOTOSIT",
-	"DSFATSIT",
-	"DSFART",
-	"DSGDDTH6",
-	"DSGDDTH7",
-	"DSGDDTH8",
-	"DSGRTSIT",
-	"DSGRTDTH",
-	"DSFATDTH"
+	"DSIONCAN", // Fire Neutron Disruptor
+	"DSBLASTR", // Fire Protector / Generic Gun
+	"DSBRIFLE", // Fire Assault Gun
+	"DSDR2OPN", // Heavy Door Open
+	"DSDR2CLS", // Heavy Door Close
+	"DSDR1OPN", // Light Door Open
+	"DSDR1CLS", // Light Door Close
+	"DSINFDT1", // Informant Death 1
+	"DSGLDSIT", // Goldfire Sight
+	"DSRN2SIT", // PS Guard Sight
+	"DSRN2DT1", // PS Guard Death 1
+	"DSEXPLO1", // Explosion 1
+	"DSGENSIT", // Genetic Guard Sight
+	"DSPR2DT1", // PS Sentinel Death 1
+	"DSDOGSIT", // Brown Mutant Sight
+	"DSSCNSIT", // Critter Sight
+	"DSPR2SIT", // PS Sentinel Sight
+	"DSGENDTH", // Genetic Guard Death
+	"DSBLUDTH", // Boss Death
+	"DSSCISIT", // Scientist Sight (Alerted)
+	"DSSCIDT1", // Scientist Death 1
+	"DSDOGDTH", // Brown Mutant Death
+	"DSSW2SIT", // PS Trooper Sight
+	"DSSCNDTH", // Critter Death
+	"DSGLDLAF", // Goldfire Laugh
+	"DSARCZAP", // Arc Barrier Zap
+	"DSPODHTC", // POD Alien Hatch
+	"DSELCATK", // Plasmoid Attack
+	"DSELCSIT", // Plasmoid Sight (Spawn)
+	"DSELCDTH", // Plasmoid Death
+	"DSLIQDTH", // Liquid Alien Death
+	"DSGRNSIT", // Necro-Guard Sight
+	"DSWARPIN", // Warp In
+	"DSWARPOU", // Warp Out
+	"DSRN2DT2", // PS Guard Death 2
+	"DSEXPLO2", // Explosion 2
+	"DSLCNSIT", // Acid Alien Sight
+	"DSLCNDTH", // Acid Alien Death
+	"DSRN2DT3", // PS Guard Death 3
+	"DSINFDT2", // Informant Death 2
+	"DSINFDT3", // Informant Death 3
+	"DSGRNDTH", // Necro-Guard Death
+	"DSPR2DT2", // PS Sentinel Death 2
+	"DSPR2DT3", // PS Sentinel Death 3
+	"DSLCNBRK", // Acid Alien Release
+	"DSSCNBRK", // Critter Release
+	"DSGRENAD", // Fire Plasma Cannon
+	"DSSW2DT1", // PS Trooper Death 1
+	"DSSW2DT2", // PS Trooper "Death" 2 (Knocked Down)
+	"DSPODDTH", // POD Alien Death
+	"DSPODSIT", // POD Alien Sight
+	"DSBLUSIT", // Robot Sight
+	"DSSW2DT3", // PS Trooper Death 3
+	"DSSCIDT2", // Scientist Death 2
+	"DSSCIDT3", // Scientist Death 3
+	"DSSPITAT", // Spit Attack
+	"DSCLAWAT", // Claw Attack
+	"DSFISTAT"  // Fist Attack
 }
 
 music
@@ -779,164 +791,165 @@ music
 
 textures
 {
-	"WALL0001", // 0
-	"WALL0002",
-	"WALL0011", // 2
-	"WALL0012",
-	"WALL0021", // 4
-	"WALL0022",
-	"WALL0031", // 6
-	"WALL0032",
-	"WALL0041", // 8
-	"WALL0042",
-	"WALL0051", // 10
-	"WALL0052",
-	"WALL0061", // 12
-	"WALL0062",
-	"WALL0071", // 14
-	"WALL0072",
-	"WALL0081", // 16
-	"WALL0082",
-	"WALL0091", // 18
-	"WALL0092",
-	"WALL0101", // 20
-	"WALL0102",
-	"WALL0111", // 22
-	"WALL0112",
-	"WALL0121", // 24
-	"WALL0122",
-	"WALL0131", // 26
-	"WALL0132",
-	"WALL0141", // 28
-	"WALL0142",
-	"WALL0151", // 30
-	"WALL0152",
-	"WALL0161", // 32
-	"WALL0162",
-	"WALL0171", // 34
-	"WALL0172",
-	"WALL0181", // 36
-	"WALL0182",
-	"WALL0191", // 38
-	"WALL0192",
-	"WALL0201", // 40
-	"WALL0202",
-	"WALL0211", // 42
-	"WALL0212",
-	"WALL0221", // 44
-	"WALL0222",
-	"WALL0231", // 46
-	"WALL0232",
-	"WALL0241", // 48
-	"WALL0242",
-	"WALL0251", // 50
-	"WALL0252",
-	"WALL0261", // 52
-	"WALL0262",
-	"WALL0271", // 54
-	"WALL0272",
-	"WALL0281", // 56
-	"WALL0282",
-	"WALL0291", // 58
-	"WALL0292",
-	"WALL0301", // 60
-	"WALL0302",
-	"WALL0311", // 62
-	"WALL0312",
-	"WALL0321", // 64
-	"WALL0322",
-	"WALL0331", // 66
-	"WALL0332",
-	"WALL0341", // 68
-	"WALL0342",
-	"WALL0351", // 70
-	"WALL0352",
-	"WALL0361", // 72
-	"WALL0362",
-	"WALL0371", // 74
-	"WALL0372",
-	"WALL0381", // 76
-	"WALL0382",
-	"WALL0391", // 78
-	"WALL0392",
-	"WALL0401", // 80
-	"WALL0402",
-	"WALL0411", // 82
-	"WALL0412",
-	"WALL0421", // 84
-	"WALL0422",
-	"WALL0431", // 86
-	"WALL0432",
-	"WALL0441", // 88
-	"WALL0442",
-	"WALL0451", // 90
-	"WALL0452",
-	"WALL0461", // 92
-	"WALL0462",
-	"WALL0471", // 94
-	"WALL0472",
-	"WALL0481", // 96
-	"WALL0482",
-	"WALL0491", // 98
-	"WALL0492",
-	"WALL0501", // 100
-	"WALL0502",
-	"WALL0511", // 102
-	"WALL0512",
-	"WALL0521", // 104
-	"WALL0522",
-	"WALL0531", // 106
-	"WALL0532",
-	"WALL0541", // 108
-	"WALL0542",
-	"WALL0551", // 110
-	"WALL0552",
-	"WALL0561", // 112
-	"WALL0562",
-	"WALL0571", // 114
-	"WALL0572",
-	"WALL0581", // 116
-	"WALL0582",
-	"WALL0591", // 118
-	"WALL0592",
-	"WALL0601", // 120
-	"WALL0602",
-	"WALL0611", // 122
-	"WALL0612",
-	"WALL0621", // 124
-	"WALL0622",
-	"FLAT0001", // 126
-	"FLAT0002",
-	"FLAT0003",
-	"FLAT0004",
-	"FLAT0005",
-	"FLAT0006",
-	"FLAT0007",
-	"FLAT0008",
-	"FLAT0009",
-	"FLAT0010",
-	"FLAT0011", // 136
-	"FLAT0012",
-	"FLAT0013",
-	"FLAT0014",
-	"FLAT0015",
-	"FLAT0016",
-	"FLAT0017",
-	"FLAT0018",
-	"FLAT0019",
-	"FLAT0020",
-	"FLAT0021", // 146
-	"FLAT0022",
-	"FLAT0023",
-	"FLAT0024",
-	"FLAT0025",
-	"FLAT0026",
-	"FLAT0027",
-	"FLAT0028",
-	"FLAT0029",
-	"FLAT0030",
-	"FLAT0031", // 156
-	"FLAT0032",
+
+	"PRIWALA1", // Prison Wall
+	"PRIWALA2",
+	"PRIWALB1", // Prison Wall w/ Windows
+	"PRIWALB2",
+	"PIPINGA1", // Piping 1
+	"PIPINGA2",
+	"PIPINGB1", // Piping 2
+	"PIPINGB2",
+	"PIPINGC1", // Piping 3
+	"PIPINGC2",
+	"PRIBLDA1", // Prison Wall w/ Blood
+	"PRIBLDA2",
+	"PIPHORA1", // Horizontal Pipes 1
+	"PIPHORA2",
+	"PIPHORB1", // Horizontal Pipes 2
+	"PIPHORB2",
+	"PRIVENA1", // Prison Vent*
+	"PRIVENA2",
+	"PRILITE1", // Prison Wall w/ Light
+	"PRILITE2",
+	"INSLITE1", // Institute Wall w/ Light
+	"INSLITE2",
+	"INSWALA1", // Institute Wall 1
+	"INSWALA2",
+	"BZCRATE1", // Bronze Crate
+	"BZCRATE2",
+	"PRISPAN1", // Prison Wall Span
+	"PRISPAN2",
+	"FOODBEV1", // Food Unit (Beverage)
+	"FOODBEV2",
+	"METPNLA1", // Metal Wall w/ Panel 1
+	"METPNLA2",
+	"CONSBIO1", // Console Biology Display
+	"CONSBIO2",
+	"FOODSNK1", // Food Unit (Snack)
+	"FOODSNK2",
+	"METLITE1", // Metal Wall w/ Lights
+	"METLITE2",
+	"METWALL1", // Metal Wall
+	"METWALL2",
+	"TELEMAP1", // Teleport Map
+	"TELEMAP2",
+	"ELEVWALA", // Elevator Wall 1
+	"ELEVWALB", // Elevator Wall 2
+	"CONSWIR1", // Console Wires
+	"CONSWIR2",
+	"PLASMSP1", // Plasma Alien Spawner
+	"PLASMSP2",
+	"PIPBARA1", // Pipes with Bars 1
+	"PIPBARA2",
+	"PIPBARB1", // Pipes with Bars 3
+	"PIPBARB2",
+	"CONSPIP1", // Console Piping
+	"CONSPIP2",
+	"CONSDAT1", // Console Data Display
+	"CONSDAT2",
+	"PNKWALA1", // Pink Wall 1
+	"PNKWALA2",
+	"PNKWALB1", // Pink Wall 2
+	"PNKWALB2",
+	"ELEVEMB1", // Elevator Wall w/ Emblem (Contrast Version)
+	"ELEVEMB2",
+	"TELEPOR1", // Teleporter
+	"TELEPOR2",
+	"INSDANG1", // Institute Wall w/ "Danger"
+	"INSDANG2",
+	"SHCRATE1", // Shipping Crate
+	"SHCRATE2",
+	"Biotech1", // Biotech Wall w/ Gold Deco
+	"Biotech2",
+	"BIOEMBL1", // Biotech Wall w/ Emblem
+	"BIOEMBL2",
+	"PRIVENB1", // Prison Vent w/ Blood
+	"PRIVENB2",
+	"METPNLB1", // Metal Wall w/ Panel 2
+	"METPNLB2",
+	"METPNLC1", // Metal Wall w/ Panel 3
+	"METPNLC2",
+	"BIOLITE1", // Biotech Wall w/ Lights
+	"BIOLITE2",
+	"METTECH1", // Metal Wall w/ Tech
+	"METTECH2",
+	"PLNWALA1", // Planet Wall 1
+	"PLNWALA2",
+	"PLNWALB1", // Planet Wall 2
+	"PLNWALB2",
+	"PLNWALC1", // Planet Wall 3
+	"PLNWALC2",
+	"SWITCHA1", // Switch Active
+	"SWITCHA2",
+	"BIOWALA1", // Biotech Wall 1
+	"BIOWALA2",
+	"CONSPLN1", // Console Planet Display
+	"CONSPLN2",
+	"BIOWALB1", // Biotech Wall 2
+	"BIOWALB2",
+	"BIODANG1", // Biotech Wall w/ "Danger"
+	"BIODANG2",
+	"BIOWALC1", // Biotech Wall 3
+	"BIOWALC2",
+	"GLDLITE1", // Gold Wall w/ Lights
+	"GLDLITE2",
+	"GLDEMBL1", // Gold Wall w/ Emblem
+	"GLDEMBL2",
+	"GLDWALA1", // Gold Wall 1
+	"GLDWALA2",
+	"PNKWALC1", // Pink Wall 3
+	"PNKWALC2",
+	"PNKWALD1", // Pink Wall 4
+	"PNKWALD2",
+	"PNKWALE1", // Pink Wall 5
+	"PNKWALE2",
+	"SWITCHI1", // Switch Inactive
+	"SWITCHI2",
+	"GLDWALB1", // Gold Wall 2
+	"GLDWALB2",
+	"INSWALB1", // Institute Wall 2
+	"INSWALB2",
+	"GLDCOMM1", // Gold Wall w/ Comm Screen
+	"GLDCOMM2",
+	"INSEMBL1", // Institute Wall w/ Emblem
+	"INSEMBL2",
+	"PLNWALD1", // Planet Wall 4
+	"PLNWALD2",
+	"PLNEMBL1", // Planet Wall w/ Emblem
+	"PLNEMBL2",
+	"F_GRYBIG", // Flat: Big Gray Square
+	"F_SQNORM", // Flat: Normal Squares
+	"F_GRYTIL", // Flat: Gray Tiles
+	"F_BRNTIL", // Flat: Brown Tiles
+	"F_BLUTIL", // Flat: Blue Tiles
+	"F_GRYCIR", // Flat: Gray Circle
+	"F_SQLITC", // Flat: Squares w/ Cyan Lights
+	"F_METALS", // Flat: Random Metal Plating
+	"F_OCTTEK", // Flat: Octagonal Tech
+	"F_GRYPN1", // Flat: Gray Panels 1
+	"F_OCTOS", // Flat: Octagonal Plain
+	"F_TRIPNL", // Flat: Triangular Panels
+	"F_GRYPN2", // Flat: Gray Panels 2
+	"F_TRILIT", // Flat: Triangular Panels w/ Lights
+	"F_TEKGLO", // Flat: Tech Frame w/ Glow
+	"F_TEKFRM", // Flat: Tech Frame
+	"F_CRSCYN", // Flat: Crisscross w/ Cyan Lights
+	"F_CRSPNK", // Flat: Crisscross w/ Pink Lights
+	"F_PNKTIL", // Flat: Pink Tiles
+	"F_GRDIAG", // Flat: Gray Diagonal
+	"F_SQLITY", // Flat: Squares w/ Yellow Lights
+	"F_SQLITR", // Flat: Squares w/ Red Lights
+	"F_OCTHOL", // Flat: Hollow Octogon
+	"F_OCTLIT", // Flat: Octagonal Tech w/ Lights
+	"F_GRNBIG", // Flat: Big Green Square
+	"F_YLOTIL", // Flat: Yellow Tiles
+	"F_CYNTIL", // Flat: Cyan Tiles
+	"F_BLUCIR", // Flat: Blue Circle
+	"F_GRNCIR", // Flat: Green Circle
+	"F_BLUPNL", // Flat: Plue Panels
+	"F_YLOPNL", // Flat: Yellow Panels
+	"F_OCTPNK", // Flat: Hollow Pink Octogon
 	"DMETALL1", // Metal Door Locked
 	"DMETALL2",
 	"DBIOL1", // Bio Door Locked
