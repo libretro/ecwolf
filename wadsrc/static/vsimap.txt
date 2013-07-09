@@ -791,7 +791,6 @@ music
 
 textures
 {
-
 	"PRIWALA1", // Prison Wall
 	"PRIWALA2",
 	"PRIWALB1", // Prison Wall w/ Windows

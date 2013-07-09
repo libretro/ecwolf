@@ -1,0 +1,271 @@
+/* BS6 Map
+ * Gives names to BS6 data.
+ */
+
+digitalsounds
+{
+	"DSIONCAN", // Fire Neutron Disruptor
+	"DSBLASTR", // Fire Protector / Generic Gun
+	"DSBRIFLE", // Fire Assault Gun
+	"DSDR2OPN", // Heavy Door Open
+	"DSDR2CLS", // Heavy Door Close
+	"DSDR1OPN", // Light Door Open
+	"DSDR1CLS", // Light Door Close
+	"DSINFDT1", // Informant Death 1
+	"DSGLDSIT", // Goldfire Sight
+	"DSRNTSIT", // Guard Sight
+	"DSRNTDT1", // Guard Death 1
+	"DSEXPLO1", // Explosion 1
+	"DSGENSIT", // Genetic Guard Sight
+	"DSPRODT1", // Sentinel Death 1
+	"DSDOGSIT", // Brown Mutant Sight
+	"DSSCNSIT", // Critter Sight
+	"DSPROSIT", // Sentinel Sight
+	"DSGENDTH", // Genetic Guard Death
+	"DSBLUDTH", // Boss Death
+	"DSSCISIT", // Scientist Sight (Alerted)
+	"DSSCIDT1", // Scientist Death 1
+	"DSDOGDTH", // Brown Mutant Death
+	"DSSWTSIT", // Trooper Sight
+	"DSSCNDTH", // Critter Death
+	"DSGLDLAF", // Goldfire Laugh
+	"DSARCZAP", // Arc Barrier Zap
+	"DSPODHTC", // POD Alien Hatch
+	"DSELCATK", // Plasmoid Attack
+	"DSELCSIT", // Plasmoid Sight (Spawn)
+	"DSELCDTH", // Plasmoid Death
+	"DSLIQDTH", // Liquid Alien Death
+	"DSGRNSIT", // Necro-Guard Sight
+	"DSWARPIN", // Warp In
+	"DSWARPOU", // Warp Out
+	"DSRNTDT2", // Guard Death 2
+	"DSEXPLO2", // Explosion 2
+	"DSLCNSIT", // Acid Alien Sight
+	"DSLCNDTH", // Acid Alien Death
+	"DSRNTDT3", // Guard Death 3
+	"DSINFDT2", // Informant Death 2
+	"DSINFDT3", // Informant Death 3
+	"DSGRNDTH", // Necro-Guard Death
+	"DSPRODT2", // Sentinel Death 2
+	"DSPRODT3", // Sentinel Death 3
+	"DSLCNBRK", // Acid Alien Release
+	"DSSCNBRK", // Critter Release
+	"DSGRENAD", // Fire Plasma Cannon
+	"DSSWTDT1", // Trooper Death 1
+	"DSSWTDT2", // Trooper "Death" 2 (Knocked Down)
+	"DSPODDTH", // POD Alien Death
+	"DSPODSIT", // POD Alien Sight
+	"DSBLUSIT", // Robot Sight
+	"DSSWTDT3", // Trooper Death 3
+	"DSSCIDT2", // Scientist Death 2
+	"DSSCIDT3", // Scientist Death 3
+	"DSSPITAT", // Spit Attack
+	"DSCLAWAT", // Claw Attack
+	"DSFISTAT"  // Fist Attack
+}
+
+textures
+{
+	"PRIWALA1", // Prison Wall
+	"PRIWALA2",
+	"PRIWALB1", // Prison Wall w/ Windows
+	"PRIWALB2",
+	"RBRICKA1", // Red Brick
+	"RBRICKA2",
+	"RBRICKB1", // Red Brick (Variation)
+	"RBRICKB2",
+	"RBRKBLD1", // Red Brick w/ Blood
+	"RBRKBLD2",
+	"PRIBLDA1", // Prison Wall w/ Blood
+	"PRIBLDA2",
+	"GBRICKA1", // Gray Brick
+	"GBRICKA2",
+	"GBRICKB1", // Gray Brick (Variation)
+	"GBRICKB1",
+	"PRIVENA1", // Prison Vent
+	"PRIVENA2",
+	"PRILITE1", // Prison Wall w/ Light
+	"PRILITE2",
+	"INSLITE1", // Institute Wall w/ Light
+	"INSLITE2",
+	"INSWALA1", // Institute Wall 1
+	"INSWALA2",
+	"TELEWAL1", // Teleporter Wall
+	"TELEWAL2",
+	"PRISPAN1", // Prison Wall Span
+	"PRISPAN2",
+	"FOODBEV1", // Food Unit (Beverage)
+	"FOODBEV2",
+	"METPNLA1", // Metal Wall w/ Panel 1
+	"METPNLA2",
+	"COMPCON1", // Computer Console
+	"COMPCON2",
+	"FOODSNK1", // Food Unit (Snack)
+	"FOODSNK2",
+	"METLITE1", // Metal Wall w/ Lights
+	"METLITE2",
+	"METWALL1", // Metal Wall
+	"METWALL2",
+	"ELEVEMBL", // Elevator Wall w/ Emblem
+	"ELEVPANL", // Elevator Control Panel
+	"ELEVWALA", // Elevator Wall 1
+	"ELEVWALB", // Elevator Wall 2
+	"GBRKBLD1", // Gray Bricks w/ Blood
+	"GBRKBLD2",
+	"PLASMSP1", // Plasma Alien Spawner
+	"PLASMSP2",
+	"ELEVOUT1", // Elevator Outside Wall
+	"ELEVOUT2",
+	"COMPLIT1", // Computer w/ Lights
+	"COMPLIT2",
+	"COMPELE1", // Computer Elevator? (Same as #0054)
+	"COMPELE2", // Computer Elevator Panel
+	"COMPWAL1", // Computer Room Wall
+	"COMPWAL2",
+	"XHANGAR1", // Episode Segue Art
+	"XPASSAG1",
+	"XHANGAR2",
+	"XPASSAG2",
+	"XHANGAR3",
+	"XPASSAG3",
+	"TELEPOR1", // Teleporter
+	"TELEPOR2",
+	"INSDANG1", // Institute Wall w/ "Danger"
+	"INSDANG2",
+	"SHCRATE1", // Shipping Crate
+	"SHCRATE2",
+	"Biotech1", // Biotech Wall w/ Gold Deco
+	"Biotech2",
+	"BIOEMBL1", // Biotech Wall w/ Emblem
+	"BIOEMBL2",
+	"PRIVENB1", // Prison Vent w/ Blood
+	"PRIVENB2",
+	"METPNLB1", // Metal Wall w/ Panel 2
+	"METPNLB2",
+	"METPNLC1", // Metal Wall w/ Panel 3
+	"METPNLC2",
+	"BIOLITE1", // Biotech Wall w/ Lights
+	"BIOLITE2",
+	"METTECH1", // Metal Wall w/ Tech
+	"METTECH2",
+	"SPCWALA1", // Space Wall 1
+	"SPCWALA2",
+	"SPCWALB1", // Space Wall 2
+	"SPCWALB2",
+	"SPCWALC1", // Space Wall 3
+	"SPCWALC2",
+	"SWITCHA1", // Switch Active
+	"SWITCHA2",
+	"BIOWALA1", // Biotech Wall 1
+	"BIOWALA2",
+	"CAVESIN1", // Cave w/ Sign
+	"CAVESIN2",
+	"BIOWALB1", // Biotech Wall 2
+	"BIOWALB2",
+	"BIODANG1", // Biotech Wall w/ "Danger"
+	"BIODANG2",
+	"BIOWALC1", // Biotech Wall 3
+	"BIOWALC2",
+	"GLDLITE1", // Gold Wall w/ Lights
+	"GLDLITE2",
+	"GLDEMBL1", // Gold Wall w/ Emblem
+	"GLDEMBL2",
+	"GLDWALA1", // Gold Wall 1
+	"GLDWALA2",
+	"CAVERNA1", // Cave Wall 1
+	"CAVERNA2",
+	"CAVEBLD1", // Cave Wall w/ Blood
+	"CAVEBLD2",
+	"CAVERNB1", // Cave Wall 2
+	"CAVERNB2",
+	"SWITCHI1", // Switch Inactive
+	"SWITCHI2",
+	"GLDWALB1", // Gold Wall 2
+	"GLDWALB2",
+	"INSWALB1", // Institute Wall 2
+	"INSWALB2",
+	"GLDCOMM1", // Gold Wall w/ Comm Screen
+	"GLDCOMM2",
+	"INSEMBL1", // Institute Wall w/ Emblem
+	"INSEMBL2",
+	"SPCWALD1", // Space Wall 4
+	"SPCWALD2",
+	"SPCEMBL1", // Space Wall w/ Emblem
+	"SPCEMBL2",
+	"F_GRYBIG", // Flat: Big Gray Square
+	"F_SQNORM", // Flat: Normal Squares
+	"F_GRYTIL", // Flat: Gray Tiles
+	"F_BRNTIL", // Flat: Brown Tiles
+	"F_BLUTIL", // Flat: Blue Tiles
+	"F_GRYCIR", // Flat: Gray Circle
+	"F_SQLITC", // Flat: Squares w/ Cyan Lights
+	"F_METALS", // Flat: Random Metal Plating
+	"F_OCTTEK", // Flat: Octagonal Tech
+	"F_GRYPN1", // Flat: Gray Panels 1
+	"F_OCTOS", // Flat: Octagonal Plain
+	"F_TRIPNL", // Flat: Triangular Panels
+	"F_GRYPN2", // Flat: Gray Panels 2
+	"F_TRILIT", // Flat: Triangular Panels w/ Lights
+	"F_TEKGLO", // Flat: Tech Frame w/ Glow
+	"F_TEKFRM", // Flat: Tech Frame
+	"F_CRSCYN", // Flat: Crisscross w/ Cyan Lights
+	"F_CRSPNK", // Flat: Crisscross w/ Pink Lights
+	"F_PNKTIL", // Flat: Pink Tiles
+	"F_GRDIAG", // Flat: Gray Diagonal
+	"F_SQLITY", // Flat: Squares w/ Yellow Lights
+	"F_SQLITR", // Flat: Squares w/ Red Lights
+	"F_OCTHOL", // Flat: Hollow Octogon
+	"F_OCTLIT", // Flat: Octagonal Tech w/ Lights
+	"F_GRNBIG", // Flat: Big Green Square
+	"F_YLOTIL", // Flat: Yellow Tiles
+	"F_CYNTIL", // Flat: Cyan Tiles
+	"F_BLUCIR", // Flat: Blue Circle
+	"F_GRNCIR", // Flat: Green Circle
+	"F_BLUPNL", // Flat: Plue Panels
+	"F_YLOPNL", // Flat: Yellow Panels
+	"F_OCTPNK", // Flat: Hollow Pink Octogon
+	"DMETALL1", // Metal Door Locked
+	"DMETALL2",
+	"DBIOL1", // Bio Door Locked
+	"DBIOL2",
+	"DELEVL1", // Elevator Door Locked
+	"DELEVL2",
+	"DSPACEL1", // Space Door Locked
+	"DSPACEL2",
+	"DPRISNL1", // Prison Door Locked
+	"DPRISNL2",
+	"DHSECL1", // High Security Door Locked
+	"DHSECL2",
+	"DONEWYL1", // One Way Door Locked
+	"DONEWYL2",
+	"DOFFICL1", // Office Door Locked
+	"DOFFICL2",
+	"DMETALU1", // Metal Door Unlocked
+	"DMETALU2",
+	"DBIOU1", // Bio Door Unlocked
+	"DBIOU2",
+	"DELEVU1", // Elevator Door Unlocked
+	"DELEVU2",
+	"DSPACEU1", // Space Door Unlocked
+	"DSPACEU2",
+	"DPRISNU1", // Prison Door Unlocked
+	"DPRISNU2",
+	"DHSECU1", // High Security Door Unlocked
+	"DHSECU2",
+	"DONEWYU1", // One Way Door Unlocked
+	"DONEWYU2",
+	"DOFFICU1", // Office Door Unlocked
+	"DOFFICU2",
+	"DOWEXIT1", // One Way Exit
+	"DOWEXIT2",
+	"JAMSTEL1", // Door Jam Steel
+	"JAMSTEL2",
+	"JAMSPCA1", // Door Jam Space (Type 1)
+	"JAMSPCA2",
+	"JAMOFFC1", // Door Jam Office
+	"JAMOFFC2",
+	"JAMBIO1", // Door Jam Bio
+	"JAMBIO2",
+	"JAMSPCB1", // Door Jam Space (Type 2)
+	"JAMSPCB2"
+}
