@@ -4,4 +4,5 @@ gameinfo
 {
 	gamepalette = "BLAKEPAL"
 	translator = "xlat/planet.txt"
+	playerclasses = "BlakePlayer"
 }

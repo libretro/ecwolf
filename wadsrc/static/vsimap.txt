@@ -395,15 +395,15 @@ sprites
 	"TURRD0",	"TURRE0",	"TURRF0",	"TURRG0",	"TURRH0",
 
 	// Auto-charge Pistol
-	"ACPGA0":pspr,	"ACPGB0":pspr,	"ACPGC0":pspr,	"ACPGD0":pspr,	"ACPGE0":pspr,
+	"ACPGA0":blakepspr,	"ACPGB0":blakepspr,	"ACPGC0":blakepspr,	"ACPGD0":blakepspr,	"ACPGE0":blakepspr,
 	// Slow Fire Protector
-	"SFPGA0":pspr,	"SFPGB0":pspr,	"SFPGC0":pspr,	"SFPGD0":pspr,	"SFPGE0":pspr,
+	"SFPGA0":blakepspr,	"SFPGB0":blakepspr,	"SFPGC0":blakepspr,	"SFPGD0":blakepspr,	"SFPGE0":blakepspr,
 	// Rapid Assault Weapon
-	"RAWGA0":pspr,	"RAWGB0":pspr,	"RAWGC0":pspr,	"RAWGD0":pspr,	"RAWGE0":pspr,
+	"RAWGA0":blakepspr,	"RAWGB0":blakepspr,	"RAWGC0":blakepspr,	"RAWGD0":blakepspr,	"RAWGE0":blakepspr,
 	// Dual Neutron Disruptor
-	"DNDGA0":pspr,	"DNDGB0":pspr,	"DNDGC0":pspr,	"DNDGD0":pspr,	"DNDGE0":pspr,
+	"DNDGA0":blakepspr,	"DNDGB0":blakepspr,	"DNDGC0":blakepspr,	"DNDGD0":blakepspr,	"DNDGE0":blakepspr,
 	// Plasma Discharge Unit
-	"PDUGA0":pspr,	"PDUGB0":pspr,	"PDUGC0":pspr,	"PDUGD0":pspr,	"PDUGE0":pspr,
+	"PDUGA0":blakepspr,	"PDUGB0":blakepspr,	"PDUGC0":blakepspr,	"PDUGD0":blakepspr,	"PDUGE0":blakepspr,
 
 	"GRENA0",	"GRENB0",	"GRENC0",	"GREND0",
 	"GRENE0",	"GRENF0",	"GRENG0",	"GRENH0",	"GRENI0",
@@ -515,7 +515,7 @@ sprites
 	"CEXPE0",	"CEXPF0",	"CEXPG0",	"CEXPH0",
 
 	// Anti-Plasma Cannon
-	"APCGA0":pspr,	"APCGB0":pspr,	"APCGC0":pspr,	"APCGD0":pspr,	"APCGE0":pspr,
+	"APCGA0":blakepspr,	"APCGB0":blakepspr,	"APCGC0":blakepspr,	"APCGD0":blakepspr,	"APCGE0":blakepspr,
 
 	"APCSA0",	"APCSB0",	"APCSC0",
 	"APCSE0",	"APCSF0",	"APCSG0",	"APCSH0",

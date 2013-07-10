@@ -39,9 +39,18 @@
 
 #define TIMER_VALUE_DEFAULT 114
 
+struct PSprite
+{
+public:
+	PSprite(const FString &name, LumpRemapper::PSpriteType type) : name(name), type(type) {}
+
+	FString name;
+	LumpRemapper::PSpriteType type;
+};
+
 static TMap<int, unsigned int> sampleRateMap;
 static TMap<FName, LumpRemapper> remaps;
-static TArray<FString> psprites;
+static TArray<PSprite> psprites;
 
 LumpRemapper::LumpRemapper(const char* extension) : digiTimerValue(TIMER_VALUE_DEFAULT),
 	loaded(false), mapLumpName(extension)
@@ -146,14 +155,14 @@ void LumpRemapper::DoRemap()
 	Wads.InitHashChains();
 }
 
-bool LumpRemapper::IsPSprite(int lumpnum)
+LumpRemapper::PSpriteType LumpRemapper::IsPSprite(int lumpnum)
 {
 	for(unsigned int i = 0;i < psprites.Size();++i)
 	{
-		if(Wads.CheckLumpName(lumpnum, psprites[i]))
-			return true;
+		if(Wads.CheckLumpName(lumpnum, psprites[i].name))
+			return psprites[i].type;
 	}
-	return false;
+	return PSPR_NONE;
 }
 
 unsigned int LumpRemapper::LumpSampleRate(FResourceFile *Owner)
@@ -274,7 +283,9 @@ void LumpRemapper::ParseMap(Scanner &sc)
 				{
 					sc.MustGetToken(TK_Identifier);
 					if(sc->str.Compare("pspr") == 0)
-						psprites.Push(spriteName);
+						psprites.Push(PSprite(spriteName, PSPR_NORMAL));
+					else if(sc->str.Compare("blakepspr") == 0)
+						psprites.Push(PSprite(spriteName, PSPR_BLAKE));
 					else
 						sc.ScriptMessage(Scanner::ERROR, "Expected pspr modifier.\n");
 				}

@@ -268,16 +268,6 @@ actor BodyCan 229
 	}
 }
 
-actor SlowFireProtector 230
-{
-	states
-	{
-		Spawn:
-			SFPP A -1
-			stop
-	}
-}
-
 actor MutantStatue 231
 {
 	radius 32
@@ -296,26 +286,6 @@ actor ChargeUnit 232
 	{
 		Spawn:
 			CHRG A -1
-			stop
-	}
-}
-
-actor RapidAssaultWeapon 233
-{
-	states
-	{
-		Spawn:
-			RAWP A -1
-			stop
-	}
-}
-
-actor DualNeutronDisruptor 234
-{
-	states
-	{
-		Spawn:
-			DNDP A -1
 			stop
 	}
 }
@@ -368,16 +338,6 @@ actor YellowAccessKey 239
 	{
 		Spawn:
 			YACS A -1
-			stop
-	}
-}
-
-actor AntiPlasmaCannon 240
-{
-	states
-	{
-		Spawn:
-			APCP A -1
 			stop
 	}
 }
@@ -494,16 +454,6 @@ actor HamBone 251
 	{
 		Spawn:
 			HAMB A -1
-			stop
-	}
-}
-
-actor PlasmaDischargeUnit 252
-{
-	states
-	{
-		Spawn:
-			PDUP A -1
 			stop
 	}
 }
@@ -1156,16 +1106,6 @@ actor ConcessionCoin5 313
 	{
 		Spawn:
 			CON5 A -1
-			stop
-	}
-}
-
-actor AutoChargePistol 314
-{
-	states
-	{
-		Spawn:
-			ACPP A -1
 			stop
 	}
 }
