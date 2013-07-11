@@ -39,6 +39,7 @@
 #include "scanner.h"
 #include "thingdef/thingdef_type.h"
 #include "thingdef/thingdef_expression.h"
+#include "v_video.h"
 
 #define IS_EXPR(no) params[no].isExpression
 #define EXPR_PARAM(var, no) ExpressionNode *var = params[no].expr;
@@ -146,6 +147,12 @@ HANDLE_PROPERTY(damage)
 		EXPR_PARAM(dmg, 0);
 		cls->Meta.SetMetaInt(AMETA_Damage, AActor::damageExpressions.Push(dmg));
 	}
+}
+
+HANDLE_PROPERTY(damagecolor)
+{
+    STRING_PARAM(dmgcolor, 0);
+    ((APlayerPawn *)defaults)->damagecolor = V_GetColorFromString(NULL, dmgcolor);
 }
 
 HANDLE_PROPERTY(deathsound)
@@ -514,6 +521,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(bobspeed, Weapon, F),
 	DEFINE_PROP(bobstyle, Weapon, S),
 	DEFINE_PROP(damage, Actor, I),
+	DEFINE_PROP_PREFIX(damagecolor, Actor, Player, S),
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
