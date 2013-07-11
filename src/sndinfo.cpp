@@ -250,7 +250,6 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 		if(sc.CheckToken('$'))
 		{
 			sc.MustGetToken(TK_Identifier);
-			printf("%d\n", excludeDepth);
 			if(excludeDepth)
 			{
 				if(sc->str.CompareNoCase("endif") == 0)
