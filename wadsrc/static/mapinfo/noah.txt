@@ -22,6 +22,7 @@ gameinfo
 	translator = "xlat/noah.txt"
 	playerclasses = "NoahPlayer"
 
+	highscoresfont = "SmallFont"
 	titlemusic = "NAZI_NOR"
 	scoresmusic = "ROSTER"
 	titlepage = "TITLEPIC"
