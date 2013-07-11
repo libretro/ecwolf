@@ -348,9 +348,12 @@ static void CollectGC()
 	GC::DelSoftRootHead();
 }
 
-static void DrawStartupConsole()
+static bool DrawStartupConsole()
 {
 	static const char* const tempString = "          " GAMENAME " " DOTVERSIONSTR_NOREV "\n\n\nTo be replaced with console...\n\n  The memory thing was just\n     for show anyways.";
+
+	if(gameinfo.SignonLump.IsEmpty())
+		return false;
 
 	CA_CacheScreen(TexMan(gameinfo.SignonLump));
 
@@ -359,6 +362,8 @@ static void DrawStartupConsole()
 	px = 160-width/2;
 	py = 76+62-height/2;
 	VWB_DrawPropString(ConFont, tempString, CR_GRAY);
+
+	return true;
 }
 
 static void InitGame()
@@ -463,11 +468,15 @@ static void InitGame()
 // Finish signon screen
 //
 	VL_SetVGAPlaneMode();
-	DrawStartupConsole();
-	VH_UpdateScreen();
+	if(DrawStartupConsole())
+	{
+		VH_UpdateScreen();
 
-	if (!param_nowait)
-		IN_UserInput(70*4);
+		if (!param_nowait)
+			IN_UserInput(70*4);
+	}
+	else // Delay for a moment to allow the user to enter the jukebox if desired
+		IN_UserInput(16);
 
 //
 // HOLDING DOWN 'M' KEY?
