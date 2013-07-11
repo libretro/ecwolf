@@ -650,67 +650,8 @@ void ContinueMusic (int offs)
 #define WHITESTEPS      20
 #define WHITETICS       6
 
-
-SDL_Color redshifts[NUMREDSHIFTS][256];
-SDL_Color whiteshifts[NUMWHITESHIFTS][256];
-
 int damagecount, bonuscount;
 bool palshifted;
-
-/*
-=====================
-=
-= InitRedShifts
-=
-=====================
-*/
-
-void InitRedShifts (void)
-{
-	SDL_Color *workptr, *baseptr;
-	int i, j, delta;
-
-
-//
-// fade through intermediate frames
-//
-	for (i = 1; i <= NUMREDSHIFTS; i++)
-	{
-		workptr = redshifts[i - 1];
-		baseptr = gamepal;
-
-		for (j = 0; j <= 255; j++)
-		{
-			delta = 256 - baseptr->r;
-			workptr->r = baseptr->r + delta * i / REDSTEPS;
-			delta = -baseptr->g;
-			workptr->g = baseptr->g + delta * i / REDSTEPS;
-			delta = -baseptr->b;
-			workptr->b = baseptr->b + delta * i / REDSTEPS;
-			baseptr++;
-			workptr++;
-		}
-	}
-
-	for (i = 1; i <= NUMWHITESHIFTS; i++)
-	{
-		workptr = whiteshifts[i - 1];
-		baseptr = gamepal;
-
-		for (j = 0; j <= 255; j++)
-		{
-			delta = 256 - baseptr->r;
-			workptr->r = baseptr->r + delta * i / WHITESTEPS;
-			delta = 248 - baseptr->g;
-			workptr->g = baseptr->g + delta * i / WHITESTEPS;
-			delta = 0-baseptr->b;
-			workptr->b = baseptr->b + delta * i / WHITESTEPS;
-			baseptr++;
-			workptr++;
-		}
-	}
-}
-
 
 /*
 =====================
