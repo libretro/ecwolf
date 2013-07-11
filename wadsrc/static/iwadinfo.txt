@@ -11,6 +11,7 @@ IWad
 	Name = "Planet Strike"
 	Mapinfo = "mapinfo/planet.txt"
 	MustContain = "APCPA0"
+	Game = "Blake"
 }
 
 IWad

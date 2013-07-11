@@ -1,8 +1,65 @@
-include "mapinfo/wolf3d.txt"
-
 gameinfo
 {
 	gamepalette = "BLAKEPAL"
 	translator = "xlat/planet.txt"
 	playerclasses = "BlakePlayer"
+	titlepage = "TITLE1"
+	titlepalette = "TITLEPAL"
+
+	menumusic = "WONDERIN"
+	finalemusic = "CORNER"
+	finaleflat = "#DCDCDC"
+	intermissionmusic = "ENDLEVEL"
+	titletime = 15
+	creditpage = "CREDITS"
+	pagetime = 10
+	menufontcolor_title = "Gold"
+	menufontcolor_label = "DarkGrey"
+	menufontcolor_selection = "Grey"
+	menufontcolor_invalid = "DarkGreen"
+	menufontcolor_invalidselection = "Green"
+	menufontcolor_highlight = "Yellow"
+	menufontcolor_highlightselection = "Gold"
+	highscoresfontcolor = "White"
+	pageindexfontcolor = "DarkYellow"
+	borderflat = "#004040"
+	advisorycolor = "20 A8 FC"
+	advisorypic = "PG13"
+	border = inset, "00 00 00", "00 70 70", "00 84 84"
+	messagecolors = "8C 8C 8C", "D0 D0 D0", "0 0 0"
+	messagefontcolor = "Black"
+	menuwindowcolors = "8C 8C 8C", "D0 D0 D0", "0 0 0", "FC F4 00", "B4 AC 00", "0 0 0"
+	doorsoundsequence = "DoorNormal"
+	pushwallsoundsequence = "PushwallNormal"
+	gibfactor = 1
+	menufade = "AE 00 00"
+	menucolors = "88 00 00", "D4 00 00", "7D 00 00", "58 00 00", "64 00 00", "00 00 00"
+	titlemusic = "NAZI_NOR"
+	scoresmusic = "ROSTER"
+	menufontcolor_disabled = "DarkRed"
+	highscoresfont = "SmallFont"
+	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
+}
+
+episode "MAP01"
+{
+	lookup = "WL_EPISODE1"
+	picname = "M_EPIS1"
+	key = "E"
+}
+
+cluster 1
+{
+	exittext = "ENDART1"
+	exittextislump
+}
+
+map "MAP01"
+{
+	next = "MAP02"
+	secretnext = "MAP10"
+	floornumber = 1
+	par = 90
+	music = "GETTHEM"
+	cluster = 1
 }
