@@ -62,9 +62,11 @@ namespace IWad
 		FString Mapinfo;
 		TArray<FString> Ident;
 		FString Required;
+		FName Game;
 		unsigned int Flags;
 	};
 
+	bool CheckGameFilter(FName filter);
 	const IWadData &GetGame();
 	unsigned int GetNumIWads();
 	void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad, const FString &progdir);

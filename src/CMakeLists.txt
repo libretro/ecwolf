@@ -138,6 +138,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	g_shared/a_playerpawn.cpp
 	g_shared/a_randomspawner.cpp
 	g_wolf/a_spearofdestiny.cpp
+	g_wolf/wolf_sbar.cpp
 	r_data/colormaps.cpp
 	r_data/r_translate.cpp
 	resourcefiles/resourcefile.cpp
