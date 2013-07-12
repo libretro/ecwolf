@@ -221,7 +221,9 @@ void StartupWin32()
 	char title[512];
 	GetConsoleTitleA(title, 512);
 	ConWindow = FindWindow(NULL, title);
-	g_hInst = (HINSTANCE)GetWindowLong(ConWindow, GWL_HINSTANCE);
+	g_hInst = NULL;
+	// Apparently the console window will prevent windows from being created if this doesn't return 0.
+	//g_hInst = (HINSTANCE)GetWindowLong(ConWindow, GWL_HINSTANCE);
 
 	InitCommonControls ();			// Load some needed controls and be pretty under XP
 	// We need to load riched20.dll so that we can create the control.
