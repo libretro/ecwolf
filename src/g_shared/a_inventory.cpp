@@ -289,6 +289,76 @@ bool AAmmo::HandlePickup(AInventory *item, bool &good)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+IMPLEMENT_CLASS(BackpackItem)
+
+bool ABackpackItem::HandlePickup(AInventory *item, bool &good)
+{
+	if(item->IsA(NATIVE_CLASS(BackpackItem)))
+	{
+		// We seem to have a backpack so just give the ammo
+		for(AInventory *item = owner->inventory;item;item = item->inventory)
+		{
+			if(item->GetClass()->GetParent() == NATIVE_CLASS(Ammo))
+			{
+				AAmmo *ammo = static_cast<AAmmo*>(item);
+				if(ammo->maxamount < ammo->Backpackmaxamount)
+					ammo->maxamount = ammo->Backpackmaxamount;
+				ammo->amount += ammo->Backpackamount;
+				if(ammo->amount > ammo->maxamount)
+					ammo->amount = ammo->maxamount;
+			}
+		}
+		good = true;
+		return true;
+	}
+	else if(inventory)
+		return inventory->HandlePickup(item, good);
+	return false;
+}
+
+AInventory *ABackpackItem::CreateCopy(AActor *holder)
+{
+	// Bump carrying capacity and give ammo
+	ClassDef::ClassIterator iter = ClassDef::GetClassIterator();
+	ClassDef::ClassPair *pair;
+	while(iter.NextPair(pair))
+	{
+		const ClassDef *cls = pair->Value;
+		if(cls->GetParent() == NATIVE_CLASS(Ammo))
+		{
+			// See if we have this time of ammo
+			AAmmo *ammo = static_cast<AAmmo *>(holder->FindInventory(cls));
+			if(ammo)
+			{
+				// Increase amount and give ammo
+				if(ammo->maxamount < ammo->Backpackmaxamount)
+					ammo->maxamount = ammo->Backpackmaxamount;
+
+				ammo->amount += ammo->Backpackamount;
+				if(ammo->amount > ammo->maxamount)
+					ammo->amount = ammo->maxamount;
+			}
+			else
+			{
+				// Give the ammo type with the proper amounts
+				ammo = static_cast<AAmmo *>(AActor::Spawn(cls, 0, 0, 0, false));
+				ammo->amount = ammo->Backpackamount;
+				if(ammo->maxamount < ammo->Backpackmaxamount)
+					ammo->maxamount = ammo->Backpackmaxamount;
+				if(ammo->amount > ammo->maxamount)
+					ammo->amount = ammo->maxamount;
+
+				ammo->RemoveFromWorld();
+				if(!ammo->CallTryPickup(holder))
+					ammo->Destroy();
+			}
+		}
+	}
+	return Super::CreateCopy(holder);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 IMPLEMENT_CLASS(CustomInventory)
 
 bool ACustomInventory::TryPickup(AActor *toucher)

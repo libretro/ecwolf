@@ -87,6 +87,18 @@ HANDLE_PROPERTY(attacksound)
 	defaults->attacksound = snd;
 }
 
+HANDLE_PROPERTY(backpackamount)
+{
+	INT_PARAM(amount, 0);
+	((AAmmo*)defaults)->Backpackamount = amount;
+}
+
+HANDLE_PROPERTY(backpackmaxamount)
+{
+	INT_PARAM(maxamount, 0);
+	((AAmmo*)defaults)->Backpackmaxamount = maxamount;
+}
+
 HANDLE_PROPERTY(bobrangex)
 {
 	FIXED_PARAM(rangex, 0);
@@ -149,7 +161,7 @@ HANDLE_PROPERTY(damage)
 	}
 }
 
-HANDLE_PROPERTY(damagecolor)
+HANDLE_PROPERTY(damagescreencolor)
 {
     STRING_PARAM(dmgcolor, 0);
     ((APlayerPawn *)defaults)->damagecolor = V_GetColorFromString(NULL, dmgcolor);
@@ -516,12 +528,14 @@ extern const PropDef properties[] =
 	DEFINE_PROP(ammouse1, Weapon, I),
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
+	DEFINE_PROP(backpackamount, Ammo, I),
+	DEFINE_PROP(backpackmaxamount, Ammo, I),
 	DEFINE_PROP(bobrangex, Weapon, F),
 	DEFINE_PROP(bobrangey, Weapon, F),
 	DEFINE_PROP(bobspeed, Weapon, F),
 	DEFINE_PROP(bobstyle, Weapon, S),
 	DEFINE_PROP(damage, Actor, I),
-	DEFINE_PROP_PREFIX(damagecolor, Actor, Player, S),
+	DEFINE_PROP_PREFIX(damagescreencolor, Actor, Player, S),
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
