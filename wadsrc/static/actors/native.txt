@@ -157,7 +157,7 @@ actor PlayerPawn native
 	player.sidemove 1, 1
 	player.maxhealth 100
 	player.movebob 1.0
-	player.damagecolor "FF 00 00"
+	player.damagescreencolor "FF 00 00"
 	+SOLID
 	+SHOOTABLE
 	+PICKUP
