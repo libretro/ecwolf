@@ -524,181 +524,207 @@ sprites
 
 sounds
 {
-	"PCHITWAL",
-	"PCSLCTWN",
-	"PCSLCTIT",
-	"PCHARTBT",
-	"PCMVGUN2",
-	"PCMVGUN1",
-	"PCNOWAY",
-	"PCNAZIHT",
-	"PCSCBATK",
-	"PCPLDETH",
-	"PCDOGDTH",
-	"PCCGUN",
-	"PCGETKEY",
-	"PCNOITEM",
-	"PCWALK1",
-	"PCWALK2",
-	"PCPLPAIN",
-	"PCGMOVER",
-	"PCDOROPN",
-	"PCDORCLS",
-	"PCNOTHIN",
-	"PCGRDSIT",
-	"PCGDDTH1",
-	"PCKNFSWG",
-	"PCPISTOL",
-	"PCGDDTH2",
-	"PCMGUN",
-	"PCNAZPAI",
-	"PCSHTDOR",
-	"PCGDDTH3",
-	"PCMGUNUP",
-	"PCAMMOUP",
-	"PCSELECT",
-	"PCFOODUP",
-	"PCMEDIUP",
-	"PCBONUS1",
-	"PCBONUS2",
-	"PCBONUS3",
-	"PCCGUNUP",
-	"PCESCPRS",
-	"PCSWITCH",
-	"PCDOGSIT",
-	"PCENDBN1",
-	"PCENDBN2",
-	"PCBNS1UP",
-	"PCBONUS4",
-	"PCPSHWAL",
-	"PCNOBNS",
-	"PCPRC100",
-	"PCBOSSIT",
-	"PCHANDTH",
-	"PCSSSIT",
-	"PCMUTDTH",
-	"PCHITSIT",
-	"PCHITDTH",
-	"PCHANSIT",
-	"PCSSDTH",
-	"PCHITSHI",
-	"PCGRDFIR",
-	"PCBOSSFR",
-	"PCSSFIRE",
-	"PCSLURPE",
-	"PCFAKSIT",
-	"PCSCBDTH",
-	"PCSCBSIT",
-	"PCFAKDTH",
-	"PCOFFSIT",
-	"PCOFFDTH",
-	"PCDOGATK",
-	"PCFAKFIR",
-	"PCMCHSTP",
-	"PCGOOB",
-	"PCYEAH",
-	"PCGDDTH4",
-	"PCGDDTH5",
-	"PCFART",
-	"PCGDDTH6",
-	"PCGDDTH7",
-	"PCGDDTH8",
-	"PCOTODTH",
-	"PCOTOSIT",
-	"PCFATSIT",
-	"PCGRTSIT",
-	"PCGRTDTH",
-	"PCFATDTH",
-	"PCRLAUNC",
-	"PCBAREXP",
+	"PCHITWAL", // Hit Wall
+	"PCTETYPE", // Terminal Type
+	"PCGETPIS", // Get Protector
+	"PCLIQDTH", // Liquid Alien Death
+	"PCMVGUN2", // Move Gun? 2
+	"PCMVGUN1", // Move Gun? 1
+	"PCNOWAY",  // Use Failure
+	"PCSCTSIT", // PerScan Sight
+	"PCGRNSIT", // Necro-Guard Sight
+	"PCPLRDTH", // Player Death
+	"PCCONCES", // Food Unit
+	"PCIONCAN", // Fire Neutron Disruptor
+	"PCGETKEY", // Get Keycard
+	"PCWARPIN", // Warp In
+	"PCWAPROU", // Warp Out
+	"PCROBSRV", // Robot Servo?
+	"PCINFDT1", // Informant Death 1
+	"PCGLDSIT", // Goldfire Sight
+	"PCDR2OPN", // Heavy Door Open
+	"PCDR2CLS", // Heavy Door Close
+	"PCGETDET", // Get Detonator (PS)
+	"PCRNTSIT", // Guard Sight
+	"PCRNTDT2", // Guard Death 2
+	"PCFIRAUT", // Fire Auto Charge Pistol
+	"PCBLASTR", // Fire Protector / Generic Gun
+	"PCGETRDR", // Get Radar Charge (PS)
+	"PCBRIFLE", // Fire Assault Gun
+	"PCVITAL",  // Vital Gone?
+	"PCSHTDOR", // Shoot Door? (Debug Mode Sound)
+	"PCRNTDT1", // Guard Death 1
+	"PCGETRIF", // Get Rapid Rifle
+	"PCGETAMM", // Get Ammo Pack
+	"PCSHOOT",  // Shoot? (Wolf3D Sound)
+	"PCHEAL1",  // Get Health
+	"PCHEAL2",  // Get More Health?
+	"PCBONUS1", // Get Money Bag
+	"PCBONUS2", // Get Loot
+	"PCBONUS3", // Get Gold Bars
+	"PCGETION", // Get Neutron Disruptor
+	"PCESCAPE", // Menu Escape
+	"PCELCSPN", // Plasmoid Spawn
+	"PCLIFEUP", // Get Extra Life
+	"PCELEVAT", // Elevator Button
+	"PCINTERR", // Interrogate
+	"PCBONUS5", // Get Bonus?
+	"PCBONUS4", // Get Xylan Orb
+	"PCPUSWAL", // Pushwall
+	"PCTEBEEP", // Terminal Beep
+	"PCSCORE",  // Score Bonus
+	"PCTURPAI", // Turret Pain
+	"PCEXPLO1", // Explosion 1
+	"PC_UN_51", // (Unused)
+	"PCSWTDT1", // Trooper Death 1
+	"PCGENSIT", // Genetic Guard Sight
+	"PCEXPLO2", // Explosion 2
+	"PCBLUSIT", // Robot Sight
+	"PCPRODT1", // Sentinel Death 1
+	"PCDOGSIT", // Brown Mutant Sight
+	"PCENGINE", // Engine Thrust?
+	"PCSCNSIT", // Critter Sight
+	"PCGETCAN", // Get Plasma Cannon
+	"PCLCNSIT", // Acid Alien Sight
+	"PCPROSIT", // Sentinel Sight
+	"PCGENDTH", // Genetic Guard Death
+	"PCBLUDTH", // Boss Death
+	"PCGLDLAF", // Goldfire Laugh
+	"PCSCISIT", // Scientist Sight (Alerted)
+	"PCSCIDT1", // Scientist Death 1
+	"PCDOGDTH", // Brown Mutant Death
+	"PCHEART",  // Heartbeat
+	"PCSWTSIT", // Trooper Sight
+	"PCSCNDTH", // Critter Death
+	"PCLCNDTH", // Acid Alien Death
+	"PCINFDT2", // Informant Death 2
+	"PCINFDT3", // Informant Death 3
+	"PCGRNDTH", // Necro-Guard Death
+	"PCPRODT2", // Sentinel Death 2
+	"PC_UN_77", // (Unused)
+	"PCSWTDT2", // Trooper "Death" 2 (Knocked Down)
+	"PCLCNBRK", // Acid Alien Release
+	"PCSCNBRK", // Critter Release
+	"PCDR1OPN", // Light Door Open
+	"PCDR1CLS", // Light Door Close
+	"PCARCZAP", // Arc Barrier Zap
+	"PCPODHTC", // POD Alien Hatch
+	"PCELCATK", // Plasmoid Attack
+	"PCELCDTH", // Plasmoid Death
+	"PCGRENAD", // Fire Plasma Cannon
+	"PCCLAWAT", // Claw Attack
+	"PCFISTAT", // Fist Attack
+	"PCSPITAT", // Spit Attack
+	"PCPODDTH", // POD Alien Death
+	"PCPODSIT", // POD Alien Sight
+	"PC_UN_93", // (Unused)
+	"PCSCIDT2", // Scientist Death 2
+	"PCSCIDT3", // Scientist Death 3
+	"PCGETTKN", // Get Food Token
+	"PCSWITCH", // Flip Switch
+	"PCSTATS1", // Stat Ticker
+	"PCSTATS2", // Stat Finish
 
-	"ALHITWAL",
-	"ALSLCTWN",
-	"ALSLCTIT",
-	"ALHARTBT",
-	"ALMVGUN2",
-	"ALMVGUN1",
-	"ALNOWAY",
-	"ALNAZIHT",
-	"ALSCBATK",
-	"ALPLDETH",
-	"ALDOGDTH",
-	"ALCGUN",
-	"ALGETKEY",
-	"ALNOITEM",
-	"ALWALK1",
-	"ALWALK2",
-	"ALPLPAIN",
-	"ALGMOVER",
-	"ALDOROPN",
-	"ALDORCLS",
-	"ALNOTHIN",
-	"ALGRDSIT",
-	"ALGDDTH1",
-	"ALKNFSWG",
-	"ALPISTOL",
-	"ALGDDTH2",
-	"ALMGUN",
-	"ALNAZPAI",
-	"ALSHTDOR",
-	"ALGDDTH3",
-	"ALMGUNUP",
-	"ALAMMOUP",
-	"ALSELECT",
-	"ALFOODUP",
-	"ALMEDIUP",
-	"ALBONUS1",
-	"ALBONUS2",
-	"ALBONUS3",
-	"ALCGUNUP",
-	"ALESCPRS",
-	"ALSWITCH",
-	"ALDOGSIT",
-	"ALENDBN1",
-	"ALENDBN2",
-	"ALBNS1UP",
-	"ALBONUS4",
-	"ALPSHWAL",
-	"ALNOBNS",
-	"ALPRC100",
-	"ALBOSSIT",
-	"ALHANDTH",
-	"ALSSSIT",
-	"ALMUTDTH",
-	"ALHITSIT",
-	"ALHITDTH",
-	"ALHANSIT",
-	"ALSSDTH",
-	"ALHITSHI",
-	"ALGRDFIR",
-	"ALBOSSFR",
-	"ALSSFIRE",
-	"ALSLURPE",
-	"ALFAKSIT",
-	"ALSCBDTH",
-	"ALSCBSIT",
-	"ALFAKDTH",
-	"ALOFFSIT",
-	"ALOFFDTH",
-	"ALDOGATK",
-	"ALFAKFIR",
-	"ALMCHSTP",
-	"ALGOOB",
-	"ALYEAH",
-	"ALGDDTH4",
-	"ALGDDTH5",
-	"ALFART",
-	"ALGDDTH6",
-	"ALGDDTH7",
-	"ALGDDTH8",
-	"ALOTODTH",
-	"ALOTOSIT",
-	"ALFATSIT",
-	"ALGRTSIT",
-	"ALGRTDTH",
-	"ALFATDTH",
-	"ALRLAUNC",
-	"ALBAREXP"
+	"ALHITWAL", // Hit Wall
+	"ALTETYPE", // Terminal Type
+	"ALGETPIS", // Get Protector
+	"ALLIQDTH", // Liquid Alien Death
+	"ALMVGUN2", // Move Gun? 2
+	"ALMVGUN1", // Move Gun? 1
+	"ALNOWAY",  // Use Failure
+	"ALSCTSIT", // PerScan Sight
+	"ALGRNSIT", // Necro-Guard Sight
+	"ALPLRDTH", // Player Death
+	"ALCONCES", // Food Unit
+	"ALIONCAN", // Fire Neutron Disruptor
+	"ALGETKEY", // Get Keycard
+	"ALWARPIN", // Warp In
+	"ALWAPROU", // Warp Out
+	"ALROBSRV", // Robot Servo?
+	"ALINFDT1", // Informant Death 1
+	"ALGLDSIT", // Goldfire Sight
+	"ALDR2OPN", // Heavy Door Open
+	"ALDR2CLS", // Heavy Door Close
+	"ALGETDET", // Get Detonator (PS)
+	"ALRNTSIT", // Guard Sight
+	"ALRNTDT2", // Guard Death 2
+	"ALFIRAUT", // Fire Auto Charge Pistol
+	"ALBLASTR", // Fire Protector / Generic Gun
+	"ALGETRDR", // Get Radar Charge (PS)
+	"ALBRIFLE", // Fire Assault Gun
+	"ALVITAL",  // Vital Gone?
+	"ALSHTDOR", // Shoot Door? (Debug Mode Sound)
+	"ALRNTDT1", // Guard Death 1
+	"ALGETRIF", // Get Rapid Rifle
+	"ALGETAMM", // Get Ammo Pack
+	"ALSHOOT",  // Shoot? (Wolf3D Sound)
+	"ALHEAL1",  // Get Health
+	"ALHEAL2",  // Get More Health?
+	"ALBONUS1", // Get Money Bag
+	"ALBONUS2", // Get Loot
+	"ALBONUS3", // Get Gold Bars
+	"ALGETION", // Get Neutron Disruptor
+	"ALESCAPE", // Menu Escape
+	"ALELCSPN", // Plasmoid Spawn
+	"ALLIFEUP", // Get Extra Life
+	"ALELEVAT", // Elevator Button
+	"ALINTERR", // Interrogate
+	"ALBONUS5", // Get Bonus?
+	"ALBONUS4", // Get Xylan Orb
+	"ALPUSWAL", // Pushwall
+	"ALTEBEEP", // Terminal Beep
+	"ALSCORE",  // Score Bonus
+	"ALTURPAI", // Turret Pain
+	"ALEXPLO1", // Explosion 1
+	"AL_UN_51", // (Unused)
+	"ALSWTDT1", // Trooper Death 1
+	"ALGENSIT", // Genetic Guard Sight
+	"ALEXPLO2", // Explosion 2
+	"ALBLUSIT", // Robot Sight
+	"ALPRODT1", // Sentinel Death 1
+	"ALDOGSIT", // Brown Mutant Sight
+	"ALENGINE", // Engine Thrust?
+	"ALSCNSIT", // Critter Sight
+	"ALGETCAN", // Get Plasma Cannon
+	"ALLCNSIT", // Acid Alien Sight
+	"ALPROSIT", // Sentinel Sight
+	"ALGENDTH", // Genetic Guard Death
+	"ALBLUDTH", // Boss Death
+	"ALGLDLAF", // Goldfire Laugh
+	"ALSCISIT", // Scientist Sight (Alerted)
+	"ALSCIDT1", // Scientist Death 1
+	"ALDOGDTH", // Brown Mutant Death
+	"ALHEART",  // Heartbeat
+	"ALSWTSIT", // Trooper Sight
+	"ALSCNDTH", // Critter Death
+	"ALLCNDTH", // Acid Alien Death
+	"ALINFDT2", // Informant Death 2
+	"ALINFDT3", // Informant Death 3
+	"ALGRNDTH", // Necro-Guard Death
+	"ALPRODT2", // Sentinel Death 2
+	"AL_UN_77", // (Unused)
+	"ALSWTDT2", // Trooper "Death" 2 (Knocked Down)
+	"ALLCNBRK", // Acid Alien Release
+	"ALSCNBRK", // Critter Release
+	"ALDR1OPN", // Light Door Open
+	"ALDR1CLS", // Light Door Close
+	"ALARCZAP", // Arc Barrier Zap
+	"ALPODHTC", // POD Alien Hatch
+	"ALELCATK", // Plasmoid Attack
+	"ALELCDTH", // Plasmoid Death
+	"ALGRENAD", // Fire Plasma Cannon
+	"ALCLAWAT", // Claw Attack
+	"ALFISTAT", // Fist Attack
+	"ALSPITAT", // Spit Attack
+	"ALPODDTH", // POD Alien Death
+	"ALPODSIT", // POD Alien Sight
+	"AL_UN_93", // (Unused)
+	"ALSCIDT2", // Scientist Death 2
+	"ALSCIDT3", // Scientist Death 3
+	"ALGETTKN", // Get Food Token
+	"ALSWITCH", // Flip Switch
+	"ALSTATS1", // Stat Ticker
+	"ALSTATS2"  // Stat Finish
 }
 
 digitalsounds
