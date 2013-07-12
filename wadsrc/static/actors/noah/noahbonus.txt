@@ -25,18 +25,13 @@ actor ArkMap : Inventory 194
 	}
 }
 
-actor FeedSack : CustomInventory 176
+actor FeedSack : BackpackItem 176
 {
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
 			SACK A -1
-			stop
-		Pickup:
-			TNT1 A 0 A_GiveInventory("Feed", 10)
-			TNT1 A 0 A_GiveInventory("CantaloupeAmmo", 1)
-			TNT1 A 0 A_GiveInventory("MelonAmmo", 1)
 			stop
 	}
 }

@@ -87,6 +87,10 @@ actor Ammo : Inventory native
 {
 }
 
+actor BackpackItem : Inventory native
+{
+}
+
 actor CustomInventory : Inventory native
 {
 }

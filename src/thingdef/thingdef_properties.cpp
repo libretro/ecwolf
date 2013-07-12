@@ -87,6 +87,18 @@ HANDLE_PROPERTY(attacksound)
 	defaults->attacksound = snd;
 }
 
+HANDLE_PROPERTY(backpackamount)
+{
+	INT_PARAM(amount, 0);
+	((AAmmo*)defaults)->Backpackamount = amount;
+}
+
+HANDLE_PROPERTY(backpackmaxamount)
+{
+	INT_PARAM(maxamount, 0);
+	((AAmmo*)defaults)->Backpackmaxamount = maxamount;
+}
+
 HANDLE_PROPERTY(bobrangex)
 {
 	FIXED_PARAM(rangex, 0);
@@ -516,6 +528,8 @@ extern const PropDef properties[] =
 	DEFINE_PROP(ammouse1, Weapon, I),
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
+	DEFINE_PROP(backpackamount, Ammo, I),
+	DEFINE_PROP(backpackmaxamount, Ammo, I),
 	DEFINE_PROP(bobrangex, Weapon, F),
 	DEFINE_PROP(bobrangey, Weapon, F),
 	DEFINE_PROP(bobspeed, Weapon, F),
