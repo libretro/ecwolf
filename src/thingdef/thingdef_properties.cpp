@@ -149,7 +149,7 @@ HANDLE_PROPERTY(damage)
 	}
 }
 
-HANDLE_PROPERTY(damagecolor)
+HANDLE_PROPERTY(damagescreencolor)
 {
     STRING_PARAM(dmgcolor, 0);
     ((APlayerPawn *)defaults)->damagecolor = V_GetColorFromString(NULL, dmgcolor);
@@ -521,7 +521,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(bobspeed, Weapon, F),
 	DEFINE_PROP(bobstyle, Weapon, S),
 	DEFINE_PROP(damage, Actor, I),
-	DEFINE_PROP_PREFIX(damagecolor, Actor, Player, S),
+	DEFINE_PROP_PREFIX(damagescreencolor, Actor, Player, S),
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
