@@ -5,8 +5,10 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "w_wad.h"
+#include "r_2d/r_main.h"
 #include "r_data/colormaps.h"
 #include "v_font.h"
+#include "v_video.h"
 #include "v_palette.h"
 #include "wl_draw.h"
 #include "wl_main.h"
@@ -36,7 +38,7 @@ SDL_Window *window = NULL;
 SDL_Renderer *screenRenderer = NULL;
 SDL_Texture *screen = NULL;
 #else
-SDL_Surface *screen = NULL;
+//SDL_Surface *screen = NULL;
 #endif
 
 SDL_Surface *screenBuffer = NULL;
@@ -77,8 +79,14 @@ void VL_ReadPalette(const char* lump)
 =======================
 */
 
+void I_InitGraphics ();
 void	VL_SetVGAPlaneMode (bool forSignon)
 {
+	I_InitGraphics();
+	Video->SetResolution(screenWidth, screenHeight, 8);
+	R_SetupBuffer ();
+	//screen->Lock(false);
+#if 0
 #if SDL_VERSION_ATLEAST(2,0,0)
 #else
 	SDL_WM_SetCaption("ECWolf", NULL);
@@ -156,9 +164,10 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 
 	curSurface = screenBuffer;
 	curPitch = bufferPitch;
+#endif
 
-	scaleFactorY = screenHeight/200;
-	scaleFactorX = screenWidth/320;
+	scaleFactorY = SCREENHEIGHT/200;
+	scaleFactorX = SCREENWIDTH/320;
 	// 1600x1200 can do clean aspect correction so why not?
 	if(scaleFactorY % 6 == 0)
 	{
@@ -171,9 +180,9 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 	else
 		scaleFactorX = scaleFactorY = MIN(scaleFactorX, scaleFactorY);
 
-	pixelangle = (short *) malloc(screenWidth * sizeof(short));
+	pixelangle = (short *) malloc(SCREENWIDTH * sizeof(short));
 	CHECKMALLOCRESULT(pixelangle);
-	wallheight = (int *) malloc(screenWidth * sizeof(int));
+	wallheight = (int *) malloc(SCREENWIDTH * sizeof(int));
 	CHECKMALLOCRESULT(wallheight);
 
 	NewViewSize(viewsize);
@@ -238,6 +247,7 @@ void VL_SetPalette (SDL_Color *palette, bool forceupdate)
 			VH_UpdateScreen();
 	}
 #else
+#if 0
 	if(screenBits == 8)
 		SDL_SetPalette(screen, SDL_PHYSPAL, palette, 0, 256);
 	else
@@ -250,18 +260,13 @@ void VL_SetPalette (SDL_Color *palette, bool forceupdate)
 		}
 	}
 #endif
+	I_Error("VL_SetPalette\n");
+#endif
 }
 
 void VL_SetPalette (PalEntry *palette, bool forceupdate)
 {
-	static SDL_Color pal[256];
-	for(uint16_t i = 0;i < 256;++i)
-	{
-		pal[i].r = palette[i].r;
-		pal[i].g = palette[i].g;
-		pal[i].b = palette[i].b;
-	}
-	VL_SetPalette(pal, forceupdate);
+//	screen->UpdateColors();
 }
 
 

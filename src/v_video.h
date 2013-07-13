@@ -40,6 +40,13 @@
 #include "zdoomsupport.h"
 #include "r_data/renderstyle.h"
 
+extern int CleanWidth, CleanHeight, CleanXfac, CleanYfac;
+extern int CleanWidth_1, CleanHeight_1, CleanXfac_1, CleanYfac_1;
+extern int DisplayWidth, DisplayHeight, DisplayBits;
+
+bool V_DoModeSetup (int width, int height, int bits);
+void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int realheight, int *cleanx, int *cleany, int *cx1=NULL, int *cx2=NULL);
+
 enum EDisplayType
 {
 	DISPLAY_WindowOnly,
@@ -66,6 +73,8 @@ class IVideo
 
 	virtual void DumpAdapters();
 };
+
+extern IVideo *Video;
 
 class FTexture;
 
@@ -440,13 +449,36 @@ private:
 
 
 // This is the screen updated by I_FinishUpdate.
-//extern DFrameBuffer *screen;
+extern DFrameBuffer *screen;
+
+#define SCREENWIDTH (screen->GetWidth ())
+#define SCREENHEIGHT (screen->GetHeight ())
+#define SCREENPITCH (screen->GetPitch ())
 
 // Col2RGB8 is a pre-multiplied palette for color lookup. It is stored in a
 // special R10B10G10 format for efficient blending computation.
 //		--RRRRRrrr--BBBBBbbb--GGGGGggg--   at level 64
 //		--------rrrr------bbbb------gggg   at level 1
-extern DWORD Col2RGB8[65][256];
+extern "C" DWORD Col2RGB8[65][256];
+
+// Col2RGB8_LessPrecision is the same as Col2RGB8, but the LSB for red
+// and blue are forced to zero, so if the blend overflows, it won't spill
+// over into the next component's value.
+//		--RRRRRrrr-#BBBBBbbb-#GGGGGggg--  at level 64
+//      --------rrr#------bbb#------gggg  at level 1
+extern "C" DWORD *Col2RGB8_LessPrecision[65];
+
+// Col2RGB8_Inverse is the same as Col2RGB8_LessPrecision, except the source
+// palette has been inverted.
+extern "C" DWORD Col2RGB8_Inverse[65][256];
+
+// "Magic" numbers used during the blending:
+//		--000001111100000111110000011111	= 0x01f07c1f
+//		-0111111111011111111101111111111	= 0x3FEFFBFF
+//		-1000000000100000000010000000000	= 0x40100400
+//		------10000000001000000000100000	= 0x40100400 >> 5
+//		--11111-----11111-----11111-----	= 0x40100400 - (0x40100400 >> 5) aka "white"
+//		--111111111111111111111111111111	= 0x3FFFFFFF
 
 // 16-bit Lookup Table
 extern BYTE RGB32k[32][32][32];

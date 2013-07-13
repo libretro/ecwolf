@@ -32,7 +32,7 @@
 **
 */
 
-#define NO_SWRENDER 	// set this if you want to exclude the software renderer. Without software renderer the base implementations of DrawTextureV and FillSimplePoly need to be disabled because they depend on it.
+//#define NO_SWRENDER 	// set this if you want to exclude the software renderer. Without software renderer the base implementations of DrawTextureV and FillSimplePoly need to be disabled because they depend on it.
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -43,9 +43,9 @@
 //#include "r_defs.h"
 //#include "r_utility.h"
 #ifndef NO_SWRENDER
-#include "r_draw.h"
-#include "r_main.h"
-#include "r_things.h"
+#include "r_2d/r_draw.h"
+#include "r_2d/r_main.h"
+#include "r_2d/r_things.h"
 #endif
 #include "r_data/r_translate.h"
 //#include "doomstat.h"
@@ -62,9 +62,18 @@
 #include "colormatcher.h"
 #include "r_data/colormaps.h"
 #include "c_cvars.h"
+#include "wl_main.h"
 
-#define SCREENWIDTH screenWidth
-#define SCREENHEIGHT screenHeight
+static inline SDWORD DivScale32(const SQWORD a, const SDWORD b)
+{
+	return (a << 32) / b;
+}
+static inline void clearbufshort(void *buffer, unsigned int count, WORD clear)
+{
+	WORD *b = reinterpret_cast<WORD*>(buffer), * const end = reinterpret_cast<WORD*>(buffer)+count;
+	while(b != end)
+		*b++ = clear;
+}
 #define FIXED2FLOAT(fixed) ((double)fixed/65536.0)
 
 // [RH] Stretch values to make a 320x200 image best fit the screen
@@ -328,10 +337,12 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32 
 
 	dc_destorg = destorgsave;
 
+#if 0
 	if (ticdup != 0 && menuactive == MENU_Off)
 	{
 		NetUpdate();
 	}
+#endif
 #endif
 }
 
@@ -749,7 +760,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, DWORD tag
 void DCanvas::VirtualToRealCoords(double &x, double &y, double &w, double &h,
 	double vwidth, double vheight, bool vbottom, bool handleaspect) const
 {
-	int myratio = handleaspect ? r_ratio : 0;
+	int myratio = handleaspect ? CheckRatio (Width, Height) : 0;
 	double right = x + w;
 	double bottom = y + h;
 
@@ -816,7 +827,7 @@ void DCanvas::VirtualToRealCoordsInt(int &x, int &y, int &w, int &h,
 
 void DCanvas::FillBorder (FTexture *img)
 {
-	int myratio = r_ratio;
+	int myratio = CheckRatio (Width, Height);
 	if (myratio == 0)
 	{ // This is a 4:3 display, so no border to show
 		return;

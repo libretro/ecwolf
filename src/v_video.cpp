@@ -1,11 +1,16 @@
 #include "colormatcher.h"
 #include "v_video.h"
 #include "thingdef/thingdef.h"
+#include "wl_main.h"
 
 #define dimamount (-1.f)
 #define dimcolor 0xffd700
 
+extern "C" {
 DWORD Col2RGB8[65][256];
+DWORD *Col2RGB8_LessPrecision[65];
+DWORD Col2RGB8_Inverse[65][256];
+}
 
 IMPLEMENT_ABSTRACT_CLASS (DCanvas)
 IMPLEMENT_ABSTRACT_CLASS (DFrameBuffer)
@@ -791,10 +796,17 @@ bool FNativeTexture::CheckWrapping(bool wrapping)
 
 // -----------------------------------------------------------------------------
 
+int DisplayWidth, DisplayHeight, DisplayBits;
 BYTE RGB32k[32][32][32];
+
+// [RH] The framebuffer is no longer a mere byte array.
+// There's also only one, not four.
+DFrameBuffer *screen;
 
 void GenerateLookupTables()
 {
+	static DWORD Col2RGB8_2[63][256];
+
 	// create the RGB555 lookup table
 	for(int r = 0;r < 32;r++)
 		for(int g = 0;g < 32;g++)
@@ -807,6 +819,28 @@ void GenerateLookupTables()
 			Col2RGB8[x][y] = (((GPalette.BaseColors[y].r*x)>>4)<<20) |
 							  ((GPalette.BaseColors[y].g*x)>>4) |
 							 (((GPalette.BaseColors[y].b*x)>>4)<<10);
+
+	// create the swizzled palette with the lsb of red and blue forced to 0
+	// (for green, a 1 is okay since it never gets added into)
+	for (int x = 1; x < 64; x++)
+	{
+		Col2RGB8_LessPrecision[x] = Col2RGB8_2[x-1];
+		for (int y = 0; y < 256; y++)
+		{
+			Col2RGB8_2[x-1][y] = Col2RGB8[x][y] & 0x3feffbff;
+		}
+	}
+	Col2RGB8_LessPrecision[0] = Col2RGB8[0];
+	Col2RGB8_LessPrecision[64] = Col2RGB8[64];
+
+	// create the inverse swizzled palette
+	for (int x = 0; x < 65; x++)
+		for (int y = 0; y < 256; y++)
+		{
+			Col2RGB8_Inverse[x][y] = (((((255-GPalette.BaseColors[y].r)*x)>>4)<<20) |
+									  (((255-GPalette.BaseColors[y].g)*x)>>4) |
+									  ((((255-GPalette.BaseColors[y].b)*x)>>4)<<10)) & 0x3feffbff;
+		}
 }
 
 static int ParseHex(const char* hex)
@@ -966,123 +1000,48 @@ int V_GetColor (const DWORD *palette, const char *str)
 #endif
 }
 
-// -----------------------------------------------------------------------------
-
-//
-// V_SetResolution
-//
-bool V_DoModeSetup (int width, int height, int bits)
+void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int realheight, int *cleanx, int *cleany, int *_cx1, int *_cx2)
 {
-#if 0
-	DFrameBuffer *buff = I_SetMode (width, height, screen);
-	int cx1, cx2;
+	int ratio;
+	int cwidth;
+	int cheight;
+	int cx1, cy1, cx2, cy2;
 
-	if (buff == NULL)
+	ratio = CheckRatio(realwidth, realheight);
+	if (ratio & 4)
 	{
-		return false;
-	}
-
-	screen = buff;
-	GC::WriteBarrier(screen);
-	screen->SetGamma (Gamma);
-
-	// Load fonts now so they can be packed into textures straight away,
-	// if D3DFB is being used for the display.
-	FFont::StaticPreloadFonts();
-
-	V_CalcCleanFacs(320, 200, width, height, &CleanXfac, &CleanYfac, &cx1, &cx2);
-
-	CleanWidth = width / CleanXfac;
-	CleanHeight = height / CleanYfac;
-	assert(CleanWidth >= 320);
-	assert(CleanHeight >= 200);
-
-	if (width < 800 || width >= 960)
-	{
-		if (cx1 < cx2)
-		{
-			// Special case in which we don't need to scale down.
-			CleanXfac_1 = 
-			CleanYfac_1 = cx1;
-		}
-		else
-		{
-			CleanXfac_1 = MAX(CleanXfac - 1, 1);
-			CleanYfac_1 = MAX(CleanYfac - 1, 1);
-			// On larger screens this is not enough so make sure it's at most 3/4 of the screen's width
-			while (CleanXfac_1 * 320 > screen->GetWidth()*3/4 && CleanXfac_1 > 2)
-			{
-				CleanXfac_1--;
-				CleanYfac_1--;
-			}
-		}
-		CleanWidth_1 = width / CleanXfac_1;
-		CleanHeight_1 = height / CleanYfac_1;
-	}
-	else // if the width is between 800 and 960 the ratio between the screensize and CleanXFac-1 becomes too large.
-	{
-		CleanXfac_1 = CleanXfac;
-		CleanYfac_1 = CleanYfac;
-		CleanWidth_1 = CleanWidth;
-		CleanHeight_1 = CleanHeight;
-	}
-
-
-	DisplayWidth = width;
-	DisplayHeight = height;
-	DisplayBits = bits;
-
-	R_OldBlend = ~0;
-	Renderer->OnModeSet();
-	
-	M_RefreshModesList ();
-
-#endif
-	return true;
-}
-
-#define SCREENWIDTH (screen->GetWidth ())
-#define SCREENHEIGHT (screen->GetHeight ())
-#define SCREENPITCH (screen->GetPitch ())
-bool IVideo::SetResolution (int width, int height, int bits)
-{
-#if 0
-	int oldwidth, oldheight;
-	int oldbits;
-
-	if (screen)
-	{
-		oldwidth = SCREENWIDTH;
-		oldheight = SCREENHEIGHT;
-		oldbits = DisplayBits;
+		cwidth = realwidth;
+		cheight = realheight * AspectCorrection[ratio].multiplier / 48;
 	}
 	else
-	{ // Harmless if screen wasn't allocated
-		oldwidth = width;
-		oldheight = height;
-		oldbits = bits;
+	{
+		cwidth = realwidth * AspectCorrection[ratio].multiplier / 48;
+		cheight = realheight;
+	}
+	// Use whichever pair of cwidth/cheight or width/height that produces less difference
+	// between CleanXfac and CleanYfac.
+	cx1 = MAX(cwidth / designwidth, 1);
+	cy1 = MAX(cheight / designheight, 1);
+	cx2 = MAX(realwidth / designwidth, 1);
+	cy2 = MAX(realheight / designheight, 1);
+	if (abs(cx1 - cy1) <= abs(cx2 - cy2))
+	{ // e.g. 640x360 looks better with this.
+		*cleanx = cx1;
+		*cleany = cy1;
+	}
+	else
+	{ // e.g. 720x480 looks better with this.
+		*cleanx = cx2;
+		*cleany = cy2;
 	}
 
-	I_ClosestResolution (&width, &height, bits);
-	if (!I_CheckResolution (width, height, bits))
-	{ // Try specified resolution
-		if (!I_CheckResolution (oldwidth, oldheight, oldbits))
-		{ // Try previous resolution (if any)
-	   		return false;
-		}
+	if (*cleanx > 1 && *cleany > 1 && *cleanx != *cleany)
+	{
+		if (*cleanx < *cleany)
+			*cleany = *cleanx;
 		else
-		{
-			width = oldwidth;
-			height = oldheight;
-			bits = oldbits;
-		}
+			*cleanx = *cleany;
 	}
-	return V_DoModeSetup (width, height, bits);
-#endif
-	return false;
-}
-
-void IVideo::DumpAdapters ()
-{
-	Printf("Multi-monitor support unavailable.\n");
+	if (_cx1 != NULL)	*_cx1 = cx1;
+	if (_cx2 != NULL)	*_cx2 = cx2;
 }

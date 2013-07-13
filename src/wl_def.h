@@ -72,9 +72,13 @@ void Quit(const char *errorStr, ...);
 
 #define abs(x) ABS(x)
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #define stricmp _stricmp
 #endif
+
+typedef double real64;
+typedef SDWORD int32;
+#include "xs_Float.h"
 
 /*
 =============================================================================

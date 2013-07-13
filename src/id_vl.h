@@ -14,7 +14,7 @@ extern SDL_Window *window;
 extern SDL_Renderer *screenRenderer;
 extern SDL_Texture *screen;
 #else
-extern SDL_Surface *screen;
+//extern SDL_Surface *screen;
 #endif
 extern SDL_Surface *screenBuffer, *curSurface;
 
@@ -48,9 +48,7 @@ void VL_FadeIn      (int start, int end, SDL_Color *palette, int steps);
 byte *VL_LockSurface(SDL_Surface *surface);
 void VL_UnlockSurface(SDL_Surface *surface);
 
-void inline VL_ClearScreen(int color)
-{
-	SDL_FillRect(curSurface, NULL, color);
-}
+#include "v_video.h"
+#define VL_ClearScreen(color) VWB_Clear(color, 0, 0, SCREENWIDTH, SCREENHEIGHT)
 
 #endif

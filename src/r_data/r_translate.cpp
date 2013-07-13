@@ -56,6 +56,8 @@
 
 TAutoGrowArray<FRemapTablePtr, FRemapTable *> translationtables[NUM_TRANSLATION_TABLES];
 
+BYTE identitymap[256];
+
 const BYTE IcePalette[16][3] =
 {
 	{  10,  8, 18 },
@@ -733,10 +735,10 @@ void R_InitTranslationTables ()
 	}*/
 
 	// Set up a guaranteed identity map
-	/*for (i = 0; i < 256; ++i)
+	for (i = 0; i < 256; ++i)
 	{
 		identitymap[i] = i;
-	}*/
+	}
 }
 
 //----------------------------------------------------------------------------

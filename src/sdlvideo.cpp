@@ -17,7 +17,48 @@
 
 #include <SDL.h>
 
+static const float Gamma = 1.f;
+
 IVideo *Video;
+
+DFrameBuffer *I_SetMode (int &width, int &height, DFrameBuffer *old)
+{
+	bool fs = false;
+	switch (Video->GetDisplayType ())
+	{
+	case DISPLAY_WindowOnly:
+		fs = false;
+		break;
+	case DISPLAY_FullscreenOnly:
+		fs = true;
+		break;
+	case DISPLAY_Both:
+		fs = vid_fullscreen;
+		break;
+	}
+	DFrameBuffer *res = Video->CreateFrameBuffer (width, height, fs, old);
+
+	/* Right now, CreateFrameBuffer cannot return NULL
+	if (res == NULL)
+	{
+		I_FatalError ("Mode %dx%d is unavailable\n", width, height);
+	}
+	*/
+	return res;
+}
+
+bool I_CheckResolution (int width, int height, int bits)
+{
+	int twidth, theight;
+
+	Video->StartModeIterator (bits, screen ? screen->IsFullscreen() : vid_fullscreen);
+	while (Video->NextMode (&twidth, &theight, NULL))
+	{
+		if (width == twidth && height == theight)
+			return true;
+	}
+	return false;
+}
 
 void I_ClosestResolution (int *width, int *height, int bits)
 {
@@ -28,8 +69,7 @@ void I_ClosestResolution (int *width, int *height, int bits)
 
 	for (iteration = 0; iteration < 2; iteration++)
 	{
-		//Video->StartModeIterator (bits, screen ? screen->IsFullscreen() : vid_fullscreen);
-		Video->StartModeIterator (bits, vid_fullscreen);
+		Video->StartModeIterator (bits, screen ? screen->IsFullscreen() : vid_fullscreen);
 		while (Video->NextMode (&twidth, &theight, NULL))
 		{
 			if (twidth == *width && theight == *height)
@@ -55,6 +95,146 @@ void I_ClosestResolution (int *width, int *height, int bits)
 			return;
 		}
 	}
+}
+
+//
+// V_SetResolution
+//
+bool V_DoModeSetup (int width, int height, int bits)
+{
+	DFrameBuffer *buff = I_SetMode (width, height, screen);
+	int cx1, cx2;
+
+	if (buff == NULL)
+	{
+		return false;
+	}
+
+	screen = buff;
+	GC::WriteBarrier(screen);
+	screen->SetGamma (Gamma);
+
+	// Load fonts now so they can be packed into textures straight away,
+	// if D3DFB is being used for the display.
+	//FFont::StaticPreloadFonts();
+
+	V_CalcCleanFacs(320, 200, width, height, &CleanXfac, &CleanYfac, &cx1, &cx2);
+
+	CleanWidth = width / CleanXfac;
+	CleanHeight = height / CleanYfac;
+	assert(CleanWidth >= 320);
+	assert(CleanHeight >= 200);
+
+	if (width < 800 || width >= 960)
+	{
+		if (cx1 < cx2)
+		{
+			// Special case in which we don't need to scale down.
+			CleanXfac_1 = 
+			CleanYfac_1 = cx1;
+		}
+		else
+		{
+			CleanXfac_1 = MAX(CleanXfac - 1, 1);
+			CleanYfac_1 = MAX(CleanYfac - 1, 1);
+			// On larger screens this is not enough so make sure it's at most 3/4 of the screen's width
+			while (CleanXfac_1 * 320 > screen->GetWidth()*3/4 && CleanXfac_1 > 2)
+			{
+				CleanXfac_1--;
+				CleanYfac_1--;
+			}
+		}
+		CleanWidth_1 = width / CleanXfac_1;
+		CleanHeight_1 = height / CleanYfac_1;
+	}
+	else // if the width is between 800 and 960 the ratio between the screensize and CleanXFac-1 becomes too large.
+	{
+		CleanXfac_1 = CleanXfac;
+		CleanYfac_1 = CleanYfac;
+		CleanWidth_1 = CleanWidth;
+		CleanHeight_1 = CleanHeight;
+	}
+
+
+	DisplayWidth = width;
+	DisplayHeight = height;
+	DisplayBits = bits;
+
+	//R_OldBlend = ~0;
+	//Renderer->OnModeSet();
+	
+	//M_RefreshModesList ();
+
+	return true;
+}
+
+bool IVideo::SetResolution (int width, int height, int bits)
+{
+	int oldwidth, oldheight;
+	int oldbits;
+
+	if (screen)
+	{
+		oldwidth = SCREENWIDTH;
+		oldheight = SCREENHEIGHT;
+		oldbits = DisplayBits;
+	}
+	else
+	{ // Harmless if screen wasn't allocated
+		oldwidth = width;
+		oldheight = height;
+		oldbits = bits;
+	}
+
+	I_ClosestResolution (&width, &height, bits);
+	if (!I_CheckResolution (width, height, bits))
+	{ // Try specified resolution
+		if (!I_CheckResolution (oldwidth, oldheight, oldbits))
+		{ // Try previous resolution (if any)
+	   		return false;
+		}
+		else
+		{
+			width = oldwidth;
+			height = oldheight;
+			bits = oldbits;
+		}
+	}
+	return V_DoModeSetup (width, height, bits);
+}
+
+void IVideo::DumpAdapters ()
+{
+	Printf("Multi-monitor support unavailable.\n");
+}
+
+void I_ShutdownGraphics ()
+{
+	if (screen)
+	{
+		DFrameBuffer *s = screen;
+		screen = NULL;
+		s->ObjectFlags |= OF_YesReallyDelete;
+		delete s;
+	}
+	if (Video)
+		delete Video, Video = NULL;
+}
+
+void I_InitGraphics ()
+{
+//	UCVarValue val;
+
+//	val.Bool = !!Args->CheckParm ("-devparm");
+//	ticker.SetGenericRepDefault (val, CVAR_Bool);
+
+	Video = new SDLVideo (0);
+	if (Video == NULL)
+		I_FatalError ("Failed to initialize display");
+
+	atterm (I_ShutdownGraphics);
+
+//	Video->SetWindowedScale (vid_winscale);
 }
 
 // MACROS ------------------------------------------------------------------
@@ -278,7 +458,7 @@ DFrameBuffer *SDLVideo::CreateFrameBuffer (int width, int height, bool fullscree
 		}
 		old->GetFlash (flashColor, flashAmount);
 		old->ObjectFlags |= OF_YesReallyDelete;
-		//if (screen == old) screen = NULL;
+		if (screen == old) screen = NULL;
 		delete old;
 	}
 	else

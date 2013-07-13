@@ -6,6 +6,7 @@
 #include "w_wad.h"
 #include "v_font.h"
 #include "v_palette.h"
+#include "v_video.h"
 #include "r_data/r_translate.h"
 #include "textures/textures.h"
 #include "templates.h"
@@ -151,8 +152,8 @@ void VH_UpdateScreen(SDL_Surface * const screenBuffer)
 	SDL_RenderCopy(screenRenderer, screen, NULL, NULL);
 	SDL_RenderPresent(screenRenderer);
 #else
-	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-	SDL_Flip(screen);
+	screen->Update();
+	screen->Lock(false);
 #endif
 }
 
@@ -395,45 +396,12 @@ finished:
 #include "r_data/colormaps.h"
 void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect)
 {
-	int myratio = handleaspect ? r_ratio : 0;
-	double right = x + w;
-	double bottom = y + h;
-
-	if (AspectCorrection[myratio].isWide)
-	{ // The target surface is either 16:9 or 16:10, so expand the
-	  // specified virtual size to avoid undesired stretching of the
-	  // image. Does not handle non-4:3 virtual sizes. I'll worry about
-	  // those if somebody expresses a desire to use them.
-		x = (x - vwidth * 0.5) * screenWidth * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screenWidth * 0.5;
-		w = (right - vwidth * 0.5) * screenWidth * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screenWidth * 0.5 - x;
-	}
-	else
-	{
-		x = x * screenWidth / vwidth;
-		w = right * screenWidth / vwidth - x;
-	}
-	if (AspectCorrection[myratio].tallscreen)
-	{ // The target surface is 5:4
-		y = (y - vheight * 0.5) * screenHeight * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screenHeight * 0.5;
-		h = (bottom - vheight * 0.5) * screenHeight * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screenHeight * 0.5 - y;
-		if (vbottom)
-		{
-			y += (screenHeight - screenHeight * AspectCorrection[myratio].multiplier / 48.0) * 0.5;
-		}
-	}
-	else
-	{
-		y = y * screenHeight / vheight;
-		h = bottom * screenHeight / vheight - y;
-	}
+	screen->VirtualToRealCoords(x, y, w, h, vwidth, vheight, vbottom, handleaspect);
 }
 
 void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 {
-	byte *vbuf = VL_LockSurface(screenBuffer);
-	for(int i = y1;i < y2;++i)
-		memset(vbuf+(i*bufferPitch)+x1, color, (x2-x1));
-	VL_UnlockSurface(screenBuffer);
+	screen->Clear(x1, y1, x2, y2, color, GPalette.BaseColors[color]);
 }
 
 void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local)
@@ -500,6 +468,23 @@ void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local)
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
+	screen->Lock(false);
+	if(menu)
+	{
+		screen->DrawTexture(tex, ix, iy,
+			DTA_Clean, true,
+			DTA_Translation, remap,
+			TAG_DONE);
+	}
+	else
+	{
+		screen->DrawTexture(tex, ix, iy,
+			DTA_Bottom320x200, true,
+			DTA_Translation, remap,
+			TAG_DONE);
+	}
+	screen->Unlock();
+#if 0
 	if(!tex)
 		return;
 
@@ -544,6 +529,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 	}
 
 	VL_UnlockSurface(screenBuffer);
+#endif
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
@@ -557,6 +543,15 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 
 void CA_CacheScreen(FTexture* tex, bool noaspect)
 {
+	screen->Lock(false);
+	screen->DrawTexture(tex, 0, 0,
+		DTA_DestWidth, 320,
+		DTA_DestHeight, 200,
+		DTA_VirtualWidth, 320,
+		DTA_VirtualHeight, 200,
+		TAG_DONE);
+	screen->Unlock();
+#if 0
 	if(!tex)
 		return;
 
@@ -603,4 +598,5 @@ void CA_CacheScreen(FTexture* tex, bool noaspect)
 		dest = ++vbuf;
 	}
 	VL_UnlockSurface(curSurface);
+#endif
 }

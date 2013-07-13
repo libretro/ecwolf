@@ -41,6 +41,7 @@
 #include "dobject.h"
 #include "colormatcher.h"
 #include "version.h"
+#include "r_2d/r_main.h"
 
 /*
 =============================================================================
@@ -1302,6 +1303,8 @@ int main (int argc, char *argv[])
 		}
 
 		InitThinkerList();
+
+		R_InitRenderer();
 
 		printf("InitGame: Setting up the game...\n");
 		InitGame();
