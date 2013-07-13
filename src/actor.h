@@ -41,7 +41,7 @@
 #include "name.h"
 #include "dobject.h"
 
-#define DECLARE_CLASS(name, parent) \
+#define DECLARE_ABSTRACT_CLASS(name, parent) \
 	friend class ClassDef; \
 	private: \
 		typedef parent Super; \
@@ -49,10 +49,14 @@
 	protected: \
 		name(const ClassDef *classType) : parent(classType) {} \
 		virtual const ClassDef *__StaticType() const { return __StaticClass; } \
-		static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem); \
 	public: \
 		static const ClassDef *__StaticClass; \
 		static const size_t __PointerOffsets[];
+#define DECLARE_CLASS(name, parent) \
+	DECLARE_ABSTRACT_CLASS(name, parent) \
+	protected: \
+		static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem); \
+	public:
 #define DECLARE_NATIVE_CLASS(name, parent) DECLARE_CLASS(A##name, A##parent)
 #define HAS_OBJECT_POINTERS
 #define __IMPCLS_ABSTRACT(cls, name) \
@@ -62,7 +66,6 @@
 	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new ((EInPlace *) mem) cls(classType); }
 #define IMPLEMENT_ABSTRACT_CLASS(cls) \
 	__IMPCLS_ABSTRACT(cls, #cls) \
-	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return Super::__InPlaceConstructor(classType, mem); } \
 	const size_t cls::__PointerOffsets[] = { ~(size_t)0 };
 #define IMPLEMENT_INTERNAL_CLASS(cls) \
 	__IMPCLS(cls, #cls) \

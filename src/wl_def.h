@@ -54,6 +54,7 @@ typedef int64_t SQWORD;
 typedef void * memptr;
 typedef uint32_t uint32;
 typedef uint32_t BITFIELD;
+typedef int INTBOOL;
 
 // Screenshot buffer image data types
 enum ESSType

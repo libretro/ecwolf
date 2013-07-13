@@ -142,6 +142,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	g_wolf/wolf_sbar.cpp
 	r_data/colormaps.cpp
 	r_data/r_translate.cpp
+	r_data/renderstyle.cpp
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp
 	resourcefiles/file_7z.cpp
@@ -218,10 +219,13 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	p_switch.cpp
 	r_sprites.cpp
 	scanner.cpp
+	sdlvideo.cpp
 	sndinfo.cpp
 	thinker.cpp
+	v_draw.cpp
 	v_font.cpp
 	v_palette.cpp
+	v_pfx.cpp
 	v_video.cpp
 	w_wad.cpp
 	weaponslots.cpp
