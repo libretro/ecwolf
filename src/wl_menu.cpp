@@ -1166,7 +1166,7 @@ void MenuFadeIn()
 	assert(menusAreFaded);
 	menusAreFaded = false;
 
-	VL_FadeIn(0, 255, gamepal, 10);
+	VL_FadeIn(0, 255, 10);
 }
 
 void ShowMenu(Menu &menu)

@@ -103,7 +103,7 @@ static void ShowFader(FaderIntermissionAction *fader)
 	{
 		case FaderIntermissionAction::FADEIN:
 			ShowImage(fader, true);
-			VL_FadeIn(0, 255, gamepal, fader->Time);
+			VL_FadeIn(0, 255, fader->Time);
 			break;
 		case FaderIntermissionAction::FADEOUT:
 			// We want to hold whatever may have been drawn in the previous page during the fade, so we don't need to draw.

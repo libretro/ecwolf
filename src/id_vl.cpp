@@ -51,8 +51,6 @@ unsigned scaleFactorX, scaleFactorY;
 
 bool	 screenfaded;
 
-SDL_Color gamepal[256];
-
 static struct
 {
 	uint8_t r,g,b;
@@ -64,9 +62,8 @@ static struct
 void VL_ReadPalette(const char* lump)
 {
 	InitPalette(lump);
-	VL_SetPalette(GPalette.BaseColors, false);
 	if(currentBlend.amount)
-		VL_SetBlend(currentBlend.r, currentBlend.g, currentBlend.b, currentBlend.amount, false);
+		V_SetBlend(currentBlend.r, currentBlend.g, currentBlend.b, currentBlend.amount);
 	R_InitColormaps();
 	V_RetranslateFonts();
 }
@@ -201,80 +198,6 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 /*
 =================
 =
-= VL_SetBlend
-=
-=================
-*/
-
-void DoBlending (const PalEntry *from, PalEntry *to, int count, int r, int g, int b, int a);
-void VL_SetBlend(uint8_t red, uint8_t green, uint8_t blue, int amount, bool forceupdate)
-{
-	static PalEntry colors[256];
-
-	currentBlend.r = red;
-	currentBlend.g = green;
-	currentBlend.b = blue;
-	currentBlend.amount = amount;
-
-	if(amount)
-	{
-		memcpy(colors, GPalette.BaseColors, sizeof(PalEntry)*256);
-
-		DoBlending(GPalette.BaseColors, colors, 256, red, green, blue, amount);
-		VL_SetPalette(colors, forceupdate);
-	}
-	else
-		VL_SetPalette(GPalette.BaseColors, forceupdate);
-}
-
-//===========================================================================
-
-/*
-=================
-=
-= VL_SetPalette
-=
-=================
-*/
-
-void VL_SetPalette (SDL_Color *palette, bool forceupdate)
-{
-#if SDL_VERSION_ATLEAST(2,0,0)
-	if(curSurface)
-	{
-		SDL_SetPaletteColors(curSurface->format->palette, palette, 0, 256);
-		if(forceupdate)
-			VH_UpdateScreen();
-	}
-#else
-#if 0
-	if(screenBits == 8)
-		SDL_SetPalette(screen, SDL_PHYSPAL, palette, 0, 256);
-	else
-	{
-		SDL_SetPalette(curSurface, SDL_LOGPAL, palette, 0, 256);
-		if(forceupdate)
-		{
-			SDL_BlitSurface(curSurface, NULL, screen, NULL);
-			SDL_Flip(screen);
-		}
-	}
-#endif
-	I_Error("VL_SetPalette\n");
-#endif
-}
-
-void VL_SetPalette (PalEntry *palette, bool forceupdate)
-{
-//	screen->UpdateColors();
-}
-
-
-//===========================================================================
-
-/*
-=================
-=
 = VL_FadeOut
 =
 = Fades the current palette to the given color in the given number of steps
@@ -298,13 +221,14 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 	for (int a = start;(aStep < 0 ? a > end : a < end);a += aStep)
 	{
 		if(!usedoublebuffering || screenBits == 8) VL_WaitVBL(1);
-		VL_SetBlend(red, green, blue, a>>FRACBITS, true);
+		V_SetBlend(red, green, blue, a>>FRACBITS);
+		VH_UpdateScreen();
 	}
 
 //
 // final color
 //
-	VL_SetBlend (red,green,blue,end>>FRACBITS, true);
+	V_SetBlend (red,green,blue,end>>FRACBITS);
 
 	screenfaded = end != 0;
 }
@@ -326,7 +250,7 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 =================
 */
 
-void VL_FadeIn (int start, int end, SDL_Color *palette, int steps)
+void VL_FadeIn (int start, int end, int steps)
 {
 	if(screenfaded)
 		VL_Fade(end, start, fadeR, fadeG, fadeB, steps);

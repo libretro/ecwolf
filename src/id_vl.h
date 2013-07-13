@@ -39,11 +39,8 @@ void VL_ReadPalette(const char* lump);
 void VL_SetVGAPlaneMode (bool forSignon=false);
 void VL_SetTextMode (void);
 
-void VL_SetBlend(uint8_t red, uint8_t green, uint8_t blue, int amount, bool forceupdate=false);
-void VL_SetPalette  (struct PalEntry *palette, bool forceupdate);
-void VL_SetPalette  (SDL_Color *palette, bool forceupdate);
 void VL_FadeOut     (int start, int end, int red, int green, int blue, int steps);
-void VL_FadeIn      (int start, int end, SDL_Color *palette, int steps);
+void VL_FadeIn      (int start, int end, int steps);
 
 byte *VL_LockSurface(SDL_Surface *surface);
 void VL_UnlockSurface(SDL_Surface *surface);

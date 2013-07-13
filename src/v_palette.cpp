@@ -45,16 +45,8 @@
 #include <fcntl.h>
 
 #include "templates.h"
-//#include "v_video.h"
-//#include "i_system.h"
-//#include "r_main.h"		// For lighting constants
+#include "v_video.h"
 #include "w_wad.h"
-//#include "i_video.h"
-//#include "c_dispatch.h"
-//#include "g_level.h"
-//#include "st_stuff.h"
-//#include "gi.h"
-//#include "x86.h"
 #include "colormatcher.h"
 #include "v_palette.h"
 #include "r_data/colormaps.h"
@@ -490,7 +482,7 @@ void V_ForceBlend (int blendr, int blendg, int blendb, int blenda)
 	BlendB = blendb;
 	BlendA = blenda;
 
-	//screen->SetFlash (PalEntry (BlendR, BlendG, BlendB), BlendA);
+	screen->SetFlash (PalEntry (BlendR, BlendG, BlendB), BlendA);
 }
 
 /*CCMD (testblend)

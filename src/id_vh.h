@@ -66,7 +66,7 @@ void VH_UpdateScreen(struct SDL_Surface * const screenBuf=screenBuffer);
 //
 
 #define VW_WaitVBL		    VL_WaitVBL
-#define VW_FadeIn()		    VL_FadeIn(0,255,gamepal,30);
+#define VW_FadeIn()		    VL_FadeIn(0,255,30);
 #define VW_FadeOut()	    VL_FadeOut(0,255,0,0,0,30);
 void	VW_MeasurePropString (FFont *font, const char *string, word &width, word &height, word *finalWidth=NULL);
 

@@ -123,7 +123,6 @@ int 			dccount;
 
 int dc_fillcolor;
 BYTE *dc_translation;
-BYTE shadetables[NUMCOLORMAPS*16*256];
 FDynamicColormap ShadeFakeColormap[16];
 
 #define r_columnmethod 0
