@@ -19,8 +19,8 @@ class FTexture;
 enum MenuOffset
 {
 	MENU_NONE = 0,
-	MENU_TOP = 1,
-	MENU_CENTER = 2,
+	MENU_TOP = 2,
+	MENU_CENTER = 1,
 	MENU_BOTTOM = 3
 };
 void VWB_Clear(int color, int x1, int y1, int x2, int y2);

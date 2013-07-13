@@ -229,6 +229,9 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 // final color
 //
 	V_SetBlend (red,green,blue,end>>FRACBITS);
+	// Not quite sure why I need to call this twice.
+	VH_UpdateScreen();
+	VH_UpdateScreen();
 
 	screenfaded = end != 0;
 }

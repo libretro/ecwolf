@@ -342,7 +342,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 		if(stencil)
 		{
 			screen->DrawTexture(tex, ix, iy,
-				DTA_Clean, true,
+				DTA_Clean, menu,
 				DTA_Translation, remap,
 				DTA_FillColor, GPalette.BaseColors[stencilcolor],
 				TAG_DONE);
@@ -350,7 +350,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 		else
 		{
 			screen->DrawTexture(tex, ix, iy,
-				DTA_Clean, true,
+				DTA_Clean, menu,
 				DTA_Translation, remap,
 				TAG_DONE);
 		}

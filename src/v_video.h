@@ -158,6 +158,14 @@ enum
 	HUD_HorizCenter
 };
 
+enum
+{
+	CLEAN_Off,
+	CLEAN_Centered,
+	CLEAN_Top,
+	CLEAN_Bottom
+};
+
 
 class FFont;
 struct FRemapTable;

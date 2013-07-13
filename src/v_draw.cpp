@@ -444,11 +444,22 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, DWORD tag
 			break;
 
 		case DTA_Clean:
-			boolval = va_arg(tags, INTBOOL);
-			if (boolval)
+			intval = va_arg(tags, int);
+			if (intval)
 			{
 				parms->x = (parms->x - 160.0) * CleanXfac + (Width * 0.5);
-				parms->y = (parms->y - 100.0) * CleanYfac + (Height * 0.5);
+				switch(intval)
+				{
+					default:
+						parms->y = (parms->y - 100.0) * CleanYfac + (Height * 0.5);
+						break;
+					case CLEAN_Top:
+						parms->y *= CleanYfac;
+						break;
+					case CLEAN_Bottom:
+						parms->y = (parms->y - 200.0) * CleanYfac + Height;
+						break;
+				}
 				parms->destwidth = parms->texwidth * CleanXfac;
 				parms->destheight = parms->texheight * CleanYfac;
 			}
