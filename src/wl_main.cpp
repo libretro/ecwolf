@@ -377,6 +377,12 @@ static void InitGame()
 	}
 	atterm(SDL_Quit);
 
+#if SDL_VERSION_ATLEAST(2,0,0)
+#else
+	SDL_WM_SetCaption("ECWolf " DOTVERSIONSTR, NULL);
+#endif
+	SDL_ShowCursor(SDL_DISABLE);
+
 	int numJoysticks = SDL_NumJoysticks();
 	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
 	{

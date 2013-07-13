@@ -1266,7 +1266,7 @@ void    ThreeDRefresh (void)
 //
 	map->ClearVisibility();
 
-	vbuf = VL_LockSurface(screenBuffer);
+	vbuf = VL_LockSurface();
 	if(vbuf == NULL) return;
 
 	vbuf += screenofs;
@@ -1274,7 +1274,7 @@ void    ThreeDRefresh (void)
 
 	R_RenderView();
 
-	VL_UnlockSurface(screenBuffer);
+	VL_UnlockSurface();
 	vbuf = NULL;
 
 //

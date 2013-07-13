@@ -282,42 +282,26 @@ MENU_LISTENER(SetResolution)
 {
 	MenuFadeOut();
 
-	if(!fullscreen)
+	if(!screen->IsFullscreen())
 	{
 		screenWidth = WinModes[which].Width;
 		screenHeight = WinModes[which].Height;
 	}
 	else
 	{
-#if SDL_VERSION_ATLEAST(2,0,0)
-		int modes = SDL_GetNumDisplayModes(0);
-		int lastw = 0, lasth = 0;
-		SDL_DisplayMode mode;
-		for(int m = 0, i = 0;m < modes;++m)
-		{
-			SDL_GetDisplayMode(0, m, &mode);
-			if(mode.w == lastw && mode.h == lasth)
-				continue;
-			lastw = mode.w;
-			lasth = mode.h;
-
-			if(i++ == which)
-			{
-				screenWidth = mode.w;
-				screenHeight = mode.h;
-				break;
-			}
-		}
-#else
-		SDL_Rect **modes = SDL_ListModes (NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
-		screenWidth = modes[which]->w;
-		screenHeight = modes[which]->h;
-#endif
+		int width, height;
+		bool lb;
+		Video->StartModeIterator(DisplayBits, screen ? screen->IsFullscreen() : vid_fullscreen);
+		for(int i = 0;i < which;++i)
+			Video->NextMode(&width, &height, &lb);
+		screenWidth = width;
+		screenHeight = height;
 	}
 
 	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
 	VH_Startup(); // Recalculate fizzlefade stuff.
 	VL_SetVGAPlaneMode();
+	screen->Lock(false);
 	EnterResolutionSelection(which);
 	resolutionMenu.draw();
 	MenuFadeIn();
@@ -345,51 +329,21 @@ MENU_LISTENER(EnterResolutionSelection)
 	}
 	else
 	{
-#if SDL_VERSION_ATLEAST(2,0,0)
-		int numModes = SDL_GetNumDisplayModes(0);
-		if(numModes == 0)
-			return false;
-
-		SDL_DisplayMode mode;
-		int lastw = 0, lasth = 0;
-		for(int m = 0;m < numModes;++m)
+		int width, height;
+		bool lb;
+		Video->StartModeIterator(DisplayBits, screen ? screen->IsFullscreen() : vid_fullscreen);
+		while(Video->NextMode(&width, &height, &lb))
 		{
-			SDL_GetDisplayMode(0, m, &mode);
-			if(mode.w == lastw && mode.h == lasth)
-				continue;
-			lastw = mode.w;
-			lasth = mode.h;
-
-			resolution.Format("%dx%d", mode.w, mode.h);
+			resolution.Format("%dx%d", width, height);
 			MenuItem *item = new MenuItem(resolution, SetResolution);
 			resolutionMenu.addItem(item);
 
-			if(static_cast<unsigned>(mode.w) == screenWidth && static_cast<unsigned>(mode.h) == screenHeight)
+			if(width == SCREENWIDTH && height == SCREENHEIGHT)
 			{
 				selected = resolutionMenu.countItems()-1;
 				item->setHighlighted(true);
 			}
 		}
-#else
-		SDL_Rect **modes = SDL_ListModes (NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
-		if(modes == NULL)
-			return false;
-
-		while(*modes)
-		{
-			resolution.Format("%dx%d", (*modes)->w, (*modes)->h);
-			MenuItem *item = new MenuItem(resolution, SetResolution);
-			resolutionMenu.addItem(item);
-
-			if((*modes)->w == screenWidth && (*modes)->h == screenHeight)
-			{
-				selected = resolutionMenu.countItems()-1;
-				item->setHighlighted(true);
-			}
-
-			++modes;
-		}
-#endif
 	}
 
 	resolutionMenu.setCurrentPosition(selected);

@@ -16,10 +16,10 @@ extern SDL_Texture *screen;
 #else
 //extern SDL_Surface *screen;
 #endif
-extern SDL_Surface *screenBuffer, *curSurface;
+extern SDL_Surface *curSurface;
 
 extern  bool	fullscreen, usedoublebuffering;
-extern  unsigned screenWidth, screenHeight, screenBits, bufferPitch, curPitch;
+extern  unsigned screenWidth, screenHeight, screenBits, curPitch;
 extern  unsigned scaleFactorX, scaleFactorY;
 
 extern	bool  screenfaded;
@@ -42,8 +42,8 @@ void VL_SetTextMode (void);
 void VL_FadeOut     (int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn      (int start, int end, int steps);
 
-byte *VL_LockSurface(SDL_Surface *surface);
-void VL_UnlockSurface(SDL_Surface *surface);
+byte *VL_LockSurface();
+void VL_UnlockSurface();
 
 #include "v_video.h"
 #define VL_ClearScreen(color) VWB_Clear(color, 0, 0, SCREENWIDTH, SCREENHEIGHT)

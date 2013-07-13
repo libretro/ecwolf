@@ -19,7 +19,7 @@
 
 static const float Gamma = 1.f;
 
-IVideo *Video;
+IVideo *Video = NULL;
 
 DFrameBuffer *I_SetMode (int &width, int &height, DFrameBuffer *old)
 {
@@ -223,10 +223,8 @@ void I_ShutdownGraphics ()
 
 void I_InitGraphics ()
 {
-//	UCVarValue val;
-
-//	val.Bool = !!Args->CheckParm ("-devparm");
-//	ticker.SetGenericRepDefault (val, CVAR_Bool);
+	if(Video)
+		return;
 
 	Video = new SDLVideo (0);
 	if (Video == NULL)
@@ -381,6 +379,7 @@ static MiniModeInfo WinModes[] =
 	{ 1600, 1000 },	// 16:10
 	{ 1600, 1200 },
 	{ 1920, 1080 },
+	{ 1920, 1200 },
 };
 
 //static cycle_t BlitCycles;

@@ -41,9 +41,6 @@ SDL_Texture *screen = NULL;
 //SDL_Surface *screen = NULL;
 #endif
 
-SDL_Surface *screenBuffer = NULL;
-unsigned bufferPitch;
-
 SDL_Surface *curSurface = NULL;
 unsigned curPitch;
 
@@ -82,86 +79,6 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 	I_InitGraphics();
 	Video->SetResolution(screenWidth, screenHeight, 8);
 	R_SetupBuffer ();
-	//screen->Lock(false);
-#if 0
-#if SDL_VERSION_ATLEAST(2,0,0)
-#else
-	SDL_WM_SetCaption("ECWolf", NULL);
-#endif
-
-	SDL_Color pal[256];
-	for(uint16_t i = 0;i < 256;++i)
-	{
-		pal[i].r = GPalette.BaseColors[i].r;
-		pal[i].g = GPalette.BaseColors[i].g;
-		pal[i].b = GPalette.BaseColors[i].b;
-	}
-
-#if SDL_VERSION_ATLEAST(2,0,0)
-	if(window) SDL_DestroyWindow(window);
-	window = SDL_CreateWindow("ECWolf", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-		screenWidth, screenHeight,
-		(fullscreen && !forSignon ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
-	);
-	if(screenRenderer) SDL_DestroyRenderer(screenRenderer);
-	screenRenderer = SDL_CreateRenderer(window, -1, 0);
-	if(!screenRenderer)
-	{
-		printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
-			screenHeight, screenBits, SDL_GetError());
-		exit(1);
-	}
-	if(screen) SDL_DestroyTexture(screen);
-	screen = SDL_CreateTexture(screenRenderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, screenWidth, screenHeight);
-	if(!screen)
-	{
-		printf("Unable to create texture: %s\n", SDL_GetError());
-		exit(1);
-	}
-	SDL_ShowCursor(SDL_DISABLE);
-#else
-	if(screenBits == static_cast<unsigned>(-1))
-	{
-		const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
-		screenBits = vidInfo->vfmt->BitsPerPixel;
-	}
-
-	screen = SDL_SetVideoMode(screenWidth, screenHeight, screenBits,
-		(usedoublebuffering ? SDL_HWSURFACE | SDL_DOUBLEBUF : 0) |
-		(screenBits == 8 ? SDL_HWPALETTE : 0) |
-		(fullscreen && !forSignon ? SDL_FULLSCREEN : 0));
-	if(!screen)
-	{
-		printf("Unable to set %ix%ix%i video mode: %s\n", screenWidth,
-			screenHeight, screenBits, SDL_GetError());
-		exit(1);
-	}
-	if((screen->flags & SDL_DOUBLEBUF) != SDL_DOUBLEBUF)
-		usedoublebuffering = false;
-	SDL_ShowCursor(SDL_DISABLE);
-
-	SDL_SetColors(screen, pal, 0, 256);
-#endif
-
-	SDL_FreeSurface(screenBuffer);
-	screenBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth,
-		screenHeight, 8, 0, 0, 0, 0);
-	if(!screenBuffer)
-	{
-		printf("Unable to create screen buffer surface: %s\n", SDL_GetError());
-		exit(1);
-	}
-#if SDL_VERSION_ATLEAST(2,0,0)
-	SDL_SetPaletteColors(screenBuffer->format->palette, pal, 0, 256);
-#else
-	SDL_SetColors(screenBuffer, pal, 0, 256);
-#endif
-
-	bufferPitch = screenBuffer->pitch;
-
-	curSurface = screenBuffer;
-	curPitch = bufferPitch;
-#endif
 
 	scaleFactorY = SCREENHEIGHT/200;
 	scaleFactorX = SCREENWIDTH/320;
@@ -267,13 +184,13 @@ void VL_FadeIn (int start, int end, int steps)
 =============================================================================
 */
 
-byte *VL_LockSurface(SDL_Surface *surface)
+byte *VL_LockSurface()
 {
 	screen->Lock(false);
 	return (byte *) screen->GetBuffer();
 }
 
-void VL_UnlockSurface(SDL_Surface *surface)
+void VL_UnlockSurface()
 {
 	screen->Unlock();
 }
