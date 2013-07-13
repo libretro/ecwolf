@@ -317,7 +317,7 @@ actor ChargePack 237
 	states
 	{
 		Spawn:
-			BCHG A -1
+			CHGU A -1
 			stop
 	}
 }
@@ -882,14 +882,14 @@ actor BlueRedPost 291
 	}
 }
 
-actor GreenPost 292
+actor GreekPost2 292
 {
 	radius 32
 	+SOLID
 	states
 	{
 		Spawn:
-			GRPS A -1
+			GRP2 A -1
 			stop
 	}
 }

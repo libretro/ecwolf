@@ -124,402 +124,1092 @@ graphics
 
 sprites
 {
-	"HACKA0",
+	"HACKA0", // Hello, Hacker!
 
-	"WPUDA0",	"CCANA0",	"LUNTA0",	"FLRLA0",
-	"LABTA0",	"PILRA0",	"BPUDA0",	"PISSA0",
-	"FICSA0",	"HFECA0",
-	"WFNTA0",	"PLT1A0",	"BVSEA0",	"GENTA0",
-	"CLT1A0",	"GENCA0",	"KTRHA0",	"OTRHA0",
-	"PLT2A0",	"GURNA0",
-	"IDHSA0",	"EXITA0",	"TNSPA0",	"BDYCA0",
-	"SFPPA0",	"MSTTA0",	"CHRGA0",	"RAWPA0",
-	"DNDPA0",	"FAIDA0",
-	"FHELA0",	"BCHGA0",	"RACSA0",	"YACSA0",
-	"APCPA0",	"BACSA0",	"YBOXA0",
-	"ODSKA0",
-	"OCHRA0",	"SDSKA0",
-	"WBWLA0",	"EBWLA0",	"CKLGA0",	"CKBNA0",
-	"HAMMA0",	"HAMBA0",	"PDUPA0",	"IDSLA0",
-	"MBAGA0",	"LOOTA0",
-	"GLD5A0",	"XORBA0",	"GRPSA0",	"BLPSA0",
-	"HTPSA0",	"CLT2A0",	"CLT3A0",
-	"CRT1A0",	"CRT2B0",	"CRT3C0",
-	"BDYPA0",	"ORLPA0",	"OSNKA0",
-	"BDY2A0",	"STBLA0",	"SCHRA0",	"SSTLA0",
-	"BDYGA0",	"GLD3A0",	"GLD2A0",	"GLD1A0",
-	"BRPSA0",	"GRPSA0",
-	"GNPSA0",	"TDCLA0",	"SDCLA0",	"DBR1A0",
-	"DBR2A0",	"DBR3A0",	"DBR4A0",	"CON1A0",
-	"CON5A0",	"ACPPA0",
+	// Props and Pickups
+	"WPUDA0", // Water Puddle
+	"CCANA0", // Toxic Waste Can
+	"LUNTA0", // Lunch Table
+	"FLRLA0", // Floor Lamp
+	"LABTA0", // Lab Table
+	"PILRA0", // Blue Pillar
+	"BPUDA0", // Blood Puddle
+	"PISSA0", // Urine Puddle
+	"FICSA0", // Potted Tree
+	"HFECA0", // Half-Eaten Corpse
+	"WFNTA0", // "Water Fountain" (Sink)
+	"PLT1A0", // Potted Plant 1
+	"BVSEA0", // Big Vase
+	"GENTA0", // Generic Table
+	"CLT1A0", // Ceiling Light 1
+	"GENCA0", // Generic Chair
+	"KTRHA0", // Kitchen Trash Can
+	"OTRHA0", // Office Trash Can
+	"PLT2A0", // Potted Plant 2
+	"GURNA0", // Empty Gurney
+	"IDHSA0", // Large Ceiling Light
+	"EXITA0", // Exit Sign
+	"TNSPA0", // Transporter
+	"BDYCA0", // Bloody Bucket
+	"SFPPA0", // Slow-Fire Protector
+	"MSTTA0", // Mutant Statue
+	"CHGUA0", // Charge Pack (1-8)
+	"RAWPA0", // Rapid Assault Weapon
+	"DNDPA0", // Dual Neutron Disruptor
+	"FAIDA0", // First Aid Kit
+	"FHELA0", // "Full Heal" (Dummy)
+	"CHRGA0", // Charge Pack (Full)
+	"RACSA0", // Red Access Card
+	"YACSA0", // Yellow Access Card
+	"APCPA0", // Anti-Plasma Cannon
+	"BACSA0", // Blue Access Card
+	"YBOXA0", // Yellow Box
+	"ODSKA0", // Office Desk
+	"OCHRA0", // Office Chair
+	"SDSKA0", // Security Desk
+	"WBWLA0", // Water Bowl
+	"EBWLA0", // - Empty
+	"CKLGA0", // Raw Meat
+	"CKBNA0", // - Eaten
+	"HAMMA0", // Steak
+	"HAMBA0", //  -Eaten
+	"PDUPA0", // Plasma Discharge Cannon
+	"IDSLA0", // Large Spotlight
+	"MBAGA0", // Money Bag
+	"LOOTA0", // Loot Chest
+	"GLD5A0", // Gold Bars (x5)
+	"XORBA0", // Xylan Orb
+	"GRPSA0", // "Greek" Post 1
+	"BLPSA0", // Biotech Post
+	"HTPSA0", // High Tech Post
+	"CLT2A0", // Ceiling Light 2
+	"CLT3A0", // Ceiling Light 3
+	"CRT1A0", // Crate 1 (Cardboard)
+	"CRT2B0", // Crate 2 (Bronze)
+	"CRT3C0", // Crate 3 (Steel)
+	"BDYPA0", // Body Parts 1
+	"ORLPA0", // Operation Lamp
+	"OSNKA0", // Operation Sink
+	"BDY2A0", // Body Parts 2
+	"STBLA0", // Cafeteria Table
+	"SCHRA0", // Cafeteria Chair
+	"SSTLA0", // Cafeteria Stool
+	"BDYGA0", // Body Parts 2 (Duplicate)
+	"GLD3A0", // Gold Bars (x3)
+	"GLD2A0", // Gold Bars (x2)
+	"GLD1A0", // Gold Bars (x1)
+	"BRPSA0", // Bronze Post
+	"GRP2A0", // "Greek" Post 2
+	"GNPSA0", // Glowing Post
+	"TDCLA0", // Tall Deco Column
+	"SDCLA0", // Short Deco Column
+	"DBR1A0", // Pulverised Bones 1
+	"DBR2A0", // Pulverised Bones 2
+	"DBR3A0", // Pulverised Bones 3
+	"DBR4A0", // Pulverised Bones 4
+	"CON1A0", // Food Token (1)
+	"CON5A0", // Food Token (5)
+	"ACPPA0", // Auto-Charge Pistol
+	"DBOMA0", // Fission Detonator
+	"DBOMB0",
+	"RUBLA0", // Rubble
+	"BONZA0", // Bonsai Tree
+	"AUTOA0", // Automap Charge
+	"POTPA0", // Terrarium Potted Plant
+	"TUBPA0", // Terrarium Tubed Plant
+	"HTCHA0", // Table and Chairs
+	"AVNTA0", // Ceiling Vent
+	"AVNTB0", // - Dripping Blood
+	"AVNTC0",
+	"AVNTD0",
+	"AVNTE0",
+	"AVNTF0", // - Dripping Water
+	"AVNTG0",
+	"AVNTH0",
+	"AVNTI0",
+	"ARCLA0", // Arc Light
+	"ARCLB0", // - Flickering Off
+	"ARCLC0", // - Shut Off
+	"GRATA0", // Floor Grate
+	"GRATB0", // - Blowing Smoke
+	"GRATC0",
+	"GRATD0",
+	"GRATE0",
+	"ALCLA0", // Alien Ceiling Light
+	"ALCLB0", // - Dimming
+	"ALCLC0",
+	"ALCLD0",
+	"ALCLE0", // - Shut Off
+	"RENTN0", // Dead AoG Guard
+	"PROGO0", // Dead AoG Sentinel
+	"SWATT0", // Dead AoG Trooper
 
-	"DBOMA0",	"DBOMB0", // DOORBOMB
-	"RUBLA0", // RUBBLE
-	"BONZA0", // BONZI_TREE
-	"AUTOA0", // AUTOMAPPER
-	"POTPA0", // POT_PLANT
-	"TUBPA0", // TUBE_PLANT
-	"HTCHA0", // HITECH_CHAIR
+	// Sector Guard
+	"SECGA1", // Stand
+	"SECGA2",
+	"SECGA3",
+	"SECGA4",
+	"SECGA5",
+	"SECGA6",
+	"SECGA7",
+	"SECGA8",
+	"SECGB1", // Walk 1
+	"SECGB2",
+	"SECGB3",
+	"SECGB4",
+	"SECGB5",
+	"SECGB6",
+	"SECGB7",
+	"SECGB8",
+	"SECGC1", // Walk 2
+	"SECGC2",
+	"SECGC3",
+	"SECGC4",
+	"SECGC5",
+	"SECGC6",
+	"SECGC7",
+	"SECGC8",
+	"SECGD1", // Walk 3
+	"SECGD2",
+	"SECGD3",
+	"SECGD4",
+	"SECGD5",
+	"SECGD6",
+	"SECGD7",
+	"SECGD8",
+	"SECGE1", // Walk 4
+	"SECGE2",
+	"SECGE3",
+	"SECGE4",
+	"SECGE5",
+	"SECGE6",
+	"SECGE7",
+	"SECGE8",
+	"SECGJ0", // Death
+	"SECGK0",
+	"SECGL0",
+	"SECGM0",
+	"SECGI0", // Pain
+	"SECGN0", // Dead
+	"SECGF0", // Attack
+	"SECGG0",
+	"SECGH0",
 
-	"AVNTA0",
-	"AVNTB0", "AVNTC0", "AVNTD0", "AVNTE0", // Blood
-	"AVNTF0", "AVNTG0", "AVNTH0", "AVNTI0", // Water
+	// Tech Warrior
+	"TECWA1", // Stand
+	"TECWA2",
+	"TECWA3",
+	"TECWA4",
+	"TECWA5",
+	"TECWA6",
+	"TECWA7",
+	"TECWA8",
+	"TECWB1", // Walk 1
+	"TECWB2",
+	"TECWB3",
+	"TECWB4",
+	"TECWB5",
+	"TECWB6",
+	"TECWB7",
+	"TECWB8",
+	"TECWC1", // Walk 2
+	"TECWC2",
+	"TECWC3",
+	"TECWC4",
+	"TECWC5",
+	"TECWC6",
+	"TECWC7",
+	"TECWC8",
+	"TECWD1", // Walk 3
+	"TECWD2",
+	"TECWD3",
+	"TECWD4",
+	"TECWD5",
+	"TECWD6",
+	"TECWD7",
+	"TECWD8",
+	"TECWE1", // Walk 4
+	"TECWE2",
+	"TECWE3",
+	"TECWE4",
+	"TECWE5",
+	"TECWE6",
+	"TECWE7",
+	"TECWE8",
+	"TECWI0", // Death
+	"TECWK0",
+	"TECWL0",
+	"TECWM0",
+	"TECWJ0", // Pain
+	"TECWN0", // Death (Last)
+	"TECWO0", // Dead
+	"TECWF0", // Attack
+	"TECWG0",
+	"TECWH0",
 
-	"ARCLA0", "ARCLB0", "ARCLC0",
+	// Alien Protector
+	"PROTA1", // Stand
+	"PROTA2",
+	"PROTA3",
+	"PROTA4",
+	"PROTA5",
+	"PROTA6",
+	"PROTA7",
+	"PROTA8",
+	"PROTB1", // Walk 1
+	"PROTB2",
+	"PROTB3",
+	"PROTB4",
+	"PROTB5",
+	"PROTB6",
+	"PROTB7",
+	"PROTB8",
+	"PROTC1", // Walk 2
+	"PROTC2",
+	"PROTC3",
+	"PROTC4",
+	"PROTC5",
+	"PROTC6",
+	"PROTC7",
+	"PROTC8",
+	"PROTD1", // Walk 3
+	"PROTD2",
+	"PROTD3",
+	"PROTD4",
+	"PROTD5",
+	"PROTD6",
+	"PROTD7",
+	"PROTD8",
+	"PROTE1", // Walk 4
+	"PROTE2",
+	"PROTE3",
+	"PROTE4",
+	"PROTE5",
+	"PROTE6",
+	"PROTE7",
+	"PROTE8",
+	"PROTI0", // Pain
+	"PROTP0", // Death
+	"PROTQ0",
+	"PROTR0",
+	"PROTJ0", // Pain (Duplicate)
+	"PROTS0", // Death (Last)
+	"PROTT0", // Dead
+	"PROTF0", // Attack
+	"PROTG0", // Knocked Down
+	"PROTH0",
+	"PROTK0",
+	"PROTL0",
+	"PROTM0",
+	"PROTN0",
 
-	"GRATA0", "GRATB0", "GRATC0", "GRATD0", "GRATE0",
+	// Bio-Technician
+	"GSCIA1", // Stand
+	"GSCIA2",
+	"GSCIA3",
+	"GSCIA4",
+	"GSCIA5",
+	"GSCIA6",
+	"GSCIA7",
+	"GSCIA8",
+	"GSCIB1", // Walk 1
+	"GSCIB2",
+	"GSCIB3",
+	"GSCIB4",
+	"GSCIB5",
+	"GSCIB6",
+	"GSCIB7",
+	"GSCIB8",
+	"GSCIC1", // Walk 2
+	"GSCIC2",
+	"GSCIC3",
+	"GSCIC4",
+	"GSCIC5",
+	"GSCIC6",
+	"GSCIC7",
+	"GSCIC8",
+	"GSCID1", // Walk 3
+	"GSCID2",
+	"GSCID3",
+	"GSCID4",
+	"GSCID5",
+	"GSCID6",
+	"GSCID7",
+	"GSCID8",
+	"GSCIE1", // Walk 4
+	"GSCIE2",
+	"GSCIE3",
+	"GSCIE4",
+	"GSCIE5",
+	"GSCIE6",
+	"GSCIE7",
+	"GSCIE8",
+	"GSCII0", // Pain
+	"GSCIK0", // Death
+	"GSCIL0",
+	"GSCIM0",
+	"GSCIJ0",
+	"GSCIN0",
+	"GSCIO0", // Dead
+	"GSCIF0", // Attack
+	"GSCIG0",
+	"GSCIH0",
 
-	// I don't think this is what the source says it is?
-	"PIPEA0", "PIPEB0", "PIPEC0", "PIPED0", "PIPEE0",
+	// Dr. Pyrus Goldfire
+	"DGLDA1", // Stand
+	"DGLDA2",
+	"DGLDA3",
+	"DGLDA4",
+	"DGLDA5",
+	"DGLDA6",
+	"DGLDA7",
+	"DGLDA8",
+	"DGLDB1", // Walk 1
+	"DGLDB2",
+	"DGLDB3",
+	"DGLDB4",
+	"DGLDB5",
+	"DGLDB6",
+	"DGLDB7",
+	"DGLDB8",
+	"DGLDC1", // Walk 2
+	"DGLDC2",
+	"DGLDC3",
+	"DGLDC4",
+	"DGLDC5",
+	"DGLDC6",
+	"DGLDC7",
+	"DGLDC8",
+	"DGLDD1", // Walk 3
+	"DGLDD2",
+	"DGLDD3",
+	"DGLDD4",
+	"DGLDD5",
+	"DGLDD6",
+	"DGLDD7",
+	"DGLDD8",
+	"DGLDE1", // Walk 4
+	"DGLDE2",
+	"DGLDE3",
+	"DGLDE4",
+	"DGLDE5",
+	"DGLDE6",
+	"DGLDE7",
+	"DGLDE8",
+	"DGLDI0", // Pain
+	"DGLDJ0", // Teleport
+	"DGLDK0",
+	"DGLDF0", // Attack
+	"DGLDG0",
+	"DGLDH0",
+	"DGLDL0", // Teleport (Cont.)
+	"DGLDM0",
+	"DGLDN0",
+	"DGLDO0",
+	"DGLDP0",
 
-	"RENTN0", "PROGO0", "SWATT0",
+	// Monstrous Goldfire
+	"MGLDJ0", // Death
+	"MGLDK0",
+	"MGLDL0",
+	"MGLDM0",
+	"MGLDN0",
+	"MGLDI0", // Pain
+	"DGLDQ0", // Morph
+	"DGLDR0",
+	"DGLDS0",
+	"DGLDT0",
+	"DGLDU0",
+	"DGLDV0",
+	"DGLDW0",
+	"DGLDX0",
+	"MGLDA0", // Stand
+	"MGLDB0", // Walk
+	"MGLDC0",
+	"MGLDD0",
+	"MGLDE0",
+	"MGLDF0", // Attack
+	"MGLDG0",
+	"MGLDH0",
+	"MSHTA0", // Missile
+	"MSHTB0",
+	"MSHTC0",
+	"MSHTD0", // - Hit
+	"MSHTE0",
+	"MSHTF0",
 
-	// Sector Guards
-	"SECGA1",	"SECGA2",	"SECGA3",	"SECGA4",
-	"SECGA5",	"SECGA6",	"SECGA7",	"SECGA8",
-	"SECGB1",	"SECGB2",	"SECGB3",	"SECGB4",
-	"SECGB5",	"SECGB6",	"SECGB7",	"SECGB8",
-	"SECGC1",	"SECGC2",	"SECGC3",	"SECGC4",
-	"SECGC5",	"SECGC6",	"SECGC7",	"SECGC8",
-	"SECGD1",	"SECGD2",	"SECGD3",	"SECGD4",
-	"SECGD5",	"SECGD6",	"SECGD7",	"SECGD8",
-	"SECGE1",	"SECGE2",	"SECGE3",	"SECGE4",
-	"SECGE5",	"SECGE6",	"SECGE7",	"SECGE8",
-	"SECGJ0",	"SECGK0",	"SECGL0",	"SECGM0",
-	"SECGI0",	"SECGN0",
-	"SECGF0",	"SECGG0",	"SECGH0",
+	// Volatile Transport
+	"GSCTA1", // Normal
+	"GSCTA2",
+	"GSCTA3",
+	"GSCTA4",
+	"GSCTA5",
+	"GSCTA6",
+	"GSCTA7",
+	"GSCTA8",
+	"GSCTB1", // Damaged
+	"GSCTB2",
+	"GSCTB3",
+	"GSCTB4",
+	"GSCTB5",
+	"GSCTB6",
+	"GSCTB7",
+	"GSCTB8",
+	"GSCTC1", // More Damaged
+	"GSCTC2",
+	"GSCTC3",
+	"GSCTC4",
+	"GSCTC5",
+	"GSCTC6",
+	"GSCTC7",
+	"GSCTC8",
+	"GSCTD1", // Heavily Damaged
+	"GSCTD2",
+	"GSCTD3",
+	"GSCTD4",
+	"GSCTD5",
+	"GSCTD6",
+	"GSCTD7",
+	"GSCTD8",
+	"GSCTE0", // Explode
+	"GSCTF0",
+	"GSCTG0",
+	"GSCTH0",
+	"GSCTI0",
+	"GSCTJ0",
+	"GSCTK0",
+	"GSCTL0",
+	"GSCTM0", // Dead
 
-	// Tech Warriors
-	"TECWA1",	"TECWA2",	"TECWA3",	"TECWA4",
-	"TECWA5",	"TECWA6",	"TECWA7",	"TECWA8",
-	"TECWB1",	"TECWB2",	"TECWB3",	"TECWB4",
-	"TECWB5",	"TECWB6",	"TECWB7",	"TECWB8",
-	"TECWC1",	"TECWC2",	"TECWC3",	"TECWC4",
-	"TECWC5",	"TECWC6",	"TECWC7",	"TECWC8",
-	"TECWD1",	"TECWD2",	"TECWD3",	"TECWD4",
-	"TECWD5",	"TECWD6",	"TECWD7",	"TECWD8",
-	"TECWE1",	"TECWE2",	"TECWE3",	"TECWE4",
-	"TECWE5",	"TECWE6",	"TECWE7",	"TECWE8",
-	"TECWI0",	"TECWK0",	"TECWL0",	"TECWM0",
-	"TECWJ0",	"TECWN0",	"TECWO0",
-	"TECWF0",	"TECWG0",	"TECWH0",
+	// Active PerScan
+	"FSCTA1", // Normal
+	"FSCTA2",
+	"FSCTA3",
+	"FSCTA4",
+	"FSCTA5",
+	"FSCTA6",
+	"FSCTA7",
+	"FSCTA8",
+	"FSCTB1", // Damaged
+	"FSCTB2",
+	"FSCTB3",
+	"FSCTB4",
+	"FSCTB5",
+	"FSCTB6",
+	"FSCTB7",
+	"FSCTB8",
+	"FSCTC1", // More Damaged
+	"FSCTC2",
+	"FSCTC3",
+	"FSCTC4",
+	"FSCTC5",
+	"FSCTC6",
+	"FSCTC7",
+	"FSCTC8",
+	"FSCTD1", // Heavily Damaged
+	"FSCTD2",
+	"FSCTD3",
+	"FSCTD4",
+	"FSCTD5",
+	"FSCTD6",
+	"FSCTD7",
+	"FSCTD8",
+	"FSCTE0", // Explode
+	"FSCTF0",
+	"FSCTG0",
+	"FSCTH0",
+	"FSCTI0",
+	"FSCTJ0",
+	"FSCTK0",
+	"FSCTL0", // Dead
 
-	// Alien Protectors
-	"PROTA1",	"PROTA2",	"PROTA3",	"PROTA4",
-	"PROTA5",	"PROTA6",	"PROTA7",	"PROTA8",
-	"PROTB1",	"PROTB2",	"PROTB3",	"PROTB4",
-	"PROTB5",	"PROTB6",	"PROTB7",	"PROTB8",
-	"PROTC1",	"PROTC2",	"PROTC3",	"PROTC4",
-	"PROTC5",	"PROTC6",	"PROTC7",	"PROTC8",
-	"PROTD1",	"PROTD2",	"PROTD3",	"PROTD4",
-	"PROTD5",	"PROTD6",	"PROTD7",	"PROTD8",
-	"PROTE1",	"PROTE2",	"PROTE3",	"PROTE4",
-	"PROTE5",	"PROTE6",	"PROTE7",	"PROTE8",
-	"PROTI0",	"PROTP0",	"PROTQ0",	"PROTR0",
-	"PROTJ0",	"PROTS0",	"PROTT0",
-	"PROTF0",	"PROTG0",	"PROTH0",
-	"PROTK0",	"PROTL0",	"PROTM0",	"PROTN0",
+	// Generic Explosion
+	"EXPLA0",
+	"EXPLB0",
+	"EXPLC0",
+	"EXPLD0",
+	"EXPLE0",
 
-	// General Scientist
-	"GSCIA1",	"GSCIA2",	"GSCIA3",	"GSCIA4",
-	"GSCIA5",	"GSCIA6",	"GSCIA7",	"GSCIA8",
-	"GSCIB1",	"GSCIB2",	"GSCIB3",	"GSCIB4",
-	"GSCIB5",	"GSCIB6",	"GSCIB7",	"GSCIB8",
-	"GSCIC1",	"GSCIC2",	"GSCIC3",	"GSCIC4",
-	"GSCIC5",	"GSCIC6",	"GSCIC7",	"GSCIC8",
-	"GSCID1",	"GSCID2",	"GSCID3",	"GSCID4",
-	"GSCID5",	"GSCID6",	"GSCID7",	"GSCID8",
-	"GSCIE1",	"GSCIE2",	"GSCIE3",	"GSCIE4",
-	"GSCIE5",	"GSCIE6",	"GSCIE7",	"GSCIE8",
-	"GSCII0",	"GSCIK0",	"GSCIL0",	"GSCIM0",
-	"GSCIJ0",	"GSCIN0",	"GSCIO0",
-	"GSCIF0",	"GSCIG0",	"GSCIH0",
-
-	// Dr. Goldstern
-	"DGLDA1",	"DGLDA2",	"DGLDA3",	"DGLDA4",
-	"DGLDA5",	"DGLDA6",	"DGLDA7",	"DGLDA8",
-	"DGLDB1",	"DGLDB2",	"DGLDB3",	"DGLDB4",
-	"DGLDB5",	"DGLDB6",	"DGLDB7",	"DGLDB8",
-	"DGLDC1",	"DGLDC2",	"DGLDC3",	"DGLDC4",
-	"DGLDC5",	"DGLDC6",	"DGLDC7",	"DGLDC8",
-	"DGLDD1",	"DGLDD2",	"DGLDD3",	"DGLDD4",
-	"DGLDD5",	"DGLDD6",	"DGLDD7",	"DGLDD8",
-	"DGLDE1",	"DGLDE2",	"DGLDE3",	"DGLDE4",
-	"DGLDE5",	"DGLDE6",	"DGLDE7",	"DGLDE8",
-	"DGLDI0",
-	"DGLDJ0", "DGLDK0",
-	"DGLDF0", "DGLDG0", "DGLDH0",
-	"DGLDL0", "DGLDM0", "DGLDN0", "DGLDO0", "DGLDP0",
-	"MGLDJ0", "MGLDK0", "MGLDL0", "MGLDM0", "MGLDN0",
-	"MGLDI0",
-	"DGLDQ0", "DGLDR0", "DGLDS0", "DGLDT0",
-	"DGLDU0", "DGLDV0", "DGLDW0", "DGLDX0",
-	"MGLDA0", "MGLDB0", "MGLDC0", "MGLDD0",
-	"MGLDE0", "MGLDF0", "MGLDG0", "MGLDH0",
-
-	"MSHTA0", "MSHTB0", "MSHTC0",
-	"MSHTD0", "MSHTE0", "MSHTF0",
-
-	// Ground Scout
-	"GSCTA1",	"GSCTA2",	"GSCTA3",	"GSCTA4",
-	"GSCTA5",	"GSCTA6",	"GSCTA7",	"GSCTA8",
-	"GSCTB1",	"GSCTB2",	"GSCTB3",	"GSCTB4",
-	"GSCTB5",	"GSCTB6",	"GSCTB7",	"GSCTB8",
-	"GSCTC1",	"GSCTC2",	"GSCTC3",	"GSCTC4",
-	"GSCTC5",	"GSCTC6",	"GSCTC7",	"GSCTC8",
-	"GSCTD1",	"GSCTD2",	"GSCTD3",	"GSCTD4",
-	"GSCTD5",	"GSCTD6",	"GSCTD7",	"GSCTD8",
-	"GSCTE0",	"GSCTF0",	"GSCTG0",	"GSCTH0",
-	"GSCTI0",	"GSCTJ0",	"GSCTK0",	"GSCTL0",
-	"GSCTM0",
-
-	// Floating Scout
-	"FSCTA1",	"FSCTA2",	"FSCTA3",	"FSCTA4",
-	"FSCTA5",	"FSCTA6",	"FSCTA7",	"FSCTA8",
-	"FSCTB1",	"FSCTB2",	"FSCTB3",	"FSCTB4",
-	"FSCTB5",	"FSCTB6",	"FSCTB7",	"FSCTB8",
-	"FSCTC1",	"FSCTC2",	"FSCTC3",	"FSCTC4",
-	"FSCTC5",	"FSCTC6",	"FSCTC7",	"FSCTC8",
-	"FSCTD1",	"FSCTD2",	"FSCTD3",	"FSCTD4",
-	"FSCTD5",	"FSCTD6",	"FSCTD7",	"FSCTD8",
-	"FSCTE0",	"FSCTF0",	"FSCTG0",	"FSCTH0",
-	"FSCTI0",	"FSCTJ0",	"FSCTK0",	"FSCTL0",
-
-	// Explosion
-	"EXPLA0",	"EXPLB0",	"EXPLC0",	"EXPLD0",	"EXPLE0",
-
-	// Rotating Cube
-	"CUBEA0",	"CUBEB0",	"CUBEC0",	"CUBED0",	"CUBEE0",
-	"CUBEF0",	"CUBEG0",	"CUBEH0",	"CUBEI0",	"CUBEJ0",
-	"CUBEK0",	"CUBEL0",	"CUBEM0",	"CUBEN0",
-	"CUBEO0",	"CUBEP0",	"CUBEQ0",	"CUBER0",	"CUBES0",
+	// Security Cube
+	"CUBEA0", // Normal
+	"CUBEB0",
+	"CUBEC0",
+	"CUBED0",
+	"CUBEE0",
+	"CUBEF0",
+	"CUBEG0",
+	"CUBEH0",
+	"CUBEI0",
+	"CUBEJ0",
+	"CUBEK0", // Explode
+	"CUBEL0",
+	"CUBEM0",
+	"CUBEN0",
+	"CUBEO0",
+	"CUBEP0",
+	"CUBEQ0",
+	"CUBER0",
+	"CUBES0", // Destroyed
 
 	// Security Light
-	"SECLA0",	"SUCLB0",
+	"SECLA0", // Off
+	"SUCLB0", // On
 
 	// POD Alien
-	"PODAA0",	"PODAB0",	"PODAC0",	"PODAD0",
-	"PODAE0",	"PODAF0",	"PODAG0",	"PODAH0",
-	"PODAI0",	"PODAJ0",	"PODAJ0",
-	"PODAN0",
-	"PODAO0",	"PODAP0",	"PODAQ0",
-	"PODAK0",	"PODAL0",	"PODAM0",
+	"PODAA0", // Egg
+	"PODAB0", // Hatch
+	"PODAC0",
+	"PODAD0",
+	"PODAE0", // Walk
+	"PODAF0",
+	"PODAG0",
+	"PODAH0",
+	"PODAI0", // Attack (Melee)
+	"PODAJ0",
+	"PODAJ0",
+	"PODAN0", // Pain
+	"PODAO0", // Death
+	"PODAP0",
+	"PODAQ0",
+	"PODAK0", // Attack (Shoot)
+	"PODAL0",
+	"PODAM0",
 
 	// Electro Alien
-	"ELCAA0",	"ELCAB0",	"ELCAC0",
-	"ELCAD0",	"ELCAE0",	"ELCAF0",	"ELCAG0",
-	"ELCAH0",	"ELCAI0",	"ELCAJ0",
+	"ELCAA0", // Spawn
+	"ELCAB0",
+	"ELCAC0",
+	"ELCAD0", // Walk
+	"ELCAE0",
+	"ELCAF0",
+	"ELCAG0",
+	"ELCAH0", // Pain
+	"ELCAI0", // Attack
+	"ELCAJ0",
 	"ELCAK0",
-	"ELCAL0",	"ELCAM0",	"ELCAN0",
-
-	"ELCSA0",	"ELCSB0",
-	"ELCSC0",	"ELCSD0",
+	"ELCAL0", // Death
+	"ELCAM0",
+	"ELCAN0",
+	"ELCSA0", // Missile
+	"ELCSB0",
+	"ELCSC0", // - Hit
+	"ELCSD0",
 
 	// Electrosphere
-	"ESPRA0",	"ESPRB0",	"ESPRC0",
-	"ESPRE0",
-	"ESPRF0",	"ESPRG0",	"ESPRH0",	"ESPRI0",
+	"ESPRA0", // Normal
+	"ESPRB0",
+	"ESPRC0",
+	"ESPRE0", // Death
+	"ESPRF0",
+	"ESPRG0",
+	"ESPRH0",
+	"ESPRI0",
 
 	// Genetic Guard
-	"GENGA0",	"GENGB0",	"GENGC0",	"GENGD0",
-	"GENGE0",	"GENGF0",	"GENGH0",
-	"GENGQ0",
-	"GENGM0",	"GENGN0",	"GENGO0",	"GENGP0",
-	"GENGL0",
-	"GENGI0",	"GENGJ0",	"GENGK0",
+	"GENGA0", // Walk
+	"GENGB0",
+	"GENGC0",
+	"GENGD0",
+	"GENGE0", // Attack (Melee)
+	"GENGF0",
+	"GENGH0",
+	"GENGQ0", // Dead
+	"GENGM0", // Death
+	"GENGN0",
+	"GENGO0",
+	"GENGP0",
+	"GENGL0", // Pain
+	"GENGI0", // Attack (Shoot)
+	"GENGJ0",
+	"GENGK0",
 
 	// Mech Sentinel
-	"MSENA0",	"MSENB0",	"MSENC0",	"MSEND0",
-	"MSENE0",	"MSENF0",	"MSENG0",
-	"MSENP0",
-	"MSENL0",	"MSENM0",	"MSENN0",	"MSENO0",
+	"MSENA0", // Walk
+	"MSENB0",
+	"MSENC0",
+	"MSEND0",
+	"MSENE0", // Attack
+	"MSENF0",
+	"MSENG0",
+	"MSENM0", // Dead
+	"MSENI0", // Death
+	"MSENJ0",
 	"MSENK0",
-	"MSENH0",	"MSENI0",	"MSENJ0",
+	"MSENK0",
+	"MSENH0", // Pain
+	"MSENN0", // (Unused)
+	"MSENO0",
+	"MSENP0", 
 
-	// Mutant Human
-	"MHUMA0",	"MHUMB0",	"MHUMC0",	"MHUMD0",
-	"MHUME0",	"MHUMF0",	"MHUMG0",
-	"MHUMP0",
-	"MHUML0",	"MHUMM0",	"MHUMN0",	"MHUMO0",
-	"MHUMK0",
-	"MHUMH0",	"MHUMI0",	"MHUMJ0",
-	"MHUMP0",	"MHUMQ0",	"MHUMR0",	"MHUMS0",
-	"MHUMT0",	"MHUMU0",	"MHUMV0",	"MHUMW0",
+	// Mutant Human (Gray)
+	"MHUMA0", // Walk
+	"MHUMB0",
+	"MHUMC0",
+	"MHUMD0",
+	"MHUME0", // Attack (Melee)
+	"MHUMF0",
+	"MHUMG0",
+	"MHUMP0", // Dead
+	"MHUML0", // Death
+	"MHUMM0",
+	"MHUMN0",
+	"MHUMO0",
+	"MHUMK0", // Pain
+	"MHUMH0", // Attack (Shoot)
+	"MHUMI0",
+	"MHUMJ0",
+	"MHUMP0", // Morph
+	"MHUMQ0",
+	"MHUMR0",
+	"MHUMS0",
+	"MHUMT0",
+	"MHUMU0",
+	"MHUMV0",
+	"MHUMW0",
 	"MHUMX0",
 
-	// Contained Alien
-	"CNTAA0",	"CNTAB0",	"CNTAC0",	"CNTAD0",	"CNTAE0",
-	"CNTAF0",	"CNTAG0",	"CNTAH0",	"CNTAI0",
-	"CNTAJ0",	"CNTAK0",	"CNTAL0",
-	"CNTAU0",	"CNTAQ0",	"CNTAR0",	"CNTAS0",	"CNTAT0",
-	"CNTAP0",
-	"CNTAM0",	"CNTAN0",	"CNTAO0",
+	// Contained Acid Alien
+	"CNTAA0", // In Canister
+	"CNTAB0", // Escaping
+	"CNTAC0",
+	"CNTAD0",
+	"CNTAE0", // Empty Canister
+	"CNTAF0", // Walk
+	"CNTAG0",
+	"CNTAH0",
+	"CNTAI0",
+	"CNTAJ0", // Attack (Melee)
+	"CNTAK0",
+	"CNTAL0",
+	"CNTAU0", // Dead
+	"CNTAQ0", // Death
+	"CNTAR0",
+	"CNTAS0",
+	"CNTAT0",
+	"CNTAP0", // Pain
+	"CNTAM0", // Attack (Shoot)
+	"CNTAN0",
+	"CNTAO0",
 
-	// Canister Alien
-	"CNSAA0",	"CNSAB0",	"CNSAC0",	"CNSAD0",	"CNSAE0",
-	"CNSAF0",	"CNSAG0",	"CNSAH0",	"CNSAI0",
-	"CNSAJ0",	"CNSAK0",	"CNSAL0",
-	"CNSAU0",	"CNSAQ0",	"CNSAR0",	"CNSAS0",	"CNSAT0",
-	"CNSAP0",
-	"CNSAM0",	"CNSAN0",	"CNSAO0",
+	// Expirimental Alien Critter
+	"CNSAA0", // In Canister
+	"CNSAB0", // Escaping
+	"CNSAC0",
+	"CNSAD0",
+	"CNSAE0", // Empty Canister
+	"CNSAF0", // Walk
+	"CNSAG0",
+	"CNSAH0",
+	"CNSAI0",
+	"CNSAJ0", // Attack (Melee)
+	"CNSAK0",
+	"CNSAL0",
+	"CNSAU0", // Dead
+	"CNSAQ0", // Death
+	"CNSAR0",
+	"CNSAS0",
+	"CNSAT0",
+	"CNSAP0", // Pain
+	"CNSAM0", // Attack (Shoot)
+	"CNSAN0",
+	"CNSAO0",
 
 	// Gurney Mutant
-	"MGURA0",	"MGURB0",	"MGURC0",	"MGURD0",	"MGURE0",
-	"MGURF0",	"MGURG0",	"MGURH0",	"MGURI0",
-	"MGURJ0",	"MGURK0",	"MGURL0",
-	"MGURR0",	"MGURN0",	"MGURO0",	"MGURP0",	"MGURQ0",
-	"MGURM0",
+	"MGURA0", // On Gurney
+	"MGURB0", // Escaping
+	"MGURC0",
+	"MGURD0",
+	"MGURE0", // Empty Gurney
+	"MGURF0", // Walk
+	"MGURG0",
+	"MGURH0",
+	"MGURI0",
+	"MGURJ0", // Attack
+	"MGURK0",
+	"MGURL0",
+	"MGURR0", // Dead
+	"MGURN0", // Death
+	"MGURO0",
+	"MGURP0",
+	"MGURQ0",
+	"MGURM0", // Pain
 
-	// Liquid Alien
-	"LIQAA0",	"LIQAB0",	"LIQAC0",
-	"LIQAD0",	"LIQAE0",	"LIQAF0",	"LIQAG0",
-	"LIQAH0",	"LIQAI0",	"LIQAJ0",
+	// Fluid Alien
+	"LIQAA0", // Puddle
+	"LIQAB0",
+	"LIQAC0",
+	"LIQAD0", // Attack
+	"LIQAE0",
+	"LIQAF0",
+	"LIQAG0",
+	"LIQAH0",
+	"LIQAI0",
+	"LIQAJ0",
 	"LIQAK0",
-	"LIQAL0",	"LIQAM0",	"LIQAN0",	"LIQAO0",	"LIQAP0",
+	"LIQAL0", // Death
+	"LIQAM0",
+	"LIQAN0",
+	"LIQAO0",
+	"LIQAP0", // Dead
+	"LIQSA0", // Missile
+	"LIQSB0",
+	"LIQSC0",
+	"LIQSD0", // - Hit
+	"LIQSE0",
+	"LIQSF0",
 
-	"LIQSA0",	"LIQSB0",	"LIQSC0",
-	"LIQSD0",	"LIQSE0",	"LIQSF0",
+	// Generic Missiles
+	"SPT1A0", // Slime Glob
+	"SPT1B0",
+	"SPT1C0",
+	"SPT1D0", // - Hit
+	"SPT1E0",
+	"SPT1F0",
+	"SPT2A0", // Plasma Glob
+	"SPT2B0",
+	"SPT2C0",
+	"SPT2D0", // - Hit
+	"SPT2E0",
+	"SPT2F0",
+	"SPT3A0", // Acid Glob
+	"SPT3B0",
+	"SPT3C0",
+	"SPT3D0", // - Hit
+	"SPT3E0",
+	"SPT3F0",
 
-	// Spit
-	"SPT1A0",	"SPT1B0",	"SPT1C0",
-	"SPT1D0",	"SPT1E0",	"SPT1F0",
-	"SPT2A0",	"SPT2B0",	"SPT2C0",
-	"SPT2D0",	"SPT2E0",	"SPT2F0",
-	"SPT3A0",	"SPT3B0",	"SPT3C0",
-	"SPT3D0",	"SPT3E0",	"SPT3F0",
+	// Ceiling Turret
+	"TURRA1", // Seek
+	"TURRA2",
+	"TURRA3",
+	"TURRA4",
+	"TURRA5",
+	"TURRA6",
+	"TURRA7",
+	"TURRA8",
+	"TURRB0", // Attack
+	"TURRC0",
+	"TURRD0", // Death
+	"TURRE0",
+	"TURRF0",
+	"TURRG0",
+	"TURRH0", // Dead
 
-	// Hanging Turret
-	"TURRA1",	"TURRA2",	"TURRA3",	"TURRA4",
-	"TURRA5",	"TURRA6",	"TURRA7",	"TURRA8",
-	"TURRB0",	"TURRC0",
-	"TURRD0",	"TURRE0",	"TURRF0",	"TURRG0",	"TURRH0",
+	// Weapons
+	"ACPGA0":blakepspr, // Auto-Charge Pistol
+	"ACPGB0":blakepspr, // - Fire
+	"ACPGC0":blakepspr, 
+	"ACPGD0":blakepspr,
+	"ACPGE0":blakepspr,
+	"SFPGA0":blakepspr, // Slow Fire Protector
+	"SFPGB0":blakepspr, // - Fire
+	"SFPGC0":blakepspr, 
+	"SFPGD0":blakepspr,
+	"SFPGE0":blakepspr,
+	"RAWGA0":blakepspr, // Rapid Assault Weapon
+	"RAWGB0":blakepspr, // - Fire
+	"RAWGC0":blakepspr, 
+	"RAWGD0":blakepspr,
+	"RAWGE0":blakepspr,
+	"DNDGA0":blakepspr, // Dual Neutron Disruptor
+	"DNDGB0":blakepspr, // - Fire
+	"DNDGC0":blakepspr, 
+	"DNDGD0":blakepspr,
+	"DNDGE0":blakepspr,
+	"PDUGA0":blakepspr, // Plasma Discharge Unit
+	"PDUGB0":blakepspr, // - Fire
+	"PDUGC0":blakepspr, 
+	"PDUGD0":blakepspr,
+	"PDUGE0":blakepspr,
+	"GRENA0", // PDU Missile
+	"GRENB0",
+	"GRENC0",
+	"GREND0",
+	"GRENE0", // - Explode
+	"GRENF0",
+	"GRENG0",
+	"GRENH0",
+	"GRENI0",
 
-	// Auto-charge Pistol
-	"ACPGA0":blakepspr,	"ACPGB0":blakepspr,	"ACPGC0":blakepspr,	"ACPGD0":blakepspr,	"ACPGE0":blakepspr,
-	// Slow Fire Protector
-	"SFPGA0":blakepspr,	"SFPGB0":blakepspr,	"SFPGC0":blakepspr,	"SFPGD0":blakepspr,	"SFPGE0":blakepspr,
-	// Rapid Assault Weapon
-	"RAWGA0":blakepspr,	"RAWGB0":blakepspr,	"RAWGC0":blakepspr,	"RAWGD0":blakepspr,	"RAWGE0":blakepspr,
-	// Dual Neutron Disruptor
-	"DNDGA0":blakepspr,	"DNDGB0":blakepspr,	"DNDGC0":blakepspr,	"DNDGD0":blakepspr,	"DNDGE0":blakepspr,
-	// Plasma Discharge Unit
-	"PDUGA0":blakepspr,	"PDUGB0":blakepspr,	"PDUGC0":blakepspr,	"PDUGD0":blakepspr,	"PDUGE0":blakepspr,
+	// Electric Arc Barrier
+	"ELCKA0", // On
+	"ELCKB0",
+	"ELCKC0",
+	"ELCKD0", // Off
 
-	"GRENA0",	"GRENB0",	"GRENC0",	"GREND0",
-	"GRENE0",	"GRENF0",	"GRENG0",	"GRENH0",	"GRENI0",
-
-	"ELCKA0",	"ELCKB0",	"ELCKC0",	"ELCKD0", // Electric Arc
-	"ELCPA0",	"ELCPB0",	"ELCPC0",	"ELCPD0", // Electric Post
+	// Electric Post
+	"ELCPA0", // On
+	"ELCPB0",
+	"ELCPC0",
+	"ELCPD0", // Off
 
 	// Vertial Post
-	"VPSTA0",	"VPSTB0",	"VPSTC0",	"VPSTD0",
-	"VPSTE0",	"VPSTF0",	"VPSTG0",	"VPSTH0",
+	"VPSTA0", // Open
+	"VPSTB0",
+	"VPSTC0",
+	"VPSTD0",
+	"VPSTE0",
+	"VPSTF0",
+	"VPSTG0",
+	"VPSTH0", // Closed
 
 	// Vertical Spike
-	"VSPKA0",	"VSPKB0",	"VSPKC0",	"VSPKD0",
-	"VSPKE0",	"VSPKF0",	"VSPKG0",	"VSPKH0",
+	"VSPKA0", // Open
+	"VSPKB0",
+	"VSPKC0",
+	"VSPKD0",
+	"VSPKE0",
+	"VSPKF0",
+	"VSPKG0",
+	"VSPKH0", // Closed
 
 	// Oozes
-	"OOZ1A0",	"OOZ1B0",	"OOZ1C0",
-	"OOZ2A0",	"OOZ2B0",	"OOZ2C0",
-	"OOZ3A0",	"OOZ3B0",	"OOZ3C0",
-	"OOZ4A0",	"OOZ4B0",	"OOZ4C0",
+	"OOZ1A0", // Green
+	"OOZ1B0",
+	"OOZ1C0",
+	"OOZ2A0", // Gray
+	"OOZ2B0",
+	"OOZ2C0",
+	"OOZ3A0", // White
+	"OOZ3B0",
+	"OOZ3C0",
+	"OOZ4A0", // Black
+	"OOZ4B0",
+	"OOZ4C0",
 
-	"CNDYA0",	"CNDYB0", // Candy (Wrapper)
-	"SNDWA0",	"SNDWB0", // Sandwich (Wrapper)
+	// More Pickups
+	"CNDYA0", // Candy Bar
+	"CNDYB0", // - Eaten
+	"SNDWA0", // Sandwich
+	"SNDWB0", // - Eaten
 
-	"BLKEA0",	"BLKEB0",	"BLKEC0",	"BLKED0",
+	// Blake (Episode Endings)
+	"BLKEA0",
+	"BLKEB0",
+	"BLKEC0",
+	"BLKED0",
 
-	// Super Mutant
-	"MSUPA0",	"MSUPB0",	"MSUPC0",	"MSUPD0",
-	"MSUPE0",	"MSUPF0",	"MSUPG0",
-	"MSUPM0",	"MSUPI0",	"MSUPJ0",	"MSUPK0",	"MSUPL0",
-	"MSUPH0",
-
-	"MSPRA0",	"MSPRB0",	"MSPRC0",
-	"MSPRD0",	"MSPRE0",	"MSPRF0",
-
-	"MSUPN0",	"MSUPO0",	"MSUPP0",	"MSUPQ0",
-	"MSUPR0",	"MSUPS0",	"MSUPT0",	"MSUPU0",
+	// Spider Mutant
+	"MSUPA0", // Walk
+	"MSUPB0",
+	"MSUPC0",
+	"MSUPD0",
+	"MSUPE0", // Attack
+	"MSUPF0",
+	"MSUPG0",
+	"MSUPM0", // Dead
+	"MSUPI0", // Death
+	"MSUPJ0",
+	"MSUPK0",
+	"MSUPL0",
+	"MSUPH0", // Pain
+	"MSPRA0", // Missile
+	"MSPRB0",
+	"MSPRC0",
+	"MSPRD0", // - Hit
+	"MSPRE0",
+	"MSPRF0",
+	"MSUPN0", // Morph
+	"MSUPO0",
+	"MSUPP0",
+	"MSUPQ0",
+	"MSUPR0",
+	"MSUPS0",
+	"MSUPT0",
+	"MSUPU0",
 	"MSUPV0",
 
 	// Breather Beast
-	"BBSTA0",	"BBSTB0",	"BBSTC0",	"BBSTD0",
-	"BBSTE0",	"BBSTF0",	"BBSTG0",
-	"BBSTM0",	"BBSTI0",	"BBSTJ0",	"BBSTK0",	"BBSTL0",
-	"BBSTH0",
+	"BBSTA0", // Walk
+	"BBSTB0",
+	"BBSTC0",
+	"BBSTD0",
+	"BBSTE0", // Attack
+	"BBSTF0",
+	"BBSTG0",
+	"BBSTM0", // Dead
+	"BBSTI0", // Death
+	"BBSTJ0",
+	"BBSTK0",
+	"BBSTL0",
+	"BBSTH0", // Pain
 
 	// Cyborg Warrior
-	"CYBWA0",	"CYBWB0",	"CYBWC0",	"CYBWD0",
-	"CYBWE0",	"CYBWF0",	"CYBWG0",
-	"CYBWM0",	"CYBWI0",	"CYBWJ0",	"CYBWK0",	"CYBWL0",
-	"CYBWH0",
+	"CYBWA0", // Walk
+	"CYBWB0",
+	"CYBWC0",
+	"CYBWD0",
+	"CYBWE0", // Attack
+	"CYBWF0",
+	"CYBWG0",
+	"CYBWM0", // Dead
+	"CYBWI0", // Death
+	"CYBWJ0",
+	"CYBWK0",
+	"CYBWL0",
+	"CYBWH0", // Pain
 
 	// Reptilian Warrior
-	"REPWA0",	"REPWB0",	"REPWC0",	"REPWD0",
-	"REPWE0",	"REPWF0",	"REPWG0",
-	"REPWM0",	"REPWI0",	"REPWJ0",	"REPWK0",	"REPWL0",
-	"REPWH0",
-	"REPWN0",	"REPWO0",	"REPWP0",	"REPWQ0",
-	"REPWR0",	"REPWS0",	"REPWT0",	"REPWU0",
+	"REPWA0", // Walk
+	"REPWB0",
+	"REPWC0",
+	"REPWD0",
+	"REPWE0", // Attack
+	"REPWF0",
+	"REPWG0",
+	"REPWM0", // Dead
+	"REPWI0", // Death
+	"REPWJ0",
+	"REPWK0",
+	"REPWL0",
+	"REPWH0", // Pain
+	"REPWN0", // Morph
+	"REPWO0",
+	"REPWP0",
+	"REPWQ0",
+	"REPWR0",
+	"REPWS0",
+	"REPWT0",
+	"REPWU0",
 	"REPWV0",
 
 	// Acid Dragon
-	"ADRGA0",	"ADRGB0",	"ADRGC0",	"ADRGD0",
-	"ADRGE0",	"ADRGF0",	"ADRGG0",
-	"ADRGM0",	"ADRGI0",	"ADRGJ0",	"ADRGK0",	"ADRGL0",
-	"ADRGH0",
-
-	"ADPRA0",	"ADPRB0",	"ADPRC0",
-	"ADPRE0",	"ADPRF0",	"ADPRG0",
+	"ADRGA0", // Walk
+	"ADRGB0",
+	"ADRGC0",
+	"ADRGD0",
+	"ADRGE0", // Attack
+	"ADRGF0",
+	"ADRGG0",
+	"ADRGM0", // Dead
+	"ADRGI0", // Death
+	"ADRGJ0",
+	"ADRGK0",
+	"ADRGL0",
+	"ADRGH0", // Pain
+	"ADPRA0", // Missile
+	"ADPRB0",
+	"ADPRC0",
+	"ADPRE0", // - Hit
+	"ADPRF0",
+	"ADPRG0",
 
 	// Bio-Mech Guardian
-	"BIOMA0",	"BIOMB0",	"BIOMC0",	"BIOMD0",
-	"BIOME0",	"BIOMF0",	"BIOMG0",
-	"BIOMM0",	"BIOMI0",	"BIOMJ0",	"BIOMK0",	"BIOML0",
-	"BIOMH0",
+	"BIOMA0", // Walk
+	"BIOMB0",
+	"BIOMC0",
+	"BIOMD0",
+	"BIOME0", // Attack
+	"BIOMF0",
+	"BIOMG0",
+	"BIOMM0", // Dead
+	"BIOMI0", // Death
+	"BIOMJ0",
+	"BIOMK0",
+	"BIOML0",
+	"BIOMH0", // Pain
 
 	// Giant Stalker
-	"STLKA0",	"STLKB0",	"STLKC0",	"STLKD0",
-	"STLKE0",	"STLKF0",	"STLKG0",
-	"STLKM0",	"STLKI0",	"STLKJ0",	"STLKK0",	"STLKL0",
-	"STLKH0",
+	"STLKA0", // Walk
+	"STLKB0",
+	"STLKC0",
+	"STLKD0",
+	"STLKE0", // Attack
+	"STLKF0",
+	"STLKG0",
+	"STLKM0", // Dead
+	"STLKI0", // Death
+	"STLKJ0",
+	"STLKK0",
+	"STLKL0",
+	"STLKH0", // Pain
 
 	// Spector Demon
-	"SPECA0",	"SPECB0",	"SPECC0",	"SPECD0",
-	"SPECE0",	"SPECF0",	"SPECG0",
-	"SPECI0",	"SPECJ0",	"SPECK0",	"SPECL0",	"SPECM0",
-	"SPECH0",
+	"SPECA0", // Walk
+	"SPECB0",
+	"SPECC0",
+	"SPECD0",
+	"SPECE0", // Attack
+	"SPECF0",
+	"SPECG0",
+	"SPECI0", // Death
+	"SPECJ0",
+	"SPECK0",
+	"SPECL0",
+	"SPECM0",
+	"SPECH0", // Pain
 
 	// Armored Stalker
-	"ARSTA0",	"ARSTB0",	"ARSTC0",	"ARSTD0",
-	"ARSTE0",	"ARSTF0",	"ARSTG0",
-	"ARSTM0",	"ARSTI0",	"ARSTJ0",	"ARSTK0",	"ARSTL0",
-	"ARSTH0",
+	"ARSTA0", // Walk
+	"ARSTB0",
+	"ARSTC0",
+	"ARSTD0",
+	"ARSTE0", // Attack
+	"ARSTF0",
+	"ARSTG0",
+	"ARSTM0", // Dead
+	"ARSTI0", // Death
+	"ARSTJ0",
+	"ARSTK0",
+	"ARSTL0",
+	"ARSTH0", // Pain
 
 	// Crawler Beast
-	"CRWLA0",	"CRWLB0",	"CRWLC0",	"CRWLD0",
-	"CRWLE0",	"CRWLF0",	"CRWLG0",
-	"CRWLM0",	"CRWLI0",	"CRWLJ0",	"CRWLK0",	"CRWLL0",
-	"CRWLH0",
+	"CRWLA0", // Walk
+	"CRWLB0",
+	"CRWLC0",
+	"CRWLD0",
+	"CRWLE0", // Attack
+	"CRWLF0",
+	"CRWLG0",
+	"CRWLM0", // Dead
+	"CRWLI0", // Death
+	"CRWLJ0",
+	"CRWLK0",
+	"CRWLL0",
+	"CRWLH0", // Pain
+	"SPT4A0", // Missile
+	"SPT4B0",
+	"SPT4C0",
+	"SPT4D0", // - Hit
+	"SPT4E0",
+	"SPT4F0",
 
-	"SPT4A0",	"SPT4B0",	"SPT4C0",
-	"SPT4D0",	"SPT4E0",	"SPT4F0",
-
-	// Plasma Detonator Explosion
-	"PEXPA0",	"PEXPB0",	"PEXPC0",	"PEXPD0",
-	"PEXPE0",	"PEXPF0",	"PEXPG0",	"PEXPH0",
-
-	// Clip Explosion
-	"CEXPA0",	"CEXPB0",	"CEXPC0",	"CEXPD0",
-	"CEXPE0",	"CEXPF0",	"CEXPG0",	"CEXPH0",
+	// More Explosions
+	"PEXPA0", // Plasma Detonator
+	"PEXPB0",
+	"PEXPC0",
+	"PEXPD0",
+	"PEXPE0",
+	"PEXPF0",
+	"PEXPG0",
+	"PEXPH0",
+	"CEXPA0", // Clip
+	"CEXPB0",
+	"CEXPC0",
+	"CEXPD0",
+	"CEXPE0",
+	"CEXPF0",
+	"CEXPG0",
+	"CEXPH0",
 
 	// Anti-Plasma Cannon
-	"APCGA0":blakepspr,	"APCGB0":blakepspr,	"APCGC0":blakepspr,	"APCGD0":blakepspr,	"APCGE0":blakepspr,
-
-	"APCSA0",	"APCSB0",	"APCSC0",
-	"APCSE0",	"APCSF0",	"APCSG0",	"APCSH0",
-	"APCSI0",	"APCSJ0",	"APCSK0",	"APCSL0"
+	"APCGA0":blakepspr, // Ready
+	"APCGB0":blakepspr, // Fire
+	"APCGC0":blakepspr,
+	"APCGD0":blakepspr,
+	"APCGE0":blakepspr,
+	"APCSA0", // Missile
+	"APCSB0",
+	"APCSC0",
+	"APCSE0", // - Explode
+	"APCSF0",
+	"APCSG0",
+	"APCSH0",
+	"APCSI0",
+	"APCSJ0",
+	"APCSK0",
+	"APCSL0"
 }
 
 sounds
