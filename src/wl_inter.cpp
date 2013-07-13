@@ -133,7 +133,7 @@ static void Erase (int x, int y, const char *string, bool rightAlign)
 
 	double fw = width;
 	double fh = height;
-	VirtualToRealCoords(nx, ny, fw, fh, 320, 200, true, true);
+	screen->VirtualToRealCoords(nx, ny, fw, fh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), nx, ny, nx+fw, ny+fh);
 }
 
@@ -533,8 +533,8 @@ bool PreloadUpdate (unsigned current, unsigned total)
 	double ow = w - 1;
 	double oh = h - 1;
 	double ox = x, oy = y;
-	VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
-	VirtualToRealCoords(ox, oy, ow, oh, 320, 200, true, true);
+	screen->VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
+	screen->VirtualToRealCoords(ox, oy, ow, oh, 320, 200, true, true);
 
 	if (current)
 	{

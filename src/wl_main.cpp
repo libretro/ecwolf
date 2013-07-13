@@ -546,7 +546,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	{
 		viewscreenx = (screenWidth-viewwidth) / 2;
 		viewscreeny = (statusbary-viewheight)/2;
-		screenofs = viewscreeny*bufferPitch+viewscreenx;
+		screenofs = viewscreeny*SCREENPITCH+viewscreenx;
 	}
 
 	int virtheight = screenHeight;

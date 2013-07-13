@@ -323,115 +323,15 @@ finished:
 }
 
 //==========================================================================
-/*
-** VirtualToRealCoords
-**
-**---------------------------------------------------------------------------
-** Copyright 1998-2008 Randy Heit
-** All rights reserved.
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions
-** are met:
-**
-** 1. Redistributions of source code must retain the above copyright
-**    notice, this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. The name of the author may not be used to endorse or promote products
-**    derived from this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-** IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-** IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-** NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**---------------------------------------------------------------------------
-**
-*/
-
-#include "c_cvars.h"
-#include "textures/textures.h"
-#include "r_data/colormaps.h"
-void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect)
-{
-	screen->VirtualToRealCoords(x, y, w, h, vwidth, vheight, vbottom, handleaspect);
-}
 
 void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 {
 	screen->Clear(x1, y1, x2, y2, color, GPalette.BaseColors[color]);
 }
 
-void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local)
+void VWB_DrawFill(FTexture *tex, int ix, int iy, int ix2, int iy2, bool local)
 {
-	screen->FlatFill(ix, iy, ix+iw, iy+ih, tex);
-#if 0
-	if(iw < 0 || ih < 0)
-		return;
-	if(static_cast<unsigned int>(iw) > screenWidth)
-		iw = screenWidth;
-	if(static_cast<unsigned int>(ih) > screenHeight)
-		ih = screenHeight;
-
-	// origin
-	unsigned int ox = 0, oy = 0;
-	if(local)
-	{
-		if(ix < 0)
-		{
-			ox = -ix;
-			ix = 0;
-		}
-		else
-			ox = ix;
-		if(iy < 0)
-		{
-			oy = -iy;
-			iy = 0;
-		}
-		else
-			oy = iy;
-	}
-	else
-	{
-		if(ix < 0)
-			ix = 0;
-		if(iy < 0)
-			iy = 0;
-	}
-
-	byte *vbuf = VL_LockSurface(screenBuffer) + ix + (iy * bufferPitch);
-
-	const unsigned int width = tex->GetWidth();
-	const unsigned int height = tex->GetHeight();
-
-	const BYTE *table = NormalLight.Maps;
-	const BYTE* src;
-	byte* dest = vbuf;
-	unsigned int x, y, sy;
-	for(x = ix;x < static_cast<unsigned int>(iw);++x)
-	{
-		src = tex->GetColumn((x+ox)%width, NULL);
-		for(y = iy, sy = (iy+oy)%height;y < static_cast<unsigned int>(ih);++y)
-		{
-			if(src[sy])
-				*dest = table[src[sy]];
-			sy = (sy+1)%height;
-			dest += bufferPitch;
-		}
-
-		dest = ++vbuf;
-	}
-
-	VL_UnlockSurface(screenBuffer);
-#endif
+	screen->FlatFill(ix, iy, ix2, iy2, tex, local);
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
@@ -439,65 +339,41 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 	screen->Lock(false);
 	if(menu)
 	{
-		screen->DrawTexture(tex, ix, iy,
-			DTA_Clean, true,
-			DTA_Translation, remap,
-			TAG_DONE);
+		if(stencil)
+		{
+			screen->DrawTexture(tex, ix, iy,
+				DTA_Clean, true,
+				DTA_Translation, remap,
+				DTA_FillColor, GPalette.BaseColors[stencilcolor],
+				TAG_DONE);
+		}
+		else
+		{
+			screen->DrawTexture(tex, ix, iy,
+				DTA_Clean, true,
+				DTA_Translation, remap,
+				TAG_DONE);
+		}
 	}
 	else
 	{
-		screen->DrawTexture(tex, ix, iy,
-			DTA_Bottom320x200, true,
-			DTA_Translation, remap,
-			TAG_DONE);
+		if(stencil)
+		{
+			screen->DrawTexture(tex, ix, iy,
+				DTA_Bottom320x200, true,
+				DTA_Translation, remap,
+				DTA_FillColor, GPalette.BaseColors[stencilcolor],
+				TAG_DONE);
+		}
+		else
+		{
+			screen->DrawTexture(tex, ix, iy,
+				DTA_Bottom320x200, true,
+				DTA_Translation, remap,
+				TAG_DONE);
+		}
 	}
 	screen->Unlock();
-#if 0
-	if(!tex)
-		return;
-
-	byte *vbuf = VL_LockSurface(screenBuffer);
-
-	double xd = (double)ix - tex->GetScaledLeftOffsetDouble();
-	double yd = (double)iy - tex->GetScaledTopOffsetDouble();
-	if(menu)
-		MenuToRealCoords(xd, yd, wd, hd, menu);
-	else
-		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, true, true);
-
-	const int x1 = static_cast<int>(ceil(xd));
-	const int y1 = static_cast<int>(ceil(yd));
-	const fixed xStep = static_cast<fixed>((tex->GetWidth()/wd)*FRACUNIT);
-	const fixed yStep = static_cast<fixed>((tex->GetHeight()/hd)*FRACUNIT);
-	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(screenWidth-x1));
-	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(screenHeight-y1));
-	vbuf += x1 + (y1 > 0 ? bufferPitch*y1 : 0);
-
-	const BYTE *table = !stencil && remap ? remap->Remap : NormalLight.Maps;
-	const BYTE *src;
-	byte *dest = vbuf;
-	fixed x, y;
-	for(x = 0;x < xRun;x += xStep)
-	{
-		src = tex->GetColumn(x>>FRACBITS, NULL);
-
-		for(y = 0;y < yRun;y += yStep)
-		{
-			if(src[y>>FRACBITS])
-			{
-				if(stencil)
-					*dest = table[stencilcolor];
-				else
-					*dest = table[src[y>>FRACBITS]];
-			}
-			dest += bufferPitch;
-		}
-
-		dest = ++vbuf;
-	}
-
-	VL_UnlockSurface(screenBuffer);
-#endif
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
@@ -512,59 +388,9 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 void CA_CacheScreen(FTexture* tex, bool noaspect)
 {
 	screen->Lock(false);
+	screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, 0, 0);
 	screen->DrawTexture(tex, 0, 0,
-		DTA_DestWidth, 320,
-		DTA_DestHeight, 200,
-		DTA_VirtualWidth, 320,
-		DTA_VirtualHeight, 200,
+		DTA_Fullscreen, true,
 		TAG_DONE);
 	screen->Unlock();
-#if 0
-	if(!tex)
-		return;
-
-	if(!noaspect)
-		VWB_Clear(GPalette.BlackIndex, 0, 0, screenWidth, screenHeight);
-
-	byte *vbuf = VL_LockSurface(curSurface);
-	if(!vbuf)
-		return;
-
-	double xd = 0;
-	double yd = 0;
-	double wd;
-	double hd;
-	if(noaspect)
-	{
-		wd = screenWidth;
-		hd = screenHeight;
-	}
-	else
-	{
-		wd = 320;
-		hd = 200;
-		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, false, true);
-	}
-
-	const fixed xStep = static_cast<fixed>((tex->GetWidth()/wd)*FRACUNIT);
-	const fixed yStep = static_cast<fixed>((tex->GetHeight()/hd)*FRACUNIT);
-
-	vbuf += static_cast<int>(xd) + bufferPitch*static_cast<int>(yd);
-	const BYTE *src;
-	byte *dest = vbuf;
-	unsigned int i, j;
-	fixed x, y;
-	for(i = (unsigned int)xd, x = 0;x < tex->GetWidth()<<FRACBITS && i < screenWidth;x += xStep, ++i)
-	{
-		src = tex->GetColumn(x>>FRACBITS, NULL);
-		for(j = (unsigned int)yd, y = 0;y < tex->GetHeight()<<FRACBITS && j < screenHeight;y += yStep, ++j)
-		{
-			*dest = NormalLight.Maps[src[y>>FRACBITS]];
-			dest += bufferPitch;
-		}
-
-		dest = ++vbuf;
-	}
-	VL_UnlockSurface(curSurface);
-#endif
 }

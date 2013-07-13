@@ -107,7 +107,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;
 	double fadew = 320;
 	double fadeh = 200;
-	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
+	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., 0., screenWidth, fadey);
 
 	word width, height;
