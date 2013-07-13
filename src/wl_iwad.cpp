@@ -53,9 +53,12 @@
 #include "wl_iwad.h"
 #include "zstring.h"
 
-static bool queryiwad = true;
+bool queryiwad = true;
 
+int I_PickIWad(WadStuff *wads, int numwads, bool showwin, int defaultiwad);
+#ifndef _WIN32
 #include "wl_iwad_picker.cpp"
+#endif
 
 namespace IWad {
 

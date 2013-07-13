@@ -736,7 +736,9 @@ void UpdatePaletteShifts (void)
 
 	if (red)
 	{
-		VL_SetBlend(0xFF, 0x00, 0x00, red*(174/NUMREDSHIFTS));
+		VL_SetBlend(RPART(players[0].mo->damagecolor),
+                             GPART(players[0].mo->damagecolor),
+                             BPART(players[0].mo->damagecolor), red*(174/NUMREDSHIFTS));
 		palshifted = true;
 	}
 	else if (white)

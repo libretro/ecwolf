@@ -10,4 +10,5 @@ actor NoahPlayer : BJPlayer
 	player.weaponslot 4, "AutoSlingshot"
 	player.weaponslot 5, "CantaloupeSlingshot"
 	player.weaponslot 6, "MelonSlingshot"
+	player.damagecolor "7F 00 FF"
 }
