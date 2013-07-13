@@ -1270,7 +1270,7 @@ void    ThreeDRefresh (void)
 	if(vbuf == NULL) return;
 
 	vbuf += screenofs;
-	vbufPitch = bufferPitch;
+	vbufPitch = SCREENPITCH;
 
 	R_RenderView();
 

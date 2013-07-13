@@ -266,18 +266,11 @@ void VL_FadeIn (int start, int end, int steps)
 
 byte *VL_LockSurface(SDL_Surface *surface)
 {
-	if(SDL_MUSTLOCK(surface))
-	{
-		if(SDL_LockSurface(surface) < 0)
-			return NULL;
-	}
-	return (byte *) surface->pixels;
+	screen->Lock(false);
+	return (byte *) screen->GetBuffer();
 }
 
 void VL_UnlockSurface(SDL_Surface *surface)
 {
-	if(SDL_MUSTLOCK(surface))
-	{
-		SDL_UnlockSurface(surface);
-	}
+	screen->Unlock();
 }

@@ -406,6 +406,8 @@ void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 
 void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local)
 {
+	screen->FlatFill(ix, iy, ix+iw, iy+ih, tex);
+#if 0
 	if(iw < 0 || ih < 0)
 		return;
 	if(static_cast<unsigned int>(iw) > screenWidth)
@@ -464,6 +466,7 @@ void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local)
 	}
 
 	VL_UnlockSurface(screenBuffer);
+#endif
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
