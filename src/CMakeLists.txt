@@ -74,6 +74,7 @@ if(WIN32)
 		${EXTRA_FILES}
 		win32/i_crash.cpp
 		win32/i_main.cpp
+		win32/wl_iwad_win32.cpp
 		sdl_winmain.cpp
 	)
 elseif(APPLE)
