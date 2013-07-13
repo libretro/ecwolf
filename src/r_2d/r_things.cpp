@@ -19,12 +19,6 @@
 // DESCRIPTION:
 //		Refresh of things, i.e. objects represented by sprites.
 //
-// This file contains some code from the Build Engine.
-//
-// "Build Engine & Tools" Copyright (c) 1993-1997 Ken Silverman
-// Ken Silverman's official web site: "http://www.advsys.net/ken"
-// See the included license file "BUILDLIC.TXT" for license info.
-//
 //-----------------------------------------------------------------------------
 
 #include "wl_def.h"
