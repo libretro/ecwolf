@@ -145,16 +145,10 @@ void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
 }
 #endif
 
-void VH_UpdateScreen(SDL_Surface * const screenBuffer)
+void VH_UpdateScreen()
 {
-#if SDL_VERSION_ATLEAST(2,0,0)
-	Blit8BitSurfaceToTexture(screen, screenBuffer);
-	SDL_RenderCopy(screenRenderer, screen, NULL, NULL);
-	SDL_RenderPresent(screenRenderer);
-#else
 	screen->Update();
 	screen->Lock(false);
-#endif
 }
 
 /*
@@ -226,33 +220,31 @@ void VH_Startup()
 	rndmask = rndmasks[rndbits - 17];
 }
 
-SDL_Surface *fizzleSurface = NULL;
+byte *fizzleSurface = NULL;
 void FizzleFadeStart()
 {
-	fizzleSurface = SDL_ConvertSurface(screenBuffer, screenBuffer->format, 0);
+	screen->Lock(false);
+	fizzleSurface = new byte[SCREENHEIGHT*SCREENPITCH];
+	memcpy(fizzleSurface, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
+	screen->Unlock();
 }
-bool FizzleFade (SDL_Surface *source, int x1, int y1,
+bool FizzleFade (int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, bool abortable)
 {
 	unsigned x, y, frame, pixperframe;
-	int32_t  rndval=0, lastrndval;
-	int      first = 1;
+	int32_t  rndval=0;
 
 	assert(fizzleSurface != NULL);
 
-	lastrndval = 0;
 	pixperframe = width * height / frames;
 
 	IN_StartAck ();
 
 	frame = GetTimeCount();
-	byte *srcptr = VL_LockSurface(source);
-	if(srcptr == NULL)
-	{
-		SDL_FreeSurface(fizzleSurface);
-		fizzleSurface = NULL;
-		return false;
-	}
+	screen->Lock(false);
+	byte * const srcptr = new byte[SCREENHEIGHT*SCREENPITCH];
+	memcpy(srcptr, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
+	screen->Unlock();
 
 	do
 	{
@@ -260,87 +252,61 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 
 		if(abortable && IN_CheckAck ())
 		{
-			VL_UnlockSurface(source);
-			VH_UpdateScreen(source);
-			SDL_FreeSurface(fizzleSurface);
+			VH_UpdateScreen();
+			delete[] fizzleSurface;
+			delete[] srcptr;
 			fizzleSurface = NULL;
 			return true;
 		}
 
-		byte *destptr = VL_LockSurface(fizzleSurface);
+		byte *destptr = fizzleSurface;
 
 		if(destptr != NULL)
 		{
-			rndval = lastrndval;
-
-			// When using double buffering, we have to copy the pixels of the last AND the current frame.
-			// Only for the first frame, there is no "last frame"
-			for(int i = first; i < 2; i++)
+			for(unsigned p = 0; p < pixperframe; p++)
 			{
-				for(unsigned p = 0; p < pixperframe; p++)
+				//
+				// seperate random value into x/y pair
+				//
+
+				x = rndval >> rndbits_y;
+				y = rndval & ((1 << rndbits_y) - 1);
+
+				//
+				// advance to next random element
+				//
+
+				rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
+
+				if(x >= width || y >= height)
 				{
-					//
-					// seperate random value into x/y pair
-					//
-
-					x = rndval >> rndbits_y;
-					y = rndval & ((1 << rndbits_y) - 1);
-
-					//
-					// advance to next random element
-					//
-
-					rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
-
-					if(x >= width || y >= height)
-					{
-						if(rndval == 0)     // entire sequence has been completed
-							goto finished;
-						p--;
-						continue;
-					}
-
-					//
-					// copy one pixel
-					//
-
-					if(screenBits == 8)
-					{
-						*(destptr + (y1 + y) * fizzleSurface->pitch + x1 + x)
-							= *(srcptr + (y1 + y) * source->pitch + x1 + x);
-					}
-					else
-					{
-						byte col = *(srcptr + (y1 + y) * source->pitch + x1 + x);
-						uint32_t fullcol = SDL_MapRGB(fizzleSurface->format, GPalette.BaseColors[col].r, GPalette.BaseColors[col].g, GPalette.BaseColors[col].b);
-						memcpy(destptr + (y1 + y) * fizzleSurface->pitch + (x1 + x) * fizzleSurface->format->BytesPerPixel,
-							&fullcol, fizzleSurface->format->BytesPerPixel);
-					}
-
-					if(rndval == 0)		// entire sequence has been completed
+					if(rndval == 0)     // entire sequence has been completed
 						goto finished;
+					p--;
+					continue;
 				}
 
-				if(!i || first) lastrndval = rndval;
+				//
+				// copy one pixel
+				//
+				*(destptr + (y1 + y) * SCREENPITCH + x1 + x)
+					= *(srcptr + (y1 + y) * SCREENPITCH + x1 + x);
+
+				if(rndval == 0)		// entire sequence has been completed
+					goto finished;
 			}
 
-			// If there is no double buffering, we always use the "first frame" case
-			if(usedoublebuffering) first = 0;
-
-			VL_UnlockSurface(fizzleSurface);
-			VH_UpdateScreen(fizzleSurface);
+			memcpy(screen->GetBuffer(), destptr, SCREENHEIGHT*SCREENPITCH);
+			VH_UpdateScreen();
 		}
 		else
 		{
 			// No surface, so only enhance rndval
-			for(int i = first; i < 2; i++)
+			for(unsigned p = 0; p < pixperframe; p++)
 			{
-				for(unsigned p = 0; p < pixperframe; p++)
-				{
-					rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
-					if(rndval == 0)
-						goto finished;
-				}
+				rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
+				if(rndval == 0)
+					goto finished;
 			}
 		}
 
@@ -349,10 +315,9 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 	} while (1);
 
 finished:
-	VL_UnlockSurface(source);
-	VL_UnlockSurface(screenBuffer);
-	VH_UpdateScreen(source);
-	SDL_FreeSurface(fizzleSurface);
+	VH_UpdateScreen();
+	delete[] fizzleSurface;
+	delete[] srcptr;
 	fizzleSurface = NULL;
 	return false;
 }
