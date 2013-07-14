@@ -38,6 +38,12 @@
 #include "tarray.h"
 #include "zstring.h"
 
+#ifdef _WIN32
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_SEPARATOR "/"
+#endif
+
 namespace FileSys
 {
 	enum ESpecialDirectory
@@ -50,15 +56,17 @@ namespace FileSys
 		NUM_SPECIAL_DIRECTORIES
 	};
 
-	enum ESteamGames
+	enum ESteamApp
 	{
-		SG_Wolfenstein3D,
-		SG_SpearOfDestiny,
-		SG_ThrowbackPack
+		APP_Wolfenstein3D,
+		APP_SpearOfDestiny,
+		APP_ThrowbackPack,
+
+		NUM_STEAM_APPS
 	};
 
 	FString GetDirectoryPath(ESpecialDirectory dir);
-	FString GetSteamPath(ESteamGames game);
+	FString GetSteamPath(ESteamApp game);
 	void SetDirectoryPath(ESpecialDirectory dir, const FString &path);
 	void SetupPaths(int argc, const char* const *argv);
 }
