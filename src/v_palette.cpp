@@ -50,8 +50,7 @@
 #include "colormatcher.h"
 #include "v_palette.h"
 #include "r_data/colormaps.h"
-
-#define STACK_ARGS
+#include "zdoomsupport.h"
 
 FPalette GPalette;
 

@@ -10,6 +10,7 @@ add_custom_target(revision_check ALL
 	DEPENDS updaterevision
 )
 
+include(CheckCXXSourceCompiles)
 include(CheckFunctionExists)
 include(FindPkgConfig)
 
@@ -46,6 +47,22 @@ endif(NOT STRNICMP_EXISTS)
 if(NOT ATOLL_EXISTS)
 	add_definitions(-Datoll=_atoi64)
 endif(NOT ATOLL_EXISTS)
+
+check_cxx_source_compiles(
+	"#include <stdarg.h>
+	int main() { va_list list1, list2; va_copy(list1, list2); return 0; }"
+	HAS_VA_COPY )
+if( NOT HAS_VA_COPY )
+	check_cxx_source_compiles(
+		"#include <stdarg.h>
+		int main() { va_list list1, list2; __va_copy(list1, list2); return 0; }"
+		HAS___VA_COPY )
+	if( HAS___VA_COPY )
+		add_definitions( -Dva_copy=__va_copy )
+	else( HAS___VA_COPY )
+		add_definitions( -DNO_VA_COPY )
+	endif( HAS___VA_COPY )
+endif( NOT HAS_VA_COPY )
 
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 	set(CMAKE_CXX_FLAGS "-Wall -Wno-unused -Wno-unused-result -Wno-ignored-qualifiers -Wextra -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}")

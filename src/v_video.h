@@ -430,11 +430,9 @@ public:
 
 	uint32 GetLastFPS() const { return LastCount; }
 
-#ifdef _WIN32
 	virtual void PaletteChanged () = 0;
 	virtual int QueryNewPalette () = 0;
 	virtual bool Is8BitMode() = 0;
-#endif
 
 protected:
 	void DrawRateStuff ();
