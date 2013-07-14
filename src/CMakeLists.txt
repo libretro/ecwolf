@@ -140,8 +140,13 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	g_shared/a_randomspawner.cpp
 	g_wolf/a_spearofdestiny.cpp
 	g_wolf/wolf_sbar.cpp
+	r_2d/r_draw.cpp
+	r_2d/r_drawt.cpp
+	r_2d/r_main.cpp
+	r_2d/r_things.cpp
 	r_data/colormaps.cpp
 	r_data/r_translate.cpp
+	r_data/renderstyle.cpp
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp
 	resourcefiles/file_7z.cpp
@@ -218,10 +223,13 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	p_switch.cpp
 	r_sprites.cpp
 	scanner.cpp
+	sdlvideo.cpp
 	sndinfo.cpp
 	thinker.cpp
+	v_draw.cpp
 	v_font.cpp
 	v_palette.cpp
+	v_pfx.cpp
 	v_video.cpp
 	w_wad.cpp
 	weaponslots.cpp

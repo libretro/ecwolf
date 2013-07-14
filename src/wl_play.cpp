@@ -736,7 +736,7 @@ void UpdatePaletteShifts (void)
 
 	if (red)
 	{
-		VL_SetBlend(RPART(players[0].mo->damagecolor),
+		V_SetBlend(RPART(players[0].mo->damagecolor),
                              GPART(players[0].mo->damagecolor),
                              BPART(players[0].mo->damagecolor), red*(174/NUMREDSHIFTS));
 		palshifted = true;
@@ -744,12 +744,12 @@ void UpdatePaletteShifts (void)
 	else if (white)
 	{
 		// [BL] More of a yellow if you ask me.
-		VL_SetBlend(0xFF, 0xF8, 0x00, white*(38/NUMWHITESHIFTS));
+		V_SetBlend(0xFF, 0xF8, 0x00, white*(38/NUMWHITESHIFTS));
 		palshifted = true;
 	}
 	else if (palshifted)
 	{
-		VL_SetBlend(0, 0, 0, 0);
+		V_SetBlend(0, 0, 0, 0);
 		palshifted = false;
 	}
 }
@@ -769,7 +769,8 @@ void FinishPaletteShifts (void)
 {
 	if (palshifted)
 	{
-		VL_SetBlend(0, 0, 0, 0, true);
+		V_SetBlend(0, 0, 0, 0);
+		VH_UpdateScreen();
 		palshifted = false;
 	}
 }

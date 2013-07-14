@@ -41,6 +41,7 @@
 #include "dobject.h"
 #include "colormatcher.h"
 #include "version.h"
+#include "r_2d/r_main.h"
 
 /*
 =============================================================================
@@ -376,6 +377,12 @@ static void InitGame()
 	}
 	atterm(SDL_Quit);
 
+#if SDL_VERSION_ATLEAST(2,0,0)
+#else
+	SDL_WM_SetCaption("ECWolf " DOTVERSIONSTR, NULL);
+#endif
+	SDL_ShowCursor(SDL_DISABLE);
+
 	int numJoysticks = SDL_NumJoysticks();
 	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
 	{
@@ -545,7 +552,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	{
 		viewscreenx = (screenWidth-viewwidth) / 2;
 		viewscreeny = (statusbary-viewheight)/2;
-		screenofs = viewscreeny*bufferPitch+viewscreenx;
+		screenofs = viewscreeny*SCREENPITCH+viewscreenx;
 	}
 
 	int virtheight = screenHeight;
@@ -1302,6 +1309,8 @@ int main (int argc, char *argv[])
 		}
 
 		InitThinkerList();
+
+		R_InitRenderer();
 
 		printf("InitGame: Setting up the game...\n");
 		InitGame();

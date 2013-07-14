@@ -683,7 +683,7 @@ void ShowArticle (const char *article, bool helphack=false)
 			VW_UpdateScreen ();
 			if (firstpage)
 			{
-				VL_FadeIn(0,255,gamepal,10);
+				VL_FadeIn(0,255,10);
 				firstpage = false;
 			}
 		}

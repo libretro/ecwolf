@@ -121,7 +121,7 @@ BOOL CALLBACK IWADBoxCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 			}
 			else
 				filepart.Format("*.%s", WadList[i].Extension.GetChars());
-			work.Format("%s (%s)", WadList[i].Name.GetChars(), filepart);
+			work.Format("%s (%s)", WadList[i].Name.GetChars(), filepart.GetChars());
 			SendMessage(ctrl, LB_ADDSTRING, 0, (LPARAM)work.GetChars());
 			SendMessage(ctrl, LB_SETITEMDATA, i, (LPARAM)i);
 		}

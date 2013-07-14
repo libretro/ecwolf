@@ -1266,15 +1266,15 @@ void    ThreeDRefresh (void)
 //
 	map->ClearVisibility();
 
-	vbuf = VL_LockSurface(screenBuffer);
+	vbuf = VL_LockSurface();
 	if(vbuf == NULL) return;
 
 	vbuf += screenofs;
-	vbufPitch = bufferPitch;
+	vbufPitch = SCREENPITCH;
 
 	R_RenderView();
 
-	VL_UnlockSurface(screenBuffer);
+	VL_UnlockSurface();
 	vbuf = NULL;
 
 //
@@ -1283,7 +1283,7 @@ void    ThreeDRefresh (void)
 
 	if (fizzlein)
 	{
-		FizzleFade(screenBuffer, 0, 0, screenWidth, screenHeight, 20, false);
+		FizzleFade(0, 0, screenWidth, screenHeight, 20, false);
 		fizzlein = false;
 
 		lasttimecount = GetTimeCount();          // don't make a big tic count
