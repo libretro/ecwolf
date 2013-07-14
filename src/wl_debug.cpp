@@ -17,6 +17,7 @@
 #include "g_mapinfo.h"
 #include "actor.h"
 #include "language.h"
+#include "m_png.h"
 #include "wl_agent.h"
 #include "wl_debug.h"
 #include "wl_draw.h"
@@ -85,7 +86,7 @@ void ViewMap (void);
 */
 void PictureGrabber (void)
 {
-	static char fname[] = "WSHOT000.BMP";
+	static char fname[] = "WSHOT000.PNG";
 
 	for(int i = 0; i < 1000; i++)
 	{
@@ -97,9 +98,16 @@ void PictureGrabber (void)
 		close(file);
 	}
 
-	// overwrites WSHOT999.BMP if all wshot files exist
-
-	SDL_SaveBMP(curSurface, fname);
+	// overwrites WSHOT999.PNG if all wshot files exist
+	const BYTE* buffer;
+	int pitch;
+	ESSType color_type;
+	screen->GetScreenshotBuffer(buffer, pitch, color_type);
+	FILE *file = fopen(fname, "wb");
+	M_CreatePNG(file, buffer, GPalette.BaseColors, color_type, SCREENWIDTH, SCREENHEIGHT, pitch);
+	M_FinishPNG(file);
+	fclose(file);
+	screen->ReleaseScreenshotBuffer();
 
 	US_CenterWindow (18,2);
 	US_PrintCentered ("Screenshot taken");
