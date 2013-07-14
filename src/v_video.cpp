@@ -1035,7 +1035,16 @@ void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int real
 		*cleany = cy2;
 	}
 
-	if (*cleanx > 1 && *cleany > 1 && *cleanx != *cleany)
+	// 1600x1200 can do clean aspect correction so why not?
+	if (*cleany % 6 == 0)
+	{
+		int newXfactor = *cleany - *cleany/6;
+		if(newXfactor <= *cleanx)
+			*cleanx = newXfactor;
+		else
+			*cleany = *cleanx;
+	}
+	else if (*cleanx > 1 && *cleany > 1 && *cleanx != *cleany)
 	{
 		if (*cleanx < *cleany)
 			*cleany = *cleanx;

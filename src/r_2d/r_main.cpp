@@ -68,12 +68,12 @@ void (STACK_ARGS *hcolfunc_post4) (int sx, int yl, int yh);
 #define viewwindowy 0
 void R_SetupBuffer ()
 {
-	static BYTE *lastbuff = NULL;
+	//static BYTE *lastbuff = NULL;
 
 	int pitch = RenderTarget->GetPitch();
 	BYTE *lineptr = RenderTarget->GetBuffer() + viewwindowy*pitch + viewwindowx;
 
-	if (dc_pitch != pitch || lineptr != lastbuff)
+	//if (dc_pitch != pitch || lineptr != lastbuff)
 	{
 		if (dc_pitch != pitch)
 		{

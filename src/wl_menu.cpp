@@ -231,68 +231,16 @@ MENU_LISTENER(SetAspectRatio)
 }
 
 // Dummy screen sizes to pass when windowed
-static struct MiniModeInfo
-{
-	WORD Width, Height;
-} WinModes[] =
-{
-	{ 320, 200 },
-	{ 320, 240 },
-	{ 400, 225 },	// 16:9
-	{ 400, 300 },
-	{ 480, 270 },	// 16:9
-	{ 480, 360 },
-	{ 512, 288 },	// 16:9
-	{ 512, 384 },
-	{ 640, 360 },	// 16:9
-	{ 640, 400 },
-	{ 640, 480 },
-	{ 720, 480 },	// 16:10
-	{ 720, 540 },
-	{ 800, 450 },	// 16:9
-	{ 800, 500 },	// 16:10
-	{ 800, 600 },
-	{ 848, 480 },	// 16:9
-	{ 960, 600 },	// 16:10
-	{ 960, 720 },
-	{ 1024, 576 },	// 16:9
-	{ 1024, 600 },	// 17:10
-	{ 1024, 640 },	// 16:10
-	{ 1024, 768 },
-	{ 1088, 612 },	// 16:9
-	{ 1152, 648 },	// 16:9
-	{ 1152, 720 },	// 16:10
-	{ 1152, 864 },
-	{ 1280, 720 },	// 16:9
-	{ 1280, 800 },	// 16:10
-	{ 1280, 960 },
-	{ 1280, 1024 },	// 5:4
-	{ 1360, 768 },	// 16:9
-	{ 1400, 787 },	// 16:9
-	{ 1400, 875 },	// 16:10
-	{ 1400, 1050 },
-	{ 1600, 900 },	// 16:9
-	{ 1600, 1000 },	// 16:10
-	{ 1600, 1200 },
-	{ 1920, 1080 },
-	{ 1920, 1200 },
-};
 MENU_LISTENER(EnterResolutionSelection);
 MENU_LISTENER(SetResolution)
 {
 	MenuFadeOut();
 
-	if(!screen->IsFullscreen())
-	{
-		screenWidth = WinModes[which].Width;
-		screenHeight = WinModes[which].Height;
-	}
-	else
 	{
 		int width, height;
 		bool lb;
 		Video->StartModeIterator(DisplayBits, screen ? screen->IsFullscreen() : vid_fullscreen);
-		for(int i = 0;i < which;++i)
+		for(int i = 0;i <= which;++i)
 			Video->NextMode(&width, &height, &lb);
 		screenWidth = width;
 		screenHeight = height;
@@ -313,21 +261,6 @@ MENU_LISTENER(EnterResolutionSelection)
 	resolutionMenu.clear();
 	FString resolution;
 
-	if(!fullscreen)
-	{
-		for(unsigned int i = 0;i < countof(WinModes);++i)
-		{
-			resolution.Format("%dx%d", WinModes[i].Width, WinModes[i].Height);
-			MenuItem *item = new MenuItem(resolution, SetResolution);
-			resolutionMenu.addItem(item);
-			if(WinModes[i].Width == screenWidth && WinModes[i].Height == screenHeight)
-			{
-				selected = resolutionMenu.countItems()-1;
-				item->setHighlighted(true);
-			}
-		}
-	}
-	else
 	{
 		int width, height;
 		bool lb;

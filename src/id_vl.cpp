@@ -80,19 +80,8 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 	Video->SetResolution(screenWidth, screenHeight, 8);
 	R_SetupBuffer ();
 
-	scaleFactorY = SCREENHEIGHT/200;
-	scaleFactorX = SCREENWIDTH/320;
-	// 1600x1200 can do clean aspect correction so why not?
-	if(scaleFactorY % 6 == 0)
-	{
-		unsigned newXfactor = scaleFactorY - scaleFactorY/6;
-		if(newXfactor <= scaleFactorX)
-			scaleFactorX = newXfactor;
-		else
-			scaleFactorY = scaleFactorX;
-	}
-	else
-		scaleFactorX = scaleFactorY = MIN(scaleFactorX, scaleFactorY);
+	scaleFactorX = CleanXfac;
+	scaleFactorY = CleanYfac;
 
 	pixelangle = (short *) malloc(SCREENWIDTH * sizeof(short));
 	CHECKMALLOCRESULT(pixelangle);
