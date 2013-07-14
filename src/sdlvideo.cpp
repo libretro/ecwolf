@@ -230,8 +230,6 @@ void I_InitGraphics ()
 	if (Video == NULL)
 		I_FatalError ("Failed to initialize display");
 
-	atterm (I_ShutdownGraphics);
-
 //	Video->SetWindowedScale (vid_winscale);
 }
 
@@ -454,11 +452,13 @@ DFrameBuffer *SDLVideo::CreateFrameBuffer (int width, int height, bool fullscree
 		{
 			bool fsnow = (fb->Screen->flags & SDL_FULLSCREEN) != 0;
 	
+			if (fsnow == fullscreen)
+				return old;
 			if (fsnow != fullscreen)
 			{
-				SDL_WM_ToggleFullScreen (fb->Screen);
+				if(SDL_WM_ToggleFullScreen (fb->Screen))
+					return old;
 			}
-			return old;
 		}
 		old->GetFlash (flashColor, flashAmount);
 		old->ObjectFlags |= OF_YesReallyDelete;

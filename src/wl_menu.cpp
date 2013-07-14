@@ -217,7 +217,9 @@ MENU_LISTENER(ReadThis)
 MENU_LISTENER(ToggleFullscreen)
 {
 	fullscreen = vid_fullscreen;
+	screen->Unlock();
 	VL_SetVGAPlaneMode();
+	screen->Lock(false);
 	displayMenu.draw();
 	return true;
 }
@@ -239,7 +241,7 @@ MENU_LISTENER(SetResolution)
 	{
 		int width, height;
 		bool lb;
-		Video->StartModeIterator(DisplayBits, screen ? screen->IsFullscreen() : vid_fullscreen);
+		Video->StartModeIterator(DisplayBits, vid_fullscreen);
 		for(int i = 0;i <= which;++i)
 			Video->NextMode(&width, &height, &lb);
 		screenWidth = width;
@@ -248,6 +250,7 @@ MENU_LISTENER(SetResolution)
 
 	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
 	VH_Startup(); // Recalculate fizzlefade stuff.
+	screen->Unlock();
 	VL_SetVGAPlaneMode();
 	screen->Lock(false);
 	EnterResolutionSelection(which);
@@ -264,7 +267,7 @@ MENU_LISTENER(EnterResolutionSelection)
 	{
 		int width, height;
 		bool lb;
-		Video->StartModeIterator(DisplayBits, screen ? screen->IsFullscreen() : vid_fullscreen);
+		Video->StartModeIterator(DisplayBits, vid_fullscreen);
 		while(Video->NextMode(&width, &height, &lb))
 		{
 			resolution.Format("%dx%d", width, height);

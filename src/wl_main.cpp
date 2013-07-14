@@ -367,6 +367,7 @@ static bool DrawStartupConsole()
 	return true;
 }
 
+void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
@@ -438,6 +439,9 @@ static void InitGame()
 
 	ClassDef::LoadActors();
 	atterm(CollectGC);
+
+	// I_ShutdownGraphics needs to be run before the class definitions are unloaded.
+	atterm (I_ShutdownGraphics);
 
 	// Parse non-gameinfo sections in MAPINFO
 	G_ParseMapInfo(false);
