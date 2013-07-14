@@ -66,7 +66,7 @@
 
 static inline SDWORD DivScale32(const SQWORD a, const SDWORD b)
 {
-	return (a << 32) / b;
+	return static_cast<SDWORD>((a << 32) / b);
 }
 static inline void clearbufshort(void *buffer, unsigned int count, WORD clear)
 {

@@ -261,6 +261,10 @@ public:
 	int GetPageCount ();
 	bool IsFullscreen ();
 
+	void PaletteChanged () { }
+	int QueryNewPalette () { return 0; }
+	bool Is8BitMode() { return true; }
+
 	friend class SDLVideo;
 
 private:

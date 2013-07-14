@@ -95,8 +95,8 @@ The FON2 header is followed by variable length data:
 #include "r_data/r_translate.h"
 #include "colormatcher.h"
 #include "v_palette.h"
+#include "zdoomsupport.h"
 
-#define STACK_ARGS
 //
 // Globally visible constants.
 //
