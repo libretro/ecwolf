@@ -41,14 +41,7 @@
 #include <cstring>
 using namespace std;
 
-#if defined(WINDOWS)
-#include <direct.h>
-#define mkdir(file,mode) _mkdir(file)
-#elif defined(__APPLE__)
-#include <CoreServices/CoreServices.h>
-#endif
-#include <sys/stat.h>
-
+#include "filesys.h"
 #include "zstring.h"
 
 Config config;
@@ -77,48 +70,7 @@ void Config::LocateConfigFile(int argc, char* argv[])
 		}
 	}
 
-	// Nothing explicitly set so go to the home directory.
-#if defined(WINDOWS)
-	char *home = getenv("APPDATA");
-	if(home == NULL || *home == '\0')
-	{
-		printf("APPDATA environment variable not set, falling back.\n");
-		configDir = argv[0];
-		int pos = configDir.LastIndexOfAny("/\\");
-		configDir = configDir.Mid(0, pos);
-	}
-	else
-		configDir.Format("%s\\ecwolf", home);
-#elif defined(__APPLE__)
-	UInt8 home[PATH_MAX];
-	FSRef folder;
-
-	if(FSFindFolder(kUserDomain, kPreferencesFolderType, kCreateFolder, &folder) != noErr ||
-		FSRefMakePath(&folder, home, PATH_MAX) != noErr)
-	{
-		printf("Could not create your preferences files.\n");
-		return;
-	}
-	configDir = reinterpret_cast<const char*>(home);	
-#else
-	char *home = getenv("HOME");
-	if(home == NULL || *home == '\0')
-	{
-		printf("Please set your HOME environment variable.\n");
-		return;
-	}
-	configDir.Format("%s/.config/ecwolf", home);
-#endif
-
-	struct stat dirStat;
-	if(stat(configDir, &dirStat) == -1)
-	{
-		if(mkdir(configDir, S_IRWXU) == -1)
-		{
-			printf("Could not create settings directory, configuration will not be saved.\n");
-			return;
-		}
-	}
+	configDir = FileSys::GetDirectoryPath(FileSys::DIR_Configuration);
 
 #ifdef WINDOWS
 	configFile = configDir + "\\ecwolf.cfg";

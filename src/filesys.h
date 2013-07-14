@@ -1,5 +1,5 @@
 /*
-** file.h
+** filesys.h
 **
 **---------------------------------------------------------------------------
 ** Copyright 2011 Braden Obrzut
@@ -32,11 +32,36 @@
 **
 */
 
-#ifndef __FILE_H__
-#define __FILE_H__
+#ifndef __FILESYS_H__
+#define __FILESYS_H__
 
 #include "tarray.h"
 #include "zstring.h"
+
+namespace FileSys
+{
+	enum ESpecialDirectory
+	{
+		DIR_Program,
+		DIR_Configuration,
+		DIR_Saves,
+		DIR_ApplicationSupport,
+
+		NUM_SPECIAL_DIRECTORIES
+	};
+
+	enum ESteamGames
+	{
+		SG_Wolfenstein3D,
+		SG_SpearOfDestiny,
+		SG_ThrowbackPack
+	};
+
+	FString GetDirectoryPath(ESpecialDirectory dir);
+	FString GetSteamPath(ESteamGames game);
+	void SetDirectoryPath(ESpecialDirectory dir, const FString &path);
+	void SetupPaths(int argc, const char* const *argv);
+}
 
 class File
 {
@@ -65,4 +90,4 @@ class File
 		bool			writable;
 };
 
-#endif /* __FILE_H__ */
+#endif /* __FILESYS_H__ */

@@ -44,7 +44,7 @@
 
 #include "resourcefiles/resourcefile.h"
 #include "config.h"
-#include "file.h"
+#include "filesys.h"
 #include "lumpremap.h"
 #include "scanner.h"
 #include "tarray.h"

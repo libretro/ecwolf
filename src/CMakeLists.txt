@@ -216,8 +216,8 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	dobject.cpp
 	dobjgc.cpp
 	farchive.cpp
-	file.cpp
 	files.cpp
+	filesys.cpp
 	g_intermission.cpp
 	g_mapinfo.cpp
 	gamemap.cpp

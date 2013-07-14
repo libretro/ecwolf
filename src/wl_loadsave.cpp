@@ -36,7 +36,7 @@
 #include "config.h"
 #include "c_cvars.h"
 #include "farchive.h"
-#include "file.h"
+#include "filesys.h"
 #include "g_mapinfo.h"
 #include "gamemap.h"
 #include "id_ca.h"
@@ -67,7 +67,6 @@ extern unsigned vbufPitch;
 namespace GameSave {
 
 long long SaveVersion = SAVEVER;
-const char* savedir = NULL;
 
 static const char* const NEW_SAVE = "    - NEW SAVE -";
 
@@ -88,7 +87,7 @@ static bool quickSaveLoad = false;
 
 static inline FString GetFullSaveFileName(const FString &filename)
 {
-	FString dir = savedir ? FString(savedir) : config.GetConfigDir();
+	FString dir = FileSys::GetDirectoryPath(FileSys::DIR_Saves);
 #ifdef _WIN32
 	dir += "\\";
 #else
@@ -245,7 +244,7 @@ bool SetupSaveGames()
 	bool canLoad = false;
 	char title[MAX_SAVENAME+1];
 
-	File saveDirectory(savedir ? FString(savedir) : config.GetConfigDir());
+	File saveDirectory(FileSys::GetDirectoryPath(FileSys::DIR_Saves));
 	const TArray<FString> &files = saveDirectory.getFileList();
 
 	for(unsigned int i = 0;i < files.Size();i++)

@@ -33,7 +33,7 @@
 */
 
 #include "doomerrors.h"
-#include "file.h"
+#include "filesys.h"
 #include "wl_def.h"
 #include "m_swap.h"
 #include "resourcefile.h"
