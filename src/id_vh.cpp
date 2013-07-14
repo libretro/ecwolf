@@ -336,42 +336,30 @@ void VWB_DrawFill(FTexture *tex, int ix, int iy, int ix2, int iy2, bool local)
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
+	double x = ix, y = iy;
+
 	screen->Lock(false);
 	if(menu)
+		MenuToRealCoords(x, y, wd, hd, menu);
+	else
+		screen->VirtualToRealCoords(x, y, wd, hd, 320, 200, true, true);
+
+	if(stencil)
 	{
-		if(stencil)
-		{
-			screen->DrawTexture(tex, ix, iy,
-				DTA_Clean, menu,
-				DTA_Translation, remap,
-				DTA_FillColor, GPalette.BaseColors[stencilcolor],
-				TAG_DONE);
-		}
-		else
-		{
-			screen->DrawTexture(tex, ix, iy,
-				DTA_Clean, menu,
-				DTA_Translation, remap,
-				TAG_DONE);
-		}
+		screen->DrawTexture(tex, x, y,
+			DTA_DestWidthF, wd,
+			DTA_DestHeightF, hd,
+			DTA_Translation, remap,
+			DTA_FillColor, GPalette.BaseColors[stencilcolor],
+			TAG_DONE);
 	}
 	else
 	{
-		if(stencil)
-		{
-			screen->DrawTexture(tex, ix, iy,
-				DTA_Bottom320x200, true,
-				DTA_Translation, remap,
-				DTA_FillColor, GPalette.BaseColors[stencilcolor],
-				TAG_DONE);
-		}
-		else
-		{
-			screen->DrawTexture(tex, ix, iy,
-				DTA_Bottom320x200, true,
-				DTA_Translation, remap,
-				TAG_DONE);
-		}
+		screen->DrawTexture(tex, x, y,
+			DTA_DestWidthF, wd,
+			DTA_DestHeightF, hd,
+			DTA_Translation, remap,
+			TAG_DONE);
 	}
 	screen->Unlock();
 }
