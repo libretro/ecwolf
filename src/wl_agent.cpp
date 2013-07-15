@@ -1051,7 +1051,6 @@ void Cmd_Use (void)
 			if(map->ActivateTrigger(trig, direction, players[0].mo))
 			{
 				P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), trig.repeatable, trig.action);
-				//buttonstate[bt_use] = false;
 				doNothing = false;
 			}
 		}
