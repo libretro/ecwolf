@@ -41,11 +41,9 @@ public:
 	void GetFlash(PalEntry &rgb, int &amount) { DBGBREAK; }
 	int GetPageCount() { DBGBREAK; return 0; }
 	bool IsFullscreen() { DBGBREAK; return 0; }
-#ifdef _WIN32
 	void PaletteChanged() {}
 	int QueryNewPalette() { return 0; }
 	bool Is8BitMode() { return false; }
-#endif
 
 	float Gamma;
 };
