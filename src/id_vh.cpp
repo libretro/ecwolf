@@ -376,9 +376,19 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 void CA_CacheScreen(FTexture* tex, bool noaspect)
 {
 	screen->Lock(false);
-	screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, 0, 0);
-	screen->DrawTexture(tex, 0, 0,
-		DTA_Fullscreen, true,
-		TAG_DONE);
+	screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
+	if(noaspect)
+	{
+		screen->DrawTexture(tex, 0, 0,
+			DTA_DestWidth, SCREENWIDTH,
+			DTA_DestHeight, SCREENHEIGHT,
+			TAG_DONE);
+	}
+	else
+	{
+		screen->DrawTexture(tex, 0, 0,
+			DTA_Fullscreen, true,
+			TAG_DONE);
+	}
 	screen->Unlock();
 }

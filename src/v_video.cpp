@@ -155,16 +155,16 @@ void DCanvas::Dim (PalEntry color)
 	PalEntry dimmer;
 	float amount;
 
-	if (dimamount >= 0)
-	{
+	//if (dimamount >= 0)
+	//{
 		dimmer = PalEntry(dimcolor);
 		amount = dimamount;
-	}
-	else
-	{
+	//}
+	//else
+	//{
 		//dimmer = gameinfo.dimcolor;
 		//amount = gameinfo.dimamount;
-	}
+	//}
 
 	// Add the cvar's dimming on top of the color passed to the function
 	if (color.a != 0)
