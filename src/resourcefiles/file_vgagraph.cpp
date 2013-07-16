@@ -277,19 +277,26 @@ class FVGAGraph : public FResourceFile
 						byte* endPtr = lumps[i-1].HuffExpand(data, out);
 						delete[] data;
 
+						bool endhit = false;
 						WORD height = ReadLittleShort(out);
 						for(unsigned int c = 0;c < 256;++c)
 						{
 							WORD offset = ReadLittleShort(&out[c*2+2]);
 							BYTE width = out[c+514];
 
-							if(offset + width*height/8 > lumps[i-1].LumpSize)
+							int space = lumps[i-1].LumpSize - (offset + width*height);
+							if(space < 0)
 							{
 								lumps[i-1].isImage = lumps[i].isImage = true;
 								break;
 							}
+							else if(space == 0)
+								endhit = true;
 						}
 						delete[] out;
+
+						if(!endhit)
+							lumps[i-1].isImage = lumps[i].isImage = true;
 
 						if(!lumps[i].isImage)
 							++numFonts;
@@ -299,8 +306,8 @@ class FVGAGraph : public FResourceFile
 
 					if(lumps[i-1].isImage)
 					{
-						lumps[i].dimensions = dimensions[0];
-						lumps[i].LumpSize += 4;
+						lumps[i-1].dimensions = dimensions[0];
+						lumps[i-1].LumpSize += 4;
 					}
 				}
 
