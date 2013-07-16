@@ -828,6 +828,9 @@ void PlayLoop (void)
 		{
 			++gamestate.TimeCount;
 			thinkerList->Tick();
+
+			if(i == 0) // After the first tic, go ahead and take care of button holding.
+				memcpy(buttonheld, buttonstate, sizeof (buttonstate));
 		}
 
 		UpdatePaletteShifts ();
