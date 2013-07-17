@@ -55,6 +55,7 @@
 #include "colormaps.h"
 #include "v_video.h"
 #include "templates.h"
+#include "g_mapinfo.h"
 
 static bool R_CheckForFixedLights(const BYTE *colormaps);
 
@@ -539,7 +540,7 @@ void R_InitColormaps ()
 		}
 	}
 	realcolormaps = new BYTE[256*NUMCOLORMAPS*fakecmaps.Size()];
-	R_SetDefaultColormap ("COLORMAP");
+	R_SetDefaultColormap (gameinfo.GameColormap);
 
 	if (fakecmaps.Size() > 1)
 	{
