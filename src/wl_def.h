@@ -90,7 +90,7 @@ typedef SDWORD int32;
 
 #define MAXPLAYERS		8 // You wish! :P  (This is just here to satisfy ZDoom stuff)
 #define BODYQUESIZE		32
-#define NUMCOLORMAPS	32
+#define NUMCOLORMAPS	64
 
 #define TICRATE 70
 #define MAXTICS 10

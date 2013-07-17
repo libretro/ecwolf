@@ -56,6 +56,7 @@ public:
 	int		TitleTime;
 	FString	BorderFlat;
 	FString	CreditPage;
+	FString GameColormap;
 	FString	GamePalette;
 	FString	TitleMusic;
 	FString	TitlePage;

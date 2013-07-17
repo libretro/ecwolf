@@ -578,6 +578,8 @@ protected:
 			ParseNameAssignment(gameinfo.DoorSoundSequence);
 		else if(key.CompareNoCase("drawreadthis") == 0)
 			ParseBoolAssignment(gameinfo.DrawReadThis);
+		else if(key.CompareNoCase("gamecolormap") == 0)
+			ParseStringAssignment(gameinfo.GameColormap);
 		else if(key.CompareNoCase("gamepalette") == 0)
 			ParseStringAssignment(gameinfo.GamePalette);
 		else if(key.CompareNoCase("gibfactor") == 0)

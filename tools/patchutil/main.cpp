@@ -260,6 +260,42 @@ struct OldDataSet
 	{
 		9,
 		{
+			{2142400748u, 304415, "audiot.vsi", NULL, NULLP, false},
+			{1639609375u, 3195112, "vswap.vsi", NULL, NULLP, false},
+			{1145553870u, 747, "vgahead.vsi", NULL, NULLP, false},
+			{2824396135u, 1288, "audiohed.vsi", NULL, NULLP, false},
+			//{3189561458u, 18977, "ianim.vsi", NULL, NULLP, false},
+			//{2781635409u, 102, "planet.bat", NULL, NULLP,  true},
+			{3915873607u, 710699, "vgagraph.vsi", NULL, NULLP, false},
+			//{1682344223u, 370212, "eanim.vsi", NULL, NULLP, false},
+			//{3556882997u, 22069, "jamerr.exe", NULL, NULLP, true},
+			{3829735414u, 834, "maphead.vsi", NULL, NULLP, false},
+			//{1056702345u, 18641, "pshelp.exe", NULL, NULLP, true},
+			{3602237331u, 1024, "vgadict.vsi", NULL, NULLP, false},
+			{2018431833u, 167158, "maptemp.vsi", NULL, NULLP, false},
+			//{4014968045u, 76751, "setblast.exe", NULL, NULLP, true},
+			{274830760u, 144374, "bs_fire.exe", NULL, P(bs_fire10), true},
+		},
+		"Blake Stone: Planet Strike v1.0"
+	},
+	{
+		9,
+		{
+			{2142400748u, 304415, "AUDIOT.VSI", NULL, NULLP, false},
+			{1639609375u, 3195112, "VSWAP.VSI", NULL, NULLP, false},
+			{1145553870u, 747, "VGAHEAD.VSI", NULL, NULLP, false},
+			{2824396135u, 1288, "AUDIOHED.VSI", NULL, NULLP, false},
+			{3915873607u, 710699, "VGAGRAPH.VSI", NULL, NULLP, false},
+			{3829735414u, 834, "MAPHEAD.VSI", NULL, NULLP, false},
+			{3602237331u, 1024, "VGADICT.VSI", NULL, NULLP, false},
+			{2018431833u, 167158, "MAPTEMP.VSI", NULL, NULLP, false},
+			{4163451519u, 144390, "BS_FIRE.EXE", NULL, NULLP, true},
+		},
+		"Blake Stone: Planet Strike v1.01"
+	},
+	{
+		9,
+		{
 			{4096914596u, 295394, "vgagraph.wl1", NULL, P(vgagraph10sw), false},
 			{4079205602u, 56618, "maptemp.wl1", "gamemaps.wl1", P(maptemp10sw), false},
 			{944411798u, 988, "audiohed.wl1", NULL, P(audiohed10sw), false},

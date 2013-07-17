@@ -3,6 +3,7 @@ gameinfo
 	border = inset, "39 2D 14", "5E 42 21", "6F 4A 25"
 	borderflat = "#4A3918"
 	drawreadthis = true
+	gamecolormap = "COLORMAP"
 	gamepalette = "NOAHPAL"
 	titlepalette = "TITLEPAL"
 	finaleflat = "#B5B5B5"
