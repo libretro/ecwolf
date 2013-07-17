@@ -463,10 +463,8 @@ void R_SetDefaultColormap (const char *name)
 			}
 
 			// Now expand color map to full internal range
-			Printf("%d\n", numLumpMaps);
 			if(numLumpMaps < NUMCOLORMAPS)
 			{
-				Printf("Expanding\n");
 				if(numLumpMaps != 32)
 					I_Error("Only 32 or 64 color maps are supported.");
 
