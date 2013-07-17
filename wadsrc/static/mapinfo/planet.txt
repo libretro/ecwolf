@@ -1,5 +1,6 @@
 gameinfo
 {
+	gamecolormap = "BLAKCMAP"
 	gamepalette = "BLAKEPAL"
 	translator = "xlat/planet.txt"
 	playerclasses = "BlakePlayer"
