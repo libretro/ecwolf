@@ -34,6 +34,8 @@
 
 #include "gamemap.h"
 #include "gamemap_common.h"
+#include "g_mapinfo.h"
+#include "id_ca.h"
 #include "lnspec.h"
 #include "scanner.h"
 #include "w_wad.h"
@@ -532,8 +534,8 @@ class UWMFParser : public TextMapParser
 
 void GameMap::ReadUWMFData()
 {
-	gLevelVisibility = VISIBILITY_DEFAULT;
-	gLevelLight = LIGHTLEVEL_DEFAULT;
+	gLevelVisibility = levelInfo->DefaultVisibility;
+	gLevelLight = levelInfo->DefaultLighting;
 
 	long size = lumps[0]->GetLength();
 	char *data = new char[size];
