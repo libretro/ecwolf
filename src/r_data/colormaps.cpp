@@ -208,12 +208,12 @@ FDynamicColormap *GetSpecialLights (PalEntry color, PalEntry fade, int desaturat
 	colormap->Desaturate = desaturate;
 	NormalLight.Next = colormap;
 
-	/*if (screen->UsesColormap())
+	//if (Renderer->UsesColormap())
 	{
 		colormap->Maps = new BYTE[NUMCOLORMAPS*256];
 		colormap->BuildLights ();
 	}
-	else*/ colormap->Maps = NULL;
+	//else colormap->Maps = NULL;
 
 	return colormap;
 }
@@ -368,7 +368,7 @@ void FDynamicColormap::ChangeColorFade (PalEntry lightcolor, PalEntry fadecolor)
 
 void FDynamicColormap::RebuildAllLights()
 {
-	/*if (screen->UsesColormap())
+	//if (Renderer->UsesColormap())
 	{
 		FDynamicColormap *cm;
 
@@ -380,7 +380,7 @@ void FDynamicColormap::RebuildAllLights()
 				cm->BuildLights ();
 			}
 		}
-	}*/
+	}
 }
 
 //==========================================================================
@@ -419,6 +419,9 @@ void R_SetDefaultColormap (const char *name)
 			// ROTT colormap has fog fades at the top
 			bool maybeRott = lumpr.GetLength() == NUMCOLORMAPS*256;
 
+			// Figure out how many colormaps are usable in the source
+			int numLumpMaps = (lumpr.GetLength()/256)&(~31);
+
 			// [RH] The colormap may not have been designed for the specific
 			// palette we are using, so remap it to match the current palette.
 			memcpy (remap, GPalette.Remap, 256);
@@ -430,7 +433,7 @@ void R_SetDefaultColormap (const char *name)
 			// Mapping to color 0 is okay, because the colormap won't be used to
 			// produce a masked texture.
 			remap[0] = 0;
-			for (i = 0; i < NUMCOLORMAPS; ++i)
+			for (i = 0; i < numLumpMaps; ++i)
 			{
 				BYTE *map2 = &realcolormaps[i*256];
 				lumpr.Read (map, 256);
@@ -450,11 +453,25 @@ void R_SetDefaultColormap (const char *name)
 			// OK, looks like we have a ROTT colormap, so remove the fog map
 			if(maybeRott)
 			{
-				for(i = 0;i < NUMCOLORMAPS/2;++i)
+				for(i = 0;i < numLumpMaps/2;++i)
 				{
 					memcpy(&realcolormaps[i*2*256], &realcolormaps[(i+16)*256], 256);
 					if(i != 15)
 						memcpy(&realcolormaps[(i*2+1)*256], &realcolormaps[(i+16)*256], 256);
+				}
+			}
+
+			// Now expand color map to full internal range
+			Printf("%d\n", numLumpMaps);
+			if(numLumpMaps < NUMCOLORMAPS)
+			{
+				Printf("Expanding\n");
+				if(numLumpMaps != 32)
+					I_Error("Only 32 or 64 color maps are supported.");
+
+				for(i = NUMCOLORMAPS-1;i >= 0;--i)
+				{
+					memcpy(&realcolormaps[i*256], &realcolormaps[(i/2)*256], 256);
 				}
 			}
 		}
