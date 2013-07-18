@@ -52,6 +52,7 @@ cluster 1
 
 map "MAP01"
 {
+	music = "MAJMIN"
 	cluster = 1
 	DefaultLighting = 178
 	DefaultVisibility = 7.0
@@ -59,6 +60,7 @@ map "MAP01"
 
 map "MAP02"
 {
+	music = "STICKS"
 	cluster = 1
 	DefaultLighting = 165
 	DefaultVisibility = 48.0
@@ -67,6 +69,7 @@ map "MAP02"
 
 map "MAP03"
 {
+	music = "MOURNING"
 	cluster = 1
 	DefaultLighting = 124
 	DefaultVisibility = 24.0
@@ -75,6 +78,7 @@ map "MAP03"
 
 map "MAP04"
 {
+	music = "LURKING"
 	cluster = 1
 	DefaultLighting = 128
 	DefaultVisibility = 35.0
@@ -83,6 +87,7 @@ map "MAP04"
 
 map "MAP05"
 {
+	music = "CIRCLES"
 	cluster = 1
 	DefaultLighting = 210
 	DefaultVisibility = 8.0
@@ -90,6 +95,7 @@ map "MAP05"
 
 map "MAP06"
 {
+	music = "TIME"
 	cluster = 1
 	DefaultLighting = 140
 	DefaultVisibility = 22.0
@@ -98,6 +104,7 @@ map "MAP06"
 
 map "MAP07"
 {
+	music = "TOHELL"
 	cluster = 1
 	DefaultLighting = 178
 	DefaultVisibility = 7.0
@@ -105,6 +112,7 @@ map "MAP07"
 
 map "MAP08"
 {
+	music = "FORTRESS"
 	cluster = 1
 	DefaultLighting = 165
 	DefaultVisibility = 48.0
@@ -113,6 +121,7 @@ map "MAP08"
 
 map "MAP09"
 {
+	music = "GIVING"
 	cluster = 1
 	DefaultLighting = 124
 	DefaultVisibility = 24.0
@@ -121,6 +130,7 @@ map "MAP09"
 
 map "MAP10"
 {
+	music = "HARTBEAT"
 	cluster = 1
 	DefaultLighting = 128
 	DefaultVisibility = 35.0
@@ -129,6 +139,7 @@ map "MAP10"
 
 map "MAP11"
 {
+	music = "MOURNING"
 	cluster = 1
 	DefaultLighting = 210
 	DefaultVisibility = 8.0
@@ -136,6 +147,7 @@ map "MAP11"
 
 map "MAP12"
 {
+	music = "MAJMIN"
 	cluster = 1
 	DefaultLighting = 140
 	DefaultVisibility = 22.0
@@ -144,6 +156,7 @@ map "MAP12"
 
 map "MAP13"
 {
+	music = "VACCINAP"
 	cluster = 1
 	DefaultLighting = 178
 	DefaultVisibility = 7.0
@@ -151,6 +164,7 @@ map "MAP13"
 
 map "MAP14"
 {
+	music = "LURKING"
 	cluster = 1
 	DefaultLighting = 165
 	DefaultVisibility = 48.0
@@ -159,6 +173,7 @@ map "MAP14"
 
 map "MAP15"
 {
+	music = "MONASTRY"
 	cluster = 1
 	DefaultLighting = 124
 	DefaultVisibility = 24.0
@@ -167,6 +182,7 @@ map "MAP15"
 
 map "MAP16"
 {
+	music = "TOMBP"
 	cluster = 1
 	DefaultLighting = 128
 	DefaultVisibility = 35.0
@@ -175,6 +191,7 @@ map "MAP16"
 
 map "MAP17"
 {
+	music = "DARKNESS"
 	cluster = 1
 	DefaultLighting = 210
 	DefaultVisibility = 8.0
@@ -182,6 +199,7 @@ map "MAP17"
 
 map "MAP18"
 {
+	music = "MOURNING"
 	cluster = 1
 	DefaultLighting = 140
 	DefaultVisibility = 22.0
@@ -190,6 +208,7 @@ map "MAP18"
 
 map "MAP19"
 {
+	music = "SERPENT"
 	cluster = 1
 	DefaultLighting = 178
 	DefaultVisibility = 7.0
@@ -197,6 +216,7 @@ map "MAP19"
 
 map "MAP20"
 {
+	music = "TIME"
 	cluster = 1
 	DefaultLighting = 165
 	DefaultVisibility = 48.0
@@ -205,6 +225,7 @@ map "MAP20"
 
 map "MAP21"
 {
+	music = "CATACOMB"
 	cluster = 1
 	DefaultLighting = 124
 	DefaultVisibility = 24.0
@@ -213,6 +234,7 @@ map "MAP21"
 
 map "MAP22"
 {
+	music = "PLOT"
 	cluster = 1
 	DefaultLighting = 128
 	DefaultVisibility = 35.0
@@ -221,6 +243,7 @@ map "MAP22"
 
 map "MAP23"
 {
+	music = "GIVING"
 	cluster = 1
 	DefaultLighting = 210
 	DefaultVisibility = 8.0
@@ -228,6 +251,7 @@ map "MAP23"
 
 map "MAP24"
 {
+	music = "VACCINAP"
 	cluster = 1
 	DefaultLighting = 140
 	DefaultVisibility = 22.0
