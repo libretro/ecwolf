@@ -44,23 +44,192 @@ gameinfo
 
 episode "MAP01"
 {
-	lookup = "WL_EPISODE1"
-	picname = "M_EPIS1"
-	key = "E"
 }
 
 cluster 1
 {
-	exittext = "ENDART1"
-	exittextislump
 }
 
 map "MAP01"
 {
-	next = "MAP02"
-	secretnext = "MAP10"
-	floornumber = 1
-	par = 90
-	music = "GETTHEM"
 	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP02"
+{
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP03"
+{
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP04"
+{
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP05"
+{
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP06"
+{
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP07"
+{
+	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP08"
+{
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP09"
+{
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP10"
+{
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP11"
+{
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP12"
+{
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP13"
+{
+	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP14"
+{
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP15"
+{
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP16"
+{
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP17"
+{
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP18"
+{
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP19"
+{
+	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP20"
+{
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP21"
+{
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP22"
+{
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP23"
+{
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP24"
+{
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
 }
