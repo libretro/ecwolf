@@ -146,6 +146,9 @@ public:
 
 	FTextureID		BorderTexture;
 	FTextureID		DefaultTexture[2];
+	int				DefaultLighting;
+	fixed			DefaultVisibility;
+	fixed			DefaultMaxLightVis;
 	int				ExitFadeColor;
 	unsigned int	ExitFadeDuration;
 	unsigned int	Par;

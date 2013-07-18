@@ -89,6 +89,7 @@ int viewshift = 0;
 fixed viewz = 32;
 
 fixed gLevelVisibility = VISIBILITY_DEFAULT;
+fixed gLevelMaxLightVis = MAXLIGHTVIS_DEFAULT;
 int gLevelLight = LIGHTLEVEL_DEFAULT;
 
 void    TransformActor (AActor *ob);

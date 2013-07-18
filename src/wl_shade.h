@@ -9,18 +9,19 @@
 #define LIGHT2SHADE(l)			((NUMCOLORMAPS*2*FRACUNIT)-(((l)+12)*(FRACUNIT*NUMCOLORMAPS/128)))
 
 // MAXLIGHTSCALE from original DOOM, divided by 2.
-#define MAXLIGHTVIS				(24*FRACUNIT)
+#define MAXLIGHTVIS_DEFAULT		(24*FRACUNIT)
 
 // Convert a shade and visibility to a clamped colormap index.
 // Result is not fixed point.
 // Change R_CalcTiltedLighting() when this changes.
-#define GETPALOOKUP(vis,shade)	(clamp<int> (((shade)-MIN(MAXLIGHTVIS,(vis)))>>FRACBITS, 0, NUMCOLORMAPS-1))
+#define GETPALOOKUP(vis,shade)	(clamp<int> (((shade)-MIN(gLevelMaxLightVis,(vis)))>>FRACBITS, 0, NUMCOLORMAPS-1))
 
 #define MINZ			(2048*4)
 
 #define VISIBILITY_DEFAULT (8<<FRACBITS)
 #define LIGHTLEVEL_DEFAULT 256
 extern fixed gLevelVisibility;
+extern fixed gLevelMaxLightVis;
 extern int gLevelLight;
 
 #endif

@@ -3,6 +3,7 @@
 #include "tarray.h"
 #include "v_palette.h"
 #include "w_wad.h"
+#include "wl_iwad.h"
 #include "zstring.h"
 #include "thingdef/thingdef.h"
 #include "g_shared/a_inventory.h"
@@ -237,7 +238,7 @@ static void ParseLock(Scanner &sc)
 	if (!sc.CheckToken('{'))
 	{
 		sc.MustGetToken(TK_Identifier);
-		//if (!CheckGame(sc->str, false)) keynum = -1;
+		if (!IWad::CheckGameFilter(sc->str)) keynum = -1;
 		sc.MustGetToken('{');
 	}
 

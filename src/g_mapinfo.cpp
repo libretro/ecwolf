@@ -41,6 +41,7 @@
 #include "scanner.h"
 #include "w_wad.h"
 #include "wl_iwad.h"
+#include "wl_shade.h"
 #include "v_video.h"
 #include "g_shared/a_inventory.h"
 #include "g_shared/a_playerpawn.h"
@@ -267,6 +268,9 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	BorderTexture.SetInvalid();
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
+	DefaultLighting = LIGHTLEVEL_DEFAULT;
+	DefaultVisibility = VISIBILITY_DEFAULT;
+	DefaultMaxLightVis = MAXLIGHTVIS_DEFAULT;
 	DeathCam = false;
 	ExitFadeColor = 0;
 	ExitFadeDuration = 30;
@@ -417,6 +421,20 @@ protected:
 			FString textureName;
 			ParseStringAssignment(textureName);
 			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
+		}
+		else if(key.CompareNoCase("DefaultLighting") == 0)
+			ParseIntAssignment(mapInfo.DefaultLighting);
+		else if(key.CompareNoCase("DefaultVisibility") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_FloatConst);
+			mapInfo.DefaultVisibility = static_cast<fixed>(sc->decimal*65536.);
+		}
+		else if(key.CompareNoCase("DefaultMaxLightVis") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_FloatConst);
+			mapInfo.DefaultMaxLightVis = static_cast<fixed>(sc->decimal*65536.);
 		}
 		else if(key.CompareNoCase("SpecialAction") == 0)
 		{
