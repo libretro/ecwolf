@@ -1,8 +1,7 @@
 // TODO: Make these separate key types with separate locks
 
-actor ArkGoldKeyRing : KeyGiver 174
+actor ArkGoldKeyRing : Key 174
 {
-	dropitem "GoldKey"
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{
@@ -12,9 +11,8 @@ actor ArkGoldKeyRing : KeyGiver 174
 	}
 }
 
-actor ArkSilverKeyRing : KeyGiver 175
+actor ArkSilverKeyRing : Key 175
 {
-	dropitem "SilverKey"
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{

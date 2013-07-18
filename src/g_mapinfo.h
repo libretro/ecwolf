@@ -56,6 +56,7 @@ public:
 	int		TitleTime;
 	FString	BorderFlat;
 	FString	CreditPage;
+	FString GameColormap;
 	FString	GamePalette;
 	FString	TitleMusic;
 	FString	TitlePage;
@@ -145,6 +146,9 @@ public:
 
 	FTextureID		BorderTexture;
 	FTextureID		DefaultTexture[2];
+	int				DefaultLighting;
+	fixed			DefaultVisibility;
+	fixed			DefaultMaxLightVis;
 	int				ExitFadeColor;
 	unsigned int	ExitFadeDuration;
 	unsigned int	Par;

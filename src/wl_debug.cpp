@@ -28,6 +28,7 @@
 #include "thingdef/thingdef.h"
 #include "g_shared/a_keys.h"
 #include "r_sprites.h"
+#include "wl_shade.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -590,6 +591,28 @@ int DebugKeys (void)
 		}
 	}
 #endif
+	else if(Keyboard[sc_Comma])
+	{
+		gLevelLight = MAX(1, gLevelLight-1);
+		Printf("Light = %d\n", gLevelLight);
+	}
+	else if(Keyboard[sc_Peroid])
+	{
+		gLevelLight = MIN(256, gLevelLight+1);
+		Printf("Light = %d\n", gLevelLight);
+	}
+	else if(Keyboard[sc_Y])
+	{
+		gLevelVisibility = MAX(1, gLevelVisibility-20000);
+		Printf("Vis = %d\n", gLevelVisibility);
+		CalcVisibility(gLevelVisibility);
+	}
+	else if(Keyboard[sc_U])
+	{
+		gLevelVisibility = MIN(200<<FRACBITS, gLevelVisibility+20000);
+		Printf("Vis = %d\n", gLevelVisibility);
+		CalcVisibility(gLevelVisibility);
+	}
 
 	return 0;
 }
