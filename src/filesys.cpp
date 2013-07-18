@@ -37,7 +37,7 @@
 #define USE_WINDOWS_BOOLEAN
 #include <windows.h>
 #include <direct.h>
-#define mkdir(file,mode) _mkdir(file)
+#include <Shlobj.h>
 #else
 #ifdef __APPLE__
 #include <CoreServices/CoreServices.h>
@@ -144,8 +144,31 @@ FString GetSteamPath(ESteamApp game)
 	return path + PATH_SEPARATOR + AppBasePath[game];
 }
 
+#ifdef _WIN32
+static wchar_t* NameToWide(const char* filename)
+{
+	wchar_t* out = new wchar_t[MAX_PATH];
+	MultiByteToWideChar(CP_UTF8, 0, filename, -1, out, MAX_PATH);
+	return out;
+}
+#endif
+
 static bool CreateDirectoryIfNeeded(const char* path)
 {
+#ifdef _WIN32
+	struct _stat dirStat;
+	wchar_t* wpath = NameToWide(path);
+	if(_wstat(wpath, &dirStat) == -1)
+	{
+		if(_wmkdir(wpath) == -1)
+		{
+			delete[] wpath;
+			return false;
+		}
+	}
+	delete[] wpath;
+	return true;
+#else
 	struct stat dirStat;
 	if(stat(path, &dirStat) == -1)
 	{
@@ -153,6 +176,7 @@ static bool CreateDirectoryIfNeeded(const char* path)
 			return false;
 	}
 	return true;
+#endif
 }
 void SetupPaths(int argc, const char * const *argv)
 {
@@ -183,20 +207,37 @@ void SetupPaths(int argc, const char * const *argv)
 
 	// Configuration directory
 #if defined(_WIN32)
-	if(pSHGetKnownFolderPath) // Vista+
+	OSVERSIONINFO osVersion;
+	GetVersionEx(&osVersion);
+	if(osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS)
 	{
-		char tempCPath[MAX_PATH];
-		PWSTR tempPath = NULL;
-		if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_RoamingAppData, 0x00008000, NULL, &tempPath)))
+		if(pSHGetKnownFolderPath) // Vista+
 		{
-			WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-			configDir.Format("%s\\ecwolf", (const char*)tempCPath);
-			CoTaskMemFree(tempPath);
+			char tempCPath[MAX_PATH];
+			PWSTR tempPath = NULL;
+			if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_RoamingAppData, 0x00008000, NULL, &tempPath)))
+			{
+				WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
+				configDir.Format("%s\\ecwolf", (const char*)tempCPath);
+				CoTaskMemFree(tempPath);
+			}
+		}
+		if(configDir.IsEmpty())
+		{
+			// Other Windows NT
+			char tempCPath[MAX_PATH];
+			wchar_t tempPath[MAX_PATH];
+			if(SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
+			{
+				WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
+				configDir.Format("%s\\ecwolf", (const char*)tempCPath);
+				CoTaskMemFree(tempPath);
+			}
 		}
 	}
 	if(configDir.IsEmpty())
 	{
-		char *home = getenv("APPDATA");
+		wchar_t *home = _wgetenv(L"APPDATA");
 		if(home == NULL || *home == '\0')
 		{
 			// No APPDATA then use the program directory (Should mean Windows 9x)
@@ -204,7 +245,12 @@ void SetupPaths(int argc, const char * const *argv)
 			configDir = progDir;
 		}
 		else
-			configDir.Format("%s\\ecwolf", home);
+		{
+			char* chome = new char[wcslen(home)];
+			WideCharToMultiByte(CP_UTF8, 0, home, -1, chome, wcslen(home), NULL, NULL);
+			configDir.Format("%s\\ecwolf", chome);
+			delete[] chome;
+		}
 	}
 #elif defined(__APPLE__)
 	UInt8 home[PATH_MAX];
@@ -237,7 +283,7 @@ void SetupPaths(int argc, const char * const *argv)
 		if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_SavedGames, 0x00008000, NULL, &tempPath)))
 		{
 			WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-			configDir.Format("%s\\ECWolf", (const char*)tempCPath);
+			saveDir.Format("%s\\ECWolf", (const char*)tempCPath);
 			CoTaskMemFree(tempPath);
 		}
 	}
@@ -390,6 +436,20 @@ FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtensio
 		}
 	}
 	return filename;
+#endif
+}
+
+FILE *File::open(const char* mode) const
+{
+#ifdef _WIN32
+	wchar_t* wname = FileSys::NameToWide(filename);
+	wchar_t* wmode = FileSys::NameToWide(mode);
+	FILE *ret = _wfopen(wname, wmode);
+	delete[] wname;
+	delete[] wmode;
+	return ret;
+#else
+	return fopen(filename, mode);
 #endif
 }
 

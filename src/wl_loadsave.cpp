@@ -88,17 +88,11 @@ static bool quickSaveLoad = false;
 static inline FString GetFullSaveFileName(const FString &filename)
 {
 	FString dir = FileSys::GetDirectoryPath(FileSys::DIR_Saves);
-#ifdef _WIN32
-	dir += "\\";
-#else
-	dir += "/";
-#endif
-
-	return dir + filename;
+	return dir + PATH_SEPARATOR + filename;
 }
 static inline FILE *OpenSaveFile(const FString &filename, const char* mode)
 {
-	return fopen(GetFullSaveFileName(filename), mode);
+	return File(GetFullSaveFileName(filename)).open(mode);
 }
 
 #define MAX_SAVENAME 31

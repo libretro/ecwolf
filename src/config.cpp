@@ -87,7 +87,7 @@ void Config::ReadConfig()
 	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(configFile, ios_base::in | ios_base::binary);
+	fstream stream(File(configFile).open("rb"));
 	if(stream.is_open())
 	{
 		stream.seekg(0, ios_base::end);
@@ -142,7 +142,7 @@ void Config::SaveConfig()
 	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(configFile, ios_base::out | ios_base::trunc);
+	fstream stream(File(configFile).open("wb"));
 	if(stream.is_open())
 	{
 		TMap<FName, SettingsData *>::Pair *pair;

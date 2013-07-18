@@ -85,6 +85,7 @@ class File
 		bool					isDirectory() const { return directory; }
 		bool					isFile() const { return !directory; }
 		bool					isWritable() const { return writable; }
+		FILE					*open(const char* mode) const;
 		void					rename(const FString &newname);
 
 	protected:
