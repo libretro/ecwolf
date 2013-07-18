@@ -536,6 +536,7 @@ void GameMap::ReadUWMFData()
 {
 	gLevelVisibility = levelInfo->DefaultVisibility;
 	gLevelLight = levelInfo->DefaultLighting;
+	gLevelMaxLightVis = levelInfo->DefaultMaxLightVis;
 
 	long size = lumps[0]->GetLength();
 	char *data = new char[size];

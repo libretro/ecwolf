@@ -270,6 +270,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	DefaultTexture[1].SetInvalid();
 	DefaultLighting = LIGHTLEVEL_DEFAULT;
 	DefaultVisibility = VISIBILITY_DEFAULT;
+	DefaultMaxLightVis = MAXLIGHTVIS_DEFAULT;
 	DeathCam = false;
 	ExitFadeColor = 0;
 	ExitFadeDuration = 30;
@@ -428,6 +429,12 @@ protected:
 			sc.MustGetToken('=');
 			sc.MustGetToken(TK_FloatConst);
 			mapInfo.DefaultVisibility = static_cast<fixed>(sc->decimal*65536.);
+		}
+		else if(key.CompareNoCase("DefaultMaxLightVis") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_FloatConst);
+			mapInfo.DefaultMaxLightVis = static_cast<fixed>(sc->decimal*65536.);
 		}
 		else if(key.CompareNoCase("SpecialAction") == 0)
 		{
