@@ -35,11 +35,10 @@
 #include "config.h"
 #include "scanner.h"
 
-#include <fstream>
 #include <cstdlib>
+#include <cstdio>
 #include <cmath>
 #include <cstring>
-using namespace std;
 
 #include "filesys.h"
 #include "zstring.h"
@@ -87,25 +86,23 @@ void Config::ReadConfig()
 	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(File(configFile).open("rb"));
-	if(stream.is_open())
+	FILE *stream = File(configFile).open("rb");
+	if(stream)
 	{
-		stream.seekg(0, ios_base::end);
-		if(stream.fail())
+		if(fseek(stream, 0, SEEK_END))
 			return;
-		unsigned int size = static_cast<unsigned int>(stream.tellg());
-		stream.seekg(0, ios_base::beg);
-		if(stream.fail())
+		unsigned int size = static_cast<unsigned int>(ftell(stream));
+		if(fseek(stream, 0, SEEK_SET))
 			return;
 		char* data = new char[size];
-		stream.read(data, size);
+		fread(data, 1, size, stream);
 		// The eof flag seems to trigger fail on windows.
-		if(!stream.eof() && stream.fail())
+		if(!feof(stream) && ferror(stream))
 		{
 			delete[] data;
 			return;
 		}
-		stream.close();
+		fclose(stream);
 
 		Scanner sc(data, size);
 		sc.SetScriptIdentifier("Configuration");
@@ -142,14 +139,14 @@ void Config::SaveConfig()
 	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(File(configFile).open("wb"));
-	if(stream.is_open())
+	FILE *stream = File(configFile).open("wb");
+	if(stream)
 	{
 		TMap<FName, SettingsData *>::Pair *pair;
 		for(TMap<FName, SettingsData *>::Iterator it(settings);it.NextPair(pair);)
 		{
-			stream.write(pair->Key, strlen(pair->Key));
-			if(stream.fail())
+			fwrite(pair->Key, 1, strlen(pair->Key), stream);
+			if(ferror(stream))
 				return;
 			SettingsData *data = pair->Value;
 			if(data->GetType() == SettingsData::ST_INT)
@@ -161,9 +158,9 @@ void Config::SaveConfig()
 
 				char* value = new char[intLength + 7];
 				sprintf(value, " = %d;\n", data->GetInteger());
-				stream.write(value, strlen(value));
+				fwrite(value, 1, strlen(value), stream);
 				delete[] value;
-				if(stream.fail())
+				if(ferror(stream))
 					return;
 			}
 			else
@@ -172,13 +169,13 @@ void Config::SaveConfig()
 				Scanner::Escape(str);
 				char* value = new char[str.Len() + 8];
 				sprintf(value, " = \"%s\";\n", str.GetChars());
-				stream.write(value, str.Len() + 7);
+				fwrite(value, 1, str.Len() + 7, stream);
 				delete[] value;
-				if(stream.fail())
+				if(ferror(stream))
 					return;
 			}
 		}
-		stream.close();
+		fclose(stream);
 	}
 }
 
