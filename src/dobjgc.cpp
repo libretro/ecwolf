@@ -307,9 +307,9 @@ static void MarkRoot()
 	if(thinkerList)
 		thinkerList->MarkRoots();
 	players[0].PropagateMark();
+	Mark(screen);
 #if 0
 	Mark(Args);
-	Mark(screen);
 	Mark(StatusBar);
 	Mark(DMenu::CurrentMenu);
 	Mark(DIntermissionController::CurrentIntermission);

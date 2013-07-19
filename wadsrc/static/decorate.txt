@@ -24,3 +24,6 @@
 #include "actors/noah/noahkeys.txt"
 #include "actors/noah/noahplayer.txt"
 #include "actors/noah/noahweapons.txt"
+#include "actors/blake/blakedecorations.txt"
+#include "actors/blake/blakeplayer.txt"
+#include "actors/blake/blakeweapons.txt"

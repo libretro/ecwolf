@@ -44,6 +44,7 @@
 #include "wl_shade.h"
 
 static const char* const FeatureFlagNames[] = {
+	"globalmeta",
 	"lightlevels",
 	NULL
 };
@@ -59,7 +60,8 @@ public:
 
 	enum EFeatureFlags
 	{
-		FF_LIGHTLEVELS = 1
+		FF_GLOBALMETA = 1,
+		FF_LIGHTLEVELS = 2
 	};
 
 	struct ThingXlat
@@ -116,6 +118,8 @@ public:
 			flatTable[i][0].SetInvalid();
 			flatTable[i][1].SetInvalid();
 		}
+		defaultFlats[0] = levelInfo->DefaultTexture[0];
+		defaultFlats[1] = levelInfo->DefaultTexture[1];
 		tileTriggers.Clear();
 		thingTable.Clear();
 	}
@@ -251,11 +255,17 @@ public:
 		return false;
 	}
 
+	void SetDefaultFlat(FTextureID floor, FTextureID ceiling)
+	{
+		defaultFlats[MapSector::Floor] = floor;
+		defaultFlats[MapSector::Ceiling] = ceiling;
+	}
+
 	FTextureID TranslateFlat(unsigned int index, bool ceiling)
 	{
 		if(flatTable[index][ceiling].isValid())
 			return flatTable[index][ceiling];
-		return levelInfo->DefaultTexture[ceiling];
+		return defaultFlats[ceiling];
 	}
 
 	bool TranslateTileTrigger(unsigned short tile, MapTrigger &trigger)
@@ -522,6 +532,7 @@ private:
 	TMap<WORD, MapTrigger> tileTriggers;
 	TMap<WORD, ModZone> modZones;
 	TMap<WORD, MapZone> zonePalette;
+	FTextureID defaultFlats[2];
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 	EFeatureFlags FeatureFlags;
 };
@@ -539,6 +550,7 @@ void GameMap::ReadPlanesData()
 		xlat.LoadXlat(levelInfo->Translator, &gameinfo.Translator);
 
 	Xlat::EFeatureFlags FeatureFlags = xlat.GetFeatureFlags();
+	sectorPalette.Clear();
 
 	// Old format maps always have a tile size of 64
 	header.tileSize = UNIT;
@@ -745,16 +757,21 @@ void GameMap::ReadPlanesData()
 				}
 				else
 				{
-					gLevelVisibility = VISIBILITY_DEFAULT;
-					gLevelLight = LIGHTLEVEL_DEFAULT;
+					gLevelVisibility = levelInfo->DefaultVisibility;
+					gLevelLight = levelInfo->DefaultLighting;
 				}
+				gLevelMaxLightVis = levelInfo->DefaultMaxLightVis;
 				break;
 			}
 
 			case Plane_Object:
 			{
+				bool canUseFlatColor = true;
+				FTextureID defaultCeiling, defaultFloor;
 				unsigned int ambushSpot = 0;
 				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors. 
+				defaultCeiling.SetInvalid();
+				defaultFloor.SetInvalid();
 
 				for(unsigned int i = 0;i < size;++i)
 				{
@@ -766,6 +783,51 @@ void GameMap::ReadPlanesData()
 						if(ambushSpots[ambushSpot] == i)
 							++ambushSpot;
 						continue;
+					}
+
+					if(FeatureFlags & Xlat::FF_GLOBALMETA)
+					{
+						switch(oldplane[i]>>8)
+						{
+							default: break;
+							case 0xF1: // Informant messages
+							case 0xF2: // Scientist messages
+							case 0xF3: // Men scientist messages
+							case 0xF5: // Intralevel warp coordinate
+								continue;
+							case 0xFB:
+								// Floor/ceiling texture
+								// We only read the first instance
+								if(canUseFlatColor || !defaultCeiling.isValid())
+								{
+									canUseFlatColor = false;
+									defaultCeiling = xlat.TranslateFlat(oldplane[++i]>>8, Sector::Ceiling);
+									defaultFloor = xlat.TranslateFlat(oldplane[i]&0xFF, Sector::Floor);
+
+									sectorPalette.Resize(1);
+									xlat.SetDefaultFlat(defaultFloor, defaultCeiling);
+									continue;
+								}
+								break;
+							case 0xFE:
+								// This would be pointless since ECWolf is
+								// always texture mapped, but it seems to be
+								// legal for a map to not include a texture tag.
+								if(canUseFlatColor && !defaultCeiling.isValid())
+								{
+									++i;
+
+									const PalEntry c = GPalette.BaseColors[oldplane[i]>>8], f = GPalette.BaseColors[oldplane[i]&0xFF];
+									FString ceilingColor, floorColor;
+									ceilingColor.Format("#%02X%02X%02X", c.r, c.g, c.b);
+									floorColor.Format("#%02X%02X%02X", f.r, f.g, f.b);
+
+									defaultCeiling = TexMan.GetTexture(ceilingColor, FTexture::TEX_Flat);
+									defaultFloor = TexMan.GetTexture(floorColor, FTexture::TEX_Flat);
+									xlat.SetDefaultFlat(defaultFloor, defaultCeiling);
+								}
+								continue;
+						}
 					}
 
 					Thing thing;
@@ -820,7 +882,7 @@ void GameMap::ReadPlanesData()
 			case Plane_Flats:
 			{
 				// Look for all unique floor/ceiling texture combinations.
-				WORD type = 0;
+				WORD type = sectorPalette.Size();
 				TMap<WORD, WORD> flatMap;
 				for(unsigned int i = 0;i < size;++i)
 				{

@@ -1,1 +1,259 @@
-include "mapinfo/wolf3d.txt"
+gameinfo
+{
+	gamecolormap = "BLAKCMAP"
+	gamepalette = "BLAKEPAL"
+	translator = "xlat/planet.txt"
+	playerclasses = "BlakePlayer"
+	titlepage = "TITLE1"
+	titlepalette = "TITLEPAL"
+	menumusic = "LASTLAFF"
+	scoresmusic = "HISCORE"
+	titlemusic = "PLOT"
+
+	finalemusic = "CORNER"
+	finaleflat = "#DCDCDC"
+	intermissionmusic = "ENDLEVEL"
+	titletime = 15
+	creditpage = "CREDITS"
+	pagetime = 10
+	menufontcolor_title = "Gold"
+	menufontcolor_label = "DarkGrey"
+	menufontcolor_selection = "Grey"
+	menufontcolor_invalid = "DarkGreen"
+	menufontcolor_invalidselection = "Green"
+	menufontcolor_highlight = "Yellow"
+	menufontcolor_highlightselection = "Gold"
+	highscoresfontcolor = "White"
+	pageindexfontcolor = "DarkYellow"
+	borderflat = "#004040"
+	advisorycolor = "20 A8 FC"
+	advisorypic = "PG13"
+	border = inset, "00 00 00", "00 70 70", "00 84 84"
+	messagecolors = "8C 8C 8C", "D0 D0 D0", "0 0 0"
+	messagefontcolor = "Black"
+	menuwindowcolors = "8C 8C 8C", "D0 D0 D0", "0 0 0", "FC F4 00", "B4 AC 00", "0 0 0"
+	doorsoundsequence = "DoorNormal"
+	pushwallsoundsequence = "PushwallNormal"
+	gibfactor = 1
+	menufade = "AE 00 00"
+	menucolors = "88 00 00", "D4 00 00", "7D 00 00", "58 00 00", "64 00 00", "00 00 00"
+	menufontcolor_disabled = "DarkRed"
+	highscoresfont = "SmallFont"
+	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
+}
+
+episode "MAP01"
+{
+}
+
+cluster 1
+{
+}
+
+map "MAP01"
+{
+	music = "MAJMIN"
+	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP02"
+{
+	music = "STICKS"
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP03"
+{
+	music = "MOURNING"
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP04"
+{
+	music = "LURKING"
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP05"
+{
+	music = "CIRCLES"
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP06"
+{
+	music = "TIME"
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP07"
+{
+	music = "TOHELL"
+	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP08"
+{
+	music = "FORTRESS"
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP09"
+{
+	music = "GIVING"
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP10"
+{
+	music = "HARTBEAT"
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP11"
+{
+	music = "MOURNING"
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP12"
+{
+	music = "MAJMIN"
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP13"
+{
+	music = "VACCINAP"
+	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP14"
+{
+	music = "LURKING"
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP15"
+{
+	music = "MONASTRY"
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP16"
+{
+	music = "TOMBP"
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP17"
+{
+	music = "DARKNESS"
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP18"
+{
+	music = "MOURNING"
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP19"
+{
+	music = "SERPENT"
+	cluster = 1
+	DefaultLighting = 178
+	DefaultVisibility = 7.0
+}
+
+map "MAP20"
+{
+	music = "TIME"
+	cluster = 1
+	DefaultLighting = 165
+	DefaultVisibility = 48.0
+	DefaultMaxLightVis = 42.0
+}
+
+map "MAP21"
+{
+	music = "CATACOMB"
+	cluster = 1
+	DefaultLighting = 124
+	DefaultVisibility = 24.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP22"
+{
+	music = "PLOT"
+	cluster = 1
+	DefaultLighting = 128
+	DefaultVisibility = 35.0
+	DefaultMaxLightVis = 52.0
+}
+
+map "MAP23"
+{
+	music = "GIVING"
+	cluster = 1
+	DefaultLighting = 210
+	DefaultVisibility = 8.0
+}
+
+map "MAP24"
+{
+	music = "VACCINAP"
+	cluster = 1
+	DefaultLighting = 140
+	DefaultVisibility = 22.0
+	DefaultMaxLightVis = 42.0
+}

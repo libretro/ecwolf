@@ -87,6 +87,10 @@ actor Ammo : Inventory native
 {
 }
 
+actor BackpackItem : Inventory native
+{
+}
+
 actor CustomInventory : Inventory native
 {
 }
@@ -153,6 +157,7 @@ actor PlayerPawn native
 	player.sidemove 1, 1
 	player.maxhealth 100
 	player.movebob 1.0
+	player.damagescreencolor "FF 00 00"
 	+SOLID
 	+SHOOTABLE
 	+PICKUP

@@ -58,13 +58,17 @@ class FGamemaps : public FResourceFile
 		FString		extension;
 		FString		gamemapsFile;
 		FString		mapheadFile;
+		// Gamemaps = Carmack+RLEW, Maptemp = RLEW
+		bool		carmacked;
 };
 
 FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(filename, file), Lumps(NULL), gamemapsFile(filename)
 {
 	FString path(filename);
 	int lastSlash = path.LastIndexOfAny("/\\");
-	extension = path.Mid(lastSlash+10);
+	int lastDot = path.LastIndexOf('.');
+	extension = path.Mid(lastDot+1);
+	carmacked = path.Mid(lastSlash+1, 7).CompareNoCase("maptemp") != 0;
 	path = path.Left(lastSlash+1);
 
 	File directory(path.Len() > 0 ? path : ".");
@@ -128,6 +132,7 @@ bool FGamemaps::Open(bool quiet)
 		// Make the data lump
 		FMapLump &dataLump = Lumps[i*NUM_MAP_LUMPS+1];
 		dataLump.rlewTag = rlewTag;
+		dataLump.carmackCompressed = carmacked;
 		BYTE header[PLANES*6+20];
 		Reader->Seek(offsets[i], SEEK_SET);
 		Reader->Read(&header, PLANES*6+20);
@@ -159,7 +164,8 @@ FResourceFile *CheckGamemaps(const char *filename, FileReader *file, bool quiet)
 	else
 		fname = fname.Left(8);
 
-	if(fname.Len() == 8 && fname.CompareNoCase("gamemaps") == 0) // file must be gamemaps.something
+	// File must be gamemaps.something or maptemp.something
+	if(fname.Len() == 8 && (fname.CompareNoCase("gamemaps") == 0 || fname.Left(7).CompareNoCase("maptemp") == 0))
 	{
 		FResourceFile *rf = new FGamemaps(filename, file);
 		if(rf->Open(quiet)) return rf;

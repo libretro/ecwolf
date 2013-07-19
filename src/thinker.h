@@ -84,7 +84,7 @@ extern class ThinkerList
 
 class Thinker : public DObject
 {
-	DECLARE_CLASS(Thinker, DObject)
+	DECLARE_ABSTRACT_CLASS(Thinker, DObject)
 
 	public:
 		Thinker(ThinkerList::Priority priority=ThinkerList::NORMAL);

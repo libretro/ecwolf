@@ -68,4 +68,10 @@ void I_Error(const char* format, ...);
 #define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
 #define MulScale16(x,y) (SDWORD((SQWORD(x)*SQWORD(y))>>16))
 
+#if defined(_MSC_VER) || defined(__WATCOMC__)
+#define STACK_ARGS __cdecl
+#else
+#define STACK_ARGS
+#endif
+
 #endif /* __ZDOOM_SUPPORT__ */

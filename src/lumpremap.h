@@ -49,6 +49,13 @@ class LumpRemapper
 			VSWAP
 		};
 
+		enum PSpriteType
+		{
+			PSPR_NONE,
+			PSPR_NORMAL,
+			PSPR_BLAKE
+		};
+
 		LumpRemapper(const char* extension);
 
 		void		AddFile(FResourceFile *file, Type type);
@@ -58,7 +65,7 @@ class LumpRemapper
 		static void ClearRemaps();
 		static void	LoadMap(const char* extension, const char* name, const char* data, unsigned int length);
 		static unsigned int LumpSampleRate(FResourceFile *Owner);
-		static bool	IsPSprite(int lumpnum);
+		static PSpriteType IsPSprite(int lumpnum);
 		static void	RemapAll();
 	protected:
 		bool		LoadMap();

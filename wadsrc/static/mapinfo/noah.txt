@@ -1,10 +1,9 @@
-include "mapinfo/wolfcommon.txt"
-
 gameinfo
 {
 	border = inset, "39 2D 14", "5E 42 21", "6F 4A 25"
 	borderflat = "#4A3918"
 	drawreadthis = true
+	gamecolormap = "COLORMAP"
 	gamepalette = "NOAHPAL"
 	titlepalette = "TITLEPAL"
 	finaleflat = "#B5B5B5"
@@ -24,11 +23,24 @@ gameinfo
 	translator = "xlat/noah.txt"
 	playerclasses = "NoahPlayer"
 
-	signon = "WLFSGNON"
+	highscoresfont = "SmallFont"
 	titlemusic = "NAZI_NOR"
 	scoresmusic = "ROSTER"
 	titlepage = "TITLEPIC"
 	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
+	doorsoundsequence = "DoorNormal"
+	pushwallsoundsequence = "PushwallNormal"
+	gibfactor = 1
+	menumusic = "WONDERIN"
+	finalemusic = "CORNER"
+	intermissionmusic = "ENDLEVEL"
+	titletime = 15
+	creditpage = "CREDITS"
+	pagetime = 10
+	highscoresfontcolor = "White"
+	pageindexfontcolor = "DarkYellow"
+	advisorycolor = "20 A8 FC"
+	advisorypic = "PG13"
 }
 
 adddefaultmap

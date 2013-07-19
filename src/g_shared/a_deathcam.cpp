@@ -107,7 +107,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;
 	double fadew = 320;
 	double fadeh = 200;
-	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
+	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., 0., screenWidth, fadey);
 
 	word width, height;
@@ -116,7 +116,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	py = ((200 - STATUSLINES) - height)/2;
 	VWB_DrawPropString(IntermissionFont, language["STR_SEEAGAIN"], CR_UNTRANSLATED);
 
-	FizzleFade(screenBuffer, 0, 0, screenWidth, static_cast<unsigned int>(fadeh), 70, false);
+	FizzleFade(0, 0, screenWidth, static_cast<unsigned int>(fadeh), 70, false);
 
 	A_Face(cam, cam->actor);
 

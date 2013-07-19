@@ -136,17 +136,26 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 	Height = 64;
 	LeftOffset = 32-header[0];
 	TopOffset = 64;
-	if(LumpRemapper::IsPSprite(lumpnum))
+	switch(LumpRemapper::IsPSprite(lumpnum))
 	{
-		// Magic numbers!!!
-		// Set the offset of this sprite such that it would match what it would
-		// be for on a Doom player sprite.
-		// Also scale it up 2.5 times, which is about what is needed to emulate
-		// the size of vanilla wolf within precision limits.
-		TopOffset = 4;
-		LeftOffset -= 64;
-		xScale = 2*FRACUNIT/5;
-		yScale = 2*FRACUNIT/5;
+		default: break;
+		case LumpRemapper::PSPR_NORMAL:
+			// Magic numbers!!!
+			// Set the offset of this sprite such that it would match what it would
+			// be for on a Doom player sprite.
+			// Also scale it up 2.5 times, which is about what is needed to emulate
+			// the size of vanilla wolf within precision limits.
+			TopOffset = 4;
+			LeftOffset -= 64;
+			xScale = 2*FRACUNIT/5;
+			yScale = 2*FRACUNIT/5;
+			break;
+		case LumpRemapper::PSPR_BLAKE:
+			TopOffset = -45;
+			LeftOffset -= 114;
+			xScale = 5*FRACUNIT/7;
+			yScale = 5*FRACUNIT/7;
+			break;
 	}
 
 	// Crop the height!

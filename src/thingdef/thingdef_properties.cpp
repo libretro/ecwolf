@@ -39,6 +39,7 @@
 #include "scanner.h"
 #include "thingdef/thingdef_type.h"
 #include "thingdef/thingdef_expression.h"
+#include "v_video.h"
 
 #define IS_EXPR(no) params[no].isExpression
 #define EXPR_PARAM(var, no) ExpressionNode *var = params[no].expr;
@@ -84,6 +85,18 @@ HANDLE_PROPERTY(attacksound)
 {
 	STRING_PARAM(snd, 0);
 	defaults->attacksound = snd;
+}
+
+HANDLE_PROPERTY(backpackamount)
+{
+	INT_PARAM(amount, 0);
+	((AAmmo*)defaults)->Backpackamount = amount;
+}
+
+HANDLE_PROPERTY(backpackmaxamount)
+{
+	INT_PARAM(maxamount, 0);
+	((AAmmo*)defaults)->Backpackmaxamount = maxamount;
 }
 
 HANDLE_PROPERTY(bobrangex)
@@ -146,6 +159,12 @@ HANDLE_PROPERTY(damage)
 		EXPR_PARAM(dmg, 0);
 		cls->Meta.SetMetaInt(AMETA_Damage, AActor::damageExpressions.Push(dmg));
 	}
+}
+
+HANDLE_PROPERTY(damagescreencolor)
+{
+    STRING_PARAM(dmgcolor, 0);
+    ((APlayerPawn *)defaults)->damagecolor = V_GetColorFromString(NULL, dmgcolor);
 }
 
 HANDLE_PROPERTY(deathsound)
@@ -509,11 +528,14 @@ extern const PropDef properties[] =
 	DEFINE_PROP(ammouse1, Weapon, I),
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
+	DEFINE_PROP(backpackamount, Ammo, I),
+	DEFINE_PROP(backpackmaxamount, Ammo, I),
 	DEFINE_PROP(bobrangex, Weapon, F),
 	DEFINE_PROP(bobrangey, Weapon, F),
 	DEFINE_PROP(bobspeed, Weapon, F),
 	DEFINE_PROP(bobstyle, Weapon, S),
 	DEFINE_PROP(damage, Actor, I),
+	DEFINE_PROP_PREFIX(damagescreencolor, Actor, Player, S),
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),

@@ -124,21 +124,26 @@ int FMapLump::FillCache()
 	unsigned char* output = reinterpret_cast<unsigned char*>(Cache+HEADERSIZE);
 	for(unsigned int i = 0;i < PLANES;++i)
 	{
-		unsigned char* input = new unsigned char[Header.PlaneLength[i]];
-		Owner->Reader->Seek(Header.PlaneOffset[i], SEEK_SET);
-		Owner->Reader->Read(input, Header.PlaneLength[i]);
-
-		if(carmackCompressed)
+		if(Header.PlaneLength[i])
 		{
-			unsigned char* tempOut = new unsigned char[ReadLittleShort((BYTE*)input)];
-			ExpandCarmack(input, tempOut);
-			ExpandRLEW(tempOut+2, output, ReadLittleShort((const BYTE*)tempOut), rlewTag);
-			delete[] tempOut;
+			unsigned char* input = new unsigned char[Header.PlaneLength[i]];
+			Owner->Reader->Seek(Header.PlaneOffset[i], SEEK_SET);
+			Owner->Reader->Read(input, Header.PlaneLength[i]);
+
+			if(carmackCompressed)
+			{
+				unsigned char* tempOut = new unsigned char[ReadLittleShort((BYTE*)input)];
+				ExpandCarmack(input, tempOut);
+				ExpandRLEW(tempOut+2, output, ReadLittleShort((const BYTE*)tempOut), rlewTag);
+				delete[] tempOut;
+			}
+			else
+				ExpandRLEW(input, output, PlaneSize, rlewTag);
+
+			delete[] input;
 		}
 		else
-			ExpandRLEW(input, output, PlaneSize, rlewTag);
-
-		delete[] input;
+			memset(output, 0, PlaneSize);
 		output += PlaneSize;
 
 		// RTL maps don't have a floor/ceiling texture plane so insert one

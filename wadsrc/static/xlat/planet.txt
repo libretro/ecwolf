@@ -1,0 +1,785 @@
+enable globalmeta;
+
+tiles
+{
+	tile 1
+	{
+		texturenorth = "PRIWALA1";
+		texturesouth = "PRIWALA1";
+		textureeast = "PRIWALA2";
+		texturewest = "PRIWALA2";
+	}
+	tile 2
+	{
+		texturenorth = "PRIWALB1";
+		texturesouth = "PRIWALB1";
+		textureeast = "PRIWALB2";
+		texturewest = "PRIWALB2";
+	}
+	tile 3
+	{
+		texturenorth = "PIPINGA1";
+		texturesouth = "PIPINGA1";
+		textureeast = "PIPINGA2";
+		texturewest = "PIPINGA2";
+	}
+	tile 4
+	{
+		texturenorth = "PIPINGB1";
+		texturesouth = "PIPINGB1";
+		textureeast = "PIPINGB2";
+		texturewest = "PIPINGB2";
+	}
+	tile 5
+	{
+		texturenorth = "PIPINGC1";
+		texturesouth = "PIPINGC1";
+		textureeast = "PIPINGC2";
+		texturewest = "PIPINGC2";
+	}
+	tile 6
+	{
+		texturenorth = "PRIBLDA1";
+		texturesouth = "PRIBLDA1";
+		textureeast = "PRIBLDA2";
+		texturewest = "PRIBLDA2";
+	}
+	tile 7
+	{
+		texturenorth = "PIPHORA1";
+		texturesouth = "PIPHORA1";
+		textureeast = "PIPHORA2";
+		texturewest = "PIPHORA2";
+	}
+	tile 8
+	{
+		texturenorth = "PIPHORB1";
+		texturesouth = "PIPHORB1";
+		textureeast = "PIPHORB2";
+		texturewest = "PIPHORB2";
+	}
+	tile 9
+	{
+		texturenorth = "PRIVENA1";
+		texturesouth = "PRIVENA1";
+		textureeast = "PRIVENA2";
+		texturewest = "PRIVENA2";
+	}
+	tile 10
+	{
+		texturenorth = "PRILITE1";
+		texturesouth = "PRILITE1";
+		textureeast = "PRILITE2";
+		texturewest = "PRILITE2";
+	}
+	tile 11
+	{
+		texturenorth = "INSLITE1";
+		texturesouth = "INSLITE1";
+		textureeast = "INSLITE2";
+		texturewest = "INSLITE2";
+	}
+	tile 12
+	{
+		texturenorth = "INSWALA1";
+		texturesouth = "INSWALA1";
+		textureeast = "INSWALA2";
+		texturewest = "INSWALA2";
+	}
+	tile 13
+	{
+		texturenorth = "BZCRATE1";
+		texturesouth = "BZCRATE1";
+		textureeast = "BZCRATE2";
+		texturewest = "BZCRATE2";
+	}
+	tile 14
+	{
+		texturenorth = "PRISPAN1";
+		texturesouth = "PRISPAN1";
+		textureeast = "PRISPAN2";
+		texturewest = "PRISPAN2";
+	}
+	tile 15
+	{
+		texturenorth = "FOODBEV1";
+		texturesouth = "FOODBEV1";
+		textureeast = "FOODBEV2";
+		texturewest = "FOODBEV2";
+	}
+	tile 16
+	{
+		texturenorth = "METPNLA1";
+		texturesouth = "METPNLA1";
+		textureeast = "METPNLA2";
+		texturewest = "METPNLA2";
+	}
+	tile 17
+	{
+		texturenorth = "CONSBIO1";
+		texturesouth = "CONSBIO1";
+		textureeast = "CONSBIO2";
+		texturewest = "CONSBIO2";
+	}
+	tile 18
+	{
+		texturenorth = "FOODSNK1";
+		texturesouth = "FOODSNK1";
+		textureeast = "FOODSNK2";
+		texturewest = "FOODSNK2";
+	}
+	tile 19
+	{
+		texturenorth = "METLITE1";
+		texturesouth = "METLITE1";
+		textureeast = "METLITE2";
+		texturewest = "METLITE2";
+	}
+	tile 20
+	{
+		texturenorth = "METWALL1";
+		texturesouth = "METWALL1";
+		textureeast = "METWALL2";
+		texturewest = "METWALL2";
+	}
+	tile 21
+	{
+		texturenorth = "TELEMAP1";
+		texturesouth = "TELEMAP1";
+		textureeast = "TELEMAP2";
+		texturewest = "TELEMAP2";
+	}
+	tile 22
+	{
+		texturenorth = "ELEVWAL1";
+		texturesouth = "ELEVWAL1";
+		textureeast = "ELEVWAL2";
+		texturewest = "ELEVWAL2";
+	}
+	tile 23
+	{
+		texturenorth = "CONSWIR1";
+		texturesouth = "CONSWIR1";
+		textureeast = "CONSWIR2";
+		texturewest = "CONSWIR2";
+	}
+	tile 24
+	{
+		texturenorth = "PLASMSP1";
+		texturesouth = "PLASMSP1";
+		textureeast = "PLASMSP2";
+		texturewest = "PLASMSP2";
+	}
+	tile 25
+	{
+		texturenorth = "PIPBARA1";
+		texturesouth = "PIPBARA1";
+		textureeast = "PIPBARA2";
+		texturewest = "PIPBARA2";
+	}
+	tile 26
+	{
+		texturenorth = "PIPBARB1";
+		texturesouth = "PIPBARB1";
+		textureeast = "PIPBARB2";
+		texturewest = "PIPBARB2";
+	}
+	tile 27
+	{
+		texturenorth = "CONSPIP1";
+		texturesouth = "CONSPIP1";
+		textureeast = "CONSPIP2";
+		texturewest = "CONSPIP2";
+	}
+	tile 28
+	{
+		texturenorth = "CONSDAT1";
+		texturesouth = "CONSDAT1";
+		textureeast = "CONSDAT2";
+		texturewest = "CONSDAT2";
+	}
+	tile 29
+	{
+		texturenorth = "PNKWALA1";
+		texturesouth = "PNKWALA1";
+		textureeast = "PNKWALA2";
+		texturewest = "PNKWALA2";
+	}
+	tile 30
+	{
+		texturenorth = "PNKWALB1";
+		texturesouth = "PNKWALB1";
+		textureeast = "PNKWALB2";
+		texturewest = "PNKWALB2";
+	}
+	tile 31
+	{
+		texturenorth = "ELEVEMB1";
+		texturesouth = "ELEVEMB1";
+		textureeast = "ELEVEMB2";
+		texturewest = "ELEVEMB2";
+	}
+	tile 32
+	{
+		texturenorth = "TELEPOR1";
+		texturesouth = "TELEPOR1";
+		textureeast = "TELEPOR2";
+		texturewest = "TELEPOR2";
+	}
+	tile 33
+	{
+		texturenorth = "INSDANG1";
+		texturesouth = "INSDANG1";
+		textureeast = "INSDANG2";
+		texturewest = "INSDANG2";
+	}
+	tile 34
+	{
+		texturenorth = "SHCRATE1";
+		texturesouth = "SHCRATE1";
+		textureeast = "SHCRATE2";
+		texturewest = "SHCRATE2";
+	}
+	tile 35
+	{
+		texturenorth = "BIOTECH1";
+		texturesouth = "BIOTECH1";
+		textureeast = "BIOTECH2";
+		texturewest = "BIOTECH2";
+	}
+	tile 36
+	{
+		texturenorth = "BIOEMBL1";
+		texturesouth = "BIOEMBL1";
+		textureeast = "BIOEMBL2";
+		texturewest = "BIOEMBL2";
+	}
+	tile 37
+	{
+		texturenorth = "PRIVENB1";
+		texturesouth = "PRIVENB1";
+		textureeast = "PRIVENB2";
+		texturewest = "PRIVENB2";
+	}
+	tile 38
+	{
+		texturenorth = "METPNLB1";
+		texturesouth = "METPNLB1";
+		textureeast = "METPNLB2";
+		texturewest = "METPNLB2";
+	}
+	tile 39
+	{
+		texturenorth = "METPNLC1";
+		texturesouth = "METPNLC1";
+		textureeast = "METPNLC2";
+		texturewest = "METPNLC2";
+	}
+	tile 40
+	{
+		texturenorth = "BIOLITE1";
+		texturesouth = "BIOLITE1";
+		textureeast = "BIOLITE2";
+		texturewest = "BIOLITE2";
+	}
+	tile 41
+	{
+		texturenorth = "METTECH1";
+		texturesouth = "METTECH1";
+		textureeast = "METTECH2";
+		texturewest = "METTECH2";
+	}
+	tile 42
+	{
+		texturenorth = "PLNWALA1";
+		texturesouth = "PLNWALA1";
+		textureeast = "PLNWALA2";
+		texturewest = "PLNWALA2";
+	}
+	tile 43
+	{
+		texturenorth = "PLNWALB1";
+		texturesouth = "PLNWALB1";
+		textureeast = "PLNWALB2";
+		texturewest = "PLNWALB2";
+	}
+	tile 44
+	{
+		texturenorth = "PLNWALC1";
+		texturesouth = "PLNWALC1";
+		textureeast = "PLNWALC2";
+		texturewest = "PLNWALC2";
+	}
+	tile 45
+	{
+		texturenorth = "SWITCHA1";
+		texturesouth = "SWITCHA1";
+		textureeast = "SWITCHA2";
+		texturewest = "SWITCHA2";
+	}
+	tile 46
+	{
+		texturenorth = "BIOWALA1";
+		texturesouth = "BIOWALA1";
+		textureeast = "BIOWALA2";
+		texturewest = "BIOWALA2";
+	}
+	tile 47
+	{
+		texturenorth = "CONSPLN1";
+		texturesouth = "CONSPLN1";
+		textureeast = "CONSPLN2";
+		texturewest = "CONSPLN2";
+	}
+	tile 48
+	{
+		texturenorth = "BIOWALB1";
+		texturesouth = "BIOWALB1";
+		textureeast = "BIOWALB2";
+		texturewest = "BIOWALB2";
+	}
+	tile 49
+	{
+		texturenorth = "BIODANG1";
+		texturesouth = "BIODANG1";
+		textureeast = "BIODANG2";
+		texturewest = "BIODANG2";
+	}
+	tile 50
+	{
+		texturenorth = "BIOWALC1";
+		texturesouth = "BIOWALC1";
+		textureeast = "BIOWALC2";
+		texturewest = "BIOWALC2";
+	}
+	tile 51
+	{
+		texturenorth = "GLDLITE1";
+		texturesouth = "GLDLITE1";
+		textureeast = "GLDLITE2";
+		texturewest = "GLDLITE2";
+	}
+	tile 52
+	{
+		texturenorth = "GLDEMBL1";
+		texturesouth = "GLDEMBL1";
+		textureeast = "GLDEMBL2";
+		texturewest = "GLDEMBL2";
+	}
+	tile 53
+	{
+		texturenorth = "GLDWALA1";
+		texturesouth = "GLDWALA1";
+		textureeast = "GLDWALA2";
+		texturewest = "GLDWALA2";
+	}
+	tile 54
+	{
+		texturenorth = "PNKWALC1";
+		texturesouth = "PNKWALC1";
+		textureeast = "PNKWALC2";
+		texturewest = "PNKWALC2";
+	}
+	tile 55
+	{
+		texturenorth = "PNKWALD1";
+		texturesouth = "PNKWALD1";
+		textureeast = "PNKWALD2";
+		texturewest = "PNKWALD2";
+	}
+	tile 56
+	{
+		texturenorth = "PNKWALE1";
+		texturesouth = "PNKWALE1";
+		textureeast = "PNKWALE2";
+		texturewest = "PNKWALE2";
+	}
+	tile 57
+	{
+		texturenorth = "SWITCHI1";
+		texturesouth = "SWITCHI1";
+		textureeast = "SWITCHI2";
+		texturewest = "SWITCHI2";
+	}
+	tile 58
+	{
+		texturenorth = "GLDWALB1";
+		texturesouth = "GLDWALB1";
+		textureeast = "GLDWALB2";
+		texturewest = "GLDWALB2";
+	}
+	tile 59
+	{
+		texturenorth = "INSWALB1";
+		texturesouth = "INSWALB1";
+		textureeast = "INSWALB2";
+		texturewest = "INSWALB2";
+	}
+	tile 60
+	{
+		texturenorth = "GLDCOMM1";
+		texturesouth = "GLDCOMM1";
+		textureeast = "GLDCOMM2";
+		texturewest = "GLDCOMM2";
+	}
+	tile 61
+	{
+		texturenorth = "INSEMBL1";
+		texturesouth = "INSEMBL1";
+		textureeast = "INSEMBL2";
+		texturewest = "INSEMBL2";
+	}
+	tile 62
+	{
+		texturenorth = "PLNWALD1";
+		texturesouth = "PLNWALD1";
+		textureeast = "PLNWALD2";
+		texturewest = "PLNWALD2";
+	}
+	tile 63
+	{
+		texturenorth = "PLNEMBL1";
+		texturesouth = "PLNEMBL1";
+		textureeast = "PLNEMBL2";
+		texturewest = "PLNEMBL2";
+	}
+	tile 88
+	{
+		texturenorth = "JAMBIO1";
+		texturesouth = "JAMBIO1";
+		textureeast = "DBIOU2";
+		texturewest = "DBIOU2";
+		offsetvertical = true;
+	}
+	tile 89
+	{
+		texturenorth = "DBIOU1";
+		texturesouth = "DBIOU1";
+		textureeast = "JAMBIO2";
+		texturewest = "JAMBIO2";
+		offsethorizontal = true;
+	}
+	tile 90
+	{
+		texturenorth = "JAMSPCB1";
+		texturesouth = "JAMSPCB1";
+		textureeast = "DMETALU2";
+		texturewest = "DMETALU2";
+		offsetvertical = true;
+	}
+	tile 91
+	{
+		texturenorth = "DMETALU1";
+		texturesouth = "DMETALU1";
+		textureeast = "JAMSPCB2";
+		texturewest = "JAMSPCB2";
+		offsethorizontal = true;
+	}
+	tile 92
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DPRISNU2";
+		texturewest = "DPRISNU2";
+		offsetvertical = true;
+	}
+	tile 93
+	{
+		texturenorth = "DPRISNU1";
+		texturesouth = "DPRISNU1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 94
+	{
+		texturenorth = "JAMSPCB1";
+		texturesouth = "JAMSPCB1";
+		textureeast = "DELEVU2";
+		texturewest = "DELEVU2";
+		offsetvertical = true;
+	}
+	tile 95
+	{
+		texturenorth = "DELEVU1";
+		texturesouth = "DELEVU1";
+		textureeast = "JAMSPCB2";
+		texturewest = "JAMSPCB2";
+		offsethorizontal = true;
+	}
+	tile 96
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DHSECU2";
+		texturewest = "DHSECU2";
+		offsetvertical = true;
+	}
+	tile 97
+	{
+		texturenorth = "DHSECU1";
+		texturesouth = "DHSECU1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 98
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DONEWYU2";
+		texturewest = "DOWEXIT2";
+		offsetvertical = true;
+	}
+	tile 99
+	{
+		texturenorth = "DOWEXIT1";
+		texturesouth = "DONEWYU1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 100
+	{
+		texturenorth = "JAMSTEL1";
+		texturesouth = "JAMSTEL1";
+		textureeast = "DOWEXIT2";
+		texturewest = "DONEWYU2";
+		offsetvertical = true;
+	}
+	tile 101
+	{
+		texturenorth = "DONEWYU1";
+		texturesouth = "DOWEXIT1";
+		textureeast = "JAMSTEL2";
+		texturewest = "JAMSTEL2";
+		offsethorizontal = true;
+	}
+	tile 102
+	{
+		texturenorth = "JAMOFFC1";
+		texturesouth = "JAMOFFC1";
+		textureeast = "DOFFICU2";
+		texturewest = "DOFFICU2";
+		offsetvertical = true;
+	}
+	tile 103
+	{
+		texturenorth = "DOFFICU1";
+		texturesouth = "DOFFICU1";
+		textureeast = "JAMOFFC2";
+		texturewest = "JAMOFFC2";
+		offsethorizontal = true;
+	}
+	tile 104
+	{
+		texturenorth = "JAMSPCA1";
+		texturesouth = "JAMSPCA1";
+		textureeast = "DSPACEU2";
+		texturewest = "DSPACEU2";
+		offsetvertical = true;
+	}
+	tile 105
+	{
+		texturenorth = "DSPACEU1";
+		texturesouth = "DSPACEU1";
+		textureeast = "JAMSPCA2";
+		texturewest = "JAMSPCA2";
+		offsethorizontal = true;
+	}
+
+	modzone 106 fillzone ambush;
+
+	zone 108 {}
+	zone 109 {}
+	zone 110 {}
+	zone 111 {}
+	zone 112 {}
+	zone 113 {}
+	zone 114 {}
+	zone 115 {}
+	zone 116 {}
+	zone 117 {}
+	zone 118 {}
+	zone 119 {}
+	zone 120 {}
+	zone 121 {}
+	zone 122 {}
+	zone 123 {}
+	zone 124 {}
+	zone 125 {}
+	zone 126 {}
+	zone 127 {}
+	zone 128 {}
+	zone 129 {}
+	zone 130 {}
+	zone 131 {}
+	zone 132 {}
+	zone 133 {}
+	zone 134 {}
+	zone 135 {}
+	zone 136 {}
+	zone 137 {}
+	zone 138 {}
+	zone 139 {}
+	zone 140 {}
+	zone 141 {}
+	zone 142 {}
+	zone 143 {}
+	zone 144 {}
+	zone 145 {}
+	zone 146 {}
+	zone 147 {}
+	zone 148 {}
+	zone 149 {}
+	zone 150 {}
+	zone 151 {}
+	zone 152 {}
+}
+
+things
+{
+	// oldnum, newnum, angles, patrol, minskill
+	{19,	1,		4,	0,	0}
+	{23,	206,	0,	0,	0}
+	{24,	207,	0,	0,	0}
+	{25,	208,	0,	0,	0}
+	{26,	209,	0,	0,	0}
+	{27,	210,	0,	0,	0}
+	{28,	211,	0,	0,	0}
+	{29,	212,	0,	0,	0}
+	{30,	213,	0,	0,	0}
+	{31,	214,	0,	0,	0}
+	{32,	215,	0,	0,	0}
+	{33,	216,	0,	0,	0}
+	{34,	217,	0,	0,	0}
+	{35,	218,	0,	0,	0}
+	{36,	219,	0,	0,	0}
+	{37,	220,	0,	0,	0}
+	{38,	221,	0,	0,	0}
+	{39,	222,	0,	0,	0}
+	{40,	223,	0,	0,	0}
+	{41,	224,	0,	0,	0}
+	{42,	225,	0,	0,	0}
+	{43,	226,	0,	0,	0}
+	{44,	227,	0,	0,	0}
+	{45,	228,	0,	0,	0}
+	{46,	229,	0,	0,	0}
+	{47,	230,	0,	0,	0}
+	{48,	231,	0,	0,	0}
+	{49,	232,	0,	0,	0}
+	{50,	233,	0,	0,	0}
+	{51,	234,	0,	0,	0}
+	{52,	235,	0,	0,	0}
+	{53,	236,	0,	0,	0}
+	{54,	237,	0,	0,	0}
+	{55,	238,	0,	0,	0}
+	{56,	239,	0,	0,	0}
+	{57,	240,	0,	0,	0}
+	{58,	241,	0,	0,	0}
+	{59,	242,	0,	0,	0}
+	{60,	243,	0,	0,	0}
+	{61,	244,	0,	0,	0}
+	{62,	245,	0,	0,	0}
+	{63,	246,	0,	0,	0}
+	{64,	247,	0,	0,	0}
+	{65,	248,	0,	0,	0}
+	{66,	249,	0,	0,	0}
+	{67,	250,	0,	0,	0}
+	{68,	251,	0,	0,	0}
+	{69,	252,	0,	0,	0}
+	{70,	253,	0,	0,	0}
+	{71,	254,	0,	0,	0}
+	{72,	255,	0,	0,	0}
+	{73,	256,	0,	0,	0}
+	{74,	257,	0,	0,	0}
+	{75,	258,	0,	0,	0}
+	{76,	259,	0,	0,	0}
+	{77,	260,	0,	0,	0}
+	{78,	261,	0,	0,	0}
+	// Intentionally left blank
+	{80,	262,	0,	0,	0}
+	{81,	263,	0,	0,	0}
+	{82,	264,	0,	0,	0}
+	{83,	265,	0,	0,	0}
+	{84,	266,	0,	0,	0}
+	{85,	267,	0,	0,	0}
+	{86,	268,	0,	0,	0}
+	{87,	269,	0,	0,	0}
+	{88,	270,	0,	0,	0}
+	{381,	271,	0,	0,	0}
+	{382,	272,	0,	0,	0}
+	{383,	273,	0,	0,	0}
+	{384,	274,	0,	0,	0}
+	{385,	275,	0,	0,	0}
+	{386,	276,	0,	0,	0}
+	{387,	277,	0,	0,	0}
+	{388,	278,	0,	0,	0}
+	{390,	279,	0,	0,	0}
+	{391,	280,	0,	0,	0}
+	{392,	281,	0,	0,	0}
+	{393,	282,	0,	0,	0}
+	{394,	283,	0,	0,	0}
+	{395,	284,	0,	0,	0}
+	{396,	285,	0,	0,	0}
+	{397,	286,	0,	0,	0}
+	{398,	287,	0,	0,	0}
+	{399,	288,	0,	0,	0}
+	{400,	289,	0,	0,	0}
+	{401,	290,	0,	0,	0}
+	{402,	291,	0,	0,	0}
+	{403,	292,	0,	0,	0}
+	{404,	293,	0,	0,	0}
+	{405,	294,	0,	0,	0}
+	{406,	295,	0,	0,	0}
+	{407,	296,	0,	0,	0}
+	{408,	297,	0,	0,	0}
+	{409,	298,	0,	0,	0}
+	{410,	299,	0,	0,	0}
+	{411,	300,	0,	0,	0}
+	{412,	301,	0,	0,	0}
+	{413,	302,	0,	0,	0}
+	{414,	303,	0,	0,	0}
+	{415,	304,	0,	0,	0}
+	{416,	305,	0,	0,	0}
+	{417,	306,	0,	0,	0}
+	{418,	307,	0,	0,	0}
+	{419,	308,	0,	0,	0}
+	{420,	309,	0,	0,	0}
+	{421,	310,	0,	0,	0}
+	{422,	311,	0,	0,	0}
+	{423,	312,	0,	0,	0}
+	{424,	313,	0,	0,	0}
+	{486,	315,	0,	0,	0}
+	{487,	316,	0,	0,	0}
+	{488,	317,	0,	0,	0}
+	{489,	318,	0,	0,	0}
+	{490,	319,	0,	0,	0}
+	{491,	320,	0,	0,	0}
+	{492,	321,	0,	0,	0}
+	{493,	322,	0,	0,	0}
+	{494,	323,	0,	0,	0}
+	{495,	324,	0,	0,	0}
+}
+
+flats
+{
+	ceiling
+	{
+		"F_GRYBIG"=1, "F_SQNORM", "F_GRYTIL", "F_BRNTIL", "F_BLUTIL", "F_GRYCIR",
+		"F_SQLITC", "F_METALS", "F_OCTTEK", "F_GRYPN1", "F_OCTOS", "F_TRIPNL",
+		"F_GRYPN2", "F_TRILIT", "F_TEKGLO", "F_TEKFRM", "F_CRSCYN", "F_CRSPNK",
+		"F_PNKTIL", "F_GRDIAG", "F_SQLITY", "F_SQLITR", "F_OCTHOL", "F_OCTLIT",
+		"F_GRNBIG", "F_YLOTIL", "F_CYNTIL", "F_BLUCIR", "F_GRNCIR", "F_BLUPNL",
+		"F_YLOPNL", "F_OCTPNK"
+	}
+	floor
+	{
+		"F_GRYBIG"=1, "F_SQNORM", "F_GRYTIL", "F_BRNTIL", "F_BLUTIL", "F_GRYCIR",
+		"F_SQLITC", "F_METALS", "F_OCTTEK", "F_GRYPN1", "F_OCTOS", "F_TRIPNL",
+		"F_GRYPN2", "F_TRILIT", "F_TEKGLO", "F_TEKFRM", "F_CRSCYN", "F_CRSPNK",
+		"F_PNKTIL", "F_GRDIAG", "F_SQLITY", "F_SQLITR", "F_OCTHOL", "F_OCTLIT",
+		"F_GRNBIG", "F_YLOTIL", "F_CYNTIL", "F_BLUCIR", "F_GRNCIR", "F_BLUPNL",
+		"F_YLOPNL", "F_OCTPNK"
+	}
+}

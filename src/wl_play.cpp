@@ -650,67 +650,8 @@ void ContinueMusic (int offs)
 #define WHITESTEPS      20
 #define WHITETICS       6
 
-
-SDL_Color redshifts[NUMREDSHIFTS][256];
-SDL_Color whiteshifts[NUMWHITESHIFTS][256];
-
 int damagecount, bonuscount;
 bool palshifted;
-
-/*
-=====================
-=
-= InitRedShifts
-=
-=====================
-*/
-
-void InitRedShifts (void)
-{
-	SDL_Color *workptr, *baseptr;
-	int i, j, delta;
-
-
-//
-// fade through intermediate frames
-//
-	for (i = 1; i <= NUMREDSHIFTS; i++)
-	{
-		workptr = redshifts[i - 1];
-		baseptr = gamepal;
-
-		for (j = 0; j <= 255; j++)
-		{
-			delta = 256 - baseptr->r;
-			workptr->r = baseptr->r + delta * i / REDSTEPS;
-			delta = -baseptr->g;
-			workptr->g = baseptr->g + delta * i / REDSTEPS;
-			delta = -baseptr->b;
-			workptr->b = baseptr->b + delta * i / REDSTEPS;
-			baseptr++;
-			workptr++;
-		}
-	}
-
-	for (i = 1; i <= NUMWHITESHIFTS; i++)
-	{
-		workptr = whiteshifts[i - 1];
-		baseptr = gamepal;
-
-		for (j = 0; j <= 255; j++)
-		{
-			delta = 256 - baseptr->r;
-			workptr->r = baseptr->r + delta * i / WHITESTEPS;
-			delta = 248 - baseptr->g;
-			workptr->g = baseptr->g + delta * i / WHITESTEPS;
-			delta = 0-baseptr->b;
-			workptr->b = baseptr->b + delta * i / WHITESTEPS;
-			baseptr++;
-			workptr++;
-		}
-	}
-}
-
 
 /*
 =====================
@@ -795,18 +736,20 @@ void UpdatePaletteShifts (void)
 
 	if (red)
 	{
-		VL_SetBlend(0xFF, 0x00, 0x00, red*(174/NUMREDSHIFTS));
+		V_SetBlend(RPART(players[0].mo->damagecolor),
+                             GPART(players[0].mo->damagecolor),
+                             BPART(players[0].mo->damagecolor), red*(174/NUMREDSHIFTS));
 		palshifted = true;
 	}
 	else if (white)
 	{
 		// [BL] More of a yellow if you ask me.
-		VL_SetBlend(0xFF, 0xF8, 0x00, white*(38/NUMWHITESHIFTS));
+		V_SetBlend(0xFF, 0xF8, 0x00, white*(38/NUMWHITESHIFTS));
 		palshifted = true;
 	}
 	else if (palshifted)
 	{
-		VL_SetBlend(0, 0, 0, 0);
+		V_SetBlend(0, 0, 0, 0);
 		palshifted = false;
 	}
 }
@@ -826,7 +769,8 @@ void FinishPaletteShifts (void)
 {
 	if (palshifted)
 	{
-		VL_SetBlend(0, 0, 0, 0, true);
+		V_SetBlend(0, 0, 0, 0);
+		VH_UpdateScreen();
 		palshifted = false;
 	}
 }
@@ -884,6 +828,9 @@ void PlayLoop (void)
 		{
 			++gamestate.TimeCount;
 			thinkerList->Tick();
+
+			if(i == 0) // After the first tic, go ahead and take care of button holding.
+				memcpy(buttonheld, buttonstate, sizeof (buttonstate));
 		}
 
 		UpdatePaletteShifts ();

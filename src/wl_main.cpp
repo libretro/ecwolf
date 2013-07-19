@@ -41,6 +41,7 @@
 #include "dobject.h"
 #include "colormatcher.h"
 #include "version.h"
+#include "r_2d/r_main.h"
 
 /*
 =============================================================================
@@ -348,9 +349,12 @@ static void CollectGC()
 	GC::DelSoftRootHead();
 }
 
-static void DrawStartupConsole()
+static bool DrawStartupConsole()
 {
 	static const char* const tempString = "          " GAMENAME " " DOTVERSIONSTR_NOREV "\n\n\nTo be replaced with console...\n\n  The memory thing was just\n     for show anyways.";
+
+	if(gameinfo.SignonLump.IsEmpty())
+		return false;
 
 	CA_CacheScreen(TexMan(gameinfo.SignonLump));
 
@@ -359,8 +363,11 @@ static void DrawStartupConsole()
 	px = 160-width/2;
 	py = 76+62-height/2;
 	VWB_DrawPropString(ConFont, tempString, CR_GRAY);
+
+	return true;
 }
 
+void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
@@ -370,6 +377,12 @@ static void InitGame()
 		exit(1);
 	}
 	atterm(SDL_Quit);
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+#else
+	SDL_WM_SetCaption("ECWolf " DOTVERSIONSTR, NULL);
+#endif
+	SDL_ShowCursor(SDL_DISABLE);
 
 	int numJoysticks = SDL_NumJoysticks();
 	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
@@ -427,6 +440,9 @@ static void InitGame()
 	ClassDef::LoadActors();
 	atterm(CollectGC);
 
+	// I_ShutdownGraphics needs to be run before the class definitions are unloaded.
+	atterm (I_ShutdownGraphics);
+
 	// Parse non-gameinfo sections in MAPINFO
 	G_ParseMapInfo(false);
 
@@ -451,11 +467,6 @@ static void InitGame()
 //
 	FinalReadConfig();
 
-//
-// initialize variables
-//
-	InitRedShifts ();
-
 // Temporary status bar config
 	SetupStatusbar();
 
@@ -468,11 +479,15 @@ static void InitGame()
 // Finish signon screen
 //
 	VL_SetVGAPlaneMode();
-	DrawStartupConsole();
-	VH_UpdateScreen();
+	if(DrawStartupConsole())
+	{
+		VH_UpdateScreen();
 
-	if (!param_nowait)
-		IN_UserInput(70*4);
+		if (!param_nowait)
+			IN_UserInput(70*4);
+	}
+	else // Delay for a moment to allow the user to enter the jukebox if desired
+		IN_UserInput(16);
 
 //
 // HOLDING DOWN 'M' KEY?
@@ -541,7 +556,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	{
 		viewscreenx = (screenWidth-viewwidth) / 2;
 		viewscreeny = (statusbary-viewheight)/2;
-		screenofs = viewscreeny*bufferPitch+viewscreenx;
+		screenofs = viewscreeny*SCREENPITCH+viewscreenx;
 	}
 
 	int virtheight = screenHeight;
@@ -1298,6 +1313,8 @@ int main (int argc, char *argv[])
 		}
 
 		InitThinkerList();
+
+		R_InitRenderer();
 
 		printf("InitGame: Setting up the game...\n");
 		InitGame();

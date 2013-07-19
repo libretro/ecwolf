@@ -76,6 +76,19 @@ class AAmmo : public AInventory
 		const ClassDef	*GetAmmoType();
 		bool			HandlePickup(AInventory *item, bool &good);
 
+		unsigned int	Backpackamount;
+		unsigned int	Backpackmaxamount;
+	protected:
+		AInventory		*CreateCopy(AActor *holder);
+};
+
+class ABackpackItem : public AInventory
+{
+	DECLARE_NATIVE_CLASS(BackpackItem, Inventory)
+
+	public:
+		bool			HandlePickup(AInventory *item, bool &good);
+
 	protected:
 		AInventory		*CreateCopy(AActor *holder);
 };

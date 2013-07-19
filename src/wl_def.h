@@ -54,6 +54,7 @@ typedef int64_t SQWORD;
 typedef void * memptr;
 typedef uint32_t uint32;
 typedef uint32_t BITFIELD;
+typedef int INTBOOL;
 
 // Screenshot buffer image data types
 enum ESSType
@@ -71,9 +72,13 @@ void Quit(const char *errorStr, ...);
 
 #define abs(x) ABS(x)
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #define stricmp _stricmp
 #endif
+
+typedef double real64;
+typedef SDWORD int32;
+#include "xs_Float.h"
 
 /*
 =============================================================================
@@ -85,7 +90,7 @@ void Quit(const char *errorStr, ...);
 
 #define MAXPLAYERS		8 // You wish! :P  (This is just here to satisfy ZDoom stuff)
 #define BODYQUESIZE		32
-#define NUMCOLORMAPS	32
+#define NUMCOLORMAPS	64
 
 #define TICRATE 70
 #define MAXTICS 10

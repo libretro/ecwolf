@@ -219,6 +219,11 @@ treasure/spear2/pickup	{ DSSPEAR2 ALSPEAR PCSPEAR }
 
 // ------ Super 3D Noah's Ark ------
 
+$ifnoah
+// Kill hitwall sound in Noah's Ark
+world/hitwall NULL
+$endif
+
 misc/i_pkup				{ DSITEMUP ALITEMUP PCITEMUP }
 
 weapon/sling/attack			{ DSSLING ALSLING PCSLING }

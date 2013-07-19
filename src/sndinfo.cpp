@@ -36,6 +36,7 @@
 #include "m_swap.h"
 #include "m_random.h"
 #include "id_sd.h"
+#include "wl_iwad.h"
 #include "w_wad.h"
 #include "scanner.h"
 #include "zdoomsupport.h"
@@ -243,12 +244,18 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 	Scanner sc((const char*)(lump.GetMem()), lump.GetSize());
 	sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpNum));
 
+	unsigned int excludeDepth = 0; // $if $endif
 	while(sc.TokensLeft() != 0)
 	{
 		if(sc.CheckToken('$'))
 		{
 			sc.MustGetToken(TK_Identifier);
-			if(sc->str.CompareNoCase("alias") == 0 || sc->str.CompareNoCase("random") == 0)
+			if(excludeDepth)
+			{
+				if(sc->str.CompareNoCase("endif") == 0)
+					--excludeDepth;
+			}
+			else if(sc->str.CompareNoCase("alias") == 0 || sc->str.CompareNoCase("random") == 0)
 			{
 				bool isRandom = sc->str.CompareNoCase("random") == 0;
 
@@ -277,11 +284,23 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 				sounds[aliasIndex].aliasLinks = aliasLinks;
 			}
+			else if(sc->str.Left(2).CompareNoCase("if") == 0)
+			{
+				if(!IWad::CheckGameFilter(sc->str.Mid(2)))
+					++excludeDepth;
+			}
+			else if(sc->str.CompareNoCase("endif") == 0) {}
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown command '%s'.", sc->str.GetChars());
 		}
 		else
 		{
+			if(excludeDepth)
+			{
+				sc.GetNextToken();
+				continue;
+			}
+
 			if(!sc.GetNextString())
 				sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
 			assert(sc->str[0] != '}');
