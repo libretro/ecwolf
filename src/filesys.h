@@ -52,6 +52,8 @@ namespace FileSys
 		DIR_Configuration,
 		DIR_Saves,
 		DIR_ApplicationSupport,
+		DIR_Documents,
+		DIR_Screenshots,
 
 		NUM_SPECIAL_DIRECTORIES
 	};

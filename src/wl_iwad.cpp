@@ -32,11 +32,6 @@
 **
 */
 
-#if defined(__APPLE__)
-#include <CoreServices/CoreServices.h>
-#define FILES_NO_LZMA
-#endif
-
 #include "resourcefiles/resourcefile.h"
 #include "config.h"
 #include "filesys.h"
@@ -447,20 +442,20 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	FString dataPaths;
 	if(config.GetSetting("BaseDataPaths") == NULL)
 	{
+		FString configDir = FileSys::GetDirectoryPath(FileSys::DIR_Configuration);
 		dataPaths = ".;$PROGDIR";
-#if !defined(__APPLE__)
-		dataPaths += FString(";") + config.GetConfigDir();
-#else
-		UInt8 dataDirBase[PATH_MAX];
-		FSRef folder;
 
-		if(FSFindFolder(kUserDomain, kDocumentsFolderType, kCreateFolder, &folder) == noErr &&
-			FSRefMakePath(&folder, dataDirBase, PATH_MAX) == noErr)
-			dataPaths += FString(";") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
-		if(FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &folder) == noErr &&
-			FSRefMakePath(&folder, dataDirBase, PATH_MAX) == noErr)
-			dataPaths += FString(";") + reinterpret_cast<const char*>(dataDirBase) + "/ECWolf";
+		// On OS X our default config directory is ~/Library/Preferences which isn't a good place to put data at all.
+#if !defined(__APPLE__)
+		dataPaths += FString(";") + configDir;
 #endif
+
+		// Add documents and application support directories if they're not mapped to the config directory.
+		FString tmp;
+		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_Documents)) != configDir)
+			dataPaths += FString(";") + tmp;
+		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_ApplicationSupport)) != configDir)
+			dataPaths += FString(";") + tmp;
 
 		config.CreateSetting("BaseDataPaths", dataPaths);
 	}

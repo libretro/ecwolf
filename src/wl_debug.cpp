@@ -29,6 +29,7 @@
 #include "g_shared/a_keys.h"
 #include "r_sprites.h"
 #include "wl_shade.h"
+#include "filesys.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -88,15 +89,15 @@ void ViewMap (void);
 void PictureGrabber (void)
 {
 	static char fname[] = "WSHOT000.PNG";
+	FString screenshotDir = FileSys::GetDirectoryPath(FileSys::DIR_Screenshots);
 
 	for(int i = 0; i < 1000; i++)
 	{
 		fname[7] = i % 10 + '0';
 		fname[6] = (i / 10) % 10 + '0';
 		fname[5] = i / 100 + '0';
-		int file = open(fname, O_RDONLY | O_BINARY);
-		if(file == -1) break;       // file does not exist, so use that filename
-		close(file);
+		if(!File(screenshotDir + PATH_SEPARATOR + fname).exists())
+			break;
 	}
 
 	// overwrites WSHOT999.PNG if all wshot files exist
@@ -104,7 +105,7 @@ void PictureGrabber (void)
 	int pitch;
 	ESSType color_type;
 	screen->GetScreenshotBuffer(buffer, pitch, color_type);
-	FILE *file = fopen(fname, "wb");
+	FILE *file = File(screenshotDir + PATH_SEPARATOR + fname).open("wb");
 	M_CreatePNG(file, buffer, GPalette.BaseColors, color_type, SCREENWIDTH, SCREENHEIGHT, pitch);
 	M_FinishPNG(file);
 	fclose(file);

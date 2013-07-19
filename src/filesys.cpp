@@ -184,6 +184,8 @@ void SetupPaths(int argc, const char * const *argv)
 	FString &configDir = SpecialPaths[DIR_Configuration];
 	FString &saveDir = SpecialPaths[DIR_Saves];
 	FString &appsupportDir = SpecialPaths[DIR_ApplicationSupport];
+	FString &documentsDir = SpecialPaths[DIR_Documents];
+	FString &screenshotsDir = SpecialPaths[DIR_Screenshots];
 
 	// Setup platform specific folder location functions
 #if defined(_WIN32)
@@ -274,6 +276,18 @@ void SetupPaths(int argc, const char * const *argv)
 	if(!CreateDirectoryIfNeeded(configDir))
 		printf("Could not create settings directory, configuration will not be saved.\n");
 
+	// Documents
+#if defined(__APPLE__)
+	if(FSFindFolder(kUserDomain, kDocumentsFolderType, kCreateFolder, &folder) == noErr &&
+		FSRefMakePath(&folder, home, PATH_MAX) == noErr)
+		documentsDir = FString(reinterpret_cast<const char*>(home)) + "/ECWolf";
+#else
+	documentsDir = configDir;
+#endif
+
+	if(!CreateDirectoryIfNeeded(documentsDir))
+		documentsDir = configDir;
+
 	// Saved games
 #if defined(_WIN32)
 	if(pSHGetKnownFolderPath) // Vista+
@@ -289,6 +303,8 @@ void SetupPaths(int argc, const char * const *argv)
 	}
 	if(saveDir.IsEmpty())
 		saveDir = configDir;
+#elif defined(__APPLE__)
+	saveDir = documentsDir + "/Savegames";
 #else
 	saveDir = configDir;
 #endif
@@ -300,10 +316,23 @@ void SetupPaths(int argc, const char * const *argv)
 #if defined(__APPLE__)
 	if(FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &folder) == noErr &&
 		FSRefMakePath(&folder, home, PATH_MAX) == noErr)
-		dataPaths += FString(";") + reinterpret_cast<const char*>(home) + "/ECWolf";
+		appsupportDir = FString(reinterpret_cast<const char*>(home)) + "/ECWolf";
 #else
 	appsupportDir = progDir;
 #endif
+
+	if(!CreateDirectoryIfNeeded(appsupportDir))
+		appsupportDir = progDir;
+
+	// Screenshots directory
+#if defined(__APPLE__)
+	screenshotsDir = documentsDir + "/Screenshots";
+#else
+	screenshotsDir = configDir;
+#endif
+
+	if(!CreateDirectoryIfNeeded(screenshotsDir))
+		screenshotsDir = configDir;
 }
 
 }
