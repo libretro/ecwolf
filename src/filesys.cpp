@@ -266,23 +266,41 @@ void SetupPaths(int argc, const char * const *argv)
 	configDir = reinterpret_cast<const char*>(home);	
 #else
 	char *home = getenv("HOME");
-	if(home == NULL || *home == '\0')
-	{
-		I_Error("Please set your HOME environment variable.\n");
+	char *xdg_config = getenv("XDG_CONFIG_HOME");
+	if(xdg_config == NULL || *xdg_config == '\0')
+	{	
+		if(home == NULL || *home == '\0')
+		{
+			I_Error("Please set your HOME environment variable.\n");
+		}
+		configDir.Format("%s/.config/ecwolf", home);
 	}
-	configDir.Format("%s/.config/ecwolf", home);
+	else
+		configDir.Format("%s/ecwolf", xdg_config);
 #endif
 
 	if(!CreateDirectoryIfNeeded(configDir))
 		printf("Could not create settings directory, configuration will not be saved.\n");
 
 	// Documents
-#if defined(__APPLE__)
+#if defined(_WIN32)
+	documentsDir = configDir;
+#elif defined(__APPLE__)
 	if(FSFindFolder(kUserDomain, kDocumentsFolderType, kCreateFolder, &folder) == noErr &&
 		FSRefMakePath(&folder, home, PATH_MAX) == noErr)
 		documentsDir = FString(reinterpret_cast<const char*>(home)) + "/ECWolf";
 #else
-	documentsDir = configDir;
+	char *xdg_data = getenv("XDG_DATA_HOME");
+	if(xdg_data == NULL || *xdg_data == '\0')
+	{
+		if(home == NULL || *home == '\0')
+		{
+			I_Error("Please set your HOME environment variable.\n");
+		}
+		documentsDir.Format("%s/.local/share/ecwolf", home);
+	}
+	else
+		documentsDir.Format("%s/ecwolf", xdg_data);
 #endif
 
 	if(!CreateDirectoryIfNeeded(documentsDir))
@@ -306,7 +324,7 @@ void SetupPaths(int argc, const char * const *argv)
 #elif defined(__APPLE__)
 	saveDir = documentsDir + "/Savegames";
 #else
-	saveDir = configDir;
+	saveDir = documentsDir + "/savegames";
 #endif
 
 	if(!CreateDirectoryIfNeeded(saveDir))
@@ -325,10 +343,12 @@ void SetupPaths(int argc, const char * const *argv)
 		appsupportDir = progDir;
 
 	// Screenshots directory
-#if defined(__APPLE__)
+#if defined(_WIN32)
+	screenshotsDir = configDir;
+#elif defined(__APPLE__)
 	screenshotsDir = documentsDir + "/Screenshots";
 #else
-	screenshotsDir = configDir;
+	screenshotsDir = documentsDir + "/screenshots";
 #endif
 
 	if(!CreateDirectoryIfNeeded(screenshotsDir))
