@@ -120,7 +120,7 @@ endif(NO_GTK)
 
 if(APPLE)
 	set(EXTRA_FILES
-		macosx/filesystem.mm
+		macosx/filesys.mm
 		macosx/SDLMain.m
 		macosx/wl_iwad_picker_cocoa.mm
 	)
@@ -217,8 +217,9 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	dobject.cpp
 	dobjgc.cpp
 	farchive.cpp
-	file.cpp
 	files.cpp
+	filesys.cpp
+	filesys_steam.cpp
 	g_intermission.cpp
 	g_mapinfo.cpp
 	gamemap.cpp

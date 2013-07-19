@@ -1,8 +1,8 @@
 /*
-** file.h
+** filesys.mm
 **
 **---------------------------------------------------------------------------
-** Copyright 2011 Braden Obrzut
+** Copyright 2013 Braden Obrzut
 ** All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
@@ -32,37 +32,35 @@
 **
 */
 
-#ifndef __FILE_H__
-#define __FILE_H__
-
-#include "tarray.h"
+#include "filesys.h"
 #include "zstring.h"
 
-class File
+#include <Cocoa/Cocoa.h>
+
+namespace FileSys {
+
+// Kind of hacking the ESpecialDirectory, but this function isn't really supposed to be widely used.
+FString OSX_FindFolder(ESpecialDirectory dir)
 {
-	public:
-		File(const FString &filename);
-		File(const File &dir, const FString &filename);
-		~File() {}
+	static const NSSearchPathDirectory DirToNS[NUM_SPECIAL_DIRECTORIES] =
+	{
+		NSApplicationDirectory,
+		NSLibraryDirectory,
+		NSDocumentDirectory,
+		NSApplicationSupportDirectory,
+		NSDocumentDirectory,
+		NSDocumentDirectory
+	};
 
-		bool					exists() const { return existing; }
-		FString					getDirectory() const;
-		const TArray<FString>	&getFileList() const { return files; }
-		FString					getInsensitiveFile(const FString &filename, bool sensitiveExtension) const;
-		bool					isDirectory() const { return directory; }
-		bool					isFile() const { return !directory; }
-		bool					isWritable() const { return writable; }
-		void					rename(const FString &newname);
+	NSURL *url = [[NSFileManager defaultManager] URLForDirectory:DirToNS[dir] inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+	if(url == nil)
+		return FString();
+	if(dir == DIR_Configuration)
+	{
+		NSString *preferences = [[url path] stringByAppendingPathComponent:@"/Preferences"];
+		return [preferences UTF8String];
+	}
+	return [[url path] UTF8String];
+}
 
-	protected:
-		void					init(const FString &filename);
-
-		FString	filename;
-
-		TArray<FString>	files;
-		bool			directory;
-		bool			existing;
-		bool			writable;
-};
-
-#endif /* __FILE_H__ */
+}

@@ -32,7 +32,7 @@
 **
 */
 
-#include "file.h"
+#include "filesys.h"
 #include "doomerrors.h"
 #include "wl_def.h"
 #include "resourcefile.h"

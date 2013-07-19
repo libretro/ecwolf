@@ -35,20 +35,12 @@
 #include "config.h"
 #include "scanner.h"
 
-#include <fstream>
 #include <cstdlib>
+#include <cstdio>
 #include <cmath>
 #include <cstring>
-using namespace std;
 
-#if defined(WINDOWS)
-#include <direct.h>
-#define mkdir(file,mode) _mkdir(file)
-#elif defined(__APPLE__)
-#include <CoreServices/CoreServices.h>
-#endif
-#include <sys/stat.h>
-
+#include "filesys.h"
 #include "zstring.h"
 
 Config config;
@@ -77,48 +69,7 @@ void Config::LocateConfigFile(int argc, char* argv[])
 		}
 	}
 
-	// Nothing explicitly set so go to the home directory.
-#if defined(WINDOWS)
-	char *home = getenv("APPDATA");
-	if(home == NULL || *home == '\0')
-	{
-		printf("APPDATA environment variable not set, falling back.\n");
-		configDir = argv[0];
-		int pos = configDir.LastIndexOfAny("/\\");
-		configDir = configDir.Mid(0, pos);
-	}
-	else
-		configDir.Format("%s\\ecwolf", home);
-#elif defined(__APPLE__)
-	UInt8 home[PATH_MAX];
-	FSRef folder;
-
-	if(FSFindFolder(kUserDomain, kPreferencesFolderType, kCreateFolder, &folder) != noErr ||
-		FSRefMakePath(&folder, home, PATH_MAX) != noErr)
-	{
-		printf("Could not create your preferences files.\n");
-		return;
-	}
-	configDir = reinterpret_cast<const char*>(home);	
-#else
-	char *home = getenv("HOME");
-	if(home == NULL || *home == '\0')
-	{
-		printf("Please set your HOME environment variable.\n");
-		return;
-	}
-	configDir.Format("%s/.config/ecwolf", home);
-#endif
-
-	struct stat dirStat;
-	if(stat(configDir, &dirStat) == -1)
-	{
-		if(mkdir(configDir, S_IRWXU) == -1)
-		{
-			printf("Could not create settings directory, configuration will not be saved.\n");
-			return;
-		}
-	}
+	configDir = FileSys::GetDirectoryPath(FileSys::DIR_Configuration);
 
 #ifdef WINDOWS
 	configFile = configDir + "\\ecwolf.cfg";
@@ -135,25 +86,23 @@ void Config::ReadConfig()
 	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(configFile, ios_base::in | ios_base::binary);
-	if(stream.is_open())
+	FILE *stream = File(configFile).open("rb");
+	if(stream)
 	{
-		stream.seekg(0, ios_base::end);
-		if(stream.fail())
+		if(fseek(stream, 0, SEEK_END))
 			return;
-		unsigned int size = static_cast<unsigned int>(stream.tellg());
-		stream.seekg(0, ios_base::beg);
-		if(stream.fail())
+		unsigned int size = static_cast<unsigned int>(ftell(stream));
+		if(fseek(stream, 0, SEEK_SET))
 			return;
 		char* data = new char[size];
-		stream.read(data, size);
+		fread(data, 1, size, stream);
 		// The eof flag seems to trigger fail on windows.
-		if(!stream.eof() && stream.fail())
+		if(!feof(stream) && ferror(stream))
 		{
 			delete[] data;
 			return;
 		}
-		stream.close();
+		fclose(stream);
 
 		Scanner sc(data, size);
 		sc.SetScriptIdentifier("Configuration");
@@ -190,14 +139,14 @@ void Config::SaveConfig()
 	if(configFile.IsEmpty())
 		return;
 
-	fstream stream(configFile, ios_base::out | ios_base::trunc);
-	if(stream.is_open())
+	FILE *stream = File(configFile).open("wb");
+	if(stream)
 	{
 		TMap<FName, SettingsData *>::Pair *pair;
 		for(TMap<FName, SettingsData *>::Iterator it(settings);it.NextPair(pair);)
 		{
-			stream.write(pair->Key, strlen(pair->Key));
-			if(stream.fail())
+			fwrite(pair->Key, 1, strlen(pair->Key), stream);
+			if(ferror(stream))
 				return;
 			SettingsData *data = pair->Value;
 			if(data->GetType() == SettingsData::ST_INT)
@@ -209,9 +158,9 @@ void Config::SaveConfig()
 
 				char* value = new char[intLength + 7];
 				sprintf(value, " = %d;\n", data->GetInteger());
-				stream.write(value, strlen(value));
+				fwrite(value, 1, strlen(value), stream);
 				delete[] value;
-				if(stream.fail())
+				if(ferror(stream))
 					return;
 			}
 			else
@@ -220,13 +169,13 @@ void Config::SaveConfig()
 				Scanner::Escape(str);
 				char* value = new char[str.Len() + 8];
 				sprintf(value, " = \"%s\";\n", str.GetChars());
-				stream.write(value, str.Len() + 7);
+				fwrite(value, 1, str.Len() + 7, stream);
 				delete[] value;
-				if(stream.fail())
+				if(ferror(stream))
 					return;
 			}
 		}
-		stream.close();
+		fclose(stream);
 	}
 }
 

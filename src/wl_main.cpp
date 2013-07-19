@@ -42,6 +42,7 @@
 #include "colormatcher.h"
 #include "version.h"
 #include "r_2d/r_main.h"
+#include "filesys.h"
 
 /*
 =============================================================================
@@ -1131,7 +1132,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 		else IFARG("--savedir")
 		{
 			if(++i < argc)
-				GameSave::savedir = argv[i];
+				FileSys::SetDirectoryPath(FileSys::DIR_Saves, argv[i]);
 		}
 		else
 			files.Push(argv[i]);
@@ -1280,6 +1281,8 @@ int main (int argc, char *argv[])
 	StartupWin32();
 	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
 #endif
+
+	FileSys::SetupPaths(argc, argv);
 
 	// Find the program directory.
 	FString progdir(".");
