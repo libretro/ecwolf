@@ -249,6 +249,19 @@ FString GetSteamPath(ESteamApp game)
 	// To do so, we read the virtual registry.
 	if(SteamAppInstallPath.CountUsed() == 0)
 	{
+#ifdef __APPLE__
+		FString regPath = OSX_FindFolder(DIR_ApplicationSupport) + "/Steam/config/config.vdf";
+		try
+		{
+			
+			ParseSteamRegistry(regPath);
+		}
+		catch(class CDoomError &error)
+		{
+			// If we can't parse for some reason just pretend we can't find anything.
+			return FString();
+		}
+#else
 		char* home = getenv("HOME");
 		if(home != NULL && *home != '\0')
 		{
@@ -264,6 +277,7 @@ FString GetSteamPath(ESteamApp game)
 				return FString();
 			}
 		}
+#endif
 	}
 	const FString *installPath = SteamAppInstallPath.CheckKey(AppInfo[game].AppID);
 	if(installPath)

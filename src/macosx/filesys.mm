@@ -1,8 +1,8 @@
 /*
-** filesys.h
+** filesys.mm
 **
 **---------------------------------------------------------------------------
-** Copyright 2011 Braden Obrzut
+** Copyright 2013 Braden Obrzut
 ** All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
@@ -32,77 +32,35 @@
 **
 */
 
-#ifndef __FILESYS_H__
-#define __FILESYS_H__
-
-#include "tarray.h"
+#include "filesys.h"
 #include "zstring.h"
 
-#ifdef _WIN32
-#define PATH_SEPARATOR "\\"
-#else
-#define PATH_SEPARATOR "/"
-#endif
+#include <Cocoa/Cocoa.h>
 
-namespace FileSys
+namespace FileSys {
+
+// Kind of hacking the ESpecialDirectory, but this function isn't really supposed to be widely used.
+FString OSX_FindFolder(ESpecialDirectory dir)
 {
-	enum ESpecialDirectory
+	static const NSSearchPathDirectory DirToNS[NUM_SPECIAL_DIRECTORIES] =
 	{
-		DIR_Program,
-		DIR_Configuration,
-		DIR_Saves,
-		DIR_ApplicationSupport,
-		DIR_Documents,
-		DIR_Screenshots,
-
-		NUM_SPECIAL_DIRECTORIES
+		NSApplicationDirectory,
+		NSLibraryDirectory,
+		NSDocumentDirectory,
+		NSApplicationSupportDirectory,
+		NSDocumentDirectory,
+		NSDocumentDirectory
 	};
 
-	enum ESteamApp
+	NSURL *url = [[NSFileManager defaultManager] URLForDirectory:DirToNS[dir] inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+	if(url == nil)
+		return FString();
+	if(dir == DIR_Configuration)
 	{
-		APP_Wolfenstein3D,
-		APP_SpearOfDestiny,
-		APP_ThrowbackPack,
-
-		NUM_STEAM_APPS
-	};
-
-	FString GetDirectoryPath(ESpecialDirectory dir);
-	FString GetSteamPath(ESteamApp game);
-	void SetDirectoryPath(ESpecialDirectory dir, const FString &path);
-	void SetupPaths(int argc, const char* const *argv);
-
-#ifdef __APPLE__
-	FString OSX_FindFolder(ESpecialDirectory dir);
-#endif
+		NSString *preferences = [[url path] stringByAppendingPathComponent:@"/Preferences"];
+		return [preferences UTF8String];
+	}
+	return [[url path] UTF8String];
 }
 
-class File
-{
-	public:
-		File(const FString &filename);
-		File(const File &dir, const FString &filename);
-		~File() {}
-
-		bool					exists() const { return existing; }
-		FString					getDirectory() const;
-		const TArray<FString>	&getFileList() const { return files; }
-		FString					getInsensitiveFile(const FString &filename, bool sensitiveExtension) const;
-		bool					isDirectory() const { return directory; }
-		bool					isFile() const { return !directory; }
-		bool					isWritable() const { return writable; }
-		FILE					*open(const char* mode) const;
-		void					rename(const FString &newname);
-
-	protected:
-		void					init(const FString &filename);
-
-		FString	filename;
-
-		TArray<FString>	files;
-		bool			directory;
-		bool			existing;
-		bool			writable;
-};
-
-#endif /* __FILESYS_H__ */
+}

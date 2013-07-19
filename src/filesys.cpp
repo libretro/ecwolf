@@ -172,15 +172,12 @@ void SetupPaths(int argc, const char * const *argv)
 		}
 	}
 #elif defined(__APPLE__)
-	UInt8 home[PATH_MAX];
-	FSRef folder;
-
-	if(FSFindFolder(kUserDomain, kPreferencesFolderType, kCreateFolder, &folder) != noErr ||
-		FSRefMakePath(&folder, home, PATH_MAX) != noErr)
+	FString osxDir = OSX_FindFolder(DIR_Configuration);
+	if(osxDir.IsEmpty())
 	{
 		I_Error("Could not create your preferences files.\n");
 	}
-	configDir = reinterpret_cast<const char*>(home);	
+	configDir = osxDir;
 #else
 	char *home = getenv("HOME");
 	char *xdg_config = getenv("XDG_CONFIG_HOME");
@@ -203,9 +200,9 @@ void SetupPaths(int argc, const char * const *argv)
 #if defined(_WIN32)
 	documentsDir = configDir;
 #elif defined(__APPLE__)
-	if(FSFindFolder(kUserDomain, kDocumentsFolderType, kCreateFolder, &folder) == noErr &&
-		FSRefMakePath(&folder, home, PATH_MAX) == noErr)
-		documentsDir = FString(reinterpret_cast<const char*>(home)) + "/ECWolf";
+	osxDir = OSX_FindFolder(DIR_Documents);
+	if(!osxDir.IsEmpty())
+		documentsDir = osxDir + "/ECWolf";
 #else
 	char *xdg_data = getenv("XDG_DATA_HOME");
 	if(xdg_data == NULL || *xdg_data == '\0')
@@ -249,9 +246,9 @@ void SetupPaths(int argc, const char * const *argv)
 
 	// Application support directory
 #if defined(__APPLE__)
-	if(FSFindFolder(kUserDomain, kApplicationSupportFolderType, kCreateFolder, &folder) == noErr &&
-		FSRefMakePath(&folder, home, PATH_MAX) == noErr)
-		appsupportDir = FString(reinterpret_cast<const char*>(home)) + "/ECWolf";
+	osxDir = OSX_FindFolder(DIR_ApplicationSupport);
+	if(!osxDir.IsEmpty())
+		appsupportDir = osxDir + "/ECWolf";
 #else
 	appsupportDir = progDir;
 #endif
