@@ -54,95 +54,12 @@
 #include "filesys.h"
 #include "zstring.h"
 
-#ifdef _WIN32
-/*
-** Steam stuff
-**
-**---------------------------------------------------------------------------
-** Copyright 1998-2009 Randy Heit
-** All rights reserved.
-**
-** License conditions same as BSD above.
-**---------------------------------------------------------------------------
-**
-*/
-//==========================================================================
-//
-// QueryPathKey
-//
-// Returns the value of a registry key into the output variable value.
-//
-//==========================================================================
-
-static bool QueryPathKey(HKEY key, const char *keypath, const char *valname, FString &value)
-{
-	HKEY steamkey;
-	DWORD pathtype;
-	DWORD pathlen;
-	LONG res;
-
-	if(ERROR_SUCCESS == RegOpenKeyEx(key, keypath, 0, KEY_QUERY_VALUE, &steamkey))
-	{
-		if (ERROR_SUCCESS == RegQueryValueEx(steamkey, valname, 0, &pathtype, NULL, &pathlen) &&
-			pathtype == REG_SZ && pathlen != 0)
-		{
-			// Don't include terminating null in count
-			char *chars = value.LockNewBuffer(pathlen - 1);
-			res = RegQueryValueEx(steamkey, valname, 0, NULL, (LPBYTE)chars, &pathlen);
-			value.UnlockBuffer();
-			if (res != ERROR_SUCCESS)
-			{
-				value = "";
-			}
-		}
-		RegCloseKey(steamkey);
-	}
-	return value.IsNotEmpty();
-}
-#endif
-
 namespace FileSys {
 
 static FString SpecialPaths[NUM_SPECIAL_DIRECTORIES];
 
 FString GetDirectoryPath(ESpecialDirectory dir) { return SpecialPaths[dir]; }
 void SetDirectoryPath(ESpecialDirectory dir, const FString &path) { SpecialPaths[dir] = path; }
-
-FString GetSteamPath(ESteamApp game)
-{
-	static const char * const AppBasePath[NUM_STEAM_APPS] =
-	{
-		"Wolfenstein 3D",
-		"Spear of Destiny",
-		"The Apogee Throwback Pack"
-	};
-
-	FString path;
-
-#if defined(_WIN32)
-	//==========================================================================
-	//
-	// I_GetSteamPath
-	//
-	// Check the registry for the path to Steam, so that we can search for
-	// IWADs that were bought with Steam.
-	//
-	//==========================================================================
-
-	if (!QueryPathKey(HKEY_CURRENT_USER, "Software\\Valve\\Steam", "SteamPath", path))
-	{
-		if(!QueryPathKey(HKEY_LOCAL_MACHINE, "Software\\Valve\\Steam", "InstallPath", path))
-			path = "";
-	}
-	if(!path.IsEmpty())
-		path += "\\SteamApps\\common";
-#endif
-
-	if(path.IsEmpty())
-		return path;
-
-	return path + PATH_SEPARATOR + AppBasePath[game];
-}
 
 #ifdef _WIN32
 static wchar_t* NameToWide(const char* filename)

@@ -218,6 +218,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	farchive.cpp
 	files.cpp
 	filesys.cpp
+	filesys_steam.cpp
 	g_intermission.cpp
 	g_mapinfo.cpp
 	gamemap.cpp

@@ -490,7 +490,6 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	}
 	while(split != 0);
 
-#if _WIN32
 	// Look for a steam install. (Basically from ZDoom)
 	{
 		static const struct
@@ -505,7 +504,6 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		for(unsigned int i = 0;i < countof(steamDirs);++i)
 			LookForGameData(datawadRes, basefiles, FileSys::GetSteamPath(steamDirs[i].app) + steamDirs[i].dir);
 	}
-#endif
 
 	delete datawadRes;
 
