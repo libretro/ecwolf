@@ -203,12 +203,11 @@ void APlayerPawn::Tick()
 	// This also fixes the bug where you can "stick" a weapon off-center by
 	// shooting it when it's at the peak of its swing.
 	static fixed curbob = 0;
-	const fixed playerMovebob = GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
 
-	if(playerMovebob)
+	if(movebob)
 	{
 		static const fixed MAXBOB = 0x100000;
-		fixed bobtarget = gamestate.victoryflag ? 0 : FixedMul(FixedMul(thrustspeed << 8, playerMovebob), movebob);
+		fixed bobtarget = gamestate.victoryflag ? 0 : FixedMul(thrustspeed << 8, movebob);
 		if(bobtarget > MAXBOB)
 			bobtarget = MAXBOB;
 

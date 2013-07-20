@@ -134,6 +134,8 @@ HANDLE_PROPERTY(bobstyle)
 		BobStyle = AWeapon::BobSmooth;
 	else if(stricmp(style, "InverseSmooth") == 0)
 		BobStyle = AWeapon::BobInverseSmooth;
+	else if(stricmp(style, "Thrust") == 0)
+		BobStyle = AWeapon::BobThrust;
 	else
 		I_Error("Invalid bob style '%s'.", style);
 }

@@ -655,6 +655,22 @@ void player_t::BobWeapon (fixed *x, fixed *y)
 		case AWeapon::BobInverseSmooth:
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = (FixedMul(boby, finecosine[angle*2 & (FINEANGLES-1)]) + boby) / 2;
+			break;
+
+		case AWeapon::BobThrust:
+			{
+				*x = 0;
+
+				// Down thrust is faster than up
+				// Blake Stone uses a linearly increasing velocity,
+				// we use a sin table since it's available and requires no extra storage
+				const int thrustPosition = (((angle<<3)*3)&(FRACUNIT-1)) * 3;
+				if(thrustPosition < FRACUNIT*2)
+					*y = -FixedMul(boby, thrustPosition - finesine[(thrustPosition/2)>>5] - FRACUNIT/2);
+				else
+					*y = FixedMul(boby, finesine[(thrustPosition - FRACUNIT*2)>>5] - FRACUNIT/2);
+			}
+			break;
 		}
 	}
 	else

@@ -23,6 +23,7 @@
 #include "wl_game.h"
 #include "wl_play.h"
 #include "a_inventory.h"
+#include "thingdef/thingdef.h"
 
 /*
 =============================================================================
@@ -1170,7 +1171,8 @@ void WallRefresh (void)
 
 	
 	angle_t bobangle = ((gamestate.TimeCount<<13)/(20*TICRATE/35)) & FINEMASK;
-	fixed curbob = gamestate.victoryflag ? 0 : FixedMul(players[0].bob>>1, finesine[bobangle]);
+	const fixed playerMovebob = players[0].mo->GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
+	fixed curbob = gamestate.victoryflag ? 0 : FixedMul(FixedMul(players[0].bob, playerMovebob)>>1, finesine[bobangle]);
 
 	viewz = (64<<FRACBITS) - players[0].mo->viewheight + curbob;
 
