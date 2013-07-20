@@ -1,7 +1,28 @@
-actor AutoChargePistol : WolfWeapon 314
+actor BlakeWeapon : Weapon
+{
+	weapon.ammotype1 "Clip"
+	weapon.ammouse1 1
+	weapon.ammogive1 6
+	weapon.yadjust 19
+	weapon.bobstyle "Thrust"
+	weapon.bobrangex 0
+	weapon.bobrangey 0.5
+	states
+	{
+		Select:
+			TNT1 A 0 A_Raise
+			loop
+		Deselect:
+			TNT1 A 0 A_Lower
+			loop
+	}
+}
+
+actor AutoChargePistol : BlakeWeapon 314
 {
 	weapon.ammouse1 0
 	+WEAPON.NOAUTOFIRE
+	-WEAPON.DONTBOB
 	states
 	{
 		Ready:
@@ -18,7 +39,7 @@ actor AutoChargePistol : WolfWeapon 314
 	}
 }
 
-actor SlowFireProtector : WolfWeapon 230
+actor SlowFireProtector : BlakeWeapon 230
 {
 	weapon.ammouse1 0
 	+WEAPON.NOAUTOFIRE
@@ -38,7 +59,7 @@ actor SlowFireProtector : WolfWeapon 230
 	}
 }
 
-actor RapidAssaultWeapon : WolfWeapon 233
+actor RapidAssaultWeapon : BlakeWeapon 233
 {
 	weapon.ammouse1 0
 	states
@@ -59,7 +80,7 @@ actor RapidAssaultWeapon : WolfWeapon 233
 	}
 }
 
-actor DualNeutronDisruptor : WolfWeapon 234
+actor DualNeutronDisruptor : BlakeWeapon 234
 {
 	weapon.ammouse1 0
 	states
@@ -81,7 +102,7 @@ actor DualNeutronDisruptor : WolfWeapon 234
 	}
 }
 
-actor PlasmaDischargeUnit : WolfWeapon 252
+actor PlasmaDischargeUnit : BlakeWeapon 252
 {
 	weapon.ammouse1 0
 	states
@@ -102,7 +123,7 @@ actor PlasmaDischargeUnit : WolfWeapon 252
 	}
 }
 
-actor AntiPlasmaCannon : WolfWeapon 240
+actor AntiPlasmaCannon : BlakeWeapon 240
 {
 	weapon.ammouse1 0
 	states
