@@ -428,7 +428,7 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 		colormap = NormalLight.Maps;
 	else
 	{
-		const int shade = LIGHT2SHADE(gLevelLight) - (10<<FRACBITS);
+		const int shade = LIGHT2SHADE(gLevelLight) - gLevelMaxLightVis;
 		colormap = &NormalLight.Maps[GETPALOOKUP(0, shade)<<8];
 	}
 
