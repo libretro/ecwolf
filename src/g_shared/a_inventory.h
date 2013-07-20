@@ -141,7 +141,8 @@ class AWeapon : public AInventory
 			BobAlpha,
 			BobInverseAlpha,
 			BobSmooth,
-			BobInverseSmooth
+			BobInverseSmooth,
+			BobThrust
 		};
 
 		void		AttachToOwner(AActor *owner);
