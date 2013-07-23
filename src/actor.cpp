@@ -252,7 +252,7 @@ void AActor::Die()
 					if(flags & FL_DROPBASEDONTARGET)
 					{
 						AActor *target = players[0].mo;
-						AInventory *inv = target->FindInventory(cls);
+						AInventory *inv = target->FindInventory(cls->GetReplacement());
 						if(!inv || !bestDrop)
 							bestDrop = drop;
 
