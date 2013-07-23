@@ -350,7 +350,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 			DTA_DestWidthF, wd,
 			DTA_DestHeightF, hd,
 			DTA_Translation, remap,
-			DTA_FillColor, GPalette.BaseColors[stencilcolor],
+			DTA_FillColor, GPalette.BaseColors[stencilcolor].d,
 			TAG_DONE);
 	}
 	else
