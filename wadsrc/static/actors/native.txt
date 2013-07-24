@@ -61,6 +61,7 @@ actor Actor native
 	action native A_Pain();
 	action native A_PlaySound(string soundname);
 	action native A_Scream();
+	action native A_SetTics(float duration);
 	action native A_SpawnItem(string type, float distance = 0, float zheight = 0);
 	action native A_SpawnItemEx(string type, float xoffset = 0, float yoffset = 0, float zoffset = 0, float xvel = 0, float yvel = 0, float zvel = 0, float angle = 0, int flags = 0, int failchance = 0);
 	action native A_Stop();
