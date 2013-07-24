@@ -6,6 +6,7 @@ actor BlakePlayer : PlayerPawn
 	player.viewheight 32
 	player.displayname "Blake Stone"
 	player.startitem "AutoChargePistol"
+	player.startitem "ChargeUnit", 8
 	player.weaponslot 1, "AutoChargePistol"
 	player.weaponslot 2, "SlowFireProtector"
 	player.weaponslot 3, "RapidAssaultWeapon"

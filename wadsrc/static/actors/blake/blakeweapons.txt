@@ -1,6 +1,6 @@
 actor BlakeWeapon : Weapon
 {
-	weapon.ammotype1 "Clip"
+	weapon.ammotype1 "ChargeUnit"
 	weapon.ammouse1 1
 	weapon.ammogive1 6
 	weapon.yadjust 19
@@ -20,9 +20,9 @@ actor BlakeWeapon : Weapon
 
 actor AutoChargePistol : BlakeWeapon 314
 {
+	attacksound "weapon/autochargepistol/attack"
 	weapon.ammouse1 0
 	+WEAPON.NOAUTOFIRE
-	-WEAPON.DONTBOB
 	states
 	{
 		Ready:
@@ -30,7 +30,7 @@ actor AutoChargePistol : BlakeWeapon 314
 			loop
 		Fire:
 			ACPG BC 3
-			ACPG D 3 // Fire
+			ACPG D 3 A_GunAttack(GAF_MACDAMAGE, "*", 1.0, 128)
 			ACPG E 3
 			goto Ready
 		Spawn:
@@ -41,7 +41,7 @@ actor AutoChargePistol : BlakeWeapon 314
 
 actor SlowFireProtector : BlakeWeapon 230
 {
-	weapon.ammouse1 0
+	attacksound "weapon/slowfireprotector/attack"
 	+WEAPON.NOAUTOFIRE
 	states
 	{
@@ -50,7 +50,7 @@ actor SlowFireProtector : BlakeWeapon 230
 			loop
 		Fire:
 			SFPG BC 3
-			SFPG D 3 // Fire
+			SFPG D 3 A_GunAttack(GAF_MACDAMAGE, "*", 1.0, 128)
 			SFPG E 3
 			goto Ready
 		Spawn:
@@ -61,7 +61,7 @@ actor SlowFireProtector : BlakeWeapon 230
 
 actor RapidAssaultWeapon : BlakeWeapon 233
 {
-	weapon.ammouse1 0
+	attacksound "weapon/rapidassaultweapon/attack"
 	states
 	{
 		Ready:
@@ -71,7 +71,7 @@ actor RapidAssaultWeapon : BlakeWeapon 233
 			RAWG B 3
 		Hold:
 			RAWG C 3
-			RAWG D 2.5 // Fire
+			RAWG D 2.5 A_GunAttack(GAF_MACDAMAGE, "*", 1.0, 128)
 			RAWG E 2.5 A_ReFire
 			goto Ready
 		Spawn:
@@ -80,9 +80,16 @@ actor RapidAssaultWeapon : BlakeWeapon 233
 	}
 }
 
+/* Fun Fact: This weapon is supposed to fire two rounds per loop instead of
+ * being just a faster version of the RAW, but the grenade malfunction code
+ * was inserted at the wrong point and breaks the second fire function before
+ * it falls through to actually fire.
+ *
+ * Seems like a classic case of improper indentation masking a critical flaw!
+ */
 actor DualNeutronDisruptor : BlakeWeapon 234
 {
-	weapon.ammouse1 0
+	attacksound "weapon/dualneutrondisruptor/attack"
 	states
 	{
 		Ready:
@@ -92,8 +99,7 @@ actor DualNeutronDisruptor : BlakeWeapon 234
 			DNDG B 3
 		Hold:
 			DNDG C 3
-			DNDG D 1.5 // Fire
-			DNDG D 0 // Fire
+			DNDG D 1.5 A_GunAttack(GAF_MACDAMAGE, "*", 1.0, 128)
 			DNDG E 1.5 A_ReFire
 			goto Ready
 		Spawn:
@@ -102,9 +108,33 @@ actor DualNeutronDisruptor : BlakeWeapon 234
 	}
 }
 
+actor PlasmaGrenade
+{
+	seesound "plasmagrenade/fire"
+	deathsound "plasmagrenade/hit"
+	radius 10
+	speed 14 // Todo: random(14, 21)?
+	damage (random(40, 167))
+	PROJECTILE
+	states
+	{
+		Spawn:
+			GREN CCBABBCD 3.5 bright
+			GREN E 0 bright A_Scream
+			GREN E 0 bright A_Explode(random(50, 177), 128, 0)
+			GREN E 3 bright A_Stop
+			GREN FGH 3 bright
+			stop
+		Death:
+			// Todo: Decide the duration once and play
+			EXPL A random(1.5, 5) bright A_Explode(random(50, 177), 128, 0)
+			EXPL BCDE random(1.5, 5) bright
+			stop
+	}
+}
 actor PlasmaDischargeUnit : BlakeWeapon 252
 {
-	weapon.ammouse1 0
+	weapon.ammouse1 4
 	states
 	{
 		Ready:
@@ -114,7 +144,7 @@ actor PlasmaDischargeUnit : BlakeWeapon 252
 			PDUG B 3
 		Hold:
 			PDUG C 3
-			PDUG D 3 // Fire
+			PDUG D 3 A_FireCustomMissile("PlasmaGrenade", random(-1,1))
 			PDUG E 3 A_ReFire
 			goto Ready
 		Spawn:
@@ -123,9 +153,31 @@ actor PlasmaDischargeUnit : BlakeWeapon 252
 	}
 }
 
+actor AntiPlasmaShot
+{
+	seesound "antiplasmashot/fire"
+	deathsound "antiplasmashot/hit"
+	radius 10
+	speed 14 // Todo: random(14, 28)?
+	damage (random(40, 167))
+	PROJECTILE
+	//+RIPPER
+	states
+	{
+		Spawn:
+			APCS B 3.5 bright
+			APCS C -1
+			stop
+		Death:
+			// Todo: Decide the duration once and play
+			APCS E 2.5 bright A_Explode(random(50, 177), 128, 0)
+			APCS FGHIJKL random(0.5, 3.5) bright
+			stop
+	}
+}
 actor AntiPlasmaCannon : BlakeWeapon 240
 {
-	weapon.ammouse1 0
+	weapon.ammouse1 8
 	states
 	{
 		Ready:
@@ -135,7 +187,7 @@ actor AntiPlasmaCannon : BlakeWeapon 240
 			APCG B 3
 		Hold:
 			APCG C 3
-			APCG D 3 // Fire
+			APCG D 3 A_FireCustomMissile("AntiPlasmaShot", random(-1,1))
 			APCG E 3 A_ReFire
 			goto Ready
 		Spawn:

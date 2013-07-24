@@ -280,16 +280,6 @@ actor MutantStatue 231
 	}
 }
 
-actor ChargeUnit 232
-{
-	states
-	{
-		Spawn:
-			CHRG A -1
-			stop
-	}
-}
-
 actor FirstAidKit 235
 {
 	states
@@ -308,16 +298,6 @@ actor VerticalSpikeStatic 236
 	{
 		Spawn:
 			VSPK H -1
-			stop
-	}
-}
-
-actor ChargePack 237
-{
-	states
-	{
-		Spawn:
-			CHGU A -1
 			stop
 	}
 }
@@ -575,8 +555,8 @@ actor BloodAirVent 263
 	states
 	{
 		Spawn:
-			AVNT A -1
-			stop
+			AVNT BCDE random(2.5, 7.5)
+			loop
 	}
 }
 
@@ -585,8 +565,8 @@ actor WaterAirVent 264
 	states
 	{
 		Spawn:
-			AVNT A -1
-			stop
+			AVNT FGHI random(2.5, 7.5)
+			loop
 	}
 }
 

@@ -280,3 +280,19 @@ burt/sight				{ DSBRTSIT ALBRTSIT PCBRTSIT }
 burt/active				{ DSBRTSTP ALBRTSTP PCBRTSTP }
 burt/attack				{ DSSPIT ALSPIT PCSPIT }
 burt/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+// ------ Blake Stone ------
+
+weapon/autochargepistol/attack		{ NULL ALFIRAUT PCFIRAUT }
+weapon/slowfireprotector/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+weapon/rapidassaultweapon/attack	{ DSBRIFLE ALBRIFLE PCBRIFLE }
+weapon/dualneutrondisruptor/attack	{ DSIONCAN ALIONCAN PCIONCAN }
+
+misc/blake/explosion1	{ DSEXPLO1 ALEXPLO1 PCEXPLO1 }
+misc/blake/explosion2	{ DSEXPLO2 ALEXPLO2 PCEXPLO2 }
+
+plasmagrenade/fire		{ DSGRENAD ALGRENAD PCGRENAD }
+$random plasmagrenade/hit { misc/blake/explosion1 misc/blake/explosion2 }
+
+antiplasmashot/fire		{ DSIONCAN ALIONCAN PCIONCAN }
+$random antiplasmashot/hit { misc/blake/explosion1 misc/blake/explosion2 }

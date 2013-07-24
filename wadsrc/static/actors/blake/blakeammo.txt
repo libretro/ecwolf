@@ -1,0 +1,21 @@
+actor ChargeUnit : Ammo 232
+{
+	inventory.amount 8
+	inventory.maxamount 100
+	states
+	{
+		Spawn:
+			CHRG A -1
+			stop
+	}
+}
+
+actor ChargePack : ChargeUnit 237
+{
+	states
+	{
+		Spawn:
+			CHGU A -1
+			stop
+	}
+}
