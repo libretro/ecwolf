@@ -510,6 +510,27 @@ ACTION_FUNCTION(A_PlaySound)
 	PlaySoundLocActor(sound, self);
 }
 
+ACTION_FUNCTION(A_SetTics)
+{
+	ACTION_PARAM_DOUBLE(duration, 0);
+
+	if(self->player)
+	{
+		if(self->player->psprite[player_t::ps_weapon].frame == caller)
+		{
+			self->player->psprite[player_t::ps_weapon].ticcount = static_cast<int> (duration*2);
+			return;
+		}
+		else if(self->player->psprite[player_t::ps_flash].frame == caller)
+		{
+			self->player->psprite[player_t::ps_flash].ticcount = static_cast<int> (duration*2);
+			return;
+		}
+	}
+
+	self->ticcount = static_cast<int> (duration*2);
+}
+
 ACTION_FUNCTION(A_SpawnItem)
 {
 	ACTION_PARAM_STRING(className, 0);

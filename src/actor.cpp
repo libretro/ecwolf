@@ -67,6 +67,14 @@ Frame::~Frame()
 	}
 }
 
+static FRandom pr_statetics("StateTics");
+int Frame::GetTics() const
+{
+	if(randDuration)
+		return duration + pr_statetics.GenRand32() % (randDuration + 1);
+	return duration;
+}
+
 void Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const
 {
 	if(pointer)
@@ -453,7 +461,7 @@ void AActor::SetState(const Frame *state, bool notic)
 
 	this->state = state;
 	sprite = state->spriteInf;
-	ticcount = state->duration;
+	ticcount = state->GetTics();
 	if(!notic)
 		state->action(this, this, state);
 }

@@ -850,7 +850,7 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 
 	if(frame)
 	{
-		psprite[layer].ticcount = frame->duration;
+		psprite[layer].ticcount = frame->GetTics();
 		frame->action(mo, ReadyWeapon, frame);
 	}
 }

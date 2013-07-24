@@ -96,6 +96,7 @@ class Frame
 {
 	public:
 		~Frame();
+		int GetTics() const;
 
 		union
 		{
@@ -104,6 +105,7 @@ class Frame
 		};
 		uint8_t		frame;
 		int			duration;
+		unsigned	randDuration;
 		bool		fullbright;
 		class ActionCall
 		{
