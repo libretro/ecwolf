@@ -248,9 +248,9 @@ void ExprRandom(AActor *self, ExpressionNode::Value &out, ExpressionNode* const 
 	int64_t min = args[0]->Evaluate(self).GetInt();
 	int64_t max = args[1]->Evaluate(self).GetInt();
 	if(min > max)
-		out = max+(*rng)((int)(min-max));
+		out = max+(*rng)((int)(min-max+1));
 	else
-		out = min+(*rng)((int)(max-min));
+		out = min+(*rng)((int)(max-min+1));
 }
 
 void ExprFRandom(AActor *self, ExpressionNode::Value &out, ExpressionNode* const *args, FRandom *rng)
