@@ -128,6 +128,7 @@ static inline double MULTIPLY_VOLUME(const int &v)
 extern	int				AdlibVolume;
 extern	int				MusicVolume;
 extern	int				SoundVolume;
+extern bool SD_UpdatePCSpeakerVolume(int which=0);
 
 enum SoundChannel
 {

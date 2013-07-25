@@ -143,6 +143,7 @@ void ReadConfig(void)
 	mouseyaxisdisabled = config.GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
 	alwaysrun = config.GetSetting("AlwaysRun")->GetInteger() != 0;
 	AdlibVolume = config.GetSetting("SoundVolume")->GetInteger();
+	SD_UpdatePCSpeakerVolume();
 	MusicVolume = config.GetSetting("MusicVolume")->GetInteger();
 	SoundVolume = config.GetSetting("DigitizedVolume")->GetInteger();
 	vid_fullscreen = config.GetSetting("Vid_FullScreen")->GetInteger() != 0;
