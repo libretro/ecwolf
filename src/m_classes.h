@@ -114,7 +114,7 @@ class SliderMenuItem : public MenuItem
 		const int	max;
 
 	public:
-		SliderMenuItem(int &value, int width, int max, const char begString[36]="", const char endString[36]="");
+		SliderMenuItem(int &value, int width, int max, const char begString[36]="", const char endString[36]="", MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
 
 		void	draw();
 		void	left();

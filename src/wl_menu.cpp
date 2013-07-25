@@ -380,7 +380,6 @@ void CreateMenus()
 
 	// Collect options and defaults
 	const char* soundEffectsOptions[] = {language["STR_NONE"], language["STR_PC"], language["STR_ALSB"] };
-	soundEffectsOptions[1] = NULL;
 	const char* digitizedOptions[] = {language["STR_NONE"], language["STR_SB"] };
 	const char* musicOptions[] = { language["STR_NONE"], language["STR_ALSB"] };
 	if(!AdLibPresent && !SoundBlasterPresent)
@@ -415,7 +414,7 @@ void CreateMenus()
 	soundBase.addItem(new SliderMenuItem(SoundVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"]));
 	soundBase.addItem(new LabelMenuItem(language["STR_ADLIBDEVICE"]));
 	soundBase.addItem(new MultipleChoiceMenuItem(SetSoundEffects, soundEffectsOptions, 3, soundEffectsMode));
-	soundBase.addItem(new SliderMenuItem(AdlibVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"]));
+	soundBase.addItem(new SliderMenuItem(AdlibVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"], SD_UpdatePCSpeakerVolume));
 	soundBase.addItem(new LabelMenuItem(language["STR_MUSICDEVICE"]));
 	soundBase.addItem(new MultipleChoiceMenuItem(SetMusic, musicOptions, 2, musicMode));
 	soundBase.addItem(new SliderMenuItem(MusicVolume, 150, MAX_VOLUME, language["STR_SOFT"], language["STR_LOUD"]));

@@ -127,7 +127,7 @@ void MenuSwitcherMenuItem::activate()
 	}
 }
 
-SliderMenuItem::SliderMenuItem(int &value, int width, int max, const char begString[36], const char endString[36]) : MenuItem(endString), value(value), width(width), max(max)
+SliderMenuItem::SliderMenuItem(int &value, int width, int max, const char begString[36], const char endString[36], MENU_LISTENER_PROTOTYPE(activateListener)) : MenuItem(endString, activateListener), value(value), width(width), max(max)
 {
 	strcpy(this->begString, begString);
 }
@@ -161,12 +161,16 @@ void SliderMenuItem::draw()
 void SliderMenuItem::left()
 {
 	value -= value > 0 ? 1 : 0;
+	if(activateListener != NULL)
+		activateListener(menu->getCurrentPosition());
 	SD_PlaySound("menu/move1");
 }
 
 void SliderMenuItem::right()
 {
 	value += value < max ? 1 : 0;
+	if(activateListener != NULL)
+		activateListener(menu->getCurrentPosition());
 	SD_PlaySound("menu/move1");
 }
 
