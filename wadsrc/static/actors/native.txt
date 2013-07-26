@@ -8,6 +8,9 @@ const int CMF_AIMOFFSET = 1;
 const int CPF_USEAMMO = 1;
 const int CPF_ALWAYSPLAYSOUND = 2;
 
+const int CVF_RELATIVE = 1;
+const int CVF_REPLACE = 2;
+
 const int WAF_NORANDOM = 1;
 
 const int GAF_NORANDOM = 1;
@@ -54,6 +57,7 @@ actor Actor native
 	action native A_BossDeath();
 	action native A_CallSpecial(int special, int arg1=0, int arg2=0, int arg3=0, int arg4=0, int arg5=0);
 	action native A_ChangeFlag(string flag, bool value);
+	action native A_ChangeVelocity(float x, float y, float z, int flags = 0);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0, int aimflags = 0);
 	action native A_Dormant();
@@ -72,6 +76,7 @@ actor Actor native
 	action native A_MonsterRefire(int chance, state abort);
 	action native A_Pain();
 	action native A_PlaySound(string soundname);
+	action native A_ScaleVelocity(float scale);
 	action native A_Scream();
 	action native A_SetTics(float duration);
 	action native A_SpawnItem(string type, float distance = 0, float zheight = 0);

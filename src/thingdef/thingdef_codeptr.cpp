@@ -266,6 +266,43 @@ ACTION_FUNCTION(A_ChangeFlag)
 	}
 }
 
+ACTION_FUNCTION(A_ChangeVelocity)
+{
+	enum
+	{
+		CVF_RELATIVE = 1,
+		CVF_REPLACE = 2
+	};
+
+	ACTION_PARAM_DOUBLE(x, 0);
+	ACTION_PARAM_DOUBLE(y, 1);
+	ACTION_PARAM_DOUBLE(z, 2);
+	ACTION_PARAM_INT(flags, 3);
+
+	fixed fx, fy;
+	if(flags & CVF_RELATIVE)
+	{
+		fx = static_cast<fixed>(((x * finecosine[self->angle>>ANGLETOFINESHIFT]) + (y * finesine[self->angle>>ANGLETOFINESHIFT]))/64);
+		fy = static_cast<fixed>(((y * finecosine[self->angle>>ANGLETOFINESHIFT]) - (x * finesine[self->angle>>ANGLETOFINESHIFT]))/64);
+	}
+	else
+	{
+		fx = static_cast<fixed>(x*(FRACUNIT/64));
+		fy = static_cast<fixed>(y*(FRACUNIT/64));
+	}
+
+	if(flags & CVF_REPLACE)
+	{
+		self->velx = fx;
+		self->vely = fy;
+	}
+	else
+	{
+		self->velx += fx;
+		self->vely += fy;
+	}
+}
+
 ACTION_FUNCTION(A_Explode)
 {
 	enum
@@ -508,6 +545,14 @@ ACTION_FUNCTION(A_PlaySound)
 	ACTION_PARAM_STRING(sound, 0);
 
 	PlaySoundLocActor(sound, self);
+}
+
+ACTION_FUNCTION(A_ScaleVelocity)
+{
+	ACTION_PARAM_DOUBLE(scale, 0);
+
+	self->velx = self->velx*scale;
+	self->vely = self->vely*scale;
 }
 
 ACTION_FUNCTION(A_SetTics)
