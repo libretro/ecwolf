@@ -29,6 +29,9 @@ const int WRF_DISABLESWITCH = 0x10;
 const int WRF_ALLOWRELOAD = 0x20;
 const int WRF_ALLOWZOOM = 0x40;
 
+const int ZOOM_INSTANT = 1;
+const int ZOOM_NOSCALETURNING = 2;
+
 actor Actor native
 {
 	damage 0
@@ -152,11 +155,13 @@ actor Weapon : Inventory native
 	action native A_Raise();
 	action native A_ReFire();
 	action native A_WeaponReady(int flags=0);
+	action native A_ZoomFactor(float zoom, int flags=0);
 }
 
 actor WeaponGiver : Weapon native
 {
 	weapon.ammogive1 -1
+	weapon.ammogive2 -1
 }
 
 actor PlayerPawn native

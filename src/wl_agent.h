@@ -92,6 +92,7 @@ extern class player_t
 		int32_t		oldscore,score,nextextra;
 		short		lives;
 		int32_t		health;
+		float		FOV, DesiredFOV;
 
 		FWeaponSlots	weapons;
 		AWeapon			*ReadyWeapon;

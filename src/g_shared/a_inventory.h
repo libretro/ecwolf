@@ -164,6 +164,7 @@ class AWeapon : public AInventory
 		int				ammogive[2];
 		unsigned int	ammouse[2];
 		fixed			yadjust;
+		float			fovscale;
 
 		// Inventory instance variables
 		FireMode		mode;

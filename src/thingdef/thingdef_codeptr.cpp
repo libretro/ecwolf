@@ -619,3 +619,25 @@ ACTION_FUNCTION(A_TakeInventory)
 			inv->amount -= amount;
 	}
 }
+
+#include "wl_main.h"
+ACTION_FUNCTION(A_ZoomFactor)
+{
+	enum
+	{
+		ZOOM_INSTANT = 1,
+		ZOOM_NOSCALETURNING = 2
+	};
+
+	ACTION_PARAM_DOUBLE(zoom, 0);
+	ACTION_PARAM_INT(flags, 1);
+
+	if(!self->player || !self->player->ReadyWeapon)
+		return;
+
+	self->player->ReadyWeapon->fovscale = 1.0 / clamp<double>(zoom, 0.1, 50.0);
+	if(flags & ZOOM_INSTANT)
+		self->player->FOV = -self->player->DesiredFOV*self->player->ReadyWeapon->fovscale;
+	if(flags & ZOOM_NOSCALETURNING)
+		self->player->ReadyWeapon->fovscale *= -1;
+}

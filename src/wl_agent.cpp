@@ -155,6 +155,9 @@ void ControlMovement (AActor *ob)
 	}
 	else
 	{
+		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
+			controlx = controlx*players[0].ReadyWeapon->fovscale;
+
 		//
 		// not strafing
 		//
@@ -585,7 +588,7 @@ void Cmd_Use (void)
 =============================================================================
 */
 
-player_t::player_t() : bob(0), attackheld(false)
+player_t::player_t() : FOV(90), DesiredFOV(90), bob(0), attackheld(false)
 {
 }
 
@@ -795,6 +798,7 @@ void player_t::Reborn()
 	ReadyWeapon = NULL;
 	PendingWeapon = WP_NOCHANGE;
 	flags = 0;
+	FOV = DesiredFOV = 90.0f;
 
 	if(state == PST_ENTER)
 	{
@@ -838,6 +842,9 @@ void player_t::Serialize(FArchive &arc)
 			<< psprite[i].sx
 			<< psprite[i].sy;
 	}
+
+	if(GameSave::SaveVersion > 1374729160)
+		arc << FOV << DesiredFOV;
 
 	if(arc.IsLoading())
 	{

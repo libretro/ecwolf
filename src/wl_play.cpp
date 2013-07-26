@@ -22,6 +22,7 @@
 #include "wl_inter.h"
 #include "wl_play.h"
 #include "g_mapinfo.h"
+#include "a_inventory.h"
 
 /*
 =============================================================================
@@ -279,6 +280,9 @@ void PollMouseMove (void)
 		controly += mouseymove * 40 / (21 - mouseadjustment);
 	else if(mouselook)
 	{
+		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
+			mouseymove = mouseymove*fabs(players[0].ReadyWeapon->fovscale);
+
 		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseadjustment));
 		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
 			players[0].mo->pitch = 56*ANGLE_1;

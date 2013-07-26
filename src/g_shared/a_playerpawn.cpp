@@ -38,6 +38,7 @@
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
 #include "wl_game.h"
+#include "wl_main.h"
 #include "wl_play.h"
 
 #include <climits>
@@ -236,6 +237,44 @@ void APlayerPawn::Tick()
 
 	player->bob = curbob;
 
+	// [RH] Zoom the player's FOV
+	float desired = player->DesiredFOV;
+	// Adjust FOV using on the currently held weapon.
+	if (player->state != player_t::PST_DEAD &&		// No adjustment while dead.
+		player->ReadyWeapon != NULL &&			// No adjustment if no weapon.
+		player->ReadyWeapon->fovscale != 0)		// No adjustment if the adjustment is zero.
+	{
+		// A negative scale is used to prevent G_AddViewAngle/G_AddViewPitch
+		// from scaling with the FOV scale.
+		desired *= fabs(player->ReadyWeapon->fovscale);
+	}
+	if (player->FOV != desired)
+	{
+		// Negative FOV means recalculate projection
+		if (player->FOV < 0)
+		{
+			player->FOV *= -1;
+		}
+		else if (fabsf (player->FOV - desired) < 7.f)
+		{
+			player->FOV = desired;
+		}
+		else
+		{
+			float zoom = MAX(7.f, fabsf(player->FOV - desired) * 0.025f);
+			if (player->FOV > desired)
+			{
+				player->FOV = player->FOV - zoom;
+			}
+			else
+			{
+				player->FOV = player->FOV + zoom;
+			}
+		}
+
+		CalcProjection(radius);
+	}
+
 	// Watching BJ
 	if(gamestate.victoryflag)
 		return;
@@ -294,7 +333,6 @@ void APlayerPawn::Tick()
 		if(zoom)
 			player->SetPSprite(zoom, player_t::ps_weapon);
 	}
-	
 
 	ControlMovement(this);
 }

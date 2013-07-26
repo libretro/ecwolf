@@ -250,21 +250,19 @@ void CalcProjection (int32_t focal)
 	int     halfview;
 	double  facedist;
 
+	const fixed projectionFOV = static_cast<fixed>((players[0].FOV / 90.0f)*AspectCorrection[r_ratio].viewGlobal);
+
 	// 0xFD17 is a magic number to convert the player's radius 0x5800 to FOCALLENGTH (0x5700)
 	focallength = FixedMul(focal, 0xFD17);
 	facedist = 2*FOCALLENGTH+0x100; // Used to be MINDIST (0x5800) which was 0x100 then the FOCALLENGTH (0x5700)
 	halfview = viewwidth/2;                                 // half view in pixels
 	focallengthy = centerx*yaspect/finetangent[FINEANGLES/2+(ANGLE_45>>ANGLETOFINESHIFT)];
 
-	/*fixed* viewTangent = finetangent+FINEANGLES/4;
-	fixed FocalTangent = viewTangent[FINEANGLES/4+(ANGLE_45>>ANGLETOFINESHIFT)];
-	fixed FocalLengthY = (centerx<<FRACBITS)/FocalTangent;*/
-
 	//
 	// calculate scale value for vertical height calculations
 	// and sprite x calculations
 	//
-	scale = (fixed) (halfview*facedist/(AspectCorrection[r_ratio].viewGlobal/2));
+	scale = (fixed) (halfview*facedist/(projectionFOV/2));
 
 	//
 	// divide heightnumerator by a posts distance to get the posts height for
@@ -279,7 +277,7 @@ void CalcProjection (int32_t focal)
 	for (i=0;i<halfview;i++)
 	{
 		// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (int32_t)i*AspectCorrection[r_ratio].viewGlobal/viewwidth/facedist;
+		tang = (int32_t)i*projectionFOV/viewwidth/facedist;
 		angle = (float) atan(tang);
 		intang = (int) (angle*radtoint);
 		pixelangle[halfview-1-i] = intang;
