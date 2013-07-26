@@ -357,10 +357,10 @@ ACTION_FUNCTION(A_GiveInventory)
 
 ACTION_FUNCTION(A_GunFlash)
 {
-	ACTION_PARAM_STATE(flash, 0, NULL);
-
 	if(!self->player)
 		return;
+
+	ACTION_PARAM_STATE(flash, 0, self->player->ReadyWeapon->FindState(self->player->ReadyWeapon->mode != AWeapon::AltFire ? NAME_Flash : NAME_AltFlash));
 
 	self->player->SetPSprite(flash, player_t::ps_flash);
 }

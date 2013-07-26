@@ -149,23 +149,25 @@ class AWeapon : public AInventory
 		bool		CheckAmmo(FireMode fireMode, bool autoSwitch, bool requireAmmo=false);
 		bool		DepleteAmmo();
 
-		const Frame	*GetAtkState(bool hold) const;
+		const Frame	*GetAtkState(FireMode mode, bool hold) const;
 		const Frame	*GetDownState() const;
 		const Frame	*GetReadyState() const;
+		const Frame *GetReloadState() const;
 		const Frame	*GetUpState() const;
+		const Frame *GetZoomState() const;
 
 		bool		HandlePickup(AInventory *item, bool &good);
 		void		Serialize(FArchive &arc);
 
 		flagstype_t		weaponFlags;
-		const ClassDef	*ammotype1;
-		int				ammogive1;
-		unsigned int	ammouse1;
+		const ClassDef	*ammotype[2];
+		int				ammogive[2];
+		unsigned int	ammouse[2];
 		fixed			yadjust;
 
 		// Inventory instance variables
 		FireMode		mode;
-		TObjPtr<AAmmo>	ammo1;
+		TObjPtr<AAmmo>	ammo[2];
 
 		// Bob
 		EBobStyle	BobStyle;

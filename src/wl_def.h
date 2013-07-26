@@ -300,6 +300,9 @@ enum Button
 	bt_movebackward,
 	bt_turnleft,
 	bt_turnright,
+	bt_altattack,
+	bt_reload,
+	bt_zoom,
 	NUMBUTTONS
 };
 

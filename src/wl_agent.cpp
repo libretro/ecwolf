@@ -80,6 +80,9 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
 
 void CheckWeaponChange (void)
 {
+	if(players[0].flags & player_t::PF_DISABLESWITCH)
+		return;
+
 	AWeapon *newWeapon = NULL;
 
 	if(buttonstate[bt_nextweapon] && !buttonheld[bt_nextweapon])
@@ -845,7 +848,7 @@ void player_t::Serialize(FArchive &arc)
 
 void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 {
-	flags &= ~(player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING);
+	flags &= ~(player_t::PF_READYFLAGS);
 	psprite[layer].frame = frame;
 
 	if(frame)

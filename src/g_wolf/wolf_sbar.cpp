@@ -387,10 +387,10 @@ void DrawKeys (void)
 void DrawAmmo (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Ammo.Enabled ||
-		!players[0].ReadyWeapon || !players[0].ReadyWeapon->ammo1)
+		!players[0].ReadyWeapon || !players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire])
 		return;
 
-	unsigned int amount = players[0].ReadyWeapon->ammo1->amount;
+	unsigned int amount = players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire]->amount;
 	LatchNumber (StatusBarConfig.Ammo.X,StatusBarConfig.Ammo.Y,StatusBarConfig.Ammo.Digits,amount);
 }
 

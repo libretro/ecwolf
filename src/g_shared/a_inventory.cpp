@@ -40,6 +40,7 @@
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_play.h"
+#include "wl_loadsave.h"
 
 IMPLEMENT_POINTY_CLASS(Inventory)
 	DECLARE_POINTER(owner)
@@ -386,29 +387,33 @@ bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
 ////////////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_POINTY_CLASS(Weapon)
-	DECLARE_POINTER(ammo1)
+	DECLARE_POINTER(ammo[0])
+	DECLARE_POINTER(ammo[1])
 END_POINTERS
 
 void AWeapon::AttachToOwner(AActor *owner)
 {
 	Super::AttachToOwner(owner);
 
-	ammo1 = static_cast<AAmmo *>(owner->FindInventory(ammotype1));
-	if(!ammo1)
+	for(unsigned int i = 0;i < 2;++i)
 	{
-		if(ammotype1)
+		ammo[i] = static_cast<AAmmo *>(owner->FindInventory(ammotype[i]));
+		if(!ammo[i])
 		{
-			ammo1 = static_cast<AAmmo *>(Spawn(ammotype1, 0, 0, 0, false));
-			ammo1->amount = MIN<unsigned int>(ammogive1, ammo1->maxamount);
-			owner->AddInventory(ammo1);
-			ammo1->RemoveFromWorld();
+			if(ammotype[i])
+			{
+				ammo[i] = static_cast<AAmmo *>(Spawn(ammotype[i], 0, 0, 0, false));
+				ammo[i]->amount = MIN<unsigned int>(ammogive[i], ammo[i]->maxamount);
+				owner->AddInventory(ammo[i]);
+				ammo[i]->RemoveFromWorld();
+			}
 		}
-	}
-	else if(ammo1->amount < ammo1->maxamount)
-	{
-		ammo1->amount += ammogive1;
-		if(ammo1->amount > ammo1->maxamount)
-			ammo1->amount = ammo1->maxamount;
+		else if(ammo[i]->amount < ammo[i]->maxamount)
+		{
+			ammo[i]->amount += ammogive[i];
+			if(ammo[i]->amount > ammo[i]->maxamount)
+				ammo[i]->amount = ammo[i]->maxamount;
+		}
 	}
 
 	// Autoswitch
@@ -421,10 +426,27 @@ void AWeapon::AttachToOwner(AActor *owner)
 
 bool AWeapon::CheckAmmo(AWeapon::FireMode fireMode, bool autoSwitch, bool requireAmmo)
 {
-	const unsigned int amount1 = ammo1 != NULL ? ammo1->amount : 0;
+	const unsigned int amount1 = ammo[PrimaryFire] != NULL ? ammo[PrimaryFire]->amount : 0;
+	const unsigned int amount2 = ammo[AltFire] != NULL ? ammo[AltFire]->amount : 0;
 
-	if(amount1 >= ammouse1)
-		return true;
+	switch(fireMode)
+	{
+		case PrimaryFire:
+			if(amount1 >= ammouse[PrimaryFire])
+				return true;
+			break;
+		case AltFire:
+			if(!FindState(NAME_AltFire))
+				return false;
+			if(amount2 >= ammouse[AltFire])
+				return true;
+			break;
+		default:
+		case EitherFire:
+			if(CheckAmmo(PrimaryFire, false) || CheckAmmo(AltFire, false))
+				return true;
+			break;
+	}
 
 	if(autoSwitch)
 	{
@@ -439,13 +461,13 @@ bool AWeapon::DepleteAmmo()
 	if(!CheckAmmo(mode, false))
 		return false;
 
-	AAmmo * const ammo = ammo1;
-	const unsigned int ammouse = ammouse1;
+	AAmmo * const ammo = this->ammo[mode];
+	const unsigned int ammouse = this->ammouse[mode];
 
 	if(ammo == NULL)
 		return true;
 
-	if(ammo->amount < ammouse1)
+	if(ammo->amount < ammouse)
 		ammo->amount = 0;
 	else
 		ammo->amount -= ammouse;
@@ -453,13 +475,23 @@ bool AWeapon::DepleteAmmo()
 	return true;
 }
 
-const Frame *AWeapon::GetAtkState(bool hold) const
+const Frame *AWeapon::GetAtkState(FireMode mode, bool hold) const
 {
 	const Frame *ret = NULL;
-	if(hold)
-		ret = FindState(NAME_Hold);
-	if(ret == NULL)
-		ret = FindState(NAME_Fire);
+	if(mode == PrimaryFire)
+	{
+		if(hold)
+			ret = FindState(NAME_Hold);
+		if(ret == NULL)
+			ret = FindState(NAME_Fire);
+	}
+	else
+	{
+		if(hold)
+			ret = FindState(NAME_AltHold);
+		if(ret == NULL)
+			ret = FindState(NAME_AltFire);
+	}
 	return ret;
 }
 
@@ -476,6 +508,16 @@ const Frame *AWeapon::GetDownState() const
 const Frame *AWeapon::GetReadyState() const
 {
 	return FindState(NAME_Ready);
+}
+
+const Frame *AWeapon::GetReloadState() const
+{
+	return FindState(NAME_Reload);
+}
+
+const Frame *AWeapon::GetZoomState() const
+{
+	return FindState(NAME_Zoom);
 }
 
 bool AWeapon::HandlePickup(AInventory *item, bool &good)
@@ -500,29 +542,37 @@ void AWeapon::Serialize(FArchive &arc)
 	arc << mode;
 	this->mode = static_cast<FireMode>(mode);
 
-	arc << ammotype1
-		<< ammogive1
-		<< ammouse1
+	arc << ammotype[0]
+		<< ammogive[0]
+		<< ammouse[0]
 		<< yadjust
-		<< ammo1;
+		<< ammo[0];
+
+	if(GameSave::SaveVersion > 1374729160)
+		arc << ammotype[1] << ammogive[1] << ammouse[1] << ammo[1];
 
 	Super::Serialize(arc);
 }
 
 bool AWeapon::UseForAmmo(AWeapon *owned)
 {
-	AAmmo *ammo1 = owned->ammo1;
-	if(!ammo1 || ammogive1 <= 0)
-		return false;
-
-	if(ammo1->amount < ammo1->maxamount)
+	bool used = false;
+	for(unsigned int i = 0;i < 2;++i)
 	{
-		ammo1->amount += ammogive1;
-		if(ammo1->amount > ammo1->maxamount)
-			ammo1->amount = ammo1->maxamount;
-		return true;
+		AAmmo *ammo = owned->ammo[i];
+		if(!ammo || ammogive[i] <= 0)
+			break;
+
+		if(ammo->amount < ammo->maxamount)
+		{
+			ammo->amount += ammogive[i];
+			if(ammo->amount > ammo->maxamount)
+				ammo->amount = ammo->maxamount;
+			used = true;
+			break;
+		}
 	}
-	return false;
+	return used;
 }
 
 ACTION_FUNCTION(A_ReFire)
@@ -531,17 +581,46 @@ ACTION_FUNCTION(A_ReFire)
 	if(!player)
 		return;
 
-	if(!player->ReadyWeapon->CheckAmmo(AWeapon::PrimaryFire, true))
+	if(!player->ReadyWeapon->CheckAmmo(player->ReadyWeapon->mode, true))
 		return;
 
-	if(buttonstate[bt_attack] && player->PendingWeapon == WP_NOCHANGE)
-		player->SetPSprite(player->ReadyWeapon->GetAtkState(true), player_t::ps_weapon);
+	if(player->PendingWeapon == WP_NOCHANGE || !(player->flags & player_t::PF_REFIRESWITCHOK))
+	{
+		if(player->ReadyWeapon->mode == AWeapon::PrimaryFire && buttonstate[bt_attack])
+			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::PrimaryFire, true), player_t::ps_weapon);
+		else if(player->ReadyWeapon->mode == AWeapon::AltFire && buttonstate[bt_altattack])
+			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::AltFire, true), player_t::ps_weapon);
+	}
 }
 
 ACTION_FUNCTION(A_WeaponReady)
 {
-	self->player->flags |= player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING;
+	enum
+	{
+		WRF_NOBOB = 1,
+		WRF_NOPRIMARY = 2,
+		WRF_NOSECONDARY = 4,
+		WRF_NOFIRE = WRF_NOPRIMARY|WRF_NOSECONDARY,
+		WRF_NOSWITCH = 8,
+		WRF_DISABLESWITCH = 0x10,
+		WRF_ALLOWRELOAD = 0x20,
+		WRF_ALLOWZOOM = 0x40
+	};
+
+	ACTION_PARAM_INT(flags, 0);
+
+	if(!(flags & WRF_NOBOB)) self->player->flags |= player_t::PF_WEAPONBOBBING;
+	if(!(flags & WRF_NOPRIMARY)) self->player->flags |= player_t::PF_WEAPONREADY;
+	if(!(flags & WRF_NOSECONDARY)) self->player->flags |= player_t::PF_WEAPONREADYALT;
+	if(!(flags & WRF_NOSWITCH)) self->player->flags |= player_t::PF_WEAPONSWITCHOK|player_t::PF_REFIRESWITCHOK;
+
+	if((flags & WRF_DISABLESWITCH)) { self->player->flags |= player_t::PF_DISABLESWITCH; self->player->flags &= ~player_t::PF_REFIRESWITCHOK; }
+	else self->player->flags &= ~player_t::PF_DISABLESWITCH;
+
+	if((flags & WRF_ALLOWRELOAD)) self->player->flags |= player_t::PF_WEAPONRELOADOK;
+	if((flags & WRF_ALLOWZOOM)) self->player->flags |= player_t::PF_WEAPONZOOMOK;
 }
+
 
 class AWeaponGiver : public AWeapon
 {
@@ -573,12 +652,14 @@ class AWeaponGiver : public AWeapon
 
 				if(noammo)
 				{
-					weap->ammogive1 = 0;
+					weap->ammogive[0] = weap->ammogive[1] = 0;
 				}
 				else
 				{
-					if(ammogive1 >= 0)
-						weap->ammogive1 = ammogive1;
+					if(ammogive[PrimaryFire] >= 0)
+						weap->ammogive[PrimaryFire] = ammogive[PrimaryFire];
+					if(ammogive[AltFire] >= 0)
+						weap->ammogive[AltFire] = ammogive[AltFire];
 				}
 
 				if(!weap->CallTryPickup(toucher))

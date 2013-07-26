@@ -57,22 +57,43 @@ HANDLE_PROPERTY(activesound)
 HANDLE_PROPERTY(ammogive1)
 {
 	INT_PARAM(give, 0);
-	((AWeapon *)defaults)->ammogive1 = give;
+	((AWeapon *)defaults)->ammogive[AWeapon::PrimaryFire] = give;
 }
 
 HANDLE_PROPERTY(ammotype1)
 {
 	STRING_PARAM(type, 0);
 	if(stricmp(type, "none") == 0 || *type == '\0')
-		((AWeapon *)defaults)->ammotype1 = NULL;
+		((AWeapon *)defaults)->ammotype[AWeapon::PrimaryFire] = NULL;
 	else
-		((AWeapon *)defaults)->ammotype1 = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
+		((AWeapon *)defaults)->ammotype[AWeapon::PrimaryFire] = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
 }
 
 HANDLE_PROPERTY(ammouse1)
 {
 	INT_PARAM(use, 0);
-	((AWeapon *)defaults)->ammouse1 = use;
+	((AWeapon *)defaults)->ammouse[AWeapon::PrimaryFire] = use;
+}
+
+HANDLE_PROPERTY(ammogive2)
+{
+	INT_PARAM(give, 0);
+	((AWeapon *)defaults)->ammogive[AWeapon::AltFire] = give;
+}
+
+HANDLE_PROPERTY(ammotype2)
+{
+	STRING_PARAM(type, 0);
+	if(stricmp(type, "none") == 0 || *type == '\0')
+		((AWeapon *)defaults)->ammotype[AWeapon::AltFire] = NULL;
+	else
+		((AWeapon *)defaults)->ammotype[AWeapon::AltFire] = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
+}
+
+HANDLE_PROPERTY(ammouse2)
+{
+	INT_PARAM(use, 0);
+	((AWeapon *)defaults)->ammouse[AWeapon::AltFire] = use;
 }
 
 HANDLE_PROPERTY(amount)
@@ -526,8 +547,11 @@ extern const PropDef properties[] =
 {
 	DEFINE_PROP(activesound, Actor, S),
 	DEFINE_PROP(ammogive1, Weapon, I),
+	DEFINE_PROP(ammogive2, Weapon, I),
 	DEFINE_PROP(ammotype1, Weapon, S),
+	DEFINE_PROP(ammotype2, Weapon, S),
 	DEFINE_PROP(ammouse1, Weapon, I),
+	DEFINE_PROP(ammouse2, Weapon, I),
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
 	DEFINE_PROP(backpackamount, Ammo, I),
