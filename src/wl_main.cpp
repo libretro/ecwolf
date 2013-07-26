@@ -262,7 +262,7 @@ void CalcProjection (int32_t focal)
 	// calculate scale value for vertical height calculations
 	// and sprite x calculations
 	//
-	scale = (fixed) (halfview*facedist/(projectionFOV/2));
+	scale = (fixed) (viewwidth*facedist/projectionFOV);
 
 	//
 	// divide heightnumerator by a posts distance to get the posts height for

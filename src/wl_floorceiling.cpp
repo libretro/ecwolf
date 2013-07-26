@@ -36,8 +36,6 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	const unsigned int mapwidth = map->GetHeader().width;
 	const unsigned int mapheight = map->GetHeader().height;
 
-	const unsigned int texDivisor = viewwidth*AspectCorrection[r_ratio].multiplier*175/48;
-
 	int planenumerator = FixedMul(heightnumerator, planeheight)/32;
 	const bool floor = planenumerator < 0;
 	int tex_offsetPitch;
@@ -67,7 +65,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		dist = (planenumerator / (y + 1)) << 5;
 		gu =  viewx + FixedMul(dist, viewcos);
 		gv = -viewy + FixedMul(dist, viewsin);
-		tex_step = (dist << 8) / texDivisor;
+		tex_step = dist / scale;
 		du =  FixedMul(tex_step, viewsin);
 		dv = -FixedMul(tex_step, viewcos);
 		gu -= (viewwidth >> 1) * du;
