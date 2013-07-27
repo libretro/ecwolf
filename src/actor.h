@@ -165,6 +165,12 @@ enum
 	AMETA_GibHealth
 };
 
+enum
+{
+	SPAWN_AllowReplacement = 1,
+	SPAWN_Patrol = 2
+};
+
 class player_t;
 class AActorProxy;
 class ClassDef;
@@ -200,8 +206,8 @@ class AActor : public DObject
 		void			RemoveFromWorld();
 		virtual void	RemoveInventory(AInventory *item);
 		void			Serialize(FArchive &arc);
-		void			SetState(const Frame *state, bool notic=false);
-		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allowreplacement);
+		void			SetState(const Frame *state, bool norun=false);
+		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags);
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
 

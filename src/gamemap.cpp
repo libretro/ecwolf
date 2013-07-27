@@ -454,33 +454,20 @@ void GameMap::SpawnThings() const
 				printf("Unknown thing %d @ (%d, %d)\n", thing.type, thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
 
-			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, true);
+			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, SPAWN_AllowReplacement|(thing.patrol ? SPAWN_Patrol : 0));
 			// This forumla helps us to avoid errors in roundoffs.
 			actor->angle = (thing.angle/45)*ANGLE_45 + (thing.angle%45)*ANGLE_1;
 			actor->dir = nodir;
 			if(thing.ambush)
 				actor->flags |= FL_AMBUSH;
 			if(thing.patrol)
-			{
-				actor->flags |= FL_PATHING;
 				actor->dir = dirtype(actor->angle/ANGLE_45);
-
-				// Pathing monsters should take at least a one tile step.
-				// Otherwise the paths will break early.
-				actor->distance = TILEGLOBAL;
-				if(actor->PathState)
-				{
-					actor->SetState(actor->PathState, true);
-					if(actor->flags & FL_RANDOMIZE)
-						actor->ticcount = pr_spawnmobj() % actor->ticcount;
-				}
-			}
 
 			// Check for valid frames
 			if(!actor->state || !R_CheckSpriteValid(actor->sprite))
 			{
 				actor->Destroy();
-				actor = AActor::Spawn(unknownClass, thing.x, thing.y, 0, true);
+				actor = AActor::Spawn(unknownClass, thing.x, thing.y, 0, SPAWN_AllowReplacement);
 
 				printf("%s at (%d, %d) has no frames\n", cls->GetName().GetChars(), thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}

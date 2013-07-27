@@ -277,7 +277,7 @@ void AActor::Die()
 					// the AI, so it can be off by one.
 					static const fixed TILEMASK = ~(TILEGLOBAL-1);
 
-					AActor * const actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0, true);
+					AActor * const actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0, SPAWN_AllowReplacement);
 					actor->angle = angle;
 					actor->dir = dir;
 
@@ -454,7 +454,7 @@ void AActor::Serialize(FArchive &arc)
 	Super::Serialize(arc);
 }
 
-void AActor::SetState(const Frame *state, bool notic)
+void AActor::SetState(const Frame *state, bool norun)
 {
 	if(state == NULL)
 		return;
@@ -462,8 +462,26 @@ void AActor::SetState(const Frame *state, bool notic)
 	this->state = state;
 	sprite = state->spriteInf;
 	ticcount = state->GetTics();
-	if(!notic)
+	if(!norun)
+	{
 		state->action(this, this, state);
+
+		while(ticcount == 0)
+		{
+			this->state = this->state->next;
+			if(!this->state)
+			{
+				Destroy();
+				break;
+			}
+			else
+			{
+				sprite = this->state->spriteInf;
+				ticcount = this->state->GetTics();
+				this->state->action(this, this, this->state);
+			}
+		}
+	}
 }
 
 void AActor::Tick()
@@ -530,7 +548,7 @@ void AActor::RemoveInventory(AInventory *item)
 }
 
 FRandom pr_spawnmobj("SpawnActor");
-AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allowreplacement)
+AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags)
 {
 	if(type == NULL)
 	{
@@ -538,7 +556,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 		return NULL;
 	}
 
-	if(allowreplacement)
+	if(flags & SPAWN_AllowReplacement)
 		type = type->GetReplacement();
 
 	AActor *actor = type->CreateInstance();
@@ -585,6 +603,27 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 			actor->ticcount = pr_spawnmobj() % actor->ticcount;
 	}
 
+	// Change between patrolling and normal spawn and also execute any zero
+	// tic functions.
+	if(flags & SPAWN_Patrol)
+	{
+		actor->flags |= FL_PATHING;
+
+		// Pathing monsters should take at least a one tile step.
+		// Otherwise the paths will break early.
+		actor->distance = TILEGLOBAL;
+		if(actor->PathState)
+		{
+			actor->SetState(actor->PathState);
+			if(actor->flags & FL_RANDOMIZE)
+				actor->ticcount = pr_spawnmobj() % actor->ticcount;
+		}
+	}
+	else
+		actor->SetState(actor->SpawnState);
+
+	if(actor->ObjectFlags & OF_EuthanizeMe)
+		return NULL;
 	return actor;
 }
 

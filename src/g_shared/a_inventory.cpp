@@ -342,7 +342,7 @@ AInventory *ABackpackItem::CreateCopy(AActor *holder)
 			else
 			{
 				// Give the ammo type with the proper amounts
-				ammo = static_cast<AAmmo *>(AActor::Spawn(cls, 0, 0, 0, false));
+				ammo = static_cast<AAmmo *>(AActor::Spawn(cls, 0, 0, 0, 0));
 				ammo->amount = ammo->Backpackamount;
 				if(ammo->maxamount < ammo->Backpackmaxamount)
 					ammo->maxamount = ammo->Backpackmaxamount;
@@ -647,7 +647,7 @@ class AWeaponGiver : public AWeapon
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
 					continue;
 
-				AWeapon *weap = static_cast<AWeapon *>(AActor::Spawn(cls, 0, 0, 0, false));
+				AWeapon *weap = static_cast<AWeapon *>(AActor::Spawn(cls, 0, 0, 0, 0));
 				weap->itemFlags &= ~IF_ALWAYSPICKUP;
 				weap->RemoveFromWorld();
 

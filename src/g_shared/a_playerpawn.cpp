@@ -122,7 +122,7 @@ void APlayerPawn::GiveStartingInventory()
 		if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 			continue;
 
-		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0, false);
+		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0, 0);
 		invItem->RemoveFromWorld();
 		invItem->amount = inv.amount;
 		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
@@ -347,7 +347,7 @@ void APlayerPawn::TickPSprites()
 		if(player->psprite[layer].ticcount > 0)
 			--player->psprite[layer].ticcount;
 
-		while(player->psprite[layer].frame && player->psprite[layer].ticcount == 0)
+		if(player->psprite[layer].frame && player->psprite[layer].ticcount == 0)
 			player->SetPSprite(player->psprite[layer].frame->next, static_cast<player_t::PSprite>(layer));
 
 		if(player->psprite[layer].frame)
