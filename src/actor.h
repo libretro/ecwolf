@@ -198,6 +198,7 @@ class AActor : public DObject
 		void			EnterZone(const MapZone *zone);
 		AInventory		*FindInventory(const ClassDef *cls);
 		const Frame		*FindState(const FName &name) const;
+		static void		FinishSpawningActors();
 		int				GetDamage();
 		const AActor	*GetDefault() const;
 		DropList		*GetDropList() const;

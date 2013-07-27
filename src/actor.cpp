@@ -486,6 +486,12 @@ void AActor::SetState(const Frame *state, bool norun)
 
 void AActor::Tick()
 {
+	// If we just spawned we're not ready to be ticked yet
+	// Otherwise we might tick on the same tick we're spawned which would cause
+	// an actor with a duration of 1 tic to never display
+	if(ObjectFlags & OF_JustSpawned)
+		return;
+
 	if(state == NULL)
 	{
 		Destroy();
@@ -545,6 +551,30 @@ void AActor::RemoveInventory(AInventory *item)
 	while(*next && (next = &(*next)->inventory));
 
 	item->DetachFromOwner();
+}
+
+/* When we spawn an actor we add them to this list. After the tic has finished
+ * processing we process this list to handle any start up actions.
+ *
+ * This is done so that we don't duplicate tics and actors appear on screen
+ * when they should. We can't do this in Spawn() since we want certain
+ * properties of the actor (velocity) to be setup before calling actions.
+ */
+static LinkedList<AActor *> SpawnedActors;
+void AActor::FinishSpawningActors()
+{
+	LinkedList<AActor *>::Node *node = SpawnedActors.Head();
+	while(node)
+	{
+		AActor *actor = node->Item();
+		node = node->Next();
+
+		// Run the first action pointer and all zero tic states!
+		actor->SetState(actor->state);
+		actor->ObjectFlags &= ~OF_JustSpawned;
+	}
+
+	SpawnedActors.Clear();
 }
 
 FRandom pr_spawnmobj("SpawnActor");
@@ -614,16 +644,14 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags
 		actor->distance = TILEGLOBAL;
 		if(actor->PathState)
 		{
-			actor->SetState(actor->PathState);
+			actor->SetState(actor->PathState, true);
 			if(actor->flags & FL_RANDOMIZE)
 				actor->ticcount = pr_spawnmobj() % actor->ticcount;
 		}
 	}
-	else
-		actor->SetState(actor->SpawnState);
 
-	if(actor->ObjectFlags & OF_EuthanizeMe)
-		return NULL;
+	SpawnedActors.Push(actor);
+
 	return actor;
 }
 
