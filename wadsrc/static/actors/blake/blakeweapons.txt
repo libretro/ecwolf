@@ -113,13 +113,14 @@ actor PlasmaGrenade
 	seesound "plasmagrenade/fire"
 	deathsound "plasmagrenade/hit"
 	radius 10
-	speed 14 // Todo: random(14, 21)?
+	speed 14
 	damage (random(40, 167))
 	PROJECTILE
 	states
 	{
 		Spawn:
-			GREN CCBABBCD 3.5 bright
+			GREN C 3.5 bright A_ScaleVelocity(frandom(1.0, 1.5))
+			GREN CBABBCD 3.5 bright
 			GREN E 0 bright A_Scream
 			GREN E 0 bright A_Explode(random(50, 177), 128, 0)
 			GREN E 3 bright A_Stop
@@ -158,15 +159,15 @@ actor AntiPlasmaShot
 	seesound "antiplasmashot/fire"
 	deathsound "antiplasmashot/hit"
 	radius 10
-	speed 14 // Todo: random(14, 28)?
+	speed 14
 	damage (random(40, 167))
 	PROJECTILE
 	//+RIPPER
 	states
 	{
 		Spawn:
-			APCS B 3.5 bright
-			APCS C -1
+			APCS B 3.5 bright A_ScaleVelocity(frandom(1.0, 2.0))
+			APCS C -1 bright
 			stop
 		Death:
 			// Todo: Decide the duration once and play
