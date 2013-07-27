@@ -22,6 +22,7 @@
 #include "wl_inter.h"
 #include "wl_play.h"
 #include "g_mapinfo.h"
+#include "a_inventory.h"
 
 /*
 =============================================================================
@@ -86,6 +87,9 @@ ControlScheme controlScheme[] =
 	{ bt_slot0,				"Slot 0",		-1,			sc_0,			-1, NULL, 0 },
 	{ bt_nextweapon,		"Next Weapon",	4,			-1,				-1, NULL, 0 },
 	{ bt_prevweapon,		"Prev Weapon",	5, 			-1,				-1, NULL, 0 },
+	{ bt_altattack,			"Alt Attack",	-1,			-1,				-1, NULL, 0 },
+	{ bt_reload,			"Reload",		-1,			-1,				-1, NULL, 0 },
+	{ bt_zoom,				"Zoom",			-1,			-1,				-1, NULL, 0 },
 
 	// End of List
 	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
@@ -276,6 +280,9 @@ void PollMouseMove (void)
 		controly += mouseymove * 40 / (21 - mouseadjustment);
 	else if(mouselook)
 	{
+		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
+			mouseymove = mouseymove*fabs(players[0].ReadyWeapon->fovscale);
+
 		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseadjustment));
 		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
 			players[0].mo->pitch = 56*ANGLE_1;
@@ -828,6 +835,7 @@ void PlayLoop (void)
 		{
 			++gamestate.TimeCount;
 			thinkerList->Tick();
+			AActor::FinishSpawningActors();
 
 			if(i == 0) // After the first tic, go ahead and take care of button holding.
 				memcpy(buttonheld, buttonstate, sizeof (buttonstate));

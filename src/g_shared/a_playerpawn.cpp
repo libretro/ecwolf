@@ -38,6 +38,7 @@
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
 #include "wl_game.h"
+#include "wl_main.h"
 #include "wl_play.h"
 
 #include <climits>
@@ -61,7 +62,7 @@ AWeapon *APlayerPawn::BestWeapon(const ClassDef *ammo)
 			continue;
 
 		AWeapon *weapon = static_cast<AWeapon *>(item);
-		if(ammo && weapon->ammo1->GetClass() != ammo)
+		if(ammo && weapon->ammo[0]->GetClass() != ammo)
 			continue;
 		if(!weapon->CheckAmmo(AWeapon::PrimaryFire, false))
 			continue;
@@ -121,7 +122,7 @@ void APlayerPawn::GiveStartingInventory()
 		if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 			continue;
 
-		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0, false);
+		AInventory *invItem = (AInventory *)AActor::Spawn(cls, 0, 0, 0, 0);
 		invItem->RemoveFromWorld();
 		invItem->amount = inv.amount;
 		if(cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
@@ -129,7 +130,7 @@ void APlayerPawn::GiveStartingInventory()
 			player->PendingWeapon = (AWeapon *)invItem;
 
 			// Empty weapon.
-			((AWeapon *)invItem)->ammogive1 = 0;
+			((AWeapon *)invItem)->ammogive[0] = ((AWeapon *)invItem)->ammogive[1] = 0;
 		}
 		if(!invItem->CallTryPickup(this))
 			invItem->Destroy();
@@ -236,6 +237,44 @@ void APlayerPawn::Tick()
 
 	player->bob = curbob;
 
+	// [RH] Zoom the player's FOV
+	float desired = player->DesiredFOV;
+	// Adjust FOV using on the currently held weapon.
+	if (player->state != player_t::PST_DEAD &&		// No adjustment while dead.
+		player->ReadyWeapon != NULL &&			// No adjustment if no weapon.
+		player->ReadyWeapon->fovscale != 0)		// No adjustment if the adjustment is zero.
+	{
+		// A negative scale is used to prevent G_AddViewAngle/G_AddViewPitch
+		// from scaling with the FOV scale.
+		desired *= fabs(player->ReadyWeapon->fovscale);
+	}
+	if (player->FOV != desired)
+	{
+		// Negative FOV means recalculate projection
+		if (player->FOV < 0)
+		{
+			player->FOV *= -1;
+		}
+		else if (fabsf (player->FOV - desired) < 7.f)
+		{
+			player->FOV = desired;
+		}
+		else
+		{
+			float zoom = MAX(7.f, fabsf(player->FOV - desired) * 0.025f);
+			if (player->FOV > desired)
+			{
+				player->FOV = player->FOV - zoom;
+			}
+			else
+			{
+				player->FOV = player->FOV + zoom;
+			}
+		}
+
+		CalcProjection(radius);
+	}
+
 	// Watching BJ
 	if(gamestate.victoryflag)
 		return;
@@ -246,25 +285,54 @@ void APlayerPawn::Tick()
 	if(buttonstate[bt_use])
 		Cmd_Use();
 
-	if((player->flags & player_t::PF_WEAPONREADY))
+	if((player->flags & (player_t::PF_WEAPONREADY|player_t::PF_WEAPONREADYALT)))
 	{
-		if(buttonstate[bt_attack] && player->ReadyWeapon->CheckAmmo(AWeapon::PrimaryFire, true))
+		// Determine primary or alternate attack
+		Button fireButton = bt_nobutton;
+		if(buttonstate[bt_attack] && (player->flags & player_t::PF_WEAPONREADY))
 		{
-			if(!buttonheld[bt_attack])
+			fireButton = bt_attack;
+			player->ReadyWeapon->mode = AWeapon::PrimaryFire;
+		}
+		else if(buttonstate[bt_altattack] && (player->flags & player_t::PF_WEAPONREADYALT))
+		{
+			fireButton = bt_altattack;
+			player->ReadyWeapon->mode = AWeapon::AltFire;
+		}
+
+		// Try to fire
+		if(fireButton != bt_nobutton && player->ReadyWeapon->CheckAmmo(player->ReadyWeapon->mode, true))
+		{
+			if(!buttonheld[fireButton])
 				player->attackheld = false;
 			if(!(player->ReadyWeapon->weaponFlags & WF_NOAUTOFIRE) || !player->attackheld)
 			{
 				player->attackheld = true;
-				player->SetPSprite(player->ReadyWeapon->GetAtkState(false), player_t::ps_weapon);
+				player->SetPSprite(player->ReadyWeapon->GetAtkState(player->ReadyWeapon->mode, false), player_t::ps_weapon);
 			}
 		}
-		else if(player->PendingWeapon != WP_NOCHANGE)
+		else if(player->PendingWeapon != WP_NOCHANGE && (player->flags & player_t::PF_WEAPONSWITCHOK))
 		{
 			player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
 		}
 	}
 	else if(player->attackheld)
-		player->attackheld = buttonstate[bt_attack];
+		player->attackheld = buttonstate[bt_attack]|buttonstate[bt_altattack];
+
+	// Reload
+	if((player->flags & player_t::PF_WEAPONRELOADOK) && buttonstate[bt_reload])
+	{
+		const Frame *reload = player->ReadyWeapon->GetReloadState();
+		if(reload)
+			player->SetPSprite(reload, player_t::ps_weapon);
+	}
+	// Zoom
+	if((player->flags & player_t::PF_WEAPONZOOMOK) && buttonstate[bt_zoom])
+	{
+		const Frame *zoom = player->ReadyWeapon->GetZoomState();
+		if(zoom)
+			player->SetPSprite(zoom, player_t::ps_weapon);
+	}
 
 	ControlMovement(this);
 }
@@ -279,7 +347,7 @@ void APlayerPawn::TickPSprites()
 		if(player->psprite[layer].ticcount > 0)
 			--player->psprite[layer].ticcount;
 
-		while(player->psprite[layer].frame && player->psprite[layer].ticcount == 0)
+		if(player->psprite[layer].frame && player->psprite[layer].ticcount == 0)
 			player->SetPSprite(player->psprite[layer].frame->next, static_cast<player_t::PSprite>(layer));
 
 		if(player->psprite[layer].frame)

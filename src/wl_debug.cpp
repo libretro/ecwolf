@@ -209,7 +209,7 @@ static void GiveAllWeaponsAndAmmo()
 			(cls->GetParent() == NATIVE_CLASS(Ammo))
 		)
 		{
-			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
+			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, 0);
 			inv->RemoveFromWorld();
 			const Frame * const readyState = cls->FindState("Ready");
 			if(cls->GetParent() == NATIVE_CLASS(Ammo))
@@ -536,7 +536,7 @@ int DebugKeys (void)
 				AActor *newobj = AActor::Spawn(cls,
 					players[0].mo->x + FixedMul(distance, finecosine[players[0].mo->angle>>ANGLETOFINESHIFT]),
 					players[0].mo->y - FixedMul(distance, finesine[players[0].mo->angle>>ANGLETOFINESHIFT]),
-					0, false);
+					0, 0);
 				newobj->angle = players[0].mo->angle;
 			}
 			else
@@ -544,7 +544,7 @@ int DebugKeys (void)
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 					return 1;
 
-				AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
+				AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, 0);
 				inv->RemoveFromWorld();
 				if(!inv->CallTryPickup(players[0].mo))
 					inv->Destroy();

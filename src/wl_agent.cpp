@@ -80,6 +80,9 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
 
 void CheckWeaponChange (void)
 {
+	if(players[0].flags & player_t::PF_DISABLESWITCH)
+		return;
+
 	AWeapon *newWeapon = NULL;
 
 	if(buttonstate[bt_nextweapon] && !buttonheld[bt_nextweapon])
@@ -152,6 +155,9 @@ void ControlMovement (AActor *ob)
 	}
 	else
 	{
+		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
+			controlx = controlx*players[0].ReadyWeapon->fovscale;
+
 		//
 		// not strafing
 		//
@@ -582,7 +588,7 @@ void Cmd_Use (void)
 =============================================================================
 */
 
-player_t::player_t() : bob(0), attackheld(false)
+player_t::player_t() : FOV(90), DesiredFOV(90), bob(0), attackheld(false)
 {
 }
 
@@ -792,6 +798,7 @@ void player_t::Reborn()
 	ReadyWeapon = NULL;
 	PendingWeapon = WP_NOCHANGE;
 	flags = 0;
+	FOV = DesiredFOV = 90.0f;
 
 	if(state == PST_ENTER)
 	{
@@ -836,6 +843,9 @@ void player_t::Serialize(FArchive &arc)
 			<< psprite[i].sy;
 	}
 
+	if(GameSave::SaveVersion > 1374729160)
+		arc << FOV << DesiredFOV;
+
 	if(arc.IsLoading())
 	{
 		mo->SetupWeaponSlots();
@@ -845,14 +855,20 @@ void player_t::Serialize(FArchive &arc)
 
 void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 {
-	flags &= ~(player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING);
+	flags &= ~(player_t::PF_READYFLAGS);
 	psprite[layer].frame = frame;
 
-	if(frame)
+	do
 	{
-		psprite[layer].ticcount = frame->GetTics();
-		frame->action(mo, ReadyWeapon, frame);
+		if(psprite[layer].frame)
+		{
+			psprite[layer].ticcount = frame->GetTics();
+			frame->action(mo, ReadyWeapon, frame);
+		}
+		else
+			break;
 	}
+	while(psprite[layer].ticcount == 0);
 }
 
 FArchive &operator<< (FArchive &arc, player_t *&player)
@@ -870,7 +886,7 @@ FArchive &operator<< (FArchive &arc, player_t *&player)
 
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
-	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, false);
+	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, 0);
 	players[0].mo->angle = dir*ANGLE_1;
 	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables
@@ -1061,7 +1077,7 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
 		return;
-	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, true);
+	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, SPAWN_AllowReplacement);
 	newobj->flags |= FL_PLAYERMISSILE;
 	newobj->angle = iangle;
 

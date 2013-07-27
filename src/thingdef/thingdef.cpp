@@ -1544,6 +1544,8 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 					}
 					while(max >= min && max < globalSymbols.Size());
 				}
+				if(globalSymbols[mid]->GetName() <= constName)
+					++mid;
 				globalSymbols.Insert(mid, newSym);
 			}
 			else

@@ -33,7 +33,7 @@ class AKeyGiver : public AInventory
 					continue;
 				}
 
-				AInventory *item = static_cast<AInventory *>(AActor::Spawn(cls, 0, 0, 0, false));
+				AInventory *item = static_cast<AInventory *>(AActor::Spawn(cls, 0, 0, 0, 0));
 				item->RemoveFromWorld();
 				if(!item->CallTryPickup(toucher))
 				{
@@ -499,7 +499,7 @@ bool P_GiveKeys (AActor *owner, int keynum)
 			OneKey &key = lock->keylist[i]->anykeylist[j];
 			if(!key.check(owner))
 			{
-				AKey *newKey = (AKey*) AActor::Spawn(key.key, 0, 0, 0, false);
+				AKey *newKey = (AKey*) AActor::Spawn(key.key, 0, 0, 0, 0);
 				newKey->RemoveFromWorld();
 				if(!newKey->CallTryPickup(owner))
 					newKey->Destroy();
