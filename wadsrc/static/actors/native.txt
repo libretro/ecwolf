@@ -56,7 +56,7 @@ actor Actor native
 	action native A_JumpIfInventory(string type, int amount, state frame);
 	action native A_Look(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180);
 	action native A_LookEx(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180); // Alias
-	action native A_MeleeAttack(int damage, float accuracy = 0.6275);
+	action native A_MeleeAttack(int damage, float accuracy = 0.6275, string hitsound = "", string misssound = "*");
 	action native A_MonsterRefire(int chance, state abort);
 	action native A_Pain();
 	action native A_PlaySound(string soundname);
