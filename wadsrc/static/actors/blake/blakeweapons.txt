@@ -108,7 +108,7 @@ actor DualNeutronDisruptor : BlakeWeapon 234
 	}
 }
 
-actor PlasmaGrenade
+actor PlasmaGrenade : SmartAnimation
 {
 	seesound "plasmagrenade/fire"
 	deathsound "plasmagrenade/hit"
@@ -116,20 +116,24 @@ actor PlasmaGrenade
 	speed 14
 	damage (random(40, 167))
 	PROJECTILE
+
+	action native A_PlasmaGrenadeCalcDuration();
+
 	states
 	{
 		Spawn:
-			GREN C 3.5 bright A_ScaleVelocity(frandom(1.0, 1.5))
-			GREN CBABBCD 3.5 bright
+			GREN C 0 bright A_ScaleVelocity(frandom(1.0, 1.5))
+			GREN CCBABBCD 3.5 bright A_PlasmaGrenadeCalcDuration
 			GREN E 0 bright A_Scream
 			GREN E 0 bright A_Explode(random(50, 177), 128, 0)
-			GREN E 3 bright A_Stop
-			GREN FGH 3 bright
+			GREN E 0 bright A_Stop
+			GREN E random(3, 6) bright A_InitSmartAnim(random(3, 6))
+			GREN FGH 3 bright A_SmartAnimDelay
 			stop
 		Death:
-			// Todo: Decide the duration once and play
-			EXPL A random(1.5, 5) bright A_Explode(random(50, 177), 128, 0)
-			EXPL BCDE random(1.5, 5) bright
+			EXPL A 0 bright A_Explode(random(50, 177), 128, 0)
+			EXPL A random(1.5, 5) bright A_InitSmartAnim(random(3, 10))
+			EXPL BCDE 1.5 bright A_SmartAnimDelay
 			stop
 	}
 }
@@ -154,7 +158,7 @@ actor PlasmaDischargeUnit : BlakeWeapon 252
 	}
 }
 
-actor AntiPlasmaShot
+actor AntiPlasmaShot : SmartAnimation
 {
 	seesound "antiplasmashot/fire"
 	deathsound "antiplasmashot/hit"
@@ -162,7 +166,7 @@ actor AntiPlasmaShot
 	speed 14
 	damage (random(40, 167))
 	PROJECTILE
-	//+RIPPER
+	+RIPPER
 	states
 	{
 		Spawn:
@@ -170,9 +174,9 @@ actor AntiPlasmaShot
 			APCS C -1 bright
 			stop
 		Death:
-			// Todo: Decide the duration once and play
-			APCS E 2.5 bright A_Explode(random(50, 177), 128, 0)
-			APCS FGHIJKL random(0.5, 3.5) bright
+			APCS E 0 bright A_Explode(random(50, 177), 128, 0)
+			APCS E 2.5 bright A_InitSmartAnim(random(1, 7))
+			APCS FGHIJKL 0.5 bright A_SmartAnimDelay
 			stop
 	}
 }

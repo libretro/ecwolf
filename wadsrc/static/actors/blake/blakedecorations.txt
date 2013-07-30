@@ -1,3 +1,9 @@
+actor SmartAnimation
+{
+	action native A_InitSmartAnim(int delay);
+	action native A_SmartAnimDelay();
+}
+
 actor BlakeWaterPuddle 206
 {
 	states
