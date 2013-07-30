@@ -442,6 +442,9 @@ void AActor::Serialize(FArchive &arc)
 		<< thinker
 		<< hasActorRef;
 
+	if(GameSave::SaveVersion > 1374914454)
+		arc << projectilepassheight;
+
 	if(!arc.IsStoring())
 	{
 		if(!hasActorRef)

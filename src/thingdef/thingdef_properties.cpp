@@ -365,6 +365,12 @@ HANDLE_PROPERTY(pickupsound)
 	((AInventory *)defaults)->pickupsound = snd;
 }
 
+HANDLE_PROPERTY(projectilepassheight)
+{
+	FLOAT_PARAM(height, 0);
+	defaults->projectilepassheight = static_cast<fixed>(height*FRACUNIT);
+}
+
 HANDLE_PROPERTY(points)
 {
 	INT_PARAM(pts, 0);
@@ -583,6 +589,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(pickupsound, Inventory, S),
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(PROJECTILE, Actor,),
+	DEFINE_PROP(projectilepassheight, Actor, F),
 	DEFINE_PROP(radius, Actor, I),
 	DEFINE_PROP(scale, Actor, F),
 	DEFINE_PROP(secretdeathsound, Actor, S),

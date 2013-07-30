@@ -48,6 +48,7 @@ actor Actor native
 	missilefrequency 1.0
 	meleerange 44
 	scale 1.0
+	projectilepassheight -1
 
 	native angle_t angle;
 	native int health;
