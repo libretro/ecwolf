@@ -460,7 +460,10 @@ void AActor::Serialize(FArchive &arc)
 void AActor::SetState(const Frame *state, bool norun)
 {
 	if(state == NULL)
+	{
+		Destroy();
 		return;
+	}
 
 	this->state = state;
 	sprite = state->spriteInf;
@@ -504,14 +507,11 @@ void AActor::Tick()
 	if(ticcount > 0)
 		--ticcount;
 
-	while(ticcount == 0)
+	if(ticcount == 0)
 	{
-		if(!state->next)
-		{
-			Destroy();
-			return;
-		}
 		SetState(state->next);
+		if(ObjectFlags & OF_EuthanizeMe)
+			return;
 	}
 
 	state->thinker(this, this, state);
