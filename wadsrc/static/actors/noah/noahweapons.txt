@@ -99,6 +99,7 @@ actor Cantaloupe
 	seesound "cantaloupe/fire"
 	deathsound "cantaloupe/hit"
 	PROJECTILE
+	+RIPPER
 	states
 	{
 		Spawn:
@@ -143,6 +144,7 @@ actor Watermelon
 	seesound "watermelon/fire"
 	deathsound "watermelon/hit"
 	PROJECTILE
+	+RIPPER
 	states
 	{
 		Spawn:

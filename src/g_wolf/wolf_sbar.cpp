@@ -14,6 +14,9 @@
 #include "a_inventory.h"
 #include "a_keys.h"
 
+#include <cmath>
+#include <climits>
+
 /*
 =============================================================================
 
@@ -196,7 +199,7 @@ void UpdateFace (bool damageUpdate)
 ===============
 */
 
-static void LatchNumber (int x, int y, unsigned width, int32_t number)
+static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=false)
 {
 	static FFont *HudFont = NULL;
 	if(!HudFont)
@@ -208,6 +211,11 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number)
 
 	FString str;
 	str.Format("%*d", width, number);
+	if(str.Len() > width && cap)
+	{
+		int maxval = width <= 9 ? (int) ceil(pow(10., width))-1 : INT_MAX;
+		str.Format("%d", maxval);
+	}
 
 	int cwidth;
 	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
@@ -230,7 +238,7 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number)
 void DrawHealth (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Health.Enabled) return;
-	LatchNumber (StatusBarConfig.Health.X,StatusBarConfig.Health.Y,StatusBarConfig.Health.Digits,players[0].health);
+	LatchNumber (StatusBarConfig.Health.X,StatusBarConfig.Health.Y,StatusBarConfig.Health.Digits,players[0].health,true);
 }
 
 //===========================================================================
@@ -391,7 +399,7 @@ void DrawAmmo (void)
 		return;
 
 	unsigned int amount = players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire]->amount;
-	LatchNumber (StatusBarConfig.Ammo.X,StatusBarConfig.Ammo.Y,StatusBarConfig.Ammo.Digits,amount);
+	LatchNumber (StatusBarConfig.Ammo.X,StatusBarConfig.Ammo.Y,StatusBarConfig.Ammo.Digits,amount,true);
 }
 
 //===========================================================================

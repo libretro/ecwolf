@@ -221,6 +221,8 @@ typedef enum
 	FL_REQUIREKEYS		= 0x00400000,
 	FL_ALWAYSFAST		= 0x00800000,
 	FL_RANDOMIZE		= 0x01000000,
+	FL_RIPPER			= 0x02000000,
+	FL_DONTRIP			= 0x04000000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
 

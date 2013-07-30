@@ -228,6 +228,7 @@ void T_Projectile (AActor *self)
 		movey /= steps;
 	}
 
+	AActor *lastHit = NULL; // For ripping, so we only hit an actor once per tic
 	do
 	{
 		self->x += movex;
@@ -244,11 +245,16 @@ void T_Projectile (AActor *self)
 			fixed deltax = LABS(self->x - players[0].mo->x);
 			fixed deltay = LABS(self->y - players[0].mo->y);
 			fixed radius = players[0].mo->radius + self->radius;
-			if (deltax < radius && deltay < radius)
+			if (lastHit != players[0].mo && deltax < radius && deltay < radius)
 			{
+				lastHit = players[0].mo;
+
 				TakeDamage (self->GetDamage(),self);
-				T_ExplodeProjectile(self, players[0].mo);
-				return;
+				if(!(self->flags & FL_RIPPER))
+				{
+					T_ExplodeProjectile(self, players[0].mo);
+					return;
+				}
 			}
 		}
 		else
@@ -257,16 +263,29 @@ void T_Projectile (AActor *self)
 			while(iter)
 			{
 				AActor *check = iter->Item();
-				if(check != players[0].mo && (check->flags & FL_SHOOTABLE))
+				if(check != players[0].mo && (check->flags & (FL_SHOOTABLE|FL_SOLID)) && lastHit != check)
 				{
 					fixed deltax = LABS(self->x - check->x);
 					fixed deltay = LABS(self->y - check->y);
 					fixed radius = check->radius + self->radius;
 					if(deltax < radius && deltay < radius)
 					{
-						DamageActor(check, self->GetDamage());
-						T_ExplodeProjectile(self, check);
-						return;
+						lastHit = check;
+						if(check->flags & FL_SHOOTABLE)
+						{
+							DamageActor(check, self->GetDamage());
+							if(!(self->flags & FL_RIPPER) || (check->flags & FL_DONTRIP))
+							{
+								T_ExplodeProjectile(self, check);
+								return;
+							}
+						}
+						// Eventually this will need an actual height check.
+						else if(check->projectilepassheight != 0)
+						{
+							T_ExplodeProjectile(self, check);
+							return;
+						}
 					}
 				}
 				iter = iter->Next();

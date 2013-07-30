@@ -258,6 +258,7 @@ class AActor : public DObject
 		int32_t	speed, runspeed;
 		int		points;
 		fixed	radius;
+		fixed	projectilepassheight;
 
 		const Frame		*state;
 		unsigned int	sprite;

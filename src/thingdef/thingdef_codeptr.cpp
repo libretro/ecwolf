@@ -503,13 +503,25 @@ ACTION_FUNCTION(A_MeleeAttack)
 {
 	ACTION_PARAM_INT(damage, 0);
 	ACTION_PARAM_INT(accuracy, 1);
+	ACTION_PARAM_STRING(hitsound, 2);
+	ACTION_PARAM_STRING(misssound, 3);
+
+	if(misssound.Compare("*") == 0)
+		misssound = hitsound;
 
 	A_Face(self, players[0].mo);
 	if(CheckMeleeRange(self, players[0].mo, self->speed))
 	{
 		if(pr_meleeattack() < accuracy*255)
+		{
 			TakeDamage(damage, self);
+			if(!hitsound.IsEmpty())
+				PlaySoundLocActor(hitsound, self);
+			return;
+		}
 	}
+	if(!misssound.IsEmpty())
+		PlaySoundLocActor(misssound, self);
 }
 
 static FRandom pr_monsterrefire("MonsterRefire");
