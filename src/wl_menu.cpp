@@ -9,6 +9,7 @@
 #include "m_random.h"
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "wl_iwad.h"
 #include "id_ca.h"
 #include "id_sd.h"
 #include "id_in.h"
@@ -42,6 +43,8 @@ int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG,
 	MENUWINHGLT_BACKGROUND, MENUWINHGLT_TOPBORDER, MENUWINHGLT_BOTBORDER;
 static MenuItem	*readThis;
 static bool menusAreFaded = true;
+
+EMenuStyle MenuStyle = MENUSTYLE_Wolf;
 
 MENU_LISTENER(EnterControlBase);
 
@@ -288,6 +291,10 @@ MENU_LISTENER(EnterResolutionSelection)
 
 void CreateMenus()
 {
+	// HACK: Determine menu style by IWAD
+	if(IWad::CheckGameFilter("Blake"))
+		MenuStyle = MENUSTYLE_Blake;
+
 	// Extract the palette
 	BORDCOLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[0]), GPART(gameinfo.MenuColors[0]), BPART(gameinfo.MenuColors[0]));
 	BORD2COLOR = ColorMatcher.Pick(RPART(gameinfo.MenuColors[1]), GPART(gameinfo.MenuColors[1]), BPART(gameinfo.MenuColors[1]));

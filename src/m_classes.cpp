@@ -503,17 +503,23 @@ void ControlMenuItem::right()
 
 void Menu::drawGunHalfStep(int x, int y)
 {
-	VWB_DrawGraphic (cursor, x, y-2, MENU_CENTER);
-	VW_UpdateScreen ();
-	SD_PlaySound ("menu/move1");
-	SDL_Delay (8 * 100 / 7);
+	if(MenuStyle != MENUSTYLE_Blake)
+	{
+		VWB_DrawGraphic (cursor, x, y-2, MENU_CENTER);
+		VW_UpdateScreen ();
+		SD_PlaySound ("menu/move1");
+		SDL_Delay (8 * 100 / 7);
+	}
 }
 
 void Menu::eraseGun(int x, int y)
 {
-	int gx = x, gy = y, gw = cursor->GetScaledWidth(), gh = cursor->GetScaledHeight();
-	MenuToRealCoords(gx, gy, gw, gh, MENU_CENTER);
-	VWB_Clear(BKGDCOLOR, gx, gy, gx+gw, gy+gh);
+	if(MenuStyle != MENUSTYLE_Blake)
+	{
+		int gx = x, gy = y, gw = cursor->GetScaledWidth(), gh = cursor->GetScaledHeight();
+		MenuToRealCoords(gx, gy, gw, gh, MENU_CENTER);
+		VWB_Clear(BKGDCOLOR, gx, gy, gx+gw, gy+gh);
+	}
 }
 
 Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) :
@@ -612,7 +618,7 @@ MenuItem *Menu::getIndex(int index) const
 
 void Menu::drawMenu() const
 {
-	if(cursor == NULL)
+	if(cursor == NULL && MenuStyle != MENUSTYLE_Blake)
 		cursor = TexMan("M_CURS1");
 
 	lastIndexDrawn = 0;
@@ -639,6 +645,16 @@ void Menu::drawMenu() const
 			lastIndexDrawn = i;
 		}
 		y += getIndex(i)->getHeight();
+	}
+
+	if(MenuStyle == MENUSTYLE_Blake)
+	{
+		double curx = getX() + getIndent() - 1;
+		double curw = getWidth() - getIndent() + 1;
+		double cury = selectedY;
+		double curh = getIndex(curPos)->getHeight();
+		MenuToRealCoords(curx, cury, curw, curh, MENU_CENTER);
+		VWB_Clear(MENUWIN_BACKGROUND, curx, cury, curx+curw, cury+curh);
 	}
 
 	// In order to draw the skill menu correctly we need to draw the selected option now
@@ -690,10 +706,11 @@ void Menu::draw() const
 			US_CPrint(BigFont, headText, gameinfo.FontColors[GameInfo::MENU_TITLE]);
 	}
 
-	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);
+	if(MenuStyle != MENUSTYLE_Blake)
+		DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);
 	drawMenu();
 
-	if(!isAnimating())
+	if(cursor && !isAnimating())
 		VWB_DrawGraphic (cursor, x - 4, y + getHeight(curPos) - 2, MENU_CENTER);
 	VW_UpdateScreen ();
 }
@@ -736,7 +753,8 @@ int Menu::handle()
 			lastBlinkTime = GetTimeCount();
 			TexMan.UpdateAnimations(lastBlinkTime*14);
 
-			cursor = TexMan("M_CURS1");
+			if(MenuStyle != MENUSTYLE_Blake)
+				cursor = TexMan("M_CURS1");
 			draw();
 		}
 		else SDL_Delay(5);
