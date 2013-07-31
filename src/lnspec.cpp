@@ -152,9 +152,10 @@ class EVDoor : public Thinker
 	DECLARE_CLASS(EVDoor, Thinker)
 
 	public:
-		EVDoor(MapSpot spot, unsigned int speed, int opentics, bool direction) : Thinker(ThinkerList::WORLD),
+		EVDoor(MapSpot spot, unsigned int speed, int opentics, bool direction, unsigned int style) : Thinker(ThinkerList::WORLD),
 			state(Closed), spot(spot), amount(0), opentics(opentics), direction(direction)
 		{
+			spot->slideStyle = style;
 			if(spot->slideAmount[direction] == 0 && spot->slideAmount[direction+2] == 0)
 				ChangeState(Opening);
 			else
@@ -368,7 +369,7 @@ FUNC(Door_Open)
 			return 0;
 		}
 
-		new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION);
+		new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
 	}
 	else
 	{
@@ -386,7 +387,7 @@ FUNC(Door_Open)
 			}
 
 			activated = true;
-			new EVDoor(door, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION);
+			new EVDoor(door, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
 		}
 		return activated;
 	}

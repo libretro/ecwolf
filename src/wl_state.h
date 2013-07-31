@@ -20,6 +20,7 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 
 void    DamageActor (AActor *ob, unsigned damage);
 
+bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amount);
 bool CheckLine (AActor *ob);
 
 #endif

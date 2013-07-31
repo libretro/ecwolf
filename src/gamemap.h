@@ -43,6 +43,13 @@
 class Thinker;
 class UWMFParser;
 
+enum
+{
+	SLIDE_Normal,
+	SLIDE_Split,
+	SLIDE_Invert
+};
+
 class GameMap
 {
 	public:
@@ -148,6 +155,7 @@ class GameMap
 				bool			visible;
 				TObjPtr<Thinker> thinker;
 				unsigned int	slideAmount[4];
+				unsigned int	slideStyle;
 				bool			sideSolid[4];
 				TArray<Trigger>	triggers;
 				Tile::Side		pushDirection;

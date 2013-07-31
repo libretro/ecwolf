@@ -22,6 +22,7 @@
 #include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_play.h"
+#include "wl_state.h"
 #include "a_inventory.h"
 #include "thingdef/thingdef.h"
 
@@ -339,6 +340,24 @@ static void DetermineHitDir(bool vertical)
 	}
 }
 
+static int SlideTextureOffset(unsigned int style, int intercept, int amount)
+{
+	if(!amount)
+		return 0;
+
+	switch(style)
+	{
+		default:
+			return -amount;
+		case SLIDE_Split:
+			if(intercept < FRACUNIT/2)
+				return amount/2;
+			return -amount/2;
+		case SLIDE_Invert:
+			return amount;
+	}
+}
+
 /*
 ====================
 =
@@ -359,7 +378,7 @@ void HitVertWall (void)
 
 	DetermineHitDir(true);
 
-	texture = (yintercept+texdelta-tilehit->slideAmount[hitdir])&(FRACUNIT-1);
+	texture = (yintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (word)yintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
 	if (xtilestep == -1 && !tilehit->tile->offsetVertical)
 	{
 		texture = (FRACUNIT - texture)&(FRACUNIT-1);
@@ -437,7 +456,7 @@ void HitHorizWall (void)
 
 	DetermineHitDir(false);
 
-	texture = (xintercept+texdelta-tilehit->slideAmount[hitdir])&(FRACUNIT-1);
+	texture = (xintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (word)xintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
 	if(!tilehit->tile->offsetHorizontal)
 	{
 		if (ytilestep == -1)
@@ -845,7 +864,7 @@ vertentry:
 					int32_t yintbuf=yintercept+(ystep>>1);
 					if((yintbuf>>16)!=(yintercept>>16))
 						goto passvert;
-					if((word)yintbuf<tilehit->slideAmount[hitdir])
+					if(CheckSlidePass(tilehit->slideStyle, (word)yintbuf, tilehit->slideAmount[hitdir]))
 						goto passvert;
 					yintercept=yintbuf;
 					xintercept=(xtile<<TILESHIFT)|0x8000;
@@ -1011,7 +1030,7 @@ horizentry:
 					int32_t xintbuf=xintercept+(xstep>>1);
 					if((xintbuf>>16)!=(xintercept>>16))
 						goto passhoriz;
-					if((word)xintbuf<tilehit->slideAmount[hitdir])
+					if(CheckSlidePass(tilehit->slideStyle, (word)xintbuf, tilehit->slideAmount[hitdir]))
 						goto passhoriz;
 					xintercept=xintbuf;
 					yintercept=(ytile<<TILESHIFT)+0x8000;
