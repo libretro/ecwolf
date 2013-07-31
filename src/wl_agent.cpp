@@ -858,17 +858,16 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 	flags &= ~(player_t::PF_READYFLAGS);
 	psprite[layer].frame = frame;
 
-	do
+	while(psprite[layer].frame)
 	{
-		if(psprite[layer].frame)
-		{
-			psprite[layer].ticcount = frame->GetTics();
-			frame->action(mo, ReadyWeapon, frame);
-		}
+		psprite[layer].ticcount = psprite[layer].frame->GetTics();
+		psprite[layer].frame->action(mo, ReadyWeapon, psprite[layer].frame);
+
+		if(psprite[layer].ticcount == 0)
+			psprite[layer].frame = psprite[layer].frame->next;
 		else
 			break;
 	}
-	while(psprite[layer].ticcount == 0);
 }
 
 FArchive &operator<< (FArchive &arc, player_t *&player)

@@ -567,17 +567,18 @@ static LinkedList<AActor *> SpawnedActors;
 void AActor::FinishSpawningActors()
 {
 	LinkedList<AActor *>::Node *node = SpawnedActors.Head();
-	while(node)
+	while((node = SpawnedActors.Head()))
 	{
+		// Kind of a weird way to iterate, but remember that new actors can be
+		// pushed to this list. Currently our LinkedList class only tracks the
+		// head.
 		AActor *actor = node->Item();
-		node = node->Next();
+		SpawnedActors.Remove(node);
 
 		// Run the first action pointer and all zero tic states!
 		actor->SetState(actor->state);
 		actor->ObjectFlags &= ~OF_JustSpawned;
 	}
-
-	SpawnedActors.Clear();
 }
 
 FRandom pr_spawnmobj("SpawnActor");
