@@ -213,7 +213,7 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=
 	str.Format("%*d", width, number);
 	if(str.Len() > width && cap)
 	{
-		int maxval = width <= 9 ? (int) ceil(pow(10., width))-1 : INT_MAX;
+		int maxval = width <= 9 ? (int) ceil(pow(10., (int)width))-1 : INT_MAX;
 		str.Format("%d", maxval);
 	}
 
