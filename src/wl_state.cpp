@@ -716,6 +716,22 @@ void DamageActor (AActor *ob, unsigned damage)
 =============================================================================
 */
 
+bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amount)
+{
+	if(!amount)
+		return false;
+
+	switch(style)
+	{
+		default:
+			return intercept < amount;
+		case SLIDE_Split:
+			return ABS(FRACUNIT - intercept*2) < amount;
+		case SLIDE_Invert:
+			return intercept>(FRACUNIT-amount);
+	}
+}
+
 
 /*
 =====================
@@ -796,7 +812,7 @@ bool CheckLine (AActor *ob)
 			//
 			intercept = yfrac-ystep/2;
 
-			if (intercept>spot->slideAmount[direction])
+			if (!CheckSlidePass(spot->slideStyle, intercept, spot->slideAmount[direction]))
 				return false;
 
 		} while (x != xt2);

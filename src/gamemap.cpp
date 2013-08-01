@@ -629,6 +629,9 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 				<< plane.map[i].zone
 				<< plane.map[i].pushReceptor;
 
+			if(GameSave::SaveVersion >= 1375246092)
+				arc << plane.map[i].slideStyle;
+
 			if(!arc.IsStoring())
 				plane.map[i].plane = &plane;
 		}
