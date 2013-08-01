@@ -134,7 +134,7 @@ void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 {
 	if(dir < -1 || dir >= 8)
 	{
-		printf("Invalid frame data for '%s' %d.\n", tex->Name, dir);
+		printf("Invalid frame data for '%s'.\n", tex->Name);
 		return;
 	}
 
