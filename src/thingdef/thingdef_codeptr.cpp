@@ -502,7 +502,7 @@ static FRandom pr_meleeattack("MeleeAccuracy");
 ACTION_FUNCTION(A_MeleeAttack)
 {
 	ACTION_PARAM_INT(damage, 0);
-	ACTION_PARAM_INT(accuracy, 1);
+	ACTION_PARAM_DOUBLE(accuracy, 1);
 	ACTION_PARAM_STRING(hitsound, 2);
 	ACTION_PARAM_STRING(misssound, 3);
 
@@ -512,7 +512,7 @@ ACTION_FUNCTION(A_MeleeAttack)
 	A_Face(self, players[0].mo);
 	if(CheckMeleeRange(self, players[0].mo, self->speed))
 	{
-		if(pr_meleeattack() < accuracy*255)
+		if(pr_meleeattack() < static_cast<int>(accuracy*256))
 		{
 			TakeDamage(damage, self);
 			if(!hitsound.IsEmpty())
