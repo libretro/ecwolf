@@ -4,16 +4,6 @@ actor SmartAnimation
 	action native A_SmartAnimDelay();
 }
 
-actor BlakeWaterPuddle 206
-{
-	states
-	{
-		Spawn:
-			WPUD A -1
-			stop
-	}
-}
-
 actor ContainmentCanister 207
 {
 	radius 32
@@ -286,16 +276,6 @@ actor MutantStatue 231
 	}
 }
 
-actor FirstAidKit 235
-{
-	states
-	{
-		Spawn:
-			FAID A -1
-			stop
-	}
-}
-
 actor VerticalSpikeStatic 236
 {
 	radius 32
@@ -354,16 +334,6 @@ actor SecurityDesk 245
 	}
 }
 
-actor FullWaterBowl 246
-{
-	states
-	{
-		Spawn:
-			WBWL A -1
-			stop
-	}
-}
-
 actor EmptyWaterBowl 247
 {
 	states
@@ -374,32 +344,12 @@ actor EmptyWaterBowl 247
 	}
 }
 
-actor ChickenLeg 248
-{
-	states
-	{
-		Spawn:
-			CKLG A -1
-			stop
-	}
-}
-
 actor ChickenBone 249
 {
 	states
 	{
 		Spawn:
 			CKBN A -1
-			stop
-	}
-}
-
-actor HamMeat 250
-{
-	states
-	{
-		Spawn:
-			HAMM A -1
 			stop
 	}
 }
@@ -650,26 +600,6 @@ actor OfficeSink 278
 	{
 		Spawn:
 			OSNK A -1
-			stop
-	}
-}
-
-actor CandyBar 279
-{
-	states
-	{
-		Spawn:
-			CNDY A -1
-			stop
-	}
-}
-
-actor Sandwich 280
-{
-	states
-	{
-		Spawn:
-			SNDW A -1
 			stop
 	}
 }

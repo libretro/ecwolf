@@ -118,6 +118,7 @@ actor Health : Inventory native
 {
 	inventory.amount 1
 	inventory.maxamount 0
+	inventory.pickupsound "misc/health_pkup"
 }
 
 actor Key : Inventory native

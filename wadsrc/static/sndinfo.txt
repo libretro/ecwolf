@@ -283,10 +283,19 @@ burt/death				{ DSSLEEP ALSLEEP PCSLEEP }
 
 // ------ Blake Stone ------
 
+$ifblake
+misc/health_pkup			{ NULL ALHEAL1 PCHEAL1 }
+$endif
+
 weapon/autochargepistol/attack		{ NULL ALFIRAUT PCFIRAUT }
 weapon/slowfireprotector/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+weapon/slowfireprotector/pickup		{ NULL ALGETPIS PCGETPIS }
 weapon/rapidassaultweapon/attack	{ DSBRIFLE ALBRIFLE PCBRIFLE }
+weapon/rapidassaultweapon/pickup	{ NULL ALGETRIF PCGETRIF }
 weapon/dualneutrondisruptor/attack	{ DSIONCAN ALIONCAN PCIONCAN }
+weapon/dualneutrondisruptor/pickup	{ NULL ALGETION PCGETION }
+weapon/plasmadischargeunit/pickup	{ NULL ALGETCAN PCGETCAN }
+weapon/antiplasmacannon/pickup		{ NULL ALGETCAN PCGETCAN }
 
 treasure/moneybag/pickup	{ NULL ALBONUS1 PCBONUS1 }
 treasure/loot/pickup		{ NULL ALBONUS2 PCBONUS2 }
@@ -298,6 +307,8 @@ misc/radar_pickup		{ NULL ALGETRDR PCGETRDR }
 
 misc/blake/explosion1	{ DSEXPLO1 ALEXPLO1 PCEXPLO1 }
 misc/blake/explosion2	{ DSEXPLO2 ALEXPLO2 PCEXPLO2 }
+
+misc/plasmadetonator/pickup	{ NULL ALGETDET PCGETDET }
 $random misc/plasmadetonator/explosion { misc/blake/explosion1 misc/blake/explosion2 }
 
 plasmagrenade/fire		{ DSGRENAD ALGRENAD PCGRENAD }

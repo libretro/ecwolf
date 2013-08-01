@@ -168,11 +168,11 @@ sprites
 	"OCHRA0", // Office Chair
 	"SDSKA0", // Security Desk
 	"WBWLA0", // Water Bowl
-	"EBWLA0", // - Empty
+	"WBWLB0", // - Empty
 	"CKLGA0", // Raw Meat
-	"CKBNA0", // - Eaten
+	"CKLGB0", // - Eaten
 	"HAMMA0", // Steak
-	"HAMBA0", //  -Eaten
+	"HAMMB0", //  -Eaten
 	"PDUPA0", // Plasma Discharge Cannon
 	"IDSLA0", // Large Spotlight
 	"MBAGA0", // Money Bag
@@ -1295,8 +1295,8 @@ sounds
 	"PCSWTDT2", // Trooper "Death" 2 (Knocked Down)
 	"PCLCNBRK", // Acid Alien Release
 	"PCSCNBRK", // Critter Release
-	"PCDR1OPN", // Light Door Open
-	"PCDR1CLS", // Light Door Close
+	"PCDROPN",  // Light Door Open
+	"PCDRCLS",  // Light Door Close
 	"PCARCZAP", // Arc Barrier Zap
 	"PCPODHTC", // POD Alien Hatch
 	"PCELCATK", // Plasmoid Attack
@@ -1396,8 +1396,8 @@ sounds
 	"ALSWTDT2", // Trooper "Death" 2 (Knocked Down)
 	"ALLCNBRK", // Acid Alien Release
 	"ALSCNBRK", // Critter Release
-	"ALDR1OPN", // Light Door Open
-	"ALDR1CLS", // Light Door Close
+	"ALDROPN",  // Light Door Open
+	"ALDRCLS",  // Light Door Close
 	"ALARCZAP", // Arc Barrier Zap
 	"ALPODHTC", // POD Alien Hatch
 	"ALELCATK", // Plasmoid Attack
@@ -1424,8 +1424,8 @@ digitalsounds
 	"DSBRIFLE", // Fire Assault Gun
 	"DSDR2OPN", // Heavy Door Open
 	"DSDR2CLS", // Heavy Door Close
-	"DSDR1OPN", // Light Door Open
-	"DSDR1CLS", // Light Door Close
+	"DSDROPN",  // Light Door Open
+	"DSDRCLS",  // Light Door Close
 	"DSINFDT1", // Informant Death 1
 	"DSGLDSIT", // Goldfire Sight
 	"DSRN2SIT", // PS Guard Sight

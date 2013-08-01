@@ -2,6 +2,7 @@ actor PlasmaDetonator : Inventory 315
 {
 	inventory.amount 1
 	inventory.maxamount 100
+	inventory.pickupsound "misc/plasmadetonator/pickup"
 	states
 	{
 		Spawn:
