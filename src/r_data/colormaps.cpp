@@ -418,7 +418,7 @@ void R_SetDefaultColormap (const char *name)
 		{
 			FWadLump lumpr = Wads.OpenLumpNum (lump);
 			// ROTT colormap has fog fades at the top
-			bool maybeRott = lumpr.GetLength() == NUMCOLORMAPS*256;
+			bool maybeRott = lumpr.GetLength() == 32*256;
 
 			// Figure out how many colormaps are usable in the source
 			int numLumpMaps = (lumpr.GetLength()/256)&(~31);
