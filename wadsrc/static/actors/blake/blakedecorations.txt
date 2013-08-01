@@ -308,36 +308,6 @@ actor VerticalSpikeStatic 236
 	}
 }
 
-actor RedAccessKey 238
-{
-	states
-	{
-		Spawn:
-			RACS A -1
-			stop
-	}
-}
-
-actor YellowAccessKey 239
-{
-	states
-	{
-		Spawn:
-			YACS A -1
-			stop
-	}
-}
-
-actor BlueAccessKey 241
-{
-	states
-	{
-		Spawn:
-			BACS A -1
-			stop
-	}
-}
-
 actor YellowBox 242
 {
 	states
@@ -596,46 +566,6 @@ actor SteamPipe 266
 	}
 }
 
-actor MoneyBag 267
-{
-	states
-	{
-		Spawn:
-			MBAG A -1
-			stop
-	}
-}
-
-actor Loot 268
-{
-	states
-	{
-		Spawn:
-			LOOT A -1
-			stop
-	}
-}
-
-actor Gold5Bars 269
-{
-	states
-	{
-		Spawn:
-			GLD5 A -1
-			stop
-	}
-}
-
-actor XylanOrb 270
-{
-	states
-	{
-		Spawn:
-			XORB A -1
-			stop
-	}
-}
-
 actor GreekPost 271
 {
 	radius 32
@@ -822,36 +752,6 @@ actor BlakeGore 287
 	{
 		Spawn:
 			BDY2 A -1
-			stop
-	}
-}
-
-actor Gold3Bars 288
-{
-	states
-	{
-		Spawn:
-			GLD3 A -1
-			stop
-	}
-}
-
-actor Gold2Bars 289
-{
-	states
-	{
-		Spawn:
-			GLD2 A -1
-			stop
-	}
-}
-
-actor Gold1Bar 290
-{
-	states
-	{
-		Spawn:
-			GLD1 A -1
 			stop
 	}
 }
@@ -1076,52 +976,12 @@ actor DeadPODAlien 311
 	}
 }
 
-actor CocessionCoin 312
-{
-	states
-	{
-		Spawn:
-			CON1 A -1
-			stop
-	}
-}
-
-actor ConcessionCoin5 313
-{
-	states
-	{
-		Spawn:
-			CON5 A -1
-			stop
-	}
-}
-
-actor PlasmaDetonator 315
-{
-	states
-	{
-		Spawn:
-			DBOM A -1
-			stop
-	}
-}
-
 actor BlakeRubble 316
 {
 	states
 	{
 		Spawn:
 			RUBL A -1
-			stop
-	}
-}
-
-actor AutoMapper 317
-{
-	states
-	{
-		Spawn:
-			AUTO A -1
 			stop
 	}
 }

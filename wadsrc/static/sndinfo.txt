@@ -288,8 +288,17 @@ weapon/slowfireprotector/attack		{ DSBLASTR ALBLASTR PCBLASTR }
 weapon/rapidassaultweapon/attack	{ DSBRIFLE ALBRIFLE PCBRIFLE }
 weapon/dualneutrondisruptor/attack	{ DSIONCAN ALIONCAN PCIONCAN }
 
+treasure/moneybag/pickup	{ NULL ALBONUS1 PCBONUS1 }
+treasure/loot/pickup		{ NULL ALBONUS2 PCBONUS2 }
+treasure/goldbars/pickup	{ NULL ALBONUS3 PCBONUS3 }
+treasure/xylanorb/pickup	{ NULL ALBONUS4 PCBONUS4 }
+
+misc/coin_pickup		{ NULL ALCONCES PCCONCES }
+misc/radar_pickup		{ NULL ALGETRDR PCGETRDR }
+
 misc/blake/explosion1	{ DSEXPLO1 ALEXPLO1 PCEXPLO1 }
 misc/blake/explosion2	{ DSEXPLO2 ALEXPLO2 PCEXPLO2 }
+$random misc/plasmadetonator/explosion { misc/blake/explosion1 misc/blake/explosion2 }
 
 plasmagrenade/fire		{ DSGRENAD ALGRENAD PCGRENAD }
 $random plasmagrenade/hit { misc/blake/explosion1 misc/blake/explosion2 }

@@ -929,7 +929,7 @@ sounds
 	"PCSHTDOR", // Shoot Door? (Debug Mode Sound)
 	"PCRNTDT1", // Guard Death 1
 	"PCGETRIF", // Get Rapid Rifle
-	"PCGETAMM", // Get Ammo Pack
+	"PCAMMOUP", // Get Ammo Pack
 	"PCSHOOT",  // Shoot? (Wolf3D Sound)
 	"PCHEAL1",  // Get Health
 	"PCHEAL2",  // Get More Health?
@@ -944,7 +944,7 @@ sounds
 	"PCINTERR", // Interrogate
 	"PCBONUS5", // Get Bonus?
 	"PCBONUS4", // Get Xylan Orb
-	"PCPUSWAL", // Pushwall
+	"PCPSHWAL", // Pushwall
 	"PCTEBEEP", // Terminal Beep
 	"PCSCORE",  // Score Bonus
 	"PCTURPAI", // Turret Pain
@@ -1030,7 +1030,7 @@ sounds
 	"ALSHTDOR", // Shoot Door? (Debug Mode Sound)
 	"ALRNTDT1", // Guard Death 1
 	"ALGETRIF", // Get Rapid Rifle
-	"ALGETAMM", // Get Ammo Pack
+	"ALAMMOUP", // Get Ammo Pack
 	"ALSHOOT",  // Shoot? (Wolf3D Sound)
 	"ALHEAL1",  // Get Health
 	"ALHEAL2",  // Get More Health?
@@ -1045,7 +1045,7 @@ sounds
 	"ALINTERR", // Interrogate
 	"ALBONUS5", // Get Bonus?
 	"ALBONUS4", // Get Xylan Orb
-	"ALPUSWAL", // Pushwall
+	"ALPSHWAL", // Pushwall
 	"ALTEBEEP", // Terminal Beep
 	"ALSCORE",  // Score Bonus
 	"ALTURPAI", // Turret Pain

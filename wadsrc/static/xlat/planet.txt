@@ -2,6 +2,227 @@ enable globalmeta;
 
 tiles
 {
+	trigger 88
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 89
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 90
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 91
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 92
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 93
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 94
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 95
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 96
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 97
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 98
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+		activatewest = false;
+	}
+	trigger 99
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+		activatenorth = false;
+	}
+	trigger 100
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+		activateeast = false;
+	}
+	trigger 101
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+		activatesouth = false;
+	}
+	trigger 102
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 103
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 104
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 105
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 3;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+
 	tile 1
 	{
 		texturenorth = "PRIWALA1";
@@ -639,6 +860,16 @@ tiles
 
 things
 {
+	trigger 98
+	{
+		action = 2;
+		arg1 = 32;
+		arg2 = 2;
+		arg3 = 2;
+		playeruse = true;
+		secret = true;
+	}
+
 	// oldnum, newnum, angles, patrol, minskill
 	{19,	1,		4,	0,	0}
 	{23,	206,	0,	0,	0}

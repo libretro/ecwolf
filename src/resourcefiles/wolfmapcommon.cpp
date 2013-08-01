@@ -138,7 +138,12 @@ int FMapLump::FillCache()
 				delete[] tempOut;
 			}
 			else
-				ExpandRLEW(input, output, PlaneSize, rlewTag);
+			{
+				if(rtlMap)
+					ExpandRLEW(input, output, PlaneSize, rlewTag);
+				else
+					ExpandRLEW(input+2, output, ReadLittleShort((const BYTE*)input), rlewTag);
+			}
 
 			delete[] input;
 		}
