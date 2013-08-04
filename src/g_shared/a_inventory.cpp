@@ -55,6 +55,9 @@ void AInventory::AttachToOwner(AActor *owner)
 // TryPickup to be called.
 bool AInventory::CallTryPickup(AActor *toucher)
 {
+	if(itemFlags & IF_INACTIVE)
+		return false;
+
 	bool ret = TryPickup(toucher);
 
 	if(!ret && (itemFlags & IF_ALWAYSPICKUP))
@@ -70,7 +73,7 @@ bool AInventory::CallTryPickup(AActor *toucher)
 // in the actor's inventory.
 AInventory *AInventory::CreateCopy(AActor *holder)
 {
-	if(!GoesAway())
+	if(!GoAway())
 		return this;
 
 	AInventory *copy = reinterpret_cast<AInventory *>(GetClass()->CreateInstance());
@@ -94,19 +97,26 @@ void AInventory::Destroy()
 	Super::Destroy();
 }
 
-// Used for items which aren't placed into an inventory and don't respawn.
+// Used to destroy items which aren't placed into an inventory and don't respawn.
 void AInventory::GoAwayAndDie()
 {
-	if(!GoesAway())
+	if(!GoAway())
 	{
 		Destroy();
 	}
 }
 
-// Returns false if this is safe to place into inventory.  True if it hides
-// itself to be reused later.
-bool AInventory::GoesAway()
+// Attempts to hide the actor for respawning. Returns true if hidden, false if
+// this actor is safe to be placed in an inventory.
+bool AInventory::GoAway()
 {
+	const Frame *hide = FindState("Hide");
+	if(hide)
+	{
+		itemFlags |= IF_INACTIVE;
+		SetState(hide);
+		return true;
+	}
 	return false;
 }
 
@@ -244,8 +254,7 @@ AInventory *AAmmo::CreateCopy(AActor *holder)
 	if(ammoClass == GetClass())
 		return Super::CreateCopy(holder);
 
-	if(!GoesAway())
-		Destroy();
+	GoAwayAndDie();
 
 	AInventory *copy = reinterpret_cast<AInventory *>(ammoClass->CreateInstance());
 	copy->RemoveFromWorld();
