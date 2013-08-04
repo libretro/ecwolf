@@ -19,7 +19,7 @@ extern  int      viewscreenx, viewscreeny;
 extern  int      viewwidth;
 extern  int      viewheight;
 extern  int      statusbarx;
-extern  int      statusbary;
+extern  int      statusbary1, statusbary2;
 extern  short    centerx;
 extern  short    centerxwide;
 extern  int32_t  heightnumerator;

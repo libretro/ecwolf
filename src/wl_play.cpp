@@ -811,7 +811,6 @@ void PlayLoop (void)
 	playstate = ex_stillplaying;
 	lasttimecount = GetTimeCount();
 	frameon = 0;
-	facecount = 0;
 	funnyticount = 0;
 	memset (buttonstate, 0, sizeof (buttonstate));
 	ClearPaletteShifts ();
@@ -821,6 +820,8 @@ void PlayLoop (void)
 
 	if (demoplayback)
 		IN_StartAck ();
+
+	StatusBar->NewGame();
 
 	do
 	{
@@ -859,7 +860,7 @@ void PlayLoop (void)
 
 		CheckKeys ();
 		if((gamestate.TimeCount & 1) || !(tics & 1))
-			DrawStatusBar();
+			StatusBar->DrawStatusBar();
 //
 // debug aids
 //

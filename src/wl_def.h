@@ -163,9 +163,6 @@ typedef uint32_t angle_t;
 #define SOUTH   2
 #define WEST    3
 
-
-#define STATUSLINES     40
-
 #define SCREENSIZE      (SCREENBWIDE*208)
 #define PAGE1START      0
 #define PAGE2START      (SCREENSIZE)
@@ -229,6 +226,7 @@ typedef enum
 	IF_AUTOACTIVATE		= 0x00000001,
 	IF_INVBAR			= 0x00000002,
 	IF_ALWAYSPICKUP		= 0x00000004,
+	IF_INACTIVE			= 0x00000008, // For picked up items that remain on the map
 
 	WF_NOGRIN			= 0x00000001,
 	WF_NOAUTOFIRE		= 0x00000002,

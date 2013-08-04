@@ -64,7 +64,7 @@ class AInventory : public AActor
 	protected:
 		virtual AInventory	*CreateCopy(AActor *holder);
 		void				GoAwayAndDie();
-		bool				GoesAway();
+		bool				GoAway();
 		virtual bool		TryPickup(AActor *toucher);
 };
 

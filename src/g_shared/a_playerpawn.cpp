@@ -279,7 +279,7 @@ void APlayerPawn::Tick()
 	if(gamestate.victoryflag)
 		return;
 
-	UpdateFace();
+	StatusBar->UpdateFace();
 	CheckWeaponChange();
 
 	if(buttonstate[bt_use])

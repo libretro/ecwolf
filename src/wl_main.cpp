@@ -89,7 +89,7 @@ int      viewscreenx, viewscreeny;
 int      viewwidth;
 int      viewheight;
 int      statusbarx;
-int      statusbary;
+int      statusbary1, statusbary2;
 short    centerx;
 short    centerxwide;
 int      shootdelta;           // pixels away from centerx a target can be
@@ -466,8 +466,10 @@ static void InitGame()
 //
 	FinalReadConfig();
 
-// Temporary status bar config
-	SetupStatusbar();
+//
+// Load the status bar
+//
+	CreateStatusBar();
 
 //
 // initialize the menusalcProjection
@@ -518,12 +520,23 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	if(AspectCorrection[r_ratio].isWide)
 		statusbarx = screenWidth*(48-AspectCorrection[r_ratio].multiplier)/(48*2);
 
-	statusbary = 200 - STATUSLINES - 1;
+	if(StatusBar)
+	{
+		statusbary1 = StatusBar->GetHeight(true);
+		statusbary2 = 200 - StatusBar->GetHeight(false);
+	}
+	else
+	{
+		statusbary1 = 0;
+		statusbary2 = 200;
+	}
+
+	statusbary1 = statusbary1*screenHeight/200;
 	if(AspectCorrection[r_ratio].tallscreen)
-		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[r_ratio].baseHeight + screenHeight/2
+		statusbary2 = ((statusbary2 - 100)*screenHeight*3)/AspectCorrection[r_ratio].baseHeight + screenHeight/2
 			+ (screenHeight - screenHeight*AspectCorrection[r_ratio].multiplier/48)/2;
 	else
-		statusbary = statusbary*screenHeight/200;
+		statusbary2 = statusbary2*screenHeight/200;
 
 	unsigned int width;
 	unsigned int height;
@@ -535,12 +548,12 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	else if(viewsize == 20)
 	{
 		width = screenWidth;
-		height = statusbary;
+		height = statusbary2-statusbary1;
 	}
 	else
 	{
 		width = screenWidth - (20-viewsize)*16*screenWidth/320;
-		height = (statusbary+1) - (20-viewsize)*8*screenHeight/200;
+		height = (statusbary2-statusbary1+1) - (20-viewsize)*8*screenHeight/200;
 	}
 
 	// Some code assumes these are even.
@@ -554,7 +567,7 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	else
 	{
 		viewscreenx = (screenWidth-viewwidth) / 2;
-		viewscreeny = (statusbary-viewheight)/2;
+		viewscreeny = (statusbary2+statusbary1-viewheight)/2;
 		screenofs = viewscreeny*SCREENPITCH+viewscreenx;
 	}
 

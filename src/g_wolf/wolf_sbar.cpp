@@ -25,6 +25,8 @@
 =============================================================================
 */
 
+#define STATUSLINES     40
+
 struct LatchConfig
 {
 	unsigned int Enabled;
@@ -49,6 +51,40 @@ static struct StatusBarConfig_t
 	{1, 0, 256, 8}
 };
 
+class WolfStatusBar : public DBaseStatusBar
+{
+public:
+	WolfStatusBar() : facecount(0)
+	{
+		SetupStatusbar();
+	}
+
+	void DrawStatusBar();
+	unsigned int GetHeight(bool top) { return (viewsize == 21 || top) ? 0 : STATUSLINES+1; }
+	void NewGame() { facecount = 0; }
+	void UpdateFace(int damage=0);
+	void WeaponGrin();
+
+private:
+	static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=false);
+	static void StatusDrawFace(FTexture *pic);
+	static void StatusDrawPic(unsigned x, unsigned y, const char* pic);
+
+	void DrawAmmo();
+	void DrawFace();
+	void DrawLevel();
+	void DrawLives();
+	void DrawHealth();
+	void DrawKeys();
+	void DrawScore();
+	void DrawWeapon();
+	void SetupStatusbar();
+
+	int facecount;
+};
+
+DBaseStatusBar *CreateStatusBar_Wolf3D() { return new WolfStatusBar(); }
+
 /*
 ==================
 =
@@ -57,12 +93,12 @@ static struct StatusBarConfig_t
 ==================
 */
 
-void StatusDrawPic (unsigned x, unsigned y, const char* pic)
+void WolfStatusBar::StatusDrawPic (unsigned x, unsigned y, const char* pic)
 {
 	VWB_DrawGraphic(TexMan(pic), x, 200-(STATUSLINES-y));
 }
 
-static void StatusDrawFace(FTexture *pic)
+void WolfStatusBar::StatusDrawFace(FTexture *pic)
 {
 	VWB_DrawGraphic(pic, StatusBarConfig.Mugshot.X, 200-(STATUSLINES-StatusBarConfig.Mugshot.Y));
 }
@@ -76,7 +112,7 @@ static void StatusDrawFace(FTexture *pic)
 ==================
 */
 
-void DrawFace (void)
+void WolfStatusBar::DrawFace (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Mugshot.Enabled) return;
 
@@ -109,16 +145,14 @@ void DrawFace (void)
 ===============
 */
 
-int facecount = 0;
-
-void WeaponGrin ()
+void WolfStatusBar::WeaponGrin ()
 {
 	static FTextureID grin = TexMan.CheckForTexture("STFEVL0", FTexture::TEX_Any);
 	gamestate.faceframe = grin;
 	facecount = 140;
 }
 
-void UpdateFace (bool damageUpdate)
+void WolfStatusBar::UpdateFace (int damage)
 {
 	static int oldDamageLevel = 0;
 	static bool noGodFace = false;
@@ -137,12 +171,21 @@ void UpdateFace (bool damageUpdate)
 
 	const int maxHealth = players[0].mo ? players[0].mo->maxhealth : 100;
 	const int damageLevel = MIN(6, players[0].health > maxHealth ? 0 : (maxHealth-players[0].health)/(maxHealth/6));
-	if(damageUpdate)
+	if(damage)
 	{
-		// Update the face only if we've changed damage levels.
-		if(damageLevel == oldDamageLevel)
-			return;
-		facecount = 0;
+		static FTextureID ouchFace = TexMan.CheckForTexture("STFOUCH0", FTexture::TEX_Any);
+		if(ouchFace.isValid() && damage > 30 && players[0].health != 0)
+		{
+			gamestate.faceframe = ouchFace;
+			facecount = 17;
+		}
+		else
+		{
+			// Update the face only if we've changed damage levels.
+			if(damageLevel == oldDamageLevel)
+				return;
+			facecount = 0;
+		}
 	}
 	oldDamageLevel = damageLevel;
 
@@ -199,7 +242,7 @@ void UpdateFace (bool damageUpdate)
 ===============
 */
 
-static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=false)
+void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, bool cap)
 {
 	static FFont *HudFont = NULL;
 	if(!HudFont)
@@ -235,7 +278,7 @@ static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=
 ===============
 */
 
-void DrawHealth (void)
+void WolfStatusBar::DrawHealth (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Health.Enabled) return;
 	LatchNumber (StatusBarConfig.Health.X,StatusBarConfig.Health.Y,StatusBarConfig.Health.Digits,players[0].health,true);
@@ -252,7 +295,7 @@ void DrawHealth (void)
 ===============
 */
 
-void DrawLevel (void)
+void WolfStatusBar::DrawLevel (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
 	LatchNumber (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,levelInfo->FloorNumber);
@@ -269,7 +312,7 @@ void DrawLevel (void)
 ===============
 */
 
-void DrawLives (void)
+void WolfStatusBar::DrawLives (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Lives.Enabled) return;
 	LatchNumber (StatusBarConfig.Lives.X,StatusBarConfig.Lives.Y,StatusBarConfig.Lives.Digits,players[0].lives);
@@ -285,28 +328,10 @@ void DrawLives (void)
 ===============
 */
 
-void DrawScore (void)
+void WolfStatusBar::DrawScore (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Score.Enabled) return;
 	LatchNumber (StatusBarConfig.Score.X,StatusBarConfig.Score.Y,StatusBarConfig.Score.Digits,players[0].score);
-}
-
-/*
-===============
-=
-= GivePoints
-=
-===============
-*/
-
-void GivePoints (int32_t points)
-{
-	players[0].score += points;
-	while (players[0].score >= players[0].nextextra)
-	{
-		players[0].nextextra += EXTRAPOINTS;
-		GiveExtraMan (1);
-	}
 }
 
 //===========================================================================
@@ -319,7 +344,7 @@ void GivePoints (int32_t points)
 ==================
 */
 
-void DrawWeapon (void)
+void WolfStatusBar::DrawWeapon (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Weapon.Enabled ||
 		players[0].ReadyWeapon == NULL ||
@@ -339,7 +364,7 @@ void DrawWeapon (void)
 ==================
 */
 
-void DrawKeys (void)
+void WolfStatusBar::DrawKeys (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Keys.Enabled) return;
 	static bool extendedKeysGraphics = TexMan.CheckForTexture("STKEYS3", FTexture::TEX_Any).isValid();
@@ -392,7 +417,7 @@ void DrawKeys (void)
 ===============
 */
 
-void DrawAmmo (void)
+void WolfStatusBar::DrawAmmo (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Ammo.Enabled ||
 		!players[0].ReadyWeapon || !players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire])
@@ -404,7 +429,7 @@ void DrawAmmo (void)
 
 //===========================================================================
 
-void DrawStatusBar()
+void WolfStatusBar::DrawStatusBar()
 {
 	if(viewsize == 21 && ingame)
 		return;
@@ -422,7 +447,7 @@ void DrawStatusBar()
 
 //===========================================================================
 
-void SetupStatusbar()
+void WolfStatusBar::SetupStatusbar()
 {
 	// Temporary configuration lump so that some mods can be ported to ECWolf
 	// before a proper solution is created.

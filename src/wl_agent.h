@@ -13,7 +13,6 @@
 =============================================================================
 */
 
-extern  int      facecount;
 extern  int32_t  thrustspeed;
 extern  AActor   *LastAttacker;
 
@@ -24,15 +23,27 @@ void    TakeDamage (int points,AActor *attacker);
 void    GivePoints (int32_t points);
 
 //
+// Status bar interface
+//
+class DBaseStatusBar
+{
+public:
+	virtual ~DBaseStatusBar() {}
+
+	virtual void DrawStatusBar()=0;
+	virtual unsigned int GetHeight(bool top)=0;
+	virtual void NewGame() {}
+	virtual void UpdateFace (int damage=0) {}
+	virtual void WeaponGrin () {}
+};
+extern DBaseStatusBar *StatusBar;
+void	CreateStatusBar();
+
+//
 // player state info
 //
 
-void	SetupStatusbar();
-void	DrawStatusBar();
-void    StatusDrawFace(unsigned picnum);
 void    GiveExtraMan (int amount);
-void    UpdateFace (bool damageUpdate=false);
-void	WeaponGrin ();
 void    CheckWeaponChange ();
 void    ControlMovement (AActor *self);
 
