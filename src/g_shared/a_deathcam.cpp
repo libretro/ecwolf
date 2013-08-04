@@ -104,9 +104,9 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	FizzleFadeStart();
 
 	double fadex = 0;
-	double fadey = 200-StatusBar->GetHeight(true);
+	double fadey = StatusBar->GetHeight(true);
 	double fadew = 320;
-	double fadeh = 200-StatusBar->GetHeight(false) - fadey;
+	double fadeh = 200-StatusBar->GetHeight(false) - fadey + 1;
 	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., fadey, screenWidth, fadeh);
 
