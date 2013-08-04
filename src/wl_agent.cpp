@@ -63,6 +63,25 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
 /*
 =============================================================================
 
+								GLOBAL VARIABLES
+
+=============================================================================
+*/
+
+DBaseStatusBar *StatusBar;
+
+DBaseStatusBar *CreateStatusBar_Wolf3D();
+
+void DestroyStatusBar() { delete StatusBar; }
+void CreateStatusBar()
+{
+	StatusBar = CreateStatusBar_Wolf3D();
+	atterm(DestroyStatusBar);
+}
+
+/*
+=============================================================================
+
 								CONTROL STUFF
 
 =============================================================================
@@ -234,6 +253,24 @@ void GiveExtraMan (int amount)
 /*
 ===============
 =
+= GivePoints
+=
+===============
+*/
+
+void GivePoints (int32_t points)
+{
+	players[0].score += points;
+	while (players[0].score >= players[0].nextextra)
+	{
+		players[0].nextextra += EXTRAPOINTS;
+		GiveExtraMan (1);
+	}
+}
+
+/*
+===============
+=
 = TakeDamage
 =
 ===============
@@ -262,15 +299,8 @@ void TakeDamage (int points,AActor *attacker)
 	if (godmode != 2)
 		StartDamageFlash (points);
 
-	static FTextureID ouchFace = TexMan.CheckForTexture("STFOUCH0", FTexture::TEX_Any);
-	if(ouchFace.isValid() && points > 30 && players[0].health != 0)
-	{
-		gamestate.faceframe = ouchFace;
-		facecount = 17;
-	}
-	else
-		UpdateFace(true);
-	DrawStatusBar();
+	StatusBar->UpdateFace(points);
+	StatusBar->DrawStatusBar();
 }
 
 /*
@@ -813,7 +843,7 @@ void player_t::Reborn()
 	// Recalculate the projection here so that player classes with differing radii are supported.
 	CalcProjection(mo->radius);
 
-	DrawStatusBar();
+	StatusBar->DrawStatusBar();
 }
 
 void player_t::Serialize(FArchive &arc)

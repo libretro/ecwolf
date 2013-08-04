@@ -104,19 +104,19 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	FizzleFadeStart();
 
 	double fadex = 0;
-	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;
+	double fadey = 200-StatusBar->GetHeight(true);
 	double fadew = 320;
-	double fadeh = 200;
+	double fadeh = 200-StatusBar->GetHeight(false) - fadey;
 	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
-	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., 0., screenWidth, fadey);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., fadey, screenWidth, fadeh);
 
 	word width, height;
 	VW_MeasurePropString(IntermissionFont, language["STR_SEEAGAIN"], width, height);
 	px = 160 - (width/2);
-	py = ((200 - STATUSLINES) - height)/2;
+	py = ((200 - StatusBar->GetHeight(false) - StatusBar->GetHeight(true)) - height)/2;
 	VWB_DrawPropString(IntermissionFont, language["STR_SEEAGAIN"], CR_UNTRANSLATED);
 
-	FizzleFade(0, 0, screenWidth, static_cast<unsigned int>(fadeh), 70, false);
+	FizzleFade(0, static_cast<unsigned int>(fadey), screenWidth, static_cast<unsigned int>(fadeh), 70, false);
 
 	A_Face(cam, cam->actor);
 

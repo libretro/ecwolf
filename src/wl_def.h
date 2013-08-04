@@ -163,9 +163,6 @@ typedef uint32_t angle_t;
 #define SOUTH   2
 #define WEST    3
 
-
-#define STATUSLINES     40
-
 #define SCREENSIZE      (SCREENBWIDE*208)
 #define PAGE1START      0
 #define PAGE2START      (SCREENSIZE)

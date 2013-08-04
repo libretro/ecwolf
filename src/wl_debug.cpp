@@ -356,7 +356,7 @@ int DebugKeys (void)
 		GiveAllWeaponsAndAmmo();
 		GivePoints (100000);
 		players[0].health = 100;
-		DrawStatusBar();
+		StatusBar->DrawStatusBar();
 		IN_Ack ();
 		return 1;
 	}

@@ -421,7 +421,7 @@ void AWeapon::AttachToOwner(AActor *owner)
 
 	// Grin
 	if(!(weaponFlags & WF_NOGRIN) && owner->player->mo == players[0].camera)
-		WeaponGrin();
+		StatusBar->WeaponGrin();
 }
 
 bool AWeapon::CheckAmmo(AWeapon::FireMode fireMode, bool autoSwitch, bool requireAmmo)
@@ -528,7 +528,7 @@ bool AWeapon::HandlePickup(AInventory *item, bool &good)
 
 		// Grin any way
 		if(weaponFlags & WF_ALWAYSGRIN)
-			WeaponGrin();
+			StatusBar->WeaponGrin();
 		return true;
 	}
 	else if(inventory)

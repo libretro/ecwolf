@@ -499,7 +499,7 @@ done:   itoa (kr, tempstr, 10);
 	}
 
 
-	DrawStatusBar();
+	StatusBar->DrawStatusBar();
 	VW_UpdateScreen ();
 
 	lastBreathTime = GetTimeCount();
@@ -557,7 +557,7 @@ void PreloadGraphics (bool showPsych)
 		VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
 
 		WindowX = (screenWidth - scaleFactorX*224)/2;
-		WindowY = (screenHeight - scaleFactorY*(STATUSLINES+48))/2;
+		WindowY = (screenHeight - scaleFactorY*(StatusBar->GetHeight(false)+48))/2;
 		WindowW = scaleFactorX * 28 * 8;
 		WindowH = scaleFactorY * 48;
 
