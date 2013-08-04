@@ -151,7 +151,7 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file)
 			yScale = 2*FRACUNIT/5;
 			break;
 		case LumpRemapper::PSPR_BLAKE:
-			TopOffset = -45;
+			TopOffset = -36;
 			LeftOffset -= 114;
 			xScale = 5*FRACUNIT/7;
 			yScale = 5*FRACUNIT/7;

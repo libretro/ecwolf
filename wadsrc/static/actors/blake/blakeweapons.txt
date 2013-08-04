@@ -3,7 +3,7 @@ actor BlakeWeapon : Weapon
 	weapon.ammotype1 "ChargeUnit"
 	weapon.ammouse1 1
 	weapon.ammogive1 6
-	weapon.yadjust 19
+	weapon.yadjust 32
 	weapon.bobstyle "Thrust"
 	weapon.bobrangex 0
 	weapon.bobrangey 0.5

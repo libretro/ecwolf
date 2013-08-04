@@ -17,6 +17,7 @@
 #include "thinker.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_iwad.h"
 #include "wl_loadsave.h"
 #include "wl_state.h"
 #include "wl_play.h"
@@ -70,12 +71,16 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
 
 DBaseStatusBar *StatusBar;
 
+DBaseStatusBar *CreateStatusBar_Blake();
 DBaseStatusBar *CreateStatusBar_Wolf3D();
 
 void DestroyStatusBar() { delete StatusBar; }
 void CreateStatusBar()
 {
-	StatusBar = CreateStatusBar_Wolf3D();
+	if(IWad::CheckGameFilter("Blake"))
+		StatusBar = CreateStatusBar_Blake();
+	else
+		StatusBar = CreateStatusBar_Wolf3D();
 	atterm(DestroyStatusBar);
 }
 

@@ -1,5 +1,3 @@
-// TODO: HamMeat, ChickenLeg, CandyBar, Sandwich, and FullWaterBowl have a used state
-
 actor BlakeWaterPuddle : Health 206
 {
 	inventory.amount 5
@@ -31,6 +29,9 @@ actor HamMeat : Health 250
 		Spawn:
 			HAMM A -1
 			stop
+		Hide:
+			HAMM B -1
+			stop
 	}
 }
 
@@ -41,6 +42,9 @@ actor ChickenLeg : Health 248
 	{
 		Spawn:
 			CKLG A -1
+			stop
+		Hide:
+			CKLG B -1
 			stop
 	}
 }
@@ -53,6 +57,9 @@ actor CandyBar : Health 279
 		Spawn:
 			CNDY A -1
 			stop
+		Hide:
+			CNDY B -1
+			stop
 	}
 }
 
@@ -64,6 +71,9 @@ actor Sandwich : Health 280
 		Spawn:
 			SNDW A -1
 			stop
+		Hide:
+			SNDW B -1
+			stop
 	}
 }
 
@@ -74,6 +84,9 @@ actor FullWaterBowl : Health 246
 	{
 		Spawn:
 			WBWL A -1
+			stop
+		Hide:
+			WBWL B -1
 			stop
 	}
 }

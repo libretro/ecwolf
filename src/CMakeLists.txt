@@ -151,6 +151,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	${HEADER_FILES}
 	${OPL_SOURCES}
 	g_blake/a_smartanim.cpp
+	g_blake/blake_sbar.cpp
 	g_shared/a_deathcam.cpp
 	g_shared/a_inventory.cpp
 	g_shared/a_keys.cpp
