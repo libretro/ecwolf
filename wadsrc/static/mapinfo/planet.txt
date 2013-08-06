@@ -50,7 +50,7 @@ cluster 1
 {
 }
 
-map "MAP01"
+map "MAP01" lookup "BLAKE_AREA_1"
 {
 	music = "MAJMIN"
 	cluster = 1
@@ -58,7 +58,7 @@ map "MAP01"
 	DefaultVisibility = 7.0
 }
 
-map "MAP02"
+map "MAP02" lookup "BLAKE_AREA_2"
 {
 	music = "STICKS"
 	cluster = 1
@@ -67,7 +67,7 @@ map "MAP02"
 	DefaultMaxLightVis = 42.0
 }
 
-map "MAP03"
+map "MAP03" lookup "BLAKE_AREA_3"
 {
 	music = "MOURNING"
 	cluster = 1
@@ -76,7 +76,7 @@ map "MAP03"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP04"
+map "MAP04" lookup "BLAKE_AREA_4"
 {
 	music = "LURKING"
 	cluster = 1
@@ -85,7 +85,7 @@ map "MAP04"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP05"
+map "MAP05" lookup "BLAKE_AREA_5"
 {
 	music = "CIRCLES"
 	cluster = 1
@@ -93,7 +93,7 @@ map "MAP05"
 	DefaultVisibility = 8.0
 }
 
-map "MAP06"
+map "MAP06" lookup "BLAKE_AREA_6"
 {
 	music = "TIME"
 	cluster = 1
@@ -102,7 +102,7 @@ map "MAP06"
 	DefaultMaxLightVis = 42.0
 }
 
-map "MAP07"
+map "MAP07" lookup "BLAKE_AREA_7"
 {
 	music = "TOHELL"
 	cluster = 1
@@ -110,7 +110,7 @@ map "MAP07"
 	DefaultVisibility = 7.0
 }
 
-map "MAP08"
+map "MAP08" lookup "BLAKE_AREA_8"
 {
 	music = "FORTRESS"
 	cluster = 1
@@ -119,7 +119,7 @@ map "MAP08"
 	DefaultMaxLightVis = 42.0
 }
 
-map "MAP09"
+map "MAP09" lookup "BLAKE_AREA_9"
 {
 	music = "GIVING"
 	cluster = 1
@@ -128,7 +128,7 @@ map "MAP09"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP10"
+map "MAP10" lookup "BLAKE_AREA_10"
 {
 	music = "HARTBEAT"
 	cluster = 1
@@ -137,7 +137,7 @@ map "MAP10"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP11"
+map "MAP11" lookup "BLAKE_AREA_11"
 {
 	music = "MOURNING"
 	cluster = 1
@@ -145,7 +145,7 @@ map "MAP11"
 	DefaultVisibility = 8.0
 }
 
-map "MAP12"
+map "MAP12" lookup "BLAKE_AREA_12"
 {
 	music = "MAJMIN"
 	cluster = 1
@@ -154,7 +154,7 @@ map "MAP12"
 	DefaultMaxLightVis = 42.0
 }
 
-map "MAP13"
+map "MAP13" lookup "BLAKE_AREA_13"
 {
 	music = "VACCINAP"
 	cluster = 1
@@ -162,7 +162,7 @@ map "MAP13"
 	DefaultVisibility = 7.0
 }
 
-map "MAP14"
+map "MAP14" lookup "BLAKE_AREA_14"
 {
 	music = "LURKING"
 	cluster = 1
@@ -171,7 +171,7 @@ map "MAP14"
 	DefaultMaxLightVis = 42.0
 }
 
-map "MAP15"
+map "MAP15" lookup "BLAKE_AREA_15"
 {
 	music = "MONASTRY"
 	cluster = 1
@@ -180,7 +180,7 @@ map "MAP15"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP16"
+map "MAP16" lookup "BLAKE_AREA_16"
 {
 	music = "TOMBP"
 	cluster = 1
@@ -189,7 +189,7 @@ map "MAP16"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP17"
+map "MAP17" lookup "BLAKE_AREA_17"
 {
 	music = "DARKNESS"
 	cluster = 1
@@ -197,7 +197,7 @@ map "MAP17"
 	DefaultVisibility = 8.0
 }
 
-map "MAP18"
+map "MAP18" lookup "BLAKE_AREA_18"
 {
 	music = "MOURNING"
 	cluster = 1
@@ -206,7 +206,7 @@ map "MAP18"
 	DefaultMaxLightVis = 42.0
 }
 
-map "MAP19"
+map "MAP19" lookup "BLAKE_AREA_19"
 {
 	music = "SERPENT"
 	cluster = 1
@@ -214,7 +214,7 @@ map "MAP19"
 	DefaultVisibility = 7.0
 }
 
-map "MAP20"
+map "MAP20" lookup "BLAKE_AREA_20"
 {
 	music = "TIME"
 	cluster = 1
@@ -223,7 +223,7 @@ map "MAP20"
 	DefaultMaxLightVis = 42.0
 }
 
-map "MAP21"
+map "MAP21" lookup "BLAKE_AREA_21"
 {
 	music = "CATACOMB"
 	cluster = 1
@@ -232,7 +232,7 @@ map "MAP21"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP22"
+map "MAP22" lookup "BLAKE_AREA_22"
 {
 	music = "PLOT"
 	cluster = 1
@@ -241,7 +241,7 @@ map "MAP22"
 	DefaultMaxLightVis = 52.0
 }
 
-map "MAP23"
+map "MAP23" lookup "BLAKE_AREA_23"
 {
 	music = "GIVING"
 	cluster = 1
@@ -249,7 +249,7 @@ map "MAP23"
 	DefaultVisibility = 8.0
 }
 
-map "MAP24"
+map "MAP24" lookup "BLAKE_AREA_24"
 {
 	music = "VACCINAP"
 	cluster = 1

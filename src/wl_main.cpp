@@ -1325,8 +1325,8 @@ int main (int argc, char *argv[])
 
 			printf("W_Init: Init WADfiles.\n");
 			Wads.InitMultipleFiles(files);
-			language.SetupStrings();
 			LumpRemapper::RemapAll();
+			language.SetupStrings();
 		}
 
 		InitThinkerList();

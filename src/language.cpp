@@ -40,6 +40,9 @@ Language language;
 
 void Language::SetupStrings(const char* language)
 {
+	// First load Blake Stone's strings so we can replace them in LANGUAGE later
+	SetupBlakeStrings("LEVELDSC", "BLAKE_AREA_");
+
 	int lastLump = 0;
 	int lump = 0;
 	while((lump = Wads.FindLump("LANGUAGE", &lastLump)) != -1)
@@ -110,6 +113,42 @@ void Language::ReadLump(int lump, const char* language)
 			sc.ScriptMessage(Scanner::ERROR, "Unexpected token.\n");
 			exit(0);
 		}
+	}
+}
+
+/* Blake Stone strings are stored in text chunks. They're referenced by an
+ * index. Strings are stored separated by ^XX at the end of a line.
+ */
+void Language::SetupBlakeStrings(const char* lumpname, const char* prefix)
+{
+	int lumpnum = Wads.CheckNumForName(lumpname);
+	if(lumpnum == -1)
+		return;
+
+	FMemLump wadLump = Wads.ReadLump(lumpnum);
+
+	unsigned int num = 1; // Start at prefix_1
+	unsigned int pos = 0;
+	unsigned int start = 0;
+	const char* data = reinterpret_cast<const char*>(wadLump.GetMem());
+	static const WORD endToken = ('X'<<8)|'X'; // Since both chars are the same this should be endian safe
+	while(pos+2 < wadLump.GetSize())
+	{
+		if(data[pos] == '^' && *(WORD*)(data+pos+1) == endToken)
+		{
+			FString name;
+			FString str(data+start, pos-start);
+			name.Format("%s%d", prefix, num++);
+
+			strings[name] = str;
+
+			pos += 3;
+			while((data[pos] == '\n' || data[pos] == '\r') && pos < wadLump.GetSize())
+				++pos;
+			start = pos;
+		}
+		else
+			++pos;
 	}
 }
 

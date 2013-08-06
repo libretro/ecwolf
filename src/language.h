@@ -47,6 +47,7 @@ class Language
 
 	protected:
 		void		ReadLump(int lump, const char* language);
+		void		SetupBlakeStrings(const char* lumpname, const char* prefix);
 
 	private:
 		TMap<FName, FString>	strings;
