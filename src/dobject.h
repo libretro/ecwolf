@@ -304,6 +304,7 @@ public:
 	DObject (const ClassDef *inClass);
 	virtual ~DObject ();
 
+	inline bool IsSameKindOf (const ClassDef *base, const ClassDef *other) const;
 	inline bool IsKindOf (const ClassDef *base) const;
 	inline bool IsA (const ClassDef *type) const;
 

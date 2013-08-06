@@ -114,6 +114,12 @@ actor CustomInventory : Inventory native
 {
 }
 
+actor ExtraLifeItem : Inventory native
+{
+	inventory.amount 1
+	inventory.maxamount 1
+}
+
 actor Health : Inventory native
 {
 	inventory.amount 1

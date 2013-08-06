@@ -36,9 +36,13 @@ actor FeedSack : BackpackItem 176
 	}
 }
 
-// TODO: 50 Fruit = 1 UP
+actor ArkFruit : ExtraLifeItem
+{
+	inventory.amount 1
+	inventory.maxamount 50
+}
 
-actor ArkBanana : Inventory 183
+actor ArkBanana : ArkFruit 183
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
@@ -50,7 +54,7 @@ actor ArkBanana : Inventory 183
 	}
 }
 
-actor ArkApple : Inventory 184
+actor ArkApple : ArkFruit 184
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
@@ -62,7 +66,7 @@ actor ArkApple : Inventory 184
 	}
 }
 
-actor ArkGrapes : Inventory 185
+actor ArkGrapes : ArkFruit 185
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
@@ -74,7 +78,7 @@ actor ArkGrapes : Inventory 185
 	}
 }
 
-actor ArkPeach : Inventory 186
+actor ArkPeach : ArkFruit 186
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP

@@ -263,7 +263,7 @@ AInventory *AAmmo::CreateCopy(AActor *holder)
 	return copy;
 }
 
-const ClassDef *AAmmo::GetAmmoType()
+const ClassDef *AAmmo::GetAmmoType() const
 {
 	const ClassDef *cls = GetClass();
 	while(cls->GetParent() != NATIVE_CLASS(Ammo))
@@ -273,8 +273,7 @@ const ClassDef *AAmmo::GetAmmoType()
 
 bool AAmmo::HandlePickup(AInventory *item, bool &good)
 {
-	if(item->GetClass() == GetClass() ||
-		(item->IsKindOf(NATIVE_CLASS(Ammo)) && ((AAmmo*)item)->GetAmmoType() == GetClass()))
+	if(IsSameKindOf(NATIVE_CLASS(Ammo), item->GetClass()))
 	{
 		if(amount < maxamount)
 		{
@@ -715,3 +714,28 @@ class AScoreItem : public AInventory
 		}
 };
 IMPLEMENT_CLASS(ScoreItem)
+
+////////////////////////////////////////////////////////////////////////////////
+
+class AExtraLifeItem : public AInventory
+{
+	DECLARE_NATIVE_CLASS(ExtraLifeItem, Inventory)
+
+	protected:
+		bool HandlePickup(AInventory *item, bool &good)
+		{
+			if(IsSameKindOf(NATIVE_CLASS(ExtraLifeItem), item->GetClass()))
+			{
+				amount += item->amount;
+				if(amount >= maxamount)
+				{
+					GiveExtraMan(amount/maxamount);
+					amount %= maxamount;
+				}
+				good = true;
+				return true;
+			}
+			return Super::HandlePickup(item, good);
+		}
+};
+IMPLEMENT_CLASS(ExtraLifeItem)
