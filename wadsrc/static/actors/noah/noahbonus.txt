@@ -36,13 +36,15 @@ actor FeedSack : BackpackItem 176
 	}
 }
 
-actor ArkFruit : ExtraLifeItem
+// Since this works the same as Mac Wolf we might as well use this as the base
+// item for both and use a more "generic" name than ArkFruit.
+actor MacTreasureItem : ExtraLifeItem
 {
 	inventory.amount 1
 	inventory.maxamount 50
 }
 
-actor ArkBanana : ArkFruit 183
+actor ArkBanana : MacTreasureItem 183
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
@@ -54,7 +56,7 @@ actor ArkBanana : ArkFruit 183
 	}
 }
 
-actor ArkApple : ArkFruit 184
+actor ArkApple : MacTreasureItem 184
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
@@ -66,7 +68,7 @@ actor ArkApple : ArkFruit 184
 	}
 }
 
-actor ArkGrapes : ArkFruit 185
+actor ArkGrapes : MacTreasureItem 185
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
@@ -78,7 +80,7 @@ actor ArkGrapes : ArkFruit 185
 	}
 }
 
-actor ArkPeach : ArkFruit 186
+actor ArkPeach : MacTreasureItem 186
 {
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP

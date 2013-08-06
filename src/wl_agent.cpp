@@ -893,7 +893,7 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 		psprite[layer].ticcount = psprite[layer].frame->GetTics();
 		psprite[layer].frame->action(mo, ReadyWeapon, psprite[layer].frame);
 
-		if(psprite[layer].ticcount == 0)
+		if(psprite[layer].frame && psprite[layer].ticcount == 0)
 			psprite[layer].frame = psprite[layer].frame->next;
 		else
 			break;

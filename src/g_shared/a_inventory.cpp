@@ -247,9 +247,7 @@ IMPLEMENT_CLASS(Ammo)
 
 AInventory *AAmmo::CreateCopy(AActor *holder)
 {
-	const ClassDef *ammoClass = GetClass();
-	while(ammoClass->GetParent() != NATIVE_CLASS(Ammo))
-		ammoClass = ammoClass->GetParent();
+	const ClassDef *ammoClass = GetAmmoType();
 
 	if(ammoClass == GetClass())
 		return Super::CreateCopy(holder);
@@ -722,6 +720,24 @@ class AExtraLifeItem : public AInventory
 	DECLARE_NATIVE_CLASS(ExtraLifeItem, Inventory)
 
 	protected:
+		AInventory *CreateCopy(AActor *holder)
+		{
+			const ClassDef *cls = GetClass();
+			while(cls->GetParent() != NATIVE_CLASS(ExtraLifeItem))
+				cls = cls->GetParent();
+
+			if(cls == GetClass())
+				return Super::CreateCopy(holder);
+
+			GoAwayAndDie();
+
+			AInventory *copy = reinterpret_cast<AInventory *>(cls->CreateInstance());
+			copy->RemoveFromWorld();
+			copy->amount = amount;
+			copy->maxamount = maxamount;
+			return copy;
+		}
+
 		bool HandlePickup(AInventory *item, bool &good)
 		{
 			if(IsSameKindOf(NATIVE_CLASS(ExtraLifeItem), item->GetClass()))
