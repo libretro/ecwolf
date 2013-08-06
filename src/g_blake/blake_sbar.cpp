@@ -34,7 +34,10 @@
 
 #include "wl_def.h"
 #include "a_inventory.h"
+#include "a_keys.h"
+#include "colormatcher.h"
 #include "id_ca.h"
+#include "id_us.h"
 #include "id_vh.h"
 #include "g_mapinfo.h"
 #include "v_font.h"
@@ -42,6 +45,8 @@
 #include "wl_agent.h"
 #include "wl_def.h"
 #include "wl_play.h"
+#include "xs_Float.h"
+#include "thingdef/thingdef.h"
 
 enum
 {
@@ -70,7 +75,8 @@ public:
 	void Tick();
 
 protected:
-	void DrawString(FFont *font, const char* string, double x, double y, bool shadow, EColorRange color=CR_UNTRANSLATED, bool center=false);
+	void DrawLed(double percent, double x, double y) const;
+	void DrawString(FFont *font, const char* string, double x, double y, bool shadow, EColorRange color=CR_UNTRANSLATED, bool center=false) const;
 
 private:
 	int CurrentScore;
@@ -78,8 +84,44 @@ private:
 
 DBaseStatusBar *CreateStatusBar_Blake() { return new BlakeStatusBar(); }
 
+void BlakeStatusBar::DrawLed(double percent, double x, double y) const
+{
+	static FTextureID LED[2][3] = {
+		{TexMan.GetTexture("STLEDDR", FTexture::TEX_Any), TexMan.GetTexture("STLEDDY", FTexture::TEX_Any), TexMan.GetTexture("STLEDDG", FTexture::TEX_Any)},
+		{TexMan.GetTexture("STLEDLR", FTexture::TEX_Any), TexMan.GetTexture("STLEDLY", FTexture::TEX_Any), TexMan.GetTexture("STLEDLG", FTexture::TEX_Any)}
+	};
+
+	unsigned int which = 0;
+	if(percent > 0.71)
+		which = 2;
+	else if(percent > 0.38)
+		which = 1;
+	FTexture *dim = TexMan(LED[0][which]);
+	FTexture *light = TexMan(LED[1][which]);
+
+	double w = dim->GetScaledWidthDouble();
+	double h = dim->GetScaledHeightDouble();
+
+	screen->VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
+
+	int lightclip = xs_ToInt(y + h*(1-percent));
+	screen->DrawTexture(dim, x, y,
+		DTA_DestWidthF, w,
+		DTA_DestHeightF, h,
+		DTA_ClipBottom, lightclip,
+		TAG_DONE);
+	screen->DrawTexture(light, x, y,
+		DTA_DestWidthF, w,
+		DTA_DestHeightF, h,
+		DTA_ClipTop, lightclip,
+		TAG_DONE);
+}
+
 void BlakeStatusBar::DrawStatusBar()
 {
+	if(viewsize == 21 && ingame)
+		return;
+
 	static FFont *IndexFont = V_GetFont("INDEXFON");
 	static FFont *HealthFont = V_GetFont("BlakeHealthFont");
 	static FFont *ScoreFont = V_GetFont("BlakeScoreFont");
@@ -92,6 +134,7 @@ void BlakeStatusBar::DrawStatusBar()
 	double stw = 320;
 	double sth = STATUSLINES;
 	screen->VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
+	int boty = xs_ToInt(sty);
 
 	screen->DrawTexture(TexMan(STBar), stx, sty,
 		DTA_DestWidthF, stw,
@@ -103,11 +146,28 @@ void BlakeStatusBar::DrawStatusBar()
 	stw = 320;
 	sth = STATUSTOPLINES;
 	screen->VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
+	int topy = xs_ToInt(sth);
 
 	screen->DrawTexture(TexMan(STBarTop), stx, 0.0,
 		DTA_DestWidthF, stw,
 		DTA_DestHeightF, sth,
 		TAG_DONE);
+
+	if(viewsize < 20)
+	{
+		// Draw outset border
+		static byte colors[3] =
+		{
+			ColorMatcher.Pick(RPART(gameinfo.Border.topcolor), GPART(gameinfo.Border.topcolor), BPART(gameinfo.Border.topcolor)),
+			ColorMatcher.Pick(RPART(gameinfo.Border.bottomcolor), GPART(gameinfo.Border.bottomcolor), BPART(gameinfo.Border.bottomcolor)),
+			ColorMatcher.Pick(RPART(gameinfo.Border.highlightcolor), GPART(gameinfo.Border.highlightcolor), BPART(gameinfo.Border.highlightcolor))
+		};
+
+		VWB_Clear(colors[1], 0, topy, screenWidth-scaleFactorX, topy+scaleFactorY);
+		VWB_Clear(colors[1], 0, topy+scaleFactorY, scaleFactorX, boty);
+		VWB_Clear(colors[0], scaleFactorX, boty-scaleFactorY, screenWidth, boty);
+		VWB_Clear(colors[0], screenWidth-scaleFactorX, topy, screenWidth, static_cast<int>(boty-scaleFactorY));
+	}
 
 	// Draw the top information
 	FString lives, area;
@@ -148,16 +208,68 @@ void BlakeStatusBar::DrawStatusBar()
 
 		// TODO: Fix color
 		unsigned int amount = players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire]->amount;
+		DrawLed(static_cast<double>(amount)/static_cast<double>(players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire]->maxamount), 243, 155);
+
 		FString ammo;
 		ammo.Format("%3d%%", amount);
 		DrawString(IndexFont, ammo, 252, 190, false, CR_LIGHTBLUE);
 	}
+
+	if(players[0].mo)
+	{
+		static const ClassDef * const radarPackCls = ClassDef::FindClass("RadarPack");
+		AInventory *radarPack = players[0].mo->FindInventory(radarPackCls);
+		if(radarPack)
+			DrawLed(static_cast<double>(radarPack->amount)/static_cast<double>(radarPack->maxamount), 235, 155);
+		else
+			DrawLed(0, 235, 155);
+	}
+
+	// Find keys in inventory
+	int presentKeys = 0;
+	if(players[0].mo)
+	{
+		for(AInventory *item = players[0].mo->inventory;item != NULL;item = item->inventory)
+		{
+			if(item->IsKindOf(NATIVE_CLASS(Key)))
+			{
+				int slot = static_cast<AKey *>(item)->KeyNumber;
+				if(slot <= 3)
+					presentKeys |= 1<<(slot-1);
+				if(presentKeys == 0x7)
+					break;
+			}
+		}
+	}
+
+	static FTextureID Keys[4] = {
+		TexMan.GetTexture("STKEYS0", FTexture::TEX_Any),
+		TexMan.GetTexture("STKEYS1", FTexture::TEX_Any),
+		TexMan.GetTexture("STKEYS2", FTexture::TEX_Any),
+		TexMan.GetTexture("STKEYS3", FTexture::TEX_Any)
+	};
+	for(unsigned int i = 0;i < 3;++i)
+	{
+		FTexture *tex;
+		if(presentKeys & (1<<i))
+			tex = TexMan(Keys[i+1]);
+		else
+			tex = TexMan(Keys[0]);
+
+		stx = 120+16*i;
+		sty = 179;
+		stw = tex->GetScaledWidthDouble();
+		sth = tex->GetScaledHeightDouble();
+		screen->VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
+		screen->DrawTexture(tex, stx, sty,
+			DTA_DestWidthF, stw,
+			DTA_DestHeightF, sth,
+			TAG_DONE);
+	}
 }
 
-void BlakeStatusBar::DrawString(FFont *font, const char* string, double x, double y, bool shadow, EColorRange color, bool center)
+void BlakeStatusBar::DrawString(FFont *font, const char* string, double x, double y, bool shadow, EColorRange color, bool center) const
 {
-	Tick();
-
 	word strWidth, strHeight;
 	VW_MeasurePropString(font, string, strWidth, strHeight);
 

@@ -33,3 +33,27 @@ Lock 101 Noah
 	ArkGoldKeyRing
 	ArkSilverKeyRing
 }
+
+// Blake Stone Planet Strike
+
+Lock 1 Blake
+{
+	RedAccessKey
+}
+
+Lock 2 Blake
+{
+	YellowAccessKey
+}
+
+Lock 3 Blake
+{
+	BlueAccessKey
+}
+
+Lock 101 Blake
+{
+	RedAccessKey
+	YellowAccessKey
+	BlueAccessKey
+}
