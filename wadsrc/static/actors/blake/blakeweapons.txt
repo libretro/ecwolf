@@ -21,6 +21,7 @@ actor BlakeWeapon : Weapon
 actor AutoChargePistol : BlakeWeapon 314
 {
 	attacksound "weapon/autochargepistol/attack"
+	inventory.icon "STWEAP1"
 	weapon.ammouse1 0
 	+WEAPON.NOAUTOFIRE
 	states
@@ -42,6 +43,7 @@ actor AutoChargePistol : BlakeWeapon 314
 actor SlowFireProtector : BlakeWeapon 230
 {
 	attacksound "weapon/slowfireprotector/attack"
+	inventory.icon "STWEAP2"
 	inventory.pickupsound "weapon/slowfireprotector/pickup"
 	+WEAPON.NOAUTOFIRE
 	states
@@ -63,6 +65,7 @@ actor SlowFireProtector : BlakeWeapon 230
 actor RapidAssaultWeapon : BlakeWeapon 233
 {
 	attacksound "weapon/rapidassaultweapon/attack"
+	inventory.icon "STWEAP3"
 	inventory.pickupsound "weapon/rapidassaultweapon/pickup"
 	states
 	{
@@ -92,6 +95,7 @@ actor RapidAssaultWeapon : BlakeWeapon 233
 actor DualNeutronDisruptor : BlakeWeapon 234
 {
 	attacksound "weapon/dualneutrondisruptor/attack"
+	inventory.icon "STWEAP4"
 	inventory.pickupsound "weapon/dualneutrondisruptor/pickup"
 	states
 	{
@@ -142,6 +146,7 @@ actor PlasmaGrenade : SmartAnimation
 }
 actor PlasmaDischargeUnit : BlakeWeapon 252
 {
+	inventory.icon "STWEAP5"
 	inventory.pickupsound "weapon/plasmadischargeunit/pickup"
 	weapon.ammouse1 4
 	states
@@ -186,6 +191,7 @@ actor AntiPlasmaShot : SmartAnimation
 }
 actor AntiPlasmaCannon : BlakeWeapon 240
 {
+	inventory.icon "STWEAP6"
 	inventory.pickupsound "weapon/antiplasmacannon/pickup"
 	weapon.ammouse1 8
 	states

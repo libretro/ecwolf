@@ -96,6 +96,7 @@ The FON2 header is followed by variable length data:
 #include "colormatcher.h"
 #include "v_palette.h"
 #include "zdoomsupport.h"
+#include "doomerrors.h"
 
 //
 // Globally visible constants.
@@ -309,15 +310,12 @@ FFont *V_GetFont(const char *name)
 		
 		if (lump != -1)
 		{
-			uint32 head;
-			{
-				FWadLump lumpy = Wads.OpenLumpNum (lump);
-				lumpy.Read (&head, 4);
-			}
-			if ((head & MAKE_ID(255,255,255,0)) == MAKE_ID('F','O','N',0) ||
-				head == MAKE_ID(0xE1,0xE6,0xD5,0x1A))
+			try
 			{
 				font = new FSingleLumpFont (name, lump);
+			}
+			catch(class CDoomError &)
+			{
 			}
 		}
 		if (font == NULL)
