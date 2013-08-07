@@ -194,10 +194,14 @@ static longword	pcNumReadySamples = 0;
 // Function prototype is for menu listener
 bool SD_UpdatePCSpeakerVolume(int)
 {
+	SDL_LockMutex(audioMutex);
+
 	if(pcVolume > 0)
 		pcVolume = AdlibVolume*250;
 	else
 		pcVolume = -AdlibVolume*250;
+
+	SDL_UnlockMutex(audioMutex);
 
 	return true;
 }
