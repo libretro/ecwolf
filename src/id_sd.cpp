@@ -31,6 +31,7 @@
 #include "w_wad.h"
 #include "zstring.h"
 #include "sndinfo.h"
+#include "sndseq.h"
 #ifdef USE_GPL
 #include "dosbox/dbopl.h"
 #else
@@ -923,6 +924,7 @@ SD_Startup(void)
 	SD_Started = true;
 
 	SoundInfo.Init();
+	SoundSeq.Init();
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -244,6 +244,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	scanner.cpp
 	sdlvideo.cpp
 	sndinfo.cpp
+	sndseq.cpp
 	thinker.cpp
 	v_draw.cpp
 	v_font.cpp

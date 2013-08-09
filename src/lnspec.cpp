@@ -37,6 +37,8 @@
 #include "id_sd.h"
 #include "lnspec.h"
 #include "actor.h"
+#include "sndseq.h"
+#include "thinker.h"
 #include "wl_act.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
@@ -97,51 +99,6 @@ LineSpecialFunction Specials::LookupFunction(LineSpecials function)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "thinker.h"
-
-// Temporary function until sound sequences are supported
-static void PlaySoundSequence(MapSpot spot, bool door, bool open)
-{
-	// Valid squences:
-	// DoorNormal
-	// DoorMetal (Lost Episodes)
-	// PushwallNormal
-	// PushwallHeavy (Lost Episodes)
-
-	FName sequence = door ? gameinfo.DoorSoundSequence : gameinfo.PushwallSoundSequence;
-
-	if(open)
-	{
-		switch(sequence)
-		{
-			case NAME_DoorNormal:
-				PlaySoundLocMapSpot("doors/open", spot);
-				break;
-			case NAME_DoorMetal:
-				PlaySoundLocMapSpot("doors/metal_open", spot);
-				break;
-			case NAME_PushwallNormal:
-				PlaySoundLocMapSpot("world/pushwall", spot);
-				break;
-			case NAME_PushwallHeavy:
-				PlaySoundLocMapSpot("world/pushwall_heavy", spot);
-				break;
-		}
-	}
-	else
-	{
-		switch(sequence)
-		{
-			case NAME_DoorNormal:
-				PlaySoundLocMapSpot("doors/close", spot);
-				break;
-			case NAME_DoorMetal:
-				PlaySoundLocMapSpot("doors/metal_close", spot);
-				break;
-		}
-	}
-}
-
 FUNC(NOP)
 {
 	return 0;
@@ -155,6 +112,9 @@ class EVDoor : public Thinker
 		EVDoor(MapSpot spot, unsigned int speed, int opentics, bool direction, unsigned int style) : Thinker(ThinkerList::WORLD),
 			state(Closed), spot(spot), amount(0), opentics(opentics), direction(direction)
 		{
+			seqname = gameinfo.DoorSoundSequence;
+			sndseq = NULL;
+
 			spot->slideStyle = style;
 			if(spot->slideAmount[direction] == 0 && spot->slideAmount[direction+2] == 0)
 				ChangeState(Opening);
@@ -171,6 +131,8 @@ class EVDoor : public Thinker
 
 		void Destroy()
 		{
+			if(sndseq)
+				delete sndseq;
 			if(spot->thinker == this)
 				spot->thinker = NULL;
 			Super::Destroy();
@@ -178,6 +140,9 @@ class EVDoor : public Thinker
 
 		void Tick()
 		{
+			if(sndseq)
+				sndseq->Tick();
+
 			switch(state)
 			{
 				default:
@@ -191,7 +156,7 @@ class EVDoor : public Thinker
 						map->LinkZones(zone1, zone2, true);
 
 						if(map->CheckLink(zone1, players[0].mo->GetZone(), true))
-							PlaySoundSequence(spot, true, true);
+							sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
 					}
 
 					if(amount < 0xffff)
@@ -320,10 +285,15 @@ class EVDoor : public Thinker
 					break;
 				case Opened:
 					wait = opentics;
+					if(sndseq)
+					{
+						delete sndseq;
+						sndseq = NULL;
+					}
 					break;
 				case Closing:
 					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[0].mo->GetZone(), true))
-						PlaySoundSequence(spot, true, false);
+						sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_CloseNormal), spot);
 					break;
 			}
 			return true;
@@ -331,6 +301,10 @@ class EVDoor : public Thinker
 
 		State state;
 		MapSpot spot;
+
+		SndSeqPlayer *sndseq;
+		FName seqname;
+
 		unsigned int speed;
 		int amount;
 		int opentics;
@@ -403,6 +377,9 @@ class EVPushwall : public Thinker
 			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
 			speed(speed), distance(distance)
 		{
+			seqname = gameinfo.PushwallSoundSequence;
+			sndseq = NULL;
+
 			if(distance == 0) // ROTT style pushwall, move until blocked
 				distance = 0xFFFF;
 
@@ -441,6 +418,8 @@ class EVPushwall : public Thinker
 
 		void Destroy()
 		{
+			if(sndseq)
+				delete sndseq;
 			if(spot->thinker == this)
 				spot->thinker = NULL;
 			Super::Destroy();
@@ -449,7 +428,10 @@ class EVPushwall : public Thinker
 		void Tick()
 		{
 			if(position == 0)
-				PlaySoundSequence(spot, false, true);
+				sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
+
+			if(sndseq)
+				sndseq->Tick();
 
 			// Setup the next tile to get ready to accept this tile.
 			if(moveTo == NULL)
@@ -520,6 +502,10 @@ class EVPushwall : public Thinker
 	private:
 
 		MapSpot spot, moveTo;
+
+		SndSeqPlayer *sndseq;
+		FName seqname;
+
 		unsigned short	direction;
 		unsigned int	position;
 		unsigned int	speed;
