@@ -53,6 +53,40 @@ enum SequenceType
 	NUM_SEQ_TYPES
 };
 
+struct SndSeqInstruction
+{
+public:
+	unsigned int Instruction;
+	FName Sound;
+	unsigned int Argument;
+	unsigned int ArgumentRand;
+};
+
+/* The SoundSequence class holds the set of instructions to execute for a given
+ * sound sequence OR points to which sound sequence to play for a given event.
+ *
+ * After parsing all of this information should be static so we can just pass
+ * a pointer to the first instruction to a player and only refer back to this
+ * object for meta data.
+ */
+class SoundSequence
+{
+public:
+	SoundSequence();
+
+	void AddInstruction(const SndSeqInstruction &instr);
+	void Clear();
+	const SoundSequence &GetSequence(SequenceType type) const;
+	void SetFlag(unsigned int flag, bool set);
+	void SetSequence(SequenceType type, FName sequence);
+	const SndSeqInstruction *Start() const;
+
+private:
+	TArray<SndSeqInstruction> Instructions;
+	FName AltSequences[NUM_SEQ_TYPES];
+	unsigned int Flags;
+};
+
 class SndSeqTable
 {
 public:

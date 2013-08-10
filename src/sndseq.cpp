@@ -54,73 +54,49 @@ enum ESndSeqInstruction
 	SSI_Delay = 0x2,
 	SSI_End = 0x4
 };
-struct SndSeqInstruction
+
+SoundSequence::SoundSequence() : Flags(0)
 {
-public:
-	unsigned int Instruction;
-	FName Sound;
-	unsigned int Argument;
-	unsigned int ArgumentRand;
-};
+}
 
-/* The SoundSequence class holds the set of instructions to execute for a given
- * sound sequence OR points to which sound sequence to play for a given event.
- *
- * After parsing all of this information should be static so we can just pass
- * a pointer to the first instruction to a player and only refer back to this
- * object for meta data.
- */
-class SoundSequence
+void SoundSequence::AddInstruction(const SndSeqInstruction &instr)
 {
-public:
-	SoundSequence() : Flags(0)
-	{
-	}
+	Instructions.Push(instr);
+}
 
-	void AddInstruction(const SndSeqInstruction &instr)
-	{
-		Instructions.Push(instr);
-	}
+void SoundSequence::Clear()
+{
+	for(unsigned int i = 0;i < NUM_SEQ_TYPES;++i)
+		AltSequences[i] = NAME_None;
+	Instructions.Clear();
+}
 
-	void Clear()
-	{
-		for(unsigned int i = 0;i < NUM_SEQ_TYPES;++i)
-			AltSequences[i] = NAME_None;
-		Instructions.Clear();
-	}
+const SoundSequence &SoundSequence::GetSequence(SequenceType type) const
+{
+	if(AltSequences[type] == NAME_None)
+		return *this;
+	return SoundSeq(AltSequences[type], type);
+}
 
-	const SoundSequence &GetSequence(SequenceType type) const
-	{
-		if(AltSequences[type] == NAME_None)
-			return *this;
-		return SoundSeq(AltSequences[type], type);
-	}
+void SoundSequence::SetFlag(unsigned int flag, bool set)
+{
+	if(set)
+		Flags |= flag;
+	else
+		Flags &= ~flag;
+}
 
-	void SetFlag(ESndSeqFlag flag, bool set)
-	{
-		if(set)
-			Flags |= flag;
-		else
-			Flags &= ~flag;
-	}
+void SoundSequence::SetSequence(SequenceType type, FName sequence)
+{
+	AltSequences[type] = sequence;
+}
 
-	void SetSequence(SequenceType type, FName sequence)
-	{
-		AltSequences[type] = sequence;
-	}
-
-	const SndSeqInstruction *Start() const
-	{
-		if(Instructions.Size() == 0)
-			return NULL;
-		return &Instructions[0];
-	}
-
-private:
-	TArray<SndSeqInstruction> Instructions;
-	FName AltSequences[NUM_SEQ_TYPES];
-	unsigned int Flags;
-};
+const SndSeqInstruction *SoundSequence::Start() const
+{
+	if(Instructions.Size() == 0)
+		return NULL;
+	return &Instructions[0];
+}
 
 //------------------------------------------------------------------------------
 
