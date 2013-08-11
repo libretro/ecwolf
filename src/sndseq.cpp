@@ -52,7 +52,9 @@ enum ESndSeqInstruction
 {
 	SSI_PlaySound = 0x1,
 	SSI_Delay = 0x2,
-	SSI_End = 0x4
+	SSI_End = 0x4,
+	SSI_WaitForFinish = 0x8,
+	SSI_Repeat = 0x10
 };
 
 SoundSequence::SoundSequence() : Flags(0)
@@ -191,6 +193,17 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 
 					seq.AddInstruction(instr);
 				}
+				else if(sc->str.CompareNoCase("playrepeat") == 0)
+				{
+					SndSeqInstruction instr;
+					instr.Instruction = SSI_PlaySound|SSI_WaitForFinish|SSI_Repeat;
+
+					if(!sc.GetNextString())
+						sc.ScriptMessage(Scanner::ERROR, "Expected logical sound name.");
+					instr.Sound = sc->str;
+
+					seq.AddInstruction(instr);
+				}
 				else if(sc->str.CompareNoCase("nostopcutoff") == 0)
 				{
 					seq.SetFlag(SSF_NoStopCutOff, true);
@@ -218,7 +231,7 @@ const SoundSequence &SndSeqTable::operator() (FName sequence, SequenceType type)
 //------------------------------------------------------------------------------
 
 SndSeqPlayer::SndSeqPlayer(const SoundSequence &sequence, MapSpot Source) :
-	Sequence(sequence), Source(Source), Delay(0), Playing(true)
+	Sequence(sequence), Source(Source), Delay(0), Playing(true), WaitForDone(false)
 {
 	Current = Sequence.Start();
 	if(Current == NULL)
@@ -231,10 +244,21 @@ SndSeqPlayer::~SndSeqPlayer()
 		Stop();
 }
 
+// SD_SoundPlaying() seems to intentionally be for adlib/pc speaker only. At
+// least it has been like that since the beginning of ECWolf.
+extern FString SoundPlaying;
 void SndSeqPlayer::Tick()
 {
 	if(!Playing || (Delay != 0 && --Delay > 0))
 		return;
+
+	if(WaitForDone)
+	{
+		if(SoundPlaying.IsNotEmpty())
+			return;
+		else
+			WaitForDone = false;
+	}
 
 	do
 	{
@@ -253,7 +277,17 @@ void SndSeqPlayer::Tick()
 			Playing = false;
 		}
 
-		++Current;
+		if(Current->Instruction & SSI_WaitForFinish)
+		{
+			WaitForDone = true;
+			if(Delay == 0)
+				Delay = 1;
+		}
+
+		if(!(Current->Instruction & SSI_Repeat))
+		{
+			++Current;
+		}
 	}
 	while(Delay == 0 && Playing);
 }

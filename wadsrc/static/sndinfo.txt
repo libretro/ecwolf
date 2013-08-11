@@ -224,6 +224,8 @@ $ifnoah
 world/hitwall NULL
 $endif
 
+world/pushwall_ark		{ DSARKPSH ALARKPSH PCARKPSHW }
+
 misc/i_pkup				{ DSITEMUP ALITEMUP PCITEMUP }
 
 weapon/sling/attack			{ DSSLING ALSLING PCSLING }

@@ -118,6 +118,7 @@ private:
 
 	unsigned int Delay;
 	bool Playing;
+	bool WaitForDone;
 };
 
 #endif
