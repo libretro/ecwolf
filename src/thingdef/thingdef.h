@@ -333,6 +333,18 @@ class ClassDef
 };
 
 // Functions below are actually a part of dobject.h, but moved here for dependency reasons
+inline bool DObject::IsSameKindOf (const ClassDef *base, const ClassDef *other) const
+{
+	const ClassDef *cls = GetClass();
+
+	if(cls == other)
+		return true;
+
+	while(cls->GetParent() != base)
+		cls = cls->GetParent();
+	return cls->IsAncestorOf(other);
+}
+
 inline bool DObject::IsKindOf (const ClassDef *base) const
 {
 	return base->IsAncestorOf (GetClass ());

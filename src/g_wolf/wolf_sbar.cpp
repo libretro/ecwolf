@@ -13,6 +13,7 @@
 #include "g_mapinfo.h"
 #include "a_inventory.h"
 #include "a_keys.h"
+#include "wl_iwad.h"
 
 #include <cmath>
 #include <climits>
@@ -37,6 +38,7 @@ struct LatchConfig
 static struct StatusBarConfig_t
 {
 	LatchConfig Floor, Score, Lives, Health, Ammo;
+	LatchConfig Items;
 
 	// The following don't use the digits
 	LatchConfig Mugshot, Keys, Weapon;
@@ -46,6 +48,7 @@ static struct StatusBarConfig_t
 	{1, 1, 112, 16},
 	{1, 3, 168, 16},
 	{1, 3, 208, 16},
+	{0, 2, 280, 16},
 	{1, 0, 136, 4},
 	{1, 0, 240, 4},
 	{1, 0, 256, 8}
@@ -56,6 +59,21 @@ class WolfStatusBar : public DBaseStatusBar
 public:
 	WolfStatusBar() : facecount(0)
 	{
+		if(IWad::CheckGameFilter("Noah"))
+		{
+			// Change default configuration
+			StatusBarConfig.Floor.X = 32;
+			StatusBarConfig.Floor.Digits = 1;
+			StatusBarConfig.Score.X = 56;
+			StatusBarConfig.Lives.X = 128;
+			StatusBarConfig.Health.X = 184;
+			StatusBarConfig.Ammo.X = 224;
+			StatusBarConfig.Items.Enabled = true;
+			StatusBarConfig.Mugshot.X = 152;
+			StatusBarConfig.Keys.X = 256;
+			StatusBarConfig.Weapon.Enabled = false;
+		}
+
 		SetupStatusbar();
 	}
 
@@ -75,6 +93,7 @@ private:
 	void DrawLevel();
 	void DrawLives();
 	void DrawHealth();
+	void DrawItems();
 	void DrawKeys();
 	void DrawScore();
 	void DrawWeapon();
@@ -320,6 +339,29 @@ void WolfStatusBar::DrawLives (void)
 
 //===========================================================================
 
+
+/*
+===============
+=
+= DrawItems
+=
+===============
+*/
+
+void WolfStatusBar::DrawItems (void)
+{
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Items.Enabled || players[0].mo == NULL) return;
+
+	AInventory *items = players[0].mo->FindInventory(ClassDef::FindClass("MacTreasureItem"));
+	unsigned int amount = 0;
+	if(items)
+		amount = items->amount;
+
+	LatchNumber (StatusBarConfig.Items.X,StatusBarConfig.Items.Y,StatusBarConfig.Items.Digits,amount);
+}
+
+//===========================================================================
+
 /*
 ===============
 =
@@ -443,6 +485,7 @@ void WolfStatusBar::DrawStatusBar()
 	DrawKeys ();
 	DrawWeapon ();
 	DrawScore ();
+	DrawItems ();
 }
 
 //===========================================================================
@@ -487,6 +530,11 @@ void WolfStatusBar::SetupStatusbar()
 			{
 				extrakey = key.Mid(6);
 				var = &StatusBarConfig.Health;
+			}
+			else if(key.IndexOf("items") == 0)
+			{
+				extrakey = key.Mid(5);
+				var = &StatusBarConfig.Items;
 			}
 			else if(key.IndexOf("keys") == 0)
 			{

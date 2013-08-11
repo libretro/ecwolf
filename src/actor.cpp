@@ -496,7 +496,10 @@ void AActor::Tick()
 	// Otherwise we might tick on the same tick we're spawned which would cause
 	// an actor with a duration of 1 tic to never display
 	if(ObjectFlags & OF_JustSpawned)
+	{
+		ObjectFlags &= ~OF_JustSpawned;
 		return;
+	}
 
 	if(state == NULL)
 	{

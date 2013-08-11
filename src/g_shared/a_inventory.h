@@ -73,7 +73,7 @@ class AAmmo : public AInventory
 	DECLARE_NATIVE_CLASS(Ammo, Inventory)
 
 	public:
-		const ClassDef	*GetAmmoType();
+		const ClassDef	*GetAmmoType() const;
 		bool			HandlePickup(AInventory *item, bool &good);
 
 		unsigned int	Backpackamount;

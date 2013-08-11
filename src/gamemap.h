@@ -113,6 +113,7 @@ class GameMap
 			bool			sideSolid[4];
 			bool			offsetVertical;
 			bool			offsetHorizontal;
+			FName			soundSequence;
 		};
 		struct Sector
 		{

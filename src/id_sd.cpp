@@ -31,6 +31,7 @@
 #include "w_wad.h"
 #include "zstring.h"
 #include "sndinfo.h"
+#include "sndseq.h"
 #ifdef USE_GPL
 #include "dosbox/dbopl.h"
 #else
@@ -194,10 +195,14 @@ static longword	pcNumReadySamples = 0;
 // Function prototype is for menu listener
 bool SD_UpdatePCSpeakerVolume(int)
 {
+	SDL_LockMutex(audioMutex);
+
 	if(pcVolume > 0)
 		pcVolume = AdlibVolume*250;
 	else
 		pcVolume = -AdlibVolume*250;
+
+	SDL_UnlockMutex(audioMutex);
 
 	return true;
 }
@@ -919,6 +924,7 @@ SD_Startup(void)
 	SD_Started = true;
 
 	SoundInfo.Init();
+	SoundSeq.Init();
 }
 
 ///////////////////////////////////////////////////////////////////////////
