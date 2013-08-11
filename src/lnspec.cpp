@@ -112,7 +112,10 @@ class EVDoor : public Thinker
 		EVDoor(MapSpot spot, unsigned int speed, int opentics, bool direction, unsigned int style) : Thinker(ThinkerList::WORLD),
 			state(Closed), spot(spot), amount(0), opentics(opentics), direction(direction)
 		{
-			seqname = gameinfo.DoorSoundSequence;
+			if(spot->tile->soundSequence == NAME_None)
+				seqname = gameinfo.DoorSoundSequence;
+			else
+				seqname = spot->tile->soundSequence;
 			sndseq = NULL;
 
 			spot->slideStyle = style;
@@ -377,7 +380,10 @@ class EVPushwall : public Thinker
 			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
 			speed(speed), distance(distance)
 		{
-			seqname = gameinfo.PushwallSoundSequence;
+			if(spot->tile->soundSequence == NAME_None)
+				seqname = gameinfo.PushwallSoundSequence;
+			else
+				seqname = spot->tile->soundSequence;
 			sndseq = NULL;
 
 			if(distance == 0) // ROTT style pushwall, move until blocked

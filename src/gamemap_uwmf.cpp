@@ -88,6 +88,11 @@ void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 		sc.MustGetToken(TK_BoolConst);
 		tile.sideSolid[MapTile::West] = sc->boolean;
 	}
+	else CheckKey("soundsequence")
+	{
+		sc.MustGetToken(TK_StringConst);
+		tile.soundSequence = sc->str;
+	}
 	else CheckKey("texturenorth")
 	{
 		sc.MustGetToken(TK_StringConst);
