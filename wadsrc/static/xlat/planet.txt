@@ -703,6 +703,7 @@ tiles
 		textureeast = "DPRISNU2";
 		texturewest = "DPRISNU2";
 		offsetvertical = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 93
 	{
@@ -711,6 +712,7 @@ tiles
 		textureeast = "JAMSTEL2";
 		texturewest = "JAMSTEL2";
 		offsethorizontal = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 94
 	{
@@ -719,6 +721,7 @@ tiles
 		textureeast = "DELEVU2";
 		texturewest = "DELEVU2";
 		offsetvertical = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 95
 	{
@@ -727,6 +730,7 @@ tiles
 		textureeast = "JAMSPCB2";
 		texturewest = "JAMSPCB2";
 		offsethorizontal = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 96
 	{
@@ -735,6 +739,7 @@ tiles
 		textureeast = "DHSECU2";
 		texturewest = "DHSECU2";
 		offsetvertical = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 97
 	{
@@ -743,6 +748,7 @@ tiles
 		textureeast = "JAMSTEL2";
 		texturewest = "JAMSTEL2";
 		offsethorizontal = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 98
 	{
@@ -751,6 +757,7 @@ tiles
 		textureeast = "DONEWYU2";
 		texturewest = "DOWEXIT2";
 		offsetvertical = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 99
 	{
@@ -759,6 +766,7 @@ tiles
 		textureeast = "JAMSTEL2";
 		texturewest = "JAMSTEL2";
 		offsethorizontal = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 100
 	{
@@ -767,6 +775,7 @@ tiles
 		textureeast = "DOWEXIT2";
 		texturewest = "DONEWYU2";
 		offsetvertical = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 101
 	{
@@ -775,6 +784,7 @@ tiles
 		textureeast = "JAMSTEL2";
 		texturewest = "JAMSTEL2";
 		offsethorizontal = true;
+		soundsequence = "DoorHeavy";
 	}
 	tile 102
 	{

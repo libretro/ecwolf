@@ -18,6 +18,16 @@ end
 	nostopcutoff
 end
 
+:DoorOpenHeavy
+	play doors/heavy_open
+	nostopcutoff
+end
+
+:DoorCloseHeavy
+	play doors/heavy_close
+	nostopcutoff
+end
+
 [DoorNormal
 	0	DoorOpenNormal
 	1	DoorCloseNormal
@@ -30,6 +40,13 @@ end
 	1	DoorCloseMetal
 	2	DoorOpenMetal
 	3	DoorCloseMetal
+]
+
+[DoorHeavy
+	0	DoorOpenHeavy
+	1	DoorCloseHeavy
+	2	DoorOpenHeavy
+	3	DoorCloseHeavy
 ]
 
 :PushwallNormal
