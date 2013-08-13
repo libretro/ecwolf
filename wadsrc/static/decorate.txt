@@ -30,5 +30,6 @@
 #include "actors/blake/blakedetonator.txt"
 #include "actors/blake/blakehealth.txt"
 #include "actors/blake/blakekeys.txt"
+#include "actors/blake/blakemonsters.txt"
 #include "actors/blake/blakeplayer.txt"
 #include "actors/blake/blakeweapons.txt"

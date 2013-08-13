@@ -376,6 +376,8 @@ actor IndirectSpotLight 253
 
 actor VerticalPostStatic 254
 {
+	radius 32
+	+SOLID
 	states
 	{
 		Spawn:

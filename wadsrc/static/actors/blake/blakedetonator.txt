@@ -25,3 +25,20 @@ actor PlasmaDetonatorDrop : SmartAnimation
 			stop
 	}
 }
+
+actor SecurityCube 325
+{
+	health 175
+	+SOLID
+	+DONTRIP
+	states
+	{
+		Spawn:
+			CUBE ABCDEFGHIJ 2.5 bright
+			loop
+		Death:
+			CUBE KLMNOPQR 2.5 bright
+			CUBE S -1 bright
+			stop
+	}
+}

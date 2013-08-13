@@ -258,16 +258,16 @@ sprites
 	"SWATE7",
 	"SWATE8",
 	"SWATI0", // Pain
-	"SWATP0", // Death
+	"SWATO0", // Death
+	"SWATP0",
 	"SWATQ0",
-	"SWATR0",
 	"SWATJ0", // Pain (Duplicate)
-	"SWATS0", // Death (Last)
-	"SWATT0", // Dead
+	"SWATR0", // Death (Last)
+	"SWATS0", // Dead
 	"SWATF0", // Attack
-	"SWATG0", // Knocked Down
+	"SWATG0",
 	"SWATH0",
-	"SWATK0",
+	"SWATK0", // Knocked Down
 	"SWATL0",
 	"SWATM0",
 	"SWATN0",

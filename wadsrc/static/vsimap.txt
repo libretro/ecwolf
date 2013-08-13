@@ -336,8 +336,8 @@ sprites
 	"TECWE6",
 	"TECWE7",
 	"TECWE8",
-	"TECWI0", // Death
-	"TECWK0",
+	"TECWI0", // Pain 2
+	"TECWK0", // Death
 	"TECWL0",
 	"TECWM0",
 	"TECWJ0", // Pain
@@ -389,16 +389,16 @@ sprites
 	"PROTE7",
 	"PROTE8",
 	"PROTI0", // Pain
-	"PROTP0", // Death
+	"PROTO0", // Death
+	"PROTP0",
 	"PROTQ0",
-	"PROTR0",
 	"PROTJ0", // Pain (Duplicate)
-	"PROTS0", // Death (Last)
-	"PROTT0", // Dead
+	"PROTR0", // Death (Last)
+	"PROTS0", // Dead
 	"PROTF0", // Attack
-	"PROTG0", // Knocked Down
+	"PROTG0",
 	"PROTH0",
-	"PROTK0",
+	"PROTK0", // Knocked Down
 	"PROTL0",
 	"PROTM0",
 	"PROTN0",
@@ -1428,20 +1428,20 @@ digitalsounds
 	"DSDRCLS",  // Light Door Close
 	"DSINFDT1", // Informant Death 1
 	"DSGLDSIT", // Goldfire Sight
-	"DSRN2SIT", // PS Guard Sight
-	"DSRN2DT1", // PS Guard Death 1
+	"DSSECSIT", // PS Guard Sight
+	"DSSECDT1", // PS Guard Death 1
 	"DSEXPLO1", // Explosion 1
 	"DSGENSIT", // Genetic Guard Sight
-	"DSPR2DT1", // PS Sentinel Death 1
+	"DSTCWDT1", // PS Sentinel Death 1
 	"DSDOGSIT", // Brown Mutant Sight
 	"DSSCNSIT", // Critter Sight
-	"DSPR2SIT", // PS Sentinel Sight
+	"DSTCWSIT", // PS Sentinel Sight
 	"DSGENDTH", // Genetic Guard Death
 	"DSBLUDTH", // Boss Death
 	"DSSCISIT", // Scientist Sight (Alerted)
 	"DSSCIDT1", // Scientist Death 1
 	"DSDOGDTH", // Brown Mutant Death
-	"DSSW2SIT", // PS Trooper Sight
+	"DSAPTSIT", // PS Trooper Sight
 	"DSSCNDTH", // Critter Death
 	"DSGLDLAF", // Goldfire Laugh
 	"DSARCZAP", // Arc Barrier Zap
@@ -1453,7 +1453,7 @@ digitalsounds
 	"DSGRNSIT", // Necro-Guard Sight
 	"DSWARPIN", // Warp In
 	"DSWARPOU", // Warp Out
-	"DSRN2DT2", // PS Guard Death 2
+	"DSSECDT2", // PS Guard Death 2
 	"DSEXPLO2", // Explosion 2
 	"DSLCNSIT", // Acid Alien Sight
 	"DSLCNDTH", // Acid Alien Death
@@ -1461,17 +1461,17 @@ digitalsounds
 	"DSINFDT2", // Informant Death 2
 	"DSINFDT3", // Informant Death 3
 	"DSGRNDTH", // Necro-Guard Death
-	"DSPR2DT2", // PS Sentinel Death 2
-	"DSPR2DT3", // PS Sentinel Death 3
+	"DSTCWDT2", // PS Sentinel Death 2
+	"DSTCWDT3", // PS Sentinel Death 3
 	"DSLCNBRK", // Acid Alien Release
 	"DSSCNBRK", // Critter Release
 	"DSGRENAD", // Fire Plasma Cannon
-	"DSSW2DT1", // PS Trooper Death 1
-	"DSSW2DT2", // PS Trooper "Death" 2 (Knocked Down)
+	"DSAPTDT1", // PS Trooper Death 1
+	"DSAPTDT2", // PS Trooper "Death" 2 (Knocked Down)
 	"DSPODDTH", // POD Alien Death
 	"DSPODSIT", // POD Alien Sight
 	"DSBLUSIT", // Robot Sight
-	"DSSW2DT3", // PS Trooper Death 3
+	"DSAPTDT3", // PS Trooper Death 3
 	"DSSCIDT2", // Scientist Death 2
 	"DSSCIDT3", // Scientist Death 3
 	"DSSPITAT", // Spit Attack

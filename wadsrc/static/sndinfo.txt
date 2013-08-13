@@ -319,3 +319,36 @@ $random plasmagrenade/hit { misc/blake/explosion1 misc/blake/explosion2 }
 
 antiplasmashot/fire		{ DSIONCAN ALIONCAN PCIONCAN }
 $random antiplasmashot/hit { misc/blake/explosion1 misc/blake/explosion2 }
+
+rentacop/sight			{ DSRNTSIT ALRNTSIT PCRNTSIT }
+sectorguard/sight		{ DSSECSIT ALRNTSIT PCRNTSIT }
+rentacop/death1			{ DSRNTDT1 ALRNTDT1 PCRNTDT1 }
+sectorguard/death1		{ DSSECDT1 ALRNTDT1 PCRNTDT1 }
+rentacop/death2			{ DSRNTDT2 ALRNTDT2 PCRNTDT2 }
+sectorguard/death2		{ DSSECDT2 ALRNTDT2 PCRNTDT2 }
+rentacop/attack			{ DSBLASTR ALBLASTR PCBLASTR }
+sectorguard/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+$random rentacop/death { rentacop/death1 rentacop/death2 }
+$random sectorguard/death { sectorguard/death1 sectorguard/death2 }
+
+proguard/sight			{ DSPROSIT ALPROSIT PCPROSIT }
+techwarrior/sight		{ DSTCWSIT ALPROSIT PCPROSIT }
+proguard/death1			{ DSPRODT1 ALPRODT1 PCPRODT1 }
+techwarrior/death1		{ DSTCWDT1 ALPRODT1 PCPRODT1 }
+proguard/death2			{ DSPRODT2 ALPRODT2 PCPRODT2 }
+techwarrior/death2		{ DSTCWDT2 ALPRODT2 PCPRODT2 }
+proguard/attack			{ DSBRIFLE ALBRIFLE PCBRIFLE }
+techwarrior/attack		{ DSBRIFLE ALBRIFLE PCBRIFLE }
+$random proguard/death { proguard/death1 proguard/death2 }
+$random techwarrior/death { techwarrior/death1 techwarrior/death2 }
+
+startrooper/sight		{ DSSWTSIT ALSWTSIT PCSWTSIT }
+alienprotector/sight	{ DSAPTSIT ALSWTSIT PCSWTSIT }
+startrooper/death1		{ DSSWTDT1 ALSWTDT1 PCSWTDT1 }
+alienprotector/death1	{ DSAPTDT1 ALSWTDT1 PCSWTDT1 }
+startrooper/wound		{ DSSWTDT2 ALSWTDT2 PCSWTDT2 }
+alienprotector/wound	{ DSAPTDT2 ALSWTDT2 PCSWTDT2 }
+startrooper/attack		{ DSBRIFLE ALBRIFLE PCBRIFLE }
+alienprotector/attack	{ DSBRIFLE ALBRIFLE PCBRIFLE }
+$random startrooper/death { startrooper/death1 startrooper/wound }
+$random alienprotector/death { alienprotector/death1 alienprotector/wound }
