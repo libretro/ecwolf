@@ -352,3 +352,18 @@ startrooper/attack		{ DSBRIFLE ALBRIFLE PCBRIFLE }
 alienprotector/attack	{ DSBRIFLE ALBRIFLE PCBRIFLE }
 $random startrooper/death { startrooper/death1 startrooper/wound }
 $random alienprotector/death { alienprotector/death1 alienprotector/wound }
+
+scientist/sight			{ DSSCISIT ALSCISIT PCSCISIT }
+scientist/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+scientist/death1		{ DSSCIDT1 ALSCIDT1 PCSCIDT1 }
+scientist/death2		{ DSSCIDT2 ALSCIDT2 PCSCIDT2 }
+scientist/death3		{ DSSCIDT3 ALSCIDT3 PCSCIDT3 }
+scientist/inform_death1	{ DSINFDT1 ALINFDT1 PCINFDT1 }
+scientist/inform_death2 { DSINFDT2 ALINFDT2 PCINFDT2 }
+scientist/inform_death3 { DSINFDT3 ALINFDT3 PCINFDT3 }
+$random scientist/death { scientist/death1 scientist/death2 scientist/death3 }
+$random scientist/inform_death { scientist/inform_death1 scientist/inform_death2 scientist/inform_death3 }
+
+floatingbomb/sight		{ NULL ALSCTSIT PCSCTSIT }
+$random floatingbomb/death { misc/blake/explosion1 misc/blake/explosion2 }
+$random volatiletransport/death { misc/blake/explosion1 misc/blake/explosion2 }

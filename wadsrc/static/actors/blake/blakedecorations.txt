@@ -996,4 +996,51 @@ actor DeadStarTrooper 324
 	}
 }
 
+actor FlickerLight 339
+{
+	states
+	{
+		Spawn:
+			ARCL A 0.5 A_SetTics(random(2, 5)*30)
+		Decide:
+			ARCL A 0 A_Jump(240, "Flicker1", "Flicker2")
+			ARCL A 0.5 A_SetTics(random(4, 13)*30)
+			loop
+		Flicker1:
+			ARCL B random(1, 2) bright
+			goto Decide
+		Flicker2:
+			ARCL C random(1, 2) bright
+			goto Decide
+	}
+}
 
+actor SteamGrate 340
+{
+	states
+	{
+		Spawn:
+			GRAT A 120
+		Release:
+			GRAT B 0.5 A_Scream
+			GRAT CDCD 7
+			GRAT E 8
+			GRAT A 0.5 A_SetTics(random(0, 255)<<2)
+			loop
+	}
+}
+
+actor AlienCeilingLight 341
+{
+	states
+	{
+		Spawn:
+			ALCL A 120
+		Release:
+			ALCL B 0.5 A_Scream
+			ALCL CDCD 7
+			ALCL E 8
+			ALCL A 0.5 A_SetTics(random(0, 255)<<2)
+			loop
+	}
+}
