@@ -653,7 +653,7 @@ sprites
 
 	// Security Light
 	"SECLA0", // Off
-	"SUCLB0", // On
+	"SECLB0", // On
 
 	// POD Alien
 	"PODAA0", // Egg
@@ -712,16 +712,16 @@ sprites
 	"GENGD0",
 	"GENGE0", // Attack (Melee)
 	"GENGF0",
-	"GENGH0",
-	"GENGQ0", // Dead
-	"GENGM0", // Death
+	"GENGG0",
+	"GENGP0", // Dead
+	"GENGL0", // Death
+	"GENGM0",
 	"GENGN0",
 	"GENGO0",
-	"GENGP0",
-	"GENGL0", // Pain
-	"GENGI0", // Attack (Shoot)
+	"GENGK0", // Pain
+	"GENGH0", // Attack (Shoot)
+	"GENGI0",
 	"GENGJ0",
-	"GENGK0",
 
 	// Mech Sentinel
 	"MSENA0", // Walk

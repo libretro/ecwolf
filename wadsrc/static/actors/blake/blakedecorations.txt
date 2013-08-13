@@ -1044,3 +1044,17 @@ actor AlienCeilingLight 341
 			loop
 	}
 }
+
+actor SecurityLight 342
+{
+	states
+	{
+		Spawn:
+			//TODO: LOF_NOSIGHTCHECK
+			SECL A -1 NOP A_Look(0, 1, 0.1)
+		See:
+			SECL B 10 bright A_AlertMonsters
+			SECL A 10 A_AlertMonsters
+			loop
+	}
+}

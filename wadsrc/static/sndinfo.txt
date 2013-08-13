@@ -367,3 +367,12 @@ $random scientist/inform_death { scientist/inform_death1 scientist/inform_death2
 floatingbomb/sight		{ NULL ALSCTSIT PCSCTSIT }
 $random floatingbomb/death { misc/blake/explosion1 misc/blake/explosion2 }
 $random volatiletransport/death { misc/blake/explosion1 misc/blake/explosion2 }
+
+geneticguard/sight		{ DSGENSIT ALGENSIT PCGENSIT }
+geneticguard/death		{ DSPODDTH ALPODDTH PCPODDTH }
+geneticguard/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+geneticguard/melee		{ DSFISTAT ALFISTAT PCFISTAT }
+
+cyborgwarrior/sight		{ DSBLUSIT ALBLUSIT PCBLUSIT }
+cyborgwarrior/death		{ DSPODDTH ALPODDTH PCPODDTH }
+cyborgwarrior/attack	{ DSBLASTR ALBLASTR PCBLASTR }
