@@ -371,7 +371,10 @@ void AActor::Init()
 
 	actorRef = actors.Push(this);
 	if(!loadedgame)
+	{
 		thinker = new AActorProxy(this);
+		thinker->ObjectFlags |= OF_JustSpawned;
+	}
 
 	if(SpawnState)
 		SetState(SpawnState, true);
@@ -538,7 +541,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 	actor->y = y;
 	actor->velx = 0;
 	actor->vely = 0;
-	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty);
+	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty, actor->health);
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);
