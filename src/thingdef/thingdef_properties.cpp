@@ -258,7 +258,8 @@ HANDLE_PROPERTY(health)
 {
 	INT_PARAM(health, 0);
 
-	defaults->defaultHealth[0] = defaults->health = health;
+	defaults->health = health;
+	cls->Meta.SetMetaInt(AMETA_DefaultHealth1, health);
 
 	int currentSlope = 0;
 	unsigned int lastValue = health;
@@ -266,13 +267,14 @@ HANDLE_PROPERTY(health)
 	{
 		INT_PARAM(skillHealth, i);
 
-		defaults->defaultHealth[i] = skillHealth;
+		cls->Meta.SetMetaInt(AMETA_DefaultHealth1 + i, skillHealth);
 		currentSlope = skillHealth - lastValue;
 	}
 
 	for(unsigned int i = PARAM_COUNT;i < 9;i++)
 	{
-		defaults->defaultHealth[i] = defaults->defaultHealth[i-1] + currentSlope;
+		cls->Meta.SetMetaInt(AMETA_DefaultHealth1 + i,
+			cls->Meta.GetMetaInt(AMETA_DefaultHealth1 + i - 1) + currentSlope);
 	}
 }
 

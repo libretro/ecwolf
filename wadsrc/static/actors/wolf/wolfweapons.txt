@@ -188,7 +188,7 @@ actor BlueGatlingGun : GatlingGun
 		Hold:
 			BGTG C 3 bright
 			BGTG D 3 bright A_GunAttack
-			BGTG D 0 bright
+			BGTG D 0 bright A_GunAttack
 			BGTG E 3 A_ReFire
 			goto Ready
 	}
