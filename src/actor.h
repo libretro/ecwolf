@@ -157,7 +157,16 @@ enum
 	AMETA_Damage,
 	AMETA_DropItems,
 	AMETA_SecretDeathSound,
-	AMETA_GibHealth
+	AMETA_GibHealth,
+	AMETA_DefaultHealth1,
+	AMETA_DefaultHealth2,
+	AMETA_DefaultHealth3,
+	AMETA_DefaultHealth4,
+	AMETA_DefaultHealth5,
+	AMETA_DefaultHealth6,
+	AMETA_DefaultHealth7,
+	AMETA_DefaultHealth8,
+	AMETA_DefaultHealth9
 };
 
 class player_t;
@@ -242,7 +251,6 @@ class AActor : public DObject
 		angle_t	angle;
 		angle_t pitch;
 		int32_t	health;
-		short	defaultHealth[9];
 		int32_t	speed, runspeed;
 		int		points;
 		fixed	radius;
