@@ -376,3 +376,32 @@ geneticguard/melee		{ DSFISTAT ALFISTAT PCFISTAT }
 cyborgwarrior/sight		{ DSBLUSIT ALBLUSIT PCBLUSIT }
 cyborgwarrior/death		{ DSPODDTH ALPODDTH PCPODDTH }
 cyborgwarrior/attack	{ DSBLASTR ALBLASTR PCBLASTR }
+
+spidermutant/sight		{ DSSCNSIT ALSCNSIT PCSCNSIT }
+spidermutant/death		{ DSBLUDTH ALBLUDTH PCBLUDTH }
+spidermutant/attack		{ DSSPITAT ALSPITAT PCSPITAT }
+
+aciddragon/sight		{ DSPODSIT ALPODSIT PCPODSIT }
+aciddragon/death		{ DSPODDTH ALPODDTH PCPODDTH }
+
+breatherbeast/sight		{ DSGENSIT ALGENSIT PCGENSIT }
+breatherbeast/death		{ DSPODDTH ALPODDTH PCPODDTH }
+breatherbeast/attack	{ DSBLASTR ALBLASTR PCBLASTR }
+
+biomechguardian/sight	{ DSBLUSIT ALBLUSIT PCBLUSIT }
+biomechguardian/death	{ DSMTHDTH ALMTHDTH PCMTHDTH }
+biomechguardian/attack	{ DSBLASTR ALBLASTR PCBLASTR }
+
+reptilianwarrior/sight	{ DSGENSIT ALGENSIT PCGENSIT }
+reptilianwarrior/death	{ DSSCNDTH ALSCNDTH PCSCNDTH }
+reptilianwarrior/attack	{ DSBLASTR ALBLASTR PCBLASTR }
+
+mechsentinel/sight		{ DSBLUSIT ALBLUSIT PCBLUSIT }
+mechsentinel/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+$random mechsentinel/death { misc/blake/explosion1 misc/blake/explosion2 }
+
+mutanthuman/sight		{ DSMTHSIT ALMTHSIT PCMTHSIT }
+mutanthuman/death		{ DSMTHDTH ALMTHDTH PCMTHDTH }
+mutanthuman/melee		{ DSFISTAT ALFISTAT PCFISTAT }
+
+electrosphere/attack	{ DSELCATK ALELCATK PCELCATK }

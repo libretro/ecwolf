@@ -758,8 +758,7 @@ sprites
 	"MHUMH0", // Attack (Shoot)
 	"MHUMI0",
 	"MHUMJ0",
-	"MHUMP0", // Morph
-	"MHUMQ0",
+	"MHUMQ0", // Morph
 	"MHUMR0",
 	"MHUMS0",
 	"MHUMT0",
@@ -767,6 +766,7 @@ sprites
 	"MHUMV0",
 	"MHUMW0",
 	"MHUMX0",
+	"MHUMY0",
 
 	// Contained Acid Alien
 	"CNTAA0", // In Canister
@@ -1271,7 +1271,7 @@ sounds
 	"PCEXPLO2", // Explosion 2
 	"PCBLUSIT", // Robot Sight
 	"PCPRODT1", // Sentinel Death 1
-	"PCDOGSIT", // Brown Mutant Sight
+	"PCMTHSIT", // Brown Mutant Sight
 	"PCENGINE", // Engine Thrust?
 	"PCSCNSIT", // Critter Sight
 	"PCGETCAN", // Get Plasma Cannon
@@ -1282,7 +1282,7 @@ sounds
 	"PCGLDLAF", // Goldfire Laugh
 	"PCSCISIT", // Scientist Sight (Alerted)
 	"PCSCIDT1", // Scientist Death 1
-	"PCDOGDTH", // Brown Mutant Death
+	"PCMTHDTH", // Brown Mutant Death
 	"PCHEART",  // Heartbeat
 	"PCSWTSIT", // Trooper Sight
 	"PCSCNDTH", // Critter Death
@@ -1372,7 +1372,7 @@ sounds
 	"ALEXPLO2", // Explosion 2
 	"ALBLUSIT", // Robot Sight
 	"ALPRODT1", // Sentinel Death 1
-	"ALDOGSIT", // Brown Mutant Sight
+	"ALMTHSIT", // Brown Mutant Sight
 	"ALENGINE", // Engine Thrust?
 	"ALSCNSIT", // Critter Sight
 	"ALGETCAN", // Get Plasma Cannon
@@ -1383,7 +1383,7 @@ sounds
 	"ALGLDLAF", // Goldfire Laugh
 	"ALSCISIT", // Scientist Sight (Alerted)
 	"ALSCIDT1", // Scientist Death 1
-	"ALDOGDTH", // Brown Mutant Death
+	"ALMTHDTH", // Brown Mutant Death
 	"ALHEART",  // Heartbeat
 	"ALSWTSIT", // Trooper Sight
 	"ALSCNDTH", // Critter Death
@@ -1433,14 +1433,14 @@ digitalsounds
 	"DSEXPLO1", // Explosion 1
 	"DSGENSIT", // Genetic Guard Sight
 	"DSTCWDT1", // PS Sentinel Death 1
-	"DSDOGSIT", // Brown Mutant Sight
+	"DSMTHSIT", // Brown Mutant Sight
 	"DSSCNSIT", // Critter Sight
 	"DSTCWSIT", // PS Sentinel Sight
 	"DSGENDTH", // Genetic Guard Death
 	"DSBLUDTH", // Boss Death
 	"DSSCISIT", // Scientist Sight (Alerted)
 	"DSSCIDT1", // Scientist Death 1
-	"DSDOGDTH", // Brown Mutant Death
+	"DSMTHDTH", // Brown Mutant Death
 	"DSAPTSIT", // PS Trooper Sight
 	"DSSCNDTH", // Critter Death
 	"DSGLDLAF", // Goldfire Laugh
