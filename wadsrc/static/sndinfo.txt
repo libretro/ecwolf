@@ -383,6 +383,7 @@ spidermutant/attack		{ DSSPITAT ALSPITAT PCSPITAT }
 
 aciddragon/sight		{ DSPODSIT ALPODSIT PCPODSIT }
 aciddragon/death		{ DSPODDTH ALPODDTH PCPODDTH }
+aciddragon/attack		{ DSSPITAT ALSPITAT PCSPITAT }
 
 breatherbeast/sight		{ DSGENSIT ALGENSIT PCGENSIT }
 breatherbeast/death		{ DSPODDTH ALPODDTH PCPODDTH }
@@ -429,3 +430,22 @@ podalien/death			{ DSPODDTH ALPODDTH PCPODDTH }
 
 turret/attack			{ DSBLASTR ALBLASTR PCBLASTR }
 $random turret/death { misc/blake/explosion1 misc/blake/explosion2 }
+
+giantstalker/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+giantstalker/sight		{ DSBLUSIT ALBLUSIT PCBLUSIT }
+giantstalker/death		{ DSBLUDTH ALBLUDTH PCBLUDTH }
+
+spectordemon/sight		{ DSGENSIT ALGENSIT PCGENSIT }
+spectordemon/death		{ DSPODDTH ALPODDTH PCPODDTH }
+
+goldfire/monster/attack	{ DSELCATK ALELCATK PCELCATK }
+
+armoredstalker/attack	{ DSBLASTR ALBLASTR PCBLASTR }
+armoredstalker/sight	{ DSBLUSIT ALBLUSIT PCBLUSIT }
+armoredstalker/death	{ DSMTHDTH ALMTHDTH PCMTHDTH }
+
+crawlerbeast/attack		{ DSSPITAT ALSPITAT PCSPITAT }
+crawlerbeast/sight		{ DSGENSIT ALGENSIT PCGENSIT }
+crawlerbeast/death		{ DSLCNDTH ALLCNDTH PCLCNDTH }
+
+liquidalien/death		{ DSLIQDTH ALLIQDTH PCLIQDTH }
