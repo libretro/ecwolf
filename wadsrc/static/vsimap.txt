@@ -666,14 +666,14 @@ sprites
 	"PODAH0",
 	"PODAI0", // Attack (Melee)
 	"PODAJ0",
-	"PODAJ0",
-	"PODAN0", // Pain
-	"PODAO0", // Death
-	"PODAP0",
+	"PODAK0",
+	"PODAO0", // Pain
+	"PODAP0", // Death
 	"PODAQ0",
-	"PODAK0", // Attack (Shoot)
-	"PODAL0",
+	"PODAR0",
+	"PODAL0", // Attack (Shoot)
 	"PODAM0",
+	"PODAN0",
 
 	// Electro Alien
 	"ELCAA0", // Spawn

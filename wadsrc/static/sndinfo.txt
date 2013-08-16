@@ -405,3 +405,27 @@ mutanthuman/death		{ DSMTHDTH ALMTHDTH PCMTHDTH }
 mutanthuman/melee		{ DSFISTAT ALFISTAT PCFISTAT }
 
 electrosphere/attack	{ DSELCATK ALELCATK PCELCATK }
+
+smallcanisteralien/release	{ DSSCNBRK ALSCNBRK PCSCNBRK }
+smallcanisteralien/sight	{ DSSCNSIT ALSCNSIT PCSCNSIT }
+smallcanisteralien/attack	{ DSSPITAT ALSPITAT PCSPITAT }
+smallcanisteralien/melee	{ DSCLAWAT ALCLAWAT PCCLAWAT }
+smallcanisteralien/death	{ DSSCNDTH ALSCNDTH PCSCNDTH }
+
+largecanisteralien/release	{ DSLCNBRK ALLCNBRK PCLCNBRK }
+largecanisteralien/sight	{ DSLCNSIT ALLCNSIT PCLCNSIT }
+largecanisteralien/attack	{ DSSPITAT ALSPITAT PCSPITAT }
+largecanisteralien/melee	{ DSCLAWAT ALCLAWAT PCCLAWAT }
+largecanisteralien/death	{ DSLCNDTH ALLCNDTH PCLCNDTH }
+
+gurneymutant/sight		{ DSGRNSIT ALGRNSIT PCGRNSIT }
+gurneymutant/attack		{ DSBLASTR ALBLASTR PCBLASTR }
+gurneymutant/death		{ DSGRNDTH ALGRNDTH PCGRNDTH }
+
+podalien/release		{ DSPODHTC ALPODHTC PCPODHTC }
+podalien/sight			{ DSPODSIT ALPODSIT PCPODSIT }
+podalien/melee			{ DSCLAWAT ALCLAWAT PCCLAWAT }
+podalien/death			{ DSPODDTH ALPODDTH PCPODDTH }
+
+turret/attack			{ DSBLASTR ALBLASTR PCBLASTR }
+$random turret/death { misc/blake/explosion1 misc/blake/explosion2 }
