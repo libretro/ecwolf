@@ -276,18 +276,6 @@ actor MutantStatue 231
 	}
 }
 
-actor VerticalSpikeStatic 236
-{
-	radius 32
-	+SOLID
-	states
-	{
-		Spawn:
-			VSPK H -1
-			stop
-	}
-}
-
 actor YellowBox 242
 {
 	states
@@ -370,18 +358,6 @@ actor IndirectSpotLight 253
 	{
 		Spawn:
 			IDSL A -1
-			stop
-	}
-}
-
-actor VerticalPostStatic 254
-{
-	radius 32
-	+SOLID
-	states
-	{
-		Spawn:
-			VPST H -1
 			stop
 	}
 }

@@ -960,6 +960,7 @@ things
 	{112,	327,	4,	PATHING,	0}
 	{116,	332,	4,	0,	0}
 	{120,	332,	4,	PATHING,	0}
+	// TODO: 124 -> Goldfire Spawn Site
 	{125,	353,	0,	0,	3}
 	{126,	329,	4,	0,	0}
 	{130,	329,	4,	PATHING,	0}
@@ -967,8 +968,10 @@ things
 	{135,	356,	0,	0,	2} // TODO: Replace with 257 when below skill
 	{136,	356,	0,	0,	3} // TODO: Replace with 257 when below skill
 	{137,	260,	0,	0,	0}
-	// TODO: 138 -> Plasma Post Barrier Off
-	// TODO: 139 -> Plasma Post Barrier On
+	{138,	376,	0,	0,	0}
+	{139,	375,	0,	0,	0}
+	// No 140
+	// TODO: 141 -> Goldfire Spawn immediately
 	{142,	343,	0,	0,	2}
 	{143,	343,	0,	0,	3}
 	{144,	327,	4,	0,	2}
@@ -983,8 +986,9 @@ things
 	{171,	358,	0,	0,	2} // TODO: Replace with 256 when below skill
 	{172,	358,	0,	0,	3} // TODO: Replace with 256 when below skill
 	{173,	360,	0,	0,	2} // TODO: Replace with 255 when below skill
-	// TODO: 174 -> Arc Barrier Off
-	// TODO: 175 -> Arc Barrier On
+	{174,	378,	0,	0,	0}
+	{175,	377,	0,	0,	0}
+	// No 176
 	{177,	325,	0,	0,	0}
 	{178,	340,	0,	0,	0}
 	{179,	341,	0,	0,	0}
@@ -992,15 +996,19 @@ things
 	{184,	327,	4,	PATHING,	3}
 	{188,	332,	4,	0,	3}
 	{192,	332,	4,	PATHING,	3}
+	// No 196-197
 	{198,	329,	4,	0,	3}
 	{202,	329,	4,	PATHING,	3}
 	{206,	335,	0,	0,	0}
 	{207,	335,	0,	0,	2}
 	{208,	335,	0,	0,	3}
+	// No 209
 	{210,	336,	0,	0,	0}
 	{211,	336,	0,	0,	2}
 	{212,	336,	0,	0,	3}
+	// No 213
 	{214,	343,	0,	0,	0}
+	// No 215
 	{216,	331,	4,	0,	0}
 	{220,	331,	4,	PATHING,	0}
 	{224,	365,	4,	0,	0}
@@ -1030,6 +1038,7 @@ things
 	{278,	333,	4,	0,	2}
 	{282,	333,	4,	PATHING,	2}
 	{286,	337,	0,	0,	0}
+	// No 287
 	{288,	355,	0,	0,	3}
 	{289,	355,	0,	0,	2}
 	{290,	355,	0,	0,	0}
@@ -1041,23 +1050,42 @@ things
 	{296,	333,	4,	0,	3}
 	{300,	333,	4,	PATHING,	3}
 	{304,	337,	0,	0,	2}
+	// No 305
 	{306,	362,	0,	0,	0}
 	{307,	361,	0,	0,	0}
 	{308,	361,	0,	0,	2}
 	{309,	361,	0,	0,	3}
+	{310,	379,	0,	0,	0}
+	{311,	379,	0,	0,	2}
+	{312,	379,	0,	0,	3}
 	{313,	338,	0,	0,	3}
 	{314,	334,	4,	0,	0}
 	{318,	334,	4,	PATHING,	0}
 	{322,	337,	0,	0,	3}
+	// No 323
+	// TODO: 324 -> Vertical Sphere Easy
+	// TODO: 325 -> Horizonal Sphere Easy
+	// TODO: 326 -> Diagonal Sphere Easy
+	// No 327
 	{328,	333,	4,	0,	0} // STATIONARY
 	{332,	334,	4,	0,	2}
 	{336,	334,	4,	PATHING,	2}
+	// TODO: 342 -> Vertical Sphere Normal
+	// TODO: 343 -> Horizonal Sphere Normal
+	// TODO: 344 -> Diagonal Sphere Normal
+	// No 345
 	{346,	333,	4,	0,	2} // STATIONARY
 	{350,	334,	4,	0,	3}
 	{354,	334,	4,	PATHING,	3}
+	// No 358-359
+	// TODO: 360 -> Vertical Sphere Hard
+	// TODO: 361 -> Horizonal Sphere Hard
+	// TODO: 362 -> Diagonal Sphere Hard
+	// No 363
 	{364,	333,	4,	0,	3} // STATIONARY
 	{368,	365,	4,	0,	3}
 	{372,	364,	4,	0,	3}
+	// No 376-380
 	{381,	271,	0,	0,	0}
 	{382,	272,	0,	0,	0}
 	{383,	273,	0,	0,	0}
@@ -1066,6 +1094,7 @@ things
 	{386,	276,	0,	0,	0}
 	{387,	277,	0,	0,	0}
 	{388,	278,	0,	0,	0}
+	// No 389
 	{390,	279,	0,	0,	0}
 	{391,	280,	0,	0,	0}
 	{392,	281,	0,	0,	0}
@@ -1101,9 +1130,16 @@ things
 	{422,	311,	0,	0,	0}
 	{423,	312,	0,	0,	0}
 	{424,	313,	0,	0,	0}
-	// TODO: 425 -> VSPIKE Barrier Off
-	// TODO: 426 -> VSPIKE Barrier On
-	// TODO: 428/429/430 -> VSPIKE Barrier Cycle
+	{425,	374,	0,	0,	0}
+	{426,	373,	0,	0,	0}
+	// No 427
+	{428,	374,	0,	0,	0}
+	{429,	374,	0,	0,	2}
+	{430,	374,	0,	0,	3}
+	// No 431
+	// TODO: 432-449 -> Blastable crate1
+	// TODO: 450-467 -> Blastable crate2
+	// TODO: 468-485 -> Blastable crate3
 	{486,	315,	0,	0,	0}
 	{487,	316,	0,	0,	0}
 	{488,	317,	0,	0,	0}
@@ -1114,46 +1150,61 @@ things
 	{493,	322,	0,	0,	0}
 	{494,	323,	0,	0,	0}
 	{495,	324,	0,	0,	0}
+	// No 496-503
 	// Technically these unset FL_RANDOM_TURN, but that's not set on anything other than scientists.
 	{504,	331,	4,	PATHING,	0}
 	{508,	333,	4,	PATHING,	0}
 	{512,	334,	4,	PATHING,	0}
-	{519,	327,	4,	PATHING,	0}
+	{516,	327,	4,	PATHING,	0}
+	// No 520-521
 	{522,	331,	4,	PATHING,	2}
 	{526,	333,	4,	PATHING,	2}
 	{530,	334,	4,	PATHING,	2}
 	{534,	327,	4,	PATHING,	2}
+	// No 538-539
 	{540,	331,	4,	PATHING,	3}
 	{544,	333,	4,	PATHING,	3}
 	{548,	334,	4,	PATHING,	3}
 	{552,	327,	4,	PATHING,	3}
+	// No 556-557
 	{558,	329,	4,	PATHING,	0}
-	// TODO: 562 -> VPOST Barrier Off
-	// TODO: 563 -> VPOST Barrier On
-	// TODO: 565, 566, 567 -> VPOST Barrier Cycle Easy/Normal/Hard (same as off?)
+	{562,	372,	0,	0,	0}
+	{563,	371,	0,	0,	0}
+	// No 564
+	{565,	372,	0,	0,	0}
+	{566,	372,	0,	0,	2}
+	{567,	372,	0,	0,	3}
+	// No 568-575
 	{576,	329,	4,	PATHING,	2}
+	// No 580-582
 	{583,	345,	0,	0,	2}
 	{584,	348,	0,	0,	2}
 	{585,	344,	0,	0,	2}
 	{586,	350,	0,	0,	2}
 	{587,	347,	0,	0,	2}
 	{588,	349,	0,	0,	2}
+	// No 589
 	{590,	351,	0,	0,	0}
 	{591,	351,	0,	0,	2} // TODO: Replace with 292 when below skill
 	{592,	351,	0,	0,	3} // TODO: Replace with 292 when below skill
+	// No 593
 	{594,	329,	4,	PATHING,	3}
+	// No 598-600
 	{601,	345,	0,	0,	3}
 	{602,	348,	0,	0,	3}
 	{603,	344,	0,	0,	3}
 	{604,	350,	0,	0,	3}
 	{605,	347,	0,	0,	3}
 	{606,	349,	0,	0,	3}
+	// No 607
 	{608,	346,	0,	0,	0}
 	{609,	346,	0,	0,	2} // TODO: Replace with 291 when below skill
 	{610,	346,	0,	0,	3} // TODO: Replace with 291 when below skill
+	// No 611-625
 	{626,	354,	0,	0,	0}
 	{627,	354,	0,	0,	2} // TODO: Replace with 231 when below skill
 	{628,	354,	0,	0,	3} // TODO: Replace with 231 when below skill
+	// No 629
 	{630,	366,	0,	0,	0}
 	{631,	367,	0,	0,	0}
 	{632,	368,	0,	0,	0}

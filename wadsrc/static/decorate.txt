@@ -27,6 +27,7 @@
 #include "actors/blake/blakeammo.txt"
 #include "actors/blake/blakebonus.txt"
 #include "actors/blake/blakedecorations.txt"
+#include "actors/blake/blakebarriers.txt"
 #include "actors/blake/blakedetonator.txt"
 #include "actors/blake/blakehealth.txt"
 #include "actors/blake/blakekeys.txt"
