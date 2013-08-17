@@ -74,7 +74,6 @@ static inline void clearbufshort(void *buffer, unsigned int count, WORD clear)
 	while(b != end)
 		*b++ = clear;
 }
-#define FIXED2FLOAT(fixed) ((double)fixed/65536.0)
 
 // [RH] Stretch values to make a 320x200 image best fit the screen
 // without using fractional steppings

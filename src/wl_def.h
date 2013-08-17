@@ -72,6 +72,8 @@ void Quit(const char *errorStr, ...);
 
 #define abs(x) ABS(x)
 
+#define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
+
 #ifdef _WIN32
 #define stricmp _stricmp
 #endif

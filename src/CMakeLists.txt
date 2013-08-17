@@ -211,6 +211,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	thingdef/thingdef_properties.cpp
 	thingdef/thingdef_type.cpp
 	actor.cpp
+	am_map.cpp
 	colormatcher.cpp
 	config.cpp
 	c_cvars.cpp

@@ -50,7 +50,7 @@ static int DebugOk;
 
 bool noclip, ammocheat, mouselook = false;
 int godmode, singlestep;
-bool notargetmode = false;
+bool notargetmode = false, automap = false;
 unsigned int extravbls = 0; // to remove flicker (gray stuff at the bottom)
 
 //
