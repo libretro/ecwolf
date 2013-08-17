@@ -365,7 +365,7 @@ const AActor *AActor::GetDefault() const
 
 Thinker *AActor::GetThinker()
 {
-	return (AActorProxy*)thinker;
+	return (Thinker*)thinker;
 }
 
 void AActor::Init()
@@ -537,7 +537,7 @@ void AActor::RemoveFromWorld()
 	}
 	if(thinker)
 	{
-		thinker->Disable();
+		((AActorProxy*)(Thinker*)thinker)->Disable();
 		thinker->Destroy();
 		thinker = NULL;
 	}

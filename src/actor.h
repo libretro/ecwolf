@@ -303,7 +303,8 @@ class AActor : public DObject
 		void	Init();
 
 		const MapZone	*soundZone;
-		TObjPtr<AActorProxy> thinker;
+		// This will hold an AActorProxy, but we use Thinker here since we want to be able to use this member elsewhere
+		TObjPtr<Thinker> thinker;
 };
 
 #endif

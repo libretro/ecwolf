@@ -35,6 +35,7 @@
 #include "a_inventory.h"
 #include "id_sd.h"
 #include "templates.h"
+#include "thinker.h"
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
 #include "wl_agent.h"
@@ -111,7 +112,7 @@ void AInventory::GoAwayAndDie()
 bool AInventory::GoAway()
 {
 	const Frame *hide = FindState("Hide");
-	if(hide)
+	if(hide && thinker) // Only hide actors that are thinking
 	{
 		itemFlags |= IF_INACTIVE;
 		SetState(hide);
