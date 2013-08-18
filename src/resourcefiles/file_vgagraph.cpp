@@ -195,8 +195,6 @@ class FVGAGraph : public FResourceFile
 			NumLumps = vgaheadReader.Tell()/3;
 			vgaheadReader.Seek(0, SEEK_SET);
 			lumps = new FVGALump[NumLumps];
-			//for(unsigned int i = 0;i < NumLumps;i++)
-			//	lumps[i].LumpSize = 0;
 			// The vgahead has 24-bit ints.
 			BYTE* data = new BYTE[NumLumps*3];
 			vgaheadReader.Read(data, NumLumps*3);
@@ -242,7 +240,7 @@ class FVGAGraph : public FResourceFile
 					lumps[0].LumpSize = (NumLumps-3)*4;
 
 					byte* data = new byte[lumps[0].length];
-					byte* out = new byte[(NumLumps-3)*4];//lumps[0].LumpSize];
+					byte* out = new byte[(NumLumps-3)*4];
 					Reader->Read(data, lumps[0].length);
 					byte* endPtr = lumps[0].HuffExpand(data, out);
 					delete[] data;
@@ -271,12 +269,22 @@ class FVGAGraph : public FResourceFile
 			}
 			// HACK: For some reason id decided the tile8 lump will not tell
 			//       its size.  So we need to assume it's right after the
-			//       graphics and is 72 tiles long.
+			//       graphics. To make matters worse, we can't assume a size
+			//       for it since S3DNA has more than 72 tiles.
+			//       We will use the method from before to guess a size.
 			unsigned int tile8Position = 3+numPictures;
 			if(tile8Position < NumLumps && (unsigned)lumps[tile8Position].LumpSize > lumps[tile8Position].length)
 			{
+				byte* data = new byte[lumps[tile8Position].length];
+				byte* out = new byte[64*256];
+				Reader->Seek(lumps[tile8Position].position, SEEK_SET);
+				Reader->Read(data, lumps[tile8Position].length);
+				byte* endPtr = lumps[tile8Position].HuffExpand(data, out);
+				delete[] data;
+				delete[] out;
+
 				lumps[tile8Position].noSkip = true;
-				lumps[tile8Position].LumpSize = 64*72;
+				lumps[tile8Position].LumpSize = (unsigned int)(endPtr - out)&~0x3F;
 			}
 			if(dimensions != NULL)
 				delete[] dimensions;

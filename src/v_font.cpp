@@ -948,13 +948,16 @@ FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 	else if (data[0] != 'F' || data[1] != 'O' || data[2] != 'N' ||
 		(data[3] != '1' && data[3] != '2'))
 	{
-		// FMemLump adds one to GetSize so account for it.
-		if(data1.GetSize() - 1 == 72*64)
+		if(!LoadWolfFont(lump, data, data1.GetSize()))
 		{
-			LoadTile8(lump, data);
+			// FMemLump adds one to GetSize so account for it.
+			if((data1.GetSize() - 1)%64 == 0)
+			{
+				LoadTile8(lump, data);
+			}
+			else
+				I_FatalError ("%s is not a recognizable font", name);
 		}
-		else if(!LoadWolfFont(lump, data, data1.GetSize()))
-			I_FatalError ("%s is not a recognizable font", name);
 	}
 	else
 	{
