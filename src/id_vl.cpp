@@ -32,6 +32,7 @@ bool usedoublebuffering = true;
 unsigned screenWidth = 640;
 unsigned screenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
+float screenGamma = 1.0f;
 
 #if SDL_VERSION_ATLEAST(2,0,0)
 SDL_Window *window = NULL;

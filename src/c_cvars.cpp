@@ -110,6 +110,7 @@ void ReadConfig(void)
 	config.CreateSetting("ScreenHeight", screenHeight);
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
+	config.CreateSetting("Gamma", 1.0f);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -152,6 +153,7 @@ void ReadConfig(void)
 	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
+	screenGamma = config.GetSetting("Gamma")->GetFloat();
 
 	char hsName[50];
 	char hsScore[50];
@@ -241,6 +243,7 @@ void WriteConfig(void)
 	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
 	config.GetSetting("MoveBob")->SetValue(movebob);
+	config.GetSetting("Gamma")->SetValue(screenGamma);
 
 	char hsName[50];
 	char hsScore[50];

@@ -433,6 +433,21 @@ void PollControls (void)
 //===========================================================================
 
 
+void BumpGamma()
+{
+	screenGamma += 0.1f;
+	if(screenGamma > 3.0f)
+		screenGamma = 1.0f;
+	screen->SetGamma(screenGamma);
+	US_CenterWindow (10,2);
+	FString msg;
+	msg.Format("Gamma: %g", screenGamma);
+	US_PrintCentered (msg);
+	VW_UpdateScreen();
+	VW_UpdateScreen();
+	IN_Ack();
+}
+
 /*
 =====================
 =
@@ -574,6 +589,12 @@ void CheckKeys (void)
 			IN_ClearKeysDown();
 			ContinueMusic (lastoffs);
 		}
+		return;
+	}
+
+	if(scan == sc_F11)
+	{
+		BumpGamma();
 		return;
 	}
 

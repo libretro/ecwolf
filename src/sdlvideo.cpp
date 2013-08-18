@@ -17,9 +17,9 @@
 
 #include <SDL.h>
 
-static const float Gamma = 1.f;
-
 IVideo *Video = NULL;
+
+extern float screenGamma;
 
 DFrameBuffer *I_SetMode (int &width, int &height, DFrameBuffer *old)
 {
@@ -112,7 +112,7 @@ bool V_DoModeSetup (int width, int height, int bits)
 
 	screen = buff;
 	GC::WriteBarrier(screen);
-	screen->SetGamma (Gamma);
+	screen->SetGamma (screenGamma);
 
 	// Load fonts now so they can be packed into textures straight away,
 	// if D3DFB is being used for the display.
