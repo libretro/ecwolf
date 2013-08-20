@@ -22,13 +22,21 @@ include_directories(
 	${CMAKE_BINARY_DIR}/gdtoa
 )
 
-option(GPL "Build GPL edition")
-
 if(GPL)
 	add_definitions(-DUSE_GPL)
 	set(OPL_SOURCES dosbox/dbopl.cpp)
+
+	option(USE_LIBTEXTSCREEN "Use libtextscreen instead of console iwad picker." OFF)
+	if(USE_LIBTEXTSCREEN)
+		add_definitions(-DUSE_TEXTSCREEN)
+		include_directories(${ECWolf_SOURCE_DIR}/textscreen)
+		set(EXTRA_LIBRARIES textscreen)
+	else(USE_LIBTEXTSCREEN)
+		set(EXTRA_LIBRARIES)
+	endif(USE_LIBTEXTSCREEN)
 else(GPL)
 	set(OPL_SOURCES mame/fmopl.cpp)
+	set(EXTRA_LIBRARIES)
 endif(GPL)
 
 find_package(SDL REQUIRED)
@@ -70,7 +78,7 @@ endif(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
 
 if(WIN32)
 	set(NO_GTK ON)
-	set(EXTRA_LIBRARIES comctl32)
+	set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} comctl32)
 	add_definitions(-DWINDOWS -DNO_STDIO_REDIRECT)
 
 	# RC file
@@ -96,7 +104,6 @@ if(WIN32)
 	)
 elseif(APPLE)
 	set(NO_GTK ON)
-	set(EXTRA_LIBRARIES)
 else(WIN32)
 	option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
 
@@ -104,13 +111,11 @@ else(WIN32)
 	if( NOT NO_GTK )
 		pkg_check_modules( GTK2 gtk+-2.0 )
 		if( GTK2_FOUND )
-			set( EXTRA_LIBRARIES ${GTK2_LIBRARIES} )
+			set( EXTRA_LIBRARIES ${EXTRA_LIBRARIES} ${GTK2_LIBRARIES} )
 			include_directories( ${GTK2_INCLUDE_DIRS} )
 		else( GTK2_FOUND )
 			set( NO_GTK ON )
 		endif( GTK2_FOUND )
-	else( NOT NO_GTK)
-		set(EXTRA_LIBRARIES)
 	endif( NOT NO_GTK )
 endif(WIN32)
 
