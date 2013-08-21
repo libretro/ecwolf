@@ -79,7 +79,9 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 {
 	I_InitGraphics();
 	Video->SetResolution(screenWidth, screenHeight, 8);
+	screen->Lock(true);
 	R_SetupBuffer ();
+	screen->Unlock();
 
 	scaleFactorX = CleanXfac;
 	scaleFactorY = CleanYfac;
