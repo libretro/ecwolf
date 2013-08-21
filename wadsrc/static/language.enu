@@ -12,6 +12,7 @@ ENDGAMESTR = "Are you sure you want\nto end the game you\nare playing? (Y or N)"
 STR_NG = "New Game";
 STR_OPTIONS = "Options";
 STR_DISPLAY = "Display Options";
+STR_AMOPTIONS = "Automap Options";
 STR_DEPTHFOG = "Use Depth Fog";
 STR_FULLSCREEN = "Fullscreen";
 STR_SD = "Sound Options";
@@ -83,6 +84,10 @@ STR_SECRETCASTLECOMPLETED = "\nsecret castle\n    area\n  completed!";
 STR_SELECTRES = "Screen Resolution";
 STR_PLAYERCLASS = "Choose Player";
 STR_ESCQUIT = "Don't Return on Escape";
+STR_AMROTATE = "Rotate Automap";
+STR_AMFLOORS = "Draw Floor Textures";
+STR_AMTEXTURES = "Draw Wall Textures";
+STR_AMOVERLAY = "Draw Map Background";
 
 STR_DEMOCOMPLETED = "This concludes your demo\nof Spear of Destiny! Now,\ngo to your local software\nstore and buy it!";
 

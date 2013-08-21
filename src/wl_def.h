@@ -305,6 +305,7 @@ enum Button
 	bt_altattack,
 	bt_reload,
 	bt_zoom,
+	bt_automap,
 	NUMBUTTONS
 };
 

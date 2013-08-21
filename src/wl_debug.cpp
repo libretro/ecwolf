@@ -9,6 +9,7 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "am_map.h"
 #include "id_ca.h"
 #include "id_sd.h"
 #include "id_vl.h"
@@ -357,9 +358,9 @@ int DebugKeys (void)
 		IN_Ack ();
 		return 1;
 	}
-	else if (Keyboard[sc_O])        // O = basic overhead
+	else if (Keyboard[sc_O])
 	{
-		automap ^= 1;
+		am_cheat ^= 1;
 		IN_ClearKeysDown();
 		return 1;
 	}

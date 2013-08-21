@@ -23,6 +23,7 @@
 #include "wl_play.h"
 #include "g_mapinfo.h"
 #include "a_inventory.h"
+#include "am_map.h"
 
 /*
 =============================================================================
@@ -50,7 +51,7 @@ static int DebugOk;
 
 bool noclip, ammocheat, mouselook = false;
 int godmode, singlestep;
-bool notargetmode = false, automap = false;
+bool notargetmode = false;
 unsigned int extravbls = 0; // to remove flicker (gray stuff at the bottom)
 
 //
@@ -90,6 +91,7 @@ ControlScheme controlScheme[] =
 	{ bt_altattack,			"Alt Attack",	-1,			-1,				-1, NULL, 0 },
 	{ bt_reload,			"Reload",		-1,			-1,				-1, NULL, 0 },
 	{ bt_zoom,				"Zoom",			-1,			-1,				-1, NULL, 0 },
+	{ bt_automap,			"Automap",		-1,			-1,				-1, NULL, 0 },
 
 	// End of List
 	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
@@ -601,7 +603,7 @@ void CheckKeys (void)
 //
 // TAB-? debug keys
 //
-	if (Keyboard[sc_Tab] && DebugOk)
+	if ((Keyboard[sc_Tab] || Keyboard[sc_BackSpace] || Keyboard[sc_Grave]) && DebugOk)
 	{
 		if (DebugKeys () && viewsize < 20)
 			DrawPlayBorder ();       // dont let the blue borders flash
@@ -848,6 +850,12 @@ void PlayLoop (void)
 	{
 		PollControls ();
 
+		// Check automap toggle before we set any buttons as held
+		if (buttonstate[bt_automap] && !buttonheld[bt_automap])
+		{
+			automap ^= 1;
+		}
+
 //
 // actor thinking
 //
@@ -867,6 +875,9 @@ void PlayLoop (void)
 
 		ThreeDRefresh ();
 
+		if(automap)
+			BasicOverhead();
+
 		//
 		// MAKE FUNNY FACE IF BJ DOESN'T MOVE FOR AWHILE
 		//
@@ -882,6 +893,8 @@ void PlayLoop (void)
 		CheckKeys ();
 		if((gamestate.TimeCount & 1) || !(tics & 1))
 			StatusBar->DrawStatusBar();
+
+		VH_UpdateScreen();
 //
 // debug aids
 //

@@ -39,14 +39,35 @@
 #include "tarray.h"
 #include "vectors.h"
 
+extern bool automap;
+extern bool am_cheat;
+extern bool am_rotate;
+extern bool am_drawtexturedwalls;
+extern bool am_drawfloors;
+extern bool am_drawbackground;
+
+void AM_ChangeResolution();
+void AM_UpdateFlags();
+
+void BasicOverhead();
+
 class AutoMap
 {
 public:
-	AutoMap();
+	enum AMFlags
+	{
+		AMF_Rotate = 0x1,
+		AMF_DrawTexturedWalls = 0x2,
+		AMF_DrawFloor = 0x4,
+		AMF_Overlay = 0x8
+	};
+
+	AutoMap(unsigned int flags=0);
 	~AutoMap();
 
 	void CalculateDimensions();
 	void Draw();
+	void SetFlags(unsigned int flags, bool set);
 	void SetScale(fixed scale);
 
 protected:
@@ -57,6 +78,7 @@ protected:
 private:
 	double rottable[2][2];
 
+	unsigned int amFlags;
 	int amsizex, amsizey, amx, amy;
 	fixed amsin, amcos;
 	fixed scale;

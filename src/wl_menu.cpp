@@ -31,6 +31,7 @@
 #include "templates.h"
 #include "thingdef/thingdef.h"
 #include "wl_loadsave.h"
+#include "am_map.h"
 
 #include <climits>
 
@@ -46,10 +47,11 @@ static bool menusAreFaded = true;
 MENU_LISTENER(EnterControlBase);
 
 Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
-Menu optionsMenu(80, 85, 180, 28);
+Menu optionsMenu(80, 80, 190, 28);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(60, 95, 225, 56);
+Menu automapMenu(40, 75, 260, 56);
 Menu mouseSensitivity(20, 80, 300, 0);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
@@ -286,6 +288,12 @@ MENU_LISTENER(EnterResolutionSelection)
 	return true;
 }
 
+MENU_LISTENER(ChangeAutomapFlag)
+{
+	AM_UpdateFlags();
+	return true;
+}
+
 void CreateMenus()
 {
 	// Extract the palette
@@ -377,6 +385,7 @@ void CreateMenus()
 	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_CL"], controlBase));
 	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_SD"], soundBase));
 	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_DISPLAY"], displayMenu));
+	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_AMOPTIONS"], automapMenu));
 
 	// Collect options and defaults
 	const char* soundEffectsOptions[] = {language["STR_NONE"], language["STR_PC"], language["STR_ALSB"] };
@@ -446,6 +455,12 @@ void CreateMenus()
 	{
 		controls.addItem(new ControlMenuItem(controlScheme[i]));
 	}
+
+	automapMenu.setHeadText(language["STR_AMOPTIONS"]);
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMROTATE"], am_rotate, ChangeAutomapFlag));
+	//automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTURES"], am_drawtexturedwalls, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMFLOORS"], am_drawfloors, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMOVERLAY"], am_drawbackground, ChangeAutomapFlag));
 }
 
 static int SoundStatus = 1;

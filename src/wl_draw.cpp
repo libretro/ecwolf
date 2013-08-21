@@ -1281,7 +1281,6 @@ void R_RenderView()
 ========================
 */
 
-void BasicOverhead();
 void    ThreeDRefresh (void)
 {
 	// Ensure we have a valid camera
@@ -1310,8 +1309,6 @@ void    ThreeDRefresh (void)
 //
 // show screen and time last cycle
 //
-
-	if(automap) BasicOverhead();
 	if (fizzlein)
 	{
 		FizzleFade(0, 0, screenWidth, screenHeight, 20, false);
@@ -1319,26 +1316,22 @@ void    ThreeDRefresh (void)
 
 		lasttimecount = GetTimeCount();          // don't make a big tic count
 	}
-	else
+	else if (fpscounter)
 	{
-		if (fpscounter)
-		{
-			FString fpsDisplay;
-			fpsDisplay.Format("%2u fps", fps);
+		FString fpsDisplay;
+		fpsDisplay.Format("%2u fps", fps);
 
-			word x = 0;
-			word y = 0;
-			word width, height;
-			VW_MeasurePropString(ConFont, fpsDisplay, width, height);
-			MenuToRealCoords(x, y, width, height, MENU_TOP);
-			VWB_Clear(GPalette.BlackIndex, x, y, x+width+1, y+height+1);
-			px = 0;
-			py = 0;
-			pa = MENU_TOP;
-			VWB_DrawPropString(ConFont, fpsDisplay, CR_WHITE);
-			pa = MENU_CENTER;
-		}
-		VH_UpdateScreen();
+		word x = 0;
+		word y = 0;
+		word width, height;
+		VW_MeasurePropString(ConFont, fpsDisplay, width, height);
+		MenuToRealCoords(x, y, width, height, MENU_TOP);
+		VWB_Clear(GPalette.BlackIndex, x, y, x+width+1, y+height+1);
+		px = 0;
+		py = 0;
+		pa = MENU_TOP;
+		VWB_DrawPropString(ConFont, fpsDisplay, CR_WHITE);
+		pa = MENU_CENTER;
 	}
 
 	if (fpscounter)

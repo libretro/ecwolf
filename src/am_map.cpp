@@ -41,6 +41,33 @@
 #include "v_video.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
+#include "wl_main.h"
+
+static AutoMap AM_Main;
+
+bool automap = false;
+bool am_cheat = false;
+bool am_rotate = false;
+bool am_drawtexturedwalls = false;
+bool am_drawfloors = false;
+bool am_drawbackground = true;
+
+void AM_ChangeResolution()
+{
+	AM_Main.CalculateDimensions();
+}
+
+void AM_UpdateFlags()
+{
+	unsigned int flags = 0;
+	if(am_rotate) flags |= AutoMap::AMF_Rotate;
+	if(am_drawtexturedwalls) flags |= AutoMap::AMF_DrawTexturedWalls;
+	if(am_drawfloors) flags |= AutoMap::AMF_DrawFloor;
+	if(!am_drawbackground) flags |= AutoMap::AMF_Overlay;
+
+	AM_Main.SetFlags(~flags, false);
+	AM_Main.SetFlags(flags, true);
+}
 
 // Culling table
 static const struct
@@ -56,7 +83,7 @@ static const struct
 	{ {0, 2}, {1, 3} }
 };
 
-AutoMap::AutoMap()
+AutoMap::AutoMap(unsigned int flags) : amFlags(flags)
 {
 	amangle = 0;
 	minmaxSel = 0;
@@ -74,13 +101,13 @@ AutoMap::~AutoMap()
 
 void AutoMap::CalculateDimensions()
 {
-	static const int windowsize = 16;
+	static const int windowsize = 24;
 
-	amsizex = screenWidth*2/3;
-	amsizey = screenHeight*2/3;
-	amx = (screenWidth - amsizex)/2;
-	amy = (screenHeight - amsizey)/2;
-	SetScale((amsizey<<FRACBITS)/windowsize);
+	amsizex = viewwidth;
+	amsizey = viewheight;
+	amx = viewscreenx;
+	amy = viewscreeny;
+	SetScale((screenHeight<<FRACBITS)/windowsize);
 
 	// Since the simple polygon fill function seems to be off by one in the y
 	// direction, lets shift this up!
@@ -136,7 +163,7 @@ struct AMPWall
 {
 public:
 	TArray<FVector2> points;
-	MapSpot spot;
+	FTextureID texid;
 	float shiftx, shifty;
 };
 void AutoMap::Draw()
@@ -146,14 +173,15 @@ void AutoMap::Draw()
 	const unsigned int mapwidth = map->GetHeader().width;
 	const unsigned int mapheight = map->GetHeader().height;
 
-	screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey, GPalette.BlackIndex, 0);
+	if(!(amFlags & AMF_Overlay))
+		screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, GPalette.BlackIndex, 0);
 
 	const fixed playerx = players[0].mo->x;
 	const fixed playery = players[0].mo->y;
 
-	if(amangle != players[0].mo->angle-ANGLE_90)
+	if(amangle != ((amFlags & AMF_Rotate) ? players[0].mo->angle-ANGLE_90 : 0))
 	{
-		amangle = players[0].mo->angle-ANGLE_90;
+		amangle = (amFlags & AMF_Rotate) ? players[0].mo->angle-ANGLE_90 : 0;
 		minmaxSel = amangle/ANGLE_90;
 		amsin = finesine[amangle>>ANGLETOFINESHIFT];
 		amcos = finecosine[amangle>>ANGLETOFINESHIFT];
@@ -172,7 +200,7 @@ void AutoMap::Draw()
 		MapSpot spot = map->GetSpot(0, my, 0);
 		for(unsigned int mx = 0;mx < mapwidth;++mx, ++spot)
 		{
-			if(!(spot->amFlags & AM_Visible))
+			if(!(spot->amFlags & AM_Visible) && !am_cheat)
 				continue;
 
 			if(TransformTile(spot, FixedMul((mx<<FRACBITS)-playerx, scale), FixedMul((my<<FRACBITS)-playery, scale), points))
@@ -182,9 +210,12 @@ void AutoMap::Draw()
 				if(spot->tile && !spot->pushAmount && !spot->pushReceptor)
 				{
 					brightness = 256;
-					tex = TexMan(spot->texture[0]);
+					if(spot->tile->offsetHorizontal)
+						tex = TexMan(spot->texture[MapTile::North]);
+					else
+						tex = TexMan(spot->texture[MapTile::East]);
 				}
-				else if(spot->sector)
+				else if((amFlags & AMF_DrawFloor) && spot->sector)
 				{
 					brightness = 128;
 					tex = TexMan(spot->sector->texture[MapSector::Floor]);
@@ -221,7 +252,7 @@ void AutoMap::Draw()
 				{
 					AMPWall pwall;
 					pwall.points = points;
-					pwall.spot = spot;
+					pwall.texid = spot->texture[0];
 					pwall.shiftx = (FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amcos) - FixedMul(FixedMul(scale, ty&0xFFFF), amsin)));
 					pwall.shifty = (FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amsin) + FixedMul(FixedMul(scale, ty&0xFFFF), amcos)));
 					pwalls.Push(pwall);
@@ -233,7 +264,7 @@ void AutoMap::Draw()
 	for(unsigned int pw = pwalls.Size();pw-- > 0;)
 	{
 		AMPWall &pwall = pwalls[pw];
-		FTexture *tex = TexMan(pwall.spot->texture[0]);
+		FTexture *tex = TexMan(pwall.texid);
 		if(tex)
 			screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
 	}
@@ -267,6 +298,14 @@ FVector2 AutoMap::GetClipIntersection(const FVector2 &p1, const FVector2 &p2, un
 				return FVector2((C - B*(amy+amsizey))/A, amy+amsizey);
 		}
 	}
+}
+
+void AutoMap::SetFlags(unsigned int flags, bool set)
+{
+	if(set)
+		amFlags |= flags;
+	else
+		amFlags &= ~flags;
 }
 
 void AutoMap::SetScale(fixed scale)
@@ -312,7 +351,6 @@ bool AutoMap::TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &po
 
 void BasicOverhead()
 {
-	static AutoMap am;
-	am.CalculateDimensions();
-	am.Draw();
+	AM_Main.CalculateDimensions();
+	AM_Main.Draw();
 }
