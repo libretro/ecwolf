@@ -96,6 +96,8 @@ private:
 
 	Color ArrowColor;
 	Color BackgroundColor;
+	Color WallColor;
+	Color DoorColor;
 };
 
 #endif

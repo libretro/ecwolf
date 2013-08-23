@@ -1151,7 +1151,7 @@ void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uin
 
 void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	double originx, double originy, double scalex, double scaley, angle_t rotation,
-	FDynamicColormap *colormap, int lightlevel)
+	FDynamicColormap *colormap, int lightlevel, int palcolor, uint32 rgbcolor)
 {
 #ifndef NO_SWRENDER
 	// Use an equation similar to player sprites to determine shade
@@ -1200,20 +1200,23 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 		return;
 	}
 
-	scalex /= FIXED2FLOAT(tex->xScale);
-	scaley /= FIXED2FLOAT(tex->yScale);
+	if(tex)
+	{
+		scalex /= FIXED2FLOAT(tex->xScale);
+		scaley /= FIXED2FLOAT(tex->yScale);
 
-	cosrot = cos(rot);
-	sinrot = sin(rot);
+		cosrot = cos(rot);
+		sinrot = sin(rot);
 
-	// Setup constant texture mapping parameters.
-	R_SetupSpanBits(tex);
-	R_SetSpanColormap(colormap != NULL ? &colormap->Maps[clamp(shade >> FRACBITS, 0, NUMCOLORMAPS-1) * 256] : identitymap);
-	R_SetSpanSource(tex->GetPixels());
-	scalex = double(1u << (32 - ds_xbits)) / scalex;
-	scaley = double(1u << (32 - ds_ybits)) / scaley;
-	ds_xstep = xs_RoundToInt(cosrot * scalex);
-	ds_ystep = xs_RoundToInt(sinrot * scaley);
+		// Setup constant texture mapping parameters.
+		R_SetupSpanBits(tex);
+		R_SetSpanColormap(colormap != NULL ? &colormap->Maps[clamp(shade >> FRACBITS, 0, NUMCOLORMAPS-1) * 256] : identitymap);
+		R_SetSpanSource(tex->GetPixels());
+		scalex = double(1u << (32 - ds_xbits)) / scalex;
+		scaley = double(1u << (32 - ds_ybits)) / scaley;
+		ds_xstep = xs_RoundToInt(cosrot * scalex);
+		ds_ystep = xs_RoundToInt(sinrot * scaley);
+	}
 
 	// Travel down the right edge and create an outline of that edge.
 	pt1 = toppt;
@@ -1274,25 +1277,27 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 				{
 					x1 = MAX(x1, 0);
 					x2 = MIN(x2, Width);
-#if 0
-					memset(this->Buffer + y * this->Pitch + x1, (int)tex, x2 - x1);
-#else
-					ds_y = y;
-					ds_x1 = x1;
-					ds_x2 = x2 - 1;
 
-					TVector2<double> tex(x1 - originx, y - originy);
-					if (dorotate)
+					if(tex)
 					{
-						double t = tex.X;
-						tex.X = t * cosrot - tex.Y * sinrot;
-						tex.Y = tex.Y * cosrot + t * sinrot;
-					}
-					ds_xfrac = xs_RoundToInt(tex.X * scalex);
-					ds_yfrac = xs_RoundToInt(tex.Y * scaley);
+						ds_y = y;
+						ds_x1 = x1;
+						ds_x2 = x2 - 1;
 
-					R_DrawSpan();
-#endif
+						TVector2<double> tex(x1 - originx, y - originy);
+						if (dorotate)
+						{
+							double t = tex.X;
+							tex.X = t * cosrot - tex.Y * sinrot;
+							tex.Y = tex.Y * cosrot + t * sinrot;
+						}
+						ds_xfrac = xs_RoundToInt(tex.X * scalex);
+						ds_yfrac = xs_RoundToInt(tex.Y * scaley);
+
+						R_DrawSpan();
+					}
+					else
+						memset(this->Buffer + y * this->Pitch + x1, palcolor, x2 - x1);
 				}
 				x += xinc;
 			}

@@ -137,6 +137,12 @@ void AutoMap::CalculateDimensions()
 
 	BackgroundColor.color = MAKERGB(0x55,0x55,0x55);
 	BackgroundColor.palcolor = ColorMatcher.Pick(0x55, 0x55, 0x55);
+
+	WallColor.color = MAKERGB(0x00, 0x8E, 0x00);
+	WallColor.palcolor = ColorMatcher.Pick(0x00, 0x8E, 0x00);
+
+	DoorColor.color = MAKERGB(0x10, 0xC7, 0x10);
+	DoorColor.palcolor = ColorMatcher.Pick(0x10, 0xC7, 0x10);
 }
 
 // Sutherland–Hodgman algorithm
@@ -231,14 +237,26 @@ void AutoMap::Draw()
 			if(TransformTile(spot, FixedMul((mx<<FRACBITS)-playerx, scale), FixedMul((my<<FRACBITS)-playery, scale), points))
 			{
 				FTexture *tex;
+				Color *color = NULL;
 				int brightness;
 				if(spot->tile && !spot->pushAmount && !spot->pushReceptor)
 				{
 					brightness = 256;
-					if(spot->tile->offsetHorizontal)
-						tex = TexMan(spot->texture[MapTile::North]);
+					if((amFlags & AMF_DrawTexturedWalls))
+					{
+						if(spot->tile->offsetHorizontal)
+							tex = TexMan(spot->texture[MapTile::North]);
+						else
+							tex = TexMan(spot->texture[MapTile::East]);
+					}
 					else
-						tex = TexMan(spot->texture[MapTile::East]);
+					{
+						tex = NULL;
+						if(spot->tile->offsetHorizontal || spot->tile->offsetVertical)
+							color = &DoorColor;
+						else
+							color = &WallColor;
+					}
 				}
 				else if((amFlags & AMF_DrawFloor) && spot->sector)
 				{
@@ -250,6 +268,8 @@ void AutoMap::Draw()
 
 				if(tex)
 					screen->FillSimplePoly(tex, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness);
+				else if(color)
+					screen->FillSimplePoly(NULL, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness, color->palcolor, color->color);
 			}
 
 			// We need to check this even if the origin tile isn't visible since
@@ -289,9 +309,14 @@ void AutoMap::Draw()
 	for(unsigned int pw = pwalls.Size();pw-- > 0;)
 	{
 		AMPWall &pwall = pwalls[pw];
-		FTexture *tex = TexMan(pwall.texid);
-		if(tex)
-			screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
+		if((amFlags & AMF_DrawTexturedWalls))
+		{
+			FTexture *tex = TexMan(pwall.texid);
+			if(tex)
+				screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
+		}
+		else
+			screen->FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);
 	}
 
 	DrawVector(AM_Arrow, 8, amx + (amsizex>>1), amy + (amsizey>>1), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);

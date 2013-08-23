@@ -458,7 +458,7 @@ void CreateMenus()
 
 	automapMenu.setHeadText(language["STR_AMOPTIONS"]);
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMROTATE"], am_rotate, ChangeAutomapFlag));
-	//automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTURES"], am_drawtexturedwalls, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTURES"], am_drawtexturedwalls, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMFLOORS"], am_drawfloors, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMOVERLAY"], am_drawbackground, ChangeAutomapFlag));
 }
