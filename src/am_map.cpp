@@ -34,6 +34,7 @@
 
 #include "wl_def.h"
 #include "am_map.h"
+#include "colormatcher.h"
 #include "id_ca.h"
 #include "id_vl.h"
 #include "gamemap.h"
@@ -83,6 +84,23 @@ static const struct
 	{ {0, 2}, {1, 3} }
 };
 
+// #FF9200
+struct AMVectorPoint
+{
+	fixed X, Y;
+};
+static const AMVectorPoint AM_Arrow[] =
+{
+	{0, -FRACUNIT/2},
+	{FRACUNIT/2, 0},
+	{FRACUNIT/4, 0},
+	{FRACUNIT/4, FRACUNIT*7/16},
+	{-FRACUNIT/4, FRACUNIT*7/16},
+	{-FRACUNIT/4, 0},
+	{-FRACUNIT/2, 0},
+	{0, -FRACUNIT/2},
+};
+
 AutoMap::AutoMap(unsigned int flags) : amFlags(flags)
 {
 	amangle = 0;
@@ -112,6 +130,13 @@ void AutoMap::CalculateDimensions()
 	// Since the simple polygon fill function seems to be off by one in the y
 	// direction, lets shift this up!
 	--amy;
+
+	// TODO: Find a better spot for this
+	ArrowColor.color = MAKERGB(0xFF,0x80,0x00);
+	ArrowColor.palcolor = ColorMatcher.Pick(0xFF, 0x80, 0x00);
+
+	BackgroundColor.color = MAKERGB(0x55,0x55,0x55);
+	BackgroundColor.palcolor = ColorMatcher.Pick(0x55, 0x55, 0x55);
 }
 
 // Sutherland–Hodgman algorithm
@@ -174,7 +199,7 @@ void AutoMap::Draw()
 	const unsigned int mapheight = map->GetHeader().height;
 
 	if(!(amFlags & AMF_Overlay))
-		screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, GPalette.BlackIndex, 0);
+		screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, BackgroundColor.palcolor, BackgroundColor.color);
 
 	const fixed playerx = players[0].mo->x;
 	const fixed playery = players[0].mo->y;
@@ -267,6 +292,47 @@ void AutoMap::Draw()
 		FTexture *tex = TexMan(pwall.texid);
 		if(tex)
 			screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
+	}
+
+	DrawVector(AM_Arrow, 8, amx + (amsizex>>1), amy + (amsizey>>1), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
+}
+
+void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const
+{
+	int x1, y1, x2, y2;
+
+	x1 = FixedMul(points[numPoints-1].X, scale)>>FRACBITS;
+	y1 = FixedMul(points[numPoints-1].Y, scale)>>FRACBITS;
+	if(angle)
+	{
+		const fixed rsin = finesine[angle>>ANGLETOFINESHIFT];
+		const fixed rcos = finecosine[angle>>ANGLETOFINESHIFT];
+		int tmp;
+		tmp = FixedMul(x1, rcos) - FixedMul(y1, rsin);
+		y1 = FixedMul(x1, rsin) + FixedMul(y1, rcos);
+		x1 = tmp;
+
+		for(unsigned int i = numPoints-1;i-- > 0;x1 = x2, y1 = y2)
+		{
+			x2 = FixedMul(points[i].X, scale)>>FRACBITS;
+			y2 = FixedMul(points[i].Y, scale)>>FRACBITS;
+
+			tmp = FixedMul(x2, rcos) - FixedMul(y2, rsin);
+			y2 = FixedMul(x2, rsin) + FixedMul(y2, rcos);
+			x2 = tmp;
+
+			screen->DrawLine(x + x1, y + y1, x + x2, y + y2, c.palcolor, c.color);
+		}
+	}
+	else
+	{
+		for(unsigned int i = numPoints-1;i-- > 0;x1 = x2, y1 = y2)
+		{
+			x2 = FixedMul(points[i].X, scale)>>FRACBITS;
+			y2 = FixedMul(points[i].Y, scale)>>FRACBITS;
+
+			screen->DrawLine(x + x1, y + y1, x + x2, y + y2, c.palcolor, c.color);
+		}
 	}
 }
 

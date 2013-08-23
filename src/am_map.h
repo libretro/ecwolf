@@ -51,6 +51,8 @@ void AM_UpdateFlags();
 
 void BasicOverhead();
 
+struct AMVectorPoint;
+
 class AutoMap
 {
 public:
@@ -60,6 +62,12 @@ public:
 		AMF_DrawTexturedWalls = 0x2,
 		AMF_DrawFloor = 0x4,
 		AMF_Overlay = 0x8
+	};
+
+	struct Color
+	{
+		uint32 color;
+		byte palcolor;
 	};
 
 	AutoMap(unsigned int flags=0);
@@ -72,6 +80,7 @@ public:
 
 protected:
 	void ClipTile(TArray<FVector2> &points) const;
+	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const;
 	FVector2 GetClipIntersection(const FVector2 &p1, const FVector2 &p2, unsigned edge) const;
 	bool TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &points) const;
 
@@ -84,6 +93,9 @@ private:
 	fixed scale;
 	angle_t amangle;
 	unsigned short minmaxSel;
+
+	Color ArrowColor;
+	Color BackgroundColor;
 };
 
 #endif
