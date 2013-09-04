@@ -148,7 +148,6 @@ int lastgamemusicoffset = 0;
 
 
 void CenterWindow (word w, word h);
-void PollControls (void);
 int StopMusic (void);
 void StartMusic (void);
 void ContinueMusic (int offs);
@@ -312,7 +311,9 @@ void PollJoystickMove (void)
 =
 = PollControls
 =
-= Gets user or demo input, call once each frame
+= Gets user or demo input
+= Enable absolute positioning once per frame. This prevents absolute devices
+= from being carried over to adaptive tics.
 =
 = controlx              set between -100 and 100 per tic
 = controly
@@ -322,32 +323,10 @@ void PollJoystickMove (void)
 ===================
 */
 
-void PollControls (void)
+void PollControls (bool absolutes)
 {
 	int i;
 	byte buttonbits;
-
-	IN_ProcessEvents();
-
-//
-// get timing info for last frame
-//
-	if (demoplayback || demorecord)   // demo recording and playback needs to be constant
-	{
-		// wait up to DEMOTICS Wolf tics
-		uint32_t curtime = SDL_GetTicks();
-		lasttimecount += DEMOTICS;
-		int32_t timediff = (lasttimecount * 100) / 7 - curtime;
-		if(timediff > 0)
-			SDL_Delay(timediff);
-
-		if(timediff < -2 * DEMOTICS)       // more than 2-times DEMOTICS behind?
-			lasttimecount = (curtime * 7) / 100;    // yes, set to current timecount
-
-		tics = DEMOTICS;
-	}
-	else
-		CalcTics ();
 
 	controlx = 0;
 	controly = 0;
@@ -393,7 +372,7 @@ void PollControls (void)
 //
 	PollKeyboardMove ();
 
-	if (mouseenabled && IN_IsInputGrabbed())
+	if (absolutes && mouseenabled && IN_IsInputGrabbed())
 		PollMouseMove ();
 
 	if (joystickenabled)
@@ -421,6 +400,32 @@ void PollControls (void)
 		if (demoptr >= lastdemoptr - 8)
 			playstate = ex_completed;
 	}
+}
+
+// This should be called once per frame
+void ProcessEvents()
+{
+	IN_ProcessEvents();
+
+//
+// get timing info for last frame
+//
+	if (demoplayback || demorecord)   // demo recording and playback needs to be constant
+	{
+		// wait up to DEMOTICS Wolf tics
+		uint32_t curtime = SDL_GetTicks();
+		lasttimecount += DEMOTICS;
+		int32_t timediff = (lasttimecount * 100) / 7 - curtime;
+		if(timediff > 0)
+			SDL_Delay(timediff);
+
+		if(timediff < -2 * DEMOTICS)       // more than 2-times DEMOTICS behind?
+			lasttimecount = (curtime * 7) / 100;    // yes, set to current timecount
+
+		tics = DEMOTICS;
+	}
+	else
+		CalcTics ();
 }
 
 //===========================================================================
@@ -814,25 +819,28 @@ void PlayLoop (void)
 
 	do
 	{
-		PollControls ();
+		ProcessEvents();
 
 //
 // actor thinking
 //
 		madenoise = false;
 
+		// Run tics
 		for (unsigned int i = 0;i < tics;++i)
 		{
+			PollControls(!i);
+
 			++gamestate.TimeCount;
 			thinkerList->Tick();
-
-			if(i == 0) // After the first tic, go ahead and take care of button holding.
-				memcpy(buttonheld, buttonstate, sizeof (buttonstate));
 		}
+		//memset(map->GetHeader().spatial, 0, sizeof(map->GetHeader().spatial));
 
 		UpdatePaletteShifts ();
 
+		//Printf("--- Starting tic ---\n");
 		ThreeDRefresh ();
+		//Printf("\t END RENDER\n");
 
 		//
 		// MAKE FUNNY FACE IF BJ DOESN'T MOVE FOR AWHILE
