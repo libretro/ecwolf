@@ -82,6 +82,7 @@ Revision History:
 #include <string.h>
 #include "wl_def.h"
 #include "id_sd.h"
+#include "m_swap.h"
 
 //#include "driver.h"		/* use M.A.M.E. */
 
@@ -2239,7 +2240,7 @@ void YM3812UpdateOne(int which, INT16 *buffer, int length)
 
 //		buf[i] = lt;
 
-		buf[i*2] = buf[i*2+1] = lt;
+		buf[i*2] = buf[i*2+1] = LittleShort(lt);
 		//buf[i*2] = static_cast<OPLSAMPLE> (lt*MULTIPLY_VOLUME(AdlibVolume));          // stereo version
 		//buf[i*2+1] = static_cast<OPLSAMPLE> (lt*MULTIPLY_VOLUME(AdlibVolume));
 

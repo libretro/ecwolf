@@ -130,7 +130,7 @@ static inline void YM3812UpdateOne(DBOPL::Chip &which, int16_t *stream, int leng
 			Bit32s sample = buffer[i] << 2;
 			if(sample > 32767) sample = 32767;
 			else if(sample < -32768) sample = -32768;
-			stream[i] = sample;
+			stream[i] = LittleShort(sample);
 		}
 	}
 	else
@@ -146,7 +146,7 @@ static inline void YM3812UpdateOne(DBOPL::Chip &which, int16_t *stream, int leng
 			Bit32s sample = buffer[i] << 2;
 			if(sample > 32767) sample = 32767;
 			else if(sample < -32768) sample = -32768;
-			stream[i * 2] = stream[i * 2 + 1] = (int16_t) sample;
+			stream[i * 2] = stream[i * 2 + 1] = (int16_t) LittleShort(sample);
 		}
 	}
 }
@@ -268,7 +268,7 @@ _SDL_PCPlaySound(PCSound *sound)
 
 	pcPhaseTick = 0;
 	pcLastSample = 0;	// Must be a value that cannot be played, so the PC Speaker is forced to reset (-1 wraps to 255 so it cannot be used here)
-    pcLengthLeft = sound->common.length;
+    pcLengthLeft = LittleLong(sound->common.length);
     pcSound = sound->data;
 
 	SDL_UnlockMutex(audioMutex);
@@ -599,7 +599,7 @@ SDL_ALPlaySound(AdLibSound *sound)
 
 	SDL_LockMutex(audioMutex);
 
-	alLengthLeft = sound->common.length;
+	alLengthLeft = LittleLong(sound->common.length);
 	data = sound->data;
 	alBlock = ((sound->block & 7) << 2) | 0x20;
 	inst = &sound->inst;
@@ -853,7 +853,7 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 			do
 			{
 				if(sqHackTime > alTimeCount) break;
-				sqHackTime = alTimeCount + *(sqHackPtr+1);
+				sqHackTime = alTimeCount + LittleShort(*(sqHackPtr+1));
 				alOutMusic(*(byte *) sqHackPtr, *(((byte *) sqHackPtr)+1));
 				sqHackPtr += 2;
 				sqHackLen -= 4;

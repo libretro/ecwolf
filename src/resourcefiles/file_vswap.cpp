@@ -129,7 +129,7 @@ struct FVSwapSound : public FResourceLump
 				SWORD curSample = (SWORD(origdata[(sample>>FRACBITS)]) - 128)<<8;
 				SWORD nextSample = unsigned(sample>>FRACBITS)+1 < numOrigSamples ? (SWORD(origdata[(sample>>FRACBITS)+1]) - 128)<<8 : curSample;
 
-				*data++ = curSample + (((sample&0xFFFF)*fixed(nextSample-curSample))>>FRACBITS);
+				*data++ = LittleShort(curSample + (((sample&0xFFFF)*fixed(nextSample-curSample))>>FRACBITS));
 			}
 			delete[] origdata;
 			return 1;
