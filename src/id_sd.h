@@ -97,6 +97,7 @@ typedef struct
 //      Sequencing stuff
 //
 #define sqMaxTracks     10
+#define OPL_CHANNELS	9
 
 typedef struct
 {

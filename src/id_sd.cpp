@@ -131,7 +131,7 @@ static inline void YM3812UpdateOne(DBOPL::Chip &which, int16_t *stream, int leng
 			Bit32s sample = buffer[i] << 2;
 			if(sample > 32767) sample = 32767;
 			else if(sample < -32768) sample = -32768;
-			stream[i] = sample;
+			stream[i] = LittleShort(sample);
 		}
 	}
 	else
@@ -147,7 +147,7 @@ static inline void YM3812UpdateOne(DBOPL::Chip &which, int16_t *stream, int leng
 			Bit32s sample = buffer[i] << 2;
 			if(sample > 32767) sample = 32767;
 			else if(sample < -32768) sample = -32768;
-			stream[i * 2] = stream[i * 2 + 1] = (int16_t) sample;
+			stream[i * 2] = stream[i * 2 + 1] = (int16_t) LittleShort(sample);
 		}
 	}
 }
@@ -269,7 +269,7 @@ _SDL_PCPlaySound(PCSound *sound)
 
 	pcPhaseTick = 0;
 	pcLastSample = 0;	// Must be a value that cannot be played, so the PC Speaker is forced to reset (-1 wraps to 255 so it cannot be used here)
-    pcLengthLeft = sound->common.length;
+    pcLengthLeft = LittleLong(sound->common.length);
     pcSound = sound->data;
 
 	SDL_UnlockMutex(audioMutex);
@@ -557,13 +557,15 @@ SDL_ALStopSound(void)
 	SDL_UnlockMutex(audioMutex);
 }
 
-static void
-SDL_AlSetFXInst(Instrument *inst)
+static void SDL_AlSetChanInst(Instrument *inst, unsigned int chan)
 {
+	static const byte chanOps[OPL_CHANNELS] = {
+		0, 1, 2, 8, 9, 0xA, 0x10, 0x11, 0x12
+	};
 	byte c,m;
 
-	m = 0;      // modulator cell for channel 0
-	c = 3;      // carrier cell for channel 0
+	m = chanOps[chan]; // modulator cell for channel
+	c = m + 3; // carrier cell for channel
 	alOut(m + alChar,inst->mChar);
 	alOut(m + alScale,inst->mScale);
 	alOut(m + alAttack,inst->mAttack);
@@ -577,7 +579,11 @@ SDL_AlSetFXInst(Instrument *inst)
 
 	// Note: Switch commenting on these lines for old MUSE compatibility
 //    alOutInIRQ(alFeedCon,inst->nConn);
-	alOut(alFeedCon,0);
+	alOut(chan + alFeedCon,0);
+}
+static void SDL_AlSetFXInst(Instrument *inst)
+{
+	SDL_AlSetChanInst(inst, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -595,7 +601,7 @@ SDL_ALPlaySound(AdLibSound *sound)
 
 	SDL_LockMutex(audioMutex);
 
-	alLengthLeft = sound->common.length;
+	alLengthLeft = LittleLong(sound->common.length);
 	data = sound->data;
 	alBlock = ((sound->block & 7) << 2) | 0x20;
 	inst = &sound->inst;
@@ -849,7 +855,7 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 			do
 			{
 				if(sqHackTime > alTimeCount) break;
-				sqHackTime = alTimeCount + *(sqHackPtr+1);
+				sqHackTime = alTimeCount + LittleShort(*(sqHackPtr+1));
 				alOutMusic(*(byte *) sqHackPtr, *(((byte *) sqHackPtr)+1));
 				sqHackPtr += 2;
 				sqHackLen -= 4;
@@ -1175,11 +1181,15 @@ SD_StartMusic(const char* chunk)
 
 	if (MusicMode == smm_AdLib)
 	{
-		SDL_LockMutex(audioMutex);
-
 		int lumpNum = Wads.CheckNumForName(chunk, ns_music);
 		if(lumpNum == -1)
 			return;
+
+		SDL_LockMutex(audioMutex);
+
+		for (int i = 0;i < OPL_CHANNELS;++i)
+			SDL_AlSetChanInst(&alZeroInst, i);
+
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);
 		if(sqHackFreeable != NULL)
 			delete[] sqHackFreeable;
