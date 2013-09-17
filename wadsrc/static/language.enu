@@ -98,26 +98,26 @@ SOD_EPISODE1 = "Episode 1\nSpear of Destiny";
 SOD_EPISODE2 = "Episode 2\nReturn to Danger";
 SOD_EPISODE3 = "Episode 3\nThe Ultimate Challenge";
 
-// Spear of Destiny
-ENDSTR01 = "Heroes don't quit, but\ngo ahead and press Y\nif you aren't one.";
-ENDSTR02 = "Press Y to quit,\nor press N to enjoy\nmore violent diversion.";
-ENDSTR03 = "Depressing the Y key means\nyou must return to the\nhumdrum workday world.";
-ENDSTR04 = "Hey, quit or play,\nY or N:\nit's your choice.";
-ENDSTR05 = "Sure you don't want to\nwaste a few more\nproductive hours?";
-ENDSTR06 = "I think you had better\nplay some more. Please\npress N...please?";
-ENDSTR07 = "If you are tough, press N.\nIf not, press Y daintily.";
-ENDSTR08 = "I'm thinkin' that\nyou might wanna press N\nto play more. You do it.";
-ENDSTR09 = "Sure. Fine. Quit.\nSee if we care.\nGet it over with.\nPress Y.";
 // Wolfenstein 3D
-ENDSTR10 = "Dost thou wish to\nleave with such hasty\nabandon?";
-ENDSTR11 = "Chickening out...\nalready?";
-ENDSTR12 = "Press N for more carnage.\nPress Y to be a weenie.";
-ENDSTR13 = "So, you think you can\nquit this easily, huh?";
-ENDSTR14 = "Press N to save the world.\nPress Y to abandon it in\nits hour of need.";
-ENDSTR15 = "Press N if you are brave.\nPress Y to cower in shame.";
-ENDSTR16 = "Heroes, press N.\nWimps, press Y.";
-ENDSTR17 = "You are at an intersection.\nA sign says, 'Press Y to quit.'\n>";
-ENDSTR18 = "For guns and glory, press N.\nFor work and worry, press Y.";
+ENDSTR01 = "Dost thou wish to\nleave with such hasty\nabandon?";
+ENDSTR02 = "Chickening out...\nalready?";
+ENDSTR03 = "Press N for more carnage.\nPress Y to be a weenie.";
+ENDSTR04 = "So, you think you can\nquit this easily, huh?";
+ENDSTR05 = "Press N to save the world.\nPress Y to abandon it in\nits hour of need.";
+ENDSTR06 = "Press N if you are brave.\nPress Y to cower in shame.";
+ENDSTR07 = "Heroes, press N.\nWimps, press Y.";
+ENDSTR08 = "You are at an intersection.\nA sign says, 'Press Y to quit.'\n>";
+ENDSTR09 = "For guns and glory, press N.\nFor work and worry, press Y.";
+// Spear of Destiny
+ENDSTR10 = "Heroes don't quit, but\ngo ahead and press Y\nif you aren't one.";
+ENDSTR11 = "Press Y to quit,\nor press N to enjoy\nmore violent diversion.";
+ENDSTR12 = "Depressing the Y key means\nyou must return to the\nhumdrum workday world.";
+ENDSTR13 = "Hey, quit or play,\nY or N:\nit's your choice.";
+ENDSTR14 = "Sure you don't want to\nwaste a few more\nproductive hours?";
+ENDSTR15 = "I think you had better\nplay some more. Please\npress N...please?";
+ENDSTR16 = "If you are tough, press N.\nIf not, press Y daintily.";
+ENDSTR17 = "I'm thinkin' that\nyou might wanna press N\nto play more. You do it.";
+ENDSTR18 = "Sure. Fine. Quit.\nSee if we care.\nGet it over with.\nPress Y.";
 
 STR_ENDGAME1 = "We owe you a great debt, Mr. Blazkowicz.\n";
 STR_ENDGAME2 = "You have served your country well.";
