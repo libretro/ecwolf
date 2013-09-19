@@ -557,7 +557,7 @@ SDL_ALStopSound(void)
 	SDL_UnlockMutex(audioMutex);
 }
 
-static void SDL_AlSetChanInst(Instrument *inst, unsigned int chan)
+static void SDL_AlSetChanInst(const Instrument *inst, unsigned int chan)
 {
 	static const byte chanOps[OPL_CHANNELS] = {
 		0, 1, 2, 8, 9, 0xA, 0x10, 0x11, 0x12
@@ -579,9 +579,12 @@ static void SDL_AlSetChanInst(Instrument *inst, unsigned int chan)
 
 	// Note: Switch commenting on these lines for old MUSE compatibility
 //    alOutInIRQ(alFeedCon,inst->nConn);
+
+	alOut(chan + alFreqL,0);
+	alOut(chan + alFreqH,0);
 	alOut(chan + alFeedCon,0);
 }
-static void SDL_AlSetFXInst(Instrument *inst)
+static void SDL_AlSetFXInst(const Instrument *inst)
 {
 	SDL_AlSetChanInst(inst, 0);
 }
@@ -1177,6 +1180,17 @@ SD_MusicOff(void)
 void
 SD_StartMusic(const char* chunk)
 {
+	static const Instrument ChannelRelease = {
+		0, 0,
+		0x3F, 0x3F,
+		0xFF, 0xFF,
+		0xF, 0xF,
+		0, 0,
+		0,
+
+		0, 0, {0, 0, 0}
+	};
+
 	SD_MusicOff();
 
 	if (MusicMode == smm_AdLib)
@@ -1188,7 +1202,7 @@ SD_StartMusic(const char* chunk)
 		SDL_LockMutex(audioMutex);
 
 		for (int i = 0;i < OPL_CHANNELS;++i)
-			SDL_AlSetChanInst(&alZeroInst, i);
+			SDL_AlSetChanInst(&ChannelRelease, i);
 
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);
 		if(sqHackFreeable != NULL)
