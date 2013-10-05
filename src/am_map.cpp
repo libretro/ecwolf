@@ -44,7 +44,7 @@
 #include "wl_draw.h"
 #include "wl_main.h"
 
-static AutoMap AM_Main;
+AutoMap AM_Main;
 
 bool automap = false;
 bool am_cheat = false;
@@ -101,12 +101,14 @@ static const AMVectorPoint AM_Arrow[] =
 	{0, -FRACUNIT/2},
 };
 
-AutoMap::AutoMap(unsigned int flags) : amFlags(flags)
+AutoMap::AutoMap(unsigned int flags) :
+	fullRefresh(true), amFlags(flags)
 {
 	amangle = 0;
 	minmaxSel = 0;
 	amsin = 0;
 	amcos = FRACUNIT;
+	absscale = FRACUNIT/2;
 	rottable[0][0] = 1.0;
 	rottable[0][1] = 0.0;
 	rottable[1][0] = 1.0;
@@ -125,7 +127,6 @@ void AutoMap::CalculateDimensions()
 	amsizey = viewheight;
 	amx = viewscreenx;
 	amy = viewscreeny;
-	SetScale((screenHeight<<FRACBITS)/windowsize);
 
 	// Since the simple polygon fill function seems to be off by one in the y
 	// direction, lets shift this up!
@@ -204,13 +205,17 @@ void AutoMap::Draw()
 	const unsigned int mapwidth = map->GetHeader().width;
 	const unsigned int mapheight = map->GetHeader().height;
 
+	// Some magic, min scale is approximately small enough so that a rotated automap will fit on screen (22/32 ~ 1/sqrt(2))
+	const fixed minscale = ((screenHeight*22)<<(FRACBITS-5))/mapheight;
+	scale = minscale + FixedMul(absscale, (screenHeight<<(FRACBITS-4)) - minscale);
+
 	if(!(amFlags & AMF_Overlay))
 		screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, BackgroundColor.palcolor, BackgroundColor.color);
 
 	const fixed playerx = players[0].mo->x;
 	const fixed playery = players[0].mo->y;
 
-	if(amangle != ((amFlags & AMF_Rotate) ? players[0].mo->angle-ANGLE_90 : 0))
+	if(fullRefresh || amangle != ((amFlags & AMF_Rotate) ? players[0].mo->angle-ANGLE_90 : 0))
 	{
 		amangle = (amFlags & AMF_Rotate) ? players[0].mo->angle-ANGLE_90 : 0;
 		minmaxSel = amangle/ANGLE_90;
@@ -220,6 +225,8 @@ void AutoMap::Draw()
 		// For rotating the tiles, this table includes the point offsets based on the current scale
 		rottable[0][0] = FIXED2FLOAT(FixedMul(scale, amcos)); rottable[0][1] = FIXED2FLOAT(FixedMul(scale, amsin));
 		rottable[1][0] = FIXED2FLOAT(FixedMul(scale, amcos) - FixedMul(scale, amsin)); rottable[1][1] = FIXED2FLOAT(FixedMul(scale, amsin) + FixedMul(scale, amcos));
+
+		fullRefresh = false;
 	}
 
 	const double originx = (amx+amsizex/2) - (FIXED2FLOAT(FixedMul(FixedMul(scale, playerx&0xFFFF), amcos) - FixedMul(FixedMul(scale, playery&0xFFFF), amsin)));
@@ -399,17 +406,15 @@ void AutoMap::SetFlags(unsigned int flags, bool set)
 		amFlags &= ~flags;
 }
 
-void AutoMap::SetScale(fixed scale)
+void AutoMap::SetScale(fixed scale, bool relative)
 {
-	this->scale = scale;
+	if(relative)
+		absscale = FixedMul(absscale, scale);
+	else
+		absscale = scale;
+	absscale = clamp<fixed>(absscale, FRACUNIT/50, FRACUNIT);
 
-	if(amangle == 0)
-	{
-		rottable[0][0] = FIXED2FLOAT(scale);
-		rottable[0][1] = 0.0;
-		rottable[1][0] = FIXED2FLOAT(scale);
-		rottable[1][1] = FIXED2FLOAT(scale);
-	}
+	fullRefresh = true;
 }
 
 bool AutoMap::TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &points) const
