@@ -475,7 +475,17 @@ void CheckKeys (void)
 	scan = LastScan;
 
 	// [BL] Allow changing the screen size with the -/= keys a la Doom.
-	if(changeSize)
+	if(automap)
+	{
+		if(Keyboard[sc_Equals] ^ Keyboard[sc_Minus])
+		{
+			if(Keyboard[sc_Equals])
+				AM_Main.SetScale(FRACUNIT*1.05, true);
+			else
+				AM_Main.SetScale(FRACUNIT*0.95, true);
+		}
+	}
+	else if(changeSize)
 	{
 		if(Keyboard[sc_Equals] && !Keyboard[sc_Minus])
 			NewViewSize(viewsize+1);

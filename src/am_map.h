@@ -76,7 +76,7 @@ public:
 	void CalculateDimensions();
 	void Draw();
 	void SetFlags(unsigned int flags, bool set);
-	void SetScale(fixed scale);
+	void SetScale(fixed scale, bool relative);
 
 protected:
 	void ClipTile(TArray<FVector2> &points) const;
@@ -87,10 +87,11 @@ protected:
 private:
 	double rottable[2][2];
 
+	bool fullRefresh;
 	unsigned int amFlags;
 	int amsizex, amsizey, amx, amy;
 	fixed amsin, amcos;
-	fixed scale;
+	fixed scale, absscale;
 	angle_t amangle;
 	unsigned short minmaxSel;
 
@@ -99,5 +100,7 @@ private:
 	Color WallColor;
 	Color DoorColor;
 };
+
+extern AutoMap AM_Main;
 
 #endif
