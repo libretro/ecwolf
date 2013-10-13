@@ -505,7 +505,6 @@ ACTION_FUNCTION(A_Chase)
 
 				if(!(flags & CHF_BACKOFF))
 				{
-					self->speed = 0;
 					if (dist > 0)
 						chance = (208*self->missilefrequency/dist)>>FRACBITS;
 					else
