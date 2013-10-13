@@ -292,7 +292,8 @@ HANDLE_PROPERTY(minmissilechance)
 	else if(chance < 0)
 		chance = 0;
 
-	defaults->minmissilechance = chance;
+	// Invert for old random number generator.
+	defaults->minmissilechance = 256 - chance;
 }
 
 HANDLE_PROPERTY(movebob)

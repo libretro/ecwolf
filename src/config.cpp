@@ -170,7 +170,7 @@ void Config::ReadConfig()
 			else
 			{
 				bool negative = sc.CheckToken('-');
-				sc.MustGetToken(TK_IntConst);
+				sc.MustGetToken(TK_FloatConst);
 				CreateSetting(index, 0);
 				GetSetting(index)->SetValue(negative ? -sc->number : sc->number);
 			}
