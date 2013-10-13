@@ -486,14 +486,14 @@ ACTION_FUNCTION(A_Chase)
 		else
 			SelectChaseDir (self);
 
-		self->movecount = pr_chase() & 15;
+		self->movecount = pr_chase.RandomOld(false) & 15;
 	}
 	// Movecount is an approximation of Doom's movecount which would keep the
 	// monster moving in some direction for a random amount of time (contrarily
 	// to wolfensteins block based movement). This is simulated since it also
 	// determines when a monster attempts to attack
 	else if(--self->movecount < 0)
-		self->movecount = pr_chase() & 15;
+		self->movecount = pr_chase.RandomOld(false) & 15;
 
 	if(!pathing)
 	{
@@ -505,8 +505,8 @@ ACTION_FUNCTION(A_Chase)
 			if (((self->flags & FL_ALWAYSFAST) || self->movecount == 0) && CheckLine(self)) // got a shot at players[0].mo?
 			{
 				self->hidden = false;
-				dx = abs(self->tilex - players[0].mo->tilex);
-				dy = abs(self->tiley - players[0].mo->tiley);
+				dx = abs(self->tilex + dirdeltax[self->dir] - players[0].mo->tilex);
+				dy = abs(self->tiley + dirdeltay[self->dir] - players[0].mo->tiley);
 				dist = dx>dy ? dx : dy;
 				// If we only do ranged attacks, be more aggressive
 				if(!melee)
@@ -524,10 +524,11 @@ ACTION_FUNCTION(A_Chase)
 
 				if(!(flags & CHF_BACKOFF))
 				{
+					self->speed = 0;
 					if (dist > 0)
-						chance = 256 - ((208*self->missilefrequency/dist)>>FRACBITS);
+						chance = (208*self->missilefrequency/dist)>>FRACBITS;
 					else
-						chance = 0;
+						chance = 256;
 
 					// If we have a combo attack monster, we want to skip this
 					// check as the monster should try to get melee in.
@@ -538,14 +539,14 @@ ACTION_FUNCTION(A_Chase)
 						{
 							target = abs(self->y - players[0].mo->y);
 							if (target < 0x14000l)
-								chance = 0;
+								chance = 256;
 						}
 					}
 				}
 				else
-					chance = 256 - ((208*self->missilefrequency)>>FRACBITS);
+					chance = (208*self->missilefrequency)>>FRACBITS;
 
-				if ( pr_chase() >= MIN<int>(chance, self->minmissilechance))
+				if ( pr_chase.RandomOld(self->flags & FL_OLDRANDOMCHASE) < MAX<int>(chance, self->minmissilechance))
 				{
 					self->SetState(missile);
 					return;
@@ -629,7 +630,7 @@ ACTION_FUNCTION(A_Chase)
 	while(move);
 
 	if(!(flags & CHF_NOPLAYACTIVE) &&
-		self->activesound != NAME_None && pr_chase() < 3)
+		self->activesound != NAME_None && pr_chase.RandomOld(false) < 3)
 	{
 		PlaySoundLocActor(self->activesound, self);
 	}
