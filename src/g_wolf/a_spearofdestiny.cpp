@@ -56,7 +56,7 @@ class ASpearOfDestiny : public AInventory
 			gamestate.victoryflag = true;
 
 			SetState(FindState("Pickup"));
-			GetThinker()->SetPriority(ThinkerList::VICTORY);
+			SetPriority(ThinkerList::VICTORY);
 			return false;
 		}
 };

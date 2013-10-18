@@ -39,7 +39,7 @@
 #include "wl_def.h"
 #include "name.h"
 #include "linkedlist.h"
-#include "actor.h"
+#include "actordef.h"
 #include "dobject.h"
 
 class Thinker;
@@ -87,11 +87,15 @@ class Thinker : public DObject
 	DECLARE_ABSTRACT_CLASS(Thinker, DObject)
 
 	public:
-		Thinker(ThinkerList::Priority priority=ThinkerList::NORMAL);
+		Thinker();
+		Thinker(ThinkerList::Priority priority);
 
+		void			Activate(ThinkerList::Priority priority=ThinkerList::NORMAL);
+		void			Deactivate();
 		void			Destroy();
 		template<class T>
 		bool			IsThinkerType() { return IsA(T::__StaticClass); }
+		bool			IsThinking() const { return thinkerRef != NULL; }
 		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
 		virtual void	PostBeginPlay() {}

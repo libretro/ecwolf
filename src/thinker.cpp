@@ -191,43 +191,63 @@ void ThinkerList::Deregister(Thinker *thinker)
 		GC::WriteBarrier(prev->Item(), next->Item());
 		GC::WriteBarrier(next->Item(), prev->Item());
 	}
+
+	thinker->thinkerRef = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_ABSTRACT_CLASS(Thinker)
 
+Thinker::Thinker() : thinkerRef(NULL)
+{
+}
+
 Thinker::Thinker(ThinkerList::Priority priority)
+{
+	Activate(priority);
+}
+
+void Thinker::Activate(ThinkerList::Priority priority)
 {
 	thinkerList->Register(this, priority);
 }
 
-void Thinker::Destroy()
+void Thinker::Deactivate()
 {
 	thinkerList->Deregister(this);
+}
+
+void Thinker::Destroy()
+{
+	if(IsThinking())
+		thinkerList->Deregister(this);
 	Super::Destroy();
 }
 
 size_t Thinker::PropagateMark()
 {
-	ThinkerList::Iterator iter = thinkerRef->Next();
-	if(iter)
+	if(thinkerRef)
 	{
-		assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
-		GC::Mark(iter->Item());
-	}
+		ThinkerList::Iterator iter = thinkerRef->Next();
+		if(iter)
+		{
+			assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
+			GC::Mark(iter->Item());
+		}
 
-	iter = thinkerRef->Prev();
-	if(iter)
-	{
-		assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
-		GC::Mark(iter->Item());
+		iter = thinkerRef->Prev();
+		if(iter)
+		{
+			assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
+			GC::Mark(iter->Item());
+		}
 	}
 	return Super::PropagateMark();
 }
 
 void Thinker::SetPriority(ThinkerList::Priority priority)
 {
-	thinkerList->Deregister(this);
-	thinkerList->Register(this, priority);
+	Deactivate();
+	Activate(priority);
 }

@@ -619,9 +619,9 @@ class EVVictorySpin : public Thinker
 			runner->flags |= FL_PATHING;
 			runner->angle = ((direction+2)%4)*ANGLE_90;
 			runner->dir = static_cast<dirtype>(runner->angle/ANGLE_45);
-			runner->GetThinker()->SetPriority(ThinkerList::VICTORY);
+			runner->SetPriority(ThinkerList::VICTORY);
 
-			activator->GetThinker()->SetPriority(ThinkerList::VICTORY);
+			activator->SetPriority(ThinkerList::VICTORY);
 		}
 
 		void Serialize(FArchive &arc)

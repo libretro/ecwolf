@@ -112,7 +112,7 @@ void AInventory::GoAwayAndDie()
 bool AInventory::GoAway()
 {
 	const Frame *hide = FindState("Hide");
-	if(hide && thinker) // Only hide actors that are thinking
+	if(hide && IsThinking()) // Only hide actors that are thinking
 	{
 		itemFlags |= IF_INACTIVE;
 		SetState(hide);

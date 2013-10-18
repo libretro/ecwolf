@@ -131,64 +131,11 @@ FArchive &operator<< (FArchive &arc, const Frame *&frame)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// We can't make AActor a thinker since we create non-thinking objects.
-class AActorProxy : public Thinker
-{
-	DECLARE_CLASS(AActorProxy, Thinker)
-	HAS_OBJECT_POINTERS
-
-	public:
-		AActorProxy(AActor *parent) : enabled(true), parent(parent)
-		{
-		}
-
-		void Destroy()
-		{
-			Super::Destroy();
-
-			if(enabled && parent)
-			{
-				parent->Destroy();
-				parent = NULL;
-			}
-		}
-
-		void Disable()
-		{
-			enabled = false;
-		}
-
-		void Tick()
-		{
-			if(enabled)
-				parent->Tick();
-		}
-
-		void PostBeginPlay()
-		{
-			if(enabled)
-				parent->PostBeginPlay();
-		}
-
-		void Serialize(FArchive &arc)
-		{
-			arc << enabled << parent;
-			Super::Serialize(arc);
-		}
-
-		bool			enabled;
-		TObjPtr<AActor>	parent;
-};
-IMPLEMENT_INTERNAL_POINTY_CLASS(AActorProxy)
-	DECLARE_POINTER(parent)
-END_POINTERS
-
 LinkedList<AActor *> AActor::actors;
 PointerIndexTable<ExpressionNode> AActor::damageExpressions;
 PointerIndexTable<AActor::DropList> AActor::dropItems;
 IMPLEMENT_POINTY_CLASS(Actor)
 	DECLARE_POINTER(inventory)
-	DECLARE_POINTER(thinker)
 END_POINTERS
 
 void AActor::AddInventory(AInventory *item)
@@ -223,8 +170,6 @@ void AActor::Destroy()
 	// Inventory items don't have a registered thinker so we must free them now
 	if(inventory)
 	{
-		assert(inventory->thinker == NULL);
-
 		inventory->Destroy();
 		inventory = NULL;
 	}
@@ -363,11 +308,6 @@ const AActor *AActor::GetDefault() const
 	return GetClass()->GetDefault();
 }
 
-Thinker *AActor::GetThinker()
-{
-	return (Thinker*)thinker;
-}
-
 void AActor::Init()
 {
 	ObjectFlags |= OF_JustSpawned;
@@ -379,10 +319,7 @@ void AActor::Init()
 
 	actorRef = actors.Push(this);
 	if(!loadedgame)
-	{
-		thinker = new AActorProxy(this);
-		thinker->ObjectFlags |= OF_JustSpawned;
-	}
+		Activate();
 
 	if(SpawnState)
 		SetState(SpawnState, true);
@@ -442,7 +379,6 @@ void AActor::Serialize(FArchive &arc)
 		<< player
 		<< inventory
 		<< soundZone
-		<< thinker
 		<< hasActorRef;
 
 	if(GameSave::SaveVersion > 1374914454)
@@ -535,12 +471,8 @@ void AActor::RemoveFromWorld()
 		actors.Remove(actorRef);
 		actorRef = NULL;
 	}
-	if(thinker)
-	{
-		((AActorProxy*)(Thinker*)thinker)->Disable();
-		thinker->Destroy();
-		thinker = NULL;
-	}
+	if(IsThinking())
+		Deactivate();
 }
 
 void AActor::RemoveInventory(AInventory *item)
@@ -686,7 +618,7 @@ void StartTravel ()
 
 	AActor *player = players[0].mo;
 
-	player->GetThinker()->SetPriority(ThinkerList::TRAVEL);
+	player->SetPriority(ThinkerList::TRAVEL);
 }
 
 void FinishTravel ()
@@ -699,30 +631,27 @@ void FinishTravel ()
 
 	do
 	{
-		if(node->Item()->IsThinkerType<AActorProxy>())
+		AActor *actor = static_cast<AActor *>((Thinker*)node->Item());
+		if(actor->IsKindOf(NATIVE_CLASS(PlayerPawn)))
 		{
-			AActorProxy *proxy = static_cast<AActorProxy *>((Thinker*)node->Item());
-			if(proxy->parent->IsKindOf(NATIVE_CLASS(PlayerPawn)))
+			APlayerPawn *player = static_cast<APlayerPawn *>(actor);
+			if(player->player == &players[0])
 			{
-				APlayerPawn *player = static_cast<APlayerPawn *>((AActor*)proxy->parent);
-				if(player->player == &players[0])
-				{
-					AActor *playertmp = players[0].mo;
-					player->x = playertmp->x;
-					player->y = playertmp->y;
-					player->angle = playertmp->angle;
-					player->EnterZone(playertmp->GetZone());
+				AActor *playertmp = players[0].mo;
+				player->x = playertmp->x;
+				player->y = playertmp->y;
+				player->angle = playertmp->angle;
+				player->EnterZone(playertmp->GetZone());
 
-					players[0].mo = player;
-					players[0].camera = player;
-					playertmp->Destroy();
+				players[0].mo = player;
+				players[0].camera = player;
+				playertmp->Destroy();
 
-					// We must move the linked list iterator here since we'll
-					// transfer to the new linked list at the SetPriority call
-					node = node->Next();
-					player->GetThinker()->SetPriority(ThinkerList::PLAYER);
-					continue;
-				}
+				// We must move the linked list iterator here since we'll
+				// transfer to the new linked list at the SetPriority call
+				node = node->Next();
+				player->SetPriority(ThinkerList::PLAYER);
+				continue;
 			}
 		}
 

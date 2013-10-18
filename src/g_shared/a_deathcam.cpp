@@ -61,8 +61,8 @@ void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
 	this->actor = actor;
 	this->killer = killer;
 
-	GetThinker()->SetPriority(ThinkerList::VICTORY);
-	actor->GetThinker()->SetPriority(ThinkerList::VICTORY);
+	SetPriority(ThinkerList::VICTORY);
+	actor->SetPriority(ThinkerList::VICTORY);
 }
 
 void ADeathCam::Tick()
