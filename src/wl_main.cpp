@@ -42,6 +42,8 @@
 #include "colormatcher.h"
 #include "version.h"
 
+#include <clocale>
+
 /*
 =============================================================================
 
@@ -1260,6 +1262,10 @@ int main (int argc, char *argv[])
 	StartupWin32();
 	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
 #endif
+
+	// Stop the C library from screwing around with its functions according
+	// to the system locale.
+	setlocale(LC_ALL, "C");
 
 	// Find the program directory.
 	FString progdir(".");
