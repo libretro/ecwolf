@@ -66,7 +66,7 @@ public:
 	{
 	public:
 		Iterator() : node(NULL) {}
-		Iterator(EmbeddedList<T>::Node *node) : node(node)
+		Iterator(typename EmbeddedList<T>::Node *node) : node(node)
 		{
 		}
 
@@ -100,14 +100,14 @@ public:
 		operator T*() const { return static_cast<T*>(node); }
 		operator bool() const { return node != NULL; }
 	private:
-		EmbeddedList<T>::Node *node;
+		typename EmbeddedList<T>::Node *node;
 	};
 
 	class ConstIterator
 	{
 	public:
 		ConstIterator() : node(NULL) {}
-		ConstIterator(EmbeddedList<T>::Node *node) : node(node)
+		ConstIterator(const typename EmbeddedList<T>::Node *node) : node(node)
 		{
 		}
 
@@ -141,13 +141,13 @@ public:
 		operator const T*() const { return static_cast<const T*>(node); }
 		operator bool() const { return node != NULL; }
 	private:
-		const EmbeddedList<T>::Node *node;
+		const typename EmbeddedList<T>::Node *node;
 	};
 
 	class List
 	{
 	public:
-		typedef EmbeddedList<T>::Node N;
+		typedef typename EmbeddedList<T>::Node N;
 
 		List() : head(NULL), size(0)
 		{
@@ -155,23 +155,23 @@ public:
 
 		// Creates an iterator for the list. Note that the Iterator will point
 		// to just before the list so it must be incremented before use.
-		EmbeddedList<T>::Iterator Iterator()
+		typename EmbeddedList<T>::Iterator Iterator()
 		{
 			assert(reinterpret_cast<N*>(this)->elNext == head);
 			return EmbeddedList<T>::Iterator(reinterpret_cast<N*>(this));
 		}
-		EmbeddedList<T>::ConstIterator Iterator() const
+		typename EmbeddedList<T>::ConstIterator Iterator() const
 		{
 			return EmbeddedList<T>::ConstIterator(reinterpret_cast<N*>(this));
 		}
 
 		// Head() is the same as Iterator() only the iterator is initialized
 		// to the head instead of one space before the head.
-		EmbeddedList<T>::Iterator Head()
+		typename EmbeddedList<T>::Iterator Head()
 		{
 			return EmbeddedList<T>::Iterator(head);
 		}
-		EmbeddedList<T>::ConstIterator Head() const
+		typename EmbeddedList<T>::ConstIterator Head() const
 		{
 			return EmbeddedList<T>::ConstIterator(head);
 		}
@@ -209,7 +209,7 @@ public:
 		List(const List &other) {}
 
 		// This should be the first member so we can type pun as Node::elNext.
-		EmbeddedList<T>::Node *head;
+		typename EmbeddedList<T>::Node *head;
 		unsigned int size;
 	};
 };
