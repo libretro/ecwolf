@@ -57,6 +57,7 @@ public:
 
 	protected:
 		friend class EmbeddedList<T>::Iterator;
+		friend class EmbeddedList<T>::ConstIterator;
 		friend class EmbeddedList<T>::List;
 
 		Node *elNext, *elPrev;
@@ -131,11 +132,11 @@ public:
 
 		const T &operator*() const
 		{
-			return *static_cast<T*>(node);
+			return *static_cast<const T*>(node);
 		}
 		const T *operator->() const
 		{
-			return static_cast<T*>(node);
+			return static_cast<const T*>(node);
 		}
 
 		operator const T*() const { return static_cast<const T*>(node); }
@@ -217,14 +218,12 @@ public:
 template<class T> class LinkedList
 {
 	public:
-		class Node
+		class Node : public EmbeddedList<Node>::Node
 		{
 			public:
-				Node(const T &item, Node *&head) : item(item), next(head), prev(NULL)
+				Node(const T &item, typename EmbeddedList<Node>::List &head) : item(item)
 				{
-					if(head != NULL)
-						head->prev = this;
-					head = this;
+					head.Push(this);
 				}
 
 				T		&Item()
@@ -238,36 +237,38 @@ template<class T> class LinkedList
 
 				Node	*Next() const
 				{
-					return next;
+					return static_cast<Node*>(EmbeddedList<Node>::Node::elNext);
 				}
 
 				Node	*Prev() const
 				{
-					return prev;
+					return static_cast<Node*>(EmbeddedList<Node>::Node::elPrev);
 				}
 
 			private:
 				friend class LinkedList;
 
 				T		item;
-				Node	*next;
-				Node	*prev;
 		};
 
-		LinkedList() : head(NULL), size(0)
+		LinkedList()
 		{
 		}
-		LinkedList(const LinkedList &other) : head(NULL), size(0)
+		LinkedList(const LinkedList &other)
 		{
-			Node *iter = other.Head();
-			if(iter != NULL)
+			typename EmbeddedList<Node>::ConstIterator iter = other.list.Head();
+			if(iter)
 			{
-				while(iter->Next())
-					iter = iter->Next();
-			}
+				while(iter.HasNext())
+					++iter;
 
-			for(;iter;iter = iter->Prev())
-				Push(iter->Item());
+				do
+				{
+					new Node(iter->Item(), list);
+				}
+				while(--iter);
+			}
+			assert(Size() == other.Size());
 		}
 		~LinkedList()
 		{
@@ -276,54 +277,42 @@ template<class T> class LinkedList
 
 		void Clear()
 		{
-			if(!head)
-				return;
-
-			Node *node = head;
-			Node *del = NULL;
-			do
+			typename EmbeddedList<Node>::Iterator iter = list.Head();
+			if(iter)
 			{
-				delete del;
-				del = node;
+				typename EmbeddedList<Node>::Iterator current;
+				do
+				{
+					current = iter++;
+					delete current;
+				}
+				while(iter);
+				
 			}
-			while((node = node->next) != NULL);
-			delete del;
-			head = NULL;
 		}
 
-		Node *Head() const
+		Node *Head()
 		{
-			return head;
+			return list.Head();
 		}
 
 		Node *Push(const T &item)
 		{
-			++size;
-			return new Node(item, head);
+			return new Node(item, list);
 		}
 
 		void Remove(Node *node)
 		{
-			if(node->next)
-				node->next->prev = node->prev;
-
-			if(node->prev)
-				node->prev->next = node->next;
-			else
-				head = head->next;
-
-			delete node;
-			--size;
+			list.Remove(node);
 		}
 
 		unsigned int Size() const
 		{
-			return size;
+			return list.Size();
 		}
 
 	private:
-		Node			*head;
-		unsigned int	size;
+		typename EmbeddedList<Node>::List list;
 };
 
 #endif
