@@ -49,8 +49,8 @@ struct SettingsData
 		};
 
 		SettingsData(int integer=0) : type(ST_INT), str("") { SetValue(integer); }
-		SettingsData(unsigned int integer=0) : type(ST_INT), str("") { SetValue(integer); }
-		SettingsData(double decimal=0) : type(ST_FLOAT), str("") { SetValue(decimal); }
+		SettingsData(unsigned int integer) : type(ST_INT), str("") { SetValue(integer); }
+		SettingsData(double decimal) : type(ST_FLOAT), str("") { SetValue(decimal); }
 		SettingsData(FString str) : type(ST_STR), str("") { SetValue(str); integer = 0; }
 
 		const int			GetInteger() { return integer; }

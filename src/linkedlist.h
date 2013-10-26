@@ -71,8 +71,8 @@ public:
 		{
 		}
 
-		bool HasNext() { return node->elNext; }
-		bool HasPrev() { return node->elPrev; }
+		bool HasNext() { return node->elNext != NULL; }
+		bool HasPrev() { return node->elPrev != NULL; }
 
 		Iterator &Next()
 		{
@@ -112,8 +112,8 @@ public:
 		{
 		}
 
-		bool HasNext() { return node->elNext; }
-		bool HasPrev() { return node->elPrev; }
+		bool HasNext() { return node->elNext != NULL; }
+		bool HasPrev() { return node->elPrev != NULL; }
 
 		ConstIterator &Next()
 		{
