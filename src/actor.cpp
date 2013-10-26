@@ -131,7 +131,7 @@ FArchive &operator<< (FArchive &arc, const Frame *&frame)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-LinkedList<AActor *> AActor::actors;
+EmbeddedList<AActor>::List AActor::actors;
 PointerIndexTable<ExpressionNode> AActor::damageExpressions;
 PointerIndexTable<AActor::DropList> AActor::dropItems;
 IMPLEMENT_POINTY_CLASS(Actor)
@@ -317,7 +317,7 @@ void AActor::Init()
 	soundZone = NULL;
 	inventory = NULL;
 
-	actorRef = actors.Push(this);
+	actors.Push(this);
 	if(!loadedgame)
 		Activate();
 
@@ -332,7 +332,7 @@ void AActor::Init()
 
 void AActor::Serialize(FArchive &arc)
 {
-	bool hasActorRef = actorRef != NULL;
+	bool hasActorRef = elNext == elPrev && actors.Size();
 
 	if(arc.IsStoring())
 		arc.WriteSprite(sprite);
@@ -388,8 +388,7 @@ void AActor::Serialize(FArchive &arc)
 	{
 		if(!hasActorRef)
 		{
-			actors.Remove(actorRef);
-			actorRef = NULL;
+			actors.Remove(this);
 		}
 	}
 
@@ -466,11 +465,7 @@ void AActor::Tick()
 // us to transfer items into inventory for example.
 void AActor::RemoveFromWorld()
 {
-	if(actorRef)
-	{
-		actors.Remove(actorRef);
-		actorRef = NULL;
-	}
+	actors.Remove(this);
 	if(IsThinking())
 		Deactivate();
 }

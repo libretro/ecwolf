@@ -164,10 +164,9 @@ void R_GetSpriteHitlist(BYTE* hitlist)
 	BYTE* sprites = new BYTE[loadedSprites.Size()];
 	memset(sprites, 0, loadedSprites.Size());
 
-	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
-		AActor *actor = iter->Item();
-		sprites[actor->state->spriteInf] = 1;
+		sprites[iter->state->spriteInf] = 1;
 	}
 
 	for(unsigned int i = loadedSprites.Size();i-- > NUM_SPECIAL_SPRITES;)

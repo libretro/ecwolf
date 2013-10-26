@@ -394,13 +394,12 @@ static bool TryMove (AActor *ob)
 	//
 	// check for actors
 	//
-	for(AActor::Iterator *next = NULL, *iter = AActor::GetIterator();iter;iter = next)
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
-		next = iter->Next();
-		if(iter->Item() == ob)
+		if(iter == ob)
 			continue;
 
-		check = iter->Item();
+		check = iter;
 
 		fixed r = check->radius + ob->radius;
 		if(check->flags & FL_SOLID)
@@ -784,18 +783,18 @@ AActor *player_t::FindTarget()
 	{
 		oldclosest = closest;
 
-		for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
+		for(AActor::Iterator check = AActor::GetIterator();check.Next();)
 		{
-			if(check->Item() == mo)
+			if(check == mo)
 				continue;
 
-			if ((check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
-				&& abs(check->Item()->viewx-centerx) < shootdelta)
+			if ((check->flags & FL_SHOOTABLE) && (check->flags & FL_VISABLE)
+				&& abs(check->viewx-centerx) < shootdelta)
 			{
-				if (check->Item()->transx < viewdist)
+				if (check->transx < viewdist)
 				{
-					viewdist = check->Item()->transx;
-					closest = check->Item();
+					viewdist = check->transx;
+					closest = check;
 				}
 			}
 		}
@@ -976,18 +975,18 @@ ACTION_FUNCTION(A_CustomPunch)
 	// actually fire
 	int dist = 0x7fffffff;
 	AActor *closest = NULL;
-	for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
+	for(AActor::Iterator check = AActor::GetIterator();check.Next();check)
 	{
-		if(check->Item() == self)
+		if(check == self)
 			continue;
 
-		if ( (check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
-			&& abs(check->Item()->viewx-centerx) < shootdelta)
+		if ( (check->flags & FL_SHOOTABLE) && (check->flags & FL_VISABLE)
+			&& abs(check->viewx-centerx) < shootdelta)
 		{
-			if (check->Item()->transx < dist)
+			if (check->transx < dist)
 			{
-				dist = check->Item()->transx;
-				closest = check->Item();
+				dist = check->transx;
+				closest = check;
 			}
 		}
 	}

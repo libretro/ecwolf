@@ -259,10 +259,10 @@ void T_Projectile (AActor *self)
 		}
 		else
 		{
-			AActor::Iterator *iter = AActor::GetIterator();
-			while(iter)
+			AActor::Iterator iter = AActor::GetIterator();
+			while(iter.Next())
 			{
-				AActor *check = iter->Item();
+				AActor *check = iter;
 				if(check != players[0].mo && (check->flags & (FL_SHOOTABLE|FL_SOLID)) && lastHit != check)
 				{
 					fixed deltax = LABS(self->x - check->x);
@@ -288,7 +288,6 @@ void T_Projectile (AActor *self)
 						}
 					}
 				}
-				iter = iter->Next();
 			}
 		}
 	}
@@ -364,12 +363,10 @@ ACTION_FUNCTION(A_CustomMissile)
 
 ACTION_FUNCTION(A_Dormant)
 {
-	AActor::Iterator *iter = AActor::GetIterator();
-	AActor *actor;
-	while(iter)
+	AActor::Iterator iter = AActor::GetIterator();
+	while(iter.Next())
 	{
-		actor = iter->Item();
-		iter = iter->Next();
+		AActor *actor = iter;
 		if(actor == self || !(actor->flags&(FL_SHOOTABLE|FL_SOLID)))
 			continue;
 

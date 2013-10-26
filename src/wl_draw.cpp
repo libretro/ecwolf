@@ -586,9 +586,9 @@ void DrawScaleds (void)
 //
 // place active objects
 //
-	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
-		AActor *obj = iter->Item();
+		AActor *obj = iter;
 
 		if (obj->sprite == SPR_NONE)
 			continue;

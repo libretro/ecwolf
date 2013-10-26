@@ -71,7 +71,8 @@ enum
 class player_t;
 class ClassDef;
 class AInventory;
-class AActor : public Thinker
+class AActor : public Thinker,
+	public EmbeddedList<AActor>::Node
 {
 	DECLARE_CLASS(AActor, Thinker)
 	HAS_OBJECT_POINTERS
@@ -180,12 +181,10 @@ class AActor : public Thinker
 
 		TObjPtr<AInventory>	inventory;
 
-		typedef LinkedList<AActor *>::Node Iterator;
-		static LinkedList<AActor *>	actors;
-		LinkedList<AActor *>::Node	*actorRef;
-		static Iterator *GetIterator() { return actors.Head(); }
+		static EmbeddedList<AActor>::List actors;
+		typedef EmbeddedList<AActor>::Iterator Iterator;
+		static Iterator GetIterator() { return actors.Iterator(); }
 	protected:
-		friend class AActorProxy;
 		void	Init();
 
 		const MapZone	*soundZone;
