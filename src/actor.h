@@ -74,6 +74,8 @@ class AInventory;
 class AActor : public Thinker,
 	public EmbeddedList<AActor>::Node
 {
+	typedef EmbeddedList<AActor>::Node ActorLink;
+
 	DECLARE_CLASS(AActor, Thinker)
 	HAS_OBJECT_POINTERS
 
@@ -183,7 +185,7 @@ class AActor : public Thinker,
 
 		static EmbeddedList<AActor>::List actors;
 		typedef EmbeddedList<AActor>::Iterator Iterator;
-		static Iterator GetIterator() { return actors.Iterator(); }
+		static Iterator GetIterator() { return Iterator(actors); }
 	protected:
 		void	Init();
 

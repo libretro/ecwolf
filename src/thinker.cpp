@@ -71,8 +71,7 @@ void ThinkerList::DestroyAll(Priority start)
 		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{
-			Thinker *thinker = iter->Item();
-			iter = iter->Next();
+			Thinker *thinker = iter++;
 
 			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
 				thinker->Destroy();
@@ -85,15 +84,15 @@ void ThinkerList::MarkRoots()
 {
 	for(unsigned int i = 0;i < NUM_TYPES;++i)
 	{
-		Iterator iter = thinkers[i].Head();
-		while(iter)
+		Iterator iter(thinkers[i]);
+		while(iter.Next())
 		{
-			if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+			Thinker *thinker = iter;
+			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
 			{
-				GC::Mark(iter->Item());
+				GC::Mark(thinker);
 				break;
 			}
-			iter = iter->Next();
 		}
 	}
 }
@@ -108,8 +107,8 @@ void ThinkerList::Tick()
 		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{
-			Thinker *thinker = iter->Item();
-			nextThinker = iter->Next();
+			Thinker *thinker = iter;
+			nextThinker = ++iter;
 
 			if(thinker->ObjectFlags & OF_JustSpawned)
 			{
@@ -134,11 +133,11 @@ void ThinkerList::Serialize(FArchive &arc)
 	{
 		for(unsigned int i = 0;i < NUM_TYPES;i++)
 		{
-			Iterator iter = thinkers[i].Head();
-			while(iter)
+			Iterator iter(thinkers[i]);
+			while(iter.Next())
 			{
-				arc << iter->Item();
-				iter = iter->Next();
+				Thinker *thinker = iter;
+				arc << thinker;
 			}
 
 			Thinker *terminator = NULL;
@@ -164,42 +163,40 @@ void ThinkerList::Serialize(FArchive &arc)
 
 void ThinkerList::Register(Thinker *thinker, Priority type)
 {
-	thinker->thinkerRef = thinkers[type].Push(thinker);
+	thinkers[type].Push(thinker);
 	thinker->thinkerPriority = type;
 
-	Iterator head;
-	if((head = thinker->thinkerRef->Next()))
+	Iterator head(thinker);
+	if(head.Next())
 	{
-		GC::WriteBarrier(thinker, head->Item());
-		GC::WriteBarrier(head->Item(), thinker);
+		GC::WriteBarrier(thinker, head);
+		GC::WriteBarrier(head, thinker);
 	}
 	GC::WriteBarrier(thinker);
 }
 
 void ThinkerList::Deregister(Thinker *thinker)
 {
-	Iterator prev = thinker->thinkerRef->Prev();
-	Iterator next = thinker->thinkerRef->Next();
+	Thinker * const prev = static_cast<Thinker*>(thinker->elPrev);
+	Thinker * const next = static_cast<Thinker*>(thinker->elNext);
 
 	// If we're about to think this thinker then we should probably skip it.
-	if(nextThinker == thinker->thinkerRef)
+	if(nextThinker == thinker)
 		nextThinker = next;
 
-	thinkers[thinker->thinkerPriority].Remove(thinker->thinkerRef);
+	thinkers[thinker->thinkerPriority].Remove(thinker);
 	if(prev && next)
 	{
-		GC::WriteBarrier(prev->Item(), next->Item());
-		GC::WriteBarrier(next->Item(), prev->Item());
+		GC::WriteBarrier(prev, next);
+		GC::WriteBarrier(next, prev);
 	}
-
-	thinker->thinkerRef = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_ABSTRACT_CLASS(Thinker)
 
-Thinker::Thinker() : thinkerRef(NULL)
+Thinker::Thinker()
 {
 }
 
@@ -227,20 +224,20 @@ void Thinker::Destroy()
 
 size_t Thinker::PropagateMark()
 {
-	if(thinkerRef)
+	if(IsThinking())
 	{
-		ThinkerList::Iterator iter = thinkerRef->Next();
-		if(iter)
+		Thinker *next = static_cast<Thinker*>(elNext);
+		Thinker *prev = static_cast<Thinker*>(elPrev);
+		if(next)
 		{
-			assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
-			GC::Mark(iter->Item());
+			assert(!(next->ObjectFlags & OF_EuthanizeMe));
+			GC::Mark(next);
 		}
 
-		iter = thinkerRef->Prev();
-		if(iter)
+		if(prev)
 		{
-			assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
-			GC::Mark(iter->Item());
+			assert(!(prev->ObjectFlags & OF_EuthanizeMe));
+			GC::Mark(prev);
 		}
 	}
 	return Super::PropagateMark();

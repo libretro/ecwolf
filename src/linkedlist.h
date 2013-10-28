@@ -35,6 +35,8 @@
 #ifndef __LINKEDLIST_H__
 #define __LINKEDLIST_H__
 
+#define EMBEDDEDLIST_UNLINKED ((EmbeddedList<T>::Node*)~0)
+
 /**
  * Provides an interface for having a linked list embedded into a class.
  *
@@ -50,11 +52,10 @@
 template<class T> class EmbeddedList
 {
 public:
+	// It was pointed out that this may be more flexible if left as a POD type.
+	// Thus the node should not be considered valid until added to a list.
 	class Node
 	{
-	public:
-		Node() : elNext(NULL), elPrev(NULL) {}
-
 	protected:
 		friend class EmbeddedList<T>::Iterator;
 		friend class EmbeddedList<T>::ConstIterator;
@@ -68,6 +69,14 @@ public:
 	public:
 		Iterator() : node(NULL) {}
 		Iterator(typename EmbeddedList<T>::Node *node) : node(node)
+		{
+		}
+		/**
+		 * Initializes an interator pointing to the item before the first item
+		 * in the list.
+		 */
+		Iterator(typename EmbeddedList<T>::List &list) :
+			node(reinterpret_cast<EmbeddedList<T>::Node *>(&list))
 		{
 		}
 
@@ -98,6 +107,10 @@ public:
 			return static_cast<T*>(node);
 		}
 
+		T *Item() const { return static_cast<T*>(node); }
+		T *NextItem() const { return static_cast<T*>(node->elNext); }
+		T *PrevItem() const { return static_cast<T*>(node->elPrev); }
+
 		operator T*() const { return static_cast<T*>(node); }
 		operator bool() const { return node != NULL; }
 	private:
@@ -109,6 +122,10 @@ public:
 	public:
 		ConstIterator() : node(NULL) {}
 		ConstIterator(const typename EmbeddedList<T>::Node *node) : node(node)
+		{
+		}
+		ConstIterator(const typename EmbeddedList<T>::List &list) :
+			node(reinterpret_cast<const EmbeddedList<T>::Node *>(&list))
 		{
 		}
 
@@ -139,6 +156,10 @@ public:
 			return static_cast<const T*>(node);
 		}
 
+		const T *Item() const { return static_cast<const T*>(node); }
+		const T *NextItem() const { return static_cast<const T*>(node->elNext); }
+		const T *PrevItem() const { return static_cast<const T*>(node->elPrev); }
+
 		operator const T*() const { return static_cast<const T*>(node); }
 		operator bool() const { return node != NULL; }
 	private:
@@ -154,20 +175,6 @@ public:
 		{
 		}
 
-		// Creates an iterator for the list. Note that the Iterator will point
-		// to just before the list so it must be incremented before use.
-		typename EmbeddedList<T>::Iterator Iterator()
-		{
-			assert(reinterpret_cast<N*>(this)->elNext == head);
-			return EmbeddedList<T>::Iterator(reinterpret_cast<N*>(this));
-		}
-		typename EmbeddedList<T>::ConstIterator Iterator() const
-		{
-			return EmbeddedList<T>::ConstIterator(reinterpret_cast<N*>(this));
-		}
-
-		// Head() is the same as Iterator() only the iterator is initialized
-		// to the head instead of one space before the head.
 		typename EmbeddedList<T>::Iterator Head()
 		{
 			return EmbeddedList<T>::Iterator(head);
@@ -177,34 +184,77 @@ public:
 			return EmbeddedList<T>::ConstIterator(head);
 		}
 
+		/**
+		 * Returns the tail of the list. Since we don't store the tail, this
+		 * function is slow, but is useful for copying lists while preserving
+		 * order.
+		 */
+		typename EmbeddedList<T>::Iterator Tail()
+		{
+			if(!head)
+				return EmbeddedList<T>::Iterator(head);
+
+			Iterator iter(head);
+			while(iter.HasNext())
+				++iter;
+
+			return iter;
+		}
+		typename EmbeddedList<T>::ConstIterator Tail() const
+		{
+			if(!head)
+				return EmbeddedList<T>::ConstIterator(head);
+
+			ConstIterator iter(head);
+			while(iter.HasNext())
+				++iter;
+
+			return iter;
+		}
+
 		void Push(N *node)
 		{
 			++size;
 
 			node->elNext = head;
+			node->elPrev = NULL;
 			if(head)
 				head->elPrev = node;
 			head = node;
 		}
 		void Remove(N *node)
 		{
+			if(!IsLinked(node))
+				return;
+
 			if(node->elNext)
 				node->elNext->elPrev = node->elPrev;
-			else if(!node->elPrev && head != node)
-				return; // Does not appear to be on the list, so we're done
 
 			if(node->elPrev)
 				node->elPrev->elNext = node->elNext;
 			else
 				head = node->elNext;
 
-			node->elNext = node->elPrev = NULL;
+			node->elNext = node->elPrev = EMBEDDEDLIST_UNLINKED;
 			--size;
 		}
 
 		unsigned int Size() const
 		{
 			return size;
+		}
+
+		/**
+		 * Returns true if a node isn linked to some list. This function is not
+		 * valid until the node has been linked to some list.
+		 *
+		 * This function would make sense as a member of the Node, but having
+		 * this here prevents name conflicts if an object has more than one
+		 * EmbeddedList::Node.
+		 */
+		static bool IsLinked(const N *node)
+		{
+			return node->elNext != EMBEDDEDLIST_UNLINKED;
 		}
 	private:
 		List(const List &other) {}
@@ -256,12 +306,9 @@ template<class T> class LinkedList
 		}
 		LinkedList(const LinkedList &other)
 		{
-			typename EmbeddedList<Node>::ConstIterator iter = other.list.Head();
+			typename EmbeddedList<Node>::ConstIterator iter = other.list.Tail();
 			if(iter)
 			{
-				while(iter.HasNext())
-					++iter;
-
 				do
 				{
 					new Node(iter->Item(), list);

@@ -332,7 +332,7 @@ void AActor::Init()
 
 void AActor::Serialize(FArchive &arc)
 {
-	bool hasActorRef = elNext == elPrev && actors.Size();
+	bool hasActorRef = ActorLink::elNext == ActorLink::elPrev && actors.Size();
 
 	if(arc.IsStoring())
 		arc.WriteSprite(sprite);
@@ -626,7 +626,7 @@ void FinishTravel ()
 
 	do
 	{
-		AActor *actor = static_cast<AActor *>((Thinker*)node->Item());
+		AActor *actor = static_cast<AActor *>((Thinker*)node);
 		if(actor->IsKindOf(NATIVE_CLASS(PlayerPawn)))
 		{
 			APlayerPawn *player = static_cast<APlayerPawn *>(actor);
@@ -644,13 +644,10 @@ void FinishTravel ()
 
 				// We must move the linked list iterator here since we'll
 				// transfer to the new linked list at the SetPriority call
-				node = node->Next();
 				player->SetPriority(ThinkerList::PLAYER);
 				continue;
 			}
 		}
-
-		node = node->Next();
 	}
-	while(node);
+	while(node.Next());
 }
