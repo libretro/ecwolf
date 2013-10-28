@@ -265,101 +265,219 @@ public:
 	};
 };
 
+/**
+ * Implements a container linked list with similar interface as the embedded
+ * structures.
+ */
 template<class T> class LinkedList
 {
+	class Node
+	{
 	public:
-		class Node : public EmbeddedList<Node>::Node
+		Node *elNext, *elPrev;
+		T item;
+
+		Node(const T &item, Node *&head) : elNext(head), elPrev(NULL), item(item)
 		{
-			public:
-				Node(const T &item, typename EmbeddedList<Node>::List &head) : item(item)
-				{
-					head.Push(this);
-				}
+			if(elNext)
+				elNext->elPrev = this;
+			head = this;
+		}
+	};
 
-				T		&Item()
-				{
-					return item;
-				}
-				const T	&Item() const
-				{
-					return item;
-				}
-
-				Node	*Next() const
-				{
-					return static_cast<Node*>(EmbeddedList<Node>::Node::elNext);
-				}
-
-				Node	*Prev() const
-				{
-					return static_cast<Node*>(EmbeddedList<Node>::Node::elPrev);
-				}
-
-			private:
-				friend class LinkedList;
-
-				T		item;
-		};
-
-		LinkedList()
+	// Like EmbeddedList, ensure that this can be punned to a Node.
+	Node *head;
+	unsigned int size;
+public:
+	class Iterator
+	{
+	public:
+		Iterator() : node(NULL) {}
+		Iterator(Node *node) : node(node)
 		{
 		}
-		LinkedList(const LinkedList &other)
+		/**
+		 * Initializes an interator pointing to the item before the first item
+		 * in the list.
+		 */
+		Iterator(LinkedList<T> &list) :
+			node(reinterpret_cast<LinkedList<T>::Node *>(&list))
 		{
-			typename EmbeddedList<Node>::ConstIterator iter = other.list.Tail();
-			if(iter)
-			{
-				do
-				{
-					new Node(iter->Item(), list);
-				}
-				while(--iter);
-			}
-			assert(Size() == other.Size());
-		}
-		~LinkedList()
-		{
-			Clear();
 		}
 
-		void Clear()
+		bool HasNext() { return node->elNext != NULL; }
+		bool HasPrev() { return node->elPrev != NULL; }
+
+		Iterator &Next()
 		{
-			typename EmbeddedList<Node>::Iterator iter = list.Head();
-			if(iter)
-			{
-				typename EmbeddedList<Node>::Iterator current;
-				do
-				{
-					current = iter++;
-					delete current;
-				}
-				while(iter);
-				
-			}
+			node = node->elNext;
+			return *this;
+		}
+		Iterator &Prev()
+		{
+			node = node->elPrev;
+			return *this;
+		}
+		Iterator &operator++() { return Next(); }
+		Iterator operator++(int) { Iterator copy(*this); Next(); return copy; }
+		Iterator &operator--() { return Prev(); }
+		Iterator operator--(int) { Iterator copy(*this); Prev(); return copy; }
+
+		T &operator*() const
+		{
+			return node->item;
+		}
+		T *operator->() const
+		{
+			return &node->item;
 		}
 
-		Node *Head()
-		{
-			return list.Head();
-		}
+		T &Item() const { return node->item; }
+		T &NextItem() const { return node->elNext->item; }
+		T &PrevItem() const { return node->elPrev->item; }
 
-		Node *Push(const T &item)
-		{
-			return new Node(item, list);
-		}
-
-		void Remove(Node *node)
-		{
-			list.Remove(node);
-		}
-
-		unsigned int Size() const
-		{
-			return list.Size();
-		}
-
+		operator T&() const { return node->item; }
+		operator bool() const { return node != NULL; }
 	private:
-		typename EmbeddedList<Node>::List list;
+		friend class LinkedList<T>;
+
+		Node *node;
+	};
+
+	class ConstIterator
+	{
+	public:
+		ConstIterator() : node(NULL) {}
+		ConstIterator(const Node *node) : node(node)
+		{
+		}
+		ConstIterator(const LinkedList<T> &list) :
+			node(reinterpret_cast<const LinkedList<T>::Node *>(&list))
+		{
+		}
+
+		bool HasNext() { return node->elNext != NULL; }
+		bool HasPrev() { return node->elPrev != NULL; }
+
+		ConstIterator &Next()
+		{
+			node = node->elNext;
+			return *this;
+		}
+		ConstIterator &Prev()
+		{
+			node = node->elPrev;
+			return *this;
+		}
+		ConstIterator &operator++() { return Next(); }
+		ConstIterator operator++(int) { ConstIterator copy(*this); Next(); return copy; }
+		ConstIterator &operator--() { return Prev(); }
+		ConstIterator operator--(int) { ConstIterator copy(*this); Prev(); return copy; }
+
+		const T &operator*() const
+		{
+			return node->item;
+		}
+		const T *operator->() const
+		{
+			return &node->item;
+		}
+
+		const T &Item() const { return node->item; }
+		const T &NextItem() const { return node->elNext->item; }
+		const T &PrevItem() const { return node->elPrev->item; }
+
+		operator const T&() const { return node->item; }
+		operator bool() const { return node != NULL; }
+	private:
+		friend class LinkedList<T>;
+
+		const Node *node;
+	};
+
+	LinkedList() : head(NULL), size(0)
+	{
+	}
+	LinkedList(const LinkedList &other) : head(NULL), size(0)
+	{
+		ConstIterator iter = other.Tail();
+		if(iter)
+		{
+			do
+			{
+				Push(iter);
+			}
+			while(--iter);
+		}
+		assert(Size() == other.Size());
+	}
+	~LinkedList()
+	{
+		Clear();
+	}
+
+	void Clear()
+	{
+		Iterator iter = Head();
+		if(iter)
+		{
+			Iterator current;
+			do
+			{
+				current = iter++;
+				delete current.node;
+			}
+			while(iter);
+			
+		}
+	}
+
+	Iterator Head() { return Iterator(head); }
+	ConstIterator Head() const { return ConstIterator(head); }
+	Iterator Tail()
+	{
+		if(!head)
+			return Iterator(head);
+
+		Iterator iter(head);
+		while(iter.HasNext())
+			++iter;
+
+		return iter;
+	}
+	ConstIterator Tail() const
+	{
+		if(!head)
+			return ConstIterator(head);
+
+		ConstIterator iter(head);
+		while(iter.HasNext())
+			++iter;
+
+		return iter;
+	}
+
+	Iterator Push(const T &item)
+	{
+		++size;
+		return Iterator(new Node(item, head));
+	}
+
+	void Remove(Iterator pos)
+	{
+		if(pos.node->elNext)
+			pos.node->elNext->elPrev = pos.node->elPrev;
+
+		if(pos.node->elPrev)
+			pos.node->elPrev->elNext = pos.node->elNext;
+		else
+			head = pos.node->elNext;
+
+		delete pos.node;
+		--size;
+	}
+
+	unsigned int Size() const { return size; }
 };
 
 #endif

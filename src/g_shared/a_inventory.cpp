@@ -642,15 +642,13 @@ class AWeaponGiver : public AWeapon
 			DropList *drops = GetDropList();
 
 			// Get the tail since that will be the primary weapon.
-			DropList::Node *item = drops->Head();
-			while(item->Next())
-				item = item->Next();
+			DropList::Iterator item = drops->Tail();
 
-			for(;item;item = item->Prev())
+			for(;item;--item)
 			{
 				// Only the first item in the list should give ammo
-				bool noammo = item->Next() != NULL;
-				const ClassDef *cls = ClassDef::FindClass(item->Item().className);
+				bool noammo = item.HasNext();
+				const ClassDef *cls = ClassDef::FindClass(item->className);
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Weapon)))
 					continue;
 

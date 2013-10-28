@@ -192,11 +192,11 @@ void AActor::Die()
 	DropList *dropitems = GetDropList();
 	if(dropitems)
 	{
-		DropList::Node *item = dropitems->Head();
-		DropItem *bestDrop = NULL; // For FL_DROPBASEDONTARGET
+		DropList::Iterator item = dropitems->Head();
+		DropList::Iterator bestDrop = NULL; // For FL_DROPBASEDONTARGET
 		do
 		{
-			DropItem *drop = &item->Item();
+			DropList::Iterator drop = item;
 			if(pr_dropitem() <= drop->probability)
 			{
 				const ClassDef *cls = ClassDef::FindClass(drop->className);
@@ -209,7 +209,7 @@ void AActor::Die()
 						if(!inv || !bestDrop)
 							bestDrop = drop;
 
-						if(item->Next() != NULL)
+						if(item.HasNext())
 							continue;
 						else
 						{
@@ -246,7 +246,7 @@ void AActor::Die()
 				}
 			}
 		}
-		while((item = item->Next()));
+		while(item.Next());
 	}
 
 	bool isExtremelyDead = health < -GetClass()->Meta.GetMetaInt(AMETA_GibHealth, (GetDefault()->health*gameinfo.GibFactor)>>FRACBITS);
@@ -496,22 +496,19 @@ void AActor::RemoveInventory(AInventory *item)
  * when they should. We can't do this in Spawn() since we want certain
  * properties of the actor (velocity) to be setup before calling actions.
  */
-static LinkedList<AActor *> SpawnedActors;
+static TArray<AActor *> SpawnedActors;
 void AActor::FinishSpawningActors()
 {
-	LinkedList<AActor *>::Node *node = SpawnedActors.Head();
-	while((node = SpawnedActors.Head()))
+	unsigned int i = SpawnedActors.Size();
+	while(i-- > 0)
 	{
-		// Kind of a weird way to iterate, but remember that new actors can be
-		// pushed to this list. Currently our LinkedList class only tracks the
-		// head.
-		AActor *actor = node->Item();
-		SpawnedActors.Remove(node);
+		AActor * const actor = SpawnedActors[i];
 
 		// Run the first action pointer and all zero tic states!
 		actor->SetState(actor->state);
 		actor->ObjectFlags &= ~OF_JustSpawned;
 	}
+	SpawnedActors.Clear();
 }
 
 FRandom pr_spawnmobj("SpawnActor");

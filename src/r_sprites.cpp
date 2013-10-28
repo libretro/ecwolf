@@ -242,9 +242,9 @@ void R_InitSprites()
 			frames[j].mirror = 0;
 		}
 
-		for(SpritesList::Node *iter = list.Head();iter;iter = iter->Next())
+		for(SpritesList::Iterator iter = list.Head();iter;++iter)
 		{
-			FTexture *tex = iter->Item();
+			FTexture *tex = iter;
 			unsigned char frame = tex->Name[4] - 'A';
 			if(frame < MAX_SPRITE_FRAMES)
 			{

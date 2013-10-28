@@ -394,12 +394,15 @@ static bool TryMove (AActor *ob)
 	//
 	// check for actors
 	//
-	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
+	for(AActor::Iterator iter = AActor::GetIterator();iter;)
 	{
 		if(iter == ob)
+		{
+			++iter;
 			continue;
+		}
 
-		check = iter;
+		check = iter++;
 
 		fixed r = check->radius + ob->radius;
 		if(check->flags & FL_SOLID)
