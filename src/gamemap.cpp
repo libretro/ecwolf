@@ -245,21 +245,35 @@ bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
 		return straightCheck;
 
 	memset(zoneTraversed, 0, sizeof(bool)*zonePalette.Size());
-	zoneTraversed[zone1->index] = true;
-
 	return TraverseLink(zone1, zone2);
 }
 bool GameMap::TraverseLink(const Zone* src, const Zone* dest)
 {
+	// Mark this node as checked
+	zoneTraversed[src->index] = true;
+
+	// Check upper zones (right side of table)
+	unsigned int ofs = src->index;
 	unsigned int i = zonePalette.Size() - src->index;
 	while(--i > 0)
 	{
-		if(!zoneTraversed[i] && zoneLinks[src->index][i] > 0)
+		if(!zoneTraversed[i + ofs] && zoneLinks[ofs][i] > 0)
 		{
-			zoneTraversed[i] = true;
+			if(i + ofs == dest->index || TraverseLink(&zonePalette[i + ofs], dest))
+				return true;
+		}
+	}
+
+	// Check lower zones (top side of table)
+	while(i < src->index)
+	{
+		if(!zoneTraversed[i] && zoneLinks[i][ofs] > 0)
+		{
 			if(i == dest->index || TraverseLink(&zonePalette[i], dest))
 				return true;
 		}
+		--ofs;
+		++i;
 	}
 	return false;
 }
@@ -347,7 +361,9 @@ void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 	if(zone1 == zone2 || zone1 == NULL || zone2 == NULL)
 		return;
 
-	unsigned short &value = zoneLinks[zone1->index][zone2->index - zone1->index];
+	unsigned short &value = zone1->index < zone2->index ?
+		zoneLinks[zone1->index][zone2->index - zone1->index] :
+		zoneLinks[zone2->index][zone1->index - zone2->index];
 	if(!open)
 	{
 		if(value > 0)
