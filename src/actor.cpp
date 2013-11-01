@@ -332,7 +332,7 @@ void AActor::Init()
 
 void AActor::Serialize(FArchive &arc)
 {
-	bool hasActorRef = ActorLink::elNext == ActorLink::elPrev && actors.Size();
+	bool hasActorRef = actors.IsLinked(this);
 
 	if(arc.IsStoring())
 		arc.WriteSprite(sprite);
