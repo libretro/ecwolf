@@ -199,6 +199,7 @@ class GameMap
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
 		void	SetupLinks();
+		bool	TraverseLink(const Zone *src, const Zone *dest);
 		void	UnloadLinks();
 
 		FString	map;
@@ -221,6 +222,7 @@ class GameMap
 		TArray<Plane>	planes;
 		TMap<unsigned int, Plane::Map *> tagMap;
 
+		bool*				zoneTraversed;
 		unsigned short***	zoneLinks;
 };
 

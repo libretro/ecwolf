@@ -244,11 +244,22 @@ bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
 		zone2 = tmp;
 	}
 
-	for(unsigned int i = zone1->index+1;i < zonePalette.Size();++i)
+	memset(zoneTraversed, 0, sizeof(bool)*zonePalette.Size());
+	zoneTraversed[zone1->index] = true;
+
+	return TraverseLink(zone1, zone2);
+}
+bool GameMap::TraverseLink(const Zone* src, const Zone* dest)
+{
+	unsigned int i = zonePalette.Size();
+	while(i-- > src->index)
 	{
-		if(*zoneLinks[zone1->index][i] > 0 &&
-			(i == zone2->index || CheckLink(&zonePalette[i], zone2, true)))
+		if(!zoneTraversed[i] && *zoneLinks[src->index][i] > 0)
+		{
+			zoneTraversed[i] = true;
+			if(i == dest->index || TraverseLink(&zonePalette[i], dest))
 				return true;
+		}
 	}
 	return false;
 }
@@ -401,6 +412,8 @@ void GameMap::SetSpotTag(MapSpot spot, unsigned int tag)
 
 void GameMap::SetupLinks()
 {
+	zoneTraversed = new bool[zonePalette.Size()];
+
 	// Might as well use the same pointer for each time x == y
 	unsigned short *one = new unsigned short;
 	*one = 1;
@@ -494,6 +507,7 @@ void GameMap::UnloadLinks()
 	if(!zoneLinks)
 		return;
 
+	delete[] zoneTraversed;
 	delete zoneLinks[0][0];
 	for(unsigned int i = 0;i < zonePalette.Size();++i)
 	{
