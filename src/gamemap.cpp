@@ -51,7 +51,8 @@
 #include "doomerrors.h"
 #include "m_random.h"
 
-GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false), file(NULL), zoneLinks(NULL)
+GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
+	file(NULL), zoneTraversed(NULL), zoneLinks(NULL)
 {
 	lumps[0] = NULL;
 
@@ -230,19 +231,18 @@ bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
 	if(zone1 == NULL || zone2 == NULL)
 		return false;
 
-	// If we're doing a recursive check and the straight check passes use that
-	bool straightCheck = *zoneLinks[zone1->index][zone2->index] > 0;
-	if(!recurse || straightCheck)
-		return straightCheck;
-
-	// If doing a recursive check we need to make zone 1 the lower number that
-	// way we can check the top half of the table.
+	// We only have the top half of the table.
 	if(zone2->index < zone1->index)
 	{
 		const Zone *tmp = zone1;
 		zone1 = zone2;
 		zone2 = tmp;
 	}
+
+	// If we're doing a recursive check and the straight check passes use that
+	bool straightCheck = zoneLinks[zone1->index][zone2->index - zone1->index] > 0;
+	if(!recurse || straightCheck)
+		return straightCheck;
 
 	memset(zoneTraversed, 0, sizeof(bool)*zonePalette.Size());
 	zoneTraversed[zone1->index] = true;
@@ -251,10 +251,10 @@ bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
 }
 bool GameMap::TraverseLink(const Zone* src, const Zone* dest)
 {
-	unsigned int i = zonePalette.Size();
-	while(i-- > src->index)
+	unsigned int i = zonePalette.Size() - src->index;
+	while(--i > 0)
 	{
-		if(!zoneTraversed[i] && *zoneLinks[src->index][i] > 0)
+		if(!zoneTraversed[i] && zoneLinks[src->index][i] > 0)
 		{
 			zoneTraversed[i] = true;
 			if(i == dest->index || TraverseLink(&zonePalette[i], dest))
@@ -347,7 +347,7 @@ void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 	if(zone1 == zone2 || zone1 == NULL || zone2 == NULL)
 		return;
 
-	unsigned short &value = *zoneLinks[zone1->index][zone2->index];
+	unsigned short &value = zoneLinks[zone1->index][zone2->index - zone1->index];
 	if(!open)
 	{
 		if(value > 0)
@@ -412,32 +412,21 @@ void GameMap::SetSpotTag(MapSpot spot, unsigned int tag)
 
 void GameMap::SetupLinks()
 {
-	zoneTraversed = new bool[zonePalette.Size()];
-
-	// Might as well use the same pointer for each time x == y
-	unsigned short *one = new unsigned short;
-	*one = 1;
+	// Allocate as one large block for locality.
+	const unsigned int zdSize = sizeof(bool)*zonePalette.Size()
+		+ sizeof(unsigned short)*((zonePalette.Size()*(zonePalette.Size()+1))>>1);
+	byte* zoneData = new byte[zdSize + sizeof(unsigned short*)*zonePalette.Size()];
+	memset(zoneData, 0, zdSize);
+	zoneTraversed = reinterpret_cast<bool*>(zoneData);
 
 	// Set up the table
-	zoneLinks = new unsigned short**[zonePalette.Size()];
+	unsigned short* ptr = reinterpret_cast<unsigned short*>(zoneData + sizeof(bool)*zonePalette.Size());
+	zoneLinks = reinterpret_cast<unsigned short**>(zoneData+zdSize);
 	for(unsigned int i = 0;i < zonePalette.Size();++i)
 	{
-		zoneLinks[i] = new unsigned short*[zonePalette.Size()];
-		zoneLinks[i][i] = one;
-		for(unsigned int j = i+1;j < zonePalette.Size();++j)
-		{
-			zoneLinks[i][j] = new unsigned short;
-			*zoneLinks[i][j] = (i == j);
-		}
-	}
-
-	// Second half should just point to the first set.
-	for(unsigned int i = 1;i < zonePalette.Size();++i)
-	{
-		for(unsigned int j = 0;j < i;++j)
-		{
-			zoneLinks[i][j] = zoneLinks[j][i];
-		}
+		zoneLinks[i] = ptr;
+		ptr += zonePalette.Size()-i;
+		zoneLinks[i][0] = 1;
 	}
 }
 
@@ -507,15 +496,9 @@ void GameMap::UnloadLinks()
 	if(!zoneLinks)
 		return;
 
+	// zoneTraversed holds the base address for our single allocation.
 	delete[] zoneTraversed;
-	delete zoneLinks[0][0];
-	for(unsigned int i = 0;i < zonePalette.Size();++i)
-	{
-		for(unsigned int j = i+1;j < zonePalette.Size();++j)
-			delete zoneLinks[i][j];
-		delete[] zoneLinks[i];
-	}
-	delete[] zoneLinks;
+	zoneTraversed = NULL;
 	zoneLinks = NULL;
 }
 
@@ -586,47 +569,13 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 
 	// zoneLinks
 	{
-		uint32_t packing = 0;
-		unsigned short shift = 0;
-		unsigned int x = 0;
-		unsigned int y = 1;
-		unsigned int max = 1;
-
-		if(!arc.IsStoring())
-			arc << packing;
-
-		do
+		unsigned int zone = gm->zonePalette.Size();
+		while(--zone > 0) // We don't care about == 0 since it's always 1
 		{
-			if(arc.IsStoring())
-			{
-				if(*gm->zoneLinks[x][y])
-					packing |= 1<<shift;
-				++shift;
-			}
-			else
-			{
-				*gm->zoneLinks[x][y] = (packing>>(shift++))&1;
-			}
-
-			if(++x >= max)
-			{
-				x = 0;
-				++y;
-				++max;
-			}
-
-			if(shift == sizeof(packing)*8)
-			{
-				arc << packing;
-				shift = 0;
-				if(arc.IsStoring())
-					packing = 0;
-			}
+			unsigned int i = gm->zonePalette.Size() - zone;
+			while(--i > 0)
+				arc << gm->zoneLinks[zone][i];
 		}
-		while(y < gm->zonePalette.Size());
-
-		if(shift && arc.IsStoring())
-			arc << packing;
 	}
 
 	// Serialize any map information that may change

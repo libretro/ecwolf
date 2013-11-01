@@ -222,8 +222,11 @@ class GameMap
 		TArray<Plane>	planes;
 		TMap<unsigned int, Plane::Map *> tagMap;
 
+		// Sound travel links.  zoneTraversed is temporary array for recursive
+		// traversals.  zoneLinks is the table of links (counts the number of
+		// links that are opened).
 		bool*				zoneTraversed;
-		unsigned short***	zoneLinks;
+		unsigned short**	zoneLinks;
 };
 
 typedef GameMap::Plane::Map *	MapSpot;
