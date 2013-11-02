@@ -96,16 +96,16 @@ static bool P_StartButton (MapSpot spot, MapTile::Side side, FSwitchDef *Switch,
 	ThinkerList::Iterator iter = thinkerList->GetHead(ThinkerList::WORLD);
 	while(iter)
 	{
-		if(iter->Item()->IsThinkerType<DActiveButton>())
+		if(iter->IsThinkerType<DActiveButton>())
 		{
-			DActiveButton *button = (DActiveButton*) iter->Item();
+			DActiveButton *button = (DActiveButton*) ((Thinker*)iter);
 			if(button->m_Side == side && button->m_Spot == spot)
 			{
 				button->m_Timer=1;	// force advancing to the next frame
 				return false;
 			}
 		}
-		iter = iter->Next();
+		++iter;
 	}
 
 	new DActiveButton (spot, side, Switch, x, y, useagain);

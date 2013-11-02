@@ -12,6 +12,7 @@ actor WolfensteinMonster
 	MONSTER
 	+ALWAYSFAST
 	+RANDOMIZE
+	+OLDRANDOMCHASE
 }
 
 actor Guard : WolfensteinMonster 11

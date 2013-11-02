@@ -9,6 +9,7 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "am_map.h"
 #include "id_ca.h"
 #include "id_sd.h"
 #include "id_vl.h"
@@ -115,78 +116,6 @@ void PictureGrabber (void)
 	US_PrintCentered ("Screenshot taken");
 	VW_UpdateScreen();
 	IN_Ack();
-}
-
-
-//===========================================================================
-
-/*
-===================
-=
-= BasicOverhead
-=
-===================
-*/
-
-void BasicOverhead (void)
-{
-#if 0
-	int x, y, z, offx, offy;
-
-	z = 128/MAPSIZE; // zoom scale
-	offx = 320/2;
-	offy = (160-MAPSIZE*z)/2;
-
-#ifdef MAPBORDER
-	int temp = viewsize;
-	NewViewSize(16);
-	DrawPlayBorder();
-#endif
-
-	// right side (raw)
-
-	for(x=0;x<MAPSIZE;x++)
-		for(y=0;y<MAPSIZE;y++)
-			VWB_Bar(x*z+offx, y*z+offy,z,z,(unsigned)(uintptr_t)actorat[x][y]);
-
-	// left side (filtered)
-
-	uintptr_t tile;
-	int color;
-	offx -= 128;
-
-	for(x=0;x<MAPSIZE;x++)
-	{
-		for(y=0;y<MAPSIZE;y++)
-		{
-			tile = (uintptr_t)actorat[x][y];
-			if (ISPOINTER(tile) && ((objtype *)tile)->flags&FL_SHOOTABLE) color = 72;  // enemy
-			else if (!tile || ISPOINTER(tile))
-			{
-				if (spotvis[x][y]) color = 111;  // visable
-				else color = 0;  // nothing
-			}
-			//else if (MAPSPOT(x,y,1) == PUSHABLETILE) color = 171;  // pushwall
-			else if (tile == 64) color = 158; // solid obj
-			else if (tile < 128) color = 154;  // walls
-			else if (tile < 256) color = 146;  // doors
-
-			VWB_Bar(x*z+offx, y*z+offy,z,z,color);
-		}
-	}
-
-	VWB_Bar(players[0].mo->tilex*z+offx,players[0].mo->tiley*z+offy,z,z,15); // players[0].mo
-
-	// resize the border to match
-
-	VW_UpdateScreen();
-	IN_Ack();
-
-#ifdef MAPBORDER
-	NewViewSize(temp);
-	DrawPlayBorder();
-#endif
-#endif
 }
 
 //===========================================================================
@@ -429,9 +358,10 @@ int DebugKeys (void)
 		IN_Ack ();
 		return 1;
 	}
-	else if (Keyboard[sc_O])        // O = basic overhead
+	else if (Keyboard[sc_O])
 	{
-		BasicOverhead();
+		am_cheat ^= 1;
+		IN_ClearKeysDown();
 		return 1;
 	}
 	else if(Keyboard[sc_P])         // P = Ripper's picture grabber
@@ -637,126 +567,3 @@ void DebugMLI()
 
 	DrawPlayScreen();
 }
-
-
-#if 0
-/*
-===================
-=
-= OverheadRefresh
-=
-===================
-*/
-
-void OverheadRefresh (void)
-{
-	unsigned        x,y,endx,endy,sx,sy;
-	unsigned        tile;
-
-
-	endx = maporgx+VIEWTILEX;
-	endy = maporgy+VIEWTILEY;
-
-	for (y=maporgy;y<endy;y++)
-	{
-		for (x=maporgx;x<endx;x++)
-		{
-			sx = (x-maporgx)*16;
-			sy = (y-maporgy)*16;
-
-			switch (viewtype)
-			{
-#if 0
-				case mapview:
-					tile = *(mapsegs[0]+farmapylookup[y]+x);
-					break;
-
-				case tilemapview:
-					tile = tilemap[x][y];
-					break;
-
-				case visview:
-					tile = spotvis[x][y];
-					break;
-#endif
-				case actoratview:
-					tile = (unsigned)actorat[x][y];
-					break;
-			}
-
-			if (tile<MAXWALLTILES)
-				LatchDrawTile(sx,sy,tile);
-			else
-			{
-				LatchDrawChar(sx,sy,NUMBERCHARS+((tile&0xf000)>>12));
-				LatchDrawChar(sx+8,sy,NUMBERCHARS+((tile&0x0f00)>>8));
-				LatchDrawChar(sx,sy+8,NUMBERCHARS+((tile&0x00f0)>>4));
-				LatchDrawChar(sx+8,sy+8,NUMBERCHARS+(tile&0x000f));
-			}
-		}
-	}
-}
-#endif
-
-#if 0
-/*
-===================
-=
-= ViewMap
-=
-===================
-*/
-
-void ViewMap (void)
-{
-	boolean         button0held;
-
-	viewtype = actoratview;
-	//      button0held = false;
-
-
-	maporgx = players[0].mo->tilex - VIEWTILEX/2;
-	if (maporgx<0)
-		maporgx = 0;
-	if (maporgx>MAPSIZE-VIEWTILEX)
-		maporgx=MAPSIZE-VIEWTILEX;
-	maporgy = players[0].mo->tiley - VIEWTILEY/2;
-	if (maporgy<0)
-		maporgy = 0;
-	if (maporgy>MAPSIZE-VIEWTILEY)
-		maporgy=MAPSIZE-VIEWTILEY;
-
-	do
-	{
-		//
-		// let user pan around
-		//
-		PollControls ();
-		if (controlx < 0 && maporgx>0)
-			maporgx--;
-		if (controlx > 0 && maporgx<mapwidth-VIEWTILEX)
-			maporgx++;
-		if (controly < 0 && maporgy>0)
-			maporgy--;
-		if (controly > 0 && maporgy<mapheight-VIEWTILEY)
-			maporgy++;
-
-#if 0
-		if (c.button0 && !button0held)
-		{
-			button0held = true;
-			viewtype++;
-			if (viewtype>visview)
-				viewtype = mapview;
-		}
-		if (!c.button0)
-			button0held = false;
-#endif
-
-		OverheadRefresh ();
-
-	} while (!Keyboard[sc_Escape]);
-
-	IN_ClearKeysDown ();
-}
-#endif

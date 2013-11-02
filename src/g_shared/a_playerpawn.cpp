@@ -114,10 +114,10 @@ void APlayerPawn::GiveStartingInventory()
 	if(!GetStartInventory())
 		return;
 
-	DropList::Node *item = GetStartInventory()->Head();
+	DropList::Iterator item = GetStartInventory()->Head();
 	do
 	{
-		DropItem &inv = item->Item();
+		DropItem &inv = item;
 		const ClassDef *cls = ClassDef::FindClass(inv.className);
 		if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 			continue;
@@ -135,7 +135,7 @@ void APlayerPawn::GiveStartingInventory()
 		if(!invItem->CallTryPickup(this))
 			invItem->Destroy();
 	}
-	while((item = item->Next()));
+	while(item.Next());
 
 	SetupWeaponSlots();
 

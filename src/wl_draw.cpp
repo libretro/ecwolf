@@ -378,6 +378,7 @@ void HitVertWall (void)
 
 	DetermineHitDir(true);
 
+	tilehit->amFlags |= AM_Visible;
 	texture = (yintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (word)yintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
 	if (xtilestep == -1 && !tilehit->tile->offsetVertical)
 	{
@@ -456,6 +457,7 @@ void HitHorizWall (void)
 
 	DetermineHitDir(false);
 
+	tilehit->amFlags |= AM_Visible;
 	texture = (xintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (word)xintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
 	if(!tilehit->tile->offsetHorizontal)
 	{
@@ -584,9 +586,9 @@ void DrawScaleds (void)
 //
 // place active objects
 //
-	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
-		AActor *obj = iter->Item();
+		AActor *obj = iter;
 
 		if (obj->sprite == SPR_NONE)
 			continue;
@@ -994,6 +996,7 @@ vertentry:
 			}
 passvert:
 			tilehit->visible=true;
+			tilehit->amFlags |= AM_Visible;
 			xtile+=xtilestep;
 			yintercept+=ystep;
 			xspot[0]=xtile;
@@ -1160,6 +1163,7 @@ horizentry:
 			}
 passhoriz:
 			tilehit->visible=true;
+			tilehit->amFlags |= AM_Visible;
 			ytile+=ytilestep;
 			xintercept+=xstep;
 			yspot[0]=xintercept>>16;
@@ -1264,6 +1268,9 @@ void R_RenderView()
 
 	if(Keyboard[sc_Tab] && viewsize == 21)
 		ShowActStatus();
+
+	// Always mark the current spot as visible in the automap
+	map->GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->amFlags |= AM_Visible;
 }
 
 /*
@@ -1302,7 +1309,6 @@ void    ThreeDRefresh (void)
 //
 // show screen and time last cycle
 //
-
 	if (fizzlein)
 	{
 		FizzleFade(0, 0, screenWidth, screenHeight, 20, false);
@@ -1310,26 +1316,22 @@ void    ThreeDRefresh (void)
 
 		lasttimecount = GetTimeCount();          // don't make a big tic count
 	}
-	else
+	else if (fpscounter)
 	{
-		if (fpscounter)
-		{
-			FString fpsDisplay;
-			fpsDisplay.Format("%2u fps", fps);
+		FString fpsDisplay;
+		fpsDisplay.Format("%2u fps", fps);
 
-			word x = 0;
-			word y = 0;
-			word width, height;
-			VW_MeasurePropString(ConFont, fpsDisplay, width, height);
-			MenuToRealCoords(x, y, width, height, MENU_TOP);
-			VWB_Clear(GPalette.BlackIndex, x, y, x+width+1, y+height+1);
-			px = 0;
-			py = 0;
-			pa = MENU_TOP;
-			VWB_DrawPropString(ConFont, fpsDisplay, CR_WHITE);
-			pa = MENU_CENTER;
-		}
-		VH_UpdateScreen();
+		word x = 0;
+		word y = 0;
+		word width, height;
+		VW_MeasurePropString(ConFont, fpsDisplay, width, height);
+		MenuToRealCoords(x, y, width, height, MENU_TOP);
+		VWB_Clear(GPalette.BlackIndex, x, y, x+width+1, y+height+1);
+		px = 0;
+		py = 0;
+		pa = MENU_TOP;
+		VWB_DrawPropString(ConFont, fpsDisplay, CR_WHITE);
+		pa = MENU_CENTER;
 	}
 
 	if (fpscounter)

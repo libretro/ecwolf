@@ -71,8 +71,7 @@ void ThinkerList::DestroyAll(Priority start)
 		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{
-			Thinker *thinker = iter->Item();
-			iter = iter->Next();
+			Thinker *thinker = iter++;
 
 			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
 				thinker->Destroy();
@@ -85,15 +84,15 @@ void ThinkerList::MarkRoots()
 {
 	for(unsigned int i = 0;i < NUM_TYPES;++i)
 	{
-		Iterator iter = thinkers[i].Head();
-		while(iter)
+		Iterator iter(thinkers[i]);
+		while(iter.Next())
 		{
-			if(!(iter->Item()->ObjectFlags & OF_EuthanizeMe))
+			Thinker *thinker = iter;
+			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
 			{
-				GC::Mark(iter->Item());
+				GC::Mark(thinker);
 				break;
 			}
-			iter = iter->Next();
 		}
 	}
 }
@@ -108,8 +107,8 @@ void ThinkerList::Tick()
 		Iterator iter = thinkers[i].Head();
 		while(iter)
 		{
-			Thinker *thinker = iter->Item();
-			nextThinker = iter->Next();
+			Thinker *thinker = iter;
+			nextThinker = ++iter;
 
 			if(thinker->ObjectFlags & OF_JustSpawned)
 			{
@@ -134,11 +133,11 @@ void ThinkerList::Serialize(FArchive &arc)
 	{
 		for(unsigned int i = 0;i < NUM_TYPES;i++)
 		{
-			Iterator iter = thinkers[i].Head();
-			while(iter)
+			Iterator iter(thinkers[i]);
+			while(iter.Next())
 			{
-				arc << iter->Item();
-				iter = iter->Next();
+				Thinker *thinker = iter;
+				arc << thinker;
 			}
 
 			Thinker *terminator = NULL;
@@ -164,32 +163,32 @@ void ThinkerList::Serialize(FArchive &arc)
 
 void ThinkerList::Register(Thinker *thinker, Priority type)
 {
-	thinker->thinkerRef = thinkers[type].Push(thinker);
+	thinkers[type].Push(thinker);
 	thinker->thinkerPriority = type;
 
-	Iterator head;
-	if((head = thinker->thinkerRef->Next()))
+	Iterator head(thinker);
+	if(head.Next())
 	{
-		GC::WriteBarrier(thinker, head->Item());
-		GC::WriteBarrier(head->Item(), thinker);
+		GC::WriteBarrier(thinker, head);
+		GC::WriteBarrier(head, thinker);
 	}
 	GC::WriteBarrier(thinker);
 }
 
 void ThinkerList::Deregister(Thinker *thinker)
 {
-	Iterator prev = thinker->thinkerRef->Prev();
-	Iterator next = thinker->thinkerRef->Next();
+	Thinker * const prev = static_cast<Thinker*>(thinker->elPrev);
+	Thinker * const next = static_cast<Thinker*>(thinker->elNext);
 
 	// If we're about to think this thinker then we should probably skip it.
-	if(nextThinker == thinker->thinkerRef)
+	if(nextThinker == thinker)
 		nextThinker = next;
 
-	thinkers[thinker->thinkerPriority].Remove(thinker->thinkerRef);
+	thinkers[thinker->thinkerPriority].Remove(thinker);
 	if(prev && next)
 	{
-		GC::WriteBarrier(prev->Item(), next->Item());
-		GC::WriteBarrier(next->Item(), prev->Item());
+		GC::WriteBarrier(prev, next);
+		GC::WriteBarrier(next, prev);
 	}
 }
 
@@ -197,37 +196,55 @@ void ThinkerList::Deregister(Thinker *thinker)
 
 IMPLEMENT_ABSTRACT_CLASS(Thinker)
 
+Thinker::Thinker()
+{
+}
+
 Thinker::Thinker(ThinkerList::Priority priority)
+{
+	Activate(priority);
+}
+
+void Thinker::Activate(ThinkerList::Priority priority)
 {
 	thinkerList->Register(this, priority);
 }
 
-void Thinker::Destroy()
+void Thinker::Deactivate()
 {
 	thinkerList->Deregister(this);
+}
+
+void Thinker::Destroy()
+{
+	if(IsThinking())
+		thinkerList->Deregister(this);
 	Super::Destroy();
 }
 
 size_t Thinker::PropagateMark()
 {
-	ThinkerList::Iterator iter = thinkerRef->Next();
-	if(iter)
+	if(IsThinking())
 	{
-		assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
-		GC::Mark(iter->Item());
-	}
+		Thinker *next = static_cast<Thinker*>(elNext);
+		Thinker *prev = static_cast<Thinker*>(elPrev);
+		if(next)
+		{
+			assert(!(next->ObjectFlags & OF_EuthanizeMe));
+			GC::Mark(next);
+		}
 
-	iter = thinkerRef->Prev();
-	if(iter)
-	{
-		assert(!(iter->Item()->ObjectFlags & OF_EuthanizeMe));
-		GC::Mark(iter->Item());
+		if(prev)
+		{
+			assert(!(prev->ObjectFlags & OF_EuthanizeMe));
+			GC::Mark(prev);
+		}
 	}
 	return Super::PropagateMark();
 }
 
 void Thinker::SetPriority(ThinkerList::Priority priority)
 {
-	thinkerList->Deregister(this);
-	thinkerList->Register(this, priority);
+	Deactivate();
+	Activate(priority);
 }

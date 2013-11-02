@@ -44,6 +44,8 @@
 #include "r_2d/r_main.h"
 #include "filesys.h"
 
+#include <clocale>
+
 /*
 =============================================================================
 
@@ -1295,6 +1297,10 @@ int main (int argc, char *argv[])
 	StartupWin32();
 	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
 #endif
+
+	// Stop the C library from screwing around with its functions according
+	// to the system locale.
+	setlocale(LC_ALL, "C");
 
 	FileSys::SetupPaths(argc, argv);
 

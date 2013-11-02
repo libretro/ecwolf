@@ -1,4 +1,5 @@
 #include "wl_def.h"
+#include "am_map.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -218,6 +219,8 @@ void VH_Startup()
 		rndbits = 25;       // fizzle fade will not fill whole screen
 
 	rndmask = rndmasks[rndbits - 17];
+
+	AM_ChangeResolution();
 }
 
 byte *fizzleSurface = NULL;

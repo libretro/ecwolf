@@ -319,12 +319,22 @@ class FVGAGraph : public FResourceFile
 			}
 			// HACK: For some reason id decided the tile8 lump will not tell
 			//       its size.  So we need to assume it's right after the
-			//       graphics and is 72 tiles long.
+			//       graphics. To make matters worse, we can't assume a size
+			//       for it since S3DNA has more than 72 tiles.
+			//       We will use the method from before to guess a size.
 			unsigned int tile8Position = 1+numFonts+numPictures;
 			if(tile8Position < NumLumps && (unsigned)lumps[tile8Position].LumpSize > lumps[tile8Position].length)
 			{
+				byte* data = new byte[lumps[tile8Position].length];
+				byte* out = new byte[64*256];
+				Reader->Seek(lumps[tile8Position].position, SEEK_SET);
+				Reader->Read(data, lumps[tile8Position].length);
+				byte* endPtr = lumps[tile8Position].HuffExpand(data, out);
+				delete[] data;
+				delete[] out;
+
 				lumps[tile8Position].noSkip = true;
-				lumps[tile8Position].LumpSize = 64*72;
+				lumps[tile8Position].LumpSize = (unsigned int)(endPtr - out)&~0x3F;
 			}
 			if(dimensions != NULL)
 				delete[] dimensions;

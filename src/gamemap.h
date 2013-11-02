@@ -50,6 +50,11 @@ enum
 	SLIDE_Invert
 };
 
+enum
+{
+	AM_Visible = 0x1
+};
+
 class GameMap
 {
 	public:
@@ -132,8 +137,8 @@ class GameMap
 			struct Map
 			{
 				Map() : tile(NULL), sector(NULL), zone(NULL), visible(false),
-					thinker(NULL), pushDirection(Tile::East), pushAmount(0),
-					pushReceptor(NULL), tag(0), nexttag(NULL)
+					amFlags(0), thinker(NULL), pushDirection(Tile::East),
+					pushAmount(0), pushReceptor(NULL), tag(0), nexttag(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
 					sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
@@ -154,6 +159,7 @@ class GameMap
 				FTextureID		texture[4];
 
 				bool			visible;
+				unsigned int	amFlags;
 				TObjPtr<Thinker> thinker;
 				unsigned int	slideAmount[4];
 				unsigned int	slideStyle;
@@ -208,6 +214,7 @@ class GameMap
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
 		void	SetupLinks();
+		bool	TraverseLink(const Zone *src, const Zone *dest);
 		void	UnloadLinks();
 
 		FString	map;
@@ -230,7 +237,11 @@ class GameMap
 		TArray<Plane>	planes;
 		TMap<unsigned int, Plane::Map *> tagMap;
 
-		unsigned short***	zoneLinks;
+		// Sound travel links.  zoneTraversed is temporary array for recursive
+		// traversals.  zoneLinks is the table of links (counts the number of
+		// links that are opened).
+		bool*				zoneTraversed;
+		unsigned short**	zoneLinks;
 };
 
 typedef GameMap::Plane::Map *	MapSpot;

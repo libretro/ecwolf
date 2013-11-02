@@ -73,6 +73,10 @@ public:
 		return t - (GenRand32() & mask & 255);
 	}
 
+	// Returns a random number in the range [0,255]. Uses the old random number
+	// table if useOld is true.
+	int RandomOld(bool useOld=true);
+
 	// HITDICE macro used in Heretic and Hexen
 	int HitDice(int count)
 	{
@@ -206,6 +210,7 @@ private:
 	} sfmt;
 	/** index counter to the 32-bit internal state array */
 	int idx;
+	BYTE oldidx;
 	/** a flag: it is 0 if and only if the internal state is not yet
 	 * initialized. */
 #ifndef NDEBUG

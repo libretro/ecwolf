@@ -503,6 +503,8 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	}
 	while(split != 0);
 
+	LookForGameData(datawadRes, basefiles, "/usr/local/share/games/wolf3d");
+
 	// Look for a steam install. (Basically from ZDoom)
 	{
 		static const struct

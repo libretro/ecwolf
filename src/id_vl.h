@@ -21,6 +21,7 @@ extern SDL_Surface *curSurface;
 extern  bool	fullscreen, usedoublebuffering;
 extern  unsigned screenWidth, screenHeight, screenBits, curPitch;
 extern  unsigned scaleFactorX, scaleFactorY;
+extern	float	screenGamma;
 
 extern	bool  screenfaded;
 

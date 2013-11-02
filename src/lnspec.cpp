@@ -268,9 +268,9 @@ class EVDoor : public Thinker
 
 		bool CheckJammed() const
 		{
-			for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+			for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 			{
-				if(!CheckClears(iter->Item()))
+				if(!CheckClears(iter))
 					return true;
 			}
 			return false;
@@ -402,12 +402,12 @@ class EVPushwall : public Thinker
 			}
 
 			// Check for any blocking actors
-			AActor::Iterator *iter = AActor::GetIterator();
+			AActor::Iterator iter = AActor::GetIterator();
 			int movex = spot->GetX();
 			int movey = spot->GetY();
-			while(iter)
+			while(iter.Next())
 			{
-				AActor *actor = iter->Item();
+				AActor *actor = iter;
 				if((actor->flags&FL_ISMONSTER) || actor->player)
 				{
 					if(actor->tilex+dirdeltax[actor->dir] == movex &&
@@ -417,7 +417,6 @@ class EVPushwall : public Thinker
 						return false;
 					}
 				}
-				iter = iter->Next();
 			}
 			return true;
 		}
@@ -619,9 +618,9 @@ class EVVictorySpin : public Thinker
 			runner->flags |= FL_PATHING;
 			runner->angle = ((direction+2)%4)*ANGLE_90;
 			runner->dir = static_cast<dirtype>(runner->angle/ANGLE_45);
-			runner->GetThinker()->SetPriority(ThinkerList::VICTORY);
+			runner->SetPriority(ThinkerList::VICTORY);
 
-			activator->GetThinker()->SetPriority(ThinkerList::VICTORY);
+			activator->SetPriority(ThinkerList::VICTORY);
 		}
 
 		void Serialize(FArchive &arc)

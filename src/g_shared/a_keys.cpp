@@ -21,11 +21,11 @@ class AKeyGiver : public AInventory
 			bool pickedup = true;
 
 			DropList *list = GetDropList();
-			DropList::Node *item = list->Head();
+			DropList::Iterator item = list->Head();
 			while(item)
 			{
-				const ClassDef *cls = ClassDef::FindClass(item->Item().className);
-				item = item->Next();
+				const ClassDef *cls = ClassDef::FindClass(item->className);
+				++item;
 
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Key)))
 				{

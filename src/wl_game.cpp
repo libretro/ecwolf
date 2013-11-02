@@ -677,6 +677,7 @@ void Died (void)
 		}
 
 		ThreeDRefresh ();
+		VH_UpdateScreen();
 		CalcTics ();
 	} while (curangle != iangle);
 
@@ -687,6 +688,7 @@ void Died (void)
 			players[0].mo->Tick();
 
 		ThreeDRefresh();
+		VH_UpdateScreen();
 		CalcTics();
 	}
 

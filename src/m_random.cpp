@@ -70,6 +70,7 @@
 //#include "c_dispatch.h"
 #include "files.h"
 #include "farchive.h"
+#include "wl_loadsave.h"
 
 // MACROS ------------------------------------------------------------------
 
@@ -98,6 +99,8 @@ FRandom M_Random;
 DWORD rngseed;
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
+
+#include "m_random_oldtable.h"
 
 FRandom *FRandom::RNGList;
 static TDeletingArray<FRandom *> NewRNGs;
@@ -195,6 +198,17 @@ FRandom::~FRandom ()
 
 //==========================================================================
 //
+// FRandom :: RandomOld
+//
+//==========================================================================
+
+int FRandom::RandomOld(bool useOld)
+{
+	return useOld ? old_rndtable[oldidx++] : (++oldidx, GenRand32()&0xFF);
+}
+
+//==========================================================================
+//
 // FRandom :: StaticClearRandom
 //
 // Initialize every RNGs. RNGs are seeded based on the global seed and their
@@ -227,6 +241,8 @@ void FRandom::Init(DWORD seed)
 	// which order they get initialized in.
 	DWORD seeds[2] = { NameCRC, seed };
 	InitByArray(seeds, 2);
+
+	oldidx = sfmt.u[0]&0xFF;
 }
 
 //==========================================================================
@@ -265,7 +281,7 @@ void FRandom::StaticWriteRNGState (FILE *file)
 		// Only write those RNGs that have names
 		if (rng->NameCRC != 0)
 		{
-			arc << rng->NameCRC << rng->idx;
+			arc << rng->NameCRC << rng->idx << rng->oldidx;
 			for (int i = 0; i < SFMT::N32; ++i)
 			{
 				arc << rng->sfmt.u[i];
@@ -309,6 +325,8 @@ void FRandom::StaticReadRNGState (PNGHandle *png)
 				if (rng->NameCRC == crc)
 				{
 					arc << rng->idx;
+					if(GameSave::SaveVersion >= 1379630950u)
+						arc << rng->oldidx;
 					for (int i = 0; i < SFMT::N32; ++i)
 					{
 						arc << rng->sfmt.u[i];
@@ -321,6 +339,8 @@ void FRandom::StaticReadRNGState (PNGHandle *png)
 				int idx;
 				DWORD sfmt;
 				arc << idx;
+				if(GameSave::SaveVersion >= 1379630950u)
+					arc << rng->oldidx;
 				for (int i = 0; i < SFMT::N32; ++i)
 				{
 					arc << sfmt;

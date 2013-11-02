@@ -35,6 +35,7 @@
 #include "c_cvars.h"
 #include "config.h"
 #include "wl_def.h"
+#include "am_map.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_us.h"
@@ -78,6 +79,8 @@ void FinalReadConfig()
 	if (!IN_JoyPresent())
 		joystickenabled = false;
 
+	AM_UpdateFlags();
+
 	doWriteConfig = true;
 }
 
@@ -110,6 +113,11 @@ void ReadConfig(void)
 	config.CreateSetting("ScreenHeight", screenHeight);
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
+	config.CreateSetting("Gamma", 1.0f);
+	config.CreateSetting("AM_Rotate", false);
+	config.CreateSetting("AM_DrawTexturedWalls", false);
+	config.CreateSetting("AM_DrawFloors", false);
+	config.CreateSetting("AM_DrawBackground", true);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -152,6 +160,11 @@ void ReadConfig(void)
 	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
+	screenGamma = config.GetSetting("Gamma")->GetFloat();
+	am_rotate = config.GetSetting("AM_Rotate")->GetInteger() != 0;
+	am_drawtexturedwalls = config.GetSetting("AM_DrawTexturedWalls")->GetInteger() != 0;
+	am_drawfloors = config.GetSetting("AM_DrawFloors")->GetInteger() != 0;
+	am_drawbackground = config.GetSetting("AM_DrawBackground")->GetInteger() != 0;
 
 	char hsName[50];
 	char hsScore[50];
@@ -241,6 +254,11 @@ void WriteConfig(void)
 	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
 	config.GetSetting("MoveBob")->SetValue(movebob);
+	config.GetSetting("Gamma")->SetValue(screenGamma);
+	config.GetSetting("AM_Rotate")->SetValue(am_rotate);
+	config.GetSetting("AM_DrawTexturedWalls")->SetValue(am_drawtexturedwalls);
+	config.GetSetting("AM_DrawFloors")->SetValue(am_drawfloors);
+	config.GetSetting("AM_DrawBackground")->SetValue(am_drawbackground);
 
 	char hsName[50];
 	char hsScore[50];

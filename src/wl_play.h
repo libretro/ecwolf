@@ -48,7 +48,7 @@ void    PlayLoop (void);
 void    InitRedShifts (void);
 void    FinishPaletteShifts (void);
 
-void    PollControls (void);
+void    PollControls (bool);
 int     StopMusic(void);
 void    StartMusic(void);
 void    ContinueMusic(int offs);

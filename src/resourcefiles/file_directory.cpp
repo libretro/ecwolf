@@ -212,7 +212,7 @@ int FDirectory::AddDirectory(const char *dirpath)
 		if (directory == NULL)
 		{
 			Printf("Could not read directory: %s\n", strerror(errno));
-+			return 0;
+			return 0;
 		}
 
 		struct dirent *file;

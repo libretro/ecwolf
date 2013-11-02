@@ -39,7 +39,7 @@
 #include "wl_def.h"
 #include "name.h"
 #include "linkedlist.h"
-#include "actor.h"
+#include "actordef.h"
 #include "dobject.h"
 
 class Thinker;
@@ -62,7 +62,7 @@ extern class ThinkerList
 		ThinkerList();
 		~ThinkerList();
 
-		typedef LinkedList<Thinker *>::Node *Iterator;
+		typedef EmbeddedList<Thinker>::Iterator Iterator;
 
 		Iterator GetHead(Priority list) { return thinkers[list].Head(); }
 		void	DestroyAll(Priority start=FIRST_TICKABLE);
@@ -78,20 +78,24 @@ extern class ThinkerList
 	private:
 		// nxetThinker allows us to skip over thinkers that we were about to
 		// think, but end up being destroyed.
-		Iterator				nextThinker;
-		LinkedList<Thinker *>	thinkers[NUM_TYPES];
+		Iterator					nextThinker;
+		EmbeddedList<Thinker>::List	thinkers[NUM_TYPES];
 } *thinkerList;
 
-class Thinker : public DObject
+class Thinker : public DObject, public EmbeddedList<Thinker>::Node
 {
 	DECLARE_ABSTRACT_CLASS(Thinker, DObject)
 
 	public:
-		Thinker(ThinkerList::Priority priority=ThinkerList::NORMAL);
+		Thinker();
+		Thinker(ThinkerList::Priority priority);
 
+		void			Activate(ThinkerList::Priority priority=ThinkerList::NORMAL);
+		void			Deactivate();
 		void			Destroy();
 		template<class T>
 		bool			IsThinkerType() { return IsA(T::__StaticClass); }
+		bool			IsThinking() const { return EmbeddedList<Thinker>::List::IsLinked(this); }
 		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
 		virtual void	PostBeginPlay() {}
@@ -101,7 +105,6 @@ class Thinker : public DObject
 		friend class ThinkerList;
 
 		ThinkerList::Priority		thinkerPriority;
-		LinkedList<Thinker *>::Node	*thinkerRef;
 };
 
 #endif

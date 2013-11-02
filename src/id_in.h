@@ -98,6 +98,8 @@ typedef	int		ScanCode;
 #define sc_Comma		SCANCODE_UNMASK(SDLK_COMMA)
 #define sc_Peroid		SCANCODE_UNMASK(SDLK_PERIOD)
 
+#define sc_Grave		SCANCODE_UNMASK(SDLK_BACKQUOTE)
+
 #define	key_None		0
 
 typedef	enum		{

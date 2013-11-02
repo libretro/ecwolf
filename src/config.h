@@ -44,21 +44,31 @@ struct SettingsData
 		enum SettingType
 		{
 			ST_INT,
+			ST_FLOAT,
 			ST_STR
 		};
 
-		SettingsData(int integer=0) : type(ST_INT), integer(0), str("") { SetValue(integer); }
-		SettingsData(FString str) : type(ST_STR), integer(0), str("") { SetValue(str); }
+		SettingsData(int integer=0) : type(ST_INT), str("") { SetValue(integer); }
+		SettingsData(unsigned int integer) : type(ST_INT), str("") { SetValue(integer); }
+		SettingsData(double decimal) : type(ST_FLOAT), str("") { SetValue(decimal); }
+		SettingsData(FString str) : type(ST_STR), str("") { SetValue(str); integer = 0; }
 
 		const int			GetInteger() { return integer; }
+		const double		GetFloat() { return decimal; }
 		const FString		GetString()	{ return str; }
 		const SettingType	GetType() { return type; }
 		void				SetValue(int integer) { this->integer = integer;this->type = ST_INT; }
+		void				SetValue(unsigned int integer) { SetValue((int)integer); }
+		void				SetValue(double decimal) { this->decimal = decimal;this->type = ST_FLOAT; }
 		void				SetValue(FString str) { this->str = str;this->type = ST_STR; }
 
 	protected:
 		SettingType		type;
-		int				integer;
+		union
+		{
+			double		decimal;
+			int			integer;
+		};
 		FString			str;
 };
 
@@ -72,7 +82,9 @@ class Config
 		 * Creates the specified setting if it hasn't been made already.  It 
 		 * will be set to the default value.
 		 */
-		void			CreateSetting(const FName index, unsigned int defaultInt);
+		void			CreateSetting(const FName index, int defaultInt);
+		void			CreateSetting(const FName index, unsigned int defaultInt) { CreateSetting(index, (int)defaultInt); }
+		void			CreateSetting(const FName index, double defaultFloat);
 		void			CreateSetting(const FName index, FString defaultString);
 		FString			GetConfigDir() const { return configDir; }
 		/**

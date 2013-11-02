@@ -119,9 +119,17 @@ void Config::ReadConfig()
 			else
 			{
 				bool negative = sc.CheckToken('-');
-				sc.MustGetToken(TK_IntConst);
-				CreateSetting(index, 0);
-				GetSetting(index)->SetValue(negative ? -sc->number : sc->number);
+				if(sc.CheckToken(TK_IntConst))
+				{
+					CreateSetting(index, 0);
+					GetSetting(index)->SetValue(negative ? -sc->number : sc->number);
+				}
+				else
+				{
+					sc.MustGetToken(TK_FloatConst);
+					CreateSetting(index, 0.0f);
+					GetSetting(index)->SetValue(negative ? -sc->decimal : sc->decimal);
+				}
 			}
 			sc.MustGetToken(';');
 		}
@@ -163,6 +171,14 @@ void Config::SaveConfig()
 				if(ferror(stream))
 					return;
 			}
+			else if(data->GetType() == SettingsData::ST_FLOAT)
+			{
+				FString value;
+				value.Format(" = %f;\n", data->GetFloat());
+				fwrite(value.GetChars(), 1, value.Len(), stream);
+				if(ferror(stream))
+					return;
+			}
 			else
 			{
 				FString str = data->GetString(); // Make a non const copy of the string.
@@ -179,12 +195,22 @@ void Config::SaveConfig()
 	}
 }
 
-void Config::CreateSetting(const FName index, unsigned int defaultInt)
+void Config::CreateSetting(const FName index, int defaultInt)
 {
 	SettingsData *data;
 	if(!FindIndex(index, data))
 	{
 		data = new SettingsData(defaultInt);
+		settings[index] = data;
+	}
+}
+
+void Config::CreateSetting(const FName index, double defaultFloat)
+{
+	SettingsData *data;
+	if(!FindIndex(index, data))
+	{
+		data = new SettingsData(defaultFloat);
 		settings[index] = data;
 	}
 }

@@ -36,124 +36,12 @@
 #define __ACTOR_H__
 
 #include "wl_def.h"
+#include "actordef.h"
 #include "gamemap.h"
 #include "linkedlist.h"
 #include "name.h"
 #include "dobject.h"
-
-#define DECLARE_ABSTRACT_CLASS(name, parent) \
-	friend class ClassDef; \
-	private: \
-		typedef parent Super; \
-		typedef name ThisClass; \
-	protected: \
-		name(const ClassDef *classType) : parent(classType) {} \
-		virtual const ClassDef *__StaticType() const { return __StaticClass; } \
-	public: \
-		static const ClassDef *__StaticClass; \
-		static const size_t __PointerOffsets[];
-#define DECLARE_CLASS(name, parent) \
-	DECLARE_ABSTRACT_CLASS(name, parent) \
-	protected: \
-		static DObject *__InPlaceConstructor(const ClassDef *classType, void *mem); \
-	public:
-#define DECLARE_NATIVE_CLASS(name, parent) DECLARE_CLASS(A##name, A##parent)
-#define HAS_OBJECT_POINTERS
-#define __IMPCLS_ABSTRACT(cls, name) \
-	const ClassDef *cls::__StaticClass = ClassDef::DeclareNativeClass<cls>(name, &Super::__StaticClass);
-#define __IMPCLS(cls, name) \
-	__IMPCLS_ABSTRACT(cls, name) \
-	DObject *cls::__InPlaceConstructor(const ClassDef *classType, void *mem) { return new ((EInPlace *) mem) cls(classType); }
-#define IMPLEMENT_ABSTRACT_CLASS(cls) \
-	__IMPCLS_ABSTRACT(cls, #cls) \
-	const size_t cls::__PointerOffsets[] = { ~(size_t)0 };
-#define IMPLEMENT_INTERNAL_CLASS(cls) \
-	__IMPCLS(cls, #cls) \
-	const size_t cls::__PointerOffsets[] = { ~(size_t)0 };
-#define IMPLEMENT_INTERNAL_POINTY_CLASS(cls) \
-	__IMPCLS(cls, #cls) \
-	const size_t cls::__PointerOffsets[] = {
-#define IMPLEMENT_CLASS(name) \
-	__IMPCLS(A##name, #name) \
-	const size_t A##name::__PointerOffsets[] = { ~(size_t)0 };
-#define IMPLEMENT_POINTY_CLASS(name) \
-	__IMPCLS(A##name, #name) \
-	const size_t A##name::__PointerOffsets[] = {
-// Similar to typeoffsetof, but doesn't cast to int.
-#define DECLARE_POINTER(ptr) \
-	(size_t)&((ThisClass*)1)->ptr - 1,
-#define END_POINTERS ~(size_t)0 };
-#define NATIVE_CLASS(name) A##name::__StaticClass
-
-class AActor;
-class CallArguments;
-class ExpressionNode;
-
-typedef uint32_t flagstype_t;
-typedef void (*ActionPtr)(AActor *, AActor *, const class Frame * const, const CallArguments &);
-
-class Frame
-{
-	public:
-		~Frame();
-		int GetTics() const;
-
-		union
-		{
-			char	sprite[4];
-			uint32_t isprite;
-		};
-		uint8_t		frame;
-		int			duration;
-		unsigned	randDuration;
-		bool		fullbright;
-		class ActionCall
-		{
-			public:
-				ActionPtr		pointer;
-				CallArguments	*args;
-
-				void operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const;
-		} action, thinker;
-		const Frame	*next;
-		unsigned int	index;
-
-		unsigned int	spriteInf;
-
-		bool	freeActionArgs;
-};
-FArchive &operator<< (FArchive &arc, const Frame *&frame);
-
-// This class allows us to store pointers into the meta table and ensures that
-// the pointers get deleted when the game exits.
-template<class T>
-class PointerIndexTable
-{
-public:
-	~PointerIndexTable()
-	{
-		Clear();
-	}
-
-	void Clear()
-	{
-		for(unsigned int i = 0;i < objects.Size();++i)
-			delete objects[i];
-		objects.Clear();
-	}
-
-	unsigned int Push(T *object)
-	{
-		return objects.Push(object);
-	}
-
-	T *operator[] (unsigned int index)
-	{
-		return objects[index];
-	}
-private:
-	TArray<T*>	objects;
-};
+#include "thinker.h"
 
 enum
 {
@@ -162,7 +50,16 @@ enum
 	AMETA_Damage,
 	AMETA_DropItems,
 	AMETA_SecretDeathSound,
-	AMETA_GibHealth
+	AMETA_GibHealth,
+	AMETA_DefaultHealth1,
+	AMETA_DefaultHealth2,
+	AMETA_DefaultHealth3,
+	AMETA_DefaultHealth4,
+	AMETA_DefaultHealth5,
+	AMETA_DefaultHealth6,
+	AMETA_DefaultHealth7,
+	AMETA_DefaultHealth8,
+	AMETA_DefaultHealth9
 };
 
 enum
@@ -172,12 +69,14 @@ enum
 };
 
 class player_t;
-class AActorProxy;
 class ClassDef;
 class AInventory;
-class AActor : public DObject
+class AActor : public Thinker,
+	public EmbeddedList<AActor>::Node
 {
-	DECLARE_CLASS(AActor, DObject)
+	typedef EmbeddedList<AActor>::Node ActorLink;
+
+	DECLARE_CLASS(AActor, Thinker)
 	HAS_OBJECT_POINTERS
 
 	public:
@@ -192,7 +91,6 @@ class AActor : public DObject
 
 		void			AddInventory(AInventory *item);
 		virtual void	BeginPlay() {}
-		Thinker			*GetThinker();
 		virtual void	Destroy();
 		virtual void	Die();
 		void			EnterZone(const MapZone *zone);
@@ -254,7 +152,6 @@ class AActor : public DObject
 		angle_t	angle;
 		angle_t pitch;
 		int32_t	health;
-		short	defaultHealth[9];
 		int32_t	speed, runspeed;
 		int		points;
 		fixed	radius;
@@ -286,16 +183,13 @@ class AActor : public DObject
 
 		TObjPtr<AInventory>	inventory;
 
-		typedef LinkedList<AActor *>::Node Iterator;
-		static LinkedList<AActor *>	actors;
-		LinkedList<AActor *>::Node	*actorRef;
-		static Iterator *GetIterator() { return actors.Head(); }
+		static EmbeddedList<AActor>::List actors;
+		typedef EmbeddedList<AActor>::Iterator Iterator;
+		static Iterator GetIterator() { return Iterator(actors); }
 	protected:
-		friend class AActorProxy;
 		void	Init();
 
 		const MapZone	*soundZone;
-		TObjPtr<AActorProxy> thinker;
 };
 
 #endif

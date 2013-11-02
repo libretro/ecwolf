@@ -23,6 +23,7 @@
 #include "wl_play.h"
 #include "g_mapinfo.h"
 #include "a_inventory.h"
+#include "am_map.h"
 
 /*
 =============================================================================
@@ -90,6 +91,7 @@ ControlScheme controlScheme[] =
 	{ bt_altattack,			"Alt Attack",	-1,			-1,				-1, NULL, 0 },
 	{ bt_reload,			"Reload",		-1,			-1,				-1, NULL, 0 },
 	{ bt_zoom,				"Zoom",			-1,			-1,				-1, NULL, 0 },
+	{ bt_automap,			"Automap",		-1,			-1,				-1, NULL, 0 },
 
 	// End of List
 	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
@@ -152,7 +154,6 @@ int lastgamemusicoffset = 0;
 
 
 void CenterWindow (word w, word h);
-void PollControls (void);
 int StopMusic (void);
 void StartMusic (void);
 void ContinueMusic (int offs);
@@ -319,7 +320,9 @@ void PollJoystickMove (void)
 =
 = PollControls
 =
-= Gets user or demo input, call once each frame
+= Gets user or demo input
+= Enable absolute positioning once per frame. This prevents absolute devices
+= from being carried over to adaptive tics.
 =
 = controlx              set between -100 and 100 per tic
 = controly
@@ -329,32 +332,10 @@ void PollJoystickMove (void)
 ===================
 */
 
-void PollControls (void)
+void PollControls (bool absolutes)
 {
 	int i;
 	byte buttonbits;
-
-	IN_ProcessEvents();
-
-//
-// get timing info for last frame
-//
-	if (demoplayback || demorecord)   // demo recording and playback needs to be constant
-	{
-		// wait up to DEMOTICS Wolf tics
-		uint32_t curtime = SDL_GetTicks();
-		lasttimecount += DEMOTICS;
-		int32_t timediff = (lasttimecount * 100) / 7 - curtime;
-		if(timediff > 0)
-			SDL_Delay(timediff);
-
-		if(timediff < -2 * DEMOTICS)       // more than 2-times DEMOTICS behind?
-			lasttimecount = (curtime * 7) / 100;    // yes, set to current timecount
-
-		tics = DEMOTICS;
-	}
-	else
-		CalcTics ();
 
 	controlx = 0;
 	controly = 0;
@@ -400,7 +381,7 @@ void PollControls (void)
 //
 	PollKeyboardMove ();
 
-	if (mouseenabled && IN_IsInputGrabbed())
+	if (absolutes && mouseenabled && IN_IsInputGrabbed())
 		PollMouseMove ();
 
 	if (joystickenabled)
@@ -430,8 +411,49 @@ void PollControls (void)
 	}
 }
 
+// This should be called once per frame
+void ProcessEvents()
+{
+	IN_ProcessEvents();
+
+//
+// get timing info for last frame
+//
+	if (demoplayback || demorecord)   // demo recording and playback needs to be constant
+	{
+		// wait up to DEMOTICS Wolf tics
+		uint32_t curtime = SDL_GetTicks();
+		lasttimecount += DEMOTICS;
+		int32_t timediff = (lasttimecount * 100) / 7 - curtime;
+		if(timediff > 0)
+			SDL_Delay(timediff);
+
+		if(timediff < -2 * DEMOTICS)       // more than 2-times DEMOTICS behind?
+			lasttimecount = (curtime * 7) / 100;    // yes, set to current timecount
+
+		tics = DEMOTICS;
+	}
+	else
+		CalcTics ();
+}
+
 //===========================================================================
 
+
+void BumpGamma()
+{
+	screenGamma += 0.1f;
+	if(screenGamma > 3.0f)
+		screenGamma = 1.0f;
+	screen->SetGamma(screenGamma);
+	US_CenterWindow (10,2);
+	FString msg;
+	msg.Format("Gamma: %g", screenGamma);
+	US_PrintCentered (msg);
+	VW_UpdateScreen();
+	VW_UpdateScreen();
+	IN_Ack();
+}
 
 /*
 =====================
@@ -453,7 +475,17 @@ void CheckKeys (void)
 	scan = LastScan;
 
 	// [BL] Allow changing the screen size with the -/= keys a la Doom.
-	if(changeSize)
+	if(automap)
+	{
+		if(Keyboard[sc_Equals] ^ Keyboard[sc_Minus])
+		{
+			if(Keyboard[sc_Equals])
+				AM_Main.SetScale(FRACUNIT*1.05, true);
+			else
+				AM_Main.SetScale(FRACUNIT*0.95, true);
+		}
+	}
+	else if(changeSize)
 	{
 		if(Keyboard[sc_Equals] && !Keyboard[sc_Minus])
 			NewViewSize(viewsize+1);
@@ -577,10 +609,16 @@ void CheckKeys (void)
 		return;
 	}
 
+	if(scan == sc_F11)
+	{
+		BumpGamma();
+		return;
+	}
+
 //
 // TAB-? debug keys
 //
-	if (Keyboard[sc_Tab] && DebugOk)
+	if ((Keyboard[sc_Tab] || Keyboard[sc_BackSpace] || Keyboard[sc_Grave]) && DebugOk)
 	{
 		if (DebugKeys () && viewsize < 20)
 			DrawPlayBorder ();       // dont let the blue borders flash
@@ -825,26 +863,35 @@ void PlayLoop (void)
 
 	do
 	{
-		PollControls ();
+		ProcessEvents();
+
+		// Check automap toggle before we set any buttons as held
+		if (buttonstate[bt_automap] && !buttonheld[bt_automap])
+		{
+			automap ^= 1;
+		}
 
 //
 // actor thinking
 //
 		madenoise = false;
 
+		// Run tics
 		for (unsigned int i = 0;i < tics;++i)
 		{
+			PollControls(!i);
+
 			++gamestate.TimeCount;
 			thinkerList->Tick();
 			AActor::FinishSpawningActors();
-
-			if(i == 0) // After the first tic, go ahead and take care of button holding.
-				memcpy(buttonheld, buttonstate, sizeof (buttonstate));
 		}
 
 		UpdatePaletteShifts ();
 
 		ThreeDRefresh ();
+
+		if(automap)
+			BasicOverhead();
 
 		//
 		// MAKE FUNNY FACE IF BJ DOESN'T MOVE FOR AWHILE
@@ -862,6 +909,8 @@ void PlayLoop (void)
 		StatusBar->Tick();
 		if((gamestate.TimeCount & 1) || !(tics & 1))
 			StatusBar->DrawStatusBar();
+
+		VH_UpdateScreen();
 //
 // debug aids
 //

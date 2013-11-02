@@ -58,3 +58,8 @@ end
 	play world/pushwall_heavy
 	nostopcutoff
 end
+
+:PushwallArk
+	playrepeat world/pushwall_ark
+	nostopcutoff
+end

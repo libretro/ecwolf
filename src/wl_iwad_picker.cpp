@@ -1,6 +1,22 @@
 // From ZDoom!
 
+#include <algorithm>
+
 #include "zdoomsupport.h"
+
+#ifdef USE_TEXTSCREEN
+#include "textscreen.h"
+
+int I_WADSEL = -1;
+txt_window_t *window;
+
+void TXT_PickWad(TXT_UNCAST_ARG(widget), int wad)
+{
+	I_WADSEL = wad;
+
+	TXT_CloseWindow(window);
+}
+#endif
 
 #ifndef NO_GTK
 #include <gtk/gtk.h>
@@ -192,6 +208,10 @@ int I_PickIWad_Gtk (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 }
 #endif
 
+bool sortwad(WadStuff const & wada, WadStuff const & wadb) {
+	return !(wada.Name.Compare(wadb.Name) < 0);
+}
+
 int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 {
 	int i;
@@ -272,7 +292,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 #elif defined(__APPLE__)
 	return I_PickIWad_Cocoa (wads, numwads, showwin, defaultiwad);
 #endif
-	
+#ifndef USE_TEXTSCREEN
 	printf ("Please select a game wad (or 0 to exit):\n");
 	for (i = 0; i < numwads; ++i)
 	{
@@ -294,4 +314,50 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 	if (i > numwads)
 		return numwads-1;
 	return i-1;
+#else
+	if (!TXT_Init())
+	{
+		fprintf(stderr, "Failed to initialise GUI\n");
+		exit(-1);
+	}
+
+    TXT_SetDesktopTitle(const_cast<char*>(GAMESIG" "DOTVERSIONSTR": Select an IWAD to use"));
+	window = TXT_NewWindow(const_cast<char*>("Pick a game wad"));
+	txt_table_t *table = TXT_NewTable(1);
+
+	std::sort(wads, wads+numwads, sortwad);
+
+	for (i = 0; i < numwads; ++i)
+	{
+		FString filepart;
+		if(wads[i].Path.Size() == 1)
+		{
+			filepart = strrchr(wads[i].Path[0], '/');
+			if(filepart.IsEmpty())
+				filepart = wads[i].Path[0];
+			else
+				filepart.Mid(1);
+		}
+		else
+			filepart.Format("*.%s", wads[i].Extension.GetChars());
+
+		TXT_AddWidget(table, TXT_NewButton2((char*)wads[i].Name.GetChars(), (void (*)(void*, void*))TXT_PickWad, (void*)(intptr_t)i));
+
+	}
+
+	TXT_AddWidget(window, TXT_NewScrollPane(0, (numwads < 10) ? numwads : 10, table));
+	TXT_GUIMainLoop();
+
+	TXT_Shutdown();
+
+	if (I_WADSEL > -1)
+		return I_WADSEL;
+	else
+	{
+		printf("User canceled.\n");
+		exit(-1);
+	}
+
+	return i-1;
+#endif
 }

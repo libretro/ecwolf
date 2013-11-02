@@ -163,10 +163,10 @@ ACTION_FUNCTION(A_BossDeath)
 	ADeathCam *deathcam = NULL;
 
 	bool alldead = true;
-	AActor::Iterator *iter = AActor::GetIterator();
-	while(iter)
+	AActor::Iterator iter = AActor::GetIterator();
+	while(iter.Next())
 	{
-		AActor * const other = iter->Item();
+		AActor * const other = iter;
 
 		if(other != self)
 		{
@@ -181,7 +181,6 @@ ACTION_FUNCTION(A_BossDeath)
 				}
 			}
 		}
-		iter = iter->Next();
 	}
 
 	if(!alldead)
@@ -320,9 +319,9 @@ ACTION_FUNCTION(A_Explode)
 		madenoise = true;
 
 	const double rolloff = 1.0/static_cast<double>(radius - fulldamageradius);
-	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
-		AActor * const target = iter->Item();
+		AActor * const target = iter;
 
 		// Calculate distance from origin to outer bound of target actor
 		const fixed dist = MAX(0, MAX(ABS(target->x - self->x), ABS(target->y - self->y)) - target->radius) >> (FRACBITS - 6);

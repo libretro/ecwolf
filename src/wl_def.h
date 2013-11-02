@@ -72,6 +72,8 @@ void Quit(const char *errorStr, ...);
 
 #define abs(x) ABS(x)
 
+#define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
+
 #ifdef _WIN32
 #define stricmp _stricmp
 #endif
@@ -220,6 +222,7 @@ typedef enum
 	FL_RANDOMIZE		= 0x01000000,
 	FL_RIPPER			= 0x02000000,
 	FL_DONTRIP			= 0x04000000,
+	FL_OLDRANDOMCHASE	= 0x08000000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
 
@@ -303,6 +306,7 @@ enum Button
 	bt_altattack,
 	bt_reload,
 	bt_zoom,
+	bt_automap,
 	NUMBUTTONS
 };
 
