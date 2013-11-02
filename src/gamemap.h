@@ -214,6 +214,7 @@ class GameMap
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
 		void	SetupLinks();
+		bool	TraverseLink(const Zone *src, const Zone *dest);
 		void	UnloadLinks();
 
 		FString	map;
@@ -236,7 +237,11 @@ class GameMap
 		TArray<Plane>	planes;
 		TMap<unsigned int, Plane::Map *> tagMap;
 
-		unsigned short***	zoneLinks;
+		// Sound travel links.  zoneTraversed is temporary array for recursive
+		// traversals.  zoneLinks is the table of links (counts the number of
+		// links that are opened).
+		bool*				zoneTraversed;
+		unsigned short**	zoneLinks;
 };
 
 typedef GameMap::Plane::Map *	MapSpot;
