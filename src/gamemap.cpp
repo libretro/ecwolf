@@ -584,6 +584,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 		<< gm->header.tileSize;
 
 	// zoneLinks
+	if(GameSave::SaveVersion >= 1383348286)
 	{
 		unsigned int zone = gm->zonePalette.Size();
 		while(--zone > 0) // We don't care about == 0 since it's always 1
@@ -593,6 +594,41 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 				arc << gm->zoneLinks[zone][i];
 		}
 	}
+	else
+	{
+		// Old zoneLinks
+		// It would probably be too much work to try to convert this, so we'll
+		// just read past it and let the game be a little inconsistent.  Most
+		// people won't notice and in most cases the level will fix itself after
+		// some time elapses.
+		uint32_t packing = 0;
+		unsigned short shift = 0;
+		unsigned int x = 0;
+		unsigned int y = 1;
+		unsigned int max = 1;
+
+		arc << packing;
+
+		do
+		{
+			//gm->zoneLinks[x][y] = (packing>>(shift++))&1;
+			++shift;
+
+			if(++x >= max)
+			{
+				x = 0;
+				++y;
+				++max;
+			}
+
+			if(shift == sizeof(packing)*8)
+			{
+				arc << packing;
+				shift = 0;
+			}
+		}
+		while(y < gm->zonePalette.Size());
+	}
 
 	// Serialize any map information that may change
 	for(unsigned int p = 0;p < gm->NumPlanes();++p)
@@ -600,6 +636,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 		MapPlane &plane = gm->planes[p];
 
 		arc << plane.depth;
+		assert(plane.depth == 64);
 		if(!arc.IsStoring())
 			plane.gm = gm;
 
