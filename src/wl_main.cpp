@@ -1254,6 +1254,13 @@ void StartupWin32();
 #endif
 int main (int argc, char *argv[])
 {
+#ifndef _WIN32
+	// Set LC_NUMERIC environment variable in case some library decides to
+	// clear the setlocale call at least this will be correct.
+	// Note that the LANG environment variable is overridden by LC_*
+	setenv ("LC_NUMERIC", "C", 1);
+#endif
+
 #ifndef NO_GTK
 	GtkAvailable = gtk_init_check(&argc, &argv);
 #endif
