@@ -31,16 +31,18 @@ THIS SOFTWARE.
 #include "gdtoaimp.h"
 #include <string.h>
 
+ extern ULong NanDflt_d_D2A[2];
+
  char *
 #ifdef KR_headers
-g_ddfmt(buf, dd0, ndig, bufsize) char *buf; double *dd0; int ndig; size_t bufsize;
+g_ddfmt_p(buf, dd0, ndig, bufsize, nik) char *buf; double *dd0; int ndig; size_t bufsize; int nik;
 #else
-g_ddfmt(char *buf, double *dd0, int ndig, size_t bufsize)
+g_ddfmt_p(char *buf, double *dd0, int ndig, size_t bufsize, int nik)
 #endif
 {
 	FPI fpi;
 	char *b, *s, *se;
-	ULong *L, bits0[4], *bits, *zx;
+	ULong *L, bits0[4], *bits, sign, *zx;
 	int bx, by, decpt, ex, ey, i, j, mode;
 	Bigint *x, *y, *z;
 	U *dd, ddx[2];
@@ -65,11 +67,29 @@ g_ddfmt(char *buf, double *dd0, int ndig, size_t bufsize)
 
 	dd = (U*)dd0;
 	L = dd->L;
+	sign = L[_0] & L[2+_0] & 0x80000000L;
+	if (nik < 0 || nik > 35)
+		nik = 0;
 	if ((L[_0] & 0x7ff00000L) == 0x7ff00000L) {
 		/* Infinity or NaN */
 		if (L[_0] & 0xfffff || L[_1]) {
  nanret:
-			return strcp(buf, "NaN");
+			b = buf;
+			if (sign && nik < 18)
+				*b++ = '-';
+			b = strcp(b, NanName[nik%3]);
+			if (nik > 5 && (nik < 12
+					|| L[_1] != NanDflt_d_D2A[0]
+					|| (L[_0] ^ NanDflt_d_D2A[1]) & 0xfffff
+					||  L[2+_1] != NanDflt_d_D2A[0]
+					|| (L[2+_0] ^ NanDflt_d_D2A[1]) & 0xfffff)) {
+				bits0[0] = L[2+_1];
+				bits0[1] = (L[2+_0] & 0xfffff) | (L[_1] << 20);
+				bits0[2] = (L[_1] >> 12) | (L[_0] << 20);
+				bits0[3] = (L[_0] >> 12) & 0xff;
+				b = add_nanbits(b, bufsize - (b-buf), bits0, 4);
+				}
+			return b;
 			}
 		if ((L[2+_0] & 0x7ff00000) == 0x7ff00000) {
 			if (L[2+_0] & 0xfffff || L[2+_1])
@@ -81,7 +101,7 @@ g_ddfmt(char *buf, double *dd0, int ndig, size_t bufsize)
 		b = buf;
 		if (L[_0] & 0x80000000L)
 			*b++ = '-';
-		return strcp(b, "Infinity");
+		return strcp(b, InfName[nik%6]);
 		}
 	if ((L[2+_0] & 0x7ff00000) == 0x7ff00000) {
 		L += 2;
@@ -92,7 +112,7 @@ g_ddfmt(char *buf, double *dd0, int ndig, size_t bufsize)
 	if (dval(&dd[0]) + dval(&dd[1]) == 0.) {
 		b = buf;
 #ifndef IGNORE_ZERO_SIGN
-		if (L[_0] & L[2+_0] & 0x80000000L)
+		if (sign)
 			*b++ = '-';
 #endif
 		*b++ = '0';

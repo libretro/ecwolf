@@ -46,7 +46,7 @@ rv_alloc(int i)
 
 	j = sizeof(ULong);
 	for(k = 0;
-		sizeof(Bigint) - sizeof(ULong) - sizeof(int) + j <= (size_t)i;
+		sizeof(Bigint) - sizeof(ULong) - sizeof(int) + j <= i;
 		j <<= 1)
 			k++;
 	r = (int*)Balloc(k);
@@ -141,7 +141,7 @@ quorem
 			carry = ys >> 32;
 			y = *bx - (ys & 0xffffffffUL) - borrow;
 			borrow = y >> 32 & 1UL;
-			*bx++ = (ULong)(y & 0xffffffffUL);
+			*bx++ = y & 0xffffffffUL;
 #else
 #ifdef Pack_32
 			si = *sx++;
@@ -182,7 +182,7 @@ quorem
 			carry = ys >> 32;
 			y = *bx - (ys & 0xffffffffUL) - borrow;
 			borrow = y >> 32 & 1UL;
-			*bx++ = (ULong)(y & 0xffffffffUL);
+			*bx++ = y & 0xffffffffUL;
 #else
 #ifdef Pack_32
 			si = *sx++;

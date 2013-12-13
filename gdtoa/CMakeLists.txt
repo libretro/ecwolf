@@ -35,12 +35,17 @@ add_library( gdtoa
 	dmisc.c
 	dtoa.c
 	g_Qfmt.c
+	g_Qfmt_p.c
 	g__fmt.c
 	g_ddfmt.c
+	g_ddfmt_p.c
 	g_dfmt.c
 	g_ffmt.c
+	g_ffmt_p.c
 	g_xLfmt.c
+	g_xLfmt_p.c
 	g_xfmt.c
+	g_xfmt_p.c
 	gdtoa.c
 	gethex.c
 	gmisc.c

@@ -2,7 +2,7 @@
 
 The author of this software is David M. Gay.
 
-Copyright (C) 1998, 2000 by Lucent Technologies
+Copyright (C) 1998 by Lucent Technologies
 All Rights Reserved
 
 Permission to use, copy, modify, and distribute this software and
@@ -31,34 +31,18 @@ THIS SOFTWARE.
 
 #include "gdtoaimp.h"
 
-#undef _0
-#undef _1
-
-/* one or the other of IEEE_MC68k or IEEE_8087 should be #defined */
-
-#ifdef IEEE_MC68k
-#define _0 0
-#define _1 1
-#define _2 2
-#define _3 3
-#endif
-#ifdef IEEE_8087
-#define _0 3
-#define _1 2
-#define _2 1
-#define _3 0
-#endif
+ extern ULong NanDflt_d_D2A[2];
 
  char*
 #ifdef KR_headers
-g_Qfmt(buf, V, ndig, bufsize) char *buf; char *V; int ndig; size_t bufsize;
+g_dfmt_p(buf, d, ndig, bufsize, nik) char *buf; double *d; int ndig; size_t bufsize; int nik;
 #else
-g_Qfmt(char *buf, void *V, int ndig, size_t bufsize)
+g_dfmt_p(char *buf, double *d, int ndig, size_t bufsize, int nik)
 #endif
 {
-	static FPI fpi0 = { 113, 1-16383-113+1, 32766 - 16383 - 113 + 1, 1, 0, Int_max };
+	static FPI fpi0 = { 53, 1-1023-53+1, 2046-1023-53+1, 1, 0, Int_max };
 	char *b, *s, *se;
-	ULong bits[4], *L, sign;
+	ULong bits[2], *L, sign;
 	int decpt, ex, i, mode;
 #ifdef Honor_FLT_ROUNDS
 #include "gdtoa_fltrnds.h"
@@ -71,49 +55,56 @@ g_Qfmt(char *buf, void *V, int ndig, size_t bufsize)
 	if (bufsize < ndig + 10)
 		return 0;
 
-	L = (ULong*)V;
+	L = (ULong*)d;
 	sign = L[_0] & 0x80000000L;
-	bits[3] = L[_0] & 0xffff;
-	bits[2] = L[_1];
-	bits[1] = L[_2];
-	bits[0] = L[_3];
-	b = buf;
-	if ( (ex = (L[_0] & 0x7fff0000L) >> 16) !=0) {
-		if (ex == 0x7fff) {
-			/* Infinity or NaN */
-			if (bits[0] | bits[1] | bits[2] | bits[3])
-				b = strcp(b, "NaN");
-			else {
-				b = buf;
-				if (sign)
-					*b++ = '-';
-				b = strcp(b, "Infinity");
+	if ((L[_0] & 0x7ff00000) == 0x7ff00000) {
+		/* Infinity or NaN */
+		if (nik < 0 || nik > 35)
+			nik = 0;
+		if (bufsize < 10)
+			return 0;
+		if (L[_0] & 0xfffff || L[_1]) {
+			b = buf;
+			if (L[_0] & 0x80000000L && nik < 18)
+				*b++ = '-';
+			b = strcp(b, NanName[nik%3]);
+			if (nik > 5 && (nik < 12
+					|| bits[0] != NanDflt_d_D2A[0]
+					|| (bits[1] ^ NanDflt_d_D2A[1]) & 0xfffff)) {
+				bits[0] = L[_1];
+				bits[1] = L[_0] & 0xfffff;
+				b = add_nanbits(b, bufsize - (b-buf), bits, 2);
 				}
 			return b;
 			}
-		i = STRTOG_Normal;
-		bits[3] |= 0x10000;
-		}
-	else if (bits[0] | bits[1] | bits[2] | bits[3]) {
-		i = STRTOG_Denormal;
-		ex = 1;
-		}
-	else {
-#ifndef IGNORE_ZERO_SIGN
+		b = buf;
 		if (sign)
+			*b++ = '-';
+		return strcp(b, InfName[nik%6]);
+		}
+	if (L[_1] == 0 && (L[_0] ^ sign) == 0 /*d == 0.*/) {
+		b = buf;
+#ifndef IGNORE_ZERO_SIGN
+		if (L[_0] & 0x80000000L)
 			*b++ = '-';
 #endif
 		*b++ = '0';
 		*b = 0;
 		return b;
 		}
-	ex -= 0x3fff + 112;
+	bits[0] = L[_1];
+	bits[1] = L[_0] & 0xfffff;
+	if ( (ex = (L[_0] >> 20) & 0x7ff) !=0)
+		bits[1] |= 0x100000;
+	else
+		ex = 1;
+	ex -= 0x3ff + 52;
 	mode = 2;
-	if (ndig <= 0) {
-		if (bufsize < 48)
-			return 0;
+	if (ndig <= 0)
 		mode = 0;
-		}
+	i = STRTOG_Normal;
+	if (sign)
+		i = STRTOG_Normal | STRTOG_Neg;
 	s = gdtoa(fpi, ex, bits, &i, mode, ndig, &decpt, &se);
 	return g__fmt(buf, s, se, decpt, sign, bufsize);
 	}

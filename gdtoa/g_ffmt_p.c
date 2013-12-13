@@ -31,24 +31,74 @@ THIS SOFTWARE.
 
 #include "gdtoaimp.h"
 
- int
+ extern ULong NanDflt_f_D2A[1];
+
+ char*
 #ifdef KR_headers
-strtopd(s, sp, d) char *s; char **sp; double *d;
+g_ffmt_p(buf, f, ndig, bufsize, nik) char *buf; float *f; int ndig; size_t bufsize; int nik;
 #else
-strtopd(CONST char *s, char **sp, double *d)
+g_ffmt_p(char *buf, float *f, int ndig, size_t bufsize, int nik)
 #endif
 {
-	static FPI fpi0 = { 53, 1-1023-53+1, 2046-1023-53+1, 1, SI };
-	ULong bits[2];
-	Long exp;
-	int k;
+	static FPI fpi0 = { 24, 1-127-24+1,  254-127-24+1, 1, 0, 6 };
+	char *b, *s, *se;
+	ULong bits[1], *L, sign;
+	int decpt, ex, i, mode;
 #ifdef Honor_FLT_ROUNDS
 #include "gdtoa_fltrnds.h"
 #else
 #define fpi &fpi0
 #endif
 
-	k = strtodg(s, sp, fpi, &exp, bits);
-	ULtod((ULong*)d, bits, exp, k);
-	return k;
+	if (ndig < 0)
+		ndig = 0;
+	if (bufsize < ndig + 10)
+		return 0;
+
+	L = (ULong*)f;
+	sign = L[0] & 0x80000000L;
+	if ((L[0] & 0x7f800000) == 0x7f800000) {
+		/* Infinity or NaN */
+		if (nik < 0 || nik > 35)
+			nik = 0;
+		if ((bits[0] = L[0] & 0x7fffff)) {
+			b = buf;
+			if (sign && nik < 18)
+				*b++ = '-';
+			b = strcp(b, NanName[nik%3]);
+			if (nik > 5 && (nik < 12
+					|| (bits[0] ^ NanDflt_f_D2A[0]) & 0x7fffff))
+				b = add_nanbits(b, bufsize - (b-buf), bits, 1);
+			return b;
+			}
+		b = buf;
+		if (sign)
+			*b++ = '-';
+		return strcp(b, InfName[nik%6]);
+		}
+	if (*f == 0.) {
+		b = buf;
+#ifndef IGNORE_ZERO_SIGN
+		if (L[0] & 0x80000000L)
+			*b++ = '-';
+#endif
+		*b++ = '0';
+		*b = 0;
+		return b;
+		}
+	bits[0] = L[0] & 0x7fffff;
+	if ( (ex = (L[0] >> 23) & 0xff) !=0)
+		bits[0] |= 0x800000;
+	else
+		ex = 1;
+	ex -= 0x7f + 23;
+	mode = 2;
+	if (ndig <= 0) {
+		if (bufsize < 16)
+			return 0;
+		mode = 0;
+		}
+	i = STRTOG_Normal;
+	s = gdtoa(fpi, ex, bits, &i, mode, ndig, &decpt, &se);
+	return g__fmt(buf, s, se, decpt, sign, bufsize);
 	}
