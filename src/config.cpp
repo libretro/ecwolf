@@ -32,14 +32,10 @@
 **
 */
 
-#include "config.h"
-#include "scanner.h"
-
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
-using namespace std;
 
 #if defined(WINDOWS)
 #include <direct.h>
@@ -50,6 +46,10 @@ using namespace std;
 #include <sys/stat.h>
 
 #include "zstring.h"
+#include "config.h"
+#include "scanner.h"
+
+using namespace std;
 
 Config config;
 

@@ -118,7 +118,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 						const int u = (gu>>10) & 63;
 						const int v = (-gv>>10) & 63;
 						const unsigned texoffs = (u * 64) + v;
-						*tex_offset = curshades[tex[u * 64 + v]];
+						*tex_offset = curshades[tex[texoffs]];
 					}
 					else
 					{

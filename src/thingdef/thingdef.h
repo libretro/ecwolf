@@ -251,7 +251,7 @@ class ClassDef
 			definition->parent = (const ClassDef *)parent;
 			definition->size = sizeof(T);
 			definition->defaultInstance = (DObject *) M_Malloc(definition->size);
-			memset(definition->defaultInstance, 0, definition->size);
+			memset((void*)definition->defaultInstance, 0, definition->size);
 			definition->ConstructNative = &T::__InPlaceConstructor;
 			return definition;
 		}

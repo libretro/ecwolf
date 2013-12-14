@@ -515,8 +515,6 @@ protected:
 private:
 	int lump;
 
-	WORD pushwall;
-	WORD patrolpoint;
 	TArray<ThingXlat> thingTable;
 	TMap<WORD, MapTile> tilePalette;
 	TMap<WORD, MapTrigger> tileTriggers;

@@ -586,7 +586,7 @@ AActor *ClassDef::CreateInstance() const
 	}
 
 	AActor *newactor = (AActor *) M_Malloc(size);
-	memcpy(newactor, defaultInstance, size);
+	memcpy((void*)newactor, (void*)defaultInstance, size);
 	ConstructNative(this, newactor);
 	newactor->Init();
 	return newactor;
@@ -996,7 +996,7 @@ void ClassDef::ParseActor(Scanner &sc)
 		newClass->size = newClass->parent->size;
 
 		newClass->defaultInstance = (DObject *) M_Malloc(newClass->parent->size);
-		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
+		memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 	}
 	else
 	{
@@ -1007,12 +1007,12 @@ void ClassDef::ParseActor(Scanner &sc)
 
 		// Copy the parents defaults for native classes
 		if(newClass->parent)
-			memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
+			memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 	}
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
 	{
-		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
+		memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 		newClass->defaultInstance->Class = newClass;
 		newClass->Meta = newClass->parent->Meta;
 	}

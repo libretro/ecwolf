@@ -535,7 +535,6 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 	if(opposite) // Rotate the dir 180 degrees.
 		dir = MapTile::Side((dir+2)%4);
 
-	const int pos = static_cast<int>(this - plane->map);
 	unsigned int x = GetX();
 	unsigned int y = GetY();
 	switch(dir)
