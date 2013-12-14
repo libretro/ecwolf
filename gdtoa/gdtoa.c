@@ -451,7 +451,7 @@ gdtoa
 			goto one_digit;
 			}
 		for(i = 1;; i++, dval(&d) *= 10.) {
-			L = dval(&d) / ds;
+			L = (Long)(dval(&d) / ds);
 			dval(&d) -= L*ds;
 #ifdef Check_FLT_ROUNDS
 			/* If FLT_ROUNDS == 2, L will usually be high by 1 */

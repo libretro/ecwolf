@@ -30,7 +30,7 @@ THIS SOFTWARE.
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
 #include "gdtoaimp.h"
-#ifndef NO_FENV_H
+#if !defined(NO_FENV_H) && !defined(_MSC_VER)
 #include <fenv.h>
 #endif
 
@@ -949,7 +949,7 @@ strtod
 #ifdef Avoid_Underflow
 			if (scale && y <= 2*P*Exp_msk1) {
 				if (aadj <= 0x7fffffff) {
-					if ((z = aadj) <= 0)
+					if ((z = (ULong)aadj) <= 0)
 						z = 1;
 					aadj = z;
 					dval(&aadj1) = dsign ? aadj : -aadj;
