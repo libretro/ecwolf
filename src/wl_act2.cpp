@@ -526,7 +526,7 @@ ACTION_FUNCTION(A_Chase)
 				else
 					chance = (208*self->missilefrequency)>>FRACBITS;
 
-				if ( pr_chase.RandomOld(self->flags & FL_OLDRANDOMCHASE) < MAX<int>(chance, self->minmissilechance))
+				if ( pr_chase.RandomOld(!!(self->flags & FL_OLDRANDOMCHASE)) < MAX<int>(chance, self->minmissilechance))
 				{
 					self->SetState(missile);
 					return;

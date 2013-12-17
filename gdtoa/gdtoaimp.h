@@ -179,7 +179,32 @@ THIS SOFTWARE.
 #ifndef GDTOAIMP_H_INCLUDED
 #define GDTOAIMP_H_INCLUDED
 #include "gdtoa.h"
+
+#ifdef _MSC_VER
+/* [RH] Generating gd_qnan.h strikes me as too cumbersome under Visual
+* Studio, so here's the equivalent, given the limited number of
+* architectures that MSC can target. (Itanium? Who cares about that?)
+*/
+#define f_QNAN 0xffc00000
+#define d_QNAN0 0x0
+#define d_QNAN1 0xfff80000
+#define ld_QNAN0 0x0
+#define ld_QNAN1 0xfff80000
+#define ld_QNAN2 0x0
+#define ld_QNAN3 0x0
+#define ldus_QNAN0 0x0
+#define ldus_QNAN1 0x0
+#define ldus_QNAN2 0x0
+#define ldus_QNAN3 0xfff8
+#define ldus_QNAN4 0x0
+/* [RH] Interestingly, MinGW produces something different because
+* it turns out that it has a true long double type. I thought that
+* all ia32 compilers had phased out extended precision.
+*/
+#else
 #include "gd_qnan.h"
+#endif
+
 #ifdef Honor_FLT_ROUNDS
 #include <fenv.h>
 #endif

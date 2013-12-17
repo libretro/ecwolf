@@ -182,7 +182,7 @@ multadd
 #ifdef ULLong
 		y = *x * (ULLong)m + carry;
 		carry = y >> 32;
-		*x++ = y & 0xffffffffUL;
+		*x++ = (ULong)(y & 0xffffffffUL);
 #else
 #ifdef Pack_32
 		xi = *x;
@@ -205,7 +205,7 @@ multadd
 			Bfree(b);
 			b = b1;
 			}
-		b->x[wds++] = carry;
+		b->x[wds++] = (ULong)carry;
 		b->wds = wds;
 		}
 	return b;
@@ -310,10 +310,10 @@ mult
 			do {
 				z = *x++ * (ULLong)y + *xc + carry;
 				carry = z >> 32;
-				*xc++ = z & 0xffffffffUL;
+				*xc++ = (ULong)(z & 0xffffffffUL);
 				}
 				while(x < xae);
-			*xc = carry;
+			*xc = (ULong)carry;
 			}
 		}
 #else
@@ -567,13 +567,13 @@ diff
 	do {
 		y = (ULLong)*xa++ - *xb++ - borrow;
 		borrow = y >> 32 & 1UL;
-		*xc++ = y & 0xffffffffUL;
+		*xc++ = (ULong)(y & 0xffffffffUL);
 		}
 		while(xb < xbe);
 	while(xa < xae) {
 		y = *xa++ - borrow;
 		borrow = y >> 32 & 1UL;
-		*xc++ = y & 0xffffffffUL;
+		*xc++ = (ULong)(y & 0xffffffffUL);
 		}
 #else
 #ifdef Pack_32

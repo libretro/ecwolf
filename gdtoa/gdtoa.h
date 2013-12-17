@@ -32,7 +32,20 @@ THIS SOFTWARE.
 #ifndef GDTOA_H_INCLUDED
 #define GDTOA_H_INCLUDED
 
+#ifdef _MSC_VER
+/* [RH] Generating arith.h strikes me as too cumbersome under Visual
+* Studio, so here's the equivalent, given the limited number of
+* architectures that MSC can target. (Itanium? Who cares about that?)
+*/
+#define IEEE_8087
+#define Arith_Kind_ASL 1
+#define Double_Align
+#ifdef _M_X64
+#define X64_bit_pointers
+#endif
+#else
 #include "arith.h"
+#endif
 #include <stddef.h> /* for size_t */
 
 #ifndef Long

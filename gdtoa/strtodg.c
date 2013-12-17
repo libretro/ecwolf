@@ -883,7 +883,7 @@ strtodg
 				inex = STRTOG_Inexlo;
 				}
 			if (dval(&adj) < 2147483647.) {
-				L = adj0;
+				L = (Long)adj0;
 				adj0 -= L;
 				switch(rd) {
 				  case 0:

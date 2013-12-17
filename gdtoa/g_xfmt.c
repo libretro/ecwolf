@@ -71,7 +71,7 @@ g_xfmt(char *buf, void *V, int ndig, size_t bufsize)
 
 	if (ndig < 0)
 		ndig = 0;
-	if (bufsize < ndig + 10)
+	if (bufsize < (size_t)(ndig + 10))
 		return 0;
 
 	L = (UShort *)V;

@@ -390,7 +390,7 @@ dtoa
 			 */
 			dval(&eps) = 0.5/tens[ilim-1] - dval(&eps);
 			for(i = 0;;) {
-				L = dval(&d);
+				L = (Long)dval(&d);
 				dval(&d) -= L;
 				*s++ = '0' + (int)L;
 				if (dval(&d) < dval(&eps))

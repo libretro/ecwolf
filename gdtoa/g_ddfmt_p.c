@@ -62,7 +62,7 @@ g_ddfmt_p(char *buf, double *dd0, int ndig, size_t bufsize, int nik)
 #define Rounding FPI_Round_near
 #endif /*}}*/
 
-	if (bufsize < 10 || bufsize < ndig + 8)
+	if (bufsize < 10 || bufsize < (size_t)(ndig + 8))
 		return 0;
 
 	dd = (U*)dd0;
@@ -172,7 +172,7 @@ g_ddfmt_p(char *buf, double *dd0, int ndig, size_t bufsize, int nik)
 		}
 	mode = 2;
 	if (ndig <= 0) {
-		if (bufsize < (int)(fpi.nbits * .301029995664) + 10) {
+		if (bufsize < (size_t)((int)(fpi.nbits * .301029995664) + 10)) {
 			Bfree(z);
 			return 0;
 			}
