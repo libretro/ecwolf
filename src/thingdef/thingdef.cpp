@@ -112,19 +112,19 @@ StateLabel::StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative)
 
 const Frame *StateLabel::Resolve() const
 {
-	return *(cls->FindStateInList(label) + offset);
+	return cls->FindStateInList(label) + offset;
 }
 
 const Frame *StateLabel::Resolve(AActor *owner, const Frame *caller, const Frame *def) const
 {
 	if(isRelative)
-		return owner->GetClass()->frameList[caller->index + offset];
+		return caller + offset;
 	else if(isDefault)
 		return def;
 
-	const Frame * const *frame = owner->GetClass()->FindStateInList(label);
+	const Frame *frame = owner->GetClass()->FindStateInList(label);
 	if(frame)
-		return *(frame + offset);
+		return frame + offset;
 	return NULL;
 }
 
@@ -649,11 +649,11 @@ const ActionInfo *ClassDef::FindFunction(const FName &function, int &specialNum)
 
 const Frame *ClassDef::FindState(const FName &stateName) const
 {
-	const Frame * const *ret = FindStateInList(stateName);
-	return ret ? *ret : NULL;
+	const Frame *ret = FindStateInList(stateName);
+	return ret;
 }
 
-const Frame * const *ClassDef::FindStateInList(const FName &stateName) const
+const Frame *ClassDef::FindStateInList(const FName &stateName) const
 {
 	const unsigned int *ret = stateList.CheckKey(stateName);
 	if(ret == NULL)
@@ -725,11 +725,22 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	// We need to resolve gotos after we install the states.
 	TArray<Goto> gotos;
 
+	// Count the number of states we need so that we can allocate the memory
+	// in one go and keep our pointers valid.
+	unsigned int numStates = 0;
+	for(unsigned int iter = 0;iter < stateDefs.Size();++iter)
+	{
+		if(!stateDefs[iter].label.IsEmpty() && stateDefs[iter].sprite[0] == 0)
+			continue;
+		numStates += stateDefs[iter].frames.Len();
+	}
+	frameList.Resize(numStates);
+
 	FString thisLabel;
 	Frame *prevFrame = NULL;
 	Frame *loopPoint = NULL;
-	Frame *thisFrame = NULL;
-	for(unsigned int iter = 0;iter < stateDefs.Size();iter++)
+	Frame *thisFrame = &frameList[0];
+	for(unsigned int iter = 0;iter < stateDefs.Size();++iter)
 	{
 		const StateDefinition &thisStateDef = stateDefs[iter];
 
@@ -742,7 +753,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 					stateList[thisStateDef.label] = INT_MAX;
 					break;
 				case StateDefinition::NORMAL:
-					stateList[thisStateDef.label] = frameList.Size();
+					stateList[thisStateDef.label] = thisFrame - &frameList[0];
 					continue;
 				case StateDefinition::GOTO:
 				{
@@ -760,13 +771,11 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			continue;
 		}
 
-		for(unsigned int i = 0;i < thisStateDef.frames.Len();i++)
+		for(unsigned int i = 0;i < thisStateDef.frames.Len();++i)
 		{
-			thisFrame = new Frame();
-
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
-				stateList[thisStateDef.label] = frameList.Size();
+				stateList[thisStateDef.label] = thisFrame - &frameList[0];
 				loopPoint = thisFrame;
 			}
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
@@ -776,7 +785,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
-			thisFrame->index = frameList.Size();
+			thisFrame->index = thisFrame - &frameList[0];
 			thisFrame->spriteInf = 0;
 			// Only free the action arguments if we are the last frame using them.
 			thisFrame->freeActionArgs = i == thisStateDef.frames.Len()-1;
@@ -803,9 +812,12 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			else
 				prevFrame = NULL;
 			//printf("Adding frame: %s %c %d\n", thisStateDef.sprite, thisFrame->frame, thisFrame->duration);
-			frameList.Push(thisFrame);
+			++thisFrame;
 		}
 	}
+
+	// Safe guard to make sure state counting stays in sync
+	assert(thisFrame == &frameList[frameList.Size()]);
 
 	// Resolve Gotos
 	for(unsigned int iter = 0;iter < gotos.Size();++iter)
@@ -835,18 +847,6 @@ bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 		if(currentParent == parent)
 			return true;
 		currentParent = currentParent->parent;
-	}
-	return false;
-}
-
-bool ClassDef::IsStateOwner(const Frame *frame) const
-{
-	// OK this is really going to be slow way to do things, but this is really
-	// only for the save game code so I guess it's not too bad.
-	for(unsigned int i = 0;i < frameList.Size();++i)
-	{
-		if(frame == frameList[i])
-			return true;
 	}
 	return false;
 }
@@ -916,7 +916,7 @@ void ClassDef::LoadActors()
 
 			cls->ClassIndex = index++;
 			for(unsigned int i = 0;i < cls->frameList.Size();++i)
-				cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
+				cls->frameList[i].spriteInf = R_GetSprite(cls->frameList[i].sprite);
 		}
 	}
 }
@@ -1536,7 +1536,7 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 	delete[] data;
 }
 
-const Frame * const *ClassDef::ResolveStateIndex(unsigned int index) const
+const Frame *ClassDef::ResolveStateIndex(unsigned int index) const
 {
 	if(index == INT_MAX) // Deleted state (Label: stop)
 		return NULL;
@@ -1724,11 +1724,7 @@ void ClassDef::UnloadActors()
 
 	// Clean up the frames in case any expressions use the symbols
 	for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
-	{
-		ClassDef *type = pair->Value;
-		for(unsigned int i = 0;i < type->frameList.Size();++i)
-			delete type->frameList[i];
-	}
+			pair->Value->frameList.Clear();
 
 	// Also contains code from ZDoom
 

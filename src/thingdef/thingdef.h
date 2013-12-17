@@ -281,9 +281,9 @@ class ClassDef
 		const ClassDef			*GetParent() const { return parent; }
 		const ClassDef			*GetReplacement(bool respectMapinfo=true) const;
 		size_t					GetSize() const { return size; }
-		const Frame				*GetState(unsigned int index) const { return frameList[index]; }
+		const Frame				*GetState(unsigned int index) const { return &frameList[index]; }
 		static void				LoadActors();
-		bool					IsStateOwner(const Frame *frame) const;
+		bool					IsStateOwner(const Frame *frame) const { return frame >= &frameList[0] && frame < &frameList[frameList.Size()]; }
 		static void				UnloadActors();
 
 		unsigned int			ClassIndex;
@@ -300,9 +300,9 @@ class ClassDef
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
 		void		BuildFlatPointers();
-		const Frame * const *FindStateInList(const FName &stateName) const;
+		const Frame *FindStateInList(const FName &stateName) const;
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
-		const Frame * const *ResolveStateIndex(unsigned int index) const;
+		const Frame *ResolveStateIndex(unsigned int index) const;
 
 		// We need to do this for proper initialization order.
 		static TMap<FName, ClassDef *>	&ClassTable();
@@ -317,8 +317,8 @@ class ClassDef
 		const ClassDef	*replacement;
 		const ClassDef	*replacee;
 
-		TMap<FName, unsigned int>	stateList;
-		TArray<Frame *>			frameList;
+		TMap<FName, unsigned int> stateList;
+		TArray<Frame> frameList;
 
 		ActionTable		actions;
 		SymbolTable		symbols;
