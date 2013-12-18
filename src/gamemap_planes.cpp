@@ -32,6 +32,8 @@
 **
 */
 
+#include <climits>
+
 #include "doomerrors.h"
 #include "id_ca.h"
 #include "g_mapinfo.h"
@@ -271,63 +273,42 @@ public:
 
 	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, uint32_t &flags, unsigned short oldnum) const
 	{
-		bool valid = false;
-		unsigned int type = thingTable.Size()/2;
-		unsigned int max = thingTable.Size()-1;
-		unsigned int min = 0;
-		do
+		unsigned int index = SearchForThing(oldnum, thingTable.Size());
+		if(index == UINT_MAX)
+			return false;
+		const ThingXlat &type = thingTable[index];
+
+		isTrigger = type.isTrigger;
+		if(isTrigger)
 		{
-			if(thingTable[type].oldnum == oldnum ||
-				(thingTable[type].angles && unsigned(oldnum - thingTable[type].oldnum) < thingTable[type].angles))
-			{
-				valid = true;
-				break;
-			}
-
-			if(thingTable[type].oldnum > oldnum)
-				max = type-1;
-			else if(thingTable[type].oldnum < oldnum)
-				min = type+1;
-
-			type = (max+min)/2;
+			trigger = type.templateTrigger;
 		}
-		while(max >= min && max < thingTable.Size());
-
-		if(valid)
+		else
 		{
-			isTrigger = thingTable[type].isTrigger;
-			if(isTrigger)
+			flags = type.flags;
+
+			thing.type = type.newnum;
+
+			// The player has a weird rotation pattern. It's 450-angle.
+			bool playerRotation = false;
+			if(thing.type == 1)
+				playerRotation = true;
+
+			if(type.angles)
 			{
-				trigger = thingTable[type].templateTrigger;
+				thing.angle = (oldnum - type.oldnum)*(360/type.angles);
+				if(playerRotation)
+					thing.angle = (360 + 360/type.angles)-thing.angle;
 			}
 			else
-			{
-				flags = thingTable[type].flags;
+				thing.angle = 0;
 
-				thing.type = thingTable[type].newnum;
-
-				// The player has a weird rotation pattern. It's 450-angle.
-				bool playerRotation = false;
-				if(thing.type == 1)
-					playerRotation = true;
-
-				if(thingTable[type].angles)
-				{
-					thing.angle = (oldnum - thingTable[type].oldnum)*(360/thingTable[type].angles);
-					if(playerRotation)
-						thing.angle = (360 + 360/thingTable[type].angles)-thing.angle;
-				}
-				else
-					thing.angle = 0;
-
-				thing.patrol = flags&Xlat::TF_PATHING;
-				thing.skill[0] = thing.skill[1] = thingTable[type].minskill <= 1;
-				thing.skill[2] = thingTable[type].minskill <= 2;
-				thing.skill[3] = thingTable[type].minskill <= 3;
-			}
+			thing.patrol = flags&Xlat::TF_PATHING;
+			thing.skill[0] = thing.skill[1] = type.minskill <= 1;
+			thing.skill[2] = type.minskill <= 2;
+			thing.skill[3] = type.minskill <= 3;
 		}
-
-		return valid;
+		return true;
 	}
 
 	int TranslateZone(unsigned short tile)
@@ -339,6 +320,33 @@ public:
 	}
 
 protected:
+	// Find the index in the thing table corresponding to an old thing number
+	// taking into account the number of angle variants
+	unsigned int SearchForThing(unsigned short oldnum, unsigned int tableSize) const
+	{
+		unsigned int type = tableSize/2;
+		unsigned int max = tableSize-1;
+		unsigned int min = 0;
+		do
+		{
+			ThingXlat &check = thingTable[type];
+			if(check.oldnum == oldnum ||
+				(check.angles && unsigned(oldnum - check.oldnum) < check.angles))
+			{
+				return type;
+			}
+
+			if(check.oldnum > oldnum)
+				max = type-1;
+			else if(check.oldnum < oldnum)
+				min = type+1;
+
+			type = (max+min)/2;
+		}
+		while(max >= min && max < tableSize);
+		return UINT_MAX;
+	}
+
 	void LoadFlatsTable(Scanner &sc)
 	{
 		sc.MustGetToken('{');
@@ -448,6 +456,11 @@ protected:
 
 	void LoadThingTable(Scanner &sc)
 	{
+		// Get the size of existing table so we know what we need to search
+		// for replacements.
+		unsigned int oldTableSize = thingTable.Size();
+		unsigned int replace;
+
 		sc.MustGetToken('{');
 		while(!sc.CheckToken('}'))
 		{
@@ -506,10 +519,37 @@ protected:
 				sc.MustGetToken('}');
 			}
 
-			thingTable.Push(thing);
+			if(oldTableSize &&
+				(replace = SearchForThing(thing.oldnum, oldTableSize)) != UINT_MAX)
+			{
+				ThingXlat &replaced = thingTable[replace];
+				if(replaced.oldnum != thing.oldnum) // Quick check for potential unwanted behavior.
+					sc.ScriptMessage(Scanner::ERROR, "Thing %d partially replaces %d.\n", thing.oldnum, replaced.oldnum);
+				replaced = thing;
+			}
+			else
+				thingTable.Push(thing);
 		}
 
 		qsort(&thingTable[0], thingTable.Size(), sizeof(thingTable[0]), ThingXlat::SortCompare);
+
+		// Sanity check for mod authors: Check for duplicate/overlapping oldnums
+		unsigned int i = thingTable.Size();
+		if(i >= 2)
+		{
+			const ThingXlat *current = &thingTable[--i];
+			unsigned short oldmin = current->oldnum;
+			unsigned short oldmax = oldmin + (current->angles ? current->angles - 1 : 0);
+			do
+			{
+				--current;
+				if(current->oldnum <= oldmax && current->oldnum + current->angles - 1 >= oldmin)
+					sc.ScriptMessage(Scanner::ERROR, "Thing table contains ambiguous overlap for old num %d (%d).\n", oldmin, i);
+				oldmin = current->oldnum;
+				oldmax = oldmin + (current->angles ? current->angles - 1 : 0);
+			}
+			while(--i);
+		}
 	}
 
 private:
