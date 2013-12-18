@@ -528,7 +528,6 @@ void GiveExtraMan (int amount)
 		players[0].lives = 0;
 	else if(players[0].lives > 9)
 		players[0].lives = 9;
-	SD_PlaySound ("misc/end_bonus1");
 }
 
 //===========================================================================
@@ -558,10 +557,15 @@ void DrawScore (void)
 void GivePoints (int32_t points)
 {
 	players[0].score += points;
-	while (players[0].score >= players[0].nextextra)
+	if (players[0].score >= players[0].nextextra)
 	{
-		players[0].nextextra += EXTRAPOINTS;
-		GiveExtraMan (1);
+		SD_PlaySound ("misc/1up");
+		do
+		{
+			players[0].nextextra += EXTRAPOINTS;
+			GiveExtraMan (1);
+		}
+		while (players[0].score >= players[0].nextextra);
 	}
 }
 
