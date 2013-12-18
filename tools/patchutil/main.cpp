@@ -24,6 +24,7 @@
 #include "patchdata_reg.cpp"
 #include "patchdata_bs1.cpp"
 #include "patchdata_bs6.cpp"
+#include "patchdata_sd3.cpp"
 
 using namespace std;
 
@@ -294,6 +295,24 @@ struct OldDataSet
 		"Blake Stone: Planet Strike v1.01"
 	},
 	{
+		3,
+		{
+			{31150618u, 1881760, "vswap.sd3", NULL, P(vswapuac), false},
+			{194254884u, 148534, "gamemaps.sd3", NULL, P(gamemapsuac), false},
+			{1314236310u, 86, "maphead.sd3", NULL, P(mapheaduac), false},
+		},
+		"Mission 3: Ultimate Challenge (UAC)"
+	},
+	{
+		3,
+		{
+			{1713865351u, 1881760, "vswap.sd3", NULL, NULLP, false},
+			{3397062772u, 148546, "gamemaps.sd3", NULL, NULLP, false},
+			{2435737438u, 86, "maphead.sd3", NULL, NULLP, false},
+		},
+		"Mission 3: Ultimate Challenge"
+	},
+	{
 		9,
 		{
 			{4096914596u, 295394, "vgagraph.wl1", NULL, P(vgagraph10sw), false},
@@ -520,7 +539,7 @@ int main(int argc, char* argv[])
 		out << "{\n";
 		dirent *file;
 		int fileCount = 0;
-		while(file = readdir(oldDir))
+		while((file = readdir(oldDir)))
 		{
 			if(file->d_name[0] == '.')
 				continue;
@@ -530,7 +549,7 @@ int main(int argc, char* argv[])
 		closedir(oldDir);
 		out << "\t" << fileCount << ",\n\t{\n";
 		oldDir = opendir("old");
-		while(file = readdir(oldDir))
+		while((file = readdir(oldDir)))
 		{
 			if(file->d_name[0] == '.')
 				continue;
@@ -564,7 +583,7 @@ int main(int argc, char* argv[])
 			while(feof(in) == 0)
 			{
 				size_t byteCount = fread(data, 1, 4096, in);
-				for(int i = 0;i < byteCount;i++)
+				for(size_t i = 0;i < byteCount;i++)
 				{
 					fprintf(outf, "0x%02X,", (unsigned char)data[i]);
 					if(i%16 == 15)
@@ -581,7 +600,7 @@ int main(int argc, char* argv[])
 
 	cout << "Wolfenstein 3D Universal Patching Utility\n\n"
 		"This utility recognizes the following (X marks latest):\n";
-	for(int i = 0;i < countof(dataSets);++i)
+	for(unsigned int i = 0;i < countof(dataSets);++i)
 	{
 		bool latest = true;
 		for(int j = 0;j < dataSets[i].numFiles;++j)
@@ -615,7 +634,7 @@ int main(int argc, char* argv[])
 	}
 	while(response != 'y' && response != 'Y');
 
-	for(int i = 0;i < countof(dataSets);++i)
+	for(unsigned int i = 0;i < countof(dataSets);++i)
 	{
 		bool identified = true;
 		bool applyPatch[MAX_FILES];
