@@ -32,9 +32,6 @@
 **
 */
 
-#include "config.h"
-#include "scanner.h"
-
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -42,6 +39,8 @@
 
 #include "filesys.h"
 #include "zstring.h"
+#include "config.h"
+#include "scanner.h"
 
 Config config;
 

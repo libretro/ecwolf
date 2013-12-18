@@ -31,6 +31,8 @@ THIS SOFTWARE.
 
 #include "gdtoaimp.h"
 
+ extern ULong NanDflt_Q_D2A[4];
+
 #undef _0
 #undef _1
 
@@ -51,9 +53,9 @@ THIS SOFTWARE.
 
  char*
 #ifdef KR_headers
-g_Qfmt(buf, V, ndig, bufsize) char *buf; char *V; int ndig; size_t bufsize;
+g_Qfmt_p(buf, V, ndig, bufsize, nik) char *buf; char *V; int ndig; size_t bufsize; int nik;
 #else
-g_Qfmt(char *buf, void *V, int ndig, size_t bufsize)
+g_Qfmt_p(char *buf, void *V, int ndig, size_t bufsize, int nik)
 #endif
 {
 	static FPI fpi0 = { 113, 1-16383-113+1, 32766 - 16383 - 113 + 1, 1, 0, Int_max };
@@ -81,13 +83,24 @@ g_Qfmt(char *buf, void *V, int ndig, size_t bufsize)
 	if ( (ex = (L[_0] & 0x7fff0000L) >> 16) !=0) {
 		if (ex == 0x7fff) {
 			/* Infinity or NaN */
-			if (bits[0] | bits[1] | bits[2] | bits[3])
-				b = strcp(b, "NaN");
+			if (nik < 0 || nik > 35)
+				nik = 0;
+			if (bits[0] | bits[1] | bits[2] | bits[3]) {
+				if (sign && nik < 18)
+					*b++ = '-';
+				b = strcp(b, NanName[nik%3]);
+				if (nik > 5 && (nik < 12
+						|| bits[0] != NanDflt_Q_D2A[0]
+						|| bits[1] != NanDflt_Q_D2A[1]
+						|| bits[2] != NanDflt_Q_D2A[2]
+						|| (bits[2] ^ NanDflt_Q_D2A[2]) & 0xffff))
+					b = add_nanbits(b, bufsize - (b-buf), bits, 4);
+				}
 			else {
 				b = buf;
 				if (sign)
 					*b++ = '-';
-				b = strcp(b, "Infinity");
+				b = strcp(b, InfName[nik%6]);
 				}
 			return b;
 			}

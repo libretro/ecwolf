@@ -1,6 +1,42 @@
 cmake_minimum_required(VERSION 2.4)
 project(ECWolf)
 
+# Generator expression are available some time in CMake 2.8. Due to
+# cmake_minimum_required, we can assume a minor version of > 7 implies major >= 2
+if(${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
+	option( NO_GENERATOR_EXPRESSIONS "Disable generator expressions (for building pk3s with IDEs)." OFF )
+else(${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
+	set( NO_GENERATOR_EXPRESSIONS ON )
+endif(${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
+
+# Simplify pk3 building, add_pk3(filename srcdirectory)
+function( add_pk3 PK3_NAME PK3_DIR )
+	get_target_property(ZIPDIR_EXE zipdir LOCATION)
+
+	# Generate target name. Just use "pk3" for main pk3 target.
+	string( REPLACE "." "_" PK3_TARGET ${PK3_NAME} )
+	if( ${PK3_TARGET} STREQUAL "ecwolf_pk3" )
+		set( PK3_TARGET "pk3" )
+	endif( ${PK3_TARGET} STREQUAL "ecwolf_pk3" )
+
+	if( NOT NO_GENERATOR_EXPRESSIONS )
+		add_custom_command( OUTPUT ${OUTPUT_DIR}/${PK3_NAME}
+			COMMAND ${ZIPDIR_EXE} -udf ${OUTPUT_DIR}/${PK3_NAME} ${PK3_DIR}
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${OUTPUT_DIR}/${PK3_NAME} $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME}
+			DEPENDS zipdir )
+	else( NOT NO_GENERATOR_EXPRESSIONS )
+		add_custom_command( OUTPUT ${OUTPUT_DIR}/${PK3_NAME}
+			COMMAND ${ZIPDIR_EXE} -udf ${OUTPUT_DIR}/${PK3_NAME} ${PK3_DIR}
+			DEPENDS zipdir )
+	endif( NOT NO_GENERATOR_EXPRESSIONS )
+
+	# Touch the zipdir executable here so that the pk3s are forced to rebuild
+	# each time since their dependecy has "changed."
+	add_custom_target( ${PK3_TARGET} ALL
+		COMMAND ${CMAKE_COMMAND} -E touch ${ZIPDIR_EXE}
+		DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+endfunction( add_pk3 )
+
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWolf.")
 
 set(LZMA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lzma/C")

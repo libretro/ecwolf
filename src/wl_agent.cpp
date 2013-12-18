@@ -1,5 +1,8 @@
 // WL_AGENT.C
 
+#include <cmath>
+#include <climits>
+
 #include "wl_def.h"
 #include "id_ca.h"
 #include "id_sd.h"

@@ -8,22 +8,24 @@ if( MSVC )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4554 /wd4102" )
 endif( MSVC )
 
-if( CMAKE_COMPILER_IS_GNUCXX )
-	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall" )
-endif( CMAKE_COMPILER_IS_GNUCXX )
+if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" )
+endif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 add_definitions( -DINFNAN_CHECK -DMULTIPLE_THREADS )
 
 if( NOT MSVC )
 	add_executable( arithchk arithchk.c )
+	get_target_property( ARITHCHK_EXE arithchk LOCATION )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/arith.h 
-		COMMAND ${CMAKE_CURRENT_BINARY_DIR}/arithchk >${CMAKE_CURRENT_BINARY_DIR}/arith.h
+		COMMAND ${ARITHCHK_EXE} >${CMAKE_CURRENT_BINARY_DIR}/arith.h
 		DEPENDS arithchk )
 
 	add_executable( qnan qnan.c arith.h )
+	get_target_property( QNAN_EXE qnan LOCATION )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gd_qnan.h
-		COMMAND ${CMAKE_CURRENT_BINARY_DIR}/qnan >${CMAKE_CURRENT_BINARY_DIR}/gd_qnan.h
+		COMMAND ${QNAN_EXE} >${CMAKE_CURRENT_BINARY_DIR}/gd_qnan.h
 		DEPENDS qnan )
 		
 	set( GEN_FP_FILES arith.h gd_qnan.h )
@@ -35,12 +37,17 @@ add_library( gdtoa
 	dmisc.c
 	dtoa.c
 	g_Qfmt.c
+	g_Qfmt_p.c
 	g__fmt.c
 	g_ddfmt.c
+	g_ddfmt_p.c
 	g_dfmt.c
 	g_ffmt.c
+	g_ffmt_p.c
 	g_xLfmt.c
+	g_xLfmt_p.c
 	g_xfmt.c
+	g_xfmt_p.c
 	gdtoa.c
 	gethex.c
 	gmisc.c
