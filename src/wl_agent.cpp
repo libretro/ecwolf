@@ -981,7 +981,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	// actually fire
 	int dist = 0x7fffffff;
 	AActor *closest = NULL;
-	for(AActor::Iterator check = AActor::GetIterator();check.Next();check)
+	for(AActor::Iterator check = AActor::GetIterator();check.Next();)
 	{
 		if(check == self)
 			continue;

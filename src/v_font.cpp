@@ -1290,7 +1290,7 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 	PatchRemap = NULL;
 	FontType = WOLFFONT;
 	Chars = new CharData[256];
-	SpaceWidth = width[' '];
+	SpaceWidth = width[(int)' '];
 	FirstChar = 0;
 	LastChar = 255;
 	GlobalKerning = 0;
@@ -2012,8 +2012,6 @@ void FTile8Char::MakeTexture()
 
 	Pixels = new BYTE[destSize];
 
-	int runlen = 0, setlen = 0;
-	BYTE setval = 0;  // Shut up, GCC!
 	BYTE *dest_p = Pixels;
 	int dest_adv = Height*4;
 	int dest_rew = destSize - 1;

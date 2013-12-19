@@ -52,6 +52,10 @@
 template<class T> class EmbeddedList
 {
 public:
+	class Iterator;
+	class ConstIterator;
+	class List;
+
 	// It was pointed out that this may be more flexible if left as a POD type.
 	// Thus the node should not be considered valid until added to a list.
 	class Node

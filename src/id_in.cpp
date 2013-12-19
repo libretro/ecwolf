@@ -93,7 +93,6 @@ int JoyNumAxes;
 static int JoyNumHats;
 
 static bool GrabInput = false;
-static bool NeedRestore = false;
 
 /*
 =============================================================================

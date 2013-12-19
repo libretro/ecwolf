@@ -981,7 +981,6 @@ void Message (const char *string)
 // THIS MAY BE FIXED A LITTLE LATER...
 //
 ////////////////////////////////////////////////////////////////////
-static int lastmusic;
 
 int StartCPMusic (const char* song)
 {

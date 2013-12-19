@@ -121,8 +121,6 @@ AutoMap::~AutoMap()
 
 void AutoMap::CalculateDimensions()
 {
-	static const int windowsize = 24;
-
 	amsizex = viewwidth;
 	amsizey = viewheight;
 	amx = viewscreenx;

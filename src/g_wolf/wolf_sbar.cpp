@@ -1,3 +1,6 @@
+#include <cmath>
+#include <climits>
+
 #include "wl_def.h"
 #include "wl_agent.h"
 #include "wl_game.h"
@@ -14,9 +17,6 @@
 #include "a_inventory.h"
 #include "a_keys.h"
 #include "wl_iwad.h"
-
-#include <cmath>
-#include <climits>
 
 /*
 =============================================================================
