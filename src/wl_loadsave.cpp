@@ -537,6 +537,15 @@ static void Serialize(FArchive &arc)
 bool Load(const FString &filename)
 {
 	FILE *fileh = OpenSaveFile(filename, "rb");
+	if(fileh == NULL)
+	{
+		Message(language["STR_FAILREAD"]);
+		printf("Could not open %s for reading.\n", GetFullSaveFileName(filename).GetChars());
+		IN_ClearKeysDown ();
+		IN_Ack ();
+		return false;
+	}
+
 	PNGHandle *png = M_VerifyPNG(fileh);
 	if(png == NULL)
 	{
@@ -600,6 +609,14 @@ void SaveScreenshot(FILE *file)
 bool Save(const FString &filename, const FString &title)
 {
 	FILE *fileh = OpenSaveFile(filename, "wb");
+	if(fileh == NULL)
+	{
+		Message(language["STR_FAILWRITE"]);
+		printf("Could not open %s for writing.\n", GetFullSaveFileName(filename).GetChars());
+		IN_ClearKeysDown ();
+		IN_Ack ();
+		return false;
+	}
 
 	if(!quickSaveLoad)
 		DrawLSAction(1);
