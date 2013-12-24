@@ -1210,7 +1210,7 @@ SD_StartMusic(const char* chunk)
 		sqHackFreeable = sqHack;
 		lump.Read(sqHack, Wads.LumpLength(lumpNum));
 		if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
-		else sqHackLen = sqHackSeqLen = *sqHack++;
+		else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
 		sqHackPtr = sqHack;
 		sqHackTime = 0;
 		alTimeCount = 0;
@@ -1241,7 +1241,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 			sqHackFreeable = sqHack;
 			lump.Read(sqHack, Wads.LumpLength(lumpNum));
 			if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
-			else sqHackLen = sqHackSeqLen = *sqHack++;
+			else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
 			sqHackPtr = sqHack;
 		}
 
