@@ -35,7 +35,7 @@
 #ifndef __LINKEDLIST_H__
 #define __LINKEDLIST_H__
 
-#define EMBEDDEDLIST_UNLINKED ((EmbeddedList<T>::Node*)~0)
+#define EMBEDDEDLIST_UNLINKED ((typename EmbeddedList<T>::Node*)~0)
 
 /**
  * Provides an interface for having a linked list embedded into a class.
@@ -80,7 +80,7 @@ public:
 		 * in the list.
 		 */
 		Iterator(typename EmbeddedList<T>::List &list) :
-			node(reinterpret_cast<EmbeddedList<T>::Node *>(&list))
+			node(reinterpret_cast<typename EmbeddedList<T>::Node *>(&list))
 		{
 		}
 
@@ -129,7 +129,7 @@ public:
 		{
 		}
 		ConstIterator(const typename EmbeddedList<T>::List &list) :
-			node(reinterpret_cast<const EmbeddedList<T>::Node *>(&list))
+			node(reinterpret_cast<const typename EmbeddedList<T>::Node *>(&list))
 		{
 		}
 
@@ -181,11 +181,11 @@ public:
 
 		typename EmbeddedList<T>::Iterator Head()
 		{
-			return EmbeddedList<T>::Iterator(head);
+			return typename EmbeddedList<T>::Iterator(head);
 		}
 		typename EmbeddedList<T>::ConstIterator Head() const
 		{
-			return EmbeddedList<T>::ConstIterator(head);
+			return typename EmbeddedList<T>::ConstIterator(head);
 		}
 
 		/**
@@ -305,7 +305,7 @@ public:
 		 * in the list.
 		 */
 		Iterator(LinkedList<T> &list) :
-			node(reinterpret_cast<LinkedList<T>::Node *>(&list))
+			node(reinterpret_cast<typename LinkedList<T>::Node *>(&list))
 		{
 		}
 
@@ -356,7 +356,7 @@ public:
 		{
 		}
 		ConstIterator(const LinkedList<T> &list) :
-			node(reinterpret_cast<const LinkedList<T>::Node *>(&list))
+			node(reinterpret_cast<const typename LinkedList<T>::Node *>(&list))
 		{
 		}
 
