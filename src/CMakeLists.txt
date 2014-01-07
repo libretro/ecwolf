@@ -72,9 +72,9 @@ if( NOT HAS_VA_COPY )
 	endif( HAS___VA_COPY )
 endif( NOT HAS_VA_COPY )
 
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
-	set(CMAKE_CXX_FLAGS "-Wall -Wno-unused -Wno-unused-result -Wno-ignored-qualifiers -Wextra -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}")
-endif(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
+if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+	set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}" )
+endif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
 
 if(WIN32)
 	set(NO_GTK ON)

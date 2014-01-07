@@ -53,10 +53,10 @@ struct SettingsData
 		SettingsData(double decimal) : type(ST_FLOAT), str("") { SetValue(decimal); }
 		SettingsData(FString str) : type(ST_STR), str("") { SetValue(str); integer = 0; }
 
-		const int			GetInteger() { return integer; }
-		const double		GetFloat() { return decimal; }
-		const FString		GetString()	{ return str; }
-		const SettingType	GetType() { return type; }
+		int					GetInteger() { return integer; }
+		double				GetFloat() { return decimal; }
+		FString				GetString()	{ return str; }
+		SettingType			GetType() { return type; }
 		void				SetValue(int integer) { this->integer = integer;this->type = ST_INT; }
 		void				SetValue(unsigned int integer) { SetValue((int)integer); }
 		void				SetValue(double decimal) { this->decimal = decimal;this->type = ST_FLOAT; }

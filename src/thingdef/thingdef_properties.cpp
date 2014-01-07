@@ -485,8 +485,6 @@ HANDLE_PROPERTY(startitem)
 	// NOTE: This property is not inherited.
 	STRING_PARAM(item, 0);
 
-	APlayerPawn *def = (APlayerPawn *)defaults;
-
 	if(cls->Meta.GetMetaInt(APMETA_StartInventory, -1) == -1 || cls->Meta.IsInherited(APMETA_StartInventory))
 		cls->Meta.SetMetaInt(APMETA_StartInventory, APlayerPawn::startInventory.Push(new AActor::DropList()));
 

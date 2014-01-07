@@ -378,7 +378,7 @@ bool DSimpleCanvas::IsValid ()
 //
 //==========================================================================
 
-bool DSimpleCanvas::Lock ()
+bool DSimpleCanvas::Lock (bool)
 {
 	if (LockCount == 0)
 	{

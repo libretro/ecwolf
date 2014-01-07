@@ -49,7 +49,7 @@ class MenuItem
 				MenuItem(const char string[80], MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
 		virtual	~MenuItem() {}
 
-		const short	getActive() const { return enabled ? (highlight + 1) : 0; }
+		short		getActive() const { return enabled ? (highlight + 1) : 0; }
 		int			getHeight() const { return visible ? height : 0; }
 		const char	*getString() const { return string; }
 		bool		isEnabled() const { return enabled && visible; }
