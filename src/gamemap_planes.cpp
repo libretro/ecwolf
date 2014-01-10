@@ -778,7 +778,7 @@ void GameMap::ReadPlanesData()
 						200<<FRACBITS
 					};
 
-					gLevelVisibility = visTable[clamp(oldplane[3] - 0xFC, 0, 15)];
+					gLevelVisibility = visTable[clamp(oldplane[3] - 0xFC, 0, 15)]*LIGHTVISIBILITY_FACTOR;
 					gLevelLight = clamp(oldplane[2] - 0xD8, 0, 7)*8 + 130; // Seems to be approx accurate for every even number lighting (0, 2, 4, 6)
 				}
 				else

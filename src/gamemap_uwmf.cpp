@@ -300,7 +300,7 @@ class UWMFParser : public TextMapParser
 						if(!ecwolf12Namespace)
 							sc.ScriptMessage(Scanner::WARNING, "Setting defaultvisibility on Wolf3D namespace not standard, use ECWolf-v12\n");
 						sc.MustGetToken(TK_FloatConst);
-						gLevelVisibility = static_cast<fixed>(sc->decimal*65536.);
+						gLevelVisibility = static_cast<fixed>(sc->decimal*LIGHTVISIBILITY_FACTOR*65536.);
 					}
 					else
 						sc.GetNextToken();
