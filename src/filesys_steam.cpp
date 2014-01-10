@@ -119,7 +119,10 @@ static bool PSR_FindAndEnterBlock(Scanner &sc, const char* keyword)
 	while(sc.TokensLeft())
 	{
 		if(sc.CheckToken('}'))
+		{
+			sc.Rewind();
 			return false;
+		}
 
 		sc.MustGetToken(TK_StringConst);
 		if(sc->str.CompareNoCase(keyword) != 0)
