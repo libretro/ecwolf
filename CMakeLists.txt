@@ -65,6 +65,7 @@ find_package(JPEG)
 if(NOT ZLIB_FOUND OR INTERNAL_ZLIB)
 	set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib)
 	add_subdirectory(zlib)
+	set(ZLIB_LIBRARIES z)
 	set(ZLIB_LIBRARY z)
 endif(NOT ZLIB_FOUND OR INTERNAL_ZLIB)
 
