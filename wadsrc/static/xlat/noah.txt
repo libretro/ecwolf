@@ -300,6 +300,421 @@ tiles
 		textureeast = "PURWALL2";
 		texturewest = "PURWALL2";
 	}
+	tile 30
+	{
+		texturenorth = "DOOR1";
+		texturesouth = "DOOR1";
+		textureeast = "DOOR2";
+		texturewest = "DOOR2";
+	}
+	tile 31
+	{
+		texturenorth = "DOOR3";
+		texturesouth = "DOOR3";
+		textureeast = "DOOR4";
+		texturewest = "DOOR4";
+	}
+
+	// BLANK, and repeat
+
+	tile 33
+	{
+		texturenorth = "ARKWODA1";
+		texturesouth = "ARKWODA1";
+		textureeast = "ARKWODA2";
+		texturewest = "ARKWODA2";
+	}
+	tile 34
+	{
+		texturenorth = "ARKWODB1";
+		texturesouth = "ARKWODB1";
+		textureeast = "ARKWODB2";
+		texturewest = "ARKWODB2";
+	}
+	tile 35
+	{
+		texturenorth = "ARKCURT1";
+		texturesouth = "ARKCURT1";
+		textureeast = "ARKCURT2";
+		texturewest = "ARKCURT2";
+	}
+	tile 36
+	{
+		texturenorth = "ARKMELV1";
+		texturesouth = "ARKMELV1";
+		textureeast = "ARKMELV2";
+		texturewest = "ARKMELV2";
+	}
+	tile 37
+	{
+		texturenorth = "LOGWALL1";
+		texturesouth = "LOGWALL1";
+		textureeast = "LOGWALL2";
+		texturewest = "LOGWALL2";
+	}
+	tile 38
+	{
+		texturenorth = "LOGNOAH1";
+		texturesouth = "LOGNOAH1";
+		textureeast = "LOGNOAH2";
+		texturewest = "LOGNOAH2";
+	}
+	tile 39
+	{
+		texturenorth = "LOGCURT1";
+		texturesouth = "LOGCURT1";
+		textureeast = "LOGCURT2";
+		texturewest = "LOGCURT2";
+	}
+	tile 40
+	{
+		texturenorth = "LOGDUCK1";
+		texturesouth = "LOGDUCK1";
+		textureeast = "LOGDUCK2";
+		texturewest = "LOGDUCK2";
+	}
+	tile 41
+	{
+		texturenorth = "KNLWODA1";
+		texturesouth = "KNLWODA1";
+		textureeast = "KNLWODA2";
+		texturewest = "KNLWODA2";
+	}
+	tile 42
+	{
+		texturenorth = "KNLBWOD1";
+		texturesouth = "KNLBWOD1";
+		textureeast = "KNLBWOD2";
+		texturewest = "KNLBWOD2";
+	}
+	tile 43
+	{
+		texturenorth = "KNLWODB1";
+		texturesouth = "KNLWODB1";
+		textureeast = "KNLWODB2";
+		texturewest = "KNLWODB2";
+	}
+	tile 44
+	{
+		texturenorth = "KNLBMET1";
+		texturesouth = "KNLBMET1";
+		textureeast = "KNLBMET2";
+		texturewest = "KNLBMET2";
+	}
+	tile 45
+	{
+		texturenorth = "CABPANL1";
+		texturesouth = "CABPANL1";
+		textureeast = "CABPANL2";
+		texturewest = "CABPANL2";
+	}
+	tile 46
+	{
+		texturenorth = "CABLARG1";
+		texturesouth = "CABLARG1";
+		textureeast = "CABLARG2";
+		texturewest = "CABLARG2";
+	}
+	tile 47
+	{
+		texturenorth = "STAIRWY1";
+		texturesouth = "STAIRWY1";
+		textureeast = "STAIRWY2";
+		texturewest = "STAIRWY2";
+	}
+	tile 48
+	{
+		texturenorth = "FLOOD1";
+		texturesouth = "FLOOD1";
+		textureeast = "FLOOD2";
+		texturewest = "FLOOD2";
+	}
+	tile 49
+	{
+		texturenorth = "WODPANL1";
+		texturesouth = "WODPANL1";
+		textureeast = "WODPANL2";
+		texturewest = "WODPANL2";
+	}
+	tile 50
+	{
+		texturenorth = "WODNAMH1";
+		texturesouth = "WODNAMH1";
+		textureeast = "WODNAMH2";
+		texturewest = "WODNAMH2";
+	}
+	tile 51
+	{
+		texturenorth = "ABRICK1";
+		texturesouth = "ABRICK1";
+		textureeast = "ABRICK2";
+		texturewest = "ABRICK2";
+	}
+	tile 52
+	{
+		texturenorth = "ABRKNH1";
+		texturesouth = "ABRKNH1";
+		textureeast = "ABRKNH2";
+		texturewest = "ABRKNH2";
+	}
+	tile 53
+	{
+		texturenorth = "GRYWOOD1";
+		texturesouth = "GRYWOOD1";
+		textureeast = "GRYWOOD2";
+		texturewest = "GRYWOOD2";
+	}
+	tile 54
+	{
+		texturenorth = "GRYCURT1";
+		texturesouth = "GRYCURT1";
+		textureeast = "GRYCURT2";
+		texturewest = "GRYCURT2";
+	}
+	tile 55
+	{
+		texturenorth = "LGTPANL1";
+		texturesouth = "LGTPANL1";
+		textureeast = "LGTPANL2";
+		texturewest = "LGTPANL2";
+	}
+	tile 56
+	{
+		texturenorth = "LGTCHLK1";
+		texturesouth = "LGTCHLK1";
+		textureeast = "LGTCHLK2";
+		texturewest = "LGTCHLK2";
+	}
+	tile 57
+	{
+		texturenorth = "YELWALL1";
+		texturesouth = "YELWALL1";
+		textureeast = "YELWALL2";
+		texturewest = "YELWALL2";
+	}
+	tile 58
+	{
+		texturenorth = "CABFOOD1";
+		texturesouth = "CABFOOD1";
+		textureeast = "CABFOOD2";
+		texturewest = "CABFOOD2";
+	}
+	tile 59
+	{
+		texturenorth = "REDWALL1";
+		texturesouth = "REDWALL1";
+		textureeast = "REDWALL2";
+		texturewest = "REDWALL2";
+	}
+	tile 60
+	{
+		texturenorth = "CABSMAL1";
+		texturesouth = "CABSMAL1";
+		textureeast = "CABSMAL2";
+		texturewest = "CABSMAL2";
+	}
+	tile 61
+	{
+		texturenorth = "PURWALL1";
+		texturesouth = "PURWALL1";
+		textureeast = "PURWALL2";
+		texturewest = "PURWALL2";
+	}
+	tile 62
+	{
+		texturenorth = "DOOR1";
+		texturesouth = "DOOR1";
+		textureeast = "DOOR2";
+		texturewest = "DOOR2";
+	}
+	tile 63
+	{
+		texturenorth = "DOOR3";
+		texturesouth = "DOOR3";
+		textureeast = "DOOR4";
+		texturewest = "DOOR4";
+	}
+
+	// BLANK, and then we repeat only the first 24
+
+	tile 65
+	{
+		texturenorth = "ARKWODA1";
+		texturesouth = "ARKWODA1";
+		textureeast = "ARKWODA2";
+		texturewest = "ARKWODA2";
+	}
+	tile 66
+	{
+		texturenorth = "ARKWODB1";
+		texturesouth = "ARKWODB1";
+		textureeast = "ARKWODB2";
+		texturewest = "ARKWODB2";
+	}
+	tile 67
+	{
+		texturenorth = "ARKCURT1";
+		texturesouth = "ARKCURT1";
+		textureeast = "ARKCURT2";
+		texturewest = "ARKCURT2";
+	}
+	tile 68
+	{
+		texturenorth = "ARKMELV1";
+		texturesouth = "ARKMELV1";
+		textureeast = "ARKMELV2";
+		texturewest = "ARKMELV2";
+	}
+	tile 69
+	{
+		texturenorth = "LOGWALL1";
+		texturesouth = "LOGWALL1";
+		textureeast = "LOGWALL2";
+		texturewest = "LOGWALL2";
+	}
+	tile 70
+	{
+		texturenorth = "LOGNOAH1";
+		texturesouth = "LOGNOAH1";
+		textureeast = "LOGNOAH2";
+		texturewest = "LOGNOAH2";
+	}
+	tile 71
+	{
+		texturenorth = "LOGCURT1";
+		texturesouth = "LOGCURT1";
+		textureeast = "LOGCURT2";
+		texturewest = "LOGCURT2";
+	}
+	tile 72
+	{
+		texturenorth = "LOGDUCK1";
+		texturesouth = "LOGDUCK1";
+		textureeast = "LOGDUCK2";
+		texturewest = "LOGDUCK2";
+	}
+	tile 73
+	{
+		texturenorth = "KNLWODA1";
+		texturesouth = "KNLWODA1";
+		textureeast = "KNLWODA2";
+		texturewest = "KNLWODA2";
+	}
+	tile 74
+	{
+		texturenorth = "KNLBWOD1";
+		texturesouth = "KNLBWOD1";
+		textureeast = "KNLBWOD2";
+		texturewest = "KNLBWOD2";
+	}
+	tile 75
+	{
+		texturenorth = "KNLWODB1";
+		texturesouth = "KNLWODB1";
+		textureeast = "KNLWODB2";
+		texturewest = "KNLWODB2";
+	}
+	tile 76
+	{
+		texturenorth = "KNLBMET1";
+		texturesouth = "KNLBMET1";
+		textureeast = "KNLBMET2";
+		texturewest = "KNLBMET2";
+	}
+	tile 77
+	{
+		texturenorth = "CABPANL1";
+		texturesouth = "CABPANL1";
+		textureeast = "CABPANL2";
+		texturewest = "CABPANL2";
+	}
+	tile 78
+	{
+		texturenorth = "CABLARG1";
+		texturesouth = "CABLARG1";
+		textureeast = "CABLARG2";
+		texturewest = "CABLARG2";
+	}
+	tile 79
+	{
+		texturenorth = "STAIRWY1";
+		texturesouth = "STAIRWY1";
+		textureeast = "STAIRWY2";
+		texturewest = "STAIRWY2";
+	}
+	tile 80
+	{
+		texturenorth = "FLOOD1";
+		texturesouth = "FLOOD1";
+		textureeast = "FLOOD2";
+		texturewest = "FLOOD2";
+	}
+	tile 81
+	{
+		texturenorth = "WODPANL1";
+		texturesouth = "WODPANL1";
+		textureeast = "WODPANL2";
+		texturewest = "WODPANL2";
+	}
+	tile 82
+	{
+		texturenorth = "WODNAMH1";
+		texturesouth = "WODNAMH1";
+		textureeast = "WODNAMH2";
+		texturewest = "WODNAMH2";
+	}
+	tile 83
+	{
+		texturenorth = "ABRICK1";
+		texturesouth = "ABRICK1";
+		textureeast = "ABRICK2";
+		texturewest = "ABRICK2";
+	}
+	tile 84
+	{
+		texturenorth = "ABRKNH1";
+		texturesouth = "ABRKNH1";
+		textureeast = "ABRKNH2";
+		texturewest = "ABRKNH2";
+	}
+	tile 85
+	{
+		texturenorth = "GRYWOOD1";
+		texturesouth = "GRYWOOD1";
+		textureeast = "GRYWOOD2";
+		texturewest = "GRYWOOD2";
+	}
+	tile 86
+	{
+		texturenorth = "GRYCURT1";
+		texturesouth = "GRYCURT1";
+		textureeast = "GRYCURT2";
+		texturewest = "GRYCURT2";
+	}
+	tile 87
+	{
+		texturenorth = "LGTPANL1";
+		texturesouth = "LGTPANL1";
+		textureeast = "LGTPANL2";
+		texturewest = "LGTPANL2";
+	}
+	tile 88
+	{
+		texturenorth = "LGTCHLK1";
+		texturesouth = "LGTCHLK1";
+		textureeast = "LGTCHLK2";
+		texturewest = "LGTCHLK2";
+	}
+
+	// Used for empty space on the map.
+	tile 89
+	{
+		texturenorth = "DOOR3";
+		texturesouth = "DOOR3";
+		textureeast = "DOOR4";
+		texturewest = "DOOR4";
+	}
+
 	tile 90
 	{
 		texturenorth = "DOORSLOT";
@@ -363,6 +778,71 @@ tiles
 		textureeast = "DOORSLOT";
 		texturewest = "DOORSLOT";
 		offsethorizontal = true;
+	}
+
+	// Back to repeating
+	tile 98
+	{
+		texturenorth = "ARKWODB1";
+		texturesouth = "ARKWODB1";
+		textureeast = "ARKWODB2";
+		texturewest = "ARKWODB2";
+	}
+	tile 99
+	{
+		texturenorth = "ARKCURT1";
+		texturesouth = "ARKCURT1";
+		textureeast = "ARKCURT2";
+		texturewest = "ARKCURT2";
+	}
+	tile 100
+	{
+		texturenorth = "ARKMELV1";
+		texturesouth = "ARKMELV1";
+		textureeast = "ARKMELV2";
+		texturewest = "ARKMELV2";
+	}
+	tile 101
+	{
+		texturenorth = "LOGWALL1";
+		texturesouth = "LOGWALL1";
+		textureeast = "LOGWALL2";
+		texturewest = "LOGWALL2";
+	}
+	tile 102
+	{
+		texturenorth = "LOGNOAH1";
+		texturesouth = "LOGNOAH1";
+		textureeast = "LOGNOAH2";
+		texturewest = "LOGNOAH2";
+	}
+	tile 103
+	{
+		texturenorth = "LOGCURT1";
+		texturesouth = "LOGCURT1";
+		textureeast = "LOGCURT2";
+		texturewest = "LOGCURT2";
+	}
+	tile 104
+	{
+		texturenorth = "LOGDUCK1";
+		texturesouth = "LOGDUCK1";
+		textureeast = "LOGDUCK2";
+		texturewest = "LOGDUCK2";
+	}
+	tile 105
+	{
+		texturenorth = "KNLWODA1";
+		texturesouth = "KNLWODA1";
+		textureeast = "KNLWODA2";
+		texturewest = "KNLWODA2";
+	}
+	tile 106
+	{
+		texturenorth = "KNLBWOD1";
+		texturesouth = "KNLBWOD1";
+		textureeast = "KNLBWOD2";
+		texturewest = "KNLBWOD2";
 	}
 
 	modzone 107 fillzone ambush;
