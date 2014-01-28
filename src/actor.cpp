@@ -51,6 +51,16 @@
 void T_ExplodeProjectile(AActor *self, AActor *target);
 void T_Projectile(AActor *self);
 
+// Old save compatibility
+void AActorProxy::Serialize(FArchive &arc)
+{
+	Super::Serialize(arc);
+
+	bool enabled;
+	arc << enabled << actualObject;
+}
+IMPLEMENT_INTERNAL_CLASS(AActorProxy)
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Frame::~Frame()
@@ -378,8 +388,13 @@ void AActor::Serialize(FArchive &arc)
 		<< hidden
 		<< player
 		<< inventory
-		<< soundZone
-		<< hasActorRef;
+		<< soundZone;
+	if(arc.IsLoading() && GameSave::SaveVersion < 1382102747)
+	{
+		TObjPtr<AActorProxy> proxy;
+		arc << proxy;
+	}
+	arc << hasActorRef;
 
 	if(GameSave::SaveVersion > 1374914454)
 		arc << projectilepassheight;

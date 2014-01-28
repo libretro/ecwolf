@@ -192,4 +192,18 @@ class AActor : public Thinker,
 		const MapZone	*soundZone;
 };
 
+// Old save compatibility
+// FIXME: Remove for 1.4
+class AActorProxy : public Thinker
+{
+	DECLARE_CLASS(AActorProxy, Thinker)
+
+public:
+	void Tick() {}
+
+	void Serialize(FArchive &arc);
+
+	TObjPtr<AActor> actualObject;
+};
+
 #endif

@@ -154,6 +154,13 @@ void ThinkerList::Serialize(FArchive &arc)
 			arc << thinker;
 			while(thinker)
 			{
+				// FIXME: Remove this save compat hack in 1.4
+				if(thinker->IsThinkerType<AActorProxy>())
+				{
+					Thinker *real = ((AActorProxy*)thinker)->actualObject;
+					thinker->Destroy();
+					thinker = real;
+				}
 				Register(thinker, static_cast<Priority>(i));
 				arc << thinker;
 			}
