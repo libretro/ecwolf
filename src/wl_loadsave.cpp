@@ -502,8 +502,19 @@ void QuickLoad()
 
 static void Serialize(FArchive &arc)
 {
-	arc << gamestate.difficulty
-		<< gamestate.playerClass
+	short difficulty;
+	if(arc.IsStoring())
+	{
+		difficulty = SkillInfo::GetSkillIndex(*gamestate.difficulty);
+		arc << difficulty;
+	}
+	else
+	{
+		arc << difficulty;
+		gamestate.difficulty = &SkillInfo::GetSkill(difficulty);
+	}
+
+	arc << gamestate.playerClass
 		<< gamestate.secretcount
 		<< gamestate.treasurecount
 		<< gamestate.killcount

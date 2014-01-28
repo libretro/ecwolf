@@ -359,24 +359,12 @@ void CreateMenus()
 
 	skills.setHeadText(language["STR_HOWTOUGH"]);
 	skills.setHeadPicture("M_HOWTGH", true);
-	const char* skillText[4] =
+	for(unsigned int i = 0;i < SkillInfo::GetNumSkills();++i)
 	{
-		language["STR_DADDY"],
-		language["STR_HURTME"],
-		language["STR_BRINGEM"],
-		language["STR_DEATH"]
-	};
-	const char* skillPicture[4] =
-	{
-		"M_BABY",
-		"M_EASY",
-		"M_NORMAL",
-		"M_HARD"
-	};
-	for(unsigned int i = 0;i < 4;i++)
-	{
-		MenuItem *tmp = new MenuItem(skillText[i], StartNewGame);
-		tmp->setPicture(skillPicture[i], NM_X + 185, NM_Y + 7);
+		SkillInfo &skill = SkillInfo::GetSkill(i);
+		MenuItem *tmp = new MenuItem(skill.Name, StartNewGame);
+		if(!skill.SkillPicture.IsEmpty())
+			tmp->setPicture(skill.SkillPicture, NM_X + 185, NM_Y + 7);
 		skills.addItem(tmp);
 	}
 	skills.setCurrentPosition(2);

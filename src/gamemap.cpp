@@ -50,6 +50,7 @@
 #include "wl_loadsave.h"
 #include "doomerrors.h"
 #include "m_random.h"
+#include "g_mapinfo.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	file(NULL), zoneTraversed(NULL), zoneLinks(NULL)
@@ -456,7 +457,7 @@ void GameMap::SpawnThings() const
 	for(unsigned int i = 0;i < things.Size();++i)
 	{
 		Thing &thing = things[i];
-		if(!thing.skill[gamestate.difficulty])
+		if(!thing.skill[gamestate.difficulty->SpawnFilter])
 			continue;
 
 		if(thing.type == 1)

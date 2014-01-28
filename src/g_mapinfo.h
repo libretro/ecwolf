@@ -218,6 +218,21 @@ public:
 	static ClusterInfo &Find(unsigned int index);
 };
 
+class SkillInfo
+{
+public:
+	SkillInfo();
+
+	FString Name;
+	FString SkillPicture;
+	fixed DamageFactor;
+	unsigned int SpawnFilter;
+
+	static unsigned int GetNumSkills();
+	static unsigned int GetSkillIndex(const SkillInfo &skill);
+	static SkillInfo &GetSkill(unsigned int index);
+};
+
 void G_ParseMapInfo(bool gameinfoPass);
 
 #endif

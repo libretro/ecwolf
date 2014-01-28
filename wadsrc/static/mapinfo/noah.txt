@@ -43,6 +43,35 @@ gameinfo
 	advisorypic = "PG13"
 }
 
+skill baby
+{
+	name = "$STR_SUPEREASY"
+	picname = "M_BABY"
+	spawnfilter = 1
+	damagefactor = 0.25
+}
+
+skill easy
+{
+	name = "$STR_EASY"
+	picname = "M_EASY"
+	spawnfilter = 2
+}
+
+skill normal
+{
+	name = "$STR_NORMAL"
+	picname = "M_NORMAL"
+	spawnfilter = 3
+}
+
+skill hard
+{
+	name = "$STR_HARD"
+	picname = "M_HARD"
+	spawnfilter = 4
+}
+
 adddefaultmap
 {
 	defaultfloor = "FLOOR1"

@@ -108,6 +108,14 @@ protected:
 		while(sc.CheckToken(','));
 	}
 
+	void ParseFixedAssignment(fixed &dest)
+	{
+		sc.MustGetToken('=');
+		bool negative = sc.CheckToken('-');
+		sc.MustGetToken(TK_FloatConst);
+		dest = negative ? -FLOAT2FIXED(sc->decimal) : FLOAT2FIXED(sc->decimal);
+	}
+
 	void ParseIntAssignment(int &dest)
 	{
 		sc.MustGetToken('=');
@@ -830,6 +838,78 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static TArray<SkillInfo> skills;
+static TMap<FName, unsigned int> skillIds;
+
+SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), SpawnFilter(0)
+{
+}
+
+unsigned int SkillInfo::GetNumSkills()
+{
+	return skills.Size();
+}
+
+unsigned int SkillInfo::GetSkillIndex(const SkillInfo &skill)
+{
+	return &skill - &skills[0];
+}
+
+SkillInfo &SkillInfo::GetSkill(unsigned int index)
+{
+	return skills[index];
+}
+
+class SkillInfoBlockParser : public MapInfoBlockParser
+{
+private:
+	SkillInfo *skill;
+
+public:
+	SkillInfoBlockParser(Scanner &sc) : MapInfoBlockParser(sc, "skill")
+	{
+	}
+
+protected:
+	void ParseHeader()
+	{
+		sc.MustGetToken(TK_Identifier);
+		const unsigned int *id = skillIds.CheckKey(sc->str);
+		if(id)
+			skill = &skills[*id];
+		else
+		{
+			unsigned int newId = skills.Push(SkillInfo());
+			skill = &skills[newId];
+			skillIds.Insert(sc->str, newId);
+		}
+	}
+
+	bool CheckKey(FString key)
+	{
+		if(key.CompareNoCase("damagefactor") == 0)
+			ParseFixedAssignment(skill->DamageFactor);
+		else if(key.CompareNoCase("name") == 0)
+		{
+			ParseStringAssignment(skill->Name);
+			if(skill->Name[0] == '$')
+				skill->Name = language[skill->Name.Mid(1)];
+		}
+		else if(key.CompareNoCase("picname") == 0)
+			ParseStringAssignment(skill->SkillPicture);
+		else if(key.CompareNoCase("spawnfilter") == 0)
+		{
+			ParseIntAssignment(skill->SpawnFilter);
+			--skill->SpawnFilter;
+		}
+		else
+			return false;
+		return true;
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 class IntermissionBlockParser : public MapInfoBlockParser
 {
 private:
@@ -1092,6 +1172,11 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 			{
 				episodes.Clear();
 			}
+			else if(sc->str.CompareNoCase("clearskills") == 0)
+			{
+				skills.Clear();
+				skillIds.Clear();
+			}
 			else if(sc->str.CompareNoCase("cluster") == 0)
 			{
 				ClusterBlockParser(sc).Parse();
@@ -1118,6 +1203,10 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 					existing = newMap;
 				else
 					levelInfos.Push(newMap);
+			}
+			else if(sc->str.CompareNoCase("skill") == 0)
+			{
+				SkillInfoBlockParser(sc).Parse();
 			}
 			else
 				SkipBlock(sc);

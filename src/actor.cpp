@@ -528,7 +528,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags
 	actor->y = y;
 	actor->velx = 0;
 	actor->vely = 0;
-	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty, actor->health);
+	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty->SpawnFilter, actor->health);
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);
