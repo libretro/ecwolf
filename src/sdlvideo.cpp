@@ -525,6 +525,7 @@ void SDLVideo::SetWindowedScale (float scale)
 
 // FrameBuffer implementation -----------------------------------------------
 
+extern bool usedoublebuffering;
 SDLFB::SDLFB (int width, int height, bool fullscreen)
 	: DFrameBuffer (width, height)
 {
@@ -542,6 +543,9 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 
 	if (Screen == NULL)
 		return;
+
+	if((Screen->flags & SDL_DOUBLEBUF) != SDL_DOUBLEBUF)
+		usedoublebuffering = false;
 
 	for (i = 0; i < 256; i++)
 	{
