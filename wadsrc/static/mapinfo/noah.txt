@@ -24,19 +24,18 @@ gameinfo
 	playerclasses = "NoahPlayer"
 	doorsoundsequence = "DoorNormal"
 	pushwallsoundsequence = "PushwallArk"
-
 	highscoresfont = "SmallFont"
-	titlemusic = "NAZI_NOR"
-	scoresmusic = "ROSTER"
+	titlemusic = "ALLGOOD"
+	scoresmusic = "SONG11"
 	titlepage = "TITLEPIC"
-	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
+	quitmessages = "$NOAH_ENDSTR01", "$NOAH_ENDSTR02", "$NOAH_ENDSTR03", "$NOAH_ENDSTR04", "$NOAH_ENDSTR05", "$NOAH_ENDSTR06", "$NOAH_ENDSTR07", "$NOAH_ENDSTR08", "$NOAH_ENDSTR09"
 	gibfactor = 1
-	menumusic = "WONDERIN"
-	finalemusic = "CORNER"
-	intermissionmusic = "ENDLEVEL"
+	menumusic = "SONG1"
+	finalemusic = "SONG1"
+	intermissionmusic = "FEEDTIME"
 	titletime = 13
-	highscoresfontcolor = "White"
-	pageindexfontcolor = "DarkYellow"
+	highscoresfontcolor = "NoahWhite"
+	pageindexfontcolor = "Black"
 }
 
 intermission DemoLoop

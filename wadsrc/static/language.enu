@@ -136,6 +136,16 @@ ENDSTR15 = "I think you had better\nplay some more. Please\npress N...please?";
 ENDSTR16 = "If you are tough, press N.\nIf not, press Y daintily.";
 ENDSTR17 = "I'm thinkin' that\nyou might wanna press N\nto play more. You do it.";
 ENDSTR18 = "Sure. Fine. Quit.\nSee if we care.\nGet it over with.\nPress Y.";
+// Super 3D Noah's Ark
+NOAH_ENDSTR01 = "Are you sure you're\nready to quit?\nPress Y to Quit.";
+NOAH_ENDSTR02 = "What? Quitting already?\nPress Y to Quit.";
+NOAH_ENDSTR03 = "Are a few hungry animals\ntoo touch for you?\nPress Y to Quit.";
+NOAH_ENDSTR04 = "Giving up so soon?\nPress Y to Quit.";
+NOAH_ENDSTR05 = "Be sure to take your\numbrella, it's wet out there.\nPress Y to Quit.";
+NOAH_ENDSTR06 = "You're going to let\nthose animals run free?\nPress Y to Quit.";
+NOAH_ENDSTR07 = "Did the animals wear\nyou out?\nPress Y to Quit.";
+NOAH_ENDSTR08 = "Are you monkeying around or\ndo you really want to quit?\nPress Y to Quit.";
+NOAH_ENDSTR09 = "The animals might get\nhungry if you're gone\ntoo long!\nPress Y to Quit.";
 
 STR_ENDGAME1 = "We owe you a great debt, Mr. Blazkowicz.\n";
 STR_ENDGAME2 = "You have served your country well.";
