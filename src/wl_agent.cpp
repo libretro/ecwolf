@@ -396,8 +396,13 @@ static bool TryMove (AActor *ob)
 	//
 	// check for actors
 	//
-	for(AActor::Iterator check = AActor::GetIterator();check.Next();)
+	for(AActor::Iterator iter = AActor::GetIterator().Next();iter;)
 	{
+		// We need to iterate a little awkwardly since the object may disappear
+		// on us rendering the next pointer invalid.
+		AActor *check = iter;
+		iter.Next();
+
 		if(check == ob)
 			continue;
 
