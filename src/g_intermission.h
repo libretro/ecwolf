@@ -48,13 +48,23 @@ public:
 		unsigned int	Y;
 	};
 
-	IntermissionAction() : Time(0), BackgroundTile(false)
+	enum BackgroundType
+	{
+		UNSET,
+
+		NORMAL,
+		HIGHSCORES,
+		TITLEPAGE,
+	};
+
+	IntermissionAction() : Type(UNSET), Time(0), BackgroundTile(false)
 	{
 		// Invalid background means use previous.
 		Background.SetInvalid();
 	}
 
 	FTextureID			Background;
+	BackgroundType		Type;
 	TArray<DrawData>	Draw;
 	FString				Music;
 	FString				Palette;
@@ -84,15 +94,18 @@ public:
 		RIGHT
 	};
 
-	TextScreenIntermissionAction() : IntermissionAction(),
-		Alignment(LEFT), TextColor(CR_UNTRANSLATED), TextDelay(20), TextSpeed(4)
+	TextScreenIntermissionAction() : IntermissionAction(), FadeTime(0),
+		Alignment(LEFT), TextFont(SmallFont), TextColor(CR_UNTRANSLATED),
+		TextDelay(20), TextSpeed(4)
 	{
 	}
 
+	unsigned int	FadeTime;
 	unsigned int	PrintX;
 	unsigned int	PrintY;
 	Alignment		Alignment;
 	TArray<FString>	Text;
+	FFont			*TextFont;
 	EColorRange		TextColor;
 	unsigned int	TextDelay;
 	unsigned int	TextSpeed;
@@ -121,4 +134,4 @@ public:
 };
 
 // Returns true if the game should return to the menu instead of the title screen.
-bool ShowIntermission(const IntermissionInfo &intermission);
+bool ShowIntermission(const IntermissionInfo &intermission, bool demoMode=false);

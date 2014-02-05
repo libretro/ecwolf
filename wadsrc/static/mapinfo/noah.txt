@@ -34,13 +34,71 @@ gameinfo
 	menumusic = "WONDERIN"
 	finalemusic = "CORNER"
 	intermissionmusic = "ENDLEVEL"
-	titletime = 15
-	creditpage = "CREDITS"
-	pagetime = 10
+	titletime = 13
 	highscoresfontcolor = "White"
 	pageindexfontcolor = "DarkYellow"
-	advisorycolor = "20 A8 FC"
-	advisorypic = "PG13"
+}
+
+intermission DemoLoop
+{
+	Fader
+	{
+		Background = TitlePage
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -1
+	}
+	Image
+	{
+		Draw = "COPYRGHT", 0, 184
+		Time = -1
+	}
+	Image
+	{
+		Draw = "COPYRGHT", 0, 184
+		Draw = "FAMILYAP", 224, 112
+		Time = TitleTime
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	TextScreen
+	{
+		Background = "#563D1C", 1, "$GamePalette"
+		FadeTime = 15
+		Position = 160, 8
+		Text = "$NOAH_BRIEF_COPYRIGHT"
+		TextAlignment = Center
+		TextColor = "NoahWhite"
+		TextFont = "BigFont"
+		TextSpeed = 0
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	Fader
+	{
+		Background = HighScores
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
 }
 
 skill baby

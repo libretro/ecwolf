@@ -52,10 +52,8 @@ public:
 	int		AdvisoryColor;
 	bool	DrawReadThis;
 
-	int		PageTime;
 	int		TitleTime;
 	FString	BorderFlat;
-	FString	CreditPage;
 	FString GameColormap;
 	FString	GamePalette;
 	FString	TitleMusic;

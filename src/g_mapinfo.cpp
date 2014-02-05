@@ -598,8 +598,6 @@ protected:
 		}
 		else if(key.CompareNoCase("borderflat") == 0)
 			ParseStringAssignment(gameinfo.BorderFlat);
-		else if(key.CompareNoCase("creditpage") == 0)
-			ParseStringAssignment(gameinfo.CreditPage);
 		else if(key.CompareNoCase("doorsoundsequence") == 0)
 			ParseNameAssignment(gameinfo.DoorSoundSequence);
 		else if(key.CompareNoCase("drawreadthis") == 0)
@@ -640,8 +638,6 @@ protected:
 			sc.MustGetToken(TK_StringConst);
 			gameinfo.Translator.Push(sc->str);
 		}
-		else if(key.CompareNoCase("pagetime") == 0)
-			ParseIntAssignment(gameinfo.PageTime);
 		else if(key.CompareNoCase("menumusic") == 0)
 			ParseStringAssignment(gameinfo.MenuMusic);
 		else if(key.CompareNoCase("pushwallsoundsequence") == 0)
@@ -928,6 +924,30 @@ protected:
 		intermission = &IntermissionInfo::Find(sc->str);
 	}
 
+	void ParseTimeAssignment(unsigned int &time)
+	{
+		sc.MustGetToken('=');
+
+		if(sc.CheckToken(TK_Identifier))
+		{
+			if(sc->str.CompareNoCase("titletime") == 0)
+				time = gameinfo.TitleTime*TICRATE;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Invalid special time %s.\n", sc->str.GetChars());
+		}
+		else
+		{
+			bool inSeconds = sc.CheckToken('-');
+			sc.MustGetToken(TK_FloatConst);
+			if(!CheckTicsValid(sc->decimal))
+				sc.ScriptMessage(Scanner::ERROR, "Invalid tic duration.");
+
+			time = static_cast<unsigned int>(sc->decimal*2);
+			if(inSeconds)
+				time *= 35;
+		}
+	}
+
 	bool CheckKey(FString key)
 	{
 		IntermissionInfo::Action action;
@@ -1014,36 +1034,45 @@ protected:
 		}
 		else if(key.CompareNoCase("Background") == 0)
 		{
-			FString tex;
-			ParseStringAssignment(tex);
-			action->Background = TexMan.CheckForTexture(tex, FTexture::TEX_Any);
-			if(sc.CheckToken(','))
+			sc.MustGetToken('=');
+			if(sc.CheckToken(TK_Identifier))
 			{
-				if(!sc.CheckToken(TK_BoolConst))
-					sc.MustGetToken(TK_IntConst);
-				action->BackgroundTile = sc->boolean;
+				if(sc->str.CompareNoCase("HighScores") == 0)
+				{
+					action->Type = IntermissionAction::HIGHSCORES;
+				}
+				else if(sc->str.CompareNoCase("TitlePage") == 0)
+				{
+					action->Type = IntermissionAction::TITLEPAGE;
+				}
+				else
+				{
+					sc.ScriptMessage(Scanner::ERROR, "Unknown background type %s. Use quotes for static image.", sc->str.GetChars());
+				}
+			}
+			else
+			{
+				sc.MustGetToken(TK_StringConst);
+				FString tex = sc->str;
+				action->Background = TexMan.CheckForTexture(tex, FTexture::TEX_Any);
+				action->Type = IntermissionAction::NORMAL;
 				if(sc.CheckToken(','))
 				{
-					sc.MustGetToken(TK_StringConst);
-					action->Palette = sc->str;
+					if(!sc.CheckToken(TK_BoolConst))
+						sc.MustGetToken(TK_IntConst);
+					action->BackgroundTile = sc->boolean;
+					if(sc.CheckToken(','))
+					{
+						sc.MustGetToken(TK_StringConst);
+						action->Palette = sc->str;
+					}
 				}
 			}
 		}
 		else if(key.CompareNoCase("Music") == 0)
 			ParseStringAssignment(action->Music);
 		else if(key.CompareNoCase("Time") == 0)
-		{
-			sc.MustGetToken('=');
-
-			bool inSeconds = sc.CheckToken('-');
-			sc.MustGetToken(TK_FloatConst);
-			if(!CheckTicsValid(sc->decimal))
-				sc.ScriptMessage(Scanner::ERROR, "Invalid tic duration.");
-
-			action->Time = static_cast<unsigned int>(sc->decimal*2);
-			if(inSeconds)
-				action->Time *= 35;
-		}
+			ParseTimeAssignment(action->Time);
 		else
 			return false;
 		return true;
@@ -1084,7 +1113,9 @@ protected:
 			if(CheckStandardKey(textscreen, sc->str))
 				continue;
 
-			if(sc->str.CompareNoCase("Text") == 0)
+			if(sc->str.CompareNoCase("FadeTime") == 0)
+				ParseTimeAssignment(textscreen->FadeTime);
+			else if(sc->str.CompareNoCase("Text") == 0)
 				ParseStringArrayAssignment(textscreen->Text);
 			else if(sc->str.CompareNoCase("TextAlignment") == 0)
 			{
@@ -1103,6 +1134,12 @@ protected:
 				ParseFontColorAssignment(textscreen->TextColor);
 			else if(sc->str.CompareNoCase("TextDelay") == 0)
 				ParseTicAssignment(textscreen->TextDelay);
+			else if(sc->str.CompareNoCase("TextFont") == 0)
+			{
+				FString fontName;
+				ParseStringAssignment(fontName);
+				textscreen->TextFont = V_GetFont(fontName);
+			}
 			else if(sc->str.CompareNoCase("TextSpeed") == 0)
 				ParseTicAssignment(textscreen->TextSpeed);
 			else if(sc->str.CompareNoCase("Position") == 0)

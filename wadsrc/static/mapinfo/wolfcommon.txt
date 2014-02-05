@@ -5,7 +5,6 @@ gameinfo
 	finaleflat = "#DCDCDC"
 	intermissionmusic = "ENDLEVEL"
 	titletime = 15
-	creditpage = "CREDITS"
 	pagetime = 10
 	menufontcolor_title = "Gold"
 	menufontcolor_label = "DarkGrey"
@@ -65,4 +64,53 @@ defaultmap
 	defaultfloor = "#717171"
 	defaultceiling = "#383838"
 	victorynext = "EndTitle"
+}
+
+intermission DemoLoop
+{
+	Fader
+	{
+		Background = TitlePage
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = TitleTime
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	Fader
+	{
+		Background = "CREDITS", 0, "$GamePalette"
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	Fader
+	{
+		Background = HighScores
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
 }

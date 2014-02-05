@@ -52,38 +52,69 @@ IntermissionInfo &IntermissionInfo::Find(const FName &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void WaitIntermission(unsigned int time)
+static bool exitOnAck;
+struct InputAcknowledged {};
+
+static bool WaitIntermission(unsigned int time)
 {
 	if(time)
 	{
-		IN_UserInput(time);
+		return IN_UserInput(time);
 	}
 	else
 	{
 		IN_ClearKeysDown ();
 		IN_Ack ();
+		return true;
 	}
 }
 
-static void ShowImage(IntermissionAction *image, bool drawonly)
+static bool ShowImage(IntermissionAction *image, bool drawonly)
 {
 	if(!image->Music.IsEmpty())
 		StartCPMusic(image->Music);
 
 	if(!image->Palette.IsEmpty())
-		VL_ReadPalette(image->Palette);
+	{
+		if(image->Palette.CompareNoCase("$GamePalette") == 0)
+			VL_ReadPalette(gameinfo.GamePalette);
+		else
+			VL_ReadPalette(image->Palette);
+	}
 
 	static FTextureID background;
 	static bool tileBackground = false;
-	if(image->Background.isValid())
+	static IntermissionAction::BackgroundType type = IntermissionAction::NORMAL;
+
+	// High Scores and such need special handling
+	if(image->Type != IntermissionAction::UNSET)
+	{
+		type = image->Type;
+	}
+	if(type == IntermissionAction::NORMAL && image->Background.isValid())
 	{
 		background = image->Background;
 		tileBackground = image->BackgroundTile;
 	}
-	if(!tileBackground)
-		CA_CacheScreen(TexMan(background));
-	else
-		VWB_DrawFill(TexMan(background), 0, 0, screenWidth, screenHeight);
+
+	switch(type)
+	{
+		default:
+			if(!tileBackground)
+				CA_CacheScreen(TexMan(background));
+			else
+				VWB_DrawFill(TexMan(background), 0, 0, screenWidth, screenHeight);
+			break;
+		case IntermissionAction::HIGHSCORES:
+			DrawHighScores();
+			break;
+		case IntermissionAction::TITLEPAGE:
+			background = TexMan.CheckForTexture(gameinfo.TitlePage, FTexture::TEX_Any);
+			if(!gameinfo.TitlePalette.IsEmpty())
+				VL_ReadPalette(gameinfo.TitlePalette);
+			CA_CacheScreen(TexMan(background));
+			break;
+	}
 
 	for(unsigned int i = 0;i < image->Draw.Size();++i)
 	{
@@ -93,8 +124,9 @@ static void ShowImage(IntermissionAction *image, bool drawonly)
 	if(!drawonly)
 	{
 		VW_UpdateScreen();
-		WaitIntermission(image->Time);
+		return WaitIntermission(image->Time);
 	}
+	return false;
 }
 
 static void ShowFader(FaderIntermissionAction *fader)
@@ -112,7 +144,7 @@ static void ShowFader(FaderIntermissionAction *fader)
 	}
 }
 
-static void ShowTextScreen(TextScreenIntermissionAction *textscreen)
+static bool ShowTextScreen(TextScreenIntermissionAction *textscreen, bool demoMode)
 {
 	if(textscreen->TextSpeed)
 		Printf("Warning: Text screen has a non-zero textspeed which isn't supported at this time.\n");
@@ -120,52 +152,73 @@ static void ShowTextScreen(TextScreenIntermissionAction *textscreen)
 	ShowImage(textscreen, true);
 
 	if(textscreen->TextDelay)
-		WaitIntermission(textscreen->TextDelay);
+	{
+		if(WaitIntermission(textscreen->TextDelay) && demoMode)
+			return true;
+	}
 
 	pa = MENU_BOTTOM;
 	py = textscreen->PrintY;
 	for(unsigned int i = 0;i < textscreen->Text.Size();++i)
 	{
-		FString line = textscreen->Text[i];
-		if(line[0] == '$')
-			line = language[line.Mid(1)];
+		FString str = textscreen->Text[i];
+		if(str[0] == '$')
+			str = language[str.Mid(1)];
 
-		word width, height;
-		VW_MeasurePropString(SmallFont, line, width, height);
-
-		switch(textscreen->Alignment)
+		long pos = -1, oldpos;
+		do
 		{
-			default:
-				px = textscreen->PrintX;
-				break;
-			case TextScreenIntermissionAction::RIGHT:
-				px = textscreen->PrintX - width;
-				break;
-			case TextScreenIntermissionAction::CENTER:
-				px = textscreen->PrintX - width/2;
-				break;
+			oldpos = pos+1;
+			pos = str.IndexOf('\n', oldpos);
+			FString line = str.Mid(oldpos, pos - oldpos);
+
+			word width, height;
+			VW_MeasurePropString(textscreen->TextFont, line, width, height);
+
+			switch(textscreen->Alignment)
+			{
+				default:
+					px = textscreen->PrintX;
+					break;
+				case TextScreenIntermissionAction::RIGHT:
+					px = textscreen->PrintX - width;
+					break;
+				case TextScreenIntermissionAction::CENTER:
+					px = textscreen->PrintX - width/2;
+					break;
+			}
+
+			VWB_DrawPropString(textscreen->TextFont, line, textscreen->TextColor);
+
+			py += textscreen->TextFont->GetHeight();
 		}
-
-		VWB_DrawPropString(SmallFont, line, textscreen->TextColor);
-
-		py += SmallFont->GetHeight();
+		while(pos != -1);
 	}
 	pa = MENU_CENTER;
 
+	// This really only makes sense to use if trying to display text immediately.
+	if(textscreen->FadeTime)
+	{
+		VL_FadeIn(0, 255, textscreen->FadeTime);
+	}
+
 	VW_UpdateScreen();
-	WaitIntermission(textscreen->Time);
+	return WaitIntermission(textscreen->Time);
 }
 
-bool ShowIntermission(const IntermissionInfo &intermission)
+bool ShowIntermission(const IntermissionInfo &intermission, bool demoMode)
 {
+	exitOnAck = demoMode;
 	bool gototitle = false;
-	for(unsigned int i = 0;!gototitle && i < intermission.Actions.Size();++i)
+	bool acked = false;
+
+	for(unsigned int i = 0;i < intermission.Actions.Size();++i)
 	{
 		switch(intermission.Actions[i].type)
 		{
 			default:
 			case IntermissionInfo::IMAGE:
-				ShowImage(intermission.Actions[i].action, false);
+				acked = ShowImage(intermission.Actions[i].action, false);
 				break;
 			case IntermissionInfo::FADER:
 				ShowFader((FaderIntermissionAction*)intermission.Actions[i].action);
@@ -174,15 +227,18 @@ bool ShowIntermission(const IntermissionInfo &intermission)
 				gototitle = true;
 				break;
 			case IntermissionInfo::TEXTSCREEN:
-				ShowTextScreen((TextScreenIntermissionAction*)intermission.Actions[i].action);
+				acked = ShowTextScreen((TextScreenIntermissionAction*)intermission.Actions[i].action, demoMode);
 				break;
 			case IntermissionInfo::VICTORYSTATS:
 				Victory(true);
 				break;
 		}
+
+		if(demoMode ? acked : gototitle)
+			break;
 	}
 
-	if(!gototitle)
+	if(!gototitle && !demoMode)
 	{
 		// Hold at the final page until esc is pressed
 		IN_ClearKeysDown();
@@ -196,6 +252,20 @@ bool ShowIntermission(const IntermissionInfo &intermission)
 		while(LastScan != sc_Escape && LastScan != sc_Enter && !ci.button1);
 	}
 
-	VL_ReadPalette(gameinfo.GamePalette);
-	return !gototitle;
+	if(demoMode)
+	{
+		if(acked)
+		{
+			VW_FadeOut();
+			VL_ReadPalette(gameinfo.GamePalette);
+			return false;
+		}
+		else
+			return true;
+	}
+	else
+	{
+		VL_ReadPalette(gameinfo.GamePalette);
+		return !gototitle;
+	}
 }
