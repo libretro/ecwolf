@@ -157,44 +157,16 @@ static bool ShowTextScreen(TextScreenIntermissionAction *textscreen, bool demoMo
 			return true;
 	}
 
-	pa = MENU_BOTTOM;
 	py = textscreen->PrintY;
+	px = textscreen->PrintX;
 	for(unsigned int i = 0;i < textscreen->Text.Size();++i)
 	{
 		FString str = textscreen->Text[i];
 		if(str[0] == '$')
 			str = language[str.Mid(1)];
 
-		long pos = -1, oldpos;
-		do
-		{
-			oldpos = pos+1;
-			pos = str.IndexOf('\n', oldpos);
-			FString line = str.Mid(oldpos, pos - oldpos);
-
-			word width, height;
-			VW_MeasurePropString(textscreen->TextFont, line, width, height);
-
-			switch(textscreen->Alignment)
-			{
-				default:
-					px = textscreen->PrintX;
-					break;
-				case TextScreenIntermissionAction::RIGHT:
-					px = textscreen->PrintX - width;
-					break;
-				case TextScreenIntermissionAction::CENTER:
-					px = textscreen->PrintX - width/2;
-					break;
-			}
-
-			VWB_DrawPropString(textscreen->TextFont, line, textscreen->TextColor);
-
-			py += textscreen->TextFont->GetHeight();
-		}
-		while(pos != -1);
+		DrawMultiLineText(str, textscreen->TextFont, textscreen->TextColor, textscreen->Alignment, textscreen->Anchor);
 	}
-	pa = MENU_CENTER;
 
 	// This really only makes sense to use if trying to display text immediately.
 	if(textscreen->FadeTime)

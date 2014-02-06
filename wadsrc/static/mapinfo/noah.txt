@@ -146,8 +146,12 @@ episode "MAP01"
 
 cluster 1
 {
-	exittext = "ENDART1"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_01"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP01"
@@ -193,8 +197,12 @@ episode "MAP04"
 
 cluster 2
 {
-	exittext = "ENDART2"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_02"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP04"
@@ -254,8 +262,12 @@ episode "MAP08"
 
 cluster 3
 {
-	exittext = "ENDART3"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_03"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP08"
@@ -329,8 +341,12 @@ episode "MAP13"
 
 cluster 4
 {
-	exittext = "ENDART4"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_04"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP13"
@@ -396,8 +412,12 @@ episode "MAP18"
 
 cluster 5
 {
-	exittext = "ENDART5"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_05"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP18"
@@ -480,8 +500,12 @@ episode "MAP24"
 
 cluster 6
 {
-	exittext = "ENDART6"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_06"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP24"

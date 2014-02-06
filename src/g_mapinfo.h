@@ -37,6 +37,7 @@
 
 #include "textures/textures.h"
 #include "v_font.h"
+#include "wl_text.h"
 #include "zstring.h"
 
 class ClassDef;
@@ -212,6 +213,11 @@ public:
 	FString		EnterText, ExitText;
 	ExitType	EnterTextType, ExitTextType;
 	FString		Flat;
+	FString		Music;
+	FFont		*TextFont;
+	ETSAlignment TextAlignment;
+	ETSAnchor	TextAnchor;
+	EColorRange	TextColor;
 
 	static ClusterInfo &Find(unsigned int index);
 };

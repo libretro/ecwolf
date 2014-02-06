@@ -34,6 +34,7 @@
 
 #include "g_mapinfo.h"
 #include "tarray.h"
+#include "wl_text.h"
 #include "zstring.h"
 #include "textures/textures.h"
 
@@ -87,23 +88,17 @@ public:
 class TextScreenIntermissionAction : public IntermissionAction
 {
 public:
-	enum Alignment
-	{
-		LEFT,
-		CENTER,
-		RIGHT
-	};
-
 	TextScreenIntermissionAction() : IntermissionAction(), FadeTime(0),
-		Alignment(LEFT), TextFont(SmallFont), TextColor(CR_UNTRANSLATED),
-		TextDelay(20), TextSpeed(4)
+		Alignment(TS_Left), Anchor(TS_Middle), TextFont(SmallFont),
+		TextColor(CR_UNTRANSLATED), TextDelay(20), TextSpeed(4)
 	{
 	}
 
 	unsigned int	FadeTime;
 	unsigned int	PrintX;
 	unsigned int	PrintY;
-	Alignment		Alignment;
+	ETSAlignment	Alignment;
+	ETSAnchor		Anchor;
 	TArray<FString>	Text;
 	FFont			*TextFont;
 	EColorRange		TextColor;

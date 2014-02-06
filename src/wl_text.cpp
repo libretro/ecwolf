@@ -73,6 +73,9 @@ static FTextureID picnum;
 static FTexture *backgroundFlat = NULL;
 static int     picdelay;
 static bool    layoutdone;
+static FFont *font;
+static ETSAlignment alignment;
+static ETSAnchor anchor;
 
 //===========================================================================
 
@@ -654,6 +657,76 @@ void CountPages (void)
 /*
 =====================
 =
+= ShowBreifing
+=
+=====================
+*/
+
+static void ShowBriefing(FString str)
+{
+	VWB_DrawFill(backgroundFlat, 0, 0, screenWidth, screenHeight);
+
+	switch(alignment)
+	{
+		default:
+			px = 8;
+			break;
+		case TS_Center:
+			px = 160;
+			break;
+		case TS_Right:
+			px = 312;
+			break;
+	}
+	py = 8;
+
+	DrawMultiLineText(str, font, textcolor, alignment, anchor);
+
+	VL_FadeIn(0,255,10);
+	IN_Ack();
+}
+
+void DrawMultiLineText(const FString str, FFont *font, EColorRange color, ETSAlignment align, ETSAnchor anchor)
+{
+	int oldpa = pa;
+	pa = anchor;
+
+	const int basepx = px;
+	long pos = -1, oldpos;
+	do
+	{
+		oldpos = pos+1;
+		pos = str.IndexOf('\n', oldpos);
+		const FString line = str.Mid(oldpos, pos - oldpos);
+
+		word width, height;
+		VW_MeasurePropString(font, line, width, height);
+
+		switch(align)
+		{
+			default:
+				px = basepx;
+				break;
+			case TS_Right:
+				px = basepx - width;
+				break;
+			case TS_Center:
+				px = basepx - width/2;
+				break;
+		}
+
+		VWB_DrawPropString(font, line, color);
+
+		py += font->GetHeight();
+	}
+	while(pos != -1);
+
+	pa = oldpa;
+}
+
+/*
+=====================
+=
 = ShowArticle
 =
 =====================
@@ -666,8 +739,15 @@ void ShowArticle (const char *article, bool helphack=false)
 	ControlInfo ci;
 
 	text = article;
-	VWB_Clear(GPalette.BlackIndex, 0, 0, screenWidth, screenHeight);
 	CountPages();
+	if(numpages == 0)
+	{
+		// No pages?  Show S3DNA style briefing.
+		ShowBriefing(article);
+		return;
+	}
+
+	VWB_Clear(GPalette.BlackIndex, 0, 0, screenWidth, screenHeight);
 
 	newpage = true;
 	firstpage = true;
@@ -771,13 +851,64 @@ void HelpScreens (void)
 	VW_FadeOut();
 }
 
+
+static bool ShowText(const FString exitText, const FString flat, const FString music, ClusterInfo::ExitType type)
+{
+	// Use cluster background if set.
+	if(!flat.IsEmpty())
+		backgroundFlat = TexMan(flat);
+	if(!backgroundFlat) // Get default if needed
+		backgroundFlat = TexMan(gameinfo.FinaleFlat);
+
+	switch(type)
+	{
+		case ClusterInfo::EXIT_MESSAGE:
+			SD_PlaySound ("misc/1up");
+
+			Message (exitText);
+
+			IN_ClearKeysDown ();
+			IN_Ack ();
+			return false;
+	
+		case ClusterInfo::EXIT_LUMP:
+		{
+			int lumpNum = Wads.CheckNumForName(exitText, ns_global);
+			if(lumpNum != -1)
+			{
+				FWadLump lump = Wads.OpenLumpNum(lumpNum);
+				char* text = new char[Wads.LumpLength(lumpNum)];
+				lump.Read(text, Wads.LumpLength(lumpNum));
+
+				if(!music.IsEmpty())
+					StartCPMusic(music);
+				ShowArticle(text, !!(IWad::GetGame().Flags & IWad::HELPHACK));
+
+				delete[] text;
+			}
+
+			break;
+		}
+
+		default:
+			if(!music.IsEmpty())
+				StartCPMusic(music);
+			ShowArticle(exitText, !!(IWad::GetGame().Flags & IWad::HELPHACK));
+			break;
+	}
+
+	IN_ClearKeysDown();
+	if (MousePresent && IN_IsInputGrabbed())
+		IN_CenterMouse();  // Clear accumulated mouse movement
+	return true;
+}
+
 //
 // END ARTICLES
 //
 bool EndText (int exitClusterNum, int enterClusterNum)
 {
 	static bool EndTextInProgress = false;
-	char    *text;
 
 	if(EndTextInProgress)
 		return false;
@@ -791,6 +922,7 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 	FString exitSlideshow;
 	FString exitText;
 	FString flat;
+	FString music;
 	ClusterInfo::ExitType type = ClusterInfo::EXIT_STRING;
 
 	if(enterClusterNum >= 0)
@@ -800,7 +932,12 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 		{
 			exitText = enterCluster.EnterText;
 			flat = enterCluster.Flat;
+			music = enterCluster.Music;
 			type = enterCluster.EnterTextType;
+			textcolor = enterCluster.TextColor;
+			font = enterCluster.TextFont;
+			alignment = enterCluster.TextAlignment;
+			anchor = enterCluster.TextAnchor;
 		}
 
 		exitSlideshow = enterCluster.EnterSlideshow;
@@ -813,7 +950,12 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 		{
 			exitText = exitCluster.ExitText;
 			flat = exitCluster.Flat;
+			music = exitCluster.Music;
 			type = exitCluster.ExitTextType;
+			textcolor = exitCluster.TextColor;
+			font = exitCluster.TextFont;
+			alignment = exitCluster.TextAlignment;
+			anchor = exitCluster.TextAnchor;
 		}
 		if(exitSlideshow.IsEmpty())
 			exitSlideshow = exitCluster.ExitSlideshow;
@@ -825,51 +967,10 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 	{
 		ret = true;
 
-		// Use cluster background if set.
-		if(!flat.IsEmpty())
-			backgroundFlat = TexMan(flat);
-		if(!backgroundFlat) // Get default if needed
-			backgroundFlat = TexMan(gameinfo.FinaleFlat);
-
-		switch(type)
-		{
-			case ClusterInfo::EXIT_MESSAGE:
-				SD_PlaySound ("misc/1up");
-
-				Message (exitText);
-
-				IN_ClearKeysDown ();
-				IN_Ack ();
-				return false;
-		
-			case ClusterInfo::EXIT_LUMP:
-			{
-				VW_FadeOut ();
-
-				int lumpNum = Wads.CheckNumForName(exitText, ns_global);
-				if(lumpNum != -1)
-				{
-					FWadLump lump = Wads.OpenLumpNum(lumpNum);
-					text = new char[Wads.LumpLength(lumpNum)];
-					lump.Read(text, Wads.LumpLength(lumpNum));
-
-					ShowArticle(text, !!(IWad::GetGame().Flags & IWad::HELPHACK));
-
-					delete[] text;
-				}
-
-				break;
-			}
-
-			default:
-				VW_FadeOut ();
-				ShowArticle(exitText, !!(IWad::GetGame().Flags & IWad::HELPHACK));
-				break;
-		}
-
-		IN_ClearKeysDown();
-		if (MousePresent && IN_IsInputGrabbed())
-			IN_CenterMouse();  // Clear accumulated mouse movement
+		if(type != ClusterInfo::EXIT_MESSAGE)
+			VW_FadeOut();
+		if(!ShowText(exitText, flat, music, type))
+			return false;
 	}
 
 	if(!exitSlideshow.IsEmpty())
@@ -880,4 +981,30 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 
 	EndTextInProgress = false;
 	return ret;
+}
+
+// Episode start execute entertext.
+void EnterText(unsigned int cluster)
+{
+	ClearMemory ();
+
+	ClusterInfo &clusterInfo = ClusterInfo::Find(cluster);
+
+	if(!clusterInfo.EnterText.IsEmpty())
+	{
+		textcolor = clusterInfo.TextColor;
+		font = clusterInfo.TextFont;
+		alignment = clusterInfo.TextAlignment;
+		anchor = clusterInfo.TextAnchor;
+
+		if(clusterInfo.EnterTextType != ClusterInfo::EXIT_MESSAGE)
+			VW_FadeOut();
+		ShowText(clusterInfo.EnterText, clusterInfo.Flat, clusterInfo.Music, clusterInfo.EnterTextType);
+	}
+
+	if(!clusterInfo.EnterSlideshow.IsEmpty())
+	{
+		IntermissionInfo &intermission = IntermissionInfo::Find(clusterInfo.EnterSlideshow);
+		ShowIntermission(intermission);
+	}
 }

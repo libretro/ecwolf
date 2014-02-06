@@ -61,6 +61,7 @@ intermission SpearEnding
 		Position = 160, 180
 		Text = "$STR_ENDGAME1", "$STR_ENDGAME2"
 		TextAlignment = Center
+		TextAnchor = Bottom
 		TextColor = "Cream"
 		TextSpeed = 0
 		TextDelay = 0
@@ -71,6 +72,7 @@ intermission SpearEnding
 		Position = 160, 180
 		Text = "$STR_ENDGAME3", "$STR_ENDGAME4"
 		TextAlignment = Center
+		TextAnchor = Bottom
 		TextColor = "Cream"
 		TextSpeed = 0
 		TextDelay = 0

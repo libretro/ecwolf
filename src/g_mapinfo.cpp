@@ -769,7 +769,9 @@ protected:
 
 static TMap<unsigned int, ClusterInfo> clusters;
 
-ClusterInfo::ClusterInfo() : ExitTextType(ClusterInfo::EXIT_STRING)
+ClusterInfo::ClusterInfo() : ExitTextType(ClusterInfo::EXIT_STRING),
+	TextFont(SmallFont), TextAlignment(TS_Left), TextAnchor(TS_Middle),
+	TextColor(CR_UNTRANSLATED)
 {
 }
 
@@ -826,6 +828,42 @@ protected:
 			cluster->ExitTextType = ClusterInfo::EXIT_MESSAGE;
 		else if(key.CompareNoCase("flat") == 0)
 			ParseStringAssignment(cluster->Flat);
+		else if(key.CompareNoCase("music") == 0)
+			ParseStringAssignment(cluster->Music);
+		else if(sc->str.CompareNoCase("textalignment") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_Identifier);
+			if(sc->str.CompareNoCase("left") == 0)
+				cluster->TextAlignment = TS_Left;
+			else if(sc->str.CompareNoCase("center") == 0)
+				cluster->TextAlignment = TS_Center;
+			else if(sc->str.CompareNoCase("right") == 0)
+				cluster->TextAlignment = TS_Right;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown alignment.");
+		}
+		else if(sc->str.CompareNoCase("textanchor") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_Identifier);
+			if(sc->str.CompareNoCase("top") == 0)
+				cluster->TextAnchor = TS_Top;
+			else if(sc->str.CompareNoCase("middle") == 0)
+				cluster->TextAnchor = TS_Middle;
+			else if(sc->str.CompareNoCase("bottom") == 0)
+				cluster->TextAnchor = TS_Bottom;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown anchor.");
+		}
+		else if(sc->str.CompareNoCase("textcolor") == 0)
+			ParseFontColorAssignment(cluster->TextColor);
+		else if(sc->str.CompareNoCase("textfont") == 0)
+		{
+			FString fontName;
+			ParseStringAssignment(fontName);
+			cluster->TextFont = V_GetFont(fontName);
+		}
 		else
 			return false;
 		return true;
@@ -1122,13 +1160,26 @@ protected:
 				sc.MustGetToken('=');
 				sc.MustGetToken(TK_Identifier);
 				if(sc->str.CompareNoCase("left") == 0)
-					textscreen->Alignment = TextScreenIntermissionAction::LEFT;
+					textscreen->Alignment = TS_Left;
 				else if(sc->str.CompareNoCase("center") == 0)
-					textscreen->Alignment = TextScreenIntermissionAction::CENTER;
+					textscreen->Alignment = TS_Center;
 				else if(sc->str.CompareNoCase("right") == 0)
-					textscreen->Alignment = TextScreenIntermissionAction::RIGHT;
+					textscreen->Alignment = TS_Right;
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown alignment.");
+			}
+			else if(sc->str.CompareNoCase("TextAnchor") == 0)
+			{
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.CompareNoCase("top") == 0)
+					textscreen->Anchor = TS_Top;
+				else if(sc->str.CompareNoCase("middle") == 0)
+					textscreen->Anchor = TS_Middle;
+				else if(sc->str.CompareNoCase("bottom") == 0)
+					textscreen->Anchor = TS_Bottom;
+				else
+					sc.ScriptMessage(Scanner::ERROR, "Unknown anchor.");
 			}
 			else if(sc->str.CompareNoCase("TextColor") == 0)
 				ParseFontColorAssignment(textscreen->TextColor);

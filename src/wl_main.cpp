@@ -145,6 +145,8 @@ void NewGame (int difficulty, const FString &map, const ClassDef *playerClass)
 	gamestate.playerClass = playerClass;
 	levelInfo = &LevelInfo::Find(map);
 
+	EnterText(levelInfo->Cluster);	
+
 	// Clear LevelRatios
 	LevelRatios.killratio = LevelRatios.secretsratio = LevelRatios.treasureratio =
 		LevelRatios.numLevels = LevelRatios.time = 0;
