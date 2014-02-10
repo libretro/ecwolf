@@ -913,7 +913,7 @@ restartgame:
 
 						ClearMemory();
 
-						CheckHighScore (players[0].score,levelInfo->FloorNumber);
+						CheckHighScore (players[0].score,levelInfo);
 						return gotoMenu;
 					}
 				}
@@ -951,7 +951,7 @@ restartgame:
 
 				if(next.CompareNoCase("EndDemo") == 0)
 				{
-					CheckHighScore (players[0].score,levelInfo->FloorNumber);
+					CheckHighScore (players[0].score,levelInfo);
 					return false;
 				}
 
@@ -975,7 +975,7 @@ restartgame:
 
 				ClearMemory ();
 
-				CheckHighScore (players[0].score,levelInfo->FloorNumber);
+				CheckHighScore (players[0].score,levelInfo);
 				return false;
 
 			case ex_warped:

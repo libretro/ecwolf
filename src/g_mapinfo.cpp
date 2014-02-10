@@ -282,7 +282,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	DeathCam = false;
 	ExitFadeColor = 0;
 	ExitFadeDuration = 30;
-	FloorNumber = 1;
+	FloorNumber = "1";
 	Par = 0;
 	LevelBonus = -1;
 	LevelNumber = 0;
@@ -494,7 +494,16 @@ protected:
 		else if(key.CompareNoCase("DeathCam") == 0)
 			ParseBoolAssignment(mapInfo.DeathCam);
 		else if(key.CompareNoCase("FloorNumber") == 0)
-			ParseIntAssignment(mapInfo.FloorNumber);
+		{
+			sc.MustGetToken('=');
+			if(sc.CheckToken(TK_StringConst))
+				mapInfo.FloorNumber = sc->str;
+			else
+			{
+				sc.MustGetToken(TK_IntConst);
+				mapInfo.FloorNumber.Format("%d", sc->number);
+			}
+		}
 		else if(key.CompareNoCase("HighScoresGraphic") == 0)
 		{
 			FString texName;

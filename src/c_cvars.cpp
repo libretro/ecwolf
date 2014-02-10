@@ -184,7 +184,10 @@ void ReadConfig(void)
 
 		strcpy(Scores[i].name, config.GetSetting(hsName)->GetString());
 		Scores[i].score = config.GetSetting(hsScore)->GetInteger();
-		Scores[i].completed = config.GetSetting(hsCompleted)->GetInteger();
+		if(config.GetSetting(hsCompleted)->GetType() == SettingsData::ST_STR)
+			Scores[i].completed = config.GetSetting(hsCompleted)->GetString();
+		else
+			Scores[i].completed.Format("%d", config.GetSetting(hsCompleted)->GetInteger());
 		strncpy(Scores[i].graphic, config.GetSetting(hsGraphic)->GetString(), 8);
 		Scores[i].graphic[8] = 0;
 	}

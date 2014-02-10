@@ -62,8 +62,8 @@ public:
 		if(IWad::CheckGameFilter("Noah"))
 		{
 			// Change default configuration
-			StatusBarConfig.Floor.X = 32;
-			StatusBarConfig.Floor.Digits = 1;
+			StatusBarConfig.Floor.X = 16;
+			StatusBarConfig.Floor.Digits = 3;
 			StatusBarConfig.Score.X = 56;
 			StatusBarConfig.Lives.X = 128;
 			StatusBarConfig.Health.X = 184;
@@ -85,6 +85,7 @@ public:
 
 private:
 	static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=false);
+	static void LatchString (int x, int y, unsigned width, const FString &str);
 	static void StatusDrawFace(FTexture *pic);
 	static void StatusDrawPic(unsigned x, unsigned y, const char* pic);
 
@@ -261,15 +262,13 @@ void WolfStatusBar::UpdateFace (int damage)
 ===============
 */
 
+static FFont *HudFont = NULL;
 void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, bool cap)
 {
-	static FFont *HudFont = NULL;
 	if(!HudFont)
 	{
 		HudFont = V_GetFont("HudFont");
 	}
-
-	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
 
 	FString str;
 	str.Format("%*d", width, number);
@@ -278,6 +277,18 @@ void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, b
 		int maxval = width <= 9 ? (int) ceil(pow(10., (int)width))-1 : INT_MAX;
 		str.Format("%d", maxval);
 	}
+
+	LatchString(x, y, width, str);
+}
+
+void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &str)
+{
+	if(!HudFont)
+	{
+		HudFont = V_GetFont("HudFont");
+	}
+
+	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
 
 	int cwidth;
 	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
@@ -317,7 +328,7 @@ void WolfStatusBar::DrawHealth (void)
 void WolfStatusBar::DrawLevel (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
-	LatchNumber (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,levelInfo->FloorNumber);
+	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,levelInfo->FloorNumber);
 }
 
 //===========================================================================

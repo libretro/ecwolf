@@ -249,7 +249,7 @@ void LevelCompleted (void)
 	}
 	else
 		completedString = language["STR_FLOORCOMPLETED"];
-	completedString.Format(completedString, levelInfo->FloorNumber);
+	completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
 	Write (14, 2, completedString);
 
 	if(levelInfo->LevelBonus == -1)
@@ -632,7 +632,7 @@ void DrawHighScores (void)
 		//
 		// level
 		//
-		buffer.Format("%d", s->completed);
+		buffer.Format("%s", s->completed.GetChars());
 		VW_MeasurePropString (font, buffer, w, h);
 		PrintX = 194 - w;
 
@@ -675,7 +675,7 @@ void DrawHighScores (void)
 =======================
 */
 
-void CheckHighScore (int32_t score, word other)
+void CheckHighScore (int32_t score, const LevelInfo *levelInfo)
 {
 	word i, j;
 	int n;
@@ -683,7 +683,7 @@ void CheckHighScore (int32_t score, word other)
 
 	strcpy (myscore.name, "");
 	myscore.score = score;
-	myscore.completed = other;
+	myscore.completed = levelInfo->FloorNumber;
 	if(levelInfo->HighScoresGraphic.isValid())
 	{
 		strncpy(myscore.graphic, TexMan[levelInfo->HighScoresGraphic]->Name, 8);

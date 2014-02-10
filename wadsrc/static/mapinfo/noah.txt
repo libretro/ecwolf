@@ -158,7 +158,7 @@ map "MAP01"
 {
 	next = "MAP02"
 	secretnext = "MAP02"
-	floornumber = 1
+	floornumber = "1-1"
 	par = 30
 	music = "SONG1"
 	cluster = 1
@@ -168,7 +168,7 @@ map "MAP02"
 {
 	next = "MAP03"
 	secretnext = "MAP03"
-	floornumber = 2
+	floornumber = "1-2"
 	par = 60
 	music = "ALLGOOD"
 	cluster = 1
@@ -178,7 +178,7 @@ map "MAP03"
 {
 	next = "MAP04"
 	secretnext = "MAP04"
-	floornumber = 3
+	floornumber = "1-3"
 	par = 60
 	music = "SONG7"
 	cluster = 1
@@ -209,7 +209,7 @@ map "MAP04"
 {
 	next = "MAP05"
 	secretnext = "MAP05"
-	floornumber = 4
+	floornumber = "2-1"
 	par = 120
 	music = "SONG3"
 	cluster = 2
@@ -221,7 +221,7 @@ map "MAP05"
 {
 	next = "MAP06"
 	secretnext = "MAP06"
-	floornumber = 5
+	floornumber = "2-2"
 	par = 105
 	music = "SONG1"
 	cluster = 2
@@ -233,7 +233,7 @@ map "MAP06"
 {
 	next = "MAP07"
 	secretnext = "MAP07"
-	floornumber = 6
+	floornumber = "2-3"
 	par = 90
 	music = "ALLGOOD"
 	cluster = 2
@@ -245,7 +245,7 @@ map "MAP07"
 {
 	next = "MAP08"
 	secretnext = "MAP08"
-	floornumber = 7
+	floornumber = "2-4"
 	par = 105
 	music = "SONG7"
 	cluster = 2
@@ -274,7 +274,7 @@ map "MAP08"
 {
 	next = "MAP09"
 	secretnext = "MAP12"
-	floornumber = 8
+	floornumber = "3-1"
 	par = 105
 	music = "SONG4"
 	cluster = 3
@@ -286,7 +286,7 @@ map "MAP09"
 {
 	next = "MAP10"
 	secretnext = "MAP10"
-	floornumber = 9
+	floornumber = "3-2"
 	music = "SONG3"
 	cluster = 3
 	par = 120
@@ -298,7 +298,7 @@ map "MAP10"
 {
 	next = "MAP11"
 	secretnext = "MAP11"
-	floornumber = 10
+	floornumber = "3-3"
 	music = "SONG1"
 	cluster = 3
 	par = 135
@@ -310,7 +310,7 @@ map "MAP11"
 {
 	next = "MAP13"
 	secretnext = "MAP13"
-	floornumber = 1
+	floornumber = "3-4"
 	par = 60
 	music = "SONG7"
 	cluster = 3
@@ -322,7 +322,7 @@ map "MAP12"
 {
 	next = "MAP09"
 	secretnext = "MAP09"
-	floornumber = 2
+	floornumber = "3-5"
 	par = 120
 	music = "SONG9"
 	cluster = 3
@@ -353,7 +353,7 @@ map "MAP13"
 {
 	next = "MAP14"
 	secretnext = "MAP14"
-	floornumber = 3
+	floornumber = "4-1"
 	par = 210
 	music = "SONG6"
 	cluster = 4
@@ -363,7 +363,7 @@ map "MAP14"
 {
 	next = "MAP15"
 	secretnext = "MAP15"
-	floornumber = 4
+	floornumber = "4-2"
 	par = 150
 	music = "SONG4"
 	cluster = 4
@@ -373,7 +373,7 @@ map "MAP15"
 {
 	next = "MAP16"
 	secretnext = "MAP16"
-	floornumber = 5
+	floornumber = "4-3"
 	par = 240
 	music = "ALLGOOD"
 	cluster = 4
@@ -383,7 +383,7 @@ map "MAP16"
 {
 	next = "MAP17"
 	secretnext = "MAP17"
-	floornumber = 6
+	floornumber = "4-4"
 	par = 135
 	music = "SONG3"
 	cluster = 4
@@ -393,7 +393,7 @@ map "MAP17"
 {
 	next = "MAP18"
 	secretnext = "MAP18"
-	floornumber = 7
+	floornumber = "4-5"
 	par = 210
 	music = "SONG7"
 	cluster = 4
@@ -424,7 +424,7 @@ map "MAP18"
 {
 	next = "MAP19"
 	secretnext = "MAP19"
-	floornumber = 8
+	floornumber = "5-1"
 	par = 150
 	music = "SONG8"
 	cluster = 5
@@ -436,7 +436,7 @@ map "MAP19"
 {
 	next = "MAP20"
 	secretnext = "MAP20"
-	floornumber = 9
+	floornumber = "5-2"
 	music = "SONG1"
 	cluster = 165
 	defaultfloor = "FLOOR2"
@@ -447,7 +447,7 @@ map "MAP20"
 {
 	next = "MAP21"
 	secretnext = "MAP21"
-	floornumber = 10
+	floornumber = "5-3"
 	music = "SONG6"
 	cluster = 5
 	par = 180
@@ -459,7 +459,7 @@ map "MAP21"
 {
 	next = "MAP22"
 	secretnext = "MAP22"
-	floornumber = 1
+	floornumber = "5-4"
 	par = 210
 	music = "SONG4"
 	cluster = 5
@@ -471,7 +471,7 @@ map "MAP22"
 {
 	next = "MAP23"
 	secretnext = "MAP33"
-	floornumber = 2
+	floornumber = "5-5"
 	par = 180
 	music = "HAPPYSNG"
 	cluster = 5
@@ -483,7 +483,7 @@ map "MAP23"
 {
 	next = "MAP24"
 	secretnext = "MAP24"
-	floornumber = 3
+	floornumber = "5-6"
 	par = 180
 	music = "SONG7"
 	cluster = 5
@@ -512,7 +512,7 @@ map "MAP24"
 {
 	next = "MAP25"
 	secretnext = "MAP25"
-	floornumber = 4
+	floornumber = "6-1"
 	par = 105
 	music = "SONG11"
 	cluster = 6
@@ -524,7 +524,7 @@ map "MAP25"
 {
 	next = "MAP26"
 	secretnext = "MAP26"
-	floornumber = 5
+	floornumber = "6-2"
 	par = 180
 	music = "ALLGOOD"
 	cluster = 6
@@ -536,7 +536,7 @@ map "MAP26"
 {
 	next = "MAP27"
 	secretnext = "MAP30"
-	floornumber = 6
+	floornumber = "6-3"
 	par = 180
 	music = "SONG3"
 	cluster = 6
@@ -548,7 +548,7 @@ map "MAP27"
 {
 	next = "MAP28"
 	secretnext = "MAP38"
-	floornumber = 7
+	floornumber = "6-4"
 	par = 90
 	music = "SONG8"
 	cluster = 6
@@ -560,7 +560,7 @@ map "MAP28"
 {
 	next = "MAP29"
 	secretnext = "MAP29"
-	floornumber = 8
+	floornumber = "6-5"
 	par = 150
 	music = "SONG6"
 	cluster = 6
@@ -573,7 +573,7 @@ map "MAP29"
 {
 	next = "MAP31"
 	secretnext = "MAP31"
-	floornumber = 9
+	floornumber = "6-6"
 	music = "SONG7"
 	cluster = 6
 	par = 191
@@ -585,7 +585,7 @@ map "MAP30"
 {
 	next = "MAP27"
 	secretnext = "MAP27"
-	floornumber = 10
+	floornumber = "6-7"
 	music = "SONG9"
 	cluster = 6
 	par = 120
@@ -602,7 +602,7 @@ map "MAP31"
 {
 	next = "MAP31"
 	secretnext = "MAP31"
-	floornumber = 1
+	floornumber = "7-1"
 	music = "ALLGOOD"
 	cluster = 7
 	defaultfloor = "FLOOR4"

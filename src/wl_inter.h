@@ -19,7 +19,7 @@ extern struct LRstruct
 } LevelRatios;
 
 void DrawHighScores(void);
-void CheckHighScore (int32_t score,word other);
+void CheckHighScore (int32_t score, const class LevelInfo *levelInfo);
 void Victory (bool fromIntermission);
 void LevelCompleted (void);
 void ClearSplitVWB (void);

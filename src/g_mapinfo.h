@@ -138,7 +138,7 @@ public:
 	FString			NextMap;
 	FString			NextSecret;
 	FString			NextVictory;
-	unsigned int	FloorNumber;
+	FString			FloorNumber;
 	FString			Music;
 	unsigned int	Cluster;
 	FString			Translator;
