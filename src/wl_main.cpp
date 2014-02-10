@@ -133,7 +133,7 @@ int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 =====================
 */
 
-void NewGame (int difficulty, const FString &map, const ClassDef *playerClass)
+void NewGame (int difficulty, const FString &map, bool displayBriefing, const ClassDef *playerClass)
 {
 	if(!playerClass)
 		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
@@ -145,7 +145,8 @@ void NewGame (int difficulty, const FString &map, const ClassDef *playerClass)
 	gamestate.playerClass = playerClass;
 	levelInfo = &LevelInfo::Find(map);
 
-	EnterText(levelInfo->Cluster);	
+	if(displayBriefing)
+		EnterText(levelInfo->Cluster);	
 
 	// Clear LevelRatios
 	LevelRatios.killratio = LevelRatios.secretsratio = LevelRatios.treasureratio =
@@ -773,7 +774,7 @@ static void DemoLoop()
 	if (param_tedlevel)
 	{
 		param_nowait = true;
-		NewGame(param_difficulty,param_tedlevel);
+		NewGame(param_difficulty,param_tedlevel,false);
 	}
 
 

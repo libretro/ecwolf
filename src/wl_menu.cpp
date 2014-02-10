@@ -197,7 +197,7 @@ MENU_LISTENER(StartNewGame)
 		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
 
 	Menu::closeMenus();
-	NewGame(which, episode->StartMap, playerClass);
+	NewGame(which, episode->StartMap, true, playerClass);
 
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR

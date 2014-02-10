@@ -43,7 +43,7 @@ extern  int      param_joystickhat;
 extern  int      param_samplerate;
 extern  int      param_audiobuffer;
 
-void            NewGame (int difficulty,const class FString &map,const class ClassDef *playerClass=NULL);
+void            NewGame (int difficulty,const class FString &map,bool displayBriefing,const class ClassDef *playerClass=NULL);
 void            CalcProjection (int32_t focal);
 void			CalcVisibility (fixed vis);
 int				CheckRatio (int width, int height);

@@ -532,7 +532,7 @@ void RecordDemo (void)
 
 	VW_FadeOut ();
 
-	NewGame (gd_hard, level);
+	NewGame (gd_hard, level, false);
 
 	StartDemoRecord (levelnum);
 
@@ -589,7 +589,7 @@ void PlayDemo (int demonumber)
 	int mapon = *demoptr++;
 	FString level;
 	level.Format("MAP%02d", mapon);
-	NewGame (1,level);
+	NewGame (1,level,false);
 	length = READWORD(*(uint8_t **)&demoptr);
 	// TODO: Seems like the original demo format supports 16 MB demos
 	//       But T_DEM00 and T_DEM01 of Wolf have a 0xd8 as third length size...
