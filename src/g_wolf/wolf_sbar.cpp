@@ -262,14 +262,8 @@ void WolfStatusBar::UpdateFace (int damage)
 ===============
 */
 
-static FFont *HudFont = NULL;
 void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, bool cap)
 {
-	if(!HudFont)
-	{
-		HudFont = V_GetFont("HudFont");
-	}
-
 	FString str;
 	str.Format("%*d", width, number);
 	if(str.Len() > width && cap)
@@ -283,6 +277,7 @@ void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, b
 
 void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &str)
 {
+	static FFont *HudFont = NULL;
 	if(!HudFont)
 	{
 		HudFont = V_GetFont("HudFont");
@@ -292,7 +287,7 @@ void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &st
 
 	int cwidth;
 	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
-	for(size_t i = MAX<size_t>(0, str.Len()-width);i < str.Len();++i)
+	for(unsigned int i = MAX<int>(0, str.Len()-width);i < str.Len();++i)
 	{
 		VWB_DrawGraphic(HudFont->GetChar(str[i], &cwidth), x, y, MENU_NONE, remap);
 		x += cwidth;
@@ -328,7 +323,9 @@ void WolfStatusBar::DrawHealth (void)
 void WolfStatusBar::DrawLevel (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
-	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,levelInfo->FloorNumber);
+	FString str;
+	str.Format("%*s", StatusBarConfig.Floor.Digits, levelInfo->FloorNumber.GetChars());
+	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,str);
 }
 
 //===========================================================================
