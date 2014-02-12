@@ -37,10 +37,10 @@
 #include "wl_def.h"
 #include "v_palette.h"
 #include "name.h"
+#include "textures/textures.h"
 
 class DCanvas;
 struct FRemapTable;
-class FTexture;
 class FArchive;
 
 enum EColorRange
@@ -82,6 +82,7 @@ public:
 	virtual ~FFont ();
 
 	virtual FTexture *GetChar (int code, int *const width) const;
+	virtual FTextureID GetCharID (int code) const;
 	virtual int GetCharWidth (int code) const;
 	FRemapTable *GetColorTranslation (EColorRange range) const;
 	int GetLump() const { return Lump; }
@@ -120,6 +121,7 @@ protected:
 	struct CharData
 	{
 		FTexture *Pic;
+		FTextureID ID;
 		int XMove;
 	} *Chars;
 	int ActiveColors;

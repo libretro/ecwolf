@@ -6,6 +6,8 @@
 #include "m_crc32.h"
 #include "templates.h"
 
+int ParseHex(const char* hex);
+
 // Ensures that a double is a whole number or a half
 static inline bool CheckTicsValid(double tics)
 {

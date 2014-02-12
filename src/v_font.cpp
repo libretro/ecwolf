@@ -179,7 +179,7 @@ protected:
 class FSpecialFont : public FFont
 {
 public:
-	FSpecialFont (const char *name, int first, int count, FTexture **lumplist, const bool *notranslate, int lump);
+	FSpecialFont (const char *name, int first, int count, FTextureID *lumplist, const bool *notranslate, int lump);
 
 	void LoadTranslations();
 
@@ -425,11 +425,13 @@ FFont::FFont (const char *name, const char *nametemplate, int first, int count, 
 		if (charlumps[i] != NULL)
 		{
 			Chars[i].Pic = new FFontChar1 (charlumps[i]);
+			Chars[i].ID = lump;
 			Chars[i].XMove = Chars[i].Pic->GetScaledWidth();
 		}
 		else
 		{
 			Chars[i].Pic = NULL;
+			Chars[i].ID.SetInvalid();
 			Chars[i].XMove = INT_MIN;
 		}
 	}
@@ -466,9 +468,10 @@ FFont::~FFont ()
 	{
 		int count = LastChar - FirstChar + 1;
 
+		// Delete any textures we haven't directly added to our texture manager
 		for (int i = 0; i < count; ++i)
 		{
-			if (Chars[i].Pic != NULL && Chars[i].Pic->Name[0] == 0)
+			if (Chars[i].Pic != NULL && Chars[i].Pic->Name[0] == 0 && TexMan[Chars[i].ID] != Chars[i].Pic)
 			{
 				delete Chars[i].Pic;
 			}
@@ -815,6 +818,29 @@ FTexture *FFont::GetChar (int code, int *const width) const
 	return (code < 0) ? NULL : Chars[code].Pic;
 }
 
+FTextureID FFont::GetCharID (int code) const
+{
+	code = GetCharCode(code, false);
+	if (code >= 0)
+	{
+		code -= FirstChar;
+		if (Chars[code].Pic == NULL)
+		{
+			code = GetCharCode(code + FirstChar, true);
+			if (code >= 0)
+				code -= FirstChar;
+		}
+	}
+
+	if (code < 0)
+	{
+		FTextureID id;
+		id.SetInvalid();
+		return id;
+	}
+	return Chars[code].ID;
+}
+
 //==========================================================================
 //
 // FFont :: GetCharWidth
@@ -975,6 +1001,16 @@ FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 
 	Next = FirstFont;
 	FirstFont = this;
+
+	// To allow access to characters outside of the font system, we need to add
+	// our textures to the texture manager.
+	for (unsigned int i = LastChar - FirstChar + 1;i-- > 0;)
+	{
+		if(Chars[i].Pic)
+		{
+			Chars[i].ID = TexMan.AddTexture(Chars[i].Pic);
+		}
+	}
 }
 
 //==========================================================================
@@ -1237,7 +1273,7 @@ void FSingleLumpFont::LoadTile8(int lump, const BYTE *data)
 	FontHeight = 8;
 	SpaceWidth = 8;
 	FirstChar = ' '-8;
-	LastChar = 'u';
+	LastChar = 0x97;
 	GlobalKerning = 0;
 	ActiveColors = 256;
 	PatchRemap = NULL;
@@ -2042,7 +2078,7 @@ void FTile8Char::MakeTexture()
 //
 //==========================================================================
 
-FSpecialFont::FSpecialFont (const char *name, int first, int count, FTexture **lumplist, const bool *notranslate, int lump) : FFont(lump)
+FSpecialFont::FSpecialFont (const char *name, int first, int count, FTextureID *lumplist, const bool *notranslate, int lump) : FFont(lump)
 {
 	int i;
 	FTexture **charlumps;
@@ -2066,7 +2102,11 @@ FSpecialFont::FSpecialFont (const char *name, int first, int count, FTexture **l
 
 	for (i = 0; i < count; i++)
 	{
-		pic = charlumps[i] = lumplist[i];
+		if(lumplist[i].Exists())
+			pic = charlumps[i] = TexMan[lumplist[i]];
+		else
+			pic = charlumps[i] = NULL;
+
 		if (pic != NULL)
 		{
 			int height = pic->GetScaledHeight();
@@ -2086,11 +2126,13 @@ FSpecialFont::FSpecialFont (const char *name, int first, int count, FTexture **l
 		if (charlumps[i] != NULL)
 		{
 			Chars[i].Pic = new FFontChar1 (charlumps[i]);
+			Chars[i].ID = lumplist[i];
 			Chars[i].XMove = Chars[i].Pic->GetScaledWidth();
 		}
 		else
 		{
 			Chars[i].Pic = NULL;
+			Chars[i].ID.SetInvalid();
 			Chars[i].XMove = INT_MIN;
 		}
 	}
@@ -2230,7 +2272,7 @@ void FFont::FixXMoves()
 #define WRONG sc.ScriptMessage (Scanner::ERROR, "Invalid combination of properties in font '%s'", namebuffer.GetChars())
 void V_InitCustomFonts()
 {
-	FTexture *lumplist[256];
+	FTextureID lumplist[256];
 	bool notranslate[256];
 	FString namebuffer, templatebuf;
 	int i;
@@ -2315,9 +2357,9 @@ void V_InitCustomFonts()
 				else
 				{
 					if (format == 1) WRONG;
-					FTexture **p = &lumplist[*(unsigned char*)sc->str.GetChars()];
+					FTextureID &texid = lumplist[*(unsigned char*)sc->str.GetChars()];
 					if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");;
-					FTextureID texid = TexMan.CheckForTexture(sc->str, FTexture::TEX_MiscPatch);
+					texid = TexMan.CheckForTexture(sc->str, FTexture::TEX_MiscPatch);
 					if (!texid.Exists())
 					{
 						int lumpno = Wads.CheckNumForFullName (sc->str);
@@ -2331,11 +2373,7 @@ void V_InitCustomFonts()
 							}
 						}
 					}
-					if (texid.Exists())
-					{
-						*p = TexMan[texid];
-					}
-					else if (Wads.GetLumpFile(llump) >= Wads.IWAD_FILENUM)
+					if (!texid.Exists() && Wads.GetLumpFile(llump) >= Wads.IWAD_FILENUM)
 					{
 						// Print a message only if this isn't in zdoom.pk3
 						sc.ScriptMessage(Scanner::WARNING, "%s: Unable to find texture in font definition for %s", sc->str.GetChars(), namebuffer.GetChars());
@@ -2352,7 +2390,7 @@ void V_InitCustomFonts()
 			{
 				for (i = 0; i < 256; i++)
 				{
-					if (lumplist[i] != NULL)
+					if (lumplist[i].isValid())
 					{
 						first = i;
 						break;
@@ -2360,7 +2398,7 @@ void V_InitCustomFonts()
 				}
 				for (i = 255; i >= 0; i--)
 				{
-					if (lumplist[i] != NULL)
+					if (lumplist[i].isValid())
 					{
 						count = i - first + 1;
 						break;

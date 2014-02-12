@@ -110,11 +110,13 @@ class GameMap
 		{
 			Tile() : offsetVertical(false), offsetHorizontal(false)
 			{
+				overhead.SetInvalid();
 				sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
 			}
 
 			enum Side { East, North, West, South };
 			FTextureID		texture[4];
+			FTextureID		overhead;
 			bool			sideSolid[4];
 			bool			offsetVertical;
 			bool			offsetHorizontal;

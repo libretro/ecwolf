@@ -229,7 +229,7 @@ void AutoMap::Draw()
 
 	const double originx = (amx+amsizex/2) - (FIXED2FLOAT(FixedMul(FixedMul(scale, playerx&0xFFFF), amcos) - FixedMul(FixedMul(scale, playery&0xFFFF), amsin)));
 	const double originy = (amy+amsizey/2) - (FIXED2FLOAT(FixedMul(FixedMul(scale, playerx&0xFFFF), amsin) + FixedMul(FixedMul(scale, playery&0xFFFF), amcos)));
-	const double texScale = FIXED2FLOAT(scale>>6);
+	const double origTexScale = FIXED2FLOAT(scale>>6);
 
 	for(unsigned int my = 0;my < mapheight;++my)
 	{
@@ -241,6 +241,8 @@ void AutoMap::Draw()
 
 			if(TransformTile(spot, FixedMul((mx<<FRACBITS)-playerx, scale), FixedMul((my<<FRACBITS)-playery, scale), points))
 			{
+				double texScale = origTexScale;
+
 				FTexture *tex;
 				Color *color = NULL;
 				int brightness;
@@ -249,7 +251,12 @@ void AutoMap::Draw()
 					brightness = 256;
 					if((amFlags & AMF_DrawTexturedWalls))
 					{
-						if(spot->tile->offsetHorizontal)
+						if(spot->tile->overhead.isValid())
+						{
+							tex = TexMan(spot->tile->overhead);
+							texScale *= 8;
+						}
+						else if(spot->tile->offsetHorizontal)
 							tex = TexMan(spot->texture[MapTile::North]);
 						else
 							tex = TexMan(spot->texture[MapTile::East]);
@@ -318,10 +325,10 @@ void AutoMap::Draw()
 		{
 			FTexture *tex = TexMan(pwall.texid);
 			if(tex)
-				screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
+				screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256);
 		}
 		else
-			screen->FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);
+			screen->FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);
 	}
 
 	DrawVector(AM_Arrow, 8, amx + (amsizex>>1), amy + (amsizey>>1), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);

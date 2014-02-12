@@ -5,7 +5,6 @@ gameinfo
 	finaleflat = "#DCDCDC"
 	intermissionmusic = "ENDLEVEL"
 	titletime = 15
-	pagetime = 10
 	menufontcolor_title = "Gold"
 	menufontcolor_label = "DarkGrey"
 	menufontcolor_selection = "Grey"

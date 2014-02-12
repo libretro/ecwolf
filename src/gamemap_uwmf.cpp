@@ -113,6 +113,11 @@ void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 		sc.MustGetToken(TK_StringConst);
 		tile.texture[MapTile::East] = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
 	}
+	else CheckKey("textureoverhead")
+	{
+		sc.MustGetToken(TK_StringConst);
+		tile.overhead = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
 	else CheckKey("offsetvertical")
 	{
 		sc.MustGetToken(TK_BoolConst);
