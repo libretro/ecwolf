@@ -38,8 +38,11 @@
 #include "id_ca.h"
 #include "id_in.h"
 #include "id_vl.h"
+#include "id_vh.h"
+#include "g_mapinfo.h"
 #include "gamemap.h"
 #include "r_data/colormaps.h"
+#include "v_font.h"
 #include "v_video.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
@@ -130,7 +133,7 @@ void AM_UpdateFlags()
 
 	AM_Main.SetFlags(~flags, false);
 	AM_Overlay.SetFlags(~ovFlags, false);
-	AM_Main.SetFlags(flags, true);
+	AM_Main.SetFlags(flags|AutoMap::AMF_DispInfo, true);
 	AM_Overlay.SetFlags(ovFlags, true);
 }
 
@@ -424,6 +427,25 @@ void AutoMap::Draw()
 	}
 
 	DrawVector(AM_Arrow, 8, amx + (amsizex>>1), amy + (amsizey>>1), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
+
+	if((amFlags & AMF_DispInfo))
+	{
+		FFont *font = SmallFont;
+		unsigned int height = (font->GetHeight()+2)*CleanYfac;
+		screen->Dim(GPalette.BlackIndex, 0.5f, 0, 0, screenWidth, height);
+
+		pa = MENU_TOP;
+		px = 2;
+		py = 1;
+		VWB_DrawPropString(font, levelInfo->GetName(map), CR_WHITE);
+
+		FString exitString;
+		unsigned int seconds = gamestate.TimeCount/70;
+		exitString.Format("%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
+		px = 318 - font->GetCharWidth('0')*6 - font->GetCharWidth(':')*2;
+		VWB_DrawPropString(font, exitString, CR_WHITE);
+		pa = MENU_CENTER;
+	}
 }
 
 void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const

@@ -189,10 +189,10 @@ void PlayLoop (void);
 
 void PollKeyboardButtons (void)
 {
-	if(automap == AMA_Normal)
+	if(Paused & 2) // Paused for automap
 	{
 		// HACK
-		bool jam[256] = {false};
+		bool jam[512] = {false};
 
 		for(int i = 0;amControlScheme[i].button != bt_nobutton;i++)
 		{
@@ -912,10 +912,8 @@ void PlayLoop (void)
 		// Run tics
 		if(Paused & 2)
 		{
-			// If paused due to the automap, continue polling controls and
-			// updating the TimeCount, but don't tick anything.
+			// If paused due to the automap, continue polling controls but don't tick anything.
 			PollControls(0);
-			gamestate.TimeCount += tics;
 		}
 		else
 		{

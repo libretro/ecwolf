@@ -118,6 +118,7 @@ void ReadConfig(void)
 	config.CreateSetting("AM_DrawTexturedWalls", false);
 	config.CreateSetting("AM_DrawFloors", false);
 	config.CreateSetting("AM_Overlay", 0);
+	config.CreateSetting("AM_Pause", true);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -165,6 +166,7 @@ void ReadConfig(void)
 	am_drawtexturedwalls = config.GetSetting("AM_DrawTexturedWalls")->GetInteger() != 0;
 	am_drawfloors = config.GetSetting("AM_DrawFloors")->GetInteger() != 0;
 	am_overlay = config.GetSetting("AM_Overlay")->GetInteger();
+	am_pause = config.GetSetting("AM_Pause")->GetInteger() != 0;
 
 	char hsName[50];
 	char hsScore[50];
@@ -262,6 +264,7 @@ void WriteConfig(void)
 	config.GetSetting("AM_DrawTexturedWalls")->SetValue(am_drawtexturedwalls);
 	config.GetSetting("AM_DrawFloors")->SetValue(am_drawfloors);
 	config.GetSetting("AM_Overlay")->SetValue(am_overlay);
+	config.GetSetting("AM_Pause")->SetValue(am_pause);
 
 	char hsName[50];
 	char hsScore[50];

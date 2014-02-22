@@ -71,7 +71,8 @@ public:
 		AMF_Rotate = 0x1,
 		AMF_DrawTexturedWalls = 0x2,
 		AMF_DrawFloor = 0x4,
-		AMF_Overlay = 0x8
+		AMF_Overlay = 0x8,
+		AMF_DispInfo = 0x10
 	};
 
 	struct Color
