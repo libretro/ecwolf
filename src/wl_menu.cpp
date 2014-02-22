@@ -293,6 +293,18 @@ MENU_LISTENER(ChangeAutomapFlag)
 	AM_UpdateFlags();
 	return true;
 }
+MENU_LISTENER(ChangeAMOverlay)
+{
+	am_overlay = which;
+	AM_UpdateFlags();
+	return true;
+}
+MENU_LISTENER(ChangeAMRotate)
+{
+	am_rotate = which;
+	AM_UpdateFlags();
+	return true;
+}
 
 void CreateMenus()
 {
@@ -444,11 +456,14 @@ void CreateMenus()
 		controls.addItem(new ControlMenuItem(controlScheme[i]));
 	}
 
+	const char* rotateOptions[] = { language["STR_AMROTATEOFF"], language["STR_AMROTATEON"], language["STR_AMROTATEOVERLAY"] };
+	const char* overlayOptions[] = { language["STR_AMOVERLAYOFF"], language["STR_AMOVERLAYON"], language["STR_AMOVERLAYBOTH"] };
 	automapMenu.setHeadText(language["STR_AMOPTIONS"]);
-	automapMenu.addItem(new BooleanMenuItem(language["STR_AMROTATE"], am_rotate, ChangeAutomapFlag));
+	automapMenu.addItem(new MultipleChoiceMenuItem(ChangeAMOverlay, overlayOptions, 3, am_overlay));
+	automapMenu.addItem(new MultipleChoiceMenuItem(ChangeAMRotate, rotateOptions, 3, am_rotate));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTURES"], am_drawtexturedwalls, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMFLOORS"], am_drawfloors, ChangeAutomapFlag));
-	automapMenu.addItem(new BooleanMenuItem(language["STR_AMOVERLAY"], am_drawbackground, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMPAUSE"], am_pause, ChangeAutomapFlag));
 }
 
 static int SoundStatus = 1;
@@ -1003,7 +1018,7 @@ void CheckPause (void)
 		SoundStatus ^= 1;
 		VW_WaitVBL (3);
 		IN_ClearKeysDown ();
-		Paused = false;
+		Paused &= ~1;
 	}
 }
 

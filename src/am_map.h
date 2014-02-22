@@ -39,15 +39,25 @@
 #include "tarray.h"
 #include "vectors.h"
 
-extern bool automap;
+enum
+{
+	AMA_Off,
+	AMA_Overlay,
+	AMA_Normal
+};
+
+extern unsigned automap;
 extern bool am_cheat;
-extern bool am_rotate;
+extern unsigned am_rotate;
 extern bool am_drawtexturedwalls;
 extern bool am_drawfloors;
-extern bool am_drawbackground;
+extern unsigned am_overlay;
+extern bool am_pause;
 
 void AM_ChangeResolution();
+void AM_CheckKeys();
 void AM_UpdateFlags();
+void AM_Toggle();
 
 void BasicOverhead();
 
@@ -73,9 +83,10 @@ public:
 	AutoMap(unsigned int flags=0);
 	~AutoMap();
 
-	void CalculateDimensions();
+	void CalculateDimensions(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 	void Draw();
 	void SetFlags(unsigned int flags, bool set);
+	void SetPanning(fixed x, fixed y, bool relative);
 	void SetScale(fixed scale, bool relative);
 
 protected:
@@ -90,6 +101,7 @@ private:
 	bool fullRefresh;
 	unsigned int amFlags;
 	int amsizex, amsizey, amx, amy;
+	fixed ampanx, ampany;
 	fixed amsin, amcos;
 	fixed scale, absscale;
 	angle_t amangle;

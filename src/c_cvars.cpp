@@ -114,10 +114,10 @@ void ReadConfig(void)
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
 	config.CreateSetting("Gamma", 1.0f);
-	config.CreateSetting("AM_Rotate", false);
+	config.CreateSetting("AM_Rotate", 0);
 	config.CreateSetting("AM_DrawTexturedWalls", false);
 	config.CreateSetting("AM_DrawFloors", false);
-	config.CreateSetting("AM_DrawBackground", true);
+	config.CreateSetting("AM_Overlay", 0);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -161,10 +161,10 @@ void ReadConfig(void)
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
 	screenGamma = config.GetSetting("Gamma")->GetFloat();
-	am_rotate = config.GetSetting("AM_Rotate")->GetInteger() != 0;
+	am_rotate = config.GetSetting("AM_Rotate")->GetInteger();
 	am_drawtexturedwalls = config.GetSetting("AM_DrawTexturedWalls")->GetInteger() != 0;
 	am_drawfloors = config.GetSetting("AM_DrawFloors")->GetInteger() != 0;
-	am_drawbackground = config.GetSetting("AM_DrawBackground")->GetInteger() != 0;
+	am_overlay = config.GetSetting("AM_Overlay")->GetInteger();
 
 	char hsName[50];
 	char hsScore[50];
@@ -261,7 +261,7 @@ void WriteConfig(void)
 	config.GetSetting("AM_Rotate")->SetValue(am_rotate);
 	config.GetSetting("AM_DrawTexturedWalls")->SetValue(am_drawtexturedwalls);
 	config.GetSetting("AM_DrawFloors")->SetValue(am_drawfloors);
-	config.GetSetting("AM_DrawBackground")->SetValue(am_drawbackground);
+	config.GetSetting("AM_Overlay")->SetValue(am_overlay);
 
 	char hsName[50];
 	char hsScore[50];

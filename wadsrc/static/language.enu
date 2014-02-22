@@ -90,10 +90,15 @@ STR_PLAYERCLASS = "Choose Player";
 STR_ESCQUIT = "Don't Return on Escape";
 STR_FAILWRITE = "Could not write save file.\nCheck file permissions.";
 STR_FAILREAD = "Could not read save file.\nCheck file permissions.";
-STR_AMROTATE = "Rotate Automap";
+STR_AMROTATEOFF = "Rotate: No";
+STR_AMROTATEON = "Rotate: Yes";
+STR_AMROTATEOVERLAY = "Rotate: Overlay Only";
 STR_AMFLOORS = "Draw Floor Textures";
 STR_AMTEXTURES = "Draw Wall Textures";
-STR_AMOVERLAY = "Draw Map Background";
+STR_AMOVERLAYOFF = "Overlay: Off";
+STR_AMOVERLAYON = "Overlay: On";
+STR_AMOVERLAYBOTH = "Overlay: On + Normal";
+STR_AMPAUSE = "Pause Game";
 
 STR_DEMOCOMPLETED = "This concludes your demo\nof Spear of Destiny! Now,\ngo to your local software\nstore and buy it!";
 

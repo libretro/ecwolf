@@ -78,7 +78,7 @@ public:
 	}
 
 	void DrawStatusBar();
-	unsigned int GetHeight(bool top) { return (viewsize == 21 || top) ? 0 : STATUSLINES+1; }
+	unsigned int GetHeight(bool top) { return top ? 0 : STATUSLINES+1; }
 	void NewGame() { facecount = 0; }
 	void UpdateFace(int damage=0);
 	void WeaponGrin();

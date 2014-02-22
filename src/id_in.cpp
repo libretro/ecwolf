@@ -70,7 +70,7 @@ bool MousePresent;
 
 // 	Global variables
 volatile bool		Keyboard[SCANCODE_UNMASK(SDLK_LAST)];
-volatile bool		Paused;
+volatile unsigned short Paused;
 volatile char		LastASCII;
 volatile ScanCode	LastScan;
 
@@ -352,7 +352,7 @@ static void processEvent(SDL_Event *event)
 			if(LastScan<SCANCODE_UNMASK(SDLK_LAST))
 				Keyboard[LastScan] = 1;
 			if(LastScan == SCANCODE_UNMASK(SDLK_PAUSE))
-				Paused = true;
+				Paused |= 1;
 			break;
 		}
 

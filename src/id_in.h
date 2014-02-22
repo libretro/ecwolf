@@ -148,7 +148,7 @@ typedef	struct		{
 // Global variables
 extern  volatile bool		Keyboard[];
 extern           bool		MousePresent;
-extern  volatile bool		Paused;
+extern  volatile unsigned short Paused;
 extern  volatile char       LastASCII;
 extern  volatile ScanCode   LastScan;
 extern           int        JoyNumButtons;

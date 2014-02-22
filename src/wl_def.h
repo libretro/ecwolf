@@ -308,7 +308,16 @@ enum Button
 	bt_reload,
 	bt_zoom,
 	bt_automap,
-	NUMBUTTONS
+	NUMBUTTONS,
+
+	// AM buttons
+	bt_zoomin = 0,
+	bt_zoomout,
+	bt_panup,
+	bt_pandown,
+	bt_panleft,
+	bt_panright,
+	NUMAMBUTTONS
 };
 
 struct ControlScheme
@@ -328,6 +337,7 @@ struct ControlScheme
 };
 
 extern ControlScheme controlScheme[];
+extern ControlScheme amControlScheme[];
 
 enum
 {

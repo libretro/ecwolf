@@ -36,38 +36,123 @@
 #include "am_map.h"
 #include "colormatcher.h"
 #include "id_ca.h"
+#include "id_in.h"
 #include "id_vl.h"
 #include "gamemap.h"
 #include "r_data/colormaps.h"
 #include "v_video.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
+#include "wl_game.h"
 #include "wl_main.h"
+#include "wl_play.h"
 
 AutoMap AM_Main;
+AutoMap AM_Overlay;
 
-bool automap = false;
+enum
+{
+	AMO_Off,
+	AMO_On,
+	AMO_Both
+};
+enum
+{
+	AMR_Off,
+	AMR_On,
+	AMR_Overlay
+};
+
+unsigned automap = 0;
 bool am_cheat = false;
-bool am_rotate = false;
-bool am_drawtexturedwalls = false;
+unsigned am_rotate = 0;
+bool am_drawtexturedwalls = true;
 bool am_drawfloors = false;
-bool am_drawbackground = true;
+unsigned am_overlay = 0;
+bool am_pause = true;
+bool am_needsrecalc = false;
 
 void AM_ChangeResolution()
 {
-	AM_Main.CalculateDimensions();
+	if(StatusBar == NULL)
+	{
+		am_needsrecalc = true;
+		return;
+	}
+
+	unsigned int y = statusbary1;
+	unsigned int height = statusbary2 - statusbary1;
+
+	AM_Main.CalculateDimensions(0, y, screenWidth, height);
+	AM_Overlay.CalculateDimensions(viewscreenx, viewscreeny, viewwidth, viewheight);
+}
+
+void AM_CheckKeys()
+{
+	if(ambuttonstate[bt_zoomin])
+	{
+		AM_Overlay.SetScale(FRACUNIT*1.05, true);
+		AM_Main.SetScale(FRACUNIT*1.05, true);
+	}
+	if(ambuttonstate[bt_zoomout])
+	{
+		AM_Overlay.SetScale(FRACUNIT*0.95, true);
+		AM_Main.SetScale(FRACUNIT*0.95, true);
+	}
+
+	if(am_pause)
+	{
+		static const fixed PAN_AMOUNT = FRACUNIT/4;
+		fixed panx = 0, pany = 0;
+		if(ambuttonstate[bt_panleft])
+			panx += PAN_AMOUNT;
+		if(ambuttonstate[bt_panright])
+			panx -= PAN_AMOUNT;
+		if(ambuttonstate[bt_panup])
+			pany += PAN_AMOUNT;
+		if(ambuttonstate[bt_pandown])
+			pany -= PAN_AMOUNT;
+		AM_Main.SetPanning(panx, pany, true);
+	}
 }
 
 void AM_UpdateFlags()
 {
 	unsigned int flags = 0;
-	if(am_rotate) flags |= AutoMap::AMF_Rotate;
+	unsigned int ovFlags = AutoMap::AMF_Overlay;
+
+	if(am_rotate == AMR_On) flags |= AutoMap::AMF_Rotate;
 	if(am_drawtexturedwalls) flags |= AutoMap::AMF_DrawTexturedWalls;
 	if(am_drawfloors) flags |= AutoMap::AMF_DrawFloor;
-	if(!am_drawbackground) flags |= AutoMap::AMF_Overlay;
+
+	ovFlags |= flags;
+	if(am_rotate == AMR_Overlay) ovFlags |= AutoMap::AMF_Rotate;
 
 	AM_Main.SetFlags(~flags, false);
+	AM_Overlay.SetFlags(~ovFlags, false);
 	AM_Main.SetFlags(flags, true);
+	AM_Overlay.SetFlags(ovFlags, true);
+}
+
+void AM_Toggle()
+{
+	++automap;
+	if(automap == AMA_Overlay && am_overlay == AMO_Off)
+		++automap;
+	else if(automap > AMA_Normal || (automap == AMA_Normal && am_overlay == AMO_On))
+	{
+		automap = AMA_Off;
+		AM_Main.SetPanning(0, 0, false);
+		DrawPlayScreen();
+	}
+
+	if(am_pause)
+	{
+		if(automap == AMA_Normal)
+			Paused |= 2;
+		else
+			Paused &= ~2;
+	}
 }
 
 // Culling table
@@ -102,7 +187,8 @@ static const AMVectorPoint AM_Arrow[] =
 };
 
 AutoMap::AutoMap(unsigned int flags) :
-	fullRefresh(true), amFlags(flags)
+	fullRefresh(true), amFlags(flags),
+	ampanx(0), ampany(0)
 {
 	amangle = 0;
 	minmaxSel = 0;
@@ -119,12 +205,13 @@ AutoMap::~AutoMap()
 {
 }
 
-void AutoMap::CalculateDimensions()
+void AutoMap::CalculateDimensions(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 {
-	amsizex = viewwidth;
-	amsizey = viewheight;
-	amx = viewscreenx;
-	amy = viewscreeny;
+	fullRefresh = true;
+	amsizex = width;
+	amsizey = height;
+	amx = x;
+	amy = y;
 
 	// Since the simple polygon fill function seems to be off by one in the y
 	// direction, lets shift this up!
@@ -227,8 +314,13 @@ void AutoMap::Draw()
 		fullRefresh = false;
 	}
 
-	const double originx = (amx+amsizex/2) - (FIXED2FLOAT(FixedMul(FixedMul(scale, playerx&0xFFFF), amcos) - FixedMul(FixedMul(scale, playery&0xFFFF), amsin)));
-	const double originy = (amy+amsizey/2) - (FIXED2FLOAT(FixedMul(FixedMul(scale, playerx&0xFFFF), amsin) + FixedMul(FixedMul(scale, playery&0xFFFF), amcos)));
+	const fixed pany = FixedMul(ampany, amcos) - FixedMul(ampanx, amsin);
+	const fixed panx = FixedMul(ampany, amsin) + FixedMul(ampanx, amcos);
+	const fixed ofsx = playerx - panx;
+	const fixed ofsy = playery - pany;
+
+	const double originx = (amx+amsizex/2) - (FIXED2FLOAT(FixedMul(FixedMul(scale, ofsx&0xFFFF), amcos) - FixedMul(FixedMul(scale, ofsy&0xFFFF), amsin)));
+	const double originy = (amy+amsizey/2) - (FIXED2FLOAT(FixedMul(FixedMul(scale, ofsx&0xFFFF), amsin) + FixedMul(FixedMul(scale, ofsy&0xFFFF), amcos)));
 	const double origTexScale = FIXED2FLOAT(scale>>6);
 
 	for(unsigned int my = 0;my < mapheight;++my)
@@ -239,7 +331,7 @@ void AutoMap::Draw()
 			if(!(spot->amFlags & AM_Visible) && !am_cheat)
 				continue;
 
-			if(TransformTile(spot, FixedMul((mx<<FRACBITS)-playerx, scale), FixedMul((my<<FRACBITS)-playery, scale), points))
+			if(TransformTile(spot, FixedMul((mx<<FRACBITS)-ofsx, scale), FixedMul((my<<FRACBITS)-ofsy, scale), points))
 			{
 				double texScale = origTexScale;
 
@@ -411,6 +503,20 @@ void AutoMap::SetFlags(unsigned int flags, bool set)
 		amFlags &= ~flags;
 }
 
+void AutoMap::SetPanning(fixed x, fixed y, bool relative)
+{
+	if(relative)
+	{
+		ampanx += x;
+		ampany += y;
+	}
+	else
+	{
+		ampanx = 0;
+		ampany = 0;
+	}
+}
+
 void AutoMap::SetScale(fixed scale, bool relative)
 {
 	if(relative)
@@ -452,6 +558,23 @@ bool AutoMap::TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &po
 
 void BasicOverhead()
 {
-	AM_Main.CalculateDimensions();
-	AM_Main.Draw();
+	if(am_needsrecalc)
+		AM_ChangeResolution();
+
+	switch(automap)
+	{
+		case AMA_Overlay:
+			AM_Overlay.Draw();
+			break;
+		case AMA_Normal:
+		{
+			int oldviewsize = viewsize;
+			viewsize = 20;
+			DrawPlayScreen();
+			viewsize = oldviewsize;
+			AM_Main.Draw();
+			break;
+		}
+		default: break;
+	}
 }
