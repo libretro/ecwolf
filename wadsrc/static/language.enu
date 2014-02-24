@@ -99,6 +99,7 @@ STR_AMOVERLAYOFF = "Overlay: Off";
 STR_AMOVERLAYON = "Overlay: On";
 STR_AMOVERLAYBOTH = "Overlay: On + Normal";
 STR_AMPAUSE = "Pause Game";
+STR_AMRATIOS = "Show Level Ratios";
 
 STR_DEMOCOMPLETED = "This concludes your demo\nof Spear of Destiny! Now,\ngo to your local software\nstore and buy it!";
 

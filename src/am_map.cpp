@@ -73,6 +73,7 @@ bool am_drawtexturedwalls = true;
 bool am_drawfloors = false;
 unsigned am_overlay = 0;
 bool am_pause = true;
+bool am_showratios = false;
 bool am_needsrecalc = false;
 
 void AM_ChangeResolution()
@@ -128,8 +129,12 @@ void AM_UpdateFlags()
 	if(am_drawtexturedwalls) flags |= AutoMap::AMF_DrawTexturedWalls;
 	if(am_drawfloors) flags |= AutoMap::AMF_DrawFloor;
 
+	// Overlay only flas
 	ovFlags |= flags;
 	if(am_rotate == AMR_Overlay) ovFlags |= AutoMap::AMF_Rotate;
+
+	// Full only flags
+	if(am_showratios) flags |= AutoMap::AMF_DispRatios;
 
 	AM_Main.SetFlags(~flags, false);
 	AM_Overlay.SetFlags(~ovFlags, false);
@@ -428,24 +433,51 @@ void AutoMap::Draw()
 
 	DrawVector(AM_Arrow, 8, amx + (amsizex>>1), amy + (amsizey>>1), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
 
-	if((amFlags & AMF_DispInfo))
-	{
-		FFont *font = SmallFont;
-		unsigned int height = (font->GetHeight()+2)*CleanYfac;
-		screen->Dim(GPalette.BlackIndex, 0.5f, 0, 0, screenWidth, height);
+	DrawStats();
+}
 
-		pa = MENU_TOP;
+void AutoMap::DrawStats() const
+{
+	if(!(amFlags & (AMF_DispInfo|AMF_DispRatios)))
+		return;
+
+	FString statString;
+	unsigned int infHeight = 0;
+
+	pa = MENU_TOP;
+
+	if(amFlags & AMF_DispInfo)
+	{
+		infHeight = SmallFont->GetHeight()+2;
+		screen->Dim(GPalette.BlackIndex, 0.5f, 0, 0, screenWidth, infHeight*CleanYfac);
+
 		px = 2;
 		py = 1;
-		VWB_DrawPropString(font, levelInfo->GetName(map), CR_WHITE);
+		VWB_DrawPropString(SmallFont, levelInfo->GetName(map), CR_WHITE);
 
-		FString exitString;
 		unsigned int seconds = gamestate.TimeCount/70;
-		exitString.Format("%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
-		px = 318 - font->GetCharWidth('0')*6 - font->GetCharWidth(':')*2;
-		VWB_DrawPropString(font, exitString, CR_WHITE);
-		pa = MENU_CENTER;
+		statString.Format("%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
+		px = 318 - SmallFont->GetCharWidth('0')*6 - SmallFont->GetCharWidth(':')*2;
+		VWB_DrawPropString(SmallFont, statString, CR_WHITE);
 	}
+
+	if(amFlags & AMF_DispRatios)
+	{
+		statString.Format("K: %d/%d\nS: %d/%d\nT: %d/%d",
+			gamestate.killcount, gamestate.killtotal,
+			gamestate.secretcount, gamestate.secrettotal,
+			gamestate.treasurecount, gamestate.treasuretotal);
+
+		word sw, sh;
+		VW_MeasurePropString(SmallFont, statString, sw, sh);
+		screen->Dim(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
+
+		px = 2;
+		py = infHeight+1;
+		VWB_DrawPropString(SmallFont, statString, CR_WHITE);
+	}
+
+	pa = MENU_CENTER;
 }
 
 void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const

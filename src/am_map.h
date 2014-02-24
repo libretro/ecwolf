@@ -53,6 +53,7 @@ extern bool am_drawtexturedwalls;
 extern bool am_drawfloors;
 extern unsigned am_overlay;
 extern bool am_pause;
+extern bool am_showratios;
 
 void AM_ChangeResolution();
 void AM_CheckKeys();
@@ -72,7 +73,8 @@ public:
 		AMF_DrawTexturedWalls = 0x2,
 		AMF_DrawFloor = 0x4,
 		AMF_Overlay = 0x8,
-		AMF_DispInfo = 0x10
+		AMF_DispInfo = 0x10,
+		AMF_DispRatios = 0x20
 	};
 
 	struct Color
@@ -92,6 +94,7 @@ public:
 
 protected:
 	void ClipTile(TArray<FVector2> &points) const;
+	void DrawStats() const;
 	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const;
 	FVector2 GetClipIntersection(const FVector2 &p1, const FVector2 &p2, unsigned edge) const;
 	bool TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &points) const;
