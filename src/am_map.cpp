@@ -436,6 +436,91 @@ void AutoMap::Draw()
 	DrawStats();
 }
 
+void AutoMap::DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const
+{
+	// Let us make an assumption that point 0 is always left of point 1
+	if(x0 > x1)
+	{
+		swapvalues(x0, x1);
+		swapvalues(y0, y1);
+	}
+
+	const int dx = x1 - x0, dy = y1 - y0;
+	int ymin = MIN(y0, y1);
+	int ymax = MAX(y0, y1);
+	const bool inc = ymax == y0;
+	bool clipped = false;
+
+	// There will inevitably be precision issues so we may need to run the
+	// clipper a few times.
+	do
+	{
+		// Trivial culling
+		if(x1 < amx || ymax < amy || x0 >= amx+amsizex || ymin >= amy+amsizey)
+			return;
+
+		if(x0 < amx) // Clip left
+		{
+			clipped = true;
+			y0 += dy*(amx-x0)/dx;
+			x0 = amx;
+		}
+		if(x1 >= amx+amsizex) // Clip right
+		{
+			clipped = true;
+			y1 += dy*(amx+amsizex-1-x1)/dx;
+			x1 = amx+amsizex-1;
+		}
+		if(ymin < amy) // Clip top
+		{
+			clipped = true;
+			if(inc)
+			{
+				x1 += dx*(amy-y1)/dy;
+				y1 = amy;
+			}
+			else
+			{
+				x0 += dx*(amy-y0)/dy;
+				y0 = amy;
+			}
+		}
+		if(ymax >= amy+amsizey) // Clip bottom
+		{
+			clipped = true;
+			if(inc)
+			{
+				x0 += dx*(amy+amsizey-1-y0)/dy;
+				y0 = amy+amsizey-1;
+			}
+			else
+			{
+				x1 += dx*(amy+amsizey-1-y1)/dy;
+				y1 = amy+amsizey-1;
+			}
+		}
+
+		if(!clipped)
+			break;
+		clipped = false;
+
+		// Fix ymin/max for the next iteration
+		if(inc)
+		{
+			ymin = y1;
+			ymax = y0;
+		}
+		else
+		{
+			ymin = y0;
+			ymax = y1;
+		}
+	}
+	while(true);
+
+	screen->DrawLine(x0, y0+1, x1, y1+1, palcolor, realcolor);
+}
+
 void AutoMap::DrawStats() const
 {
 	if(!(amFlags & (AMF_DispInfo|AMF_DispRatios)))
@@ -504,7 +589,7 @@ void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, in
 			y2 = FixedMul(x2, rsin) + FixedMul(y2, rcos);
 			x2 = tmp;
 
-			screen->DrawLine(x + x1, y + y1, x + x2, y + y2, c.palcolor, c.color);
+			DrawClippedLine(x + x1, y + y1, x + x2, y + y2, c.palcolor, c.color);
 		}
 	}
 	else
@@ -514,7 +599,7 @@ void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, in
 			x2 = FixedMul(points[i].X, scale)>>FRACBITS;
 			y2 = FixedMul(points[i].Y, scale)>>FRACBITS;
 
-			screen->DrawLine(x + x1, y + y1, x + x2, y + y2, c.palcolor, c.color);
+			DrawClippedLine(x + x1, y + y1, x + x2, y + y2, c.palcolor, c.color);
 		}
 	}
 }
