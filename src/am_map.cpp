@@ -431,7 +431,7 @@ void AutoMap::Draw()
 			screen->FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);
 	}
 
-	DrawVector(AM_Arrow, 8, amx + (amsizex>>1), amy + (amsizey>>1), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
+	DrawVector(AM_Arrow, 8, FixedMul(playerx - ofsx, scale), FixedMul(playery - ofsy, scale), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
 
 	DrawStats();
 }
@@ -565,9 +565,13 @@ void AutoMap::DrawStats() const
 	pa = MENU_CENTER;
 }
 
-void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const
+void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, angle_t angle, const Color &c) const
 {
 	int x1, y1, x2, y2;
+
+	fixed tmp = (FixedMul(x, amcos) - FixedMul(y, amsin) + (amsizex<<(FRACBITS-1)))>>FRACBITS;
+	y = (FixedMul(x, amsin) + FixedMul(y, amcos) + (amsizey<<(FRACBITS-1)))>>FRACBITS;
+	x = tmp;
 
 	x1 = FixedMul(points[numPoints-1].X, scale)>>FRACBITS;
 	y1 = FixedMul(points[numPoints-1].Y, scale)>>FRACBITS;

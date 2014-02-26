@@ -96,7 +96,7 @@ protected:
 	void ClipTile(TArray<FVector2> &points) const;
 	void DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const;
 	void DrawStats() const;
-	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const;
+	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, angle_t angle, const Color &c) const;
 	FVector2 GetClipIntersection(const FVector2 &p1, const FVector2 &p2, unsigned edge) const;
 	bool TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &points) const;
 
