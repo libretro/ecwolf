@@ -691,8 +691,9 @@ void AutoMap::SetPanning(fixed x, fixed y, bool relative)
 {
 	if(relative)
 	{
-		ampanx += x;
-		ampany += y;
+		// TODO: Make panning absolute instead of relative to the player so this isn't weird
+		ampanx = clamp<fixed>(ampanx+x, players[0].mo->x - fixed(map->GetHeader().width<<FRACBITS), players[0].mo->x);
+		ampany = clamp<fixed>(ampany+y, players[0].mo->y - fixed(map->GetHeader().height<<FRACBITS), players[0].mo->y);
 	}
 	else
 	{
