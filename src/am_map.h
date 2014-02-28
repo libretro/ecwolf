@@ -94,6 +94,7 @@ public:
 
 protected:
 	void ClipTile(TArray<FVector2> &points) const;
+	void DrawActor(class AActor *actor, fixed x, fixed y);
 	void DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const;
 	void DrawStats() const;
 	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, angle_t angle, const Color &c) const;

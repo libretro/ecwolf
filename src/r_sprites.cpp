@@ -130,6 +130,27 @@ unsigned int R_GetSprite(const char* spr)
 	return 0;
 }
 
+FTexture *R_GetAMSprite(AActor *actor, angle_t rotangle, bool &flip)
+{
+	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
+		return NULL;
+
+	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+actor->state->frame];
+	FTexture *tex;
+	if(spr.rotations == 0)
+	{
+		tex = TexMan[spr.texture[0]];
+		flip = false;
+	}
+	else
+	{
+		int rot = (rotangle-actor->angle-ANGLE_90)/ANGLE_45;
+		tex = TexMan[spr.texture[rot]];
+		flip = (spr.mirror>>rot)&1;
+	}
+	return tex;
+}
+
 void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 {
 	if(dir < -1 || dir >= 8)

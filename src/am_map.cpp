@@ -42,6 +42,7 @@
 #include "g_mapinfo.h"
 #include "gamemap.h"
 #include "r_data/colormaps.h"
+#include "r_sprites.h"
 #include "v_font.h"
 #include "v_video.h"
 #include "wl_agent.h"
@@ -300,7 +301,7 @@ void AutoMap::Draw()
 
 	// Some magic, min scale is approximately small enough so that a rotated automap will fit on screen (22/32 ~ 1/sqrt(2))
 	const fixed minscale = ((screenHeight*22)<<(FRACBITS-5))/mapheight;
-	scale = minscale + FixedMul(absscale, (screenHeight<<(FRACBITS-4)) - minscale);
+	scale = minscale + FixedMul(absscale, (screenHeight<<(FRACBITS-3)) - minscale);
 
 	if(!(amFlags & AMF_Overlay))
 		screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, BackgroundColor.palcolor, BackgroundColor.color);
@@ -433,7 +434,48 @@ void AutoMap::Draw()
 
 	DrawVector(AM_Arrow, 8, FixedMul(playerx - ofsx, scale), FixedMul(playery - ofsy, scale), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
 
+	if(am_cheat)
+	{
+		for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
+		{
+			DrawActor(iter, FixedMul(iter->x - ofsx, scale), FixedMul(iter->y - ofsy, scale));
+		}
+	}
+
 	DrawStats();
+}
+
+void AutoMap::DrawActor(AActor *actor, fixed x, fixed y)
+{
+	{
+		fixed tmp = (FixedMul(x, amcos) - FixedMul(y, amsin) + (amsizex<<(FRACBITS-1)))>>FRACBITS;
+		y = (FixedMul(x, amsin) + FixedMul(y, amcos) + (amsizey<<(FRACBITS-1)))>>FRACBITS;
+		x = tmp;
+
+		int adiameter = FixedMul(actor->radius, scale)>>(FRACBITS-1);
+		int aheight = scale>>FRACBITS;
+
+		// Cull out actors that are obviously out of bounds
+		if(x + adiameter < amx || x - adiameter >= amx+amsizex || y + aheight < amy || y - aheight >= amy+amsizey)
+			return;
+	}
+
+	bool flip;
+	FTexture *tex = R_GetAMSprite(actor, amangle, flip);
+	if(!tex)
+		return;
+
+	double width = tex->GetScaledWidthDouble()*FIXED2FLOAT(scale>>6);
+	double height = tex->GetScaledHeightDouble()*FIXED2FLOAT(scale>>6);
+	screen->DrawTexture(tex, x, y,
+		DTA_DestWidthF, width,
+		DTA_DestHeightF, height,
+		DTA_ClipLeft, amx,
+		DTA_ClipRight, amx+amsizex,
+		DTA_ClipTop, amy,
+		DTA_ClipBottom, amy+amsizey,
+		DTA_FlipX, flip,
+		TAG_DONE);
 }
 
 void AutoMap::DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const
