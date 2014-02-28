@@ -571,21 +571,22 @@ void AutoMap::DrawStats() const
 	FString statString;
 	unsigned int infHeight = 0;
 
-	pa = MENU_TOP;
-
 	if(amFlags & AMF_DispInfo)
 	{
 		infHeight = SmallFont->GetHeight()+2;
 		screen->Dim(GPalette.BlackIndex, 0.5f, 0, 0, screenWidth, infHeight*CleanYfac);
 
-		px = 2;
-		py = 1;
-		VWB_DrawPropString(SmallFont, levelInfo->GetName(map), CR_WHITE);
+		screen->DrawText(SmallFont, CR_WHITE, 2*CleanXfac, CleanYfac, levelInfo->GetName(map),
+			DTA_CleanNoMove, true,
+			TAG_DONE);
 
 		unsigned int seconds = gamestate.TimeCount/70;
 		statString.Format("%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
-		px = 318 - SmallFont->GetCharWidth('0')*6 - SmallFont->GetCharWidth(':')*2;
-		VWB_DrawPropString(SmallFont, statString, CR_WHITE);
+		screen->DrawText(SmallFont, CR_WHITE,
+			screenWidth - (SmallFont->GetCharWidth('0')*6 + SmallFont->GetCharWidth(':')*2 + 2)*CleanXfac, CleanYfac,
+			statString,
+			DTA_CleanNoMove, true,
+			TAG_DONE);
 	}
 
 	if(amFlags & AMF_DispRatios)
@@ -599,12 +600,10 @@ void AutoMap::DrawStats() const
 		VW_MeasurePropString(SmallFont, statString, sw, sh);
 		screen->Dim(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
 
-		px = 2;
-		py = infHeight+1;
-		VWB_DrawPropString(SmallFont, statString, CR_WHITE);
+		screen->DrawText(SmallFont, CR_WHITE, 2*CleanXfac, (infHeight+1)*CleanYfac, statString,
+			DTA_CleanNoMove, true,
+			TAG_DONE);
 	}
-
-	pa = MENU_CENTER;
 }
 
 void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, angle_t angle, const Color &c) const

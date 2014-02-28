@@ -256,6 +256,7 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	v_font.cpp
 	v_palette.cpp
 	v_pfx.cpp
+	v_text.cpp
 	v_video.cpp
 	w_wad.cpp
 	weaponslots.cpp
