@@ -383,6 +383,8 @@ void GameMap::LoadMap()
 		ReadUWMFData();
 	else
 		ReadPlanesData();
+
+	ScanTiles();
 }
 
 GameMap::Plane &GameMap::NewPlane()
@@ -408,6 +410,28 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	newTrig.z = z;
 	spot->triggers.Push(newTrig);
 	return spot->triggers[spot->triggers.Size()-1];
+}
+
+// Look at data and determine if we need to set up any flags.
+void GameMap::ScanTiles()
+{
+	for(unsigned int p = 0;p < planes.Size();++p)
+	{
+		MapSpot spot = planes[p].map;
+		MapSpot endSpot = spot + header.width*header.height; 
+		while(spot < endSpot)
+		{
+			if(spot->tile)
+			{
+				if(spot->tile->mapped > gamestate.difficulty->MapFilter)
+					spot->amFlags |= AM_Visible;
+				if(spot->tile->dontOverlay)
+					spot->amFlags |= AM_DontOverlay;
+			}
+
+			++spot;
+		}
+	}
 }
 
 // Adds the spot to the tag list. The linked chain is stored in the tile itself.

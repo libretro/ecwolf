@@ -88,6 +88,11 @@ void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 		sc.MustGetToken(TK_BoolConst);
 		tile.sideSolid[MapTile::West] = sc->boolean;
 	}
+	else CheckKey("dontoverlay")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.dontOverlay = sc->boolean;
+	}
 	else CheckKey("soundsequence")
 	{
 		sc.MustGetToken(TK_StringConst);
@@ -117,6 +122,11 @@ void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 	{
 		sc.MustGetToken(TK_StringConst);
 		tile.overhead = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
+	else CheckKey("mapped")
+	{
+		sc.MustGetToken(TK_IntConst);
+		tile.mapped = sc->number;
 	}
 	else CheckKey("offsetvertical")
 	{

@@ -231,6 +231,7 @@ public:
 	FString SkillPicture;
 	fixed DamageFactor;
 	unsigned int SpawnFilter;
+	unsigned int MapFilter;
 
 	static unsigned int GetNumSkills();
 	static unsigned int GetSkillIndex(const SkillInfo &skill);

@@ -52,7 +52,8 @@ enum
 
 enum
 {
-	AM_Visible = 0x1
+	AM_Visible = 0x1,
+	AM_DontOverlay = 0x2
 };
 
 class GameMap
@@ -108,7 +109,8 @@ class GameMap
 		};
 		struct Tile
 		{
-			Tile() : offsetVertical(false), offsetHorizontal(false)
+			Tile() : offsetVertical(false), offsetHorizontal(false),
+				mapped(0), dontOverlay(false)
 			{
 				overhead.SetInvalid();
 				sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
@@ -121,6 +123,9 @@ class GameMap
 			bool			offsetVertical;
 			bool			offsetHorizontal;
 			FName			soundSequence;
+
+			unsigned int	mapped; // filter level for always visible
+			bool			dontOverlay;
 		};
 		struct Sector
 		{
@@ -216,6 +221,7 @@ class GameMap
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
 		void	SetupLinks();
+		void	ScanTiles();
 		bool	TraverseLink(const Zone *src, const Zone *dest);
 		void	UnloadLinks();
 

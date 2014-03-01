@@ -113,6 +113,7 @@ skill easy
 	name = "$STR_EASY"
 	picname = "M_EASY"
 	spawnfilter = 2
+	mapfilter = 1
 }
 
 skill normal
@@ -120,6 +121,7 @@ skill normal
 	name = "$STR_NORMAL"
 	picname = "M_NORMAL"
 	spawnfilter = 3
+	mapfilter = 1
 }
 
 skill hard
@@ -127,6 +129,7 @@ skill hard
 	name = "$STR_HARD"
 	picname = "M_HARD"
 	spawnfilter = 4
+	mapfilter = 1
 }
 
 adddefaultmap

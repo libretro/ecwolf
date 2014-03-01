@@ -209,13 +209,14 @@ tiles
 		texturewest = "CABLARG2";
 		textureoverhead = "TILE8:5F";
 	}
-	tile 15 // TODO: Visible on skill 0
+	tile 15
 	{
 		texturenorth = "STAIRWY1";
 		texturesouth = "STAIRWY1";
 		textureeast = "STAIRWY2";
 		texturewest = "STAIRWY2";
 		textureoverhead = "TILE8:60";
+		mapped = 1;
 	}
 	tile 16
 	{
@@ -358,6 +359,7 @@ tiles
 		textureeast = "ARKWODA2";
 		texturewest = "ARKWODA2";
 		textureoverhead = "TILE8:52";
+		mapped = 2;
 	}
 	tile 34
 	{
@@ -366,6 +368,7 @@ tiles
 		textureeast = "ARKWODB2";
 		texturewest = "ARKWODB2";
 		textureoverhead = "TILE8:53";
+		mapped = 2;
 	}
 	tile 35
 	{
@@ -374,6 +377,7 @@ tiles
 		textureeast = "ARKCURT2";
 		texturewest = "ARKCURT2";
 		textureoverhead = "TILE8:54";
+		mapped = 2;
 	}
 	tile 36
 	{
@@ -382,6 +386,7 @@ tiles
 		textureeast = "ARKMELV2";
 		texturewest = "ARKMELV2";
 		textureoverhead = "TILE8:55";
+		mapped = 2;
 	}
 	tile 37
 	{
@@ -390,6 +395,7 @@ tiles
 		textureeast = "LOGWALL2";
 		texturewest = "LOGWALL2";
 		textureoverhead = "TILE8:56";
+		mapped = 2;
 	}
 	tile 38
 	{
@@ -398,6 +404,7 @@ tiles
 		textureeast = "LOGNOAH2";
 		texturewest = "LOGNOAH2";
 		textureoverhead = "TILE8:57";
+		mapped = 2;
 	}
 	tile 39
 	{
@@ -406,6 +413,7 @@ tiles
 		textureeast = "LOGCURT2";
 		texturewest = "LOGCURT2";
 		textureoverhead = "TILE8:58";
+		mapped = 2;
 	}
 	tile 40
 	{
@@ -414,6 +422,7 @@ tiles
 		textureeast = "LOGDUCK2";
 		texturewest = "LOGDUCK2";
 		textureoverhead = "TILE8:59";
+		mapped = 2;
 	}
 	tile 41
 	{
@@ -422,6 +431,7 @@ tiles
 		textureeast = "KNLWODA2";
 		texturewest = "KNLWODA2";
 		textureoverhead = "TILE8:5A";
+		mapped = 2;
 	}
 	tile 42
 	{
@@ -430,6 +440,7 @@ tiles
 		textureeast = "KNLBWOD2";
 		texturewest = "KNLBWOD2";
 		textureoverhead = "TILE8:5B";
+		mapped = 2;
 	}
 	tile 43
 	{
@@ -438,6 +449,7 @@ tiles
 		textureeast = "KNLWODB2";
 		texturewest = "KNLWODB2";
 		textureoverhead = "TILE8:5C";
+		mapped = 2;
 	}
 	tile 44
 	{
@@ -446,6 +458,7 @@ tiles
 		textureeast = "KNLBMET2";
 		texturewest = "KNLBMET2";
 		textureoverhead = "TILE8:5D";
+		mapped = 2;
 	}
 	tile 45
 	{
@@ -454,6 +467,7 @@ tiles
 		textureeast = "CABPANL2";
 		texturewest = "CABPANL2";
 		textureoverhead = "TILE8:5E";
+		mapped = 2;
 	}
 	tile 46
 	{
@@ -462,6 +476,7 @@ tiles
 		textureeast = "CABLARG2";
 		texturewest = "CABLARG2";
 		textureoverhead = "TILE8:5F";
+		mapped = 2;
 	}
 	tile 47
 	{
@@ -470,6 +485,7 @@ tiles
 		textureeast = "STAIRWY2";
 		texturewest = "STAIRWY2";
 		textureoverhead = "TILE8:60";
+		mapped = 2;
 	}
 	tile 48
 	{
@@ -478,6 +494,7 @@ tiles
 		textureeast = "FLOOD2";
 		texturewest = "FLOOD2";
 		textureoverhead = "TILE8:61";
+		mapped = 2;
 	}
 	tile 49
 	{
@@ -486,6 +503,7 @@ tiles
 		textureeast = "WODPANL2";
 		texturewest = "WODPANL2";
 		textureoverhead = "TILE8:62";
+		mapped = 2;
 	}
 	tile 50
 	{
@@ -494,6 +512,7 @@ tiles
 		textureeast = "WODNAMH2";
 		texturewest = "WODNAMH2";
 		textureoverhead = "TILE8:63";
+		mapped = 2;
 	}
 	tile 51
 	{
@@ -502,6 +521,7 @@ tiles
 		textureeast = "ABRICK2";
 		texturewest = "ABRICK2";
 		textureoverhead = "TILE8:64";
+		mapped = 2;
 	}
 	tile 52
 	{
@@ -510,6 +530,7 @@ tiles
 		textureeast = "ABRKNH2";
 		texturewest = "ABRKNH2";
 		textureoverhead = "TILE8:65";
+		mapped = 2;
 	}
 	tile 53
 	{
@@ -518,6 +539,7 @@ tiles
 		textureeast = "GRYWOOD2";
 		texturewest = "GRYWOOD2";
 		textureoverhead = "TILE8:66";
+		mapped = 2;
 	}
 	tile 54
 	{
@@ -526,6 +548,7 @@ tiles
 		textureeast = "GRYCURT2";
 		texturewest = "GRYCURT2";
 		textureoverhead = "TILE8:67";
+		mapped = 2;
 	}
 	tile 55
 	{
@@ -534,6 +557,7 @@ tiles
 		textureeast = "LGTPANL2";
 		texturewest = "LGTPANL2";
 		textureoverhead = "TILE8:68";
+		mapped = 2;
 	}
 	tile 56
 	{
@@ -542,6 +566,7 @@ tiles
 		textureeast = "LGTCHLK2";
 		texturewest = "LGTCHLK2";
 		textureoverhead = "TILE8:69";
+		mapped = 2;
 	}
 	tile 57
 	{
@@ -550,6 +575,7 @@ tiles
 		textureeast = "YELWALL2";
 		texturewest = "YELWALL2";
 		textureoverhead = "TILE8:6A";
+		mapped = 2;
 	}
 	tile 58
 	{
@@ -558,6 +584,7 @@ tiles
 		textureeast = "CABFOOD2";
 		texturewest = "CABFOOD2";
 		textureoverhead = "TILE8:6B";
+		mapped = 2;
 	}
 	tile 59
 	{
@@ -566,6 +593,7 @@ tiles
 		textureeast = "REDWALL2";
 		texturewest = "REDWALL2";
 		textureoverhead = "TILE8:6C";
+		mapped = 2;
 	}
 	tile 60
 	{
@@ -574,6 +602,7 @@ tiles
 		textureeast = "CABSMAL2";
 		texturewest = "CABSMAL2";
 		textureoverhead = "TILE8:6D";
+		mapped = 2;
 	}
 	tile 61
 	{
@@ -582,6 +611,7 @@ tiles
 		textureeast = "PURWALL2";
 		texturewest = "PURWALL2";
 		textureoverhead = "TILE8:6E";
+		mapped = 2;
 	}
 	tile 62
 	{
@@ -590,6 +620,7 @@ tiles
 		textureeast = "DOOR2";
 		texturewest = "DOOR2";
 		textureoverhead = "TILE8:6F";
+		mapped = 2;
 	}
 	tile 63
 	{
@@ -598,6 +629,7 @@ tiles
 		textureeast = "DOOR4";
 		texturewest = "DOOR4";
 		textureoverhead = "TILE8:79";
+		mapped = 2;
 	}
 
 	// BLANK, and then we repeat only the first 24.
@@ -804,6 +836,7 @@ tiles
 		textureeast = "DOOR4";
 		texturewest = "DOOR4";
 		textureoverhead = "TILE8:79";
+		dontoverlay = true;
 	}
 
 	tile 90
@@ -888,6 +921,7 @@ tiles
 		textureeast = "ARKWODB2";
 		texturewest = "ARKWODB2";
 		textureoverhead = "TILE8:53";
+		mapped = 2;
 	}
 	tile 99
 	{
@@ -896,6 +930,7 @@ tiles
 		textureeast = "ARKCURT2";
 		texturewest = "ARKCURT2";
 		textureoverhead = "TILE8:54";
+		mapped = 2;
 	}
 	tile 100
 	{
@@ -904,6 +939,7 @@ tiles
 		textureeast = "ARKMELV2";
 		texturewest = "ARKMELV2";
 		textureoverhead = "TILE8:55";
+		mapped = 2;
 	}
 	tile 101
 	{
@@ -912,6 +948,7 @@ tiles
 		textureeast = "LOGWALL2";
 		texturewest = "LOGWALL2";
 		textureoverhead = "TILE8:56";
+		mapped = 2;
 	}
 	tile 102
 	{
@@ -920,6 +957,7 @@ tiles
 		textureeast = "LOGNOAH2";
 		texturewest = "LOGNOAH2";
 		textureoverhead = "TILE8:57";
+		mapped = 2;
 	}
 	tile 103
 	{
@@ -928,6 +966,7 @@ tiles
 		textureeast = "LOGCURT2";
 		texturewest = "LOGCURT2";
 		textureoverhead = "TILE8:58";
+		mapped = 2;
 	}
 	tile 104
 	{
@@ -936,6 +975,7 @@ tiles
 		textureeast = "LOGDUCK2";
 		texturewest = "LOGDUCK2";
 		textureoverhead = "TILE8:59";
+		mapped = 2;
 	}
 	tile 105
 	{
@@ -944,6 +984,7 @@ tiles
 		textureeast = "KNLWODA2";
 		texturewest = "KNLWODA2";
 		textureoverhead = "TILE8:5A";
+		mapped = 2;
 	}
 	tile 106
 	{
@@ -952,6 +993,7 @@ tiles
 		textureeast = "KNLBWOD2";
 		texturewest = "KNLBWOD2";
 		textureoverhead = "TILE8:5B";
+		mapped = 2;
 	}
 
 	modzone 107 fillzone ambush;

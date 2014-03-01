@@ -337,7 +337,8 @@ void AutoMap::Draw()
 		MapSpot spot = map->GetSpot(0, my, 0);
 		for(unsigned int mx = 0;mx < mapwidth;++mx, ++spot)
 		{
-			if(!(spot->amFlags & AM_Visible) && !am_cheat)
+			if(!((spot->amFlags & AM_Visible) || am_cheat) ||
+				((amFlags & AMF_Overlay) && (spot->amFlags & AM_DontOverlay)))
 				continue;
 
 			if(TransformTile(spot, FixedMul((mx<<FRACBITS)-ofsx, scale), FixedMul((my<<FRACBITS)-ofsy, scale), points))

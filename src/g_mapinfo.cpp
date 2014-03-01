@@ -884,7 +884,7 @@ protected:
 static TArray<SkillInfo> skills;
 static TMap<FName, unsigned int> skillIds;
 
-SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), SpawnFilter(0)
+SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), SpawnFilter(0), MapFilter(0)
 {
 }
 
@@ -945,6 +945,8 @@ protected:
 			ParseIntAssignment(skill->SpawnFilter);
 			--skill->SpawnFilter;
 		}
+		else if(key.CompareNoCase("mapfilter") == 0)
+			ParseIntAssignment(skill->MapFilter);
 		else
 			return false;
 		return true;
