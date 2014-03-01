@@ -354,10 +354,7 @@ void AutoMap::Draw()
 					if((amFlags & AMF_DrawTexturedWalls))
 					{
 						if(spot->tile->overhead.isValid())
-						{
 							tex = TexMan(spot->tile->overhead);
-							texScale *= 8;
-						}
 						else if(spot->tile->offsetHorizontal)
 							tex = TexMan(spot->texture[MapTile::North]);
 						else
@@ -381,7 +378,13 @@ void AutoMap::Draw()
 					tex = NULL;
 
 				if(tex)
+				{
+					// As a special case, since Noah's Ark stores the Automap
+					// graphics in the TILE8, we need to override the scaling.
+					if(tex->GetWidth() == 8 && tex->GetHeight() == 8)
+						texScale *= 8;
 					screen->FillSimplePoly(tex, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness);
+				}
 				else if(color)
 					screen->FillSimplePoly(NULL, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness, color->palcolor, color->color);
 			}
@@ -411,7 +414,7 @@ void AutoMap::Draw()
 				{
 					AMPWall pwall;
 					pwall.points = points;
-					pwall.texid = spot->texture[0];
+					pwall.texid = spot->tile->overhead.isValid() ? spot->tile->overhead : spot->texture[0];
 					pwall.shiftx = (FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amcos) - FixedMul(FixedMul(scale, ty&0xFFFF), amsin)));
 					pwall.shifty = (FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amsin) + FixedMul(FixedMul(scale, ty&0xFFFF), amcos)));
 					pwalls.Push(pwall);
@@ -425,9 +428,15 @@ void AutoMap::Draw()
 		AMPWall &pwall = pwalls[pw];
 		if((amFlags & AMF_DrawTexturedWalls))
 		{
+			double texScale = origTexScale;
 			FTexture *tex = TexMan(pwall.texid);
 			if(tex)
-				screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256);
+			{
+				// Noah's ark TILE8
+				if(tex->GetWidth() == 8 && tex->GetHeight() == 8)
+					texScale *= 8;
+				screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
+			}
 		}
 		else
 			screen->FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);

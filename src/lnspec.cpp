@@ -479,6 +479,10 @@ class EVPushwall : public Thinker
 				spot->thinker = NULL;
 				moveTo->pushReceptor = NULL;
 				moveTo->thinker = this;
+
+				// Transfer amflags
+				moveTo->amFlags |= spot->amFlags;
+
 				spot = moveTo;
 				moveTo = NULL;
 			}
