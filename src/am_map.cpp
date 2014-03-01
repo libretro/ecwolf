@@ -692,8 +692,28 @@ void AutoMap::SetPanning(fixed x, fixed y, bool relative)
 	if(relative)
 	{
 		// TODO: Make panning absolute instead of relative to the player so this isn't weird
-		ampanx = clamp<fixed>(ampanx+x, players[0].mo->x - fixed(map->GetHeader().width<<FRACBITS), players[0].mo->x);
-		ampany = clamp<fixed>(ampany+y, players[0].mo->y - fixed(map->GetHeader().height<<FRACBITS), players[0].mo->y);
+		fixed posx, posy, maxx, maxy;
+		if(amangle)
+		{
+			const int sizex = map->GetHeader().width;
+			const int sizey = map->GetHeader().height;
+			maxx = abs(sizex*amcos) + abs(sizey*amsin);
+			maxy = abs(sizex*amsin) + abs(sizey*amcos);
+			posx = players[0].mo->x - (sizex<<(FRACBITS-1));
+			posy = players[0].mo->y - (sizey<<(FRACBITS-1));
+			fixed tmp = (FixedMul(posx, amcos) - FixedMul(posy, amsin)) + (maxx>>1);
+			posy = (FixedMul(posy, amcos) + FixedMul(posx, amsin)) + (maxy>>1);
+			posx = tmp;
+		}
+		else
+		{
+			maxx = map->GetHeader().width<<FRACBITS;
+			maxy = map->GetHeader().height<<FRACBITS;
+			posx = players[0].mo->x;
+			posy = players[0].mo->y;
+		}
+		ampanx = clamp<fixed>(ampanx+x, posx - maxx, posx);
+		ampany = clamp<fixed>(ampany+y, posy - maxy, posy);
 	}
 	else
 	{
