@@ -144,7 +144,7 @@ FTexture *R_GetAMSprite(AActor *actor, angle_t rotangle, bool &flip)
 	}
 	else
 	{
-		int rot = (rotangle-actor->angle-ANGLE_90)/ANGLE_45;
+		int rot = (rotangle-actor->angle-(ANGLE_90-ANGLE_45/2))/ANGLE_45;
 		tex = TexMan[spr.texture[rot]];
 		flip = (spr.mirror>>rot)&1;
 	}

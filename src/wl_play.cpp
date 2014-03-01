@@ -189,12 +189,13 @@ void PlayLoop (void);
 
 void PollKeyboardButtons (void)
 {
-	if(Paused & 2) // Paused for automap
+	if(automap == AMA_Normal)
 	{
 		// HACK
 		bool jam[512] = {false};
+		bool jamall = (Paused & 2); // Paused for automap
 
-		for(int i = 0;amControlScheme[i].button != bt_nobutton;i++)
+		for(int i = 0;jamall ? amControlScheme[i].button != bt_nobutton : amControlScheme[i].button <= bt_zoomout;i++)
 		{
 			if(amControlScheme[i].keyboard != -1 && Keyboard[amControlScheme[i].keyboard])
 			{
