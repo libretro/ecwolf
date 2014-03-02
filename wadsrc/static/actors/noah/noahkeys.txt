@@ -1,7 +1,7 @@
-// TODO: Make these separate key types with separate locks
-
 actor ArkGoldKeyRing : Key 174
 {
+	overheadicon "TILE8:7A"
+	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{
@@ -13,6 +13,8 @@ actor ArkGoldKeyRing : Key 174
 
 actor ArkSilverKeyRing : Key 175
 {
+	overheadicon "TILE8:7B"
+	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{

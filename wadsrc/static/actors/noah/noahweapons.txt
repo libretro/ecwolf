@@ -45,6 +45,8 @@ actor SuperSlingshot : WolfWeapon 181
 	attacksound "weapon/supersling/attack"
 	weapon.ammotype1 "Feed"
 	weapon.selectionorder 1300
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{
@@ -69,6 +71,8 @@ actor AutoSlingshot : WolfWeapon 182
 	attacksound "weapon/autosling/attack"
 	weapon.ammotype1 "Feed"
 	weapon.selectionorder 700
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	-WEAPON.NOGRIN
 	+WEAPON.ALWAYSGRIN
 	+INVENTORY.ALWAYSPICKUP
@@ -118,6 +122,8 @@ actor CantaloupeSlingshot : WolfWeapon 190
 {
 	weapon.ammotype1 "CantaloupeAmmo"
 	weapon.ammogive1 20
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	+WEAPON.NOAUTOFIRE
 	states
@@ -160,6 +166,8 @@ actor MelonSlingshot : WolfWeapon 192
 {
 	weapon.ammotype1 "MelonAmmo"
 	weapon.ammogive1 5
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	+WEAPON.NOAUTOFIRE
 	states

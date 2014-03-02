@@ -224,6 +224,7 @@ typedef enum
 	FL_RIPPER			= 0x02000000,
 	FL_DONTRIP			= 0x04000000,
 	FL_OLDRANDOMCHASE	= 0x08000000,
+	FL_PLOTONAUTOMAP	= 0x10000000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
 

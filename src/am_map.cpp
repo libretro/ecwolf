@@ -337,7 +337,7 @@ void AutoMap::Draw()
 		MapSpot spot = map->GetSpot(0, my, 0);
 		for(unsigned int mx = 0;mx < mapwidth;++mx, ++spot)
 		{
-			if(!((spot->amFlags & AM_Visible) || am_cheat) ||
+			if(!((spot->amFlags & AM_Visible) || am_cheat || gamestate.fullmap) ||
 				((amFlags & AMF_Overlay) && (spot->amFlags & AM_DontOverlay)))
 				continue;
 
@@ -381,7 +381,7 @@ void AutoMap::Draw()
 				{
 					// As a special case, since Noah's Ark stores the Automap
 					// graphics in the TILE8, we need to override the scaling.
-					if(tex->GetWidth() == 8 && tex->GetHeight() == 8)
+					if(tex->UseType == FTexture::TEX_FontChar)
 						texScale *= 8;
 					screen->FillSimplePoly(tex, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness);
 				}
@@ -433,7 +433,7 @@ void AutoMap::Draw()
 			if(tex)
 			{
 				// Noah's ark TILE8
-				if(tex->GetWidth() == 8 && tex->GetHeight() == 8)
+				if(tex->UseType == FTexture::TEX_FontChar)
 					texScale *= 8;
 				screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
 			}
@@ -444,11 +444,12 @@ void AutoMap::Draw()
 
 	DrawVector(AM_Arrow, 8, FixedMul(playerx - ofsx, scale), FixedMul(playery - ofsy, scale), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
 
-	if(am_cheat)
+	if(am_cheat || gamestate.fullmap)
 	{
 		for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 		{
-			DrawActor(iter, FixedMul(iter->x - ofsx, scale), FixedMul(iter->y - ofsy, scale));
+			if(am_cheat || (gamestate.fullmap && (iter->flags & FL_PLOTONAUTOMAP)))
+				DrawActor(iter, FixedMul(iter->x - ofsx, scale), FixedMul(iter->y - ofsy, scale));
 		}
 	}
 
@@ -471,21 +472,41 @@ void AutoMap::DrawActor(AActor *actor, fixed x, fixed y)
 	}
 
 	bool flip;
-	FTexture *tex = R_GetAMSprite(actor, amangle, flip);
+	FTexture *tex;
+	if(actor->overheadIcon.isValid())
+		tex = actor->sprite != SPR_NONE ? TexMan(actor->overheadIcon) : NULL;
+	else
+		tex = R_GetAMSprite(actor, amangle, flip);
+
 	if(!tex)
 		return;
 
-	double width = tex->GetScaledWidthDouble()*FIXED2FLOAT(scale>>6);
-	double height = tex->GetScaledHeightDouble()*FIXED2FLOAT(scale>>6);
-	screen->DrawTexture(tex, x, y,
-		DTA_DestWidthF, width,
-		DTA_DestHeightF, height,
-		DTA_ClipLeft, amx,
-		DTA_ClipRight, amx+amsizex,
-		DTA_ClipTop, amy,
-		DTA_ClipBottom, amy+amsizey,
-		DTA_FlipX, flip,
-		TAG_DONE);
+	if(tex->UseType != FTexture::TEX_FontChar)
+	{
+		double width = tex->GetScaledWidthDouble()*FIXED2FLOAT(scale>>6);
+		double height = tex->GetScaledHeightDouble()*FIXED2FLOAT(scale>>6);
+		screen->DrawTexture(tex, x, y,
+			DTA_DestWidthF, width,
+			DTA_DestHeightF, height,
+			DTA_ClipLeft, amx,
+			DTA_ClipRight, amx+amsizex,
+			DTA_ClipTop, amy,
+			DTA_ClipBottom, amy+amsizey,
+			DTA_FlipX, flip,
+			TAG_DONE);
+	}
+	else
+	{
+		screen->DrawTexture(tex, x - (scale>>(FRACBITS+1)), y - (scale>>(FRACBITS+1)),
+			DTA_DestWidthF, FIXED2FLOAT(scale),
+			DTA_DestHeightF, FIXED2FLOAT(scale),
+			DTA_ClipLeft, amx,
+			DTA_ClipRight, amx+amsizex,
+			DTA_ClipTop, amy,
+			DTA_ClipBottom, amy+amsizey,
+			DTA_FlipX, flip,
+			TAG_DONE);
+	}
 }
 
 void AutoMap::DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const

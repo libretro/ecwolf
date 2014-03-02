@@ -29,6 +29,7 @@ extern struct gametype
 				secrettotal,treasuretotal,killtotal;
 	int32_t     TimeCount;
 	bool        victoryflag;            // set during victory animations
+	bool		fullmap;
 } gamestate;
 
 extern  char            demoname[13];

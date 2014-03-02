@@ -144,6 +144,10 @@ actor KeyGiver : Inventory native
 	inventory.pickupsound "misc/k_pkup"
 }
 
+actor MapRevealer : Inventory native
+{
+}
+
 actor ScoreItem : Inventory native
 {
 	+COUNTITEM

@@ -6,6 +6,8 @@
 actor BibleQuiz : Health 163
 {
 	inventory.amount 4
+	overheadicon "TILE8:80"
+	+PLOTONAUTOMAP
 	states
 	{
 		Spawn:
@@ -14,8 +16,10 @@ actor BibleQuiz : Health 163
 	}
 }
 
-actor ArkMap : Inventory 194
+actor ArkMap : MapRevealer 194
 {
+	overheadicon "TILE8:7E" // Map does indeed use the sling graphic
+	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{
@@ -27,6 +31,8 @@ actor ArkMap : Inventory 194
 
 actor FeedSack : BackpackItem 176
 {
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	states
 	{
@@ -46,6 +52,8 @@ actor MacTreasureItem : ExtraLifeItem
 
 actor ArkBanana : MacTreasureItem 183
 {
+	overheadicon "TILE8:7F"
+	+PLOTONAUTOMAP
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
 	states
@@ -58,6 +66,8 @@ actor ArkBanana : MacTreasureItem 183
 
 actor ArkApple : MacTreasureItem 184
 {
+	overheadicon "TILE8:7F"
+	+PLOTONAUTOMAP
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
 	states
@@ -70,6 +80,8 @@ actor ArkApple : MacTreasureItem 184
 
 actor ArkGrapes : MacTreasureItem 185
 {
+	overheadicon "TILE8:7F"
+	+PLOTONAUTOMAP
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
 	states
@@ -82,6 +94,8 @@ actor ArkGrapes : MacTreasureItem 185
 
 actor ArkPeach : MacTreasureItem 186
 {
+	overheadicon "TILE8:7F"
+	+PLOTONAUTOMAP
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
 	states

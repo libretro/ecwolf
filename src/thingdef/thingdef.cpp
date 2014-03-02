@@ -91,6 +91,7 @@ const struct FlagDef
 	DEFINE_FLAG(WF, NOGRIN, Weapon, weaponFlags),
 	DEFINE_FLAG(FL, OLDRANDOMCHASE, Actor, flags),
 	DEFINE_FLAG(FL, PICKUP, Actor, flags),
+	DEFINE_FLAG(FL, PLOTONAUTOMAP, Actor, flags),
 	DEFINE_FLAG(FL, RANDOMIZE, Actor, flags),
 	DEFINE_FLAG(FL, RIPPER, Actor, flags),
 	DEFINE_FLAG(FL, REQUIREKEYS, Actor, flags),

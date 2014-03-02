@@ -4,6 +4,8 @@ actor Feed : Ammo 180
 	inventory.maxamount 99
 	ammo.backpackamount 10
 	ammo.backpackmaxamount 299
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	states
 	{
 		Spawn:
@@ -29,6 +31,8 @@ actor CantaloupeAmmo : Ammo 191
 	inventory.maxamount 99
 	ammo.backpackamount 1
 	ammo.backpackmaxamount 99
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	states
 	{
 		Spawn:
@@ -43,6 +47,8 @@ actor MelonAmmo : Ammo 193
 	inventory.maxamount 99
 	ammo.backpackamount 1
 	ammo.backpackmaxamount 99
+	overheadicon "TILE8:7E"
+	+PLOTONAUTOMAP
 	states
 	{
 		Spawn:

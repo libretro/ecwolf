@@ -166,6 +166,8 @@ class AActor : public Thinker,
 		word        viewheight;
 		fixed       transx,transy;      // in global coord
 
+		FTextureID	overheadIcon;
+
 		uint16_t	sighttime;
 		uint8_t		sightrandom;
 		fixed		missilefrequency;

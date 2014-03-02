@@ -754,3 +754,19 @@ class AExtraLifeItem : public AInventory
 		}
 };
 IMPLEMENT_CLASS(ExtraLifeItem)
+
+////////////////////////////////////////////////////////////////////////////////
+
+class AMapRevealer : public AInventory
+{
+	DECLARE_NATIVE_CLASS(MapRevealer, Inventory)
+
+	protected:
+		bool TryPickup(AActor *toucher)
+		{
+			gamestate.fullmap = true;
+			GoAwayAndDie();
+			return true;
+		}
+};
+IMPLEMENT_CLASS(MapRevealer)

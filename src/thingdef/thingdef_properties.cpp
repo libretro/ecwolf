@@ -356,6 +356,12 @@ HANDLE_PROPERTY(painchance)
 	defaults->painchance = chance;
 }
 
+HANDLE_PROPERTY(overheadicon)
+{
+	STRING_PARAM(icon, 0);
+	defaults->overheadIcon = TexMan.CheckForTexture(icon, FTexture::TEX_Any);
+}
+
 HANDLE_PROPERTY(painsound)
 {
 	STRING_PARAM(snd, 0);
@@ -585,6 +591,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(missilefrequency, Actor, F),
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP_PREFIX(movebob, PlayerPawn, Player, F),
+	DEFINE_PROP(overheadicon, Actor, S),
 	DEFINE_PROP(painchance, Actor, I),
 	DEFINE_PROP(painsound, Actor, S),
 	DEFINE_PROP(pickupsound, Inventory, S),

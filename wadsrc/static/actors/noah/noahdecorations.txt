@@ -11,6 +11,8 @@ actor ArkPuddle 158
 actor WaterBucket 159
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -23,6 +25,8 @@ actor WaterBucket 159
 actor TableWithCandle 160
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -35,6 +39,8 @@ actor TableWithCandle 160
 actor WoodenBarrel 161
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -57,6 +63,8 @@ actor ArkScraps 162
 actor FeedBucket 164
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -69,6 +77,8 @@ actor FeedBucket 164
 actor ColumnWithCandles 165
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -81,6 +91,8 @@ actor ColumnWithCandles 165
 actor ThinColumn 166
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -93,6 +105,8 @@ actor ThinColumn 166
 actor BirdCage 167
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -105,6 +119,8 @@ actor BirdCage 167
 actor WaterPitcher 168
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -147,6 +163,8 @@ actor ArkChandelier 171
 actor ArkWaterTrough 172
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -159,6 +177,8 @@ actor ArkWaterTrough 172
 actor CandlePole 173
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -171,6 +191,8 @@ actor CandlePole 173
 actor ArkMetalCage 188
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
@@ -183,6 +205,8 @@ actor ArkMetalCage 188
 actor PlainColumn 189
 {
 	radius 32
+	overheadicon "TILE8:7C"
+	+PLOTONAUTOMAP
 	+SOLID
 	states
 	{
