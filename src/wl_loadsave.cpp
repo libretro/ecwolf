@@ -522,8 +522,10 @@ static void Serialize(FArchive &arc)
 		<< gamestate.treasuretotal
 		<< gamestate.killtotal
 		<< gamestate.TimeCount
-		<< gamestate.victoryflag
-		<< LevelRatios.killratio
+		<< gamestate.victoryflag;
+	if(SaveVersion >= 1393719642)
+		arc << gamestate.fullmap;
+	arc << LevelRatios.killratio
 		<< LevelRatios.secretsratio
 		<< LevelRatios.treasureratio
 		<< LevelRatios.numLevels

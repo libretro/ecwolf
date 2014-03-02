@@ -371,8 +371,10 @@ void AActor::Serialize(FArchive &arc)
 		<< viewx
 		<< viewheight
 		<< transx
-		<< transy
-		<< sighttime
+		<< transy;
+	if(GameSave::SaveVersion >= 1393719642)
+		arc << overheadIcon;
+	arc << sighttime
 		<< sightrandom
 		<< minmissilechance
 		<< painchance

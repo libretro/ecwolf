@@ -658,8 +658,10 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			plane.map[i].pushDirection = static_cast<MapTile::Side>(pushdir);
 
 			arc << plane.map[i].texture[0] << plane.map[i].texture[1] << plane.map[i].texture[2] << plane.map[i].texture[3]
-				<< plane.map[i].visible
-				<< plane.map[i].thinker
+				<< plane.map[i].visible;
+			if(GameSave::SaveVersion >= 1393719642)
+				arc << plane.map[i].amFlags;
+			arc << plane.map[i].thinker
 				<< plane.map[i].slideAmount[0] << plane.map[i].slideAmount[1] << plane.map[i].slideAmount[2] << plane.map[i].slideAmount[3]
 				<< plane.map[i].sideSolid[0] << plane.map[i].sideSolid[1] << plane.map[i].sideSolid[2] << plane.map[i].sideSolid[3]
 				<< plane.map[i].triggers
