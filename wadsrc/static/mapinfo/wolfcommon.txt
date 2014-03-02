@@ -29,6 +29,16 @@ gameinfo
 	gamecolormap = "COLORMAP"
 }
 
+automap
+{
+	fontcolor = "White"
+	background = "55 55 55"
+	doorcolor = "10 C7 10"
+	floorcolor = "55 55 55"
+	wallcolor = "00 8E 00"
+	yourcolor = "FF 80 00"
+}
+
 skill baby
 {
 	name = "$STR_DADDY"

@@ -125,6 +125,16 @@ public:
 		FString l, r;
 		FString bl, b, br;
 	} Border;
+
+	struct AutomapInfo
+	{
+		EColorRange FontColor;
+		int Background;
+		int DoorColor;
+		int FloorColor;
+		int WallColor;
+		int YourColor;
+	} automap;
 } gameinfo;
 
 class LevelInfo

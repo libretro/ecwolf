@@ -51,6 +51,13 @@
 #include "wl_main.h"
 #include "wl_play.h"
 
+AutoMap::Color &AutoMap::Color::operator=(int rgb)
+{
+	color = rgb;
+	palcolor = ColorMatcher.Pick(RPART(rgb), GPART(rgb), BPART(rgb));
+	return *this;
+}
+
 AutoMap AM_Main;
 AutoMap AM_Overlay;
 
@@ -128,7 +135,6 @@ void AM_UpdateFlags()
 
 	if(am_rotate == AMR_On) flags |= AutoMap::AMF_Rotate;
 	if(am_drawtexturedwalls) flags |= AutoMap::AMF_DrawTexturedWalls;
-	if(am_drawfloors) flags |= AutoMap::AMF_DrawFloor;
 
 	// Overlay only flas
 	ovFlags |= flags;
@@ -136,6 +142,7 @@ void AM_UpdateFlags()
 
 	// Full only flags
 	if(am_showratios) flags |= AutoMap::AMF_DispRatios;
+	if(am_drawfloors) flags |= AutoMap::AMF_DrawFloor;
 
 	AM_Main.SetFlags(~flags, false);
 	AM_Overlay.SetFlags(~ovFlags, false);
@@ -203,7 +210,7 @@ AutoMap::AutoMap(unsigned int flags) :
 	minmaxSel = 0;
 	amsin = 0;
 	amcos = FRACUNIT;
-	absscale = FRACUNIT/2;
+	absscale = FRACUNIT/4;
 	rottable[0][0] = 1.0;
 	rottable[0][1] = 0.0;
 	rottable[1][0] = 1.0;
@@ -227,17 +234,11 @@ void AutoMap::CalculateDimensions(unsigned int x, unsigned int y, unsigned int w
 	--amy;
 
 	// TODO: Find a better spot for this
-	ArrowColor.color = MAKERGB(0xFF,0x80,0x00);
-	ArrowColor.palcolor = ColorMatcher.Pick(0xFF, 0x80, 0x00);
-
-	BackgroundColor.color = MAKERGB(0x55,0x55,0x55);
-	BackgroundColor.palcolor = ColorMatcher.Pick(0x55, 0x55, 0x55);
-
-	WallColor.color = MAKERGB(0x00, 0x8E, 0x00);
-	WallColor.palcolor = ColorMatcher.Pick(0x00, 0x8E, 0x00);
-
-	DoorColor.color = MAKERGB(0x10, 0xC7, 0x10);
-	DoorColor.palcolor = ColorMatcher.Pick(0x10, 0xC7, 0x10);
+	ArrowColor = gameinfo.automap.YourColor;
+	BackgroundColor = gameinfo.automap.Background;
+	FloorColor = gameinfo.automap.FloorColor;
+	WallColor = gameinfo.automap.WallColor;
+	DoorColor = gameinfo.automap.DoorColor;
 }
 
 // Sutherland–Hodgman algorithm
@@ -369,13 +370,25 @@ void AutoMap::Draw()
 							color = &WallColor;
 					}
 				}
-				else if((amFlags & AMF_DrawFloor) && spot->sector)
+				else if(spot->sector && !(amFlags & AMF_Overlay))
 				{
-					brightness = 128;
-					tex = TexMan(spot->sector->texture[MapSector::Floor]);
+					if(amFlags & AMF_DrawFloor)
+					{
+						brightness = 128;
+						tex = TexMan(spot->sector->texture[MapSector::Floor]);
+					}
+					else
+					{
+						brightness = 256;
+						tex = NULL;
+						if(FloorColor.color != BackgroundColor.color)
+							color = &FloorColor;
+					}
 				}
 				else
+				{
 					tex = NULL;
+				}
 
 				if(tex)
 				{
@@ -607,13 +620,13 @@ void AutoMap::DrawStats() const
 		infHeight = SmallFont->GetHeight()+2;
 		screen->Dim(GPalette.BlackIndex, 0.5f, 0, 0, screenWidth, infHeight*CleanYfac);
 
-		screen->DrawText(SmallFont, CR_WHITE, 2*CleanXfac, CleanYfac, levelInfo->GetName(map),
+		screen->DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, CleanYfac, levelInfo->GetName(map),
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 
 		unsigned int seconds = gamestate.TimeCount/70;
 		statString.Format("%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
-		screen->DrawText(SmallFont, CR_WHITE,
+		screen->DrawText(SmallFont, gameinfo.automap.FontColor,
 			screenWidth - (SmallFont->GetCharWidth('0')*6 + SmallFont->GetCharWidth(':')*2 + 2)*CleanXfac, CleanYfac,
 			statString,
 			DTA_CleanNoMove, true,
@@ -631,7 +644,7 @@ void AutoMap::DrawStats() const
 		VW_MeasurePropString(SmallFont, statString, sw, sh);
 		screen->Dim(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
 
-		screen->DrawText(SmallFont, CR_WHITE, 2*CleanXfac, (infHeight+1)*CleanYfac, statString,
+		screen->DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, infHeight*CleanYfac, statString,
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 	}

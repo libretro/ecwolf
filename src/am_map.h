@@ -81,6 +81,8 @@ public:
 	{
 		uint32 color;
 		byte palcolor;
+
+		Color &operator=(int rgb);
 	};
 
 	AutoMap(unsigned int flags=0);
@@ -115,6 +117,7 @@ private:
 
 	Color ArrowColor;
 	Color BackgroundColor;
+	Color FloorColor;
 	Color WallColor;
 	Color DoorColor;
 };

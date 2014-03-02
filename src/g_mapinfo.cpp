@@ -704,6 +704,32 @@ protected:
 	}
 };
 
+class AutomapBlockParser : public MapInfoBlockParser
+{
+public:
+	AutomapBlockParser(Scanner &sc) : MapInfoBlockParser(sc, "automap") {}
+
+protected:
+	bool CheckKey(FString key)
+	{
+		if(key.CompareNoCase("Background") == 0)
+			ParseColorAssignment(gameinfo.automap.Background);
+		else if(key.CompareNoCase("DoorColor") == 0)
+			ParseColorAssignment(gameinfo.automap.DoorColor);
+		else if(key.CompareNoCase("FloorColor") == 0)
+			ParseColorAssignment(gameinfo.automap.FloorColor);
+		else if(key.CompareNoCase("FontColor") == 0)
+			ParseFontColorAssignment(gameinfo.automap.FontColor);
+		else if(key.CompareNoCase("WallColor") == 0)
+			ParseColorAssignment(gameinfo.automap.WallColor);
+		else if(key.CompareNoCase("YourColor") == 0)
+			ParseColorAssignment(gameinfo.automap.YourColor);
+		else
+			return false;
+		return true;
+	}
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 
 static TArray<EpisodeInfo> episodes;
@@ -1266,6 +1292,10 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 			else if(sc->str.CompareNoCase("adddefaultmap") == 0)
 			{
 				LevelInfoBlockParser(sc, defaultMap, false).Parse();
+			}
+			else if(sc->str.CompareNoCase("automap") == 0)
+			{
+				AutomapBlockParser(sc).Parse();
 			}
 			else if(sc->str.CompareNoCase("clearepisodes") == 0)
 			{
