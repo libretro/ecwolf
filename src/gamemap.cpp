@@ -374,7 +374,7 @@ void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 		++value;
 }
 
-void GameMap::LoadMap()
+void GameMap::LoadMap(bool loadingSave)
 {
 	if(!valid)
 		throw CRecoverableError("Tried to load invalid map!");
@@ -384,7 +384,8 @@ void GameMap::LoadMap()
 	else
 		ReadPlanesData();
 
-	ScanTiles();
+	if(!loadingSave)
+		ScanTiles();
 }
 
 GameMap::Plane &GameMap::NewPlane()

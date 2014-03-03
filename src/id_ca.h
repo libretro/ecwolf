@@ -8,7 +8,7 @@ extern	class LevelInfo *levelInfo;
 
 //===========================================================================
 
-void CA_CacheMap (const class FString &mapname);
+void CA_CacheMap (const class FString &mapname, bool loading);
 
 void CA_CacheScreen (class FTexture *tex, bool noaspect=false);
 
