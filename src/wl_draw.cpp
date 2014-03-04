@@ -1266,7 +1266,7 @@ void R_RenderView()
 
 	DrawPlayerWeapon ();    // draw players[0].mo's hands
 
-	if(Keyboard[sc_Tab] && viewsize == 21)
+	if((buttonstate[bt_showstatusbar] || buttonheld[bt_showstatusbar]) && viewsize == 21)
 		ShowActStatus();
 
 	// Always mark the current spot as visible in the automap

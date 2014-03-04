@@ -92,10 +92,12 @@ ControlScheme controlScheme[] =
 	{ bt_reload,			"Reload",		-1,			-1,				-1, NULL, 0 },
 	{ bt_zoom,				"Zoom",			-1,			-1,				-1, NULL, 0 },
 	{ bt_automap,			"Automap",		-1,			-1,				-1, NULL, 0 },
+	{ bt_showstatusbar,		"Show Status",	-1,			sc_Tab,			-1,	NULL, 0 },
 
 	// End of List
 	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
 };
+ControlScheme &schemeAutomapKey = controlScheme[25]; // When the input system is redone, hopefully we don't need this kind of thing
 
 ControlScheme amControlScheme[] =
 {
@@ -658,16 +660,27 @@ void CheckKeys (void)
 //
 // TAB-? debug keys
 //
-	if ((Keyboard[sc_Tab] || Keyboard[sc_BackSpace] || Keyboard[sc_Grave]) && DebugOk)
+	if (DebugOk)
 	{
-		if (DebugKeys () && viewsize < 20)
-			DrawPlayBorder ();       // dont let the blue borders flash
+		// Jam debug sequence if we're trying to open the automap
+		// We really only need to check for the automap control since it's
+		// likely to be put in the Tab space and be tapped while using other controls
+		bool keyDown = Keyboard[sc_Tab] || Keyboard[sc_BackSpace] || Keyboard[sc_Grave];
+		if ((schemeAutomapKey.keyboard == sc_Tab || schemeAutomapKey.keyboard == sc_BackSpace || schemeAutomapKey.keyboard == sc_Grave)
+			&& (buttonstate[bt_automap] || buttonheld[bt_automap]))
+			keyDown = false;
 
-		if (MousePresent && IN_IsInputGrabbed())
-			IN_CenterMouse();     // Clear accumulated mouse movement
+		if (keyDown)
+		{
+			if (DebugKeys () && viewsize < 20)
+				DrawPlayBorder ();       // dont let the blue borders flash
 
-		lasttimecount = GetTimeCount();
-		return;
+			if (MousePresent && IN_IsInputGrabbed())
+				IN_CenterMouse();     // Clear accumulated mouse movement
+
+			lasttimecount = GetTimeCount();
+			return;
+		}
 	}
 }
 

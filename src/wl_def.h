@@ -309,6 +309,7 @@ enum Button
 	bt_reload,
 	bt_zoom,
 	bt_automap,
+	bt_showstatusbar,
 	NUMBUTTONS,
 
 	// AM buttons
@@ -339,6 +340,7 @@ struct ControlScheme
 
 extern ControlScheme controlScheme[];
 extern ControlScheme amControlScheme[];
+extern ControlScheme &schemeAutomapKey;
 
 enum
 {
