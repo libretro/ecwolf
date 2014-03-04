@@ -231,13 +231,15 @@ protected:
 class FTile8Char : public FFontChar2
 {
 public:
-	FTile8Char (int sourcelump, int sourcepos, int width, int height, int leftofs=0, int topofs=0) :
-		FFontChar2(sourcelump, sourcepos, width, height, leftofs)
+	FTile8Char (int sourcelump, int sourcepos, int width, int height, int maskcolor=-1, int leftofs=0, int topofs=0) :
+		FFontChar2(sourcelump, sourcepos, width, height, leftofs), MaskColor(maskcolor)
 	{
 	}
 
 protected:
 	void MakeTexture ();
+
+	int MaskColor;
 };
 
 struct TempParmInfo
@@ -1287,6 +1289,9 @@ void FSingleLumpFont::LoadTile8(int lump, const BYTE *data)
 			Chars[i].Pic = new FTile8Char (lump, i*64, SpaceWidth, FontHeight);
 		else if(i >= (unsigned int)('0'-FirstChar) && i <= (unsigned int)('9'-FirstChar))
 			Chars[i].Pic = new FTile8Char (lump, (i-('0'-FirstChar)+9)*64, SpaceWidth, FontHeight);
+		// Mask off background color in S3DNA automap things (0x71-0x78 = Player, 0x7A+ = Things)
+		else if((i >= 0x71u-FirstChar && i <= 0x78u-FirstChar) || (i >= 0x7Au-FirstChar))
+			Chars[i].Pic = new FTile8Char (lump, (i-('A'-FirstChar)+19)*64, SpaceWidth, FontHeight, 215);
 		else if(i >= (unsigned int)('A'-FirstChar))
 			Chars[i].Pic = new FTile8Char (lump, (i-('A'-FirstChar)+19)*64, SpaceWidth, FontHeight);
 		else
@@ -2064,7 +2069,7 @@ void FTile8Char::MakeTexture()
 				{
 					color = SourceRemap[color];
 				}
-				*dest_p = color;
+				*dest_p = color != MaskColor ? color : 0;
 				dest_p += dest_adv;
 			}
 			dest_p -= dest_rew;
