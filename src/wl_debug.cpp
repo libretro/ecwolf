@@ -361,7 +361,13 @@ int DebugKeys (void)
 	else if (Keyboard[sc_O])
 	{
 		am_cheat ^= 1;
-		IN_ClearKeysDown();
+		US_CenterWindow (18,3);
+		if (am_cheat)
+			US_PrintCentered ("Automap revealed");
+		else
+			US_PrintCentered ("Automap hidden");
+		VW_UpdateScreen();
+		IN_Ack ();
 		return 1;
 	}
 	else if(Keyboard[sc_P])         // P = Ripper's picture grabber
