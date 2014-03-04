@@ -77,6 +77,7 @@ enum
 unsigned automap = 0;
 bool am_cheat = false;
 unsigned am_rotate = 0;
+bool am_overlaytextured = false;
 bool am_drawtexturedwalls = true;
 bool am_drawfloors = false;
 unsigned am_overlay = 0;
@@ -134,19 +135,20 @@ void AM_UpdateFlags()
 	unsigned int ovFlags = AutoMap::AMF_Overlay;
 
 	if(am_rotate == AMR_On) flags |= AutoMap::AMF_Rotate;
-	if(am_drawtexturedwalls) flags |= AutoMap::AMF_DrawTexturedWalls;
 
-	// Overlay only flas
+	// Overlay only flags
 	ovFlags |= flags;
 	if(am_rotate == AMR_Overlay) ovFlags |= AutoMap::AMF_Rotate;
+	if(am_overlaytextured) ovFlags |= AutoMap::AMF_DrawTexturedWalls;
 
 	// Full only flags
 	if(am_showratios) flags |= AutoMap::AMF_DispRatios;
 	if(am_drawfloors) flags |= AutoMap::AMF_DrawFloor;
+	if(am_drawtexturedwalls) flags |= AutoMap::AMF_DrawTexturedWalls;
 
 	AM_Main.SetFlags(~flags, false);
 	AM_Overlay.SetFlags(~ovFlags, false);
-	AM_Main.SetFlags(flags|AutoMap::AMF_DispInfo, true);
+	AM_Main.SetFlags(flags|AutoMap::AMF_DispInfo|AutoMap::AMF_ShowThings, true);
 	AM_Overlay.SetFlags(ovFlags, true);
 }
 
@@ -457,7 +459,7 @@ void AutoMap::Draw()
 
 	DrawVector(AM_Arrow, 8, FixedMul(playerx - ofsx, scale), FixedMul(playery - ofsy, scale), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
 
-	if(am_cheat || gamestate.fullmap)
+	if((amFlags & AMF_ShowThings) && (am_cheat || gamestate.fullmap))
 	{
 		for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 		{

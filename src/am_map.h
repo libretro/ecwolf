@@ -49,6 +49,7 @@ enum
 extern unsigned automap;
 extern bool am_cheat;
 extern unsigned am_rotate;
+extern bool am_overlaytextured;
 extern bool am_drawtexturedwalls;
 extern bool am_drawfloors;
 extern unsigned am_overlay;
@@ -74,7 +75,8 @@ public:
 		AMF_DrawFloor = 0x4,
 		AMF_Overlay = 0x8,
 		AMF_DispInfo = 0x10,
-		AMF_DispRatios = 0x20
+		AMF_DispRatios = 0x20,
+		AMF_ShowThings = 0x40
 	};
 
 	struct Color

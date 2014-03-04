@@ -51,7 +51,7 @@ Menu optionsMenu(80, 80, 190, 28);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(60, 95, 225, 56);
-Menu automapMenu(40, 75, 260, 56);
+Menu automapMenu(40, 55, 260, 56);
 Menu mouseSensitivity(20, 80, 300, 0);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
@@ -463,6 +463,7 @@ void CreateMenus()
 	automapMenu.addItem(new MultipleChoiceMenuItem(ChangeAMRotate, rotateOptions, 3, am_rotate));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTURES"], am_drawtexturedwalls, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMFLOORS"], am_drawfloors, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTUREDOVERLAY"], am_overlaytextured, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMRATIOS"], am_showratios, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMPAUSE"], am_pause, ChangeAutomapFlag));
 }
