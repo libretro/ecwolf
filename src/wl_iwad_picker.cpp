@@ -310,8 +310,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 		printf ("%d. %s (%s)\n", i+1, wads[i].Name.GetChars(), filepart.GetChars());
 	}
 	printf ("Which one? ");
-	scanf ("%d", &i);
-	if (i > numwads)
+	if (scanf ("%d", &i) != 1 || i > numwads)
 		return numwads-1;
 	return i-1;
 #else
