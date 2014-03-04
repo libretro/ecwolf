@@ -262,7 +262,7 @@ void SetupGameLevel (void)
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapname);
+	CA_CacheMap (gamestate.mapname, false);
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer

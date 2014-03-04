@@ -474,8 +474,8 @@ void AutoMap::Draw()
 void AutoMap::DrawActor(AActor *actor, fixed x, fixed y)
 {
 	{
-		fixed tmp = (FixedMul(x, amcos) - FixedMul(y, amsin) + (amsizex<<(FRACBITS-1)))>>FRACBITS;
-		y = (FixedMul(x, amsin) + FixedMul(y, amcos) + (amsizey<<(FRACBITS-1)))>>FRACBITS;
+		fixed tmp = ((FixedMul(x, amcos) - FixedMul(y, amsin) + (amsizex<<(FRACBITS-1)))>>FRACBITS) + amx;
+		y = ((FixedMul(x, amsin) + FixedMul(y, amcos) + (amsizey<<(FRACBITS-1)))>>FRACBITS) + amy;
 		x = tmp;
 
 		int adiameter = FixedMul(actor->radius, scale)>>(FRACBITS-1);
@@ -656,8 +656,8 @@ void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, fi
 {
 	int x1, y1, x2, y2;
 
-	fixed tmp = (FixedMul(x, amcos) - FixedMul(y, amsin) + (amsizex<<(FRACBITS-1)))>>FRACBITS;
-	y = (FixedMul(x, amsin) + FixedMul(y, amcos) + (amsizey<<(FRACBITS-1)))>>FRACBITS;
+	fixed tmp = ((FixedMul(x, amcos) - FixedMul(y, amsin) + (amsizex<<(FRACBITS-1)))>>FRACBITS) + amx;
+	y = ((FixedMul(x, amsin) + FixedMul(y, amcos) + (amsizey<<(FRACBITS-1)))>>FRACBITS) + amy;
 	x = tmp;
 
 	x1 = FixedMul(points[numPoints-1].X, scale)>>FRACBITS;

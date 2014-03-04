@@ -568,7 +568,7 @@ bool Load(const FString &filename)
 
 	char level[9];
 	M_GetPNGText(png, "Current Map", level, 8);
-	CA_CacheMap(level);
+	CA_CacheMap(level, true);
 
 	{
 		unsigned int chunkLength = M_FindPNGChunk(png, SNAP_ID);
