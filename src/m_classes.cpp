@@ -517,9 +517,9 @@ void Menu::eraseGun(int x, int y)
 }
 
 Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) :
-	entryListener(entryListener), curPos(0), headPicture(NULL),
-	headTextInStripes(false), headPictureIsAlternate(false), height(0),
-	indent(indent), x(x), y(y), w(w), itemOffset(0)
+	entryListener(entryListener), controlHeaders(false), curPos(0),
+	headPicture(NULL), headTextInStripes(false), headPictureIsAlternate(false),
+	height(0), indent(indent), x(x), y(y), w(w), itemOffset(0)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';

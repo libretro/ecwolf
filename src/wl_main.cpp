@@ -43,6 +43,7 @@
 #include "version.h"
 #include "r_2d/r_main.h"
 #include "filesys.h"
+#include "g_conversation.h"
 #include "g_intermission.h"
 
 #include <clocale>
@@ -481,6 +482,11 @@ static void InitGame()
 // initialize the menusalcProjection
 	printf("CreateMenus: Preparing the menu system...\n");
 	CreateMenus();
+
+//
+// Load Noah's Ark quiz
+//
+	Dialog::LoadGlobalModule("NOAHQUIZ");
 
 //
 // Finish signon screen

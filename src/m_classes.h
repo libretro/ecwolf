@@ -208,7 +208,7 @@ class Menu
 
 	public:
 		Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)=NULL);
-		~Menu();
+		virtual ~Menu();
 
 		void			addItem(MenuItem *item);
 		static bool		areMenusClosed() { return close; }
