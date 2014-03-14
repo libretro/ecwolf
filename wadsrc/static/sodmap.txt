@@ -61,7 +61,7 @@ graphics
 	"ENDSCR7",
 	"ENDSCR8",
 	"ENDSCR9",
-	"STBAR",
+	"STBACK",
 	"PG13",
 	"CREDITS",
 	"IDGUYS1",

@@ -581,7 +581,7 @@ void CheckKeys (void)
 		IN_Ack ();
 
 		if (viewsize < 18)
-			DrawPlayBorder ();
+			StatusBar->RefreshBackground ();
 	}
 
 //
@@ -673,7 +673,7 @@ void CheckKeys (void)
 		if (keyDown)
 		{
 			if (DebugKeys () && viewsize < 20)
-				DrawPlayBorder ();       // dont let the blue borders flash
+				StatusBar->RefreshBackground ();       // dont let the blue borders flash
 
 			if (MousePresent && IN_IsInputGrabbed())
 				IN_CenterMouse();     // Clear accumulated mouse movement

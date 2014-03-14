@@ -36,7 +36,6 @@ extern  char            demoname[13];
 
 void    SetupGameLevel (void);
 bool    GameLoop (void);
-void    DrawPlayBorder (void);
 void    DrawPlayScreen (bool noborder=false);
 void    DrawPlayBorderSides (void);
 void    ShowActStatus();

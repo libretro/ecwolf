@@ -6,6 +6,17 @@ graphic optional "TITLESOD", 320, 200
 	graphic "TITLE2", 0, 80
 }
 
+// Separate the status bar from the background image since off by one issues
+// arise since graphics like the mugshot and keys align with the top of the
+// status bar and not the background.
+graphic optional "STBAR", 302, 33
+{
+	offset -9, -4
+	graphic "STBACK", -9, -4
+}
+
+// HELPART support
+
 graphic optional "IDGUYS", 320, 200
 {
 	graphic "IDGUYS1", 0, 0

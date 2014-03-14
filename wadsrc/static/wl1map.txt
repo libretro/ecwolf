@@ -66,7 +66,7 @@ graphics
 	"FONTL089", "FONTL090", "FONTL033", "FONTL039",
 	"L_GUY2",
 	"L_BJWINS",
-	"STBAR",
+	"STBACK",
 	"TITLEPIC",
 	"PG13",
 	"CREDITS",

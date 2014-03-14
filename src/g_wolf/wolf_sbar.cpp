@@ -80,6 +80,7 @@ public:
 	void DrawStatusBar();
 	unsigned int GetHeight(bool top) { return top ? 0 : STATUSLINES+1; }
 	void NewGame() { facecount = 0; }
+	void RefreshBackground();
 	void UpdateFace(int damage=0);
 	void WeaponGrin();
 
@@ -478,6 +479,16 @@ void WolfStatusBar::DrawAmmo (void)
 }
 
 //===========================================================================
+
+void WolfStatusBar::RefreshBackground()
+{
+	DBaseStatusBar::RefreshBackground();
+
+	if(viewsize == 21 && ingame)
+		return;
+
+	VWB_DrawGraphic(TexMan("STBACK"), 0, 160);
+}
 
 void WolfStatusBar::DrawStatusBar()
 {

@@ -33,6 +33,7 @@ public:
 	virtual void DrawStatusBar()=0;
 	virtual unsigned int GetHeight(bool top)=0;
 	virtual void NewGame() {}
+	virtual void RefreshBackground();
 	virtual void UpdateFace (int damage=0) {}
 	virtual void WeaponGrin () {}
 };

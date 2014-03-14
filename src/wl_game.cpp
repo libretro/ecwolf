@@ -366,7 +366,7 @@ void DrawPlayBorderSides(void)
 ===================
 */
 
-void DrawPlayBorder (void)
+void DBaseStatusBar::RefreshBackground (void)
 {
 	FTexture *borderTex = TexMan(levelInfo->GetBorderTexture());
 
@@ -402,7 +402,7 @@ void DrawPlayBorder (void)
 void DrawPlayScreen (bool noborder)
 {
 	if(!noborder)
-		DrawPlayBorder ();
+		StatusBar->RefreshBackground();
 
 	StatusBar->DrawStatusBar();
 }

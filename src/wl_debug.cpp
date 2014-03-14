@@ -206,7 +206,7 @@ int DebugKeys (void)
 			if (texID.isValid())
 			{
 				levelInfo->BorderTexture = texID;
-				DrawPlayBorder();
+				StatusBar->RefreshBackground();
 
 				return 0;
 			}
