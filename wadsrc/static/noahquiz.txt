@@ -17,7 +17,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A01A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 2;
 			giveitem = 3;
 		}
@@ -31,7 +31,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A01C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 2;
 			giveitem = 3;
 		}
@@ -44,7 +44,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A02A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 3;
 			giveitem = 3;
 		}
@@ -58,7 +58,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A02C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 3;
 			giveitem = 3;
 		}
@@ -78,14 +78,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A03B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 4;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A03C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 4;
 			giveitem = 3;
 		}
@@ -98,14 +98,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A04A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 5;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A04B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 5;
 			giveitem = 3;
 		}
@@ -125,7 +125,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A05A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 6;
 			giveitem = 3;
 		}
@@ -139,7 +139,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A05C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 6;
 			giveitem = 3;
 		}
@@ -159,14 +159,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A06B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 7;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A06C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 7;
 			giveitem = 3;
 		}
@@ -186,14 +186,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A07B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 8;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A07C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 8;
 			giveitem = 3;
 		}
@@ -206,7 +206,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A08A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 9;
 			giveitem = 3;
 		}
@@ -220,7 +220,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A08C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 9;
 			giveitem = 3;
 		}
@@ -240,14 +240,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A09B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 10;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A09C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 10;
 			giveitem = 3;
 		}
@@ -260,14 +260,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A10A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 11;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A10B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 11;
 			giveitem = 3;
 		}
@@ -287,7 +287,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A11A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 12;
 			giveitem = 3;
 		}
@@ -301,7 +301,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A11C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 12;
 			giveitem = 3;
 		}
@@ -314,7 +314,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A12A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 13;
 			giveitem = 3;
 		}
@@ -328,7 +328,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A12C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 13;
 			giveitem = 3;
 		}
@@ -341,14 +341,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A13A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 14;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A13B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 14;
 			giveitem = 3;
 		}
@@ -368,7 +368,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A14A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 15;
 			giveitem = 3;
 		}
@@ -388,14 +388,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A15A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 16;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A15B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 16;
 			giveitem = 3;
 		}
@@ -415,7 +415,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A16A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 17;
 			giveitem = 3;
 		}
@@ -435,14 +435,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A17A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 18;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A17B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 18;
 			giveitem = 3;
 		}
@@ -462,7 +462,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A18A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 19;
 			giveitem = 3;
 		}
@@ -476,7 +476,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A18C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 19;
 			giveitem = 3;
 		}
@@ -496,14 +496,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A19B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 20;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A19C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 20;
 			giveitem = 3;
 		}
@@ -516,7 +516,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A20A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 21;
 			giveitem = 3;
 		}
@@ -530,7 +530,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A20C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 21;
 			giveitem = 3;
 		}
@@ -543,7 +543,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A21A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 22;
 			giveitem = 3;
 		}
@@ -557,7 +557,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A21C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 22;
 			giveitem = 3;
 		}
@@ -570,14 +570,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A22A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 23;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A22B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 23;
 			giveitem = 3;
 		}
@@ -597,7 +597,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A23A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 24;
 			giveitem = 3;
 		}
@@ -611,7 +611,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A23C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 24;
 			giveitem = 3;
 		}
@@ -631,14 +631,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A24B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 25;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A24C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 25;
 			giveitem = 3;
 		}
@@ -651,14 +651,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A25A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 26;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A25B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 26;
 			giveitem = 3;
 		}
@@ -678,14 +678,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A26A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 27;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A26B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 27;
 			giveitem = 3;
 		}
@@ -712,14 +712,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A27B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 28;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A27C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 28;
 			giveitem = 3;
 		}
@@ -739,7 +739,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A28B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 29;
 			giveitem = 3;
 		}
@@ -752,14 +752,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A29A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 30;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A29B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 30;
 			giveitem = 3;
 		}
@@ -786,14 +786,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A30B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 31;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A30C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 31;
 			giveitem = 3;
 		}
@@ -806,14 +806,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A31A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 32;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A31B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 32;
 			giveitem = 3;
 		}
@@ -833,14 +833,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A32A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 33;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A32B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 33;
 			giveitem = 3;
 		}
@@ -860,7 +860,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A33A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 34;
 			giveitem = 3;
 		}
@@ -874,7 +874,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A33C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 34;
 			giveitem = 3;
 		}
@@ -894,14 +894,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A34B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 35;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A34C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 35;
 			giveitem = 3;
 		}
@@ -914,14 +914,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A35A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 36;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A35B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 36;
 			giveitem = 3;
 		}
@@ -948,14 +948,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A36B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 37;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A36C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 37;
 			giveitem = 3;
 		}
@@ -975,14 +975,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A37B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 38;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A37C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 38;
 			giveitem = 3;
 		}
@@ -995,7 +995,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A38A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 39;
 			giveitem = 3;
 		}
@@ -1022,14 +1022,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A39B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 40;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A39C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 40;
 			giveitem = 3;
 		}
@@ -1042,14 +1042,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A40A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 41;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A40B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 41;
 			giveitem = 3;
 		}
@@ -1076,14 +1076,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A41B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 42;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A41C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 42;
 			giveitem = 3;
 		}
@@ -1096,7 +1096,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A42A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 43;
 			giveitem = 3;
 		}
@@ -1110,7 +1110,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A42C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 43;
 			giveitem = 3;
 		}
@@ -1130,14 +1130,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A43B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 44;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A43C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 44;
 			giveitem = 3;
 		}
@@ -1157,14 +1157,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A44B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 45;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A44C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 45;
 			giveitem = 3;
 		}
@@ -1177,14 +1177,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A45A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 46;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A45B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 46;
 			giveitem = 3;
 		}
@@ -1211,7 +1211,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A46B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 47;
 			giveitem = 3;
 		}
@@ -1224,7 +1224,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A47A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 48;
 			giveitem = 3;
 		}
@@ -1238,7 +1238,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A47C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 48;
 			giveitem = 3;
 		}
@@ -1251,7 +1251,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A48A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 49;
 			giveitem = 3;
 		}
@@ -1265,7 +1265,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A48C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 49;
 			giveitem = 3;
 		}
@@ -1278,14 +1278,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A49A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 50;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A49B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 50;
 			giveitem = 3;
 		}
@@ -1312,14 +1312,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A50B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 51;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A50C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 51;
 			giveitem = 3;
 		}
@@ -1332,7 +1332,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A51A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 52;
 			giveitem = 3;
 		}
@@ -1359,7 +1359,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A52B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 53;
 			giveitem = 3;
 		}
@@ -1379,14 +1379,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A53B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 54;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A53C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 54;
 			giveitem = 3;
 		}
@@ -1399,7 +1399,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A54A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 55;
 			giveitem = 3;
 		}
@@ -1413,7 +1413,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A54C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 55;
 			giveitem = 3;
 		}
@@ -1426,7 +1426,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A55A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 56;
 			giveitem = 3;
 		}
@@ -1440,7 +1440,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A55C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 56;
 			giveitem = 3;
 		}
@@ -1453,7 +1453,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A56A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 57;
 			giveitem = 3;
 		}
@@ -1467,7 +1467,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A56C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 57;
 			giveitem = 3;
 		}
@@ -1487,7 +1487,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A57B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 58;
 			giveitem = 3;
 		}
@@ -1500,7 +1500,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A58A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 59;
 			giveitem = 3;
 		}
@@ -1514,7 +1514,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A58C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 59;
 			giveitem = 3;
 		}
@@ -1527,7 +1527,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A59A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 60;
 			giveitem = 3;
 		}
@@ -1541,7 +1541,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A59C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 60;
 			giveitem = 3;
 		}
@@ -1554,7 +1554,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A60A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 61;
 			giveitem = 3;
 		}
@@ -1568,7 +1568,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A60C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 61;
 			giveitem = 3;
 		}
@@ -1581,14 +1581,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A61A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 62;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A61B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 62;
 			giveitem = 3;
 		}
@@ -1608,7 +1608,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A62A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 63;
 			giveitem = 3;
 		}
@@ -1622,7 +1622,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A62C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 63;
 			giveitem = 3;
 		}
@@ -1635,14 +1635,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A63A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 64;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A63B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 64;
 			giveitem = 3;
 		}
@@ -1669,14 +1669,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A64B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 65;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A64C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 65;
 			giveitem = 3;
 		}
@@ -1689,7 +1689,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A65A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 66;
 			giveitem = 3;
 		}
@@ -1703,7 +1703,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A65C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 66;
 			giveitem = 3;
 		}
@@ -1723,14 +1723,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A66B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 67;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A66C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 67;
 			giveitem = 3;
 		}
@@ -1750,14 +1750,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A67B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 68;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A67C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 68;
 			giveitem = 3;
 		}
@@ -1770,7 +1770,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A68A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 69;
 			giveitem = 3;
 		}
@@ -1790,7 +1790,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A69A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 70;
 			giveitem = 3;
 		}
@@ -1817,7 +1817,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A70B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 71;
 			giveitem = 3;
 		}
@@ -1837,14 +1837,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A71B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 72;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A71C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 72;
 			giveitem = 3;
 		}
@@ -1864,7 +1864,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A72B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 73;
 			giveitem = 3;
 		}
@@ -1877,7 +1877,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A73A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 74;
 			giveitem = 3;
 		}
@@ -1891,7 +1891,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A73C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 74;
 			giveitem = 3;
 		}
@@ -1904,7 +1904,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A74A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 75;
 			giveitem = 3;
 		}
@@ -1924,14 +1924,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A75A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 76;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A75B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 76;
 			giveitem = 3;
 		}
@@ -1951,7 +1951,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A76A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 77;
 			giveitem = 3;
 		}
@@ -1978,7 +1978,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A77B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 78;
 			giveitem = 3;
 		}
@@ -1991,14 +1991,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A78A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 79;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A78B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 79;
 			giveitem = 3;
 		}
@@ -2018,7 +2018,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A79A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 80;
 			giveitem = 3;
 		}
@@ -2032,7 +2032,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A79C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 80;
 			giveitem = 3;
 		}
@@ -2045,14 +2045,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A80A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 81;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A80B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 81;
 			giveitem = 3;
 		}
@@ -2079,7 +2079,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A81B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 82;
 			giveitem = 3;
 		}
@@ -2099,14 +2099,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A82B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 83;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A82C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 83;
 			giveitem = 3;
 		}
@@ -2119,7 +2119,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A83A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 84;
 			giveitem = 3;
 		}
@@ -2133,7 +2133,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A83C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 84;
 			giveitem = 3;
 		}
@@ -2146,7 +2146,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A84A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 85;
 			giveitem = 3;
 		}
@@ -2173,14 +2173,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A85B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 86;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A85C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 86;
 			giveitem = 3;
 		}
@@ -2193,7 +2193,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A86A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 87;
 			giveitem = 3;
 		}
@@ -2213,7 +2213,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A87A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 88;
 			giveitem = 3;
 		}
@@ -2233,7 +2233,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A88A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 89;
 			giveitem = 3;
 		}
@@ -2247,7 +2247,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A88C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 89;
 			giveitem = 3;
 		}
@@ -2260,7 +2260,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A89A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 90;
 			giveitem = 3;
 		}
@@ -2287,14 +2287,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A90B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 91;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A90C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 91;
 			giveitem = 3;
 		}
@@ -2314,7 +2314,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A91B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 92;
 			giveitem = 3;
 		}
@@ -2327,7 +2327,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A92A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 93;
 			giveitem = 3;
 		}
@@ -2341,7 +2341,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A92C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 93;
 			giveitem = 3;
 		}
@@ -2361,14 +2361,14 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A93B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 94;
 			giveitem = 3;
 		}
 		choice
 		{
 			text = "$NOAH_QUIZ_A93C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 94;
 			giveitem = 3;
 		}
@@ -2381,7 +2381,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A94A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 95;
 			giveitem = 3;
 		}
@@ -2395,7 +2395,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A94C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 95;
 			giveitem = 3;
 		}
@@ -2408,7 +2408,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A95A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 96;
 			giveitem = 3;
 		}
@@ -2422,7 +2422,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A95C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 96;
 			giveitem = 3;
 		}
@@ -2435,7 +2435,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A96A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 97;
 			giveitem = 3;
 		}
@@ -2462,7 +2462,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A97B";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 98;
 			giveitem = 3;
 		}
@@ -2475,7 +2475,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A98A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 99;
 			giveitem = 3;
 		}
@@ -2489,7 +2489,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A98C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 99;
 			giveitem = 3;
 		}
@@ -2502,7 +2502,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A99A";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 1;
 			giveitem = 3;
 		}
@@ -2516,7 +2516,7 @@ conversation
 		choice
 		{
 			text = "$NOAH_QUIZ_A99C";
-			yesmessage = "$NOAH_WRONG";
+			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 1;
 			giveitem = 3;
 		}

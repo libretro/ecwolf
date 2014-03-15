@@ -277,7 +277,7 @@ NOAH_BRIEF_COPYRIGHT = "\nSuper 3-D Noah's Ark\n\n\n(C)1995 Wisdom Tree, Inc.\nA
 /* Super 3D Noah's Ark Quiz */
 
 NOAH_CORRECT = "Correct!";
-NOAH_WRONG = "Wrong!";
+NOAH_INCORRECT = "Incorrect!";
 
 NOAH_QUIZ_Q01 = "Who was Noah's father?";
 NOAH_QUIZ_H01 = "Gen 5:30";

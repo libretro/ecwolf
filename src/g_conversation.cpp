@@ -279,7 +279,7 @@ bool ConversationModule::ParsePageBlock(Scanner &sc, FName key, bool isValue, Pa
 			if(Namespace != NS_Noah)
 				return false;
 			sc.MustGetToken(TK_StringConst);
-			obj.Hint = sc->number;
+			obj.Hint = sc->str;
 			break;
 	}
 	else switch(key)
@@ -352,7 +352,7 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 		case NAME_Arg3:
 		case NAME_Arg4:
 			sc.MustGetToken(TK_IntConst);
-			obj.Arg[key - NAME_Arg0] = sc->number;
+			obj.Arg[key - (int)NAME_Arg0] = sc->number;
 			break;
 		case NAME_NextPage:
 			sc.MustGetToken(TK_IntConst);
@@ -381,6 +381,10 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 #include "id_vh.h"
 #include "language.h"
 #include "v_video.h"
+#include "g_mapinfo.h"
+#include "id_ca.h"
+#include "wl_agent.h"
+#include "v_text.h"
 
 namespace Dialog {
 
@@ -413,7 +417,7 @@ void ShowQuiz()
 	class QuizMenu : public Menu
 	{
 	public:
-		QuizMenu() : Menu(24, 100, 290, 30) {}
+		QuizMenu() : Menu(30, 96, 290, 24) {}
 
 		void loadQuestion(const ConversationModule::Page *page)
 		{
@@ -422,6 +426,11 @@ void ShowQuiz()
 			question = page->Dialog;
 			if(question[0] == '$')
 				question = language[question.Mid(1)];
+
+			hint = page->Hint;
+			if(hint[0] == '$')
+				hint = language[hint.Mid(1)];
+			hint.Format("(%s)", hint.GetChars());
 
 			for(unsigned int i = 0;i < page->Choices.Size();++i)
 			{
@@ -434,24 +443,34 @@ void ShowQuiz()
 
 		void drawBackground() const
 		{
-			ClearMScreen();
-			ShowActStatus();
+			DrawPlayScreen();
+			VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, statusbary1, screenWidth, statusbary2-statusbary1+CleanYfac);
 
 			WindowX = 0;
 			WindowW = 320;
-			PrintY = 2;
+			PrintY = 4;
 			US_CPrint(BigFont, headText, CR_WHITE);
 
-			DrawWindow(getX() - 8, BigFont->GetHeight() + 4, getWidth(), 148, BKGDCOLOR);
+			DrawWindow(14, 21, 292, 134, BKGDCOLOR);
 		}
 
 		void draw() const
 		{
 			drawBackground();
 
-			screen->DrawText(BigFont, CR_WHITE, getX(), BigFont->GetHeight() + 8, question,
-				DTA_WindowLeft, 0,
-				DTA_WindowRight, screenWidth,
+			FBrokenLines *lines = V_BreakLines(BigFont, 280, question);
+			unsigned int ly = 26;
+			for(FBrokenLines *line = lines;line->Width != -1;++line)
+			{
+				screen->DrawText(BigFont, CR_WHITE, 26, ly, line->Text,
+					DTA_Clean, true,
+					TAG_DONE
+				);
+				ly += BigFont->GetHeight() + 1;
+			}
+			delete[] lines;
+
+			screen->DrawText(BigFont, CR_WHITE, 26, ly, hint,
 				DTA_Clean, true,
 				TAG_DONE
 			);
@@ -459,12 +478,13 @@ void ShowQuiz()
 			drawMenu();
 
 			if(!isAnimating())
-				VWB_DrawGraphic (cursor, x - 4, y + getHeight(curPos) - 2, MENU_CENTER);
+				VWB_DrawGraphic (cursor, getX() - 4, getY() + getHeight(curPos) - 2, MENU_CENTER);
 			VW_UpdateScreen ();
 		}
 
 	private:
 		FString question;
+		FString hint;
 	};
 
 	static const ConversationModule::Page *page = &LoadedModules[0].Conversations[0].Pages[0];
@@ -475,6 +495,7 @@ void ShowQuiz()
 		int answer = quiz.handle();
 		if(answer >= 0)
 		{
+			// TODO: Play sound 41 on correct, 27 on incorrect.  Wait until sound done (which means picking a value for us)
 			const ConversationModule::Choice &choice = page->Choices[answer];
 			FString response = choice.YesMessage;
 			if(response[0] == '$')
@@ -483,7 +504,7 @@ void ShowQuiz()
 			quiz.drawBackground();
 
 			int size = BigFont->StringWidth(response);
-			screen->DrawText(BigFont, CR_WHITE, 160-size/2, 100, response,
+			screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::MENU_SELECTION], 160-size/2, 88, response,
 				DTA_Clean, true,
 				TAG_DONE);
 
@@ -504,6 +525,10 @@ void ShowQuiz()
 			VW_FadeIn();
 		}
 	} while(true);
+
+	// Fix screen
+	StatusBar->RefreshBackground();
+	DrawPlayScreen();
 }
 
 }
