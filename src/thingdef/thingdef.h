@@ -120,17 +120,17 @@ class ActionInfo
 typedef TArray<ActionInfo *> ActionTable;
 
 #define ACTION_FUNCTION(func) \
-	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &); \
+	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &, struct ActionResult *); \
 	static const ActionInfo __AI_##func(__AF_##func, #func); \
-	void __AF_##func(AActor *self, AActor *stateOwner, const Frame * const caller, const CallArguments &args)
+	void __AF_##func(AActor *self, AActor *stateOwner, const Frame * const caller, const CallArguments &args, struct ActionResult *result)
 #define ACTION_ALIAS(func, alias) \
 	ACTION_FUNCTION(alias) \
 	{ \
-		__AF_##func(self, stateOwner, caller, args); \
+		__AF_##func(self, stateOwner, caller, args, result); \
 	}
 #define CALL_ACTION(func, self) \
-	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &); \
-	__AF_##func(self, self, NULL, CallArguments());
+	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &, struct ActionResult *); \
+	__AF_##func(self, self, NULL, CallArguments(), NULL);
 #define ACTION_PARAM_COUNT args.Count()
 #define ACTION_PARAM_BOOL(name, num) \
 	bool name = args[num].val.i ? true : false

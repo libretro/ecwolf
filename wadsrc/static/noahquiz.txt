@@ -9,6 +9,8 @@ namespace = "Noah";
 conversation
 {
 	actor = 1;
+	randomstart = true;
+	preserve = true;
 	page
 	{
 		name = "Question #1";
@@ -16,6 +18,7 @@ conversation
 		hint = "$NOAH_QUIZ_H01";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A01A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 2;
@@ -23,6 +26,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A01B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 2;
@@ -30,6 +34,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A01C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 2;
@@ -43,6 +48,7 @@ conversation
 		hint = "$NOAH_QUIZ_H02";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A02A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 3;
@@ -50,6 +56,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A02B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 3;
@@ -57,6 +64,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A02C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 3;
@@ -70,6 +78,7 @@ conversation
 		hint = "$NOAH_QUIZ_H03";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A03A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 4;
@@ -77,6 +86,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A03B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 4;
@@ -84,6 +94,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A03C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 4;
@@ -97,6 +108,7 @@ conversation
 		hint = "$NOAH_QUIZ_H04";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A04A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 5;
@@ -104,6 +116,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A04B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 5;
@@ -111,6 +124,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A04C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 5;
@@ -124,6 +138,7 @@ conversation
 		hint = "$NOAH_QUIZ_H05";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A05A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 6;
@@ -131,6 +146,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A05B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 6;
@@ -138,6 +154,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A05C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 6;
@@ -151,6 +168,7 @@ conversation
 		hint = "$NOAH_QUIZ_H06";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A06A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 7;
@@ -158,6 +176,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A06B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 7;
@@ -165,6 +184,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A06C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 7;
@@ -178,6 +198,7 @@ conversation
 		hint = "$NOAH_QUIZ_H07";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A07A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 8;
@@ -185,6 +206,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A07B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 8;
@@ -192,6 +214,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A07C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 8;
@@ -205,6 +228,7 @@ conversation
 		hint = "$NOAH_QUIZ_H08";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A08A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 9;
@@ -212,6 +236,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A08B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 9;
@@ -219,6 +244,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A08C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 9;
@@ -232,6 +258,7 @@ conversation
 		hint = "$NOAH_QUIZ_H09";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A09A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 10;
@@ -239,6 +266,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A09B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 10;
@@ -246,6 +274,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A09C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 10;
@@ -259,6 +288,7 @@ conversation
 		hint = "$NOAH_QUIZ_H10";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A10A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 11;
@@ -266,6 +296,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A10B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 11;
@@ -273,6 +304,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A10C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 11;
@@ -286,6 +318,7 @@ conversation
 		hint = "$NOAH_QUIZ_H11";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A11A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 12;
@@ -293,6 +326,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A11B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 12;
@@ -300,6 +334,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A11C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 12;
@@ -313,6 +348,7 @@ conversation
 		hint = "$NOAH_QUIZ_H12";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A12A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 13;
@@ -320,6 +356,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A12B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 13;
@@ -327,6 +364,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A12C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 13;
@@ -340,6 +378,7 @@ conversation
 		hint = "$NOAH_QUIZ_H13";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A13A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 14;
@@ -347,6 +386,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A13B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 14;
@@ -354,6 +394,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A13C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 14;
@@ -367,6 +408,7 @@ conversation
 		hint = "$NOAH_QUIZ_H14";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A14A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 15;
@@ -374,6 +416,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A14B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 15;
@@ -387,6 +430,7 @@ conversation
 		hint = "$NOAH_QUIZ_H15";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A15A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 16;
@@ -394,6 +438,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A15B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 16;
@@ -401,6 +446,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A15C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 16;
@@ -414,6 +460,7 @@ conversation
 		hint = "$NOAH_QUIZ_H16";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A16A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 17;
@@ -421,6 +468,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A16B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 17;
@@ -434,6 +482,7 @@ conversation
 		hint = "$NOAH_QUIZ_H17";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A17A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 18;
@@ -441,6 +490,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A17B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 18;
@@ -448,6 +498,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A17C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 18;
@@ -461,6 +512,7 @@ conversation
 		hint = "$NOAH_QUIZ_H18";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A18A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 19;
@@ -468,6 +520,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A18B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 19;
@@ -475,6 +528,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A18C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 19;
@@ -488,6 +542,7 @@ conversation
 		hint = "$NOAH_QUIZ_H19";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A19A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 20;
@@ -495,6 +550,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A19B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 20;
@@ -502,6 +558,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A19C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 20;
@@ -515,6 +572,7 @@ conversation
 		hint = "$NOAH_QUIZ_H20";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A20A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 21;
@@ -522,6 +580,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A20B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 21;
@@ -529,6 +588,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A20C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 21;
@@ -542,6 +602,7 @@ conversation
 		hint = "$NOAH_QUIZ_H21";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A21A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 22;
@@ -549,6 +610,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A21B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 22;
@@ -556,6 +618,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A21C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 22;
@@ -569,6 +632,7 @@ conversation
 		hint = "$NOAH_QUIZ_H22";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A22A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 23;
@@ -576,6 +640,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A22B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 23;
@@ -583,6 +648,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A22C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 23;
@@ -596,6 +662,7 @@ conversation
 		hint = "$NOAH_QUIZ_H23";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A23A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 24;
@@ -603,6 +670,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A23B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 24;
@@ -610,6 +678,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A23C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 24;
@@ -623,6 +692,7 @@ conversation
 		hint = "$NOAH_QUIZ_H24";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A24A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 25;
@@ -630,6 +700,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A24B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 25;
@@ -637,6 +708,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A24C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 25;
@@ -650,6 +722,7 @@ conversation
 		hint = "$NOAH_QUIZ_H25";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A25A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 26;
@@ -657,6 +730,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A25B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 26;
@@ -664,6 +738,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A25C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 26;
@@ -677,6 +752,7 @@ conversation
 		hint = "$NOAH_QUIZ_H26";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A26A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 27;
@@ -684,6 +760,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A26B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 27;
@@ -691,6 +768,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A26C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 27;
@@ -704,6 +782,7 @@ conversation
 		hint = "$NOAH_QUIZ_H27";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A27A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 28;
@@ -711,6 +790,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A27B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 28;
@@ -718,6 +798,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A27C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 28;
@@ -731,6 +812,7 @@ conversation
 		hint = "$NOAH_QUIZ_H28";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A28A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 29;
@@ -738,6 +820,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A28B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 29;
@@ -751,6 +834,7 @@ conversation
 		hint = "$NOAH_QUIZ_H29";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A29A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 30;
@@ -758,6 +842,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A29B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 30;
@@ -765,6 +850,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A29C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 30;
@@ -778,6 +864,7 @@ conversation
 		hint = "$NOAH_QUIZ_H30";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A30A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 31;
@@ -785,6 +872,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A30B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 31;
@@ -792,6 +880,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A30C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 31;
@@ -805,6 +894,7 @@ conversation
 		hint = "$NOAH_QUIZ_H31";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A31A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 32;
@@ -812,6 +902,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A31B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 32;
@@ -819,6 +910,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A31C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 32;
@@ -832,6 +924,7 @@ conversation
 		hint = "$NOAH_QUIZ_H32";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A32A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 33;
@@ -839,6 +932,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A32B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 33;
@@ -846,6 +940,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A32C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 33;
@@ -859,6 +954,7 @@ conversation
 		hint = "$NOAH_QUIZ_H33";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A33A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 34;
@@ -866,6 +962,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A33B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 34;
@@ -873,6 +970,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A33C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 34;
@@ -886,6 +984,7 @@ conversation
 		hint = "$NOAH_QUIZ_H34";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A34A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 35;
@@ -893,6 +992,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A34B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 35;
@@ -900,6 +1000,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A34C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 35;
@@ -913,6 +1014,7 @@ conversation
 		hint = "$NOAH_QUIZ_H35";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A35A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 36;
@@ -920,6 +1022,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A35B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 36;
@@ -927,6 +1030,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A35C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 36;
@@ -940,6 +1044,7 @@ conversation
 		hint = "$NOAH_QUIZ_H36";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A36A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 37;
@@ -947,6 +1052,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A36B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 37;
@@ -954,6 +1060,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A36C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 37;
@@ -967,6 +1074,7 @@ conversation
 		hint = "$NOAH_QUIZ_H37";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A37A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 38;
@@ -974,6 +1082,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A37B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 38;
@@ -981,6 +1090,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A37C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 38;
@@ -994,6 +1104,7 @@ conversation
 		hint = "$NOAH_QUIZ_H38";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A38A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 39;
@@ -1001,6 +1112,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A38B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 39;
@@ -1014,6 +1126,7 @@ conversation
 		hint = "$NOAH_QUIZ_H39";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A39A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 40;
@@ -1021,6 +1134,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A39B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 40;
@@ -1028,6 +1142,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A39C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 40;
@@ -1041,6 +1156,7 @@ conversation
 		hint = "$NOAH_QUIZ_H40";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A40A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 41;
@@ -1048,6 +1164,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A40B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 41;
@@ -1055,6 +1172,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A40C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 41;
@@ -1068,6 +1186,7 @@ conversation
 		hint = "$NOAH_QUIZ_H41";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A41A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 42;
@@ -1075,6 +1194,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A41B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 42;
@@ -1082,6 +1202,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A41C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 42;
@@ -1095,6 +1216,7 @@ conversation
 		hint = "$NOAH_QUIZ_H42";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A42A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 43;
@@ -1102,6 +1224,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A42B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 43;
@@ -1109,6 +1232,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A42C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 43;
@@ -1122,6 +1246,7 @@ conversation
 		hint = "$NOAH_QUIZ_H43";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A43A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 44;
@@ -1129,6 +1254,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A43B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 44;
@@ -1136,6 +1262,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A43C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 44;
@@ -1149,6 +1276,7 @@ conversation
 		hint = "$NOAH_QUIZ_H44";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A44A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 45;
@@ -1156,6 +1284,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A44B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 45;
@@ -1163,6 +1292,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A44C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 45;
@@ -1176,6 +1306,7 @@ conversation
 		hint = "$NOAH_QUIZ_H45";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A45A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 46;
@@ -1183,6 +1314,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A45B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 46;
@@ -1190,6 +1322,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A45C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 46;
@@ -1203,6 +1336,7 @@ conversation
 		hint = "$NOAH_QUIZ_H46";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A46A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 47;
@@ -1210,6 +1344,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A46B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 47;
@@ -1223,6 +1358,7 @@ conversation
 		hint = "$NOAH_QUIZ_H47";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A47A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 48;
@@ -1230,6 +1366,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A47B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 48;
@@ -1237,6 +1374,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A47C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 48;
@@ -1250,6 +1388,7 @@ conversation
 		hint = "$NOAH_QUIZ_H48";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A48A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 49;
@@ -1257,6 +1396,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A48B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 49;
@@ -1264,6 +1404,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A48C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 49;
@@ -1277,6 +1418,7 @@ conversation
 		hint = "$NOAH_QUIZ_H49";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A49A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 50;
@@ -1284,6 +1426,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A49B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 50;
@@ -1291,6 +1434,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A49C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 50;
@@ -1304,6 +1448,7 @@ conversation
 		hint = "$NOAH_QUIZ_H50";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A50A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 51;
@@ -1311,6 +1456,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A50B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 51;
@@ -1318,6 +1464,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A50C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 51;
@@ -1331,6 +1478,7 @@ conversation
 		hint = "$NOAH_QUIZ_H51";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A51A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 52;
@@ -1338,6 +1486,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A51B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 52;
@@ -1351,6 +1500,7 @@ conversation
 		hint = "$NOAH_QUIZ_H52";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A52A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 53;
@@ -1358,6 +1508,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A52B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 53;
@@ -1371,6 +1522,7 @@ conversation
 		hint = "$NOAH_QUIZ_H53";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A53A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 54;
@@ -1378,6 +1530,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A53B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 54;
@@ -1385,6 +1538,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A53C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 54;
@@ -1398,6 +1552,7 @@ conversation
 		hint = "$NOAH_QUIZ_H54";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A54A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 55;
@@ -1405,6 +1560,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A54B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 55;
@@ -1412,6 +1568,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A54C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 55;
@@ -1425,6 +1582,7 @@ conversation
 		hint = "$NOAH_QUIZ_H55";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A55A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 56;
@@ -1432,6 +1590,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A55B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 56;
@@ -1439,6 +1598,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A55C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 56;
@@ -1452,6 +1612,7 @@ conversation
 		hint = "$NOAH_QUIZ_H56";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A56A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 57;
@@ -1459,6 +1620,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A56B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 57;
@@ -1466,6 +1628,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A56C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 57;
@@ -1479,6 +1642,7 @@ conversation
 		hint = "$NOAH_QUIZ_H57";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A57A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 58;
@@ -1486,6 +1650,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A57B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 58;
@@ -1499,6 +1664,7 @@ conversation
 		hint = "$NOAH_QUIZ_H58";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A58A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 59;
@@ -1506,6 +1672,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A58B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 59;
@@ -1513,6 +1680,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A58C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 59;
@@ -1526,6 +1694,7 @@ conversation
 		hint = "$NOAH_QUIZ_H59";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A59A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 60;
@@ -1533,6 +1702,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A59B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 60;
@@ -1540,6 +1710,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A59C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 60;
@@ -1553,6 +1724,7 @@ conversation
 		hint = "$NOAH_QUIZ_H60";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A60A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 61;
@@ -1560,6 +1732,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A60B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 61;
@@ -1567,6 +1740,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A60C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 61;
@@ -1580,6 +1754,7 @@ conversation
 		hint = "$NOAH_QUIZ_H61";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A61A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 62;
@@ -1587,6 +1762,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A61B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 62;
@@ -1594,6 +1770,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A61C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 62;
@@ -1607,6 +1784,7 @@ conversation
 		hint = "$NOAH_QUIZ_H62";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A62A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 63;
@@ -1614,6 +1792,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A62B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 63;
@@ -1621,6 +1800,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A62C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 63;
@@ -1634,6 +1814,7 @@ conversation
 		hint = "$NOAH_QUIZ_H63";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A63A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 64;
@@ -1641,6 +1822,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A63B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 64;
@@ -1648,6 +1830,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A63C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 64;
@@ -1661,6 +1844,7 @@ conversation
 		hint = "$NOAH_QUIZ_H64";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A64A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 65;
@@ -1668,6 +1852,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A64B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 65;
@@ -1675,6 +1860,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A64C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 65;
@@ -1688,6 +1874,7 @@ conversation
 		hint = "$NOAH_QUIZ_H65";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A65A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 66;
@@ -1695,6 +1882,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A65B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 66;
@@ -1702,6 +1890,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A65C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 66;
@@ -1715,6 +1904,7 @@ conversation
 		hint = "$NOAH_QUIZ_H66";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A66A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 67;
@@ -1722,6 +1912,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A66B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 67;
@@ -1729,6 +1920,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A66C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 67;
@@ -1742,6 +1934,7 @@ conversation
 		hint = "$NOAH_QUIZ_H67";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A67A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 68;
@@ -1749,6 +1942,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A67B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 68;
@@ -1756,6 +1950,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A67C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 68;
@@ -1769,6 +1964,7 @@ conversation
 		hint = "$NOAH_QUIZ_H68";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A68A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 69;
@@ -1776,6 +1972,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A68B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 69;
@@ -1789,6 +1986,7 @@ conversation
 		hint = "$NOAH_QUIZ_H69";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A69A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 70;
@@ -1796,6 +1994,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A69B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 70;
@@ -1809,6 +2008,7 @@ conversation
 		hint = "$NOAH_QUIZ_H70";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A70A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 71;
@@ -1816,6 +2016,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A70B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 71;
@@ -1829,6 +2030,7 @@ conversation
 		hint = "$NOAH_QUIZ_H71";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A71A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 72;
@@ -1836,6 +2038,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A71B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 72;
@@ -1843,6 +2046,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A71C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 72;
@@ -1856,6 +2060,7 @@ conversation
 		hint = "$NOAH_QUIZ_H72";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A72A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 73;
@@ -1863,6 +2068,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A72B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 73;
@@ -1876,6 +2082,7 @@ conversation
 		hint = "$NOAH_QUIZ_H73";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A73A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 74;
@@ -1883,6 +2090,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A73B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 74;
@@ -1890,6 +2098,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A73C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 74;
@@ -1903,6 +2112,7 @@ conversation
 		hint = "$NOAH_QUIZ_H74";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A74A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 75;
@@ -1910,6 +2120,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A74B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 75;
@@ -1923,6 +2134,7 @@ conversation
 		hint = "$NOAH_QUIZ_H75";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A75A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 76;
@@ -1930,6 +2142,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A75B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 76;
@@ -1937,6 +2150,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A75C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 76;
@@ -1950,6 +2164,7 @@ conversation
 		hint = "$NOAH_QUIZ_H76";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A76A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 77;
@@ -1957,6 +2172,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A76B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 77;
@@ -1970,6 +2186,7 @@ conversation
 		hint = "$NOAH_QUIZ_H77";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A77A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 78;
@@ -1977,6 +2194,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A77B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 78;
@@ -1990,6 +2208,7 @@ conversation
 		hint = "$NOAH_QUIZ_H78";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A78A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 79;
@@ -1997,6 +2216,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A78B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 79;
@@ -2004,6 +2224,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A78C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 79;
@@ -2017,6 +2238,7 @@ conversation
 		hint = "$NOAH_QUIZ_H79";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A79A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 80;
@@ -2024,6 +2246,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A79B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 80;
@@ -2031,6 +2254,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A79C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 80;
@@ -2044,6 +2268,7 @@ conversation
 		hint = "$NOAH_QUIZ_H80";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A80A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 81;
@@ -2051,6 +2276,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A80B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 81;
@@ -2058,6 +2284,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A80C";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 81;
@@ -2071,6 +2298,7 @@ conversation
 		hint = "$NOAH_QUIZ_H81";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A81A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 82;
@@ -2078,6 +2306,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A81B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 82;
@@ -2091,6 +2320,7 @@ conversation
 		hint = "$NOAH_QUIZ_H82";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A82A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 83;
@@ -2098,6 +2328,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A82B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 83;
@@ -2105,6 +2336,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A82C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 83;
@@ -2118,6 +2350,7 @@ conversation
 		hint = "$NOAH_QUIZ_H83";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A83A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 84;
@@ -2125,6 +2358,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A83B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 84;
@@ -2132,6 +2366,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A83C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 84;
@@ -2145,6 +2380,7 @@ conversation
 		hint = "$NOAH_QUIZ_H84";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A84A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 85;
@@ -2152,6 +2388,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A84B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 85;
@@ -2165,6 +2402,7 @@ conversation
 		hint = "$NOAH_QUIZ_H85";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A85A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 86;
@@ -2172,6 +2410,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A85B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 86;
@@ -2179,6 +2418,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A85C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 86;
@@ -2192,6 +2432,7 @@ conversation
 		hint = "$NOAH_QUIZ_H86";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A86A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 87;
@@ -2199,6 +2440,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A86B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 87;
@@ -2212,6 +2454,7 @@ conversation
 		hint = "$NOAH_QUIZ_H87";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A87A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 88;
@@ -2219,6 +2462,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A87B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 88;
@@ -2232,6 +2476,7 @@ conversation
 		hint = "$NOAH_QUIZ_H88";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A88A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 89;
@@ -2239,6 +2484,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A88B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 89;
@@ -2246,6 +2492,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A88C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 89;
@@ -2259,6 +2506,7 @@ conversation
 		hint = "$NOAH_QUIZ_H89";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A89A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 90;
@@ -2266,6 +2514,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A89B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 90;
@@ -2279,6 +2528,7 @@ conversation
 		hint = "$NOAH_QUIZ_H90";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A90A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 91;
@@ -2286,6 +2536,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A90B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 91;
@@ -2293,6 +2544,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A90C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 91;
@@ -2306,6 +2558,7 @@ conversation
 		hint = "$NOAH_QUIZ_H91";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A91A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 92;
@@ -2313,6 +2566,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A91B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 92;
@@ -2326,6 +2580,7 @@ conversation
 		hint = "$NOAH_QUIZ_H92";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A92A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 93;
@@ -2333,6 +2588,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A92B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 93;
@@ -2340,6 +2596,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A92C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 93;
@@ -2353,6 +2610,7 @@ conversation
 		hint = "$NOAH_QUIZ_H93";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A93A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 94;
@@ -2360,6 +2618,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A93B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 94;
@@ -2367,6 +2626,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A93C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 94;
@@ -2380,6 +2640,7 @@ conversation
 		hint = "$NOAH_QUIZ_H94";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A94A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 95;
@@ -2387,6 +2648,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A94B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 95;
@@ -2394,6 +2656,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A94C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 95;
@@ -2407,6 +2670,7 @@ conversation
 		hint = "$NOAH_QUIZ_H95";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A95A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 96;
@@ -2414,6 +2678,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A95B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 96;
@@ -2421,6 +2686,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A95C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 96;
@@ -2434,6 +2700,7 @@ conversation
 		hint = "$NOAH_QUIZ_H96";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A96A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 97;
@@ -2441,6 +2708,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A96B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 97;
@@ -2454,6 +2722,7 @@ conversation
 		hint = "$NOAH_QUIZ_H97";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A97A";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 98;
@@ -2461,6 +2730,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A97B";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 98;
@@ -2474,6 +2744,7 @@ conversation
 		hint = "$NOAH_QUIZ_H98";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A98A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 99;
@@ -2481,6 +2752,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A98B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 99;
@@ -2488,6 +2760,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A98C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 99;
@@ -2501,6 +2774,7 @@ conversation
 		hint = "$NOAH_QUIZ_H99";
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A99A";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 1;
@@ -2508,6 +2782,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A99B";
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 1;
@@ -2515,6 +2790,7 @@ conversation
 		}
 		choice
 		{
+			closedialog = true;
 			text = "$NOAH_QUIZ_A99C";
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 1;

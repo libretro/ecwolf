@@ -288,7 +288,7 @@ void TakeDamage (int points,AActor *attacker)
 	points = (points*gamestate.difficulty->DamageFactor)>>FRACBITS;
 
 	if (!godmode)
-		players[0].health -= points;
+		players[0].mo->health = players[0].health -= points;
 
 	if (players[0].health<=0)
 	{

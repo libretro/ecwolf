@@ -59,7 +59,8 @@ enum
 	AMETA_DefaultHealth6,
 	AMETA_DefaultHealth7,
 	AMETA_DefaultHealth8,
-	AMETA_DefaultHealth9
+	AMETA_DefaultHealth9,
+	AMETA_ConversationID
 };
 
 enum

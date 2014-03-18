@@ -35,6 +35,7 @@
 #include "doomerrors.h"
 #include "id_ca.h"
 #include "id_sd.h"
+#include "g_conversation.h"
 #include "lnspec.h"
 #include "actor.h"
 #include "sndseq.h"
@@ -734,4 +735,21 @@ FUNC(Trigger_Execute)
 	}
 
 	return activated;
+}
+
+FUNC(StartConversation)
+{
+	if(args[0] != 0)
+		I_Error("TIDs are not yet supported.");
+
+	AActor *talker = activator;
+
+	if(args[1] == 1) // Face talker
+	{
+		A_Face(activator, talker);
+	}
+
+	Dialog::ShowQuiz(activator->GetClass()->Meta.GetMetaInt(AMETA_ConversationID));
+
+	return 1;
 }

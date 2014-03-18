@@ -37,8 +37,9 @@
 
 namespace Dialog {
 
+extern void LoadMapModules();
 extern void LoadGlobalModule(const char* module);
-extern void ShowQuiz();
+extern void ShowQuiz(unsigned int id);
 
 }
 

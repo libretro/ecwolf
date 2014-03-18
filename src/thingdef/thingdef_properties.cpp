@@ -161,6 +161,13 @@ HANDLE_PROPERTY(bobstyle)
 		I_Error("Invalid bob style '%s'.", style);
 }
 
+HANDLE_PROPERTY(conversationid)
+{
+	INT_PARAM(id, 0);
+
+	cls->Meta.SetMetaInt(AMETA_ConversationID, id);
+}
+
 HANDLE_PROPERTY(damage)
 {
 	if(!IS_EXPR(0))
@@ -573,6 +580,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(bobrangey, Weapon, F),
 	DEFINE_PROP(bobspeed, Weapon, F),
 	DEFINE_PROP(bobstyle, Weapon, S),
+	DEFINE_PROP(conversationid, Actor, I),
 	DEFINE_PROP(damage, Actor, I),
 	DEFINE_PROP_PREFIX(damagescreencolor, Actor, Player, S),
 	DEFINE_PROP(deathsound, Actor, S),

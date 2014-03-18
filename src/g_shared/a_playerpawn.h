@@ -78,7 +78,7 @@ class APlayerPawn : public AActor
 		static PointerIndexTable<DropList> startInventory;
 
 		int32_t		maxhealth;
-		int             damagecolor;
+		int			damagecolor;
 		fixed		forwardmove[2];
 		fixed		sidemove[2];
 		fixed		viewheight;

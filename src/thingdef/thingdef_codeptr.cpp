@@ -401,11 +401,17 @@ ACTION_FUNCTION(A_GunFlash)
 	self->player->SetPSprite(flash, player_t::ps_flash);
 }
 
-#define STATE_JUMP(frame) DoStateJump(frame, self, caller, args)
-static void DoStateJump(const Frame *frame, AActor *self, const Frame * const caller, const CallArguments &args)
+#define STATE_JUMP(frame) DoStateJump(frame, self, caller, args, result)
+static void DoStateJump(const Frame *frame, AActor *self, const Frame * const caller, const CallArguments &args, ActionResult *result)
 {
 	if(!frame)
 		return;
+
+	if(result)
+	{
+		result->JumpFrame = frame;
+		return;
+	}
 
 	if(self->player)
 	{

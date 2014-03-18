@@ -85,12 +85,12 @@ int Frame::GetTics() const
 	return duration;
 }
 
-void Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const
+void Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller, ActionResult *result) const
 {
 	if(pointer)
 	{
 		args->Evaluate(self);
-		pointer(self, stateOwner, caller, *args);
+		pointer(self, stateOwner, caller, *args, result);
 	}
 }
 

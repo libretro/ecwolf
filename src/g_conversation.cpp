@@ -33,11 +33,16 @@
 **
 */
 
+#include <climits>
+
 #include "g_conversation.h"
 #include "m_classes.h"
+#include "m_random.h"
 #include "scanner.h"
 #include "tarray.h"
 #include "w_wad.h"
+
+static FRandom pr_conversation("Conversation");
 
 class ConversationModule
 {
@@ -53,10 +58,11 @@ public:
 		NS_Noah
 	};
 
+	const Conversation *Find(unsigned int id) const;
 	void Load(int lump);
 
 	TArray<FString> Include;
-	TArray<Conversation> Conversations;
+	TMap<unsigned int, Conversation> Conversations;
 	ConvNamespace Namespace;
 	int Lump;
 
@@ -116,9 +122,23 @@ struct ConversationModule::Conversation
 {
 	TArray<Page> Pages;
 	unsigned int Actor;
+	bool RandomStart;
+	bool Preserve;
+
+	const Page *Start() const
+	{
+		if(RandomStart)
+			return &Pages[pr_conversation(Pages.Size())];
+		return &Pages[0];
+	}
 };
 
 // ----------------------------------------------------------------------------
+
+const ConversationModule::Conversation *ConversationModule::Find(unsigned int id) const
+{
+	return Conversations.CheckKey(id);
+}
 
 void ConversationModule::Load(int lump)
 {
@@ -208,14 +228,23 @@ void ConversationModule::ParseConversation(Scanner &sc)
 				default: break;
 				case NAME_Conversation:
 				{
-					Conversation &conv = Conversations[Conversations.Push(Conversation())];
+					Conversation conv;
+					conv.Actor = UINT_MAX;
+					conv.RandomStart = false;
+					conv.Preserve = false;
+
 					ParseBlock(sc, conv, &ConversationModule::ParseConvBlock);
-					// Resolve page links
-					for(unsigned int i = conv.Pages.Size();i-- > 0;)
+					if(conv.Actor != UINT_MAX)
 					{
-						conv.Pages[i].Link = &conv.Pages[conv.Pages[i].LinkIndex - 1];
-						for(unsigned int j = conv.Pages[i].Choices.Size();j-- > 0;)
-							conv.Pages[i].Choices[j].NextPage = &conv.Pages[conv.Pages[i].Choices[j].NextPageIndex - 1];
+						Conversation &conv2 = Conversations.Insert(conv.Actor, conv);
+
+						// Resolve page links
+						for(unsigned int i = conv2.Pages.Size();i-- > 0;)
+						{
+							conv2.Pages[i].Link = &conv2.Pages[conv2.Pages[i].LinkIndex - 1];
+							for(unsigned int j = conv2.Pages[i].Choices.Size();j-- > 0;)
+								conv2.Pages[i].Choices[j].NextPage = &conv2.Pages[conv2.Pages[i].Choices[j].NextPageIndex - 1];
+						}
 					}
 					break;
 				}
@@ -234,6 +263,22 @@ bool ConversationModule::ParseConvBlock(Scanner &sc, FName key, bool isValue, Co
 		case NAME_Actor:
 			sc.MustGetToken(TK_IntConst);
 			obj.Actor = sc->number;
+			break;
+		case NAME_RandomStart:
+			if(Namespace == NS_Noah)
+			{
+				sc.MustGetToken(TK_BoolConst);
+				obj.RandomStart = sc->boolean;
+			}
+			else return false;
+			break;
+		case NAME_Preserve:
+			if(Namespace == NS_Noah)
+			{
+				sc.MustGetToken(TK_BoolConst);
+				obj.Preserve = sc->boolean;
+			}
+			else return false;
 			break;
 	}
 	else switch(key)
@@ -286,8 +331,13 @@ bool ConversationModule::ParsePageBlock(Scanner &sc, FName key, bool isValue, Pa
 	{
 		default: return false;
 		case NAME_Choice:
-			ParseBlock(sc, obj.Choices[obj.Choices.Push(Choice())], &ConversationModule::ParseChoiceBlock);
+		{
+			Choice &choice = obj.Choices[obj.Choices.Push(Choice())];
+			choice.DisplayCost = false;
+			choice.CloseDialog = true;
+			ParseBlock(sc, choice, &ConversationModule::ParseChoiceBlock);
 			break;
+		}
 		case NAME_IfItem:
 			ParseBlock(sc, obj.IfItem[obj.IfItem.Push(ItemCheck())], &ConversationModule::ParseItemCheckBlock);
 			break;
@@ -388,7 +438,9 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 
 namespace Dialog {
 
-TArray<ConversationModule> LoadedModules;
+static TMap<unsigned int, const ConversationModule::Page *> ConversationPosition;
+static TArray<ConversationModule> LoadedModules;
+static unsigned int MapModuleStart = 0;
 
 static bool CheckModuleLoaded(int lump)
 {
@@ -410,9 +462,41 @@ void LoadGlobalModule(const char* moduleName)
 		for(unsigned int i = 0;i < LoadedModules[module].Include.Size();++i)
 			LoadGlobalModule(LoadedModules[module].Include[i]);
 	}
+	MapModuleStart = LoadedModules.Size();
 }
 
-void ShowQuiz()
+void LoadMapModules()
+{
+	// Unload any old modules
+	LoadedModules.Delete(MapModuleStart, LoadedModules.Size()-MapModuleStart);
+
+	// Reset conversations
+	ConversationPosition.Clear();
+}
+
+const ConversationModule::Page **FindConversation(unsigned int id)
+{
+	// See if we have an active conversation going
+	const ConversationModule::Page **page = ConversationPosition.CheckKey(id);
+	if(page)
+		return page;
+
+	// If not, open a conversation
+	for(unsigned int i = LoadedModules.Size();i-- > 0;)
+	{
+		if(const ConversationModule::Conversation *conv = LoadedModules[i].Find(id))
+		{
+			page = &ConversationPosition[id];
+			*page = conv->Start();
+			return page;
+		}
+	}
+
+	// No conversation found.
+	return NULL;
+}
+
+void ShowQuiz(unsigned int id)
 {
 	class QuizMenu : public Menu
 	{
@@ -487,16 +571,19 @@ void ShowQuiz()
 		FString hint;
 	};
 
-	static const ConversationModule::Page *page = &LoadedModules[0].Conversations[0].Pages[0];
+	const ConversationModule::Page **page = FindConversation(1);
+	if(!page)
+		return;
+
 	QuizMenu quiz;
-	quiz.loadQuestion(page);
+	quiz.loadQuestion(*page);
 	do
 	{
 		int answer = quiz.handle();
 		if(answer >= 0)
 		{
 			// TODO: Play sound 41 on correct, 27 on incorrect.  Wait until sound done (which means picking a value for us)
-			const ConversationModule::Choice &choice = page->Choices[answer];
+			const ConversationModule::Choice &choice = (*page)->Choices[answer];
 			FString response = choice.YesMessage;
 			if(response[0] == '$')
 				response = language[response.Mid(1)];
@@ -511,8 +598,11 @@ void ShowQuiz()
 			VW_UpdateScreen();
 			VL_WaitVBL(140);
 
-			page = choice.NextPage;
-			break;
+			*page = choice.NextPage;
+			if(choice.CloseDialog)
+				break;
+			else
+				quiz.loadQuestion(*page);
 		}
 		else
 		{

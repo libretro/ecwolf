@@ -223,12 +223,9 @@ IMPLEMENT_CLASS(Health)
 
 bool AHealth::TryPickup(AActor *toucher)
 {
-	//if(!Super::TryPickup(toucher))
-	//	return false;
-
 	int max = maxamount;
 	if(max == 0)
-		max = toucher->health;
+		max = toucher->player->mo->maxhealth;
 
 	if(toucher->player->health >= max)
 		return false;
@@ -237,6 +234,7 @@ bool AHealth::TryPickup(AActor *toucher)
 		toucher->player->health += amount;
 		if(toucher->player->health > max)
 			toucher->player->health = max;
+		toucher->health = toucher->player->health;
 		Destroy();
 	}
 	return true;
@@ -378,11 +376,26 @@ bool ACustomInventory::TryPickup(AActor *toucher)
 
 bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
 {
+	ActionResult result;
+	memset(&result, 0, sizeof(ActionResult));
+
 	while(frame)
 	{
 		// Execute both functions since why not.
-		frame->action(context, this, frame);
-		frame->thinker(context, this, frame);
+		frame->action(context, this, frame, &result);
+		if(result.JumpFrame)
+		{
+			frame = result.JumpFrame;
+			result.JumpFrame = NULL;
+			continue;
+		}
+		frame->thinker(context, this, frame, &result);
+		if(result.JumpFrame)
+		{
+			frame = result.JumpFrame;
+			result.JumpFrame = NULL;
+			continue;
+		}
 
 		if(frame == frame->next)
 			break;

@@ -63,6 +63,8 @@ xx(Conversation)
 // USDF/Conversation
 //xx(Actor)
 xx(Page)
+xx(RandomStart)
+xx(Preserve)
 // USDF/Conversation/Page
 xx(Name)
 xx(Panel)

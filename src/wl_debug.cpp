@@ -191,7 +191,7 @@ int DebugKeys (void)
 
 	if (Keyboard[sc_A])
 	{
-		Dialog::ShowQuiz();
+		Dialog::ShowQuiz(1);
 	}
 	else if (Keyboard[sc_B])             // B = border color
 	{
