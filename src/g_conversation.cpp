@@ -402,7 +402,7 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 		case NAME_Arg3:
 		case NAME_Arg4:
 			sc.MustGetToken(TK_IntConst);
-			obj.Arg[key - (int)NAME_Arg0] = sc->number;
+			obj.Arg[(int)key - (int)NAME_Arg0] = sc->number;
 			break;
 		case NAME_NextPage:
 			sc.MustGetToken(TK_IntConst);

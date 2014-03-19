@@ -367,29 +367,38 @@ AInventory *ABackpackItem::CreateCopy(AActor *holder)
 
 IMPLEMENT_CLASS(CustomInventory)
 
+ACTION_FUNCTION(A_Succeed)
+{
+	// At the time of writing we don't really have a good action function to
+	// call to ensure that a Pickup state succeeds. So we'll make a no op.
+	return true;
+}
+
 bool ACustomInventory::TryPickup(AActor *toucher)
 {
 	const Frame *pickup = FindState("Pickup");
-	ExecuteState(toucher, pickup);
+	if(!ExecuteState(toucher, pickup))
+		return false;
 	return Super::TryPickup(toucher);
 }
 
 bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
 {
+	bool success = false;
 	ActionResult result;
 	memset(&result, 0, sizeof(ActionResult));
 
 	while(frame)
 	{
 		// Execute both functions since why not.
-		frame->action(context, this, frame, &result);
+		success |= frame->action(context, this, frame, &result);
 		if(result.JumpFrame)
 		{
 			frame = result.JumpFrame;
 			result.JumpFrame = NULL;
 			continue;
 		}
-		frame->thinker(context, this, frame, &result);
+		success |= frame->thinker(context, this, frame, &result);
 		if(result.JumpFrame)
 		{
 			frame = result.JumpFrame;
@@ -398,10 +407,14 @@ bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
 		}
 
 		if(frame == frame->next)
+		{
+			// Fail if we stay on the same state
+			success = false;
 			break;
+		}
 		frame = frame->next;
 	}
-	return true;
+	return success;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -600,10 +613,10 @@ ACTION_FUNCTION(A_ReFire)
 {
 	player_t *player = self->player;
 	if(!player)
-		return;
+		return false;
 
 	if(!player->ReadyWeapon->CheckAmmo(player->ReadyWeapon->mode, true))
-		return;
+		return false;
 
 	if(player->PendingWeapon == WP_NOCHANGE || !(player->flags & player_t::PF_REFIRESWITCHOK))
 	{
@@ -612,6 +625,7 @@ ACTION_FUNCTION(A_ReFire)
 		else if(player->ReadyWeapon->mode == AWeapon::AltFire && buttonstate[bt_altattack])
 			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::AltFire, true), player_t::ps_weapon);
 	}
+	return true;
 }
 
 ACTION_FUNCTION(A_WeaponReady)
@@ -640,6 +654,7 @@ ACTION_FUNCTION(A_WeaponReady)
 
 	if((flags & WRF_ALLOWRELOAD)) self->player->flags |= player_t::PF_WEAPONRELOADOK;
 	if((flags & WRF_ALLOWZOOM)) self->player->flags |= player_t::PF_WEAPONZOOMOK;
+	return true;
 }
 
 

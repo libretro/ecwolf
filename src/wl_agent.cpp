@@ -744,7 +744,7 @@ ACTION_FUNCTION(A_Lower)
 
 	player->psprite[player_t::ps_weapon].sy += RAISESPEED;
 	if(player->psprite[player_t::ps_weapon].sy < RAISERANGE)
-		return;
+		return false;
 	player->psprite[player_t::ps_weapon].sy = RAISERANGE;
 
 	if(player->PendingWeapon == WP_NOCHANGE)
@@ -752,6 +752,7 @@ ACTION_FUNCTION(A_Lower)
 
 	player->SetPSprite(NULL, player_t::ps_flash);
 	player->BringUpWeapon();
+	return true;
 }
 ACTION_FUNCTION(A_Raise)
 {
@@ -760,18 +761,19 @@ ACTION_FUNCTION(A_Raise)
 	if(player->PendingWeapon != WP_NOCHANGE)
 	{
 		player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
-		return;
+		return false;
 	}
 
 	player->psprite[player_t::ps_weapon].sy -= RAISESPEED;
 	if(player->psprite[player_t::ps_weapon].sy > 0)
-		return;
+		return false;
 	player->psprite[player_t::ps_weapon].sy = 0;
 
 	if(player->ReadyWeapon)
 		player->SetPSprite(player->ReadyWeapon->GetReadyState(), player_t::ps_weapon);
 	else
 		player->psprite[player_t::ps_weapon].frame = NULL;
+	return true;
 }
 
 // Finds the target closest to the player within shooting range.
@@ -999,7 +1001,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	if (!closest || dist-(FRACUNIT/2) > (range/64)*FRACUNIT)
 	{
 		// missed
-		return;
+		return false;
 	}
 
 	if(!norandom)
@@ -1014,7 +1016,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	if(flags & CPF_USEAMMO)
 	{
 		if(!player->ReadyWeapon->DepleteAmmo())
-			return;
+			return true;
 	}
 
 	if(lifesteal > 0 && player->health < self->health)
@@ -1024,6 +1026,7 @@ ACTION_FUNCTION(A_CustomPunch)
 		if(player->health > self->health)
 			player->health = self->health;
 	}
+	return true;
 }
 
 static FRandom pr_cwbullet("CustomWpBullet");
@@ -1051,7 +1054,7 @@ ACTION_FUNCTION(A_GunAttack)
 	if(!(flags & GAF_NOAMMO))
 	{
 		if(!player->ReadyWeapon->DepleteAmmo())
-			return;
+			return false;
 	}
 
 	if(sound.Len() == 1 && sound[0] == '*')
@@ -1064,7 +1067,7 @@ ACTION_FUNCTION(A_GunAttack)
 
 	AActor *closest = players[0].FindTarget();
 	if(!closest)
-		return;
+		return false;
 
 	//
 	// hit something
@@ -1082,9 +1085,10 @@ ACTION_FUNCTION(A_GunAttack)
 	if (dist >= longrange)
 	{
 		if ( (pr_cwbullet() % maxrange) < dist)           // missed
-			return;
+			return false;
 	}
 	DamageActor (closest,damage);
+	return true;
 }
 
 ACTION_FUNCTION(A_FireCustomMissile)
@@ -1097,7 +1101,7 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	ACTION_PARAM_BOOL(aim, 5);
 
 	if(useammo && !players[0].ReadyWeapon->DepleteAmmo())
-		return;
+		return false;
 
 	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
 		madenoise = true;
@@ -1109,11 +1113,12 @@ ACTION_FUNCTION(A_FireCustomMissile)
 
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
-		return;
+		return false;
 	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, SPAWN_AllowReplacement);
 	newobj->flags |= FL_PLAYERMISSILE;
 	newobj->angle = iangle;
 
 	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);
 	newobj->vely = -FixedMul(newobj->speed,finesine[iangle>>ANGLETOFINESHIFT]);
+	return true;
 }

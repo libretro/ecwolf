@@ -1182,7 +1182,7 @@ void ClassDef::ParseActor(Scanner &sc)
 										thisState.jumpLabel = StateLabel(sc, newClass, true);
 										thisState.nextType = StateDefinition::GOTO;
 									}
-									else if(sc->str.CompareNoCase("wait") == 0)
+									else if(sc->str.CompareNoCase("wait") == 0 || sc->str.CompareNoCase("fail") == 0)
 									{
 										thisState.nextType = StateDefinition::WAIT;
 									}

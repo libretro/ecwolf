@@ -85,13 +85,14 @@ int Frame::GetTics() const
 	return duration;
 }
 
-void Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller, ActionResult *result) const
+bool Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller, ActionResult *result) const
 {
 	if(pointer)
 	{
 		args->Evaluate(self);
-		pointer(self, stateOwner, caller, *args, result);
+		return pointer(self, stateOwner, caller, *args, result);
 	}
+	return false;
 }
 
 FArchive &operator<< (FArchive &arc, const Frame *&frame)

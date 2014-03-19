@@ -8,13 +8,13 @@ actor BibleQuiz : CustomInventory 163
 	conversationid 1
 	overheadicon "TILE8:80"
 	+PLOTONAUTOMAP
-	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
 			QUIZ A -1
 			stop
 		Pickup:
+			TNT1 A 0 A_Succeed
 			TNT1 A 0 A_JumpIf(health >= 100, "FullHealth")
 			stop
 		FullHealth:

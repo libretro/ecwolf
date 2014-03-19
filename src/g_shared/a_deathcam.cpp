@@ -89,7 +89,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	{
 		cam->camState = ADeathCam::CAM_FINISHED;
 		CALL_ACTION(A_BossDeath, cam->actor);
-		return;
+		return true;
 	}
 
 	cam->x = cam->actor->killerx;
@@ -152,4 +152,5 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	DrawPlayScreen();
 
 	fizzlein = true;
+	return true;
 }
