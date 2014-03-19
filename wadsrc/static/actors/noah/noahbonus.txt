@@ -3,7 +3,12 @@
 // * 1000 points
 // * Either 25 points of health if under 100 and 10 feed or 25 feed
 // * Grin
-actor BibleQuiz : CustomInventory 163
+actor QuizItem : CustomInventory native
+{
+	inventory.amount 0
+}
+
+actor BibleQuiz : QuizItem 163
 {
 	conversationid 1
 	overheadicon "TILE8:80"

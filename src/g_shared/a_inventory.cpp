@@ -33,6 +33,7 @@
 */
 
 #include "a_inventory.h"
+#include "g_conversation.h"
 #include "id_sd.h"
 #include "templates.h"
 #include "thinker.h"
@@ -416,6 +417,27 @@ bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
 	}
 	return success;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Opens a dialog when picked up, but otherwise behaves like a CustomInventory.
+class AQuizItem : public ACustomInventory
+{
+	DECLARE_NATIVE_CLASS(QuizItem, CustomInventory)
+
+public:
+	bool TryPickup(AActor *toucher)
+	{
+		if(Super::TryPickup(toucher))
+		{
+			Dialog::ShowQuiz(GetClass()->Meta.GetMetaInt(AMETA_ConversationID));
+			return true;
+		}
+		return false;
+	}
+};
+
+IMPLEMENT_CLASS(QuizItem)
 
 ////////////////////////////////////////////////////////////////////////////////
 
