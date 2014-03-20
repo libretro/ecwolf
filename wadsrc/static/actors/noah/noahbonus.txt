@@ -12,6 +12,7 @@ actor BibleQuiz : QuizItem 163
 {
 	conversationid 1
 	overheadicon "TILE8:80"
+	inventory.pickupsound ""
 	+PLOTONAUTOMAP
 	states
 	{

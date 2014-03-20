@@ -282,3 +282,6 @@ burt/sight				{ DSBRTSIT ALBRTSIT PCBRTSIT }
 burt/active				{ DSBRTSTP ALBRTSTP PCBRTSTP }
 burt/attack				{ DSSPIT ALSPIT PCSPIT }
 burt/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+quiz/correct			{ NULL ALENDBN1 PCENDBN1 }
+quiz/incorrect			{ NULL ALNOBNS PCNOBNS }

@@ -910,7 +910,8 @@ protected:
 static TArray<SkillInfo> skills;
 static TMap<FName, unsigned int> skillIds;
 
-SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), SpawnFilter(0), MapFilter(0)
+SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), SpawnFilter(0), MapFilter(0),
+	QuizHints(false)
 {
 }
 
@@ -973,6 +974,8 @@ protected:
 		}
 		else if(key.CompareNoCase("mapfilter") == 0)
 			ParseIntAssignment(skill->MapFilter);
+		else if(key.CompareNoCase("quizhints") == 0)
+			ParseBoolAssignment(skill->QuizHints);
 		else
 			return false;
 		return true;

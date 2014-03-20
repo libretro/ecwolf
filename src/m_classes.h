@@ -42,6 +42,7 @@ class MenuItem
 		char		string[80];
 		bool		visible;
 		const Menu	*menu;
+		FString		activateSound;
 
 		EColorRange	getTextColor() const;
 
@@ -52,11 +53,13 @@ class MenuItem
 		short		getActive() const { return enabled ? (highlight + 1) : 0; }
 		int			getHeight() const { return visible ? height : 0; }
 		const char	*getString() const { return string; }
+		FString		getActivateSound() const { return activateSound; }
 		bool		isEnabled() const { return enabled && visible; }
 		bool		isHighlighted() const { return highlight != 0; }
 		bool		isSelected() const;
 		bool		isVisible() const { return visible; }
 		void		setActivateListener(MENU_LISTENER_PROTOTYPE(activateListener)) { this->activateListener = activateListener; }
+		void		setActivateSound(FString sound) { activateSound = sound; }
 		void		setEnabled(bool enabled=true) { this->enabled = enabled; }
 		void		setHighlighted(int highlight=1) { this->highlight = highlight; }
 		void		setMenu(const Menu *menu) { this->menu = menu; }

@@ -242,6 +242,7 @@ public:
 	fixed DamageFactor;
 	unsigned int SpawnFilter;
 	unsigned int MapFilter;
+	bool QuizHints;
 
 	static unsigned int GetNumSkills();
 	static unsigned int GetSkillIndex(const SkillInfo &skill);

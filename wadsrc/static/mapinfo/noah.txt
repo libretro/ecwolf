@@ -116,6 +116,7 @@ skill baby
 	picname = "M_BABY"
 	spawnfilter = 1
 	damagefactor = 0.25
+	quizhints = true
 }
 
 skill easy

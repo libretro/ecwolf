@@ -72,6 +72,7 @@ public:
 		FString Text;
 		FString YesMessage, NoMessage;
 		FString Log;
+		FString SelectSound;
 		union
 		{
 			unsigned int NextPageIndex;
@@ -398,6 +399,10 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 			sc.MustGetToken(TK_IntConst);
 			obj.GiveItem = sc->number;
 			break;
+		case NAME_SelectSound:
+			sc.MustGetToken(TK_StringConst);
+			obj.SelectSound = sc->str;
+			break;
 		case NAME_Special:
 			sc.MustGetToken(TK_IntConst);
 			obj.Special = sc->number;
@@ -528,7 +533,11 @@ void ShowQuiz(unsigned int id)
 				FString choice = page->Choices[i].Text;
 				if(choice[0] == '$')
 					choice = language[page->Choices[i].Text.Mid(1)];
-				addItem(new MenuItem(choice));
+
+				MenuItem *mchoice = new MenuItem(choice);
+				if(page->Choices[i].SelectSound.IsNotEmpty())
+					mchoice->setActivateSound(page->Choices[i].SelectSound);
+				addItem(mchoice);
 			}
 		}
 
@@ -561,10 +570,13 @@ void ShowQuiz(unsigned int id)
 			}
 			delete[] lines;
 
-			screen->DrawText(BigFont, CR_WHITE, 26, ly, hint,
-				DTA_Clean, true,
-				TAG_DONE
-			);
+			if(gamestate.difficulty->QuizHints)
+			{
+				screen->DrawText(BigFont, CR_WHITE, 26, ly, hint,
+					DTA_Clean, true,
+					TAG_DONE
+				);
+			}
 
 			drawMenu();
 
@@ -589,7 +601,6 @@ void ShowQuiz(unsigned int id)
 		int answer = quiz.handle();
 		if(answer >= 0)
 		{
-			// TODO: Play sound 41 on correct, 27 on incorrect.  Wait until sound done (which means picking a value for us)
 			const ConversationModule::Choice &choice = (*page)->Choices[answer];
 			FString response = choice.YesMessage;
 			if(response[0] == '$')

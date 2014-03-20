@@ -23,6 +23,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 2;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -31,6 +32,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 2;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -39,6 +41,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 2;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -53,6 +56,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 3;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -61,6 +65,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 3;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -69,6 +74,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 3;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -83,6 +89,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 4;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -91,6 +98,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 4;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -99,6 +107,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 4;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -113,6 +122,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 5;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -121,6 +131,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 5;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -129,6 +140,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 5;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -143,6 +155,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 6;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -151,6 +164,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 6;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -159,6 +173,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 6;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -173,6 +188,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 7;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -181,6 +197,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 7;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -189,6 +206,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 7;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -203,6 +221,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 8;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -211,6 +230,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 8;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -219,6 +239,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 8;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -233,6 +254,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 9;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -241,6 +263,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 9;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -249,6 +272,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 9;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -263,6 +287,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 10;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -271,6 +296,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 10;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -279,6 +305,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 10;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -293,6 +320,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 11;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -301,6 +329,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 11;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -309,6 +338,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 11;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -323,6 +353,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 12;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -331,6 +362,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 12;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -339,6 +371,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 12;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -353,6 +386,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 13;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -361,6 +395,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 13;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -369,6 +404,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 13;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -383,6 +419,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 14;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -391,6 +428,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 14;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -399,6 +437,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 14;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -413,6 +452,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 15;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -421,6 +461,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 15;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -435,6 +476,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 16;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -443,6 +485,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 16;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -451,6 +494,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 16;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -465,6 +509,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 17;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -473,6 +518,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 17;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -487,6 +533,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 18;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -495,6 +542,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 18;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -503,6 +551,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 18;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -517,6 +566,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 19;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -525,6 +575,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 19;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -533,6 +584,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 19;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -547,6 +599,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 20;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -555,6 +608,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 20;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -563,6 +617,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 20;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -577,6 +632,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 21;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -585,6 +641,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 21;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -593,6 +650,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 21;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -607,6 +665,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 22;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -615,6 +674,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 22;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -623,6 +683,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 22;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -637,6 +698,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 23;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -645,6 +707,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 23;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -653,6 +716,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 23;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -667,6 +731,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 24;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -675,6 +740,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 24;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -683,6 +749,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 24;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -697,6 +764,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 25;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -705,6 +773,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 25;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -713,6 +782,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 25;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -727,6 +797,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 26;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -735,6 +806,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 26;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -743,6 +815,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 26;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -757,6 +830,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 27;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -765,6 +839,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 27;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -773,6 +848,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 27;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -787,6 +863,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 28;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -795,6 +872,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 28;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -803,6 +881,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 28;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -817,6 +896,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 29;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -825,6 +905,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 29;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -839,6 +920,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 30;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -847,6 +929,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 30;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -855,6 +938,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 30;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -869,6 +953,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 31;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -877,6 +962,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 31;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -885,6 +971,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 31;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -899,6 +986,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 32;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -907,6 +995,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 32;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -915,6 +1004,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 32;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -929,6 +1019,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 33;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -937,6 +1028,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 33;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -945,6 +1037,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 33;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -959,6 +1052,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 34;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -967,6 +1061,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 34;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -975,6 +1070,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 34;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -989,6 +1085,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 35;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -997,6 +1094,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 35;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1005,6 +1103,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 35;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1019,6 +1118,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 36;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1027,6 +1127,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 36;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1035,6 +1136,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 36;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1049,6 +1151,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 37;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1057,6 +1160,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 37;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1065,6 +1169,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 37;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1079,6 +1184,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 38;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1087,6 +1193,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 38;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1095,6 +1202,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 38;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1109,6 +1217,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 39;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1117,6 +1226,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 39;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1131,6 +1241,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 40;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1139,6 +1250,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 40;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1147,6 +1259,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 40;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1161,6 +1274,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 41;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1169,6 +1283,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 41;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1177,6 +1292,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 41;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1191,6 +1307,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 42;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1199,6 +1316,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 42;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1207,6 +1325,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 42;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1221,6 +1340,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 43;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1229,6 +1349,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 43;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1237,6 +1358,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 43;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1251,6 +1373,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 44;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1259,6 +1382,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 44;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1267,6 +1391,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 44;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1281,6 +1406,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 45;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1289,6 +1415,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 45;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1297,6 +1424,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 45;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1311,6 +1439,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 46;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1319,6 +1448,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 46;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1327,6 +1457,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 46;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1341,6 +1472,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 47;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1349,6 +1481,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 47;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1363,6 +1496,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 48;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1371,6 +1505,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 48;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1379,6 +1514,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 48;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1393,6 +1529,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 49;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1401,6 +1538,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 49;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1409,6 +1547,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 49;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1423,6 +1562,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 50;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1431,6 +1571,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 50;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1439,6 +1580,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 50;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1453,6 +1595,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 51;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1461,6 +1604,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 51;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1469,6 +1613,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 51;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1483,6 +1628,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 52;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1491,6 +1637,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 52;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1505,6 +1652,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 53;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1513,6 +1661,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 53;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1527,6 +1676,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 54;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1535,6 +1685,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 54;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1543,6 +1694,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 54;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1557,6 +1709,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 55;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1565,6 +1718,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 55;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1573,6 +1727,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 55;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1587,6 +1742,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 56;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1595,6 +1751,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 56;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1603,6 +1760,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 56;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1617,6 +1775,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 57;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1625,6 +1784,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 57;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1633,6 +1793,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 57;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1647,6 +1808,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 58;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1655,6 +1817,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 58;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1669,6 +1832,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 59;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1677,6 +1841,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 59;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1685,6 +1850,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 59;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1699,6 +1865,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 60;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1707,6 +1874,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 60;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1715,6 +1883,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 60;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1729,6 +1898,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 61;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1737,6 +1907,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 61;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1745,6 +1916,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 61;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1759,6 +1931,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 62;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1767,6 +1940,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 62;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1775,6 +1949,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 62;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1789,6 +1964,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 63;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1797,6 +1973,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 63;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1805,6 +1982,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 63;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1819,6 +1997,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 64;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1827,6 +2006,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 64;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1835,6 +2015,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 64;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1849,6 +2030,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 65;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1857,6 +2039,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 65;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1865,6 +2048,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 65;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1879,6 +2063,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 66;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1887,6 +2072,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 66;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1895,6 +2081,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 66;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1909,6 +2096,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 67;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1917,6 +2105,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 67;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1925,6 +2114,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 67;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1939,6 +2129,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 68;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -1947,6 +2138,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 68;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1955,6 +2147,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 68;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -1969,6 +2162,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 69;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1977,6 +2171,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 69;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -1991,6 +2186,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 70;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -1999,6 +2195,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 70;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2013,6 +2210,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 71;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2021,6 +2219,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 71;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2035,6 +2234,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 72;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2043,6 +2243,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 72;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2051,6 +2252,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 72;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2065,6 +2267,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 73;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2073,6 +2276,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 73;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2087,6 +2291,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 74;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2095,6 +2300,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 74;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2103,6 +2309,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 74;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2117,6 +2324,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 75;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2125,6 +2333,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 75;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2139,6 +2348,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 76;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2147,6 +2357,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 76;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2155,6 +2366,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 76;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2169,6 +2381,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 77;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2177,6 +2390,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 77;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2191,6 +2405,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 78;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2199,6 +2414,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 78;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2213,6 +2429,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 79;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2221,6 +2438,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 79;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2229,6 +2447,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 79;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2243,6 +2462,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 80;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2251,6 +2471,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 80;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2259,6 +2480,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 80;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2273,6 +2495,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 81;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2281,6 +2504,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 81;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2289,6 +2513,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 81;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2303,6 +2528,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 82;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2311,6 +2537,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 82;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2325,6 +2552,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 83;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2333,6 +2561,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 83;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2341,6 +2570,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 83;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2355,6 +2585,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 84;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2363,6 +2594,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 84;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2371,6 +2603,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 84;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2385,6 +2618,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 85;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2393,6 +2627,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 85;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2407,6 +2642,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 86;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2415,6 +2651,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 86;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2423,6 +2660,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 86;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2437,6 +2675,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 87;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2445,6 +2684,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 87;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2459,6 +2699,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 88;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2467,6 +2708,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 88;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2481,6 +2723,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 89;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2489,6 +2732,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 89;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2497,6 +2741,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 89;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2511,6 +2756,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 90;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2519,6 +2765,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 90;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2533,6 +2780,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 91;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2541,6 +2789,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 91;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2549,6 +2798,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 91;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2563,6 +2813,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 92;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2571,6 +2822,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 92;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2585,6 +2837,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 93;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2593,6 +2846,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 93;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2601,6 +2855,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 93;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2615,6 +2870,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 94;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2623,6 +2879,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 94;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2631,6 +2888,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 94;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2645,6 +2903,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 95;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2653,6 +2912,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 95;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2661,6 +2921,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 95;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2675,6 +2936,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 96;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2683,6 +2945,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 96;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2691,6 +2954,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 96;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2705,6 +2969,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 97;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2713,6 +2978,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 97;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 	}
 	page
@@ -2727,6 +2993,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 98;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2735,6 +3002,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 98;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2749,6 +3017,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 99;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2757,6 +3026,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 99;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2765,6 +3035,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 99;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 	page
@@ -2779,6 +3050,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 1;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 		choice
 		{
@@ -2787,6 +3059,7 @@ conversation
 			yesmessage = "$NOAH_CORRECT";
 			nextpage = 1;
 			giveitem = 2;
+			selectsound = "quiz/correct";
 		}
 		choice
 		{
@@ -2795,6 +3068,7 @@ conversation
 			yesmessage = "$NOAH_INCORRECT";
 			nextpage = 1;
 			giveitem = 3;
+			selectsound = "quiz/incorrect";
 		}
 	}
 }

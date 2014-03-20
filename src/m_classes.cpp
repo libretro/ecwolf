@@ -27,7 +27,8 @@ EColorRange MenuItem::getTextColor() const
 
 MenuItem::MenuItem(const char string[80], MENU_LISTENER_PROTOTYPE(activateListener)) :
 	activateListener(activateListener), enabled(true), highlight(false),
-	picture(NULL), pictureX(-1), pictureY(-1), visible(true)
+	picture(NULL), pictureX(-1), pictureY(-1), visible(true),
+	activateSound("menu/activate")
 {
 	setText(string);
 }
@@ -931,7 +932,7 @@ int Menu::handle()
 	{
 		case 1:
 			if(getIndex(curPos)->playActivateSound())
-				SD_PlaySound ("menu/activate");
+				SD_PlaySound (getIndex(curPos)->getActivateSound());
 			getIndex(curPos)->activate();
 			PrintX = getX() + getIndent();
 			PrintY = getY() + getHeight(curPos);
