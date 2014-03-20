@@ -36,6 +36,7 @@ gameinfo
 	titletime = 13
 	highscoresfontcolor = "NoahWhite"
 	pageindexfontcolor = "Black"
+	dialogcolor = "NoahWhite"
 }
 
 automap

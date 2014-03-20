@@ -607,6 +607,8 @@ protected:
 		}
 		else if(key.CompareNoCase("borderflat") == 0)
 			ParseStringAssignment(gameinfo.BorderFlat);
+		else if(key.CompareNoCase("dialogcolor") == 0)
+			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::DIALOG]);
 		else if(key.CompareNoCase("doorsoundsequence") == 0)
 			ParseNameAssignment(gameinfo.DoorSoundSequence);
 		else if(key.CompareNoCase("drawreadthis") == 0)

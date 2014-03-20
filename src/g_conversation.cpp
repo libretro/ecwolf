@@ -549,7 +549,7 @@ void ShowQuiz(unsigned int id)
 			WindowX = 0;
 			WindowW = 320;
 			PrintY = 4;
-			US_CPrint(BigFont, headText, CR_WHITE);
+			US_CPrint(BigFont, headText, gameinfo.FontColors[GameInfo::DIALOG]);
 
 			DrawWindow(14, 21, 292, 134, BKGDCOLOR);
 		}
@@ -562,7 +562,7 @@ void ShowQuiz(unsigned int id)
 			unsigned int ly = 26;
 			for(FBrokenLines *line = lines;line->Width != -1;++line)
 			{
-				screen->DrawText(BigFont, CR_WHITE, 26, ly, line->Text,
+				screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, line->Text,
 					DTA_Clean, true,
 					TAG_DONE
 				);
@@ -572,7 +572,7 @@ void ShowQuiz(unsigned int id)
 
 			if(gamestate.difficulty->QuizHints)
 			{
-				screen->DrawText(BigFont, CR_WHITE, 26, ly, hint,
+				screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, hint,
 					DTA_Clean, true,
 					TAG_DONE
 				);
@@ -596,6 +596,7 @@ void ShowQuiz(unsigned int id)
 
 	QuizMenu quiz;
 	quiz.loadQuestion(*page);
+	Menu::closeMenus(false); // Clear out any main menu state
 	do
 	{
 		int answer = quiz.handle();
