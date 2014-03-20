@@ -464,7 +464,7 @@ void MetaTable::SetMetaString(uint32_t id, const char* value)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TMap<int, ClassDef *> ClassDef::classNumTable;
+static TMap<int, ClassDef *> EditorNumberTable, ConversationIDTable;
 SymbolTable ClassDef::globalSymbols;
 bool ClassDef::bShutdown = false;
 
@@ -598,7 +598,7 @@ AActor *ClassDef::CreateInstance() const
 
 const ClassDef *ClassDef::FindClass(unsigned int ednum)
 {
-	ClassDef **ret = classNumTable.CheckKey(ednum);
+	ClassDef **ret = EditorNumberTable.CheckKey(ednum);
 	if(ret == NULL)
 		return NULL;
 	return *ret;
@@ -607,6 +607,14 @@ const ClassDef *ClassDef::FindClass(unsigned int ednum)
 const ClassDef *ClassDef::FindClass(const FName &className)
 {
 	ClassDef **ret = ClassTable().CheckKey(className);
+	if(ret == NULL)
+		return NULL;
+	return *ret;
+}
+
+const ClassDef *ClassDef::FindConversationClass(unsigned int convid)
+{
+	ClassDef **ret = ConversationIDTable.CheckKey(convid);
 	if(ret == NULL)
 		return NULL;
 	return *ret;
@@ -979,9 +987,9 @@ void ClassDef::ParseActor(Scanner &sc)
 
 	if(sc.CheckToken(TK_IntConst))
 	{
-		if(classNumTable.CheckKey(sc->number) != NULL)
-			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, classNumTable[sc->number]->GetName().GetChars());
-		classNumTable[sc->number] = newClass;
+		if(EditorNumberTable.CheckKey(sc->number) != NULL)
+			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
+		EditorNumberTable[sc->number] = newClass;
 	}
 	if(sc.CheckToken(TK_Identifier))
 	{
@@ -1482,6 +1490,10 @@ void ClassDef::ParseActor(Scanner &sc)
 	qsort(&newClass->symbols[0], newClass->symbols.Size(), sizeof(newClass->symbols[0]), SymbolCompare);
 	if(!actionsSorted)
 		InitFunctionTable(&newClass->actions);
+
+	// Register conversation id into table if assigned
+	if(int convid = newClass->Meta.GetMetaInt(AMETA_ConversationID))
+		ConversationIDTable[convid] = newClass;
 }
 
 void ClassDef::ParseDecorateLump(int lumpNum)

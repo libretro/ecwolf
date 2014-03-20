@@ -273,6 +273,7 @@ class ClassDef
 		static const ClassDef	*FindClass(unsigned int ednum);
 		static const ClassDef	*FindClass(const FName &className);
 		static const ClassDef	*FindClassTentative(const FName &className, const ClassDef *parent);
+		static const ClassDef	*FindConversationClass(unsigned int convid);
 		const ActionInfo		*FindFunction(const FName &function, int &specialNum) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const;
@@ -306,7 +307,6 @@ class ClassDef
 
 		// We need to do this for proper initialization order.
 		static TMap<FName, ClassDef *>	&ClassTable();
-		static TMap<int, ClassDef *>	classNumTable;
 		static SymbolTable				globalSymbols;
 
 		bool			tentative;

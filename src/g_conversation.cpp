@@ -42,15 +42,77 @@
 #include "tarray.h"
 #include "w_wad.h"
 
+#include "a_inventory.h"
+#include "g_mapinfo.h"
+#include "id_ca.h"
+#include "id_us.h"
+#include "id_vh.h"
+#include "language.h"
+#include "v_text.h"
+#include "v_video.h"
+#include "wl_agent.h"
+#include "wl_game.h"
+#include "wl_menu.h"
+#include "thingdef/thingdef.h"
+
 static FRandom pr_conversation("Conversation");
 
 class ConversationModule
 {
 public:
-	struct ItemCheck;
-	struct Choice;
 	struct Page;
-	struct Conversation;
+	struct ItemCheck
+	{
+		unsigned int Item;
+		unsigned int Amount;
+	};
+	struct Choice
+	{
+		TArray<ItemCheck> Cost;
+		FString Text;
+		FString YesMessage, NoMessage;
+		FString Log;
+		union
+		{
+			unsigned int NextPageIndex;
+			Page *NextPage;
+		};
+		unsigned int GiveItem;
+		unsigned int Special;
+		unsigned int Arg[5];
+		bool CloseDialog;
+		bool DisplayCost;
+	};
+	struct Page
+	{
+		TArray<Choice> Choices;
+		TArray<ItemCheck> IfItem;
+		FString Name;
+		FString Panel;
+		FString Voice;
+		FString Dialog;
+		FString Hint;
+		union
+		{
+			unsigned int LinkIndex; // Valid while parsing
+			Page *Link;
+		};
+		unsigned int Drop;
+	};
+	struct Conversation
+	{
+		TArray<Page> Pages;
+		unsigned int Actor;
+		bool RandomStart;
+		bool Preserve;
+
+		const Page *Start() const
+		{
+			if(RandomStart)
+				return &Pages[pr_conversation(Pages.Size())];
+			return &Pages[0];
+		}
+	};
 
 	enum ConvNamespace
 	{
@@ -75,62 +137,6 @@ private:
 	bool ParsePageBlock(Scanner &, FName, bool, Page &);
 	bool ParseChoiceBlock(Scanner &, FName, bool, Choice &);
 	bool ParseItemCheckBlock(Scanner &, FName, bool, ItemCheck &);
-};
-
-struct ConversationModule::ItemCheck
-{
-	unsigned int Item;
-	unsigned int Amount;
-};
-
-struct ConversationModule::Choice
-{
-	TArray<ItemCheck> Cost;
-	FString Text;
-	FString YesMessage, NoMessage;
-	FString Log;
-	union
-	{
-		unsigned int NextPageIndex;
-		Page *NextPage;
-	};
-	unsigned int GiveItem;
-	unsigned int Special;
-	unsigned int Arg[5];
-	bool CloseDialog;
-	bool DisplayCost;
-};
-
-struct ConversationModule::Page
-{
-	TArray<Choice> Choices;
-	TArray<ItemCheck> IfItem;
-	FString Name;
-	FString Panel;
-	FString Voice;
-	FString Dialog;
-	FString Hint;
-	union
-	{
-		unsigned int LinkIndex; // Valid while parsing
-		Page *Link;
-	};
-	unsigned int Drop;
-};
-
-struct ConversationModule::Conversation
-{
-	TArray<Page> Pages;
-	unsigned int Actor;
-	bool RandomStart;
-	bool Preserve;
-
-	const Page *Start() const
-	{
-		if(RandomStart)
-			return &Pages[pr_conversation(Pages.Size())];
-		return &Pages[0];
-	}
 };
 
 // ----------------------------------------------------------------------------
@@ -425,17 +431,6 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 
 // ----------------------------------------------------------------------------
 
-#include "wl_game.h"
-#include "wl_menu.h"
-#include "id_us.h"
-#include "id_vh.h"
-#include "language.h"
-#include "v_video.h"
-#include "g_mapinfo.h"
-#include "id_ca.h"
-#include "wl_agent.h"
-#include "v_text.h"
-
 namespace Dialog {
 
 static TMap<unsigned int, const ConversationModule::Page *> ConversationPosition;
@@ -494,6 +489,18 @@ const ConversationModule::Page **FindConversation(unsigned int id)
 
 	// No conversation found.
 	return NULL;
+}
+
+static void GiveConversationItem(AActor *recipient, unsigned int id)
+{
+	const ClassDef *cls = ClassDef::FindConversationClass(id);
+	if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
+		return;
+
+	AInventory *inv = (AInventory *)AActor::Spawn(cls, 0, 0, 0, SPAWN_AllowReplacement);
+	inv->RemoveFromWorld();
+	if(!inv->CallTryPickup(recipient))
+		inv->Destroy();
 }
 
 void ShowQuiz(unsigned int id)
@@ -587,6 +594,7 @@ void ShowQuiz(unsigned int id)
 			FString response = choice.YesMessage;
 			if(response[0] == '$')
 				response = language[response.Mid(1)];
+			GiveConversationItem(players[0].mo, choice.GiveItem);
 
 			quiz.drawBackground();
 
