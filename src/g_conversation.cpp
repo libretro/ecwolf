@@ -43,6 +43,7 @@
 #include "w_wad.h"
 
 #include "a_inventory.h"
+#include "farchive.h"
 #include "g_mapinfo.h"
 #include "id_ca.h"
 #include "id_us.h"
@@ -57,64 +58,66 @@
 
 static FRandom pr_conversation("Conversation");
 
+namespace Dialog {
+	
+struct Page;
+struct ItemCheck
+{
+	unsigned int Item;
+	unsigned int Amount;
+};
+struct Choice
+{
+	TArray<ItemCheck> Cost;
+	FString Text;
+	FString YesMessage, NoMessage;
+	FString Log;
+	FString SelectSound;
+	union
+	{
+		unsigned int NextPageIndex;
+		Page *NextPage;
+	};
+	unsigned int GiveItem;
+	unsigned int Special;
+	unsigned int Arg[5];
+	bool CloseDialog;
+	bool DisplayCost;
+};
+struct Page
+{
+	TArray<Choice> Choices;
+	TArray<ItemCheck> IfItem;
+	FString Name;
+	FString Panel;
+	FString Voice;
+	FString Dialog;
+	FString Hint;
+	union
+	{
+		unsigned int LinkIndex; // Valid while parsing
+		Page *Link;
+	};
+	unsigned int Drop;
+};
+struct Conversation
+{
+	TArray<Page> Pages;
+	unsigned int Actor;
+	bool RandomStart;
+	bool Preserve;
+
+	const Page *Start() const
+	{
+		if(RandomStart)
+			return &Pages[pr_conversation(Pages.Size())];
+		return &Pages[0];
+	}
+};
+
 class ConversationModule
 {
 public:
-	struct Page;
-	struct ItemCheck
-	{
-		unsigned int Item;
-		unsigned int Amount;
-	};
-	struct Choice
-	{
-		TArray<ItemCheck> Cost;
-		FString Text;
-		FString YesMessage, NoMessage;
-		FString Log;
-		FString SelectSound;
-		union
-		{
-			unsigned int NextPageIndex;
-			Page *NextPage;
-		};
-		unsigned int GiveItem;
-		unsigned int Special;
-		unsigned int Arg[5];
-		bool CloseDialog;
-		bool DisplayCost;
-	};
-	struct Page
-	{
-		TArray<Choice> Choices;
-		TArray<ItemCheck> IfItem;
-		FString Name;
-		FString Panel;
-		FString Voice;
-		FString Dialog;
-		FString Hint;
-		union
-		{
-			unsigned int LinkIndex; // Valid while parsing
-			Page *Link;
-		};
-		unsigned int Drop;
-	};
-	struct Conversation
-	{
-		TArray<Page> Pages;
-		unsigned int Actor;
-		bool RandomStart;
-		bool Preserve;
-
-		const Page *Start() const
-		{
-			if(RandomStart)
-				return &Pages[pr_conversation(Pages.Size())];
-			return &Pages[0];
-		}
-	};
-
 	enum ConvNamespace
 	{
 		NS_Strife,
@@ -142,7 +145,7 @@ private:
 
 // ----------------------------------------------------------------------------
 
-const ConversationModule::Conversation *ConversationModule::Find(unsigned int id) const
+const Conversation *ConversationModule::Find(unsigned int id) const
 {
 	return Conversations.CheckKey(id);
 }
@@ -436,9 +439,7 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 
 // ----------------------------------------------------------------------------
 
-namespace Dialog {
-
-static TMap<unsigned int, const ConversationModule::Page *> ConversationPosition;
+static TMap<unsigned int, const Page *> PreservedConversations;
 static TArray<ConversationModule> LoadedModules;
 static unsigned int MapModuleStart = 0;
 
@@ -450,6 +451,12 @@ static bool CheckModuleLoaded(int lump)
 			return true;
 	}
 	return false;
+}
+
+// Prepare for a new game.
+void ClearConversations()
+{
+	PreservedConversations.Clear();
 }
 
 void LoadGlobalModule(const char* moduleName)
@@ -465,28 +472,40 @@ void LoadGlobalModule(const char* moduleName)
 	MapModuleStart = LoadedModules.Size();
 }
 
+// TODO: Actually implement this. We should load any DIALOGUE lump in a UWMF
+// or DIALOGXY in binary. Since we have added support for global conversations
+// that are preserved across maps, we need to have some way of identifying
+// if the same conversation page is available in the new map.
 void LoadMapModules()
 {
 	// Unload any old modules
 	LoadedModules.Delete(MapModuleStart, LoadedModules.Size()-MapModuleStart);
 
 	// Reset conversations
-	ConversationPosition.Clear();
+	PreservedConversations.Clear();
 }
 
-const ConversationModule::Page **FindConversation(unsigned int id)
+const Page **FindConversation(AActor *npc)
 {
-	// See if we have an active conversation going
-	const ConversationModule::Page **page = ConversationPosition.CheckKey(id);
+	if(npc->conversation)
+		return &npc->conversation;
+
+	const unsigned int id = npc->GetClass()->Meta.GetMetaInt(AMETA_ConversationID);
+
+	// See if we have an active preserved conversation going
+	const Page **page = PreservedConversations.CheckKey(id);
 	if(page)
 		return page;
 
 	// If not, open a conversation
 	for(unsigned int i = LoadedModules.Size();i-- > 0;)
 	{
-		if(const ConversationModule::Conversation *conv = LoadedModules[i].Find(id))
+		if(const Conversation *conv = LoadedModules[i].Find(id))
 		{
-			page = &ConversationPosition[id];
+			if(conv->Preserve)
+				page = &PreservedConversations[id];
+			else
+				page = &npc->conversation;
 			*page = conv->Start();
 			return page;
 		}
@@ -508,14 +527,14 @@ static void GiveConversationItem(AActor *recipient, unsigned int id)
 		inv->Destroy();
 }
 
-void ShowQuiz(unsigned int id)
+void StartConversation(AActor *npc)
 {
 	class QuizMenu : public Menu
 	{
 	public:
 		QuizMenu() : Menu(30, 96, 290, 24) {}
 
-		void loadQuestion(const ConversationModule::Page *page)
+		void loadQuestion(const Page *page)
 		{
 			setHeadText(page->Name);
 
@@ -590,7 +609,7 @@ void ShowQuiz(unsigned int id)
 		FString hint;
 	};
 
-	const ConversationModule::Page **page = FindConversation(1);
+	const Page **page = FindConversation(npc);
 	if(!page)
 		return;
 
@@ -602,7 +621,7 @@ void ShowQuiz(unsigned int id)
 		int answer = quiz.handle();
 		if(answer >= 0)
 		{
-			const ConversationModule::Choice &choice = (*page)->Choices[answer];
+			const Choice &choice = (*page)->Choices[answer];
 			FString response = choice.YesMessage;
 			if(response[0] == '$')
 				response = language[response.Mid(1)];

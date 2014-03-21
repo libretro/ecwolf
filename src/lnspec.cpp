@@ -749,7 +749,7 @@ FUNC(StartConversation)
 		A_Face(activator, talker);
 	}
 
-	Dialog::ShowQuiz(activator->GetClass()->Meta.GetMetaInt(AMETA_ConversationID));
+	Dialog::StartConversation(talker);
 
 	return 1;
 }

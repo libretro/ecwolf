@@ -35,11 +35,15 @@
 #ifndef __G_CONVERSATION_H__
 #define __G_CONVERSATION_H__
 
+class AActor;
+
 namespace Dialog {
 
-extern void LoadMapModules();
+extern void ClearConversations();
+// Not yet implemented
+//extern void LoadMapModules();
 extern void LoadGlobalModule(const char* module);
-extern void ShowQuiz(unsigned int id);
+extern void StartConversation(AActor *npc);
 
 }
 

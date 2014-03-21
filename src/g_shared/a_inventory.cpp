@@ -430,7 +430,7 @@ public:
 	{
 		if(Super::TryPickup(toucher))
 		{
-			Dialog::ShowQuiz(GetClass()->Meta.GetMetaInt(AMETA_ConversationID));
+			Dialog::StartConversation(this);
 			return true;
 		}
 		return false;

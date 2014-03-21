@@ -31,7 +31,6 @@
 #include "r_sprites.h"
 #include "wl_shade.h"
 #include "filesys.h"
-#include "g_conversation.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -189,11 +188,7 @@ int DebugKeys (void)
 	int level;
 	char str[80];
 
-	if (Keyboard[sc_A])
-	{
-		Dialog::ShowQuiz(1);
-	}
-	else if (Keyboard[sc_B])             // B = border color
+	if (Keyboard[sc_B])             // B = border color
 	{
 		US_CenterWindow(22,3);
 		PrintY+=6;

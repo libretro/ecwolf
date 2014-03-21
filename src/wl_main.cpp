@@ -155,6 +155,8 @@ void NewGame (int difficulty, const FString &map, bool displayBriefing, const Cl
 
 	players[0].state = player_t::PST_ENTER;
 
+	Dialog::ClearConversations();
+
 	startgame = true;
 }
 

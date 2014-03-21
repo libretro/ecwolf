@@ -72,6 +72,7 @@ enum
 class player_t;
 class ClassDef;
 class AInventory;
+namespace Dialog { class Page; }
 class AActor : public Thinker,
 	public EmbeddedList<AActor>::Node
 {
@@ -185,6 +186,8 @@ class AActor : public Thinker,
 		player_t	*player;	// Only valid with APlayerPawn
 
 		TObjPtr<AInventory>	inventory;
+
+		const Dialog::Page *conversation;
 
 		static EmbeddedList<AActor>::List actors;
 		typedef EmbeddedList<AActor>::Iterator Iterator;
