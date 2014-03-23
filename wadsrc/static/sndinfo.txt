@@ -222,6 +222,8 @@ treasure/spear2/pickup	{ DSSPEAR2 ALSPEAR PCSPEAR }
 $ifnoah
 // Kill hitwall sound in Noah's Ark
 world/hitwall NULL
+
+misc/100percent			{ NULL ALENDBN2 PCENDBN2 }
 $endif
 
 world/pushwall_ark		{ DSARKPSH ALARKPSH PCARKPSHW }
@@ -283,5 +285,5 @@ burt/active				{ DSBRTSTP ALBRTSTP PCBRTSTP }
 burt/attack				{ DSSPIT ALSPIT PCSPIT }
 burt/death				{ DSSLEEP ALSLEEP PCSLEEP }
 
-quiz/correct			{ NULL ALENDBN1 PCENDBN1 }
+quiz/correct			{ NULL ALENDBN2 PCENDBN2 }
 quiz/incorrect			{ NULL ALNOBNS PCNOBNS }

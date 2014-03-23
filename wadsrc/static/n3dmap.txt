@@ -227,7 +227,7 @@ sounds
 	"PCGNYSIT",
 	"PCGOTSIT",
 	"PCSLING",
-	"PCENDBN2",
+	"PCENDBN1",
 	"PCKRYSIT",
 	"PCGETKEY",
 	"PCFEED",
@@ -252,7 +252,7 @@ sounds
 	"PCHITWAL", // Only called from EnterCtrlData, not ClipMove
 	"PCSELECT",
 	"PCSHTDOR", // Called from EnterCtrlData as in Wolf3D
-	"ALENDBN1", // Also Quiz correct
+	"ALENDBN2", // Also Quiz correct
 	"PCBELL", // Three rings of a bell (Unused)
 	"PCPOWER", // Generic powerup noise (Unused)
 
@@ -272,7 +272,7 @@ sounds
 	"ALGNYSIT",
 	"ALGOTSIT",
 	"ALSLING",
-	"ALENDBN2",
+	"ALENDBN1",
 	"ALKRYSIT",
 	"ALGETKEY",
 	"ALFEED",
@@ -297,7 +297,7 @@ sounds
 	"ALHITWAL",
 	"ALSELECT",
 	"ALSHTDOR",
-	"ALENDBN1",
+	"ALENDBN2",
 	"ALBELL",
 	"ALPOWER"
 }
@@ -320,7 +320,7 @@ digitalsounds(timervalue = 166)
 	"DSGNYSIT",
 	"DSGOTSIT",
 	"DSSLING",
-	"DSENDBN2",
+	"DSENDBN1",
 	"DSKRYSIT",
 	"DSGETKEY", // Also Map pickup
 	"DSFEED",

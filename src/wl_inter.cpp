@@ -19,7 +19,7 @@ LRstruct LevelRatios;
 static int32_t lastBreathTime = 0;
 
 static void Erase (int x, int y, const char *string, bool rightAlign=false);
-static void Write (int x, int y, const char *string, bool rightAlign=false);
+static void Write (int x, int y, const char *string, bool rightAlign=false, bool bonusfont=false);
 
 //==========================================================================
 
@@ -137,11 +137,10 @@ static void Erase (int x, int y, const char *string, bool rightAlign)
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), nx, ny, nx+fw, ny+fh);
 }
 
-static void Write (int x, int y, const char *string, bool rightAlign)
+static void Write (int x, int y, const char *string, bool rightAlign, bool bonusfont)
 {
-	static FRemapTable *remap = NULL;
-	if(!remap)
-		remap = IntermissionFont->GetColorTranslation(CR_UNTRANSLATED);
+	FFont *font = bonusfont ? V_GetFont("BonusFont") : IntermissionFont;
+	FRemapTable *remap = font->GetColorTranslation(CR_UNTRANSLATED);
 
 	int nx = x*8;
 	int ny = y*8;
@@ -149,7 +148,7 @@ static void Write (int x, int y, const char *string, bool rightAlign)
 	if(rightAlign)
 	{
 		word width, height;
-		VW_MeasurePropString(IntermissionFont, string, width, height);
+		VW_MeasurePropString(font, string, width, height);
 		nx -= width;
 	}
 
@@ -158,7 +157,7 @@ static void Write (int x, int y, const char *string, bool rightAlign)
 	{
 		if(*string != '\n')
 		{
-			FTexture *glyph = IntermissionFont->GetChar(*string, &width);
+			FTexture *glyph = font->GetChar(*string, &width);
 			if(glyph)
 				VWB_DrawGraphic(glyph, nx, ny, MENU_NONE, remap);
 			nx += width;
@@ -166,12 +165,22 @@ static void Write (int x, int y, const char *string, bool rightAlign)
 		else
 		{
 			nx = x*8;
-			ny += IntermissionFont->GetHeight();
+			ny += font->GetHeight();
 		}
 		++string;
 	}
 }
 
+
+static const unsigned int VBLWAIT = 30;
+static const unsigned int PAR_AMOUNT = 500;
+static const unsigned int PERCENT100AMT = 10000;
+static struct IntermissionState
+{
+	uint32_t bonus;
+	bool acked;
+	bool graphical;
+} InterState;
 
 //
 // Breathe Mr. BJ!!!
@@ -180,10 +189,11 @@ void BJ_Breathe (bool drawOnly=false)
 {
 	static int which = 0, max = 10;
 	static FTexture* const pics[2] = { TexMan("L_GUY1"), TexMan("L_GUY2") };
+	unsigned int height = InterState.graphical ? 8 : 16;
 
 	if(drawOnly)
 	{
-		VWB_DrawGraphic(pics[which], 0, 16);
+		VWB_DrawGraphic(pics[which], 0, height);
 		return;
 	}
 
@@ -192,14 +202,126 @@ void BJ_Breathe (bool drawOnly=false)
 	if ((int32_t) GetTimeCount () - lastBreathTime > max)
 	{
 		which ^= 1;
-		VWB_DrawGraphic(pics[which], 0, 16);
+		VWB_DrawGraphic(pics[which], 0, height);
 		VW_UpdateScreen ();
 		lastBreathTime = GetTimeCount();
 		max = 35;
 	}
 }
 
+static void InterWriteCounter(int start, int end, int step, unsigned int x, unsigned int y, const char* sound, unsigned int sndfreq, bool bonusfont=false)
+{
+	const unsigned int tx = x>>3, ty = y>>3;
 
+	if(InterState.acked)
+	{
+		FString tempstr;
+		tempstr.Format("%d", end);
+		Write(tx, ty, tempstr, true, bonusfont);
+		return;
+	}
+
+	bool cont = true;
+	unsigned int i = 0;
+	FString tempstr("0");
+	do
+	{
+		if(start > end)
+		{
+			start = end;
+			cont = false;
+		}
+
+		if(start) Erase (tx, ty, tempstr, true);
+		tempstr.Format("%d", start);
+		Write (tx, ty, tempstr, true, bonusfont);
+		if (sndfreq == 0)
+		{
+			if(cont)
+				SD_PlaySound(sound);
+		}
+		else if(!((i++) % sndfreq))
+			SD_PlaySound (sound);
+		if(!usedoublebuffering || !(start & 1)) VW_UpdateScreen ();
+		do
+		{
+			BJ_Breathe ();
+		}
+		while (sndfreq && SD_SoundPlaying ());
+
+		if (IN_CheckAck ())
+		{
+			InterState.acked = true;
+			if(start != end)
+			{
+				start = end;
+				continue;
+			}
+		}
+
+		start += step;
+	}
+	while(cont);
+}
+
+static void InterAddBonus(unsigned int bonus, bool count=false)
+{
+	const unsigned int y = InterState.graphical ? 72 : 56;
+	if(count)
+	{
+		InterState.bonus += bonus;
+		InterWriteCounter(0, bonus, PAR_AMOUNT, 288, y, "misc/end_bonus1", PAR_AMOUNT/10, InterState.graphical);
+		return;
+	}
+
+	FString bonusstr;
+	bonusstr.Format("%u", InterState.bonus);
+	Erase (36, y>>3, bonusstr, true);
+	InterState.bonus += bonus;
+	bonusstr.Format("%u", InterState.bonus);
+	Write (36, y>>3, bonusstr, true, InterState.graphical);
+	VW_UpdateScreen ();
+}
+
+/**
+ * Displays a percentage ratio, counting up to the ratio.
+ * Returns true if the intermission has been acked and should be skipped.
+ */
+static void InterCountRatio(int ratio, unsigned int x, unsigned int y)
+{
+	if (InterState.graphical)
+		InterWriteCounter(1, ratio, 1, x, y, "misc/end_bonus1", 0);
+	else
+		InterWriteCounter(0, ratio, 1, x, y, "misc/end_bonus1", 10);
+	if (ratio >= 100)
+	{
+		if(!InterState.acked)
+			VW_WaitVBL (VBLWAIT);
+		SD_StopSound ();
+		InterAddBonus(PERCENT100AMT);
+		if(InterState.acked)
+			return;
+		SD_PlaySound ("misc/100percent");
+	}
+	else if (!ratio)
+	{
+		if(InterState.acked)
+			return;
+		VW_WaitVBL (VBLWAIT);
+		SD_StopSound ();
+		SD_PlaySound ("misc/no_bonus");
+	}
+	else
+	{
+		if(InterState.acked)
+			return;
+		SD_PlaySound ("misc/end_bonus2");
+	}
+
+	VW_UpdateScreen ();
+	while (SD_SoundPlaying ())
+		BJ_Breathe ();
+}
 
 /*
 ==================
@@ -216,14 +338,48 @@ void BJ_Breathe (bool drawOnly=false)
 
 void LevelCompleted (void)
 {
-	static const unsigned int VBLWAIT = 30;
-	static const unsigned int PAR_AMOUNT = 500;
-	static const unsigned int PERCENT100AMT = 10000;
-
 	int i, min, sec, ratio, kr, sr, tr;
 	char bonusstr[10];
 	char tempstr[10];
-	int32_t bonus, timeleft = 0;
+	int32_t timeleft = 0;
+
+	InterState.bonus = 0;
+	InterState.acked = false;
+
+	enum
+	{
+		WI_LEVEL,
+		WI_FLOOR,
+		WI_FINISH,
+		WI_BONUS,
+		WI_TIME,
+		WI_PAR,
+		WI_KILLS,
+		WI_TREASR,
+		WI_SECRTS,
+		WI_PERFCT,
+
+		NUM_WI
+	};
+	static const char* const GraphicalTexNames[NUM_WI] = {
+		"WILEVEL", "WIFLOOR", "WIFINISH", "WIBONUS", "WITIME", "WIPAR",
+		"WIKILLS", "WITREASR", "WISECRTS", "WIPERFCT"
+	};
+	static FTextureID GraphicalTexID[NUM_WI];
+	static bool modeUndetermined = true;
+	if(modeUndetermined)
+	{
+		modeUndetermined = false;
+		InterState.graphical = true;
+		for(unsigned int i = 0;i < NUM_WI;++i)
+		{
+			if(!(GraphicalTexID[i] = TexMan.CheckForTexture(GraphicalTexNames[i], FTexture::TEX_Any)).isValid())
+			{
+				InterState.graphical = false;
+				break;
+			}
+		}
+	}
 
 	ClearSplitVWB ();           // set up for double buffering in split screen
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
@@ -239,35 +395,66 @@ void LevelCompleted (void)
 
 	BJ_Breathe(true);
 
-	FString completedString;
-	if(!levelInfo->CompletionString.IsEmpty())
+	if(!InterState.graphical)
 	{
-		if(levelInfo->CompletionString[0] == '$')
-			completedString = language[levelInfo->CompletionString.Mid(1)];
+		FString completedString;
+		if(!levelInfo->CompletionString.IsEmpty())
+		{
+			if(levelInfo->CompletionString[0] == '$')
+				completedString = language[levelInfo->CompletionString.Mid(1)];
+			else
+				completedString = levelInfo->CompletionString;
+		}
 		else
-			completedString = levelInfo->CompletionString;
+			completedString = language["STR_FLOORCOMPLETED"];
+		completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
+		Write (14, 2, completedString);
 	}
 	else
-		completedString = language["STR_FLOORCOMPLETED"];
-	completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
-	Write (14, 2, completedString);
+	{
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_LEVEL]), 104, 8);
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FLOOR]), 104, 24);
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FINISH]), 104, 40);
+		{
+			int dash = levelInfo->FloorNumber.IndexOf('-');
+			if(dash != -1)
+			{
+				Write(23, 1, levelInfo->FloorNumber.Left(dash), false);
+				Write(23, 3, levelInfo->FloorNumber.Mid(dash+1), false);
+			}
+		}
+
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_BONUS]), 104, 72);
+		Write (36, 9, "0", true, true);
+	}
 
 	if(levelInfo->LevelBonus == -1)
 	{
-		Write (24, 7, language["STR_BONUS"], true);
-		Write (24, 10, language["STR_TIME"], true);
-		Write (24, 12, language["STR_PAR"], true);
+		if(!InterState.graphical)
+		{
+			Write (24, 7, language["STR_BONUS"], true);
+			Write (24, 10, language["STR_TIME"], true);
+			Write (24, 12, language["STR_PAR"], true);
 
-		Write (37, 14, "%");
-		Write (37, 16, "%");
-		Write (37, 18, "%");
-		Write (29, 14, language["STR_RAT2KILL"], true);
-		Write (29, 16, language["STR_RAT2SECRET"], true);
-		Write (29, 18, language["STR_RAT2TREASURE"], true);
+			Write (37, 14, "%");
+			Write (37, 16, "%");
+			Write (37, 18, "%");
+			Write (29, 14, language["STR_RAT2KILL"], true);
+			Write (29, 16, language["STR_RAT2SECRET"], true);
+			Write (29, 18, language["STR_RAT2TREASURE"], true);
+		}
+		else
+		{
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_TIME]), 88, 128);
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PAR]), 96, 112);
+		}
 
 		FString timeString;
 		timeString.Format("%02d:%02d", levelInfo->Par/60, levelInfo->Par%60);
-		Write (26, 12, timeString);
+		if(!InterState.graphical)
+			Write (26, 12, timeString);
+		else
+			Write (19, 14, timeString);
 
 		//
 		// PRINT TIME
@@ -283,7 +470,10 @@ void LevelCompleted (void)
 		min = sec / 60;
 		sec %= 60;
 		timeString.Format("%02d:%02d", min, sec);
-		Write(26, 10, timeString);
+		if(!InterState.graphical)
+			Write(26, 10, timeString);
+		else
+			Write(19, 16, timeString);
 
 		VW_UpdateScreen ();
 		VW_FadeIn ();
@@ -304,178 +494,69 @@ void LevelCompleted (void)
 		//
 		// PRINT TIME BONUS
 		//
-		bonus = timeleft * PAR_AMOUNT;
-		if (bonus)
+		if(timeleft)
+			InterAddBonus(timeleft * PAR_AMOUNT, true);
+		if (InterState.bonus)
 		{
-			for (i = 0; i <= timeleft; i++)
+			VW_UpdateScreen ();
+
+			SD_PlaySound ("misc/end_bonus2");
+			while (SD_SoundPlaying ())
+				BJ_Breathe ();
+		}
+
+		if(InterState.graphical)
+		{
+			InterState.acked = false; // Clear for second stage
+			IN_StartAck ();
+			while (!IN_CheckAck ())
+				BJ_Breathe ();
+			IN_ClearKeysDown();
+
 			{
-				if(i) Erase (36, 7, bonusstr, true);
-				ltoa ((int32_t) i * PAR_AMOUNT, bonusstr, 10);
-				Write (36, 7, bonusstr, true);
-				if (!(i % (PAR_AMOUNT / 10)))
-					SD_PlaySound ("misc/end_bonus1");
-				if(!usedoublebuffering || !(i % (PAR_AMOUNT / 50))) VW_UpdateScreen ();
-				while(SD_SoundPlaying ())
-					BJ_Breathe ();
-				if (IN_CheckAck ())
-					goto done;
+				double clearx = 88;
+				double cleary = 112;
+				double clearw = 144;
+				double clearh = 32;
+				screen->VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
+				VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), clearx, cleary, clearx+clearw, cleary+clearh);
 			}
-
-			VW_UpdateScreen ();
-
-			SD_PlaySound ("misc/end_bonus2");
-			while (SD_SoundPlaying ())
-				BJ_Breathe ();
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_KILLS]), 80, 104);
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_TREASR]), 104, 120);
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_SECRTS]), 72, 136);
+			Write (27, 13, "0%");
+			Write (27, 15, "0%");
+			Write (27, 17, "0%");
 		}
 
-		static const unsigned int RATIOXX = 37;
-		//
-		// KILL RATIO
-		//
-		ratio = kr;
-		for (i = 0; i <= ratio; i++)
+		if(InterState.graphical)
 		{
-			if(i) Erase (RATIOXX, 14, tempstr, true);
-			itoa (i, tempstr, 10);
-			Write (RATIOXX, 14, tempstr, true);
-			if (!(i % 10))
-				SD_PlaySound ("misc/end_bonus1");
-			if(!usedoublebuffering || !(i & 1)) VW_UpdateScreen ();
-			while (SD_SoundPlaying ())
-				BJ_Breathe ();
-
-			if (IN_CheckAck ())
-				goto done;
-		}
-		if (ratio >= 100)
-		{
-			VW_WaitVBL (VBLWAIT);
-			SD_StopSound ();
-			bonus += PERCENT100AMT;
-			Erase (36, 7, bonusstr, true);
-			ltoa (bonus, bonusstr, 10);
-			Write (36, 7, bonusstr, true);
-			VW_UpdateScreen ();
-			SD_PlaySound ("misc/100percent");
-		}
-		else if (!ratio)
-		{
-			VW_WaitVBL (VBLWAIT);
-			SD_StopSound ();
-			SD_PlaySound ("misc/no_bonus");
+			InterCountRatio(kr, 232, 104);
+			InterCountRatio(tr, 232, 104+16);
+			InterCountRatio(sr, 232, 104+32);
 		}
 		else
-			SD_PlaySound ("misc/end_bonus2");
-
-		VW_UpdateScreen ();
-		while (SD_SoundPlaying ())
-			BJ_Breathe ();
-
-		//
-		// SECRET RATIO
-		//
-		ratio = sr;
-		for (i = 0; i <= ratio; i++)
 		{
-			if(i) Erase (RATIOXX, 16, tempstr, true);
-			itoa (i, tempstr, 10);
-			Write (RATIOXX, 16, tempstr, true);
-			if (!(i % 10))
-				SD_PlaySound ("misc/end_bonus1");
-			if(!usedoublebuffering || !(i & 1)) VW_UpdateScreen ();
-			while (SD_SoundPlaying ())
-				BJ_Breathe ();
-
-			if (IN_CheckAck ())
-				goto done;
+			InterCountRatio(kr, 296, 112);
+			InterCountRatio(sr, 296, 112+16);
+			InterCountRatio(tr, 296, 112+32);
 		}
-		if (ratio >= 100)
+
+		GivePoints (InterState.bonus);
+
+		if(InterState.graphical && kr == 100 && sr == 100 && tr == 100)
 		{
-			VW_WaitVBL (VBLWAIT);
-			SD_StopSound ();
-			bonus += PERCENT100AMT;
-			Erase (36, 7, bonusstr, true);
-			ltoa (bonus, bonusstr, 10);
-			Write (36, 7, bonusstr, true);
-			VW_UpdateScreen ();
+			{
+				double clearx = 72;
+				double cleary = 104;
+				double clearw = 176;
+				double clearh = 48;
+				screen->VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
+				VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), clearx, cleary, clearx+clearw, cleary+clearh);
+			}
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PERFCT]), 96, 120);
 			SD_PlaySound ("misc/100percent");
 		}
-		else if (!ratio)
-		{
-			VW_WaitVBL (VBLWAIT);
-			SD_StopSound ();
-			SD_PlaySound ("misc/no_bonus");
-		}
-		else
-			SD_PlaySound ("misc/end_bonus2");
-		VW_UpdateScreen ();
-		while (SD_SoundPlaying ())
-			BJ_Breathe ();
-
-		//
-		// TREASURE RATIO
-		//
-		ratio = tr;
-		for (i = 0; i <= ratio; i++)
-		{
-			if(i) Erase (RATIOXX, 18, tempstr, true);
-			itoa (i, tempstr, 10);
-			Write (RATIOXX, 18, tempstr, true);
-			if (!(i % 10))
-				SD_PlaySound ("misc/end_bonus1");
-			if(!usedoublebuffering || !(i & 1)) VW_UpdateScreen ();
-			while (SD_SoundPlaying ())
-				BJ_Breathe ();
-			if (IN_CheckAck ())
-				goto done;
-		}
-		if (ratio >= 100)
-		{
-			VW_WaitVBL (VBLWAIT);
-			SD_StopSound ();
-			bonus += PERCENT100AMT;
-			Erase (36, 7, bonusstr, true);
-			ltoa (bonus, tempstr, 10);
-			Write (36, 7, tempstr, true);
-			VW_UpdateScreen ();
-			SD_PlaySound ("misc/100percent");
-		}
-		else if (!ratio)
-		{
-			VW_WaitVBL (VBLWAIT);
-			SD_StopSound ();
-			SD_PlaySound ("misc/no_bonus");
-		}
-		else
-			SD_PlaySound ("misc/end_bonus2");
-		VW_UpdateScreen ();
-		while (SD_SoundPlaying ())
-			BJ_Breathe ();
-
-
-		//
-		// JUMP STRAIGHT HERE IF KEY PRESSED
-		//
-done:   itoa (kr, tempstr, 10);
-		Erase (RATIOXX, 14, tempstr, true);
-		Write (RATIOXX, 14, tempstr, true);
-
-		itoa (sr, tempstr, 10);
-		Erase (RATIOXX, 16, tempstr, true);
-		Write (RATIOXX, 16, tempstr, true);
-
-		itoa (tr, tempstr, 10);
-		Erase (RATIOXX, 18, tempstr, true);
-		Write (RATIOXX, 18, tempstr, true);
-
-		bonus = (int32_t) timeleft *PAR_AMOUNT +
-			(PERCENT100AMT * (kr >= 100)) +
-			(PERCENT100AMT * (sr >= 100)) + (PERCENT100AMT * (tr >= 100));
-
-		GivePoints (bonus);
-		Erase (36, 7, bonusstr, true);
-		ltoa (bonus, bonusstr, 10);
-		Write (36, 7, bonusstr, true);
 
 		//
 		// SAVE RATIO INFORMATION FOR ENDGAME
