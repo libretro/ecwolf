@@ -177,6 +177,8 @@ static const unsigned int PAR_AMOUNT = 500;
 static const unsigned int PERCENT100AMT = 10000;
 static struct IntermissionState
 {
+	unsigned int kr, sr, tr;
+	int timeleft;
 	uint32_t bonus;
 	bool acked;
 	bool graphical;
@@ -264,6 +266,16 @@ static void InterWriteCounter(int start, int end, int step, unsigned int x, unsi
 	while(cont);
 }
 
+static void InterWriteTime(unsigned int time, unsigned int x, unsigned int y)
+{
+	FString timestamp;
+	timestamp.Format("%02d:%02d",
+		clamp<unsigned int>(time/60, 0, 99),
+		time % 60);
+
+	Write(x>>3, y>>3, timestamp, false);
+}
+
 static void InterAddBonus(unsigned int bonus, bool count=false)
 {
 	const unsigned int y = InterState.graphical ? 72 : 56;
@@ -323,6 +335,15 @@ static void InterCountRatio(int ratio, unsigned int x, unsigned int y)
 		BJ_Breathe ();
 }
 
+static void InterWaitForAck()
+{
+	InterState.acked = false;
+	IN_StartAck ();
+	while (!IN_CheckAck ())
+		BJ_Breathe ();
+	IN_ClearKeysDown();
+}
+
 /*
 ==================
 =
@@ -338,14 +359,6 @@ static void InterCountRatio(int ratio, unsigned int x, unsigned int y)
 
 void LevelCompleted (void)
 {
-	int i, min, sec, ratio, kr, sr, tr;
-	char bonusstr[10];
-	char tempstr[10];
-	int32_t timeleft = 0;
-
-	InterState.bonus = 0;
-	InterState.acked = false;
-
 	enum
 	{
 		WI_LEVEL,
@@ -381,15 +394,45 @@ void LevelCompleted (void)
 		}
 	}
 
+	InterState.bonus = 0;
+	InterState.acked = false;
+
+	//
+	// FIGURE RATIOS OUT BEFOREHAND
+	//
+	InterState.kr = InterState.sr = InterState.tr = 100;
+	if (gamestate.killtotal)
+		InterState.kr = (gamestate.killcount * 100) / gamestate.killtotal;
+	if (gamestate.secrettotal)
+		InterState.sr = (gamestate.secretcount * 100) / gamestate.secrettotal;
+	if (gamestate.treasuretotal)
+		InterState.tr = (gamestate.treasurecount * 100) / gamestate.treasuretotal;
+
+	InterState.timeleft = 0;
+	if ((unsigned)gamestate.TimeCount < levelInfo->Par * TICRATE)
+		InterState.timeleft = (int) (levelInfo->Par - gamestate.TimeCount/TICRATE);
+
+	if(levelInfo->LevelBonus == -1)
+	{
+		//
+		// SAVE RATIO INFORMATION FOR ENDGAME
+		//
+		LevelRatios.killratio += InterState.kr;
+		LevelRatios.secretsratio += InterState.sr;
+		LevelRatios.treasureratio += InterState.tr;
+		LevelRatios.time += gamestate.TimeCount/TICRATE;
+		++LevelRatios.numLevels;
+	}
+
+//
+// do the intermission
+//
 	ClearSplitVWB ();           // set up for double buffering in split screen
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
 	DrawPlayScreen(true);
 
 	StartCPMusic (gameinfo.IntermissionMusic);
 
-//
-// do the intermission
-//
 	IN_ClearKeysDown ();
 	IN_StartAck ();
 
@@ -449,53 +492,27 @@ void LevelCompleted (void)
 			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PAR]), 96, 112);
 		}
 
-		FString timeString;
-		timeString.Format("%02d:%02d", levelInfo->Par/60, levelInfo->Par%60);
 		if(!InterState.graphical)
-			Write (26, 12, timeString);
+			InterWriteTime(levelInfo->Par, 26*8, 12*8);
 		else
-			Write (19, 14, timeString);
+			InterWriteTime(levelInfo->Par, 19*8, 14*8);
 
 		//
 		// PRINT TIME
 		//
-		sec = gamestate.TimeCount / 70;
-
-		if (sec > 99 * 60)      // 99 minutes max
-			sec = 99 * 60;
-
-		if ((unsigned)gamestate.TimeCount < levelInfo->Par * 70)
-			timeleft = (int32_t) (levelInfo->Par - sec);
-
-		min = sec / 60;
-		sec %= 60;
-		timeString.Format("%02d:%02d", min, sec);
 		if(!InterState.graphical)
-			Write(26, 10, timeString);
+			InterWriteTime(gamestate.TimeCount/TICRATE, 26*8, 10*8);
 		else
-			Write(19, 16, timeString);
+			InterWriteTime(gamestate.TimeCount/TICRATE, 19*8, 16*8);
 
 		VW_UpdateScreen ();
 		VW_FadeIn ();
 
-
-		//
-		// FIGURE RATIOS OUT BEFOREHAND
-		//
-		kr = sr = tr = 100;
-		if (gamestate.killtotal)
-			kr = (gamestate.killcount * 100) / gamestate.killtotal;
-		if (gamestate.secrettotal)
-			sr = (gamestate.secretcount * 100) / gamestate.secrettotal;
-		if (gamestate.treasuretotal)
-			tr = (gamestate.treasurecount * 100) / gamestate.treasuretotal;
-
-
 		//
 		// PRINT TIME BONUS
 		//
-		if(timeleft)
-			InterAddBonus(timeleft * PAR_AMOUNT, true);
+		if(InterState.timeleft)
+			InterAddBonus(InterState.timeleft * PAR_AMOUNT, true);
 		if (InterState.bonus)
 		{
 			VW_UpdateScreen ();
@@ -505,21 +522,18 @@ void LevelCompleted (void)
 				BJ_Breathe ();
 		}
 
+		double cleary = 104;
 		if(InterState.graphical)
 		{
-			InterState.acked = false; // Clear for second stage
-			IN_StartAck ();
-			while (!IN_CheckAck ())
-				BJ_Breathe ();
-			IN_ClearKeysDown();
+			InterWaitForAck();
 
 			{
-				double clearx = 88;
-				double cleary = 112;
-				double clearw = 144;
-				double clearh = 32;
+				// Really all we care about here is finding the starting y
+				// since we need to over clear a bit in order to account for
+				// rounding errors and so we don't need to worry about fonts.
+				double clearx = 0, clearw = 0, clearh = 0;
 				screen->VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
-				VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), clearx, cleary, clearx+clearw, cleary+clearh);
+				VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., cleary, (double)screenWidth, (double)statusbary2);
 			}
 			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_KILLS]), 80, 104);
 			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_TREASR]), 104, 120);
@@ -531,41 +545,25 @@ void LevelCompleted (void)
 
 		if(InterState.graphical)
 		{
-			InterCountRatio(kr, 232, 104);
-			InterCountRatio(tr, 232, 104+16);
-			InterCountRatio(sr, 232, 104+32);
+			InterCountRatio(InterState.kr, 232, 104);
+			InterCountRatio(InterState.tr, 232, 104+16);
+			InterCountRatio(InterState.sr, 232, 104+32);
 		}
 		else
 		{
-			InterCountRatio(kr, 296, 112);
-			InterCountRatio(sr, 296, 112+16);
-			InterCountRatio(tr, 296, 112+32);
+			InterCountRatio(InterState.kr, 296, 112);
+			InterCountRatio(InterState.sr, 296, 112+16);
+			InterCountRatio(InterState.tr, 296, 112+32);
 		}
 
 		GivePoints (InterState.bonus);
 
-		if(InterState.graphical && kr == 100 && sr == 100 && tr == 100)
+		if(InterState.graphical && InterState.kr == 100 && InterState.sr == 100 && InterState.tr == 100)
 		{
-			{
-				double clearx = 72;
-				double cleary = 104;
-				double clearw = 176;
-				double clearh = 48;
-				screen->VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
-				VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), clearx, cleary, clearx+clearw, cleary+clearh);
-			}
+			VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., cleary, (double)screenWidth, (double)statusbary2);
 			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PERFCT]), 96, 120);
 			SD_PlaySound ("misc/100percent");
 		}
-
-		//
-		// SAVE RATIO INFORMATION FOR ENDGAME
-		//
-		LevelRatios.killratio += kr;
-		LevelRatios.secretsratio += sr;
-		LevelRatios.treasureratio += tr;
-		LevelRatios.time += min * 60 + sec;
-		++LevelRatios.numLevels;
 	}
 	else
 	{
@@ -583,10 +581,7 @@ void LevelCompleted (void)
 	StatusBar->DrawStatusBar();
 	VW_UpdateScreen ();
 
-	lastBreathTime = GetTimeCount();
-	IN_StartAck ();
-	while (!IN_CheckAck ())
-		BJ_Breathe ();
+	InterWaitForAck();
 }
 
 
