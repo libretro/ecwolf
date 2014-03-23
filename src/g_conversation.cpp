@@ -521,10 +521,7 @@ static void GiveConversationItem(AActor *recipient, unsigned int id)
 	if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 		return;
 
-	AInventory *inv = (AInventory *)AActor::Spawn(cls, 0, 0, 0, SPAWN_AllowReplacement);
-	inv->RemoveFromWorld();
-	if(!inv->CallTryPickup(recipient))
-		inv->Destroy();
+	recipient->GiveInventory(cls);
 }
 
 void StartConversation(AActor *npc)

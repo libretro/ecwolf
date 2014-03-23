@@ -173,6 +173,17 @@ void AActor::AddInventory(AInventory *item)
 	}
 }
 
+void AActor::ClearCounters()
+{
+	if(flags & FL_COUNTITEM)
+		--gamestate.treasuretotal;
+	if((flags & FL_COUNTKILL) && health > 0)
+		--gamestate.killtotal;
+	if(flags & FL_COUNTSECRET)
+		--gamestate.secrettotal;
+	flags &= ~(FL_COUNTITEM|FL_COUNTKILL|FL_COUNTSECRET);
+}
+
 void AActor::Destroy()
 {
 	Super::Destroy();
@@ -317,6 +328,28 @@ AActor::DropList *AActor::GetDropList() const
 const AActor *AActor::GetDefault() const
 {
 	return GetClass()->GetDefault();
+}
+
+bool AActor::GiveInventory(const ClassDef *cls, int amount, bool allowreplacement)
+{
+	AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, allowreplacement ? SPAWN_AllowReplacement : 0);
+
+	if(amount)
+	{
+		if(inv->IsKindOf(NATIVE_CLASS(Health)))
+			inv->amount *= amount;
+		else
+			inv->amount = amount;
+	}
+
+	inv->ClearCounters();
+	inv->RemoveFromWorld();
+	if(!inv->CallTryPickup(this))
+	{
+		inv->Destroy();
+		return false;
+	}
+	return true;
 }
 
 void AActor::Init()

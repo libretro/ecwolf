@@ -388,18 +388,7 @@ ACTION_FUNCTION(A_GiveInventory)
 
 	if(cls && cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 	{
-		AInventory *inv = (AInventory *)AActor::Spawn(cls, 0, 0, 0, SPAWN_AllowReplacement);
-		if(inv->IsKindOf(NATIVE_CLASS(Health)))
-			inv->amount *= amount;
-		else
-			inv->amount = amount;
-
-		inv->RemoveFromWorld();
-		if(!inv->CallTryPickup(self))
-		{
-			inv->Destroy();
-			return false;
-		}
+		return self->GiveInventory(cls, amount);
 	}
 	return true;
 }

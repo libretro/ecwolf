@@ -480,10 +480,7 @@ int DebugKeys (void)
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 					return 1;
 
-				AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, 0);
-				inv->RemoveFromWorld();
-				if(!inv->CallTryPickup(players[0].mo))
-					inv->Destroy();
+				players[0].mo->GiveInventory(cls, 0, false);
 			}
 		}
 		return 1;

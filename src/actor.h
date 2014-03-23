@@ -93,6 +93,7 @@ class AActor : public Thinker,
 
 		void			AddInventory(AInventory *item);
 		virtual void	BeginPlay() {}
+		void			ClearCounters();
 		virtual void	Destroy();
 		virtual void	Die();
 		void			EnterZone(const MapZone *zone);
@@ -103,6 +104,7 @@ class AActor : public Thinker,
 		const AActor	*GetDefault() const;
 		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
+		bool			GiveInventory(const ClassDef *cls, int amount=0, bool allowreplacement=true);
 		virtual void	PostBeginPlay() {}
 		void			RemoveFromWorld();
 		virtual void	RemoveInventory(AInventory *item);
