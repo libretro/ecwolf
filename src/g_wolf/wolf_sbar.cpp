@@ -64,7 +64,7 @@ public:
 			// Change default configuration
 			StatusBarConfig.Floor.X = 16;
 			StatusBarConfig.Floor.Digits = 3;
-			StatusBarConfig.Score.X = 56;
+			StatusBarConfig.Score.X = 64;
 			StatusBarConfig.Lives.X = 128;
 			StatusBarConfig.Health.X = 184;
 			StatusBarConfig.Ammo.X = 224;

@@ -693,6 +693,18 @@ protected:
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		else if(key.CompareNoCase("pageindexfontcolor") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::PAGEINDEX]);
+		else if(key.CompareNoCase("psyched") == 0)
+		{
+			ParseColorArrayAssignment(gameinfo.PsychedColors, 2);
+			if(sc.CheckToken(','))
+			{
+				bool negative = sc.CheckToken('-');
+				sc.MustGetToken(TK_IntConst);
+				gameinfo.PsychedOffset = negative ? -sc->number : sc->number;
+			}
+			else
+				gameinfo.PsychedOffset = 0;
+		}
 		else if(key.CompareNoCase("playerclasses") == 0)
 		{
 			sc.MustGetToken('=');

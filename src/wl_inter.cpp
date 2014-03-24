@@ -13,6 +13,7 @@
 #include "wl_inter.h"
 #include "wl_text.h"
 #include "g_mapinfo.h"
+#include "colormatcher.h"
 
 LRstruct LevelRatios;
 
@@ -662,11 +663,15 @@ void LevelCompleted (void)
 
 bool PreloadUpdate (unsigned current, unsigned total)
 {
+	static const PalEntry colors[2] = {
+		ColorMatcher.Pick(RPART(gameinfo.PsychedColors[0]), GPART(gameinfo.PsychedColors[0]), BPART(gameinfo.PsychedColors[0])),
+		ColorMatcher.Pick(RPART(gameinfo.PsychedColors[1]), GPART(gameinfo.PsychedColors[1]), BPART(gameinfo.PsychedColors[1]))
+	};
 
 	double x = 53;
-	double y = 101;
+	double y = 101 + gameinfo.PsychedOffset;
 	double w = 214.0*current/total;
-	double h = 3;
+	double h = 2;
 	double ow = w - 1;
 	double oh = h - 1;
 	double ox = x, oy = y;
@@ -675,8 +680,8 @@ bool PreloadUpdate (unsigned current, unsigned total)
 
 	if (current)
 	{
-		VWB_Clear(0x37, x, y, x+w, y+h);
-		VWB_Clear(0x32, ox, oy, ox+ow, oy+oh);
+		VWB_Clear(colors[0], x, y, x+w, y+h);
+		VWB_Clear(colors[1], ox, oy, ox+ow, oy+oh);
 
 	}
 	VW_UpdateScreen ();

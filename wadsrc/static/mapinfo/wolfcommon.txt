@@ -23,6 +23,7 @@ gameinfo
 	messagecolors = "8C 8C 8C", "D0 D0 D0", "0 0 0"
 	messagefontcolor = "Black"
 	menuwindowcolors = "8C 8C 8C", "D0 D0 D0", "0 0 0", "FC F4 00", "B4 AC 00", "0 0 0"
+	psyched = "FF 00 00", "FF 9D 9D"
 	doorsoundsequence = "DoorNormal"
 	pushwallsoundsequence = "PushwallNormal"
 	gibfactor = 1

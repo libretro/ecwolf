@@ -51,6 +51,8 @@ public:
 	int		MessageColors[3];
 	int		MenuWindowColors[6];
 	int		AdvisoryColor;
+	int		PsychedColors[2];
+	int 	PsychedOffset;
 	bool	DrawReadThis;
 
 	int		TitleTime;
