@@ -375,6 +375,12 @@ ACTION_FUNCTION(A_Succeed)
 	return true;
 }
 
+ACTION_FUNCTION(A_WeaponGrin)
+{
+	StatusBar->WeaponGrin();
+	return true;
+}
+
 bool ACustomInventory::TryPickup(AActor *toucher)
 {
 	const Frame *pickup = FindState("Pickup");

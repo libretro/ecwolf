@@ -120,6 +120,7 @@ actor BackpackItem : Inventory native
 actor CustomInventory : Inventory native
 {
 	action native A_Succeed();
+	action native A_WeaponGrin();
 }
 
 actor ExtraLifeItem : Inventory native

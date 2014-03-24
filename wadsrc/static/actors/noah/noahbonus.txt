@@ -1,8 +1,9 @@
-// Implemented as health for now (disabled behavior). When enabled:
 // Display quiz and give 4 points of health if wrong.  If right, give:
 // * 1000 points
 // * Either 25 points of health if under 100 and 10 feed or 25 feed
 // * Grin
+// In vanilla quizes could be disabled which made them act as if the wrong
+// answer was always chosen.
 actor QuizItem : CustomInventory native
 {
 	inventory.amount 0
@@ -39,7 +40,7 @@ actor BibleQuizCorrect : CustomInventory
 	states
 	{
 		Pickup:
-			// TODO: Grin
+			TNT1 A 0 A_WeaponGrin
 			TNT1 A 0 A_GiveInventory("ScoreItem", 1000)
 			TNT1 A 0 A_JumpIf(health >= 100, "ExtraFeed")
 			TNT1 A 0 A_GiveInventory("LargeBandage")
