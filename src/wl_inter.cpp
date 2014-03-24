@@ -172,9 +172,7 @@ static void Write (int x, int y, const char *string, bool rightAlign, bool bonus
 }
 
 
-static const unsigned int VBLWAIT = 30;
 static const unsigned int PAR_AMOUNT = 500;
-static const unsigned int PERCENT100AMT = 10000;
 static struct IntermissionState
 {
 	unsigned int kr, sr, tr;
@@ -183,6 +181,26 @@ static struct IntermissionState
 	bool acked;
 	bool graphical;
 } InterState;
+enum
+{
+	WI_LEVEL,
+	WI_FLOOR,
+	WI_FINISH,
+	WI_BONUS,
+	WI_TIME,
+	WI_PAR,
+	WI_KILLS,
+	WI_TREASR,
+	WI_SECRTS,
+	WI_PERFCT,
+
+	NUM_WI
+};
+static const char* const GraphicalTexNames[NUM_WI] = {
+	"WILEVEL", "WIFLOOR", "WIFINISH", "WIBONUS", "WITIME", "WIPAR",
+	"WIKILLS", "WITREASR", "WISECRTS", "WIPERFCT"
+};
+static FTextureID GraphicalTexID[NUM_WI];
 
 //
 // Breathe Mr. BJ!!!
@@ -301,6 +319,9 @@ static void InterAddBonus(unsigned int bonus, bool count=false)
  */
 static void InterCountRatio(int ratio, unsigned int x, unsigned int y)
 {
+	static const unsigned int VBLWAIT = 30;
+	static const unsigned int PERCENT100AMT = 10000;
+
 	if (InterState.graphical)
 		InterWriteCounter(1, ratio, 1, x, y, "misc/end_bonus1", 0);
 	else
@@ -344,6 +365,193 @@ static void InterWaitForAck()
 	IN_ClearKeysDown();
 }
 
+static void InterDrawNormalTop()
+{
+	FString completedString;
+	if(!levelInfo->CompletionString.IsEmpty())
+	{
+		if(levelInfo->CompletionString[0] == '$')
+			completedString = language[levelInfo->CompletionString.Mid(1)];
+		else
+			completedString = levelInfo->CompletionString;
+		completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
+		Write (14, 2, completedString);
+	}
+	else
+	{
+		if(levelInfo->TitlePatch.isValid())
+		{
+			VWB_DrawGraphic(TexMan(levelInfo->TitlePatch), 112, 16);
+		}
+		else
+		{
+			completedString.Format("%s %s", language["STR_FLOOR"], levelInfo->FloorNumber.GetChars());
+			Write (14, 2, completedString);
+		}
+		Write(14, 4, language["STR_COMPLETED"]);
+	}
+}
+
+static void InterDrawGraphicalTop()
+{
+	// Handle X-Y floor numbers. If not in that format emulate the normal
+	// mode by just using floor X.
+	int dash = levelInfo->FloorNumber.IndexOf('-');
+	if(dash != -1)
+	{
+		if(levelInfo->TitlePatch.isValid())
+		{
+			VWB_DrawGraphic(TexMan(levelInfo->TitlePatch), 104, 8);
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_LEVEL]), 104, 24);
+			Write(23, 3, levelInfo->FloorNumber.Left(dash), false);
+		}
+		else
+		{
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_LEVEL]), 104, 8);
+			Write(23, 1, levelInfo->FloorNumber.Left(dash), false);
+			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FLOOR]), 104, 24);
+			Write(23, 3, levelInfo->FloorNumber.Mid(dash+1), false);
+		}
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FINISH]), 104, 40);
+	}
+	else
+	{
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FLOOR]), 104, 8);
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FINISH]), 104, 24);
+		Write(23, 1, levelInfo->FloorNumber, false);
+	}
+}
+
+static void InterDoBonus()
+{
+	if(InterState.graphical)
+		InterDrawGraphicalTop();
+	else
+		InterDrawNormalTop();
+
+	FString bonusString;
+	bonusString.Format("%d bonus!", levelInfo->LevelBonus);
+	Write (34, 16, bonusString, true);
+
+	VW_UpdateScreen ();
+	VW_FadeIn ();
+
+	GivePoints (levelInfo->LevelBonus);
+}
+
+static void InterDoNormal()
+{
+	InterDrawNormalTop();
+
+	Write (24, 7, language["STR_BONUS"], true);
+	Write (24, 10, language["STR_TIME"], true);
+	Write (24, 12, language["STR_PAR"], true);
+
+	Write (37, 14, "%");
+	Write (37, 16, "%");
+	Write (37, 18, "%");
+	Write (29, 14, language["STR_RAT2KILL"], true);
+	Write (29, 16, language["STR_RAT2SECRET"], true);
+	Write (29, 18, language["STR_RAT2TREASURE"], true);
+
+	InterWriteTime(levelInfo->Par, 26*8, 12*8);
+
+	//
+	// PRINT TIME
+	//
+	InterWriteTime(gamestate.TimeCount/TICRATE, 26*8, 10*8);
+
+	VW_UpdateScreen ();
+	VW_FadeIn ();
+
+	//
+	// PRINT TIME BONUS
+	//
+	if(InterState.timeleft)
+		InterAddBonus(InterState.timeleft * PAR_AMOUNT, true);
+	if (InterState.bonus)
+	{
+		VW_UpdateScreen ();
+
+		SD_PlaySound ("misc/end_bonus2");
+		while (SD_SoundPlaying ())
+			BJ_Breathe ();
+	}
+
+	InterCountRatio(InterState.kr, 296, 112);
+	InterCountRatio(InterState.sr, 296, 112+16);
+	InterCountRatio(InterState.tr, 296, 112+32);
+
+	GivePoints (InterState.bonus);
+}
+
+static void InterDoGraphical()
+{
+	InterDrawGraphicalTop();
+
+	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_BONUS]), 104, 72);
+	Write (36, 9, "0", true, true);
+
+	VW_UpdateScreen ();
+	VW_FadeIn ();
+
+	//
+	// PRINT TIME BONUS
+	//
+	if(InterState.timeleft)
+		InterAddBonus(InterState.timeleft * PAR_AMOUNT, true);
+	if (InterState.bonus)
+	{
+		VW_UpdateScreen ();
+
+		SD_PlaySound ("misc/end_bonus2");
+		while (SD_SoundPlaying ())
+			BJ_Breathe ();
+	}
+
+	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_TIME]), 88, 128);
+	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PAR]), 96, 112);
+
+	InterWriteTime(levelInfo->Par, 19*8, 14*8);
+
+	//
+	// PRINT TIME
+	//
+	InterWriteTime(gamestate.TimeCount/TICRATE, 19*8, 16*8);
+
+	double cleary = 104;
+	{
+		// Really all we care about here is finding the starting y
+		// since we need to over clear a bit in order to account for
+		// rounding errors and so we don't need to worry about fonts.
+		double clearx = 0, clearw = 0, clearh = 0;
+		screen->VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
+	}
+
+	InterWaitForAck();
+
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., cleary, (double)screenWidth, (double)statusbary2);
+	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_KILLS]), 80, 104);
+	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_TREASR]), 104, 120);
+	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_SECRTS]), 72, 136);
+	Write (27, 13, "0%");
+	Write (27, 15, "0%");
+	Write (27, 17, "0%");
+
+	InterCountRatio(InterState.kr, 232, 104);
+	InterCountRatio(InterState.tr, 232, 104+16);
+	InterCountRatio(InterState.sr, 232, 104+32);
+
+	GivePoints (InterState.bonus);
+
+	if(InterState.kr == 100 && InterState.sr == 100 && InterState.tr == 100)
+	{
+		VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., cleary, (double)screenWidth, (double)statusbary2);
+		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PERFCT]), 96, 120);
+		SD_PlaySound ("misc/100percent");
+	}
+}
+
 /*
 ==================
 =
@@ -359,26 +567,6 @@ static void InterWaitForAck()
 
 void LevelCompleted (void)
 {
-	enum
-	{
-		WI_LEVEL,
-		WI_FLOOR,
-		WI_FINISH,
-		WI_BONUS,
-		WI_TIME,
-		WI_PAR,
-		WI_KILLS,
-		WI_TREASR,
-		WI_SECRTS,
-		WI_PERFCT,
-
-		NUM_WI
-	};
-	static const char* const GraphicalTexNames[NUM_WI] = {
-		"WILEVEL", "WIFLOOR", "WIFINISH", "WIBONUS", "WITIME", "WIPAR",
-		"WIKILLS", "WITREASR", "WISECRTS", "WIPERFCT"
-	};
-	static FTextureID GraphicalTexID[NUM_WI];
 	static bool modeUndetermined = true;
 	if(modeUndetermined)
 	{
@@ -438,143 +626,16 @@ void LevelCompleted (void)
 
 	BJ_Breathe(true);
 
-	if(!InterState.graphical)
-	{
-		FString completedString;
-		if(!levelInfo->CompletionString.IsEmpty())
-		{
-			if(levelInfo->CompletionString[0] == '$')
-				completedString = language[levelInfo->CompletionString.Mid(1)];
-			else
-				completedString = levelInfo->CompletionString;
-		}
-		else
-			completedString = language["STR_FLOORCOMPLETED"];
-		completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
-		Write (14, 2, completedString);
-	}
-	else
-	{
-		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_LEVEL]), 104, 8);
-		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FLOOR]), 104, 24);
-		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_FINISH]), 104, 40);
-		{
-			int dash = levelInfo->FloorNumber.IndexOf('-');
-			if(dash != -1)
-			{
-				Write(23, 1, levelInfo->FloorNumber.Left(dash), false);
-				Write(23, 3, levelInfo->FloorNumber.Mid(dash+1), false);
-			}
-		}
-
-		VWB_DrawGraphic(TexMan(GraphicalTexID[WI_BONUS]), 104, 72);
-		Write (36, 9, "0", true, true);
-	}
-
 	if(levelInfo->LevelBonus == -1)
 	{
-		if(!InterState.graphical)
-		{
-			Write (24, 7, language["STR_BONUS"], true);
-			Write (24, 10, language["STR_TIME"], true);
-			Write (24, 12, language["STR_PAR"], true);
-
-			Write (37, 14, "%");
-			Write (37, 16, "%");
-			Write (37, 18, "%");
-			Write (29, 14, language["STR_RAT2KILL"], true);
-			Write (29, 16, language["STR_RAT2SECRET"], true);
-			Write (29, 18, language["STR_RAT2TREASURE"], true);
-		}
-		else
-		{
-			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_TIME]), 88, 128);
-			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PAR]), 96, 112);
-		}
-
-		if(!InterState.graphical)
-			InterWriteTime(levelInfo->Par, 26*8, 12*8);
-		else
-			InterWriteTime(levelInfo->Par, 19*8, 14*8);
-
-		//
-		// PRINT TIME
-		//
-		if(!InterState.graphical)
-			InterWriteTime(gamestate.TimeCount/TICRATE, 26*8, 10*8);
-		else
-			InterWriteTime(gamestate.TimeCount/TICRATE, 19*8, 16*8);
-
-		VW_UpdateScreen ();
-		VW_FadeIn ();
-
-		//
-		// PRINT TIME BONUS
-		//
-		if(InterState.timeleft)
-			InterAddBonus(InterState.timeleft * PAR_AMOUNT, true);
-		if (InterState.bonus)
-		{
-			VW_UpdateScreen ();
-
-			SD_PlaySound ("misc/end_bonus2");
-			while (SD_SoundPlaying ())
-				BJ_Breathe ();
-		}
-
-		double cleary = 104;
 		if(InterState.graphical)
-		{
-			InterWaitForAck();
-
-			{
-				// Really all we care about here is finding the starting y
-				// since we need to over clear a bit in order to account for
-				// rounding errors and so we don't need to worry about fonts.
-				double clearx = 0, clearw = 0, clearh = 0;
-				screen->VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
-				VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., cleary, (double)screenWidth, (double)statusbary2);
-			}
-			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_KILLS]), 80, 104);
-			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_TREASR]), 104, 120);
-			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_SECRTS]), 72, 136);
-			Write (27, 13, "0%");
-			Write (27, 15, "0%");
-			Write (27, 17, "0%");
-		}
-
-		if(InterState.graphical)
-		{
-			InterCountRatio(InterState.kr, 232, 104);
-			InterCountRatio(InterState.tr, 232, 104+16);
-			InterCountRatio(InterState.sr, 232, 104+32);
-		}
+			InterDoGraphical();
 		else
-		{
-			InterCountRatio(InterState.kr, 296, 112);
-			InterCountRatio(InterState.sr, 296, 112+16);
-			InterCountRatio(InterState.tr, 296, 112+32);
-		}
-
-		GivePoints (InterState.bonus);
-
-		if(InterState.graphical && InterState.kr == 100 && InterState.sr == 100 && InterState.tr == 100)
-		{
-			VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., cleary, (double)screenWidth, (double)statusbary2);
-			VWB_DrawGraphic(TexMan(GraphicalTexID[WI_PERFCT]), 96, 120);
-			SD_PlaySound ("misc/100percent");
-		}
+			InterDoNormal();
 	}
 	else
 	{
-		FString bonusString;
-		bonusString.Format("%d bonus!", levelInfo->LevelBonus);
-		Write (34, 16, bonusString, true);
-
-		VW_UpdateScreen ();
-		VW_FadeIn ();
-
-		GivePoints (levelInfo->LevelBonus);
+		InterDoBonus();
 	}
 
 

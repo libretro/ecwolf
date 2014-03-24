@@ -273,6 +273,7 @@ static TArray<LevelInfo> levelInfos;
 LevelInfo::LevelInfo() : UseMapInfoName(false)
 {
 	MapName[0] = 0;
+	TitlePatch.SetInvalid();
 	BorderTexture.SetInvalid();
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
@@ -530,6 +531,12 @@ protected:
 			ParseBoolAssignment(mapInfo.SecretDeathSounds);
 		else if(key.CompareNoCase("SpawnWithWeaponRaised") == 0)
 			mapInfo.SpawnWithWeaponRaised = true;
+		else if(key.CompareNoCase("TitlePatch") == 0)
+		{
+			FString textureName;
+			ParseStringAssignment(textureName);
+			mapInfo.TitlePatch = TexMan.GetTexture(textureName, FTexture::TEX_Any);
+		}
 		else if(key.CompareNoCase("Translator") == 0)
 			ParseStringAssignment(mapInfo.Translator);
 		else

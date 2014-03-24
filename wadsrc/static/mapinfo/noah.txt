@@ -338,6 +338,7 @@ map "MAP12"
 	next = "MAP09"
 	secretnext = "MAP09"
 	floornumber = "3-5"
+	titlepatch = "WISECRET"
 	par = 120
 	music = "SONG9"
 	cluster = 3
@@ -485,7 +486,7 @@ map "MAP21"
 map "MAP22"
 {
 	next = "MAP23"
-	secretnext = "MAP33"
+	secretnext = "MAP23"
 	floornumber = "5-5"
 	par = 180
 	music = "HAPPYSNG"
@@ -601,6 +602,7 @@ map "MAP30"
 	next = "MAP27"
 	secretnext = "MAP27"
 	floornumber = "6-7"
+	titlepatch = "WISECRET"
 	music = "SONG9"
 	cluster = 6
 	par = 120

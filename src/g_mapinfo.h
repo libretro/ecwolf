@@ -153,6 +153,7 @@ public:
 	FString			Music;
 	unsigned int	Cluster;
 	FString			Translator;
+	FTextureID		TitlePatch;
 
 	FTextureID		BorderTexture;
 	FTextureID		DefaultTexture[2];
