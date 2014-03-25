@@ -69,6 +69,7 @@ public:
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
 	FString FinaleFlat;
+	FString GameOverPic;
 	// Special stack for strings like the default translator.
 	// This will allow the previous default to be included.
 	class FStringStack

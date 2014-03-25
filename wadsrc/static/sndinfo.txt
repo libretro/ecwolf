@@ -39,8 +39,7 @@ menu/escape				{ NULL ALESCPRS PCESCPRS }
 menu/move1				{ NULL ALMVGUN1 PCMVGUN1 }
 menu/move2				{ NULL ALMVGUN2 PCMVGUN2 }
 
-player/death			{ NULL ALPLDETH PCPYDETH }
-player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN } // Unused in Wolf
+player/death			{ DSPLDETH ALPLDETH PCPYDETH }
 player/usefail			{ NULL ALNOWAY PCNOWAY }
 
 weapon/knife/attack		{ NULL ALKNFSWG PCKNFSWG }
@@ -227,6 +226,9 @@ world/hitwall NULL
 
 misc/100percent			{ NULL ALENDBN2 PCENDBN2 }
 $alias misc/w_pkup		misc/i_pkup
+
+// Defined here since vanilla Wolf3D didn't use it.
+player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN }
 $endif
 
 world/pushwall_ark		{ DSARKPSH ALARKPSH PCARKPSHW }

@@ -6,6 +6,7 @@ gameinfo
 	gamecolormap = "COLORMAP"
 	gamepalette = "NOAHPAL"
 	titlepalette = "TITLEPAL"
+	gameoverpic = "GMOVA0"
 	finaleflat = "#B5B5B5"
 	psyched = "C6 C6 00", "E7 E7 00", 3
 	menufade = "56 3D 1C"

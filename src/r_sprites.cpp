@@ -493,3 +493,40 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 		dest = ++destBase;
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// S3DNA Zoomer
+//
+
+IMPLEMENT_INTERNAL_CLASS(SpriteZoomer)
+
+SpriteZoomer::SpriteZoomer(FTextureID texID) : Thinker(ThinkerList::VICTORY), texID(texID), count(0)
+{
+}
+
+void SpriteZoomer::Draw()
+{
+	FTexture *gmoverTex = TexMan(texID);
+
+	// What we're trying to do is zoom in a 160x160 player sprite to
+	// fill the viewheight.  S3DNA use the player sprite rendering
+	// function and passed count as the height. We won't do it like that
+	// since that method didn't account for the view window size
+	// (vanilla could crash) and our player sprite renderer may take
+	// into account things we would rather not have here.
+	const double yscale = double(viewheight*count)/(160.*192.);
+	const double xscale = yscale/FIXED2FLOAT(yaspect);
+
+	screen->DrawTexture(gmoverTex, viewscreenx + (viewwidth>>1) - xscale*160, viewscreeny + (viewheight>>1) - yscale*80,
+		DTA_DestWidthF, gmoverTex->GetScaledWidthDouble()*xscale,
+		DTA_DestHeightF, gmoverTex->GetScaledHeightDouble()*yscale,
+		TAG_DONE);
+}
+
+void SpriteZoomer::Tick()
+{
+	assert(count <= 192);
+	if(++count > 192)
+		Destroy();
+}

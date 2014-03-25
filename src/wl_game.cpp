@@ -21,6 +21,7 @@
 #include "wl_agent.h"
 #include "g_intermission.h"
 #include "g_mapinfo.h"
+#include "r_sprites.h"
 #include "wl_inter.h"
 #include "wl_draw.h"
 #include "wl_play.h"
@@ -699,6 +700,29 @@ void Died (void)
 
 	if(usedoublebuffering) VH_UpdateScreen();
 
+	--players[0].lives;
+
+	if (gameinfo.GameOverPic.IsNotEmpty() && players[0].lives == -1)
+	{
+		FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
+		if(texID.isValid())
+		{
+			TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(texID);
+			do
+			{
+				for(unsigned int t = tics;zoomer && t-- > 0;)
+					zoomer->Tick();
+				if(!zoomer)
+					break;
+
+				ThreeDRefresh();
+				zoomer->Draw();
+				VH_UpdateScreen();
+				CalcTics();
+			}
+			while(true);
+		}
+	}
 
 	FizzleFadeStart();
 
@@ -711,8 +735,6 @@ void Died (void)
 	IN_UserInput(100);
 	SD_WaitSoundDone ();
 	ClearMemory();
-
-	players[0].lives--;
 
 	if (players[0].lives > -1)
 	{

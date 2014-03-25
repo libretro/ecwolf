@@ -622,6 +622,8 @@ protected:
 			ParseBoolAssignment(gameinfo.DrawReadThis);
 		else if(key.CompareNoCase("gamecolormap") == 0)
 			ParseStringAssignment(gameinfo.GameColormap);
+		else if(key.CompareNoCase("gameoverpic") == 0)
+			ParseStringAssignment(gameinfo.GameOverPic);
 		else if(key.CompareNoCase("gamepalette") == 0)
 			ParseStringAssignment(gameinfo.GamePalette);
 		else if(key.CompareNoCase("gibfactor") == 0)

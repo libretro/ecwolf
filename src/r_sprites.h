@@ -59,4 +59,20 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 unsigned int R_GetNumLoadedSprites();
 uint32_t R_GetNameForSprite(unsigned int index);
 
+// Thinker for S3DNA style zoom in sprites. (Game over, you win, cast call)
+class SpriteZoomer : public Thinker
+{
+	DECLARE_CLASS(SpriteZoomer, Thinker)
+
+private:
+	FTextureID texID;
+	unsigned short count;
+
+public:
+	SpriteZoomer(FTextureID texID);
+
+	void Draw();
+	void Tick();
+};
+
 #endif

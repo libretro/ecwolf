@@ -87,7 +87,6 @@ class Thinker : public DObject, public EmbeddedList<Thinker>::Node
 	DECLARE_ABSTRACT_CLASS(Thinker, DObject)
 
 	public:
-		Thinker();
 		Thinker(ThinkerList::Priority priority);
 
 		void			Activate(ThinkerList::Priority priority=ThinkerList::NORMAL);

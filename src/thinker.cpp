@@ -203,10 +203,6 @@ void ThinkerList::Deregister(Thinker *thinker)
 
 IMPLEMENT_ABSTRACT_CLASS(Thinker)
 
-Thinker::Thinker()
-{
-}
-
 Thinker::Thinker(ThinkerList::Priority priority)
 {
 	Activate(priority);
