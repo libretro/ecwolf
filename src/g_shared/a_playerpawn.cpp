@@ -91,6 +91,8 @@ void APlayerPawn::CheckWeaponSwitch(const ClassDef *ammo)
 
 void APlayerPawn::Die()
 {
+	player->state = player_t::PST_DEAD;
+
 	if(player)
 	{
 		player->extralight = 0;

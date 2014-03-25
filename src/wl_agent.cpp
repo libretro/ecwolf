@@ -753,7 +753,13 @@ ACTION_FUNCTION(A_Lower)
 		player->PendingWeapon = NULL;
 
 	player->SetPSprite(NULL, player_t::ps_flash);
-	player->BringUpWeapon();
+	// If we're dead, don't bother trying to raise a weapon.
+	// In fact, we want to keep the current weapon "up" so that the status bar
+	// displays the correct information.
+	if(player->state != player_t::PST_DEAD)
+		player->BringUpWeapon();
+	else
+		player->SetPSprite(NULL, player_t::ps_weapon);
 	return true;
 }
 ACTION_FUNCTION(A_Raise)
