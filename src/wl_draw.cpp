@@ -1267,7 +1267,11 @@ void R_RenderView()
 	DrawPlayerWeapon ();    // draw players[0].mo's hands
 
 	if((buttonstate[bt_showstatusbar] || buttonheld[bt_showstatusbar]) && viewsize == 21)
-		ShowActStatus();
+	{
+		ingame = false;
+		StatusBar->DrawStatusBar();
+		ingame = true;
+	}
 
 	// Always mark the current spot as visible in the automap
 	map->GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->amFlags |= AM_Visible;

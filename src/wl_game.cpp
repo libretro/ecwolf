@@ -408,13 +408,6 @@ void DrawPlayScreen (bool noborder)
 	StatusBar->DrawStatusBar();
 }
 
-void ShowActStatus()
-{
-	ingame = false;
-	StatusBar->DrawStatusBar();
-	ingame = true;
-}
-
 
 //==========================================================================
 
@@ -726,7 +719,11 @@ void Died (void)
 
 	FizzleFadeStart();
 
-	VWB_Clear(ColorMatcher.Pick(0xAA,0x00,0x00), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
+	// Fizzle fade used a slightly darker shade of red.
+	byte fr = RPART(players[0].mo->damagecolor)*2/3;
+	byte fg = GPART(players[0].mo->damagecolor)*2/3;
+	byte fb = BPART(players[0].mo->damagecolor)*2/3;
+	VWB_Clear(ColorMatcher.Pick(fr,fg,fb), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
 
 	IN_ClearKeysDown ();
 

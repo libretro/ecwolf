@@ -695,7 +695,12 @@ void PreloadGraphics (bool showPsych)
 		ClearSplitVWB ();           // set up for double buffering in split screen
 
 		VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
-		ShowActStatus();
+
+		assert(ingame);
+		ingame = false;
+		DrawPlayScreen();
+		ingame = true;
+
 		VWB_DrawGraphic(TexMan("GETPSYCH"), 48, 56);
 
 		WindowX = (screenWidth - scaleFactorX*224)/2;

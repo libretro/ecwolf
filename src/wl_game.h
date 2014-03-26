@@ -38,7 +38,6 @@ void    SetupGameLevel (void);
 bool    GameLoop (void);
 void    DrawPlayScreen (bool noborder=false);
 void    DrawPlayBorderSides (void);
-void    ShowActStatus();
 
 void    PlayDemo (int demonumber);
 void    RecordDemo (void);
