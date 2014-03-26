@@ -19,9 +19,6 @@ LRstruct LevelRatios;
 
 static int32_t lastBreathTime = 0;
 
-static void Erase (int x, int y, const char *string, bool rightAlign=false);
-static void Write (int x, int y, const char *string, bool rightAlign=false, bool bonusfont=false);
-
 //==========================================================================
 
 /*
@@ -43,85 +40,7 @@ ClearSplitVWB (void)
 
 //==========================================================================
 
-/*
-==================
-=
-= Victory
-=
-==================
-*/
-
-void Victory (bool fromIntermission)
-{
-	int32_t sec;
-	int min, kr = 0, sr = 0, tr = 0, x;
-	char tempstr[8];
-
-	static const unsigned int RATIOX = 22, RATIOY = 14, TIMEX = 14, TIMEY = 8;
-
-	StartCPMusic ("URAHERO");
-	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
-	if(!fromIntermission)
-		DrawPlayScreen(true);
-
-	Write (18, 2, language["STR_YOUWIN"]);
-
-	Write (TIMEX, TIMEY - 2, language["STR_TOTALTIME"]);
-
-	Write (12, RATIOY - 2, language["STR_AVERAGES"]);
-
-	Write (RATIOX, RATIOY, language["STR_RATKILL"], true);
-	Write (RATIOX, RATIOY + 2, language["STR_RATSECRET"], true);
-	Write (RATIOX, RATIOY + 4, language["STR_RATTREASURE"], true);
-	Write (RATIOX+8, RATIOY, "%");
-	Write (RATIOX+8, RATIOY + 2, "%");
-	Write (RATIOX+8, RATIOY + 4, "%");
-
-	VWB_DrawGraphic (TexMan("L_BJWINS"), 8, 4);
-
-	sec = LevelRatios.time;
-	if(LevelRatios.numLevels)
-	{
-		kr = LevelRatios.killratio / LevelRatios.numLevels;
-		sr = LevelRatios.secretsratio / LevelRatios.numLevels;
-		tr = LevelRatios.treasureratio / LevelRatios.numLevels;
-	}
-
-	min = sec / 60;
-	sec %= 60;
-
-	if (min > 99)
-		min = sec = 99;
-
-	FString timeString;
-	timeString.Format("%02d:%02d", min, sec);
-	Write (TIMEX, TIMEY, timeString);
-
-	itoa (kr, tempstr, 10);
-	x = RATIOX + 8 - (int) strlen(tempstr) * 2;
-	Write (x, RATIOY, tempstr);
-
-	itoa (sr, tempstr, 10);
-	x = RATIOX + 8 - (int) strlen(tempstr) * 2;
-	Write (x, RATIOY + 2, tempstr);
-
-	itoa (tr, tempstr, 10);
-	x = RATIOX + 8 - (int) strlen(tempstr) * 2;
-	Write (x, RATIOY + 4, tempstr);
-
-	VW_UpdateScreen ();
-	VW_FadeIn ();
-
-	IN_Ack ();
-
-	EndText (levelInfo->Cluster);
-
-	VW_FadeOut();
-}
-
-//==========================================================================
-
-static void Erase (int x, int y, const char *string, bool rightAlign)
+static void Erase (int x, int y, const char *string, bool rightAlign=false)
 {
 	double nx = x*8;
 	double ny = y*8;
@@ -138,7 +57,7 @@ static void Erase (int x, int y, const char *string, bool rightAlign)
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), nx, ny, nx+fw, ny+fh);
 }
 
-static void Write (int x, int y, const char *string, bool rightAlign, bool bonusfont)
+static void Write (int x, int y, const char *string, bool rightAlign=false, bool bonusfont=false)
 {
 	FFont *font = bonusfont ? V_GetFont("BonusFont") : IntermissionFont;
 	FRemapTable *remap = font->GetColorTranslation(CR_UNTRANSLATED);
@@ -194,12 +113,13 @@ enum
 	WI_TREASR,
 	WI_SECRTS,
 	WI_PERFCT,
+	WI_RATING,
 
 	NUM_WI
 };
 static const char* const GraphicalTexNames[NUM_WI] = {
 	"WILEVEL", "WIFLOOR", "WIFINISH", "WIBONUS", "WITIME", "WIPAR",
-	"WIKILLS", "WITREASR", "WISECRTS", "WIPERFCT"
+	"WIKILLS", "WITREASR", "WISECRTS", "WIPERFCT", "WIRATING"
 };
 static FTextureID GraphicalTexID[NUM_WI];
 
@@ -285,12 +205,36 @@ static void InterWriteCounter(int start, int end, int step, unsigned int x, unsi
 	while(cont);
 }
 
-static void InterWriteTime(unsigned int time, unsigned int x, unsigned int y)
+static void InterWriteTime(unsigned int time, unsigned int x, unsigned int y, bool hours=false)
 {
+	unsigned int m, s;
 	FString timestamp;
-	timestamp.Format("%02d:%02d",
-		clamp<unsigned int>(time/60, 0, 99),
-		time % 60);
+	if(hours)
+	{
+		unsigned int h = clamp<unsigned int>(time/3600, 0, 9);
+		if(h < 9)
+			m = (time / 60) % 60;
+		else
+			m = clamp<unsigned int>((time - 3600*9)/60, 0, 99);
+
+		if(m < 99)
+			s = time % 60;
+		else
+			s = clamp<unsigned int>(time - (3600*9 + 60*99), 0, 99);
+
+		timestamp.Format("%u:%02u:%02u", h, m, s);
+	}
+	else
+	{
+		m = clamp<unsigned int>(time/60, 0, 99);
+
+		if(m < 99)
+			s = time % 60;
+		else
+			s = clamp<unsigned int>(time - (3600*9 + 60*99), 0, 99);
+
+		timestamp.Format("%02u:%02u", m, s);
+	}
 
 	Write(x>>3, y>>3, timestamp, false);
 }
@@ -553,20 +497,7 @@ static void InterDoGraphical()
 	}
 }
 
-/*
-==================
-=
-= LevelCompleted
-=
-= Entered with the screen faded out
-= Still in split screen mode with the status bar
-=
-= Exit with the screen faded out
-=
-==================
-*/
-
-void LevelCompleted (void)
+static void DetermineIntermissionMode()
 {
 	static bool modeUndetermined = true;
 	if(modeUndetermined)
@@ -582,6 +513,24 @@ void LevelCompleted (void)
 			}
 		}
 	}
+}
+
+/*
+==================
+=
+= LevelCompleted
+=
+= Entered with the screen faded out
+= Still in split screen mode with the status bar
+=
+= Exit with the screen faded out
+=
+==================
+*/
+
+void LevelCompleted (void)
+{
+	DetermineIntermissionMode();
 
 	InterState.bonus = 0;
 	InterState.acked = false;
@@ -610,6 +559,7 @@ void LevelCompleted (void)
 		LevelRatios.secretsratio += InterState.sr;
 		LevelRatios.treasureratio += InterState.tr;
 		LevelRatios.time += gamestate.TimeCount/TICRATE;
+		LevelRatios.par += levelInfo->Par;
 		++LevelRatios.numLevels;
 	}
 
@@ -646,7 +596,107 @@ void LevelCompleted (void)
 	InterWaitForAck();
 }
 
+//==========================================================================
 
+/*
+==================
+=
+= Victory
+=
+==================
+*/
+
+void Victory (bool fromIntermission)
+{
+	DetermineIntermissionMode();
+
+	int kr = 0, sr = 0, tr = 0;
+
+	StartCPMusic (gameinfo.VictoryMusic);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, 0, screenWidth, screenHeight);
+	if(!fromIntermission)
+		DrawPlayScreen(true);
+
+	if(LevelRatios.numLevels)
+	{
+		kr = LevelRatios.killratio / LevelRatios.numLevels;
+		sr = LevelRatios.secretsratio / LevelRatios.numLevels;
+		tr = LevelRatios.treasureratio / LevelRatios.numLevels;
+	}
+
+	if(InterState.graphical)
+	{
+		VWB_DrawGraphic (TexMan("L_BJWINS"), 8, 8);
+		VWB_DrawGraphic (TexMan(GraphicalTexID[WI_RATING]), 104, 32);
+		VWB_DrawGraphic (TexMan(GraphicalTexID[WI_PAR]), 120, 56);
+		VWB_DrawGraphic (TexMan(GraphicalTexID[WI_TIME]), 112, 72);
+		VWB_DrawGraphic (TexMan(GraphicalTexID[WI_KILLS]), 104, 96);
+		VWB_DrawGraphic (TexMan(GraphicalTexID[WI_TREASR]), 128, 112);
+		VWB_DrawGraphic (TexMan(GraphicalTexID[WI_SECRTS]), 96, 128);
+
+		InterWriteTime(LevelRatios.par, 184, 56, true);
+		InterWriteTime(LevelRatios.time, 184, 72, true);
+
+		FString ratioStr;
+		ratioStr.Format("%u%%", kr);
+		Write(35, 12, ratioStr, true);
+		ratioStr.Format("%u%%", tr);
+		Write(35, 14, ratioStr, true);
+		ratioStr.Format("%u%%", sr);
+		Write(35, 16, ratioStr, true);
+	}
+	else
+	{
+		static const unsigned int RATIOX = 22, RATIOY = 14, TIMEX = 14, TIMEY = 8;
+		int min, sec;
+		char tempstr[8];
+
+		VWB_DrawGraphic (TexMan("L_BJWINS"), 8, 4);
+
+		Write (18, 2, language["STR_YOUWIN"]);
+
+		Write (TIMEX, TIMEY - 2, language["STR_TOTALTIME"]);
+
+		Write (12, RATIOY - 2, language["STR_AVERAGES"]);
+
+		Write (RATIOX, RATIOY, language["STR_RATKILL"], true);
+		Write (RATIOX, RATIOY + 2, language["STR_RATSECRET"], true);
+		Write (RATIOX, RATIOY + 4, language["STR_RATTREASURE"], true);
+		Write (RATIOX+8, RATIOY, "%");
+		Write (RATIOX+8, RATIOY + 2, "%");
+		Write (RATIOX+8, RATIOY + 4, "%");
+
+		sec = LevelRatios.time;
+
+		min = sec / 60;
+		sec %= 60;
+
+		if (min > 99)
+			min = sec = 99;
+
+		FString timeString;
+		timeString.Format("%02d:%02d", min, sec);
+		Write (TIMEX, TIMEY, timeString);
+
+		itoa (kr, tempstr, 10);
+		Write (RATIOX + 8, RATIOY, tempstr, true);
+
+		itoa (sr, tempstr, 10);
+		Write (RATIOX + 8, RATIOY + 2, tempstr, true);
+
+		itoa (tr, tempstr, 10);
+		Write (RATIOX + 8, RATIOY + 4, tempstr, true);
+	}
+
+	VW_UpdateScreen ();
+	VW_FadeIn ();
+
+	IN_Ack ();
+
+	EndText (levelInfo->Cluster);
+
+	VW_FadeOut();
+}
 
 //==========================================================================
 

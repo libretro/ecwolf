@@ -65,6 +65,7 @@ public:
 	FString	MenuMusic;
 	FString	ScoresMusic;
 	FString	FinaleMusic;
+	FString VictoryMusic;
 	FString	IntermissionMusic;
 	FString	HighScoresFont;
 	FString	AdvisoryPic;

@@ -16,6 +16,7 @@ extern struct LRstruct
 	unsigned int treasureratio;
 	unsigned int numLevels;
 	unsigned int time;
+	unsigned int par;
 } LevelRatios;
 
 void DrawHighScores(void);

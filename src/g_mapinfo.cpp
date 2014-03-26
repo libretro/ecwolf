@@ -682,6 +682,8 @@ protected:
 			ParseStringAssignment(gameinfo.FinaleFlat);
 		else if(key.CompareNoCase("finalemusic") == 0)
 			ParseStringAssignment(gameinfo.FinaleMusic);
+		else if(key.CompareNoCase("victorymusic") == 0)
+			ParseStringAssignment(gameinfo.VictoryMusic);
 		else if(key.CompareNoCase("intermissionmusic") == 0)
 			ParseStringAssignment(gameinfo.IntermissionMusic);
 		else if(key.CompareNoCase("menufontcolor_title") == 0)

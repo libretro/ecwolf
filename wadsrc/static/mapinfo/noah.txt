@@ -34,6 +34,7 @@ gameinfo
 	gibfactor = 1
 	menumusic = "SONG1"
 	finalemusic = "SONG1"
+	victorymusic = "SONG7"
 	intermissionmusic = "FEEDTIME"
 	titletime = 13
 	highscoresfontcolor = "NoahWhite"

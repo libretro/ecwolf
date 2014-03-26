@@ -530,6 +530,8 @@ static void Serialize(FArchive &arc)
 		<< LevelRatios.treasureratio
 		<< LevelRatios.numLevels
 		<< LevelRatios.time;
+	if(SaveVersion > 1395865826)
+		arc << LevelRatios.par;
 
 	thinkerList->Serialize(arc);
 

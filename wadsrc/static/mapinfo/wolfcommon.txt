@@ -2,6 +2,7 @@ gameinfo
 {
 	menumusic = "WONDERIN"
 	finalemusic = "CORNER"
+	victorymusic = "URAHERO"
 	finaleflat = "#DCDCDC"
 	intermissionmusic = "ENDLEVEL"
 	titletime = 15
