@@ -16,10 +16,14 @@
 #define DOTVERSIONSTR DOTVERSIONSTR_NOREV " (r" SVN_REVISION_STRING ")"
 #define SAVEPRODVER 0x001002FF // 0xMMMmmmrr in hex
 
+// Windows RC files have weird syntax so we need an unquoted version
+#define RCGAMENAME ECWolf
+
 #define MINSAVEVER	1370923175ll
 // The following will be used as a less accurate fallback for non-version control builds
 #define MINSAVEPRODVER 0x00100201
 
+#ifndef RC_INVOKED
 #define SAVEVERUNDEFINED 99999999999ll
 #define __GETSAVESIG(x) #x
 #define GETSAVESIG(x) "ECWOLFSAVE" __GETSAVESIG(x)
@@ -29,6 +33,7 @@
 #define SAVEVER	SVN_REVISION_NUMBER
 #endif
 #define SAVESIG	GETSAVESIG(SAVEVER)
+#endif
 
 //#define USE_FEATUREFLAGS    // Enables the level feature flags (see bottom of wl_def.h)
 //#define USE_DIR3DSPR        // Enables directional 3d sprites (see wl_dir3dspr.cpp)
