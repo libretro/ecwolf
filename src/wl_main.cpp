@@ -388,7 +388,7 @@ static void InitGame()
 
 #if SDL_VERSION_ATLEAST(2,0,0)
 #else
-	SDL_WM_SetCaption("ECWolf " DOTVERSIONSTR, NULL);
+	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
 #endif
 	SDL_ShowCursor(SDL_DISABLE);
 
@@ -1086,12 +1086,12 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 	{
 		if(hasError) printf("\n");
 		printf(
-			"ECWolf v1.0\n"
+			GAMENAME " v" DOTVERSIONSTR "\n"
 			"http://maniacsvault.net/ecwolf/\n"
 			"Based on Wolf4SDL v1.7\n"
 			"Ported by Chaos-Software (http://www.chaos-software.de.vu)\n"
 			"Original Wolfenstein 3D by id Software\n\n"
-			"Usage: ecwolf [options]\n"
+			"Usage: " BINNAME " [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
 			" --config <file>        Use an explicit location for the config file\n"
@@ -1260,7 +1260,7 @@ int main (int argc, char *argv[])
 
 			Printf("IWad: Selecting base game data.\n");
 			const char* extension = CheckParameters(argc, argv, wadfiles);
-			IWad::SelectGame(files, extension, "ecwolf.pk3", progdir);
+			IWad::SelectGame(files, extension, MAIN_PK3, progdir);
 
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
 				files.Push(wadfiles[i]);

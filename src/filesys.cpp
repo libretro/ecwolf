@@ -53,6 +53,7 @@
 #include <sys/stat.h>
 #include <cstdio>
 #include "filesys.h"
+#include "version.h"
 #include "zstring.h"
 
 namespace FileSys {
@@ -138,7 +139,7 @@ void SetupPaths(int argc, const char * const *argv)
 			if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_RoamingAppData, 0x00008000, NULL, &tempPath)))
 			{
 				WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-				configDir.Format("%s\\ecwolf", (const char*)tempCPath);
+				configDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
 				CoTaskMemFree(tempPath);
 			}
 		}
@@ -150,7 +151,7 @@ void SetupPaths(int argc, const char * const *argv)
 			if(SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
 			{
 				WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-				configDir.Format("%s\\ecwolf", (const char*)tempCPath);
+				configDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
 				CoTaskMemFree(tempPath);
 			}
 		}
@@ -168,7 +169,7 @@ void SetupPaths(int argc, const char * const *argv)
 		{
 			char* chome = new char[wcslen(home)];
 			WideCharToMultiByte(CP_UTF8, 0, home, -1, chome, wcslen(home), NULL, NULL);
-			configDir.Format("%s\\ecwolf", chome);
+			configDir.Format("%s\\" GAME_DIR, chome);
 			delete[] chome;
 		}
 	}
@@ -188,10 +189,10 @@ void SetupPaths(int argc, const char * const *argv)
 		{
 			I_Error("Please set your HOME environment variable.\n");
 		}
-		configDir.Format("%s/.config/ecwolf", home);
+		configDir.Format("%s/.config/" GAME_DIR, home);
 	}
 	else
-		configDir.Format("%s/ecwolf", xdg_config);
+		configDir.Format("%s/" GAME_DIR, xdg_config);
 #endif
 
 	if(!CreateDirectoryIfNeeded(configDir))
@@ -203,7 +204,7 @@ void SetupPaths(int argc, const char * const *argv)
 #elif defined(__APPLE__)
 	osxDir = OSX_FindFolder(DIR_Documents);
 	if(!osxDir.IsEmpty())
-		documentsDir = osxDir + "/ECWolf";
+		documentsDir = osxDir + "/" GAME_DIR;
 #else
 	char *xdg_data = getenv("XDG_DATA_HOME");
 	if(xdg_data == NULL || *xdg_data == '\0')
@@ -212,10 +213,10 @@ void SetupPaths(int argc, const char * const *argv)
 		{
 			I_Error("Please set your HOME environment variable.\n");
 		}
-		documentsDir.Format("%s/.local/share/ecwolf", home);
+		documentsDir.Format("%s/.local/share/" GAME_DIR, home);
 	}
 	else
-		documentsDir.Format("%s/ecwolf", xdg_data);
+		documentsDir.Format("%s/" GAME_DIR, xdg_data);
 #endif
 
 	if(!CreateDirectoryIfNeeded(documentsDir))
@@ -230,7 +231,7 @@ void SetupPaths(int argc, const char * const *argv)
 		if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_SavedGames, 0x00008000, NULL, &tempPath)))
 		{
 			WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-			saveDir.Format("%s\\ECWolf", (const char*)tempCPath);
+			saveDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
 			CoTaskMemFree(tempPath);
 		}
 	}
@@ -249,7 +250,7 @@ void SetupPaths(int argc, const char * const *argv)
 #if defined(__APPLE__)
 	osxDir = OSX_FindFolder(DIR_ApplicationSupport);
 	if(!osxDir.IsEmpty())
-		appsupportDir = osxDir + "/ECWolf";
+		appsupportDir = osxDir + "/" GAME_DIR;
 #else
 	appsupportDir = progDir;
 #endif

@@ -555,9 +555,9 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	selectedGame = &iwadTypes[base.Type];
 
 	if(!useProgdir)
-		wadfiles.Push("ecwolf.pk3");
+		wadfiles.Push(datawad);
 	else
-		wadfiles.Push(progdir + "/ecwolf.pk3");
+		wadfiles.Push(progdir + "/" + datawad);
 	for(unsigned int i = 0;i < base.Path.Size();++i)
 	{
 		wadfiles.Push(base.Path[i]);

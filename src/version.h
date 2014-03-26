@@ -5,6 +5,13 @@
 
 #define GAMENAME "ECWolf"
 #define GAMESIG "ECWOLF"
+#define BINNAME "ecwolf"
+#define MAIN_PK3 "ecwolf.pk3"
+#if defined(__APPLE__) || defined(_WIN32)
+#define GAME_DIR GAMENAME
+#else
+#define GAME_DIR "ecwolf"
+#endif
 #define DOTVERSIONSTR_NOREV "1.2.99999"
 #define DOTVERSIONSTR DOTVERSIONSTR_NOREV " (r" SVN_REVISION_STRING ")"
 #define SAVEPRODVER 0x001002FF // 0xMMMmmmrr in hex
