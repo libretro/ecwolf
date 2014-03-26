@@ -116,6 +116,13 @@ public:
 	};
 	EColorRange	FontColors[NUM_FONTCOLORS];
 
+	enum ETransition
+	{
+		TRANSITION_Fizzle,
+		TRANSITION_Fade
+	};
+	ETransition DeathTransition;
+
 	struct BorderTextures
 	{
 		bool issolid;

@@ -39,6 +39,7 @@ gameinfo
 	highscoresfontcolor = "NoahWhite"
 	pageindexfontcolor = "Black"
 	dialogcolor = "NoahWhite"
+	deathtransition = "Fade"
 }
 
 automap

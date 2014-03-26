@@ -717,19 +717,29 @@ void Died (void)
 		}
 	}
 
-	FizzleFadeStart();
+	if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
+	{
+		FizzleFadeStart();
 
-	// Fizzle fade used a slightly darker shade of red.
-	byte fr = RPART(players[0].mo->damagecolor)*2/3;
-	byte fg = GPART(players[0].mo->damagecolor)*2/3;
-	byte fb = BPART(players[0].mo->damagecolor)*2/3;
-	VWB_Clear(ColorMatcher.Pick(fr,fg,fb), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
+		// Fizzle fade used a slightly darker shade of red.
+		byte fr = RPART(players[0].mo->damagecolor)*2/3;
+		byte fg = GPART(players[0].mo->damagecolor)*2/3;
+		byte fb = BPART(players[0].mo->damagecolor)*2/3;
+		VWB_Clear(ColorMatcher.Pick(fr,fg,fb), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
 
-	IN_ClearKeysDown ();
+		IN_ClearKeysDown ();
 
-	FizzleFade(viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
+		FizzleFade(viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
 
-	IN_UserInput(100);
+		IN_UserInput(100);
+	}
+	else
+	{
+		// If we get a game over we will fade out any way
+		if(players[0].lives > -1)
+			VL_FadeOut(0, 255, 0, 0, 0, 64);
+	}
+
 	SD_WaitSoundDone ();
 	ClearMemory();
 

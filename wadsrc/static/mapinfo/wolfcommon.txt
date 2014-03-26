@@ -29,6 +29,7 @@ gameinfo
 	gibfactor = 1
 	translator = "xlat/wolf3d.txt"
 	gamecolormap = "COLORMAP"
+	deathtransition = "Fizzle"
 }
 
 automap

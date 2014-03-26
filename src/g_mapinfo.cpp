@@ -614,6 +614,17 @@ protected:
 		}
 		else if(key.CompareNoCase("borderflat") == 0)
 			ParseStringAssignment(gameinfo.BorderFlat);
+		else if(key.CompareNoCase("deathtransition") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			if(sc->str.CompareNoCase("fizzle") == 0)
+				gameinfo.DeathTransition = GameInfo::TRANSITION_Fizzle;
+			else if(sc->str.CompareNoCase("fade") == 0)
+				gameinfo.DeathTransition = GameInfo::TRANSITION_Fade;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown transition type '%s'.", sc->str.GetChars());
+		}
 		else if(key.CompareNoCase("dialogcolor") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::DIALOG]);
 		else if(key.CompareNoCase("doorsoundsequence") == 0)
