@@ -291,6 +291,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	NoIntermission = false;
 	SecretDeathSounds = false;
 	SpawnWithWeaponRaised = false;
+	ForceTally = false;
 	HighScoresGraphic.SetInvalid();
 }
 
@@ -505,6 +506,8 @@ protected:
 				mapInfo.FloorNumber.Format("%d", sc->number);
 			}
 		}
+		else if(key.CompareNoCase("ForceTally") == 0)
+			ParseBoolAssignment(mapInfo.ForceTally);
 		else if(key.CompareNoCase("HighScoresGraphic") == 0)
 		{
 			FString texName;
@@ -635,6 +638,8 @@ protected:
 			ParseStringAssignment(gameinfo.GameColormap);
 		else if(key.CompareNoCase("gameoverpic") == 0)
 			ParseStringAssignment(gameinfo.GameOverPic);
+		else if(key.CompareNoCase("victorypic") == 0)
+			ParseStringAssignment(gameinfo.VictoryPic);
 		else if(key.CompareNoCase("gamepalette") == 0)
 			ParseStringAssignment(gameinfo.GamePalette);
 		else if(key.CompareNoCase("gibfactor") == 0)

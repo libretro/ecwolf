@@ -7,6 +7,7 @@ gameinfo
 	gamepalette = "NOAHPAL"
 	titlepalette = "TITLEPAL"
 	gameoverpic = "GMOVA0"
+	victorypic = "YWINA0"
 	finaleflat = "#B5B5B5"
 	psyched = "C6 C6 00", "E7 E7 00", 3
 	menufade = "56 3D 1C"
@@ -152,6 +153,9 @@ adddefaultmap
 {
 	defaultfloor = "FLOOR1"
 	defaultceiling = "CEILING1"
+	specialaction = "BurtTheBear", "Exit_Victory"
+	victorynext = "EndTitle"
+	forcetally = true
 }
 
 // Episode 1
@@ -591,8 +595,8 @@ map "MAP28"
 
 map "MAP29"
 {
-	next = "MAP31"
-	secretnext = "MAP31"
+	next = "MAP30"
+	secretnext = "MAP30"
 	floornumber = "6-6"
 	music = "SONG7"
 	cluster = 6

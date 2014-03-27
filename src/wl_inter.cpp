@@ -392,6 +392,11 @@ static void InterDoNormal()
 	Write (24, 10, language["STR_TIME"], true);
 	Write (24, 12, language["STR_PAR"], true);
 
+	// Write the starting value based on InterState.bonus in case ForceTally is on
+	FString bonusstr;
+	bonusstr.Format("%u", InterState.bonus);
+	Write (36, 7, bonusstr, true);
+
 	Write (37, 14, "%");
 	Write (37, 16, "%");
 	Write (37, 18, "%");
@@ -435,7 +440,10 @@ static void InterDoGraphical()
 	InterDrawGraphicalTop();
 
 	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_BONUS]), 104, 72);
-	Write (36, 9, "0", true, true);
+	// Write the starting value based on InterState.bonus in case ForceTally is on
+	FString bonusstr;
+	bonusstr.Format("%u", InterState.bonus);
+	Write (36, 9, bonusstr, true, true);
 
 	VW_UpdateScreen ();
 	VW_FadeIn ();
@@ -550,7 +558,7 @@ void LevelCompleted (void)
 	if ((unsigned)gamestate.TimeCount < levelInfo->Par * TICRATE)
 		InterState.timeleft = (int) (levelInfo->Par - gamestate.TimeCount/TICRATE);
 
-	if(levelInfo->LevelBonus == -1)
+	if(levelInfo->LevelBonus == -1 || levelInfo->ForceTally)
 	{
 		//
 		// SAVE RATIO INFORMATION FOR ENDGAME
@@ -577,8 +585,11 @@ void LevelCompleted (void)
 
 	BJ_Breathe(true);
 
-	if(levelInfo->LevelBonus == -1)
+	if(levelInfo->LevelBonus == -1 || levelInfo->ForceTally)
 	{
+		if(levelInfo->LevelBonus > 0)
+			InterState.bonus = levelInfo->LevelBonus;
+
 		if(InterState.graphical)
 			InterDoGraphical();
 		else

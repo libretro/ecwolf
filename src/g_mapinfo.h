@@ -71,6 +71,7 @@ public:
 	FString	AdvisoryPic;
 	FString FinaleFlat;
 	FString GameOverPic;
+	FString VictoryPic;
 	// Special stack for strings like the default translator.
 	// This will allow the previous default to be included.
 	class FStringStack
@@ -183,6 +184,7 @@ public:
 	bool			DeathCam;
 	bool			SecretDeathSounds;
 	bool			SpawnWithWeaponRaised;
+	bool			ForceTally;
 
 	TArray<const ClassDef *>	EnsureInventory;
 

@@ -75,4 +75,6 @@ public:
 	void Tick();
 };
 
+void R_DrawZoomer(FTextureID texID);
+
 #endif

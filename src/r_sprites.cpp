@@ -49,6 +49,7 @@
 #include "zstring.h"
 #include "r_data/colormaps.h"
 #include "a_inventory.h"
+#include "id_vh.h"
 
 struct SpriteInfo
 {
@@ -501,7 +502,8 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 
 IMPLEMENT_INTERNAL_CLASS(SpriteZoomer)
 
-SpriteZoomer::SpriteZoomer(FTextureID texID) : Thinker(ThinkerList::VICTORY), texID(texID), count(0)
+SpriteZoomer::SpriteZoomer(FTextureID texID) :
+	Thinker(ThinkerList::VICTORY), texID(texID), count(0)
 {
 }
 
@@ -529,4 +531,22 @@ void SpriteZoomer::Tick()
 	assert(count <= 192);
 	if(++count > 192)
 		Destroy();
+}
+
+void R_DrawZoomer(FTextureID texID)
+{
+	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(texID);
+	do
+	{
+		for(unsigned int t = tics;zoomer && t-- > 0;)
+			zoomer->Tick();
+		if(!zoomer)
+			break;
+
+		ThreeDRefresh();
+		zoomer->Draw();
+		VH_UpdateScreen();
+		CalcTics();
+	}
+	while(true);
 }

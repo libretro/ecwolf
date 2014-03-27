@@ -699,22 +699,7 @@ void Died (void)
 	{
 		FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
 		if(texID.isValid())
-		{
-			TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(texID);
-			do
-			{
-				for(unsigned int t = tics;zoomer && t-- > 0;)
-					zoomer->Tick();
-				if(!zoomer)
-					break;
-
-				ThreeDRefresh();
-				zoomer->Draw();
-				VH_UpdateScreen();
-				CalcTics();
-			}
-			while(true);
-		}
+			R_DrawZoomer(texID);
 	}
 
 	if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
@@ -882,6 +867,16 @@ restartgame:
 
 		PlayLoop ();
 
+		if(playstate == ex_victorious)
+		{
+			if(gameinfo.VictoryPic.IsNotEmpty())
+			{
+				FTextureID ywin = TexMan.CheckForTexture(gameinfo.VictoryPic, FTexture::TEX_Any);
+				if(ywin.isValid())
+					R_DrawZoomer(ywin);
+			}
+		}
+
 		StopMusic ();
 		ingame = false;
 
@@ -929,6 +924,12 @@ restartgame:
 
 						if(dointermission)
 						{
+							if(levelInfo->ForceTally)
+							{
+								LevelCompleted();
+								VW_FadeOut();
+							}
+
 							Victory (false);
 
 							ClearMemory ();
