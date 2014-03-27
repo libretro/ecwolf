@@ -50,7 +50,7 @@ automap
 	background = "6F 4A 25"
 	doorcolor = "77 CE CE"
 	floorcolor = "6F 4A 25"
-	wallcolor = "42 31 18"
+	wallcolor = "4E 5E 00"
 	yourcolor = "C6 C6 00"
 }
 
