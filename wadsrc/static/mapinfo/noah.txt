@@ -230,7 +230,7 @@ adddefaultmap
 	defaultfloor = "FLOOR1"
 	defaultceiling = "CEILING1"
 	specialaction = "BurtTheBear", "Exit_Victory"
-	victorynext = "EndTitle"
+	victorynext = "EndSequence:NoahCast"
 	forcetally = true
 }
 
@@ -671,7 +671,7 @@ map "MAP28"
 
 map "MAP29"
 {
-	next = "EndSequence:NoahCast"
+	next = "MAP30"
 	secretnext = "MAP30"
 	floornumber = "6-6"
 	music = "SONG7"

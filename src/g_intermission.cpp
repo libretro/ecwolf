@@ -41,6 +41,7 @@
 #include "language.h"
 #include "r_sprites.h"
 #include "tarray.h"
+#include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"
 #include "wl_inter.h"
@@ -57,9 +58,11 @@ IntermissionInfo *IntermissionInfo::Find(const FName &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void StartTravel ();
+void FinishTravel ();
+
 static bool intermissionMapLoaded = false;
 static bool exitOnAck;
-struct InputAcknowledged {};
 
 static void ClearStatusbar()
 {
@@ -133,7 +136,11 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 			if(image->MapName.IsNotEmpty())
 			{
 				strncpy(gamestate.mapname, image->MapName, 8);
+				StartTravel();
 				SetupGameLevel();
+				FinishTravel();
+				// Drop weapon
+				players[0].SetPSprite(NULL, player_t::ps_weapon);
 				PreloadGraphics(true);
 				gamestate.victoryflag = true;
 			}
