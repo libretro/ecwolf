@@ -1238,7 +1238,11 @@ protected:
 				cast->Class = ClassDef::FindClass(sc->str);
 			}
 			else if(sc->str.CompareNoCase("CastName") == 0)
+			{
 				ParseStringAssignment(cast->Name);
+				if(cast->Name[0] == '$')
+					cast->Name = language[cast->Name.Mid(1)];
+			}
 			else
 				return false;
 		}

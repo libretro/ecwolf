@@ -275,6 +275,19 @@ NOAH_BRIEF_05 = "Wow! Kerry was no challenge for\nyou! Can you keep up the pace\
 NOAH_BRIEF_06 = "You are almost there! If you can\nget through one more day, you\nwill be out of here for good!\n\nRumor has it one of the bears\ndoes not want to be found. In\nfact he may try to hide from\nyou. Be on the alert for Burt\nthe Bear.\n\nGet him to sleep and your work\nis done!";
 NOAH_BRIEF_COPYRIGHT = "\nSuper 3-D Noah's Ark\n\n\n(C)1995 Wisdom Tree, Inc.\nAll rights reserved.\n\n\nThis game contains copyrighted\nsoftware code owned by\nId Software, Inc\n(C)1992 Id Software, Inc.\nAll rights reserved.\n";
 
+CC_GOAT = "Goat";
+CC_SHEEP = "Sheep";
+CC_OSTRICH = "Ostrich";
+CC_ANTELOPE = "Antelope";
+CC_OX = "Ox";
+CC_CARL = "Carl the Camel";
+CC_MELVIN = "Melvin the Monkey";
+CC_GINNY = "Ginny the Giraffe";
+CC_KERRY = "Kerry the Kangaroo";
+CC_ERNIE = "Ernie the Elephant";
+CC_BURTHIDING = "Hiding Burt";
+CC_BURT = "Burt the Bear";
+
 /* Super 3D Noah's Ark Quiz */
 
 NOAH_CORRECT = "Correct!";

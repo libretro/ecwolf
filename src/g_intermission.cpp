@@ -60,6 +60,14 @@ IntermissionInfo *IntermissionInfo::Find(const FName &name)
 static bool exitOnAck;
 struct InputAcknowledged {};
 
+static void ClearStatusbar()
+{
+	DrawPlayScreen();
+
+	FTexture *borderTex = TexMan(levelInfo->GetBorderTexture());
+	VWB_DrawFill(borderTex, statusbarx, statusbary2+CleanYfac, screenWidth-statusbarx, screenHeight);
+}
+
 static bool WaitIntermission(unsigned int time)
 {
 	if(time)
@@ -128,6 +136,7 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 				gamestate.victoryflag = true;
 			}
 			ThreeDRefresh();
+			ClearStatusbar();
 			break;
 	}
 
@@ -176,6 +185,16 @@ bool R_CastZoomer(const Frame *frame)
 }
 static bool ShowCast(CastIntermissionAction *cast)
 {
+	ClearStatusbar();
+
+	int width = BigFont->StringWidth(cast->Name);
+	screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG],
+		(screenWidth - width*CleanXfac)/2, statusbary2 + (screenHeight - statusbary2 - BigFont->GetHeight())/2,
+		cast->Name,
+		DTA_CleanNoMove, true,
+		TAG_DONE
+	);
+
 	SD_PlaySound(cast->Class->GetDefault()->seesound);
 	const Frame *frame = cast->Class->FindState(NAME_See);
 	return R_CastZoomer(frame);
@@ -236,6 +255,14 @@ bool ShowIntermission(const IntermissionInfo *intermission, bool demoMode)
 	bool gototitle = false;
 	bool acked = false;
 
+	// For a cast call we want the bar area to display the names
+	if(viewsize > 20)
+	{
+		const int oldviewsize = viewsize;
+		NewViewSize(20);
+		viewsize = oldviewsize;
+	}
+
 	do
 	{
 		for(unsigned int i = 0;i < intermission->Actions.Size();++i)
@@ -273,6 +300,10 @@ bool ShowIntermission(const IntermissionInfo *intermission, bool demoMode)
 	}
 	while(intermission);
 EscSequence:
+
+	// If we changed the view size, we should reset it now.
+	if(viewsize > 20)
+		NewViewSize(viewsize);
 
 	if(!gototitle && !demoMode)
 	{

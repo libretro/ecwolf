@@ -132,62 +132,62 @@ intermission NoahCastLoop
 	cast
 	{
 		castclass = "ArkGoat"
-		castname = "Goat"
+		castname = "$CC_GOAT"
 	}
 	cast
 	{
 		castclass = "ArkSheep"
-		castname = "Sheep"
+		castname = "$CC_SHEEP"
 	}
 	cast
 	{
 		castclass = "ArkOstrich"
-		castname = "Ostrich"
+		castname = "$CC_OSTRICH"
 	}
 	cast
 	{
 		castclass = "ArkAntelope"
-		castname = "Antelope"
+		castname = "$CC_ANTELOPE"
 	}
 	cast
 	{
 		castclass = "ArkOx"
-		castname = "Ox"
+		castname = "$CC_OX"
 	}
 	cast
 	{
 		castclass = "CarlTheCamel"
-		castname = "Carl the Camel"
+		castname = "$CC_CARL"
 	}
 	cast
 	{
 		castclass = "MelvinTheMonkey"
-		castname = "Melvin the Monkey"
+		castname = "$CC_MELVIN"
 	}
 	cast
 	{
 		castclass = "GinnyTheGiraffe"
-		castname = "Ginny the Giraffe"
+		castname = "$CC_GINNY"
 	}
 	cast
 	{
 		castclass = "KerryTheKangaroo"
-		castname = "Kerry the Kangaroo"
+		castname = "$CC_KERRY"
 	}
 	cast
 	{
 		castclass = "ErnieTheElephant"
-		castname = "Ernie the Elephant"
+		castname = "$CC_ERNIE"
 	}
 	cast
 	{
 		castclass = "DisguisedBurt"
-		castname = "Hiding Burt"
+		castname = "$CC_BURTHIDING"
 	}
 	cast
 	{
 		castclass = "BurtTheBear"
-		castname = "Burt the Bear"
+		castname = "$CC_BURT"
 	}
 	Link = "NoahCastLoop"
 }

@@ -306,7 +306,7 @@ void SetupGameLevel (void)
 */
 void DrawPlayBorderSides(void)
 {
-	if(viewsize == 21) return;
+	if((unsigned)viewheight == screenHeight) return;
 
 	if(!gameinfo.Border.issolid)
 	{
@@ -367,7 +367,7 @@ void DrawPlayBorderSides(void)
 ===================
 */
 
-void DBaseStatusBar::RefreshBackground (void)
+void DBaseStatusBar::RefreshBackground (bool noborder)
 {
 	FTexture *borderTex = TexMan(levelInfo->GetBorderTexture());
 
@@ -388,6 +388,8 @@ void DBaseStatusBar::RefreshBackground (void)
 		VWB_DrawFill(borderTex, statusbarx, 0, screenWidth-statusbarx, statusbary1);
 	VWB_DrawFill(borderTex, statusbarx, statusbary2, screenWidth-statusbarx, screenHeight);
 
+	if(noborder)
+		return;
 	DrawPlayBorderSides();
 }
 
@@ -402,9 +404,7 @@ void DBaseStatusBar::RefreshBackground (void)
 
 void DrawPlayScreen (bool noborder)
 {
-	if(!noborder)
-		StatusBar->RefreshBackground();
-
+	StatusBar->RefreshBackground(noborder);
 	StatusBar->DrawStatusBar();
 }
 
@@ -893,8 +893,6 @@ restartgame:
 			case ex_newmap:
 			case ex_victorious:
 			{
-				if(viewsize == 21) DrawPlayScreen();
-
 				dointermission = !levelInfo->NoIntermission;
 
 				FString next;
@@ -962,7 +960,6 @@ restartgame:
 
 				StripInventory(players[0].mo);
 
-				StatusBar->DrawStatusBar();
 				if(dointermission)
 					VL_FadeOut(0, 255, RPART(levelInfo->ExitFadeColor), GPART(levelInfo->ExitFadeColor), BPART(levelInfo->ExitFadeColor), levelInfo->ExitFadeDuration);
 
