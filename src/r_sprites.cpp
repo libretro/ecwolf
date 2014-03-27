@@ -503,13 +503,13 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 
 IMPLEMENT_INTERNAL_CLASS(SpriteZoomer)
 
-SpriteZoomer::SpriteZoomer(FTextureID texID) :
-	Thinker(ThinkerList::VICTORY), frame(NULL), texID(texID), count(0)
+SpriteZoomer::SpriteZoomer(FTextureID texID, unsigned short zoomtime) :
+	Thinker(ThinkerList::VICTORY), frame(NULL), texID(texID), count(0), zoomtime(zoomtime)
 {
 }
 
-SpriteZoomer::SpriteZoomer(const Frame *frame) :
-	Thinker(ThinkerList::VICTORY), frame(frame), count(0)
+SpriteZoomer::SpriteZoomer(const Frame *frame, unsigned short zoomtime) :
+	Thinker(ThinkerList::VICTORY), frame(frame), count(0), zoomtime(zoomtime)
 {
 	frametics = frame->duration;
 }
@@ -531,7 +531,7 @@ void SpriteZoomer::Draw()
 	// since that method didn't account for the view window size
 	// (vanilla could crash) and our player sprite renderer may take
 	// into account things we would rather not have here.
-	const double yscale = double(viewheight*count)/(64.*192.);
+	const double yscale = double(viewheight*count)/double(zoomtime*64);
 	const double xscale = yscale/FIXED2FLOAT(yaspect);
 
 	screen->DrawTexture(gmoverTex, viewscreenx + (viewwidth>>1), viewscreeny + (viewheight>>1) + yscale*32,
@@ -555,14 +555,14 @@ void SpriteZoomer::Tick()
 		}
 	}
 
-	assert(count <= 192);
-	if(++count > 192)
+	assert(count <= zoomtime);
+	if(++count > zoomtime)
 		Destroy();
 }
 
 void R_DrawZoomer(FTextureID texID)
 {
-	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(texID);
+	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(texID, 192);
 	do
 	{
 		for(unsigned int t = tics;zoomer && t-- > 0;)

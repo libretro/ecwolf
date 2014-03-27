@@ -69,10 +69,11 @@ private:
 	FTextureID texID;
 	int frametics;
 	unsigned short count;
+	unsigned short zoomtime;
 
 public:
-	SpriteZoomer(FTextureID texID);
-	SpriteZoomer(const Frame *frame);
+	SpriteZoomer(FTextureID texID, unsigned short zoomtime);
+	SpriteZoomer(const Frame *frame, unsigned short zoomtime);
 
 	void Draw();
 	void Tick();

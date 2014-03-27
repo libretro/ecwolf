@@ -57,6 +57,7 @@ IntermissionInfo *IntermissionInfo::Find(const FName &name)
 
 ////////////////////////////////////////////////////////////////////////////////
 
+static bool intermissionMapLoaded = false;
 static bool exitOnAck;
 struct InputAcknowledged {};
 
@@ -110,6 +111,7 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 		tileBackground = image->BackgroundTile;
 	}
 
+	intermissionMapLoaded = false;
 	switch(type)
 	{
 		default:
@@ -135,6 +137,7 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 				PreloadGraphics(true);
 				gamestate.victoryflag = true;
 			}
+			intermissionMapLoaded = true;
 			ThreeDRefresh();
 			ClearStatusbar();
 			break;
@@ -154,9 +157,22 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 }
 
 
-bool R_CastZoomer(const Frame *frame)
+static void DrawCastName(CastIntermissionAction *cast)
 {
-	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(frame);
+	int width = BigFont->StringWidth(cast->Name);
+	screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG],
+		(screenWidth - width*CleanXfac)/2, statusbary2 + (screenHeight - statusbary2 - BigFont->GetHeight())/2,
+		cast->Name,
+		DTA_CleanNoMove, true,
+		TAG_DONE
+	);
+}
+static bool R_CastZoomer(const Frame *frame, CastIntermissionAction *cast)
+{
+	// This may appear to animate faster than vanilla, but I'm fairly sure
+	// that's because while the time on screen is adaptive, the frame durations
+	// were decremented by one each frame.
+	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(frame, 224);
 	do
 	{
 		for(unsigned int t = tics;zoomer && t-- > 0;)
@@ -164,8 +180,14 @@ bool R_CastZoomer(const Frame *frame)
 		if(!zoomer)
 			break;
 
-		//if(ingame)
+		if(intermissionMapLoaded)
 			ThreeDRefresh();
+		else
+		{
+			// Unlike a 3D view, we will overwrite the whole screen here
+			ShowImage(cast, true);
+			DrawCastName(cast);
+		}
 		zoomer->Draw();
 		VH_UpdateScreen();
 		IN_ProcessEvents();
@@ -186,18 +208,11 @@ bool R_CastZoomer(const Frame *frame)
 static bool ShowCast(CastIntermissionAction *cast)
 {
 	ClearStatusbar();
-
-	int width = BigFont->StringWidth(cast->Name);
-	screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG],
-		(screenWidth - width*CleanXfac)/2, statusbary2 + (screenHeight - statusbary2 - BigFont->GetHeight())/2,
-		cast->Name,
-		DTA_CleanNoMove, true,
-		TAG_DONE
-	);
+	DrawCastName(cast);
 
 	SD_PlaySound(cast->Class->GetDefault()->seesound);
 	const Frame *frame = cast->Class->FindState(NAME_See);
-	return R_CastZoomer(frame);
+	return R_CastZoomer(frame, cast);
 }
 
 static void ShowFader(FaderIntermissionAction *fader)
