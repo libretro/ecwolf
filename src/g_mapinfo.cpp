@@ -1040,7 +1040,7 @@ protected:
 	{
 		sc.MustGetToken(TK_Identifier);
 
-		intermission = &IntermissionInfo::Find(sc->str);
+		intermission = IntermissionInfo::Find(sc->str);
 	}
 
 	void ParseTimeAssignment(unsigned int &time)
@@ -1070,7 +1070,20 @@ protected:
 	bool CheckKey(FString key)
 	{
 		IntermissionInfo::Action action;
-		if(key.CompareNoCase("Fader") == 0)
+		if(key.CompareNoCase("Cast") == 0)
+		{
+			CastIntermissionAction *cast = new CastIntermissionAction();
+
+			action.type = IntermissionInfo::CAST;
+			action.action = cast;
+
+			if(!ParseCast(cast))
+			{
+				delete cast;
+				return false;
+			}
+		}
+		else if(key.CompareNoCase("Fader") == 0)
 		{
 			FaderIntermissionAction *fader = new FaderIntermissionAction();
 
@@ -1105,6 +1118,11 @@ protected:
 					return false;
 				}
 			}
+		}
+		else if(key.CompareNoCase("Link") == 0)
+		{
+			ParseNameAssignment(intermission->Link);
+			return true;
 		}
 		else if(key.CompareNoCase("TextScreen") == 0)
 		{
@@ -1164,6 +1182,13 @@ protected:
 				{
 					action->Type = IntermissionAction::TITLEPAGE;
 				}
+				else if(sc->str.CompareNoCase("LoadMap") == 0)
+				{
+					action->Type = IntermissionAction::LOADMAP;
+					sc.MustGetToken(',');
+					sc.MustGetToken(TK_StringConst);
+					action->MapName = sc->str;
+				}
 				else
 				{
 					sc.ScriptMessage(Scanner::ERROR, "Unknown background type %s. Use quotes for static image.", sc->str.GetChars());
@@ -1194,6 +1219,29 @@ protected:
 			ParseTimeAssignment(action->Time);
 		else
 			return false;
+		return true;
+	}
+
+	bool ParseCast(CastIntermissionAction *cast)
+	{
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			if(CheckStandardKey(cast, sc->str))
+				continue;
+
+			if(sc->str.CompareNoCase("CastClass") == 0)
+			{
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_StringConst);
+				cast->Class = ClassDef::FindClass(sc->str);
+			}
+			else if(sc->str.CompareNoCase("CastName") == 0)
+				ParseStringAssignment(cast->Name);
+			else
+				return false;
+		}
 		return true;
 	}
 

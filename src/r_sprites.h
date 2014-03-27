@@ -65,11 +65,14 @@ class SpriteZoomer : public Thinker
 	DECLARE_CLASS(SpriteZoomer, Thinker)
 
 private:
+	const Frame *frame;
 	FTextureID texID;
+	int frametics;
 	unsigned short count;
 
 public:
 	SpriteZoomer(FTextureID texID);
+	SpriteZoomer(const Frame *frame);
 
 	void Draw();
 	void Tick();

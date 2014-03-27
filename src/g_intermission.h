@@ -56,6 +56,7 @@ public:
 		NORMAL,
 		HIGHSCORES,
 		TITLEPAGE,
+		LOADMAP
 	};
 
 	IntermissionAction() : Type(UNSET), Time(0), BackgroundTile(false)
@@ -71,6 +72,15 @@ public:
 	FString				Palette;
 	unsigned int		Time;
 	bool				BackgroundTile;
+
+	FString				MapName;
+};
+
+class CastIntermissionAction : public IntermissionAction
+{
+public:
+	const ClassDef *Class;
+	FString Name;
 };
 
 class FaderIntermissionAction : public IntermissionAction
@@ -109,12 +119,15 @@ public:
 class IntermissionInfo
 {
 public:
-	static IntermissionInfo &Find(const FName &name);
+	static IntermissionInfo *Find(const FName &name);
+
+	IntermissionInfo() : Link(NAME_None) {}
 
 	enum ActionType
 	{
 		IMAGE,
 		FADER,
+		CAST,
 		GOTOTITLE,
 		TEXTSCREEN,
 		VICTORYSTATS
@@ -126,7 +139,8 @@ public:
 		IntermissionAction	*action;
 	};
 	TArray<Action>	Actions;
+	FName			Link;
 };
 
 // Returns true if the game should return to the menu instead of the title screen.
-bool ShowIntermission(const IntermissionInfo &intermission, bool demoMode=false);
+bool ShowIntermission(const IntermissionInfo *intermission, bool demoMode=false);

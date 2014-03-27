@@ -49,6 +49,7 @@
 #include "zstring.h"
 #include "r_data/colormaps.h"
 #include "a_inventory.h"
+#include "id_us.h"
 #include "id_vh.h"
 
 struct SpriteInfo
@@ -503,13 +504,26 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 IMPLEMENT_INTERNAL_CLASS(SpriteZoomer)
 
 SpriteZoomer::SpriteZoomer(FTextureID texID) :
-	Thinker(ThinkerList::VICTORY), texID(texID), count(0)
+	Thinker(ThinkerList::VICTORY), frame(NULL), texID(texID), count(0)
 {
+}
+
+SpriteZoomer::SpriteZoomer(const Frame *frame) :
+	Thinker(ThinkerList::VICTORY), frame(frame), count(0)
+{
+	frametics = frame->duration;
 }
 
 void SpriteZoomer::Draw()
 {
-	FTexture *gmoverTex = TexMan(texID);
+	FTexture *gmoverTex;
+	if(frame)
+	{
+		const Sprite &spr = spriteFrames[loadedSprites[frame->spriteInf].frames+frame->frame];
+		gmoverTex = TexMan[spr.texture[0]];
+	}
+	else
+		gmoverTex = TexMan(texID);
 
 	// What we're trying to do is zoom in a 160x160 player sprite to
 	// fill the viewheight.  S3DNA use the player sprite rendering
@@ -517,10 +531,10 @@ void SpriteZoomer::Draw()
 	// since that method didn't account for the view window size
 	// (vanilla could crash) and our player sprite renderer may take
 	// into account things we would rather not have here.
-	const double yscale = double(viewheight*count)/(160.*192.);
+	const double yscale = double(viewheight*count)/(64.*192.);
 	const double xscale = yscale/FIXED2FLOAT(yaspect);
 
-	screen->DrawTexture(gmoverTex, viewscreenx + (viewwidth>>1) - xscale*160, viewscreeny + (viewheight>>1) - yscale*80,
+	screen->DrawTexture(gmoverTex, viewscreenx + (viewwidth>>1), viewscreeny + (viewheight>>1) + yscale*32,
 		DTA_DestWidthF, gmoverTex->GetScaledWidthDouble()*xscale,
 		DTA_DestHeightF, gmoverTex->GetScaledHeightDouble()*yscale,
 		TAG_DONE);
@@ -528,6 +542,19 @@ void SpriteZoomer::Draw()
 
 void SpriteZoomer::Tick()
 {
+	if(frame)
+	{
+		if(--frametics <= 0)
+		{
+			do
+			{
+				frame = frame->next;
+				frametics = frame->duration;
+			}
+			while(frametics == 0);
+		}
+	}
+
 	assert(count <= 192);
 	if(++count > 192)
 		Destroy();

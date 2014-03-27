@@ -798,7 +798,7 @@ static void DemoLoop()
 	if (!param_nowait)
 		PG13 ();
 
-	IntermissionInfo &demoLoop = IntermissionInfo::Find("DemoLoop");
+	IntermissionInfo *demoLoop = IntermissionInfo::Find("DemoLoop");
 	bool gotoMenu = false;
 	while (1)
 	{

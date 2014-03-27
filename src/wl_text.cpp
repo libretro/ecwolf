@@ -975,7 +975,7 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 
 	if(!exitSlideshow.IsEmpty())
 	{
-		IntermissionInfo &intermission = IntermissionInfo::Find(exitSlideshow);
+		IntermissionInfo *intermission = IntermissionInfo::Find(exitSlideshow);
 		ShowIntermission(intermission);
 	}
 
@@ -1004,7 +1004,7 @@ void EnterText(unsigned int cluster)
 
 	if(!clusterInfo.EnterSlideshow.IsEmpty())
 	{
-		IntermissionInfo &intermission = IntermissionInfo::Find(clusterInfo.EnterSlideshow);
+		IntermissionInfo *intermission = IntermissionInfo::Find(clusterInfo.EnterSlideshow);
 		ShowIntermission(intermission);
 	}
 }

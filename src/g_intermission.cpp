@@ -35,19 +35,24 @@
 #include "wl_def.h"
 #include "id_ca.h"
 #include "id_in.h"
+#include "id_sd.h"
 #include "id_vh.h"
 #include "g_intermission.h"
 #include "language.h"
+#include "r_sprites.h"
 #include "tarray.h"
+#include "wl_draw.h"
+#include "wl_game.h"
 #include "wl_inter.h"
 #include "wl_menu.h"
 #include "wl_play.h"
+#include "thingdef/thingdef.h"
 
 static TMap<FName, IntermissionInfo> intermissions;
 
-IntermissionInfo &IntermissionInfo::Find(const FName &name)
+IntermissionInfo *IntermissionInfo::Find(const FName &name)
 {
-	return intermissions[name];
+	return &intermissions[name];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,6 +119,16 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 				VL_ReadPalette(gameinfo.TitlePalette);
 			CA_CacheScreen(TexMan(background));
 			break;
+		case IntermissionAction::LOADMAP:
+			if(image->MapName.IsNotEmpty())
+			{
+				strncpy(gamestate.mapname, image->MapName, 8);
+				SetupGameLevel();
+				PreloadGraphics(true);
+				gamestate.victoryflag = true;
+			}
+			ThreeDRefresh();
+			break;
 	}
 
 	for(unsigned int i = 0;i < image->Draw.Size();++i)
@@ -127,6 +142,43 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 		return WaitIntermission(image->Time);
 	}
 	return false;
+}
+
+
+bool R_CastZoomer(const Frame *frame)
+{
+	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(frame);
+	do
+	{
+		for(unsigned int t = tics;zoomer && t-- > 0;)
+			zoomer->Tick();
+		if(!zoomer)
+			break;
+
+		//if(ingame)
+			ThreeDRefresh();
+		zoomer->Draw();
+		VH_UpdateScreen();
+		IN_ProcessEvents();
+		if(Keyboard[sc_Space] || Keyboard[sc_Escape] || Keyboard[sc_Enter])
+		{
+			bool done = Keyboard[sc_Escape] || Keyboard[sc_Enter];
+			Keyboard[sc_Space] = Keyboard[sc_Escape] = Keyboard[sc_Enter] = false;
+			zoomer->Destroy();
+			if(done)
+				return true;
+			break;
+		}
+		CalcTics();
+	}
+	while(true);
+	return false;
+}
+static bool ShowCast(CastIntermissionAction *cast)
+{
+	SD_PlaySound(cast->Class->GetDefault()->seesound);
+	const Frame *frame = cast->Class->FindState(NAME_See);
+	return R_CastZoomer(frame);
 }
 
 static void ShowFader(FaderIntermissionAction *fader)
@@ -178,37 +230,49 @@ static bool ShowTextScreen(TextScreenIntermissionAction *textscreen, bool demoMo
 	return WaitIntermission(textscreen->Time);
 }
 
-bool ShowIntermission(const IntermissionInfo &intermission, bool demoMode)
+bool ShowIntermission(const IntermissionInfo *intermission, bool demoMode)
 {
 	exitOnAck = demoMode;
 	bool gototitle = false;
 	bool acked = false;
 
-	for(unsigned int i = 0;i < intermission.Actions.Size();++i)
+	do
 	{
-		switch(intermission.Actions[i].type)
+		for(unsigned int i = 0;i < intermission->Actions.Size();++i)
 		{
-			default:
-			case IntermissionInfo::IMAGE:
-				acked = ShowImage(intermission.Actions[i].action, false);
-				break;
-			case IntermissionInfo::FADER:
-				ShowFader((FaderIntermissionAction*)intermission.Actions[i].action);
-				break;
-			case IntermissionInfo::GOTOTITLE:
-				gototitle = true;
-				break;
-			case IntermissionInfo::TEXTSCREEN:
-				acked = ShowTextScreen((TextScreenIntermissionAction*)intermission.Actions[i].action, demoMode);
-				break;
-			case IntermissionInfo::VICTORYSTATS:
-				Victory(true);
-				break;
-		}
+			switch(intermission->Actions[i].type)
+			{
+				default:
+				case IntermissionInfo::IMAGE:
+					acked = ShowImage(intermission->Actions[i].action, false);
+					break;
+				case IntermissionInfo::CAST:
+					acked = gototitle = ShowCast((CastIntermissionAction*)intermission->Actions[i].action);
+					break;
+				case IntermissionInfo::FADER:
+					ShowFader((FaderIntermissionAction*)intermission->Actions[i].action);
+					break;
+				case IntermissionInfo::GOTOTITLE:
+					gototitle = true;
+					break;
+				case IntermissionInfo::TEXTSCREEN:
+					acked = ShowTextScreen((TextScreenIntermissionAction*)intermission->Actions[i].action, demoMode);
+					break;
+				case IntermissionInfo::VICTORYSTATS:
+					Victory(true);
+					break;
+			}
 
-		if(demoMode ? acked : gototitle)
+			if(demoMode ? acked : gototitle)
+				goto EscSequence;
+		}
+		if(intermission->Link != NAME_None)
+			intermission = IntermissionInfo::Find(intermission->Link);
+		else
 			break;
 	}
+	while(intermission);
+EscSequence:
 
 	if(!gototitle && !demoMode)
 	{

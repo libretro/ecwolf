@@ -938,7 +938,7 @@ restartgame:
 						bool gotoMenu = false;
 						if(endSequence)
 						{
-							IntermissionInfo &intermission = IntermissionInfo::Find(next.Mid(12));
+							IntermissionInfo *intermission = IntermissionInfo::Find(next.Mid(12));
 							gotoMenu = ShowIntermission(intermission);
 						}
 

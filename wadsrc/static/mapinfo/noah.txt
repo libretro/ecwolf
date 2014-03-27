@@ -116,6 +116,82 @@ intermission DemoLoop
 	}
 }
 
+intermission NoahCast
+{
+	Fader
+	{
+		Background = LoadMap, "MAP31"
+		Music = "ALLGOOD"
+		Time = 15
+		FadeType = FadeIn
+	}
+	Link = "NoahCastLoop"
+}
+intermission NoahCastLoop
+{
+	cast
+	{
+		castclass = "ArkGoat"
+		castname = "Goat"
+	}
+	cast
+	{
+		castclass = "ArkSheep"
+		castname = "Sheep"
+	}
+	cast
+	{
+		castclass = "ArkOstrich"
+		castname = "Ostrich"
+	}
+	cast
+	{
+		castclass = "ArkAntelope"
+		castname = "Antelope"
+	}
+	cast
+	{
+		castclass = "ArkOx"
+		castname = "Ox"
+	}
+	cast
+	{
+		castclass = "CarlTheCamel"
+		castname = "Carl the Camel"
+	}
+	cast
+	{
+		castclass = "MelvinTheMonkey"
+		castname = "Melvin the Monkey"
+	}
+	cast
+	{
+		castclass = "GinnyTheGiraffe"
+		castname = "Ginny the Giraffe"
+	}
+	cast
+	{
+		castclass = "KerryTheKangaroo"
+		castname = "Kerry the Kangaroo"
+	}
+	cast
+	{
+		castclass = "ErnieTheElephant"
+		castname = "Ernie the Elephant"
+	}
+	cast
+	{
+		castclass = "DisguisedBurt"
+		castname = "Hiding Burt"
+	}
+	cast
+	{
+		castclass = "BurtTheBear"
+		castname = "Burt the Bear"
+	}
+	Link = "NoahCastLoop"
+}
+
 skill baby
 {
 	name = "$STR_SUPEREASY"
@@ -595,7 +671,7 @@ map "MAP28"
 
 map "MAP29"
 {
-	next = "MAP30"
+	next = "EndSequence:NoahCast"
 	secretnext = "MAP30"
 	floornumber = "6-6"
 	music = "SONG7"

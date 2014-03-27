@@ -102,11 +102,11 @@ sprites
 
 	"WMLNA0",	"WMLNB0",
 
-	"GMOVA0":pspr,
+	"GMOVA0",
 
 	"CNUTA0",	"CTLPA0",	"CTLPB0",	"CNUTB0",
 
-	"YWINA0":pspr,
+	"YWINA0",
 
 	"SHEPA1",	"SHEPA2",	"SHEPA3",	"SHEPA4",
 	"SHEPA5",	"SHEPA6",	"SHEPA7",	"SHEPA8",
