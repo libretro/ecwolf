@@ -98,7 +98,8 @@ void ReadConfig(void)
 	config.CreateSetting("MouseEnabled", 1);
 	config.CreateSetting("JoystickEnabled", 0);
 	config.CreateSetting("ViewSize", 19);
-	config.CreateSetting("MouseAdjustment", 5);
+	config.CreateSetting("MouseXAdjustment", 5);
+	config.CreateSetting("MouseYAdjustment", 5);
 	config.CreateSetting("SoundDevice", sdm_AdLib);
 	config.CreateSetting("MusicDevice", smm_AdLib);
 	config.CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
@@ -150,7 +151,8 @@ void ReadConfig(void)
 		controlScheme[i].mouse = config.GetSetting(mseSettingName)->GetInteger();
 	}
 	viewsize = config.GetSetting("ViewSize")->GetInteger();
-	mouseadjustment = config.GetSetting("MouseAdjustment")->GetInteger();
+	mousexadjustment = config.GetSetting("MouseXAdjustment")->GetInteger();
+	mouseyadjustment = config.GetSetting("MouseYAdjustment")->GetInteger();
 	mouseyaxisdisabled = config.GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
 	alwaysrun = config.GetSetting("AlwaysRun")->GetInteger() != 0;
 	AdlibVolume = config.GetSetting("SoundVolume")->GetInteger();
@@ -203,8 +205,11 @@ void ReadConfig(void)
 	if(mouseenabled) mouseenabled=true;
 	if(joystickenabled) joystickenabled=true;
 
-	if(mouseadjustment<0) mouseadjustment=0;
-	else if(mouseadjustment>20) mouseadjustment=20;
+	if(mousexadjustment<0) mousexadjustment=0;
+	else if(mousexadjustment>20) mousexadjustment=20;
+
+	if(mouseyadjustment<0) mouseyadjustment=0;
+	else if(mouseyadjustment>20) mouseyadjustment=20;
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
@@ -248,7 +253,8 @@ void WriteConfig(void)
 		config.GetSetting(mseSettingName)->SetValue(controlScheme[i].mouse);
 	}
 	config.GetSetting("ViewSize")->SetValue(viewsize);
-	config.GetSetting("MouseAdjustment")->SetValue(mouseadjustment);
+	config.GetSetting("MouseXAdjustment")->SetValue(mousexadjustment);
+	config.GetSetting("MouseYAdjustment")->SetValue(mouseyadjustment);
 	config.GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
 	config.GetSetting("AlwaysRun")->SetValue(alwaysrun);
 	config.GetSetting("SoundDevice")->SetValue(SoundMode);

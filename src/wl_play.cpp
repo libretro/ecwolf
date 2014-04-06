@@ -313,20 +313,20 @@ void PollMouseMove (void)
 	mousexmove -= screenWidth / 2;
 	mouseymove -= screenHeight / 2;
 
-	controlx += mousexmove * 20 / (21 - mouseadjustment);
-	if(!mouseyaxisdisabled)
-		controly += mouseymove * 40 / (21 - mouseadjustment);
-	else if(mouselook)
+	controlx += mousexmove * 20 / (21 - mousexadjustment);
+	if(mouselook)
 	{
 		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
 			mouseymove = mouseymove*fabs(players[0].ReadyWeapon->fovscale);
 
-		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseadjustment));
+		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseyadjustment));
 		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
 			players[0].mo->pitch = 56*ANGLE_1;
 		else if(players[0].mo->pitch+ANGLE_180 < ANGLE_180-56*ANGLE_1)
 			players[0].mo->pitch = ANGLE_NEG(56*ANGLE_1);
 	}
+	else if(!mouseyaxisdisabled)
+		controly += mouseymove * 40 / (21 - mouseyadjustment);
 }
 
 

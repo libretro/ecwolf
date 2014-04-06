@@ -108,7 +108,8 @@ void    Quit (const char *error,...);
 
 bool	startgame;
 bool	loadedgame;
-int		mouseadjustment;
+int		mousexadjustment;
+int     mouseyadjustment;
 
 //
 // Command line parameter variables
@@ -147,7 +148,7 @@ void NewGame (int difficulty, const FString &map, bool displayBriefing, const Cl
 	levelInfo = &LevelInfo::Find(map);
 
 	if(displayBriefing)
-		EnterText(levelInfo->Cluster);	
+		EnterText(levelInfo->Cluster);
 
 	// Clear LevelRatios
 	LevelRatios.killratio = LevelRatios.secretsratio = LevelRatios.treasureratio =
@@ -331,7 +332,7 @@ void DoJukebox(void)
 		else
 			musicMenu.addItem(new MenuItem(language[langString], ChangeMusic));
 		songList.Push(Wads.GetLumpFullName(i));
-		
+
 	}
 	musicMenu.show();
 	return;

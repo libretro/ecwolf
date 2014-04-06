@@ -78,13 +78,13 @@ MENU_LISTENER(ViewScoresOrEndGame)
 		MenuFadeOut();
 
 		StartCPMusic(gameinfo.ScoresMusic);
-	
+
 		DrawHighScores();
 		VW_UpdateScreen();
 		MenuFadeIn();
-	
+
 		IN_Ack();
-	
+
 		StartCPMusic(gameinfo.MenuMusic);
 		MenuFadeOut();
 		mainMenu.draw();
@@ -446,8 +446,13 @@ void CreateMenus()
 
 	resolutionMenu.setHeadText(language["STR_SELECTRES"]);
 
-	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEADJ"]));
-	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
+    mouseSensitivity.setHeadText(language["STR_MOUSEADJ"]);
+	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEXADJ"]));
+	mouseSensitivity.addItem(new SliderMenuItem(mousexadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
+	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEYADJ"]));
+	mouseSensitivity.addItem(new SliderMenuItem(mouseyadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
+
+
 
 	controls.setHeadPicture("M_CUSTOM");
 	controls.showControlHeaders(true);
@@ -554,7 +559,7 @@ void US_ControlPanel (ScanCode scancode)
 		if(idEasterEgg)
 		{
 			IN_ProcessEvents();
-	
+
 			//
 			// EASTER EGG FOR SPEAR OF DESTINY!
 			//
@@ -575,7 +580,7 @@ void US_ControlPanel (ScanCode scancode)
 					IN_WaitAndProcessEvents();
 				IN_ClearKeysDown ();
 				IN_Ack ();
-	
+
 				VW_FadeOut ();
 				VL_ReadPalette(gameinfo.GamePalette);
 
