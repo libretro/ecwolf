@@ -178,7 +178,7 @@ void ControlMovement (AActor *ob)
 	else
 	{
 		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
-			controlx = controlx*players[0].ReadyWeapon->fovscale;
+			controlx = xs_ToInt(controlx*players[0].ReadyWeapon->fovscale);
 
 		//
 		// not strafing
@@ -194,7 +194,7 @@ void ControlMovement (AActor *ob)
 		else if (strafe < -100)
 			strafe = -100;
 
-		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[ABS(strafe) >= RUNMOVE]));
+		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[abs(strafe) >= RUNMOVE]));
 
 		if (strafe > 0)
 		{
@@ -335,7 +335,6 @@ static bool TryMove (AActor *ob)
 	}
 
 	int xl,yl,xh,yh,x,y;
-	AActor *check;
 
 	xl = (ob->x-ob->radius) >>TILESHIFT;
 	yl = (ob->y-ob->radius) >>TILESHIFT;
@@ -1080,8 +1079,8 @@ ACTION_FUNCTION(A_GunAttack)
 	//
 	// hit something
 	//
-	dx = ABS(closest->x - players[0].mo->x);
-	dy = ABS(closest->y - players[0].mo->y);
+	dx = abs(closest->x - players[0].mo->x);
+	dy = abs(closest->y - players[0].mo->y);
 	dist = dx>dy ? dx:dy;
 
 	dist = FixedMul(dist, snipe);

@@ -725,7 +725,7 @@ bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amo
 		default:
 			return intercept < amount;
 		case SLIDE_Split:
-			return ABS(FRACUNIT - intercept*2) < amount;
+			return (unsigned int)abs((int)(FRACUNIT - intercept*2)) < amount;
 		case SLIDE_Invert:
 			return intercept>(FRACUNIT-amount);
 	}

@@ -66,12 +66,6 @@ enum ESSType
 
 void Quit(const char *errorStr, ...);
 
-#define SIGN(x)         ((x)>0?1:-1)
-#define ABS(x)          ((int)(x)>0?(x):-(x))
-#define LABS(x)         ((int32_t)(x)>0?(x):-(x))
-
-#define abs(x) ABS(x)
-
 #define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
 #define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
 
@@ -398,8 +392,6 @@ static inline fixed FixedDiv(fixed a, fixed b)
 }
 
 #define GetTicks() ((SDL_GetTicks()*7)/100)
-
-#define ISPOINTER(x) ((((uintptr_t)(x)) & ~0xffff) != 0)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 

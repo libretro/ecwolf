@@ -104,13 +104,13 @@ void AM_CheckKeys()
 {
 	if(ambuttonstate[bt_zoomin])
 	{
-		AM_Overlay.SetScale(FRACUNIT*1.05, true);
-		AM_Main.SetScale(FRACUNIT*1.05, true);
+		AM_Overlay.SetScale(FRACUNIT*135/128, true);
+		AM_Main.SetScale(FRACUNIT*135/128, true);
 	}
 	if(ambuttonstate[bt_zoomout])
 	{
-		AM_Overlay.SetScale(FRACUNIT*0.95, true);
-		AM_Main.SetScale(FRACUNIT*0.95, true);
+		AM_Overlay.SetScale(FRACUNIT*122/128, true);
+		AM_Main.SetScale(FRACUNIT*122/128, true);
 	}
 
 	if(am_pause)
@@ -430,8 +430,8 @@ void AutoMap::Draw()
 					AMPWall pwall;
 					pwall.points = points;
 					pwall.texid = spot->tile->overhead.isValid() ? spot->tile->overhead : spot->texture[0];
-					pwall.shiftx = (FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amcos) - FixedMul(FixedMul(scale, ty&0xFFFF), amsin)));
-					pwall.shifty = (FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amsin) + FixedMul(FixedMul(scale, ty&0xFFFF), amcos)));
+					pwall.shiftx = (float)(FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amcos) - FixedMul(FixedMul(scale, ty&0xFFFF), amsin)));
+					pwall.shifty = (float)(FIXED2FLOAT(FixedMul(FixedMul(scale, tx&0xFFFF), amsin) + FixedMul(FixedMul(scale, ty&0xFFFF), amcos)));
 					pwalls.Push(pwall);
 				}
 			}

@@ -195,7 +195,7 @@ void PollKeyboardButtons (void)
 	{
 		// HACK
 		bool jam[512] = {false};
-		bool jamall = (Paused & 2); // Paused for automap
+		bool jamall = !!(Paused & 2); // Paused for automap
 
 		for(int i = 0;jamall ? amControlScheme[i].button != bt_nobutton : amControlScheme[i].button <= bt_zoomout;i++)
 		{
@@ -317,7 +317,7 @@ void PollMouseMove (void)
 	if(mouselook)
 	{
 		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
-			mouseymove = mouseymove*fabs(players[0].ReadyWeapon->fovscale);
+			mouseymove = xs_ToInt(mouseymove*fabs(players[0].ReadyWeapon->fovscale));
 
 		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseyadjustment));
 		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
@@ -347,7 +347,7 @@ void PollJoystickMove (void)
 			// Scale to -100 - 100
 			const int axis = (((IN_GetJoyAxis((controlScheme[i].joystick-32)>>1))+1)*100)>>15;
 			if((controlScheme[i].joystick&1) ^ (axis < 0))
-				*controlScheme[i].axis += controlScheme[i].negative ? -ABS(axis) : ABS(axis);
+				*controlScheme[i].axis += controlScheme[i].negative ? -abs(axis) : abs(axis);
 		}
 	}
 }

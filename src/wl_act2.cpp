@@ -242,8 +242,8 @@ void T_Projectile (AActor *self)
 
 		if(!(self->flags & FL_PLAYERMISSILE))
 		{
-			fixed deltax = LABS(self->x - players[0].mo->x);
-			fixed deltay = LABS(self->y - players[0].mo->y);
+			fixed deltax = abs(self->x - players[0].mo->x);
+			fixed deltay = abs(self->y - players[0].mo->y);
 			fixed radius = players[0].mo->radius + self->radius;
 			if (lastHit != players[0].mo && deltax < radius && deltay < radius)
 			{
@@ -265,8 +265,8 @@ void T_Projectile (AActor *self)
 				AActor *check = iter;
 				if(check != players[0].mo && (check->flags & (FL_SHOOTABLE|FL_SOLID)) && lastHit != check)
 				{
-					fixed deltax = LABS(self->x - check->x);
-					fixed deltay = LABS(self->y - check->y);
+					fixed deltax = abs(self->x - check->x);
+					fixed deltay = abs(self->y - check->y);
 					fixed radius = check->radius + self->radius;
 					if(deltax < radius && deltay < radius)
 					{

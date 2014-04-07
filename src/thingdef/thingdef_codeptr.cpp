@@ -129,7 +129,7 @@ ACTION_FUNCTION(A_CallSpecial)
 	int specialArgs[5] = {arg1, arg2, arg3, arg4, arg5};
 
 	Specials::LineSpecialFunction function = Specials::LookupFunction(static_cast<Specials::LineSpecials>(special));
-	return function(map->GetSpot(self->tilex, self->tiley, 0), specialArgs, MapTrigger::East, self);
+	return function(map->GetSpot(self->tilex, self->tiley, 0), specialArgs, MapTrigger::East, self) != 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -329,7 +329,7 @@ ACTION_FUNCTION(A_Explode)
 		AActor * const target = iter;
 
 		// Calculate distance from origin to outer bound of target actor
-		const fixed dist = MAX(0, MAX(ABS(target->x - self->x), ABS(target->y - self->y)) - target->radius) >> (FRACBITS - 6);
+		const fixed dist = MAX(0, MAX(abs(target->x - self->x), abs(target->y - self->y)) - target->radius) >> (FRACBITS - 6);
 
 		// First check if the target is in range (also don't mess with ourself)
 		if(dist >= radius || target == self || !(target->flags & FL_SHOOTABLE))
@@ -588,8 +588,8 @@ ACTION_FUNCTION(A_ScaleVelocity)
 {
 	ACTION_PARAM_DOUBLE(scale, 0);
 
-	self->velx = self->velx*scale;
-	self->vely = self->vely*scale;
+	self->velx = FLOAT2FIXED(self->velx*scale);
+	self->vely = FLOAT2FIXED(self->vely*scale);
 	return true;
 }
 
@@ -724,7 +724,7 @@ ACTION_FUNCTION(A_ZoomFactor)
 	if(!self->player || !self->player->ReadyWeapon)
 		return false;
 
-	self->player->ReadyWeapon->fovscale = 1.0 / clamp<double>(zoom, 0.1, 50.0);
+	self->player->ReadyWeapon->fovscale = 1.0f / clamp<float>((float)zoom, 0.1f, 50.0f);
 	if(flags & ZOOM_INSTANT)
 		self->player->FOV = -self->player->DesiredFOV*self->player->ReadyWeapon->fovscale;
 	if(flags & ZOOM_NOSCALETURNING)

@@ -165,7 +165,7 @@ void ReadConfig(void)
 	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
-	screenGamma = config.GetSetting("Gamma")->GetFloat();
+	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());
 	am_rotate = config.GetSetting("AM_Rotate")->GetInteger();
 	am_drawtexturedwalls = config.GetSetting("AM_DrawTexturedWalls")->GetInteger() != 0;
 	am_drawfloors = config.GetSetting("AM_DrawFloors")->GetInteger() != 0;

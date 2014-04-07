@@ -72,7 +72,7 @@ enum
 class player_t;
 class ClassDef;
 class AInventory;
-namespace Dialog { class Page; }
+namespace Dialog { struct Page; }
 class AActor : public Thinker,
 	public EmbeddedList<AActor>::Node
 {
