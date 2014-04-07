@@ -255,6 +255,7 @@ public:
 	FString Name;
 	FString SkillPicture;
 	fixed DamageFactor;
+	fixed PlayerDamageFactor;
 	unsigned int SpawnFilter;
 	unsigned int MapFilter;
 	bool QuizHints;

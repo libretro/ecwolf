@@ -198,6 +198,7 @@ skill baby
 	picname = "M_BABY"
 	spawnfilter = 1
 	damagefactor = 0.25
+	playerdamagefactor = 2
 	quizhints = true
 }
 
@@ -207,6 +208,7 @@ skill easy
 	picname = "M_EASY"
 	spawnfilter = 2
 	mapfilter = 1
+	playerdamagefactor = 1.5
 }
 
 skill normal
@@ -215,6 +217,7 @@ skill normal
 	picname = "M_NORMAL"
 	spawnfilter = 3
 	mapfilter = 1
+	playerdamagefactor = 1.25
 }
 
 skill hard

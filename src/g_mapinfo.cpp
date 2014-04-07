@@ -951,8 +951,8 @@ protected:
 static TArray<SkillInfo> skills;
 static TMap<FName, unsigned int> skillIds;
 
-SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), SpawnFilter(0), MapFilter(0),
-	QuizHints(false)
+SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), PlayerDamageFactor(FRACUNIT),
+	SpawnFilter(0), MapFilter(0), QuizHints(false)
 {
 }
 
@@ -1008,6 +1008,8 @@ protected:
 		}
 		else if(key.CompareNoCase("picname") == 0)
 			ParseStringAssignment(skill->SkillPicture);
+		else if(key.CompareNoCase("playerdamagefactor") == 0)
+			ParseFixedAssignment(skill->PlayerDamageFactor);
 		else if(key.CompareNoCase("spawnfilter") == 0)
 		{
 			ParseIntAssignment(skill->SpawnFilter);

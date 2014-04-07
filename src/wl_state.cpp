@@ -4,6 +4,7 @@
 #include "id_ca.h"
 #include "id_sd.h"
 #include "id_us.h"
+#include "g_mapinfo.h"
 #include "m_random.h"
 #include "actor.h"
 #include "thingdef/thingdef.h"
@@ -689,7 +690,7 @@ void DamageActor (AActor *ob, unsigned damage)
 	if ( !(ob->flags & FL_ATTACKMODE) )
 		damage <<= 1;
 
-	ob->health -= (short)damage;
+	ob->health -= FixedMul(damage, gamestate.difficulty->PlayerDamageFactor);
 
 	if (ob->health<=0)
 	{
