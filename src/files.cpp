@@ -34,6 +34,7 @@
 */
 
 #include "files.h"
+#include "filesys.h"
 #include "templates.h"
 #include "zdoomsupport.h"
 
@@ -88,7 +89,7 @@ FileReader::~FileReader ()
 
 bool FileReader::Open (const char *filename)
 {
-	File = fopen (filename, "rb");
+	File = ::File(filename).open("rb");
 	if (File == NULL) return false;
 	FilePos = 0;
 	StartPos = 0;

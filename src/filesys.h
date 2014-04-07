@@ -86,6 +86,7 @@ class File
 
 		bool					exists() const { return existing; }
 		FString					getDirectory() const;
+		FString					getFileName() const;
 		const TArray<FString>	&getFileList() const { return files; }
 		FString					getInsensitiveFile(const FString &filename, bool sensitiveExtension) const;
 		bool					isDirectory() const { return directory; }

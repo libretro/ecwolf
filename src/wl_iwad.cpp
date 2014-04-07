@@ -169,28 +169,31 @@ static bool VerifySpearInstall(const char* directory)
 	};
 
 	File dir(directory);
-	if(!dir.isWritable())
-		return true;
+	//if(!dir.isWritable())
+	//	return true;
 
 	// Check for gamemaps.sd1, if it doesn't exist assume we're good
 	if(!File(dir, dir.getInsensitiveFile("gamemaps.sd1", false)).exists())
 		return true;
 
+	// Try to find what mission that the .sod files are.
+	// If everything is present then we just need to worry about the sd1 files.
 	int currentMission = 1;
 	if(!File(dir, dir.getInsensitiveFile("gamemaps.sd3", false)).exists())
 		currentMission = 3;
 	else if(!File(dir, dir.getInsensitiveFile("gamemaps.sd2", false)).exists())
 		currentMission = 2;
 	else if(File(dir, dir.getInsensitiveFile("gamemaps.sod", false)).exists())
-		return true;
+		currentMission = -1;
 
-	Printf("Reseting Spear of Destiny: %s\n", directory);
+	Printf("Spear of Destiny is not set to the original mission. Attempting remap for files in: %s\n", directory);
 	for(unsigned int i = 0;i < 3;++i)
 	{
 		File srcFile(dir, dir.getInsensitiveFile(MissionFiles[i] + "sod", false));
 		File sd1File(dir, dir.getInsensitiveFile(MissionFiles[i] + "sd1", false));
 
-		srcFile.rename(MissionFiles[i] + "sd" + (char)('0' + currentMission));
+		if(currentMission > 0)
+			srcFile.rename(MissionFiles[i] + "sd" + (char)('0' + currentMission));
 		sd1File.rename(MissionFiles[i] + "sod");
 	}
 
