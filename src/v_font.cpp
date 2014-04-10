@@ -187,8 +187,9 @@ protected:
 	bool notranslate[256];
 };
 
+
 // This is a font character that loads a texture and recolors it.
-class FFontChar1 : public FTexture
+class FFontChar1 : public FFontTexture
 {
 public:
    FFontChar1 (FTexture *sourcelump);
@@ -207,7 +208,7 @@ protected:
 };
 
 // This is a font character that reads RLE compressed data.
-class FFontChar2 : public FTexture
+class FFontChar2 : public FFontTexture
 {
 public:
 	FFontChar2 (int sourcelump, int sourcepos, int width, int height, int leftofs=0, int topofs=0);
@@ -1010,6 +1011,8 @@ FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 	{
 		if(Chars[i].Pic)
 		{
+			static_cast<FFontTexture*>(Chars[i].Pic)->SourceFont = this;
+			sprintf(Chars[i].Pic->Name, FONT_CHAR_NAME "%X", i + FirstChar);
 			Chars[i].ID = TexMan.AddTexture(Chars[i].Pic);
 		}
 	}

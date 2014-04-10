@@ -74,6 +74,15 @@ enum EColorRange
 
 extern int NumTextColors;
 
+// [BL] Allow tracing font characters back to their font
+#define FONT_CHAR_NAME ":FONT:"
+class FFontTexture : public FTexture
+{
+public:
+	FFontTexture() : SourceFont(NULL) {}
+
+	class FFont *SourceFont;
+};
 
 class FFont
 {
@@ -89,6 +98,7 @@ public:
 	int GetSpaceWidth () const { return SpaceWidth; }
 	int GetHeight () const { return FontHeight; }
 	int GetDefaultKerning () const { return GlobalKerning; }
+	const char* GetName() const { return Name; }
 	virtual void LoadTranslations();
 	void Preload() const;
 

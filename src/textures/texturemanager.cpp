@@ -1084,7 +1084,14 @@ void FTextureManager::WriteTexture (FArchive &arc, int picnum)
 		pic = Textures[picnum].Texture;
 	}
 
-	arc.WriteName (pic->Name);
+	if(strncmp(pic->Name, FONT_CHAR_NAME, 6) != 0)
+		arc.WriteName (pic->Name);
+	else
+	{
+		FString cname;
+		cname.Format("%s:%s", static_cast<FFontTexture*>(pic)->SourceFont->GetName(), pic->Name+6);
+		arc.WriteName (cname);
+	}
 	arc.WriteCount (pic->UseType);
 }
 

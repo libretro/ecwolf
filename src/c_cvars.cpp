@@ -116,7 +116,7 @@ void ReadConfig(void)
 	config.CreateSetting("MoveBob", FRACUNIT);
 	config.CreateSetting("Gamma", 1.0f);
 	config.CreateSetting("AM_Rotate", 0);
-	config.CreateSetting("AM_DrawTexturedWalls", false);
+	config.CreateSetting("AM_DrawTexturedWalls", true);
 	config.CreateSetting("AM_DrawFloors", false);
 	config.CreateSetting("AM_Overlay", 0);
 	config.CreateSetting("AM_OverlayTextured", false);
