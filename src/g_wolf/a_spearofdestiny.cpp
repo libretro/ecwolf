@@ -55,7 +55,7 @@ class ASpearOfDestiny : public AInventory
 			PlaySoundLocActor(pickupsound, toucher);
 			gamestate.victoryflag = true;
 
-			SetState(FindState("Pickup"));
+			SetState(FindState(NAME_Pickup));
 			SetPriority(ThinkerList::VICTORY);
 			return false;
 		}

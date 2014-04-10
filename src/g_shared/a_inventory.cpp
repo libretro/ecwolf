@@ -112,7 +112,7 @@ void AInventory::GoAwayAndDie()
 // this actor is safe to be placed in an inventory.
 bool AInventory::GoAway()
 {
-	const Frame *hide = FindState("Hide");
+	const Frame *hide = FindState(NAME_Hide);
 	if(hide && IsThinking()) // Only hide actors that are thinking
 	{
 		itemFlags |= IF_INACTIVE;
@@ -383,7 +383,7 @@ ACTION_FUNCTION(A_WeaponGrin)
 
 bool ACustomInventory::TryPickup(AActor *toucher)
 {
-	const Frame *pickup = FindState("Pickup");
+	const Frame *pickup = FindState(NAME_Pickup);
 	if(!ExecuteState(toucher, pickup))
 		return false;
 	return Super::TryPickup(toucher);

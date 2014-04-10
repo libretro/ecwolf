@@ -140,7 +140,7 @@ static void GiveAllWeaponsAndAmmo()
 		{
 			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, 0);
 			inv->RemoveFromWorld();
-			const Frame * const readyState = cls->FindState("Ready");
+			const Frame * const readyState = cls->FindState(NAME_Ready);
 			if(cls->GetParent() == NATIVE_CLASS(Ammo))
 				inv->amount = inv->maxamount;
 			else if(!readyState || !R_CheckSpriteValid(readyState->spriteInf))

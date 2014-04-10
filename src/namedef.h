@@ -26,6 +26,7 @@ xx(Greetings)
 xx(Idle)
 xx(GenericFreezeDeath)
 xx(Path)
+xx(Hide)
 
 // Compatible death names for the decorate parser.
 xx(XDeath)

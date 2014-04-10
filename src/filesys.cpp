@@ -56,6 +56,10 @@
 #include "version.h"
 #include "zstring.h"
 
+#ifndef MAX_PATH
+#define MAX_PATH PATH_MAX
+#endif
+
 namespace FileSys {
 
 static FString SpecialPaths[NUM_SPECIAL_DIRECTORIES];
@@ -85,7 +89,7 @@ static void FullFileName(const char* filename, char* dest)
 	_wfullpath(fullpath, path, MAX_PATH);
 	ConvertName(fullpath, dest);
 #else
-	strcpy(dest, filename);
+	realpath(filename, dest);
 #endif
 }
 
