@@ -1,6 +1,6 @@
 #include <windows.h>
 #include "resource.h"
-#include "version.h"
+#include "../version.h"
 
 #if _MSC_VER > 1400
 IDI_ICON1	ICON	DISCARDABLE	"icon.ico"
@@ -29,7 +29,7 @@ BEGIN
 END
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_IWADDIALOG, DIALOG
     BEGIN

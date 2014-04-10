@@ -52,7 +52,7 @@ Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(60, 95, 225, 56);
 Menu automapMenu(40, 55, 260, 56);
-Menu mouseSensitivity(20, 80, 300, 0);
+Menu mouseSensitivity(20, 80, 300, 24);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
@@ -448,9 +448,9 @@ void CreateMenus()
 
     mouseSensitivity.setHeadText(language["STR_MOUSEADJ"]);
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEXADJ"]));
-	mouseSensitivity.addItem(new SliderMenuItem(mousexadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
+	mouseSensitivity.addItem(new SliderMenuItem(mousexadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEYADJ"]));
-	mouseSensitivity.addItem(new SliderMenuItem(mouseyadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
+	mouseSensitivity.addItem(new SliderMenuItem(mouseyadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
 
 
 
