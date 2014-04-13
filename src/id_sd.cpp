@@ -482,10 +482,10 @@ int SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChanne
 	// If this sound has been played too recently, don't play it again.
 	// (Fix for extremely loud sounds when one plays over itself too much.)
 	uint32_t currentTick = SDL_GetTicks();
-	if (currentTick - which.GetLastPlayTick() < MIN_TICKS_BETWEEN_DIGI_REPEATS)
+	if (currentTick - SoundInfo.GetLastPlayTick(which) < MIN_TICKS_BETWEEN_DIGI_REPEATS)
 		return 0;
 
-	which.SetLastPlayTick(currentTick);
+	SoundInfo.SetLastPlayTick(which, currentTick);
 
 	int channel = chan;
 	if(chan == SD_GENERIC)
