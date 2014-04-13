@@ -71,6 +71,9 @@ class SoundData
 		bool			HasType(Type type=ADLIB) const { return lump[type] != -1; }
 		bool			IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1 && !isAlias; }
 
+		uint32_t		GetLastPlayTick() const { return *lastPlayTick; }
+		void			SetLastPlayTick(uint32_t value) const { *lastPlayTick = value; }
+
 		const SoundData &operator= (const SoundData &other);
 	protected:
 		FString			logicalName;
@@ -82,6 +85,8 @@ class SoundData
 
 		bool				isAlias;
 		TArray<SoundIndex>	aliasLinks;
+
+		uint32_t		*lastPlayTick;
 
 		friend class SoundInformation;
 };

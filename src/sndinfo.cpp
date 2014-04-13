@@ -64,11 +64,15 @@ SoundData::SoundData() : priority(50), isAlias(false)
 	data[0] = data[1] = data[2] = NULL;
 	lump[0] = lump[1] = lump[2] = -1;
 	length[0] = length[1] = length[2] = 0;
+	lastPlayTick = new uint32_t[1];
+	*lastPlayTick = 0;
 }
 
 SoundData::SoundData(const SoundData &other)
 {
 	*this = other;
+	lastPlayTick = new uint32_t[1];
+	*lastPlayTick = 0;
 }
 
 SoundData::~SoundData()
@@ -78,6 +82,7 @@ SoundData::~SoundData()
 		if(data[i] != NULL)
 			delete[] data[i];
 	}
+	delete[] lastPlayTick;
 }
 
 const SoundData &SoundData::operator= (const SoundData &other)
