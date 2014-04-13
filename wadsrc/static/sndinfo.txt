@@ -39,7 +39,7 @@ menu/escape				{ NULL ALESCPRS PCESCPRS }
 menu/move1				{ NULL ALMVGUN1 PCMVGUN1 }
 menu/move2				{ NULL ALMVGUN2 PCMVGUN2 }
 
-player/death			{ DSPLDETH ALPLDETH PCPYDETH }
+player/death			{ DSPLDETH ALPLDETH PCPLDETH }
 player/usefail			{ NULL ALNOWAY PCNOWAY }
 
 weapon/knife/attack		{ NULL ALKNFSWG PCKNFSWG }

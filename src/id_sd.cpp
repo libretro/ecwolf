@@ -1054,22 +1054,34 @@ int SD_PlaySound(const char* sound, SoundChannel chan)
 	if (sindex.GetPriority() < SoundPriority)
 		return 0;
 
+	bool didPlaySound = false;
+
 	switch (SoundMode)
 	{
 		default:
+			didPlaySound = true;
 			break;
 		case sdm_PC:
 			if(sindex.HasType(SoundData::PCSPEAKER))
+			{
 				SDL_PCPlaySound((PCSound *)sindex.GetData(SoundData::PCSPEAKER));
+				didPlaySound = true;
+			}
 			break;
 		case sdm_AdLib:
 			if(sindex.HasType(SoundData::ADLIB))
+			{
 				SDL_ALPlaySound((AdLibSound *)sindex.GetData(SoundData::ADLIB));
+				didPlaySound = true;
+			}
 			break;
 	}
 
-	SoundPriority = sindex.GetPriority();
-	SoundPlaying = sound;
+	if (didPlaySound)
+	{
+		SoundPriority = sindex.GetPriority();
+		SoundPlaying = sound;
+	}
 
 	return 0;
 }
