@@ -730,8 +730,6 @@ void Died (void)
 
 	if (players[0].lives > -1)
 	{
-		StatusBar->DrawStatusBar();
-
 		players[0].state = player_t::PST_REBORN;
 		thinkerList->DestroyAll();
 	}

@@ -86,6 +86,10 @@ actor Needle
 		Loop:
 			HYPO BCDA 3
 			loop
+		Death:
+			// Keep the actor alive so our temporary damage type hack works consistantly
+			TNT1 A 1
+			stop
 	}
 }
 

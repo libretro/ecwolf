@@ -855,8 +855,6 @@ void player_t::Reborn()
 
 	// Recalculate the projection here so that player classes with differing radii are supported.
 	CalcProjection(mo->radius);
-
-	StatusBar->DrawStatusBar();
 }
 
 void player_t::Serialize(FArchive &arc)
