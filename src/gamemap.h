@@ -211,6 +211,7 @@ class GameMap
 
 		static bool		CheckMapExists(const FString &map);
 
+		TMap<unsigned int, Plane::Map *> elevatorPosition;
 	private:
 		friend class UWMFParser;
 		friend FArchive &operator<< (FArchive &, GameMap *&);

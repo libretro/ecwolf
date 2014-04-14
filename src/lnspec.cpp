@@ -142,6 +142,11 @@ class EVDoor : public Thinker
 			Super::Destroy();
 		}
 
+		bool IsClosing() const
+		{
+			return state == Closing || state == Closed;
+		}
+
 		void Tick()
 		{
 			if(sndseq)
@@ -342,7 +347,7 @@ FUNC(Door_Open)
 		{
 			if(spot->thinker->IsThinkerType<EVDoor>())
 			{
-				return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
 			}
 			return 0;
 		}
@@ -359,7 +364,7 @@ FUNC(Door_Open)
 			{
 				if(door->thinker->IsThinkerType<EVDoor>())
 				{
-					return static_cast<EVDoor *>((Thinker*)door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
 				}
 				continue;
 			}
@@ -368,6 +373,98 @@ FUNC(Door_Open)
 			new EVDoor(door, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
 		}
 		return activated;
+	}
+	return 1;
+}
+
+// Takes same arugments as Door_Open, but the tag points to the elevator switch.
+// Will attempt to call the elevator if not in the correct position.
+FUNC(Door_Elevator)
+{
+	static const unsigned int DOOR_TYPE_DIRECTION = 0x1;
+
+	if(activator->player)
+	{
+		if(buttonheld[bt_use])
+			return 0;
+	}
+
+	if(activator->player || (activator->flags & FL_REQUIREKEYS))
+	{
+		if(args[3] != 0)
+		{
+			if(!P_CheckKeys(activator, args[3], false))
+				return 0;
+		}
+	}
+
+	if(spot->thinker)
+	{
+		if(spot->thinker->IsThinkerType<EVDoor>())
+		{
+			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+		}
+		return 0;
+	}
+
+	new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
+	return 1;
+}
+
+class EVElevator : public Thinker
+{
+	DECLARE_CLASS(EVElevator, Thinker)
+public:
+	EVElevator(MapSpot spot, unsigned int elevTag, unsigned int doorTag, unsigned int callSpeed) :
+		Thinker(ThinkerList::WORLD), spot(spot), elevTag(elevTag),
+		doorTag(doorTag), callSpeed(callSpeed)
+	{
+	}
+
+	void Tick()
+	{
+		if(--callSpeed == 0)
+		{
+			map->elevatorPosition[elevTag] = spot;
+
+			//Specials::LineSpecialFunction function = Specials::LookupFunction(Trigger_Execute);
+			//return function(map->GetSpotByTag(doorTag), specialArgs, MapTrigger::East, self);
+		}
+	}
+
+private:
+	MapSpot spot;
+	unsigned int elevTag;
+	unsigned int doorTag;
+	unsigned int callSpeed;
+};
+IMPLEMENT_INTERNAL_CLASS(EVElevator)
+
+FUNC(Elevator_SwitchFloor)
+{
+#if 0
+	if(map->elevatorPosition[args[0]] == spot)
+	{
+		// Go!
+	}
+	else
+	{
+		// Call
+	}
+#endif
+	MapSpot door = map->GetSpotByTag(args[1], NULL);
+	if(!door)
+		return 0;
+
+	if(door->thinker)
+	{
+		if(door->thinker->IsThinkerType<EVDoor>())
+		{
+			EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
+			if(!doorThinker->IsClosing())
+				return doorThinker->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+		}
+		return 0;
 	}
 	return 1;
 }

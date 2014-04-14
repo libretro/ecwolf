@@ -284,17 +284,17 @@ tiles
 	}
 	tile 44
 	{
-		texturenorth = "WALL41";
-		texturesouth = "WALL41";
-		textureeast = "WALL41";
-		texturewest = "WALL41";
+		texturenorth = "FPLACE1";
+		texturesouth = "FPLACE1";
+		textureeast = "FPLACE1";
+		texturewest = "FPLACE1";
 	}
 	tile 45
 	{
-		texturenorth = "WALL42";
-		texturesouth = "WALL42";
-		textureeast = "WALL42";
-		texturewest = "WALL42";
+		texturenorth = "ANIMFAC1";
+		texturesouth = "ANIMFAC1";
+		textureeast = "ANIMFAC1";
+		texturewest = "ANIMFAC1";
 	}
 	tile 46
 	{
@@ -303,6 +303,22 @@ tiles
 		textureeast = "WALL74";
 		texturewest = "WALL74";
 	}
+
+	tile 47
+	{
+		texturenorth = "EXIT";
+		texturesouth = "EXIT";
+		textureeast = "EXIT";
+		texturewest = "EXIT";
+	}
+	tile 48
+	{
+		texturenorth = "ENTRANCE";
+		texturesouth = "ENTRANCE";
+		textureeast = "ENTRANCE";
+		texturewest = "ENTRANCE";
+	}
+
 	tile 49
 	{
 		texturenorth = "WALL41";
@@ -464,6 +480,64 @@ tiles
 		textureeast = "WALL63";
 		texturewest = "WALL63";
 	}
+
+	tile 72
+	{
+		texturenorth = "ELEV1";
+		texturesouth = "ELEV1";
+		textureeast = "ELEV1";
+		texturewest = "ELEV1";
+	}
+	tile 73
+	{
+		texturenorth = "ELEV2";
+		texturesouth = "ELEV2";
+		textureeast = "ELEV2";
+		texturewest = "ELEV2";
+	}
+	tile 74
+	{
+		texturenorth = "ELEV3";
+		texturesouth = "ELEV3";
+		textureeast = "ELEV3";
+		texturewest = "ELEV3";
+	}
+	tile 75
+	{
+		texturenorth = "ELEV4";
+		texturesouth = "ELEV4";
+		textureeast = "ELEV4";
+		texturewest = "ELEV4";
+	}
+	tile 76
+	{
+		texturenorth = "ELEV5";
+		texturesouth = "ELEV5";
+		textureeast = "ELEV5";
+		texturewest = "ELEV5";
+	}
+	tile 77
+	{
+		texturenorth = "ELEV6";
+		texturesouth = "ELEV6";
+		textureeast = "ELEV6";
+		texturewest = "ELEV6";
+	}
+	tile 78
+	{
+		texturenorth = "ELEV7";
+		texturesouth = "ELEV7";
+		textureeast = "ELEV7";
+		texturewest = "ELEV7";
+	}
+	tile 79
+	{
+		texturenorth = "ELEV8";
+		texturesouth = "ELEV8";
+		textureeast = "ELEV8";
+		texturewest = "ELEV8";
+	}
+
 	tile 80
 	{
 		texturenorth = "WALL64";
@@ -535,7 +609,46 @@ tiles
 		texturewest = "WALL73";
 	}
 
-	zone 107 {}
+	trigger 102
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	tile 102
+	{
+		texturenorth = "EDOOR";
+		texturesouth = "EDOOR";
+		textureeast = "SIDE8";
+		texturewest = "SIDE8";
+
+		// ROTT's doors use other map data to determine orientation.
+		// This is just for my purposes.
+		offsethorizontal = true;
+	}
+
+	tile 106
+	{
+		texturenorth = "ANIMY1";
+		texturesouth = "ANIMY1";
+		textureeast = "ANIMY1";
+		texturewest = "ANIMY1";
+	}
+	tile 107
+	{
+		texturenorth = "ANIMR1";
+		texturesouth = "ANIMR1";
+		textureeast = "ANIMR1";
+		texturewest = "ANIMR1";
+	}
+
+	//zone 107 {}
 	zone 108 {}
 	zone 109 {}
 	zone 110 {}
@@ -572,6 +685,99 @@ tiles
 	zone 141 {}
 	zone 142 {}
 	zone 143 {}
+
+	tile 224
+	{
+		texturenorth = "ANIMONE1";
+		texturesouth = "ANIMONE1";
+		textureeast = "ANIMONE1";
+		texturewest = "ANIMONE1";
+	}
+	tile 225
+	{
+		texturenorth = "ANIMTWO1";
+		texturesouth = "ANIMTWO1";
+		textureeast = "ANIMTWO1";
+		texturewest = "ANIMTWO1";
+	}
+	tile 226
+	{
+		texturenorth = "ANIMTHR1";
+		texturesouth = "ANIMTHR1";
+		textureeast = "ANIMTHR1";
+		texturewest = "ANIMTHR1";
+	}
+	tile 227
+	{
+		texturenorth = "ANIMFOR1";
+		texturesouth = "ANIMFOR1";
+		textureeast = "ANIMFOR1";
+		texturewest = "ANIMFOR1";
+	}
+	tile 228
+	{
+		texturenorth = "ANIMGW1";
+		texturesouth = "ANIMGW1";
+		textureeast = "ANIMGW1";
+		texturewest = "ANIMGW1";
+	}
+	tile 229
+	{
+		texturenorth = "ANIMYOU1";
+		texturesouth = "ANIMYOU1";
+		textureeast = "ANIMYOU1";
+		texturewest = "ANIMYOU1";
+	}
+	tile 230
+	{
+		texturenorth = "ANIMBW1";
+		texturesouth = "ANIMBW1";
+		textureeast = "ANIMBW1";
+		texturewest = "ANIMBW1";
+	}
+	tile 231
+	{
+		texturenorth = "ANIMBP1";
+		texturesouth = "ANIMBP1";
+		textureeast = "ANIMBP1";
+		texturewest = "ANIMBP1";
+	}
+	tile 232
+	{
+		texturenorth = "ANIMCHN1";
+		texturesouth = "ANIMCHN1";
+		textureeast = "ANIMCHN1";
+		texturewest = "ANIMCHN1";
+	}
+	tile 233
+	{
+		texturenorth = "ANIMFW1";
+		texturesouth = "ANIMFW1";
+		textureeast = "ANIMFW1";
+		texturewest = "ANIMFW1";
+	}
+
+	tile 242
+	{
+		texturenorth = "ANIMLAT1";
+		texturesouth = "ANIMLAT1";
+		textureeast = "ANIMLAT1";
+		texturewest = "ANIMLAT1";
+	}
+	tile 243
+	{
+		texturenorth = "ANIMST1";
+		texturesouth = "ANIMST1";
+		textureeast = "ANIMST1";
+		texturewest = "ANIMST1";
+	}
+	tile 244
+	{
+		texturenorth = "ANIMRP1";
+		texturesouth = "ANIMRP1";
+		textureeast = "ANIMRP1";
+		texturewest = "ANIMRP1";
+	}
 }
 
 things
@@ -669,6 +875,15 @@ things
 		playeruse = true;
 		secret = true;
 	}
+
+	elevator 90;
+	elevator 91;
+	elevator 92;
+	elevator 93;
+	elevator 94;
+	elevator 95;
+	elevator 96;
+	elevator 97;
 
 	// oldnum, newnum, angles, patrol, minskill
 	{19,	1,	4,	0,	0}
