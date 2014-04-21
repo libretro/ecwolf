@@ -415,58 +415,181 @@ class EVElevator : public Thinker
 {
 	DECLARE_CLASS(EVElevator, Thinker)
 public:
-	EVElevator(MapSpot spot, unsigned int elevTag, unsigned int doorTag, unsigned int callSpeed) :
-		Thinker(ThinkerList::WORLD), spot(spot), elevTag(elevTag),
-		doorTag(doorTag), callSpeed(callSpeed)
+	EVElevator(AActor *activator, MapSpot spot, MapSpot door, MapSpot next, unsigned int elevTag, unsigned int callSpeed) :
+		Thinker(ThinkerList::WORLD), spot(spot), door(door), next(next), elevTag(elevTag),
+		callSpeed(callSpeed)
 	{
+		// Try to close the door if it is open.
+		if(door->thinker)
+		{
+			if(door->thinker->IsThinkerType<EVDoor>())
+			{
+				state = ClosingDoor;
+
+				EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
+				if(!doorThinker->IsClosing())
+				{
+					if(!doorThinker->Reactivate(activator, !!(activator->flags & FL_ISMONSTER)))
+					{
+						Destroy();
+						return;
+					}
+				}
+				return;
+			}
+			else
+			{
+				Destroy();
+				return;
+			}
+		}
+
+		state = Moving;
 	}
 
 	void Tick()
 	{
-		if(--callSpeed == 0)
+		switch(state)
 		{
-			map->elevatorPosition[elevTag] = spot;
+			default:
+				Destroy();
+				break;
+			case ClosingDoor:
+				if(door->thinker)
+					break;
+				state = Moving;
+				// Fall through
+			case Moving:
+				if(--callSpeed == 0)
+				{
+					state = Finished;
 
-			//Specials::LineSpecialFunction function = Specials::LookupFunction(Trigger_Execute);
-			//return function(map->GetSpotByTag(doorTag), specialArgs, MapTrigger::East, self);
+					map->elevatorPosition[elevTag] = next;
+
+					// Find elevator trigger on destination
+					MapSpot nextDoor;
+					for(unsigned int i = 0;i < next->triggers.Size();++i)
+					{
+						if(next->triggers[i].action == Elevator_SwitchFloor)
+						{
+							nextDoor = map->GetSpotByTag(next->triggers[i].arg[1], NULL);
+						}
+					}
+					if(!nextDoor)
+					{
+						Printf("Failed to perform elevator teleport.\n");
+						break;
+					}
+
+					/* Teleport the player, trying to rotate according to the
+					 * orientation of the detination. ROTT only changed the
+					 * location of the player, so this could be an issue. In
+					 * that case we just need to remove the angle change and
+					 * the fracx/y change since ROTT use elevator things and
+					 * not the switch as the reference point.
+					 */
+					const int ddeltax = clamp<int>(nextDoor->GetX() - next->GetX(), -1, 1);
+					const int ddeltay = clamp<int>(nextDoor->GetY() - next->GetY(), -1, 1);
+					const int sdeltax = clamp<int>(door->GetX() - spot->GetX(), -1, 1);
+					const int sdeltay = clamp<int>(door->GetY() - spot->GetY(), -1, 1);
+					int relx = spot->GetX()-players[0].mo->tilex;
+					int rely = spot->GetY()-players[0].mo->tiley;
+					fixed fracx = players[0].mo->fracx;
+					fixed fracy = players[0].mo->fracy;
+					angle_t angle = 0;
+					if((ddeltax && ddeltax == -sdeltax) || (ddeltay && ddeltay == -sdeltay))
+					{
+						relx *= -1;
+						rely *= -1;
+						angle = ANGLE_180;
+						fracx = (FRACUNIT-fracx);
+						fracy = (FRACUNIT-fracy);
+					}
+					else if(ddeltax == 0 && sdeltax)
+					{
+						int tmp = relx;
+						if(ddeltay > 0)
+						{
+							rely = relx;
+							relx = -tmp;
+							angle = ANGLE_90;
+
+							tmp = fracx;
+							fracx = (FRACUNIT-fracy);
+							fracy = tmp;
+						}
+						else
+						{
+							rely = -relx;
+							relx = tmp;
+							angle = ANGLE_270;
+
+							tmp = (FRACUNIT-fracx);
+							fracx = fracy;
+							fracy = tmp;
+						}
+					}
+					else if(ddeltay == 0 && sdeltay)
+					{
+						int tmp = relx;
+						if(ddeltax > 0)
+						{
+							relx = rely;
+							rely = -tmp;
+							angle = ANGLE_90;
+
+							tmp = fracy;
+							fracy = (FRACUNIT-fracx);
+							fracx = tmp;
+						}
+						else
+						{
+							relx = -rely;
+							rely = tmp;
+							angle = ANGLE_270;
+
+							tmp = (FRACUNIT-fracy);
+							fracy = fracx;
+							fracx = tmp;
+						}
+					}
+					players[0].mo->x = ((next->GetX() - relx)<<16)|fracx;
+					players[0].mo->y = ((next->GetY() - rely)<<16)|fracy;
+					players[0].mo->angle += angle;
+
+					//Specials::LineSpecialFunction function = Specials::LookupFunction(Trigger_Execute);
+					//return function(map->GetSpotByTag(doorTag), specialArgs, MapTrigger::East, self);
+				}
+				break;
 		}
 	}
 
 private:
+	enum State { ClosingDoor, Moving, Finished };
+
 	MapSpot spot;
+	MapSpot door;
+	MapSpot next;
 	unsigned int elevTag;
-	unsigned int doorTag;
 	unsigned int callSpeed;
+	State state;
 };
 IMPLEMENT_INTERNAL_CLASS(EVElevator)
 
 FUNC(Elevator_SwitchFloor)
 {
-#if 0
-	if(map->elevatorPosition[args[0]] == spot)
-	{
-		// Go!
-	}
-	else
-	{
-		// Call
-	}
-#endif
 	MapSpot door = map->GetSpotByTag(args[1], NULL);
-	if(!door)
+	MapSpot next = map->GetSpotByTag(args[3], NULL);
+	if(spot->thinker || !door || !next)
 		return 0;
-
-	if(door->thinker)
+	
+	EVElevator *elevator = new EVElevator(activator, spot, door, next, args[0], args[2]);
+	if(!(elevator->ObjectFlags & OF_EuthanizeMe))
 	{
-		if(door->thinker->IsThinkerType<EVDoor>())
-		{
-			EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
-			if(!doorThinker->IsClosing())
-				return doorThinker->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
-		}
-		return 0;
+		spot->thinker = elevator;
+		return 1;
 	}
-	return 1;
+	return 0;
 }
 
 class EVPushwall : public Thinker

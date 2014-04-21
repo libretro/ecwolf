@@ -967,37 +967,47 @@ void GameMap::ReadPlanesData()
 			}
 		}
 
-		unsigned int elevTag = 0;
-		for(unsigned int i = locations.Size();i-- > 0;)
 		{
-			MapSpot spot = locations[i];
-
-			// Search for door in adjacent tile
-			int doorside;
-			MapTrigger *trigger = NULL;
-			if((doorside = FindAdjacentDoor(spot, trigger)) != -1)
+			unsigned int elevTag = 0;
+			unsigned int swtchTag;
+			int *lastNext;
+			for(unsigned int i = 0;i < locations.Size();++i)
 			{
-				MapSpot door = spot->GetAdjacent(static_cast<MapTile::Side>(doorside));
-				MapSpot swtch = spot->GetAdjacent(static_cast<MapTile::Side>(doorside), true);
+				MapSpot spot = locations[i];
 
-				trigger->action = Specials::Door_Elevator;
-				trigger->arg[0] = (swtch->GetX()<<16)|swtch->GetY();
-				SetSpotTag(swtch, trigger->arg[0]);
-				if(i == 0)
-					elevTag = trigger->arg[0];
+				// Search for door in adjacent tile
+				int doorside;
+				MapTrigger *trigger = NULL;
+				if((doorside = FindAdjacentDoor(spot, trigger)) != -1)
+				{
+					MapSpot door = spot->GetAdjacent(static_cast<MapTile::Side>(doorside));
+					MapSpot swtch = spot->GetAdjacent(static_cast<MapTile::Side>(doorside), true);
 
-				Trigger &elevTrigger = NewTrigger(swtch->GetX(), swtch->GetY(), 0);
-				elevTrigger.action = Specials::Elevator_SwitchFloor;
-				elevTrigger.playerUse = true;
-				elevTrigger.repeatable = true;
-				elevTrigger.arg[0] = elevTag;
-				elevTrigger.arg[1] = (door->GetX()<<16)|door->GetY();
-				elevTrigger.arg[2] = samezone ? 70 : 140;
-				SetSpotTag(door, elevTrigger.arg[1]);
-				
+					trigger->action = Specials::Door_Elevator;
+					trigger->arg[0] = (swtch->GetX()<<8)|swtch->GetY();
+					SetSpotTag(swtch, trigger->arg[0]);
+					if(i == 0)
+						elevTag = trigger->arg[0];
+
+					Trigger &elevTrigger = NewTrigger(swtch->GetX(), swtch->GetY(), 0);
+					elevTrigger.action = Specials::Elevator_SwitchFloor;
+					elevTrigger.playerUse = true;
+					elevTrigger.repeatable = true;
+					elevTrigger.arg[0] = elevTag;
+					elevTrigger.arg[1] = (door->GetX()<<8)|door->GetY();
+					elevTrigger.arg[2] = samezone ? 140 : 280;
+					if(i == 0)
+						lastNext = &elevTrigger.arg[3];
+					else
+						elevTrigger.arg[3] = swtchTag;
+					SetSpotTag(door, elevTrigger.arg[1]);
+
+					swtchTag = trigger->arg[0];
+				}
 			}
+			*lastNext = swtchTag;
+			elevatorPosition[elevTag] = locations[0];
 		}
-		elevatorPosition[elevTag] = locations[0];
 	}
 }
 
