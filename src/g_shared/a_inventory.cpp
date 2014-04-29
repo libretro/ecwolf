@@ -236,6 +236,7 @@ bool AHealth::TryPickup(AActor *toucher)
 		if(toucher->player->health > max)
 			toucher->player->health = max;
 		toucher->health = toucher->player->health;
+		StatusBar->UpdateFace(toucher->health);
 		Destroy();
 	}
 	return true;
