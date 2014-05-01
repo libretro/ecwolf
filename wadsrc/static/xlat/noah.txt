@@ -1117,11 +1117,11 @@ things
 	{116,	203,	0,	HOLOWALL,	0}
 	{117,	204,	0,	HOLOWALL,	0}
 	{118,	205,	0,	HOLOWALL,	0}
-	{126,	195,	0,	HOLOWALL,	0} //Ambush
-	{127,	196,	0,	HOLOWALL,	0} //Ambush
-	{128,	197,	0,	HOLOWALL,	0} //Ambush
-	{129,	198,	0,	HOLOWALL,	0} //Ambush
-	{130,	199,	0,	HOLOWALL,	0} //Ambush
+	{126,	195,	0,	HOLOWALL|AMBUSH,	0}
+	{127,	196,	0,	HOLOWALL|AMBUSH,	0}
+	{128,	197,	0,	HOLOWALL|AMBUSH,	0}
+	{129,	198,	0,	HOLOWALL|AMBUSH,	0}
+	{130,	199,	0,	HOLOWALL|AMBUSH,	0}
 	//The bosses are identical between the two sets
 	{131,	200,	0,	HOLOWALL,	0}
 	{132,	201,	0,	HOLOWALL,	0}

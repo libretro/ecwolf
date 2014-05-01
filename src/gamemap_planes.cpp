@@ -56,7 +56,8 @@ public:
 	enum
 	{
 		TF_PATHING = 1,
-		TF_HOLOWALL = 2
+		TF_HOLOWALL = 2,
+		TF_AMBUSH = 4
 	};
 
 	enum EFeatureFlags
@@ -508,6 +509,8 @@ protected:
 							thing.flags |= TF_PATHING;
 						else if(sc->str.CompareNoCase("HOLOWALL") == 0)
 							thing.flags |= TF_HOLOWALL;
+						else if(sc->str.CompareNoCase("AMBUSH") == 0)
+							thing.flags |= TF_AMBUSH;
 						else
 							sc.ScriptMessage(Scanner::ERROR, "Unknown flag '%s'.", sc->str.GetChars());
 					}
@@ -845,7 +848,7 @@ void GameMap::ReadPlanesData()
 							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.z = 0;
-							thing.ambush = ambushSpots[ambushSpot] == i;
+							thing.ambush = (flags & Xlat::TF_AMBUSH) || ambushSpots[ambushSpot] == i;
 							things.Push(thing);
 						}
 					}
