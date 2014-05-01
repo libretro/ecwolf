@@ -18,7 +18,7 @@ misc/ammo_pickup		{ NULL ALAMMOUP PCAMMOUP }
 misc/ammobox_pickup		{ NULL ALAMBXUP PCAMBXUP }
 misc/health_pickup		{ NULL ALFOODUP PCFOODUP }
 misc/medkit_pickup		{ NULL ALMEDIUP PCMEDIUP }
-misc/k_pkup				{ NULL ALGETKEY PCGETKEY }
+misc/k_pkup				{ DSGETKEY ALGETKEY PCGETKEY }
 misc/end_bonus1			{ NULL ALENDBN1 PCENDBN1 }
 misc/end_bonus2			{ DSENDBN2 ALENDBN2 PCENDBN2 }
 misc/no_bonus			{ NULL ALNOBNS PCNOBNS }
@@ -226,6 +226,7 @@ world/hitwall NULL
 
 misc/100percent			{ NULL ALENDBN2 PCENDBN2 }
 $alias misc/w_pkup		misc/i_pkup
+$alias misc/map_pkup	misc/k_pkup
 
 // Defined here since vanilla Wolf3D didn't use it.
 player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN }

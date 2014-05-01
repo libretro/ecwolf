@@ -61,6 +61,7 @@ actor BibleQuizWrong : Health
 actor ArkMap : MapRevealer 194
 {
 	overheadicon "TILE8:7E" // Map does indeed use the sling graphic
+	inventory.pickupsound "misc/map_pkup"
 	+PLOTONAUTOMAP
 	+INVENTORY.ALWAYSPICKUP
 	states
