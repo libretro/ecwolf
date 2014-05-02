@@ -301,7 +301,8 @@ void TakeDamage (int points,AActor *attacker)
 	if (godmode != 2)
 		StartDamageFlash (points);
 
-	SD_PlaySound("player/pain");
+	if (points > 0)
+		SD_PlaySound("player/pain");
 
 	StatusBar->UpdateFace(points);
 	StatusBar->DrawStatusBar();
