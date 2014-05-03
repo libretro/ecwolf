@@ -147,6 +147,7 @@ FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 	{
 		FResourceFile *rf = new FAudiot(filename, file);
 		if(rf->Open(quiet)) return rf;
+		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
 	}
 	return NULL;
