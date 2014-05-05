@@ -26,7 +26,6 @@ if(GPL)
 	add_definitions(-DUSE_GPL)
 	set(OPL_SOURCES dosbox/dbopl.cpp)
 
-	option(USE_LIBTEXTSCREEN "Use libtextscreen instead of console iwad picker." OFF)
 	if(USE_LIBTEXTSCREEN)
 		add_definitions(-DUSE_TEXTSCREEN)
 		include_directories(${ECWolf_SOURCE_DIR}/textscreen)

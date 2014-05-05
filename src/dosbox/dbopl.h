@@ -102,7 +102,6 @@ public:
 	} State;
 
 	VolumeHandler volHandler;
-	const int *playVolume; // ECWolf
 
 #if (DBOPL_WAVE == WAVE_HANDLER)
 	WaveHandler waveHandler;	//Routine that generate a wave
@@ -159,7 +158,7 @@ public:
 	bool Silent() const;
 	void Prepare( const Chip* chip );
 
-	void KeyOn( Bit8u mask, const int *volume);
+	void KeyOn( Bit8u mask);
 	void KeyOff( Bit8u mask);
 
 	template< State state>
@@ -191,6 +190,7 @@ struct Channel {
 	Bit8u fourMask;
 	Bit8s maskLeft;		//Sign extended values for both channel's panning
 	Bit8s maskRight;
+	const int *playVolume; // ECWolf
 
 	//Forward the channel data to the operators of the channel
 	void SetChanData( const Chip* chip, Bit32u data );

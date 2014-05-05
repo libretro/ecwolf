@@ -52,7 +52,8 @@ set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWol
 
 set(LZMA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lzma/C")
 
-option(GPL "Build GPL edition")
+option(GPL "Build GPL edition" ON)
+option(USE_LIBTEXTSCREEN "Use libtextscreen instead of console iwad picker." OFF)
 
 option(INTERNAL_ZLIB "Force build with internal zlib" OFF)
 option(INTERNAL_BZIP2 "Force build with internal bzip2" OFF)
@@ -97,9 +98,9 @@ add_subdirectory(wadsrc)
 
 add_subdirectory(gdtoa)
 add_subdirectory(lzma)
-if(GPL)
+if(GPL AND USE_LIBTEXTSCREEN)
 	add_subdirectory(textscreen)
-endif(GPL)
+endif(GPL AND USE_LIBTEXTSCREEN)
 add_subdirectory(src)
 
 if( NOT CMAKE_CROSSCOMPILING )

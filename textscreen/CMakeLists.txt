@@ -1,5 +1,9 @@
 cmake_minimum_required( VERSION 2.4 )
 
+if(COMMAND cmake_policy)
+	cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
 if( CMAKE_COMPILER_IS_GNUC )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fomit-frame-pointer" )
 endif( CMAKE_COMPILER_IS_GNUC )
