@@ -425,7 +425,7 @@ void AutoMap::Draw()
 						ty -= (spot->pushAmount<<10);
 						break;
 				}
-				if(TransformTile(spot, FixedMul(tx-playerx, scale), FixedMul(ty-playery, scale), points))
+				if(TransformTile(spot, FixedMul(tx-ofsx, scale), FixedMul(ty-ofsy, scale), points))
 				{
 					AMPWall pwall;
 					pwall.points = points;
