@@ -78,6 +78,7 @@ class AAmmo : public AInventory
 
 		unsigned int	Backpackamount;
 		unsigned int	Backpackmaxamount;
+		unsigned int	Backpackboostamount;
 	protected:
 		AInventory		*CreateCopy(AActor *holder);
 };
@@ -90,6 +91,7 @@ class ABackpackItem : public AInventory
 		bool			HandlePickup(AInventory *item, bool &good);
 
 	protected:
+		void			BoostAmmo(AAmmo *ammo);
 		AInventory		*CreateCopy(AActor *holder);
 };
 

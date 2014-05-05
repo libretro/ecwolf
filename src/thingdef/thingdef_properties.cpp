@@ -114,6 +114,12 @@ HANDLE_PROPERTY(backpackamount)
 	((AAmmo*)defaults)->Backpackamount = amount;
 }
 
+HANDLE_PROPERTY(backpackboostamount)
+{
+	INT_PARAM(boostamount, 0);
+	((AAmmo*)defaults)->Backpackboostamount = boostamount;
+}
+
 HANDLE_PROPERTY(backpackmaxamount)
 {
 	INT_PARAM(maxamount, 0);
@@ -575,6 +581,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
 	DEFINE_PROP(backpackamount, Ammo, I),
+	DEFINE_PROP(backpackboostamount, Ammo, I),
 	DEFINE_PROP(backpackmaxamount, Ammo, I),
 	DEFINE_PROP(bobrangex, Weapon, F),
 	DEFINE_PROP(bobrangey, Weapon, F),
