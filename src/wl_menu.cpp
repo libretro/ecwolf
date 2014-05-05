@@ -50,7 +50,7 @@ Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
 Menu optionsMenu(80, 80, 190, 28);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
-Menu displayMenu(60, 95, 225, 56);
+Menu displayMenu(20, 75, 285, 56);
 Menu automapMenu(40, 55, 260, 56);
 Menu mouseSensitivity(20, 80, 300, 24);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
@@ -305,6 +305,11 @@ MENU_LISTENER(ChangeAMRotate)
 	AM_UpdateFlags();
 	return true;
 }
+MENU_LISTENER(AdjustViewSize)
+{
+	NewViewSize(viewsize);
+	return true;
+}
 
 void CreateMenus()
 {
@@ -443,6 +448,8 @@ void CreateMenus()
 	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
 	displayMenu.addItem(new MultipleChoiceMenuItem(SetAspectRatio, aspectOptions, 6, vid_aspect));
 	displayMenu.addItem(new MenuSwitcherMenuItem(language["STR_SELECTRES"], resolutionMenu, EnterResolutionSelection));
+	displayMenu.addItem(new LabelMenuItem(language["STR_SCREENSIZE"]));
+	displayMenu.addItem(new SliderMenuItem(viewsize, 110, 21, language["STR_SMALL"], language["STR_LARGE"], AdjustViewSize));
 
 	resolutionMenu.setHeadText(language["STR_SELECTRES"]);
 
