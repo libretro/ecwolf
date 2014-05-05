@@ -131,6 +131,9 @@ void AM_CheckKeys()
 
 void AM_UpdateFlags()
 {
+	// Release pause if we appear to have unset am_pause
+	if(!am_pause && (Paused&2)) Paused &= ~2;
+
 	unsigned int flags = 0;
 	unsigned int ovFlags = AutoMap::AMF_Overlay;
 
@@ -489,7 +492,10 @@ void AutoMap::DrawActor(AActor *actor, fixed x, fixed y)
 	bool flip;
 	FTexture *tex;
 	if(actor->overheadIcon.isValid())
+	{
 		tex = actor->sprite != SPR_NONE ? TexMan(actor->overheadIcon) : NULL;
+		flip = false;
+	}
 	else
 		tex = R_GetAMSprite(actor, amangle, flip);
 
