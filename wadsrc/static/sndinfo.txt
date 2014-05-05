@@ -234,9 +234,10 @@ $endif
 
 world/pushwall_ark		{ DSARKPSH ALARKPSH PCARKPSHW }
 
-weapon/sling/attack			{ DSSLING ALSLING PCSLING }
-weapon/supersling/attack	{ DSSSLING ALSSLING PCSSLING }
-weapon/autosling/attack		{ DSASLING ALASLING PCASLING }
+weapon/handfeed/attack			{ DSHDFEED ALHDFEED PCHDFEED }
+weapon/smallfeedluancher/attack	{ DSSMFEED ALSMFEED PCSMFEED }
+weapon/largefeedlauncher/attack	{ DSLGFEED ALLGFEED PCLGFEED }
+weapon/superfeeder5000/attack	{ DSSPFEED ALSPFEED PCSPFEED }
 
 cantaloupe/fire			{ DSTHROW ALTHROW PCTHROW }
 cantaloupe/hit			{ DSSPLAT ALSPLAT PCSPLAT }

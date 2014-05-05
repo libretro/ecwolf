@@ -2,13 +2,13 @@ actor NoahPlayer : BJPlayer
 {
 	player.displayname "Noah"
 	player.startitem "Feed", 8
-	player.startitem "Slingshot"
+	player.startitem "SmallFeedLauncher"
 	player.startitem "HandFeed"
 	player.weaponslot 1, "HandFeed"
-	player.weaponslot 2, "Slingshot"
-	player.weaponslot 3, "SuperSlingshot"
-	player.weaponslot 4, "AutoSlingshot"
-	player.weaponslot 5, "CantaloupeSlingshot"
-	player.weaponslot 6, "MelonSlingshot"
+	player.weaponslot 2, "SmallFeedLauncher"
+	player.weaponslot 3, "LargeFeedLauncher"
+	player.weaponslot 4, "SuperFeeder5000"
+	player.weaponslot 5, "CantaloupeFeeder"
+	player.weaponslot 6, "WatermelonFeeder"
 	player.damagescreencolor "7F 00 FF"
 }
