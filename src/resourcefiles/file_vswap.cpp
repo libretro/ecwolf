@@ -135,12 +135,21 @@ struct FVSwapSound : public FResourceLump
 			static const fixed sampleStep = static_cast<fixed>(((double)origSampleRate / param_samplerate)*FRACUNIT);
 			SWORD* data = (SWORD*)(Cache+sizeof(WAV_HEADER));
 			i = 0;
-			for(fixed sample = 0;i++ < samples;sample += sampleStep)
+			fixed samplefrac = 0;
+			unsigned int sample = 0;
+			while(i++ < samples)
 			{
-				SWORD curSample = (SWORD(origdata[(sample>>FRACBITS)]) - 128)<<8;
-				SWORD nextSample = unsigned(sample>>FRACBITS)+1 < numOrigSamples ? (SWORD(origdata[(sample>>FRACBITS)+1]) - 128)<<8 : curSample;
+				SWORD curSample = (SWORD(origdata[sample]) - 128)<<8;
+				SWORD nextSample = sample+1 < numOrigSamples ? (SWORD(origdata[sample+1]) - 128)<<8 : curSample;
 
-				*data++ = LittleShort(curSample + (((sample&0xFFFF)*fixed(nextSample-curSample))>>FRACBITS));
+				*data++ = LittleShort(curSample + ((samplefrac*fixed(nextSample-curSample))>>FRACBITS));
+
+				samplefrac += sampleStep;
+				if(samplefrac > FRACUNIT)
+				{
+					samplefrac -= FRACUNIT;
+					++sample;
+				}
 			}
 			delete[] origdata;
 			return 1;
