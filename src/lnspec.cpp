@@ -377,40 +377,6 @@ FUNC(Door_Open)
 	return 1;
 }
 
-// Takes same arugments as Door_Open, but the tag points to the elevator switch.
-// Will attempt to call the elevator if not in the correct position.
-FUNC(Door_Elevator)
-{
-	static const unsigned int DOOR_TYPE_DIRECTION = 0x1;
-
-	if(activator->player)
-	{
-		if(buttonheld[bt_use])
-			return 0;
-	}
-
-	if(activator->player || (activator->flags & FL_REQUIREKEYS))
-	{
-		if(args[3] != 0)
-		{
-			if(!P_CheckKeys(activator, args[3], false))
-				return 0;
-		}
-	}
-
-	if(spot->thinker)
-	{
-		if(spot->thinker->IsThinkerType<EVDoor>())
-		{
-			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
-		}
-		return 0;
-	}
-
-	new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
-	return 1;
-}
-
 class EVElevator : public Thinker
 {
 	DECLARE_CLASS(EVElevator, Thinker)
@@ -419,6 +385,8 @@ public:
 		Thinker(ThinkerList::WORLD), spot(spot), door(door), next(next), elevTag(elevTag),
 		callSpeed(callSpeed)
 	{
+		state = Moving;
+
 		// Try to close the door if it is open.
 		if(door->thinker)
 		{
@@ -435,7 +403,6 @@ public:
 						return;
 					}
 				}
-				return;
 			}
 			else
 			{
@@ -444,7 +411,12 @@ public:
 			}
 		}
 
-		state = Moving;
+		// Remove elevator position since we're off!
+		map->elevatorPosition[elevTag] = NULL;
+	}
+
+	void Destroy()
+	{
 	}
 
 	void Tick()
@@ -557,8 +529,16 @@ public:
 					players[0].mo->y = ((next->GetY() - rely)<<16)|fracy;
 					players[0].mo->angle += angle;
 
-					//Specials::LineSpecialFunction function = Specials::LookupFunction(Trigger_Execute);
-					//return function(map->GetSpotByTag(doorTag), specialArgs, MapTrigger::East, self);
+					// Find the actual door trigger and try to open it.
+					for(unsigned int i = nextDoor->triggers.Size();i-- > 0;)
+					{
+						MapTrigger &trig = nextDoor->triggers[i];
+						if(trig.action == Door_Elevator)
+						{
+							map->ActivateTrigger(trig, MapTrigger::East, NULL);
+							break;
+						}
+					}
 				}
 				break;
 		}
@@ -576,8 +556,80 @@ private:
 };
 IMPLEMENT_INTERNAL_CLASS(EVElevator)
 
-FUNC(Elevator_SwitchFloor)
+// Takes same arugments as Door_Open, but the tag points to the elevator switch.
+// Will attempt to call the elevator if not in the correct position.
+FUNC(Door_Elevator)
 {
+	static const unsigned int DOOR_TYPE_DIRECTION = 0x1;
+
+	// If no activator it's probably the elevator reaching its destination.
+	if(activator)
+	{
+		if(activator->player)
+		{
+			if(buttonheld[bt_use])
+				return 0;
+		}
+
+		if(activator->player || (activator->flags & FL_REQUIREKEYS))
+		{
+			if(args[3] != 0)
+			{
+				if(!P_CheckKeys(activator, args[3], false))
+					return 0;
+			}
+		}
+	}
+
+	if(spot->thinker)
+	{
+		if(spot->thinker->IsThinkerType<EVDoor>())
+		{
+			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+		}
+		return 0;
+	}
+
+	// Now locate the switch and elevator trigger so we can find out if we need
+	// to call to our location.
+	MapSpot swtch = map->GetSpotByTag(args[0], NULL);
+	if(!swtch)
+	{
+		Printf("Door_Elevator: Could not find switch.\n");
+		return 0;
+	}
+	MapTrigger *trig = NULL; 
+	for(unsigned int i = 0;i < swtch->triggers.Size();++i)
+	{
+		if(swtch->triggers[i].action == Elevator_SwitchFloor)
+		{
+			trig = &swtch->triggers[i];
+			break;
+		}
+	}
+	if(!trig)
+	{
+		Printf("Door_Elevator: Could not find elevator trigger.\n");
+		return 0;
+	}
+
+	// Call elevator
+	if(map->elevatorPosition[trig->arg[0]] != swtch)
+	{
+		// Check if elevator is active
+		if(map->elevatorPosition[trig->arg[0]] == NULL)
+			return 0;
+
+		new EVElevator(activator, swtch, spot, swtch, trig->arg[0], trig->arg[2]);
+		return 1;
+	}
+
+	new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
+	return 1;
+}
+
+FUNC(Elevator_SwitchFloor)
+{ // elevTag, doorTag, callSpeed, nextTag
 	MapSpot door = map->GetSpotByTag(args[1], NULL);
 	MapSpot next = map->GetSpotByTag(args[3], NULL);
 	if(spot->thinker || !door || !next)

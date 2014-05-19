@@ -987,7 +987,10 @@ void GameMap::ReadPlanesData()
 					trigger->arg[0] = (swtch->GetX()<<8)|swtch->GetY();
 					SetSpotTag(swtch, trigger->arg[0]);
 					if(i == 0)
+					{
 						elevTag = trigger->arg[0];
+						elevatorPosition[elevTag] = swtch;
+					}
 
 					Trigger &elevTrigger = NewTrigger(swtch->GetX(), swtch->GetY(), 0);
 					elevTrigger.action = Specials::Elevator_SwitchFloor;
@@ -1006,7 +1009,6 @@ void GameMap::ReadPlanesData()
 				}
 			}
 			*lastNext = swtchTag;
-			elevatorPosition[elevTag] = locations[0];
 		}
 	}
 }
