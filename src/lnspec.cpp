@@ -382,7 +382,8 @@ class EVElevator : public Thinker
 	DECLARE_CLASS(EVElevator, Thinker)
 public:
 	EVElevator(AActor *activator, MapSpot spot, MapSpot door, MapSpot next, unsigned int elevTag, unsigned int callSpeed) :
-		Thinker(ThinkerList::WORLD), spot(spot), door(door), next(next), elevTag(elevTag),
+		Thinker(ThinkerList::WORLD), activator(activator), sndseq(NULL),
+		spot(spot), door(door), next(next), nextDoor(NULL), elevTag(elevTag),
 		callSpeed(callSpeed)
 	{
 		state = Moving;
@@ -411,16 +412,24 @@ public:
 			}
 		}
 
+		if(state == Moving)
+			StartSoundSequence();
+
 		// Remove elevator position since we're off!
 		map->elevatorPosition[elevTag] = NULL;
 	}
 
 	void Destroy()
 	{
+		delete sndseq;
+		Super::Destroy();
 	}
 
 	void Tick()
 	{
+		if(sndseq)
+			sndseq->Tick();
+
 		switch(state)
 		{
 			default:
@@ -429,17 +438,24 @@ public:
 			case ClosingDoor:
 				if(door->thinker)
 					break;
+
 				state = Moving;
+				StartSoundSequence();
 				// Fall through
 			case Moving:
 				if(--callSpeed == 0)
 				{
-					state = Finished;
+					state = Shaking;
+					callSpeed = 20; // ROTT uses 10 tics @ 35Hz
+					if(sndseq)
+					{
+						sndseq->SetSource(next);
+						sndseq->Stop();
+					}
 
 					map->elevatorPosition[elevTag] = next;
 
 					// Find elevator trigger on destination
-					MapSpot nextDoor;
 					for(unsigned int i = 0;i < next->triggers.Size();++i)
 					{
 						if(next->triggers[i].action == Elevator_SwitchFloor)
@@ -450,84 +466,95 @@ public:
 					if(!nextDoor)
 					{
 						Printf("Failed to perform elevator teleport.\n");
+						state = Finished;
 						break;
 					}
 
-					/* Teleport the player, trying to rotate according to the
-					 * orientation of the detination. ROTT only changed the
-					 * location of the player, so this could be an issue. In
-					 * that case we just need to remove the angle change and
-					 * the fracx/y change since ROTT use elevator things and
-					 * not the switch as the reference point.
-					 */
-					const int ddeltax = clamp<int>(nextDoor->GetX() - next->GetX(), -1, 1);
-					const int ddeltay = clamp<int>(nextDoor->GetY() - next->GetY(), -1, 1);
-					const int sdeltax = clamp<int>(door->GetX() - spot->GetX(), -1, 1);
-					const int sdeltay = clamp<int>(door->GetY() - spot->GetY(), -1, 1);
-					int relx = spot->GetX()-players[0].mo->tilex;
-					int rely = spot->GetY()-players[0].mo->tiley;
-					fixed fracx = players[0].mo->fracx;
-					fixed fracy = players[0].mo->fracy;
-					angle_t angle = 0;
-					if((ddeltax && ddeltax == -sdeltax) || (ddeltay && ddeltay == -sdeltay))
+					if(activator)
 					{
-						relx *= -1;
-						rely *= -1;
-						angle = ANGLE_180;
-						fracx = (FRACUNIT-fracx);
-						fracy = (FRACUNIT-fracy);
+						/* Teleport the player, trying to rotate according to the
+						* orientation of the detination. ROTT only changed the
+						* location of the player, so this could be an issue. In
+						* that case we just need to remove the angle change and
+						* the fracx/y change since ROTT use elevator things and
+						* not the switch as the reference point.
+						*/
+						const int ddeltax = clamp<int>(nextDoor->GetX() - next->GetX(), -1, 1);
+						const int ddeltay = clamp<int>(nextDoor->GetY() - next->GetY(), -1, 1);
+						const int sdeltax = clamp<int>(door->GetX() - spot->GetX(), -1, 1);
+						const int sdeltay = clamp<int>(door->GetY() - spot->GetY(), -1, 1);
+						int relx = spot->GetX()-activator->tilex;
+						int rely = spot->GetY()-activator->tiley;
+						fixed fracx = activator->fracx;
+						fixed fracy = activator->fracy;
+						angle_t angle = 0;
+						if((ddeltax && ddeltax == -sdeltax) || (ddeltay && ddeltay == -sdeltay))
+						{
+							relx *= -1;
+							rely *= -1;
+							angle = ANGLE_180;
+							fracx = (FRACUNIT-fracx);
+							fracy = (FRACUNIT-fracy);
+						}
+						else if(ddeltax == 0 && sdeltax)
+						{
+							int tmp = relx;
+							if(ddeltay > 0)
+							{
+								rely = relx;
+								relx = -tmp;
+								angle = ANGLE_90;
+
+								tmp = fracx;
+								fracx = (FRACUNIT-fracy);
+								fracy = tmp;
+							}
+							else
+							{
+								rely = -relx;
+								relx = tmp;
+								angle = ANGLE_270;
+
+								tmp = (FRACUNIT-fracx);
+								fracx = fracy;
+								fracy = tmp;
+							}
+						}
+						else if(ddeltay == 0 && sdeltay)
+						{
+							int tmp = relx;
+							if(ddeltax > 0)
+							{
+								relx = rely;
+								rely = -tmp;
+								angle = ANGLE_90;
+
+								tmp = fracy;
+								fracy = (FRACUNIT-fracx);
+								fracx = tmp;
+							}
+							else
+							{
+								relx = -rely;
+								rely = tmp;
+								angle = ANGLE_270;
+
+								tmp = (FRACUNIT-fracy);
+								fracy = fracx;
+								fracx = tmp;
+							}
+						}
+						activator->x = ((next->GetX() - relx)<<16)|fracx;
+						activator->y = ((next->GetY() - rely)<<16)|fracy;
+						activator->angle += angle;
 					}
-					else if(ddeltax == 0 && sdeltax)
-					{
-						int tmp = relx;
-						if(ddeltay > 0)
-						{
-							rely = relx;
-							relx = -tmp;
-							angle = ANGLE_90;
-
-							tmp = fracx;
-							fracx = (FRACUNIT-fracy);
-							fracy = tmp;
-						}
-						else
-						{
-							rely = -relx;
-							relx = tmp;
-							angle = ANGLE_270;
-
-							tmp = (FRACUNIT-fracx);
-							fracx = fracy;
-							fracy = tmp;
-						}
-					}
-					else if(ddeltay == 0 && sdeltay)
-					{
-						int tmp = relx;
-						if(ddeltax > 0)
-						{
-							relx = rely;
-							rely = -tmp;
-							angle = ANGLE_90;
-
-							tmp = fracy;
-							fracy = (FRACUNIT-fracx);
-							fracx = tmp;
-						}
-						else
-						{
-							relx = -rely;
-							rely = tmp;
-							angle = ANGLE_270;
-
-							tmp = (FRACUNIT-fracy);
-							fracy = fracx;
-							fracx = tmp;
-						}
-					}
-					players[0].mo->x = ((next->GetX() - relx)<<16)|fracx;
-					players[0].mo->y = ((next->GetY() - rely)<<16)|fracy;
-					players[0].mo->angle += angle;
+				}
+				break;
+			case Shaking:
+				// TODO: Shake the screen
+				if(--callSpeed == 0)
+				{
+					state = Finished;
 
 					// Find the actual door trigger and try to open it.
 					for(unsigned int i = nextDoor->triggers.Size();i-- > 0;)
@@ -544,12 +571,27 @@ public:
 		}
 	}
 
-private:
-	enum State { ClosingDoor, Moving, Finished };
+protected:
+	void StartSoundSequence()
+	{
+		FName seqname;
+		if(spot->tile->soundSequence == NAME_None)
+			seqname = NAME_Platform;
+		else
+			seqname = spot->tile->soundSequence;
 
+		sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
+	}
+
+private:
+	enum State { ClosingDoor, Moving, Shaking, Finished };
+
+	AActor *activator;
+	SndSeqPlayer *sndseq;
 	MapSpot spot;
 	MapSpot door;
 	MapSpot next;
+	MapSpot nextDoor;
 	unsigned int elevTag;
 	unsigned int callSpeed;
 	State state;

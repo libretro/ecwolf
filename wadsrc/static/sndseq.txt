@@ -46,3 +46,8 @@ end
 	playrepeat world/pushwall_ark
 	nostopcutoff
 end
+
+:Platform
+	play plats/pt1_strt
+	stopsound plats/pt1_stop
+end
