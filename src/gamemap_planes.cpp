@@ -58,6 +58,9 @@ public:
 		TF_PATHING = 1,
 		TF_HOLOWALL = 2,
 		TF_AMBUSH = 4
+
+		TF_ISELEVATOR = 0x40000000,
+		TF_ISTRIGGER = 0x80000000
 	};
 
 	enum EFeatureFlags
@@ -80,9 +83,6 @@ public:
 		}
 
 		unsigned short	oldnum;
-		bool			isTrigger;
-
-
 		unsigned short	newnum;
 		unsigned char	angles;
 		uint32_t		flags;
@@ -272,22 +272,23 @@ public:
 		return false;
 	}
 
-	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, uint32_t &flags, unsigned short oldnum) const
+	bool TranslateThing(MapThing &thing, MapTrigger &trigger, uint32_t &flags, unsigned short oldnum) const
 	{
 		unsigned int index = SearchForThing(oldnum, thingTable.Size());
 		if(index == UINT_MAX)
 			return false;
 		const ThingXlat &type = thingTable[index];
 
-		isTrigger = type.isTrigger;
-		if(isTrigger)
+		flags = type.flags;
+		if(type.flags & Xlat::TF_ISELEVATOR)
+			return true;
+
+		if(type.flags & Xlat::TF_ISTRIGGER)
 		{
 			trigger = type.templateTrigger;
 		}
 		else
 		{
-			flags = type.flags;
-
 			thing.type = type.newnum;
 
 			// The player has a weird rotation pattern. It's 450-angle.
@@ -473,12 +474,20 @@ protected:
 				if(sc->str.CompareNoCase("trigger") == 0)
 				{
 					sc.MustGetToken(TK_IntConst);
-					thing.isTrigger = true;
+					thing.flags = Xlat::TF_ISTRIGGER;
 					thing.angles = 0;
 					thing.oldnum = sc->number;
 
 					sc.MustGetToken('{');
 					TextMapParser::ParseTrigger(sc, thing.templateTrigger);
+				}
+				else if(sc->str.CompareNoCase("elevator") == 0)
+				{
+					sc.MustGetToken(TK_IntConst);
+					thing.flags = Xlat::TF_ISELEVATOR;
+					thing.angles = 0;
+					thing.oldnum = sc->number;
+					sc.MustGetToken(';');
 				}
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown thing table block '%s'.", sc->str.GetChars());
@@ -486,7 +495,6 @@ protected:
 			else
 			{
 				// Handle thing translation
-				thing.isTrigger = false;
 				sc.MustGetToken('{');
 				sc.MustGetToken(TK_IntConst);
 				thing.oldnum = sc->number;
@@ -567,6 +575,8 @@ private:
 	EFeatureFlags FeatureFlags;
 };
 
+static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger);
+
 // Reads old format maps
 void GameMap::ReadPlanesData()
 {
@@ -614,6 +624,7 @@ void GameMap::ReadPlanesData()
 	// tiles plane instead of the objects plane.
 	TArray<WORD> ambushSpots;
 	TArray<MapTrigger> triggers;
+	TMap<WORD, TArray<MapSpot> > elevatorSpots;
 
 	// Read and store the info plane so we can reference it
 	WORD* infoplane = new WORD[size];
@@ -798,7 +809,11 @@ void GameMap::ReadPlanesData()
 				unsigned int ambushSpot = 0;
 				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors. 
 
-				for(unsigned int i = 0;i < size;++i)
+				unsigned int i = 0;
+				// Using ROTT feature flags invalidates the first four tiles
+				if(xlat.GetFeatureFlags() & Xlat::FF_LIGHTLEVELS)
+					i = 4;
+				for(;i < size;++i)
 				{
 					oldplane[i] = LittleShort(oldplane[i]);
 
@@ -812,20 +827,23 @@ void GameMap::ReadPlanesData()
 
 					Thing thing;
 					Trigger trigger;
-					bool isTrigger;
 					uint32_t flags = 0;
 
-					if(!xlat.TranslateThing(thing, trigger, isTrigger, flags, oldplane[i]))
+					if(!xlat.TranslateThing(thing, trigger, flags, oldplane[i]))
 						printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 					else
 					{
-						if(isTrigger)
+						if(flags & Xlat::TF_ISTRIGGER)
 						{
 							trigger.x = i%header.width;
 							trigger.y = i/header.width;
 							trigger.z = 0;
 
 							triggers.Push(trigger);
+						}
+						else if(flags & Xlat::TF_ISELEVATOR)
+						{
+							elevatorSpots[oldplane[i]].Push(&mapPlane.map[i]);
 						}
 						else
 						{
@@ -933,4 +951,90 @@ void GameMap::ReadPlanesData()
 			++gamestate.secrettotal;
 	}
 	delete[] infoplane;
+
+	// Install elevators
+	TMap<WORD, TArray<MapSpot> >::ConstIterator iter(elevatorSpots);
+	TMap<WORD, TArray<MapSpot> >::ConstPair *pair;
+	while(iter.NextPair(pair))
+	{
+		const TArray<MapSpot> &locations = pair->Value;
+
+		// Elevators in the same sound zone move faster
+		bool samezone = true;
+		for(unsigned int i = locations.Size();i-- > 1;)
+		{
+			if(locations[i]->zone != locations[0]->zone)
+			{
+				samezone = false;
+				break;
+			}
+		}
+
+		{
+			unsigned int elevTag = 0;
+			unsigned int swtchTag;
+			int *lastNext;
+			for(unsigned int i = 0;i < locations.Size();++i)
+			{
+				MapSpot spot = locations[i];
+
+				// Search for door in adjacent tile
+				int doorside;
+				MapTrigger *trigger = NULL;
+				if((doorside = FindAdjacentDoor(spot, trigger)) != -1)
+				{
+					MapSpot door = spot->GetAdjacent(static_cast<MapTile::Side>(doorside));
+					MapSpot swtch = spot->GetAdjacent(static_cast<MapTile::Side>(doorside), true);
+
+					trigger->action = Specials::Door_Elevator;
+					trigger->arg[0] = (swtch->GetX()<<8)|swtch->GetY();
+					SetSpotTag(swtch, trigger->arg[0]);
+					if(i == 0)
+					{
+						elevTag = trigger->arg[0];
+						elevatorPosition[elevTag] = swtch;
+					}
+
+					Trigger &elevTrigger = NewTrigger(swtch->GetX(), swtch->GetY(), 0);
+					elevTrigger.action = Specials::Elevator_SwitchFloor;
+					elevTrigger.playerUse = true;
+					elevTrigger.repeatable = true;
+					elevTrigger.arg[0] = elevTag;
+					elevTrigger.arg[1] = (door->GetX()<<8)|door->GetY();
+					elevTrigger.arg[2] = samezone ? 140 : 280;
+					if(i == 0)
+						lastNext = &elevTrigger.arg[3];
+					else
+						elevTrigger.arg[3] = swtchTag;
+					SetSpotTag(door, elevTrigger.arg[1]);
+
+					swtchTag = trigger->arg[0];
+				}
+			}
+			*lastNext = swtchTag;
+		}
+	}
+}
+
+static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger)
+{
+	const TArray<MapTrigger> *triggers[4] = {
+		&spot->GetAdjacent(MapTile::East)->triggers,
+		&spot->GetAdjacent(MapTile::North)->triggers,
+		&spot->GetAdjacent(MapTile::West)->triggers,
+		&spot->GetAdjacent(MapTile::South)->triggers
+	};
+
+	for(unsigned int i = 0;i < 4;++i)
+	{
+		for(unsigned int t = triggers[i]->Size();t-- > 0;)
+		{
+			if(triggers[i]->operator[](t).action == Specials::Door_Open)
+			{
+				trigger = &triggers[i]->operator[](t);
+				return i;
+			}
+		}
+	}
+	return -1;
 }

@@ -208,6 +208,12 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 				{
 					seq.SetFlag(SSF_NoStopCutOff, true);
 				}
+				else if(sc->str.CompareNoCase("stopsound") == 0)
+				{
+					if(!sc.GetNextString())
+						sc.ScriptMessage(Scanner::ERROR, "Expected logical sound name.");
+					seq.StopSound = sc->str;
+				}
 				else
 				{
 					sc.ScriptMessage(Scanner::ERROR, "Unknown sound sequence command '%s'.", sc->str.GetChars());
@@ -298,4 +304,7 @@ void SndSeqPlayer::Stop()
 
 	// Unfortunately due to limitations of the sound code we can't determine
 	// what sound is playing much less stop the sound.
+
+	if(Sequence.GetStopSound() != NAME_None)
+		PlaySoundLocMapSpot(Sequence.GetStopSound(), Source);
 }

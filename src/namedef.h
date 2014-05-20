@@ -8,6 +8,8 @@ xx(Actor)
 
 xx(Untranslated)
 
+xx(Platform)
+
 // Standard animator names.
 xx(Spawn)
 xx(See)
