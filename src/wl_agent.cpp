@@ -250,7 +250,7 @@ void GiveExtraMan (int amount)
 		players[0].lives = 0;
 	else if(players[0].lives > 9)
 		players[0].lives = 9;
-	SD_PlaySound ("misc/end_bonus1");
+	SD_PlaySound ("misc/1up");
 }
 
 /*
@@ -598,6 +598,8 @@ void Cmd_Use (void)
 	}
 
 	bool doNothing = true;
+	bool isRepeatable = false;
+	BYTE lastTrigger = 0;
 	MapSpot spot = map->GetSpot(checkx, checky, 0);
 	for(unsigned int i = 0;i < spot->triggers.Size();++i)
 	{
@@ -606,7 +608,8 @@ void Cmd_Use (void)
 		{
 			if(map->ActivateTrigger(trig, direction, players[0].mo))
 			{
-				P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), trig.repeatable, trig.action);
+				isRepeatable |= trig.repeatable;
+				lastTrigger = trig.action;
 				doNothing = false;
 			}
 		}
@@ -614,6 +617,8 @@ void Cmd_Use (void)
 
 	if(doNothing)
 		SD_PlaySound ("misc/do_nothing");
+	else
+		P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), isRepeatable, lastTrigger);
 }
 
 /*
