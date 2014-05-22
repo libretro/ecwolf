@@ -1255,12 +1255,12 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 
 	if (MusicMode == smm_AdLib)
 	{
-		SDL_LockMutex(audioMutex);
-
 		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
 			int lumpNum = Wads.CheckNumForName(chunk, ns_music);
 			if(lumpNum == -1)
 				return;
+
+			SDL_LockMutex(audioMutex);
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);
 			if(sqHackFreeable != NULL)
 				delete[] sqHackFreeable;
