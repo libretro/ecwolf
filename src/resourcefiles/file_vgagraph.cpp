@@ -151,7 +151,7 @@ struct FVGALump : public FResourceLump
 class FVGAGraph : public FResourceFile
 {
 	public:
-		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), lumps(NULL), vgagraphFile(filename)
+		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), lumps(NULL)
 		{
 			FString path(filename);
 			int lastSlash = path.LastIndexOfAny("/\\");
@@ -159,45 +159,68 @@ class FVGAGraph : public FResourceFile
 			path = path.Left(lastSlash+1);
 
 			File directory(path.Len() > 0 ? path : ".");
-			vgadictFile = path + directory.getInsensitiveFile(FString("vgadict.") + extension, true);
-			vgaheadFile = path + directory.getInsensitiveFile(FString("vgahead.") + extension, true);
-		}
-		~FVGAGraph()
-		{
-			if(lumps != NULL)
-				delete[] lumps;
-		}
+			FString vgadictFile = path + directory.getInsensitiveFile(FString("vgadict.") + extension, true);
+			FString vgaheadFile = path + directory.getInsensitiveFile(FString("vgahead.") + extension, true);
 
-		bool Open(bool quiet)
-		{
-			FileReader vgadictReader;
-			if(!vgadictReader.Open(vgadictFile))
+			vgadictReader = new FileReader();
+			if(!vgadictReader->Open(vgadictFile))
 			{
+				delete vgadictReader;
+				vgadictReader = NULL;
+
 				FString error;
 				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
 				throw CRecoverableError(error);
 			}
-			vgadictReader.Read(huffman, sizeof(huffman));
+
+			vgaheadReader = new FileReader();
+			if(!vgaheadReader->Open(vgaheadFile))
+			{
+				delete vgadictReader;
+				delete vgaheadReader;
+				vgadictReader = vgaheadReader = NULL;
+
+				FString error;
+				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
+				throw CRecoverableError(error);
+			}
+		}
+
+		FVGAGraph(const char* filename, FileReader **file) : FResourceFile(filename, file[0]), lumps(NULL)
+		{
+			FString path(filename);
+			int lastSlash = path.LastIndexOf(':');
+			extension = path.Mid(lastSlash+10);
+
+			vgaheadReader = file[1];
+			vgadictReader = file[2];
+		}
+
+		~FVGAGraph()
+		{
+			if(lumps != NULL)
+				delete[] lumps;
+
+			delete vgadictReader;
+			delete vgaheadReader;
+		}
+
+		bool Open(bool quiet)
+		{
+			vgadictReader->Read(huffman, sizeof(huffman));
 			for(unsigned int i = 0;i < 255;++i)
 			{
 				huffman[i].bit0 = LittleShort(huffman[i].bit0);
 				huffman[i].bit1 = LittleShort(huffman[i].bit1);
 			}
 
-			FileReader vgaheadReader;
-			if(!vgaheadReader.Open(vgaheadFile))
-			{
-				FString error;
-				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
-				throw CRecoverableError(error);
-			}
-			vgaheadReader.Seek(0, SEEK_END);
-			NumLumps = vgaheadReader.Tell()/3;
-			vgaheadReader.Seek(0, SEEK_SET);
+			vgaheadReader->Seek(0, SEEK_END);
+			NumLumps = vgaheadReader->Tell()/3;
+			vgaheadReader->Seek(0, SEEK_SET);
 			lumps = new FVGALump[NumLumps];
 			// The vgahead has 24-bit ints.
 			BYTE* data = new BYTE[NumLumps*3];
-			vgaheadReader.Read(data, NumLumps*3);
+			vgaheadReader->Read(data, NumLumps*3);
 
 			unsigned int numPictures = 0;
 			Dimensions* dimensions = NULL;
@@ -309,15 +332,15 @@ class FVGAGraph : public FResourceFile
 		FVGALump*	lumps;
 
 		FString		extension;
-		FString		vgadictFile;
-		FString		vgaheadFile;
-		FString		vgagraphFile;
+		FileReader	*vgaheadReader;
+		FileReader	*vgadictReader;
 };
 
 FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
-	int lastSlash = fname.LastIndexOfAny("/\\");
+	int embeddedSep = fname.LastIndexOf(':');
+	int lastSlash = MAX<long>(fname.LastIndexOfAny("/\\"), embeddedSep);
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 8);
 	else
@@ -325,7 +348,8 @@ FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 
 	if(fname.Len() == 8 && fname.CompareNoCase("vgagraph") == 0) // file must be vgagraph.something
 	{
-		FResourceFile *rf = new FVGAGraph(filename, file);
+		FResourceFile *rf = embeddedSep == -1 ? new FVGAGraph(filename, file) :
+			new FVGAGraph(filename, reinterpret_cast<FileReader**>(file)); // HACK
 		if(rf->Open(quiet)) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;

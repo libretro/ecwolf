@@ -153,12 +153,16 @@ void FResourceLump::LumpNameSetup(const char *iname)
 void FResourceLump::CheckEmbedded()
 {
 	// Checks for embedded archives
-	const char *c = strstr(FullName, ".wad");
-	if (c && strlen(c) == 4 && !strchr(FullName, '/'))
+	const char *c = strstr(FullName, "ecwolf.");
+	// Expect to find a <ext>MAP lump in the ecwolf file so given 8 character
+	// limits the extension may be up to 5 characters long.
+	if (c && strlen(c) > 7 && strlen(c) <= 12 && !strchr(FullName, '/'))
 	{
 		// Mark all embedded WADs
 		Flags |= LUMPF_EMBEDDED;
-		memset(Name, 0, 8);
+		// [ECWolf] We don't need to do this since we'll be NULLing the whole
+		// archive.
+		//memset(Name, 0, 8);
 	}
 	/* later
 	else
@@ -263,7 +267,8 @@ FResourceFile *CheckMacBin(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckRtl(const char *filename, FileReader *file, bool quiet);
 
 #define COUNTOF_FUNCS 13
-static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF, CheckRtl, CheckMacBin, CheckAudiot, CheckVGAGraph, CheckVSwap, CheckGamemaps, CheckLump };
+#define WOLFHACK_START 8 // Should point to AudioT
+static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF, CheckRtl, CheckMacBin, CheckAudiot, CheckVGAGraph, CheckGamemaps, CheckVSwap, CheckLump };
 
 FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader *file, bool quiet)
 {
@@ -278,6 +283,21 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 			return NULL;
 		}
 	}
+	else
+	{
+		// ECWolf HACK For embedded files, try to load a multi file type since
+		// the file parameter is forced to the wrong type.
+		const char* c = strchr(filename, ':');
+		if(c)
+		{
+			for(size_t i = WOLFHACK_START; i < WOLFHACK_START+3; ++i)
+			{
+				FResourceFile *resfile = funcs[i](filename, file, quiet);
+				if (resfile != NULL) return resfile;
+			}
+		}
+	}
+
 	for(size_t i = 0; i < COUNTOF_FUNCS; i++)
 	{
 		FResourceFile *resfile = funcs[i](filename, file, quiet);

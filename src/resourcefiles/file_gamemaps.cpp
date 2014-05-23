@@ -47,6 +47,7 @@ class FGamemaps : public FResourceFile
 {
 	public:
 		FGamemaps(const char* filename, FileReader *file);
+		FGamemaps(const char* filename, FileReader **file);
 		~FGamemaps();
 
 		FResourceLump *GetLump(int lump);
@@ -56,11 +57,10 @@ class FGamemaps : public FResourceFile
 		FMapLump*	Lumps;
 
 		FString		extension;
-		FString		gamemapsFile;
-		FString		mapheadFile;
+		FileReader	*mapheadReader;
 };
 
-FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(filename, file), Lumps(NULL), gamemapsFile(filename)
+FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(filename, file), Lumps(NULL)
 {
 	FString path(filename);
 	int lastSlash = path.LastIndexOfAny("/\\");
@@ -68,13 +68,35 @@ FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(fil
 	path = path.Left(lastSlash+1);
 
 	File directory(path.Len() > 0 ? path : ".");
-	mapheadFile = path + directory.getInsensitiveFile(FString("maphead.") + extension, true);
+	FString mapheadFile = path + directory.getInsensitiveFile(FString("maphead.") + extension, true);
+
+	mapheadReader = new FileReader();
+	if(!mapheadReader->Open(mapheadFile))
+	{
+		delete mapheadReader;
+		mapheadReader = NULL;
+
+		FString error;
+		error.Format("Could not open gamemaps since %s is missing.", mapheadFile.GetChars());
+		throw CRecoverableError(error);
+	}
+}
+
+FGamemaps::FGamemaps(const char* filename, FileReader **file) : FResourceFile(filename, file[0]), Lumps(NULL)
+{
+	FString path(filename);
+	int lastSlash = path.LastIndexOf(':');
+	extension = path.Mid(lastSlash+10);
+
+	mapheadReader = file[1];
 }
 
 FGamemaps::~FGamemaps()
 {
 	if(Lumps != NULL)
 		delete[] Lumps;
+
+	delete mapheadReader;
 }
 
 FResourceLump *FGamemaps::GetLump(int lump)
@@ -90,20 +112,13 @@ bool FGamemaps::Open(bool quiet)
 	// First two bytes is the tag for the run length encoding
 	// Followed by offsets in the gamemaps file, we'll count until we
 	// hit a 0 offset.
-	FileReader mapheadReader;
-	if(!mapheadReader.Open(mapheadFile))
-	{
-		FString error;
-		error.Format("Could not open gamemaps since %s is missing.", mapheadFile.GetChars());
-		throw CRecoverableError(error);
-	}
-	mapheadReader.Seek(0, SEEK_END);
-	unsigned int NumPossibleMaps = (mapheadReader.Tell()-2)/4;
-	mapheadReader.Seek(0, SEEK_SET);
+	mapheadReader->Seek(0, SEEK_END);
+	unsigned int NumPossibleMaps = (mapheadReader->Tell()-2)/4;
+	mapheadReader->Seek(0, SEEK_SET);
 	DWORD* offsets = new DWORD[NumPossibleMaps];
-	mapheadReader.Read(&rlewTag, 2);
+	mapheadReader->Read(&rlewTag, 2);
 	rlewTag = LittleShort(rlewTag);
-	mapheadReader.Read(offsets, NumPossibleMaps*4);
+	mapheadReader->Read(offsets, NumPossibleMaps*4);
 	for(NumLumps = 0;NumLumps < NumPossibleMaps && offsets[NumLumps] != 0;++NumLumps)
 		offsets[NumLumps] = LittleLong(offsets[NumLumps]);
 
@@ -153,7 +168,8 @@ bool FGamemaps::Open(bool quiet)
 FResourceFile *CheckGamemaps(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
-	int lastSlash = fname.LastIndexOfAny("/\\");
+	int embeddedSep = fname.LastIndexOf(':');
+	int lastSlash = MAX<long>(fname.LastIndexOfAny("/\\"), embeddedSep);
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 8);
 	else
@@ -161,7 +177,8 @@ FResourceFile *CheckGamemaps(const char *filename, FileReader *file, bool quiet)
 
 	if(fname.Len() == 8 && fname.CompareNoCase("gamemaps") == 0) // file must be gamemaps.something
 	{
-		FResourceFile *rf = new FGamemaps(filename, file);
+		FResourceFile *rf = embeddedSep == -1 ? new FGamemaps(filename, file) :
+			new FGamemaps(filename, reinterpret_cast<FileReader**>(file)); // HACK
 		if(rf->Open(quiet)) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;

@@ -43,7 +43,7 @@
 class FAudiot : public FUncompressedFile
 {
 	public:
-		FAudiot(const char* filename, FileReader *file) : FUncompressedFile(filename, file), audiotFile(filename)
+		FAudiot(const char* filename, FileReader *file) : FUncompressedFile(filename, file)
 		{
 			FString path(filename);
 			int lastSlash = path.LastIndexOfAny("/\\");
@@ -51,26 +51,44 @@ class FAudiot : public FUncompressedFile
 			path = path.Left(lastSlash+1);
 
 			File directory(path.Len() > 0 ? path : ".");
-			audiohedFile = path + directory.getInsensitiveFile(FString("audiohed.") + extension, true);
-		}
+			FString audiohedFile = path + directory.getInsensitiveFile(FString("audiohed.") + extension, true);
 
-		bool Open(bool quiet)
-		{
-			FileReader audiohedReader;
-			if(!audiohedReader.Open(audiohedFile))
+			audiohedReader = new FileReader();
+			if(!audiohedReader->Open(audiohedFile))
 			{
+				delete audiohedReader;
+				audiohedReader = NULL;
+
 				FString error;
 				error.Format("Could not open audiot since %s is missing.", audiohedFile.GetChars());
 				throw CRecoverableError(error);
 			}
-			audiohedReader.Seek(0, SEEK_END);
-			NumLumps = (audiohedReader.Tell()/4)-1;
-			audiohedReader.Seek(0, SEEK_SET);
+		}
+
+		FAudiot(const char* filename, FileReader **file) : FUncompressedFile(filename, file[0])
+		{
+			FString path(filename);
+			int lastSlash = path.LastIndexOf(':');
+			extension = path.Mid(lastSlash+8);
+
+			audiohedReader = file[1];
+		}
+
+		~FAudiot()
+		{
+			delete audiohedReader;
+		}
+
+		bool Open(bool quiet)
+		{
+			audiohedReader->Seek(0, SEEK_END);
+			NumLumps = (audiohedReader->Tell()/4)-1;
+			audiohedReader->Seek(0, SEEK_SET);
 			Lumps = new FUncompressedLump[NumLumps];
 			// The vgahead has 24-bit ints.
 			DWORD* positions = new DWORD[NumLumps+1];
 			DWORD* sizes = new DWORD[NumLumps];
-			audiohedReader.Read(positions, (NumLumps+1)*4);
+			audiohedReader->Read(positions, (NumLumps+1)*4);
 			for(unsigned int i = NumLumps;i-- > 0;)
 				positions[i] = LittleLong(positions[i]);
 
@@ -130,14 +148,14 @@ class FAudiot : public FUncompressedFile
 
 	private:
 		FString		extension;
-		FString		audiotFile;
-		FString		audiohedFile;
+		FileReader	*audiohedReader;
 };
 
 FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
-	int lastSlash = fname.LastIndexOfAny("/\\");
+	int embeddedSep = fname.LastIndexOf(':');
+	int lastSlash = MAX<long>(fname.LastIndexOfAny("/\\"), embeddedSep);
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 6);
 	else
@@ -145,7 +163,9 @@ FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 
 	if(fname.Len() == 6 && fname.CompareNoCase("audiot") == 0) // file must be audiot.something
 	{
-		FResourceFile *rf = new FAudiot(filename, file);
+		FResourceFile *rf = embeddedSep == -1 ? new FAudiot(filename, file) :
+			new FAudiot(filename, reinterpret_cast<FileReader**>(file)); // HACK
+
 		if(rf->Open(quiet)) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
