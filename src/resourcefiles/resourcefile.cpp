@@ -288,6 +288,10 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 		// ECWolf HACK For embedded files, try to load a multi file type since
 		// the file parameter is forced to the wrong type.
 		const char* c = strchr(filename, ':');
+#if _WIN32
+		if(c == filename+1) // Drive letter
+			c = strchr(filename+2, ':');
+#endif
 		if(c)
 		{
 			for(size_t i = WOLFHACK_START; i < WOLFHACK_START+3; ++i)

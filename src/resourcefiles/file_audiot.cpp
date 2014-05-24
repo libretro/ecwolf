@@ -155,6 +155,9 @@ FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
 	int embeddedSep = fname.LastIndexOf(':');
+#ifdef _WIN32
+	if(embeddedSep == 1) embeddedSep = -1;
+#endif
 	int lastSlash = MAX<long>(fname.LastIndexOfAny("/\\"), embeddedSep);
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 6);
