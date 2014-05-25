@@ -425,14 +425,14 @@ void AActor::Serialize(FArchive &arc)
 		<< player
 		<< inventory
 		<< soundZone;
-	if(arc.IsLoading() && GameSave::SaveVersion < 1382102747)
+	if(arc.IsLoading() && (GameSave::SaveProdVersion < 0x001002FF || GameSave::SaveVersion < 1382102747))
 	{
 		TObjPtr<AActorProxy> proxy;
 		arc << proxy;
 	}
 	arc << hasActorRef;
 
-	if(GameSave::SaveVersion > 1374914454)
+	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374914454)
 		arc << projectilepassheight;
 
 	if(!arc.IsStoring())

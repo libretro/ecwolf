@@ -12,9 +12,9 @@
 #else
 #define GAME_DIR "ecwolf"
 #endif
-#define DOTVERSIONSTR_NOREV "1.2.99999"
+#define DOTVERSIONSTR_NOREV "1.3.0"
 #define DOTVERSIONSTR DOTVERSIONSTR_NOREV " (r" SVN_REVISION_STRING ")"
-#define SAVEPRODVER 0x001002FF // 0xMMMmmmrr in hex
+#define SAVEPRODVER 0x00100300 // 0xMMMmmmrr in hex
 
 // Windows RC files have weird syntax so we need an unquoted version
 #define RCGAMENAME ECWolf

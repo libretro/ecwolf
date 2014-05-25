@@ -890,7 +890,7 @@ void player_t::Serialize(FArchive &arc)
 			<< psprite[i].sy;
 	}
 
-	if(GameSave::SaveVersion > 1374729160)
+	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374729160)
 		arc << FOV << DesiredFOV;
 
 	if(arc.IsLoading())
