@@ -301,7 +301,7 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 				FWadCollection::LumpRecord *lump_p = &LumpInfo[LumpInfo.Reserve(1)];
 
 				lump_p->lump = lump;
-				lump_p->wadnum = Files.Size();
+				lump_p->wadnum = Files.Size()-1;
 			}
 		}
 		return;
