@@ -119,6 +119,8 @@ actor BackpackItem : Inventory native
 
 actor CustomInventory : Inventory native
 {
+	action native A_Succeed();
+	action native A_WeaponGrin();
 }
 
 actor ExtraLifeItem : Inventory native
@@ -143,6 +145,10 @@ actor Key : Inventory native
 actor KeyGiver : Inventory native
 {
 	inventory.pickupsound "misc/k_pkup"
+}
+
+actor MapRevealer : Inventory native
+{
 }
 
 actor ScoreItem : Inventory native

@@ -34,6 +34,7 @@ public:
 	virtual unsigned int GetHeight(bool top)=0;
 	virtual void NewGame() {}
 	virtual void Tick() {}
+	virtual void RefreshBackground(bool noborder=false);
 	virtual void UpdateFace (int damage=0) {}
 	virtual void WeaponGrin () {}
 };

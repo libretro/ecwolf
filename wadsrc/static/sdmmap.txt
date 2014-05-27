@@ -47,7 +47,7 @@ graphics
 	"L_BJWINS",
 	"TITLE1",
 	"TITLE2",
-	"STBAR",
+	"STBACK",
 	"PG13",
 	"CREDITS",
 	"KNIFE",

@@ -1,3 +1,6 @@
+#include <cmath>
+#include <climits>
+
 #include "wl_def.h"
 #include "wl_agent.h"
 #include "wl_game.h"
@@ -14,9 +17,6 @@
 #include "a_inventory.h"
 #include "a_keys.h"
 #include "wl_iwad.h"
-
-#include <cmath>
-#include <climits>
 
 /*
 =============================================================================
@@ -62,9 +62,9 @@ public:
 		if(IWad::CheckGameFilter("Noah"))
 		{
 			// Change default configuration
-			StatusBarConfig.Floor.X = 32;
-			StatusBarConfig.Floor.Digits = 1;
-			StatusBarConfig.Score.X = 56;
+			StatusBarConfig.Floor.X = 16;
+			StatusBarConfig.Floor.Digits = 3;
+			StatusBarConfig.Score.X = 64;
 			StatusBarConfig.Lives.X = 128;
 			StatusBarConfig.Health.X = 184;
 			StatusBarConfig.Ammo.X = 224;
@@ -78,13 +78,15 @@ public:
 	}
 
 	void DrawStatusBar();
-	unsigned int GetHeight(bool top) { return (viewsize == 21 || top) ? 0 : STATUSLINES+1; }
+	unsigned int GetHeight(bool top) { return top ? 0 : STATUSLINES+1; }
 	void NewGame() { facecount = 0; }
+	void RefreshBackground(bool noborder);
 	void UpdateFace(int damage=0);
 	void WeaponGrin();
 
 private:
 	static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=false);
+	static void LatchString (int x, int y, unsigned width, const FString &str);
 	static void StatusDrawFace(FTexture *pic);
 	static void StatusDrawPic(unsigned x, unsigned y, const char* pic);
 
@@ -263,14 +265,6 @@ void WolfStatusBar::UpdateFace (int damage)
 
 void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, bool cap)
 {
-	static FFont *HudFont = NULL;
-	if(!HudFont)
-	{
-		HudFont = V_GetFont("HudFont");
-	}
-
-	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
-
 	FString str;
 	str.Format("%*d", width, number);
 	if(str.Len() > width && cap)
@@ -279,9 +273,22 @@ void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, b
 		str.Format("%d", maxval);
 	}
 
+	LatchString(x, y, width, str);
+}
+
+void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &str)
+{
+	static FFont *HudFont = NULL;
+	if(!HudFont)
+	{
+		HudFont = V_GetFont("HudFont");
+	}
+
+	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
+
 	int cwidth;
 	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
-	for(size_t i = MAX<size_t>(0, str.Len()-width);i < str.Len();++i)
+	for(unsigned int i = MAX<int>(0, str.Len()-width);i < str.Len();++i)
 	{
 		VWB_DrawGraphic(HudFont->GetChar(str[i], &cwidth), x, y, MENU_NONE, remap);
 		x += cwidth;
@@ -317,7 +324,9 @@ void WolfStatusBar::DrawHealth (void)
 void WolfStatusBar::DrawLevel (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
-	LatchNumber (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,levelInfo->FloorNumber);
+	FString str;
+	str.Format("%*s", StatusBarConfig.Floor.Digits, levelInfo->FloorNumber.GetChars());
+	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,str);
 }
 
 //===========================================================================
@@ -470,6 +479,16 @@ void WolfStatusBar::DrawAmmo (void)
 }
 
 //===========================================================================
+
+void WolfStatusBar::RefreshBackground(bool noborder)
+{
+	DBaseStatusBar::RefreshBackground(noborder);
+
+	if(viewsize == 21 && ingame)
+		return;
+
+	VWB_DrawGraphic(TexMan("STBACK"), 0, 160);
+}
 
 void WolfStatusBar::DrawStatusBar()
 {

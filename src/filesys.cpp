@@ -53,7 +53,12 @@
 #include <sys/stat.h>
 #include <cstdio>
 #include "filesys.h"
+#include "version.h"
 #include "zstring.h"
+
+#ifndef MAX_PATH
+#define MAX_PATH PATH_MAX
+#endif
 
 namespace FileSys {
 
@@ -63,28 +68,42 @@ FString GetDirectoryPath(ESpecialDirectory dir) { return SpecialPaths[dir]; }
 void SetDirectoryPath(ESpecialDirectory dir, const FString &path) { SpecialPaths[dir] = path; }
 
 #ifdef _WIN32
-static wchar_t* NameToWide(const char* filename)
+// Utility functions for converting to and from wchar_t since we want to use
+// UTF8 so that the majority of our file system code is platform independent.
+static inline void ConvertName(const char* filename, wchar_t* out, const int len=MAX_PATH)
 {
-	wchar_t* out = new wchar_t[MAX_PATH];
-	MultiByteToWideChar(CP_UTF8, 0, filename, -1, out, MAX_PATH);
-	return out;
+	MultiByteToWideChar(CP_UTF8, 0, filename, -1, out, len);
+}
+static inline void ConvertName(const wchar_t* filename, char* out, const int len=MAX_PATH)
+{
+	WideCharToMultiByte(CP_UTF8, 0, filename, -1, out, len, NULL, NULL);
 }
 #endif
+
+// Converts a relative filename to an absolute name
+static void FullFileName(const char* filename, char* dest)
+{
+#ifdef _WIN32
+	wchar_t path[MAX_PATH], fullpath[MAX_PATH];
+	ConvertName(filename, path);
+	_wfullpath(fullpath, path, MAX_PATH);
+	ConvertName(fullpath, dest);
+#else
+	realpath(filename, dest);
+#endif
+}
 
 static bool CreateDirectoryIfNeeded(const char* path)
 {
 #ifdef _WIN32
 	struct _stat dirStat;
-	wchar_t* wpath = NameToWide(path);
+	wchar_t wpath[MAX_PATH];
+	ConvertName(path, wpath);
 	if(_wstat(wpath, &dirStat) == -1)
 	{
 		if(_wmkdir(wpath) == -1)
-		{
-			delete[] wpath;
 			return false;
-		}
 	}
-	delete[] wpath;
 	return true;
 #else
 	struct stat dirStat;
@@ -137,8 +156,8 @@ void SetupPaths(int argc, const char * const *argv)
 			PWSTR tempPath = NULL;
 			if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_RoamingAppData, 0x00008000, NULL, &tempPath)))
 			{
-				WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-				configDir.Format("%s\\ecwolf", (const char*)tempCPath);
+				ConvertName(tempPath, tempCPath);
+				configDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
 				CoTaskMemFree(tempPath);
 			}
 		}
@@ -149,8 +168,8 @@ void SetupPaths(int argc, const char * const *argv)
 			wchar_t tempPath[MAX_PATH];
 			if(SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
 			{
-				WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-				configDir.Format("%s\\ecwolf", (const char*)tempCPath);
+				ConvertName(tempPath, tempCPath);
+				configDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
 				CoTaskMemFree(tempPath);
 			}
 		}
@@ -167,8 +186,8 @@ void SetupPaths(int argc, const char * const *argv)
 		else
 		{
 			char* chome = new char[wcslen(home)];
-			WideCharToMultiByte(CP_UTF8, 0, home, -1, chome, wcslen(home), NULL, NULL);
-			configDir.Format("%s\\ecwolf", chome);
+			ConvertName(home, chome, wcslen(home));
+			configDir.Format("%s\\" GAME_DIR, chome);
 			delete[] chome;
 		}
 	}
@@ -188,10 +207,10 @@ void SetupPaths(int argc, const char * const *argv)
 		{
 			I_Error("Please set your HOME environment variable.\n");
 		}
-		configDir.Format("%s/.config/ecwolf", home);
+		configDir.Format("%s/.config/" GAME_DIR, home);
 	}
 	else
-		configDir.Format("%s/ecwolf", xdg_config);
+		configDir.Format("%s/" GAME_DIR, xdg_config);
 #endif
 
 	if(!CreateDirectoryIfNeeded(configDir))
@@ -203,7 +222,7 @@ void SetupPaths(int argc, const char * const *argv)
 #elif defined(__APPLE__)
 	osxDir = OSX_FindFolder(DIR_Documents);
 	if(!osxDir.IsEmpty())
-		documentsDir = osxDir + "/ECWolf";
+		documentsDir = osxDir + "/" GAME_DIR;
 #else
 	char *xdg_data = getenv("XDG_DATA_HOME");
 	if(xdg_data == NULL || *xdg_data == '\0')
@@ -212,10 +231,10 @@ void SetupPaths(int argc, const char * const *argv)
 		{
 			I_Error("Please set your HOME environment variable.\n");
 		}
-		documentsDir.Format("%s/.local/share/ecwolf", home);
+		documentsDir.Format("%s/.local/share/" GAME_DIR, home);
 	}
 	else
-		documentsDir.Format("%s/ecwolf", xdg_data);
+		documentsDir.Format("%s/" GAME_DIR, xdg_data);
 #endif
 
 	if(!CreateDirectoryIfNeeded(documentsDir))
@@ -229,8 +248,8 @@ void SetupPaths(int argc, const char * const *argv)
 		PWSTR tempPath = NULL;
 		if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_SavedGames, 0x00008000, NULL, &tempPath)))
 		{
-			WideCharToMultiByte(CP_UTF8, 0, tempPath, -1, tempCPath, sizeof(tempCPath), NULL, NULL);
-			saveDir.Format("%s\\ECWolf", (const char*)tempCPath);
+			ConvertName(tempPath, tempCPath);
+			saveDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
 			CoTaskMemFree(tempPath);
 		}
 	}
@@ -249,7 +268,7 @@ void SetupPaths(int argc, const char * const *argv)
 #if defined(__APPLE__)
 	osxDir = OSX_FindFolder(DIR_ApplicationSupport);
 	if(!osxDir.IsEmpty())
-		appsupportDir = osxDir + "/ECWolf";
+		appsupportDir = osxDir + "/" GAME_DIR;
 #else
 	appsupportDir = progDir;
 #endif
@@ -357,6 +376,17 @@ FString File::getDirectory() const
 	return FString(".");
 }
 
+FString File::getFileName() const
+{
+	if(directory)
+		return FString();
+
+	long dirSepPos = filename.LastIndexOfAny("/\\");
+	if(dirSepPos != -1)
+		return filename.Mid(dirSepPos+1);
+	return filename;
+}
+
 FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtension) const
 {
 #ifdef _WIN32
@@ -403,23 +433,42 @@ FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtensio
 #endif
 }
 
+static TMap<unsigned int, FString> VirtualRenameTable;
+
+/**
+ * Open a file while handling any non-English character sets and
+ * respecting our virtual renaming table.
+ */
 FILE *File::open(const char* mode) const
 {
+	char path[MAX_PATH];
+	FileSys::FullFileName(filename, path);
+	FString *renamed = VirtualRenameTable.CheckKey(MakeKey(path));
+	FString fn = renamed ? *renamed : filename;
+
 #ifdef _WIN32
-	wchar_t* wname = FileSys::NameToWide(filename);
-	wchar_t* wmode = FileSys::NameToWide(mode);
+	wchar_t wname[MAX_PATH], wmode[MAX_PATH];
+	FileSys::ConvertName(fn, wname);
+	FileSys::ConvertName(mode, wmode);
 	FILE *ret = _wfopen(wname, wmode);
-	delete[] wname;
-	delete[] wmode;
 	return ret;
 #else
 	return fopen(filename, mode);
 #endif
 }
 
+/**
+ * Perform a virtual rename on the file. This function is designed to handle
+ * renaming improperly set copies of Spear of Destiny. Since we can't assume
+ * that the user can physically rename the file, we need to do the remapping
+ * in memory. We could just load the SD1 files, but that may be undesirable
+ * for save compatibility and/or multiplayer.
+ */
 void File::rename(const FString &newname)
 {
-	FString dirName = getDirectory() + PATH_SEPARATOR;
+	char path[MAX_PATH];
+	FileSys::FullFileName(filename, path);
+	filename = path;
 
-	::rename(filename, dirName + newname);
+	VirtualRenameTable[MakeKey(getDirectory() + PATH_SEPARATOR + newname)] = filename;
 }

@@ -43,14 +43,16 @@
 
 ACTION_FUNCTION(A_PlasmaGrenadeCalcDuration)
 {
-	const bool horiz = ABS(self->velx) > ABS(self->vely);
+	const bool horiz = abs(self->velx) > abs(self->vely);
 	const fixed velocity = horiz ? self->velx : self->vely;
 
 	fixed distance = horiz ? self->fracx : self->fracy;
 	if(velocity > 0)
 		distance = FRACUNIT - distance;
 
-	self->ticcount = distance/ABS(velocity) + 1;
+	self->ticcount = distance/abs(velocity) + 1;
+
+	return true;
 }
 
 //------------------------------------------------------------------------------
@@ -66,9 +68,11 @@ ACTION_FUNCTION(A_InitSmartAnim)
 {
 	ACTION_PARAM_INT(delay, 0);
 	self->temp1 = delay;
+	return true;
 }
 
 ACTION_FUNCTION(A_SmartAnimDelay)
 {
 	self->ticcount = self->temp1;
+	return true;
 }

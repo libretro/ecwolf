@@ -43,6 +43,8 @@
 #include "version.h"
 #include "r_2d/r_main.h"
 #include "filesys.h"
+#include "g_conversation.h"
+#include "g_intermission.h"
 
 #include <clocale>
 
@@ -106,7 +108,8 @@ void    Quit (const char *error,...);
 
 bool	startgame;
 bool	loadedgame;
-int		mouseadjustment;
+int		mousexadjustment;
+int     mouseyadjustment;
 
 //
 // Command line parameter variables
@@ -132,23 +135,28 @@ int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 =====================
 */
 
-void NewGame (int difficulty, const FString &map, const ClassDef *playerClass)
+void NewGame (int difficulty, const FString &map, bool displayBriefing, const ClassDef *playerClass)
 {
 	if(!playerClass)
 		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
 
 	memset (&gamestate,0,sizeof(gamestate));
-	gamestate.difficulty = difficulty;
+	gamestate.difficulty = &SkillInfo::GetSkill(difficulty);
 	strncpy(gamestate.mapname, map, 8);
 	gamestate.mapname[8] = 0;
 	gamestate.playerClass = playerClass;
 	levelInfo = &LevelInfo::Find(map);
+
+	if(displayBriefing)
+		EnterText(levelInfo->Cluster);
 
 	// Clear LevelRatios
 	LevelRatios.killratio = LevelRatios.secretsratio = LevelRatios.treasureratio =
 		LevelRatios.numLevels = LevelRatios.time = 0;
 
 	players[0].state = player_t::PST_ENTER;
+
+	Dialog::ClearConversations();
 
 	startgame = true;
 }
@@ -324,7 +332,7 @@ void DoJukebox(void)
 		else
 			musicMenu.addItem(new MenuItem(language[langString], ChangeMusic));
 		songList.Push(Wads.GetLumpFullName(i));
-		
+
 	}
 	musicMenu.show();
 	return;
@@ -381,7 +389,7 @@ static void InitGame()
 
 #if SDL_VERSION_ATLEAST(2,0,0)
 #else
-	SDL_WM_SetCaption("ECWolf " DOTVERSIONSTR, NULL);
+	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
 #endif
 	SDL_ShowCursor(SDL_DISABLE);
 
@@ -479,6 +487,11 @@ static void InitGame()
 	CreateMenus();
 
 //
+// Load Noah's Ark quiz
+//
+	Dialog::LoadGlobalModule("NOAHQUIZ");
+
+//
 // Finish signon screen
 //
 	VL_SetVGAPlaneMode();
@@ -563,7 +576,8 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	viewheight = height&~1;
 	centerx = viewwidth/2-1;
 	centerxwide = AspectCorrection[r_ratio].isWide ? CorrectWidthFactor(centerx) : centerx;
-	shootdelta = viewwidth/10;
+	// This should allow shooting within 9 degrees, but it's not perfect.
+	shootdelta = ((viewwidth<<FRACBITS)/AspectCorrection[r_ratio].viewGlobal)/10;
 	if((unsigned) viewheight == screenHeight)
 		viewscreenx = viewscreeny = screenofs = 0;
 	else
@@ -765,7 +779,6 @@ static void NonShareware (void)
 =====================
 */
 
-
 static void DemoLoop()
 {
 //
@@ -774,7 +787,7 @@ static void DemoLoop()
 	if (param_tedlevel)
 	{
 		param_nowait = true;
-		NewGame(param_difficulty,param_tedlevel);
+		NewGame(param_difficulty,param_tedlevel,false);
 	}
 
 
@@ -790,95 +803,17 @@ static void DemoLoop()
 	if (!param_nowait)
 		PG13 ();
 
-	bool reloadPalette = false;
+	IntermissionInfo *demoLoop = IntermissionInfo::Find("DemoLoop");
 	bool gotoMenu = false;
 	while (1)
 	{
-		while (!param_nowait && !gotoMenu)
+		while(!param_nowait && ShowIntermission(demoLoop, true))
 		{
-//
-// title page
-//
-			bool useTitlePalette = !gameinfo.TitlePalette.IsEmpty();
-			if(useTitlePalette)
-			{
-				reloadPalette = true;
-				VL_ReadPalette(gameinfo.TitlePalette);
-			}
-
-			CA_CacheScreen(TexMan(gameinfo.TitlePage));
-			VW_UpdateScreen ();
-			VW_FadeIn();
-			if (IN_UserInput(TICRATE*gameinfo.TitleTime))
-				break;
-			VW_FadeOut();
-			if(useTitlePalette)
-			{
-				VL_ReadPalette(gameinfo.GamePalette);
-				reloadPalette = false;
-			}
-//
-// credits page
-//
-			CA_CacheScreen (TexMan(gameinfo.CreditPage));
-			VW_UpdateScreen();
-			VW_FadeIn ();
-			if (IN_UserInput(TICRATE*gameinfo.PageTime))
-				break;
-			VW_FadeOut ();
-//
-// high scores
-//
-			DrawHighScores ();
-			VW_UpdateScreen ();
-			VW_FadeIn ();
-
-			if (IN_UserInput(TICRATE*gameinfo.PageTime))
-				break;
-//
-// demo
-//
-#if 0
-			bool demoPlayed = false;
-			do // This basically loops twice at most.  If the lump exists it plays the demo if not it goes to DEMO0.
-			{  // PlayDemo will actually play the demo picked if it exists otherwise it will immediately return.
-				char demoName[9];
-				sprintf(demoName, "DEMO%d", LastDemo);
-				if(Wads.CheckNumForName(demoName) == -1)
-				{
-					if(LastDemo == 0)
-						break;
-					else
-						LastDemo = 0;
-					continue;
-				}
-				else
-				{
-					demoPlayed = true;
-					PlayDemo(LastDemo++);
-					break;
-				}
-			}
-			while(true);
-#endif
-
-			if (playstate == ex_abort)
-				break;
-			VW_FadeOut();
-			if(screenHeight % 200 != 0)
-				VL_ClearScreen(0);
 		}
 
 		if(!param_tedlevel)
 		{
 			gotoMenu = false;
-
-			VW_FadeOut ();
-			if(reloadPalette)
-			{
-				VL_ReadPalette(gameinfo.GamePalette);
-				reloadPalette = false;
-			}
 
 			if (Keyboard[sc_Tab])
 				RecordDemo ();
@@ -894,7 +829,6 @@ static void DemoLoop()
 
 			if(!param_nowait && !gotoMenu)
 			{
-				VW_FadeOut();
 				StartCPMusic(gameinfo.TitleMusic);
 			}
 		}
@@ -1157,12 +1091,12 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 	{
 		if(hasError) printf("\n");
 		printf(
-			"ECWolf v1.0\n"
+			GAMENAME " v" DOTVERSIONSTR "\n"
 			"http://maniacsvault.net/ecwolf/\n"
 			"Based on Wolf4SDL v1.7\n"
 			"Ported by Chaos-Software (http://www.chaos-software.de.vu)\n"
 			"Original Wolfenstein 3D by id Software\n\n"
-			"Usage: ecwolf [options]\n"
+			"Usage: " BINNAME " [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
 			" --config <file>        Use an explicit location for the config file\n"
@@ -1289,6 +1223,13 @@ void StartupWin32();
 #endif
 int main (int argc, char *argv[])
 {
+#ifndef _WIN32
+	// Set LC_NUMERIC environment variable in case some library decides to
+	// clear the setlocale call at least this will be correct.
+	// Note that the LANG environment variable is overridden by LC_*
+	setenv ("LC_NUMERIC", "C", 1);
+#endif
+
 #ifndef NO_GTK
 	GtkAvailable = gtk_init_check(&argc, &argv);
 #endif
@@ -1324,7 +1265,7 @@ int main (int argc, char *argv[])
 
 			Printf("IWad: Selecting base game data.\n");
 			const char* extension = CheckParameters(argc, argv, wadfiles);
-			IWad::SelectGame(files, extension, "ecwolf.pk3", progdir);
+			IWad::SelectGame(files, extension, MAIN_PK3, progdir);
 
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
 				files.Push(wadfiles[i]);

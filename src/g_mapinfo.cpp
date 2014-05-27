@@ -108,6 +108,14 @@ protected:
 		while(sc.CheckToken(','));
 	}
 
+	void ParseFixedAssignment(fixed &dest)
+	{
+		sc.MustGetToken('=');
+		bool negative = sc.CheckToken('-');
+		sc.MustGetToken(TK_FloatConst);
+		dest = negative ? -FLOAT2FIXED(sc->decimal) : FLOAT2FIXED(sc->decimal);
+	}
+
 	void ParseIntAssignment(int &dest)
 	{
 		sc.MustGetToken('=');
@@ -265,6 +273,7 @@ static TArray<LevelInfo> levelInfos;
 LevelInfo::LevelInfo() : UseMapInfoName(false)
 {
 	MapName[0] = 0;
+	TitlePatch.SetInvalid();
 	BorderTexture.SetInvalid();
 	DefaultTexture[0].SetInvalid();
 	DefaultTexture[1].SetInvalid();
@@ -274,7 +283,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	DeathCam = false;
 	ExitFadeColor = 0;
 	ExitFadeDuration = 30;
-	FloorNumber = 1;
+	FloorNumber = "1";
 	Par = 0;
 	LevelBonus = -1;
 	LevelNumber = 0;
@@ -282,6 +291,7 @@ LevelInfo::LevelInfo() : UseMapInfoName(false)
 	NoIntermission = false;
 	SecretDeathSounds = false;
 	SpawnWithWeaponRaised = false;
+	ForceTally = false;
 	HighScoresGraphic.SetInvalid();
 }
 
@@ -428,13 +438,13 @@ protected:
 		{
 			sc.MustGetToken('=');
 			sc.MustGetToken(TK_FloatConst);
-			mapInfo.DefaultVisibility = static_cast<fixed>(sc->decimal*65536.);
+			mapInfo.DefaultVisibility = static_cast<fixed>(sc->decimal*LIGHTVISIBILITY_FACTOR*65536.);
 		}
 		else if(key.CompareNoCase("DefaultMaxLightVis") == 0)
 		{
 			sc.MustGetToken('=');
 			sc.MustGetToken(TK_FloatConst);
-			mapInfo.DefaultMaxLightVis = static_cast<fixed>(sc->decimal*65536.);
+			mapInfo.DefaultMaxLightVis = static_cast<fixed>(sc->decimal*LIGHTVISIBILITY_FACTOR*65536.);
 		}
 		else if(key.CompareNoCase("SpecialAction") == 0)
 		{
@@ -486,7 +496,18 @@ protected:
 		else if(key.CompareNoCase("DeathCam") == 0)
 			ParseBoolAssignment(mapInfo.DeathCam);
 		else if(key.CompareNoCase("FloorNumber") == 0)
-			ParseIntAssignment(mapInfo.FloorNumber);
+		{
+			sc.MustGetToken('=');
+			if(sc.CheckToken(TK_StringConst))
+				mapInfo.FloorNumber = sc->str;
+			else
+			{
+				sc.MustGetToken(TK_IntConst);
+				mapInfo.FloorNumber.Format("%d", sc->number);
+			}
+		}
+		else if(key.CompareNoCase("ForceTally") == 0)
+			ParseBoolAssignment(mapInfo.ForceTally);
 		else if(key.CompareNoCase("HighScoresGraphic") == 0)
 		{
 			FString texName;
@@ -513,6 +534,12 @@ protected:
 			ParseBoolAssignment(mapInfo.SecretDeathSounds);
 		else if(key.CompareNoCase("SpawnWithWeaponRaised") == 0)
 			mapInfo.SpawnWithWeaponRaised = true;
+		else if(key.CompareNoCase("TitlePatch") == 0)
+		{
+			FString textureName;
+			ParseStringAssignment(textureName);
+			mapInfo.TitlePatch = TexMan.GetTexture(textureName, FTexture::TEX_Any);
+		}
 		else if(key.CompareNoCase("Translator") == 0)
 			ParseStringAssignment(mapInfo.Translator);
 		else
@@ -590,14 +617,29 @@ protected:
 		}
 		else if(key.CompareNoCase("borderflat") == 0)
 			ParseStringAssignment(gameinfo.BorderFlat);
-		else if(key.CompareNoCase("creditpage") == 0)
-			ParseStringAssignment(gameinfo.CreditPage);
+		else if(key.CompareNoCase("deathtransition") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_StringConst);
+			if(sc->str.CompareNoCase("fizzle") == 0)
+				gameinfo.DeathTransition = GameInfo::TRANSITION_Fizzle;
+			else if(sc->str.CompareNoCase("fade") == 0)
+				gameinfo.DeathTransition = GameInfo::TRANSITION_Fade;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown transition type '%s'.", sc->str.GetChars());
+		}
+		else if(key.CompareNoCase("dialogcolor") == 0)
+			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::DIALOG]);
 		else if(key.CompareNoCase("doorsoundsequence") == 0)
 			ParseNameAssignment(gameinfo.DoorSoundSequence);
 		else if(key.CompareNoCase("drawreadthis") == 0)
 			ParseBoolAssignment(gameinfo.DrawReadThis);
 		else if(key.CompareNoCase("gamecolormap") == 0)
 			ParseStringAssignment(gameinfo.GameColormap);
+		else if(key.CompareNoCase("gameoverpic") == 0)
+			ParseStringAssignment(gameinfo.GameOverPic);
+		else if(key.CompareNoCase("victorypic") == 0)
+			ParseStringAssignment(gameinfo.VictoryPic);
 		else if(key.CompareNoCase("gamepalette") == 0)
 			ParseStringAssignment(gameinfo.GamePalette);
 		else if(key.CompareNoCase("gibfactor") == 0)
@@ -632,8 +674,6 @@ protected:
 			sc.MustGetToken(TK_StringConst);
 			gameinfo.Translator.Push(sc->str);
 		}
-		else if(key.CompareNoCase("pagetime") == 0)
-			ParseIntAssignment(gameinfo.PageTime);
 		else if(key.CompareNoCase("menumusic") == 0)
 			ParseStringAssignment(gameinfo.MenuMusic);
 		else if(key.CompareNoCase("pushwallsoundsequence") == 0)
@@ -647,6 +687,8 @@ protected:
 			ParseStringAssignment(gameinfo.FinaleFlat);
 		else if(key.CompareNoCase("finalemusic") == 0)
 			ParseStringAssignment(gameinfo.FinaleMusic);
+		else if(key.CompareNoCase("victorymusic") == 0)
+			ParseStringAssignment(gameinfo.VictoryMusic);
 		else if(key.CompareNoCase("intermissionmusic") == 0)
 			ParseStringAssignment(gameinfo.IntermissionMusic);
 		else if(key.CompareNoCase("menufontcolor_title") == 0)
@@ -671,6 +713,18 @@ protected:
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		else if(key.CompareNoCase("pageindexfontcolor") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::PAGEINDEX]);
+		else if(key.CompareNoCase("psyched") == 0)
+		{
+			ParseColorArrayAssignment(gameinfo.PsychedColors, 2);
+			if(sc.CheckToken(','))
+			{
+				bool negative = sc.CheckToken('-');
+				sc.MustGetToken(TK_IntConst);
+				gameinfo.PsychedOffset = negative ? -sc->number : sc->number;
+			}
+			else
+				gameinfo.PsychedOffset = 0;
+		}
 		else if(key.CompareNoCase("playerclasses") == 0)
 		{
 			sc.MustGetToken('=');
@@ -685,6 +739,32 @@ protected:
 		}
 		else if(key.CompareNoCase("quitmessages") == 0)
 			ParseStringArrayAssignment(gameinfo.QuitMessages);
+		else
+			return false;
+		return true;
+	}
+};
+
+class AutomapBlockParser : public MapInfoBlockParser
+{
+public:
+	AutomapBlockParser(Scanner &sc) : MapInfoBlockParser(sc, "automap") {}
+
+protected:
+	bool CheckKey(FString key)
+	{
+		if(key.CompareNoCase("Background") == 0)
+			ParseColorAssignment(gameinfo.automap.Background);
+		else if(key.CompareNoCase("DoorColor") == 0)
+			ParseColorAssignment(gameinfo.automap.DoorColor);
+		else if(key.CompareNoCase("FloorColor") == 0)
+			ParseColorAssignment(gameinfo.automap.FloorColor);
+		else if(key.CompareNoCase("FontColor") == 0)
+			ParseFontColorAssignment(gameinfo.automap.FontColor);
+		else if(key.CompareNoCase("WallColor") == 0)
+			ParseColorAssignment(gameinfo.automap.WallColor);
+		else if(key.CompareNoCase("YourColor") == 0)
+			ParseColorAssignment(gameinfo.automap.YourColor);
 		else
 			return false;
 		return true;
@@ -765,7 +845,9 @@ protected:
 
 static TMap<unsigned int, ClusterInfo> clusters;
 
-ClusterInfo::ClusterInfo() : ExitTextType(ClusterInfo::EXIT_STRING)
+ClusterInfo::ClusterInfo() : ExitTextType(ClusterInfo::EXIT_STRING),
+	TextFont(SmallFont), TextAlignment(TS_Left), TextAnchor(TS_Middle),
+	TextColor(CR_UNTRANSLATED)
 {
 }
 
@@ -822,6 +904,121 @@ protected:
 			cluster->ExitTextType = ClusterInfo::EXIT_MESSAGE;
 		else if(key.CompareNoCase("flat") == 0)
 			ParseStringAssignment(cluster->Flat);
+		else if(key.CompareNoCase("music") == 0)
+			ParseStringAssignment(cluster->Music);
+		else if(sc->str.CompareNoCase("textalignment") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_Identifier);
+			if(sc->str.CompareNoCase("left") == 0)
+				cluster->TextAlignment = TS_Left;
+			else if(sc->str.CompareNoCase("center") == 0)
+				cluster->TextAlignment = TS_Center;
+			else if(sc->str.CompareNoCase("right") == 0)
+				cluster->TextAlignment = TS_Right;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown alignment.");
+		}
+		else if(sc->str.CompareNoCase("textanchor") == 0)
+		{
+			sc.MustGetToken('=');
+			sc.MustGetToken(TK_Identifier);
+			if(sc->str.CompareNoCase("top") == 0)
+				cluster->TextAnchor = TS_Top;
+			else if(sc->str.CompareNoCase("middle") == 0)
+				cluster->TextAnchor = TS_Middle;
+			else if(sc->str.CompareNoCase("bottom") == 0)
+				cluster->TextAnchor = TS_Bottom;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Unknown anchor.");
+		}
+		else if(sc->str.CompareNoCase("textcolor") == 0)
+			ParseFontColorAssignment(cluster->TextColor);
+		else if(sc->str.CompareNoCase("textfont") == 0)
+		{
+			FString fontName;
+			ParseStringAssignment(fontName);
+			cluster->TextFont = V_GetFont(fontName);
+		}
+		else
+			return false;
+		return true;
+	}
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+static TArray<SkillInfo> skills;
+static TMap<FName, unsigned int> skillIds;
+
+SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), PlayerDamageFactor(FRACUNIT),
+	SpawnFilter(0), MapFilter(0), QuizHints(false)
+{
+}
+
+unsigned int SkillInfo::GetNumSkills()
+{
+	return skills.Size();
+}
+
+unsigned int SkillInfo::GetSkillIndex(const SkillInfo &skill)
+{
+	return &skill - &skills[0];
+}
+
+SkillInfo &SkillInfo::GetSkill(unsigned int index)
+{
+	return skills[index];
+}
+
+class SkillInfoBlockParser : public MapInfoBlockParser
+{
+private:
+	SkillInfo *skill;
+
+public:
+	SkillInfoBlockParser(Scanner &sc) : MapInfoBlockParser(sc, "skill")
+	{
+	}
+
+protected:
+	void ParseHeader()
+	{
+		sc.MustGetToken(TK_Identifier);
+		const unsigned int *id = skillIds.CheckKey(sc->str);
+		if(id)
+			skill = &skills[*id];
+		else
+		{
+			unsigned int newId = skills.Push(SkillInfo());
+			skill = &skills[newId];
+			skillIds.Insert(sc->str, newId);
+		}
+	}
+
+	bool CheckKey(FString key)
+	{
+		if(key.CompareNoCase("damagefactor") == 0)
+			ParseFixedAssignment(skill->DamageFactor);
+		else if(key.CompareNoCase("name") == 0)
+		{
+			ParseStringAssignment(skill->Name);
+			if(skill->Name[0] == '$')
+				skill->Name = language[skill->Name.Mid(1)];
+		}
+		else if(key.CompareNoCase("picname") == 0)
+			ParseStringAssignment(skill->SkillPicture);
+		else if(key.CompareNoCase("playerdamagefactor") == 0)
+			ParseFixedAssignment(skill->PlayerDamageFactor);
+		else if(key.CompareNoCase("spawnfilter") == 0)
+		{
+			ParseIntAssignment(skill->SpawnFilter);
+			--skill->SpawnFilter;
+		}
+		else if(key.CompareNoCase("mapfilter") == 0)
+			ParseIntAssignment(skill->MapFilter);
+		else if(key.CompareNoCase("quizhints") == 0)
+			ParseBoolAssignment(skill->QuizHints);
 		else
 			return false;
 		return true;
@@ -845,13 +1042,50 @@ protected:
 	{
 		sc.MustGetToken(TK_Identifier);
 
-		intermission = &IntermissionInfo::Find(sc->str);
+		intermission = IntermissionInfo::Find(sc->str);
+	}
+
+	void ParseTimeAssignment(unsigned int &time)
+	{
+		sc.MustGetToken('=');
+
+		if(sc.CheckToken(TK_Identifier))
+		{
+			if(sc->str.CompareNoCase("titletime") == 0)
+				time = gameinfo.TitleTime*TICRATE;
+			else
+				sc.ScriptMessage(Scanner::ERROR, "Invalid special time %s.\n", sc->str.GetChars());
+		}
+		else
+		{
+			bool inSeconds = sc.CheckToken('-');
+			sc.MustGetToken(TK_FloatConst);
+			if(!CheckTicsValid(sc->decimal))
+				sc.ScriptMessage(Scanner::ERROR, "Invalid tic duration.");
+
+			time = static_cast<unsigned int>(sc->decimal*2);
+			if(inSeconds)
+				time *= 35;
+		}
 	}
 
 	bool CheckKey(FString key)
 	{
 		IntermissionInfo::Action action;
-		if(key.CompareNoCase("Fader") == 0)
+		if(key.CompareNoCase("Cast") == 0)
+		{
+			CastIntermissionAction *cast = new CastIntermissionAction();
+
+			action.type = IntermissionInfo::CAST;
+			action.action = cast;
+
+			if(!ParseCast(cast))
+			{
+				delete cast;
+				return false;
+			}
+		}
+		else if(key.CompareNoCase("Fader") == 0)
 		{
 			FaderIntermissionAction *fader = new FaderIntermissionAction();
 
@@ -886,6 +1120,11 @@ protected:
 					return false;
 				}
 			}
+		}
+		else if(key.CompareNoCase("Link") == 0)
+		{
+			ParseNameAssignment(intermission->Link);
+			return true;
 		}
 		else if(key.CompareNoCase("TextScreen") == 0)
 		{
@@ -934,38 +1173,81 @@ protected:
 		}
 		else if(key.CompareNoCase("Background") == 0)
 		{
-			FString tex;
-			ParseStringAssignment(tex);
-			action->Background = TexMan.CheckForTexture(tex, FTexture::TEX_Any);
-			if(sc.CheckToken(','))
+			sc.MustGetToken('=');
+			if(sc.CheckToken(TK_Identifier))
 			{
-				if(!sc.CheckToken(TK_BoolConst))
-					sc.MustGetToken(TK_IntConst);
-				action->BackgroundTile = sc->boolean;
+				if(sc->str.CompareNoCase("HighScores") == 0)
+				{
+					action->Type = IntermissionAction::HIGHSCORES;
+				}
+				else if(sc->str.CompareNoCase("TitlePage") == 0)
+				{
+					action->Type = IntermissionAction::TITLEPAGE;
+				}
+				else if(sc->str.CompareNoCase("LoadMap") == 0)
+				{
+					action->Type = IntermissionAction::LOADMAP;
+					sc.MustGetToken(',');
+					sc.MustGetToken(TK_StringConst);
+					action->MapName = sc->str;
+				}
+				else
+				{
+					sc.ScriptMessage(Scanner::ERROR, "Unknown background type %s. Use quotes for static image.", sc->str.GetChars());
+				}
+			}
+			else
+			{
+				sc.MustGetToken(TK_StringConst);
+				FString tex = sc->str;
+				action->Background = TexMan.CheckForTexture(tex, FTexture::TEX_Any);
+				action->Type = IntermissionAction::NORMAL;
 				if(sc.CheckToken(','))
 				{
-					sc.MustGetToken(TK_StringConst);
-					action->Palette = sc->str;
+					if(!sc.CheckToken(TK_BoolConst))
+						sc.MustGetToken(TK_IntConst);
+					action->BackgroundTile = sc->boolean;
+					if(sc.CheckToken(','))
+					{
+						sc.MustGetToken(TK_StringConst);
+						action->Palette = sc->str;
+					}
 				}
 			}
 		}
 		else if(key.CompareNoCase("Music") == 0)
 			ParseStringAssignment(action->Music);
 		else if(key.CompareNoCase("Time") == 0)
-		{
-			sc.MustGetToken('=');
-
-			bool inSeconds = sc.CheckToken('-');
-			sc.MustGetToken(TK_FloatConst);
-			if(!CheckTicsValid(sc->decimal))
-				sc.ScriptMessage(Scanner::ERROR, "Invalid tic duration.");
-
-			action->Time = static_cast<unsigned int>(sc->decimal*2);
-			if(inSeconds)
-				action->Time *= 35;
-		}
+			ParseTimeAssignment(action->Time);
 		else
 			return false;
+		return true;
+	}
+
+	bool ParseCast(CastIntermissionAction *cast)
+	{
+		sc.MustGetToken('{');
+		while(!sc.CheckToken('}'))
+		{
+			sc.MustGetToken(TK_Identifier);
+			if(CheckStandardKey(cast, sc->str))
+				continue;
+
+			if(sc->str.CompareNoCase("CastClass") == 0)
+			{
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_StringConst);
+				cast->Class = ClassDef::FindClass(sc->str);
+			}
+			else if(sc->str.CompareNoCase("CastName") == 0)
+			{
+				ParseStringAssignment(cast->Name);
+				if(cast->Name[0] == '$')
+					cast->Name = language[cast->Name.Mid(1)];
+			}
+			else
+				return false;
+		}
 		return true;
 	}
 
@@ -1004,25 +1286,46 @@ protected:
 			if(CheckStandardKey(textscreen, sc->str))
 				continue;
 
-			if(sc->str.CompareNoCase("Text") == 0)
+			if(sc->str.CompareNoCase("FadeTime") == 0)
+				ParseTimeAssignment(textscreen->FadeTime);
+			else if(sc->str.CompareNoCase("Text") == 0)
 				ParseStringArrayAssignment(textscreen->Text);
 			else if(sc->str.CompareNoCase("TextAlignment") == 0)
 			{
 				sc.MustGetToken('=');
 				sc.MustGetToken(TK_Identifier);
 				if(sc->str.CompareNoCase("left") == 0)
-					textscreen->Alignment = TextScreenIntermissionAction::LEFT;
+					textscreen->Alignment = TS_Left;
 				else if(sc->str.CompareNoCase("center") == 0)
-					textscreen->Alignment = TextScreenIntermissionAction::CENTER;
+					textscreen->Alignment = TS_Center;
 				else if(sc->str.CompareNoCase("right") == 0)
-					textscreen->Alignment = TextScreenIntermissionAction::RIGHT;
+					textscreen->Alignment = TS_Right;
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown alignment.");
+			}
+			else if(sc->str.CompareNoCase("TextAnchor") == 0)
+			{
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.CompareNoCase("top") == 0)
+					textscreen->Anchor = TS_Top;
+				else if(sc->str.CompareNoCase("middle") == 0)
+					textscreen->Anchor = TS_Middle;
+				else if(sc->str.CompareNoCase("bottom") == 0)
+					textscreen->Anchor = TS_Bottom;
+				else
+					sc.ScriptMessage(Scanner::ERROR, "Unknown anchor.");
 			}
 			else if(sc->str.CompareNoCase("TextColor") == 0)
 				ParseFontColorAssignment(textscreen->TextColor);
 			else if(sc->str.CompareNoCase("TextDelay") == 0)
 				ParseTicAssignment(textscreen->TextDelay);
+			else if(sc->str.CompareNoCase("TextFont") == 0)
+			{
+				FString fontName;
+				ParseStringAssignment(fontName);
+				textscreen->TextFont = V_GetFont(fontName);
+			}
 			else if(sc->str.CompareNoCase("TextSpeed") == 0)
 				ParseTicAssignment(textscreen->TextSpeed);
 			else if(sc->str.CompareNoCase("Position") == 0)
@@ -1088,9 +1391,18 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 			{
 				LevelInfoBlockParser(sc, defaultMap, false).Parse();
 			}
+			else if(sc->str.CompareNoCase("automap") == 0)
+			{
+				AutomapBlockParser(sc).Parse();
+			}
 			else if(sc->str.CompareNoCase("clearepisodes") == 0)
 			{
 				episodes.Clear();
+			}
+			else if(sc->str.CompareNoCase("clearskills") == 0)
+			{
+				skills.Clear();
+				skillIds.Clear();
 			}
 			else if(sc->str.CompareNoCase("cluster") == 0)
 			{
@@ -1118,6 +1430,10 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 					existing = newMap;
 				else
 					levelInfos.Push(newMap);
+			}
+			else if(sc->str.CompareNoCase("skill") == 0)
+			{
+				SkillInfoBlockParser(sc).Parse();
 			}
 			else
 				SkipBlock(sc);

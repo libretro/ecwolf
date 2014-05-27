@@ -20,7 +20,7 @@
 extern struct gametype
 {
 	char		mapname[9];
-	short       difficulty;
+	const class SkillInfo *difficulty;
 	const class ClassDef *playerClass;
 
 	FTextureID  faceframe;
@@ -29,16 +29,15 @@ extern struct gametype
 				secrettotal,treasuretotal,killtotal;
 	int32_t     TimeCount;
 	bool        victoryflag;            // set during victory animations
+	bool		fullmap;
 } gamestate;
 
 extern  char            demoname[13];
 
 void    SetupGameLevel (void);
 bool    GameLoop (void);
-void    DrawPlayBorder (void);
 void    DrawPlayScreen (bool noborder=false);
 void    DrawPlayBorderSides (void);
-void    ShowActStatus();
 
 void    PlayDemo (int demonumber);
 void    RecordDemo (void);

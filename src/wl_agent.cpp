@@ -1,5 +1,8 @@
 // WL_AGENT.C
 
+#include <cmath>
+#include <climits>
+
 #include "wl_def.h"
 #include "id_ca.h"
 #include "id_sd.h"
@@ -180,7 +183,7 @@ void ControlMovement (AActor *ob)
 	else
 	{
 		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
-			controlx = controlx*players[0].ReadyWeapon->fovscale;
+			controlx = xs_ToInt(controlx*players[0].ReadyWeapon->fovscale);
 
 		//
 		// not strafing
@@ -196,7 +199,7 @@ void ControlMovement (AActor *ob)
 		else if (strafe < -100)
 			strafe = -100;
 
-		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[ABS(strafe) >= RUNMOVE]));
+		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[abs(strafe) >= RUNMOVE]));
 
 		if (strafe > 0)
 		{
@@ -252,7 +255,7 @@ void GiveExtraMan (int amount)
 		players[0].lives = 0;
 	else if(players[0].lives > 9)
 		players[0].lives = 9;
-	SD_PlaySound ("misc/end_bonus1");
+	SD_PlaySound ("misc/1up");
 }
 
 /*
@@ -287,11 +290,10 @@ void TakeDamage (int points,AActor *attacker)
 
 	if (gamestate.victoryflag)
 		return;
-	if (gamestate.difficulty==gd_baby)
-		points>>=2;
+	points = (points*gamestate.difficulty->DamageFactor)>>FRACBITS;
 
 	if (!godmode)
-		players[0].health -= points;
+		players[0].mo->health = players[0].health -= points;
 
 	if (players[0].health<=0)
 	{
@@ -303,6 +305,9 @@ void TakeDamage (int points,AActor *attacker)
 
 	if (godmode != 2)
 		StartDamageFlash (points);
+
+	if (points > 0)
+		SD_PlaySound("player/pain");
 
 	StatusBar->UpdateFace(points);
 	StatusBar->DrawStatusBar();
@@ -336,7 +341,6 @@ static bool TryMove (AActor *ob)
 	}
 
 	int xl,yl,xh,yh,x,y;
-	AActor *check;
 
 	xl = (ob->x-ob->radius) >>TILESHIFT;
 	yl = (ob->y-ob->radius) >>TILESHIFT;
@@ -399,15 +403,15 @@ static bool TryMove (AActor *ob)
 	//
 	// check for actors
 	//
-	for(AActor::Iterator iter = AActor::GetIterator();iter;)
+	for(AActor::Iterator iter = AActor::GetIterator().Next();iter;)
 	{
-		if(iter == ob)
-		{
-			++iter;
-			continue;
-		}
+		// We need to iterate a little awkwardly since the object may disappear
+		// on us rendering the next pointer invalid.
+		AActor *check = iter;
+		iter.Next();
 
-		check = iter++;
+		if(check == ob)
+			continue;
 
 		fixed r = check->radius + ob->radius;
 		if(check->flags & FL_SOLID)
@@ -599,6 +603,8 @@ void Cmd_Use (void)
 	}
 
 	bool doNothing = true;
+	bool isRepeatable = false;
+	BYTE lastTrigger = 0;
 	MapSpot spot = map->GetSpot(checkx, checky, 0);
 	for(unsigned int i = 0;i < spot->triggers.Size();++i)
 	{
@@ -607,7 +613,8 @@ void Cmd_Use (void)
 		{
 			if(map->ActivateTrigger(trig, direction, players[0].mo))
 			{
-				P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), trig.repeatable, trig.action);
+				isRepeatable |= trig.repeatable;
+				lastTrigger = trig.action;
 				doNothing = false;
 			}
 		}
@@ -615,6 +622,8 @@ void Cmd_Use (void)
 
 	if(doNothing)
 		SD_PlaySound ("misc/do_nothing");
+	else
+		P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), isRepeatable, lastTrigger);
 }
 
 /*
@@ -747,14 +756,21 @@ ACTION_FUNCTION(A_Lower)
 
 	player->psprite[player_t::ps_weapon].sy += RAISESPEED;
 	if(player->psprite[player_t::ps_weapon].sy < RAISERANGE)
-		return;
+		return false;
 	player->psprite[player_t::ps_weapon].sy = RAISERANGE;
 
 	if(player->PendingWeapon == WP_NOCHANGE)
 		player->PendingWeapon = NULL;
 
 	player->SetPSprite(NULL, player_t::ps_flash);
-	player->BringUpWeapon();
+	// If we're dead, don't bother trying to raise a weapon.
+	// In fact, we want to keep the current weapon "up" so that the status bar
+	// displays the correct information.
+	if(player->state != player_t::PST_DEAD)
+		player->BringUpWeapon();
+	else
+		player->SetPSprite(NULL, player_t::ps_weapon);
+	return true;
 }
 ACTION_FUNCTION(A_Raise)
 {
@@ -763,18 +779,19 @@ ACTION_FUNCTION(A_Raise)
 	if(player->PendingWeapon != WP_NOCHANGE)
 	{
 		player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
-		return;
+		return false;
 	}
 
 	player->psprite[player_t::ps_weapon].sy -= RAISESPEED;
 	if(player->psprite[player_t::ps_weapon].sy > 0)
-		return;
+		return false;
 	player->psprite[player_t::ps_weapon].sy = 0;
 
 	if(player->ReadyWeapon)
 		player->SetPSprite(player->ReadyWeapon->GetReadyState(), player_t::ps_weapon);
 	else
 		player->psprite[player_t::ps_weapon].frame = NULL;
+	return true;
 }
 
 // Finds the target closest to the player within shooting range.
@@ -849,8 +866,6 @@ void player_t::Reborn()
 
 	// Recalculate the projection here so that player classes with differing radii are supported.
 	CalcProjection(mo->radius);
-
-	StatusBar->DrawStatusBar();
 }
 
 void player_t::Serialize(FArchive &arc)
@@ -880,7 +895,7 @@ void player_t::Serialize(FArchive &arc)
 			<< psprite[i].sy;
 	}
 
-	if(GameSave::SaveVersion > 1374729160)
+	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374729160)
 		arc << FOV << DesiredFOV;
 
 	if(arc.IsLoading())
@@ -983,7 +998,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	// actually fire
 	int dist = 0x7fffffff;
 	AActor *closest = NULL;
-	for(AActor::Iterator check = AActor::GetIterator();check.Next();check)
+	for(AActor::Iterator check = AActor::GetIterator();check.Next();)
 	{
 		if(check == self)
 			continue;
@@ -1002,7 +1017,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	if (!closest || dist-(FRACUNIT/2) > (range/64)*FRACUNIT)
 	{
 		// missed
-		return;
+		return false;
 	}
 
 	if(!norandom)
@@ -1017,7 +1032,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	if(flags & CPF_USEAMMO)
 	{
 		if(!player->ReadyWeapon->DepleteAmmo())
-			return;
+			return true;
 	}
 
 	if(lifesteal > 0 && player->health < self->health)
@@ -1027,6 +1042,7 @@ ACTION_FUNCTION(A_CustomPunch)
 		if(player->health > self->health)
 			player->health = self->health;
 	}
+	return true;
 }
 
 static FRandom pr_cwbullet("CustomWpBullet");
@@ -1054,7 +1070,7 @@ ACTION_FUNCTION(A_GunAttack)
 	if(!(flags & GAF_NOAMMO))
 	{
 		if(!player->ReadyWeapon->DepleteAmmo())
-			return;
+			return false;
 	}
 
 	if(sound.Len() == 1 && sound[0] == '*')
@@ -1067,13 +1083,13 @@ ACTION_FUNCTION(A_GunAttack)
 
 	AActor *closest = players[0].FindTarget();
 	if(!closest)
-		return;
+		return false;
 
 	//
 	// hit something
 	//
-	dx = ABS(closest->x - players[0].mo->x);
-	dy = ABS(closest->y - players[0].mo->y);
+	dx = abs(closest->x - players[0].mo->x);
+	dy = abs(closest->y - players[0].mo->y);
 	dist = dx>dy ? dx:dy;
 
 	dist = FixedMul(dist, snipe);
@@ -1085,9 +1101,10 @@ ACTION_FUNCTION(A_GunAttack)
 	if (dist >= longrange)
 	{
 		if ( (pr_cwbullet() % maxrange) < dist)           // missed
-			return;
+			return false;
 	}
 	DamageActor (closest,damage);
+	return true;
 }
 
 ACTION_FUNCTION(A_FireCustomMissile)
@@ -1100,7 +1117,7 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	ACTION_PARAM_BOOL(aim, 5);
 
 	if(useammo && !players[0].ReadyWeapon->DepleteAmmo())
-		return;
+		return false;
 
 	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
 		madenoise = true;
@@ -1112,11 +1129,12 @@ ACTION_FUNCTION(A_FireCustomMissile)
 
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
-		return;
+		return false;
 	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, SPAWN_AllowReplacement);
 	newobj->flags |= FL_PLAYERMISSILE;
 	newobj->angle = iangle;
 
 	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);
 	newobj->vely = -FixedMul(newobj->speed,finesine[iangle>>ANGLETOFINESHIFT]);
+	return true;
 }

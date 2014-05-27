@@ -114,6 +114,12 @@ HANDLE_PROPERTY(backpackamount)
 	((AAmmo*)defaults)->Backpackamount = amount;
 }
 
+HANDLE_PROPERTY(backpackboostamount)
+{
+	INT_PARAM(boostamount, 0);
+	((AAmmo*)defaults)->Backpackboostamount = boostamount;
+}
+
 HANDLE_PROPERTY(backpackmaxamount)
 {
 	INT_PARAM(maxamount, 0);
@@ -159,6 +165,13 @@ HANDLE_PROPERTY(bobstyle)
 		BobStyle = AWeapon::BobThrust;
 	else
 		I_Error("Invalid bob style '%s'.", style);
+}
+
+HANDLE_PROPERTY(conversationid)
+{
+	INT_PARAM(id, 0);
+
+	cls->Meta.SetMetaInt(AMETA_ConversationID, id);
 }
 
 HANDLE_PROPERTY(damage)
@@ -356,6 +369,12 @@ HANDLE_PROPERTY(painchance)
 	defaults->painchance = chance;
 }
 
+HANDLE_PROPERTY(overheadicon)
+{
+	STRING_PARAM(icon, 0);
+	defaults->overheadIcon = TexMan.CheckForTexture(icon, FTexture::TEX_Any);
+}
+
 HANDLE_PROPERTY(painsound)
 {
 	STRING_PARAM(snd, 0);
@@ -485,8 +504,6 @@ HANDLE_PROPERTY(startitem)
 	// NOTE: This property is not inherited.
 	STRING_PARAM(item, 0);
 
-	APlayerPawn *def = (APlayerPawn *)defaults;
-
 	if(cls->Meta.GetMetaInt(APMETA_StartInventory, -1) == -1 || cls->Meta.IsInherited(APMETA_StartInventory))
 		cls->Meta.SetMetaInt(APMETA_StartInventory, APlayerPawn::startInventory.Push(new AActor::DropList()));
 
@@ -564,11 +581,13 @@ extern const PropDef properties[] =
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
 	DEFINE_PROP(backpackamount, Ammo, I),
+	DEFINE_PROP(backpackboostamount, Ammo, I),
 	DEFINE_PROP(backpackmaxamount, Ammo, I),
 	DEFINE_PROP(bobrangex, Weapon, F),
 	DEFINE_PROP(bobrangey, Weapon, F),
 	DEFINE_PROP(bobspeed, Weapon, F),
 	DEFINE_PROP(bobstyle, Weapon, S),
+	DEFINE_PROP(conversationid, Actor, I),
 	DEFINE_PROP(damage, Actor, I),
 	DEFINE_PROP_PREFIX(damagescreencolor, Actor, Player, S),
 	DEFINE_PROP(deathsound, Actor, S),
@@ -587,6 +606,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(missilefrequency, Actor, F),
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP_PREFIX(movebob, PlayerPawn, Player, F),
+	DEFINE_PROP(overheadicon, Actor, S),
 	DEFINE_PROP(painchance, Actor, I),
 	DEFINE_PROP(painsound, Actor, S),
 	DEFINE_PROP(pickupsound, Inventory, S),

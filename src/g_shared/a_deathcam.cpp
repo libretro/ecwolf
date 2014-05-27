@@ -89,7 +89,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	{
 		cam->camState = ADeathCam::CAM_FINISHED;
 		CALL_ACTION(A_BossDeath, cam->actor);
-		return;
+		return true;
 	}
 
 	cam->x = cam->actor->killerx;
@@ -103,10 +103,17 @@ ACTION_FUNCTION(A_FinishDeathCam)
 
 	FizzleFadeStart();
 
-	double fadex = 0;
-	double fadey = StatusBar->GetHeight(true);
-	double fadew = 320;
-	double fadeh = 200-StatusBar->GetHeight(false) - fadey + 1;
+	double fadex = 0, fadey, fadew = 320, fadeh;
+	if(viewsize == 21)
+	{
+		fadey = 0;
+		fadeh = 200;
+	}
+	else
+	{
+		fadey = StatusBar->GetHeight(true);
+		fadeh = 200-StatusBar->GetHeight(false) - fadey + 1;
+	}
 	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., fadey, screenWidth, fadeh);
 
@@ -139,10 +146,11 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	IN_UserInput(300);
 
 	players[0].camera = cam;
-	players[0].SetPSprite(cam->FindState("Ready"), player_t::ps_weapon);
+	players[0].SetPSprite(cam->FindState(NAME_Ready), player_t::ps_weapon);
 	cam->actor->SetState(cam->actor->FindState(NAME_Death));
 
 	DrawPlayScreen();
 
 	fizzlein = true;
+	return true;
 }

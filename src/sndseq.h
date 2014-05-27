@@ -77,12 +77,16 @@ public:
 	void AddInstruction(const SndSeqInstruction &instr);
 	void Clear();
 	const SoundSequence &GetSequence(SequenceType type) const;
+	FName GetStopSound() const { return StopSound; }
 	void SetFlag(unsigned int flag, bool set);
 	void SetSequence(SequenceType type, FName sequence);
 	const SndSeqInstruction *Start() const;
 
 private:
+	friend class SndSeqTable;
+
 	TArray<SndSeqInstruction> Instructions;
+	FName StopSound;
 	FName AltSequences[NUM_SEQ_TYPES];
 	unsigned int Flags;
 };
@@ -109,6 +113,7 @@ public:
 
 	bool IsPlaying() const { return Playing; }
 	void Tick();
+	void SetSource(MapSpot source) { Source = source; }
 	void Stop();
 
 private:

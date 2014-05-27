@@ -67,6 +67,7 @@ extern unsigned vbufPitch;
 namespace GameSave {
 
 long long SaveVersion = SAVEVER;
+DWORD SaveProdVersion = SAVEPRODVER;
 
 static const char* const NEW_SAVE = "    - NEW SAVE -";
 
@@ -502,8 +503,19 @@ void QuickLoad()
 
 static void Serialize(FArchive &arc)
 {
-	arc << gamestate.difficulty
-		<< gamestate.playerClass
+	short difficulty;
+	if(arc.IsStoring())
+	{
+		difficulty = SkillInfo::GetSkillIndex(*gamestate.difficulty);
+		arc << difficulty;
+	}
+	else
+	{
+		arc << difficulty;
+		gamestate.difficulty = &SkillInfo::GetSkill(difficulty);
+	}
+
+	arc << gamestate.playerClass
 		<< gamestate.secretcount
 		<< gamestate.treasurecount
 		<< gamestate.killcount
@@ -511,12 +523,16 @@ static void Serialize(FArchive &arc)
 		<< gamestate.treasuretotal
 		<< gamestate.killtotal
 		<< gamestate.TimeCount
-		<< gamestate.victoryflag
-		<< LevelRatios.killratio
+		<< gamestate.victoryflag;
+	if(SaveVersion >= 1393719642)
+		arc << gamestate.fullmap;
+	arc << LevelRatios.killratio
 		<< LevelRatios.secretsratio
 		<< LevelRatios.treasureratio
 		<< LevelRatios.numLevels
 		<< LevelRatios.time;
+	if(SaveVersion > 1395865826)
+		arc << LevelRatios.par;
 
 	thinkerList->Serialize(arc);
 
@@ -530,6 +546,15 @@ static void Serialize(FArchive &arc)
 bool Load(const FString &filename)
 {
 	FILE *fileh = OpenSaveFile(filename, "rb");
+	if(fileh == NULL)
+	{
+		Message(language["STR_FAILREAD"]);
+		printf("Could not open %s for reading.\n", GetFullSaveFileName(filename).GetChars());
+		IN_ClearKeysDown ();
+		IN_Ack ();
+		return false;
+	}
+
 	PNGHandle *png = M_VerifyPNG(fileh);
 	if(png == NULL)
 	{
@@ -544,9 +569,13 @@ bool Load(const FString &filename)
 	SaveVersion = atoll(savesig+10);
 	delete[] savesig;
 
+	char *prodver = M_GetPNGText(png, "ECWolf Save Product Version");
+	SaveProdVersion = atoll(prodver);
+	delete[] prodver;
+
 	char level[9];
 	M_GetPNGText(png, "Current Map", level, 8);
-	CA_CacheMap(level);
+	CA_CacheMap(level, true);
 
 	{
 		unsigned int chunkLength = M_FindPNGChunk(png, SNAP_ID);
@@ -593,6 +622,14 @@ void SaveScreenshot(FILE *file)
 bool Save(const FString &filename, const FString &title)
 {
 	FILE *fileh = OpenSaveFile(filename, "wb");
+	if(fileh == NULL)
+	{
+		Message(language["STR_FAILWRITE"]);
+		printf("Could not open %s for writing.\n", GetFullSaveFileName(filename).GetChars());
+		IN_ClearKeysDown ();
+		IN_Ack ();
+		return false;
+	}
 
 	if(!quickSaveLoad)
 		DrawLSAction(1);
@@ -600,6 +637,7 @@ bool Save(const FString &filename, const FString &title)
 		Message (language["STR_SAVING"]);
 
 	SaveVersion = SAVEVER;
+	SaveProdVersion = SAVEPRODVER;
 
 	// If we get hubs this will need to be moved so that we can have multiple of them
 	FCompressedMemFile snapshot;

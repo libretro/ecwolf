@@ -129,7 +129,7 @@ ACTION_FUNCTION(A_CallSpecial)
 	int specialArgs[5] = {arg1, arg2, arg3, arg4, arg5};
 
 	Specials::LineSpecialFunction function = Specials::LookupFunction(static_cast<Specials::LineSpecials>(special));
-	function(map->GetSpot(self->tilex, self->tiley, 0), specialArgs, MapTrigger::East, self);
+	return function(map->GetSpot(self->tilex, self->tiley, 0), specialArgs, MapTrigger::East, self) != 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,11 +143,13 @@ ACTION_FUNCTION(A_ActiveSound)
 	// wolfenstein style monsters activesounds without making it 8x as likely
 	if(chance >= 256 || pr_chase() < chance)
 		PlaySoundLocActor(self->activesound, self);
+	return true;
 }
 
 ACTION_FUNCTION(A_AlertMonsters)
 {
 	madenoise = true;
+	return true;
 }
 
 ACTION_FUNCTION(A_BossDeath)
@@ -184,7 +186,7 @@ ACTION_FUNCTION(A_BossDeath)
 	}
 
 	if(!alldead)
-		return;
+		return false;
 
 	if(levelInfo->DeathCam && (!deathcam || deathcam->camState != ADeathCam::CAM_FINISHED))
 	{
@@ -220,6 +222,7 @@ ACTION_FUNCTION(A_BossDeath)
 			gamestate.victoryflag = false;
 		}
 	}
+	return true;
 }
 
 // Sets or unsets a flag on an actor.
@@ -242,7 +245,7 @@ ACTION_FUNCTION(A_ChangeFlag)
 	if(!ClassDef::SetFlag(self->GetClass(), self, prefix, flag, value))
 	{
 		Printf("A_ChangeFlag: Attempt to change unknown flag '%s'.\n", (prefix.IsEmpty() ? flag.GetChars() : (prefix + "." + flag).GetChars()));
-		return;
+		return false;
 	}
 
 	const bool countsKill = !!(self->flags & FL_COUNTKILL);
@@ -263,6 +266,7 @@ ACTION_FUNCTION(A_ChangeFlag)
 		if(countsSecret) ++gamestate.secrettotal;
 		else --gamestate.secrettotal;
 	}
+	return true;
 }
 
 ACTION_FUNCTION(A_ChangeVelocity)
@@ -300,6 +304,7 @@ ACTION_FUNCTION(A_ChangeVelocity)
 		self->velx += fx;
 		self->vely += fy;
 	}
+	return true;
 }
 
 ACTION_FUNCTION(A_Explode)
@@ -324,7 +329,7 @@ ACTION_FUNCTION(A_Explode)
 		AActor * const target = iter;
 
 		// Calculate distance from origin to outer bound of target actor
-		const fixed dist = MAX(0, MAX(ABS(target->x - self->x), ABS(target->y - self->y)) - target->radius) >> (FRACBITS - 6);
+		const fixed dist = MAX(0, MAX(abs(target->x - self->x), abs(target->y - self->y)) - target->radius) >> (FRACBITS - 6);
 
 		// First check if the target is in range (also don't mess with ourself)
 		if(dist >= radius || target == self || !(target->flags & FL_SHOOTABLE))
@@ -345,6 +350,7 @@ ACTION_FUNCTION(A_Explode)
 		else
 			DamageActor(target, static_cast<unsigned int>(output));
 	}
+	return true;
 }
 
 ACTION_FUNCTION(A_FaceTarget)
@@ -353,11 +359,13 @@ ACTION_FUNCTION(A_FaceTarget)
 	ACTION_PARAM_DOUBLE(max_pitch, 1);
 
 	A_Face(self, players[0].mo, angle_t(max_turn*ANGLE_45/45));
+	return true;
 }
 
 ACTION_FUNCTION(A_Fall)
 {
 	self->flags &= ~FL_SOLID;
+	return true;
 }
 
 ACTION_FUNCTION(A_GiveExtraMan)
@@ -365,6 +373,7 @@ ACTION_FUNCTION(A_GiveExtraMan)
 	ACTION_PARAM_INT(amount, 0);
 
 	GiveExtraMan(amount);
+	return true;
 }
 
 ACTION_FUNCTION(A_GiveInventory)
@@ -379,33 +388,33 @@ ACTION_FUNCTION(A_GiveInventory)
 
 	if(cls && cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 	{
-		AInventory *inv = (AInventory *)AActor::Spawn(cls, 0, 0, 0, SPAWN_AllowReplacement);
-		if(inv->IsKindOf(NATIVE_CLASS(Health)))
-			inv->amount *= amount;
-		else
-			inv->amount = amount;
-
-		inv->RemoveFromWorld();
-		if(!inv->CallTryPickup(self))
-			inv->Destroy();
+		return self->GiveInventory(cls, amount);
 	}
+	return true;
 }
 
 ACTION_FUNCTION(A_GunFlash)
 {
 	if(!self->player)
-		return;
+		return false;
 
 	ACTION_PARAM_STATE(flash, 0, self->player->ReadyWeapon->FindState(self->player->ReadyWeapon->mode != AWeapon::AltFire ? NAME_Flash : NAME_AltFlash));
 
 	self->player->SetPSprite(flash, player_t::ps_flash);
+	return true;
 }
 
-#define STATE_JUMP(frame) DoStateJump(frame, self, caller, args)
-static void DoStateJump(const Frame *frame, AActor *self, const Frame * const caller, const CallArguments &args)
+#define STATE_JUMP(frame) DoStateJump(frame, self, caller, args, result)
+static void DoStateJump(const Frame *frame, AActor *self, const Frame * const caller, const CallArguments &args, ActionResult *result)
 {
 	if(!frame)
 		return;
+
+	if(result)
+	{
+		result->JumpFrame = frame;
+		return;
+	}
 
 	if(self->player)
 	{
@@ -435,6 +444,9 @@ ACTION_FUNCTION(A_Jump)
 
 		STATE_JUMP(frame);
 	}
+
+	// Jumps will always return false so that they don't trigger success as a whole
+	return false;
 }
 
 ACTION_FUNCTION(A_JumpIf)
@@ -444,6 +456,9 @@ ACTION_FUNCTION(A_JumpIf)
 
 	if(expr)
 		STATE_JUMP(frame);
+
+	// Jumps will always return false so that they don't trigger success as a whole
+	return false;
 }
 
 ACTION_FUNCTION(A_JumpIfCloser)
@@ -462,6 +477,9 @@ ACTION_FUNCTION(A_JumpIfCloser)
 	{
 		STATE_JUMP(frame);
 	}
+
+	// Jumps will always return false so that they don't trigger success as a whole
+	return false;
 }
 
 ACTION_FUNCTION(A_JumpIfInventory)
@@ -474,15 +492,18 @@ ACTION_FUNCTION(A_JumpIfInventory)
 	AInventory *inv = self->FindInventory(cls);
 
 	if(!inv)
-		return;
+		return false;
 
 	// Amount of 0 means check if the amount is the maxamount.
 	// Otherwise check if we have at least that amount.
 	if((amount == 0 && inv->amount == inv->maxamount) ||
-		inv->amount >= static_cast<unsigned int>(amount))
+		(amount > 0 && inv->amount >= static_cast<unsigned int>(amount)))
 	{
 		STATE_JUMP(frame);
 	}
+
+	// Jumps will always return false so that they don't trigger success as a whole
+	return false;
 }
 
 ACTION_FUNCTION(A_Light)
@@ -490,12 +511,13 @@ ACTION_FUNCTION(A_Light)
 	ACTION_PARAM_INT(level, 0);
 
 	self->player->extralight = clamp(level, -20, 20);
+	return true;
 }
 // Might as well support these as well since they're far more popular than the
 // generic version and don't require much code.
-ACTION_FUNCTION(A_Light0) { self->player->extralight = 0; }
-ACTION_FUNCTION(A_Light1) { self->player->extralight = 1; }
-ACTION_FUNCTION(A_Light2) { self->player->extralight = 2; }
+ACTION_FUNCTION(A_Light0) { self->player->extralight = 0; return true; }
+ACTION_FUNCTION(A_Light1) { self->player->extralight = 1; return true; }
+ACTION_FUNCTION(A_Light2) { self->player->extralight = 2; return true; }
 
 static FRandom pr_meleeattack("MeleeAccuracy");
 ACTION_FUNCTION(A_MeleeAttack)
@@ -516,11 +538,12 @@ ACTION_FUNCTION(A_MeleeAttack)
 			TakeDamage(damage, self);
 			if(!hitsound.IsEmpty())
 				PlaySoundLocActor(hitsound, self);
-			return;
+			return true;
 		}
 	}
 	if(!misssound.IsEmpty())
 		PlaySoundLocActor(misssound, self);
+	return false;
 }
 
 static FRandom pr_monsterrefire("MonsterRefire");
@@ -533,7 +556,7 @@ ACTION_FUNCTION(A_MonsterRefire)
 	A_Face(self, target);
 
 	if(pr_monsterrefire() < probability)
-		return;
+		return false;
 
 	if(jump && (
 		!(self->flags & FL_ATTACKMODE) ||
@@ -544,11 +567,13 @@ ACTION_FUNCTION(A_MonsterRefire)
 	{
 		STATE_JUMP(jump);
 	}
+	return true;
 }
 
 ACTION_FUNCTION(A_Pain)
 {
 	PlaySoundLocActor(self->painsound, self);
+	return true;
 }
 
 ACTION_FUNCTION(A_PlaySound)
@@ -556,14 +581,16 @@ ACTION_FUNCTION(A_PlaySound)
 	ACTION_PARAM_STRING(sound, 0);
 
 	PlaySoundLocActor(sound, self);
+	return true;
 }
 
 ACTION_FUNCTION(A_ScaleVelocity)
 {
 	ACTION_PARAM_DOUBLE(scale, 0);
 
-	self->velx = self->velx*scale;
-	self->vely = self->vely*scale;
+	self->velx = FLOAT2FIXED(self->velx*scale);
+	self->vely = FLOAT2FIXED(self->vely*scale);
+	return true;
 }
 
 ACTION_FUNCTION(A_SetTics)
@@ -575,16 +602,17 @@ ACTION_FUNCTION(A_SetTics)
 		if(self->player->psprite[player_t::ps_weapon].frame == caller)
 		{
 			self->player->psprite[player_t::ps_weapon].ticcount = static_cast<int> (duration*2);
-			return;
+			return true;
 		}
 		else if(self->player->psprite[player_t::ps_flash].frame == caller)
 		{
 			self->player->psprite[player_t::ps_flash].ticcount = static_cast<int> (duration*2);
-			return;
+			return true;
 		}
 	}
 
 	self->ticcount = static_cast<int> (duration*2);
+	return true;
 }
 
 ACTION_FUNCTION(A_SpawnItem)
@@ -595,12 +623,13 @@ ACTION_FUNCTION(A_SpawnItem)
 
 	const ClassDef *cls = ClassDef::FindClass(className);
 	if(cls == NULL)
-		return;
+		return false;
 
 	AActor *newobj = AActor::Spawn(cls,
 		self->x + fixed(distance*finecosine[self->angle>>ANGLETOFINESHIFT])/64,
 		self->y - fixed(distance*finesine[self->angle>>ANGLETOFINESHIFT])/64,
 		0, SPAWN_AllowReplacement);
+	return true;
 }
 
 static FRandom pr_spawnitemex("SpawnItemEx");
@@ -623,11 +652,11 @@ ACTION_FUNCTION(A_SpawnItemEx)
 	ACTION_PARAM_INT(chance, 9);
 
 	if(chance > 0 && pr_spawnitemex() < chance)
-		return;
+		return false;
 
 	const ClassDef *cls = ClassDef::FindClass(className);
 	if(cls == NULL)
-		return;
+		return false;
 
 	angle_t ang = self->angle>>ANGLETOFINESHIFT;
 
@@ -650,6 +679,7 @@ ACTION_FUNCTION(A_SpawnItemEx)
 	//We divide by 128 here since Wolf is 70hz instead of 35.
 	newobj->velx = (fixed(xvel*finecosine[ang]) + fixed(yvel*finesine[ang]))/128;
 	newobj->vely = (-fixed(xvel*finesine[ang]) + fixed(yvel*finecosine[ang]))/128;
+	return true;
 }
 
 ACTION_FUNCTION(A_Stop)
@@ -657,6 +687,7 @@ ACTION_FUNCTION(A_Stop)
 	self->velx = 0;
 	self->vely = 0;
 	self->dir = nodir;
+	return true;
 }
 
 ACTION_FUNCTION(A_TakeInventory)
@@ -673,7 +704,9 @@ ACTION_FUNCTION(A_TakeInventory)
 			inv->Destroy();
 		else
 			inv->amount -= amount;
+		return true;
 	}
+	return false;
 }
 
 #include "wl_main.h"
@@ -689,11 +722,12 @@ ACTION_FUNCTION(A_ZoomFactor)
 	ACTION_PARAM_INT(flags, 1);
 
 	if(!self->player || !self->player->ReadyWeapon)
-		return;
+		return false;
 
-	self->player->ReadyWeapon->fovscale = 1.0 / clamp<double>(zoom, 0.1, 50.0);
+	self->player->ReadyWeapon->fovscale = 1.0f / clamp<float>((float)zoom, 0.1f, 50.0f);
 	if(flags & ZOOM_INSTANT)
 		self->player->FOV = -self->player->DesiredFOV*self->player->ReadyWeapon->fovscale;
 	if(flags & ZOOM_NOSCALETURNING)
 		self->player->ReadyWeapon->fovscale *= -1;
+	return true;
 }

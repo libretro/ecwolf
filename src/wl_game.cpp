@@ -21,6 +21,7 @@
 #include "wl_agent.h"
 #include "g_intermission.h"
 #include "g_mapinfo.h"
+#include "r_sprites.h"
 #include "wl_inter.h"
 #include "wl_draw.h"
 #include "wl_play.h"
@@ -244,6 +245,7 @@ void SetupGameLevel (void)
 	if (!loadedgame)
 	{
 		gamestate.victoryflag = false;
+		gamestate.fullmap = false;
 		gamestate.TimeCount
 			= gamestate.secrettotal
 			= gamestate.killtotal
@@ -261,7 +263,7 @@ void SetupGameLevel (void)
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapname);
+	CA_CacheMap (gamestate.mapname, false);
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer
@@ -304,7 +306,7 @@ void SetupGameLevel (void)
 */
 void DrawPlayBorderSides(void)
 {
-	if(viewsize == 21) return;
+	if((unsigned)viewheight == screenHeight) return;
 
 	if(!gameinfo.Border.issolid)
 	{
@@ -365,7 +367,7 @@ void DrawPlayBorderSides(void)
 ===================
 */
 
-void DrawPlayBorder (void)
+void DBaseStatusBar::RefreshBackground (bool noborder)
 {
 	FTexture *borderTex = TexMan(levelInfo->GetBorderTexture());
 
@@ -386,6 +388,8 @@ void DrawPlayBorder (void)
 		VWB_DrawFill(borderTex, statusbarx, 0, screenWidth-statusbarx, statusbary1);
 	VWB_DrawFill(borderTex, statusbarx, statusbary2, screenWidth-statusbarx, screenHeight);
 
+	if(noborder)
+		return;
 	DrawPlayBorderSides();
 }
 
@@ -400,17 +404,8 @@ void DrawPlayBorder (void)
 
 void DrawPlayScreen (bool noborder)
 {
-	if(!noborder)
-		DrawPlayBorder ();
-
+	StatusBar->RefreshBackground(noborder);
 	StatusBar->DrawStatusBar();
-}
-
-void ShowActStatus()
-{
-	ingame = false;
-	StatusBar->DrawStatusBar();
-	ingame = true;
 }
 
 
@@ -532,7 +527,7 @@ void RecordDemo (void)
 
 	VW_FadeOut ();
 
-	NewGame (gd_hard, level);
+	NewGame (gd_hard, level, false);
 
 	StartDemoRecord (levelnum);
 
@@ -589,8 +584,7 @@ void PlayDemo (int demonumber)
 	int mapon = *demoptr++;
 	FString level;
 	level.Format("MAP%02d", mapon);
-	NewGame (1,level);
-	gamestate.difficulty = gd_hard;
+	NewGame (1,level,false);
 	length = READWORD(*(uint8_t **)&demoptr);
 	// TODO: Seems like the original demo format supports 16 MB demos
 	//       But T_DEM00 and T_DEM01 of Wolf have a 0xd8 as third length size...
@@ -699,25 +693,43 @@ void Died (void)
 
 	if(usedoublebuffering) VH_UpdateScreen();
 
+	--players[0].lives;
 
-	FizzleFadeStart();
+	if (gameinfo.GameOverPic.IsNotEmpty() && players[0].lives == -1)
+	{
+		FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
+		if(texID.isValid())
+			R_DrawZoomer(texID);
+	}
 
-	VWB_Clear(ColorMatcher.Pick(0xAA,0x00,0x00), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
+	if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
+	{
+		FizzleFadeStart();
 
-	IN_ClearKeysDown ();
+		// Fizzle fade used a slightly darker shade of red.
+		byte fr = RPART(players[0].mo->damagecolor)*2/3;
+		byte fg = GPART(players[0].mo->damagecolor)*2/3;
+		byte fb = BPART(players[0].mo->damagecolor)*2/3;
+		VWB_Clear(ColorMatcher.Pick(fr,fg,fb), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
 
-	FizzleFade(viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
+		IN_ClearKeysDown ();
 
-	IN_UserInput(100);
+		FizzleFade(viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
+
+		IN_UserInput(100);
+	}
+	else
+	{
+		// If we get a game over we will fade out any way
+		if(players[0].lives > -1)
+			VL_FadeOut(0, 255, 0, 0, 0, 64);
+	}
+
 	SD_WaitSoundDone ();
 	ClearMemory();
 
-	players[0].lives--;
-
 	if (players[0].lives > -1)
 	{
-		StatusBar->DrawStatusBar();
-
 		players[0].state = player_t::PST_REBORN;
 		thinkerList->DestroyAll();
 	}
@@ -853,6 +865,16 @@ restartgame:
 
 		PlayLoop ();
 
+		if(playstate == ex_victorious)
+		{
+			if(gameinfo.VictoryPic.IsNotEmpty())
+			{
+				FTextureID ywin = TexMan.CheckForTexture(gameinfo.VictoryPic, FTexture::TEX_Any);
+				if(ywin.isValid())
+					R_DrawZoomer(ywin);
+			}
+		}
+
 		StopMusic ();
 		ingame = false;
 
@@ -869,8 +891,6 @@ restartgame:
 			case ex_newmap:
 			case ex_victorious:
 			{
-				if(viewsize == 21) DrawPlayScreen();
-
 				dointermission = !levelInfo->NoIntermission;
 
 				FString next;
@@ -900,6 +920,12 @@ restartgame:
 
 						if(dointermission)
 						{
+							if(levelInfo->ForceTally)
+							{
+								LevelCompleted();
+								VW_FadeOut();
+							}
+
 							Victory (false);
 
 							ClearMemory ();
@@ -908,13 +934,13 @@ restartgame:
 						bool gotoMenu = false;
 						if(endSequence)
 						{
-							IntermissionInfo &intermission = IntermissionInfo::Find(next.Mid(12));
+							IntermissionInfo *intermission = IntermissionInfo::Find(next.Mid(12));
 							gotoMenu = ShowIntermission(intermission);
 						}
 
 						ClearMemory();
 
-						CheckHighScore (players[0].score,levelInfo->FloorNumber);
+						CheckHighScore (players[0].score,levelInfo);
 						return gotoMenu;
 					}
 				}
@@ -932,7 +958,6 @@ restartgame:
 
 				StripInventory(players[0].mo);
 
-				StatusBar->DrawStatusBar();
 				if(dointermission)
 					VL_FadeOut(0, 255, RPART(levelInfo->ExitFadeColor), GPART(levelInfo->ExitFadeColor), BPART(levelInfo->ExitFadeColor), levelInfo->ExitFadeDuration);
 
@@ -952,7 +977,7 @@ restartgame:
 
 				if(next.CompareNoCase("EndDemo") == 0)
 				{
-					CheckHighScore (players[0].score,levelInfo->FloorNumber);
+					CheckHighScore (players[0].score,levelInfo);
 					return false;
 				}
 
@@ -976,7 +1001,7 @@ restartgame:
 
 				ClearMemory ();
 
-				CheckHighScore (players[0].score,levelInfo->FloorNumber);
+				CheckHighScore (players[0].score,levelInfo);
 				return false;
 
 			case ex_warped:

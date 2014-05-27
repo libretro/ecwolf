@@ -183,8 +183,7 @@ public:
 	virtual bool IsValid ();
 
 	// Access control
-	virtual bool Lock () = 0;		// Returns true if the surface was lost since last time
-	virtual bool Lock (bool usesimplecanvas) { return Lock(); }	
+	virtual bool Lock (bool buffered=true) = 0;		// Returns true if the surface was lost since last time
 	virtual void Unlock () = 0;
 	virtual bool IsLocked () { return Buffer != NULL; }	// Returns true if the surface is locked
 
@@ -313,7 +312,7 @@ public:
 	~DSimpleCanvas ();
 
 	bool IsValid ();
-	bool Lock ();
+	bool Lock (bool buffered=true);
 	void Unlock ();
 
 protected:

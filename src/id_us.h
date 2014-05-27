@@ -36,7 +36,7 @@ typedef	struct
 {
 	char	name[MaxHighName + 1];
 	int32_t	score;
-	word	completed;
+	FString	completed;
 	char	graphic[9];
 } HighScore;
 
@@ -80,7 +80,6 @@ void			US_PrintUnsigned(longword n);
 void			US_PrintSigned(int32_t n);
 void			US_StartCursor(void),
 				US_ShutCursor(void);
-void			US_CheckHighScore(int32_t score,word other);
 void			US_DisplayHighScores(int which);
 extern	bool	US_UpdateCursor(void);
 bool			US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,

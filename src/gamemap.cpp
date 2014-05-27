@@ -50,6 +50,7 @@
 #include "wl_loadsave.h"
 #include "doomerrors.h"
 #include "m_random.h"
+#include "g_mapinfo.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	file(NULL), zoneTraversed(NULL), zoneLinks(NULL)
@@ -373,7 +374,7 @@ void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 		++value;
 }
 
-void GameMap::LoadMap()
+void GameMap::LoadMap(bool loadingSave)
 {
 	if(!valid)
 		throw CRecoverableError("Tried to load invalid map!");
@@ -382,6 +383,9 @@ void GameMap::LoadMap()
 		ReadUWMFData();
 	else
 		ReadPlanesData();
+
+	if(!loadingSave)
+		ScanTiles();
 }
 
 GameMap::Plane &GameMap::NewPlane()
@@ -407,6 +411,28 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	newTrig.z = z;
 	spot->triggers.Push(newTrig);
 	return spot->triggers[spot->triggers.Size()-1];
+}
+
+// Look at data and determine if we need to set up any flags.
+void GameMap::ScanTiles()
+{
+	for(unsigned int p = 0;p < planes.Size();++p)
+	{
+		MapSpot spot = planes[p].map;
+		MapSpot endSpot = spot + header.width*header.height; 
+		while(spot < endSpot)
+		{
+			if(spot->tile)
+			{
+				if(spot->tile->mapped > gamestate.difficulty->MapFilter)
+					spot->amFlags |= AM_Visible;
+				if(spot->tile->dontOverlay)
+					spot->amFlags |= AM_DontOverlay;
+			}
+
+			++spot;
+		}
+	}
 }
 
 // Adds the spot to the tag list. The linked chain is stored in the tile itself.
@@ -456,7 +482,7 @@ void GameMap::SpawnThings() const
 	for(unsigned int i = 0;i < things.Size();++i)
 	{
 		Thing &thing = things[i];
-		if(!thing.skill[gamestate.difficulty])
+		if(!thing.skill[gamestate.difficulty->SpawnFilter])
 			continue;
 
 		if(thing.type == 1)
@@ -522,7 +548,6 @@ MapSpot GameMap::Plane::Map::GetAdjacent(MapTile::Side dir, bool opposite) const
 	if(opposite) // Rotate the dir 180 degrees.
 		dir = MapTile::Side((dir+2)%4);
 
-	const int pos = static_cast<int>(this - plane->map);
 	unsigned int x = GetX();
 	unsigned int y = GetY();
 	switch(dir)
@@ -634,8 +659,10 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			plane.map[i].pushDirection = static_cast<MapTile::Side>(pushdir);
 
 			arc << plane.map[i].texture[0] << plane.map[i].texture[1] << plane.map[i].texture[2] << plane.map[i].texture[3]
-				<< plane.map[i].visible
-				<< plane.map[i].thinker
+				<< plane.map[i].visible;
+			if(GameSave::SaveVersion >= 1393719642)
+				arc << plane.map[i].amFlags;
+			arc << plane.map[i].thinker
 				<< plane.map[i].slideAmount[0] << plane.map[i].slideAmount[1] << plane.map[i].slideAmount[2] << plane.map[i].slideAmount[3]
 				<< plane.map[i].sideSolid[0] << plane.map[i].sideSolid[1] << plane.map[i].sideSolid[2] << plane.map[i].sideSolid[3]
 				<< plane.map[i].triggers
@@ -645,7 +672,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 				<< plane.map[i].zone
 				<< plane.map[i].pushReceptor;
 
-			if(GameSave::SaveVersion >= 1375246092)
+			if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion >= 1375246092)
 				arc << plane.map[i].slideStyle;
 
 			if(!arc.IsStoring())

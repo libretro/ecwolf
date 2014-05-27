@@ -52,7 +52,8 @@ enum
 
 enum
 {
-	AM_Visible = 0x1
+	AM_Visible = 0x1,
+	AM_DontOverlay = 0x2
 };
 
 class GameMap
@@ -108,17 +109,23 @@ class GameMap
 		};
 		struct Tile
 		{
-			Tile() : offsetVertical(false), offsetHorizontal(false)
+			Tile() : offsetVertical(false), offsetHorizontal(false),
+				mapped(0), dontOverlay(false)
 			{
+				overhead.SetInvalid();
 				sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
 			}
 
 			enum Side { East, North, West, South };
 			FTextureID		texture[4];
+			FTextureID		overhead;
 			bool			sideSolid[4];
 			bool			offsetVertical;
 			bool			offsetHorizontal;
 			FName			soundSequence;
+
+			unsigned int	mapped; // filter level for always visible
+			bool			dontOverlay;
 		};
 		struct Sector
 		{
@@ -187,7 +194,7 @@ class GameMap
 		const Zone		&GetZone(unsigned int index) { return zonePalette[index]; }
 		bool			IsValid() const { return valid; }
 		bool			IsValidTileCoordinate(unsigned int x, unsigned int y, unsigned int z) const { return x < header.width && y < header.height && z < NumPlanes(); }
-		void			LoadMap();
+		void			LoadMap(bool loadingSave);
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
 		void			SpawnThings() const;
@@ -204,6 +211,7 @@ class GameMap
 
 		static bool		CheckMapExists(const FString &map);
 
+		TMap<unsigned int, Plane::Map *> elevatorPosition;
 	private:
 		friend class UWMFParser;
 		friend FArchive &operator<< (FArchive &, GameMap *&);
@@ -214,6 +222,7 @@ class GameMap
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
 		void	SetupLinks();
+		void	ScanTiles();
 		bool	TraverseLink(const Zone *src, const Zone *dest);
 		void	UnloadLinks();
 

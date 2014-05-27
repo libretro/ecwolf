@@ -4,6 +4,7 @@
 #include "id_ca.h"
 #include "id_sd.h"
 #include "id_us.h"
+#include "g_mapinfo.h"
 #include "m_random.h"
 #include "actor.h"
 #include "thingdef/thingdef.h"
@@ -689,7 +690,7 @@ void DamageActor (AActor *ob, unsigned damage)
 	if ( !(ob->flags & FL_ATTACKMODE) )
 		damage <<= 1;
 
-	ob->health -= (short)damage;
+	ob->health -= FixedMul(damage, gamestate.difficulty->PlayerDamageFactor);
 
 	if (ob->health<=0)
 	{
@@ -725,7 +726,7 @@ bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amo
 		default:
 			return intercept < amount;
 		case SLIDE_Split:
-			return ABS(FRACUNIT - intercept*2) < amount;
+			return (unsigned int)abs((int)(FRACUNIT - intercept*2)) < amount;
 		case SLIDE_Invert:
 			return intercept>(FRACUNIT-amount);
 	}

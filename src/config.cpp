@@ -32,9 +32,6 @@
 **
 */
 
-#include "config.h"
-#include "scanner.h"
-
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
@@ -42,6 +39,9 @@
 
 #include "filesys.h"
 #include "zstring.h"
+#include "config.h"
+#include "scanner.h"
+#include "version.h"
 
 Config config;
 
@@ -72,9 +72,9 @@ void Config::LocateConfigFile(int argc, char* argv[])
 	configDir = FileSys::GetDirectoryPath(FileSys::DIR_Configuration);
 
 #ifdef WINDOWS
-	configFile = configDir + "\\ecwolf.cfg";
+	configFile = configDir + "\\" BINNAME ".cfg";
 #else
-	configFile = configDir + "/ecwolf.cfg";
+	configFile = configDir + "/" BINNAME ".cfg";
 #endif
 
 	ReadConfig();

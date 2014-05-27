@@ -270,3 +270,13 @@ Console:
 Flat:
 	#FFBD94
 }
+
+NoahWhite
+{
+	#242424  #FFFFFF
+Console:
+	#000000  #7F7F7F    0 127
+	#808080  #FFFFFF  128 256
+Flat:
+	#FFFFFF
+}

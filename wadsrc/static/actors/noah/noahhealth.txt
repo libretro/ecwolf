@@ -1,6 +1,8 @@
 actor SmallBandage : Health 178
 {
 	inventory.amount 10
+	overheadicon "TILE8:7D"
+	+PLOTONAUTOMAP
 	states
 	{
 		Spawn:
@@ -12,6 +14,8 @@ actor SmallBandage : Health 178
 actor LargeBandage : Health 179
 {
 	inventory.amount 25
+	overheadicon "TILE8:7D"
+	+PLOTONAUTOMAP
 	states
 	{
 		Spawn:
@@ -23,6 +27,8 @@ actor LargeBandage : Health 179
 actor ArkOneUp : CustomInventory 187
 {
 	inventory.pickupsound "misc/1up"
+	overheadicon "TILE8:7D"
+	+PLOTONAUTOMAP
 	+COUNTITEM
 	+INVENTORY.ALWAYSPICKUP
 	states

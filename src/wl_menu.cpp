@@ -53,9 +53,9 @@ Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
 Menu optionsMenu(80, 80, 190, 28);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
-Menu displayMenu(60, 95, 225, 56);
-Menu automapMenu(40, 75, 260, 56);
-Menu mouseSensitivity(20, 80, 300, 0);
+Menu displayMenu(20, 75, 285, 56);
+Menu automapMenu(40, 55, 260, 56);
+Menu mouseSensitivity(20, 80, 300, 24);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
@@ -81,13 +81,13 @@ MENU_LISTENER(ViewScoresOrEndGame)
 		MenuFadeOut();
 
 		StartCPMusic(gameinfo.ScoresMusic);
-	
+
 		DrawHighScores();
 		VW_UpdateScreen();
 		MenuFadeIn();
-	
+
 		IN_Ack();
-	
+
 		StartCPMusic(gameinfo.MenuMusic);
 		MenuFadeOut();
 		mainMenu.draw();
@@ -200,7 +200,7 @@ MENU_LISTENER(StartNewGame)
 		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
 
 	Menu::closeMenus();
-	NewGame(which, episode->StartMap, playerClass);
+	NewGame(which, episode->StartMap, true, playerClass);
 
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR
@@ -296,6 +296,23 @@ MENU_LISTENER(ChangeAutomapFlag)
 	AM_UpdateFlags();
 	return true;
 }
+MENU_LISTENER(ChangeAMOverlay)
+{
+	am_overlay = which;
+	AM_UpdateFlags();
+	return true;
+}
+MENU_LISTENER(ChangeAMRotate)
+{
+	am_rotate = which;
+	AM_UpdateFlags();
+	return true;
+}
+MENU_LISTENER(AdjustViewSize)
+{
+	NewViewSize(viewsize);
+	return true;
+}
 
 void CreateMenus()
 {
@@ -366,24 +383,12 @@ void CreateMenus()
 
 	skills.setHeadText(language["STR_HOWTOUGH"]);
 	skills.setHeadPicture("M_HOWTGH", true);
-	const char* skillText[4] =
+	for(unsigned int i = 0;i < SkillInfo::GetNumSkills();++i)
 	{
-		language["STR_DADDY"],
-		language["STR_HURTME"],
-		language["STR_BRINGEM"],
-		language["STR_DEATH"]
-	};
-	const char* skillPicture[4] =
-	{
-		"M_BABY",
-		"M_EASY",
-		"M_NORMAL",
-		"M_HARD"
-	};
-	for(unsigned int i = 0;i < 4;i++)
-	{
-		MenuItem *tmp = new MenuItem(skillText[i], StartNewGame);
-		tmp->setPicture(skillPicture[i], NM_X + 185, NM_Y + 7);
+		SkillInfo &skill = SkillInfo::GetSkill(i);
+		MenuItem *tmp = new MenuItem(skill.Name, StartNewGame);
+		if(!skill.SkillPicture.IsEmpty())
+			tmp->setPicture(skill.SkillPicture, NM_X + 185, NM_Y + 7);
 		skills.addItem(tmp);
 	}
 	skills.setCurrentPosition(2);
@@ -450,11 +455,18 @@ void CreateMenus()
 	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
 	displayMenu.addItem(new MultipleChoiceMenuItem(SetAspectRatio, aspectOptions, 6, vid_aspect));
 	displayMenu.addItem(new MenuSwitcherMenuItem(language["STR_SELECTRES"], resolutionMenu, EnterResolutionSelection));
+	displayMenu.addItem(new LabelMenuItem(language["STR_SCREENSIZE"]));
+	displayMenu.addItem(new SliderMenuItem(viewsize, 110, 21, language["STR_SMALL"], language["STR_LARGE"], AdjustViewSize));
 
 	resolutionMenu.setHeadText(language["STR_SELECTRES"]);
 
-	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEADJ"]));
-	mouseSensitivity.addItem(new SliderMenuItem(mouseadjustment, 200, 20, language["STR_SLOW"], language["STR_FAST"]));
+    mouseSensitivity.setHeadText(language["STR_MOUSEADJ"]);
+	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEXADJ"]));
+	mouseSensitivity.addItem(new SliderMenuItem(mousexadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
+	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEYADJ"]));
+	mouseSensitivity.addItem(new SliderMenuItem(mouseyadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
+
+
 
 	controls.setHeadPicture("M_CUSTOM");
 	controls.showControlHeaders(true);
@@ -463,15 +475,19 @@ void CreateMenus()
 		controls.addItem(new ControlMenuItem(controlScheme[i]));
 	}
 
+	const char* rotateOptions[] = { language["STR_AMROTATEOFF"], language["STR_AMROTATEON"], language["STR_AMROTATEOVERLAY"] };
+	const char* overlayOptions[] = { language["STR_AMOVERLAYOFF"], language["STR_AMOVERLAYON"], language["STR_AMOVERLAYBOTH"] };
 	automapMenu.setHeadText(language["STR_AMOPTIONS"]);
-	automapMenu.addItem(new BooleanMenuItem(language["STR_AMROTATE"], am_rotate, ChangeAutomapFlag));
+	automapMenu.addItem(new MultipleChoiceMenuItem(ChangeAMOverlay, overlayOptions, 3, am_overlay));
+	automapMenu.addItem(new MultipleChoiceMenuItem(ChangeAMRotate, rotateOptions, 3, am_rotate));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTURES"], am_drawtexturedwalls, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMFLOORS"], am_drawfloors, ChangeAutomapFlag));
-	automapMenu.addItem(new BooleanMenuItem(language["STR_AMOVERLAY"], am_drawbackground, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTUREDOVERLAY"], am_overlaytextured, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMRATIOS"], am_showratios, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMPAUSE"], am_pause, ChangeAutomapFlag));
 }
 
 static int SoundStatus = 1;
-static char SaveName[13] = "savegam?.";
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -557,7 +573,7 @@ void US_ControlPanel (ScanCode scancode)
 		if(idEasterEgg)
 		{
 			IN_ProcessEvents();
-	
+
 			//
 			// EASTER EGG FOR SPEAR OF DESTINY!
 			//
@@ -578,7 +594,7 @@ void US_ControlPanel (ScanCode scancode)
 					IN_WaitAndProcessEvents();
 				IN_ClearKeysDown ();
 				IN_Ack ();
-	
+
 				VW_FadeOut ();
 				VL_ReadPalette(gameinfo.GamePalette);
 
@@ -967,8 +983,6 @@ void Message (const char *string)
 		TOPBRDR = ColorMatcher.Pick(RPART(gameinfo.MessageColors[1]), GPART(gameinfo.MessageColors[1]), BPART(gameinfo.MessageColors[1])),
 		BOTBRDR = ColorMatcher.Pick(RPART(gameinfo.MessageColors[2]), GPART(gameinfo.MessageColors[2]), BPART(gameinfo.MessageColors[2]));
 
-	int len = (int) strlen(string);
-	FFont *font = BigFont;
 	word width, height;
 
 	FString measureString;
@@ -991,7 +1005,6 @@ void Message (const char *string)
 // THIS MAY BE FIXED A LITTLE LATER...
 //
 ////////////////////////////////////////////////////////////////////
-static int lastmusic;
 
 int StartCPMusic (const char* song)
 {
@@ -1026,7 +1039,7 @@ void CheckPause (void)
 		SoundStatus ^= 1;
 		VW_WaitVBL (3);
 		IN_ClearKeysDown ();
-		Paused = false;
+		Paused &= ~1;
 	}
 }
 

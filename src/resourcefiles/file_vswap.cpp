@@ -135,12 +135,21 @@ struct FVSwapSound : public FResourceLump
 			static const fixed sampleStep = static_cast<fixed>(((double)origSampleRate / param_samplerate)*FRACUNIT);
 			SWORD* data = (SWORD*)(Cache+sizeof(WAV_HEADER));
 			i = 0;
-			for(fixed sample = 0;i++ < samples;sample += sampleStep)
+			fixed samplefrac = 0;
+			unsigned int sample = 0;
+			while(i++ < samples)
 			{
-				SWORD curSample = (SWORD(origdata[(sample>>FRACBITS)]) - 128)<<8;
-				SWORD nextSample = unsigned(sample>>FRACBITS)+1 < numOrigSamples ? (SWORD(origdata[(sample>>FRACBITS)+1]) - 128)<<8 : curSample;
+				SWORD curSample = (SWORD(origdata[sample]) - 128)<<8;
+				SWORD nextSample = sample+1 < numOrigSamples ? (SWORD(origdata[sample+1]) - 128)<<8 : curSample;
 
-				*data++ = LittleShort(curSample + (((sample&0xFFFF)*fixed(nextSample-curSample))>>FRACBITS));
+				*data++ = LittleShort(curSample + ((samplefrac*fixed(nextSample-curSample))>>FRACBITS));
+
+				samplefrac += sampleStep;
+				if(samplefrac > FRACUNIT)
+				{
+					samplefrac -= FRACUNIT;
+					++sample;
+				}
 			}
 			delete[] origdata;
 			return 1;
@@ -158,7 +167,7 @@ class FVSwap : public FResourceFile
 	public:
 		FVSwap(const char* filename, FileReader *file) : FResourceFile(filename, file), spriteStart(0), soundStart(0), Lumps(NULL), SoundLumps(NULL), vswapFile(filename)
 		{
-			int lastSlash = vswapFile.LastIndexOfAny("/\\");
+			int lastSlash = vswapFile.LastIndexOfAny("/\\:");
 			extension = vswapFile.Mid(lastSlash+7);
 		}
 		~FVSwap()
@@ -175,12 +184,8 @@ class FVSwap : public FResourceFile
 
 		bool Open(bool quiet)
 		{
-			FileReader vswapReader;
-			if(!vswapReader.Open(vswapFile))
-				return false;
-
 			BYTE header[6];
-			vswapReader.Read(header, 6);
+			Reader->Read(header, 6);
 			WORD numChunks = ReadLittleShort(&header[0]);
 
 			spriteStart = ReadLittleShort(&header[2]);
@@ -190,7 +195,7 @@ class FVSwap : public FResourceFile
 
 
 			BYTE* data = new BYTE[6*numChunks];
-			vswapReader.Read(data, 6*numChunks);
+			Reader->Read(data, 6*numChunks);
 
 			for(unsigned int i = 0;i < soundStart;i++)
 			{
@@ -212,8 +217,8 @@ class FVSwap : public FResourceFile
 			unsigned int numDigi = soundMapSize/4;
 			byte* soundMap = new byte[soundMapSize];
 			SoundLumps = new FVSwapSound*[numDigi];
-			vswapReader.Seek(soundMapOffset, SEEK_SET);
-			vswapReader.Read(soundMap, soundMapSize);
+			Reader->Seek(soundMapOffset, SEEK_SET);
+			Reader->Read(soundMap, soundMapSize);
 			for(unsigned int i = 0;i < numDigi;i++)
 			{
 				WORD start = ReadLittleShort(&soundMap[i*4]);
@@ -269,7 +274,7 @@ class FVSwap : public FResourceFile
 FResourceFile *CheckVSwap(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
-	int lastSlash = fname.LastIndexOfAny("/\\");
+	int lastSlash = fname.LastIndexOfAny("/\\:");
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 5);
 	else
@@ -279,6 +284,7 @@ FResourceFile *CheckVSwap(const char *filename, FileReader *file, bool quiet)
 	{
 		FResourceFile *rf = new FVSwap(filename, file);
 		if(rf->Open(quiet)) return rf;
+		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
 	}
 	return NULL;

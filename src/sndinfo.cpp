@@ -122,6 +122,7 @@ struct SoundInformation::HashIndex
 SoundInformation::SoundInformation() : hashTable(NULL)
 {
 	sounds.Push(nullIndex);
+	lastPlayTicks.Push(0);
 }
 
 SoundInformation::~SoundInformation()
@@ -158,6 +159,7 @@ SoundData &SoundInformation::AddSound(const char* logical)
 	SoundData &data = sounds[idx];
 	data.logicalName = logical;
 	data.index = SoundIndex(idx);
+	lastPlayTicks.Push(0);
 	return data;
 }
 

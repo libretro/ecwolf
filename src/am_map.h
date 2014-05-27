@@ -39,15 +39,27 @@
 #include "tarray.h"
 #include "vectors.h"
 
-extern bool automap;
+enum
+{
+	AMA_Off,
+	AMA_Overlay,
+	AMA_Normal
+};
+
+extern unsigned automap;
 extern bool am_cheat;
-extern bool am_rotate;
+extern unsigned am_rotate;
+extern bool am_overlaytextured;
 extern bool am_drawtexturedwalls;
 extern bool am_drawfloors;
-extern bool am_drawbackground;
+extern unsigned am_overlay;
+extern bool am_pause;
+extern bool am_showratios;
 
 void AM_ChangeResolution();
+void AM_CheckKeys();
 void AM_UpdateFlags();
+void AM_Toggle();
 
 void BasicOverhead();
 
@@ -61,26 +73,35 @@ public:
 		AMF_Rotate = 0x1,
 		AMF_DrawTexturedWalls = 0x2,
 		AMF_DrawFloor = 0x4,
-		AMF_Overlay = 0x8
+		AMF_Overlay = 0x8,
+		AMF_DispInfo = 0x10,
+		AMF_DispRatios = 0x20,
+		AMF_ShowThings = 0x40
 	};
 
 	struct Color
 	{
 		uint32 color;
 		byte palcolor;
+
+		Color &operator=(int rgb);
 	};
 
 	AutoMap(unsigned int flags=0);
 	~AutoMap();
 
-	void CalculateDimensions();
+	void CalculateDimensions(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 	void Draw();
 	void SetFlags(unsigned int flags, bool set);
+	void SetPanning(fixed x, fixed y, bool relative);
 	void SetScale(fixed scale, bool relative);
 
 protected:
 	void ClipTile(TArray<FVector2> &points) const;
-	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, int x, int y, angle_t angle, const Color &c) const;
+	void DrawActor(class AActor *actor, fixed x, fixed y);
+	void DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const;
+	void DrawStats() const;
+	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, angle_t angle, const Color &c) const;
 	FVector2 GetClipIntersection(const FVector2 &p1, const FVector2 &p2, unsigned edge) const;
 	bool TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &points) const;
 
@@ -90,6 +111,7 @@ private:
 	bool fullRefresh;
 	unsigned int amFlags;
 	int amsizex, amsizey, amx, amy;
+	fixed ampanx, ampany;
 	fixed amsin, amcos;
 	fixed scale, absscale;
 	angle_t amangle;
@@ -97,6 +119,7 @@ private:
 
 	Color ArrowColor;
 	Color BackgroundColor;
+	Color FloorColor;
 	Color WallColor;
 	Color DoorColor;
 };

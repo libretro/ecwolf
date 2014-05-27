@@ -37,6 +37,7 @@
 
 #include "textures/textures.h"
 #include "v_font.h"
+#include "wl_text.h"
 #include "zstring.h"
 
 class ClassDef;
@@ -50,12 +51,12 @@ public:
 	int		MessageColors[3];
 	int		MenuWindowColors[6];
 	int		AdvisoryColor;
+	int		PsychedColors[2];
+	int 	PsychedOffset;
 	bool	DrawReadThis;
 
-	int		PageTime;
 	int		TitleTime;
 	FString	BorderFlat;
-	FString	CreditPage;
 	FString GameColormap;
 	FString	GamePalette;
 	FString	TitleMusic;
@@ -64,10 +65,13 @@ public:
 	FString	MenuMusic;
 	FString	ScoresMusic;
 	FString	FinaleMusic;
+	FString VictoryMusic;
 	FString	IntermissionMusic;
 	FString	HighScoresFont;
 	FString	AdvisoryPic;
 	FString FinaleFlat;
+	FString GameOverPic;
+	FString VictoryPic;
 	// Special stack for strings like the default translator.
 	// This will allow the previous default to be included.
 	class FStringStack
@@ -108,10 +112,18 @@ public:
 		HIGHSCORES,
 		PAGEINDEX,
 		MESSAGEFONT,
+		DIALOG,
 
 		NUM_FONTCOLORS
 	};
 	EColorRange	FontColors[NUM_FONTCOLORS];
+
+	enum ETransition
+	{
+		TRANSITION_Fizzle,
+		TRANSITION_Fade
+	};
+	ETransition DeathTransition;
 
 	struct BorderTextures
 	{
@@ -126,6 +138,16 @@ public:
 		FString l, r;
 		FString bl, b, br;
 	} Border;
+
+	struct AutomapInfo
+	{
+		EColorRange FontColor;
+		int Background;
+		int DoorColor;
+		int FloorColor;
+		int WallColor;
+		int YourColor;
+	} automap;
 } gameinfo;
 
 class LevelInfo
@@ -139,10 +161,11 @@ public:
 	FString			NextMap;
 	FString			NextSecret;
 	FString			NextVictory;
-	unsigned int	FloorNumber;
+	FString			FloorNumber;
 	FString			Music;
 	unsigned int	Cluster;
 	FString			Translator;
+	FTextureID		TitlePatch;
 
 	FTextureID		BorderTexture;
 	FTextureID		DefaultTexture[2];
@@ -161,6 +184,7 @@ public:
 	bool			DeathCam;
 	bool			SecretDeathSounds;
 	bool			SpawnWithWeaponRaised;
+	bool			ForceTally;
 
 	TArray<const ClassDef *>	EnsureInventory;
 
@@ -214,8 +238,31 @@ public:
 	FString		EnterText, ExitText;
 	ExitType	EnterTextType, ExitTextType;
 	FString		Flat;
+	FString		Music;
+	FFont		*TextFont;
+	ETSAlignment TextAlignment;
+	ETSAnchor	TextAnchor;
+	EColorRange	TextColor;
 
 	static ClusterInfo &Find(unsigned int index);
+};
+
+class SkillInfo
+{
+public:
+	SkillInfo();
+
+	FString Name;
+	FString SkillPicture;
+	fixed DamageFactor;
+	fixed PlayerDamageFactor;
+	unsigned int SpawnFilter;
+	unsigned int MapFilter;
+	bool QuizHints;
+
+	static unsigned int GetNumSkills();
+	static unsigned int GetSkillIndex(const SkillInfo &skill);
+	static SkillInfo &GetSkill(unsigned int index);
 };
 
 void G_ParseMapInfo(bool gameinfoPass);

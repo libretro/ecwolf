@@ -378,7 +378,7 @@ bool DSimpleCanvas::IsValid ()
 //
 //==========================================================================
 
-bool DSimpleCanvas::Lock ()
+bool DSimpleCanvas::Lock (bool)
 {
 	if (LockCount == 0)
 	{
@@ -841,7 +841,7 @@ void GenerateLookupTables()
 		}
 }
 
-static int ParseHex(const char* hex)
+int ParseHex(const char* hex)
 {
 	int num = 0;
 	int i = 1;

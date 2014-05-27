@@ -66,13 +66,8 @@ enum ESSType
 
 void Quit(const char *errorStr, ...);
 
-#define SIGN(x)         ((x)>0?1:-1)
-#define ABS(x)          ((int)(x)>0?(x):-(x))
-#define LABS(x)         ((int32_t)(x)>0?(x):-(x))
-
-#define abs(x) ABS(x)
-
 #define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
+#define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
 
 #ifdef _WIN32
 #define stricmp _stricmp
@@ -223,6 +218,7 @@ typedef enum
 	FL_RIPPER			= 0x02000000,
 	FL_DONTRIP			= 0x04000000,
 	FL_OLDRANDOMCHASE	= 0x08000000,
+	FL_PLOTONAUTOMAP	= 0x10000000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
 
@@ -307,7 +303,17 @@ enum Button
 	bt_reload,
 	bt_zoom,
 	bt_automap,
-	NUMBUTTONS
+	bt_showstatusbar,
+	NUMBUTTONS,
+
+	// AM buttons
+	bt_zoomin = 0,
+	bt_zoomout,
+	bt_panup,
+	bt_pandown,
+	bt_panleft,
+	bt_panright,
+	NUMAMBUTTONS
 };
 
 struct ControlScheme
@@ -327,6 +333,8 @@ struct ControlScheme
 };
 
 extern ControlScheme controlScheme[];
+extern ControlScheme amControlScheme[];
+extern ControlScheme &schemeAutomapKey;
 
 enum
 {
@@ -384,8 +392,6 @@ static inline fixed FixedDiv(fixed a, fixed b)
 }
 
 #define GetTicks() ((SDL_GetTicks()*7)/100)
-
-#define ISPOINTER(x) ((((uintptr_t)(x)) & ~0xffff) != 0)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 

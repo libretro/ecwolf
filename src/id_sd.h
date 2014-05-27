@@ -150,7 +150,7 @@ extern  void    SD_Startup(void),
 				SD_Shutdown(void);
 
 extern  void    SD_PositionSound(int leftvol,int rightvol);
-extern  bool	SD_PlaySound(const char* sound,SoundChannel chan=SD_GENERIC);
+extern  int		SD_PlaySound(const char* sound,SoundChannel chan=SD_GENERIC);
 extern  void    SD_SetPosition(int channel, int leftvol,int rightvol);
 extern  void    SD_StopSound(void),
 				SD_WaitSoundDone(void);

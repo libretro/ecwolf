@@ -6,12 +6,15 @@ gameinfo
 	gamecolormap = "COLORMAP"
 	gamepalette = "NOAHPAL"
 	titlepalette = "TITLEPAL"
+	gameoverpic = "GMOVA0"
+	victorypic = "YWINA0"
 	finaleflat = "#B5B5B5"
+	psyched = "C6 C6 00", "E7 E7 00", 3
 	menufade = "56 3D 1C"
 	menucolors = "56 3D 1C", "6F 4A 25", "32 31 10", "29 21 0C", "56 3D 1C", "56 3D 1C"
 	messagecolors = "D6 84 52", "FF BD 94", "00 00 00"
 	menuwindowcolors = "D6 84 52", "FF BD 94", "00 00 00", "FF FF FF", "FF FF 00", "0 0 0"
-	menufontcolor_title = "Gold"
+	menufontcolor_title = "NoahWhite"
 	menufontcolor_label = "NoahDarkCream"
 	menufontcolor_selection = "NoahCream"
 	menufontcolor_invalid = "DarkGreen"
@@ -24,29 +27,214 @@ gameinfo
 	playerclasses = "NoahPlayer"
 	doorsoundsequence = "DoorNormal"
 	pushwallsoundsequence = "PushwallArk"
-
 	highscoresfont = "SmallFont"
-	titlemusic = "NAZI_NOR"
-	scoresmusic = "ROSTER"
+	titlemusic = "ALLGOOD"
+	scoresmusic = "SONG11"
 	titlepage = "TITLEPIC"
-	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
+	quitmessages = "$NOAH_ENDSTR01", "$NOAH_ENDSTR02", "$NOAH_ENDSTR03", "$NOAH_ENDSTR04", "$NOAH_ENDSTR05", "$NOAH_ENDSTR06", "$NOAH_ENDSTR07", "$NOAH_ENDSTR08", "$NOAH_ENDSTR09"
 	gibfactor = 1
-	menumusic = "WONDERIN"
-	finalemusic = "CORNER"
-	intermissionmusic = "ENDLEVEL"
-	titletime = 15
-	creditpage = "CREDITS"
-	pagetime = 10
-	highscoresfontcolor = "White"
-	pageindexfontcolor = "DarkYellow"
-	advisorycolor = "20 A8 FC"
-	advisorypic = "PG13"
+	menumusic = "SONG1"
+	finalemusic = "SONG1"
+	victorymusic = "SONG7"
+	intermissionmusic = "FEEDTIME"
+	titletime = 13
+	highscoresfontcolor = "NoahWhite"
+	pageindexfontcolor = "Black"
+	dialogcolor = "NoahWhite"
+	deathtransition = "Fade"
+}
+
+automap
+{
+	fontcolor = "NoahCream"
+	background = "6F 4A 25"
+	doorcolor = "77 CE CE"
+	floorcolor = "6F 4A 25"
+	wallcolor = "4E 5E 00"
+	yourcolor = "C6 C6 00"
+}
+
+intermission DemoLoop
+{
+	Fader
+	{
+		Background = TitlePage
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -1
+	}
+	Image
+	{
+		Draw = "COPYRGHT", 0, 184
+		Time = -1
+	}
+	Image
+	{
+		Draw = "COPYRGHT", 0, 184
+		Draw = "FAMILYAP", 224, 112
+		Time = TitleTime
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	TextScreen
+	{
+		Background = "#563D1C", 1, "$GamePalette"
+		FadeTime = 15
+		Position = 160, 8
+		Text = "$NOAH_BRIEF_COPYRIGHT"
+		TextAlignment = Center
+		TextColor = "NoahWhite"
+		TextFont = "BigFont"
+		TextSpeed = 0
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	Fader
+	{
+		Background = HighScores
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+}
+
+intermission NoahCast
+{
+	Fader
+	{
+		Background = LoadMap, "MAP31"
+		Music = "ALLGOOD"
+		Time = 15
+		FadeType = FadeIn
+	}
+	Link = "NoahCastLoop"
+}
+intermission NoahCastLoop
+{
+	cast
+	{
+		castclass = "ArkGoat"
+		castname = "$CC_GOAT"
+	}
+	cast
+	{
+		castclass = "ArkSheep"
+		castname = "$CC_SHEEP"
+	}
+	cast
+	{
+		castclass = "ArkOstrich"
+		castname = "$CC_OSTRICH"
+	}
+	cast
+	{
+		castclass = "ArkAntelope"
+		castname = "$CC_ANTELOPE"
+	}
+	cast
+	{
+		castclass = "ArkOx"
+		castname = "$CC_OX"
+	}
+	cast
+	{
+		castclass = "CarlTheCamel"
+		castname = "$CC_CARL"
+	}
+	cast
+	{
+		castclass = "MelvinTheMonkey"
+		castname = "$CC_MELVIN"
+	}
+	cast
+	{
+		castclass = "GinnyTheGiraffe"
+		castname = "$CC_GINNY"
+	}
+	cast
+	{
+		castclass = "KerryTheKangaroo"
+		castname = "$CC_KERRY"
+	}
+	cast
+	{
+		castclass = "ErnieTheElephant"
+		castname = "$CC_ERNIE"
+	}
+	cast
+	{
+		castclass = "DisguisedBurt"
+		castname = "$CC_BURTHIDING"
+	}
+	cast
+	{
+		castclass = "BurtTheBear"
+		castname = "$CC_BURT"
+	}
+	Link = "NoahCastLoop"
+}
+
+skill baby
+{
+	name = "$STR_SUPEREASY"
+	picname = "M_BABY"
+	spawnfilter = 1
+	damagefactor = 0.25
+	playerdamagefactor = 2
+	quizhints = true
+}
+
+skill easy
+{
+	name = "$STR_EASY"
+	picname = "M_EASY"
+	spawnfilter = 2
+	mapfilter = 1
+	playerdamagefactor = 1.5
+}
+
+skill normal
+{
+	name = "$STR_NORMAL"
+	picname = "M_NORMAL"
+	spawnfilter = 3
+	mapfilter = 1
+	playerdamagefactor = 1.25
+}
+
+skill hard
+{
+	name = "$STR_HARD"
+	picname = "M_HARD"
+	spawnfilter = 4
+	mapfilter = 1
 }
 
 adddefaultmap
 {
 	defaultfloor = "FLOOR1"
 	defaultceiling = "CEILING1"
+	specialaction = "BurtTheBear", "Exit_Victory"
+	victorynext = "EndSequence:NoahCast"
+	forcetally = true
 }
 
 // Episode 1
@@ -60,15 +248,19 @@ episode "MAP01"
 
 cluster 1
 {
-	exittext = "ENDART1"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_01"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP01"
 {
 	next = "MAP02"
 	secretnext = "MAP02"
-	floornumber = 1
+	floornumber = "1-1"
 	par = 30
 	music = "SONG1"
 	cluster = 1
@@ -78,7 +270,7 @@ map "MAP02"
 {
 	next = "MAP03"
 	secretnext = "MAP03"
-	floornumber = 2
+	floornumber = "1-2"
 	par = 60
 	music = "ALLGOOD"
 	cluster = 1
@@ -88,7 +280,7 @@ map "MAP03"
 {
 	next = "MAP04"
 	secretnext = "MAP04"
-	floornumber = 3
+	floornumber = "1-3"
 	par = 60
 	music = "SONG7"
 	cluster = 1
@@ -107,15 +299,19 @@ episode "MAP04"
 
 cluster 2
 {
-	exittext = "ENDART2"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_02"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP04"
 {
 	next = "MAP05"
 	secretnext = "MAP05"
-	floornumber = 4
+	floornumber = "2-1"
 	par = 120
 	music = "SONG3"
 	cluster = 2
@@ -127,7 +323,7 @@ map "MAP05"
 {
 	next = "MAP06"
 	secretnext = "MAP06"
-	floornumber = 5
+	floornumber = "2-2"
 	par = 105
 	music = "SONG1"
 	cluster = 2
@@ -139,7 +335,7 @@ map "MAP06"
 {
 	next = "MAP07"
 	secretnext = "MAP07"
-	floornumber = 6
+	floornumber = "2-3"
 	par = 90
 	music = "ALLGOOD"
 	cluster = 2
@@ -151,7 +347,7 @@ map "MAP07"
 {
 	next = "MAP08"
 	secretnext = "MAP08"
-	floornumber = 7
+	floornumber = "2-4"
 	par = 105
 	music = "SONG7"
 	cluster = 2
@@ -168,15 +364,19 @@ episode "MAP08"
 
 cluster 3
 {
-	exittext = "ENDART3"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_03"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP08"
 {
 	next = "MAP09"
 	secretnext = "MAP12"
-	floornumber = 8
+	floornumber = "3-1"
 	par = 105
 	music = "SONG4"
 	cluster = 3
@@ -188,7 +388,7 @@ map "MAP09"
 {
 	next = "MAP10"
 	secretnext = "MAP10"
-	floornumber = 9
+	floornumber = "3-2"
 	music = "SONG3"
 	cluster = 3
 	par = 120
@@ -200,7 +400,7 @@ map "MAP10"
 {
 	next = "MAP11"
 	secretnext = "MAP11"
-	floornumber = 10
+	floornumber = "3-3"
 	music = "SONG1"
 	cluster = 3
 	par = 135
@@ -212,7 +412,7 @@ map "MAP11"
 {
 	next = "MAP13"
 	secretnext = "MAP13"
-	floornumber = 1
+	floornumber = "3-4"
 	par = 60
 	music = "SONG7"
 	cluster = 3
@@ -224,7 +424,8 @@ map "MAP12"
 {
 	next = "MAP09"
 	secretnext = "MAP09"
-	floornumber = 2
+	floornumber = "3-5"
+	titlepatch = "WISECRET"
 	par = 120
 	music = "SONG9"
 	cluster = 3
@@ -243,15 +444,19 @@ episode "MAP13"
 
 cluster 4
 {
-	exittext = "ENDART4"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_04"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP13"
 {
 	next = "MAP14"
 	secretnext = "MAP14"
-	floornumber = 3
+	floornumber = "4-1"
 	par = 210
 	music = "SONG6"
 	cluster = 4
@@ -261,7 +466,7 @@ map "MAP14"
 {
 	next = "MAP15"
 	secretnext = "MAP15"
-	floornumber = 4
+	floornumber = "4-2"
 	par = 150
 	music = "SONG4"
 	cluster = 4
@@ -271,7 +476,7 @@ map "MAP15"
 {
 	next = "MAP16"
 	secretnext = "MAP16"
-	floornumber = 5
+	floornumber = "4-3"
 	par = 240
 	music = "ALLGOOD"
 	cluster = 4
@@ -281,7 +486,7 @@ map "MAP16"
 {
 	next = "MAP17"
 	secretnext = "MAP17"
-	floornumber = 6
+	floornumber = "4-4"
 	par = 135
 	music = "SONG3"
 	cluster = 4
@@ -291,7 +496,7 @@ map "MAP17"
 {
 	next = "MAP18"
 	secretnext = "MAP18"
-	floornumber = 7
+	floornumber = "4-5"
 	par = 210
 	music = "SONG7"
 	cluster = 4
@@ -310,15 +515,19 @@ episode "MAP18"
 
 cluster 5
 {
-	exittext = "ENDART5"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_05"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP18"
 {
 	next = "MAP19"
 	secretnext = "MAP19"
-	floornumber = 8
+	floornumber = "5-1"
 	par = 150
 	music = "SONG8"
 	cluster = 5
@@ -330,7 +539,7 @@ map "MAP19"
 {
 	next = "MAP20"
 	secretnext = "MAP20"
-	floornumber = 9
+	floornumber = "5-2"
 	music = "SONG1"
 	cluster = 165
 	defaultfloor = "FLOOR2"
@@ -341,7 +550,7 @@ map "MAP20"
 {
 	next = "MAP21"
 	secretnext = "MAP21"
-	floornumber = 10
+	floornumber = "5-3"
 	music = "SONG6"
 	cluster = 5
 	par = 180
@@ -353,7 +562,7 @@ map "MAP21"
 {
 	next = "MAP22"
 	secretnext = "MAP22"
-	floornumber = 1
+	floornumber = "5-4"
 	par = 210
 	music = "SONG4"
 	cluster = 5
@@ -364,8 +573,8 @@ map "MAP21"
 map "MAP22"
 {
 	next = "MAP23"
-	secretnext = "MAP33"
-	floornumber = 2
+	secretnext = "MAP23"
+	floornumber = "5-5"
 	par = 180
 	music = "HAPPYSNG"
 	cluster = 5
@@ -377,7 +586,7 @@ map "MAP23"
 {
 	next = "MAP24"
 	secretnext = "MAP24"
-	floornumber = 3
+	floornumber = "5-6"
 	par = 180
 	music = "SONG7"
 	cluster = 5
@@ -394,15 +603,19 @@ episode "MAP24"
 
 cluster 6
 {
-	exittext = "ENDART6"
-	exittextislump
+	textalignment = Center
+	textfont = "BigFont"
+	textcolor = "NoahWhite"
+	entertext = lookup, "NOAH_BRIEF_06"
+	music = "SONG9"
+	flat = "#563D1C"
 }
 
 map "MAP24"
 {
 	next = "MAP25"
 	secretnext = "MAP25"
-	floornumber = 4
+	floornumber = "6-1"
 	par = 105
 	music = "SONG11"
 	cluster = 6
@@ -414,7 +627,7 @@ map "MAP25"
 {
 	next = "MAP26"
 	secretnext = "MAP26"
-	floornumber = 5
+	floornumber = "6-2"
 	par = 180
 	music = "ALLGOOD"
 	cluster = 6
@@ -426,7 +639,7 @@ map "MAP26"
 {
 	next = "MAP27"
 	secretnext = "MAP30"
-	floornumber = 6
+	floornumber = "6-3"
 	par = 180
 	music = "SONG3"
 	cluster = 6
@@ -438,7 +651,7 @@ map "MAP27"
 {
 	next = "MAP28"
 	secretnext = "MAP38"
-	floornumber = 7
+	floornumber = "6-4"
 	par = 90
 	music = "SONG8"
 	cluster = 6
@@ -450,7 +663,7 @@ map "MAP28"
 {
 	next = "MAP29"
 	secretnext = "MAP29"
-	floornumber = 8
+	floornumber = "6-5"
 	par = 150
 	music = "SONG6"
 	cluster = 6
@@ -461,9 +674,9 @@ map "MAP28"
 
 map "MAP29"
 {
-	next = "MAP31"
-	secretnext = "MAP31"
-	floornumber = 9
+	next = "MAP30"
+	secretnext = "MAP30"
+	floornumber = "6-6"
 	music = "SONG7"
 	cluster = 6
 	par = 191
@@ -475,7 +688,8 @@ map "MAP30"
 {
 	next = "MAP27"
 	secretnext = "MAP27"
-	floornumber = 10
+	floornumber = "6-7"
+	titlepatch = "WISECRET"
 	music = "SONG9"
 	cluster = 6
 	par = 120
@@ -492,7 +706,7 @@ map "MAP31"
 {
 	next = "MAP31"
 	secretnext = "MAP31"
-	floornumber = 1
+	floornumber = "7-1"
 	music = "ALLGOOD"
 	cluster = 7
 	defaultfloor = "FLOOR4"

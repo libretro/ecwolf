@@ -87,7 +87,7 @@ class CallArguments;
 class ExpressionNode;
 
 typedef uint32_t flagstype_t;
-typedef void (*ActionPtr)(AActor *, AActor *, const class Frame * const, const CallArguments &);
+typedef bool (*ActionPtr)(AActor *, AActor *, const class Frame * const, const CallArguments &, struct ActionResult *);
 
 class Frame
 {
@@ -110,7 +110,7 @@ class Frame
 				ActionPtr		pointer;
 				CallArguments	*args;
 
-				void operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const;
+				bool operator() (AActor *self, AActor *stateOwner, const Frame * const caller, struct ActionResult *result=NULL) const;
 		} action, thinker;
 		const Frame	*next;
 		unsigned int	index;
@@ -150,6 +150,11 @@ public:
 	}
 private:
 	TArray<T*>	objects;
+};
+
+struct ActionResult
+{
+	const Frame *JumpFrame;
 };
 
 #endif

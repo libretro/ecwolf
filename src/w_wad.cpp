@@ -265,22 +265,19 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 		DWORD lumpstart = LumpInfo.Size();
 
 		resfile->SetFirstLump(lumpstart);
-		for (DWORD i=0; i < resfile->LumpCount(); i++)
-		{
-			FResourceLump *lump = resfile->GetLump(i);
-			FWadCollection::LumpRecord *lump_p = &LumpInfo[LumpInfo.Reserve(1)];
-
-			lump_p->lump = lump;
-			lump_p->wadnum = Files.Size();
-		}
 
 		Files.Push(resfile);
 
+		// [ECWolf] Do this first.
+		bool noEmbedded = true;
 		for (DWORD i=0; i < resfile->LumpCount(); i++)
 		{
 			FResourceLump *lump = resfile->GetLump(i);
 			if (lump->Flags & LUMPF_EMBEDDED)
 			{
+				// Should be ecwolf.<something>
+				FindEmbeddedWolfData(resfile, filename, lump->FullName+7);
+
 				char path[256];
 
 				mysnprintf(path, 256, "%s:", filename);
@@ -290,10 +287,137 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 				strcpy(wadstr, lump->FullName);
 
 				AddFile(path, embedded);
+
+				noEmbedded = false;
+				break;
+			}
+		}
+
+		if(noEmbedded)
+		{
+			for (DWORD i=0; i < resfile->LumpCount(); i++)
+			{
+				FResourceLump *lump = resfile->GetLump(i);
+				FWadCollection::LumpRecord *lump_p = &LumpInfo[LumpInfo.Reserve(1)];
+
+				lump_p->lump = lump;
+				lump_p->wadnum = Files.Size()-1;
 			}
 		}
 		return;
 	}
+}
+
+//==========================================================================
+//
+// Looks for "vanilla" wolf data embedded into an archive. This is only
+// intended so that Wolf4SDL/vanilla mods can include a compatibility patch
+// which is automatically loaded.
+//
+//==========================================================================
+
+void FWadCollection::FindEmbeddedWolfData(FResourceFile *res, const char* filename, const char* ext)
+{
+	enum
+	{
+		FILE_AUDIOHED,
+		FILE_AUDIOT,
+		FILE_GAMEMAPS,
+		FILE_MAPHEAD,
+		FILE_VGADICT,
+		FILE_VGAGRAPH,
+		FILE_VGAHEAD,
+		FILE_VSWAP,
+
+		NUM_FILES
+	};
+
+	struct
+	{
+		const char* name;
+		bool found;
+		int lump;
+	} data[NUM_FILES] =
+	{
+		{ "audiohed.", false },
+		{ "audiot.", false },
+		{ "gamemaps.", false },
+		{ "maphead.", false },
+		{ "vgadict.", false },
+		{ "vgagraph.", false },
+		{ "vgahead.", false },
+		{ "vswap.", false }
+	};
+	unsigned int count = 0;
+
+	for(DWORD i = 0; i < res->LumpCount(); ++i)
+	{
+		FResourceLump *lump = res->GetLump(i);
+
+		FString name(lump->FullName);
+		for(unsigned int j = 0; j < NUM_FILES; ++j)
+		{
+			if(data[j].found)
+				continue;
+
+			FString expected = FString(data[j].name) + ext;
+			if(name.CompareNoCase(expected) == 0)
+			{
+				data[j].found = true;
+				data[j].lump = i;
+				break;
+			}
+		}
+	}
+
+	// [BL] HACK: In order to mimize changes to ZDoom code, we're doing
+	// something horrible here.  We're going to pass an array of FileReaders
+	// into AddFile and when we open the respective archive, just know that
+	// there are extra pointers.
+	FileReader *readers[3];
+	FString fname;
+
+	if(data[FILE_AUDIOHED].found && data[FILE_AUDIOT].found)
+	{
+		readers[0] = res->GetLump(data[FILE_AUDIOT].lump)->NewReader();
+		readers[1] = res->GetLump(data[FILE_AUDIOHED].lump)->NewReader();
+
+		fname.Format("%s:%s%s", filename, data[FILE_AUDIOT].name, ext);
+		AddFile(fname, reinterpret_cast<FileReader*>(&readers));
+		++count;
+	}
+
+	if(data[FILE_GAMEMAPS].found && data[FILE_MAPHEAD].found)
+	{
+		readers[0] = res->GetLump(data[FILE_GAMEMAPS].lump)->NewReader();
+		readers[1] = res->GetLump(data[FILE_MAPHEAD].lump)->NewReader();
+
+		fname.Format("%s:%s%s", filename, data[FILE_GAMEMAPS].name, ext);
+		AddFile(fname, reinterpret_cast<FileReader*>(&readers));
+		++count;
+	}
+
+	if(data[FILE_VGADICT].found && data[FILE_VGAGRAPH].found && data[FILE_VGAHEAD].found)
+	{
+		readers[0] = res->GetLump(data[FILE_VGAGRAPH].lump)->NewReader();
+		readers[1] = res->GetLump(data[FILE_VGAHEAD].lump)->NewReader();
+		readers[2] = res->GetLump(data[FILE_VGADICT].lump)->NewReader();
+
+		fname.Format("%s:%s%s", filename, data[FILE_VGAGRAPH].name, ext);
+		AddFile(fname, reinterpret_cast<FileReader*>(&readers));
+		++count;
+	}
+
+	// This one can be handled normally. :)
+	if(data[FILE_VSWAP].found)
+	{
+		fname.Format("%s:%s%s", filename, data[FILE_VSWAP].name, ext);
+		AddFile(fname, res->GetLump(data[FILE_VSWAP].lump)->NewReader());
+		++count;
+	}
+
+	if(count == 0)
+		I_Error("Attempt to load embedded compatibility patch without data.");
 }
 
 //==========================================================================

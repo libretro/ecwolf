@@ -538,6 +538,7 @@ void FTextureManager::ParseTime (Scanner &sc, DWORD &min, DWORD &max)
 	}
 	else
 	{
+		min = max = 1;
 		sc.ScriptMessage (Scanner::ERROR, "Must specify a duration for animation frame");
 	}
 }

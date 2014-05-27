@@ -21,8 +21,6 @@ gameinfo
 	finaleflat = "#DCDCDC"
 	intermissionmusic = "ENDLEVEL"
 	titletime = 15
-	creditpage = "CREDITS"
-	pagetime = 10
 	menufontcolor_title = "Green"
 	menufontcolor_label = "DarkGreen"
 	menufontcolor_selection = "Green"
@@ -40,6 +38,96 @@ gameinfo
 	gibfactor = 1
 	highscoresfont = "SmallFont"
 	quitmessages = "$ENDSTR01", "$ENDSTR02", "$ENDSTR03", "$ENDSTR04", "$ENDSTR05", "$ENDSTR06", "$ENDSTR07", "$ENDSTR08", "$ENDSTR09"
+	gamecolormap = "COLORMAP"
+	deathtransition = "Fizzle"
+}
+
+automap
+{
+	fontcolor = "White"
+	background = "55 55 55"
+	doorcolor = "10 C7 10"
+	floorcolor = "55 55 55"
+	wallcolor = "00 8E 00"
+	yourcolor = "FF 80 00"
+}
+
+skill baby
+{
+	name = "$STR_DADDY"
+	picname = "M_BABY"
+	spawnfilter = 1
+	damagefactor = 0.25
+}
+
+skill easy
+{
+	name = "$STR_HURTME"
+	picname = "M_EASY"
+	spawnfilter = 2
+}
+
+skill normal
+{
+	name = "$STR_BRINGEM"
+	picname = "M_NORMAL"
+	spawnfilter = 3
+}
+
+skill hard
+{
+	name = "$STR_DEATH"
+	picname = "M_HARD"
+	spawnfilter = 4
+}
+
+intermission DemoLoop
+{
+	Fader
+	{
+		Background = TitlePage
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = TitleTime
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	Fader
+	{
+		Background = "CREDITS", 0, "$GamePalette"
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
+	Fader
+	{
+		Background = HighScores
+		Time = 15
+		FadeType = FadeIn
+	}
+	Image
+	{
+		Time = -10
+	}
+	Fader
+	{
+		Time = 15
+		FadeType = FadeOut
+	}
 }
 
 episode "MAP01"

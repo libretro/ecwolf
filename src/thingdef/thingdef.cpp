@@ -91,6 +91,7 @@ const struct FlagDef
 	DEFINE_FLAG(WF, NOGRIN, Weapon, weaponFlags),
 	DEFINE_FLAG(FL, OLDRANDOMCHASE, Actor, flags),
 	DEFINE_FLAG(FL, PICKUP, Actor, flags),
+	DEFINE_FLAG(FL, PLOTONAUTOMAP, Actor, flags),
 	DEFINE_FLAG(FL, RANDOMIZE, Actor, flags),
 	DEFINE_FLAG(FL, RIPPER, Actor, flags),
 	DEFINE_FLAG(FL, REQUIREKEYS, Actor, flags),
@@ -114,19 +115,19 @@ StateLabel::StateLabel(Scanner &sc, const ClassDef *parent, bool noRelative)
 
 const Frame *StateLabel::Resolve() const
 {
-	return *(cls->FindStateInList(label) + offset);
+	return cls->FindStateInList(label) + offset;
 }
 
 const Frame *StateLabel::Resolve(AActor *owner, const Frame *caller, const Frame *def) const
 {
 	if(isRelative)
-		return owner->GetClass()->frameList[caller->index + offset];
+		return caller + offset;
 	else if(isDefault)
 		return def;
 
-	const Frame * const *frame = owner->GetClass()->FindStateInList(label);
+	const Frame *frame = owner->GetClass()->FindStateInList(label);
 	if(frame)
-		return *(frame + offset);
+		return frame + offset;
 	return NULL;
 }
 
@@ -463,7 +464,7 @@ void MetaTable::SetMetaString(uint32_t id, const char* value)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-TMap<int, ClassDef *> ClassDef::classNumTable;
+static TMap<int, ClassDef *> EditorNumberTable, ConversationIDTable;
 SymbolTable ClassDef::globalSymbols;
 bool ClassDef::bShutdown = false;
 
@@ -589,7 +590,7 @@ AActor *ClassDef::CreateInstance() const
 	}
 
 	AActor *newactor = (AActor *) M_Malloc(size);
-	memcpy(newactor, defaultInstance, size);
+	memcpy((void*)newactor, (void*)defaultInstance, size);
 	ConstructNative(this, newactor);
 	newactor->Init();
 	return newactor;
@@ -597,7 +598,7 @@ AActor *ClassDef::CreateInstance() const
 
 const ClassDef *ClassDef::FindClass(unsigned int ednum)
 {
-	ClassDef **ret = classNumTable.CheckKey(ednum);
+	ClassDef **ret = EditorNumberTable.CheckKey(ednum);
 	if(ret == NULL)
 		return NULL;
 	return *ret;
@@ -606,6 +607,14 @@ const ClassDef *ClassDef::FindClass(unsigned int ednum)
 const ClassDef *ClassDef::FindClass(const FName &className)
 {
 	ClassDef **ret = ClassTable().CheckKey(className);
+	if(ret == NULL)
+		return NULL;
+	return *ret;
+}
+
+const ClassDef *ClassDef::FindConversationClass(unsigned int convid)
+{
+	ClassDef **ret = ConversationIDTable.CheckKey(convid);
 	if(ret == NULL)
 		return NULL;
 	return *ret;
@@ -652,11 +661,11 @@ const ActionInfo *ClassDef::FindFunction(const FName &function, int &specialNum)
 
 const Frame *ClassDef::FindState(const FName &stateName) const
 {
-	const Frame * const *ret = FindStateInList(stateName);
-	return ret ? *ret : NULL;
+	const Frame *ret = FindStateInList(stateName);
+	return ret;
 }
 
-const Frame * const *ClassDef::FindStateInList(const FName &stateName) const
+const Frame *ClassDef::FindStateInList(const FName &stateName) const
 {
 	const unsigned int *ret = stateList.CheckKey(stateName);
 	if(ret == NULL)
@@ -728,11 +737,22 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	// We need to resolve gotos after we install the states.
 	TArray<Goto> gotos;
 
+	// Count the number of states we need so that we can allocate the memory
+	// in one go and keep our pointers valid.
+	unsigned int numStates = 0;
+	for(unsigned int iter = 0;iter < stateDefs.Size();++iter)
+	{
+		if(!stateDefs[iter].label.IsEmpty() && stateDefs[iter].sprite[0] == 0)
+			continue;
+		numStates += stateDefs[iter].frames.Len();
+	}
+	frameList.Resize(numStates);
+
 	FString thisLabel;
 	Frame *prevFrame = NULL;
 	Frame *loopPoint = NULL;
-	Frame *thisFrame = NULL;
-	for(unsigned int iter = 0;iter < stateDefs.Size();iter++)
+	Frame *thisFrame = &frameList[0];
+	for(unsigned int iter = 0;iter < stateDefs.Size();++iter)
 	{
 		const StateDefinition &thisStateDef = stateDefs[iter];
 
@@ -745,7 +765,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 					stateList[thisStateDef.label] = INT_MAX;
 					break;
 				case StateDefinition::NORMAL:
-					stateList[thisStateDef.label] = frameList.Size();
+					stateList[thisStateDef.label] = thisFrame - &frameList[0];
 					continue;
 				case StateDefinition::GOTO:
 				{
@@ -763,13 +783,11 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			continue;
 		}
 
-		for(unsigned int i = 0;i < thisStateDef.frames.Len();i++)
+		for(unsigned int i = 0;i < thisStateDef.frames.Len();++i)
 		{
-			thisFrame = new Frame();
-
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
-				stateList[thisStateDef.label] = frameList.Size();
+				stateList[thisStateDef.label] = thisFrame - &frameList[0];
 				loopPoint = thisFrame;
 			}
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
@@ -780,7 +798,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
-			thisFrame->index = frameList.Size();
+			thisFrame->index = thisFrame - &frameList[0];
 			thisFrame->spriteInf = 0;
 			// Only free the action arguments if we are the last frame using them.
 			thisFrame->freeActionArgs = i == thisStateDef.frames.Len()-1;
@@ -807,9 +825,12 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			else
 				prevFrame = NULL;
 			//printf("Adding frame: %s %c %d\n", thisStateDef.sprite, thisFrame->frame, thisFrame->duration);
-			frameList.Push(thisFrame);
+			++thisFrame;
 		}
 	}
+
+	// Safe guard to make sure state counting stays in sync
+	assert(thisFrame == &frameList[frameList.Size()]);
 
 	// Resolve Gotos
 	for(unsigned int iter = 0;iter < gotos.Size();++iter)
@@ -839,18 +860,6 @@ bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 		if(currentParent == parent)
 			return true;
 		currentParent = currentParent->parent;
-	}
-	return false;
-}
-
-bool ClassDef::IsStateOwner(const Frame *frame) const
-{
-	// OK this is really going to be slow way to do things, but this is really
-	// only for the save game code so I guess it's not too bad.
-	for(unsigned int i = 0;i < frameList.Size();++i)
-	{
-		if(frame == frameList[i])
-			return true;
 	}
 	return false;
 }
@@ -920,7 +929,7 @@ void ClassDef::LoadActors()
 
 			cls->ClassIndex = index++;
 			for(unsigned int i = 0;i < cls->frameList.Size();++i)
-				cls->frameList[i]->spriteInf = R_GetSprite(cls->frameList[i]->sprite);
+				cls->frameList[i].spriteInf = R_GetSprite(cls->frameList[i].sprite);
 		}
 	}
 }
@@ -978,9 +987,9 @@ void ClassDef::ParseActor(Scanner &sc)
 
 	if(sc.CheckToken(TK_IntConst))
 	{
-		if(classNumTable.CheckKey(sc->number) != NULL)
-			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, classNumTable[sc->number]->GetName().GetChars());
-		classNumTable[sc->number] = newClass;
+		if(EditorNumberTable.CheckKey(sc->number) != NULL)
+			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
+		EditorNumberTable[sc->number] = newClass;
 	}
 	if(sc.CheckToken(TK_Identifier))
 	{
@@ -1000,7 +1009,7 @@ void ClassDef::ParseActor(Scanner &sc)
 		newClass->size = newClass->parent->size;
 
 		newClass->defaultInstance = (DObject *) M_Malloc(newClass->parent->size);
-		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
+		memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 	}
 	else
 	{
@@ -1011,12 +1020,12 @@ void ClassDef::ParseActor(Scanner &sc)
 
 		// Copy the parents defaults for native classes
 		if(newClass->parent)
-			memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
+			memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 	}
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
 	{
-		memcpy(newClass->defaultInstance, newClass->parent->defaultInstance, newClass->parent->size);
+		memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 		newClass->defaultInstance->Class = newClass;
 		newClass->Meta = newClass->parent->Meta;
 	}
@@ -1181,7 +1190,7 @@ void ClassDef::ParseActor(Scanner &sc)
 										thisState.jumpLabel = StateLabel(sc, newClass, true);
 										thisState.nextType = StateDefinition::GOTO;
 									}
-									else if(sc->str.CompareNoCase("wait") == 0)
+									else if(sc->str.CompareNoCase("wait") == 0 || sc->str.CompareNoCase("fail") == 0)
 									{
 										thisState.nextType = StateDefinition::WAIT;
 									}
@@ -1481,6 +1490,10 @@ void ClassDef::ParseActor(Scanner &sc)
 	qsort(&newClass->symbols[0], newClass->symbols.Size(), sizeof(newClass->symbols[0]), SymbolCompare);
 	if(!actionsSorted)
 		InitFunctionTable(&newClass->actions);
+
+	// Register conversation id into table if assigned
+	if(int convid = newClass->Meta.GetMetaInt(AMETA_ConversationID))
+		ConversationIDTable[convid] = newClass;
 }
 
 void ClassDef::ParseDecorateLump(int lumpNum)
@@ -1560,7 +1573,7 @@ void ClassDef::ParseDecorateLump(int lumpNum)
 	delete[] data;
 }
 
-const Frame * const *ClassDef::ResolveStateIndex(unsigned int index) const
+const Frame *ClassDef::ResolveStateIndex(unsigned int index) const
 {
 	if(index == INT_MAX) // Deleted state (Label: stop)
 		return NULL;
@@ -1748,11 +1761,7 @@ void ClassDef::UnloadActors()
 
 	// Clean up the frames in case any expressions use the symbols
 	for(TMap<FName, ClassDef *>::Iterator iter(ClassTable());iter.NextPair(pair);)
-	{
-		ClassDef *type = pair->Value;
-		for(unsigned int i = 0;i < type->frameList.Size();++i)
-			delete type->frameList[i];
-	}
+			pair->Value->frameList.Clear();
 
 	// Also contains code from ZDoom
 

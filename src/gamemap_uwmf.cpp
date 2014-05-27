@@ -88,6 +88,11 @@ void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 		sc.MustGetToken(TK_BoolConst);
 		tile.sideSolid[MapTile::West] = sc->boolean;
 	}
+	else CheckKey("dontoverlay")
+	{
+		sc.MustGetToken(TK_BoolConst);
+		tile.dontOverlay = sc->boolean;
+	}
 	else CheckKey("soundsequence")
 	{
 		sc.MustGetToken(TK_StringConst);
@@ -112,6 +117,16 @@ void TextMapParser::ParseTile(Scanner &sc, MapTile &tile)
 	{
 		sc.MustGetToken(TK_StringConst);
 		tile.texture[MapTile::East] = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
+	else CheckKey("textureoverhead")
+	{
+		sc.MustGetToken(TK_StringConst);
+		tile.overhead = TexMan.CheckForTexture(sc->str, FTexture::TEX_Wall);
+	}
+	else CheckKey("mapped")
+	{
+		sc.MustGetToken(TK_IntConst);
+		tile.mapped = sc->number;
 	}
 	else CheckKey("offsetvertical")
 	{
@@ -300,7 +315,7 @@ class UWMFParser : public TextMapParser
 						if(!ecwolf12Namespace)
 							sc.ScriptMessage(Scanner::WARNING, "Setting defaultvisibility on Wolf3D namespace not standard, use ECWolf-v12\n");
 						sc.MustGetToken(TK_FloatConst);
-						gLevelVisibility = static_cast<fixed>(sc->decimal*65536.);
+						gLevelVisibility = static_cast<fixed>(sc->decimal*LIGHTVISIBILITY_FACTOR*65536.);
 					}
 					else
 						sc.GetNextToken();
@@ -350,9 +365,19 @@ class UWMFParser : public TextMapParser
 				PMData* pdata = data[i];
 				for(unsigned int j = 0;j < size;++j)
 				{
-					plane.map[j].SetTile(pdata[j].tile < 0 ? NULL : &gm->tilePalette[pdata[j].tile]);
-					plane.map[j].sector = pdata[j].sector < 0 ? NULL : &gm->sectorPalette[pdata[j].sector];
-					plane.map[j].zone = pdata[j].zone < 0 ? NULL : &gm->zonePalette[pdata[j].zone];
+					plane.map[j].SetTile(
+						pdata[j].tile < 0 || (unsigned)pdata[j].tile >= gm->tilePalette.Size()
+						? NULL : &gm->tilePalette[pdata[j].tile]
+					);
+					plane.map[j].sector =
+						pdata[j].sector < 0 || (unsigned)pdata[j].sector >= gm->sectorPalette.Size()
+						? NULL : &gm->sectorPalette[pdata[j].sector];
+					plane.map[j].zone =
+						pdata[j].zone < 0 || (unsigned)pdata[j].zone >= gm->zonePalette.Size()
+						? NULL : &gm->zonePalette[pdata[j].zone];
+
+					if(pdata[j].tag)
+						gm->SetSpotTag(&plane.map[j], pdata[j].tag);
 				}
 			}
 
@@ -384,6 +409,10 @@ class UWMFParser : public TextMapParser
 				pdata[i].sector = MustGetSignedInteger(sc);
 				sc.MustGetToken(',');
 				pdata[i].zone = MustGetSignedInteger(sc);
+				if(sc.CheckToken(','))
+					pdata[i].tag = MustGetSignedInteger(sc);
+				else
+					pdata[i].tag = 0;
 				sc.MustGetToken('}');
 				if(++i != size)
 					sc.MustGetToken(',');
@@ -529,6 +558,7 @@ class UWMFParser : public TextMapParser
 			int tile;
 			int sector;
 			int zone;
+			int tag;
 		};
 
 		GameMap * const gm;

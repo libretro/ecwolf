@@ -137,6 +137,7 @@ FResourceFile *CheckPak(const char *filename, FileReader *file, bool quiet)
 		{
 			FResourceFile *rf = new FPakFile(filename, file);
 			if (rf->Open(quiet)) return rf;
+			rf->Reader = NULL; // to avoid destruction of reader
 			delete rf;
 		}
 	}

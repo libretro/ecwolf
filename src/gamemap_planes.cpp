@@ -32,6 +32,8 @@
 **
 */
 
+#include <climits>
+
 #include "doomerrors.h"
 #include "id_ca.h"
 #include "g_mapinfo.h"
@@ -55,7 +57,11 @@ public:
 	enum
 	{
 		TF_PATHING = 1,
-		TF_HOLOWALL = 2
+		TF_HOLOWALL = 2,
+		TF_AMBUSH = 4,
+
+		TF_ISELEVATOR = 0x40000000,
+		TF_ISTRIGGER = 0x80000000
 	};
 
 	enum EFeatureFlags
@@ -79,9 +85,6 @@ public:
 		}
 
 		unsigned short	oldnum;
-		bool			isTrigger;
-
-
 		unsigned short	newnum;
 		unsigned char	angles;
 		uint32_t		flags;
@@ -279,65 +282,45 @@ public:
 		return false;
 	}
 
-	bool TranslateThing(MapThing &thing, MapTrigger &trigger, bool &isTrigger, uint32_t &flags, unsigned short oldnum) const
+	bool TranslateThing(MapThing &thing, MapTrigger &trigger, uint32_t &flags, unsigned short oldnum) const
 	{
-		bool valid = false;
-		unsigned int type = thingTable.Size()/2;
-		unsigned int max = thingTable.Size()-1;
-		unsigned int min = 0;
-		do
+		unsigned int index = SearchForThing(oldnum, thingTable.Size());
+		if(index == UINT_MAX)
+			return false;
+		const ThingXlat &type = thingTable[index];
+
+		flags = type.flags;
+		if(type.flags & Xlat::TF_ISELEVATOR)
+			return true;
+
+		if(type.flags & Xlat::TF_ISTRIGGER)
 		{
-			if(thingTable[type].oldnum == oldnum ||
-				(thingTable[type].angles && unsigned(oldnum - thingTable[type].oldnum) < thingTable[type].angles))
-			{
-				valid = true;
-				break;
-			}
-
-			if(thingTable[type].oldnum > oldnum)
-				max = type-1;
-			else if(thingTable[type].oldnum < oldnum)
-				min = type+1;
-
-			type = (max+min)/2;
+			trigger = type.templateTrigger;
 		}
-		while(max >= min && max < thingTable.Size());
-
-		if(valid)
+		else
 		{
-			isTrigger = thingTable[type].isTrigger;
-			if(isTrigger)
+			thing.type = type.newnum;
+
+			// The player has a weird rotation pattern. It's 450-angle.
+			bool playerRotation = false;
+			if(thing.type == 1)
+				playerRotation = true;
+
+			if(type.angles)
 			{
-				trigger = thingTable[type].templateTrigger;
+				thing.angle = (oldnum - type.oldnum)*(360/type.angles);
+				if(playerRotation)
+					thing.angle = (360 + 360/type.angles)-thing.angle;
 			}
 			else
-			{
-				flags = thingTable[type].flags;
+				thing.angle = 0;
 
-				thing.type = thingTable[type].newnum;
-
-				// The player has a weird rotation pattern. It's 450-angle.
-				bool playerRotation = false;
-				if(thing.type == 1)
-					playerRotation = true;
-
-				if(thingTable[type].angles)
-				{
-					thing.angle = (oldnum - thingTable[type].oldnum)*(360/thingTable[type].angles);
-					if(playerRotation)
-						thing.angle = (360 + 360/thingTable[type].angles)-thing.angle;
-				}
-				else
-					thing.angle = 0;
-
-				thing.patrol = flags&Xlat::TF_PATHING;
-				thing.skill[0] = thing.skill[1] = thingTable[type].minskill <= 1;
-				thing.skill[2] = thingTable[type].minskill <= 2;
-				thing.skill[3] = thingTable[type].minskill <= 3;
-			}
+			thing.patrol = flags&Xlat::TF_PATHING;
+			thing.skill[0] = thing.skill[1] = type.minskill <= 1;
+			thing.skill[2] = type.minskill <= 2;
+			thing.skill[3] = type.minskill <= 3;
 		}
-
-		return valid;
+		return true;
 	}
 
 	int TranslateZone(unsigned short tile)
@@ -349,6 +332,33 @@ public:
 	}
 
 protected:
+	// Find the index in the thing table corresponding to an old thing number
+	// taking into account the number of angle variants
+	unsigned int SearchForThing(unsigned short oldnum, unsigned int tableSize) const
+	{
+		unsigned int type = tableSize/2;
+		unsigned int max = tableSize-1;
+		unsigned int min = 0;
+		do
+		{
+			ThingXlat &check = thingTable[type];
+			if(check.oldnum == oldnum ||
+				(check.angles && unsigned(oldnum - check.oldnum) < check.angles))
+			{
+				return type;
+			}
+
+			if(check.oldnum > oldnum)
+				max = type-1;
+			else if(check.oldnum < oldnum)
+				min = type+1;
+
+			type = (max+min)/2;
+		}
+		while(max >= min && max < tableSize);
+		return UINT_MAX;
+	}
+
 	void LoadFlatsTable(Scanner &sc)
 	{
 		sc.MustGetToken('{');
@@ -458,6 +468,11 @@ protected:
 
 	void LoadThingTable(Scanner &sc)
 	{
+		// Get the size of existing table so we know what we need to search
+		// for replacements.
+		unsigned int oldTableSize = thingTable.Size();
+		unsigned int replace;
+
 		sc.MustGetToken('{');
 		while(!sc.CheckToken('}'))
 		{
@@ -469,12 +484,20 @@ protected:
 				if(sc->str.CompareNoCase("trigger") == 0)
 				{
 					sc.MustGetToken(TK_IntConst);
-					thing.isTrigger = true;
+					thing.flags = Xlat::TF_ISTRIGGER;
 					thing.angles = 0;
 					thing.oldnum = sc->number;
 
 					sc.MustGetToken('{');
 					TextMapParser::ParseTrigger(sc, thing.templateTrigger);
+				}
+				else if(sc->str.CompareNoCase("elevator") == 0)
+				{
+					sc.MustGetToken(TK_IntConst);
+					thing.flags = Xlat::TF_ISELEVATOR;
+					thing.angles = 0;
+					thing.oldnum = sc->number;
+					sc.MustGetToken(';');
 				}
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown thing table block '%s'.", sc->str.GetChars());
@@ -482,7 +505,6 @@ protected:
 			else
 			{
 				// Handle thing translation
-				thing.isTrigger = false;
 				sc.MustGetToken('{');
 				sc.MustGetToken(TK_IntConst);
 				thing.oldnum = sc->number;
@@ -505,6 +527,8 @@ protected:
 							thing.flags |= TF_PATHING;
 						else if(sc->str.CompareNoCase("HOLOWALL") == 0)
 							thing.flags |= TF_HOLOWALL;
+						else if(sc->str.CompareNoCase("AMBUSH") == 0)
+							thing.flags |= TF_AMBUSH;
 						else
 							sc.ScriptMessage(Scanner::ERROR, "Unknown flag '%s'.", sc->str.GetChars());
 					}
@@ -516,17 +540,42 @@ protected:
 				sc.MustGetToken('}');
 			}
 
-			thingTable.Push(thing);
+			if(oldTableSize &&
+				(replace = SearchForThing(thing.oldnum, oldTableSize)) != UINT_MAX)
+			{
+				ThingXlat &replaced = thingTable[replace];
+				if(replaced.oldnum != thing.oldnum) // Quick check for potential unwanted behavior.
+					sc.ScriptMessage(Scanner::ERROR, "Thing %d partially replaces %d.\n", thing.oldnum, replaced.oldnum);
+				replaced = thing;
+			}
+			else
+				thingTable.Push(thing);
 		}
 
 		qsort(&thingTable[0], thingTable.Size(), sizeof(thingTable[0]), ThingXlat::SortCompare);
+
+		// Sanity check for mod authors: Check for duplicate/overlapping oldnums
+		unsigned int i = thingTable.Size();
+		if(i >= 2)
+		{
+			const ThingXlat *current = &thingTable[--i];
+			unsigned short oldmin = current->oldnum;
+			unsigned short oldmax = oldmin + (current->angles ? current->angles - 1 : 0);
+			do
+			{
+				--current;
+				if(current->oldnum <= oldmax && current->oldnum + current->angles - 1 >= oldmin)
+					sc.ScriptMessage(Scanner::ERROR, "Thing table contains ambiguous overlap for old num %d (%d).\n", oldmin, i);
+				oldmin = current->oldnum;
+				oldmax = oldmin + (current->angles ? current->angles - 1 : 0);
+			}
+			while(--i);
+		}
 	}
 
 private:
 	int lump;
 
-	WORD pushwall;
-	WORD patrolpoint;
 	TArray<ThingXlat> thingTable;
 	TMap<WORD, MapTile> tilePalette;
 	TMap<WORD, MapTrigger> tileTriggers;
@@ -536,6 +585,8 @@ private:
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 	EFeatureFlags FeatureFlags;
 };
+
+static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger);
 
 // Reads old format maps
 void GameMap::ReadPlanesData()
@@ -585,6 +636,7 @@ void GameMap::ReadPlanesData()
 	// tiles plane instead of the objects plane.
 	TArray<WORD> ambushSpots;
 	TArray<MapTrigger> triggers;
+	TMap<WORD, TArray<MapSpot> > elevatorSpots;
 
 	// Read and store the info plane so we can reference it
 	WORD* infoplane = new WORD[size];
@@ -752,7 +804,7 @@ void GameMap::ReadPlanesData()
 						200<<FRACBITS
 					};
 
-					gLevelVisibility = visTable[clamp(oldplane[3] - 0xFC, 0, 15)];
+					gLevelVisibility = visTable[clamp(oldplane[3] - 0xFC, 0, 15)]*LIGHTVISIBILITY_FACTOR;
 					gLevelLight = clamp(oldplane[2] - 0xD8, 0, 7)*8 + 130; // Seems to be approx accurate for every even number lighting (0, 2, 4, 6)
 				}
 				else
@@ -773,7 +825,11 @@ void GameMap::ReadPlanesData()
 				defaultCeiling.SetInvalid();
 				defaultFloor.SetInvalid();
 
-				for(unsigned int i = 0;i < size;++i)
+				unsigned int i = 0;
+				// Using ROTT feature flags invalidates the first four tiles
+				if(xlat.GetFeatureFlags() & Xlat::FF_LIGHTLEVELS)
+					i = 4;
+				for(;i < size;++i)
 				{
 					oldplane[i] = LittleShort(oldplane[i]);
 
@@ -832,20 +888,23 @@ void GameMap::ReadPlanesData()
 
 					Thing thing;
 					Trigger trigger;
-					bool isTrigger;
 					uint32_t flags = 0;
 
-					if(!xlat.TranslateThing(thing, trigger, isTrigger, flags, oldplane[i]))
+					if(!xlat.TranslateThing(thing, trigger, flags, oldplane[i]))
 						printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 					else
 					{
-						if(isTrigger)
+						if(flags & Xlat::TF_ISTRIGGER)
 						{
 							trigger.x = i%header.width;
 							trigger.y = i/header.width;
 							trigger.z = 0;
 
 							triggers.Push(trigger);
+						}
+						else if(flags & Xlat::TF_ISELEVATOR)
+						{
+							elevatorSpots[oldplane[i]].Push(&mapPlane.map[i]);
 						}
 						else
 						{
@@ -868,7 +927,7 @@ void GameMap::ReadPlanesData()
 							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.z = 0;
-							thing.ambush = ambushSpots[ambushSpot] == i;
+							thing.ambush = (flags & Xlat::TF_AMBUSH) || ambushSpots[ambushSpot] == i;
 							things.Push(thing);
 						}
 					}
@@ -953,4 +1012,90 @@ void GameMap::ReadPlanesData()
 			++gamestate.secrettotal;
 	}
 	delete[] infoplane;
+
+	// Install elevators
+	TMap<WORD, TArray<MapSpot> >::ConstIterator iter(elevatorSpots);
+	TMap<WORD, TArray<MapSpot> >::ConstPair *pair;
+	while(iter.NextPair(pair))
+	{
+		const TArray<MapSpot> &locations = pair->Value;
+
+		// Elevators in the same sound zone move faster
+		bool samezone = true;
+		for(unsigned int i = locations.Size();i-- > 1;)
+		{
+			if(locations[i]->zone != locations[0]->zone)
+			{
+				samezone = false;
+				break;
+			}
+		}
+
+		{
+			unsigned int elevTag = 0;
+			unsigned int swtchTag;
+			int *lastNext;
+			for(unsigned int i = 0;i < locations.Size();++i)
+			{
+				MapSpot spot = locations[i];
+
+				// Search for door in adjacent tile
+				int doorside;
+				MapTrigger *trigger = NULL;
+				if((doorside = FindAdjacentDoor(spot, trigger)) != -1)
+				{
+					MapSpot door = spot->GetAdjacent(static_cast<MapTile::Side>(doorside));
+					MapSpot swtch = spot->GetAdjacent(static_cast<MapTile::Side>(doorside), true);
+
+					trigger->action = Specials::Door_Elevator;
+					trigger->arg[0] = (swtch->GetX()<<8)|swtch->GetY();
+					SetSpotTag(swtch, trigger->arg[0]);
+					if(i == 0)
+					{
+						elevTag = trigger->arg[0];
+						elevatorPosition[elevTag] = swtch;
+					}
+
+					Trigger &elevTrigger = NewTrigger(swtch->GetX(), swtch->GetY(), 0);
+					elevTrigger.action = Specials::Elevator_SwitchFloor;
+					elevTrigger.playerUse = true;
+					elevTrigger.repeatable = true;
+					elevTrigger.arg[0] = elevTag;
+					elevTrigger.arg[1] = (door->GetX()<<8)|door->GetY();
+					elevTrigger.arg[2] = samezone ? 140 : 280;
+					if(i == 0)
+						lastNext = &elevTrigger.arg[3];
+					else
+						elevTrigger.arg[3] = swtchTag;
+					SetSpotTag(door, elevTrigger.arg[1]);
+
+					swtchTag = trigger->arg[0];
+				}
+			}
+			*lastNext = swtchTag;
+		}
+	}
+}
+
+static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger)
+{
+	const TArray<MapTrigger> *triggers[4] = {
+		&spot->GetAdjacent(MapTile::East)->triggers,
+		&spot->GetAdjacent(MapTile::North)->triggers,
+		&spot->GetAdjacent(MapTile::West)->triggers,
+		&spot->GetAdjacent(MapTile::South)->triggers
+	};
+
+	for(unsigned int i = 0;i < 4;++i)
+	{
+		for(unsigned int t = triggers[i]->Size();t-- > 0;)
+		{
+			if(triggers[i]->operator[](t).action == Specials::Door_Open)
+			{
+				trigger = &triggers[i]->operator[](t);
+				return i;
+			}
+		}
+	}
+	return -1;
 }

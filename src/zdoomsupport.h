@@ -6,6 +6,8 @@
 #include "m_crc32.h"
 #include "templates.h"
 
+int ParseHex(const char* hex);
+
 // Ensures that a double is a whole number or a half
 static inline bool CheckTicsValid(double tics)
 {
@@ -65,7 +67,6 @@ static void DPrintf(const char* fmt, ...) {}
 #define I_FatalError Quit
 void I_Error(const char* format, ...);
 
-#define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
 #define MulScale16(x,y) (SDWORD((SQWORD(x)*SQWORD(y))>>16))
 
 #if defined(_MSC_VER) || defined(__WATCOMC__)

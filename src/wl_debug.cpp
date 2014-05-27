@@ -140,7 +140,7 @@ static void GiveAllWeaponsAndAmmo()
 		{
 			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, 0);
 			inv->RemoveFromWorld();
-			const Frame * const readyState = cls->FindState("Ready");
+			const Frame * const readyState = cls->FindState(NAME_Ready);
 			if(cls->GetParent() == NATIVE_CLASS(Ammo))
 				inv->amount = inv->maxamount;
 			else if(!readyState || !R_CheckSpriteValid(readyState->spriteInf))
@@ -201,7 +201,7 @@ int DebugKeys (void)
 			if (texID.isValid())
 			{
 				levelInfo->BorderTexture = texID;
-				DrawPlayBorder();
+				StatusBar->RefreshBackground();
 
 				return 0;
 			}
@@ -361,7 +361,13 @@ int DebugKeys (void)
 	else if (Keyboard[sc_O])
 	{
 		am_cheat ^= 1;
-		IN_ClearKeysDown();
+		US_CenterWindow (18,3);
+		if (am_cheat)
+			US_PrintCentered ("Automap revealed");
+		else
+			US_PrintCentered ("Automap hidden");
+		VW_UpdateScreen();
+		IN_Ack ();
 		return 1;
 	}
 	else if(Keyboard[sc_P])         // P = Ripper's picture grabber
@@ -474,10 +480,7 @@ int DebugKeys (void)
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 					return 1;
 
-				AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, 0);
-				inv->RemoveFromWorld();
-				if(!inv->CallTryPickup(players[0].mo))
-					inv->Destroy();
+				players[0].mo->GiveInventory(cls, 0, false);
 			}
 		}
 		return 1;

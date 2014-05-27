@@ -17,6 +17,7 @@
 #include "actor.h"
 #include "id_ca.h"
 #include "gamemap.h"
+#include "g_mapinfo.h"
 #include "lumpremap.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
@@ -1266,8 +1267,12 @@ void R_RenderView()
 
 	DrawPlayerWeapon ();    // draw players[0].mo's hands
 
-	if(Keyboard[sc_Tab] && viewsize == 21)
-		ShowActStatus();
+	if((buttonstate[bt_showstatusbar] || buttonheld[bt_showstatusbar]) && viewsize == 21)
+	{
+		ingame = false;
+		StatusBar->DrawStatusBar();
+		ingame = true;
+	}
 
 	// Always mark the current spot as visible in the automap
 	map->GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->amFlags |= AM_Visible;
@@ -1287,7 +1292,7 @@ void    ThreeDRefresh (void)
 	if(players[0].camera == NULL)
 		players[0].camera = players[0].mo;
 
-	if (fizzlein)
+	if (fizzlein && gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
 		FizzleFadeStart();
 
 //
@@ -1311,7 +1316,10 @@ void    ThreeDRefresh (void)
 //
 	if (fizzlein)
 	{
-		FizzleFade(0, 0, screenWidth, screenHeight, 20, false);
+		if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
+			FizzleFade(0, 0, screenWidth, screenHeight, 20, false);
+		else
+			VL_FadeIn(0, 255, 24);
 		fizzlein = false;
 
 		lasttimecount = GetTimeCount();          // don't make a big tic count

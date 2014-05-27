@@ -35,55 +35,120 @@
 #include "wl_def.h"
 #include "id_ca.h"
 #include "id_in.h"
+#include "id_sd.h"
 #include "id_vh.h"
 #include "g_intermission.h"
 #include "language.h"
+#include "r_sprites.h"
 #include "tarray.h"
+#include "wl_agent.h"
+#include "wl_draw.h"
+#include "wl_game.h"
 #include "wl_inter.h"
 #include "wl_menu.h"
 #include "wl_play.h"
+#include "thingdef/thingdef.h"
 
 static TMap<FName, IntermissionInfo> intermissions;
 
-IntermissionInfo &IntermissionInfo::Find(const FName &name)
+IntermissionInfo *IntermissionInfo::Find(const FName &name)
 {
-	return intermissions[name];
+	return &intermissions[name];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static void WaitIntermission(unsigned int time)
+void StartTravel ();
+void FinishTravel ();
+
+static bool intermissionMapLoaded = false;
+static bool exitOnAck;
+
+static void ClearStatusbar()
+{
+	DrawPlayScreen();
+
+	FTexture *borderTex = TexMan(levelInfo->GetBorderTexture());
+	VWB_DrawFill(borderTex, statusbarx, statusbary2+CleanYfac, screenWidth-statusbarx, screenHeight);
+}
+
+static bool WaitIntermission(unsigned int time)
 {
 	if(time)
 	{
-		IN_UserInput(time);
+		return IN_UserInput(time);
 	}
 	else
 	{
 		IN_ClearKeysDown ();
 		IN_Ack ();
+		return true;
 	}
 }
 
-static void ShowImage(IntermissionAction *image, bool drawonly)
+static bool ShowImage(IntermissionAction *image, bool drawonly)
 {
 	if(!image->Music.IsEmpty())
 		StartCPMusic(image->Music);
 
 	if(!image->Palette.IsEmpty())
-		VL_ReadPalette(image->Palette);
+	{
+		if(image->Palette.CompareNoCase("$GamePalette") == 0)
+			VL_ReadPalette(gameinfo.GamePalette);
+		else
+			VL_ReadPalette(image->Palette);
+	}
 
 	static FTextureID background;
 	static bool tileBackground = false;
-	if(image->Background.isValid())
+	static IntermissionAction::BackgroundType type = IntermissionAction::NORMAL;
+
+	// High Scores and such need special handling
+	if(image->Type != IntermissionAction::UNSET)
+	{
+		type = image->Type;
+	}
+	if(type == IntermissionAction::NORMAL && image->Background.isValid())
 	{
 		background = image->Background;
 		tileBackground = image->BackgroundTile;
 	}
-	if(!tileBackground)
-		CA_CacheScreen(TexMan(background));
-	else
-		VWB_DrawFill(TexMan(background), 0, 0, screenWidth, screenHeight);
+
+	intermissionMapLoaded = false;
+	switch(type)
+	{
+		default:
+			if(!tileBackground)
+				CA_CacheScreen(TexMan(background));
+			else
+				VWB_DrawFill(TexMan(background), 0, 0, screenWidth, screenHeight);
+			break;
+		case IntermissionAction::HIGHSCORES:
+			DrawHighScores();
+			break;
+		case IntermissionAction::TITLEPAGE:
+			background = TexMan.CheckForTexture(gameinfo.TitlePage, FTexture::TEX_Any);
+			if(!gameinfo.TitlePalette.IsEmpty())
+				VL_ReadPalette(gameinfo.TitlePalette);
+			CA_CacheScreen(TexMan(background));
+			break;
+		case IntermissionAction::LOADMAP:
+			if(image->MapName.IsNotEmpty())
+			{
+				strncpy(gamestate.mapname, image->MapName, 8);
+				StartTravel();
+				SetupGameLevel();
+				FinishTravel();
+				// Drop weapon
+				players[0].SetPSprite(NULL, player_t::ps_weapon);
+				PreloadGraphics(true);
+				gamestate.victoryflag = true;
+			}
+			intermissionMapLoaded = true;
+			ThreeDRefresh();
+			ClearStatusbar();
+			break;
+	}
 
 	for(unsigned int i = 0;i < image->Draw.Size();++i)
 	{
@@ -93,8 +158,68 @@ static void ShowImage(IntermissionAction *image, bool drawonly)
 	if(!drawonly)
 	{
 		VW_UpdateScreen();
-		WaitIntermission(image->Time);
+		return WaitIntermission(image->Time);
 	}
+	return false;
+}
+
+
+static void DrawCastName(CastIntermissionAction *cast)
+{
+	int width = BigFont->StringWidth(cast->Name);
+	screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG],
+		(screenWidth - width*CleanXfac)/2, statusbary2 + (screenHeight - statusbary2 - BigFont->GetHeight())/2,
+		cast->Name,
+		DTA_CleanNoMove, true,
+		TAG_DONE
+	);
+}
+static bool R_CastZoomer(const Frame *frame, CastIntermissionAction *cast)
+{
+	// This may appear to animate faster than vanilla, but I'm fairly sure
+	// that's because while the time on screen is adaptive, the frame durations
+	// were decremented by one each frame.
+	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(frame, 224);
+	do
+	{
+		for(unsigned int t = tics;zoomer && t-- > 0;)
+			zoomer->Tick();
+		if(!zoomer)
+			break;
+
+		if(intermissionMapLoaded)
+			ThreeDRefresh();
+		else
+		{
+			// Unlike a 3D view, we will overwrite the whole screen here
+			ShowImage(cast, true);
+			DrawCastName(cast);
+		}
+		zoomer->Draw();
+		VH_UpdateScreen();
+		IN_ProcessEvents();
+		if(Keyboard[sc_Space] || Keyboard[sc_Escape] || Keyboard[sc_Enter])
+		{
+			bool done = Keyboard[sc_Escape] || Keyboard[sc_Enter];
+			Keyboard[sc_Space] = Keyboard[sc_Escape] = Keyboard[sc_Enter] = false;
+			zoomer->Destroy();
+			if(done)
+				return true;
+			break;
+		}
+		CalcTics();
+	}
+	while(true);
+	return false;
+}
+static bool ShowCast(CastIntermissionAction *cast)
+{
+	ClearStatusbar();
+	DrawCastName(cast);
+
+	SD_PlaySound(cast->Class->GetDefault()->seesound);
+	const Frame *frame = cast->Class->FindState(NAME_See);
+	return R_CastZoomer(frame, cast);
 }
 
 static void ShowFader(FaderIntermissionAction *fader)
@@ -112,7 +237,7 @@ static void ShowFader(FaderIntermissionAction *fader)
 	}
 }
 
-static void ShowTextScreen(TextScreenIntermissionAction *textscreen)
+static bool ShowTextScreen(TextScreenIntermissionAction *textscreen, bool demoMode)
 {
 	if(textscreen->TextSpeed)
 		Printf("Warning: Text screen has a non-zero textspeed which isn't supported at this time.\n");
@@ -120,69 +245,89 @@ static void ShowTextScreen(TextScreenIntermissionAction *textscreen)
 	ShowImage(textscreen, true);
 
 	if(textscreen->TextDelay)
-		WaitIntermission(textscreen->TextDelay);
+	{
+		if(WaitIntermission(textscreen->TextDelay) && demoMode)
+			return true;
+	}
 
-	pa = MENU_BOTTOM;
 	py = textscreen->PrintY;
+	px = textscreen->PrintX;
 	for(unsigned int i = 0;i < textscreen->Text.Size();++i)
 	{
-		FString line = textscreen->Text[i];
-		if(line[0] == '$')
-			line = language[line.Mid(1)];
+		FString str = textscreen->Text[i];
+		if(str[0] == '$')
+			str = language[str.Mid(1)];
 
-		word width, height;
-		VW_MeasurePropString(SmallFont, line, width, height);
-
-		switch(textscreen->Alignment)
-		{
-			default:
-				px = textscreen->PrintX;
-				break;
-			case TextScreenIntermissionAction::RIGHT:
-				px = textscreen->PrintX - width;
-				break;
-			case TextScreenIntermissionAction::CENTER:
-				px = textscreen->PrintX - width/2;
-				break;
-		}
-
-		VWB_DrawPropString(SmallFont, line, textscreen->TextColor);
-
-		py += SmallFont->GetHeight();
+		DrawMultiLineText(str, textscreen->TextFont, textscreen->TextColor, textscreen->Alignment, textscreen->Anchor);
 	}
-	pa = MENU_CENTER;
+
+	// This really only makes sense to use if trying to display text immediately.
+	if(textscreen->FadeTime)
+	{
+		VL_FadeIn(0, 255, textscreen->FadeTime);
+	}
 
 	VW_UpdateScreen();
-	WaitIntermission(textscreen->Time);
+	return WaitIntermission(textscreen->Time);
 }
 
-bool ShowIntermission(const IntermissionInfo &intermission)
+bool ShowIntermission(const IntermissionInfo *intermission, bool demoMode)
 {
+	exitOnAck = demoMode;
 	bool gototitle = false;
-	for(unsigned int i = 0;!gototitle && i < intermission.Actions.Size();++i)
+	bool acked = false;
+
+	// For a cast call we want the bar area to display the names
+	if(viewsize > 20)
 	{
-		switch(intermission.Actions[i].type)
-		{
-			default:
-			case IntermissionInfo::IMAGE:
-				ShowImage(intermission.Actions[i].action, false);
-				break;
-			case IntermissionInfo::FADER:
-				ShowFader((FaderIntermissionAction*)intermission.Actions[i].action);
-				break;
-			case IntermissionInfo::GOTOTITLE:
-				gototitle = true;
-				break;
-			case IntermissionInfo::TEXTSCREEN:
-				ShowTextScreen((TextScreenIntermissionAction*)intermission.Actions[i].action);
-				break;
-			case IntermissionInfo::VICTORYSTATS:
-				Victory(true);
-				break;
-		}
+		const int oldviewsize = viewsize;
+		NewViewSize(20);
+		viewsize = oldviewsize;
 	}
 
-	if(!gototitle)
+	do
+	{
+		for(unsigned int i = 0;i < intermission->Actions.Size();++i)
+		{
+			switch(intermission->Actions[i].type)
+			{
+				default:
+				case IntermissionInfo::IMAGE:
+					acked = ShowImage(intermission->Actions[i].action, false);
+					break;
+				case IntermissionInfo::CAST:
+					acked = gototitle = ShowCast((CastIntermissionAction*)intermission->Actions[i].action);
+					break;
+				case IntermissionInfo::FADER:
+					ShowFader((FaderIntermissionAction*)intermission->Actions[i].action);
+					break;
+				case IntermissionInfo::GOTOTITLE:
+					gototitle = true;
+					break;
+				case IntermissionInfo::TEXTSCREEN:
+					acked = ShowTextScreen((TextScreenIntermissionAction*)intermission->Actions[i].action, demoMode);
+					break;
+				case IntermissionInfo::VICTORYSTATS:
+					Victory(true);
+					break;
+			}
+
+			if(demoMode ? acked : gototitle)
+				goto EscSequence;
+		}
+		if(intermission->Link != NAME_None)
+			intermission = IntermissionInfo::Find(intermission->Link);
+		else
+			break;
+	}
+	while(intermission);
+EscSequence:
+
+	// If we changed the view size, we should reset it now.
+	if(viewsize > 20)
+		NewViewSize(viewsize);
+
+	if(!gototitle && !demoMode)
 	{
 		// Hold at the final page until esc is pressed
 		IN_ClearKeysDown();
@@ -196,6 +341,20 @@ bool ShowIntermission(const IntermissionInfo &intermission)
 		while(LastScan != sc_Escape && LastScan != sc_Enter && !ci.button1);
 	}
 
-	VL_ReadPalette(gameinfo.GamePalette);
-	return !gototitle;
+	if(demoMode)
+	{
+		if(acked)
+		{
+			VW_FadeOut();
+			VL_ReadPalette(gameinfo.GamePalette);
+			return false;
+		}
+		else
+			return true;
+	}
+	else
+	{
+		VL_ReadPalette(gameinfo.GamePalette);
+		return !gototitle;
+	}
 }

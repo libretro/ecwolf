@@ -33,6 +33,7 @@
 */
 
 #include "a_inventory.h"
+#include "g_conversation.h"
 #include "id_sd.h"
 #include "templates.h"
 #include "thinker.h"
@@ -111,7 +112,7 @@ void AInventory::GoAwayAndDie()
 // this actor is safe to be placed in an inventory.
 bool AInventory::GoAway()
 {
-	const Frame *hide = FindState("Hide");
+	const Frame *hide = FindState(NAME_Hide);
 	if(hide && IsThinking()) // Only hide actors that are thinking
 	{
 		itemFlags |= IF_INACTIVE;
@@ -223,12 +224,9 @@ IMPLEMENT_CLASS(Health)
 
 bool AHealth::TryPickup(AActor *toucher)
 {
-	//if(!Super::TryPickup(toucher))
-	//	return false;
-
 	int max = maxamount;
 	if(max == 0)
-		max = toucher->health;
+		max = toucher->player->mo->maxhealth;
 
 	if(toucher->player->health >= max)
 		return false;
@@ -237,6 +235,8 @@ bool AHealth::TryPickup(AActor *toucher)
 		toucher->player->health += amount;
 		if(toucher->player->health > max)
 			toucher->player->health = max;
+		toucher->health = toucher->player->health;
+		StatusBar->UpdateFace(toucher->health);
 		Destroy();
 	}
 	return true;
@@ -299,6 +299,22 @@ bool AAmmo::HandlePickup(AInventory *item, bool &good)
 
 IMPLEMENT_CLASS(BackpackItem)
 
+void ABackpackItem::BoostAmmo(AAmmo *ammo)
+{
+	if(ammo->Backpackboostamount)
+	{
+		ammo->maxamount += ammo->Backpackboostamount;
+		if(ammo->maxamount > ammo->Backpackmaxamount)
+			ammo->maxamount = ammo->Backpackmaxamount;
+	}
+	else
+		ammo->maxamount = ammo->Backpackmaxamount;
+
+	ammo->amount += ammo->Backpackamount;
+	if(ammo->amount > ammo->maxamount)
+		ammo->amount = ammo->maxamount;
+}
+
 bool ABackpackItem::HandlePickup(AInventory *item, bool &good)
 {
 	if(item->IsA(NATIVE_CLASS(BackpackItem)))
@@ -309,11 +325,7 @@ bool ABackpackItem::HandlePickup(AInventory *item, bool &good)
 			if(item->GetClass()->GetParent() == NATIVE_CLASS(Ammo))
 			{
 				AAmmo *ammo = static_cast<AAmmo*>(item);
-				if(ammo->maxamount < ammo->Backpackmaxamount)
-					ammo->maxamount = ammo->Backpackmaxamount;
-				ammo->amount += ammo->Backpackamount;
-				if(ammo->amount > ammo->maxamount)
-					ammo->amount = ammo->maxamount;
+				BoostAmmo(ammo);
 			}
 		}
 		good = true;
@@ -339,22 +351,14 @@ AInventory *ABackpackItem::CreateCopy(AActor *holder)
 			if(ammo)
 			{
 				// Increase amount and give ammo
-				if(ammo->maxamount < ammo->Backpackmaxamount)
-					ammo->maxamount = ammo->Backpackmaxamount;
-
-				ammo->amount += ammo->Backpackamount;
-				if(ammo->amount > ammo->maxamount)
-					ammo->amount = ammo->maxamount;
+				BoostAmmo(ammo);
 			}
 			else
 			{
 				// Give the ammo type with the proper amounts
 				ammo = static_cast<AAmmo *>(AActor::Spawn(cls, 0, 0, 0, 0));
-				ammo->amount = ammo->Backpackamount;
-				if(ammo->maxamount < ammo->Backpackmaxamount)
-					ammo->maxamount = ammo->Backpackmaxamount;
-				if(ammo->amount > ammo->maxamount)
-					ammo->amount = ammo->maxamount;
+				ammo->amount = 0;
+				BoostAmmo(ammo);
 
 				ammo->RemoveFromWorld();
 				if(!ammo->CallTryPickup(holder))
@@ -369,27 +373,82 @@ AInventory *ABackpackItem::CreateCopy(AActor *holder)
 
 IMPLEMENT_CLASS(CustomInventory)
 
+ACTION_FUNCTION(A_Succeed)
+{
+	// At the time of writing we don't really have a good action function to
+	// call to ensure that a Pickup state succeeds. So we'll make a no op.
+	return true;
+}
+
+ACTION_FUNCTION(A_WeaponGrin)
+{
+	StatusBar->WeaponGrin();
+	return true;
+}
+
 bool ACustomInventory::TryPickup(AActor *toucher)
 {
-	const Frame *pickup = FindState("Pickup");
-	ExecuteState(toucher, pickup);
+	const Frame *pickup = FindState(NAME_Pickup);
+	if(!ExecuteState(toucher, pickup))
+		return false;
 	return Super::TryPickup(toucher);
 }
 
 bool ACustomInventory::ExecuteState(AActor *context, const Frame *frame)
 {
+	bool success = false;
+	ActionResult result;
+	memset(&result, 0, sizeof(ActionResult));
+
 	while(frame)
 	{
 		// Execute both functions since why not.
-		frame->action(context, this, frame);
-		frame->thinker(context, this, frame);
+		success |= frame->action(context, this, frame, &result);
+		if(result.JumpFrame)
+		{
+			frame = result.JumpFrame;
+			result.JumpFrame = NULL;
+			continue;
+		}
+		success |= frame->thinker(context, this, frame, &result);
+		if(result.JumpFrame)
+		{
+			frame = result.JumpFrame;
+			result.JumpFrame = NULL;
+			continue;
+		}
 
 		if(frame == frame->next)
+		{
+			// Fail if we stay on the same state
+			success = false;
 			break;
+		}
 		frame = frame->next;
 	}
-	return true;
+	return success;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+// Opens a dialog when picked up, but otherwise behaves like a CustomInventory.
+class AQuizItem : public ACustomInventory
+{
+	DECLARE_NATIVE_CLASS(QuizItem, CustomInventory)
+
+public:
+	bool TryPickup(AActor *toucher)
+	{
+		if(Super::TryPickup(toucher))
+		{
+			Dialog::StartConversation(this);
+			return true;
+		}
+		return false;
+	}
+};
+
+IMPLEMENT_CLASS(QuizItem)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -555,7 +614,7 @@ void AWeapon::Serialize(FArchive &arc)
 		<< yadjust
 		<< ammo[0];
 
-	if(GameSave::SaveVersion > 1374729160)
+	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374729160)
 		arc << ammotype[1] << ammogive[1] << ammouse[1] << ammo[1]
 			<< fovscale;
 
@@ -587,10 +646,10 @@ ACTION_FUNCTION(A_ReFire)
 {
 	player_t *player = self->player;
 	if(!player)
-		return;
+		return false;
 
 	if(!player->ReadyWeapon->CheckAmmo(player->ReadyWeapon->mode, true))
-		return;
+		return false;
 
 	if(player->PendingWeapon == WP_NOCHANGE || !(player->flags & player_t::PF_REFIRESWITCHOK))
 	{
@@ -599,6 +658,7 @@ ACTION_FUNCTION(A_ReFire)
 		else if(player->ReadyWeapon->mode == AWeapon::AltFire && buttonstate[bt_altattack])
 			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::AltFire, true), player_t::ps_weapon);
 	}
+	return true;
 }
 
 ACTION_FUNCTION(A_WeaponReady)
@@ -627,6 +687,7 @@ ACTION_FUNCTION(A_WeaponReady)
 
 	if((flags & WRF_ALLOWRELOAD)) self->player->flags |= player_t::PF_WEAPONRELOADOK;
 	if((flags & WRF_ALLOWZOOM)) self->player->flags |= player_t::PF_WEAPONZOOMOK;
+	return true;
 }
 
 
@@ -754,3 +815,19 @@ class AExtraLifeItem : public AInventory
 		}
 };
 IMPLEMENT_CLASS(ExtraLifeItem)
+
+////////////////////////////////////////////////////////////////////////////////
+
+class AMapRevealer : public AInventory
+{
+	DECLARE_NATIVE_CLASS(MapRevealer, Inventory)
+
+	protected:
+		bool TryPickup(AActor *toucher)
+		{
+			gamestate.fullmap = true;
+			GoAwayAndDie();
+			return true;
+		}
+};
+IMPLEMENT_CLASS(MapRevealer)

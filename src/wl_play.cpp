@@ -92,8 +92,22 @@ ControlScheme controlScheme[] =
 	{ bt_reload,			"Reload",		-1,			-1,				-1, NULL, 0 },
 	{ bt_zoom,				"Zoom",			-1,			-1,				-1, NULL, 0 },
 	{ bt_automap,			"Automap",		-1,			-1,				-1, NULL, 0 },
+	{ bt_showstatusbar,		"Show Status",	-1,			sc_Tab,			-1,	NULL, 0 },
 
 	// End of List
+	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
+};
+ControlScheme &schemeAutomapKey = controlScheme[25]; // When the input system is redone, hopefully we don't need this kind of thing
+
+ControlScheme amControlScheme[] =
+{
+	{ bt_zoomin,			"Zoom In",		-1,			sc_Equals,		-1, NULL, 0 },
+	{ bt_zoomout,			"Zoom Out",		-1,			sc_Minus,		-1, NULL, 0 },
+	{ bt_panup,				"Pan Up",		-1,			sc_UpArrow,		-1, NULL, 0 },
+	{ bt_pandown,			"Pan Down",		-1,			sc_DownArrow,	-1, NULL, 0 },
+	{ bt_panleft,			"Pan Left",		-1,			sc_LeftArrow,	-1, NULL, 0 },
+	{ bt_panright,			"Pan Right",	-1,			sc_RightArrow,	-1, NULL, 0 },
+
 	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
 };
 
@@ -135,7 +149,7 @@ bool mouseenabled, mouseyaxisdisabled, joystickenabled;
 
 int viewsize;
 
-bool buttonheld[NUMBUTTONS];
+bool buttonheld[NUMBUTTONS], ambuttonheld[NUMAMBUTTONS];
 
 bool demorecord, demoplayback;
 int8_t *demoptr, *lastdemoptr;
@@ -145,7 +159,7 @@ memptr demobuffer;
 // current user input
 //
 int controlx, controly, controlstrafe;         // range from -100 to 100 per tic
-bool buttonstate[NUMBUTTONS];
+bool buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
 
 int lastgamemusicoffset = 0;
 
@@ -177,10 +191,33 @@ void PlayLoop (void);
 
 void PollKeyboardButtons (void)
 {
-	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	if(automap == AMA_Normal)
 	{
-		if(controlScheme[i].keyboard != -1 && Keyboard[controlScheme[i].keyboard])
-			buttonstate[controlScheme[i].button] = true;
+		// HACK
+		bool jam[512] = {false};
+		bool jamall = !!(Paused & 2); // Paused for automap
+
+		for(int i = 0;jamall ? amControlScheme[i].button != bt_nobutton : amControlScheme[i].button <= bt_zoomout;i++)
+		{
+			if(amControlScheme[i].keyboard != -1 && Keyboard[amControlScheme[i].keyboard])
+			{
+				ambuttonstate[amControlScheme[i].button] = true;
+				jam[amControlScheme[i].keyboard] = true;
+			}
+		}
+		for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+		{
+			if(controlScheme[i].keyboard != -1 && Keyboard[controlScheme[i].keyboard] && !jam[controlScheme[i].keyboard])
+				buttonstate[controlScheme[i].button] = true;
+		}
+	}
+	else
+	{
+		for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+		{
+			if(controlScheme[i].keyboard != -1 && Keyboard[controlScheme[i].keyboard])
+				buttonstate[controlScheme[i].button] = true;
+		}
 	}
 }
 
@@ -276,20 +313,20 @@ void PollMouseMove (void)
 	mousexmove -= screenWidth / 2;
 	mouseymove -= screenHeight / 2;
 
-	controlx += mousexmove * 20 / (21 - mouseadjustment);
-	if(!mouseyaxisdisabled)
-		controly += mouseymove * 40 / (21 - mouseadjustment);
-	else if(mouselook)
+	controlx += mousexmove * 20 / (21 - mousexadjustment);
+	if(mouselook)
 	{
 		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
-			mouseymove = mouseymove*fabs(players[0].ReadyWeapon->fovscale);
+			mouseymove = xs_ToInt(mouseymove*fabs(players[0].ReadyWeapon->fovscale));
 
-		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseadjustment));
+		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseyadjustment));
 		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
 			players[0].mo->pitch = 56*ANGLE_1;
 		else if(players[0].mo->pitch+ANGLE_180 < ANGLE_180-56*ANGLE_1)
 			players[0].mo->pitch = ANGLE_NEG(56*ANGLE_1);
 	}
+	else if(!mouseyaxisdisabled)
+		controly += mouseymove * 40 / (21 - mouseyadjustment);
 }
 
 
@@ -310,7 +347,7 @@ void PollJoystickMove (void)
 			// Scale to -100 - 100
 			const int axis = (((IN_GetJoyAxis((controlScheme[i].joystick-32)>>1))+1)*100)>>15;
 			if((controlScheme[i].joystick&1) ^ (axis < 0))
-				*controlScheme[i].axis += controlScheme[i].negative ? -ABS(axis) : ABS(axis);
+				*controlScheme[i].axis += controlScheme[i].negative ? -abs(axis) : abs(axis);
 		}
 	}
 }
@@ -342,6 +379,11 @@ void PollControls (bool absolutes)
 	controlstrafe = 0;
 	memcpy (buttonheld, buttonstate, sizeof (buttonstate));
 	memset (buttonstate, 0, sizeof (buttonstate));
+	if (automap)
+	{
+		memcpy (ambuttonheld, ambuttonstate, sizeof (ambuttonstate));
+		memset (ambuttonstate, 0, sizeof (ambuttonstate));
+	}
 
 	if (demoplayback)
 	{
@@ -409,6 +451,16 @@ void PollControls (bool absolutes)
 		if (demoptr >= lastdemoptr - 8)
 			playstate = ex_completed;
 	}
+
+	// Check automap toggle before we set any buttons as held
+	if (buttonstate[bt_automap] && !buttonheld[bt_automap])
+	{
+		AM_Toggle();
+	}
+	if (automap)
+	{
+		AM_CheckKeys();
+	}
 }
 
 // This should be called once per frame
@@ -475,17 +527,7 @@ void CheckKeys (void)
 	scan = LastScan;
 
 	// [BL] Allow changing the screen size with the -/= keys a la Doom.
-	if(automap)
-	{
-		if(Keyboard[sc_Equals] ^ Keyboard[sc_Minus])
-		{
-			if(Keyboard[sc_Equals])
-				AM_Main.SetScale(FRACUNIT*1.05, true);
-			else
-				AM_Main.SetScale(FRACUNIT*0.95, true);
-		}
-	}
-	else if(changeSize)
+	if(automap != AMA_Normal && changeSize)
 	{
 		if(Keyboard[sc_Equals] && !Keyboard[sc_Minus])
 			NewViewSize(viewsize+1);
@@ -539,14 +581,14 @@ void CheckKeys (void)
 		IN_Ack ();
 
 		if (viewsize < 18)
-			DrawPlayBorder ();
+			StatusBar->RefreshBackground ();
 	}
 
 //
 // pause key weirdness can't be checked as a scan code
 //
-	if(buttonstate[bt_pause]) Paused = true;
-	if(Paused)
+	if(buttonstate[bt_pause]) Paused |= 1;
+	if(Paused & 1)
 	{
 		int lastoffs = StopMusic();
 		IN_ReleaseMouse();
@@ -554,7 +596,7 @@ void CheckKeys (void)
 		VH_UpdateScreen();
 		IN_Ack ();
 		IN_GrabMouse();
-		Paused = false;
+		Paused &= ~1;
 		ContinueMusic(lastoffs);
 		if (MousePresent && IN_IsInputGrabbed())
 			IN_CenterMouse();     // Clear accumulated mouse movement
@@ -618,16 +660,27 @@ void CheckKeys (void)
 //
 // TAB-? debug keys
 //
-	if ((Keyboard[sc_Tab] || Keyboard[sc_BackSpace] || Keyboard[sc_Grave]) && DebugOk)
+	if (DebugOk)
 	{
-		if (DebugKeys () && viewsize < 20)
-			DrawPlayBorder ();       // dont let the blue borders flash
+		// Jam debug sequence if we're trying to open the automap
+		// We really only need to check for the automap control since it's
+		// likely to be put in the Tab space and be tapped while using other controls
+		bool keyDown = Keyboard[sc_Tab] || Keyboard[sc_BackSpace] || Keyboard[sc_Grave];
+		if ((schemeAutomapKey.keyboard == sc_Tab || schemeAutomapKey.keyboard == sc_BackSpace || schemeAutomapKey.keyboard == sc_Grave)
+			&& (buttonstate[bt_automap] || buttonheld[bt_automap]))
+			keyDown = false;
 
-		if (MousePresent && IN_IsInputGrabbed())
-			IN_CenterMouse();     // Clear accumulated mouse movement
+		if (keyDown)
+		{
+			if (DebugKeys () && viewsize < 20)
+				StatusBar->RefreshBackground ();       // dont let the blue borders flash
 
-		lasttimecount = GetTimeCount();
-		return;
+			if (MousePresent && IN_IsInputGrabbed())
+				IN_CenterMouse();     // Clear accumulated mouse movement
+
+			lasttimecount = GetTimeCount();
+			return;
+		}
 	}
 }
 
@@ -865,32 +918,34 @@ void PlayLoop (void)
 	{
 		ProcessEvents();
 
-		// Check automap toggle before we set any buttons as held
-		if (buttonstate[bt_automap] && !buttonheld[bt_automap])
-		{
-			automap ^= 1;
-		}
-
 //
 // actor thinking
 //
 		madenoise = false;
 
 		// Run tics
-		for (unsigned int i = 0;i < tics;++i)
+		if(Paused & 2)
 		{
-			PollControls(!i);
+			// If paused due to the automap, continue polling controls but don't tick anything.
+			PollControls(0);
+		}
+		else
+		{
+			for (unsigned int i = 0;i < tics;++i)
+			{
+				PollControls(!i);
 
-			++gamestate.TimeCount;
-			thinkerList->Tick();
-			AActor::FinishSpawningActors();
+				++gamestate.TimeCount;
+				thinkerList->Tick();
+				AActor::FinishSpawningActors();
+			}
 		}
 
 		UpdatePaletteShifts ();
 
 		ThreeDRefresh ();
 
-		if(automap)
+		if(automap && !gamestate.victoryflag)
 			BasicOverhead();
 
 		//

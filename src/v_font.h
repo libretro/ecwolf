@@ -37,10 +37,10 @@
 #include "wl_def.h"
 #include "v_palette.h"
 #include "name.h"
+#include "textures/textures.h"
 
 class DCanvas;
 struct FRemapTable;
-class FTexture;
 class FArchive;
 
 enum EColorRange
@@ -74,6 +74,15 @@ enum EColorRange
 
 extern int NumTextColors;
 
+// [BL] Allow tracing font characters back to their font
+#define FONT_CHAR_NAME ":FONT:"
+class FFontTexture : public FTexture
+{
+public:
+	FFontTexture() : SourceFont(NULL) {}
+
+	class FFont *SourceFont;
+};
 
 class FFont
 {
@@ -82,12 +91,14 @@ public:
 	virtual ~FFont ();
 
 	virtual FTexture *GetChar (int code, int *const width) const;
+	virtual FTextureID GetCharID (int code) const;
 	virtual int GetCharWidth (int code) const;
 	FRemapTable *GetColorTranslation (EColorRange range) const;
 	int GetLump() const { return Lump; }
 	int GetSpaceWidth () const { return SpaceWidth; }
 	int GetHeight () const { return FontHeight; }
 	int GetDefaultKerning () const { return GlobalKerning; }
+	const char* GetName() const { return Name; }
 	virtual void LoadTranslations();
 	void Preload() const;
 
@@ -120,6 +131,7 @@ protected:
 	struct CharData
 	{
 		FTexture *Pic;
+		FTextureID ID;
 		int XMove;
 	} *Chars;
 	int ActiveColors;

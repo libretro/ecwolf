@@ -51,6 +51,16 @@
 void T_ExplodeProjectile(AActor *self, AActor *target);
 void T_Projectile(AActor *self);
 
+// Old save compatibility
+void AActorProxy::Serialize(FArchive &arc)
+{
+	Super::Serialize(arc);
+
+	bool enabled;
+	arc << enabled << actualObject;
+}
+IMPLEMENT_INTERNAL_CLASS(AActorProxy)
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Frame::~Frame()
@@ -75,13 +85,14 @@ int Frame::GetTics() const
 	return duration;
 }
 
-void Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const
+bool Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller, ActionResult *result) const
 {
 	if(pointer)
 	{
 		args->Evaluate(self);
-		pointer(self, stateOwner, caller, *args);
+		return pointer(self, stateOwner, caller, *args, result);
 	}
+	return false;
 }
 
 FArchive &operator<< (FArchive &arc, const Frame *&frame)
@@ -160,6 +171,17 @@ void AActor::AddInventory(AInventory *item)
 		}
 		while((next = next->inventory));
 	}
+}
+
+void AActor::ClearCounters()
+{
+	if(flags & FL_COUNTITEM)
+		--gamestate.treasuretotal;
+	if((flags & FL_COUNTKILL) && health > 0)
+		--gamestate.killtotal;
+	if(flags & FL_COUNTSECRET)
+		--gamestate.secrettotal;
+	flags &= ~(FL_COUNTITEM|FL_COUNTKILL|FL_COUNTSECRET);
 }
 
 void AActor::Destroy()
@@ -308,6 +330,28 @@ const AActor *AActor::GetDefault() const
 	return GetClass()->GetDefault();
 }
 
+bool AActor::GiveInventory(const ClassDef *cls, int amount, bool allowreplacement)
+{
+	AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, allowreplacement ? SPAWN_AllowReplacement : 0);
+
+	if(amount)
+	{
+		if(inv->IsKindOf(NATIVE_CLASS(Health)))
+			inv->amount *= amount;
+		else
+			inv->amount = amount;
+	}
+
+	inv->ClearCounters();
+	inv->RemoveFromWorld();
+	if(!inv->CallTryPickup(this))
+	{
+		inv->Destroy();
+		return false;
+	}
+	return true;
+}
+
 void AActor::Init()
 {
 	ObjectFlags |= OF_JustSpawned;
@@ -361,8 +405,10 @@ void AActor::Serialize(FArchive &arc)
 		<< viewx
 		<< viewheight
 		<< transx
-		<< transy
-		<< sighttime
+		<< transy;
+	if(GameSave::SaveVersion >= 1393719642)
+		arc << overheadIcon;
+	arc << sighttime
 		<< sightrandom
 		<< minmissilechance
 		<< painchance
@@ -378,10 +424,15 @@ void AActor::Serialize(FArchive &arc)
 		<< hidden
 		<< player
 		<< inventory
-		<< soundZone
-		<< hasActorRef;
+		<< soundZone;
+	if(arc.IsLoading() && (GameSave::SaveProdVersion < 0x001002FF || GameSave::SaveVersion < 1382102747))
+	{
+		TObjPtr<AActorProxy> proxy;
+		arc << proxy;
+	}
+	arc << hasActorRef;
 
-	if(GameSave::SaveVersion > 1374914454)
+	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374914454)
 		arc << projectilepassheight;
 
 	if(!arc.IsStoring())
@@ -528,7 +579,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags
 	actor->y = y;
 	actor->velx = 0;
 	actor->vely = 0;
-	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty, actor->health);
+	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty->SpawnFilter, actor->health);
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);

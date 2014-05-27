@@ -98,7 +98,8 @@ void ReadConfig(void)
 	config.CreateSetting("MouseEnabled", 1);
 	config.CreateSetting("JoystickEnabled", 0);
 	config.CreateSetting("ViewSize", 19);
-	config.CreateSetting("MouseAdjustment", 5);
+	config.CreateSetting("MouseXAdjustment", 5);
+	config.CreateSetting("MouseYAdjustment", 5);
 	config.CreateSetting("SoundDevice", sdm_AdLib);
 	config.CreateSetting("MusicDevice", smm_AdLib);
 	config.CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
@@ -114,10 +115,13 @@ void ReadConfig(void)
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
 	config.CreateSetting("Gamma", 1.0f);
-	config.CreateSetting("AM_Rotate", false);
-	config.CreateSetting("AM_DrawTexturedWalls", false);
+	config.CreateSetting("AM_Rotate", 0);
+	config.CreateSetting("AM_DrawTexturedWalls", true);
 	config.CreateSetting("AM_DrawFloors", false);
-	config.CreateSetting("AM_DrawBackground", true);
+	config.CreateSetting("AM_Overlay", 0);
+	config.CreateSetting("AM_OverlayTextured", false);
+	config.CreateSetting("AM_Pause", true);
+	config.CreateSetting("AM_ShowRatios", false);
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
@@ -147,7 +151,8 @@ void ReadConfig(void)
 		controlScheme[i].mouse = config.GetSetting(mseSettingName)->GetInteger();
 	}
 	viewsize = config.GetSetting("ViewSize")->GetInteger();
-	mouseadjustment = config.GetSetting("MouseAdjustment")->GetInteger();
+	mousexadjustment = config.GetSetting("MouseXAdjustment")->GetInteger();
+	mouseyadjustment = config.GetSetting("MouseYAdjustment")->GetInteger();
 	mouseyaxisdisabled = config.GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
 	alwaysrun = config.GetSetting("AlwaysRun")->GetInteger() != 0;
 	AdlibVolume = config.GetSetting("SoundVolume")->GetInteger();
@@ -160,11 +165,14 @@ void ReadConfig(void)
 	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
-	screenGamma = config.GetSetting("Gamma")->GetFloat();
-	am_rotate = config.GetSetting("AM_Rotate")->GetInteger() != 0;
+	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());
+	am_rotate = config.GetSetting("AM_Rotate")->GetInteger();
 	am_drawtexturedwalls = config.GetSetting("AM_DrawTexturedWalls")->GetInteger() != 0;
 	am_drawfloors = config.GetSetting("AM_DrawFloors")->GetInteger() != 0;
-	am_drawbackground = config.GetSetting("AM_DrawBackground")->GetInteger() != 0;
+	am_overlay = config.GetSetting("AM_Overlay")->GetInteger();
+	am_overlaytextured = config.GetSetting("AM_OverlayTextured")->GetInteger() != 0;
+	am_pause = config.GetSetting("AM_Pause")->GetInteger() != 0;
+	am_showratios = config.GetSetting("AM_ShowRatios")->GetInteger() != 0;
 
 	char hsName[50];
 	char hsScore[50];
@@ -184,7 +192,10 @@ void ReadConfig(void)
 
 		strcpy(Scores[i].name, config.GetSetting(hsName)->GetString());
 		Scores[i].score = config.GetSetting(hsScore)->GetInteger();
-		Scores[i].completed = config.GetSetting(hsCompleted)->GetInteger();
+		if(config.GetSetting(hsCompleted)->GetType() == SettingsData::ST_STR)
+			Scores[i].completed = config.GetSetting(hsCompleted)->GetString();
+		else
+			Scores[i].completed.Format("%d", config.GetSetting(hsCompleted)->GetInteger());
 		strncpy(Scores[i].graphic, config.GetSetting(hsGraphic)->GetString(), 8);
 		Scores[i].graphic[8] = 0;
 	}
@@ -194,8 +205,11 @@ void ReadConfig(void)
 	if(mouseenabled) mouseenabled=true;
 	if(joystickenabled) joystickenabled=true;
 
-	if(mouseadjustment<0) mouseadjustment=0;
-	else if(mouseadjustment>20) mouseadjustment=20;
+	if(mousexadjustment<0) mousexadjustment=0;
+	else if(mousexadjustment>20) mousexadjustment=20;
+
+	if(mouseyadjustment<0) mouseyadjustment=0;
+	else if(mouseyadjustment>20) mouseyadjustment=20;
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
@@ -239,7 +253,8 @@ void WriteConfig(void)
 		config.GetSetting(mseSettingName)->SetValue(controlScheme[i].mouse);
 	}
 	config.GetSetting("ViewSize")->SetValue(viewsize);
-	config.GetSetting("MouseAdjustment")->SetValue(mouseadjustment);
+	config.GetSetting("MouseXAdjustment")->SetValue(mousexadjustment);
+	config.GetSetting("MouseYAdjustment")->SetValue(mouseyadjustment);
 	config.GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
 	config.GetSetting("AlwaysRun")->SetValue(alwaysrun);
 	config.GetSetting("SoundDevice")->SetValue(SoundMode);
@@ -258,7 +273,10 @@ void WriteConfig(void)
 	config.GetSetting("AM_Rotate")->SetValue(am_rotate);
 	config.GetSetting("AM_DrawTexturedWalls")->SetValue(am_drawtexturedwalls);
 	config.GetSetting("AM_DrawFloors")->SetValue(am_drawfloors);
-	config.GetSetting("AM_DrawBackground")->SetValue(am_drawbackground);
+	config.GetSetting("AM_Overlay")->SetValue(am_overlay);
+	config.GetSetting("AM_OverlayTextured")->SetValue(am_overlaytextured);
+	config.GetSetting("AM_Pause")->SetValue(am_pause);
+	config.GetSetting("AM_ShowRatios")->SetValue(am_showratios);
 
 	char hsName[50];
 	char hsScore[50];

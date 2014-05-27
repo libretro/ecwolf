@@ -49,13 +49,16 @@ enum
 static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 
 // Class to convert the IWAD data into a form that Cocoa can use.
-@interface IWADTableData : NSObject// <NSTableViewDataSource>
+@interface IWADTableData : NSObject
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
+	<NSTableViewDataSource>
+#endif
 {
 	NSMutableArray *data;
 }
 
 - (void)dealloc;
-- (IWADTableData *)init:(WadStuff *) wads:(int) numwads;
+- (IWADTableData *)init:(WadStuff *) wads num:(int) numwads;
 
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
@@ -70,7 +73,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 	[super dealloc];
 }
 
-- (IWADTableData *)init:(WadStuff *) wads:(int) numwads
+- (IWADTableData *)init:(WadStuff *) wads num:(int) numwads
 {
 	data = [[NSMutableArray alloc] initWithCapacity:numwads];
 
@@ -123,13 +126,13 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 
 - (void)buttonPressed:(id) sender;
 - (void)doubleClicked:(id) sender;
-- (void)makeLabel:(NSTextField *)label:(const char*) str;
-- (int)pickIWad:(WadStuff *)wads:(int) numwads:(bool) showwin:(int) defaultiwad;
+- (void)makeLabel:(NSTextField *)label withString:(const char*) str;
+- (int)pickIWad:(WadStuff *)wads num:(int) numwads showWindow:(bool) showwin defaultWad:(int) defaultiwad;
 @end
 
 @implementation IWADPicker
 
-- (void)buttonPressed:(id) sender;
+- (void)buttonPressed:(id) sender
 {
 	if(sender == cancelButton)
 		cancelled = true;
@@ -138,7 +141,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 	[app stopModal];
 }
 
-- (void)doubleClicked:(id) sender;
+- (void)doubleClicked:(id) sender
 {
 	if ([sender clickedRow] >= 0)
 	{
@@ -149,7 +152,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 
 // Apparently labels in Cocoa are uneditable text fields, so lets make this a
 // little more automated.
-- (void)makeLabel:(NSTextField *)label:(const char*) str
+- (void)makeLabel:(NSTextField *)label withString:(const char*) str
 {
 	[label setStringValue:[NSString stringWithUTF8String:str]];
 	[label setBezeled:NO];
@@ -158,7 +161,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 	[label setSelectable:NO];
 }
 
-- (int)pickIWad:(WadStuff *)wads:(int) numwads:(bool) showwin:(int) defaultiwad
+- (int)pickIWad:(WadStuff *)wads num:(int) numwads showWindow:(bool) showwin defaultWad:(int) defaultiwad
 {
 	cancelled = false;
 
@@ -170,7 +173,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 	[window setTitle:windowTitle];
 
 	NSTextField *description = [[NSTextField alloc] initWithFrame:NSMakeRect(22, 379, 412, 50)];
-	[self makeLabel:description:"ZDoom found more than one IWAD\nSelect from the list below to determine which one to use:"];
+	[self makeLabel:description withString:GAMENAME " found more than one IWAD\nSelect from the list below to determine which one to use:"];
 	[[window contentView] addSubview:description];
 	[description release];
 
@@ -178,7 +181,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 	//NSScrollView *iwadScroller = [[NSScrollView alloc] initWithFrame:NSMakeRect(20, 103, 412, 288)];
 	NSScrollView *iwadScroller = [[NSScrollView alloc] initWithFrame:NSMakeRect(20, 50, 412, 341)];
 	NSTableView *iwadTable = [[NSTableView alloc] initWithFrame:[iwadScroller bounds]];
-	IWADTableData *tableData = [[IWADTableData alloc] init:wads:numwads];
+	IWADTableData *tableData = [[IWADTableData alloc] init:wads num:numwads];
 	for(int i = 0;i < NUM_COLUMNS;i++)
 	{
 		NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithUTF8String:tableHeaders[i]]];
@@ -249,7 +252,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 int I_PickIWad_Cocoa (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 {
 	IWADPicker *picker = [IWADPicker alloc];
-	int ret = [picker pickIWad:wads:numwads:showwin:defaultiwad];
+	int ret = [picker pickIWad:wads num:numwads showWindow:showwin defaultWad:defaultiwad];
 	[picker release];
 	return ret;
 }

@@ -12,13 +12,13 @@ switches/normbutn		{ DSSWITCH ALSWITCH PCSWITCH }
 $alias switches/exitbutn switches/normbutn
 switches/elevbutn		{ DSPLATFM ALSWITCH PCSWITCH }
 
-misc/1up				{ NULL ALBNS1UP PCBNS1UP }
+misc/1up				{ DSBNS1UP ALBNS1UP PCBNS1UP }
 misc/do_nothing			{ NULL ALNOTHIN PCNOTHIN }
 misc/ammo_pickup		{ NULL ALAMMOUP PCAMMOUP }
 misc/ammobox_pickup		{ NULL ALAMBXUP PCAMBXUP }
 misc/health_pickup		{ NULL ALFOODUP PCFOODUP }
 misc/medkit_pickup		{ NULL ALMEDIUP PCMEDIUP }
-misc/k_pkup				{ NULL ALGETKEY PCGETKEY }
+misc/k_pkup				{ DSGETKEY ALGETKEY PCGETKEY }
 misc/end_bonus1			{ NULL ALENDBN1 PCENDBN1 }
 misc/end_bonus2			{ DSENDBN2 ALENDBN2 PCENDBN2 }
 misc/no_bonus			{ NULL ALNOBNS PCNOBNS }
@@ -39,8 +39,7 @@ menu/escape				{ NULL ALESCPRS PCESCPRS }
 menu/move1				{ NULL ALMVGUN1 PCMVGUN1 }
 menu/move2				{ NULL ALMVGUN2 PCMVGUN2 }
 
-player/death			{ NULL ALPLDETH PCPYDETH }
-player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN } // Unused in Wolf
+player/death			{ DSPLDETH ALPLDETH PCPLDETH }
 player/usefail			{ NULL ALNOWAY PCNOWAY }
 
 weapon/knife/attack		{ NULL ALKNFSWG PCKNFSWG }
@@ -219,18 +218,26 @@ treasure/spear2/pickup	{ DSSPEAR2 ALSPEAR PCSPEAR }
 
 // ------ Super 3D Noah's Ark ------
 
+misc/i_pkup				{ DSITEMUP ALITEMUP PCITEMUP }
+
 $ifnoah
 // Kill hitwall sound in Noah's Ark
 world/hitwall NULL
+
+misc/100percent			{ NULL ALENDBN2 PCENDBN2 }
+$alias misc/w_pkup		misc/i_pkup
+$alias misc/map_pkup	misc/k_pkup
+
+// Defined here since vanilla Wolf3D didn't use it.
+player/pain				{ DSPLPAIN ALPLPAIN PCPLPAIN }
 $endif
 
 world/pushwall_ark		{ DSARKPSH ALARKPSH PCARKPSHW }
 
-misc/i_pkup				{ DSITEMUP ALITEMUP PCITEMUP }
-
-weapon/sling/attack			{ DSSLING ALSLING PCSLING }
-weapon/supersling/attack	{ DSSSLING ALSSLING PCSSLING }
-weapon/autosling/attack		{ DSASLING ALASLING PCASLING }
+weapon/handfeed/attack			{ DSHDFEED ALHDFEED PCHDFEED }
+weapon/smallfeedluancher/attack	{ DSSMFEED ALSMFEED PCSMFEED }
+weapon/largefeedlauncher/attack	{ DSLGFEED ALLGFEED PCLGFEED }
+weapon/superfeeder5000/attack	{ DSSPFEED ALSPFEED PCSPFEED }
 
 cantaloupe/fire			{ DSTHROW ALTHROW PCTHROW }
 cantaloupe/hit			{ DSSPLAT ALSPLAT PCSPLAT }
@@ -282,6 +289,9 @@ burt/sight				{ DSBRTSIT ALBRTSIT PCBRTSIT }
 burt/active				{ DSBRTSTP ALBRTSTP PCBRTSTP }
 burt/attack				{ DSSPIT ALSPIT PCSPIT }
 burt/death				{ DSSLEEP ALSLEEP PCSLEEP }
+
+quiz/correct			{ NULL ALENDBN2 PCENDBN2 }
+quiz/incorrect			{ NULL ALNOBNS PCNOBNS }
 
 // ------ Blake Stone ------
 

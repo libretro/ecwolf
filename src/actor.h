@@ -59,7 +59,8 @@ enum
 	AMETA_DefaultHealth6,
 	AMETA_DefaultHealth7,
 	AMETA_DefaultHealth8,
-	AMETA_DefaultHealth9
+	AMETA_DefaultHealth9,
+	AMETA_ConversationID
 };
 
 enum
@@ -71,6 +72,7 @@ enum
 class player_t;
 class ClassDef;
 class AInventory;
+namespace Dialog { struct Page; }
 class AActor : public Thinker,
 	public EmbeddedList<AActor>::Node
 {
@@ -91,6 +93,7 @@ class AActor : public Thinker,
 
 		void			AddInventory(AInventory *item);
 		virtual void	BeginPlay() {}
+		void			ClearCounters();
 		virtual void	Destroy();
 		virtual void	Die();
 		void			EnterZone(const MapZone *zone);
@@ -101,6 +104,7 @@ class AActor : public Thinker,
 		const AActor	*GetDefault() const;
 		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
+		bool			GiveInventory(const ClassDef *cls, int amount=0, bool allowreplacement=true);
 		virtual void	PostBeginPlay() {}
 		void			RemoveFromWorld();
 		virtual void	RemoveInventory(AInventory *item);
@@ -166,6 +170,8 @@ class AActor : public Thinker,
 		word        viewheight;
 		fixed       transx,transy;      // in global coord
 
+		FTextureID	overheadIcon;
+
 		uint16_t	sighttime;
 		uint8_t		sightrandom;
 		fixed		missilefrequency;
@@ -183,6 +189,8 @@ class AActor : public Thinker,
 
 		TObjPtr<AInventory>	inventory;
 
+		const Dialog::Page *conversation;
+
 		static EmbeddedList<AActor>::List actors;
 		typedef EmbeddedList<AActor>::Iterator Iterator;
 		static Iterator GetIterator() { return Iterator(actors); }
@@ -190,6 +198,20 @@ class AActor : public Thinker,
 		void	Init();
 
 		const MapZone	*soundZone;
+};
+
+// Old save compatibility
+// FIXME: Remove for 1.4
+class AActorProxy : public Thinker
+{
+	DECLARE_CLASS(AActorProxy, Thinker)
+
+public:
+	void Tick() {}
+
+	void Serialize(FArchive &arc);
+
+	TObjPtr<AActor> actualObject;
 };
 
 #endif

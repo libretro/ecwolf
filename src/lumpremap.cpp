@@ -272,7 +272,6 @@ void LumpRemapper::ParseMap(Scanner &sc)
 			sc.ScriptMessage(Scanner::ERROR, "Expected '{'.");
 		if(!sc.CheckToken('}'))
 		{
-			int i = 0;
 			while(true)
 			{
 				if(!sc.CheckToken(TK_StringConst))

@@ -103,6 +103,7 @@ tiles
 		texturesouth = "ARKWODA1";
 		textureeast = "ARKWODA2";
 		texturewest = "ARKWODA2";
+		textureoverhead = "TILE8:52";
 	}
 	tile 2
 	{
@@ -110,6 +111,7 @@ tiles
 		texturesouth = "ARKWODB1";
 		textureeast = "ARKWODB2";
 		texturewest = "ARKWODB2";
+		textureoverhead = "TILE8:53";
 	}
 	tile 3
 	{
@@ -117,6 +119,7 @@ tiles
 		texturesouth = "ARKCURT1";
 		textureeast = "ARKCURT2";
 		texturewest = "ARKCURT2";
+		textureoverhead = "TILE8:54";
 	}
 	tile 4
 	{
@@ -124,6 +127,7 @@ tiles
 		texturesouth = "ARKMELV1";
 		textureeast = "ARKMELV2";
 		texturewest = "ARKMELV2";
+		textureoverhead = "TILE8:55";
 	}
 	tile 5
 	{
@@ -131,6 +135,7 @@ tiles
 		texturesouth = "LOGWALL1";
 		textureeast = "LOGWALL2";
 		texturewest = "LOGWALL2";
+		textureoverhead = "TILE8:56";
 	}
 	tile 6
 	{
@@ -138,6 +143,7 @@ tiles
 		texturesouth = "LOGNOAH1";
 		textureeast = "LOGNOAH2";
 		texturewest = "LOGNOAH2";
+		textureoverhead = "TILE8:57";
 	}
 	tile 7
 	{
@@ -145,6 +151,7 @@ tiles
 		texturesouth = "LOGCURT1";
 		textureeast = "LOGCURT2";
 		texturewest = "LOGCURT2";
+		textureoverhead = "TILE8:58";
 	}
 	tile 8
 	{
@@ -152,6 +159,7 @@ tiles
 		texturesouth = "LOGDUCK1";
 		textureeast = "LOGDUCK2";
 		texturewest = "LOGDUCK2";
+		textureoverhead = "TILE8:59";
 	}
 	tile 9
 	{
@@ -159,6 +167,7 @@ tiles
 		texturesouth = "KNLWODA1";
 		textureeast = "KNLWODA2";
 		texturewest = "KNLWODA2";
+		textureoverhead = "TILE8:5A";
 	}
 	tile 10
 	{
@@ -166,6 +175,7 @@ tiles
 		texturesouth = "KNLBWOD1";
 		textureeast = "KNLBWOD2";
 		texturewest = "KNLBWOD2";
+		textureoverhead = "TILE8:5B";
 	}
 	tile 11
 	{
@@ -173,6 +183,7 @@ tiles
 		texturesouth = "KNLWODB1";
 		textureeast = "KNLWODB2";
 		texturewest = "KNLWODB2";
+		textureoverhead = "TILE8:5C";
 	}
 	tile 12
 	{
@@ -180,6 +191,7 @@ tiles
 		texturesouth = "KNLBMET1";
 		textureeast = "KNLBMET2";
 		texturewest = "KNLBMET2";
+		textureoverhead = "TILE8:5D";
 	}
 	tile 13
 	{
@@ -187,6 +199,7 @@ tiles
 		texturesouth = "CABPANL1";
 		textureeast = "CABPANL2";
 		texturewest = "CABPANL2";
+		textureoverhead = "TILE8:5E";
 	}
 	tile 14
 	{
@@ -194,6 +207,7 @@ tiles
 		texturesouth = "CABLARG1";
 		textureeast = "CABLARG2";
 		texturewest = "CABLARG2";
+		textureoverhead = "TILE8:5F";
 	}
 	tile 15
 	{
@@ -201,6 +215,8 @@ tiles
 		texturesouth = "STAIRWY1";
 		textureeast = "STAIRWY2";
 		texturewest = "STAIRWY2";
+		textureoverhead = "TILE8:60";
+		mapped = 1;
 	}
 	tile 16
 	{
@@ -208,6 +224,7 @@ tiles
 		texturesouth = "FLOOD1";
 		textureeast = "FLOOD2";
 		texturewest = "FLOOD2";
+		textureoverhead = "TILE8:61";
 	}
 	tile 17
 	{
@@ -215,6 +232,7 @@ tiles
 		texturesouth = "WODPANL1";
 		textureeast = "WODPANL2";
 		texturewest = "WODPANL2";
+		textureoverhead = "TILE8:62";
 	}
 	tile 18
 	{
@@ -222,6 +240,7 @@ tiles
 		texturesouth = "WODNAMH1";
 		textureeast = "WODNAMH2";
 		texturewest = "WODNAMH2";
+		textureoverhead = "TILE8:63";
 	}
 	tile 19
 	{
@@ -229,6 +248,7 @@ tiles
 		texturesouth = "ABRICK1";
 		textureeast = "ABRICK2";
 		texturewest = "ABRICK2";
+		textureoverhead = "TILE8:64";
 	}
 	tile 20
 	{
@@ -236,6 +256,7 @@ tiles
 		texturesouth = "ABRKNH1";
 		textureeast = "ABRKNH2";
 		texturewest = "ABRKNH2";
+		textureoverhead = "TILE8:65";
 	}
 	tile 21
 	{
@@ -243,6 +264,7 @@ tiles
 		texturesouth = "GRYWOOD1";
 		textureeast = "GRYWOOD2";
 		texturewest = "GRYWOOD2";
+		textureoverhead = "TILE8:66";
 	}
 	tile 22
 	{
@@ -250,6 +272,7 @@ tiles
 		texturesouth = "GRYCURT1";
 		textureeast = "GRYCURT2";
 		texturewest = "GRYCURT2";
+		textureoverhead = "TILE8:67";
 	}
 	tile 23
 	{
@@ -257,6 +280,7 @@ tiles
 		texturesouth = "LGTPANL1";
 		textureeast = "LGTPANL2";
 		texturewest = "LGTPANL2";
+		textureoverhead = "TILE8:68";
 	}
 	tile 24
 	{
@@ -264,6 +288,7 @@ tiles
 		texturesouth = "LGTCHLK1";
 		textureeast = "LGTCHLK2";
 		texturewest = "LGTCHLK2";
+		textureoverhead = "TILE8:69";
 	}
 	tile 25
 	{
@@ -271,6 +296,7 @@ tiles
 		texturesouth = "YELWALL1";
 		textureeast = "YELWALL2";
 		texturewest = "YELWALL2";
+		textureoverhead = "TILE8:6A";
 	}
 	tile 26
 	{
@@ -278,6 +304,7 @@ tiles
 		texturesouth = "CABFOOD1";
 		textureeast = "CABFOOD2";
 		texturewest = "CABFOOD2";
+		textureoverhead = "TILE8:6B";
 	}
 	tile 27
 	{
@@ -285,6 +312,7 @@ tiles
 		texturesouth = "REDWALL1";
 		textureeast = "REDWALL2";
 		texturewest = "REDWALL2";
+		textureoverhead = "TILE8:6C";
 	}
 	tile 28
 	{
@@ -292,6 +320,7 @@ tiles
 		texturesouth = "CABSMAL1";
 		textureeast = "CABSMAL2";
 		texturewest = "CABSMAL2";
+		textureoverhead = "TILE8:6D";
 	}
 	tile 29
 	{
@@ -299,7 +328,517 @@ tiles
 		texturesouth = "PURWALL1";
 		textureeast = "PURWALL2";
 		texturewest = "PURWALL2";
+		textureoverhead = "TILE8:6E";
 	}
+	tile 30
+	{
+		texturenorth = "DOOR1";
+		texturesouth = "DOOR1";
+		textureeast = "DOOR2";
+		texturewest = "DOOR2";
+		textureoverhead = "TILE8:6F";
+	}
+	tile 31
+	{
+		texturenorth = "DOOR3";
+		texturesouth = "DOOR3";
+		textureeast = "DOOR4";
+		texturewest = "DOOR4";
+		textureoverhead = "TILE8:79";
+	}
+
+	// BLANK, and repeat
+	// This next set is for tiles visible on the map
+	// TILE8:71-TILE8:78 are player arrows
+	// TILE8:7A-TILE8:80 are things visible with full map pickup.
+
+	tile 33
+	{
+		texturenorth = "ARKWODA1";
+		texturesouth = "ARKWODA1";
+		textureeast = "ARKWODA2";
+		texturewest = "ARKWODA2";
+		textureoverhead = "TILE8:52";
+		mapped = 2;
+	}
+	tile 34
+	{
+		texturenorth = "ARKWODB1";
+		texturesouth = "ARKWODB1";
+		textureeast = "ARKWODB2";
+		texturewest = "ARKWODB2";
+		textureoverhead = "TILE8:53";
+		mapped = 2;
+	}
+	tile 35
+	{
+		texturenorth = "ARKCURT1";
+		texturesouth = "ARKCURT1";
+		textureeast = "ARKCURT2";
+		texturewest = "ARKCURT2";
+		textureoverhead = "TILE8:54";
+		mapped = 2;
+	}
+	tile 36
+	{
+		texturenorth = "ARKMELV1";
+		texturesouth = "ARKMELV1";
+		textureeast = "ARKMELV2";
+		texturewest = "ARKMELV2";
+		textureoverhead = "TILE8:55";
+		mapped = 2;
+	}
+	tile 37
+	{
+		texturenorth = "LOGWALL1";
+		texturesouth = "LOGWALL1";
+		textureeast = "LOGWALL2";
+		texturewest = "LOGWALL2";
+		textureoverhead = "TILE8:56";
+		mapped = 2;
+	}
+	tile 38
+	{
+		texturenorth = "LOGNOAH1";
+		texturesouth = "LOGNOAH1";
+		textureeast = "LOGNOAH2";
+		texturewest = "LOGNOAH2";
+		textureoverhead = "TILE8:57";
+		mapped = 2;
+	}
+	tile 39
+	{
+		texturenorth = "LOGCURT1";
+		texturesouth = "LOGCURT1";
+		textureeast = "LOGCURT2";
+		texturewest = "LOGCURT2";
+		textureoverhead = "TILE8:58";
+		mapped = 2;
+	}
+	tile 40
+	{
+		texturenorth = "LOGDUCK1";
+		texturesouth = "LOGDUCK1";
+		textureeast = "LOGDUCK2";
+		texturewest = "LOGDUCK2";
+		textureoverhead = "TILE8:59";
+		mapped = 2;
+	}
+	tile 41
+	{
+		texturenorth = "KNLWODA1";
+		texturesouth = "KNLWODA1";
+		textureeast = "KNLWODA2";
+		texturewest = "KNLWODA2";
+		textureoverhead = "TILE8:5A";
+		mapped = 2;
+	}
+	tile 42
+	{
+		texturenorth = "KNLBWOD1";
+		texturesouth = "KNLBWOD1";
+		textureeast = "KNLBWOD2";
+		texturewest = "KNLBWOD2";
+		textureoverhead = "TILE8:5B";
+		mapped = 2;
+	}
+	tile 43
+	{
+		texturenorth = "KNLWODB1";
+		texturesouth = "KNLWODB1";
+		textureeast = "KNLWODB2";
+		texturewest = "KNLWODB2";
+		textureoverhead = "TILE8:5C";
+		mapped = 2;
+	}
+	tile 44
+	{
+		texturenorth = "KNLBMET1";
+		texturesouth = "KNLBMET1";
+		textureeast = "KNLBMET2";
+		texturewest = "KNLBMET2";
+		textureoverhead = "TILE8:5D";
+		mapped = 2;
+	}
+	tile 45
+	{
+		texturenorth = "CABPANL1";
+		texturesouth = "CABPANL1";
+		textureeast = "CABPANL2";
+		texturewest = "CABPANL2";
+		textureoverhead = "TILE8:5E";
+		mapped = 2;
+	}
+	tile 46
+	{
+		texturenorth = "CABLARG1";
+		texturesouth = "CABLARG1";
+		textureeast = "CABLARG2";
+		texturewest = "CABLARG2";
+		textureoverhead = "TILE8:5F";
+		mapped = 2;
+	}
+	tile 47
+	{
+		texturenorth = "STAIRWY1";
+		texturesouth = "STAIRWY1";
+		textureeast = "STAIRWY2";
+		texturewest = "STAIRWY2";
+		textureoverhead = "TILE8:60";
+		mapped = 2;
+	}
+	tile 48
+	{
+		texturenorth = "FLOOD1";
+		texturesouth = "FLOOD1";
+		textureeast = "FLOOD2";
+		texturewest = "FLOOD2";
+		textureoverhead = "TILE8:61";
+		mapped = 2;
+	}
+	tile 49
+	{
+		texturenorth = "WODPANL1";
+		texturesouth = "WODPANL1";
+		textureeast = "WODPANL2";
+		texturewest = "WODPANL2";
+		textureoverhead = "TILE8:62";
+		mapped = 2;
+	}
+	tile 50
+	{
+		texturenorth = "WODNAMH1";
+		texturesouth = "WODNAMH1";
+		textureeast = "WODNAMH2";
+		texturewest = "WODNAMH2";
+		textureoverhead = "TILE8:63";
+		mapped = 2;
+	}
+	tile 51
+	{
+		texturenorth = "ABRICK1";
+		texturesouth = "ABRICK1";
+		textureeast = "ABRICK2";
+		texturewest = "ABRICK2";
+		textureoverhead = "TILE8:64";
+		mapped = 2;
+	}
+	tile 52
+	{
+		texturenorth = "ABRKNH1";
+		texturesouth = "ABRKNH1";
+		textureeast = "ABRKNH2";
+		texturewest = "ABRKNH2";
+		textureoverhead = "TILE8:65";
+		mapped = 2;
+	}
+	tile 53
+	{
+		texturenorth = "GRYWOOD1";
+		texturesouth = "GRYWOOD1";
+		textureeast = "GRYWOOD2";
+		texturewest = "GRYWOOD2";
+		textureoverhead = "TILE8:66";
+		mapped = 2;
+	}
+	tile 54
+	{
+		texturenorth = "GRYCURT1";
+		texturesouth = "GRYCURT1";
+		textureeast = "GRYCURT2";
+		texturewest = "GRYCURT2";
+		textureoverhead = "TILE8:67";
+		mapped = 2;
+	}
+	tile 55
+	{
+		texturenorth = "LGTPANL1";
+		texturesouth = "LGTPANL1";
+		textureeast = "LGTPANL2";
+		texturewest = "LGTPANL2";
+		textureoverhead = "TILE8:68";
+		mapped = 2;
+	}
+	tile 56
+	{
+		texturenorth = "LGTCHLK1";
+		texturesouth = "LGTCHLK1";
+		textureeast = "LGTCHLK2";
+		texturewest = "LGTCHLK2";
+		textureoverhead = "TILE8:69";
+		mapped = 2;
+	}
+	tile 57
+	{
+		texturenorth = "YELWALL1";
+		texturesouth = "YELWALL1";
+		textureeast = "YELWALL2";
+		texturewest = "YELWALL2";
+		textureoverhead = "TILE8:6A";
+		mapped = 2;
+	}
+	tile 58
+	{
+		texturenorth = "CABFOOD1";
+		texturesouth = "CABFOOD1";
+		textureeast = "CABFOOD2";
+		texturewest = "CABFOOD2";
+		textureoverhead = "TILE8:6B";
+		mapped = 2;
+	}
+	tile 59
+	{
+		texturenorth = "REDWALL1";
+		texturesouth = "REDWALL1";
+		textureeast = "REDWALL2";
+		texturewest = "REDWALL2";
+		textureoverhead = "TILE8:6C";
+		mapped = 2;
+	}
+	tile 60
+	{
+		texturenorth = "CABSMAL1";
+		texturesouth = "CABSMAL1";
+		textureeast = "CABSMAL2";
+		texturewest = "CABSMAL2";
+		textureoverhead = "TILE8:6D";
+		mapped = 2;
+	}
+	tile 61
+	{
+		texturenorth = "PURWALL1";
+		texturesouth = "PURWALL1";
+		textureeast = "PURWALL2";
+		texturewest = "PURWALL2";
+		textureoverhead = "TILE8:6E";
+		mapped = 2;
+	}
+	tile 62
+	{
+		texturenorth = "DOOR1";
+		texturesouth = "DOOR1";
+		textureeast = "DOOR2";
+		texturewest = "DOOR2";
+		textureoverhead = "TILE8:6F";
+		mapped = 2;
+	}
+	tile 63
+	{
+		texturenorth = "DOOR3";
+		texturesouth = "DOOR3";
+		textureeast = "DOOR4";
+		texturewest = "DOOR4";
+		textureoverhead = "TILE8:79";
+		mapped = 2;
+	}
+
+	// BLANK, and then we repeat only the first 24.
+	// Not visible on automap.
+
+	tile 65
+	{
+		texturenorth = "ARKWODA1";
+		texturesouth = "ARKWODA1";
+		textureeast = "ARKWODA2";
+		texturewest = "ARKWODA2";
+		textureoverhead = "TILE8:52";
+	}
+	tile 66
+	{
+		texturenorth = "ARKWODB1";
+		texturesouth = "ARKWODB1";
+		textureeast = "ARKWODB2";
+		texturewest = "ARKWODB2";
+		textureoverhead = "TILE8:53";
+	}
+	tile 67
+	{
+		texturenorth = "ARKCURT1";
+		texturesouth = "ARKCURT1";
+		textureeast = "ARKCURT2";
+		texturewest = "ARKCURT2";
+		textureoverhead = "TILE8:54";
+	}
+	tile 68
+	{
+		texturenorth = "ARKMELV1";
+		texturesouth = "ARKMELV1";
+		textureeast = "ARKMELV2";
+		texturewest = "ARKMELV2";
+		textureoverhead = "TILE8:55";
+	}
+	tile 69
+	{
+		texturenorth = "LOGWALL1";
+		texturesouth = "LOGWALL1";
+		textureeast = "LOGWALL2";
+		texturewest = "LOGWALL2";
+		textureoverhead = "TILE8:56";
+	}
+	tile 70
+	{
+		texturenorth = "LOGNOAH1";
+		texturesouth = "LOGNOAH1";
+		textureeast = "LOGNOAH2";
+		texturewest = "LOGNOAH2";
+		textureoverhead = "TILE8:57";
+	}
+	tile 71
+	{
+		texturenorth = "LOGCURT1";
+		texturesouth = "LOGCURT1";
+		textureeast = "LOGCURT2";
+		texturewest = "LOGCURT2";
+		textureoverhead = "TILE8:58";
+	}
+	tile 72
+	{
+		texturenorth = "LOGDUCK1";
+		texturesouth = "LOGDUCK1";
+		textureeast = "LOGDUCK2";
+		texturewest = "LOGDUCK2";
+		textureoverhead = "TILE8:59";
+	}
+	tile 73
+	{
+		texturenorth = "KNLWODA1";
+		texturesouth = "KNLWODA1";
+		textureeast = "KNLWODA2";
+		texturewest = "KNLWODA2";
+		textureoverhead = "TILE8:5A";
+	}
+	tile 74
+	{
+		texturenorth = "KNLBWOD1";
+		texturesouth = "KNLBWOD1";
+		textureeast = "KNLBWOD2";
+		texturewest = "KNLBWOD2";
+		textureoverhead = "TILE8:5B";
+	}
+	tile 75
+	{
+		texturenorth = "KNLWODB1";
+		texturesouth = "KNLWODB1";
+		textureeast = "KNLWODB2";
+		texturewest = "KNLWODB2";
+		textureoverhead = "TILE8:5C";
+	}
+	tile 76
+	{
+		texturenorth = "KNLBMET1";
+		texturesouth = "KNLBMET1";
+		textureeast = "KNLBMET2";
+		texturewest = "KNLBMET2";
+		textureoverhead = "TILE8:5D";
+	}
+	tile 77
+	{
+		texturenorth = "CABPANL1";
+		texturesouth = "CABPANL1";
+		textureeast = "CABPANL2";
+		texturewest = "CABPANL2";
+		textureoverhead = "TILE8:5E";
+	}
+	tile 78
+	{
+		texturenorth = "CABLARG1";
+		texturesouth = "CABLARG1";
+		textureeast = "CABLARG2";
+		texturewest = "CABLARG2";
+		textureoverhead = "TILE8:5F";
+	}
+	tile 79
+	{
+		texturenorth = "STAIRWY1";
+		texturesouth = "STAIRWY1";
+		textureeast = "STAIRWY2";
+		texturewest = "STAIRWY2";
+		textureoverhead = "TILE8:60";
+	}
+	tile 80
+	{
+		texturenorth = "FLOOD1";
+		texturesouth = "FLOOD1";
+		textureeast = "FLOOD2";
+		texturewest = "FLOOD2";
+		textureoverhead = "TILE8:61";
+	}
+	tile 81
+	{
+		texturenorth = "WODPANL1";
+		texturesouth = "WODPANL1";
+		textureeast = "WODPANL2";
+		texturewest = "WODPANL2";
+		textureoverhead = "TILE8:62";
+	}
+	tile 82
+	{
+		texturenorth = "WODNAMH1";
+		texturesouth = "WODNAMH1";
+		textureeast = "WODNAMH2";
+		texturewest = "WODNAMH2";
+		textureoverhead = "TILE8:63";
+	}
+	tile 83
+	{
+		texturenorth = "ABRICK1";
+		texturesouth = "ABRICK1";
+		textureeast = "ABRICK2";
+		texturewest = "ABRICK2";
+		textureoverhead = "TILE8:64";
+	}
+	tile 84
+	{
+		texturenorth = "ABRKNH1";
+		texturesouth = "ABRKNH1";
+		textureeast = "ABRKNH2";
+		texturewest = "ABRKNH2";
+		textureoverhead = "TILE8:65";
+	}
+	tile 85
+	{
+		texturenorth = "GRYWOOD1";
+		texturesouth = "GRYWOOD1";
+		textureeast = "GRYWOOD2";
+		texturewest = "GRYWOOD2";
+		textureoverhead = "TILE8:66";
+	}
+	tile 86
+	{
+		texturenorth = "GRYCURT1";
+		texturesouth = "GRYCURT1";
+		textureeast = "GRYCURT2";
+		texturewest = "GRYCURT2";
+		textureoverhead = "TILE8:67";
+	}
+	tile 87
+	{
+		texturenorth = "LGTPANL1";
+		texturesouth = "LGTPANL1";
+		textureeast = "LGTPANL2";
+		texturewest = "LGTPANL2";
+		textureoverhead = "TILE8:68";
+	}
+	tile 88
+	{
+		texturenorth = "LGTCHLK1";
+		texturesouth = "LGTCHLK1";
+		textureeast = "LGTCHLK2";
+		texturewest = "LGTCHLK2";
+		textureoverhead = "TILE8:69";
+	}
+
+	// Used for empty space on the map.
+	tile 89
+	{
+		texturenorth = "DOOR3";
+		texturesouth = "DOOR3";
+		textureeast = "DOOR4";
+		texturewest = "DOOR4";
+		textureoverhead = "TILE8:79";
+		dontoverlay = true;
+	}
+
 	tile 90
 	{
 		texturenorth = "DOORSLOT";
@@ -307,6 +846,7 @@ tiles
 		textureeast = "DOOR1";
 		texturewest = "DOOR1";
 		offsetvertical = true;
+		textureoverhead = "TILE8:6F";
 	}
 	tile 91
 	{
@@ -315,6 +855,7 @@ tiles
 		textureeast = "DOORSLOT";
 		texturewest = "DOORSLOT";
 		offsethorizontal = true;
+		textureoverhead = "TILE8:70";
 	}
 	tile 92
 	{
@@ -323,6 +864,7 @@ tiles
 		textureeast = "DOOR2";
 		texturewest = "DOOR2";
 		offsetvertical = true;
+		textureoverhead = "TILE8:6F";
 	}
 	tile 93
 	{
@@ -331,6 +873,7 @@ tiles
 		textureeast = "DOORSLOT";
 		texturewest = "DOORSLOT";
 		offsethorizontal = true;
+		textureoverhead = "TILE8:70";
 	}
 	tile 94
 	{
@@ -339,6 +882,7 @@ tiles
 		textureeast = "DOOR3";
 		texturewest = "DOOR3";
 		offsetvertical = true;
+		textureoverhead = "TILE8:6F";
 	}
 	tile 95
 	{
@@ -347,6 +891,7 @@ tiles
 		textureeast = "DOORSLOT";
 		texturewest = "DOORSLOT";
 		offsethorizontal = true;
+		textureoverhead = "TILE8:70";
 	}
 	tile 96
 	{
@@ -355,6 +900,7 @@ tiles
 		textureeast = "DOOR4";
 		texturewest = "DOOR4";
 		offsetvertical = true;
+		textureoverhead = "TILE8:6F";
 	}
 	tile 97
 	{
@@ -363,6 +909,91 @@ tiles
 		textureeast = "DOORSLOT";
 		texturewest = "DOORSLOT";
 		offsethorizontal = true;
+		textureoverhead = "TILE8:70";
+	}
+
+	// Back to repeating
+	// These would also be visible on the automap
+	tile 98
+	{
+		texturenorth = "ARKWODB1";
+		texturesouth = "ARKWODB1";
+		textureeast = "ARKWODB2";
+		texturewest = "ARKWODB2";
+		textureoverhead = "TILE8:53";
+		mapped = 2;
+	}
+	tile 99
+	{
+		texturenorth = "ARKCURT1";
+		texturesouth = "ARKCURT1";
+		textureeast = "ARKCURT2";
+		texturewest = "ARKCURT2";
+		textureoverhead = "TILE8:54";
+		mapped = 2;
+	}
+	tile 100
+	{
+		texturenorth = "ARKMELV1";
+		texturesouth = "ARKMELV1";
+		textureeast = "ARKMELV2";
+		texturewest = "ARKMELV2";
+		textureoverhead = "TILE8:55";
+		mapped = 2;
+	}
+	tile 101
+	{
+		texturenorth = "LOGWALL1";
+		texturesouth = "LOGWALL1";
+		textureeast = "LOGWALL2";
+		texturewest = "LOGWALL2";
+		textureoverhead = "TILE8:56";
+		mapped = 2;
+	}
+	tile 102
+	{
+		texturenorth = "LOGNOAH1";
+		texturesouth = "LOGNOAH1";
+		textureeast = "LOGNOAH2";
+		texturewest = "LOGNOAH2";
+		textureoverhead = "TILE8:57";
+		mapped = 2;
+	}
+	tile 103
+	{
+		texturenorth = "LOGCURT1";
+		texturesouth = "LOGCURT1";
+		textureeast = "LOGCURT2";
+		texturewest = "LOGCURT2";
+		textureoverhead = "TILE8:58";
+		mapped = 2;
+	}
+	tile 104
+	{
+		texturenorth = "LOGDUCK1";
+		texturesouth = "LOGDUCK1";
+		textureeast = "LOGDUCK2";
+		texturewest = "LOGDUCK2";
+		textureoverhead = "TILE8:59";
+		mapped = 2;
+	}
+	tile 105
+	{
+		texturenorth = "KNLWODA1";
+		texturesouth = "KNLWODA1";
+		textureeast = "KNLWODA2";
+		texturewest = "KNLWODA2";
+		textureoverhead = "TILE8:5A";
+		mapped = 2;
+	}
+	tile 106
+	{
+		texturenorth = "KNLBWOD1";
+		texturesouth = "KNLBWOD1";
+		textureeast = "KNLBWOD2";
+		texturewest = "KNLBWOD2";
+		textureoverhead = "TILE8:5B";
+		mapped = 2;
 	}
 
 	modzone 107 fillzone ambush;
@@ -486,11 +1117,11 @@ things
 	{116,	203,	0,	HOLOWALL,	0}
 	{117,	204,	0,	HOLOWALL,	0}
 	{118,	205,	0,	HOLOWALL,	0}
-	{126,	195,	0,	HOLOWALL,	0} //Ambush
-	{127,	196,	0,	HOLOWALL,	0} //Ambush
-	{128,	197,	0,	HOLOWALL,	0} //Ambush
-	{129,	198,	0,	HOLOWALL,	0} //Ambush
-	{130,	199,	0,	HOLOWALL,	0} //Ambush
+	{126,	195,	0,	HOLOWALL|AMBUSH,	0}
+	{127,	196,	0,	HOLOWALL|AMBUSH,	0}
+	{128,	197,	0,	HOLOWALL|AMBUSH,	0}
+	{129,	198,	0,	HOLOWALL|AMBUSH,	0}
+	{130,	199,	0,	HOLOWALL|AMBUSH,	0}
 	//The bosses are identical between the two sets
 	{131,	200,	0,	HOLOWALL,	0}
 	{132,	201,	0,	HOLOWALL,	0}
