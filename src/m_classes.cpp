@@ -25,9 +25,10 @@ EColorRange MenuItem::getTextColor() const
 	return gameinfo.FontColors[colors[isSelected()][getActive()]];
 }
 
-MenuItem::MenuItem(const char string[36], MENU_LISTENER_PROTOTYPE(activateListener)) :
+MenuItem::MenuItem(const char string[80], MENU_LISTENER_PROTOTYPE(activateListener)) :
 	activateListener(activateListener), enabled(true), highlight(false),
-	picture(NULL), pictureX(-1), pictureY(-1), visible(true)
+	picture(NULL), pictureX(-1), pictureY(-1), visible(true),
+	activateSound("menu/activate")
 {
 	setText(string);
 }
@@ -59,11 +60,11 @@ void MenuItem::setPicture(const char* picture, int x, int y)
 	pictureY = y;
 }
 
-void MenuItem::setText(const char string[36])
+void MenuItem::setText(const char string[80])
 {
 	height = 13;
 	strcpy(this->string, string);
-	for(unsigned int i = 0;i < 36;i++)
+	for(unsigned int i = 0;i < 80;i++)
 	{
 		if(string[i] == '\n')
 			height += 13;
@@ -517,9 +518,10 @@ void Menu::eraseGun(int x, int y)
 }
 
 Menu::Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)) :
-	entryListener(entryListener), curPos(0), headPicture(NULL),
-	headTextInStripes(false), headPictureIsAlternate(false), height(0),
-	indent(indent), x(x), y(y), w(w), itemOffset(0)
+	entryListener(entryListener), animating(false), controlHeaders(false),
+	curPos(0), headPicture(NULL), headTextInStripes(false),
+	headPictureIsAlternate(false), height(0), indent(indent), x(x), y(y), w(w),
+	itemOffset(0)
 {
 	for(unsigned int i = 0;i < 36;i++)
 		headText[i] = '\0';
@@ -930,7 +932,7 @@ int Menu::handle()
 	{
 		case 1:
 			if(getIndex(curPos)->playActivateSound())
-				SD_PlaySound ("menu/activate");
+				SD_PlaySound (getIndex(curPos)->getActivateSound());
 			getIndex(curPos)->activate();
 			PrintX = getX() + getIndent();
 			PrintY = getY() + getHeight(curPos);

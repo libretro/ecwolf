@@ -10,6 +10,7 @@ add_custom_target(revision_check ALL
 	DEPENDS updaterevision
 )
 
+include(CheckCXXSourceCompiles)
 include(CheckFunctionExists)
 include(FindPkgConfig)
 
@@ -21,13 +22,20 @@ include_directories(
 	${CMAKE_BINARY_DIR}/gdtoa
 )
 
-option(GPL "Build GPL edition")
-
 if(GPL)
 	add_definitions(-DUSE_GPL)
 	set(OPL_SOURCES dosbox/dbopl.cpp)
+
+	if(USE_LIBTEXTSCREEN)
+		add_definitions(-DUSE_TEXTSCREEN)
+		include_directories(${ECWolf_SOURCE_DIR}/textscreen)
+		set(EXTRA_LIBRARIES textscreen)
+	else(USE_LIBTEXTSCREEN)
+		set(EXTRA_LIBRARIES)
+	endif(USE_LIBTEXTSCREEN)
 else(GPL)
 	set(OPL_SOURCES mame/fmopl.cpp)
+	set(EXTRA_LIBRARIES)
 endif(GPL)
 
 find_package(SDL REQUIRED)
@@ -47,13 +55,29 @@ if(NOT ATOLL_EXISTS)
 	add_definitions(-Datoll=_atoi64)
 endif(NOT ATOLL_EXISTS)
 
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
-	set(CMAKE_CXX_FLAGS "-Wall -Wno-unused -Wno-unused-result -Wno-ignored-qualifiers -Wextra -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}")
-endif(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
+check_cxx_source_compiles(
+	"#include <stdarg.h>
+	int main() { va_list list1, list2; va_copy(list1, list2); return 0; }"
+	HAS_VA_COPY )
+if( NOT HAS_VA_COPY )
+	check_cxx_source_compiles(
+		"#include <stdarg.h>
+		int main() { va_list list1, list2; __va_copy(list1, list2); return 0; }"
+		HAS___VA_COPY )
+	if( HAS___VA_COPY )
+		add_definitions( -Dva_copy=__va_copy )
+	else( HAS___VA_COPY )
+		add_definitions( -DNO_VA_COPY )
+	endif( HAS___VA_COPY )
+endif( NOT HAS_VA_COPY )
+
+if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+	set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}" )
+endif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
 
 if(WIN32)
 	set(NO_GTK ON)
-	set(EXTRA_LIBRARIES comctl32)
+	set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} comctl32)
 	add_definitions(-DWINDOWS -DNO_STDIO_REDIRECT)
 
 	# RC file
@@ -79,7 +103,6 @@ if(WIN32)
 	)
 elseif(APPLE)
 	set(NO_GTK ON)
-	set(EXTRA_LIBRARIES)
 else(WIN32)
 	option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
 
@@ -87,13 +110,11 @@ else(WIN32)
 	if( NOT NO_GTK )
 		pkg_check_modules( GTK2 gtk+-2.0 )
 		if( GTK2_FOUND )
-			set( EXTRA_LIBRARIES ${GTK2_LIBRARIES} )
+			set( EXTRA_LIBRARIES ${EXTRA_LIBRARIES} ${GTK2_LIBRARIES} )
 			include_directories( ${GTK2_INCLUDE_DIRS} )
 		else( GTK2_FOUND )
 			set( NO_GTK ON )
 		endif( GTK2_FOUND )
-	else( NOT NO_GTK)
-		set(EXTRA_LIBRARIES)
 	endif( NOT NO_GTK )
 endif(WIN32)
 
@@ -103,6 +124,7 @@ endif(NO_GTK)
 
 if(APPLE)
 	set(EXTRA_FILES
+		macosx/filesys.mm
 		macosx/SDLMain.m
 		macosx/wl_iwad_picker_cocoa.mm
 	)
@@ -139,8 +161,14 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	g_shared/a_playerpawn.cpp
 	g_shared/a_randomspawner.cpp
 	g_wolf/a_spearofdestiny.cpp
+	g_wolf/wolf_sbar.cpp
+	r_2d/r_draw.cpp
+	r_2d/r_drawt.cpp
+	r_2d/r_main.cpp
+	r_2d/r_things.cpp
 	r_data/colormaps.cpp
 	r_data/r_translate.cpp
+	r_data/renderstyle.cpp
 	resourcefiles/resourcefile.cpp
 	resourcefiles/ancientzip.cpp
 	resourcefiles/file_7z.cpp
@@ -187,14 +215,17 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	thingdef/thingdef_properties.cpp
 	thingdef/thingdef_type.cpp
 	actor.cpp
+	am_map.cpp
 	colormatcher.cpp
 	config.cpp
 	c_cvars.cpp
 	dobject.cpp
 	dobjgc.cpp
 	farchive.cpp
-	file.cpp
 	files.cpp
+	filesys.cpp
+	filesys_steam.cpp
+	g_conversation.cpp
 	g_intermission.cpp
 	g_mapinfo.cpp
 	gamemap.cpp
@@ -217,10 +248,15 @@ add_executable(ecwolf ${PLATFORM_EXE_FLAGS}
 	p_switch.cpp
 	r_sprites.cpp
 	scanner.cpp
+	sdlvideo.cpp
 	sndinfo.cpp
+	sndseq.cpp
 	thinker.cpp
+	v_draw.cpp
 	v_font.cpp
 	v_palette.cpp
+	v_pfx.cpp
+	v_text.cpp
 	v_video.cpp
 	w_wad.cpp
 	weaponslots.cpp
@@ -252,3 +288,19 @@ set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
 # Install
 install(TARGETS ecwolf BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION bin COMPONENT Runtime)
+
+# Project file source groupings
+source_group("Sources" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/.+")
+source_group("Game Objects\\Decorate" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/thingdef/.+")
+source_group("Game Objects\\Shared" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/g_shared/.+")
+source_group("Game Objects\\Wolf3D" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/g_wolf/.+")
+source_group("Game Objects" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/(actor|dobj|thinker).+")
+source_group("OPL Emulator\\DOSBox" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/dosbox/.+")
+source_group("OPL Emulator\\MAME" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/mame/.+")
+source_group("Renderer" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/(r_|wl_draw|wl_floorceiling|wl_parallax|wl_atmos|wl_cloudsky).+")
+source_group("Renderer\\2D Drawing" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/r_2d/.+")
+source_group("Renderer\\Data" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/r_data/.+")
+source_group("Resource Files" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/resourcefiles/.+")
+source_group("SFMT" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/sfmt/.+")
+source_group("Textures" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/textures/.+")
+source_group("Win32" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/win32/.+")

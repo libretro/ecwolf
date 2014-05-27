@@ -50,6 +50,7 @@
 #include "wl_loadsave.h"
 #include "doomerrors.h"
 #include "m_random.h"
+#include "g_mapinfo.h"
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	file(NULL), zoneTraversed(NULL), zoneLinks(NULL)
@@ -373,7 +374,7 @@ void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 		++value;
 }
 
-void GameMap::LoadMap()
+void GameMap::LoadMap(bool loadingSave)
 {
 	if(!valid)
 		throw CRecoverableError("Tried to load invalid map!");
@@ -382,6 +383,9 @@ void GameMap::LoadMap()
 		ReadUWMFData();
 	else
 		ReadPlanesData();
+
+	if(!loadingSave)
+		ScanTiles();
 }
 
 GameMap::Plane &GameMap::NewPlane()
@@ -407,6 +411,28 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	newTrig.z = z;
 	spot->triggers.Push(newTrig);
 	return spot->triggers[spot->triggers.Size()-1];
+}
+
+// Look at data and determine if we need to set up any flags.
+void GameMap::ScanTiles()
+{
+	for(unsigned int p = 0;p < planes.Size();++p)
+	{
+		MapSpot spot = planes[p].map;
+		MapSpot endSpot = spot + header.width*header.height; 
+		while(spot < endSpot)
+		{
+			if(spot->tile)
+			{
+				if(spot->tile->mapped > gamestate.difficulty->MapFilter)
+					spot->amFlags |= AM_Visible;
+				if(spot->tile->dontOverlay)
+					spot->amFlags |= AM_DontOverlay;
+			}
+
+			++spot;
+		}
+	}
 }
 
 // Adds the spot to the tag list. The linked chain is stored in the tile itself.
@@ -456,7 +482,7 @@ void GameMap::SpawnThings() const
 	for(unsigned int i = 0;i < things.Size();++i)
 	{
 		Thing &thing = things[i];
-		if(!thing.skill[gamestate.difficulty])
+		if(!thing.skill[gamestate.difficulty->SpawnFilter])
 			continue;
 
 		if(thing.type == 1)
@@ -472,33 +498,20 @@ void GameMap::SpawnThings() const
 				printf("Unknown thing %d @ (%d, %d)\n", thing.type, thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
 
-			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, true);
+			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, SPAWN_AllowReplacement|(thing.patrol ? SPAWN_Patrol : 0));
 			// This forumla helps us to avoid errors in roundoffs.
 			actor->angle = (thing.angle/45)*ANGLE_45 + (thing.angle%45)*ANGLE_1;
 			actor->dir = nodir;
 			if(thing.ambush)
 				actor->flags |= FL_AMBUSH;
 			if(thing.patrol)
-			{
-				actor->flags |= FL_PATHING;
 				actor->dir = dirtype(actor->angle/ANGLE_45);
-
-				// Pathing monsters should take at least a one tile step.
-				// Otherwise the paths will break early.
-				actor->distance = TILEGLOBAL;
-				if(actor->PathState)
-				{
-					actor->SetState(actor->PathState, true);
-					if(actor->flags & FL_RANDOMIZE)
-						actor->ticcount = pr_spawnmobj() % actor->ticcount;
-				}
-			}
 
 			// Check for valid frames
 			if(!actor->state || !R_CheckSpriteValid(actor->sprite))
 			{
 				actor->Destroy();
-				actor = AActor::Spawn(unknownClass, thing.x, thing.y, 0, true);
+				actor = AActor::Spawn(unknownClass, thing.x, thing.y, 0, SPAWN_AllowReplacement);
 
 				printf("%s at (%d, %d) has no frames\n", cls->GetName().GetChars(), thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
@@ -646,8 +659,10 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			plane.map[i].pushDirection = static_cast<MapTile::Side>(pushdir);
 
 			arc << plane.map[i].texture[0] << plane.map[i].texture[1] << plane.map[i].texture[2] << plane.map[i].texture[3]
-				<< plane.map[i].visible
-				<< plane.map[i].thinker
+				<< plane.map[i].visible;
+			if(GameSave::SaveVersion >= 1393719642)
+				arc << plane.map[i].amFlags;
+			arc << plane.map[i].thinker
 				<< plane.map[i].slideAmount[0] << plane.map[i].slideAmount[1] << plane.map[i].slideAmount[2] << plane.map[i].slideAmount[3]
 				<< plane.map[i].sideSolid[0] << plane.map[i].sideSolid[1] << plane.map[i].sideSolid[2] << plane.map[i].sideSolid[3]
 				<< plane.map[i].triggers
@@ -656,6 +671,9 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 				<< plane.map[i].sector
 				<< plane.map[i].zone
 				<< plane.map[i].pushReceptor;
+
+			if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion >= 1375246092)
+				arc << plane.map[i].slideStyle;
 
 			if(!arc.IsStoring())
 				plane.map[i].plane = &plane;

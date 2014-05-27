@@ -66,6 +66,25 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
 /*
 =============================================================================
 
+								GLOBAL VARIABLES
+
+=============================================================================
+*/
+
+DBaseStatusBar *StatusBar;
+
+DBaseStatusBar *CreateStatusBar_Wolf3D();
+
+void DestroyStatusBar() { delete StatusBar; }
+void CreateStatusBar()
+{
+	StatusBar = CreateStatusBar_Wolf3D();
+	atterm(DestroyStatusBar);
+}
+
+/*
+=============================================================================
+
 								CONTROL STUFF
 
 =============================================================================
@@ -83,6 +102,9 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
 
 void CheckWeaponChange (void)
 {
+	if(players[0].flags & player_t::PF_DISABLESWITCH)
+		return;
+
 	AWeapon *newWeapon = NULL;
 
 	if(buttonstate[bt_nextweapon] && !buttonheld[bt_nextweapon])
@@ -155,6 +177,9 @@ void ControlMovement (AActor *ob)
 	}
 	else
 	{
+		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
+			controlx = xs_ToInt(controlx*players[0].ReadyWeapon->fovscale);
+
 		//
 		// not strafing
 		//
@@ -169,7 +194,7 @@ void ControlMovement (AActor *ob)
 		else if (strafe < -100)
 			strafe = -100;
 
-		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[ABS(strafe) >= RUNMOVE]));
+		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[abs(strafe) >= RUNMOVE]));
 
 		if (strafe > 0)
 		{
@@ -211,229 +236,40 @@ void ControlMovement (AActor *ob)
 }
 
 /*
-=============================================================================
-
-							STATUS WINDOW STUFF
-
-=============================================================================
+===============
+=
+= GiveExtraMan
+=
+===============
 */
 
-struct LatchConfig
+void GiveExtraMan (int amount)
 {
-	unsigned int Enabled;
-	unsigned int Digits;
-	unsigned int X;
-	unsigned int Y;
-};
-static struct StatusBarConfig_t
-{
-	LatchConfig Floor, Score, Lives, Health, Ammo;
-
-	// The following don't use the digits
-	LatchConfig Mugshot, Keys, Weapon;
-} StatusBarConfig = {
-	{1, 2, 16, 16},
-	{1, 6, 48, 16},
-	{1, 1, 112, 16},
-	{1, 3, 168, 16},
-	{1, 3, 208, 16},
-	{1, 0, 136, 4},
-	{1, 0, 240, 4},
-	{1, 0, 256, 8}
-};
-
-/*
-==================
-=
-= StatusDrawPic
-=
-==================
-*/
-
-void StatusDrawPic (unsigned x, unsigned y, const char* pic)
-{
-	VWB_DrawGraphic(TexMan(pic), x, 200-(STATUSLINES-y));
-}
-
-static void StatusDrawFace(FTexture *pic)
-{
-	VWB_DrawGraphic(pic, StatusBarConfig.Mugshot.X, 200-(STATUSLINES-StatusBarConfig.Mugshot.Y));
-}
-
-
-/*
-==================
-=
-= DrawFace
-=
-==================
-*/
-
-void DrawFace (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Mugshot.Enabled) return;
-
-	if(!gamestate.faceframe.isValid())
-	{
-		facecount = 0;
-		UpdateFace();
-	}
-
-	if (players[0].health)
-		StatusDrawFace(TexMan(gamestate.faceframe));
-	else
-	{
-		// TODO: Make this work based on damage types.
-		static const ClassDef *needle = ClassDef::FindClass("Needle");
-		if (players[0].killerobj && players[0].killerobj->GetClass() == needle)
-			StatusDrawFace(TexMan("STFMUT0"));
-		else
-			StatusDrawFace(TexMan("STFDEAD0"));
-	}
+	players[0].lives += amount;
+	if (players[0].lives < 0)
+		players[0].lives = 0;
+	else if(players[0].lives > 9)
+		players[0].lives = 9;
+	SD_PlaySound ("misc/1up");
 }
 
 /*
 ===============
 =
-= UpdateFace
-=
-= Calls draw face if time to change
+= GivePoints
 =
 ===============
 */
 
-int facecount = 0;
-
-void WeaponGrin ()
+void GivePoints (int32_t points)
 {
-	static FTextureID grin = TexMan.CheckForTexture("STFEVL0", FTexture::TEX_Any);
-	gamestate.faceframe = grin;
-	facecount = 140;
-}
-
-void UpdateFace (bool damageUpdate)
-{
-	static int oldDamageLevel = 0;
-	static bool noGodFace = false;
-	static FTextureID godmodeFace[3] = { TexMan.CheckForTexture("STFGOD0", FTexture::TEX_Any), TexMan.CheckForTexture("STFGOD1", FTexture::TEX_Any), TexMan.CheckForTexture("STFGOD2", FTexture::TEX_Any) };
-	static FTextureID waitFace[2] = { TexMan.CheckForTexture("STFWAIT0", FTexture::TEX_Any), TexMan.CheckForTexture("STFWAIT1", FTexture::TEX_Any) };
-	static FTextureID animations[7][3] =
+	players[0].score += points;
+	while (players[0].score >= players[0].nextextra)
 	{
-		{ TexMan.CheckForTexture("STFST00", FTexture::TEX_Any), TexMan.CheckForTexture("STFST01", FTexture::TEX_Any), TexMan.CheckForTexture("STFST02", FTexture::TEX_Any) },
-		{ TexMan.CheckForTexture("STFST10", FTexture::TEX_Any), TexMan.CheckForTexture("STFST11", FTexture::TEX_Any), TexMan.CheckForTexture("STFST12", FTexture::TEX_Any) },
-		{ TexMan.CheckForTexture("STFST20", FTexture::TEX_Any), TexMan.CheckForTexture("STFST21", FTexture::TEX_Any), TexMan.CheckForTexture("STFST22", FTexture::TEX_Any) },
-		{ TexMan.CheckForTexture("STFST30", FTexture::TEX_Any), TexMan.CheckForTexture("STFST31", FTexture::TEX_Any), TexMan.CheckForTexture("STFST32", FTexture::TEX_Any) },
-		{ TexMan.CheckForTexture("STFST40", FTexture::TEX_Any), TexMan.CheckForTexture("STFST41", FTexture::TEX_Any), TexMan.CheckForTexture("STFST42", FTexture::TEX_Any) },
-		{ TexMan.CheckForTexture("STFST50", FTexture::TEX_Any), TexMan.CheckForTexture("STFST51", FTexture::TEX_Any), TexMan.CheckForTexture("STFST52", FTexture::TEX_Any) },
-		{ TexMan.CheckForTexture("STFST60", FTexture::TEX_Any), TexMan.CheckForTexture("STFST61", FTexture::TEX_Any), TexMan.CheckForTexture("STFST62", FTexture::TEX_Any) },
-	};
-
-	const int maxHealth = players[0].mo ? players[0].mo->maxhealth : 100;
-	const int damageLevel = MIN(6, players[0].health > maxHealth ? 0 : (maxHealth-players[0].health)/(maxHealth/6));
-	if(damageUpdate)
-	{
-		// Update the face only if we've changed damage levels.
-		if(damageLevel == oldDamageLevel)
-			return;
-		facecount = 0;
-	}
-	oldDamageLevel = damageLevel;
-
-	// OK Wolf apparently did something more along the lines of ++facecount > M_Random()
-	// This doesn't seem to work as well with the new random generator, so lets take a different approach.
-	if (--facecount <= 0)
-	{
-		facecount = ((M_Random()>>3)|0xF);
-
-		if (funnyticount > 301 * 70)
-		{
-			funnyticount = 0;
-			FTextureID pickedID = waitFace[M_Random() & 1];
-			if(pickedID.isValid())
-			{
-				gamestate.faceframe = pickedID;
-				facecount = 17;
-				return;
-			}
-		}
-
-		unsigned int facePick = M_Random()%3;
-
-		if(godmode && !noGodFace)
-		{
-			gamestate.faceframe = godmodeFace[facePick];
-
-			if(!gamestate.faceframe.isValid())
-			{
-				if(!godmodeFace[0].isValid())
-					noGodFace = true;
-				godmodeFace[1] = godmodeFace[2] = godmodeFace[0];
-			}
-			else
-				return;
-		}
-
-		if(players[0].mo)
-			gamestate.faceframe = animations[damageLevel][facePick];
-		else
-			gamestate.faceframe = animations[0][0];
+		players[0].nextextra += EXTRAPOINTS;
+		GiveExtraMan (1);
 	}
 }
-
-
-
-/*
-===============
-=
-= LatchNumber
-=
-= right justifies and pads with blanks
-=
-===============
-*/
-
-static void LatchNumber (int x, int y, unsigned width, int32_t number, bool cap=false)
-{
-	static FFont *HudFont = NULL;
-	if(!HudFont)
-	{
-		HudFont = V_GetFont("HudFont");
-	}
-
-	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
-
-	FString str;
-	str.Format("%*d", width, number);
-	if(str.Len() > width && cap)
-	{
-		int maxval = width <= 9 ? (int) ceil(pow(10., (int)width))-1 : INT_MAX;
-		str.Format("%d", maxval);
-	}
-
-	int cwidth;
-	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
-	for(size_t i = MAX<size_t>(0, str.Len()-width);i < str.Len();++i)
-	{
-		VWB_DrawGraphic(HudFont->GetChar(str[i], &cwidth), x, y, MENU_NONE, remap);
-		x += cwidth;
-	}
-}
-
-
-/*
-===============
-=
-= DrawHealth
-=
-===============
-*/
-
-void DrawHealth (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Health.Enabled) return;
-	LatchNumber (StatusBarConfig.Health.X,StatusBarConfig.Health.Y,StatusBarConfig.Health.Digits,players[0].health,true);
-}
-
 
 /*
 ===============
@@ -449,11 +285,10 @@ void TakeDamage (int points,AActor *attacker)
 
 	if (gamestate.victoryflag)
 		return;
-	if (gamestate.difficulty==gd_baby)
-		points>>=2;
+	points = (points*gamestate.difficulty->DamageFactor)>>FRACBITS;
 
 	if (!godmode)
-		players[0].health -= points;
+		players[0].mo->health = players[0].health -= points;
 
 	if (players[0].health<=0)
 	{
@@ -466,303 +301,11 @@ void TakeDamage (int points,AActor *attacker)
 	if (godmode != 2)
 		StartDamageFlash (points);
 
-	static FTextureID ouchFace = TexMan.CheckForTexture("STFOUCH0", FTexture::TEX_Any);
-	if(ouchFace.isValid() && points > 30 && players[0].health != 0)
-	{
-		gamestate.faceframe = ouchFace;
-		facecount = 17;
-	}
-	else
-		UpdateFace(true);
-	DrawStatusBar();
-}
+	if (points > 0)
+		SD_PlaySound("player/pain");
 
-
-//===========================================================================
-
-
-/*
-===============
-=
-= DrawLevel
-=
-===============
-*/
-
-void DrawLevel (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
-	LatchNumber (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,levelInfo->FloorNumber);
-}
-
-//===========================================================================
-
-
-/*
-===============
-=
-= DrawLives
-=
-===============
-*/
-
-void DrawLives (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Lives.Enabled) return;
-	LatchNumber (StatusBarConfig.Lives.X,StatusBarConfig.Lives.Y,StatusBarConfig.Lives.Digits,players[0].lives);
-}
-
-
-/*
-===============
-=
-= GiveExtraMan
-=
-===============
-*/
-
-void GiveExtraMan (int amount)
-{
-	players[0].lives += amount;
-	if (players[0].lives < 0)
-		players[0].lives = 0;
-	else if(players[0].lives > 9)
-		players[0].lives = 9;
-}
-
-//===========================================================================
-
-/*
-===============
-=
-= DrawScore
-=
-===============
-*/
-
-void DrawScore (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Score.Enabled) return;
-	LatchNumber (StatusBarConfig.Score.X,StatusBarConfig.Score.Y,StatusBarConfig.Score.Digits,players[0].score);
-}
-
-/*
-===============
-=
-= GivePoints
-=
-===============
-*/
-
-void GivePoints (int32_t points)
-{
-	players[0].score += points;
-	if (players[0].score >= players[0].nextextra)
-	{
-		SD_PlaySound ("misc/1up");
-		do
-		{
-			players[0].nextextra += EXTRAPOINTS;
-			GiveExtraMan (1);
-		}
-		while (players[0].score >= players[0].nextextra);
-	}
-}
-
-//===========================================================================
-
-/*
-==================
-=
-= DrawWeapon
-=
-==================
-*/
-
-void DrawWeapon (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Weapon.Enabled ||
-		players[0].ReadyWeapon == NULL ||
-		players[0].ReadyWeapon->icon.isNull()
-	)
-		return;
-
-	VWB_DrawGraphic(TexMan(players[0].ReadyWeapon->icon), StatusBarConfig.Weapon.X, 200-(STATUSLINES-StatusBarConfig.Weapon.Y));
-}
-
-
-/*
-==================
-=
-= DrawKeys
-=
-==================
-*/
-
-void DrawKeys (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Keys.Enabled) return;
-	static bool extendedKeysGraphics = TexMan.CheckForTexture("STKEYS3", FTexture::TEX_Any).isValid();
-
-	// Find keys in inventory
-	int presentKeys = 0;
-	if(players[0].mo)
-	{
-		for(AInventory *item = players[0].mo->inventory;item != NULL;item = item->inventory)
-		{
-			if(item->IsKindOf(NATIVE_CLASS(Key)))
-			{
-				int slot = static_cast<AKey *>(item)->KeyNumber;
-				if(slot <= 4)
-					presentKeys |= 1<<(slot-1);
-				if(presentKeys == 15)
-					break;
-			}
-		}
-	}
-
-	const unsigned int x = StatusBarConfig.Keys.X;
-	const unsigned int y = StatusBarConfig.Keys.Y;
-	if (extendedKeysGraphics && (presentKeys & (1|4)) == (1|4))
-		StatusDrawPic (x,y,"STKEYS5");
-	else if(extendedKeysGraphics && (presentKeys & 4))
-		StatusDrawPic (x,y,"STKEYS3");
-	else if(presentKeys & 1)
-		StatusDrawPic (x,y,"STKEYS1");
-	else
-		StatusDrawPic (x,y,"STKEYS0");
-
-	if (extendedKeysGraphics && (presentKeys & (2|8)) == (2|8))
-		StatusDrawPic (x,y+16,"STKEYS6");
-	else if (extendedKeysGraphics && (presentKeys & 8))
-		StatusDrawPic (x,y+16,"STKEYS4");
-	else if (presentKeys & 2)
-		StatusDrawPic (x,y+16,"STKEYS2");
-	else
-		StatusDrawPic (x,y+16,"STKEYS0");
-}
-
-//===========================================================================
-
-/*
-===============
-=
-= DrawAmmo
-=
-===============
-*/
-
-void DrawAmmo (void)
-{
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Ammo.Enabled ||
-		!players[0].ReadyWeapon || !players[0].ReadyWeapon->ammo1)
-		return;
-
-	unsigned int amount = players[0].ReadyWeapon->ammo1->amount;
-	LatchNumber (StatusBarConfig.Ammo.X,StatusBarConfig.Ammo.Y,StatusBarConfig.Ammo.Digits,amount,true);
-}
-
-//===========================================================================
-
-void DrawStatusBar()
-{
-	if(viewsize == 21 && ingame)
-		return;
-
-	VWB_DrawGraphic(TexMan("STBAR"), 0, 160);
-	DrawFace ();
-	DrawHealth ();
-	DrawLives ();
-	DrawLevel ();
-	DrawAmmo ();
-	DrawKeys ();
-	DrawWeapon ();
-	DrawScore ();
-}
-
-//===========================================================================
-
-void SetupStatusbar()
-{
-	// Temporary configuration lump so that some mods can be ported to ECWolf
-	// before a proper solution is created.
-	// ---> WILL BE REMOVED <---
-
-	int lastLump = 0;
-	int lumpnum = 0;
-	while((lumpnum = Wads.FindLump("LATCHCFG", &lastLump)) != -1)
-	{
-		FMemLump lump = Wads.ReadLump(lumpnum);
-		Scanner sc((const char*)(lump.GetMem()), lump.GetSize());
-		sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpnum));
-		sc.ScriptMessage(Scanner::WARNING, "Utilizing temporary status bar configuration script.");
-
-		while(sc.TokensLeft())
-		{
-			sc.MustGetToken(TK_Identifier);
-			FString key = sc->str;
-			key.ToLower();
-			sc.MustGetToken('=');
-			sc.MustGetToken(TK_IntConst);
-			unsigned int value = sc->number;
-
-			LatchConfig *var = NULL;
-			FString extrakey;
-			if(key.IndexOf("ammo") == 0)
-			{
-				extrakey = key.Mid(4);
-				var = &StatusBarConfig.Ammo;
-			}
-			else if(key.IndexOf("floor") == 0)
-			{
-				extrakey = key.Mid(5);
-				var = &StatusBarConfig.Floor;
-			}
-			else if(key.IndexOf("health") == 0)
-			{
-				extrakey = key.Mid(6);
-				var = &StatusBarConfig.Health;
-			}
-			else if(key.IndexOf("keys") == 0)
-			{
-				extrakey = key.Mid(4);
-				var = &StatusBarConfig.Keys;
-			}
-			else if(key.IndexOf("lives") == 0)
-			{
-				extrakey = key.Mid(5);
-				var = &StatusBarConfig.Lives;
-			}
-			else if(key.IndexOf("mugshot") == 0)
-			{
-				extrakey = key.Mid(7);
-				var = &StatusBarConfig.Mugshot;
-			}
-			else if(key.IndexOf("score") == 0)
-			{
-				extrakey = key.Mid(5);
-				var = &StatusBarConfig.Score;
-			}
-			else if(key.IndexOf("weapon") == 0)
-			{
-				extrakey = key.Mid(6);
-				var = &StatusBarConfig.Weapon;
-			}
-			else
-				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key.GetChars());
-
-			if(extrakey.Compare("enabled") == 0)
-				var->Enabled = value;
-			else if(extrakey.Compare("digits") == 0)
-				var->Digits = value;
-			else if(extrakey.Compare("x") == 0)
-				var->X = value;
-			else if(extrakey.Compare("y") == 0)
-				var->Y = value;
-			else
-				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key.GetChars());
-		}
-	}
+	StatusBar->UpdateFace(points);
+	StatusBar->DrawStatusBar();
 }
 
 /*
@@ -793,7 +336,6 @@ static bool TryMove (AActor *ob)
 	}
 
 	int xl,yl,xh,yh,x,y;
-	AActor *check;
 
 	xl = (ob->x-ob->radius) >>TILESHIFT;
 	yl = (ob->y-ob->radius) >>TILESHIFT;
@@ -856,13 +398,15 @@ static bool TryMove (AActor *ob)
 	//
 	// check for actors
 	//
-	for(AActor::Iterator *next = NULL, *iter = AActor::GetIterator();iter;iter = next)
+	for(AActor::Iterator iter = AActor::GetIterator().Next();iter;)
 	{
-		next = iter->Next();
-		if(iter->Item() == ob)
-			continue;
+		// We need to iterate a little awkwardly since the object may disappear
+		// on us rendering the next pointer invalid.
+		AActor *check = iter;
+		iter.Next();
 
-		check = iter->Item();
+		if(check == ob)
+			continue;
 
 		fixed r = check->radius + ob->radius;
 		if(check->flags & FL_SOLID)
@@ -1054,6 +598,8 @@ void Cmd_Use (void)
 	}
 
 	bool doNothing = true;
+	bool isRepeatable = false;
+	BYTE lastTrigger = 0;
 	MapSpot spot = map->GetSpot(checkx, checky, 0);
 	for(unsigned int i = 0;i < spot->triggers.Size();++i)
 	{
@@ -1062,7 +608,8 @@ void Cmd_Use (void)
 		{
 			if(map->ActivateTrigger(trig, direction, players[0].mo))
 			{
-				P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), trig.repeatable, trig.action);
+				isRepeatable |= trig.repeatable;
+				lastTrigger = trig.action;
 				doNothing = false;
 			}
 		}
@@ -1070,6 +617,8 @@ void Cmd_Use (void)
 
 	if(doNothing)
 		SD_PlaySound ("misc/do_nothing");
+	else
+		P_ChangeSwitchTexture(spot, static_cast<MapTile::Side>(direction), isRepeatable, lastTrigger);
 }
 
 /*
@@ -1080,7 +629,7 @@ void Cmd_Use (void)
 =============================================================================
 */
 
-player_t::player_t() : bob(0), attackheld(false)
+player_t::player_t() : FOV(90), DesiredFOV(90), bob(0), attackheld(false)
 {
 }
 
@@ -1153,6 +702,22 @@ void player_t::BobWeapon (fixed *x, fixed *y)
 		case AWeapon::BobInverseSmooth:
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = (FixedMul(boby, finecosine[angle*2 & (FINEANGLES-1)]) + boby) / 2;
+			break;
+
+		case AWeapon::BobThrust:
+			{
+				*x = 0;
+
+				// Down thrust is faster than up
+				// Blake Stone uses a linearly increasing velocity,
+				// we use a sin table since it's available and requires no extra storage
+				const int thrustPosition = (((angle<<3)*3)&(FRACUNIT-1)) * 3;
+				if(thrustPosition < FRACUNIT*2)
+					*y = -FixedMul(boby, thrustPosition - finesine[(thrustPosition/2)>>5] - FRACUNIT/2);
+				else
+					*y = FixedMul(boby, finesine[(thrustPosition - FRACUNIT*2)>>5] - FRACUNIT/2);
+			}
+			break;
 		}
 	}
 	else
@@ -1186,14 +751,21 @@ ACTION_FUNCTION(A_Lower)
 
 	player->psprite[player_t::ps_weapon].sy += RAISESPEED;
 	if(player->psprite[player_t::ps_weapon].sy < RAISERANGE)
-		return;
+		return false;
 	player->psprite[player_t::ps_weapon].sy = RAISERANGE;
 
 	if(player->PendingWeapon == WP_NOCHANGE)
 		player->PendingWeapon = NULL;
 
 	player->SetPSprite(NULL, player_t::ps_flash);
-	player->BringUpWeapon();
+	// If we're dead, don't bother trying to raise a weapon.
+	// In fact, we want to keep the current weapon "up" so that the status bar
+	// displays the correct information.
+	if(player->state != player_t::PST_DEAD)
+		player->BringUpWeapon();
+	else
+		player->SetPSprite(NULL, player_t::ps_weapon);
+	return true;
 }
 ACTION_FUNCTION(A_Raise)
 {
@@ -1202,18 +774,19 @@ ACTION_FUNCTION(A_Raise)
 	if(player->PendingWeapon != WP_NOCHANGE)
 	{
 		player->SetPSprite(player->ReadyWeapon->GetDownState(), player_t::ps_weapon);
-		return;
+		return false;
 	}
 
 	player->psprite[player_t::ps_weapon].sy -= RAISESPEED;
 	if(player->psprite[player_t::ps_weapon].sy > 0)
-		return;
+		return false;
 	player->psprite[player_t::ps_weapon].sy = 0;
 
 	if(player->ReadyWeapon)
 		player->SetPSprite(player->ReadyWeapon->GetReadyState(), player_t::ps_weapon);
 	else
 		player->psprite[player_t::ps_weapon].frame = NULL;
+	return true;
 }
 
 // Finds the target closest to the player within shooting range.
@@ -1230,18 +803,18 @@ AActor *player_t::FindTarget()
 	{
 		oldclosest = closest;
 
-		for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
+		for(AActor::Iterator check = AActor::GetIterator();check.Next();)
 		{
-			if(check->Item() == mo)
+			if(check == mo)
 				continue;
 
-			if ((check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
-				&& abs(check->Item()->viewx-centerx) < shootdelta)
+			if ((check->flags & FL_SHOOTABLE) && (check->flags & FL_VISABLE)
+				&& abs(check->viewx-centerx) < shootdelta)
 			{
-				if (check->Item()->transx < viewdist)
+				if (check->transx < viewdist)
 				{
-					viewdist = check->Item()->transx;
-					closest = check->Item();
+					viewdist = check->transx;
+					closest = check;
 				}
 			}
 		}
@@ -1274,6 +847,7 @@ void player_t::Reborn()
 	ReadyWeapon = NULL;
 	PendingWeapon = WP_NOCHANGE;
 	flags = 0;
+	FOV = DesiredFOV = 90.0f;
 
 	if(state == PST_ENTER)
 	{
@@ -1287,8 +861,6 @@ void player_t::Reborn()
 
 	// Recalculate the projection here so that player classes with differing radii are supported.
 	CalcProjection(mo->radius);
-
-	DrawStatusBar();
 }
 
 void player_t::Serialize(FArchive &arc)
@@ -1318,6 +890,9 @@ void player_t::Serialize(FArchive &arc)
 			<< psprite[i].sy;
 	}
 
+	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374729160)
+		arc << FOV << DesiredFOV;
+
 	if(arc.IsLoading())
 	{
 		mo->SetupWeaponSlots();
@@ -1327,13 +902,18 @@ void player_t::Serialize(FArchive &arc)
 
 void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 {
-	flags &= ~(player_t::PF_WEAPONREADY|player_t::PF_WEAPONBOBBING);
+	flags &= ~(player_t::PF_READYFLAGS);
 	psprite[layer].frame = frame;
 
-	if(frame)
+	while(psprite[layer].frame)
 	{
-		psprite[layer].ticcount = frame->duration;
-		frame->action(mo, ReadyWeapon, frame);
+		psprite[layer].ticcount = psprite[layer].frame->GetTics();
+		psprite[layer].frame->action(mo, ReadyWeapon, psprite[layer].frame);
+
+		if(psprite[layer].frame && psprite[layer].ticcount == 0)
+			psprite[layer].frame = psprite[layer].frame->next;
+		else
+			break;
 	}
 }
 
@@ -1352,11 +932,11 @@ FArchive &operator<< (FArchive &arc, player_t *&player)
 
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
-	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, false);
+	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, 0);
 	players[0].mo->angle = dir*ANGLE_1;
 	players[0].mo->player = &players[0];
 	Thrust (0,0); // set some variables
-	players[0].mo->GetThinker()->SetPriority(ThinkerList::PLAYER);
+	players[0].mo->SetPriority(ThinkerList::PLAYER);
 
 	if(players[0].state == player_t::PST_ENTER || players[0].state == player_t::PST_REBORN)
 		players[0].Reborn();
@@ -1413,18 +993,18 @@ ACTION_FUNCTION(A_CustomPunch)
 	// actually fire
 	int dist = 0x7fffffff;
 	AActor *closest = NULL;
-	for(AActor::Iterator *check = AActor::GetIterator();check;check = check->Next())
+	for(AActor::Iterator check = AActor::GetIterator();check.Next();)
 	{
-		if(check->Item() == self)
+		if(check == self)
 			continue;
 
-		if ( (check->Item()->flags & FL_SHOOTABLE) && (check->Item()->flags & FL_VISABLE)
-			&& abs(check->Item()->viewx-centerx) < shootdelta)
+		if ( (check->flags & FL_SHOOTABLE) && (check->flags & FL_VISABLE)
+			&& abs(check->viewx-centerx) < shootdelta)
 		{
-			if (check->Item()->transx < dist)
+			if (check->transx < dist)
 			{
-				dist = check->Item()->transx;
-				closest = check->Item();
+				dist = check->transx;
+				closest = check;
 			}
 		}
 	}
@@ -1432,7 +1012,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	if (!closest || dist-(FRACUNIT/2) > (range/64)*FRACUNIT)
 	{
 		// missed
-		return;
+		return false;
 	}
 
 	if(!norandom)
@@ -1447,7 +1027,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	if(flags & CPF_USEAMMO)
 	{
 		if(!player->ReadyWeapon->DepleteAmmo())
-			return;
+			return true;
 	}
 
 	if(lifesteal > 0 && player->health < self->health)
@@ -1457,6 +1037,7 @@ ACTION_FUNCTION(A_CustomPunch)
 		if(player->health > self->health)
 			player->health = self->health;
 	}
+	return true;
 }
 
 static FRandom pr_cwbullet("CustomWpBullet");
@@ -1484,7 +1065,7 @@ ACTION_FUNCTION(A_GunAttack)
 	if(!(flags & GAF_NOAMMO))
 	{
 		if(!player->ReadyWeapon->DepleteAmmo())
-			return;
+			return false;
 	}
 
 	if(sound.Len() == 1 && sound[0] == '*')
@@ -1497,13 +1078,13 @@ ACTION_FUNCTION(A_GunAttack)
 
 	AActor *closest = players[0].FindTarget();
 	if(!closest)
-		return;
+		return false;
 
 	//
 	// hit something
 	//
-	dx = ABS(closest->x - players[0].mo->x);
-	dy = ABS(closest->y - players[0].mo->y);
+	dx = abs(closest->x - players[0].mo->x);
+	dy = abs(closest->y - players[0].mo->y);
 	dist = dx>dy ? dx:dy;
 
 	dist = FixedMul(dist, snipe);
@@ -1515,9 +1096,10 @@ ACTION_FUNCTION(A_GunAttack)
 	if (dist >= longrange)
 	{
 		if ( (pr_cwbullet() % maxrange) < dist)           // missed
-			return;
+			return false;
 	}
 	DamageActor (closest,damage);
+	return true;
 }
 
 ACTION_FUNCTION(A_FireCustomMissile)
@@ -1530,7 +1112,7 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	ACTION_PARAM_BOOL(aim, 5);
 
 	if(useammo && !players[0].ReadyWeapon->DepleteAmmo())
-		return;
+		return false;
 
 	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
 		madenoise = true;
@@ -1542,11 +1124,12 @@ ACTION_FUNCTION(A_FireCustomMissile)
 
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
-		return;
-	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, true);
+		return false;
+	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, SPAWN_AllowReplacement);
 	newobj->flags |= FL_PLAYERMISSILE;
 	newobj->angle = iangle;
 
 	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);
 	newobj->vely = -FixedMul(newobj->speed,finesine[iangle>>ANGLETOFINESHIFT]);
+	return true;
 }

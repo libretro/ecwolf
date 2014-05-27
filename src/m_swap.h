@@ -3,20 +3,20 @@
 
 #include "wl_def.h"
 
-static inline const WORD ReadLittleShort(const BYTE * const ptr)
+static inline WORD ReadLittleShort(const BYTE * const ptr)
 {
 	return WORD(BYTE(*ptr)) |
 		(WORD(BYTE(*(ptr+1)))<<8);
 }
 
-static inline const DWORD ReadLittle24(const BYTE * const ptr)
+static inline DWORD ReadLittle24(const BYTE * const ptr)
 {
 	return DWORD(BYTE(*ptr)) |
 		(DWORD(BYTE(*(ptr+1)))<<8) |
 		(DWORD(BYTE(*(ptr+2)))<<16);
 }
 
-static inline const DWORD ReadLittleLong(const BYTE * const ptr)
+static inline DWORD ReadLittleLong(const BYTE * const ptr)
 {
 	return DWORD(BYTE(*ptr)) |
 		(DWORD(BYTE(*(ptr+1)))<<8) |
@@ -46,12 +46,12 @@ static inline void WriteLittleShort(BYTE * const ptr, WORD value)
 
 // After the fact Byte Swapping ------------------------------------------------
 
-static inline const WORD SwapShort(WORD x)
+static inline WORD SwapShort(WORD x)
 {
 	return ((x&0xFF)<<8) | ((x>>8)&0xFF);
 }
 
-static inline const DWORD SwapLong(DWORD x)
+static inline DWORD SwapLong(DWORD x)
 {
 	return ((x&0xFF)<<24) |
 		(((x>>8)&0xFF)<<16) |

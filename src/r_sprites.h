@@ -46,6 +46,7 @@ enum SpecialSprites
 };
 
 bool R_CheckSpriteValid(unsigned int spr);
+class FTexture *R_GetAMSprite(AActor *actor, angle_t rotangle, bool &flip);
 unsigned int R_GetSprite(const char* spr);
 void R_GetSpriteHitlist(BYTE* hitlist);
 void R_InitSprites();
@@ -57,5 +58,27 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 // For FArchive
 unsigned int R_GetNumLoadedSprites();
 uint32_t R_GetNameForSprite(unsigned int index);
+
+// Thinker for S3DNA style zoom in sprites. (Game over, you win, cast call)
+class SpriteZoomer : public Thinker
+{
+	DECLARE_CLASS(SpriteZoomer, Thinker)
+
+private:
+	const Frame *frame;
+	FTextureID texID;
+	int frametics;
+	unsigned short count;
+	unsigned short zoomtime;
+
+public:
+	SpriteZoomer(FTextureID texID, unsigned short zoomtime);
+	SpriteZoomer(const Frame *frame, unsigned short zoomtime);
+
+	void Draw();
+	void Tick();
+};
+
+void R_DrawZoomer(FTextureID texID);
 
 #endif

@@ -556,8 +556,7 @@ INLINE void Operator::Prepare( const Chip* chip )  {
 	}
 }
 
-void Operator::KeyOn( Bit8u mask, const int *volume ) {
-	playVolume = volume;
+void Operator::KeyOn( Bit8u mask ) {
 	if ( !keyOn ) {
 		//Restart the frequency generator
 #if ( DBOPL_WAVE > WAVE_HANDLER )
@@ -606,10 +605,7 @@ Bits INLINE Operator::GetSample( Bits modulation ) {
 	} else {
 		Bitu index = ForwardWave();
 		index += modulation;
-		if(playVolume)
-			return GetWave( index, vol )*MULTIPLY_VOLUME(*playVolume);
-		else
-			return GetWave( index, vol );
+		return GetWave( index, vol );
 	}
 }
 
@@ -633,7 +629,6 @@ Operator::Operator() {
 	totalLevel = ENV_MAX;
 	volume = ENV_MAX;
 	releaseAdd = 0;
-	playVolume = NULL;
 }
 
 /*
@@ -650,6 +645,7 @@ Channel::Channel() {
 	feedback = 31;
 	fourMask = 0;
 	synthHandler = &Channel::BlockTemplate< sm2FM >;
+	playVolume = NULL;
 };
 
 void Channel::SetChanData( const Chip* chip, Bit32u data ) {
@@ -689,6 +685,7 @@ void Channel::UpdateFrequency( const Chip* chip, Bit8u fourOp ) {
 }
 
 void Channel::WriteA0( const Chip* chip, Bit8u val ) {
+	playVolume = chip->volume;
 	Bit8u fourOp = chip->reg104 & chip->opl3Active & fourMask;
 	//Don't handle writes to silent fourop channels
 	if ( fourOp > 0x80 )
@@ -701,6 +698,7 @@ void Channel::WriteA0( const Chip* chip, Bit8u val ) {
 }
 
 void Channel::WriteB0( const Chip* chip, Bit8u val ) {
+	playVolume = chip->volume;
 	Bit8u fourOp = chip->reg104 & chip->opl3Active & fourMask;
 	//Don't handle writes to silent fourop channels
 	if ( fourOp > 0x80 )
@@ -715,11 +713,11 @@ void Channel::WriteB0( const Chip* chip, Bit8u val ) {
 		return;
 	regB0 = val;
 	if ( val & 0x20 ) {
-		Op(0)->KeyOn( 0x1, chip->volume );
-		Op(1)->KeyOn( 0x1, chip->volume );
+		Op(0)->KeyOn( 0x1 );
+		Op(1)->KeyOn( 0x1 );
 		if ( fourOp & 0x3f ) {
-			( this + 1 )->Op(0)->KeyOn( 1, chip->volume );
-			( this + 1 )->Op(1)->KeyOn( 1, chip->volume );
+			( this + 1 )->Op(0)->KeyOn( 1 );
+			( this + 1 )->Op(1)->KeyOn( 1 );
 		}
 	} else {
 		Op(0)->KeyOff( 0x1 );
@@ -898,6 +896,9 @@ Channel* Channel::BlockTemplate( Chip* chip, Bit32u samples, Bit32s* output ) {
 			return (this + 2);
 		}
 		break;
+	case sm3Percussion:
+	case sm2Percussion:
+		break;
 	}
 	//Init the operators with the the current vibrato and tremolo values
 	Op( 0 )->Prepare( chip );
@@ -949,6 +950,10 @@ Channel* Channel::BlockTemplate( Chip* chip, Bit32u samples, Bit32s* output ) {
 			sample += Op(2)->GetSample( next );
 			sample += Op(3)->GetSample( 0 );
 		}
+
+		if(playVolume)
+			sample *= MULTIPLY_VOLUME(*playVolume);
+
 		switch( mode ) {
 		case sm2AM:
 		case sm2FM:
@@ -962,6 +967,9 @@ Channel* Channel::BlockTemplate( Chip* chip, Bit32u samples, Bit32s* output ) {
 		case sm3AMAM:
 			output[ i * 2 + 0 ] += sample & maskLeft;
 			output[ i * 2 + 1 ] += sample & maskRight;
+			break;
+		case sm3Percussion:
+		case sm2Percussion:
 			break;
 		}
 	}
@@ -1057,33 +1065,33 @@ void Chip::WriteBD( Bit8u val ) {
 		}
 		//Bass Drum
 		if ( val & 0x10 ) {
-			chan[6].op[0].KeyOn( 0x2, volume );
-			chan[6].op[1].KeyOn( 0x2, volume );
+			chan[6].op[0].KeyOn( 0x2 );
+			chan[6].op[1].KeyOn( 0x2 );
 		} else {
 			chan[6].op[0].KeyOff( 0x2 );
 			chan[6].op[1].KeyOff( 0x2 );
 		}
 		//Hi-Hat
 		if ( val & 0x1 ) {
-			chan[7].op[0].KeyOn( 0x2, volume );
+			chan[7].op[0].KeyOn( 0x2 );
 		} else {
 			chan[7].op[0].KeyOff( 0x2 );
 		}
 		//Snare
 		if ( val & 0x8 ) {
-			chan[7].op[1].KeyOn( 0x2, volume );
+			chan[7].op[1].KeyOn( 0x2 );
 		} else {
 			chan[7].op[1].KeyOff( 0x2 );
 		}
 		//Tom-Tom
 		if ( val & 0x4 ) {
-			chan[8].op[0].KeyOn( 0x2, volume );
+			chan[8].op[0].KeyOn( 0x2 );
 		} else {
 			chan[8].op[0].KeyOff( 0x2 );
 		}
 		//Top Cymbal
 		if ( val & 0x2 ) {
-			chan[8].op[1].KeyOn( 0x2, volume );
+			chan[8].op[1].KeyOn( 0x2 );
 		} else {
 			chan[8].op[1].KeyOff( 0x2 );
 		}

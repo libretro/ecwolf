@@ -6,7 +6,7 @@ cluster 1
 	exittextismessage
 }
 
-map "MAP02"
+map "MAP02" lookup "SHUSTR_02"
 {
 	next = "EndDemo"
 	secretnext = "EndDemo"

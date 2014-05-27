@@ -51,6 +51,16 @@
 void T_ExplodeProjectile(AActor *self, AActor *target);
 void T_Projectile(AActor *self);
 
+// Old save compatibility
+void AActorProxy::Serialize(FArchive &arc)
+{
+	Super::Serialize(arc);
+
+	bool enabled;
+	arc << enabled << actualObject;
+}
+IMPLEMENT_INTERNAL_CLASS(AActorProxy)
+
 ////////////////////////////////////////////////////////////////////////////////
 
 Frame::~Frame()
@@ -67,13 +77,22 @@ Frame::~Frame()
 	}
 }
 
-void Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller) const
+static FRandom pr_statetics("StateTics");
+int Frame::GetTics() const
+{
+	if(randDuration)
+		return duration + pr_statetics.GenRand32() % (randDuration + 1);
+	return duration;
+}
+
+bool Frame::ActionCall::operator() (AActor *self, AActor *stateOwner, const Frame * const caller, ActionResult *result) const
 {
 	if(pointer)
 	{
 		args->Evaluate(self);
-		pointer(self, stateOwner, caller, *args);
+		return pointer(self, stateOwner, caller, *args, result);
 	}
+	return false;
 }
 
 FArchive &operator<< (FArchive &arc, const Frame *&frame)
@@ -123,64 +142,11 @@ FArchive &operator<< (FArchive &arc, const Frame *&frame)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// We can't make AActor a thinker since we create non-thinking objects.
-class AActorProxy : public Thinker
-{
-	DECLARE_CLASS(AActorProxy, Thinker)
-	HAS_OBJECT_POINTERS
-
-	public:
-		AActorProxy(AActor *parent) : enabled(true), parent(parent)
-		{
-		}
-
-		void Destroy()
-		{
-			Super::Destroy();
-
-			if(enabled && parent)
-			{
-				parent->Destroy();
-				parent = NULL;
-			}
-		}
-
-		void Disable()
-		{
-			enabled = false;
-		}
-
-		void Tick()
-		{
-			if(enabled)
-				parent->Tick();
-		}
-
-		void PostBeginPlay()
-		{
-			if(enabled)
-				parent->PostBeginPlay();
-		}
-
-		void Serialize(FArchive &arc)
-		{
-			arc << enabled << parent;
-			Super::Serialize(arc);
-		}
-
-		bool			enabled;
-		TObjPtr<AActor>	parent;
-};
-IMPLEMENT_INTERNAL_POINTY_CLASS(AActorProxy)
-	DECLARE_POINTER(parent)
-END_POINTERS
-
-LinkedList<AActor *> AActor::actors;
+EmbeddedList<AActor>::List AActor::actors;
 PointerIndexTable<ExpressionNode> AActor::damageExpressions;
 PointerIndexTable<AActor::DropList> AActor::dropItems;
 IMPLEMENT_POINTY_CLASS(Actor)
 	DECLARE_POINTER(inventory)
-	DECLARE_POINTER(thinker)
 END_POINTERS
 
 void AActor::AddInventory(AInventory *item)
@@ -207,6 +173,17 @@ void AActor::AddInventory(AInventory *item)
 	}
 }
 
+void AActor::ClearCounters()
+{
+	if(flags & FL_COUNTITEM)
+		--gamestate.treasuretotal;
+	if((flags & FL_COUNTKILL) && health > 0)
+		--gamestate.killtotal;
+	if(flags & FL_COUNTSECRET)
+		--gamestate.secrettotal;
+	flags &= ~(FL_COUNTITEM|FL_COUNTKILL|FL_COUNTSECRET);
+}
+
 void AActor::Destroy()
 {
 	Super::Destroy();
@@ -215,8 +192,6 @@ void AActor::Destroy()
 	// Inventory items don't have a registered thinker so we must free them now
 	if(inventory)
 	{
-		assert(inventory->thinker == NULL);
-
 		inventory->Destroy();
 		inventory = NULL;
 	}
@@ -239,11 +214,11 @@ void AActor::Die()
 	DropList *dropitems = GetDropList();
 	if(dropitems)
 	{
-		DropList::Node *item = dropitems->Head();
-		DropItem *bestDrop = NULL; // For FL_DROPBASEDONTARGET
+		DropList::Iterator item = dropitems->Head();
+		DropList::Iterator bestDrop = NULL; // For FL_DROPBASEDONTARGET
 		do
 		{
-			DropItem *drop = &item->Item();
+			DropList::Iterator drop = item;
 			if(pr_dropitem() <= drop->probability)
 			{
 				const ClassDef *cls = ClassDef::FindClass(drop->className);
@@ -256,7 +231,7 @@ void AActor::Die()
 						if(!inv || !bestDrop)
 							bestDrop = drop;
 
-						if(item->Next() != NULL)
+						if(item.HasNext())
 							continue;
 						else
 						{
@@ -269,7 +244,7 @@ void AActor::Die()
 					// the AI, so it can be off by one.
 					static const fixed TILEMASK = ~(TILEGLOBAL-1);
 
-					AActor * const actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0, true);
+					AActor * const actor = AActor::Spawn(cls, (x&TILEMASK)+TILEGLOBAL/2, (y&TILEMASK)+TILEGLOBAL/2, 0, SPAWN_AllowReplacement);
 					actor->angle = angle;
 					actor->dir = dir;
 
@@ -293,7 +268,7 @@ void AActor::Die()
 				}
 			}
 		}
-		while((item = item->Next()));
+		while(item.Next());
 	}
 
 	bool isExtremelyDead = health < -GetClass()->Meta.GetMetaInt(AMETA_GibHealth, (GetDefault()->health*gameinfo.GibFactor)>>FRACBITS);
@@ -355,9 +330,26 @@ const AActor *AActor::GetDefault() const
 	return GetClass()->GetDefault();
 }
 
-Thinker *AActor::GetThinker()
+bool AActor::GiveInventory(const ClassDef *cls, int amount, bool allowreplacement)
 {
-	return (AActorProxy*)thinker;
+	AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, allowreplacement ? SPAWN_AllowReplacement : 0);
+
+	if(amount)
+	{
+		if(inv->IsKindOf(NATIVE_CLASS(Health)))
+			inv->amount *= amount;
+		else
+			inv->amount = amount;
+	}
+
+	inv->ClearCounters();
+	inv->RemoveFromWorld();
+	if(!inv->CallTryPickup(this))
+	{
+		inv->Destroy();
+		return false;
+	}
+	return true;
 }
 
 void AActor::Init()
@@ -369,12 +361,9 @@ void AActor::Init()
 	soundZone = NULL;
 	inventory = NULL;
 
-	actorRef = actors.Push(this);
+	actors.Push(this);
 	if(!loadedgame)
-	{
-		thinker = new AActorProxy(this);
-		thinker->ObjectFlags |= OF_JustSpawned;
-	}
+		Activate();
 
 	if(SpawnState)
 		SetState(SpawnState, true);
@@ -387,7 +376,7 @@ void AActor::Init()
 
 void AActor::Serialize(FArchive &arc)
 {
-	bool hasActorRef = actorRef != NULL;
+	bool hasActorRef = actors.IsLinked(this);
 
 	if(arc.IsStoring())
 		arc.WriteSprite(sprite);
@@ -416,8 +405,10 @@ void AActor::Serialize(FArchive &arc)
 		<< viewx
 		<< viewheight
 		<< transx
-		<< transy
-		<< sighttime
+		<< transy;
+	if(GameSave::SaveVersion >= 1393719642)
+		arc << overheadIcon;
+	arc << sighttime
 		<< sightrandom
 		<< minmissilechance
 		<< painchance
@@ -433,36 +424,72 @@ void AActor::Serialize(FArchive &arc)
 		<< hidden
 		<< player
 		<< inventory
-		<< soundZone
-		<< thinker
-		<< hasActorRef;
+		<< soundZone;
+	if(arc.IsLoading() && (GameSave::SaveProdVersion < 0x001002FF || GameSave::SaveVersion < 1382102747))
+	{
+		TObjPtr<AActorProxy> proxy;
+		arc << proxy;
+	}
+	arc << hasActorRef;
+
+	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374914454)
+		arc << projectilepassheight;
 
 	if(!arc.IsStoring())
 	{
 		if(!hasActorRef)
 		{
-			actors.Remove(actorRef);
-			actorRef = NULL;
+			actors.Remove(this);
 		}
 	}
 
 	Super::Serialize(arc);
 }
 
-void AActor::SetState(const Frame *state, bool notic)
+void AActor::SetState(const Frame *state, bool norun)
 {
 	if(state == NULL)
+	{
+		Destroy();
 		return;
+	}
 
 	this->state = state;
 	sprite = state->spriteInf;
-	ticcount = state->duration;
-	if(!notic)
+	ticcount = state->GetTics();
+	if(!norun)
+	{
 		state->action(this, this, state);
+
+		while(ticcount == 0)
+		{
+			this->state = this->state->next;
+			if(!this->state)
+			{
+				Destroy();
+				break;
+			}
+			else
+			{
+				sprite = this->state->spriteInf;
+				ticcount = this->state->GetTics();
+				this->state->action(this, this, this->state);
+			}
+		}
+	}
 }
 
 void AActor::Tick()
 {
+	// If we just spawned we're not ready to be ticked yet
+	// Otherwise we might tick on the same tick we're spawned which would cause
+	// an actor with a duration of 1 tic to never display
+	if(ObjectFlags & OF_JustSpawned)
+	{
+		ObjectFlags &= ~OF_JustSpawned;
+		return;
+	}
+
 	if(state == NULL)
 	{
 		Destroy();
@@ -472,14 +499,11 @@ void AActor::Tick()
 	if(ticcount > 0)
 		--ticcount;
 
-	while(ticcount == 0)
+	if(ticcount == 0)
 	{
-		if(!state->next)
-		{
-			Destroy();
-			return;
-		}
 		SetState(state->next);
+		if(ObjectFlags & OF_EuthanizeMe)
+			return;
 	}
 
 	state->thinker(this, this, state);
@@ -492,17 +516,9 @@ void AActor::Tick()
 // us to transfer items into inventory for example.
 void AActor::RemoveFromWorld()
 {
-	if(actorRef)
-	{
-		actors.Remove(actorRef);
-		actorRef = NULL;
-	}
-	if(thinker)
-	{
-		thinker->Disable();
-		thinker->Destroy();
-		thinker = NULL;
-	}
+	actors.Remove(this);
+	if(IsThinking())
+		Deactivate();
 }
 
 void AActor::RemoveInventory(AInventory *item)
@@ -524,8 +540,30 @@ void AActor::RemoveInventory(AInventory *item)
 	item->DetachFromOwner();
 }
 
+/* When we spawn an actor we add them to this list. After the tic has finished
+ * processing we process this list to handle any start up actions.
+ *
+ * This is done so that we don't duplicate tics and actors appear on screen
+ * when they should. We can't do this in Spawn() since we want certain
+ * properties of the actor (velocity) to be setup before calling actions.
+ */
+static TArray<AActor *> SpawnedActors;
+void AActor::FinishSpawningActors()
+{
+	unsigned int i = SpawnedActors.Size();
+	while(i-- > 0)
+	{
+		AActor * const actor = SpawnedActors[i];
+
+		// Run the first action pointer and all zero tic states!
+		actor->SetState(actor->state);
+		actor->ObjectFlags &= ~OF_JustSpawned;
+	}
+	SpawnedActors.Clear();
+}
+
 FRandom pr_spawnmobj("SpawnActor");
-AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allowreplacement)
+AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags)
 {
 	if(type == NULL)
 	{
@@ -533,7 +571,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 		return NULL;
 	}
 
-	if(allowreplacement)
+	if(flags & SPAWN_AllowReplacement)
 		type = type->GetReplacement();
 
 	AActor *actor = type->CreateInstance();
@@ -541,7 +579,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 	actor->y = y;
 	actor->velx = 0;
 	actor->vely = 0;
-	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty, actor->health);
+	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty->SpawnFilter, actor->health);
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);
@@ -581,6 +619,25 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, bool allo
 			actor->ticcount = pr_spawnmobj() % actor->ticcount;
 	}
 
+	// Change between patrolling and normal spawn and also execute any zero
+	// tic functions.
+	if(flags & SPAWN_Patrol)
+	{
+		actor->flags |= FL_PATHING;
+
+		// Pathing monsters should take at least a one tile step.
+		// Otherwise the paths will break early.
+		actor->distance = TILEGLOBAL;
+		if(actor->PathState)
+		{
+			actor->SetState(actor->PathState, true);
+			if(actor->flags & FL_RANDOMIZE)
+				actor->ticcount = pr_spawnmobj() % actor->ticcount;
+		}
+	}
+
+	SpawnedActors.Push(actor);
+
 	return actor;
 }
 
@@ -604,7 +661,7 @@ void StartTravel ()
 
 	AActor *player = players[0].mo;
 
-	player->GetThinker()->SetPriority(ThinkerList::TRAVEL);
+	player->SetPriority(ThinkerList::TRAVEL);
 }
 
 void FinishTravel ()
@@ -617,34 +674,28 @@ void FinishTravel ()
 
 	do
 	{
-		if(node->Item()->IsThinkerType<AActorProxy>())
+		AActor *actor = static_cast<AActor *>((Thinker*)node);
+		if(actor->IsKindOf(NATIVE_CLASS(PlayerPawn)))
 		{
-			AActorProxy *proxy = static_cast<AActorProxy *>((Thinker*)node->Item());
-			if(proxy->parent->IsKindOf(NATIVE_CLASS(PlayerPawn)))
+			APlayerPawn *player = static_cast<APlayerPawn *>(actor);
+			if(player->player == &players[0])
 			{
-				APlayerPawn *player = static_cast<APlayerPawn *>((AActor*)proxy->parent);
-				if(player->player == &players[0])
-				{
-					AActor *playertmp = players[0].mo;
-					player->x = playertmp->x;
-					player->y = playertmp->y;
-					player->angle = playertmp->angle;
-					player->EnterZone(playertmp->GetZone());
+				AActor *playertmp = players[0].mo;
+				player->x = playertmp->x;
+				player->y = playertmp->y;
+				player->angle = playertmp->angle;
+				player->EnterZone(playertmp->GetZone());
 
-					players[0].mo = player;
-					players[0].camera = player;
-					playertmp->Destroy();
+				players[0].mo = player;
+				players[0].camera = player;
+				playertmp->Destroy();
 
-					// We must move the linked list iterator here since we'll
-					// transfer to the new linked list at the SetPriority call
-					node = node->Next();
-					player->GetThinker()->SetPriority(ThinkerList::PLAYER);
-					continue;
-				}
+				// We must move the linked list iterator here since we'll
+				// transfer to the new linked list at the SetPriority call
+				player->SetPriority(ThinkerList::PLAYER);
+				continue;
 			}
 		}
-
-		node = node->Next();
 	}
-	while(node);
+	while(node.Next());
 }

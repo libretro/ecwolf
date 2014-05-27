@@ -9,6 +9,7 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
+#include "am_map.h"
 #include "id_ca.h"
 #include "id_sd.h"
 #include "id_vl.h"
@@ -17,6 +18,7 @@
 #include "g_mapinfo.h"
 #include "actor.h"
 #include "language.h"
+#include "m_png.h"
 #include "wl_agent.h"
 #include "wl_debug.h"
 #include "wl_draw.h"
@@ -27,6 +29,8 @@
 #include "thingdef/thingdef.h"
 #include "g_shared/a_keys.h"
 #include "r_sprites.h"
+#include "wl_shade.h"
+#include "filesys.h"
 
 #ifdef USE_CLOUDSKY
 #include "wl_cloudsky.h"
@@ -85,98 +89,33 @@ void ViewMap (void);
 */
 void PictureGrabber (void)
 {
-	static char fname[] = "WSHOT000.BMP";
+	static char fname[] = "WSHOT000.PNG";
+	FString screenshotDir = FileSys::GetDirectoryPath(FileSys::DIR_Screenshots);
 
 	for(int i = 0; i < 1000; i++)
 	{
 		fname[7] = i % 10 + '0';
 		fname[6] = (i / 10) % 10 + '0';
 		fname[5] = i / 100 + '0';
-		int file = open(fname, O_RDONLY | O_BINARY);
-		if(file == -1) break;       // file does not exist, so use that filename
-		close(file);
+		if(!File(screenshotDir + PATH_SEPARATOR + fname).exists())
+			break;
 	}
 
-	// overwrites WSHOT999.BMP if all wshot files exist
-
-	SDL_SaveBMP(curSurface, fname);
+	// overwrites WSHOT999.PNG if all wshot files exist
+	const BYTE* buffer;
+	int pitch;
+	ESSType color_type;
+	screen->GetScreenshotBuffer(buffer, pitch, color_type);
+	FILE *file = File(screenshotDir + PATH_SEPARATOR + fname).open("wb");
+	M_CreatePNG(file, buffer, GPalette.BaseColors, color_type, SCREENWIDTH, SCREENHEIGHT, pitch);
+	M_FinishPNG(file);
+	fclose(file);
+	screen->ReleaseScreenshotBuffer();
 
 	US_CenterWindow (18,2);
 	US_PrintCentered ("Screenshot taken");
 	VW_UpdateScreen();
 	IN_Ack();
-}
-
-
-//===========================================================================
-
-/*
-===================
-=
-= BasicOverhead
-=
-===================
-*/
-
-void BasicOverhead (void)
-{
-#if 0
-	int x, y, z, offx, offy;
-
-	z = 128/MAPSIZE; // zoom scale
-	offx = 320/2;
-	offy = (160-MAPSIZE*z)/2;
-
-#ifdef MAPBORDER
-	int temp = viewsize;
-	NewViewSize(16);
-	DrawPlayBorder();
-#endif
-
-	// right side (raw)
-
-	for(x=0;x<MAPSIZE;x++)
-		for(y=0;y<MAPSIZE;y++)
-			VWB_Bar(x*z+offx, y*z+offy,z,z,(unsigned)(uintptr_t)actorat[x][y]);
-
-	// left side (filtered)
-
-	uintptr_t tile;
-	int color;
-	offx -= 128;
-
-	for(x=0;x<MAPSIZE;x++)
-	{
-		for(y=0;y<MAPSIZE;y++)
-		{
-			tile = (uintptr_t)actorat[x][y];
-			if (ISPOINTER(tile) && ((objtype *)tile)->flags&FL_SHOOTABLE) color = 72;  // enemy
-			else if (!tile || ISPOINTER(tile))
-			{
-				if (spotvis[x][y]) color = 111;  // visable
-				else color = 0;  // nothing
-			}
-			//else if (MAPSPOT(x,y,1) == PUSHABLETILE) color = 171;  // pushwall
-			else if (tile == 64) color = 158; // solid obj
-			else if (tile < 128) color = 154;  // walls
-			else if (tile < 256) color = 146;  // doors
-
-			VWB_Bar(x*z+offx, y*z+offy,z,z,color);
-		}
-	}
-
-	VWB_Bar(players[0].mo->tilex*z+offx,players[0].mo->tiley*z+offy,z,z,15); // players[0].mo
-
-	// resize the border to match
-
-	VW_UpdateScreen();
-	IN_Ack();
-
-#ifdef MAPBORDER
-	NewViewSize(temp);
-	DrawPlayBorder();
-#endif
-#endif
 }
 
 //===========================================================================
@@ -199,9 +138,9 @@ static void GiveAllWeaponsAndAmmo()
 			(cls->GetParent() == NATIVE_CLASS(Ammo))
 		)
 		{
-			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
+			inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, 0);
 			inv->RemoveFromWorld();
-			const Frame * const readyState = cls->FindState("Ready");
+			const Frame * const readyState = cls->FindState(NAME_Ready);
 			if(cls->GetParent() == NATIVE_CLASS(Ammo))
 				inv->amount = inv->maxamount;
 			else if(!readyState || !R_CheckSpriteValid(readyState->spriteInf))
@@ -262,7 +201,7 @@ int DebugKeys (void)
 			if (texID.isValid())
 			{
 				levelInfo->BorderTexture = texID;
-				DrawPlayBorder();
+				StatusBar->RefreshBackground();
 
 				return 0;
 			}
@@ -346,7 +285,7 @@ int DebugKeys (void)
 		GiveAllWeaponsAndAmmo();
 		GivePoints (100000);
 		players[0].health = 100;
-		DrawStatusBar();
+		StatusBar->DrawStatusBar();
 		IN_Ack ();
 		return 1;
 	}
@@ -419,9 +358,16 @@ int DebugKeys (void)
 		IN_Ack ();
 		return 1;
 	}
-	else if (Keyboard[sc_O])        // O = basic overhead
+	else if (Keyboard[sc_O])
 	{
-		BasicOverhead();
+		am_cheat ^= 1;
+		US_CenterWindow (18,3);
+		if (am_cheat)
+			US_PrintCentered ("Automap revealed");
+		else
+			US_PrintCentered ("Automap hidden");
+		VW_UpdateScreen();
+		IN_Ack ();
 		return 1;
 	}
 	else if(Keyboard[sc_P])         // P = Ripper's picture grabber
@@ -526,7 +472,7 @@ int DebugKeys (void)
 				AActor *newobj = AActor::Spawn(cls,
 					players[0].mo->x + FixedMul(distance, finecosine[players[0].mo->angle>>ANGLETOFINESHIFT]),
 					players[0].mo->y - FixedMul(distance, finesine[players[0].mo->angle>>ANGLETOFINESHIFT]),
-					0, false);
+					0, 0);
 				newobj->angle = players[0].mo->angle;
 			}
 			else
@@ -534,10 +480,7 @@ int DebugKeys (void)
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
 					return 1;
 
-				AInventory *inv = (AInventory *) AActor::Spawn(cls, 0, 0, 0, false);
-				inv->RemoveFromWorld();
-				if(!inv->CallTryPickup(players[0].mo))
-					inv->Destroy();
+				players[0].mo->GiveInventory(cls, 0, false);
 			}
 		}
 		return 1;
@@ -582,6 +525,28 @@ int DebugKeys (void)
 		}
 	}
 #endif
+	else if(Keyboard[sc_Comma])
+	{
+		gLevelLight = MAX(1, gLevelLight-1);
+		Printf("Light = %d\n", gLevelLight);
+	}
+	else if(Keyboard[sc_Peroid])
+	{
+		gLevelLight = MIN(256, gLevelLight+1);
+		Printf("Light = %d\n", gLevelLight);
+	}
+	else if(Keyboard[sc_Y])
+	{
+		gLevelVisibility = MAX(1, gLevelVisibility-20000);
+		Printf("Vis = %d\n", gLevelVisibility);
+		CalcVisibility(gLevelVisibility);
+	}
+	else if(Keyboard[sc_U])
+	{
+		gLevelVisibility = MIN(200<<FRACBITS, gLevelVisibility+20000);
+		Printf("Vis = %d\n", gLevelVisibility);
+		CalcVisibility(gLevelVisibility);
+	}
 
 	return 0;
 }
@@ -605,126 +570,3 @@ void DebugMLI()
 
 	DrawPlayScreen();
 }
-
-
-#if 0
-/*
-===================
-=
-= OverheadRefresh
-=
-===================
-*/
-
-void OverheadRefresh (void)
-{
-	unsigned        x,y,endx,endy,sx,sy;
-	unsigned        tile;
-
-
-	endx = maporgx+VIEWTILEX;
-	endy = maporgy+VIEWTILEY;
-
-	for (y=maporgy;y<endy;y++)
-	{
-		for (x=maporgx;x<endx;x++)
-		{
-			sx = (x-maporgx)*16;
-			sy = (y-maporgy)*16;
-
-			switch (viewtype)
-			{
-#if 0
-				case mapview:
-					tile = *(mapsegs[0]+farmapylookup[y]+x);
-					break;
-
-				case tilemapview:
-					tile = tilemap[x][y];
-					break;
-
-				case visview:
-					tile = spotvis[x][y];
-					break;
-#endif
-				case actoratview:
-					tile = (unsigned)actorat[x][y];
-					break;
-			}
-
-			if (tile<MAXWALLTILES)
-				LatchDrawTile(sx,sy,tile);
-			else
-			{
-				LatchDrawChar(sx,sy,NUMBERCHARS+((tile&0xf000)>>12));
-				LatchDrawChar(sx+8,sy,NUMBERCHARS+((tile&0x0f00)>>8));
-				LatchDrawChar(sx,sy+8,NUMBERCHARS+((tile&0x00f0)>>4));
-				LatchDrawChar(sx+8,sy+8,NUMBERCHARS+(tile&0x000f));
-			}
-		}
-	}
-}
-#endif
-
-#if 0
-/*
-===================
-=
-= ViewMap
-=
-===================
-*/
-
-void ViewMap (void)
-{
-	boolean         button0held;
-
-	viewtype = actoratview;
-	//      button0held = false;
-
-
-	maporgx = players[0].mo->tilex - VIEWTILEX/2;
-	if (maporgx<0)
-		maporgx = 0;
-	if (maporgx>MAPSIZE-VIEWTILEX)
-		maporgx=MAPSIZE-VIEWTILEX;
-	maporgy = players[0].mo->tiley - VIEWTILEY/2;
-	if (maporgy<0)
-		maporgy = 0;
-	if (maporgy>MAPSIZE-VIEWTILEY)
-		maporgy=MAPSIZE-VIEWTILEY;
-
-	do
-	{
-		//
-		// let user pan around
-		//
-		PollControls ();
-		if (controlx < 0 && maporgx>0)
-			maporgx--;
-		if (controlx > 0 && maporgx<mapwidth-VIEWTILEX)
-			maporgx++;
-		if (controly < 0 && maporgy>0)
-			maporgy--;
-		if (controly > 0 && maporgy<mapheight-VIEWTILEY)
-			maporgy++;
-
-#if 0
-		if (c.button0 && !button0held)
-		{
-			button0held = true;
-			viewtype++;
-			if (viewtype>visview)
-				viewtype = mapview;
-		}
-		if (!c.button0)
-			button0held = false;
-#endif
-
-		OverheadRefresh ();
-
-	} while (!Keyboard[sc_Escape]);
-
-	IN_ClearKeysDown ();
-}
-#endif

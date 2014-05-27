@@ -34,6 +34,7 @@
 */
 
 #include "files.h"
+#include "filesys.h"
 #include "templates.h"
 #include "zdoomsupport.h"
 
@@ -88,7 +89,7 @@ FileReader::~FileReader ()
 
 bool FileReader::Open (const char *filename)
 {
-	File = fopen (filename, "rb");
+	File = ::File(filename).open("rb");
 	if (File == NULL) return false;
 	FilePos = 0;
 	StartPos = 0;
@@ -369,8 +370,8 @@ extern "C" void bz_internal_error (int errcode)
 //
 //==========================================================================
 
-static void *SzAlloc(void *p, size_t size) { p = p; return malloc(size); }
-static void SzFree(void *p, void *address) { p = p; free(address); }
+static void *SzAlloc(void *, size_t size) { return malloc(size); }
+static void SzFree(void *, void *address) { free(address); }
 ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 FileReaderLZMA::FileReaderLZMA (FileReader &file, size_t uncompressed_size, bool zip)

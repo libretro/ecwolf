@@ -8,6 +8,9 @@ const int CMF_AIMOFFSET = 1;
 const int CPF_USEAMMO = 1;
 const int CPF_ALWAYSPLAYSOUND = 2;
 
+const int CVF_RELATIVE = 1;
+const int CVF_REPLACE = 2;
+
 const int WAF_NORANDOM = 1;
 
 const int GAF_NORANDOM = 1;
@@ -19,6 +22,18 @@ const int SXF_TRANSFERPOINTERS = 1;
 const int ASP_CHASE = 3;
 
 const int XF_HURTSOURCE = 1;
+
+const int WRF_NOBOB = 1;
+const int WRF_NOPRIMARY = 2;
+const int WRF_NOSECONDARY = 4;
+const int WRF_NOFIRE = WRF_NOPRIMARY|WRF_NOSECONDARY;
+const int WRF_NOSWITCH = 8;
+const int WRF_DISABLESWITCH = 0x10;
+const int WRF_ALLOWRELOAD = 0x20;
+const int WRF_ALLOWZOOM = 0x40;
+
+const int ZOOM_INSTANT = 1;
+const int ZOOM_NOSCALETURNING = 2;
 
 actor Actor native
 {
@@ -33,6 +48,7 @@ actor Actor native
 	missilefrequency 1.0
 	meleerange 44
 	scale 1.0
+	projectilepassheight -1
 
 	native angle_t angle;
 	native int health;
@@ -42,6 +58,7 @@ actor Actor native
 	action native A_BossDeath();
 	action native A_CallSpecial(int special, int arg1=0, int arg2=0, int arg3=0, int arg4=0, int arg5=0);
 	action native A_ChangeFlag(string flag, bool value);
+	action native A_ChangeVelocity(float x, float y, float z, int flags = 0);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0, int aimflags = 0);
 	action native A_Dormant();
@@ -60,7 +77,9 @@ actor Actor native
 	action native A_MonsterRefire(int chance, state abort);
 	action native A_Pain();
 	action native A_PlaySound(string soundname);
+	action native A_ScaleVelocity(float scale);
 	action native A_Scream();
+	action native A_SetTics(float duration);
 	action native A_SpawnItem(string type, float distance = 0, float zheight = 0);
 	action native A_SpawnItemEx(string type, float xoffset = 0, float yoffset = 0, float zoffset = 0, float xvel = 0, float yvel = 0, float zvel = 0, float angle = 0, int flags = 0, int failchance = 0);
 	action native A_Stop();
@@ -80,14 +99,34 @@ actor Inventory native
 	inventory.amount 1
 	inventory.maxamount 1
 	inventory.interhubamount 1
+	inventory.pickupsound "misc/i_pkup"
+
+	states
+	{
+		Hide:
+			TNT1 A -1
+			stop
+	}
 }
 
 actor Ammo : Inventory native
 {
 }
 
+actor BackpackItem : Inventory native
+{
+}
+
 actor CustomInventory : Inventory native
 {
+	action native A_Succeed();
+	action native A_WeaponGrin();
+}
+
+actor ExtraLifeItem : Inventory native
+{
+	inventory.amount 1
+	inventory.maxamount 1
 }
 
 actor Health : Inventory native
@@ -105,6 +144,10 @@ actor Key : Inventory native
 actor KeyGiver : Inventory native
 {
 	inventory.pickupsound "misc/k_pkup"
+}
+
+actor MapRevealer : Inventory native
+{
 }
 
 actor ScoreItem : Inventory native
@@ -128,7 +171,7 @@ actor Weapon : Inventory native
 	action native A_CustomPunch(int damage, bool norandom=false, int flags=0, string pufftype="", float range=0, float lifesteal=0);
 	action native A_FireCustomMissile(string missiletype, float angle=0, bool useammo=true, int spawnoffset=0, int spawnheight=0, bool aim=false, float pitch=0);
 	action native A_GunAttack(int flags = 0, string sound = "*", float snipe = 1.0, int maxdamage = 64, int blocksize = 128, int pointblank = 2, int longrange = 4, int maxrange = 21);
-	action native A_GunFlash(state frame="Flash");
+	action native A_GunFlash(state frame="*");
 	action native A_Light(int level);
 	action native A_Light0();
 	action native A_Light1();
@@ -136,12 +179,14 @@ actor Weapon : Inventory native
 	action native A_Lower();
 	action native A_Raise();
 	action native A_ReFire();
-	action native A_WeaponReady();
+	action native A_WeaponReady(int flags=0);
+	action native A_ZoomFactor(float zoom, int flags=0);
 }
 
 actor WeaponGiver : Weapon native
 {
 	weapon.ammogive1 -1
+	weapon.ammogive2 -1
 }
 
 actor PlayerPawn native
@@ -152,6 +197,7 @@ actor PlayerPawn native
 	player.sidemove 1, 1
 	player.maxhealth 100
 	player.movebob 1.0
+	player.damagescreencolor "FF 00 00"
 	+SOLID
 	+SHOOTABLE
 	+PICKUP

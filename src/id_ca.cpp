@@ -50,7 +50,7 @@ GameMap *map = NULL;
 ======================
 */
 
-void CA_CacheMap (const FString &mapname)
+void CA_CacheMap (const FString &mapname, bool loading)
 {
 	delete map;
 
@@ -59,7 +59,7 @@ void CA_CacheMap (const FString &mapname)
 	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
 	map = new GameMap(mapname);
-	map->LoadMap();
+	map->LoadMap(loading);
 
 	Printf("\n%s - %s\n\n", mapname.GetChars(), levelInfo->GetName(map).GetChars());
 

@@ -49,6 +49,8 @@
 #include "zstring.h"
 #include "r_data/colormaps.h"
 #include "a_inventory.h"
+#include "id_us.h"
+#include "id_vh.h"
 
 struct SpriteInfo
 {
@@ -130,6 +132,27 @@ unsigned int R_GetSprite(const char* spr)
 	return 0;
 }
 
+FTexture *R_GetAMSprite(AActor *actor, angle_t rotangle, bool &flip)
+{
+	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
+		return NULL;
+
+	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+actor->state->frame];
+	FTexture *tex;
+	if(spr.rotations == 0)
+	{
+		tex = TexMan[spr.texture[0]];
+		flip = false;
+	}
+	else
+	{
+		int rot = (rotangle-actor->angle-(ANGLE_90-ANGLE_45/2))/ANGLE_45;
+		tex = TexMan[spr.texture[rot]];
+		flip = (spr.mirror>>rot)&1;
+	}
+	return tex;
+}
+
 void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 {
 	if(dir < -1 || dir >= 8)
@@ -164,10 +187,9 @@ void R_GetSpriteHitlist(BYTE* hitlist)
 	BYTE* sprites = new BYTE[loadedSprites.Size()];
 	memset(sprites, 0, loadedSprites.Size());
 
-	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
-		AActor *actor = iter->Item();
-		sprites[actor->state->spriteInf] = 1;
+		sprites[iter->state->spriteInf] = 1;
 	}
 
 	for(unsigned int i = loadedSprites.Size();i-- > NUM_SPECIAL_SPRITES;)
@@ -243,9 +265,9 @@ void R_InitSprites()
 			frames[j].mirror = 0;
 		}
 
-		for(SpritesList::Node *iter = list.Head();iter;iter = iter->Next())
+		for(SpritesList::Iterator iter = list.Head();iter;++iter)
 		{
-			FTexture *tex = iter->Item();
+			FTexture *tex = iter;
 			unsigned char frame = tex->Name[4] - 'A';
 			if(frame < MAX_SPRITE_FRAMES)
 			{
@@ -428,7 +450,7 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 		colormap = NormalLight.Maps;
 	else
 	{
-		const int shade = LIGHT2SHADE(gLevelLight) - (10<<FRACBITS);
+		const int shade = LIGHT2SHADE(gLevelLight) - (gLevelMaxLightVis/LIGHTVISIBILITY_FACTOR);
 		colormap = &NormalLight.Maps[GETPALOOKUP(0, shade)<<8];
 	}
 
@@ -472,4 +494,86 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 
 		dest = ++destBase;
 	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// S3DNA Zoomer
+//
+
+IMPLEMENT_INTERNAL_CLASS(SpriteZoomer)
+
+SpriteZoomer::SpriteZoomer(FTextureID texID, unsigned short zoomtime) :
+	Thinker(ThinkerList::VICTORY), frame(NULL), texID(texID), count(0), zoomtime(zoomtime)
+{
+}
+
+SpriteZoomer::SpriteZoomer(const Frame *frame, unsigned short zoomtime) :
+	Thinker(ThinkerList::VICTORY), frame(frame), count(0), zoomtime(zoomtime)
+{
+	frametics = frame->duration;
+}
+
+void SpriteZoomer::Draw()
+{
+	FTexture *gmoverTex;
+	if(frame)
+	{
+		const Sprite &spr = spriteFrames[loadedSprites[frame->spriteInf].frames+frame->frame];
+		gmoverTex = TexMan[spr.texture[0]];
+	}
+	else
+		gmoverTex = TexMan(texID);
+
+	// What we're trying to do is zoom in a 160x160 player sprite to
+	// fill the viewheight.  S3DNA use the player sprite rendering
+	// function and passed count as the height. We won't do it like that
+	// since that method didn't account for the view window size
+	// (vanilla could crash) and our player sprite renderer may take
+	// into account things we would rather not have here.
+	const double yscale = double(viewheight*count)/double(zoomtime*64);
+	const double xscale = yscale/FIXED2FLOAT(yaspect);
+
+	screen->DrawTexture(gmoverTex, viewscreenx + (viewwidth>>1), viewscreeny + (viewheight>>1) + yscale*32,
+		DTA_DestWidthF, gmoverTex->GetScaledWidthDouble()*xscale,
+		DTA_DestHeightF, gmoverTex->GetScaledHeightDouble()*yscale,
+		TAG_DONE);
+}
+
+void SpriteZoomer::Tick()
+{
+	if(frame)
+	{
+		if(--frametics <= 0)
+		{
+			do
+			{
+				frame = frame->next;
+				frametics = frame->duration;
+			}
+			while(frametics == 0);
+		}
+	}
+
+	assert(count <= zoomtime);
+	if(++count > zoomtime)
+		Destroy();
+}
+
+void R_DrawZoomer(FTextureID texID)
+{
+	TObjPtr<SpriteZoomer> zoomer = new SpriteZoomer(texID, 192);
+	do
+	{
+		for(unsigned int t = tics;zoomer && t-- > 0;)
+			zoomer->Tick();
+		if(!zoomer)
+			break;
+
+		ThreeDRefresh();
+		zoomer->Draw();
+		VH_UpdateScreen();
+		CalcTics();
+	}
+	while(true);
 }

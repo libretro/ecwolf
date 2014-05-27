@@ -96,6 +96,8 @@ class SoundInformation
 		void			Init();
 		const SoundData	&operator[] (const char* logical) const { return operator[](FindSound(logical)); }
 		const SoundData	&operator[] (const SoundIndex &index) const;
+		uint32_t		GetLastPlayTick(const SoundData &sound) const { return lastPlayTicks[sound.index]; }
+		void			SetLastPlayTick(const SoundData &sound, uint32_t value) const { lastPlayTicks[sound.index] = value; }
 
 	protected:
 		SoundData	&AddSound(const char* logical);
@@ -105,6 +107,7 @@ class SoundInformation
 	private:
 		SoundData			nullIndex;
 		TArray<SoundData>	sounds;
+		TArray<uint32_t>	lastPlayTicks;
 
 		struct HashIndex;
 		HashIndex*	hashTable;

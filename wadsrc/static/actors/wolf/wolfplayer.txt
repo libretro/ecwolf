@@ -12,6 +12,7 @@ actor BJPlayer : PlayerPawn
 	player.weaponslot 2, "Pistol"
 	player.weaponslot 3, "MachineGun"
 	player.weaponslot 4, "GatlingGun"
+	player.damagescreencolor "FF 00 00"
 }
 
 actor LostBJPlayer : BJPlayer

@@ -36,7 +36,7 @@
 #include "config.h"
 #include "c_cvars.h"
 #include "farchive.h"
-#include "file.h"
+#include "filesys.h"
 #include "g_mapinfo.h"
 #include "gamemap.h"
 #include "id_ca.h"
@@ -67,7 +67,7 @@ extern unsigned vbufPitch;
 namespace GameSave {
 
 long long SaveVersion = SAVEVER;
-const char* savedir = NULL;
+DWORD SaveProdVersion = SAVEPRODVER;
 
 static const char* const NEW_SAVE = "    - NEW SAVE -";
 
@@ -88,18 +88,12 @@ static bool quickSaveLoad = false;
 
 static inline FString GetFullSaveFileName(const FString &filename)
 {
-	FString dir = savedir ? FString(savedir) : config.GetConfigDir();
-#ifdef _WIN32
-	dir += "\\";
-#else
-	dir += "/";
-#endif
-
-	return dir + filename;
+	FString dir = FileSys::GetDirectoryPath(FileSys::DIR_Saves);
+	return dir + PATH_SEPARATOR + filename;
 }
 static inline FILE *OpenSaveFile(const FString &filename, const char* mode)
 {
-	return fopen(GetFullSaveFileName(filename), mode);
+	return File(GetFullSaveFileName(filename)).open(mode);
 }
 
 #define MAX_SAVENAME 31
@@ -245,7 +239,7 @@ bool SetupSaveGames()
 	bool canLoad = false;
 	char title[MAX_SAVENAME+1];
 
-	File saveDirectory(savedir ? FString(savedir) : config.GetConfigDir());
+	File saveDirectory(FileSys::GetDirectoryPath(FileSys::DIR_Saves));
 	const TArray<FString> &files = saveDirectory.getFileList();
 
 	for(unsigned int i = 0;i < files.Size();i++)
@@ -509,8 +503,19 @@ void QuickLoad()
 
 static void Serialize(FArchive &arc)
 {
-	arc << gamestate.difficulty
-		<< gamestate.playerClass
+	short difficulty;
+	if(arc.IsStoring())
+	{
+		difficulty = SkillInfo::GetSkillIndex(*gamestate.difficulty);
+		arc << difficulty;
+	}
+	else
+	{
+		arc << difficulty;
+		gamestate.difficulty = &SkillInfo::GetSkill(difficulty);
+	}
+
+	arc << gamestate.playerClass
 		<< gamestate.secretcount
 		<< gamestate.treasurecount
 		<< gamestate.killcount
@@ -518,12 +523,16 @@ static void Serialize(FArchive &arc)
 		<< gamestate.treasuretotal
 		<< gamestate.killtotal
 		<< gamestate.TimeCount
-		<< gamestate.victoryflag
-		<< LevelRatios.killratio
+		<< gamestate.victoryflag;
+	if(SaveVersion >= 1393719642)
+		arc << gamestate.fullmap;
+	arc << LevelRatios.killratio
 		<< LevelRatios.secretsratio
 		<< LevelRatios.treasureratio
 		<< LevelRatios.numLevels
 		<< LevelRatios.time;
+	if(SaveVersion > 1395865826)
+		arc << LevelRatios.par;
 
 	thinkerList->Serialize(arc);
 
@@ -560,9 +569,13 @@ bool Load(const FString &filename)
 	SaveVersion = atoll(savesig+10);
 	delete[] savesig;
 
+	char *prodver = M_GetPNGText(png, "ECWolf Save Product Version");
+	SaveProdVersion = atoll(prodver);
+	delete[] prodver;
+
 	char level[9];
 	M_GetPNGText(png, "Current Map", level, 8);
-	CA_CacheMap(level);
+	CA_CacheMap(level, true);
 
 	{
 		unsigned int chunkLength = M_FindPNGChunk(png, SNAP_ID);
@@ -624,6 +637,7 @@ bool Save(const FString &filename, const FString &title)
 		Message (language["STR_SAVING"]);
 
 	SaveVersion = SAVEVER;
+	SaveProdVersion = SAVEPRODVER;
 
 	// If we get hubs this will need to be moved so that we can have multiple of them
 	FCompressedMemFile snapshot;

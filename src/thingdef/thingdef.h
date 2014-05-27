@@ -120,17 +120,17 @@ class ActionInfo
 typedef TArray<ActionInfo *> ActionTable;
 
 #define ACTION_FUNCTION(func) \
-	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &); \
+	bool __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &, struct ActionResult *); \
 	static const ActionInfo __AI_##func(__AF_##func, #func); \
-	void __AF_##func(AActor *self, AActor *stateOwner, const Frame * const caller, const CallArguments &args)
+	bool __AF_##func(AActor *self, AActor *stateOwner, const Frame * const caller, const CallArguments &args, struct ActionResult *result)
 #define ACTION_ALIAS(func, alias) \
 	ACTION_FUNCTION(alias) \
 	{ \
-		__AF_##func(self, stateOwner, caller, args); \
+		return __AF_##func(self, stateOwner, caller, args, result); \
 	}
 #define CALL_ACTION(func, self) \
-	void __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &); \
-	__AF_##func(self, self, NULL, CallArguments());
+	bool __AF_##func(AActor *, AActor *, const Frame * const, const CallArguments &, struct ActionResult *); \
+	__AF_##func(self, self, NULL, CallArguments(), NULL);
 #define ACTION_PARAM_COUNT args.Count()
 #define ACTION_PARAM_BOOL(name, num) \
 	bool name = args[num].val.i ? true : false
@@ -273,6 +273,7 @@ class ClassDef
 		static const ClassDef	*FindClass(unsigned int ednum);
 		static const ClassDef	*FindClass(const FName &className);
 		static const ClassDef	*FindClassTentative(const FName &className, const ClassDef *parent);
+		static const ClassDef	*FindConversationClass(unsigned int convid);
 		const ActionInfo		*FindFunction(const FName &function, int &specialNum) const;
 		const Frame				*FindState(const FName &stateName) const;
 		Symbol					*FindSymbol(const FName &symbol) const;
@@ -306,7 +307,6 @@ class ClassDef
 
 		// We need to do this for proper initialization order.
 		static TMap<FName, ClassDef *>	&ClassTable();
-		static TMap<int, ClassDef *>	classNumTable;
 		static SymbolTable				globalSymbols;
 
 		bool			tentative;
@@ -333,6 +333,18 @@ class ClassDef
 };
 
 // Functions below are actually a part of dobject.h, but moved here for dependency reasons
+inline bool DObject::IsSameKindOf (const ClassDef *base, const ClassDef *other) const
+{
+	const ClassDef *cls = GetClass();
+
+	if(cls == other)
+		return true;
+
+	while(cls->GetParent() != base)
+		cls = cls->GetParent();
+	return cls->IsAncestorOf(other);
+}
+
 inline bool DObject::IsKindOf (const ClassDef *base) const
 {
 	return base->IsAncestorOf (GetClass ());

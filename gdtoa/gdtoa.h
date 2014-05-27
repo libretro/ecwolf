@@ -32,7 +32,7 @@ THIS SOFTWARE.
 #ifndef GDTOA_H_INCLUDED
 #define GDTOA_H_INCLUDED
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 /* [RH] Generating arith.h strikes me as too cumbersome under Visual
 * Studio, so here's the equivalent, given the limited number of
 * architectures that MSC can target. (Itanium? Who cares about that?)
@@ -42,6 +42,26 @@ THIS SOFTWARE.
 #define Double_Align
 #ifdef _M_X64
 #define X64_bit_pointers
+#endif
+#elif defined(__APPLE__)
+/* [BL] While generating the files may be easy, on OS X we have cross
+ * compiling to deal with, which means we can't run the generation
+ * program on the target.
+ */
+#if defined(__x86_64__)
+#define IEEE_8087
+#define Arith_Kind_ASL 1
+#define Long int
+#define Intcast (int)(long)
+#define Double_Align
+#define X64_bit_pointers
+#elif defined(__i386__)
+#define IEEE_8087
+#define Arith_Kind_ASL 1
+#else
+#define IEEE_MC68k
+#define Arith_Kind_ASL 2
+#define Double_Align
 #endif
 #else
 #include "arith.h"
@@ -122,8 +142,8 @@ extern char* dtoa  ANSI((double d, int mode, int ndigits, int *decpt,
 extern char* gdtoa ANSI((FPI *fpi, int be, ULong *bits, int *kindp,
 			int mode, int ndigits, int *decpt, char **rve));
 extern void freedtoa ANSI((char*));
-extern float  strtof ANSI((CONST char *, char **));
-extern double strtod ANSI((CONST char *, char **));
+//extern float  strtof ANSI((CONST char *, char **));
+//extern double strtod ANSI((CONST char *, char **));
 extern int strtodg ANSI((CONST char*, char**, FPI*, Long*, ULong*));
 
 extern char*	g_ddfmt   ANSI((char*, double*, int, size_t));

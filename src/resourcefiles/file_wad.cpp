@@ -292,7 +292,8 @@ class FWadFile : public FResourceFile
 	{
 		HACK_NONE,
 		HACK_FLAT,
-		HACK_ROTT
+		HACK_ROTT,
+		HACK_ROTT2,
 	};
 
 	FWadFileLump *Lumps;
@@ -393,6 +394,11 @@ bool FWadFile::Open(bool quiet)
 
 		// ROTT Namespaces
 		SetNamespace("WALLSTRT", "WALLSTOP", ns_flats, HACK_ROTT);
+		SetNamespace("ANIMSTRT", "ANIMSTOP", ns_flats, HACK_ROTT2);
+		SetNamespace("DOORSTRT", "DOORSTOP", ns_flats, HACK_ROTT);
+		SetNamespace("EXITSTRT", "EXITSTOP", ns_flats, HACK_ROTT);
+		SetNamespace("ELEVSTRT", "ELEVSTOP", ns_flats, HACK_ROTT);
+		SetNamespace("SIDESTRT", "SIDESTOP", ns_flats, HACK_ROTT);
 		SetNamespace("UPDNSTRT", "UPDNSTOP", ns_flats);
 
 		SkinHack();
@@ -457,6 +463,19 @@ void FWadFile::SetNamespace(const char *startmarker, const char *endmarker, name
 			Marker m = { 1, i };
 			markers.Push(m);
 			numendmarkers++;
+		}
+	}
+
+	if (flathack == HACK_ROTT2 && numstartmarkers == 1 && numendmarkers == 0)
+	{
+		for(i = markers[0].index+1; i < NumLumps; i++)
+		{
+			if(IsMarker(i, "EXITSTRT"))
+			{
+				Marker m = { 1, i };
+				markers.Push(m);
+				numendmarkers++;
+			}
 		}
 	}
 
@@ -547,7 +566,7 @@ void FWadFile::SetNamespace(const char *startmarker, const char *endmarker, name
 			else
 			{
 				Lumps[j].Namespace = space;
-				if(flathack == HACK_ROTT)
+				if(flathack == HACK_ROTT || flathack == HACK_ROTT2)
 				{
 					Lumps[j].Flags |= LUMPF_DONTFLIPFLAT;
 				}
@@ -671,6 +690,7 @@ FResourceFile *CheckWad(const char *filename, FileReader *file, bool quiet)
 		{
 			FResourceFile *rf = new FWadFile(filename, file);
 			if (rf->Open(quiet)) return rf;
+			rf->Reader = NULL; // to avoid destruction of reader
 			delete rf;
 		}
 	}

@@ -37,10 +37,14 @@
 #include "zstring.h"
 #include "scanner.h"
 
+#define TIMER_VALUE_DEFAULT 114
+
+static TMap<int, unsigned int> sampleRateMap;
 static TMap<FName, LumpRemapper> remaps;
 static TArray<FString> psprites;
 
-LumpRemapper::LumpRemapper(const char* extension) : loaded(false), mapLumpName(extension)
+LumpRemapper::LumpRemapper(const char* extension) : digiTimerValue(TIMER_VALUE_DEFAULT),
+	loaded(false), mapLumpName(extension)
 {
 	mapLumpName.ToUpper();
 	mapLumpName += "MAP";
@@ -69,7 +73,9 @@ void LumpRemapper::AddFile(FResourceFile *file, Type type)
 
 void LumpRemapper::ClearRemaps()
 {
+	sampleRateMap.Clear();
 	remaps.Clear();
+	psprites.Clear();
 }
 
 void LumpRemapper::DoRemap()
@@ -80,6 +86,10 @@ void LumpRemapper::DoRemap()
 	for(unsigned int i = 0;i < files.Size();i++)
 	{
 		RemapFile &file = files[i];
+
+		// Register sample rate
+		sampleRateMap[Wads.GetLumpFile(files[i].file->GetFirstLump())] = digiTimerValue;
+
 		int temp = 0; // Use to count something
 		int temp2 = 0;
 		for(unsigned int i = 0;i < file.file->LumpCount();i++)
@@ -130,6 +140,7 @@ void LumpRemapper::DoRemap()
 					break;
 			}
 			lump->Namespace = oldNamespace;
+			lump->DoFinishRemap();
 		}
 	}
 	Wads.InitHashChains();
@@ -143,6 +154,15 @@ bool LumpRemapper::IsPSprite(int lumpnum)
 			return true;
 	}
 	return false;
+}
+
+unsigned int LumpRemapper::LumpSampleRate(FResourceFile *Owner)
+{
+	const int file = Wads.GetLumpFile(Owner->GetFirstLump());
+	const unsigned int* rate = sampleRateMap.CheckKey(file);
+	if(rate)
+		return 1000000/(256 - *rate);
+	return 1000000/(256 - TIMER_VALUE_DEFAULT);
 }
 
 bool LumpRemapper::LoadMap()
@@ -218,7 +238,20 @@ void LumpRemapper::ParseMap(Scanner &sc)
 		else if(sc->str.Compare("sounds") == 0)
 			map = &sounds;
 		else if(sc->str.Compare("digitalsounds") == 0)
+		{
+			// Check for sample rate change
+			if(sc.CheckToken('('))
+			{
+				sc.MustGetToken(TK_Identifier);
+				if(sc->str.Compare("timervalue") != 0)
+					sc.ScriptMessage(Scanner::ERROR, "Expected timervalue.\n");
+				sc.MustGetToken('=');
+				sc.MustGetToken(TK_IntConst);
+				digiTimerValue = sc->number;
+				sc.MustGetToken(')');
+			}
 			map = &digitalsounds;
+		}
 		else if(sc->str.Compare("music") == 0)
 			map = &music;
 		else if(sc->str.Compare("textures") == 0)

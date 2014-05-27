@@ -225,6 +225,7 @@ protected:
 	DWORD NumLumps;					// Not necessarily the same as LumpInfo.Size()
 	DWORD NumWads;
 
+	void FindEmbeddedWolfData (FResourceFile *res, const char* filename, const char* extension);
 	void SkinHack (int baselump);
 	void InitHashChains ();								// [RH] Set up the lumpinfo hashing
 

@@ -214,11 +214,23 @@ FTextureID FTextureManager::CheckForTexture (const char *name, int usetype, BITF
 		i = Textures[i].HashNext;
 	}
 
-	if(name[0] == '#' && strlen(name) == 7)
+	size_t namelen = strlen(name);
+	if(name[0] == '#' && namelen == 7)
 	{
 		FTexture *solidTex = SolidTexture_TryCreate(name+1);
 		solidTex->UseType = FTexture::TEX_Flat;
 		return AddTexture(solidTex);
+	}
+
+	// Handle font look ups (FONTNAME:XX)
+	if(namelen > 3 && name[namelen-3] == ':')
+	{
+		FString fontName(name, namelen-3);
+		FFont *font = V_GetFont(fontName);
+		if(font)
+		{
+			return font->GetCharID(ParseHex(name+namelen-2));
+		}
 	}
 
 	if ((flags & TEXMAN_TryAny) && usetype != FTexture::TEX_Any)
@@ -1072,7 +1084,14 @@ void FTextureManager::WriteTexture (FArchive &arc, int picnum)
 		pic = Textures[picnum].Texture;
 	}
 
-	arc.WriteName (pic->Name);
+	if(strncmp(pic->Name, FONT_CHAR_NAME, 6) != 0)
+		arc.WriteName (pic->Name);
+	else
+	{
+		FString cname;
+		cname.Format("%s:%s", static_cast<FFontTexture*>(pic)->SourceFont->GetName(), pic->Name+6);
+		arc.WriteName (cname);
+	}
 	arc.WriteCount (pic->UseType);
 }
 

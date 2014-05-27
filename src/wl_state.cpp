@@ -4,6 +4,7 @@
 #include "id_ca.h"
 #include "id_sd.h"
 #include "id_us.h"
+#include "g_mapinfo.h"
 #include "m_random.h"
 #include "actor.h"
 #include "thingdef/thingdef.h"
@@ -116,19 +117,19 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 		if(spot->slideAmount[dir] != 0xffff)
 			return 0;
 	}
-	for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
 		// We want to check where the actor is heading instead of the exact
 		// tile it exists in since this is essentially how Wolf3D handled things
 		// We must first determine if the monster has moved into the destination
 		// tile or not.  (Half way to destination.)
 
-		const dirtype offsetDir = iter->Item()->distance >= TILEGLOBAL/2 ? iter->Item()->dir : nodir;
+		const dirtype offsetDir = iter->distance >= TILEGLOBAL/2 ? iter->dir : nodir;
 
 		// Players need not be checked
-		if(iter->Item() != ob && !iter->Item()->player && (iter->Item()->flags & FL_SOLID) &&
-			static_cast<unsigned int>(iter->Item()->tilex+dirdeltax[offsetDir]) == x &&
-			static_cast<unsigned int>(iter->Item()->tiley+dirdeltay[offsetDir]) == y)
+		if(iter != ob && !iter->player && (iter->flags & FL_SOLID) &&
+			static_cast<unsigned int>(iter->tilex+dirdeltax[offsetDir]) == x &&
+			static_cast<unsigned int>(iter->tiley+dirdeltay[offsetDir]) == y)
 			return 0;
 	}
 	return -1;
@@ -641,10 +642,9 @@ moveok:
 	ob->distance -=move;
 
 	// Check for touching objects
-	for(AActor::Iterator *next = NULL, *iter = AActor::GetIterator();iter;iter = next)
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 	{
-		next = iter->Next();
-		AActor *check = iter->Item();
+		AActor *check = iter;
 		if(check == ob || (check->flags & FL_SOLID))
 			continue;
 
@@ -690,7 +690,7 @@ void DamageActor (AActor *ob, unsigned damage)
 	if ( !(ob->flags & FL_ATTACKMODE) )
 		damage <<= 1;
 
-	ob->health -= (short)damage;
+	ob->health -= FixedMul(damage, gamestate.difficulty->PlayerDamageFactor);
 
 	if (ob->health<=0)
 	{
@@ -715,6 +715,22 @@ void DamageActor (AActor *ob, unsigned damage)
 
 =============================================================================
 */
+
+bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amount)
+{
+	if(!amount)
+		return false;
+
+	switch(style)
+	{
+		default:
+			return intercept < amount;
+		case SLIDE_Split:
+			return (unsigned int)abs((int)(FRACUNIT - intercept*2)) < amount;
+		case SLIDE_Invert:
+			return intercept>(FRACUNIT-amount);
+	}
+}
 
 
 /*
@@ -796,7 +812,7 @@ bool CheckLine (AActor *ob)
 			//
 			intercept = yfrac-ystep/2;
 
-			if (intercept>spot->slideAmount[direction])
+			if (!CheckSlidePass(spot->slideStyle, intercept, spot->slideAmount[direction]))
 				return false;
 
 		} while (x != xt2);

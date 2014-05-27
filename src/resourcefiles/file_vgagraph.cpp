@@ -33,7 +33,7 @@
 */
 
 #include "doomerrors.h"
-#include "file.h"
+#include "filesys.h"
 #include "wl_def.h"
 #include "m_swap.h"
 #include "resourcefile.h"
@@ -151,7 +151,7 @@ struct FVGALump : public FResourceLump
 class FVGAGraph : public FResourceFile
 {
 	public:
-		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), lumps(NULL), vgagraphFile(filename)
+		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), lumps(NULL)
 		{
 			FString path(filename);
 			int lastSlash = path.LastIndexOfAny("/\\");
@@ -159,47 +159,68 @@ class FVGAGraph : public FResourceFile
 			path = path.Left(lastSlash+1);
 
 			File directory(path.Len() > 0 ? path : ".");
-			vgadictFile = path + directory.getInsensitiveFile(FString("vgadict.") + extension, true);
-			vgaheadFile = path + directory.getInsensitiveFile(FString("vgahead.") + extension, true);
-		}
-		~FVGAGraph()
-		{
-			if(lumps != NULL)
-				delete[] lumps;
-		}
+			FString vgadictFile = path + directory.getInsensitiveFile(FString("vgadict.") + extension, true);
+			FString vgaheadFile = path + directory.getInsensitiveFile(FString("vgahead.") + extension, true);
 
-		bool Open(bool quiet)
-		{
-			FileReader vgadictReader;
-			if(!vgadictReader.Open(vgadictFile))
+			vgadictReader = new FileReader();
+			if(!vgadictReader->Open(vgadictFile))
 			{
+				delete vgadictReader;
+				vgadictReader = NULL;
+
 				FString error;
 				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
 				throw CRecoverableError(error);
 			}
-			vgadictReader.Read(huffman, sizeof(huffman));
+
+			vgaheadReader = new FileReader();
+			if(!vgaheadReader->Open(vgaheadFile))
+			{
+				delete vgadictReader;
+				delete vgaheadReader;
+				vgadictReader = vgaheadReader = NULL;
+
+				FString error;
+				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
+				throw CRecoverableError(error);
+			}
+		}
+
+		FVGAGraph(const char* filename, FileReader **file) : FResourceFile(filename, file[0]), lumps(NULL)
+		{
+			FString path(filename);
+			int lastSlash = path.LastIndexOf(':');
+			extension = path.Mid(lastSlash+10);
+
+			vgaheadReader = file[1];
+			vgadictReader = file[2];
+		}
+
+		~FVGAGraph()
+		{
+			if(lumps != NULL)
+				delete[] lumps;
+
+			delete vgadictReader;
+			delete vgaheadReader;
+		}
+
+		bool Open(bool quiet)
+		{
+			vgadictReader->Read(huffman, sizeof(huffman));
 			for(unsigned int i = 0;i < 255;++i)
 			{
 				huffman[i].bit0 = LittleShort(huffman[i].bit0);
 				huffman[i].bit1 = LittleShort(huffman[i].bit1);
 			}
 
-			FileReader vgaheadReader;
-			if(!vgaheadReader.Open(vgaheadFile))
-			{
-				FString error;
-				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
-				throw CRecoverableError(error);
-			}
-			vgaheadReader.Seek(0, SEEK_END);
-			NumLumps = vgaheadReader.Tell()/3;
-			vgaheadReader.Seek(0, SEEK_SET);
+			vgaheadReader->Seek(0, SEEK_END);
+			NumLumps = vgaheadReader->Tell()/3;
+			vgaheadReader->Seek(0, SEEK_SET);
 			lumps = new FVGALump[NumLumps];
-			//for(unsigned int i = 0;i < NumLumps;i++)
-			//	lumps[i].LumpSize = 0;
 			// The vgahead has 24-bit ints.
 			BYTE* data = new BYTE[NumLumps*3];
-			vgaheadReader.Read(data, NumLumps*3);
+			vgaheadReader->Read(data, NumLumps*3);
 
 			unsigned int numPictures = 0;
 			Dimensions* dimensions = NULL;
@@ -242,7 +263,7 @@ class FVGAGraph : public FResourceFile
 					lumps[0].LumpSize = (NumLumps-3)*4;
 
 					byte* data = new byte[lumps[0].length];
-					byte* out = new byte[(NumLumps-3)*4];//lumps[0].LumpSize];
+					byte* out = new byte[(NumLumps-3)*4];
 					Reader->Read(data, lumps[0].length);
 					byte* endPtr = lumps[0].HuffExpand(data, out);
 					delete[] data;
@@ -271,12 +292,22 @@ class FVGAGraph : public FResourceFile
 			}
 			// HACK: For some reason id decided the tile8 lump will not tell
 			//       its size.  So we need to assume it's right after the
-			//       graphics and is 72 tiles long.
+			//       graphics. To make matters worse, we can't assume a size
+			//       for it since S3DNA has more than 72 tiles.
+			//       We will use the method from before to guess a size.
 			unsigned int tile8Position = 3+numPictures;
 			if(tile8Position < NumLumps && (unsigned)lumps[tile8Position].LumpSize > lumps[tile8Position].length)
 			{
+				byte* data = new byte[lumps[tile8Position].length];
+				byte* out = new byte[64*256];
+				Reader->Seek(lumps[tile8Position].position, SEEK_SET);
+				Reader->Read(data, lumps[tile8Position].length);
+				byte* endPtr = lumps[tile8Position].HuffExpand(data, out);
+				delete[] data;
+				delete[] out;
+
 				lumps[tile8Position].noSkip = true;
-				lumps[tile8Position].LumpSize = 64*72;
+				lumps[tile8Position].LumpSize = (unsigned int)(endPtr - out)&~0x3F;
 			}
 			if(dimensions != NULL)
 				delete[] dimensions;
@@ -301,15 +332,18 @@ class FVGAGraph : public FResourceFile
 		FVGALump*	lumps;
 
 		FString		extension;
-		FString		vgadictFile;
-		FString		vgaheadFile;
-		FString		vgagraphFile;
+		FileReader	*vgaheadReader;
+		FileReader	*vgadictReader;
 };
 
 FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
-	int lastSlash = fname.LastIndexOfAny("/\\");
+	int embeddedSep = fname.LastIndexOf(':');
+#ifdef _WIN32
+	if(embeddedSep == 1) embeddedSep = -1;
+#endif
+	int lastSlash = MAX<long>(fname.LastIndexOfAny("/\\"), embeddedSep);
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 8);
 	else
@@ -317,8 +351,10 @@ FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 
 	if(fname.Len() == 8 && fname.CompareNoCase("vgagraph") == 0) // file must be vgagraph.something
 	{
-		FResourceFile *rf = new FVGAGraph(filename, file);
+		FResourceFile *rf = embeddedSep == -1 ? new FVGAGraph(filename, file) :
+			new FVGAGraph(filename, reinterpret_cast<FileReader**>(file)); // HACK
 		if(rf->Open(quiet)) return rf;
+		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
 	}
 	return NULL;

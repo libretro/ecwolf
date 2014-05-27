@@ -228,6 +228,7 @@ void T_Projectile (AActor *self)
 		movey /= steps;
 	}
 
+	AActor *lastHit = NULL; // For ripping, so we only hit an actor once per tic
 	do
 	{
 		self->x += movex;
@@ -241,35 +242,52 @@ void T_Projectile (AActor *self)
 
 		if(!(self->flags & FL_PLAYERMISSILE))
 		{
-			fixed deltax = LABS(self->x - players[0].mo->x);
-			fixed deltay = LABS(self->y - players[0].mo->y);
+			fixed deltax = abs(self->x - players[0].mo->x);
+			fixed deltay = abs(self->y - players[0].mo->y);
 			fixed radius = players[0].mo->radius + self->radius;
-			if (deltax < radius && deltay < radius)
+			if (lastHit != players[0].mo && deltax < radius && deltay < radius)
 			{
+				lastHit = players[0].mo;
+
 				TakeDamage (self->GetDamage(),self);
-				T_ExplodeProjectile(self, players[0].mo);
-				return;
+				if(!(self->flags & FL_RIPPER))
+				{
+					T_ExplodeProjectile(self, players[0].mo);
+					return;
+				}
 			}
 		}
 		else
 		{
-			AActor::Iterator *iter = AActor::GetIterator();
-			while(iter)
+			AActor::Iterator iter = AActor::GetIterator();
+			while(iter.Next())
 			{
-				AActor *check = iter->Item();
-				if(check != players[0].mo && (check->flags & FL_SHOOTABLE))
+				AActor *check = iter;
+				if(check != players[0].mo && (check->flags & (FL_SHOOTABLE|FL_SOLID)) && lastHit != check)
 				{
-					fixed deltax = LABS(self->x - check->x);
-					fixed deltay = LABS(self->y - check->y);
+					fixed deltax = abs(self->x - check->x);
+					fixed deltay = abs(self->y - check->y);
 					fixed radius = check->radius + self->radius;
 					if(deltax < radius && deltay < radius)
 					{
-						DamageActor(check, self->GetDamage());
-						T_ExplodeProjectile(self, check);
-						return;
+						lastHit = check;
+						if(check->flags & FL_SHOOTABLE)
+						{
+							DamageActor(check, self->GetDamage());
+							if(!(self->flags & FL_RIPPER) || (check->flags & FL_DONTRIP))
+							{
+								T_ExplodeProjectile(self, check);
+								return;
+							}
+						}
+						// Eventually this will need an actual height check.
+						else if(check->projectilepassheight != 0)
+						{
+							T_ExplodeProjectile(self, check);
+							return;
+						}
 					}
 				}
-				iter = iter->Next();
 			}
 		}
 	}
@@ -287,6 +305,7 @@ void T_Projectile (AActor *self)
 ACTION_FUNCTION(A_Scream)
 {
 	PlaySoundLocActor(self->deathsound, self);
+	return true;
 }
 
 /*
@@ -322,12 +341,13 @@ ACTION_FUNCTION(A_CustomMissile)
 
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)
-		return;
-	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, true);
+		return false;
+	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, SPAWN_AllowReplacement);
 	newobj->angle = iangle;
 
 	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);
 	newobj->vely = -FixedMul(newobj->speed,finesine[iangle>>ANGLETOFINESHIFT]);
+	return true;
 }
 
 //
@@ -345,25 +365,24 @@ ACTION_FUNCTION(A_CustomMissile)
 
 ACTION_FUNCTION(A_Dormant)
 {
-	AActor::Iterator *iter = AActor::GetIterator();
-	AActor *actor;
-	while(iter)
+	AActor::Iterator iter = AActor::GetIterator();
+	while(iter.Next())
 	{
-		actor = iter->Item();
-		iter = iter->Next();
+		AActor *actor = iter;
 		if(actor == self || !(actor->flags&(FL_SHOOTABLE|FL_SOLID)))
 			continue;
 
 		fixed radius = self->radius + actor->radius;
 		if(abs(self->x - actor->x) < radius &&
 			abs(self->y - actor->y) < radius)
-			return;
+			return false;
 	}
 
 	self->flags |= FL_AMBUSH | FL_SHOOTABLE | FL_SOLID;
 	self->flags &= ~FL_ATTACKMODE;
 	self->dir = nodir;
 	self->SetState(self->SeeState);
+	return true;
 }
 
 /*
@@ -396,6 +415,7 @@ ACTION_FUNCTION(A_Look)
 		fov = 180;
 
 	SightPlayer(self, minseedist, maxseedist, maxheardist, fov);
+	return true;
 }
 // Create A_LookEx as an alias to A_Look since we're technically emulating this
 // ZDoom function with A_Look.
@@ -529,7 +549,7 @@ ACTION_FUNCTION(A_Chase)
 				if ( pr_chase.RandomOld(!!(self->flags & FL_OLDRANDOMCHASE)) < MAX<int>(chance, self->minmissilechance))
 				{
 					self->SetState(missile);
-					return;
+					return true;
 				}
 				dodge = !(flags & CHF_DONTDODGE);
 			}
@@ -542,11 +562,11 @@ ACTION_FUNCTION(A_Chase)
 	else
 	{
 		if (!(flags & CHF_NOSIGHTCHECK) && SightPlayer (self, 0, 0, 0, 180))
-			return;
+			return true;
 	}
 
 	if(self->dir == nodir)
-		return; // object is blocked in
+		return false; // object is blocked in
 
 	self->angle = dirangle[self->dir];
 	move = self->speed;
@@ -554,7 +574,7 @@ ACTION_FUNCTION(A_Chase)
 	do
 	{
 		if (CheckDoorMovement(self))
-			return;
+			return true;
 
 		if(!pathing)
 		{
@@ -565,7 +585,7 @@ ACTION_FUNCTION(A_Chase)
 			{
 				PlaySoundLocActor(self->attacksound, self);
 				self->SetState(melee);
-				return;
+				return true;
 			}
 		}
 
@@ -605,7 +625,7 @@ ACTION_FUNCTION(A_Chase)
 			SelectChaseDir (self);
 
 		if (self->dir == nodir)
-			return; // object is blocked in
+			return false; // object is blocked in
 	}
 	while(move);
 
@@ -614,6 +634,7 @@ ACTION_FUNCTION(A_Chase)
 	{
 		PlaySoundLocActor(self->activesound, self);
 	}
+	return true;
 }
 
 /*
@@ -701,4 +722,6 @@ ACTION_FUNCTION(A_WolfAttack)
 		PlaySoundLocActor(self->attacksound, self);
 	else
 		PlaySoundLocActor(sound, self);
+
+	return true;
 }

@@ -61,8 +61,8 @@ void ADeathCam::SetupDeathCam(AActor *actor, AActor *killer)
 	this->actor = actor;
 	this->killer = killer;
 
-	GetThinker()->SetPriority(ThinkerList::VICTORY);
-	actor->GetThinker()->SetPriority(ThinkerList::VICTORY);
+	SetPriority(ThinkerList::VICTORY);
+	actor->SetPriority(ThinkerList::VICTORY);
 }
 
 void ADeathCam::Tick()
@@ -89,7 +89,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	{
 		cam->camState = ADeathCam::CAM_FINISHED;
 		CALL_ACTION(A_BossDeath, cam->actor);
-		return;
+		return true;
 	}
 
 	cam->x = cam->actor->killerx;
@@ -103,20 +103,27 @@ ACTION_FUNCTION(A_FinishDeathCam)
 
 	FizzleFadeStart();
 
-	double fadex = 0;
-	double fadey = viewsize != 21 ? 200-STATUSLINES : 200;
-	double fadew = 320;
-	double fadeh = 200;
-	VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
-	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., 0., screenWidth, fadey);
+	double fadex = 0, fadey, fadew = 320, fadeh;
+	if(viewsize == 21)
+	{
+		fadey = 0;
+		fadeh = 200;
+	}
+	else
+	{
+		fadey = StatusBar->GetHeight(true);
+		fadeh = 200-StatusBar->GetHeight(false) - fadey + 1;
+	}
+	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., fadey, screenWidth, fadeh);
 
 	word width, height;
 	VW_MeasurePropString(IntermissionFont, language["STR_SEEAGAIN"], width, height);
 	px = 160 - (width/2);
-	py = ((200 - STATUSLINES) - height)/2;
+	py = ((200 - StatusBar->GetHeight(false) - StatusBar->GetHeight(true)) - height)/2;
 	VWB_DrawPropString(IntermissionFont, language["STR_SEEAGAIN"], CR_UNTRANSLATED);
 
-	FizzleFade(screenBuffer, 0, 0, screenWidth, static_cast<unsigned int>(fadeh), 70, false);
+	FizzleFade(0, static_cast<unsigned int>(fadey), screenWidth, static_cast<unsigned int>(fadeh), 70, false);
 
 	A_Face(cam, cam->actor);
 
@@ -139,10 +146,11 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	IN_UserInput(300);
 
 	players[0].camera = cam;
-	players[0].SetPSprite(cam->FindState("Ready"), player_t::ps_weapon);
+	players[0].SetPSprite(cam->FindState(NAME_Ready), player_t::ps_weapon);
 	cam->actor->SetState(cam->actor->FindState(NAME_Death));
 
 	DrawPlayScreen();
 
 	fizzlein = true;
+	return true;
 }

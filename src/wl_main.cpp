@@ -41,6 +41,10 @@
 #include "dobject.h"
 #include "colormatcher.h"
 #include "version.h"
+#include "r_2d/r_main.h"
+#include "filesys.h"
+#include "g_conversation.h"
+#include "g_intermission.h"
 
 #include <clocale>
 
@@ -89,7 +93,7 @@ int      viewscreenx, viewscreeny;
 int      viewwidth;
 int      viewheight;
 int      statusbarx;
-int      statusbary;
+int      statusbary1, statusbary2;
 short    centerx;
 short    centerxwide;
 int      shootdelta;           // pixels away from centerx a target can be
@@ -104,7 +108,8 @@ void    Quit (const char *error,...);
 
 bool	startgame;
 bool	loadedgame;
-int		mouseadjustment;
+int		mousexadjustment;
+int     mouseyadjustment;
 
 //
 // Command line parameter variables
@@ -130,23 +135,28 @@ int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 =====================
 */
 
-void NewGame (int difficulty, const FString &map, const ClassDef *playerClass)
+void NewGame (int difficulty, const FString &map, bool displayBriefing, const ClassDef *playerClass)
 {
 	if(!playerClass)
 		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
 
 	memset (&gamestate,0,sizeof(gamestate));
-	gamestate.difficulty = difficulty;
+	gamestate.difficulty = &SkillInfo::GetSkill(difficulty);
 	strncpy(gamestate.mapname, map, 8);
 	gamestate.mapname[8] = 0;
 	gamestate.playerClass = playerClass;
 	levelInfo = &LevelInfo::Find(map);
+
+	if(displayBriefing)
+		EnterText(levelInfo->Cluster);
 
 	// Clear LevelRatios
 	LevelRatios.killratio = LevelRatios.secretsratio = LevelRatios.treasureratio =
 		LevelRatios.numLevels = LevelRatios.time = 0;
 
 	players[0].state = player_t::PST_ENTER;
+
+	Dialog::ClearConversations();
 
 	startgame = true;
 }
@@ -250,21 +260,19 @@ void CalcProjection (int32_t focal)
 	int     halfview;
 	double  facedist;
 
+	const fixed projectionFOV = static_cast<fixed>((players[0].FOV / 90.0f)*AspectCorrection[r_ratio].viewGlobal);
+
 	// 0xFD17 is a magic number to convert the player's radius 0x5800 to FOCALLENGTH (0x5700)
 	focallength = FixedMul(focal, 0xFD17);
 	facedist = 2*FOCALLENGTH+0x100; // Used to be MINDIST (0x5800) which was 0x100 then the FOCALLENGTH (0x5700)
 	halfview = viewwidth/2;                                 // half view in pixels
 	focallengthy = centerx*yaspect/finetangent[FINEANGLES/2+(ANGLE_45>>ANGLETOFINESHIFT)];
 
-	/*fixed* viewTangent = finetangent+FINEANGLES/4;
-	fixed FocalTangent = viewTangent[FINEANGLES/4+(ANGLE_45>>ANGLETOFINESHIFT)];
-	fixed FocalLengthY = (centerx<<FRACBITS)/FocalTangent;*/
-
 	//
 	// calculate scale value for vertical height calculations
 	// and sprite x calculations
 	//
-	scale = (fixed) (halfview*facedist/(AspectCorrection[r_ratio].viewGlobal/2));
+	scale = (fixed) (viewwidth*facedist/projectionFOV);
 
 	//
 	// divide heightnumerator by a posts distance to get the posts height for
@@ -279,7 +287,7 @@ void CalcProjection (int32_t focal)
 	for (i=0;i<halfview;i++)
 	{
 		// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (int32_t)i*AspectCorrection[r_ratio].viewGlobal/viewwidth/facedist;
+		tang = (int32_t)i*projectionFOV/viewwidth/facedist;
 		angle = (float) atan(tang);
 		intang = (int) (angle*radtoint);
 		pixelangle[halfview-1-i] = intang;
@@ -324,7 +332,7 @@ void DoJukebox(void)
 		else
 			musicMenu.addItem(new MenuItem(language[langString], ChangeMusic));
 		songList.Push(Wads.GetLumpFullName(i));
-		
+
 	}
 	musicMenu.show();
 	return;
@@ -350,9 +358,12 @@ static void CollectGC()
 	GC::DelSoftRootHead();
 }
 
-static void DrawStartupConsole()
+static bool DrawStartupConsole()
 {
 	static const char* const tempString = "          " GAMENAME " " DOTVERSIONSTR_NOREV "\n\n\nTo be replaced with console...\n\n  The memory thing was just\n     for show anyways.";
+
+	if(gameinfo.SignonLump.IsEmpty())
+		return false;
 
 	CA_CacheScreen(TexMan(gameinfo.SignonLump));
 
@@ -361,8 +372,11 @@ static void DrawStartupConsole()
 	px = 160-width/2;
 	py = 76+62-height/2;
 	VWB_DrawPropString(ConFont, tempString, CR_GRAY);
+
+	return true;
 }
 
+void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
@@ -372,6 +386,12 @@ static void InitGame()
 		exit(1);
 	}
 	atterm(SDL_Quit);
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+#else
+	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
+#endif
+	SDL_ShowCursor(SDL_DISABLE);
 
 	int numJoysticks = SDL_NumJoysticks();
 	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
@@ -429,6 +449,9 @@ static void InitGame()
 	ClassDef::LoadActors();
 	atterm(CollectGC);
 
+	// I_ShutdownGraphics needs to be run before the class definitions are unloaded.
+	atterm (I_ShutdownGraphics);
+
 	// Parse non-gameinfo sections in MAPINFO
 	G_ParseMapInfo(false);
 
@@ -453,8 +476,10 @@ static void InitGame()
 //
 	FinalReadConfig();
 
-// Temporary status bar config
-	SetupStatusbar();
+//
+// Load the status bar
+//
+	CreateStatusBar();
 
 //
 // initialize the menusalcProjection
@@ -462,14 +487,23 @@ static void InitGame()
 	CreateMenus();
 
 //
+// Load Noah's Ark quiz
+//
+	Dialog::LoadGlobalModule("NOAHQUIZ");
+
+//
 // Finish signon screen
 //
 	VL_SetVGAPlaneMode();
-	DrawStartupConsole();
-	VH_UpdateScreen();
+	if(DrawStartupConsole())
+	{
+		VH_UpdateScreen();
 
-	if (!param_nowait)
-		IN_UserInput(70*4);
+		if (!param_nowait)
+			IN_UserInput(70*4);
+	}
+	else // Delay for a moment to allow the user to enter the jukebox if desired
+		IN_UserInput(16);
 
 //
 // HOLDING DOWN 'M' KEY?
@@ -501,12 +535,23 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	if(AspectCorrection[r_ratio].isWide)
 		statusbarx = screenWidth*(48-AspectCorrection[r_ratio].multiplier)/(48*2);
 
-	statusbary = 200 - STATUSLINES - 1;
+	if(StatusBar)
+	{
+		statusbary1 = StatusBar->GetHeight(true);
+		statusbary2 = 200 - StatusBar->GetHeight(false);
+	}
+	else
+	{
+		statusbary1 = 0;
+		statusbary2 = 200;
+	}
+
+	statusbary1 = statusbary1*screenHeight/200;
 	if(AspectCorrection[r_ratio].tallscreen)
-		statusbary = ((statusbary - 100)*screenHeight*3)/AspectCorrection[r_ratio].baseHeight + screenHeight/2
+		statusbary2 = ((statusbary2 - 100)*screenHeight*3)/AspectCorrection[r_ratio].baseHeight + screenHeight/2
 			+ (screenHeight - screenHeight*AspectCorrection[r_ratio].multiplier/48)/2;
 	else
-		statusbary = statusbary*screenHeight/200;
+		statusbary2 = statusbary2*screenHeight/200;
 
 	unsigned int width;
 	unsigned int height;
@@ -518,12 +563,12 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	else if(viewsize == 20)
 	{
 		width = screenWidth;
-		height = statusbary;
+		height = statusbary2-statusbary1;
 	}
 	else
 	{
 		width = screenWidth - (20-viewsize)*16*screenWidth/320;
-		height = (statusbary+1) - (20-viewsize)*8*screenHeight/200;
+		height = (statusbary2-statusbary1+1) - (20-viewsize)*8*screenHeight/200;
 	}
 
 	// Some code assumes these are even.
@@ -531,14 +576,15 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	viewheight = height&~1;
 	centerx = viewwidth/2-1;
 	centerxwide = AspectCorrection[r_ratio].isWide ? CorrectWidthFactor(centerx) : centerx;
-	shootdelta = viewwidth/10;
+	// This should allow shooting within 9 degrees, but it's not perfect.
+	shootdelta = ((viewwidth<<FRACBITS)/AspectCorrection[r_ratio].viewGlobal)/10;
 	if((unsigned) viewheight == screenHeight)
 		viewscreenx = viewscreeny = screenofs = 0;
 	else
 	{
 		viewscreenx = (screenWidth-viewwidth) / 2;
-		viewscreeny = (statusbary-viewheight)/2;
-		screenofs = viewscreeny*bufferPitch+viewscreenx;
+		viewscreeny = (statusbary2+statusbary1-viewheight)/2;
+		screenofs = viewscreeny*SCREENPITCH+viewscreenx;
 	}
 
 	int virtheight = screenHeight;
@@ -730,7 +776,6 @@ static void NonShareware (void)
 =====================
 */
 
-
 static void DemoLoop()
 {
 //
@@ -739,7 +784,7 @@ static void DemoLoop()
 	if (param_tedlevel)
 	{
 		param_nowait = true;
-		NewGame(param_difficulty,param_tedlevel);
+		NewGame(param_difficulty,param_tedlevel,false);
 	}
 
 
@@ -755,95 +800,17 @@ static void DemoLoop()
 	if (!param_nowait)
 		PG13 ();
 
-	bool reloadPalette = false;
+	IntermissionInfo *demoLoop = IntermissionInfo::Find("DemoLoop");
 	bool gotoMenu = false;
 	while (1)
 	{
-		while (!param_nowait && !gotoMenu)
+		while(!param_nowait && ShowIntermission(demoLoop, true))
 		{
-//
-// title page
-//
-			bool useTitlePalette = !gameinfo.TitlePalette.IsEmpty();
-			if(useTitlePalette)
-			{
-				reloadPalette = true;
-				VL_ReadPalette(gameinfo.TitlePalette);
-			}
-
-			CA_CacheScreen(TexMan(gameinfo.TitlePage));
-			VW_UpdateScreen ();
-			VW_FadeIn();
-			if (IN_UserInput(TICRATE*gameinfo.TitleTime))
-				break;
-			VW_FadeOut();
-			if(useTitlePalette)
-			{
-				VL_ReadPalette(gameinfo.GamePalette);
-				reloadPalette = false;
-			}
-//
-// credits page
-//
-			CA_CacheScreen (TexMan(gameinfo.CreditPage));
-			VW_UpdateScreen();
-			VW_FadeIn ();
-			if (IN_UserInput(TICRATE*gameinfo.PageTime))
-				break;
-			VW_FadeOut ();
-//
-// high scores
-//
-			DrawHighScores ();
-			VW_UpdateScreen ();
-			VW_FadeIn ();
-
-			if (IN_UserInput(TICRATE*gameinfo.PageTime))
-				break;
-//
-// demo
-//
-#if 0
-			bool demoPlayed = false;
-			do // This basically loops twice at most.  If the lump exists it plays the demo if not it goes to DEMO0.
-			{  // PlayDemo will actually play the demo picked if it exists otherwise it will immediately return.
-				char demoName[9];
-				sprintf(demoName, "DEMO%d", LastDemo);
-				if(Wads.CheckNumForName(demoName) == -1)
-				{
-					if(LastDemo == 0)
-						break;
-					else
-						LastDemo = 0;
-					continue;
-				}
-				else
-				{
-					demoPlayed = true;
-					PlayDemo(LastDemo++);
-					break;
-				}
-			}
-			while(true);
-#endif
-
-			if (playstate == ex_abort)
-				break;
-			VW_FadeOut();
-			if(screenHeight % 200 != 0)
-				VL_ClearScreen(0);
 		}
 
 		if(!param_tedlevel)
 		{
 			gotoMenu = false;
-
-			VW_FadeOut ();
-			if(reloadPalette)
-			{
-				VL_ReadPalette(gameinfo.GamePalette);
-				reloadPalette = false;
-			}
 
 			if (Keyboard[sc_Tab])
 				RecordDemo ();
@@ -859,7 +826,6 @@ static void DemoLoop()
 
 			if(!param_nowait && !gotoMenu)
 			{
-				VW_FadeOut();
 				StartCPMusic(gameinfo.TitleMusic);
 			}
 		}
@@ -1113,7 +1079,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 		else IFARG("--savedir")
 		{
 			if(++i < argc)
-				GameSave::savedir = argv[i];
+				FileSys::SetDirectoryPath(FileSys::DIR_Saves, argv[i]);
 		}
 		else
 			files.Push(argv[i]);
@@ -1122,12 +1088,12 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 	{
 		if(hasError) printf("\n");
 		printf(
-			"ECWolf v1.0\n"
+			GAMENAME " v" DOTVERSIONSTR "\n"
 			"http://maniacsvault.net/ecwolf/\n"
 			"Based on Wolf4SDL v1.7\n"
 			"Ported by Chaos-Software (http://www.chaos-software.de.vu)\n"
 			"Original Wolfenstein 3D by id Software\n\n"
-			"Usage: ecwolf [options]\n"
+			"Usage: " BINNAME " [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
 			" --config <file>        Use an explicit location for the config file\n"
@@ -1274,6 +1240,8 @@ int main (int argc, char *argv[])
 	// to the system locale.
 	setlocale(LC_ALL, "C");
 
+	FileSys::SetupPaths(argc, argv);
+
 	// Find the program directory.
 	FString progdir(".");
 	int pos = FString(argv[0]).LastIndexOfAny("/\\");
@@ -1294,7 +1262,7 @@ int main (int argc, char *argv[])
 
 			Printf("IWad: Selecting base game data.\n");
 			const char* extension = CheckParameters(argc, argv, wadfiles);
-			IWad::SelectGame(files, extension, "ecwolf.pk3", progdir);
+			IWad::SelectGame(files, extension, MAIN_PK3, progdir);
 
 			for(unsigned int i = 0;i < wadfiles.Size();++i)
 				files.Push(wadfiles[i]);
@@ -1306,6 +1274,8 @@ int main (int argc, char *argv[])
 		}
 
 		InitThinkerList();
+
+		R_InitRenderer();
 
 		printf("InitGame: Setting up the game...\n");
 		InitGame();

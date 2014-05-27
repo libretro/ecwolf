@@ -86,6 +86,10 @@ actor Needle
 		Loop:
 			HYPO BCDA 3
 			loop
+		Death:
+			// Keep the actor alive so our temporary damage type hack works consistantly
+			TNT1 A 1
+			stop
 	}
 }
 
@@ -130,7 +134,7 @@ actor Schabbs : WolfensteinMonster 17
 actor Gift : WolfensteinMonster 21
 {
 	points 5000
-	health 850, 950, 1050, 120
+	health 850, 950, 1050, 1200
 	speed 1, 3
 	missilefrequency 0.04
 	attacksound "missile/fire"
@@ -169,7 +173,7 @@ actor Gift : WolfensteinMonster 21
 actor FatFace : WolfensteinMonster 22
 {
 	points 5000
-	health 850, 950, 1050, 120
+	health 850, 950, 1050, 1200
 	speed 1, 3
 	missilefrequency 0.04
 	attacksound "missile/fire"

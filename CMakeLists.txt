@@ -9,6 +9,17 @@ else(${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
 	set( NO_GENERATOR_EXPRESSIONS ON )
 endif(${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
 
+# Support cross compiling
+option( FORCE_CROSSCOMPILE "Turn on cross compiling." NO )
+if( FORCE_CROSSCOMPILE )
+	set( CMAKE_CROSSCOMPILING TRUE )
+endif( FORCE_CROSSCOMPILE )
+
+if(CMAKE_CROSSCOMPILING)
+	set(IMPORT_EXECUTABLES "IMPORTFILE-NOTFOUND" CACHE FILEPATH "Export file from native build.")
+	include(${IMPORT_EXECUTABLES})
+endif(CMAKE_CROSSCOMPILING)
+
 # Simplify pk3 building, add_pk3(filename srcdirectory)
 function( add_pk3 PK3_NAME PK3_DIR )
 	get_target_property(ZIPDIR_EXE zipdir LOCATION)
@@ -41,6 +52,9 @@ set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWol
 
 set(LZMA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lzma/C")
 
+option(GPL "Build GPL edition" ON)
+option(USE_LIBTEXTSCREEN "Use libtextscreen instead of console iwad picker." OFF)
+
 option(INTERNAL_ZLIB "Force build with internal zlib" OFF)
 option(INTERNAL_BZIP2 "Force build with internal bzip2" OFF)
 option(INTERNAL_JPEG "Force build with internal libjpeg" OFF)
@@ -52,6 +66,7 @@ find_package(JPEG)
 if(NOT ZLIB_FOUND OR INTERNAL_ZLIB)
 	set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zlib)
 	add_subdirectory(zlib)
+	set(ZLIB_LIBRARIES z)
 	set(ZLIB_LIBRARY z)
 endif(NOT ZLIB_FOUND OR INTERNAL_ZLIB)
 
@@ -83,4 +98,11 @@ add_subdirectory(wadsrc)
 
 add_subdirectory(gdtoa)
 add_subdirectory(lzma)
+if(GPL AND USE_LIBTEXTSCREEN)
+	add_subdirectory(textscreen)
+endif(GPL AND USE_LIBTEXTSCREEN)
 add_subdirectory(src)
+
+if( NOT CMAKE_CROSSCOMPILING )
+	export(TARGETS ${CROSS_EXPORTS} FILE "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" )
+endif( NOT CMAKE_CROSSCOMPILING )

@@ -13,7 +13,6 @@
 =============================================================================
 */
 
-extern  int      facecount;
 extern  int32_t  thrustspeed;
 extern  AActor   *LastAttacker;
 
@@ -24,15 +23,28 @@ void    TakeDamage (int points,AActor *attacker);
 void    GivePoints (int32_t points);
 
 //
+// Status bar interface
+//
+class DBaseStatusBar
+{
+public:
+	virtual ~DBaseStatusBar() {}
+
+	virtual void DrawStatusBar()=0;
+	virtual unsigned int GetHeight(bool top)=0;
+	virtual void NewGame() {}
+	virtual void RefreshBackground(bool noborder=false);
+	virtual void UpdateFace (int damage=0) {}
+	virtual void WeaponGrin () {}
+};
+extern DBaseStatusBar *StatusBar;
+void	CreateStatusBar();
+
+//
 // player state info
 //
 
-void	SetupStatusbar();
-void	DrawStatusBar();
-void    StatusDrawFace(unsigned picnum);
 void    GiveExtraMan (int amount);
-void    UpdateFace (bool damageUpdate=false);
-void	WeaponGrin ();
 void    CheckWeaponChange ();
 void    ControlMovement (AActor *self);
 
@@ -75,6 +87,14 @@ extern class player_t
 		{
 			PF_WEAPONREADY = 0x1,
 			PF_WEAPONBOBBING = 0x2,
+			PF_WEAPONREADYALT = 0x4,
+			PF_WEAPONSWITCHOK = 0x8,
+			PF_DISABLESWITCH = 0x10,
+			PF_WEAPONRELOADOK = 0x20,
+			PF_WEAPONZOOMOK = 0x40,
+			PF_REFIRESWITCHOK = 0x80,
+
+			PF_READYFLAGS = PF_WEAPONREADY|PF_WEAPONBOBBING|PF_WEAPONREADYALT|PF_WEAPONSWITCHOK|PF_WEAPONRELOADOK|PF_WEAPONZOOMOK
 		};
 
 		APlayerPawn	*mo;
@@ -84,6 +104,7 @@ extern class player_t
 		int32_t		oldscore,score,nextextra;
 		short		lives;
 		int32_t		health;
+		float		FOV, DesiredFOV;
 
 		FWeaponSlots	weapons;
 		AWeapon			*ReadyWeapon;

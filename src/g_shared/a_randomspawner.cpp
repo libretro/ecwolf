@@ -25,7 +25,7 @@ class ARandomSpawner : public AActor
 	// random spawner's velocity (0...) instead of their own.
 	void BeginPlay()
 	{
-		DropList::Node *di; // di will be our drop item list iterator
+		DropList::Iterator di; // di will be our drop item list iterator
 		DropList *drop; // while drop stays as the reference point.
 		int n=0;
 		//bool nomonsters = (dmflags & DF_NO_MONSTERS) || (level.flags2 & LEVEL2_NOMONSTERS);
@@ -33,20 +33,21 @@ class ARandomSpawner : public AActor
 		//Super::BeginPlay();
 		drop = GetDropList();
 		di = drop->Head();
-		if (di != NULL)
+		if (di)
 		{
-			while (di != NULL)
+			do
 			{
-				if (di->Item().className != NAME_None)
+				if (di->className != NAME_None)
 				{
 					//if (!nomonsters || !(GetDefaultByType(PClass::FindClass(di->Name))->flags3 & MF3_ISMONSTER))
 					{
-						if (di->Item().amount == 0) di->Item().amount = 1; // default value is -1, we need a positive value.
-						n += di->Item().amount; // this is how we can weight the list.
+						if (di->amount == 0) di->amount = 1; // default value is -1, we need a positive value.
+						n += di->amount; // this is how we can weight the list.
 					}
-					di = di->Next();
+					++di;
 				}
 			}
+			while(di);
 			if (n == 0)
 			{ // Nothing left to spawn. They must have all been monsters, and monsters are disabled.
 				Destroy();
@@ -57,34 +58,34 @@ class ARandomSpawner : public AActor
 			// Take a random number...
 			n = pr_randomspawn(n);
 			// And iterate in the array up to the random number chosen.
-			while (n > -1 && di != NULL)
+			while (n > -1 && di)
 			{
-				if (di->Item().className != NAME_None)// &&
+				if (di->className != NAME_None)// &&
 					//(!nomonsters || !(GetDefaultByType(PClass::FindClass(di->Name))->flags3 & MF3_ISMONSTER)))
 				{
-					n -= di->Item().amount;
-					if ((di->Next() != NULL) && (n > -1))
-						di = di->Next();
+					n -= di->amount;
+					if (di.HasNext() && (n > -1))
+						++di;
 					else
 						n = -1;
 				}
 				else
 				{
-					di = di->Next();
+					++di;
 				}
 			}
 			// So now we can spawn the dropped item.
-			if (di == NULL || bouncecount >= MAX_RANDOMSPAWNERS_RECURSION)	// Prevents infinite recursions
+			if (!di || bouncecount >= MAX_RANDOMSPAWNERS_RECURSION)	// Prevents infinite recursions
 			{
 				Spawn(ClassDef::FindClass("Unknown"), x, y, 0, false);		// Show that there's a problem.
 				Destroy();
 				return;
 			}
-			else if (pr_randomspawn() <= di->Item().probability)	// prob 255 = always spawn, prob 0 = never spawn.
+			else if (pr_randomspawn() <= di->probability)	// prob 255 = always spawn, prob 0 = never spawn.
 			{
 				// Handle replacement here so as to get the proper speed and flags for missiles
 				const ClassDef *cls;
-				cls = ClassDef::FindClass(di->Item().className);
+				cls = ClassDef::FindClass(di->className);
 				if (cls != NULL)
 				{
 					const ClassDef *rep = cls->GetReplacement();

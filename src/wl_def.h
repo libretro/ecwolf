@@ -54,6 +54,7 @@ typedef int64_t SQWORD;
 typedef void * memptr;
 typedef uint32_t uint32;
 typedef uint32_t BITFIELD;
+typedef int INTBOOL;
 
 // Screenshot buffer image data types
 enum ESSType
@@ -65,15 +66,16 @@ enum ESSType
 
 void Quit(const char *errorStr, ...);
 
-#define SIGN(x)         ((x)>0?1:-1)
-#define ABS(x)          ((int)(x)>0?(x):-(x))
-#define LABS(x)         ((int32_t)(x)>0?(x):-(x))
+#define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
+#define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
 
-#define abs(x) ABS(x)
-
-#ifdef WINDOWS
+#ifdef _WIN32
 #define stricmp _stricmp
 #endif
+
+typedef double real64;
+typedef SDWORD int32;
+#include "xs_Float.h"
 
 /*
 =============================================================================
@@ -85,7 +87,7 @@ void Quit(const char *errorStr, ...);
 
 #define MAXPLAYERS		8 // You wish! :P  (This is just here to satisfy ZDoom stuff)
 #define BODYQUESIZE		32
-#define NUMCOLORMAPS	32
+#define NUMCOLORMAPS	64
 
 #define TICRATE 70
 #define MAXTICS 10
@@ -158,9 +160,6 @@ typedef uint32_t angle_t;
 #define SOUTH   2
 #define WEST    3
 
-
-#define STATUSLINES     40
-
 #define SCREENSIZE      (SCREENBWIDE*208)
 #define PAGE1START      0
 #define PAGE2START      (SCREENSIZE)
@@ -216,13 +215,17 @@ typedef enum
 	FL_REQUIREKEYS		= 0x00400000,
 	FL_ALWAYSFAST		= 0x00800000,
 	FL_RANDOMIZE		= 0x01000000,
-	FL_OLDRANDOMCHASE	= 0x02000000,
+	FL_RIPPER			= 0x02000000,
+	FL_DONTRIP			= 0x04000000,
+	FL_OLDRANDOMCHASE	= 0x08000000,
+	FL_PLOTONAUTOMAP	= 0x10000000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
 
 	IF_AUTOACTIVATE		= 0x00000001,
 	IF_INVBAR			= 0x00000002,
 	IF_ALWAYSPICKUP		= 0x00000004,
+	IF_INACTIVE			= 0x00000008, // For picked up items that remain on the map
 
 	WF_NOGRIN			= 0x00000001,
 	WF_NOAUTOFIRE		= 0x00000002,
@@ -296,7 +299,21 @@ enum Button
 	bt_movebackward,
 	bt_turnleft,
 	bt_turnright,
-	NUMBUTTONS
+	bt_altattack,
+	bt_reload,
+	bt_zoom,
+	bt_automap,
+	bt_showstatusbar,
+	NUMBUTTONS,
+
+	// AM buttons
+	bt_zoomin = 0,
+	bt_zoomout,
+	bt_panup,
+	bt_pandown,
+	bt_panleft,
+	bt_panright,
+	NUMAMBUTTONS
 };
 
 struct ControlScheme
@@ -316,6 +333,8 @@ struct ControlScheme
 };
 
 extern ControlScheme controlScheme[];
+extern ControlScheme amControlScheme[];
+extern ControlScheme &schemeAutomapKey;
 
 enum
 {
@@ -373,8 +392,6 @@ static inline fixed FixedDiv(fixed a, fixed b)
 }
 
 #define GetTicks() ((SDL_GetTicks()*7)/100)
-
-#define ISPOINTER(x) ((((uintptr_t)(x)) & ~0xffff) != 0)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 

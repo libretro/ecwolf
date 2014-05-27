@@ -44,8 +44,7 @@
 #include "scanner.h"
 //#include "gi.h"
 #include "farchive.h"
-
-#define STACK_ARGS
+#include "zdoomsupport.h"
 
 static int STACK_ARGS SortSwitchDefs (const void *a, const void *b)
 {

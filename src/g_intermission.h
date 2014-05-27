@@ -34,6 +34,7 @@
 
 #include "g_mapinfo.h"
 #include "tarray.h"
+#include "wl_text.h"
 #include "zstring.h"
 #include "textures/textures.h"
 
@@ -48,18 +49,38 @@ public:
 		unsigned int	Y;
 	};
 
-	IntermissionAction() : Time(0), BackgroundTile(false)
+	enum BackgroundType
+	{
+		UNSET,
+
+		NORMAL,
+		HIGHSCORES,
+		TITLEPAGE,
+		LOADMAP
+	};
+
+	IntermissionAction() : Type(UNSET), Time(0), BackgroundTile(false)
 	{
 		// Invalid background means use previous.
 		Background.SetInvalid();
 	}
 
 	FTextureID			Background;
+	BackgroundType		Type;
 	TArray<DrawData>	Draw;
 	FString				Music;
 	FString				Palette;
 	unsigned int		Time;
 	bool				BackgroundTile;
+
+	FString				MapName;
+};
+
+class CastIntermissionAction : public IntermissionAction
+{
+public:
+	const ClassDef *Class;
+	FString Name;
 };
 
 class FaderIntermissionAction : public IntermissionAction
@@ -77,22 +98,19 @@ public:
 class TextScreenIntermissionAction : public IntermissionAction
 {
 public:
-	enum Alignment
-	{
-		LEFT,
-		CENTER,
-		RIGHT
-	};
-
-	TextScreenIntermissionAction() : IntermissionAction(),
-		Alignment(LEFT), TextColor(CR_UNTRANSLATED), TextDelay(20), TextSpeed(4)
+	TextScreenIntermissionAction() : IntermissionAction(), FadeTime(0),
+		Alignment(TS_Left), Anchor(TS_Middle), TextFont(SmallFont),
+		TextColor(CR_UNTRANSLATED), TextDelay(20), TextSpeed(4)
 	{
 	}
 
+	unsigned int	FadeTime;
 	unsigned int	PrintX;
 	unsigned int	PrintY;
-	Alignment		Alignment;
+	ETSAlignment	Alignment;
+	ETSAnchor		Anchor;
 	TArray<FString>	Text;
+	FFont			*TextFont;
 	EColorRange		TextColor;
 	unsigned int	TextDelay;
 	unsigned int	TextSpeed;
@@ -101,12 +119,15 @@ public:
 class IntermissionInfo
 {
 public:
-	static IntermissionInfo &Find(const FName &name);
+	static IntermissionInfo *Find(const FName &name);
+
+	IntermissionInfo() : Link(NAME_None) {}
 
 	enum ActionType
 	{
 		IMAGE,
 		FADER,
+		CAST,
 		GOTOTITLE,
 		TEXTSCREEN,
 		VICTORYSTATS
@@ -118,7 +139,8 @@ public:
 		IntermissionAction	*action;
 	};
 	TArray<Action>	Actions;
+	FName			Link;
 };
 
 // Returns true if the game should return to the menu instead of the title screen.
-bool ShowIntermission(const IntermissionInfo &intermission);
+bool ShowIntermission(const IntermissionInfo *intermission, bool demoMode=false);

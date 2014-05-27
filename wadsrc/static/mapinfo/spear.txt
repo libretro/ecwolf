@@ -61,6 +61,7 @@ intermission SpearEnding
 		Position = 160, 180
 		Text = "$STR_ENDGAME1", "$STR_ENDGAME2"
 		TextAlignment = Center
+		TextAnchor = Bottom
 		TextColor = "Cream"
 		TextSpeed = 0
 		TextDelay = 0
@@ -71,6 +72,7 @@ intermission SpearEnding
 		Position = 160, 180
 		Text = "$STR_ENDGAME3", "$STR_ENDGAME4"
 		TextAlignment = Center
+		TextAnchor = Bottom
 		TextColor = "Cream"
 		TextSpeed = 0
 		TextDelay = 0
@@ -195,7 +197,7 @@ adddefaultmap
 
 episode "MAP01"
 {
-	name = "Spear of Destiny"
+	lookup = "SOD_EPISODE1"
 }
 
 // Demo cluster
@@ -209,7 +211,7 @@ cluster 2
 }
 
 // Map definitions
-map "MAP01"
+map "MAP01" lookup "SHUSTR_01"
 {
 	next = "MAP02"
 	secretnext = "MAP02"
@@ -220,7 +222,7 @@ map "MAP01"
 	cluster = 1
 }
 
-map "MAP02"
+map "MAP02" lookup "SHUSTR_02"
 {
 	next = "MAP03"
 	secretnext = "MAP03"
@@ -231,7 +233,7 @@ map "MAP02"
 	cluster = 1
 }
 
-map "MAP03"
+map "MAP03" lookup "SHUSTR_03"
 {
 	next = "MAP04"
 	secretnext = "MAP04"
@@ -241,7 +243,7 @@ map "MAP03"
 	cluster = 2
 }
 
-map "MAP04"
+map "MAP04" lookup "SHUSTR_04"
 {
 	next = "MAP05"
 	secretnext = "MAP19"
@@ -252,7 +254,7 @@ map "MAP04"
 	cluster = 2
 }
 
-map "MAP05"
+map "MAP05" lookup "SHUSTR_05"
 {
 	next = "MAP06"
 	secretnext = "MAP06"
@@ -264,7 +266,7 @@ map "MAP05"
 	levelbonus = 15000
 }
 
-map "MAP06"
+map "MAP06" lookup "SHUSTR_06"
 {
 	next = "MAP07"
 	secretnext = "MAP07"
@@ -275,7 +277,7 @@ map "MAP06"
 	cluster = 2
 }
 
-map "MAP07"
+map "MAP07" lookup "SHUSTR_07"
 {
 	next = "MAP08"
 	secretnext = "MAP08"
@@ -286,7 +288,7 @@ map "MAP07"
 	cluster = 2
 }
 
-map "MAP08"
+map "MAP08" lookup "SHUSTR_08"
 {
 	next = "MAP09"
 	secretnext = "MAP09"
@@ -297,7 +299,7 @@ map "MAP08"
 	cluster = 2
 }
 
-map "MAP09"
+map "MAP09" lookup "SHUSTR_09"
 {
 	next = "MAP10"
 	secretnext = "MAP10"
@@ -308,7 +310,7 @@ map "MAP09"
 	cluster = 2
 }
 
-map "MAP10"
+map "MAP10" lookup "SHUSTR_10"
 {
 	next = "MAP11"
 	secretnext = "MAP11"
@@ -320,7 +322,7 @@ map "MAP10"
 	levelbonus = 15000
 }
 
-map "MAP11"
+map "MAP11" lookup "SHUSTR_11"
 {
 	next = "MAP12"
 	secretnext = "MAP12"
@@ -330,7 +332,7 @@ map "MAP11"
 	cluster = 2
 }
 
-map "MAP12"
+map "MAP12" lookup "SHUSTR_12"
 {
 	next = "MAP13"
 	secretnext = "MAP20"
@@ -341,7 +343,7 @@ map "MAP12"
 	cluster = 2
 }
 
-map "MAP13"
+map "MAP13" lookup "SHUSTR_13"
 {
 	next = "MAP14"
 	secretnext = "MAP14"
@@ -352,7 +354,7 @@ map "MAP13"
 	cluster = 2
 }
 
-map "MAP14"
+map "MAP14" lookup "SHUSTR_14"
 {
 	next = "MAP15"
 	secretnext = "MAP15"
@@ -363,7 +365,7 @@ map "MAP14"
 	cluster = 2
 }
 
-map "MAP15"
+map "MAP15" lookup "SHUSTR_15"
 {
 	next = "MAP16"
 	secretnext = "MAP16"
@@ -374,7 +376,7 @@ map "MAP15"
 	cluster = 2
 }
 
-map "MAP16"
+map "MAP16" lookup "SHUSTR_16"
 {
 	next = "MAP17"
 	secretnext = "MAP17"
@@ -386,7 +388,7 @@ map "MAP16"
 	levelbonus = 15000
 }
 
-map "MAP17"
+map "MAP17" lookup "SHUSTR_17"
 {
 	next = "MAP18"
 	secretnext = "MAP18"
@@ -397,7 +399,7 @@ map "MAP17"
 	cluster = 2
 }
 
-map "MAP18"
+map "MAP18" lookup "SHUSTR_18"
 {
 	next = "MAP21"
 	secretnext = "MAP21"
@@ -408,7 +410,7 @@ map "MAP18"
 	nointermission
 }
 
-map "MAP19"
+map "MAP19" lookup "SHUSTR_19"
 {
 	next = "MAP05"
 	secretnext = "MAP05"
@@ -421,7 +423,7 @@ map "MAP19"
 	secretdeathsounds = true
 }
 
-map "MAP20"
+map "MAP20" lookup "SHUSTR_20"
 {
 	next = "MAP13"
 	secretnext = "MAP13"
@@ -433,7 +435,7 @@ map "MAP20"
 	secretdeathsounds = true
 }
 
-map "MAP21"
+map "MAP21" lookup "SHUSTR_21"
 {
 	next = EndSequence, "SpearEnding"
 	secretnext = EndSequence, "SpearEnding"

@@ -21,6 +21,7 @@
 #include "wl_agent.h"
 #include "g_intermission.h"
 #include "g_mapinfo.h"
+#include "r_sprites.h"
 #include "wl_inter.h"
 #include "wl_draw.h"
 #include "wl_play.h"
@@ -244,6 +245,7 @@ void SetupGameLevel (void)
 	if (!loadedgame)
 	{
 		gamestate.victoryflag = false;
+		gamestate.fullmap = false;
 		gamestate.TimeCount
 			= gamestate.secrettotal
 			= gamestate.killtotal
@@ -261,7 +263,7 @@ void SetupGameLevel (void)
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapname);
+	CA_CacheMap (gamestate.mapname, false);
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer
@@ -304,7 +306,7 @@ void SetupGameLevel (void)
 */
 void DrawPlayBorderSides(void)
 {
-	if(viewsize == 21) return;
+	if((unsigned)viewheight == screenHeight) return;
 
 	if(!gameinfo.Border.issolid)
 	{
@@ -349,7 +351,11 @@ void DrawPlayBorderSides(void)
 			VWB_Clear(colors[2], viewscreenx-scaleFactorX, viewscreeny+viewheight, viewscreenx, viewscreeny+viewheight+scaleFactorY);
 		}
 		else
+		{
+			if(statusbary1)
+				VWB_Clear(colors[0], 0, viewscreeny-scaleFactorY, screenWidth, viewscreeny);
 			VWB_Clear(colors[1], 0, viewscreeny+viewheight, screenWidth, viewscreeny+viewheight+scaleFactorY);
+		}
 	}
 }
 
@@ -361,23 +367,29 @@ void DrawPlayBorderSides(void)
 ===================
 */
 
-void DrawPlayBorder (void)
+void DBaseStatusBar::RefreshBackground (bool noborder)
 {
 	FTexture *borderTex = TexMan(levelInfo->GetBorderTexture());
 
-	//TODO Highlight of bordercol-3 in lower left.
-	VWB_DrawFill(borderTex, 0, 0, screenWidth, viewscreeny);
+	if(viewscreeny > statusbary1)
+		VWB_DrawFill(borderTex, 0, statusbary1, screenWidth, viewscreeny);
 	VWB_DrawFill(borderTex, 0, viewscreeny, viewscreenx, viewheight + viewscreeny);
 	VWB_DrawFill(borderTex, viewwidth + viewscreenx, viewscreeny, screenWidth, viewheight + viewscreeny);
-	VWB_DrawFill(borderTex, 0, viewscreeny + viewheight, screenWidth, statusbary);
+	VWB_DrawFill(borderTex, 0, viewscreeny + viewheight, screenWidth, statusbary2);
 	if(statusbarx)
 	{
-		VWB_DrawFill(borderTex, 0, statusbary, statusbarx, screenHeight);
-		VWB_DrawFill(borderTex, screenWidth-statusbarx, statusbary, screenWidth, screenHeight);
+		VWB_DrawFill(borderTex, 0, 0, statusbarx, statusbary1);
+		VWB_DrawFill(borderTex, screenWidth-statusbarx, 0, screenWidth, statusbary1);
+		VWB_DrawFill(borderTex, 0, statusbary2, statusbarx, screenHeight);
+		VWB_DrawFill(borderTex, screenWidth-statusbarx, statusbary2, screenWidth, screenHeight);
 	}
 	// Complete border
-	VWB_DrawFill(borderTex, statusbarx, statusbary, screenWidth-statusbarx, screenHeight);
+	if(statusbary1)
+		VWB_DrawFill(borderTex, statusbarx, 0, screenWidth-statusbarx, statusbary1);
+	VWB_DrawFill(borderTex, statusbarx, statusbary2, screenWidth-statusbarx, screenHeight);
 
+	if(noborder)
+		return;
 	DrawPlayBorderSides();
 }
 
@@ -392,17 +404,8 @@ void DrawPlayBorder (void)
 
 void DrawPlayScreen (bool noborder)
 {
-	if(!noborder)
-		DrawPlayBorder ();
-
-	DrawStatusBar();
-}
-
-void ShowActStatus()
-{
-	ingame = false;
-	DrawStatusBar();
-	ingame = true;
+	StatusBar->RefreshBackground(noborder);
+	StatusBar->DrawStatusBar();
 }
 
 
@@ -524,7 +527,7 @@ void RecordDemo (void)
 
 	VW_FadeOut ();
 
-	NewGame (gd_hard, level);
+	NewGame (gd_hard, level, false);
 
 	StartDemoRecord (levelnum);
 
@@ -581,8 +584,7 @@ void PlayDemo (int demonumber)
 	int mapon = *demoptr++;
 	FString level;
 	level.Format("MAP%02d", mapon);
-	NewGame (1,level);
-	gamestate.difficulty = gd_hard;
+	NewGame (1,level,false);
 	length = READWORD(*(uint8_t **)&demoptr);
 	// TODO: Seems like the original demo format supports 16 MB demos
 	//       But T_DEM00 and T_DEM01 of Wolf have a 0xd8 as third length size...
@@ -669,6 +671,7 @@ void Died (void)
 		}
 
 		ThreeDRefresh ();
+		VH_UpdateScreen();
 		CalcTics ();
 	} while (curangle != iangle);
 
@@ -679,6 +682,7 @@ void Died (void)
 			players[0].mo->Tick();
 
 		ThreeDRefresh();
+		VH_UpdateScreen();
 		CalcTics();
 	}
 
@@ -689,25 +693,43 @@ void Died (void)
 
 	if(usedoublebuffering) VH_UpdateScreen();
 
+	--players[0].lives;
 
-	FizzleFadeStart();
+	if (gameinfo.GameOverPic.IsNotEmpty() && players[0].lives == -1)
+	{
+		FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
+		if(texID.isValid())
+			R_DrawZoomer(texID);
+	}
 
-	VWB_Clear(ColorMatcher.Pick(0xAA,0x00,0x00), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
+	if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
+	{
+		FizzleFadeStart();
 
-	IN_ClearKeysDown ();
+		// Fizzle fade used a slightly darker shade of red.
+		byte fr = RPART(players[0].mo->damagecolor)*2/3;
+		byte fg = GPART(players[0].mo->damagecolor)*2/3;
+		byte fb = BPART(players[0].mo->damagecolor)*2/3;
+		VWB_Clear(ColorMatcher.Pick(fr,fg,fb), viewscreenx, viewscreeny, viewwidth+viewscreenx, viewheight+viewscreeny);
 
-	FizzleFade(screenBuffer,viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
+		IN_ClearKeysDown ();
 
-	IN_UserInput(100);
+		FizzleFade(viewscreenx,viewscreeny,viewwidth,viewheight,70,false);
+
+		IN_UserInput(100);
+	}
+	else
+	{
+		// If we get a game over we will fade out any way
+		if(players[0].lives > -1)
+			VL_FadeOut(0, 255, 0, 0, 0, 64);
+	}
+
 	SD_WaitSoundDone ();
 	ClearMemory();
 
-	players[0].lives--;
-
 	if (players[0].lives > -1)
 	{
-		DrawStatusBar();
-
 		players[0].state = player_t::PST_REBORN;
 		thinkerList->DestroyAll();
 	}
@@ -791,7 +813,7 @@ restartgame:
 					if(ensure->IsDescendantOf(NATIVE_CLASS(Ammo)))
 					{
 						// For ammo ensure we have the proper amount
-						AAmmo *ammo = static_cast<AAmmo*>(AActor::Spawn(ensure, 0, 0, 0, false));
+						AAmmo *ammo = static_cast<AAmmo*>(AActor::Spawn(ensure, 0, 0, 0, 0));
 						ammo->RemoveFromWorld();
 
 						if(!holding)
@@ -813,7 +835,7 @@ restartgame:
 					if(holding)
 						continue;
 
-					AInventory *item = static_cast<AInventory*>(AActor::Spawn(ensure, 0, 0, 0, false));
+					AInventory *item = static_cast<AInventory*>(AActor::Spawn(ensure, 0, 0, 0, 0));
 					item->RemoveFromWorld();
 					if(!item->CallTryPickup(players[0].mo))
 						item->Destroy();
@@ -837,11 +859,21 @@ restartgame:
 			fizzlein = true;
 		}
 
-		DrawStatusBar();
+		StatusBar->DrawStatusBar();
 
 		dointermission = true;
 
 		PlayLoop ();
+
+		if(playstate == ex_victorious)
+		{
+			if(gameinfo.VictoryPic.IsNotEmpty())
+			{
+				FTextureID ywin = TexMan.CheckForTexture(gameinfo.VictoryPic, FTexture::TEX_Any);
+				if(ywin.isValid())
+					R_DrawZoomer(ywin);
+			}
+		}
 
 		StopMusic ();
 		ingame = false;
@@ -859,8 +891,6 @@ restartgame:
 			case ex_newmap:
 			case ex_victorious:
 			{
-				if(viewsize == 21) DrawPlayScreen();
-
 				dointermission = !levelInfo->NoIntermission;
 
 				FString next;
@@ -890,6 +920,12 @@ restartgame:
 
 						if(dointermission)
 						{
+							if(levelInfo->ForceTally)
+							{
+								LevelCompleted();
+								VW_FadeOut();
+							}
+
 							Victory (false);
 
 							ClearMemory ();
@@ -898,13 +934,13 @@ restartgame:
 						bool gotoMenu = false;
 						if(endSequence)
 						{
-							IntermissionInfo &intermission = IntermissionInfo::Find(next.Mid(12));
+							IntermissionInfo *intermission = IntermissionInfo::Find(next.Mid(12));
 							gotoMenu = ShowIntermission(intermission);
 						}
 
 						ClearMemory();
 
-						CheckHighScore (players[0].score,levelInfo->FloorNumber);
+						CheckHighScore (players[0].score,levelInfo);
 						return gotoMenu;
 					}
 				}
@@ -922,7 +958,6 @@ restartgame:
 
 				StripInventory(players[0].mo);
 
-				DrawStatusBar();
 				if(dointermission)
 					VL_FadeOut(0, 255, RPART(levelInfo->ExitFadeColor), GPART(levelInfo->ExitFadeColor), BPART(levelInfo->ExitFadeColor), levelInfo->ExitFadeDuration);
 
@@ -942,7 +977,7 @@ restartgame:
 
 				if(next.CompareNoCase("EndDemo") == 0)
 				{
-					CheckHighScore (players[0].score,levelInfo->FloorNumber);
+					CheckHighScore (players[0].score,levelInfo);
 					return false;
 				}
 
@@ -966,7 +1001,7 @@ restartgame:
 
 				ClearMemory ();
 
-				CheckHighScore (players[0].score,levelInfo->FloorNumber);
+				CheckHighScore (players[0].score,levelInfo);
 				return false;
 
 			case ex_warped:

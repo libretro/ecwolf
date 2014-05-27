@@ -64,7 +64,7 @@ class AInventory : public AActor
 	protected:
 		virtual AInventory	*CreateCopy(AActor *holder);
 		void				GoAwayAndDie();
-		bool				GoesAway();
+		bool				GoAway();
 		virtual bool		TryPickup(AActor *toucher);
 };
 
@@ -73,10 +73,25 @@ class AAmmo : public AInventory
 	DECLARE_NATIVE_CLASS(Ammo, Inventory)
 
 	public:
-		const ClassDef	*GetAmmoType();
+		const ClassDef	*GetAmmoType() const;
+		bool			HandlePickup(AInventory *item, bool &good);
+
+		unsigned int	Backpackamount;
+		unsigned int	Backpackmaxamount;
+		unsigned int	Backpackboostamount;
+	protected:
+		AInventory		*CreateCopy(AActor *holder);
+};
+
+class ABackpackItem : public AInventory
+{
+	DECLARE_NATIVE_CLASS(BackpackItem, Inventory)
+
+	public:
 		bool			HandlePickup(AInventory *item, bool &good);
 
 	protected:
+		void			BoostAmmo(AAmmo *ammo);
 		AInventory		*CreateCopy(AActor *holder);
 };
 
@@ -128,30 +143,34 @@ class AWeapon : public AInventory
 			BobAlpha,
 			BobInverseAlpha,
 			BobSmooth,
-			BobInverseSmooth
+			BobInverseSmooth,
+			BobThrust
 		};
 
 		void		AttachToOwner(AActor *owner);
 		bool		CheckAmmo(FireMode fireMode, bool autoSwitch, bool requireAmmo=false);
 		bool		DepleteAmmo();
 
-		const Frame	*GetAtkState(bool hold) const;
+		const Frame	*GetAtkState(FireMode mode, bool hold) const;
 		const Frame	*GetDownState() const;
 		const Frame	*GetReadyState() const;
+		const Frame *GetReloadState() const;
 		const Frame	*GetUpState() const;
+		const Frame *GetZoomState() const;
 
 		bool		HandlePickup(AInventory *item, bool &good);
 		void		Serialize(FArchive &arc);
 
 		flagstype_t		weaponFlags;
-		const ClassDef	*ammotype1;
-		int				ammogive1;
-		unsigned int	ammouse1;
+		const ClassDef	*ammotype[2];
+		int				ammogive[2];
+		unsigned int	ammouse[2];
 		fixed			yadjust;
+		float			fovscale;
 
 		// Inventory instance variables
 		FireMode		mode;
-		TObjPtr<AAmmo>	ammo1;
+		TObjPtr<AAmmo>	ammo[2];
 
 		// Bob
 		EBobStyle	BobStyle;

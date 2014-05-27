@@ -17,7 +17,10 @@ if( WIN32 )
 	endif( CMAKE_COMPILER_IS_GNUC OR CMAKE_COMPILER_IS_GNUCXX )
 endif( WIN32 )
 
-add_executable( updaterevision updaterevision.c ${TRUSTINFO} )
+if( NOT CMAKE_CROSSCOMPILING )
+	add_executable( updaterevision updaterevision.c ${TRUSTINFO} )
+	set( CROSS_EXPORTS ${CROSS_EXPORTS} updaterevision PARENT_SCOPE )
+endif( NOT CMAKE_CROSSCOMPILING )
 
 if( MT_MERGE )
 	get_target_property( UPDATEREVISION_EXE updaterevision LOCATION )

@@ -1,4 +1,5 @@
 #include "wl_def.h"
+#include "am_map.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -6,6 +7,7 @@
 #include "w_wad.h"
 #include "v_font.h"
 #include "v_palette.h"
+#include "v_video.h"
 #include "r_data/r_translate.h"
 #include "textures/textures.h"
 #include "templates.h"
@@ -144,16 +146,10 @@ void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
 }
 #endif
 
-void VH_UpdateScreen(SDL_Surface * const screenBuffer)
+void VH_UpdateScreen()
 {
-#if SDL_VERSION_ATLEAST(2,0,0)
-	Blit8BitSurfaceToTexture(screen, screenBuffer);
-	SDL_RenderCopy(screenRenderer, screen, NULL, NULL);
-	SDL_RenderPresent(screenRenderer);
-#else
-	SDL_BlitSurface(screenBuffer, NULL, screen, NULL);
-	SDL_Flip(screen);
-#endif
+	screen->Update();
+	screen->Lock(false);
 }
 
 /*
@@ -223,35 +219,35 @@ void VH_Startup()
 		rndbits = 25;       // fizzle fade will not fill whole screen
 
 	rndmask = rndmasks[rndbits - 17];
+
+	AM_ChangeResolution();
 }
 
-SDL_Surface *fizzleSurface = NULL;
+byte *fizzleSurface = NULL;
 void FizzleFadeStart()
 {
-	fizzleSurface = SDL_ConvertSurface(screenBuffer, screenBuffer->format, 0);
+	screen->Lock(false);
+	fizzleSurface = new byte[SCREENHEIGHT*SCREENPITCH];
+	memcpy(fizzleSurface, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
+	screen->Unlock();
 }
-bool FizzleFade (SDL_Surface *source, int x1, int y1,
+bool FizzleFade (int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, bool abortable)
 {
 	unsigned x, y, frame, pixperframe;
-	int32_t  rndval=0, lastrndval;
-	int      first = 1;
+	int32_t  rndval=0;
 
 	assert(fizzleSurface != NULL);
 
-	lastrndval = 0;
 	pixperframe = width * height / frames;
 
 	IN_StartAck ();
 
 	frame = GetTimeCount();
-	byte *srcptr = VL_LockSurface(source);
-	if(srcptr == NULL)
-	{
-		SDL_FreeSurface(fizzleSurface);
-		fizzleSurface = NULL;
-		return false;
-	}
+	screen->Lock(false);
+	byte * const srcptr = new byte[SCREENHEIGHT*SCREENPITCH];
+	memcpy(srcptr, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
+	screen->Unlock();
 
 	do
 	{
@@ -259,87 +255,61 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 
 		if(abortable && IN_CheckAck ())
 		{
-			VL_UnlockSurface(source);
-			VH_UpdateScreen(source);
-			SDL_FreeSurface(fizzleSurface);
+			VH_UpdateScreen();
+			delete[] fizzleSurface;
+			delete[] srcptr;
 			fizzleSurface = NULL;
 			return true;
 		}
 
-		byte *destptr = VL_LockSurface(fizzleSurface);
+		byte *destptr = fizzleSurface;
 
 		if(destptr != NULL)
 		{
-			rndval = lastrndval;
-
-			// When using double buffering, we have to copy the pixels of the last AND the current frame.
-			// Only for the first frame, there is no "last frame"
-			for(int i = first; i < 2; i++)
+			for(unsigned p = 0; p < pixperframe; p++)
 			{
-				for(unsigned p = 0; p < pixperframe; p++)
+				//
+				// seperate random value into x/y pair
+				//
+
+				x = rndval >> rndbits_y;
+				y = rndval & ((1 << rndbits_y) - 1);
+
+				//
+				// advance to next random element
+				//
+
+				rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
+
+				if(x >= width || y >= height)
 				{
-					//
-					// seperate random value into x/y pair
-					//
-
-					x = rndval >> rndbits_y;
-					y = rndval & ((1 << rndbits_y) - 1);
-
-					//
-					// advance to next random element
-					//
-
-					rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
-
-					if(x >= width || y >= height)
-					{
-						if(rndval == 0)     // entire sequence has been completed
-							goto finished;
-						p--;
-						continue;
-					}
-
-					//
-					// copy one pixel
-					//
-
-					if(screenBits == 8)
-					{
-						*(destptr + (y1 + y) * fizzleSurface->pitch + x1 + x)
-							= *(srcptr + (y1 + y) * source->pitch + x1 + x);
-					}
-					else
-					{
-						byte col = *(srcptr + (y1 + y) * source->pitch + x1 + x);
-						uint32_t fullcol = SDL_MapRGB(fizzleSurface->format, GPalette.BaseColors[col].r, GPalette.BaseColors[col].g, GPalette.BaseColors[col].b);
-						memcpy(destptr + (y1 + y) * fizzleSurface->pitch + (x1 + x) * fizzleSurface->format->BytesPerPixel,
-							&fullcol, fizzleSurface->format->BytesPerPixel);
-					}
-
-					if(rndval == 0)		// entire sequence has been completed
+					if(rndval == 0)     // entire sequence has been completed
 						goto finished;
+					p--;
+					continue;
 				}
 
-				if(!i || first) lastrndval = rndval;
+				//
+				// copy one pixel
+				//
+				*(destptr + (y1 + y) * SCREENPITCH + x1 + x)
+					= *(srcptr + (y1 + y) * SCREENPITCH + x1 + x);
+
+				if(rndval == 0)		// entire sequence has been completed
+					goto finished;
 			}
 
-			// If there is no double buffering, we always use the "first frame" case
-			if(usedoublebuffering) first = 0;
-
-			VL_UnlockSurface(fizzleSurface);
-			VH_UpdateScreen(fizzleSurface);
+			memcpy(screen->GetBuffer(), destptr, SCREENHEIGHT*SCREENPITCH);
+			VH_UpdateScreen();
 		}
 		else
 		{
 			// No surface, so only enhance rndval
-			for(int i = first; i < 2; i++)
+			for(unsigned p = 0; p < pixperframe; p++)
 			{
-				for(unsigned p = 0; p < pixperframe; p++)
-				{
-					rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
-					if(rndval == 0)
-						goto finished;
-				}
+				rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
+				if(rndval == 0)
+					goto finished;
 			}
 		}
 
@@ -348,202 +318,53 @@ bool FizzleFade (SDL_Surface *source, int x1, int y1,
 	} while (1);
 
 finished:
-	VL_UnlockSurface(source);
-	VL_UnlockSurface(screenBuffer);
-	VH_UpdateScreen(source);
-	SDL_FreeSurface(fizzleSurface);
+	VH_UpdateScreen();
+	delete[] fizzleSurface;
+	delete[] srcptr;
 	fizzleSurface = NULL;
 	return false;
 }
 
 //==========================================================================
-/*
-** VirtualToRealCoords
-**
-**---------------------------------------------------------------------------
-** Copyright 1998-2008 Randy Heit
-** All rights reserved.
-**
-** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions
-** are met:
-**
-** 1. Redistributions of source code must retain the above copyright
-**    notice, this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. The name of the author may not be used to endorse or promote products
-**    derived from this software without specific prior written permission.
-**
-** THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-** IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-** OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-** IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-** INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-** NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-**---------------------------------------------------------------------------
-**
-*/
-
-#include "c_cvars.h"
-#include "textures/textures.h"
-#include "r_data/colormaps.h"
-void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom, bool handleaspect)
-{
-	int myratio = handleaspect ? r_ratio : 0;
-	double right = x + w;
-	double bottom = y + h;
-
-	if (AspectCorrection[myratio].isWide)
-	{ // The target surface is either 16:9 or 16:10, so expand the
-	  // specified virtual size to avoid undesired stretching of the
-	  // image. Does not handle non-4:3 virtual sizes. I'll worry about
-	  // those if somebody expresses a desire to use them.
-		x = (x - vwidth * 0.5) * screenWidth * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screenWidth * 0.5;
-		w = (right - vwidth * 0.5) * screenWidth * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screenWidth * 0.5 - x;
-	}
-	else
-	{
-		x = x * screenWidth / vwidth;
-		w = right * screenWidth / vwidth - x;
-	}
-	if (AspectCorrection[myratio].tallscreen)
-	{ // The target surface is 5:4
-		y = (y - vheight * 0.5) * screenHeight * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screenHeight * 0.5;
-		h = (bottom - vheight * 0.5) * screenHeight * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screenHeight * 0.5 - y;
-		if (vbottom)
-		{
-			y += (screenHeight - screenHeight * AspectCorrection[myratio].multiplier / 48.0) * 0.5;
-		}
-	}
-	else
-	{
-		y = y * screenHeight / vheight;
-		h = bottom * screenHeight / vheight - y;
-	}
-}
 
 void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 {
-	byte *vbuf = VL_LockSurface(screenBuffer);
-	for(int i = y1;i < y2;++i)
-		memset(vbuf+(i*bufferPitch)+x1, color, (x2-x1));
-	VL_UnlockSurface(screenBuffer);
+	screen->Clear(x1, y1, x2, y2, color, GPalette.BaseColors[color]);
 }
 
-void VWB_DrawFill(FTexture *tex, int ix, int iy, int iw, int ih, bool local)
+void VWB_DrawFill(FTexture *tex, int ix, int iy, int ix2, int iy2, bool local)
 {
-	if(iw < 0 || ih < 0)
-		return;
-	if(static_cast<unsigned int>(iw) > screenWidth)
-		iw = screenWidth;
-	if(static_cast<unsigned int>(ih) > screenHeight)
-		ih = screenHeight;
-
-	// origin
-	unsigned int ox = 0, oy = 0;
-	if(local)
-	{
-		if(ix < 0)
-		{
-			ox = -ix;
-			ix = 0;
-		}
-		else
-			ox = ix;
-		if(iy < 0)
-		{
-			oy = -iy;
-			iy = 0;
-		}
-		else
-			oy = iy;
-	}
-	else
-	{
-		if(ix < 0)
-			ix = 0;
-		if(iy < 0)
-			iy = 0;
-	}
-
-	byte *vbuf = VL_LockSurface(screenBuffer) + ix + (iy * bufferPitch);
-
-	const unsigned int width = tex->GetWidth();
-	const unsigned int height = tex->GetHeight();
-
-	const BYTE *table = NormalLight.Maps;
-	const BYTE* src;
-	byte* dest = vbuf;
-	unsigned int x, y, sy;
-	for(x = ix;x < static_cast<unsigned int>(iw);++x)
-	{
-		src = tex->GetColumn((x+ox)%width, NULL);
-		for(y = iy, sy = (iy+oy)%height;y < static_cast<unsigned int>(ih);++y)
-		{
-			if(src[sy])
-				*dest = table[src[sy]];
-			sy = (sy+1)%height;
-			dest += bufferPitch;
-		}
-
-		dest = ++vbuf;
-	}
-
-	VL_UnlockSurface(screenBuffer);
+	screen->FlatFill(ix, iy, ix2, iy2, tex, local);
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
 {
-	if(!tex)
-		return;
+	double x = ix, y = iy;
 
-	byte *vbuf = VL_LockSurface(screenBuffer);
-
-	double xd = (double)ix - tex->GetScaledLeftOffsetDouble();
-	double yd = (double)iy - tex->GetScaledTopOffsetDouble();
+	screen->Lock(false);
 	if(menu)
-		MenuToRealCoords(xd, yd, wd, hd, menu);
+		MenuToRealCoords(x, y, wd, hd, menu);
 	else
-		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, true, true);
+		screen->VirtualToRealCoords(x, y, wd, hd, 320, 200, true, true);
 
-	const int x1 = static_cast<int>(ceil(xd));
-	const int y1 = static_cast<int>(ceil(yd));
-	const fixed xStep = static_cast<fixed>((tex->GetWidth()/wd)*FRACUNIT);
-	const fixed yStep = static_cast<fixed>((tex->GetHeight()/hd)*FRACUNIT);
-	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(screenWidth-x1));
-	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(screenHeight-y1));
-	vbuf += x1 + (y1 > 0 ? bufferPitch*y1 : 0);
-
-	const BYTE *table = !stencil && remap ? remap->Remap : NormalLight.Maps;
-	const BYTE *src;
-	byte *dest = vbuf;
-	fixed x, y;
-	for(x = 0;x < xRun;x += xStep)
+	if(stencil)
 	{
-		src = tex->GetColumn(x>>FRACBITS, NULL);
-
-		for(y = 0;y < yRun;y += yStep)
-		{
-			if(src[y>>FRACBITS])
-			{
-				if(stencil)
-					*dest = table[stencilcolor];
-				else
-					*dest = table[src[y>>FRACBITS]];
-			}
-			dest += bufferPitch;
-		}
-
-		dest = ++vbuf;
+		screen->DrawTexture(tex, x, y,
+			DTA_DestWidthF, wd,
+			DTA_DestHeightF, hd,
+			DTA_Translation, remap,
+			DTA_FillColor, GPalette.BaseColors[stencilcolor].d,
+			TAG_DONE);
 	}
-
-	VL_UnlockSurface(screenBuffer);
+	else
+	{
+		screen->DrawTexture(tex, x, y,
+			DTA_DestWidthF, wd,
+			DTA_DestHeightF, hd,
+			DTA_Translation, remap,
+			TAG_DONE);
+	}
+	screen->Unlock();
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
@@ -557,50 +378,20 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 
 void CA_CacheScreen(FTexture* tex, bool noaspect)
 {
-	if(!tex)
-		return;
-
-	if(!noaspect)
-		VWB_Clear(GPalette.BlackIndex, 0, 0, screenWidth, screenHeight);
-
-	byte *vbuf = VL_LockSurface(curSurface);
-	if(!vbuf)
-		return;
-
-	double xd = 0;
-	double yd = 0;
-	double wd;
-	double hd;
+	screen->Lock(false);
+	screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
 	if(noaspect)
 	{
-		wd = screenWidth;
-		hd = screenHeight;
+		screen->DrawTexture(tex, 0, 0,
+			DTA_DestWidth, SCREENWIDTH,
+			DTA_DestHeight, SCREENHEIGHT,
+			TAG_DONE);
 	}
 	else
 	{
-		wd = 320;
-		hd = 200;
-		VirtualToRealCoords(xd, yd, wd, hd, 320, 200, false, true);
+		screen->DrawTexture(tex, 0, 0,
+			DTA_Fullscreen, true,
+			TAG_DONE);
 	}
-
-	const fixed xStep = static_cast<fixed>((tex->GetWidth()/wd)*FRACUNIT);
-	const fixed yStep = static_cast<fixed>((tex->GetHeight()/hd)*FRACUNIT);
-
-	vbuf += static_cast<int>(xd) + bufferPitch*static_cast<int>(yd);
-	const BYTE *src;
-	byte *dest = vbuf;
-	unsigned int i, j;
-	fixed x, y;
-	for(i = (unsigned int)xd, x = 0;x < tex->GetWidth()<<FRACBITS && i < screenWidth;x += xStep, ++i)
-	{
-		src = tex->GetColumn(x>>FRACBITS, NULL);
-		for(j = (unsigned int)yd, y = 0;y < tex->GetHeight()<<FRACBITS && j < screenHeight;y += yStep, ++j)
-		{
-			*dest = NormalLight.Maps[src[y>>FRACBITS]];
-			dest += bufferPitch;
-		}
-
-		dest = ++vbuf;
-	}
-	VL_UnlockSurface(curSurface);
+	screen->Unlock();
 }

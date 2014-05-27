@@ -42,7 +42,7 @@ class MenuItem;
 namespace GameSave
 {
 	extern long long SaveVersion;
-	extern const char* savedir;
+	extern DWORD SaveProdVersion;
 
 	Menu		&GetLoadMenu();
 	MenuItem	*GetLoadMenuItem();

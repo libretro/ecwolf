@@ -35,8 +35,11 @@
 #include "doomerrors.h"
 #include "id_ca.h"
 #include "id_sd.h"
+#include "g_conversation.h"
 #include "lnspec.h"
 #include "actor.h"
+#include "sndseq.h"
+#include "thinker.h"
 #include "wl_act.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
@@ -97,51 +100,6 @@ LineSpecialFunction Specials::LookupFunction(LineSpecials function)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "thinker.h"
-
-// Temporary function until sound sequences are supported
-static void PlaySoundSequence(MapSpot spot, bool door, bool open)
-{
-	// Valid squences:
-	// DoorNormal
-	// DoorMetal (Lost Episodes)
-	// PushwallNormal
-	// PushwallHeavy (Lost Episodes)
-
-	FName sequence = door ? gameinfo.DoorSoundSequence : gameinfo.PushwallSoundSequence;
-
-	if(open)
-	{
-		switch(sequence)
-		{
-			case NAME_DoorNormal:
-				PlaySoundLocMapSpot("doors/open", spot);
-				break;
-			case NAME_DoorMetal:
-				PlaySoundLocMapSpot("doors/metal_open", spot);
-				break;
-			case NAME_PushwallNormal:
-				PlaySoundLocMapSpot("world/pushwall", spot);
-				break;
-			case NAME_PushwallHeavy:
-				PlaySoundLocMapSpot("world/pushwall_heavy", spot);
-				break;
-		}
-	}
-	else
-	{
-		switch(sequence)
-		{
-			case NAME_DoorNormal:
-				PlaySoundLocMapSpot("doors/close", spot);
-				break;
-			case NAME_DoorMetal:
-				PlaySoundLocMapSpot("doors/metal_close", spot);
-				break;
-		}
-	}
-}
-
 FUNC(NOP)
 {
 	return 0;
@@ -152,9 +110,16 @@ class EVDoor : public Thinker
 	DECLARE_CLASS(EVDoor, Thinker)
 
 	public:
-		EVDoor(MapSpot spot, unsigned int speed, int opentics, bool direction) : Thinker(ThinkerList::WORLD),
+		EVDoor(MapSpot spot, unsigned int speed, int opentics, bool direction, unsigned int style) : Thinker(ThinkerList::WORLD),
 			state(Closed), spot(spot), amount(0), opentics(opentics), direction(direction)
 		{
+			if(spot->tile->soundSequence == NAME_None)
+				seqname = gameinfo.DoorSoundSequence;
+			else
+				seqname = spot->tile->soundSequence;
+			sndseq = NULL;
+
+			spot->slideStyle = style;
 			if(spot->slideAmount[direction] == 0 && spot->slideAmount[direction+2] == 0)
 				ChangeState(Opening);
 			else
@@ -170,13 +135,23 @@ class EVDoor : public Thinker
 
 		void Destroy()
 		{
+			if(sndseq)
+				delete sndseq;
 			if(spot->thinker == this)
 				spot->thinker = NULL;
 			Super::Destroy();
 		}
 
+		bool IsClosing() const
+		{
+			return state == Closing || state == Closed;
+		}
+
 		void Tick()
 		{
+			if(sndseq)
+				sndseq->Tick();
+
 			switch(state)
 			{
 				default:
@@ -190,7 +165,7 @@ class EVDoor : public Thinker
 						map->LinkZones(zone1, zone2, true);
 
 						if(map->CheckLink(zone1, players[0].mo->GetZone(), true))
-							PlaySoundSequence(spot, true, true);
+							sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
 					}
 
 					if(amount < 0xffff)
@@ -299,9 +274,9 @@ class EVDoor : public Thinker
 
 		bool CheckJammed() const
 		{
-			for(AActor::Iterator *iter = AActor::GetIterator();iter;iter = iter->Next())
+			for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 			{
-				if(!CheckClears(iter->Item()))
+				if(!CheckClears(iter))
 					return true;
 			}
 			return false;
@@ -319,10 +294,15 @@ class EVDoor : public Thinker
 					break;
 				case Opened:
 					wait = opentics;
+					if(sndseq)
+					{
+						delete sndseq;
+						sndseq = NULL;
+					}
 					break;
 				case Closing:
 					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[0].mo->GetZone(), true))
-						PlaySoundSequence(spot, true, false);
+						sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_CloseNormal), spot);
 					break;
 			}
 			return true;
@@ -330,6 +310,10 @@ class EVDoor : public Thinker
 
 		State state;
 		MapSpot spot;
+
+		SndSeqPlayer *sndseq;
+		FName seqname;
+
 		unsigned int speed;
 		int amount;
 		int opentics;
@@ -363,12 +347,12 @@ FUNC(Door_Open)
 		{
 			if(spot->thinker->IsThinkerType<EVDoor>())
 			{
-				return static_cast<EVDoor *>((Thinker*)spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
 			}
 			return 0;
 		}
 
-		new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION);
+		new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
 	}
 	else
 	{
@@ -380,17 +364,326 @@ FUNC(Door_Open)
 			{
 				if(door->thinker->IsThinkerType<EVDoor>())
 				{
-					return static_cast<EVDoor *>((Thinker*)door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
 				}
 				continue;
 			}
 
 			activated = true;
-			new EVDoor(door, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION);
+			new EVDoor(door, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
 		}
 		return activated;
 	}
 	return 1;
+}
+
+class EVElevator : public Thinker
+{
+	DECLARE_CLASS(EVElevator, Thinker)
+public:
+	EVElevator(AActor *activator, MapSpot spot, MapSpot door, MapSpot next, unsigned int elevTag, unsigned int callSpeed) :
+		Thinker(ThinkerList::WORLD), activator(activator), sndseq(NULL),
+		spot(spot), door(door), next(next), nextDoor(NULL), elevTag(elevTag),
+		callSpeed(callSpeed)
+	{
+		state = Moving;
+
+		// Try to close the door if it is open.
+		if(door->thinker)
+		{
+			if(door->thinker->IsThinkerType<EVDoor>())
+			{
+				state = ClosingDoor;
+
+				EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
+				if(!doorThinker->IsClosing())
+				{
+					if(!doorThinker->Reactivate(activator, !!(activator->flags & FL_ISMONSTER)))
+					{
+						Destroy();
+						return;
+					}
+				}
+			}
+			else
+			{
+				Destroy();
+				return;
+			}
+		}
+
+		if(state == Moving)
+			StartSoundSequence();
+
+		// Remove elevator position since we're off!
+		map->elevatorPosition[elevTag] = NULL;
+	}
+
+	void Destroy()
+	{
+		delete sndseq;
+		Super::Destroy();
+	}
+
+	void Tick()
+	{
+		if(sndseq)
+			sndseq->Tick();
+
+		switch(state)
+		{
+			default:
+				Destroy();
+				break;
+			case ClosingDoor:
+				if(door->thinker)
+					break;
+
+				state = Moving;
+				StartSoundSequence();
+				// Fall through
+			case Moving:
+				if(--callSpeed == 0)
+				{
+					state = Shaking;
+					callSpeed = 20; // ROTT uses 10 tics @ 35Hz
+					if(sndseq)
+					{
+						sndseq->SetSource(next);
+						sndseq->Stop();
+					}
+
+					map->elevatorPosition[elevTag] = next;
+
+					// Find elevator trigger on destination
+					for(unsigned int i = 0;i < next->triggers.Size();++i)
+					{
+						if(next->triggers[i].action == Elevator_SwitchFloor)
+						{
+							nextDoor = map->GetSpotByTag(next->triggers[i].arg[1], NULL);
+						}
+					}
+					if(!nextDoor)
+					{
+						Printf("Failed to perform elevator teleport.\n");
+						state = Finished;
+						break;
+					}
+
+					if(activator)
+					{
+						/* Teleport the player, trying to rotate according to the
+						* orientation of the detination. ROTT only changed the
+						* location of the player, so this could be an issue. In
+						* that case we just need to remove the angle change and
+						* the fracx/y change since ROTT use elevator things and
+						* not the switch as the reference point.
+						*/
+						const int ddeltax = clamp<int>(nextDoor->GetX() - next->GetX(), -1, 1);
+						const int ddeltay = clamp<int>(nextDoor->GetY() - next->GetY(), -1, 1);
+						const int sdeltax = clamp<int>(door->GetX() - spot->GetX(), -1, 1);
+						const int sdeltay = clamp<int>(door->GetY() - spot->GetY(), -1, 1);
+						int relx = spot->GetX()-activator->tilex;
+						int rely = spot->GetY()-activator->tiley;
+						fixed fracx = activator->fracx;
+						fixed fracy = activator->fracy;
+						angle_t angle = 0;
+						if((ddeltax && ddeltax == -sdeltax) || (ddeltay && ddeltay == -sdeltay))
+						{
+							relx *= -1;
+							rely *= -1;
+							angle = ANGLE_180;
+							fracx = (FRACUNIT-fracx);
+							fracy = (FRACUNIT-fracy);
+						}
+						else if(ddeltax == 0 && sdeltax)
+						{
+							int tmp = relx;
+							if(ddeltay > 0)
+							{
+								rely = relx;
+								relx = -tmp;
+								angle = ANGLE_90;
+
+								tmp = fracx;
+								fracx = (FRACUNIT-fracy);
+								fracy = tmp;
+							}
+							else
+							{
+								rely = -relx;
+								relx = tmp;
+								angle = ANGLE_270;
+
+								tmp = (FRACUNIT-fracx);
+								fracx = fracy;
+								fracy = tmp;
+							}
+						}
+						else if(ddeltay == 0 && sdeltay)
+						{
+							int tmp = relx;
+							if(ddeltax > 0)
+							{
+								relx = rely;
+								rely = -tmp;
+								angle = ANGLE_90;
+
+								tmp = fracy;
+								fracy = (FRACUNIT-fracx);
+								fracx = tmp;
+							}
+							else
+							{
+								relx = -rely;
+								rely = tmp;
+								angle = ANGLE_270;
+
+								tmp = (FRACUNIT-fracy);
+								fracy = fracx;
+								fracx = tmp;
+							}
+						}
+						activator->x = ((next->GetX() - relx)<<16)|fracx;
+						activator->y = ((next->GetY() - rely)<<16)|fracy;
+						activator->angle += angle;
+					}
+				}
+				break;
+			case Shaking:
+				// TODO: Shake the screen
+				if(--callSpeed == 0)
+				{
+					state = Finished;
+
+					// Find the actual door trigger and try to open it.
+					for(unsigned int i = nextDoor->triggers.Size();i-- > 0;)
+					{
+						MapTrigger &trig = nextDoor->triggers[i];
+						if(trig.action == Door_Elevator)
+						{
+							map->ActivateTrigger(trig, MapTrigger::East, NULL);
+							break;
+						}
+					}
+				}
+				break;
+		}
+	}
+
+protected:
+	void StartSoundSequence()
+	{
+		FName seqname;
+		if(spot->tile->soundSequence == NAME_None)
+			seqname = NAME_Platform;
+		else
+			seqname = spot->tile->soundSequence;
+
+		sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
+	}
+
+private:
+	enum State { ClosingDoor, Moving, Shaking, Finished };
+
+	AActor *activator;
+	SndSeqPlayer *sndseq;
+	MapSpot spot;
+	MapSpot door;
+	MapSpot next;
+	MapSpot nextDoor;
+	unsigned int elevTag;
+	unsigned int callSpeed;
+	State state;
+};
+IMPLEMENT_INTERNAL_CLASS(EVElevator)
+
+// Takes same arugments as Door_Open, but the tag points to the elevator switch.
+// Will attempt to call the elevator if not in the correct position.
+FUNC(Door_Elevator)
+{
+	static const unsigned int DOOR_TYPE_DIRECTION = 0x1;
+
+	// If no activator it's probably the elevator reaching its destination.
+	if(activator)
+	{
+		if(activator->player)
+		{
+			if(buttonheld[bt_use])
+				return 0;
+		}
+
+		if(activator->player || (activator->flags & FL_REQUIREKEYS))
+		{
+			if(args[3] != 0)
+			{
+				if(!P_CheckKeys(activator, args[3], false))
+					return 0;
+			}
+		}
+	}
+
+	if(spot->thinker)
+	{
+		if(spot->thinker->IsThinkerType<EVDoor>())
+		{
+			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+		}
+		return 0;
+	}
+
+	// Now locate the switch and elevator trigger so we can find out if we need
+	// to call to our location.
+	MapSpot swtch = map->GetSpotByTag(args[0], NULL);
+	if(!swtch)
+	{
+		Printf("Door_Elevator: Could not find switch.\n");
+		return 0;
+	}
+	MapTrigger *trig = NULL; 
+	for(unsigned int i = 0;i < swtch->triggers.Size();++i)
+	{
+		if(swtch->triggers[i].action == Elevator_SwitchFloor)
+		{
+			trig = &swtch->triggers[i];
+			break;
+		}
+	}
+	if(!trig)
+	{
+		Printf("Door_Elevator: Could not find elevator trigger.\n");
+		return 0;
+	}
+
+	// Call elevator
+	if(map->elevatorPosition[trig->arg[0]] != swtch)
+	{
+		// Check if elevator is active
+		if(map->elevatorPosition[trig->arg[0]] == NULL)
+			return 0;
+
+		new EVElevator(activator, swtch, spot, swtch, trig->arg[0], trig->arg[2]);
+		return 1;
+	}
+
+	new EVDoor(spot, args[1], args[2], args[4]&DOOR_TYPE_DIRECTION, args[4]>>1);
+	return 1;
+}
+
+FUNC(Elevator_SwitchFloor)
+{ // elevTag, doorTag, callSpeed, nextTag
+	MapSpot door = map->GetSpotByTag(args[1], NULL);
+	MapSpot next = map->GetSpotByTag(args[3], NULL);
+	if(spot->thinker || !door || !next)
+		return 0;
+	
+	EVElevator *elevator = new EVElevator(activator, spot, door, next, args[0], args[2]);
+	if(!(elevator->ObjectFlags & OF_EuthanizeMe))
+	{
+		spot->thinker = elevator;
+		return 1;
+	}
+	return 0;
 }
 
 class EVPushwall : public Thinker
@@ -402,6 +695,12 @@ class EVPushwall : public Thinker
 			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
 			speed(speed), distance(distance)
 		{
+			if(spot->tile->soundSequence == NAME_None)
+				seqname = gameinfo.PushwallSoundSequence;
+			else
+				seqname = spot->tile->soundSequence;
+			sndseq = NULL;
+
 			if(distance == 0) // ROTT style pushwall, move until blocked
 				distance = 0xFFFF;
 
@@ -418,12 +717,12 @@ class EVPushwall : public Thinker
 			}
 
 			// Check for any blocking actors
-			AActor::Iterator *iter = AActor::GetIterator();
+			AActor::Iterator iter = AActor::GetIterator();
 			int movex = spot->GetX();
 			int movey = spot->GetY();
-			while(iter)
+			while(iter.Next())
 			{
-				AActor *actor = iter->Item();
+				AActor *actor = iter;
 				if((actor->flags&FL_ISMONSTER) || actor->player)
 				{
 					if(actor->tilex+dirdeltax[actor->dir] == movex &&
@@ -433,13 +732,14 @@ class EVPushwall : public Thinker
 						return false;
 					}
 				}
-				iter = iter->Next();
 			}
 			return true;
 		}
 
 		void Destroy()
 		{
+			if(sndseq)
+				delete sndseq;
 			if(spot->thinker == this)
 				spot->thinker = NULL;
 			Super::Destroy();
@@ -448,7 +748,10 @@ class EVPushwall : public Thinker
 		void Tick()
 		{
 			if(position == 0)
-				PlaySoundSequence(spot, false, true);
+				sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
+
+			if(sndseq)
+				sndseq->Tick();
 
 			// Setup the next tile to get ready to accept this tile.
 			if(moveTo == NULL)
@@ -491,6 +794,10 @@ class EVPushwall : public Thinker
 				spot->thinker = NULL;
 				moveTo->pushReceptor = NULL;
 				moveTo->thinker = this;
+
+				// Transfer amflags
+				moveTo->amFlags |= spot->amFlags;
+
 				spot = moveTo;
 				moveTo = NULL;
 			}
@@ -519,6 +826,10 @@ class EVPushwall : public Thinker
 	private:
 
 		MapSpot spot, moveTo;
+
+		SndSeqPlayer *sndseq;
+		FName seqname;
+
 		unsigned short	direction;
 		unsigned int	position;
 		unsigned int	speed;
@@ -622,13 +933,13 @@ class EVVictorySpin : public Thinker
 			gamestate.victoryflag = true;
 			players[0].SetPSprite(NULL, player_t::ps_weapon);
 
-			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0, true);
+			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0, SPAWN_AllowReplacement);
 			runner->flags |= FL_PATHING;
 			runner->angle = ((direction+2)%4)*ANGLE_90;
 			runner->dir = static_cast<dirtype>(runner->angle/ANGLE_45);
-			runner->GetThinker()->SetPriority(ThinkerList::VICTORY);
+			runner->SetPriority(ThinkerList::VICTORY);
 
-			activator->GetThinker()->SetPriority(ThinkerList::VICTORY);
+			activator->SetPriority(ThinkerList::VICTORY);
 		}
 
 		void Serialize(FArchive &arc)
@@ -738,4 +1049,21 @@ FUNC(Trigger_Execute)
 	}
 
 	return activated;
+}
+
+FUNC(StartConversation)
+{
+	if(args[0] != 0)
+		I_Error("TIDs are not yet supported.");
+
+	AActor *talker = activator;
+
+	if(args[1] == 1) // Face talker
+	{
+		A_Face(activator, talker);
+	}
+
+	Dialog::StartConversation(talker);
+
+	return 1;
 }

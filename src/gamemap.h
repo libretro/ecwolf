@@ -43,6 +43,19 @@
 class Thinker;
 class UWMFParser;
 
+enum
+{
+	SLIDE_Normal,
+	SLIDE_Split,
+	SLIDE_Invert
+};
+
+enum
+{
+	AM_Visible = 0x1,
+	AM_DontOverlay = 0x2
+};
+
 class GameMap
 {
 	public:
@@ -96,16 +109,23 @@ class GameMap
 		};
 		struct Tile
 		{
-			Tile() : offsetVertical(false), offsetHorizontal(false)
+			Tile() : offsetVertical(false), offsetHorizontal(false),
+				mapped(0), dontOverlay(false)
 			{
+				overhead.SetInvalid();
 				sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
 			}
 
 			enum Side { East, North, West, South };
 			FTextureID		texture[4];
+			FTextureID		overhead;
 			bool			sideSolid[4];
 			bool			offsetVertical;
 			bool			offsetHorizontal;
+			FName			soundSequence;
+
+			unsigned int	mapped; // filter level for always visible
+			bool			dontOverlay;
 		};
 		struct Sector
 		{
@@ -124,8 +144,8 @@ class GameMap
 			struct Map
 			{
 				Map() : tile(NULL), sector(NULL), zone(NULL), visible(false),
-					thinker(NULL), pushDirection(Tile::East), pushAmount(0),
-					pushReceptor(NULL), tag(0), nexttag(NULL)
+					amFlags(0), thinker(NULL), pushDirection(Tile::East),
+					pushAmount(0), pushReceptor(NULL), tag(0), nexttag(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
 					sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
@@ -146,8 +166,10 @@ class GameMap
 				FTextureID		texture[4];
 
 				bool			visible;
+				unsigned int	amFlags;
 				TObjPtr<Thinker> thinker;
 				unsigned int	slideAmount[4];
+				unsigned int	slideStyle;
 				bool			sideSolid[4];
 				TArray<Trigger>	triggers;
 				Tile::Side		pushDirection;
@@ -172,7 +194,7 @@ class GameMap
 		const Zone		&GetZone(unsigned int index) { return zonePalette[index]; }
 		bool			IsValid() const { return valid; }
 		bool			IsValidTileCoordinate(unsigned int x, unsigned int y, unsigned int z) const { return x < header.width && y < header.height && z < NumPlanes(); }
-		void			LoadMap();
+		void			LoadMap(bool loadingSave);
 		unsigned int	NumPlanes() const { return planes.Size(); }
 		const Plane		&GetPlane(unsigned int index) const { return planes[index]; }
 		void			SpawnThings() const;
@@ -189,6 +211,7 @@ class GameMap
 
 		static bool		CheckMapExists(const FString &map);
 
+		TMap<unsigned int, Plane::Map *> elevatorPosition;
 	private:
 		friend class UWMFParser;
 		friend FArchive &operator<< (FArchive &, GameMap *&);
@@ -199,6 +222,7 @@ class GameMap
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
 		void	SetupLinks();
+		void	ScanTiles();
 		bool	TraverseLink(const Zone *src, const Zone *dest);
 		void	UnloadLinks();
 

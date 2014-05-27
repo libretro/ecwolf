@@ -39,6 +39,7 @@
 #include "scanner.h"
 #include "thingdef/thingdef_type.h"
 #include "thingdef/thingdef_expression.h"
+#include "v_video.h"
 
 #define IS_EXPR(no) params[no].isExpression
 #define EXPR_PARAM(var, no) ExpressionNode *var = params[no].expr;
@@ -56,22 +57,43 @@ HANDLE_PROPERTY(activesound)
 HANDLE_PROPERTY(ammogive1)
 {
 	INT_PARAM(give, 0);
-	((AWeapon *)defaults)->ammogive1 = give;
+	((AWeapon *)defaults)->ammogive[AWeapon::PrimaryFire] = give;
 }
 
 HANDLE_PROPERTY(ammotype1)
 {
 	STRING_PARAM(type, 0);
 	if(stricmp(type, "none") == 0 || *type == '\0')
-		((AWeapon *)defaults)->ammotype1 = NULL;
+		((AWeapon *)defaults)->ammotype[AWeapon::PrimaryFire] = NULL;
 	else
-		((AWeapon *)defaults)->ammotype1 = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
+		((AWeapon *)defaults)->ammotype[AWeapon::PrimaryFire] = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
 }
 
 HANDLE_PROPERTY(ammouse1)
 {
 	INT_PARAM(use, 0);
-	((AWeapon *)defaults)->ammouse1 = use;
+	((AWeapon *)defaults)->ammouse[AWeapon::PrimaryFire] = use;
+}
+
+HANDLE_PROPERTY(ammogive2)
+{
+	INT_PARAM(give, 0);
+	((AWeapon *)defaults)->ammogive[AWeapon::AltFire] = give;
+}
+
+HANDLE_PROPERTY(ammotype2)
+{
+	STRING_PARAM(type, 0);
+	if(stricmp(type, "none") == 0 || *type == '\0')
+		((AWeapon *)defaults)->ammotype[AWeapon::AltFire] = NULL;
+	else
+		((AWeapon *)defaults)->ammotype[AWeapon::AltFire] = ClassDef::FindClassTentative(type, NATIVE_CLASS(Ammo));
+}
+
+HANDLE_PROPERTY(ammouse2)
+{
+	INT_PARAM(use, 0);
+	((AWeapon *)defaults)->ammouse[AWeapon::AltFire] = use;
 }
 
 HANDLE_PROPERTY(amount)
@@ -84,6 +106,24 @@ HANDLE_PROPERTY(attacksound)
 {
 	STRING_PARAM(snd, 0);
 	defaults->attacksound = snd;
+}
+
+HANDLE_PROPERTY(backpackamount)
+{
+	INT_PARAM(amount, 0);
+	((AAmmo*)defaults)->Backpackamount = amount;
+}
+
+HANDLE_PROPERTY(backpackboostamount)
+{
+	INT_PARAM(boostamount, 0);
+	((AAmmo*)defaults)->Backpackboostamount = boostamount;
+}
+
+HANDLE_PROPERTY(backpackmaxamount)
+{
+	INT_PARAM(maxamount, 0);
+	((AAmmo*)defaults)->Backpackmaxamount = maxamount;
 }
 
 HANDLE_PROPERTY(bobrangex)
@@ -121,8 +161,17 @@ HANDLE_PROPERTY(bobstyle)
 		BobStyle = AWeapon::BobSmooth;
 	else if(stricmp(style, "InverseSmooth") == 0)
 		BobStyle = AWeapon::BobInverseSmooth;
+	else if(stricmp(style, "Thrust") == 0)
+		BobStyle = AWeapon::BobThrust;
 	else
 		I_Error("Invalid bob style '%s'.", style);
+}
+
+HANDLE_PROPERTY(conversationid)
+{
+	INT_PARAM(id, 0);
+
+	cls->Meta.SetMetaInt(AMETA_ConversationID, id);
 }
 
 HANDLE_PROPERTY(damage)
@@ -146,6 +195,12 @@ HANDLE_PROPERTY(damage)
 		EXPR_PARAM(dmg, 0);
 		cls->Meta.SetMetaInt(AMETA_Damage, AActor::damageExpressions.Push(dmg));
 	}
+}
+
+HANDLE_PROPERTY(damagescreencolor)
+{
+    STRING_PARAM(dmgcolor, 0);
+    ((APlayerPawn *)defaults)->damagecolor = V_GetColorFromString(NULL, dmgcolor);
 }
 
 HANDLE_PROPERTY(deathsound)
@@ -314,6 +369,12 @@ HANDLE_PROPERTY(painchance)
 	defaults->painchance = chance;
 }
 
+HANDLE_PROPERTY(overheadicon)
+{
+	STRING_PARAM(icon, 0);
+	defaults->overheadIcon = TexMan.CheckForTexture(icon, FTexture::TEX_Any);
+}
+
 HANDLE_PROPERTY(painsound)
 {
 	STRING_PARAM(snd, 0);
@@ -324,6 +385,12 @@ HANDLE_PROPERTY(pickupsound)
 {
 	STRING_PARAM(snd, 0);
 	((AInventory *)defaults)->pickupsound = snd;
+}
+
+HANDLE_PROPERTY(projectilepassheight)
+{
+	FLOAT_PARAM(height, 0);
+	defaults->projectilepassheight = static_cast<fixed>(height*FRACUNIT);
 }
 
 HANDLE_PROPERTY(points)
@@ -437,8 +504,6 @@ HANDLE_PROPERTY(startitem)
 	// NOTE: This property is not inherited.
 	STRING_PARAM(item, 0);
 
-	APlayerPawn *def = (APlayerPawn *)defaults;
-
 	if(cls->Meta.GetMetaInt(APMETA_StartInventory, -1) == -1 || cls->Meta.IsInherited(APMETA_StartInventory))
 		cls->Meta.SetMetaInt(APMETA_StartInventory, APlayerPawn::startInventory.Push(new AActor::DropList()));
 
@@ -508,15 +573,23 @@ extern const PropDef properties[] =
 {
 	DEFINE_PROP(activesound, Actor, S),
 	DEFINE_PROP(ammogive1, Weapon, I),
+	DEFINE_PROP(ammogive2, Weapon, I),
 	DEFINE_PROP(ammotype1, Weapon, S),
+	DEFINE_PROP(ammotype2, Weapon, S),
 	DEFINE_PROP(ammouse1, Weapon, I),
+	DEFINE_PROP(ammouse2, Weapon, I),
 	DEFINE_PROP(amount, Inventory, I),
 	DEFINE_PROP(attacksound, Actor, S),
+	DEFINE_PROP(backpackamount, Ammo, I),
+	DEFINE_PROP(backpackboostamount, Ammo, I),
+	DEFINE_PROP(backpackmaxamount, Ammo, I),
 	DEFINE_PROP(bobrangex, Weapon, F),
 	DEFINE_PROP(bobrangey, Weapon, F),
 	DEFINE_PROP(bobspeed, Weapon, F),
 	DEFINE_PROP(bobstyle, Weapon, S),
+	DEFINE_PROP(conversationid, Actor, I),
 	DEFINE_PROP(damage, Actor, I),
+	DEFINE_PROP_PREFIX(damagescreencolor, Actor, Player, S),
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
@@ -533,11 +606,13 @@ extern const PropDef properties[] =
 	DEFINE_PROP(missilefrequency, Actor, F),
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP_PREFIX(movebob, PlayerPawn, Player, F),
+	DEFINE_PROP(overheadicon, Actor, S),
 	DEFINE_PROP(painchance, Actor, I),
 	DEFINE_PROP(painsound, Actor, S),
 	DEFINE_PROP(pickupsound, Inventory, S),
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(PROJECTILE, Actor,),
+	DEFINE_PROP(projectilepassheight, Actor, F),
 	DEFINE_PROP(radius, Actor, I),
 	DEFINE_PROP(scale, Actor, F),
 	DEFINE_PROP(secretdeathsound, Actor, S),

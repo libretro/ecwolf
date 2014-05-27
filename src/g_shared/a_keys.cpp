@@ -3,6 +3,7 @@
 #include "tarray.h"
 #include "v_palette.h"
 #include "w_wad.h"
+#include "wl_iwad.h"
 #include "zstring.h"
 #include "thingdef/thingdef.h"
 #include "g_shared/a_inventory.h"
@@ -20,11 +21,11 @@ class AKeyGiver : public AInventory
 			bool pickedup = true;
 
 			DropList *list = GetDropList();
-			DropList::Node *item = list->Head();
+			DropList::Iterator item = list->Head();
 			while(item)
 			{
-				const ClassDef *cls = ClassDef::FindClass(item->Item().className);
-				item = item->Next();
+				const ClassDef *cls = ClassDef::FindClass(item->className);
+				++item;
 
 				if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Key)))
 				{
@@ -32,7 +33,7 @@ class AKeyGiver : public AInventory
 					continue;
 				}
 
-				AInventory *item = static_cast<AInventory *>(AActor::Spawn(cls, 0, 0, 0, false));
+				AInventory *item = static_cast<AInventory *>(AActor::Spawn(cls, 0, 0, 0, 0));
 				item->RemoveFromWorld();
 				if(!item->CallTryPickup(toucher))
 				{
@@ -237,7 +238,7 @@ static void ParseLock(Scanner &sc)
 	if (!sc.CheckToken('{'))
 	{
 		sc.MustGetToken(TK_Identifier);
-		//if (!CheckGame(sc->str, false)) keynum = -1;
+		if (!IWad::CheckGameFilter(sc->str)) keynum = -1;
 		sc.MustGetToken('{');
 	}
 
@@ -498,7 +499,7 @@ bool P_GiveKeys (AActor *owner, int keynum)
 			OneKey &key = lock->keylist[i]->anykeylist[j];
 			if(!key.check(owner))
 			{
-				AKey *newKey = (AKey*) AActor::Spawn(key.key, 0, 0, 0, false);
+				AKey *newKey = (AKey*) AActor::Spawn(key.key, 0, 0, 0, 0);
 				newKey->RemoveFromWorld();
 				if(!newKey->CallTryPickup(owner))
 					newKey->Destroy();

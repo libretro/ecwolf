@@ -16,10 +16,11 @@ extern struct LRstruct
 	unsigned int treasureratio;
 	unsigned int numLevels;
 	unsigned int time;
+	unsigned int par;
 } LevelRatios;
 
 void DrawHighScores(void);
-void CheckHighScore (int32_t score,word other);
+void CheckHighScore (int32_t score, const class LevelInfo *levelInfo);
 void Victory (bool fromIntermission);
 void LevelCompleted (void);
 void ClearSplitVWB (void);
