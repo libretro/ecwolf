@@ -488,9 +488,11 @@ void QuickLoad()
 {
 	if(saveGame.getCurrentPosition() != 0)
 	{
+		const SaveSlotMenuItem *menuItem = static_cast<SaveSlotMenuItem *> (saveGame.getIndex(saveGame.getCurrentPosition()));
+
 		quickSaveLoad = true;
-		char string[100];
-		sprintf(string, "%s%s\"?", language["STR_LGC"], SaveFile::files[saveGame.getCurrentPosition()-1].name.GetChars());
+		FString string;
+		string.Format("%s\"%s\"?", language["STR_LGC"], SaveFile::files[menuItem->slotIndex].name.GetChars());
 		if(Confirm(string))
 			LoadSaveGame(saveGame.getCurrentPosition()-1);
 		quickSaveLoad = false;
