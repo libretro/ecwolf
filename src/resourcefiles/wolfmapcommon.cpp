@@ -116,6 +116,7 @@ int FMapLump::FillCache()
 	Cache = new char[LumpSize];
 	strcpy(Cache, "WDC3.1");
 	WriteLittleShort((BYTE*)&Cache[10], rtlMap ? 4 : 3);
+	WriteLittleShort((BYTE*)&Cache[12], 16);
 	WriteLittleShort((BYTE*)&Cache[HEADERSIZE-4], Header.Width);
 	WriteLittleShort((BYTE*)&Cache[HEADERSIZE-2], Header.Height);
 	memcpy(&Cache[14], Header.Name, 16);
