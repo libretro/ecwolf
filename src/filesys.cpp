@@ -146,13 +146,16 @@ void SetupPaths(int argc, const char * const *argv)
 
 	// Configuration directory
 #if defined(_WIN32)
+#ifndef _M_X64
 	OSVERSIONINFO osVersion;
 	GetVersionEx(&osVersion);
 	if(osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS)
+#endif
 	{
 		if(pSHGetKnownFolderPath) // Vista+
 		{
 			char tempCPath[MAX_PATH];
+			memset(tempCPath, 0, MAX_PATH);
 			PWSTR tempPath = NULL;
 			if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_RoamingAppData, 0x00008000, NULL, &tempPath)))
 			{
@@ -166,6 +169,8 @@ void SetupPaths(int argc, const char * const *argv)
 			// Other Windows NT
 			char tempCPath[MAX_PATH];
 			wchar_t tempPath[MAX_PATH];
+			memset(tempCPath, 0, MAX_PATH);
+			memset(tempPath, 0, MAX_PATH);
 			if(SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
 			{
 				ConvertName(tempPath, tempCPath);
@@ -186,7 +191,7 @@ void SetupPaths(int argc, const char * const *argv)
 		else
 		{
 			char* chome = new char[wcslen(home)];
-			ConvertName(home, chome, wcslen(home));
+			ConvertName(home, chome, (int)wcslen(home));
 			configDir.Format("%s\\" GAME_DIR, chome);
 			delete[] chome;
 		}
