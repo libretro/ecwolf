@@ -130,10 +130,12 @@ void SetupPaths(int argc, const char * const *argv)
 	static const GUID gFOLDERID_SavedGames = {0x4C5C32FFu, 0xBB9Du, 0x43b0u, {0xB5u,0xB4u,0x2Du,0x72u,0xE5u,0x4Eu,0xAAu,0xA4u}};
 
 	HRESULT (WINAPI* pSHGetKnownFolderPath)(const GUID*,DWORD,HANDLE,PWSTR*) = NULL;
+	HRESULT (WINAPI* pSHGetFolderPathW)(HWND,int,HANDLE,DWORD,LPWSTR) = NULL;
 	HMODULE shell32 = LoadLibrary ("shell32");
 	if(shell32)
 	{
 		pSHGetKnownFolderPath = (HRESULT (WINAPI*)(const GUID*,DWORD,HANDLE,PWSTR*))GetProcAddress(shell32, "SHGetKnownFolderPath");
+		pSHGetFolderPathW = (HRESULT (WINAPI*)(HWND,int,HANDLE,DWORD,LPWSTR))GetProcAddress(shell32, "SHGetFolderPathW");
 	}
 #endif
 
@@ -164,14 +166,14 @@ void SetupPaths(int argc, const char * const *argv)
 				CoTaskMemFree(tempPath);
 			}
 		}
-		if(configDir.IsEmpty())
+		if(configDir.IsEmpty() && pSHGetFolderPathW)
 		{
 			// Other Windows NT
 			char tempCPath[MAX_PATH];
 			wchar_t tempPath[MAX_PATH];
 			memset(tempCPath, 0, MAX_PATH);
 			memset(tempPath, 0, MAX_PATH);
-			if(SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
+			if(SUCCEEDED(pSHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
 			{
 				ConvertName(tempPath, tempCPath);
 				configDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
