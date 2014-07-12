@@ -78,6 +78,12 @@ static inline void ConvertName(const wchar_t* filename, char* out, const int len
 {
 	WideCharToMultiByte(CP_UTF8, 0, filename, -1, out, len, NULL, NULL);
 }
+
+#ifdef _M_X64
+static const bool IsWinNT = true;
+#else
+static bool IsWinNT = true;
+#endif
 #endif
 
 // Converts a relative filename to an absolute name
@@ -97,12 +103,23 @@ static bool CreateDirectoryIfNeeded(const char* path)
 {
 #ifdef _WIN32
 	struct _stat dirStat;
-	wchar_t wpath[MAX_PATH];
-	ConvertName(path, wpath);
-	if(_wstat(wpath, &dirStat) == -1)
+	if(IsWinNT)
 	{
-		if(_wmkdir(wpath) == -1)
-			return false;
+		wchar_t wpath[MAX_PATH];
+		ConvertName(path, wpath);
+		if(_wstat(wpath, &dirStat) == -1)
+		{
+			if(_wmkdir(wpath) == -1)
+				return false;
+		}
+	}
+	else
+	{
+		if(_stat(path, &dirStat) == -1)
+		{
+			if(_mkdir(path) == -1)
+				return false;
+		}
 	}
 	return true;
 #else
@@ -150,8 +167,11 @@ void SetupPaths(int argc, const char * const *argv)
 #if defined(_WIN32)
 #ifndef _M_X64
 	OSVERSIONINFO osVersion;
+	ZeroMemory(&osVersion, sizeof(OSVERSIONINFO));
+	osVersion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osVersion);
-	if(osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS)
+	IsWinNT = osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS;
+	if(IsWinNT)
 #endif
 	{
 		if(pSHGetKnownFolderPath) // Vista+
@@ -454,14 +474,15 @@ FILE *File::open(const char* mode) const
 	FString fn = renamed ? *renamed : filename;
 
 #ifdef _WIN32
-	wchar_t wname[MAX_PATH], wmode[MAX_PATH];
-	FileSys::ConvertName(fn, wname);
-	FileSys::ConvertName(mode, wmode);
-	FILE *ret = _wfopen(wname, wmode);
-	return ret;
-#else
-	return fopen(filename, mode);
+	if(FileSys::IsWinNT)
+	{
+		wchar_t wname[MAX_PATH], wmode[MAX_PATH];
+		FileSys::ConvertName(fn, wname);
+		FileSys::ConvertName(mode, wmode);
+		return _wfopen(wname, wmode);
+	}
 #endif
+	return fopen(filename, mode);
 }
 
 /**
