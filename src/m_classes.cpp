@@ -583,7 +583,8 @@ int Menu::getHeight(int position) const
 	}
 
 	unsigned int num = 0;
-	for(unsigned int i = itemOffset;i < items.Size();i++)
+	unsigned int ignore = itemOffset;
+	for(unsigned int i = 0;i < items.Size();i++)
 	{
 		if((unsigned)position == i)
 			break;
@@ -592,7 +593,11 @@ int Menu::getHeight(int position) const
 		{
 			if(getY() + num + items[i]->getHeight() + 6 >= 200)
 				break;
-			num += items[i]->getHeight();
+
+			if(ignore)
+				--ignore;
+			else
+				num += items[i]->getHeight();
 		}
 	}
 	if(position >= 0)
@@ -823,7 +828,7 @@ int Menu::handle()
 				}
 				while (!getIndex(curPos)->isEnabled());
 
-				if(abs(oldPos - curPos) == 1)
+				if(oldPos - curPos == 1)
 				{
 					animating = true;
 					draw();
@@ -867,7 +872,7 @@ int Menu::handle()
 				}
 				while (!getIndex(curPos)->isEnabled());
 
-				if(abs(oldPos - curPos) == 1)
+				if(oldPos - curPos == -1)
 				{
 					animating = true;
 					draw();
@@ -969,10 +974,13 @@ void Menu::setCurrentPosition(int position)
 		curPos = items.Size()-1;
 		itemOffset = curPos;
 		unsigned int accumulatedHeight = getY();
-		while((accumulatedHeight += getIndex(itemOffset)->getHeight()) + 6 < 200)
+		while(accumulatedHeight < 200)
 		{
 			if(itemOffset == 0)
 				break;
+
+			if(items[itemOffset]->isVisible())
+				accumulatedHeight += items[itemOffset]->getHeight() + 6;
 			--itemOffset;
 		}
 		if(itemOffset > 0)
@@ -982,19 +990,19 @@ void Menu::setCurrentPosition(int position)
 	{
 		curPos = position;
 		itemOffset = curPos;
-		unsigned int accumulatedHeight = getY() + getIndex(itemOffset)->getHeight();
+		unsigned int accumulatedHeight = getY() + items[itemOffset]->getHeight();
 		unsigned int lastIndex = curPos;
 		while(accumulatedHeight + 6 < 200)
 		{
 			if(lastIndex < items.Size()-1)
 			{
-				accumulatedHeight += getIndex(++lastIndex)->getHeight();
+				accumulatedHeight += items[++lastIndex]->getHeight();
 				if(accumulatedHeight + 6 >= 200)
 					break;
 			}
 
 			if(itemOffset > 0)
-				accumulatedHeight += getIndex(--itemOffset)->getHeight();
+				accumulatedHeight += items[--itemOffset]->getHeight();
 			else
 				break;
 		}
