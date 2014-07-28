@@ -196,12 +196,40 @@ public:
 	}
 };
 
+class LoadSaveMenu : public Menu
+{
+public:
+	LoadSaveMenu(bool save) : Menu(LSM_X, LSM_Y, LSM_W, 24), save(save)
+	{
+	}
+
+protected:
+	void handleDelete()
+	{
+		if(save)
+			return;
+
+		SaveSlotMenuItem *item = static_cast<SaveSlotMenuItem *>(getIndex(getCurrentPosition()));
+		SaveFile &saveFile = SaveFile::files[item->slotIndex];
+
+		FString msg;
+		msg.Format(language["DELETESVDGAME"], saveFile.name.GetChars());
+		if(Confirm(msg))
+		{
+			File(GetFullSaveFileName(saveFile.filename)).remove();
+			item->setVisible(false);
+			setCurrentPosition(getCurrentPosition());
+		}
+	}
+
+	bool save;
+};
+
 MENU_LISTENER(BeginEditSave);
 MENU_LISTENER(LoadSaveGame);
 MENU_LISTENER(PerformSaveGame);
 
-static Menu loadGame(LSM_X, LSM_Y, LSM_W, 24);
-static Menu saveGame(LSM_X, LSM_Y, LSM_W, 24);
+static LoadSaveMenu loadGame(false), saveGame(true);
 static MenuItem *loadItem, *saveItem;
 
 Menu &GetLoadMenu() { return loadGame; }

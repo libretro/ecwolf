@@ -94,6 +94,7 @@ class File
 		bool					isWritable() const { return writable; }
 		FILE					*open(const char* mode) const;
 		void					rename(const FString &newname);
+		bool					remove();
 
 	protected:
 		void					init(const FString &filename);

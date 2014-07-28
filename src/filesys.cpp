@@ -95,7 +95,8 @@ static void FullFileName(const char* filename, char* dest)
 	_wfullpath(fullpath, path, MAX_PATH);
 	ConvertName(fullpath, dest);
 #else
-	realpath(filename, dest);
+	if(realpath(filename, dest) == NULL)
+		strncpy(dest, filename, MAX_PATH);
 #endif
 }
 
@@ -482,7 +483,7 @@ FILE *File::open(const char* mode) const
 		return _wfopen(wname, wmode);
 	}
 #endif
-	return fopen(filename, mode);
+	return fopen(fn, mode);
 }
 
 /**
@@ -499,4 +500,24 @@ void File::rename(const FString &newname)
 	filename = path;
 
 	VirtualRenameTable[MakeKey(getDirectory() + PATH_SEPARATOR + newname)] = filename;
+}
+
+bool File::remove()
+{
+	char path[MAX_PATH];
+	FileSys::FullFileName(filename, path);
+	FString *renamed = VirtualRenameTable.CheckKey(MakeKey(path));
+	FString fn = renamed ? *renamed : filename;
+#ifdef _WIN32
+	if(FileSys::IsWinNT)
+	{
+		wchar_t wname[MAX_PATH];
+		FileSys::ConvertName(fn, wname);
+		return DeleteFileW(wname);
+	}
+	else
+		return DeleteFileA(fn);
+#else
+	return unlink(fn) == 0;
+#endif
 }
