@@ -1131,6 +1131,10 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 	if(sampleRateGiven && !audioBufferGiven)
 		param_audiobuffer = 2048 / (44100 / param_samplerate);
 
+#ifdef __ANDROID__
+	param_audiobuffer = (2048*2) / (44100 / param_samplerate);
+#endif
+
 	return extension;
 }
 

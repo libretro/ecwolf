@@ -429,6 +429,11 @@ void PollControls (bool absolutes)
 	if (joystickenabled)
 		PollJoystickMove ();
 
+#ifdef __ANDROID__
+	extern void pollAndroidControls();
+	pollAndroidControls();
+#endif
+
 	if (demorecord)
 	{
 		//
