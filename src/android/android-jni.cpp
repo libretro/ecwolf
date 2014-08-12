@@ -184,9 +184,9 @@ void gameButton(int state,int code)
 void weaponWheelSelected(int enabled)
 {
 	if (enabled)
-		tcWeaponWheel->fade(0,5); //fade in
+		tcWeaponWheel->fade(touchcontrols::FADE_IN,5); //fade in
 	else
-		tcWeaponWheel->fade(1,5);
+		tcWeaponWheel->fade(touchcontrols::FADE_OUT,5);
 }
 void weaponWheel(int segment)
 {

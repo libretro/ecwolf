@@ -1222,7 +1222,11 @@ bool GtkAvailable;
 bool CheckIsRunningFromCommandPrompt();
 void StartupWin32();
 #endif
+#ifdef __ANDROID__
+int main_android (int argc, char *argv[])
+#else
 int main (int argc, char *argv[])
+#endif
 {
 #ifndef _WIN32
 	// Set LC_NUMERIC environment variable in case some library decides to

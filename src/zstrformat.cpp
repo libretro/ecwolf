@@ -966,7 +966,7 @@ fp_begin:
 //========================================================================//
 // snprintf / vsnprintf imitations
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__ANDROID__)
 #define GCCPRINTF(stri,firstargi)	__attribute__((format(printf,stri,firstargi)))
 #define GCCFORMAT(stri)				__attribute__((format(printf,stri,0)))
 #define GCCNOWARN					__attribute__((unused))
