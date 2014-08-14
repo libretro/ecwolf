@@ -52,7 +52,7 @@ int I_PickIWad(WadStuff *wads, int numwads, bool showwin, int defaultiwad);
 
 namespace IWad {
 
-#if defined(_WIN32) || defined(__APPLE__)
+#if defined(_WIN32) || defined(__APPLE__) || defined(__ANDROID__)
 #define ISCASEINSENSITIVE 1
 #else
 #define ISCASEINSENSITIVE 0

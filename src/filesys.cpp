@@ -78,6 +78,12 @@ static inline void ConvertName(const wchar_t* filename, char* out, const int len
 {
 	WideCharToMultiByte(CP_UTF8, 0, filename, -1, out, len, NULL, NULL);
 }
+
+#ifdef _M_X64
+static const bool IsWinNT = true;
+#else
+static bool IsWinNT = true;
+#endif
 #endif
 
 // Converts a relative filename to an absolute name
@@ -89,7 +95,8 @@ static void FullFileName(const char* filename, char* dest)
 	_wfullpath(fullpath, path, MAX_PATH);
 	ConvertName(fullpath, dest);
 #else
-	realpath(filename, dest);
+	if(realpath(filename, dest) == NULL)
+		strncpy(dest, filename, MAX_PATH);
 #endif
 }
 
@@ -97,12 +104,23 @@ static bool CreateDirectoryIfNeeded(const char* path)
 {
 #ifdef _WIN32
 	struct _stat dirStat;
-	wchar_t wpath[MAX_PATH];
-	ConvertName(path, wpath);
-	if(_wstat(wpath, &dirStat) == -1)
+	if(IsWinNT)
 	{
-		if(_wmkdir(wpath) == -1)
-			return false;
+		wchar_t wpath[MAX_PATH];
+		ConvertName(path, wpath);
+		if(_wstat(wpath, &dirStat) == -1)
+		{
+			if(_wmkdir(wpath) == -1)
+				return false;
+		}
+	}
+	else
+	{
+		if(_stat(path, &dirStat) == -1)
+		{
+			if(_mkdir(path) == -1)
+				return false;
+		}
 	}
 	return true;
 #else
@@ -130,10 +148,12 @@ void SetupPaths(int argc, const char * const *argv)
 	static const GUID gFOLDERID_SavedGames = {0x4C5C32FFu, 0xBB9Du, 0x43b0u, {0xB5u,0xB4u,0x2Du,0x72u,0xE5u,0x4Eu,0xAAu,0xA4u}};
 
 	HRESULT (WINAPI* pSHGetKnownFolderPath)(const GUID*,DWORD,HANDLE,PWSTR*) = NULL;
+	HRESULT (WINAPI* pSHGetFolderPathW)(HWND,int,HANDLE,DWORD,LPWSTR) = NULL;
 	HMODULE shell32 = LoadLibrary ("shell32");
 	if(shell32)
 	{
 		pSHGetKnownFolderPath = (HRESULT (WINAPI*)(const GUID*,DWORD,HANDLE,PWSTR*))GetProcAddress(shell32, "SHGetKnownFolderPath");
+		pSHGetFolderPathW = (HRESULT (WINAPI*)(HWND,int,HANDLE,DWORD,LPWSTR))GetProcAddress(shell32, "SHGetFolderPathW");
 	}
 #endif
 
@@ -146,13 +166,19 @@ void SetupPaths(int argc, const char * const *argv)
 
 	// Configuration directory
 #if defined(_WIN32)
+#ifndef _M_X64
 	OSVERSIONINFO osVersion;
+	ZeroMemory(&osVersion, sizeof(OSVERSIONINFO));
+	osVersion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osVersion);
-	if(osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS)
+	IsWinNT = osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS;
+	if(IsWinNT)
+#endif
 	{
 		if(pSHGetKnownFolderPath) // Vista+
 		{
 			char tempCPath[MAX_PATH];
+			memset(tempCPath, 0, MAX_PATH);
 			PWSTR tempPath = NULL;
 			if(SUCCEEDED(pSHGetKnownFolderPath(&gFOLDERID_RoamingAppData, 0x00008000, NULL, &tempPath)))
 			{
@@ -161,12 +187,14 @@ void SetupPaths(int argc, const char * const *argv)
 				CoTaskMemFree(tempPath);
 			}
 		}
-		if(configDir.IsEmpty())
+		if(configDir.IsEmpty() && pSHGetFolderPathW)
 		{
 			// Other Windows NT
 			char tempCPath[MAX_PATH];
 			wchar_t tempPath[MAX_PATH];
-			if(SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
+			memset(tempCPath, 0, MAX_PATH);
+			memset(tempPath, 0, MAX_PATH);
+			if(SUCCEEDED(pSHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
 			{
 				ConvertName(tempPath, tempCPath);
 				configDir.Format("%s\\" GAME_DIR, (const char*)tempCPath);
@@ -186,7 +214,7 @@ void SetupPaths(int argc, const char * const *argv)
 		else
 		{
 			char* chome = new char[wcslen(home)];
-			ConvertName(home, chome, wcslen(home));
+			ConvertName(home, chome, (int)wcslen(home));
 			configDir.Format("%s\\" GAME_DIR, chome);
 			delete[] chome;
 		}
@@ -447,14 +475,15 @@ FILE *File::open(const char* mode) const
 	FString fn = renamed ? *renamed : filename;
 
 #ifdef _WIN32
-	wchar_t wname[MAX_PATH], wmode[MAX_PATH];
-	FileSys::ConvertName(fn, wname);
-	FileSys::ConvertName(mode, wmode);
-	FILE *ret = _wfopen(wname, wmode);
-	return ret;
-#else
-	return fopen(filename, mode);
+	if(FileSys::IsWinNT)
+	{
+		wchar_t wname[MAX_PATH], wmode[MAX_PATH];
+		FileSys::ConvertName(fn, wname);
+		FileSys::ConvertName(mode, wmode);
+		return _wfopen(wname, wmode);
+	}
 #endif
+	return fopen(fn, mode);
 }
 
 /**
@@ -471,4 +500,24 @@ void File::rename(const FString &newname)
 	filename = path;
 
 	VirtualRenameTable[MakeKey(getDirectory() + PATH_SEPARATOR + newname)] = filename;
+}
+
+bool File::remove()
+{
+	char path[MAX_PATH];
+	FileSys::FullFileName(filename, path);
+	FString *renamed = VirtualRenameTable.CheckKey(MakeKey(path));
+	FString fn = renamed ? *renamed : filename;
+#ifdef _WIN32
+	if(FileSys::IsWinNT)
+	{
+		wchar_t wname[MAX_PATH];
+		FileSys::ConvertName(fn, wname);
+		return DeleteFileW(wname);
+	}
+	else
+		return DeleteFileA(fn);
+#else
+	return unlink(fn) == 0;
+#endif
 }

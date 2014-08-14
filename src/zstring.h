@@ -41,13 +41,14 @@
 #include "tarray.h"
 #include "name.h"
 
-#ifdef __GNUC__
+// Android doesn't apply here since printf is redefined to be LOGI
+#if defined(__GNUC__) && !defined(__ANDROID__)
 #define PRINTFISH(x) __attribute__((format(printf, 2, x)))
 #else
 #define PRINTFISH(x)
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__ANDROID__)
 #define GCCPRINTF(stri,firstargi)		__attribute__((format(printf,stri,firstargi)))
 #define GCCFORMAT(stri)					__attribute__((format(printf,stri,0)))
 #define GCCNOWARN						__attribute__((unused))

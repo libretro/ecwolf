@@ -1134,6 +1134,10 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 	if(sampleRateGiven && !audioBufferGiven)
 		param_audiobuffer = 2048 / (44100 / param_samplerate);
 
+#ifdef __ANDROID__
+	param_audiobuffer = (2048*2) / (44100 / param_samplerate);
+#endif
+
 	return extension;
 }
 
@@ -1221,7 +1225,11 @@ bool GtkAvailable;
 bool CheckIsRunningFromCommandPrompt();
 void StartupWin32();
 #endif
+#ifdef __ANDROID__
+extern "C" int main_android (int argc, char *argv[])
+#else
 int main (int argc, char *argv[])
+#endif
 {
 #ifndef _WIN32
 	// Set LC_NUMERIC environment variable in case some library decides to
@@ -1295,8 +1303,13 @@ int main (int argc, char *argv[])
 	{
 		SDL_Quit();
 
+#ifdef __ANDROID__
+		if(error.GetMessage())
+			Printf("%s\n", error.GetMessage());
+#else
 		if(error.GetMessage())
 			fprintf(stderr, "%s\n", error.GetMessage());
+#endif
 
 #ifdef _WIN32
 		// When running from Windows explorer, wait for user dismissal

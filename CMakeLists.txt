@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.4)
 project(ECWolf)
 
+option(ANDROID "Build for Android" OFF)
+
 # Generator expression are available some time in CMake 2.8. Due to
 # cmake_minimum_required, we can assume a minor version of > 7 implies major >= 2
 if(${CMAKE_MAJOR_VERSION} GREATER 2 OR ${CMAKE_MINOR_VERSION} GREATER 7)
@@ -43,9 +45,17 @@ function( add_pk3 PK3_NAME PK3_DIR )
 
 	# Touch the zipdir executable here so that the pk3s are forced to rebuild
 	# each time since their dependecy has "changed."
-	add_custom_target( ${PK3_TARGET} ALL
-		COMMAND ${CMAKE_COMMAND} -E touch ${ZIPDIR_EXE}
-		DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+	if( NOT ANDROID )
+		add_custom_target( ${PK3_TARGET} ALL
+			COMMAND ${CMAKE_COMMAND} -E touch ${ZIPDIR_EXE}
+			DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+	else( NOT ANDROID )
+		# Prepare assets directory for APK
+		add_custom_target( ${PK3_TARGET} ALL
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${OUTPUT_DIR}/${PK3_NAME} ${OUTPUT_DIR}/assets/${PK3_NAME}
+			COMMAND ${CMAKE_COMMAND} -E touch ${ZIPDIR_EXE}
+			DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+	endif( NOT ANDROID )
 endfunction( add_pk3 )
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWolf.")
@@ -101,6 +111,24 @@ add_subdirectory(lzma)
 if(GPL AND USE_LIBTEXTSCREEN)
 	add_subdirectory(textscreen)
 endif(GPL AND USE_LIBTEXTSCREEN)
+
+if(ANDROID)
+	set(LIBPNG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs)
+	set(LIBPNG_LIBRARY png16_static)
+	set(SIGCPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/sigc++)
+	set(SIGCPP_LIBRARY sigc++)
+	set(TINYXML_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/TinyXML)
+	set(TINYXML_LIBRARY TinyXML)
+	set(TOUCHCONTROLS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/TouchControls)
+	set(TOUCHCONTROLS_LIBRARY TouchControls)
+
+	add_subdirectory(android-libs/libpng)
+	add_subdirectory(android-libs/sigc++)
+	add_subdirectory(android-libs/TinyXML)
+	add_subdirectory(android-libs/TouchControls)
+	add_subdirectory(android-libs/launcher)
+endif(ANDROID)
+
 add_subdirectory(src)
 
 if( NOT CMAKE_CROSSCOMPILING )

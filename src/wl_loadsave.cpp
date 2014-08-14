@@ -196,12 +196,40 @@ public:
 	}
 };
 
+class LoadSaveMenu : public Menu
+{
+public:
+	LoadSaveMenu(bool save) : Menu(LSM_X, LSM_Y, LSM_W, 24), save(save)
+	{
+	}
+
+protected:
+	void handleDelete()
+	{
+		if(save)
+			return;
+
+		SaveSlotMenuItem *item = static_cast<SaveSlotMenuItem *>(getIndex(getCurrentPosition()));
+		SaveFile &saveFile = SaveFile::files[item->slotIndex];
+
+		FString msg;
+		msg.Format(language["DELETESVDGAME"], saveFile.name.GetChars());
+		if(Confirm(msg))
+		{
+			File(GetFullSaveFileName(saveFile.filename)).remove();
+			item->setVisible(false);
+			setCurrentPosition(getCurrentPosition());
+		}
+	}
+
+	bool save;
+};
+
 MENU_LISTENER(BeginEditSave);
 MENU_LISTENER(LoadSaveGame);
 MENU_LISTENER(PerformSaveGame);
 
-static Menu loadGame(LSM_X, LSM_Y, LSM_W, 24);
-static Menu saveGame(LSM_X, LSM_Y, LSM_W, 24);
+static LoadSaveMenu loadGame(false), saveGame(true);
 static MenuItem *loadItem, *saveItem;
 
 Menu &GetLoadMenu() { return loadGame; }
@@ -323,7 +351,6 @@ bool SetupSaveGames()
 						canLoad = true;
 					delete[] checkFile;
 				}
-				canLoad = true;
 
 				if(M_GetPNGText(png, "Title", title, MAX_SAVENAME))
 				{
@@ -488,9 +515,11 @@ void QuickLoad()
 {
 	if(saveGame.getCurrentPosition() != 0)
 	{
+		const SaveSlotMenuItem *menuItem = static_cast<SaveSlotMenuItem *> (saveGame.getIndex(saveGame.getCurrentPosition()));
+
 		quickSaveLoad = true;
-		char string[100];
-		sprintf(string, "%s%s\"?", language["STR_LGC"], SaveFile::files[saveGame.getCurrentPosition()-1].name.GetChars());
+		FString string;
+		string.Format("%s\"%s\"?", language["STR_LGC"], SaveFile::files[menuItem->slotIndex].name.GetChars());
 		if(Confirm(string))
 			LoadSaveGame(saveGame.getCurrentPosition()-1);
 		quickSaveLoad = false;

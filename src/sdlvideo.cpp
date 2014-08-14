@@ -309,7 +309,8 @@ extern IVideo *Video;
 
 // PUBLIC DATA DEFINITIONS -------------------------------------------------
 
-#define vid_displaybits 8
+extern unsigned screenBits;
+#define vid_displaybits screenBits
 //CVAR (Int, vid_displaybits, 8, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 
 #define rgamma 1.f
@@ -536,7 +537,13 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 	UpdatePending = false;
 	NotPaletted = false;
 	FlashAmount = 0;
-	
+
+	if(vid_displaybits == static_cast<unsigned>(-1))
+	{
+		const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
+		screenBits = vidInfo->vfmt->BitsPerPixel;
+	}
+
 	Screen = SDL_SetVideoMode (width, height, vid_displaybits,
 		SDL_HWSURFACE|SDL_HWPALETTE|SDL_DOUBLEBUF|SDL_ANYFORMAT|
 		(fullscreen ? SDL_FULLSCREEN : 0));

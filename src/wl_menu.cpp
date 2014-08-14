@@ -43,7 +43,8 @@ int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG,
 	MENUWIN_BACKGROUND, MENUWIN_TOPBORDER, MENUWIN_BOTBORDER,
 	MENUWINHGLT_BACKGROUND, MENUWINHGLT_TOPBORDER, MENUWINHGLT_BOTBORDER;
 static MenuItem	*readThis;
-static bool menusAreFaded = true;
+// Android version reads this elsewhere so non-static.
+bool menusAreFaded = true;
 
 EMenuStyle MenuStyle = MENUSTYLE_Wolf;
 
@@ -452,9 +453,13 @@ void CreateMenus()
 
 	const char* aspectOptions[] = {"Aspect: Auto", "Aspect: 16:9", "Aspect: 16:10", "Aspect: 17:10", "Aspect: 4:3", "Aspect: 5:4"};
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
+#ifndef __ANDROID__
 	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
+#endif
 	displayMenu.addItem(new MultipleChoiceMenuItem(SetAspectRatio, aspectOptions, 6, vid_aspect));
+#ifndef __ANDROID__
 	displayMenu.addItem(new MenuSwitcherMenuItem(language["STR_SELECTRES"], resolutionMenu, EnterResolutionSelection));
+#endif
 	displayMenu.addItem(new LabelMenuItem(language["STR_SCREENSIZE"]));
 	displayMenu.addItem(new SliderMenuItem(viewsize, 110, 21, language["STR_SMALL"], language["STR_LARGE"], AdjustViewSize));
 
@@ -901,7 +906,9 @@ void ReadAnyControl (ControlInfo * ci)
 	}
 }
 
-
+#ifdef __ANDROID__
+extern  bool inConfirm;
+#endif
 ////////////////////////////////////////////////////////////////////
 //
 // DRAW DIALOG AND CONFIRM YES OR NO TO QUESTION
@@ -913,6 +920,10 @@ bool Confirm (const char *string)
 	int x, y, tick = 0, lastBlinkTime;
 	const char* whichsnd[2] = { "menu/escape", "menu/activate" };
 	ControlInfo ci;
+
+#ifdef __ANDROID__
+	inConfirm = true;
+#endif
 
 	Message (string);
 	IN_ClearKeysDown ();
@@ -955,9 +966,9 @@ bool Confirm (const char *string)
 		else SDL_Delay(5);
 
 	}
-	while (!Keyboard[sc_Y] && !Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape] && !ci.button0 && !ci.button1);
+	while (!Keyboard[sc_Y] && !Keyboard[sc_S] && !Keyboard[sc_N] && !Keyboard[sc_Escape] && !Keyboard[sc_Return] && !ci.button0 && !ci.button1);
 
-	if (Keyboard[sc_S] || Keyboard[sc_Y] || ci.button0)
+	if (Keyboard[sc_S] || Keyboard[sc_Y] || Keyboard[sc_Return] || ci.button0)
 	{
 		xit = true;
 		ShootSnd ();
@@ -967,6 +978,10 @@ bool Confirm (const char *string)
 	WaitKeyUp ();
 
 	SD_PlaySound (whichsnd[xit]);
+
+#ifdef __ANDROID__
+	inConfirm = false;
+#endif
 
 	return xit;
 }

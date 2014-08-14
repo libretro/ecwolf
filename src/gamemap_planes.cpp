@@ -610,17 +610,18 @@ void GameMap::ReadPlanesData()
 
 	// Read plane count
 	lump->Seek(10, SEEK_SET);
-	WORD numPlanes;
+	WORD numPlanes, nameLength;
 	lump->Read(&numPlanes, 2);
+	lump->Read(&nameLength, 2);
 	numPlanes = LittleShort(numPlanes);
+	nameLength = LittleShort(nameLength);
 
-	lump->Seek(14, SEEK_SET);
-	char name[17];
-	lump->Read(name, 16);
-	name[16] = 0;
+	char* name = new char[nameLength+1];
+	lump->Read(name, nameLength);
+	name[nameLength] = 0;
 	header.name = name;
+	delete[] name;
 
-	lump->Seek(30, SEEK_SET);
 	WORD dimensions[2];
 	lump->Read(dimensions, 4);
 	dimensions[0] = LittleShort(dimensions[0]);

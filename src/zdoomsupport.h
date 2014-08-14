@@ -6,6 +6,11 @@
 #include "m_crc32.h"
 #include "templates.h"
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#define printf LOGI
+#endif
+
 int ParseHex(const char* hex);
 
 // Ensures that a double is a whole number or a half

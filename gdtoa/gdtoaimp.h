@@ -201,8 +201,8 @@ THIS SOFTWARE.
 * it turns out that it has a true long double type. I thought that
 * all ia32 compilers had phased out extended precision.
 */
-#elif defined(__APPLE__)
-#if defined(__x86_64__) || defined(__i386__)
+#elif defined(__APPLE__) || defined(__ANDROID__)
+#if defined(__x86_64__) || defined(__i386__) || defined(__ANDROID__)
 #define f_QNAN 0xffc00000
 #define d_QNAN0 0x0
 #define d_QNAN1 0xfff80000
