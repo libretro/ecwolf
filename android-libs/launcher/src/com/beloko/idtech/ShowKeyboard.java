@@ -1,0 +1,51 @@
+package com.beloko.idtech;
+
+import android.app.Activity;
+import android.content.Context;
+import android.util.Log;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+
+public class ShowKeyboard {
+	static Activity activity;
+	static View view;;
+
+	public static void setup(Activity a,View v)
+	{
+		activity = a;
+		view = v;
+	}
+
+
+	public static void toggleKeyboard()
+	{
+		Log.d("ShowKeyboard","toggleKeyboard");
+
+		InputMethodManager im = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		if (im != null)
+		{
+			Log.d("ShowKeyboard","toggleKeyboard...");
+			im.toggleSoftInput(0, 0);
+		}
+	}
+
+	public static void showKeyboard(int show)
+	{
+		Log.d("ShowKeyboard","showKeyboard " + show);
+
+		InputMethodManager im = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		if (im != null)
+		{
+			if (show == 0)
+			{
+				im.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),      
+					    0);
+			}
+			if (show == 1)
+				if (!im.isAcceptingText()) 
+					toggleKeyboard();
+			if (show == 2)
+				toggleKeyboard();
+		}
+	}
+}

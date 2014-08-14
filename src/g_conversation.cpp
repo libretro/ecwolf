@@ -524,8 +524,18 @@ static void GiveConversationItem(AActor *recipient, unsigned int id)
 	recipient->GiveInventory(cls);
 }
 
+#ifdef __ANDROID__
+extern "C"
+{
+int inConversation;
+}
+#endif
 void StartConversation(AActor *npc)
 {
+#ifdef __ANDROID__
+	inConversation = 1;
+#endif
+
 	class QuizMenu : public Menu
 	{
 	public:
@@ -655,6 +665,10 @@ void StartConversation(AActor *npc)
 	// Fix screen
 	StatusBar->RefreshBackground();
 	DrawPlayScreen();
+
+#ifdef __ANDROID__
+	inConversation = 0;
+#endif
 }
 
 }

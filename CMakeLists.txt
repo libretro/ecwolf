@@ -45,9 +45,17 @@ function( add_pk3 PK3_NAME PK3_DIR )
 
 	# Touch the zipdir executable here so that the pk3s are forced to rebuild
 	# each time since their dependecy has "changed."
-	add_custom_target( ${PK3_TARGET} ALL
-		COMMAND ${CMAKE_COMMAND} -E touch ${ZIPDIR_EXE}
-		DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+	if( NOT ANDROID )
+		add_custom_target( ${PK3_TARGET} ALL
+			COMMAND ${CMAKE_COMMAND} -E touch ${ZIPDIR_EXE}
+			DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+	else( NOT ANDROID )
+		# Prepare assets directory for APK
+		add_custom_target( ${PK3_TARGET} ALL
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${OUTPUT_DIR}/${PK3_NAME} ${OUTPUT_DIR}/assets/${PK3_NAME}
+			COMMAND ${CMAKE_COMMAND} -E touch ${ZIPDIR_EXE}
+			DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+	endif( NOT ANDROID )
 endfunction( add_pk3 )
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWolf.")
@@ -118,6 +126,7 @@ if(ANDROID)
 	add_subdirectory(android-libs/sigc++)
 	add_subdirectory(android-libs/TinyXML)
 	add_subdirectory(android-libs/TouchControls)
+	add_subdirectory(android-libs/launcher)
 endif(ANDROID)
 
 add_subdirectory(src)

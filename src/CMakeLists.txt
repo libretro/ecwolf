@@ -139,6 +139,7 @@ elseif(ANDROID)
 	set(EXTRA_FILES
 		android/android-jni.cpp
 		android/in_android.cpp
+		android/wl_iwad_picker_android.cpp
 	)
 
 	include_directories(${TOUCHCONTROLS_INCLUDE_DIR} ${SIGCPP_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${LIBPNG_INCLUDE_DIR})
@@ -303,6 +304,10 @@ else(NOT ANDROID)
 		${SOURCE_FILES}
 		${EXTRA_FILES}
 	)
+
+	# Link test
+	add_executable(link-test android/link-test.c)
+	target_link_libraries(link-test ecwolf)
 endif(NOT ANDROID)
 
 add_dependencies(ecwolf lzma gdtoa revision_check)

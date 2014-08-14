@@ -1223,7 +1223,7 @@ bool CheckIsRunningFromCommandPrompt();
 void StartupWin32();
 #endif
 #ifdef __ANDROID__
-int main_android (int argc, char *argv[])
+extern "C" int main_android (int argc, char *argv[])
 #else
 int main (int argc, char *argv[])
 #endif
@@ -1300,8 +1300,13 @@ int main (int argc, char *argv[])
 	{
 		SDL_Quit();
 
+#ifdef __ANDROID__
+		if(error.GetMessage())
+			Printf("%s\n", error.GetMessage());
+#else
 		if(error.GetMessage())
 			fprintf(stderr, "%s\n", error.GetMessage());
+#endif
 
 #ifdef _WIN32
 		// When running from Windows explorer, wait for user dismissal

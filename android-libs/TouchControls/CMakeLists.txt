@@ -21,5 +21,5 @@ add_library(TouchControls SHARED
     WheelSelect.cpp
 )
 
-target_link_libraries(TouchControls GLESv1_CM ${TINYXML_LIBRARY} ${SIGCPP_LIBRARY} ${LIBPNG_LIBRARY})
+target_link_libraries(TouchControls GLESv1_CM log ${TINYXML_LIBRARY} ${SIGCPP_LIBRARY} ${LIBPNG_LIBRARY})
  

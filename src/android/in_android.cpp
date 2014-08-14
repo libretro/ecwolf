@@ -1,10 +1,10 @@
 
 #include "wl_def.h"
 
-extern int main_android (int argc, char *argv[]);
-
 extern "C"
 {
+
+int main_android (int argc, char *argv[]);
 
 #include "in_android.h"
 
@@ -264,11 +264,12 @@ void PortableFrame(void){
 
 extern bool	ingame;
 extern  bool menusAreFaded;
+extern int inConversation;
 
 bool inConfirm = false;;
 int PortableInMenu(void){
 	//return (ingame)?0:1;
-	return (!menusAreFaded) || !ingame || inConfirm;
+	return (!menusAreFaded) || !ingame || inConfirm || inConversation;
 }
 
 int PortableInAutomap(void)
