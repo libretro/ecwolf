@@ -535,7 +535,7 @@ void Menu::addItem(MenuItem *item)
 {
 	item->setMenu(this);
 	items.Push(item);
-	if(!item->isEnabled() && (signed)items.Size()-1 == curPos)
+	if(item->isVisible() && !item->isEnabled() && (signed)countItems()-1 == curPos)
 		curPos++;
 	height += item->getHeight();
 }
@@ -583,7 +583,8 @@ int Menu::getHeight(int position) const
 	}
 
 	unsigned int num = 0;
-	for(unsigned int i = itemOffset;i < items.Size();i++)
+	unsigned int ignore = itemOffset;
+	for(unsigned int i = 0;i < items.Size();i++)
 	{
 		if((unsigned)position == i)
 			break;
@@ -592,7 +593,11 @@ int Menu::getHeight(int position) const
 		{
 			if(getY() + num + items[i]->getHeight() + 6 >= 200)
 				break;
-			num += items[i]->getHeight();
+
+			if(ignore)
+				--ignore;
+			else
+				num += items[i]->getHeight();
 		}
 	}
 	if(position >= 0)
@@ -628,7 +633,8 @@ void Menu::drawMenu() const
 	int y = getY();
 	int selectedY = getY(); // See later
 
-	for (unsigned int i = itemOffset; i < countItems(); i++)
+	unsigned int count = countItems();
+	for (unsigned int i = itemOffset; i < count; i++)
 	{
 		if(i == (unsigned)curPos)
 			selectedY = y;
@@ -644,7 +650,7 @@ void Menu::drawMenu() const
 	}
 
 	// In order to draw the skill menu correctly we need to draw the selected option now
-	if(curPos >= (signed)itemOffset)
+	if(curPos < (signed)count && curPos >= (signed)itemOffset)
 	{
 		PrintY = selectedY;
 		getIndex(curPos)->draw();
@@ -695,7 +701,7 @@ void Menu::draw() const
 	DrawWindow(getX() - 8, getY() - 3, getWidth(), getHeight(), BKGDCOLOR);
 	drawMenu();
 
-	if(!isAnimating())
+	if(!isAnimating() && countItems() > 0)
 		VWB_DrawGraphic (cursor, x - 4, y + getHeight(curPos) - 2, MENU_CENTER);
 	VW_UpdateScreen ();
 }
@@ -784,6 +790,19 @@ int Menu::handle()
 			}
 		}
 
+		if(LastScan == SCANCODE_UNMASK(SDLK_DELETE))
+		{
+			handleDelete();
+			LastScan = 0;
+
+			// Leave menu if we delete everything.
+			if(countItems() == 0)
+			{
+				lastitem = curPos; // Prevent redrawing
+				exit = 2;
+			}
+		}
+
 		//
 		// GET INPUT
 		//
@@ -823,7 +842,7 @@ int Menu::handle()
 				}
 				while (!getIndex(curPos)->isEnabled());
 
-				if(abs(oldPos - curPos) == 1)
+				if(oldPos - curPos == 1)
 				{
 					animating = true;
 					draw();
@@ -867,7 +886,7 @@ int Menu::handle()
 				}
 				while (!getIndex(curPos)->isEnabled());
 
-				if(abs(oldPos - curPos) == 1)
+				if(oldPos - curPos == -1)
 				{
 					animating = true;
 					draw();
@@ -959,37 +978,40 @@ int Menu::handle()
 
 void Menu::setCurrentPosition(int position)
 {
+	unsigned int count;
+
 	if(position <= 0) // At start
 	{
 		curPos = 0;
 		itemOffset = 0;
 	}
-	else if((unsigned) position >= items.Size()-1) // At end
+	else if((unsigned) position >= (count = countItems())-1) // At end
 	{
-		curPos = items.Size()-1;
+		curPos = count-1;
 		itemOffset = curPos;
-		unsigned int accumulatedHeight = getY();
-		while((accumulatedHeight += getIndex(itemOffset)->getHeight()) + 6 < 200)
+		unsigned int accumulatedHeight = getY() + getIndex(itemOffset)->getHeight() + 6;
+		while(accumulatedHeight < 200)
 		{
 			if(itemOffset == 0)
 				break;
-			--itemOffset;
+
+			accumulatedHeight += getIndex(--itemOffset)->getHeight();
 		}
-		if(itemOffset > 0)
+		if(accumulatedHeight >= 200)
 			++itemOffset;
 	}
 	else // Somewhere in the middle
 	{
 		curPos = position;
 		itemOffset = curPos;
-		unsigned int accumulatedHeight = getY() + getIndex(itemOffset)->getHeight();
+		unsigned int accumulatedHeight = getY() + getIndex(itemOffset)->getHeight() + 6;
 		unsigned int lastIndex = curPos;
-		while(accumulatedHeight + 6 < 200)
+		while(accumulatedHeight < 200)
 		{
 			if(lastIndex < items.Size()-1)
 			{
 				accumulatedHeight += getIndex(++lastIndex)->getHeight();
-				if(accumulatedHeight + 6 >= 200)
+				if(accumulatedHeight >= 200)
 					break;
 			}
 
@@ -998,7 +1020,7 @@ void Menu::setCurrentPosition(int position)
 			else
 				break;
 		}
-		if(itemOffset > 0)
+		if(accumulatedHeight >= 200)
 			++itemOffset;
 	}
 }

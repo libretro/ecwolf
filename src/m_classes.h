@@ -208,6 +208,7 @@ class Menu
 
 		void	drawGunHalfStep(int x, int y);
 		void	eraseGun(int x, int y);
+		virtual void handleDelete() {}
 
 	public:
 		Menu(int x, int y, int w, int indent, MENU_LISTENER_PROTOTYPE(entryListener)=NULL);

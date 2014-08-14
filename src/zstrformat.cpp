@@ -692,7 +692,11 @@ fp_begin:
 			dblarg = va_arg(arglist, double);
 			obuff = dtoaresult = dtoa(dblarg, expchar ? 2 : 3, precision, &expt, &signflag, &dtoaend);
 //fp_common:
+#ifdef __ANDROID__
+			decimal_point = ".";
+#else
 			decimal_point = localeconv()->decimal_point;
+#endif
 			flags |= F_SIGNED;
 			if (signflag)
 			{
@@ -962,7 +966,7 @@ fp_begin:
 //========================================================================//
 // snprintf / vsnprintf imitations
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__ANDROID__)
 #define GCCPRINTF(stri,firstargi)	__attribute__((format(printf,stri,firstargi)))
 #define GCCFORMAT(stri)				__attribute__((format(printf,stri,0)))
 #define GCCNOWARN					__attribute__((unused))

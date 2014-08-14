@@ -23,8 +23,10 @@ void TXT_PickWad(TXT_UNCAST_ARG(widget), int wad)
 #include <gdk/gdkkeysyms.h>
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 int I_PickIWad_Cocoa (WadStuff *wads, int numwads, bool showwin, int defaultiwad);
+#elif defined(__ANDROID__)
+int I_PickIWad_Android (WadStuff *wads, int numwads, bool showwin, int defaultiwad);
 #endif
 
 #ifndef NO_GTK
@@ -221,7 +223,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 		return defaultiwad;
 	}
 
-#if !defined(__APPLE__) && !defined(_WIN32)
+#if !defined(__APPLE__) && !defined(_WIN32) && !defined(__ANDROID__)
 	const char *str;
 	if((str=getenv("KDE_FULL_SESSION")) && strcmp(str, "true") == 0)
 	{
@@ -291,6 +293,8 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 	}
 #elif defined(__APPLE__)
 	return I_PickIWad_Cocoa (wads, numwads, showwin, defaultiwad);
+#elif defined(__ANDROID__)
+	return I_PickIWad_Android (wads, numwads, showwin, defaultiwad);
 #endif
 #ifndef USE_TEXTSCREEN
 	printf ("Please select a game wad (or 0 to exit):\n");

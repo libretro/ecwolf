@@ -9,6 +9,7 @@ QUITSUR = "Are you sure you want\nto quit this great game?";
 CURGAME = "You are currently in\na game. Continuing will\nerase old game. Ok?";
 GAMESVD = "There's already a game\nsaved at this position.\n      Overwrite?";
 ENDGAMESTR = "Are you sure you want\nto end the game you\nare playing? (Y or N)";
+DELETESVDGAME = "Are you sure you want to\ndelete this saved game?\n\"%s\"";
 STR_NG = "New Game";
 STR_OPTIONS = "Options";
 STR_DISPLAY = "Display Options";

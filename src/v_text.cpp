@@ -151,13 +151,15 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 		// We don't handle these. :(
 		case DTA_DestWidth:
 		case DTA_DestHeight:
-			*(DWORD *)tags = TAG_IGNORE;
+			assert(false && "DTA_DestWidth or DTA_DestHeight unsupported.");
+			//*(DWORD *)tags = TAG_IGNORE;
 			data = va_arg (tags, DWORD);
 			break;
 
 		// Translation is specified explicitly by the text.
 		case DTA_Translation:
-			*(DWORD *)tags = TAG_IGNORE;
+			assert(false && "DTA_Translation unsupported.");
+			//*(DWORD *)tags = TAG_IGNORE;
 			ptrval = va_arg (tags, void*);
 			break;
 
