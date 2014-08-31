@@ -8,6 +8,8 @@
 #ifndef __ID_SD__
 #define __ID_SD__
 
+#include <SDL_mixer.h>
+
 #include "wl_def.h"
 #include "sndinfo.h"
 
@@ -138,6 +140,8 @@ enum SoundChannel
 	SD_BOSSWEAPONS
 };
 
+extern	Mix_Music		*music;
+
 #define GetTimeCount()  ((SDL_GetTicks()*7)/100)
 
 inline void Delay(int wolfticks)
@@ -156,6 +160,7 @@ extern  void    SD_StopSound(void),
 				SD_WaitSoundDone(void);
 
 extern  void    SD_StartMusic(const char* chunk);
+extern  void    SD_PauseMusic(void);
 extern  void    SD_ContinueMusic(const char* chunk, int startoffs);
 extern  void    SD_MusicOn(void),
 				SD_FadeOutMusic(void);

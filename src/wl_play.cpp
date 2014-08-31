@@ -710,7 +710,16 @@ void CheckKeys (void)
 */
 int StopMusic (void)
 {
-	int lastoffs = SD_MusicOff ();
+	int lastoffs = 0;
+
+    if (music == NULL)
+    {
+        lastoffs = SD_MusicOff ();
+    }
+    else
+    {
+        SD_PauseMusic ();
+    }
 
 	return lastoffs;
 }

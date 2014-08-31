@@ -1037,10 +1037,14 @@ void CheckPause (void)
 		switch (SoundStatus)
 		{
 			case 0:
+                if (music == NULL)
 				SD_MusicOn ();
 				break;
 			case 1:
+                if (music == NULL)
 				SD_MusicOff ();
+                else
+                SD_PauseMusic ();
 				break;
 		}
 
