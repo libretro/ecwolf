@@ -1075,6 +1075,10 @@ int SD_PlaySound(const char* sound, SoundChannel chan)
 	if (sindex.GetPriority() < SoundPriority)
 		return 0;
 
+	// For now we can't play emulated sounds with sampled music.
+	if (music != NULL)
+		return 0;
+
 	bool didPlaySound = false;
 
 	switch (SoundMode)
@@ -1210,16 +1214,16 @@ SD_MusicOff(void)
 		default:
 			break;
 		case smm_AdLib:
-            if (music == NULL)
-            {
-			alOut(alEffects, 0);
-			for (i = 0;i < sqMaxTracks;i++)
-				alOut(alFreqH + i + 1, 0);
-            }
-            else
-            {
-                return 0;
-            }
+			if (music == NULL)
+			{
+				alOut(alEffects, 0);
+				for (i = 0;i < sqMaxTracks;i++)
+					alOut(alFreqH + i + 1, 0);
+			}
+			else
+			{
+				return 0;
+			}
 			break;
 	}
 
@@ -1253,67 +1257,63 @@ SD_StartMusic(const char* chunk)
 		if(lumpNum == -1)
 			return;
 
-        // Load our music file from chunk
-        chunkmem = new byte[Wads.LumpLength(lumpNum)];
-        FWadLump lump = Wads.OpenLumpNum(lumpNum);
-        lump.Read(chunkmem, Wads.LumpLength(lumpNum));
-        SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem, Wads.LumpLength(lumpNum));
-	    music = Mix_LoadMUS_RW(mus_cunk);
+		// Load our music file from chunk
+		chunkmem = new byte[Wads.LumpLength(lumpNum)];
+		FWadLump lump = Wads.OpenLumpNum(lumpNum);
+		lump.Read(chunkmem, Wads.LumpLength(lumpNum));
+		SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem, Wads.LumpLength(lumpNum));
+		music = Mix_LoadMUS_RW(mus_cunk);
 
-        // We assume that when music equals to NULL, we've an IMF file to play
-	    if (music == NULL)
-	    {
-	        delete [] chunkmem;
-	        chunkmem = NULL;
+		// We assume that when music equals to NULL, we've an IMF file to play
+		if (music == NULL)
+		{
+			Mix_HookMusic(SDL_IMFMusicPlayer, 0);
 
-            Mix_HookMusic(SDL_IMFMusicPlayer, 0);
+			SDL_LockMutex(audioMutex);
 
-            SDL_LockMutex(audioMutex);
+			for (int i = 0;i < OPL_CHANNELS;++i)
+				SDL_AlSetChanInst(&ChannelRelease, i);
 
-            for (int i = 0;i < OPL_CHANNELS;++i)
-                SDL_AlSetChanInst(&ChannelRelease, i);
+			if(sqHackFreeable != NULL)
+				delete[] sqHackFreeable;
+			sqHack = reinterpret_cast<word*>(chunkmem);
+			sqHackFreeable = sqHack;
+			chunkmem = NULL;
+			if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
+			else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
+			sqHackPtr = sqHack;
+			sqHackTime = 0;
+			alTimeCount = 0;
 
-            FWadLump lump = Wads.OpenLumpNum(lumpNum);
-            if(sqHackFreeable != NULL)
-                delete[] sqHackFreeable;
-            sqHack = new word[(Wads.LumpLength(lumpNum)/2)+1]; //+1 is just safety
-            sqHackFreeable = sqHack;
-            lump.Read(sqHack, Wads.LumpLength(lumpNum));
-            if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
-            else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
-            sqHackPtr = sqHack;
-            sqHackTime = 0;
-            alTimeCount = 0;
+			SDL_UnlockMutex(audioMutex);
 
-            SDL_UnlockMutex(audioMutex);
+			SD_MusicOn();
+		}
+		else
+		{
+			Mix_HookMusic(0, 0);
 
-            SD_MusicOn();
-        }
-        else
-        {
-            Mix_HookMusic(0, 0);
+			SDL_LockMutex(audioMutex);
 
-            SDL_LockMutex(audioMutex);
+			// Play the music
+			Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
+			if (Mix_PlayMusic(music, -1) == -1)
+			{
+				printf("Unable to play music file: %s\n", Mix_GetError());
+			}
 
-	        // Play the music
-	        Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
-	        if (Mix_PlayMusic(music, -1) == -1)
-	        {
-		        printf("Unable to play music file: %s\n", Mix_GetError());
-	        }
-
-            SDL_UnlockMutex(audioMutex);
-        }
+			SDL_UnlockMutex(audioMutex);
+		}
 	}
 }
 
 void
 SD_PauseMusic(void)
 {
-  if (music != NULL && Mix_PlayingMusic() == 1)
-  {
-      Mix_PauseMusic();
-  }
+	if (music != NULL && Mix_PlayingMusic() == 1)
+	{
+		Mix_PauseMusic();
+	}
 }
 
 void
@@ -1333,83 +1333,80 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 			if(sqHackFreeable != NULL)
 				delete[] sqHackFreeable;
 
-            // Load our music file from chunk
-            chunkmem = new byte[Wads.LumpLength(lumpNum)];
-            lump.Read(chunkmem, Wads.LumpLength(lumpNum));
-            SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem, Wads.LumpLength(lumpNum));
-            music = Mix_LoadMUS_RW(mus_cunk);
+			// Load our music file from chunk
+			chunkmem = new byte[Wads.LumpLength(lumpNum)];
+			lump.Read(chunkmem, Wads.LumpLength(lumpNum));
+			SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem, Wads.LumpLength(lumpNum));
+			music = Mix_LoadMUS_RW(mus_cunk);
 
-            if (music == NULL)
-            {
-                delete [] chunkmem;
-                chunkmem = NULL;
-
-                sqHack = new word[(Wads.LumpLength(lumpNum)/2)+1]; //+1 is just safety
-                sqHackFreeable = sqHack;
-                lump.Read(sqHack, Wads.LumpLength(lumpNum));
-                if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
-                else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
-                sqHackPtr = sqHack;
-            }
+			if (music == NULL)
+			{
+				sqHack = reinterpret_cast<word*>(chunkmem);
+				sqHackFreeable = sqHack;
+				chunkmem = NULL;
+				if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
+				else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
+				sqHackPtr = sqHack;
+			}
 		}
 
-        if (music == NULL)
-        {
-            if(startoffs >= sqHackLen)
-            {
-                SDL_UnlockMutex(audioMutex);
-                Quit("SD_StartMusic: Illegal startoffs provided!");
-            }
+		if (music == NULL)
+		{
+			if(startoffs >= sqHackLen)
+			{
+				SDL_UnlockMutex(audioMutex);
+				Quit("SD_StartMusic: Illegal startoffs provided!");
+			}
 
-            // fast forward to correct position
-            // (needed to reconstruct the instruments)
+			// fast forward to correct position
+			// (needed to reconstruct the instruments)
 
-            for(int i = 0; i < startoffs; i += 2)
-            {
-                byte reg = *(byte *)sqHackPtr;
-                byte val = *(((byte *)sqHackPtr) + 1);
-                if(reg >= 0xb1 && reg <= 0xb8) val &= 0xdf;           // disable play note flag
-                else if(reg == 0xbd) val &= 0xe0;                     // disable drum flags
+			for(int i = 0; i < startoffs; i += 2)
+			{
+				byte reg = *(byte *)sqHackPtr;
+				byte val = *(((byte *)sqHackPtr) + 1);
+				if(reg >= 0xb1 && reg <= 0xb8) val &= 0xdf;           // disable play note flag
+				else if(reg == 0xbd) val &= 0xe0;                     // disable drum flags
 
-                alOut(reg,val);
-                sqHackPtr += 2;
-                sqHackLen -= 4;
-            }
-            sqHackTime = 0;
-            alTimeCount = 0;
+				alOut(reg,val);
+				sqHackPtr += 2;
+				sqHackLen -= 4;
+			}
+			sqHackTime = 0;
+			alTimeCount = 0;
 
-            SDL_UnlockMutex(audioMutex);
+			SDL_UnlockMutex(audioMutex);
 
-            Mix_HookMusic(SDL_IMFMusicPlayer, 0);
+			Mix_HookMusic(SDL_IMFMusicPlayer, 0);
 
-            SD_MusicOn();
-        }
-        else
-        {
-            SDL_UnlockMutex(audioMutex);
+			SD_MusicOn();
+		}
+		else
+		{
+			SDL_UnlockMutex(audioMutex);
 
-            Mix_HookMusic(0, 0);
+			Mix_HookMusic(0, 0);
 
-            if (Mix_PausedMusic() == 1)
-            {
-                Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
-                Mix_ResumeMusic();
+			if (Mix_PausedMusic() == 1)
+			{
+				Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
+				Mix_ResumeMusic();
 
-                return;
-            }
+				return;
+			}
 
-	        // Play the music
-	        Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
-	        if (Mix_PlayMusic(music, -1) == -1)
-	        {
-		        printf("Unable to play music file: %s\n", Mix_GetError());
-	        }
+			// Play the music
+			Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
+			if (Mix_PlayMusic(music, -1) == -1)
+			{
+				printf("Unable to play music file: %s\n", Mix_GetError());
+			}
 
-            if (Mix_SetMusicPosition(startoffs) == -1)
-            {
-                printf("Mix_SetMusicPosition: %s\n", Mix_GetError());
-            }
-        }
+			if (Mix_SetMusicPosition(startoffs) == -1)
+			{
+				printf("Mix_SetMusicPosition: %s\n", Mix_GetError());
+			}
+		}
 	}
 }
 
@@ -1446,10 +1443,10 @@ bool SD_MusicPlaying(void)
 	switch (MusicMode)
 	{
 		case smm_AdLib:
-            if (music == NULL)
-			result = sqActive;	// not really thread-safe, but a mutex would be overkill
-            else
-            result = Mix_PlayingMusic();
+			if (music == NULL)
+				result = sqActive;	// not really thread-safe, but a mutex would be overkill
+			else
+				result = Mix_PlayingMusic();
 			break;
 		default:
 			result = false;
