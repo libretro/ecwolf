@@ -105,16 +105,21 @@ byte* chunkmem = NULL;
 
 void musicFinished(void)
 {
-    if (music != NULL)
-    {
-        Mix_HaltMusic();
-        Mix_FreeMusic(music);
-        music = NULL;
+	if (music != NULL)
+	{
+		Mix_HaltMusic();
+		Mix_FreeMusic(music);
+		music = NULL;
 
-        delete [] chunkmem;
+		delete [] chunkmem;
+		chunkmem = NULL;
+	}
+}
 
-        chunkmem = NULL;
-    }
+bool SD_UpdateMusicVolume(int which)
+{
+	Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
+	return 0;
 }
 
 #ifdef USE_GPL
@@ -862,7 +867,7 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 		if(!soundTimeCounter)
 		{
 			// Sound effects are played at 140 Hz (every 5 cycles of the 700 Hz music service)
-            soundTimeCounter = SOUND_TICKS;
+			soundTimeCounter = SOUND_TICKS;
 
 			SDL_PCService();
 
@@ -878,8 +883,8 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 				if (!(--alLengthLeft))
 				{
 					alSound = 0;
-                    SoundPriority=0;
-                    alOut(alFreqH, 0);
+					SoundPriority=0;
+					alOut(alFreqH, 0);
 				}
 			}
 		}
@@ -1222,6 +1227,7 @@ SD_MusicOff(void)
 			}
 			else
 			{
+				Mix_PauseMusic();
 				return 0;
 			}
 			break;
@@ -1296,7 +1302,6 @@ SD_StartMusic(const char* chunk)
 			SDL_LockMutex(audioMutex);
 
 			// Play the music
-			Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
 			if (Mix_PlayMusic(music, -1) == -1)
 			{
 				printf("Unable to play music file: %s\n", Mix_GetError());
@@ -1323,6 +1328,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 
 	if (MusicMode == smm_AdLib)
 	{
+		if (music == NULL)
 		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
 			int lumpNum = Wads.CheckNumForName(chunk, ns_music);
 			if(lumpNum == -1)
@@ -1389,14 +1395,11 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 
 			if (Mix_PausedMusic() == 1)
 			{
-				Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
 				Mix_ResumeMusic();
-
 				return;
 			}
 
 			// Play the music
-			Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
 			if (Mix_PlayMusic(music, -1) == -1)
 			{
 				printf("Unable to play music file: %s\n", Mix_GetError());
@@ -1446,7 +1449,7 @@ bool SD_MusicPlaying(void)
 			if (music == NULL)
 				result = sqActive;	// not really thread-safe, but a mutex would be overkill
 			else
-				result = Mix_PlayingMusic();
+				result = Mix_PlayingMusic() && !Mix_PausedMusic();
 			break;
 		default:
 			result = false;

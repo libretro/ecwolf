@@ -132,6 +132,7 @@ extern	int				AdlibVolume;
 extern	int				MusicVolume;
 extern	int				SoundVolume;
 extern bool SD_UpdatePCSpeakerVolume(int which=0);
+extern bool SD_UpdateMusicVolume(int which);
 
 enum SoundChannel
 {
