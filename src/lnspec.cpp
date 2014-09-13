@@ -498,32 +498,33 @@ public:
 						}
 						else if(ddeltax == 0 && sdeltax)
 						{
-							int tmp = relx;
-							if(ddeltay > 0)
-							{
-								rely = relx;
-								relx = -tmp;
-								angle = ANGLE_90;
-
-								tmp = fracx;
-								fracx = (FRACUNIT-fracy);
-								fracy = tmp;
-							}
-							else
+							int tmp = rely;
+							if(ddeltay < 0)
 							{
 								rely = -relx;
 								relx = tmp;
-								angle = ANGLE_270;
+								angle = ANGLE_90;
 
 								tmp = (FRACUNIT-fracx);
 								fracx = fracy;
 								fracy = tmp;
 							}
+							else
+							{
+								rely = relx;
+								relx = -tmp;
+								angle = ANGLE_270;
+
+								tmp = fracx;
+								fracx = (FRACUNIT-fracy);
+								fracy = tmp;
+
+							}
 						}
 						else if(ddeltay == 0 && sdeltay)
 						{
 							int tmp = relx;
-							if(ddeltax > 0)
+							if(ddeltax < 0)
 							{
 								relx = rely;
 								rely = -tmp;
