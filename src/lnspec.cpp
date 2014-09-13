@@ -347,7 +347,7 @@ FUNC(Door_Open)
 		{
 			if(spot->thinker->IsThinkerType<EVDoor>())
 			{
-				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 			}
 			return 0;
 		}
@@ -364,7 +364,7 @@ FUNC(Door_Open)
 			{
 				if(door->thinker->IsThinkerType<EVDoor>())
 				{
-					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 				}
 				continue;
 			}
@@ -398,7 +398,7 @@ public:
 				EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
 				if(!doorThinker->IsClosing())
 				{
-					if(!doorThinker->Reactivate(activator, !!(activator->flags & FL_ISMONSTER)))
+					if(!doorThinker->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER)))
 					{
 						Destroy();
 						return;
@@ -563,7 +563,7 @@ public:
 						MapTrigger &trig = nextDoor->triggers[i];
 						if(trig.action == Door_Elevator)
 						{
-							map->ActivateTrigger(trig, MapTrigger::East, NULL);
+							map->ActivateTrigger(trig, MapTrigger::East, activator);
 							break;
 						}
 					}
@@ -587,7 +587,7 @@ protected:
 private:
 	enum State { ClosingDoor, Moving, Shaking, Finished };
 
-	AActor *activator;
+	TObjPtr<AActor> activator;
 	SndSeqPlayer *sndseq;
 	MapSpot spot;
 	MapSpot door;
@@ -597,7 +597,9 @@ private:
 	unsigned int callSpeed;
 	State state;
 };
-IMPLEMENT_INTERNAL_CLASS(EVElevator)
+IMPLEMENT_INTERNAL_POINTY_CLASS(EVElevator)
+	DECLARE_POINTER(activator)
+END_POINTERS
 
 // Takes same arugments as Door_Open, but the tag points to the elevator switch.
 // Will attempt to call the elevator if not in the correct position.
@@ -628,7 +630,7 @@ FUNC(Door_Elevator)
 	{
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
-			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 		}
 		return 0;
 	}
