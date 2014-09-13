@@ -81,66 +81,76 @@ class FAudiot : public FUncompressedFile
 
 		bool Open(bool quiet)
 		{
+			unsigned int segstart[4] = {0};
+			unsigned int curseg = 0;
+
 			audiohedReader->Seek(0, SEEK_END);
 			NumLumps = (audiohedReader->Tell()/4)-1;
 			audiohedReader->Seek(0, SEEK_SET);
 			Lumps = new FUncompressedLump[NumLumps];
-			// The vgahead has 24-bit ints.
 			DWORD* positions = new DWORD[NumLumps+1];
-			DWORD* sizes = new DWORD[NumLumps];
 			audiohedReader->Read(positions, (NumLumps+1)*4);
-			for(unsigned int i = NumLumps;i-- > 0;)
-				positions[i] = LittleLong(positions[i]);
 
-			// Since the music is at the end and is easy to identify we'll look for the end of the music.
-			// HACK: I'm using the fact that the IMFs have the string IMF near
-			//       the end of the files to identify them.
-			int musicStart = -1;
-			sizes[NumLumps-1] = positions[NumLumps] - positions[NumLumps-1];
-			for(unsigned int i = NumLumps;i-- > 0;)
+			positions[0] = LittleLong(positions[0]);
+			for(unsigned int i = 0;i < NumLumps;++i)
 			{
-				if(i != 0)
-					sizes[i-1] = positions[i] - positions[i-1];
-				if(i != NumLumps-1 && musicStart == -1) // See if we can find the first music lump.
+				positions[i+1] = LittleLong(positions[i+1]);
+				DWORD size = positions[i+1] - positions[i];
+
+				char name[9];
+				sprintf(name, "AUD%05d", i);
+				Lumps[i].Owner = this;
+				Lumps[i].LumpNameSetup(name);
+				Lumps[i].Position = positions[i];
+				Lumps[i].LumpSize = size;
+				Lumps[i].Namespace = curseg != 3 ? ns_sounds : ns_music;
+
+				// Try to find !ID! tags
+				if(curseg < 3 && size >= 4)
 				{
-					if(sizes[i] < 64)
+					char tag[4];
+					Reader->Seek(positions[i]+size-4, SEEK_SET);
+					Reader->Read(tag, 4);
+					if(strncmp("!ID!", tag, 4) == 0)
 					{
-						musicStart = i+1;
-						continue;
-					}
-					Reader->Seek(positions[i]+sizes[i]-64, SEEK_SET);
-					char data[64];
-					Reader->Read(data, 64);
-					bool isMusic = false;
-					for(unsigned int j = 0;j+3 < 64;j++)
-					{
-						if(strnicmp(&data[j], "IMF", 3) == 0)
-						{
-							isMusic = true;
-							break;
-						}
-					}
-					if(!isMusic)
-					{
-						musicStart = i+1;
-						continue;
+						segstart[++curseg] = i;
+						Lumps[i].LumpSize -= 4;
 					}
 				}
 			}
-			for(unsigned int i = 0;i < NumLumps;i++)
+
+			// If we didn't find enough !ID! tags, lets try another method of
+			// counting.  Since digitized chunks were not used, find the first
+			// empty chunk.
+			if(curseg != 4)
 			{
-				// Give the lump a temporary name.
-				char lumpname[9];
-				sprintf(lumpname, "AUD%05d", i);
-				Lumps[i].Owner = this;
-				Lumps[i].LumpNameSetup(lumpname);
-				Lumps[i].Namespace = i >= (unsigned int)musicStart ? ns_music : ns_sounds;
-				Lumps[i].Position = positions[i];
-				Lumps[i].LumpSize = sizes[i];
+				for(int i = NumLumps-1;i >= 0;i -= 3)
+				{
+					if(Lumps[i].LumpSize <= 4)
+					{
+						for(++i;i < static_cast<int>(NumLumps);++i)
+							Lumps[i].Namespace = ns_music;
+						break;
+					}
+				}
 			}
+
 			delete[] positions;
-			delete[] sizes;
-			if(!quiet) Printf(", %d lumps\n", NumLumps);
+
+			if(!quiet)
+			{
+				Printf(", %d lumps\n", NumLumps);
+
+				// Check that there are the same number of each sound type.
+				// Technically the format can contain differing numbers, but
+				// the engine may not like that, so issue a warning.
+				if(curseg == 4)
+				{
+					DWORD numsounds = segstart[1] - segstart[0];
+					if(segstart[2] - segstart[1] != numsounds || segstart[3] - segstart[2] != numsounds)
+						Printf("Warning: AUDIOT doesn't contain the same number of AdLib, PC Speaker, and Digitized sound chunks.\n");
+				}
+			}
 
 			LumpRemapper::AddFile(extension, this, LumpRemapper::AUDIOT);
 			return true;
