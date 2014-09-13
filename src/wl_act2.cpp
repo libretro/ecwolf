@@ -379,7 +379,7 @@ ACTION_FUNCTION(A_Dormant)
 	}
 
 	self->flags |= FL_AMBUSH | FL_SHOOTABLE | FL_SOLID;
-	self->flags &= ~FL_ATTACKMODE;
+	self->flags &= ~(FL_ATTACKMODE|FL_COUNTKILL);
 	self->dir = nodir;
 	self->SetState(self->SeeState);
 	return true;
