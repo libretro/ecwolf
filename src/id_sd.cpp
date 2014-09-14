@@ -1080,9 +1080,11 @@ int SD_PlaySound(const char* sound, SoundChannel chan)
 	if (sindex.GetPriority() < SoundPriority)
 		return 0;
 
-	// For now we can't play emulated sounds with sampled music.
+#ifndef ECWOLF_MIXER
+	// With stock SDL_mixer we can't play music and emulated sounds.
 	if (music != NULL)
 		return 0;
+#endif
 
 	bool didPlaySound = false;
 
