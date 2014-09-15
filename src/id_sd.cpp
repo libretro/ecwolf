@@ -934,6 +934,10 @@ SD_Startup(void)
 		return;
 	}
 
+#ifdef __unix__
+	Mix_SetSoundFonts("/usr/share/sounds/sf2/FluidR3_GM.sf2");
+#endif
+
 	if(Mix_OpenAudio(param_samplerate, AUDIO_S16, 2, param_audiobuffer))
 	{
 		printf("Unable to open audio: %s\n", Mix_GetError());

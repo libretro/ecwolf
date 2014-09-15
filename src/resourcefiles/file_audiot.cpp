@@ -113,7 +113,7 @@ class FAudiot : public FUncompressedFile
 					Reader->Read(tag, 4);
 					if(strncmp("!ID!", tag, 4) == 0)
 					{
-						segstart[++curseg] = i;
+						segstart[++curseg] = i+1;
 						Lumps[i].LumpSize -= 4;
 					}
 				}
@@ -122,13 +122,14 @@ class FAudiot : public FUncompressedFile
 			// If we didn't find enough !ID! tags, lets try another method of
 			// counting.  Since digitized chunks were not used, find the first
 			// empty chunk.
-			if(curseg != 4)
+			if(curseg != 3)
 			{
-				for(int i = NumLumps-1;i >= 0;i -= 3)
+				for(int i = NumLumps-(NumLumps%3)-1;i >= 0;i -= 3)
 				{
 					if(Lumps[i].LumpSize <= 4)
 					{
-						for(++i;i < static_cast<int>(NumLumps);++i)
+						segstart[3] = ++i;
+						for(;i < static_cast<int>(NumLumps);++i)
 							Lumps[i].Namespace = ns_music;
 						break;
 					}
@@ -136,6 +137,8 @@ class FAudiot : public FUncompressedFile
 			}
 
 			delete[] positions;
+
+			MidiHack(segstart[3]);
 
 			if(!quiet)
 			{
@@ -154,6 +157,31 @@ class FAudiot : public FUncompressedFile
 
 			LumpRemapper::AddFile(extension, this, LumpRemapper::AUDIOT);
 			return true;
+		}
+
+		// Scan music lumps that may be MIDI and fudge some numbers.  We need
+		// to do this since we normally want the length of the data to be a
+		// part of the lump, but that's not the case for MIDI data.
+		//
+		// Having the length in the lump is probably a relic from reverse
+		// engineering.  The first two bytes are probably supposed to be
+		// considered part of the container.
+		void MidiHack(unsigned int music)
+		{
+			for(;music < NumLumps; ++music)
+			{
+				if(Lumps[music].LumpSize < 6)
+					continue;
+
+				char head[4];
+				Reader->Seek(Lumps[music].Position+2, SEEK_SET);
+				Reader->Read(head, 4);
+				if(strncmp("MThd", head, 4) == 0)
+				{
+					Lumps[music].LumpSize -= 2;
+					Lumps[music].Position += 2;
+				}
+			}
 		}
 
 	private:
