@@ -541,7 +541,7 @@ map "MAP19"
 	secretnext = "MAP20"
 	floornumber = "5-2"
 	music = "SONG1"
-	cluster = 165
+	cluster = 5
 	defaultfloor = "FLOOR2"
 	defaultceiling = "CEILING2"
 }
