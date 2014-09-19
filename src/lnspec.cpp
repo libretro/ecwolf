@@ -44,6 +44,7 @@
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_loadsave.h"
 #include "wl_play.h"
 #include "g_mapinfo.h"
 #include "g_shared/a_keys.h"
@@ -243,6 +244,8 @@ class EVDoor : public Thinker
 				<< amount
 				<< wait
 				<< direction;
+			if(GameSave::SaveVersion > 1410810515)
+				arc << sndseq << seqname << opentics;
 
 			Super::Serialize(arc);
 		}
@@ -822,6 +825,9 @@ class EVPushwall : public Thinker
 				<< position
 				<< speed
 				<< distance;
+
+			if(GameSave::SaveVersion > 1410810515)
+				arc << sndseq << seqname;
 
 			Super::Serialize(arc);
 		}

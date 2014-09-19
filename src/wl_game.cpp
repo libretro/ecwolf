@@ -256,8 +256,6 @@ void SetupGameLevel (void)
 		gamestate.faceframe.SetInvalid();
 		LastAttacker = NULL;
 		players[0].killerobj = NULL;
-
-		thinkerList->DestroyAll();
 	}
 
 //
@@ -729,10 +727,7 @@ void Died (void)
 	ClearMemory();
 
 	if (players[0].lives > -1)
-	{
 		players[0].state = player_t::PST_REBORN;
-		thinkerList->DestroyAll();
-	}
 }
 
 //==========================================================================
