@@ -382,8 +382,22 @@ static void processEvent(SDL_Event *event)
 			break;
 		}
 
-		/*case SDL_ACTIVEEVENT:
+		case SDL_ACTIVEEVENT:
 		{
+			if (!fullscreen && forcegrabmouse && (event->active.state & SDL_APPINPUTFOCUS || event->active.state & SDL_APPACTIVE))
+			{
+					// Release the mouse if we lose input focus, grab it again
+					// when we gain input focus.
+				if (event->active.gain == 1)
+				{
+					IN_GrabMouse();
+				}
+				else
+				{
+					IN_ReleaseMouse();
+				}
+			}
+								/*
 			if(fullscreen && (event->active.state & SDL_APPACTIVE) != 0)
 			{
 					if(event->active.gain)
@@ -391,8 +405,10 @@ static void processEvent(SDL_Event *event)
 						NeedRestore = false;
 					}
 					else NeedRestore = true;
-			}
-		}*/
+			}*/
+
+			break;
+		}
 	}
 }
 
