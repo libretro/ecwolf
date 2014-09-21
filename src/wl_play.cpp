@@ -233,9 +233,9 @@ void PollKeyboardButtons (void)
 void PollMouseButtons (void)
 {
 	int buttons = IN_MouseButtons();
-	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	for (int i = 0; controlScheme[i].button != bt_nobutton; i++)
 	{
-		if(controlScheme[i].mouse != -1 && (buttons & (1<<controlScheme[i].mouse)))
+		if (controlScheme[i].mouse != -1 && (buttons & (1 << controlScheme[i].mouse)))
 			buttonstate[controlScheme[i].button] = true;
 	}
 }
@@ -411,7 +411,7 @@ void PollControls (bool absolutes)
 // get button states
 //
 	PollKeyboardButtons ();
-
+	
 	if (mouseenabled && IN_IsInputGrabbed())
 		PollMouseButtons ();
 
@@ -919,6 +919,15 @@ void PlayLoop (void)
 	funnyticount = 0;
 	memset (buttonstate, 0, sizeof (buttonstate));
 	ClearPaletteShifts ();
+
+	if(automap != AMA_Off)
+	{
+			// Force the automap to off if it were previously on, unpause the game if am_pause
+		automap = AMA_Off;
+
+		if(am_pause) Paused &= ~2;
+	}
+
 
 	if (MousePresent && IN_IsInputGrabbed())
 		IN_CenterMouse();         // Clear accumulated mouse movement
