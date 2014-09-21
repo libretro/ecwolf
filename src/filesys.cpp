@@ -171,8 +171,8 @@ void SetupPaths(int argc, const char * const *argv)
 	{
 		char tempCName[MAX_PATH];
 		wchar_t tempName[MAX_PATH];
-		memset(tempCName, 0, MAX_PATH*sizeof(wchar_t));
-		memset(tempName, 0, MAX_PATH);
+		memset(tempCName, 0, MAX_PATH);
+		memset(tempName, 0, MAX_PATH*sizeof(wchar_t));
 		if(SUCCEEDED(GetModuleFileNameW(NULL, tempName, MAX_PATH)))
 		{
 			ConvertName(tempName, tempCName);
