@@ -296,6 +296,9 @@ class ClassDef
 		friend class StateLabel;
 		static const size_t POINTER_END;
 
+		static void ParseActorStateDuration(Scanner &sc, StateDefinition &thisState);
+		static bool ParseActorStateFlags(Scanner &sc, StateDefinition &thisState);
+		static void ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted);
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
