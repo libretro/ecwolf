@@ -116,7 +116,9 @@ void AM_CheckKeys()
 	if(am_pause)
 	{
 		static const fixed PAN_AMOUNT = FRACUNIT/4;
+		static const fixed PAN_ANALOG_MULTIPLIER = 100;
 		fixed panx = 0, pany = 0;
+
 		if(ambuttonstate[bt_panleft])
 			panx += PAN_AMOUNT;
 		if(ambuttonstate[bt_panright])
@@ -125,6 +127,13 @@ void AM_CheckKeys()
 			pany += PAN_AMOUNT;
 		if(ambuttonstate[bt_pandown])
 			pany -= PAN_AMOUNT;
+
+		if(controlpanx != 0)
+			panx += controlpanx * PAN_ANALOG_MULTIPLIER;
+
+		if(controlpany != 0)
+			pany += controlpany * PAN_ANALOG_MULTIPLIER;
+
 		AM_Main.SetPanning(panx, pany, true);
 	}
 }

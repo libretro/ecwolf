@@ -55,6 +55,8 @@ extern bool am_drawfloors;
 extern unsigned am_overlay;
 extern bool am_pause;
 extern bool am_showratios;
+extern int	automap_panx;
+extern int	automap_pany;
 
 void AM_ChangeResolution();
 void AM_CheckKeys();
