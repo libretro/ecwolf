@@ -301,6 +301,14 @@ class ClassDef
 		static bool ParseActorStateFlags(Scanner &sc, StateDefinition &thisState);
 		static void ParseActorStateAction(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int funcIdx);
 
+		static ClassDef *ParseActorHeader(Scanner &sc, bool &previouslyDefined, bool &isNative);
+		static bool ParseActorInheritance(Scanner &sc, ClassDef *newClass);
+		static bool ParseActorReplacements(Scanner &sc, ClassDef *newClass);
+
+		static bool ParseActorFlag(Scanner &sc, ClassDef *newClass);
+
+		static bool InitializeActor(ClassDef *newClass, bool isNative);
+
 		static void ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted);
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);

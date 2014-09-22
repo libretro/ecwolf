@@ -1270,13 +1270,16 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 	newClass->InstallStates(stateDefs);
 }
 
-void ClassDef::ParseActor(Scanner &sc)
+// Returns the new class to operate on
+ClassDef *ClassDef::ParseActorHeader(Scanner &sc, bool &previouslyDefined, bool &isNative)
 {
-	// Read the header
 	sc.MustGetToken(TK_Identifier);
+
 	ClassDef **classRef = ClassTable().CheckKey(sc->str);
 	ClassDef *newClass;
-	bool previouslyDefined = classRef != NULL;
+
+	previouslyDefined = (classRef != NULL);
+
 	if(!previouslyDefined)
 	{
 		newClass = new ClassDef();
@@ -1284,26 +1287,62 @@ void ClassDef::ParseActor(Scanner &sc)
 	}
 	else
 		newClass = *classRef;
-	bool native = false;
-	newClass->name = sc->str;
+
+	ParseActorInheritance(sc, newClass);
+	ParseActorReplacements(sc, newClass);
+
+	if(sc.CheckToken(TK_IntConst))
+	{
+		if(EditorNumberTable.CheckKey(sc->number) != NULL)
+			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
+
+		EditorNumberTable[sc->number] = newClass;
+	}
+
+	if(sc.CheckToken(TK_Identifier))
+	{
+		if(sc->str.CompareNoCase("native") == 0)
+			isNative = true;
+		else
+			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.", sc->str.GetChars());
+	}
+
+	return newClass;
+}
+
+
+// Returns true if explicit inheritance was found; false otherwise
+bool ClassDef::ParseActorInheritance(Scanner &sc, ClassDef *newClass)
+{
 	if(sc.CheckToken(':'))
 	{
 		sc.MustGetToken(TK_Identifier);
+
 		const ClassDef *parent = FindClass(sc->str);
+
 		if(parent == NULL)
 			sc.ScriptMessage(Scanner::ERROR, "Could not find parent actor '%s'\n", sc->str.GetChars());
 		if(newClass->tentative && !parent->IsDescendantOf(newClass->parent))
 			sc.ScriptMessage(Scanner::ERROR, "Parent for actor expected to be '%s'\n", newClass->parent->GetName().GetChars());
+
 		newClass->parent = parent;
+
+		return true;
 	}
-	else
+	else if(newClass != NATIVE_CLASS(Actor))
 	{
 		// If no class was specified to inherit from, inherit from AActor, but not for AActor.
-		if(newClass != NATIVE_CLASS(Actor))
-			newClass->parent = NATIVE_CLASS(Actor);
+
+		newClass->parent = NATIVE_CLASS(Actor);
 	}
 
-	// Handle class replacements
+	return false;
+}
+
+// Returns true if a replacement was specified; false otherwise
+bool ClassDef::ParseActorReplacements(Scanner &sc, ClassDef *newClass)
+{
+		// Handle class replacements
 	if(sc.CheckToken(TK_Identifier))
 	{
 		if(sc->str.CompareNoCase("replaces") == 0)
@@ -1316,30 +1355,20 @@ void ClassDef::ParseActor(Scanner &sc)
 			ClassDef *replacee = const_cast<ClassDef *>(FindClassTentative(sc->str, NATIVE_CLASS(Actor)));
 			replacee->replacement = newClass;
 			newClass->replacee = replacee;
+
+			return true;
 		}
 		else
 			sc.Rewind();
 	}
 
-	if(sc.CheckToken(TK_IntConst))
-	{
-		if(EditorNumberTable.CheckKey(sc->number) != NULL)
-			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
-		EditorNumberTable[sc->number] = newClass;
-	}
-	if(sc.CheckToken(TK_Identifier))
-	{
-		if(sc->str.CompareNoCase("native") == 0)
-			native = true;
-		else
-			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.", sc->str.GetChars());
-	}
-	if(previouslyDefined && !native && !newClass->tentative)
-		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.", newClass->name.GetChars());
-	else
-		newClass->tentative = false;
+	return false;
+}
 
-	if(!native) // Initialize the default instance to the nearest native class.
+// Return true if we were able to initialize the actor with whatever sane defaults we may have; false if we were not
+bool ClassDef::InitializeActor(ClassDef *newClass, bool isNative)
+{
+	if(!isNative) // Initialize the default instance to the nearest native class.
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
 		newClass->size = newClass->parent->size;
@@ -1352,12 +1381,13 @@ void ClassDef::ParseActor(Scanner &sc)
 		// This could happen if a non-native actor is declared native or
 		// possibly in the case of a stuck dependency.
 		if(!newClass->defaultInstance)
-			sc.ScriptMessage(Scanner::ERROR, "Uninitialized default instance for '%s'.", newClass->GetName().GetChars());
+			return false;
 
 		// Copy the parents defaults for native classes
 		if(newClass->parent)
 			memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 	}
+
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
 	{
@@ -1366,32 +1396,62 @@ void ClassDef::ParseActor(Scanner &sc)
 		newClass->Meta = newClass->parent->Meta;
 	}
 
+	return true;
+}
+
+// Returns true if the flag could be set/unset; false if it could not
+bool ClassDef::ParseActorFlag(Scanner &sc, ClassDef *newClass)
+{
+	bool set = sc->token == '+';
+	FString prefix;
+	
+	sc.MustGetToken(TK_Identifier);
+	FString flagName = sc->str;
+	
+	if(sc.CheckToken('.'))
+	{
+		prefix = flagName;
+		sc.MustGetToken(TK_Identifier);
+		flagName = sc->str;
+	}
+
+	if(!SetFlag(newClass, (AActor*)newClass->defaultInstance, prefix, flagName, set))
+	{
+		sc.ScriptMessage(Scanner::WARNING, "Unknown flag '%s' for actor '%s'.", flagName.GetChars(), newClass->name.GetChars());
+		return false;
+	}
+
+	return true;
+}
+
+void ClassDef::ParseActor(Scanner &sc)
+{
+	// Read the header
+	bool previouslyDefined = false;
+	bool isNative = false;
+	ClassDef *newClass = ParseActorHeader(sc, previouslyDefined, isNative);
+
+	if(previouslyDefined && !isNative && !newClass->tentative)
+		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.", newClass->name.GetChars());
+	else
+		newClass->tentative = false;
+
+	if(!InitializeActor(newClass, isNative))
+		sc.ScriptMessage(Scanner::ERROR, "Uninitialized default instance for '%s'.", newClass->GetName().GetChars());
+
 	bool actionsSorted = true;
 	sc.MustGetToken('{');
+
 	while(!sc.CheckToken('}'))
 	{
 		if(sc.CheckToken('+') || sc.CheckToken('-'))
-		{
-			bool set = sc->token == '+';
-			FString prefix;
-			sc.MustGetToken(TK_Identifier);
-			FString flagName = sc->str;
-			if(sc.CheckToken('.'))
-			{
-				prefix = flagName;
-				sc.MustGetToken(TK_Identifier);
-				flagName = sc->str;
-			}
-			if(!SetFlag(newClass, (AActor*)newClass->defaultInstance, prefix, flagName, set))
-				sc.ScriptMessage(Scanner::WARNING, "Unknown flag '%s' for actor '%s'.", flagName.GetChars(), newClass->name.GetChars());
-		}
+			ParseActorFlag(sc, newClass);
 		else
 		{
 			sc.MustGetToken(TK_Identifier);
+
 			if(sc->str.CompareNoCase("states") == 0)
-			{
 				ParseActorState(sc, newClass, actionsSorted);
-			}
 			else if(sc->str.CompareNoCase("action") == 0)
 			{
 				actionsSorted = false;
