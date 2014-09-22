@@ -1084,9 +1084,8 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 			controlStatement = ParseActorStateControl(sc, newClass, thisState, DPARSER_CTL_STOP | DPARSER_CTL_GOTO);
 
 			// If it's not set to DPARSER_CTL_NONE, then it will be either STOP or GOTO
-			if(controlStatement != DPARSER_CTL_NONE && !sc.CheckToken('}')) {
+			if(controlStatement != DPARSER_CTL_NONE && !sc.CheckToken('}'))
 				sc.MustGetToken(TK_Identifier);
-			}
 
 			stateString = sc->str;
 		}
