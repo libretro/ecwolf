@@ -934,6 +934,51 @@ void ClassDef::LoadActors()
 	}
 }
 
+#define DPARSER_CTL_NONE 0
+#define DPARSER_CTL_GOTO 1
+#define DPARSER_CTL_LOOP 2
+#define DPARSER_CTL_WAIT 4
+#define DPARSER_CTL_FAIL 8
+#define DPARSER_CTL_STOP 16
+#define DPARSER_CTL_ANYSTATEMENT (DPARSER_CTL_STOP | DPARSER_CTL_FAIL | DPARSER_CTL_WAIT | DPARSER_CTL_LOOP | DPARSER_CTL_GOTO)
+
+//  Returns the state that it parsed (DPARSER_CTL_NONE if none), sets up thisState
+int ClassDef::ParseActorStateControl(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int allowedStatements)
+{
+	int statement = 0;
+
+	if(sc->str.CompareNoCase("goto") == 0) statement = DPARSER_CTL_GOTO;
+	else if(sc->str.CompareNoCase("wait") == 0) statement = DPARSER_CTL_WAIT;
+	else if(sc->str.CompareNoCase("fail") == 0) statement = DPARSER_CTL_FAIL;
+	else if(sc->str.CompareNoCase("loop") == 0) statement = DPARSER_CTL_LOOP;
+	else if(sc->str.CompareNoCase("stop") == 0) statement = DPARSER_CTL_STOP;
+	
+	if(!(allowedStatements & statement)) return DPARSER_CTL_NONE;
+
+	switch(statement)
+	{
+		case DPARSER_CTL_GOTO:
+			thisState.jumpLabel = StateLabel(sc, newClass, true);
+			thisState.nextType = StateDefinition::GOTO;
+			break;
+
+		case DPARSER_CTL_FAIL:
+		case DPARSER_CTL_WAIT:
+			thisState.nextType = StateDefinition::WAIT;
+			break;
+
+		case DPARSER_CTL_LOOP:
+			thisState.nextType = StateDefinition::LOOP;
+			break;
+
+		case DPARSER_CTL_STOP:
+			thisState.nextType = StateDefinition::STOP;
+			break;
+	}
+
+	return statement;
+}
+
 void ClassDef::ParseActorStateDuration(Scanner &sc, StateDefinition &thisState)
 {
 	if(sc.CheckToken('-'))
@@ -1012,6 +1057,8 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 	//sc.MustGetToken(TK_Identifier); // We should already have grabbed the identifier in all other cases.
 	bool needIdentifier = true;
 	bool infiniteLoopProtection = false;
+	int controlStatement = DPARSER_CTL_NONE;
+
 	while(sc->token != '}' && !sc.CheckToken('}'))
 	{
 		StateDefinition thisState;
@@ -1034,19 +1081,11 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 				sc.ScriptMessage(Scanner::ERROR, "State defined with no frames.");
 			sc.MustGetToken(TK_Identifier);
 
+			controlStatement = ParseActorStateControl(sc, newClass, thisState, DPARSER_CTL_STOP | DPARSER_CTL_GOTO);
 
-			if(sc->str.CompareNoCase("stop") == 0)
-			{
-				thisState.nextType = StateDefinition::STOP;
-				if(!sc.CheckToken('}'))
-					sc.MustGetToken(TK_Identifier);
-			}
-			else if(sc->str.CompareNoCase("goto") == 0)
-			{
-				thisState.jumpLabel = StateLabel(sc, newClass, true);
-				thisState.nextType = StateDefinition::GOTO;
-				if(!sc.CheckToken('}'))
-					sc.MustGetToken(TK_Identifier);
+			// If it's not set to DPARSER_CTL_NONE, then it will be either STOP or GOTO
+			if(controlStatement != DPARSER_CTL_NONE && !sc.CheckToken('}')) {
+				sc.MustGetToken(TK_Identifier);
 			}
 
 			stateString = sc->str;
@@ -1088,25 +1127,11 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 					}
 					if(sc->str.Len() == 4 || func == 2)
 					{
-						if(sc->str.CompareNoCase("goto") == 0)
-						{
-							thisState.jumpLabel = StateLabel(sc, newClass, true);
-							thisState.nextType = StateDefinition::GOTO;
-						}
-						else if(sc->str.CompareNoCase("wait") == 0 || sc->str.CompareNoCase("fail") == 0)
-						{
-							thisState.nextType = StateDefinition::WAIT;
-						}
-						else if(sc->str.CompareNoCase("loop") == 0)
-						{
-							thisState.nextType = StateDefinition::LOOP;
-						}
-						else if(sc->str.CompareNoCase("stop") == 0)
-						{
-							thisState.nextType = StateDefinition::STOP;
-						}
-						else
+						controlStatement = ParseActorStateControl(sc, newClass, thisState, DPARSER_CTL_ANYSTATEMENT);
+
+						if(controlStatement == DPARSER_CTL_NONE)
 							needIdentifier = false;
+						
 						break;
 					}
 					else

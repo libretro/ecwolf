@@ -296,6 +296,7 @@ class ClassDef
 		friend class StateLabel;
 		static const size_t POINTER_END;
 
+		static int ParseActorStateControl(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int allowedStatements);
 		static void ParseActorStateDuration(Scanner &sc, StateDefinition &thisState);
 		static bool ParseActorStateFlags(Scanner &sc, StateDefinition &thisState);
 		static void ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted);
