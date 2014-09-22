@@ -299,6 +299,8 @@ class ClassDef
 		static int ParseActorStateControl(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int allowedStatements);
 		static void ParseActorStateDuration(Scanner &sc, StateDefinition &thisState);
 		static bool ParseActorStateFlags(Scanner &sc, StateDefinition &thisState);
+		static void ParseActorStateAction(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int funcIdx);
+
 		static void ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted);
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);

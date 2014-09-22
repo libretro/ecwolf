@@ -1046,6 +1046,110 @@ bool ClassDef::ParseActorStateFlags(Scanner &sc, StateDefinition &thisState)
 	return false;
 }
 
+void ClassDef::ParseActorStateAction(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int funcIdx)
+{
+	int specialNum = -1;
+	const ActionInfo *funcInf = newClass->FindFunction(sc->str, specialNum);
+	if(funcInf)
+	{
+		thisState.functions[funcIdx].pointer = *funcInf->func;
+
+		CallArguments *&ca = thisState.functions[funcIdx].args;
+		ca = new CallArguments();
+		CallArguments::Value val;
+		unsigned int argc = 0;
+
+		// When using a line special we have to inject a parameter.
+		if(specialNum >= 0)
+		{
+			val.useType = CallArguments::Value::VAL_INTEGER;
+			val.isExpression = false;
+			val.val.i = specialNum;
+			ca->AddArgument(val);
+			++argc;
+		}
+				
+		if(sc.CheckToken('('))
+		{
+			if(funcInf->maxArgs == 0)
+				sc.MustGetToken(')');
+			else if(!(funcInf->minArgs == 0 && sc.CheckToken(')')))
+			{
+				do
+				{
+					val.isExpression = false;
+
+					const Type *argType = funcInf->types[argc];
+					if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
+						argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT) ||
+						argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
+					{
+						val.isExpression = true;
+						if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
+							val.useType = CallArguments::Value::VAL_INTEGER;
+						else
+							val.useType = CallArguments::Value::VAL_DOUBLE;
+						val.expr = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
+					}
+					else if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
+					{
+						val.useType = CallArguments::Value::VAL_STATE;
+						if(sc.CheckToken(TK_IntConst))
+						{
+							if(thisState.frames.Len() > 1)
+								sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed on multistate definitions.");
+							FString label;
+							label.Format("%d", sc->number);
+							val.label = StateLabel(label, newClass);
+						}
+						else
+						{
+							sc.MustGetToken(TK_StringConst);
+							val.label = StateLabel(sc->str, newClass);
+						}
+					}
+					else
+					{
+						sc.MustGetToken(TK_StringConst);
+						val.useType = CallArguments::Value::VAL_STRING;
+						val.str = sc->str;
+					}
+					ca->AddArgument(val);
+
+					// Check if we can or should take another argument
+					if(sc.CheckToken(','))
+					{
+						if(argc+1 < funcInf->maxArgs)
+						{
+							++argc;
+							continue;
+						}
+						else if(funcInf->varArgs)
+							continue;
+					}
+					else
+					{
+						++argc;
+						break;
+					}
+				}
+				while(true);
+				sc.MustGetToken(')');
+			}
+		}
+		if(argc < funcInf->minArgs)
+			sc.ScriptMessage(Scanner::ERROR, "Too few arguments.");
+		else
+		{
+			// Push unused defaults.
+			while(argc < funcInf->maxArgs)
+				ca->AddArgument(funcInf->defaults[(argc++)-funcInf->minArgs]);
+		}
+	}
+	else
+		sc.ScriptMessage(Scanner::WARNING, "Could not find function %s.", sc->str.GetChars());
+}
+
 void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted)
 {
 	if(!actionsSorted)
@@ -1124,6 +1228,7 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 						sc.Rewind();
 						break;
 					}
+
 					if(sc->str.Len() == 4 || func == 2)
 					{
 						controlStatement = ParseActorStateControl(sc, newClass, thisState, DPARSER_CTL_ANYSTATEMENT);
@@ -1136,108 +1241,7 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 					else
 					{
 						if(sc->str.CompareNoCase("NOP") != 0)
-						{
-							int specialNum = -1;
-							const ActionInfo *funcInf = newClass->FindFunction(sc->str, specialNum);
-							if(funcInf)
-							{
-								thisState.functions[func].pointer = *funcInf->func;
-
-								CallArguments *&ca = thisState.functions[func].args;
-								ca = new CallArguments();
-								CallArguments::Value val;
-								unsigned int argc = 0;
-
-								// When using a line special we have to inject a parameter.
-								if(specialNum >= 0)
-								{
-									val.useType = CallArguments::Value::VAL_INTEGER;
-									val.isExpression = false;
-									val.val.i = specialNum;
-									ca->AddArgument(val);
-									++argc;
-								}
-				
-								if(sc.CheckToken('('))
-								{
-									if(funcInf->maxArgs == 0)
-										sc.MustGetToken(')');
-									else if(!(funcInf->minArgs == 0 && sc.CheckToken(')')))
-									{
-										do
-										{
-											val.isExpression = false;
-
-											const Type *argType = funcInf->types[argc];
-											if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
-												argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT) ||
-												argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
-											{
-												val.isExpression = true;
-												if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
-													val.useType = CallArguments::Value::VAL_INTEGER;
-												else
-													val.useType = CallArguments::Value::VAL_DOUBLE;
-												val.expr = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
-											}
-											else if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
-											{
-												val.useType = CallArguments::Value::VAL_STATE;
-												if(sc.CheckToken(TK_IntConst))
-												{
-													if(thisState.frames.Len() > 1)
-														sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed on multistate definitions.");
-													FString label;
-													label.Format("%d", sc->number);
-													val.label = StateLabel(label, newClass);
-												}
-												else
-												{
-													sc.MustGetToken(TK_StringConst);
-													val.label = StateLabel(sc->str, newClass);
-												}
-											}
-											else
-											{
-												sc.MustGetToken(TK_StringConst);
-												val.useType = CallArguments::Value::VAL_STRING;
-												val.str = sc->str;
-											}
-											ca->AddArgument(val);
-
-											// Check if we can or should take another argument
-											if(sc.CheckToken(','))
-											{
-												if(argc+1 < funcInf->maxArgs)
-												{
-													++argc;
-													continue;
-												}
-												else if(funcInf->varArgs)
-													continue;
-											}
-											else
-											{
-												++argc;
-												break;
-											}
-										}
-										while(true);
-										sc.MustGetToken(')');
-									}
-								}
-								if(argc < funcInf->minArgs)
-									sc.ScriptMessage(Scanner::ERROR, "Too few arguments.");
-								else
-								{
-									// Push unused defaults.
-									while(argc < funcInf->maxArgs)
-										ca->AddArgument(funcInf->defaults[(argc++)-funcInf->minArgs]);
-								}
-							}
-							else
-								sc.ScriptMessage(Scanner::WARNING, "Could not find function %s.", sc->str.GetChars());
-						}
+							ParseActorStateAction(sc, newClass, thisState, func);
 					}
 
 					if(!sc.CheckToken(TK_Identifier))
