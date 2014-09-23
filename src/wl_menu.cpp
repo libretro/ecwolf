@@ -219,23 +219,7 @@ MENU_LISTENER(ReadThis)
 }
 MENU_LISTENER(ToggleFullscreen)
 {
-	fullscreen = vid_fullscreen;
-	if(fullscreen)
-	{
-		screenWidth = fullScreenWidth;
-		screenHeight = fullScreenHeight;
-	}
-	else
-	{
-		screenWidth = windowedScreenWidth;
-		screenHeight = windowedScreenHeight;
-	}
-
-	// Recalculate the aspect ratio, because this can change from fullscreen to windowed now
-	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
-	screen->Unlock();
-	VL_SetVGAPlaneMode();
-	screen->Lock(false);
+	SetFullscreen(vid_fullscreen);
 	displayMenu.draw();
 	return true;
 }

@@ -37,6 +37,9 @@ extern SDL_Color gamepal[256];
 
 #define VL_WaitVBL(a) SDL_Delay((a)*8)
 
+void ToggleFullscreen();
+void SetFullscreen(bool isFull);
+
 void VL_ReadPalette(const char* lump);
 
 void VL_SetVGAPlaneMode (bool forSignon=false);

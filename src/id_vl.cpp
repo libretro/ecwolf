@@ -1,6 +1,7 @@
 // ID_VL.C
 
 #include <string.h>
+#include "c_cvars.h"
 #include "wl_def.h"
 #include "id_vl.h"
 #include "id_vh.h"
@@ -58,6 +59,35 @@ static struct
 	uint8_t r,g,b;
 	int amount;
 } currentBlend;
+
+//===========================================================================
+
+void ToggleFullscreen()
+{
+	SetFullscreen(!fullscreen);
+}
+
+void SetFullscreen(bool isFull)
+{
+	vid_fullscreen = fullscreen = isFull;
+
+	if (fullscreen)
+	{
+		screenWidth = fullScreenWidth;
+		screenHeight = fullScreenHeight;
+	}
+	else
+	{
+		screenWidth = windowedScreenWidth;
+		screenHeight = windowedScreenHeight;
+	}
+
+	// Recalculate the aspect ratio, because this can change from fullscreen to windowed now
+	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
+	screen->Unlock();
+	VL_SetVGAPlaneMode();
+	screen->Lock(false);
+}
 
 //===========================================================================
 
