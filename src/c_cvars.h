@@ -61,4 +61,10 @@ extern Aspect	vid_aspect;
 extern bool		quitonescape;
 extern fixed	movebob;
 
+//
+// control info
+//
+extern  bool		alwaysrun;
+extern  bool		mouseenabled, mouseyaxisdisabled, joystickenabled;
+
 #endif /* __C_CVARS__ */

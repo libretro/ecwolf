@@ -1,3 +1,4 @@
+#include "c_cvars.h"
 #include "m_classes.h"
 #include "wl_def.h"
 #include "wl_menu.h"
