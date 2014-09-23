@@ -110,8 +110,10 @@ void ReadConfig(void)
 	config.CreateSetting("DigitizedVolume", MAX_VOLUME);
 	config.CreateSetting("Vid_FullScreen", false);
 	config.CreateSetting("Vid_Aspect", ASPECT_NONE);
-	config.CreateSetting("ScreenWidth", screenWidth);
-	config.CreateSetting("ScreenHeight", screenHeight);
+	config.CreateSetting("FullScreenWidth", fullScreenWidth);
+	config.CreateSetting("FullScreenHeight", fullScreenHeight);
+	config.CreateSetting("WindowedScreenWidth", windowedScreenWidth);
+	config.CreateSetting("WindowedScreenHeight", windowedScreenHeight);
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
 	config.CreateSetting("Gamma", 1.0f);
@@ -161,8 +163,10 @@ void ReadConfig(void)
 	SoundVolume = config.GetSetting("DigitizedVolume")->GetInteger();
 	vid_fullscreen = config.GetSetting("Vid_FullScreen")->GetInteger() != 0;
 	vid_aspect = static_cast<Aspect>(config.GetSetting("Vid_Aspect")->GetInteger());
-	screenWidth = config.GetSetting("ScreenWidth")->GetInteger();
-	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
+	fullScreenWidth = config.GetSetting("FullScreenWidth")->GetInteger();
+	fullScreenHeight = config.GetSetting("FullScreenHeight")->GetInteger();
+	windowedScreenWidth = config.GetSetting("WindowedScreenWidth")->GetInteger();
+	windowedScreenHeight = config.GetSetting("WindowedScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
 	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());
@@ -213,6 +217,18 @@ void ReadConfig(void)
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
+
+	// Set screenHeight, screenWidth
+	if(vid_fullscreen)
+	{
+		screenHeight = fullScreenHeight;
+		screenWidth = fullScreenWidth;
+	}
+	else
+	{
+		screenHeight = windowedScreenHeight;
+		screenWidth = windowedScreenWidth;
+	}
 }
 
 /*
@@ -265,8 +281,10 @@ void WriteConfig(void)
 	config.GetSetting("DigitizedVolume")->SetValue(SoundVolume);
 	config.GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
 	config.GetSetting("Vid_Aspect")->SetValue(vid_aspect);
-	config.GetSetting("ScreenWidth")->SetValue(screenWidth);
-	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
+	config.GetSetting("FullScreenWidth")->SetValue(fullScreenWidth);
+	config.GetSetting("FullScreenHeight")->SetValue(fullScreenHeight);
+	config.GetSetting("WindowedScreenWidth")->SetValue(windowedScreenWidth);
+	config.GetSetting("WindowedScreenHeight")->SetValue(windowedScreenHeight);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
 	config.GetSetting("MoveBob")->SetValue(movebob);
 	config.GetSetting("Gamma")->SetValue(screenGamma);

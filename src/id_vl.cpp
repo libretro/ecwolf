@@ -31,6 +31,10 @@ bool fullscreen = true;
 bool usedoublebuffering = true;
 unsigned screenWidth = 640;
 unsigned screenHeight = 480;
+unsigned fullScreenWidth = 640;
+unsigned fullScreenHeight = 480;
+unsigned windowedScreenWidth = 640;
+unsigned windowedScreenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
 float screenGamma = 1.0f;
 
