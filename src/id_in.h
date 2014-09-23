@@ -180,6 +180,7 @@ void    IN_ProcessEvents();
 int     IN_MouseButtons (void);
 void	IN_ReleaseMouse();
 void	IN_GrabMouse();
+void    IN_AdjustMouse();
 
 bool	IN_JoyPresent();
 void    IN_SetJoyCurrent(int joyIndex);

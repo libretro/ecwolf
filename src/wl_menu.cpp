@@ -150,12 +150,11 @@ MENU_LISTENER(EnterControlBase)
 	controlBase[5]->setEnabled(IN_JoyPresent());
 	controlBase.draw();
 
-	if(forcegrabmouse || (fullscreen && mouseenabled))
-		IN_GrabMouse();
-	else if(!fullscreen)
-		IN_ReleaseMouse();
+	IN_AdjustMouse();
+
 	return true;
 }
+
 MENU_LISTENER(SetPlayerClassAndSwitch)
 {
 	playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[which]);
@@ -224,6 +223,9 @@ MENU_LISTENER(ToggleFullscreen)
 	VL_SetVGAPlaneMode();
 	screen->Lock(false);
 	displayMenu.draw();
+
+	IN_AdjustMouse();
+
 	return true;
 }
 MENU_LISTENER(SetAspectRatio)
