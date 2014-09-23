@@ -29,6 +29,8 @@ extern  fixed    pspriteyscale;
 extern  fixed    yaspect;
 extern  int      mousexadjustment;
 extern  int      mouseyadjustment;
+extern  int      panxadjustment;
+extern  int      panyadjustment;
 extern  int      shootdelta;
 extern  unsigned screenofs;
 

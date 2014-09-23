@@ -129,10 +129,10 @@ void AM_CheckKeys()
 			pany -= PAN_AMOUNT;
 
 		if(controlpanx != 0)
-			panx += controlpanx * PAN_ANALOG_MULTIPLIER;
+			panx += controlpanx * (PAN_ANALOG_MULTIPLIER + (100 * panxadjustment));
 
 		if(controlpany != 0)
-			pany += controlpany * PAN_ANALOG_MULTIPLIER;
+			pany += controlpany * (PAN_ANALOG_MULTIPLIER + (100 * panxadjustment));
 
 		AM_Main.SetPanning(panx, pany, true);
 	}

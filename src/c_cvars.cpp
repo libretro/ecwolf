@@ -100,6 +100,8 @@ void ReadConfig(void)
 	config.CreateSetting("ViewSize", 19);
 	config.CreateSetting("MouseXAdjustment", 5);
 	config.CreateSetting("MouseYAdjustment", 5);
+	config.CreateSetting("PanXAdjustment", 5);
+	config.CreateSetting("PanYAdjustment", 5);
 	config.CreateSetting("SoundDevice", sdm_AdLib);
 	config.CreateSetting("MusicDevice", smm_AdLib);
 	config.CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
@@ -153,6 +155,8 @@ void ReadConfig(void)
 	viewsize = config.GetSetting("ViewSize")->GetInteger();
 	mousexadjustment = config.GetSetting("MouseXAdjustment")->GetInteger();
 	mouseyadjustment = config.GetSetting("MouseYAdjustment")->GetInteger();
+	panxadjustment = config.GetSetting("PanXAdjustment")->GetInteger();
+	panyadjustment = config.GetSetting("PanYAdjustment")->GetInteger();
 	mouseyaxisdisabled = config.GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
 	alwaysrun = config.GetSetting("AlwaysRun")->GetInteger() != 0;
 	AdlibVolume = config.GetSetting("SoundVolume")->GetInteger();
@@ -205,11 +209,17 @@ void ReadConfig(void)
 	if(mouseenabled) mouseenabled=true;
 	if(joystickenabled) joystickenabled=true;
 
-	if(mousexadjustment<0) mousexadjustment=0;
-	else if(mousexadjustment>20) mousexadjustment=20;
+	if (mousexadjustment<0) mousexadjustment = 0;
+	else if (mousexadjustment>20) mousexadjustment = 20;
 
-	if(mouseyadjustment<0) mouseyadjustment=0;
-	else if(mouseyadjustment>20) mouseyadjustment=20;
+	if (mouseyadjustment<0) mouseyadjustment = 0;
+	else if (mouseyadjustment>20) mouseyadjustment = 20;
+
+	if (panxadjustment<0) panxadjustment = 0;
+	else if (panxadjustment>20) panxadjustment = 20;
+
+	if (panyadjustment<0) panyadjustment = 0;
+	else if (panyadjustment>20) panyadjustment = 20;
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
@@ -255,6 +265,8 @@ void WriteConfig(void)
 	config.GetSetting("ViewSize")->SetValue(viewsize);
 	config.GetSetting("MouseXAdjustment")->SetValue(mousexadjustment);
 	config.GetSetting("MouseYAdjustment")->SetValue(mouseyadjustment);
+	config.GetSetting("PanXAdjustment")->SetValue(panxadjustment);
+	config.GetSetting("PanYAdjustment")->SetValue(panyadjustment);
 	config.GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
 	config.GetSetting("AlwaysRun")->SetValue(alwaysrun);
 	config.GetSetting("SoundDevice")->SetValue(SoundMode);

@@ -110,6 +110,8 @@ bool	startgame;
 bool	loadedgame;
 int		mousexadjustment;
 int     mouseyadjustment;
+int		panxadjustment;
+int     panyadjustment;
 
 //
 // Command line parameter variables

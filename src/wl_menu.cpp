@@ -464,6 +464,10 @@ void CreateMenus()
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEYADJ"]));
 	mouseSensitivity.addItem(new SliderMenuItem(mouseyadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
 
+	mouseSensitivity.addItem(new LabelMenuItem(language["STR_PANXADJ"]));
+	mouseSensitivity.addItem(new SliderMenuItem(panxadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
+	mouseSensitivity.addItem(new LabelMenuItem(language["STR_PANYADJ"]));
+	mouseSensitivity.addItem(new SliderMenuItem(panyadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
 
 
 	controls.setHeadPicture("M_CUSTOM");
