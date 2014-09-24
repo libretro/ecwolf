@@ -38,12 +38,6 @@ extern  bool        demorecord,demoplayback;
 extern  int8_t      *demoptr, *lastdemoptr;
 extern  memptr      demobuffer;
 
-//
-// control info
-//
-extern  bool		alwaysrun;
-extern  bool		mouseenabled,mouseyaxisdisabled,joystickenabled;
-
 void    PlayLoop (void);
 
 void    InitRedShifts (void);

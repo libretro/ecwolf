@@ -734,6 +734,14 @@ void IN_GrabMouse()
 	}
 }
 
+void IN_AdjustMouse()
+{
+	if (mouseenabled && (forcegrabmouse || fullscreen))
+		IN_GrabMouse();
+	else if (!fullscreen)
+		IN_ReleaseMouse();
+}
+
 bool IN_IsInputGrabbed()
 {
 	return GrabInput;

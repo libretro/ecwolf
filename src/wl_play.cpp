@@ -1,5 +1,6 @@
 // WL_PLAY.C
 
+#include "c_cvars.h"
 #include "wl_def.h"
 #include "wl_menu.h"
 #include "id_ca.h"
@@ -143,9 +144,6 @@ void ControlScheme::setMouse(ControlScheme* scheme, Button button, int value)
 			scheme[i].mouse = value;
 	}
 }
-
-bool alwaysrun;
-bool mouseenabled, mouseyaxisdisabled, joystickenabled;
 
 int viewsize;
 

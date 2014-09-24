@@ -50,6 +50,10 @@ bool vid_fullscreen = false;
 bool quitonescape = false;
 fixed movebob = FRACUNIT;
 
+bool alwaysrun;
+bool mouseenabled, mouseyaxisdisabled, joystickenabled;
+
+
 void FinalReadConfig()
 {
 	SDMode  sd;
