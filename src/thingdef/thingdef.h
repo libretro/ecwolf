@@ -310,6 +310,9 @@ class ClassDef
 		static bool InitializeActor(ClassDef *newClass, bool isNative);
 
 		static void ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted);
+		static void ParseActorAction(Scanner &sc, ClassDef *newClass, bool &actionsSorted);
+		static void ParseActorNative(Scanner &sc, ClassDef *newClass);
+		static void ParseActorProperty(Scanner &sc, ClassDef *newClass);
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);

@@ -1424,6 +1424,152 @@ bool ClassDef::ParseActorFlag(Scanner &sc, ClassDef *newClass)
 	return true;
 }
 
+void ClassDef::ParseActorAction(Scanner &sc, ClassDef *newClass, bool &actionsSorted)
+{
+	actionsSorted = false;
+	sc.MustGetToken(TK_Identifier);
+	if (sc->str.CompareNoCase("native") != 0)
+		sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
+	sc.MustGetToken(TK_Identifier);
+	ActionInfo *funcInf = LookupFunction(sc->str, NULL);
+	if (!funcInf)
+		sc.ScriptMessage(Scanner::ERROR, "The specified function %s could not be located.", sc->str.GetChars());
+	newClass->actions.Push(funcInf);
+	sc.MustGetToken('(');
+	if (!sc.CheckToken(')'))
+	{
+		bool optRequired = false;
+		do
+		{
+			// If we have processed at least one argument, then we can take varArgs.
+			if (funcInf->minArgs > 0 && sc.CheckToken(TK_Ellipsis))
+			{
+				funcInf->varArgs = true;
+				break;
+			}
+
+			sc.MustGetToken(TK_Identifier);
+			const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
+			if (type == NULL)
+				sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
+			funcInf->types.Push(type);
+
+			if (sc->str.CompareNoCase("class") == 0)
+			{
+				sc.MustGetToken('<');
+				sc.MustGetToken(TK_Identifier);
+				sc.MustGetToken('>');
+			}
+			sc.MustGetToken(TK_Identifier);
+			if (optRequired || sc.CheckToken('='))
+			{
+				if (optRequired)
+					sc.MustGetToken('=');
+				else
+					optRequired = true;
+
+				CallArguments::Value defVal;
+				defVal.isExpression = false;
+
+				if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
+					type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT)
+					)
+				{
+					ExpressionNode *node = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
+					const ExpressionNode::Value &val = node->Evaluate(NULL);
+					if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
+					{
+						defVal.useType = CallArguments::Value::VAL_INTEGER;
+						defVal.val.i = val.GetInt();
+					}
+					else
+					{
+						defVal.useType = CallArguments::Value::VAL_DOUBLE;
+						defVal.val.d = val.GetDouble();
+					}
+					delete node;
+				}
+				else if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
+				{
+					sc.MustGetToken(TK_BoolConst);
+					defVal.useType = CallArguments::Value::VAL_INTEGER;
+					defVal.val.i = sc->boolean;
+				}
+				else if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
+				{
+					defVal.useType = CallArguments::Value::VAL_STATE;
+					if (sc.CheckToken(TK_IntConst))
+						sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed for defaults.");
+					else
+					{
+						sc.MustGetToken(TK_StringConst);
+						defVal.label = StateLabel(sc->str, newClass);
+					}
+				}
+				else
+				{
+					sc.MustGetToken(TK_StringConst);
+					defVal.useType = CallArguments::Value::VAL_STRING;
+					defVal.str = sc->str;
+				}
+				funcInf->defaults.Push(defVal);
+			}
+			else
+				++funcInf->minArgs;
+			++funcInf->maxArgs;
+		} while (sc.CheckToken(','));
+		sc.MustGetToken(')');
+	}
+	sc.MustGetToken(';');
+}
+
+void ClassDef::ParseActorNative(Scanner &sc, ClassDef *newClass)
+{
+	sc.MustGetToken(TK_Identifier);
+	const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
+	if (type == NULL)
+		sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
+	sc.MustGetToken(TK_Identifier);
+	FName varName(sc->str);
+	const SymbolInfo *symInf = NULL;
+	for (unsigned int i = 0; i < symbolPool->Size(); ++i)
+	{
+		// I think the symbol pool will be small enough to do a
+		// linear search on.
+		if ((*symbolPool)[i]->cls == newClass && (*symbolPool)[i]->var == varName)
+		{
+			symInf = (*symbolPool)[i];
+			break;
+		}
+	}
+	if (symInf == NULL)
+		sc.ScriptMessage(Scanner::ERROR, "Could not identify symbol %s::%s.\n", newClass->name.GetChars(), varName.GetChars());
+	sc.MustGetToken(';');
+
+	newClass->symbols.Push(new VariableSymbol(varName, type, symInf->offset));
+}
+
+void ClassDef::ParseActorProperty(Scanner &sc, ClassDef *newClass)
+{
+	FString className("actor");
+	FString propertyName = sc->str;
+	if (sc.CheckToken('.'))
+	{
+		className = propertyName;
+		sc.MustGetToken(TK_Identifier);
+		propertyName = sc->str;
+	}
+
+	if (!SetProperty(newClass, className, propertyName, sc))
+	{
+		do
+		{
+			sc.GetNextToken();
+		} while (sc.CheckToken(','));
+		sc.ScriptMessage(Scanner::WARNING, "Unknown property '%s' for actor '%s'.", propertyName.GetChars(), newClass->name.GetChars());
+	}
+}
+
 void ClassDef::ParseActor(Scanner &sc)
 {
 	// Read the header
@@ -1454,148 +1600,15 @@ void ClassDef::ParseActor(Scanner &sc)
 				ParseActorState(sc, newClass, actionsSorted);
 			else if(sc->str.CompareNoCase("action") == 0)
 			{
-				actionsSorted = false;
-				sc.MustGetToken(TK_Identifier);
-				if(sc->str.CompareNoCase("native") != 0)
-					sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
-				sc.MustGetToken(TK_Identifier);
-				ActionInfo *funcInf = LookupFunction(sc->str, NULL);
-				if(!funcInf)
-					sc.ScriptMessage(Scanner::ERROR, "The specified function %s could not be located.", sc->str.GetChars());
-				newClass->actions.Push(funcInf);
-				sc.MustGetToken('(');
-				if(!sc.CheckToken(')'))
-				{
-					bool optRequired = false;
-					do
-					{
-						// If we have processed at least one argument, then we can take varArgs.
-						if(funcInf->minArgs > 0 && sc.CheckToken(TK_Ellipsis))
-						{
-							funcInf->varArgs = true;
-							break;
-						}
-
-						sc.MustGetToken(TK_Identifier);
-						const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
-						if(type == NULL)
-							sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
-						funcInf->types.Push(type);
-
-						if(sc->str.CompareNoCase("class") == 0)
-						{
-							sc.MustGetToken('<');
-							sc.MustGetToken(TK_Identifier);
-							sc.MustGetToken('>');
-						}
-						sc.MustGetToken(TK_Identifier);
-						if(optRequired || sc.CheckToken('='))
-						{
-							if(optRequired)
-								sc.MustGetToken('=');
-							else
-								optRequired = true;
-
-							CallArguments::Value defVal;
-							defVal.isExpression = false;
-
-							if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
-								type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT)
-							)
-							{
-								ExpressionNode *node = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
-								const ExpressionNode::Value &val = node->Evaluate(NULL);
-								if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
-								{
-									defVal.useType = CallArguments::Value::VAL_INTEGER;
-									defVal.val.i = val.GetInt();
-								}
-								else
-								{
-									defVal.useType = CallArguments::Value::VAL_DOUBLE;
-									defVal.val.d = val.GetDouble();
-								}
-								delete node;
-							}
-							else if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
-							{
-								sc.MustGetToken(TK_BoolConst);
-								defVal.useType = CallArguments::Value::VAL_INTEGER;
-								defVal.val.i = sc->boolean;
-							}
-							else if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
-							{
-								defVal.useType = CallArguments::Value::VAL_STATE;
-								if(sc.CheckToken(TK_IntConst))
-									sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed for defaults.");
-								else
-								{
-									sc.MustGetToken(TK_StringConst);
-									defVal.label = StateLabel(sc->str, newClass);
-								}
-							}
-							else
-							{
-								sc.MustGetToken(TK_StringConst);
-								defVal.useType = CallArguments::Value::VAL_STRING;
-								defVal.str = sc->str;
-							}
-							funcInf->defaults.Push(defVal);
-						}
-						else
-							++funcInf->minArgs;
-						++funcInf->maxArgs;
-					}
-					while(sc.CheckToken(','));
-					sc.MustGetToken(')');
-				}
-				sc.MustGetToken(';');
+				ParseActorAction(sc, newClass, actionsSorted);
 			}
 			else if(sc->str.CompareNoCase("native") == 0)
 			{
-				sc.MustGetToken(TK_Identifier);
-				const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
-				if(type == NULL)
-					sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
-				sc.MustGetToken(TK_Identifier);
-				FName varName(sc->str);
-				const SymbolInfo *symInf = NULL;
-				for(unsigned int i = 0;i < symbolPool->Size();++i)
-				{
-					// I think the symbol pool will be small enough to do a
-					// linear search on.
-					if((*symbolPool)[i]->cls == newClass && (*symbolPool)[i]->var == varName)
-					{
-						symInf = (*symbolPool)[i];
-						break;
-					}
-				}
-				if(symInf == NULL)
-					sc.ScriptMessage(Scanner::ERROR, "Could not identify symbol %s::%s.\n", newClass->name.GetChars(), varName.GetChars());
-				sc.MustGetToken(';');
-
-				newClass->symbols.Push(new VariableSymbol(varName, type, symInf->offset));
+				ParseActorNative(sc, newClass);
 			}
 			else
 			{
-				FString className("actor");
-				FString propertyName = sc->str;
-				if(sc.CheckToken('.'))
-				{
-					className = propertyName;
-					sc.MustGetToken(TK_Identifier);
-					propertyName = sc->str;
-				}
-
-				if(!SetProperty(newClass, className, propertyName, sc))
-				{
-					do
-					{
-						sc.GetNextToken();
-					}
-					while(sc.CheckToken(','));
-					sc.ScriptMessage(Scanner::WARNING, "Unknown property '%s' for actor '%s'.", propertyName.GetChars(), newClass->name.GetChars());
-				}
+				ParseActorProperty(sc, newClass);
 			}
 		}
 	}
