@@ -50,6 +50,10 @@ bool vid_fullscreen = false;
 bool quitonescape = false;
 fixed movebob = FRACUNIT;
 
+bool alwaysrun;
+bool mouseenabled, mouseyaxisdisabled, joystickenabled;
+
+
 void FinalReadConfig()
 {
 	SDMode  sd;
@@ -94,6 +98,9 @@ void FinalReadConfig()
 
 void ReadConfig(void)
 {
+	int uniScreenWidth = 0, uniScreenHeight = 0;
+	SettingsData * sd = NULL;
+
 	config.CreateSetting("ForceGrabMouse", false);
 	config.CreateSetting("MouseEnabled", 1);
 	config.CreateSetting("JoystickEnabled", 0);
@@ -167,6 +174,17 @@ void ReadConfig(void)
 	fullScreenHeight = config.GetSetting("FullScreenHeight")->GetInteger();
 	windowedScreenWidth = config.GetSetting("WindowedScreenWidth")->GetInteger();
 	windowedScreenHeight = config.GetSetting("WindowedScreenHeight")->GetInteger();
+	if ((sd = config.GetSetting("ScreenWidth")) != NULL)
+	{
+		uniScreenWidth = sd->GetInteger();
+		config.DeleteSetting("ScreenWidth");
+	}
+
+	if ((sd = config.GetSetting("ScreenHeight")) != NULL)
+	{
+		uniScreenHeight = sd->GetInteger();
+		config.DeleteSetting("ScreenHeight");
+	}
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
 	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());
@@ -217,6 +235,20 @@ void ReadConfig(void)
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
+
+	// Carry over the unified screenWidth/screenHeight from previous versions
+	// Overwrite the full*/windowed* variables, because they're (most likely) defaulted anyways
+	if(uniScreenWidth != 0)
+	{
+		fullScreenWidth = uniScreenWidth;
+		windowedScreenWidth = uniScreenWidth;
+	}
+
+	if(uniScreenHeight != 0)
+	{
+		fullScreenHeight = uniScreenHeight;
+		windowedScreenHeight = uniScreenHeight;
+	}
 
 	// Set screenHeight, screenWidth
 	if(vid_fullscreen)

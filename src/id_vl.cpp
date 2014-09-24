@@ -3,6 +3,7 @@
 #include <string.h>
 #include "c_cvars.h"
 #include "wl_def.h"
+#include "id_in.h"
 #include "id_vl.h"
 #include "id_vh.h"
 #include "w_wad.h"
@@ -87,6 +88,8 @@ void SetFullscreen(bool isFull)
 	screen->Unlock();
 	VL_SetVGAPlaneMode();
 	screen->Lock(false);
+
+	IN_AdjustMouse();
 }
 
 //===========================================================================
