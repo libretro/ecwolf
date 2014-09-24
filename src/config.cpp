@@ -225,6 +225,11 @@ void Config::CreateSetting(const FName index, FString defaultString)
 	}
 }
 
+void Config::DeleteSetting(const FName index)
+{
+	settings.Remove(index);
+}
+
 SettingsData *Config::GetSetting(const FName index)
 {
 	SettingsData *data;

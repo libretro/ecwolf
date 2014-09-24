@@ -218,10 +218,7 @@ MENU_LISTENER(ReadThis)
 }
 MENU_LISTENER(ToggleFullscreen)
 {
-	fullscreen = vid_fullscreen;
-	screen->Unlock();
-	VL_SetVGAPlaneMode();
-	screen->Lock(false);
+	SetFullscreen(vid_fullscreen);
 	displayMenu.draw();
 
 	IN_AdjustMouse();
@@ -251,6 +248,17 @@ MENU_LISTENER(SetResolution)
 			Video->NextMode(&width, &height, &lb);
 		screenWidth = width;
 		screenHeight = height;
+
+		if(vid_fullscreen)
+		{
+			fullScreenWidth = screenWidth;
+			fullScreenHeight = screenHeight;
+		}
+		else
+		{
+			windowedScreenWidth = screenWidth;
+			windowedScreenHeight = screenHeight;
+		}
 	}
 
 	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));

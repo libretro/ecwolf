@@ -549,6 +549,9 @@ void CheckKeys (void)
 	else if(!Keyboard[sc_Equals] && !Keyboard[sc_Minus])
 		changeSize = true;
 
+	if(Keyboard[sc_Alt] && Keyboard[sc_Enter])
+		ToggleFullscreen();
+
 	//
 	// SECRET CHEAT CODE: 'MLI'
 	//
