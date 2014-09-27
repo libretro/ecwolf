@@ -161,7 +161,7 @@ extern  void    SD_StopSound(void),
 				SD_WaitSoundDone(void);
 
 extern  void    SD_StartMusic(const char* chunk);
-extern  void    SD_PauseMusic(void);
+extern  int     SD_PauseMusic(void);
 extern  void    SD_ContinueMusic(const char* chunk, int startoffs);
 extern  void    SD_MusicOn(void),
 				SD_FadeOutMusic(void);

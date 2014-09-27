@@ -190,6 +190,11 @@ static const int oplChip = 0;
 
 #endif
 
+#ifndef ECWOLF_MIXER
+static int Mix_SetMusicPCMPosition(Uint64 position) { return 0; }
+static Uint64 Mix_GetMusicPCMPosition() { return 0; }
+#endif
+
 static void SDL_SoundFinished(void)
 {
 	SoundPlaying = FString();
@@ -1322,13 +1327,15 @@ SD_StartMusic(const char* chunk)
 	}
 }
 
-void
+int
 SD_PauseMusic(void)
 {
 	if (music != NULL && Mix_PlayingMusic() == 1)
 	{
 		Mix_PauseMusic();
+		return Mix_GetMusicPCMPosition();
 	}
+	return 0;
 }
 
 void
@@ -1416,10 +1423,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 				printf("Unable to play music file: %s\n", Mix_GetError());
 			}
 
-			if (Mix_SetMusicPosition(startoffs) == -1)
-			{
-				printf("Mix_SetMusicPosition: %s\n", Mix_GetError());
-			}
+			Mix_SetMusicPCMPosition(startoffs);
 		}
 	}
 }

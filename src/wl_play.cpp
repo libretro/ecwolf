@@ -722,7 +722,7 @@ int StopMusic (void)
     }
     else
     {
-        SD_PauseMusic ();
+        lastoffs = SD_PauseMusic ();
     }
 
 	return lastoffs;
