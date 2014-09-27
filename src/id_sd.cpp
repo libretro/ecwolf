@@ -100,7 +100,8 @@ static  int                     sqHackLen;
 static  int                     sqHackSeqLen;
 static  longword                sqHackTime;
 
-Mix_Music		*music=NULL;
+static int musicchunk=-1;
+Mix_Music *music=NULL;
 byte* chunkmem = NULL;
 
 void musicFinished(void)
@@ -113,6 +114,8 @@ void musicFinished(void)
 
 		delete [] chunkmem;
 		chunkmem = NULL;
+
+		musicchunk = -1;
 	}
 }
 
@@ -1308,6 +1311,7 @@ SD_StartMusic(const char* chunk)
 			SDL_LockMutex(audioMutex);
 
 			// Play the music
+			musicchunk = lumpNum;
 			if (Mix_PlayMusic(music, -1) == -1)
 			{
 				printf("Unable to play music file: %s\n", Mix_GetError());
@@ -1334,12 +1338,12 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 
 	if (MusicMode == smm_AdLib)
 	{
-		if (music == NULL)
-		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
-			int lumpNum = Wads.CheckNumForName(chunk, ns_music);
-			if(lumpNum == -1)
-				return;
+		int lumpNum = Wads.CheckNumForName(chunk, ns_music);
+		if(lumpNum == -1)
+			return;
 
+		if (music == NULL || musicchunk != lumpNum)
+		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
 			SDL_LockMutex(audioMutex);
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);
 			if(sqHackFreeable != NULL)
@@ -1399,13 +1403,14 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 
 			Mix_HookMusic(0, 0);
 
-			if (Mix_PausedMusic() == 1)
+			if (Mix_PausedMusic() == 1 && musicchunk == lumpNum)
 			{
 				Mix_ResumeMusic();
 				return;
 			}
 
 			// Play the music
+			musicchunk = lumpNum;
 			if (Mix_PlayMusic(music, -1) == -1)
 			{
 				printf("Unable to play music file: %s\n", Mix_GetError());
