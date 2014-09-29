@@ -1294,8 +1294,7 @@ SD_StartMusic(const char* chunk)
 			for (int i = 0;i < OPL_CHANNELS;++i)
 				SDL_AlSetChanInst(&ChannelRelease, i);
 
-			if(sqHackFreeable != NULL)
-				delete[] sqHackFreeable;
+			delete[] sqHackFreeable;
 			sqHack = reinterpret_cast<word*>(chunkmem);
 			sqHackFreeable = sqHack;
 			chunkmem = NULL;
@@ -1353,8 +1352,8 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
 			SDL_LockMutex(audioMutex);
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);
-			if(sqHackFreeable != NULL)
-				delete[] sqHackFreeable;
+			delete[] sqHackFreeable;
+			sqHackFreeable = NULL;
 
 			// Load our music file from chunk
 			chunkmem = new byte[Wads.LumpLength(lumpNum)];
