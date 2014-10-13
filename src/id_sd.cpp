@@ -971,8 +971,10 @@ SD_Startup(void)
 	Mix_HookMusic(SDL_IMFMusicPlayer, 0);
 	Mix_ChannelFinished(SD_ChannelFinished);
 
-    // Make sure that the musicFinished() function is called when the music stops playing
-    Mix_HookMusicFinished(musicFinished);
+	Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
+
+	// Make sure that the musicFinished() function is called when the music stops playing
+	Mix_HookMusicFinished(musicFinished);
 
 	AdLibPresent = true;
 	SoundBlasterPresent = true;
