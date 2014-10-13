@@ -1046,19 +1046,16 @@ int StartCPMusic (const char* song)
 ///////////////////////////////////////////////////////////////////////////
 void CheckPause (void)
 {
+	static int pauseofs = 0;
 	if (Paused)
 	{
 		switch (SoundStatus)
 		{
 			case 0:
-                if (music == NULL)
-				SD_MusicOn ();
+				SD_ContinueMusic(gameinfo.MenuMusic, pauseofs);
 				break;
 			case 1:
-                if (music == NULL)
-				SD_MusicOff ();
-                else
-                SD_PauseMusic ();
+				pauseofs = music ? SD_PauseMusic() : SD_MusicOff();
 				break;
 		}
 
