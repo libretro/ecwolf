@@ -89,7 +89,10 @@ void SetFullscreen(bool isFull)
 	screen->Unlock();
 	VL_SetVGAPlaneMode();
 	screen->Lock(false);
-	DrawPlayScreen();
+	if(playstate)
+	{
+		DrawPlayScreen();
+	}
 	IN_AdjustMouse();
 }
 
