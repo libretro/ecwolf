@@ -1277,25 +1277,13 @@ void ClassDef::ParseActor(Scanner &sc)
 															val.str = sc->str;
 														}
 														ca->AddArgument(val);
+														++argc;
 
 														// Check if we can or should take another argument
-														if(sc.CheckToken(','))
-														{
-															if(argc+1 < funcInf->maxArgs)
-															{
-																++argc;
-																continue;
-															}
-															else if(funcInf->varArgs)
-																continue;
-														}
-														else
-														{
-															++argc;
+														if(!funcInf->varArgs && argc >= funcInf->maxArgs)
 															break;
-														}
 													}
-													while(true);
+													while(sc.CheckToken(','));
 													sc.MustGetToken(')');
 												}
 											}
