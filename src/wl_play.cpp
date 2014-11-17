@@ -313,7 +313,7 @@ void PollMouseMove (void)
 	controlx += controlpanx * 20 / (21 - mousexadjustment);
 	if(mouselook)
 	{
-		int mousey;
+		int mousey = controlpany;
 
 		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
 			mousey = xs_ToInt(controlpany*fabs(players[0].ReadyWeapon->fovscale));
