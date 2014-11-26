@@ -1047,7 +1047,7 @@ int StartCPMusic (const char* song)
 void CheckPause (void)
 {
 	static int pauseofs = 0;
-	if (Paused)
+	if (Paused & 1)
 	{
 		switch (SoundStatus)
 		{
