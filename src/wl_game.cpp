@@ -261,7 +261,8 @@ void SetupGameLevel (void)
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapname, false);
+	CA_CacheMap (gamestate.mapname, loadedgame);
+	StartMusic ();
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer
@@ -536,7 +537,6 @@ void RecordDemo (void)
 	demorecord = true;
 
 	SetupGameLevel ();
-	StartMusic ();
 
 	if(usedoublebuffering) VH_UpdateScreen();
 	fizzlein = true;
@@ -597,7 +597,6 @@ void PlayDemo (int demonumber)
 	demoplayback = true;
 
 	SetupGameLevel ();
-	StartMusic ();
 
 	PlayLoop ();
 
@@ -837,14 +836,13 @@ restartgame:
 				}
 			}
 		}
+		else
+		{
+			loadedgame = false;
+			StartMusic ();
+		}
 
 		ingame = true;
-		if(loadedgame)
-		{
-			ContinueMusic(lastgamemusicoffset);
-			loadedgame = false;
-		}
-		else StartMusic ();
 
 		if (!died)
 			PreloadGraphics (dointermission);

@@ -20,8 +20,6 @@ extern  bool noadaptive;
 extern  unsigned        tics;
 extern  int             viewsize;
 
-extern  int             lastgamemusicoffset;
-
 //
 // current user input
 //

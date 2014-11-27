@@ -35,7 +35,7 @@
 
 #include <climits>
 
-extern int	lastgamemusicoffset;
+static int	lastgamemusicoffset;
 const ClassDef *playerClass = NULL;
 EpisodeInfo	*episode = 0;
 int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG,

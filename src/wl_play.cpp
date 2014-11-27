@@ -160,9 +160,6 @@ int controlx, controly, controlstrafe;         // range from -100 to 100 per tic
 int controlpanx, controlpany;
 bool buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
 
-int lastgamemusicoffset = 0;
-
-
 //===========================================================================
 
 
