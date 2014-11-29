@@ -921,7 +921,8 @@ void player_t::SetFOV(float newlyDesiredFOV)
 {
 	DesiredFOV = newlyDesiredFOV;
 
-	if(ReadyWeapon != NULL) 
+		// If they're not dead, holding a weapon, and the weapon has a non-zero scale, then we adjust the FOV
+	if(state != player_t::PST_DEAD && ReadyWeapon != NULL && ReadyWeapon->fovscale != 0) 
 	{
 		FOV = -DesiredFOV * ReadyWeapon->fovscale;
 		if(mo != NULL) CalcProjection(mo->radius);
