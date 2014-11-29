@@ -847,7 +847,7 @@ void player_t::Reborn()
 	ReadyWeapon = NULL;
 	PendingWeapon = WP_NOCHANGE;
 	flags = 0;
-	FOV = DesiredFOV = 90.0f;
+	FOV = DesiredFOV;
 
 	if(state == PST_ENTER)
 	{
@@ -915,6 +915,12 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 		else
 			break;
 	}
+}
+
+void player_t::SetFOV(float newlyDesiredFOV)
+{
+	FOV = DesiredFOV = newlyDesiredFOV;
+	if(mo != NULL) CalcProjection(mo->radius);
 }
 
 FArchive &operator<< (FArchive &arc, player_t *&player)

@@ -61,6 +61,7 @@ extern Aspect	vid_aspect;
 extern bool		quitonescape;
 extern fixed	movebob;
 
+extern float	localDesiredFOV;
 //
 // control info
 //
