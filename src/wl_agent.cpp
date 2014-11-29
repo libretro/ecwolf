@@ -920,7 +920,16 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 void player_t::SetFOV(float newlyDesiredFOV)
 {
 	DesiredFOV = newlyDesiredFOV;
-	AdjustFOV();
+
+	if(ReadyWeapon != NULL) 
+	{
+		FOV = -DesiredFOV * ReadyWeapon->fovscale;
+		if(mo != NULL) CalcProjection(mo->radius);
+	}
+	else
+	{
+		FOV = DesiredFOV;
+	}
 }
 
 void player_t::AdjustFOV()
@@ -963,7 +972,7 @@ void player_t::AdjustFOV()
 			}
 		}
 
-		if(mo != NULL) CalcProjection(mo->radius);
+		CalcProjection(mo->radius);
 	}
 }
 
