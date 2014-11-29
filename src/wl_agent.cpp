@@ -919,8 +919,52 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 
 void player_t::SetFOV(float newlyDesiredFOV)
 {
-	FOV = DesiredFOV = newlyDesiredFOV;
-	if(mo != NULL) CalcProjection(mo->radius);
+	DesiredFOV = newlyDesiredFOV;
+	AdjustFOV();
+}
+
+void player_t::AdjustFOV()
+{
+	// [RH] Zoom the player's FOV
+	float desired = DesiredFOV;
+
+	// Adjust FOV using on the currently held weapon.
+	if (state != player_t::PST_DEAD &&		// No adjustment while dead.
+		ReadyWeapon != NULL &&				// No adjustment if no weapon.
+		ReadyWeapon->fovscale != 0)			// No adjustment if the adjustment is zero.
+	{
+
+		// A negative scale is used to prevent G_AddViewAngle/G_AddViewPitch
+		// from scaling with the FOV scale.
+		desired *= fabs(ReadyWeapon->fovscale);
+	}
+
+	if (FOV != desired)
+	{
+		// Negative FOV means recalculate projection
+		if (FOV < 0)
+		{
+			FOV *= -1;
+		}
+		else if (fabsf(FOV - desired) < 7.f)
+		{
+			FOV = desired;
+		}
+		else
+		{
+			float zoom = MAX(7.f, fabsf(FOV - desired) * 0.025f);
+			if (FOV > desired)
+			{
+				FOV = FOV - zoom;
+			}
+			else
+			{
+				FOV = FOV + zoom;
+			}
+		}
+
+		if(mo != NULL) CalcProjection(mo->radius);
+	}
 }
 
 FArchive &operator<< (FArchive &arc, player_t *&player)
