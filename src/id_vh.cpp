@@ -318,6 +318,15 @@ bool FizzleFade (int x1, int y1,
 	} while (1);
 
 finished:
+	for (y = y1; y < (y1 + height); ++y)
+	{
+		for (x = x1; x < (x1 + width); ++x)
+		{
+			*(fizzleSurface + (y1 + y) * SCREENPITCH + x1 + x)
+				= *(srcptr + (y1 + y) * SCREENPITCH + x1 + x);
+		}
+	}
+	
 	VH_UpdateScreen();
 	delete[] fizzleSurface;
 	delete[] srcptr;
