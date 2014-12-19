@@ -98,9 +98,6 @@ void FinalReadConfig()
 
 void ReadConfig(void)
 {
-	int uniScreenWidth = 0, uniScreenHeight = 0;
-	SettingsData * sd = NULL;
-
 	config.CreateSetting("ForceGrabMouse", false);
 	config.CreateSetting("MouseEnabled", 1);
 	config.CreateSetting("JoystickEnabled", 0);
@@ -119,10 +116,8 @@ void ReadConfig(void)
 	config.CreateSetting("DigitizedVolume", MAX_VOLUME);
 	config.CreateSetting("Vid_FullScreen", false);
 	config.CreateSetting("Vid_Aspect", ASPECT_NONE);
-	config.CreateSetting("FullScreenWidth", fullScreenWidth);
-	config.CreateSetting("FullScreenHeight", fullScreenHeight);
-	config.CreateSetting("WindowedScreenWidth", windowedScreenWidth);
-	config.CreateSetting("WindowedScreenHeight", windowedScreenHeight);
+	config.CreateSetting("ScreenWidth", screenWidth);
+	config.CreateSetting("ScreenHeight", screenHeight);
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
 	config.CreateSetting("Gamma", 1.0f);
@@ -174,21 +169,8 @@ void ReadConfig(void)
 	SoundVolume = config.GetSetting("DigitizedVolume")->GetInteger();
 	vid_fullscreen = config.GetSetting("Vid_FullScreen")->GetInteger() != 0;
 	vid_aspect = static_cast<Aspect>(config.GetSetting("Vid_Aspect")->GetInteger());
-	fullScreenWidth = config.GetSetting("FullScreenWidth")->GetInteger();
-	fullScreenHeight = config.GetSetting("FullScreenHeight")->GetInteger();
-	windowedScreenWidth = config.GetSetting("WindowedScreenWidth")->GetInteger();
-	windowedScreenHeight = config.GetSetting("WindowedScreenHeight")->GetInteger();
-	if ((sd = config.GetSetting("ScreenWidth")) != NULL)
-	{
-		uniScreenWidth = sd->GetInteger();
-		config.DeleteSetting("ScreenWidth");
-	}
-
-	if ((sd = config.GetSetting("ScreenHeight")) != NULL)
-	{
-		uniScreenHeight = sd->GetInteger();
-		config.DeleteSetting("ScreenHeight");
-	}
+	screenWidth = config.GetSetting("ScreenWidth")->GetInteger();
+	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
 	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());
@@ -245,32 +227,6 @@ void ReadConfig(void)
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
-
-	// Carry over the unified screenWidth/screenHeight from previous versions
-	// Overwrite the full*/windowed* variables, because they're (most likely) defaulted anyways
-	if(uniScreenWidth != 0)
-	{
-		fullScreenWidth = uniScreenWidth;
-		windowedScreenWidth = uniScreenWidth;
-	}
-
-	if(uniScreenHeight != 0)
-	{
-		fullScreenHeight = uniScreenHeight;
-		windowedScreenHeight = uniScreenHeight;
-	}
-
-	// Set screenHeight, screenWidth
-	if(vid_fullscreen)
-	{
-		screenHeight = fullScreenHeight;
-		screenWidth = fullScreenWidth;
-	}
-	else
-	{
-		screenHeight = windowedScreenHeight;
-		screenWidth = windowedScreenWidth;
-	}
 }
 
 /*
@@ -325,10 +281,8 @@ void WriteConfig(void)
 	config.GetSetting("DigitizedVolume")->SetValue(SoundVolume);
 	config.GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
 	config.GetSetting("Vid_Aspect")->SetValue(vid_aspect);
-	config.GetSetting("FullScreenWidth")->SetValue(fullScreenWidth);
-	config.GetSetting("FullScreenHeight")->SetValue(fullScreenHeight);
-	config.GetSetting("WindowedScreenWidth")->SetValue(windowedScreenWidth);
-	config.GetSetting("WindowedScreenHeight")->SetValue(windowedScreenHeight);
+	config.GetSetting("ScreenWidth")->SetValue(screenWidth);
+	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
 	config.GetSetting("MoveBob")->SetValue(movebob);
 	config.GetSetting("Gamma")->SetValue(screenGamma);

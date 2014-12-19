@@ -34,10 +34,6 @@ bool fullscreen = true;
 bool usedoublebuffering = true;
 unsigned screenWidth = 640;
 unsigned screenHeight = 480;
-unsigned fullScreenWidth = 640;
-unsigned fullScreenHeight = 480;
-unsigned windowedScreenWidth = 640;
-unsigned windowedScreenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
 float screenGamma = 1.0f;
 
@@ -61,40 +57,6 @@ static struct
 	uint8_t r,g,b;
 	int amount;
 } currentBlend;
-
-//===========================================================================
-
-void ToggleFullscreen()
-{
-	SetFullscreen(!fullscreen);
-}
-
-void SetFullscreen(bool isFull)
-{
-	vid_fullscreen = fullscreen = isFull;
-
-	if (fullscreen)
-	{
-		screenWidth = fullScreenWidth;
-		screenHeight = fullScreenHeight;
-	}
-	else
-	{
-		screenWidth = windowedScreenWidth;
-		screenHeight = windowedScreenHeight;
-	}
-
-	// Recalculate the aspect ratio, because this can change from fullscreen to windowed now
-	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
-	screen->Unlock();
-	VL_SetVGAPlaneMode();
-	screen->Lock(false);
-	if(playstate)
-	{
-		DrawPlayScreen();
-	}
-	IN_AdjustMouse();
-}
 
 //===========================================================================
 
