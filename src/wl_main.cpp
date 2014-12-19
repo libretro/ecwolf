@@ -110,6 +110,8 @@ bool	startgame;
 bool	loadedgame;
 int		mousexadjustment;
 int     mouseyadjustment;
+int		panxadjustment;
+int     panyadjustment;
 
 //
 // Command line parameter variables
@@ -1251,10 +1253,7 @@ int main (int argc, char *argv[])
 	FileSys::SetupPaths(argc, argv);
 
 	// Find the program directory.
-	FString progdir(".");
-	int pos = FString(argv[0]).LastIndexOfAny("/\\");
-	if(pos != -1)
-		progdir = FString(argv[0]).Mid(0, pos);
+	FString progdir(FileSys::GetDirectoryPath(FileSys::DIR_Program));
 
 	Scanner::SetMessageHandler(ScannerMessageHandler);
 	atexit(CallTerminateFunctions);

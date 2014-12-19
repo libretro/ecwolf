@@ -20,12 +20,11 @@ extern  bool noadaptive;
 extern  unsigned        tics;
 extern  int             viewsize;
 
-extern  int             lastgamemusicoffset;
-
 //
 // current user input
 //
 extern  int         controlx,controly, controlstrafe;              // range from -100 to 100
+extern	int			controlpanx, controlpany;
 extern  bool        buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
 extern  bool        buttonheld[NUMBUTTONS], ambuttonheld[NUMAMBUTTONS];
 extern  exit_t      playstate;
@@ -36,12 +35,6 @@ extern	bool		notargetmode;
 extern  bool        demorecord,demoplayback;
 extern  int8_t      *demoptr, *lastdemoptr;
 extern  memptr      demobuffer;
-
-//
-// control info
-//
-extern  bool		alwaysrun;
-extern  bool		mouseenabled,mouseyaxisdisabled,joystickenabled;
 
 void    PlayLoop (void);
 

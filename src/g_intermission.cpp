@@ -251,9 +251,10 @@ static bool ShowTextScreen(TextScreenIntermissionAction *textscreen, bool demoMo
 	}
 
 	py = textscreen->PrintY;
-	px = textscreen->PrintX;
 	for(unsigned int i = 0;i < textscreen->Text.Size();++i)
 	{
+		px = textscreen->PrintX;
+
 		FString str = textscreen->Text[i];
 		if(str[0] == '$')
 			str = language[str.Mid(1)];

@@ -655,10 +655,13 @@ ACTION_FUNCTION(A_ReFire)
 
 	if(player->PendingWeapon == WP_NOCHANGE || !(player->flags & player_t::PF_REFIRESWITCHOK))
 	{
-		if(player->ReadyWeapon->mode == AWeapon::PrimaryFire && buttonstate[bt_attack])
-			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::PrimaryFire, true), player_t::ps_weapon);
-		else if(player->ReadyWeapon->mode == AWeapon::AltFire && buttonstate[bt_altattack])
-			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::AltFire, true), player_t::ps_weapon);
+		ACTION_PARAM_STATE(hold, 0, player->ReadyWeapon->GetAtkState(player->ReadyWeapon->mode, true));
+
+		if((player->ReadyWeapon->mode == AWeapon::PrimaryFire && buttonstate[bt_attack]) ||
+		   (player->ReadyWeapon->mode == AWeapon::AltFire && buttonstate[bt_altattack]))
+		{
+			player->SetPSprite(hold, player_t::ps_weapon);
+		}
 	}
 	return true;
 }

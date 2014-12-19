@@ -155,25 +155,73 @@ void SetupPaths(int argc, const char * const *argv)
 		pSHGetKnownFolderPath = (HRESULT (WINAPI*)(const GUID*,DWORD,HANDLE,PWSTR*))GetProcAddress(shell32, "SHGetKnownFolderPath");
 		pSHGetFolderPathW = (HRESULT (WINAPI*)(HWND,int,HANDLE,DWORD,LPWSTR))GetProcAddress(shell32, "SHGetFolderPathW");
 	}
-#endif
 
-	// Find the program directory.
-	int pos = FString(argv[0]).LastIndexOfAny("/\\");
-	if(pos != -1)
-		progDir = FString(argv[0]).Mid(0, pos);
-	else
-		progDir = ".";
-
-	// Configuration directory
-#if defined(_WIN32)
 #ifndef _M_X64
 	OSVERSIONINFO osVersion;
 	ZeroMemory(&osVersion, sizeof(OSVERSIONINFO));
 	osVersion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osVersion);
 	IsWinNT = osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS;
-	if(IsWinNT)
 #endif
+#endif
+
+	// Find the program directory.
+#if defined(_WIN32)
+	if(IsWinNT)
+	{
+		char tempCName[MAX_PATH];
+		wchar_t tempName[MAX_PATH];
+		memset(tempCName, 0, MAX_PATH);
+		memset(tempName, 0, MAX_PATH*sizeof(wchar_t));
+		if(SUCCEEDED(GetModuleFileNameW(NULL, tempName, MAX_PATH)))
+		{
+			ConvertName(tempName, tempCName);
+			progDir = tempCName;
+		}
+		else
+			progDir = argv[0];
+	}
+	else
+	{
+		char tempName[MAX_PATH];
+		memset(tempName, 0, MAX_PATH);
+		if(SUCCEEDED(GetModuleFileNameA(NULL, tempName, MAX_PATH)))
+			progDir = tempName;
+		else
+			progDir = argv[0];
+	}
+#elif defined(__APPLE__)
+	{
+		char binpath[MAX_PATH];
+		char binrealpath[MAX_PATH];
+		uint32_t binlen = MAX_PATH;
+		if(_NSGetExecutablePath(binpath, &binlen) == 0 && realpath(binpath, binrealpath) != NULL)
+			progDir = binrealpath;
+		else
+			progDir = argv[0];
+	}
+#else
+	{
+		char linkbuf[MAX_PATH];
+		ssize_t linklen;
+		if((linklen = readlink("/proc/self/exe", linkbuf, MAX_PATH)) > 0)
+		{
+			linkbuf[linklen] = 0;
+			progDir = linkbuf;
+		}
+		else
+			progDir = argv[0];
+	}
+#endif
+	int pos = progDir.LastIndexOfAny("/\\");
+	if(pos != -1)
+		progDir = progDir.Mid(0, pos);
+	else
+		progDir = ".";
+
+	// Configuration directory
+#if defined(_WIN32)
+	if(IsWinNT)
 	{
 		if(pSHGetKnownFolderPath) // Vista+
 		{
@@ -193,7 +241,7 @@ void SetupPaths(int argc, const char * const *argv)
 			char tempCPath[MAX_PATH];
 			wchar_t tempPath[MAX_PATH];
 			memset(tempCPath, 0, MAX_PATH);
-			memset(tempPath, 0, MAX_PATH);
+			memset(tempPath, 0, MAX_PATH*sizeof(wchar_t));
 			if(SUCCEEDED(pSHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
 			{
 				ConvertName(tempPath, tempCPath);

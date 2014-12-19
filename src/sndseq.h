@@ -78,6 +78,7 @@ public:
 	void Clear();
 	const SoundSequence &GetSequence(SequenceType type) const;
 	FName GetStopSound() const { return StopSound; }
+	FName GetSeqName() const { return Name; }
 	void SetFlag(unsigned int flag, bool set);
 	void SetSequence(SequenceType type, FName sequence);
 	const SndSeqInstruction *Start() const;
@@ -89,6 +90,8 @@ private:
 	FName StopSound;
 	FName AltSequences[NUM_SEQ_TYPES];
 	unsigned int Flags;
+
+	FName Name;
 };
 
 class SndSeqTable
@@ -117,6 +120,8 @@ public:
 	void Stop();
 
 private:
+	friend FArchive &operator<< (FArchive &, SndSeqPlayer *&);
+
 	const SoundSequence &Sequence;
 	const SndSeqInstruction *Current;
 	MapSpot Source;
@@ -125,5 +130,7 @@ private:
 	bool Playing;
 	bool WaitForDone;
 };
+
+FArchive &operator<< (FArchive &, SndSeqPlayer *&);
 
 #endif

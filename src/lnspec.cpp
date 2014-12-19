@@ -44,6 +44,7 @@
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_loadsave.h"
 #include "wl_play.h"
 #include "g_mapinfo.h"
 #include "g_shared/a_keys.h"
@@ -243,6 +244,8 @@ class EVDoor : public Thinker
 				<< amount
 				<< wait
 				<< direction;
+			if(GameSave::SaveVersion > 1410810515)
+				arc << sndseq << seqname << opentics;
 
 			Super::Serialize(arc);
 		}
@@ -347,7 +350,7 @@ FUNC(Door_Open)
 		{
 			if(spot->thinker->IsThinkerType<EVDoor>())
 			{
-				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 			}
 			return 0;
 		}
@@ -364,7 +367,7 @@ FUNC(Door_Open)
 			{
 				if(door->thinker->IsThinkerType<EVDoor>())
 				{
-					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 				}
 				continue;
 			}
@@ -398,7 +401,7 @@ public:
 				EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
 				if(!doorThinker->IsClosing())
 				{
-					if(!doorThinker->Reactivate(activator, !!(activator->flags & FL_ISMONSTER)))
+					if(!doorThinker->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER)))
 					{
 						Destroy();
 						return;
@@ -498,32 +501,33 @@ public:
 						}
 						else if(ddeltax == 0 && sdeltax)
 						{
-							int tmp = relx;
-							if(ddeltay > 0)
-							{
-								rely = relx;
-								relx = -tmp;
-								angle = ANGLE_90;
-
-								tmp = fracx;
-								fracx = (FRACUNIT-fracy);
-								fracy = tmp;
-							}
-							else
+							int tmp = rely;
+							if(ddeltay < 0)
 							{
 								rely = -relx;
 								relx = tmp;
-								angle = ANGLE_270;
+								angle = ANGLE_90;
 
 								tmp = (FRACUNIT-fracx);
 								fracx = fracy;
 								fracy = tmp;
 							}
+							else
+							{
+								rely = relx;
+								relx = -tmp;
+								angle = ANGLE_270;
+
+								tmp = fracx;
+								fracx = (FRACUNIT-fracy);
+								fracy = tmp;
+
+							}
 						}
 						else if(ddeltay == 0 && sdeltay)
 						{
 							int tmp = relx;
-							if(ddeltax > 0)
+							if(ddeltax < 0)
 							{
 								relx = rely;
 								rely = -tmp;
@@ -562,7 +566,7 @@ public:
 						MapTrigger &trig = nextDoor->triggers[i];
 						if(trig.action == Door_Elevator)
 						{
-							map->ActivateTrigger(trig, MapTrigger::East, NULL);
+							map->ActivateTrigger(trig, MapTrigger::East, activator);
 							break;
 						}
 					}
@@ -586,7 +590,7 @@ protected:
 private:
 	enum State { ClosingDoor, Moving, Shaking, Finished };
 
-	AActor *activator;
+	TObjPtr<AActor> activator;
 	SndSeqPlayer *sndseq;
 	MapSpot spot;
 	MapSpot door;
@@ -596,7 +600,9 @@ private:
 	unsigned int callSpeed;
 	State state;
 };
-IMPLEMENT_INTERNAL_CLASS(EVElevator)
+IMPLEMENT_INTERNAL_POINTY_CLASS(EVElevator)
+	DECLARE_POINTER(activator)
+END_POINTERS
 
 // Takes same arugments as Door_Open, but the tag points to the elevator switch.
 // Will attempt to call the elevator if not in the correct position.
@@ -627,7 +633,7 @@ FUNC(Door_Elevator)
 	{
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
-			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 		}
 		return 0;
 	}
@@ -819,6 +825,9 @@ class EVPushwall : public Thinker
 				<< position
 				<< speed
 				<< distance;
+
+			if(GameSave::SaveVersion > 1410810515)
+				arc << sndseq << seqname;
 
 			Super::Serialize(arc);
 		}

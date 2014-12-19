@@ -935,4 +935,5 @@ void CheckHighScore (int32_t score, const LevelInfo *levelInfo)
 		IN_UserInput (500);
 	}
 
+	VW_FadeOut();
 }

@@ -20,6 +20,8 @@ extern SDL_Surface *curSurface;
 
 extern  bool	fullscreen, usedoublebuffering;
 extern  unsigned screenWidth, screenHeight, screenBits, curPitch;
+extern  unsigned fullScreenWidth, fullScreenHeight;
+extern  unsigned windowedScreenWidth, windowedScreenHeight;
 extern  unsigned scaleFactorX, scaleFactorY;
 extern	float	screenGamma;
 
@@ -34,6 +36,9 @@ extern SDL_Color gamepal[256];
 //
 
 #define VL_WaitVBL(a) SDL_Delay((a)*8)
+
+void ToggleFullscreen();
+void SetFullscreen(bool isFull);
 
 void VL_ReadPalette(const char* lump);
 

@@ -55,6 +55,8 @@ STR_HARD = "Hard";
 STR_MOUSEADJ = "Adjust Mouse Sensitivity";
 STR_MOUSEXADJ = "X Sensitivity";
 STR_MOUSEYADJ = "Y Sensitivity";
+STR_PANXADJ = "Pan X Sensitivity";
+STR_PANYADJ = "Pan Y Sensitivity";
 STR_SLOW = "Slow";
 STR_FAST = "Fast";
 STR_THINK = "Thinking";
@@ -161,9 +163,9 @@ NOAH_ENDSTR07 = "Did the animals wear\nyou out?\nPress Y to Quit.";
 NOAH_ENDSTR08 = "Are you monkeying around or\ndo you really want to quit?\nPress Y to Quit.";
 NOAH_ENDSTR09 = "The animals might get\nhungry if you're gone\ntoo long!\nPress Y to Quit.";
 
-STR_ENDGAME1 = "We owe you a great debt, Mr. Blazkowicz.\n";
+STR_ENDGAME1 = "We owe you a great debt, Mr. Blazkowicz.";
 STR_ENDGAME2 = "You have served your country well.";
-STR_ENDGAME3 = "With the spear gone, the Allies will finally\n";
+STR_ENDGAME3 = "With the spear gone, the Allies will finally";
 STR_ENDGAME4 = "by able to destroy Hitler...";
 
 ROBSJUKEBOX = "Robert's Jukebox";

@@ -146,8 +146,6 @@ void ThinkerList::Serialize(FArchive &arc)
 	}
 	else
 	{
-		DestroyAll();
-
 		for(unsigned int i = 0;i < NUM_TYPES;i++)
 		{
 			Thinker *thinker;

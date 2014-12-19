@@ -176,6 +176,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 
 GameMap::~GameMap()
 {
+	thinkerList->DestroyAll();
+
 	if(isWad)
 		delete file;
 	delete lumps[0];

@@ -973,8 +973,8 @@ void GameMap::ReadPlanesData()
 
 		{
 			unsigned int elevTag = 0;
-			unsigned int swtchTag;
-			int *lastNext;
+			unsigned int swtchTag = 0;
+			int *lastNext = NULL;
 			for(unsigned int i = 0;i < locations.Size();++i)
 			{
 				MapSpot spot = locations[i];

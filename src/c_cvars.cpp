@@ -50,6 +50,10 @@ bool vid_fullscreen = false;
 bool quitonescape = false;
 fixed movebob = FRACUNIT;
 
+bool alwaysrun;
+bool mouseenabled, mouseyaxisdisabled, joystickenabled;
+
+
 void FinalReadConfig()
 {
 	SDMode  sd;
@@ -94,12 +98,17 @@ void FinalReadConfig()
 
 void ReadConfig(void)
 {
+	int uniScreenWidth = 0, uniScreenHeight = 0;
+	SettingsData * sd = NULL;
+
 	config.CreateSetting("ForceGrabMouse", false);
 	config.CreateSetting("MouseEnabled", 1);
 	config.CreateSetting("JoystickEnabled", 0);
 	config.CreateSetting("ViewSize", 19);
 	config.CreateSetting("MouseXAdjustment", 5);
 	config.CreateSetting("MouseYAdjustment", 5);
+	config.CreateSetting("PanXAdjustment", 5);
+	config.CreateSetting("PanYAdjustment", 5);
 	config.CreateSetting("SoundDevice", sdm_AdLib);
 	config.CreateSetting("MusicDevice", smm_AdLib);
 	config.CreateSetting("DigitalSoundDevice", sds_SoundBlaster);
@@ -110,8 +119,10 @@ void ReadConfig(void)
 	config.CreateSetting("DigitizedVolume", MAX_VOLUME);
 	config.CreateSetting("Vid_FullScreen", false);
 	config.CreateSetting("Vid_Aspect", ASPECT_NONE);
-	config.CreateSetting("ScreenWidth", screenWidth);
-	config.CreateSetting("ScreenHeight", screenHeight);
+	config.CreateSetting("FullScreenWidth", fullScreenWidth);
+	config.CreateSetting("FullScreenHeight", fullScreenHeight);
+	config.CreateSetting("WindowedScreenWidth", windowedScreenWidth);
+	config.CreateSetting("WindowedScreenHeight", windowedScreenHeight);
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
 	config.CreateSetting("Gamma", 1.0f);
@@ -153,6 +164,8 @@ void ReadConfig(void)
 	viewsize = config.GetSetting("ViewSize")->GetInteger();
 	mousexadjustment = config.GetSetting("MouseXAdjustment")->GetInteger();
 	mouseyadjustment = config.GetSetting("MouseYAdjustment")->GetInteger();
+	panxadjustment = config.GetSetting("PanXAdjustment")->GetInteger();
+	panyadjustment = config.GetSetting("PanYAdjustment")->GetInteger();
 	mouseyaxisdisabled = config.GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
 	alwaysrun = config.GetSetting("AlwaysRun")->GetInteger() != 0;
 	AdlibVolume = config.GetSetting("SoundVolume")->GetInteger();
@@ -161,8 +174,21 @@ void ReadConfig(void)
 	SoundVolume = config.GetSetting("DigitizedVolume")->GetInteger();
 	vid_fullscreen = config.GetSetting("Vid_FullScreen")->GetInteger() != 0;
 	vid_aspect = static_cast<Aspect>(config.GetSetting("Vid_Aspect")->GetInteger());
-	screenWidth = config.GetSetting("ScreenWidth")->GetInteger();
-	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
+	fullScreenWidth = config.GetSetting("FullScreenWidth")->GetInteger();
+	fullScreenHeight = config.GetSetting("FullScreenHeight")->GetInteger();
+	windowedScreenWidth = config.GetSetting("WindowedScreenWidth")->GetInteger();
+	windowedScreenHeight = config.GetSetting("WindowedScreenHeight")->GetInteger();
+	if ((sd = config.GetSetting("ScreenWidth")) != NULL)
+	{
+		uniScreenWidth = sd->GetInteger();
+		config.DeleteSetting("ScreenWidth");
+	}
+
+	if ((sd = config.GetSetting("ScreenHeight")) != NULL)
+	{
+		uniScreenHeight = sd->GetInteger();
+		config.DeleteSetting("ScreenHeight");
+	}
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
 	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());
@@ -205,14 +231,46 @@ void ReadConfig(void)
 	if(mouseenabled) mouseenabled=true;
 	if(joystickenabled) joystickenabled=true;
 
-	if(mousexadjustment<0) mousexadjustment=0;
-	else if(mousexadjustment>20) mousexadjustment=20;
+	if (mousexadjustment<0) mousexadjustment = 0;
+	else if (mousexadjustment>20) mousexadjustment = 20;
 
-	if(mouseyadjustment<0) mouseyadjustment=0;
-	else if(mouseyadjustment>20) mouseyadjustment=20;
+	if (mouseyadjustment<0) mouseyadjustment = 0;
+	else if (mouseyadjustment>20) mouseyadjustment = 20;
+
+	if (panxadjustment<0) panxadjustment = 0;
+	else if (panxadjustment>20) panxadjustment = 20;
+
+	if (panyadjustment<0) panyadjustment = 0;
+	else if (panyadjustment>20) panyadjustment = 20;
 
 	if(viewsize<4) viewsize=4;
 	else if(viewsize>21) viewsize=21;
+
+	// Carry over the unified screenWidth/screenHeight from previous versions
+	// Overwrite the full*/windowed* variables, because they're (most likely) defaulted anyways
+	if(uniScreenWidth != 0)
+	{
+		fullScreenWidth = uniScreenWidth;
+		windowedScreenWidth = uniScreenWidth;
+	}
+
+	if(uniScreenHeight != 0)
+	{
+		fullScreenHeight = uniScreenHeight;
+		windowedScreenHeight = uniScreenHeight;
+	}
+
+	// Set screenHeight, screenWidth
+	if(vid_fullscreen)
+	{
+		screenHeight = fullScreenHeight;
+		screenWidth = fullScreenWidth;
+	}
+	else
+	{
+		screenHeight = windowedScreenHeight;
+		screenWidth = windowedScreenWidth;
+	}
 }
 
 /*
@@ -255,6 +313,8 @@ void WriteConfig(void)
 	config.GetSetting("ViewSize")->SetValue(viewsize);
 	config.GetSetting("MouseXAdjustment")->SetValue(mousexadjustment);
 	config.GetSetting("MouseYAdjustment")->SetValue(mouseyadjustment);
+	config.GetSetting("PanXAdjustment")->SetValue(panxadjustment);
+	config.GetSetting("PanYAdjustment")->SetValue(panyadjustment);
 	config.GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
 	config.GetSetting("AlwaysRun")->SetValue(alwaysrun);
 	config.GetSetting("SoundDevice")->SetValue(SoundMode);
@@ -265,8 +325,10 @@ void WriteConfig(void)
 	config.GetSetting("DigitizedVolume")->SetValue(SoundVolume);
 	config.GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
 	config.GetSetting("Vid_Aspect")->SetValue(vid_aspect);
-	config.GetSetting("ScreenWidth")->SetValue(screenWidth);
-	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
+	config.GetSetting("FullScreenWidth")->SetValue(fullScreenWidth);
+	config.GetSetting("FullScreenHeight")->SetValue(fullScreenHeight);
+	config.GetSetting("WindowedScreenWidth")->SetValue(windowedScreenWidth);
+	config.GetSetting("WindowedScreenHeight")->SetValue(windowedScreenHeight);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
 	config.GetSetting("MoveBob")->SetValue(movebob);
 	config.GetSetting("Gamma")->SetValue(screenGamma);

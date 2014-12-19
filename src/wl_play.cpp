@@ -1,5 +1,6 @@
 // WL_PLAY.C
 
+#include "c_cvars.h"
 #include "wl_def.h"
 #include "wl_menu.h"
 #include "id_ca.h"
@@ -144,9 +145,6 @@ void ControlScheme::setMouse(ControlScheme* scheme, Button button, int value)
 	}
 }
 
-bool alwaysrun;
-bool mouseenabled, mouseyaxisdisabled, joystickenabled;
-
 int viewsize;
 
 bool buttonheld[NUMBUTTONS], ambuttonheld[NUMAMBUTTONS];
@@ -159,10 +157,8 @@ memptr demobuffer;
 // current user input
 //
 int controlx, controly, controlstrafe;         // range from -100 to 100 per tic
+int controlpanx, controlpany;
 bool buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
-
-int lastgamemusicoffset = 0;
-
 
 //===========================================================================
 
@@ -233,9 +229,9 @@ void PollKeyboardButtons (void)
 void PollMouseButtons (void)
 {
 	int buttons = IN_MouseButtons();
-	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	for (int i = 0; controlScheme[i].button != bt_nobutton; i++)
 	{
-		if(controlScheme[i].mouse != -1 && (buttons & (1<<controlScheme[i].mouse)))
+		if (controlScheme[i].mouse != -1 && (buttons & (1 << controlScheme[i].mouse)))
 			buttonstate[controlScheme[i].button] = true;
 	}
 }
@@ -304,29 +300,29 @@ void PollKeyboardMove (void)
 
 void PollMouseMove (void)
 {
-	int mousexmove, mouseymove;
-
-	SDL_GetMouseState(&mousexmove, &mouseymove);
+	SDL_GetMouseState(&controlpanx, &controlpany);
 	if(IN_IsInputGrabbed())
 		IN_CenterMouse();
 
-	mousexmove -= screenWidth / 2;
-	mouseymove -= screenHeight / 2;
+	controlpanx -= screenWidth / 2;
+	controlpany -= screenHeight / 2;
 
-	controlx += mousexmove * 20 / (21 - mousexadjustment);
+	controlx += controlpanx * 20 / (21 - mousexadjustment);
 	if(mouselook)
 	{
-		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
-			mouseymove = xs_ToInt(mouseymove*fabs(players[0].ReadyWeapon->fovscale));
+		int mousey = controlpany;
 
-		players[0].mo->pitch += mouseymove * (ANGLE_1 / (21 - mouseyadjustment));
+		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
+			mousey = xs_ToInt(controlpany*fabs(players[0].ReadyWeapon->fovscale));
+
+		players[0].mo->pitch += mousey * (ANGLE_1 / (21 - mouseyadjustment));
 		if(players[0].mo->pitch+ANGLE_180 > ANGLE_180+56*ANGLE_1)
 			players[0].mo->pitch = 56*ANGLE_1;
 		else if(players[0].mo->pitch+ANGLE_180 < ANGLE_180-56*ANGLE_1)
 			players[0].mo->pitch = ANGLE_NEG(56*ANGLE_1);
 	}
 	else if(!mouseyaxisdisabled)
-		controly += mouseymove * 40 / (21 - mouseyadjustment);
+		controly += controlpany * 40 / (21 - mouseyadjustment);
 }
 
 
@@ -376,6 +372,8 @@ void PollControls (bool absolutes)
 
 	controlx = 0;
 	controly = 0;
+	controlpanx = 0;
+	controlpany = 0;
 	controlstrafe = 0;
 	memcpy (buttonheld, buttonstate, sizeof (buttonstate));
 	memset (buttonstate, 0, sizeof (buttonstate));
@@ -411,7 +409,7 @@ void PollControls (bool absolutes)
 // get button states
 //
 	PollKeyboardButtons ();
-
+	
 	if (mouseenabled && IN_IsInputGrabbed())
 		PollMouseButtons ();
 
@@ -547,6 +545,9 @@ void CheckKeys (void)
 	}
 	else if(!Keyboard[sc_Equals] && !Keyboard[sc_Minus])
 		changeSize = true;
+
+	if(Keyboard[sc_Alt] && Keyboard[sc_Enter])
+		ToggleFullscreen();
 
 	//
 	// SECRET CHEAT CODE: 'MLI'
@@ -710,7 +711,16 @@ void CheckKeys (void)
 */
 int StopMusic (void)
 {
-	int lastoffs = SD_MusicOff ();
+	int lastoffs = 0;
+
+    if (music == NULL)
+    {
+        lastoffs = SD_MusicOff ();
+    }
+    else
+    {
+        lastoffs = SD_PauseMusic ();
+    }
 
 	return lastoffs;
 }
@@ -911,6 +921,15 @@ void PlayLoop (void)
 	memset (buttonstate, 0, sizeof (buttonstate));
 	ClearPaletteShifts ();
 
+	if(automap != AMA_Off)
+	{
+			// Force the automap to off if it were previously on, unpause the game if am_pause
+		automap = AMA_Off;
+
+		if(am_pause) Paused &= ~2;
+	}
+
+
 	if (MousePresent && IN_IsInputGrabbed())
 		IN_CenterMouse();         // Clear accumulated mouse movement
 
@@ -931,8 +950,12 @@ void PlayLoop (void)
 		// Run tics
 		if(Paused & 2)
 		{
+			static bool absolutes = false;
+
 			// If paused due to the automap, continue polling controls but don't tick anything.
-			PollControls(0);
+			PollControls(absolutes);
+
+			absolutes = !absolutes;
 		}
 		else
 		{

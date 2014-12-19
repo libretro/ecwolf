@@ -602,9 +602,8 @@ bool Load(const FString &filename)
 	SaveProdVersion = atoll(prodver);
 	delete[] prodver;
 
-	char level[9];
-	M_GetPNGText(png, "Current Map", level, 8);
-	CA_CacheMap(level, true);
+	M_GetPNGText(png, "Current Map", gamestate.mapname, 8);
+	SetupGameLevel();
 
 	{
 		unsigned int chunkLength = M_FindPNGChunk(png, SNAP_ID);
@@ -617,6 +616,9 @@ bool Load(const FString &filename)
 	}
 
 	FRandom::StaticReadRNGState(png);
+	// It is apparently possible to load a game at just the right time and end
+	// up in the wrong play state.
+	playstate = ex_stillplaying;
 
 	delete png;
 	fclose(fileh);

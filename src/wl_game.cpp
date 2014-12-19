@@ -256,14 +256,13 @@ void SetupGameLevel (void)
 		gamestate.faceframe.SetInvalid();
 		LastAttacker = NULL;
 		players[0].killerobj = NULL;
-
-		thinkerList->DestroyAll();
 	}
 
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapname, false);
+	CA_CacheMap (gamestate.mapname, loadedgame);
+	StartMusic ();
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer
@@ -538,7 +537,6 @@ void RecordDemo (void)
 	demorecord = true;
 
 	SetupGameLevel ();
-	StartMusic ();
 
 	if(usedoublebuffering) VH_UpdateScreen();
 	fizzlein = true;
@@ -599,7 +597,6 @@ void PlayDemo (int demonumber)
 	demoplayback = true;
 
 	SetupGameLevel ();
-	StartMusic ();
 
 	PlayLoop ();
 
@@ -729,10 +726,7 @@ void Died (void)
 	ClearMemory();
 
 	if (players[0].lives > -1)
-	{
 		players[0].state = player_t::PST_REBORN;
-		thinkerList->DestroyAll();
-	}
 }
 
 //==========================================================================
@@ -842,14 +836,13 @@ restartgame:
 				}
 			}
 		}
+		else
+		{
+			loadedgame = false;
+			StartMusic ();
+		}
 
 		ingame = true;
-		if(loadedgame)
-		{
-			ContinueMusic(lastgamemusicoffset);
-			loadedgame = false;
-		}
-		else StartMusic ();
 
 		if (!died)
 			PreloadGraphics (dointermission);
