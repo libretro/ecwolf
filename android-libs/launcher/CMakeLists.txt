@@ -26,12 +26,6 @@ set(ANDROID_SIGN_KEYNAME "" CACHE STRING "Key name for jarsigner")
 
 set(CMAKE_JAVA_COMPILE_FLAGS -target 1.6 -source 1.6 -Xlint:-options ${CMAKE_JAVA_COMPILE_FLAGS})
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(APK_BUILD_FLAGS "")
-else(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(APK_BUILD_FLAGS "--debug-mode")
-endif(CMAKE_BUILD_TYPE STREQUAL "Release")
-
 add_subdirectory(src)
 
 add_custom_target(runadb

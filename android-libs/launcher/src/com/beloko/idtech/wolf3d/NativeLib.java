@@ -27,7 +27,7 @@ public class NativeLib implements QuakeControlInterface{
 			Log.i("JNI", "Trying to load libraries");
 
 			SDLLib.loadSDL();
-			System.loadLibrary("TouchControls");
+			System.loadLibrary("touchcontrols");
 
 			System.loadLibrary("ecwolf");
 		}

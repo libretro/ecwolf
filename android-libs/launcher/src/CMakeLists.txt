@@ -60,10 +60,10 @@ add_dependencies(ecwolf-android ecwolf TouchControls pk3)
 
 add_custom_command(TARGET ecwolf-android POST_BUILD
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:ecwolf>" "${CMAKE_CURRENT_BINARY_DIR}/lib/armeabi/$<TARGET_FILE_NAME:ecwolf>"
-	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:TouchControls>" "${CMAKE_CURRENT_BINARY_DIR}/lib/armeabi/$<TARGET_FILE_NAME:TouchControls>"
+	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:touchcontrols>" "${CMAKE_CURRENT_BINARY_DIR}/lib/armeabi/$<TARGET_FILE_NAME:touchcontrols>"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${SDL_LIBRARY}" "${CMAKE_CURRENT_BINARY_DIR}/lib/armeabi/libSDL.so"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${SDL_MIXER_LIBRARY}" "${CMAKE_CURRENT_BINARY_DIR}/lib/armeabi/libSDL_mixer.so"
-	COMMAND "${ANDROID_AAPT_BINARY}" package -f ${APK_BUILD_FLAGS} -M "${CMAKE_CURRENT_SOURCE_DIR}/../AndroidManifest.xml" -S "${CMAKE_CURRENT_SOURCE_DIR}/../res" -A "${CMAKE_CURRENT_SOURCE_DIR}/../assets" -A "${OUTPUT_DIR}/assets" -I "${ANDROID_SDK_JAR}" -F "${APK_OUTPUT}"
+	COMMAND "${ANDROID_AAPT_BINARY}" package -f $<$<CONFIG:DEBUG>:--debug-mode> -M "${CMAKE_CURRENT_SOURCE_DIR}/../AndroidManifest.xml" -S "${CMAKE_CURRENT_SOURCE_DIR}/../res" -A "${CMAKE_CURRENT_SOURCE_DIR}/../assets" -A "${OUTPUT_DIR}/assets" -I "${ANDROID_SDK_JAR}" -F "${APK_OUTPUT}"
 	COMMAND "${ANDROID_DX_BINARY}" --dex "--output=classes.dex"
 		"ecwolf-android.jar"
 		"${ANDROID_SUPPORT_V4_JAR}"
