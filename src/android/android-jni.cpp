@@ -3,11 +3,14 @@
 #include <string.h>
 #include <jni.h>
 #include <android/log.h>
+#include <unistd.h>
 
 
 #include "SDL_android_extra.h"
 
 #include "TouchControlsContainer.h"
+#include "JNITouchControlsUtils.h"
+
 extern "C"
 {
 
@@ -31,7 +34,7 @@ int android_screen_height;
 #define KEY_SHOW_INV     0x1006
 #define KEY_QUICK_CMD    0x1007
 
-#define KEY_SHOW_KEYB    0x1009
+#define KEY_SHOW_KBRD    0x1009
 
 float gameControlsAlpha = 0.5;
 bool showWeaponCycle = false;
@@ -97,43 +100,10 @@ void gameSettingsButton(int state)
 	//LOGTOUCH("gameSettingsButton %d",state);
 	if (state == 1)
 	{
-		jclass helloWorldClass;
-		jmethodID mainMethod;
-
-		helloWorldClass = env_->FindClass("com/beloko/idtech/QuakeTouchControlsSettings");
-
-		mainMethod = env_->GetStaticMethodID(helloWorldClass, "showSettings", "()V");
-
-		env_->CallStaticVoidMethod(helloWorldClass, mainMethod);
+		showTouchSettings();
 	}
 }
 
-void showCustomCommands()
-{
-	jclass helloWorldClass;
-	jmethodID mainMethod;
-	helloWorldClass = env_->FindClass("com/beloko/idtech/QuakeCustomCommands");
-	mainMethod = env_->GetStaticMethodID(helloWorldClass, "showCommands", "()V");
-	env_->CallStaticVoidMethod(helloWorldClass, mainMethod);
-}
-
-void toggleKeyboard()
-{
-	jclass helloWorldClass;
-	jmethodID mainMethod;
-	helloWorldClass = env_->FindClass("com/beloko/idtech/ShowKeyboard");
-	mainMethod = env_->GetStaticMethodID(helloWorldClass, "toggleKeyboard", "()V");
-	env_->CallStaticVoidMethod(helloWorldClass, mainMethod);
-}
-
-void showKeyboard(int val)
-{
-	jclass helloWorldClass;
-	jmethodID mainMethod;
-	helloWorldClass = env_->FindClass("com/beloko/idtech/ShowKeyboard");
-	mainMethod = env_->GetStaticMethodID(helloWorldClass, "showKeyboard", "(I)V");
-	env_->CallStaticVoidMethod(helloWorldClass, mainMethod,val);
-}
 
 
 static jclass NativeLibClass = 0;
@@ -173,6 +143,11 @@ void gameButton(int state,int code)
 				tcGameWeapons->animateIn(5);
 			}
 	}
+	else if  (code == KEY_SHOW_KBRD)
+	{
+		if (state)
+			showKeyboard(true);
+	}
 	else
 	{
 		PortableAction(state, code);
@@ -203,7 +178,7 @@ void weaponWheel(int segment)
 
 void menuButton(int state,int code)
 {
-	if (code == KEY_SHOW_KEYB)
+	if (code == KEY_SHOW_KBRD)
 	{
 		if (state)
 			toggleKeyboard();
@@ -307,6 +282,7 @@ void initControls(int width, int height,const char * graphics_path,const char *s
 	if (!controlsCreated)
 	{
 		LOGI("creating controls");
+		setControlsContainer(&controlsContainer);
 
 		touchcontrols::setGraphicsBasePath(graphics_path);
 
@@ -329,19 +305,21 @@ void initControls(int width, int height,const char * graphics_path,const char *s
 		tcMenuMain->addControl(new touchcontrols::Button("enter",touchcontrols::RectF(0,12,4,16),"enter",SDL_SCANCODE_RETURN));
 		tcMenuMain->signal_button.connect(  sigc::ptr_fun(&menuButton) );
 
-		tcMenuMain->setAlpha(0.5);
+		tcMenuMain->setAlpha(0.8);
 
 
 		//Game
 		tcGameMain->setAlpha(gameControlsAlpha);
-		tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(20,7,23,10),"fire2",KEY_SHOOT));
+		tcGameMain->addControl(new touchcontrols::Button("attack",touchcontrols::RectF(20,7,23,10),"shoot",KEY_SHOOT));
 		tcGameMain->addControl(new touchcontrols::Button("use",touchcontrols::RectF(23,6,26,9),"use",PORT_ACT_USE));
 		tcGameMain->addControl(new touchcontrols::Button("quick_save",touchcontrols::RectF(24,0,26,2),"save",PORT_ACT_QUICKSAVE));
 		tcGameMain->addControl(new touchcontrols::Button("quick_load",touchcontrols::RectF(20,0,22,2),"load",PORT_ACT_QUICKLOAD));
 		tcGameMain->addControl(new touchcontrols::Button("map",touchcontrols::RectF(4,0,6,2),"map",PORT_ACT_MAP));
 		tcGameMain->addControl(new touchcontrols::Button("run",touchcontrols::RectF(7,0,9,2),"run",PORT_ACT_ALWAYS_RUN));
-		tcGameMain->addControl(new touchcontrols::Button("plus",touchcontrols::RectF(17,0,19,2),"zoom_in",PORT_ACT_MAP_ZOOM_IN));
-		tcGameMain->addControl(new touchcontrols::Button("minus",touchcontrols::RectF(15,0,17,2),"zoom_out",PORT_ACT_MAP_ZOOM_OUT));
+		tcGameMain->addControl(new touchcontrols::Button("keyboard",touchcontrols::RectF(9,0,11,2),"keyboard",KEY_SHOW_KBRD,false,true));
+
+		tcGameMain->addControl(new touchcontrols::Button("plus",touchcontrols::RectF(17,0,19,2),"key_+",PORT_ACT_MAP_ZOOM_IN));
+		tcGameMain->addControl(new touchcontrols::Button("minus",touchcontrols::RectF(15,0,17,2),"key_-",PORT_ACT_MAP_ZOOM_OUT));
 
 //		tcGameMain->addControl(new touchcontrols::Button("show_weapons",touchcontrols::RectF(11,14,13,16),"show_weapons",KEY_SHOW_WEAPONS));
 
@@ -513,9 +491,9 @@ std::string home_env;
 
 
 extern void Android_SetGameResolution(int width, int height);
-
+extern int SDLDisableAlphaFix; //This is in the SDL renderer gles file
 jint EXPORT_ME
-JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint mem_mb,jobjectArray argsArray,jint lowRes,jstring game_path_ )
+JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint disableAlphaFix,jobjectArray argsArray,jint lowRes,jstring game_path_ )
 {
 	env_ = env;
 
@@ -523,6 +501,8 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint mem_mb,job
 		Android_SetGameResolution(320,240);
 	else
 		Android_SetGameResolution(640,400);
+
+	SDLDisableAlphaFix = disableAlphaFix;
 
 	argv[0] = "quake";
 	int argCount = (env)->GetArrayLength( argsArray);
@@ -594,7 +574,7 @@ JAVA_FUNC(frame) ( JNIEnv* env,	jobject thiz )
 __attribute__((visibility("default"))) jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	LOGI("JNI_OnLoad");
-
+	setTCJNIEnv(vm);
 	return JNI_VERSION_1_4;
 }
 
@@ -603,8 +583,13 @@ void EXPORT_ME
 JAVA_FUNC(keypress) (JNIEnv *env, jobject obj,jint down, jint keycode, jint unicode)
 {
 	LOGI("keypress %d",keycode);
+	if (controlsContainer.isEditing())
+	{
+		if (down && (keycode == SDL_SCANCODE_ESCAPE ))
+			controlsContainer.finishEditing();
+		return;
+	}
 	PortableKeyEvent(down,keycode,unicode);
-
 }
 
 

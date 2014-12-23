@@ -32,21 +32,27 @@ public class AppSettings {
 
 	public static long rid = 0x12345678abcdef12l;
 
+	public static int rnlvl = 0;
+
 	public static void setGame(IDGame g)
 	{
 		game = g;
 	}
 
+	public static void resetBaseDir(Context ctx)
+	{
+		belokoBaseDir  =  Environment.getExternalStorageDirectory().toString() + "/Beloko";
+		setStringOption(ctx, "base_path", belokoBaseDir);
+	}
+
 	public static void reloadSettings(Context ctx)
 	{
-		String base = getStringOption(ctx, "base_path", null);
-		if (base == null)
+		belokoBaseDir = getStringOption(ctx, "base_path", null);
+		if (belokoBaseDir == null)
 		{
-			base  =  Environment.getExternalStorageDirectory().toString() + "/Beloko";
-			setStringOption(ctx, "base_path", base);
+			resetBaseDir(ctx);
 		}
 
-		belokoBaseDir =  base;
 
 
 		String music = getStringOption(ctx, "music_path", null);
@@ -79,6 +85,10 @@ public class AppSettings {
 			rid = randomGenerator.nextLong();
 			setLongOption(ctx, "rid", rid);
 		}
+
+		Random randomGenerator = new Random();
+		rnlvl = randomGenerator.nextInt();
+
 
 		CDAudioPlayer.initFiles(musicBaseDir);
 

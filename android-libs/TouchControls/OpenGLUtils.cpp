@@ -359,6 +359,7 @@ std::map <std::string, GLuint> tc_gl_textures;
 static int texNumber = 20000;
 GLuint loadTextureFromPNG(std::string filename, int &width, int &height)
 {
+	LOGTOUCH("loadTextureFromPNG %s", filename.c_str());
 
     if (filename == "")
     {

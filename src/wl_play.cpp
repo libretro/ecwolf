@@ -48,7 +48,11 @@ bool madenoise;              // true when shooting or screaming
 
 exit_t playstate;
 
+#ifndef __ANDROID__
 static int DebugOk;
+#else
+static int DebugOk = 1;
+#endif
 
 bool noclip, ammocheat, mouselook = false;
 int godmode, singlestep;
@@ -555,6 +559,7 @@ void CheckKeys (void)
 	//
 	// OPEN UP DEBUG KEYS
 	//
+#ifndef __ANDROID__
 	if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt])
 	{
 		ClearMemory ();
@@ -567,6 +572,7 @@ void CheckKeys (void)
 		DrawPlayBorderSides ();
 		DebugOk = 1;
 	}
+#endif
 
 	//
 	// TRYING THE KEEN CHEAT CODE!
@@ -665,6 +671,8 @@ void CheckKeys (void)
 //
 	if (DebugOk)
 	{
+		// Impossible to press 2 keys at once on android
+#ifndef __ANDROID__
 		// Jam debug sequence if we're trying to open the automap
 		// We really only need to check for the automap control since it's
 		// likely to be put in the Tab space and be tapped while using other controls
@@ -674,6 +682,7 @@ void CheckKeys (void)
 			keyDown = false;
 
 		if (keyDown)
+#endif
 		{
 			if (DebugKeys () && viewsize < 20)
 				StatusBar->RefreshBackground ();       // dont let the blue borders flash

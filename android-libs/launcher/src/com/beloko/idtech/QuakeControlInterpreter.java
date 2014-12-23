@@ -1,6 +1,7 @@
 package com.beloko.idtech;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import android.util.Log;
 import android.view.KeyEvent;
@@ -19,8 +20,9 @@ public class QuakeControlInterpreter {
 
 	boolean gamePadEnabled;
 
-	int screenWidth, screenHeight;
+	float screenWidth, screenHeight;
 	
+	HashMap<Integer, Boolean> analogButtonState = new HashMap<Integer, Boolean>(); //Saves current state of analog buttons so all sent each time
 	
 	public QuakeControlInterpreter(QuakeControlInterface qif,IDGame game,String controlfile,boolean ctrlEn)
 	{
@@ -38,6 +40,15 @@ public class QuakeControlInterpreter {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}
+
+		for (ActionInput ai: config.actions)
+		{
+			if ((ai.sourceType == Type.ANALOG) && ((ai.actionType == Type.MENU) || (ai.actionType == Type.BUTTON)))
+			{
+				analogButtonState.put(ai.actionCode, false);
+			}
+		}
+
 		quakeIf = qif;
 	}
 
@@ -67,7 +78,6 @@ public class QuakeControlInterpreter {
 		{
 			float x = event.getX()/screenWidth;
 			float y = event.getY()/screenHeight;
-
 			quakeIf.touchEvent_if(1, 0, x, y);
 		}
 		else if (actionCode == MotionEvent.ACTION_POINTER_DOWN)
@@ -113,7 +123,7 @@ public class QuakeControlInterpreter {
 
 		if (pad_version ==  Controller.ACTION_VERSION_MOGA)
 		{
-			Log.d(LOG,"removed");
+			//Log.d(LOG,"removed");
 			if ((keycode == com.bda.controller.KeyEvent.KEYCODE_DPAD_DOWN) || 
 					(keycode == com.bda.controller.KeyEvent.KEYCODE_DPAD_UP) || 
 					(keycode == com.bda.controller.KeyEvent.KEYCODE_DPAD_LEFT) || 
@@ -252,13 +262,26 @@ public class QuakeControlInterpreter {
 
 						if (((ai.sourcePositive) && (event.getAxisValue(ai.source)) > 0.5) ||
 								((!ai.sourcePositive) && (event.getAxisValue(ai.source)) < -0.5) )
-							quakeIf.doAction_if(1, ai.actionCode); //press
+						{
+							if (!analogButtonState.get(ai.actionCode)) //Check internal state, only send if different
+							{
+								quakeIf.doAction_if(1, ai.actionCode); //press
+								analogButtonState.put(ai.actionCode, true);
+							}
+						}
 						else
-							quakeIf.doAction_if(0, ai.actionCode); //un-press
+						{
+							if (analogButtonState.get(ai.actionCode)) //Check internal state, only send if different
+							{
+								quakeIf.doAction_if(0, ai.actionCode); //un-press
+								analogButtonState.put(ai.actionCode, false);
+							}
+						}
 
 					}
 					used = true;
 				}
+				/*
 				//Menu buttons
 				if ((ai.sourceType == Type.ANALOG) && (ai.actionType == Type.MENU) && (ai.source != -1))
 				{
@@ -270,6 +293,7 @@ public class QuakeControlInterpreter {
 					else
 						quakeIf.doAction_if(0, ai.actionCode); //un-press
 				}
+				 */
 			}
 
 		}

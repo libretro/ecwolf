@@ -37,7 +37,7 @@ public class NativeLib implements QuakeControlInterface{
 
 	}
 
-	public static native int init(String graphics_dir,int mem,String[] args,int game,String path);
+	public static native int init(String graphics_dir,int disableAlphaFix,String[] args,int game,String path);
 
 	public static native void setScreenSize( int width, int height );
 
@@ -194,82 +194,110 @@ public class NativeLib implements QuakeControlInterface{
 	public static final int  SDL_SCANCODE_RALT = 230; /**< alt gr; option */
 	public  int mapKey(int acode,  int unicode)
 	{
-		switch(acode)
+		if ((acode >= KeyEvent.KEYCODE_A) && (acode <= KeyEvent.KEYCODE_Z))
 		{
-		case KeyEvent.KEYCODE_TAB:
-			return SDL_SCANCODE_TAB;
-		case KeyEvent.KEYCODE_DPAD_CENTER:
-		case KeyEvent.KEYCODE_ENTER:
-			return SDL_SCANCODE_RETURN;
-		case KeyEvent.KEYCODE_ESCAPE:
-		case KeyEvent.KEYCODE_BACK:
-			return SDL_SCANCODE_ESCAPE;
-		case KeyEvent.KEYCODE_SPACE:
-			return SDL_SCANCODE_SPACE;
-		case KeyEvent.KEYCODE_DEL:
-			return SDL_SCANCODE_BACKSPACE;
-		case KeyEvent.KEYCODE_DPAD_UP:
-			return SDL_SCANCODE_UP;
-		case KeyEvent.KEYCODE_DPAD_DOWN:
-			return SDL_SCANCODE_DOWN;
-		case KeyEvent.KEYCODE_DPAD_LEFT:
-			return SDL_SCANCODE_LEFT;
-		case KeyEvent.KEYCODE_DPAD_RIGHT:
-			return SDL_SCANCODE_RIGHT;
-		case KeyEvent.KEYCODE_ALT_LEFT:
-			return SDL_SCANCODE_A;
-		case KeyEvent.KEYCODE_ALT_RIGHT:
-			return SDL_SCANCODE_RALT;
-		case KeyEvent.KEYCODE_CTRL_LEFT:
-			return SDL_SCANCODE_LCTRL;
-		case KeyEvent.KEYCODE_CTRL_RIGHT:
-			return SDL_SCANCODE_RCTRL;
-		case KeyEvent.KEYCODE_SHIFT_LEFT:
-			return SDL_SCANCODE_LSHIFT;
-		case KeyEvent.KEYCODE_SHIFT_RIGHT:
-			return SDL_SCANCODE_RSHIFT;
-		case KeyEvent.KEYCODE_F1:
-			return SDL_SCANCODE_F1;
-		case KeyEvent.KEYCODE_F2:
-			return SDL_SCANCODE_F2;
-		case KeyEvent.KEYCODE_F3:
-			return SDL_SCANCODE_F3;
-		case KeyEvent.KEYCODE_F4:
-			return SDL_SCANCODE_F4;
-		case KeyEvent.KEYCODE_F5:
-			return SDL_SCANCODE_F5;
-		case KeyEvent.KEYCODE_F6:
-			return SDL_SCANCODE_F6;
-		case KeyEvent.KEYCODE_F7:
-			return SDL_SCANCODE_F7;
-		case KeyEvent.KEYCODE_F8:
-			return SDL_SCANCODE_F8;
-		case KeyEvent.KEYCODE_F9:
-			return SDL_SCANCODE_F9;
-		case KeyEvent.KEYCODE_F10:
-			return SDL_SCANCODE_F10;
-		case KeyEvent.KEYCODE_F11:
-			return SDL_SCANCODE_F11;
-		case KeyEvent.KEYCODE_F12:
-			return SDL_SCANCODE_F12;	
-		case KeyEvent.KEYCODE_FORWARD_DEL:
-			return SDL_SCANCODE_DELETE;
-		case KeyEvent.KEYCODE_INSERT:
-			return SDL_SCANCODE_INSERT;
-		case KeyEvent.KEYCODE_PAGE_UP:
-			return SDL_SCANCODE_PAGEUP;
-		case KeyEvent.KEYCODE_PAGE_DOWN:
-			return SDL_SCANCODE_PAGEDOWN;
-		case KeyEvent.KEYCODE_MOVE_HOME:
-			return SDL_SCANCODE_HOME;
-		case KeyEvent.KEYCODE_MOVE_END:
-			return SDL_SCANCODE_END;
-		case KeyEvent.KEYCODE_BREAK:
-			return SDL_SCANCODE_PRINTSCREEN;
+			return SDL_SCANCODE_A + (acode - KeyEvent.KEYCODE_A);
+		}
 
-		default:
-			if (unicode < 128)
-				return Character.toLowerCase(unicode);
+		else
+		{
+			switch(acode)
+			{
+			case KeyEvent.KEYCODE_TAB:
+				return SDL_SCANCODE_TAB;
+			case KeyEvent.KEYCODE_DPAD_CENTER:
+			case KeyEvent.KEYCODE_ENTER:
+				return SDL_SCANCODE_RETURN;
+			case KeyEvent.KEYCODE_ESCAPE:
+			case KeyEvent.KEYCODE_BACK:
+				return SDL_SCANCODE_ESCAPE;
+			case KeyEvent.KEYCODE_SPACE:
+				return SDL_SCANCODE_SPACE;
+			case KeyEvent.KEYCODE_DEL:
+				return SDL_SCANCODE_BACKSPACE;
+			case KeyEvent.KEYCODE_DPAD_UP:
+				return SDL_SCANCODE_UP;
+			case KeyEvent.KEYCODE_DPAD_DOWN:
+				return SDL_SCANCODE_DOWN;
+			case KeyEvent.KEYCODE_DPAD_LEFT:
+				return SDL_SCANCODE_LEFT;
+			case KeyEvent.KEYCODE_DPAD_RIGHT:
+				return SDL_SCANCODE_RIGHT;
+			case KeyEvent.KEYCODE_ALT_LEFT:
+				return SDL_SCANCODE_A;
+			case KeyEvent.KEYCODE_ALT_RIGHT:
+				return SDL_SCANCODE_RALT;
+			case KeyEvent.KEYCODE_CTRL_LEFT:
+				return SDL_SCANCODE_LCTRL;
+			case KeyEvent.KEYCODE_CTRL_RIGHT:
+				return SDL_SCANCODE_RCTRL;
+			case KeyEvent.KEYCODE_SHIFT_LEFT:
+				return SDL_SCANCODE_LSHIFT;
+			case KeyEvent.KEYCODE_SHIFT_RIGHT:
+				return SDL_SCANCODE_RSHIFT;
+			case KeyEvent.KEYCODE_F1:
+				return SDL_SCANCODE_F1;
+			case KeyEvent.KEYCODE_F2:
+				return SDL_SCANCODE_F2;
+			case KeyEvent.KEYCODE_F3:
+				return SDL_SCANCODE_F3;
+			case KeyEvent.KEYCODE_F4:
+				return SDL_SCANCODE_F4;
+			case KeyEvent.KEYCODE_F5:
+				return SDL_SCANCODE_F5;
+			case KeyEvent.KEYCODE_F6:
+				return SDL_SCANCODE_F6;
+			case KeyEvent.KEYCODE_F7:
+				return SDL_SCANCODE_F7;
+			case KeyEvent.KEYCODE_F8:
+				return SDL_SCANCODE_F8;
+			case KeyEvent.KEYCODE_F9:
+				return SDL_SCANCODE_F9;
+			case KeyEvent.KEYCODE_F10:
+				return SDL_SCANCODE_F10;
+			case KeyEvent.KEYCODE_F11:
+				return SDL_SCANCODE_F11;
+			case KeyEvent.KEYCODE_F12:
+				return SDL_SCANCODE_F12;	
+			case KeyEvent.KEYCODE_FORWARD_DEL:
+				return SDL_SCANCODE_DELETE;
+			case KeyEvent.KEYCODE_INSERT:
+				return SDL_SCANCODE_INSERT;
+			case KeyEvent.KEYCODE_PAGE_UP:
+				return SDL_SCANCODE_PAGEUP;
+			case KeyEvent.KEYCODE_PAGE_DOWN:
+				return SDL_SCANCODE_PAGEDOWN;
+			case KeyEvent.KEYCODE_MOVE_HOME:
+				return SDL_SCANCODE_HOME;
+			case KeyEvent.KEYCODE_MOVE_END:
+				return SDL_SCANCODE_END;
+			case KeyEvent.KEYCODE_BREAK:
+				return SDL_SCANCODE_PRINTSCREEN;
+			case KeyEvent.KEYCODE_0:
+				return SDL_SCANCODE_0;
+			case KeyEvent.KEYCODE_1:
+				return SDL_SCANCODE_1;
+			case KeyEvent.KEYCODE_2:
+				return SDL_SCANCODE_2;
+			case KeyEvent.KEYCODE_3:
+				return SDL_SCANCODE_3;
+			case KeyEvent.KEYCODE_4:
+				return SDL_SCANCODE_4;
+			case KeyEvent.KEYCODE_5:
+				return SDL_SCANCODE_5;
+			case KeyEvent.KEYCODE_6:
+				return SDL_SCANCODE_6;
+			case KeyEvent.KEYCODE_7:
+				return SDL_SCANCODE_7;
+			case KeyEvent.KEYCODE_8:
+				return SDL_SCANCODE_8;
+			case KeyEvent.KEYCODE_9:
+				return SDL_SCANCODE_9;
+
+			default:
+				if (unicode < 128)
+					return Character.toLowerCase(unicode);
+			}
 		}
 		return 0;
 	} 
@@ -291,6 +319,8 @@ public class NativeLib implements QuakeControlInterface{
 	static int pickIWad(String[] games, int defaultwad)
 	{
 		Looper.prepare();
+
+		pickedWad = defaultwad;
 
 		new AlertDialog.Builder(Game.act)
 			.setTitle("Select an IWAD to use")
