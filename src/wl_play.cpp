@@ -684,14 +684,16 @@ void CheckKeys (void)
 		if (keyDown)
 #endif
 		{
-			if (DebugKeys () && viewsize < 20)
-				StatusBar->RefreshBackground ();       // dont let the blue borders flash
+			if (DebugKeys ())
+			{
+				if (viewsize < 20)
+					StatusBar->RefreshBackground ();       // dont let the blue borders flash
 
-			if (MousePresent && IN_IsInputGrabbed())
-				IN_CenterMouse();     // Clear accumulated mouse movement
+				if (MousePresent && IN_IsInputGrabbed())
+					IN_CenterMouse();     // Clear accumulated mouse movement
 
-			lasttimecount = GetTimeCount();
-			return;
+				lasttimecount = GetTimeCount();
+			}
 		}
 	}
 }
