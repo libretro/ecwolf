@@ -1,5 +1,5 @@
 add_custom_command(OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/com/beloko/idtech/R.java"
-	COMMAND "${ANDROID_AAPT_BINARY}" package -m -J . -M ../AndroidManifest.xml -S ../res -I "${ANDROID_SDK_JAR}"
+	COMMAND "${ANDROID_AAPT_BINARY}" package -m -J . -M ../AndroidManifest.xml -S ../res -I "${ANDROID_SDK_JAR}" --custom-package com.beloko.idtech
 	DEPENDS ../AndroidManifest.xml ../res
 	WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 	COMMENT "Generating resources"
