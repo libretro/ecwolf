@@ -48,10 +48,9 @@ bool madenoise;              // true when shooting or screaming
 
 exit_t playstate;
 
-#ifndef __ANDROID__
 static int DebugOk;
-#else
-static int DebugOk = 1;
+#ifdef __ANDROID__
+extern bool ShadowingEnabled;
 #endif
 
 bool noclip, ammocheat, mouselook = false;
@@ -559,7 +558,6 @@ void CheckKeys (void)
 	//
 	// OPEN UP DEBUG KEYS
 	//
-#ifndef __ANDROID__
 	if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt])
 	{
 		ClearMemory ();
@@ -572,7 +570,6 @@ void CheckKeys (void)
 		DrawPlayBorderSides ();
 		DebugOk = 1;
 	}
-#endif
 
 	//
 	// TRYING THE KEEN CHEAT CODE!
@@ -671,8 +668,6 @@ void CheckKeys (void)
 //
 	if (DebugOk)
 	{
-		// Impossible to press 2 keys at once on android
-#ifndef __ANDROID__
 		// Jam debug sequence if we're trying to open the automap
 		// We really only need to check for the automap control since it's
 		// likely to be put in the Tab space and be tapped while using other controls
@@ -681,8 +676,13 @@ void CheckKeys (void)
 			&& (buttonstate[bt_automap] || buttonheld[bt_automap]))
 			keyDown = false;
 
-		if (keyDown)
+#ifdef __ANDROID__
+		// Soft keyboard
+		if (ShadowingEnabled)
+			keyDown = true;
 #endif
+
+		if (keyDown)
 		{
 			if (DebugKeys ())
 			{
@@ -920,6 +920,11 @@ void PlayLoop (void)
 #if defined(USE_FEATUREFLAGS) && defined(USE_CLOUDSKY)
 	if(GetFeatureFlags() & FF_CLOUDSKY)
 		InitSky();
+#endif
+
+#ifdef __ANDROID__
+	if (ShadowingEnabled)
+		DebugOk = 1;
 #endif
 
 	playstate = ex_stillplaying;

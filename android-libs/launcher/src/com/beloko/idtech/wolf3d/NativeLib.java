@@ -152,6 +152,7 @@ public class NativeLib implements QuakeControlInterface{
 	public static final int  SDL_SCANCODE_LEFTBRACKET = 47;
 	public static final int  SDL_SCANCODE_RIGHTBRACKET = 48;
 
+	public static final int  SDL_SCANCODE_GRAVE = 53;
 	public static final int  SDL_SCANCODE_COMMA = 54;
 	public static final int  SDL_SCANCODE_PERIOD = 55;
 	public static final int  SDL_SCANCODE_SLASH = 56;
@@ -224,7 +225,7 @@ public class NativeLib implements QuakeControlInterface{
 			case KeyEvent.KEYCODE_DPAD_RIGHT:
 				return SDL_SCANCODE_RIGHT;
 			case KeyEvent.KEYCODE_ALT_LEFT:
-				return SDL_SCANCODE_A;
+				return SDL_SCANCODE_LALT;
 			case KeyEvent.KEYCODE_ALT_RIGHT:
 				return SDL_SCANCODE_RALT;
 			case KeyEvent.KEYCODE_CTRL_LEFT:
@@ -293,6 +294,8 @@ public class NativeLib implements QuakeControlInterface{
 				return SDL_SCANCODE_8;
 			case KeyEvent.KEYCODE_9:
 				return SDL_SCANCODE_9;
+			case KeyEvent.KEYCODE_GRAVE:
+				return SDL_SCANCODE_GRAVE;
 
 			default:
 				if (unicode < 128)

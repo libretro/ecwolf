@@ -264,7 +264,9 @@ bool IN_JoyPresent()
 }
 
 #ifdef __ANDROID__
-bool ShadowKey = false;
+static bool ShadowKey = false;
+bool ShadowingEnabled = false;
+extern "C" int hasHardwareKeyboard();
 #endif
 
 static void processEvent(SDL_Event *event)
@@ -440,9 +442,12 @@ void IN_ProcessEvents()
 	SDL_Event event;
 
 #ifdef __ANDROID__
-	if(!ShadowKey)
-		Keyboard[LastScan] = 0;
-	ShadowKey = true;
+	if(ShadowingEnabled)
+	{
+		if(!ShadowKey)
+			Keyboard[LastScan] = 0;
+		ShadowKey = true;
+	}
 #endif
 
 	while (SDL_PollEvent(&event))
@@ -462,6 +467,10 @@ IN_Startup(void)
 {
 	if (IN_Started)
 		return;
+
+#ifdef __ANDROID__
+	ShadowingEnabled = !hasHardwareKeyboard();
+#endif
 
 	IN_ClearKeysDown();
 

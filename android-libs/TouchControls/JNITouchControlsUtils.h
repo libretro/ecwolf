@@ -17,6 +17,7 @@ void showTouchSettings();
 
 void toggleKeyboard();
 void showKeyboard(int val);
+int hasHardwareKeyboard();
 
 void ChangeDroidMusic(int action,int param1,int param2);
 
