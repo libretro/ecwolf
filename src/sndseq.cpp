@@ -40,6 +40,8 @@
 #include "w_wad.h"
 #include "wl_game.h"
 
+#include <climits>
+
 enum ESndSeqFlag
 {
 	SSF_NoStopCutOff = 0x1
