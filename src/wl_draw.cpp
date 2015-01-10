@@ -570,9 +570,6 @@ typedef struct
 	//		shapenum;
 	//short      flags;          // this must be changed to uint32_t, when you
 							// you need more than 16-flags for drawing
-#ifdef USE_DIR3DSPR
-	statobj_t *transsprite;
-#endif
 } visobj_t;
 
 visobj_t vislist[MAXVISABLE];
@@ -626,12 +623,8 @@ void DrawScaleds (void)
 			visptr->viewheight = obj->viewheight;
 
 			if (visptr < &vislist[MAXVISABLE-1])    // don't let it overflow
-			{
-#ifdef USE_DIR3DSPR
-				visptr->transsprite = NULL;
-#endif
 				visptr++;
-			}
+
 			obj->flags |= FL_VISABLE;
 		}
 		else
@@ -661,11 +654,9 @@ void DrawScaleds (void)
 		//
 		// draw farthest
 		//
-#ifdef USE_DIR3DSPR
-		if(farthest->transsprite)
-			Scale3DShape(vbuf, vbufPitch, farthest->transsprite);
+		if(farthest->actor->flags & FL_BILLBOARD)
+			Scale3DSprite(farthest->actor, farthest->actor->state, farthest->viewheight);
 		else
-#endif
 			ScaleSprite(farthest->actor, farthest->actor->viewx, farthest->actor->state, farthest->viewheight);
 
 		farthest->viewheight = 32000;

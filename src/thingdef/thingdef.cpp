@@ -75,6 +75,7 @@ const struct FlagDef
 	DEFINE_FLAG(IF, ALWAYSPICKUP, Inventory, itemFlags),
 	DEFINE_FLAG(FL, AMBUSH, Actor, flags),
 	DEFINE_FLAG(IF, AUTOACTIVATE, Inventory, itemFlags),
+	DEFINE_FLAG(FL, BILLBOARD, Actor, flags),
 	DEFINE_FLAG(FL, BRIGHT, Actor, flags),
 	DEFINE_FLAG(FL, CANUSEWALLS, Actor, flags),
 	DEFINE_FLAG(FL, COUNTITEM, Actor, flags),
