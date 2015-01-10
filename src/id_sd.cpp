@@ -942,7 +942,10 @@ SD_Startup(void)
 		return;
 	}
 
-#ifdef __unix__
+#if defined(__ANDROID__)
+	// Working directory will be in the form: Beloko/Wolf3d/FULL
+	Mix_SetSoundFonts("../../FluidR3_GM.sf2");
+#elif defined(__unix__)
 	Mix_SetSoundFonts("/usr/share/sounds/sf2/FluidR3_GM.sf2");
 #endif
 

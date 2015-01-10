@@ -577,7 +577,17 @@ private:
 
 static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger);
 
-// Reads old format maps
+/* Reads old format maps... well technically WDC format maps.
+ * char[6] - Magic "WDC3.1"
+ * int32 - Number of maps (Should be 1 in our case)
+ * int16 - Number of planes
+ * int16 - (Max) name length
+ * --- The following would be repeated per map ---
+ * char[max] - Name
+ * int16 - Width
+ * int16 - Hieght
+ * ... raw plane data ...
+ */
 void GameMap::ReadPlanesData()
 {
 	static Xlat xlat;
@@ -633,7 +643,7 @@ void GameMap::ReadPlanesData()
 	{
 		lump->Seek(size*2*3, SEEK_CUR);
 		lump->Read(infoplane, size*2);
-		lump->Seek(34, SEEK_SET);
+		lump->Seek(18+nameLength, SEEK_SET);
 	}
 	else
 		memset(infoplane, 0, size*2);

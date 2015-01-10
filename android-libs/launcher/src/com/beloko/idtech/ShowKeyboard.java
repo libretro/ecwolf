@@ -2,6 +2,7 @@ package com.beloko.idtech;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -47,5 +48,13 @@ public class ShowKeyboard {
 			if (show == 2)
 				toggleKeyboard();
 		}
+	}
+
+	public static boolean hasHardwareKeyboard()
+	{
+		if(activity == null)
+			return false;
+
+		return activity.getApplicationContext().getResources().getConfiguration().keyboard == Configuration.KEYBOARD_QWERTY;
 	}
 }

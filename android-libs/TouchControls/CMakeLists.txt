@@ -5,7 +5,7 @@ include_directories(${SIGCPP_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${LIBPNG_INCLUD
 # Add -DUSE_GLES2 for OpenGLES 2
 add_definitions(-DANDROID_NDK)
 
-add_library(TouchControls SHARED
+add_library(touchcontrols SHARED
     Button.cpp
     ControlSuper.cpp
     GLLines.cpp
@@ -21,5 +21,5 @@ add_library(TouchControls SHARED
     WheelSelect.cpp
 )
 
-target_link_libraries(TouchControls GLESv1_CM log ${TINYXML_LIBRARY} ${SIGCPP_LIBRARY} ${LIBPNG_LIBRARY})
+target_link_libraries(touchcontrols GLESv1_CM log ${TINYXML_LIBRARY} ${SIGCPP_LIBRARY} ${LIBPNG_LIBRARY})
  

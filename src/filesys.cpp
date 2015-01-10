@@ -44,6 +44,7 @@
 #include <CoreServices/CoreServices.h>
 #include <sys/attr.h>
 #include <sys/mount.h>
+#include <mach-o/dyld.h>
 #endif
 #include <sys/stat.h>
 #include <dirent.h>

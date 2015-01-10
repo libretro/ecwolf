@@ -46,6 +46,7 @@ import com.beloko.idtech.MyGLSurfaceView;
 import com.beloko.idtech.QuakeControlInterpreter;
 import com.beloko.idtech.QuakeCustomCommands;
 import com.beloko.idtech.QuakeTouchControlsSettings;
+import com.beloko.idtech.ShowKeyboard;
 import com.beloko.idtech.Utils;
 import com.beloko.libsdl.SDLLib;
 
@@ -122,6 +123,7 @@ public class Game extends Activity
 		NativeLib engine = new NativeLib();
 
 		NativeLib.loadLibraries(false);
+		ShowKeyboard.setup(act, null);
 
 		controlInterp = new QuakeControlInterpreter(engine,AppSettings.game,AppSettings.gamePadControlsFile,AppSettings.gamePadEnabled);
 
@@ -406,7 +408,9 @@ public class Game extends Activity
 
 			String[] args_array = Utils.creatArgs(args);
 
-			int ret = NativeLib.init(AppSettings.graphicsDir,64,args_array,lowRes,gamePath);
+			int disableAlphaFix =  getIntent().getIntExtra("disable_alpha_fix", 0);
+
+			int ret = NativeLib.init(AppSettings.graphicsDir,disableAlphaFix,args_array,lowRes,gamePath);
 
 			Log.i("Quake2", "Quake2Init done");
 
@@ -422,8 +426,6 @@ public class Game extends Activity
 		boolean inited = false;
 
 		public void onDrawFrame(GL10 gl) {
-
-
 
 			//Log.d(LOG,"onDrawFrame");
 

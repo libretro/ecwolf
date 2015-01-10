@@ -49,6 +49,9 @@ bool madenoise;              // true when shooting or screaming
 exit_t playstate;
 
 static int DebugOk;
+#ifdef __ANDROID__
+extern bool ShadowingEnabled;
+#endif
 
 bool noclip, ammocheat, mouselook = false;
 int godmode, singlestep;
@@ -676,16 +679,24 @@ void CheckKeys (void)
 			&& (buttonstate[bt_automap] || buttonheld[bt_automap]))
 			keyDown = false;
 
+#ifdef __ANDROID__
+		// Soft keyboard
+		if (ShadowingEnabled)
+			keyDown = true;
+#endif
+
 		if (keyDown)
 		{
-			if (DebugKeys () && viewsize < 20)
-				StatusBar->RefreshBackground ();       // dont let the blue borders flash
+			if (DebugKeys ())
+			{
+				if (viewsize < 20)
+					StatusBar->RefreshBackground ();       // dont let the blue borders flash
 
-			if (MousePresent && IN_IsInputGrabbed())
-				IN_CenterMouse();     // Clear accumulated mouse movement
+				if (MousePresent && IN_IsInputGrabbed())
+					IN_CenterMouse();     // Clear accumulated mouse movement
 
-			lasttimecount = GetTimeCount();
-			return;
+				lasttimecount = GetTimeCount();
+			}
 		}
 	}
 }
@@ -912,6 +923,11 @@ void PlayLoop (void)
 #if defined(USE_FEATUREFLAGS) && defined(USE_CLOUDSKY)
 	if(GetFeatureFlags() & FF_CLOUDSKY)
 		InitSky();
+#endif
+
+#ifdef __ANDROID__
+	if (ShadowingEnabled)
+		DebugOk = 1;
 #endif
 
 	playstate = ex_stillplaying;

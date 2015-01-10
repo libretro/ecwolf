@@ -263,6 +263,12 @@ bool IN_JoyPresent()
 	return Joystick != NULL;
 }
 
+#ifdef __ANDROID__
+static bool ShadowKey = false;
+bool ShadowingEnabled = false;
+extern "C" int hasHardwareKeyboard();
+#endif
+
 static void processEvent(SDL_Event *event)
 {
 	switch (event->type)
@@ -377,6 +383,14 @@ static void processEvent(SDL_Event *event)
 				}
 			}
 
+#ifdef __ANDROID__
+			if(ShadowKey && LastScan == SCANCODE_UNMASK(event->key.keysym.sym))
+			{
+				ShadowKey = false;
+				break;
+			}
+#endif
+
 			if(SCANCODE_UNMASK(key)<SDLK_LAST)
 				Keyboard[SCANCODE_UNMASK(key)] = 0;
 			break;
@@ -427,6 +441,15 @@ void IN_ProcessEvents()
 {
 	SDL_Event event;
 
+#ifdef __ANDROID__
+	if(ShadowingEnabled)
+	{
+		if(!ShadowKey)
+			Keyboard[LastScan] = 0;
+		ShadowKey = true;
+	}
+#endif
+
 	while (SDL_PollEvent(&event))
 	{
 		processEvent(&event);
@@ -444,6 +467,10 @@ IN_Startup(void)
 {
 	if (IN_Started)
 		return;
+
+#ifdef __ANDROID__
+	ShadowingEnabled = !hasHardwareKeyboard();
+#endif
 
 	IN_ClearKeysDown();
 

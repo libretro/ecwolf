@@ -4,6 +4,8 @@ find_package(Java REQUIRED)
 include(UseJava)
 
 set(APK_OUTPUT "${CMAKE_BINARY_DIR}/ecwolf.apk")
+set(APK_PACKAGE_NAME "com.beloko.wolf3dhg")
+set(APK_ENTRY_ACTIVITY "com.beloko.wolf3d.EntryActivity")
 
 set(ANDROID_SDK "ANDROID_SDK-NOTFOUND" CACHE PATH "Path to android.jar")
 set(ANDROID_SDK_TOOLS "ANDROID_SDK_TOOLS-NOTFOUND" CACHE PATH "Path to android build-tools")
@@ -26,17 +28,11 @@ set(ANDROID_SIGN_KEYNAME "" CACHE STRING "Key name for jarsigner")
 
 set(CMAKE_JAVA_COMPILE_FLAGS -target 1.6 -source 1.6 -Xlint:-options ${CMAKE_JAVA_COMPILE_FLAGS})
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(APK_BUILD_FLAGS "")
-else(CMAKE_BUILD_TYPE STREQUAL "Release")
-	set(APK_BUILD_FLAGS "--debug-mode")
-endif(CMAKE_BUILD_TYPE STREQUAL "Release")
-
 add_subdirectory(src)
 
 add_custom_target(runadb
 	COMMAND "${ANDROID_ADB_BINARY}" install -r "${APK_OUTPUT}"
-	COMMAND "${ANDROID_ADB_BINARY}" shell am start com.beloko.idtech/com.beloko.wolf3d.EntryActivity
+	COMMAND "${ANDROID_ADB_BINARY}" shell am start "${APK_PACKAGE_NAME}/${APK_ENTRY_ACTIVITY}"
 	COMMAND "${ANDROID_ADB_BINARY}" shell logcat
 	DEPENDS ecwolf-android
 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"

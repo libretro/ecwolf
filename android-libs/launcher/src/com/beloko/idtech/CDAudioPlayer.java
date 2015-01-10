@@ -74,6 +74,27 @@ public class CDAudioPlayer {
 		}
 	}
 
+	public static boolean checkHasAudioFiles(String path)
+	{
+		if (path == null)
+			return false;
+		
+		if (!(new File(path).isDirectory()))
+			return false;
+		
+		File files[] = new File(path).listFiles(new FileFilter() {
+
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.toString().toLowerCase().endsWith("mp3");
+			}
+		});
+
+		if (files != null)
+			return true;
+		else return false;
+	}
+	
 	static ArrayList<String> tracks;
 	public static void initFiles(String path)
 	{

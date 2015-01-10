@@ -120,7 +120,7 @@ if(ANDROID)
 	set(TINYXML_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/TinyXML)
 	set(TINYXML_LIBRARY TinyXML)
 	set(TOUCHCONTROLS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/TouchControls)
-	set(TOUCHCONTROLS_LIBRARY TouchControls)
+	set(TOUCHCONTROLS_LIBRARY touchcontrols)
 
 	add_subdirectory(android-libs/libpng)
 	add_subdirectory(android-libs/sigc++)

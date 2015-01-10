@@ -123,6 +123,18 @@ public class QuakeControlConfig implements Serializable{
 	public static final int   PORT_ACT_FLY_UP          =   93;
 	public static final int   PORT_ACT_FLY_DOWN        =   94;
 
+	//Custom
+	public static final int PORT_ACT_CUSTOM_0          = 150;
+	public static final int PORT_ACT_CUSTOM_1          = 151;
+	public static final int PORT_ACT_CUSTOM_2          = 152;
+	public static final int PORT_ACT_CUSTOM_3          = 153;
+	public static final int PORT_ACT_CUSTOM_4          = 154;
+	public static final int PORT_ACT_CUSTOM_5          = 155;
+	public static final int PORT_ACT_CUSTOM_6          = 156;
+	public static final int PORT_ACT_CUSTOM_7          = 157;
+
+
+	
 	//Menu
 	public static final int MENU_UP                 = 0x200;
 	public static final int MENU_DOWN               = 0x201;
@@ -183,6 +195,24 @@ public class QuakeControlConfig implements Serializable{
 		if ((game == IDGame.Quake2) || (game == IDGame.Quake3)|| (game == IDGame.Hexen2)|| (game == IDGame.RTCW)|| (game == IDGame.JK2) || (game == IDGame.JK3))
 			actions.add(new ActionInput("crouch","Crouch",PORT_ACT_DOWN,Type.BUTTON));
 
+		//Add GZDoom specific actions
+		if (game == IDGame.Doom)
+		{
+			actions.add(new ActionInput("attack_alt","Alt Attack (GZ)",PORT_ACT_ALT_ATTACK,Type.BUTTON));
+			actions.add(new ActionInput("jump","Jump (GZ)",PORT_ACT_JUMP,Type.BUTTON));
+			actions.add(new ActionInput("crouch","Crouch (GZ)",PORT_ACT_DOWN,Type.BUTTON));
+			actions.add(new ActionInput("custom_0","Custom A (GZ)",PORT_ACT_CUSTOM_0,Type.BUTTON));
+			actions.add(new ActionInput("custom_1","Custom B (GZ)",PORT_ACT_CUSTOM_1,Type.BUTTON));
+			actions.add(new ActionInput("custom_2","Custom C (GZ)",PORT_ACT_CUSTOM_2,Type.BUTTON));
+			actions.add(new ActionInput("custom_3","Custom D (GZ)",PORT_ACT_CUSTOM_3,Type.BUTTON));
+			actions.add(new ActionInput("custom_4","Custom E (GZ)",PORT_ACT_CUSTOM_4,Type.BUTTON));
+			actions.add(new ActionInput("custom_5","Custom F (GZ)",PORT_ACT_CUSTOM_5,Type.BUTTON));
+			actions.add(new ActionInput("quick_save","Quick Save (GZ)",PORT_ACT_QUICKSAVE,Type.BUTTON));
+			actions.add(new ActionInput("quick_load","Quick Load (GZ)",PORT_ACT_QUICKLOAD,Type.BUTTON));
+			
+
+		}
+		
 		actions.add(new ActionInput("fwd","Move Forward",PORT_ACT_FWD,Type.BUTTON));
 		actions.add(new ActionInput("back","Move Backwards",PORT_ACT_BACK,Type.BUTTON));
 		actions.add(new ActionInput("left","Strafe Left",PORT_ACT_MOVE_LEFT,Type.BUTTON));

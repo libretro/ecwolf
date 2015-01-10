@@ -18,10 +18,11 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.beloko.idtech.AppSettings;
+import com.beloko.idtech.R;
 
 public class AboutDialog {
 
-	public static void show(final Context ctx,final int changes,final int about )
+	public static void show(final Context ctx)
 	{
 		final Dialog dialog = new Dialog(ctx);
 		dialog.setContentView(R.layout.about_dialog_view);
@@ -31,7 +32,7 @@ public class AboutDialog {
 
 		//set up text
 		final TextView text = (TextView) dialog.findViewById(R.id.about_text_textview);
-		text.setText(readTxt(ctx,changes));
+		text.setText(readTxt(ctx,R.raw.changes));
 
 		//set up image view
 
@@ -42,7 +43,7 @@ public class AboutDialog {
 			@Override
 			public void onClick(View v) {
 				dialog.setTitle("Changes");
-				text.setText(readTxt(ctx,changes));
+				text.setText(readTxt(ctx,R.raw.changes));
 			}
 		});
 
@@ -52,7 +53,7 @@ public class AboutDialog {
 			@Override
 			public void onClick(View v) {
 				dialog.setTitle("About");
-				text.setText(readTxt(ctx,about));
+				text.setText(readTxt(ctx,R.raw.about));
 			}
 		});
 
