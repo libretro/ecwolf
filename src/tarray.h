@@ -49,6 +49,15 @@
 
 class FArchive;
 
+template<class T>
+struct TMoveInsert
+{
+	explicit TMoveInsert(void *loc, const T &obj)
+	{
+		::new (loc) T(obj);
+	}
+};
+
 // TArray -------------------------------------------------------------------
 
 // T is the type stored in the array.
@@ -132,7 +141,7 @@ public:
 	unsigned int Push (const T &item)
 	{
 		Grow (1);
-		::new((void*)&Array[Count]) T(item);
+		(void)TMoveInsert<T>(&Array[Count], item);
 		return Count++;
 	}
 	bool Pop (T &item)
@@ -182,7 +191,7 @@ public:
 			// Inserting somewhere past the end of the array, so we can
 			// just add it without moving things.
 			Resize (index + 1);
-			::new ((void *)&Array[index]) T(item);
+			(void)TMoveInsert<T>(&Array[index], item);
 		}
 		else
 		{
@@ -194,7 +203,7 @@ public:
 			memmove (&Array[index+1], &Array[index], sizeof(T)*(Count - index - 1));
 
 			// And put the new element in
-			::new ((void *)&Array[index]) T(item);
+			(void)TMoveInsert<T>(&Array[index], item);
 		}
 	}
 	void ShrinkToFit ()
@@ -237,7 +246,7 @@ public:
 			Grow (amount - Count);
 			for (unsigned int i = Count; i < amount; ++i)
 			{
-				::new((void *)&Array[i]) T;
+				(void)TMoveInsert<T>(&Array[i], T());
 			}
 		}
 		else if (Count != amount)
@@ -256,7 +265,7 @@ public:
 		Count += amount;
 		for (unsigned int i = place; i < Count; ++i)
 		{
-			::new((void *)&Array[i]) T;
+			(void)TMoveInsert<T>(&Array[i], T());
 		}
 		return place;
 	}
@@ -314,6 +323,8 @@ private:
 	}
 };
 
+// Use TArray<TUniquePtr>
+#if 0
 // TDeletingArray -----------------------------------------------------------
 // An array that deletes its elements when it gets deleted.
 template<class T, class TT=T>
@@ -329,6 +340,7 @@ public:
 		}
 	}
 };
+#endif
 
 // TAutoGrowArray -----------------------------------------------------------
 // An array with accessors that automatically grow the array as needed.
@@ -551,7 +563,7 @@ public:
 		else
 		{
 			n = NewKey(key);
-			::new(&n->Pair.Value) VT(value);
+			(void)TMoveInsert<VT>(&n->Pair.Value, value);
 		}
 		return n->Pair.Value;
 	}
@@ -653,7 +665,7 @@ protected:
 			if (!nold[i].IsNil())
 			{
 				Node *n = NewKey(nold[i].Pair.Key);
-				::new(&n->Pair.Value) VT(nold[i].Pair.Value);
+				(void)TMoveInsert<VT>(&n->Pair.Value, nold[i].Pair.Value);
 				nold[i].~Node();
 			}
 		}
@@ -721,7 +733,7 @@ protected:
 			mp->Next = NULL;
 		}
 		++NumUsed;
-		::new(&mp->Pair.Key) KT(key);
+		(void)TMoveInsert<KT>(&mp->Pair.Key, key);
 		return mp;
 	}
 
