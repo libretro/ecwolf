@@ -127,10 +127,8 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 	scaleFactorX = CleanXfac;
 	scaleFactorY = CleanYfac;
 
-	pixelangle = (short *) malloc(SCREENWIDTH * sizeof(short));
-	CHECKMALLOCRESULT(pixelangle);
-	wallheight = (int *) malloc(SCREENWIDTH * sizeof(int));
-	CHECKMALLOCRESULT(wallheight);
+	pixelangle = new short[SCREENWIDTH];
+	wallheight = new int[SCREENWIDTH];
 
 	NewViewSize(viewsize);
 }

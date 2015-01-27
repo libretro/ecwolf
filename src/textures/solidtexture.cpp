@@ -120,7 +120,8 @@ FSolidTexture::FSolidTexture(DWORD color) : FTexture(NULL, -1), Pixels(NULL),
 
 FSolidTexture::~FSolidTexture ()
 {
-	if(!Spans)
+	Unload();
+	if(Spans)
 	{
 		FreeSpans (Spans);
 		Spans = NULL;

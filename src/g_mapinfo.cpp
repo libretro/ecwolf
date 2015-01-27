@@ -1080,10 +1080,7 @@ protected:
 			action.action = cast;
 
 			if(!ParseCast(cast))
-			{
-				delete cast;
 				return false;
-			}
 		}
 		else if(key.CompareNoCase("Fader") == 0)
 		{
@@ -1093,10 +1090,7 @@ protected:
 			action.action = fader;
 
 			if(!ParseFader(fader))
-			{
-				delete fader;
 				return false;
-			}
 		}
 		else if(key.CompareNoCase("GotoTitle") == 0)
 		{
@@ -1115,10 +1109,7 @@ protected:
 			{
 				sc.MustGetToken(TK_Identifier);
 				if(!CheckStandardKey(action.action, sc->str))
-				{
-					delete action.action;
 					return false;
-				}
 			}
 		}
 		else if(key.CompareNoCase("Link") == 0)
@@ -1134,10 +1125,7 @@ protected:
 			action.action = textscreen;
 
 			if(!ParseTextScreen(textscreen))
-			{
-				delete textscreen;
 				return false;
-			}
 		}
 		else if(key.CompareNoCase("VictoryStats") == 0)
 		{

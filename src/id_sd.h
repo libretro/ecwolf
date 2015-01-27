@@ -173,7 +173,7 @@ extern  bool	SD_SetMusicMode(SMMode mode);
 extern  bool    SD_SoundPlaying(void);
 
 extern  void    SD_SetDigiDevice(SDSMode);
-extern  byte*	SD_PrepareSound(int which);
+extern  Mix_Chunk*	SD_PrepareSound(int which);
 extern  int     SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChannel chan=SD_GENERIC);
 extern  void    SD_StopDigitized(void);
 

@@ -71,13 +71,13 @@ int		r_extralight;
 
 int fps_frames=0, fps_time=0, fps=0;
 
-int *wallheight;
+TUniquePtr<int[]> wallheight;
 int min_wallheight;
 
 //
 // math tables
 //
-short *pixelangle;
+TUniquePtr<short[]> pixelangle;
 fixed finetangent[FINEANGLES/2 + ANG180];
 fixed finesine[FINEANGLES+FINEANGLES/4];
 fixed *finecosine = finesine+ANG90;

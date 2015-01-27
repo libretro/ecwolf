@@ -178,9 +178,9 @@ GameMap::~GameMap()
 {
 	thinkerList->DestroyAll();
 
+	delete lumps[0];
 	if(isWad)
 		delete file;
-	delete lumps[0];
 
 	for(unsigned int i = 0;i < planes.Size();++i)
 		delete[] planes[i].map;

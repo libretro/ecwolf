@@ -33,6 +33,7 @@
 */
 
 #ifndef __TMEMORY_H__
+#define __TMEMORY_H__
 
 #include <stddef.h>
 #ifndef _WIN32

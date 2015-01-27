@@ -102,6 +102,8 @@ void FResourceLump::LumpNameSetup(const char *iname)
 	base = base.Left(base.LastIndexOf('.'));
 	uppercopy(Name, base);
 	Name[8] = 0;
+	if(FullName)
+		delete[] FullName;
 	FullName = copystring(iname);
 
 	// Map some directories to WAD namespaces.

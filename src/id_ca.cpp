@@ -16,6 +16,7 @@ loaded into the data segment
 
 #include "g_mapinfo.h"
 #include "gamemap.h"
+#include "tmemory.h"
 #include "wl_def.h"
 #include "wl_game.h"
 #include "w_wad.h"
@@ -52,13 +53,14 @@ GameMap *map = NULL;
 
 void CA_CacheMap (const FString &mapname, bool loading)
 {
-	delete map;
+	static TUniquePtr<GameMap> map;
+	map.Reset();
 
 	Printf("\n");
 
 	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
-	map = new GameMap(mapname);
+	::map = map = new GameMap(mapname);
 	map->LoadMap(loading);
 
 	Printf("\n%s - %s\n\n", mapname.GetChars(), levelInfo->GetName(map).GetChars());
