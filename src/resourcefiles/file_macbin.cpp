@@ -33,8 +33,35 @@
 */ 
 
 #include "resourcefile.h"
+#include "tmemory.h"
 #include "w_wad.h"
 #include "zstring.h"
+
+/* Sound format:
+ * 2: Format (0x0001)
+ * 2: Number of data foramts (Ignore, should be 0x0001)
+ * {
+ *   2: Data format ID (0x0005 for sampled)
+ *   4: Init option (Ensure 0x00000080 bit is set for mono, 0xC0 would be stereo)
+ * }
+ * 2: Number of sound commands
+ * {
+ *   2: Command
+ *   2: Parm1
+ *   4: Parm2
+ * }
+ * Sampled header
+ * [
+ *   4: Data offset (0 for immediate)
+ *   4: Number of bytes in sample
+ *   4: Sample rate
+ *   4: Start loop point
+ *   4: End loop point
+ *   1: Encoding type
+ *   1: Base frequency (0x3C)
+ * ]
+ * PCM data
+ */
 
 #pragma pack(push, 1)
 struct FMacBinHeader
@@ -108,10 +135,127 @@ public:
 };
 #pragma pack(pop)
 
+#define MACWOLF
+#include "filereaderlzss.h"
+#undef MACWOLF
+
+struct FMacResLump : FResourceLump
+{
+	enum CMode
+	{
+		MODE_Uncompressed,
+		MODE_CSound,
+		MODE_Compressed
+	};
+	CMode Compressed;
+	int CompressedSize;
+	int	Position;
+
+	int GetFileOffset() { return Position; }
+	FileReader *GetReader()
+	{
+		if(!Compressed)
+		{
+			Owner->Reader->Seek(Position, SEEK_SET);
+			return Owner->Reader;
+		}
+		return NULL;
+	}
+	int FillCache()
+	{
+		if(!Compressed)
+		{
+			const char * buffer = Owner->Reader->GetBuffer();
+
+			if (buffer != NULL)
+			{
+				// This is an in-memory file so the cache can point directly to the file's data.
+				Cache = const_cast<char*>(buffer) + Position;
+				RefCount = -1;
+				return -1;
+			}
+		}
+
+		Owner->Reader->Seek(Position, SEEK_SET);
+		Cache = new char[LumpSize];
+
+		switch(Compressed)
+		{
+			case MODE_Compressed:
+			{
+				FileReaderLZSS<0> lzss(*Owner->Reader);
+				lzss.Read(Cache, LumpSize);
+				break;
+			}
+			case MODE_CSound:
+			{
+				FileReaderLZSS<1> lzss(*Owner->Reader);
+				lzss.Read(Cache, LumpSize);
+				break;
+			}
+			case MODE_Uncompressed:
+				Owner->Reader->Read(Cache, LumpSize);
+				break;
+		}
+
+		RefCount = 1;
+		return 1;
+	}
+};
+
+enum EListType
+{
+	LIST_Sounds,
+	LIST_Walls,
+	LIST_Maps,
+	LIST_Songs,
+
+	NUM_LISTS,
+	LIST_None
+};
+
+static const struct BRGRConstant
+{
+	WORD resNum;
+	const char* name;
+	EListType list;
+	bool compressed;
+} BRGRConstants[] =
+{
+	{ 128, "IDLOGO", LIST_None, true },
+	{ 129, "MACPLAY", LIST_None, true },
+	{ 130, "MPLAYPAL", LIST_None, false },
+	{ 131, "IDPAL", LIST_None, false },
+	{ 132, "BLACKPAL", LIST_None, false },
+	{ 133, "TITLEPIC", LIST_None, true },
+	{ 134, "TITLEPAL", LIST_None, false },
+	{ 135, "SOUNDLST", LIST_Sounds, false },
+	{ 136, "DARKMAP", LIST_None, false },
+	{ 137, "WALLLIST", LIST_Walls, false },
+	{ 138, "BJFACE", LIST_None, false },
+	{ 139, "INTERPIC", LIST_None, true },
+	{ 140, "INTERPAL", LIST_None, false },
+	{ 141, "INTERBJ", LIST_None, true },
+	{ 142, "FACE320", LIST_None, true },
+	{ 143, "FACE512", LIST_None, true },
+	{ 144, "FACE640", LIST_None, true },
+	{ 145, "PLAYPAL", LIST_None, false },
+	{ 146, "MAPLIST", LIST_Maps, false },
+	{ 147, "SONGLIST", LIST_Songs, false },
+	{ 148, "GETPSYCH", LIST_None, true },
+	{ 149, "YUMMYPIC", LIST_None, true },
+	{ 150, "YUMMYPAL", LIST_None, false },
+	{ 151, "FINETAN", LIST_None, false },
+	{ 152, "FINESIN", LIST_None, false },
+	{ 153, "SCALEATZ", LIST_None, false },
+	{ 154, "VIEWANGX", LIST_None, false },
+	{ 155, "XVIEWANG", LIST_None, false }
+};
+
 class FMacBin : public FResourceFile
 {
 	private:
-		FUncompressedLump *Lumps;
+		FMacResLump *Lumps;
 
 	public:
 		FMacBin(const char* filename, FileReader *file) : FResourceFile(filename, file), Lumps(NULL)
@@ -145,6 +289,9 @@ class FMacBin : public FResourceFile
 			DWORD resourceForkOffset;
 			DWORD resTypeListOffset;
 			WORD numTypes;
+
+			unsigned int BRGRref = 0xFFFFFFFF;
+			FMacResLump *lists[NUM_LISTS] = { NULL };
 
 			// Read MacBin version 0 header
 			Reader->Read(&header, sizeof(FMacBinHeader));
@@ -196,6 +343,11 @@ class FMacBin : public FResourceFile
 				if(doIgnore)
 					continue;
 
+				// We need to do some manipulation of these resources so take
+				// note of where it is.
+				if(strncmp(resTypes[i].type, "BRGR", 4) == 0)
+					BRGRref = i;
+
 				numTotalResources += resTypes[i].numResources;
 			}
 
@@ -241,15 +393,39 @@ class FMacBin : public FResourceFile
 
 			// Now we can finally load the lumps, assigning temporary names
 			NumLumps = numTotalResources;
-			Lumps = new FUncompressedLump[NumLumps];
+			Lumps = new FMacResLump[NumLumps];
 			{
-				FUncompressedLump *lump = Lumps;
+				FMacResLump *lump = Lumps;
 				FResReference *refPtr = refs;
 				for(unsigned int i = 0;i < numTypes;++i)
 				{
+					char type[5];
+					memcpy(type, resTypes[i].type, 4);
+					type[4] = 0;
+
+					const bool csnd = strncmp(type, "csnd", 4) == 0;
+					const bool brgr = BRGRref == i;
+
 					for(unsigned int j = 0;j < resTypes[i].numResources;++j, ++refPtr, ++lump)
 					{
 						char name[9];
+						sprintf(name, "%s%04d", type, j);
+
+						lump->Compressed = FMacResLump::MODE_Uncompressed;
+
+						// Find special BRGR lumps
+						if(brgr)
+						{
+							if(const BRGRConstant *c = BinarySearch(&BRGRConstants[0], countof(BRGRConstants), &BRGRConstant::resNum, refPtr->ref.resID))
+							{
+								strcpy(name, c->name);
+								if(c->list != LIST_None)
+									lists[c->list] = lump;
+								if(c->compressed)
+									lump->Compressed = FMacResLump::MODE_Compressed;
+							}
+						}
+
 						DWORD length;
 						lump->Position = resourceForkOffset + refPtr->dataOffset + resHeader.resourceOffset + 4;
 						lump->Namespace = ns_global;
@@ -259,6 +435,59 @@ class FMacBin : public FResourceFile
 						Reader->Seek(lump->Position - 4, SEEK_SET);
 						*Reader >> length;
 						lump->LumpSize = BigLong(length);
+
+						if(csnd)
+							lump->Compressed = FMacResLump::MODE_CSound;
+						if(lump->Compressed != FMacResLump::MODE_Uncompressed)
+						{
+							*Reader >> length;
+							lump->CompressedSize = lump->LumpSize-4;
+							lump->Position += 4;
+							lump->LumpSize = BigLong(length);
+						}
+						else if(refPtr->ref.resID >= 428) // Sprites
+						{
+							lump->Compressed = FMacResLump::MODE_Compressed;
+							WORD csize;
+							*Reader >> csize;
+							lump->CompressedSize = lump->LumpSize-2;
+							lump->Position += 2;
+							lump->LumpSize = LittleShort(csize);
+						}
+					}
+				}
+			}
+
+			// Scan for the wall textures and mark them as compressed with a
+			// fixed size.
+			if(lists[LIST_Walls] && lists[LIST_Walls]->LumpSize >= 4)
+			{
+				FMacResLump *lump = Lumps;
+				FResReference *refPtr = refs;
+				for(unsigned int i = 0;i < BRGRref;++i)
+				{
+					lump += resTypes[i].numResources;
+					refPtr += resTypes[i].numResources;
+				}
+
+				const unsigned int numWalls = lists[LIST_Walls]->LumpSize/2 - 1;
+				Reader->Seek(lists[LIST_Walls]->Position+2, SEEK_SET);
+				TUniquePtr<WORD[]> walls(new WORD[numWalls]);
+				Reader->Read(walls.Get(), numWalls*2);
+				for(unsigned int i = 0;i < numWalls;++i)
+					walls[i] = BigShort(walls[i]);
+
+				for(unsigned int j = 0;j < resTypes[BRGRref].numResources;++j, ++refPtr, ++lump)
+				{
+					for(unsigned int i = 0;i < numWalls;++i)
+					{
+						if((walls[i]&0x3FF) == refPtr->ref.resID)
+						{
+							lump->Compressed = FMacResLump::MODE_Compressed;
+							lump->CompressedSize = lump->LumpSize;
+							lump->LumpSize = 0x4000;
+							break;
+						}
 					}
 				}
 			}
