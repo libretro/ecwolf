@@ -72,7 +72,11 @@ private:
 	// returns false if it ran out of input data.
 	bool UncompressBlock()
 	{
+#ifndef MACWOLF
 		if(Stream.CFlags & 1)
+#else
+		if(!(Stream.CFlags & 1))
+#endif
 		{
 			// Check to see if we have enough input
 			if(Stream.AvailIn < 2)
@@ -98,7 +102,11 @@ private:
 			}
 #endif
 
+#ifndef MACWOLF
 			const BYTE* copyStart = Stream.InternalBuffer-pos-1;
+#else
+			const BYTE* copyStart = Stream.InternalBuffer-pos;
+#endif
 
 			// Complete overlap: Single byte repeated
 			if(pos == 0)
