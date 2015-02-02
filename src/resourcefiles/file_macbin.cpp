@@ -411,6 +411,7 @@ class FMacBin : public FResourceFile
 						sprintf(name, "%s%04d", type, j);
 
 						lump->Compressed = FMacResLump::MODE_Uncompressed;
+						lump->Namespace = isSnd ? ns_sounds : ns_global;
 
 						// Find special BRGR lumps
 						if(brgr)
@@ -421,13 +422,15 @@ class FMacBin : public FResourceFile
 								if(c->list != LIST_None)
 									lists[c->list] = lump;
 								if(c->compressed)
+								{
 									lump->Compressed = FMacResLump::MODE_Compressed;
+									lump->Namespace = ns_graphics;
+								}
 							}
 						}
 
 						DWORD length;
 						lump->Position = resourceForkOffset + refPtr->dataOffset + resHeader.resourceOffset + 4;
-						lump->Namespace = isSnd ? ns_sounds : ns_global;
 						lump->Owner = this;
 
 						Reader->Seek(lump->Position - 4, SEEK_SET);
@@ -460,6 +463,7 @@ class FMacBin : public FResourceFile
 						}
 
 						uppercopy(lump->Name, name);
+						lump->Name[8] = 0;
 					}
 				}
 			}
@@ -493,7 +497,7 @@ class FMacBin : public FResourceFile
 							lump->CompressedSize = lump->LumpSize;
 							lump->LumpSize = 0x4000;
 							lump->Namespace = ns_flats;
-							lump->Flags |= LUMPF_DONTFLIPFLAT;
+							lump->Flags |= LUMPF_DONTFLIPFLAT|LUMPF_DOUBLERESFLAT;
 							break;
 						}
 					}

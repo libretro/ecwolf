@@ -205,6 +205,7 @@ set(SOURCE_FILES
 	textures/flattexture.cpp
 	textures/imgztexture.cpp
 	textures/jpegtexture.cpp
+	textures/machudtexture.cpp
 	textures/multipatchtexture.cpp
 	textures/patchtexture.cpp
 	textures/pcxtexture.cpp

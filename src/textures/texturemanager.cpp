@@ -1000,6 +1000,8 @@ void FTextureManager::Init()
 	//InitBuildTiles ();
 	//FirstTextureForFile.Push(Textures.Size());
 
+	InitMacHud ();
+
 	DefaultTexture = CheckForTexture ("-NOFLAT-", FTexture::TEX_Override, 0);
 
 	//InitAnimated();

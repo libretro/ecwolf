@@ -62,7 +62,7 @@ public:
 protected:
 	BYTE *Pixels;
 	Span **Spans;
-
+	bool Mac;
 
 	virtual void MakeTexture ();
 };
@@ -84,6 +84,11 @@ static bool CheckIfWolfRaw(FileReader &file)
 	WORD Width = LittleShort(header[0]);
 	WORD Height = LittleShort(header[1]);
 	if(file.GetLength() == Width*Height+4) // Raw page
+		return true;
+
+	Width = BigShort(header[0]);
+	Height = BigShort(header[1]);
+	if(file.GetLength() == Width*Height+4) // Mac raw
 		return true;
 	return false;
 }
@@ -115,6 +120,14 @@ FWolfRawTexture::FWolfRawTexture(int lumpnum, FileReader &file)
 	file.Read(header, 4);
 	Width = LittleShort(header[0]);
 	Height = LittleShort(header[1]);
+	if(file.GetLength() != Width*Height+4)
+	{
+		Mac = true;
+		Width = BigShort(header[0]);
+		Height = BigShort(header[1]);
+	}
+	else
+		Mac = false;
 	LeftOffset = 0;
 	TopOffset = 0;
 	CalcBitSize ();
@@ -215,9 +228,24 @@ void FWolfRawTexture::MakeTexture ()
 	Pixels = new BYTE[Width*Height];
 	memset(Pixels, 0, Width*Height);
 
-	for(unsigned int x = 0;x < Width;++x)
+	if(Mac)
 	{
 		for(unsigned int y = 0;y < Height;++y)
-			Pixels[x*Height+y] = GPalette.Remap[data[y*(Width>>2)+(x>>2) + (x&3)*(Width>>2)*Height]];
+		{
+			BYTE *dest = Pixels+y;
+			for(unsigned int x = 0;x < Width;++x)
+			{
+				*dest = GPalette.Remap[*data++];
+				dest += Height;
+			}
+		}
+	}
+	else
+	{
+		for(unsigned int x = 0;x < Width;++x)
+		{
+			for(unsigned int y = 0;y < Height;++y)
+				Pixels[x*Height+y] = GPalette.Remap[data[y*(Width>>2)+(x>>2) + (x&3)*(Width>>2)*Height]];
+		}
 	}
 }
