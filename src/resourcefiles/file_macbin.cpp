@@ -284,8 +284,6 @@ class FMacBin : public FResourceFile
 			FMacBinHeader header;
 			FResHeader resHeader;
 			FMapHeader mapHeader;
-			FResType* resTypes = NULL;
-			FResReference* refs = NULL;
 			DWORD resourceForkOffset;
 			DWORD resTypeListOffset;
 			WORD numTypes;
@@ -321,7 +319,7 @@ class FMacBin : public FResourceFile
 			Reader->Seek(resTypeListOffset, SEEK_SET);
 			*Reader >> numTypes;
 			numTypes = BigShort(numTypes)+1;
-			resTypes = new FResType[numTypes];
+			TUniquePtr<FResType[]> resTypes(new FResType[numTypes]);
 			for(unsigned int i = 0;i < numTypes;++i)
 			{
 				Reader->Read(&resTypes[i], sizeof(FResType));
@@ -352,7 +350,7 @@ class FMacBin : public FResourceFile
 			}
 
 			// Read in the refs
-			refs = new FResReference[numTotalResources];
+			TUniquePtr<FResReference[]> refs(new FResReference[numTotalResources]);
 			{
 				FResReference *refPtr = refs;
 				for(unsigned int i = 0;i < numTypes;++i)
@@ -404,6 +402,7 @@ class FMacBin : public FResourceFile
 					type[4] = 0;
 
 					const bool csnd = strncmp(type, "csnd", 4) == 0;
+					const bool isSnd = csnd || strncmp(type, "snd ", 4) == 0;
 					const bool brgr = BRGRref == i;
 
 					for(unsigned int j = 0;j < resTypes[i].numResources;++j, ++refPtr, ++lump)
@@ -428,9 +427,8 @@ class FMacBin : public FResourceFile
 
 						DWORD length;
 						lump->Position = resourceForkOffset + refPtr->dataOffset + resHeader.resourceOffset + 4;
-						lump->Namespace = ns_global;
+						lump->Namespace = isSnd ? ns_sounds : ns_global;
 						lump->Owner = this;
-						lump->LumpNameSetup(name);
 
 						Reader->Seek(lump->Position - 4, SEEK_SET);
 						*Reader >> length;
@@ -438,14 +436,14 @@ class FMacBin : public FResourceFile
 
 						if(csnd)
 							lump->Compressed = FMacResLump::MODE_CSound;
-						if(lump->Compressed != FMacResLump::MODE_Uncompressed)
+						else if(lump->Compressed != FMacResLump::MODE_Uncompressed)
 						{
 							*Reader >> length;
 							lump->CompressedSize = lump->LumpSize-4;
 							lump->Position += 4;
 							lump->LumpSize = BigLong(length);
 						}
-						else if(refPtr->ref.resID >= 428) // Sprites
+						else if(brgr && refPtr->ref.resID >= 428) // Sprites
 						{
 							lump->Compressed = FMacResLump::MODE_Compressed;
 							WORD csize;
@@ -453,7 +451,15 @@ class FMacBin : public FResourceFile
 							lump->CompressedSize = lump->LumpSize-2;
 							lump->Position += 2;
 							lump->LumpSize = LittleShort(csize);
+							lump->Namespace = ns_sprites;
+
+							// TEMPORARY naming so we can test stuff.
+							static int counter = 0;
+							sprintf(name, "BR%02XA0", counter);
+							++counter;
 						}
+
+						uppercopy(lump->Name, name);
 					}
 				}
 			}
@@ -486,14 +492,14 @@ class FMacBin : public FResourceFile
 							lump->Compressed = FMacResLump::MODE_Compressed;
 							lump->CompressedSize = lump->LumpSize;
 							lump->LumpSize = 0x4000;
+							lump->Namespace = ns_flats;
+							lump->Flags |= LUMPF_DONTFLIPFLAT;
 							break;
 						}
 					}
 				}
 			}
 
-			delete[] refs;
-			delete[] resTypes;
 			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
 			return true;

@@ -90,7 +90,7 @@ private:
 #else
 			WORD pos = BigEndian ? BigShort(*(WORD*)Stream.In) : LittleShort(*(WORD*)Stream.In);
 			BYTE len = ((pos>>12) & 0xF)+3;
-			pos = 0x1000-(pos&0xFFF);
+			pos = 0xFFF-(pos&0xFFF);
 #endif
 			Stream.In += 2;
 #ifndef MACWOLF
@@ -102,11 +102,7 @@ private:
 			}
 #endif
 
-#ifndef MACWOLF
 			const BYTE* copyStart = Stream.InternalBuffer-pos-1;
-#else
-			const BYTE* copyStart = Stream.InternalBuffer-pos;
-#endif
 
 			// Complete overlap: Single byte repeated
 			if(pos == 0)
