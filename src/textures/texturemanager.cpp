@@ -988,6 +988,10 @@ void FTextureManager::Init()
 	// Texture 0 is a dummy texture used to indicate "no texture"
 	AddTexture (new FDummyTexture);
 
+	// Pull in Mac HUD graphics, which we do first so that hopefully anything
+	// can override them.
+	InitMacHud ();
+
 	int wadcnt = Wads.GetNumWads();
 	for(int i = 0; i< wadcnt; i++)
 	{
@@ -999,8 +1003,6 @@ void FTextureManager::Init()
 	//FirstTextureForFile.Push(Textures.Size());
 	//InitBuildTiles ();
 	//FirstTextureForFile.Push(Textures.Size());
-
-	InitMacHud ();
 
 	DefaultTexture = CheckForTexture ("-NOFLAT-", FTexture::TEX_Override, 0);
 

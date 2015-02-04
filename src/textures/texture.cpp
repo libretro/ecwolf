@@ -167,6 +167,7 @@ FTexture::FTexture (const char *name, int lumpnum)
 	if (name != NULL)
 	{
 		uppercopy(Name, name);
+		Name[8] = 0;
 	}
 	else if (lumpnum < 0)
 	{

@@ -419,6 +419,7 @@ void WolfStatusBar::DrawKeys (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Keys.Enabled) return;
 	static bool extendedKeysGraphics = TexMan.CheckForTexture("STKEYS3", FTexture::TEX_Any).isValid();
+	static bool emptyKeysGraphic = TexMan.CheckForTexture("STKEYS0", FTexture::TEX_Any).isValid();
 
 	// Find keys in inventory
 	int presentKeys = 0;
@@ -445,7 +446,7 @@ void WolfStatusBar::DrawKeys (void)
 		StatusDrawPic (x,y,"STKEYS3");
 	else if(presentKeys & 1)
 		StatusDrawPic (x,y,"STKEYS1");
-	else
+	else if(emptyKeysGraphic)
 		StatusDrawPic (x,y,"STKEYS0");
 
 	if (extendedKeysGraphics && (presentKeys & (2|8)) == (2|8))
@@ -454,7 +455,7 @@ void WolfStatusBar::DrawKeys (void)
 		StatusDrawPic (x,y+16,"STKEYS4");
 	else if (presentKeys & 2)
 		StatusDrawPic (x,y+16,"STKEYS2");
-	else
+	else if (emptyKeysGraphic)
 		StatusDrawPic (x,y+16,"STKEYS0");
 }
 

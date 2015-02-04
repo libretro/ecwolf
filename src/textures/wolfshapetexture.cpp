@@ -234,7 +234,7 @@ void FWolfShapeTexture::InitMac(FileReader &file)
 	xScale = FRACUNIT*2;
 
 	// Crop the height!
-	int minStart = 64;
+	int minStart = 128;
 	int maxEnd = 0;
 	FMemLump lump = Wads.ReadLump (SourceLump);
 	const BYTE* data = (const BYTE*)lump.GetMem();

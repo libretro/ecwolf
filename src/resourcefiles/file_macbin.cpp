@@ -252,6 +252,88 @@ static const struct BRGRConstant
 	{ 155, "XVIEWANG", LIST_None, false }
 };
 
+// As far as I know only one game used the Mac Wolf engine, so can just hard
+// code the names here.  Furthermore not all data can be given a nice name.
+static const char* const MacSpriteNames[] = {
+	"MISLA0", "MISLB0",
+	"GMOVA0",
+	"ROCKA0", "BOOMA0", "BOOMB0",
+	"HYPOA0",
+	"YWINA0",
+
+	// Death Knight
+	"DKNTE0", "DKNTF0", "DKNTG0", "DKNTH0",
+	"DKNTA0", "DKNTB0", "DKNTC0", "DKNTD0",
+	"DKNTI0", "DKNTJ0", "DKNTK0",
+
+	// Dog
+	"DOGYE0", "DOGYF0", "DOGYG0",
+	"DOGYA0", "DOGYB0", "DOGYC0", "DOGYD0",
+	"DOGYH0", "DOGYI0", "DOGYJ0",
+
+	// Guard
+	"GARDE0", "GARDF0", "GARDG0",
+	"GARDA0", "GARDB0", "GARDC0", "GARDD0",
+	"GARDH0",
+	"GARDI0", "GARDJ0", "GARDK0",
+
+	// Hans
+	"HANSE0", "HANSF0", "HANSG0",
+	"HANSA0", "HANSB0", "HANSC0", "HANSD0",
+	"HANSH0", "HANSI0", "HANSJ0",
+
+	// Hitler
+	"HTLRE0", "HTLRF0", "HTLRG0",
+	"HTLRA0", "HTLRB0", "HTLRC0", "HTLRD0",
+	"HTLRH0", "HTLRI0", "HTLRJ0",
+
+	// Ubermutant
+	"UBERE0", "UBERF0", "UBERG0", "UBERH0",
+	"UBERA0", "UBERB0", "UBERC0", "UBERD0",
+	"UBERI0", "UBERJ0", "UBERK0",
+
+	// Mecha Hitler
+	"MECHE0", "MECHF0", "MECHG0",
+	"MECHH0", "MECHI0", "MECHJ0", "MECHK0",
+	"MECHA0", "MECHB0", "MECHC0", "MECHD0",
+
+	// Mutant
+	"MTNTE0", "MTNTF0", "MTNTG0",
+	"MTNTA0", "MTNTB0", "MTNTC0", "MTNTD0",
+	"MTNTH0",
+	"MTNTI0", "MTNTJ0", "MTNTK0",
+
+	// Officer
+	"OFFIE0", "OFFIF0", "OFFIG0",
+	"OFFIA0", "OFFIB0", "OFFIC0", "OFFID0",
+	"OFFIH0",
+	"OFFII0", "OFFIJ0", "OFFIK0",
+
+	// Schabbs
+	"SHABE0", "SHABF0",
+	"SHABA0", "SHABB0", "SHABC0", "SHABD0",
+	"SHABG0", "SHABH0", "SHABI0",
+
+	// SS
+	"SSWVE0", "SSWVF0", "SSWVG0",
+	"SSWVA0", "SSWVB0", "SSWVC0", "SSWVD0",
+	"SSWVH0",
+	"SSWVI0", "SSWVJ0", "SSWVK0",
+
+	// Trans
+	"TRNSE0", "TRNSF0", "TRNSG0",
+	"TRNSA0", "TRNSB0", "TRNSC0", "TRNSD0",
+	"TRNSH0", "TRNSI0", "TRNSJ0",
+
+	"WATRA0", "DRUMA0", "TABLA0", "FLMPA0", "CHANA0", "ALPOA0",
+	"COL2A0", "PLNTA0", "FLAGA0", "BPNTA0", "VASEA0", "BON1A0",
+	"GLMPA0", "BASKA0", "ARMRA0", "CAG1A0", "GKEYA0", "SKEYA0",
+	"BPAKA0", "AMMOA0", "FOODA0", "MEDIA0", "CLIPA0", "MGUNA0",
+	"CGUNA0", "CROSA0", "CHALA0", "JEWLA0", "CRWNA0", "ONUPA0",
+	"BARLA0", "WEL1A0", "FTHRA0", "TANKA0", "LAUNA0", "BROKA0",
+	"FNKYA0", "INKYA0", "KNKYA0", "BLKYA0"
+};
+
 class FMacBin : public FResourceFile
 {
 	private:
@@ -277,7 +359,10 @@ class FMacBin : public FResourceFile
 				"ics#", "ics4", "ics8", "MBAR", "MDRV",
 				"mstr", "MENU", "PICT", "STR#", "TEXT",
 				"vers", "WDEF", "hmnu", "SMOD", "CODE",
-				"XREF", "DATA", "SIZE", "cfrg",
+				"XREF", "DATA", "SIZE", "cfrg", "proc",
+				"prox",
+				// Maybe these are relevant?
+				"INST", "WOLF", "SONG",
 				NULL
 			};
 
@@ -403,15 +488,29 @@ class FMacBin : public FResourceFile
 
 					const bool csnd = strncmp(type, "csnd", 4) == 0;
 					const bool isSnd = csnd || strncmp(type, "snd ", 4) == 0;
+					const bool music = strncmp(type, "Midi", 4) == 0;
 					const bool brgr = BRGRref == i;
 
 					for(unsigned int j = 0;j < resTypes[i].numResources;++j, ++refPtr, ++lump)
 					{
 						char name[9];
-						sprintf(name, "%s%04d", type, j);
 
 						lump->Compressed = FMacResLump::MODE_Uncompressed;
-						lump->Namespace = isSnd ? ns_sounds : ns_global;
+						if(isSnd)
+						{
+							lump->Namespace = ns_sounds;
+							sprintf(name, "SND%04X", refPtr->ref.resID);
+						}
+						else if(music)
+						{
+							lump->Namespace = ns_music;
+							sprintf(name, "MUS_%04X", refPtr->ref.resID);
+						}
+						else
+						{
+							lump->Namespace = ns_global;
+							sprintf(name, "%s%04X", type, refPtr->ref.resID);
+						}
 
 						// Find special BRGR lumps
 						if(brgr)
@@ -456,10 +555,11 @@ class FMacBin : public FResourceFile
 							lump->LumpSize = LittleShort(csize);
 							lump->Namespace = ns_sprites;
 
-							// TEMPORARY naming so we can test stuff.
-							static int counter = 0;
-							sprintf(name, "BR%02XA0", counter);
-							++counter;
+							WORD id = refPtr->ref.resID-428;
+							if(id < countof(MacSpriteNames))
+								strcpy(name, MacSpriteNames[id]);
+							else
+								sprintf(name, "S%03XA0", refPtr->ref.resID-428);
 						}
 
 						uppercopy(lump->Name, name);
@@ -468,10 +568,19 @@ class FMacBin : public FResourceFile
 				}
 			}
 
-			// Scan for the wall textures and mark them as compressed with a
-			// fixed size.
-			if(lists[LIST_Walls] && lists[LIST_Walls]->LumpSize >= 4)
+			// Rename map lumps. Since a mod can replace maps without chaning
+			// the mapinfo HACK around it by storing some data statically.
+			static WORD mapmax = 0, mapbase = 0;
+			if(lists[LIST_Maps] && lists[LIST_Maps]->LumpSize >= 4)
 			{
+				Reader->Seek(lists[LIST_Maps]->Position, SEEK_SET);
+				*Reader >> mapmax >> mapbase;
+				mapmax = BigShort(mapmax);
+				mapbase = BigShort(mapbase);
+			}
+			if(mapmax > 0)
+			{
+				// Find BRGR
 				FMacResLump *lump = Lumps;
 				FResReference *refPtr = refs;
 				for(unsigned int i = 0;i < BRGRref;++i)
@@ -480,19 +589,44 @@ class FMacBin : public FResourceFile
 					refPtr += resTypes[i].numResources;
 				}
 
-				const unsigned int numWalls = lists[LIST_Walls]->LumpSize/2 - 1;
+				for(unsigned int j = 0;j < resTypes[BRGRref].numResources;++j, ++refPtr, ++lump)
+				{
+					if(refPtr->ref.resID >= mapbase && refPtr->ref.resID < mapbase+mapmax)
+						sprintf(lump->Name, "MAP%02d", refPtr->ref.resID-mapbase+1);
+				}
+			}
+
+			// Scan for the wall textures and mark them as compressed with a
+			// fixed size.  Note that a mod can replace textures without
+			// redoing the wall list so HACK around it by storing the last list
+			// statically.
+			static TArray<WORD> walllist;
+			if(lists[LIST_Walls] && lists[LIST_Walls]->LumpSize >= 4)
+			{
+				walllist.Resize(lists[LIST_Walls]->LumpSize/2 - 1);
 				Reader->Seek(lists[LIST_Walls]->Position+2, SEEK_SET);
-				TUniquePtr<WORD[]> walls(new WORD[numWalls]);
-				Reader->Read(walls.Get(), numWalls*2);
-				for(unsigned int i = 0;i < numWalls;++i)
-					walls[i] = BigShort(walls[i]);
+				Reader->Read(&walllist[0], walllist.Size()*2);
+				for(unsigned int i = 0;i < walllist.Size();++i)
+					walllist[i] = BigShort(walllist[i]);
+			}
+			if(walllist.Size() > 0)
+			{
+				// Find BRGR
+				FMacResLump *lump = Lumps;
+				FResReference *refPtr = refs;
+				for(unsigned int i = 0;i < BRGRref;++i)
+				{
+					lump += resTypes[i].numResources;
+					refPtr += resTypes[i].numResources;
+				}
 
 				for(unsigned int j = 0;j < resTypes[BRGRref].numResources;++j, ++refPtr, ++lump)
 				{
-					for(unsigned int i = 0;i < numWalls;++i)
+					for(unsigned int i = 0;i < walllist.Size();++i)
 					{
-						if((walls[i]&0x3FF) == refPtr->ref.resID)
+						if((walllist[i]&0x3FF) == refPtr->ref.resID)
 						{
+							sprintf(lump->Name, "WALL%04X", refPtr->ref.resID);
 							lump->Compressed = FMacResLump::MODE_Compressed;
 							lump->CompressedSize = lump->LumpSize;
 							lump->LumpSize = 0x4000;

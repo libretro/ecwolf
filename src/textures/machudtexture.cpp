@@ -68,7 +68,12 @@ public:
 		}
 		return Pixels.Get() + column*Height;
 	}
-	const BYTE *GetPixels () { return Pixels; }
+	const BYTE *GetPixels ()
+	{
+		if(!Pixels)
+			MakeTexture();
+		return Pixels;
+	}
 	void Unload () { Pixels.Reset(); }
 
 protected:
@@ -95,14 +100,18 @@ FMacHudTexture::FMacHudTexture(const char* name, int lumpnum, int offset, FileRe
 	if(Masked)
 	{
 		// In this case the previous was the x/y offset.
-		LeftOffset = -Width;
-		TopOffset = -Height;
+		LeftOffset = -256-Width;
+		TopOffset = -172-Height;
 
 		file >> width >> height;
 		Width = BigShort(width);
 		Height = BigShort(height);
 		Offset += 4;
+
+		UseType = TEX_Sprite;
 	}
+	else
+		UseType = TEX_MiscPatch;
 
 	CalcBitSize();
 }
@@ -134,27 +143,68 @@ void FMacHudTexture::MakeTexture()
 	}
 }
 
-void FTextureManager::InitMacHud()
+static bool CheckHudGraphicsLump(FWadLump &lump, unsigned int numgraphics, DWORD* offsets)
 {
-	enum { NUM_HUDGRAPHICS = 47 };
+	if(lump.GetLength() < numgraphics*4) return false;
 
-	int lumpnum = Wads.GetNumForName("FACE640", ns_graphics);
-	FWadLump lump = Wads.OpenLumpNum(lumpnum);
-	if(lump.GetLength() < NUM_HUDGRAPHICS*4) return;
-
-	DWORD offsets[NUM_HUDGRAPHICS];
-	lump.Read(offsets, NUM_HUDGRAPHICS*4);
+	lump.Read(offsets, numgraphics*4);
 	// Check potentially valid data.
-	for(unsigned int i = 0;i < NUM_HUDGRAPHICS;++i)
+	for(unsigned int i = 0;i < numgraphics;++i)
 	{
 		offsets[i] = BigLong(offsets[i]);
-		if(lump.GetLength() < offsets[i]) return;
+		if(lump.GetLength() < offsets[i]) return false;
 	}
 
-	for(unsigned int i = 0;i < NUM_HUDGRAPHICS;++i)
+	return true;
+}
+
+void FTextureManager::InitMacHud()
+{
+	enum { NUM_HUDGRAPHICS = 47, NUM_INTERGRAPHICS = 3 };
+	static const char* const MacHudGfxNames[NUM_HUDGRAPHICS] = {
+		"STFST00", "STFST01",
+		"STFTR00", "STFTL00",
+		"STFEVL0",
+		"STFST10", "STFST11",
+		"STFTR10", "STRTL10",
+		"STFDEAD0",
+		"STKEYS1", "STKEYS2",
+		"KNIFA0", "KNIFB0", "KNIFC0", "KNIFD0",
+		"PISGA0", "PISGB0", "PISGC0", "PISGD0",
+		"MCHGA0", "MCHGB0", "MCHGC0", "MCHGD0",
+		"CHGGA0", "CHGGB0", "CHGGC0", "CHGGD0",
+		"FLMGA0", "FLMGB0", "FLMGC0", "FLMGD0",
+		"MISGA0", "MISGB0", "MISGC0", "MISGD0",
+		"FONTN048", "FONTN049", "FONTN050", "FONTN051", "FONTN052",
+		"FONTN053", "FONTN054", "FONTN055", "FONTN056", "FONTN057",
+		"STBACK",
+	};
+
+	static const char* const InterBJGfxNames[NUM_INTERGRAPHICS] = {
+		"L_GUY1", "L_GUY2", "L_BJWINS"
+	};
+
+	int lumpnum = Wads.CheckNumForName("FACE640", ns_graphics);
+	if(lumpnum != -1)
 	{
-		char name[9];
-		sprintf(name, "HUD%02d", i);
-		AddTexture(new FMacHudTexture(name, lumpnum, offsets[i], lump, i >= 12 && i <= 35));
+		FWadLump lump = Wads.OpenLumpNum(lumpnum);
+		DWORD offsets[NUM_HUDGRAPHICS];
+		if(CheckHudGraphicsLump(lump, NUM_HUDGRAPHICS, offsets))
+		{
+			for(unsigned int i = 0;i < NUM_HUDGRAPHICS;++i)
+				AddTexture(new FMacHudTexture(MacHudGfxNames[i], lumpnum, offsets[i], lump, i >= 12 && i <= 35));
+		}
+	}
+
+	lumpnum = Wads.CheckNumForName("INTERBJ", ns_graphics);
+	if(lumpnum != -1)
+	{
+		FWadLump lump = Wads.OpenLumpNum(lumpnum);
+		DWORD offsets[NUM_INTERGRAPHICS];
+		if(CheckHudGraphicsLump(lump, NUM_INTERGRAPHICS, offsets))
+		{
+			for(unsigned int i = 0;i < NUM_INTERGRAPHICS;++i)
+				AddTexture(new FMacHudTexture(InterBJGfxNames[i], lumpnum, offsets[i], lump, false));
+		}
 	}
 }
