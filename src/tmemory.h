@@ -57,7 +57,7 @@ template<class T> struct TDefaultDelete
 	static inline void CheckConversion() { static_cast<Ptr>((typename D::Ptr)0); }
 
 private:
-	template<class> friend class TDefaultDelete;
+	template<class> friend struct TDefaultDelete;
 	typedef T *Ptr;
 };
 template<class T> struct TDefaultDelete<T[]>
@@ -76,7 +76,7 @@ template<class T> struct TDefaultDelete<T[]>
 	}
 
 private:
-	template<class> friend class TDefaultDelete;
+	template<class> friend struct TDefaultDelete;
 	typedef T Array[1];
 };
 
@@ -90,7 +90,7 @@ template<class T, void (*Func)(T*)> struct TFuncDeleter
 	static inline void CheckConversion() { static_cast<Ptr>((typename D::Ptr)0); }
 
 private:
-	template<class A, void(*)(A*)> friend class TFuncDeleter;
+	template<class A, void(*)(A*)> friend struct TFuncDeleter;
 	typedef T *Ptr;
 };
 
@@ -116,7 +116,7 @@ class TUniquePtr
 {
 	typedef TUniquePtr<Type, Deleter> Self;
 	typedef typename TDefaultDelete<Type>::Type T;
-	friend class TMoveInsert<Self>;
+	friend struct TMoveInsert<Self>;
 
 	// Mutable so that TMoveInsert can work on const objects.
 	mutable T *p;
@@ -174,7 +174,6 @@ public:
 	inline T *Get() const { return p; }
 	inline T &operator*() const { return *p; }
 	inline T *operator->() const { return p; }
-	inline T &operator[](size_t ofs) const { return p[ofs]; }
 
 	inline Self &operator=(T *other) { Reset(other); return *this; }
 
@@ -348,7 +347,6 @@ public:
 	inline T *Get() const { return p; }
 	inline T &operator*() const { return *p; }
 	inline T *operator->() const { return p; }
-	inline T &operator[](size_t ofs) const { return p[ofs]; }
 
 	inline operator bool() const { return p != NULL; }
 	inline operator T*() const { return p;  }
@@ -484,11 +482,9 @@ public:
 	// dereference.  So in release mode, don't bother checking the reference.
 	inline T &operator*() const { return *p; }
 	inline T *operator->() const { return p; }
-	inline T &operator[](size_t ofs) const { return p[ofs]; }
 #else
 	inline T &operator*() const { return *CheckedAccess(); }
 	inline T *operator->() const { return CheckedAccess(); }
-	inline T &operator[](size_t ofs) const { return CheckedAccess()[ofs]; }
 #endif
 
 	inline operator bool() const { return CheckedAccess() != NULL; }
