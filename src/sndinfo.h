@@ -92,7 +92,7 @@ class SoundData
 		TArray<SoundIndex> aliasLinks;
 
 		friend class SoundInformation;
-		friend class TMoveInsert<SoundData>;
+		friend struct TMoveInsert<SoundData>;
 };
 
 class SoundInformation

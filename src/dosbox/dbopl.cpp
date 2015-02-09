@@ -952,7 +952,7 @@ Channel* Channel::BlockTemplate( Chip* chip, Bit32u samples, Bit32s* output ) {
 		}
 
 		if(playVolume)
-			sample *= MULTIPLY_VOLUME(*playVolume);
+			sample = (Bit32s)(sample*MULTIPLY_VOLUME(*playVolume));
 
 		switch( mode ) {
 		case sm2AM:

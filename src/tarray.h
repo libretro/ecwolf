@@ -246,7 +246,7 @@ public:
 			Grow (amount - Count);
 			for (unsigned int i = Count; i < amount; ++i)
 			{
-				(void)TMoveInsert<T>(&Array[i], T());
+				::new ((void *)&Array[i]) T;
 			}
 		}
 		else if (Count != amount)
@@ -265,7 +265,7 @@ public:
 		Count += amount;
 		for (unsigned int i = place; i < Count; ++i)
 		{
-			(void)TMoveInsert<T>(&Array[i], T());
+			::new ((void *)&Array[i]) T;
 		}
 		return place;
 	}

@@ -145,14 +145,14 @@ void FMacHudTexture::MakeTexture()
 
 static bool CheckHudGraphicsLump(FWadLump &lump, unsigned int numgraphics, DWORD* offsets)
 {
-	if(lump.GetLength() < numgraphics*4) return false;
+	if(lump.GetLength() < (long)(numgraphics*4)) return false;
 
 	lump.Read(offsets, numgraphics*4);
 	// Check potentially valid data.
 	for(unsigned int i = 0;i < numgraphics;++i)
 	{
 		offsets[i] = BigLong(offsets[i]);
-		if(lump.GetLength() < offsets[i]) return false;
+		if((unsigned)lump.GetLength() < offsets[i]) return false;
 	}
 
 	return true;
