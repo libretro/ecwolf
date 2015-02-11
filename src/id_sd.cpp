@@ -40,6 +40,10 @@
 #include "wl_main.h"
 #include "id_sd.h"
 
+#ifndef ECWOLF_MIXER
+#warning Not using customized SDL_mixer. Features will be disabled. https://bitbucket.org/Blzut3/sdl_mixer-for-ecwolf
+#endif
+
 // For AdLib sounds & music:
 #define MUSIC_RATE 700	// Must be a multiple of SOUND_RATE
 #define SOUND_RATE 140	// Also affects PC Speaker sounds
@@ -1283,7 +1287,12 @@ SD_StartMusic(const char* chunk)
 
 		if(music)
 			Mix_FreeMusic(music);
+		// Technically an SDL_mixer 2 feature to free the source
+#ifdef ECWOLF_MIXER
 		music = Mix_LoadMUS_RW(mus_cunk, true);
+#else
+		music = Mix_LoadMUS_RW(mus_cunk);
+#endif
 
 		// We assume that when music equals to NULL, we've an IMF file to play
 		if (music == NULL)
