@@ -1366,8 +1366,11 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 			chunkmem = new byte[Wads.LumpLength(lumpNum)];
 			lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
 			SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
+#ifdef ECWOLF_MIXER
 			music = Mix_LoadMUS_RW(mus_cunk, true);
-
+#else
+			music = Mix_LoadMUS_RW(mus_cunk);
+#endif
 			if (music == NULL)
 			{
 				sqHack = reinterpret_cast<word*>(chunkmem.Release());
