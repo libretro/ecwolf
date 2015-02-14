@@ -668,8 +668,8 @@ void GameMap::ReadMacData()
 			continue;
 
 		wallsused[i].tilenum = tilePalette.Size();
-		wallsused[i].wallnum1 = walltexs[(i-1)*2]&0x3FF;
-		wallsused[i].wallnum2 = walltexs[(i-1)*2+1]&0x3FF;
+		wallsused[i].wallnum1 = walltexs[(i-1)*2]&0x3FFF;
+		wallsused[i].wallnum2 = walltexs[(i-1)*2+1]&0x3FFF;
 
 		char name[2][9];
 		sprintf(name[0], "WALL%04X", wallsused[i].wallnum1);
@@ -688,16 +688,17 @@ void GameMap::ReadMacData()
 	const unsigned int firstdoor = tilePalette.Size();
 	for(unsigned int i = 0;i < 4;++i)
 	{
-		char name[9];
-		sprintf(name, "WALL014%X", 0xB+i);
+		char name[2][9];
+		sprintf(name[0], "WALL%04X", walltexs[59+i]&0x3FFF);
+		sprintf(name[1], "WALL%04X", walltexs[63]&0x3FFF);
 
 		Tile tile1, tile2;
 		tile1.texture[1] = tile1.texture[3] =
 		tile2.texture[0] = tile2.texture[2] =
-			TexMan.CheckForTexture(name, FTexture::TEX_Wall);
+			TexMan.CheckForTexture(name[0], FTexture::TEX_Wall);
 		tile1.texture[0] = tile1.texture[2] =
 		tile2.texture[1] = tile2.texture[3] =
-			TexMan.CheckForTexture("WALL014F", FTexture::TEX_Wall);
+			TexMan.CheckForTexture(name[1], FTexture::TEX_Wall);
 
 		tile1.offsetHorizontal = true;
 		tile2.offsetVertical = true;

@@ -545,7 +545,10 @@ class FMacBin : public FResourceFile
 							lump->Position += 4;
 							lump->LumpSize = BigLong(length);
 						}
-						else if(brgr && refPtr->ref.resID >= 428) // Sprites
+						// Sprites. It may be tempting to consider anything
+						// above id 428 a sprite, but mods don't follow that
+						// convention.
+						else if(brgr && refPtr->ref.resID >= 428 && refPtr->ref.resID < 428+countof(MacSpriteNames))
 						{
 							lump->Compressed = FMacResLump::MODE_Compressed;
 							WORD csize;
@@ -555,11 +558,7 @@ class FMacBin : public FResourceFile
 							lump->LumpSize = LittleShort(csize);
 							lump->Namespace = ns_sprites;
 
-							WORD id = refPtr->ref.resID-428;
-							if(id < countof(MacSpriteNames))
-								strcpy(name, MacSpriteNames[id]);
-							else
-								sprintf(name, "S%03XA0", refPtr->ref.resID-428);
+							strcpy(name, MacSpriteNames[refPtr->ref.resID-428]);
 						}
 
 						uppercopy(lump->Name, name);
@@ -627,7 +626,7 @@ class FMacBin : public FResourceFile
 				{
 					for(unsigned int i = 0;i < walllist.Size();++i)
 					{
-						if((walllist[i]&0x3FF) == refPtr->ref.resID)
+						if((walllist[i]&0x3FFF) == refPtr->ref.resID)
 						{
 							sprintf(lump->Name, "WALL%04X", refPtr->ref.resID);
 							lump->Compressed = FMacResLump::MODE_Compressed;
