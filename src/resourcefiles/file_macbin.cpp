@@ -592,7 +592,10 @@ class FMacBin : public FResourceFile
 				for(unsigned int j = 0;j < resTypes[BRGRref].numResources;++j, ++refPtr, ++lump)
 				{
 					if(refPtr->ref.resID >= mapbase && refPtr->ref.resID < mapbase+mapmax)
+					{
+						memset(lump->Name, 0, 8); // Some code requires 0-filled
 						sprintf(lump->Name, "MAP%02d", refPtr->ref.resID-mapbase+1);
+					}
 				}
 			}
 

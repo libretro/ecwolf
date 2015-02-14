@@ -202,6 +202,7 @@ public:
 
 protected:
 	friend class LevelInfoBlockParser;
+	friend void ParseMacMapList(int);
 
 	bool			UseMapInfoName;
 	FString			Name;

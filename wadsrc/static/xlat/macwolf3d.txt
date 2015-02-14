@@ -1,0 +1,189 @@
+things
+{
+	trigger 90
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 91
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 92
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 93
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 1;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 94
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 95
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 2;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 96
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 97
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+
+	trigger 98
+	{
+		action = 2;
+		arg1 = 8;
+		arg2 = 2;
+		arg3 = 2;
+		playeruse = true;
+		secret = true;
+	}
+
+	// Tile 99 was going to be an outdoors effect
+
+	trigger 100
+	{
+		action = 3;
+		playeruse = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 101
+	{
+		action = 4;
+		playeruse = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+
+	// oldnum, newnum, angles, patrol, minskill
+	{19,	1,	4,	0,	0}
+	{23,	33,	0,	0,	0}
+	{24,	34,	0,	0,	0}
+	{25,	46,	0,	0,	0}
+	{26,	36,	0,	0,	0}
+	{27,	37,	0,	0,	0}
+	{28,	39,	0,	0,	0}
+	{29,	89,	0,	0,	0}
+	{30,	41,	0,	0,	0}
+	{31,	72,	0,	0,	0}
+	{32,	44,	0,	0,	0}
+	{33,	45,	0,	0,	0}
+	{34,	52,	0,	0,	0}
+	{35,	47,	0,	0,	0}
+	{36,	56,	0,	0,	0}
+	{37,	49,	0,	0,	0}
+	{38,	50,	0,	0,	0}
+	{39,	53,	0,	0,	0}
+	{40,	54,	0,	0,	0}
+	//{41,	<>,	0,	0,	0} Backpack
+	{42,	90,	0,	0,	0}
+	{43,	57,	0,	0,	0}
+	{44,	58,	0,	0,	0}
+	{45,	59,	0,	0,	0}
+	{46,	60,	0,	0,	0}
+	{47,	61,	0,	0,	0}
+	{48,	62,	0,	0,	0}
+	{49,	63,	0,	0,	0}
+	{50,	64,	0,	0,	0}
+	{51,	65,	0,	0,	0}
+	{52,	66,	0,	0,	0}
+	{53,	68,	0,	0,	0}
+	{54,	69,	0,	0,	0}
+	//{55,	<>,	0,	0,	0} Flamethrower
+	//{56,	<>,	0,	0,	0} Gascan
+	//{57,	<>,	0,	0,	0} Launcher
+	//{58,	<>,	0,	0,	0} Missiles
+	{108,	11,	0,	0,	0}
+	{109,	12,	0,	0,	0}
+	{110,	13,	0,	0,	0}
+	{111,	14,	0,	0,	0}
+	{112,	15,	0,	0,	0}
+	{113,	16,	0,	0,	0}
+	{114,	17,	0,	0,	0}
+	{115,	23,	0,	0,	0}
+	{116,	24,	0,	0,	0}
+	{117,	26,	0,	0,	0}
+	{118,	19,	0,	0,	0}
+	{119,	19,	0,	0,	0}
+	{126,	11,	0,	AMBUSH,	0}
+	{127,	12,	0,	AMBUSH,	0}
+	{128,	13,	0,	AMBUSH,	0}
+	{129,	14,	0,	AMBUSH,	0}
+	{130,	15,	0,	AMBUSH,	0}
+	{131,	16,	0,	AMBUSH,	0}
+	{132,	17,	0,	AMBUSH,	0}
+	{133,	23,	0,	AMBUSH,	0}
+	{134,	24,	0,	AMBUSH,	0}
+	{135,	26,	0,	AMBUSH,	0}
+	{136,	19,	0,	AMBUSH,	0}
+	{137,	19,	0,	AMBUSH,	0}
+}

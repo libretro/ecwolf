@@ -56,3 +56,35 @@ IWad
 	MustContain = "MISTA0"
 	Game = "Wolf3D"
 }
+
+IWad
+{
+	Name = "Wolfenstein 3D: The First Encounter"
+	Mapinfo = "mapinfo/macwolf3d.txt"
+	MustContain = "MACPLAY", "MAPLIST"
+	Game = "Wolf3D"
+}
+
+IWad
+{
+	Name = "Wolfenstein 3D: The Third Encounter"
+	Mapinfo = "mapinfo/macwolf3d.txt"
+	MustContain = "MACPLAY", "HTLRA0"
+	Game = "Wolf3D"
+}
+
+IWad
+{
+	Name = "Wolfenstein 3D: The Second Encounter"
+	Required = "Wolfenstein 3D: The Third Encounter"
+	Mapinfo = "mapinfo/macwolf3d.txt"
+	MustContain = "MAP01", "MAPLIST"
+	Game = "Wolf3D"
+}
+
+Names
+{
+	"wolfdemo.bin"
+	"wolf3d.bin"
+	"wolflvls.bin"
+}

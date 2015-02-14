@@ -115,7 +115,7 @@ int I_PickIWad_Gtk (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 			if(filepart.IsEmpty())
 				filepart = wads[i].Path[0];
 			else
-				filepart.Mid(1);
+				filepart = filepart.Mid(1);
 		}
 		else
 			filepart.Format("*.%s", wads[i].Extension.GetChars());
@@ -240,7 +240,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 				if(filepart.IsEmpty())
 					filepart = wads[i].Path[0];
 				else
-					filepart.Mid(1);
+					filepart = filepart.Mid(1);
 			}
 			else
 				filepart.Format("*.%s", wads[i].Extension.GetChars());
@@ -259,7 +259,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 				if(filepart.IsEmpty())
 					filepart = wads[defaultiwad].Path[0];
 				else
-					filepart.Mid(1);
+					filepart = filepart.Mid(1);
 			}
 			else
 				filepart.Format("*.%s", wads[defaultiwad].Extension.GetChars());
@@ -307,7 +307,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 			if(filepart.IsEmpty())
 				filepart = wads[i].Path[0];
 			else
-				filepart.Mid(1);
+				filepart = filepart.Mid(1);
 		}
 		else
 			filepart.Format("*.%s", wads[i].Extension.GetChars());
@@ -339,7 +339,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 			if(filepart.IsEmpty())
 				filepart = wads[i].Path[0];
 			else
-				filepart.Mid(1);
+				filepart = filepart.Mid(1);
 		}
 		else
 			filepart.Format("*.%s", wads[i].Extension.GetChars());

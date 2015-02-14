@@ -1440,6 +1440,61 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 	}
 }
 
+// The Mac version of Wolf3D had a primitive scenario definition chunk.
+void ParseMacMapList(int lumpnum)
+{
+	int songlumpnum = Wads.CheckNumForName("SONGLIST");
+	TArray<WORD> songs;
+	if(songlumpnum != -1)
+	{
+		FWadLump songlump = Wads.OpenLumpNum(songlumpnum);
+		songs.Resize(songlump.GetLength()/2);
+		songlump.Read(&songs[0], songs.Size()*2);
+		for(unsigned int i = 0;i < songs.Size();++i)
+			songs[i] = BigShort(songs[i]);
+
+		gameinfo.TitleMusic.Format("MUS_%04X", songs[0]);
+		gameinfo.MenuMusic = gameinfo.TitleMusic;
+		gameinfo.IntermissionMusic.Format("MUS_%04X", songs[1]);
+	}
+
+	FWadLump lump = Wads.OpenLumpNum(lumpnum);
+
+	WORD numMaps;
+	lump >> numMaps;
+	lump.Seek(2, SEEK_CUR);
+	numMaps = BigShort(numMaps);
+
+	for(unsigned int i = 0;i < numMaps;++i)
+	{
+		WORD nextLevel, nextSecret, parTime, scenarioNum, floorNum;
+		lump >> nextLevel >> nextSecret >> parTime >> scenarioNum >> floorNum;
+		nextLevel = BigShort(nextLevel);
+		nextSecret = BigShort(nextSecret);
+		parTime = BigShort(parTime);
+		scenarioNum = BigShort(scenarioNum);
+		floorNum = BigShort(floorNum);
+
+		LevelInfo info = defaultMap;
+		sprintf(info.MapName, "MAP%02d", i+1);
+		info.NextMap.Format("MAP%02d", nextLevel+1);
+		info.NextSecret.Format("MAP%02d", nextSecret+1);
+		info.Par = parTime;
+		info.FloorNumber.Format("%d-%d", scenarioNum, floorNum);
+		info.UseMapInfoName = true;
+		info.Name = info.FloorNumber;
+
+		if(songs.Size() > 0)
+			info.Music.Format("MUS_%04X", songs[(i+2)%songs.Size()]);
+
+		LevelInfo &existing = LevelInfo::Find(info.MapName);
+		if(&existing != &defaultMap)
+			existing = info;
+		else
+			levelInfos.Push(info);
+	}
+}
+
 void G_ParseMapInfo(bool gameinfoPass)
 {
 	int lastlump = 0;
@@ -1447,6 +1502,9 @@ void G_ParseMapInfo(bool gameinfoPass)
 
 	if((lump = Wads.GetNumForFullName(IWad::GetGame().Mapinfo)) != -1)
 		ParseMapInfoLump(lump, gameinfoPass);
+
+	if(!gameinfoPass && (lump = Wads.GetNumForName("MAPLIST")) != -1)
+		ParseMacMapList(lump);
 
 	while((lump = Wads.FindLump("MAPINFO", &lastlump)) != -1)
 		ParseMapInfoLump(lump, gameinfoPass);

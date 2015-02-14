@@ -135,23 +135,33 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	}
 	else
 	{
-		if(strcmp(Wads.GetLumpFullName(markerLump+1), "PLANES") == 0)
+		const char* nextLumpName = Wads.GetLumpFullName(markerLump+1);
+		if(nextLumpName == NULL || strcmp(nextLumpName, "TEXTMAP") != 0)
 		{
 			numLumps = 1;
 			isUWMF = false;
 			valid = true;
-			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			if(nextLumpName != NULL && strcmp(nextLumpName, "PLANES") == 0)
+			{
+				// DOS (WDC) format binary map
+				lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			}
+			else
+			{
+				// Must be a Mac format map
+				lumps[0] = Wads.ReopenLumpNum(markerLump);
+				if(lumps[0]->GetLength() <= 0)
+				{
+					FString error;
+					error.Format("Invalid map format for %s!", map.GetChars());
+					throw CRecoverableError(error);
+				}
+			}
+			
 		}
 		else
 		{
 			// Expect UWMF formatted map.
-			if(strcmp(Wads.GetLumpFullName(markerLump+1), "TEXTMAP") != 0)
-			{
-				FString error;
-				error.Format("Invalid map format for %s!", map.GetChars());
-				throw CRecoverableError(error);
-			}
-
 			isUWMF = true;
 			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
 

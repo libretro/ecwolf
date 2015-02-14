@@ -38,6 +38,7 @@
 #include "lumpremap.h"
 #include "scanner.h"
 #include "tarray.h"
+#include "tmemory.h"
 #include "version.h"
 #include "w_wad.h"
 #include "wl_iwad.h"
@@ -59,6 +60,7 @@ namespace IWad {
 #endif
 
 static TArray<IWadData> iwadTypes;
+static TArray<FString> iwadNames;
 static const IWadData *selectedGame;
 static unsigned int NumIWads;
 
@@ -72,52 +74,83 @@ static bool SplitFilename(const FString &filename, FString &name, FString &exten
 	return true;
 }
 
+static int CheckFileContents(FResourceFile *file, unsigned int* valid)
+{
+	for(unsigned int j = file->LumpCount();j-- > 0;)
+	{
+		FResourceLump *lump = file->GetLump(j);
+
+		for(unsigned int k = 0;k < iwadTypes.Size();++k)
+		{
+			for(unsigned int l = iwadTypes[k].Ident.Size();l-- > 0;)
+			{
+				if(iwadTypes[k].Ident[l].CompareNoCase(lump->Name) == 0 ||
+					(lump->FullName && (strnicmp(lump->FullName, "maps/", 5) == 0 &&
+					iwadTypes[k].Ident[l].CompareNoCase(FString(lump->FullName+5, strcspn(lump->FullName+5, "."))))))
+				{
+					valid[k] |= 1<<l;
+					if(valid[k] == static_cast<unsigned>((1<<iwadTypes[k].Ident.Size())-1))
+						return k;
+				}
+			}
+		}
+	}
+	return -1;
+}
+
 // Identifies the IWAD by examining the lumps against the possible requirements.
 // Returns -1 if it isn't identifiable.
 static int CheckData(WadStuff &wad)
 {
-	unsigned int* valid = new unsigned int[iwadTypes.Size()];
-	memset(valid, 0, sizeof(unsigned int)*iwadTypes.Size());
+	TUniquePtr<unsigned int[]> valid(new unsigned int[iwadTypes.Size()]);
+	memset(valid.Get(), 0, sizeof(unsigned int)*iwadTypes.Size());
 
 	for(unsigned int i = 0;i < wad.Path.Size();++i)
 	{
-		FResourceFile *file = FResourceFile::OpenResourceFile(wad.Path[i], NULL, true);
+		TUniquePtr<FResourceFile> file(FResourceFile::OpenResourceFile(wad.Path[i], NULL, true));
 		if(file)
 		{
 			LumpRemapper::RemapAll(); // Fix lump names if needed
-			for(unsigned int j = file->LumpCount();j-- > 0;)
+
+			if((wad.Type = CheckFileContents(file, valid)) >= 0)
 			{
-				FResourceLump *lump = file->GetLump(j);
-
-				for(unsigned int k = 0;k < iwadTypes.Size();++k)
-				{
-					for(unsigned int l = iwadTypes[k].Ident.Size();l-- > 0;)
-					{
-						if(iwadTypes[k].Ident[l].CompareNoCase(lump->Name) == 0 ||
-							(lump->FullName && (strnicmp(lump->FullName, "maps/", 5) == 0 &&
-							iwadTypes[k].Ident[l].CompareNoCase(FString(lump->FullName+5, strcspn(lump->FullName+5, "."))))))
-						{
-							valid[k] |= 1<<l;
-						}
-					}
-				}
+				wad.Name = iwadTypes[wad.Type].Name;
+				break;
 			}
-			delete file;
 		}
 	}
 
-	wad.Type = -1;
-	for(unsigned int i = 0;i < iwadTypes.Size();++i)
-	{
-		if(static_cast<unsigned>((1<<iwadTypes[i].Ident.Size())-1) == valid[i])
-		{
-			wad.Name = iwadTypes[i].Name;
-			wad.Type = i;
-			break;
-		}
-	}
-	delete[] valid;
 	return wad.Type;
+}
+
+static bool CheckStandalone(const char* directory, FString filename, FString extension, TArray<WadStuff> &iwads)
+{
+	WadStuff wad;
+	for(unsigned int i = 0;i < iwadNames.Size();++i)
+	{
+		if(filename.CompareNoCase(iwadNames[i]) != 0)
+			continue;
+
+		FString path;
+		path.Format("%s/%s", directory, filename.GetChars());
+		TUniquePtr<FResourceFile> file(FResourceFile::OpenResourceFile(path, NULL, true));
+		if(file)
+		{
+			TUniquePtr<unsigned int[]> valid(new unsigned int[iwadTypes.Size()]);
+			memset(valid.Get(), 0, sizeof(unsigned int)*iwadTypes.Size());
+
+			if((wad.Type = CheckFileContents(file, valid)) >= 0)
+			{
+				wad.Path.Push(path);
+				wad.Extension = extension;
+				wad.Name = iwadTypes[wad.Type].Name;
+				iwads.Push(wad);
+				return true;
+			}
+		}
+		break;
+	}
+	return false;
 }
 
 bool CheckGameFilter(FName filter)
@@ -228,6 +261,9 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 	{
 		FString name, extension;
 		if(!SplitFilename(files[i], name, extension))
+			continue;
+
+		if(CheckStandalone(directory, files[i], extension, iwads))
 			continue;
 
 		BaseFile *base = NULL;
@@ -414,6 +450,16 @@ static void ParseIWadInfo(FResourceFile *res)
 				{
 					ParseIWad(sc);
 				}
+				else if(sc->str.CompareNoCase("Names") == 0)
+				{
+					sc.MustGetToken('{');
+					do
+					{
+						sc.MustGetToken(TK_StringConst);
+						iwadNames.Push(sc->str);
+					}
+					while(!sc.CheckToken('}'));
+				}
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown IWADINFO block '%s'.", sc->str.GetChars());
 			}
@@ -518,7 +564,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 	if(basefiles.Size() == 0)
 	{
-		I_Error("Can not find base game data. (*.wl6, *.wl1, *.sdm, *.sod)");
+		I_Error("Can not find base game data. (*.wl6, *.wl1, *.sdm, *.sod, *.n3d)");
 	}
 
 	int pick = -1;

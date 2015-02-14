@@ -87,7 +87,7 @@ static const char* const tableHeaders[NUM_COLUMNS] = { "IWAD", "Game" };
 			if(filename.IsEmpty())
 				filename = wads[i].Path[0];
 			else
-				filename.Mid(1);
+				filename = filename.Mid(1);
 		}
 		else
 			filename.Format("*.%s", wads[i].Extension.GetChars());
