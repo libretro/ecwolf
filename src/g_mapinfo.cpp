@@ -1480,7 +1480,7 @@ void ParseMacMapList(int lumpnum)
 		info.NextMap.Format("MAP%02d", nextLevel+1);
 		info.NextSecret.Format("MAP%02d", nextSecret+1);
 		info.Par = parTime;
-		info.FloorNumber.Format("%d-%d", scenarioNum, floorNum);
+		info.FloorNumber.Format("%-2d-%d", scenarioNum, floorNum);
 		info.UseMapInfoName = true;
 		info.Name = info.FloorNumber;
 

@@ -334,6 +334,51 @@ static const char* const MacSpriteNames[] = {
 	"FNKYA0", "INKYA0", "KNKYA0", "BLKYA0"
 };
 
+static const char* const MacSoundNames[] = {
+	"DSSWITCH",
+	"DSGETKEY",
+	"DSBONUS1",
+	"DSDROPN",
+	"DSDOGATK",
+	"DSDOGDTH",
+	"DSGRDSIT",
+	"DSGRDSI2",
+	"DSGDDTH1",
+	"DSGDDTH2",
+	"DSTHUD",
+	"DSGDPAIN",
+	"DSAMMOUP",
+	"DSKNFSWG",
+	"DSPISTOL",
+	"DSMGUN",
+	"DSCGUN",
+	"DSFLAME",
+	"DSRLAUNC",
+	"DSPSHWAL",
+	"DSPSHSTP",
+	"DSHANSIT",
+	"DSHITSHI",
+	"DSMEDIUP",
+	"DSYEAH",
+	"DSBNS1UP",
+	"DSPLPAIN",
+	"DSPLPAI2",
+	"DSPLDETH",
+	"DSNOWAY",
+	"DSKNFMIS",
+	"DSBOSSFR",
+	"DSKNTSIT",
+	"DSGRDSI3",
+	"DSGRDSI4",
+	"DSOK",
+	"DSMENU",
+	"DSHITSIT",
+	"DSSCBSIT",
+	"DSBAREXP",
+	"DSLOCKED",
+	"DSMCHSTP"
+};
+
 class FMacBin : public FResourceFile
 {
 	private:
@@ -499,7 +544,10 @@ class FMacBin : public FResourceFile
 						if(isSnd)
 						{
 							lump->Namespace = ns_sounds;
-							sprintf(name, "SND%04X", refPtr->ref.resID);
+							if(refPtr->ref.resID >= 128 && refPtr->ref.resID < 128+countof(MacSoundNames))
+								strcpy(name, MacSoundNames[refPtr->ref.resID-128]);
+							else
+								sprintf(name, "SND%04X", refPtr->ref.resID);
 						}
 						else if(music)
 						{
@@ -538,7 +586,7 @@ class FMacBin : public FResourceFile
 
 						if(csnd)
 							lump->Compressed = FMacResLump::MODE_CSound;
-						else if(lump->Compressed != FMacResLump::MODE_Uncompressed)
+						if(lump->Compressed != FMacResLump::MODE_Uncompressed)
 						{
 							*Reader >> length;
 							lump->CompressedSize = lump->LumpSize-4;

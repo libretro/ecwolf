@@ -489,6 +489,80 @@ void SD_SetPosition(int channel, int leftpos, int rightpos)
 	}
 }
 
+// Mac format sound loading.
+struct MacSoundData
+{
+	uint8_t *data;
+	Sint64 pos;
+	int size;
+};
+static Sint64 MacSound_Size(SDL_RWops *ops)
+{
+	return (Sint64)((MacSoundData*)ops->hidden.unknown.data1)->size;
+}
+static int MacSound_Seek(SDL_RWops *ops, int pos, int relative)
+{
+	Sint64 &curpos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
+	switch(relative)
+	{
+		case RW_SEEK_SET:
+			curpos = pos;
+			break;
+		case RW_SEEK_CUR:
+			curpos += pos;
+			break;
+		case RW_SEEK_END:
+			curpos = ((MacSoundData*)ops->hidden.unknown.data1)->size+pos;
+			break;
+	}
+	return curpos;
+}
+static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
+{
+	static const char WAV_HEADER[40] = {
+		'R','I','F','F',0,0,0,0,'W','A','V','E',
+		'f','m','t',' ',16,0,0,0,1,0,1,0,
+		0x22,0x56,0,0,0x22,0x56,0,0,1,0,8,0,
+		'd','a','t','a'
+	};
+	static const unsigned int MacSoundHeaderSize = 0x2A;
+
+	size_t totalsize = size*nmem;
+	DWORD ssize = MacSound_Size(ops)-MacSoundHeaderSize;
+	Sint64 &pos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
+	if(pos < (Sint64)sizeof(WAV_HEADER))
+	{
+		size_t copysize = MIN(totalsize, sizeof(WAV_HEADER)-pos);
+		memcpy(buffer, WAV_HEADER+pos, copysize);
+		pos += copysize;
+		buffer = ((char*)buffer)+copysize;
+		totalsize -= copysize;
+		if(totalsize == 0)
+			return nmem;
+	}
+	if(pos < (Sint64)sizeof(WAV_HEADER)+4)
+	{
+		size_t copysize = MIN(totalsize, sizeof(ssize)+sizeof(WAV_HEADER)-pos);
+		memcpy(buffer, (char*)(&ssize)+(pos-sizeof(WAV_HEADER)), copysize);
+		pos += copysize;
+		buffer = ((char*)buffer)+copysize;
+		totalsize -= copysize;
+		if(totalsize == 0)
+			return nmem;
+	}
+
+	size_t copysize = MIN(totalsize, ssize-(pos-sizeof(WAV_HEADER)-4));
+	memcpy(buffer, ((MacSoundData*)ops->hidden.unknown.data1)->data+pos-sizeof(WAV_HEADER)-4, copysize);
+
+	return copysize/size;
+}
+static int MacSound_Close(SDL_RWops *ops)
+{
+	free(((MacSoundData*)ops->hidden.unknown.data1)->data);
+	free(ops->hidden.unknown.data1);
+	return 0;
+}
+
 Mix_Chunk* SD_PrepareSound(int which)
 {
 	int size = Wads.LumpLength(which);
@@ -496,6 +570,29 @@ Mix_Chunk* SD_PrepareSound(int which)
 		return NULL;
 
 	FMemLump soundLump = Wads.ReadLump(which);
+
+	// 0x2A is the size of the sound header. From what I can tell the csnds
+	// have mostly garbage filled headers (outside of what is precisely needed
+	// since the sample rate is hard coded). I'm not sure if the sounds are
+	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
+	if(BigShort(*(WORD*)soundLump.GetMem()) == 1 && size > 0x2A)
+	{
+		SDL_RWops *ops = SDL_AllocRW();
+		//ops->size = MacSound_Size;
+		ops->seek = MacSound_Seek;
+		ops->read = MacSound_Read;
+		ops->write = NULL;
+		ops->close = MacSound_Close;
+		ops->type = 0;
+		ops->hidden.unknown.data1 = malloc(sizeof(MacSoundData));
+		((MacSoundData*)ops->hidden.unknown.data1)->data = (uint8_t*)malloc(size-0x2A);
+		((MacSoundData*)ops->hidden.unknown.data1)->size = size-0x2A;
+		((MacSoundData*)ops->hidden.unknown.data1)->pos = 0;
+		memcpy(((MacSoundData*)ops->hidden.unknown.data1)->data, ((char*)soundLump.GetMem())+0x2A, size-0x2A);
+		for(unsigned int i = size-0x2A;i-- > 0;)
+			((MacSoundData*)ops->hidden.unknown.data1)->data[i] = 0x80+((MacSoundData*)ops->hidden.unknown.data1)->data[i];
+		return Mix_LoadWAV_RW(ops, 1);
+	}
 
 	return Mix_LoadWAV_RW(SDL_RWFromMem(soundLump.GetMem(), size), 1);
 }
