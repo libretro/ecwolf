@@ -697,9 +697,9 @@ class EVPushwall : public Thinker
 	DECLARE_CLASS(EVPushwall, Thinker)
 
 	public:
-		EVPushwall(MapSpot spot, unsigned int speed, MapTrigger::Side direction, unsigned int distance) :
+		EVPushwall(MapSpot spot, unsigned int speed, MapTrigger::Side direction, unsigned int distance, bool nostop) :
 			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
-			speed(speed), distance(distance)
+			speed(speed), distance(distance), nostop(nostop)
 		{
 			if(spot->tile->soundSequence == NAME_None)
 				seqname = gameinfo.PushwallSoundSequence;
@@ -776,7 +776,7 @@ class EVPushwall : public Thinker
 					#endif
 				}
 
-				if(!CheckSpotFree(moveTo))
+				if(!nostop && !CheckSpotFree(moveTo))
 				{
 					Destroy();
 					return;
@@ -843,10 +843,11 @@ class EVPushwall : public Thinker
 		unsigned int	position;
 		unsigned int	speed;
 		unsigned int	distance;
+		bool nostop;
 };
 IMPLEMENT_INTERNAL_CLASS(EVPushwall)
 
-FUNC(Pushwall_Move)
+static int DoPushwall(MapSpot spot, MapTrigger::Side direction, const int *args, bool nostop)
 {
 	static const unsigned int PUSHWALL_DIR_DIAGONAL = 0x1;
 	static const unsigned int PUSHWALL_DIR_ABSOLUTE = 0x8;
@@ -864,7 +865,7 @@ FUNC(Pushwall_Move)
 			return 0;
 		}
 
-		new EVPushwall(spot, args[1], dir, args[3]);
+		new EVPushwall(spot, args[1], dir, args[3], nostop);
 	}
 	else
 	{
@@ -878,11 +879,24 @@ FUNC(Pushwall_Move)
 			}
 
 			activated = true;
-			new EVPushwall(pwall, args[1], dir, args[3]);
+			new EVPushwall(pwall, args[1], dir, args[3], nostop);
 		}
 		return activated;
 	}
 	return 1;
+}
+
+FUNC(Pushwall_Move)
+{
+	return DoPushwall(spot, direction, args, false);
+}
+
+FUNC(Pushwall_MoveNoStop)
+{
+	// TODO: This really needs the pushwalls to be detached from our map grid.
+	// Secondly we might want to look into crushing features? I think ROTT does
+	// that.
+	return DoPushwall(spot, direction, args, true);
 }
 
 FUNC(Exit_Normal)

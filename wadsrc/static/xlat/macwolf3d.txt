@@ -99,7 +99,7 @@ things
 
 	trigger 98
 	{
-		action = 2;
+		action = 12;
 		arg1 = 8;
 		arg2 = 2;
 		arg3 = 2;
