@@ -1503,7 +1503,7 @@ void G_ParseMapInfo(bool gameinfoPass)
 	if((lump = Wads.GetNumForFullName(IWad::GetGame().Mapinfo)) != -1)
 		ParseMapInfoLump(lump, gameinfoPass);
 
-	if(!gameinfoPass && (lump = Wads.GetNumForName("MAPLIST")) != -1)
+	if(!gameinfoPass && (lump = Wads.CheckNumForName("MAPLIST")) != -1)
 		ParseMacMapList(lump);
 
 	while((lump = Wads.FindLump("MAPINFO", &lastlump)) != -1)
