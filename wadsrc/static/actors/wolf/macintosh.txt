@@ -208,7 +208,56 @@ actor MacBandolier : BackpackItem 213
 	}
 }
 
-actor MacGuard : Guard 214
+// Base item for Mac treasure items and Noah's fruit.
+actor MacTreasureItem : ExtraLifeItem
+{
+	inventory.amount 1
+	inventory.maxamount 50
+	+COUNTITEM
+	+INVENTORY.ALWAYSPICKUP
+}
+
+actor MacCross : MacTreasureItem 214
+{
+	states
+	{
+		Spawn:
+			CROS A -1
+			stop
+	}
+}
+
+actor MacChalice : MacTreasureItem 215
+{
+	states
+	{
+		Spawn:
+			CHAL A -1
+			stop
+	}
+}
+
+actor MacChestofJewels : MacTreasureItem 216
+{
+	states
+	{
+		Spawn:
+			JEWL A -1
+			stop
+	}
+}
+
+actor MacCrown : MacTreasureItem 217
+{
+	states
+	{
+		Spawn:
+			CRWN A -1
+			stop
+	}
+}
+
+actor MacGuard : Guard 218
 {
 	radius 26
 	speed 2.5
@@ -242,7 +291,7 @@ actor MacGuard : Guard 214
 	}
 }
 
-actor MacOfficer : Officer 215
+actor MacOfficer : Officer 219
 {
 	radius 26
 	speed 5
@@ -279,7 +328,7 @@ actor MacOfficer : Officer 215
 	}
 }
 
-actor MacWolfensteinSS : WolfensteinSS 216
+actor MacWolfensteinSS : WolfensteinSS 220
 {
 	radius 26
 	speed 3
@@ -319,7 +368,7 @@ actor MacWolfensteinSS : WolfensteinSS 216
 	}
 }
 
-actor MacDog : Dog 217
+actor MacDog : Dog 221
 {
 	radius 26
 	speed 4.5
@@ -352,7 +401,7 @@ actor MacDog : Dog 217
 	}
 }
 
-actor MacMutant : Mutant 218
+actor MacMutant : Mutant 222
 {
 	radius 26
 	speed 3.5
@@ -387,7 +436,7 @@ actor MacMutant : Mutant 218
 	}
 }
 
-actor MacHans : Hans 219
+actor MacHans : Hans 223
 {
 	radius 26
 	speed 3.5
@@ -432,7 +481,7 @@ actor MacNeedle : Needle
 	}
 }
 
-actor MacSchabbs : Schabbs 220
+actor MacSchabbs : Schabbs 224
 {
 	radius 26
 	speed 2.5
@@ -461,7 +510,7 @@ actor MacSchabbs : Schabbs 220
 	}
 }
 
-actor MacTrans : Trans 221
+actor MacTrans : Trans 225
 {
 	radius 26
 	speed 3.5
@@ -490,7 +539,7 @@ actor MacTrans : Trans 221
 	}
 }
 
-actor MacUberMutant : UberMutant 222
+actor MacUberMutant : UberMutant 226
 {
 	radius 26
 	speed 4
@@ -535,7 +584,7 @@ actor MacRocket : Rocket
 	}
 }
 
-actor MacDeathKnight : DeathKnight 223
+actor MacDeathKnight : DeathKnight 227
 {
 	radius 26
 	speed 3.5
@@ -567,7 +616,7 @@ actor MacDeathKnight : DeathKnight 223
 	}
 }
 
-actor MacMechaHitler : MechaHitler 224
+actor MacMechaHitler : MechaHitler 228
 {
 	radius 26
 	speed 3.5

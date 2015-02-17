@@ -85,20 +85,10 @@ actor FeedSack : BackpackItem 176
 	}
 }
 
-// Since this works the same as Mac Wolf we might as well use this as the base
-// item for both and use a more "generic" name than ArkFruit.
-actor MacTreasureItem : ExtraLifeItem
-{
-	inventory.amount 1
-	inventory.maxamount 50
-}
-
 actor ArkBanana : MacTreasureItem 183
 {
 	overheadicon "TILE8:7F"
 	+PLOTONAUTOMAP
-	+COUNTITEM
-	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
@@ -111,8 +101,6 @@ actor ArkApple : MacTreasureItem 184
 {
 	overheadicon "TILE8:7F"
 	+PLOTONAUTOMAP
-	+COUNTITEM
-	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
@@ -125,8 +113,6 @@ actor ArkGrapes : MacTreasureItem 185
 {
 	overheadicon "TILE8:7F"
 	+PLOTONAUTOMAP
-	+COUNTITEM
-	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
@@ -139,8 +125,6 @@ actor ArkPeach : MacTreasureItem 186
 {
 	overheadicon "TILE8:7F"
 	+PLOTONAUTOMAP
-	+COUNTITEM
-	+INVENTORY.ALWAYSPICKUP
 	states
 	{
 		Spawn:
