@@ -255,9 +255,10 @@ static const struct BRGRConstant
 // As far as I know only one game used the Mac Wolf engine, so can just hard
 // code the names here.  Furthermore not all data can be given a nice name.
 static const char* const MacSpriteNames[] = {
-	"MISLA0", "MISLB0",
+	"MISLA0", "BOOMA0",
 	"GMOVA0",
-	"ROCKA0", "BOOMA0", "BOOMB0",
+	"ROCKA0",
+	"FLAMA0", "FLAMB0",
 	"HYPOA0",
 	"YWINA0",
 

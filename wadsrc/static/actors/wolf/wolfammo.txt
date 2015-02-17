@@ -3,6 +3,9 @@ actor Clip : Ammo 59
 	inventory.pickupsound "misc/ammo_pickup"
 	inventory.amount 8
 	inventory.maxamount 99
+	ammo.backpackamount 20
+	ammo.backpackboostamount 100
+	ammo.backpackmaxamount 299
 	states
 	{
 		Spawn:

@@ -1,0 +1,630 @@
+// Variants of certain actors for Macintosh Wolfenstein 3D.
+
+actor MacBJPlayer : BJPlayer
+{
+	player.displayname "BJ Blazkowicz"
+	player.startitem "Clip", 16 // TODO: Double on easy
+	player.startitem "MacPistol"
+	player.startitem "MacKnife"
+	player.weaponslot 1, "MacKnife"
+	player.weaponslot 2, "MacPistol"
+	player.weaponslot 3, "MacMachineGun"
+	player.weaponslot 4, "MacGatlingGun"
+	player.weaponslot 5, "MacFlameThrower"
+	player.weaponslot 6, "MacRocketLauncher"
+}
+
+// Mac Wolfenstein runs weapon attacks at the start of a frame.
+
+actor MacKnife : Knife
+{
+	states
+	{
+		Ready:
+			KNIF A 1 A_WeaponReady
+			loop
+		Fire:
+			KNIF B 3
+			KNIF C 3 A_CustomPunch(random(0,15), true, CPF_ALWAYSPLAYSOUND)
+			KNIF D 3
+			KNIF B 3
+			goto Ready
+	}
+}
+
+actor MacClip : Clip 206
+{
+	inventory.amount 5
+}
+
+actor MacPistol : Pistol
+{
+	states
+	{
+		Ready:
+			PISG A 1 A_WeaponReady
+			loop
+		Fire:
+			PISG B 3
+			PISG C 3 bright A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, random(0,0xF))
+			PISG DB 3
+			goto Ready
+	}
+}
+
+actor MacMachineGun : MachineGun 209
+{
+	states
+	{
+		Spawn:
+			MGUN A -1
+			stop
+		Ready:
+			MCHG A 1 A_WeaponReady
+			loop
+		Fire:
+			MCHG B 3
+		Hold:
+			MCHG C 3 bright A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, random(0,0xF))
+			MCHG D 3
+			MCHG B 3 A_ReFire
+			goto Ready
+	}
+}
+
+actor MacGatlingGun : GatlingGun 210
+{
+	weapon.ammogive1 20
+	states
+	{
+		Spawn:
+			CGUN A -1
+			stop
+		Ready:
+			CHGG A 1 A_WeaponReady
+			loop
+		Fire:
+			CHGG B 3
+		Hold:
+			CHGG C 3 bright A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, random(0,0xF))
+			CHGG D 3 bright A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, random(0,0xF))
+			CHGG B 3 A_ReFire
+			goto Ready
+	}
+}
+
+actor MacGasTank : Ammo 207
+{
+	inventory.amount 14
+	inventory.maxamount 99
+	ammo.backpackamount 2
+	ammo.backpackmaxamount 99
+	states
+	{
+		Spawn:
+			TANK A -1
+			stop
+	}
+}
+
+actor MacFlame
+{
+	radius 4
+	speed 12.8
+	damage (random(1,16))
+	PROJECTILE
+	states
+	{
+		Spawn:
+			FLAM A -1 bright
+			stop
+		Death:
+			FLAM B 4 bright
+			stop
+	}
+}
+
+actor MacFlameThrower : WolfWeapon 211
+{
+	weapon.ammotype1 "MacGasTank"
+	weapon.ammogive1 20
+	states
+	{
+		Spawn:
+			FTHR A -1
+			stop
+		Ready:
+			FLMG A 1 A_WeaponReady
+			loop
+		Fire:
+			FLMG B 3
+		Hold:
+			FLMG C 3 bright A_FireCustomMissile("MacFlame")
+			FLMG D 3 bright A_FireCustomMissile("MacFlame")
+			FLMG B 3 A_ReFire
+			goto Ready
+	}
+}
+
+actor MacMissiles : Ammo 208
+{
+	inventory.amount 5
+	inventory.maxamount 99
+	ammo.backpackamount 5
+	ammo.backpackmaxamount 99
+	states
+	{
+		Spawn:
+			BROK A -1
+			stop
+	}
+}
+
+actor MacMissile
+{
+	radius 4
+	speed 12.8
+	damage (random(16,64))
+	PROJECTILE
+	states
+	{
+		Spawn:
+			MISL A -1 bright
+			stop
+		Death:
+			BOOM A 8 bright
+			stop
+	}
+}
+
+actor MacRocketLauncher : WolfWeapon 212
+{
+	weapon.ammotype1 "MacMissiles"
+	weapon.ammogive1 5
+	states
+	{
+		Spawn:
+			LAUN A -1
+			stop
+		Ready:
+			MISG A 1 A_WeaponReady
+			loop
+		Fire:
+			MISG B 3
+		Hold:
+			MISG C 3 bright A_FireCustomMissile("MacMissile")
+			MISG DB 3
+			goto Ready
+	}
+}
+
+actor MacBandolier : BackpackItem 213
+{
+	states
+	{
+		Spawn:
+			BPAK A -1
+			stop
+	}
+}
+
+actor MacGuard : Guard 214
+{
+	radius 26
+	speed 2.5
+	health 6
+	points 100
+	sighttime 1, 4
+	dropitem "MacClip", 256, 5
+	states
+	{
+		Spawn:
+			GARD D -1 NOP A_Look(0,0,0,0,360)
+			stop
+		Path:
+		See:
+			// TODO: Only determine attack once per state
+			GARD ABCD 6 NOP A_Chase
+			loop
+		Missile:
+			GARD EF 8 A_FaceTarget
+			GARD G 8 bright A_WolfAttack
+			goto See
+		Pain:
+			GARD H 6
+			goto See
+		Death:
+			GARD H 4 A_Fall
+			GARD I 4 A_Scream
+			GARD J 4 //Thud
+			GARD K -1
+			stop
+	}
+}
+
+actor MacOfficer : Officer 215
+{
+	radius 26
+	speed 5
+	health 12
+	points 400
+	sighttime 1, 63
+	dropitem "MacClip", 256, 5
+	states
+	{
+		Spawn:
+			OFFI D -1 NOP A_Look(0,0,0,0,360)
+			stop
+		Path:
+		See:
+			OFFI A 6 NOP A_Chase
+			OFFI B 4 NOP A_Chase
+			OFFI C 6 NOP A_Chase
+			OFFI D 4 NOP A_Chase
+			loop
+		Missile:
+			OFFI EF 4 A_FaceTarget
+			// TODO: Revisit damage
+			OFFI G 8 bright A_WolfAttack(0, "*", 1.0, 64, 128, 3, 5)
+			goto See
+		Pain:
+			OFFI H 4
+			goto See
+		Death:
+			OFFI H 4 A_Fall
+			OFFI I 4 A_Scream
+			OFFI J 4 // Thud
+			OFFI K -1
+			stop
+	}
+}
+
+actor MacWolfensteinSS : WolfensteinSS 216
+{
+	radius 26
+	speed 3
+	health 25
+	points 500
+	sighttime 1, 9
+	dropitem "MacMachineGun"
+	-DROPBASEDONTARGET
+	states
+	{
+		Spawn:
+			SSWV D -1 NOP A_Look(0,0,0,0,360)
+			stop
+		Path:
+		See:
+			SSWV ABCD 5 NOP A_Chase
+			loop
+		Missile:
+			SSWV EF 10 A_FaceTarget
+			SSWV G 4 bright A_WolfAttack
+			SSWV F 4 A_FaceTarget
+			SSWV G 4 bright A_WolfAttack
+			SSWV F 4 A_FaceTarget
+			SSWV G 4 bright A_WolfAttack
+			SSWV F 4 A_FaceTarget
+			SSWV G 4 bright A_WolfAttack
+			goto See
+		Pain:
+			SSWV H 4
+			goto See
+		Death:
+			SSWV H 4 A_Fall
+			SSWV I 4 A_Scream
+			SSWV J 4 // Thud
+			SSWV K -1
+			stop
+	}
+}
+
+actor MacDog : Dog 217
+{
+	radius 26
+	speed 4.5
+	health 1
+	points 200
+	sighttime 1, 9
+	states
+	{
+		Spawn:
+			DOGY D -1 NOP A_Look(0,0,0,0,360)
+			stop
+		Pain:
+		Path:
+		See:
+			DOGY A 4 NOP A_Chase
+			DOGY B 4 NOP A_Chase
+			DOGY C 4 NOP A_Chase
+			DOGY D 4 NOP A_Chase
+			loop
+		Melee:
+			DOGY EF 4 A_FaceTarget
+			DOGY G 10 A_MeleeAttack(random(1,15))
+			DOGY A 4
+			goto See
+		Death:
+			DOGY H 4 A_Fall
+			DOGY I 4 A_Scream
+			DOGY J -1 // Thud
+			stop
+	}
+}
+
+actor MacMutant : Mutant 218
+{
+	radius 26
+	speed 3.5
+	health 18
+	points 400
+	sighttime 1, 63
+	dropitem "MacClip", 256, 5
+	states
+	{
+		Spawn:
+			MTNT D -1 NOP A_Look(0,0,0,0,360)
+			stop
+		Path:
+		See:
+			MTNT ABCD 8 NOP A_Chase
+			loop
+		Missile:
+			MTNT E 4 A_FaceTarget
+			MTNT F 10 bright A_WolfAttack
+			MTNT E 4 A_FaceTarget
+			MTNT G 10 bright A_WolfAttack
+			goto See
+		Pain:
+			MTNT H 4
+			goto See
+		Death:
+			MTNT H 4 A_Fall
+			MTNT I 4 A_Scream
+			MTNT J 4 // Thud
+			MTNT K -1
+			stop
+	}
+}
+
+actor MacHans : Hans 219
+{
+	radius 26
+	speed 3.5
+	health 250
+	points 5000
+	sighttime 1, 63
+	dropitem "GoldKey"
+	states
+	{
+		Spawn:
+			HANS D -1 NOP A_Look(0, 0, 0, 0, 360)
+			stop
+		See:
+			HANS ABCD 10 NOP A_Chase
+			loop
+		Missile:
+			HANS E 20 A_FaceTarget
+			HANS FGFGFG 6 bright A_WolfAttack(0, "*", 1.0, 64, 128, 3, 5)
+			goto See
+		Death:
+			HANS H 0 A_Fall
+			HANS H 8 A_Scream
+			HANS I 8 // Thud
+			HANS J -1
+			stop
+	}
+}
+
+actor MacNeedle : Needle
+{
+	radius 8
+	speed 12.8
+	damage (random[MissileDamage](8, 64))
+	states
+	{
+		Spawn:
+			HYPO A -1
+			stop
+		Death:
+			FLAM B 4 bright
+			stop
+	}
+}
+
+actor MacSchabbs : Schabbs 220
+{
+	radius 26
+	speed 2.5
+	health 350
+	points 5000
+	sighttime 1, 63
+	dropitem "GoldKey"
+	states
+	{
+		Spawn:
+			SHAB D -1 NOP A_Look(0, 0, 0, 0, 360)
+			stop
+		See:
+			SHAB ABCD 10 NOP A_Chase("*", "*", CHF_BACKOFF)
+			loop
+		Missile:
+			SHAB E 14 A_FaceTarget
+			SHAB F 6 A_CustomMissile("MacNeedle")
+			goto See
+		Death:
+			SHAB G 0 A_Fall
+			SHAB G 8 A_Scream
+			SHAB H 8 // Thud
+			SHAB I -1
+			stop
+	}
+}
+
+actor MacTrans : Trans 221
+{
+	radius 26
+	speed 3.5
+	health 300
+	points 5000
+	sighttime 1, 63
+	dropitem "GoldKey"
+	states
+	{
+		Spawn:
+			TRNS D -1 NOP A_Look(0, 0, 0, 0, 360)
+			stop
+		See:
+			TRNS ABCD 10 NOP A_Chase
+			loop
+		Missile:
+			TRNS E 24 A_FaceTarget
+			TRNS FGFGFG 6 bright A_WolfAttack
+			goto See
+		Death:
+			TRNS H 0 A_Fall
+			TRNS H 8 A_Scream
+			TRNS I 8 // Thud
+			TRNS J -1
+			stop
+	}
+}
+
+actor MacUberMutant : UberMutant 222
+{
+	radius 26
+	speed 4
+	health 400
+	points 5000
+	sighttime 1, 63
+	dropitem "GoldKey"
+	states
+	{
+		Spawn:
+			UBER D -1 NOP A_Look(0, 0, 0, 0, 360)
+			stop
+		See:
+			UBER ABCD 6 NOP A_Chase
+			loop
+		Missile:
+			UBER E 20 A_FaceTarget
+			UBER FGFGFG 6 bright A_WolfAttack
+			goto See
+		Death:
+			UBER I 0 A_Fall
+			UBER I 8 A_Scream
+			UBER J 8 // Thud
+			UBER K -1
+			stop
+	}
+}
+
+actor MacRocket : Rocket
+{
+	radius 8
+	speed 12.8
+	damage (random[MissileDamage](8, 64))
+	states
+	{
+		Spawn:
+			ROCK A -1 bright
+			loop
+		Death:
+			FLAM B 4 bright
+			stop
+	}
+}
+
+actor MacDeathKnight : DeathKnight 223
+{
+	radius 26
+	speed 3.5
+	health 450
+	points 5000
+	sighttime 1, 63
+	dropitem "GoldKey"
+	states
+	{
+		Spawn:
+			DKNT D -1 NOP A_Look(0, 0, 0, 0, 360)
+			stop
+		See:
+			DKNT ABCD 10 NOP A_Chase("*", "*", CHF_BACKOFF)
+			loop
+		Missile:
+			DKNT E 14 A_FaceTarget
+			DKNT F 6 bright A_CustomMissile("MacRocket")
+			DKNT H 6 bright A_WolfAttack
+			DKNT G 6 bright A_CustomMissile("MacRocket")
+			DKNT H 6 bright A_WolfAttack
+			goto See
+		Death:
+			DKNT I 0 A_Fall
+			DKNT I 8 A_Scream
+			DKNT J 8 // Thud
+			DKNT K -1
+			stop
+	}
+}
+
+actor MacMechaHitler : MechaHitler 224
+{
+	radius 26
+	speed 3.5
+	health 500
+	points 5000
+	sighttime 1, 63
+	states
+	{
+		Spawn:
+			MECH D -1 NOP A_Look(0, 0, 0, 0, 360)
+			stop
+		See:
+			MECH A 10 A_PlaySound("hitler/active") A_Chase
+			MECH B 10 NOP A_Chase
+			MECH C 10 A_PlaySound("hitler/active") A_Chase
+			MECH D 10 NOP A_Chase
+			loop
+		Missile:
+			MECH E 14 A_FaceTarget
+			MECH FGFGFG 8 bright A_WolfAttack
+			goto See
+		Death:
+			MECH H 6 A_Fall
+			MECH I 6
+			MECH J 6
+			MECH K -1 A_SpawnItemEx("MacHitler", 0, 0, 0, 0, 0, 0, 0, SXF_TRANSFERPOINTERS)
+			stop
+	}
+}
+
+actor MacHitler : Hitler
+{
+	radius 26
+	speed 4
+	health 500
+	points 5000
+	sighttime 1, 63
+	states
+	{
+		Spawn:
+			HTLR D 4
+		See:
+			HTLR A 6 NOP A_Chase
+			HTLR B 4 NOP A_Chase
+			HTLR C 6 NOP A_Chase
+			HTLR D 4 NOP A_Chase
+			loop
+		Missile:
+			HTLR E 14 A_FaceTarget
+			HTLR FGFG 4 bright A_WolfAttack
+			goto See
+		Death:
+			HTLR H 0 A_Fall
+			HTLR H 8 A_Scream
+			HTLR I 8
+			HTLR J 60 // Thud
+			HTLR J -1 A_BossDeath
+			stop
+	}
+}
