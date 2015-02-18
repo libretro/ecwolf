@@ -62,7 +62,7 @@ AWeapon *APlayerPawn::BestWeapon(const ClassDef *ammo)
 			continue;
 
 		AWeapon *weapon = static_cast<AWeapon *>(item);
-		if(ammo && weapon->ammo[0]->GetClass() != ammo)
+		if(ammo && (weapon->ammo[0] == NULL || weapon->ammo[0]->GetClass() != ammo))
 			continue;
 		if(!weapon->CheckAmmo(AWeapon::PrimaryFire, false))
 			continue;
