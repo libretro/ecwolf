@@ -1,6 +1,5 @@
 actor Clip : Ammo 59
 {
-	inventory.pickupsound "misc/ammo_pickup"
 	inventory.amount 8
 	inventory.maxamount 99
 	ammo.backpackamount 20
@@ -16,7 +15,7 @@ actor Clip : Ammo 59
 
 actor ClipBox : Clip 90
 {
-	inventory.pickupsound "misc/ammobox_pickup"
+	inventory.pickupsound "misc/ammobox_pkup"
 	inventory.amount 25
 	states
 	{

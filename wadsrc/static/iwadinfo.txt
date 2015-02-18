@@ -62,7 +62,7 @@ IWad
 	Name = "Wolfenstein 3D: The First Encounter"
 	Mapinfo = "mapinfo/macwolf3d.txt"
 	MustContain = "MACPLAY", "MAPLIST"
-	Game = "Wolf3D"
+	Game = "MacWolf3D"
 }
 
 IWad
@@ -70,7 +70,7 @@ IWad
 	Name = "Wolfenstein 3D: The Third Encounter"
 	Mapinfo = "mapinfo/macwolf3d.txt"
 	MustContain = "MACPLAY", "HTLRA0"
-	Game = "Wolf3D"
+	Game = "MacWolf3D"
 }
 
 IWad
@@ -79,7 +79,7 @@ IWad
 	Required = "Wolfenstein 3D: The Third Encounter"
 	Mapinfo = "mapinfo/macwolf3d.txt"
 	MustContain = "MAP01", "MAPLIST"
-	Game = "Wolf3D"
+	Game = "MacWolf3D"
 }
 
 Names
