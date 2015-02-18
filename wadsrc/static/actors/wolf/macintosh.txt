@@ -677,3 +677,61 @@ actor MacHitler : Hitler
 			stop
 	}
 }
+
+actor MacFunky 229
+{
+	damage (2)
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			FNKY A -1 NOP A_Chase("*", "*", CHF_DONTDODGE)
+			stop
+	}
+}
+
+actor MacInky 230
+{
+	damage (2)
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			INKY A -1 NOP A_Chase("*", "*", CHF_DONTDODGE)
+			stop
+	}
+}
+
+actor MacKinky 231
+{
+	damage (2)
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			KNKY A -1 NOP A_Chase("*", "*", CHF_DONTDODGE)
+			stop
+	}
+}
+
+actor MacBlinky 232
+{
+	damage (2)
+	speed 2.93, 5.859
+	states
+	{
+		Spawn:
+			BLKY A -1 NOP A_Chase("*", "*", CHF_DONTDODGE)
+			stop
+	}
+}
+
+actor MacDeadGuard : DeadGuard 233
+{
+	states
+	{
+		Spawn:
+			GARD K -1
+			stop
+	}
+}
