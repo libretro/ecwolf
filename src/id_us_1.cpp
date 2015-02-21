@@ -182,8 +182,6 @@ US_CPrintLine(FFont *font, const char *s, EColorRange translation)
 
 	VW_MeasurePropString(font, s,w,h);
 
-	if (w > WindowW)
-		Quit("US_CPrintLine() - String exceeds width");
 	px = WindowX + ((WindowW - w) / 2);
 	py = PrintY;
 	VWB_DrawPropString(font, s, translation);

@@ -190,7 +190,7 @@ public:
 	{ return p1.Get() op p2; } \
 	template<class T1, class T2, class D> \
 	inline bool operator op (T2 *p1, const type<T1, D> &p2) \
-	{ return p1.Get() op p2; }
+	{ return p1 op p2.Get(); }
 TSmartOper(TUniquePtr,==)
 TSmartOper(TUniquePtr,!=)
 TSmartOper(TUniquePtr,<=)
@@ -507,7 +507,7 @@ public:
 	{ return p1.Get() op p2; } \
 	template<class T1, class T2> \
 	inline bool operator op (T2 *p1, const type<T1> &p2) \
-	{ return p1.Get() op p2; }
+	{ return p1 op p2.Get(); }
 TSmartOper(TWeakPtr,==)
 TSmartOper(TWeakPtr,!=)
 TSmartOper(TWeakPtr,<=)
