@@ -134,24 +134,12 @@ class FZipFile : public FResourceFile
 {
 	FZipLump *Lumps;
 
-	static int STACK_ARGS lumpcmp(const void * a, const void * b);
-
 public:
 	FZipFile(const char * filename, FileReader *file);
 	virtual ~FZipFile();
 	bool Open(bool quiet);
 	virtual FResourceLump *GetLump(int no) { return ((unsigned)no < NumLumps)? &Lumps[no] : NULL; }
 };
-
-
-
-int STACK_ARGS FZipFile::lumpcmp(const void * a, const void * b)
-{
-	FZipLump * rec1 = (FZipLump *)a;
-	FZipLump * rec2 = (FZipLump *)b;
-
-	return stricmp(rec1->FullName, rec2->FullName);
-}
 
 
 //==========================================================================
@@ -196,9 +184,10 @@ bool FZipFile::Open(bool quiet)
 	Lumps = new FZipLump[NumLumps];
 
 	// Load the entire central directory. Too bad that this contains variable length entries...
-	void *directory = malloc(LittleLong(info.DirectorySize));
+	int dirsize = LittleLong(info.DirectorySize);
+	void *directory = malloc(dirsize);
 	Reader->Seek(LittleLong(info.DirectoryOffset), SEEK_SET);
-	Reader->Read(directory, LittleLong(info.DirectorySize));
+	Reader->Read(directory, dirsize);
 
 	char *dirptr = (char*)directory;
 	FZipLump *lump_p = Lumps;
@@ -212,6 +201,13 @@ bool FZipFile::Open(bool quiet)
 				  LittleShort(zip_fh->NameLength) + 
 				  LittleShort(zip_fh->ExtraLength) + 
 				  LittleShort(zip_fh->CommentLength);
+		
+		if (dirptr > ((char*)directory) + dirsize)	// This directory entry goes beyond the end of the file.
+		{
+			free(directory);
+			if (!quiet) Printf("\n%s: Central directory corrupted.", Filename);
+			return false;
+		}
 		
 		// skip Directories
 		if (name[len - 1] == '/' && LittleLong(zip_fh->UncompressedSize) == 0) 
@@ -263,8 +259,7 @@ bool FZipFile::Open(bool quiet)
 
 	if (!quiet) Printf(", %d lumps\n", NumLumps);
 	
-	// Entries in Zips are sorted alphabetically.
-	qsort(Lumps, NumLumps, sizeof(FZipLump), lumpcmp);
+	PostProcessArchive(&Lumps[0], sizeof(FZipLump));
 	return true;
 }
 

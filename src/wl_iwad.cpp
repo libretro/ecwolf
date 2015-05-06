@@ -86,7 +86,7 @@ static int CheckFileContents(FResourceFile *file, unsigned int* valid)
 			{
 				if(iwadTypes[k].Ident[l].CompareNoCase(lump->Name) == 0 ||
 					(lump->FullName && (strnicmp(lump->FullName, "maps/", 5) == 0 &&
-					iwadTypes[k].Ident[l].CompareNoCase(FString(lump->FullName+5, strcspn(lump->FullName+5, "."))))))
+					iwadTypes[k].Ident[l].CompareNoCase(FString(lump->FullName.Mid(5).GetChars(), strcspn(lump->FullName.Mid(5), "."))))))
 				{
 					valid[k] |= 1<<l;
 					if(valid[k] == static_cast<unsigned>((1<<iwadTypes[k].Ident.Size())-1))
@@ -409,6 +409,11 @@ static void ParseIWad(Scanner &sc)
 			sc.MustGetToken(TK_StringConst);
 			iwad.Name = sc->str;
 		}
+		else if(key.CompareNoCase("Autoname") == 0)
+		{
+			sc.MustGetToken(TK_StringConst);
+			iwad.Autoname = sc->str;
+		}
 		else if(key.CompareNoCase("Mapinfo") == 0)
 		{
 			sc.MustGetToken(TK_StringConst);
@@ -501,9 +506,9 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 		// Add documents and application support directories if they're not mapped to the config directory.
 		FString tmp;
-		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_Documents)) != configDir)
+		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_Documents)).Compare(configDir) != 0)
 			dataPaths += FString(";") + tmp;
-		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_ApplicationSupport)) != configDir)
+		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_ApplicationSupport)).Compare(configDir) != 0)
 			dataPaths += FString(";") + tmp;
 
 		config.CreateSetting("BaseDataPaths", dataPaths);
