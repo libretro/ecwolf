@@ -618,6 +618,30 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	}
 
 	NumIWads = base.Path.Size();
+
+	// Load in config autoloads
+	long dot = 0;
+	FString autoloadkey = FString("Autoload") + selectedGame->Autoname;
+	for(long dot = 0, dotterm;dot < (long)autoloadkey.Len();dot = dotterm+1)
+	{
+		dotterm = autoloadkey.IndexOf('.', dot);
+		if(dotterm == -1)
+			dotterm = autoloadkey.Len();
+
+		FString autoload = autoloadkey.Mid(0, dotterm);
+		autoload.StripChars('.');
+		config.CreateSetting(autoload, "");
+		autoload = config.GetSetting(autoload)->GetString();
+		for(long i = 0, term;i < (long)autoload.Len();i = term+1)
+		{
+			term = autoload.IndexOf(';', i);
+			if(term == -1)
+				term = autoload.Len();
+
+			FString fname = autoload.Mid(i, term-i);
+			wadfiles.Push(fname);
+		}
+	}
 }
 
 }
