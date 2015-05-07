@@ -248,7 +248,7 @@ void APlayerPawn::Tick()
 	{
 		// A negative scale is used to prevent G_AddViewAngle/G_AddViewPitch
 		// from scaling with the FOV scale.
-		desired *= fabs(player->ReadyWeapon->fovscale);
+		desired *= (float)fabs(player->ReadyWeapon->fovscale);
 	}
 	if (player->FOV != desired)
 	{

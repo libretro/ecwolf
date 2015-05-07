@@ -744,7 +744,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	{
 		if(!stateDefs[iter].label.IsEmpty() && stateDefs[iter].sprite[0] == 0)
 			continue;
-		numStates += stateDefs[iter].frames.Len();
+		numStates += (int)stateDefs[iter].frames.Len();
 	}
 	frameList.Resize(numStates);
 
@@ -765,7 +765,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 					stateList[thisStateDef.label] = INT_MAX;
 					break;
 				case StateDefinition::NORMAL:
-					stateList[thisStateDef.label] = thisFrame - &frameList[0];
+					stateList[thisStateDef.label] = (unsigned int)(thisFrame - &frameList[0]);
 					continue;
 				case StateDefinition::GOTO:
 				{
@@ -787,7 +787,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 		{
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
-				stateList[thisStateDef.label] = thisFrame - &frameList[0];
+				stateList[thisStateDef.label] = (unsigned int)(thisFrame - &frameList[0]);
 				loopPoint = thisFrame;
 			}
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
@@ -798,7 +798,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
-			thisFrame->index = thisFrame - &frameList[0];
+			thisFrame->index = (unsigned int)(thisFrame - &frameList[0]);
 			thisFrame->spriteInf = 0;
 			// Only free the action arguments if we are the last frame using them.
 			thisFrame->freeActionArgs = i == thisStateDef.frames.Len()-1;

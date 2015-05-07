@@ -515,7 +515,7 @@ static int MacSound_Seek(SDL_RWops *ops, int pos, int relative)
 			curpos = ((MacSoundData*)ops->hidden.unknown.data1)->size+pos;
 			break;
 	}
-	return curpos;
+	return (int)curpos;
 }
 static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
 {
@@ -528,7 +528,7 @@ static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
 	static const unsigned int MacSoundHeaderSize = 0x2A;
 
 	size_t totalsize = size*nmem;
-	DWORD ssize = MacSound_Size(ops)-MacSoundHeaderSize;
+	DWORD ssize = (DWORD)(MacSound_Size(ops)-MacSoundHeaderSize);
 	Sint64 &pos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
 	if(pos < (Sint64)sizeof(WAV_HEADER))
 	{
@@ -554,7 +554,7 @@ static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
 	size_t copysize = MIN<size_t>(totalsize, ssize-(pos-sizeof(WAV_HEADER)-4));
 	memcpy(buffer, ((MacSoundData*)ops->hidden.unknown.data1)->data+pos-sizeof(WAV_HEADER)-4, copysize);
 
-	return copysize/size;
+	return (int)(copysize/size);
 }
 static int MacSound_Close(SDL_RWops *ops)
 {
