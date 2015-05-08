@@ -276,7 +276,7 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 			if (lump->Flags & LUMPF_EMBEDDED)
 			{
 				// Should be ecwolf.<something>
-				FindEmbeddedWolfData(resfile, filename, lump->FullName+7);
+				FindEmbeddedWolfData(resfile, filename, lump->FullName.Mid(7));
 
 				FString path;
 				path.Format("%s:%s", filename, lump->FullName.GetChars());
