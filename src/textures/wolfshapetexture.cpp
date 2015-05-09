@@ -126,7 +126,9 @@ static bool CheckIfMacShape(FileReader &file)
 	file.Read(runOfs, width*2);
 	for(unsigned int i = 0;i < width;++i)
 	{
-		if(file.GetLength() < BigShort(runOfs[i])+8)
+		runOfs[i] = BigShort(runOfs[i]);
+		// Runs should start after the column directory and shouldn't go past the end of the lump.
+		if(runOfs[i] < 2+width*2 || file.GetLength() < runOfs[i]+8)
 			return false;
 	}
 	return true;
