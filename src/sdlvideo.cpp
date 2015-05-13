@@ -14,6 +14,8 @@
 #include "sdlvideo.h"
 //#include "r_swrenderer.h"
 #include "thingdef/thingdef.h"
+#include "wl_main.h"
+#include "version.h"
 
 #include <SDL.h>
 
@@ -256,6 +258,7 @@ public:
 	bool SetGamma (float gamma);
 	bool SetFlash (PalEntry rgb, int amount);
 	void GetFlash (PalEntry &rgb, int &amount);
+	void SetFullscreen (bool fullscreen);
 	int GetPageCount ();
 	bool IsFullscreen ();
 
@@ -265,6 +268,9 @@ public:
 
 	friend class SDLVideo;
 
+	virtual void SetVSync (bool vsync);
+	virtual void ScaleCoordsFromWindow(SWORD &x, SWORD &y);
+
 private:
 	PalEntry SourcePalette[256];
 	BYTE GammaTable[3][256];
@@ -272,14 +278,27 @@ private:
 	int FlashAmount;
 	float Gamma;
 	bool UpdatePending;
-	
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+	SDL_Window *Screen;
+	SDL_Renderer *Renderer;
+	union
+	{
+		SDL_Texture *Texture;
+		SDL_Surface *Surface;
+	};
+	SDL_Rect UpdateRect;
+#else
 	SDL_Surface *Screen;
-	
+#endif
+
+	bool UsingRenderer;
 	bool NeedPalUpdate;
 	bool NeedGammaUpdate;
 	bool NotPaletted;
-	
+
 	void UpdateColors ();
+	void ResetSDLRenderer ();
 
 	SDLFB () {}
 };
@@ -311,12 +330,14 @@ extern IVideo *Video;
 
 extern unsigned screenBits;
 #define vid_displaybits screenBits
-//CVAR (Int, vid_displaybits, 8, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 
-#define rgamma 1.f
-#define ggamma 1.f
-#define bgamma 1.f
 #if 0
+CVAR (Int, vid_adapter, 0, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+
+CVAR (Int, vid_displaybits, 32, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+
+CVAR (Bool, vid_forcesurface, false, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
+
 CUSTOM_CVAR (Float, rgamma, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 {
 	if (screen != NULL)
@@ -338,6 +359,13 @@ CUSTOM_CVAR (Float, bgamma, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 		screen->SetGamma (Gamma);
 	}
 }
+#else
+#define vid_adapter 0
+#define rgamma 1.f
+#define ggamma 1.f
+#define bgamma 1.f
+#define vid_forcesurface 0
+#define vid_vsync 0
 #endif
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
@@ -359,6 +387,7 @@ static MiniModeInfo WinModes[] =
 	{ 720, 480 },	// 16:10
 	{ 720, 540 },
 	{ 800, 450 },	// 16:9
+	{ 800, 480 },
 	{ 800, 500 },	// 16:10
 	{ 800, 600 },
 	{ 848, 480 },	// 16:9
@@ -373,23 +402,64 @@ static MiniModeInfo WinModes[] =
 	{ 1152, 720 },	// 16:10
 	{ 1152, 864 },
 	{ 1280, 720 },	// 16:9
+	{ 1280, 854 },
 	{ 1280, 800 },	// 16:10
 	{ 1280, 960 },
+	{ 1280, 1024 },	// 5:4
 	{ 1360, 768 },	// 16:9
+	{ 1366, 768 },
 	{ 1400, 787 },	// 16:9
 	{ 1400, 875 },	// 16:10
 	{ 1400, 1050 },
+	{ 1440, 900 },
+	{ 1440, 960 },
+	{ 1440, 1080 },
 	{ 1600, 900 },	// 16:9
 	{ 1600, 1000 },	// 16:10
 	{ 1600, 1200 },
 	{ 1920, 1080 },
 	{ 1920, 1200 },
+	{ 2048, 1536 },
+	{ 2560, 1440 },
+	{ 2560, 1600 },
+	{ 2560, 2048 },
+	{ 2880, 1800 },
+	{ 3200, 1800 },
+	{ 3840, 2160 },
+	{ 3840, 2400 },
+	{ 4096, 2160 },
+	{ 5120, 2880 }
 };
 
 //static cycle_t BlitCycles;
 //static cycle_t SDLFlipCycles;
 
 // CODE --------------------------------------------------------------------
+
+void ScaleWithAspect (int &w, int &h, int Width, int Height)
+{
+	int resRatio = CheckRatio (Width, Height);
+	//int screenRatio;
+	//CheckRatio (w, h, &screenRatio);
+	//if (resRatio == screenRatio)
+	//	return;
+
+	double yratio;
+	switch(resRatio)
+	{
+		case 0: yratio = 4./3.; break;
+		case 1: yratio = 16./9.; break;
+		case 2: yratio = 16./10.; break;
+		case 3: yratio = 17./10.; break;
+		case 4: yratio = 5./4.; break;
+		default: return;
+	}
+	double y = w/yratio;
+	if (y > h)
+		w = h*yratio;
+	else
+		h = y;
+}
 
 SDLVideo::SDLVideo (int parm)
 {
@@ -412,9 +482,11 @@ bool SDLVideo::NextMode (int *width, int *height, bool *letterbox)
 {
 	if (IteratorBits != 8)
 		return false;
-	
+
+#if !SDL_VERSION_ATLEAST(2,0,0)
 	if (!IteratorFS)
 	{
+#endif
 		if ((unsigned)IteratorMode < sizeof(WinModes)/sizeof(WinModes[0]))
 		{
 			*width = WinModes[IteratorMode].Width;
@@ -422,6 +494,7 @@ bool SDLVideo::NextMode (int *width, int *height, bool *letterbox)
 			++IteratorMode;
 			return true;
 		}
+#if !SDL_VERSION_ATLEAST(2,0,0)
 	}
 	else
 	{
@@ -434,6 +507,7 @@ bool SDLVideo::NextMode (int *width, int *height, bool *letterbox)
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 
@@ -451,6 +525,15 @@ DFrameBuffer *SDLVideo::CreateFrameBuffer (int width, int height, bool fullscree
 		if (fb->Width == width &&
 			fb->Height == height)
 		{
+#if SDL_VERSION_ATLEAST(2,0,0)
+			bool fsnow = (SDL_GetWindowFlags (fb->Screen) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
+	
+			if (fsnow != fullscreen)
+			{
+				fb->SetFullscreen (fullscreen);
+			}
+			return old;
+#else
 			bool fsnow = (fb->Screen->flags & SDL_FULLSCREEN) != 0;
 	
 			if (fsnow == fullscreen)
@@ -460,6 +543,7 @@ DFrameBuffer *SDLVideo::CreateFrameBuffer (int width, int height, bool fullscree
 				if(SDL_WM_ToggleFullScreen (fb->Screen))
 					return old;
 			}
+#endif
 		}
 		old->GetFlash (flashColor, flashAmount);
 		old->ObjectFlags |= OF_YesReallyDelete;
@@ -473,7 +557,6 @@ DFrameBuffer *SDLVideo::CreateFrameBuffer (int width, int height, bool fullscree
 	}
 	
 	SDLFB *fb = new SDLFB (width, height, fullscreen);
-	retry = 0;
 	
 	// If we could not create the framebuffer, try again with slightly
 	// different parameters in this order:
@@ -514,6 +597,7 @@ DFrameBuffer *SDLVideo::CreateFrameBuffer (int width, int height, bool fullscree
 		++retry;
 		fb = static_cast<SDLFB *>(CreateFrameBuffer (width, height, fullscreen, NULL));
 	}
+	retry = 0;
 
 	fb->SetFlash (flashColor, flashAmount);
 
@@ -538,6 +622,25 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 	NotPaletted = false;
 	FlashAmount = 0;
 
+#if SDL_VERSION_ATLEAST(2,0,0)
+	FString caption = GAMENAME " " DOTVERSIONSTR;
+
+	Screen = SDL_CreateWindow (caption,
+		SDL_WINDOWPOS_UNDEFINED_DISPLAY(vid_adapter), SDL_WINDOWPOS_UNDEFINED_DISPLAY(vid_adapter),
+		width, height, (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
+
+	if (Screen == NULL)
+		return;
+
+	Renderer = NULL;
+	Texture = NULL;
+	ResetSDLRenderer ();
+
+	for (i = 0; i < 256; i++)
+	{
+		GammaTable[0][i] = GammaTable[1][i] = GammaTable[2][i] = i;
+	}
+#else
 	if(vid_displaybits == static_cast<unsigned>(-1))
 	{
 		const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();
@@ -566,12 +669,31 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 			Screen->format->Gmask,
 			Screen->format->Bmask);
 	}
+#endif
+
 	memcpy (SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
 	UpdateColors ();
+
+#ifdef __APPLE__
+	SetVSync (vid_vsync);
+#endif
 }
 
 SDLFB::~SDLFB ()
 {
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(Screen)
+	{
+		if (Renderer)
+		{
+			if (Texture)
+				SDL_DestroyTexture (Texture);
+			SDL_DestroyRenderer (Renderer);
+ 		}
+
+		SDL_DestroyWindow (Screen);
+	}
+#endif
 }
 
 bool SDLFB::IsValid ()
@@ -638,6 +760,62 @@ void SDLFB::Update ()
 	//SDLFlipCycles.Reset();
 	//BlitCycles.Clock();
 
+#if SDL_VERSION_ATLEAST(2,0,0)
+	void *pixels;
+	int pitch;
+	if (UsingRenderer)
+	{
+		if (SDL_LockTexture (Texture, NULL, &pixels, &pitch))
+			return;
+	}
+	else
+	{
+		if (SDL_LockSurface (Surface))
+			return;
+
+		pixels = Surface->pixels;
+		pitch = Surface->pitch;
+	}
+
+	if (NotPaletted)
+	{
+		GPfx.Convert (MemBuffer, Pitch,
+			pixels, pitch, Width, Height,
+			FRACUNIT, FRACUNIT, 0, 0);
+	}
+	else
+	{
+		if (pitch == Pitch)
+		{
+			memcpy (pixels, MemBuffer, Width*Height);
+		}
+		else
+		{
+			for (int y = 0; y < Height; ++y)
+			{
+				memcpy ((BYTE *)pixels+y*pitch, MemBuffer+y*Pitch, Width);
+			}
+		}
+	}
+
+	if (UsingRenderer)
+	{
+		SDL_UnlockTexture (Texture);
+
+		//SDLFlipCycles.Clock();
+		SDL_RenderCopy(Renderer, Texture, NULL, &UpdateRect);
+		SDL_RenderPresent(Renderer);
+		//SDLFlipCycles.Unclock();
+	}
+	else
+	{
+		SDL_UnlockSurface (Surface);
+
+		//SDLFlipCycles.Clock();
+		SDL_UpdateWindowSurface (Screen);
+		//SDLFlipCycles.Unclock();
+	}
+#else
 	if (SDL_LockSurface (Screen) == -1)
 		return;
 
@@ -675,6 +853,7 @@ void SDLFB::Update ()
 	//SDLFlipCycles.Clock();
 	SDL_Flip (Screen);
 	//SDLFlipCycles.Unclock();
+#endif
 
 	//BlitCycles.Unclock();
 
@@ -731,7 +910,11 @@ void SDLFB::UpdateColors ()
 				256, GammaTable[2][Flash.b], GammaTable[1][Flash.g], GammaTable[0][Flash.r],
 				FlashAmount);
 		}
+#if SDL_VERSION_ATLEAST(2,0,0)
+		SDL_SetPaletteColors (Surface->format->palette, colors, 0, 256);
+#else
 		SDL_SetPalette (Screen, SDL_LOGPAL|SDL_PHYSPAL, colors, 0, 256);
+#endif
 	}
 }
 
@@ -776,9 +959,158 @@ void SDLFB::GetFlashedPalette (PalEntry pal[256])
 	}
 }
 
+void SDLFB::SetFullscreen (bool fullscreen)
+{
+#if SDL_VERSION_ATLEAST(2,0,0)
+	SDL_SetWindowFullscreen (Screen, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+	if (!fullscreen)
+	{
+		// Restore proper window size
+		SDL_SetWindowSize (Screen, Width, Height);
+	}
+
+	ResetSDLRenderer ();
+#endif
+}
+
 bool SDLFB::IsFullscreen ()
 {
+#if SDL_VERSION_ATLEAST(2,0,0)
+	return (SDL_GetWindowFlags (Screen) & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0;
+#else
 	return (Screen->flags & SDL_FULLSCREEN) != 0;
+#endif
+}
+
+void SDLFB::ResetSDLRenderer ()
+{
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if (Renderer)
+	{
+		if (Texture)
+			SDL_DestroyTexture (Texture);
+		SDL_DestroyRenderer (Renderer);
+	}
+
+	UsingRenderer = !vid_forcesurface;
+	if (UsingRenderer)
+	{
+		Renderer = SDL_CreateRenderer (Screen, -1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_TARGETTEXTURE|
+										(vid_vsync ? SDL_RENDERER_PRESENTVSYNC : 0));
+		if (!Renderer)
+			return;
+
+		Uint32 fmt;
+		switch(vid_displaybits)
+		{
+			default: fmt = SDL_PIXELFORMAT_ARGB8888; break;
+			case 30: fmt = SDL_PIXELFORMAT_ARGB2101010; break;
+			case 24: fmt = SDL_PIXELFORMAT_RGB888; break;
+			case 16: fmt = SDL_PIXELFORMAT_RGB565; break;
+			case 15: fmt = SDL_PIXELFORMAT_ARGB1555; break;
+		}
+		Texture = SDL_CreateTexture (Renderer, fmt, SDL_TEXTUREACCESS_STREAMING, Width, Height);
+
+		{
+			NotPaletted = true;
+
+			Uint32 format;
+			SDL_QueryTexture(Texture, &format, NULL, NULL, NULL);
+
+			Uint32 Rmask, Gmask, Bmask, Amask;
+			int bpp;
+			SDL_PixelFormatEnumToMasks(format, &bpp, &Rmask, &Gmask, &Bmask, &Amask);
+			GPfx.SetFormat (bpp, Rmask, Gmask, Bmask);
+		}
+	}
+	else
+	{
+		Surface = SDL_GetWindowSurface (Screen);
+
+		if (Surface->format->palette == NULL)
+		{
+			NotPaletted = true;
+			GPfx.SetFormat (Surface->format->BitsPerPixel, Surface->format->Rmask, Surface->format->Gmask, Surface->format->Bmask);
+		}
+		else
+			NotPaletted = false;
+	}
+
+	// Calculate update rectangle
+	if (IsFullscreen ())
+	{
+		int w, h;
+		SDL_GetWindowSize (Screen, &w, &h);
+		UpdateRect.w = w;
+		UpdateRect.h = h;
+		ScaleWithAspect (UpdateRect.w, UpdateRect.h, Width, Height);
+		UpdateRect.x = (w - UpdateRect.w)/2;
+		UpdateRect.y = (h - UpdateRect.h)/2;
+	}
+	else
+	{
+		// In windowed mode we just update the whole window.
+		UpdateRect.x = 0;
+		UpdateRect.y = 0;
+		UpdateRect.w = Width;
+		UpdateRect.h = Height;
+	}
+#endif
+}
+
+void SDLFB::SetVSync (bool vsync)
+{
+#if SDL_VERSION_ATLEAST(2,0,0)
+#ifdef __APPLE__
+	if (CGLContextObj context = CGLGetCurrentContext())
+	{
+		// Apply vsync for native backend only (where OpenGL context is set)
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED < 1050
+		// Inconsistency between 10.4 and 10.5 SDKs:
+		// third argument of CGLSetParameter() is const long* on 10.4 and const GLint* on 10.5
+		// So, GLint typedef'ed to long instead of int to workaround this issue
+		typedef long GLint;
+#endif // prior to 10.5
+
+		const GLint value = vsync ? 1 : 0;
+		CGLSetParameter(context, kCGLCPSwapInterval, &value);
+	}
+#else
+	ResetSDLRenderer ();
+#endif // __APPLE__
+#endif
+}
+
+void SDLFB::ScaleCoordsFromWindow(SWORD &x, SWORD &y)
+{
+#if SDL_VERSION_ATLEAST(2,0,0)
+	// Detect if we're doing scaling in the Window and adjust the mouse
+	// coordinates accordingly. This could be more efficent, but I
+	// don't think performance is an issue in the menus.
+	if(IsFullscreen())
+	{
+		int w, h;
+		SDL_GetWindowSize (Screen, &w, &h);
+		int realw = w, realh = h;
+		ScaleWithAspect (realw, realh, SCREENWIDTH, SCREENHEIGHT);
+		if (realw != SCREENWIDTH || realh != SCREENHEIGHT)
+		{
+			double xratio = (double)SCREENWIDTH/realw;
+			double yratio = (double)SCREENHEIGHT/realh;
+			if (realw < w)
+			{
+				x = (x - (w - realw)/2)*xratio;
+				y *= yratio;
+			}
+			else
+			{
+				y = (y - (h - realh)/2)*yratio;
+				x *= xratio;
+			}
+		}
+	}
+#endif
 }
 
 #if 0

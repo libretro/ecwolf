@@ -303,12 +303,7 @@ void PollKeyboardMove (void)
 
 void PollMouseMove (void)
 {
-	SDL_GetMouseState(&controlpanx, &controlpany);
-	if(IN_IsInputGrabbed())
-		IN_CenterMouse();
-
-	controlpanx -= screenWidth / 2;
-	controlpany -= screenHeight / 2;
+	SDL_GetRelativeMouseState(&controlpanx, &controlpany);
 
 	controlx += controlpanx * 20 / (21 - mousexadjustment);
 	if(mouselook)

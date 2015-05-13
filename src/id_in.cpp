@@ -26,10 +26,7 @@
 #include "id_vh.h"
 
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-// TODO: Remove this dependency!
-#define SDLK_LAST 512
-#else
+#if !SDL_VERSION_ATLEAST(2,0,0)
 #define SDLK_KP_0 SDLK_KP0
 #define SDLK_KP_1 SDLK_KP1
 #define SDLK_KP_2 SDLK_KP2
@@ -41,6 +38,7 @@
 #define SDLK_KP_8 SDLK_KP8
 #define SDLK_KP_9 SDLK_KP9
 #define SDLK_SCROLLLOCK SDLK_SCROLLOCK
+#define SDL_NUM_SCANCODES SDLK_LAST
 typedef SDLMod SDL_Keymod;
 
 inline void SDL_SetRelativeMouseMode(bool enabled)
@@ -69,7 +67,7 @@ bool MousePresent;
 
 
 // 	Global variables
-volatile bool		Keyboard[SCANCODE_UNMASK(SDLK_LAST)];
+volatile bool		Keyboard[SDL_NUM_SCANCODES];
 volatile unsigned short Paused;
 volatile char		LastASCII;
 volatile ScanCode	LastScan;
@@ -277,9 +275,56 @@ static void processEvent(SDL_Event *event)
 		case SDL_QUIT:
 			Quit(NULL);
 
+		// ASCII (Unicode) text entry for saves and stuff like that.
+#if SDL_VERSION_ATLEAST(2,0,0)
+		case SDL_TEXTINPUT:
+		{
+			LastASCII = event->text.text[0];
+			break;
+		}
+#endif
+
 		// check for keypresses
 		case SDL_KEYDOWN:
 		{
+			if(event->key.keysym.sym==SDLK_SCROLLLOCK || event->key.keysym.sym==SDLK_F12)
+			{
+				GrabInput = !GrabInput;
+				SDL_SetRelativeMouseMode(GrabInput ? SDL_TRUE : SDL_FALSE);
+				return;
+			}
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+			LastScan = event->key.keysym.scancode;
+#else
+			LastScan = event->key.keysym.sym;
+#endif
+			SDL_Keymod mod = SDL_GetModState();
+			if(Keyboard[sc_Alt])
+			{
+				if(LastScan==SDLx_SCANCODE(F4))
+					Quit(NULL);
+			}
+
+			if(LastScan == SDLx_SCANCODE(KP_ENTER)) LastScan = SDLx_SCANCODE(RETURN);
+			else if(LastScan == SDLx_SCANCODE(RSHIFT)) LastScan = SDLx_SCANCODE(LSHIFT);
+			else if(LastScan == SDLx_SCANCODE(RALT)) LastScan = SDLx_SCANCODE(LALT);
+			else if(LastScan == SDLx_SCANCODE(RCTRL)) LastScan = SDLx_SCANCODE(LCTRL);
+			else
+			{
+				if((mod & KMOD_NUM) == 0)
+				{
+					switch(LastScan)
+					{
+						case SDLx_SCANCODE(KP_2): LastScan = SDLx_SCANCODE(DOWN); break;
+						case SDLx_SCANCODE(KP_4): LastScan = SDLx_SCANCODE(LEFT); break;
+						case SDLx_SCANCODE(KP_6): LastScan = SDLx_SCANCODE(RIGHT); break;
+						case SDLx_SCANCODE(KP_8): LastScan = SDLx_SCANCODE(UP); break;
+					}
+				}
+			}
+
+#if !SDL_VERSION_ATLEAST(2,0,0)
 			static const byte ASCIINames[] = // Unshifted ASCII for scan codes       // TODO: keypad
 			{
 			//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
@@ -305,40 +350,7 @@ static void processEvent(SDL_Event *event)
 				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
 			};
 
-			if(event->key.keysym.sym==SDLK_SCROLLLOCK || event->key.keysym.sym==SDLK_F12)
-			{
-				GrabInput = !GrabInput;
-				SDL_SetRelativeMouseMode(GrabInput ? SDL_TRUE : SDL_FALSE);
-				return;
-			}
-
-			LastScan = SCANCODE_UNMASK(event->key.keysym.sym);
-			SDL_Keymod mod = SDL_GetModState();
-			if(Keyboard[sc_Alt])
-			{
-				if(LastScan==SCANCODE_UNMASK(SDLK_F4))
-					Quit(NULL);
-			}
-
-			if(LastScan == SCANCODE_UNMASK(SDLK_KP_ENTER)) LastScan = SCANCODE_UNMASK(SDLK_RETURN);
-			else if(LastScan == SCANCODE_UNMASK(SDLK_RSHIFT)) LastScan = SCANCODE_UNMASK(SDLK_LSHIFT);
-			else if(LastScan == SCANCODE_UNMASK(SDLK_RALT)) LastScan = SCANCODE_UNMASK(SDLK_LALT);
-			else if(LastScan == SCANCODE_UNMASK(SDLK_RCTRL)) LastScan = SCANCODE_UNMASK(SDLK_LCTRL);
-			else
-			{
-				if((mod & KMOD_NUM) == 0)
-				{
-					switch(LastScan)
-					{
-						case SCANCODE_UNMASK(SDLK_KP_2): LastScan = SCANCODE_UNMASK(SDLK_DOWN); break;
-						case SCANCODE_UNMASK(SDLK_KP_4): LastScan = SCANCODE_UNMASK(SDLK_LEFT); break;
-						case SCANCODE_UNMASK(SDLK_KP_6): LastScan = SCANCODE_UNMASK(SDLK_RIGHT); break;
-						case SCANCODE_UNMASK(SDLK_KP_8): LastScan = SCANCODE_UNMASK(SDLK_UP); break;
-					}
-				}
-			}
-
-			int sym = LastScan;
+			int sym = event->key.keysym.sym;
 			if(sym >= 'a' && sym <= 'z')
 				sym -= 32;  // convert to uppercase
 
@@ -354,48 +366,54 @@ static void processEvent(SDL_Event *event)
 			}
 			if(LastASCII && sym >= 'A' && sym <= 'Z' && (mod & KMOD_CAPS))
 				LastASCII ^= 0x20;
+#endif
 
-			if(LastScan<SCANCODE_UNMASK(SDLK_LAST))
+			if(LastScan<SDL_NUM_SCANCODES)
 				Keyboard[LastScan] = 1;
-			if(LastScan == SCANCODE_UNMASK(SDLK_PAUSE))
+			if(LastScan == SDLx_SCANCODE(PAUSE))
 				Paused |= 1;
 			break;
 		}
 
 		case SDL_KEYUP:
 		{
+#if SDL_VERSION_ATLEAST(2,0,0)
+			int key = event->key.keysym.scancode;
+#else
 			int key = event->key.keysym.sym;
-			if(key == SDLK_KP_ENTER) key = SDLK_RETURN;
-			else if(key == SDLK_RSHIFT) key = SDLK_LSHIFT;
-			else if(key == SDLK_RALT) key = SDLK_LALT;
-			else if(key == SDLK_RCTRL) key = SDLK_LCTRL;
+#endif
+			if(key == SDLx_SCANCODE(KP_ENTER)) key = SDLx_SCANCODE(RETURN);
+			else if(key == SDLx_SCANCODE(RSHIFT)) key = SDLx_SCANCODE(LSHIFT);
+			else if(key == SDLx_SCANCODE(RALT)) key = SDLx_SCANCODE(LALT);
+			else if(key == SDLx_SCANCODE(RCTRL)) key = SDLx_SCANCODE(LCTRL);
 			else
 			{
 				if((SDL_GetModState() & KMOD_NUM) == 0)
 				{
 					switch(key)
 					{
-						case SDLK_KP_2: key = SDLK_DOWN; break;
-						case SDLK_KP_4: key = SDLK_LEFT; break;
-						case SDLK_KP_6: key = SDLK_RIGHT; break;
-						case SDLK_KP_8: key = SDLK_UP; break;
+						case SDLx_SCANCODE(KP_2): key = SDLx_SCANCODE(DOWN); break;
+						case SDLx_SCANCODE(KP_4): key = SDLx_SCANCODE(LEFT); break;
+						case SDLx_SCANCODE(KP_6): key = SDLx_SCANCODE(RIGHT); break;
+						case SDLx_SCANCODE(KP_8): key = SDLx_SCANCODE(UP); break;
 					}
 				}
 			}
 
 #ifdef __ANDROID__
-			if(ShadowKey && LastScan == SCANCODE_UNMASK(event->key.keysym.sym))
+			if(ShadowKey && LastScan == event->key.keysym.scancode)
 			{
 				ShadowKey = false;
 				break;
 			}
 #endif
 
-			if(SCANCODE_UNMASK(key)<SDLK_LAST)
-				Keyboard[SCANCODE_UNMASK(key)] = 0;
+			if(key<SDL_NUM_SCANCODES)
+				Keyboard[key] = 0;
 			break;
 		}
 
+#if !SDL_VERSION_ATLEAST(2,0,0)	
 		case SDL_ACTIVEEVENT:
 		{
 			if (!fullscreen && forcegrabmouse && (event->active.state & SDL_APPINPUTFOCUS || event->active.state & SDL_APPACTIVE))
@@ -411,18 +429,9 @@ static void processEvent(SDL_Event *event)
 					IN_ReleaseMouse();
 				}
 			}
-								/*
-			if(fullscreen && (event->active.state & SDL_APPACTIVE) != 0)
-			{
-					if(event->active.gain)
-					{
-						NeedRestore = false;
-					}
-					else NeedRestore = true;
-			}*/
-
 			break;
 		}
+#endif
 	}
 }
 
@@ -776,5 +785,7 @@ bool IN_IsInputGrabbed()
 
 void IN_CenterMouse()
 {
-	SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
+	// Clear out relative mouse movement
+	int x, y;
+	SDL_GetRelativeMouseState(&x, &y);
 }

@@ -828,6 +828,10 @@ void WaitKeyUp (void)
 // READ KEYBOARD, JOYSTICK AND MOUSE FOR INPUT
 //
 ////////////////////////////////////////////////////////////////////
+
+// Store relative mouse movement until menu changes.
+static int menumousex, menumousey;
+
 void ReadAnyControl (ControlInfo * ci)
 {
 	int mouseactive = 0;
@@ -837,37 +841,40 @@ void ReadAnyControl (ControlInfo * ci)
 	if (mouseenabled && IN_IsInputGrabbed())
 	{
 		int mousex, mousey, buttons;
-		buttons = SDL_GetMouseState(&mousex, &mousey);
+		buttons = SDL_GetRelativeMouseState(&mousex, &mousey);
+		menumousex += mousex;
+		menumousey += mousey;
+
 		int middlePressed = buttons & SDL_BUTTON(SDL_BUTTON_MIDDLE);
 		int rightPressed = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		buttons &= ~(SDL_BUTTON(SDL_BUTTON_MIDDLE) | SDL_BUTTON(SDL_BUTTON_RIGHT));
 		if(middlePressed) buttons |= 1 << 2;
 		if(rightPressed) buttons |= 1 << 1;
 
-		if(mousey - CENTERY < -SENSITIVE)
+		if(menumousey < -SENSITIVE)
 		{
 			ci->dir = dir_North;
 			mouseactive = 1;
 		}
-		else if(mousey - CENTERY > SENSITIVE)
+		else if(menumousey > SENSITIVE)
 		{
 			ci->dir = dir_South;
 			mouseactive = 1;
 		}
 
-		if(mousex - CENTERX < -SENSITIVE)
+		if(menumousex < -SENSITIVE)
 		{
 			ci->dir = dir_West;
 			mouseactive = 1;
 		}
-		else if(mousex - CENTERX > SENSITIVE)
+		else if(menumousex > SENSITIVE)
 		{
 			ci->dir = dir_East;
 			mouseactive = 1;
 		}
 
 		if(mouseactive)
-			IN_CenterMouse();
+			menumousex = menumousey = 0;
 
 		if (buttons)
 		{
@@ -1110,6 +1117,9 @@ void MenuFadeIn()
 
 void ShowMenu(Menu &menu)
 {
+	// Clear out any residual mouse movement.
+	menumousex = menumousey = 0;
+
 	VW_FadeOut ();
 	if(screenHeight % 200 != 0)
 		VL_ClearScreen(0);
