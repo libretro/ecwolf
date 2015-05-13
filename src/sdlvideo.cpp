@@ -365,7 +365,6 @@ CUSTOM_CVAR (Float, bgamma, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
 #define ggamma 1.f
 #define bgamma 1.f
 #define vid_forcesurface 0
-#define vid_vsync 0
 #endif
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
@@ -439,10 +438,10 @@ static MiniModeInfo WinModes[] =
 void ScaleWithAspect (int &w, int &h, int Width, int Height)
 {
 	int resRatio = CheckRatio (Width, Height);
-	//int screenRatio;
-	//CheckRatio (w, h, &screenRatio);
-	//if (resRatio == screenRatio)
-	//	return;
+	int screenRatio;
+	CheckRatio (w, h, &screenRatio);
+	if (resRatio == screenRatio)
+		return;
 
 	double yratio;
 	switch(resRatio)

@@ -47,6 +47,7 @@ static bool doWriteConfig = false;
 Aspect r_ratio = ASPECT_4_3, vid_aspect = ASPECT_NONE;
 bool forcegrabmouse = false;
 bool vid_fullscreen = false;
+bool vid_vsync = false;
 bool quitonescape = false;
 fixed movebob = FRACUNIT;
 
@@ -180,6 +181,7 @@ void ReadConfig(void)
 	config.CreateSetting("DigitizedVolume", MAX_VOLUME);
 	config.CreateSetting("Vid_FullScreen", false);
 	config.CreateSetting("Vid_Aspect", ASPECT_NONE);
+	config.CreateSetting("Vid_Vsync", false);
 	config.CreateSetting("ScreenWidth", screenWidth);
 	config.CreateSetting("ScreenHeight", screenHeight);
 	config.CreateSetting("QuitOnEscape", quitonescape);
@@ -233,6 +235,7 @@ void ReadConfig(void)
 	SoundVolume = config.GetSetting("DigitizedVolume")->GetInteger();
 	vid_fullscreen = config.GetSetting("Vid_FullScreen")->GetInteger() != 0;
 	vid_aspect = static_cast<Aspect>(config.GetSetting("Vid_Aspect")->GetInteger());
+	vid_vsync = config.GetSetting("Vid_Vsync")->GetInteger() != 0;
 	screenWidth = config.GetSetting("ScreenWidth")->GetInteger();
 	screenHeight = config.GetSetting("ScreenHeight")->GetInteger();
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
@@ -345,6 +348,7 @@ void WriteConfig(void)
 	config.GetSetting("DigitizedVolume")->SetValue(SoundVolume);
 	config.GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
 	config.GetSetting("Vid_Aspect")->SetValue(vid_aspect);
+	config.GetSetting("Vid_Vsync")->SetValue(vid_vsync);
 	config.GetSetting("ScreenWidth")->SetValue(screenWidth);
 	config.GetSetting("ScreenHeight")->SetValue(screenHeight);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);

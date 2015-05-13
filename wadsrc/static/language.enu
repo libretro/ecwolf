@@ -16,6 +16,7 @@ STR_DISPLAY = "Display Options";
 STR_AMOPTIONS = "Automap Options";
 STR_DEPTHFOG = "Use Depth Fog";
 STR_FULLSCREEN = "Fullscreen";
+STR_VSYNC = "Vertical Sync";
 STR_SD = "Sound Options";
 STR_CL = "Control Setup";
 STR_LG = "Load Game";
