@@ -6,6 +6,8 @@
 #include "m_crc32.h"
 #include "templates.h"
 
+#include <cstring>
+
 #ifdef __ANDROID__
 #include <android/log.h>
 #define printf LOGI

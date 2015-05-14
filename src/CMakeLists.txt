@@ -99,8 +99,10 @@ if(WIN32)
 		win32/i_crash.cpp
 		win32/i_main.cpp
 		win32/wl_iwad_win32.cpp
-		sdl_winmain.cpp
 	)
+	if(${SDL_VERSION_STRING} VERSION_LESS "2.0.0")
+		set(EXTRA_FILES ${EXTRA_FILES} sdl_winmain.cpp)
+	endif()
 elseif(APPLE OR ANDROID)
 	set(NO_GTK ON)
 else(WIN32)

@@ -438,9 +438,11 @@ static void InitGame()
 	VL_SetVGAPlaneMode (true);
 	DrawStartupConsole();
 
+#if !SDL_VERSION_ATLEAST(2,0,0)
 #if defined _WIN32
 	if(!fullscreen)
 		SetupWM();
+#endif
 #endif
 	VW_UpdateScreen();
 

@@ -455,9 +455,9 @@ void ScaleWithAspect (int &w, int &h, int Width, int Height)
 	}
 	double y = w/yratio;
 	if (y > h)
-		w = h*yratio;
+		w = (int)(h*yratio);
 	else
-		h = y;
+		h = (int)(y);
 }
 
 SDLVideo::SDLVideo (int parm)
@@ -630,6 +630,11 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 
 	if (Screen == NULL)
 		return;
+
+#ifdef _WIN32
+	extern void ForceSDLFocus(SDL_Window *win);
+	ForceSDLFocus(Screen);
+#endif
 
 	Renderer = NULL;
 	Texture = NULL;
@@ -1099,13 +1104,13 @@ void SDLFB::ScaleCoordsFromWindow(SWORD &x, SWORD &y)
 			double yratio = (double)SCREENHEIGHT/realh;
 			if (realw < w)
 			{
-				x = (x - (w - realw)/2)*xratio;
-				y *= yratio;
+				x = (int)((x - (w - realw)/2)*xratio);
+				y = (int)(y*yratio);
 			}
 			else
 			{
-				y = (y - (h - realh)/2)*yratio;
-				x *= xratio;
+				y = (int)((y - (h - realh)/2)*yratio);
+				x = (int)(x*xratio);
 			}
 		}
 	}
