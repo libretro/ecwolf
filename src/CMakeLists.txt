@@ -127,9 +127,12 @@ endif(NO_GTK)
 if(APPLE)
 	set(EXTRA_FILES
 		macosx/filesys.mm
-		macosx/SDLMain.m
 		macosx/wl_iwad_picker_cocoa.mm
 	)
+
+	if(${SDL_VERSION_STRING} VERSION_LESS "2.0.0")
+		set(EXTRA_FILES ${EXTRA_FILES} macosx/SDLMain.m)
+	endif()
 
 	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.txt)
 
