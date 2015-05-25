@@ -389,10 +389,6 @@ static void InitGame()
 	}
 	atterm(SDL_Quit);
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-#else
-	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
-#endif
 	SDL_ShowCursor(SDL_DISABLE);
 
 	//

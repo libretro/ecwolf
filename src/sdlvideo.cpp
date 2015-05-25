@@ -686,6 +686,8 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 		GammaTable[0][i] = GammaTable[1][i] = GammaTable[2][i] = i;
 	}
 #else
+	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
+
 	if(vid_displaybits == static_cast<unsigned>(-1))
 	{
 		const SDL_VideoInfo *vidInfo = SDL_GetVideoInfo();

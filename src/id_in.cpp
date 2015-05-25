@@ -87,6 +87,15 @@ static KeyboardDef KbdDefs = {
 };
 
 static SDL_Joystick *Joystick;
+#if SDL_VERSION_ATLEAST(2,0,0)
+static SDL_GameController *GameController;
+// Flip the right stick axes to match usual mapping of Joystick API.
+static SDL_GameControllerAxis GameControllerAxisMap[SDL_CONTROLLER_AXIS_MAX] = {
+	SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY, // X, Y
+	SDL_CONTROLLER_AXIS_RIGHTY, SDL_CONTROLLER_AXIS_RIGHTX, // Z, R
+	SDL_CONTROLLER_AXIS_TRIGGERLEFT, SDL_CONTROLLER_AXIS_TRIGGERRIGHT
+};
+#endif
 JoystickSens *JoySensitivity;
 int JoyNumButtons;
 int JoyNumAxes;
@@ -144,56 +153,43 @@ void IN_GetJoyDelta(int *dx,int *dy)
 		return;
 	}
 
-	SDL_JoystickUpdate();
-	int x = SDL_JoystickGetAxis(Joystick, 0) >> 8;
-	int y = SDL_JoystickGetAxis(Joystick, 1) >> 8;
-
-	if(param_joystickhat != -1)
+	int x, y;
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
 	{
-		uint8_t hatState = SDL_JoystickGetHat(Joystick, param_joystickhat);
-		if(hatState & SDL_HAT_RIGHT)
+		SDL_GameControllerUpdate();
+		x = SDL_GameControllerGetAxis(GameController, SDL_CONTROLLER_AXIS_LEFTX) >> 8;
+		y = SDL_GameControllerGetAxis(GameController, SDL_CONTROLLER_AXIS_LEFTY) >> 8;
+
+		if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT))
 			x += 127;
-		else if(hatState & SDL_HAT_LEFT)
+		else if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT))
 			x -= 127;
-		if(hatState & SDL_HAT_DOWN)
+		if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN))
 			y += 127;
-		else if(hatState & SDL_HAT_UP)
+		else if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_UP))
 			y -= 127;
-
-		if(x < -128) x = -128;
-		else if(x > 127) x = 127;
-
-		if(y < -128) y = -128;
-		else if(y > 127) y = 127;
 	}
-
-	*dx = x;
-	*dy = y;
-}
-
-int IN_GetJoyAxis(int axis)
-{
-	return SDL_JoystickGetAxis(Joystick, axis);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_GetJoyFineDelta() - Returns the relative movement of the specified
-//		joystick without dividing the results by 256 (from +/-127)
-//
-///////////////////////////////////////////////////////////////////////////
-void IN_GetJoyFineDelta(int *dx, int *dy)
-{
-	if(!Joystick)
+	else
+#endif
 	{
-		*dx = 0;
-		*dy = 0;
-		return;
-	}
+		SDL_JoystickUpdate();
+		x = SDL_JoystickGetAxis(Joystick, 0) >> 8;
+		y = SDL_JoystickGetAxis(Joystick, 1) >> 8;
 
-	SDL_JoystickUpdate();
-	int x = SDL_JoystickGetAxis(Joystick, 0);
-	int y = SDL_JoystickGetAxis(Joystick, 1);
+		if(param_joystickhat != -1)
+		{
+			uint8_t hatState = SDL_JoystickGetHat(Joystick, param_joystickhat);
+			if(hatState & SDL_HAT_RIGHT)
+				x += 127;
+			else if(hatState & SDL_HAT_LEFT)
+				x -= 127;
+			if(hatState & SDL_HAT_DOWN)
+				y += 127;
+			else if(hatState & SDL_HAT_UP)
+				y -= 127;
+		}
+	}
 
 	if(x < -128) x = -128;
 	else if(x > 127) x = 127;
@@ -203,6 +199,15 @@ void IN_GetJoyFineDelta(int *dx, int *dy)
 
 	*dx = x;
 	*dy = y;
+}
+
+int IN_GetJoyAxis(int axis)
+{
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+		return SDL_GameControllerGetAxis(GameController, GameControllerAxisMap[axis]);
+#endif
+	return SDL_JoystickGetAxis(Joystick, axis);
 }
 
 /*
@@ -215,6 +220,18 @@ void IN_GetJoyFineDelta(int *dx, int *dy)
 
 int IN_JoyButtons()
 {
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+	{
+		SDL_GameControllerUpdate();
+
+		int res = 0;
+		for(int i = 0; i < JoyNumButtons; ++i)
+			res |= SDL_GameControllerGetButton(GameController, (SDL_GameControllerButton)i) << i;
+		return res;
+	}
+#endif
+
 	if(!Joystick) return 0;
 
 	SDL_JoystickUpdate();
@@ -242,6 +259,22 @@ int IN_JoyButtons()
 
 int IN_JoyAxes()
 {
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+	{
+		SDL_GameControllerUpdate();
+		int res = 0;
+		for(int i = 0; i < JoyNumAxes; ++i)
+		{
+			SWORD pos = SDL_GameControllerGetAxis(GameController, (SDL_GameControllerAxis)GameControllerAxisMap[i]);
+			if(pos <= -64)
+				res |= 1 << (i*2);
+			else if(pos >= 64)
+				res |= 1 << (i*2+1);
+		}
+		return res;
+	}
+#endif
 	if(!Joystick) return 0;
 
 	SDL_JoystickUpdate();
@@ -260,7 +293,11 @@ int IN_JoyAxes()
 
 bool IN_JoyPresent()
 {
-	return Joystick != NULL;
+	return Joystick != NULL
+#if SDL_VERSION_ATLEAST(2,0,0)
+		|| GameController != NULL
+#endif
+	;
 }
 
 #ifdef __ANDROID__
@@ -488,19 +525,41 @@ IN_Startup(void)
 	if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0 &&
 		param_joystickindex >= 0 && param_joystickindex < SDL_NumJoysticks())
 	{
-		Joystick = SDL_JoystickOpen(param_joystickindex);
-		if(Joystick)
+#if SDL_VERSION_ATLEAST(2,0,0)
+		if(SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0 && SDL_IsGameController(param_joystickindex))
 		{
-			JoyNumButtons = SDL_JoystickNumButtons(Joystick);
-			if(JoyNumButtons > 32) JoyNumButtons = 32;      // only up to 32 buttons are supported
-			JoyNumAxes = SDL_JoystickNumAxes(Joystick);
-			JoyNumHats = SDL_JoystickNumHats(Joystick);
-			if(param_joystickhat >= JoyNumHats)
-				Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
-			else if(param_joystickhat < 0 && JoyNumHats > 0) // Default to hat 0
-				param_joystickhat = 0;
+			GameController = SDL_GameControllerOpen(param_joystickindex);
+			if(GameController)
+			{
+				Printf("Using game controller: %s\n", SDL_GameControllerName(GameController));
+				JoyNumButtons = SDL_CONTROLLER_BUTTON_MAX;
+				JoyNumAxes = SDL_CONTROLLER_AXIS_MAX;
+				JoyNumHats = 0;
 
-			JoySensitivity = new JoystickSens[JoyNumAxes];
+				JoySensitivity = new JoystickSens[JoyNumAxes];
+			}
+		}
+		else
+#endif
+		{
+			Joystick = SDL_JoystickOpen(param_joystickindex);
+			if(Joystick)
+			{
+				JoyNumButtons = SDL_JoystickNumButtons(Joystick);
+				if(JoyNumButtons > 32) JoyNumButtons = 32;      // only up to 32 buttons are supported
+				JoyNumAxes = SDL_JoystickNumAxes(Joystick);
+				JoyNumHats = SDL_JoystickNumHats(Joystick);
+				if(param_joystickhat >= JoyNumHats)
+					Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
+				else if(param_joystickhat < 0 && JoyNumHats > 0) // Default to hat 0
+					param_joystickhat = 0;
+
+				JoySensitivity = new JoystickSens[JoyNumAxes];
+			}
+		}
+
+		if(JoySensitivity)
+		{
 			for(int i = 0;i < JoyNumAxes;++i)
 			{
 				FString settingName;
@@ -538,7 +597,7 @@ IN_Shutdown(void)
 	if (!IN_Started)
 		return;
 
-	if(Joystick)
+	if(JoySensitivity)
 	{
 		for(int i = 0;i < JoyNumAxes;++i)
 		{
@@ -551,8 +610,14 @@ IN_Shutdown(void)
 			config.GetSetting(settingName)->SetValue(JoySensitivity[i].deadzone);
 		}
 		delete[] JoySensitivity;
-		SDL_JoystickClose(Joystick);
 	}
+
+	if(Joystick)
+		SDL_JoystickClose(Joystick);
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+		SDL_GameControllerClose(GameController);
+#endif
 
 	IN_Started = false;
 }
