@@ -24,6 +24,7 @@
 #include "id_in.h"
 #include "id_vl.h"
 #include "id_vh.h"
+#include "config.h"
 
 
 #if !SDL_VERSION_ATLEAST(2,0,0)
@@ -86,6 +87,7 @@ static KeyboardDef KbdDefs = {
 };
 
 static SDL_Joystick *Joystick;
+JoystickSens *JoySensitivity;
 int JoyNumButtons;
 int JoyNumAxes;
 static int JoyNumHats;
@@ -496,6 +498,21 @@ IN_Startup(void)
 				Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
 			else if(param_joystickhat < 0 && JoyNumHats > 0) // Default to hat 0
 				param_joystickhat = 0;
+
+			JoySensitivity = new JoystickSens[JoyNumAxes];
+			for(int i = 0;i < JoyNumAxes;++i)
+			{
+				FString settingName;
+				settingName.Format("JoyAxis%dInvert", i);
+				config.CreateSetting(settingName, false);
+				JoySensitivity[i].invert = config.GetSetting(settingName)->GetInteger() != 0;
+				settingName.Format("JoyAxis%dSensitivity", i);
+				config.CreateSetting(settingName, 15);
+				JoySensitivity[i].sensitivity = config.GetSetting(settingName)->GetInteger();
+				settingName.Format("JoyAxis%dDeadzone", i);
+				config.CreateSetting(settingName, 2);
+				JoySensitivity[i].deadzone = config.GetSetting(settingName)->GetInteger();
+			}
 		}
 	}
 
@@ -521,7 +538,20 @@ IN_Shutdown(void)
 		return;
 
 	if(Joystick)
+	{
+		for(int i = 0;i < JoyNumAxes;++i)
+		{
+			FString settingName;
+			settingName.Format("JoyAxis%dInvert", i);
+			config.GetSetting(settingName)->SetValue(JoySensitivity[i].invert);
+			settingName.Format("JoyAxis%dSensitivity", i);
+			config.GetSetting(settingName)->SetValue(JoySensitivity[i].sensitivity);
+			settingName.Format("JoyAxis%dDeadzone", i);
+			config.GetSetting(settingName)->SetValue(JoySensitivity[i].deadzone);
+		}
+		delete[] JoySensitivity;
 		SDL_JoystickClose(Joystick);
+	}
 
 	IN_Started = false;
 }

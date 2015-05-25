@@ -338,10 +338,14 @@ void PollJoystickMove (void)
 	{
 		if(controlScheme[i].joystick >= 32)
 		{
+			int axisnum = (controlScheme[i].joystick-32)>>1;
+			bool positive = (controlScheme[i].joystick&1) != 0;
 			// Scale to -100 - 100
-			const int axis = (((IN_GetJoyAxis((controlScheme[i].joystick-32)>>1))+1)*100)>>15;
-			if((controlScheme[i].joystick&1) ^ (axis < 0))
-				*controlScheme[i].axis += controlScheme[i].negative ? -abs(axis) : abs(axis);
+			const int rawaxis = clamp(IN_GetJoyAxis(axisnum), -0x7FFF, 0x7FFF);
+			const int dzfactor = clamp(JoySensitivity[axisnum].deadzone*0x8000/20, 0, 0x7FFF);
+			const int axis = clamp(abs(rawaxis)+1-dzfactor, 0, 0x8000)*5*JoySensitivity[axisnum].sensitivity/(0x8000-dzfactor);
+			if(positive ^ (rawaxis < 0))
+				*controlScheme[i].axis += controlScheme[i].negative ? -axis : axis;
 		}
 	}
 }

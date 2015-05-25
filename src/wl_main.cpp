@@ -647,6 +647,8 @@ void Quit (const char *errorStr, ...)
 	}
 	else error[0] = 0;
 
+	ShutdownId ();
+
 	if (error[0] == 0)
 	{
 #ifdef NOTYET
@@ -665,8 +667,6 @@ void Quit (const char *errorStr, ...)
 		screen = grsegs[ERRORSCREEN];
 	}
 #endif
-
-	ShutdownId ();
 
 	if (error[0] != 0)
 	{

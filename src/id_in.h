@@ -168,14 +168,15 @@ typedef	struct		{
 									left,				right,
 									downleft,	down,	downright;
 					} KeyboardDef;
-typedef	struct		{
-						word		joyMinX,joyMinY,
-									threshMinX,threshMinY,
-									threshMaxX,threshMaxY,
-									joyMaxX,joyMaxY,
-									joyMultXL,joyMultYL,
-									joyMultXH,joyMultYH;
-					} JoystickDef;
+
+struct JoystickSens
+{
+	int sensitivity;
+	int deadzone;
+	bool invert;
+};
+extern JoystickSens *JoySensitivity;
+
 // Global variables
 extern  volatile bool		Keyboard[];
 extern           bool		MousePresent;
@@ -183,6 +184,7 @@ extern  volatile unsigned short Paused;
 extern  volatile char       LastASCII;
 extern  volatile ScanCode   LastScan;
 extern           int        JoyNumButtons;
+extern           int        JoyNumAxes;
 
 
 // Function prototypes

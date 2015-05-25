@@ -913,7 +913,7 @@ int Menu::handle()
 						curPos = 0;
 						itemOffset = 0;
 					}
-					else if (lastIndexDrawn != lastPos && (unsigned)curPos == lastIndexDrawn-1)
+					else if (lastIndexDrawn != lastPos && (unsigned)curPos >= lastIndexDrawn-1)
 					{
 						++itemOffset;
 						++curPos;

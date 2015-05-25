@@ -53,7 +53,8 @@ Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(20, 75, 285, 56);
 Menu automapMenu(40, 55, 260, 56);
-Menu mouseSensitivity(20, 80, 300, 24);
+Menu mouseSensitivity(20, 50, 300, 24);
+Menu joySensitivity(20, 30, 300, 24);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
@@ -148,6 +149,7 @@ MENU_LISTENER(EnterControlBase)
 	controlBase[3]->setEnabled(mouseenabled);
 	controlBase[4]->setEnabled(mouseenabled);
 	controlBase[5]->setEnabled(IN_JoyPresent());
+	controlBase[6]->setEnabled(joystickenabled);
 	controlBase.draw();
 
 	IN_AdjustMouse();
@@ -448,8 +450,26 @@ void CreateMenus()
 	controlBase.addItem(new BooleanMenuItem(language["STR_DISABLEYAXIS"], mouseyaxisdisabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_SENS"], mouseSensitivity));
 	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
+	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_JOYSENS"], joySensitivity));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
 	controlBase.addItem(new BooleanMenuItem(language["STR_ESCQUIT"], quitonescape));
+
+	joySensitivity.setHeadText(language["STR_JOYSENS"]);
+	for(int i = 0;i < JoyNumAxes;++i)
+	{
+		FString label;
+		if(i < 4)
+		{
+			static const char AxisNames[4] = { 'X', 'Y', 'Z', 'R' };
+			label.Format("%c Axis", AxisNames[i]);
+		}
+		else
+			label.Format("Axis %d", i+1);
+
+		joySensitivity.addItem(new LabelMenuItem(label));
+		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].sensitivity, 164, 20, language["STR_SLOW"], language["STR_FAST"]));
+		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].deadzone, 150, 20, language["STR_SMALL"], language["STR_LARGE"]));
+	}
 
 	const char* aspectOptions[] = {"Aspect: Auto", "Aspect: 16:9", "Aspect: 16:10", "Aspect: 17:10", "Aspect: 4:3", "Aspect: 5:4"};
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
@@ -468,7 +488,7 @@ void CreateMenus()
 
 	resolutionMenu.setHeadText(language["STR_SELECTRES"]);
 
-    mouseSensitivity.setHeadText(language["STR_MOUSEADJ"]);
+	mouseSensitivity.setHeadText(language["STR_MOUSEADJ"]);
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEXADJ"]));
 	mouseSensitivity.addItem(new SliderMenuItem(mousexadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEYADJ"]));
