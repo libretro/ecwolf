@@ -221,12 +221,20 @@ void I_ShutdownGraphics ()
 	}
 	if (Video)
 		delete Video, Video = NULL;
+
+	SDL_QuitSubSystem (SDL_INIT_VIDEO);
 }
 
 void I_InitGraphics ()
 {
 	if(Video)
 		return;
+
+	if (SDL_InitSubSystem (SDL_INIT_VIDEO) < 0)
+	{
+		I_FatalError ("Could not initialize SDL video:\n%s\n", SDL_GetError());
+		return;
+	}
 
 	Video = new SDLVideo (0);
 	if (Video == NULL)

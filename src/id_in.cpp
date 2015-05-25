@@ -485,7 +485,8 @@ IN_Startup(void)
 
 	IN_ClearKeysDown();
 
-	if(param_joystickindex >= 0 && param_joystickindex < SDL_NumJoysticks())
+	if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0 &&
+		param_joystickindex >= 0 && param_joystickindex < SDL_NumJoysticks())
 	{
 		Joystick = SDL_JoystickOpen(param_joystickindex);
 		if(Joystick)
