@@ -267,9 +267,9 @@ int IN_JoyAxes()
 		for(int i = 0; i < JoyNumAxes; ++i)
 		{
 			SWORD pos = SDL_GameControllerGetAxis(GameController, (SDL_GameControllerAxis)GameControllerAxisMap[i]);
-			if(pos <= -64)
+			if(pos <= -0x1000)
 				res |= 1 << (i*2);
-			else if(pos >= 64)
+			else if(pos >= 0x1000)
 				res |= 1 << (i*2+1);
 		}
 		return res;
@@ -283,9 +283,9 @@ int IN_JoyAxes()
 	for(int i = 0; i < JoyNumAxes && i < 16; ++i)
 	{
 		SWORD pos = SDL_JoystickGetAxis(Joystick, i);
-		if(pos <= -64)
+		if(pos <= -0x1000)
 			res |= 1 << (i*2);
-		else if(pos >= 64)
+		else if(pos >= 0x1000)
 			res |= 1 << (i*2+1);
 	}
 	return res;
@@ -532,6 +532,7 @@ IN_Startup(void)
 			if(GameController)
 			{
 				Printf("Using game controller: %s\n", SDL_GameControllerName(GameController));
+				SDL_GameControllerEventState(SDL_IGNORE);
 				JoyNumButtons = SDL_CONTROLLER_BUTTON_MAX;
 				JoyNumAxes = SDL_CONTROLLER_AXIS_MAX;
 				JoyNumHats = 0;
@@ -563,9 +564,6 @@ IN_Startup(void)
 			for(int i = 0;i < JoyNumAxes;++i)
 			{
 				FString settingName;
-				settingName.Format("JoyAxis%dInvert", i);
-				config.CreateSetting(settingName, false);
-				JoySensitivity[i].invert = config.GetSetting(settingName)->GetInteger() != 0;
 				settingName.Format("JoyAxis%dSensitivity", i);
 				config.CreateSetting(settingName, 15);
 				JoySensitivity[i].sensitivity = config.GetSetting(settingName)->GetInteger();
@@ -602,8 +600,6 @@ IN_Shutdown(void)
 		for(int i = 0;i < JoyNumAxes;++i)
 		{
 			FString settingName;
-			settingName.Format("JoyAxis%dInvert", i);
-			config.GetSetting(settingName)->SetValue(JoySensitivity[i].invert);
 			settingName.Format("JoyAxis%dSensitivity", i);
 			config.GetSetting(settingName)->SetValue(JoySensitivity[i].sensitivity);
 			settingName.Format("JoyAxis%dDeadzone", i);

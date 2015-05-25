@@ -173,7 +173,6 @@ struct JoystickSens
 {
 	int sensitivity;
 	int deadzone;
-	bool invert;
 };
 extern JoystickSens *JoySensitivity;
 
