@@ -148,11 +148,7 @@ INL_GetMouseButtons(void)
 ///////////////////////////////////////////////////////////////////////////
 void IN_GetJoyDelta(int *dx,int *dy)
 {
-	if(!Joystick
-#if SDL_VERSION_ATLEAST(2,0,0)
-		&& !GameController
-#endif
-	)
+	if(!IN_JoyPresent())
 	{
 		*dx = *dy = 0;
 		return;

@@ -460,7 +460,7 @@ void PollControls (bool absolutes)
 	if (mouseenabled && IN_IsInputGrabbed())
 		PollMouseButtons ();
 
-	if (joystickenabled)
+	if (joystickenabled && IN_JoyPresent())
 		PollJoystickButtons ();
 
 //
@@ -471,7 +471,7 @@ void PollControls (bool absolutes)
 	if (absolutes && mouseenabled && IN_IsInputGrabbed())
 		PollMouseMove ();
 
-	if (joystickenabled)
+	if (joystickenabled && IN_JoyPresent())
 		PollJoystickMove ();
 
 #ifdef __ANDROID__

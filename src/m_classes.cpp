@@ -436,7 +436,7 @@ void ControlMenuItem::activate()
 				break;
 			}
 			case 2:
-				if(!joystickenabled)
+				if(!IN_JoyPresent())
 				{
 					exit = true;
 					break;
