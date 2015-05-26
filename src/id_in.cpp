@@ -25,6 +25,7 @@
 #include "id_vl.h"
 #include "id_vh.h"
 #include "config.h"
+#include "wl_play.h"
 
 
 #if !SDL_VERSION_ATLEAST(2,0,0)
@@ -231,7 +232,17 @@ int IN_JoyButtons()
 
 		int res = 0;
 		for(int i = 0; i < JoyNumButtons; ++i)
-			res |= SDL_GameControllerGetButton(GameController, (SDL_GameControllerButton)i) << i;
+		{
+			if(SDL_GameControllerGetButton(GameController, (SDL_GameControllerButton)i))
+			{
+				// Attempt to allow controllers using the game controller API
+				// to enter the menu.
+				if(i == SDL_CONTROLLER_BUTTON_START)
+					buttonstate[bt_esc] = true;
+				else
+					res |= 1<<i;
+			}
+		}
 		return res;
 	}
 #endif
@@ -569,7 +580,7 @@ IN_Startup(void)
 			{
 				FString settingName;
 				settingName.Format("JoyAxis%dSensitivity", i);
-				config.CreateSetting(settingName, 15);
+				config.CreateSetting(settingName, 10);
 				JoySensitivity[i].sensitivity = config.GetSetting(settingName)->GetInteger();
 				settingName.Format("JoyAxis%dDeadzone", i);
 				config.CreateSetting(settingName, 2);

@@ -105,12 +105,12 @@ ControlScheme &schemeAutomapKey = controlScheme[25]; // When the input system is
 
 ControlScheme amControlScheme[] =
 {
-	{ bt_zoomin,			"Zoom In",		-1,			sc_Equals,		-1, NULL, 0 },
-	{ bt_zoomout,			"Zoom Out",		-1,			sc_Minus,		-1, NULL, 0 },
-	{ bt_panup,				"Pan Up",		-1,			sc_UpArrow,		-1, NULL, 0 },
-	{ bt_pandown,			"Pan Down",		-1,			sc_DownArrow,	-1, NULL, 0 },
-	{ bt_panleft,			"Pan Left",		-1,			sc_LeftArrow,	-1, NULL, 0 },
-	{ bt_panright,			"Pan Right",	-1,			sc_RightArrow,	-1, NULL, 0 },
+	{ bt_zoomin,			"Zoom In",		JoyAx(2),	sc_Equals,		-1, NULL, 0 },
+	{ bt_zoomout,			"Zoom Out",		JoyAx(2)+1,	sc_Minus,		-1, NULL, 0 },
+	{ bt_panup,				"Pan Up",		JoyAx(1),	sc_UpArrow,		-1, &controlpany, 0 },
+	{ bt_pandown,			"Pan Down",		JoyAx(1)+1,	sc_DownArrow,	-1, &controlpany, 1 },
+	{ bt_panleft,			"Pan Left",		JoyAx(0),	sc_LeftArrow,	-1, &controlpanx, 0 },
+	{ bt_panright,			"Pan Right",	JoyAx(0)+1,	sc_RightArrow,	-1, &controlpanx, 1 },
 
 	{ bt_nobutton,			NULL, -1, -1, -1, NULL, 0 }
 };
@@ -251,16 +251,54 @@ void PollMouseButtons (void)
 
 void PollJoystickButtons (void)
 {
-	int buttons = IN_JoyButtons();
-	int axes = IN_JoyAxes();
-	for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+	if(automap == AMA_Normal)
 	{
-		if(controlScheme[i].joystick != -1)
+		// HACK
+		bool jam[64] = {false};
+		bool jamall = !!(Paused & 2); // Paused for automap
+
+		int buttons = IN_JoyButtons();
+		int axes = IN_JoyAxes();
+		for(int i = 0;jamall ? amControlScheme[i].button != bt_nobutton : amControlScheme[i].button <= bt_zoomout;i++)
 		{
-			if(controlScheme[i].joystick < 32 && (buttons & (1<<controlScheme[i].joystick)))
-				buttonstate[controlScheme[i].button] = true;
-			else if(controlScheme[i].axis == NULL && controlScheme[i].joystick >= 32 && (axes & (1<<(controlScheme[i].joystick-32))))
-				buttonstate[controlScheme[i].button] = true;
+			if(amControlScheme[i].joystick != -1)
+			{
+				if(amControlScheme[i].joystick < 32 && (buttons & (1<<amControlScheme[i].joystick)))
+				{
+					ambuttonstate[amControlScheme[i].button] = true;
+					jam[amControlScheme[i].joystick] = true;
+				}
+				else if(amControlScheme[i].axis == NULL && amControlScheme[i].joystick >= 32 && (axes & (1<<(amControlScheme[i].joystick-32))))
+				{
+					ambuttonstate[amControlScheme[i].button] = true;
+					jam[amControlScheme[i].joystick] = true;
+				}
+			}
+		}
+		for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+		{
+			if(controlScheme[i].joystick != -1 && !jam[controlScheme[i].joystick])
+			{
+				if(controlScheme[i].joystick < 32 && (buttons & (1<<controlScheme[i].joystick)))
+					buttonstate[controlScheme[i].button] = true;
+				else if(controlScheme[i].axis == NULL && controlScheme[i].joystick >= 32 && (axes & (1<<(controlScheme[i].joystick-32))))
+					buttonstate[controlScheme[i].button] = true;
+			}
+		}
+	}
+	else
+	{
+		int buttons = IN_JoyButtons();
+		int axes = IN_JoyAxes();
+		for(int i = 0;controlScheme[i].button != bt_nobutton;i++)
+		{
+			if(controlScheme[i].joystick != -1)
+			{
+				if(controlScheme[i].joystick < 32 && (buttons & (1<<controlScheme[i].joystick)))
+					buttonstate[controlScheme[i].button] = true;
+				else if(controlScheme[i].axis == NULL && controlScheme[i].joystick >= 32 && (axes & (1<<(controlScheme[i].joystick-32))))
+					buttonstate[controlScheme[i].button] = true;
+			}
 		}
 	}
 }
@@ -334,20 +372,27 @@ void PollMouseMove (void)
 
 void PollJoystickMove (void)
 {
-	for(int i = 0;controlScheme[i].axis;i++)
+	const bool useam = automap == AMA_Normal && Paused;
+	const ControlScheme *scheme = useam ? amControlScheme+2 : controlScheme;
+	do
 	{
-		if(controlScheme[i].joystick >= 32)
+		if(scheme->joystick >= 32)
 		{
-			int axisnum = (controlScheme[i].joystick-32)>>1;
-			bool positive = (controlScheme[i].joystick&1) != 0;
+			int axisnum = (scheme->joystick-32)>>1;
+			bool positive = (scheme->joystick&1) != 0;
 			// Scale to -100 - 100
 			const int rawaxis = clamp(IN_GetJoyAxis(axisnum), -0x7FFF, 0x7FFF);
 			const int dzfactor = clamp(JoySensitivity[axisnum].deadzone*0x8000/20, 0, 0x7FFF);
-			const int axis = clamp(abs(rawaxis)+1-dzfactor, 0, 0x8000)*5*JoySensitivity[axisnum].sensitivity/(0x8000-dzfactor);
+			int axis = clamp(abs(rawaxis)+1-dzfactor, 0, 0x8000)*5*JoySensitivity[axisnum].sensitivity/(0x8000-dzfactor);
+			if(useam)
+				axis >>= 2;
+			else if(buttonstate[bt_run])
+				axis <<= 1;
 			if(positive ^ (rawaxis < 0))
-				*controlScheme[i].axis += controlScheme[i].negative ? -axis : axis;
+				*scheme->axis += scheme->negative ? -axis : axis;
 		}
 	}
+	while((++scheme)->axis);
 }
 
 /*

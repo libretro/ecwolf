@@ -467,7 +467,7 @@ void CreateMenus()
 			label.Format("Axis %d", i+1);
 
 		joySensitivity.addItem(new LabelMenuItem(label));
-		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].sensitivity, 164, 20, language["STR_SLOW"], language["STR_FAST"]));
+		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].sensitivity, 164, 30, language["STR_SLOW"], language["STR_FAST"]));
 		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].deadzone, 150, 20, language["STR_SMALL"], language["STR_LARGE"]));
 	}
 
