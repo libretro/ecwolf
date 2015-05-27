@@ -102,11 +102,17 @@ static const SDL_Scancode SDL2ConversionTable[323] = {
 
 int SDL2Convert(int sc)
 {
+	if(sc < 0)
+		return sc;
+
 	return SDL2ConversionTable[sc];
 }
 
 int SDL2Backconvert(int sc)
 {
+	if(sc < 0)
+		return sc;
+
 	for(unsigned int i = 0;i < 323;++i)
 	{
 		if(SDL2ConversionTable[i] == sc)
@@ -211,7 +217,7 @@ void ReadConfig(void)
 				mseSettingName[j] = '_';
 		}
 		config.CreateSetting(joySettingName, controlScheme[i].joystick);
-		config.CreateSetting(keySettingName, controlScheme[i].keyboard);
+		config.CreateSetting(keySettingName, SDL2Backconvert(controlScheme[i].keyboard));
 		config.CreateSetting(mseSettingName, controlScheme[i].mouse);
 		controlScheme[i].joystick = config.GetSetting(joySettingName)->GetInteger();
 		controlScheme[i].keyboard = SDL2Convert(config.GetSetting(keySettingName)->GetInteger());
