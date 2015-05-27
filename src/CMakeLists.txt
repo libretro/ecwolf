@@ -93,8 +93,10 @@ if(WIN32)
 		win32/i_crash.cpp
 		win32/i_main.cpp
 		win32/wl_iwad_win32.cpp
-		sdl_winmain.cpp
 	)
+	if(${SDL_VERSION_STRING} VERSION_LESS "2.0.0")
+		set(EXTRA_FILES ${EXTRA_FILES} sdl_winmain.cpp)
+	endif()
 elseif(APPLE OR ANDROID)
 	set(NO_GTK ON)
 else()
@@ -119,9 +121,12 @@ endif()
 if(APPLE)
 	set(EXTRA_FILES
 		macosx/filesys.mm
-		macosx/SDLMain.m
 		macosx/wl_iwad_picker_cocoa.mm
 	)
+
+	if(${SDL_VERSION_STRING} VERSION_LESS "2.0.0")
+		set(EXTRA_FILES ${EXTRA_FILES} macosx/SDLMain.m)
+	endif()
 
 	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.txt)
 

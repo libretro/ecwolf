@@ -38,6 +38,7 @@
 #include <commctrl.h>
 #include <cstdlib>
 #include <ctime>
+#include <SDL_syswm.h>
 
 #define USE_WINDOWS_DWORD
 #include "version.h"
@@ -258,6 +259,22 @@ bool CheckIsRunningFromCommandPrompt()
 		return false;
 	return info.dwCursorPosition.X != 0 || info.dwCursorPosition.Y != 0;
 }
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+// If we have a console application then the console will be on a separate thread.
+// What this means that when the IWAD picker finishes its job, the focus will go to
+// the console thread and not to the SDL window we eventually create. We'll call this
+// function to bring it into focus.
+// https://forums.libsdl.org/viewtopic.php?p=42799
+void ForceSDLFocus(SDL_Window *win)
+{
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+	if (!SDL_GetWindowWMInfo(win, &info))
+		Printf("Failed to focus window.\n");
+	SetForegroundWindow(info.info.win.window);
+}
+#endif
 
 //==========================================================================
 //

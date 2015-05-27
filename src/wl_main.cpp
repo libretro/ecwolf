@@ -382,28 +382,14 @@ void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
+	if(SDL_Init(0) < 0)
 	{
 		printf("Unable to init SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
 	atterm(SDL_Quit);
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-#else
-	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
-#endif
 	SDL_ShowCursor(SDL_DISABLE);
-
-	int numJoysticks = SDL_NumJoysticks();
-	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
-	{
-		if(!numJoysticks)
-			printf("No joysticks are available to SDL!\n");
-		else
-			printf("The joystick index must be between -1 and %i!\n", numJoysticks - 1);
-		exit(1);
-	}
 
 	//
 	// Mapinfo
@@ -438,9 +424,11 @@ static void InitGame()
 	VL_SetVGAPlaneMode (true);
 	DrawStartupConsole();
 
+#if !SDL_VERSION_ATLEAST(2,0,0)
 #if defined _WIN32
 	if(!fullscreen)
 		SetupWM();
+#endif
 #endif
 	VW_UpdateScreen();
 
@@ -645,6 +633,8 @@ void Quit (const char *errorStr, ...)
 	}
 	else error[0] = 0;
 
+	ShutdownId ();
+
 	if (error[0] == 0)
 	{
 #ifdef NOTYET
@@ -663,8 +653,6 @@ void Quit (const char *errorStr, ...)
 		screen = grsegs[ERRORSCREEN];
 	}
 #endif
-
-	ShutdownId ();
 
 	if (error[0] != 0)
 	{
@@ -841,7 +829,7 @@ static void DemoLoop()
 //
 // Tries to guess the physical dimensions of the screen based on the
 // screen's pixel dimensions.
-int CheckRatio (int width, int height)//, int *trueratio)
+int CheckRatio (int width, int height, int *trueratio)
 {
 	int fakeratio = -1;
 	Aspect ratio;
@@ -896,10 +884,10 @@ int CheckRatio (int width, int height)//, int *trueratio)
 		ratio = ASPECT_4_3;
 	}
 
-	/*if (trueratio != NULL)
+	if (trueratio != NULL)
 	{
 		*trueratio = ratio;
-	}*/
+	}
 	return (fakeratio >= 0) ? fakeratio : ratio;
 }
 

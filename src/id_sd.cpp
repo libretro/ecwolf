@@ -1029,6 +1029,12 @@ SD_Startup(void)
 	if (SD_Started)
 		return;
 
+	if(SDL_InitSubSystem(SDL_INIT_AUDIO) != 0)
+	{
+		Printf("Unable to initialize audio.\n");
+		return;
+	}
+
 	if((audioMutex = SDL_CreateMutex()) == NULL)
 	{
 		printf("Unable to create audio mutex\n");
@@ -1107,6 +1113,8 @@ SD_Shutdown(void)
 		SDL_DestroyMutex(audioMutex);
 		audioMutex = NULL;
 	}
+
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
 	SD_Started = false;
 }

@@ -41,14 +41,6 @@ unsigned windowedScreenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
 float screenGamma = 1.0f;
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-SDL_Window *window = NULL;
-SDL_Renderer *screenRenderer = NULL;
-SDL_Texture *screen = NULL;
-#else
-//SDL_Surface *screen = NULL;
-#endif
-
 SDL_Surface *curSurface = NULL;
 unsigned curPitch;
 

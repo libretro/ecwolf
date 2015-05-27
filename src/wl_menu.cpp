@@ -53,7 +53,8 @@ Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
 Menu displayMenu(20, 75, 285, 56);
 Menu automapMenu(40, 55, 260, 56);
-Menu mouseSensitivity(20, 80, 300, 24);
+Menu mouseSensitivity(20, 50, 300, 24);
+Menu joySensitivity(20, 30, 300, 24);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
@@ -148,6 +149,7 @@ MENU_LISTENER(EnterControlBase)
 	controlBase[3]->setEnabled(mouseenabled);
 	controlBase[4]->setEnabled(mouseenabled);
 	controlBase[5]->setEnabled(IN_JoyPresent());
+	controlBase[6]->setEnabled(IN_JoyPresent() && joystickenabled);
 	controlBase.draw();
 
 	IN_AdjustMouse();
@@ -223,6 +225,11 @@ MENU_LISTENER(ToggleFullscreen)
 
 	IN_AdjustMouse();
 
+	return true;
+}
+MENU_LISTENER(ToggleVsync)
+{
+	screen->SetVSync(vid_vsync);
 	return true;
 }
 MENU_LISTENER(SetAspectRatio)
@@ -451,13 +458,34 @@ void CreateMenus()
 	controlBase.addItem(new BooleanMenuItem(language["STR_DISABLEYAXIS"], mouseyaxisdisabled, EnterControlBase));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_SENS"], mouseSensitivity));
 	controlBase.addItem(new BooleanMenuItem(language["STR_JOYEN"], joystickenabled, EnterControlBase));
+	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_JOYSENS"], joySensitivity));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
 	controlBase.addItem(new BooleanMenuItem(language["STR_ESCQUIT"], quitonescape));
+
+	joySensitivity.setHeadText(language["STR_JOYSENS"]);
+	for(int i = 0;i < JoyNumAxes;++i)
+	{
+		FString label;
+		if(i < 4)
+		{
+			static const char AxisNames[4] = { 'X', 'Y', 'Z', 'R' };
+			label.Format("%c Axis", AxisNames[i]);
+		}
+		else
+			label.Format("Axis %d", i+1);
+
+		joySensitivity.addItem(new LabelMenuItem(label));
+		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].sensitivity, 164, 30, language["STR_SLOW"], language["STR_FAST"]));
+		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].deadzone, 150, 20, language["STR_SMALL"], language["STR_LARGE"]));
+	}
 
 	const char* aspectOptions[] = {"Aspect: Auto", "Aspect: 16:9", "Aspect: 16:10", "Aspect: 17:10", "Aspect: 4:3", "Aspect: 5:4"};
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
 #ifndef __ANDROID__
 	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
+#endif
+#if SDL_VERSION_ATLEAST(2,0,0)
+	displayMenu.addItem(new BooleanMenuItem(language["STR_VSYNC"], vid_vsync, ToggleVsync));
 #endif
 	displayMenu.addItem(new MultipleChoiceMenuItem(SetAspectRatio, aspectOptions, 6, vid_aspect));
 #ifndef __ANDROID__
@@ -468,7 +496,7 @@ void CreateMenus()
 
 	resolutionMenu.setHeadText(language["STR_SELECTRES"]);
 
-    mouseSensitivity.setHeadText(language["STR_MOUSEADJ"]);
+	mouseSensitivity.setHeadText(language["STR_MOUSEADJ"]);
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEXADJ"]));
 	mouseSensitivity.addItem(new SliderMenuItem(mousexadjustment, 173, 20, language["STR_SLOW"], language["STR_FAST"]));
 	mouseSensitivity.addItem(new LabelMenuItem(language["STR_MOUSEYADJ"]));
@@ -836,6 +864,10 @@ void WaitKeyUp (void)
 // READ KEYBOARD, JOYSTICK AND MOUSE FOR INPUT
 //
 ////////////////////////////////////////////////////////////////////
+
+// Store relative mouse movement until menu changes.
+static int menumousex, menumousey;
+
 void ReadAnyControl (ControlInfo * ci)
 {
 	int mouseactive = 0;
@@ -845,37 +877,40 @@ void ReadAnyControl (ControlInfo * ci)
 	if (mouseenabled && IN_IsInputGrabbed())
 	{
 		int mousex, mousey, buttons;
-		buttons = SDL_GetMouseState(&mousex, &mousey);
+		buttons = SDL_GetRelativeMouseState(&mousex, &mousey);
+		menumousex += mousex;
+		menumousey += mousey;
+
 		int middlePressed = buttons & SDL_BUTTON(SDL_BUTTON_MIDDLE);
 		int rightPressed = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		buttons &= ~(SDL_BUTTON(SDL_BUTTON_MIDDLE) | SDL_BUTTON(SDL_BUTTON_RIGHT));
 		if(middlePressed) buttons |= 1 << 2;
 		if(rightPressed) buttons |= 1 << 1;
 
-		if(mousey - CENTERY < -SENSITIVE)
+		if(menumousey < -SENSITIVE)
 		{
 			ci->dir = dir_North;
 			mouseactive = 1;
 		}
-		else if(mousey - CENTERY > SENSITIVE)
+		else if(menumousey > SENSITIVE)
 		{
 			ci->dir = dir_South;
 			mouseactive = 1;
 		}
 
-		if(mousex - CENTERX < -SENSITIVE)
+		if(menumousex < -SENSITIVE)
 		{
 			ci->dir = dir_West;
 			mouseactive = 1;
 		}
-		else if(mousex - CENTERX > SENSITIVE)
+		else if(menumousex > SENSITIVE)
 		{
 			ci->dir = dir_East;
 			mouseactive = 1;
 		}
 
 		if(mouseactive)
-			IN_CenterMouse();
+			menumousex = menumousey = 0;
 
 		if (buttons)
 		{
@@ -1118,6 +1153,9 @@ void MenuFadeIn()
 
 void ShowMenu(Menu &menu)
 {
+	// Clear out any residual mouse movement.
+	menumousex = menumousey = 0;
+
 	VW_FadeOut ();
 	if(screenHeight % 200 != 0)
 		VL_ClearScreen(0);
