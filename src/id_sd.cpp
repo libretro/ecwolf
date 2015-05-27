@@ -500,7 +500,11 @@ static Sint64 MacSound_Size(SDL_RWops *ops)
 {
 	return (Sint64)((MacSoundData*)ops->hidden.unknown.data1)->size;
 }
+#if SDL_VERSION_ATLEAST(2,0,0)
+static Sint64 MacSound_Seek(SDL_RWops *ops, Sint64 pos, int relative)
+#else
 static int MacSound_Seek(SDL_RWops *ops, int pos, int relative)
+#endif
 {
 	Sint64 &curpos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
 	switch(relative)
@@ -517,7 +521,11 @@ static int MacSound_Seek(SDL_RWops *ops, int pos, int relative)
 	}
 	return (int)curpos;
 }
+#if SDL_VERSION_ATLEAST(2,0,0)
+static size_t MacSound_Read(SDL_RWops *ops, void *buffer, size_t size, size_t nmem)
+#else
 static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
+#endif
 {
 	static const char WAV_HEADER[40] = {
 		'R','I','F','F',0,0,0,0,'W','A','V','E',
