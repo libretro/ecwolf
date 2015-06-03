@@ -382,7 +382,11 @@ void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
+#if SDL_VERSION_ATLEAST(2,0,0)
 	if(SDL_Init(0) < 0)
+#else
+	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+#endif
 	{
 		printf("Unable to init SDL: %s\n", SDL_GetError());
 		exit(1);
