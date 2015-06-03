@@ -288,7 +288,7 @@ void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &st
 
 	int cwidth;
 	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
-	for(unsigned int i = MAX<int>(0, str.Len()-width);i < str.Len();++i)
+	for(unsigned int i = MAX<int>(0, (int)(str.Len()-width));i < str.Len();++i)
 	{
 		VWB_DrawGraphic(HudFont->GetChar(str[i], &cwidth), x, y, MENU_NONE, remap);
 		x += cwidth;

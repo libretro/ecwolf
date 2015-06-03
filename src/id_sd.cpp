@@ -1345,7 +1345,7 @@ SD_PauseMusic(void)
 	if (music != NULL && Mix_PlayingMusic() == 1)
 	{
 		Mix_PauseMusic();
-		return Mix_GetMusicPCMPosition();
+		return (int)Mix_GetMusicPCMPosition();
 	}
 	return 0;
 }

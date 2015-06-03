@@ -963,7 +963,7 @@ unsigned int SkillInfo::GetNumSkills()
 
 unsigned int SkillInfo::GetSkillIndex(const SkillInfo &skill)
 {
-	return &skill - &skills[0];
+	return (unsigned int)(&skill - &skills[0]);
 }
 
 SkillInfo &SkillInfo::GetSkill(unsigned int index)
