@@ -174,6 +174,10 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 	VH_UpdateScreen();
 
 	screenfaded = end != 0;
+
+	// Clear out any input at this point that may be stored up. This solves
+	// issues such as starting facing the wrong angle in super 3d noah's ark.
+	IN_ProcessEvents();
 }
 
 void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)

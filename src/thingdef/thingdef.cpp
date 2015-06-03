@@ -744,7 +744,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	{
 		if(!stateDefs[iter].label.IsEmpty() && stateDefs[iter].sprite[0] == 0)
 			continue;
-		numStates += (int)stateDefs[iter].frames.Len();
+		numStates += (unsigned int)stateDefs[iter].frames.Len();
 	}
 	frameList.Resize(numStates);
 
