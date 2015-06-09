@@ -504,7 +504,8 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		} steamDirs[] =
 		{
 			{FileSys::APP_Wolfenstein3D, PATH_SEPARATOR "base"},
-			{FileSys::APP_SpearOfDestiny, PATH_SEPARATOR "base"}
+			{FileSys::APP_SpearOfDestiny, PATH_SEPARATOR "base"},
+			{FileSys::APP_NoahsArk, ""}
 		};
 		for(unsigned int i = 0;i < countof(steamDirs);++i)
 			LookForGameData(datawadRes, basefiles, FileSys::GetSteamPath(steamDirs[i].app) + steamDirs[i].dir);

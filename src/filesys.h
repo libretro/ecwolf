@@ -63,6 +63,7 @@ namespace FileSys
 		APP_Wolfenstein3D,
 		APP_SpearOfDestiny,
 		APP_ThrowbackPack,
+		APP_NoahsArk,
 
 		NUM_STEAM_APPS
 	};

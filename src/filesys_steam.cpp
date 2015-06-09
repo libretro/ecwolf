@@ -38,6 +38,8 @@
 #define USE_WINDOWS_BOOLEAN
 #include <windows.h>
 #undef ERROR
+#else
+#include "sys/stat.h"
 #endif
 
 #include "doomerrors.h"
@@ -138,49 +140,46 @@ static bool PSR_FindAndEnterBlock(Scanner &sc, const char* keyword)
 	}
 	return false;
 }
-static void PSR_ReadApps(Scanner &sc)
+
+static TArray<FString> PSR_ReadBaseInstalls(Scanner &sc)
 {
-	// Inside of each app, the only thing we care about is the installdir
-	// If the files we want are inside will be determined later.
+	TArray<FString> result;
+
+	// Get a list of possible install directories.
 	while(sc.TokensLeft())
 	{
 		if(sc.CheckToken('}'))
 			break;
 
 		sc.MustGetToken(TK_StringConst);
-		int appid = atoi(sc->str);
-		if(sc.CheckToken(TK_StringConst))
-			continue;
-
-		sc.MustGetToken('{');
-		while(!sc.CheckToken('}'))
+		FString key(sc->str);
+		if(key.Left(18).CompareNoCase("BaseInstallFolder_") == 0)
 		{
 			sc.MustGetToken(TK_StringConst);
-			bool installdir = sc->str.CompareNoCase("installdir") == 0;
-
+			result.Push(sc->str + "/steamapps/common");
+		}
+		else
+		{
 			if(sc.CheckToken('{'))
 				PSR_FindEndBlock(sc);
 			else
-			{
 				sc.MustGetToken(TK_StringConst);
-				if(installdir && !sc->str.IsEmpty())
-				{
-					SteamAppInstallPath[appid] = sc->str;
-				}
-			}
 		}
 	}
-	sc.Rewind();
+
+	return result;
 }
-static void ParseSteamRegistry(const char* path)
+static TArray<FString> ParseSteamRegistry(const char* path)
 {
+	TArray<FString> dirs;
+
 	char* data;
 	long size;
 
 	// Read registry data
 	FILE* registry = fopen(path, "rb");
 	if(!registry)
-		return;
+		return dirs;
 
 	fseek(registry, 0, SEEK_END);
 	size = ftell(registry);
@@ -192,7 +191,7 @@ static void ParseSteamRegistry(const char* path)
 	Scanner sc(data, size);
 	delete[] data;
 
-	// Find the app listing
+	// Find the SteamApps listing
 	if(PSR_FindAndEnterBlock(sc, "InstallConfigStore"))
 	{
 		if(PSR_FindAndEnterBlock(sc, "Software"))
@@ -201,12 +200,7 @@ static void ParseSteamRegistry(const char* path)
 			{
 				if(PSR_FindAndEnterBlock(sc, "Steam"))
 				{
-					if(PSR_FindAndEnterBlock(sc, "apps"))
-					{
-						PSR_ReadApps(sc);
-						PSR_FindEndBlock(sc);
-					}
-					PSR_FindEndBlock(sc);
+					dirs = PSR_ReadBaseInstalls(sc);
 				}
 				PSR_FindEndBlock(sc);
 			}
@@ -214,6 +208,8 @@ static void ParseSteamRegistry(const char* path)
 		}
 		PSR_FindEndBlock(sc);
 	}
+
+	return dirs;
 }
 #endif
 
@@ -227,7 +223,8 @@ FString GetSteamPath(ESteamApp game)
 	{
 		{"Wolfenstein 3D", 2270},
 		{"Spear of Destiny", 9000},
-		{"The Apogee Throwback Pack", 238050}
+		{"The Apogee Throwback Pack", 238050},
+		{"Super 3-D Noah's Ark", 371180}
 	};
 
 #if defined(_WIN32)
@@ -260,35 +257,53 @@ FString GetSteamPath(ESteamApp game)
 	// To do so, we read the virtual registry.
 	if(SteamAppInstallPath.CountUsed() == 0)
 	{
+		TArray<FString> SteamInstallFolders;
+
 #ifdef __APPLE__
 		FString regPath = OSX_FindFolder(DIR_ApplicationSupport) + "/Steam/config/config.vdf";
 		try
 		{
 			
-			ParseSteamRegistry(regPath);
+			SteamInstallFolders = ParseSteamRegistry(regPath);
 		}
 		catch(class CDoomError &error)
 		{
 			// If we can't parse for some reason just pretend we can't find anything.
 			return FString();
 		}
+
+		SteamInstallFolders.Push(appSupportPath + "/Steam/SteamApps/common");
 #else
 		char* home = getenv("HOME");
 		if(home != NULL && *home != '\0')
 		{
 			FString regPath;
-			regPath.Format("%s/.steam/steam/config/config.vdf", home);
+			regPath.Format("%s/.local/share/Steam/config/config.vdf", home);
 			try
 			{
-				ParseSteamRegistry(regPath);
+				SteamInstallFolders = ParseSteamRegistry(regPath);
 			}
 			catch(class CDoomError &error)
 			{
 				// If we can't parse for some reason just pretend we can't find anything.
 				return FString();
 			}
+
+			regPath.Format("%s/.local/share/Steam/SteamApps/common", home);
+			SteamInstallFolders.Push(regPath);
 		}
 #endif
+
+		for(unsigned int i = 0;i < SteamInstallFolders.Size();++i)
+		{
+			for(unsigned int app = 0;app < countof(AppInfo);++app)
+			{
+				struct stat st;
+				FString candidate(SteamInstallFolders[i] + "/" + AppInfo[app].BasePath);
+				if(stat(candidate, &st) == 0 && S_ISDIR(st.st_mode))
+					SteamAppInstallPath[AppInfo[app].AppID] = candidate;
+			}
+		}
 	}
 	const FString *installPath = SteamAppInstallPath.CheckKey(AppInfo[game].AppID);
 	if(installPath)
