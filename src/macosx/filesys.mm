@@ -37,6 +37,12 @@
 
 #include <Cocoa/Cocoa.h>
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+@interface NSFileManager(FindFolders)
+- (NSURL *)URLForDirectory:(NSSearchPathDirectory)directory inDomain:(NSSearchPathDomainMask)domain appropriateForURL:(NSURL *)url create:(BOOL)create error:(NSError **)error;
+@end
+#endif
+
 namespace FileSys {
 
 // Kind of hacking the ESpecialDirectory, but this function isn't really supposed to be widely used.
@@ -52,15 +58,28 @@ FString OSX_FindFolder(ESpecialDirectory dir)
 		NSDocumentDirectory
 	};
 
-	NSURL *url = [[NSFileManager defaultManager] URLForDirectory:DirToNS[dir] inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
-	if(url == nil)
-		return FString();
+	NSString *path;
+	if([[NSFileManager defaultManager] respondsToSelector:@selector(URLForDirectory:inDomain:appropriateForURL:create:error:)])
+	{
+		NSURL *url = [[NSFileManager defaultManager] URLForDirectory:DirToNS[dir] inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nil];
+		if(url == nil)
+			return FString();
+		path = [url path];
+	}
+	else // OS X 10.4/10.5
+	{
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(DirToNS[dir], NSUserDomainMask, YES);
+		if([paths count] == 0)
+			return FString();
+		path = [paths objectAtIndex:0];
+	}
+
 	if(dir == DIR_Configuration)
 	{
-		NSString *preferences = [[url path] stringByAppendingPathComponent:@"/Preferences"];
+		NSString *preferences = [path stringByAppendingPathComponent:@"/Preferences"];
 		return [preferences UTF8String];
 	}
-	return [[url path] UTF8String];
+	return [path UTF8String];
 }
 
 }

@@ -129,11 +129,13 @@ actor ArkAntelope : WolfensteinMonster 197
 	health 25
 	speed 1, 4
 	sighttime 1, 6
+	dropitem "LargeFeedLauncher"
 	dropitem "Feed", 256, 5
 	attacksound "antelope/attack"
 	deathsound "antelope/death"
 	seesound "antelope/sight"
 	+DONTRIP
+	+DROPBASEDONTARGET
 	states
 	{
 		Spawn:
@@ -291,6 +293,7 @@ actor CarlTheCamel : WolfensteinMonster 200
 	deathsound "carl/death"
 	seesound "carl/sight"
 	+DONTRIP
+	+AMBUSH
 	states
 	{
 		Spawn:
@@ -352,6 +355,7 @@ actor MelvinTheMonkey : WolfensteinMonster 201
 	deathsound "melvin/death"
 	seesound "melvin/sight"
 	+DONTRIP
+	+AMBUSH
 	states
 	{
 		Spawn:
@@ -392,6 +396,7 @@ actor GinnyTheGiraffe : WolfensteinMonster 202
 	deathsound "ginny/death"
 	seesound "ginny/sight"
 	+DONTRIP
+	+AMBUSH
 	states
 	{
 		Spawn:
@@ -430,6 +435,7 @@ actor KerryTheKangaroo : WolfensteinMonster 203
 	deathsound "kerry/death"
 	seesound "kerry/sight"
 	+DONTRIP
+	+AMBUSH
 	states
 	{
 		Spawn:
@@ -470,6 +476,7 @@ actor ErnieTheElephant : WolfensteinMonster 204
 	deathsound "ernie/death"
 	seesound "ernie/sight"
 	+DONTRIP
+	+AMBUSH
 	states
 	{
 		Spawn:
@@ -512,6 +519,7 @@ actor DisguisedBurt : WolfensteinMonster 205
 	deathsound "burt/death"
 	seesound "burt/sight"
 	+DONTRIP
+	+AMBUSH
 	states
 	{
 		Spawn:
@@ -551,6 +559,7 @@ actor BurtTheBear : WolfensteinMonster
 	attacksound "burt/attack"
 	deathsound "burt/death"
 	+DONTRIP
+	+AMBUSH
 	states
 	{
 		Spawn:
