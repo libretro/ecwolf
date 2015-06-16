@@ -954,10 +954,10 @@ void ClassDef::ParseActor(Scanner &sc)
 	{
 		sc.MustGetToken(TK_Identifier);
 		const ClassDef *parent = FindClass(sc->str);
-		if(parent == NULL)
-			sc.ScriptMessage(Scanner::ERROR, "Could not find parent actor '%s'\n", sc->str.GetChars());
+		if(parent == NULL || parent->tentative)
+			sc.ScriptMessage(Scanner::ERROR, "Could not find parent actor '%s'", sc->str.GetChars());
 		if(newClass->tentative && !parent->IsDescendantOf(newClass->parent))
-			sc.ScriptMessage(Scanner::ERROR, "Parent for actor expected to be '%s'\n", newClass->parent->GetName().GetChars());
+			sc.ScriptMessage(Scanner::ERROR, "Parent for actor expected to be '%s'", newClass->parent->GetName().GetChars());
 		newClass->parent = parent;
 	}
 	else
