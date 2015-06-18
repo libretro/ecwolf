@@ -193,6 +193,13 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 }
 MENU_LISTENER(StartNewGame)
 {
+	const SkillInfo &si = SkillInfo::GetSkill(which);
+	if(si.MustConfirm.IsNotEmpty())
+	{
+		if(!Confirm(si.MustConfirm))
+			return false;
+	}
+
 	if(episode == NULL)
 		episode = &EpisodeInfo::GetEpisode(0);
 	if(playerClass == NULL)

@@ -374,6 +374,11 @@ void AActor::Init()
 	}
 }
 
+bool AActor::IsFast() const
+{
+	return (flags & FL_ALWAYSFAST) || gamestate.difficulty->FastMonsters;
+}
+
 void AActor::Serialize(FArchive &arc)
 {
 	bool hasActorRef = actors.IsLinked(this);
