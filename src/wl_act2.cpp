@@ -503,8 +503,9 @@ ACTION_FUNCTION(A_Chase)
 		if(!inMeleeRange && missile)
 		{
 			dodge = false;
-			if (((self->flags & FL_ALWAYSFAST) || self->movecount == 0) && CheckLine(self)) // got a shot at players[0].mo?
+			if ((self->IsFast() || self->movecount == 0) && CheckLine(self)) // got a shot at players[0].mo?
 			{
+				Printf("%d\n", self->movecount);
 				self->hidden = false;
 				dx = abs(self->tilex + dirdeltax[self->dir] - players[0].mo->tilex);
 				dy = abs(self->tiley + dirdeltay[self->dir] - players[0].mo->tiley);

@@ -255,10 +255,12 @@ public:
 
 	FString Name;
 	FString SkillPicture;
+	FString MustConfirm;
 	fixed DamageFactor;
 	fixed PlayerDamageFactor;
 	unsigned int SpawnFilter;
 	unsigned int MapFilter;
+	bool FastMonsters;
 	bool QuizHints;
 
 	static unsigned int GetNumSkills();

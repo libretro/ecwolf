@@ -157,7 +157,7 @@ ENDSTR18 = "Sure. Fine. Quit.\nSee if we care.\nGet it over with.\nPress Y.";
 // Super 3D Noah's Ark
 NOAH_ENDSTR01 = "Are you sure you're\nready to quit?\nPress Y to Quit.";
 NOAH_ENDSTR02 = "What? Quitting already?\nPress Y to Quit.";
-NOAH_ENDSTR03 = "Are a few hungry animals\ntoo touch for you?\nPress Y to Quit.";
+NOAH_ENDSTR03 = "Are a few hungry animals\ntoo tough for you?\nPress Y to Quit.";
 NOAH_ENDSTR04 = "Giving up so soon?\nPress Y to Quit.";
 NOAH_ENDSTR05 = "Be sure to take your\numbrella, it's wet out there.\nPress Y to Quit.";
 NOAH_ENDSTR06 = "You're going to let\nthose animals run free?\nPress Y to Quit.";

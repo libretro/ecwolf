@@ -105,6 +105,7 @@ class AActor : public Thinker,
 		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
 		bool			GiveInventory(const ClassDef *cls, int amount=0, bool allowreplacement=true);
+		bool			IsFast() const;
 		virtual void	PostBeginPlay() {}
 		void			RemoveFromWorld();
 		virtual void	RemoveInventory(AInventory *item);

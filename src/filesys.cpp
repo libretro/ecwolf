@@ -386,23 +386,54 @@ void File::init(const FString &filename)
 	writable = false;
 
 #ifdef _WIN32
-	DWORD fAttributes = GetFileAttributes(filename);
-	if(fAttributes != INVALID_FILE_ATTRIBUTES)
+	if(FileSys::IsWinNT)
 	{
-		existing = true;
-		if(fAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		wchar_t wname[MAX_PATH];
+		FileSys::ConvertName(filename, wname);
+		DWORD fAttributes = GetFileAttributesW(wname);
+		if(fAttributes != INVALID_FILE_ATTRIBUTES)
 		{
-			directory = true;
-			WIN32_FIND_DATA fdata;
-			HANDLE hnd = INVALID_HANDLE_VALUE;
-			hnd = FindFirstFile((filename + "\\*").GetChars(), &fdata);
-			if(hnd != INVALID_HANDLE_VALUE)
+			existing = true;
+			if(fAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				do
+				directory = true;
+				WIN32_FIND_DATAW fdata;
+				HANDLE hnd = INVALID_HANDLE_VALUE;
+				FileSys::ConvertName(filename + "\\*", wname);
+				hnd = FindFirstFileW(wname, &fdata);
+				if(hnd != INVALID_HANDLE_VALUE)
 				{
-					files.Push(fdata.cFileName);
+					do
+					{
+						char fname[MAX_PATH];
+						FileSys::ConvertName(fdata.cFileName, fname);
+						files.Push(fname);
+					}
+					while(FindNextFileW(hnd, &fdata) != 0);
 				}
-				while(FindNextFile(hnd, &fdata) != 0);
+			}
+		}
+	}
+	else
+	{
+		DWORD fAttributes = GetFileAttributesA(filename);
+		if(fAttributes != INVALID_FILE_ATTRIBUTES)
+		{
+			existing = true;
+			if(fAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				directory = true;
+				WIN32_FIND_DATA fdata;
+				HANDLE hnd = INVALID_HANDLE_VALUE;
+				hnd = FindFirstFileA((filename + "\\*").GetChars(), &fdata);
+				if(hnd != INVALID_HANDLE_VALUE)
+				{
+					do
+					{
+						files.Push(fdata.cFileName);
+					}
+					while(FindNextFileA(hnd, &fdata) != 0);
+				}
 			}
 		}
 	}

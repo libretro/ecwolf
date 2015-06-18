@@ -952,7 +952,7 @@ static TArray<SkillInfo> skills;
 static TMap<FName, unsigned int> skillIds;
 
 SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), PlayerDamageFactor(FRACUNIT),
-	SpawnFilter(0), MapFilter(0), QuizHints(false)
+	SpawnFilter(0), MapFilter(0), FastMonsters(false), QuizHints(false)
 {
 }
 
@@ -1000,6 +1000,8 @@ protected:
 	{
 		if(key.CompareNoCase("damagefactor") == 0)
 			ParseFixedAssignment(skill->DamageFactor);
+		else if(key.CompareNoCase("fastmonsters") == 0)
+			skill->FastMonsters = true;
 		else if(key.CompareNoCase("name") == 0)
 		{
 			ParseStringAssignment(skill->Name);
@@ -1017,6 +1019,12 @@ protected:
 		}
 		else if(key.CompareNoCase("mapfilter") == 0)
 			ParseIntAssignment(skill->MapFilter);
+		else if(key.CompareNoCase("mustconfirm") == 0)
+		{
+			ParseStringAssignment(skill->MustConfirm);
+			if(skill->MustConfirm[0] == '$')
+				skill->MustConfirm = language[skill->MustConfirm.Mid(1)];
+		}
 		else if(key.CompareNoCase("quizhints") == 0)
 			ParseBoolAssignment(skill->QuizHints);
 		else
