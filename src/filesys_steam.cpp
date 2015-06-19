@@ -260,7 +260,8 @@ FString GetSteamPath(ESteamApp game)
 		TArray<FString> SteamInstallFolders;
 
 #ifdef __APPLE__
-		FString regPath = OSX_FindFolder(DIR_ApplicationSupport) + "/Steam/config/config.vdf";
+		FString appSupportPath = OSX_FindFolder(DIR_ApplicationSupport);
+		FString regPath = appSupportPath + "/Steam/config/config.vdf";
 		try
 		{
 			
