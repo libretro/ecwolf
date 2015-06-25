@@ -11,5 +11,6 @@
 
 int DebugKeys (void);
 void DebugMLI();
+void DebugGod(bool noah);
 
 #endif

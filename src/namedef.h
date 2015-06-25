@@ -98,3 +98,7 @@ xx(NextPage)
 xx(CloseDialog)
 xx(Cost)
 xx(Hint) // Noah extension
+
+// Game filters
+xx(Wolf3D)
+xx(Noah)

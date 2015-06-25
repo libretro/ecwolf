@@ -25,6 +25,7 @@
 #include "g_mapinfo.h"
 #include "a_inventory.h"
 #include "am_map.h"
+#include "wl_iwad.h"
 
 /*
 =============================================================================
@@ -593,11 +594,52 @@ void CheckKeys (void)
 	else if(!Keyboard[sc_Equals] && !Keyboard[sc_Minus])
 		changeSize = true;
 
-	//
-	// SECRET CHEAT CODE: 'MLI'
-	//
-	if (Keyboard[sc_M] && Keyboard[sc_L] && Keyboard[sc_I])
-		DebugMLI();
+	if(IWad::CheckGameFilter(NAME_Wolf3D))
+	{
+		//
+		// SECRET CHEAT CODE: TAB-G-F10
+		//
+		if (Keyboard[sc_Tab] && Keyboard[sc_G] && Keyboard[sc_F10])
+		{
+			DebugGod(false);
+			return;
+		}
+
+		//
+		// SECRET CHEAT CODE: 'MLI'
+		//
+		if (Keyboard[sc_M] && Keyboard[sc_L] && Keyboard[sc_I])
+			DebugMLI();
+
+		//
+		// TRYING THE KEEN CHEAT CODE!
+		//
+		if (Keyboard[sc_B] && Keyboard[sc_A] && Keyboard[sc_T])
+		{
+			ClearMemory ();
+			ClearSplitVWB ();
+
+			Message ("Commander Keen is also\n"
+					"available from Apogee, but\n"
+					"then, you already know\n" "that - right, Cheatmeister?!");
+
+			IN_ClearKeysDown ();
+			IN_Ack ();
+
+			if (viewsize < 18)
+				StatusBar->RefreshBackground ();
+		}
+	}
+	else if(IWad::CheckGameFilter(NAME_Noah))
+	{
+		//
+		// Secret cheat code: JIM
+		//
+		if (Keyboard[sc_J] && Keyboard[sc_I] && Keyboard[sc_M])
+		{
+			DebugGod(true);
+		}
+	}
 
 	//
 	// OPEN UP DEBUG KEYS
@@ -613,25 +655,6 @@ void CheckKeys (void)
 
 		DrawPlayBorderSides ();
 		DebugOk = 1;
-	}
-
-	//
-	// TRYING THE KEEN CHEAT CODE!
-	//
-	if (Keyboard[sc_B] && Keyboard[sc_A] && Keyboard[sc_T])
-	{
-		ClearMemory ();
-		ClearSplitVWB ();
-
-		Message ("Commander Keen is also\n"
-				"available from Apogee, but\n"
-				"then, you already know\n" "that - right, Cheatmeister?!");
-
-		IN_ClearKeysDown ();
-		IN_Ack ();
-
-		if (viewsize < 18)
-			StatusBar->RefreshBackground ();
 	}
 
 //
