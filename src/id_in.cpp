@@ -28,7 +28,7 @@
 #include "wl_play.h"
 
 
-#if !SDL_VERSION_ATLEAST(2,0,0)
+#if !SDL_VERSION_ATLEAST(1,3,0)
 #define SDLK_KP_0 SDLK_KP0
 #define SDLK_KP_1 SDLK_KP1
 #define SDLK_KP_2 SDLK_KP2
@@ -326,7 +326,7 @@ static void processEvent(SDL_Event *event)
 			Quit(NULL);
 
 		// ASCII (Unicode) text entry for saves and stuff like that.
-#if SDL_VERSION_ATLEAST(2,0,0)
+#if SDL_VERSION_ATLEAST(1,3,0)
 		case SDL_TEXTINPUT:
 		{
 			LastASCII = event->text.text[0];
@@ -344,7 +344,7 @@ static void processEvent(SDL_Event *event)
 				return;
 			}
 
-#if SDL_VERSION_ATLEAST(2,0,0)
+#if SDL_VERSION_ATLEAST(1,3,0)
 			LastScan = event->key.keysym.scancode;
 #else
 			LastScan = event->key.keysym.sym;
@@ -374,7 +374,7 @@ static void processEvent(SDL_Event *event)
 				}
 			}
 
-#if !SDL_VERSION_ATLEAST(2,0,0)
+#if !SDL_VERSION_ATLEAST(1,3,0)
 			static const byte ASCIINames[] = // Unshifted ASCII for scan codes       // TODO: keypad
 			{
 			//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
@@ -427,7 +427,7 @@ static void processEvent(SDL_Event *event)
 
 		case SDL_KEYUP:
 		{
-#if SDL_VERSION_ATLEAST(2,0,0)
+#if SDL_VERSION_ATLEAST(1,3,0)
 			int key = event->key.keysym.scancode;
 #else
 			int key = event->key.keysym.sym;
@@ -463,7 +463,7 @@ static void processEvent(SDL_Event *event)
 			break;
 		}
 
-#if !SDL_VERSION_ATLEAST(2,0,0)	
+#if !SDL_VERSION_ATLEAST(1,3,0)
 		case SDL_ACTIVEEVENT:
 		{
 			if (!fullscreen && forcegrabmouse && (event->active.state & SDL_APPINPUTFOCUS || event->active.state & SDL_APPACTIVE))

@@ -12,7 +12,7 @@
 #define	__DEBUG_InputMgr__
 #endif
 
-#if !SDL_VERSION_ATLEAST(2,0,0)
+#if !SDL_VERSION_ATLEAST(1,3,0)
 #define SDLK_A SDLK_a
 #define SDLK_B SDLK_b
 #define SDLK_C SDLK_c
