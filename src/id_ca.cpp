@@ -52,6 +52,7 @@ GameMap *map = NULL;
 
 void CA_CacheMap (const FString &mapname, bool loading)
 {
+	thinkerList->DestroyAll();
 	delete map;
 
 	Printf("\n");
