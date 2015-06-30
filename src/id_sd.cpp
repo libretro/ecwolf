@@ -562,6 +562,11 @@ static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
 	size_t copysize = MIN<size_t>(totalsize, ssize-(pos-sizeof(WAV_HEADER)-4));
 	memcpy(buffer, ((MacSoundData*)ops->hidden.unknown.data1)->data+pos-sizeof(WAV_HEADER)-4, copysize);
 
+	// Mac sound data is signed, we need unsigned
+	unsigned char* pcm = (unsigned char*)buffer;
+	for(size_t i = copysize;i-- > 0;)
+		*pcm++ += 0x80;
+
 	return (int)(copysize/size);
 }
 static int MacSound_Close(SDL_RWops *ops)

@@ -191,6 +191,12 @@ struct FMacResLump : FResourceLump
 			{
 				FileReaderLZSS<1> lzss(*Owner->Reader);
 				lzss.Read(Cache, LumpSize);
+
+				// Delta filter
+				// By the way the Mac Wolf sound engine seems to be an older
+				// version of http://minibae.org/
+				for(int i = 1;i < LumpSize;++i)
+					((unsigned char*)Cache)[i] += ((unsigned char*)Cache)[i-1];
 				break;
 			}
 			case MODE_Uncompressed:
