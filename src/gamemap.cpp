@@ -37,7 +37,6 @@
 #include "farchive.h"
 #include "gamemap.h"
 #include "tarray.h"
-#include "thinker.h"
 #include "w_wad.h"
 #include "wl_def.h"
 #include "lnspec.h"
@@ -186,8 +185,6 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 
 GameMap::~GameMap()
 {
-	thinkerList->DestroyAll();
-
 	delete lumps[0];
 	if(isWad)
 		delete file;

@@ -551,7 +551,7 @@ int DebugKeys (void)
 	return 0;
 }
 
-void DebugMLI()
+static void GiveMLI()
 {
 	players[0].health = 100;
 	players[0].score = 0;
@@ -559,6 +559,11 @@ void DebugMLI()
 	GiveAllWeaponsAndAmmo();
 	P_GiveKeys(players[0].mo, 101);
 	DrawPlayScreen();
+}
+
+void DebugMLI()
+{
+	GiveMLI();
 
 	ClearMemory ();
 	ClearSplitVWB ();
@@ -569,4 +574,49 @@ void DebugMLI()
 	IN_Ack ();
 
 	DrawPlayScreen();
+}
+
+void DebugGod(bool noah)
+{
+	WindowH = 160;
+
+	if (noah)
+	{
+		if (godmode)
+		{
+			Message ("Invulnerability OFF");
+			SD_PlaySound ("misc/no_bonus");
+		}
+		else
+		{
+			Message ("Invulnerability ON");
+			SD_PlaySound ("misc/1up");
+		}
+	}
+	else
+	{
+		if (godmode)
+		{
+			Message ("God mode OFF");
+			SD_PlaySound ("misc/no_bonus");
+		}
+		else
+		{
+			Message ("God mode ON");
+			SD_PlaySound ("misc/end_bonus2");
+		}
+	}
+
+	godmode ^= 1;
+
+	IN_ClearKeysDown ();
+	IN_Ack ();
+
+	if (noah)
+	{
+		GiveMLI();
+	}
+
+	if (viewsize < 18)
+		StatusBar->RefreshBackground ();
 }

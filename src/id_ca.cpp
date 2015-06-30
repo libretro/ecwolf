@@ -54,6 +54,7 @@ GameMap *map = NULL;
 void CA_CacheMap (const FString &mapname, bool loading)
 {
 	static TUniquePtr<GameMap> map;
+	thinkerList->DestroyAll();
 	map.Reset();
 
 	Printf("\n");
