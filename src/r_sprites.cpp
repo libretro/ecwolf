@@ -357,7 +357,7 @@ void R_LoadSprite(const FString &name)
 ////////////////////////////////////////////////////////////////////////////////
 
 // From wl_draw.cpp
-int CalcRotate(AActor *ob);
+unsigned int CalcRotate(AActor *ob);
 extern byte* vbuf;
 extern unsigned vbufPitch;
 extern fixed viewshift;
@@ -365,6 +365,19 @@ extern fixed viewz;
 
 void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
 {
+	// height is a 13.3 fixed point number indicating the number of screen
+	// pixels that the sprite should occupy.
+	if(height < 8)
+		return;
+
+	// Check if we're rendering completely off screen.
+	// Simpler form:
+	// topoffset = ( viewheight/2 - viewshift - ((height>>3)*(viewz-(32<<FRACBITS))/(32<<FRACBITS)) )<<3;
+	const int topoffset = (viewheight<<2) - (viewshift<<3) -
+	                      ((height*(viewz-(32<<FRACBITS)))>>15);
+	if(-topoffset >= (signed)height)
+		return;
+
 	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
 		return;
 
@@ -375,31 +388,26 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		tex = TexMan[spr.texture[0]];
 	else
 	{
-		int rot = (CalcRotate(actor)+4)%8;
+		const unsigned int rot = CalcRotate(actor);
 		tex = TexMan[spr.texture[rot]];
 		flip = (spr.mirror>>rot)&1;
 	}
 	if(tex == NULL)
 		return;
 
-	const int scale = height>>3; // Integer part of the height
-	const int topoffset = (scale*(viewz-(32<<FRACBITS))/(32<<FRACBITS));
-	if(scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
-		return;
+	const double dyScale = (height/256.0)*FIXED2FLOAT(actor->scaleY);
+	const int upperedge = topoffset + height - static_cast<int>(tex->GetScaledTopOffsetDouble()*dyScale*8);
 
-	const double dyScale = (height/256.0)*(actor->scaleY/65536.);
-	const int upperedge = static_cast<int>((viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale);
-
-	const double dxScale = (height/256.0)*(FixedDiv(actor->scaleX, yaspect)/65536.);
+	const double dxScale = (height/256.0)*FIXED2FLOAT(FixedDiv(actor->scaleX, yaspect));
 	const int actx = static_cast<int>(xcenter - tex->GetScaledLeftOffsetDouble()*dxScale);
 
 	const unsigned int texWidth = tex->GetWidth();
 	const unsigned int startX = -MIN(actx, 0);
-	const unsigned int startY = -MIN(upperedge, 0);
+	const unsigned int startY = -MIN(upperedge>>3, 0);
 	const fixed xStep = static_cast<fixed>(tex->xScale/dxScale);
 	const fixed yStep = static_cast<fixed>(tex->yScale/dyScale);
 	const fixed xRun = MIN<fixed>(texWidth<<FRACBITS, xStep*(viewwidth-actx));
-	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
+	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, (yStep*((viewheight<<3)-upperedge))>>3);
 
 	const BYTE *colormap;
 	if((actor->flags & FL_BRIGHT) || frame->fullbright)
@@ -411,7 +419,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 	}
 	const BYTE *src;
-	byte *destBase = vbuf + actx + startX + (upperedge > 0 ? vbufPitch*upperedge : 0);
+	byte *destBase = vbuf + actx + startX + ((upperedge>>3) > 0 ? vbufPitch*(upperedge>>3) : 0);
 	byte *dest = destBase;
 	unsigned int i;
 	fixed x, y;

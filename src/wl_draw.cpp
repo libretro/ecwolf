@@ -98,7 +98,7 @@ int gLevelLight = LIGHTLEVEL_DEFAULT;
 void    TransformActor (AActor *ob);
 void    BuildTables (void);
 void    ClearScreen (void);
-int     CalcRotate (AActor *ob);
+unsigned int CalcRotate (AActor *ob);
 void    DrawScaleds (void);
 void    CalcTics (void);
 void    ThreeDRefresh (void);
@@ -213,7 +213,7 @@ void TransformActor (AActor *ob)
 //
 // calculate height (heightnumerator/(nx>>8))
 //
-	ob->viewheight = (word)(heightnumerator/(nx>>8));
+	ob->viewheight = (word)((heightnumerator<<8)/nx);
 }
 
 //==========================================================================
@@ -533,7 +533,7 @@ void HitHorizWall (void)
 =====================
 */
 
-int CalcRotate (AActor *ob)
+unsigned int CalcRotate (AActor *ob)
 {
 	angle_t angle, viewangle;
 
@@ -544,7 +544,7 @@ int CalcRotate (AActor *ob)
 
 	angle = viewangle - ob->angle;
 
-	angle+=ANGLE_45/2;
+	angle+= ANGLE_180 + ANGLE_45/2;
 
 	return angle/ANGLE_45;
 }
