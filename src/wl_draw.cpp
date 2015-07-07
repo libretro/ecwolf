@@ -233,7 +233,7 @@ int CalcHeight()
 	fixed z = FixedMul(xintercept - viewx, viewcos)
 		- FixedMul(yintercept - viewy, viewsin);
 	if(z < MINDIST) z = MINDIST;
-	int height = heightnumerator / (z >> 8);
+	int height = (heightnumerator << 8) / z;
 	if(height < min_wallheight) min_wallheight = height;
 	return height;
 }
@@ -391,13 +391,6 @@ void HitVertWall (void)
 	{
 		texture -= texture%texxscale;
 
-		if((pixx&3) && texture == lasttexture)
-		{
-			ScalePost();
-			postx = pixx;
-			wallheight[pixx] = wallheight[pixx-1];
-			return;
-		}
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		if(postsource)
@@ -472,13 +465,6 @@ void HitHorizWall (void)
 	{
 		texture -= texture%texxscale;
 
-		if((pixx&3) && texture == lasttexture)
-		{
-			ScalePost();
-			postx=pixx;
-			wallheight[pixx] = wallheight[pixx-1];
-			return;
-		}
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		if(postsource)
