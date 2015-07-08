@@ -372,9 +372,9 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 
 	// Check if we're rendering completely off screen.
 	// Simpler form:
-	// topoffset = ( viewheight/2 - viewshift - ((height>>3)*(viewz-(32<<FRACBITS))/(32<<FRACBITS)) )<<3;
+	// topoffset = ( viewheight/2 - viewshift - (signed(height>>3)*(viewz-(32<<FRACBITS))/(32<<FRACBITS)) )<<3;
 	const int topoffset = (viewheight<<2) - (viewshift<<3) -
-	                      ((height*(viewz-(32<<FRACBITS)))>>15);
+	                      FixedMul(height, (viewz-(32<<FRACBITS))>>5);
 	if(-topoffset >= (signed)height)
 		return;
 
