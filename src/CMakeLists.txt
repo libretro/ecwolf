@@ -207,6 +207,7 @@ set(SOURCE_FILES
 	textures/machudtexture.cpp
 	textures/multipatchtexture.cpp
 	textures/patchtexture.cpp
+	textures/picttexture.cpp
 	textures/pcxtexture.cpp
 	textures/pngtexture.cpp
 	textures/rawpagetexture.cpp

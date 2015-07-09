@@ -30,6 +30,14 @@ static inline DWORD ReadLittleLong(const BYTE * const ptr)
 		(DWORD(BYTE(*(ptr+3)))<<24);
 }
 
+static inline DWORD ReadBigLong(const BYTE * const ptr)
+{
+	return (DWORD(BYTE(*ptr))<<24) |
+		(DWORD(BYTE(*(ptr+1)))<<16) |
+		(DWORD(BYTE(*(ptr+2)))<<8) |
+		DWORD(BYTE(*(ptr+3)));
+}
+
 static inline void WriteLittleShort(BYTE * const ptr, WORD value)
 {
 	ptr[0] = value&0xFF;

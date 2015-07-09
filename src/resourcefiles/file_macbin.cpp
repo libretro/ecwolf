@@ -409,10 +409,9 @@ class FMacBin : public FResourceFile
 				"ALRT", "BNDL", "cicn", "DITL", "DLOG",
 				"FREF", "hfdr", "icl4", "icl8", "ICN#",
 				"ics#", "ics4", "ics8", "MBAR", "MDRV",
-				"mstr", "MENU", "PICT", "STR#", "TEXT",
-				"vers", "WDEF", "hmnu", "SMOD", "CODE",
-				"XREF", "DATA", "SIZE", "cfrg", "proc",
-				"prox",
+				"mstr", "MENU", "STR#", "TEXT", "vers",
+				"WDEF", "hmnu", "SMOD", "CODE", "XREF",
+				"DATA", "SIZE", "cfrg", "proc", "prox",
 				// Maybe these are relevant?
 				"INST", "WOLF", "SONG",
 				NULL
@@ -541,6 +540,7 @@ class FMacBin : public FResourceFile
 					const bool csnd = strncmp(type, "csnd", 4) == 0;
 					const bool isSnd = csnd || strncmp(type, "snd ", 4) == 0;
 					const bool music = strncmp(type, "Midi", 4) == 0;
+					const bool pict = strncmp(type, "PICT", 4) == 0;
 					const bool brgr = BRGRref == i;
 
 					for(unsigned int j = 0;j < resTypes[i].numResources;++j, ++refPtr, ++lump)
@@ -560,6 +560,12 @@ class FMacBin : public FResourceFile
 						{
 							lump->Namespace = ns_music;
 							sprintf(name, "MUS_%04X", refPtr->ref.resID);
+						}
+						else if(pict)
+						{
+							lump->Namespace = ns_graphics;
+							// TODO: Do something else with these
+							sprintf(name, "PICT%04X", refPtr->ref.resID);
 						}
 						else
 						{
