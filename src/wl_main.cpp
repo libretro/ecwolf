@@ -1060,6 +1060,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			// The config code will handle this itself, so ignore it here.
 			++i;
 		}
+		else IFARG("--console") {} // Windows always create console parameter
 		else IFARG("--savedir")
 		{
 			if(++i < argc)
@@ -1080,6 +1081,9 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			"Usage: " BINNAME " [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
+#ifdef _WIN32
+			" --console              Display a console window\n"
+#endif
 			" --config <file>        Use an explicit location for the config file\n"
 			" --savedir <dir>        Use an explicit location for save games\n"
 			" --file <file>          Loads an extra data file\n"
