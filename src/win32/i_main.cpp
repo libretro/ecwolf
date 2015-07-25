@@ -51,7 +51,7 @@ HWND			ConWindow;
 HANDLE			MainThread;
 DWORD			MainThreadID;
 
-static bool AttachedStdOut = false, FancyStdOut = false;
+static bool AttachedStdOut = false, MustAllocConsole = false, FancyStdOut = false;
 
 extern EXCEPTION_POINTERS CrashPointers;
 void CreateCrashLog (char *custominfo, DWORD customsize, HWND richedit);
@@ -276,6 +276,17 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE nothing, LPSTR cmdline, int n
 	}
 #endif
 
+	// Check for parameter to always show console window.
+	bool showconsole = false;
+	for (int i = 1;i < __argc;++i)
+	{
+		if (stricmp (__argv[i], "--console") == 0)
+		{
+			showconsole = true;
+			break;
+		}
+	}
+
 	// As a GUI application, we don't normally get a console when we start.
 	// If we were run from the shell and are on XP+, we can attach to its
 	// console. Otherwise, we can create a new one. If we already have a
@@ -308,9 +319,15 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE nothing, LPSTR cmdline, int n
 			DWORD foo; WriteFile(StdOut, "\n", 1, &foo, NULL);
 			AttachedStdOut = true;
 		}
-		if (StdOut == NULL && AllocConsole())
+		if (StdOut == NULL)
 		{
-			StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+			if (showconsole)
+			{
+				if (AllocConsole())
+					StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+			}
+			else // Defer console allocation to error
+				MustAllocConsole = true;
 		}
 
 		// Reopen output so that printf shows up in the console.
@@ -320,6 +337,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE nothing, LPSTR cmdline, int n
 			freopen("CONOUT$", "w", stderr);
 			freopen("CONIN$", "r", stdin);
 		}
+
 		FancyStdOut = true;
 	}
 
@@ -332,6 +350,22 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE nothing, LPSTR cmdline, int n
 
 void I_AcknowledgeError()
 {
+	// If we don't have a console window, we need to open one and tell the user
+	// that we have more information, but they need to open the program in a
+	// different way to see that information.
+	if (MustAllocConsole)
+	{
+		MustAllocConsole = false;
+		if (AllocConsole())
+		{
+			freopen("CONOUT$", "w", stdout);
+			freopen("CONOUT$", "w", stderr);
+			freopen("CONIN$", "r", stdin);
+
+			printf("Please use --console or start from command prompt to see error messages.\n\n");
+		}
+	}
+
 	// When running from Windows explorer, wait for user dismissal
 	if (FancyStdOut && !AttachedStdOut)
 	{
