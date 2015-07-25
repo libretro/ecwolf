@@ -350,10 +350,6 @@ void DoJukebox(void)
 ==========================
 */
 
-#ifdef _WIN32
-void SetupWM();
-#endif
-
 static void CollectGC()
 {
 	GC::FullGC();
@@ -428,12 +424,6 @@ static void InitGame()
 	VL_SetVGAPlaneMode (true);
 	DrawStartupConsole();
 
-#if !SDL_VERSION_ATLEAST(2,0,0)
-#if defined _WIN32
-	if(!fullscreen)
-		SetupWM();
-#endif
-#endif
 	VW_UpdateScreen();
 
 //
@@ -1205,39 +1195,12 @@ void CallTerminateFunctions()
 		TermFuncs[--NumTerms]();
 }
 
-#ifndef NO_GTK
-#include <gtk/gtk.h>
-bool GtkAvailable;
-#endif
-#if defined(main) && !defined(__APPLE__)
-#undef main
-#endif
 #ifdef _WIN32
-bool CheckIsRunningFromCommandPrompt();
-void StartupWin32();
+void I_AcknowledgeError();
 #endif
-#ifdef __ANDROID__
-extern "C" int main_android (int argc, char *argv[])
-#else
-int main (int argc, char *argv[])
-#endif
+
+int WL_Main (int argc, char *argv[])
 {
-#ifndef _WIN32
-	// Set LC_NUMERIC environment variable in case some library decides to
-	// clear the setlocale call at least this will be correct.
-	// Note that the LANG environment variable is overridden by LC_*
-	setenv ("LC_NUMERIC", "C", 1);
-#endif
-
-#ifndef NO_GTK
-	GtkAvailable = gtk_init_check(&argc, &argv);
-#endif
-
-#ifdef _WIN32
-	StartupWin32();
-	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
-#endif
-
 	// Stop the C library from screwing around with its functions according
 	// to the system locale.
 	setlocale(LC_ALL, "C");
@@ -1300,16 +1263,40 @@ int main (int argc, char *argv[])
 #endif
 
 #ifdef _WIN32
-		// When running from Windows explorer, wait for user dismissal
-		if(waitForConsoleInput)
-		{
-			fprintf(stderr, "An error has occured (press enter to dismiss)");
-			fseek(stdin, 0, SEEK_END);
-			getchar();
-		}
+		I_AcknowledgeError();
 #endif
 
 		exit(-1);
 	}
 	return 1;
 }
+
+// TODO: Move this to a system dependent file?
+#if defined(main) && !defined(__APPLE__)
+#undef main
+#endif
+
+#ifndef NO_GTK
+#include <gtk/gtk.h>
+bool GtkAvailable;
+#endif
+
+#ifndef _WIN32
+#ifdef __ANDROID__
+extern "C" int main_android(int argc, char *argv[])
+#else
+int main(int argc, char *argv[])
+#endif
+{
+	// Set LC_NUMERIC environment variable in case some library decides to
+	// clear the setlocale call at least this will be correct.
+	// Note that the LANG environment variable is overridden by LC_*
+	setenv("LC_NUMERIC", "C", 1);
+
+#ifndef NO_GTK
+	GtkAvailable = gtk_init_check(&argc, &argv);
+#endif
+
+	return WL_Main(argc, argv);
+}
+#endif
