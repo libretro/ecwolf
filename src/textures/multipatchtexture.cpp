@@ -49,6 +49,7 @@
 #include "v_video.h"
 #include "textures.h"
 #include "r_data/colormaps.h"
+#include <malloc.h>
 
 // On the Alpha, accessing the shorts directly if they aren't aligned on a
 // 4-byte boundary causes unaligned access warnings. Why it does this at
@@ -441,7 +442,7 @@ BYTE *GetBlendMap(PalEntry blend, BYTE *blendwork)
 		{
 			return DesaturateColormap[blend - BLEND_DESATURATE1];
 		}
-		else 
+		else
 		{
 			blendwork[0]=0;
 			if (blend.a == 255)
@@ -503,7 +504,7 @@ void FMultiPatchTexture::MakeTexture ()
 		for (int i = 0; i < NumParts; ++i)
 		{
 			if (Parts[i].Texture->bHasCanvas) continue;	// cannot use camera textures as patch.
-		
+
 			BYTE *trans = Parts[i].Translation ? Parts[i].Translation->Remap : NULL;
 			{
 				if (Parts[i].Blend != 0)
@@ -641,8 +642,8 @@ int FMultiPatchTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rota
 //
 //==========================================================================
 
-FTextureFormat FMultiPatchTexture::GetFormat() 
-{ 
+FTextureFormat FMultiPatchTexture::GetFormat()
+{
 	if (bComplex) return TEX_RGB;
 	if (NumParts == 1) return Parts[0].Texture->GetFormat();
 	return UseBasePalette() ? TEX_Pal : TEX_RGB;
@@ -658,8 +659,8 @@ FTextureFormat FMultiPatchTexture::GetFormat()
 //
 //===========================================================================
 
-bool FMultiPatchTexture::UseBasePalette() 
-{ 
+bool FMultiPatchTexture::UseBasePalette()
+{
 	if (bComplex) return false;
 	for(int i=0;i<NumParts;i++)
 	{
@@ -988,7 +989,7 @@ void FTextureManager::AddTexturesLumps (int lump1, int lump2, int patcheslump)
 
 //==========================================================================
 //
-// 
+//
 //
 //==========================================================================
 
@@ -1256,7 +1257,7 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 	sc.MustGetToken(TK_IntConst);
 	Height = sc->number;
 	UseType = usetype;
-	
+
 	if (sc.CheckToken('{'))
 	{
 		while (!sc.CheckToken('}'))
@@ -1331,14 +1332,14 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 			if (Parts->OriginX == 0 && Parts->OriginY == 0 &&
 				Parts->Texture->GetWidth() == Width &&
 				Parts->Texture->GetHeight() == Height &&
-				Parts->Rotate == 0 && 
+				Parts->Rotate == 0 &&
 				!bComplex)
 			{
 				bRedirect = true;
 			}
 		}
 	}
-	
+
 	if (Width <= 0 || Height <= 0)
 	{
 		UseType = FTexture::TEX_Null;

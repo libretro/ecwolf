@@ -245,11 +245,14 @@ void ControlMovement (AActor *ob)
 
 void GiveExtraMan (int amount)
 {
-	players[0].lives += amount;
-	if (players[0].lives < 0)
-		players[0].lives = 0;
-	else if(players[0].lives > 9)
-		players[0].lives = 9;
+    if (gamestate.difficulty->LivesCount >= 0)
+    {
+        players[0].lives += amount;
+        if (players[0].lives < 0)
+            players[0].lives = 0;
+        else if(players[0].lives > 9)
+            players[0].lives = 9;
+    }
 	SD_PlaySound ("misc/1up");
 }
 
@@ -263,7 +266,7 @@ void GiveExtraMan (int amount)
 
 void GivePoints (int32_t points)
 {
-	players[0].score += points;
+	players[0].score += FixedMul(points, gamestate.difficulty->ScoreMultiplier);
 	while (players[0].score >= players[0].nextextra)
 	{
 		players[0].nextextra += EXTRAPOINTS;
@@ -678,22 +681,22 @@ void player_t::BobWeapon (fixed *x, fixed *y)
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobInverse:
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = boby - FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobAlpha:
 			*x = FixedMul(bobx, finesine[angle]);
 			*y = FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobInverseAlpha:
 			*x = FixedMul(bobx, finesine[angle]);
 			*y = boby - FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobSmooth:
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = (boby - FixedMul(boby, finecosine[angle*2 & (FINEANGLES-1)])) / 2;
@@ -851,7 +854,7 @@ void player_t::Reborn()
 
 	if(state == PST_ENTER)
 	{
-		lives = 3;
+		lives = gamestate.difficulty->LivesCount;
 		score = oldscore = 0;
 		nextextra = EXTRAPOINTS;
 	}

@@ -1406,7 +1406,7 @@ SD_StartMusic(const char* chunk)
 		if(music)
 			Mix_FreeMusic(music);
 		// Technically an SDL_mixer 2 feature to free the source
-#ifdef ECWOLF_MIXER
+#if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
 		music = Mix_LoadMUS_RW(mus_cunk, true);
 #else
 		music = Mix_LoadMUS_RW(mus_cunk);
@@ -1484,7 +1484,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 			chunkmem = new byte[Wads.LumpLength(lumpNum)];
 			lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
 			SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
-#ifdef ECWOLF_MIXER
+#if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
 			music = Mix_LoadMUS_RW(mus_cunk, true);
 #else
 			music = Mix_LoadMUS_RW(mus_cunk);

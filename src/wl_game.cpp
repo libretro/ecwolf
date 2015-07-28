@@ -690,14 +690,16 @@ void Died (void)
 
 	if(usedoublebuffering) VH_UpdateScreen();
 
-	--players[0].lives;
+    if (gamestate.difficulty->LivesCount >= 0) {
+        --players[0].lives;
 
-	if (gameinfo.GameOverPic.IsNotEmpty() && players[0].lives == -1)
-	{
-		FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
-		if(texID.isValid())
-			R_DrawZoomer(texID);
-	}
+        if (gameinfo.GameOverPic.IsNotEmpty() && players[0].lives == -1)
+        {
+            FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
+            if(texID.isValid())
+                R_DrawZoomer(texID);
+        }
+    }
 
 	if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
 	{
@@ -718,14 +720,14 @@ void Died (void)
 	else
 	{
 		// If we get a game over we will fade out any way
-		if(players[0].lives > -1)
+		if((players[0].lives > -1) || (gamestate.difficulty->LivesCount < 0))
 			VL_FadeOut(0, 255, 0, 0, 0, 64);
 	}
 
 	SD_WaitSoundDone ();
 	ClearMemory();
 
-	if (players[0].lives > -1)
+	if ((players[0].lives > -1) || (gamestate.difficulty->LivesCount < 0))
 		players[0].state = player_t::PST_REBORN;
 }
 
@@ -985,7 +987,7 @@ restartgame:
 				Died ();
 				died = true;                    // don't "get psyched!"
 
-				if (players[0].lives > -1)
+				if ((players[0].lives > -1) || (gamestate.difficulty->LivesCount < 0))
 					break;                          // more lives left
 
 				VW_FadeOut ();

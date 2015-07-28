@@ -59,7 +59,7 @@ void DisplayCrashLog ();
 
 int WL_Main(int argc, char* argv[]);
 
-#ifdef _WINDEF_
+//#ifdef _WINDEF_ //uncomment this if you get problems
 // Helper template so that we can access newer Win32 functions with a single static
 // variable declaration. If this were C++11 it could be totally transparent.
 template<typename Proto>
@@ -83,7 +83,7 @@ public:
 	// Wrapper object can be tested against NULL, but not directly called.
 	operator const void*() const { return (const void*)Call; }
 };
-#endif
+//#endif
 
 //==========================================================================
 //

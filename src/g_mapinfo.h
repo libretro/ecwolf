@@ -31,7 +31,7 @@
 **
 **
 */
- 
+
 #ifndef __G_MAPINFO_H__
 #define __G_MAPINFO_H__
 
@@ -262,6 +262,8 @@ public:
 	unsigned int MapFilter;
 	bool FastMonsters;
 	bool QuizHints;
+	int LivesCount;
+	fixed ScoreMultiplier;
 
 	static unsigned int GetNumSkills();
 	static unsigned int GetSkillIndex(const SkillInfo &skill);

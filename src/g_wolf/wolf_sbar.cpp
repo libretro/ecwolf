@@ -366,7 +366,7 @@ void WolfStatusBar::DrawLevel (void)
 
 void WolfStatusBar::DrawLives (void)
 {
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Lives.Enabled) return;
+	if((viewsize == 21 && ingame) || (!StatusBarConfig.Lives.Enabled) || (gamestate.difficulty->LivesCount < 0)) return;
 	LatchNumber (StatusBarConfig.Lives.X,StatusBarConfig.Lives.Y,StatusBarConfig.Lives.Digits,players[0].lives,mac);
 }
 

@@ -40,6 +40,7 @@
 #include "textures.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include <malloc.h>
 
 
 FWarpTexture::FWarpTexture (FTexture *source)

@@ -60,6 +60,7 @@
 #include "g_shared/a_inventory.h"
 #include "thingdef/thingdef.h"
 #include "zdoomsupport.h"
+#include <malloc.h>
 
 // These are special tokens found in the data stream of an archive.
 // Whenever a new object is encountered, it gets created using new and
@@ -429,7 +430,7 @@ void FCompressedFile::Explode ()
 		unsigned int *ints = (unsigned int *)(m_Buffer);
 		cprlen = BigLong(ints[0]);
 		expandsize = BigLong(ints[1]);
-		
+
 		expand = (unsigned char *)M_Malloc (expandsize);
 		if (cprlen)
 		{
@@ -1313,7 +1314,7 @@ void FArchive::WriteSprite (int spritenum)
 	if (m_SpriteMap[spritenum] < 0)
 	{
 		m_SpriteMap[spritenum] = (int)(m_NumSprites++);
-		id = NEW_SPRITE; 
+		id = NEW_SPRITE;
 		Write (&id, 1);
 		DWORD spriteName = R_GetNameForSprite(spritenum);
 		Write (&spriteName, 4);

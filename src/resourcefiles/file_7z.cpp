@@ -38,6 +38,7 @@
 #include "w_wad.h"
 #include "zstring.h"
 #include "zdoomsupport.h"
+#include <malloc.h>
 
 #define TEXTCOLOR_RED
 
@@ -201,7 +202,7 @@ public:
 //==========================================================================
 
 F7ZFile::F7ZFile(const char * filename, FileReader *filer)
-	: FResourceFile(filename, filer) 
+	: FResourceFile(filename, filer)
 {
 	Lumps = NULL;
 	Archive = NULL;
@@ -320,7 +321,7 @@ bool F7ZFile::Open(bool quiet)
 
 //==========================================================================
 //
-// 
+//
 //
 //==========================================================================
 

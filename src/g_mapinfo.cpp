@@ -31,7 +31,7 @@
 **
 **
 */
- 
+
 #include "gamemap.h"
 #include "g_intermission.h"
 #include "g_mapinfo.h"
@@ -733,7 +733,7 @@ protected:
 			{
 				sc.MustGetToken(TK_StringConst);
 				gameinfo.PlayerClasses.Push(sc->str);
-				
+
 			}
 			while(sc.CheckToken(','));
 		}
@@ -952,7 +952,8 @@ static TArray<SkillInfo> skills;
 static TMap<FName, unsigned int> skillIds;
 
 SkillInfo::SkillInfo() : DamageFactor(FRACUNIT), PlayerDamageFactor(FRACUNIT),
-	SpawnFilter(0), MapFilter(0), FastMonsters(false), QuizHints(false)
+	SpawnFilter(0), MapFilter(0), FastMonsters(false), QuizHints(false), LivesCount(3),
+	ScoreMultiplier(FRACUNIT)
 {
 }
 
@@ -1027,6 +1028,10 @@ protected:
 		}
 		else if(key.CompareNoCase("quizhints") == 0)
 			ParseBoolAssignment(skill->QuizHints);
+        else if(key.CompareNoCase("lives") == 0)
+            ParseIntAssignment(skill->LivesCount);
+        else if (key.CompareNoCase("scoremultiplier") == 0)
+            ParseFixedAssignment(skill->ScoreMultiplier);
 		else
 			return false;
 		return true;
