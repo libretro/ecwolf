@@ -60,7 +60,9 @@
 #include "g_shared/a_inventory.h"
 #include "thingdef/thingdef.h"
 #include "zdoomsupport.h"
+#ifdef _WIN32
 #include <malloc.h>
+#endif
 
 // These are special tokens found in the data stream of an archive.
 // Whenever a new object is encountered, it gets created using new and

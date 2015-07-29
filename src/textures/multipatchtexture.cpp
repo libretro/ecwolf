@@ -49,7 +49,9 @@
 #include "v_video.h"
 #include "textures.h"
 #include "r_data/colormaps.h"
+#ifdef _WIN32
 #include <malloc.h>
+#endif
 
 // On the Alpha, accessing the shorts directly if they aren't aligned on a
 // 4-byte boundary causes unaligned access warnings. Why it does this at

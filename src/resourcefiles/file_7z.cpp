@@ -38,7 +38,9 @@
 #include "w_wad.h"
 #include "zstring.h"
 #include "zdoomsupport.h"
+#ifdef _WIN32
 #include <malloc.h>
+#endif
 
 #define TEXTCOLOR_RED
 
