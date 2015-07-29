@@ -934,13 +934,340 @@ void ClassDef::LoadActors()
 	}
 }
 
-void ClassDef::ParseActor(Scanner &sc)
+#define DPARSER_CTL_NONE 0
+#define DPARSER_CTL_GOTO 1
+#define DPARSER_CTL_LOOP 2
+#define DPARSER_CTL_WAIT 4
+#define DPARSER_CTL_FAIL 8
+#define DPARSER_CTL_STOP 16
+#define DPARSER_CTL_ANYSTATEMENT (DPARSER_CTL_STOP | DPARSER_CTL_FAIL | DPARSER_CTL_WAIT | DPARSER_CTL_LOOP | DPARSER_CTL_GOTO)
+
+//  Returns the state that it parsed (DPARSER_CTL_NONE if none), sets up thisState
+int ClassDef::ParseActorStateControl(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int allowedStatements)
 {
-	// Read the header
+	int statement = 0;
+
+	if(sc->str.CompareNoCase("goto") == 0) statement = DPARSER_CTL_GOTO;
+	else if(sc->str.CompareNoCase("wait") == 0) statement = DPARSER_CTL_WAIT;
+	else if(sc->str.CompareNoCase("fail") == 0) statement = DPARSER_CTL_FAIL;
+	else if(sc->str.CompareNoCase("loop") == 0) statement = DPARSER_CTL_LOOP;
+	else if(sc->str.CompareNoCase("stop") == 0) statement = DPARSER_CTL_STOP;
+	
+	if(!(allowedStatements & statement)) return DPARSER_CTL_NONE;
+
+	switch(statement)
+	{
+		case DPARSER_CTL_GOTO:
+			thisState.jumpLabel = StateLabel(sc, newClass, true);
+			thisState.nextType = StateDefinition::GOTO;
+			break;
+
+		case DPARSER_CTL_FAIL:
+		case DPARSER_CTL_WAIT:
+			thisState.nextType = StateDefinition::WAIT;
+			break;
+
+		case DPARSER_CTL_LOOP:
+			thisState.nextType = StateDefinition::LOOP;
+			break;
+
+		case DPARSER_CTL_STOP:
+			thisState.nextType = StateDefinition::STOP;
+			break;
+	}
+
+	return statement;
+}
+
+void ClassDef::ParseActorStateDuration(Scanner &sc, StateDefinition &thisState)
+{
+	if(sc.CheckToken('-'))
+	{
+		sc.MustGetToken(TK_FloatConst);
+		thisState.duration = -1;
+	}
+	else
+	{
+		if(sc.CheckToken(TK_FloatConst))
+		{
+			// Eliminate confusion about fractional frame delays
+			if(!CheckTicsValid(sc->decimal))
+				sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
+
+			thisState.duration = static_cast<int> (sc->decimal*2);
+		}
+		else if(stricmp(thisState.sprite, "goto") == 0)
+		{
+			thisState.nextType = StateDefinition::GOTO;
+			thisState.nextArg = thisState.frames;
+			thisState.frames = FString();
+		}
+		else if(sc.CheckToken(TK_Identifier))
+		{
+			if(sc->str.CompareNoCase("random") != 0)
+				sc.ScriptMessage(Scanner::ERROR, "Expected random frame duration.");
+
+			sc.MustGetToken('(');
+			sc.MustGetToken(TK_FloatConst);
+			if(!CheckTicsValid(sc->decimal))
+				sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
+			thisState.duration = static_cast<int> (sc->decimal*2);
+			sc.MustGetToken(',');
+			sc.MustGetToken(TK_FloatConst);
+			if(!CheckTicsValid(sc->decimal))
+				sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
+			thisState.randDuration = static_cast<int> (sc->decimal*2);
+			sc.MustGetToken(')');
+		}
+		else
+			sc.ScriptMessage(Scanner::ERROR, "Expected frame duration.");
+	}
+}
+
+// Returns true if this state is finalized, false if it is not.
+bool ClassDef::ParseActorStateFlags(Scanner &sc, StateDefinition &thisState)
+{
+	thisState.fullbright = false;
+
+	do
+	{
+		if(sc.CheckToken('}'))
+			return true;
+		else
+			sc.MustGetToken(TK_Identifier);
+
+		if(sc->str.CompareNoCase("bright") == 0)
+			thisState.fullbright = true;
+		else
+			break;
+	}
+	while(true);
+
+	return false;
+}
+
+void ClassDef::ParseActorStateAction(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int funcIdx)
+{
+	int specialNum = -1;
+	const ActionInfo *funcInf = newClass->FindFunction(sc->str, specialNum);
+	if(funcInf)
+	{
+		thisState.functions[funcIdx].pointer = *funcInf->func;
+
+		CallArguments *&ca = thisState.functions[funcIdx].args;
+		ca = new CallArguments();
+		CallArguments::Value val;
+		unsigned int argc = 0;
+
+		// When using a line special we have to inject a parameter.
+		if(specialNum >= 0)
+		{
+			val.useType = CallArguments::Value::VAL_INTEGER;
+			val.isExpression = false;
+			val.val.i = specialNum;
+			ca->AddArgument(val);
+			++argc;
+		}
+				
+		if(sc.CheckToken('('))
+		{
+			if(funcInf->maxArgs == 0)
+				sc.MustGetToken(')');
+			else if(!(funcInf->minArgs == 0 && sc.CheckToken(')')))
+			{
+				do
+				{
+					val.isExpression = false;
+
+					const Type *argType = funcInf->types[argc];
+					if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
+						argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT) ||
+						argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
+					{
+						val.isExpression = true;
+						if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
+							val.useType = CallArguments::Value::VAL_INTEGER;
+						else
+							val.useType = CallArguments::Value::VAL_DOUBLE;
+						val.expr = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
+					}
+					else if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
+					{
+						val.useType = CallArguments::Value::VAL_STATE;
+						if(sc.CheckToken(TK_IntConst))
+						{
+							if(thisState.frames.Len() > 1)
+								sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed on multistate definitions.");
+							FString label;
+							label.Format("%d", sc->number);
+							val.label = StateLabel(label, newClass);
+						}
+						else
+						{
+							sc.MustGetToken(TK_StringConst);
+							val.label = StateLabel(sc->str, newClass);
+						}
+					}
+					else
+					{
+						sc.MustGetToken(TK_StringConst);
+						val.useType = CallArguments::Value::VAL_STRING;
+						val.str = sc->str;
+					}
+					ca->AddArgument(val);
+					++argc;
+
+					// Check if we can or should take another argument
+					if(!funcInf->varArgs && argc >= funcInf->maxArgs)
+						break;
+				}
+				while(sc.CheckToken(','));
+				sc.MustGetToken(')');
+			}
+		}
+		if(argc < funcInf->minArgs)
+			sc.ScriptMessage(Scanner::ERROR, "Too few arguments.");
+		else
+		{
+			// Push unused defaults.
+			while(argc < funcInf->maxArgs)
+				ca->AddArgument(funcInf->defaults[(argc++)-funcInf->minArgs]);
+		}
+	}
+	else
+		sc.ScriptMessage(Scanner::WARNING, "Could not find function %s.", sc->str.GetChars());
+}
+
+void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted)
+{
+	if(!actionsSorted)
+		InitFunctionTable(&newClass->actions);
+
+	TArray<StateDefinition> stateDefs;
+
+	sc.MustGetToken('{');
+	//sc.MustGetToken(TK_Identifier); // We should already have grabbed the identifier in all other cases.
+	bool needIdentifier = true;
+	bool infiniteLoopProtection = false;
+	int controlStatement = DPARSER_CTL_NONE;
+
+	while(sc->token != '}' && !sc.CheckToken('}'))
+	{
+		StateDefinition thisState;
+		thisState.sprite[0] = thisState.sprite[4] = 0;
+		thisState.duration = 0;
+		thisState.randDuration = 0;
+		thisState.nextType = StateDefinition::NORMAL;
+
+		if(needIdentifier)
+			sc.MustGetToken(TK_Identifier);
+		else
+			needIdentifier = true;
+		FString stateString = sc->str;
+		if(sc.CheckToken(':'))
+		{
+			infiniteLoopProtection = false;
+			thisState.label = stateString;
+			// New state
+			if(sc.CheckToken('}'))
+				sc.ScriptMessage(Scanner::ERROR, "State defined with no frames.");
+			sc.MustGetToken(TK_Identifier);
+
+			controlStatement = ParseActorStateControl(sc, newClass, thisState, DPARSER_CTL_STOP | DPARSER_CTL_GOTO);
+
+			// If it's not set to DPARSER_CTL_NONE, then it will be either STOP or GOTO
+			if(controlStatement != DPARSER_CTL_NONE && !sc.CheckToken('}'))
+				sc.MustGetToken(TK_Identifier);
+
+			stateString = sc->str;
+		}
+
+		if(thisState.nextType == StateDefinition::NORMAL &&
+			(sc.CheckToken(TK_Identifier) || sc.CheckToken(TK_StringConst)))
+		{
+			bool invalidSprite = (stateString.Len() != 4);
+			strncpy(thisState.sprite, stateString, 4);
+
+			infiniteLoopProtection = false;
+			if(invalidSprite) // We now know this is a frame so check sprite length
+				sc.ScriptMessage(Scanner::ERROR, "Sprite name must be exactly 4 characters long.");
+
+			R_LoadSprite(thisState.sprite);
+			thisState.frames = sc->str;
+
+			ParseActorStateDuration(sc, thisState);
+
+			thisState.functions[0].pointer = thisState.functions[1].pointer = NULL;
+
+			// True return value indicates that the state is finished
+			if(ParseActorStateFlags(sc, thisState))
+			{
+				goto FinishState;
+			}
+
+			if(thisState.nextType == StateDefinition::NORMAL)
+			{
+				for(int func = 0;func <= 2;func++)
+				{
+					if(sc.CheckToken(':'))
+					{
+						// We have a state label!
+						needIdentifier = false;
+						sc.Rewind();
+						break;
+					}
+
+					if(sc->str.Len() == 4 || func == 2)
+					{
+						controlStatement = ParseActorStateControl(sc, newClass, thisState, DPARSER_CTL_ANYSTATEMENT);
+
+						if(controlStatement == DPARSER_CTL_NONE)
+							needIdentifier = false;
+						
+						break;
+					}
+					else
+					{
+						if(sc->str.CompareNoCase("NOP") != 0)
+							ParseActorStateAction(sc, newClass, thisState, func);
+					}
+
+					if(!sc.CheckToken(TK_Identifier))
+						break;
+					else if(sc.CheckToken(':'))
+					{
+						needIdentifier = false;
+						sc.Rewind();
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			thisState.sprite[0] = 0;
+			needIdentifier = false;
+			if(infiniteLoopProtection)
+				sc.ScriptMessage(Scanner::ERROR, "Malformed script.");
+			infiniteLoopProtection = true;
+		}
+	FinishState:
+		stateDefs.Push(thisState);
+	}
+
+	newClass->InstallStates(stateDefs);
+}
+
+// Returns the new class to operate on
+ClassDef *ClassDef::ParseActorHeader(Scanner &sc, bool &previouslyDefined, bool &isNative)
+{
 	sc.MustGetToken(TK_Identifier);
+
 	ClassDef **classRef = ClassTable().CheckKey(sc->str);
 	ClassDef *newClass;
-	bool previouslyDefined = classRef != NULL;
+
+	previouslyDefined = (classRef != NULL);
+
 	if(!previouslyDefined)
 	{
 		newClass = new ClassDef();
@@ -948,26 +1275,62 @@ void ClassDef::ParseActor(Scanner &sc)
 	}
 	else
 		newClass = *classRef;
-	bool native = false;
-	newClass->name = sc->str;
+
+	ParseActorInheritance(sc, newClass);
+	ParseActorReplacements(sc, newClass);
+
+	if(sc.CheckToken(TK_IntConst))
+	{
+		if(EditorNumberTable.CheckKey(sc->number) != NULL)
+			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
+
+		EditorNumberTable[sc->number] = newClass;
+	}
+
+	if(sc.CheckToken(TK_Identifier))
+	{
+		if(sc->str.CompareNoCase("native") == 0)
+			isNative = true;
+		else
+			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.", sc->str.GetChars());
+	}
+
+	return newClass;
+}
+
+
+// Returns true if explicit inheritance was found; false otherwise
+bool ClassDef::ParseActorInheritance(Scanner &sc, ClassDef *newClass)
+{
 	if(sc.CheckToken(':'))
 	{
 		sc.MustGetToken(TK_Identifier);
+
 		const ClassDef *parent = FindClass(sc->str);
+
 		if(parent == NULL || parent->tentative)
 			sc.ScriptMessage(Scanner::ERROR, "Could not find parent actor '%s'", sc->str.GetChars());
 		if(newClass->tentative && !parent->IsDescendantOf(newClass->parent))
 			sc.ScriptMessage(Scanner::ERROR, "Parent for actor expected to be '%s'", newClass->parent->GetName().GetChars());
+
 		newClass->parent = parent;
+
+		return true;
 	}
-	else
+	else if(newClass != NATIVE_CLASS(Actor))
 	{
 		// If no class was specified to inherit from, inherit from AActor, but not for AActor.
-		if(newClass != NATIVE_CLASS(Actor))
-			newClass->parent = NATIVE_CLASS(Actor);
+
+		newClass->parent = NATIVE_CLASS(Actor);
 	}
 
-	// Handle class replacements
+	return false;
+}
+
+// Returns true if a replacement was specified; false otherwise
+bool ClassDef::ParseActorReplacements(Scanner &sc, ClassDef *newClass)
+{
+		// Handle class replacements
 	if(sc.CheckToken(TK_Identifier))
 	{
 		if(sc->str.CompareNoCase("replaces") == 0)
@@ -980,30 +1343,20 @@ void ClassDef::ParseActor(Scanner &sc)
 			ClassDef *replacee = const_cast<ClassDef *>(FindClassTentative(sc->str, NATIVE_CLASS(Actor)));
 			replacee->replacement = newClass;
 			newClass->replacee = replacee;
+
+			return true;
 		}
 		else
 			sc.Rewind();
 	}
 
-	if(sc.CheckToken(TK_IntConst))
-	{
-		if(EditorNumberTable.CheckKey(sc->number) != NULL)
-			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
-		EditorNumberTable[sc->number] = newClass;
-	}
-	if(sc.CheckToken(TK_Identifier))
-	{
-		if(sc->str.CompareNoCase("native") == 0)
-			native = true;
-		else
-			sc.ScriptMessage(Scanner::ERROR, "Unknown keyword '%s'.", sc->str.GetChars());
-	}
-	if(previouslyDefined && !native && !newClass->tentative)
-		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.", newClass->name.GetChars());
-	else
-		newClass->tentative = false;
+	return false;
+}
 
-	if(!native) // Initialize the default instance to the nearest native class.
+// Return true if we were able to initialize the actor with whatever sane defaults we may have; false if we were not
+bool ClassDef::InitializeActor(ClassDef *newClass, bool isNative)
+{
+	if(!isNative) // Initialize the default instance to the nearest native class.
 	{
 		newClass->ConstructNative = newClass->parent->ConstructNative;
 		newClass->size = newClass->parent->size;
@@ -1016,12 +1369,13 @@ void ClassDef::ParseActor(Scanner &sc)
 		// This could happen if a non-native actor is declared native or
 		// possibly in the case of a stuck dependency.
 		if(!newClass->defaultInstance)
-			sc.ScriptMessage(Scanner::ERROR, "Uninitialized default instance for '%s'.", newClass->GetName().GetChars());
+			return false;
 
 		// Copy the parents defaults for native classes
 		if(newClass->parent)
 			memcpy((void*)newClass->defaultInstance, (void*)newClass->parent->defaultInstance, newClass->parent->size);
 	}
+
 	// Copy properties and flags.
 	if(newClass->parent != NULL)
 	{
@@ -1030,446 +1384,220 @@ void ClassDef::ParseActor(Scanner &sc)
 		newClass->Meta = newClass->parent->Meta;
 	}
 
+	return true;
+}
+
+// Returns true if the flag could be set/unset; false if it could not
+bool ClassDef::ParseActorFlag(Scanner &sc, ClassDef *newClass)
+{
+	bool set = sc->token == '+';
+	FString prefix;
+	
+	sc.MustGetToken(TK_Identifier);
+	FString flagName = sc->str;
+	
+	if(sc.CheckToken('.'))
+	{
+		prefix = flagName;
+		sc.MustGetToken(TK_Identifier);
+		flagName = sc->str;
+	}
+
+	if(!SetFlag(newClass, (AActor*)newClass->defaultInstance, prefix, flagName, set))
+	{
+		sc.ScriptMessage(Scanner::WARNING, "Unknown flag '%s' for actor '%s'.", flagName.GetChars(), newClass->name.GetChars());
+		return false;
+	}
+
+	return true;
+}
+
+void ClassDef::ParseActorAction(Scanner &sc, ClassDef *newClass, bool &actionsSorted)
+{
+	actionsSorted = false;
+	sc.MustGetToken(TK_Identifier);
+	if (sc->str.CompareNoCase("native") != 0)
+		sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
+	sc.MustGetToken(TK_Identifier);
+	ActionInfo *funcInf = LookupFunction(sc->str, NULL);
+	if (!funcInf)
+		sc.ScriptMessage(Scanner::ERROR, "The specified function %s could not be located.", sc->str.GetChars());
+	newClass->actions.Push(funcInf);
+	sc.MustGetToken('(');
+	if (!sc.CheckToken(')'))
+	{
+		bool optRequired = false;
+		do
+		{
+			// If we have processed at least one argument, then we can take varArgs.
+			if (funcInf->minArgs > 0 && sc.CheckToken(TK_Ellipsis))
+			{
+				funcInf->varArgs = true;
+				break;
+			}
+
+			sc.MustGetToken(TK_Identifier);
+			const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
+			if (type == NULL)
+				sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
+			funcInf->types.Push(type);
+
+			if (sc->str.CompareNoCase("class") == 0)
+			{
+				sc.MustGetToken('<');
+				sc.MustGetToken(TK_Identifier);
+				sc.MustGetToken('>');
+			}
+			sc.MustGetToken(TK_Identifier);
+			if (optRequired || sc.CheckToken('='))
+			{
+				if (optRequired)
+					sc.MustGetToken('=');
+				else
+					optRequired = true;
+
+				CallArguments::Value defVal;
+				defVal.isExpression = false;
+
+				if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
+					type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT)
+					)
+				{
+					ExpressionNode *node = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
+					const ExpressionNode::Value &val = node->Evaluate(NULL);
+					if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
+					{
+						defVal.useType = CallArguments::Value::VAL_INTEGER;
+						defVal.val.i = val.GetInt();
+					}
+					else
+					{
+						defVal.useType = CallArguments::Value::VAL_DOUBLE;
+						defVal.val.d = val.GetDouble();
+					}
+					delete node;
+				}
+				else if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
+				{
+					sc.MustGetToken(TK_BoolConst);
+					defVal.useType = CallArguments::Value::VAL_INTEGER;
+					defVal.val.i = sc->boolean;
+				}
+				else if (type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
+				{
+					defVal.useType = CallArguments::Value::VAL_STATE;
+					if (sc.CheckToken(TK_IntConst))
+						sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed for defaults.");
+					else
+					{
+						sc.MustGetToken(TK_StringConst);
+						defVal.label = StateLabel(sc->str, newClass);
+					}
+				}
+				else
+				{
+					sc.MustGetToken(TK_StringConst);
+					defVal.useType = CallArguments::Value::VAL_STRING;
+					defVal.str = sc->str;
+				}
+				funcInf->defaults.Push(defVal);
+			}
+			else
+				++funcInf->minArgs;
+			++funcInf->maxArgs;
+		} while (sc.CheckToken(','));
+		sc.MustGetToken(')');
+	}
+	sc.MustGetToken(';');
+}
+
+void ClassDef::ParseActorNative(Scanner &sc, ClassDef *newClass)
+{
+	sc.MustGetToken(TK_Identifier);
+	const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
+	if (type == NULL)
+		sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
+	sc.MustGetToken(TK_Identifier);
+	FName varName(sc->str);
+	const SymbolInfo *symInf = NULL;
+	for (unsigned int i = 0; i < symbolPool->Size(); ++i)
+	{
+		// I think the symbol pool will be small enough to do a
+		// linear search on.
+		if ((*symbolPool)[i]->cls == newClass && (*symbolPool)[i]->var == varName)
+		{
+			symInf = (*symbolPool)[i];
+			break;
+		}
+	}
+	if (symInf == NULL)
+		sc.ScriptMessage(Scanner::ERROR, "Could not identify symbol %s::%s.\n", newClass->name.GetChars(), varName.GetChars());
+	sc.MustGetToken(';');
+
+	newClass->symbols.Push(new VariableSymbol(varName, type, symInf->offset));
+}
+
+void ClassDef::ParseActorProperty(Scanner &sc, ClassDef *newClass)
+{
+	FString className("actor");
+	FString propertyName = sc->str;
+	if (sc.CheckToken('.'))
+	{
+		className = propertyName;
+		sc.MustGetToken(TK_Identifier);
+		propertyName = sc->str;
+	}
+
+	if (!SetProperty(newClass, className, propertyName, sc))
+	{
+		do
+		{
+			sc.GetNextToken();
+		} while (sc.CheckToken(','));
+		sc.ScriptMessage(Scanner::WARNING, "Unknown property '%s' for actor '%s'.", propertyName.GetChars(), newClass->name.GetChars());
+	}
+}
+
+void ClassDef::ParseActor(Scanner &sc)
+{
+	// Read the header
+	bool previouslyDefined = false;
+	bool isNative = false;
+	ClassDef *newClass = ParseActorHeader(sc, previouslyDefined, isNative);
+
+	if(previouslyDefined && !isNative && !newClass->tentative)
+		sc.ScriptMessage(Scanner::ERROR, "Actor '%s' already defined.", newClass->name.GetChars());
+	else
+		newClass->tentative = false;
+
+	if(!InitializeActor(newClass, isNative))
+		sc.ScriptMessage(Scanner::ERROR, "Uninitialized default instance for '%s'.", newClass->GetName().GetChars());
+
 	bool actionsSorted = true;
 	sc.MustGetToken('{');
+
 	while(!sc.CheckToken('}'))
 	{
 		if(sc.CheckToken('+') || sc.CheckToken('-'))
-		{
-			bool set = sc->token == '+';
-			FString prefix;
-			sc.MustGetToken(TK_Identifier);
-			FString flagName = sc->str;
-			if(sc.CheckToken('.'))
-			{
-				prefix = flagName;
-				sc.MustGetToken(TK_Identifier);
-				flagName = sc->str;
-			}
-			if(!SetFlag(newClass, (AActor*)newClass->defaultInstance, prefix, flagName, set))
-				sc.ScriptMessage(Scanner::WARNING, "Unknown flag '%s' for actor '%s'.", flagName.GetChars(), newClass->name.GetChars());
-		}
+			ParseActorFlag(sc, newClass);
 		else
 		{
 			sc.MustGetToken(TK_Identifier);
+
 			if(sc->str.CompareNoCase("states") == 0)
-			{
-				if(!actionsSorted)
-					InitFunctionTable(&newClass->actions);
+				ParseActorState(sc, newClass, actionsSorted);
 
-				TArray<StateDefinition> stateDefs;
-
-				sc.MustGetToken('{');
-				//sc.MustGetToken(TK_Identifier); // We should already have grabbed the identifier in all other cases.
-				bool needIdentifier = true;
-				bool infiniteLoopProtection = false;
-				while(sc->token != '}' && !sc.CheckToken('}'))
-				{
-					StateDefinition thisState;
-					thisState.sprite[0] = thisState.sprite[4] = 0;
-					thisState.duration = 0;
-					thisState.randDuration = 0;
-					thisState.nextType = StateDefinition::NORMAL;
-
-					if(needIdentifier)
-						sc.MustGetToken(TK_Identifier);
-					else
-						needIdentifier = true;
-					FString stateString = sc->str;
-					if(sc.CheckToken(':'))
-					{
-						infiniteLoopProtection = false;
-						thisState.label = stateString;
-						// New state
-						if(sc.CheckToken('}'))
-							sc.ScriptMessage(Scanner::ERROR, "State defined with no frames.");
-						sc.MustGetToken(TK_Identifier);
-
-						if(sc->str.CompareNoCase("stop") == 0)
-						{
-							thisState.nextType = StateDefinition::STOP;
-							if(!sc.CheckToken('}'))
-								sc.MustGetToken(TK_Identifier);
-						}
-						else if(sc->str.CompareNoCase("goto") == 0)
-						{
-							thisState.jumpLabel = StateLabel(sc, newClass, true);
-							thisState.nextType = StateDefinition::GOTO;
-							if(!sc.CheckToken('}'))
-								sc.MustGetToken(TK_Identifier);
-						}
-
-						stateString = sc->str;
-					}
-
-					if(thisState.nextType == StateDefinition::NORMAL &&
-						(sc.CheckToken(TK_Identifier) || sc.CheckToken(TK_StringConst)))
-					{
-						bool invalidSprite = (stateString.Len() != 4);
-						strncpy(thisState.sprite, stateString, 4);
-
-						infiniteLoopProtection = false;
-						if(invalidSprite) // We now know this is a frame so check sprite length
-							sc.ScriptMessage(Scanner::ERROR, "Sprite name must be exactly 4 characters long.");
-
-						R_LoadSprite(thisState.sprite);
-						thisState.frames = sc->str;
-						if(sc.CheckToken('-'))
-						{
-							sc.MustGetToken(TK_FloatConst);
-							thisState.duration = -1;
-						}
-						else
-						{
-							if(sc.CheckToken(TK_FloatConst))
-							{
-								// Eliminate confusion about fractional frame delays
-								if(!CheckTicsValid(sc->decimal))
-									sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
-
-								thisState.duration = static_cast<int> (sc->decimal*2);
-							}
-							else if(stricmp(thisState.sprite, "goto") == 0)
-							{
-								thisState.nextType = StateDefinition::GOTO;
-								thisState.nextArg = thisState.frames;
-								thisState.frames = FString();
-							}
-							else if(sc.CheckToken(TK_Identifier))
-							{
-								if(sc->str.CompareNoCase("random") != 0)
-									sc.ScriptMessage(Scanner::ERROR, "Expected random frame duration.");
-
-								sc.MustGetToken('(');
-								sc.MustGetToken(TK_FloatConst);
-								if(!CheckTicsValid(sc->decimal))
-									sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
-								thisState.duration = static_cast<int> (sc->decimal*2);
-								sc.MustGetToken(',');
-								sc.MustGetToken(TK_FloatConst);
-								if(!CheckTicsValid(sc->decimal))
-									sc.ScriptMessage(Scanner::ERROR, "Fractional frame durations must be exactly .5!");
-								thisState.randDuration = static_cast<int> (sc->decimal*2);
-								sc.MustGetToken(')');
-							}
-							else
-								sc.ScriptMessage(Scanner::ERROR, "Expected frame duration.");
-						}
-						thisState.functions[0].pointer = thisState.functions[1].pointer = NULL;
-						thisState.fullbright = false;
-
-						do
-						{
-							if(sc.CheckToken('}'))
-								goto FinishState;
-							else
-								sc.MustGetToken(TK_Identifier);
-
-							if(sc->str.CompareNoCase("bright") == 0)
-								thisState.fullbright = true;
-							else
-								break;
-						}
-						while(true);
-
-						if(thisState.nextType == StateDefinition::NORMAL)
-						{
-							for(int func = 0;func <= 2;func++)
-							{
-								if(sc.CheckToken(':'))
-								{
-									// We have a state label!
-									needIdentifier = false;
-									sc.Rewind();
-									break;
-								}
-								if(sc->str.Len() == 4 || func == 2)
-								{
-									if(sc->str.CompareNoCase("goto") == 0)
-									{
-										thisState.jumpLabel = StateLabel(sc, newClass, true);
-										thisState.nextType = StateDefinition::GOTO;
-									}
-									else if(sc->str.CompareNoCase("wait") == 0 || sc->str.CompareNoCase("fail") == 0)
-									{
-										thisState.nextType = StateDefinition::WAIT;
-									}
-									else if(sc->str.CompareNoCase("loop") == 0)
-									{
-										thisState.nextType = StateDefinition::LOOP;
-									}
-									else if(sc->str.CompareNoCase("stop") == 0)
-									{
-										thisState.nextType = StateDefinition::STOP;
-									}
-									else
-										needIdentifier = false;
-									break;
-								}
-								else
-								{
-									if(sc->str.CompareNoCase("NOP") != 0)
-									{
-										int specialNum = -1;
-										const ActionInfo *funcInf = newClass->FindFunction(sc->str, specialNum);
-										if(funcInf)
-										{
-											thisState.functions[func].pointer = *funcInf->func;
-
-											CallArguments *&ca = thisState.functions[func].args;
-											ca = new CallArguments();
-											CallArguments::Value val;
-											unsigned int argc = 0;
-
-											// When using a line special we have to inject a parameter.
-											if(specialNum >= 0)
-											{
-												val.useType = CallArguments::Value::VAL_INTEGER;
-												val.isExpression = false;
-												val.val.i = specialNum;
-												ca->AddArgument(val);
-												++argc;
-											}
-				
-											if(sc.CheckToken('('))
-											{
-												if(funcInf->maxArgs == 0)
-													sc.MustGetToken(')');
-												else if(!(funcInf->minArgs == 0 && sc.CheckToken(')')))
-												{
-													do
-													{
-														val.isExpression = false;
-
-														const Type *argType = funcInf->types[argc];
-														if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
-															argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT) ||
-															argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
-														{
-															val.isExpression = true;
-															if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
-																val.useType = CallArguments::Value::VAL_INTEGER;
-															else
-																val.useType = CallArguments::Value::VAL_DOUBLE;
-															val.expr = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
-														}
-														else if(argType == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
-														{
-															val.useType = CallArguments::Value::VAL_STATE;
-															if(sc.CheckToken(TK_IntConst))
-															{
-																if(thisState.frames.Len() > 1)
-																	sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed on multistate definitions.");
-																FString label;
-																label.Format("%d", sc->number);
-																val.label = StateLabel(label, newClass);
-															}
-															else
-															{
-																sc.MustGetToken(TK_StringConst);
-																val.label = StateLabel(sc->str, newClass);
-															}
-														}
-														else
-														{
-															sc.MustGetToken(TK_StringConst);
-															val.useType = CallArguments::Value::VAL_STRING;
-															val.str = sc->str;
-														}
-														ca->AddArgument(val);
-														++argc;
-
-														// Check if we can or should take another argument
-														if(!funcInf->varArgs && argc >= funcInf->maxArgs)
-															break;
-													}
-													while(sc.CheckToken(','));
-													sc.MustGetToken(')');
-												}
-											}
-											if(argc < funcInf->minArgs)
-												sc.ScriptMessage(Scanner::ERROR, "Too few arguments.");
-											else
-											{
-												// Push unused defaults.
-												while(argc < funcInf->maxArgs)
-													ca->AddArgument(funcInf->defaults[(argc++)-funcInf->minArgs]);
-											}
-										}
-										else
-											sc.ScriptMessage(Scanner::WARNING, "Could not find function %s.", sc->str.GetChars());
-									}
-								}
-
-								if(!sc.CheckToken(TK_Identifier))
-									break;
-								else if(sc.CheckToken(':'))
-								{
-									needIdentifier = false;
-									sc.Rewind();
-									break;
-								}
-							}
-						}
-					}
-					else
-					{
-						thisState.sprite[0] = 0;
-						needIdentifier = false;
-						if(infiniteLoopProtection)
-							sc.ScriptMessage(Scanner::ERROR, "Malformed script.");
-						infiniteLoopProtection = true;
-					}
-				FinishState:
-					stateDefs.Push(thisState);
-				}
-
-				newClass->InstallStates(stateDefs);
-			}
 			else if(sc->str.CompareNoCase("action") == 0)
 			{
-				actionsSorted = false;
-				sc.MustGetToken(TK_Identifier);
-				if(sc->str.CompareNoCase("native") != 0)
-					sc.ScriptMessage(Scanner::ERROR, "Custom actions not supported.");
-				sc.MustGetToken(TK_Identifier);
-				ActionInfo *funcInf = LookupFunction(sc->str, NULL);
-				if(!funcInf)
-					sc.ScriptMessage(Scanner::ERROR, "The specified function %s could not be located.", sc->str.GetChars());
-				newClass->actions.Push(funcInf);
-				sc.MustGetToken('(');
-				if(!sc.CheckToken(')'))
-				{
-					bool optRequired = false;
-					do
-					{
-						// If we have processed at least one argument, then we can take varArgs.
-						if(funcInf->minArgs > 0 && sc.CheckToken(TK_Ellipsis))
-						{
-							funcInf->varArgs = true;
-							break;
-						}
-
-						sc.MustGetToken(TK_Identifier);
-						const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
-						if(type == NULL)
-							sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
-						funcInf->types.Push(type);
-
-						if(sc->str.CompareNoCase("class") == 0)
-						{
-							sc.MustGetToken('<');
-							sc.MustGetToken(TK_Identifier);
-							sc.MustGetToken('>');
-						}
-						sc.MustGetToken(TK_Identifier);
-						if(optRequired || sc.CheckToken('='))
-						{
-							if(optRequired)
-								sc.MustGetToken('=');
-							else
-								optRequired = true;
-
-							CallArguments::Value defVal;
-							defVal.isExpression = false;
-
-							if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT) ||
-								type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::FLOAT)
-							)
-							{
-								ExpressionNode *node = ExpressionNode::ParseExpression(newClass, TypeHierarchy::staticTypes, sc);
-								const ExpressionNode::Value &val = node->Evaluate(NULL);
-								if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::INT))
-								{
-									defVal.useType = CallArguments::Value::VAL_INTEGER;
-									defVal.val.i = val.GetInt();
-								}
-								else
-								{
-									defVal.useType = CallArguments::Value::VAL_DOUBLE;
-									defVal.val.d = val.GetDouble();
-								}
-								delete node;
-							}
-							else if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::BOOL))
-							{
-								sc.MustGetToken(TK_BoolConst);
-								defVal.useType = CallArguments::Value::VAL_INTEGER;
-								defVal.val.i = sc->boolean;
-							}
-							else if(type == TypeHierarchy::staticTypes.GetType(TypeHierarchy::STATE))
-							{
-								defVal.useType = CallArguments::Value::VAL_STATE;
-								if(sc.CheckToken(TK_IntConst))
-									sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed for defaults.");
-								else
-								{
-									sc.MustGetToken(TK_StringConst);
-									defVal.label = StateLabel(sc->str, newClass);
-								}
-							}
-							else
-							{
-								sc.MustGetToken(TK_StringConst);
-								defVal.useType = CallArguments::Value::VAL_STRING;
-								defVal.str = sc->str;
-							}
-							funcInf->defaults.Push(defVal);
-						}
-						else
-							++funcInf->minArgs;
-						++funcInf->maxArgs;
-					}
-					while(sc.CheckToken(','));
-					sc.MustGetToken(')');
-				}
-				sc.MustGetToken(';');
+				ParseActorAction(sc, newClass, actionsSorted);
 			}
 			else if(sc->str.CompareNoCase("native") == 0)
 			{
-				sc.MustGetToken(TK_Identifier);
-				const Type *type = TypeHierarchy::staticTypes.GetType(sc->str);
-				if(type == NULL)
-					sc.ScriptMessage(Scanner::ERROR, "Unknown type %s.\n", sc->str.GetChars());
-				sc.MustGetToken(TK_Identifier);
-				FName varName(sc->str);
-				const SymbolInfo *symInf = NULL;
-				for(unsigned int i = 0;i < symbolPool->Size();++i)
-				{
-					// I think the symbol pool will be small enough to do a
-					// linear search on.
-					if((*symbolPool)[i]->cls == newClass && (*symbolPool)[i]->var == varName)
-					{
-						symInf = (*symbolPool)[i];
-						break;
-					}
-				}
-				if(symInf == NULL)
-					sc.ScriptMessage(Scanner::ERROR, "Could not identify symbol %s::%s.\n", newClass->name.GetChars(), varName.GetChars());
-				sc.MustGetToken(';');
-
-				newClass->symbols.Push(new VariableSymbol(varName, type, symInf->offset));
+				ParseActorNative(sc, newClass);
 			}
 			else
 			{
-				FString className("actor");
-				FString propertyName = sc->str;
-				if(sc.CheckToken('.'))
-				{
-					className = propertyName;
-					sc.MustGetToken(TK_Identifier);
-					propertyName = sc->str;
-				}
-
-				if(!SetProperty(newClass, className, propertyName, sc))
-				{
-					do
-					{
-						sc.GetNextToken();
-					}
-					while(sc.CheckToken(','));
-					sc.ScriptMessage(Scanner::WARNING, "Unknown property '%s' for actor '%s'.", propertyName.GetChars(), newClass->name.GetChars());
-				}
+				ParseActorProperty(sc, newClass);
 			}
 		}
 	}
