@@ -62,6 +62,7 @@ extern bool		vid_vsync;
 extern bool		quitonescape;
 extern fixed	movebob;
 
+extern float	localDesiredFOV;
 //
 // control info
 //

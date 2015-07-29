@@ -39,6 +39,8 @@
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_us.h"
+#include "templates.h"
+#include "wl_agent.h"
 #include "wl_main.h"
 #include "wl_play.h"
 
@@ -53,6 +55,7 @@ fixed movebob = FRACUNIT;
 
 bool alwaysrun;
 bool mouseenabled, mouseyaxisdisabled, joystickenabled;
+float localDesiredFOV = 90.0f;
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 // Convert SDL1 keycode to SDL2 scancode
@@ -190,6 +193,7 @@ void ReadConfig(void)
 	config.CreateSetting("FullScreenHeight", fullScreenHeight);
 	config.CreateSetting("WindowedScreenWidth", windowedScreenWidth);
 	config.CreateSetting("WindowedScreenHeight", windowedScreenHeight);
+	config.CreateSetting("DesiredFOV", localDesiredFOV);
 	config.CreateSetting("QuitOnEscape", quitonescape);
 	config.CreateSetting("MoveBob", FRACUNIT);
 	config.CreateSetting("Gamma", 1.0f);
@@ -257,6 +261,7 @@ void ReadConfig(void)
 		uniScreenHeight = sd->GetInteger();
 		config.DeleteSetting("ScreenHeight");
 	}
+	localDesiredFOV = clamp<float>(static_cast<const float>(config.GetSetting("DesiredFOV")->GetFloat()), 45.0f, 180.0f);
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
 	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());
@@ -335,6 +340,9 @@ void ReadConfig(void)
 		screenHeight = windowedScreenHeight;
 		screenWidth = windowedScreenWidth;
 	}
+
+		// Propogate localDesiredFOV to players[0]
+	players[0].SetFOV(localDesiredFOV);
 }
 
 /*
@@ -394,6 +402,7 @@ void WriteConfig(void)
 	config.GetSetting("FullScreenHeight")->SetValue(fullScreenHeight);
 	config.GetSetting("WindowedScreenWidth")->SetValue(windowedScreenWidth);
 	config.GetSetting("WindowedScreenHeight")->SetValue(windowedScreenHeight);
+	config.GetSetting("DesiredFOV")->SetValue(localDesiredFOV);
 	config.GetSetting("QuitOnEscape")->SetValue(quitonescape);
 	config.GetSetting("MoveBob")->SetValue(movebob);
 	config.GetSetting("Gamma")->SetValue(screenGamma);

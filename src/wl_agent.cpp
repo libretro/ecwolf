@@ -850,7 +850,7 @@ void player_t::Reborn()
 	ReadyWeapon = NULL;
 	PendingWeapon = WP_NOCHANGE;
 	flags = 0;
-	FOV = DesiredFOV = 90.0f;
+	FOV = DesiredFOV;
 
 	if(state == PST_ENTER)
 	{
@@ -917,6 +917,66 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 			psprite[layer].frame = psprite[layer].frame->next;
 		else
 			break;
+	}
+}
+
+void player_t::SetFOV(float newlyDesiredFOV)
+{
+	DesiredFOV = newlyDesiredFOV;
+
+		// If they're not dead, holding a weapon, and the weapon has a non-zero scale, then we adjust the FOV
+	if(state != player_t::PST_DEAD && ReadyWeapon != NULL && ReadyWeapon->fovscale != 0) 
+	{
+		FOV = -DesiredFOV * ReadyWeapon->fovscale;
+		if(mo != NULL) CalcProjection(mo->radius);
+	}
+	else
+	{
+		FOV = DesiredFOV;
+	}
+}
+
+void player_t::AdjustFOV()
+{
+	// [RH] Zoom the player's FOV
+	float desired = DesiredFOV;
+
+	// Adjust FOV using on the currently held weapon.
+	if (state != player_t::PST_DEAD &&		// No adjustment while dead.
+		ReadyWeapon != NULL &&				// No adjustment if no weapon.
+		ReadyWeapon->fovscale != 0)			// No adjustment if the adjustment is zero.
+	{
+
+		// A negative scale is used to prevent G_AddViewAngle/G_AddViewPitch
+		// from scaling with the FOV scale.
+		desired *= fabsf(ReadyWeapon->fovscale);
+	}
+
+	if (FOV != desired)
+	{
+		// Negative FOV means recalculate projection
+		if (FOV < 0)
+		{
+			FOV *= -1;
+		}
+		else if (fabsf(FOV - desired) < 7.f)
+		{
+			FOV = desired;
+		}
+		else
+		{
+			float zoom = MAX(7.f, fabsf(FOV - desired) * 0.025f);
+			if (FOV > desired)
+			{
+				FOV = FOV - zoom;
+			}
+			else
+			{
+				FOV = FOV + zoom;
+			}
+		}
+
+		CalcProjection(mo->radius);
 	}
 }
 
