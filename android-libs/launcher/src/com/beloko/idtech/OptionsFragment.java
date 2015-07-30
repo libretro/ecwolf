@@ -66,7 +66,8 @@ public class OptionsFragment extends Fragment{
 
 		if ((AppSettings.game == IDGame.Doom) || (AppSettings.game == IDGame.Quake3)|| (AppSettings.game == IDGame.RTCW)
 				|| (AppSettings.game == IDGame.Wolf3d)|| (AppSettings.game == IDGame.JK2)|| (AppSettings.game == IDGame.JK3)
-				|| (AppSettings.game == IDGame.Hexen)|| (AppSettings.game == IDGame.Strife)|| (AppSettings.game == IDGame.Heretic)) //If doom, hide the music and other options, now alos Q3!
+				|| (AppSettings.game == IDGame.Hexen)|| (AppSettings.game == IDGame.Strife)|| (AppSettings.game == IDGame.Heretic)
+				|| (AppSettings.game == IDGame.Noah)) //If doom, hide the music and other options, now alos Q3!
 			quakeExtra.setVisibility(View.GONE);
 
 		//Immersion mode for KitKat or above

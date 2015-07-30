@@ -157,14 +157,14 @@ public class QuakeControlConfig implements Serializable{
 		actions.add(new ActionInput("analog_move_strafe","Strafe",ACTION_ANALOG_STRAFE,Type.ANALOG));
 
 
-		if (game != IDGame.Wolf3d)
+		if ((game != IDGame.Wolf3d) && (game != IDGame.Noah))
 			actions.add(new ActionInput("analog_look_pitch","Look Up/Look Down",ACTION_ANALOG_PITCH,Type.ANALOG));
 
 		actions.add(new ActionInput("analog_look_yaw","Look Left/Look Right",ACTION_ANALOG_YAW,Type.ANALOG));
 
 		actions.add(new ActionInput("attack","Attack",PORT_ACT_ATTACK,Type.BUTTON));
 
-		if ((game == IDGame.Doom) || (game == IDGame.Wolf3d)|| (game == IDGame.Hexen)|| (game == IDGame.Strife)|| (game == IDGame.Heretic))
+		if ((game == IDGame.Doom) || (game == IDGame.Wolf3d) || (game == IDGame.Noah) || (game == IDGame.Hexen)|| (game == IDGame.Strife)|| (game == IDGame.Heretic))
 			actions.add(new ActionInput("use","Use/Open",PORT_ACT_USE,Type.BUTTON));
 
 		if (game == IDGame.RTCW)
@@ -189,7 +189,7 @@ public class QuakeControlConfig implements Serializable{
 			actions.add(new ActionInput("use","Use/Open",PORT_ACT_USE,Type.BUTTON));
 		}
 
-		if ((game != IDGame.Doom) && (game != IDGame.Wolf3d))
+		if ((game != IDGame.Doom) && (game != IDGame.Wolf3d) && (game != IDGame.Noah))
 			actions.add(new ActionInput("jump","Jump",PORT_ACT_JUMP,Type.BUTTON));
 
 		if ((game == IDGame.Quake2) || (game == IDGame.Quake3)|| (game == IDGame.Hexen2)|| (game == IDGame.RTCW)|| (game == IDGame.JK2) || (game == IDGame.JK3))
@@ -218,7 +218,7 @@ public class QuakeControlConfig implements Serializable{
 		actions.add(new ActionInput("left","Strafe Left",PORT_ACT_MOVE_LEFT,Type.BUTTON));
 		actions.add(new ActionInput("right","Strafe Right",PORT_ACT_MOVE_RIGHT,Type.BUTTON));
 
-		if ((game != IDGame.Doom) && (game != IDGame.Wolf3d))
+		if ((game != IDGame.Doom) && (game != IDGame.Wolf3d) && (game != IDGame.Noah))
 		{
 			actions.add(new ActionInput("look_up","Look Up",PORT_ACT_LOOK_UP,Type.BUTTON));
 			actions.add(new ActionInput("look_down","Look Down",PORT_ACT_LOOK_DOWN,Type.BUTTON));
@@ -227,7 +227,7 @@ public class QuakeControlConfig implements Serializable{
 		actions.add(new ActionInput("look_left","Look Left",PORT_ACT_LEFT,Type.BUTTON));
 		actions.add(new ActionInput("look_right","Look Right",PORT_ACT_RIGHT,Type.BUTTON));
 
-		if ((game != IDGame.Wolf3d) && (game != IDGame.JK2) || (game != IDGame.JK3))
+		if ((game != IDGame.Wolf3d) && (game != IDGame.Noah) && (game != IDGame.JK2) || (game != IDGame.JK3))
 		{
 			actions.add(new ActionInput("strafe_on","Strafe On",PORT_ACT_STRAFE,Type.BUTTON));
 			actions.add(new ActionInput("speed","Run On",PORT_ACT_SPEED,Type.BUTTON));
