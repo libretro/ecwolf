@@ -344,7 +344,7 @@ static void processEvent(SDL_Event *event)
 		// check for keypresses
 		case SDL_KEYDOWN:
 		{
-			if(event->key.keysym.sym==SDLK_SCROLLLOCK || event->key.keysym.sym==SDLK_F12)
+			if(event->key.keysym.sym==SDLK_SCROLLLOCK)
 			{
 				GrabInput = !GrabInput;
 				SDL_SetRelativeMouseMode(GrabInput ? SDL_TRUE : SDL_FALSE);
