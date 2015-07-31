@@ -634,6 +634,8 @@ protected:
 			ParseNameAssignment(gameinfo.DoorSoundSequence);
 		else if(key.CompareNoCase("drawreadthis") == 0)
 			ParseBoolAssignment(gameinfo.DrawReadThis);
+		else if(key.CompareNoCase("trackhighscores") == 0)
+			ParseBoolAssignment(gameinfo.TrackHighScores);
 		else if(key.CompareNoCase("gamecolormap") == 0)
 			ParseStringAssignment(gameinfo.GameColormap);
 		else if(key.CompareNoCase("gameoverpic") == 0)

@@ -54,6 +54,7 @@ public:
 	int		PsychedColors[2];
 	int 	PsychedOffset;
 	bool	DrawReadThis;
+	bool	TrackHighScores;
 
 	int		TitleTime;
 	FString	BorderFlat;

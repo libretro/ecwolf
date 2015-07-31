@@ -885,6 +885,9 @@ void DrawHighScores (void)
 
 void CheckHighScore (int32_t score, const LevelInfo *levelInfo)
 {
+	if (!gameinfo.TrackHighScores)
+		return;
+
 	word i, j;
 	int n;
 	HighScore myscore;

@@ -42,6 +42,7 @@ gameinfo
 	pageindexfontcolor = "Black"
 	dialogcolor = "NoahWhite"
 	deathtransition = "Fade"
+	trackhighscores = true
 }
 
 automap

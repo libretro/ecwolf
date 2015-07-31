@@ -77,20 +77,23 @@ MENU_LISTENER(ViewScoresOrEndGame)
 	}
 	else
 	{
-		MenuFadeOut();
+		if (gameinfo.TrackHighScores == true)
+		{
+			MenuFadeOut();
 
-		StartCPMusic(gameinfo.ScoresMusic);
+			StartCPMusic(gameinfo.ScoresMusic);
 
-		DrawHighScores();
-		VW_UpdateScreen();
-		MenuFadeIn();
+			DrawHighScores();
+			VW_UpdateScreen();
+			MenuFadeIn();
 
-		IN_Ack();
+			IN_Ack();
 
-		StartCPMusic(gameinfo.MenuMusic);
-		MenuFadeOut();
-		mainMenu.draw();
-		MenuFadeIn ();
+			StartCPMusic(gameinfo.MenuMusic);
+			MenuFadeOut();
+			mainMenu.draw();
+			MenuFadeIn ();
+		}
 	}
 	return true;
 }
@@ -595,13 +598,23 @@ void US_ControlPanel (ScanCode scancode)
 	if(ingame)
 	{
 		mainMenu[mainMenu.countItems()-3]->setText(language["STR_EG"]);
+		mainMenu[mainMenu.countItems()-3]->setEnabled(true);
 		mainMenu[mainMenu.countItems()-2]->setText(language["STR_BG"]);
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(true);
 		mainMenu[3]->setEnabled(true);
 	}
 	else
 	{
-		mainMenu[mainMenu.countItems()-3]->setText(language["STR_VS"]);
+		if (gameinfo.TrackHighScores == true)
+		{
+			mainMenu[mainMenu.countItems()-3]->setText(language["STR_VS"]);
+			mainMenu[mainMenu.countItems()-3]->setEnabled(true);
+		}
+		else
+		{
+			mainMenu[mainMenu.countItems()-3]->setText(language["STR_EG"]);
+			mainMenu[mainMenu.countItems()-3]->setEnabled(false);
+		}
 		mainMenu[mainMenu.countItems()-2]->setText(language["STR_BD"]);
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(false);
 		mainMenu[3]->setEnabled(false);
