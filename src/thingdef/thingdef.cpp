@@ -1045,8 +1045,6 @@ bool ClassDef::ParseActorStateFlags(Scanner &sc, StateDefinition &thisState)
 			thisState.fullbright = true;
 		else if(sc->str.CompareNoCase("offset") == 0)
 		{
-			thisState.offsetX = thisState.offsetY = 1;
-
 			sc.MustGetToken('(');
 
 			negate = sc.CheckToken('-');
