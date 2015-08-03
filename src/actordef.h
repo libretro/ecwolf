@@ -104,6 +104,8 @@ class Frame
 		int			duration;
 		unsigned	randDuration;
 		bool		fullbright;
+		fixed_t		offsetX;
+		fixed_t		offsetY;
 		class ActionCall
 		{
 			public:
