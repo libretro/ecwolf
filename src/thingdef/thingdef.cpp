@@ -209,6 +209,8 @@ struct StateDefinition
 		int			duration;
 		unsigned	randDuration;
 		bool		fullbright;
+		fixed_t		offsetX;
+		fixed_t		offsetY;
 		NextType	nextType;
 		FString		nextArg;
 		StateLabel	jumpLabel;
@@ -795,6 +797,8 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->duration = thisStateDef.duration;
 			thisFrame->randDuration = thisStateDef.randDuration;
 			thisFrame->fullbright = thisStateDef.fullbright;
+			thisFrame->offsetX = thisStateDef.offsetX;
+			thisFrame->offsetY = thisStateDef.offsetY;
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
@@ -1027,6 +1031,7 @@ void ClassDef::ParseActorStateDuration(Scanner &sc, StateDefinition &thisState)
 // Returns true if this state is finalized, false if it is not.
 bool ClassDef::ParseActorStateFlags(Scanner &sc, StateDefinition &thisState)
 {
+	bool negate = false;
 	thisState.fullbright = false;
 
 	do
@@ -1038,6 +1043,22 @@ bool ClassDef::ParseActorStateFlags(Scanner &sc, StateDefinition &thisState)
 
 		if(sc->str.CompareNoCase("bright") == 0)
 			thisState.fullbright = true;
+		else if(sc->str.CompareNoCase("offset") == 0)
+		{
+			sc.MustGetToken('(');
+
+			negate = sc.CheckToken('-');
+			sc.MustGetToken(TK_FloatConst);
+			thisState.offsetX = FLOAT2FIXED((negate ? -1 : 1) * sc->decimal);
+
+			sc.MustGetToken(',');
+
+			negate = sc.CheckToken('-');
+			sc.MustGetToken(TK_FloatConst);
+			thisState.offsetY = FLOAT2FIXED((negate ? -1 : 1) * sc->decimal);
+
+			sc.MustGetToken(')');
+		}
 		else
 			break;
 	}
@@ -1157,6 +1178,7 @@ void ClassDef::ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSort
 		thisState.sprite[0] = thisState.sprite[4] = 0;
 		thisState.duration = 0;
 		thisState.randDuration = 0;
+		thisState.offsetX = thisState.offsetY = 0;
 		thisState.nextType = StateDefinition::NORMAL;
 
 		if(needIdentifier)

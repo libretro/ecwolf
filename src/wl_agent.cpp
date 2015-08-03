@@ -910,8 +910,17 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 
 	while(psprite[layer].frame)
 	{
+		if(psprite[layer].frame->offsetX != 0)
+			psprite[layer].sx = psprite[layer].frame->offsetX;
+
+		if(psprite[layer].frame->offsetY != 0)
+			psprite[layer].sy = psprite[layer].frame->offsetY;
+
 		psprite[layer].ticcount = psprite[layer].frame->GetTics();
 		psprite[layer].frame->action(mo, ReadyWeapon, psprite[layer].frame);
+
+		if(mo->player->flags & player_t::PF_WEAPONBOBBING)
+			psprite[layer].sx = psprite[layer].sy = 0;
 
 		if(psprite[layer].frame && psprite[layer].ticcount == 0)
 			psprite[layer].frame = psprite[layer].frame->next;
