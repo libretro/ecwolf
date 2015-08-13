@@ -1298,6 +1298,8 @@ ClassDef *ClassDef::ParseActorHeader(Scanner &sc, bool &previouslyDefined, bool 
 	else
 		newClass = *classRef;
 
+	newClass->name = sc->str;
+
 	ParseActorInheritance(sc, newClass);
 	ParseActorReplacements(sc, newClass);
 
