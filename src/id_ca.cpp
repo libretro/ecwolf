@@ -43,6 +43,16 @@ GameMap *map = NULL;
 =============================================================================
 */
 
+// Deleter function for our map object. Ensures that any thinkers that may be
+// referencing the map are cleaned up first. Note that this can't be done
+// during the GameMap object's destructor since there can be more than one
+// GameMap object.
+void CA_UnloadMap(GameMap *map)
+{
+	thinkerList->DestroyAll();
+	delete map;
+}
+
 /*
 ======================
 =
@@ -53,8 +63,7 @@ GameMap *map = NULL;
 
 void CA_CacheMap (const FString &mapname, bool loading)
 {
-	static TUniquePtr<GameMap> map;
-	thinkerList->DestroyAll();
+	static TUniquePtr<GameMap, TFuncDeleter<GameMap, CA_UnloadMap> > map;
 	map.Reset();
 
 	Printf("\n");
