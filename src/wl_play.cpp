@@ -1061,7 +1061,7 @@ void PlayLoop (void)
 		//
 		funnyticount += tics;
 
-		TexMan.UpdateAnimations(gamestate.TimeCount*14);
+		TexMan.UpdateAnimations(lasttimecount*14);
 		GC::CheckGC();
 
 		UpdateSoundLoc ();      // JAB
