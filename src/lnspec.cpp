@@ -575,6 +575,27 @@ public:
 		}
 	}
 
+	void Serialize(FArchive &arc)
+	{
+		if(GameSave::SaveVersion > 1438232816)
+		{
+			BYTE state = this->state;
+			arc << state;
+			this->state = static_cast<State>(state);
+
+			arc << activator
+				<< sndseq
+				<< spot
+				<< door
+				<< next
+				<< nextDoor
+				<< elevTag
+				<< callSpeed;
+		}
+
+		Super::Serialize(arc);
+	}
+
 protected:
 	void StartSoundSequence()
 	{

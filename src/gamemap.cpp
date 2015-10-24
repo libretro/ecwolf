@@ -679,6 +679,37 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 		}
 	}
 
+	// Current elevator positions.
+	if(GameSave::SaveVersion > 1438232816)
+	{
+		if(arc.IsStoring())
+		{
+			unsigned int count = gm->elevatorPosition.CountUsed();
+			arc << count;
+
+			TMap<unsigned int, MapSpot>::Iterator iter(gm->elevatorPosition);
+			TMap<unsigned int, MapSpot>::Pair *pair;
+			while(iter.NextPair(pair))
+			{
+				DWORD key = pair->Key;
+				arc << key << pair->Value;
+			}
+		}
+		else
+		{
+			unsigned int count;
+			arc << count;
+			while(count-- > 0)
+			{
+				DWORD key;
+				MapSpot value;
+				arc << key << value;
+
+				gm->elevatorPosition[key] = value;
+			}
+		}
+	}
+
 	return arc;
 }
 
