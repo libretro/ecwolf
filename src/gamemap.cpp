@@ -412,6 +412,17 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	return spot->triggers[spot->triggers.Size()-1];
 }
 
+void GameMap::PropagateMark()
+{
+	for(unsigned int p = 0;p < NumPlanes();++p)
+	{
+		MapPlane &plane = planes[p];
+
+		for(unsigned int i = 0;i < GetHeader().width*GetHeader().height;++i)
+			GC::Mark(plane.map[i].thinker);
+	}
+}
+
 // Look at data and determine if we need to set up any flags.
 void GameMap::ScanTiles()
 {
@@ -699,6 +710,8 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 		{
 			unsigned int count;
 			arc << count;
+
+			gm->elevatorPosition.Clear();
 			while(count-- > 0)
 			{
 				DWORD key;

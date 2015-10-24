@@ -551,6 +551,7 @@ public:
 						activator->x = ((next->GetX() - relx)<<16)|fracx;
 						activator->y = ((next->GetY() - rely)<<16)|fracy;
 						activator->angle += angle;
+						activator->EnterZone(map->GetSpot(activator->tilex, activator->tiley, 0)->zone);
 					}
 				}
 				break;
