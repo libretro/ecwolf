@@ -53,6 +53,13 @@ inline void SDL_WarpMouseInWindow(struct SDL_Window* window, int x, int y)
 }
 #endif
 
+#ifdef _WIN32
+// SDL doesn't track the real state of the numlock or capslock key, so we need
+// to query the system. It's probably like this since Linux and OS X don't
+// appear to have nice APIs for this.
+void I_CheckKeyMods();
+#endif
+
 /*
 =============================================================================
 
@@ -337,7 +344,7 @@ static void processEvent(SDL_Event *event)
 		// check for keypresses
 		case SDL_KEYDOWN:
 		{
-			if(event->key.keysym.sym==SDLK_SCROLLLOCK || event->key.keysym.sym==SDLK_F12)
+			if(event->key.keysym.sym==SDLK_SCROLLLOCK)
 			{
 				GrabInput = !GrabInput;
 				SDL_SetRelativeMouseMode(GrabInput ? SDL_TRUE : SDL_FALSE);
@@ -481,6 +488,13 @@ static void processEvent(SDL_Event *event)
 			}
 			break;
 		}
+#else
+#ifdef _WIN32
+		case SDL_WINDOWEVENT:
+			if (event->window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				I_CheckKeyMods();
+			break;
+#endif
 #endif
 	}
 }
@@ -529,6 +543,13 @@ IN_Startup(void)
 
 #ifdef __ANDROID__
 	ShadowingEnabled = !hasHardwareKeyboard();
+#endif
+
+#ifdef _WIN32
+	I_CheckKeyMods();
+#else
+	// Turn numlock on by default since that's probably what most people want.
+	SDL_SetModState(SDL_Keymod(SDL_GetModState()|KMOD_NUM));
 #endif
 
 	IN_ClearKeysDown();

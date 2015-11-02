@@ -400,6 +400,13 @@ void ForceSDLFocus(SDL_Window *win)
 }
 #endif
 
+void I_CheckKeyMods()
+{
+	const bool numlock = GetKeyState(VK_NUMLOCK) & 1;
+	const bool capslock = GetKeyState(VK_CAPITAL) & 1;
+	SDL_SetModState(SDL_Keymod((numlock ? KMOD_NUM : 0)|(capslock ? KMOD_CAPS : 0)));
+}
+
 //==========================================================================
 //
 // I_MakeRNGSeed

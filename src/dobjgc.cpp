@@ -79,6 +79,7 @@
 //#include "intermission/intermission.h"
 #include "wl_agent.h"
 #include "thingdef/thingdef.h"
+#include "id_ca.h"
 
 // MACROS ------------------------------------------------------------------
 
@@ -307,6 +308,8 @@ static void MarkRoot()
 	if(thinkerList)
 		thinkerList->MarkRoots();
 	players[0].PropagateMark();
+	if(map)
+		map->PropagateMark();
 	Mark(screen);
 #if 0
 	Mark(Args);

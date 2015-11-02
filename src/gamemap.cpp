@@ -422,6 +422,17 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	return spot->triggers[spot->triggers.Size()-1];
 }
 
+void GameMap::PropagateMark()
+{
+	for(unsigned int p = 0;p < NumPlanes();++p)
+	{
+		MapPlane &plane = planes[p];
+
+		for(unsigned int i = 0;i < GetHeader().width*GetHeader().height;++i)
+			GC::Mark(plane.map[i].thinker);
+	}
+}
+
 // Look at data and determine if we need to set up any flags.
 void GameMap::ScanTiles()
 {
@@ -686,6 +697,39 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 
 			if(!arc.IsStoring())
 				plane.map[i].plane = &plane;
+		}
+	}
+
+	// Current elevator positions.
+	if(GameSave::SaveVersion > 1438232816)
+	{
+		if(arc.IsStoring())
+		{
+			unsigned int count = gm->elevatorPosition.CountUsed();
+			arc << count;
+
+			TMap<unsigned int, MapSpot>::Iterator iter(gm->elevatorPosition);
+			TMap<unsigned int, MapSpot>::Pair *pair;
+			while(iter.NextPair(pair))
+			{
+				DWORD key = pair->Key;
+				arc << key << pair->Value;
+			}
+		}
+		else
+		{
+			unsigned int count;
+			arc << count;
+
+			gm->elevatorPosition.Clear();
+			while(count-- > 0)
+			{
+				DWORD key;
+				MapSpot value;
+				arc << key << value;
+
+				gm->elevatorPosition[key] = value;
+			}
 		}
 	}
 

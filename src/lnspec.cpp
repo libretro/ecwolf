@@ -184,7 +184,7 @@ class EVDoor : public Thinker
 				case Opened:
 					if(wait == 0)
 					{
-						if(CheckJammed())
+						if(CheckJammed(false))
 						{
 							// Might as well reset the door timer, chances are the actor isn't going any where
 							wait = opentics;
@@ -213,7 +213,10 @@ class EVDoor : public Thinker
 			}
 		}
 
-		bool Reactivate(AActor *activator, bool ismonster)
+		// forceclose is a temporary workaround for the issue where monsters can
+		// jam elevator doors and breaking levels. TODO: Replace with ROTT's
+		// crushing/gibbing behavior.
+		bool Reactivate(AActor *activator, bool ismonster, bool forceclose=false)
 		{
 			switch(state)
 			{
@@ -224,9 +227,9 @@ class EVDoor : public Thinker
 						return false;
 					}
 				default:
-					if(!ismonster && !CheckJammed())
-						return ChangeState(Closing);
-					break;
+					if(ismonster || CheckJammed(forceclose))
+						break;
+					return ChangeState(Closing);
 				case Closing:
 					return ChangeState(Opening);
 			}
@@ -275,12 +278,15 @@ class EVDoor : public Thinker
 			return true;
 		}
 
-		bool CheckJammed() const
+		bool CheckJammed(bool onlysolid) const
 		{
 			for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 			{
 				if(!CheckClears(iter))
-					return true;
+				{
+					if(!onlysolid || (iter->flags & FL_SOLID))
+						return true;
+				}
 			}
 			return false;
 		}
@@ -401,7 +407,7 @@ public:
 				EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
 				if(!doorThinker->IsClosing())
 				{
-					if(!doorThinker->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER)))
+					if(!doorThinker->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER), true))
 					{
 						Destroy();
 						return;
@@ -551,6 +557,7 @@ public:
 						activator->x = ((next->GetX() - relx)<<16)|fracx;
 						activator->y = ((next->GetY() - rely)<<16)|fracy;
 						activator->angle += angle;
+						activator->EnterZone(map->GetSpot(activator->tilex, activator->tiley, 0)->zone);
 					}
 				}
 				break;
@@ -573,6 +580,27 @@ public:
 				}
 				break;
 		}
+	}
+
+	void Serialize(FArchive &arc)
+	{
+		if(GameSave::SaveVersion > 1438232816)
+		{
+			BYTE state = this->state;
+			arc << state;
+			this->state = static_cast<State>(state);
+
+			arc << activator
+				<< sndseq
+				<< spot
+				<< door
+				<< next
+				<< nextDoor
+				<< elevTag
+				<< callSpeed;
+		}
+
+		Super::Serialize(arc);
 	}
 
 protected:

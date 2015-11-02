@@ -86,7 +86,6 @@ class AActor;
 class CallArguments;
 class ExpressionNode;
 
-typedef uint32_t flagstype_t;
 typedef bool (*ActionPtr)(AActor *, AActor *, const class Frame * const, const CallArguments &, struct ActionResult *);
 
 class Frame
