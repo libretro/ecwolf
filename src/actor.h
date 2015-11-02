@@ -41,6 +41,7 @@
 #include "linkedlist.h"
 #include "name.h"
 #include "dobject.h"
+#include "tflags.h"
 #include "thinker.h"
 
 enum
@@ -68,6 +69,9 @@ enum
 	SPAWN_AllowReplacement = 1,
 	SPAWN_Patrol = 2
 };
+
+typedef TFlags<ActorFlag> ActorFlags;
+DEFINE_TFLAGS_OPERATORS (ActorFlags)
 
 class player_t;
 class ClassDef;
@@ -119,7 +123,7 @@ class AActor : public Thinker,
 		static PointerIndexTable<DropList> dropItems;
 
 		// Basic properties from objtype
-		flagstype_t flags;
+		ActorFlags flags;
 
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;

@@ -57,6 +57,8 @@ void InitFunctionTable(ActionTable *table);
 void ReleaseFunctionTable();
 ActionInfo *LookupFunction(const FName &func, const ActionTable *table);
 
+typedef DWORD flagstype_t;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DEFINE_FLAG(prefix, flag, type, variable) { NATIVE_CLASS(type), prefix##_##flag, #type, #flag, typeoffsetof(A##type,variable) }

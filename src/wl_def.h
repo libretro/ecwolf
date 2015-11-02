@@ -174,7 +174,7 @@ typedef uint32_t angle_t;
 
 // object flag values
 
-typedef enum
+enum ActorFlag
 {
 	FL_SHOOTABLE        = 0x00000001,
 	FL_VISABLE          = 0x00000008,
@@ -221,18 +221,24 @@ typedef enum
 	FL_PLOTONAUTOMAP	= 0x10000000,
 
 	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
+};
 
+enum ItemFlag
+{
 	IF_AUTOACTIVATE		= 0x00000001,
 	IF_INVBAR			= 0x00000002,
 	IF_ALWAYSPICKUP		= 0x00000004,
 	IF_INACTIVE			= 0x00000008, // For picked up items that remain on the map
+};
 
+enum WeaponFlag
+{
 	WF_NOGRIN			= 0x00000001,
 	WF_NOAUTOFIRE		= 0x00000002,
 	WF_DONTBOB			= 0x00000004,
 	WF_ALWAYSGRIN		= 0x00000008,
 	WF_NOALERT			= 0x00000010,
-} objflag_t;
+};
 
 /*
 =============================================================================
