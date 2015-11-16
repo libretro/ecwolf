@@ -404,7 +404,7 @@ void ControlMenuItem::activate()
 				break;
 			}
 			case 2:
-				if(!joystickenabled)
+				if(!IN_JoyPresent())
 				{
 					exit = true;
 					break;
@@ -459,16 +459,20 @@ void ControlMenuItem::activate()
 
 void ControlMenuItem::draw()
 {
+	extern int SDL2Backconvert(int sc);
+
 	DrawWindow(159, PrintY, ((52)*3) - 1, 13, BKGDCOLOR, BKGDCOLOR, BKGDCOLOR);
 	if(isSelected())
 		DrawWindow(160 + (52*column), PrintY + 1, 50 - 2, 11, MENUWIN_BACKGROUND, MENUWIN_BOTBORDER, MENUWIN_TOPBORDER);
 
 	US_Print(BigFont, getString(), getTextColor());
 
-	if(button.keyboard != -1)
+	const int key = SDL2Backconvert(button.keyboard);
+
+	if(button.keyboard >= 0 && button.keyboard < 512 && keyNames[key])
 	{
 		PrintX = 162;
-		US_Print(BigFont, keyNames[button.keyboard], getTextColor());
+		US_Print(BigFont, keyNames[key], getTextColor());
 	}
 	if(button.mouse != -1)
 	{
@@ -791,7 +795,7 @@ int Menu::handle()
 			}
 		}
 
-		if(LastScan == SCANCODE_UNMASK(SDLK_DELETE))
+		if(LastScan == SDLx_SCANCODE(DELETE))
 		{
 			handleDelete();
 			LastScan = 0;
@@ -877,7 +881,7 @@ int Menu::handle()
 						curPos = 0;
 						itemOffset = 0;
 					}
-					else if (lastIndexDrawn != lastPos && (unsigned)curPos == lastIndexDrawn-1)
+					else if (lastIndexDrawn != lastPos && (unsigned)curPos >= lastIndexDrawn-1)
 					{
 						++itemOffset;
 						++curPos;

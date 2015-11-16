@@ -1089,7 +1089,7 @@ void FString::ReallocBuffer (size_t newlen)
 	{ // If more than one reference, we must use a new copy
 		FStringData *old = Data();
 		AllocBuffer (newlen);
-		StrCopy (Chars, old->Chars(), old->Len);
+		StrCopy (Chars, old->Chars(), MIN<size_t>(newlen, old->Len));
 		old->Release();
 	}
 	else

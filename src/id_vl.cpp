@@ -41,14 +41,6 @@ unsigned windowedScreenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
 float screenGamma = 1.0f;
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-SDL_Window *window = NULL;
-SDL_Renderer *screenRenderer = NULL;
-SDL_Texture *screen = NULL;
-#else
-//SDL_Surface *screen = NULL;
-#endif
-
 SDL_Surface *curSurface = NULL;
 unsigned curPitch;
 
@@ -127,10 +119,8 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 	scaleFactorX = CleanXfac;
 	scaleFactorY = CleanYfac;
 
-	pixelangle = (short *) malloc(SCREENWIDTH * sizeof(short));
-	CHECKMALLOCRESULT(pixelangle);
-	wallheight = (int *) malloc(SCREENWIDTH * sizeof(int));
-	CHECKMALLOCRESULT(wallheight);
+	pixelangle = new short[SCREENWIDTH];
+	wallheight = new int[SCREENWIDTH];
 
 	NewViewSize(viewsize);
 }
@@ -184,6 +174,10 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 	VH_UpdateScreen();
 
 	screenfaded = end != 0;
+
+	// Clear out any input at this point that may be stored up. This solves
+	// issues such as starting facing the wrong angle in super 3d noah's ark.
+	IN_ProcessEvents();
 }
 
 void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)

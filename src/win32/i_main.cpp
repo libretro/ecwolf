@@ -36,8 +36,10 @@
 #include <windows.h>
 #include <wincrypt.h>
 #include <commctrl.h>
+#include <io.h>
 #include <cstdlib>
 #include <ctime>
+#include <SDL_syswm.h>
 
 #define USE_WINDOWS_DWORD
 #include "version.h"
@@ -49,9 +51,39 @@ HWND			ConWindow;
 HANDLE			MainThread;
 DWORD			MainThreadID;
 
+static bool AttachedStdOut = false, MustAllocConsole = false, FancyStdOut = false;
+
 extern EXCEPTION_POINTERS CrashPointers;
 void CreateCrashLog (char *custominfo, DWORD customsize, HWND richedit);
 void DisplayCrashLog ();
+
+int WL_Main(int argc, char* argv[]);
+
+//#ifdef _WINDEF_ //uncomment this if you get problems
+// Helper template so that we can access newer Win32 functions with a single static
+// variable declaration. If this were C++11 it could be totally transparent.
+template<typename Proto>
+class TOptWin32Proc
+{
+	static Proto GetOptionalWin32Proc(const char* module, const char* function)
+	{
+		HMODULE hmodule = GetModuleHandle(module);
+		if (hmodule == NULL)
+			return NULL;
+
+		return (Proto)GetProcAddress(hmodule, function);
+	}
+
+public:
+	const Proto Call;
+
+	TOptWin32Proc(const char* module, const char* function)
+		: Call(GetOptionalWin32Proc(module, function)) {}
+
+	// Wrapper object can be tested against NULL, but not directly called.
+	operator const void*() const { return (const void*)Call; }
+};
+//#endif
 
 //==========================================================================
 //
@@ -216,17 +248,12 @@ LONG WINAPI CatchAllExceptions (LPEXCEPTION_POINTERS info)
 	return EXCEPTION_CONTINUE_EXECUTION;
 }
 
-void StartupWin32()
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE nothing, LPSTR cmdline, int nCmdShow)
 {
-	// Get console window and hinstance.
-	char title[512];
-	GetConsoleTitleA(title, 512);
-	ConWindow = FindWindow(NULL, title);
-	g_hInst = NULL;
-	// Apparently the console window will prevent windows from being created if this doesn't return 0.
-	//g_hInst = (HINSTANCE)GetWindowLong(ConWindow, GWL_HINSTANCE);
+	g_hInst = hInstance;
 
 	InitCommonControls ();			// Load some needed controls and be pretty under XP
+
 	// We need to load riched20.dll so that we can create the control.
 	if (NULL == LoadLibrary ("riched20.dll"))
 	{
@@ -248,6 +275,104 @@ void StartupWin32()
 		SetUnhandledExceptionFilter(CatchAllExceptions);
 	}
 #endif
+
+	// Check for parameter to always show console window.
+	bool showconsole = false;
+	for (int i = 1;i < __argc;++i)
+	{
+		if (stricmp (__argv[i], "--console") == 0)
+		{
+			showconsole = true;
+			break;
+		}
+	}
+
+	// As a GUI application, we don't normally get a console when we start.
+	// If we were run from the shell and are on XP+, we can attach to its
+	// console. Otherwise, we can create a new one. If we already have a
+	// stdout handle, then we have been redirected and should just use that
+	// handle instead of creating a console window.
+
+	HANDLE StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (StdOut != NULL)
+	{
+		// It seems that running from a shell always creates a std output
+		// for us, even if it doesn't go anywhere. (Running from Explorer
+		// does not.) If we can get file information for this handle, it's
+		// a file or pipe, so use it. Otherwise, pretend it wasn't there
+		// and find a console to use instead.
+		BY_HANDLE_FILE_INFORMATION info;
+		if (!GetFileInformationByHandle(StdOut, &info))
+		{
+			StdOut = NULL;
+		}
+	}
+	if (StdOut == NULL)
+	{
+		// AttachConsole was introduced with Windows XP. (OTOH, since we
+		// have to share the console with the shell, I'm not sure if it's
+		// a good idea to actually attach to it.)
+		TOptWin32Proc<BOOL(WINAPI *)(DWORD)> attach_console("kernel32.dll", "AttachConsole");
+		if (attach_console != NULL && attach_console.Call(ATTACH_PARENT_PROCESS))
+		{
+			StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+			DWORD foo; WriteFile(StdOut, "\n", 1, &foo, NULL);
+			AttachedStdOut = true;
+		}
+		if (StdOut == NULL)
+		{
+			if (showconsole)
+			{
+				if (AllocConsole())
+					StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+			}
+			else // Defer console allocation to error
+				MustAllocConsole = true;
+		}
+
+		// Reopen output so that printf shows up in the console.
+		if (StdOut != NULL)
+		{
+			freopen("CONOUT$", "w", stdout);
+			freopen("CONOUT$", "w", stderr);
+			freopen("CONIN$", "r", stdin);
+		}
+
+		FancyStdOut = true;
+	}
+
+	int ret = WL_Main(__argc, __argv);
+
+	CloseHandle (MainThread);
+	MainThread = INVALID_HANDLE_VALUE;
+	return ret;
+}
+
+void I_AcknowledgeError()
+{
+	// If we don't have a console window, we need to open one and tell the user
+	// that we have more information, but they need to open the program in a
+	// different way to see that information.
+	if (MustAllocConsole)
+	{
+		MustAllocConsole = false;
+		if (AllocConsole())
+		{
+			freopen("CONOUT$", "w", stdout);
+			freopen("CONOUT$", "w", stderr);
+			freopen("CONIN$", "r", stdin);
+
+			printf("Please use --console or start from command prompt to see error messages.\n\n");
+		}
+	}
+
+	// When running from Windows explorer, wait for user dismissal
+	if (FancyStdOut && !AttachedStdOut)
+	{
+		fprintf(stderr, "An error has occured (press enter to dismiss)");
+		fseek(stdin, 0, SEEK_END);
+		getchar();
+	}
 }
 
 bool CheckIsRunningFromCommandPrompt()
@@ -257,6 +382,29 @@ bool CheckIsRunningFromCommandPrompt()
 	if(!GetConsoleScreenBufferInfo(stdOutput, &info))
 		return false;
 	return info.dwCursorPosition.X != 0 || info.dwCursorPosition.Y != 0;
+}
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+// If we have a console application then the console will be on a separate thread.
+// What this means that when the IWAD picker finishes its job, the focus will go to
+// the console thread and not to the SDL window we eventually create. We'll call this
+// function to bring it into focus.
+// https://forums.libsdl.org/viewtopic.php?p=42799
+void ForceSDLFocus(SDL_Window *win)
+{
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+	if (!SDL_GetWindowWMInfo(win, &info))
+		Printf("Failed to focus window.\n");
+	SetForegroundWindow(info.info.win.window);
+}
+#endif
+
+void I_CheckKeyMods()
+{
+	const bool numlock = GetKeyState(VK_NUMLOCK) & 1;
+	const bool capslock = GetKeyState(VK_CAPITAL) & 1;
+	SDL_SetModState(SDL_Keymod((numlock ? KMOD_NUM : 0)|(capslock ? KMOD_CAPS : 0)));
 }
 
 //==========================================================================

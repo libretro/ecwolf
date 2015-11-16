@@ -71,13 +71,13 @@ int		r_extralight;
 
 int fps_frames=0, fps_time=0, fps=0;
 
-int *wallheight;
+TUniquePtr<int[]> wallheight;
 int min_wallheight;
 
 //
 // math tables
 //
-short *pixelangle;
+TUniquePtr<short[]> pixelangle;
 fixed finetangent[FINEANGLES/2 + ANG180];
 fixed finesine[FINEANGLES+FINEANGLES/4];
 fixed *finecosine = finesine+ANG90;
@@ -98,7 +98,7 @@ int gLevelLight = LIGHTLEVEL_DEFAULT;
 void    TransformActor (AActor *ob);
 void    BuildTables (void);
 void    ClearScreen (void);
-int     CalcRotate (AActor *ob);
+unsigned int CalcRotate (AActor *ob);
 void    DrawScaleds (void);
 void    CalcTics (void);
 void    ThreeDRefresh (void);
@@ -213,7 +213,7 @@ void TransformActor (AActor *ob)
 //
 // calculate height (heightnumerator/(nx>>8))
 //
-	ob->viewheight = (word)(heightnumerator/(nx>>8));
+	ob->viewheight = (word)((heightnumerator<<8)/nx);
 }
 
 //==========================================================================
@@ -233,7 +233,7 @@ int CalcHeight()
 	fixed z = FixedMul(xintercept - viewx, viewcos)
 		- FixedMul(yintercept - viewy, viewsin);
 	if(z < MINDIST) z = MINDIST;
-	int height = heightnumerator / (z >> 8);
+	int height = (heightnumerator << 8) / z;
 	if(height < min_wallheight) min_wallheight = height;
 	return height;
 }
@@ -391,13 +391,6 @@ void HitVertWall (void)
 	{
 		texture -= texture%texxscale;
 
-		if((pixx&3) && texture == lasttexture)
-		{
-			ScalePost();
-			postx = pixx;
-			wallheight[pixx] = wallheight[pixx-1];
-			return;
-		}
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		if(postsource)
@@ -472,13 +465,6 @@ void HitHorizWall (void)
 	{
 		texture -= texture%texxscale;
 
-		if((pixx&3) && texture == lasttexture)
-		{
-			ScalePost();
-			postx=pixx;
-			wallheight[pixx] = wallheight[pixx-1];
-			return;
-		}
 		ScalePost();
 		wallheight[pixx] = CalcHeight();
 		if(postsource)
@@ -533,7 +519,7 @@ void HitHorizWall (void)
 =====================
 */
 
-int CalcRotate (AActor *ob)
+unsigned int CalcRotate (AActor *ob)
 {
 	angle_t angle, viewangle;
 
@@ -544,7 +530,7 @@ int CalcRotate (AActor *ob)
 
 	angle = viewangle - ob->angle;
 
-	angle+=ANGLE_45/2;
+	angle+= ANGLE_180 + ANGLE_45/2;
 
 	return angle/ANGLE_45;
 }

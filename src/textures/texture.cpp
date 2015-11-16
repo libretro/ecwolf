@@ -77,6 +77,8 @@ FTexture *FlatTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *PatchTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *EmptyTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *AutomapTexture_TryCreate(FileReader &, int lumpnum);
+FTexture *MacShapeTexture_TryCreate(FileReader &, int lumpnum);
+FTexture *PictTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *WolfRawTexture_TryCreate(FileReader &, int lumpnum);
 FTexture *WolfShapeTexture_TryCreate(FileReader &, int lumpnum);
 
@@ -98,6 +100,8 @@ FTexture * FTexture::CreateTexture (int lumpnum, int usetype)
 		{ PatchTexture_TryCreate,		TEX_Any },
 		{ WolfShapeTexture_TryCreate,	TEX_Any },
 		{ WolfRawTexture_TryCreate,		TEX_MiscPatch },
+		{ PictTexture_TryCreate,		TEX_MiscPatch },
+		{ MacShapeTexture_TryCreate,	TEX_Any },
 		{ EmptyTexture_TryCreate,		TEX_Any },
 		{ AutomapTexture_TryCreate,		TEX_MiscPatch },
 	};
@@ -165,6 +169,7 @@ FTexture::FTexture (const char *name, int lumpnum)
 	if (name != NULL)
 	{
 		uppercopy(Name, name);
+		Name[8] = 0;
 	}
 	else if (lumpnum < 0)
 	{

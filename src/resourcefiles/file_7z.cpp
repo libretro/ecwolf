@@ -38,6 +38,9 @@
 #include "w_wad.h"
 #include "zstring.h"
 #include "zdoomsupport.h"
+#ifdef _WIN32
+#include <malloc.h>
+#endif
 
 #define TEXTCOLOR_RED
 
@@ -174,7 +177,7 @@ struct F7ZLump : public FResourceLump
 
 //==========================================================================
 //
-// Zip file
+// 7-zip file
 //
 //==========================================================================
 
@@ -185,8 +188,6 @@ class F7ZFile : public FResourceFile
 	F7ZLump *Lumps;
 	C7zArchive *Archive;
 
-	static int STACK_ARGS lumpcmp(const void * a, const void * b);
-
 public:
 	F7ZFile(const char * filename, FileReader *filer);
 	bool Open(bool quiet);
@@ -196,15 +197,6 @@ public:
 
 
 
-int STACK_ARGS F7ZFile::lumpcmp(const void * a, const void * b)
-{
-	F7ZLump * rec1 = (F7ZLump *)a;
-	F7ZLump * rec2 = (F7ZLump *)b;
-
-	return stricmp(rec1->FullName, rec2->FullName);
-}
-
-
 //==========================================================================
 //
 // 7Z file
@@ -212,7 +204,7 @@ int STACK_ARGS F7ZFile::lumpcmp(const void * a, const void * b)
 //==========================================================================
 
 F7ZFile::F7ZFile(const char * filename, FileReader *filer)
-	: FResourceFile(filename, filer) 
+	: FResourceFile(filename, filer)
 {
 	Lumps = NULL;
 	Archive = NULL;
@@ -238,7 +230,7 @@ bool F7ZFile::Open(bool quiet)
 		Archive = NULL;
 		if (!quiet)
 		{
-			Printf("\n"TEXTCOLOR_RED"%s: ", Filename);
+			Printf("\n" TEXTCOLOR_RED "%s: ", Filename);
 			if (res == SZ_ERROR_UNSUPPORTED)
 			{
 				Printf("Decoder does not support this archive\n");
@@ -325,14 +317,13 @@ bool F7ZFile::Open(bool quiet)
 
 	if (!quiet) Printf(", %d lumps\n", NumLumps);
 
-	// Entries in archives are sorted alphabetically
-	qsort(&Lumps[0], NumLumps, sizeof(F7ZLump), lumpcmp);
+	PostProcessArchive(&Lumps[0], sizeof(F7ZLump));
 	return true;
 }
 
 //==========================================================================
 //
-// 
+//
 //
 //==========================================================================
 

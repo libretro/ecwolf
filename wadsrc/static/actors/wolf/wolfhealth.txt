@@ -1,7 +1,7 @@
 actor DogFood : Health 39
 {
 	inventory.amount 4
-	inventory.pickupsound "misc/health_pickup"
+	inventory.pickupsound "misc/dogfood_pkup"
 	states
 	{
 		Spawn:
@@ -22,7 +22,6 @@ actor DogFood2 : DogFood 111
 actor Food : Health 57
 {
 	inventory.amount 10
-	inventory.pickupsound "misc/health_pickup"
 	states
 	{
 		Spawn:
@@ -43,7 +42,7 @@ actor Food2 : Food 142
 actor Medikit : Health 58
 {
 	inventory.amount 25
-	inventory.pickupsound "misc/medkit_pickup"
+	inventory.pickupsound "misc/medkit_pkup"
 	states
 	{
 		Spawn:

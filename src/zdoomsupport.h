@@ -6,6 +6,8 @@
 #include "m_crc32.h"
 #include "templates.h"
 
+#include <cstring>
+
 #ifdef __ANDROID__
 #include <android/log.h>
 #define printf LOGI
@@ -67,7 +69,7 @@ static void DPrintf(const char* fmt, ...) {}
 #define MAKE_ID(a,b,c,d)	((DWORD)((d)|((c)<<8)|((b)<<16)|((a)<<24)))
 #endif
 
-#define MAXWIDTH 2560
+#define MAXWIDTH 5120
 #define Printf printf
 #define I_FatalError Quit
 void I_Error(const char* format, ...);

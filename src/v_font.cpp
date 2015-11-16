@@ -232,8 +232,8 @@ protected:
 class FTile8Char : public FFontChar2
 {
 public:
-	FTile8Char (int sourcelump, int sourcepos, int width, int height, int maskcolor=-1, int leftofs=0, int topofs=0) :
-		FFontChar2(sourcelump, sourcepos, width, height, leftofs), MaskColor(maskcolor)
+	FTile8Char (int sourcelump, int sourcepos, int width, int height, int maskcolor=-1) :
+		FFontChar2(sourcelump, sourcepos, width, height), MaskColor(maskcolor)
 	{
 	}
 
@@ -1084,6 +1084,9 @@ void FSingleLumpFont::LoadTranslations()
 			memset(colorsused, 0, 256);
 			for(unsigned int i = 0;i < count;++i)
 			{
+				if(!Chars[i].Pic)
+					continue;
+
 				static_cast<FFontChar2*>(Chars[i].Pic)->SetSourceRemap(NULL);
 				RecordTextureColors(Chars[i].Pic, colorsused);
 			}
@@ -1286,20 +1289,29 @@ void FSingleLumpFont::LoadTile8(int lump, const BYTE *data)
 	unsigned int count = LastChar - FirstChar + 1;
 	Chars = new CharData[count];
 
+	const int tile8size = Wads.LumpLength(lump);
+
 	for(unsigned int i = 0;i < count;++i)
 	{
+		int pos;
+		int mask = -1;
+
 		if(i <= 7)
-			Chars[i].Pic = new FTile8Char (lump, i*64, SpaceWidth, FontHeight);
+			pos = i*64;
 		else if(i >= (unsigned int)('0'-FirstChar) && i <= (unsigned int)('9'-FirstChar))
-			Chars[i].Pic = new FTile8Char (lump, (i-('0'-FirstChar)+9)*64, SpaceWidth, FontHeight);
+			pos = (i-('0'-FirstChar)+9)*64;
 		// Mask off background color in S3DNA automap things (0x71-0x78 = Player, 0x7A+ = Things)
 		else if((i >= 0x71u-FirstChar && i <= 0x78u-FirstChar) || (i >= 0x7Au-FirstChar))
-			Chars[i].Pic = new FTile8Char (lump, (i-('A'-FirstChar)+19)*64, SpaceWidth, FontHeight, 215);
+		{
+			mask = 215;
+			pos = (i-('A'-FirstChar)+19)*64;
+		}
 		else if(i >= (unsigned int)('A'-FirstChar))
-			Chars[i].Pic = new FTile8Char (lump, (i-('A'-FirstChar)+19)*64, SpaceWidth, FontHeight);
+			pos = (i-('A'-FirstChar)+19)*64;
 		else
-			Chars[i].Pic = new FTile8Char (lump, 8*64, SpaceWidth, FontHeight);
+			pos = 8*64;
 
+		Chars[i].Pic = pos < tile8size ? new FTile8Char (lump, pos, SpaceWidth, FontHeight, mask) : NULL;
 		Chars[i].XMove = 8;
 	}
 

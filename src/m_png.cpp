@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <zlib.h>
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <malloc.h>		// for alloca()
 #endif
 

@@ -184,7 +184,7 @@ class EVDoor : public Thinker
 				case Opened:
 					if(wait == 0)
 					{
-						if(CheckJammed())
+						if(CheckJammed(false))
 						{
 							// Might as well reset the door timer, chances are the actor isn't going any where
 							wait = opentics;
@@ -213,7 +213,10 @@ class EVDoor : public Thinker
 			}
 		}
 
-		bool Reactivate(AActor *activator, bool ismonster)
+		// forceclose is a temporary workaround for the issue where monsters can
+		// jam elevator doors and breaking levels. TODO: Replace with ROTT's
+		// crushing/gibbing behavior.
+		bool Reactivate(AActor *activator, bool ismonster, bool forceclose=false)
 		{
 			switch(state)
 			{
@@ -224,9 +227,9 @@ class EVDoor : public Thinker
 						return false;
 					}
 				default:
-					if(!ismonster && !CheckJammed())
-						return ChangeState(Closing);
-					break;
+					if(ismonster || CheckJammed(forceclose))
+						break;
+					return ChangeState(Closing);
 				case Closing:
 					return ChangeState(Opening);
 			}
@@ -275,12 +278,15 @@ class EVDoor : public Thinker
 			return true;
 		}
 
-		bool CheckJammed() const
+		bool CheckJammed(bool onlysolid) const
 		{
 			for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 			{
 				if(!CheckClears(iter))
-					return true;
+				{
+					if(!onlysolid || (iter->flags & FL_SOLID))
+						return true;
+				}
 			}
 			return false;
 		}
@@ -401,7 +407,7 @@ public:
 				EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
 				if(!doorThinker->IsClosing())
 				{
-					if(!doorThinker->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER)))
+					if(!doorThinker->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER), true))
 					{
 						Destroy();
 						return;
@@ -551,6 +557,7 @@ public:
 						activator->x = ((next->GetX() - relx)<<16)|fracx;
 						activator->y = ((next->GetY() - rely)<<16)|fracy;
 						activator->angle += angle;
+						activator->EnterZone(map->GetSpot(activator->tilex, activator->tiley, 0)->zone);
 					}
 				}
 				break;
@@ -573,6 +580,27 @@ public:
 				}
 				break;
 		}
+	}
+
+	void Serialize(FArchive &arc)
+	{
+		if(GameSave::SaveVersion > 1438232816)
+		{
+			BYTE state = this->state;
+			arc << state;
+			this->state = static_cast<State>(state);
+
+			arc << activator
+				<< sndseq
+				<< spot
+				<< door
+				<< next
+				<< nextDoor
+				<< elevTag
+				<< callSpeed;
+		}
+
+		Super::Serialize(arc);
 	}
 
 protected:
@@ -697,9 +725,9 @@ class EVPushwall : public Thinker
 	DECLARE_CLASS(EVPushwall, Thinker)
 
 	public:
-		EVPushwall(MapSpot spot, unsigned int speed, MapTrigger::Side direction, unsigned int distance) :
+		EVPushwall(MapSpot spot, unsigned int speed, MapTrigger::Side direction, unsigned int distance, bool nostop) :
 			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
-			speed(speed), distance(distance)
+			speed(speed), distance(distance), nostop(nostop)
 		{
 			if(spot->tile->soundSequence == NAME_None)
 				seqname = gameinfo.PushwallSoundSequence;
@@ -776,7 +804,7 @@ class EVPushwall : public Thinker
 					#endif
 				}
 
-				if(!CheckSpotFree(moveTo))
+				if(!nostop && !CheckSpotFree(moveTo))
 				{
 					Destroy();
 					return;
@@ -843,10 +871,11 @@ class EVPushwall : public Thinker
 		unsigned int	position;
 		unsigned int	speed;
 		unsigned int	distance;
+		bool nostop;
 };
 IMPLEMENT_INTERNAL_CLASS(EVPushwall)
 
-FUNC(Pushwall_Move)
+static int DoPushwall(MapSpot spot, MapTrigger::Side direction, const int *args, bool nostop)
 {
 	static const unsigned int PUSHWALL_DIR_DIAGONAL = 0x1;
 	static const unsigned int PUSHWALL_DIR_ABSOLUTE = 0x8;
@@ -864,7 +893,7 @@ FUNC(Pushwall_Move)
 			return 0;
 		}
 
-		new EVPushwall(spot, args[1], dir, args[3]);
+		new EVPushwall(spot, args[1], dir, args[3], nostop);
 	}
 	else
 	{
@@ -878,11 +907,24 @@ FUNC(Pushwall_Move)
 			}
 
 			activated = true;
-			new EVPushwall(pwall, args[1], dir, args[3]);
+			new EVPushwall(pwall, args[1], dir, args[3], nostop);
 		}
 		return activated;
 	}
 	return 1;
+}
+
+FUNC(Pushwall_Move)
+{
+	return DoPushwall(spot, direction, args, false);
+}
+
+FUNC(Pushwall_MoveNoStop)
+{
+	// TODO: This really needs the pushwalls to be detached from our map grid.
+	// Secondly we might want to look into crushing features? I think ROTT does
+	// that.
+	return DoPushwall(spot, direction, args, true);
 }
 
 FUNC(Exit_Normal)

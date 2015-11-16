@@ -14,10 +14,10 @@ switches/elevbutn		{ DSPLATFM ALSWITCH PCSWITCH }
 
 misc/1up				{ DSBNS1UP ALBNS1UP PCBNS1UP }
 misc/do_nothing			{ NULL ALNOTHIN PCNOTHIN }
-misc/ammo_pickup		{ NULL ALAMMOUP PCAMMOUP }
-misc/ammobox_pickup		{ NULL ALAMBXUP PCAMBXUP }
-misc/health_pickup		{ NULL ALFOODUP PCFOODUP }
-misc/medkit_pickup		{ NULL ALMEDIUP PCMEDIUP }
+misc/ammo_pkup			{ DSAMMOUP ALAMMOUP PCAMMOUP }
+misc/ammobox_pkup		{ NULL ALAMBXUP PCAMBXUP }
+misc/health_pkup		{ NULL ALFOODUP PCFOODUP }
+misc/medkit_pkup		{ DSMEDIUP ALMEDIUP PCMEDIUP }
 misc/k_pkup				{ DSGETKEY ALGETKEY PCGETKEY }
 misc/end_bonus1			{ NULL ALENDBN1 PCENDBN1 }
 misc/end_bonus2			{ DSENDBN2 ALENDBN2 PCENDBN2 }
@@ -28,6 +28,13 @@ misc/slurpie2			{ DSLSLURP ALSLURPE PCSLURPE }
 misc/yeah				{ DSYEAH ALYEAH PCYEAH }
 misc/fart				{ DSFART ALFART PCFART }
 misc/crash				{ DSCRASH ALFART PCFART }
+$alias misc/dogfood_pkup	misc/health_pkup
+
+// Compatibility
+$alias misc/ammo_pickup		misc/ammo_pkup
+$alias misc/ammobox_pickup	misc/ammobox_pkup
+$alias misc/health_pickup	misc/health_pkup
+$alias misc/medkit_pickup	misc/medkit_pkup
 
 treasure/cross/pickup	{ NULL ALBONUS1 PCBONUS1 }
 treasure/chalice/pickup	{ NULL ALBONUS2 PCBONUS2 }
@@ -42,7 +49,7 @@ menu/move2				{ NULL ALMVGUN2 PCMVGUN2 }
 player/death			{ DSPLDETH ALPLDETH PCPLDETH }
 player/usefail			{ NULL ALNOWAY PCNOWAY }
 
-weapon/knife/attack		{ NULL ALKNFSWG PCKNFSWG }
+weapon/knife/attack		{ DSKNFSWG ALKNFSWG PCKNFSWG }
 
 weapon/pistol/attack	{ DSPISTOL ALPISTOL PCPISTOL }
 
@@ -216,6 +223,86 @@ treasure/spear/pickup	{ DSSPEAR ALSPEAR PCSPEAR }
 treasure/spear2/pickup	{ DSSPEAR2 ALSPEAR PCSPEAR }
 
 
+// ------ Macintosh Wolfenstein 3D ------
+
+misc/thud	DSTHUD
+
+weapon/flame/pickup		DSYEAH
+
+weapon/launcher/pickup	DSYEAH
+
+macgeneric/sight1	DSENSIT1
+macgeneric/sight2	DSENSIT2
+macgeneric/sight3	DSENSIT3
+macgeneric/sight4	DSENSIT4
+macgeneric/death1	DSENDTH1
+macgeneric/death2	DSENDTH2
+macgeneric/attack	DSPISTOL
+macgeneric/pain	DSENPAIN
+$random macgeneric/sight { macgeneric/sight1 macgeneric/sight2 macgeneric/sight3 macgeneric/sight4 }
+$random macgeneric/death { macgeneric/death1 macgeneric/death2 }
+
+$alias macguard/sight	macgeneric/sight
+$alias macguard/attack	macgeneric/attack
+$alias macguard/pain	macgeneric/pain
+$alias macguard/death	macgeneric/death
+
+macdog/sight	DSDOGATK
+macdog/attack	DSDOGATK
+macdog/death	DSDOGDTH
+
+$alias macofficer/sight		macgeneric/sight
+$alias macofficer/attack	macgeneric/attack
+$alias macofficer/pain		macgeneric/pain
+$alias macofficer/death		macgeneric/death
+
+$alias macss/sight	macgeneric/sight
+$alias macss/attack	macgeneric/attack
+$alias macss/pain	macgeneric/pain
+$alias macss/death	macgeneric/death
+
+$alias macmutant/attack	macgeneric/attack
+$alias macmutant/pain	macgeneric/pain
+$alias macmutant/death	macgeneric/death
+
+$alias machans/sight	hans/sight
+$alias machans/attack	hans/attack
+$alias machans/death	macgeneric/death
+
+$alias macschabbs/sight	schabbs/sight
+$alias macschabbs/death	macgeneric/death
+
+$alias mactrans/sight	hans/sight
+$alias mactrans/attack	trans/attack
+$alias mactrans/death	macgeneric/death
+
+macuber/sight			DSDOGATK
+$alias macuber/attack	uber/attack
+$alias macuber/death	macgeneric/death
+
+$alias macknight/sight	knight/sight
+$alias macknight/attack	knight/attack
+$alias macknight/death	macgeneric/death
+
+$alias machitler/sight		hitler/sight
+$alias machitler/active		hitler/active
+$alias machitler/attack		hitler/attack
+$alias machitler/mechadeath	hitler/mechadeath
+$alias machitler/death		macgeneric/death
+
+$ifmacwolf3d
+$alias misc/ammobox_pkup	misc/ammo_pkup
+$alias misc/w_pkup			misc/ammo_pkup
+$alias weapon/machine/pickup	misc/w_pkup
+$alias misc/health_pkup		misc/medkit_pkup
+misc/dogfood_pkup			DSDOGATK
+weapon/gatling/pickup		DSYEAH
+
+player/pain1	DSPLPAIN
+player/pain2	DSPLAAI2
+$random player/pain { player/pain1 player/pain2 }
+$endif
+
 // ------ Super 3D Noah's Ark ------
 
 misc/i_pkup				{ DSITEMUP ALITEMUP PCITEMUP }
@@ -226,6 +313,7 @@ world/hitwall NULL
 
 misc/100percent			{ NULL ALENDBN2 PCENDBN2 }
 $alias misc/w_pkup		misc/i_pkup
+$alias misc/ammo_pkup	misc/i_pkup
 $alias misc/map_pkup	misc/k_pkup
 
 // Defined here since vanilla Wolf3D didn't use it.

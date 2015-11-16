@@ -41,6 +41,7 @@
 #include "gamemap_common.h"
 #include "lnspec.h"
 #include "scanner.h"
+#include "tmemory.h"
 #include "w_wad.h"
 #include "wl_game.h"
 #include "wl_shade.h"
@@ -574,13 +575,223 @@ private:
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 	EFeatureFlags FeatureFlags;
 };
+static Xlat xlat;
 
 static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger);
 
-// Reads old format maps
+static void ProduceHolowall(MapSpot spot, const MapThing &thing, uint32_t flags)
+{
+	if(spot->tile)
+	{
+		spot->sideSolid[0] = spot->sideSolid[1] =
+			spot->sideSolid[2] = spot->sideSolid[3] = false;
+		if(flags & Xlat::TF_PATHING)
+		{
+			// If we created a holowall and we path into another wall it should also become non-solid.
+			spot = spot->GetAdjacent(MapTile::Side(thing.angle/90));
+			if(spot->tile)
+				spot->sideSolid[0] = spot->sideSolid[1] =
+					spot->sideSolid[2] = spot->sideSolid[3] = false;
+		}
+	}
+}
+
+struct MacTile
+{
+	unsigned int tilenum;
+	WORD wallnum1, wallnum2;
+	bool used;
+};
+void GameMap::ReadMacData()
+{
+	static const BYTE TEX_MASK = 0x1F;
+	static const BYTE NUM_MASK = 0x3F;
+	static const BYTE DOOR_TEX = 31;
+	static const BYTE BLOCKING = 0x80;
+
+	FileReader &lump = *lumps[0];
+	lump.Seek(0, SEEK_SET);
+
+	// Setup header
+	header.width = 64;
+	header.height = 64;
+
+	Plane &mapPlane = NewPlane();
+	mapPlane.depth = 64;
+
+	BYTE tilemap[64*64];
+	BYTE areamap[64];
+	lump.Read(tilemap, 64*64);
+	lump.Read(areamap, 64);
+
+	// Areamap maps area number into sound zones. The area number was
+	// apparently used to speed up collision checks.
+	for(unsigned int i = 0;i < 64;++i)
+	{
+		if(i+1 >= zonePalette.Size())
+		{
+			unsigned int start = zonePalette.Size();
+			zonePalette.Resize(i+1);
+			for(unsigned int j = start;j < zonePalette.Size();++j)
+				zonePalette[j].index = j;
+		}
+	}
+
+	WORD numSpawn, spawnListOfs;
+	lump >> numSpawn >> spawnListOfs;
+	numSpawn = LittleShort(numSpawn);
+	spawnListOfs = LittleShort(spawnListOfs);
+	// Followed by 2 more WORDs for numNodes and nodeListOfs. If we had a BSP
+	// renderer, we'd care about those.
+
+	// Load in the wall list so we can build a tile set.
+	FWadLump wallListLump = Wads.OpenLumpName("WALLLIST");
+	TArray<WORD> walltexs;
+	walltexs.Resize(wallListLump.GetLength()/2 - 1);
+	wallListLump.Seek(2, SEEK_SET);
+	wallListLump.Read(&walltexs[0], walltexs.Size()*2);
+	for(unsigned int i = 0;i < walltexs.Size();++i)
+		walltexs[i] = BigShort(walltexs[i]);
+		
+
+	// Find used tiles
+	MacTile wallsused[TEX_MASK+1+5];
+	for(unsigned int i = 0;i < 64*64;++i)
+		wallsused[tilemap[i]&TEX_MASK].used = true;
+
+	// Load wall textures based on our wall list.
+	// TODO: These have a flag to have the engine darken the texture with a
+	// colormap.
+	for(unsigned int i = 1;i < TEX_MASK+1;++i)
+	{
+		if(!wallsused[i].used)
+			continue;
+
+		wallsused[i].tilenum = tilePalette.Size();
+		wallsused[i].wallnum1 = walltexs[(i-1)*2]&0x3FFF;
+		wallsused[i].wallnum2 = walltexs[(i-1)*2+1]&0x3FFF;
+
+		char name[2][9];
+		sprintf(name[0], "WALL%04X", wallsused[i].wallnum1);
+		sprintf(name[1], "WALL%04X", wallsused[i].wallnum2);
+
+		Tile tile;
+		tile.texture[1] = tile.texture[3] =
+			TexMan.CheckForTexture(name[0], FTexture::TEX_Wall);
+		tile.texture[0] = tile.texture[2] =
+			TexMan.CheckForTexture(name[1], FTexture::TEX_Wall);
+
+		tilePalette.Push(tile);
+	}
+
+	// Load in the door textures which are a constant.
+	const unsigned int firstdoor = tilePalette.Size();
+	for(unsigned int i = 0;i < 4;++i)
+	{
+		char name[2][9];
+		sprintf(name[0], "WALL%04X", walltexs[59+i]&0x3FFF);
+		sprintf(name[1], "WALL%04X", walltexs[63]&0x3FFF);
+
+		Tile tile1, tile2;
+		tile1.texture[1] = tile1.texture[3] =
+		tile2.texture[0] = tile2.texture[2] =
+			TexMan.CheckForTexture(name[0], FTexture::TEX_Wall);
+		tile1.texture[0] = tile1.texture[2] =
+		tile2.texture[1] = tile2.texture[3] =
+			TexMan.CheckForTexture(name[1], FTexture::TEX_Wall);
+
+		tile1.offsetHorizontal = true;
+		tile2.offsetVertical = true;
+
+		tilePalette.Push(tile1);
+		tilePalette.Push(tile2);
+	}
+
+	sectorPalette.Resize(1);
+	sectorPalette[0].texture[Sector::Floor] = levelInfo->DefaultTexture[Sector::Floor];
+	sectorPalette[0].texture[Sector::Ceiling] = levelInfo->DefaultTexture[Sector::Ceiling];
+	for(unsigned int i = 0;i < 64*64;++i)
+	{
+		if(tilemap[i]&BLOCKING)
+		{
+			if((tilemap[i]&TEX_MASK) > 0)
+				mapPlane.map[i].SetTile(&tilePalette[wallsused[tilemap[i]&TEX_MASK].tilenum]);
+		}
+		else
+			mapPlane.map[i].zone = &zonePalette[areamap[tilemap[i]&NUM_MASK]];
+
+		mapPlane.map[i].sector = &sectorPalette[0];
+	}
+
+	lump.Seek(spawnListOfs, SEEK_SET);
+	for(unsigned int i = 0;i < numSpawn;++i)
+	{
+		BYTE x, y, type, pwallTile;
+		lump >> x >> y >> type;
+		if(type == 98)
+		{
+			lump >> pwallTile;
+			assert(wallsused[pwallTile].used);
+			mapPlane.map[y*64+x].SetTile(&tilePalette[wallsused[pwallTile].tilenum]);
+		}
+
+		Thing thing;
+		Trigger trigger;
+		uint32_t flags = 0;
+
+		if(!xlat.TranslateThing(thing, trigger, flags, type))
+			printf("Unknown old type %d @ (%d,%d)\n", type, x, y);
+		else
+		{
+			if(flags & Xlat::TF_ISTRIGGER)
+			{
+				if(trigger.isSecret)
+					++gamestate.secrettotal;
+
+				MapSpot spot = &mapPlane.map[y*64+x];
+				if(trigger.action == Specials::Door_Open || trigger.action == Specials::Door_Elevator)
+				{
+					const unsigned int tex = type/2 != 96/2 ? firstdoor+MIN(trigger.arg[3], 3)*2 : firstdoor+6;
+					spot->SetTile(&tilePalette[tex+!(trigger.arg[4]&1)]);
+				}
+
+				trigger.x = x;
+				trigger.y = y;
+				trigger.z = 0;
+
+				Trigger &trig = NewTrigger(x, y, 0);
+				trig = trigger;
+			}
+			else
+			{
+				if(flags & Xlat::TF_HOLOWALL)
+					ProduceHolowall(&mapPlane.map[y*64+x], thing, flags);
+
+				thing.x = (fixed(x)<<FRACBITS)+(FRACUNIT/2);
+				thing.y = (fixed(y)<<FRACBITS)+(FRACUNIT/2);
+				thing.z = 0;
+				thing.ambush = !!(flags & Xlat::TF_AMBUSH);
+				things.Push(thing);
+			}
+		}
+	}
+
+	SetupLinks();
+}
+
+/* Reads old format maps... well technically WDC format maps.
+ * char[6] - Magic "WDC3.1"
+ * int32 - Number of maps (Should be 1 in our case)
+ * int16 - Number of planes
+ * int16 - (Max) name length
+ * --- The following would be repeated per map ---
+ * char[max] - Name
+ * int16 - Width
+ * int16 - Hieght
+ * ... raw plane data ...
+ */
 void GameMap::ReadPlanesData()
 {
-	static Xlat xlat;
 	static const unsigned short UNIT = 64;
 	enum OldPlanes { Plane_Tiles, Plane_Object, Plane_Flats, NUM_USABLE_PLANES };
 
@@ -593,6 +804,14 @@ void GameMap::ReadPlanesData()
 
 	// Old format maps always have a tile size of 64
 	header.tileSize = UNIT;
+
+	// Xlat loaded, see if we have a Mac format map.
+	char magic[6];
+	if(lumps[0]->Read(magic, 6) != 6 || strncmp(magic, "WDC3.1", 6) != 0)
+	{
+		ReadMacData();
+		return;
+	}
 
 	FileReader *lump = lumps[0];
 
@@ -633,7 +852,7 @@ void GameMap::ReadPlanesData()
 	{
 		lump->Seek(size*2*3, SEEK_CUR);
 		lump->Read(infoplane, size*2);
-		lump->Seek(34, SEEK_SET);
+		lump->Seek(18+nameLength, SEEK_SET);
 	}
 	else
 		memset(infoplane, 0, size*2);
@@ -849,20 +1068,7 @@ void GameMap::ReadPlanesData()
 						else
 						{
 							if(flags & Xlat::TF_HOLOWALL)
-							{
-								MapSpot spot = &mapPlane.map[i];
-								if(spot->tile)
-								{
-									spot->sideSolid[0] = spot->sideSolid[1] = spot->sideSolid[2] = spot->sideSolid[3] = false;
-									if(flags & Xlat::TF_PATHING)
-									{
-										// If we created a holowall and we path into another wall it should also become non-solid.
-										spot = spot->GetAdjacent(MapTile::Side(thing.angle/90));
-										if(spot->tile)
-											spot->sideSolid[0] = spot->sideSolid[1] = spot->sideSolid[2] = spot->sideSolid[3] = false;
-									}
-								}
-							}
+								ProduceHolowall(&mapPlane.map[i], thing, flags);
 
 							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);

@@ -51,6 +51,10 @@
 
 static TMap<FName, IntermissionInfo> intermissions;
 
+IntermissionInfo::~IntermissionInfo()
+{
+}
+
 IntermissionInfo *IntermissionInfo::Find(const FName &name)
 {
 	return &intermissions[name];
@@ -294,19 +298,19 @@ bool ShowIntermission(const IntermissionInfo *intermission, bool demoMode)
 			{
 				default:
 				case IntermissionInfo::IMAGE:
-					acked = ShowImage(intermission->Actions[i].action, false);
+					acked = ShowImage(intermission->Actions[i].action.Get(), false);
 					break;
 				case IntermissionInfo::CAST:
-					acked = gototitle = ShowCast((CastIntermissionAction*)intermission->Actions[i].action);
+					acked = gototitle = ShowCast((CastIntermissionAction*)intermission->Actions[i].action.Get());
 					break;
 				case IntermissionInfo::FADER:
-					ShowFader((FaderIntermissionAction*)intermission->Actions[i].action);
+					ShowFader((FaderIntermissionAction*)intermission->Actions[i].action.Get());
 					break;
 				case IntermissionInfo::GOTOTITLE:
 					gototitle = true;
 					break;
 				case IntermissionInfo::TEXTSCREEN:
-					acked = ShowTextScreen((TextScreenIntermissionAction*)intermission->Actions[i].action, demoMode);
+					acked = ShowTextScreen((TextScreenIntermissionAction*)intermission->Actions[i].action.Get(), demoMode);
 					break;
 				case IntermissionInfo::VICTORYSTATS:
 					Victory(true);

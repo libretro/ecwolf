@@ -36,6 +36,7 @@
 #define __CONFIG_H__
 
 #include "tarray.h"
+#include "tmemory.h"
 #include "zstring.h"
 
 struct SettingsData
@@ -123,10 +124,10 @@ class Config
 	protected:
 		bool			FindIndex(const FName index, SettingsData *&data);
 
-		bool						firstRun;
-		FString						configDir;
-		FString						configFile;
-		TMap<FName, SettingsData *>	settings;
+		bool firstRun;
+		FString configDir;
+		FString configFile;
+		TMap<FName, TUniquePtr<SettingsData> > settings;
 };
 
 extern Config config;

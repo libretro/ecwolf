@@ -240,52 +240,52 @@ void T_Projectile (AActor *self)
 			return;
 		}
 
-		if(!(self->flags & FL_PLAYERMISSILE))
+		const bool playermissile = !!(self->flags & FL_PLAYERMISSILE);
+		AActor::Iterator iter = AActor::GetIterator();
+		while(iter.Next())
 		{
-			fixed deltax = abs(self->x - players[0].mo->x);
-			fixed deltay = abs(self->y - players[0].mo->y);
-			fixed radius = players[0].mo->radius + self->radius;
-			if (lastHit != players[0].mo && deltax < radius && deltay < radius)
-			{
-				lastHit = players[0].mo;
+			AActor *check = iter;
+			if(check == self)
+				continue;
 
-				TakeDamage (self->GetDamage(),self);
-				if(!(self->flags & FL_RIPPER))
-				{
-					T_ExplodeProjectile(self, players[0].mo);
-					return;
-				}
-			}
-		}
-		else
-		{
-			AActor::Iterator iter = AActor::GetIterator();
-			while(iter.Next())
+			// Pass through allies
+			if(playermissile)
 			{
-				AActor *check = iter;
-				if(check != players[0].mo && (check->flags & (FL_SHOOTABLE|FL_SOLID)) && lastHit != check)
+				if(check == players[0].mo)
+					continue;
+			}
+			else
+			{
+				if(check->flags & FL_ISMONSTER)
+					continue;
+			}
+
+			if((check->flags & (FL_SHOOTABLE|FL_SOLID)) && lastHit != check)
+			{
+				fixed deltax = abs(self->x - check->x);
+				fixed deltay = abs(self->y - check->y);
+				fixed radius = check->radius + self->radius;
+				if(deltax < radius && deltay < radius)
 				{
-					fixed deltax = abs(self->x - check->x);
-					fixed deltay = abs(self->y - check->y);
-					fixed radius = check->radius + self->radius;
-					if(deltax < radius && deltay < radius)
+					lastHit = check;
+					if(check->flags & FL_SHOOTABLE)
 					{
-						lastHit = check;
-						if(check->flags & FL_SHOOTABLE)
-						{
+						if(check != players[0].mo)
 							DamageActor(check, self->GetDamage());
-							if(!(self->flags & FL_RIPPER) || (check->flags & FL_DONTRIP))
-							{
-								T_ExplodeProjectile(self, check);
-								return;
-							}
-						}
-						// Eventually this will need an actual height check.
-						else if(check->projectilepassheight != 0)
+						else
+							TakeDamage(self->GetDamage(), self);
+
+						if(!(self->flags & FL_RIPPER) || (check->flags & FL_DONTRIP))
 						{
 							T_ExplodeProjectile(self, check);
 							return;
 						}
+					}
+					// Eventually this will need an actual height check.
+					else if(check->projectilepassheight != 0)
+					{
+						T_ExplodeProjectile(self, check);
+						return;
 					}
 				}
 			}
@@ -503,7 +503,7 @@ ACTION_FUNCTION(A_Chase)
 		if(!inMeleeRange && missile)
 		{
 			dodge = false;
-			if (((self->flags & FL_ALWAYSFAST) || self->movecount == 0) && CheckLine(self)) // got a shot at players[0].mo?
+			if ((self->IsFast() || self->movecount == 0) && CheckLine(self)) // got a shot at players[0].mo?
 			{
 				self->hidden = false;
 				dx = abs(self->tilex + dirdeltax[self->dir] - players[0].mo->tilex);

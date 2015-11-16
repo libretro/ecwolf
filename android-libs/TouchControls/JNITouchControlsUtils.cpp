@@ -101,6 +101,16 @@ void showKeyboard(int val)
 
 }
 
+// Returns int for C compatibility
+int hasHardwareKeyboard()
+{
+	JNIEnv * env = getEnv();
+
+	jclass myClass =  env->FindClass("com/beloko/idtech/ShowKeyboard");
+	jmethodID myMethod = env->GetStaticMethodID(myClass,  "hasHardwareKeyboard", "()Z");
+	return env->CallStaticBooleanMethod(myClass, myMethod);
+}
+
 //This is to try and stop the occasional crash on shutdown
 int android_app_is_shutting_down = 0;
 void appShutdown()

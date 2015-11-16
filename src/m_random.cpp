@@ -71,6 +71,7 @@
 #include "files.h"
 #include "farchive.h"
 #include "wl_loadsave.h"
+#include "tmemory.h"
 
 // MACROS ------------------------------------------------------------------
 
@@ -103,7 +104,7 @@ DWORD rngseed;
 #include "m_random_oldtable.h"
 
 FRandom *FRandom::RNGList;
-static TDeletingArray<FRandom *> NewRNGs;
+static TArray<TUniquePtr<FRandom> > NewRNGs;
 
 // CODE --------------------------------------------------------------------
 

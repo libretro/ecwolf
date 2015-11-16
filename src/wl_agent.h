@@ -74,6 +74,8 @@ extern class player_t
 		void	Reborn();
 		void	Serialize(FArchive &arc);
 		void	SetPSprite(const Frame *frame, PSprite layer);
+		void	SetFOV(float newlyDesiredFOV);
+		void	AdjustFOV();
 
 		enum State
 		{

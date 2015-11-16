@@ -1,0 +1,194 @@
+things
+{
+	trigger 90
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 91
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 92
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 93
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 1;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 94
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 2;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 95
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg3 = 2;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+	trigger 96
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 97
+	{
+		action = 1;
+		arg1 = 16;
+		arg2 = 300;
+		arg4 = 1;
+		playeruse = true;
+		monsteruse = true;
+		repeatable = true;
+		activateeast = false;
+		activatewest = false;
+	}
+
+	trigger 98
+	{
+		action = 12;
+		arg1 = 8;
+		arg2 = 2;
+		arg3 = 2;
+		playeruse = true;
+		secret = true;
+	}
+
+	// Tile 99 was going to be an outdoors effect
+
+	trigger 100
+	{
+		action = 3;
+		playeruse = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+	trigger 101
+	{
+		action = 4;
+		playeruse = true;
+		activatenorth = false;
+		activatesouth = false;
+	}
+
+	// oldnum, newnum, angles, patrol, minskill
+	{19,	1,	4,	0,	0}
+	{23,	33,	0,	0,	0}
+	{24,	34,	0,	0,	0}
+	{25,	46,	0,	0,	0}
+	{26,	36,	0,	0,	0}
+	{27,	37,	0,	0,	0}
+	{28,	39,	0,	0,	0}
+	{29,	89,	0,	0,	0}
+	{30,	41,	0,	0,	0}
+	{31,	72,	0,	0,	0}
+	{32,	44,	0,	0,	0}
+	{33,	45,	0,	0,	0}
+	{34,	52,	0,	0,	0}
+	{35,	47,	0,	0,	0}
+	{36,	56,	0,	0,	0}
+	{37,	49,	0,	0,	0}
+	{38,	50,	0,	0,	0}
+	{39,	53,	0,	0,	0}
+	{40,	54,	0,	0,	0}
+	{41,	213,	0,	0,	0}
+	{42,	90,	0,	0,	0}
+	{43,	57,	0,	0,	0}
+	{44,	58,	0,	0,	0}
+	{45,	206,	0,	0,	0}
+	{46,	209,	0,	0,	0}
+	{47,	210,	0,	0,	0}
+	{48,	214,	0,	0,	0}
+	{49,	215,	0,	0,	0}
+	{50,	216,	0,	0,	0}
+	{51,	217,	0,	0,	0}
+	{52,	66,	0,	0,	0}
+	{53,	68,	0,	0,	0}
+	{54,	69,	0,	0,	0}
+	{55,	211,	0,	0,	0}
+	{56,	207,	0,	0,	0}
+	{57,	212,	0,	0,	0}
+	{58,	208,	0,	0,	0}
+	{59,	233,	0,	0,	0}
+	{108,	218,	0,	0,	0}
+	{109,	219,	0,	0,	0}
+	{110,	220,	0,	0,	0}
+	{111,	221,	0,	0,	0}
+	{112,	222,	0,	0,	0}
+	{113,	223,	0,	0,	0}
+	{114,	224,	0,	0,	0}
+	{115,	225,	0,	0,	0}
+	{116,	226,	0,	0,	0}
+	{117,	227,	0,	0,	0}
+	{118,	228,	0,	0,	0}
+	{119,	228,	0,	0,	0}
+	{121,	229,	0,	0,	0}
+	{122,	230,	0,	0,	0}
+	{123,	231,	0,	0,	0}
+	{124,	232,	0,	0,	0}
+	{126,	218,	0,	AMBUSH,	0}
+	{127,	219,	0,	AMBUSH,	0}
+	{128,	220,	0,	AMBUSH,	0}
+	{129,	221,	0,	AMBUSH,	0}
+	{130,	222,	0,	AMBUSH,	0}
+	{131,	223,	0,	AMBUSH,	0}
+	{132,	224,	0,	AMBUSH,	0}
+	{133,	225,	0,	AMBUSH,	0}
+	{134,	226,	0,	AMBUSH,	0}
+	{135,	227,	0,	AMBUSH,	0}
+	{136,	228,	0,	AMBUSH,	0}
+	{137,	228,	0,	AMBUSH,	0}
+}

@@ -350,10 +350,6 @@ void DoJukebox(void)
 ==========================
 */
 
-#ifdef _WIN32
-void SetupWM();
-#endif
-
 static void CollectGC()
 {
 	GC::FullGC();
@@ -382,28 +378,18 @@ void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(SDL_Init(0) < 0)
+#else
+	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+#endif
 	{
 		printf("Unable to init SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
 	atterm(SDL_Quit);
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-#else
-	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
-#endif
 	SDL_ShowCursor(SDL_DISABLE);
-
-	int numJoysticks = SDL_NumJoysticks();
-	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
-	{
-		if(!numJoysticks)
-			printf("No joysticks are available to SDL!\n");
-		else
-			printf("The joystick index must be between -1 and %i!\n", numJoysticks - 1);
-		exit(1);
-	}
 
 	//
 	// Mapinfo
@@ -438,10 +424,6 @@ static void InitGame()
 	VL_SetVGAPlaneMode (true);
 	DrawStartupConsole();
 
-#if defined _WIN32
-	if(!fullscreen)
-		SetupWM();
-#endif
 	VW_UpdateScreen();
 
 //
@@ -645,6 +627,8 @@ void Quit (const char *errorStr, ...)
 	}
 	else error[0] = 0;
 
+	ShutdownId ();
+
 	if (error[0] == 0)
 	{
 #ifdef NOTYET
@@ -663,8 +647,6 @@ void Quit (const char *errorStr, ...)
 		screen = grsegs[ERRORSCREEN];
 	}
 #endif
-
-	ShutdownId ();
 
 	if (error[0] != 0)
 	{
@@ -841,7 +823,7 @@ static void DemoLoop()
 //
 // Tries to guess the physical dimensions of the screen based on the
 // screen's pixel dimensions.
-int CheckRatio (int width, int height)//, int *trueratio)
+int CheckRatio (int width, int height, int *trueratio)
 {
 	int fakeratio = -1;
 	Aspect ratio;
@@ -896,10 +878,10 @@ int CheckRatio (int width, int height)//, int *trueratio)
 		ratio = ASPECT_4_3;
 	}
 
-	/*if (trueratio != NULL)
+	if (trueratio != NULL)
 	{
 		*trueratio = ratio;
-	}*/
+	}
 	return (fakeratio >= 0) ? fakeratio : ratio;
 }
 
@@ -1078,6 +1060,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			// The config code will handle this itself, so ignore it here.
 			++i;
 		}
+		else IFARG("--console") {} // Windows always create console parameter
 		else IFARG("--savedir")
 		{
 			if(++i < argc)
@@ -1098,6 +1081,9 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			"Usage: " BINNAME " [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
+#ifdef _WIN32
+			" --console              Display a console window\n"
+#endif
 			" --config <file>        Use an explicit location for the config file\n"
 			" --savedir <dir>        Use an explicit location for save games\n"
 			" --file <file>          Loads an extra data file\n"
@@ -1213,39 +1199,12 @@ void CallTerminateFunctions()
 		TermFuncs[--NumTerms]();
 }
 
-#ifndef NO_GTK
-#include <gtk/gtk.h>
-bool GtkAvailable;
-#endif
-#if defined(main) && !defined(__APPLE__)
-#undef main
-#endif
 #ifdef _WIN32
-bool CheckIsRunningFromCommandPrompt();
-void StartupWin32();
+void I_AcknowledgeError();
 #endif
-#ifdef __ANDROID__
-extern "C" int main_android (int argc, char *argv[])
-#else
-int main (int argc, char *argv[])
-#endif
+
+int WL_Main (int argc, char *argv[])
 {
-#ifndef _WIN32
-	// Set LC_NUMERIC environment variable in case some library decides to
-	// clear the setlocale call at least this will be correct.
-	// Note that the LANG environment variable is overridden by LC_*
-	setenv ("LC_NUMERIC", "C", 1);
-#endif
-
-#ifndef NO_GTK
-	GtkAvailable = gtk_init_check(&argc, &argv);
-#endif
-
-#ifdef _WIN32
-	StartupWin32();
-	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
-#endif
-
 	// Stop the C library from screwing around with its functions according
 	// to the system locale.
 	setlocale(LC_ALL, "C");
@@ -1308,16 +1267,40 @@ int main (int argc, char *argv[])
 #endif
 
 #ifdef _WIN32
-		// When running from Windows explorer, wait for user dismissal
-		if(waitForConsoleInput)
-		{
-			fprintf(stderr, "An error has occured (press enter to dismiss)");
-			fseek(stdin, 0, SEEK_END);
-			getchar();
-		}
+		I_AcknowledgeError();
 #endif
 
 		exit(-1);
 	}
 	return 1;
 }
+
+// TODO: Move this to a system dependent file?
+#if defined(main) && !defined(__APPLE__)
+#undef main
+#endif
+
+#ifndef NO_GTK
+#include <gtk/gtk.h>
+bool GtkAvailable;
+#endif
+
+#ifndef _WIN32
+#ifdef __ANDROID__
+extern "C" int main_android(int argc, char *argv[])
+#else
+int main(int argc, char *argv[])
+#endif
+{
+	// Set LC_NUMERIC environment variable in case some library decides to
+	// clear the setlocale call at least this will be correct.
+	// Note that the LANG environment variable is overridden by LC_*
+	setenv("LC_NUMERIC", "C", 1);
+
+#ifndef NO_GTK
+	GtkAvailable = gtk_init_check(&argc, &argv);
+#endif
+
+	return WL_Main(argc, argv);
+}
+#endif

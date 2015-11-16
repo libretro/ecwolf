@@ -37,7 +37,6 @@
 #include "farchive.h"
 #include "gamemap.h"
 #include "tarray.h"
-#include "thinker.h"
 #include "w_wad.h"
 #include "wl_def.h"
 #include "lnspec.h"
@@ -135,23 +134,33 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	}
 	else
 	{
-		if(strcmp(Wads.GetLumpFullName(markerLump+1), "PLANES") == 0)
+		const char* nextLumpName = Wads.GetLumpFullName(markerLump+1);
+		if(nextLumpName == NULL || strcmp(nextLumpName, "TEXTMAP") != 0)
 		{
 			numLumps = 1;
 			isUWMF = false;
 			valid = true;
-			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			if(nextLumpName != NULL && strcmp(nextLumpName, "PLANES") == 0)
+			{
+				// DOS (WDC) format binary map
+				lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			}
+			else
+			{
+				// Must be a Mac format map
+				lumps[0] = Wads.ReopenLumpNum(markerLump);
+				if(lumps[0]->GetLength() <= 0)
+				{
+					FString error;
+					error.Format("Invalid map format for %s!", map.GetChars());
+					throw CRecoverableError(error);
+				}
+			}
+			
 		}
 		else
 		{
 			// Expect UWMF formatted map.
-			if(strcmp(Wads.GetLumpFullName(markerLump+1), "TEXTMAP") != 0)
-			{
-				FString error;
-				error.Format("Invalid map format for %s!", map.GetChars());
-				throw CRecoverableError(error);
-			}
-
 			isUWMF = true;
 			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
 
@@ -176,11 +185,9 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 
 GameMap::~GameMap()
 {
-	thinkerList->DestroyAll();
-
+	delete lumps[0];
 	if(isWad)
 		delete file;
-	delete lumps[0];
 
 	for(unsigned int i = 0;i < planes.Size();++i)
 		delete[] planes[i].map;
@@ -413,6 +420,17 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	newTrig.z = z;
 	spot->triggers.Push(newTrig);
 	return spot->triggers[spot->triggers.Size()-1];
+}
+
+void GameMap::PropagateMark()
+{
+	for(unsigned int p = 0;p < NumPlanes();++p)
+	{
+		MapPlane &plane = planes[p];
+
+		for(unsigned int i = 0;i < GetHeader().width*GetHeader().height;++i)
+			GC::Mark(plane.map[i].thinker);
+	}
 }
 
 // Look at data and determine if we need to set up any flags.
@@ -679,6 +697,39 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 
 			if(!arc.IsStoring())
 				plane.map[i].plane = &plane;
+		}
+	}
+
+	// Current elevator positions.
+	if(GameSave::SaveVersion > 1438232816)
+	{
+		if(arc.IsStoring())
+		{
+			unsigned int count = gm->elevatorPosition.CountUsed();
+			arc << count;
+
+			TMap<unsigned int, MapSpot>::Iterator iter(gm->elevatorPosition);
+			TMap<unsigned int, MapSpot>::Pair *pair;
+			while(iter.NextPair(pair))
+			{
+				DWORD key = pair->Key;
+				arc << key << pair->Value;
+			}
+		}
+		else
+		{
+			unsigned int count;
+			arc << count;
+
+			gm->elevatorPosition.Clear();
+			while(count-- > 0)
+			{
+				DWORD key;
+				MapSpot value;
+				arc << key << value;
+
+				gm->elevatorPosition[key] = value;
+			}
 		}
 	}
 

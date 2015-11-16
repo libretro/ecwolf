@@ -9,13 +9,6 @@ void Quit (const char *error,...);
 
 //===========================================================================
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-extern SDL_Window *window;
-extern SDL_Renderer *screenRenderer;
-extern SDL_Texture *screen;
-#else
-//extern SDL_Surface *screen;
-#endif
 extern SDL_Surface *curSurface;
 
 extern  bool	fullscreen, usedoublebuffering;

@@ -599,7 +599,7 @@ bool Load(const FString &filename)
 	delete[] savesig;
 
 	char *prodver = M_GetPNGText(png, "ECWolf Save Product Version");
-	SaveProdVersion = atoll(prodver);
+	SaveProdVersion = (DWORD)atoll(prodver);
 	delete[] prodver;
 
 	M_GetPNGText(png, "Current Map", gamestate.mapname, 8);

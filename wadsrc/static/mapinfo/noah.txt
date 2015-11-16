@@ -42,6 +42,7 @@ gameinfo
 	pageindexfontcolor = "Black"
 	dialogcolor = "NoahWhite"
 	deathtransition = "Fade"
+	trackhighscores = true
 }
 
 automap
@@ -540,6 +541,7 @@ map "MAP19"
 	next = "MAP20"
 	secretnext = "MAP20"
 	floornumber = "5-2"
+	par = 165
 	music = "SONG1"
 	cluster = 5
 	defaultfloor = "FLOOR2"
@@ -667,7 +669,7 @@ map "MAP28"
 	par = 150
 	music = "SONG6"
 	cluster = 6
-	par = 90
+	par = 150
 	defaultfloor = "FLOOR3"
 	defaultceiling = "CEILING3"
 }

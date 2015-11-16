@@ -9,7 +9,7 @@ public class GD {
 	public static boolean DEBUG = false;
 	
 	
-	public enum IDGame{Quake,Quake2,Doom,Duke3d,Quake3,Hexen2,RTCW,Wolf3d,JK2,JK3,Heretic,Hexen,Strife,AVP,Shadow,Gish,Descent1,Descent2,Homeworld,BlakeStone,Noah};
+	public enum IDGame{Quake,Quake2,Doom,Duke3d,Quake3,Hexen2,RTCW,Wolf3d,JK2,JK3,Heretic,Hexen,Strife,AVP,Shadow,Gish,Descent1,Descent2,Homeworld,BlakeStone,Noah,Doom3};
 	
 	public static String qc_fn = "quick_cmd.dat";
 	

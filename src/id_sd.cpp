@@ -40,6 +40,10 @@
 #include "wl_main.h"
 #include "id_sd.h"
 
+#ifndef ECWOLF_MIXER
+#warning Not using customized SDL_mixer. Features will be disabled. https://bitbucket.org/Blzut3/sdl_mixer-for-ecwolf
+#endif
+
 // For AdLib sounds & music:
 #define MUSIC_RATE 700	// Must be a multiple of SOUND_RATE
 #define SOUND_RATE 140	// Also affects PC Speaker sounds
@@ -94,7 +98,7 @@ static  Instrument              alZeroInst;
 //      Sequencer variables
 static  volatile bool			sqActive;
 static  word                   *sqHack;
-static	word					*sqHackFreeable=NULL;
+static	TUniquePtr<word[]>		sqHackFreeable;
 static  word                   *sqHackPtr;
 static  int                     sqHackLen;
 static  int                     sqHackSeqLen;
@@ -102,7 +106,7 @@ static  longword                sqHackTime;
 
 static int musicchunk=-1;
 Mix_Music *music=NULL;
-byte* chunkmem = NULL;
+TUniquePtr<byte[]> chunkmem;
 
 void musicFinished(void)
 {
@@ -112,8 +116,7 @@ void musicFinished(void)
 		Mix_FreeMusic(music);
 		music = NULL;
 
-		delete [] chunkmem;
-		chunkmem = NULL;
+		chunkmem.Reset();
 
 		musicchunk = -1;
 	}
@@ -486,7 +489,94 @@ void SD_SetPosition(int channel, int leftpos, int rightpos)
 	}
 }
 
-byte* SD_PrepareSound(int which)
+// Mac format sound loading.
+struct MacSoundData
+{
+	uint8_t *data;
+	Sint64 pos;
+	int size;
+};
+static Sint64 MacSound_Size(SDL_RWops *ops)
+{
+	return (Sint64)((MacSoundData*)ops->hidden.unknown.data1)->size;
+}
+#if SDL_VERSION_ATLEAST(2,0,0)
+static Sint64 MacSound_Seek(SDL_RWops *ops, Sint64 pos, int relative)
+#else
+static int MacSound_Seek(SDL_RWops *ops, int pos, int relative)
+#endif
+{
+	Sint64 &curpos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
+	switch(relative)
+	{
+		case RW_SEEK_SET:
+			curpos = pos;
+			break;
+		case RW_SEEK_CUR:
+			curpos += pos;
+			break;
+		case RW_SEEK_END:
+			curpos = ((MacSoundData*)ops->hidden.unknown.data1)->size+pos;
+			break;
+	}
+	return (int)curpos;
+}
+#if SDL_VERSION_ATLEAST(2,0,0)
+static size_t MacSound_Read(SDL_RWops *ops, void *buffer, size_t size, size_t nmem)
+#else
+static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
+#endif
+{
+	static const char WAV_HEADER[40] = {
+		'R','I','F','F',0,0,0,0,'W','A','V','E',
+		'f','m','t',' ',16,0,0,0,1,0,1,0,
+		0x22,0x56,0,0,0x22,0x56,0,0,1,0,8,0,
+		'd','a','t','a'
+	};
+	static const unsigned int MacSoundHeaderSize = 0x2A;
+
+	size_t totalsize = size*nmem;
+	DWORD ssize = (DWORD)(MacSound_Size(ops)-MacSoundHeaderSize);
+	Sint64 &pos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
+	if(pos < (Sint64)sizeof(WAV_HEADER))
+	{
+		size_t copysize = MIN<size_t>(totalsize, sizeof(WAV_HEADER)-pos);
+		memcpy(buffer, WAV_HEADER+pos, copysize);
+		pos += copysize;
+		buffer = ((char*)buffer)+copysize;
+		totalsize -= copysize;
+		if(totalsize == 0)
+			return nmem;
+	}
+	if(pos < (Sint64)sizeof(WAV_HEADER)+4)
+	{
+		size_t copysize = MIN<size_t>(totalsize, sizeof(ssize)+sizeof(WAV_HEADER)-pos);
+		memcpy(buffer, (char*)(&ssize)+(pos-sizeof(WAV_HEADER)), copysize);
+		pos += copysize;
+		buffer = ((char*)buffer)+copysize;
+		totalsize -= copysize;
+		if(totalsize == 0)
+			return nmem;
+	}
+
+	size_t copysize = MIN<size_t>(totalsize, ssize-(pos-sizeof(WAV_HEADER)-4));
+	memcpy(buffer, ((MacSoundData*)ops->hidden.unknown.data1)->data+pos-sizeof(WAV_HEADER)-4, copysize);
+
+	// Mac sound data is signed, we need unsigned
+	unsigned char* pcm = (unsigned char*)buffer;
+	for(size_t i = copysize;i-- > 0;)
+		*pcm++ += 0x80;
+
+	return (int)(copysize/size);
+}
+static int MacSound_Close(SDL_RWops *ops)
+{
+	free(((MacSoundData*)ops->hidden.unknown.data1)->data);
+	free(ops->hidden.unknown.data1);
+	return 0;
+}
+
+Mix_Chunk* SD_PrepareSound(int which)
 {
 	int size = Wads.LumpLength(which);
 	if(size == 0)
@@ -494,14 +584,30 @@ byte* SD_PrepareSound(int which)
 
 	FMemLump soundLump = Wads.ReadLump(which);
 
-	byte* out = reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(soundLump.GetMem(), size), 1));
-	if(!out)
-		return NULL;
+	// 0x2A is the size of the sound header. From what I can tell the csnds
+	// have mostly garbage filled headers (outside of what is precisely needed
+	// since the sample rate is hard coded). I'm not sure if the sounds are
+	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
+	if(BigShort(*(WORD*)soundLump.GetMem()) == 1 && size > 0x2A)
+	{
+		SDL_RWops *ops = SDL_AllocRW();
+		//ops->size = MacSound_Size;
+		ops->seek = MacSound_Seek;
+		ops->read = MacSound_Read;
+		ops->write = NULL;
+		ops->close = MacSound_Close;
+		ops->type = 0;
+		ops->hidden.unknown.data1 = malloc(sizeof(MacSoundData));
+		((MacSoundData*)ops->hidden.unknown.data1)->data = (uint8_t*)malloc(size-0x2A);
+		((MacSoundData*)ops->hidden.unknown.data1)->size = size-0x2A;
+		((MacSoundData*)ops->hidden.unknown.data1)->pos = 0;
+		memcpy(((MacSoundData*)ops->hidden.unknown.data1)->data, ((char*)soundLump.GetMem())+0x2A, size-0x2A);
+		for(unsigned int i = size-0x2A;i-- > 0;)
+			((MacSoundData*)ops->hidden.unknown.data1)->data[i] = 0x80+((MacSoundData*)ops->hidden.unknown.data1)->data[i];
+		return Mix_LoadWAV_RW(ops, 1);
+	}
 
-	// TEMPORARY WORK AROUND FOR MEMORY ERROR
-	byte* nout = new byte[sizeof(Mix_Chunk)];
-	memcpy(nout, out, sizeof(Mix_Chunk));
-	return nout;
+	return Mix_LoadWAV_RW(SDL_RWFromMem(soundLump.GetMem(), size), 1);
 }
 
 int SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChannel chan)
@@ -529,7 +635,7 @@ int SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChanne
 
 	DigiPlaying = true;
 
-	Mix_Chunk *sample = reinterpret_cast<Mix_Chunk*> (which.GetData(SoundData::DIGITAL));
+	Mix_Chunk *sample = which.GetDigitalData();
 	if(sample == NULL)
 		return 0;
 
@@ -936,13 +1042,22 @@ SD_Startup(void)
 	if (SD_Started)
 		return;
 
+	if(SDL_InitSubSystem(SDL_INIT_AUDIO) != 0)
+	{
+		Printf("Unable to initialize audio.\n");
+		return;
+	}
+
 	if((audioMutex = SDL_CreateMutex()) == NULL)
 	{
 		printf("Unable to create audio mutex\n");
 		return;
 	}
 
-#ifdef __unix__
+#if defined(__ANDROID__)
+	// Working directory will be in the form: Beloko/Wolf3d/FULL
+	Mix_SetSoundFonts("../../FluidR3_GM.sf2");
+#elif defined(__unix__)
 	Mix_SetSoundFonts("/usr/share/sounds/sf2/FluidR3_GM.sf2");
 #endif
 
@@ -951,6 +1066,7 @@ SD_Startup(void)
 		printf("Unable to open audio: %s\n", Mix_GetError());
 		return;
 	}
+	atterm(Mix_CloseAudio);
 
 	Mix_ReserveChannels(2);  // reserve player and boss weapon channels
 	Mix_GroupChannels(2, MIX_CHANNELS-1, 1); // group remaining channels
@@ -1010,6 +1126,8 @@ SD_Shutdown(void)
 		SDL_DestroyMutex(audioMutex);
 		audioMutex = NULL;
 	}
+
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
 	SD_Started = false;
 }
@@ -1110,14 +1228,14 @@ int SD_PlaySound(const char* sound, SoundChannel chan)
 		case sdm_PC:
 			if(sindex.HasType(SoundData::PCSPEAKER))
 			{
-				SDL_PCPlaySound((PCSound *)sindex.GetData(SoundData::PCSPEAKER));
+				SDL_PCPlaySound((PCSound *)sindex.GetSpeakerData());
 				didPlaySound = true;
 			}
 			break;
 		case sdm_AdLib:
 			if(sindex.HasType(SoundData::ADLIB))
 			{
-				SDL_ALPlaySound((AdLibSound *)sindex.GetData(SoundData::ADLIB));
+				SDL_ALPlaySound((AdLibSound *)sindex.GetAdLibData());
 				didPlaySound = true;
 			}
 			break;
@@ -1282,9 +1400,17 @@ SD_StartMusic(const char* chunk)
 		// Load our music file from chunk
 		chunkmem = new byte[Wads.LumpLength(lumpNum)];
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);
-		lump.Read(chunkmem, Wads.LumpLength(lumpNum));
-		SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem, Wads.LumpLength(lumpNum));
+		lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
+		SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
+
+		if(music)
+			Mix_FreeMusic(music);
+		// Technically an SDL_mixer 2 feature to free the source
+#if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
+		music = Mix_LoadMUS_RW(mus_cunk, true);
+#else
 		music = Mix_LoadMUS_RW(mus_cunk);
+#endif
 
 		// We assume that when music equals to NULL, we've an IMF file to play
 		if (music == NULL)
@@ -1296,10 +1422,8 @@ SD_StartMusic(const char* chunk)
 			for (int i = 0;i < OPL_CHANNELS;++i)
 				SDL_AlSetChanInst(&ChannelRelease, i);
 
-			delete[] sqHackFreeable;
-			sqHack = reinterpret_cast<word*>(chunkmem);
+			sqHack = reinterpret_cast<word*>(chunkmem.Release());
 			sqHackFreeable = sqHack;
-			chunkmem = NULL;
 			if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
 			else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
 			sqHackPtr = sqHack;
@@ -1334,7 +1458,7 @@ SD_PauseMusic(void)
 	if (music != NULL && Mix_PlayingMusic() == 1)
 	{
 		Mix_PauseMusic();
-		return Mix_GetMusicPCMPosition();
+		return (int)Mix_GetMusicPCMPosition();
 	}
 	return 0;
 }
@@ -1354,20 +1478,21 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
 			SDL_LockMutex(audioMutex);
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);
-			delete[] sqHackFreeable;
-			sqHackFreeable = NULL;
+			sqHackFreeable.Reset();
 
 			// Load our music file from chunk
 			chunkmem = new byte[Wads.LumpLength(lumpNum)];
-			lump.Read(chunkmem, Wads.LumpLength(lumpNum));
-			SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem, Wads.LumpLength(lumpNum));
+			lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
+			SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
+#if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
+			music = Mix_LoadMUS_RW(mus_cunk, true);
+#else
 			music = Mix_LoadMUS_RW(mus_cunk);
-
+#endif
 			if (music == NULL)
 			{
-				sqHack = reinterpret_cast<word*>(chunkmem);
+				sqHack = reinterpret_cast<word*>(chunkmem.Release());
 				sqHackFreeable = sqHack;
-				chunkmem = NULL;
 				if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
 				else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
 				sqHackPtr = sqHack;

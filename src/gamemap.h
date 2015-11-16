@@ -211,6 +211,8 @@ class GameMap
 
 		static bool		CheckMapExists(const FString &map);
 
+		void PropagateMark();
+
 		TMap<unsigned int, Plane::Map *> elevatorPosition;
 	private:
 		friend class UWMFParser;
@@ -218,6 +220,7 @@ class GameMap
 
 		Plane	&NewPlane();
 		Trigger	&NewTrigger(unsigned int x, unsigned int y, unsigned int z);
+		void	ReadMacData();
 		void	ReadPlanesData();
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);

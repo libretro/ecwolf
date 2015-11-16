@@ -31,9 +31,8 @@
 #include "templates.h"
 #include "wl_def.h"
 #include "r_data/colormaps.h"
+#include "r_data/r_translate.h"
 #include "r_2d/r_draw.h"
-
-void R_InitTranslationTables();
 
 // PRIVATE DATA DECLARATIONS -----------------------------------------------
 
@@ -97,9 +96,14 @@ void R_SetupBuffer ()
 //
 //==========================================================================
 
+void R_ShutdownRenderer()
+{
+	R_DeinitTranslationTables ();
+}
+
 void R_InitRenderer()
 {
-	//atterm(R_ShutdownRenderer);
+	atterm(R_ShutdownRenderer);
 	// viewwidth / viewheight are set by the defaults
 
 	//R_InitPlanes ();

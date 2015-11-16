@@ -34,6 +34,7 @@
 
 #include "g_mapinfo.h"
 #include "tarray.h"
+#include "tmemory.h"
 #include "wl_text.h"
 #include "zstring.h"
 #include "textures/textures.h"
@@ -64,6 +65,7 @@ public:
 		// Invalid background means use previous.
 		Background.SetInvalid();
 	}
+	virtual ~IntermissionAction() {}
 
 	FTextureID			Background;
 	BackgroundType		Type;
@@ -122,6 +124,7 @@ public:
 	static IntermissionInfo *Find(const FName &name);
 
 	IntermissionInfo() : Link(NAME_None) {}
+	~IntermissionInfo();
 
 	enum ActionType
 	{
@@ -135,8 +138,8 @@ public:
 
 	struct Action
 	{
-		ActionType			type;
-		IntermissionAction	*action;
+		ActionType type;
+		TSharedPtr<IntermissionAction> action;
 	};
 	TArray<Action>	Actions;
 	FName			Link;

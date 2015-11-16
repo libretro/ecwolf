@@ -16,7 +16,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -42,6 +45,36 @@ public class Utils {
 		out.close(); 
 	}
 
+	static public void copyFile(InputStream in, OutputStream out,ProgressDialog pb) throws IOException {
+		byte[] buffer = new byte[1024];
+		int read;
+		while((read = in.read(buffer)) != -1){
+			out.write(buffer, 0, read);
+			pb.setProgress(pb.getProgress() + 1024);
+		}
+		out.close(); 
+	}
+	/*static public  void showDownloadDialog(final Activity act,String title,final String KEY,final String directory,final String file)
+	{
+		AlertDialog.Builder builder = new AlertDialog.Builder(act);
+		builder.setMessage(title)
+		.setCancelable(true)
+		.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				ServerAPI.downloadFileSecure(act,KEY,file,directory);
+			}
+		});
+		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});                                                   
+		AlertDialog alert = builder.create();
+		alert.show(); 
+	}*/
+	
 	public static String checkFiles(String basePath,String[] files_to_ceck)
 	{
 		File[] files = new File(basePath ).listFiles();
