@@ -313,4 +313,52 @@ FString GetSteamPath(ESteamApp game)
 #endif
 }
 
+FString GetGOGPath(ESteamApp game)
+{
+	static struct SteamAppInfo
+	{
+		const char* const AppID;
+	} AppInfo[NUM_STEAM_APPS] =
+	{
+		{"1441705046"}, // Wolfenstein 3D
+		{"1441705126"}, // Spear of Destiny
+		{NULL}, // Throwback Pack
+		{NULL} // Super 3D Noah's Ark
+	};
+
+	if(AppInfo[game].AppID == NULL)
+		return FString();
+
+#if defined(_WIN32)
+	FString path;
+
+
+	//==========================================================================
+	//
+	// I_GetGogPaths
+	//
+	// Check the registry for GOG installation paths, so we can search for IWADs
+	// that were bought from GOG.com. This is a bit different from the Steam
+	// version because each game has its own independent installation path, no
+	// such thing as <steamdir>/SteamApps/common/<GameName>.
+	//
+	//==========================================================================
+
+#ifdef _WIN64
+	FString gogregistrypath = "Software\\Wow6432Node\\GOG.com\\Games";
+#else
+	// If a 32-bit ZDoom runs on a 64-bit Windows, this will be transparently and
+	// automatically redirected to the Wow6432Node address instead, so this address
+	// should be safe to use in all cases.
+	FString gogregistrypath = "Software\\GOG.com\\Games";
+#endif
+
+	if(QueryPathKey(HKEY_LOCAL_MACHINE, gogregistrypath + PATH_SEPARATOR + AppInfo[game].AppID, "Path", path))
+		return path;
+	return FString();
+#else
+	return FString();
+#endif
+}
+
 }
