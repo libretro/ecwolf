@@ -90,6 +90,12 @@ if(WIN32)
 		set(EXTRA_FILES ${ECWolf_SOURCE_DIR}/src/win32/windows.rc)
 	endif(CMAKE_COMPILER_IS_GNUCXX)
 
+	# Fix stat in v140_xp (broken in RTM and Update 1 so far)
+	if( MSVC AND MSVC_VERSION EQUAL 1900 AND CMAKE_GENERATOR_TOOLSET STREQUAL "v140_xp" )
+		add_definitions(-D_stat64i32=VS14Stat)
+		set(EXTRA_FILES ${EXTRA_FILES} win32/vs2015hack.cpp)
+	endif( MSVC AND MSVC_VERSION EQUAL 1900 AND CMAKE_GENERATOR_TOOLSET STREQUAL "v140_xp" )
+
 	set(PLATFORM_EXE_FLAGS WIN32)
 
 	set(EXTRA_FILES

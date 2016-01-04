@@ -368,6 +368,11 @@ void SetupPaths(int argc, const char * const *argv)
 
 }
 
+static TMap<unsigned int, FString> VirtualRenameTable;
+// The reverse table was setup for the GOG version of Spear of Destiny.
+// It seems awfully fragile in comparison to the above.
+static TMap<unsigned int, FString> VirtualRenameReverse;
+
 File::File(const FString &filename)
 {
 	init(filename);
@@ -378,12 +383,16 @@ File::File(const File &dir, const FString &filename)
 	init(dir.getDirectory() + PATH_SEPARATOR + filename);
 }
 
-void File::init(const FString &filename)
+void File::init(FString filename)
 {
 	this->filename = filename;
 	directory = false;
 	existing = false;
 	writable = false;
+
+	// Are we trying to reference a renamed file?
+	if(FString *fname = VirtualRenameTable.CheckKey(MakeKey(filename)))
+		filename = *fname;
 
 #ifdef _WIN32
 	if(FileSys::IsWinNT)
@@ -467,6 +476,14 @@ void File::init(const FString &filename)
 			writable = true;
 	}
 #endif
+
+	// Check for any virtual renames
+	for(unsigned int i = 0;i < files.Size();++i)
+	{
+		FString *renamed = VirtualRenameReverse.CheckKey(MakeKey(getDirectory() + PATH_SEPARATOR + files[i]));
+		if(renamed)
+			files[i] = *renamed;
+	}
 }
 
 FString File::getDirectory() const
@@ -541,8 +558,6 @@ FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtensio
 #endif
 }
 
-static TMap<unsigned int, FString> VirtualRenameTable;
-
 /**
  * Open a file while handling any non-English character sets and
  * respecting our virtual renaming table.
@@ -579,6 +594,7 @@ void File::rename(const FString &newname)
 	FileSys::FullFileName(filename, path);
 	filename = path;
 
+	VirtualRenameReverse[MakeKey(filename)] = newname;
 	VirtualRenameTable[MakeKey(getDirectory() + PATH_SEPARATOR + newname)] = filename;
 }
 

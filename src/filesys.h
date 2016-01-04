@@ -70,6 +70,7 @@ namespace FileSys
 
 	FString GetDirectoryPath(ESpecialDirectory dir);
 	FString GetSteamPath(ESteamApp game);
+	FString GetGOGPath(ESteamApp game);
 	void SetDirectoryPath(ESpecialDirectory dir, const FString &path);
 	void SetupPaths(int argc, const char* const *argv);
 
@@ -98,7 +99,7 @@ class File
 		bool					remove();
 
 	protected:
-		void					init(const FString &filename);
+		void					init(FString filename);
 
 		FString	filename;
 

@@ -48,6 +48,7 @@
 #include "doomerrors.h"
 #include "resourcefiles/resourcefile.h"
 #include "zdoomsupport.h"
+#include "filesys.h"
 
 // Work around missing defines for ECWolf
 #ifndef PATH_MAX
@@ -226,14 +227,14 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 	if (wadinfo == NULL)
 	{
 		// Does this exist? If so, is it a directory?
-		struct stat info;
-		if (stat(filename, &info) != 0)
+		File info(filename);
+		if (!info.exists())
 		{
 			Printf(TEXTCOLOR_RED "Could not stat %s\n", filename);
 			PrintLastError();
 			return;
 		}
-		isdir = (info.st_mode & S_IFDIR) != 0;
+		isdir = info.isDirectory();
 
 		if (!isdir)
 		{

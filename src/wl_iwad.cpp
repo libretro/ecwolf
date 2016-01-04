@@ -292,7 +292,7 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 		{
 			if(name.CompareNoCase(BaseFileNames[baseName]) == 0)
 			{
-				base->filename[baseName].Format("%s/%s", directory, files[i].GetChars());
+				base->filename[baseName].Format("%s" PATH_SEPARATOR "%s", directory, files[i].GetChars());
 				base->isValid |= 1<<baseName;
 				break;
 			}
@@ -485,7 +485,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	if(!datawadRes)
 	{
 		useProgdir = true;
-		datawadRes = FResourceFile::OpenResourceFile(progdir + "/" + datawad, NULL, true);
+		datawadRes = FResourceFile::OpenResourceFile(progdir + PATH_SEPARATOR + datawad, NULL, true);
 	}
 	if(!datawadRes)
 		I_Error("Could not open %s!", datawad);
@@ -548,11 +548,13 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 	// Look for a steam install. (Basically from ZDoom)
 	{
-		static const struct
+		struct CommercialGameDir
 		{
 			FileSys::ESteamApp app;
-			const char* const dir;
-		} steamDirs[] =
+			const char* dir;
+		};
+
+		static const CommercialGameDir steamDirs[] =
 		{
 			{FileSys::APP_Wolfenstein3D, PATH_SEPARATOR "base"},
 			{FileSys::APP_SpearOfDestiny, PATH_SEPARATOR "base"},
@@ -560,6 +562,33 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		};
 		for(unsigned int i = 0;i < countof(steamDirs);++i)
 			LookForGameData(datawadRes, basefiles, FileSys::GetSteamPath(steamDirs[i].app) + steamDirs[i].dir);
+
+		static const CommercialGameDir gogDirs[] = 
+		{
+			{FileSys::APP_Wolfenstein3D, ""},
+			{FileSys::APP_SpearOfDestiny, PATH_SEPARATOR "M1"}
+		};
+		for(unsigned int i = 0;i < countof(gogDirs);++i)
+		{
+			FString path = FileSys::GetGOGPath(gogDirs[i].app) + gogDirs[i].dir;
+			LookForGameData(datawadRes, basefiles, path);
+
+			// Find mission packs which GOG was so kind to remove the hack for.
+			if(!path.IsEmpty() && gogDirs[i].app == FileSys::APP_SpearOfDestiny)
+			{
+				for(unsigned int mp = 2;mp <= 3;++mp)
+				{
+					File dir(path.Left(path.Len()-1) + ('0' + mp));
+					TArray<FString> files = dir.getFileList();
+					for(unsigned int f = 0;f < files.Size();++f)
+					{
+						if(files[f].Right(4).CompareNoCase(".SOD") == 0)
+							File(dir, files[f]).rename(files[f].Left(files[f].Len()-4) + ".sd" + ('0' + mp));
+					}
+					LookForGameData(datawadRes, basefiles, dir.getDirectory());
+				}
+			}
+		}
 	}
 
 	delete datawadRes;
@@ -612,7 +641,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	if(!useProgdir)
 		wadfiles.Push(datawad);
 	else
-		wadfiles.Push(progdir + "/" + datawad);
+		wadfiles.Push(progdir + PATH_SEPARATOR + datawad);
 	for(unsigned int i = 0;i < base.Path.Size();++i)
 	{
 		wadfiles.Push(base.Path[i]);
