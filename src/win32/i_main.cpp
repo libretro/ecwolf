@@ -400,6 +400,10 @@ void ForceSDLFocus(SDL_Window *win)
 }
 #endif
 
+#if !SDL_VERSION_ATLEAST(2,0,0)
+typedef SDLMod SDL_Keymod;
+#endif
+
 void I_CheckKeyMods()
 {
 	const bool numlock = GetKeyState(VK_NUMLOCK) & 1;
