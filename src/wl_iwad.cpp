@@ -578,12 +578,12 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 			{
 				for(unsigned int mp = 2;mp <= 3;++mp)
 				{
-					File dir(path.Left(path.Len()-1) + ('0' + mp));
+					File dir(path.Left(path.Len()-1) + char('0' + mp));
 					TArray<FString> files = dir.getFileList();
 					for(unsigned int f = 0;f < files.Size();++f)
 					{
 						if(files[f].Right(4).CompareNoCase(".SOD") == 0)
-							File(dir, files[f]).rename(files[f].Left(files[f].Len()-4) + ".sd" + ('0' + mp));
+							File(dir, files[f]).rename(files[f].Left(files[f].Len()-4) + ".sd" + char('0' + mp));
 					}
 					LookForGameData(datawadRes, basefiles, dir.getDirectory());
 				}
