@@ -92,9 +92,11 @@ class Thinker : public DObject, public EmbeddedList<Thinker>::Node
 		void			Activate(ThinkerList::Priority priority=ThinkerList::NORMAL);
 		void			Deactivate();
 		void			Destroy();
+		void			Init();
 		template<class T>
 		bool			IsThinkerType() { return IsA(T::__StaticClass); }
 		bool			IsThinking() const { return EmbeddedList<Thinker>::List::IsLinked(this); }
+		void			Serialize(FArchive &arc);
 		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
 		virtual void	PostBeginPlay() {}

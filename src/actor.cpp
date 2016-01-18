@@ -354,6 +354,8 @@ bool AActor::GiveInventory(const ClassDef *cls, int amount, bool allowreplacemen
 
 void AActor::Init()
 {
+	Super::Init();
+
 	ObjectFlags |= OF_JustSpawned;
 
 	distance = 0;
@@ -377,6 +379,17 @@ void AActor::Init()
 bool AActor::IsFast() const
 {
 	return (flags & FL_ALWAYSFAST) || gamestate.difficulty->FastMonsters;
+}
+
+void AActor::PrintInventory()
+{
+	Printf("%s inventory:\n", GetClass()->GetName().GetChars());
+	AInventory *item = inventory;
+	while(item)
+	{
+		Printf("  %s (%d/%d)\n", item->GetClass()->GetName().GetChars(), item->amount, item->maxamount);
+		item = item->inventory;
+	}
 }
 
 void AActor::Serialize(FArchive &arc)
@@ -440,13 +453,8 @@ void AActor::Serialize(FArchive &arc)
 	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374914454)
 		arc << projectilepassheight;
 
-	if(!arc.IsStoring())
-	{
-		if(!hasActorRef)
-		{
-			actors.Remove(this);
-		}
-	}
+	if(arc.IsLoading() && !hasActorRef)
+		actors.Remove(this);
 
 	Super::Serialize(arc);
 }

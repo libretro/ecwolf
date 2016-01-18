@@ -57,7 +57,8 @@ public:
 	class List;
 
 	// It was pointed out that this may be more flexible if left as a POD type.
-	// Thus the node should not be considered valid until added to a list.
+	// Thus the node should not be considered valid until added to a list or
+	// ValidateNode has been called on it.
 	class Node
 	{
 	protected:
@@ -259,6 +260,12 @@ public:
 		static bool IsLinked(const N *node)
 		{
 			return node->elNext != EMBEDDEDLIST_UNLINKED;
+		}
+
+		// Initializes a node.
+		static void ValidateNode(N *node)
+		{
+			node->elNext = node->elPrev = EMBEDDEDLIST_UNLINKED;
 		}
 	private:
 		List(const List &other) {}
