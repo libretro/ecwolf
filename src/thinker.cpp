@@ -40,6 +40,7 @@
 #include "thingdef/thingdef.h"
 #include "wl_def.h"
 #include "wl_game.h"
+#include "wl_loadsave.h"
 
 ThinkerList *thinkerList;
 
@@ -223,6 +224,12 @@ void Thinker::Destroy()
 	Super::Destroy();
 }
 
+void Thinker::Init()
+{
+	Super::Init();
+	EmbeddedList<Thinker>::List::ValidateNode(this);
+}
+
 size_t Thinker::PropagateMark()
 {
 	if(IsThinking())
@@ -242,6 +249,20 @@ size_t Thinker::PropagateMark()
 		}
 	}
 	return Super::PropagateMark();
+}
+
+void Thinker::Serialize(FArchive &arc)
+{
+	if(GameSave::SaveVersion > 1451884199)
+	{
+		BYTE priority = thinkerPriority;
+		arc << priority;
+		thinkerPriority = static_cast<ThinkerList::Priority>(priority);
+	}
+	else
+		thinkerPriority = ThinkerList::NORMAL;
+
+	Super::Serialize(arc);
 }
 
 void Thinker::SetPriority(ThinkerList::Priority priority)

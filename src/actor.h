@@ -119,6 +119,8 @@ class AActor : public Thinker,
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
 
+		void PrintInventory();
+
 		static PointerIndexTable<ExpressionNode> damageExpressions;
 		static PointerIndexTable<DropList> dropItems;
 
