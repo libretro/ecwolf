@@ -51,6 +51,10 @@ void CA_UnloadMap(GameMap *map)
 {
 	thinkerList->DestroyAll();
 	delete map;
+
+	// Don't dangle a reference to the map we just unloaded.
+	if(::map == map)
+		::map = NULL;
 }
 
 /*
