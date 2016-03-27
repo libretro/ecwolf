@@ -309,6 +309,17 @@ void R_InitSprites()
 
 		loadedSprites[i].numFrames = maxframes;
 	}
+
+	// Special case for PLAY, if it doesn't exist then swap with UNKN.
+	if(spritesMap[MAKE_ID('P','L','A','Y')].Size() == 0)
+	{
+		SpriteInfo &playsprite = loadedSprites[R_GetSprite("PLAY")];
+		SpriteInfo &unknsprite = loadedSprites[R_GetSprite("UNKN")];
+		playsprite.frames = spriteFrames.Size();
+		playsprite.numFrames = MAX_SPRITE_FRAMES;
+		for(char i = 0;i < MAX_SPRITE_FRAMES;++i)
+			spriteFrames.Push(spriteFrames[unknsprite.frames]);
+	}
 }
 
 void R_LoadSprite(const FString &name)
@@ -467,9 +478,9 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 	const fixed centeringOffset = (centerx - 2*centerxwide)<<FRACBITS;
 	const fixed leftedge = FixedMul((160<<FRACBITS) - fixed(tex->GetScaledLeftOffsetDouble()*FRACUNIT) + offsetX, pspritexscale) + centeringOffset;
 	fixed upperedge = ((100-32)<<FRACBITS) + fixed(tex->GetScaledTopOffsetDouble()*FRACUNIT) - offsetY - AspectCorrection[r_ratio].tallscreen;
-	if(viewsize == 21 && players[0].ReadyWeapon)
+	if(viewsize == 21 && players[ConsolePlayer].ReadyWeapon)
 	{
-		upperedge -= players[0].ReadyWeapon->yadjust;
+		upperedge -= players[ConsolePlayer].ReadyWeapon->yadjust;
 	}
 	upperedge = scale - FixedMul(upperedge, pspriteyscale);
 

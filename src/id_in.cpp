@@ -241,7 +241,7 @@ int IN_JoyButtons()
 				// Attempt to allow controllers using the game controller API
 				// to enter the menu.
 				if(i == SDL_CONTROLLER_BUTTON_START)
-					buttonstate[bt_esc] = true;
+					control[ConsolePlayer].buttonstate[bt_esc] = true;
 				else
 					res |= 1<<i;
 			}

@@ -18,9 +18,9 @@ void    SelectRunDir (AActor *ob);
 bool MoveObj (AActor *ob, int32_t move);
 bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov);
 
-void    DamageActor (AActor *ob, unsigned damage);
+void    DamageActor (AActor *ob, AActor *attacker, unsigned damage);
 
 bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amount);
-bool CheckLine (AActor *ob);
+bool CheckLine (AActor *ob, AActor *ob2);
 
 #endif

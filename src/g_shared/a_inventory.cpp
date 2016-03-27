@@ -170,7 +170,8 @@ void AInventory::Touch(AActor *toucher)
 		++gamestate.secretcount;
 
 	PlaySoundLocActor(pickupsound, toucher);
-	StartBonusFlash();
+	if(toucher->player == &players[ConsolePlayer])
+		StartBonusFlash();
 }
 
 bool AInventory::TryPickup(AActor *toucher)
@@ -657,9 +658,11 @@ ACTION_FUNCTION(A_ReFire)
 	{
 		ACTION_PARAM_STATE(hold, 0, player->ReadyWeapon->GetAtkState(player->ReadyWeapon->mode, true));
 
-		if((player->ReadyWeapon->mode == AWeapon::PrimaryFire && buttonstate[bt_attack]) ||
-		   (player->ReadyWeapon->mode == AWeapon::AltFire && buttonstate[bt_altattack]))
+		if((player->ReadyWeapon->mode == AWeapon::PrimaryFire && control[player - players].buttonstate[bt_attack]) ||
+		   (player->ReadyWeapon->mode == AWeapon::AltFire && control[player - players].buttonstate[bt_altattack]))
 		{
+			if(self->MissileState)
+				self->SetState(player->mo->MissileState);
 			player->SetPSprite(hold, player_t::ps_weapon);
 		}
 	}
@@ -771,7 +774,8 @@ class AScoreItem : public AInventory
 	protected:
 		bool TryPickup(AActor *toucher)
 		{
-			GivePoints(amount);
+			if(toucher->player)
+				toucher->player->GivePoints(amount);
 			GoAwayAndDie();
 			return true;
 		}
@@ -810,7 +814,8 @@ class AExtraLifeItem : public AInventory
 				amount += item->amount;
 				if(amount >= maxamount)
 				{
-					GiveExtraMan(amount/maxamount);
+					if(item->owner->player)
+						item->owner->player->GiveExtraMan(amount/maxamount);
 					amount %= maxamount;
 				}
 				good = true;

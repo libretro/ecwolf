@@ -165,7 +165,7 @@ class EVDoor : public Thinker
 						const MapZone *zone2 = spot->GetAdjacent(MapTile::Side(direction), true)->zone;
 						map->LinkZones(zone1, zone2, true);
 
-						if(map->CheckLink(zone1, players[0].mo->GetZone(), true))
+						if(map->CheckLink(zone1, players[ConsolePlayer].mo->GetZone(), true))
 							sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
 					}
 
@@ -310,7 +310,7 @@ class EVDoor : public Thinker
 					}
 					break;
 				case Closing:
-					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[0].mo->GetZone(), true))
+					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[ConsolePlayer].mo->GetZone(), true))
 						sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_CloseNormal), spot);
 					break;
 			}
@@ -337,7 +337,7 @@ FUNC(Door_Open)
 
 	if(activator->player)
 	{
-		if(buttonheld[bt_use])
+		if(control[activator->player - players].buttonheld[bt_use])
 			return 0;
 	}
 
@@ -643,7 +643,7 @@ FUNC(Door_Elevator)
 	{
 		if(activator->player)
 		{
-			if(buttonheld[bt_use])
+			if(control[activator->player - players].buttonheld[bt_use])
 				return 0;
 		}
 
@@ -929,9 +929,9 @@ FUNC(Pushwall_MoveNoStop)
 
 FUNC(Exit_Normal)
 {
-	if(buttonheld[bt_use])
+	if(control[activator->player - players].buttonheld[bt_use])
 		return 0;
-	buttonheld[bt_use] = true;
+	control[activator->player - players].buttonheld[bt_use] = true;
 
 	playstate = ex_completed;
 	SD_WaitSoundDone();
@@ -940,9 +940,9 @@ FUNC(Exit_Normal)
 
 FUNC(Exit_Secret)
 {
-	if(buttonheld[bt_use])
+	if(control[activator->player - players].buttonheld[bt_use])
 		return 0;
-	buttonheld[bt_use] = true;
+	control[activator->player - players].buttonheld[bt_use] = true;
 
 	playstate = ex_secretlevel;
 	SD_WaitSoundDone();
@@ -951,9 +951,9 @@ FUNC(Exit_Secret)
 
 FUNC(Exit_Victory)
 {
-	if(buttonheld[bt_use])
+	if(control[activator->player - players].buttonheld[bt_use])
 		return 0;
-	buttonheld[bt_use] = true;
+	control[activator->player - players].buttonheld[bt_use] = true;
 
 	playstate = ex_victorious;
 	SD_WaitSoundDone();
@@ -962,9 +962,9 @@ FUNC(Exit_Victory)
 
 FUNC(Teleport_NewMap)
 {
-	if(buttonheld[bt_use])
+	if(control[activator->player - players].buttonheld[bt_use])
 		return 0;
-	buttonheld[bt_use] = true;
+	control[activator->player - players].buttonheld[bt_use] = true;
 
 	playstate = ex_newmap;
 	NewMap.newmap = args[0];
@@ -982,7 +982,7 @@ class EVVictorySpin : public Thinker
 			doturn(true), dist(6*FRACUNIT + FRACUNIT/2), activator(activator)
 		{
 			gamestate.victoryflag = true;
-			players[0].SetPSprite(NULL, player_t::ps_weapon);
+			activator->player->SetPSprite(NULL, player_t::ps_weapon);
 
 			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0, SPAWN_AllowReplacement);
 			runner->flags |= FL_PATHING;
@@ -1075,9 +1075,9 @@ IMPLEMENT_INTERNAL_POINTY_CLASS(EVVictorySpin)
 END_POINTERS
 FUNC(Exit_VictorySpin)
 {
-	if(buttonheld[bt_use])
+	if(control[activator->player - players].buttonheld[bt_use])
 		return 0;
-	buttonheld[bt_use] = true;
+	control[activator->player - players].buttonheld[bt_use] = true;
 
 	new EVVictorySpin(activator, direction);
 	return 1;

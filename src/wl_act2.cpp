@@ -60,6 +60,9 @@ static inline bool CheckDoorMovement(AActor *actor)
 
 void A_Face(AActor *self, AActor *target, angle_t maxturn)
 {
+	if (!target)
+		return;
+
 	double angle = atan2 ((double) (target->x - self->x), (double) (target->y - self->y));
 	if (angle<0)
 		angle = (M_PI*2+angle);
@@ -251,7 +254,7 @@ void T_Projectile (AActor *self)
 			// Pass through allies
 			if(playermissile)
 			{
-				if(check == players[0].mo)
+				if(check->player)
 					continue;
 			}
 			else
@@ -270,10 +273,7 @@ void T_Projectile (AActor *self)
 					lastHit = check;
 					if(check->flags & FL_SHOOTABLE)
 					{
-						if(check != players[0].mo)
-							DamageActor(check, self->GetDamage());
-						else
-							TakeDamage(self->GetDamage(), self);
+						DamageActor(check, self, self->GetDamage());
 
 						if(!(self->flags & FL_RIPPER) || (check->flags & FL_DONTRIP))
 						{
@@ -333,8 +333,8 @@ ACTION_FUNCTION(A_CustomMissile)
 	fixed newy = self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64;
 
 	double angle = (flags & CMF_AIMOFFSET) ?
-		atan2 ((double) (self->y - players[0].mo->y), (double) (players[0].mo->x - self->x)) :
-		atan2 ((double) (newy - players[0].mo->y), (double) (players[0].mo->x - newx));
+		atan2 ((double) (self->y - self->target->y), (double) (self->target->x - self->x)) :
+		atan2 ((double) (newy - self->target->y), (double) (self->target->x - newx));
 	if (angle<0)
 		angle = (M_PI*2+angle);
 	angle_t iangle = (angle_t) (angle*ANGLE_180/M_PI) + (angle_t) ((angleOffset*ANGLE_45)/45);
@@ -440,6 +440,9 @@ CHASE
 
 bool CheckMeleeRange(AActor *inflictor, AActor *inflictee, fixed range)
 {
+	if(!inflictee)
+		return false;
+
 	fixed r = inflictor->meleerange + inflictee->radius + range;
 	return abs(inflictee->x - inflictor->x) <= r && abs(inflictee->y - inflictor->y) <= r;
 }
@@ -473,7 +476,7 @@ ACTION_FUNCTION(A_Chase)
 	ACTION_PARAM_STATE(missile, 1, self->MissileState);
 	ACTION_PARAM_INT(flags, 2);
 
-	int32_t	move,target;
+	int32_t	move;
 	int		dx,dy,dist = INT_MAX,chance;
 	bool	dodge = !(flags & CHF_DONTDODGE);
 	bool	pathing = (self->flags & FL_PATHING) ? true : false;
@@ -498,16 +501,16 @@ ACTION_FUNCTION(A_Chase)
 
 	if(!pathing)
 	{
-		bool inMeleeRange = melee ? CheckMeleeRange(self, players[0].mo, self->speed) : false;
+		bool inMeleeRange = melee ? CheckMeleeRange(self, self->target, self->speed) : false;
 
 		if(!inMeleeRange && missile)
 		{
 			dodge = false;
-			if ((self->IsFast() || self->movecount == 0) && CheckLine(self)) // got a shot at players[0].mo?
+			if ((self->IsFast() || self->movecount == 0) && CheckLine(self, self->target)) // got a shot at player?
 			{
 				self->hidden = false;
-				dx = abs(self->tilex + dirdeltax[self->dir] - players[0].mo->tilex);
-				dy = abs(self->tiley + dirdeltay[self->dir] - players[0].mo->tiley);
+				dx = abs(self->tilex + dirdeltax[self->dir] - self->target->tilex);
+				dy = abs(self->tiley + dirdeltay[self->dir] - self->target->tiley);
 				dist = dx>dy ? dx : dy;
 				// If we only do ranged attacks, be more aggressive
 				if(!melee)
@@ -534,11 +537,11 @@ ACTION_FUNCTION(A_Chase)
 					// check as the monster should try to get melee in.
 					if (dist == 1 && !melee)
 					{
-						target = abs(self->x - players[0].mo->x);
-						if (target < 0x14000l) //  < 1.25 tiles or 80 units
+						fixed targetdist = abs(self->x - self->target->x);
+						if (targetdist < 0x14000l) //  < 1.25 tiles or 80 units
 						{
-							target = abs(self->y - players[0].mo->y);
-							if (target < 0x14000l)
+							targetdist = abs(self->y - self->target->y);
+							if (targetdist < 0x14000l)
 								chance = 256;
 						}
 					}
@@ -581,7 +584,7 @@ ACTION_FUNCTION(A_Chase)
 			//
 			// check for melee range
 			//
-			if(melee && CheckMeleeRange(self, players[0].mo, self->speed))
+			if(melee && CheckMeleeRange(self, self->target, self->speed))
 			{
 				PlaySoundLocActor(self->attacksound, self);
 				self->SetState(melee);
@@ -612,17 +615,20 @@ ACTION_FUNCTION(A_Chase)
 
 		move -= self->distance;
 
-		dx = abs(self->tilex - players[0].mo->tilex);
-		dy = abs(self->tiley - players[0].mo->tiley);
-		dist = dx>dy ? dx : dy;
 		if (pathing)
 			SelectPathDir (self);
-		else if ((flags & CHF_BACKOFF) && dist < 4)
-			SelectRunDir (self);
-		else if (dodge)
-			SelectDodgeDir (self);
 		else
-			SelectChaseDir (self);
+		{
+			dx = abs(self->tilex - self->target->tilex);
+			dy = abs(self->tiley - self->target->tiley);
+			dist = dx>dy ? dx : dy;
+			if ((flags & CHF_BACKOFF) && dist < 4)
+				SelectRunDir (self);
+			else if (dodge)
+				SelectDodgeDir (self);
+			else
+				SelectChaseDir (self);
+		}
 
 		if (self->dir == nodir)
 			return false; // object is blocked in
@@ -651,7 +657,7 @@ ACTION_FUNCTION(A_Chase)
 =
 = A_WolfAttack
 =
-= Try to damage the players[0].mo, based on skill level and players[0].mo's speed
+= Try to damage the player, based on skill level and player's speed
 =
 ===============
 */
@@ -678,28 +684,28 @@ ACTION_FUNCTION(A_WolfAttack)
 
 	runspeed *= 37.5;
 
-	A_Face(self, players[0].mo);
+	A_Face(self, self->target);
 
-	if (CheckLine (self))                    // players[0].mo is not behind a wall
+	if (CheckLine (self, self->target)) // player is not behind a wall
 	{
-		dx = abs(self->x - players[0].mo->x);
-		dy = abs(self->y - players[0].mo->y);
+		dx = abs(self->x - self->target->x);
+		dy = abs(self->y - self->target->y);
 		dist = dx>dy ? dx:dy;
 
 		dist = FixedMul(dist, snipe);
 		dist /= blocksize<<9;
 
-		if (thrustspeed >= runspeed)
+		if (self->target->player->thrustspeed >= runspeed)
 		{
 			if (self->flags&FL_VISABLE)
-				hitchance = 160-dist*16;                // players[0].mo can see to dodge
+				hitchance = 160-dist*16; // player can see to dodge
 			else
 				hitchance = 160-dist*8;
 		}
 		else
 		{
 			if (self->flags&FL_VISABLE)
-				hitchance = 256-dist*16;                // players[0].mo can see to dodge
+				hitchance = 256-dist*16; // player can see to dodge
 			else
 				hitchance = 256-dist*8;
 		}
@@ -714,7 +720,7 @@ ACTION_FUNCTION(A_WolfAttack)
 			if (dist>=longrange)
 				damage >>= 1;
 
-			TakeDamage (damage,self);
+			DamageActor (self->target, self, damage);
 		}
 	}
 

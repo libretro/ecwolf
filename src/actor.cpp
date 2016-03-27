@@ -147,6 +147,7 @@ PointerIndexTable<ExpressionNode> AActor::damageExpressions;
 PointerIndexTable<AActor::DropList> AActor::dropItems;
 IMPLEMENT_POINTY_CLASS(Actor)
 	DECLARE_POINTER(inventory)
+	DECLARE_POINTER(target)
 END_POINTERS
 
 void AActor::AddInventory(AInventory *item)
@@ -200,7 +201,17 @@ void AActor::Destroy()
 static FRandom pr_dropitem("DropItem");
 void AActor::Die()
 {
-	GivePoints(points);
+	if(target && target->player)
+		target->player->GivePoints(points);
+	else if(points)
+	{
+		// The targetting system may need some refinement, so if we don't have
+		// a usable target to give points to then we should give to player 1
+		// and possibly investigate.
+		players[0].GivePoints(points);
+		NetDPrintf("%s %d points with no target\n", __FUNCTION__, points);
+	}
+
 	if(flags & FL_COUNTKILL)
 		gamestate.killcount++;
 	flags &= ~FL_SHOOTABLE;
@@ -226,8 +237,7 @@ void AActor::Die()
 				{
 					if(flags & FL_DROPBASEDONTARGET)
 					{
-						AActor *target = players[0].mo;
-						AInventory *inv = target->FindInventory(cls->GetReplacement());
+						AInventory *inv = target ? target->FindInventory(cls->GetReplacement()) : NULL;
 						if(!inv || !bestDrop)
 							bestDrop = drop;
 
@@ -376,6 +386,22 @@ void AActor::Init()
 	}
 }
 
+// Approximate if a state sequence is running by checking if we are in a
+// contiguous sequence.
+bool AActor::InStateSequence(const Frame *basestate) const
+{
+	if(!basestate)
+		return false;
+
+	while(state != basestate)
+	{
+		if(basestate->next != basestate+1)
+			return false;
+		++basestate;
+	}
+	return true;
+}
+
 bool AActor::IsFast() const
 {
 	return (flags & FL_ALWAYSFAST) || gamestate.difficulty->FastMonsters;
@@ -443,6 +469,8 @@ void AActor::Serialize(FArchive &arc)
 		<< player
 		<< inventory
 		<< soundZone;
+	if(GameSave::SaveVersion >= 1459043051)
+		arc << target;
 	if(arc.IsLoading() && (GameSave::SaveProdVersion < 0x001002FF || GameSave::SaveVersion < 1382102747))
 	{
 		TObjPtr<AActorProxy> proxy;

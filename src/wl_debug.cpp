@@ -275,7 +275,7 @@ int DebugKeys (void)
 	if (Keyboard[sc_H])             // H = hurt self
 	{
 		IN_ClearKeysDown ();
-		TakeDamage (16,NULL);
+		players[0].TakeDamage (16,NULL);
 	}
 	else if (Keyboard[sc_I])        // I = item cheat
 	{
@@ -283,7 +283,7 @@ int DebugKeys (void)
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
 		GiveAllWeaponsAndAmmo();
-		GivePoints (100000);
+		players[0].GivePoints (100000);
 		players[0].health = 100;
 		StatusBar->DrawStatusBar();
 		IN_Ack ();

@@ -44,6 +44,7 @@
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
 #include "wl_game.h"
+#include "wl_play.h"
 #include "r_sprites.h"
 #include "resourcefiles/resourcefile.h"
 #include "wl_loadsave.h"
@@ -219,8 +220,8 @@ void GameMap::ClearVisibility()
 		for(unsigned int p = 0;p < planes.Size();++p)
 			planes[p].map[i].visible = false;
 	}
-	if(players[0].camera)
-		GetSpot(players[0].camera->tilex, players[0].camera->tiley, 0)->visible = true;
+	if(players[ConsolePlayer].camera)
+		GetSpot(players[ConsolePlayer].camera->tilex, players[ConsolePlayer].camera->tiley, 0)->visible = true;
 }
 
 bool GameMap::CheckMapExists(const FString &map)

@@ -526,7 +526,7 @@ unsigned int CalcRotate (AActor *ob)
 	// this isn't exactly correct, as it should vary by a trig value,
 	// but it is close enough with only eight rotations
 
-	viewangle = players[0].camera->angle + (centerx - ob->viewx)/8;
+	viewangle = players[ConsolePlayer].camera->angle + (centerx - ob->viewx)/8;
 
 	angle = viewangle - ob->angle;
 
@@ -605,7 +605,7 @@ void DrawScaleds (void)
 			|| ( spots[7] && (spots[7]->visible && !spots[7]->tile) ) )
 		{
 			TransformActor (obj);
-			if (!obj->viewheight || (gamestate.victoryflag && obj == players[0].mo))
+			if (!obj->viewheight || (gamestate.victoryflag && obj == players[ConsolePlayer].mo))
 				continue;                                               // too close or far away
 
 			visptr->actor = obj;
@@ -674,13 +674,13 @@ void DrawPlayerWeapon (void)
 {
 	for(unsigned int i = 0;i < player_t::NUM_PSPRITES;++i)
 	{
-		if(!players[0].psprite[i].frame)
+		if(!players[ConsolePlayer].psprite[i].frame)
 			return;
 
 		fixed xoffset, yoffset;
-		players[0].BobWeapon(&xoffset, &yoffset);
+		players[ConsolePlayer].BobWeapon(&xoffset, &yoffset);
 
-		R_DrawPlayerSprite(players[0].ReadyWeapon, players[0].psprite[i].frame, players[0].psprite[i].sx+xoffset, players[0].psprite[i].sy+yoffset);
+		R_DrawPlayerSprite(players[ConsolePlayer].ReadyWeapon, players[ConsolePlayer].psprite[i].frame, players[ConsolePlayer].psprite[i].sx+xoffset, players[ConsolePlayer].psprite[i].sy+yoffset);
 	}
 }
 
@@ -1177,14 +1177,14 @@ void WallRefresh (void)
 
 	min_wallheight = viewheight;
 	lastside = -1;                  // the first pixel is on a new wall
-	viewshift = FixedMul(focallengthy, finetangent[(ANGLE_180+players[0].camera->pitch)>>ANGLETOFINESHIFT]);
+	viewshift = FixedMul(focallengthy, finetangent[(ANGLE_180+players[ConsolePlayer].camera->pitch)>>ANGLETOFINESHIFT]);
 
 	
 	angle_t bobangle = ((gamestate.TimeCount<<13)/(20*TICRATE/35)) & FINEMASK;
-	const fixed playerMovebob = players[0].mo->GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
-	fixed curbob = gamestate.victoryflag ? 0 : FixedMul(FixedMul(players[0].bob, playerMovebob)>>1, finesine[bobangle]);
+	const fixed playerMovebob = players[ConsolePlayer].mo->GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
+	fixed curbob = gamestate.victoryflag ? 0 : FixedMul(FixedMul(players[ConsolePlayer].bob, playerMovebob)>>1, finesine[bobangle]);
 
-	viewz = (64<<FRACBITS) - players[0].mo->viewheight + curbob;
+	viewz = (64<<FRACBITS) - players[ConsolePlayer].mo->viewheight + curbob;
 
 	AsmRefresh();
 	ScalePost ();                   // no more optimization on last post
@@ -1192,21 +1192,21 @@ void WallRefresh (void)
 
 void CalcViewVariables()
 {
-	viewangle = players[0].camera->angle;
+	viewangle = players[ConsolePlayer].camera->angle;
 	midangle = viewangle>>ANGLETOFINESHIFT;
 	viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
 	viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
-	viewx = players[0].camera->x - FixedMul(focallength,viewcos);
-	viewy = players[0].camera->y + FixedMul(focallength,viewsin);
+	viewx = players[ConsolePlayer].camera->x - FixedMul(focallength,viewcos);
+	viewy = players[ConsolePlayer].camera->y + FixedMul(focallength,viewsin);
 
 	focaltx = (short)(viewx>>TILESHIFT);
 	focalty = (short)(viewy>>TILESHIFT);
 
-	viewtx = (short)(players[0].camera->x >> TILESHIFT);
-	viewty = (short)(players[0].camera->y >> TILESHIFT);
+	viewtx = (short)(players[ConsolePlayer].camera->x >> TILESHIFT);
+	viewty = (short)(players[ConsolePlayer].camera->y >> TILESHIFT);
 
-	if(players[0].camera->player)
-		r_extralight = players[0].camera->player->extralight << 3;
+	if(players[ConsolePlayer].camera->player)
+		r_extralight = players[ConsolePlayer].camera->player->extralight << 3;
 	else
 		r_extralight = 0;
 }
@@ -1251,9 +1251,9 @@ void R_RenderView()
 		DrawSnow(vbuf, vbufPitch);
 #endif
 
-	DrawPlayerWeapon ();    // draw players[0].mo's hands
+	DrawPlayerWeapon ();    // draw player's hands
 
-	if((buttonstate[bt_showstatusbar] || buttonheld[bt_showstatusbar]) && viewsize == 21)
+	if((control[ConsolePlayer].buttonstate[bt_showstatusbar] || control[ConsolePlayer].buttonheld[bt_showstatusbar]) && viewsize == 21)
 	{
 		ingame = false;
 		StatusBar->DrawStatusBar();
@@ -1261,7 +1261,7 @@ void R_RenderView()
 	}
 
 	// Always mark the current spot as visible in the automap
-	map->GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->amFlags |= AM_Visible;
+	map->GetSpot(players[ConsolePlayer].mo->tilex, players[ConsolePlayer].mo->tiley, 0)->amFlags |= AM_Visible;
 }
 
 /*
@@ -1275,8 +1275,8 @@ void R_RenderView()
 void    ThreeDRefresh (void)
 {
 	// Ensure we have a valid camera
-	if(players[0].camera == NULL)
-		players[0].camera = players[0].mo;
+	if(players[ConsolePlayer].camera == NULL)
+		players[ConsolePlayer].camera = players[ConsolePlayer].mo;
 
 	if (fizzlein && gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
 		FizzleFadeStart();

@@ -78,6 +78,7 @@
 //#include "menu/menu.h"
 //#include "intermission/intermission.h"
 #include "wl_agent.h"
+#include "wl_net.h"
 #include "thingdef/thingdef.h"
 #include "id_ca.h"
 
@@ -307,7 +308,8 @@ static void MarkRoot()
 	Gray = NULL;
 	if(thinkerList)
 		thinkerList->MarkRoots();
-	players[0].PropagateMark();
+	for(unsigned int i = 0;i < Net::InitVars.numPlayers;++i)
+		players[i].PropagateMark();
 	if(map)
 		map->PropagateMark();
 	Mark(screen);

@@ -23,10 +23,15 @@ extern  int             viewsize;
 //
 // current user input
 //
-extern  int         controlx,controly, controlstrafe;              // range from -100 to 100
-extern	int			controlpanx, controlpany;
-extern  bool        buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
-extern  bool        buttonheld[NUMBUTTONS], ambuttonheld[NUMAMBUTTONS];
+struct TicCmd_t
+{
+	int controlx,controly, controlstrafe; // range from -100 to 100
+	int controlpanx, controlpany;
+	bool buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
+	bool buttonheld[NUMBUTTONS], ambuttonheld[NUMAMBUTTONS];
+};
+extern unsigned int ConsolePlayer;
+extern TicCmd_t control[MAXPLAYERS];
 extern  exit_t      playstate;
 extern  bool        madenoise;
 extern  int         godmode;

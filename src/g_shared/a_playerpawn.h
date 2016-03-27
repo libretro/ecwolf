@@ -85,6 +85,8 @@ class APlayerPawn : public AActor
 
 	protected:
 		AWeapon	*BestWeapon(const ClassDef *ammo=NULL);
+
+		void Cmd_Use();
 };
 
 #endif

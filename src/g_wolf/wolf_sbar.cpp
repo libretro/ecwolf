@@ -161,13 +161,13 @@ void WolfStatusBar::DrawFace (void)
 		UpdateFace();
 	}
 
-	if (players[0].health)
+	if (players[ConsolePlayer].health)
 		StatusDrawFace(TexMan(gamestate.faceframe));
 	else
 	{
 		// TODO: Make this work based on damage types.
 		static const ClassDef *needle = ClassDef::FindClass("Needle");
-		if (players[0].killerobj && players[0].killerobj->GetClass() == needle)
+		if (players[ConsolePlayer].killerobj && players[ConsolePlayer].killerobj->GetClass() == needle)
 			StatusDrawFace(TexMan("STFMUT0"));
 		else
 			StatusDrawFace(TexMan("STFDEAD0"));
@@ -210,13 +210,13 @@ void WolfStatusBar::UpdateFace (int damage)
 	static unsigned int faceAmimSet = animations[0][2].isValid() ? 3 : 2;
 	static bool macDamage = !animations[2][0].isValid();
 
-	const int maxHealth = players[0].mo ? players[0].mo->maxhealth : 100;
-	const int damageLevel = macDamage ? (players[0].health > (maxHealth>>2) ? 0 : 1)
-		: MIN(6, players[0].health > maxHealth ? 0 : (maxHealth-players[0].health)/(maxHealth/6));
+	const int maxHealth = players[ConsolePlayer].mo ? players[ConsolePlayer].mo->maxhealth : 100;
+	const int damageLevel = macDamage ? (players[ConsolePlayer].health > (maxHealth>>2) ? 0 : 1)
+		: MIN(6, players[ConsolePlayer].health > maxHealth ? 0 : (maxHealth-players[ConsolePlayer].health)/(maxHealth/6));
 	if(damage)
 	{
 		static FTextureID ouchFace = TexMan.CheckForTexture("STFOUCH0", FTexture::TEX_Any);
-		if(ouchFace.isValid() && damage > 30 && players[0].health != 0)
+		if(ouchFace.isValid() && damage > 30 && players[ConsolePlayer].health != 0)
 		{
 			gamestate.faceframe = ouchFace;
 			facecount = 17;
@@ -265,7 +265,7 @@ void WolfStatusBar::UpdateFace (int damage)
 				return;
 		}
 
-		if(players[0].mo)
+		if(players[ConsolePlayer].mo)
 			gamestate.faceframe = animations[damageLevel][facePick];
 		else
 			gamestate.faceframe = animations[0][0];
@@ -331,7 +331,7 @@ void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &st
 void WolfStatusBar::DrawHealth (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Health.Enabled) return;
-	LatchNumber (StatusBarConfig.Health.X,StatusBarConfig.Health.Y,StatusBarConfig.Health.Digits,players[0].health,mac,true);
+	LatchNumber (StatusBarConfig.Health.X,StatusBarConfig.Health.Y,StatusBarConfig.Health.Digits,players[ConsolePlayer].health,mac,true);
 }
 
 //===========================================================================
@@ -367,7 +367,7 @@ void WolfStatusBar::DrawLevel (void)
 void WolfStatusBar::DrawLives (void)
 {
 	if((viewsize == 21 && ingame) || (!StatusBarConfig.Lives.Enabled) || (gamestate.difficulty->LivesCount < 0)) return;
-	LatchNumber (StatusBarConfig.Lives.X,StatusBarConfig.Lives.Y,StatusBarConfig.Lives.Digits,players[0].lives,mac);
+	LatchNumber (StatusBarConfig.Lives.X,StatusBarConfig.Lives.Y,StatusBarConfig.Lives.Digits,players[ConsolePlayer].lives,mac);
 }
 
 //===========================================================================
@@ -383,9 +383,9 @@ void WolfStatusBar::DrawLives (void)
 
 void WolfStatusBar::DrawItems (void)
 {
-	if((viewsize == 21 && ingame) || !StatusBarConfig.Items.Enabled || players[0].mo == NULL) return;
+	if((viewsize == 21 && ingame) || !StatusBarConfig.Items.Enabled || players[ConsolePlayer].mo == NULL) return;
 
-	AInventory *items = players[0].mo->FindInventory(ClassDef::FindClass("MacTreasureItem"));
+	AInventory *items = players[ConsolePlayer].mo->FindInventory(ClassDef::FindClass("MacTreasureItem"));
 	unsigned int amount = 0;
 	if(items)
 		amount = items->amount;
@@ -406,7 +406,7 @@ void WolfStatusBar::DrawItems (void)
 void WolfStatusBar::DrawScore (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Score.Enabled) return;
-	LatchNumber (StatusBarConfig.Score.X,StatusBarConfig.Score.Y,StatusBarConfig.Score.Digits,players[0].score,mac);
+	LatchNumber (StatusBarConfig.Score.X,StatusBarConfig.Score.Y,StatusBarConfig.Score.Digits,players[ConsolePlayer].score,mac);
 }
 
 //===========================================================================
@@ -422,12 +422,12 @@ void WolfStatusBar::DrawScore (void)
 void WolfStatusBar::DrawWeapon (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Weapon.Enabled ||
-		players[0].ReadyWeapon == NULL ||
-		players[0].ReadyWeapon->icon.isNull()
+		players[ConsolePlayer].ReadyWeapon == NULL ||
+		players[ConsolePlayer].ReadyWeapon->icon.isNull()
 	)
 		return;
 
-	VWB_DrawGraphic(TexMan(players[0].ReadyWeapon->icon), StatusBarConfig.Weapon.X, 200-(STATUSLINES-StatusBarConfig.Weapon.Y));
+	VWB_DrawGraphic(TexMan(players[ConsolePlayer].ReadyWeapon->icon), StatusBarConfig.Weapon.X, 200-(STATUSLINES-StatusBarConfig.Weapon.Y));
 }
 
 
@@ -447,9 +447,9 @@ void WolfStatusBar::DrawKeys (void)
 
 	// Find keys in inventory
 	unsigned int presentKeys = 0;
-	if(players[0].mo)
+	if(players[ConsolePlayer].mo)
 	{
-		for(AInventory *item = players[0].mo->inventory;item != NULL;item = item->inventory)
+		for(AInventory *item = players[ConsolePlayer].mo->inventory;item != NULL;item = item->inventory)
 		{
 			if(item->IsKindOf(NATIVE_CLASS(Key)))
 			{
@@ -497,10 +497,10 @@ void WolfStatusBar::DrawKeys (void)
 void WolfStatusBar::DrawAmmo (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Ammo.Enabled ||
-		!players[0].ReadyWeapon || !players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire])
+		!players[ConsolePlayer].ReadyWeapon || !players[ConsolePlayer].ReadyWeapon->ammo[AWeapon::PrimaryFire])
 		return;
 
-	unsigned int amount = players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire]->amount;
+	unsigned int amount = players[ConsolePlayer].ReadyWeapon->ammo[AWeapon::PrimaryFire]->amount;
 	LatchNumber (StatusBarConfig.Ammo.X,StatusBarConfig.Ammo.Y,StatusBarConfig.Ammo.Digits,amount,mac,true);
 }
 

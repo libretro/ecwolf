@@ -38,6 +38,7 @@
 #include "wl_play.h"
 #include "wl_game.h"
 #include "wl_loadsave.h"
+#include "wl_net.h"
 #include "dobject.h"
 #include "colormatcher.h"
 #include "version.h"
@@ -262,7 +263,7 @@ void CalcProjection (int32_t focal)
 	int     halfview;
 	double  facedist;
 
-	const fixed projectionFOV = static_cast<fixed>((players[0].FOV / 90.0f)*AspectCorrection[r_ratio].viewGlobal);
+	const fixed projectionFOV = static_cast<fixed>((players[ConsolePlayer].FOV / 90.0f)*AspectCorrection[r_ratio].viewGlobal);
 
 	// 0xFD17 is a magic number to convert the player's radius 0x5800 to FOCALLENGTH (0x5700)
 	focallength = FixedMul(focal, 0xFD17);
@@ -476,6 +477,11 @@ static void InitGame()
 	Dialog::LoadGlobalModule("NOAHQUIZ");
 
 //
+// Net game?
+//
+	Net::Init();
+
+//
 // Finish signon screen
 //
 	VL_SetVGAPlaneMode();
@@ -585,8 +591,8 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	//
 	// calculate trace angles and projection constants
 	//
-	if(players[0].mo)
-		CalcProjection(players[0].mo->radius);
+	if(players[ConsolePlayer].mo)
+		CalcProjection(players[ConsolePlayer].mo->radius);
 	else
 		CalcProjection (FOCALLENGTH);
 }
@@ -684,6 +690,21 @@ void I_Error(const char* format, ...)
 	va_end(vlist);
 
 	throw CRecoverableError(error);
+}
+
+//==========================================================================
+
+static bool DebugNetwork = false;
+
+void NetDPrintf(const char* format, ...)
+{
+	if(!DebugNetwork)
+		return;
+
+	va_list vlist;
+	va_start(vlist, format);
+	vprintf(format, vlist);
+	va_end(vlist);
 }
 
 //==========================================================================
@@ -1066,6 +1087,31 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			if(++i < argc)
 				FileSys::SetDirectoryPath(FileSys::DIR_Saves, argv[i]);
 		}
+		else IFARG("--port")
+		{
+			if(++i < argc)
+				Net::InitVars.port = atoi(argv[i]);
+		}
+		else IFARG("--host")
+		{
+			if(++i < argc)
+			{
+				Net::InitVars.mode = Net::MODE_Host;
+				Net::InitVars.numPlayers = atoi(argv[i]);
+			}
+		}
+		else IFARG("--join")
+		{
+			if(++i < argc)
+			{
+				Net::InitVars.mode = Net::MODE_Client;
+				Net::InitVars.joinAddress = argv[i];
+			}
+		}
+		else IFARG("--debugnet")
+		{
+			DebugNetwork = true;
+		}
 		else
 			files.Push(argv[i]);
 	}
@@ -1109,6 +1155,10 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			" --samplerate <rate>    Sets the sound sample rate (given in Hz, default: %i)\n"
 			" --audiobuffer <size>   Sets the size of the audio buffer (-> sound latency)\n"
 			"                        (given in bytes, default: 2048 / (44100 / samplerate))\n"
+			" --host <number>        Sets up a network game with the given number of players.\n"
+			" --connect <address>    Connects to the given host.\n"
+			" --port <number>        Port number to use for network communications.\n"
+			" --debugnet             Enable network debugging messages.\n"
 			, defaultSampleRate
 		);
 		exit(1);
@@ -1244,9 +1294,9 @@ int WL_Main (int argc, char *argv[])
 		R_InitRenderer();
 
 		printf("InitGame: Setting up the game...\n");
+		rngseed = I_MakeRNGSeed(); // May change after initializing a net game
 		InitGame();
 
-		rngseed = I_MakeRNGSeed();
 		FRandom::StaticClearRandom();
 
 		printf("DemoLoop: Starting the game loop...\n");

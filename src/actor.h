@@ -109,6 +109,7 @@ class AActor : public Thinker,
 		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
 		bool			GiveInventory(const ClassDef *cls, int amount=0, bool allowreplacement=true);
+		bool			InStateSequence(const Frame *basestate) const;
 		bool			IsFast() const;
 		virtual void	PostBeginPlay() {}
 		void			RemoveFromWorld();
@@ -192,6 +193,7 @@ class AActor : public Thinker,
 		short       temp1,hidden;
 		fixed		killerx,killery; // For deathcam
 
+		TObjPtr<AActor> target;
 		player_t	*player;	// Only valid with APlayerPawn
 
 		TObjPtr<AInventory>	inventory;

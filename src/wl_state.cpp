@@ -10,7 +10,9 @@
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
 #include "wl_game.h"
+#include "wl_net.h"
 #include "wl_play.h"
+#include "wl_state.h"
 #include "templates.h"
 
 /*
@@ -229,7 +231,7 @@ bool TryWalk (AActor *ob)
 = SelectDodgeDir
 =
 = Attempts to choose and initiate a movement for ob that sends it towards
-= the players[0].mo while dodging
+= the player while dodging
 =
 = If there is no possible move (ob is totally surrounded)
 =
@@ -265,8 +267,8 @@ void SelectDodgeDir (AActor *ob)
 	else
 		turnaround=opposite[ob->dir];
 
-	deltax = players[0].mo->tilex - ob->tilex;
-	deltay = players[0].mo->tiley - ob->tiley;
+	deltax = ob->target->tilex - ob->tilex;
+	deltay = ob->target->tiley - ob->tiley;
 
 	//
 	// arange 5 direction choices in order of preference
@@ -372,8 +374,8 @@ void SelectChaseDir (AActor *ob)
 	olddir=ob->dir;
 	turnaround=opposite[olddir];
 
-	deltax=players[0].mo->tilex - ob->tilex;
-	deltay=players[0].mo->tiley - ob->tiley;
+	deltax=ob->target->tilex - ob->tilex;
+	deltay=ob->target->tiley - ob->tiley;
 
 	d[1]=nodir;
 	d[2]=nodir;
@@ -479,8 +481,8 @@ void SelectRunDir (AActor *ob)
 	dirtype tdir;
 
 
-	deltax=players[0].mo->tilex - ob->tilex;
-	deltay=players[0].mo->tiley - ob->tiley;
+	deltax=ob->target->tilex - ob->tilex;
+	deltay=ob->target->tiley - ob->tiley;
 
 	if (deltax<0)
 		d[1]= east;
@@ -590,55 +592,57 @@ bool MoveObj (AActor *ob, int32_t move)
 	//
 	// check to make sure it's not on top of player
 	//
-	if (map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
+	for(unsigned int i = 0;i < Net::InitVars.numPlayers;++i)
 	{
-		fixed r = ob->radius + players[0].mo->radius;
-		if (abs(ob->x - players[0].mo->x) > r || abs(ob->y - players[0].mo->y) > r)
-			goto moveok;
-
-		if (ob->GetClass()->Meta.GetMetaInt(AMETA_Damage) >= 0)
-			TakeDamage (ob->GetDamage(), ob);
-
-		//
-		// back up
-		//
-		switch (ob->dir)
+		if (map->CheckLink(ob->GetZone(), players[i].mo->GetZone(), true))
 		{
-			case north:
-				ob->y += move;
-				break;
-			case northeast:
-				ob->x -= move;
-				ob->y += move;
-				break;
-			case east:
-				ob->x -= move;
-				break;
-			case southeast:
-				ob->x -= move;
-				ob->y -= move;
-				break;
-			case south:
-				ob->y -= move;
-				break;
-			case southwest:
-				ob->x += move;
-				ob->y -= move;
-				break;
-			case west:
-				ob->x += move;
-				break;
-			case northwest:
-				ob->x += move;
-				ob->y += move;
-				break;
+			fixed r = ob->radius + players[i].mo->radius;
+			if (abs(ob->x - players[i].mo->x) > r || abs(ob->y - players[i].mo->y) > r)
+				continue;
 
-			case nodir:
-				return false;
+			if (ob->GetClass()->Meta.GetMetaInt(AMETA_Damage) >= 0)
+				DamageActor (players[i].mo, ob, ob->GetDamage());
+
+			//
+			// back up
+			//
+			switch (ob->dir)
+			{
+				case north:
+					ob->y += move;
+					break;
+				case northeast:
+					ob->x -= move;
+					ob->y += move;
+					break;
+				case east:
+					ob->x -= move;
+					break;
+				case southeast:
+					ob->x -= move;
+					ob->y -= move;
+					break;
+				case south:
+					ob->y -= move;
+					break;
+				case southwest:
+					ob->x += move;
+					ob->y -= move;
+					break;
+				case west:
+					ob->x += move;
+					break;
+				case northwest:
+					ob->x += move;
+					ob->y += move;
+					break;
+
+				case nodir:
+					return false;
+			}
+			return false;
 		}
-		return false;
 	}
-moveok:
 	ob->distance -=move;
 
 	// Check for touching objects
@@ -680,8 +684,14 @@ moveok:
 */
 
 static FRandom pr_damagemobj("ActorTakeDamage");
-void DamageActor (AActor *ob, unsigned damage)
+void DamageActor (AActor *ob, AActor *attacker, unsigned damage)
 {
+	if (ob->player)
+	{
+		ob->player->TakeDamage(damage, attacker);
+		return;
+	}
+
 	madenoise = true;
 
 	//
@@ -690,12 +700,14 @@ void DamageActor (AActor *ob, unsigned damage)
 	if ( !(ob->flags & FL_ATTACKMODE) )
 		damage <<= 1;
 
+	NetDPrintf("%s %d points\n", __FUNCTION__, FixedMul(damage, gamestate.difficulty->PlayerDamageFactor));
 	ob->health -= FixedMul(damage, gamestate.difficulty->PlayerDamageFactor);
+	ob->target = attacker;
 
 	if (ob->health<=0)
 	{
-		ob->killerx = players[0].mo->x;
-		ob->killery = players[0].mo->y;
+		ob->killerx = attacker->x;
+		ob->killery = attacker->y;
 		ob->Die();
 	}
 	else
@@ -743,7 +755,7 @@ bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amo
 =====================
 */
 
-bool CheckLine (AActor *ob)
+bool CheckLine (AActor *ob, AActor *ob2)
 {
 	int         x1,y1,xt1,yt1,x2,y2,xt2,yt2;
 	int         x,y;
@@ -754,15 +766,18 @@ bool CheckLine (AActor *ob)
 	unsigned    intercept;
 	MapTile::Side	direction;
 
+	if (!ob2)
+		return false;
+
 	x1 = ob->x >> UNSIGNEDSHIFT;            // 1/256 tile precision
 	y1 = ob->y >> UNSIGNEDSHIFT;
 	xt1 = x1 >> 8;
 	yt1 = y1 >> 8;
 
-	x2 = players[0].mo->x >> UNSIGNEDSHIFT;
-	y2 = players[0].mo->y >> UNSIGNEDSHIFT;
-	xt2 = players[0].mo->tilex;
-	yt2 = players[0].mo->tiley;
+	x2 = ob2->x >> UNSIGNEDSHIFT;
+	y2 = ob2->y >> UNSIGNEDSHIFT;
+	xt2 = ob2->tilex;
+	yt2 = ob2->tiley;
 
 	xdist = abs(xt2-xt1);
 
@@ -891,19 +906,19 @@ bool CheckLine (AActor *ob)
 
 #define MINSIGHT (0x18000l*64)
 
-static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
+static bool CheckSightTo (AActor *ob, AActor *target, double minseedist, double maxseedist, double maxheardist, double fov)
 {
 	bool heardnoise = madenoise;
 
 	// Check if we can hear the player's noise
-	if (heardnoise && !map->CheckLink(ob->GetZone(), players[0].mo->GetZone(), true))
+	if (heardnoise && !map->CheckLink(ob->GetZone(), target->GetZone(), true))
 		heardnoise = false;
 
 	//
-	// if the players[0].mo is real close, sight is automatic
+	// if the target is real close, sight is automatic
 	//
-	int32_t deltax = players[0].mo->x - ob->x;
-	int32_t deltay = players[0].mo->y - ob->y;
+	int32_t deltax = target->x - ob->x;
+	int32_t deltay = target->y - ob->y;
 	uint32_t distance = MAX(abs(deltax), abs(deltay))*64;
 
 	if (!(ob->flags & FL_AMBUSH) && heardnoise &&
@@ -940,7 +955,17 @@ static bool CheckSight (AActor *ob, double minseedist, double maxseedist, double
 	//
 	// trace a line to check for blocking tiles (corners)
 	//
-	return CheckLine (ob);
+	return CheckLine (ob, target);
+}
+
+static int CheckSight (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
+{
+	for(unsigned int i = 0;i < Net::InitVars.numPlayers;++i)
+	{
+		if(CheckSightTo(ob, players[i].mo, minseedist, maxseedist, maxheardist, fov))
+			return i;
+	}
+	return -1;
 }
 
 
@@ -977,7 +1002,7 @@ void FirstSighting (AActor *ob)
 =
 = SightPlayer
 =
-= Called by actors that ARE NOT chasing the players[0].  If the player
+= Called by actors that ARE NOT chasing the player.  If the player
 = is detected (by sight, noise, or proximity), the actor is put into
 = it's combat frame and true is returned.
 =
@@ -1017,14 +1042,17 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 	}
 	else
 	{
-		if (!CheckSight (ob, minseedist, maxseedist, maxheardist, fov))
-			return false;
-		ob->flags &= ~FL_AMBUSH;
+		int player = CheckSight (ob, minseedist, maxseedist, maxheardist, fov);
+		if (player >= 0)
+		{
+			ob->target = players[player].mo;
+			ob->flags &= ~FL_AMBUSH;
 
-		--ob->sighttime; // We need to somehow mark we started.
-		ob->sightrandom = 1; // Account for tic.
-		if(ob->GetDefault()->sightrandom)
-			ob->sightrandom += pr_sight()/ob->GetDefault()->sightrandom;
+			--ob->sighttime; // We need to somehow mark we started.
+			ob->sightrandom = 1; // Account for tic.
+			if(ob->GetDefault()->sightrandom)
+				ob->sightrandom += pr_sight()/ob->GetDefault()->sightrandom;
+		}
 		return false;
 	}
 

@@ -36,7 +36,8 @@ endif()
 
 find_package(SDL REQUIRED)
 find_package(SDL_mixer REQUIRED)
-include_directories(${SDLMIXER_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
+find_package(SDL_net REQUIRED)
+include_directories(${SDLMIXER_INCLUDE_DIR} ${SDLNET_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
 
 check_function_exists(stricmp STRICMP_EXISTS)
 check_function_exists(strnicmp STRNICMP_EXISTS)
@@ -288,6 +289,7 @@ set(SOURCE_FILES
 	wl_loadsave.cpp
 	wl_main.cpp
 	wl_menu.cpp
+	wl_net.cpp
 	wl_parallax.cpp
 	wl_play.cpp
 	wl_state.cpp
@@ -317,7 +319,7 @@ else()
 endif()
 
 add_dependencies(ecwolf lzma gdtoa revision_check)
-target_link_libraries(ecwolf ${EXTRA_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
+target_link_libraries(ecwolf ${EXTRA_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLNET_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
 set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
 
 # Install

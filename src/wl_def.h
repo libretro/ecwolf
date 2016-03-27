@@ -65,6 +65,7 @@ enum ESSType
 };
 
 void Quit(const char *errorStr, ...);
+void NetDPrintf(const char *format, ...);
 
 #define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
 #define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
@@ -334,7 +335,7 @@ struct ControlScheme
 		int			joystick;
 		int			keyboard;
 		int			mouse;
-		int			*axis;
+		int			axis;
 		bool		negative;
 };
 
