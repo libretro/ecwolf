@@ -19,6 +19,7 @@
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_net.h"
 #include "wl_state.h"
 
 static const angle_t dirangle[9] = {0,ANGLE_45,2*ANGLE_45,3*ANGLE_45,4*ANGLE_45,
@@ -480,6 +481,15 @@ ACTION_FUNCTION(A_Chase)
 	int		dx,dy,dist = INT_MAX,chance;
 	bool	dodge = !(flags & CHF_DONTDODGE);
 	bool	pathing = (self->flags & FL_PATHING) ? true : false;
+
+	if(!pathing && self->target == NULL)
+	{
+		// Auto select player to target. ZDoom tries to sight for a target and
+		// if it doesn't find one switches to idle. Wolf3D, however, never had
+		// explicit targets so the player was assumed to always be targeted.
+		self->target = players[pr_chase()%Net::InitVars.numPlayers].mo;
+		assert(self->target);
+	}
 
 	if (self->dir == nodir)
 	{

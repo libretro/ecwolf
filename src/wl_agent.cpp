@@ -319,7 +319,6 @@ void player_t::TakeDamage (int points, AActor *attacker)
 	}
 	else
 	{
-		Printf("%d\n", mo->painchance);
 		if(mo->PainState && pr_damageplayer() < mo->painchance)
 			mo->SetState(mo->PainState);
 	}
