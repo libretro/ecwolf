@@ -929,9 +929,12 @@ FUNC(Pushwall_MoveNoStop)
 
 FUNC(Exit_Normal)
 {
-	if(control[activator->player - players].buttonheld[bt_use])
-		return 0;
-	control[activator->player - players].buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_completed;
 	SD_WaitSoundDone();
@@ -940,9 +943,13 @@ FUNC(Exit_Normal)
 
 FUNC(Exit_Secret)
 {
-	if(control[activator->player - players].buttonheld[bt_use])
-		return 0;
-	control[activator->player - players].buttonheld[bt_use] = true;
+	
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_secretlevel;
 	SD_WaitSoundDone();
@@ -951,9 +958,12 @@ FUNC(Exit_Secret)
 
 FUNC(Exit_Victory)
 {
-	if(control[activator->player - players].buttonheld[bt_use])
-		return 0;
-	control[activator->player - players].buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_victorious;
 	SD_WaitSoundDone();
@@ -962,9 +972,12 @@ FUNC(Exit_Victory)
 
 FUNC(Teleport_NewMap)
 {
-	if(control[activator->player - players].buttonheld[bt_use])
-		return 0;
-	control[activator->player - players].buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_newmap;
 	NewMap.newmap = args[0];
@@ -1075,9 +1088,12 @@ IMPLEMENT_INTERNAL_POINTY_CLASS(EVVictorySpin)
 END_POINTERS
 FUNC(Exit_VictorySpin)
 {
-	if(control[activator->player - players].buttonheld[bt_use])
-		return 0;
-	control[activator->player - players].buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	new EVVictorySpin(activator, direction);
 	return 1;
