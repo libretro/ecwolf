@@ -12,9 +12,10 @@
 void    InitHitRect (AActor *ob, unsigned radius);
 
 bool TryWalk (AActor *ob);
-void    SelectChaseDir (AActor *ob);
-void    SelectDodgeDir (AActor *ob);
-void    SelectRunDir (AActor *ob);
+void SelectChaseDir (AActor *ob);
+void SelectDodgeDir (AActor *ob);
+void SelectRunDir (AActor *ob);
+void SelectWanderDir (AActor *ob);
 bool MoveObj (AActor *ob, int32_t move);
 bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov);
 

@@ -84,6 +84,7 @@ actor Actor native
 	action native A_SpawnItemEx(string type, float xoffset = 0, float yoffset = 0, float zoffset = 0, float xvel = 0, float yvel = 0, float zvel = 0, float angle = 0, int flags = 0, int failchance = 0);
 	action native A_Stop();
 	action native A_TakeInventory(string type, int amount);
+	action native A_Wander();
 	action native A_WolfAttack(int flags = 0, string sound = "*", float snipe = 1.0, int maxdamage = 64, int blocksize = 128, int pointblank = 2, int longrange = 4, float runspeed = 160.0);
 
 	states

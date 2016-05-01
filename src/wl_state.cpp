@@ -532,6 +532,70 @@ void SelectRunDir (AActor *ob)
 	ob->dir = nodir;                // can't move
 }
 
+/*
+============================
+=
+= SelectWanderDir
+=
+= Pick a random direction.
+=
+============================
+*/
+
+void SelectWanderDir(AActor *ob)
+{
+	if(ob->dir == nodir)
+		ob->dir = (dirtype)(pr_newchasedir()&7);
+
+	// Randomly keep direction if possible.
+	if(pr_newchasedir() < 150)
+	{
+		if(TryWalk(ob))
+			return;
+	}
+
+	dirtype turnaround = opposite[ob->dir];
+	const dirtype startdir = ob->dir;
+
+	if (pr_newchasedir()>128)      /*randomly determine direction of search*/
+	{
+		for (dirtype tdir=(dirtype)((startdir+1)&7); tdir!=startdir; tdir=(dirtype)((tdir+1)&7))
+		{
+			if (tdir!=turnaround)
+			{
+				ob->dir=tdir;
+				if ( TryWalk(ob) )
+					return;
+			}
+		}
+	}
+	else
+	{
+		for (dirtype tdir=(dirtype)((startdir-1)&7); tdir!=startdir; tdir=(dirtype)((tdir-1)&7))
+		{
+			if (tdir!=turnaround)
+			{
+				ob->dir=tdir;
+				if ( TryWalk(ob) )
+					return;
+			}
+		}
+	}
+
+	if (turnaround != nodir)
+	{
+		ob->dir=turnaround;
+		if (ob->dir != nodir)
+		{
+			if ( TryWalk(ob) )
+				return;
+		}
+	}
+
+	ob->dir = nodir;                // can't move
+
+	
+}
 
 /*
 =================
@@ -585,7 +649,7 @@ bool MoveObj (AActor *ob, int32_t move)
 			return true;
 
 		default:
-			Printf ("MoveObj: bad dir!");
+			Printf ("MoveObj: bad dir!\n");
 			assert(ob->dir <= nodir);
 	}
 

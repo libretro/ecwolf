@@ -653,6 +653,56 @@ ACTION_FUNCTION(A_Chase)
 	return true;
 }
 
+ACTION_FUNCTION(A_Wander)
+{
+	if(self->dir == nodir)
+	{
+		SelectWanderDir(self);
+
+		if(self->dir == nodir)
+			return false; // object is blocked in
+	}
+
+	self->angle = dirangle[self->dir];
+	int32_t move = self->speed;
+
+	do
+	{
+		if (CheckDoorMovement(self))
+			return true;
+
+		if (move < self->distance)
+		{
+			if(!MoveObj (self,move))
+			{
+				// Touched the player so turn around!
+				self->dir = dirtype((self->dir+4)%8);
+				self->distance = FRACUNIT-self->distance;
+			}
+			break;
+		}
+
+		//
+		// reached goal tile, so select another one
+		//
+
+		//
+		// fix position to account for round off during moving
+		//
+		self->x = ((int32_t)self->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		self->y = ((int32_t)self->tiley<<TILESHIFT)+TILEGLOBAL/2;
+
+		move -= self->distance;
+
+		SelectWanderDir(self);
+
+		if (self->dir == nodir)
+			return false; // object is blocked in
+	}
+	while(move);
+	return true;
+}
+
 /*
 =============================================================================
 
