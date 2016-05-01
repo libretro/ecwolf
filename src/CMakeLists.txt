@@ -320,7 +320,12 @@ endif()
 
 add_dependencies(ecwolf lzma gdtoa revision_check)
 target_link_libraries(ecwolf ${EXTRA_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLNET_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
-set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+set_target_properties(ecwolf PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR}
+	# On Linux look for any libraries we link against in the executable directory.
+	INSTALL_RPATH "\$ORIGIN"
+	BUILD_WITH_INSTALL_RPATH ON
+)
 
 # Install
 if(NOT ANDROID)
