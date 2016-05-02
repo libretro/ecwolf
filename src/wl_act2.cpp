@@ -321,7 +321,8 @@ ACTION_FUNCTION(A_CustomMissile)
 {
 	enum
 	{
-		CMF_AIMOFFSET = 1
+		CMF_AIMOFFSET = 1,
+		CMF_AIMDIRECTION = 2
 	};
 
 	ACTION_PARAM_STRING(missiletype, 0);
@@ -333,12 +334,18 @@ ACTION_FUNCTION(A_CustomMissile)
 	fixed newx = self->x + spawnoffset*finesine[self->angle>>ANGLETOFINESHIFT]/64;
 	fixed newy = self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64;
 
-	double angle = (flags & CMF_AIMOFFSET) ?
-		atan2 ((double) (self->y - self->target->y), (double) (self->target->x - self->x)) :
-		atan2 ((double) (newy - self->target->y), (double) (self->target->x - newx));
-	if (angle<0)
-		angle = (M_PI*2+angle);
-	angle_t iangle = (angle_t) (angle*ANGLE_180/M_PI) + (angle_t) ((angleOffset*ANGLE_45)/45);
+	angle_t iangle;
+	if(!(flags & CMF_AIMDIRECTION) && self->target)
+	{
+		double angle = (flags & CMF_AIMOFFSET) ?
+			atan2 ((double) (self->y - self->target->y), (double) (self->target->x - self->x)) :
+			atan2 ((double) (newy - self->target->y), (double) (self->target->x - newx));
+		if (angle<0)
+			angle = (M_PI*2+angle);
+		iangle = (angle_t) (angle*ANGLE_180/M_PI) + (angle_t) ((angleOffset*ANGLE_45)/45);
+	}
+	else
+		iangle = self->angle;
 
 	const ClassDef *cls = ClassDef::FindClass(missiletype);
 	if(!cls)

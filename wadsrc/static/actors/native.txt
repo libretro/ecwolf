@@ -4,6 +4,7 @@ const int CHF_NOSIGHTCHECK = 4;
 const int CHF_NOPLAYACTIVE = 8;
 
 const int CMF_AIMOFFSET = 1;
+const int CMF_AIMDIRECTION = 2;
 
 const int CPF_USEAMMO = 1;
 const int CPF_ALWAYSPLAYSOUND = 2;
