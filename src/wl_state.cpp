@@ -52,7 +52,7 @@ static const dirtype diagonal[9][9] =
 bool TryWalk (AActor *ob);
 bool MoveObj (AActor *ob, int32_t move);
 
-void    FirstSighting (AActor *ob);
+static void FirstSighting (AActor *ob, const Frame *state);
 
 /*
 =============================================================================
@@ -777,7 +777,7 @@ void DamageActor (AActor *ob, AActor *attacker, unsigned damage)
 	else
 	{
 		if (! (ob->flags & FL_ATTACKMODE) )
-			FirstSighting (ob);             // put into combat mode
+			FirstSighting (ob, ob->SeeState);             // put into combat mode
 
 		if(ob->PainState && pr_damagemobj() < ob->painchance)
 			ob->SetState(ob->PainState);
@@ -1044,7 +1044,7 @@ static int CheckSight (AActor *ob, double minseedist, double maxseedist, double 
 ===============
 */
 
-void FirstSighting (AActor *ob)
+static void FirstSighting (AActor *ob, const Frame *state)
 {
 	PlaySoundLocActor(ob->seesound, ob);
 	ob->speed = ob->runspeed;
@@ -1055,8 +1055,8 @@ void FirstSighting (AActor *ob)
 	ob->flags &= ~FL_PATHING;
 	ob->flags |= FL_ATTACKMODE|FL_FIRSTATTACK;
 
-	if(ob->SeeState)
-		ob->SetState(ob->SeeState);
+	if(state)
+		ob->SetState(state);
 }
 
 
@@ -1076,7 +1076,7 @@ void FirstSighting (AActor *ob)
 */
 
 static FRandom pr_sight("SightPlayer");
-bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov)
+bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxheardist, double fov, const Frame *state)
 {
 	if (notargetmode)
 		return false;
@@ -1120,7 +1120,7 @@ bool SightPlayer (AActor *ob, double minseedist, double maxseedist, double maxhe
 		return false;
 	}
 
-	FirstSighting (ob);
+	FirstSighting (ob, state);
 
 	return true;
 }

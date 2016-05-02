@@ -107,6 +107,7 @@ extern const PropDef properties[];
 StateLabel::StateLabel(const FString &str, const ClassDef *parent, bool noRelative)
 {
 	Scanner sc(str.GetChars(), str.Len());
+	sc.SetScriptIdentifier("StateLabel");
 	Parse(sc, parent, noRelative);
 }
 
@@ -136,6 +137,15 @@ const Frame *StateLabel::Resolve(AActor *owner, const Frame *caller, const Frame
 void StateLabel::Parse(Scanner &sc, const ClassDef *parent, bool noRelative)
 {
 	cls = parent;
+
+	// Empty string?
+	if(!sc.TokensLeft())
+	{
+		isRelative = false;
+		isDefault = false;
+		label = "";
+		return;
+	}
 
 	if(!noRelative && sc.CheckToken(TK_IntConst))
 	{

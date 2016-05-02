@@ -366,6 +366,8 @@ ACTION_FUNCTION(A_CustomMissile)
 
 ACTION_FUNCTION(A_Dormant)
 {
+	ACTION_PARAM_STATE(state, 0, NULL);
+
 	AActor::Iterator iter = AActor::GetIterator();
 	while(iter.Next())
 	{
@@ -382,7 +384,7 @@ ACTION_FUNCTION(A_Dormant)
 	self->flags |= FL_AMBUSH | FL_SHOOTABLE | FL_SOLID;
 	self->flags &= ~(FL_ATTACKMODE|FL_COUNTKILL);
 	self->dir = nodir;
-	self->SetState(self->SeeState);
+	self->SetState(state);
 	return true;
 }
 
@@ -410,12 +412,13 @@ ACTION_FUNCTION(A_Look)
 	ACTION_PARAM_DOUBLE(maxseedist, 2);
 	ACTION_PARAM_DOUBLE(maxheardist, 3);
 	ACTION_PARAM_DOUBLE(fov, 4);
+	ACTION_PARAM_STATE(state, 5, self->SeeState);
 
 	// FOV of 0 indicates default
 	if(fov < 0.00001)
 		fov = 180;
 
-	SightPlayer(self, minseedist, maxseedist, maxheardist, fov);
+	SightPlayer(self, minseedist, maxseedist, maxheardist, fov, state);
 	return true;
 }
 // Create A_LookEx as an alias to A_Look since we're technically emulating this
@@ -574,7 +577,7 @@ ACTION_FUNCTION(A_Chase)
 	}
 	else
 	{
-		if (!(flags & CHF_NOSIGHTCHECK) && SightPlayer (self, 0, 0, 0, 180))
+		if (!(flags & CHF_NOSIGHTCHECK) && SightPlayer (self, 0, 0, 0, 180, self->SeeState))
 			return true;
 	}
 
