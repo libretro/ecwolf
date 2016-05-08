@@ -38,6 +38,7 @@
 #include "id_ca.h"
 #include "lnspec.h"
 #include "scanner.h"
+#include "thingdef/thingdef.h"
 #include "w_wad.h"
 #include "wl_game.h"
 #include "wl_shade.h"
@@ -487,8 +488,18 @@ class UWMFParser : public TextMapParser
 			}
 			else CheckKey("type")
 			{
-				sc.MustGetToken(TK_IntConst);
-				thing.type = sc->number;
+				if(sc.CheckToken(TK_IntConst))
+				{
+					if(const ClassDef *cls = ClassDef::FindClass(sc->number))
+						thing.type = cls->GetName();
+					else if(sc->number >= 1 && sc->number <= SMT_NumThings)
+						thing.type = SpecialThingNames[sc->number-1];
+				}
+				else
+				{
+					sc.MustGetToken(TK_StringConst);
+					thing.type = FName(sc->str, true);
+				}
 			}
 			else CheckKey("ambush")
 			{

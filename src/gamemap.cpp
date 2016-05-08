@@ -52,6 +52,10 @@
 #include "m_random.h"
 #include "g_mapinfo.h"
 
+const FName SpecialThingNames[SMT_NumThings] = {
+	"$Player1Start"
+};
+
 GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	file(NULL), zoneTraversed(NULL), zoneLinks(NULL)
 {
@@ -506,7 +510,7 @@ void GameMap::SpawnThings() const
 		if(!thing.skill[gamestate.difficulty->SpawnFilter])
 			continue;
 
-		if(thing.type == 1)
+		if(thing.type == SpecialThingNames[SMT_Player1Start])
 			SpawnPlayer(thing.x>>FRACBITS, thing.y>>FRACBITS, thing.angle);
 		else
 		{

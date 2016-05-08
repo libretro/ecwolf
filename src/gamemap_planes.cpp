@@ -41,6 +41,7 @@
 #include "gamemap_common.h"
 #include "lnspec.h"
 #include "scanner.h"
+#include "thingdef/thingdef.h"
 #include "tmemory.h"
 #include "w_wad.h"
 #include "wl_game.h"
@@ -83,10 +84,10 @@ public:
 			return 0;
 		}
 
-		unsigned short	oldnum;
-		unsigned short	newnum;
-		unsigned char	angles;
+		FName			type;
 		uint32_t		flags;
+		unsigned short	oldnum;
+		unsigned char	angles;
 		unsigned char	minskill;
 
 		MapTrigger		templateTrigger;
@@ -290,11 +291,11 @@ public:
 		}
 		else
 		{
-			thing.type = type.newnum;
+			thing.type = type.type;
 
 			// The player has a weird rotation pattern. It's 450-angle.
 			bool playerRotation = false;
-			if(thing.type == 1)
+			if(thing.type == SpecialThingNames[SMT_Player1Start])
 				playerRotation = true;
 
 			if(type.angles)
@@ -500,8 +501,28 @@ protected:
 				sc.MustGetToken(TK_IntConst);
 				thing.oldnum = sc->number;
 				sc.MustGetToken(',');
-				sc.MustGetToken(TK_IntConst);
-				thing.newnum = sc->number;
+				if(sc.CheckToken(TK_IntConst))
+				{
+					// Deprecated use of Doom Editor Number
+					static bool deprEdNum = false;
+					if(!deprEdNum)
+					{
+						deprEdNum = true;
+						sc.ScriptMessage(Scanner::WARNING, "Deprecated use of editor number. Use class name instead.");
+					}
+					if(const ClassDef *cls = ClassDef::FindClass(sc->number))
+						thing.type = cls->GetName();
+					else if(sc->number >= 1 && sc->number <= SMT_NumThings)
+						thing.type = SpecialThingNames[sc->number-1];
+				}
+				else
+				{
+					bool sigil = sc.CheckToken('$');
+					sc.MustGetToken(TK_Identifier);
+					thing.type = FName(sigil ? FString("$") + sc->str : sc->str, true);
+					if(!sigil && ClassDef::FindClass(thing.type) == NULL)
+						sc.ScriptMessage(Scanner::ERROR, "Could not find class '%s'.", sc->str.GetChars());
+				}
 				sc.MustGetToken(',');
 				sc.MustGetToken(TK_IntConst);
 				thing.angles = sc->number;

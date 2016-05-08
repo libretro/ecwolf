@@ -68,15 +68,15 @@ class GameMap
 		};
 		struct Thing
 		{
-			Thing() : x(0), y(0), z(0), angle(0), type(0), ambush(false), 
-				patrol(false)
+			Thing() : x(0), y(0), z(0), type(NAME_None), angle(0),
+				ambush(false), patrol(false)
 			{
 				skill[0] = skill[1] = skill[2] = skill[3] = false;
 			}
 
 			fixed			x, y, z;
+			FName			type;
 			unsigned short	angle;
-			unsigned int	type;
 			bool			ambush;
 			bool			patrol;
 			bool			skill[4];
@@ -255,6 +255,14 @@ class GameMap
 		bool*				zoneTraversed;
 		unsigned short**	zoneLinks;
 };
+
+enum ESpecialThings
+{
+	SMT_Player1Start,
+
+	SMT_NumThings
+};
+extern const FName SpecialThingNames[SMT_NumThings];
 
 typedef GameMap::Plane::Map *	MapSpot;
 

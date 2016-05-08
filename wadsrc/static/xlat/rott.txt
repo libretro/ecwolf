@@ -885,8 +885,8 @@ things
 	elevator 96;
 	elevator 97;
 
-	// oldnum, newnum, angles, patrol, minskill
-	{19,	1,	4,	0,	0}
+	// oldnum, class, angles, patrol, minskill
+	{19, $Player1Start, 4, 0, 0}
 }
 
 flats
