@@ -2,7 +2,7 @@ things
 {
 	trigger 90
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		playeruse = true;
@@ -13,7 +13,7 @@ things
 	}
 	trigger 91
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 1;
@@ -25,7 +25,7 @@ things
 	}
 	trigger 92
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 1;
@@ -37,7 +37,7 @@ things
 	}
 	trigger 93
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 1;
@@ -50,7 +50,7 @@ things
 	}
 	trigger 94
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 2;
@@ -62,7 +62,7 @@ things
 	}
 	trigger 95
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 2;
@@ -75,7 +75,7 @@ things
 	}
 	trigger 96
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		playeruse = true;
@@ -86,7 +86,7 @@ things
 	}
 	trigger 97
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 1;
@@ -99,7 +99,7 @@ things
 
 	trigger 98
 	{
-		action = 12;
+		action = "Pushwall_MoveNoStop";
 		arg1 = 8;
 		arg2 = 2;
 		arg3 = 2;
@@ -111,14 +111,14 @@ things
 
 	trigger 100
 	{
-		action = 3;
+		action = "Exit_Normal";
 		playeruse = true;
 		activatenorth = false;
 		activatesouth = false;
 	}
 	trigger 101
 	{
-		action = 4;
+		action = "Exit_Secret";
 		playeruse = true;
 		activatenorth = false;
 		activatesouth = false;

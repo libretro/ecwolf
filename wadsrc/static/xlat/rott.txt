@@ -611,7 +611,7 @@ tiles
 
 	trigger 102
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 1;
@@ -784,7 +784,7 @@ things
 {
 	trigger 72
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 8;
 		playeruse = true;
@@ -795,7 +795,7 @@ things
 	}
 	trigger 73
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 9;
 		playeruse = true;
@@ -805,7 +805,7 @@ things
 	}
 	trigger 74
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 10;
 		playeruse = true;
@@ -816,7 +816,7 @@ things
 	}
 	trigger 75
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 11;
 		playeruse = true;
@@ -826,7 +826,7 @@ things
 	}
 	trigger 76
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 12;
 		playeruse = true;
@@ -837,7 +837,7 @@ things
 	}
 	trigger 77
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 13;
 		playeruse = true;
@@ -847,7 +847,7 @@ things
 	}
 	trigger 78
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 14;
 		playeruse = true;
@@ -858,7 +858,7 @@ things
 	}
 	trigger 79
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 15;
 		playeruse = true;
@@ -869,7 +869,7 @@ things
 
 	trigger 80
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 16;
 		arg2 = 2;
 		playeruse = true;

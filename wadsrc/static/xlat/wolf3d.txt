@@ -2,14 +2,14 @@ tiles
 {
 	trigger 21
 	{
-		action = 3;
+		action = "Exit_Normal";
 		playeruse = true;
 		activatenorth = false;
 		activatesouth = false;
 	}
 	trigger 90
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		playeruse = true;
@@ -20,7 +20,7 @@ tiles
 	}
 	trigger 91
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 1;
@@ -32,7 +32,7 @@ tiles
 	}
 	trigger 92
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 1;
@@ -44,7 +44,7 @@ tiles
 	}
 	trigger 93
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 1;
@@ -57,7 +57,7 @@ tiles
 	}
 	trigger 94
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 2;
@@ -69,7 +69,7 @@ tiles
 	}
 	trigger 95
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 2;
@@ -82,7 +82,7 @@ tiles
 	}
 	trigger 96
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 3;
@@ -94,7 +94,7 @@ tiles
 	}
 	trigger 97
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 3;
@@ -107,7 +107,7 @@ tiles
 	}
 	trigger 98
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 4;
@@ -119,7 +119,7 @@ tiles
 	}
 	trigger 99
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 4;
@@ -132,7 +132,7 @@ tiles
 	}
 	trigger 100
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		playeruse = true;
@@ -143,7 +143,7 @@ tiles
 	}
 	trigger 101
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 1;
@@ -632,7 +632,7 @@ tiles
 	modzone 106 fillzone ambush;
 	modzone 107 changetrigger 3
 	{
-		action = 4;
+		action = "Exit_Secret";
 		playeruse = true;
 		activatenorth = false;
 		activatesouth = false;
@@ -680,7 +680,7 @@ things
 {
 	trigger 98
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 8;
 		arg2 = 2;
 		arg3 = 2;
@@ -690,7 +690,7 @@ things
 
 	trigger 99
 	{
-		action = 6;
+		action = "Exit_VictorySpin";
 		playercross = true;
 	}
 
