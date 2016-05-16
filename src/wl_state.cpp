@@ -766,12 +766,17 @@ void DamageActor (AActor *ob, AActor *attacker, unsigned damage)
 
 	NetDPrintf("%s %d points\n", __FUNCTION__, FixedMul(damage, gamestate.difficulty->PlayerDamageFactor));
 	ob->health -= FixedMul(damage, gamestate.difficulty->PlayerDamageFactor);
-	ob->target = attacker;
+	// Ensure that we're targetting a player for now.
+	if(attacker && attacker->player)
+		ob->target = attacker;
 
 	if (ob->health<=0)
 	{
-		ob->killerx = attacker->x;
-		ob->killery = attacker->y;
+		if(attacker)
+		{
+			ob->killerx = attacker->x;
+			ob->killery = attacker->y;
+		}
 		ob->Die();
 	}
 	else

@@ -1244,7 +1244,7 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	if(!cls)
 		return false;
 	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, SPAWN_AllowReplacement);
-	newobj->flags |= FL_PLAYERMISSILE;
+	newobj->target = self;
 	newobj->angle = iangle;
 
 	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);

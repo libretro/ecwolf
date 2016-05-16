@@ -244,7 +244,7 @@ void T_Projectile (AActor *self)
 			return;
 		}
 
-		const bool playermissile = !!(self->flags & FL_PLAYERMISSILE);
+		const bool playermissile = !!(self->target->player);
 		AActor::Iterator iter = AActor::GetIterator();
 		while(iter.Next())
 		{
@@ -274,7 +274,7 @@ void T_Projectile (AActor *self)
 					lastHit = check;
 					if(check->flags & FL_SHOOTABLE)
 					{
-						DamageActor(check, self, self->GetDamage());
+						DamageActor(check, self->target, self->GetDamage());
 
 						if(!(self->flags & FL_RIPPER) || (check->flags & FL_DONTRIP))
 						{
@@ -752,20 +752,32 @@ ACTION_FUNCTION(A_WolfAttack)
 	int     dx,dy,dist;
 	int     hitchance;
 
+	if(sound.Len() == 1 && sound[0] == '*')
+		PlaySoundLocActor(self->attacksound, self);
+	else
+		PlaySoundLocActor(sound, self);
+
+	AActor *target = self->target;
+	if(!target)
+	{
+		NetDPrintf("Actor %s called A_WolfAttack without target.\n", self->GetClass()->GetName().GetChars());
+		return true;
+	}
+
 	runspeed *= 37.5;
 
-	A_Face(self, self->target);
+	A_Face(self, target);
 
-	if (CheckLine (self, self->target)) // player is not behind a wall
+	if (CheckLine (self, target)) // player is not behind a wall
 	{
-		dx = abs(self->x - self->target->x);
-		dy = abs(self->y - self->target->y);
+		dx = abs(self->x - target->x);
+		dy = abs(self->y - target->y);
 		dist = dx>dy ? dx:dy;
 
 		dist = FixedMul(dist, snipe);
 		dist /= blocksize<<9;
 
-		if (self->target->player->thrustspeed >= runspeed)
+		if (target->player->thrustspeed >= runspeed)
 		{
 			if (self->flags&FL_VISABLE)
 				hitchance = 160-dist*16; // player can see to dodge
@@ -790,14 +802,9 @@ ACTION_FUNCTION(A_WolfAttack)
 			if (dist>=longrange)
 				damage >>= 1;
 
-			DamageActor (self->target, self, damage);
+			DamageActor (target, self, damage);
 		}
 	}
-
-	if(sound.Len() == 1 && sound[0] == '*')
-		PlaySoundLocActor(self->attacksound, self);
-	else
-		PlaySoundLocActor(sound, self);
 
 	return true;
 }
