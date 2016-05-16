@@ -345,7 +345,7 @@ ACTION_FUNCTION(A_Explode)
 		if(output <= 0.0)
 			continue;
 
-		DamageActor(target, self, static_cast<unsigned int>(output));
+		DamageActor(target, self->target, static_cast<unsigned int>(output));
 	}
 	return true;
 }

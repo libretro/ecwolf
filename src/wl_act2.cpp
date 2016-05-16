@@ -244,7 +244,7 @@ void T_Projectile (AActor *self)
 			return;
 		}
 
-		const bool playermissile = !!(self->target->player);
+		const bool playermissile = self->target && self->target->player;
 		AActor::Iterator iter = AActor::GetIterator();
 		while(iter.Next())
 		{
