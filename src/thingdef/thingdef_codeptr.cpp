@@ -336,7 +336,7 @@ ACTION_FUNCTION(A_Explode)
 			continue;
 		// Next see if we should damage the target
 		if(!(flags&XF_HURTSOURCE) &&
-			!(!!(self->target->player) ^ (!!target->player)))
+			!((self->target && self->target->player) ^ (!!target->player)))
 			continue;
 
 		double output = damage;
