@@ -567,55 +567,29 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	fixed playx = viewx;
 	fixed playy = viewy;
 
+	fixed gy1,gy2,gx1,gx2,gyt1,gyt2,gxt1,gxt2;
 
-	// [XA] For now, treat 0- and 180-degree angles as vertical sprites, all else as horizontal.
-	//      TODO support any angle
-	if(actor->angle == 0 || actor->angle == ANGLE_180) // vertical dir 3d sprite
-	{
-		fixed gy1,gy2,gx,gyt1,gyt2,gxt;
-
-		// translate point to view centered coordinates
-		gy1 = actor->y-playy-0x8000;
-		gy2 = gy1+0x10000L+2;
-		gx = actor->x-playx;
-		
-		// calculate newx
-		gxt = FixedMul(gx,viewcos);
-		gyt1 = FixedMul(gy1,viewsin);
-		gyt2 = FixedMul(gy2,viewsin);
-		nx1 = gxt-gyt1;
-		nx2 = gxt-gyt2;
-		
-		// calculate newy
-		gxt = FixedMul(gx,viewsin);
-		gyt1 = FixedMul(gy1,viewcos);
-		gyt2 = FixedMul(gy2,viewcos);
-		ny1 = gyt1+gxt;
-		ny2 = gyt2+gxt;
-	}
-	else // horizontal dir 3d sprite
-	{
-		fixed gx1,gx2,gy,gxt1,gxt2,gyt;
-
-		// translate point to view centered coordinates
-		gx1 = actor->x-playx-0x8000L;
-		gx2 = gx1+0x10000L+2;
-		gy = actor->y-playy;
-		
-		// calculate newx
-		gxt1 = FixedMul(gx1,viewcos);
-		gxt2 = FixedMul(gx2,viewcos);
-		gyt = FixedMul(gy,viewsin);
-		nx1 = gxt1-gyt;
-		nx2 = gxt2-gyt;
-		
-		// calculate newy
-		gxt1 = FixedMul(gx1,viewsin);
-		gxt2 = FixedMul(gx2,viewsin);
-		gyt = FixedMul(gy,viewcos);
-		ny1 = gyt+gxt1;
-		ny2 = gyt+gxt2;
-	}
+	// translate point to view centered coordinates
+	gy1 = actor->y-playy-FixedMul(0x8000, finecosine[actor->angle>>ANGLETOFINESHIFT]);
+	gy2 = gy1+FixedMul(0x10000L, finecosine[actor->angle>>ANGLETOFINESHIFT])+2;
+	gx1 = actor->x-playx-FixedMul(0x8000, finesine[actor->angle>>ANGLETOFINESHIFT]);
+	gx2 = gx1+FixedMul(0x10000L, finesine[actor->angle>>ANGLETOFINESHIFT])+2;
+	
+	// calculate newx
+	gxt1 = FixedMul(gx1,viewcos);
+	gxt2 = FixedMul(gx2,viewcos);
+	gyt1 = FixedMul(gy1,viewsin);
+	gyt2 = FixedMul(gy2,viewsin);
+	nx1 = gxt1-gyt1;
+	nx2 = gxt2-gyt2;
+	
+	// calculate newy
+	gxt1 = FixedMul(gx1,viewsin);
+	gxt2 = FixedMul(gx2,viewsin);
+	gyt1 = FixedMul(gy1,viewcos);
+	gyt2 = FixedMul(gy2,viewcos);
+	ny1 = gyt1+gxt1;
+	ny2 = gyt2+gxt2;
 	
 	if(nx1 < 0 || nx2 < 0) return; // TODO: Clip on viewplane
 	
