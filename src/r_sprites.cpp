@@ -569,8 +569,6 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 
 	fixed gy1,gy2,gx1,gx2,gyt1,gyt2,gxt1,gxt2;
 
-	actor->angle = ANGLE_45;
-
 	// translate point to view centered coordinates
 	const fixed scaledOffset = FixedMul(FLOAT2FIXED(tex->GetScaledLeftOffsetDouble()), actor->scaleX);
 	const fixed scaledWidth = FixedMul(FLOAT2FIXED(tex->GetScaledWidthDouble()), actor->scaleX);
