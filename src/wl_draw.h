@@ -41,4 +41,6 @@ typedef struct
 // table data after dataofs[rightpix-leftpix+1]
 } t_compshape;
 
+extern bool UseWolf4SDL3DSpriteScaler;
+
 #endif

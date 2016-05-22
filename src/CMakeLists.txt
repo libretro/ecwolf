@@ -274,6 +274,7 @@ set(SOURCE_FILES
 	wl_atmos.cpp
 	wl_cloudsky.cpp
 	wl_debug.cpp
+	wl_dir3dspr.cpp
 	wl_draw.cpp
 	wl_floorceiling.cpp
 	wl_game.cpp
