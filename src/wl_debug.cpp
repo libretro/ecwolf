@@ -547,6 +547,18 @@ int DebugKeys (void)
 		Printf("Vis = %d\n", gLevelVisibility);
 		CalcVisibility(gLevelVisibility);
 	}
+	else if(Keyboard[sc_3])
+	{
+		UseWolf4SDL3DSpriteScaler = !UseWolf4SDL3DSpriteScaler;
+		US_CenterWindow (20,3);
+		if(UseWolf4SDL3DSpriteScaler)
+			US_PrintCentered("3D Sprite scaler: 4SDL");
+		else
+			US_PrintCentered("3D Sprite scaler: ECWolf");
+		VW_UpdateScreen();
+		IN_Ack ();
+		return 1;
+	}
 
 	return 0;
 }

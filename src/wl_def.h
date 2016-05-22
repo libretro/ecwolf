@@ -183,26 +183,26 @@ enum ActorFlag
 	FL_FIRSTATTACK      = 0x00000020,
 	FL_AMBUSH           = 0x00000040,
 	FL_BRIGHT           = 0x00000100,
-#ifdef USE_DIR3DSPR
+
 	// you can choose one of the following values in wl_act1.cpp
 	// to make a static sprite a directional 3d sprite
 	// (see example at the end of the statinfo array)
-	FL_DIR_HORIZ_MID    = 0x00000200,
-	FL_DIR_HORIZ_FW     = 0x00000400,
-	FL_DIR_HORIZ_BW     = 0x00000600,
-	FL_DIR_VERT_MID     = 0x00000a00,
-	FL_DIR_VERT_FW      = 0x00000c00,
-	FL_DIR_VERT_BW      = 0x00000e00,
+//	FL_DIR_HORIZ_MID    = 0x00000200,
+//	FL_DIR_HORIZ_FW     = 0x00000400,
+//	FL_DIR_HORIZ_BW     = 0x00000600,
+//	FL_DIR_VERT_MID     = 0x00000a00,
+//	FL_DIR_VERT_FW      = 0x00000c00,
+//	FL_DIR_VERT_BW      = 0x00000e00,
 
 	// these values are just used to improve readability of code
-	FL_DIR_NONE         = 0x00000000,
-	FL_DIR_POS_MID      = 0x00000200,
-	FL_DIR_POS_FW       = 0x00000400,
-	FL_DIR_POS_BW       = 0x00000600,
-	FL_DIR_POS_MASK     = 0x00000600,
-	FL_DIR_VERT_FLAG    = 0x00000800,
-	FL_DIR_MASK         = 0x00000e00,
-#endif
+//	FL_DIR_NONE         = 0x00000000,
+//	FL_DIR_POS_MID      = 0x00000200,
+//	FL_DIR_POS_FW       = 0x00000400,
+//	FL_DIR_POS_BW       = 0x00000600,
+//	FL_DIR_POS_MASK     = 0x00000600,
+//	FL_DIR_VERT_FLAG    = 0x00000800,
+//	FL_DIR_MASK         = 0x00000e00,
+
 	FL_ISMONSTER        = 0x00001000,
 	FL_CANUSEWALLS		= 0x00002000,
 	FL_COUNTKILL		= 0x00004000,
@@ -220,6 +220,7 @@ enum ActorFlag
 	FL_DONTRIP			= 0x04000000,
 	FL_OLDRANDOMCHASE	= 0x08000000,
 	FL_PLOTONAUTOMAP	= 0x10000000,
+	FL_BILLBOARD        = 0x20000000,
 };
 
 enum ItemFlag

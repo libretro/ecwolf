@@ -450,6 +450,222 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	}
 }
 
+void Scale3DSpriter(AActor *actor, int x1, int x2, const Frame *frame, fixed ny1, fixed ny2, fixed nx1, fixed nx2)
+{
+	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
+		return;
+
+	bool flip = false;
+	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
+	FTexture *tex;
+	if(spr.rotations == 0)
+		tex = TexMan[spr.texture[0]];
+	else
+	{
+		int rot = (CalcRotate(actor)+4)%8;
+		tex = TexMan[spr.texture[rot]];
+		flip = (spr.mirror>>rot)&1;
+	}
+	if(tex == NULL)
+		return;
+
+	const unsigned int texWidth = tex->GetWidth();
+	if(x2 == x1)
+		return;
+
+	unsigned height1 = (word)(heightnumerator/(nx1>>8));
+	unsigned height2 = (word)(heightnumerator/(nx2>>8));
+	
+	unsigned height = height1;
+
+	int scale = height>>3; // Integer part of the height
+	int topoffset = (scale*(viewz-(32<<FRACBITS))/(32<<FRACBITS));
+
+	if(scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
+		return;
+
+	double dyScale = (height/256.0)*(actor->scaleY/65536.);
+	int upperedge = static_cast<int>((viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale);
+	
+	fixed yStep = static_cast<fixed>(tex->yScale/dyScale);
+	unsigned int startY = -MIN(upperedge, 0);
+	fixed endY = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
+
+	// [XA] TODO: shade the sprite per-column?
+	const BYTE *colormap;
+	if((actor->flags & FL_BRIGHT) || frame->fullbright)
+		colormap = NormalLight.Maps;
+	else
+	{
+		const int shade = LIGHT2SHADE(gLevelLight + r_extralight);
+		const int tz = FixedMul(r_depthvisibility<<8, height);
+		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
+	}
+	const BYTE *src;
+
+	byte *dest;
+	int i;
+	fixed x, y;
+	unsigned screenSize = screenHeight * screenWidth;
+
+	//printf("%f, %f, %f, %f\n", FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx1));
+	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
+	fixed dxa = 0, dza = 0;
+	dxx>>=TEXTURESHIFT,dzz>>=TEXTURESHIFT;
+	dxa+=dxx,dza+=dzz;
+	int nexti = (int)((ny1+(dxa>>8))*::scale/(nx1+(dza>>8))+centerx);
+	src = tex->GetColumn(flip ? texWidth - 1 : 0, NULL);
+
+	for(i = x1, x = 0; i < x2; ++i)
+	{
+		while(i >= nexti)
+		{
+			++x;
+			src = tex->GetColumn(flip ? texWidth - x - 1 : x, NULL);
+
+			dxa += dxx;
+			dza += dzz;
+			nexti = (int)((ny1+(dxa>>8))*::scale/(nx1+(dza>>8))+centerx);
+		}
+
+		// linear interpolation oh no
+		height = (unsigned)(height1 + ((int)height2 - (int)height1) * ((double)(i+1 - x1) / (x2 - x1)));
+
+		// recalculation double oh no
+		scale = height>>3;
+		topoffset = (scale*(viewz-(32<<FRACBITS))/(32<<FRACBITS));
+
+		if(i < 0 || (unsigned)i > screenWidth || wallheight[i] > (signed)height || scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
+			continue;
+		
+		dest = vbuf + i + (upperedge > 0 ? vbufPitch*upperedge : 0);
+		for(y = startY*yStep;y < endY;y += yStep)
+		{
+			if(src[y>>FRACBITS])
+				*dest = colormap[src[y>>FRACBITS]];
+			dest += vbufPitch;
+		}
+
+		dyScale = (height/256.0)*(actor->scaleY/65536.);
+		upperedge = static_cast<int>((viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale);
+		
+		yStep = static_cast<fixed>(tex->yScale/dyScale);
+		startY = -MIN(upperedge, 0);
+		endY = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
+	}
+}
+
+bool UseWolf4SDL3DSpriteScaler = false;
+void Scale3DShaper(int, int, FTexture *, uint32_t, fixed, fixed, fixed, fixed, byte *, unsigned);
+
+// This function from Wolf4SDL more or less verbatim at the moment.
+void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
+{	
+	fixed nx1,nx2,ny1,ny2;
+	int viewx1,viewx2;
+	fixed diradd;
+	fixed playx = viewx;
+	fixed playy = viewy;
+
+
+	// [XA] For now, treat 0- and 180-degree angles as vertical sprites, all else as horizontal.
+	//      TODO support any angle
+	if(actor->angle == 0 || actor->angle == ANGLE_180) // vertical dir 3d sprite
+	{
+		fixed gy1,gy2,gx,gyt1,gyt2,gxt;
+
+		// translate point to view centered coordinates
+		gy1 = actor->y-playy-0x8000;
+		gy2 = gy1+0x10000L+2;
+		gx = actor->x-playx;
+		
+		// calculate newx
+		gxt = FixedMul(gx,viewcos);
+		gyt1 = FixedMul(gy1,viewsin);
+		gyt2 = FixedMul(gy2,viewsin);
+		nx1 = gxt-gyt1;
+		nx2 = gxt-gyt2;
+		
+		// calculate newy
+		gxt = FixedMul(gx,viewsin);
+		gyt1 = FixedMul(gy1,viewcos);
+		gyt2 = FixedMul(gy2,viewcos);
+		ny1 = gyt1+gxt;
+		ny2 = gyt2+gxt;
+	}
+	else // horizontal dir 3d sprite
+	{
+		fixed gx1,gx2,gy,gxt1,gxt2,gyt;
+
+		// translate point to view centered coordinates
+		gx1 = actor->x-playx-0x8000L;
+		gx2 = gx1+0x10000L+2;
+		gy = actor->y-playy;
+		
+		// calculate newx
+		gxt1 = FixedMul(gx1,viewcos);
+		gxt2 = FixedMul(gx2,viewcos);
+		gyt = FixedMul(gy,viewsin);
+		nx1 = gxt1-gyt;
+		nx2 = gxt2-gyt;
+		
+		// calculate newy
+		gxt1 = FixedMul(gx1,viewsin);
+		gxt2 = FixedMul(gx2,viewsin);
+		gyt = FixedMul(gy,viewcos);
+		ny1 = gyt+gxt1;
+		ny2 = gyt+gxt2;
+	}
+	
+	if(nx1 < 0 || nx2 < 0) return; // TODO: Clip on viewplane
+	
+	// calculate perspective ratio
+	if(nx1>=0 && nx1<=1792) nx1=1792;
+	if(nx1<0 && nx1>=-1792) nx1=-1792;
+	if(nx2>=0 && nx2<=1792) nx2=1792;
+	if(nx2<0 && nx2>=-1792) nx2=-1792;
+	
+	viewx1=(int)(centerx+ny1*scale/nx1);
+	viewx2=(int)(centerx+ny2*scale/nx2);
+
+	// Switch between original Wolf4SDL scaler and a new one.
+	if(UseWolf4SDL3DSpriteScaler)
+	{
+		bool flip = false;
+		const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
+		FTexture *tex;
+		if(spr.rotations == 0)
+			tex = TexMan[spr.texture[0]];
+		else
+		{
+			int rot = (CalcRotate(actor)+4)%8;
+			tex = TexMan[spr.texture[rot]];
+			flip = (spr.mirror>>rot)&1;
+		}
+		if(tex == NULL)
+			return;
+		if(viewx2 < viewx1)
+		{
+			Scale3DShaper(viewx2,viewx1,tex,0,ny2,ny1,nx2,nx1,vbuf,vbufPitch);
+		}
+		else
+		{
+			Scale3DShaper(viewx1,viewx2,tex,0,ny1,ny2,nx1,nx2,vbuf,vbufPitch);
+		}
+	}
+	else
+	{
+		if(viewx2 < viewx1)
+		{
+			Scale3DSpriter(actor, viewx2, viewx1, frame, ny2, ny1, nx2, nx1);
+		}
+		else
+		{
+			Scale3DSpriter(actor, viewx1, viewx2, frame, ny1, ny2, nx1, nx2);
+		}
+	}
+}
+
 void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed offsetY)
 {
 	if(frame->spriteInf == SPR_NONE || loadedSprites[frame->spriteInf].numFrames == 0)
