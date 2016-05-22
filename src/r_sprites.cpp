@@ -450,23 +450,9 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	}
 }
 
-void Scale3DSpriter(AActor *actor, int x1, int x2, const Frame *frame, fixed ny1, fixed ny2, fixed nx1, fixed nx2)
+void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, const Frame *frame, fixed ny1, fixed ny2, fixed nx1, fixed nx2)
 {
 	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
-		return;
-
-	bool flip = false;
-	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
-	FTexture *tex;
-	if(spr.rotations == 0)
-		tex = TexMan[spr.texture[0]];
-	else
-	{
-		int rot = (CalcRotate(actor)+4)%8;
-		tex = TexMan[spr.texture[rot]];
-		flip = (spr.mirror>>rot)&1;
-	}
-	if(tex == NULL)
 		return;
 
 	const unsigned int texWidth = tex->GetWidth();
@@ -511,7 +497,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, const Frame *frame, fixed ny1
 	//printf("%f, %f, %f, %f\n", FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx1));
 	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
 	fixed dxa = 0, dza = 0;
-	dxx>>=TEXTURESHIFT,dzz>>=TEXTURESHIFT;
+	dxx/=(signed)texWidth,dzz/=(signed)texWidth;
 	dxa+=dxx,dza+=dzz;
 	int nexti = (int)((ny1+(dxa>>8))*::scale/(nx1+(dza>>8))+centerx);
 	src = tex->GetColumn(flip ? texWidth - 1 : 0, NULL);
@@ -560,7 +546,21 @@ void Scale3DShaper(int, int, FTexture *, uint32_t, fixed, fixed, fixed, fixed, b
 
 // This function from Wolf4SDL more or less verbatim at the moment.
 void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
-{	
+{
+	bool flip = false;
+	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
+	FTexture *tex;
+	if(spr.rotations == 0)
+		tex = TexMan[spr.texture[0]];
+	else
+	{
+		const unsigned int rot = CalcRotate(actor);
+		tex = TexMan[spr.texture[rot]];
+		flip = (spr.mirror>>rot)&1;
+	}
+	if(tex == NULL)
+		return;
+
 	fixed nx1,nx2,ny1,ny2;
 	int viewx1,viewx2;
 	fixed diradd;
@@ -569,11 +569,15 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 
 	fixed gy1,gy2,gx1,gx2,gyt1,gyt2,gxt1,gxt2;
 
+	actor->angle = ANGLE_45;
+
 	// translate point to view centered coordinates
-	gy1 = actor->y-playy-FixedMul(0x8000, finecosine[actor->angle>>ANGLETOFINESHIFT]);
-	gy2 = gy1+FixedMul(0x10000L, finecosine[actor->angle>>ANGLETOFINESHIFT])+2;
-	gx1 = actor->x-playx-FixedMul(0x8000, finesine[actor->angle>>ANGLETOFINESHIFT]);
-	gx2 = gx1+FixedMul(0x10000L, finesine[actor->angle>>ANGLETOFINESHIFT])+2;
+	const fixed scaledOffset = FixedMul(FLOAT2FIXED(tex->GetScaledLeftOffsetDouble()), actor->scaleX);
+	const fixed scaledWidth = FixedMul(FLOAT2FIXED(tex->GetScaledWidthDouble()), actor->scaleX);
+	gy1 = actor->y-playy-(FixedMul(scaledOffset, finecosine[actor->angle>>ANGLETOFINESHIFT])>>6);
+	gy2 = gy1+(FixedMul(scaledWidth, finecosine[actor->angle>>ANGLETOFINESHIFT])>>6)+2;
+	gx1 = actor->x-playx-(FixedMul(scaledOffset, finesine[actor->angle>>ANGLETOFINESHIFT])>>6);
+	gx2 = gx1+(FixedMul(scaledWidth, finesine[actor->angle>>ANGLETOFINESHIFT])>>6)+2;
 	
 	// calculate newx
 	gxt1 = FixedMul(gx1,viewcos);
@@ -605,19 +609,6 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	// Switch between original Wolf4SDL scaler and a new one.
 	if(UseWolf4SDL3DSpriteScaler)
 	{
-		bool flip = false;
-		const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
-		FTexture *tex;
-		if(spr.rotations == 0)
-			tex = TexMan[spr.texture[0]];
-		else
-		{
-			int rot = (CalcRotate(actor)+4)%8;
-			tex = TexMan[spr.texture[rot]];
-			flip = (spr.mirror>>rot)&1;
-		}
-		if(tex == NULL)
-			return;
 		if(viewx2 < viewx1)
 		{
 			Scale3DShaper(viewx2,viewx1,tex,0,ny2,ny1,nx2,nx1,vbuf,vbufPitch);
@@ -631,11 +622,11 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	{
 		if(viewx2 < viewx1)
 		{
-			Scale3DSpriter(actor, viewx2, viewx1, frame, ny2, ny1, nx2, nx1);
+			Scale3DSpriter(actor, viewx2, viewx1, tex, flip, frame, ny2, ny1, nx2, nx1);
 		}
 		else
 		{
-			Scale3DSpriter(actor, viewx1, viewx2, frame, ny1, ny2, nx1, nx2);
+			Scale3DSpriter(actor, viewx1, viewx2, tex, flip, frame, ny1, ny2, nx1, nx2);
 		}
 	}
 }
