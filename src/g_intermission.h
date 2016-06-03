@@ -122,6 +122,9 @@ public:
 	static IntermissionInfo *Find(const FName &name);
 
 	IntermissionInfo() : Link(NAME_None) {}
+	~IntermissionInfo() { Clear(); }
+
+	void Clear();
 
 	enum ActionType
 	{

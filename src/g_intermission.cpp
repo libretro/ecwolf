@@ -56,6 +56,13 @@ IntermissionInfo *IntermissionInfo::Find(const FName &name)
 	return &intermissions[name];
 }
 
+void IntermissionInfo::Clear()
+{
+	for(unsigned int i = 0;i < Actions.Size();++i)
+		delete Actions[i].action;
+	Actions.Clear();
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 void StartTravel ();

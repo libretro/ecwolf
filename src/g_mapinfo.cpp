@@ -1051,6 +1051,7 @@ protected:
 		sc.MustGetToken(TK_Identifier);
 
 		intermission = IntermissionInfo::Find(sc->str);
+		intermission->Clear();
 	}
 
 	void ParseTimeAssignment(unsigned int &time)
