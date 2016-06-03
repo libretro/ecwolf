@@ -126,6 +126,8 @@ public:
 	IntermissionInfo() : Link(NAME_None) {}
 	~IntermissionInfo();
 
+	void Clear();
+
 	enum ActionType
 	{
 		IMAGE,
