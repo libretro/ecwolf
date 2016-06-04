@@ -520,7 +520,7 @@ void GameMap::SpawnThings() const
 			if(cls == NULL)
 			{
 				cls = unknownClass;
-				printf("Unknown thing %d @ (%d, %d)\n", thing.type, thing.x>>FRACBITS, thing.y>>FRACBITS);
+				printf("Unknown thing %s @ (%d, %d)\n", thing.type.GetChars(), thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
 
 			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, SPAWN_AllowReplacement|(thing.patrol ? SPAWN_Patrol : 0));

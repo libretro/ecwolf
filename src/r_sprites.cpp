@@ -492,7 +492,6 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 	byte *dest;
 	int i;
 	fixed x, y;
-	unsigned screenSize = screenHeight * screenWidth;
 
 	//printf("%f, %f, %f, %f\n", FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx1));
 	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
@@ -521,7 +520,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		scale = height>>3;
 		topoffset = (scale*(viewz-(32<<FRACBITS))/(32<<FRACBITS));
 
-		if(i < 0 || (unsigned)i > screenWidth || wallheight[i] > (signed)height || scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
+		if(i < 0 || i >= viewwidth || wallheight[i] > (signed)height || scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
 			continue;
 		
 		dest = vbuf + i + (upperedge > 0 ? vbufPitch*upperedge : 0);
