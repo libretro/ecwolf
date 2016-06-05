@@ -572,9 +572,9 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	const fixed scaledOffset = FixedMul(FLOAT2FIXED(tex->GetScaledLeftOffsetDouble()), actor->scaleX);
 	const fixed scaledWidth = FixedMul(FLOAT2FIXED(tex->GetScaledWidthDouble()), actor->scaleX);
 	gy1 = actor->y-playy-(FixedMul(scaledOffset, finecosine[actor->angle>>ANGLETOFINESHIFT])>>6);
-	gy2 = gy1+(FixedMul(scaledWidth, finecosine[actor->angle>>ANGLETOFINESHIFT])>>6)+2;
+	gy2 = gy1+(FixedMul(scaledWidth, finecosine[actor->angle>>ANGLETOFINESHIFT])>>6);
 	gx1 = actor->x-playx-(FixedMul(scaledOffset, finesine[actor->angle>>ANGLETOFINESHIFT])>>6);
-	gx2 = gx1+(FixedMul(scaledWidth, finesine[actor->angle>>ANGLETOFINESHIFT])>>6)+2;
+	gx2 = gx1+(FixedMul(scaledWidth, finesine[actor->angle>>ANGLETOFINESHIFT])>>6);
 	
 	// calculate newx
 	gxt1 = FixedMul(gx1,viewcos);
@@ -608,22 +608,22 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	{
 		if(viewx2 < viewx1)
 		{
-			Scale3DShaper(viewx2,viewx1,tex,0,ny2,ny1,nx2,nx1,vbuf,vbufPitch);
+			Scale3DShaper(viewx2,viewx1+1,tex,0,ny2,ny1,nx2,nx1,vbuf,vbufPitch);
 		}
 		else
 		{
-			Scale3DShaper(viewx1,viewx2,tex,0,ny1,ny2,nx1,nx2,vbuf,vbufPitch);
+			Scale3DShaper(viewx1,viewx2+1,tex,0,ny1,ny2,nx1,nx2,vbuf,vbufPitch);
 		}
 	}
 	else
 	{
 		if(viewx2 < viewx1)
 		{
-			Scale3DSpriter(actor, viewx2, viewx1, tex, flip, frame, ny2, ny1, nx2, nx1);
+			Scale3DSpriter(actor, viewx2, viewx1+1, tex, flip, frame, ny2, ny1, nx2, nx1);
 		}
 		else
 		{
-			Scale3DSpriter(actor, viewx1, viewx2, tex, flip, frame, ny1, ny2, nx1, nx2);
+			Scale3DSpriter(actor, viewx1, viewx2+1, tex, flip, frame, ny1, ny2, nx1, nx2);
 		}
 	}
 }

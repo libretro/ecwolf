@@ -44,18 +44,21 @@ void Scale3DShaper(int x1, int x2, FTexture *shape, uint32_t flags, fixed ny1, f
 	dxx/=len,dzz/=len;
 	for(int i=0;i<len && slinex < viewwidth;i++)
 	{
-		dxa+=dxx,dza+=dzz;
-		elinex=(int)((ny1+(dxa>>8))*scale/(nx1+(dza>>8))+centerx);
-		if(elinex < 0)
-			continue;
+		if(i == len-1) // Absorb any round off error at the end of the sprite.
+			elinex = x2;
+		else
+		{
+			dxa+=dxx,dza+=dzz;
+			elinex=(int)((ny1+(dxa>>8))*scale/(nx1+(dza>>8))+centerx);
+			if(elinex < 0)
+				continue;
+		}
 
 		const FTexture::Span *spans;
 		const BYTE *line=shape->GetColumn(i, &spans);
 
-		for(;slinex<elinex && slinex<x2;slinex++)
+		for(;slinex<elinex && slinex<x2;slinex++, height += dheight)
 		{
-			height+=dheight;
-
 			unsigned scale1=(unsigned)(height>>14);
 
 			if(wallheight[slinex]<(height>>12) && scale1)

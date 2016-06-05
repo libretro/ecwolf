@@ -199,7 +199,7 @@ void ShutdownId (void)
 ==================
 */
 
-const float radtoint = (float)(FINEANGLES/2/PI);
+const double radtoint = (double)(FINEANGLES/2/PI);
 
 void BuildTables (void)
 {
@@ -258,8 +258,6 @@ void CalcProjection (int32_t focal)
 {
 	int     i;
 	int    intang;
-	float   angle;
-	double  tang;
 	int     halfview;
 	double  facedist;
 
@@ -287,14 +285,14 @@ void CalcProjection (int32_t focal)
 	// calculate the angle offset from view angle of each pixel's ray
 	//
 
-	for (i=0;i<halfview;i++)
+	for (i=0;i<=halfview;i++)
 	{
 		// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (int32_t)i*projectionFOV/viewwidth/facedist;
-		angle = (float) atan(tang);
+		double tang = (((double)i+0.5)*projectionFOV)/viewwidth/facedist;
+		double angle = atan(tang);
 		intang = (int) (angle*radtoint);
-		pixelangle[halfview-1-i] = intang;
-		pixelangle[halfview+i] = -intang;
+		pixelangle[halfview-i] = intang;
+		pixelangle[halfview-1+i] = -intang;
 	}
 }
 
