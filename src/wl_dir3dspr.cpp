@@ -11,90 +11,83 @@ void Scale3DShaper(int x1, int x2, FTexture *shape, uint32_t flags, fixed ny1, f
 				fixed nx1, fixed nx2, byte *vbuf, unsigned vbufPitch)
 {
 	//printf("%s(%d, %d, %p, %d, %f, %f, %f, %f, %p, %d)\n", __FUNCTION__, x1, x2, shape, flags, FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx2), vbuf, vbufPitch);
-	unsigned scale1,starty,endy;
-	byte *vmem;
-	int dx,len,i,newstart,ycnt,pixheight,screndy,upperedge,scrstarty;
-	unsigned j;
-	fixed height,dheight,height1,height2;
-	int xpos[TEXTURESIZE+1];
-	int slinex;
 	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
 	fixed dxa=0,dza=0;
-	byte col;
 
-	len=shape->GetWidth();
-	if(!len) return;
+	int len=shape->GetWidth();
 
 	ny1+=dxx>>9;
 	nx1+=dzz>>9;
 
 	dxa=-(dxx>>1),dza=-(dzz>>1);
-	dxx>>=TEXTURESHIFT,dzz>>=TEXTURESHIFT;
 
-	xpos[0]=(int)((ny1+(dxa>>8))*scale/(nx1+(dza>>8))+centerx);
-	height1 = heightnumerator/((nx1+(dza>>8))>>8);
-	height=(((fixed)height1)<<12)+2048;
+	fixed height1 = heightnumerator/((nx1+(dza>>8))>>8);
+	fixed height2 = heightnumerator/((nx1+((dza+dzz)>>8))>>8);
+	fixed height=(height1<<12)+2048;
 
-	//printf("{%d,", xpos[0]);
-	for(i=1;i<=len;i++)
-	{
-		dxa+=dxx,dza+=dzz;
-		xpos[i]=(int)((ny1+(dxa>>8))*scale/(nx1+(dza>>8))+centerx);
-		//printf("%d,", xpos[i]);
-		if(xpos[i-1]>viewwidth) break;
-	}
-	//printf("}\n");
-	len=i-1;
-	dx = xpos[len] - xpos[0];
+	int slinex = (int)((ny1+(dxa>>8))*scale/(nx1+(dza>>8))+centerx);
+	int elinex = (int)((ny1+((dxa+dxx)>>8))*scale/(nx1+((dza+dzz)>>8))+centerx);
+	int dx = elinex - slinex;
 	if(!dx) return;
 
-	height2 = heightnumerator/((nx1+(dza>>8))>>8);
-	dheight=(((fixed)height2-(fixed)height1)<<12)/(fixed)dx;
+	fixed dheight=((height2-height1)<<12)/(fixed)dx;
 
 	if(x2>viewwidth) x2=viewwidth;
 
-	for(i=0;i<len;i++)
+	// Clip left edge
+	if(slinex < 0)
 	{
-		const BYTE *line=shape->GetColumn(i, NULL);
+		height -= dheight*slinex;
+		slinex = 0;
+	}
 
-		for(slinex=xpos[i];slinex<xpos[i+1] && slinex<x2;slinex++)
+	dxx/=len,dzz/=len;
+	for(int i=0;i<len && slinex < viewwidth;i++)
+	{
+		dxa+=dxx,dza+=dzz;
+		elinex=(int)((ny1+(dxa>>8))*scale/(nx1+(dza>>8))+centerx);
+		if(elinex < 0)
+			continue;
+
+		const FTexture::Span *spans;
+		const BYTE *line=shape->GetColumn(i, &spans);
+
+		for(;slinex<elinex && slinex<x2;slinex++)
 		{
 			height+=dheight;
-			if(slinex<0) continue;
 
-			scale1=(unsigned)(height>>15);
+			unsigned scale1=(unsigned)(height>>14);
 
-			if(wallheight[slinex]<(height>>12) && scale1 /*&& scale1<=maxscale*/)
+			if(wallheight[slinex]<(height>>12) && scale1)
 			{
-#define SPRITESCALEFACTOR 2
-				pixheight=scale1*SPRITESCALEFACTOR;
-				upperedge=viewheight/2-scale1;
+				int pixheight=scale1;
+				int upperedge=(viewheight-pixheight)/2;
 
-				if((endy = 128) != 0)
+				const FTexture::Span *span = spans;
+				while(unsigned endy = span->TopOffset+span->Length)
 				{
-					endy >>= 1;
-					newstart = 0;
-					starty = 0 >> 1;
-					j=starty;
-					ycnt=j*pixheight;
-					screndy=(ycnt>>6)+upperedge;
+					unsigned j=span->TopOffset;
+					++span;
+
+					int ycnt=j*pixheight;
+					int screndy=(ycnt>>6)+upperedge;
+					byte *vmem;
 					if(screndy<0) vmem=vbuf+slinex;
 					else vmem=vbuf+screndy*vbufPitch+slinex;
 					for(;j<endy;j++)
 					{
-						scrstarty=screndy;
+						int scrstarty=screndy;
 						ycnt+=pixheight;
 						screndy=(ycnt>>6)+upperedge;
 						if(scrstarty!=screndy && screndy>0)
 						{
-							col=line[j];
+							BYTE col=line[j];
 							if(scrstarty<0) scrstarty=0;
 							if(screndy>viewheight) screndy=viewheight,j=endy;
 
 							while(scrstarty<screndy)
 							{
-								if(col)
-									*vmem=col;
+								*vmem=col;
 								vmem+=vbufPitch;
 								scrstarty++;
 							}
@@ -103,5 +96,7 @@ void Scale3DShaper(int x1, int x2, FTexture *shape, uint32_t flags, fixed ny1, f
 				}
 			}
 		}
+
+		slinex = elinex;
 	}
 }
