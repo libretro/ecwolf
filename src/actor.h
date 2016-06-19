@@ -41,6 +41,7 @@
 #include "linkedlist.h"
 #include "name.h"
 #include "dobject.h"
+#include "tflags.h"
 #include "thinker.h"
 
 enum
@@ -68,6 +69,9 @@ enum
 	SPAWN_AllowReplacement = 1,
 	SPAWN_Patrol = 2
 };
+
+typedef TFlags<ActorFlag> ActorFlags;
+DEFINE_TFLAGS_OPERATORS (ActorFlags)
 
 class player_t;
 class ClassDef;
@@ -105,20 +109,25 @@ class AActor : public Thinker,
 		DropList		*GetDropList() const;
 		const MapZone	*GetZone() const { return soundZone; }
 		bool			GiveInventory(const ClassDef *cls, int amount=0, bool allowreplacement=true);
+		bool			InStateSequence(const Frame *basestate) const;
+		bool			IsFast() const;
 		virtual void	PostBeginPlay() {}
 		void			RemoveFromWorld();
 		virtual void	RemoveInventory(AInventory *item);
 		void			Serialize(FArchive &arc);
 		void			SetState(const Frame *state, bool norun=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags);
+		int32_t			SpawnHealth() const;
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
+
+		void PrintInventory();
 
 		static PointerIndexTable<ExpressionNode> damageExpressions;
 		static PointerIndexTable<DropList> dropItems;
 
 		// Basic properties from objtype
-		flagstype_t flags;
+		ActorFlags flags;
 
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;
@@ -185,6 +194,7 @@ class AActor : public Thinker,
 		short       temp1,hidden;
 		fixed		killerx,killery; // For deathcam
 
+		TObjPtr<AActor> target;
 		player_t	*player;	// Only valid with APlayerPawn
 
 		TObjPtr<AInventory>	inventory;

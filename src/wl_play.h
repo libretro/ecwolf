@@ -20,14 +20,18 @@ extern  bool noadaptive;
 extern  unsigned        tics;
 extern  int             viewsize;
 
-extern  int             lastgamemusicoffset;
-
 //
 // current user input
 //
-extern  int         controlx,controly, controlstrafe;              // range from -100 to 100
-extern  bool        buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
-extern  bool        buttonheld[NUMBUTTONS], ambuttonheld[NUMAMBUTTONS];
+struct TicCmd_t
+{
+	int controlx,controly, controlstrafe; // range from -100 to 100
+	int controlpanx, controlpany;
+	bool buttonstate[NUMBUTTONS], ambuttonstate[NUMAMBUTTONS];
+	bool buttonheld[NUMBUTTONS], ambuttonheld[NUMAMBUTTONS];
+};
+extern unsigned int ConsolePlayer;
+extern TicCmd_t control[MAXPLAYERS];
 extern  exit_t      playstate;
 extern  bool        madenoise;
 extern  int         godmode;
@@ -36,12 +40,6 @@ extern	bool		notargetmode;
 extern  bool        demorecord,demoplayback;
 extern  int8_t      *demoptr, *lastdemoptr;
 extern  memptr      demobuffer;
-
-//
-// control info
-//
-extern  bool		alwaysrun;
-extern  bool		mouseenabled,mouseyaxisdisabled,joystickenabled;
 
 void    PlayLoop (void);
 

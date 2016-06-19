@@ -40,6 +40,8 @@
 #include "w_wad.h"
 #include "wl_game.h"
 
+#include <climits>
+
 enum ESndSeqFlag
 {
 	SSF_NoStopCutOff = 0x1
@@ -128,6 +130,7 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 		{
 			sc.MustGetToken(TK_Identifier);
 			SoundSequence &seq = Sequences[sc->str];
+			seq.Name = sc->str;
 			seq.Clear();
 
 			while(!sc.CheckToken(']'))
@@ -145,6 +148,7 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 			sc.MustGetToken(':');
 			sc.MustGetToken(TK_Identifier);
 			SoundSequence &seq = Sequences[sc->str];
+			seq.Name = sc->str;
 			seq.Clear();
 
 			do
@@ -307,4 +311,52 @@ void SndSeqPlayer::Stop()
 
 	if(Sequence.GetStopSound() != NAME_None)
 		PlaySoundLocMapSpot(Sequence.GetStopSound(), Source);
+}
+
+FArchive &operator<< (FArchive &arc, SndSeqPlayer *&seqplayer)
+{
+	FName seqname;
+	MapSpot source;
+	unsigned int offs;
+
+	if(arc.IsStoring())
+	{
+		if(seqplayer == NULL)
+		{
+			// Can't do much here, so flag and move on.
+			offs = UINT_MAX;
+			arc << offs;
+			return arc;
+		}
+
+		seqname = seqplayer->Sequence.GetSeqName();
+		source = seqplayer->Source;
+		offs = static_cast<unsigned int>(seqplayer->Current - seqplayer->Sequence.Start());
+	}
+
+	// First check that we actually stored a sequence player.
+	arc << offs;
+	if(arc.IsLoading() && offs == UINT_MAX)
+	{
+		delete seqplayer;
+		seqplayer = NULL;
+		return arc;
+	}
+
+	arc << seqname << source;
+
+	if(arc.IsLoading())
+	{
+		// We don't need to worry about the sequence type here since seqname
+		// should have already resolved to the proper sequence.
+		delete seqplayer;
+		seqplayer = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), source);
+		seqplayer->Current += offs;
+	}
+
+	arc	<< seqplayer->Delay
+		<< seqplayer->Playing
+		<< seqplayer->WaitForDone;
+
+	return arc;
 }

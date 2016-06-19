@@ -13,6 +13,10 @@
 #define USE_ASM
 #endif
 
+#ifdef __ANDROID__
+#include <cpuid.h>
+#endif
+
 #if defined(USE_ASM) && !defined(MY_CPU_AMD64)
 static UInt32 CheckFlag(UInt32 flag)
 {
@@ -76,6 +80,7 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
 
   #else
 
+  #ifndef __ANDROID__
   __asm__ __volatile__ (
     "cpuid"
     : "=a" (*a) ,
@@ -83,6 +88,11 @@ static void MyCPUID(UInt32 function, UInt32 *a, UInt32 *b, UInt32 *c, UInt32 *d)
       "=c" (*c) ,
       "=d" (*d)
     : "0" (function)) ;
+  #else
+  // The version of Android's GCC that I'm using doesn't like the above for
+  // some reason so here's an alternative.
+  __get_cpuid (function, a, b, c, d);
+  #endif
 
   #endif
   

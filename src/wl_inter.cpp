@@ -381,7 +381,7 @@ static void InterDoBonus()
 	VW_UpdateScreen ();
 	VW_FadeIn ();
 
-	GivePoints (levelInfo->LevelBonus);
+	players[0].GivePoints (levelInfo->LevelBonus);
 }
 
 static void InterDoNormal()
@@ -432,7 +432,7 @@ static void InterDoNormal()
 	InterCountRatio(InterState.sr, 296, 112+16);
 	InterCountRatio(InterState.tr, 296, 112+32);
 
-	GivePoints (InterState.bonus);
+	players[0].GivePoints (InterState.bonus);
 }
 
 static void InterDoGraphical()
@@ -495,7 +495,7 @@ static void InterDoGraphical()
 	InterCountRatio(InterState.tr, 232, 104+16);
 	InterCountRatio(InterState.sr, 232, 104+32);
 
-	GivePoints (InterState.bonus);
+	players[0].GivePoints (InterState.bonus);
 
 	if(InterState.kr == 100 && InterState.sr == 100 && InterState.tr == 100)
 	{
@@ -885,6 +885,9 @@ void DrawHighScores (void)
 
 void CheckHighScore (int32_t score, const LevelInfo *levelInfo)
 {
+	if (!gameinfo.TrackHighScores)
+		return;
+
 	word i, j;
 	int n;
 	HighScore myscore;
@@ -903,7 +906,7 @@ void CheckHighScore (int32_t score, const LevelInfo *levelInfo)
 	for (i = 0, n = -1; i < MaxScores; i++)
 	{
 		if ((myscore.score > Scores[i].score)
-			|| ((myscore.score == Scores[i].score) && (myscore.completed > Scores[i].completed)))
+			|| ((myscore.score == Scores[i].score) && (myscore.completed.Compare(Scores[i].completed) > 0)))
 		{
 			for (j = MaxScores; --j > i;)
 				Scores[j] = Scores[j - 1];
@@ -935,4 +938,5 @@ void CheckHighScore (int32_t score, const LevelInfo *levelInfo)
 		IN_UserInput (500);
 	}
 
+	VW_FadeOut();
 }

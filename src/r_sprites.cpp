@@ -309,6 +309,17 @@ void R_InitSprites()
 
 		loadedSprites[i].numFrames = maxframes;
 	}
+
+	// Special case for PLAY, if it doesn't exist then swap with UNKN.
+	if(spritesMap[MAKE_ID('P','L','A','Y')].Size() == 0)
+	{
+		SpriteInfo &playsprite = loadedSprites[R_GetSprite("PLAY")];
+		SpriteInfo &unknsprite = loadedSprites[R_GetSprite("UNKN")];
+		playsprite.frames = spriteFrames.Size();
+		playsprite.numFrames = MAX_SPRITE_FRAMES;
+		for(char i = 0;i < MAX_SPRITE_FRAMES;++i)
+			spriteFrames.Push(spriteFrames[unknsprite.frames]);
+	}
 }
 
 void R_LoadSprite(const FString &name)
@@ -357,7 +368,7 @@ void R_LoadSprite(const FString &name)
 ////////////////////////////////////////////////////////////////////////////////
 
 // From wl_draw.cpp
-int CalcRotate(AActor *ob);
+unsigned int CalcRotate(AActor *ob);
 extern byte* vbuf;
 extern unsigned vbufPitch;
 extern fixed viewshift;
@@ -365,6 +376,19 @@ extern fixed viewz;
 
 void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)
 {
+	// height is a 13.3 fixed point number indicating the number of screen
+	// pixels that the sprite should occupy.
+	if(height < 8)
+		return;
+
+	// Check if we're rendering completely off screen.
+	// Simpler form:
+	// topoffset = ( viewheight/2 - viewshift - (signed(height>>3)*(viewz-(32<<FRACBITS))/(32<<FRACBITS)) )<<3;
+	const int topoffset = (viewheight<<2) - (viewshift<<3) -
+	                      FixedMul(height, (viewz-(32<<FRACBITS))>>5);
+	if(-topoffset >= (signed)height)
+		return;
+
 	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
 		return;
 
@@ -375,31 +399,26 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		tex = TexMan[spr.texture[0]];
 	else
 	{
-		int rot = (CalcRotate(actor)+4)%8;
+		const unsigned int rot = CalcRotate(actor);
 		tex = TexMan[spr.texture[rot]];
 		flip = (spr.mirror>>rot)&1;
 	}
 	if(tex == NULL)
 		return;
 
-	const int scale = height>>3; // Integer part of the height
-	const int topoffset = (scale*(viewz-(32<<FRACBITS))/(32<<FRACBITS));
-	if(scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
-		return;
+	const double dyScale = (height/256.0)*FIXED2FLOAT(actor->scaleY);
+	const int upperedge = topoffset + height - static_cast<int>(tex->GetScaledTopOffsetDouble()*dyScale*8);
 
-	const double dyScale = (height/256.0)*(actor->scaleY/65536.);
-	const int upperedge = static_cast<int>((viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale);
-
-	const double dxScale = (height/256.0)*(FixedDiv(actor->scaleX, yaspect)/65536.);
+	const double dxScale = (height/256.0)*FIXED2FLOAT(FixedDiv(actor->scaleX, yaspect));
 	const int actx = static_cast<int>(xcenter - tex->GetScaledLeftOffsetDouble()*dxScale);
 
 	const unsigned int texWidth = tex->GetWidth();
 	const unsigned int startX = -MIN(actx, 0);
-	const unsigned int startY = -MIN(upperedge, 0);
+	const unsigned int startY = -MIN(upperedge>>3, 0);
 	const fixed xStep = static_cast<fixed>(tex->xScale/dxScale);
 	const fixed yStep = static_cast<fixed>(tex->yScale/dyScale);
 	const fixed xRun = MIN<fixed>(texWidth<<FRACBITS, xStep*(viewwidth-actx));
-	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
+	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, (yStep*((viewheight<<3)-upperedge))>>3);
 
 	const BYTE *colormap;
 	if((actor->flags & FL_BRIGHT) || frame->fullbright)
@@ -411,7 +430,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 	}
 	const BYTE *src;
-	byte *destBase = vbuf + actx + startX + (upperedge > 0 ? vbufPitch*upperedge : 0);
+	byte *destBase = vbuf + actx + startX + ((upperedge>>3) > 0 ? vbufPitch*(upperedge>>3) : 0);
 	byte *dest = destBase;
 	unsigned int i;
 	fixed x, y;
@@ -427,6 +446,184 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 			if(src[y>>FRACBITS])
 				*dest = colormap[src[y>>FRACBITS]];
 			dest += vbufPitch;
+		}
+	}
+}
+
+void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, const Frame *frame, fixed ny1, fixed ny2, fixed nx1, fixed nx2)
+{
+	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
+		return;
+
+	const unsigned int texWidth = tex->GetWidth();
+	if(x2 == x1)
+		return;
+
+	unsigned height1 = (word)(heightnumerator/(nx1>>8));
+	unsigned height2 = (word)(heightnumerator/(nx2>>8));
+	
+	unsigned height = height1;
+
+	int scale = height>>3; // Integer part of the height
+	int topoffset = (scale*(viewz-(32<<FRACBITS))/(32<<FRACBITS));
+
+	if(scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
+		return;
+
+	double dyScale = (height/256.0)*(actor->scaleY/65536.);
+	int upperedge = static_cast<int>((viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale);
+	
+	fixed yStep = static_cast<fixed>(tex->yScale/dyScale);
+	unsigned int startY = -MIN(upperedge, 0);
+	fixed endY = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
+
+	// [XA] TODO: shade the sprite per-column?
+	const BYTE *colormap;
+	if((actor->flags & FL_BRIGHT) || frame->fullbright)
+		colormap = NormalLight.Maps;
+	else
+	{
+		const int shade = LIGHT2SHADE(gLevelLight + r_extralight);
+		const int tz = FixedMul(r_depthvisibility<<8, height);
+		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
+	}
+	const BYTE *src;
+
+	byte *dest;
+	int i;
+	fixed x, y;
+
+	//printf("%f, %f, %f, %f\n", FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx1));
+	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
+	fixed dxa = 0, dza = 0;
+	dxx/=(signed)texWidth,dzz/=(signed)texWidth;
+	dxa+=dxx,dza+=dzz;
+	int nexti = (int)((ny1+(dxa>>8))*::scale/(nx1+(dza>>8))+centerx);
+	src = tex->GetColumn(flip ? texWidth - 1 : 0, NULL);
+
+	for(i = x1, x = 0; i < x2; ++i)
+	{
+		while(i >= nexti)
+		{
+			++x;
+			src = tex->GetColumn(flip ? texWidth - x - 1 : x, NULL);
+
+			dxa += dxx;
+			dza += dzz;
+			nexti = (int)((ny1+(dxa>>8))*::scale/(nx1+(dza>>8))+centerx);
+		}
+
+		// linear interpolation oh no
+		height = (unsigned)(height1 + ((int)height2 - (int)height1) * ((double)(i+1 - x1) / (x2 - x1)));
+
+		// recalculation double oh no
+		scale = height>>3;
+		topoffset = (scale*(viewz-(32<<FRACBITS))/(32<<FRACBITS));
+
+		if(i < 0 || i >= viewwidth || wallheight[i] > (signed)height || scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
+			continue;
+		
+		dest = vbuf + i + (upperedge > 0 ? vbufPitch*upperedge : 0);
+		for(y = startY*yStep;y < endY;y += yStep)
+		{
+			if(src[y>>FRACBITS])
+				*dest = colormap[src[y>>FRACBITS]];
+			dest += vbufPitch;
+		}
+
+		dyScale = (height/256.0)*(actor->scaleY/65536.);
+		upperedge = static_cast<int>((viewheight/2 - viewshift - topoffset)+scale - tex->GetScaledTopOffsetDouble()*dyScale);
+		
+		yStep = static_cast<fixed>(tex->yScale/dyScale);
+		startY = -MIN(upperedge, 0);
+		endY = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
+	}
+}
+
+bool UseWolf4SDL3DSpriteScaler = false;
+void Scale3DShaper(int, int, FTexture *, uint32_t, fixed, fixed, fixed, fixed, byte *, unsigned);
+
+// This function from Wolf4SDL more or less verbatim at the moment.
+void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
+{
+	bool flip = false;
+	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
+	FTexture *tex;
+	if(spr.rotations == 0)
+		tex = TexMan[spr.texture[0]];
+	else
+	{
+		const unsigned int rot = CalcRotate(actor);
+		tex = TexMan[spr.texture[rot]];
+		flip = (spr.mirror>>rot)&1;
+	}
+	if(tex == NULL)
+		return;
+
+	fixed nx1,nx2,ny1,ny2;
+	int viewx1,viewx2;
+	fixed diradd;
+	fixed playx = viewx;
+	fixed playy = viewy;
+
+	fixed gy1,gy2,gx1,gx2,gyt1,gyt2,gxt1,gxt2;
+
+	// translate point to view centered coordinates
+	const fixed scaledOffset = FixedMul(FLOAT2FIXED(tex->GetScaledLeftOffsetDouble()), actor->scaleX);
+	const fixed scaledWidth = FixedMul(FLOAT2FIXED(tex->GetScaledWidthDouble()), actor->scaleX);
+	gy1 = actor->y-playy-(FixedMul(scaledOffset, finecosine[actor->angle>>ANGLETOFINESHIFT])>>6);
+	gy2 = gy1+(FixedMul(scaledWidth, finecosine[actor->angle>>ANGLETOFINESHIFT])>>6);
+	gx1 = actor->x-playx-(FixedMul(scaledOffset, finesine[actor->angle>>ANGLETOFINESHIFT])>>6);
+	gx2 = gx1+(FixedMul(scaledWidth, finesine[actor->angle>>ANGLETOFINESHIFT])>>6);
+	
+	// calculate newx
+	gxt1 = FixedMul(gx1,viewcos);
+	gxt2 = FixedMul(gx2,viewcos);
+	gyt1 = FixedMul(gy1,viewsin);
+	gyt2 = FixedMul(gy2,viewsin);
+	nx1 = gxt1-gyt1;
+	nx2 = gxt2-gyt2;
+	
+	// calculate newy
+	gxt1 = FixedMul(gx1,viewsin);
+	gxt2 = FixedMul(gx2,viewsin);
+	gyt1 = FixedMul(gy1,viewcos);
+	gyt2 = FixedMul(gy2,viewcos);
+	ny1 = gyt1+gxt1;
+	ny2 = gyt2+gxt2;
+	
+	if(nx1 < 0 || nx2 < 0) return; // TODO: Clip on viewplane
+	
+	// calculate perspective ratio
+	if(nx1>=0 && nx1<=1792) nx1=1792;
+	if(nx1<0 && nx1>=-1792) nx1=-1792;
+	if(nx2>=0 && nx2<=1792) nx2=1792;
+	if(nx2<0 && nx2>=-1792) nx2=-1792;
+	
+	viewx1=(int)(centerx+ny1*scale/nx1);
+	viewx2=(int)(centerx+ny2*scale/nx2);
+
+	// Switch between original Wolf4SDL scaler and a new one.
+	if(UseWolf4SDL3DSpriteScaler)
+	{
+		if(viewx2 < viewx1)
+		{
+			Scale3DShaper(viewx2,viewx1+1,tex,0,ny2,ny1,nx2,nx1,vbuf,vbufPitch);
+		}
+		else
+		{
+			Scale3DShaper(viewx1,viewx2+1,tex,0,ny1,ny2,nx1,nx2,vbuf,vbufPitch);
+		}
+	}
+	else
+	{
+		if(viewx2 < viewx1)
+		{
+			Scale3DSpriter(actor, viewx2, viewx1+1, tex, flip, frame, ny2, ny1, nx2, nx1);
+		}
+		else
+		{
+			Scale3DSpriter(actor, viewx1, viewx2+1, tex, flip, frame, ny1, ny2, nx1, nx2);
 		}
 	}
 }
@@ -459,9 +656,9 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 	const fixed centeringOffset = (centerx - 2*centerxwide)<<FRACBITS;
 	const fixed leftedge = FixedMul((160<<FRACBITS) - fixed(tex->GetScaledLeftOffsetDouble()*FRACUNIT) + offsetX, pspritexscale) + centeringOffset;
 	fixed upperedge = ((100-32)<<FRACBITS) + fixed(tex->GetScaledTopOffsetDouble()*FRACUNIT) - offsetY - AspectCorrection[r_ratio].tallscreen;
-	if(viewsize == 21 && players[0].ReadyWeapon)
+	if(viewsize == 21 && players[ConsolePlayer].ReadyWeapon)
 	{
-		upperedge -= players[0].ReadyWeapon->yadjust;
+		upperedge -= players[ConsolePlayer].ReadyWeapon->yadjust;
 	}
 	upperedge = scale - FixedMul(upperedge, pspriteyscale);
 

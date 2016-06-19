@@ -40,6 +40,10 @@
 #include "wl_main.h"
 #include "id_sd.h"
 
+#ifndef ECWOLF_MIXER
+#warning Not using customized SDL_mixer. Features will be disabled. https://bitbucket.org/Blzut3/sdl_mixer-for-ecwolf
+#endif
+
 // For AdLib sounds & music:
 #define MUSIC_RATE 700	// Must be a multiple of SOUND_RATE
 #define SOUND_RATE 140	// Also affects PC Speaker sounds
@@ -94,11 +98,35 @@ static  Instrument              alZeroInst;
 //      Sequencer variables
 static  volatile bool			sqActive;
 static  word                   *sqHack;
-static	word					*sqHackFreeable=NULL;
+static	TUniquePtr<word[]>		sqHackFreeable;
 static  word                   *sqHackPtr;
 static  int                     sqHackLen;
 static  int                     sqHackSeqLen;
 static  longword                sqHackTime;
+
+static int musicchunk=-1;
+Mix_Music *music=NULL;
+TUniquePtr<byte[]> chunkmem;
+
+void musicFinished(void)
+{
+	if (music != NULL)
+	{
+		Mix_HaltMusic();
+		Mix_FreeMusic(music);
+		music = NULL;
+
+		chunkmem.Reset();
+
+		musicchunk = -1;
+	}
+}
+
+bool SD_UpdateMusicVolume(int which)
+{
+	Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
+	return 0;
+}
 
 #ifdef USE_GPL
 
@@ -165,6 +193,11 @@ static const int oplChip = 0;
 
 #endif
 
+#ifndef ECWOLF_MIXER
+static int Mix_SetMusicPCMPosition(Uint64 position) { return 0; }
+static Uint64 Mix_GetMusicPCMPosition() { return 0; }
+#endif
+
 static void SDL_SoundFinished(void)
 {
 	SoundPlaying = FString();
@@ -179,7 +212,7 @@ static void SDL_SoundFinished(void)
 -----------------------------------------------------------------------------
 
 This emulator was designed to be FAST! The sampled audio data created by this
-code might not be 100% true to the output of a real PC Speaker, but it is 
+code might not be 100% true to the output of a real PC Speaker, but it is
 close enough.
 
 The emulator generates a square wave:
@@ -312,7 +345,7 @@ _SDL_ShutPC(void)
 
 ///////////////////////////////////////////////////////////////////////////
 //
-//      SDL_EmulateAndMixPC() - Emulates the pc speaker 
+//      SDL_EmulateAndMixPC() - Emulates the pc speaker
 //                              and mixes the output into buffer
 //
 ///////////////////////////////////////////////////////////////////////////
@@ -342,12 +375,12 @@ void _SDL_EmulateAndMixPC(Sint16 *buffer, int length)
 		else if (mix >  32767) mix =  32767;
 		// This generates pretty much the same output as SDL_MixAudio(), but
 		// it does not require a second buffer for the PC Speaker sample data.
-		// 
+		//
 		// Note: If you use another mixing method, you cannot simply return
 		// from this function if pcActive is false. You will have to mix a
 		// PC Volume of 0 into the entire buffer!
 
-		// We assume that the left and right channel in the buffer contain 
+		// We assume that the left and right channel in the buffer contain
 		// the same value, so we only need to calculate the mix once.
 		*buffer++ = mix;	//left channel
 		*buffer++ = mix;	//right channel
@@ -374,7 +407,7 @@ void _SDL_PCSpeakerEmulator(void *udata, Uint8 *stream, int len)
     int stereolen = len>>1;
     int sampleslen = stereolen>>1;
     Sint16 *stream16 = (Sint16 *) (void *) stream;    // expect correct alignment
-	
+
 	SDL_LockMutex(audioMutex);
 
 	while(1)
@@ -456,7 +489,94 @@ void SD_SetPosition(int channel, int leftpos, int rightpos)
 	}
 }
 
-byte* SD_PrepareSound(int which)
+// Mac format sound loading.
+struct MacSoundData
+{
+	uint8_t *data;
+	Sint64 pos;
+	int size;
+};
+static Sint64 MacSound_Size(SDL_RWops *ops)
+{
+	return (Sint64)((MacSoundData*)ops->hidden.unknown.data1)->size;
+}
+#if SDL_VERSION_ATLEAST(2,0,0)
+static Sint64 MacSound_Seek(SDL_RWops *ops, Sint64 pos, int relative)
+#else
+static int MacSound_Seek(SDL_RWops *ops, int pos, int relative)
+#endif
+{
+	Sint64 &curpos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
+	switch(relative)
+	{
+		case RW_SEEK_SET:
+			curpos = pos;
+			break;
+		case RW_SEEK_CUR:
+			curpos += pos;
+			break;
+		case RW_SEEK_END:
+			curpos = ((MacSoundData*)ops->hidden.unknown.data1)->size+pos;
+			break;
+	}
+	return (int)curpos;
+}
+#if SDL_VERSION_ATLEAST(2,0,0)
+static size_t MacSound_Read(SDL_RWops *ops, void *buffer, size_t size, size_t nmem)
+#else
+static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
+#endif
+{
+	static const char WAV_HEADER[40] = {
+		'R','I','F','F',0,0,0,0,'W','A','V','E',
+		'f','m','t',' ',16,0,0,0,1,0,1,0,
+		0x22,0x56,0,0,0x22,0x56,0,0,1,0,8,0,
+		'd','a','t','a'
+	};
+	static const unsigned int MacSoundHeaderSize = 0x2A;
+
+	size_t totalsize = size*nmem;
+	DWORD ssize = (DWORD)(MacSound_Size(ops)-MacSoundHeaderSize);
+	Sint64 &pos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
+	if(pos < (Sint64)sizeof(WAV_HEADER))
+	{
+		size_t copysize = MIN<size_t>(totalsize, sizeof(WAV_HEADER)-pos);
+		memcpy(buffer, WAV_HEADER+pos, copysize);
+		pos += copysize;
+		buffer = ((char*)buffer)+copysize;
+		totalsize -= copysize;
+		if(totalsize == 0)
+			return nmem;
+	}
+	if(pos < (Sint64)sizeof(WAV_HEADER)+4)
+	{
+		size_t copysize = MIN<size_t>(totalsize, sizeof(ssize)+sizeof(WAV_HEADER)-pos);
+		memcpy(buffer, (char*)(&ssize)+(pos-sizeof(WAV_HEADER)), copysize);
+		pos += copysize;
+		buffer = ((char*)buffer)+copysize;
+		totalsize -= copysize;
+		if(totalsize == 0)
+			return nmem;
+	}
+
+	size_t copysize = MIN<size_t>(totalsize, ssize-(pos-sizeof(WAV_HEADER)-4));
+	memcpy(buffer, ((MacSoundData*)ops->hidden.unknown.data1)->data+pos-sizeof(WAV_HEADER)-4, copysize);
+
+	// Mac sound data is signed, we need unsigned
+	unsigned char* pcm = (unsigned char*)buffer;
+	for(size_t i = copysize;i-- > 0;)
+		*pcm++ += 0x80;
+
+	return (int)(copysize/size);
+}
+static int MacSound_Close(SDL_RWops *ops)
+{
+	free(((MacSoundData*)ops->hidden.unknown.data1)->data);
+	free(ops->hidden.unknown.data1);
+	return 0;
+}
+
+Mix_Chunk* SD_PrepareSound(int which)
 {
 	int size = Wads.LumpLength(which);
 	if(size == 0)
@@ -464,14 +584,30 @@ byte* SD_PrepareSound(int which)
 
 	FMemLump soundLump = Wads.ReadLump(which);
 
-	byte* out = reinterpret_cast<byte*> (Mix_LoadWAV_RW(SDL_RWFromMem(soundLump.GetMem(), size), 1));
-	if(!out)
-		return NULL;
+	// 0x2A is the size of the sound header. From what I can tell the csnds
+	// have mostly garbage filled headers (outside of what is precisely needed
+	// since the sample rate is hard coded). I'm not sure if the sounds are
+	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
+	if(BigShort(*(WORD*)soundLump.GetMem()) == 1 && size > 0x2A)
+	{
+		SDL_RWops *ops = SDL_AllocRW();
+		//ops->size = MacSound_Size;
+		ops->seek = MacSound_Seek;
+		ops->read = MacSound_Read;
+		ops->write = NULL;
+		ops->close = MacSound_Close;
+		ops->type = 0;
+		ops->hidden.unknown.data1 = malloc(sizeof(MacSoundData));
+		((MacSoundData*)ops->hidden.unknown.data1)->data = (uint8_t*)malloc(size-0x2A);
+		((MacSoundData*)ops->hidden.unknown.data1)->size = size-0x2A;
+		((MacSoundData*)ops->hidden.unknown.data1)->pos = 0;
+		memcpy(((MacSoundData*)ops->hidden.unknown.data1)->data, ((char*)soundLump.GetMem())+0x2A, size-0x2A);
+		for(unsigned int i = size-0x2A;i-- > 0;)
+			((MacSoundData*)ops->hidden.unknown.data1)->data[i] = 0x80+((MacSoundData*)ops->hidden.unknown.data1)->data[i];
+		return Mix_LoadWAV_RW(ops, 1);
+	}
 
-	// TEMPORARY WORK AROUND FOR MEMORY ERROR
-	byte* nout = new byte[sizeof(Mix_Chunk)];
-	memcpy(nout, out, sizeof(Mix_Chunk));
-	return nout;
+	return Mix_LoadWAV_RW(SDL_RWFromMem(soundLump.GetMem(), size), 1);
 }
 
 int SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChannel chan)
@@ -499,7 +635,7 @@ int SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChanne
 
 	DigiPlaying = true;
 
-	Mix_Chunk *sample = reinterpret_cast<Mix_Chunk*> (which.GetData(SoundData::DIGITAL));
+	Mix_Chunk *sample = which.GetDigitalData();
 	if(sample == NULL)
 		return 0;
 
@@ -782,14 +918,14 @@ int numreadysamples = 0;
 int soundTimeCounter = SOUND_TICKS;
 int samplesPerMusicTick;
 /*-----------------------------------------------------------------------------
-The variables below are not required unless you WANT to change the behavior of 
+The variables below are not required unless you WANT to change the behavior of
 AdLib sound effects compared to the original Wolfenstein 3-D code.
 
-What would happen is this: SDL_AlPlaySound() resets the AdLib instrument and 
+What would happen is this: SDL_AlPlaySound() resets the AdLib instrument and
 the alSound pointer to play the given AdLib sound from the beginning. The check
-that was implemented in SDL_IMFMusicPlayer() would not reset the curAlSoundPtr 
-if the alSound pointer pointed to the data that was already being played. This 
-resulted in situations where the instrument data was reset, but not the data 
+that was implemented in SDL_IMFMusicPlayer() would not reset the curAlSoundPtr
+if the alSound pointer pointed to the data that was already being played. This
+resulted in situations where the instrument data was reset, but not the data
 pointer. This caused some sounds to be played at the wrong pitch.
 
 If you really WANT to set the behavior so that an AdLib sound will not be re-
@@ -845,7 +981,7 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 		if(!soundTimeCounter)
 		{
 			// Sound effects are played at 140 Hz (every 5 cycles of the 700 Hz music service)
-            soundTimeCounter = SOUND_TICKS;
+			soundTimeCounter = SOUND_TICKS;
 
 			SDL_PCService();
 
@@ -861,8 +997,8 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 				if (!(--alLengthLeft))
 				{
 					alSound = 0;
-                    SoundPriority=0;
-                    alOut(alFreqH, 0);
+					SoundPriority=0;
+					alOut(alFreqH, 0);
 				}
 			}
 		}
@@ -906,17 +1042,31 @@ SD_Startup(void)
 	if (SD_Started)
 		return;
 
+	if(SDL_InitSubSystem(SDL_INIT_AUDIO) != 0)
+	{
+		Printf("Unable to initialize audio.\n");
+		return;
+	}
+
 	if((audioMutex = SDL_CreateMutex()) == NULL)
 	{
 		printf("Unable to create audio mutex\n");
 		return;
 	}
 
+#if defined(__ANDROID__)
+	// Working directory will be in the form: Beloko/Wolf3d/FULL
+	Mix_SetSoundFonts("../../FluidR3_GM.sf2");
+#elif defined(__unix__)
+	Mix_SetSoundFonts("/usr/share/sounds/sf2/FluidR3_GM.sf2");
+#endif
+
 	if(Mix_OpenAudio(param_samplerate, AUDIO_S16, 2, param_audiobuffer))
 	{
 		printf("Unable to open audio: %s\n", Mix_GetError());
 		return;
 	}
+	atterm(Mix_CloseAudio);
 
 	Mix_ReserveChannels(2);  // reserve player and boss weapon channels
 	Mix_GroupChannels(2, MIX_CHANNELS-1, 1); // group remaining channels
@@ -936,6 +1086,12 @@ SD_Startup(void)
 	samplesPerMusicTick = param_samplerate / MUSIC_RATE;    // SDL_t0FastAsmService played at 700Hz
 	Mix_HookMusic(SDL_IMFMusicPlayer, 0);
 	Mix_ChannelFinished(SD_ChannelFinished);
+
+	Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
+
+	// Make sure that the musicFinished() function is called when the music stops playing
+	Mix_HookMusicFinished(musicFinished);
+
 	AdLibPresent = true;
 	SoundBlasterPresent = true;
 
@@ -970,6 +1126,8 @@ SD_Shutdown(void)
 		SDL_DestroyMutex(audioMutex);
 		audioMutex = NULL;
 	}
+
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 
 	SD_Started = false;
 }
@@ -1054,6 +1212,12 @@ int SD_PlaySound(const char* sound, SoundChannel chan)
 	if (sindex.GetPriority() < SoundPriority)
 		return 0;
 
+#ifndef ECWOLF_MIXER
+	// With stock SDL_mixer we can't play music and emulated sounds.
+	if (music != NULL)
+		return 0;
+#endif
+
 	bool didPlaySound = false;
 
 	switch (SoundMode)
@@ -1064,14 +1228,14 @@ int SD_PlaySound(const char* sound, SoundChannel chan)
 		case sdm_PC:
 			if(sindex.HasType(SoundData::PCSPEAKER))
 			{
-				SDL_PCPlaySound((PCSound *)sindex.GetData(SoundData::PCSPEAKER));
+				SDL_PCPlaySound((PCSound *)sindex.GetSpeakerData());
 				didPlaySound = true;
 			}
 			break;
 		case sdm_AdLib:
 			if(sindex.HasType(SoundData::ADLIB))
 			{
-				SDL_ALPlaySound((AdLibSound *)sindex.GetData(SoundData::ADLIB));
+				SDL_ALPlaySound((AdLibSound *)sindex.GetAdLibData());
 				didPlaySound = true;
 			}
 			break;
@@ -1189,9 +1353,17 @@ SD_MusicOff(void)
 		default:
 			break;
 		case smm_AdLib:
-			alOut(alEffects, 0);
-			for (i = 0;i < sqMaxTracks;i++)
-				alOut(alFreqH + i + 1, 0);
+			if (music == NULL)
+			{
+				alOut(alEffects, 0);
+				for (i = 0;i < sqMaxTracks;i++)
+					alOut(alFreqH + i + 1, 0);
+			}
+			else
+			{
+				Mix_PauseMusic();
+				return 0;
+			}
 			break;
 	}
 
@@ -1225,27 +1397,70 @@ SD_StartMusic(const char* chunk)
 		if(lumpNum == -1)
 			return;
 
-		SDL_LockMutex(audioMutex);
-
-		for (int i = 0;i < OPL_CHANNELS;++i)
-			SDL_AlSetChanInst(&ChannelRelease, i);
-
+		// Load our music file from chunk
+		chunkmem = new byte[Wads.LumpLength(lumpNum)];
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);
-		if(sqHackFreeable != NULL)
-			delete[] sqHackFreeable;
-		sqHack = new word[(Wads.LumpLength(lumpNum)/2)+1]; //+1 is just safety
-		sqHackFreeable = sqHack;
-		lump.Read(sqHack, Wads.LumpLength(lumpNum));
-		if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
-		else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
-		sqHackPtr = sqHack;
-		sqHackTime = 0;
-		alTimeCount = 0;
+		lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
+		SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
 
-		SDL_UnlockMutex(audioMutex);
+		if(music)
+			Mix_FreeMusic(music);
+		// Technically an SDL_mixer 2 feature to free the source
+#if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
+		music = Mix_LoadMUS_RW(mus_cunk, true);
+#else
+		music = Mix_LoadMUS_RW(mus_cunk);
+#endif
 
-		SD_MusicOn();
+		// We assume that when music equals to NULL, we've an IMF file to play
+		if (music == NULL)
+		{
+			Mix_HookMusic(SDL_IMFMusicPlayer, 0);
+
+			SDL_LockMutex(audioMutex);
+
+			for (int i = 0;i < OPL_CHANNELS;++i)
+				SDL_AlSetChanInst(&ChannelRelease, i);
+
+			sqHack = reinterpret_cast<word*>(chunkmem.Release());
+			sqHackFreeable = sqHack;
+			if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
+			else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
+			sqHackPtr = sqHack;
+			sqHackTime = 0;
+			alTimeCount = 0;
+
+			SDL_UnlockMutex(audioMutex);
+
+			SD_MusicOn();
+		}
+		else
+		{
+			Mix_HookMusic(0, 0);
+
+			SDL_LockMutex(audioMutex);
+
+			// Play the music
+			musicchunk = lumpNum;
+			if (Mix_PlayMusic(music, -1) == -1)
+			{
+				printf("Unable to play music file: %s\n", Mix_GetError());
+			}
+
+			SDL_UnlockMutex(audioMutex);
+		}
 	}
+}
+
+int
+SD_PauseMusic(void)
+{
+	if (music != NULL && Mix_PlayingMusic() == 1)
+	{
+		Mix_PauseMusic();
+		return (int)Mix_GetMusicPCMPosition();
+	}
+	return 0;
 }
 
 void
@@ -1255,49 +1470,87 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 
 	if (MusicMode == smm_AdLib)
 	{
-		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
-			int lumpNum = Wads.CheckNumForName(chunk, ns_music);
-			if(lumpNum == -1)
-				return;
+		int lumpNum = Wads.CheckNumForName(chunk, ns_music);
+		if(lumpNum == -1)
+			return;
 
+		if (music == NULL || musicchunk != lumpNum)
+		{ // We need this scope to "delete" the lump before modifying the sqHack pointers.
 			SDL_LockMutex(audioMutex);
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);
-			if(sqHackFreeable != NULL)
-				delete[] sqHackFreeable;
-			sqHack = new word[(Wads.LumpLength(lumpNum)/2)+1]; //+1 is just safety
-			sqHackFreeable = sqHack;
-			lump.Read(sqHack, Wads.LumpLength(lumpNum));
-			if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
-			else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
-			sqHackPtr = sqHack;
+			sqHackFreeable.Reset();
+
+			// Load our music file from chunk
+			chunkmem = new byte[Wads.LumpLength(lumpNum)];
+			lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
+			SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
+#if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
+			music = Mix_LoadMUS_RW(mus_cunk, true);
+#else
+			music = Mix_LoadMUS_RW(mus_cunk);
+#endif
+			if (music == NULL)
+			{
+				sqHack = reinterpret_cast<word*>(chunkmem.Release());
+				sqHackFreeable = sqHack;
+				if(*sqHack == 0) sqHackLen = sqHackSeqLen = Wads.LumpLength(lumpNum);
+				else sqHackLen = sqHackSeqLen = LittleShort(*sqHack++);
+				sqHackPtr = sqHack;
+			}
 		}
 
-		if(startoffs >= sqHackLen)
+		if (music == NULL)
+		{
+			if(startoffs >= sqHackLen)
+			{
+				SDL_UnlockMutex(audioMutex);
+				Quit("SD_StartMusic: Illegal startoffs provided!");
+			}
+
+			// fast forward to correct position
+			// (needed to reconstruct the instruments)
+
+			for(int i = 0; i < startoffs; i += 2)
+			{
+				byte reg = *(byte *)sqHackPtr;
+				byte val = *(((byte *)sqHackPtr) + 1);
+				if(reg >= 0xb1 && reg <= 0xb8) val &= 0xdf;           // disable play note flag
+				else if(reg == 0xbd) val &= 0xe0;                     // disable drum flags
+
+				alOut(reg,val);
+				sqHackPtr += 2;
+				sqHackLen -= 4;
+			}
+			sqHackTime = 0;
+			alTimeCount = 0;
+
+			SDL_UnlockMutex(audioMutex);
+
+			Mix_HookMusic(SDL_IMFMusicPlayer, 0);
+
+			SD_MusicOn();
+		}
+		else
 		{
 			SDL_UnlockMutex(audioMutex);
-			Quit("SD_StartMusic: Illegal startoffs provided!");
+
+			Mix_HookMusic(0, 0);
+
+			if (Mix_PausedMusic() == 1 && musicchunk == lumpNum)
+			{
+				Mix_ResumeMusic();
+				return;
+			}
+
+			// Play the music
+			musicchunk = lumpNum;
+			if (Mix_PlayMusic(music, -1) == -1)
+			{
+				printf("Unable to play music file: %s\n", Mix_GetError());
+			}
+
+			Mix_SetMusicPCMPosition(startoffs);
 		}
-
-		// fast forward to correct position
-		// (needed to reconstruct the instruments)
-
-		for(int i = 0; i < startoffs; i += 2)
-		{
-			byte reg = *(byte *)sqHackPtr;
-			byte val = *(((byte *)sqHackPtr) + 1);
-			if(reg >= 0xb1 && reg <= 0xb8) val &= 0xdf;           // disable play note flag
-			else if(reg == 0xbd) val &= 0xe0;                     // disable drum flags
-
-			alOut(reg,val);
-			sqHackPtr += 2;
-			sqHackLen -= 4;
-		}
-		sqHackTime = 0;
-		alTimeCount = 0;
-
-		SDL_UnlockMutex(audioMutex);
-
-		SD_MusicOn();
 	}
 }
 
@@ -1334,7 +1587,10 @@ bool SD_MusicPlaying(void)
 	switch (MusicMode)
 	{
 		case smm_AdLib:
-			result = sqActive;	// not really thread-safe, but a mutex would be overkill
+			if (music == NULL)
+				result = sqActive;	// not really thread-safe, but a mutex would be overkill
+			else
+				result = Mix_PlayingMusic() && !Mix_PausedMusic();
 			break;
 		default:
 			result = false;

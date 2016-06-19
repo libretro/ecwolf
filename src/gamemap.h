@@ -68,15 +68,15 @@ class GameMap
 		};
 		struct Thing
 		{
-			Thing() : x(0), y(0), z(0), angle(0), type(0), ambush(false), 
-				patrol(false)
+			Thing() : x(0), y(0), z(0), type(NAME_None), angle(0),
+				ambush(false), patrol(false)
 			{
 				skill[0] = skill[1] = skill[2] = skill[3] = false;
 			}
 
 			fixed			x, y, z;
+			FName			type;
 			unsigned short	angle;
-			unsigned int	type;
 			bool			ambush;
 			bool			patrol;
 			bool			skill[4];
@@ -144,8 +144,9 @@ class GameMap
 			struct Map
 			{
 				Map() : tile(NULL), sector(NULL), zone(NULL), visible(false),
-					amFlags(0), thinker(NULL), pushDirection(Tile::East),
-					pushAmount(0), pushReceptor(NULL), tag(0), nexttag(NULL)
+					amFlags(0), thinker(NULL), slideStyle(0),
+					pushDirection(Tile::East), pushAmount(0),
+					pushReceptor(NULL), tag(0), nexttag(NULL)
 				{
 					slideAmount[0] = slideAmount[1] = slideAmount[2] = slideAmount[3] = 0;
 					sideSolid[0] = sideSolid[1] = sideSolid[2] = sideSolid[3] = true;
@@ -211,6 +212,8 @@ class GameMap
 
 		static bool		CheckMapExists(const FString &map);
 
+		void PropagateMark();
+
 		TMap<unsigned int, Plane::Map *> elevatorPosition;
 	private:
 		friend class UWMFParser;
@@ -218,6 +221,7 @@ class GameMap
 
 		Plane	&NewPlane();
 		Trigger	&NewTrigger(unsigned int x, unsigned int y, unsigned int z);
+		void	ReadMacData();
 		void	ReadPlanesData();
 		void	ReadUWMFData();
 		void	SetSpotTag(Plane::Map *spot, unsigned int tag);
@@ -252,6 +256,14 @@ class GameMap
 		bool*				zoneTraversed;
 		unsigned short**	zoneLinks;
 };
+
+enum ESpecialThings
+{
+	SMT_Player1Start,
+
+	SMT_NumThings
+};
+extern const FName SpecialThingNames[SMT_NumThings];
 
 typedef GameMap::Plane::Map *	MapSpot;
 

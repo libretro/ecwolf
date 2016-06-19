@@ -65,6 +65,7 @@ enum ESSType
 };
 
 void Quit(const char *errorStr, ...);
+void NetDPrintf(const char *format, ...);
 
 #define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
 #define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))
@@ -174,7 +175,7 @@ typedef uint32_t angle_t;
 
 // object flag values
 
-typedef enum
+enum ActorFlag
 {
 	FL_SHOOTABLE        = 0x00000001,
 	FL_VISABLE          = 0x00000008,
@@ -182,26 +183,26 @@ typedef enum
 	FL_FIRSTATTACK      = 0x00000020,
 	FL_AMBUSH           = 0x00000040,
 	FL_BRIGHT           = 0x00000100,
-#ifdef USE_DIR3DSPR
+
 	// you can choose one of the following values in wl_act1.cpp
 	// to make a static sprite a directional 3d sprite
 	// (see example at the end of the statinfo array)
-	FL_DIR_HORIZ_MID    = 0x00000200,
-	FL_DIR_HORIZ_FW     = 0x00000400,
-	FL_DIR_HORIZ_BW     = 0x00000600,
-	FL_DIR_VERT_MID     = 0x00000a00,
-	FL_DIR_VERT_FW      = 0x00000c00,
-	FL_DIR_VERT_BW      = 0x00000e00,
+//	FL_DIR_HORIZ_MID    = 0x00000200,
+//	FL_DIR_HORIZ_FW     = 0x00000400,
+//	FL_DIR_HORIZ_BW     = 0x00000600,
+//	FL_DIR_VERT_MID     = 0x00000a00,
+//	FL_DIR_VERT_FW      = 0x00000c00,
+//	FL_DIR_VERT_BW      = 0x00000e00,
 
 	// these values are just used to improve readability of code
-	FL_DIR_NONE         = 0x00000000,
-	FL_DIR_POS_MID      = 0x00000200,
-	FL_DIR_POS_FW       = 0x00000400,
-	FL_DIR_POS_BW       = 0x00000600,
-	FL_DIR_POS_MASK     = 0x00000600,
-	FL_DIR_VERT_FLAG    = 0x00000800,
-	FL_DIR_MASK         = 0x00000e00,
-#endif
+//	FL_DIR_NONE         = 0x00000000,
+//	FL_DIR_POS_MID      = 0x00000200,
+//	FL_DIR_POS_FW       = 0x00000400,
+//	FL_DIR_POS_BW       = 0x00000600,
+//	FL_DIR_POS_MASK     = 0x00000600,
+//	FL_DIR_VERT_FLAG    = 0x00000800,
+//	FL_DIR_MASK         = 0x00000e00,
+
 	FL_ISMONSTER        = 0x00001000,
 	FL_CANUSEWALLS		= 0x00002000,
 	FL_COUNTKILL		= 0x00004000,
@@ -219,20 +220,25 @@ typedef enum
 	FL_DONTRIP			= 0x04000000,
 	FL_OLDRANDOMCHASE	= 0x08000000,
 	FL_PLOTONAUTOMAP	= 0x10000000,
+	FL_BILLBOARD        = 0x20000000,
+};
 
-	FL_PLAYERMISSILE	= 0x80000000, // Temporary until missile can keep the player as a target.
-
+enum ItemFlag
+{
 	IF_AUTOACTIVATE		= 0x00000001,
 	IF_INVBAR			= 0x00000002,
 	IF_ALWAYSPICKUP		= 0x00000004,
 	IF_INACTIVE			= 0x00000008, // For picked up items that remain on the map
+};
 
+enum WeaponFlag
+{
 	WF_NOGRIN			= 0x00000001,
 	WF_NOAUTOFIRE		= 0x00000002,
 	WF_DONTBOB			= 0x00000004,
 	WF_ALWAYSGRIN		= 0x00000008,
 	WF_NOALERT			= 0x00000010,
-} objflag_t;
+};
 
 /*
 =============================================================================
@@ -328,7 +334,7 @@ struct ControlScheme
 		int			joystick;
 		int			keyboard;
 		int			mouse;
-		int			*axis;
+		int			axis;
 		bool		negative;
 };
 

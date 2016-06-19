@@ -58,7 +58,15 @@ extern bool		forcegrabmouse;
 extern bool		r_depthfog;
 extern bool		vid_fullscreen;
 extern Aspect	vid_aspect;
+extern bool		vid_vsync;
 extern bool		quitonescape;
 extern fixed	movebob;
+
+extern float	localDesiredFOV;
+//
+// control info
+//
+extern  bool		alwaysrun;
+extern  bool		mouseenabled, mouseyaxisdisabled, joystickenabled;
 
 #endif /* __C_CVARS__ */

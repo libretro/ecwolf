@@ -107,6 +107,8 @@ class ActionInfo
 	public:
 		ActionInfo(ActionPtr func, const FName &name);
 
+		const Type *ArgType(unsigned int n) const { return types[MIN(n, maxArgs-1)]; }
+
 		ActionPtr func;
 		const FName name;
 
@@ -296,6 +298,23 @@ class ClassDef
 		friend class StateLabel;
 		static const size_t POINTER_END;
 
+		static int ParseActorStateControl(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int allowedStatements);
+		static void ParseActorStateDuration(Scanner &sc, StateDefinition &thisState);
+		static bool ParseActorStateFlags(Scanner &sc, StateDefinition &thisState);
+		static void ParseActorStateAction(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int funcIdx);
+
+		static ClassDef *ParseActorHeader(Scanner &sc, bool &previouslyDefined, bool &isNative);
+		static bool ParseActorInheritance(Scanner &sc, ClassDef *newClass);
+		static bool ParseActorReplacements(Scanner &sc, ClassDef *newClass);
+
+		static bool ParseActorFlag(Scanner &sc, ClassDef *newClass);
+
+		static bool InitializeActor(ClassDef *newClass, bool isNative);
+
+		static void ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted);
+		static void ParseActorAction(Scanner &sc, ClassDef *newClass, bool &actionsSorted);
+		static void ParseActorNative(Scanner &sc, ClassDef *newClass);
+		static void ParseActorProperty(Scanner &sc, ClassDef *newClass);
 		static void	ParseActor(Scanner &sc);
 		static void	ParseDecorateLump(int lumpNum);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);

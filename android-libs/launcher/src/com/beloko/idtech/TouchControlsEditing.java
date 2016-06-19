@@ -43,6 +43,11 @@ public class TouchControlsEditing {
 		activity = a;
 	}
 
+	public static void show()
+	{
+		show(activity);
+	}
+
 	public static void show(Activity act)
 	{
 		Log.d(TAG,"showSettings");

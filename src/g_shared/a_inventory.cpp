@@ -170,7 +170,8 @@ void AInventory::Touch(AActor *toucher)
 		++gamestate.secretcount;
 
 	PlaySoundLocActor(pickupsound, toucher);
-	StartBonusFlash();
+	if(toucher->player == &players[ConsolePlayer])
+		StartBonusFlash();
 }
 
 bool AInventory::TryPickup(AActor *toucher)
@@ -224,14 +225,19 @@ IMPLEMENT_CLASS(Health)
 
 bool AHealth::TryPickup(AActor *toucher)
 {
-	int max = maxamount;
-	if(max == 0)
-		max = toucher->player->mo->maxhealth;
-
-	if(toucher->player->health >= max)
+	if(toucher->health <= 0)
 		return false;
-	else
+
+	int max = maxamount;
+
+	if(toucher->player)
 	{
+		if(max == 0)
+			max = toucher->player->mo->maxhealth;
+
+		if(toucher->player->health >= max)
+			return false;
+
 		toucher->player->health += amount;
 		if(toucher->player->health > max)
 			toucher->player->health = max;
@@ -239,8 +245,21 @@ bool AHealth::TryPickup(AActor *toucher)
 		const int oldhealth = toucher->health;
 		toucher->health = toucher->player->health;
 		StatusBar->UpdateFace(oldhealth - toucher->health);
-		Destroy();
 	}
+	else
+	{
+		if(max == 0)
+			max = toucher->SpawnHealth();
+
+		if(toucher->health >= max)
+			return false;
+
+		toucher->health += amount;
+		if(toucher->health > max)
+			toucher->health = max;
+	}
+
+	Destroy();
 	return true;
 }
 
@@ -655,10 +674,15 @@ ACTION_FUNCTION(A_ReFire)
 
 	if(player->PendingWeapon == WP_NOCHANGE || !(player->flags & player_t::PF_REFIRESWITCHOK))
 	{
-		if(player->ReadyWeapon->mode == AWeapon::PrimaryFire && buttonstate[bt_attack])
-			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::PrimaryFire, true), player_t::ps_weapon);
-		else if(player->ReadyWeapon->mode == AWeapon::AltFire && buttonstate[bt_altattack])
-			player->SetPSprite(player->ReadyWeapon->GetAtkState(AWeapon::AltFire, true), player_t::ps_weapon);
+		ACTION_PARAM_STATE(hold, 0, player->ReadyWeapon->GetAtkState(player->ReadyWeapon->mode, true));
+
+		if((player->ReadyWeapon->mode == AWeapon::PrimaryFire && control[player - players].buttonstate[bt_attack]) ||
+		   (player->ReadyWeapon->mode == AWeapon::AltFire && control[player - players].buttonstate[bt_altattack]))
+		{
+			if(self->MissileState)
+				self->SetState(player->mo->MissileState);
+			player->SetPSprite(hold, player_t::ps_weapon);
+		}
 	}
 	return true;
 }
@@ -768,7 +792,8 @@ class AScoreItem : public AInventory
 	protected:
 		bool TryPickup(AActor *toucher)
 		{
-			GivePoints(amount);
+			if(toucher->player)
+				toucher->player->GivePoints(amount);
 			GoAwayAndDie();
 			return true;
 		}
@@ -807,7 +832,8 @@ class AExtraLifeItem : public AInventory
 				amount += item->amount;
 				if(amount >= maxamount)
 				{
-					GiveExtraMan(amount/maxamount);
+					if(item->owner->player)
+						item->owner->player->GiveExtraMan(amount/maxamount);
 					amount %= maxamount;
 				}
 				good = true;

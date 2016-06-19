@@ -147,7 +147,7 @@ actor Watermelon
 {
 	radius 11
 	speed 24
-	damage (random[MissileDamage](0, 3)<<4)
+	damage (random[MissileDamage](1, 4)<<4)
 	seesound "watermelon/fire"
 	deathsound "watermelon/hit"
 	PROJECTILE

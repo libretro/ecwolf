@@ -1,159 +1,7 @@
+include "xlat/wolf3d.txt"
+
 tiles
 {
-	trigger 21
-	{
-		action = 3;
-		playeruse = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-	trigger 90
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-	trigger 91
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg4 = 1;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activateeast = false;
-		activatewest = false;
-	}
-	trigger 92
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 1;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-	trigger 93
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 1;
-		arg4 = 1;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activateeast = false;
-		activatewest = false;
-	}
-	trigger 94
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 2;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-	trigger 95
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 2;
-		arg4 = 1;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activateeast = false;
-		activatewest = false;
-	}
-	trigger 96
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 3;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-	trigger 97
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 3;
-		arg4 = 1;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activateeast = false;
-		activatewest = false;
-	}
-	trigger 98
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 4;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-	trigger 99
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg3 = 4;
-		arg4 = 1;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activateeast = false;
-		activatewest = false;
-	}
-	trigger 100
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-	trigger 101
-	{
-		action = 1;
-		arg1 = 16;
-		arg2 = 300;
-		arg4 = 1;
-		playeruse = true;
-		monsteruse = true;
-		repeatable = true;
-		activateeast = false;
-		activatewest = false;
-	}
-
 	tile 1
 	{
 		texturenorth = "VOLROCK1";
@@ -691,173 +539,99 @@ tiles
 		texturewest = "SLOT2_2";
 		offsethorizontal = true;
 	}
-
-	modzone 106 fillzone ambush;
-	modzone 107 changetrigger 3
-	{
-		action = 4;
-		playeruse = true;
-		activatenorth = false;
-		activatesouth = false;
-	}
-
-	zone 108 {}
-	zone 109 {}
-	zone 110 {}
-	zone 111 {}
-	zone 112 {}
-	zone 113 {}
-	zone 114 {}
-	zone 115 {}
-	zone 116 {}
-	zone 117 {}
-	zone 118 {}
-	zone 119 {}
-	zone 120 {}
-	zone 121 {}
-	zone 122 {}
-	zone 123 {}
-	zone 124 {}
-	zone 125 {}
-	zone 126 {}
-	zone 127 {}
-	zone 128 {}
-	zone 129 {}
-	zone 130 {}
-	zone 131 {}
-	zone 132 {}
-	zone 133 {}
-	zone 134 {}
-	zone 135 {}
-	zone 136 {}
-	zone 137 {}
-	zone 138 {}
-	zone 139 {}
-	zone 140 {}
-	zone 141 {}
-	zone 142 {}
-	zone 143 {}
 }
 
 things
 {
-	trigger 98
-	{
-		action = 2;
-		arg1 = 8;
-		arg2 = 2;
-		arg3 = 2;
-		playeruse = true;
-		secret = true;
-	}
-
-	trigger 99
-	{
-		action = 6;
-		playercross = true;
-	}
-
-	// oldnum, newnum, angles, patrol, minskill
-	{19,	1,	4,	0,	0}
-	{23,	105,0,	0,	0}
-	{24,	106,0,	0,	0}
-	{25,	107,0,	0,	0}
-	{26,	108,0,	0,	0}
-	{27,	109,0,	0,	0}
-	{28,	110,0,	0,	0}
-	{29,	111,0,	0,	0}
-	{30,	112,0,	0,	0}
-	{31,	113,0,	0,	0}
-	{32,	114,0,	0,	0}
-	{33,	150,0,	0,	0}
-	{34,	115,0,	0,	0}
-	{35,	116,0,	0,	0}
-	{36,	117,0,	0,	0}
-	{37,	118,0,	0,	0}
-	{38,	119,0,	0,	0}
-	{39,	120,0,	0,	0}
-	{40,	121,0,	0,	0}
-	{41,	122,0,	0,	0}
-	{42,	123,0,	0,	0}
-	{43,	154,0,	0,	0}
-	{44,	155,0,	0,	0}
-	{45,	124,0,	0,	0}
-	{46,	125,0,	0,	0}
-	{47,	142,0,	0,	0}
-	{48,	143,0,	0,	0}
-	{49,	139,0,	0,	0}
-	{50,	141,0,	0,	0}
-	{51,	156,0,	0,	0}
-	{52,	146,0,	0,	0}
-	{53,	147,0,	0,	0}
-	{54,	148,0,	0,	0}
-	{55,	149,0,	0,	0}
-	{56,	144,0,	0,	0}
-	{57,	126,0,	0,	0}
-	{58,	151,0,	0,	0}
-	{59,	152,0,	0,	0}
-	{60,	153,0,	0,	0}
-	{61,	145,0,	0,	0}
-	{62,	127,0,	0,	0}
-	{63,	128,0,	0,	0}
-	{64,	129,0,	0,	0}
-	{65,	130,0,	0,	0}
-	{66,	131,0,	0,	0}
-	{67,	132,0,	0,	0}
-	{68,	133,0,	0,	0}
-	{69,	134,0,	0,	0}
-	{70,	135,0,	0,	0}
-	{71,	136,0,	0,	0}
-	{72,	140,0,	0,	0}
-	{73,	137,0,	0,	0}
-	{74,	138,0,	0,	0}
-	{90,	10,	8,	0,	0}
-	{106,	104,0,	HOLOWALL,	0}
-	{107,	103,0,	HOLOWALL,	0}
-	{108,	93,	4,	HOLOWALL,	1}
-	{112,	93,	4,	PATHING|HOLOWALL,	1}
-	{116,	97,	4,	HOLOWALL,	1}
-	{120,	97,	4,	PATHING|HOLOWALL,	1}
-	{124,	98,	0,	HOLOWALL,	0}
-	{125,	99,	0,	HOLOWALL,	0}
-	{126,	94,	4,	HOLOWALL,	1}
-	{130,	94,	4,	PATHING|HOLOWALL,	1}
-	{134,	95,	4,	HOLOWALL,	1}
-	{138,	95,	4,	PATHING|HOLOWALL,	1}
-	{142,	101,0,	HOLOWALL,	0}
-	{143,	100,0,	HOLOWALL,	0}
-	{144,	93,	4,	HOLOWALL,	2}
-	{148,	93,	4,	PATHING|HOLOWALL,	2}
-	{152,	97,	4,	HOLOWALL,	2}
-	{156,	97,	4,	PATHING|HOLOWALL,	2}
-	{160,	18,	0,	HOLOWALL,	0}
-	{161,	102,0,	HOLOWALL,	0}
-	{162,	94,	4,	HOLOWALL,	2}
-	{166,	94,	4,	PATHING|HOLOWALL,	2}
-	{170,	95,	4,	HOLOWALL,	2}
-	{174,	95,	4,	PATHING|HOLOWALL,	2}
-	{178,	19,	0,	HOLOWALL,	0}
-	{179,	22,	0,	HOLOWALL,	0}
-	{180,	93,	4,	HOLOWALL,	3}
-	{184,	93,	4,	PATHING|HOLOWALL,	3}
-	{188,	97,	4,	HOLOWALL,	3}
-	{192,	97,	4,	PATHING|HOLOWALL,	3}
-	{196,	17,	0,	HOLOWALL,	0}
-	{197,	20,	0,	HOLOWALL,	0}
-	{198,	94,	4,	HOLOWALL,	3}
-	{202,	94,	4,	PATHING|HOLOWALL,	3}
-	{206,	95,	4,	HOLOWALL,	3}
-	{210,	95,	4,	PATHING|HOLOWALL,	3}
-	{214,	16,	0,	HOLOWALL,	0}
-	{215,	21,	0,	HOLOWALL,	0}
-	{216,	96,	4,	HOLOWALL,	1}
-	{220,	96,	4,	PATHING|HOLOWALL,	1}
-	{224,	29,	0,	HOLOWALL,	0}
-	{225,	30,	0,	HOLOWALL,	0}
-	{226,	31,	0,	HOLOWALL,	0}
-	{227,	32,	0,	HOLOWALL,	0}
-	{234,	96,	4,	HOLOWALL,	2}
-	{238,	96,	4,	PATHING|HOLOWALL,	2}
-	{252,	96,	4,	HOLOWALL,	3}
-	{256,	96,	4,	PATHING|HOLOWALL,	3}
+	// oldnum, class, angles, patrol, minskill
+	{23,  Puddle2,               0, 0, 0}
+	{24,  HorizontalGreenBarrel, 0, 0, 0}
+	{25,  TableWithChairs2,      0, 0, 0}
+	{26,  TallFloorLamp,         0, 0, 0}
+	{27,  Chandelier2,           0, 0, 0}
+	{28,  HangedMan2,            0, 0, 0}
+	{29,  DogFood2,              0, 0, 0}
+	{30,  CrackedPillar,         0, 0, 0}
+	{31,  GreenPlant2,           0, 0, 0}
+	{32,  SkeletonFlat2,         0, 0, 0}
+	{33,  SkullPile,             0, 0, 0}
+	{34,  BrownPlant2,           0, 0, 0}
+	{35,  Vase2,                 0, 0, 0}
+	{36,  MetalTable,            0, 0, 0}
+	{37,  CeilingLight2,         0, 0, 0}
+	{38,  CageWithGore2,         0, 0, 0}
+	{39,  SuitOfArmor2,          0, 0, 0}
+	{40,  HangingCage2,          0, 0, 0}
+	{41,  BrokenCage,            0, 0, 0}
+	{42,  Bones5,                0, 0, 0}
+	{43,  YellowKey,             0, 0, 0}
+	{44,  CyanKey,               0, 0, 0}
+	{45,  CageWithRat,           0, 0, 0}
+	{46,  DeadRat,               0, 0, 0}
+	{47,  Food2,                 0, 0, 0}
+	{48,  Medikit2,              0, 0, 0}
+	{49,  BlueClip,              0, 0, 0}
+	{50,  BlueAK47,              0, 0, 0}
+	{51,  BlueGatlingGunUpgrade, 0, 0, 0}
+	{52,  Radio,                 0, 0, 0}
+	{53,  Plutonium,             0, 0, 0}
+	{54,  ControlPanel,          0, 0, 0}
+	{55,  Bomb,                  0, 0, 0}
+	{56,  OneUpPill,             0, 0, 0}
+	{57,  Gibs2,                 0, 0, 0}
+	{58,  HorizontalBarrel,      0, 0, 0}
+	{59,  Well2,                 0, 0, 0}
+	{60,  EmptyWell2,            0, 0, 0}
+	{61,  Blood2,                0, 0, 0}
+	{62,  TeslaCoil,             0, 0, 0}
+	{63,  RedCeilingLight2,      0, 0, 0}
+	{64,  Bones6,                0, 0, 0}
+	{65,  BareLightBulb,         0, 0, 0}
+	{66,  GreenSlime,            0, 0, 0}
+	{67,  ChemicalTable,         0, 0, 0}
+	{68,  NuclearBarrel,         0, 0, 0}
+	{69,  BlueColumn,            0, 0, 0}
+	{70,  Bubbles,               0, 0, 0}
+	{71,  DevilStatue,           0, 0, 0}
+	{72,  ClipBox2,              0, 0, 0}
+	{73,  BJWasHere,             0, 0, 0}
+	{74,  SpearOfDestiny2,       0, 0, 0}
+	{90,  PatrolPoint,           8, 0, 0}
+	{106, GhoulishGhost,         0, HOLOWALL, 0}
+	{107, DevilIncarnate,        0, HOLOWALL, 0}
+	{108, GreenGuard,            4, HOLOWALL, 1}
+	{112, GreenGuard,            4, PATHING|HOLOWALL, 1}
+	{116, LostOfficer,           4, HOLOWALL, 1}
+	{120, LostOfficer,           4, PATHING|HOLOWALL, 1}
+	{124, DeadGreenGuard,        0, HOLOWALL, 0}
+	{125, SubmarineWilly,        0, HOLOWALL, 0}
+	{126, Schutzstafell,         4, HOLOWALL, 1}
+	{130, Schutzstafell,         4, PATHING|HOLOWALL, 1}
+	{134, Doberman,              4, HOLOWALL, 1}
+	{138, Doberman,              4, PATHING|HOLOWALL, 1}
+	{142, TheAxe,                0, HOLOWALL, 0}
+	{143, ProfessorQuarkblitz,   0, HOLOWALL, 0}
+	{144, GreenGuard,            4, HOLOWALL, 2}
+	{148, GreenGuard,            4, PATHING|HOLOWALL, 2}
+	{152, LostOfficer,           4, HOLOWALL, 2}
+	{156, LostOfficer,           4, PATHING|HOLOWALL, 2}
+	{161, Robot,                 0, HOLOWALL, 0}
+	{162, Schutzstafell,         4, HOLOWALL, 2}
+	{166, Schutzstafell,         4, PATHING|HOLOWALL, 2}
+	{170, Doberman,              4, HOLOWALL, 2}
+	{174, Doberman,              4, PATHING|HOLOWALL, 2}
+	{180, GreenGuard,            4, HOLOWALL, 3}
+	{184, GreenGuard,            4, PATHING|HOLOWALL, 3}
+	{188, LostOfficer,           4, HOLOWALL, 3}
+	{192, LostOfficer,           4, PATHING|HOLOWALL, 3}
+	{198, Schutzstafell,         4, HOLOWALL, 3}
+	{202, Schutzstafell,         4, PATHING|HOLOWALL, 3}
+	{206, Doberman,              4, HOLOWALL, 3}
+	{210, Doberman,              4, PATHING|HOLOWALL, 3}
+	{216, GunBat,                4, HOLOWALL, 1}
+	{220, GunBat,                4, PATHING|HOLOWALL, 1}
+	{234, GunBat,                4, HOLOWALL, 2}
+	{238, GunBat,                4, PATHING|HOLOWALL, 2}
+	{252, GunBat,                4, HOLOWALL, 3}
+	{256, GunBat,                4, PATHING|HOLOWALL, 3}
 }

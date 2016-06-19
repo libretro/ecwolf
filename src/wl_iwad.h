@@ -59,6 +59,7 @@ namespace IWad
 	struct IWadData
 	{
 		FString Name;
+		FString Autoname;
 		FString Mapinfo;
 		TArray<FString> Ident;
 		FString Required;

@@ -12,9 +12,9 @@
 #else
 #define GAME_DIR "ecwolf"
 #endif
-#define DOTVERSIONSTR_NOREV "1.3.1"
+#define DOTVERSIONSTR_NOREV "1.3.99999"
 #define DOTVERSIONSTR DOTVERSIONSTR_NOREV " (r" SVN_REVISION_STRING ")"
-#define SAVEPRODVER 0x00100301 // 0xMMMmmmrr in hex
+#define SAVEPRODVER 0x001003FF // 0xMMMmmmrr in hex
 
 // Windows RC files have weird syntax so we need an unquoted version
 #define RCGAMENAME ECWolf
@@ -36,7 +36,6 @@
 #endif
 
 //#define USE_FEATUREFLAGS    // Enables the level feature flags (see bottom of wl_def.h)
-//#define USE_DIR3DSPR        // Enables directional 3d sprites (see wl_dir3dspr.cpp)
 //#define USE_PARALLAX 16     // Enables parallax sky with 16 textures per sky (see wl_parallax.cpp)
 //#define USE_CLOUDSKY        // Enables cloud sky support (see wl_cloudsky.cpp)
 //#define USE_STARSKY         // Enables star sky support (see wl_atmos.cpp)

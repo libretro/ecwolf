@@ -13,14 +13,9 @@
 =============================================================================
 */
 
-extern  int32_t  thrustspeed;
 extern  AActor   *LastAttacker;
 
-void    Cmd_Use ();
-void    Thrust (angle_t angle, int32_t speed);
 void    SpawnPlayer (int tilex, int tiley, int dir);
-void    TakeDamage (int points,AActor *attacker);
-void    GivePoints (int32_t points);
 
 //
 // Status bar interface
@@ -45,9 +40,8 @@ void	CreateStatusBar();
 // player state info
 //
 
-void    GiveExtraMan (int amount);
-void    CheckWeaponChange ();
-void    ControlMovement (AActor *self);
+void    CheckWeaponChange (AActor *self);
+void    ControlMovement (class APlayerPawn *self);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -71,10 +65,15 @@ extern class player_t
 		void	BobWeapon(fixed_t *x, fixed_t *y);
 		void	BringUpWeapon();
 		AActor	*FindTarget();
+		void	GiveExtraMan(int amount);
+		void	GivePoints(int32_t points);
 		size_t	PropagateMark();
 		void	Reborn();
 		void	Serialize(FArchive &arc);
 		void	SetPSprite(const Frame *frame, PSprite layer);
+		void	SetFOV(float newlyDesiredFOV);
+		void	AdjustFOV();
+		void	TakeDamage(int points, AActor *attacker);
 
 		enum State
 		{
@@ -106,6 +105,8 @@ extern class player_t
 		short		lives;
 		int32_t		health;
 		float		FOV, DesiredFOV;
+
+		int32_t		thrustspeed;
 
 		FWeaponSlots	weapons;
 		AWeapon			*ReadyWeapon;

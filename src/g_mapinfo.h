@@ -31,7 +31,7 @@
 **
 **
 */
- 
+
 #ifndef __G_MAPINFO_H__
 #define __G_MAPINFO_H__
 
@@ -54,6 +54,7 @@ public:
 	int		PsychedColors[2];
 	int 	PsychedOffset;
 	bool	DrawReadThis;
+	bool	TrackHighScores;
 
 	int		TitleTime;
 	FString	BorderFlat;
@@ -202,6 +203,7 @@ public:
 
 protected:
 	friend class LevelInfoBlockParser;
+	friend void ParseMacMapList(int);
 
 	bool			UseMapInfoName;
 	FString			Name;
@@ -254,11 +256,15 @@ public:
 
 	FString Name;
 	FString SkillPicture;
+	FString MustConfirm;
 	fixed DamageFactor;
 	fixed PlayerDamageFactor;
 	unsigned int SpawnFilter;
 	unsigned int MapFilter;
+	bool FastMonsters;
 	bool QuizHints;
+	int LivesCount;
+	fixed ScoreMultiplier;
 
 	static unsigned int GetNumSkills();
 	static unsigned int GetSkillIndex(const SkillInfo &skill);

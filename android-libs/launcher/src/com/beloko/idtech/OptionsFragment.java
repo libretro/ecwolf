@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Fragment;
@@ -14,7 +15,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -66,7 +66,8 @@ public class OptionsFragment extends Fragment{
 
 		if ((AppSettings.game == IDGame.Doom) || (AppSettings.game == IDGame.Quake3)|| (AppSettings.game == IDGame.RTCW)
 				|| (AppSettings.game == IDGame.Wolf3d)|| (AppSettings.game == IDGame.JK2)|| (AppSettings.game == IDGame.JK3)
-				|| (AppSettings.game == IDGame.Hexen)|| (AppSettings.game == IDGame.Strife)|| (AppSettings.game == IDGame.Heretic)) //If doom, hide the music and other options, now alos Q3!
+				|| (AppSettings.game == IDGame.Hexen)|| (AppSettings.game == IDGame.Strife)|| (AppSettings.game == IDGame.Heretic)
+				|| (AppSettings.game == IDGame.Noah)) //If doom, hide the music and other options, now alos Q3!
 			quakeExtra.setVisibility(View.GONE);
 
 		//Immersion mode for KitKat or above
@@ -114,6 +115,69 @@ public class OptionsFragment extends Fragment{
 				directoryChooserDialog.chooseDirectory(AppSettings.belokoBaseDir);
 			}
 		});
+
+
+		Button resetDir = (Button)mainView.findViewById(R.id.reset_base_button);
+		resetDir.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				AppSettings.resetBaseDir(getActivity());
+				updateBaseDir(AppSettings.belokoBaseDir);
+			}
+		});
+
+
+
+		Button sdcardDir = (Button)mainView.findViewById(R.id.sdcard_base_button);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			sdcardDir.setOnClickListener(new OnClickListener() {
+
+				@TargetApi(Build.VERSION_CODES.KITKAT)
+				@Override
+				public void onClick(View v) {
+					File[] files =getActivity().getExternalFilesDirs(null);
+					
+					if ((files.length < 2) || (files[1] == null))
+					{
+						showError("Can not find an external SD Card, is the card inserted?");
+						return;
+					}
+					
+					final String path = files[1].toString();
+					
+					AlertDialog.Builder dialogBuilder = new Builder(getActivity());
+					dialogBuilder.setTitle("WARNING");
+					dialogBuilder.setMessage("This will use the special location on the external SD Card which can be written to by this app, Android will DELETE this"
+							+ " area when you uninstall the app and you will LOSE YOUR SAVEGAMES and game data!");
+					dialogBuilder.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() 
+					{
+						@Override
+						public void onClick(DialogInterface dialog, int which) 
+						{
+							updateBaseDir(path);
+						}
+					});
+					dialogBuilder.setNegativeButton("Cancel",  new android.content.DialogInterface.OnClickListener() 
+					{
+						@Override
+						public void onClick(DialogInterface dialog, int which) 
+						{
+						
+						}
+					});
+					
+					final AlertDialog errdialog = dialogBuilder.create();
+					errdialog.show();
+					
+				}
+			});
+		}
+		else
+		{
+			sdcardDir.setVisibility(View.GONE);
+		}
+
 
 		Button chooseMusicDir = (Button)mainView.findViewById(R.id.choose_music_button);
 		chooseMusicDir.setOnClickListener(new OnClickListener() {
@@ -269,12 +333,9 @@ public class OptionsFragment extends Fragment{
 							SendDebugEmail();
 						}
 					}
-
 				};
 			}
 		});
-
-
 		return mainView;
 	}
 

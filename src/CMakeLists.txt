@@ -1,14 +1,10 @@
-if(COMMAND cmake_policy)
-	cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
-
-get_target_property( UPDATEREVISION_EXE updaterevision LOCATION )
-
 add_custom_target(revision_check ALL
-	COMMAND ${UPDATEREVISION_EXE} . ${CMAKE_CURRENT_SOURCE_DIR}/svnrevision.h
+	COMMAND updaterevision . ${CMAKE_CURRENT_SOURCE_DIR}/svnrevision.h
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 	DEPENDS updaterevision
 )
+
+set(PLATFORM_EXE_FLAGS "")
 
 include(CheckCXXSourceCompiles)
 include(CheckFunctionExists)
@@ -30,30 +26,31 @@ if(GPL)
 		add_definitions(-DUSE_TEXTSCREEN)
 		include_directories(${ECWolf_SOURCE_DIR}/textscreen)
 		set(EXTRA_LIBRARIES textscreen)
-	else(USE_LIBTEXTSCREEN)
+	else()
 		set(EXTRA_LIBRARIES)
-	endif(USE_LIBTEXTSCREEN)
-else(GPL)
+	endif()
+else()
 	set(OPL_SOURCES mame/fmopl.cpp)
 	set(EXTRA_LIBRARIES)
-endif(GPL)
+endif()
 
 find_package(SDL REQUIRED)
 find_package(SDL_mixer REQUIRED)
-include_directories(${SDLMIXER_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
+find_package(SDL_net REQUIRED)
+include_directories(${SDLMIXER_INCLUDE_DIR} ${SDLNET_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
 
 check_function_exists(stricmp STRICMP_EXISTS)
 check_function_exists(strnicmp STRNICMP_EXISTS)
 check_function_exists(atoll ATOLL_EXISTS)
 if(NOT STRICMP_EXISTS)
 	add_definitions(-Dstricmp=strcasecmp)
-endif(NOT STRICMP_EXISTS)
+endif()
 if(NOT STRNICMP_EXISTS)
 	add_definitions(-Dstrnicmp=strncasecmp)
-endif(NOT STRNICMP_EXISTS)
+endif()
 if(NOT ATOLL_EXISTS)
 	add_definitions(-Datoll=_atoi64)
-endif(NOT ATOLL_EXISTS)
+endif()
 
 check_cxx_source_compiles(
 	"#include <stdarg.h>
@@ -66,14 +63,14 @@ if( NOT HAS_VA_COPY )
 		HAS___VA_COPY )
 	if( HAS___VA_COPY )
 		add_definitions( -Dva_copy=__va_copy )
-	else( HAS___VA_COPY )
+	else()
 		add_definitions( -DNO_VA_COPY )
-	endif( HAS___VA_COPY )
-endif( NOT HAS_VA_COPY )
+	endif()
+endif()
 
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
 	set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}" )
-endif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+endif()
 
 if(WIN32)
 	set(NO_GTK ON)
@@ -94,16 +91,23 @@ if(WIN32)
 		set(EXTRA_FILES ${ECWolf_SOURCE_DIR}/src/win32/windows.rc)
 	endif(CMAKE_COMPILER_IS_GNUCXX)
 
+	# Fix stat in v140_xp (broken in RTM and Update 1 so far)
+	if( MSVC AND MSVC_VERSION EQUAL 1900 AND CMAKE_GENERATOR_TOOLSET STREQUAL "v140_xp" )
+		add_definitions(-D_stat64i32=VS14Stat)
+		set(EXTRA_FILES ${EXTRA_FILES} win32/vs2015hack.cpp)
+	endif( MSVC AND MSVC_VERSION EQUAL 1900 AND CMAKE_GENERATOR_TOOLSET STREQUAL "v140_xp" )
+
+	set(PLATFORM_EXE_FLAGS WIN32)
+
 	set(EXTRA_FILES
 		${EXTRA_FILES}
 		win32/i_crash.cpp
 		win32/i_main.cpp
 		win32/wl_iwad_win32.cpp
-		sdl_winmain.cpp
 	)
 elseif(APPLE OR ANDROID)
 	set(NO_GTK ON)
-else(WIN32)
+else()
 	option( NO_GTK "Disable GTK+ dialogs (Not applicable to Windows)" )
 
 	# Use GTK+ for the IWAD picker, if available.
@@ -112,22 +116,25 @@ else(WIN32)
 		if( GTK2_FOUND )
 			set( EXTRA_LIBRARIES ${EXTRA_LIBRARIES} ${GTK2_LIBRARIES} )
 			include_directories( ${GTK2_INCLUDE_DIRS} )
-		else( GTK2_FOUND )
+		else()
 			set( NO_GTK ON )
-		endif( GTK2_FOUND )
-	endif( NOT NO_GTK )
-endif(WIN32)
+		endif()
+	endif()
+endif()
 
 if(NO_GTK)
 	add_definitions(-DNO_GTK=1)
-endif(NO_GTK)
+endif()
 
 if(APPLE)
 	set(EXTRA_FILES
 		macosx/filesys.mm
-		macosx/SDLMain.m
 		macosx/wl_iwad_picker_cocoa.mm
 	)
+
+	if(${SDL_VERSION_STRING} VERSION_LESS "2.0.0")
+		set(EXTRA_FILES ${EXTRA_FILES} macosx/SDLMain.m)
+	endif()
 
 	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.txt)
 
@@ -146,9 +153,7 @@ elseif(ANDROID)
 	add_definitions(-Dmalloc_usable_size=dlmalloc_usable_size)
 
 	set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} ${TOUCHCONTROLS_LIBRARY} log)
-else(APPLE)
-	set(PLATFORM_EXE_FLAGS "")
-endif(APPLE)
+endif()
 
 # Glob for the header files so project generation can include them
 file(GLOB HEADER_FILES
@@ -207,8 +212,10 @@ set(SOURCE_FILES
 	textures/flattexture.cpp
 	textures/imgztexture.cpp
 	textures/jpegtexture.cpp
+	textures/machudtexture.cpp
 	textures/multipatchtexture.cpp
 	textures/patchtexture.cpp
+	textures/picttexture.cpp
 	textures/pcxtexture.cpp
 	textures/pngtexture.cpp
 	textures/rawpagetexture.cpp
@@ -276,6 +283,7 @@ set(SOURCE_FILES
 	wl_atmos.cpp
 	wl_cloudsky.cpp
 	wl_debug.cpp
+	wl_dir3dspr.cpp
 	wl_draw.cpp
 	wl_floorceiling.cpp
 	wl_game.cpp
@@ -284,6 +292,7 @@ set(SOURCE_FILES
 	wl_loadsave.cpp
 	wl_main.cpp
 	wl_menu.cpp
+	wl_net.cpp
 	wl_parallax.cpp
 	wl_play.cpp
 	wl_state.cpp
@@ -299,7 +308,7 @@ if(NOT ANDROID)
 		${SOURCE_FILES}
 		${EXTRA_FILES}
 	)
-else(NOT ANDROID)
+else()
 	add_library(ecwolf SHARED
 		${HEADER_FILES}
 		${OPL_SOURCES}
@@ -310,16 +319,21 @@ else(NOT ANDROID)
 	# Link test
 	add_executable(link-test android/link-test.c)
 	target_link_libraries(link-test ecwolf)
-endif(NOT ANDROID)
+endif()
 
 add_dependencies(ecwolf lzma gdtoa revision_check)
-target_link_libraries(ecwolf ${EXTRA_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
-set_target_properties(ecwolf PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR})
+target_link_libraries(ecwolf ${EXTRA_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLNET_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
+set_target_properties(ecwolf PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR}
+	# On Linux look for any libraries we link against in the executable directory.
+	INSTALL_RPATH "\$ORIGIN"
+	BUILD_WITH_INSTALL_RPATH ON
+)
 
 # Install
 if(NOT ANDROID)
 	install(TARGETS ecwolf BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION bin COMPONENT Runtime)
-endif(NOT ANDROID)
+endif()
 
 # Project file source groupings
 source_group("Sources" REGULAR_EXPRESSION "^${CMAKE_CURRENT_SOURCE_DIR}/.+")

@@ -38,6 +38,9 @@
 #include "actor.h"
 #include "textures/textures.h"
 
+typedef TFlags<ItemFlag> ItemFlags;
+DEFINE_TFLAGS_OPERATORS (ItemFlags)
+
 class AInventory : public AActor
 {
 	DECLARE_NATIVE_CLASS(Inventory, Actor)
@@ -53,7 +56,7 @@ class AInventory : public AActor
 		void			Touch(AActor *toucher);
 		virtual bool	Use();
 
-		flagstype_t		itemFlags;
+		ItemFlags		itemFlags;
 		TObjPtr<AActor>	owner;
 
 		FNameNoInit		pickupsound;
@@ -123,6 +126,9 @@ enum
 	AWMETA_SlotPriority
 };
 
+typedef TFlags<WeaponFlag> WeaponFlags;
+DEFINE_TFLAGS_OPERATORS (WeaponFlags)
+
 class AWeapon : public AInventory
 {
 	DECLARE_NATIVE_CLASS(Weapon, Inventory)
@@ -161,7 +167,7 @@ class AWeapon : public AInventory
 		bool		HandlePickup(AInventory *item, bool &good);
 		void		Serialize(FArchive &arc);
 
-		flagstype_t		weaponFlags;
+		WeaponFlags		weaponFlags;
 		const ClassDef	*ammotype[2];
 		int				ammogive[2];
 		unsigned int	ammouse[2];

@@ -12,93 +12,124 @@
 #define	__DEBUG_InputMgr__
 #endif
 
-#define KEYCODE_UNMASK(x) (((x)&(~(1<<30)))|0x100)
-#define SCANCODE_UNMASK(x) ((x)&(1<<30) ? KEYCODE_UNMASK(x) : (x))
+#if !SDL_VERSION_ATLEAST(1,3,0)
+#define SDLK_A SDLK_a
+#define SDLK_B SDLK_b
+#define SDLK_C SDLK_c
+#define SDLK_D SDLK_d
+#define SDLK_E SDLK_e
+#define SDLK_F SDLK_f
+#define SDLK_G SDLK_g
+#define SDLK_H SDLK_h
+#define SDLK_I SDLK_i
+#define SDLK_J SDLK_j
+#define SDLK_K SDLK_k
+#define SDLK_L SDLK_l
+#define SDLK_M SDLK_m
+#define SDLK_N SDLK_n
+#define SDLK_O SDLK_o
+#define SDLK_P SDLK_p
+#define SDLK_Q SDLK_q
+#define SDLK_R SDLK_r
+#define SDLK_S SDLK_s
+#define SDLK_T SDLK_t
+#define SDLK_U SDLK_u
+#define SDLK_V SDLK_v
+#define SDLK_W SDLK_w
+#define SDLK_X SDLK_x
+#define SDLK_Y SDLK_y
+#define SDLK_Z SDLK_z
+#define SDLK_GRAVE SDLK_BACKQUOTE
+#define SDLx_SCANCODE(x) SDLK_##x
+#else
+#define SDLx_SCANCODE(x) SDL_SCANCODE_##x
+#endif
+
 typedef	int		ScanCode;
 #define	sc_None			0
 #define	sc_Bad			0xff
-#define	sc_Return		SCANCODE_UNMASK(SDLK_RETURN)
+#define	sc_Return		SDLx_SCANCODE(RETURN)
 #define	sc_Enter		sc_Return
-#define	sc_Escape		SCANCODE_UNMASK(SDLK_ESCAPE)
-#define	sc_Space		SCANCODE_UNMASK(SDLK_SPACE)
-#define	sc_BackSpace	SCANCODE_UNMASK(SDLK_BACKSPACE)
-#define	sc_Tab			SCANCODE_UNMASK(SDLK_TAB)
-#define	sc_Alt			SCANCODE_UNMASK(SDLK_LALT)
-#define	sc_Control		SCANCODE_UNMASK(SDLK_LCTRL)
-#define	sc_CapsLock		SCANCODE_UNMASK(SDLK_CAPSLOCK)
-#define	sc_LShift		SCANCODE_UNMASK(SDLK_LSHIFT)
-#define	sc_RShift		SCANCODE_UNMASK(SDLK_RSHIFT)
-#define	sc_UpArrow		SCANCODE_UNMASK(SDLK_UP)
-#define	sc_DownArrow	SCANCODE_UNMASK(SDLK_DOWN)
-#define	sc_LeftArrow	SCANCODE_UNMASK(SDLK_LEFT)
-#define	sc_RightArrow	SCANCODE_UNMASK(SDLK_RIGHT)
-#define	sc_Insert		SCANCODE_UNMASK(SDLK_INSERT)
-#define	sc_Delete		SCANCODE_UNMASK(SDLK_DELETE)
-#define	sc_Home			SCANCODE_UNMASK(SDLK_HOME)
-#define	sc_End			SCANCODE_UNMASK(SDLK_END)
-#define	sc_PgUp			SCANCODE_UNMASK(SDLK_PAGEUP)
-#define	sc_PgDn			SCANCODE_UNMASK(SDLK_PAGEDOWN)
-#define	sc_F1			SCANCODE_UNMASK(SDLK_F1)
-#define	sc_F2			SCANCODE_UNMASK(SDLK_F2)
-#define	sc_F3			SCANCODE_UNMASK(SDLK_F3)
-#define	sc_F4			SCANCODE_UNMASK(SDLK_F4)
-#define	sc_F5			SCANCODE_UNMASK(SDLK_F5)
-#define	sc_F6			SCANCODE_UNMASK(SDLK_F6)
-#define	sc_F7			SCANCODE_UNMASK(SDLK_F7)
-#define	sc_F8			SCANCODE_UNMASK(SDLK_F8)
-#define	sc_F9			SCANCODE_UNMASK(SDLK_F9)
-#define	sc_F10			SCANCODE_UNMASK(SDLK_F10)
-#define	sc_F11			SCANCODE_UNMASK(SDLK_F11)
-#define	sc_F12			SCANCODE_UNMASK(SDLK_F12)
+#define	sc_Escape		SDLx_SCANCODE(ESCAPE)
+#define	sc_Space		SDLx_SCANCODE(SPACE)
+#define	sc_BackSpace	SDLx_SCANCODE(BACKSPACE)
+#define	sc_Tab			SDLx_SCANCODE(TAB)
+#define	sc_Alt			SDLx_SCANCODE(LALT)
+#define	sc_Control		SDLx_SCANCODE(LCTRL)
+#define	sc_CapsLock		SDLx_SCANCODE(CAPSLOCK)
+#define	sc_LShift		SDLx_SCANCODE(LSHIFT)
+#define	sc_RShift		SDLx_SCANCODE(RSHIFT)
+#define	sc_UpArrow		SDLx_SCANCODE(UP)
+#define	sc_DownArrow	SDLx_SCANCODE(DOWN)
+#define	sc_LeftArrow	SDLx_SCANCODE(LEFT)
+#define	sc_RightArrow	SDLx_SCANCODE(RIGHT)
+#define	sc_Insert		SDLx_SCANCODE(INSERT)
+#define	sc_Delete		SDLx_SCANCODE(DELETE)
+#define	sc_Home			SDLx_SCANCODE(HOME)
+#define	sc_End			SDLx_SCANCODE(END)
+#define	sc_PgUp			SDLx_SCANCODE(PAGEUP)
+#define	sc_PgDn			SDLx_SCANCODE(PAGEDOWN)
+#define	sc_F1			SDLx_SCANCODE(F1)
+#define	sc_F2			SDLx_SCANCODE(F2)
+#define	sc_F3			SDLx_SCANCODE(F3)
+#define	sc_F4			SDLx_SCANCODE(F4)
+#define	sc_F5			SDLx_SCANCODE(F5)
+#define	sc_F6			SDLx_SCANCODE(F6)
+#define	sc_F7			SDLx_SCANCODE(F7)
+#define	sc_F8			SDLx_SCANCODE(F8)
+#define	sc_F9			SDLx_SCANCODE(F9)
+#define	sc_F10			SDLx_SCANCODE(F10)
+#define	sc_F11			SDLx_SCANCODE(F11)
+#define	sc_F12			SDLx_SCANCODE(F12)
 
-#define sc_ScrollLock		SCANCODE_UNMASK(SDLK_SCROLLOCK)
-#define sc_PrintScreen		SCANCODE_UNMASK(SDLK_PRINT)
+#define sc_ScrollLock		SDLx_SCANCODE(SCROLLOCK)
+#define sc_PrintScreen		SDLx_SCANCODE(PRINT)
 
-#define	sc_1			SCANCODE_UNMASK(SDLK_1)
-#define	sc_2			SCANCODE_UNMASK(SDLK_2)
-#define	sc_3			SCANCODE_UNMASK(SDLK_3)
-#define	sc_4			SCANCODE_UNMASK(SDLK_4)
-#define	sc_5			SCANCODE_UNMASK(SDLK_5)
-#define	sc_6			SCANCODE_UNMASK(SDLK_6)
-#define	sc_7			SCANCODE_UNMASK(SDLK_7)
-#define	sc_8			SCANCODE_UNMASK(SDLK_8)
-#define	sc_9			SCANCODE_UNMASK(SDLK_9)
-#define	sc_0			SCANCODE_UNMASK(SDLK_0)
+#define	sc_1			SDLx_SCANCODE(1)
+#define	sc_2			SDLx_SCANCODE(2)
+#define	sc_3			SDLx_SCANCODE(3)
+#define	sc_4			SDLx_SCANCODE(4)
+#define	sc_5			SDLx_SCANCODE(5)
+#define	sc_6			SDLx_SCANCODE(6)
+#define	sc_7			SDLx_SCANCODE(7)
+#define	sc_8			SDLx_SCANCODE(8)
+#define	sc_9			SDLx_SCANCODE(9)
+#define	sc_0			SDLx_SCANCODE(0)
 
-#define	sc_A			SCANCODE_UNMASK(SDLK_a)
-#define	sc_B			SCANCODE_UNMASK(SDLK_b)
-#define	sc_C			SCANCODE_UNMASK(SDLK_c)
-#define	sc_D			SCANCODE_UNMASK(SDLK_d)
-#define	sc_E			SCANCODE_UNMASK(SDLK_e)
-#define	sc_F			SCANCODE_UNMASK(SDLK_f)
-#define	sc_G			SCANCODE_UNMASK(SDLK_g)
-#define	sc_H			SCANCODE_UNMASK(SDLK_h)
-#define	sc_I			SCANCODE_UNMASK(SDLK_i)
-#define	sc_J			SCANCODE_UNMASK(SDLK_j)
-#define	sc_K			SCANCODE_UNMASK(SDLK_k)
-#define	sc_L			SCANCODE_UNMASK(SDLK_l)
-#define	sc_M			SCANCODE_UNMASK(SDLK_m)
-#define	sc_N			SCANCODE_UNMASK(SDLK_n)
-#define	sc_O			SCANCODE_UNMASK(SDLK_o)
-#define	sc_P			SCANCODE_UNMASK(SDLK_p)
-#define	sc_Q			SCANCODE_UNMASK(SDLK_q)
-#define	sc_R			SCANCODE_UNMASK(SDLK_r)
-#define	sc_S			SCANCODE_UNMASK(SDLK_s)
-#define	sc_T			SCANCODE_UNMASK(SDLK_t)
-#define	sc_U			SCANCODE_UNMASK(SDLK_u)
-#define	sc_V			SCANCODE_UNMASK(SDLK_v)
-#define	sc_W			SCANCODE_UNMASK(SDLK_w)
-#define	sc_X			SCANCODE_UNMASK(SDLK_x)
-#define	sc_Y			SCANCODE_UNMASK(SDLK_y)
-#define	sc_Z			SCANCODE_UNMASK(SDLK_z)
+#define	sc_A			SDLx_SCANCODE(A)
+#define	sc_B			SDLx_SCANCODE(B)
+#define	sc_C			SDLx_SCANCODE(C)
+#define	sc_D			SDLx_SCANCODE(D)
+#define	sc_E			SDLx_SCANCODE(E)
+#define	sc_F			SDLx_SCANCODE(F)
+#define	sc_G			SDLx_SCANCODE(G)
+#define	sc_H			SDLx_SCANCODE(H)
+#define	sc_I			SDLx_SCANCODE(I)
+#define	sc_J			SDLx_SCANCODE(J)
+#define	sc_K			SDLx_SCANCODE(K)
+#define	sc_L			SDLx_SCANCODE(L)
+#define	sc_M			SDLx_SCANCODE(M)
+#define	sc_N			SDLx_SCANCODE(N)
+#define	sc_O			SDLx_SCANCODE(O)
+#define	sc_P			SDLx_SCANCODE(P)
+#define	sc_Q			SDLx_SCANCODE(Q)
+#define	sc_R			SDLx_SCANCODE(R)
+#define	sc_S			SDLx_SCANCODE(S)
+#define	sc_T			SDLx_SCANCODE(T)
+#define	sc_U			SDLx_SCANCODE(U)
+#define	sc_V			SDLx_SCANCODE(V)
+#define	sc_W			SDLx_SCANCODE(W)
+#define	sc_X			SDLx_SCANCODE(X)
+#define	sc_Y			SDLx_SCANCODE(Y)
+#define	sc_Z			SDLx_SCANCODE(Z)
 
-#define sc_Equals		SCANCODE_UNMASK(SDLK_EQUALS)
-#define sc_Minus		SCANCODE_UNMASK(SDLK_MINUS)
+#define sc_Equals		SDLx_SCANCODE(EQUALS)
+#define sc_Minus		SDLx_SCANCODE(MINUS)
 
-#define sc_Comma		SCANCODE_UNMASK(SDLK_COMMA)
-#define sc_Peroid		SCANCODE_UNMASK(SDLK_PERIOD)
+#define sc_Comma		SDLx_SCANCODE(COMMA)
+#define sc_Peroid		SDLx_SCANCODE(PERIOD)
 
-#define sc_Grave		SCANCODE_UNMASK(SDLK_BACKQUOTE)
+#define sc_Grave		SDLx_SCANCODE(GRAVE)
 
 #define	key_None		0
 
@@ -137,14 +168,14 @@ typedef	struct		{
 									left,				right,
 									downleft,	down,	downright;
 					} KeyboardDef;
-typedef	struct		{
-						word		joyMinX,joyMinY,
-									threshMinX,threshMinY,
-									threshMaxX,threshMaxY,
-									joyMaxX,joyMaxY,
-									joyMultXL,joyMultYL,
-									joyMultXH,joyMultYH;
-					} JoystickDef;
+
+struct JoystickSens
+{
+	int sensitivity;
+	int deadzone;
+};
+extern JoystickSens *JoySensitivity;
+
 // Global variables
 extern  volatile bool		Keyboard[];
 extern           bool		MousePresent;
@@ -152,6 +183,7 @@ extern  volatile unsigned short Paused;
 extern  volatile char       LastASCII;
 extern  volatile ScanCode   LastScan;
 extern           int        JoyNumButtons;
+extern           int        JoyNumAxes;
 
 
 // Function prototypes
@@ -180,13 +212,13 @@ void    IN_ProcessEvents();
 int     IN_MouseButtons (void);
 void	IN_ReleaseMouse();
 void	IN_GrabMouse();
+void    IN_AdjustMouse();
 
 bool	IN_JoyPresent();
 void    IN_SetJoyCurrent(int joyIndex);
 int     IN_JoyButtons (void);
 int     IN_JoyAxes (void);
 void    IN_GetJoyDelta(int *dx,int *dy);
-void    IN_GetJoyFineDelta(int *dx, int *dy);
 int		IN_GetJoyAxis(int axis);
 
 void    IN_StartAck(void);

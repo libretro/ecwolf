@@ -2,7 +2,7 @@ tiles
 {
 	trigger 90
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		playeruse = true;
@@ -13,7 +13,7 @@ tiles
 	}
 	trigger 91
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 1;
@@ -25,7 +25,7 @@ tiles
 	}
 	trigger 92
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 1;
@@ -37,7 +37,7 @@ tiles
 	}
 	trigger 93
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 1;
@@ -50,7 +50,7 @@ tiles
 	}
 	trigger 94
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 2;
@@ -62,7 +62,7 @@ tiles
 	}
 	trigger 95
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg3 = 2;
@@ -75,7 +75,7 @@ tiles
 	}
 	trigger 96
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		playeruse = true;
@@ -86,7 +86,7 @@ tiles
 	}
 	trigger 97
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 1;
@@ -1040,7 +1040,7 @@ things
 {
 	trigger 98
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 8;
 		arg2 = 2;
 		arg3 = 2;
@@ -1051,82 +1051,82 @@ things
 	// Trigger 99 is a secret door path in SNES Wolf, does not appear to be used by DOS Noah's Ark.
 	trigger 99
 	{
-		action = 0;
+		action = "";
 	}
 
 	trigger 100
 	{
-		action = 3;
+		action = "Exit_Normal";
 		playercross = true;
 	}
 
 	trigger 101
 	{
-		action = 4;
+		action = "Exit_Secret";
 		playercross = true;
 	}
 
-	// oldnum, newnum, angles, patrol, minskill
-	{19,	1,		4,	0,	0}
-	{23,	158,	0,	0,	0}
-	{24,	159,	0,	0,	0}
-	{25,	160,	0,	0,	0}
-	{26,	161,	0,	0,	0}
-	{27,	162,	0,	0,	0}
-	{28,	163,	0,	0,	0}
-	{29,	164,	0,	0,	0}
-	{30,	165,	0,	0,	0}
-	{31,	166,	0,	0,	0}
-	{32,	167,	0,	0,	0}
-	{33,	168,	0,	0,	0}
-	{34,	169,	0,	0,	0}
-	{35,	170,	0,	0,	0}
-	{36,	171,	0,	0,	0}
-	{37,	172,	0,	0,	0}
-	{38,	173,	0,	0,	0}
-	{39,	174,	0,	0,	0}
-	{40,	175,	0,	0,	0}
-	{41,	176,	0,	0,	0}
-	{42,	177,	0,	0,	0}
-	{43,	178,	0,	0,	0}
-	{44,	179,	0,	0,	0}
-	{45,	180,	0,	0,	0}
-	{46,	181,	0,	0,	0}
-	{47,	182,	0,	0,	0}
-	{48,	183,	0,	0,	0}
-	{49,	184,	0,	0,	0}
-	{50,	185,	0,	0,	0}
-	{51,	186,	0,	0,	0}
-	{52,	187,	0,	0,	0}
-	{53,	188,	0,	0,	0}
-	{54,	189,	0,	0,	0}
-	{55,	190,	0,	0,	0}
-	{56,	191,	0,	0,	0}
-	{57,	192,	0,	0,	0}
-	{58,	193,	0,	0,	0}
-	{59,	194,	0,	0,	0}
-	{90,	10,		8,	0,	0}
-	{108,	195,	0,	HOLOWALL,	0}
-	{109,	196,	0,	HOLOWALL,	0}
-	{110,	197,	0,	HOLOWALL,	0}
-	{111,	198,	0,	HOLOWALL,	0}
-	{112,	199,	0,	HOLOWALL,	0}
-	{113,	200,	0,	HOLOWALL,	0}
-	{114,	201,	0,	HOLOWALL,	0}
-	{115,	202,	0,	HOLOWALL,	0}
-	{116,	203,	0,	HOLOWALL,	0}
-	{117,	204,	0,	HOLOWALL,	0}
-	{118,	205,	0,	HOLOWALL,	0}
-	{126,	195,	0,	HOLOWALL|AMBUSH,	0}
-	{127,	196,	0,	HOLOWALL|AMBUSH,	0}
-	{128,	197,	0,	HOLOWALL|AMBUSH,	0}
-	{129,	198,	0,	HOLOWALL|AMBUSH,	0}
-	{130,	199,	0,	HOLOWALL|AMBUSH,	0}
+	// oldnum, class, angles, patrol, minskill
+	{19,  $Player1Start,       4, 0, 0}
+	{23,  ArkPuddle,           0, 0, 0}
+	{24,  WaterBucket,         0, 0, 0}
+	{25,  TableWithCandle,     0, 0, 0}
+	{26,  WoodenBarrel,        0, 0, 0}
+	{27,  ArkScraps,           0, 0, 0}
+	{28,  BibleQuiz,           0, 0, 0}
+	{29,  FeedBucket,          0, 0, 0}
+	{30,  ColumnWithCandles,   0, 0, 0}
+	{31,  ThinColumn,          0, 0, 0}
+	{32,  BirdCage,            0, 0, 0}
+	{33,  WaterPitcher,        0, 0, 0}
+	{34,  ArkPuddleWithScraps, 0, 0, 0}
+	{35,  ArkOverheadPost,     0, 0, 0}
+	{36,  ArkChandelier,       0, 0, 0}
+	{37,  ArkWaterTrough,      0, 0, 0}
+	{38,  CandlePole,          0, 0, 0}
+	{39,  ArkGoldKeyRing,      0, 0, 0}
+	{40,  ArkSilverKeyRing,    0, 0, 0}
+	{41,  FeedSack,            0, 0, 0}
+	{42,  FeedTrough,          0, 0, 0}
+	{43,  SmallBandage,        0, 0, 0}
+	{44,  LargeBandage,        0, 0, 0}
+	{45,  Feed,                0, 0, 0}
+	{46,  LargeFeedLauncher,   0, 0, 0}
+	{47,  SuperFeeder5000,     0, 0, 0}
+	{48,  ArkBanana,           0, 0, 0}
+	{49,  ArkApple,            0, 0, 0}
+	{50,  ArkGrapes,           0, 0, 0}
+	{51,  ArkPeach,            0, 0, 0}
+	{52,  ArkOneUp,            0, 0, 0}
+	{53,  ArkMetalCage,        0, 0, 0}
+	{54,  PlainColumn,         0, 0, 0}
+	{55,  CantaloupeFeeder,    0, 0, 0}
+	{56,  CantaloupeAmmo,      0, 0, 0}
+	{57,  WatermelonFeeder,    0, 0, 0}
+	{58,  MelonAmmo,           0, 0, 0}
+	{59,  ArkMap,              0, 0, 0}
+	{90,  PatrolPoint,         8, 0, 0}
+	{108, ArkSheep,            0, HOLOWALL, 0}
+	{109, ArkOstrich,          0, HOLOWALL, 0}
+	{110, ArkAntelope,         0, HOLOWALL, 0}
+	{111, ArkGoat,             0, HOLOWALL, 0}
+	{112, ArkOx,               0, HOLOWALL, 0}
+	{113, CarlTheCamel,        0, HOLOWALL, 0}
+	{114, MelvinTheMonkey,     0, HOLOWALL, 0}
+	{115, GinnyTheGiraffe,     0, HOLOWALL, 0}
+	{116, KerryTheKangaroo,    0, HOLOWALL, 0}
+	{117, ErnieTheElephant,    0, HOLOWALL, 0}
+	{118, DisguisedBurt,       0, HOLOWALL, 0}
+	{126, ArkSheep,            0, HOLOWALL|AMBUSH, 0}
+	{127, ArkOstrich,          0, HOLOWALL|AMBUSH, 0}
+	{128, ArkAntelope,         0, HOLOWALL|AMBUSH, 0}
+	{129, ArkGoat,             0, HOLOWALL|AMBUSH, 0}
+	{130, ArkOx,               0, HOLOWALL|AMBUSH, 0}
 	//The bosses are identical between the two sets
-	{131,	200,	0,	HOLOWALL,	0}
-	{132,	201,	0,	HOLOWALL,	0}
-	{133,	202,	0,	HOLOWALL,	0}
-	{134,	203,	0,	HOLOWALL,	0}
-	{135,	204,	0,	HOLOWALL,	0}
-	{136,	205,	0,	HOLOWALL,	0}
+	{131, CarlTheCamel,        0, HOLOWALL, 0}
+	{132, MelvinTheMonkey,     0, HOLOWALL, 0}
+	{133, GinnyTheGiraffe,     0, HOLOWALL, 0}
+	{134, KerryTheKangaroo,    0, HOLOWALL, 0}
+	{135, ErnieTheElephant,    0, HOLOWALL, 0}
+	{136, DisguisedBurt,       0, HOLOWALL, 0}
 }

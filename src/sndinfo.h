@@ -36,10 +36,14 @@
 #define __SNDINFO_H__
 
 #include "tarray.h"
+#include "tmemory.h"
 #include "name.h"
 #include "zstring.h"
 
 class SoundInformation;
+
+struct Mix_Chunk;
+extern "C" void Mix_FreeChunk(Mix_Chunk *);
 
 class SoundIndex
 {
@@ -63,27 +67,32 @@ class SoundData
 		};
 
 		SoundData();
-		SoundData(const SoundData &other);
 		~SoundData();
 
-		byte*			GetData(Type type=ADLIB) const { return data[type]; }
-		unsigned short	GetPriority() const { return priority; }
-		bool			HasType(Type type=ADLIB) const { return lump[type] != -1; }
-		bool			IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1 && !isAlias; }
+		byte* GetAdLibData() const { return adlibData; }
+		Mix_Chunk *GetDigitalData() const { return digitalData; }
+		unsigned short GetPriority() const { return priority; }
+		byte* GetSpeakerData() const { return speakerData; }
+		bool HasType(Type type=ADLIB) const { return lump[type] != -1; }
+		bool IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1 && !isAlias; }
 
-		const SoundData &operator= (const SoundData &other);
+	private:
+		const SoundData &operator= (const SoundData &);
+		SoundData(const SoundData &);
+
 	protected:
-		FString			logicalName;
-		SoundIndex		index;
-		byte*			data[3];
-		int				lump[3];
-		unsigned int	length[3];
-		unsigned short	priority;
+		FString logicalName;
+		SoundIndex index;
+		TUniquePtr<Mix_Chunk, TFuncDeleter<Mix_Chunk, Mix_FreeChunk> > digitalData;
+		TUniquePtr<byte[]> adlibData, speakerData;
+		int lump[3];
+		unsigned short priority;
 
-		bool				isAlias;
-		TArray<SoundIndex>	aliasLinks;
+		bool isAlias;
+		TArray<SoundIndex> aliasLinks;
 
 		friend class SoundInformation;
+		friend struct TMoveInsert<SoundData>;
 };
 
 class SoundInformation

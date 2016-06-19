@@ -44,6 +44,7 @@
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"
+#include "wl_loadsave.h"
 #include "wl_play.h"
 #include "g_mapinfo.h"
 #include "g_shared/a_keys.h"
@@ -164,7 +165,7 @@ class EVDoor : public Thinker
 						const MapZone *zone2 = spot->GetAdjacent(MapTile::Side(direction), true)->zone;
 						map->LinkZones(zone1, zone2, true);
 
-						if(map->CheckLink(zone1, players[0].mo->GetZone(), true))
+						if(map->CheckLink(zone1, players[ConsolePlayer].mo->GetZone(), true))
 							sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_OpenNormal), spot);
 					}
 
@@ -183,7 +184,7 @@ class EVDoor : public Thinker
 				case Opened:
 					if(wait == 0)
 					{
-						if(CheckJammed())
+						if(CheckJammed(false))
 						{
 							// Might as well reset the door timer, chances are the actor isn't going any where
 							wait = opentics;
@@ -212,7 +213,10 @@ class EVDoor : public Thinker
 			}
 		}
 
-		bool Reactivate(AActor *activator, bool ismonster)
+		// forceclose is a temporary workaround for the issue where monsters can
+		// jam elevator doors and breaking levels. TODO: Replace with ROTT's
+		// crushing/gibbing behavior.
+		bool Reactivate(AActor *activator, bool ismonster, bool forceclose=false)
 		{
 			switch(state)
 			{
@@ -223,9 +227,9 @@ class EVDoor : public Thinker
 						return false;
 					}
 				default:
-					if(!ismonster && !CheckJammed())
-						return ChangeState(Closing);
-					break;
+					if(ismonster || CheckJammed(forceclose))
+						break;
+					return ChangeState(Closing);
 				case Closing:
 					return ChangeState(Opening);
 			}
@@ -243,6 +247,8 @@ class EVDoor : public Thinker
 				<< amount
 				<< wait
 				<< direction;
+			if(GameSave::SaveVersion > 1410810515)
+				arc << sndseq << seqname << opentics;
 
 			Super::Serialize(arc);
 		}
@@ -272,12 +278,15 @@ class EVDoor : public Thinker
 			return true;
 		}
 
-		bool CheckJammed() const
+		bool CheckJammed(bool onlysolid) const
 		{
 			for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 			{
 				if(!CheckClears(iter))
-					return true;
+				{
+					if(!onlysolid || (iter->flags & FL_SOLID))
+						return true;
+				}
 			}
 			return false;
 		}
@@ -301,7 +310,7 @@ class EVDoor : public Thinker
 					}
 					break;
 				case Closing:
-					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[0].mo->GetZone(), true))
+					if(map->CheckLink(spot->GetAdjacent(MapTile::Side(direction))->zone, players[ConsolePlayer].mo->GetZone(), true))
 						sndseq = new SndSeqPlayer(SoundSeq(seqname, SEQ_CloseNormal), spot);
 					break;
 			}
@@ -328,7 +337,7 @@ FUNC(Door_Open)
 
 	if(activator->player)
 	{
-		if(buttonheld[bt_use])
+		if(control[activator->player - players].buttonheld[bt_use])
 			return 0;
 	}
 
@@ -347,7 +356,7 @@ FUNC(Door_Open)
 		{
 			if(spot->thinker->IsThinkerType<EVDoor>())
 			{
-				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+				return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 			}
 			return 0;
 		}
@@ -364,7 +373,7 @@ FUNC(Door_Open)
 			{
 				if(door->thinker->IsThinkerType<EVDoor>())
 				{
-					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+					return barrier_cast<EVDoor *>(door->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 				}
 				continue;
 			}
@@ -398,7 +407,7 @@ public:
 				EVDoor *doorThinker = barrier_cast<EVDoor *>(door->thinker);
 				if(!doorThinker->IsClosing())
 				{
-					if(!doorThinker->Reactivate(activator, !!(activator->flags & FL_ISMONSTER)))
+					if(!doorThinker->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER), true))
 					{
 						Destroy();
 						return;
@@ -498,32 +507,33 @@ public:
 						}
 						else if(ddeltax == 0 && sdeltax)
 						{
-							int tmp = relx;
-							if(ddeltay > 0)
-							{
-								rely = relx;
-								relx = -tmp;
-								angle = ANGLE_90;
-
-								tmp = fracx;
-								fracx = (FRACUNIT-fracy);
-								fracy = tmp;
-							}
-							else
+							int tmp = rely;
+							if(ddeltay < 0)
 							{
 								rely = -relx;
 								relx = tmp;
-								angle = ANGLE_270;
+								angle = ANGLE_90;
 
 								tmp = (FRACUNIT-fracx);
 								fracx = fracy;
 								fracy = tmp;
 							}
+							else
+							{
+								rely = relx;
+								relx = -tmp;
+								angle = ANGLE_270;
+
+								tmp = fracx;
+								fracx = (FRACUNIT-fracy);
+								fracy = tmp;
+
+							}
 						}
 						else if(ddeltay == 0 && sdeltay)
 						{
 							int tmp = relx;
-							if(ddeltax > 0)
+							if(ddeltax < 0)
 							{
 								relx = rely;
 								rely = -tmp;
@@ -547,6 +557,7 @@ public:
 						activator->x = ((next->GetX() - relx)<<16)|fracx;
 						activator->y = ((next->GetY() - rely)<<16)|fracy;
 						activator->angle += angle;
+						activator->EnterZone(map->GetSpot(activator->tilex, activator->tiley, 0)->zone);
 					}
 				}
 				break;
@@ -562,13 +573,34 @@ public:
 						MapTrigger &trig = nextDoor->triggers[i];
 						if(trig.action == Door_Elevator)
 						{
-							map->ActivateTrigger(trig, MapTrigger::East, NULL);
+							map->ActivateTrigger(trig, MapTrigger::East, activator);
 							break;
 						}
 					}
 				}
 				break;
 		}
+	}
+
+	void Serialize(FArchive &arc)
+	{
+		if(GameSave::SaveVersion > 1438232816)
+		{
+			BYTE state = this->state;
+			arc << state;
+			this->state = static_cast<State>(state);
+
+			arc << activator
+				<< sndseq
+				<< spot
+				<< door
+				<< next
+				<< nextDoor
+				<< elevTag
+				<< callSpeed;
+		}
+
+		Super::Serialize(arc);
 	}
 
 protected:
@@ -586,7 +618,7 @@ protected:
 private:
 	enum State { ClosingDoor, Moving, Shaking, Finished };
 
-	AActor *activator;
+	TObjPtr<AActor> activator;
 	SndSeqPlayer *sndseq;
 	MapSpot spot;
 	MapSpot door;
@@ -596,7 +628,9 @@ private:
 	unsigned int callSpeed;
 	State state;
 };
-IMPLEMENT_INTERNAL_CLASS(EVElevator)
+IMPLEMENT_INTERNAL_POINTY_CLASS(EVElevator)
+	DECLARE_POINTER(activator)
+END_POINTERS
 
 // Takes same arugments as Door_Open, but the tag points to the elevator switch.
 // Will attempt to call the elevator if not in the correct position.
@@ -609,7 +643,7 @@ FUNC(Door_Elevator)
 	{
 		if(activator->player)
 		{
-			if(buttonheld[bt_use])
+			if(control[activator->player - players].buttonheld[bt_use])
 				return 0;
 		}
 
@@ -627,7 +661,7 @@ FUNC(Door_Elevator)
 	{
 		if(spot->thinker->IsThinkerType<EVDoor>())
 		{
-			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, !!(activator->flags & FL_ISMONSTER));
+			return barrier_cast<EVDoor *>(spot->thinker)->Reactivate(activator, activator && (activator->flags & FL_ISMONSTER));
 		}
 		return 0;
 	}
@@ -691,9 +725,9 @@ class EVPushwall : public Thinker
 	DECLARE_CLASS(EVPushwall, Thinker)
 
 	public:
-		EVPushwall(MapSpot spot, unsigned int speed, MapTrigger::Side direction, unsigned int distance) :
+		EVPushwall(MapSpot spot, unsigned int speed, MapTrigger::Side direction, unsigned int distance, bool nostop) :
 			Thinker(ThinkerList::WORLD), spot(spot), moveTo(NULL), direction(direction), position(0),
-			speed(speed), distance(distance)
+			speed(speed), distance(distance), nostop(nostop)
 		{
 			if(spot->tile->soundSequence == NAME_None)
 				seqname = gameinfo.PushwallSoundSequence;
@@ -770,7 +804,7 @@ class EVPushwall : public Thinker
 					#endif
 				}
 
-				if(!CheckSpotFree(moveTo))
+				if(!nostop && !CheckSpotFree(moveTo))
 				{
 					Destroy();
 					return;
@@ -820,6 +854,9 @@ class EVPushwall : public Thinker
 				<< speed
 				<< distance;
 
+			if(GameSave::SaveVersion > 1410810515)
+				arc << sndseq << seqname;
+
 			Super::Serialize(arc);
 		}
 
@@ -834,10 +871,11 @@ class EVPushwall : public Thinker
 		unsigned int	position;
 		unsigned int	speed;
 		unsigned int	distance;
+		bool nostop;
 };
 IMPLEMENT_INTERNAL_CLASS(EVPushwall)
 
-FUNC(Pushwall_Move)
+static int DoPushwall(MapSpot spot, MapTrigger::Side direction, const int *args, bool nostop)
 {
 	static const unsigned int PUSHWALL_DIR_DIAGONAL = 0x1;
 	static const unsigned int PUSHWALL_DIR_ABSOLUTE = 0x8;
@@ -855,7 +893,7 @@ FUNC(Pushwall_Move)
 			return 0;
 		}
 
-		new EVPushwall(spot, args[1], dir, args[3]);
+		new EVPushwall(spot, args[1], dir, args[3], nostop);
 	}
 	else
 	{
@@ -869,18 +907,34 @@ FUNC(Pushwall_Move)
 			}
 
 			activated = true;
-			new EVPushwall(pwall, args[1], dir, args[3]);
+			new EVPushwall(pwall, args[1], dir, args[3], nostop);
 		}
 		return activated;
 	}
 	return 1;
 }
 
+FUNC(Pushwall_Move)
+{
+	return DoPushwall(spot, direction, args, false);
+}
+
+FUNC(Pushwall_MoveNoStop)
+{
+	// TODO: This really needs the pushwalls to be detached from our map grid.
+	// Secondly we might want to look into crushing features? I think ROTT does
+	// that.
+	return DoPushwall(spot, direction, args, true);
+}
+
 FUNC(Exit_Normal)
 {
-	if(buttonheld[bt_use])
-		return 0;
-	buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_completed;
 	SD_WaitSoundDone();
@@ -889,9 +943,13 @@ FUNC(Exit_Normal)
 
 FUNC(Exit_Secret)
 {
-	if(buttonheld[bt_use])
-		return 0;
-	buttonheld[bt_use] = true;
+	
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_secretlevel;
 	SD_WaitSoundDone();
@@ -900,9 +958,12 @@ FUNC(Exit_Secret)
 
 FUNC(Exit_Victory)
 {
-	if(buttonheld[bt_use])
-		return 0;
-	buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_victorious;
 	SD_WaitSoundDone();
@@ -911,9 +972,12 @@ FUNC(Exit_Victory)
 
 FUNC(Teleport_NewMap)
 {
-	if(buttonheld[bt_use])
-		return 0;
-	buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	playstate = ex_newmap;
 	NewMap.newmap = args[0];
@@ -931,7 +995,7 @@ class EVVictorySpin : public Thinker
 			doturn(true), dist(6*FRACUNIT + FRACUNIT/2), activator(activator)
 		{
 			gamestate.victoryflag = true;
-			players[0].SetPSprite(NULL, player_t::ps_weapon);
+			activator->player->SetPSprite(NULL, player_t::ps_weapon);
 
 			runner = AActor::Spawn(ClassDef::FindClass("BJRun"), activator->x, activator->y, 0, SPAWN_AllowReplacement);
 			runner->flags |= FL_PATHING;
@@ -1024,9 +1088,12 @@ IMPLEMENT_INTERNAL_POINTY_CLASS(EVVictorySpin)
 END_POINTERS
 FUNC(Exit_VictorySpin)
 {
-	if(buttonheld[bt_use])
-		return 0;
-	buttonheld[bt_use] = true;
+	if(activator->player)
+	{
+		if(control[activator->player - players].buttonheld[bt_use])
+			return 0;
+		control[activator->player - players].buttonheld[bt_use] = true;
+	}
 
 	new EVVictorySpin(activator, direction);
 	return 1;

@@ -3,7 +3,6 @@
     android:layout_height="fill_parent" >
 
     <LinearLayout
-      
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
@@ -20,30 +19,44 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="All Beloko Games are located here. The folders &apos;Quake/Quake2/Doom/&apos; etc should be UNDER here (Default is &apos;/sdcard/Beloko&apos;)."
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <RelativeLayout
+        <TextView
+            android:id="@+id/base_path_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/choose_base_button"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/light_green" >
+        </TextView>
+
+        <LinearLayout
             android:id="@+id/layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" >
 
-            <TextView
-                android:id="@+id/base_path_textview"
+             <Button
+                android:id="@+id/sdcard_base_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/choose_base_button"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/light_green" >
-            </TextView>
+                android:layout_gravity="right"
+                android:text="SDCard" />
+             
+            <Button
+                android:id="@+id/reset_base_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="Reset" />
 
             <Button
                 android:id="@+id/choose_base_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_gravity="right"
                 android:text="Choose" />
-        </RelativeLayout>
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -96,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Choose the location of the Quake (or any!) music files. Plays maximum of 11 mp3 files."
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <RelativeLayout
                 android:id="@+id/layout"
@@ -147,7 +160,6 @@
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <LinearLayout
-              
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal" >
@@ -219,7 +231,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Choose the EGL mode to use. This is an advanced option and does not usually need to change."
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -264,7 +276,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="If you are having trouble launching the game, we may request you to send a debug log. Try to launch the game, then press the button below."
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <Button
             android:id="@+id/save_logcat_button"

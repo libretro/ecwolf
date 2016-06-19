@@ -1163,7 +1163,7 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	fixed_t x;
 	double rot = rotation * M_PI / double(1u << 31);
 	bool dorotate = rot != 0;
-	double cosrot, sinrot;
+	double cosrot = 1, sinrot = 0;
 
 	if (--npoints < 2 || Buffer == NULL)
 	{ // not a polygon or we're not locked

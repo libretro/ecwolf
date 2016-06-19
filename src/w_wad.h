@@ -52,6 +52,8 @@ struct wadlump_t
 
 // [RH] Namespaces from BOOM.
 typedef enum {
+	ns_hidden = -1,
+
 	ns_global = 0,
 	ns_sprites,
 	ns_flats,
@@ -85,6 +87,7 @@ enum ELumpFlags
 	LUMPF_EMBEDDED=4,
 	LUMPF_BLOODCRYPT = 8,
 	LUMPF_DONTFLIPFLAT = 16,
+	LUMPF_DOUBLERESFLAT = 32,
 };
 
 

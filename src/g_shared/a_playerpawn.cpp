@@ -62,7 +62,7 @@ AWeapon *APlayerPawn::BestWeapon(const ClassDef *ammo)
 			continue;
 
 		AWeapon *weapon = static_cast<AWeapon *>(item);
-		if(ammo && weapon->ammo[0]->GetClass() != ammo)
+		if(ammo && (weapon->ammo[0] == NULL || weapon->ammo[0]->GetClass() != ammo))
 			continue;
 		if(!weapon->CheckAmmo(AWeapon::PrimaryFire, false))
 			continue;
@@ -191,7 +191,7 @@ void APlayerPawn::Serialize(FArchive &arc)
 
 void APlayerPawn::SetupWeaponSlots()
 {
-	players[0].weapons.StandardSetup(GetClass());
+	player->weapons.StandardSetup(GetClass());
 }
 
 void APlayerPawn::Tick()
@@ -202,101 +202,71 @@ void APlayerPawn::Tick()
 
 	TickPSprites();
 
-	// [RH] Smooth transitions between bobbing and not-bobbing frames.
-	// This also fixes the bug where you can "stick" a weapon off-center by
-	// shooting it when it's at the peak of its swing.
-	static fixed curbob = 0;
-
-	if(movebob)
+	if(player - players == ConsolePlayer)
 	{
-		static const fixed MAXBOB = 0x100000;
-		fixed bobtarget = gamestate.victoryflag ? 0 : FixedMul(thrustspeed << 8, movebob);
-		if(bobtarget > MAXBOB)
-			bobtarget = MAXBOB;
+		// [RH] Smooth transitions between bobbing and not-bobbing frames.
+		// This also fixes the bug where you can "stick" a weapon off-center by
+		// shooting it when it's at the peak of its swing.
+		static fixed curbob = 0;
 
-		if (curbob != bobtarget)
+		if(movebob)
 		{
-			if (abs (bobtarget - curbob) <= 1*FRACUNIT)
+			static const fixed MAXBOB = 0x100000;
+			fixed bobtarget = gamestate.victoryflag ? 0 : FixedMul(player->thrustspeed << 8, movebob);
+			if(bobtarget > MAXBOB)
+				bobtarget = MAXBOB;
+
+			if (curbob != bobtarget)
 			{
-				curbob = bobtarget;
-			}
-			else
-			{
-				fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
-				if (curbob > bobtarget)
+				if (abs (bobtarget - curbob) <= 1*FRACUNIT)
 				{
-					curbob -= zoom;
+					curbob = bobtarget;
 				}
 				else
 				{
-					curbob += zoom;
+					fixed_t zoom = MAX<fixed_t> (1*FRACUNIT, abs (curbob - bobtarget) / 40);
+					if (curbob > bobtarget)
+					{
+						curbob -= zoom;
+					}
+					else
+					{
+						curbob += zoom;
+					}
 				}
 			}
 		}
-	}
-	else
-		curbob = 0;
-
-	player->bob = curbob;
-
-	// [RH] Zoom the player's FOV
-	float desired = player->DesiredFOV;
-	// Adjust FOV using on the currently held weapon.
-	if (player->state != player_t::PST_DEAD &&		// No adjustment while dead.
-		player->ReadyWeapon != NULL &&			// No adjustment if no weapon.
-		player->ReadyWeapon->fovscale != 0)		// No adjustment if the adjustment is zero.
-	{
-		// A negative scale is used to prevent G_AddViewAngle/G_AddViewPitch
-		// from scaling with the FOV scale.
-		desired *= fabs(player->ReadyWeapon->fovscale);
-	}
-	if (player->FOV != desired)
-	{
-		// Negative FOV means recalculate projection
-		if (player->FOV < 0)
-		{
-			player->FOV *= -1;
-		}
-		else if (fabsf (player->FOV - desired) < 7.f)
-		{
-			player->FOV = desired;
-		}
 		else
-		{
-			float zoom = MAX(7.f, fabsf(player->FOV - desired) * 0.025f);
-			if (player->FOV > desired)
-			{
-				player->FOV = player->FOV - zoom;
-			}
-			else
-			{
-				player->FOV = player->FOV + zoom;
-			}
-		}
+			curbob = 0;
 
-		CalcProjection(radius);
+		player->bob = curbob;
 	}
+
+	player->AdjustFOV();
 
 	// Watching BJ
 	if(gamestate.victoryflag)
 		return;
 
-	StatusBar->UpdateFace();
-	CheckWeaponChange();
+	if((player - players) == ConsolePlayer)
+		StatusBar->UpdateFace();
+	CheckWeaponChange(this);
 
-	if(buttonstate[bt_use])
+	TicCmd_t &cmd = control[player - players];
+
+	if(cmd.buttonstate[bt_use])
 		Cmd_Use();
 
 	if((player->flags & (player_t::PF_WEAPONREADY|player_t::PF_WEAPONREADYALT)))
 	{
 		// Determine primary or alternate attack
 		Button fireButton = bt_nobutton;
-		if(buttonstate[bt_attack] && (player->flags & player_t::PF_WEAPONREADY))
+		if(cmd.buttonstate[bt_attack] && (player->flags & player_t::PF_WEAPONREADY))
 		{
 			fireButton = bt_attack;
 			player->ReadyWeapon->mode = AWeapon::PrimaryFire;
 		}
-		else if(buttonstate[bt_altattack] && (player->flags & player_t::PF_WEAPONREADYALT))
+		else if(cmd.buttonstate[bt_altattack] && (player->flags & player_t::PF_WEAPONREADYALT))
 		{
 			fireButton = bt_altattack;
 			player->ReadyWeapon->mode = AWeapon::AltFire;
@@ -305,11 +275,13 @@ void APlayerPawn::Tick()
 		// Try to fire
 		if(fireButton != bt_nobutton && player->ReadyWeapon->CheckAmmo(player->ReadyWeapon->mode, true))
 		{
-			if(!buttonheld[fireButton])
+			if(!cmd.buttonheld[fireButton])
 				player->attackheld = false;
 			if(!(player->ReadyWeapon->weaponFlags & WF_NOAUTOFIRE) || !player->attackheld)
 			{
 				player->attackheld = true;
+				if(MissileState)
+					SetState(MissileState);
 				player->SetPSprite(player->ReadyWeapon->GetAtkState(player->ReadyWeapon->mode, false), player_t::ps_weapon);
 			}
 		}
@@ -319,17 +291,17 @@ void APlayerPawn::Tick()
 		}
 	}
 	else if(player->attackheld)
-		player->attackheld = buttonstate[bt_attack]|buttonstate[bt_altattack];
+		player->attackheld = cmd.buttonstate[bt_attack]|cmd.buttonstate[bt_altattack];
 
 	// Reload
-	if((player->flags & player_t::PF_WEAPONRELOADOK) && buttonstate[bt_reload])
+	if((player->flags & player_t::PF_WEAPONRELOADOK) && cmd.buttonstate[bt_reload])
 	{
 		const Frame *reload = player->ReadyWeapon->GetReloadState();
 		if(reload)
 			player->SetPSprite(reload, player_t::ps_weapon);
 	}
 	// Zoom
-	if((player->flags & player_t::PF_WEAPONZOOMOK) && buttonstate[bt_zoom])
+	if((player->flags & player_t::PF_WEAPONZOOMOK) && cmd.buttonstate[bt_zoom])
 	{
 		const Frame *zoom = player->ReadyWeapon->GetZoomState();
 		if(zoom)

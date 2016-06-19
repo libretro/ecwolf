@@ -112,6 +112,9 @@ FFlatTexture::FFlatTexture (int lumpnum)
 	DummySpans[0].Length = Height;
 	DummySpans[1].TopOffset = 0;
 	DummySpans[1].Length = 0;
+
+	if(Wads.GetLumpFlags(lumpnum) & LUMPF_DOUBLERESFLAT)
+		yScale = xScale = 2*FRACUNIT;
 }
 
 //==========================================================================

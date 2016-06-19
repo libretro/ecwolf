@@ -102,12 +102,12 @@ void AM_ChangeResolution()
 
 void AM_CheckKeys()
 {
-	if(ambuttonstate[bt_zoomin])
+	if(control[ConsolePlayer].ambuttonstate[bt_zoomin])
 	{
 		AM_Overlay.SetScale(FRACUNIT*135/128, true);
 		AM_Main.SetScale(FRACUNIT*135/128, true);
 	}
-	if(ambuttonstate[bt_zoomout])
+	if(control[ConsolePlayer].ambuttonstate[bt_zoomout])
 	{
 		AM_Overlay.SetScale(FRACUNIT*122/128, true);
 		AM_Main.SetScale(FRACUNIT*122/128, true);
@@ -116,15 +116,24 @@ void AM_CheckKeys()
 	if(am_pause)
 	{
 		static const fixed PAN_AMOUNT = FRACUNIT/4;
+		static const fixed PAN_ANALOG_MULTIPLIER = 100;
 		fixed panx = 0, pany = 0;
-		if(ambuttonstate[bt_panleft])
+
+		if(control[ConsolePlayer].ambuttonstate[bt_panleft])
 			panx += PAN_AMOUNT;
-		if(ambuttonstate[bt_panright])
+		if(control[ConsolePlayer].ambuttonstate[bt_panright])
 			panx -= PAN_AMOUNT;
-		if(ambuttonstate[bt_panup])
+		if(control[ConsolePlayer].ambuttonstate[bt_panup])
 			pany += PAN_AMOUNT;
-		if(ambuttonstate[bt_pandown])
+		if(control[ConsolePlayer].ambuttonstate[bt_pandown])
 			pany -= PAN_AMOUNT;
+
+		if(control[ConsolePlayer].controlpanx != 0)
+			panx += control[ConsolePlayer].controlpanx * (PAN_ANALOG_MULTIPLIER + (100 * panxadjustment));
+
+		if(control[ConsolePlayer].controlpany != 0)
+			pany += control[ConsolePlayer].controlpany * (PAN_ANALOG_MULTIPLIER + (100 * panxadjustment));
+
 		AM_Main.SetPanning(panx, pany, true);
 	}
 }

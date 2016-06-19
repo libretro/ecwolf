@@ -24,12 +24,11 @@
 #include "id_in.h"
 #include "id_vl.h"
 #include "id_vh.h"
+#include "config.h"
+#include "wl_play.h"
 
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-// TODO: Remove this dependency!
-#define SDLK_LAST 512
-#else
+#if !SDL_VERSION_ATLEAST(1,3,0)
 #define SDLK_KP_0 SDLK_KP0
 #define SDLK_KP_1 SDLK_KP1
 #define SDLK_KP_2 SDLK_KP2
@@ -41,6 +40,7 @@
 #define SDLK_KP_8 SDLK_KP8
 #define SDLK_KP_9 SDLK_KP9
 #define SDLK_SCROLLLOCK SDLK_SCROLLOCK
+#define SDL_NUM_SCANCODES SDLK_LAST
 typedef SDLMod SDL_Keymod;
 
 inline void SDL_SetRelativeMouseMode(bool enabled)
@@ -51,6 +51,13 @@ inline void SDL_WarpMouseInWindow(struct SDL_Window* window, int x, int y)
 {
 	SDL_WarpMouse(x, y);
 }
+#endif
+
+#ifdef _WIN32
+// SDL doesn't track the real state of the numlock or capslock key, so we need
+// to query the system. It's probably like this since Linux and OS X don't
+// appear to have nice APIs for this.
+void I_CheckKeyMods();
 #endif
 
 /*
@@ -69,7 +76,7 @@ bool MousePresent;
 
 
 // 	Global variables
-volatile bool		Keyboard[SCANCODE_UNMASK(SDLK_LAST)];
+volatile bool		Keyboard[SDL_NUM_SCANCODES];
 volatile unsigned short Paused;
 volatile char		LastASCII;
 volatile ScanCode	LastScan;
@@ -88,6 +95,16 @@ static KeyboardDef KbdDefs = {
 };
 
 static SDL_Joystick *Joystick;
+#if SDL_VERSION_ATLEAST(2,0,0)
+static SDL_GameController *GameController;
+// Flip the right stick axes to match usual mapping of Joystick API.
+static SDL_GameControllerAxis GameControllerAxisMap[SDL_CONTROLLER_AXIS_MAX] = {
+	SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY, // X, Y
+	SDL_CONTROLLER_AXIS_RIGHTY, SDL_CONTROLLER_AXIS_RIGHTX, // Z, R
+	SDL_CONTROLLER_AXIS_TRIGGERLEFT, SDL_CONTROLLER_AXIS_TRIGGERRIGHT
+};
+#endif
+JoystickSens *JoySensitivity;
 int JoyNumButtons;
 int JoyNumAxes;
 static int JoyNumHats;
@@ -138,62 +155,49 @@ INL_GetMouseButtons(void)
 ///////////////////////////////////////////////////////////////////////////
 void IN_GetJoyDelta(int *dx,int *dy)
 {
-	if(!Joystick)
+	if(!IN_JoyPresent())
 	{
 		*dx = *dy = 0;
 		return;
 	}
 
-	SDL_JoystickUpdate();
-	int x = SDL_JoystickGetAxis(Joystick, 0) >> 8;
-	int y = SDL_JoystickGetAxis(Joystick, 1) >> 8;
-
-	if(param_joystickhat != -1)
+	int x, y;
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
 	{
-		uint8_t hatState = SDL_JoystickGetHat(Joystick, param_joystickhat);
-		if(hatState & SDL_HAT_RIGHT)
+		SDL_GameControllerUpdate();
+		x = SDL_GameControllerGetAxis(GameController, SDL_CONTROLLER_AXIS_LEFTX) >> 8;
+		y = SDL_GameControllerGetAxis(GameController, SDL_CONTROLLER_AXIS_LEFTY) >> 8;
+
+		if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT))
 			x += 127;
-		else if(hatState & SDL_HAT_LEFT)
+		else if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT))
 			x -= 127;
-		if(hatState & SDL_HAT_DOWN)
+		if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN))
 			y += 127;
-		else if(hatState & SDL_HAT_UP)
+		else if(SDL_GameControllerGetButton(GameController, SDL_CONTROLLER_BUTTON_DPAD_UP))
 			y -= 127;
-
-		if(x < -128) x = -128;
-		else if(x > 127) x = 127;
-
-		if(y < -128) y = -128;
-		else if(y > 127) y = 127;
 	}
-
-	*dx = x;
-	*dy = y;
-}
-
-int IN_GetJoyAxis(int axis)
-{
-	return SDL_JoystickGetAxis(Joystick, axis);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	IN_GetJoyFineDelta() - Returns the relative movement of the specified
-//		joystick without dividing the results by 256 (from +/-127)
-//
-///////////////////////////////////////////////////////////////////////////
-void IN_GetJoyFineDelta(int *dx, int *dy)
-{
-	if(!Joystick)
+	else
+#endif
 	{
-		*dx = 0;
-		*dy = 0;
-		return;
-	}
+		SDL_JoystickUpdate();
+		x = SDL_JoystickGetAxis(Joystick, 0) >> 8;
+		y = SDL_JoystickGetAxis(Joystick, 1) >> 8;
 
-	SDL_JoystickUpdate();
-	int x = SDL_JoystickGetAxis(Joystick, 0);
-	int y = SDL_JoystickGetAxis(Joystick, 1);
+		if(param_joystickhat != -1)
+		{
+			uint8_t hatState = SDL_JoystickGetHat(Joystick, param_joystickhat);
+			if(hatState & SDL_HAT_RIGHT)
+				x += 127;
+			else if(hatState & SDL_HAT_LEFT)
+				x -= 127;
+			if(hatState & SDL_HAT_DOWN)
+				y += 127;
+			else if(hatState & SDL_HAT_UP)
+				y -= 127;
+		}
+	}
 
 	if(x < -128) x = -128;
 	else if(x > 127) x = 127;
@@ -203,6 +207,15 @@ void IN_GetJoyFineDelta(int *dx, int *dy)
 
 	*dx = x;
 	*dy = y;
+}
+
+int IN_GetJoyAxis(int axis)
+{
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+		return SDL_GameControllerGetAxis(GameController, GameControllerAxisMap[axis]);
+#endif
+	return SDL_JoystickGetAxis(Joystick, axis);
 }
 
 /*
@@ -215,6 +228,28 @@ void IN_GetJoyFineDelta(int *dx, int *dy)
 
 int IN_JoyButtons()
 {
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+	{
+		SDL_GameControllerUpdate();
+
+		int res = 0;
+		for(int i = 0; i < JoyNumButtons; ++i)
+		{
+			if(SDL_GameControllerGetButton(GameController, (SDL_GameControllerButton)i))
+			{
+				// Attempt to allow controllers using the game controller API
+				// to enter the menu.
+				if(i == SDL_CONTROLLER_BUTTON_START)
+					control[ConsolePlayer].buttonstate[bt_esc] = true;
+				else
+					res |= 1<<i;
+			}
+		}
+		return res;
+	}
+#endif
+
 	if(!Joystick) return 0;
 
 	SDL_JoystickUpdate();
@@ -242,6 +277,22 @@ int IN_JoyButtons()
 
 int IN_JoyAxes()
 {
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+	{
+		SDL_GameControllerUpdate();
+		int res = 0;
+		for(int i = 0; i < JoyNumAxes; ++i)
+		{
+			SWORD pos = SDL_GameControllerGetAxis(GameController, (SDL_GameControllerAxis)GameControllerAxisMap[i]);
+			if(pos <= -0x1000)
+				res |= 1 << (i*2);
+			else if(pos >= 0x1000)
+				res |= 1 << (i*2+1);
+		}
+		return res;
+	}
+#endif
 	if(!Joystick) return 0;
 
 	SDL_JoystickUpdate();
@@ -250,9 +301,9 @@ int IN_JoyAxes()
 	for(int i = 0; i < JoyNumAxes && i < 16; ++i)
 	{
 		SWORD pos = SDL_JoystickGetAxis(Joystick, i);
-		if(pos <= -64)
+		if(pos <= -0x1000)
 			res |= 1 << (i*2);
-		else if(pos >= 64)
+		else if(pos >= 0x1000)
 			res |= 1 << (i*2+1);
 	}
 	return res;
@@ -260,8 +311,18 @@ int IN_JoyAxes()
 
 bool IN_JoyPresent()
 {
-	return Joystick != NULL;
+	return Joystick != NULL
+#if SDL_VERSION_ATLEAST(2,0,0)
+		|| GameController != NULL
+#endif
+	;
 }
+
+#ifdef __ANDROID__
+static bool ShadowKey = false;
+bool ShadowingEnabled = false;
+extern "C" int hasHardwareKeyboard();
+#endif
 
 static void processEvent(SDL_Event *event)
 {
@@ -271,9 +332,56 @@ static void processEvent(SDL_Event *event)
 		case SDL_QUIT:
 			Quit(NULL);
 
+		// ASCII (Unicode) text entry for saves and stuff like that.
+#if SDL_VERSION_ATLEAST(1,3,0)
+		case SDL_TEXTINPUT:
+		{
+			LastASCII = event->text.text[0];
+			break;
+		}
+#endif
+
 		// check for keypresses
 		case SDL_KEYDOWN:
 		{
+			if(event->key.keysym.sym==SDLK_SCROLLLOCK)
+			{
+				GrabInput = !GrabInput;
+				SDL_SetRelativeMouseMode(GrabInput ? SDL_TRUE : SDL_FALSE);
+				return;
+			}
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+			LastScan = event->key.keysym.scancode;
+#else
+			LastScan = event->key.keysym.sym;
+#endif
+			SDL_Keymod mod = SDL_GetModState();
+			if(Keyboard[sc_Alt])
+			{
+				if(LastScan==SDLx_SCANCODE(F4))
+					Quit(NULL);
+			}
+
+			if(LastScan == SDLx_SCANCODE(KP_ENTER)) LastScan = SDLx_SCANCODE(RETURN);
+			else if(LastScan == SDLx_SCANCODE(RSHIFT)) LastScan = SDLx_SCANCODE(LSHIFT);
+			else if(LastScan == SDLx_SCANCODE(RALT)) LastScan = SDLx_SCANCODE(LALT);
+			else if(LastScan == SDLx_SCANCODE(RCTRL)) LastScan = SDLx_SCANCODE(LCTRL);
+			else
+			{
+				if((mod & KMOD_NUM) == 0)
+				{
+					switch(LastScan)
+					{
+						case SDLx_SCANCODE(KP_2): LastScan = SDLx_SCANCODE(DOWN); break;
+						case SDLx_SCANCODE(KP_4): LastScan = SDLx_SCANCODE(LEFT); break;
+						case SDLx_SCANCODE(KP_6): LastScan = SDLx_SCANCODE(RIGHT); break;
+						case SDLx_SCANCODE(KP_8): LastScan = SDLx_SCANCODE(UP); break;
+					}
+				}
+			}
+
+#if !SDL_VERSION_ATLEAST(1,3,0)
 			static const byte ASCIINames[] = // Unshifted ASCII for scan codes       // TODO: keypad
 			{
 			//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
@@ -299,40 +407,7 @@ static void processEvent(SDL_Event *event)
 				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
 			};
 
-			if(event->key.keysym.sym==SDLK_SCROLLLOCK || event->key.keysym.sym==SDLK_F12)
-			{
-				GrabInput = !GrabInput;
-				SDL_SetRelativeMouseMode(GrabInput ? SDL_TRUE : SDL_FALSE);
-				return;
-			}
-
-			LastScan = SCANCODE_UNMASK(event->key.keysym.sym);
-			SDL_Keymod mod = SDL_GetModState();
-			if(Keyboard[sc_Alt])
-			{
-				if(LastScan==SCANCODE_UNMASK(SDLK_F4))
-					Quit(NULL);
-			}
-
-			if(LastScan == SCANCODE_UNMASK(SDLK_KP_ENTER)) LastScan = SCANCODE_UNMASK(SDLK_RETURN);
-			else if(LastScan == SCANCODE_UNMASK(SDLK_RSHIFT)) LastScan = SCANCODE_UNMASK(SDLK_LSHIFT);
-			else if(LastScan == SCANCODE_UNMASK(SDLK_RALT)) LastScan = SCANCODE_UNMASK(SDLK_LALT);
-			else if(LastScan == SCANCODE_UNMASK(SDLK_RCTRL)) LastScan = SCANCODE_UNMASK(SDLK_LCTRL);
-			else
-			{
-				if((mod & KMOD_NUM) == 0)
-				{
-					switch(LastScan)
-					{
-						case SCANCODE_UNMASK(SDLK_KP_2): LastScan = SCANCODE_UNMASK(SDLK_DOWN); break;
-						case SCANCODE_UNMASK(SDLK_KP_4): LastScan = SCANCODE_UNMASK(SDLK_LEFT); break;
-						case SCANCODE_UNMASK(SDLK_KP_6): LastScan = SCANCODE_UNMASK(SDLK_RIGHT); break;
-						case SCANCODE_UNMASK(SDLK_KP_8): LastScan = SCANCODE_UNMASK(SDLK_UP); break;
-					}
-				}
-			}
-
-			int sym = LastScan;
+			int sym = event->key.keysym.sym;
 			if(sym >= 'a' && sym <= 'z')
 				sym -= 32;  // convert to uppercase
 
@@ -348,51 +423,79 @@ static void processEvent(SDL_Event *event)
 			}
 			if(LastASCII && sym >= 'A' && sym <= 'Z' && (mod & KMOD_CAPS))
 				LastASCII ^= 0x20;
+#endif
 
-			if(LastScan<SCANCODE_UNMASK(SDLK_LAST))
+			if(LastScan<SDL_NUM_SCANCODES)
 				Keyboard[LastScan] = 1;
-			if(LastScan == SCANCODE_UNMASK(SDLK_PAUSE))
+			if(LastScan == SDLx_SCANCODE(PAUSE))
 				Paused |= 1;
 			break;
 		}
 
 		case SDL_KEYUP:
 		{
+#if SDL_VERSION_ATLEAST(1,3,0)
+			int key = event->key.keysym.scancode;
+#else
 			int key = event->key.keysym.sym;
-			if(key == SDLK_KP_ENTER) key = SDLK_RETURN;
-			else if(key == SDLK_RSHIFT) key = SDLK_LSHIFT;
-			else if(key == SDLK_RALT) key = SDLK_LALT;
-			else if(key == SDLK_RCTRL) key = SDLK_LCTRL;
+#endif
+			if(key == SDLx_SCANCODE(KP_ENTER)) key = SDLx_SCANCODE(RETURN);
+			else if(key == SDLx_SCANCODE(RSHIFT)) key = SDLx_SCANCODE(LSHIFT);
+			else if(key == SDLx_SCANCODE(RALT)) key = SDLx_SCANCODE(LALT);
+			else if(key == SDLx_SCANCODE(RCTRL)) key = SDLx_SCANCODE(LCTRL);
 			else
 			{
 				if((SDL_GetModState() & KMOD_NUM) == 0)
 				{
 					switch(key)
 					{
-						case SDLK_KP_2: key = SDLK_DOWN; break;
-						case SDLK_KP_4: key = SDLK_LEFT; break;
-						case SDLK_KP_6: key = SDLK_RIGHT; break;
-						case SDLK_KP_8: key = SDLK_UP; break;
+						case SDLx_SCANCODE(KP_2): key = SDLx_SCANCODE(DOWN); break;
+						case SDLx_SCANCODE(KP_4): key = SDLx_SCANCODE(LEFT); break;
+						case SDLx_SCANCODE(KP_6): key = SDLx_SCANCODE(RIGHT); break;
+						case SDLx_SCANCODE(KP_8): key = SDLx_SCANCODE(UP); break;
 					}
 				}
 			}
 
-			if(SCANCODE_UNMASK(key)<SDLK_LAST)
-				Keyboard[SCANCODE_UNMASK(key)] = 0;
+#ifdef __ANDROID__
+			if(ShadowKey && LastScan == event->key.keysym.scancode)
+			{
+				ShadowKey = false;
+				break;
+			}
+#endif
+
+			if(key<SDL_NUM_SCANCODES)
+				Keyboard[key] = 0;
 			break;
 		}
 
-		/*case SDL_ACTIVEEVENT:
+#if !SDL_VERSION_ATLEAST(1,3,0)
+		case SDL_ACTIVEEVENT:
 		{
-			if(fullscreen && (event->active.state & SDL_APPACTIVE) != 0)
+			if (!fullscreen && forcegrabmouse && (event->active.state & SDL_APPINPUTFOCUS || event->active.state & SDL_APPACTIVE))
 			{
-					if(event->active.gain)
-					{
-						NeedRestore = false;
-					}
-					else NeedRestore = true;
+					// Release the mouse if we lose input focus, grab it again
+					// when we gain input focus.
+				if (event->active.gain == 1)
+				{
+					IN_GrabMouse();
+				}
+				else
+				{
+					IN_ReleaseMouse();
+				}
 			}
-		}*/
+			break;
+		}
+#else
+#ifdef _WIN32
+		case SDL_WINDOWEVENT:
+			if (event->window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				I_CheckKeyMods();
+			break;
+#endif
+#endif
 	}
 }
 
@@ -410,6 +513,15 @@ void IN_WaitAndProcessEvents()
 void IN_ProcessEvents()
 {
 	SDL_Event event;
+
+#ifdef __ANDROID__
+	if(ShadowingEnabled)
+	{
+		if(!ShadowKey)
+			Keyboard[LastScan] = 0;
+		ShadowKey = true;
+	}
+#endif
 
 	while (SDL_PollEvent(&event))
 	{
@@ -429,21 +541,68 @@ IN_Startup(void)
 	if (IN_Started)
 		return;
 
+#ifdef __ANDROID__
+	ShadowingEnabled = !hasHardwareKeyboard();
+#endif
+
+#ifdef _WIN32
+	I_CheckKeyMods();
+#else
+	// Turn numlock on by default since that's probably what most people want.
+	SDL_SetModState(SDL_Keymod(SDL_GetModState()|KMOD_NUM));
+#endif
+
 	IN_ClearKeysDown();
 
-	if(param_joystickindex >= 0 && param_joystickindex < SDL_NumJoysticks())
+	if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) == 0 &&
+		param_joystickindex >= 0 && param_joystickindex < SDL_NumJoysticks())
 	{
-		Joystick = SDL_JoystickOpen(param_joystickindex);
-		if(Joystick)
+#if SDL_VERSION_ATLEAST(2,0,0)
+		if(SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == 0 && SDL_IsGameController(param_joystickindex))
 		{
-			JoyNumButtons = SDL_JoystickNumButtons(Joystick);
-			if(JoyNumButtons > 32) JoyNumButtons = 32;      // only up to 32 buttons are supported
-			JoyNumAxes = SDL_JoystickNumAxes(Joystick);
-			JoyNumHats = SDL_JoystickNumHats(Joystick);
-			if(param_joystickhat >= JoyNumHats)
-				Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
-			else if(param_joystickhat < 0 && JoyNumHats > 0) // Default to hat 0
-				param_joystickhat = 0;
+			GameController = SDL_GameControllerOpen(param_joystickindex);
+			if(GameController)
+			{
+				Printf("Using game controller: %s\n", SDL_GameControllerName(GameController));
+				SDL_GameControllerEventState(SDL_IGNORE);
+				JoyNumButtons = SDL_CONTROLLER_BUTTON_MAX;
+				JoyNumAxes = SDL_CONTROLLER_AXIS_MAX;
+				JoyNumHats = 0;
+
+				JoySensitivity = new JoystickSens[JoyNumAxes];
+			}
+		}
+		else
+#endif
+		{
+			Joystick = SDL_JoystickOpen(param_joystickindex);
+			if(Joystick)
+			{
+				JoyNumButtons = SDL_JoystickNumButtons(Joystick);
+				if(JoyNumButtons > 32) JoyNumButtons = 32;      // only up to 32 buttons are supported
+				JoyNumAxes = SDL_JoystickNumAxes(Joystick);
+				JoyNumHats = SDL_JoystickNumHats(Joystick);
+				if(param_joystickhat >= JoyNumHats)
+					Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
+				else if(param_joystickhat < 0 && JoyNumHats > 0) // Default to hat 0
+					param_joystickhat = 0;
+
+				JoySensitivity = new JoystickSens[JoyNumAxes];
+			}
+		}
+
+		if(JoySensitivity)
+		{
+			for(int i = 0;i < JoyNumAxes;++i)
+			{
+				FString settingName;
+				settingName.Format("JoyAxis%dSensitivity", i);
+				config.CreateSetting(settingName, 10);
+				JoySensitivity[i].sensitivity = config.GetSetting(settingName)->GetInteger();
+				settingName.Format("JoyAxis%dDeadzone", i);
+				config.CreateSetting(settingName, 2);
+				JoySensitivity[i].deadzone = config.GetSetting(settingName)->GetInteger();
+			}
 		}
 	}
 
@@ -468,8 +627,25 @@ IN_Shutdown(void)
 	if (!IN_Started)
 		return;
 
+	if(JoySensitivity)
+	{
+		for(int i = 0;i < JoyNumAxes;++i)
+		{
+			FString settingName;
+			settingName.Format("JoyAxis%dSensitivity", i);
+			config.GetSetting(settingName)->SetValue(JoySensitivity[i].sensitivity);
+			settingName.Format("JoyAxis%dDeadzone", i);
+			config.GetSetting(settingName)->SetValue(JoySensitivity[i].deadzone);
+		}
+		delete[] JoySensitivity;
+	}
+
 	if(Joystick)
 		SDL_JoystickClose(Joystick);
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(GameController)
+		SDL_GameControllerClose(GameController);
+#endif
 
 	IN_Started = false;
 }
@@ -718,6 +894,14 @@ void IN_GrabMouse()
 	}
 }
 
+void IN_AdjustMouse()
+{
+	if (mouseenabled && (forcegrabmouse || fullscreen))
+		IN_GrabMouse();
+	else if (!fullscreen)
+		IN_ReleaseMouse();
+}
+
 bool IN_IsInputGrabbed()
 {
 	return GrabInput;
@@ -725,5 +909,7 @@ bool IN_IsInputGrabbed()
 
 void IN_CenterMouse()
 {
-	SDL_WarpMouseInWindow(NULL, screenWidth / 2, screenHeight / 2);
+	// Clear out relative mouse movement
+	int x, y;
+	SDL_GetRelativeMouseState(&x, &y);
 }

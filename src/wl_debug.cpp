@@ -275,7 +275,7 @@ int DebugKeys (void)
 	if (Keyboard[sc_H])             // H = hurt self
 	{
 		IN_ClearKeysDown ();
-		TakeDamage (16,NULL);
+		players[0].TakeDamage (16,NULL);
 	}
 	else if (Keyboard[sc_I])        // I = item cheat
 	{
@@ -283,7 +283,7 @@ int DebugKeys (void)
 		US_PrintCentered ("Free items!");
 		VW_UpdateScreen();
 		GiveAllWeaponsAndAmmo();
-		GivePoints (100000);
+		players[0].GivePoints (100000);
 		players[0].health = 100;
 		StatusBar->DrawStatusBar();
 		IN_Ack ();
@@ -547,11 +547,23 @@ int DebugKeys (void)
 		Printf("Vis = %d\n", gLevelVisibility);
 		CalcVisibility(gLevelVisibility);
 	}
+	else if(Keyboard[sc_3])
+	{
+		UseWolf4SDL3DSpriteScaler = !UseWolf4SDL3DSpriteScaler;
+		US_CenterWindow (20,3);
+		if(UseWolf4SDL3DSpriteScaler)
+			US_PrintCentered("3D Sprite scaler: 4SDL");
+		else
+			US_PrintCentered("3D Sprite scaler: ECWolf");
+		VW_UpdateScreen();
+		IN_Ack ();
+		return 1;
+	}
 
 	return 0;
 }
 
-void DebugMLI()
+static void GiveMLI()
 {
 	players[0].health = 100;
 	players[0].score = 0;
@@ -559,6 +571,11 @@ void DebugMLI()
 	GiveAllWeaponsAndAmmo();
 	P_GiveKeys(players[0].mo, 101);
 	DrawPlayScreen();
+}
+
+void DebugMLI()
+{
+	GiveMLI();
 
 	ClearMemory ();
 	ClearSplitVWB ();
@@ -569,4 +586,49 @@ void DebugMLI()
 	IN_Ack ();
 
 	DrawPlayScreen();
+}
+
+void DebugGod(bool noah)
+{
+	WindowH = 160;
+
+	if (noah)
+	{
+		if (godmode)
+		{
+			Message ("Invulnerability OFF");
+			SD_PlaySound ("misc/no_bonus");
+		}
+		else
+		{
+			Message ("Invulnerability ON");
+			SD_PlaySound ("misc/1up");
+		}
+	}
+	else
+	{
+		if (godmode)
+		{
+			Message ("God mode OFF");
+			SD_PlaySound ("misc/no_bonus");
+		}
+		else
+		{
+			Message ("God mode ON");
+			SD_PlaySound ("misc/end_bonus2");
+		}
+	}
+
+	godmode ^= 1;
+
+	IN_ClearKeysDown ();
+	IN_Ack ();
+
+	if (noah)
+	{
+		GiveMLI();
+	}
+
+	if (viewsize < 18)
+		StatusBar->RefreshBackground ();
 }

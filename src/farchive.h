@@ -38,6 +38,7 @@
 #include "dobject.h"
 #include "tarray.h"
 #include "v_palette.h"
+#include "tflags.h"
 
 class FName;
 class FString;
@@ -336,5 +337,11 @@ FArchive &operator<< (FArchive &arc, line_t *&line);
 FArchive &operator<< (FArchive &arc, vertex_t *&vert);
 FArchive &operator<< (FArchive &arc, side_t *&side);
 #endif
+
+template<typename T, typename TT>
+FArchive& operator<< (FArchive& arc, TFlags<T, TT>& flag)
+{
+	return flag.Serialize (arc);
+}
 
 #endif //__FARCHIVE_H__

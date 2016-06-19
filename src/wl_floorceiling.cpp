@@ -62,9 +62,10 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 			continue;
 		}
 
-		dist = (planenumerator / (y + 1));
-		gu =  viewx + FixedMul(dist, viewcos);
-		gv = -viewy + FixedMul(dist, viewsin);
+		// Shift in some extra bits so that we don't get spectacular round off.
+		dist = (planenumerator / (y + 1))<<8;
+		gu =  (viewx<<8) + FixedMul(dist, viewcos);
+		gv = -(viewy<<8) + FixedMul(dist, viewsin);
 		tex_step = dist / scale;
 		du =  FixedMul(tex_step, viewsin);
 		dv = -FixedMul(tex_step, viewcos);
@@ -80,8 +81,8 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		{
 			if(((wallheight[x] >> 3)*heightFactor)>>FRACBITS <= y)
 			{
-				unsigned int curx = (gu >> TILESHIFT);
-				unsigned int cury = (-(gv >> TILESHIFT) - 1);
+				unsigned int curx = (gu >> (TILESHIFT+8));
+				unsigned int cury = (-(gv >> (TILESHIFT+8)) - 1);
 
 				if(curx != oldmapx || cury != oldmapy)
 				{
@@ -113,15 +114,15 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 				{
 					if(useOptimized)
 					{
-						const int u = (gu>>10) & 63;
-						const int v = (-gv>>10) & 63;
+						const int u = (gu>>18) & 63;
+						const int v = (-gv>>18) & 63;
 						const unsigned texoffs = (u * 64) + v;
 						*tex_offset = curshades[tex[texoffs]];
 					}
 					else
 					{
-						const int u = (FixedMul(gu-512, texxscale)) & (texwidth-1);
-						const int v = (FixedMul(gv+512, texyscale)) & (texheight-1);
+						const int u = (FixedMul((gu>>8)-512, texxscale)) & (texwidth-1);
+						const int v = (FixedMul((gv>>8)+512, texyscale)) & (texheight-1);
 						const unsigned texoffs = (u * texheight) + v;
 						*tex_offset = curshades[tex[texoffs]];
 					}

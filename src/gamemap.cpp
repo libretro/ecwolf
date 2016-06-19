@@ -37,7 +37,6 @@
 #include "farchive.h"
 #include "gamemap.h"
 #include "tarray.h"
-#include "thinker.h"
 #include "w_wad.h"
 #include "wl_def.h"
 #include "lnspec.h"
@@ -45,12 +44,17 @@
 #include "thingdef/thingdef.h"
 #include "wl_agent.h"
 #include "wl_game.h"
+#include "wl_play.h"
 #include "r_sprites.h"
 #include "resourcefiles/resourcefile.h"
 #include "wl_loadsave.h"
 #include "doomerrors.h"
 #include "m_random.h"
 #include "g_mapinfo.h"
+
+const FName SpecialThingNames[SMT_NumThings] = {
+	"$Player1Start"
+};
 
 GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	file(NULL), zoneTraversed(NULL), zoneLinks(NULL)
@@ -135,23 +139,33 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	}
 	else
 	{
-		if(strcmp(Wads.GetLumpFullName(markerLump+1), "PLANES") == 0)
+		const char* nextLumpName = Wads.GetLumpFullName(markerLump+1);
+		if(nextLumpName == NULL || strcmp(nextLumpName, "TEXTMAP") != 0)
 		{
 			numLumps = 1;
 			isUWMF = false;
 			valid = true;
-			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			if(nextLumpName != NULL && strcmp(nextLumpName, "PLANES") == 0)
+			{
+				// DOS (WDC) format binary map
+				lumps[0] = Wads.ReopenLumpNum(markerLump+1);
+			}
+			else
+			{
+				// Must be a Mac format map
+				lumps[0] = Wads.ReopenLumpNum(markerLump);
+				if(lumps[0]->GetLength() <= 0)
+				{
+					FString error;
+					error.Format("Invalid map format for %s!", map.GetChars());
+					throw CRecoverableError(error);
+				}
+			}
+			
 		}
 		else
 		{
 			// Expect UWMF formatted map.
-			if(strcmp(Wads.GetLumpFullName(markerLump+1), "TEXTMAP") != 0)
-			{
-				FString error;
-				error.Format("Invalid map format for %s!", map.GetChars());
-				throw CRecoverableError(error);
-			}
-
 			isUWMF = true;
 			lumps[0] = Wads.ReopenLumpNum(markerLump+1);
 
@@ -176,9 +190,9 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 
 GameMap::~GameMap()
 {
+	delete lumps[0];
 	if(isWad)
 		delete file;
-	delete lumps[0];
 
 	for(unsigned int i = 0;i < planes.Size();++i)
 		delete[] planes[i].map;
@@ -210,8 +224,8 @@ void GameMap::ClearVisibility()
 		for(unsigned int p = 0;p < planes.Size();++p)
 			planes[p].map[i].visible = false;
 	}
-	if(players[0].camera)
-		GetSpot(players[0].camera->tilex, players[0].camera->tiley, 0)->visible = true;
+	if(players[ConsolePlayer].camera)
+		GetSpot(players[ConsolePlayer].camera->tilex, players[ConsolePlayer].camera->tiley, 0)->visible = true;
 }
 
 bool GameMap::CheckMapExists(const FString &map)
@@ -413,6 +427,17 @@ GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned i
 	return spot->triggers[spot->triggers.Size()-1];
 }
 
+void GameMap::PropagateMark()
+{
+	for(unsigned int p = 0;p < NumPlanes();++p)
+	{
+		MapPlane &plane = planes[p];
+
+		for(unsigned int i = 0;i < GetHeader().width*GetHeader().height;++i)
+			GC::Mark(plane.map[i].thinker);
+	}
+}
+
 // Look at data and determine if we need to set up any flags.
 void GameMap::ScanTiles()
 {
@@ -485,7 +510,7 @@ void GameMap::SpawnThings() const
 		if(!thing.skill[gamestate.difficulty->SpawnFilter])
 			continue;
 
-		if(thing.type == 1)
+		if(thing.type == SpecialThingNames[SMT_Player1Start])
 			SpawnPlayer(thing.x>>FRACBITS, thing.y>>FRACBITS, thing.angle);
 		else
 		{
@@ -495,7 +520,7 @@ void GameMap::SpawnThings() const
 			if(cls == NULL)
 			{
 				cls = unknownClass;
-				printf("Unknown thing %d @ (%d, %d)\n", thing.type, thing.x>>FRACBITS, thing.y>>FRACBITS);
+				printf("Unknown thing %s @ (%d, %d)\n", thing.type.GetChars(), thing.x>>FRACBITS, thing.y>>FRACBITS);
 			}
 
 			AActor *actor = AActor::Spawn(cls, thing.x, thing.y, 0, SPAWN_AllowReplacement|(thing.patrol ? SPAWN_Patrol : 0));
@@ -677,6 +702,39 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 
 			if(!arc.IsStoring())
 				plane.map[i].plane = &plane;
+		}
+	}
+
+	// Current elevator positions.
+	if(GameSave::SaveVersion > 1438232816)
+	{
+		if(arc.IsStoring())
+		{
+			unsigned int count = gm->elevatorPosition.CountUsed();
+			arc << count;
+
+			TMap<unsigned int, MapSpot>::Iterator iter(gm->elevatorPosition);
+			TMap<unsigned int, MapSpot>::Pair *pair;
+			while(iter.NextPair(pair))
+			{
+				DWORD key = pair->Key;
+				arc << key << pair->Value;
+			}
+		}
+		else
+		{
+			unsigned int count;
+			arc << count;
+
+			gm->elevatorPosition.Clear();
+			while(count-- > 0)
+			{
+				DWORD key;
+				MapSpot value;
+				arc << key << value;
+
+				gm->elevatorPosition[key] = value;
+			}
 		}
 	}
 

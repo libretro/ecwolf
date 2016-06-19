@@ -29,6 +29,8 @@ extern  fixed    pspriteyscale;
 extern  fixed    yaspect;
 extern  int      mousexadjustment;
 extern  int      mouseyadjustment;
+extern  int      panxadjustment;
+extern  int      panyadjustment;
 extern  int      shootdelta;
 extern  unsigned screenofs;
 
@@ -47,7 +49,7 @@ extern  int      param_audiobuffer;
 void            NewGame (int difficulty,const class FString &map,bool displayBriefing,const class ClassDef *playerClass=NULL);
 void            CalcProjection (int32_t focal);
 void			CalcVisibility (fixed vis);
-int				CheckRatio (int width, int height);
+int				CheckRatio (int width, int height, int *trueratio=NULL);
 void            NewViewSize (int width, unsigned int scrWidth=screenWidth, unsigned int scrHeight=screenHeight);
 void            ShutdownId (void);
 

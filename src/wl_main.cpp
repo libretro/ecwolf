@@ -38,6 +38,7 @@
 #include "wl_play.h"
 #include "wl_game.h"
 #include "wl_loadsave.h"
+#include "wl_net.h"
 #include "dobject.h"
 #include "colormatcher.h"
 #include "version.h"
@@ -110,6 +111,8 @@ bool	startgame;
 bool	loadedgame;
 int		mousexadjustment;
 int     mouseyadjustment;
+int		panxadjustment;
+int     panyadjustment;
 
 //
 // Command line parameter variables
@@ -196,7 +199,7 @@ void ShutdownId (void)
 ==================
 */
 
-const float radtoint = (float)(FINEANGLES/2/PI);
+const double radtoint = (double)(FINEANGLES/2/PI);
 
 void BuildTables (void)
 {
@@ -255,12 +258,10 @@ void CalcProjection (int32_t focal)
 {
 	int     i;
 	int    intang;
-	float   angle;
-	double  tang;
 	int     halfview;
 	double  facedist;
 
-	const fixed projectionFOV = static_cast<fixed>((players[0].FOV / 90.0f)*AspectCorrection[r_ratio].viewGlobal);
+	const fixed projectionFOV = static_cast<fixed>((players[ConsolePlayer].FOV / 90.0f)*AspectCorrection[r_ratio].viewGlobal);
 
 	// 0xFD17 is a magic number to convert the player's radius 0x5800 to FOCALLENGTH (0x5700)
 	focallength = FixedMul(focal, 0xFD17);
@@ -284,14 +285,14 @@ void CalcProjection (int32_t focal)
 	// calculate the angle offset from view angle of each pixel's ray
 	//
 
-	for (i=0;i<halfview;i++)
+	for (i=0;i<=halfview;i++)
 	{
 		// start 1/2 pixel over, so viewangle bisects two middle pixels
-		tang = (int32_t)i*projectionFOV/viewwidth/facedist;
-		angle = (float) atan(tang);
+		double tang = (((double)i+0.5)*projectionFOV)/viewwidth/facedist;
+		double angle = atan(tang);
 		intang = (int) (angle*radtoint);
-		pixelangle[halfview-1-i] = intang;
-		pixelangle[halfview+i] = -intang;
+		pixelangle[halfview-i] = intang;
+		pixelangle[halfview-1+i] = -intang;
 	}
 }
 
@@ -348,10 +349,6 @@ void DoJukebox(void)
 ==========================
 */
 
-#ifdef _WIN32
-void SetupWM();
-#endif
-
 static void CollectGC()
 {
 	GC::FullGC();
@@ -380,28 +377,18 @@ void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
+#if SDL_VERSION_ATLEAST(2,0,0)
+	if(SDL_Init(0) < 0)
+#else
+	if(SDL_Init(SDL_INIT_VIDEO) < 0)
+#endif
 	{
 		printf("Unable to init SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
 	atterm(SDL_Quit);
 
-#if SDL_VERSION_ATLEAST(2,0,0)
-#else
-	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
-#endif
 	SDL_ShowCursor(SDL_DISABLE);
-
-	int numJoysticks = SDL_NumJoysticks();
-	if(param_joystickindex && (param_joystickindex < -1 || param_joystickindex >= numJoysticks))
-	{
-		if(!numJoysticks)
-			printf("No joysticks are available to SDL!\n");
-		else
-			printf("The joystick index must be between -1 and %i!\n", numJoysticks - 1);
-		exit(1);
-	}
 
 	//
 	// Mapinfo
@@ -436,10 +423,6 @@ static void InitGame()
 	VL_SetVGAPlaneMode (true);
 	DrawStartupConsole();
 
-#if defined _WIN32
-	if(!fullscreen)
-		SetupWM();
-#endif
 	VW_UpdateScreen();
 
 //
@@ -490,6 +473,11 @@ static void InitGame()
 // Load Noah's Ark quiz
 //
 	Dialog::LoadGlobalModule("NOAHQUIZ");
+
+//
+// Net game?
+//
+	Net::Init();
 
 //
 // Finish signon screen
@@ -601,8 +589,8 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 	//
 	// calculate trace angles and projection constants
 	//
-	if(players[0].mo)
-		CalcProjection(players[0].mo->radius);
+	if(players[ConsolePlayer].mo)
+		CalcProjection(players[ConsolePlayer].mo->radius);
 	else
 		CalcProjection (FOCALLENGTH);
 }
@@ -643,6 +631,8 @@ void Quit (const char *errorStr, ...)
 	}
 	else error[0] = 0;
 
+	ShutdownId ();
+
 	if (error[0] == 0)
 	{
 #ifdef NOTYET
@@ -661,8 +651,6 @@ void Quit (const char *errorStr, ...)
 		screen = grsegs[ERRORSCREEN];
 	}
 #endif
-
-	ShutdownId ();
 
 	if (error[0] != 0)
 	{
@@ -700,6 +688,21 @@ void I_Error(const char* format, ...)
 	va_end(vlist);
 
 	throw CRecoverableError(error);
+}
+
+//==========================================================================
+
+static bool DebugNetwork = false;
+
+void NetDPrintf(const char* format, ...)
+{
+	if(!DebugNetwork)
+		return;
+
+	va_list vlist;
+	va_start(vlist, format);
+	vprintf(format, vlist);
+	va_end(vlist);
 }
 
 //==========================================================================
@@ -842,7 +845,7 @@ static void DemoLoop()
 //
 // Tries to guess the physical dimensions of the screen based on the
 // screen's pixel dimensions.
-int CheckRatio (int width, int height)//, int *trueratio)
+int CheckRatio (int width, int height, int *trueratio)
 {
 	int fakeratio = -1;
 	Aspect ratio;
@@ -897,10 +900,10 @@ int CheckRatio (int width, int height)//, int *trueratio)
 		ratio = ASPECT_4_3;
 	}
 
-	/*if (trueratio != NULL)
+	if (trueratio != NULL)
 	{
 		*trueratio = ratio;
-	}*/
+	}
 	return (fakeratio >= 0) ? fakeratio : ratio;
 }
 
@@ -1079,10 +1082,36 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			// The config code will handle this itself, so ignore it here.
 			++i;
 		}
+		else IFARG("--console") {} // Windows always create console parameter
 		else IFARG("--savedir")
 		{
 			if(++i < argc)
 				FileSys::SetDirectoryPath(FileSys::DIR_Saves, argv[i]);
+		}
+		else IFARG("--port")
+		{
+			if(++i < argc)
+				Net::InitVars.port = atoi(argv[i]);
+		}
+		else IFARG("--host")
+		{
+			if(++i < argc)
+			{
+				Net::InitVars.mode = Net::MODE_Host;
+				Net::InitVars.numPlayers = atoi(argv[i]);
+			}
+		}
+		else IFARG("--join")
+		{
+			if(++i < argc)
+			{
+				Net::InitVars.mode = Net::MODE_Client;
+				Net::InitVars.joinAddress = argv[i];
+			}
+		}
+		else IFARG("--debugnet")
+		{
+			DebugNetwork = true;
 		}
 		else
 			files.Push(argv[i]);
@@ -1099,6 +1128,9 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			"Usage: " BINNAME " [options]\n"
 			"Options:\n"
 			" --help                 This help page\n"
+#ifdef _WIN32
+			" --console              Display a console window\n"
+#endif
 			" --config <file>        Use an explicit location for the config file\n"
 			" --savedir <dir>        Use an explicit location for save games\n"
 			" --file <file>          Loads an extra data file\n"
@@ -1124,6 +1156,10 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			" --samplerate <rate>    Sets the sound sample rate (given in Hz, default: %i)\n"
 			" --audiobuffer <size>   Sets the size of the audio buffer (-> sound latency)\n"
 			"                        (given in bytes, default: 2048 / (44100 / samplerate))\n"
+			" --host <number>        Sets up a network game with the given number of players.\n"
+			" --connect <address>    Connects to the given host.\n"
+			" --port <number>        Port number to use for network communications.\n"
+			" --debugnet             Enable network debugging messages.\n"
 			, defaultSampleRate
 		);
 		exit(1);
@@ -1214,39 +1250,12 @@ void CallTerminateFunctions()
 		TermFuncs[--NumTerms]();
 }
 
-#ifndef NO_GTK
-#include <gtk/gtk.h>
-bool GtkAvailable;
-#endif
-#if defined(main) && !defined(__APPLE__)
-#undef main
-#endif
 #ifdef _WIN32
-bool CheckIsRunningFromCommandPrompt();
-void StartupWin32();
+void I_AcknowledgeError();
 #endif
-#ifdef __ANDROID__
-extern "C" int main_android (int argc, char *argv[])
-#else
-int main (int argc, char *argv[])
-#endif
+
+int WL_Main (int argc, char *argv[])
 {
-#ifndef _WIN32
-	// Set LC_NUMERIC environment variable in case some library decides to
-	// clear the setlocale call at least this will be correct.
-	// Note that the LANG environment variable is overridden by LC_*
-	setenv ("LC_NUMERIC", "C", 1);
-#endif
-
-#ifndef NO_GTK
-	GtkAvailable = gtk_init_check(&argc, &argv);
-#endif
-
-#ifdef _WIN32
-	StartupWin32();
-	bool waitForConsoleInput = !CheckIsRunningFromCommandPrompt();
-#endif
-
 	// Stop the C library from screwing around with its functions according
 	// to the system locale.
 	setlocale(LC_ALL, "C");
@@ -1254,10 +1263,7 @@ int main (int argc, char *argv[])
 	FileSys::SetupPaths(argc, argv);
 
 	// Find the program directory.
-	FString progdir(".");
-	int pos = FString(argv[0]).LastIndexOfAny("/\\");
-	if(pos != -1)
-		progdir = FString(argv[0]).Mid(0, pos);
+	FString progdir(FileSys::GetDirectoryPath(FileSys::DIR_Program));
 
 	Scanner::SetMessageHandler(ScannerMessageHandler);
 	atexit(CallTerminateFunctions);
@@ -1289,9 +1295,9 @@ int main (int argc, char *argv[])
 		R_InitRenderer();
 
 		printf("InitGame: Setting up the game...\n");
+		rngseed = I_MakeRNGSeed(); // May change after initializing a net game
 		InitGame();
 
-		rngseed = I_MakeRNGSeed();
 		FRandom::StaticClearRandom();
 
 		printf("DemoLoop: Starting the game loop...\n");
@@ -1312,16 +1318,40 @@ int main (int argc, char *argv[])
 #endif
 
 #ifdef _WIN32
-		// When running from Windows explorer, wait for user dismissal
-		if(waitForConsoleInput)
-		{
-			fprintf(stderr, "An error has occured (press enter to dismiss)");
-			fseek(stdin, 0, SEEK_END);
-			getchar();
-		}
+		I_AcknowledgeError();
 #endif
 
 		exit(-1);
 	}
 	return 1;
 }
+
+// TODO: Move this to a system dependent file?
+#if defined(main) && !defined(__APPLE__)
+#undef main
+#endif
+
+#ifndef NO_GTK
+#include <gtk/gtk.h>
+bool GtkAvailable;
+#endif
+
+#ifndef _WIN32
+#ifdef __ANDROID__
+extern "C" int main_android(int argc, char *argv[])
+#else
+int main(int argc, char *argv[])
+#endif
+{
+	// Set LC_NUMERIC environment variable in case some library decides to
+	// clear the setlocale call at least this will be correct.
+	// Note that the LANG environment variable is overridden by LC_*
+	setenv("LC_NUMERIC", "C", 1);
+
+#ifndef NO_GTK
+	GtkAvailable = gtk_init_check(&argc, &argv);
+#endif
+
+	return WL_Main(argc, argv);
+}
+#endif

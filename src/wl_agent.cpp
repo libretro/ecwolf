@@ -22,6 +22,7 @@
 #include "wl_game.h"
 #include "wl_iwad.h"
 #include "wl_loadsave.h"
+#include "wl_net.h"
 #include "wl_state.h"
 #include "wl_play.h"
 #include "templates.h"
@@ -56,13 +57,12 @@
 //
 // player state info
 //
-int32_t			thrustspeed;
-
 AActor			*LastAttacker;
 
-player_t		players[1];
+player_t		players[MAXPLAYERS];
 
 void ClipMove (AActor *ob, int32_t xmove, int32_t ymove);
+static void Thrust (APlayerPawn *player, angle_t angle, int32_t speed);
 
 /*
 =============================================================================
@@ -105,38 +105,40 @@ void CreateStatusBar()
 ======================
 */
 
-void CheckWeaponChange (void)
+void CheckWeaponChange (AActor *self)
 {
-	if(players[0].flags & player_t::PF_DISABLESWITCH)
+	if(self->player->flags & player_t::PF_DISABLESWITCH)
 		return;
 
 	AWeapon *newWeapon = NULL;
 
-	if(buttonstate[bt_nextweapon] && !buttonheld[bt_nextweapon])
+	TicCmd_t &cmd = control[self->player - players];
+
+	if(cmd.buttonstate[bt_nextweapon] && !cmd.buttonheld[bt_nextweapon])
 	{
-		newWeapon = players[0].weapons.PickNextWeapon(&players[0]);
-		buttonheld[bt_nextweapon] = true;
+		newWeapon = self->player->weapons.PickNextWeapon(self->player);
+		cmd.buttonheld[bt_nextweapon] = true;
 	}
-	else if(buttonstate[bt_prevweapon] && !buttonheld[bt_prevweapon])
+	else if(cmd.buttonstate[bt_prevweapon] && !cmd.buttonheld[bt_prevweapon])
 	{
-		newWeapon = players[0].weapons.PickPrevWeapon(&players[0]);
-		buttonheld[bt_prevweapon] = true;
+		newWeapon = self->player->weapons.PickPrevWeapon(self->player);
+		cmd.buttonheld[bt_prevweapon] = true;
 	}
 	else
 	{
 		for(int i = 0;i <= 9;++i)
 		{
-			if(buttonstate[bt_slot0 + i] && !buttonheld[bt_slot0 + i])
+			if(cmd.buttonstate[bt_slot0 + i] && !cmd.buttonheld[bt_slot0 + i])
 			{
-				newWeapon = players[0].weapons.Slots[i].PickWeapon(&players[0]);
-				buttonheld[bt_slot0 + i] = true;
+				newWeapon = self->player->weapons.Slots[i].PickWeapon(self->player);
+				cmd.buttonheld[bt_slot0 + i] = true;
 				break;
 			}
 		}
 	}
 
-	if(newWeapon && newWeapon != players[0].ReadyWeapon)
-		players[0].PendingWeapon = newWeapon;
+	if(newWeapon && newWeapon != self->player->ReadyWeapon)
+		self->player->PendingWeapon = newWeapon;
 }
 
 
@@ -145,34 +147,34 @@ void CheckWeaponChange (void)
 =
 = ControlMovement
 =
-= Takes controlx,controly, and buttonstate[bt_strafe]
-=
-= Changes the players[0].mo's angle and position
-=
-= There is an angle hack because when going 70 fps, the roundoff becomes
-= significant
+= Changes the players's angle and position
 =
 =======================
 */
 
-void ControlMovement (AActor *ob)
+void ControlMovement (APlayerPawn *ob)
 {
 	if(playstate == ex_died)
 		return;
+
+	const unsigned int playernum = ob->player - players;
+	int controlx = control[playernum].controlx;
+	int controly = control[playernum].controly;
+	int controlstrafe = control[playernum].controlstrafe;
 
 	int32_t oldx,oldy;
 	angle_t angle;
 	int strafe = controlstrafe;
 
-	thrustspeed = 0;
+	ob->player->thrustspeed = 0;
 
-	oldx = players[0].mo->x;
-	oldy = players[0].mo->y;
+	oldx = ob->x;
+	oldy = ob->y;
 
 	//
 	// side to side move
 	//
-	if (buttonstate[bt_strafe])
+	if (control[playernum].buttonstate[bt_strafe])
 	{
 		//
 		// strafing
@@ -182,8 +184,8 @@ void ControlMovement (AActor *ob)
 	}
 	else
 	{
-		if(players[0].ReadyWeapon && players[0].ReadyWeapon->fovscale > 0)
-			controlx = xs_ToInt(controlx*players[0].ReadyWeapon->fovscale);
+		if(ob->player->ReadyWeapon && ob->player->ReadyWeapon->fovscale > 0)
+			controlx = xs_ToInt(controlx*ob->player->ReadyWeapon->fovscale);
 
 		//
 		// not strafing
@@ -199,17 +201,17 @@ void ControlMovement (AActor *ob)
 		else if (strafe < -100)
 			strafe = -100;
 
-		strafe = FixedMul(players[0].mo->speed<<7, FixedMul(strafe, players[0].mo->sidemove[abs(strafe) >= RUNMOVE]));
+		strafe = FixedMul(ob->speed<<7, FixedMul(strafe, ob->sidemove[abs(strafe) >= RUNMOVE]));
 
 		if (strafe > 0)
 		{
 			angle = ob->angle - ANGLE_90;
-			Thrust (angle,strafe*MOVESCALE);      // move to left
+			Thrust (ob,angle,strafe*MOVESCALE);      // move to left
 		}
 		else if (strafe < 0)
 		{
 			angle = ob->angle + ANGLE_90;
-			Thrust (angle,-strafe*MOVESCALE);     // move to right
+			Thrust (ob,angle,-strafe*MOVESCALE);     // move to right
 		}
 	}
 
@@ -221,19 +223,31 @@ void ControlMovement (AActor *ob)
 		if(controly < -100)
 			controly = -100;
 
-		controly = FixedMul(players[0].mo->speed<<7, FixedMul(controly, players[0].mo->forwardmove[controly <= -RUNMOVE]));
+		controly = FixedMul(ob->speed<<7, FixedMul(controly, ob->forwardmove[controly <= -RUNMOVE]));
 
-		Thrust (ob->angle,-controly*MOVESCALE); // move forwards
+		Thrust (ob,ob->angle,-controly*MOVESCALE); // move forwards
 	}
 	else if (controly > 0)
 	{
 		if(controly > 100)
 			controly = 100;
 
-		controly = FixedMul(players[0].mo->speed<<7, FixedMul(controly, players[0].mo->forwardmove[controly >= RUNMOVE]));
+		controly = FixedMul(ob->speed<<7, FixedMul(controly, ob->forwardmove[controly >= RUNMOVE]));
 
 		angle = ob->angle + ANGLE_180;
-		Thrust (angle,controly*MOVESCALE*2/3);          // move backwards
+		Thrust (ob,angle,controly*MOVESCALE*2/3);          // move backwards
+	}
+
+	// Running animation
+	if (ob->player->thrustspeed)
+	{
+		if(ob->SeeState && ob->InStateSequence(ob->SpawnState))
+			ob->SetState(ob->SeeState);
+	}
+	else
+	{
+		if(ob->SpawnState && ob->InStateSequence(ob->SeeState))
+			ob->SetState(ob->SpawnState);
 	}
 
 	if (gamestate.victoryflag)              // watching the BJ actor
@@ -248,13 +262,16 @@ void ControlMovement (AActor *ob)
 ===============
 */
 
-void GiveExtraMan (int amount)
+void player_t::GiveExtraMan (int amount)
 {
-	players[0].lives += amount;
-	if (players[0].lives < 0)
-		players[0].lives = 0;
-	else if(players[0].lives > 9)
-		players[0].lives = 9;
+	if (gamestate.difficulty->LivesCount >= 0)
+	{
+		lives += amount;
+		if (lives < 0)
+			lives = 0;
+		else if(lives > 9)
+			lives = 9;
+	}
 	SD_PlaySound ("misc/1up");
 }
 
@@ -266,12 +283,12 @@ void GiveExtraMan (int amount)
 ===============
 */
 
-void GivePoints (int32_t points)
+void player_t::GivePoints (int32_t points)
 {
-	players[0].score += points;
-	while (players[0].score >= players[0].nextextra)
+	score += FixedMul(points, gamestate.difficulty->ScoreMultiplier);
+	while (score >= nextextra)
 	{
-		players[0].nextextra += EXTRAPOINTS;
+		nextextra += EXTRAPOINTS;
 		GiveExtraMan (1);
 	}
 }
@@ -284,26 +301,34 @@ void GivePoints (int32_t points)
 ===============
 */
 
-void TakeDamage (int points,AActor *attacker)
+static FRandom pr_damageplayer("PlayerTakeDamge");
+void player_t::TakeDamage (int points, AActor *attacker)
 {
 	LastAttacker = attacker;
 
 	if (gamestate.victoryflag)
 		return;
 	points = (points*gamestate.difficulty->DamageFactor)>>FRACBITS;
+	NetDPrintf("%s %d points\n", __FUNCTION__, points);
 
 	if (!godmode)
-		players[0].mo->health = players[0].health -= points;
+		mo->health = health -= points;
 
-	if (players[0].health<=0)
+	if (health<=0)
 	{
-		players[0].mo->Die();
-		players[0].health = 0;
+		mo->target = attacker;
+		mo->Die();
+		health = 0;
 		playstate = ex_died;
-		players[0].killerobj = attacker;
+		killerobj = attacker;
+	}
+	else
+	{
+		if(mo->PainState && pr_damageplayer() < mo->painchance)
+			mo->SetState(mo->PainState);
 	}
 
-	if (godmode != 2)
+	if (godmode != 2 && (this - players) == ConsolePlayer)
 		StartDamageFlash (points);
 
 	if (points > 0)
@@ -413,6 +438,10 @@ static bool TryMove (AActor *ob)
 		if(check == ob)
 			continue;
 
+		// Allow players to clip through each other for now.
+		if(check->player && ob->player)
+			continue;
+
 		fixed r = check->radius + ob->radius;
 		if(check->flags & FL_SOLID)
 		{
@@ -432,7 +461,7 @@ static bool TryMove (AActor *ob)
 	return true;
 }
 
-static void ExecuteWalkTriggers(MapSpot spot, MapTrigger::Side dir)
+static void ExecuteWalkTriggers(AActor *ob, MapSpot spot, MapTrigger::Side dir)
 {
 	if(!spot)
 		return;
@@ -441,7 +470,7 @@ static void ExecuteWalkTriggers(MapSpot spot, MapTrigger::Side dir)
 	{
 		MapTrigger &trigger = spot->triggers[i];
 		if(trigger.playerCross && trigger.activate[dir])
-			map->ActivateTrigger(trigger, dir, players[0].mo);
+			map->ActivateTrigger(trigger, dir, ob);
 	}
 }
 
@@ -453,18 +482,18 @@ static void CheckWalkTriggers(AActor *ob, int32_t xmove, int32_t ymove)
 	{
 		spot = map->GetSpot((ob->x-xmove)>>FRACBITS, ob->y>>FRACBITS, 0);
 		if(xmove > 0)
-			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::East), MapTrigger::West);
+			ExecuteWalkTriggers(ob, spot->GetAdjacent(MapTile::East), MapTrigger::West);
 		else if(xmove < 0)
-			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::West), MapTrigger::East);
+			ExecuteWalkTriggers(ob, spot->GetAdjacent(MapTile::West), MapTrigger::East);
 	}
 
 	if(ob->fracy <= abs(ymove) || ob->fracy >= 0xFFFF-abs(ymove))
 	{
 		spot = map->GetSpot(ob->x>>FRACBITS, (ob->y-ymove)>>FRACBITS, 0);
 		if(ymove > 0)
-			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::South), MapTrigger::North);
+			ExecuteWalkTriggers(ob, spot->GetAdjacent(MapTile::South), MapTrigger::North);
 		else if(ymove < 0)
-			ExecuteWalkTriggers(spot->GetAdjacent(MapTile::North), MapTrigger::South);
+			ExecuteWalkTriggers(ob, spot->GetAdjacent(MapTile::North), MapTrigger::South);
 	}
 }
 
@@ -524,7 +553,7 @@ void ClipMove (AActor *ob, int32_t xmove, int32_t ymove)
 ===================
 */
 
-void Thrust (angle_t angle, int32_t speed)
+static void Thrust (APlayerPawn *player, angle_t angle, int32_t speed)
 {
 	static const int MAXTHRUST = 0x5800l * 2;
 	int32_t xmove,ymove;
@@ -535,7 +564,7 @@ void Thrust (angle_t angle, int32_t speed)
 	if (speed)
 		funnyticount = 0;
 
-	thrustspeed += speed;
+	player->player->thrustspeed += speed;
 	//
 	// moving bounds speed
 	//
@@ -545,9 +574,9 @@ void Thrust (angle_t angle, int32_t speed)
 	xmove = FixedMul(speed,finecosine[angle>>ANGLETOFINESHIFT]);
 	ymove = -FixedMul(speed,finesine[angle>>ANGLETOFINESHIFT]);
 
-	ClipMove(players[0].mo,xmove,ymove);
+	ClipMove(player,xmove,ymove);
 
-	players[0].mo->EnterZone(map->GetSpot(players[0].mo->tilex, players[0].mo->tiley, 0)->zone);
+	player->EnterZone(map->GetSpot(player->tilex, player->tiley, 0)->zone);
 }
 
 
@@ -569,7 +598,7 @@ void Thrust (angle_t angle, int32_t speed)
 ===============
 */
 
-void Cmd_Use (void)
+void APlayerPawn::Cmd_Use()
 {
 	int     checkx,checky;
 	MapTrigger::Side direction;
@@ -577,28 +606,28 @@ void Cmd_Use (void)
 	//
 	// find which cardinal direction the player is facing
 	//
-	if (players[0].mo->angle < ANGLE_45 || players[0].mo->angle > 7*ANGLE_45)
+	if (angle < ANGLE_45 || angle > 7*ANGLE_45)
 	{
-		checkx = players[0].mo->tilex + 1;
-		checky = players[0].mo->tiley;
+		checkx = tilex + 1;
+		checky = tiley;
 		direction = MapTrigger::West;
 	}
-	else if (players[0].mo->angle < 3*ANGLE_45)
+	else if (angle < 3*ANGLE_45)
 	{
-		checkx = players[0].mo->tilex;
-		checky = players[0].mo->tiley-1;
+		checkx = tilex;
+		checky = tiley-1;
 		direction = MapTrigger::South;
 	}
-	else if (players[0].mo->angle < 5*ANGLE_45)
+	else if (angle < 5*ANGLE_45)
 	{
-		checkx = players[0].mo->tilex - 1;
-		checky = players[0].mo->tiley;
+		checkx = tilex - 1;
+		checky = tiley;
 		direction = MapTrigger::East;
 	}
 	else
 	{
-		checkx = players[0].mo->tilex;
-		checky = players[0].mo->tiley + 1;
+		checkx = tilex;
+		checky = tiley + 1;
 		direction = MapTrigger::North;
 	}
 
@@ -611,7 +640,7 @@ void Cmd_Use (void)
 		MapTrigger &trig = spot->triggers[i];
 		if(trig.activate[direction] && trig.playerUse)
 		{
-			if(map->ActivateTrigger(trig, direction, players[0].mo))
+			if(map->ActivateTrigger(trig, direction, this))
 			{
 				isRepeatable |= trig.repeatable;
 				lastTrigger = trig.action;
@@ -683,22 +712,22 @@ void player_t::BobWeapon (fixed *x, fixed *y)
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobInverse:
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = boby - FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobAlpha:
 			*x = FixedMul(bobx, finesine[angle]);
 			*y = FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobInverseAlpha:
 			*x = FixedMul(bobx, finesine[angle]);
 			*y = boby - FixedMul(boby, finesine[angle & (FINEANGLES/2-1)]);
 			break;
-			
+
 		case AWeapon::BobSmooth:
 			*x = FixedMul(bobx, finecosine[angle]);
 			*y = (boby - FixedMul(boby, finecosine[angle*2 & (FINEANGLES-1)])) / 2;
@@ -813,12 +842,21 @@ AActor *player_t::FindTarget()
 			if(check == mo)
 				continue;
 
-			if ((check->flags & FL_SHOOTABLE) && (check->flags & FL_VISABLE)
-				&& abs(check->viewx-centerx) < shootdelta)
+			if ((check->flags & FL_SHOOTABLE))// && (check->flags & FL_VISABLE)
+			//	&& abs(check->viewx-centerx) < shootdelta)
 			{
-				if (check->transx < viewdist)
+				const int dist = MAX(abs(check->x - mo->x), abs(check->y - mo->y));
+
+				float angle = (float) atan2 ((float) (check->y - mo->y), (float) (check->x - mo->x));
+				if (angle<0)
+					angle = (float) (M_PI*2+angle);
+				angle_t iangle = 0-(angle_t)(angle*ANGLE_180/M_PI);
+				angle_t lowerAngle = MIN(iangle, mo->angle);
+				angle_t upperAngle = MAX(iangle, mo->angle);
+				if(MIN(upperAngle - lowerAngle, lowerAngle - upperAngle) <= (ANGLE_90/9) &&
+					CheckLine(check, mo) && dist < viewdist)
 				{
-					viewdist = check->transx;
+					viewdist = dist;
 					closest = check;
 				}
 			}
@@ -830,7 +868,7 @@ AActor *player_t::FindTarget()
 		//
 		// trace a line from player to enemey
 		//
-		if (CheckLine(closest))
+		if (CheckLine(closest, mo))
 			break;
 	}
 
@@ -852,11 +890,11 @@ void player_t::Reborn()
 	ReadyWeapon = NULL;
 	PendingWeapon = WP_NOCHANGE;
 	flags = 0;
-	FOV = DesiredFOV = 90.0f;
+	FOV = DesiredFOV;
 
 	if(state == PST_ENTER)
 	{
-		lives = 3;
+		lives = gamestate.difficulty->LivesCount;
 		score = oldscore = 0;
 		nextextra = EXTRAPOINTS;
 	}
@@ -912,13 +950,82 @@ void player_t::SetPSprite(const Frame *frame, player_t::PSprite layer)
 
 	while(psprite[layer].frame)
 	{
+		if(psprite[layer].frame->offsetX != 0)
+			psprite[layer].sx = psprite[layer].frame->offsetX;
+
+		if(psprite[layer].frame->offsetY != 0)
+			psprite[layer].sy = psprite[layer].frame->offsetY;
+
 		psprite[layer].ticcount = psprite[layer].frame->GetTics();
 		psprite[layer].frame->action(mo, ReadyWeapon, psprite[layer].frame);
+
+		if(mo->player->flags & player_t::PF_WEAPONBOBBING)
+			psprite[layer].sx = psprite[layer].sy = 0;
 
 		if(psprite[layer].frame && psprite[layer].ticcount == 0)
 			psprite[layer].frame = psprite[layer].frame->next;
 		else
 			break;
+	}
+}
+
+void player_t::SetFOV(float newlyDesiredFOV)
+{
+	DesiredFOV = newlyDesiredFOV;
+
+		// If they're not dead, holding a weapon, and the weapon has a non-zero scale, then we adjust the FOV
+	if(state != player_t::PST_DEAD && ReadyWeapon != NULL && ReadyWeapon->fovscale != 0) 
+	{
+		FOV = -DesiredFOV * ReadyWeapon->fovscale;
+		if(mo != NULL) CalcProjection(mo->radius);
+	}
+	else
+	{
+		FOV = DesiredFOV;
+	}
+}
+
+void player_t::AdjustFOV()
+{
+	// [RH] Zoom the player's FOV
+	float desired = DesiredFOV;
+
+	// Adjust FOV using on the currently held weapon.
+	if (state != player_t::PST_DEAD &&		// No adjustment while dead.
+		ReadyWeapon != NULL &&				// No adjustment if no weapon.
+		ReadyWeapon->fovscale != 0)			// No adjustment if the adjustment is zero.
+	{
+
+		// A negative scale is used to prevent G_AddViewAngle/G_AddViewPitch
+		// from scaling with the FOV scale.
+		desired *= fabsf(ReadyWeapon->fovscale);
+	}
+
+	if (FOV != desired)
+	{
+		// Negative FOV means recalculate projection
+		if (FOV < 0)
+		{
+			FOV *= -1;
+		}
+		else if (fabsf(FOV - desired) < 7.f)
+		{
+			FOV = desired;
+		}
+		else
+		{
+			float zoom = MAX(7.f, fabsf(FOV - desired) * 0.025f);
+			if (FOV > desired)
+			{
+				FOV = FOV - zoom;
+			}
+			else
+			{
+				FOV = FOV + zoom;
+			}
+		}
+
+		CalcProjection(mo->radius);
 	}
 }
 
@@ -937,23 +1044,28 @@ FArchive &operator<< (FArchive &arc, player_t *&player)
 
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
-	players[0].mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, 0);
-	players[0].mo->angle = dir*ANGLE_1;
-	players[0].mo->player = &players[0];
-	Thrust (0,0); // set some variables
-	players[0].mo->SetPriority(ThinkerList::PLAYER);
+	for(unsigned int i = 0;i < Net::InitVars.numPlayers;++i)
+	{
+		player_t &player = players[i];
 
-	if(players[0].state == player_t::PST_ENTER || players[0].state == player_t::PST_REBORN)
-		players[0].Reborn();
+		player.mo = (APlayerPawn *) AActor::Spawn(gamestate.playerClass, ((int32_t)tilex<<TILESHIFT)+TILEGLOBAL/2, ((int32_t)tiley<<TILESHIFT)+TILEGLOBAL/2, 0, 0);
+		player.mo->angle = dir*ANGLE_1;
+		player.mo->player = &player;
+		Thrust (player.mo,0,0); // set some variables
+		player.mo->SetPriority(ThinkerList::PLAYER);
 
-	players[0].camera = players[0].mo;
-	players[0].state = player_t::PST_LIVE;
-	players[0].extralight = 0;
+		if(player.state == player_t::PST_ENTER || player.state == player_t::PST_REBORN)
+			player.Reborn();
 
-	// Re-raise the weapon like Doom if we don't have the flag set in mapinfo.
-	if(!levelInfo->SpawnWithWeaponRaised && players[0].PendingWeapon == WP_NOCHANGE)
-		players[0].PendingWeapon = players[0].ReadyWeapon;
-	players[0].BringUpWeapon();
+		player.camera = player.mo;
+		player.state = player_t::PST_LIVE;
+		player.extralight = 0;
+
+		// Re-raise the weapon like Doom if we don't have the flag set in mapinfo.
+		if(!levelInfo->SpawnWithWeaponRaised && player.PendingWeapon == WP_NOCHANGE)
+			player.PendingWeapon = player.ReadyWeapon;
+		player.BringUpWeapon();
+	}
 }
 
 
@@ -992,7 +1104,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	if(range == 0)
 		range = 64;
 
-	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
+	if(!(player->ReadyWeapon->weaponFlags & WF_NOALERT))
 		madenoise = true;
 
 	// actually fire
@@ -1026,7 +1138,7 @@ ACTION_FUNCTION(A_CustomPunch)
 	// hit something
 	if(!(flags & CPF_ALWAYSPLAYSOUND))
 		SD_PlaySound(player->ReadyWeapon->attacksound, SD_WEAPONS);
-	DamageActor(closest, damage);
+	DamageActor(closest, self, damage);
 
 	// Ammo is only used when hit
 	if(flags & CPF_USEAMMO)
@@ -1078,18 +1190,21 @@ ACTION_FUNCTION(A_GunAttack)
 	else
 		SD_PlaySound(sound, SD_WEAPONS);
 
-	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
+	if(self->MeleeState)
+		self->SetState(self->MeleeState);
+
+	if(!(player->ReadyWeapon->weaponFlags & WF_NOALERT))
 		madenoise = true;
 
-	AActor *closest = players[0].FindTarget();
+	AActor *closest = player->FindTarget();
 	if(!closest)
 		return false;
 
 	//
 	// hit something
 	//
-	dx = abs(closest->x - players[0].mo->x);
-	dy = abs(closest->y - players[0].mo->y);
+	dx = abs(closest->x - self->x);
+	dy = abs(closest->y - self->y);
 	dist = dx>dy ? dx:dy;
 
 	dist = FixedMul(dist, snipe);
@@ -1103,7 +1218,7 @@ ACTION_FUNCTION(A_GunAttack)
 		if ( (pr_cwbullet() % maxrange) < dist)           // missed
 			return false;
 	}
-	DamageActor (closest,damage);
+	DamageActor (closest, self, damage);
 	return true;
 }
 
@@ -1116,11 +1231,14 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	ACTION_PARAM_INT(spawnheight, 4);
 	ACTION_PARAM_BOOL(aim, 5);
 
-	if(useammo && !players[0].ReadyWeapon->DepleteAmmo())
+	if(useammo && !self->player->ReadyWeapon->DepleteAmmo())
 		return false;
 
-	if(!(players[0].ReadyWeapon->weaponFlags & WF_NOALERT))
+	if(!(self->player->ReadyWeapon->weaponFlags & WF_NOALERT))
 		madenoise = true;
+
+	if(self->MeleeState)
+		self->SetState(self->MeleeState);
 
 	fixed newx = self->x + spawnoffset*finesine[self->angle>>ANGLETOFINESHIFT]/64;
 	fixed newy = self->y + spawnoffset*finecosine[self->angle>>ANGLETOFINESHIFT]/64;
@@ -1131,7 +1249,7 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	if(!cls)
 		return false;
 	AActor *newobj = AActor::Spawn(cls, newx, newy, 0, SPAWN_AllowReplacement);
-	newobj->flags |= FL_PLAYERMISSILE;
+	newobj->target = self;
 	newobj->angle = iangle;
 
 	newobj->velx = FixedMul(newobj->speed,finecosine[iangle>>ANGLETOFINESHIFT]);

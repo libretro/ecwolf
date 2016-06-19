@@ -44,6 +44,7 @@
 #include <CoreServices/CoreServices.h>
 #include <sys/attr.h>
 #include <sys/mount.h>
+#include <mach-o/dyld.h>
 #endif
 #include <sys/stat.h>
 #include <dirent.h>
@@ -155,25 +156,73 @@ void SetupPaths(int argc, const char * const *argv)
 		pSHGetKnownFolderPath = (HRESULT (WINAPI*)(const GUID*,DWORD,HANDLE,PWSTR*))GetProcAddress(shell32, "SHGetKnownFolderPath");
 		pSHGetFolderPathW = (HRESULT (WINAPI*)(HWND,int,HANDLE,DWORD,LPWSTR))GetProcAddress(shell32, "SHGetFolderPathW");
 	}
-#endif
 
-	// Find the program directory.
-	int pos = FString(argv[0]).LastIndexOfAny("/\\");
-	if(pos != -1)
-		progDir = FString(argv[0]).Mid(0, pos);
-	else
-		progDir = ".";
-
-	// Configuration directory
-#if defined(_WIN32)
 #ifndef _M_X64
 	OSVERSIONINFO osVersion;
 	ZeroMemory(&osVersion, sizeof(OSVERSIONINFO));
 	osVersion.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&osVersion);
 	IsWinNT = osVersion.dwPlatformId > VER_PLATFORM_WIN32_WINDOWS;
-	if(IsWinNT)
 #endif
+#endif
+
+	// Find the program directory.
+#if defined(_WIN32)
+	if(IsWinNT)
+	{
+		char tempCName[MAX_PATH];
+		wchar_t tempName[MAX_PATH];
+		memset(tempCName, 0, MAX_PATH);
+		memset(tempName, 0, MAX_PATH*sizeof(wchar_t));
+		if(SUCCEEDED(GetModuleFileNameW(NULL, tempName, MAX_PATH)))
+		{
+			ConvertName(tempName, tempCName);
+			progDir = tempCName;
+		}
+		else
+			progDir = argv[0];
+	}
+	else
+	{
+		char tempName[MAX_PATH];
+		memset(tempName, 0, MAX_PATH);
+		if(SUCCEEDED(GetModuleFileNameA(NULL, tempName, MAX_PATH)))
+			progDir = tempName;
+		else
+			progDir = argv[0];
+	}
+#elif defined(__APPLE__)
+	{
+		char binpath[MAX_PATH];
+		char binrealpath[MAX_PATH];
+		uint32_t binlen = MAX_PATH;
+		if(_NSGetExecutablePath(binpath, &binlen) == 0 && realpath(binpath, binrealpath) != NULL)
+			progDir = binrealpath;
+		else
+			progDir = argv[0];
+	}
+#else
+	{
+		char linkbuf[MAX_PATH];
+		ssize_t linklen;
+		if((linklen = readlink("/proc/self/exe", linkbuf, MAX_PATH)) > 0)
+		{
+			linkbuf[linklen] = 0;
+			progDir = linkbuf;
+		}
+		else
+			progDir = argv[0];
+	}
+#endif
+	int pos = progDir.LastIndexOfAny("/\\");
+	if(pos != -1)
+		progDir = progDir.Mid(0, pos);
+	else
+		progDir = ".";
+
+	// Configuration directory
+#if defined(_WIN32)
+	if(IsWinNT)
 	{
 		if(pSHGetKnownFolderPath) // Vista+
 		{
@@ -193,7 +242,7 @@ void SetupPaths(int argc, const char * const *argv)
 			char tempCPath[MAX_PATH];
 			wchar_t tempPath[MAX_PATH];
 			memset(tempCPath, 0, MAX_PATH);
-			memset(tempPath, 0, MAX_PATH);
+			memset(tempPath, 0, MAX_PATH*sizeof(wchar_t));
 			if(SUCCEEDED(pSHGetFolderPathW(NULL, CSIDL_APPDATA|CSIDL_FLAG_CREATE, NULL, 0, tempPath)))
 			{
 				ConvertName(tempPath, tempCPath);
@@ -319,6 +368,11 @@ void SetupPaths(int argc, const char * const *argv)
 
 }
 
+static TMap<unsigned int, FString> VirtualRenameTable;
+// The reverse table was setup for the GOG version of Spear of Destiny.
+// It seems awfully fragile in comparison to the above.
+static TMap<unsigned int, FString> VirtualRenameReverse;
+
 File::File(const FString &filename)
 {
 	init(filename);
@@ -329,31 +383,66 @@ File::File(const File &dir, const FString &filename)
 	init(dir.getDirectory() + PATH_SEPARATOR + filename);
 }
 
-void File::init(const FString &filename)
+void File::init(FString filename)
 {
 	this->filename = filename;
 	directory = false;
 	existing = false;
 	writable = false;
 
+	// Are we trying to reference a renamed file?
+	if(FString *fname = VirtualRenameTable.CheckKey(MakeKey(filename)))
+		filename = *fname;
+
 #ifdef _WIN32
-	DWORD fAttributes = GetFileAttributes(filename);
-	if(fAttributes != INVALID_FILE_ATTRIBUTES)
+	if(FileSys::IsWinNT)
 	{
-		existing = true;
-		if(fAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		wchar_t wname[MAX_PATH];
+		FileSys::ConvertName(filename, wname);
+		DWORD fAttributes = GetFileAttributesW(wname);
+		if(fAttributes != INVALID_FILE_ATTRIBUTES)
 		{
-			directory = true;
-			WIN32_FIND_DATA fdata;
-			HANDLE hnd = INVALID_HANDLE_VALUE;
-			hnd = FindFirstFile((filename + "\\*").GetChars(), &fdata);
-			if(hnd != INVALID_HANDLE_VALUE)
+			existing = true;
+			if(fAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				do
+				directory = true;
+				WIN32_FIND_DATAW fdata;
+				HANDLE hnd = INVALID_HANDLE_VALUE;
+				FileSys::ConvertName(filename + "\\*", wname);
+				hnd = FindFirstFileW(wname, &fdata);
+				if(hnd != INVALID_HANDLE_VALUE)
 				{
-					files.Push(fdata.cFileName);
+					do
+					{
+						char fname[MAX_PATH];
+						FileSys::ConvertName(fdata.cFileName, fname);
+						files.Push(fname);
+					}
+					while(FindNextFileW(hnd, &fdata) != 0);
 				}
-				while(FindNextFile(hnd, &fdata) != 0);
+			}
+		}
+	}
+	else
+	{
+		DWORD fAttributes = GetFileAttributesA(filename);
+		if(fAttributes != INVALID_FILE_ATTRIBUTES)
+		{
+			existing = true;
+			if(fAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				directory = true;
+				WIN32_FIND_DATA fdata;
+				HANDLE hnd = INVALID_HANDLE_VALUE;
+				hnd = FindFirstFileA((filename + "\\*").GetChars(), &fdata);
+				if(hnd != INVALID_HANDLE_VALUE)
+				{
+					do
+					{
+						files.Push(fdata.cFileName);
+					}
+					while(FindNextFileA(hnd, &fdata) != 0);
+				}
 			}
 		}
 	}
@@ -387,6 +476,14 @@ void File::init(const FString &filename)
 			writable = true;
 	}
 #endif
+
+	// Check for any virtual renames
+	for(unsigned int i = 0;i < files.Size();++i)
+	{
+		FString *renamed = VirtualRenameReverse.CheckKey(MakeKey(getDirectory() + PATH_SEPARATOR + files[i]));
+		if(renamed)
+			files[i] = *renamed;
+	}
 }
 
 FString File::getDirectory() const
@@ -461,8 +558,6 @@ FString File::getInsensitiveFile(const FString &filename, bool sensitiveExtensio
 #endif
 }
 
-static TMap<unsigned int, FString> VirtualRenameTable;
-
 /**
  * Open a file while handling any non-English character sets and
  * respecting our virtual renaming table.
@@ -499,6 +594,7 @@ void File::rename(const FString &newname)
 	FileSys::FullFileName(filename, path);
 	filename = path;
 
+	VirtualRenameReverse[MakeKey(filename)] = newname;
 	VirtualRenameTable[MakeKey(getDirectory() + PATH_SEPARATOR + newname)] = filename;
 }
 
@@ -513,10 +609,10 @@ bool File::remove()
 	{
 		wchar_t wname[MAX_PATH];
 		FileSys::ConvertName(fn, wname);
-		return DeleteFileW(wname);
+		return DeleteFileW(wname) != 0;
 	}
 	else
-		return DeleteFileA(fn);
+		return DeleteFileA(fn) != 0;
 #else
 	return unlink(fn) == 0;
 #endif

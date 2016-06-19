@@ -13,6 +13,35 @@ actor BJPlayer : PlayerPawn
 	player.weaponslot 3, "MachineGun"
 	player.weaponslot 4, "GatlingGun"
 	player.damagescreencolor "FF 00 00"
+	states
+	{
+		Spawn:
+			PLAY A -1
+			stop
+		See:
+			PLAY B 6.5
+			PLAY C 4
+			PLAY D 6.5
+			PLAY E 4
+			loop
+		Missile:
+			PLAY FG 10
+			goto See
+		Melee:
+			PLAY H 10 bright
+			goto See
+		Pain:
+			PLAY I 5 A_JumpIf(health & 1, 1)
+			goto See
+			PLAY J 5
+			goto See
+		Death:
+			PLAY K 7.5 A_Fall
+			PLAY L 7.5
+			PLAY M 7.5
+			PLAY N -1
+			stop
+	}
 }
 
 actor LostBJPlayer : BJPlayer

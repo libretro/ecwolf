@@ -424,6 +424,9 @@ private:
 	//int CountBuildTiles ();
 	//void InitBuildTiles ();
 
+	// Mac faces (and other hud stuff)
+	void InitMacHud ();
+
 	// Animation stuff
 	void AddAnim (FAnimDef *anim);
 	void FixAnimations ();

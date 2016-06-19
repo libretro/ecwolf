@@ -43,6 +43,8 @@
 #include "scanner.h"
 #include "version.h"
 
+typedef TMap<FName, TUniquePtr<SettingsData> > SettingsMap;
+
 Config config;
 
 Config::Config() : firstRun(false)
@@ -51,9 +53,6 @@ Config::Config() : firstRun(false)
 
 Config::~Config()
 {
-	TMap<FName, SettingsData *>::Pair *pair;
-	for(TMap<FName, SettingsData *>::Iterator it(settings);it.NextPair(pair);)
-		delete pair->Value;
 }
 
 void Config::LocateConfigFile(int argc, char* argv[])
@@ -150,8 +149,8 @@ void Config::SaveConfig()
 	FILE *stream = File(configFile).open("wb");
 	if(stream)
 	{
-		TMap<FName, SettingsData *>::Pair *pair;
-		for(TMap<FName, SettingsData *>::Iterator it(settings);it.NextPair(pair);)
+		SettingsMap::Pair *pair;
+		for(SettingsMap::Iterator it(settings);it.NextPair(pair);)
 		{
 			fwrite(pair->Key, 1, strlen(pair->Key), stream);
 			if(ferror(stream))
@@ -225,6 +224,11 @@ void Config::CreateSetting(const FName index, FString defaultString)
 	}
 }
 
+void Config::DeleteSetting(const FName index)
+{
+	settings.Remove(index);
+}
+
 SettingsData *Config::GetSetting(const FName index)
 {
 	SettingsData *data;
@@ -235,7 +239,7 @@ SettingsData *Config::GetSetting(const FName index)
 
 bool Config::FindIndex(const FName index, SettingsData *&data)
 {
-	SettingsData **setting = settings.CheckKey(index);
+	TUniquePtr<SettingsData> *setting = settings.CheckKey(index);
 	if(setting == NULL)
 		return false;
 	data = *setting;

@@ -48,6 +48,7 @@
 #include "doomerrors.h"
 #include "resourcefiles/resourcefile.h"
 #include "zdoomsupport.h"
+#include "filesys.h"
 
 // Work around missing defines for ECWolf
 #ifndef PATH_MAX
@@ -226,14 +227,14 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 	if (wadinfo == NULL)
 	{
 		// Does this exist? If so, is it a directory?
-		struct stat info;
-		if (stat(filename, &info) != 0)
+		File info(filename);
+		if (!info.exists())
 		{
 			Printf(TEXTCOLOR_RED "Could not stat %s\n", filename);
 			PrintLastError();
 			return;
 		}
-		isdir = (info.st_mode & S_IFDIR) != 0;
+		isdir = info.isDirectory();
 
 		if (!isdir)
 		{
@@ -276,16 +277,11 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 			if (lump->Flags & LUMPF_EMBEDDED)
 			{
 				// Should be ecwolf.<something>
-				FindEmbeddedWolfData(resfile, filename, lump->FullName+7);
+				FindEmbeddedWolfData(resfile, filename, lump->FullName.Mid(7));
 
-				char path[256];
-
-				mysnprintf(path, 256, "%s:", filename);
-				char *wadstr = path + strlen(path);
-
+				FString path;
+				path.Format("%s:%s", filename, lump->FullName.GetChars());
 				FileReader *embedded = lump->NewReader();
-				strcpy(wadstr, lump->FullName);
-
 				AddFile(path, embedded);
 
 				noEmbedded = false;
@@ -771,7 +767,7 @@ void FWadCollection::InitHashChains (void)
 		FirstLumpIndex[j] = i;
 
 		// Do the same for the full paths
-		if (LumpInfo[i].lump->FullName!=NULL)
+		if (LumpInfo[i].lump->FullName.IsNotEmpty())
 		{
 			j = MakeKey(LumpInfo[i].lump->FullName) % NumLumps;
 			NextLumpIndex_FullName[i] = FirstLumpIndex_FullName[j];
@@ -914,7 +910,7 @@ const char *FWadCollection::GetLumpFullName (int lump) const
 {
 	if ((size_t)lump >= NumLumps)
 		return NULL;
-	else if (LumpInfo[lump].lump->FullName != NULL)
+	else if (LumpInfo[lump].lump->FullName.IsNotEmpty())
 		return LumpInfo[lump].lump->FullName;
 	else
 		return LumpInfo[lump].lump->Name;

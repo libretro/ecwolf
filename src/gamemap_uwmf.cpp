@@ -38,6 +38,7 @@
 #include "id_ca.h"
 #include "lnspec.h"
 #include "scanner.h"
+#include "thingdef/thingdef.h"
 #include "w_wad.h"
 #include "wl_game.h"
 #include "wl_shade.h"
@@ -183,8 +184,31 @@ void TextMapParser::ParseTrigger(Scanner &sc, MapTrigger &trigger)
 	}
 	else CheckKey("action")
 	{
-		sc.MustGetToken(TK_IntConst);
-		trigger.action = sc->number;
+		if(sc.CheckToken(TK_IntConst))
+		{
+			trigger.action = sc->number;
+
+			// Warn on first use of deprecated special number.
+			static bool deprSpecial = false;
+			if(!deprSpecial)
+			{
+				deprSpecial = true;
+				sc.ScriptMessage(Scanner::WARNING, "Use of action special number is deprecated. Use names instead.");
+			}
+		}
+		else
+		{
+			sc.MustGetToken(TK_StringConst);
+			Specials::LineSpecials num = Specials::LookupFunctionNum(sc->str);
+			if(num != Specials::NUM_POSSIBLE_SPECIALS)
+				trigger.action = num;
+			else
+			{
+				if(!sc->str.IsEmpty())
+					sc.ScriptMessage(Scanner::WARNING, "Could not resolve action special '%s'.", sc->str.GetChars());
+				trigger.action = 0;
+			}
+		}
 	}
 	else CheckKey("arg0")
 	{
@@ -487,8 +511,26 @@ class UWMFParser : public TextMapParser
 			}
 			else CheckKey("type")
 			{
-				sc.MustGetToken(TK_IntConst);
-				thing.type = sc->number;
+				if(sc.CheckToken(TK_IntConst))
+				{
+					// Deprecated use of Doom Editor Number
+					static bool deprEdNum = false;
+					if(!deprEdNum)
+					{
+						deprEdNum = true;
+						sc.ScriptMessage(Scanner::WARNING, "Deprecated use of editor number. Use class name instead.");
+					}
+
+					if(const ClassDef *cls = ClassDef::FindClass(sc->number))
+						thing.type = cls->GetName();
+					else if(sc->number >= 1 && sc->number <= SMT_NumThings)
+						thing.type = SpecialThingNames[sc->number-1];
+				}
+				else
+				{
+					sc.MustGetToken(TK_StringConst);
+					thing.type = FName(sc->str, true);
+				}
 			}
 			else CheckKey("ambush")
 			{

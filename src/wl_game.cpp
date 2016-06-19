@@ -256,14 +256,13 @@ void SetupGameLevel (void)
 		gamestate.faceframe.SetInvalid();
 		LastAttacker = NULL;
 		players[0].killerobj = NULL;
-
-		thinkerList->DestroyAll();
 	}
 
 //
 // load the level
 //
-	CA_CacheMap (gamestate.mapname, false);
+	CA_CacheMap (gamestate.mapname, loadedgame);
+	StartMusic ();
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer
@@ -538,7 +537,6 @@ void RecordDemo (void)
 	demorecord = true;
 
 	SetupGameLevel ();
-	StartMusic ();
 
 	if(usedoublebuffering) VH_UpdateScreen();
 	fizzlein = true;
@@ -599,7 +597,6 @@ void PlayDemo (int demonumber)
 	demoplayback = true;
 
 	SetupGameLevel ();
-	StartMusic ();
 
 	PlayLoop ();
 
@@ -693,14 +690,16 @@ void Died (void)
 
 	if(usedoublebuffering) VH_UpdateScreen();
 
-	--players[0].lives;
+    if (gamestate.difficulty->LivesCount >= 0) {
+        --players[0].lives;
 
-	if (gameinfo.GameOverPic.IsNotEmpty() && players[0].lives == -1)
-	{
-		FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
-		if(texID.isValid())
-			R_DrawZoomer(texID);
-	}
+        if (gameinfo.GameOverPic.IsNotEmpty() && players[0].lives == -1)
+        {
+            FTextureID texID = TexMan.CheckForTexture(gameinfo.GameOverPic, FTexture::TEX_Any);
+            if(texID.isValid())
+                R_DrawZoomer(texID);
+        }
+    }
 
 	if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
 	{
@@ -721,18 +720,15 @@ void Died (void)
 	else
 	{
 		// If we get a game over we will fade out any way
-		if(players[0].lives > -1)
+		if((players[0].lives > -1) || (gamestate.difficulty->LivesCount < 0))
 			VL_FadeOut(0, 255, 0, 0, 0, 64);
 	}
 
 	SD_WaitSoundDone ();
 	ClearMemory();
 
-	if (players[0].lives > -1)
-	{
+	if ((players[0].lives > -1) || (gamestate.difficulty->LivesCount < 0))
 		players[0].state = player_t::PST_REBORN;
-		thinkerList->DestroyAll();
-	}
 }
 
 //==========================================================================
@@ -842,14 +838,13 @@ restartgame:
 				}
 			}
 		}
+		else
+		{
+			loadedgame = false;
+			StartMusic ();
+		}
 
 		ingame = true;
-		if(loadedgame)
-		{
-			ContinueMusic(lastgamemusicoffset);
-			loadedgame = false;
-		}
-		else StartMusic ();
 
 		if (!died)
 			PreloadGraphics (dointermission);
@@ -992,7 +987,7 @@ restartgame:
 				Died ();
 				died = true;                    // don't "get psyched!"
 
-				if (players[0].lives > -1)
+				if ((players[0].lives > -1) || (gamestate.difficulty->LivesCount < 0))
 					break;                          // more lives left
 
 				VW_FadeOut ();

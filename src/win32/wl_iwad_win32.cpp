@@ -117,7 +117,7 @@ BOOL CALLBACK IWADBoxCallback(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPa
 				if(filepart.IsEmpty())
 					filepart = WadList[i].Path[0];
 				else
-					filepart.Mid(1);
+					filepart = filepart.Mid(1);
 			}
 			else
 				filepart.Format("*.%s", WadList[i].Extension.GetChars());
