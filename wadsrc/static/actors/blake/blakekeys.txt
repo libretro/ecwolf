@@ -1,4 +1,4 @@
-actor RedAccessKey : Key 238
+actor RedAccessKey : Key
 {
 	+INVENTORY.ALWAYSPICKUP
 	states
@@ -9,7 +9,7 @@ actor RedAccessKey : Key 238
 	}
 }
 
-actor YellowAccessKey : Key 239
+actor YellowAccessKey : Key
 {
 	+INVENTORY.ALWAYSPICKUP
 	states
@@ -20,7 +20,7 @@ actor YellowAccessKey : Key 239
 	}
 }
 
-actor BlueAccessKey : Key 241
+actor BlueAccessKey : Key
 {
 	+INVENTORY.ALWAYSPICKUP
 	states

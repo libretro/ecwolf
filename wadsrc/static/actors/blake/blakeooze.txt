@@ -1,6 +1,6 @@
 // TODO: Hurt player with 1/8 probability if on the C frame and player is on same tile
 
-actor GreenOoze : SmartAnimation 335
+actor GreenOoze : SmartAnimation
 {
 	states
 	{
@@ -13,7 +13,7 @@ actor GreenOoze : SmartAnimation 335
 	}
 }
 
-actor GrayOoze : SmartAnimation 336
+actor GrayOoze : SmartAnimation
 {
 	states
 	{
@@ -26,7 +26,7 @@ actor GrayOoze : SmartAnimation 336
 	}
 }
 
-actor WhiteOoze : SmartAnimation 337
+actor WhiteOoze : SmartAnimation
 {
 	states
 	{
@@ -39,7 +39,7 @@ actor WhiteOoze : SmartAnimation 337
 	}
 }
 
-actor BlackOoze : SmartAnimation 338
+actor BlackOoze : SmartAnimation
 {
 	states
 	{

@@ -1,4 +1,4 @@
-actor BlakeWaterPuddle : Health 206
+actor BlakeWaterPuddle : Health
 {
 	inventory.amount 5
 	inventory.maxamount 16
@@ -10,7 +10,7 @@ actor BlakeWaterPuddle : Health 206
 	}
 }
 
-actor FirstAidKit : Health 235
+actor FirstAidKit : Health
 {
 	inventory.amount 30
 	states
@@ -21,7 +21,7 @@ actor FirstAidKit : Health 235
 	}
 }
 
-actor HamMeat : Health 250
+actor HamMeat : Health
 {
 	inventory.amount 20
 	states
@@ -35,7 +35,7 @@ actor HamMeat : Health 250
 	}
 }
 
-actor ChickenLeg : Health 248
+actor ChickenLeg : Health
 {
 	inventory.amount 15
 	states
@@ -49,7 +49,7 @@ actor ChickenLeg : Health 248
 	}
 }
 
-actor CandyBar : Health 279
+actor CandyBar : Health
 {
 	inventory.amount 8
 	states
@@ -63,7 +63,7 @@ actor CandyBar : Health 279
 	}
 }
 
-actor Sandwich : Health 280
+actor Sandwich : Health
 {
 	inventory.amount 10
 	states
@@ -77,7 +77,7 @@ actor Sandwich : Health 280
 	}
 }
 
-actor FullWaterBowl : Health 246
+actor FullWaterBowl : Health
 {
 	inventory.amount 5
 	states

@@ -4,7 +4,7 @@ actor SmartAnimation
 	action native A_SmartAnimDelay();
 }
 
-actor ContainmentCanister 207
+actor ContainmentCanister
 {
 	radius 32
 	+SOLID
@@ -16,7 +16,7 @@ actor ContainmentCanister 207
 	}
 }
 
-actor LunchTable 208
+actor LunchTable
 {
 	radius 32
 	+SOLID
@@ -28,7 +28,7 @@ actor LunchTable 208
 	}
 }
 
-actor BlakeFloorLamp 209
+actor BlakeFloorLamp
 {
 	radius 32
 	+SOLID
@@ -40,7 +40,7 @@ actor BlakeFloorLamp 209
 	}
 }
 
-actor LabTable 210
+actor LabTable
 {
 	radius 32
 	+SOLID
@@ -52,7 +52,7 @@ actor LabTable 210
 	}
 }
 
-actor BlakePillar 211
+actor BlakePillar
 {
 	radius 32
 	+SOLID
@@ -64,7 +64,7 @@ actor BlakePillar 211
 	}
 }
 
-actor BlakeBloodPuddle 212
+actor BlakeBloodPuddle
 {
 	states
 	{
@@ -74,7 +74,7 @@ actor BlakeBloodPuddle 212
 	}
 }
 
-actor PissPuddle 213
+actor PissPuddle
 {
 	states
 	{
@@ -84,7 +84,7 @@ actor PissPuddle 213
 	}
 }
 
-actor FicusTree 214
+actor FicusTree
 {
 	radius 32
 	+SOLID
@@ -96,7 +96,7 @@ actor FicusTree 214
 	}
 }
 
-actor HalfEatenCorpse 215
+actor HalfEatenCorpse
 {
 	states
 	{
@@ -106,7 +106,7 @@ actor HalfEatenCorpse 215
 	}
 }
 
-actor WaterFountain 216
+actor WaterFountain
 {
 	radius 32
 	+SOLID
@@ -118,7 +118,7 @@ actor WaterFountain 216
 	}
 }
 
-actor BlakePlant1 217
+actor BlakePlant1
 {
 	radius 32
 	+SOLID
@@ -130,7 +130,7 @@ actor BlakePlant1 217
 	}
 }
 
-actor BlakeVase 218
+actor BlakeVase
 {
 	radius 32
 	+SOLID
@@ -142,7 +142,7 @@ actor BlakeVase 218
 	}
 }
 
-actor GeneralTable 219
+actor GeneralTable
 {
 	radius 32
 	+SOLID
@@ -154,7 +154,7 @@ actor GeneralTable 219
 	}
 }
 
-actor BlakeCeilingLight1 220
+actor BlakeCeilingLight1
 {
 	states
 	{
@@ -164,7 +164,7 @@ actor BlakeCeilingLight1 220
 	}
 }
 
-actor GeneralChair 221
+actor GeneralChair
 {
 	radius 32
 	+SOLID
@@ -176,7 +176,7 @@ actor GeneralChair 221
 	}
 }
 
-actor KitchenTrashBin 222
+actor KitchenTrashBin
 {
 	radius 32
 	+SOLID
@@ -188,7 +188,7 @@ actor KitchenTrashBin 222
 	}
 }
 
-actor OfficeTrashBin 223
+actor OfficeTrashBin
 {
 	states
 	{
@@ -198,7 +198,7 @@ actor OfficeTrashBin 223
 	}
 }
 
-actor BlakePlant2 224
+actor BlakePlant2
 {
 	radius 32
 	+SOLID
@@ -210,7 +210,7 @@ actor BlakePlant2 224
 	}
 }
 
-actor Gurney 225
+actor Gurney
 {
 	radius 32
 	+SOLID
@@ -222,7 +222,7 @@ actor Gurney 225
 	}
 }
 
-actor IndirectHalfSphere 226
+actor IndirectHalfSphere
 {
 	states
 	{
@@ -232,7 +232,7 @@ actor IndirectHalfSphere 226
 	}
 }
 
-actor ExitSign 227
+actor ExitSign
 {
 	states
 	{
@@ -242,7 +242,7 @@ actor ExitSign 227
 	}
 }
 
-actor Transporter 228
+actor Transporter
 {
 	states
 	{
@@ -252,7 +252,7 @@ actor Transporter 228
 	}
 }
 
-actor BodyCan 229
+actor BodyCan
 {
 	radius 32
 	+SOLID
@@ -264,7 +264,7 @@ actor BodyCan 229
 	}
 }
 
-actor MutantStatue 231
+actor MutantStatue
 {
 	radius 32
 	+SOLID
@@ -276,7 +276,7 @@ actor MutantStatue 231
 	}
 }
 
-actor YellowBox 242
+actor YellowBox
 {
 	states
 	{
@@ -286,7 +286,7 @@ actor YellowBox 242
 	}
 }
 
-actor OfficeDesk 243
+actor OfficeDesk
 {
 	radius 32
 	+SOLID
@@ -298,7 +298,7 @@ actor OfficeDesk 243
 	}
 }
 
-actor OfficeChair 244
+actor OfficeChair
 {
 	radius 32
 	+SOLID
@@ -310,7 +310,7 @@ actor OfficeChair 244
 	}
 }
 
-actor SecurityDesk 245
+actor SecurityDesk
 {
 	radius 32
 	+SOLID
@@ -322,7 +322,7 @@ actor SecurityDesk 245
 	}
 }
 
-actor EmptyWaterBowl 247
+actor EmptyWaterBowl
 {
 	states
 	{
@@ -332,7 +332,7 @@ actor EmptyWaterBowl 247
 	}
 }
 
-actor ChickenBone 249
+actor ChickenBone
 {
 	states
 	{
@@ -342,7 +342,7 @@ actor ChickenBone 249
 	}
 }
 
-actor HamBone 251
+actor HamBone
 {
 	states
 	{
@@ -352,7 +352,7 @@ actor HamBone 251
 	}
 }
 
-actor IndirectSpotLight 253
+actor IndirectSpotLight
 {
 	states
 	{
@@ -362,7 +362,7 @@ actor IndirectSpotLight 253
 	}
 }
 
-actor GurneyMutantStatic 255
+actor GurneyMutantStatic
 {
 	radius 32
 	+SOLID
@@ -374,7 +374,7 @@ actor GurneyMutantStatic 255
 	}
 }
 
-actor LargeAlienCanisterStatic 256
+actor LargeAlienCanisterStatic
 {
 	radius 32
 	+SOLID
@@ -386,7 +386,7 @@ actor LargeAlienCanisterStatic 256
 	}
 }
 
-actor SmallAlienCanisterStatic 257
+actor SmallAlienCanisterStatic
 {
 	radius 32
 	+SOLID
@@ -398,7 +398,7 @@ actor SmallAlienCanisterStatic 257
 	}
 }
 
-actor GurneyMutantEmpty 258
+actor GurneyMutantEmpty
 {
 	radius 32
 	+SOLID
@@ -410,7 +410,7 @@ actor GurneyMutantEmpty 258
 	}
 }
 
-actor LargeAlienCanisterEmpty 259
+actor LargeAlienCanisterEmpty
 {
 	radius 32
 	+SOLID
@@ -422,7 +422,7 @@ actor LargeAlienCanisterEmpty 259
 	}
 }
 
-actor SmallAlienCanisterEmpty 260
+actor SmallAlienCanisterEmpty
 {
 	radius 32
 	+SOLID
@@ -434,7 +434,7 @@ actor SmallAlienCanisterEmpty 260
 	}
 }
 
-actor DeadGenericScientist 261
+actor DeadGenericScientist
 {
 	states
 	{
@@ -444,7 +444,7 @@ actor DeadGenericScientist 261
 	}
 }
 
-actor PlainAirVent 262
+actor PlainAirVent
 {
 	states
 	{
@@ -454,7 +454,7 @@ actor PlainAirVent 262
 	}
 }
 
-actor BloodAirVent 263
+actor BloodAirVent
 {
 	states
 	{
@@ -464,7 +464,7 @@ actor BloodAirVent 263
 	}
 }
 
-actor WaterAirVent 264
+actor WaterAirVent
 {
 	states
 	{
@@ -474,7 +474,7 @@ actor WaterAirVent 264
 	}
 }
 
-actor FloorGrate 265
+actor FloorGrate
 {
 	states
 	{
@@ -484,7 +484,7 @@ actor FloorGrate 265
 	}
 }
 
-actor SteamPipe 266
+actor SteamPipe
 {
 	states
 	{
@@ -494,7 +494,7 @@ actor SteamPipe 266
 	}
 }
 
-actor GreekPost 271
+actor GreekPost
 {
 	radius 32
 	+SOLID
@@ -506,7 +506,7 @@ actor GreekPost 271
 	}
 }
 
-actor BluePost 272
+actor BluePost
 {
 	radius 32
 	+SOLID
@@ -518,7 +518,7 @@ actor BluePost 272
 	}
 }
 
-actor HiTechPost 273
+actor HiTechPost
 {
 	radius 32
 	+SOLID
@@ -530,7 +530,7 @@ actor HiTechPost 273
 	}
 }
 
-actor BlakeCeilingLight2 274
+actor BlakeCeilingLight2
 {
 	states
 	{
@@ -540,7 +540,7 @@ actor BlakeCeilingLight2 274
 	}
 }
 
-actor BlakeCeilingLight3 275
+actor BlakeCeilingLight3
 {
 	states
 	{
@@ -550,7 +550,7 @@ actor BlakeCeilingLight3 275
 	}
 }
 
-actor BodyParts 276
+actor BodyParts
 {
 	states
 	{
@@ -560,7 +560,7 @@ actor BodyParts 276
 	}
 }
 
-actor OverheadLamp 277
+actor OverheadLamp
 {
 	states
 	{
@@ -570,7 +570,7 @@ actor OverheadLamp 277
 	}
 }
 
-actor OfficeSink 278
+actor OfficeSink
 {
 	radius 32
 	+SOLID
@@ -582,7 +582,7 @@ actor OfficeSink 278
 	}
 }
 
-actor BlakeCrate1 281
+actor BlakeCrate1
 {
 	radius 32
 	+SOLID
@@ -594,7 +594,7 @@ actor BlakeCrate1 281
 	}
 }
 
-actor BlakeCrate2 282
+actor BlakeCrate2
 {
 	radius 32
 	+SOLID
@@ -606,7 +606,7 @@ actor BlakeCrate2 282
 	}
 }
 
-actor BlakeCrate3 283
+actor BlakeCrate3
 {
 	radius 32
 	+SOLID
@@ -618,7 +618,7 @@ actor BlakeCrate3 283
 	}
 }
 
-actor BlakeTable 284
+actor BlakeTable
 {
 	radius 32
 	+SOLID
@@ -630,7 +630,7 @@ actor BlakeTable 284
 	}
 }
 
-actor BlakeChair 285
+actor BlakeChair
 {
 	radius 32
 	+SOLID
@@ -642,7 +642,7 @@ actor BlakeChair 285
 	}
 }
 
-actor BlakeStool 286
+actor BlakeStool
 {
 	radius 32
 	+SOLID
@@ -654,7 +654,7 @@ actor BlakeStool 286
 	}
 }
 
-actor BlakeGore 287
+actor BlakeGore
 {
 	states
 	{
@@ -664,7 +664,7 @@ actor BlakeGore 287
 	}
 }
 
-actor BlueRedPost 291
+actor BlueRedPost
 {
 	radius 32
 	+SOLID
@@ -676,7 +676,7 @@ actor BlueRedPost 291
 	}
 }
 
-actor GreekPost2 292
+actor GreekPost2
 {
 	radius 32
 	+SOLID
@@ -688,7 +688,7 @@ actor GreekPost2 292
 	}
 }
 
-actor GeneratorPost 293
+actor GeneratorPost
 {
 	radius 32
 	+SOLID
@@ -700,7 +700,7 @@ actor GeneratorPost 293
 	}
 }
 
-actor TallDecorativeColumn 294
+actor TallDecorativeColumn
 {
 	radius 32
 	+SOLID
@@ -712,7 +712,7 @@ actor TallDecorativeColumn 294
 	}
 }
 
-actor ShortDecorativeColumn 295
+actor ShortDecorativeColumn
 {
 	radius 32
 	+SOLID
@@ -724,7 +724,7 @@ actor ShortDecorativeColumn 295
 	}
 }
 
-actor BlakeDebris1 296
+actor BlakeDebris1
 {
 	states
 	{
@@ -734,7 +734,7 @@ actor BlakeDebris1 296
 	}
 }
 
-actor BlakeDebris2 297
+actor BlakeDebris2
 {
 	states
 	{
@@ -744,7 +744,7 @@ actor BlakeDebris2 297
 	}
 }
 
-actor BlakeDebris3 298
+actor BlakeDebris3
 {
 	states
 	{
@@ -754,7 +754,7 @@ actor BlakeDebris3 298
 	}
 }
 
-actor BlakeDebris4 299
+actor BlakeDebris4
 {
 	states
 	{
@@ -764,7 +764,7 @@ actor BlakeDebris4 299
 	}
 }
 
-actor DeadSectorGuard 300
+actor DeadSectorGuard
 {
 	states
 	{
@@ -774,7 +774,7 @@ actor DeadSectorGuard 300
 	}
 }
 
-actor DeadTechWarrior 301
+actor DeadTechWarrior
 {
 	states
 	{
@@ -784,7 +784,7 @@ actor DeadTechWarrior 301
 	}
 }
 
-actor DeadAlienProtector 302
+actor DeadAlienProtector
 {
 	states
 	{
@@ -794,7 +794,7 @@ actor DeadAlienProtector 302
 	}
 }
 
-actor DeadGroundScout 303
+actor DeadGroundScout
 {
 	states
 	{
@@ -804,7 +804,7 @@ actor DeadGroundScout 303
 	}
 }
 
-actor DeadFloatingScout 304
+actor DeadFloatingScout
 {
 	states
 	{
@@ -814,7 +814,7 @@ actor DeadFloatingScout 304
 	}
 }
 
-actor DeadMechSentinel 305
+actor DeadMechSentinel
 {
 	states
 	{
@@ -824,7 +824,7 @@ actor DeadMechSentinel 305
 	}
 }
 
-actor DeadMutantHuman 306
+actor DeadMutantHuman
 {
 	states
 	{
@@ -834,7 +834,7 @@ actor DeadMutantHuman 306
 	}
 }
 
-actor DeadContainedAlien 307
+actor DeadContainedAlien
 {
 	states
 	{
@@ -844,7 +844,7 @@ actor DeadContainedAlien 307
 	}
 }
 
-actor DeadCanisterAlien 308
+actor DeadCanisterAlien
 {
 	states
 	{
@@ -854,7 +854,7 @@ actor DeadCanisterAlien 308
 	}
 }
 
-actor DeadGurneyMutant 309
+actor DeadGurneyMutant
 {
 	states
 	{
@@ -864,7 +864,7 @@ actor DeadGurneyMutant 309
 	}
 }
 
-actor DeadHangingTurret 310
+actor DeadHangingTurret
 {
 	states
 	{
@@ -874,7 +874,7 @@ actor DeadHangingTurret 310
 	}
 }
 
-actor DeadPODAlien 311
+actor DeadPODAlien
 {
 	states
 	{
@@ -884,7 +884,7 @@ actor DeadPODAlien 311
 	}
 }
 
-actor BlakeRubble 316
+actor BlakeRubble
 {
 	states
 	{
@@ -894,7 +894,7 @@ actor BlakeRubble 316
 	}
 }
 
-actor BonziTree 318
+actor BonziTree
 {
 	radius 32
 	+SOLID
@@ -906,7 +906,7 @@ actor BonziTree 318
 	}
 }
 
-actor YellowPottedPlant 319
+actor YellowPottedPlant
 {
 	radius 32
 	+SOLID
@@ -918,7 +918,7 @@ actor YellowPottedPlant 319
 	}
 }
 
-actor TubePlant 320
+actor TubePlant
 {
 	radius 32
 	+SOLID
@@ -930,7 +930,7 @@ actor TubePlant 320
 	}
 }
 
-actor HiTechTableAndChairs 321
+actor HiTechTableAndChairs
 {
 	radius 32
 	+SOLID
@@ -942,7 +942,7 @@ actor HiTechTableAndChairs 321
 	}
 }
 
-actor DeadSectorPatrol 322
+actor DeadSectorPatrol
 {
 	states
 	{
@@ -952,7 +952,7 @@ actor DeadSectorPatrol 322
 	}
 }
 
-actor DeadStarSentinel 323
+actor DeadStarSentinel
 {
 	states
 	{
@@ -962,7 +962,7 @@ actor DeadStarSentinel 323
 	}
 }
 
-actor DeadStarTrooper 324
+actor DeadStarTrooper
 {
 	states
 	{
@@ -972,7 +972,7 @@ actor DeadStarTrooper 324
 	}
 }
 
-actor FlickerLight 339
+actor FlickerLight
 {
 	states
 	{
@@ -991,7 +991,7 @@ actor FlickerLight 339
 	}
 }
 
-actor SteamGrate 340
+actor SteamGrate
 {
 	states
 	{
@@ -1006,7 +1006,7 @@ actor SteamGrate 340
 	}
 }
 
-actor AlienCeilingLight 341
+actor AlienCeilingLight
 {
 	states
 	{
@@ -1021,7 +1021,7 @@ actor AlienCeilingLight 341
 	}
 }
 
-actor SecurityLight 342
+actor SecurityLight
 {
 	states
 	{

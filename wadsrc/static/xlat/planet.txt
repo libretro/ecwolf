@@ -4,7 +4,7 @@ tiles
 {
 	trigger 88
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -16,7 +16,7 @@ tiles
 	}
 	trigger 89
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -28,7 +28,7 @@ tiles
 	}
 	trigger 90
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -40,7 +40,7 @@ tiles
 	}
 	trigger 91
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -52,7 +52,7 @@ tiles
 	}
 	trigger 92
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -64,7 +64,7 @@ tiles
 	}
 	trigger 93
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -76,7 +76,7 @@ tiles
 	}
 	trigger 94
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -88,7 +88,7 @@ tiles
 	}
 	trigger 95
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -100,7 +100,7 @@ tiles
 	}
 	trigger 96
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -112,7 +112,7 @@ tiles
 	}
 	trigger 97
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -124,7 +124,7 @@ tiles
 	}
 	trigger 98
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -137,7 +137,7 @@ tiles
 	}
 	trigger 99
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -150,7 +150,7 @@ tiles
 	}
 	trigger 100
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -163,7 +163,7 @@ tiles
 	}
 	trigger 101
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -176,7 +176,7 @@ tiles
 	}
 	trigger 102
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -188,7 +188,7 @@ tiles
 	}
 	trigger 103
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -200,7 +200,7 @@ tiles
 	}
 	trigger 104
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 2;
@@ -212,7 +212,7 @@ tiles
 	}
 	trigger 105
 	{
-		action = 1;
+		action = "Door_Open";
 		arg1 = 16;
 		arg2 = 300;
 		arg4 = 3;
@@ -872,7 +872,7 @@ things
 {
 	trigger 98
 	{
-		action = 2;
+		action = "Pushwall_Move";
 		arg1 = 32;
 		arg2 = 2;
 		arg3 = 2;
@@ -881,334 +881,334 @@ things
 	}
 
 	// oldnum, newnum, angles, patrol, minskill
-	{19,	1,		4,	0,	0}
-	{23,	206,	0,	0,	0}
-	{24,	207,	0,	0,	0}
-	{25,	208,	0,	0,	0}
-	{26,	209,	0,	0,	0}
-	{27,	210,	0,	0,	0}
-	{28,	211,	0,	0,	0}
-	{29,	212,	0,	0,	0}
-	{30,	213,	0,	0,	0}
-	{31,	214,	0,	0,	0}
-	{32,	215,	0,	0,	0}
-	{33,	216,	0,	0,	0}
-	{34,	217,	0,	0,	0}
-	{35,	218,	0,	0,	0}
-	{36,	219,	0,	0,	0}
-	{37,	220,	0,	0,	0}
-	{38,	221,	0,	0,	0}
-	{39,	222,	0,	0,	0}
-	{40,	223,	0,	0,	0}
-	{41,	224,	0,	0,	0}
-	{42,	225,	0,	0,	0}
-	{43,	226,	0,	0,	0}
-	{44,	227,	0,	0,	0}
-	{45,	228,	0,	0,	0}
-	{46,	229,	0,	0,	0}
-	{47,	230,	0,	0,	0}
-	{48,	231,	0,	0,	0}
-	{49,	232,	0,	0,	0}
-	{50,	233,	0,	0,	0}
-	{51,	234,	0,	0,	0}
-	{52,	235,	0,	0,	0}
-	{53,	236,	0,	0,	0}
-	{54,	237,	0,	0,	0}
-	{55,	238,	0,	0,	0}
-	{56,	239,	0,	0,	0}
-	{57,	240,	0,	0,	0}
-	{58,	241,	0,	0,	0}
-	{59,	242,	0,	0,	0}
-	{60,	243,	0,	0,	0}
-	{61,	244,	0,	0,	0}
-	{62,	245,	0,	0,	0}
-	{63,	246,	0,	0,	0}
-	{64,	247,	0,	0,	0}
-	{65,	248,	0,	0,	0}
-	{66,	249,	0,	0,	0}
-	{67,	250,	0,	0,	0}
-	{68,	251,	0,	0,	0}
-	{69,	252,	0,	0,	0}
-	{70,	253,	0,	0,	0}
-	{71,	254,	0,	0,	0}
-	{72,	255,	0,	0,	0}
-	{73,	256,	0,	0,	0}
-	{74,	257,	0,	0,	0}
-	{75,	258,	0,	0,	0}
-	{76,	259,	0,	0,	0}
-	{77,	260,	0,	0,	0}
-	{78,	261,	0,	0,	0}
-	{79,	339,	0,	0,	0}
-	{80,	262,	0,	0,	0}
-	{81,	263,	0,	0,	0}
-	{82,	264,	0,	0,	0}
-	{83,	265,	0,	0,	0}
-	{84,	266,	0,	0,	0}
-	{85,	267,	0,	0,	0}
-	{86,	268,	0,	0,	0}
-	{87,	269,	0,	0,	0}
-	{88,	270,	0,	0,	0}
+	{19,  $Player1Start,            4, 0, 0}
+	{23,  BlakeWaterPuddle,         0, 0, 0}
+	{24,  ContainmentCanister,      0, 0, 0}
+	{25,  LunchTable,               0, 0, 0}
+	{26,  BlakeFloorLamp,           0, 0, 0}
+	{27,  LabTable,                 0, 0, 0}
+	{28,  BlakePillar,              0, 0, 0}
+	{29,  BlakeBloodPuddle,         0, 0, 0}
+	{30,  PissPuddle,               0, 0, 0}
+	{31,  FicusTree,                0, 0, 0}
+	{32,  HalfEatenCorpse,          0, 0, 0}
+	{33,  WaterFountain,            0, 0, 0}
+	{34,  BlakePlant1,              0, 0, 0}
+	{35,  BlakeVase,                0, 0, 0}
+	{36,  GeneralTable,             0, 0, 0}
+	{37,  BlakeCeilingLight1,       0, 0, 0}
+	{38,  GeneralChair,             0, 0, 0}
+	{39,  KitchenTrashBin,          0, 0, 0}
+	{40,  OfficeTrashBin,           0, 0, 0}
+	{41,  BlakePlant2,              0, 0, 0}
+	{42,  Gurney,                   0, 0, 0}
+	{43,  IndirectHalfSphere,       0, 0, 0}
+	{44,  ExitSign,                 0, 0, 0}
+	{45,  Transporter,              0, 0, 0}
+	{46,  BodyCan,                  0, 0, 0}
+	{47,  SlowFireProtector,        0, 0, 0}
+	{48,  MutantStatue,             0, 0, 0}
+	{49,  ChargeUnit,               0, 0, 0}
+	{50,  RapidAssaultWeapon,       0, 0, 0}
+	{51,  DualNeutronDisruptor,     0, 0, 0}
+	{52,  FirstAidKit,              0, 0, 0}
+	{53,  VerticalSpikeStatic,      0, 0, 0}
+	{54,  ChargePack,               0, 0, 0}
+	{55,  RedAccessKey,             0, 0, 0}
+	{56,  YellowAccessKey,          0, 0, 0}
+	{57,  AntiPlasmaCannon,         0, 0, 0}
+	{58,  BlueAccessKey,            0, 0, 0}
+	{59,  YellowBox,                0, 0, 0}
+	{60,  OfficeDesk,               0, 0, 0}
+	{61,  OfficeChair,              0, 0, 0}
+	{62,  SecurityDesk,             0, 0, 0}
+	{63,  FullWaterBowl,            0, 0, 0}
+	{64,  EmptyWaterBowl,           0, 0, 0}
+	{65,  ChickenLeg,               0, 0, 0}
+	{66,  ChickenBone,              0, 0, 0}
+	{67,  HamMeat,                  0, 0, 0}
+	{68,  HamBone,                  0, 0, 0}
+	{69,  PlasmaDischargeUnit,      0, 0, 0}
+	{70,  IndirectSpotLight,        0, 0, 0}
+	{71,  VerticalPostStatic,       0, 0, 0}
+	{72,  GurneyMutantStatic,       0, 0, 0}
+	{73,  LargeAlienCanisterStatic, 0, 0, 0}
+	{74,  SmallAlienCanisterStatic, 0, 0, 0}
+	{75,  GurneyMutantEmpty,        0, 0, 0}
+	{76,  LargeAlienCanisterEmpty,  0, 0, 0}
+	{77,  SmallAlienCanisterEmpty,  0, 0, 0}
+	{78,  DeadGenericScientist,     0, 0, 0}
+	{79,  FlickerLight,             0, 0, 0}
+	{80,  PlainAirVent,             0, 0, 0}
+	{81,  BloodAirVent,             0, 0, 0}
+	{82,  WaterAirVent,             0, 0, 0}
+	{83,  FloorGrate,               0, 0, 0}
+	{84,  SteamPipe,                0, 0, 0}
+	{85,  MoneyBag,                 0, 0, 0}
+	{86,  Loot,	                    0, 0, 0}
+	{87,  Gold5Bars,                0, 0, 0}
+	{88,  XylanOrb,                 0, 0, 0}
 	// No 89
-	{90,	10,		8,	0,	0}
+	{90,  PatrolPoint,              8, 0, 0}
 	// No 99-101
-	{103,	352,	0,	0,	0}
-	{104,	352,	0,	0,	2}
-	{105,	352,	0,	0,	3}
-	{106,	353,	0,	0,	0}
-	{107,	353,	0,	0,	2}
-	{108,	327,	4,	0,	0}
-	{112,	327,	4,	PATHING,	0}
-	{116,	332,	4,	0,	0}
-	{120,	332,	4,	PATHING,	0}
+	{103, MechSentinel,             0, 0, 0}
+	{104, MechSentinel,             0, 0, 2}
+	{105, MechSentinel,             0, 0, 3}
+	{106, MutantHuman,              0, 0, 0}
+	{107, MutantHuman,              0, 0, 2}
+	{108, SectorGuard,              4, 0, 0}
+	{112, SectorGuard,              4, PATHING, 0}
+	{116, GeneralScientist,         4, 0, 0}
+	{120, GeneralScientist,         4, PATHING, 0}
 	// TODO: 124 -> Goldfire Spawn Site
-	{125,	353,	0,	0,	3}
-	{126,	329,	4,	0,	0}
-	{130,	329,	4,	PATHING,	0}
-	{134,	356,	0,	0,	0}
-	{135,	356,	0,	0,	2} // TODO: Replace with 257 when below skill
-	{136,	356,	0,	0,	3} // TODO: Replace with 257 when below skill
-	{137,	260,	0,	0,	0}
-	{138,	376,	0,	0,	0}
-	{139,	375,	0,	0,	0}
+	{125, MutantHuman,              0, 0, 3}
+	{126, TechWarrior,              4, 0, 0}
+	{130, TechWarrior,              4, PATHING, 0}
+	{134, SmallAlienCanister,       0, 0, 0}
+	{135, SmallAlienCanister,       0, 0, 2} // TODO: Replace with SmallAlienCanisterStatic when below skill
+	{136, SmallAlienCanister,       0, 0, 3} // TODO: Replace with SmallAlienCanisterStatic when below skill
+	{137, SmallAlienCanisterEmpty,  0, 0, 0}
+	{138, ElectricArcBarrierOff,    0, 0, 0}
+	{139, ElectricArcBarrier,       0, 0, 0}
 	// No 140
 	// TODO: 141 -> Goldfire Spawn immediately
-	{142,	343,	0,	0,	2}
-	{143,	343,	0,	0,	3}
-	{144,	327,	4,	0,	2}
-	{148,	327,	4,	PATHING,	2}
-	{152,	332,	4,	0,	2}
-	{156,	332,	4,	PATHING,	2}
-	{160,	342,	0,	0,	0}
-	{161,	360,	0,	0,	3} // TODO: Replace with 255 when below skill
-	{162,	329,	4,	0,	2}
-	{166,	329,	4,	PATHING,	2}
-	{170,	358,	0,	0,	0}
-	{171,	358,	0,	0,	2} // TODO: Replace with 256 when below skill
-	{172,	358,	0,	0,	3} // TODO: Replace with 256 when below skill
-	{173,	360,	0,	0,	2} // TODO: Replace with 255 when below skill
-	{174,	378,	0,	0,	0}
-	{175,	377,	0,	0,	0}
+	{142, GeneticGuard,             0, 0, 2}
+	{143, GeneticGuard,             0, 0, 3}
+	{144, SectorGuard,              4, 0, 2}
+	{148, SectorGuard,              4, PATHING, 2}
+	{152, GeneralScientist,         4, 0, 2}
+	{156, GeneralScientist,         4, PATHING, 2}
+	{160, SecurityLight,            0, 0, 0}
+	{161, GurneyMutantSleep,        0, 0, 3} // TODO: Replace with GurneyMutantStatic when below skill
+	{162, TechWarrior,              4, 0, 2}
+	{166, TechWarrior,              4, PATHING, 2}
+	{170, LargeAlienCanister,       0, 0, 0}
+	{171, LargeAlienCanister,       0, 0, 2} // TODO: Replace with LargeAlienCanisterStatic when below skill
+	{172, LargeAlienCanister,       0, 0, 3} // TODO: Replace with LargeAlienCanisterStatic when below skill
+	{173, GurneyMutantSleep,        0, 0, 2} // TODO: Replace with GurneyMutantStatic when below skill
+	{174, ElectricPostBarrierOff,   0, 0, 0}
+	{175, ElectricPostBarrier,      0, 0, 0}
 	// No 176
-	{177,	325,	0,	0,	0}
-	{178,	340,	0,	0,	0}
-	{179,	341,	0,	0,	0}
-	{180,	327,	4,	0,	3}
-	{184,	327,	4,	PATHING,	3}
-	{188,	332,	4,	0,	3}
-	{192,	332,	4,	PATHING,	3}
+	{177, SecurityCube,             0, 0, 0}
+	{178, SteamGrate,               0, 0, 0}
+	{179, AlienCeilingLight,        0, 0, 0}
+	{180, SectorGuard,              4, 0, 3}
+	{184, SectorGuard,              4, PATHING, 3}
+	{188, GeneralScientist,         4, 0, 3}
+	{192, GeneralScientist,         4, PATHING, 3}
 	// No 196-197
-	{198,	329,	4,	0,	3}
-	{202,	329,	4,	PATHING,	3}
-	{206,	335,	0,	0,	0}
-	{207,	335,	0,	0,	2}
-	{208,	335,	0,	0,	3}
+	{198, TechWarrior,              4, 0, 3}
+	{202, TechWarrior,              4, PATHING, 3}
+	{206, GreenOoze,                0, 0, 0}
+	{207, GreenOoze,                0, 0, 2}
+	{208, GreenOoze,                0, 0, 3}
 	// No 209
-	{210,	336,	0,	0,	0}
-	{211,	336,	0,	0,	2}
-	{212,	336,	0,	0,	3}
+	{210, GrayOoze,                 0, 0, 0}
+	{211, GrayOoze,                 0, 0, 2}
+	{212, GrayOoze,                 0, 0, 3}
 	// No 213
-	{214,	343,	0,	0,	0}
+	{214, GeneticGuard,             0, 0, 0}
 	// No 215
-	{216,	331,	4,	0,	0}
-	{220,	331,	4,	PATHING,	0}
-	{224,	365,	4,	0,	0}
-	{228,	364,	4,	0,	0}
-	{232,	345,	0,	0,	0}
-	{233,	348,	0,	0,	0}
-	{234,	331,	4,	0,	2}
-	{238,	331,	4,	PATHING,	2}
-	{242,	365,	4,	0,	2}
-	{246,	364,	4,	0,	2}
-	{250,	344,	0,	0,	0}
-	{251,	350,	0,	0,	0}
-	{252,	331,	4,	0,	3}
-	{256,	331,	4,	PATHING,	3}
-	{260,	333,	4,	0,	0}
-	{264,	333,	4,	PATHING,	0}
-	{268,	347,	0,	0,	0}
-	{269,	349,	0,	0,	0}
-	{270,	357,	0,	0,	3}
-	{271,	357,	0,	0,	2}
-	{272,	357,	0,	0,	0}
-	{273,	259,	0,	0,	0}
-	{274,	259,	0,	0,	2}
-	{275,	259,	0,	0,	3}
-	{276,	362,	0,	0,	2} // TODO: Replace with 363 when below skill
-	{277,	338,	0,	0,	0}
-	{278,	333,	4,	0,	2}
-	{282,	333,	4,	PATHING,	2}
-	{286,	337,	0,	0,	0}
+	{216, AlienProtector,           4, 0, 0}
+	{220, AlienProtector,           4, PATHING, 0}
+	{224, CeilingTurretStatic,      4, 0, 0}
+	{228, CeilingTurretRotate,      4, 0, 0}
+	{232, SpiderMutant,             0, 0, 0}
+	{233, BreatherBeast,            0, 0, 0}
+	{234, AlienProtector,           4, 0, 2}
+	{238, AlienProtector,           4, PATHING, 2}
+	{242, CeilingTurretStatic,      4, 0, 2}
+	{246, CeilingTurretRotate,      4, 0, 2}
+	{250, CyborgWarrior,            0, 0, 0}
+	{251, ReptilianWarrior,         0, 0, 0}
+	{252, AlienProtector,           4, 0, 3}
+	{256, AlienProtector,           4, PATHING, 3}
+	{260, FloatingBomb,             4, 0, 0}
+	{264, FloatingBomb,             4, PATHING, 0}
+	{268, AcidDragon,               0, 0, 0}
+	{269, BioMechGuardian,          0, 0, 0}
+	{270, LargeCanisterAlien,       0, 0, 3}
+	{271, LargeCanisterAlien,       0, 0, 2}
+	{272, LargeCanisterAlien,       0, 0, 0}
+	{273, LargeAlienCanisterEmpty,  0, 0, 0}
+	{274, LargeAlienCanisterEmpty,  0, 0, 2}
+	{275, LargeAlienCanisterEmpty,  0, 0, 3}
+	{276, PODAlienEgg,              0, 0, 2} // TODO: Replace with PODAlienEggDead when below skill
+	{277, BlackOoze,                0, 0, 0}
+	{278, FloatingBomb,             4, 0, 2}
+	{282, FloatingBomb,             4, PATHING, 2}
+	{286, WhiteOoze,                0, 0, 0}
 	// No 287
-	{288,	355,	0,	0,	3}
-	{289,	355,	0,	0,	2}
-	{290,	355,	0,	0,	0}
-	{291,	370,	0,	0,	0}
-	{292,	370,	0,	0,	2}
-	{293,	370,	0,	0,	3}
-	{294,	362,	0,	0,	3} // TODO: Replace with 363 when below skill
-	{295,	338,	0,	0,	2}
-	{296,	333,	4,	0,	3}
-	{300,	333,	4,	PATHING,	3}
-	{304,	337,	0,	0,	2}
+	{288, SmallCanisterAlien,       0, 0, 3}
+	{289, SmallCanisterAlien,       0, 0, 2}
+	{290, SmallCanisterAlien,       0, 0, 0}
+	{291, LiquidAlien,              0, 0, 0}
+	{292, LiquidAlien,              0, 0, 2}
+	{293, LiquidAlien,              0, 0, 3}
+	{294, PODAlienEgg,              0, 0, 3} // TODO: Replace with PODAlienEggDead when below skill
+	{295, BlackOoze,                0, 0, 2}
+	{296, FloatingBomb,             4, 0, 3}
+	{300, FloatingBomb,             4, PATHING, 3}
+	{304, WhiteOoze,                0, 0, 2}
 	// No 305
-	{306,	362,	0,	0,	0}
-	{307,	361,	0,	0,	0}
-	{308,	361,	0,	0,	2}
-	{309,	361,	0,	0,	3}
-	{310,	379,	0,	0,	0}
-	{311,	379,	0,	0,	2}
-	{312,	379,	0,	0,	3}
-	{313,	338,	0,	0,	3}
-	{314,	334,	4,	0,	0}
-	{318,	334,	4,	PATHING,	0}
-	{322,	337,	0,	0,	3}
+	{306, PODAlienEgg,              0, 0, 0}
+	{307, PODAlien,                 0, 0, 0}
+	{308, PODAlien,                 0, 0, 2}
+	{309, PODAlien,                 0, 0, 3}
+	{310, ElectroAlien,             0, 0, 0}
+	{311, ElectroAlien,             0, 0, 2}
+	{312, ElectroAlien,             0, 0, 3}
+	{313, BlackOoze,                0, 0, 3}
+	{314, VolatileTransport,        4, 0, 0}
+	{318, VolatileTransport,        4, PATHING, 0}
+	{322, WhiteOoze,                0, 0, 3}
 	// No 323
 	// TODO: 324 -> Vertical Sphere Easy
 	// TODO: 325 -> Horizonal Sphere Easy
 	// TODO: 326 -> Diagonal Sphere Easy
 	// No 327
-	{328,	333,	4,	0,	0} // STATIONARY
-	{332,	334,	4,	0,	2}
-	{336,	334,	4,	PATHING,	2}
+	{328, FloatingBomb,             4, 0, 0} // STATIONARY
+	{332, VolatileTransport,        4, 0, 2}
+	{336, VolatileTransport,        4, PATHING, 2}
 	// TODO: 342 -> Vertical Sphere Normal
 	// TODO: 343 -> Horizonal Sphere Normal
 	// TODO: 344 -> Diagonal Sphere Normal
 	// No 345
-	{346,	333,	4,	0,	2} // STATIONARY
-	{350,	334,	4,	0,	3}
-	{354,	334,	4,	PATHING,	3}
+	{346, FloatingBomb,             4, 0, 2} // STATIONARY
+	{350, VolatileTransport,        4, 0, 3}
+	{354, VolatileTransport,        4, PATHING, 3}
 	// No 358-359
 	// TODO: 360 -> Vertical Sphere Hard
 	// TODO: 361 -> Horizonal Sphere Hard
 	// TODO: 362 -> Diagonal Sphere Hard
 	// No 363
-	{364,	333,	4,	0,	3} // STATIONARY
-	{368,	365,	4,	0,	3}
-	{372,	364,	4,	0,	3}
+	{364, FloatingBomb,             4, 0, 3} // STATIONARY
+	{368, CeilingTurretStatic,      4, 0, 3}
+	{372, CeilingTurretRotate,      4, 0, 3}
 	// No 376-380
-	{381,	271,	0,	0,	0}
-	{382,	272,	0,	0,	0}
-	{383,	273,	0,	0,	0}
-	{384,	274,	0,	0,	0}
-	{385,	275,	0,	0,	0}
-	{386,	276,	0,	0,	0}
-	{387,	277,	0,	0,	0}
-	{388,	278,	0,	0,	0}
+	{381, GreekPost,                0, 0, 0}
+	{382, BluePost,                 0, 0, 0}
+	{383, HiTechPost,               0, 0, 0}
+	{384, BlakeCeilingLight2,       0, 0, 0}
+	{385, BlakeCeilingLight3,       0, 0, 0}
+	{386, BodyParts,                0, 0, 0}
+	{387, OverheadLamp,             0, 0, 0}
+	{388, OfficeSink,               0, 0, 0}
 	// No 389
-	{390,	279,	0,	0,	0}
-	{391,	280,	0,	0,	0}
-	{392,	281,	0,	0,	0}
-	{393,	282,	0,	0,	0}
-	{394,	283,	0,	0,	0}
-	{395,	284,	0,	0,	0}
-	{396,	285,	0,	0,	0}
-	{397,	286,	0,	0,	0}
-	{398,	287,	0,	0,	0}
-	{399,	288,	0,	0,	0}
-	{400,	289,	0,	0,	0}
-	{401,	290,	0,	0,	0}
-	{402,	291,	0,	0,	0}
-	{403,	292,	0,	0,	0}
-	{404,	293,	0,	0,	0}
-	{405,	294,	0,	0,	0}
-	{406,	295,	0,	0,	0}
-	{407,	296,	0,	0,	0}
-	{408,	297,	0,	0,	0}
-	{409,	298,	0,	0,	0}
-	{410,	299,	0,	0,	0}
-	{411,	300,	0,	0,	0}
-	{412,	301,	0,	0,	0}
-	{413,	302,	0,	0,	0}
-	{414,	303,	0,	0,	0}
-	{415,	304,	0,	0,	0}
-	{416,	305,	0,	0,	0}
-	{417,	306,	0,	0,	0}
-	{418,	307,	0,	0,	0}
-	{419,	308,	0,	0,	0}
-	{420,	309,	0,	0,	0}
-	{421,	310,	0,	0,	0}
-	{422,	311,	0,	0,	0}
-	{423,	312,	0,	0,	0}
-	{424,	313,	0,	0,	0}
-	{425,	374,	0,	0,	0}
-	{426,	373,	0,	0,	0}
+	{390, CandyBar,                 0, 0, 0}
+	{391, Sandwich,                 0, 0, 0}
+	{392, BlakeCrate1,              0, 0, 0}
+	{393, BlakeCrate2,              0, 0, 0}
+	{394, BlakeCrate3,              0, 0, 0}
+	{395, BlakeTable,               0, 0, 0}
+	{396, BlakeChair,               0, 0, 0}
+	{397, BlakeStool,               0, 0, 0}
+	{398, BlakeGore,                0, 0, 0}
+	{399, Gold3Bars,                0, 0, 0}
+	{400, Gold2Bars,                0, 0, 0}
+	{401, Gold1Bar,                 0, 0, 0}
+	{402, BlueRedPost,              0, 0, 0}
+	{403, GreekPost2,               0, 0, 0}
+	{404, GeneratorPost,            0, 0, 0}
+	{405, TallDecorativeColumn,     0, 0, 0}
+	{406, ShortDecorativeColumn,    0, 0, 0}
+	{407, BlakeDebris1,             0, 0, 0}
+	{408, BlakeDebris2,             0, 0, 0}
+	{409, BlakeDebris3,             0, 0, 0}
+	{410, BlakeDebris4,             0, 0, 0}
+	{411, DeadSectorGuard,          0, 0, 0}
+	{412, DeadTechWarrior,          0, 0, 0}
+	{413, DeadAlienProtector,       0, 0, 0}
+	{414, DeadGroundScout,          0, 0, 0}
+	{415, DeadFloatingScout,        0, 0, 0}
+	{416, DeadMechSentinel,         0, 0, 0}
+	{417, DeadMutantHuman,          0, 0, 0}
+	{418, DeadContainedAlien,       0, 0, 0}
+	{419, DeadCanisterAlien,        0, 0, 0}
+	{420, DeadGurneyMutant,         0, 0, 0}
+	{421, DeadHangingTurret,        0, 0, 0}
+	{422, DeadPODAlien,             0, 0, 0}
+	{423, ConcessionCoin,           0, 0, 0}
+	{424, ConcessionCoin5,          0, 0, 0}
+	{425, VerticalSpikeInactive,    0, 0, 0}
+	{426, VerticalSpikeActive,      0, 0, 0}
 	// No 427
-	{428,	374,	0,	0,	0}
-	{429,	374,	0,	0,	2}
-	{430,	374,	0,	0,	3}
+	{428, VerticalSpikeInactive,    0, 0, 0}
+	{429, VerticalSpikeInactive,    0, 0, 2}
+	{430, VerticalSpikeInactive,    0, 0, 3}
 	// No 431
 	// TODO: 432-449 -> Blastable crate1
 	// TODO: 450-467 -> Blastable crate2
 	// TODO: 468-485 -> Blastable crate3
-	{486,	315,	0,	0,	0}
-	{487,	316,	0,	0,	0}
-	{488,	317,	0,	0,	0}
-	{489,	318,	0,	0,	0}
-	{490,	319,	0,	0,	0}
-	{491,	320,	0,	0,	0}
-	{492,	321,	0,	0,	0}
-	{493,	322,	0,	0,	0}
-	{494,	323,	0,	0,	0}
-	{495,	324,	0,	0,	0}
+	{486, PlasmaDetonator,          0, 0, 0}
+	{487, BlakeRubble,              0, 0, 0}
+	{488, RadarPack,                0, 0, 0}
+	{489, BonziTree,                0, 0, 0}
+	{490, YellowPottedPlant,        0, 0, 0}
+	{491, TubePlant,                0, 0, 0}
+	{492, HiTechTableAndChairs,     0, 0, 0}
+	{493, DeadSectorPatrol,         0, 0, 0}
+	{494, DeadStarSentinel,         0, 0, 0}
+	{495, DeadStarTrooper,          0, 0, 0}
 	// No 496-503
 	// Technically these unset FL_RANDOM_TURN, but that's not set on anything other than scientists.
-	{504,	331,	4,	PATHING,	0}
-	{508,	333,	4,	PATHING,	0}
-	{512,	334,	4,	PATHING,	0}
-	{516,	327,	4,	PATHING,	0}
+	{504, AlienProtector,           4, PATHING, 0}
+	{508, FloatingBomb,             4, PATHING, 0}
+	{512, VolatileTransport,        4, PATHING, 0}
+	{516, SectorGuard,              4, PATHING, 0}
 	// No 520-521
-	{522,	331,	4,	PATHING,	2}
-	{526,	333,	4,	PATHING,	2}
-	{530,	334,	4,	PATHING,	2}
-	{534,	327,	4,	PATHING,	2}
+	{522, AlienProtector,           4, PATHING, 2}
+	{526, FloatingBomb,             4, PATHING, 2}
+	{530, VolatileTransport,        4, PATHING, 2}
+	{534, SectorGuard,              4, PATHING, 2}
 	// No 538-539
-	{540,	331,	4,	PATHING,	3}
-	{544,	333,	4,	PATHING,	3}
-	{548,	334,	4,	PATHING,	3}
-	{552,	327,	4,	PATHING,	3}
+	{540, AlienProtector,           4, PATHING, 3}
+	{544, FloatingBomb,             4, PATHING, 3}
+	{548, VolatileTransport,        4, PATHING, 3}
+	{552, SectorGuard,              4, PATHING, 3}
 	// No 556-557
-	{558,	329,	4,	PATHING,	0}
-	{562,	372,	0,	0,	0}
-	{563,	371,	0,	0,	0}
+	{558, TechWarrior,              4, PATHING, 0}
+	{562, VerticalPostInactive,     0, 0, 0}
+	{563, VerticalPostActive,       0, 0, 0}
 	// No 564
-	{565,	372,	0,	0,	0}
-	{566,	372,	0,	0,	2}
-	{567,	372,	0,	0,	3}
+	{565, VerticalPostInactive,     0, 0, 0}
+	{566, VerticalPostInactive,     0, 0, 2}
+	{567, VerticalPostInactive,     0, 0, 3}
 	// No 568-575
-	{576,	329,	4,	PATHING,	2}
+	{576, TechWarrior,              4, PATHING, 2}
 	// No 580-582
-	{583,	345,	0,	0,	2}
-	{584,	348,	0,	0,	2}
-	{585,	344,	0,	0,	2}
-	{586,	350,	0,	0,	2}
-	{587,	347,	0,	0,	2}
-	{588,	349,	0,	0,	2}
+	{583, SpiderMutant,             0, 0, 2}
+	{584, BreatherBeast,            0, 0, 2}
+	{585, CyborgWarrior,            0, 0, 2}
+	{586, ReptilianWarrior,         0, 0, 2}
+	{587, AcidDragon,               0, 0, 2}
+	{588, BioMechGuardian,          0, 0, 2}
 	// No 589
-	{590,	351,	0,	0,	0}
-	{591,	351,	0,	0,	2} // TODO: Replace with 292 when below skill
-	{592,	351,	0,	0,	3} // TODO: Replace with 292 when below skill
+	{590, ReptilianWarriorMorphed,  0, 0, 0}
+	{591, ReptilianWarriorMorphed,  0, 0, 2} // TODO: Replace with GreekPost2 when below skill
+	{592, ReptilianWarriorMorphed,  0, 0, 3} // TODO: Replace with GreekPost2 when below skill
 	// No 593
-	{594,	329,	4,	PATHING,	3}
+	{594, TechWarrior,              4, PATHING, 3}
 	// No 598-600
-	{601,	345,	0,	0,	3}
-	{602,	348,	0,	0,	3}
-	{603,	344,	0,	0,	3}
-	{604,	350,	0,	0,	3}
-	{605,	347,	0,	0,	3}
-	{606,	349,	0,	0,	3}
+	{601, SpiderMutant,             0, 0, 3}
+	{602, BreatherBeast,            0, 0, 3}
+	{603, CyborgWarrior,            0, 0, 3}
+	{604, ReptilianWarrior,         0, 0, 3}
+	{605, AcidDragon,               0, 0, 3}
+	{606, BioMechGuardian,          0, 0, 3}
 	// No 607
-	{608,	346,	0,	0,	0}
-	{609,	346,	0,	0,	2} // TODO: Replace with 291 when below skill
-	{610,	346,	0,	0,	3} // TODO: Replace with 291 when below skill
+	{608, SpiderMutantMorphed,      0, 0, 0}
+	{609, SpiderMutantMorphed,      0, 0, 2} // TODO: Replace with BlueRedPost when below skill
+	{610, SpiderMutantMorphed,      0, 0, 3} // TODO: Replace with BlueRedPost when below skill
 	// No 611-625
-	{626,	354,	0,	0,	0}
-	{627,	354,	0,	0,	2} // TODO: Replace with 231 when below skill
-	{628,	354,	0,	0,	3} // TODO: Replace with 231 when below skill
+	{626, MutantHumanMorphed,       0, 0, 0}
+	{627, MutantHumanMorphed,       0, 0, 2} // TODO: Replace with MutantStatue when below skill
+	{628, MutantHumanMorphed,       0, 0, 3} // TODO: Replace with MutantStatue when below skill
 	// No 629
-	{630,	366,	0,	0,	0}
-	{631,	367,	0,	0,	0}
-	{632,	368,	0,	0,	0}
-	{633,	369,	0,	0,	0}
+	{630, GiantStalker,             0, 0, 0}
+	{631, SpectorDemon,             0, 0, 0}
+	{632, ArmoredStalker,           0, 0, 0}
+	{633, CrawlerBeast,             0, 0, 0}
 }
 
 flats

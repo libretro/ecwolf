@@ -18,7 +18,7 @@ actor BlakeWeapon : Weapon
 	}
 }
 
-actor AutoChargePistol : BlakeWeapon 314
+actor AutoChargePistol : BlakeWeapon
 {
 	attacksound "weapon/autochargepistol/attack"
 	inventory.icon "STWEAP1"
@@ -40,7 +40,7 @@ actor AutoChargePistol : BlakeWeapon 314
 	}
 }
 
-actor SlowFireProtector : BlakeWeapon 230
+actor SlowFireProtector : BlakeWeapon
 {
 	attacksound "weapon/slowfireprotector/attack"
 	inventory.icon "STWEAP2"
@@ -62,7 +62,7 @@ actor SlowFireProtector : BlakeWeapon 230
 	}
 }
 
-actor RapidAssaultWeapon : BlakeWeapon 233
+actor RapidAssaultWeapon : BlakeWeapon
 {
 	attacksound "weapon/rapidassaultweapon/attack"
 	inventory.icon "STWEAP3"
@@ -92,7 +92,7 @@ actor RapidAssaultWeapon : BlakeWeapon 233
  *
  * Seems like a classic case of improper indentation masking a critical flaw!
  */
-actor DualNeutronDisruptor : BlakeWeapon 234
+actor DualNeutronDisruptor : BlakeWeapon
 {
 	attacksound "weapon/dualneutrondisruptor/attack"
 	inventory.icon "STWEAP4"
@@ -144,7 +144,7 @@ actor PlasmaGrenade : SmartAnimation
 			stop
 	}
 }
-actor PlasmaDischargeUnit : BlakeWeapon 252
+actor PlasmaDischargeUnit : BlakeWeapon
 {
 	inventory.icon "STWEAP5"
 	inventory.pickupsound "weapon/plasmadischargeunit/pickup"
@@ -189,7 +189,7 @@ actor AntiPlasmaShot : SmartAnimation
 			stop
 	}
 }
-actor AntiPlasmaCannon : BlakeWeapon 240
+actor AntiPlasmaCannon : BlakeWeapon
 {
 	inventory.icon "STWEAP6"
 	inventory.pickupsound "weapon/antiplasmacannon/pickup"

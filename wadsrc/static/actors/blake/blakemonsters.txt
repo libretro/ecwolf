@@ -1,6 +1,6 @@
 // Sector Patrol / Sector Guard
 
-actor RentACop : WolfensteinMonster 326
+actor RentACop : WolfensteinMonster
 {
 	points 1025
 	health 4, 9, 25, 38
@@ -52,7 +52,7 @@ actor RentACop : WolfensteinMonster 326
 	}
 }
 
-actor SectorGuard : RentACop 327
+actor SectorGuard : RentACop
 {
 	attacksound "sectorguard/attack"
 	seesound "sectorguard/sight"
@@ -98,7 +98,7 @@ actor SectorGuard : RentACop 327
 
 // STAR Sentinel / Tech Warrior
 
-actor ProGuard : WolfensteinMonster 328
+actor ProGuard : WolfensteinMonster
 {
 	points 5000
 	health 33, 63, 150, 175
@@ -154,7 +154,7 @@ actor ProGuard : WolfensteinMonster 328
 	}
 }
 
-actor TechWarrior : ProGuard 329
+actor TechWarrior : ProGuard
 {
 	attacksound "techwarrior/attack"
 	seesound "techwarrior/sight"
@@ -204,7 +204,7 @@ actor TechWarrior : ProGuard 329
 
 // STAR Trooper / Alien Protector
 
-actor STARTrooper : WolfensteinMonster 330
+actor STARTrooper : WolfensteinMonster
 {
 	points 7025
 	health 78, 112, 325, 425
@@ -269,7 +269,7 @@ actor STARTrooper : WolfensteinMonster 330
 	}
 }
 
-actor AlienProtector : STARTrooper 331
+actor AlienProtector : STARTrooper
 {
 	attacksound "alienprotector/attack"
 	seesound "alienprotector/sight"
@@ -328,7 +328,7 @@ actor AlienProtector : STARTrooper 331
 
 // General Scientist/Informant
 
-actor GeneralScientist : WolfensteinMonster 332
+actor GeneralScientist : WolfensteinMonster
 {
 	points 500
 	health 4, 9, 23, 28
@@ -396,7 +396,7 @@ actor InformantScientist : GeneralScientist
 
 // Floating Bomb & VolatileTransport
 
-actor FloatingBomb : WolfensteinMonster 333
+actor FloatingBomb : WolfensteinMonster
 {
 	points 2025
 	health 15, 40, 60, 85
@@ -437,7 +437,7 @@ actor FloatingBomb : WolfensteinMonster 333
 	}
 }
 
-actor VolatileTransport : WolfensteinMonster 334
+actor VolatileTransport : WolfensteinMonster
 {
 	points 2025
 	health 17, 25, 63, 75
@@ -472,7 +472,7 @@ actor VolatileTransport : WolfensteinMonster 334
 
 // Genetic Guard
 
-actor GeneticGuard : WolfensteinMonster 343
+actor GeneticGuard : WolfensteinMonster
 {
 	points 10000
 	health 20, 60, 180, 240
@@ -521,7 +521,7 @@ actor GeneticGuard : WolfensteinMonster 343
 
 // Cyborg Warrior
 
-actor CyborgWarrior : WolfensteinMonster 344
+actor CyborgWarrior : WolfensteinMonster
 {
 	points 7000
 	health 70, 100, 150, 200
@@ -592,7 +592,7 @@ actor SpiderMutantShot : SmartAnimation
 	}
 }
 
-actor SpiderMutant : WolfensteinMonster 345
+actor SpiderMutant : WolfensteinMonster
 {
 	points 5000
 	health 60, 100, 150, 200
@@ -632,7 +632,7 @@ actor SpiderMutant : WolfensteinMonster 345
 	}
 }
 
-actor SpiderMutantMorphed 346
+actor SpiderMutantMorphed
 {
 	radius 32
 	health 1
@@ -681,7 +681,7 @@ actor AcidDragonShot : SmartAnimation
 	}
 }
 
-actor AcidDragon : WolfensteinMonster 347
+actor AcidDragon : WolfensteinMonster
 {
 	points 9000
 	health 60, 100, 150, 200
@@ -723,7 +723,7 @@ actor AcidDragon : WolfensteinMonster 347
 
 // Breather Beast
 
-actor BreatherBeast : WolfensteinMonster 348
+actor BreatherBeast : WolfensteinMonster
 {
 	points 6000
 	health 65, 115, 165, 225
@@ -766,7 +766,7 @@ actor BreatherBeast : WolfensteinMonster 348
 
 // Bio-Mech Guardian
 
-actor BioMechGuardian : WolfensteinMonster 349
+actor BioMechGuardian : WolfensteinMonster
 {
 	points 9000
 	health 65, 115, 165, 225
@@ -810,7 +810,7 @@ actor BioMechGuardian : WolfensteinMonster 349
 
 // Reptilian Warrior
 
-actor ReptilianWarrior : WolfensteinMonster 350
+actor ReptilianWarrior : WolfensteinMonster
 {
 	points 8000
 	health 65, 115, 165, 225
@@ -852,7 +852,7 @@ actor ReptilianWarrior : WolfensteinMonster 350
 	}
 }
 
-actor ReptilianWarriorMorphed 351
+actor ReptilianWarriorMorphed
 {
 	radius 32
 	health 1
@@ -874,7 +874,7 @@ actor ReptilianWarriorMorphed 351
 
 // Mech Sentinel
 
-actor MechSentinel : WolfensteinMonster 352
+actor MechSentinel : WolfensteinMonster
 {
 	points 5055
 	health 24, 50, 155, 210
@@ -918,7 +918,7 @@ actor MechSentinel : WolfensteinMonster 352
 
 // Mutant Human
 
-actor MutantHuman : WolfensteinMonster 353
+actor MutantHuman : WolfensteinMonster
 {
 	points 6055
 	health 24, 50, 155, 210
@@ -962,7 +962,7 @@ actor MutantHuman : WolfensteinMonster 353
 	}
 }
 
-actor MutantHumanMorphed 354
+actor MutantHumanMorphed
 {
 	radius 32
 	health 1
@@ -1009,7 +1009,7 @@ actor SmallCanisterShot : SmartAnimation
 	}
 }
 
-actor SmallCanisterAlien : WolfensteinMonster 355
+actor SmallCanisterAlien : WolfensteinMonster
 {
 	points 3750
 	health 25, 60, 100, 240
@@ -1053,7 +1053,7 @@ actor SmallCanisterAlien : WolfensteinMonster 355
 	}
 }
 
-actor SmallAlienCanister 356
+actor SmallAlienCanister
 {
 	radius 32
 	health 1
@@ -1105,7 +1105,7 @@ actor LargeCanisterShot : SmartAnimation
 	}
 }
 
-actor LargeCanisterAlien : WolfensteinMonster 357
+actor LargeCanisterAlien : WolfensteinMonster
 {
 	points 6050
 	health 34, 75, 225, 300
@@ -1149,7 +1149,7 @@ actor LargeCanisterAlien : WolfensteinMonster 357
 	}
 }
 
-actor LargeAlienCanister 358
+actor LargeAlienCanister
 {
 	radius 32
 	health 1
@@ -1172,7 +1172,7 @@ actor LargeAlienCanister 358
 
 // Gurney Mutant
 
-actor GurneyMutant : WolfensteinMonster 359
+actor GurneyMutant : WolfensteinMonster
 {
 	points 3750
 	health 27, 37, 150, 200
@@ -1216,7 +1216,7 @@ actor GurneyMutant : WolfensteinMonster 359
 	}
 }
 
-actor GurneyMutantSleep 360
+actor GurneyMutantSleep
 {
 	radius 32
 	health 1
@@ -1238,7 +1238,7 @@ actor GurneyMutantSleep 360
 
 // P.O.D. Alien
 
-actor PODAlien : WolfensteinMonster 361
+actor PODAlien : WolfensteinMonster
 {
 	points 5075
 	health 22, 60, 160, 210
@@ -1279,7 +1279,7 @@ actor PODAlien : WolfensteinMonster 361
 	}
 }
 
-actor PODAlienEgg 362
+actor PODAlienEgg
 {
 	radius 32
 	health 1
@@ -1299,7 +1299,7 @@ actor PODAlienEgg 362
 	}
 }
 
-actor PODAlienEggDead 363
+actor PODAlienEggDead
 {
 	radius 32
 	+SOLID
@@ -1313,7 +1313,7 @@ actor PODAlienEggDead 363
 
 // Hanging Turret
 
-actor CeilingTurretRotate 364
+actor CeilingTurretRotate
 {
 	points 1050
 	health 4, 9, 23, 28
@@ -1344,7 +1344,7 @@ actor CeilingTurretRotate 364
 	}
 }
 
-actor CeilingTurretStatic : CeilingTurretRotate 365
+actor CeilingTurretStatic : CeilingTurretRotate
 {
 	states
 	{
@@ -1356,7 +1356,7 @@ actor CeilingTurretStatic : CeilingTurretRotate 365
 
 // Giant Stalker
 
-actor GiantStalker : WolfensteinMonster 366
+actor GiantStalker : WolfensteinMonster
 {
 	points 30000
 	health 1600, 1700, 1800, 1900
@@ -1425,7 +1425,7 @@ actor GoldfireMonsterShot : SmartAnimation
 	}
 }
 
-actor SpectorDemon : WolfensteinMonster 367
+actor SpectorDemon : WolfensteinMonster
 {
 	points 40000
 	health 1700, 1800, 1900, 2000
@@ -1466,7 +1466,7 @@ actor SpectorDemon : WolfensteinMonster 367
 
 // Armored Stalker
 
-actor ArmoredStalker : WolfensteinMonster 368
+actor ArmoredStalker : WolfensteinMonster
 {
 	points 50000
 	health 1800, 1900, 2000, 2100
@@ -1532,7 +1532,7 @@ actor CrawlerBeastShot : SmartAnimation
 	}
 }
 
-actor CrawlerBeast : WolfensteinMonster 369
+actor CrawlerBeast : WolfensteinMonster
 {
 	points 60000
 	health 1900, 2000, 2100, 2200
@@ -1598,7 +1598,7 @@ actor LiquidAlienShot : SmartAnimation
 	}
 }
 
-actor LiquidAlien : WolfensteinMonster 370
+actor LiquidAlien : WolfensteinMonster
 {
 	speed 3
 	sighttime 1, 6
@@ -1677,7 +1677,7 @@ actor ElectroShot : SmartAnimation
 	}
 }
 
-actor ElectroAlien : WolfensteinMonster 379
+actor ElectroAlien : WolfensteinMonster
 {
 	points 5150
 	health 13, 37, 112, 150

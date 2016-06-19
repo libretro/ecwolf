@@ -1,7 +1,7 @@
 // Cycling barriers are just normal barriers not hooked up to a switch depsite
 // the fact that they have separate tile numbers may suggest otherwise.
 
-actor VerticalSpikeStatic 236
+actor VerticalSpikeStatic
 {
 	radius 32
 	+SOLID
@@ -13,7 +13,7 @@ actor VerticalSpikeStatic 236
 	}
 }
 
-actor VerticalSpikeActive 373
+actor VerticalSpikeActive
 {
 	radius 32
 	+SOLID
@@ -36,7 +36,7 @@ actor VerticalSpikeActive 373
 	}
 }
 
-actor VerticalSpikeInctive : VerticalSpikeActive 374
+actor VerticalSpikeInactive : VerticalSpikeActive
 {
 	states
 	{
@@ -45,7 +45,7 @@ actor VerticalSpikeInctive : VerticalSpikeActive 374
 	}
 }
 
-actor VerticalPostStatic 254
+actor VerticalPostStatic
 {
 	radius 32
 	+SOLID
@@ -57,7 +57,7 @@ actor VerticalPostStatic 254
 	}
 }
 
-actor VerticalPostActive 371
+actor VerticalPostActive
 {
 	radius 32
 	+SOLID
@@ -80,7 +80,7 @@ actor VerticalPostActive 371
 	}
 }
 
-actor VerticalPostInctive : VerticalPostActive 372
+actor VerticalPostInactive : VerticalPostActive
 {
 	-SOLID
 	states
@@ -90,7 +90,7 @@ actor VerticalPostInctive : VerticalPostActive 372
 	}
 }
 
-actor ElectricArcBarrier : SmartAnimation 375
+actor ElectricArcBarrier : SmartAnimation
 {
 	radius 32
 	+SOLID
@@ -110,7 +110,7 @@ actor ElectricArcBarrier : SmartAnimation 375
 	}
 }
 
-actor ElectricArcBarrierOff : ElectricArcBarrier 376
+actor ElectricArcBarrierOff : ElectricArcBarrier
 {
 	-SOLID
 	states
@@ -120,7 +120,7 @@ actor ElectricArcBarrierOff : ElectricArcBarrier 376
 	}
 }
 
-actor ElectricPostBarrier : SmartAnimation 377
+actor ElectricPostBarrier : SmartAnimation
 {
 	radius 32
 	+SOLID
@@ -140,7 +140,7 @@ actor ElectricPostBarrier : SmartAnimation 377
 	}
 }
 
-actor ElectricPostBarrierOff : ElectricPostBarrier 378
+actor ElectricPostBarrierOff : ElectricPostBarrier
 {
 	-SOLID
 	states

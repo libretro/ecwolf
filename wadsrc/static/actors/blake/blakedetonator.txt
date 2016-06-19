@@ -1,4 +1,4 @@
-actor PlasmaDetonator : Inventory 315
+actor PlasmaDetonator : Inventory
 {
 	inventory.amount 1
 	inventory.maxamount 100
@@ -26,7 +26,7 @@ actor PlasmaDetonatorDrop : SmartAnimation
 	}
 }
 
-actor SecurityCube 325
+actor SecurityCube
 {
 	health 175
 	+SOLID

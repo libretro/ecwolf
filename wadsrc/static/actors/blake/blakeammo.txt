@@ -1,4 +1,4 @@
-actor ChargeUnit : Ammo 232
+actor ChargeUnit : Ammo
 {
 	inventory.pickupsound "misc/ammo_pickup"
 	inventory.amount 8
@@ -11,7 +11,7 @@ actor ChargeUnit : Ammo 232
 	}
 }
 
-actor ChargePack : ChargeUnit 237
+actor ChargePack : ChargeUnit
 {
 	states
 	{
@@ -24,7 +24,7 @@ actor ChargePack : ChargeUnit 237
 // OK, so concession coins aren't really ammo, but for our purposes we need a
 // way to pool two different pickups into one counter. Sounds like ammo to me?
 
-actor ConcessionCoin : Ammo 312
+actor ConcessionCoin : Ammo
 {
 	inventory.pickupsound "misc/coin_pickup"
 	inventory.amount 1
@@ -37,7 +37,7 @@ actor ConcessionCoin : Ammo 312
 	}
 }
 
-actor ConcessionCoin5 : ConcessionCoin 313
+actor ConcessionCoin5 : ConcessionCoin
 {
 	inventory.amount 5
 	states
@@ -50,7 +50,7 @@ actor ConcessionCoin5 : ConcessionCoin 313
 
 // While stretching the definition of this file, we might as well include this :P
 
-actor RadarPack : Inventory 317
+actor RadarPack : Inventory
 {
 	inventory.pickupsound "misc/radar_pickup"
 	inventory.amount 900
