@@ -225,14 +225,19 @@ IMPLEMENT_CLASS(Health)
 
 bool AHealth::TryPickup(AActor *toucher)
 {
-	int max = maxamount;
-	if(max == 0)
-		max = toucher->player->mo->maxhealth;
-
-	if(toucher->player->health >= max)
+	if(toucher->health <= 0)
 		return false;
-	else
+
+	int max = maxamount;
+
+	if(toucher->player)
 	{
+		if(max == 0)
+			max = toucher->player->mo->maxhealth;
+
+		if(toucher->player->health >= max)
+			return false;
+
 		toucher->player->health += amount;
 		if(toucher->player->health > max)
 			toucher->player->health = max;
@@ -240,8 +245,21 @@ bool AHealth::TryPickup(AActor *toucher)
 		const int oldhealth = toucher->health;
 		toucher->health = toucher->player->health;
 		StatusBar->UpdateFace(oldhealth - toucher->health);
-		Destroy();
 	}
+	else
+	{
+		if(max == 0)
+			max = toucher->SpawnHealth();
+
+		if(toucher->health >= max)
+			return false;
+
+		toucher->health += amount;
+		if(toucher->health > max)
+			toucher->health = max;
+	}
+
+	Destroy();
 	return true;
 }
 

@@ -374,7 +374,13 @@ ACTION_FUNCTION(A_CustomMissile)
 
 ACTION_FUNCTION(A_Dormant)
 {
+	enum
+	{
+		DF_REVIVE = 1
+	};
+
 	ACTION_PARAM_STATE(state, 0, NULL);
+	ACTION_PARAM_INT(flags, 1);
 
 	AActor::Iterator iter = AActor::GetIterator();
 	while(iter.Next())
@@ -392,6 +398,11 @@ ACTION_FUNCTION(A_Dormant)
 	self->flags |= FL_AMBUSH | FL_SHOOTABLE | FL_SOLID;
 	self->flags &= ~(FL_ATTACKMODE|FL_COUNTKILL);
 	self->dir = nodir;
+	self->target = NULL;
+
+	if(flags & DF_REVIVE)
+		self->health = self->SpawnHealth();
+
 	self->SetState(state);
 	return true;
 }

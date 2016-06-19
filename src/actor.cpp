@@ -620,7 +620,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags
 	actor->y = y;
 	actor->velx = 0;
 	actor->vely = 0;
-	actor->health = type->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty->SpawnFilter, actor->health);
+	actor->health = actor->SpawnHealth();
 
 	MapSpot spot = map->GetSpot(actor->tilex, actor->tiley, 0);
 	actor->EnterZone(spot->zone);
@@ -680,6 +680,11 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags
 	SpawnedActors.Push(actor);
 
 	return actor;
+}
+
+int32_t AActor::SpawnHealth() const
+{
+	return GetClass()->Meta.GetMetaInt(AMETA_DefaultHealth1 + gamestate.difficulty->SpawnFilter, health);
 }
 
 DEFINE_SYMBOL(Actor, angle)

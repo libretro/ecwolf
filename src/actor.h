@@ -117,6 +117,7 @@ class AActor : public Thinker,
 		void			Serialize(FArchive &arc);
 		void			SetState(const Frame *state, bool norun=false);
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags);
+		int32_t			SpawnHealth() const;
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
 

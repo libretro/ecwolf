@@ -36,6 +36,8 @@ const int WRF_ALLOWZOOM = 0x40;
 const int ZOOM_INSTANT = 1;
 const int ZOOM_NOSCALETURNING = 2;
 
+const int DF_REVIVE = 1;
+
 actor Actor native
 {
 	damage 0
@@ -62,7 +64,7 @@ actor Actor native
 	action native A_ChangeVelocity(float x, float y, float z, int flags = 0);
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0, int aimflags = 0);
-	action native A_Dormant(state frame = "See");
+	action native A_Dormant(state frame = "See", int flags = 0);
 	action native A_Explode(int damage = 128, int radius = 128, int flags = XF_HURTSOURCE, bool alert = false, int fulldamageradius = 0);
 	action native A_FaceTarget(float max_turn = 0, float max_pitch = 270);
 	action native A_Fall();

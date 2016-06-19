@@ -710,9 +710,11 @@ bool MoveObj (AActor *ob, int32_t move)
 	ob->distance -=move;
 
 	// Check for touching objects
-	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
+	for(AActor::Iterator iter = AActor::GetIterator();iter;)
 	{
 		AActor *check = iter;
+		iter.Next();
+
 		if(check == ob || (check->flags & FL_SOLID))
 			continue;
 
