@@ -107,6 +107,8 @@ class ActionInfo
 	public:
 		ActionInfo(ActionPtr func, const FName &name);
 
+		const Type *ArgType(unsigned int n) const { return types[MIN(n, maxArgs-1)]; }
+
 		ActionPtr func;
 		const FName name;
 
