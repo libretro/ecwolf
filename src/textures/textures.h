@@ -218,6 +218,7 @@ public:
 	virtual FTexture *GetRawTexture();		// for FMultiPatchTexture to override
 	FTextureID GetID() const { return id; }
 
+	virtual void InvalidatePalette() {}
 	virtual void Unload () = 0;
 
 	// Returns the native pixel format for this image
@@ -412,6 +413,8 @@ public:
 	FDoorAnimation *FindAnimatedDoor (FTextureID picnum);
 
 	FTextureID GetArtIndex(unsigned int index);
+	// Inform textures that palette maps may be invalid
+	void InvalidatePalette();
 private:
 
 	// texture counting

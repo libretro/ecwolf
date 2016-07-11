@@ -45,12 +45,19 @@
 #include "v_palette.h"
 #include "textures.h"
 #include "v_video.h"
+#include "tmemory.h"
 
 //==========================================================================
 //
 // A PNG texture
 //
 //==========================================================================
+
+union PNGPalette
+{
+	DWORD palette[256];
+	BYTE pngpal[256][3];
+};
 
 class FPNGTexture : public FTexture
 {
@@ -60,6 +67,7 @@ public:
 
 	const BYTE *GetColumn (unsigned int column, const Span **spans_out);
 	const BYTE *GetPixels ();
+	void InvalidatePalette ();
 	void Unload ();
 	FTextureFormat GetFormat ();
 	int CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCopyInfo *inf = NULL);
@@ -74,16 +82,24 @@ protected:
 	BYTE BitDepth;
 	BYTE ColorType;
 	BYTE Interlace;
+	bool HaveTrans;
+	WORD NonPaletteTrans[3];
 
 	BYTE *PaletteMap;
 	int PaletteSize;
 	DWORD StartOfIDAT;
-	DWORD StartOftRNS;
-	DWORD StartOfPLTE;
 
 	void MakeTexture ();
 
 	friend class FTexture;
+
+	// ECWolf - Palette changing support since ZDoom moved palette map
+	// generation into the constructor we can't just unload the textures. This
+	// could be done a little bit better, but in the interest in keeping changes
+	// to this file as small as possible...
+	void MakePaletteMap ();
+	TUniquePtr<PNGPalette> Palette;
+	TUniquePtr<BYTE[]> Trans;
 };
 
 
@@ -201,11 +217,11 @@ FTexture *PNGTexture_CreateFromFile(PNGHandle *png, const FString &filename)
 FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename, int width, int height,
 						  BYTE depth, BYTE colortype, BYTE interlace)
 : FTexture(NULL, lumpnum), SourceFile(filename), Pixels(0), Spans(0),
-  BitDepth(depth), ColorType(colortype), Interlace(interlace),
-  PaletteMap(0), PaletteSize(0), StartOfIDAT(0), StartOftRNS(0)
+  BitDepth(depth), ColorType(colortype), Interlace(interlace), HaveTrans(false),
+  PaletteMap(0), PaletteSize(0), StartOfIDAT(0)
 {
 	DWORD len, id;
-	//int i;
+	int i;
 
 	UseType = TEX_MiscPatch;
 	LeftOffset = 0;
@@ -256,13 +272,29 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 			break;
 
 		case MAKE_ID('P','L','T','E'):
-			StartOfPLTE = lump.Tell() - 8;
-			lump.Seek (len, SEEK_CUR);
+			Palette.Reset(new PNGPalette);
+			PaletteSize = MIN<int> (len / 3, 256);
+			lump.Read (Palette->pngpal, PaletteSize * 3);
+			if (PaletteSize * 3 != (int)len)
+			{
+				lump.Seek (len - PaletteSize * 3, SEEK_CUR);
+			}
+			for (i = PaletteSize - 1; i >= 0; --i)
+			{
+				Palette->palette[i] = MAKERGB(Palette->pngpal[i][0], Palette->pngpal[i][1], Palette->pngpal[i][2]);
+			}
 			break;
 
 		case MAKE_ID('t','R','N','S'):
-			StartOftRNS = lump.Tell() - 8;
-			lump.Seek (len, SEEK_CUR);
+			Trans.Reset(new BYTE[256]);
+			memset(Trans.Get(), 255, 256);
+
+			lump.Read (Trans.Get(), len);
+			HaveTrans = true;
+			// Save for colortype 2
+			NonPaletteTrans[0] = WORD(Trans[0] * 256 + Trans[1]);
+			NonPaletteTrans[1] = WORD(Trans[2] * 256 + Trans[3]);
+			NonPaletteTrans[2] = WORD(Trans[4] * 256 + Trans[5]);
 			break;
 
 		case MAKE_ID('a','l','P','h'):
@@ -280,13 +312,16 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 	switch (colortype)
 	{
 	case 4:		// Grayscale + Alpha
-		bMasked = true;
-		// intentional fall-through
-
 	case 6:		// RGB + Alpha
 		bMasked = true;
 		break;
+
+	case 2:		// RGB
+		bMasked = HaveTrans;
+		break;
 	}
+
+	MakePaletteMap ();
 }
 
 //==========================================================================
@@ -303,6 +338,68 @@ FPNGTexture::~FPNGTexture ()
 		FreeSpans (Spans);
 		Spans = NULL;
 	}
+	if (PaletteMap != NULL && PaletteMap != GrayMap)
+	{
+		delete[] PaletteMap;
+		PaletteMap = NULL;
+	}
+}
+
+//==========================================================================
+//
+//
+//
+//==========================================================================
+
+void FPNGTexture::MakePaletteMap ()
+{
+	switch (ColorType)
+	{
+	case 4:		// Grayscale + Alpha
+	case 0:		// Grayscale
+		if (!bAlphaTexture)
+		{
+			if (ColorType == 0 && HaveTrans && NonPaletteTrans[0] < 256)
+			{
+				bMasked = true;
+				PaletteSize = 256;
+				PaletteMap = new BYTE[256];
+				memcpy (PaletteMap, GrayMap, 256);
+				PaletteMap[NonPaletteTrans[0]] = 0;
+			}
+			else
+			{
+				PaletteMap = GrayMap;
+			}
+		}
+		break;
+
+	case 3:		// Paletted
+		PaletteMap = new BYTE[PaletteSize];
+		GPalette.MakeRemap (Palette->palette, PaletteMap, Trans, PaletteSize);
+		if (Trans)
+		{
+			for (int i = 0; i < PaletteSize; ++i)
+			{
+				if (Trans[i] == 0)
+				{
+					bMasked = true;
+					PaletteMap[i] = 0;
+				}
+			}
+		}
+		break;
+	}
+}
+
+//==========================================================================
+//
+//
+//
+//==========================================================================
+
+void FPNGTexture::InvalidatePalette ()
+{
 	if (PaletteMap != NULL && PaletteMap != GrayMap)
 	{
 		delete[] PaletteMap;
@@ -403,6 +500,9 @@ const BYTE *FPNGTexture::GetPixels ()
 
 void FPNGTexture::MakeTexture ()
 {
+	if (!PaletteMap)
+		MakePaletteMap();
+
 	FileReader *lump;
 
 	if (SourceLump >= 0)
@@ -422,76 +522,6 @@ void FPNGTexture::MakeTexture ()
 	else
 	{
 		DWORD len, id;
-
-		// For Grayscale and Paletted we may need to read PLTE and tRNS
-		if (ColorType == 0 || ColorType == 3)
-		{
-			union
-			{
-				DWORD palette[256];
-				BYTE pngpal[256][3];
-			} p;
-			BYTE trans[256];
-			memset(trans, 255, 256);
-
-			if (StartOftRNS)
-			{
-				lump->Seek (StartOftRNS, SEEK_SET);
-				lump->Read (&len, 4);
-				lump->Read (&id, 4);
-				len = BigLong((unsigned int)len);
-				lump->Read (trans, len);
-			}
-
-			if (ColorType == 3) // Paletted
-			{
-				lump->Seek (StartOfPLTE, SEEK_SET);
-				lump->Read (&len, 4);
-				lump->Read (&id, 4);
-				len = BigLong((unsigned int)len);
-
-				PaletteSize = MIN<int> (len / 3, 256);
-				lump->Read (p.pngpal, PaletteSize * 3);
-				//if (PaletteSize * 3 != (int)len)
-				//{
-				//	lump.Seek (len - PaletteSize * 3, SEEK_CUR);
-				//}
-				for (int i = PaletteSize - 1; i >= 0; --i)
-				{
-					p.palette[i] = MAKERGB(p.pngpal[i][0], p.pngpal[i][1], p.pngpal[i][2]);
-				}
-
-				PaletteMap = new BYTE[PaletteSize];
-				GPalette.MakeRemap (p.palette, PaletteMap, trans, PaletteSize);
-				for (int i = 0; i < PaletteSize; ++i)
-				{
-					if (trans[i] == 0)
-					{
-						bMasked = true;
-						PaletteMap[i] = 0;
-					}
-				}
-			}
-			else // Grayscale
-			{
-				if (!bAlphaTexture)
-				{
-					if (ColorType == 0 && StartOftRNS && trans[0] != 0)
-					{
-						bMasked = true;
-						PaletteSize = 256;
-						PaletteMap = new BYTE[256];
-						memcpy (PaletteMap, GrayMap, 256);
-						PaletteMap[trans[0]] = 0;
-					}
-					else
-					{
-						PaletteMap = GrayMap;
-					}
-				}
-			}
-		}
-
 		lump->Seek (StartOfIDAT, SEEK_SET);
 		lump->Read(&len, 4);
 		lump->Read(&id, 4);
@@ -549,7 +579,23 @@ void FPNGTexture::MakeTexture ()
 				{
 					for (y = Height; y > 0; --y)
 					{
-						*out++ = RGB32k[in[0]>>3][in[1]>>3][in[2]>>3];
+						if (!HaveTrans)
+						{
+							*out++ = RGB32k[in[0]>>3][in[1]>>3][in[2]>>3];
+						}
+						else
+						{
+							if (in[0] == NonPaletteTrans[0] &&
+								in[1] == NonPaletteTrans[1] &&
+								in[2] == NonPaletteTrans[2])
+							{
+								*out++ = 0;
+							}
+							else
+							{
+								*out++ = RGB32k[in[0]>>3][in[1]>>3][in[2]>>3];
+							}
+						}
 						in += pitch;
 					}
 					in -= backstep;
@@ -653,11 +699,18 @@ int FPNGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCo
 			break;
 
 		case MAKE_ID('t','R','N','S'):
-			for(DWORD i = 0; i < len; i++)
+			if (ColorType == 3)
 			{
-				(*lump) >> pe[i].a;
-				if (pe[i].a != 0 && pe[i].a != 255)
-					transpal = true;
+				for(DWORD i = 0; i < len; i++)
+				{
+					(*lump) >> pe[i].a;
+					if (pe[i].a != 0 && pe[i].a != 255)
+						transpal = true;
+				}
+			}
+			else
+			{
+				lump->Seek(len, SEEK_CUR);
 			}
 			break;
 		}
@@ -665,6 +718,12 @@ int FPNGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCo
 		lump->Read(&len, 4);
 		id = MAKE_ID('I','E','N','D');
 		lump->Read(&id, 4);
+	}
+
+	if (ColorType == 0 && HaveTrans && NonPaletteTrans[0] < 256)
+	{
+		pe[NonPaletteTrans[0]].a = 0;
+		transpal = true;
 	}
 
 	BYTE * Pixels = new BYTE[pixwidth * Height];
@@ -683,7 +742,16 @@ int FPNGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCo
 		break;
 
 	case 2:
-		bmp->CopyPixelDataRGB(x, y, Pixels, Width, Height, 3, pixwidth, rotate, CF_RGB, inf);
+		if (!HaveTrans)
+		{
+			bmp->CopyPixelDataRGB(x, y, Pixels, Width, Height, 3, pixwidth, rotate, CF_RGB, inf);
+		}
+		else
+		{
+			bmp->CopyPixelDataRGB(x, y, Pixels, Width, Height, 3, pixwidth, rotate, CF_RGBT, inf,
+				NonPaletteTrans[0], NonPaletteTrans[1], NonPaletteTrans[2]);
+			transpal = true;
+		}
 		break;
 
 	case 4:

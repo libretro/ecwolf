@@ -318,7 +318,9 @@ void R_InitSprites()
 		playsprite.frames = spriteFrames.Size();
 		playsprite.numFrames = MAX_SPRITE_FRAMES;
 		for(char i = 0;i < MAX_SPRITE_FRAMES;++i)
-			spriteFrames.Push(spriteFrames[unknsprite.frames]);
+			// Force early copy here since TArray does not copy before growing
+			// the array (assumes that reference is not from the array)
+			spriteFrames.Push(Sprite(spriteFrames[unknsprite.frames]));
 	}
 }
 

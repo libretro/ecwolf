@@ -359,6 +359,20 @@ FTexture *FTextureManager::FindTexture(const char *texname, int usetype, BITFIEL
 
 //==========================================================================
 //
+// FTextureManager :: InvalidatePalette
+//
+//==========================================================================
+
+void FTextureManager::InvalidatePalette ()
+{
+	for (unsigned int i = 0; i < Textures.Size(); ++i)
+	{
+		Textures[i].Texture->InvalidatePalette ();
+	}
+}
+
+//==========================================================================
+//
 // FTextureManager :: UnloadAll
 //
 //==========================================================================
