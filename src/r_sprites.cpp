@@ -458,9 +458,6 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		return;
 
 	const unsigned int texWidth = tex->GetWidth();
-	if(x2 == x1)
-		return;
-
 	unsigned height1 = (word)(heightnumerator/(nx1>>8));
 	unsigned height2 = (word)(heightnumerator/(nx2>>8));
 	
@@ -493,7 +490,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 
 	byte *dest;
 	int i;
-	fixed x, y;
+	unsigned int x;
 
 	//printf("%f, %f, %f, %f\n", FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx1));
 	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
@@ -505,9 +502,10 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 
 	for(i = x1, x = 0; i < x2; ++i)
 	{
-		while(i >= nexti)
+		while(i > nexti)
 		{
 			++x;
+			assert(x < texWidth);
 			src = tex->GetColumn(flip ? texWidth - x - 1 : x, NULL);
 
 			dxa += dxx;
@@ -526,7 +524,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 			continue;
 		
 		dest = vbuf + i + (upperedge > 0 ? vbufPitch*upperedge : 0);
-		for(y = startY*yStep;y < endY;y += yStep)
+		for(fixed y = startY*yStep;y < endY;y += yStep)
 		{
 			if(src[y>>FRACBITS])
 				*dest = colormap[src[y>>FRACBITS]];
@@ -601,7 +599,7 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	if(nx1<0 && nx1>=-1792) nx1=-1792;
 	if(nx2>=0 && nx2<=1792) nx2=1792;
 	if(nx2<0 && nx2>=-1792) nx2=-1792;
-	
+
 	viewx1=(int)(centerx+ny1*scale/nx1);
 	viewx2=(int)(centerx+ny2*scale/nx2);
 
