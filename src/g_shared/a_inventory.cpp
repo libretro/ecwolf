@@ -832,8 +832,8 @@ class AExtraLifeItem : public AInventory
 				amount += item->amount;
 				if(amount >= maxamount)
 				{
-					if(item->owner->player)
-						item->owner->player->GiveExtraMan(amount/maxamount);
+					if(owner->player)
+						owner->player->GiveExtraMan(amount/maxamount);
 					amount %= maxamount;
 				}
 				good = true;
