@@ -96,7 +96,7 @@ map "MAP08" lookup "RHUSTR_08"
 {
 	next = "MAP09"
 	secretnext = "MAP09"
-	defaultceiling = "#4C0000"
+	defaultceiling = "#00004C"
 	par = 165
 	music = "POW"
 	floornumber = 8
