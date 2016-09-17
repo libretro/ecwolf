@@ -122,7 +122,8 @@ public:
 	static IntermissionInfo *Find(const FName &name);
 
 	IntermissionInfo() : Link(NAME_None) {}
-	~IntermissionInfo() { Clear(); }
+	// Clear on destruct requires move semantics
+	//~IntermissionInfo() { Clear(); }
 
 	void Clear();
 

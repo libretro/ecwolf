@@ -1406,7 +1406,6 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 	// Find any characters?
 	if(LastChar < FirstChar)
 		return false;
-	Printf("Loaded font with %X-%X\n", FirstChar, LastChar);
 
 	PatchRemap = NULL;
 	FontType = WOLFFONT;
