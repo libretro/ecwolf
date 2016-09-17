@@ -1110,6 +1110,10 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 		{
 			DebugNetwork = true;
 		}
+		else IFARG("--foreignsave")
+		{
+			GameSave::param_foreginsave = true;
+		}
 		else
 			files.Push(argv[i]);
 	}
@@ -1157,6 +1161,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			" --connect <address>    Connects to the given host.\n"
 			" --port <number>        Port number to use for network communications.\n"
 			" --debugnet             Enable network debugging messages.\n"
+			" --foreignsave          Disable save game validity checking.\n"
 			, defaultSampleRate
 		);
 		exit(1);
