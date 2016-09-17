@@ -719,7 +719,7 @@ map "MAP58"
 	secretnext = "MAP60"
 	defaultceiling = "#483818"
 	floornumber = 8
-	par = 810
+	par = 510
 	music = "ZEROHOUR"
 	cluster = 6
 }
