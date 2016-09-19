@@ -125,6 +125,16 @@ int FMapLump::FillCache()
 	unsigned char* output = reinterpret_cast<unsigned char*>(Cache+HEADERSIZE);
 	for(unsigned int i = 0;i < PLANES;++i)
 	{
+		// ChaosEdit HACK: Likely in order to save a few bytes ChaosEdit sets
+		// the second and third map plane offsets to be the same (since vanilla
+		// doesn't use the data). If we see this we need to zero fill the plane.
+		if(i == 2 && Header.PlaneOffset[1] == Header.PlaneOffset[2] && !rtlMap)
+		{
+			memset(output, 0, PlaneSize);
+			output += PlaneSize;
+			continue;
+		}
+
 		unsigned char* input = new unsigned char[Header.PlaneLength[i]];
 		Owner->Reader->Seek(Header.PlaneOffset[i], SEEK_SET);
 		Owner->Reader->Read(input, Header.PlaneLength[i]);
