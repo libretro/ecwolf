@@ -112,8 +112,7 @@ bool FGamemaps::Open(bool quiet)
 	// First two bytes is the tag for the run length encoding
 	// Followed by offsets in the gamemaps file, we'll count until we
 	// hit a 0 offset.
-	mapheadReader->Seek(0, SEEK_END);
-	unsigned int NumPossibleMaps = (mapheadReader->Tell()-2)/4;
+	unsigned int NumPossibleMaps = (mapheadReader->GetLength()-2)/4;
 	mapheadReader->Seek(0, SEEK_SET);
 	DWORD* offsets = new DWORD[NumPossibleMaps];
 	mapheadReader->Read(&rlewTag, 2);

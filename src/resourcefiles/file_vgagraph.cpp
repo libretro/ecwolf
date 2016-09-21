@@ -214,8 +214,7 @@ class FVGAGraph : public FResourceFile
 				huffman[i].bit1 = LittleShort(huffman[i].bit1);
 			}
 
-			vgaheadReader->Seek(0, SEEK_END);
-			NumLumps = vgaheadReader->Tell()/3;
+			NumLumps = vgaheadReader->GetLength()/3;
 			vgaheadReader->Seek(0, SEEK_SET);
 			lumps = new FVGALump[NumLumps];
 			// The vgahead has 24-bit ints.
