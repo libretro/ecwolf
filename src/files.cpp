@@ -510,7 +510,7 @@ long MemoryReader::Seek (long offset, int origin)
 		break;
 
 	}
-	FilePos=clamp<long>(offset,0,Length-1);
+	FilePos=clamp<long>(offset,0,Length);
 	return 0;
 }
 
