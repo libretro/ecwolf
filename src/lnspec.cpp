@@ -888,7 +888,7 @@ static int DoPushwall(MapSpot spot, MapTrigger::Side direction, const int *args,
 
 	if(args[0] == 0)
 	{
-		if(spot->thinker || !spot->tile || spot->GetAdjacent(MapTile::Side(dir))->tile)
+		if(spot->thinker || !spot->tile || (spot->GetAdjacent(MapTile::Side(dir))->tile && !nostop))
 		{
 			return 0;
 		}
@@ -901,7 +901,7 @@ static int DoPushwall(MapSpot spot, MapTrigger::Side direction, const int *args,
 		MapSpot pwall = NULL;
 		while((pwall = map->GetSpotByTag(args[0], pwall)))
 		{
-			if(pwall->thinker || !pwall->tile || pwall->GetAdjacent(MapTile::Side(dir))->tile)
+			if(pwall->thinker || !pwall->tile || (pwall->GetAdjacent(MapTile::Side(dir))->tile && !nostop))
 			{
 				continue;
 			}
