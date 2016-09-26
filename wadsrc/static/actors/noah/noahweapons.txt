@@ -17,7 +17,7 @@ actor HandFeed : WolfWeapon
 			HNDG D 3 A_CustomPunch(random(0,3), true, CPF_ALWAYSPLAYSOUND) //Damage: US_RndT()&3
 			HNDG E 3
 			// In Noah's Ark weapons automatically refired, but it took at least one tic
-			HNDG A 1
+			HNDG A 0.5
 			goto Ready
 	}
 }
@@ -33,10 +33,13 @@ actor SmallFeedLauncher : WolfWeapon
 			SFDG A 1 A_WeaponReady
 			loop
 		Fire:
-			SFDG B 3
-			SFDG C 3 A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, random(0,0xF))
-			SFDG DE 3
-			SFDG A 1
+			SFDG BC 3
+			SFDG D 3 A_GunAttack(GAF_MACDAMAGE|GAF_NORANDOM, "*", 1.0, random(0,0xF))
+			// Oddly S3DNA changes the final frame time to 8 (4 here), but since
+			// the frame is incremented after taking the time it never gets used
+			// except when frames are being dropped.
+			SFDG E 3
+			SFDG A 0.5
 			goto Ready
 	}
 }
