@@ -363,7 +363,7 @@ actor GunBat : Mutant 96
 {
 	attacksound "bat/attack"
 	deathsound "bat/death"
-	secretdeathsound "bat/fart"
+	secretdeathsound "bat/crash"
 	dropitem "BlueClip"
 	states
 	{
@@ -467,7 +467,7 @@ actor Schutzstafell : WolfensteinSS 94
 {
 	attacksound "ss/attack"
 	deathsound "ss/death"
-	secretdeathsound "ss/fart"
+	secretdeathsound "ss/crash"
 	seesound "ss/sight"
 	dropitem "BlueAK47"
 	dropitem "BlueClip"
