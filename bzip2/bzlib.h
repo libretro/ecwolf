@@ -116,7 +116,7 @@ BZ_EXTERN int BZ_API(BZ2_bzCompressEnd) (
 BZ_EXTERN int BZ_API(BZ2_bzDecompressInit) ( 
       bz_stream *strm, 
       int       verbosity, 
-      int       small
+      int       lowmem
    );
 
 BZ_EXTERN int BZ_API(BZ2_bzDecompress) ( 
@@ -140,7 +140,7 @@ BZ_EXTERN BZFILE* BZ_API(BZ2_bzReadOpen) (
       int*  bzerror,   
       FILE* f, 
       int   verbosity, 
-      int   small,
+      int   lowmem,
       void* unused,    
       int   nUnused 
    );
@@ -216,7 +216,7 @@ BZ_EXTERN int BZ_API(BZ2_bzBuffToBuffDecompress) (
       unsigned int* destLen,
       char*         source, 
       unsigned int  sourceLen,
-      int           small, 
+      int           lowmem, 
       int           verbosity 
    );
 
