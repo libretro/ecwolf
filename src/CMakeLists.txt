@@ -155,7 +155,6 @@ elseif(ANDROID)
 	)
 
 	include_directories(${TOUCHCONTROLS_INCLUDE_DIR} ${SIGCPP_INCLUDE_DIR} ${TINYXML_INCLUDE_DIR} ${LIBPNG_INCLUDE_DIR})
-	add_definitions(-Dmalloc_usable_size=dlmalloc_usable_size)
 
 	set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} ${TOUCHCONTROLS_LIBRARY} log)
 endif(APPLE)
