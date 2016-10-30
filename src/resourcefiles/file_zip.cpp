@@ -119,7 +119,8 @@ private:
 	virtual int GetFileOffset() 
 	{ 
 		if (Method != METHOD_STORED) return -1;
-		if (Flags & LUMPFZIP_NEEDFILESTART) SetLumpAddress(); return Position; 
+		if (Flags & LUMPFZIP_NEEDFILESTART) SetLumpAddress();
+		return Position; 
 	}
 };
 

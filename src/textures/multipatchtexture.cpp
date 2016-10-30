@@ -138,8 +138,7 @@ struct strifemaptexture_t
 
 struct FPatchLookup
 {
-	char Name[9];
-	FTexture *Texture;
+	FString Name;
 };
 
 
@@ -167,6 +166,7 @@ public:
 	int GetSourceLump() { return DefinitionLump; }
 	FTexture *GetRedirect(bool wantwarped);
 	FTexture *GetRawTexture();
+	void ResolvePatches();
 
 protected:
 	BYTE *Pixels;
@@ -186,8 +186,21 @@ protected:
 		TexPart();
 	};
 
+	struct TexInit
+	{
+		TexInit() : UseType(TEX_Null), Silent(false), HasLine(false), UseOffsets(false) {}
+
+		FString TexName;
+		int UseType;
+		bool Silent;
+		bool HasLine;
+		bool UseOffsets;
+		Scanner::Position sc;
+	};
+
 	int NumParts;
 	TexPart *Parts;
+	TexInit *Inits;
 	bool bRedirect:1;
 	bool bTranslucentPatches:1;
 
@@ -195,7 +208,7 @@ protected:
 
 private:
 	void CheckForHacks ();
-	void ParsePatch(Scanner &sc, TexPart & part, bool silent, int usetype);
+	void ParsePatch(Scanner &sc, TexPart & part, TexInit &init);
 };
 
 //==========================================================================
@@ -205,7 +218,7 @@ private:
 //==========================================================================
 
 FMultiPatchTexture::FMultiPatchTexture (const void *texdef, FPatchLookup *patchlookup, int maxpatchnum, bool strife, int deflumpnum)
-: Pixels (0), Spans(0), Parts(0), bRedirect(false), bTranslucentPatches(false)
+: Pixels (0), Spans(0), Parts(NULL), Inits(NULL), bRedirect(false), bTranslucentPatches(false)
 {
 	union
 	{
@@ -235,18 +248,17 @@ FMultiPatchTexture::FMultiPatchTexture (const void *texdef, FPatchLookup *patchl
 		NumParts = SAFESHORT(mtexture.d->patchcount);
 	}
 
-	if (NumParts <= 0)
+	if (NumParts < 0)
 	{
 		I_Error ("Bad texture directory");
 	}
 
 	UseType = FTexture::TEX_Wall;
-	Parts = new TexPart[NumParts];
+	Parts = NumParts > 0 ? new TexPart[NumParts] : NULL;
+	Inits = NumParts > 0 ? new TexInit[NumParts] : NULL;
 	Width = SAFESHORT(mtexture.d->width);
 	Height = SAFESHORT(mtexture.d->height);
-	strncpy (Name, (const char *)mtexture.d->name, 8);
-	Name[8] = 0;
-
+	Name = (char *)mtexture.d->name;
 	CalcBitSize ();
 
 	xScale = mtexture.d->ScaleX ? mtexture.d->ScaleX*(FRACUNIT/8) : FRACUNIT;
@@ -275,13 +287,9 @@ FMultiPatchTexture::FMultiPatchTexture (const void *texdef, FPatchLookup *patchl
 		}
 		Parts[i].OriginX = LittleShort(mpatch.d->originx);
 		Parts[i].OriginY = LittleShort(mpatch.d->originy);
-		Parts[i].Texture = patchlookup[LittleShort(mpatch.d->patch)].Texture;
-		if (Parts[i].Texture == NULL)
-		{
-			Printf ("Unknown patch %s in texture %s\n", patchlookup[LittleShort(mpatch.d->patch)].Name, Name);
-			NumParts--;
-			i--;
-		}
+		Parts[i].Texture = NULL;
+		Inits[i].TexName = patchlookup[LittleShort(mpatch.d->patch)].Name;
+		Inits[i].UseType = TEX_WallPatch;
 		if (strife)
 			mpatch.s++;
 		else
@@ -289,22 +297,9 @@ FMultiPatchTexture::FMultiPatchTexture (const void *texdef, FPatchLookup *patchl
 	}
 	if (NumParts == 0)
 	{
-		Printf ("Texture %s is left without any patches\n", Name);
+		Printf ("Texture %s is left without any patches\n", Name.GetChars());
 	}
 
-	CheckForHacks ();
-
-	// If this texture is just a wrapper around a single patch, we can simply
-	// forward GetPixels() and GetColumn() calls to that patch.
-	if (NumParts == 1)
-	{
-		if (Parts->OriginX == 0 && Parts->OriginY == 0 &&
-			Parts->Texture->GetWidth() == Width &&
-			Parts->Texture->GetHeight() == Height)
-		{
-			bRedirect = true;
-		}
-	}
 	DefinitionLump = deflumpnum;
 }
 
@@ -325,6 +320,11 @@ FMultiPatchTexture::~FMultiPatchTexture ()
 		}
 		delete[] Parts;
 		Parts = NULL;
+	}
+	if (Inits != NULL)
+	{
+		delete[] Inits;
+		Inits = NULL;
 	}
 	if (Spans != NULL)
 	{
@@ -560,7 +560,7 @@ int FMultiPatchTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rota
 		return Parts[0].Texture->CopyTrueColorPixels(bmp, x, y, rotate, inf);
 	}
 
-	if (rotate != 0 || (inf != NULL && inf->op != OP_OVERWRITE && inf->op != OP_COPY))
+	if (rotate != 0 || (inf != NULL && ((inf->op != OP_OVERWRITE && inf->op != OP_COPY) || inf->blend != BLEND_NONE)))
 	{ // We are doing some sort of fancy stuff to the destination bitmap, so composite to
 	  // a temporary bitmap, and copy that.
 		FBitmap tbmp;
@@ -586,7 +586,6 @@ int FMultiPatchTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rota
 	for(int i = 0; i < NumParts; i++)
 	{
 		int ret = -1;
-
 		FCopyInfo info;
 
 		if (Parts[i].Texture->bHasCanvas) continue;	// cannot use camera textures as patch.
@@ -826,7 +825,7 @@ FMultiPatchTexture::TexPart::TexPart()
 
 void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int deflumpnum, int patcheslump, int firstdup, bool texture1)
 {
-	FPatchLookup *patchlookup;
+	FPatchLookup *patchlookup = NULL;
 	int i;
 	DWORD numpatches;
 
@@ -859,26 +858,13 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 
 		// Catalog the patches these textures use so we know which
 		// textures they represent.
-		patchlookup = (FPatchLookup *)alloca (numpatches * sizeof(*patchlookup));
-
+		patchlookup = new FPatchLookup[numpatches];
 		for (DWORD i = 0; i < numpatches; ++i)
 		{
-			pnames.Read (patchlookup[i].Name, 8);
-			patchlookup[i].Name[8] = 0;
-
-			FTextureID j = CheckForTexture (patchlookup[i].Name, FTexture::TEX_WallPatch);
-			if (j.isValid())
-			{
-				patchlookup[i].Texture = Textures[j.GetIndex()].Texture;
-			}
-			else
-			{
-				// Shareware Doom has the same PNAMES lump as the registered
-				// Doom, so printing warnings for patches that don't really
-				// exist isn't such a good idea.
-				//Printf ("Patch %s not found.\n", patchlookup[i].Name);
-				patchlookup[i].Texture = NULL;
-			}
+			char pname[9];
+			pnames.Read(pname, 8);
+			pname[8] = '\0';
+			patchlookup[i].Name = pname;
 		}
 	}
 
@@ -895,6 +881,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 	if (maxoff < DWORD(numtextures+1)*4)
 	{
 		Printf ("Texture directory is too short");
+		delete[] patchlookup;
 		return;
 	}
 
@@ -905,6 +892,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 		if (offset > maxoff)
 		{
 			Printf ("Bad texture directory");
+			delete[] patchlookup;
 			return;
 		}
 
@@ -912,7 +900,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 
 		// There is bizzarely a Doom editing tool that writes to the
 		// first two elements of columndirectory, so I can't check those.
-		if (SAFESHORT(tex->patchcount) <= 0 ||
+		if (SAFESHORT(tex->patchcount) < 0 ||
 			tex->columndirectory[2] != 0 ||
 			tex->columndirectory[3] != 0)
 		{
@@ -940,6 +928,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 		if (offset > maxoff)
 		{
 			Printf ("Bad texture directory");
+			delete[] patchlookup;
 			return;
 		}
 
@@ -963,6 +952,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 			//StartScreen->Progress();
 		}
 	}
+	delete[] patchlookup;
 }
 
 
@@ -995,49 +985,13 @@ void FTextureManager::AddTexturesLumps (int lump1, int lump2, int patcheslump)
 //
 //==========================================================================
 
-void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, bool silent, int usetype)
+void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, TexInit &init)
 {
 	FString patchname;
+	int Mirror = 0;
 	if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
 
-	FTextureID texno = TexMan.CheckForTexture(sc->str, usetype);
-	int Mirror = 0;
-
-	if (!texno.isValid())
-	{
-		int lumpnum = Wads.CheckNumForFullName(sc->str);
-		if (lumpnum >= 0)
-		{
-			texno = TexMan.FindTextureByLumpNum(lumpnum);
-			if (texno.isValid ())
-			{
-				part.Texture = TexMan[texno];
-			}
-			else
-			{
-				part.Texture = FTexture::CreateTexture("", lumpnum, usetype);
-				TexMan.AddTexture(part.Texture);
-			}
-		}
-		else if (strlen(sc->str) <= 8 && !strpbrk(sc->str, "./"))
-		{
-			int lumpnum = Wads.CheckNumForName(sc->str, usetype == TEX_MiscPatch? ns_graphics : ns_patches);
-			if (lumpnum >= 0)
-			{
-				part.Texture = FTexture::CreateTexture(lumpnum, usetype);
-				TexMan.AddTexture(part.Texture);
-			}
-		}
-	}
-	else
-	{
-		part.Texture = TexMan[texno];
-		bComplex |= part.Texture->bComplex;
-	}
-	if (part.Texture == NULL)
-	{
-		if (!silent) Printf("Unknown patch '%s' in texture '%s' %d == %d\n", sc->str.GetChars(), Name, FTexture::TEX_MiscPatch, usetype);
-	}
+	init.TexName = sc->str;
 	sc.MustGetToken(',');
 	bool negative = sc.CheckToken('-');
 	sc.MustGetToken(TK_IntConst);
@@ -1170,7 +1124,7 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, bool silent, in
 					sc.MustGetToken(',');
 					sc.MustGetToken(TK_IntConst);
 					b = sc->number;
-					sc.MustGetToken(',');
+					//sc.MustGetToken(','); This was never supposed to be here.
 					part.Blend = MAKERGB(r, g, b);
 				}
 				// Blend.a may never be 0 here.
@@ -1204,11 +1158,7 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, bool silent, in
 			}
 			else if (sc->str.CompareNoCase("useoffsets") == 0)
 			{
-				if (part.Texture != NULL)
-				{
-					part.OriginX -= part.Texture->LeftOffset;
-					part.OriginY -= part.Texture->TopOffset;
-				}
+				init.UseOffsets = true;
 			}
 		}
 	}
@@ -1233,6 +1183,7 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 : Pixels (0), Spans(0), Parts(0), bRedirect(false), bTranslucentPatches(false)
 {
 	TArray<TexPart> parts;
+	TArray<TexInit> inits;
 	bool bSilent = false;
 
 	bMultiPatch = true;
@@ -1250,8 +1201,8 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 			bSilent = false;
 		}
 	}
-	uppercopy(Name, !textureName ? sc->str.GetChars() : textureName);
-	Name[8] = 0;
+	Name = !textureName ? sc->str : FString(textureName);
+	Name.ToUpper();
 	sc.MustGetToken(',');
 	sc.MustGetToken(TK_IntConst);
 	Width = sc->number;
@@ -1269,13 +1220,13 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 			{
 				sc.MustGetToken(TK_FloatConst);
 				xScale = FLOAT2FIXED(sc->decimal);
-				if (xScale == 0) sc.ScriptMessage(Scanner::ERROR, "Texture %s is defined with null x-scale\n", Name);
+				if (xScale == 0) sc.ScriptMessage(Scanner::ERROR, "Texture %s is defined with null x-scale\n", Name.GetChars());
 			}
 			else if (sc->str.CompareNoCase("YScale") == 0)
 			{
 				sc.MustGetToken(TK_FloatConst);
 				yScale = FLOAT2FIXED(sc->decimal);
-				if (yScale == 0) sc.ScriptMessage(Scanner::ERROR, "Texture %s is defined with null y-scale\n", Name);
+				if (yScale == 0) sc.ScriptMessage(Scanner::ERROR, "Texture %s is defined with null y-scale\n", Name.GetChars());
 			}
 			else if (sc->str.CompareNoCase("WorldPanning") == 0)
 			{
@@ -1292,16 +1243,51 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 			else if (sc->str.CompareNoCase("Patch") == 0)
 			{
 				TexPart part;
-				ParsePatch(sc, part, bSilent, TEX_WallPatch);
-				if (part.Texture != NULL) parts.Push(part);
+				TexInit init;
+				ParsePatch(sc, part, init);
+				if (init.TexName.IsNotEmpty())
+				{
+					parts.Push(part);
+					init.UseType = TEX_WallPatch;
+					init.Silent = bSilent;
+					init.HasLine = true;
+					init.sc = sc.GetPosition();
+					inits.Push(init);
+				}
+				part.Texture = NULL;
+				part.Translation = NULL;
+			}
+			else if (sc->str.CompareNoCase("Sprite") == 0)
+			{
+				TexPart part;
+				TexInit init;
+				ParsePatch(sc, part, init);
+				if (init.TexName.IsNotEmpty())
+				{
+					parts.Push(part);
+					init.UseType = TEX_Sprite;
+					init.Silent = bSilent;
+					init.HasLine = true;
+					init.sc = sc.GetPosition();
+					inits.Push(init);
+				}
 				part.Texture = NULL;
 				part.Translation = NULL;
 			}
 			else if (sc->str.CompareNoCase("Graphic") == 0)
 			{
 				TexPart part;
-				ParsePatch(sc, part, bSilent, TEX_MiscPatch);
-				if (part.Texture != NULL) parts.Push(part);
+				TexInit init;
+				ParsePatch(sc, part, init);
+				if (init.TexName.IsNotEmpty())
+				{
+					parts.Push(part);
+					init.UseType = TEX_MiscPatch;
+					init.Silent = bSilent;
+					init.HasLine = true;
+					init.sc = sc.GetPosition();
+					inits.Push(init);
+				}
 				part.Texture = NULL;
 				part.Translation = NULL;
 			}
@@ -1324,33 +1310,104 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 		NumParts = parts.Size();
 		Parts = new TexPart[NumParts];
 		memcpy(Parts, &parts[0], NumParts * sizeof(*Parts));
-
-		//CalcBitSize ();
-
-		// If this texture is just a wrapper around a single patch, we can simply
-		// forward GetPixels() and GetColumn() calls to that patch.
-		if (NumParts == 1)
+		Inits = new TexInit[NumParts];
+		for (int i = 0; i < NumParts; i++)
 		{
-			if (Parts->OriginX == 0 && Parts->OriginY == 0 &&
-				Parts->Texture->GetWidth() == Width &&
-				Parts->Texture->GetHeight() == Height &&
-				Parts->Rotate == 0 &&
-				!bComplex)
-			{
-				bRedirect = true;
-			}
+			Inits[i] = inits[i];
 		}
 	}
 
 	if (Width <= 0 || Height <= 0)
 	{
 		UseType = FTexture::TEX_Null;
-		Printf("Texture %s has invalid dimensions (%d, %d)\n", Name, Width, Height);
+		Printf("Texture %s has invalid dimensions (%d, %d)\n", Name.GetChars(), Width, Height);
 		Width = Height = 1;
 	}
 	CalcBitSize ();
 }
 
+
+void FMultiPatchTexture::ResolvePatches()
+{
+	if (Inits != NULL)
+	{
+		for (int i = 0; i < NumParts; i++)
+		{
+			FTextureID texno = TexMan.CheckForTexture(Inits[i].TexName, Inits[i].UseType);
+			if (texno == id)	// we found ourselves. Try looking for another one with the same name which is not a multipatch texture itself.
+			{
+				TArray<FTextureID> list;
+				TexMan.ListTextures(Inits[i].TexName, list, true);
+				for (int i = list.Size() - 1; i >= 0; i--)
+				{
+					if (list[i] != id && !TexMan[list[i]]->bMultiPatch)
+					{
+						texno = list[i];
+						break;
+					}
+				}
+				if (texno == id)
+				{
+					if (Inits[i].HasLine) Inits[i].sc.ScriptMessage(Scanner::WARNING, "Texture '%s' references itself as patch\n", Inits[i].TexName.GetChars());
+					else Printf("Texture '%s' references itself as patch\n", Inits[i].TexName.GetChars());
+				}
+				else
+				{
+					// If it could be resolved, just print a developer warning.
+					DPrintf("Resolved self-referencing texture by picking an older entry for %s\n", Inits[i].TexName.GetChars());
+				}
+			}
+
+			if (!texno.isValid())
+			{
+				if (!Inits[i].Silent)
+				{
+					if (Inits[i].HasLine) Inits[i].sc.ScriptMessage(Scanner::WARNING, "Unknown patch '%s' in texture '%s'\n", Inits[i].TexName.GetChars(), Name.GetChars());
+					else Printf("Unknown patch '%s' in texture '%s'\n", Inits[i].TexName.GetChars(), Name.GetChars());
+				}
+			}
+			else
+			{
+				Parts[i].Texture = TexMan[texno];
+				bComplex |= Parts[i].Texture->bComplex;
+				Parts[i].Texture->bKeepAround = true;
+				if (Inits[i].UseOffsets)
+				{
+					Parts[i].OriginX -= Parts[i].Texture->LeftOffset;
+					Parts[i].OriginY -= Parts[i].Texture->TopOffset;
+				}
+			}
+		}
+		for (int i = 0; i < NumParts; i++)
+		{
+			if (Parts[i].Texture == NULL)
+			{
+				memcpy(&Parts[i], &Parts[i + 1], NumParts - i - 1);
+				i--;
+				NumParts--;
+			}
+		}
+	}
+	delete[] Inits;
+	Inits = NULL;
+
+	CheckForHacks ();
+
+	// If this texture is just a wrapper around a single patch, we can simply
+	// forward GetPixels() and GetColumn() calls to that patch.
+
+	if (NumParts == 1)
+	{
+		if (Parts->OriginX == 0 && Parts->OriginY == 0 &&
+			Parts->Texture->GetWidth() == Width &&
+			Parts->Texture->GetHeight() == Height &&
+			Parts->Rotate == 0 &&
+			!bComplex)
+		{
+			bRedirect = true;
+		}
+	}
+}
 
 
 void FTextureManager::ParseXTexture(Scanner &sc, int usetype)

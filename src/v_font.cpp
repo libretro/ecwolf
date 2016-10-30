@@ -1063,7 +1063,7 @@ FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 		if(Chars[i].Pic)
 		{
 			static_cast<FFontTexture*>(Chars[i].Pic)->SourceFont = this;
-			sprintf(Chars[i].Pic->Name, FONT_CHAR_NAME "%X", i + FirstChar);
+			Chars[i].Pic->Name.Format(FONT_CHAR_NAME "%X", i + FirstChar);
 			Chars[i].ID = TexMan.AddTexture(Chars[i].Pic);
 		}
 	}
@@ -2452,21 +2452,12 @@ void V_InitCustomFonts()
 				else
 				{
 					if (format == 1) WRONG;
-					FTextureID &texid = lumplist[*(unsigned char*)sc->str.GetChars()];
-					if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");;
-					texid = TexMan.CheckForTexture(sc->str, FTexture::TEX_MiscPatch);
-					if (!texid.Exists())
+					FTextureID &p = lumplist[*(unsigned char*)sc->str.GetChars()];
+					sif(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
+					FTextureID texid = TexMan.CheckForTexture(sc->str, FTexture::TEX_MiscPatch);
+					if (texid.Exists())
 					{
-						int lumpno = Wads.CheckNumForFullName (sc->str);
-						if (lumpno >= 0)
-						{
-							texid = TexMan.FindTextureByLumpNum(lumpno);
-							if (!texid.Exists())
-							{
-								FTexture *tex = FTexture::CreateTexture("", lumpno, FTexture::TEX_MiscPatch);
-								texid = TexMan.AddTexture(tex);
-							}
-						}
+						p = texid;
 					}
 					if (!texid.Exists() && Wads.GetLumpFile(llump) >= Wads.IWAD_FILENUM)
 					{

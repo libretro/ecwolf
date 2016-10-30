@@ -52,6 +52,8 @@
 #include "id_us.h"
 #include "id_vh.h"
 
+#define TEX_DWNAME(tex) MAKE_ID(tex->Name[0], tex->Name[1], tex->Name[2], tex->Name[3])
+
 struct SpriteInfo
 {
 	union
@@ -157,7 +159,7 @@ void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 {
 	if(dir < -1 || dir >= 8)
 	{
-		printf("Invalid frame data for '%s'.\n", tex->Name);
+		printf("Invalid frame data for '%s'.\n", tex->Name.GetChars());
 		return;
 	}
 
@@ -244,7 +246,7 @@ void R_InitSprites()
 		FTexture *tex = TexMan.ByIndex(i);
 		if(tex->UseType == FTexture::TEX_Sprite && strlen(tex->Name) >= 6)
 		{
-			SpritesList &list = spritesMap[tex->dwName];
+			SpritesList &list = spritesMap[TEX_DWNAME(tex)];
 			list.Push(tex);
 		}
 	}
