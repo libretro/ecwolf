@@ -2453,7 +2453,7 @@ void V_InitCustomFonts()
 				{
 					if (format == 1) WRONG;
 					FTextureID &p = lumplist[*(unsigned char*)sc->str.GetChars()];
-					sif(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
+					if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
 					FTextureID texid = TexMan.CheckForTexture(sc->str, FTexture::TEX_MiscPatch);
 					if (texid.Exists())
 					{
