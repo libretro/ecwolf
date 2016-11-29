@@ -45,6 +45,7 @@
 #include "zstring.h"
 
 bool queryiwad = true;
+static bool showpreviewgames = false;
 
 int I_PickIWad(WadStuff *wads, int numwads, bool showwin, int defaultiwad);
 #ifndef _WIN32
@@ -82,6 +83,9 @@ static int CheckFileContents(FResourceFile *file, unsigned int* valid)
 
 		for(unsigned int k = 0;k < iwadTypes.Size();++k)
 		{
+			if((iwadTypes[k].Flags & IWad::PREVIEW) && !showpreviewgames)
+				continue;
+
 			for(unsigned int l = iwadTypes[k].Ident.Size();l-- > 0;)
 			{
 				if(iwadTypes[k].Ident[l].CompareNoCase(lump->Name) == 0 ||
@@ -407,6 +411,8 @@ static void ParseIWad(Scanner &sc)
 					iwad.Flags |= IWad::HELPHACK;
 				else if(sc->str.CompareNoCase("Registered") == 0)
 					iwad.Flags |= IWad::REGISTERED;
+				else if(sc->str.CompareNoCase("Preview") == 0)
+					iwad.Flags |= IWad::PREVIEW;
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown flag %s.", sc->str.GetChars());
 			}
@@ -494,6 +500,9 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	config.CreateSetting("ShowIWadPicker", 1);
 	bool showPicker = config.GetSetting("ShowIWadPicker")->GetInteger() != 0;
 	int defaultIWad = config.GetSetting("DefaultIWad")->GetInteger();
+
+	if(config.GetSetting("ShowPreviewGames"))
+		showpreviewgames = config.GetSetting("ShowPreviewGames")->GetInteger() != 0;
 
 	bool useProgdir = false;
 	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL, true);

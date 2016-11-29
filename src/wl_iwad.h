@@ -53,7 +53,8 @@ namespace IWad
 	enum Flags
 	{
 		REGISTERED = 1,
-		HELPHACK = 2
+		HELPHACK = 2,
+		PREVIEW = 4
 	};
 
 	struct IWadData
