@@ -900,7 +900,7 @@ void player_t::Reborn()
 	}
 
 	mo->GiveStartingInventory();
-	health = mo->maxhealth;
+	health = mo->health;
 
 	// Recalculate the projection here so that player classes with differing radii are supported.
 	CalcProjection(mo->radius);

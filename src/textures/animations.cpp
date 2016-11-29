@@ -553,7 +553,7 @@ void FTextureManager::ParseTime (Scanner &sc, DWORD &min, DWORD &max)
 
 void FTextureManager::ParseWarp(Scanner &sc)
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny | TEXMAN_ShortNameOnly;
 	bool isflat = false;
 	bool type2 = sc->str.Compare ("warp2") == 0;	// [GRB]
 	if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
@@ -620,7 +620,7 @@ void FTextureManager::ParseCameraTexture(Scanner &sc)
 {
 	sc.ScriptMessage(Scanner::ERROR, "Not ready yet to do cameras!");
 #if 0
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny | TEXMAN_ShortNameOnly;
 	int width, height;
 	int fitwidth, fitheight;
 	FString picname;

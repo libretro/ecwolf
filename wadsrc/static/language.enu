@@ -662,7 +662,7 @@ NOAH_QUIZ_A61B = "brussel sprouts"; // Wrong
 NOAH_QUIZ_A61C = "blood"; // Correct
 
 NOAH_QUIZ_Q62 = "After the flood, what were\nthe animals supposed to do?";
-NOAH_QUIZ_H62 = "Gen 8:7"; // Gen 8:17 in DOS version
+NOAH_QUIZ_H62 = "Gen 8:17";
 NOAH_QUIZ_A62A = "exercise and become strong"; // Wrong
 NOAH_QUIZ_A62B = "be fruitful and multiply"; // Correct
 NOAH_QUIZ_A62C = "be sacrificed to God"; // Wrong

@@ -14,6 +14,7 @@
 #endif
 
 class FResourceFile;
+class FTexture;
 
 struct FResourceLump
 {
@@ -32,6 +33,7 @@ struct FResourceLump
 	SBYTE			RefCount;
 	char *			Cache;
 	FResourceFile *	Owner;
+	FTexture *		LinkedTexture;
 	int				Namespace;
 
 	FResourceLump()
@@ -42,6 +44,7 @@ struct FResourceLump
 		RefCount = 0;
 		Namespace = 0;	// ns_global
 		*Name = 0;
+		LinkedTexture = NULL;
 	}
 
 	virtual ~FResourceLump();

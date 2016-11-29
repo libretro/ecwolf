@@ -1,6 +1,6 @@
 SmallFont
 {
-	Template "STCFN%.3d"
+	Template "STCFN%03d"
 }
 
 IntermissionFont

@@ -96,6 +96,7 @@ void VL_ReadPalette(const char* lump)
 	if(currentBlend.amount)
 		V_SetBlend(currentBlend.r, currentBlend.g, currentBlend.b, currentBlend.amount);
 	R_InitColormaps();
+	TexMan.InvalidatePalette();
 	V_RetranslateFonts();
 }
 

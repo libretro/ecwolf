@@ -68,6 +68,7 @@ namespace GameSave {
 
 long long SaveVersion = SAVEVER;
 DWORD SaveProdVersion = SAVEPRODVER;
+bool param_foreginsave = false;
 
 static const char* const NEW_SAVE = "    - NEW SAVE -";
 
@@ -317,7 +318,7 @@ bool SetupSaveGames()
 				char* checkFile = M_GetPNGText(png, "Map WAD");
 				if(checkFile)
 				{
-					if(Wads.CheckIfWadLoaded(checkFile) < 0)
+					if(Wads.CheckIfWadLoaded(checkFile) < 0 && !param_foreginsave)
 						sFile.hasFiles = false;
 					delete[] checkFile;
 				}
@@ -333,7 +334,7 @@ bool SetupSaveGames()
 					do
 					{
 						nextIndex = checkString.IndexOf(';', lastIndex);
-						if(Wads.CheckIfWadLoaded(checkString.Mid(lastIndex, nextIndex-lastIndex)) < 0)
+						if(Wads.CheckIfWadLoaded(checkString.Mid(lastIndex, nextIndex-lastIndex)) < 0 && !param_foreginsave)
 						{
 							sFile.hide = true;
 							break;
@@ -345,7 +346,7 @@ bool SetupSaveGames()
 					while(nextIndex != -1);
 
 					// See if we don't have the right number of iwads loaded.
-					if(expectedIwads != 0)
+					if(expectedIwads != 0 && !param_foreginsave)
 						sFile.hide = true;
 					else
 						canLoad = true;

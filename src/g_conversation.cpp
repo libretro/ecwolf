@@ -653,16 +653,14 @@ void StartConversation(AActor *npc)
 		}
 		else
 		{
-			const int lastoffs = StopMusic();
-			US_ControlPanel(sc_Escape);
-			Menu::closeMenus(false);
-			if(startgame)
-				return;
-			IN_ClearKeysDown();
-			VW_FadeOut();
-			ContinueMusic(lastoffs);
-			quiz.draw();
-			VW_FadeIn();
+			// If the player escapes then they get nothing.
+
+			// For S3DNA, proceed to the next page. Probably should factor this
+			// into an option.
+			if((*page)->Choices.Size() > 0)
+				*page = (*page)->Choices[0].NextPage;
+
+			break;
 		}
 	} while(true);
 

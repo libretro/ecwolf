@@ -43,6 +43,7 @@ namespace GameSave
 {
 	extern long long SaveVersion;
 	extern DWORD SaveProdVersion;
+	extern bool param_foreginsave;
 
 	Menu		&GetLoadMenu();
 	MenuItem	*GetLoadMenuItem();

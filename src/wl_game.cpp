@@ -253,10 +253,11 @@ void SetupGameLevel (void)
 			= gamestate.secretcount
 			= gamestate.killcount
 			= gamestate.treasurecount = 0;
-		gamestate.faceframe.SetInvalid();
 		LastAttacker = NULL;
 		players[0].killerobj = NULL;
 	}
+
+	gamestate.faceframe.SetInvalid();
 
 //
 // load the level
@@ -797,6 +798,15 @@ restartgame:
 					if(NewMap.flags & NEWMAP_KEEPFACING)
 						players[0].mo->angle = NewMap.angle;
 				}
+			}
+
+			if(levelInfo->ResetHealth)
+				players[0].health = players[0].mo->health = players[0].mo->SpawnHealth();
+
+			if(levelInfo->ResetInventory)
+			{
+				players[0].mo->ClearInventory();
+				players[0].mo->GiveStartingInventory();
 			}
 
 			if(levelInfo->EnsureInventory.Size() > 0)

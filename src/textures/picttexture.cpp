@@ -193,7 +193,7 @@ void FPictTexture::MakeTexture()
 		switch(opcode)
 		{
 		default:
-			Printf("Unknown opcode %04X in %s\n", opcode, Name);
+			Printf("Unknown opcode %04X in %s\n", opcode, Name.GetChars());
 		case OP_EndPic:
 			goto FinishTexture;
 
@@ -205,7 +205,7 @@ void FPictTexture::MakeTexture()
 			if(regionSize != 0xA)
 			{
 				// Region is in an undocumented format if it's not rectangular.
-				Printf("Non-rectangular clipping region in %s.\n", Name);
+				Printf("Non-rectangular clipping region in %s.\n", Name.GetChars());
 				return;
 			}
 			data += regionSize;

@@ -52,6 +52,8 @@
 #include "id_us.h"
 #include "id_vh.h"
 
+#define TEX_DWNAME(tex) MAKE_ID(tex->Name[0], tex->Name[1], tex->Name[2], tex->Name[3])
+
 struct SpriteInfo
 {
 	union
@@ -157,7 +159,7 @@ void R_InstallSprite(Sprite &frame, FTexture *tex, int dir, bool mirror)
 {
 	if(dir < -1 || dir >= 8)
 	{
-		printf("Invalid frame data for '%s'.\n", tex->Name);
+		printf("Invalid frame data for '%s'.\n", tex->Name.GetChars());
 		return;
 	}
 
@@ -244,7 +246,7 @@ void R_InitSprites()
 		FTexture *tex = TexMan.ByIndex(i);
 		if(tex->UseType == FTexture::TEX_Sprite && strlen(tex->Name) >= 6)
 		{
-			SpritesList &list = spritesMap[tex->dwName];
+			SpritesList &list = spritesMap[TEX_DWNAME(tex)];
 			list.Push(tex);
 		}
 	}
@@ -318,7 +320,9 @@ void R_InitSprites()
 		playsprite.frames = spriteFrames.Size();
 		playsprite.numFrames = MAX_SPRITE_FRAMES;
 		for(char i = 0;i < MAX_SPRITE_FRAMES;++i)
-			spriteFrames.Push(spriteFrames[unknsprite.frames]);
+			// Force early copy here since TArray does not copy before growing
+			// the array (assumes that reference is not from the array)
+			spriteFrames.Push(Sprite(spriteFrames[unknsprite.frames]));
 	}
 }
 
@@ -456,9 +460,6 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		return;
 
 	const unsigned int texWidth = tex->GetWidth();
-	if(x2 == x1)
-		return;
-
 	unsigned height1 = (word)(heightnumerator/(nx1>>8));
 	unsigned height2 = (word)(heightnumerator/(nx2>>8));
 	
@@ -491,7 +492,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 
 	byte *dest;
 	int i;
-	fixed x, y;
+	unsigned int x;
 
 	//printf("%f, %f, %f, %f\n", FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx1));
 	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
@@ -503,9 +504,10 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 
 	for(i = x1, x = 0; i < x2; ++i)
 	{
-		while(i >= nexti)
+		while(i > nexti)
 		{
 			++x;
+			assert(x < texWidth);
 			src = tex->GetColumn(flip ? texWidth - x - 1 : x, NULL);
 
 			dxa += dxx;
@@ -524,7 +526,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 			continue;
 		
 		dest = vbuf + i + (upperedge > 0 ? vbufPitch*upperedge : 0);
-		for(y = startY*yStep;y < endY;y += yStep)
+		for(fixed y = startY*yStep;y < endY;y += yStep)
 		{
 			if(src[y>>FRACBITS])
 				*dest = colormap[src[y>>FRACBITS]];
@@ -599,7 +601,7 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	if(nx1<0 && nx1>=-1792) nx1=-1792;
 	if(nx2>=0 && nx2<=1792) nx2=1792;
 	if(nx2<0 && nx2>=-1792) nx2=-1792;
-	
+
 	viewx1=(int)(centerx+ny1*scale/nx1);
 	viewx2=(int)(centerx+ny2*scale/nx2);
 

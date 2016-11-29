@@ -459,7 +459,7 @@ void PollControls (bool absolutes)
 // get button states
 //
 	PollKeyboardButtons ();
-	
+
 	if (mouseenabled && IN_IsInputGrabbed())
 		PollMouseButtons ();
 
@@ -1076,9 +1076,12 @@ void PlayLoop (void)
 			VW_FadeIn ();
 
 		CheckKeys ();
-		StatusBar->Tick();
-		if((gamestate.TimeCount & 1) || !(tics & 1))
-			StatusBar->DrawStatusBar();
+		if (!loadedgame)
+		{
+			StatusBar->Tick();
+			if ((gamestate.TimeCount & 1) || !(tics & 1))
+				StatusBar->DrawStatusBar();
+		}
 
 		VH_UpdateScreen();
 //

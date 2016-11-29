@@ -4,6 +4,7 @@
 #include "wl_def.h"
 #include "name.h"
 #include "tarray.h"
+#include "zstring.h"
 
 class FBitmap;
 struct FRemapTable;
@@ -158,11 +159,7 @@ public:
 	int SourceLump;
 	FTextureID id;
 
-	union
-	{
-		char Name[9];
-		DWORD dwName;		// Used with sprites
-	};
+	FString Name;
 	BYTE UseType;	// This texture's primary purpose
 
 	BYTE bNoDecals:1;		// Decals should not stick to texture
@@ -176,6 +173,7 @@ public:
 							// fully composited before subjected to any kinf of postprocessing instead of
 							// doing it per patch.
 	BYTE bMultiPatch:1;		// This is a multipatch texture (we really could use real type info for textures...)
+	BYTE bKeepAround:1; // This texture was used as part of a multi-patch texture. Do not free it.
 
 	WORD Rotations;
 	SWORD SkyOffset;
@@ -218,6 +216,7 @@ public:
 	virtual FTexture *GetRawTexture();		// for FMultiPatchTexture to override
 	FTextureID GetID() const { return id; }
 
+	virtual void InvalidatePalette() {}
 	virtual void Unload () = 0;
 
 	// Returns the native pixel format for this image
@@ -244,6 +243,7 @@ public:
 	int GetScaledTopOffset () { int foo = (TopOffset << 17) / yScale; return (foo >> 1) + (foo & 1); }
 	double GetScaledLeftOffsetDouble() { return (LeftOffset * 65536.) / xScale; }
 	double GetScaledTopOffsetDouble() { return (TopOffset * 65536.) / yScale; }
+	virtual void ResolvePatches() {}
 
 	virtual void SetFrontSkyLayer();
 
@@ -362,12 +362,14 @@ public:
 		TEXMAN_TryAny = 1,
 		TEXMAN_Overridable = 2,
 		TEXMAN_ReturnFirst = 4,
+		TEXMAN_AllowSkins = 8,
+		TEXMAN_ShortNameOnly = 16,
+		TEXMAN_DontCreate = 32
 	};
 
 	FTextureID CheckForTexture (const char *name, int usetype, BITFIELD flags=TEXMAN_TryAny);
 	FTextureID GetTexture (const char *name, int usetype, BITFIELD flags=0);
-	FTextureID FindTextureByLumpNum (int lumpnum);
-	int ListTextures (const char *name, TArray<FTextureID> &list);
+	int ListTextures (const char *name, TArray<FTextureID> &list, bool listall = false);
 
 	void AddTexturesLump (const void *lumpdata, int lumpsize, int deflumpnum, int patcheslump, int firstdup=0, bool texture1=false);
 	void AddTexturesLumps (int lump1, int lump2, int patcheslump);
@@ -412,6 +414,8 @@ public:
 	FDoorAnimation *FindAnimatedDoor (FTextureID picnum);
 
 	FTextureID GetArtIndex(unsigned int index);
+	// Inform textures that palette maps may be invalid
+	void InvalidatePalette();
 private:
 
 	// texture counting

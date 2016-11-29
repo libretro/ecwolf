@@ -4,9 +4,6 @@
 #include <stdio.h>
 #include <zlib.h>
 #include "bzlib.h"
-#ifndef FILES_NO_LZMA
-#include "LzmaDec.h"
-#endif
 #include "wl_def.h"
 #include "m_swap.h"
 
@@ -256,10 +253,11 @@ private:
 	FileReaderBZ2 &operator= (const FileReaderBZ2 &) { return *this; }
 };
 
-#ifndef FILES_NO_LZMA
 // Wraps around a FileReader to decompress a lzma stream
 class FileReaderLZMA : public FileReaderBase
 {
+	struct StreamPointer;
+
 public:
 	FileReaderLZMA (FileReader &file, size_t uncompressed_size, bool zip);
 	~FileReaderLZMA ();
@@ -311,7 +309,7 @@ private:
 
 	FileReader &File;
 	bool SawEOF;
-	CLzmaDec Stream;
+	StreamPointer *Streamp; // anonymous pointer to LKZA decoder struct - to avoid including the LZMA headers globally
 	size_t Size;
 	size_t InPos, InSize;
 	size_t OutProcessed;
@@ -321,7 +319,6 @@ private:
 
 	FileReaderLZMA &operator= (const FileReaderLZMA &) { return *this; }
 };
-#endif
 
 class MemoryReader : public FileReader
 {

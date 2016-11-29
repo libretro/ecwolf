@@ -166,8 +166,11 @@ void WolfStatusBar::DrawFace (void)
 	else
 	{
 		// TODO: Make this work based on damage types.
-		static const ClassDef *needle = ClassDef::FindClass("Needle");
-		if (players[ConsolePlayer].killerobj && players[ConsolePlayer].killerobj->GetClass() == needle)
+		// It gets uglier now that we can blame the source of a projectile we
+		// have to check the class that fired it which is just wrong. One of
+		// these days I'll get damage types in!
+		static const ClassDef *schabbs = ClassDef::FindClass("Schabbs");
+		if (players[ConsolePlayer].killerobj && players[ConsolePlayer].killerobj->IsKindOf(schabbs))
 			StatusDrawFace(TexMan("STFMUT0"));
 		else
 			StatusDrawFace(TexMan("STFDEAD0"));

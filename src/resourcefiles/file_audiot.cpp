@@ -84,8 +84,7 @@ class FAudiot : public FUncompressedFile
 			unsigned int segstart[4] = {0};
 			unsigned int curseg = 0;
 
-			audiohedReader->Seek(0, SEEK_END);
-			NumLumps = (audiohedReader->Tell()/4)-1;
+			NumLumps = (audiohedReader->GetLength()/4)-1;
 			audiohedReader->Seek(0, SEEK_SET);
 			Lumps = new FUncompressedLump[NumLumps];
 			DWORD* positions = new DWORD[NumLumps+1];

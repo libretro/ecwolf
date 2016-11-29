@@ -70,6 +70,21 @@ enum
 class Scanner
 {
 	public:
+		enum MessageLevel
+		{
+			ERROR,
+			WARNING,
+			NOTICE
+		};
+
+		struct Position
+		{
+			SCString scriptIdentifier;
+			unsigned int tokenLine, tokenLinePosition;
+
+			void ScriptMessage(MessageLevel level, const char* error, ...) const;
+		};
+
 		struct ParserState
 		{
 			SCString		str;
@@ -82,13 +97,6 @@ class Scanner
 			unsigned int	scanPos;
 		};
 
-		enum MessageLevel
-		{
-			ERROR,
-			WARNING,
-			NOTICE
-		};
-
 		Scanner(const char* data, size_t length=0);
 		~Scanner();
 
@@ -97,14 +105,15 @@ class Scanner
 		bool			CheckToken(char token);
 		void			ExpandState();
 		const char*		GetData() const { return data; }
-		int				GetLine() const { return state.tokenLine; }
-		int				GetLinePos() const { return state.tokenLinePosition; }
-		int				GetPos() const { return logicalPosition; }
+		Position		GetPosition() const { Position pos = { scriptIdentifier, GetLine(), GetLinePos() }; return pos; }
+		unsigned int	GetLine() const { return state.tokenLine; }
+		unsigned int	GetLinePos() const { return state.tokenLinePosition; }
+		unsigned int	GetLogicalPos() const { return logicalPosition; }
 		unsigned int	GetScanPos() const { return scanPos; }
 		bool			GetNextString();
 		bool			GetNextToken(bool expandState=true);
 		void			MustGetToken(char token);
-		void			Rewind(); /// Only can rewind one step.
+		void			Rewind(); // Only can rewind one step.
 		void			ScriptMessage(MessageLevel level, const char* error, ...) const;
 		void			SetScriptIdentifier(const SCString &ident) { scriptIdentifier = ident; }
 		int				SkipLine();
@@ -116,7 +125,7 @@ class Scanner
 		static const SCString	Escape(const char *str);
 		static const SCString	&Unescape(SCString &str);
 
-		static void		SetMessageHandler(void (*handler)(MessageLevel, const char*, va_list)) { messageHander = handler; }
+		static void		SetMessageHandler(void (*handler)(MessageLevel, const char*, va_list));
 
 
 		ParserState		state;
@@ -138,8 +147,6 @@ class Scanner
 		bool			needNext; // If checkToken returns false this will be false.
 
 		SCString		scriptIdentifier;
-
-		static void		(*messageHander)(MessageLevel, const char*, va_list);
 };
 
 #endif /* __SCANNER_H__ */
