@@ -800,6 +800,15 @@ restartgame:
 				}
 			}
 
+			if(levelInfo->ResetHealth)
+				players[0].health = players[0].mo->health = players[0].mo->SpawnHealth();
+
+			if(levelInfo->ResetInventory)
+			{
+				players[0].mo->ClearInventory();
+				players[0].mo->GiveStartingInventory();
+			}
+
 			if(levelInfo->EnsureInventory.Size() > 0)
 			{
 				for(unsigned int i = 0;i < levelInfo->EnsureInventory.Size();++i)

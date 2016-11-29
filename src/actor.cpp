@@ -185,6 +185,12 @@ void AActor::ClearCounters()
 	flags &= ~(FL_COUNTITEM|FL_COUNTKILL|FL_COUNTSECRET);
 }
 
+void AActor::ClearInventory()
+{
+	while(inventory)
+		RemoveInventory(inventory);
+}
+
 void AActor::Destroy()
 {
 	Super::Destroy();

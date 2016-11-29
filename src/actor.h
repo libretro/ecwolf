@@ -98,6 +98,7 @@ class AActor : public Thinker,
 		void			AddInventory(AInventory *item);
 		virtual void	BeginPlay() {}
 		void			ClearCounters();
+		void			ClearInventory();
 		virtual void	Destroy();
 		virtual void	Die();
 		void			EnterZone(const MapZone *zone);

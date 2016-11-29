@@ -186,6 +186,8 @@ public:
 	bool			SecretDeathSounds;
 	bool			SpawnWithWeaponRaised;
 	bool			ForceTally;
+	bool			ResetHealth;
+	bool			ResetInventory;
 
 	TArray<const ClassDef *>	EnsureInventory;
 
