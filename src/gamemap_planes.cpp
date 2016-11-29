@@ -123,8 +123,6 @@ public:
 			flatTable[i][0].SetInvalid();
 			flatTable[i][1].SetInvalid();
 		}
-		defaultFlats[0] = levelInfo->DefaultTexture[0];
-		defaultFlats[1] = levelInfo->DefaultTexture[1];
 		tileTriggers.Clear();
 		thingTable.Clear();
 	}
@@ -260,17 +258,11 @@ public:
 		return false;
 	}
 
-	void SetDefaultFlat(FTextureID floor, FTextureID ceiling)
-	{
-		defaultFlats[MapSector::Floor] = floor;
-		defaultFlats[MapSector::Ceiling] = ceiling;
-	}
-
-	FTextureID TranslateFlat(unsigned int index, bool ceiling)
+	FTextureID TranslateFlat(unsigned int index, bool ceiling, FTextureID def)
 	{
 		if(flatTable[index][ceiling].isValid())
 			return flatTable[index][ceiling];
-		return defaultFlats[ceiling];
+		return def;
 	}
 
 	bool TranslateTileTrigger(unsigned short tile, MapTrigger &trigger)
@@ -603,7 +595,6 @@ private:
 	TMap<WORD, MapTrigger> tileTriggers;
 	TMap<WORD, ModZone> modZones;
 	TMap<WORD, MapZone> zonePalette;
-	FTextureID defaultFlats[2];
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 	EFeatureFlags FeatureFlags;
 };
@@ -890,6 +881,9 @@ void GameMap::ReadPlanesData()
 	else
 		memset(infoplane, 0, size*2);
 
+	FTextureID defaultCeiling = levelInfo->DefaultTexture[Sector::Ceiling];
+	FTextureID defaultFloor = levelInfo->DefaultTexture[Sector::Floor];
+
 	for(int plane = 0;plane < numPlanes && plane < NUM_USABLE_PLANES;++plane)
 	{
 		if(plane == 3) // Info plane is already read
@@ -1060,11 +1054,9 @@ void GameMap::ReadPlanesData()
 			case Plane_Object:
 			{
 				bool canUseFlatColor = true;
-				FTextureID defaultCeiling, defaultFloor;
+				bool gotFlatTextures = false;
 				unsigned int ambushSpot = 0;
 				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors. 
-				defaultCeiling.SetInvalid();
-				defaultFloor.SetInvalid();
 
 				unsigned int i = 0;
 				// Using ROTT feature flags invalidates the first four tiles
@@ -1095,14 +1087,14 @@ void GameMap::ReadPlanesData()
 							case 0xFB:
 								// Floor/ceiling texture
 								// We only read the first instance
-								if(canUseFlatColor || !defaultCeiling.isValid())
+								if(canUseFlatColor || !gotFlatTextures)
 								{
 									canUseFlatColor = false;
-									defaultCeiling = xlat.TranslateFlat(oldplane[++i]>>8, Sector::Ceiling);
-									defaultFloor = xlat.TranslateFlat(oldplane[i]&0xFF, Sector::Floor);
+									gotFlatTextures = true;
+									defaultCeiling = xlat.TranslateFlat(oldplane[++i]>>8, Sector::Ceiling, levelInfo->DefaultTexture[Sector::Ceiling]);
+									defaultFloor = xlat.TranslateFlat(oldplane[i]&0xFF, Sector::Floor, levelInfo->DefaultTexture[Sector::Floor]);
 
 									sectorPalette.Resize(1);
-									xlat.SetDefaultFlat(defaultFloor, defaultCeiling);
 									continue;
 								}
 								break;
@@ -1110,8 +1102,10 @@ void GameMap::ReadPlanesData()
 								// This would be pointless since ECWolf is
 								// always texture mapped, but it seems to be
 								// legal for a map to not include a texture tag.
-								if(canUseFlatColor && !defaultCeiling.isValid())
+								if(canUseFlatColor && !gotFlatTextures)
 								{
+									gotFlatTextures = true;
+
 									++i;
 
 									const PalEntry c = GPalette.BaseColors[oldplane[i]>>8], f = GPalette.BaseColors[oldplane[i]&0xFF];
@@ -1121,7 +1115,6 @@ void GameMap::ReadPlanesData()
 
 									defaultCeiling = TexMan.GetTexture(ceilingColor, FTexture::TEX_Flat);
 									defaultFloor = TexMan.GetTexture(floorColor, FTexture::TEX_Flat);
-									xlat.SetDefaultFlat(defaultFloor, defaultCeiling);
 								}
 								continue;
 						}
@@ -1186,8 +1179,8 @@ void GameMap::ReadPlanesData()
 				while(iter.NextPair(pair))
 				{
 					Sector &sect = sectorPalette[pair->Value];
-					sect.texture[Sector::Floor] = xlat.TranslateFlat(pair->Key&0xFF, Sector::Floor);
-					sect.texture[Sector::Ceiling] = xlat.TranslateFlat(pair->Key>>8, Sector::Ceiling);
+					sect.texture[Sector::Floor] = xlat.TranslateFlat(pair->Key&0xFF, Sector::Floor, defaultFloor);
+					sect.texture[Sector::Ceiling] = xlat.TranslateFlat(pair->Key>>8, Sector::Ceiling, defaultCeiling);
 				}
 
 				// Now link the sector data to map points!
