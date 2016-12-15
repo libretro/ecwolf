@@ -439,9 +439,29 @@ protected:
 				}
 				else if(sc->str.CompareNoCase("changetrigger") == 0)
 				{
-					sc.MustGetToken(TK_IntConst);
 					zone.type = ModZone::CHANGETRIGGER;
-					zone.oldTrigger = sc->number;
+
+					if(sc.CheckToken(TK_IntConst))
+					{
+						zone.oldTrigger = sc->number;
+
+						// Warn on first use of deprecated special number.
+						static bool deprSpecial = false;
+						if(!deprSpecial)
+						{
+							deprSpecial = true;
+							sc.ScriptMessage(Scanner::WARNING, "Use of action special number is deprecated. Use names instead.");
+						}
+					}
+					else
+					{
+						sc.MustGetToken(TK_StringConst);
+						Specials::LineSpecials num = Specials::LookupFunctionNum(sc->str);
+						if(num != Specials::NUM_POSSIBLE_SPECIALS)
+							zone.oldTrigger = num;
+						else
+							sc.ScriptMessage(Scanner::ERROR, "Could not resolve action special '%s'.", sc->str.GetChars());
+					}
 
 					sc.MustGetToken('{');
 					TextMapParser::ParseTrigger(sc, zone.triggerTemplate);

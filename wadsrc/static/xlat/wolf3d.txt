@@ -630,7 +630,7 @@ tiles
 	}
 
 	modzone 106 fillzone ambush;
-	modzone 107 changetrigger 3
+	modzone 107 changetrigger "Exit_Normal"
 	{
 		action = "Exit_Secret";
 		playeruse = true;
