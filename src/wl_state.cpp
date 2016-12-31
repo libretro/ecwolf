@@ -815,6 +815,22 @@ bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amo
 	}
 }
 
+// Helps prevent leakage cases in CheckLine
+static inline bool CheckAdjacentTileBlockage(int x, int y, int lastx, int lasty) {
+	int adjacentX, adjacentY;
+	if (abs(lastx - x) != 1 && abs(lasty - y) != 1)
+		return false;
+
+	adjacentX = lastx > x ? x + 1 : x - 1;
+	adjacentY = lasty > y ? y + 1 : y - 1;
+
+	MapSpot adjacentSpot1 = map->GetSpot(adjacentX, y, 0);
+	MapSpot adjacentSpot2 = map->GetSpot(x, adjacentY, 0);
+	if (adjacentSpot1->tile && adjacentSpot2->tile)
+		return true;
+
+	return false;
+}
 
 /*
 =====================
@@ -825,7 +841,6 @@ bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amo
 =
 =====================
 */
-
 bool CheckLine (AActor *ob, AActor *ob2)
 {
 	int         x1,y1,xt1,yt1,x2,y2,xt2,yt2;
@@ -836,6 +851,7 @@ bool CheckLine (AActor *ob, AActor *ob2)
 	int         xfrac,yfrac,deltafrac;
 	unsigned    intercept;
 	MapTile::Side	direction;
+	int			lastx, lasty;
 
 	if (!ob2)
 		return false;
@@ -878,6 +894,9 @@ bool CheckLine (AActor *ob, AActor *ob2)
 			ystep = ltemp;
 		yfrac = y1 + (((int32_t)ystep*partial) >>8);
 
+		lastx = xt1;
+		lasty = yt1;
+
 		x = xt1+xstep;
 		xt2 += xstep;
 		do
@@ -886,21 +905,30 @@ bool CheckLine (AActor *ob, AActor *ob2)
 			yfrac += ystep;
 
 			MapSpot spot = map->GetSpot(x, y, 0);
-			x += xstep;
-
+			
 			if (!spot->tile)
-				continue;
-			if (spot->tile && spot->slideAmount[direction] == 0)
-				return false;
+			{
+				if (CheckAdjacentTileBlockage(x, y, lastx, lasty))
+					return false;
+			}
+			else 
+			{
+				if (spot->slideAmount[direction] == 0)
+					return false;
 
-			//
-			// see if the door is open enough
-			//
-			intercept = yfrac-ystep/2;
+				//
+				// see if the door is open enough
+				//
+				intercept = yfrac - ystep / 2;
 
-			if (!CheckSlidePass(spot->slideStyle, intercept, spot->slideAmount[direction]))
-				return false;
+				if (!CheckSlidePass(spot->slideStyle, intercept, spot->slideAmount[direction]))
+					return false;
 
+			}
+			lastx = x;
+			lasty = y;
+
+			x += xstep;
 		} while (x != xt2);
 	}
 
@@ -932,6 +960,9 @@ bool CheckLine (AActor *ob, AActor *ob2)
 			xstep = ltemp;
 		xfrac = x1 + (((int32_t)xstep*partial) >>8);
 
+		lasty = yt1;
+		lastx = xt1;
+
 		y = yt1 + ystep;
 		yt2 += ystep;
 		do
@@ -940,26 +971,34 @@ bool CheckLine (AActor *ob, AActor *ob2)
 			xfrac += xstep;
 
 			MapSpot spot = map->GetSpot(x, y, 0);
-			y += ystep;
 
 			if (!spot->tile)
-				continue;
-			if (spot->tile && spot->slideAmount[direction] == 0)
-				return false;
+			{
+				if (CheckAdjacentTileBlockage(x, y, lastx, lasty))
+					return false;
+			}
+			else 
+			{
+				if (spot->slideAmount[direction] == 0)
+					return false;
 
-			//
-			// see if the door is open enough
-			//
-			intercept = xfrac-xstep/2;
+				//
+				// see if the door is open enough
+				//
+				intercept = xfrac - xstep / 2;
 
-			if (intercept>spot->slideAmount[direction])
-				return false;
+				if (intercept>spot->slideAmount[direction])
+					return false;
+			}
+			lastx = x;
+			lasty = y;
+
+			y += ystep;
 		} while (y != yt2);
 	}
 
 	return true;
 }
-
 
 /*
 ================
