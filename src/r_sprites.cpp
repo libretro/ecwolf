@@ -206,7 +206,8 @@ void R_GetSpriteHitlist(BYTE* hitlist)
 			if(frame->rotations == Sprite::NO_FRAMES)
 				continue;
 
-			for(unsigned int k = frame->rotations;k-- > 0;)
+			// 0 rotations means 1 rotation in this context
+			for(unsigned int k = MAX<unsigned int>(frame->rotations, 1);k-- > 0;)
 			{
 				if(frame->texture[k].isValid())
 					hitlist[frame->texture[k].GetIndex()] |= 1;

@@ -36,11 +36,13 @@ private:
 		unsigned int AvailIn;
 		unsigned int InternalOut;
 
-		BYTE CFlags, Bits;
-
-		BYTE Window[WINDOW_SIZE+INTERNAL_BUFFER_SIZE];
 		const BYTE *WindowData;
 		BYTE *InternalBuffer;
+		BYTE CFlags, Bits;
+
+		// Double sized window so that we can avoid shuffling bytes around until
+		// we can purge a whole window of data.
+		BYTE Window[WINDOW_SIZE*2+INTERNAL_BUFFER_SIZE];
 	} Stream;
 
 	void FillBuffer()
@@ -64,6 +66,27 @@ private:
 		assert(Stream.InternalBuffer == Stream.WindowData);
 		Stream.CFlags = *Stream.In++;
 		--Stream.AvailIn;
+
+		// If entirely uncompressed shortcut loop if possible
+#ifndef MACWOLF
+		if(Stream.CFlags == 0)
+#else
+		if(Stream.CFlags == 0xFF)
+#endif
+		{
+			if(Stream.AvailIn >= 8)
+			{
+				memcpy(Stream.InternalBuffer, Stream.In, 8);
+
+				Stream.AvailIn -= 8;
+				Stream.In += 8;
+				Stream.InternalBuffer += 8;
+				Stream.InternalOut += 8;
+				Stream.State = STREAM_FLUSH;
+				return;
+			}
+		}
+
 		Stream.Bits = 0xFF;
 		Stream.State = STREAM_BITS;
 	}
@@ -186,10 +209,16 @@ public:
 				Out += copy;
 				AvailOut -= copy;
 
-				// Slide our window
-				memmove(Stream.Window, Stream.Window+copy, WINDOW_SIZE+INTERNAL_BUFFER_SIZE-copy);
-				Stream.InternalBuffer -= copy;
 				Stream.InternalOut -= copy;
+				Stream.WindowData += copy;
+
+				// If our sliding window has grown large enough, slide it back.
+				if(Stream.WindowData >= Stream.Window+WINDOW_SIZE*2)
+				{
+					memmove(Stream.Window, Stream.Window+WINDOW_SIZE, WINDOW_SIZE+INTERNAL_BUFFER_SIZE);
+					Stream.WindowData -= WINDOW_SIZE;
+					Stream.InternalBuffer -= WINDOW_SIZE;
+				}
 			}
 
 			if(Stream.State == STREAM_FINAL)

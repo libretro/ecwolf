@@ -333,7 +333,11 @@ const BYTE *FWolfShapeTexture::GetColumn (unsigned int column, const Span **span
 	}
 	if ((unsigned)column >= (unsigned)Width)
 	{
-		if (WidthMask + 1 == Width)
+		if (Width == 0)
+		{
+			column = 0;
+		}
+		else if (WidthMask + 1 == Width)
 		{
 			column &= WidthMask;
 		}
