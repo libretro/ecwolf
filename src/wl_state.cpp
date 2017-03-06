@@ -818,7 +818,7 @@ bool CheckSlidePass(unsigned int style, unsigned int intercept, unsigned int amo
 // Helps prevent leakage cases in CheckLine
 static inline bool CheckAdjacentTileBlockage(int x, int y, int lastx, int lasty) {
 	int adjacentX, adjacentY;
-	if (abs(lastx - x) != 1 && abs(lasty - y) != 1)
+	if (abs(lastx - x) != 1 || abs(lasty - y) != 1)
 		return false;
 
 	adjacentX = lastx > x ? x + 1 : x - 1;
