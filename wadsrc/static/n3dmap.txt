@@ -252,7 +252,7 @@ sounds
 	"PCHITWAL", // Only called from EnterCtrlData, not ClipMove
 	"PCSELECT",
 	"PCSHTDOR", // Called from EnterCtrlData as in Wolf3D
-	"ALENDBN2", // Also Quiz correct
+	"PCENDBN2", // Also Quiz correct
 	"PCBELL", // Three rings of a bell (Unused)
 	"PCPOWER", // Generic powerup noise (Unused)
 
@@ -374,7 +374,7 @@ textures
 	"STAIRWY1",	"STAIRWY2",	// Staircase
 	"FLOOD1",	"FLOOD2",	// View of the food (day/night)
 	"WODPANL1",	"WODPANL2",	// (Entry) wood panel
-	"WODNAMH1",	"WODNAMH2",	// Wood panel with Naamah picture
+	"WODNAMH1",	"WODNAMH2",	// Wood Panel with Naamah picture
 	"ABRICK1",	"ABRICK2",	// Brick wall
 	"ABRKNH1",	"ABRKNH2",	// Brick wall with Naoh sign
 	"GRYWOOD1",	"GRYWOOD2",	// Gray wood
