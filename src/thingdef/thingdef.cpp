@@ -483,6 +483,9 @@ static TMap<int, ClassDef *> EditorNumberTable, ConversationIDTable;
 SymbolTable ClassDef::globalSymbols;
 bool ClassDef::bShutdown = false;
 
+// Minimize warning spam for deprecated feature in 1.4
+static bool g_ThingEdNumWarning;
+
 ClassDef::ClassDef() : tentative(false)
 {
 	defaultInstance = NULL;
@@ -916,6 +919,10 @@ void ClassDef::LoadActors()
 	int lump = 0;
 	while((lump = Wads.FindLump("DECORATE", &lastLump)) != -1)
 	{
+		// Enable ed num warning if not in ecwolf.pk3 (set to true which
+		// incidateds we've thrown this warning)
+		g_ThingEdNumWarning = Wads.GetLumpFile(lump) == 0;
+
 		ParseDecorateLump(lump);
 	}
 
@@ -1319,7 +1326,27 @@ ClassDef *ClassDef::ParseActorHeader(Scanner &sc, bool &previouslyDefined, bool 
 	if(sc.CheckToken(TK_IntConst))
 	{
 		if(EditorNumberTable.CheckKey(sc->number) != NULL)
-			sc.ScriptMessage(Scanner::WARNING, "Overwriting editor number %d previously assigned to '%s', use replaces instead.", sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
+		{
+			sc.ScriptMessage(Scanner::WARNING, "'%s' overwrites deprecated editor number %d previously assigned to '%s'. This mod will soon break if not changed to 'replaces'!",
+			                 newClass->GetName().GetChars(), sc->number, EditorNumberTable[sc->number]->GetName().GetChars());
+
+			if(newClass->replacee && newClass->replacee != EditorNumberTable[sc->number])
+				sc.ScriptMessage(Scanner::WARNING, "Use of both editor number and 'replace' for '%s' can't be emulated. This mod is probably broken!", newClass->GetName().GetChars());
+			else
+			{
+				// Treat as a replacement. This is the best compatibility we can do
+				// for now that the engine doesn't use editor numbers.
+				EditorNumberTable[sc->number]->replacement = newClass;
+				newClass->replacee = EditorNumberTable[sc->number];
+			}
+		}
+
+		// Deprecated use of Doom Editor Number
+		if(!g_ThingEdNumWarning)
+		{
+			g_ThingEdNumWarning = true;
+			sc.ScriptMessage(Scanner::WARNING, "Deprecated use of editor number for class '%s'.", newClass->GetName().GetChars());
+		}
 
 		EditorNumberTable[sc->number] = newClass;
 	}
