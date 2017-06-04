@@ -18,6 +18,66 @@ IWad
 
 IWad
 {
+	Name = "Rise of the Triad: The Hunt Begins (Data)"
+	Autoname = "ROTT.HuntBegins"
+	Mapinfo = "mapinfo/rott.txt"
+	MustContain = "VENDOR", "TRITITL"
+	Flags = Preview, Resource
+	Game = "ROTT"
+}
+
+IWad
+{
+	Name = "Rise of the Triad: Dark War (Data)"
+	Autoname = "ROTT.DarkWar"
+	Mapinfo = "mapinfo/rott.txt"
+	MustContain = "LICENSE", "TRITITL", "WHERIZIT"
+	Flags = Preview, Resource
+	Game = "ROTT"
+}
+
+LevelSet "huntbgin.rtl"
+{
+	Name = "Rise of the Triad: The Hunt Begins"
+	Autoname = "ROTT.HuntBegins"
+	Mapinfo = "mapinfo/rott.txt"
+	Flags = Preview
+	Required = "Rise of the Triad: The Hunt Begins (Data)", "Rise of the Triad: Dark War (Data)"
+	Game = "ROTT"
+}
+
+LevelSet "huntbgn2.rtl"
+{
+	Name = "Rise of the Triad: The Hunt Begins Deluxe"
+	Autoname = "ROTT.HuntBegins"
+	Mapinfo = "mapinfo/rott.txt"
+	Flags = Preview
+	Required = "Rise of the Triad: The Hunt Begins (Data)", "Rise of the Triad: Dark War (Data)"
+	Game = "ROTT"
+}
+
+LevelSet "darkwar.rtl"
+{
+	Name = "Rise of the Triad: Dark War"
+	Autoname = "ROTT.DarkWar"
+	Mapinfo = "mapinfo/rott.txt"
+	Flags = Preview
+	Required = "Rise of the Triad: Dark War (Data)"
+	Game = "ROTT"
+}
+
+LevelSet "extreme.rtl"
+{
+	Name = "Extreme Rise of the Triad"
+	Autoname = "ROTT.Extreme"
+	Mapinfo = "mapinfo/rott.txt"
+	Flags = Preview
+	Required = "Rise of the Triad: Dark War (Data)"
+	Game = "ROTT"
+}
+
+IWad
+{
 	Name = "Spear of Destiny"
 	Autoname = "Wolf.Spear.Commercial"
 	Mapinfo = "mapinfo/spear.txt"
@@ -84,26 +144,27 @@ IWad
 
 IWad
 {
-	Name = "Wolfenstein 3D: The Third Encounter"
+	Name = "Wolfenstein 3D: The Third Encounter (Data)"
 	Autoname = "MacWolf.Third"
 	Mapinfo = "mapinfo/macwolf3d.txt"
 	MustContain = "MACPLAY", "HTLRA0"
+	Flags = Resource
 	Game = "MacWolf3D"
 }
 
-IWad
+LevelSet "wolflvls.bin"
 {
 	Name = "Wolfenstein 3D: The Second Encounter"
 	Autoname = "MacWolf.Second"
-	Required = "Wolfenstein 3D: The Third Encounter"
+	Required = "Wolfenstein 3D: The Third Encounter (Data)"
 	Mapinfo = "mapinfo/macwolf3d.txt"
-	MustContain = "MAP01", "MAPLIST"
 	Game = "MacWolf3D"
 }
 
 Names
 {
+	"darkwar.wad"
+	"huntbgin.wad"
 	"wolfdemo.bin"
 	"wolf3d.bin"
-	"wolflvls.bin"
 }

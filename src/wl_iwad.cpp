@@ -60,10 +60,24 @@ namespace IWad {
 #define ISCASEINSENSITIVE 0
 #endif
 
+struct LevelSet
+{
+	FString FileName;
+	int Type;
+};
+
 static TArray<IWadData> iwadTypes;
 static TArray<FString> iwadNames;
+static TArray<LevelSet> levelSets;
 static const IWadData *selectedGame;
 static unsigned int NumIWads;
+
+// Insert Paths from one WadStuff into another when Required is satisfied
+static void TransferWadStuffPaths(WadStuff &dest, const WadStuff &src)
+{
+	for(unsigned int i = src.Path.Size();i-- > 0;)
+		dest.Path.Insert(0, src.Path[i]);
+}
 
 static bool SplitFilename(const FString &filename, FString &name, FString &extension)
 {
@@ -83,9 +97,6 @@ static int CheckFileContents(FResourceFile *file, unsigned int* valid)
 
 		for(unsigned int k = 0;k < iwadTypes.Size();++k)
 		{
-			if((iwadTypes[k].Flags & IWad::PREVIEW) && !showpreviewgames)
-				continue;
-
 			for(unsigned int l = iwadTypes[k].Ident.Size();l-- > 0;)
 			{
 				if(iwadTypes[k].Ident[l].CompareNoCase(lump->Name) == 0 ||
@@ -100,6 +111,12 @@ static int CheckFileContents(FResourceFile *file, unsigned int* valid)
 		}
 	}
 	return -1;
+}
+
+static bool CheckHidden(const IWadData &data)
+{
+	return ((data.Flags & IWad::PREVIEW) && !showpreviewgames) ||
+			!!(data.Flags & IWad::RESOURCE);
 }
 
 // Identifies the IWAD by examining the lumps against the possible requirements.
@@ -120,7 +137,8 @@ static int CheckData(WadStuff &wad)
 			if((type = CheckFileContents(file, valid)) >= 0)
 			{
 				wad.Type = type;
-				wad.Name = iwadTypes[wad.Type].Name;
+				wad.Name = iwadTypes[type].Name;
+				wad.Hidden = CheckHidden(iwadTypes[type]);
 				// Don't break here since we might want to refine our selection.
 			}
 		}
@@ -150,6 +168,7 @@ static bool CheckStandalone(const char* directory, FString filename, FString ext
 				wad.Path.Push(path);
 				wad.Extension = extension;
 				wad.Name = iwadTypes[wad.Type].Name;
+				wad.Hidden = CheckHidden(iwadTypes[wad.Type]);
 				iwads.Push(wad);
 				return true;
 			}
@@ -157,6 +176,46 @@ static bool CheckStandalone(const char* directory, FString filename, FString ext
 		break;
 	}
 	return false;
+}
+
+/**
+ * Locate level sets based on what required data sets we have available
+ */
+static void CheckForLevelSets(TArray<WadStuff> &iwads)
+{
+	for(unsigned int i = levelSets.Size();i-- > 0;)
+	{
+		const FString fileName = levelSets[i].FileName;
+		const IWadData &lsType = iwadTypes[levelSets[i].Type];
+
+		for(unsigned int r = 0;r < lsType.Required.Size();++r)
+		{
+			for(unsigned int j = 0;j < iwads.Size();++j)
+			{
+				if(iwadTypes[iwads[j].Type].Name.Compare(lsType.Required[r]) == 0)
+				{
+					// Find candidate in same directory as base data
+					File baseFileDir(File(iwads[j].Path[0]).getDirectory());
+					File candidateFile(baseFileDir, baseFileDir.getInsensitiveFile(fileName, false));
+					if(!candidateFile.exists())
+						continue;
+
+					WadStuff wad;
+					wad.Path.Push(candidateFile.getPath());
+					TransferWadStuffPaths(wad, iwads[j]);
+
+					FString dummy;
+					SplitFilename(candidateFile.getPath(), dummy, wad.Extension);
+					wad.Name = lsType.Name;
+					wad.Type = levelSets[i].Type;
+					wad.Hidden = CheckHidden(lsType);
+					iwads.Push(wad);
+					goto FinishLevelSet;
+				}
+			}
+		}
+	FinishLevelSet:;
+	}
 }
 
 bool CheckGameFilter(FName filter)
@@ -350,7 +409,7 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 			}
 			if(doPush)
 			{
-				if(!iwadTypes[wadStuff.Type].Required.IsEmpty() ||
+				if(iwadTypes[wadStuff.Type].Required.Size() > 0 ||
 					(foundFiles[i].isValid & FILE_REQMASK) == FILE_REQMASK)
 				{
 					iwads.Push(wadStuff);
@@ -369,25 +428,29 @@ static void CheckForExpansionRequirements(TArray<WadStuff> &iwads)
 {
 	for(unsigned int i = iwads.Size();i-- > 0;)
 	{
-		const FString &req = iwadTypes[iwads[i].Type].Required;
-		if(!req.IsEmpty())
-		{
-			bool reqSatisfied = false;
+		if(iwadTypes[iwads[i].Type].Required.Size() == 0)
+			continue;
 
-			for(unsigned int j = 0;j < iwads.Size();++j)
+		bool reqSatisfied = false;
+		for(unsigned int j = 0;!reqSatisfied && j < iwadTypes[iwads[i].Type].Required.Size();++j)
+		{
+			const FString &req = iwadTypes[iwads[i].Type].Required[j];
+			if(req.IsNotEmpty())
 			{
-				if(iwadTypes[iwads[j].Type].Name.Compare(req) == 0)
+				for(unsigned int k = 0;k < iwads.Size();++k)
 				{
-					for(unsigned int k = iwads[j].Path.Size();k-- > 0;)
-						iwads[i].Path.Insert(0, iwads[j].Path[k]);
-					reqSatisfied = true;
-					break;
+					if(iwadTypes[iwads[k].Type].Name.Compare(req) == 0)
+					{
+						TransferWadStuffPaths(iwads[i], iwads[k]);
+						reqSatisfied = true;
+						break;
+					}
 				}
 			}
-
-			if(!reqSatisfied)
-				iwads.Delete(i);
 		}
+
+		if(!reqSatisfied)
+			iwads.Delete(i);
 	}
 }
 
@@ -413,6 +476,8 @@ static void ParseIWad(Scanner &sc)
 					iwad.Flags |= IWad::REGISTERED;
 				else if(sc->str.CompareNoCase("Preview") == 0)
 					iwad.Flags |= IWad::PREVIEW;
+				else if(sc->str.CompareNoCase("Resource") == 0)
+					iwad.Flags |= IWad::RESOURCE;
 				else
 					sc.ScriptMessage(Scanner::ERROR, "Unknown flag %s.", sc->str.GetChars());
 			}
@@ -451,8 +516,12 @@ static void ParseIWad(Scanner &sc)
 		}
 		else if(key.CompareNoCase("Required") == 0)
 		{
-			sc.MustGetToken(TK_StringConst);
-			iwad.Required = sc->str;
+			do
+			{
+				sc.MustGetToken(TK_StringConst);
+				iwad.Required.Push(sc->str);
+			}
+			while(sc.CheckToken(','));
 		}
 	}
 
@@ -474,6 +543,17 @@ static void ParseIWadInfo(FResourceFile *res)
 				sc.MustGetToken(TK_Identifier);
 				if(sc->str.CompareNoCase("IWad") == 0)
 				{
+					ParseIWad(sc);
+				}
+				else if(sc->str.CompareNoCase("LevelSet") == 0)
+				{
+					sc.MustGetToken(TK_StringConst);
+
+					LevelSet ls;
+					ls.FileName = sc->str;
+					ls.Type = iwadTypes.Size();
+					levelSets.Push(ls);
+
 					ParseIWad(sc);
 				}
 				else if(sc->str.CompareNoCase("Names") == 0)
@@ -627,6 +707,16 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	// Check requirements now as opposed to with LookForGameData so that reqs
 	// don't get loaded multiple times.
 	CheckForExpansionRequirements(basefiles);
+
+	// Now search for any applicable level sets
+	CheckForLevelSets(basefiles);
+
+	// Remove hidden options
+	for(unsigned int i = basefiles.Size();i-- > 0;)
+	{
+		if(basefiles[i].Hidden)
+			basefiles.Delete(i);
+	}
 
 	if(basefiles.Size() == 0)
 	{

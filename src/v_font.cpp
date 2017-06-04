@@ -157,6 +157,7 @@ protected:
 		FONT2,
 		BMFFONT,
 		WOLFFONT,
+		ROTTCFONT,
 		TILE8FONT
 	} FontType;
 	BYTE PaletteData[768];
@@ -242,6 +243,18 @@ protected:
 	void MakeTexture ();
 
 	int MaskColor;
+};
+
+class FROTTChar : public FFontChar2
+{
+public:
+	FROTTChar (int sourcelump, int sourcepos, int width, int height) :
+		FFontChar2(sourcelump, sourcepos, width, height)
+	{
+	}
+
+protected:
+	void MakeTexture ();
 };
 
 struct TempParmInfo
@@ -1123,21 +1136,17 @@ void FSingleLumpFont::LoadTranslations()
 
 		case TILE8FONT:
 		{
-			BYTE colorsused[256];
+			BYTE colorsused[256] = {};
 			BYTE translation[256];
 			BYTE tempIdentity[256];
 			double* tempLuminosity;
 
 			ranges = &TranslationParms[0][0];
 
-			memset(colorsused, 0, 256);
 			for(unsigned int i = 0;i < count;++i)
 			{
-				if(!Chars[i].Pic)
-					continue;
-
-				static_cast<FFontChar2*>(Chars[i].Pic)->SetSourceRemap(NULL);
-				RecordTextureColors(Chars[i].Pic, colorsused);
+				if(Chars[i].Pic)
+					RecordTextureColors(Chars[i].Pic, colorsused);
 			}
 
 			for(unsigned int i = 0;i < 256;++i)
@@ -1159,6 +1168,37 @@ void FSingleLumpFont::LoadTranslations()
 				luminosity[i] = i != 0 ? 0.5 : 0.0;
 			memset(identity, GPalette.BlackIndex, 256);
 			break;
+
+		case ROTTCFONT:
+		{
+			BYTE colorsused[256] = {};
+
+			useidentity = false;
+			ranges = &TranslationParms[0][0];
+			for(unsigned int i = 0;i < count;++i)
+			{
+				if(Chars[i].Pic)
+					RecordTextureColors(Chars[i].Pic, colorsused);
+			}
+
+			colorsused[0xFE] = 0; // Don't count the mask color
+			ActiveColors = 0;
+			unsigned int lastcolor = 0;
+			for(unsigned int i = 0;i < 256;++i)
+			{
+				if(!colorsused[i])
+					continue;
+
+				++ActiveColors;
+				lastcolor = i;
+			}
+
+			// We'll be loading the texture with +1 on all the colors, so
+			// calculate luminosity shifted.
+			for(unsigned int i = 0, j = 0;i < 256;++i)
+				luminosity[i] = ((double)(i-1))/lastcolor;
+			break;
+		}
 
 		default:
 			// Should be unreachable.
@@ -1388,8 +1428,27 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 
 	// Copy header information and then do a sanity check
 	FontHeight = LittleShort(*(const int16_t *)data);
-	memcpy(location, data+2, 512);
-	memcpy(width, data+514, 256);
+	if(FontHeight == 0 && length >= 1540 )
+	{
+		// ROTT defines the first byte as "color" but doesn't seem to read it.
+		// We'll probably need to change this check later since you just know
+		// somebody didn't put zero here, but I haven't really heard of ROTT
+		// mods either. Byte 2 seems to be padding.
+		FontType = ROTTCFONT;
+		FontHeight = LittleShort(*(const int16_t *)(data+2));
+		memcpy(width, data+229, 31);
+		memcpy(width+31, data+4, 225);
+		memcpy(location, data+710, 62);
+		memcpy(location+31, data+260, 450);
+		// data+772 through data+1540 should be a palette but ROTT seems to not use it.
+	}
+	else
+	{
+		FontType = WOLFFONT;
+		memcpy(location, data+2, 512);
+		memcpy(width, data+514, 256);
+	}
+
 	for(int i = 0;i < 256;++i)
 	{
 		// Find first and last defined characters
@@ -1406,7 +1465,7 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 		return false;
 
 	PatchRemap = NULL;
-	FontType = WOLFFONT;
+	RescalePalette = false;
 	Chars = new CharData[LastChar-FirstChar+1];
 	SpaceWidth = width[(int)' '];
 	GlobalKerning = 0;
@@ -1415,7 +1474,9 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 	for(int i = FirstChar;i <= LastChar;++i)
 	{
 		CharData &c = Chars[i-FirstChar];
-		c.Pic = new FFontChar2 (lump, location[i], width[i], FontHeight);
+		c.Pic = FontType == ROTTCFONT
+			? new FROTTChar (lump, location[i], width[i], FontHeight)
+			: new FFontChar2 (lump, location[i], width[i], FontHeight);
 		c.XMove = width[i];
 	}
 
@@ -1982,6 +2043,11 @@ const BYTE *FFontChar2::GetColumn (unsigned int column, const Span **spans_out)
 void FFontChar2::SetSourceRemap(const BYTE *sourceremap)
 {
 	Unload();
+	if(Spans) // ECWolf: Free spans since ROTT fonts have an unusual transparent color
+	{
+		FreeSpans(Spans);
+		Spans = NULL;
+	}
 	SourceRemap = sourceremap;
 }
 
@@ -2150,6 +2216,32 @@ void FTile8Char::MakeTexture()
 			}
 			dest_p -= dest_rew;
 		}
+	}
+}
+
+void FROTTChar::MakeTexture()
+{
+	FWadLump lump = Wads.OpenLumpNum (SourceLump);
+	const int destSize = Width * Height;
+
+	lump.Seek (SourcePos, SEEK_SET);
+
+	Pixels = new BYTE[destSize];
+	lump.Read(Pixels, destSize);
+
+	// A ROTT font character is row major with 0xFE as the mask color. Coloring
+	// is number of palette indexes off from a base color.
+	// Due to how we assume mask is 0, we'll load with a +1 offset and we can't
+	// do much about index 0xFF.
+	int i = destSize;
+	while (i-- != 0)
+	{
+		BYTE color = Pixels[i] + 1;
+		if(color == 0xFF)
+			color = 0;
+		if(SourceRemap)
+			color = SourceRemap[color];
+		Pixels[i] = color;
 	}
 }
 
@@ -2901,14 +2993,22 @@ void V_InitFonts()
 	V_InitCustomFonts ();
 
 	// load the heads-up font
-	SmallFont = FindNewestFont("SmallFont", "SMALLFNT");
-	SmallFont2 = FindNewestFont("SmallFont2", "SMALLFN2");
-	if(!SmallFont2)
+	if(!(SmallFont = FindNewestFont("SmallFont", "SMALLFNT")))
+		SmallFont = FindNewestFont("SmallFont", "SIFONT");
+
+	if(!(SmallFont2 = FindNewestFont("SmallFont2", "SMALLFN2")))
 		SmallFont2 = SmallFont;
-	BigFont = FindNewestFont("BigFont", "BIGFONT");
+
+	if(!(BigFont = FindNewestFont("BigFont", "BIGFONT")))
+		BigFont = FindNewestFont("BigFont", "LIFONT");
+
 	ConFont = FindNewestFont("ConsoleFont", "CONFONT");
-	IntermissionFont = FindNewestFont("IntermissionFont", "INTERFNT");
-	Tile8Font = FindNewestFont("Tile8", "TILE8");
+
+	if(!(IntermissionFont = FindNewestFont("IntermissionFont", "INTERFNT")))
+		IntermissionFont = BigFont;
+
+	if(!(Tile8Font = FindNewestFont("Tile8", "TILE8")))
+		Tile8Font = FindNewestFont("Tile8", "IFNT");
 
 	assert(SmallFont && SmallFont2 && BigFont && ConFont && IntermissionFont);
 }

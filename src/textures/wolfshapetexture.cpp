@@ -118,8 +118,13 @@ static bool CheckIfMacShape(FileReader &file)
 	file >> width;
 	width = BigShort(width);
 
+	if(width == 0)
+		return file.GetLength() == 2;
+
 	// No reason that I can think of for a shape to be larger than 128x128
-	if((width == 0 && file.GetLength() != 2) || width > 128 || file.GetLength() < 2 + width*2)
+	if(width > 128 || file.GetLength() < 2 + width*2 ||
+		// Rule out excessively large files
+		file.GetLength() > 776*width + 2)
 		return false;
 
 	WORD runOfs[128];

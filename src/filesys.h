@@ -91,6 +91,7 @@ class File
 		FString					getFileName() const;
 		const TArray<FString>	&getFileList() const { return files; }
 		FString					getInsensitiveFile(const FString &filename, bool sensitiveExtension) const;
+		FString					getPath() const { return filename; }
 		bool					isDirectory() const { return directory; }
 		bool					isFile() const { return !directory; }
 		bool					isWritable() const { return writable; }

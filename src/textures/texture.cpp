@@ -98,10 +98,10 @@ FTexture * FTexture::CreateTexture (int lumpnum, int usetype)
 		{ RottFlatTexture_TryCreate,	TEX_Flat },
 		{ FlatTexture_TryCreate,		TEX_Flat },
 		{ PatchTexture_TryCreate,		TEX_Any },
-		{ WolfShapeTexture_TryCreate,	TEX_Any },
+		{ WolfShapeTexture_TryCreate,	TEX_Sprite },
 		{ WolfRawTexture_TryCreate,		TEX_MiscPatch },
 		{ PictTexture_TryCreate,		TEX_MiscPatch },
-		{ MacShapeTexture_TryCreate,	TEX_Any },
+		{ MacShapeTexture_TryCreate,	TEX_Sprite },
 		{ EmptyTexture_TryCreate,		TEX_Any },
 		{ AutomapTexture_TryCreate,		TEX_MiscPatch },
 	};
