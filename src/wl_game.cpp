@@ -263,7 +263,8 @@ void SetupGameLevel (void)
 // load the level
 //
 	CA_CacheMap (gamestate.mapname, loadedgame);
-	StartMusic ();
+	if (!loadedgame)
+		StartMusic ();
 
 #ifdef USE_FEATUREFLAGS
 	// Temporary definition to make things clearer

@@ -727,14 +727,14 @@ int CP_CheckQuick (ScanCode scancode)
 		// QUICKSAVE
 		//
 		case sc_F8:
-			GameSave::QuickSave();
+			GameSave::QuickLoadOrSave(false);
 			return 1;
 
 		//
 		// QUICKLOAD
 		//
 		case sc_F9:
-			GameSave::QuickLoad();
+			GameSave::QuickLoadOrSave(true);
 			return 1;
 
 		//
@@ -764,7 +764,8 @@ int CP_EndGame (int)
 {
 	int res;
 	res = Confirm (language["ENDGAMESTR"]);
-	mainMenu.draw();
+	if (!ingame)
+		mainMenu.draw();
 	if(!res) return 0;
 
 	players[0].lives = 0;

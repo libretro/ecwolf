@@ -50,8 +50,7 @@ namespace GameSave
 	Menu		&GetSaveMenu();
 	MenuItem	*GetSaveMenuItem();
 	void		InitMenus();
-	void		QuickLoad();
-	void		QuickSave();
+	void		QuickLoadOrSave(bool load);
 
 	bool		Load(const FString &filename);
 	bool		Save(const FString &filename, const FString &title);

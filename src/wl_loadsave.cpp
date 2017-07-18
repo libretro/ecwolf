@@ -474,8 +474,7 @@ MENU_LISTENER(LoadSaveGame)
 
 	loadedgame = true;
 	Load(SaveFile::files[menuItem->slotIndex].filename);
-	
-	ShootSnd();
+
 	if(!quickSaveLoad)
 		Menu::closeMenus(true);
 	else
@@ -498,21 +497,7 @@ void InitMenus()
 	saveItem->setEnabled(false);
 }
 
-void QuickSave()
-{
-	if(saveGame.getCurrentPosition() != 0)
-	{
-		quickSaveLoad = true;
-		PerformSaveGame(saveGame.getCurrentPosition());
-		quickSaveLoad = false;
-
-		return;
-	}
-
-	ShowMenu(saveGame);
-}
-
-void QuickLoad()
+void QuickLoadOrSave(bool load)
 {
 	if(saveGame.getCurrentPosition() != 0)
 	{
@@ -520,9 +505,9 @@ void QuickLoad()
 
 		quickSaveLoad = true;
 		FString string;
-		string.Format("%s\"%s\"?", language["STR_LGC"], SaveFile::files[menuItem->slotIndex].name.GetChars());
+		string.Format("%s\"%s\"?", language[load ? "STR_LGC" : "STR_SGC"], SaveFile::files[menuItem->slotIndex].name.GetChars());
 		if(Confirm(string))
-			LoadSaveGame(saveGame.getCurrentPosition()-1);
+			load ? LoadSaveGame(saveGame.getCurrentPosition()-1) : PerformSaveGame(saveGame.getCurrentPosition()-1);
 		quickSaveLoad = false;
 
 		return;
@@ -665,8 +650,6 @@ bool Save(const FString &filename, const FString &title)
 
 	if(!quickSaveLoad)
 		DrawLSAction(1);
-	else
-		Message (language["STR_SAVING"]);
 
 	SaveVersion = SAVEVER;
 	SaveProdVersion = SAVEPRODVER;

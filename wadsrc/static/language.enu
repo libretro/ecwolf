@@ -31,6 +31,7 @@ STR_QT = "Quit";
 STR_LOADING = "Loading...";
 STR_SAVING = "Saving...";
 STR_LGC = "Load Game called\n";
+STR_SGC = "Save Game called\n";
 STR_NONE = "None";
 STR_PC = "PC Speaker";
 STR_ALSB = "AdLib/Sound Blaster";
