@@ -507,7 +507,7 @@ void QuickLoadOrSave(bool load)
 		FString string;
 		string.Format("%s\"%s\"?", language[load ? "STR_LGC" : "STR_SGC"], SaveFile::files[menuItem->slotIndex].name.GetChars());
 		if(Confirm(string))
-			load ? LoadSaveGame(saveGame.getCurrentPosition()-1) : PerformSaveGame(saveGame.getCurrentPosition()-1);
+			load ? LoadSaveGame(saveGame.getCurrentPosition()-1) : PerformSaveGame(saveGame.getCurrentPosition());
 		quickSaveLoad = false;
 
 		return;
