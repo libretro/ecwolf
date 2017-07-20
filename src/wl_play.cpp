@@ -591,7 +591,8 @@ void CheckKeys (void)
 		if(Keyboard[sc_Equals] || Keyboard[sc_Minus])
 		{
 			SD_PlaySound("world/hitwall");
-			DrawPlayScreen();
+			if (viewsize < 21)
+				DrawPlayScreen();
 			changeSize = false;
 		}
 	}
