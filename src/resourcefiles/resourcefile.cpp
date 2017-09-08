@@ -44,31 +44,6 @@
 
 //==========================================================================
 //
-// FileReader that reads from a lump's cache
-//
-//==========================================================================
-
-class FLumpReader : public MemoryReader
-{
-	FResourceLump *source;
-
-public:
-	FLumpReader(FResourceLump *src)
-		: MemoryReader(NULL, src->LumpSize), source(src)
-	{
-		src->CacheLump();
-		bufptr = src->Cache;
-	}
-
-	~FLumpReader()
-	{
-		source->ReleaseCache();
-	}
-};
-
-
-//==========================================================================
-//
 // Base class for resource lumps
 //
 //==========================================================================
@@ -262,7 +237,7 @@ FResourceFile *CheckMacBin(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckRtl(const char *filename, FileReader *file, bool quiet);
 
 #define COUNTOF_FUNCS 13
-#define WOLFHACK_START 8 // Should point to AudioT
+#define EMBEDDABLE_START 8 // Should point to AudioT
 static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF, CheckRtl, CheckMacBin, CheckAudiot, CheckVGAGraph, CheckGamemaps, CheckVSwap, CheckLump };
 
 FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader *file, bool quiet)
@@ -289,7 +264,7 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 #endif
 		if(c)
 		{
-			for(size_t i = WOLFHACK_START; i < WOLFHACK_START+3; ++i)
+			for(size_t i = EMBEDDABLE_START; i < EMBEDDABLE_START+3; ++i)
 			{
 				FResourceFile *resfile = funcs[i](filename, file, quiet);
 				if (resfile != NULL) return resfile;

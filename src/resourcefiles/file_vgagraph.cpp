@@ -37,6 +37,7 @@
 #include "wl_def.h"
 #include "m_swap.h"
 #include "resourcefile.h"
+#include "tmemory.h"
 #include "w_wad.h"
 #include "lumpremap.h"
 #include "zstring.h"
@@ -158,51 +159,57 @@ class FVGAGraph : public FResourceFile
 			extension = path.Mid(lastSlash+10);
 			path = path.Left(lastSlash+1);
 
-			File directory(path.Len() > 0 ? path : ".");
-			FString vgadictFile = path + directory.getInsensitiveFile(FString("vgadict.") + extension, true);
-			FString vgaheadFile = path + directory.getInsensitiveFile(FString("vgahead.") + extension, true);
-
-			vgadictReader = new FileReader();
-			if(!vgadictReader->Open(vgadictFile))
+			FString vgadictFile = FString("vgadict.") + extension;
+			FString vgaheadFile = FString("vgahead.") + extension;
+			if(Wads.CheckIfWadLoaded(path.Left(lastSlash)) == -1)
 			{
-				delete vgadictReader;
-				vgadictReader = NULL;
+				File directory(path.Len() > 0 ? path : ".");
+				FString vgadictFile = path + directory.getInsensitiveFile(FString("vgadict.") + extension, true);
+				FString vgaheadFile = path + directory.getInsensitiveFile(FString("vgahead.") + extension, true);
 
+				vgadictReader = new FileReader();
+				if(!vgadictReader->Open(vgadictFile))
+					vgadictReader.Reset();
+
+				vgaheadReader = new FileReader();
+				if(!vgaheadReader->Open(vgaheadFile))
+					vgaheadReader.Reset();
+			}
+			else // Embedded vanilla data?
+			{
+				FLumpReader *lreader = reinterpret_cast<FLumpReader *>(file);
+
+				for(DWORD i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
+				{
+					FResourceLump *lump = lreader->LumpOwner()->GetLump(i);
+					if(lump->FullName.CompareNoCase(vgaheadFile) == 0)
+						vgaheadReader = lump->NewReader();
+					else if(lump->FullName.CompareNoCase(vgadictFile) == 0)
+						vgadictReader = lump->NewReader();
+
+					if(vgaheadReader && vgadictReader)
+						break;
+				}
+			}
+
+			if(!vgadictReader)
+			{
+				FString error;
+				error.Format("Could not open vgagraph since %s is missing.", vgadictFile.GetChars());
+				throw CRecoverableError(error);
+			}
+			if(!vgaheadReader)
+			{
 				FString error;
 				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
 				throw CRecoverableError(error);
 			}
-
-			vgaheadReader = new FileReader();
-			if(!vgaheadReader->Open(vgaheadFile))
-			{
-				delete vgadictReader;
-				delete vgaheadReader;
-				vgadictReader = vgaheadReader = NULL;
-
-				FString error;
-				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
-				throw CRecoverableError(error);
-			}
-		}
-
-		FVGAGraph(const char* filename, FileReader **file) : FResourceFile(filename, file[0]), lumps(NULL)
-		{
-			FString path(filename);
-			int lastSlash = path.LastIndexOf(':');
-			extension = path.Mid(lastSlash+10);
-
-			vgaheadReader = file[1];
-			vgadictReader = file[2];
 		}
 
 		~FVGAGraph()
 		{
 			if(lumps != NULL)
 				delete[] lumps;
-
-			delete vgadictReader;
-			delete vgaheadReader;
 		}
 
 		bool Open(bool quiet)
@@ -377,22 +384,18 @@ class FVGAGraph : public FResourceFile
 		}
 
 	private:
-		Huffnode	huffman[255];
-		FVGALump*	lumps;
+		Huffnode huffman[255];
+		FVGALump* lumps;
 
-		FString		extension;
-		FileReader	*vgaheadReader;
-		FileReader	*vgadictReader;
+		FString extension;
+		TUniquePtr<FileReader> vgaheadReader;
+		TUniquePtr<FileReader> vgadictReader;
 };
 
 FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
-	int embeddedSep = fname.LastIndexOf(':');
-#ifdef _WIN32
-	if(embeddedSep == 1) embeddedSep = -1;
-#endif
-	int lastSlash = MAX<long>(fname.LastIndexOfAny("/\\"), embeddedSep);
+	int lastSlash = fname.LastIndexOfAny("/\\:");
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 8);
 	else
@@ -400,8 +403,7 @@ FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 
 	if(fname.Len() == 8 && fname.CompareNoCase("vgagraph") == 0) // file must be vgagraph.something
 	{
-		FResourceFile *rf = embeddedSep == -1 ? new FVGAGraph(filename, file) :
-			new FVGAGraph(filename, reinterpret_cast<FileReader**>(file)); // HACK
+		FResourceFile *rf = new FVGAGraph(filename, file);
 		if(rf->Open(quiet)) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;

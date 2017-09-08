@@ -36,6 +36,7 @@
 #include "doomerrors.h"
 #include "wl_def.h"
 #include "resourcefile.h"
+#include "tmemory.h"
 #include "w_wad.h"
 #include "lumpremap.h"
 #include "zstring.h"
@@ -50,33 +51,42 @@ class FAudiot : public FUncompressedFile
 			extension = path.Mid(lastSlash+8);
 			path = path.Left(lastSlash+1);
 
-			File directory(path.Len() > 0 ? path : ".");
-			FString audiohedFile = path + directory.getInsensitiveFile(FString("audiohed.") + extension, true);
 
-			audiohedReader = new FileReader();
-			if(!audiohedReader->Open(audiohedFile))
+			FString audiohedFile = FString("audiohed.") + extension;
+			if(Wads.CheckIfWadLoaded(path.Left(lastSlash)) == -1)
 			{
-				delete audiohedReader;
-				audiohedReader = NULL;
+				File directory(path.Len() > 0 ? path : ".");
+				audiohedFile = path + directory.getInsensitiveFile(audiohedFile, true);
 
+				audiohedReader = new FileReader();
+				if(!audiohedReader->Open(audiohedFile))
+					audiohedReader.Reset();
+			}
+			else // Embedded vanilla data?
+			{
+				FLumpReader *lreader = reinterpret_cast<FLumpReader *>(file);
+
+				for(DWORD i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
+				{
+					FResourceLump *lump = lreader->LumpOwner()->GetLump(i);
+					if(lump->FullName.CompareNoCase(audiohedFile) == 0)
+					{
+						audiohedReader = lump->NewReader();
+						break;
+					}
+				}
+			}
+
+			if(!audiohedReader)
+			{
 				FString error;
 				error.Format("Could not open audiot since %s is missing.", audiohedFile.GetChars());
 				throw CRecoverableError(error);
 			}
 		}
 
-		FAudiot(const char* filename, FileReader **file) : FUncompressedFile(filename, file[0])
-		{
-			FString path(filename);
-			int lastSlash = path.LastIndexOf(':');
-			extension = path.Mid(lastSlash+8);
-
-			audiohedReader = file[1];
-		}
-
 		~FAudiot()
 		{
-			delete audiohedReader;
 		}
 
 		bool Open(bool quiet)
@@ -184,18 +194,14 @@ class FAudiot : public FUncompressedFile
 		}
 
 	private:
-		FString		extension;
-		FileReader	*audiohedReader;
+		FString	 extension;
+		TUniquePtr<FileReader> audiohedReader;
 };
 
 FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
-	int embeddedSep = fname.LastIndexOf(':');
-#ifdef _WIN32
-	if(embeddedSep == 1) embeddedSep = -1;
-#endif
-	int lastSlash = MAX<long>(fname.LastIndexOfAny("/\\"), embeddedSep);
+	int lastSlash = fname.LastIndexOfAny("/\\:");
 	if(lastSlash != -1)
 		fname = fname.Mid(lastSlash+1, 6);
 	else
@@ -203,8 +209,7 @@ FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 
 	if(fname.Len() == 6 && fname.CompareNoCase("audiot") == 0) // file must be audiot.something
 	{
-		FResourceFile *rf = embeddedSep == -1 ? new FAudiot(filename, file) :
-			new FAudiot(filename, reinterpret_cast<FileReader**>(file)); // HACK
+		FResourceFile *rf = new FAudiot(filename, file);
 
 		if(rf->Open(quiet)) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader

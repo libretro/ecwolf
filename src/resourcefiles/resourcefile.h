@@ -135,9 +135,33 @@ struct FExternalLump : public FResourceLump
 
 };
 
+//==========================================================================
+//
+// FileReader that reads from a lump's cache
+//
+//==========================================================================
 
+class FLumpReader : public MemoryReader
+{
+	FResourceLump *source;
 
+public:
+	FLumpReader(FResourceLump *src)
+		: MemoryReader(NULL, src->LumpSize), source(src)
+	{
+		src->CacheLump();
+		bufptr = src->Cache;
+	}
 
+	~FLumpReader()
+	{
+		source->ReleaseCache();
+	}
 
+	FResourceFile *LumpOwner() const
+	{
+		return source->Owner;
+	}
+};
 
 #endif
