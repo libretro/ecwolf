@@ -1,4 +1,5 @@
 enable lightlevels;
+enable planedepth;
 
 tiles
 {

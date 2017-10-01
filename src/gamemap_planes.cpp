@@ -50,6 +50,7 @@
 static const char* const FeatureFlagNames[] = {
 	"globalmeta",
 	"lightlevels",
+	"planedepth",
 	NULL
 };
 
@@ -69,7 +70,8 @@ public:
 	enum EFeatureFlags
 	{
 		FF_GLOBALMETA = 1,
-		FF_LIGHTLEVELS = 2
+		FF_LIGHTLEVELS = 2,
+		FF_PLANEDEPTH = 4,
 	};
 
 	struct ThingXlat
@@ -1079,9 +1081,6 @@ void GameMap::ReadPlanesData()
 				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors. 
 
 				unsigned int i = 0;
-				// Using ROTT feature flags invalidates the first four tiles
-				if(xlat.GetFeatureFlags() & Xlat::FF_LIGHTLEVELS)
-					i = 4;
 				for(;i < size;++i)
 				{
 					oldplane[i] = LittleShort(oldplane[i]);
@@ -1091,6 +1090,17 @@ void GameMap::ReadPlanesData()
 						// In case of malformed maps we need to always check this.
 						if(ambushSpots[ambushSpot] == i)
 							++ambushSpot;
+						continue;
+					}
+
+					if(i == 0 && (FeatureFlags & Xlat::FF_PLANEDEPTH))
+					{
+						if(oldplane[0] >= 0x5A && oldplane[0] <= 0x61)
+							mapPlane.depth = UNIT*(oldplane[i]-0x5A+1);
+						else if(oldplane[0] >= 0x1C2 && oldplane[0] <= 0x1C9)
+							mapPlane.depth = UNIT*(oldplane[i]-0x1C2+9);
+						else // ROTT would error if this is invalid.
+							printf("Error: Map height specifier %X not in range!\n", oldplane[i]);
 						continue;
 					}
 
@@ -1272,6 +1282,7 @@ void GameMap::ReadPlanesData()
 			}
 		}
 
+		assert(locations.Size() > 0);
 		{
 			unsigned int elevTag = 0;
 			unsigned int swtchTag = 0;
@@ -1313,27 +1324,31 @@ void GameMap::ReadPlanesData()
 					swtchTag = trigger->arg[0];
 				}
 			}
-			*lastNext = swtchTag;
+			if(lastNext)
+				*lastNext = swtchTag;
 		}
 	}
 }
 
 static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger)
 {
-	const TArray<MapTrigger> *triggers[4] = {
-		&spot->GetAdjacent(MapTile::East)->triggers,
-		&spot->GetAdjacent(MapTile::North)->triggers,
-		&spot->GetAdjacent(MapTile::West)->triggers,
-		&spot->GetAdjacent(MapTile::South)->triggers
+	const MapSpot adjacent[4] = {
+		spot->GetAdjacent(MapTile::East),
+		spot->GetAdjacent(MapTile::North),
+		spot->GetAdjacent(MapTile::West),
+		spot->GetAdjacent(MapTile::South)
 	};
 
 	for(unsigned int i = 0;i < 4;++i)
 	{
-		for(unsigned int t = triggers[i]->Size();t-- > 0;)
+		if(!adjacent[i])
+			continue;
+
+		for(unsigned int t = adjacent[i]->triggers.Size();t-- > 0;)
 		{
-			if(triggers[i]->operator[](t).action == Specials::Door_Open)
+			if(adjacent[i]->triggers[t].action == Specials::Door_Open)
 			{
-				trigger = &triggers[i]->operator[](t);
+				trigger = &adjacent[i]->triggers[t];
 				return i;
 			}
 		}

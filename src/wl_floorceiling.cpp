@@ -25,8 +25,11 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	byte *tex_offset;
 	bool useOptimized = false;
 
-	const fixed heightFactor = abs(planeheight/32);
-	int y0 = (((min_wallheight >> 3)*heightFactor)>>FRACBITS) - abs(viewshift);
+	if(planeheight == 0) // Eye level
+		return;
+
+	const fixed heightFactor = abs(planeheight)>>8;
+	int y0 = ((min_wallheight*heightFactor)>>FRACBITS) - abs(viewshift);
 	if(y0 > halfheight)
 		return; // view obscured by walls
 	if(y0 <= 0) y0 = 1; // don't let division by zero
@@ -79,7 +82,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 
 		for(unsigned int x = 0;x < (unsigned)viewwidth; ++x, ++tex_offset)
 		{
-			if(((wallheight[x] >> 3)*heightFactor)>>FRACBITS <= y)
+			if(((wallheight[x]*heightFactor)>>FRACBITS) <= y)
 			{
 				unsigned int curx = (gu >> (TILESHIFT+8));
 				unsigned int cury = (-(gv >> (TILESHIFT+8)) - 1);
@@ -141,6 +144,6 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
 {
 	const int halfheight = (viewheight >> 1) - viewshift;
 
-	R_DrawPlane(vbuf, vbufPitch, min_wallheight, halfheight, viewz-(64<<FRACBITS));
 	R_DrawPlane(vbuf, vbufPitch, min_wallheight, halfheight, viewz);
+	R_DrawPlane(vbuf, vbufPitch, min_wallheight, halfheight, viewz+(map->GetPlane(0).depth<<FRACBITS));
 }

@@ -263,7 +263,7 @@ void ScalePost()
 	const int tz = FixedMul(r_depthvisibility<<8, wallheight[postx]);
 	BYTE *curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 
-	ywcount = yd = (wallheight[postx] >> 3);
+	ywcount = yd = wallheight[postx];
 	if(yd <= 0)
 		yd = 100;
 
@@ -271,20 +271,20 @@ void ScalePost()
 	{
 		// ywcount can be large enough to cause an overflow if we don't reduce
 		// fixed point precision here
-		const int topoffset = ywcount*(viewz>>8)/(32<<(FRACBITS-8));
-		const int botoffset = ywcount*((viewz - (64<<FRACBITS))>>8)/(32<<(FRACBITS-8));
+		const int topoffset = ywcount*((viewz + fixed(map->GetPlane(0).depth<<FRACBITS))>>8)/(32<<(FRACBITS-5));
+		const int botoffset = ywcount*(viewz>>8)/(32<<(FRACBITS-5));
 
 		yoffs = (viewheight / 2 - topoffset - viewshift) * vbufPitch;
 		if(yoffs < 0) yoffs = 0;
 		yoffs += postx;
 
 		yendoffs = viewheight / 2 - botoffset - 1 - viewshift;
-		yw=texyscale-1;
+		yw=(texyscale>>2)-1;
 	}
 
 	while(yendoffs >= viewheight)
 	{
-		ywcount -= texyscale/2;
+		ywcount -= texyscale;
 		while(ywcount <= 0)
 		{
 			ywcount += yd;
@@ -293,14 +293,14 @@ void ScalePost()
 		yendoffs--;
 	}
 	if(yw < 0)
-		return;
+		yw = (texyscale>>2) - ((-yw) % (texyscale>>2));
 
 	col = curshades[postsource[yw]];
 	yendoffs = yendoffs * vbufPitch + postx;
 	while(yoffs <= yendoffs)
 	{
 		vbuf[yendoffs] = col;
-		ywcount -= texyscale/2;
+		ywcount -= texyscale;
 		if(ywcount <= 0)
 		{
 			do
@@ -309,7 +309,7 @@ void ScalePost()
 				yw--;
 			}
 			while(ywcount <= 0);
-			if(yw < 0) break;
+			if(yw < 0) yw = (texyscale>>2)-1;
 			col = curshades[postsource[yw]];
 		}
 		yendoffs -= vbufPitch;
@@ -419,7 +419,7 @@ void HitVertWall (void)
 	{
 		texheight = source->GetHeight();
 		texxscale = TEXTUREBASE/source->xScale;
-		texyscale = (64*source->yScale)>>FRACBITS;
+		texyscale = source->yScale>>(FRACBITS-8);
 		texture -= texture%texxscale;
 
 		postsource = source->GetColumn(texture/texxscale, NULL);
@@ -493,7 +493,7 @@ void HitHorizWall (void)
 	{
 		texheight = source->GetHeight();
 		texxscale = TEXTUREBASE/source->xScale;
-		texyscale = (64*source->yScale)>>FRACBITS;
+		texyscale = source->yScale>>(FRACBITS-8);
 		texture -= texture%texxscale;
 
 		postsource = source->GetColumn(texture/texxscale, NULL);
@@ -1175,7 +1175,7 @@ void WallRefresh (void)
 	const fixed playerMovebob = players[ConsolePlayer].mo->GetClass()->Meta.GetMetaFixed(APMETA_MoveBob);
 	fixed curbob = gamestate.victoryflag ? 0 : FixedMul(FixedMul(players[ConsolePlayer].bob, playerMovebob)>>1, finesine[bobangle]);
 
-	viewz = (64<<FRACBITS) - players[ConsolePlayer].mo->viewheight + curbob;
+	viewz = curbob - players[ConsolePlayer].mo->viewheight;
 
 	AsmRefresh();
 	ScalePost ();                   // no more optimization on last post
