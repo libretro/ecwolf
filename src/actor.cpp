@@ -526,6 +526,16 @@ void AActor::SetState(const Frame *state, bool norun)
 	}
 }
 
+void AActor::SpawnFog()
+{
+	if(const ClassDef *cls = ClassDef::FindClass("TeleportFog"))
+	{
+		AActor *fog = Spawn(cls, x, y, 0, SPAWN_AllowReplacement);
+		fog->angle = angle;
+		fog->target = this;
+	}
+}
+
 void AActor::Tick()
 {
 	// If we just spawned we're not ready to be ticked yet

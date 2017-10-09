@@ -308,7 +308,10 @@ void APlayerPawn::Tick()
 			player->SetPSprite(zoom, player_t::ps_weapon);
 	}
 
-	ControlMovement(this);
+	if(sighttime) // Player is frozen
+		--sighttime;
+	else
+		ControlMovement(this);
 }
 
 void APlayerPawn::TickPSprites()

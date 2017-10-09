@@ -198,6 +198,7 @@ actor WeaponGiver : Weapon native
 actor PlayerPawn native
 {
 	painchance 255
+	sighttime 0
 	speed 1
 	player.viewheight 41
 	player.forwardmove 1, 1

@@ -38,6 +38,7 @@
 #include "g_conversation.h"
 #include "lnspec.h"
 #include "actor.h"
+#include "m_random.h"
 #include "sndseq.h"
 #include "thinker.h"
 #include "wl_act.h"
@@ -50,6 +51,8 @@
 #include "g_shared/a_keys.h"
 #include "thingdef/thingdef.h"
 using namespace Specials;
+
+static FRandom pr_teleport("Teleport");
 
 #define DEFINE_SPECIAL(name,num,argc) \
 	static int LN_##name(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator);
@@ -1132,5 +1135,59 @@ FUNC(StartConversation)
 
 	Dialog::StartConversation(talker);
 
+	return 1;
+}
+
+FUNC(Teleport_Relative)
+{
+	enum
+	{
+		TELEPORT_NoStop = 1,
+		TELEPORT_NoFog = 2,
+		TELEPORT_Center = 4, // Center onto destination tile
+		TELEPORT_AbsoluteAngle = 8, // Set absolute angle instead of relative
+		TELEPORT_ActivationAngle = 0x10, // Face the activation point (typically used with AbsoluteAngle)
+	};
+
+	if(!spot)
+	{
+		Printf("Error: Attempted to relative teleport without a reference point.\n");
+		return 0;
+	}
+
+	if(activator->player && control[activator->player - players].buttonheld[bt_use])
+		return 0;
+
+	// Collect destination points so we can randomly decide
+	TArray<MapSpot> dests;
+	MapSpot dest = NULL;
+	while((dest = map->GetSpotByTag(args[0], dest)))
+		dests.Push(dest);
+	if(dests.Size() == 0)
+		return 0;
+	dest = dests[pr_teleport(dests.Size())];
+
+	if(!(args[2] & TELEPORT_NoFog))
+		activator->SpawnFog(); // Source fog
+
+	if(!(args[2] & TELEPORT_NoStop))
+		activator->sighttime = 35; // Halt for half second
+
+	activator->x += (dest->GetX() - spot->GetX())<<FRACBITS;
+	activator->y += (dest->GetY() - spot->GetY())<<FRACBITS;
+	if((args[2] & TELEPORT_Center))
+	{
+		activator->x = (activator->x&0xFFFF0000)|0x8000;
+		activator->y = (activator->y&0xFFFF0000)|0x8000;
+	}
+
+	activator->angle = (args[1]<<24) +
+		(!(args[2] & TELEPORT_AbsoluteAngle) ? activator->angle : 0) +
+		((args[2] & TELEPORT_ActivationAngle) ? (direction<<30)+ANGLE_180 : 0);
+
+	activator->EnterZone(map->GetSpot(activator->tilex, activator->tiley, 0)->zone);
+
+	if(!(args[2] & TELEPORT_NoFog))
+		activator->SpawnFog(); // Destination fog
 	return 1;
 }
