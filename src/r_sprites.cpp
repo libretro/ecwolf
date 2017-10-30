@@ -390,7 +390,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	// Simpler form:
 	// topoffset = ( viewheight/2 - viewshift - (signed(height>>3)*(viewz+(32<<FRACBITS))/(32<<FRACBITS)) )<<3;
 	const int topoffset = (viewheight<<2) - (viewshift<<3) -
-	                      FixedMul(height, (viewz+(32<<FRACBITS))>>5);
+	                      FixedMul(height, (viewz+(actor->z<<6)+(32<<FRACBITS))>>5);
 	if(-topoffset >= (signed)height)
 		return;
 
@@ -412,7 +412,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		return;
 
 	const double dyScale = (height/256.0)*FIXED2FLOAT(actor->scaleY);
-	const int upperedge = topoffset + height - static_cast<int>(tex->GetScaledTopOffsetDouble()*dyScale*8);
+	const int upperedge = topoffset + height - static_cast<int>((tex->GetScaledTopOffsetDouble())*dyScale*8);
 
 	const double dxScale = (height/256.0)*FIXED2FLOAT(FixedDiv(actor->scaleX, yaspect));
 	const int actx = static_cast<int>(xcenter - tex->GetScaledLeftOffsetDouble()*dxScale);
@@ -467,7 +467,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 	unsigned height = height1;
 
 	int scale = height>>3; // Integer part of the height
-	int topoffset = (scale*(viewz+(32<<FRACBITS))/(32<<FRACBITS));
+	int topoffset = (scale*(viewz+(actor->z<<6)+(32<<FRACBITS))/(32<<FRACBITS));
 
 	if(scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
 		return;
@@ -521,7 +521,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 
 		// recalculation double oh no
 		scale = height>>3;
-		topoffset = (scale*(viewz+(32<<FRACBITS))/(32<<FRACBITS));
+		topoffset = (scale*(viewz+(actor->z<<6)+(32<<FRACBITS))/(32<<FRACBITS));
 
 		if(i < 0 || i >= viewwidth || wallheight[i] > (signed)height || scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
 			continue;

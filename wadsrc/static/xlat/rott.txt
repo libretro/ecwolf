@@ -1,5 +1,6 @@
 enable lightlevels;
 enable planedepth;
+enable zheights;
 
 tiles
 {
@@ -888,6 +889,13 @@ things
 
 	// oldnum, class, angles, patrol, minskill
 	{19, $Player1Start, 4, 0, 0}
+	{57, Unknown, 0, 0, 0} // Life item 1
+	{58, Unknown, 0, 0, 0} // Life item 2
+	{59, Unknown, 0, 0, 0} // Life item 3
+	{60, Unknown, 0, 0, 0} // Life item 4
+	{461, Unknown, 0, 0, 0} // Stationary GAD
+	{462, Unknown, 0, 0, 0} // Elevator GAD
+	{463, Unknown, 4, 0, 0} // Path GAD
 }
 
 flats

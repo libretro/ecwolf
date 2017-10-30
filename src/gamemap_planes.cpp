@@ -51,6 +51,7 @@ static const char* const FeatureFlagNames[] = {
 	"globalmeta",
 	"lightlevels",
 	"planedepth",
+	"zheights",
 	NULL
 };
 
@@ -72,6 +73,7 @@ public:
 		FF_GLOBALMETA = 1,
 		FF_LIGHTLEVELS = 2,
 		FF_PLANEDEPTH = 4,
+		FF_ZHEIGHTS = 8
 	};
 
 	struct ThingXlat
@@ -1177,7 +1179,15 @@ void GameMap::ReadPlanesData()
 
 							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
-							thing.z = 0;
+							if((FeatureFlags & Xlat::FF_ZHEIGHTS) && (infoplane[i]&0xFF00) == 0xB000)
+							{
+								// ROTT uses the signed lower byte of info plane to assign height in 1/16 tile (4 unit) increments
+								thing.z = int8_t(infoplane[i]&0xFF)*0x1000;
+								// Unset value so it can't also be interpreted as a remote trigger (should only affect oversized maps)
+								infoplane[i] = 0;
+							}
+							else
+								thing.z = 0;
 							thing.ambush = (flags & Xlat::TF_AMBUSH) || ambushSpots[ambushSpot] == i;
 							things.Push(thing);
 						}

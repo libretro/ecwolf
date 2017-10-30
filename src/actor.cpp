@@ -440,8 +440,10 @@ void AActor::Serialize(FArchive &arc)
 	arc << flags
 		<< distance
 		<< x
-		<< y
-		<< velx
+		<< y;
+	if(GameSave::SaveVersion >= 1507591295)
+		arc << z;
+	arc << velx
 		<< vely
 		<< angle
 		<< pitch
@@ -634,6 +636,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags
 	AActor *actor = type->CreateInstance();
 	actor->x = x;
 	actor->y = y;
+	actor->z = z;
 	actor->velx = 0;
 	actor->vely = 0;
 	actor->health = actor->SpawnHealth();

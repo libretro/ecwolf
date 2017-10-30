@@ -162,6 +162,7 @@ class AActor : public Thinker,
 #endif
 		};
 #pragma pack(pop)
+		fixed z;
 		fixed	velx, vely;
 
 		angle_t	angle;
