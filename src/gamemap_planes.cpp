@@ -201,12 +201,21 @@ public:
 				while(FeatureFlagNames[++i]);
 				sc.MustGetToken(';');
 			}
+			else if(sc->str.CompareNoCase("music") == 0)
+				LoadMusicTable(sc);
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown xlat property '%s'.", sc->str.GetChars());
 		}
 	}
 
 	EFeatureFlags GetFeatureFlags() const { return FeatureFlags; }
+
+	FString GetMusic(unsigned int index) const
+	{
+		if(const FString *value = musicTable.CheckKey(index))
+			return *value;
+		return FString();
+	}
 
 	WORD GetTilePalette(TArray<MapTile> &tilePalette)
 	{
@@ -367,27 +376,43 @@ protected:
 			if(!ceiling && sc->str.CompareNoCase("floor") != 0)
 				sc.ScriptMessage(Scanner::ERROR, "Unknown flat section '%s'.", sc->str.GetChars());
 
-			sc.MustGetToken('{');
-			unsigned int index = 0;
-			do
+			const TMap<unsigned int, FString> table = LoadStringTable(sc);
+			TMap<unsigned int, FString>::ConstPair *pair;
+			for(TMap<unsigned int, FString>::ConstIterator iter(table);iter.NextPair(pair);)
 			{
-				sc.MustGetToken(TK_StringConst);
-				FTextureID texID = TexMan.GetTexture(sc->str, FTexture::TEX_Flat);
-				if(sc.CheckToken('='))
-				{
-					sc.MustGetToken(TK_IntConst);
-					index = sc->number;
-					if(index > 255)
-						index = 255;
-				}
-				flatTable[index++][ceiling] = texID;
-
-				if(index == 256)
-					break;
+				if(pair->Key > 255)
+					continue;
+				flatTable[pair->Key][ceiling] = TexMan.GetTexture(pair->Value, FTexture::TEX_Flat);
 			}
-			while(sc.CheckToken(','));
-			sc.MustGetToken('}');
 		}
+	}
+
+	void LoadMusicTable(Scanner &sc)
+	{
+		musicTable = LoadStringTable(sc);
+	}
+
+	// Parse comma separated list of strings (with optional explicit indexes
+	TMap<unsigned int, FString> LoadStringTable(Scanner &sc)
+	{
+		TMap<unsigned int, FString> table;
+		unsigned int index = 0;
+
+		sc.MustGetToken('{');
+		do
+		{
+			sc.MustGetToken(TK_StringConst);
+			FString str = sc->str;
+			if(sc.CheckToken('='))
+			{
+				sc.MustGetToken(TK_IntConst);
+				index = sc->number;
+			}
+			table[index++] = str;
+		}
+		while(sc.CheckToken(','));
+		sc.MustGetToken('}');
+		return table;
 	}
 
 	void LoadTilesTable(Scanner &sc)
@@ -619,6 +644,7 @@ private:
 	TMap<WORD, MapTrigger> tileTriggers;
 	TMap<WORD, ModZone> modZones;
 	TMap<WORD, MapZone> zonePalette;
+	TMap<unsigned, FString> musicTable;
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 	EFeatureFlags FeatureFlags;
 };
@@ -1233,6 +1259,23 @@ void GameMap::ReadPlanesData()
 	}
 
 	SetupLinks();
+
+	// Scan for music selection in info plane in y = 0
+	// No need for a feature flag here since we only use it if we can find a
+	// valid entry, so we presence of the music table in xlat should be enough.
+	for(unsigned int i = 0;i < header.width;++i)
+	{
+		if((infoplane[i]&0xFF00) == 0xBA00)
+		{
+			FString music = xlat.GetMusic(infoplane[i]&0xFF);
+			if(music.IsNotEmpty())
+			{
+				header.music = music;
+				infoplane[i] = 0;
+				break;
+			}
+		}
+	}
 
 	// Install triggers
 	for(unsigned int i = 0;i < triggers.Size();++i)

@@ -41,6 +41,7 @@
 #include "zstring.h"
 
 class ClassDef;
+class GameMap;
 
 extern class GameInfo
 {
@@ -156,7 +157,8 @@ class LevelInfo
 public:
 	LevelInfo();
 	FTextureID GetBorderTexture() const;
-	FString GetName(const class GameMap *gm) const;
+	FString GetMusic(const GameMap *gm) const;
+	FString GetName(const GameMap *gm) const;
 
 	char			MapName[9];
 	FString			NextMap;

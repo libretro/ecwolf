@@ -304,6 +304,13 @@ FTextureID LevelInfo::GetBorderTexture() const
 	return BorderTexture;
 }
 
+FString LevelInfo::GetMusic(const GameMap *gm) const
+{
+	if(gm->GetHeader().music.IsNotEmpty())
+		return gm->GetHeader().music;
+	return Music;
+}
+
 FString LevelInfo::GetName(const GameMap *gm) const
 {
 	if(UseMapInfoName)

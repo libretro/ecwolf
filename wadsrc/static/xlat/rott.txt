@@ -2,6 +2,34 @@ enable lightlevels;
 enable planedepth;
 enable zheights;
 
+music
+{
+	"FASTWAY",
+	"MISTACHE",
+	"OWW",
+	"SMOKE",
+	"SPRAY",
+	"RUNLIKE",
+	"SMOOTH",
+	"CHANT",
+	"MEDIEV1A",
+	"TASKFORC",
+	"KISSOFF",
+	"RADAGIO",
+	"SHARDS",
+	"STAIRS",
+	"SUCKTHIS",
+	"EXCALIBR",
+	"CCCOOL",
+	"WORK_DAY",
+	"WHERIZIT",
+	"BOSSBLOW",
+	"HELLERO",
+	"EVINRUDE",
+	"VICTORY",
+	"HERE_BOY"
+}
+
 tiles
 {
 	tile 1

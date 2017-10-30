@@ -61,10 +61,11 @@ class GameMap
 	public:
 		struct Header
 		{
-			FString			name;
-			unsigned int	width;
-			unsigned int	height;
-			unsigned int	tileSize;
+			FString name;
+			FString music;
+			unsigned int width;
+			unsigned int height;
+			unsigned int tileSize;
 		};
 		struct Thing
 		{

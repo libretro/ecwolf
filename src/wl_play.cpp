@@ -822,13 +822,13 @@ int StopMusic (void)
 void StartMusic ()
 {
 	SD_MusicOff ();
-	SD_StartMusic(levelInfo->Music);
+	SD_StartMusic(levelInfo->GetMusic(map));
 }
 
 void ContinueMusic (int offs)
 {
 	SD_MusicOff ();
-	SD_ContinueMusic(levelInfo->Music, offs);
+	SD_ContinueMusic(levelInfo->GetMusic(map), offs);
 }
 
 /*
