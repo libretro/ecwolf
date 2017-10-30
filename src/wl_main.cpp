@@ -929,6 +929,15 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			param_difficulty = 2;
 		else IFARG("--hard")
 			param_difficulty = 3;
+		else IFARG("--skill")
+		{
+			if(++i >= argc)
+			{
+				printf("The skill option is missing an argument!\n");
+				hasError = true;
+			}
+			param_difficulty = atoi(argv[i])-1; // 1-based indexing
+		}
 		else IFARG("--nowait")
 			param_nowait = true;
 		else IFARG("--tedlevel")
@@ -1138,7 +1147,9 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			" --config <file>        Use an explicit location for the config file\n"
 			" --savedir <dir>        Use an explicit location for save games\n"
 			" --file <file>          Loads an extra data file\n"
+			" --data <extension>     Selects the given game data set skipping the dialog\n"
 			" --tedlevel <level>     Starts the game in the given level\n"
+			" --skill <#>            Sets the difficulty for tedlevel\n"
 			" --baby                 Sets the difficulty to baby for tedlevel\n"
 			" --easy                 Sets the difficulty to easy for tedlevel\n"
 			" --normal               Sets the difficulty to normal for tedlevel\n"

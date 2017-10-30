@@ -983,7 +983,7 @@ unsigned int SkillInfo::GetSkillIndex(const SkillInfo &skill)
 
 SkillInfo &SkillInfo::GetSkill(unsigned int index)
 {
-	return skills[index];
+	return skills[MIN(index, skills.Size()-1)];
 }
 
 class SkillInfoBlockParser : public MapInfoBlockParser
