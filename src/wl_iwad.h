@@ -40,7 +40,7 @@
 // For IWad Pickers so not in namespace
 struct WadStuff
 {
-	WadStuff() : Type(0), Hidden(false) {}
+	WadStuff() : Type(-1), Hidden(false) {}
 
 	TArray<FString> Path;
 	FString Extension;

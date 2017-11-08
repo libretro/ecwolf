@@ -268,9 +268,7 @@ static bool VerifySpearInstall(const char* directory)
 		"vswap."
 	};
 
-	File dir(directory);
-	//if(!dir.isWritable())
-	//	return true;
+	const File dir(directory);
 
 	// Check for gamemaps.sd1, if it doesn't exist assume we're good
 	if(!File(dir, dir.getInsensitiveFile("gamemaps.sd1", false)).exists())
