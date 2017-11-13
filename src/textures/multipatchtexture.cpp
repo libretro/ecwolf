@@ -283,7 +283,7 @@ FMultiPatchTexture::FMultiPatchTexture (const void *texdef, FPatchLookup *patchl
 		if (unsigned(LittleShort(mpatch.d->patch)) >= unsigned(maxpatchnum))
 		{
 			I_Error ("Bad PNAMES and/or texture directory:\n\nPNAMES has %d entries, but\n%s wants to use entry %d.",
-				maxpatchnum, Name, LittleShort(mpatch.d->patch)+1);
+				maxpatchnum, Name.GetChars(), LittleShort(mpatch.d->patch)+1);
 		}
 		Parts[i].OriginX = LittleShort(mpatch.d->originx);
 		Parts[i].OriginY = LittleShort(mpatch.d->originy);
