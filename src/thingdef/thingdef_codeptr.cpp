@@ -64,7 +64,7 @@ ActionInfo::ActionInfo(ActionPtr func, const FName &name) : func(func), name(nam
 	actionFunctions->Push(this);
 }
 
-int FunctionTableComp(const void *f1, const void *f2)
+static int FunctionTableComp(const void *f1, const void *f2)
 {
 	const ActionInfo * const func1 = *((const ActionInfo **)f1);
 	const ActionInfo * const func2 = *((const ActionInfo **)f2);

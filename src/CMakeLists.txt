@@ -69,6 +69,9 @@ if( NOT HAS_VA_COPY )
 endif()
 
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+	if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0 )
+		set( CMAKE_CXX_FLAGS "-Wno-implicit-fallthrough ${CMAKE_CXX_FLAGS}")
+	endif()
 	set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}" )
 endif()
 
@@ -229,6 +232,7 @@ set(SOURCE_FILES
 	thingdef/thingdef.cpp
 	thingdef/thingdef_codeptr.cpp
 	thingdef/thingdef_expression.cpp
+	thingdef/thingdef_parse.cpp
 	thingdef/thingdef_properties.cpp
 	thingdef/thingdef_type.cpp
 	actor.cpp

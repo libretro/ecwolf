@@ -97,6 +97,7 @@ class Scanner
 			unsigned int	scanPos;
 		};
 
+		Scanner(int lump);
 		Scanner(const char* data, size_t length=0);
 		~Scanner();
 

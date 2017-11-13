@@ -111,7 +111,7 @@ class Symbol
 		virtual ~Symbol() {}
 
 		virtual void	FillValue(ExpressionNode::Value &val, AActor *self=NULL) const=0;
-		const FName		&GetName() const { return name; }
+		FName			GetName() const { return name; }
 		const Type		*GetType() const { return type.GetType(); }
 		virtual bool	IsArray() const { return false; }
 		virtual bool	IsFunction() const { return false; }

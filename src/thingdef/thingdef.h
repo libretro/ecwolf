@@ -150,7 +150,9 @@ typedef TArray<ActionInfo *> ActionTable;
 class SymbolInfo
 {
 	public:
-		SymbolInfo(const ClassDef *cls, const FName &var, const int offset);
+		static const SymbolInfo *LookupSymbol(const ClassDef *cls, FName var);
+
+		SymbolInfo(const ClassDef *cls, const FName var, const int offset);
 
 		const ClassDef	* const cls;
 		const FName		var;
@@ -296,32 +298,18 @@ class ClassDef
 	protected:
 		friend class DObject;
 		friend class StateLabel;
+		friend class FDecorateParser;
 		static const size_t POINTER_END;
 
-		static int ParseActorStateControl(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int allowedStatements);
-		static void ParseActorStateDuration(Scanner &sc, StateDefinition &thisState);
-		static bool ParseActorStateFlags(Scanner &sc, StateDefinition &thisState);
-		static void ParseActorStateAction(Scanner &sc, ClassDef *newClass, StateDefinition &thisState, int funcIdx);
-
-		static ClassDef *ParseActorHeader(Scanner &sc, bool &previouslyDefined, bool &isNative);
-		static bool ParseActorInheritance(Scanner &sc, ClassDef *newClass);
-		static bool ParseActorReplacements(Scanner &sc, ClassDef *newClass);
-
-		static bool ParseActorFlag(Scanner &sc, ClassDef *newClass);
-
-		static bool InitializeActor(ClassDef *newClass, bool isNative);
-
-		static void ParseActorState(Scanner &sc, ClassDef *newClass, bool actionsSorted);
-		static void ParseActorAction(Scanner &sc, ClassDef *newClass, bool &actionsSorted);
-		static void ParseActorNative(Scanner &sc, ClassDef *newClass);
-		static void ParseActorProperty(Scanner &sc, ClassDef *newClass);
-		static void	ParseActor(Scanner &sc);
-		static void	ParseDecorateLump(int lumpNum);
 		static bool SetProperty(ClassDef *newClass, const char* className, const char* propName, Scanner &sc);
 
+		static void AddGlobalSymbol(Symbol *sym);
 		void		BuildFlatPointers();
 		const Frame *FindStateInList(const FName &stateName) const;
+		void		FinalizeActorClass();
+		bool		InitializeActorClass(bool isNative);
 		void		InstallStates(const TArray<StateDefinition> &stateDefs);
+		void		RegisterEdNum(unsigned int ednum);
 		const Frame *ResolveStateIndex(unsigned int index) const;
 
 		// We need to do this for proper initialization order.

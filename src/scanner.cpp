@@ -32,6 +32,7 @@
 
 #include "scanner_support.h"
 #include "scanner.h"
+#include "w_wad.h"
 
 static void DefaultMessageHandler(Scanner::MessageLevel, const char* error, va_list list)
 {
@@ -97,7 +98,25 @@ static const char* const TokenNames[TK_NumSpecialTokens] =
 	"Ellipsis"
 };
 
-Scanner::Scanner(const char* data, size_t length) : line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
+Scanner::Scanner(int lumpNum)
+: line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
+{
+	FMemLump lump = Wads.ReadLump(lumpNum);
+	length = lump.GetSize();
+	this->data = new char[length];
+	memcpy(this->data, lump.GetMem(), length);
+
+	SetScriptIdentifier(Wads.GetLumpFullPath(lumpNum));
+
+	CheckForWhitespace();
+
+	state.scanPos = scanPos;
+	state.tokenLine = 0;
+	state.tokenLinePosition = 0;
+}
+
+Scanner::Scanner(const char* data, size_t length)
+: line(1), lineStart(0), logicalPosition(0), scanPos(0), needNext(true)
 {
 	if(length == 0 && *data != 0)
 		length = strlen(data);
