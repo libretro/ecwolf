@@ -269,9 +269,7 @@ void FTextureManager::InitAnimDefs ()
 	
 	while ((lump = Wads.FindLump ("ANIMDEFS", &lastlump)) != -1)
 	{
-		FMemLump lmp = Wads.ReadLump(lump);
-		Scanner sc((const char*)lmp.GetMem(), lmp.GetSize());
-		sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
+		Scanner sc(lump);
 
 		while (sc.GetNextString ())
 		{

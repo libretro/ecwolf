@@ -1379,9 +1379,7 @@ static void SkipBlock(Scanner &sc)
 
 static void ParseMapInfoLump(int lump, bool gameinfoPass)
 {
-	FMemLump data = Wads.ReadLump(lump);
-	Scanner sc((const char*)data.GetMem(), data.GetSize());
-	sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
+	Scanner sc(lump);
 
 	while(sc.TokensLeft())
 	{

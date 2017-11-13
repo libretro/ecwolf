@@ -227,9 +227,7 @@ void SoundInformation::Init()
 
 void SoundInformation::ParseSoundInformation(int lumpNum)
 {
-	FMemLump lump = Wads.ReadLump(lumpNum);
-	Scanner sc((const char*)(lump.GetMem()), lump.GetSize());
-	sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpNum));
+	Scanner sc(lumpNum);
 
 	unsigned int excludeDepth = 0; // $if $endif
 	while(sc.TokensLeft() != 0)

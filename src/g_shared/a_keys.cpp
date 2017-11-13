@@ -382,9 +382,7 @@ void P_InitKeyMessages()
 	ClearLocks();
 	while ((lump = Wads.FindLump ("LOCKDEFS", &lastlump)) != -1)
 	{
-		FMemLump data = Wads.ReadLump(lump);
-		Scanner sc((const char*)data.GetMem(), data.GetSize());
-		sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
+		Scanner sc(lump);
 		do
 		{
 			sc.MustGetToken(TK_Identifier);

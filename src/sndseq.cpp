@@ -120,9 +120,7 @@ void SndSeqTable::Init()
 
 void SndSeqTable::ParseSoundSequence(int lumpnum)
 {
-	FMemLump lump = Wads.ReadLump(lumpnum);
-	Scanner sc((const char*)(lump.GetMem()), lump.GetSize());
-	sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpnum));
+	Scanner sc(lumpnum);
 
 	while(sc.TokensLeft())
 	{

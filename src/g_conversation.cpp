@@ -155,9 +155,7 @@ void ConversationModule::Load(int lump)
 {
 	Lump = lump;
 
-	FMemLump lmp = Wads.ReadLump(lump);
-	Scanner sc((const char*)lmp.GetMem(), lmp.GetSize());
-	sc.SetScriptIdentifier(Wads.GetLumpFullPath(lump));
+	Scanner sc(lump);
 
 	ParseConversation(sc);
 }

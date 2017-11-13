@@ -151,9 +151,7 @@ public:
 			ClearTables();
 		}
 
-		FMemLump data = Wads.ReadLump(lump);
-		Scanner sc((const char*)data.GetMem(), data.GetSize());
-		sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
+		Scanner sc(lump);
 
 		while(sc.TokensLeft())
 		{

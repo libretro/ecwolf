@@ -548,9 +548,7 @@ void WolfStatusBar::SetupStatusbar()
 	int lumpnum = 0;
 	while((lumpnum = Wads.FindLump("LATCHCFG", &lastLump)) != -1)
 	{
-		FMemLump lump = Wads.ReadLump(lumpnum);
-		Scanner sc((const char*)(lump.GetMem()), lump.GetSize());
-		sc.SetScriptIdentifier(Wads.GetLumpFullName(lumpnum));
+		Scanner sc(lumpnum);
 		sc.ScriptMessage(Scanner::WARNING, "Utilizing temporary status bar configuration script.");
 
 		while(sc.TokensLeft())

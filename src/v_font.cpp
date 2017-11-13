@@ -2471,9 +2471,7 @@ void V_InitCustomFonts()
 
 	while ((llump = Wads.FindLump ("FONTDEFS", &lastlump)) != -1)
 	{
-		FMemLump data = Wads.ReadLump(llump);
-		Scanner sc((const char*)data.GetMem(), data.GetSize());
-		sc.SetScriptIdentifier(Wads.GetLumpFullName(llump));
+		Scanner sc(llump);
 		while (sc.GetNextString())
 		{
 			memset (lumplist, 0, sizeof(lumplist));
@@ -2635,9 +2633,7 @@ void V_InitFontColors ()
 			if (Wads.GetLumpFile(lump) == 1) continue;
 		}
 #endif
-		FMemLump data = Wads.ReadLump(lump);
-		Scanner sc((const char*)data.GetMem(), data.GetSize());
-		sc.SetScriptIdentifier(Wads.GetLumpFullName(lump));
+		Scanner sc(lump);
 
 		while (sc.GetNextString())
 		{
