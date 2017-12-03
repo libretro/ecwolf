@@ -531,6 +531,8 @@ void GameMap::SpawnThings() const
 				actor->flags |= FL_AMBUSH;
 			if(thing.patrol)
 				actor->dir = dirtype(actor->angle/ANGLE_45);
+			if(thing.holo)
+				actor->flags &= ~(FL_SOLID);
 
 			// Check for valid frames
 			if(!actor->state || !R_CheckSpriteValid(actor->sprite))

@@ -41,7 +41,7 @@
 #include "id_sd.h"
 
 #ifndef ECWOLF_MIXER
-#warning Not using customized SDL_mixer. Features will be disabled. https://bitbucket.org/Blzut3/sdl_mixer-for-ecwolf
+#pragma message "Not using customized SDL_mixer. Features will be disabled. https://bitbucket.org/Blzut3/sdl_mixer-for-ecwolf"
 #endif
 
 // For AdLib sounds & music:

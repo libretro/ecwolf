@@ -70,7 +70,7 @@ class GameMap
 		struct Thing
 		{
 			Thing() : x(0), y(0), z(0), type(NAME_None), angle(0),
-				ambush(false), patrol(false)
+				ambush(false), patrol(false), holo(false)
 			{
 				skill[0] = skill[1] = skill[2] = skill[3] = false;
 			}
@@ -80,6 +80,7 @@ class GameMap
 			unsigned short	angle;
 			bool			ambush;
 			bool			patrol;
+			bool			holo;
 			bool			skill[4];
 		};
 		struct Trigger

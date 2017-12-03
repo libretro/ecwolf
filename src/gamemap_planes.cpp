@@ -650,22 +650,64 @@ static Xlat xlat;
 
 static int FindAdjacentDoor(MapSpot spot, MapTrigger *&trigger);
 
-static void ProduceHolowall(MapSpot spot, const MapThing &thing, uint32_t flags)
+struct HolowallProducer
 {
-	if(spot->tile)
+	MapSpot spot;
+	MapTile::Side facing;
+	unsigned int thingnum;
+	uint32_t flags;
+
+	HolowallProducer() : spot(NULL), facing(MapTile::East), flags(0) {}
+	HolowallProducer(const HolowallProducer &other) : spot(other.spot), facing(other.facing), thingnum(other.thingnum), flags(other.flags) {}
+
+	HolowallProducer(MapSpot spot, const MapThing &thing, unsigned int thingnum, uint32_t flags)
+	: spot(spot), facing(MapTile::Side(thing.angle/90)), thingnum(thingnum), flags(flags)
 	{
-		spot->sideSolid[0] = spot->sideSolid[1] =
-			spot->sideSolid[2] = spot->sideSolid[3] = false;
-		if(flags & Xlat::TF_PATHING)
+	}
+
+	void Produce(TArray<MapThing> &things) const
+	{
+		MapSpot nextSpot = spot->GetAdjacent(facing);
+		if(spot->tile)
 		{
-			// If we created a holowall and we path into another wall it should also become non-solid.
-			spot = spot->GetAdjacent(MapTile::Side(thing.angle/90));
-			if(spot->tile)
-				spot->sideSolid[0] = spot->sideSolid[1] =
-					spot->sideSolid[2] = spot->sideSolid[3] = false;
+			spot->sideSolid[0] = spot->sideSolid[1] =
+				spot->sideSolid[2] = spot->sideSolid[3] = false;
+		}
+
+		// Pathing objects can make statics and walls in front of them non-solid
+		if((flags & Xlat::TF_PATHING) && nextSpot)
+		{
+			if(nextSpot->tile)
+			{
+				nextSpot->sideSolid[0] = nextSpot->sideSolid[1] =
+					nextSpot->sideSolid[2] = nextSpot->sideSolid[3] = false;
+			}
+
+			fixed x = nextSpot->GetX(), y = nextSpot->GetY();
+			for(unsigned int i = 0; i < things.Size(); ++i)
+			{
+				MapThing &thing = things[i];
+				if((thing.x>>FRACBITS) == x && (thing.y>>FRACBITS) == y)
+				{
+					// Technically this should be conditional on if the target thing is a holowall producer (non-static)
+					// but we don't have that information easily accessible so we let the caller clean this up.
+					thing.holo = true;
+					break; // Binary map, so we can assume there's only one thing in the given spot
+				}
+			}
 		}
 	}
-}
+
+	static void Produce(TArray<HolowallProducer> &producers, TArray<MapThing> &things)
+	{
+		for(unsigned int i = 0; i < producers.Size(); ++i)
+			producers[i].Produce(things);
+
+		// Holowall producers should not affect other holowall producers, so fixup flag
+		for(unsigned int i = 0; i < producers.Size(); ++i)
+			things[producers[i].thingnum].holo = false;
+	}
+};
 
 struct MacTile
 {
@@ -794,6 +836,7 @@ void GameMap::ReadMacData()
 		mapPlane.map[i].sector = &sectorPalette[0];
 	}
 
+	TArray<HolowallProducer> holowallThings;
 	lump.Seek(spawnListOfs, SEEK_SET);
 	for(unsigned int i = 0;i < numSpawn;++i)
 	{
@@ -835,17 +878,17 @@ void GameMap::ReadMacData()
 			}
 			else
 			{
-				if(flags & Xlat::TF_HOLOWALL)
-					ProduceHolowall(&mapPlane.map[y*64+x], thing, flags);
-
 				thing.x = (fixed(x)<<FRACBITS)+(FRACUNIT/2);
 				thing.y = (fixed(y)<<FRACBITS)+(FRACUNIT/2);
 				thing.z = 0;
 				thing.ambush = !!(flags & Xlat::TF_AMBUSH);
-				things.Push(thing);
+				int thingnum = things.Push(thing);
+				if(flags & Xlat::TF_HOLOWALL)
+					holowallThings.Push(HolowallProducer(&mapPlane.map[y*64+x], thing, thingnum, flags));
 			}
 		}
 	}
+	HolowallProducer::Produce(holowallThings, things);
 
 	SetupLinks();
 }
@@ -895,11 +938,10 @@ void GameMap::ReadPlanesData()
 	numPlanes = LittleShort(numPlanes);
 	nameLength = LittleShort(nameLength);
 
-	char* name = new char[nameLength+1];
-	lump->Read(name, nameLength);
+	TUniquePtr<char[]> name(new char[nameLength+1]);
+	lump->Read(name.Get(), nameLength);
 	name[nameLength] = 0;
 	header.name = name;
-	delete[] name;
 
 	WORD dimensions[2];
 	lump->Read(dimensions, 4);
@@ -919,15 +961,15 @@ void GameMap::ReadPlanesData()
 	TMap<WORD, TArray<MapSpot> > elevatorSpots;
 
 	// Read and store the info plane so we can reference it
-	WORD* infoplane = new WORD[size];
+	TUniquePtr<WORD[]> infoplane(new WORD[size]);
 	if(numPlanes > 3)
 	{
 		lump->Seek(size*2*3, SEEK_CUR);
-		lump->Read(infoplane, size*2);
+		lump->Read(infoplane.Get(), size*2);
 		lump->Seek(18+nameLength, SEEK_SET);
 	}
 	else
-		memset(infoplane, 0, size*2);
+		memset(infoplane.Get(), 0, size*2);
 
 	FTextureID defaultCeiling = levelInfo->DefaultTexture[Sector::Ceiling];
 	FTextureID defaultFloor = levelInfo->DefaultTexture[Sector::Floor];
@@ -937,8 +979,8 @@ void GameMap::ReadPlanesData()
 		if(plane == 3) // Info plane is already read
 			continue;
 
-		WORD* oldplane = new WORD[size];
-		lump->Read(oldplane, size*2);
+		TUniquePtr<WORD[]> oldplane(new WORD[size]);
+		lump->Read(oldplane.Get(), size*2);
 
 		switch(plane)
 		{
@@ -1104,7 +1146,9 @@ void GameMap::ReadPlanesData()
 				bool canUseFlatColor = true;
 				bool gotFlatTextures = false;
 				unsigned int ambushSpot = 0;
-				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors. 
+				ambushSpots.Push(0xFFFF); // Prevent uninitialized value errors.
+
+				TArray<HolowallProducer> holowallThings;
 
 				unsigned int i = 0;
 				for(;i < size;++i)
@@ -1198,9 +1242,6 @@ void GameMap::ReadPlanesData()
 						}
 						else
 						{
-							if(flags & Xlat::TF_HOLOWALL)
-								ProduceHolowall(&mapPlane.map[i], thing, flags);
-
 							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
 							if((FeatureFlags & Xlat::FF_ZHEIGHTS) && (infoplane[i]&0xFF00) == 0xB000)
@@ -1213,13 +1254,18 @@ void GameMap::ReadPlanesData()
 							else
 								thing.z = 0;
 							thing.ambush = (flags & Xlat::TF_AMBUSH) || ambushSpots[ambushSpot] == i;
-							things.Push(thing);
+
+							int thingnum = things.Push(thing);
+							if(flags & Xlat::TF_HOLOWALL)
+								holowallThings.Push(HolowallProducer(&mapPlane.map[i], thing, thingnum, flags));
 						}
 					}
 
 					if(ambushSpots[ambushSpot] == i)
 						++ambushSpot;
 				}
+
+				HolowallProducer::Produce(holowallThings, things);
 				break;
 			}
 
@@ -1253,7 +1299,6 @@ void GameMap::ReadPlanesData()
 				break;
 			}
 		}
-		delete[] oldplane;
 	}
 
 	SetupLinks();
@@ -1313,7 +1358,6 @@ void GameMap::ReadPlanesData()
 		if(trig.isSecret)
 			++gamestate.secrettotal;
 	}
-	delete[] infoplane;
 
 	// Install elevators
 	TMap<WORD, TArray<MapSpot> >::ConstIterator iter(elevatorSpots);
