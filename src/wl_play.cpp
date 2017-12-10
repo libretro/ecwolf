@@ -174,6 +174,65 @@ void PlayLoop (void);
 /*
 =============================================================================
 
+							TIMING
+
+=============================================================================
+*/
+
+static int32_t lasttimecount;
+
+int32_t GetTimeCount()
+{
+	return SDL_GetTicks()*7/100;
+}
+
+/*
+=====================
+=
+= CalcTics
+=
+=====================
+*/
+
+void CalcTics()
+{
+//
+// calculate tics since last refresh for adaptive timing
+//
+	if (lasttimecount > GetTimeCount())
+		ResetTimeCount(); // if the game was paused a LONG time
+
+	uint32_t curtime = SDL_GetTicks();
+	tics = (curtime * 7) / 100 - lasttimecount;
+	if(!tics)
+	{
+		// wait until end of current tic
+		SDL_Delay(((lasttimecount + 1) * 100) / 7 - curtime);
+		tics = 1;
+	}
+	else if(noadaptive)
+		tics = 1;
+
+	lasttimecount += tics;
+
+	if (tics>MAXTICS)
+		tics = MAXTICS;
+}
+
+void ResetTimeCount()
+{
+	lasttimecount = GetTimeCount();
+}
+
+void Delay(int wolfticks)
+{
+	if(wolfticks>0)
+		SDL_Delay(wolfticks * 100 / 7);
+}
+
+/*
+=============================================================================
+
 							USER CONTROL
 
 =============================================================================
@@ -681,7 +740,7 @@ void CheckKeys (void)
 		ContinueMusic(lastoffs);
 		if (MousePresent && IN_IsInputGrabbed())
 			IN_CenterMouse();     // Clear accumulated mouse movement
-		lasttimecount = GetTimeCount();
+		ResetTimeCount();
 		return;
 	}
 
@@ -720,7 +779,7 @@ void CheckKeys (void)
 			}
 			if (loadedgame)
 				playstate = ex_abort;
-			lasttimecount = GetTimeCount();
+			ResetTimeCount();
 			if (MousePresent && IN_IsInputGrabbed())
 				IN_CenterMouse();     // Clear accumulated mouse movement
 		}
@@ -767,7 +826,7 @@ void CheckKeys (void)
 				if (MousePresent && IN_IsInputGrabbed())
 					IN_CenterMouse();     // Clear accumulated mouse movement
 
-				lasttimecount = GetTimeCount();
+				ResetTimeCount();
 			}
 		}
 	}
@@ -794,18 +853,7 @@ void CheckKeys (void)
 */
 int StopMusic (void)
 {
-	int lastoffs = 0;
-
-    if (music == NULL)
-    {
-        lastoffs = SD_MusicOff ();
-    }
-    else
-    {
-        lastoffs = SD_PauseMusic ();
-    }
-
-	return lastoffs;
+	return SD_MusicOff();
 }
 
 //==========================================================================
@@ -1003,7 +1051,7 @@ void PlayLoop (void)
 #endif
 
 	playstate = ex_stillplaying;
-	lasttimecount = GetTimeCount();
+	ResetTimeCount();
 	frameon = 0;
 	funnyticount = 0;
 	memset (control[ConsolePlayer].buttonstate, 0, sizeof (control[ConsolePlayer].buttonstate));
@@ -1074,7 +1122,10 @@ void PlayLoop (void)
 
 		UpdateSoundLoc ();      // JAB
 		if (screenfaded)
+		{
 			VW_FadeIn ();
+			ResetTimeCount();
+		}
 
 		CheckKeys ();
 		if (!loadedgame)
@@ -1091,7 +1142,7 @@ void PlayLoop (void)
 		if (singlestep)
 		{
 			VW_WaitVBL (singlestep);
-			lasttimecount = GetTimeCount();
+			ResetTimeCount();
 		}
 		if (extravbls)
 			VW_WaitVBL (extravbls);

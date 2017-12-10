@@ -8,8 +8,6 @@
 #ifndef __ID_SD__
 #define __ID_SD__
 
-#include <SDL_mixer.h>
-
 #include "wl_def.h"
 #include "sndinfo.h"
 
@@ -141,15 +139,6 @@ enum SoundChannel
 	SD_BOSSWEAPONS
 };
 
-extern	Mix_Music		*music;
-
-#define GetTimeCount()  ((SDL_GetTicks()*7)/100)
-
-inline void Delay(int wolfticks)
-{
-	if(wolfticks>0) SDL_Delay(wolfticks * 100 / 7);
-}
-
 // Function prototypes
 extern  void    SD_Startup(void),
 				SD_Shutdown(void);
@@ -157,14 +146,13 @@ extern  void    SD_Startup(void),
 extern  void    SD_PositionSound(int leftvol,int rightvol);
 extern  int		SD_PlaySound(const char* sound,SoundChannel chan=SD_GENERIC);
 extern  void    SD_SetPosition(int channel, int leftvol,int rightvol);
-extern  void    SD_StopSound(void),
-				SD_WaitSoundDone(void);
+extern  void    SD_StopSound(void);
+extern  void    SD_WaitSoundDone(void);
 
 extern  void    SD_StartMusic(const char* chunk);
-extern  int     SD_PauseMusic(void);
 extern  void    SD_ContinueMusic(const char* chunk, int startoffs);
-extern  void    SD_MusicOn(void),
-				SD_FadeOutMusic(void);
+extern  void    SD_MusicOn(void);
+extern  void    SD_FadeOutMusic(void);
 extern  int     SD_MusicOff(void);
 
 extern  bool	SD_MusicPlaying(void);
@@ -173,7 +161,7 @@ extern  bool	SD_SetMusicMode(SMMode mode);
 extern  bool    SD_SoundPlaying(void);
 
 extern  void    SD_SetDigiDevice(SDSMode);
-extern  Mix_Chunk*	SD_PrepareSound(int which);
+extern  struct Mix_Chunk *SD_PrepareSound(int which);
 extern  int     SD_PlayDigitized(const SoundData &which,int leftpos,int rightpos,SoundChannel chan=SD_GENERIC);
 extern  void    SD_StopDigitized(void);
 

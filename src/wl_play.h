@@ -53,6 +53,11 @@ void    ContinueMusic(int offs);
 void    StartDamageFlash (int damage);
 void    StartBonusFlash (void);
 
+void CalcTics();
+void Delay(int wolfticks);
+int32_t GetTimeCount();
+void ResetTimeCount();
+
 extern  int32_t     funnyticount;           // FOR FUNNY BJ FACE
 
 extern  bool        noclip,ammocheat,mouselook;

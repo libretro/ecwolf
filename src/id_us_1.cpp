@@ -22,7 +22,7 @@
 
 #include "wl_def.h"
 #include "wl_menu.h"
-#include "id_sd.h"
+#include "wl_play.h"
 #include "id_in.h"
 #include "id_vh.h"
 #include "id_us.h"

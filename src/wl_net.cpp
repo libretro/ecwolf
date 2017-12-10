@@ -200,7 +200,7 @@ static void StartHost()
 	// other player in the game (they already know the host).
 	Printf("\b\b\bAll players connected! Sending sync...\n");
 
-	static const int startSize = sizeof(StartPacket) + sizeof(StartPacket::Client)*(InitVars.numPlayers-1);
+	const int startSize = sizeof(StartPacket) + sizeof(StartPacket::Client)*(InitVars.numPlayers-1);
 	StartPacket *startData = (StartPacket *)malloc(startSize);
 	UDPpacket startPacket = { -1, (Uint8*)startData, startSize, startSize, 0 };
 	startData->type = NET_CONNECTION_START;

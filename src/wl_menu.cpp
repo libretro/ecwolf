@@ -1118,7 +1118,7 @@ void CheckPause (void)
 				SD_ContinueMusic(gameinfo.MenuMusic, pauseofs);
 				break;
 			case 1:
-				pauseofs = music ? SD_PauseMusic() : SD_MusicOff();
+				pauseofs = SD_MusicOff();
 				break;
 		}
 
@@ -1203,7 +1203,7 @@ void ShowMenu(Menu &menu)
 	if (loadedgame)
 		playstate = ex_abort;
 
-	lasttimecount = GetTimeCount ();
+	ResetTimeCount();
 
 	if (MousePresent && IN_IsInputGrabbed())
 		IN_CenterMouse();     // Clear accumulated mouse movement

@@ -1,6 +1,6 @@
 #include "wl_def.h"
+#include "wl_play.h"
 #include "am_map.h"
-#include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
 #include "id_vh.h"

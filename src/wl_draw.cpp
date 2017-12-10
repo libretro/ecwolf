@@ -675,44 +675,6 @@ void DrawPlayerWeapon (void)
 	}
 }
 
-
-//==========================================================================
-
-
-/*
-=====================
-=
-= CalcTics
-=
-=====================
-*/
-
-void CalcTics (void)
-{
-//
-// calculate tics since last refresh for adaptive timing
-//
-	if (lasttimecount > (int32_t) GetTimeCount())
-		lasttimecount = GetTimeCount();    // if the game was paused a LONG time
-
-	uint32_t curtime = SDL_GetTicks();
-	tics = (curtime * 7) / 100 - lasttimecount;
-	if(!tics)
-	{
-		// wait until end of current tic
-		SDL_Delay(((lasttimecount + 1) * 100) / 7 - curtime);
-		tics = 1;
-	}
-	else if(noadaptive)
-		tics = 1;
-
-	lasttimecount += tics;
-
-	if (tics>MAXTICS)
-		tics = MAXTICS;
-}
-
-
 //==========================================================================
 
 void AsmRefresh()
@@ -1299,7 +1261,8 @@ void    ThreeDRefresh (void)
 			VL_FadeIn(0, 255, 24);
 		fizzlein = false;
 
-		lasttimecount = GetTimeCount();          // don't make a big tic count
+		// don't make a big tic count
+		ResetTimeCount();
 	}
 	else if (fpscounter)
 	{

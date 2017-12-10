@@ -20,7 +20,6 @@ extern	fixed finesine[FINEANGLES+FINEANGLES/4];
 extern	fixed* finecosine;
 extern  TUniquePtr<int[]> wallheight;
 extern  word horizwall[],vertwall[];
-extern  int32_t    lasttimecount;
 extern  int32_t    frameon;
 extern	int r_extralight;
 
@@ -32,7 +31,6 @@ extern  fixed   viewx,viewy;                    // the focal point
 extern  fixed   viewsin,viewcos;
 
 void    ThreeDRefresh (void);
-void    CalcTics (void);
 
 typedef struct
 {

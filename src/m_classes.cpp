@@ -733,7 +733,7 @@ int Menu::handle()
 	char key;
 	static int redrawitem = 1, lastitem = -1;
 	int x, y, basey, exit, shape;
-	uint32_t lastBlinkTime;
+	int32_t lastBlinkTime;
 	ControlInfo ci;
 
 	if(close)

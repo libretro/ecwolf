@@ -1361,7 +1361,11 @@ SD_MusicOff(void)
 			}
 			else
 			{
-				Mix_PauseMusic();
+				if(Mix_PlayingMusic() == 1)
+				{
+					Mix_PauseMusic();
+					return (int)Mix_GetMusicPCMPosition();
+				}
 				return 0;
 			}
 			break;
@@ -1452,17 +1456,6 @@ SD_StartMusic(const char* chunk)
 	}
 }
 
-int
-SD_PauseMusic(void)
-{
-	if (music != NULL && Mix_PlayingMusic() == 1)
-	{
-		Mix_PauseMusic();
-		return (int)Mix_GetMusicPCMPosition();
-	}
-	return 0;
-}
-
 void
 SD_ContinueMusic(const char* chunk, int startoffs)
 {
@@ -1479,6 +1472,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 			SDL_LockMutex(audioMutex);
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);
 			sqHackFreeable.Reset();
+			musicchunk = -1;
 
 			// Load our music file from chunk
 			chunkmem = new byte[Wads.LumpLength(lumpNum)];
