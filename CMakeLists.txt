@@ -26,23 +26,17 @@ function( add_pk3 PK3_NAME PK3_DIR )
 		set( PK3_TARGET "pk3" )
 	endif()
 
-	add_custom_command( OUTPUT ${OUTPUT_DIR}/${PK3_NAME}
-		COMMAND zipdir -udf ${OUTPUT_DIR}/${PK3_NAME} ${PK3_DIR}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${OUTPUT_DIR}/${PK3_NAME} $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME}
-		DEPENDS zipdir )
-
 	# Touch the zipdir executable here so that the pk3s are forced to rebuild
 	# each time since their dependecy has "changed."
 	if( NOT ANDROID )
 		add_custom_target( ${PK3_TARGET} ALL
-			COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE:zipdir>
-			DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+			COMMAND zipdir -udf $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME} ${PK3_DIR}
+			DEPENDS zipdir )
 	else()
 		# Prepare assets directory for APK
 		add_custom_target( ${PK3_TARGET} ALL
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different ${OUTPUT_DIR}/${PK3_NAME} ${OUTPUT_DIR}/assets/${PK3_NAME}
-			COMMAND ${CMAKE_COMMAND} -E touch $<TARGET_FILE:zipdir>
-			DEPENDS ${OUTPUT_DIR}/${PK3_NAME} )
+			COMMAND zipdir -udf ${OUTPUT_DIR}/assets/${PK3_NAME} ${PK3_DIR}
+			DEPENDS zipdir )
 	endif()
 endfunction()
 
