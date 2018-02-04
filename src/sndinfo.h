@@ -43,7 +43,7 @@
 class SoundInformation;
 
 struct Mix_Chunk;
-extern "C" void Mix_FreeChunk(Mix_Chunk *);
+struct Mix_ChunkDeleter;
 
 class SoundIndex
 {
@@ -83,7 +83,7 @@ class SoundData
 	protected:
 		FString logicalName;
 		SoundIndex index;
-		TUniquePtr<Mix_Chunk, TFuncDeleter<Mix_Chunk, Mix_FreeChunk> > digitalData;
+		TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> digitalData;
 		TUniquePtr<byte[]> adlibData, speakerData;
 		int lump[3];
 		unsigned short priority;

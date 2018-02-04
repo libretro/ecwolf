@@ -42,6 +42,15 @@
 #include "zdoomsupport.h"
 #include <SDL_mixer.h>
 
+
+// TFuncDeleter can't be used here since Mix_FreeChunk has various attributes
+// on Windows that make it difficult to forward declare. We'd prefer to not
+// include SDL_mixer.h in more places than we absolutely have to.
+struct Mix_ChunkDeleter
+{
+	inline explicit Mix_ChunkDeleter(Mix_Chunk *obj) { Mix_FreeChunk(obj); }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 //
 // Sound Index
@@ -78,7 +87,7 @@ struct TMoveInsert<SoundData>
 		data->priority = other.priority;
 		data->isAlias = other.isAlias;
 		data->aliasLinks = other.aliasLinks;
-		(void)TMoveInsert<TUniquePtr<Mix_Chunk, TFuncDeleter<Mix_Chunk, Mix_FreeChunk> > >(&data->digitalData, other.digitalData);
+		(void)TMoveInsert<TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> >(&data->digitalData, other.digitalData);
 		(void)TMoveInsert<TUniquePtr<byte[]> >(&data->adlibData, other.adlibData);
 		(void)TMoveInsert<TUniquePtr<byte[]> >(&data->speakerData, other.speakerData);
 		memcpy(data->lump, other.lump, sizeof(data->lump));
