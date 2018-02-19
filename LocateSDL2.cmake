@@ -105,6 +105,13 @@ function(sdl_modernize NEW_TARGET LIBS DIRS)
 		list(GET ${LIBS} 0 LIB)
 		list(REMOVE_AT ${LIBS} 0)
 
+		# On Linux SDL2's sdl2-config.cmake will specify -lSDL2 so we need to find that for CMake otherwise the target won't work
+		if(${LIB} MATCHES "^-l")
+			string(SUBSTRING ${LIB} 2 -1 LIB)
+			find_library(LIB2 ${LIB})
+			set(LIB ${LIB2})
+		endif()
+
 		set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB})
 		if(LIBS)
 			set_property(TARGET ${NEW_TARGET} APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${${LIBS}})
