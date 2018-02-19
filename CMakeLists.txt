@@ -79,11 +79,6 @@ if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
 endif()
 
-option(BUILD_PATCHUTIL "Builds the Wolf patching utility." OFF)
-if(BUILD_PATCHUTIL)
-	add_subdirectory(tools/patchutil)
-endif()
-
 add_subdirectory(tools/zipdir)
 add_subdirectory(tools/updaterevision)
 add_subdirectory(wadsrc)
