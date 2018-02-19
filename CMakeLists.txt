@@ -1,8 +1,17 @@
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.12)
 project(ECWolf)
 
 if(POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
+endif()
+
+# Multiarch support
+if(UNIX AND NOT APPLE)
+	include(GNUInstallDirs)
+elseif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
+	# CMAKE_ prefix used here to match the variable set by GNUInstallDirs.
+	# Value currently doesn't matter outside of Linux.
+	set(CMAKE_INSTALL_LIBDIR "lib")
 endif()
 
 option(ANDROID "Build for Android" OFF)
@@ -74,6 +83,8 @@ if(NOT JPEG_FOUND OR INTERNAL_JPEG)
 	set(JPEG_LIBRARIES jpeg)
 	set(JPEG_LIBRARY jpeg)
 endif()
+
+include(LocateSDL2.cmake)
 
 if(MSVC)
 	add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)

@@ -1,5 +1,5 @@
 add_custom_target(revision_check ALL
-	COMMAND updaterevision . ${CMAKE_CURRENT_SOURCE_DIR}/svnrevision.h
+	COMMAND updaterevision . ${CMAKE_CURRENT_BINARY_DIR}/svnrevision.h
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 	DEPENDS updaterevision
 )
@@ -9,14 +9,6 @@ set(PLATFORM_EXE_FLAGS "")
 include(CheckCXXSourceCompiles)
 include(CheckFunctionExists)
 include(FindPkgConfig)
-
-include_directories(
-	${ECWolf_SOURCE_DIR}/src
-	${ECWolf_SOURCE_DIR}/src/g_shared
-	${LZMA_INCLUDE_DIR}
-	${ECWolf_SOURCE_DIR}/gdtoa
-	${CMAKE_BINARY_DIR}/gdtoa
-)
 
 if(GPL)
 	add_definitions(-DUSE_GPL)
@@ -33,11 +25,6 @@ else()
 	set(OPL_SOURCES mame/fmopl.cpp)
 	set(EXTRA_LIBRARIES)
 endif()
-
-find_package(SDL REQUIRED)
-find_package(SDL_mixer REQUIRED)
-find_package(SDL_net REQUIRED)
-include_directories(${SDLMIXER_INCLUDE_DIR} ${SDLNET_INCLUDE_DIR} ${SDL_INCLUDE_DIR} ${ZLIB_INCLUDE_DIR} ${BZIP2_INCLUDE_DIR} ${JPEG_INCLUDE_DIR})
 
 check_function_exists(stricmp STRICMP_EXISTS)
 check_function_exists(strnicmp STRNICMP_EXISTS)
@@ -324,8 +311,19 @@ else()
 	target_link_libraries(link-test ecwolf)
 endif()
 
-add_dependencies(ecwolf lzma gdtoa revision_check)
-target_link_libraries(ecwolf ${EXTRA_LIBRARIES} ${SDL_LIBRARY} ${SDLMIXER_LIBRARY} ${SDLNET_LIBRARY} ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
+add_dependencies(ecwolf revision_check)
+target_link_libraries(ecwolf ${EXTRA_LIBRARIES} SDL::SDL SDL::SDL_mixer SDL::SDL_net ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
+target_include_directories(ecwolf PRIVATE
+	${ZLIB_INCLUDE_DIR}
+	${BZIP2_INCLUDE_DIR}
+	${JPEG_INCLUDE_DIR}
+	${ECWolf_SOURCE_DIR}/src
+	${ECWolf_SOURCE_DIR}/src/g_shared
+	${LZMA_INCLUDE_DIR}
+	${ECWolf_SOURCE_DIR}/gdtoa
+	${CMAKE_BINARY_DIR}/gdtoa
+)
+
 set_target_properties(ecwolf PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR}
 	# On Linux look for any libraries we link against in the executable directory.

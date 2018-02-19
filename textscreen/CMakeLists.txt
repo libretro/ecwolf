@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 2.4 )
+cmake_minimum_required( VERSION 2.8.12 )
 
 if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
@@ -7,9 +7,6 @@ endif(COMMAND cmake_policy)
 if( CMAKE_COMPILER_IS_GNUC )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fomit-frame-pointer" )
 endif( CMAKE_COMPILER_IS_GNUC )
-
-find_package(SDL REQUIRED)
-include_directories(${SDL_INCLUDE_DIR})
 
 add_library( textscreen
 	txt_radiobutton.c
@@ -33,4 +30,4 @@ add_library( textscreen
 	txt_gui.c
 	txt_label.c
 )
-target_link_libraries( textscreen ${SDL_LIBRARY} )
+target_link_libraries( textscreen SDL::SDL )
