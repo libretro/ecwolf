@@ -313,7 +313,7 @@ else()
 endif()
 
 add_dependencies(ecwolf revision_check)
-target_link_libraries(ecwolf ${EXTRA_LIBRARIES} SDL::SDL SDL::SDL_mixer SDL::SDL_net ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
+target_link_libraries(ecwolf ${EXTRA_LIBRARIES} SDL::SDL_mixer SDL::SDL_net SDL::SDL ${ZLIB_LIBRARY} ${BZIP2_LIBRARIES} ${JPEG_LIBRARIES} lzma gdtoa)
 target_include_directories(ecwolf PRIVATE
 	${ZLIB_INCLUDE_DIR}
 	${BZIP2_INCLUDE_DIR}
