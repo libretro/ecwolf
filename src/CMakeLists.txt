@@ -322,8 +322,8 @@ target_include_directories(ecwolf PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/g_shared
 	${LZMA_INCLUDE_DIR}
-	${ECWolf_SOURCE_DIR}/gdtoa
-	${CMAKE_BINARY_DIR}/gdtoa
+	${ECWolf_SOURCE_DIR}/deps/gdtoa
+	${CMAKE_BINARY_DIR}/deps/gdtoa
 )
 
 set_target_properties(ecwolf PROPERTIES
