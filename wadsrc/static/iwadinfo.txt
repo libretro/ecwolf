@@ -139,6 +139,7 @@ IWad
 	Autoname = "MacWolf.First"
 	Mapinfo = "mapinfo/macwolf3d.txt"
 	MustContain = "MACPLAY", "MAPLIST"
+	Flags = Preview
 	Game = "MacWolf3D"
 }
 
@@ -148,7 +149,7 @@ IWad
 	Autoname = "MacWolf.Third"
 	Mapinfo = "mapinfo/macwolf3d.txt"
 	MustContain = "MACPLAY", "HTLRA0"
-	Flags = Resource
+	Flags = Preview, Resource
 	Game = "MacWolf3D"
 }
 
@@ -158,6 +159,7 @@ LevelSet "wolflvls.bin"
 	Autoname = "MacWolf.Second"
 	Required = "Wolfenstein 3D: The Third Encounter (Data)"
 	Mapinfo = "mapinfo/macwolf3d.txt"
+	Flags = Preview
 	Game = "MacWolf3D"
 }
 
