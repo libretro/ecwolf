@@ -1,5 +1,5 @@
 add_custom_target(revision_check ALL
-	COMMAND updaterevision . ${CMAKE_CURRENT_BINARY_DIR}/svnrevision.h
+	COMMAND updaterevision ${CMAKE_CURRENT_BINARY_DIR}/hginfo.h
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 	DEPENDS updaterevision
 )
@@ -239,6 +239,7 @@ set(SOURCE_FILES
 	gamemap.cpp
 	gamemap_planes.cpp
 	gamemap_uwmf.cpp
+	hginfo.cpp
 	id_ca.cpp
 	id_in.cpp
 	id_sd.cpp
@@ -317,8 +318,9 @@ target_include_directories(ecwolf PRIVATE
 	${ZLIB_INCLUDE_DIR}
 	${BZIP2_INCLUDE_DIR}
 	${JPEG_INCLUDE_DIR}
-	${ECWolf_SOURCE_DIR}/src
-	${ECWolf_SOURCE_DIR}/src/g_shared
+	${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/g_shared
 	${LZMA_INCLUDE_DIR}
 	${ECWolf_SOURCE_DIR}/gdtoa
 	${CMAKE_BINARY_DIR}/gdtoa

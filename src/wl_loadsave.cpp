@@ -66,7 +66,7 @@ extern unsigned vbufPitch;
 
 namespace GameSave {
 
-long long SaveVersion = SAVEVER;
+unsigned long long SaveVersion = GetSaveVersion();
 DWORD SaveProdVersion = SAVEPRODVER;
 bool param_foreginsave = false;
 
@@ -291,11 +291,11 @@ bool SetupSaveGames()
 				char* savesig = M_GetPNGText(png, "ECWolf Save Version");
 				if(savesig)
 				{
-					if(strncmp(savesig, SAVESIG, 10) != 0) // Should be "ECWOLFSAVE"
+					if(strncmp(savesig, GetSaveSignature(), 10) != 0) // Should be "ECWOLFSAVE"
 						sFile.oldVersion = true;
 					else
 					{
-						long long savever = atoll(savesig+10);
+						unsigned long long savever = atoll(savesig+10);
 						char *prodver = M_GetPNGText(png, "ECWolf Save Product Version");
 						// If the build was done in the revision control tree, then
 						// savever should be used for better precision.  Otherwise
@@ -651,7 +651,7 @@ bool Save(const FString &filename, const FString &title)
 	if(!quickSaveLoad)
 		DrawLSAction(1);
 
-	SaveVersion = SAVEVER;
+	SaveVersion = GetSaveVersion();
 	SaveProdVersion = SAVEPRODVER;
 
 	// If we get hubs this will need to be moved so that we can have multiple of them
@@ -665,7 +665,7 @@ bool Save(const FString &filename, const FString &title)
 	SaveScreenshot(fileh);
 	M_AppendPNGText(fileh, "Software", "ECWolf");
 	M_AppendPNGText(fileh, "Engine", GAMESIG);
-	M_AppendPNGText(fileh, "ECWolf Save Version", SAVESIG);
+	M_AppendPNGText(fileh, "ECWolf Save Version", GetSaveSignature());
 	{
 		char saveprodver[11];
 		sprintf(saveprodver, "%u", SAVEPRODVER);

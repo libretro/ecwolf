@@ -663,9 +663,7 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 	}
 	else
 	{
-		FString caption = GAMENAME " " DOTVERSIONSTR;
-
-		Screen = SDL_CreateWindow (caption,
+		Screen = SDL_CreateWindow (GetGameCaption(),
 			SDL_WINDOWPOS_UNDEFINED_DISPLAY(vid_adapter), SDL_WINDOWPOS_UNDEFINED_DISPLAY(vid_adapter),
 			width, height, (fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
 
@@ -687,7 +685,7 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 		GammaTable[0][i] = GammaTable[1][i] = GammaTable[2][i] = i;
 	}
 #else
-	SDL_WM_SetCaption(GAMENAME " " DOTVERSIONSTR, NULL);
+	SDL_WM_SetCaption(GetGameCaption(), NULL);
 
 	if(vid_displaybits == static_cast<unsigned>(-1))
 	{

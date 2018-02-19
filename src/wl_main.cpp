@@ -1133,7 +1133,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 	{
 		if(hasError) printf("\n");
 		printf(
-			GAMENAME " v" DOTVERSIONSTR "\n"
+			"%s\n"
 			"http://maniacsvault.net/ecwolf/\n"
 			"Based on Wolf4SDL v1.7\n"
 			"Ported by Chaos-Software (http://www.chaos-software.de.vu)\n"
@@ -1176,7 +1176,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			" --port <number>        Port number to use for network communications.\n"
 			" --debugnet             Enable network debugging messages.\n"
 			" --foreignsave          Disable save game validity checking.\n"
-			, defaultSampleRate
+			, GetGameCaption(), defaultSampleRate
 		);
 		exit(1);
 	}

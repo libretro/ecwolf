@@ -1,8 +1,8 @@
 /*
-** wl_loadsave.h
+** hginfo.cpp
 **
 **---------------------------------------------------------------------------
-** Copyright 2012 Braden Obrzut
+** Copyright 2018 Braden Obrzut
 ** All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
@@ -29,31 +29,46 @@
 ** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **---------------------------------------------------------------------------
 **
-**
 */
 
-#ifndef __WL_LOADSAVE_H__
-#define __WL_LOADSAVE_H__
+#include "hginfo.h"
+#include "version.h"
 
-class FString;
-class Menu;
-class MenuItem;
+#define __GETSAVESIG(x) #x
+#define GETSAVESIG(x) "ECWOLFSAVE" __GETSAVESIG(x)
+#if HG_DATE_INT < MINSAVEVER
+#define SAVEVER	SAVEVERUNDEFINED
+#else
+#define SAVEVER	HG_DATE_INT
+#endif
+#define SAVESIG	GETSAVESIG(SAVEVER)
 
-namespace GameSave
+const char *GetVersionDescription()
 {
-	extern unsigned long long SaveVersion;
-	extern DWORD SaveProdVersion;
-	extern bool param_foreginsave;
-
-	Menu		&GetLoadMenu();
-	MenuItem	*GetLoadMenuItem();
-	Menu		&GetSaveMenu();
-	MenuItem	*GetSaveMenuItem();
-	void		InitMenus();
-	void		QuickLoadOrSave(bool load);
-
-	bool		Load(const FString &filename);
-	bool		Save(const FString &filename, const FString &title);
+	return HG_DESCRIPTION;
 }
 
-#endif
+const char *GetVersionHash()
+{
+	return HG_HASH;
+}
+
+const char *GetVersionTime()
+{
+	return HG_TIME;
+}
+
+unsigned long long GetSaveVersion()
+{
+	return SAVEVER;
+}
+
+const char *GetSaveSignature()
+{
+	return SAVESIG;
+}
+
+const char *GetGameCaption()
+{
+	return GAMENAME " " DOTVERSIONSTR_NOREV " (" HG_TIME ")";
+}

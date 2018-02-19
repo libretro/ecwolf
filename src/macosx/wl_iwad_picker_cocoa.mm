@@ -272,11 +272,14 @@ static NSArray* GetKnownExtensions()
 
 - (int)pickIWad:(WadStuff *)wads num:(int) numwads showWindow:(bool) showwin defaultWad:(int) defaultiwad
 {
+	FString caption;
+	caption.Format("%s: Select an IWAD to use", GetGameCaption());
+
 	cancelled = false;
 
 	app = [NSApplication sharedApplication];
 	//id windowTitle = [NSString stringWithFormat:@"%s %s", GAMENAME, GetVersionString()];
-	id windowTitle = [NSString stringWithUTF8String:GAMESIG " " DOTVERSIONSTR ": Select an IWAD to use"];
+	id windowTitle = [NSString stringWithUTF8String:caption.GetChars()];
 
 	NSRect frame = NSMakeRect(0, 0, 440, 450);
 	window = [[NSWindow alloc] initWithContentRect:frame styleMask:NSTitledWindowMask backing:NSBackingStoreBuffered defer:NO];

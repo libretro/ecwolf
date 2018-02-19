@@ -87,9 +87,12 @@ int I_PickIWad_Gtk (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 	int close_style = 0;
 	int i;
 
+	FString caption;
+	caption.Format("%s: Select an IWAD to use", GetGameCaption());
+
 	// Create the dialog window.
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title (GTK_WINDOW(window), GAMESIG " " DOTVERSIONSTR ": Select an IWAD to use");
+	gtk_window_set_title (GTK_WINDOW(window), caption);
 	gtk_window_set_position (GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 	gtk_container_set_border_width (GTK_CONTAINER(window), 10);
 	g_signal_connect (window, "delete_event", G_CALLBACK(gtk_main_quit), NULL);
@@ -227,9 +230,10 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 	const char *str;
 	if((str=getenv("KDE_FULL_SESSION")) && strcmp(str, "true") == 0)
 	{
-		FString cmd("kdialog --title \"" GAMESIG " " DOTVERSIONSTR ": Select an IWAD to use\""
-		            " --menu \"" GAMENAME " found more than one IWAD\n"
-		            "Select from the list below to determine which one to use:\"");
+		FString cmd;
+		cmd.Format("kdialog --title \"%s: Select an IWAD to use\""
+		           " --menu \"" GAMENAME " found more than one IWAD\n"
+		           "Select from the list below to determine which one to use:\"", GetGameCaption());
 
 		for(i = 0; i < numwads; ++i)
 		{
@@ -324,7 +328,9 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 		exit(-1);
 	}
 
-    TXT_SetDesktopTitle(const_cast<char*>(GAMESIG" "DOTVERSIONSTR": Select an IWAD to use"));
+	FString caption;
+	caption.Format("%s: Select an IWAD to use", GetGameCaption());
+    TXT_SetDesktopTitle(const_cast<char*>(caption.GetChars()));
 	window = TXT_NewWindow(const_cast<char*>("Pick a game wad"));
 	txt_table_t *table = TXT_NewTable(1);
 
