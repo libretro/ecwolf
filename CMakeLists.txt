@@ -27,6 +27,19 @@ if(CMAKE_CROSSCOMPILING)
 	include(${IMPORT_EXECUTABLES})
 endif()
 
+# Replacement variables for a possible long list of C/C++ compilers compatible with GCC
+if( "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" )
+	set( ZD_CMAKE_COMPILER_IS_GNUC_COMPATIBLE TRUE )
+else()
+	set( ZD_CMAKE_COMPILER_IS_GNUC_COMPATIBLE FALSE )
+endif()
+
+if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+	set( ZD_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE TRUE )
+else()
+	set( ZD_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE FALSE )
+endif()
+
 # Simplify pk3 building, add_pk3(filename srcdirectory)
 function( add_pk3 PK3_NAME PK3_DIR )
 	# Generate target name. Just use "pk3" for main pk3 target.

@@ -75,11 +75,12 @@ int main(int argc, char **argv)
 
 	if (gotrev)
 	{
+		struct tm *lt;
+
 		hash = lastlog;
 
 		hgdate = atoi ( hgdateString );
-		char *endptr;
-		struct tm *lt = gmtime( &hgdate );
+		lt = gmtime( &hgdate );
 		sprintf ( hgdateString, "%d%02d%02d-%02d%02d", lt->tm_year - 100, lt->tm_mon + 1, lt->tm_mday, lt->tm_hour, lt->tm_min);
 	}
 	if (hash == NULL)
