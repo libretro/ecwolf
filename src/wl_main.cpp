@@ -866,8 +866,11 @@ int CheckRatio (int width, int height, int *trueratio)
 			fakeratio = (height * 5/4 == width) ? 4 : 0;
 		}
 	}*/
-	// If the size is approximately 16:9, consider it so.
-	if (abs (height * 16/9 - width) < 10)
+	if (abs (height * 64/27 - width) < 5 || abs (height * 43/18 - width) < 5)
+	{
+		ratio = ASPECT_64_27;
+	}
+	else if (abs (height * 16/9 - width) < 10) // If the size is approximately 16:9, consider it so.
 	{
 		ratio = ASPECT_16_9;
 	}
@@ -981,6 +984,8 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 				vid_aspect = ASPECT_16_9;
 			else if(strcmp(ratio, "5:4") == 0)
 				vid_aspect = ASPECT_5_4;
+			else if(strcmp(ratio, "21:9") == 0)
+				vid_aspect = ASPECT_64_27;
 			else
 			{
 				printf("Unknown aspect ratio %s!\n", ratio);

@@ -53,12 +53,13 @@ void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight);
 
 const RatioInformation AspectCorrection[] =
 {
-	/* UNC */	{960,	600,	0x10000,	0,				48,			false},
-	/* 16:9 */	{1280,	450,	0x15555,	0,				48*3/4,		true},
-	/* 16:10 */	{1152,	500,	0x13333,	0,				48*5/6,		true},
-	/* 17:10 */ {1224,	471,	0x14666,	0,				48*40/51,	true},
-	/* 4:3 */	{960,	600,	0x10000,	0,				48,			false},
-	/* 5:4 */	{960,	640,	0x10000,(fixed)6.5*FRACUNIT,	48*15/16,	false}
+	/* UNC */    {960,  600, 0x10000, 0,                    48,         false},
+	/* 16:9 */   {1280, 450, 0x15555, 0,                    48*3/4,     true},
+	/* 16:10 */  {1152, 500, 0x13333, 0,                    48*5/6,     true},
+	/* 17:10 */  {1224, 471, 0x14666, 0,                    48*40/51,   true},
+	/* 4:3 */    {960,  600, 0x10000, 0,                    48,         false},
+	/* 5:4 */    {960,  640, 0x10000, (fixed) 6.5*FRACUNIT, 48*15/16,   false},
+	/* 64:27 */  {1720, 346, 0x1C71C, 0,                    48*173/300, true},
 };
 
 /*static*/ byte *vbuf = NULL;
