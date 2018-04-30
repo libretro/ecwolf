@@ -582,12 +582,16 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	if(config.GetSetting("ShowPreviewGames"))
 		showpreviewgames = config.GetSetting("ShowPreviewGames")->GetInteger() != 0;
 
-	bool useProgdir = false;
+	FString datawadDir;
 	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL, true);
 	if(!datawadRes)
 	{
-		useProgdir = true;
-		datawadRes = FResourceFile::OpenResourceFile(progdir + PATH_SEPARATOR + datawad, NULL, true);
+		if((datawadRes = FResourceFile::OpenResourceFile(progdir + PATH_SEPARATOR + datawad, NULL, true)))
+			datawadDir = progdir + PATH_SEPARATOR;
+#if !defined(__APPLE__) && !defined(_WIN32)
+		else if((datawadRes = FResourceFile::OpenResourceFile(FString(INSTALL_PREFIX "/share/" BINNAME "/") + datawad, NULL, true)))
+			datawadDir = FString(INSTALL_PREFIX "/share/" BINNAME "/");
+#endif
 	}
 	if(!datawadRes)
 		I_Error("Could not open %s!", datawad);
@@ -646,7 +650,10 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	}
 	while(split != 0);
 
+#if !defined(__APPLE__) && !defined(_WIN32)
+	LookForGameData(datawadRes, basefiles, "/usr/share/games/wolf3d");
 	LookForGameData(datawadRes, basefiles, "/usr/local/share/games/wolf3d");
+#endif
 
 	// Look for a steam install. (Basically from ZDoom)
 	{
@@ -757,10 +764,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	WadStuff &base = basefiles[pick];
 	selectedGame = &iwadTypes[base.Type];
 
-	if(!useProgdir)
-		wadfiles.Push(datawad);
-	else
-		wadfiles.Push(progdir + PATH_SEPARATOR + datawad);
+	wadfiles.Push(datawadDir + datawad);
 	for(unsigned int i = 0;i < base.Path.Size();++i)
 	{
 		wadfiles.Push(base.Path[i]);

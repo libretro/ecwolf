@@ -144,6 +144,12 @@ elseif(ANDROID)
 	set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} ${TOUCHCONTROLS_LIBRARY} log)
 endif()
 
+# Derive version info and generate header
+string(TOUPPER "${PRODUCT_NAME}" PRODUCT_SIGNATURE)
+string(TOLOWER "${PRODUCT_NAME}" PRODUCT_BINARY)
+math(EXPR VERSION_INTEGER "(${VERSION_MAJOR}<<20) | (${VERSION_MINOR}<<8) | ${VERSION_PATCH}")
+configure_file(versiondefs.h.in versiondefs.h)
+
 # Glob for the header files so project generation can include them
 file(GLOB HEADER_FILES
 	g_shared/*.h
@@ -155,6 +161,7 @@ file(GLOB HEADER_FILES
 	thingdef/*.h
 	*.h
 )
+list(APPEND HEADER_FILES ${CMAKE_CURRENT_BINARY_DIR}/versiondefs.h)
 
 set(SOURCE_FILES
 	g_blake/a_smartanim.cpp
@@ -335,7 +342,15 @@ set_target_properties(ecwolf PROPERTIES
 
 # Install
 if(NOT ANDROID)
-	install(TARGETS ecwolf BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION bin COMPONENT Runtime)
+	install(TARGETS ecwolf BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
+
+	if(NOT WIN32 AND NOT APPLE)
+		install(FILES "posix/ecwolf.desktop" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications")
+		install(FILES "macosx/icon.iconset/icon_16x16.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps" RENAME "ecwolf.png")
+		install(FILES "macosx/icon.iconset/icon_32x32.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps" RENAME "ecwolf.png")
+		install(FILES "macosx/icon.iconset/icon_32x32@2x.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/64x64/apps" RENAME "ecwolf.png")
+		install(FILES "macosx/icon.iconset/icon_512x512@2x.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/1024x1024/apps" RENAME "ecwolf.png")
+	endif()
 endif()
 
 # Project file source groupings

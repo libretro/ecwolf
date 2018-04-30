@@ -6,8 +6,48 @@ if(POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
 endif()
 
+include(src/versiondefs.cmake)
+
+# We need a newer CPack version to get desirable results.
+# Note: CMake 3.11+ recommended for best results
+if(NOT CMAKE_VERSION VERSION_LESS "3.6.0")
+	set(USE_CPACK ON)
+else()
+	set(USE_CPACK OFF)
+endif()
+
+if(USE_CPACK)
+	# Right now all we support is DEB, but we'll probably want to make this a
+	# user option later?
+	set(CPACK_GENERATOR "DEB")
+	set(CPACK_PACKAGE_CONTACT "First Last <example@example.com>" CACHE STRING "Contact info for archive maintainer.")
+	set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Advanced source port of the Wolfenstein 3D engine.\n Provides enhanced game engine for playing Wolfenstein 3D, Spear of Destiny, and\n Super 3-D Noah's Ark. Requires the original game data files.")
+	string(TOLOWER "${PRODUCT_NAME}" CPACK_PACKAGE_NAME)
+	# Use same prefix for packaging for consistency
+	set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+	set(CPACK_STRIP_FILES ON)
+	set(CPACK_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+	set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
+	set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
+	set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
+
+	set(CPACK_DEB_COMPONENT_INSTALL ON)
+	set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://maniacsvault.net/ecwolf/")
+	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+	set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION ON)
+	set(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
+	include(CPack)
+endif()
+
 # Multiarch support
 if(UNIX AND NOT APPLE)
+	# If we're installing to opt, then we want /opt/ecwolf
+	if("${CMAKE_INSTALL_PREFIX}" STREQUAL "/opt")
+		set(CMAKE_INSTALL_BINDIR "${PRODUCT_DIRECTORY}")
+		set(CMAKE_INSTALL_DATADIR "/opt")
+	endif()
+
 	include(GNUInstallDirs)
 elseif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 	# CMAKE_ prefix used here to match the variable set by GNUInstallDirs.
@@ -55,6 +95,7 @@ function( add_pk3 PK3_NAME PK3_DIR )
 		add_custom_target( ${PK3_TARGET} ALL
 			COMMAND zipdir -udf $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME} ${PK3_DIR}
 			DEPENDS zipdir )
+		install(FILES $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_FULL_DATADIR}/${PRODUCT_DIRECTORY}")
 	else()
 		# Prepare assets directory for APK
 		add_custom_target( ${PK3_TARGET} ALL
@@ -147,6 +188,19 @@ if(ANDROID)
 endif()
 
 add_subdirectory(src)
+
+if(USE_CPACK AND NOT APPLE AND NOT WIN32)
+	install(FILES docs/changelog DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
+	install(FILES docs/copyright DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
+	install(FILES docs/ecwolf.6 DESTINATION "${CMAKE_INSTALL_MANDIR}/man6")
+
+	# Lintian requires that man pages in deb packages are compressed.
+	find_program(GZIP_BINARY NAMES gzip DOC "gzip program for man page compression.")
+	if(GZIP_BINARY)
+		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -n9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}/changelog\")")
+		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -n9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MANDIR}/man6/ecwolf.6\")")
+	endif()
+endif()
 
 if( NOT CMAKE_CROSSCOMPILING )
 	export(TARGETS ${CROSS_EXPORTS} FILE "${CMAKE_BINARY_DIR}/ImportExecutables.cmake" )
