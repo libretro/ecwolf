@@ -34,6 +34,7 @@ if(USE_CPACK)
 	set(CPACK_DEB_COMPONENT_INSTALL ON)
 	set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
 	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://maniacsvault.net/ecwolf/")
+	set(CPACK_DEBIAN_PACKAGE_SECTION "games")
 	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 	set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION ON)
 	set(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
@@ -42,17 +43,19 @@ endif()
 
 # Multiarch support
 if(UNIX AND NOT APPLE)
-	# If we're installing to opt, then we want /opt/ecwolf
-	if("${CMAKE_INSTALL_PREFIX}" STREQUAL "/opt")
-		set(CMAKE_INSTALL_BINDIR "${PRODUCT_DIRECTORY}")
-		set(CMAKE_INSTALL_DATADIR "/opt")
-	endif()
+	# We are in the games section
+	set(CMAKE_INSTALL_BINDIR "games")
 
 	include(GNUInstallDirs)
 elseif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 	# CMAKE_ prefix used here to match the variable set by GNUInstallDirs.
-	# Value currently doesn't matter outside of Linux.
+	# Value currently doesn't matter outside of Linux these are more or less
+	# to keep the script working where values are expected.
+	set(CMAKE_INSTALL_BINDIR "bin")
+	set(CMAKE_INSTALL_DATAROOTDIR "share")
 	set(CMAKE_INSTALL_LIBDIR "lib")
+	set(CMAKE_INSTALL_MANDIR "share/man")
+	set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}")
 endif()
 
 option(ANDROID "Build for Android" OFF)
