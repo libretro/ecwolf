@@ -513,7 +513,7 @@ void QuickLoadOrSave(bool load)
 		return;
 	}
 
-	ShowMenu(loadGame);
+	ShowMenu(load ? loadGame : saveGame);
 }
 
 static void Serialize(FArchive &arc)
