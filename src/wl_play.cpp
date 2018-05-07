@@ -70,6 +70,7 @@ unsigned tics;
 // control info
 //
 #define JoyAx(x) (32+(x<<1))
+#define CS_AxisDigital -1
 ControlScheme controlScheme[] =
 {
 	{ bt_moveforward,		"Forward",		JoyAx(1),	sc_UpArrow,		-1, offsetof(TicCmd_t, controly), 1 },
@@ -78,30 +79,30 @@ ControlScheme controlScheme[] =
 	{ bt_straferight,		"Strafe Right",	JoyAx(0)+1,	sc_Peroid,		-1, offsetof(TicCmd_t, controlstrafe), 0 },
 	{ bt_turnleft,			"Turn Left",	JoyAx(3),	sc_LeftArrow,	-1, offsetof(TicCmd_t, controlx), 1 },
 	{ bt_turnright,			"Turn Right",	JoyAx(3)+1,	sc_RightArrow,	-1, offsetof(TicCmd_t, controlx), 0 },
-	{ bt_attack,			"Attack",		0,			sc_Control,		0,  -1, 0},
-	{ bt_strafe,			"Strafe",		3,			sc_Alt,			-1, -1, 0 },
-	{ bt_run,				"Run",			2,			sc_LShift,		-1, -1, 0 },
-	{ bt_use,				"Use",			1,			sc_Space,		-1, -1, 0 },
-	{ bt_slot1,				"Slot 1",		-1,			sc_1,			-1, -1, 0 },
-	{ bt_slot2,				"Slot 2", 		-1,			sc_2,			-1, -1, 0 },
-	{ bt_slot3,				"Slot 3",		-1,			sc_3,			-1, -1, 0 },
-	{ bt_slot4,				"Slot 4",		-1,			sc_4,			-1, -1, 0 },
-	{ bt_slot5,				"Slot 5",		-1,			sc_5,			-1, -1, 0 },
-	{ bt_slot6,				"Slot 6",		-1,			sc_6,			-1, -1, 0 },
-	{ bt_slot7,				"Slot 7",		-1,			sc_7,			-1, -1, 0 },
-	{ bt_slot8,				"Slot 8",		-1,			sc_8,			-1, -1, 0 },
-	{ bt_slot9,				"Slot 9",		-1,			sc_9,			-1, -1, 0 },
-	{ bt_slot0,				"Slot 0",		-1,			sc_0,			-1, -1, 0 },
-	{ bt_nextweapon,		"Next Weapon",	4,			-1,				-1, -1, 0 },
-	{ bt_prevweapon,		"Prev Weapon",	5, 			-1,				-1, -1, 0 },
-	{ bt_altattack,			"Alt Attack",	-1,			-1,				-1, -1, 0 },
-	{ bt_reload,			"Reload",		-1,			-1,				-1, -1, 0 },
-	{ bt_zoom,				"Zoom",			-1,			-1,				-1, -1, 0 },
-	{ bt_automap,			"Automap",		-1,			-1,				-1, -1, 0 },
-	{ bt_showstatusbar,		"Show Status",	-1,			sc_Tab,			-1,	-1, 0 },
+	{ bt_attack,			"Attack",		0,			sc_Control,		0,  CS_AxisDigital, 0},
+	{ bt_strafe,			"Strafe",		3,			sc_Alt,			-1, CS_AxisDigital, 0 },
+	{ bt_run,				"Run",			2,			sc_LShift,		-1, CS_AxisDigital, 0 },
+	{ bt_use,				"Use",			1,			sc_Space,		-1, CS_AxisDigital, 0 },
+	{ bt_slot1,				"Slot 1",		-1,			sc_1,			-1, CS_AxisDigital, 0 },
+	{ bt_slot2,				"Slot 2", 		-1,			sc_2,			-1, CS_AxisDigital, 0 },
+	{ bt_slot3,				"Slot 3",		-1,			sc_3,			-1, CS_AxisDigital, 0 },
+	{ bt_slot4,				"Slot 4",		-1,			sc_4,			-1, CS_AxisDigital, 0 },
+	{ bt_slot5,				"Slot 5",		-1,			sc_5,			-1, CS_AxisDigital, 0 },
+	{ bt_slot6,				"Slot 6",		-1,			sc_6,			-1, CS_AxisDigital, 0 },
+	{ bt_slot7,				"Slot 7",		-1,			sc_7,			-1, CS_AxisDigital, 0 },
+	{ bt_slot8,				"Slot 8",		-1,			sc_8,			-1, CS_AxisDigital, 0 },
+	{ bt_slot9,				"Slot 9",		-1,			sc_9,			-1, CS_AxisDigital, 0 },
+	{ bt_slot0,				"Slot 0",		-1,			sc_0,			-1, CS_AxisDigital, 0 },
+	{ bt_nextweapon,		"Next Weapon",	4,			-1,				-1, CS_AxisDigital, 0 },
+	{ bt_prevweapon,		"Prev Weapon",	5, 			-1,				-1, CS_AxisDigital, 0 },
+	{ bt_altattack,			"Alt Attack",	-1,			-1,				-1, CS_AxisDigital, 0 },
+	{ bt_reload,			"Reload",		-1,			-1,				-1, CS_AxisDigital, 0 },
+	{ bt_zoom,				"Zoom",			-1,			-1,				-1, CS_AxisDigital, 0 },
+	{ bt_automap,			"Automap",		-1,			-1,				-1, CS_AxisDigital, 0 },
+	{ bt_showstatusbar,		"Show Status",	-1,			sc_Tab,			-1,	CS_AxisDigital, 0 },
 
 	// End of List
-	{ bt_nobutton,			NULL, -1, -1, -1, -1, 0 }
+	{ bt_nobutton,			NULL, -1, -1, -1, CS_AxisDigital, 0 }
 };
 ControlScheme &schemeAutomapKey = controlScheme[25]; // When the input system is redone, hopefully we don't need this kind of thing
 
@@ -452,7 +453,7 @@ void PollJoystickMove (void)
 				*(int*)((char*)&control[ConsolePlayer] + scheme->axis) += scheme->negative ? -axis : axis;
 		}
 	}
-	while((++scheme)->axis);
+	while((++scheme)->axis != CS_AxisDigital);
 }
 
 /*
