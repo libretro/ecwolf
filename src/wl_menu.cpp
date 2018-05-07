@@ -648,7 +648,6 @@ void US_ControlPanel (ScanCode scancode)
 			{
 				MenuFadeOut ();
 				StartCPMusic ("XJAZNAZI");
-				ClearMemory ();
 				VL_ReadPalette("IDGUYPAL");
 
 				CA_CacheScreen(TexMan("IDGUYS"));

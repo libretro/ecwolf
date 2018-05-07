@@ -577,7 +577,6 @@ void DebugMLI()
 {
 	GiveMLI();
 
-	ClearMemory ();
 	ClearSplitVWB ();
 
 	Message (language["STR_CHEATER"]);

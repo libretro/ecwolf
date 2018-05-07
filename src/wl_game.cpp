@@ -549,7 +549,6 @@ void RecordDemo (void)
 
 	StopMusic ();
 	VW_FadeOut ();
-	ClearMemory ();
 
 	FinishDemoRecord ();
 }
@@ -607,7 +606,6 @@ void PlayDemo (int demonumber)
 	demoplayback = false;
 
 	StopMusic ();
-	ClearMemory ();
 }
 
 //==========================================================================
@@ -727,7 +725,6 @@ void Died (void)
 	}
 
 	SD_WaitSoundDone ();
-	ClearMemory();
 
 	if ((players[0].lives > -1) || (gamestate.difficulty->LivesCount < 0))
 		players[0].state = player_t::PST_REBORN;
@@ -772,7 +769,6 @@ bool GameLoop (void)
 	bool dointermission;
 
 restartgame:
-	ClearMemory ();
 	VW_FadeOut();
 	DrawPlayScreen ();
 	died = false;
@@ -922,7 +918,6 @@ restartgame:
 						bool endSequence = next.IndexOf("EndSequence:") == 0;
 
 						VL_FadeOut(0, 255, RPART(levelInfo->ExitFadeColor), GPART(levelInfo->ExitFadeColor), BPART(levelInfo->ExitFadeColor), levelInfo->ExitFadeDuration);
-						ClearMemory();
 
 						if(dointermission)
 						{
@@ -933,8 +928,6 @@ restartgame:
 							}
 
 							Victory (false);
-
-							ClearMemory ();
 						}
 
 						bool gotoMenu = false;
@@ -943,8 +936,6 @@ restartgame:
 							IntermissionInfo *intermission = IntermissionInfo::Find(next.Mid(12));
 							gotoMenu = ShowIntermission(intermission);
 						}
-
-						ClearMemory();
 
 						CheckHighScore (players[0].score,levelInfo);
 						return gotoMenu;
@@ -966,8 +957,6 @@ restartgame:
 
 				if(dointermission)
 					VL_FadeOut(0, 255, RPART(levelInfo->ExitFadeColor), GPART(levelInfo->ExitFadeColor), BPART(levelInfo->ExitFadeColor), levelInfo->ExitFadeDuration);
-
-				ClearMemory ();
 
 				StartTravel ();
 				if(dointermission)
@@ -1005,8 +994,6 @@ restartgame:
 				if(screenHeight % 200 != 0)
 					VL_ClearScreen(0);
 
-				ClearMemory ();
-
 				CheckHighScore (players[0].score,levelInfo);
 				return false;
 
@@ -1016,7 +1003,6 @@ restartgame:
 
 			default:
 				if(viewsize == 21) DrawPlayScreen();
-				ClearMemory ();
 				break;
 		}
 	} while (1);

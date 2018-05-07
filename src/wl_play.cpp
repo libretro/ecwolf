@@ -684,7 +684,6 @@ void CheckKeys (void)
 		//
 		if (Keyboard[sc_B] && Keyboard[sc_A] && Keyboard[sc_T])
 		{
-			ClearMemory ();
 			ClearSplitVWB ();
 
 			Message ("Commander Keen is also\n"
@@ -714,7 +713,6 @@ void CheckKeys (void)
 	//
 	if (Keyboard[sc_BackSpace] && Keyboard[sc_LShift] && Keyboard[sc_Alt])
 	{
-		ClearMemory ();
 		ClearSplitVWB ();
 
 		Message ("Debugging keys are\nnow available!");
@@ -751,7 +749,6 @@ void CheckKeys (void)
 	if (scan == sc_F10 ||
 		scan == sc_F9 || scan == sc_F7 || scan == sc_F8)     // pop up quit dialog
 	{
-		ClearMemory ();
 		ClearSplitVWB ();
 		US_ControlPanel (scan);
 
@@ -764,7 +761,7 @@ void CheckKeys (void)
 	if ((scan >= sc_F1 && scan <= sc_F9) || scan == sc_Escape || control[ConsolePlayer].buttonstate[bt_esc])
 	{
 		int lastoffs = StopMusic ();
-		ClearMemory ();
+		SD_StopDigitized();
 
 		US_ControlPanel (control[ConsolePlayer].buttonstate[bt_esc] ? sc_Escape : scan);
 

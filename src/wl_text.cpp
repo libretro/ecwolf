@@ -902,8 +902,6 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 		return false;
 	EndTextInProgress = true;
 
-	ClearMemory ();
-
 	// Determine if we're using an exit text or enter text. The enter text
 	// overrides the exit text since it's mainly used for entering secret levels.
 	// Also collect any information
@@ -974,8 +972,6 @@ bool EndText (int exitClusterNum, int enterClusterNum)
 // Episode start execute entertext.
 void EnterText(unsigned int cluster)
 {
-	ClearMemory ();
-
 	ClusterInfo &clusterInfo = ClusterInfo::Find(cluster);
 
 	if(!clusterInfo.EnterText.IsEmpty())
