@@ -654,7 +654,7 @@ class FMacBin : public FResourceFile
 					if(refPtr->ref.resID >= mapbase && refPtr->ref.resID < mapbase+mapmax)
 					{
 						memset(lump->Name, 0, 8); // Some code requires 0-filled
-						sprintf(lump->Name, "MAP%02d", refPtr->ref.resID-mapbase+1);
+						sprintf(lump->Name, "MAP%02u", refPtr->ref.resID-mapbase+1);
 					}
 				}
 			}

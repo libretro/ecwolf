@@ -569,6 +569,7 @@ void RecordDemo (void)
 
 void PlayDemo (int demonumber)
 {
+#if 0
 	int length;
 	char demoName[9];
 	sprintf(demoName, "DEMO%d", demonumber);
@@ -606,6 +607,7 @@ void PlayDemo (int demonumber)
 	demoplayback = false;
 
 	StopMusic ();
+#endif
 }
 
 //==========================================================================

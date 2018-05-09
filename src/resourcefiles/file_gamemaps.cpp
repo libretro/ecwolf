@@ -144,7 +144,7 @@ bool FGamemaps::Open(bool quiet)
 		FMapLump &markerLump = Lumps[i*NUM_MAP_LUMPS];
 		// Hey we don't need to use a temporary name here!
 		// First map is MAP01 and so forth.
-		char lumpname[7];
+		char lumpname[14];
 		sprintf(lumpname, "MAP%02d", i+1);
 		markerLump.Owner = this;
 		markerLump.LumpNameSetup(lumpname);

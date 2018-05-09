@@ -59,7 +59,7 @@ if( ZD_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE )
 	if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0 )
 		set( CMAKE_CXX_FLAGS "-Wno-implicit-fallthrough ${CMAKE_CXX_FLAGS}")
 	endif()
-	set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}" )
+	set( CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-unused-result -Wno-missing-field-initializers ${CMAKE_CXX_FLAGS}" )
 endif()
 
 if(WIN32)

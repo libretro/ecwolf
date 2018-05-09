@@ -155,15 +155,13 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 
 				if(sc->str.CompareNoCase("end") == 0)
 				{
-					SndSeqInstruction instr;
-					instr.Instruction = SSI_End;
+					SndSeqInstruction instr = {SSI_End};
 					seq.AddInstruction(instr);
 					break;
 				}
 				else if(sc->str.CompareNoCase("delay") == 0)
 				{
-					SndSeqInstruction instr;
-					instr.Instruction = SSI_Delay;
+					SndSeqInstruction instr = {SSI_Delay};
 					instr.ArgumentRand = 0;
 
 					sc.MustGetToken(TK_IntConst);
@@ -173,8 +171,7 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 				}
 				else if(sc->str.CompareNoCase("delayrand") == 0)
 				{
-					SndSeqInstruction instr;
-					instr.Instruction = SSI_Delay;
+					SndSeqInstruction instr = {SSI_Delay};
 
 					sc.MustGetToken(TK_IntConst);
 					instr.Argument = sc->number;
@@ -186,8 +183,7 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 				}
 				else if(sc->str.CompareNoCase("play") == 0)
 				{
-					SndSeqInstruction instr;
-					instr.Instruction = SSI_PlaySound;
+					SndSeqInstruction instr = {SSI_PlaySound};
 
 					if(!sc.GetNextString())
 						sc.ScriptMessage(Scanner::ERROR, "Expected logical sound name.");
@@ -197,8 +193,7 @@ void SndSeqTable::ParseSoundSequence(int lumpnum)
 				}
 				else if(sc->str.CompareNoCase("playrepeat") == 0)
 				{
-					SndSeqInstruction instr;
-					instr.Instruction = SSI_PlaySound|SSI_WaitForFinish|SSI_Repeat;
+					SndSeqInstruction instr = {SSI_PlaySound|SSI_WaitForFinish|SSI_Repeat};
 
 					if(!sc.GetNextString())
 						sc.ScriptMessage(Scanner::ERROR, "Expected logical sound name.");

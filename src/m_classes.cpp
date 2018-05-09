@@ -477,18 +477,18 @@ void ControlMenuItem::draw()
 	if(button.mouse != -1)
 	{
 		PrintX = 214;
-		char btn[8];
-		sprintf(btn, "MS%d", button.mouse);
+		FString btn;
+		btn.Format("MS%d", button.mouse);
 		US_Print(BigFont, btn, getTextColor());
 	}
 	if(button.joystick != -1)
 	{
 		PrintX = 266;
-		char btn[8];
+		FString btn;
 		if(button.joystick < 32)
-			sprintf(btn, "JY%d", button.joystick);
+			btn.Format("JY%d", button.joystick);
 		else
-			sprintf(btn, "A%d%c", (button.joystick-32)/2, (button.joystick&1) ? 'D' : 'U');
+			btn.Format("A%d%c", (button.joystick-32)/2, (button.joystick&1) ? 'D' : 'U');
 		US_Print(BigFont, btn, getTextColor());
 	}
 
