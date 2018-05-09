@@ -115,8 +115,8 @@ void AM_CheckKeys()
 
 	if(am_pause)
 	{
-		static const fixed PAN_AMOUNT = FRACUNIT/4;
-		static const fixed PAN_ANALOG_MULTIPLIER = 100;
+		const fixed PAN_AMOUNT = FixedDiv(FRACUNIT*10, AM_Main.GetScreenScale());
+		const fixed PAN_ANALOG_MULTIPLIER = PAN_AMOUNT/100;
 		fixed panx = 0, pany = 0;
 
 		if(control[ConsolePlayer].ambuttonstate[bt_panleft])
@@ -129,10 +129,10 @@ void AM_CheckKeys()
 			pany -= PAN_AMOUNT;
 
 		if(control[ConsolePlayer].controlpanx != 0)
-			panx += control[ConsolePlayer].controlpanx * (PAN_ANALOG_MULTIPLIER + (100 * panxadjustment));
+			panx += control[ConsolePlayer].controlpanx * (PAN_ANALOG_MULTIPLIER * (panxadjustment+1));
 
 		if(control[ConsolePlayer].controlpany != 0)
-			pany += control[ConsolePlayer].controlpany * (PAN_ANALOG_MULTIPLIER + (100 * panxadjustment));
+			pany += control[ConsolePlayer].controlpany * (PAN_ANALOG_MULTIPLIER * (panxadjustment+1));
 
 		AM_Main.SetPanning(panx, pany, true);
 	}
@@ -314,9 +314,7 @@ void AutoMap::Draw()
 	const unsigned int mapwidth = map->GetHeader().width;
 	const unsigned int mapheight = map->GetHeader().height;
 
-	// Some magic, min scale is approximately small enough so that a rotated automap will fit on screen (22/32 ~ 1/sqrt(2))
-	const fixed minscale = ((screenHeight*22)<<(FRACBITS-5))/mapheight;
-	scale = minscale + FixedMul(absscale, (screenHeight<<(FRACBITS-3)) - minscale);
+	const fixed scale = GetScreenScale();
 
 	if(!(amFlags & AMF_Overlay))
 		screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, BackgroundColor.palcolor, BackgroundColor.color);
@@ -469,21 +467,21 @@ void AutoMap::Draw()
 			screen->FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);
 	}
 
-	DrawVector(AM_Arrow, 8, FixedMul(playerx - ofsx, scale), FixedMul(playery - ofsy, scale), (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
+	DrawVector(AM_Arrow, 8, FixedMul(playerx - ofsx, scale), FixedMul(playery - ofsy, scale), scale, (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
 
 	if((amFlags & AMF_ShowThings) && (am_cheat || gamestate.fullmap))
 	{
 		for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
 		{
 			if(am_cheat || (gamestate.fullmap && (iter->flags & FL_PLOTONAUTOMAP)))
-				DrawActor(iter, FixedMul(iter->x - ofsx, scale), FixedMul(iter->y - ofsy, scale));
+				DrawActor(iter, FixedMul(iter->x - ofsx, scale), FixedMul(iter->y - ofsy, scale), scale);
 		}
 	}
 
 	DrawStats();
 }
 
-void AutoMap::DrawActor(AActor *actor, fixed x, fixed y)
+void AutoMap::DrawActor(AActor *actor, fixed x, fixed y, fixed scale)
 {
 	{
 		fixed tmp = ((FixedMul(x, amcos) - FixedMul(y, amsin) + (amsizex<<(FRACBITS-1)))>>FRACBITS) + amx;
@@ -667,7 +665,7 @@ void AutoMap::DrawStats() const
 	}
 }
 
-void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, angle_t angle, const Color &c) const
+void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, fixed scale, angle_t angle, const Color &c) const
 {
 	int x1, y1, x2, y2;
 
@@ -740,6 +738,14 @@ FVector2 AutoMap::GetClipIntersection(const FVector2 &p1, const FVector2 &p2, un
 	}
 }
 
+// Returns size of a tile in pixels
+fixed AutoMap::GetScreenScale() const
+{
+	// Some magic, min scale is approximately small enough so that a rotated automap will fit on screen (22/32 ~ 1/sqrt(2))
+	const fixed minscale = ((screenHeight*22)<<(FRACBITS-5))/map->GetHeader().height;
+	return minscale + FixedMul(absscale, (screenHeight<<(FRACBITS-3)) - minscale);
+}
+
 void AutoMap::SetFlags(unsigned int flags, bool set)
 {
 	if(set)
@@ -778,8 +784,8 @@ void AutoMap::SetPanning(fixed x, fixed y, bool relative)
 	}
 	else
 	{
-		ampanx = 0;
-		ampany = 0;
+		ampanx = x;
+		ampany = y;
 	}
 }
 

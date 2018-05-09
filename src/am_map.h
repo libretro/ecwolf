@@ -92,16 +92,18 @@ public:
 
 	void CalculateDimensions(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 	void Draw();
+	fixed GetScale() const { return absscale; }
+	fixed GetScreenScale() const;
 	void SetFlags(unsigned int flags, bool set);
 	void SetPanning(fixed x, fixed y, bool relative);
 	void SetScale(fixed scale, bool relative);
 
 protected:
 	void ClipTile(TArray<FVector2> &points) const;
-	void DrawActor(class AActor *actor, fixed x, fixed y);
+	void DrawActor(class AActor *actor, fixed x, fixed y, fixed scale);
 	void DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const;
 	void DrawStats() const;
-	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, angle_t angle, const Color &c) const;
+	void DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, fixed scale, angle_t angle, const Color &c) const;
 	FVector2 GetClipIntersection(const FVector2 &p1, const FVector2 &p2, unsigned edge) const;
 	bool TransformTile(MapSpot spot, fixed x, fixed y, TArray<FVector2> &points) const;
 
@@ -113,7 +115,7 @@ private:
 	int amsizex, amsizey, amx, amy;
 	fixed ampanx, ampany;
 	fixed amsin, amcos;
-	fixed scale, absscale;
+	fixed absscale;
 	angle_t amangle;
 	unsigned short minmaxSel;
 
