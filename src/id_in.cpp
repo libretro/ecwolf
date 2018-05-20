@@ -73,13 +73,13 @@ void I_CheckKeyMods();
 // configuration variables
 //
 bool MousePresent;
-
+bool MouseWheel[4];
 
 // 	Global variables
-volatile bool		Keyboard[SDL_NUM_SCANCODES];
-volatile unsigned short Paused;
-volatile char		LastASCII;
-volatile ScanCode	LastScan;
+bool Keyboard[SDL_NUM_SCANCODES];
+unsigned short Paused;
+char LastASCII;
+ScanCode LastScan;
 
 static KeyboardDef KbdDefs = {
 	sc_Control,             // button0
@@ -470,6 +470,31 @@ static void processEvent(SDL_Event *event)
 			break;
 		}
 
+#if SDL_VERSION_ATLEAST(2,0,0)
+		case SDL_MOUSEWHEEL:
+		{
+			if(event->wheel.x > 0)
+				MouseWheel[di_west] = true;
+			else if(event->wheel.x < 0)
+				MouseWheel[di_east] = true;
+			if(event->wheel.y > 0)
+				MouseWheel[di_north] = true;
+			else if(event->wheel.y < 0)
+				MouseWheel[di_south] = true;
+			break;
+		}
+#else
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+		{
+			if(event->button.button == SDL_BUTTON_WHEELUP)
+				MouseWheel[di_north] = true;
+			if(event->button.button == SDL_BUTTON_WHEELDOWN)
+				MouseWheel[di_south] = true;
+			break;
+		}
+#endif
+
 #if !SDL_VERSION_ATLEAST(1,3,0)
 		case SDL_ACTIVEEVENT:
 		{
@@ -661,6 +686,22 @@ IN_ClearKeysDown(void)
 	LastScan = sc_None;
 	LastASCII = key_None;
 	memset ((void *) Keyboard,0,sizeof(Keyboard));
+
+	// Clear the wheel too since although we want to be able to acknowledge it
+	// separately since there's no key up state, we still generally think of it
+	// as a key.
+	IN_ClearWheel();
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
+//	IN_ClearKeysDown() - Clears only mouse wheel state
+//
+///////////////////////////////////////////////////////////////////////////
+void
+IN_ClearWheel()
+{
+	memset ((void *) MouseWheel,0,sizeof(MouseWheel));
 }
 
 

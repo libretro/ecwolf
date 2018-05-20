@@ -53,7 +53,7 @@
 //
 // Write a single character using the given font
 //
-void STACK_ARGS DCanvas::DrawChar (FFont *font, int normalcolor, int x, int y, BYTE character, ...)
+void STACK_ARGS DCanvas::DrawChar (FFont *font, int normalcolor, int x, int y, int character, ...)
 {
 	if (font == NULL)
 		return;

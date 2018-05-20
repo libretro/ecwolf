@@ -293,9 +293,36 @@ void PollMouseButtons (void)
 	int buttons = IN_MouseButtons();
 	for (int i = 0; controlScheme[i].button != bt_nobutton; i++)
 	{
-		if (controlScheme[i].mouse != -1 && (buttons & (1 << controlScheme[i].mouse)))
-			control[ConsolePlayer].buttonstate[controlScheme[i].button] = true;
+		if (controlScheme[i].mouse == -1)
+			continue;
+
+		bool &state = control[ConsolePlayer].buttonstate[controlScheme[i].button];
+		switch(controlScheme[i].mouse)
+		{
+		case ControlScheme::MWheel_Left:
+			if (MouseWheel[di_west])
+				state = true;
+			break;
+		case ControlScheme::MWheel_Right:
+			if (MouseWheel[di_east])
+				state = true;
+			break;
+		case ControlScheme::MWheel_Down:
+			if (MouseWheel[di_south])
+				state = true;
+			break;
+		case ControlScheme::MWheel_Up:
+			if (MouseWheel[di_north])
+				state = true;
+			break;
+		default:
+			if ((buttons & (1 << controlScheme[i].mouse)))
+				state = true;
+			break;
+		}
 	}
+
+	IN_ClearWheel();
 }
 
 

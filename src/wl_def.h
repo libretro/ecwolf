@@ -324,18 +324,26 @@ enum Button
 
 struct ControlScheme
 {
-	public:
-		static void	setKeyboard(ControlScheme* scheme, Button button, int value);
-		static void setJoystick(ControlScheme* scheme, Button button, int value);
-		static void setMouse(ControlScheme* scheme, Button button, int value);
+public:
+	enum
+	{
+		MWheel_Left = 33,
+		MWheel_Right = 34,
+		MWheel_Down = 35,
+		MWheel_Up = 36
+	};
 
-		Button		button;
-		const char*	name;
-		int			joystick;
-		int			keyboard;
-		int			mouse;
-		int			axis;
-		bool		negative;
+	static void	setKeyboard(ControlScheme* scheme, Button button, int value);
+	static void setJoystick(ControlScheme* scheme, Button button, int value);
+	static void setMouse(ControlScheme* scheme, Button button, int value);
+
+	Button		button;
+	const char*	name;
+	int			joystick;
+	int			keyboard;
+	int			mouse;
+	int			axis;
+	bool		negative;
 };
 
 extern ControlScheme controlScheme[];

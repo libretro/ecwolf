@@ -582,7 +582,7 @@ protected:
 			if(sc.CheckToken(TK_Identifier))
 			{
 				gameinfo.Border.issolid = true;
-				if(!sc->str.CompareNoCase("inset") == 0)
+				if(sc->str.CompareNoCase("inset") != 0)
 					sc.ScriptMessage(Scanner::ERROR, "Expected 'inset' got '%s' instead.", sc->str.GetChars());
 				sc.MustGetToken(',');
 				sc.MustGetToken(TK_StringConst);

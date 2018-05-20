@@ -300,7 +300,7 @@ void TextInputMenuItem::draw()
 }
 
 int ControlMenuItem::column = 0;
-const char* const ControlMenuItem::keyNames[512] =
+static const char* const KeyNames[512] =
 {
 	"?","?","?","?","?","?","?","?",                                //   0
 	"BkSp","Tab","?","?","?","Ret","?","?",                      //   8
@@ -343,6 +343,10 @@ const char* const ControlMenuItem::keyNames[512] =
 	"Shft","RCtl","Ctrl","RAlt","Alt","RMet","Meta","Supr",         // 304
 	"RSpr","Mode","Comp","Help","PrtS","Brk","Pwr","Euro",          // 312
 	"Undo","?"                                                      // 320
+};
+
+static const char* const MWheelNames[4] = {
+	"WhLt", "WhRt", "WhDn", "WhUp"
 };
 
 ControlMenuItem::ControlMenuItem(ControlScheme &button) : MenuItem(button.name), button(button)
@@ -391,12 +395,31 @@ void ControlMenuItem::activate()
 					break;
 				}
 
-				btn = IN_MouseButtons();
-				for(int i = 0;btn != 0 && i < 32;i++)
+				if((btn = IN_MouseButtons()))
 				{
-					if(btn & (1<<i))
+					for(int i = 0;btn != 0 && i < 32;i++)
 					{
-						ControlScheme::setMouse(controlScheme, button.button, i);
+						if(btn & (1<<i))
+						{
+							ControlScheme::setMouse(controlScheme, button.button, i);
+							exit = true;
+						}
+					}
+				}
+				else
+				{
+					if(MouseWheel[di_west])
+						btn = ControlScheme::MWheel_Left;
+					if(MouseWheel[di_east])
+						btn = ControlScheme::MWheel_Right;
+					if(MouseWheel[di_north])
+						btn = ControlScheme::MWheel_Up;
+					if(MouseWheel[di_south])
+						btn = ControlScheme::MWheel_Down;
+
+					if(btn)
+					{
+						ControlScheme::setMouse(controlScheme, button.button, btn);
 						exit = true;
 					}
 				}
@@ -469,16 +492,19 @@ void ControlMenuItem::draw()
 
 	const int key = SDL2Backconvert(button.keyboard);
 
-	if(button.keyboard >= 0 && button.keyboard < 512 && keyNames[key])
+	if(button.keyboard >= 0 && button.keyboard < 512 && KeyNames[key])
 	{
 		PrintX = 162;
-		US_Print(BigFont, keyNames[key], getTextColor());
+		US_Print(BigFont, KeyNames[key], getTextColor());
 	}
 	if(button.mouse != -1)
 	{
 		PrintX = 214;
 		FString btn;
-		btn.Format("MS%d", button.mouse);
+		if(button.mouse >= ControlScheme::MWheel_Left && button.mouse <= ControlScheme::MWheel_Up)
+			btn = MWheelNames[button.mouse - ControlScheme::MWheel_Left];
+		else
+			btn.Format("MS%d", button.mouse);
 		US_Print(BigFont, btn, getTextColor());
 	}
 	if(button.joystick != -1)

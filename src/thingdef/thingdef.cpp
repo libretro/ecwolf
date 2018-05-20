@@ -278,7 +278,7 @@ static const struct ExpressionFunction
 	{ "random",		TypeHierarchy::INT,		2,	true,	ExprRandom },
 	{ "sin",		TypeHierarchy::FLOAT,	1,	false,	ExprSin },
 
-	{ NULL, 0, false, NULL }
+	{ NULL, 0, 0, false, NULL }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

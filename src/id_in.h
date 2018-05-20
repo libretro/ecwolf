@@ -133,41 +133,41 @@ typedef	int		ScanCode;
 
 #define	key_None		0
 
-typedef	enum		{
-						demo_Off,demo_Record,demo_Playback,demo_PlayDone
-					} Demo;
-typedef	enum		{
-						ctrl_Keyboard,
-						ctrl_Keyboard1 = ctrl_Keyboard,ctrl_Keyboard2,
-						ctrl_Joystick,
-						ctrl_Joystick1 = ctrl_Joystick,ctrl_Joystick2,
-						ctrl_Mouse
-					} ControlType;
-typedef	enum		{
-						motion_Left = -1,motion_Up = -1,
-						motion_None = 0,
-						motion_Right = 1,motion_Down = 1
-					} Motion;
-typedef	enum		{
-						dir_North,dir_NorthEast,
-						dir_East,dir_SouthEast,
-						dir_South,dir_SouthWest,
-						dir_West,dir_NorthWest,
-						dir_None
-					} Direction;
-typedef	struct		{
-						bool		button0,button1,button2,button3;
-						short		x,y;
-						Motion		xaxis,yaxis;
-						Direction	dir;
-					} CursorInfo;
+enum Demo {
+	demo_Off,demo_Record,demo_Playback,demo_PlayDone
+};
+enum ControlType {
+	ctrl_Keyboard,
+	ctrl_Keyboard1 = ctrl_Keyboard,ctrl_Keyboard2,
+	ctrl_Joystick,
+	ctrl_Joystick1 = ctrl_Joystick,ctrl_Joystick2,
+	ctrl_Mouse
+};
+enum Motion {
+	motion_Left = -1,motion_Up = -1,
+	motion_None = 0,
+	motion_Right = 1,motion_Down = 1
+};
+enum Direction {
+	dir_North,dir_NorthEast,
+	dir_East,dir_SouthEast,
+	dir_South,dir_SouthWest,
+	dir_West,dir_NorthWest,
+	dir_None
+};
+struct CursorInfo {
+	bool		button0,button1,button2,button3;
+	short		x,y;
+	Motion		xaxis,yaxis;
+	Direction	dir;
+};
 typedef	CursorInfo	ControlInfo;
-typedef	struct		{
-						ScanCode	button0,button1,
-									upleft,		up,		upright,
-									left,				right,
-									downleft,	down,	downright;
-					} KeyboardDef;
+struct KeyboardDef {
+	ScanCode	button0,button1,
+				upleft,		up,		upright,
+				left,				right,
+				downleft,	down,	downright;
+};
 
 struct JoystickSens
 {
@@ -177,53 +177,52 @@ struct JoystickSens
 extern JoystickSens *JoySensitivity;
 
 // Global variables
-extern  volatile bool		Keyboard[];
-extern           bool		MousePresent;
-extern  volatile unsigned short Paused;
-extern  volatile char       LastASCII;
-extern  volatile ScanCode   LastScan;
-extern           int        JoyNumButtons;
-extern           int        JoyNumAxes;
+extern bool Keyboard[];
+extern bool MousePresent;
+extern bool MouseWheel[4];
+extern unsigned short Paused;
+extern char LastASCII;
+extern ScanCode LastScan;
+extern int JoyNumButtons;
+extern int JoyNumAxes;
 
 
 // Function prototypes
-#define	IN_KeyDown(code)	(Keyboard[(code)])
-#define	IN_ClearKey(code)	{Keyboard[code] = false;\
-							if (code == LastScan) LastScan = sc_None;}
 
-// DEBUG - put names in prototypes
-extern	void		IN_Startup(void),IN_Shutdown(void);
-extern	void		IN_ClearKeysDown(void);
-extern	void		IN_ReadControl(int,ControlInfo *);
-extern	void		IN_GetJoyAbs(word joy,word *xp,word *yp);
-extern	void		IN_SetupJoy(word joy,word minx,word maxx,
-								word miny,word maxy);
-extern	void		IN_StopDemo(void),IN_FreeDemoBuffer(void),
-					IN_Ack(void);
-extern	bool		IN_UserInput(longword delay);
-extern	char		IN_WaitForASCII(void);
-extern	ScanCode	IN_WaitForKey(void);
-extern	word		IN_GetJoyButtonsDB(word joy);
-extern	const char *IN_GetScanName(ScanCode);
+void IN_Startup();
+void IN_Shutdown();
+void IN_ClearKeysDown();
+void IN_ClearWheel();
+void IN_ReadControl(int,ControlInfo *);
+void IN_GetJoyAbs(word joy,word *xp,word *yp);
+void IN_SetupJoy(word joy,word minx,word maxx,word miny,word maxy);
+void IN_StopDemo();
+void IN_FreeDemoBuffer();
+void IN_Ack();
+bool IN_UserInput(longword delay);
+char IN_WaitForASCII();
+ScanCode IN_WaitForKey();
+word IN_GetJoyButtonsDB(word joy);
+const char *IN_GetScanName(ScanCode);
 
-void    IN_WaitAndProcessEvents();
-void    IN_ProcessEvents();
+void IN_WaitAndProcessEvents();
+void IN_ProcessEvents();
 
-int     IN_MouseButtons (void);
-void	IN_ReleaseMouse();
-void	IN_GrabMouse();
-void    IN_AdjustMouse();
+int IN_MouseButtons (void);
+void IN_ReleaseMouse();
+void IN_GrabMouse();
+void IN_AdjustMouse();
 
-bool	IN_JoyPresent();
-void    IN_SetJoyCurrent(int joyIndex);
-int     IN_JoyButtons (void);
-int     IN_JoyAxes (void);
-void    IN_GetJoyDelta(int *dx,int *dy);
-int		IN_GetJoyAxis(int axis);
+bool IN_JoyPresent();
+void IN_SetJoyCurrent(int joyIndex);
+int IN_JoyButtons (void);
+int IN_JoyAxes (void);
+void IN_GetJoyDelta(int *dx,int *dy);
+int IN_GetJoyAxis(int axis);
 
-void    IN_StartAck(void);
-bool	IN_CheckAck (void);
-bool    IN_IsInputGrabbed();
-void    IN_CenterMouse();
+void IN_StartAck(void);
+bool IN_CheckAck (void);
+bool IN_IsInputGrabbed();
+void IN_CenterMouse();
 
 #endif
