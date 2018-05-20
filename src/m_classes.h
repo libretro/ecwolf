@@ -241,6 +241,8 @@ class Menu
 		 * Should this menu show the Key, Mse. and Joy headers?
 		 */
 		void			showControlHeaders(bool show) { controlHeaders = show; }
+		void			validateCurPos();
+
 		MenuItem		*operator[] (int index) { return getIndex(index); }
 };
 

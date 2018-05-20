@@ -1100,8 +1100,7 @@ void Menu::show()
 
 	if(countItems() == 0) // Do nothing.
 		return;
-	if(curPos >= (signed)countItems())
-		curPos = countItems()-1;
+	validateCurPos();
 
 	draw();
 	MenuFadeIn();
@@ -1112,4 +1111,23 @@ void Menu::show()
 
 	if(!Menu::areMenusClosed())
 		MenuFadeOut ();
+}
+
+void Menu::validateCurPos()
+{
+	if(curPos >= (signed)countItems())
+		curPos = countItems()-1;
+
+	// If current item is disable try to move off it
+	const int oldCurPos = curPos;
+	while(!getIndex(curPos)->isEnabled() && curPos > 0)
+		--curPos;
+
+	// Reached top? Try searching downwards
+	if(curPos == 0 && !getIndex(0)->isEnabled())
+	{
+		curPos = oldCurPos+1;
+		while(!getIndex(curPos)->isEnabled() && curPos < (signed)countItems())
+			++curPos;
+	}
 }

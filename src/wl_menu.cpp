@@ -544,8 +544,6 @@ void CreateMenus()
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMPAUSE"], am_pause, ChangeAutomapFlag));
 }
 
-static int SoundStatus = 1;
-
 ////////////////////////////////////////////////////////////////////
 //
 // Wolfenstein Control Panel!  Ta Da!
@@ -626,6 +624,7 @@ void US_ControlPanel (ScanCode scancode)
 		mainMenu[mainMenu.countItems()-2]->setHighlighted(false);
 		mainMenu[3]->setEnabled(false);
 	}
+	mainMenu.validateCurPos();
 	mainMenu.draw();
 	MenuFadeIn ();
 	Menu::closeMenus(false);
@@ -1108,6 +1107,7 @@ int StartCPMusic (const char* song)
 ///////////////////////////////////////////////////////////////////////////
 void CheckPause (void)
 {
+	static int SoundStatus = 1;
 	static int pauseofs = 0;
 	if (Paused & 1)
 	{
