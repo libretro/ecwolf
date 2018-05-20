@@ -49,6 +49,10 @@ GameMap *map = NULL;
 // GameMap object.
 void CA_UnloadMap(GameMap *map)
 {
+	// Flush pending spawn operations. Generally this does nothing, but we want
+	// to ensure that defferred operations are cleared.
+	AActor::FinishSpawningActors();
+
 	thinkerList->DestroyAll();
 	delete map;
 

@@ -148,6 +148,7 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 				StartTravel();
 				SetupGameLevel();
 				FinishTravel();
+				AActor::FinishSpawningActors();
 				// Drop weapon
 				players[0].SetPSprite(NULL, player_t::ps_weapon);
 				PreloadGraphics(true);
