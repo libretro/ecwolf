@@ -35,9 +35,9 @@
 # or will point SDL2_DIR to the directory containing it.
 #
 # But not only are many people not aware of how this works, the SDL subprojects
-# don't follow the convention, we'd really like to use imported targets, we'd
-# like to also support SDL 1.2, and we can just in general do more to make this
-# seamless.
+# don't always follow the convention. We'd really like to use imported targets,
+# we'd like to also support SDL 1.2, and we can just in general do more to make
+# this seamless.
 
 option(FORCE_SDL12 "Use SDL 1.2 instead of SDL2" OFF)
 if(FORCE_SDL12)
@@ -69,7 +69,11 @@ else()
 			set(SDL_FIND_ERROR YES)
 		endif()
 	endif()
-	message(STATUS "Using SDL2: ${SDL2_LIBRARIES}, ${SDL2_INCLUDE_DIRS}")
+	if(TARGET SDL2::SDL2)
+		message(STATUS "Using system SDL2")
+	else()
+		message(STATUS "Using SDL2: ${SDL2_LIBRARIES}, ${SDL2_INCLUDE_DIRS}")
+	endif()
 
 	if(NOT SDL2_mixer_FOUND)
 		find_library(SDL2_MIXER_LIBRARIES SDL2_mixer)
@@ -79,7 +83,11 @@ else()
 			set(SDL_FIND_ERROR YES)
 		endif()
 	endif()
-	message(STATUS "Using SDL2_mixer: ${SDL2_MIXER_LIBRARIES}, ${SDL2_MIXER_INCLUDE_DIRS}")
+	if(TARGET SDL2::SDL2_mixer)
+		message(STATUS "Using system SDL2_mixer")
+	else()
+		message(STATUS "Using SDL2_mixer: ${SDL2_MIXER_LIBRARIES}, ${SDL2_MIXER_INCLUDE_DIRS}")
+	endif()
 
 	if(NOT SDL2_net_FOUND)
 		find_library(SDL2_NET_LIBRARIES SDL2_net)
@@ -89,7 +97,11 @@ else()
 			set(SDL_FIND_ERROR YES)
 		endif()
 	endif()
-	message(STATUS "Using SDL2_net: ${SDL2_NET_LIBRARIES}, ${SDL2_NET_INCLUDE_DIRS}")
+	if(TARGET SDL2::SDL2_net)
+		message(STATUS "Using system SDL2_net")
+	else()
+		message(STATUS "Using SDL2_net: ${SDL2_NET_LIBRARIES}, ${SDL2_NET_INCLUDE_DIRS}")
+	endif()
 
 	if(SDL_FIND_ERROR)
 		message(FATAL_ERROR "One or more required SDL libraries were not found.")
@@ -120,6 +132,6 @@ function(sdl_modernize NEW_TARGET LIBS DIRS)
 	endif()
 endfunction()
 
-sdl_modernize(SDL::SDL SDL2_LIBRARIES SDL2_INCLUDE_DIRS)
-sdl_modernize(SDL::SDL_mixer SDL2_MIXER_LIBRARIES SDL2_MIXER_INCLUDE_DIRS)
-sdl_modernize(SDL::SDL_net SDL2_NET_LIBRARIES SDL2_NET_INCLUDE_DIRS)
+sdl_modernize(SDL2::SDL2 SDL2_LIBRARIES SDL2_INCLUDE_DIRS)
+sdl_modernize(SDL2::SDL2_mixer SDL2_MIXER_LIBRARIES SDL2_MIXER_INCLUDE_DIRS)
+sdl_modernize(SDL2::SDL2_net SDL2_NET_LIBRARIES SDL2_NET_INCLUDE_DIRS)
