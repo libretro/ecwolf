@@ -377,6 +377,12 @@ void I_ShutdownGraphics();
 static void InitGame()
 {
 	// initialize SDL
+	{
+		SDL_version ver;
+		SDL_GetVersion(&ver);
+		printf("SDL_Init: Using SDL %d.%d.%d\n", ver.major, ver.minor, ver.patch);
+	}
+
 #if SDL_VERSION_ATLEAST(2,0,0)
 	if(SDL_Init(0) < 0)
 #else
