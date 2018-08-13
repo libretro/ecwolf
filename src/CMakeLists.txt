@@ -122,7 +122,7 @@ if(APPLE)
 		macosx/wl_iwad_picker_cocoa.mm
 	)
 
-	if(${SDL_VERSION_STRING} VERSION_LESS "2.0.0")
+	if(FORCE_SDL12)
 		set(EXTRA_FILES ${EXTRA_FILES} macosx/SDLMain.m)
 	endif()
 

@@ -384,7 +384,7 @@ static void InitGame()
 		printf("SDL_Init: Using SDL %d.%d.%d\n", ver.major, ver.minor, ver.patch);
 	}
 #else
-	printf("SDL_Init: Using SDL 1.2");
+	printf("SDL_Init: Using SDL 1.2\n");
 #endif
 
 #if SDL_VERSION_ATLEAST(2,0,0)
