@@ -119,13 +119,13 @@ function(find_sdl_library PKG LIB HEADER INTERNAL_TARGET)
 		endif()
 	else()
 		find_package(${PKG})
-		if(NOT ${PKG}_FOUND)
+		string(TOUPPER "${PKG}" SDL1_VAR)
+
+		if(NOT ${SDL1_VAR}_FOUND)
 			set(SDL_FIND_ERROR YES PARENT_SCOPE)
 		else()
 			message(STATUS "Using system ${PKG}:")
 		endif()
-
-		string(TOUPPER "${PKG}" SDL1_VAR)
 
 		set(${LIB}_LIBRARIES ${${SDL1_VAR}_LIBRARY})
 		set(${LIB}_INCLUDE_DIRS ${${SDL1_VAR}_INCLUDE_DIR})

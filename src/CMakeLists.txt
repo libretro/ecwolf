@@ -346,10 +346,7 @@ if(NOT ANDROID)
 
 	if(NOT WIN32 AND NOT APPLE)
 		install(FILES "posix/ecwolf.desktop" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/applications")
-		install(FILES "macosx/icon.iconset/icon_16x16.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/16x16/apps" RENAME "ecwolf.png")
-		install(FILES "macosx/icon.iconset/icon_32x32.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/32x32/apps" RENAME "ecwolf.png")
-		install(FILES "macosx/icon.iconset/icon_32x32@2x.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/64x64/apps" RENAME "ecwolf.png")
-		install(FILES "macosx/icon.iconset/icon_512x512@2x.png" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/1024x1024/apps" RENAME "ecwolf.png")
+		install(FILES "posix/icon.svg" DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps" RENAME "ecwolf.svg")
 	endif()
 endif()
 

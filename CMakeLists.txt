@@ -95,10 +95,16 @@ function( add_pk3 PK3_NAME PK3_DIR )
 	# Touch the zipdir executable here so that the pk3s are forced to rebuild
 	# each time since their dependecy has "changed."
 	if( NOT ANDROID )
+		if(CMAKE_VERSION VERSION_LESS 3.0.0)
+			# CMake 2.8.12 doesn't support generator expressions in install()
+			get_target_property(TARGET_DIR ecwolf RUNTIME_OUTPUT_DIRECTORY)
+		else()
+			set(TARGET_DIR "$<TARGET_FILE_DIR:ecwolf>")
+		endif()
 		add_custom_target( ${PK3_TARGET} ALL
 			COMMAND zipdir -udf $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME} ${PK3_DIR}
 			DEPENDS zipdir )
-		install(FILES $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_FULL_DATADIR}/${PRODUCT_DIRECTORY}")
+		install(FILES ${TARGET_DIR}/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_FULL_DATADIR}/${PRODUCT_DIRECTORY}")
 	else()
 		# Prepare assets directory for APK
 		add_custom_target( ${PK3_TARGET} ALL
@@ -165,7 +171,6 @@ endif()
 
 add_subdirectory(tools/zipdir)
 add_subdirectory(tools/updaterevision)
-add_subdirectory(wadsrc)
 
 add_subdirectory(deps/gdtoa)
 add_subdirectory(deps/lzma)
@@ -191,6 +196,7 @@ if(ANDROID)
 endif()
 
 add_subdirectory(src)
+add_subdirectory(wadsrc)
 
 if(USE_CPACK AND NOT APPLE AND NOT WIN32)
 	install(FILES docs/changelog DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
@@ -200,8 +206,8 @@ if(USE_CPACK AND NOT APPLE AND NOT WIN32)
 	# Lintian requires that man pages in deb packages are compressed.
 	find_program(GZIP_BINARY NAMES gzip DOC "gzip program for man page compression.")
 	if(GZIP_BINARY)
-		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -n9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}/changelog\")")
-		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -n9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MANDIR}/man6/ecwolf.6\")")
+		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -fn9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}/changelog\")")
+		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -fn9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MANDIR}/man6/ecwolf.6\")")
 	endif()
 endif()
 
