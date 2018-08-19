@@ -38,10 +38,10 @@ void stripnl(char *str)
 
 int main(int argc, char **argv)
 {
-	char vertag[128], lastlog[128], lasthash[128], *hash = NULL;
+	char vertag[128] = { 0 }, lastlog[128] = { 0 }, lasthash[128] = { 0 }, *hash = NULL;
 	FILE *stream = NULL;
 	int gotrev = 0, needupdate = 1;
-	char hgdateString[128];
+	char hgdateString[128] = { 0 };
 	time_t hgdate = 0;
 	char hgHash[13];
 	hgHash[0] = '\0';
@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 	}
 
 	// Use commit date and short hash
-	stream = popen("hg log --config trusted.users=* -r. --template \"{latesttag}-{latesttagdistance}-{node|short}\n{node|short}\n{date|hgdate}\"", "r");
+	stream = popen("hg log --config trusted.users=* -r. --template \"{latesttag}-{latesttagdistance}-{node|short}\\n{node|short}\\n{date|hgdate}\"", "r");
 
 	if (NULL != stream)
 	{
