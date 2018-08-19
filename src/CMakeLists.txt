@@ -71,7 +71,7 @@ if(WIN32)
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		add_custom_command(
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/windows.o
-			COMMAND windres -o ${CMAKE_CURRENT_BINARY_DIR}/windows.o -i ${ECWolf_SOURCE_DIR}/src/win32/windows.rc
+			COMMAND windres -o ${CMAKE_CURRENT_BINARY_DIR}/windows.o -I ${CMAKE_CURRENT_BINARY_DIR} -i ${ECWolf_SOURCE_DIR}/src/win32/windows.rc
 			WORKING_DIRECTORY ${ECWolf_SOURCE_DIR}/src/win32
 			COMMENT "Generating windows resources (windows.rc)"
 		)
