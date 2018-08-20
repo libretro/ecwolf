@@ -68,18 +68,7 @@ if(WIN32)
 	add_definitions(-DWINDOWS -DNO_STDIO_REDIRECT)
 
 	# RC file
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		add_custom_command(
-			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/windows.o
-			COMMAND windres -o ${CMAKE_CURRENT_BINARY_DIR}/windows.o -I ${CMAKE_CURRENT_BINARY_DIR} -i ${ECWolf_SOURCE_DIR}/src/win32/windows.rc
-			WORKING_DIRECTORY ${ECWolf_SOURCE_DIR}/src/win32
-			COMMENT "Generating windows resources (windows.rc)"
-		)
-
-		set(EXTRA_FILES windows.o)
-	else(CMAKE_COMPILER_IS_GNUCXX)
-		set(EXTRA_FILES ${ECWolf_SOURCE_DIR}/src/win32/windows.rc)
-	endif(CMAKE_COMPILER_IS_GNUCXX)
+	set(EXTRA_FILES ${ECWolf_SOURCE_DIR}/src/win32/windows.rc)
 
 	# Fix stat in v140_xp (broken in RTM and Update 1 so far)
 	if( MSVC AND MSVC_VERSION EQUAL 1900 AND CMAKE_GENERATOR_TOOLSET STREQUAL "v140_xp" )

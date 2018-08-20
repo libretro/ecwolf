@@ -15,18 +15,16 @@ endif()
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 add_definitions( -DINFNAN_CHECK -DMULTIPLE_THREADS )
 
-if( NOT MSVC AND NOT APPLE )
-	if( NOT CMAKE_CROSSCOMPILING )
-		add_executable( arithchk arithchk.c )
-	endif()
+# These can't be run effectively in a cross compiling environment so we'll just
+# not generate the header and let it error if we haven't collected the data
+# statically.
+if( NOT MSVC AND NOT APPLE AND NOT CMAKE_CROSSCOMPILING )
+	add_executable( arithchk arithchk.c )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/arith.h 
 		COMMAND arithchk >${CMAKE_CURRENT_BINARY_DIR}/arith.h
 		DEPENDS arithchk )
 
-	if( NOT CMAKE_CROSSCOMPILING )
-		add_executable( qnan qnan.c arith.h )
-		set( CROSS_EXPORTS ${CROSS_EXPORTS} arithchk qnan PARENT_SCOPE )
-	endif()
+	add_executable( qnan qnan.c arith.h )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gd_qnan.h
 		COMMAND qnan >${CMAKE_CURRENT_BINARY_DIR}/gd_qnan.h
 		DEPENDS qnan )

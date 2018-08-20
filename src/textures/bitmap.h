@@ -184,7 +184,9 @@ bool ClipCopyPixelRect(const FClipRect *cr, int &originx, int &originy,
 // used by the supported texture formats
 //
 //===========================================================================
+#ifndef __forceinline
 #define __forceinline inline
+#endif
 struct cRGB
 {
 	static __forceinline unsigned char R(const unsigned char * p) { return p[0]; }

@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 2.8.12)
 project(ECWolf)
 
@@ -17,9 +16,6 @@ else()
 endif()
 
 if(USE_CPACK)
-	# Right now all we support is DEB, but we'll probably want to make this a
-	# user option later?
-	set(CPACK_GENERATOR "DEB")
 	set(CPACK_PACKAGE_CONTACT "First Last <example@example.com>" CACHE STRING "Contact info for archive maintainer.")
 	set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Advanced source port of the Wolfenstein 3D engine.\n Provides enhanced game engine for playing Wolfenstein 3D, Spear of Destiny, and\n Super 3-D Noah's Ark. Requires the original game data files.")
 	string(TOLOWER "${PRODUCT_NAME}" CPACK_PACKAGE_NAME)
@@ -30,14 +26,21 @@ if(USE_CPACK)
 	set(CPACK_PACKAGE_VERSION_MAJOR ${VERSION_MAJOR})
 	set(CPACK_PACKAGE_VERSION_MINOR ${VERSION_MINOR})
 	set(CPACK_PACKAGE_VERSION_PATCH ${VERSION_PATCH})
+	set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/CPackProjectConfig.cmake")
 
-	set(CPACK_DEB_COMPONENT_INSTALL ON)
-	set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
-	set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://maniacsvault.net/ecwolf/")
-	set(CPACK_DEBIAN_PACKAGE_SECTION "games")
-	set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
-	set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION ON)
-	set(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
+	if(WIN32)
+		set(CPACK_GENERATOR "ZIP")
+	else()
+		set(CPACK_GENERATOR "DEB")
+		set(CPACK_DEB_COMPONENT_INSTALL ON)
+		set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+		set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://maniacsvault.net/ecwolf/")
+		set(CPACK_DEBIAN_PACKAGE_SECTION "games")
+		set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+		set(CPACK_DEBIAN_PACKAGE_CONTROL_STRICT_PERMISSION ON)
+		set(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
+	endif()
+
 	include(CPack)
 endif()
 
@@ -47,15 +50,37 @@ if(UNIX AND NOT APPLE)
 	set(CMAKE_INSTALL_BINDIR "games")
 
 	include(GNUInstallDirs)
+	if(CPACK_PACKAGE_NAME)
+		# Match this to package name instead of project name
+		set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
+	endif()
+	# GNUInstallDirs doesn't provide this, but we could use share/product_name
+	set(CMAKE_INSTALL_DATAPRODUCTDIR "${CMAKE_INSTALL_DATADIR}/${PRODUCT_DIRECTORY}")
 elseif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 	# CMAKE_ prefix used here to match the variable set by GNUInstallDirs.
 	# Value currently doesn't matter outside of Linux these are more or less
 	# to keep the script working where values are expected.
-	set(CMAKE_INSTALL_BINDIR "bin")
-	set(CMAKE_INSTALL_DATAROOTDIR "share")
-	set(CMAKE_INSTALL_LIBDIR "lib")
-	set(CMAKE_INSTALL_MANDIR "share/man")
-	set(CMAKE_INSTALL_FULL_DATADIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}")
+	if(NOT WIN32)
+		set(CMAKE_INSTALL_BINDIR "bin")
+		set(CMAKE_INSTALL_DATAROOTDIR "share")
+		set(CMAKE_INSTALL_LIBDIR "lib")
+		set(CMAKE_INSTALL_MANDIR "share/man")
+		set(CMAKE_INSTALL_DATADIR "${CMAKE_INSTALL_DATAROOTDIR}")
+		set(CMAKE_INSTALL_DATAPRODUCTDIR "${CMAKE_INSTALL_DATADIR}/${PRODUCT_DIRECTORY}")
+		if(CPACK_PACKAGE_NAME)
+			set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
+		else()
+			set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/${PRODUCT_DIRECTORY}")
+		endif()
+	else()
+		set(CMAKE_INSTALL_BINDIR ".")
+		set(CMAKE_INSTALL_DATAROOTDIR ".")
+		set(CMAKE_INSTALL_LIBDIR ".")
+		set(CMAKE_INSTALL_MANDIR ".")
+		set(CMAKE_INSTALL_DATADIR ".")
+		set(CMAKE_INSTALL_DATAPRODUCTDIR ".")
+		set(CMAKE_INSTALL_DOCDIR ".")
+	endif()
 endif()
 
 option(ANDROID "Build for Android" OFF)
@@ -104,7 +129,7 @@ function( add_pk3 PK3_NAME PK3_DIR )
 		add_custom_target( ${PK3_TARGET} ALL
 			COMMAND zipdir -udf $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME} ${PK3_DIR}
 			DEPENDS zipdir )
-		install(FILES ${TARGET_DIR}/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_FULL_DATADIR}/${PRODUCT_DIRECTORY}")
+		install(FILES ${TARGET_DIR}/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_DATAPRODUCTDIR}")
 	else()
 		# Prepare assets directory for APK
 		add_custom_target( ${PK3_TARGET} ALL
@@ -198,16 +223,20 @@ endif()
 add_subdirectory(src)
 add_subdirectory(wadsrc)
 
-if(USE_CPACK AND NOT APPLE AND NOT WIN32)
-	install(FILES docs/changelog DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
-	install(FILES docs/copyright DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}")
-	install(FILES docs/ecwolf.6 DESTINATION "${CMAKE_INSTALL_MANDIR}/man6")
+if(USE_CPACK AND NOT APPLE)
+	if(WIN32)
+		install(FILES docs/copyright DESTINATION "${CMAKE_INSTALL_DOCDIR}" RENAME licenses.txt)
+	else()
+		install(FILES docs/copyright DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+		install(FILES docs/changelog DESTINATION "${CMAKE_INSTALL_DOCDIR}")
+		install(FILES docs/ecwolf.6 DESTINATION "${CMAKE_INSTALL_MANDIR}/man6")
 
-	# Lintian requires that man pages in deb packages are compressed.
-	find_program(GZIP_BINARY NAMES gzip DOC "gzip program for man page compression.")
-	if(GZIP_BINARY)
-		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -fn9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/doc/${CPACK_PACKAGE_NAME}/changelog\")")
-		install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -fn9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MANDIR}/man6/ecwolf.6\")")
+		# Lintian requires that man pages in deb packages are compressed.
+		find_program(GZIP_BINARY NAMES gzip DOC "gzip program for man page compression.")
+		if(GZIP_BINARY)
+			install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -fn9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DOCDIR}/changelog\")")
+			install(CODE "execute_process(COMMAND \"${GZIP_BINARY}\" -fn9 \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_MANDIR}/man6/ecwolf.6\")")
+		endif()
 	endif()
 endif()
 

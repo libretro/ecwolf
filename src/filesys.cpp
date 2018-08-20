@@ -38,7 +38,7 @@
 #define USE_WINDOWS_BOOLEAN
 #include <windows.h>
 #include <direct.h>
-#include <Shlobj.h>
+#include <shlobj.h>
 #else
 #ifdef __APPLE__
 #include <CoreServices/CoreServices.h>
