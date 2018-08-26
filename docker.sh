@@ -435,13 +435,16 @@ build_android() {
 	build_ecwolf || return
 
 	declare Arch
-	for Arch in x86 armeabi-v7a; do
+	for Arch in x86 x86_64 armeabi-v7a arm64-v8a; do
 		{
+			declare NDKVersion=12
+			[[ $Arch =~ 64 ]] && NDKVersion=21
+
 			mkdir ~/build-mgw-"$Arch" &&
 			cd ~/build-mgw-"$Arch" &&
 			cmake "$SrcDir" \
 				-DCMAKE_SYSTEM_NAME=Android \
-				-DCMAKE_SYSTEM_VERSION=12 \
+				-DCMAKE_SYSTEM_VERSION="$NDKVersion" \
 				-DCMAKE_ANDROID_NDK=/sdk/ndk-bundle \
 				-DCMAKE_ANDROID_ARCH_ABI="$Arch" \
 				-DCMAKE_BUILD_TYPE=Release \
@@ -453,7 +456,7 @@ build_android() {
 				-DANDROID_SIGN_KEYSTORE=/sdk/untrusted.keystore \
 				-DANDROID_SIGN_STOREPASS=untrusted \
 				-DANDROID_MOGA_CONTROLLER_JAR=/sdk/com.bda.controller.jar \
-				-DINTERNAL_SDL{_MIXER,_MIXER_CODECS,_NET}=ON
+				-DINTERNAL_SDL{,_MIXER,_MIXER_CODECS,_NET}=ON
 			make -j "$(nproc)" &&
 			cp ecwolf.apk /results/ecwolf-"$Arch".apk
 		} 2>&1 | tee "/results/build-$Arch.log"
