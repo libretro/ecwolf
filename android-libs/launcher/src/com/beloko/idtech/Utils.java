@@ -143,7 +143,7 @@ public class Utils {
 			if (filename.endsWith("png") && filename.startsWith(prefix)){
 				InputStream in = null;
 				OutputStream out = null;
-				//Log.d("test","file = " + filename);
+				Log.d("test","file = " + filename + " -> " + dir + "/" + filename.substring(prefix.length()));
 				try {
 					in = assetManager.open(filename);
 					out = new FileOutputStream(dir + "/" + filename.substring(prefix.length()));

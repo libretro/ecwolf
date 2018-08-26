@@ -541,6 +541,11 @@ DFrameBuffer *SDLVideo::CreateFrameBuffer (int width, int height, bool fullscree
 	SDL_Window *oldwin = NULL;
 #endif
 
+#if __ANDROID__
+	// Always fullscreen in Android
+	fullscreen = true;
+#endif
+
 	if (old != NULL)
 	{ // Reuse the old framebuffer if its attributes are the same
 		SDLFB *fb = static_cast<SDLFB *> (old);
@@ -686,6 +691,11 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 	Renderer = NULL;
 	Texture = NULL;
 	ResetSDLRenderer ();
+
+#ifdef __ANDROID__
+	extern void PostSDLInit(SDL_Window *);
+	PostSDLInit(Screen);
+#endif
 
 	for (i = 0; i < 256; i++)
 	{
@@ -858,6 +868,13 @@ void SDLFB::Update ()
 		//SDLFlipCycles.Clock();
 		SDL_RenderClear(Renderer);
 		SDL_RenderCopy(Renderer, Texture, NULL, NULL);
+
+#ifdef __ANDROID__
+		// Hack control overlay in
+		extern void frameControls();
+		frameControls();
+#endif
+
 		SDL_RenderPresent(Renderer);
 		//SDLFlipCycles.Unclock();
 	}
@@ -869,6 +886,7 @@ void SDLFB::Update ()
 		SDL_UpdateWindowSurface (Screen);
 		//SDLFlipCycles.Unclock();
 	}
+
 #else
 	if (SDL_LockSurface (Screen) == -1)
 		return;
@@ -1015,6 +1033,10 @@ void SDLFB::GetFlashedPalette (PalEntry pal[256])
 
 void SDLFB::SetFullscreen (bool fullscreen)
 {
+#ifdef __ANDROID__
+	fullscreen = true;
+#endif
+
 #if SDL_VERSION_ATLEAST(2,0,0)
 	if (IsFullscreen() == fullscreen)
 		return;

@@ -18,7 +18,7 @@ find_file(ANDROID_AAPT_BINARY NAMES aapt aapt.exe PATHS "${ANDROID_SDK_TOOLS}")
 find_file(ANDROID_DX_BINARY NAMES dx dx.exe PATHS "${ANDROID_SDK_TOOLS}")
 find_file(ANDROID_ADB_BINARY NAMES adb adb.exe PATHS "${ANDROID_SDK_TOOLS}" "${ANDROID_SDK_TOOLS}/../../platform-tools")
 find_file(ANDROID_JAR_SIGNER NAMES jarsigner jarsigner.exe PATHS "/usr/bin")
-find_file(ANDROID_SUPPORT_V4_JAR android-support-v4.jar PATHS "${ANDROID_SDK_TOOLS}/../../extras/android/support/v4")
+find_file(ANDROID_SUPPORT_V4_JAR support-v4-13.0.0.jar PATHS "${ANDROID_SDK_TOOLS}/../../extras/android/m2repository/com/android/support/support-v4/13.0.0")
 
 set(ANDROID_MOGA_CONTROLLER_JAR "" CACHE FILE "Path to com.bda.controller.jar")
 

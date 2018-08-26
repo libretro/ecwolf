@@ -3,27 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <RadioGroup
-        android:id="@+id/res_radiogroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-
-        android:orientation="vertical" >
-
-        <RadioButton
-            android:id="@+id/high_res_radiobutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="640x400" />
-
-        <RadioButton
-            android:id="@+id/low_res_radiobutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="320x240" />
-    </RadioGroup>
-
     <RelativeLayout
         android:id="@+id/extra_args_linearlayout"
         android:layout_width="match_parent"

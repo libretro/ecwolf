@@ -5,9 +5,6 @@
 #include <android/log.h>
 #include <unistd.h>
 
-
-#include "SDL_android_extra.h"
-
 #include "TouchControlsContainer.h"
 #include "JNITouchControlsUtils.h"
 
@@ -16,7 +13,10 @@ extern "C"
 
 
 #include "in_android.h"
+#include "SDL_events.h"
+#include "SDL_hints.h"
 #include "SDL_keycode.h"
+#include "SDL_system.h"
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"JNI", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "JNI", __VA_ARGS__))
@@ -24,8 +24,8 @@ extern "C"
 
 #define JAVA_FUNC(x) Java_com_beloko_idtech_wolf3d_NativeLib_##x
 
-int android_screen_width;
-int android_screen_height;
+int android_screen_width = 640;
+int android_screen_height = 400;
 
 
 #define KEY_SHOW_WEAPONS 0x1000
@@ -64,10 +64,25 @@ touchcontrols::Button *prevWeapon=0;
 touchcontrols::TouchJoy *touchJoyLeft;
 touchcontrols::TouchJoy *touchJoyRight;
 
-extern JNIEnv* env_;
+JNIEnv* env_;
+
+int argc=1;
+const char * argv[32];
+std::string graphicpath;
+
+GLint viewport[4];
 
 void openGLStart()
 {
+	// Draw over black bars
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glViewport(0, 0, android_screen_width, android_screen_height);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrthof(0.f, (GLfloat)android_screen_width, (GLfloat)android_screen_height, 0.f, 0.f, 1.f);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
 
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_DEPTH_TEST);
@@ -79,20 +94,20 @@ void openGLStart()
 	glEnable (GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
-	//glDisable(GL_CULL_FACE);
-	glMatrixMode(GL_MODELVIEW);
-
 }
 
 void openGLEnd()
 {
-
 	glDisable (GL_BLEND);
 	glColor4f(1,1,1,1);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	//glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 
+	// Restore viewport that SDL uses
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 }
 
 void gameSettingsButton(int state)
@@ -102,20 +117,6 @@ void gameSettingsButton(int state)
 	{
 		showTouchSettings();
 	}
-}
-
-
-
-static jclass NativeLibClass = 0;
-static jmethodID swapBuffersMethod = 0;
-void swapBuffers()
-{
-	if (NativeLibClass == 0)
-	{
-		NativeLibClass = env_->FindClass("com/beloko/idtech/wolf3d/NativeLib");
-		swapBuffersMethod = env_->GetStaticMethodID(NativeLibClass, "swapBuffers", "()V");
-	}
-	env_->CallStaticVoidMethod(NativeLibClass, swapBuffersMethod);
 }
 
 extern unsigned int Sys_Milliseconds(void);
@@ -377,13 +378,13 @@ void initControls(int width, int height,const char * graphics_path,const char *s
 	controlsContainer.initGL();
 }
 
+}
 
 int inMenuLast = 1;
 int inAutomapLast = 0;
 void frameControls()
 {
-
-//	LOGI("frameControls");
+	//LOGI("frameControls\n");
 
 	int inMenuNew = PortableInMenu();
 	if (inMenuLast != inMenuNew)
@@ -410,12 +411,11 @@ void frameControls()
 	setHideSticks(!showSticks);
 	controlsContainer.draw();
 
-	swapBuffers();
-
 	// glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	// glClear(GL_COLOR_BUFFER_BIT);
 }
 
+extern "C" {
 
 void setTouchSettings(float alpha,float strafe,float fwd,float pitch,float yaw,int other)
 {
@@ -473,12 +473,6 @@ int quit_now = 0;
 
 #define EXPORT_ME __attribute__ ((visibility("default")))
 
-JNIEnv* env_;
-
-int argc=1;
-const char * argv[32];
-std::string graphicpath;
-
 
 std::string game_path;
 
@@ -488,34 +482,26 @@ const char * getGamePath()
 }
 
 std::string home_env;
+}
 
-
-extern void Android_SetGameResolution(int width, int height);
-extern int SDLDisableAlphaFix; //This is in the SDL renderer gles file
-jint EXPORT_ME
-JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint disableAlphaFix,jobjectArray argsArray,jint lowRes,jstring game_path_ )
+extern int main_android(int, char*[]);
+extern "C"
+int SDL_main(int argc, char* argv[])
 {
-	env_ = env;
+	// We hack in a control overlay by doing direct OpenGL ES 1.x calls
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengles");
 
-	if (lowRes)
-		Android_SetGameResolution(320,240);
-	else
-		Android_SetGameResolution(640,400);
+	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "false");
 
-	SDLDisableAlphaFix = disableAlphaFix;
+	JNIEnv *env = env_ = static_cast<JNIEnv*>(SDL_AndroidGetJNIEnv());
+	JavaVM *vm;
+	env_->GetJavaVM(&vm);
+	setTCJNIEnv(vm);
 
-	argv[0] = "quake";
-	int argCount = (env)->GetArrayLength( argsArray);
-	LOGI("argCount = %d",argCount);
-	for (int i=0; i<argCount; i++) {
-		jstring string = (jstring) (env)->GetObjectArrayElement( argsArray, i);
-		argv[argc] = (char *)(env)->GetStringUTFChars( string, 0);
-		LOGI("arg = %s",argv[argc]);
-		argc++;
-	}
+	for(int i = 0;i < argc;++i)
+		LOGI("Arg%d = %s\n", i, argv[i]);
 
-
-	game_path = (char *)(env)->GetStringUTFChars( game_path_, 0);
+	game_path = argv[1];
 
 	LOGI("game_path = %s",getGamePath());
 
@@ -529,60 +515,72 @@ JAVA_FUNC(init) ( JNIEnv* env,	jobject thiz,jstring graphics_dir,jint disableAlp
 	chdir(getGamePath());
 
 
-	const char * p = env->GetStringUTFChars(graphics_dir,NULL);
+	const char * p = argv[2];
+	LOGI("graphicpath = %s\n", p);
 	graphicpath =  std::string(p);
 
-
-
-	initControls(android_screen_width,-android_screen_height,graphicpath.c_str(),(graphicpath + "/game_controls.xml").c_str());
-
-	SDL_SetSwapBufferCallBack(frameControls);
-
-	//Now done in java to keep context etc
-	SDL_SwapBufferPerformsSwap(false);
-
-	PortableInit(argc,argv); //Never returns!!
+	main_android(argc-2,argv+2); //Never returns!!
 
 	return 0;
 }
 
-
-jint EXPORT_ME
-JAVA_FUNC(frame) ( JNIEnv* env,	jobject thiz )
+void Android_SetScreenSize(int w, int h)
 {
+	android_screen_width = w;
+	android_screen_height = h;
 
-	//NOT CALLED
-/*
-	LOGI("frame");
-
-	PortableFrame();
-
-	if (quit_now)
+	static jclass NativeLibClass = 0;
+	static jmethodID setScreenSizeMethod = 0;
+	if (NativeLibClass == 0)
 	{
-		LOGI("frame QUIT");
-		return 128;
+		NativeLibClass = env_->FindClass("com/beloko/idtech/wolf3d/NativeLib");
+		setScreenSizeMethod = env_->GetStaticMethodID(NativeLibClass, "setScreenSize", "(II)V");
+	}
+	env_->CallStaticVoidMethod(NativeLibClass, setScreenSizeMethod, android_screen_width, android_screen_height);
+
+	initControls(android_screen_width,-android_screen_height,graphicpath.c_str(),(graphicpath + "/game_controls.xml").c_str());
+}
+
+int Android_EventWatch(void *, SDL_Event *event)
+{
+	switch(event->common.type)
+	{
+	case SDL_WINDOWEVENT:
+		if(event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+			Android_SetScreenSize(event->window.data1, event->window.data2);
+		break;
+
+#if 0
+	case SDL_FINGERMOTION:
+		controlsContainer.processPointer(P_MOVE, event->tfinger.fingerId, event->tfinger.x, event->tfinger.y);
+		break;
+	case SDL_FINGERDOWN:
+		controlsContainer.processPointer(P_DOWN, event->tfinger.fingerId, event->tfinger.x, event->tfinger.y);
+		break;
+	case SDL_FINGERUP:
+		controlsContainer.processPointer(P_UP, event->tfinger.fingerId, event->tfinger.x, event->tfinger.y);
+		break;
+#endif
 	}
 
-	frameControls();
-
-	int ret = 0;
-
-	return ret;
-	*/
+	return 0;
 }
 
-__attribute__((visibility("default"))) jint JNI_OnLoad(JavaVM* vm, void* reserved)
+void PostSDLInit(SDL_Window *Screen)
 {
-	LOGI("JNI_OnLoad");
-	setTCJNIEnv(vm);
-	return JNI_VERSION_1_4;
+	SDL_AddEventWatch(Android_EventWatch, NULL);
+
+	SDL_DisplayMode mode;
+	SDL_GetWindowDisplayMode(Screen, &mode);
+	Android_SetScreenSize(mode.w, mode.h);
 }
 
+extern "C" {
 
 void EXPORT_ME
 JAVA_FUNC(keypress) (JNIEnv *env, jobject obj,jint down, jint keycode, jint unicode)
 {
-	LOGI("keypress %d",keycode);
+	//LOGI("keypress %d",keycode);
 	if (controlsContainer.isEditing())
 	{
 		if (down && (keycode == SDL_SCANCODE_ESCAPE ))
@@ -609,7 +607,7 @@ JAVA_FUNC(doAction) (JNIEnv *env, jobject obj,	jint state, jint action)
 		if (tcGameMain)
 			if (tcGameMain->isEnabled())
 				tcGameMain->animateOut(30);
-	LOGI("doAction %d %d",state,action);
+	//LOGI("doAction %d %d",state,action);
 	PortableAction(state,action);
 }
 
@@ -626,11 +624,10 @@ JAVA_FUNC(analogSide) (JNIEnv *env, jobject obj,jfloat v)
 }
 
 void EXPORT_ME
-JAVA_FUNC(analogPitch) (JNIEnv *env, jobject obj,
-		jint mode,jfloat v)
-		{
+JAVA_FUNC(analogPitch) (JNIEnv *env, jobject obj, jint mode,jfloat v)
+{
 	PortableLookPitch(mode, v);
-		}
+}
 
 void EXPORT_ME
 JAVA_FUNC(analogYaw) (JNIEnv *env, jobject obj,	jint mode,jfloat v)
@@ -654,16 +651,5 @@ JAVA_FUNC(quickCommand) (JNIEnv *env, jobject obj,	jstring command)
 	PortableCommand(quickCommandString.c_str());
 	return 0;
 }
-
-
-
-
-void EXPORT_ME
-JAVA_FUNC(setScreenSize) ( JNIEnv* env,	jobject thiz, jint width, jint height)
-{
-	android_screen_width = width;
-	android_screen_height = height;
-}
-
 
 }

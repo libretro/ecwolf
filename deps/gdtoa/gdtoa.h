@@ -32,7 +32,7 @@ THIS SOFTWARE.
 #ifndef GDTOA_H_INCLUDED
 #define GDTOA_H_INCLUDED
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 /* [RH] Generating arith.h strikes me as too cumbersome under Visual
 * Studio, so here's the equivalent, given the limited number of
 * architectures that MSC can target. (Itanium? Who cares about that?)

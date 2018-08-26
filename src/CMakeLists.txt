@@ -304,7 +304,7 @@ else()
 	)
 
 	# Link test
-	add_executable(link-test android/link-test.c)
+	add_executable(link-test android/link-test.cpp)
 	target_link_libraries(link-test ecwolf)
 endif()
 

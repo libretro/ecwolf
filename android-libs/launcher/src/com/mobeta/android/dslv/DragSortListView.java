@@ -2589,7 +2589,7 @@ public class DragSortListView extends ListView {
      * A word of warning about a "feature" in Android that you may run into when
      * dealing with movable list items: for an adapter that <em>does</em> have
      * stable IDs, ListView will attempt to locate each item based on its ID and
-     * move the check state from the item's old position to the new position —
+     * move the check state from the item's old position to the new position -
      * which is all fine and good (and removes the need for calling this
      * function), except for the half-baked approach. Apparently to save time in
      * the naive algorithm used, ListView will only search for an ID in the

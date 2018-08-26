@@ -353,6 +353,10 @@ static void processEvent(SDL_Event *event)
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 			LastScan = event->key.keysym.scancode;
+
+			// Android back button should be treated as escape for now
+			if(LastScan == SDL_SCANCODE_AC_BACK)
+				LastScan = SDL_SCANCODE_ESCAPE;
 #else
 			LastScan = event->key.keysym.sym;
 #endif

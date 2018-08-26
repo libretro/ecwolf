@@ -37,6 +37,8 @@ import com.beloko.idtech.Utils;
 import com.beloko.idtech.wolf3d.Game;
 import com.beloko.idtech.R;
 
+import org.libsdl.app.SDLActivity;
+
 public class LaunchFragment extends Fragment{                           
 
 	String LOG = "LaunchFragment";     
@@ -52,8 +54,6 @@ public class LaunchFragment extends Fragment{
 
 	ArrayList<String> argsHistory;
 
-
-	int lowRes;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,35 +86,6 @@ public class LaunchFragment extends Fragment{
 
 		argsEditText = (EditText)mainView.findViewById(R.id.extra_args_edittext);
 		gameArgsTextView = (TextView)mainView.findViewById(R.id.extra_args_textview);
-
-		lowRes = 0;
-
-		RadioGroup resRadio =  (RadioGroup) mainView.findViewById(R.id.res_radiogroup);
-
-		resRadio.setOnCheckedChangeListener(new OnCheckedChangeListener() 
-		{
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				// checkedId is the RadioButton selected
-
-				switch(checkedId) {
-				case R.id.high_res_radiobutton:
-					AppSettings.setIntOption(getActivity(), "low_res", 0);
-					lowRes = 0;
-					break;
-				case R.id.low_res_radiobutton:
-					AppSettings.setIntOption(getActivity(), "low_res", 1);
-					lowRes = 1;
-					break;
-				}   
-			}
-		}); 
-
-		lowRes = AppSettings.getIntOption(getActivity(), "low_res", 0);
-		if (lowRes == 0)
-			((RadioButton)mainView.findViewById(R.id.high_res_radiobutton)).setChecked(true);
-		else
-			((RadioButton)mainView.findViewById(R.id.low_res_radiobutton)).setChecked(true);
-
 
 		Button startfull = (Button)mainView.findViewById(R.id.start_full);
 		startfull.setOnClickListener(new OnClickListener() {
@@ -189,8 +160,6 @@ public class LaunchFragment extends Fragment{
 
 		intent.putExtra("game_path",base); 
 
-
-		intent.putExtra("low_res",lowRes);
 		intent.putExtra("args"," --samplerate 11250 --bits 32"  + args + " ");                                                
 		startActivity(intent);
 	}                  

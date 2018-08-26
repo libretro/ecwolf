@@ -18,7 +18,6 @@ class Button : public ControlSuper
 
 
 	GLuint glTex;
-	GLuint glTexHidden;
 
 	GLRect glRect;
 

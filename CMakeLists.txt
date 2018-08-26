@@ -83,8 +83,6 @@ elseif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 	endif()
 endif()
 
-option(ANDROID "Build for Android" OFF)
-
 # Support cross compiling
 option( FORCE_CROSSCOMPILE "Turn on cross compiling." NO )
 if( FORCE_CROSSCOMPILE )
@@ -131,8 +129,9 @@ function( add_pk3 PK3_NAME PK3_DIR )
 			DEPENDS zipdir )
 		install(FILES ${TARGET_DIR}/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_DATAPRODUCTDIR}")
 	else()
-		# Prepare assets directory for APK
+		# On Android need to put pk3 in an assets directory
 		add_custom_target( ${PK3_TARGET} ALL
+			COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_DIR}/assets
 			COMMAND zipdir -udf ${OUTPUT_DIR}/assets/${PK3_NAME} ${PK3_DIR}
 			DEPENDS zipdir )
 	endif()

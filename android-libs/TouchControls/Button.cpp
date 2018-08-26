@@ -101,7 +101,6 @@ bool Button::initGL()
 {
 	int x,y;
 	glTex = loadTextureFromPNG(image,x,y);
-	glTexHidden = loadTextureFromPNG("red_cross",x,y);
 }
 
 bool Button::drawGL(bool forEditor)

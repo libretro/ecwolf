@@ -1287,20 +1287,20 @@ void I_AcknowledgeError();
 
 int WL_Main (int argc, char *argv[])
 {
-	// Stop the C library from screwing around with its functions according
-	// to the system locale.
-	setlocale(LC_ALL, "C");
-
-	FileSys::SetupPaths(argc, argv);
-
-	// Find the program directory.
-	FString progdir(FileSys::GetDirectoryPath(FileSys::DIR_Program));
-
-	Scanner::SetMessageHandler(ScannerMessageHandler);
-	atexit(CallTerminateFunctions);
-
 	try
 	{
+		// Stop the C library from screwing around with its functions according
+		// to the system locale.
+		setlocale(LC_ALL, "C");
+
+		FileSys::SetupPaths(argc, argv);
+
+		// Find the program directory.
+		FString progdir(FileSys::GetDirectoryPath(FileSys::DIR_Program));
+
+		Scanner::SetMessageHandler(ScannerMessageHandler);
+		atexit(CallTerminateFunctions);
+
 		printf("ReadConfig: Reading the Configuration.\n");
 		config.LocateConfigFile(argc, argv);
 		ReadConfig();
@@ -1369,7 +1369,7 @@ bool GtkAvailable;
 
 #ifndef _WIN32
 #ifdef __ANDROID__
-extern "C" int main_android(int argc, char *argv[])
+int main_android(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif

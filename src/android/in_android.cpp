@@ -1,10 +1,9 @@
 
 #include "wl_def.h"
+#include "wl_play.h"
 
 extern "C"
 {
-
-int main_android (int argc, char *argv[]);
 
 #include "in_android.h"
 
@@ -21,10 +20,11 @@ int main_android (int argc, char *argv[]);
 
 #include "SDL.h"
 #include "SDL_keycode.h"
+#include "SDL_main.h"
 
 
 #include <android/log.h>
-//#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"JNI", __VA_ARGS__))
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"JNI", __VA_ARGS__))
 //#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "JNI", __VA_ARGS__))
 //#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR,"JNI", __VA_ARGS__))
 
@@ -60,15 +60,12 @@ static void in_finishevent(void)
 extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
 
 int PortableKeyEvent(int state, int code, int unicode){
-	LOGI("PortableKeyEvent %d %d %d",state,code,unicode);
-
 	if (state)
 		SDL_SendKeyboardKey(SDL_PRESSED, (SDL_Scancode)code);
 	else
 		SDL_SendKeyboardKey(SDL_RELEASED, (SDL_Scancode) code);
 
 	return 0;
-
 }
 
 
@@ -86,8 +83,6 @@ static bool alwaysrun = false;
 
 void PortableAction(int state, int action)
 {
-	LOGI("PortableAction %d   %d",state,action);
-
 	int key = -1;
 
 	switch (action)
@@ -250,13 +245,6 @@ void PortableCommand(const char * cmd){
 	postCommand(cmd);
 }
 
-
-void PortableInit(int argc,const char ** argv){
-	main_android(argc,(char **)argv);
-
-}
-
-
 void PortableFrame(void){
 
 
@@ -288,32 +276,28 @@ int PortableShowKeyboard(void){
 #define BASETURN                35
 #define RUNTURN                 70
 
-extern int controlx, controly,controlstrafe;
-extern bool buttonstate[NUMBUTTONS];
-
 //NOTE this is cpp
 void pollAndroidControls()
 {
-
-	controly  -= forwardmove     * (alwaysrun ? RUNMOVE:BASEMOVE);
-	controlstrafe  += sidemove   * (alwaysrun ? RUNMOVE:BASEMOVE);
+	control[ConsolePlayer].controly  -= forwardmove     * (alwaysrun ? RUNMOVE:BASEMOVE);
+	control[ConsolePlayer].controlstrafe  += sidemove   * (alwaysrun ? RUNMOVE:BASEMOVE);
 
 
 	switch(look_yaw_mode)
 	{
 	case LOOK_MODE_MOUSE:
-		controlx += -look_yaw_mouse * 8000;
+		control[ConsolePlayer].controlx += -look_yaw_mouse * 8000;
 		look_yaw_mouse = 0;
 		break;
 	case LOOK_MODE_JOYSTICK:
-		controlx += -look_yaw_joy * 80;
+		control[ConsolePlayer].controlx += -look_yaw_joy * 80;
 		break;
 	}
 
 	for (int n=0;n<NUMBUTTONS;n++)
 	{
 		if (my_buttonstate[n])
-			buttonstate[n] = 1;
+			control[ConsolePlayer].buttonstate[n] = 1;
 	}
 }
 
