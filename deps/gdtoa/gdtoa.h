@@ -40,7 +40,7 @@ THIS SOFTWARE.
 #define IEEE_8087
 #define Arith_Kind_ASL 1
 #define Double_Align
-#ifdef _M_X64
+#if defined(_M_X64) || defined(__MINGW64__)
 #define X64_bit_pointers
 #endif
 #elif defined(__APPLE__)

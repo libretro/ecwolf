@@ -51,7 +51,7 @@ add_jar(ecwolf-android
 		"${ANDROID_MOGA_CONTROLLER_JAR}"
 )
 
-add_dependencies(ecwolf-android ecwolf TouchControls pk3)
+add_dependencies(ecwolf-android ecwolf touchcontrols pk3)
 
 add_custom_command(TARGET ecwolf-android POST_BUILD
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:ecwolf>" "${CMAKE_CURRENT_BINARY_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/$<TARGET_FILE_NAME:ecwolf>"
