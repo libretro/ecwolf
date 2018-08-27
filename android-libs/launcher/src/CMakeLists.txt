@@ -48,7 +48,6 @@ add_jar(ecwolf-android
 	INCLUDE_JARS
 		"${ANDROID_SDK_JAR}"
 		"${ANDROID_SUPPORT_V4_JAR}"
-		"${ANDROID_MOGA_CONTROLLER_JAR}"
 )
 
 add_dependencies(ecwolf-android ecwolf touchcontrols pk3)
@@ -61,7 +60,6 @@ add_custom_command(TARGET ecwolf-android POST_BUILD
 	COMMAND "${ANDROID_DX_BINARY}" --dex "--output=classes.dex"
 		"ecwolf-android.jar"
 		"${ANDROID_SUPPORT_V4_JAR}"
-		"${ANDROID_MOGA_CONTROLLER_JAR}"
 	COMMAND "${ANDROID_AAPT_BINARY}" add -f "${APK_OUTPUT}" "classes.dex" "lib/${CMAKE_ANDROID_ARCH_ABI}/*"
 	COMMAND "${ANDROID_JAR_SIGNER}" -storepass "${ANDROID_SIGN_STOREPASS}" -keystore "${ANDROID_SIGN_KEYSTORE}" "${APK_OUTPUT}" "${ANDROID_SIGN_KEYNAME}"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"

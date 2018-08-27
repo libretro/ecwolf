@@ -24,10 +24,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bda.controller.Controller;
-import com.bda.controller.ControllerListener;
-import com.bda.controller.StateEvent;
-
 public class GamePadFragment extends Fragment{
 	final String LOG = "GamePadFragment";
 	
@@ -39,9 +35,6 @@ public class GamePadFragment extends Fragment{
 	QuakeControlConfig config;
 
 	GenericAxisValues genericAxisValues = new GenericAxisValues();
-	
-	Controller mogaController = null;
-	final MogaControllerListener mListener = new MogaControllerListener();
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,33 +50,7 @@ public class GamePadFragment extends Fragment{
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}
-		
-		
-		mogaController = Controller.getInstance(getActivity());
-		mogaController.init();
-		mogaController.setListener(mListener,new Handler());
 	}
-
-	@Override
-	public void onPause()
-	{
-		super.onPause();
-		mogaController.onPause();
-	}
-	@Override
-	public void onResume()
-	{
-		super.onResume();
-		mogaController.onResume();
-	}
-	
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-		mogaController.exit();
-	}
-	
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -240,35 +207,4 @@ public class GamePadFragment extends Fragment{
 		}
 
 	}
-
-
-	class MogaControllerListener implements ControllerListener {
-
-		
-		@Override
-		public void onKeyEvent(com.bda.controller.KeyEvent event) {
-			//Log.d(LOG,"onKeyEvent " + event.getKeyCode());
-			
-			if (event.getAction() == com.bda.controller.KeyEvent.ACTION_DOWN)
-				onKeyDown(event.getKeyCode(),null);
-			else if (event.getAction() == com.bda.controller.KeyEvent.ACTION_UP)
-				onKeyUp(event.getKeyCode(),null);
-		}
-	
-		@Override
-		public void onMotionEvent(com.bda.controller.MotionEvent event) {
-			//Log.d(LOG,"onGenericMotionEvent " + event.toString());
-			
-			genericAxisValues.setMogaValues(event);
-			
-			if (config.onGenericMotionEvent(genericAxisValues))
-				adapter.notifyDataSetChanged();
-		}
-
-		@Override
-		public void onStateEvent(StateEvent event) {
-			Log.d(LOG,"onStateEvent " + event.getState());
-		}
-	}
-
 }

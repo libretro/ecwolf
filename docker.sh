@@ -394,7 +394,6 @@ declare -A ConfigMinGW=(
 # Ubuntu Android ---------------------------------------------------------------
 
 dockerfile_android() {
-	# Need a more sustainable solution for com.bda.controller.jar
 	cat <<-'EOF'
 		FROM ubuntu:18.04
 
@@ -413,7 +412,6 @@ dockerfile_android() {
 		cd sdk && \
 		curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk-tools-linux.zip && \
 		curl https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip -o android-ndk.zip && \
-		curl https://raw.githubusercontent.com/emileb/OpenGames/3e8682f24fe223c7065671d0204de639a6d2ec05/touchcontrols/libs/com.bda.controller.jar -o com.bda.controller.jar && \
 		7za x sdk-tools-linux.zip && \
 		7za x android-ndk.zip && \
 		rm sdk-tools-linux.zip android-ndk.zip && \
@@ -455,7 +453,6 @@ build_android() {
 				-DANDROID_SIGN_KEYNAME=untrusted \
 				-DANDROID_SIGN_KEYSTORE=/sdk/untrusted.keystore \
 				-DANDROID_SIGN_STOREPASS=untrusted \
-				-DANDROID_MOGA_CONTROLLER_JAR=/sdk/com.bda.controller.jar \
 				-DINTERNAL_SDL{,_MIXER,_MIXER_CODECS,_NET}=ON
 			make -j "$(nproc)" &&
 			cp ecwolf.apk /results/ecwolf-"$Arch".apk

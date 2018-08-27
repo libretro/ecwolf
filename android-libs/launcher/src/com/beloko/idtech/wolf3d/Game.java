@@ -18,10 +18,6 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.bda.controller.Controller;
-import com.bda.controller.ControllerListener;
-import com.bda.controller.StateEvent;
-
 public class Game extends SDLActivity
 {
 	static final String LOG = "ECWolf Activity";
@@ -33,9 +29,6 @@ public class Game extends SDLActivity
 
 	private ControlAdapter controlAdapter;
 	static QuakeControlInterpreter controlInterp;
-
-	private final MogaControllerListener mogaListener = new MogaControllerListener();
-	Controller mogaController = null;
 
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -50,10 +43,6 @@ public class Game extends SDLActivity
 
 		args = getIntent().getStringExtra("args");
 		gamePath  = getIntent().getStringExtra("game_path");
-
-		mogaController = Controller.getInstance(this);
-		mogaController.init();
-		mogaController.setListener(mogaListener,new Handler());
 
 		Utils.copyPNGAssets(getApplicationContext(),AppSettings.graphicsDir);
 
@@ -123,26 +112,6 @@ public class Game extends SDLActivity
 		{
 			controlInterp.onTouchEvent(event);
 			return ((View.OnTouchListener)sdlSurface).onTouch(v, event);
-		}
-	}
-
-	class MogaControllerListener implements ControllerListener {
-		@Override
-		public void onKeyEvent(com.bda.controller.KeyEvent event) {
-			//Log.d(LOG,"onKeyEvent " + event.getKeyCode());
-			controlInterp.onMogaKeyEvent(event,mogaController.getState(Controller.STATE_CURRENT_PRODUCT_VERSION));
-		}
-
-		@Override
-		public void onMotionEvent(com.bda.controller.MotionEvent event) {
-			// TODO Auto-generated method stub
-			Log.d(LOG,"onGenericMotionEvent " + event.toString());
-			controlInterp.onGenericMotionEvent(event);
-		}
-
-		@Override
-		public void onStateEvent(StateEvent event) {
-			Log.d(LOG,"onStateEvent " + event.getState());
 		}
 	}
 }

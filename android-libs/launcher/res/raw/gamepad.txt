@@ -11,9 +11,4 @@ The Actions with a joystick icon are for analog inputs ONLY. The other Actions c
 
 Press the Back Button to cancel and clear an Action
 
-MOGA Pocket:
-Ensure your MOGA Pocket device is first connected via bluetooth to your Android device.
-
-MOGA Pro:
-You can set your game pad to A OR B mode, ensure it is first connected via bluetooth.
  
