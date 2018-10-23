@@ -139,6 +139,7 @@ class ARandomSpawner : public AActor
 		{
 			// copy everything relevant
 			newmobj->angle = angle;
+			newmobj->dir = dir;
 			newmobj->flags |= (flags & FL_AMBUSH);
 			newmobj->target = target;
 			/*newmobj->SpawnAngle = newmobj->angle = angle;
