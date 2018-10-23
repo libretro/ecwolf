@@ -97,6 +97,9 @@ class ARandomSpawner : public AActor
 				if (cls != NULL)
 				{
 					Species = cls->GetName();
+					const AActor *defmobj = cls->GetDefault();
+					this->speed   =  defmobj->speed;
+					this->flags  |= (defmobj->flags  & FL_MISSILE);
 					/*AActor *defmobj = GetDefaultByType(cls);
 					this->Speed   =  defmobj->Speed;
 					this->flags  |= (defmobj->flags  & MF_MISSILE);
@@ -137,6 +140,7 @@ class ARandomSpawner : public AActor
 			// copy everything relevant
 			newmobj->angle = angle;
 			newmobj->flags |= (flags & FL_AMBUSH);
+			newmobj->target = target;
 			/*newmobj->SpawnAngle = newmobj->angle = angle;
 			newmobj->SpawnPoint[2] = SpawnPoint[2];
 			newmobj->special    = special;
