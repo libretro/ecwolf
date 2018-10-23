@@ -122,16 +122,21 @@ class ARandomSpawner : public AActor
 		//Super::PostBeginPlay();
 		if (Species == NAME_None) { Destroy(); return; }
 		const ClassDef * cls = ClassDef::FindClass(Species);
+		// Flags passed to Spawn(). Currently only SPAWN_Patrol is relevant, since
+		// class replacement is already handled in BeginPlay().
+		int spawnflags = 0;
+		if (flags & FL_PATHING) spawnflags |= SPAWN_Patrol;
 		/*if (this->flags & MF_MISSILE && target && target->target) // Attempting to spawn a missile.
 		{
 			if ((tracer == NULL) && (flags2 & MF2_SEEKERMISSILE)) tracer = target->target;
 			newmobj = P_SpawnMissileXYZ(x, y, z, target, target->target, cls, false);
 		}
-		else*/ newmobj = Spawn(cls, x, y, 0, false);
+		else*/ newmobj = Spawn(cls, x, y, 0, spawnflags);
 		if (newmobj != NULL)
 		{
 			// copy everything relevant
 			newmobj->angle = angle;
+			newmobj->flags |= (flags & FL_AMBUSH);
 			/*newmobj->SpawnAngle = newmobj->angle = angle;
 			newmobj->SpawnPoint[2] = SpawnPoint[2];
 			newmobj->special    = special;
