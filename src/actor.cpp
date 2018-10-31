@@ -441,7 +441,7 @@ void AActor::Serialize(FArchive &arc)
 		<< distance
 		<< x
 		<< y;
-	if(GameSave::SaveVersion >= 1507591295)
+	if(GameSave::SaveProdVersion >= 0x001003FF && GameSave::SaveVersion >= 1507591295)
 		arc << z;
 	arc << velx
 		<< vely
@@ -477,7 +477,7 @@ void AActor::Serialize(FArchive &arc)
 		<< player
 		<< inventory
 		<< soundZone;
-	if(GameSave::SaveVersion >= 1459043051)
+	if(GameSave::SaveProdVersion >= 0x001003FF && GameSave::SaveVersion >= 1459043051)
 		arc << target;
 	if(arc.IsLoading() && (GameSave::SaveProdVersion < 0x001002FF || GameSave::SaveVersion < 1382102747))
 	{
