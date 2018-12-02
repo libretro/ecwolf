@@ -55,7 +55,12 @@ function(sdl_modernize NEW_TARGET LIBS DIRS)
 			set(LIB ${LIB2})
 		endif()
 
-		set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB})
+		# For a Mac framework we need to specify the location of the actual library
+		if(APPLE AND LIB MATCHES "([^/]+)\\.framework$")
+			set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB}/${CMAKE_MATCH_1})
+		else()
+			set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB})
+		endif()
 		if(LIBS)
 			set_property(TARGET ${NEW_TARGET} APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${${LIBS}})
 		endif()
