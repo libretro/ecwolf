@@ -62,10 +62,16 @@ public:
 	{
 		TF_PATHING = 1,
 		TF_HOLOWALL = 2,
-		TF_AMBUSH = 4,
+		TF_AMBUSH = 4
+	};
 
-		TF_ISELEVATOR = 0x40000000,
-		TF_ISTRIGGER = 0x80000000
+	enum
+	{
+		TSF_ISELEVATOR = 1,
+		TSF_ISTRIGGER = 2,
+
+		// Only returned by TranslateThing to indicate that the thing object is valid.
+		TSF_ISTHING = 0x80000000
 	};
 
 	enum EFeatureFlags
@@ -95,8 +101,14 @@ public:
 		unsigned short	oldnum;
 		unsigned char	angles;
 		unsigned char	minskill;
+	};
 
-		MapTrigger		templateTrigger;
+	struct ThingSpecialXlat
+	{
+		ThingSpecialXlat() : flags(0) {}
+
+		MapTrigger templateTrigger;
+		uint32_t flags;
 	};
 
 	struct ModZone
@@ -287,45 +299,49 @@ public:
 		return false;
 	}
 
-	bool TranslateThing(MapThing &thing, MapTrigger &trigger, uint32_t &flags, unsigned short oldnum) const
+	uint32_t TranslateThing(MapThing &thing, MapTrigger &trigger, uint32_t &flags, unsigned short oldnum) const
 	{
+		uint32_t tsFlags = 0;
+
+		// Add special (i.e. trigger, elevator)
+		const ThingSpecialXlat *ts;
+		if((ts = thingSpecialTable.CheckKey(oldnum)) != NULL)
+		{
+			tsFlags = ts->flags;
+
+			if(ts->flags & Xlat::TSF_ISTRIGGER)
+				trigger = ts->templateTrigger;
+		}
+
+		// Add thing
 		unsigned int index = SearchForThing(oldnum, thingTable.Size());
 		if(index == UINT_MAX)
-			return false;
+			return tsFlags;
 		const ThingXlat &type = thingTable[index];
 
+		tsFlags |= TSF_ISTHING;
 		flags = type.flags;
-		if(type.flags & Xlat::TF_ISELEVATOR)
-			return true;
+		thing.type = type.type;
 
-		if(type.flags & Xlat::TF_ISTRIGGER)
+		// The player has a weird rotation pattern. It's 450-angle.
+		bool playerRotation = false;
+		if(thing.type == SpecialThingNames[SMT_Player1Start])
+			playerRotation = true;
+
+		if(type.angles)
 		{
-			trigger = type.templateTrigger;
+			thing.angle = (oldnum - type.oldnum)*(360/type.angles);
+			if(playerRotation)
+				thing.angle = (360 + 360/type.angles)-thing.angle;
 		}
 		else
-		{
-			thing.type = type.type;
+			thing.angle = 0;
 
-			// The player has a weird rotation pattern. It's 450-angle.
-			bool playerRotation = false;
-			if(thing.type == SpecialThingNames[SMT_Player1Start])
-				playerRotation = true;
-
-			if(type.angles)
-			{
-				thing.angle = (oldnum - type.oldnum)*(360/type.angles);
-				if(playerRotation)
-					thing.angle = (360 + 360/type.angles)-thing.angle;
-			}
-			else
-				thing.angle = 0;
-
-			thing.patrol = flags&Xlat::TF_PATHING;
-			thing.skill[0] = thing.skill[1] = type.minskill <= 1;
-			thing.skill[2] = type.minskill <= 2;
-			thing.skill[3] = type.minskill <= 3;
-		}
-		return true;
+		thing.patrol = type.flags&Xlat::TF_PATHING;
+		thing.skill[0] = thing.skill[1] = type.minskill <= 1;
+		thing.skill[2] = type.minskill <= 2;
+		thing.skill[3] = type.minskill <= 3;
+		return tsFlags;
 	}
 
 	int TranslateZone(unsigned short tile)
@@ -517,17 +533,14 @@ protected:
 		sc.MustGetToken('{');
 		while(!sc.CheckToken('}'))
 		{
-			ThingXlat thing;
-
 			// Property
 			if(sc.CheckToken(TK_Identifier))
 			{
 				if(sc->str.CompareNoCase("trigger") == 0)
 				{
 					sc.MustGetToken(TK_IntConst);
-					thing.flags = Xlat::TF_ISTRIGGER;
-					thing.angles = 0;
-					thing.oldnum = sc->number;
+					ThingSpecialXlat &thing = thingSpecialTable[sc->number];
+					thing.flags |= Xlat::TSF_ISTRIGGER;
 
 					sc.MustGetToken('{');
 					TextMapParser::ParseTrigger(sc, thing.templateTrigger);
@@ -535,9 +548,9 @@ protected:
 				else if(sc->str.CompareNoCase("elevator") == 0)
 				{
 					sc.MustGetToken(TK_IntConst);
-					thing.flags = Xlat::TF_ISELEVATOR;
-					thing.angles = 0;
-					thing.oldnum = sc->number;
+					ThingSpecialXlat &thing = thingSpecialTable[sc->number];
+					thing.flags |= Xlat::TSF_ISELEVATOR;
+
 					sc.MustGetToken(';');
 				}
 				else
@@ -545,6 +558,8 @@ protected:
 			}
 			else
 			{
+				ThingXlat thing;
+
 				// Handle thing translation
 				sc.MustGetToken('{');
 				sc.MustGetToken(TK_IntConst);
@@ -599,18 +614,18 @@ protected:
 				sc.MustGetToken(TK_IntConst);
 				thing.minskill = sc->number;
 				sc.MustGetToken('}');
-			}
 
-			if(oldTableSize &&
+				if(oldTableSize &&
 				(replace = SearchForThing(thing.oldnum, oldTableSize)) != UINT_MAX)
-			{
-				ThingXlat &replaced = thingTable[replace];
-				if(replaced.oldnum != thing.oldnum) // Quick check for potential unwanted behavior.
-					sc.ScriptMessage(Scanner::ERROR, "Thing %d partially replaces %d.\n", thing.oldnum, replaced.oldnum);
-				replaced = thing;
+				{
+					ThingXlat &replaced = thingTable[replace];
+					if(replaced.oldnum != thing.oldnum) // Quick check for potential unwanted behavior.
+						sc.ScriptMessage(Scanner::ERROR, "Thing %d partially replaces %d.\n", thing.oldnum, replaced.oldnum);
+					replaced = thing;
+				}
+				else
+					thingTable.Push(thing);
 			}
-			else
-				thingTable.Push(thing);
 		}
 
 		qsort(&thingTable[0], thingTable.Size(), sizeof(thingTable[0]), ThingXlat::SortCompare);
@@ -626,7 +641,7 @@ protected:
 			{
 				--current;
 				if(current->oldnum <= oldmax && current->oldnum + current->angles - 1 >= oldmin)
-					sc.ScriptMessage(Scanner::ERROR, "Thing table contains ambiguous overlap for old num %d (%d).\n", oldmin, i);
+					sc.ScriptMessage(Scanner::ERROR, "Thing table contains ambiguous overlap for old num %d (%s).\n", oldmin, current->type.GetChars());
 				oldmin = current->oldnum;
 				oldmax = oldmin + (current->angles ? current->angles - 1 : 0);
 			}
@@ -638,6 +653,7 @@ private:
 	int lump;
 
 	TArray<ThingXlat> thingTable;
+	TMap<WORD, ThingSpecialXlat> thingSpecialTable;
 	TMap<WORD, MapTile> tilePalette;
 	TMap<WORD, MapTrigger> tileTriggers;
 	TMap<WORD, ModZone> modZones;
@@ -852,12 +868,13 @@ void GameMap::ReadMacData()
 		Thing thing;
 		Trigger trigger;
 		uint32_t flags = 0;
+		uint32_t tsFlags = 0;
 
-		if(!xlat.TranslateThing(thing, trigger, flags, type))
+		if((tsFlags = xlat.TranslateThing(thing, trigger, flags, type)) == 0)
 			printf("Unknown old type %d @ (%d,%d)\n", type, x, y);
 		else
 		{
-			if(flags & Xlat::TF_ISTRIGGER)
+			if(tsFlags & Xlat::TSF_ISTRIGGER)
 			{
 				if(trigger.isSecret)
 					++gamestate.secrettotal;
@@ -876,7 +893,7 @@ void GameMap::ReadMacData()
 				Trigger &trig = NewTrigger(x, y, 0);
 				trig = trigger;
 			}
-			else
+			if(tsFlags & Xlat::TSF_ISTHING)
 			{
 				thing.x = (fixed(x)<<FRACBITS)+(FRACUNIT/2);
 				thing.y = (fixed(y)<<FRACBITS)+(FRACUNIT/2);
@@ -1223,12 +1240,13 @@ void GameMap::ReadPlanesData()
 					Thing thing;
 					Trigger trigger;
 					uint32_t flags = 0;
+					uint32_t tsFlags = 0;
 
-					if(!xlat.TranslateThing(thing, trigger, flags, oldplane[i]))
+					if((tsFlags = xlat.TranslateThing(thing, trigger, flags, oldplane[i])) == 0)
 						printf("Unknown old type %d @ (%d,%d)\n", oldplane[i], i%header.width, i/header.width);
 					else
 					{
-						if(flags & Xlat::TF_ISTRIGGER)
+						if(tsFlags & Xlat::TSF_ISTRIGGER)
 						{
 							trigger.x = i%header.width;
 							trigger.y = i/header.width;
@@ -1236,11 +1254,11 @@ void GameMap::ReadPlanesData()
 
 							triggers.Push(trigger);
 						}
-						else if(flags & Xlat::TF_ISELEVATOR)
+						if(tsFlags & Xlat::TSF_ISELEVATOR)
 						{
 							elevatorSpots[oldplane[i]].Push(&mapPlane.map[i]);
 						}
-						else
+						if(tsFlags & Xlat::TSF_ISTHING)
 						{
 							thing.x = ((i%header.width)<<FRACBITS)+(FRACUNIT/2);
 							thing.y = ((i/header.width)<<FRACBITS)+(FRACUNIT/2);
