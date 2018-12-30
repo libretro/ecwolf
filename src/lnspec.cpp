@@ -1167,27 +1167,21 @@ FUNC(Teleport_Relative)
 		return 0;
 	dest = dests[pr_teleport(dests.Size())];
 
-	if(!(args[2] & TELEPORT_NoFog))
-		activator->SpawnFog(); // Source fog
-
 	if(!(args[2] & TELEPORT_NoStop))
 		activator->sighttime = 35; // Halt for half second
 
-	activator->x += (dest->GetX() - spot->GetX())<<FRACBITS;
-	activator->y += (dest->GetY() - spot->GetY())<<FRACBITS;
+	fixed x = activator->x + ((dest->GetX() - spot->GetX())<<FRACBITS);
+	fixed y = activator->y + ((dest->GetY() - spot->GetY())<<FRACBITS);
 	if((args[2] & TELEPORT_Center))
 	{
-		activator->x = (activator->x&0xFFFF0000)|0x8000;
-		activator->y = (activator->y&0xFFFF0000)|0x8000;
+		x = (activator->x&0xFFFF0000)|0x8000;
+		y = (activator->y&0xFFFF0000)|0x8000;
 	}
 
-	activator->angle = (args[1]<<24) +
+	angle_t angle = (args[1]<<24) +
 		(!(args[2] & TELEPORT_AbsoluteAngle) ? activator->angle : 0) +
 		((args[2] & TELEPORT_ActivationAngle) ? (direction<<30)+ANGLE_180 : 0);
 
-	activator->EnterZone(map->GetSpot(activator->tilex, activator->tiley, 0)->zone);
-
-	if(!(args[2] & TELEPORT_NoFog))
-		activator->SpawnFog(); // Destination fog
+	activator->Teleport(x, y, angle, !!(args[2] & TELEPORT_NoFog));
 	return 1;
 }

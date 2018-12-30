@@ -45,6 +45,7 @@
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_loadsave.h"
+#include "wl_state.h"
 #include "id_us.h"
 #include "m_random.h"
 
@@ -536,6 +537,31 @@ void AActor::SpawnFog()
 		fog->angle = angle;
 		fog->target = this;
 	}
+}
+
+bool AActor::Teleport(fixed x, fixed y, angle_t angle, bool nofog)
+{
+	const MapSpot destination = map->GetSpot(x>>FRACBITS, y>>FRACBITS, 0);
+
+	// For non-players, only teleport if spot is clear.
+	if(!player)
+	{
+		if(!TrySpot(this, destination))
+			return false;
+	}
+
+	if(!nofog)
+		SpawnFog(); // Source fog
+
+	this->x = x;
+	this->y = y;
+	this->angle = angle;
+
+	EnterZone(destination->zone);
+
+	if(!nofog)
+		SpawnFog(); // Destination fog
+	return true;
 }
 
 void AActor::Tick()

@@ -120,6 +120,7 @@ class AActor : public Thinker,
 		void			SpawnFog();
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags);
 		int32_t			SpawnHealth() const;
+		bool			Teleport(fixed x, fixed y, angle_t angle, bool nofog=false);
 		virtual void	Tick();
 		virtual void	Touch(AActor *toucher) {}
 

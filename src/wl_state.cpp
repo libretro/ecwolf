@@ -72,6 +72,30 @@ static void FirstSighting (AActor *ob, const Frame *state);
 */
 
 
+// Determines if the MapSpot is open to receive a monster
+bool TrySpot(AActor *ob, MapSpot spot)
+{
+	unsigned int x = spot->GetX();
+	unsigned int y = spot->GetY();
+
+	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
+	{
+		// We want to check where the actor is heading instead of the exact
+		// tile it exists in since this is essentially how Wolf3D handled things
+		// We must first determine if the monster has moved into the destination
+		// tile or not.  (Half way to destination.)
+
+		const dirtype offsetDir = iter->distance >= TILEGLOBAL/2 ? iter->dir : nodir;
+
+		// Players need not be checked
+		if(iter != ob && !iter->player && (iter->flags & FL_SOLID) &&
+			static_cast<unsigned int>(iter->tilex+dirdeltax[offsetDir]) == x &&
+			static_cast<unsigned int>(iter->tiley+dirdeltay[offsetDir]) == y)
+			return false;
+	}
+	return true;
+}
+
 /*
 ==================================
 =
@@ -110,8 +134,9 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 						used = true;
 				}
 			}
-			if(used)
+			if(used && spot->thinker)
 			{
+				// Wait for door
 				ob->distance = -1;
 				return 1;
 			}
@@ -119,21 +144,9 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 		if(spot->slideAmount[dir] != 0xffff)
 			return 0;
 	}
-	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
-	{
-		// We want to check where the actor is heading instead of the exact
-		// tile it exists in since this is essentially how Wolf3D handled things
-		// We must first determine if the monster has moved into the destination
-		// tile or not.  (Half way to destination.)
 
-		const dirtype offsetDir = iter->distance >= TILEGLOBAL/2 ? iter->dir : nodir;
-
-		// Players need not be checked
-		if(iter != ob && !iter->player && (iter->flags & FL_SOLID) &&
-			static_cast<unsigned int>(iter->tilex+dirdeltax[offsetDir]) == x &&
-			static_cast<unsigned int>(iter->tiley+dirdeltay[offsetDir]) == y)
-			return 0;
-	}
+	if(!TrySpot(ob, spot))
+		return 0;
 	return -1;
 }
 #define CHECKSIDE(x,y,dir) \
