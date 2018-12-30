@@ -315,20 +315,26 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 			unsigned int i = 0;
 			do
 			{
-				if(sc.CheckToken('}') || !sc.GetNextString())
+				if(hasAlternatives)
 				{
-					if(i == 0)
-						sc.ScriptMessage(Scanner::ERROR, "Expected lump name for '%s'.\n", idx.logicalName.GetChars());
-					else
+					if(i > 2)
+					{
+						sc.MustGetToken('}');
 						break;
+					}
+					else if(sc.CheckToken('}'))
+					{
+						break;
+					}
 				}
+
+				if(!sc.GetNextString())
+					sc.ScriptMessage(Scanner::ERROR, "Expected lump name for '%s'.\n", idx.logicalName.GetChars());
 
 				if(sc->str.Compare("NULL") == 0)
 					continue;
-				int sndLump = Wads.CheckNumForName(sc->str, ns_sounds);
 
-				if(i == 2 && !sc.CheckToken('}'))
-					sc.ScriptMessage(Scanner::ERROR, "Expected '}'.\n");
+				int sndLump = Wads.CheckNumForName(sc->str, ns_sounds);
 				if(sndLump == -1)
 					continue;
 
@@ -350,7 +356,7 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 						idx.priority = ReadLittleShort(&data[4]);
 				}
 			}
-			while(hasAlternatives && ++i < 3);
+			while(++i, hasAlternatives);
 		}
 	}
 }
