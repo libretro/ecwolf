@@ -43,28 +43,39 @@
 function(sdl_modernize NEW_TARGET LIBS DIRS)
 	# Lets be hopeful that eventually a target will appear upstream
 	if(NOT TARGET ${NEW_TARGET})
-		add_library(${NEW_TARGET} UNKNOWN IMPORTED)
+		if(CMAKE_VERSION VERSION_LESS 3.0)
+			# CMake 2.8.12 doesn't have interface libraries so we need to do a
+			# lot of work to approximate one.
+			add_library(${NEW_TARGET} UNKNOWN IMPORTED)
 
-		list(GET ${LIBS} 0 LIB)
-		list(REMOVE_AT ${LIBS} 0)
+			list(GET ${LIBS} 0 LIB)
+			list(REMOVE_AT ${LIBS} 0)
 
-		# On Linux SDL2's sdl2-config.cmake will specify -lSDL2 so we need to find that for CMake otherwise the target won't work
-		if(${LIB} MATCHES "^-l")
-			string(SUBSTRING ${LIB} 2 -1 LIB)
-			find_library(LIB2 ${LIB})
-			set(LIB ${LIB2})
-		endif()
+			# On Linux SDL2's sdl2-config.cmake will specify -lSDL2 so we need to find that for CMake otherwise the target won't work
+			if(${LIB} MATCHES "^-l")
+				string(SUBSTRING ${LIB} 2 -1 LIB)
+				find_library(LIB2 ${LIB})
+				set(LIB ${LIB2})
+			endif()
 
-		# For a Mac framework we need to specify the location of the actual library
-		if(APPLE AND LIB MATCHES "([^/]+)\\.framework$")
-			set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB}/${CMAKE_MATCH_1})
+			# For a Mac framework we need to specify the location of the actual library
+			if(APPLE AND LIB MATCHES "([^/]+)\\.framework$")
+				set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB}/${CMAKE_MATCH_1})
+			else()
+				set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB})
+			endif()
+			if(LIBS)
+				set_property(TARGET ${NEW_TARGET} APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${${LIBS}})
+			endif()
+			set_property(TARGET ${NEW_TARGET} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${${DIRS}})
 		else()
-			set_property(TARGET ${NEW_TARGET} PROPERTY IMPORTED_LOCATION ${LIB})
+			add_library(${NEW_TARGET} INTERFACE IMPORTED)
+			# In CMake 3.11 this could just be target_link_libraries and target_include_directories
+			set_target_properties(${NEW_TARGET} PROPERTIES
+				INTERFACE_LINK_LIBRARIES ${${LIBS}}
+				INTERFACE_INCLUDE_DIRECTORIES ${${DIRS}}
+			)
 		endif()
-		if(LIBS)
-			set_property(TARGET ${NEW_TARGET} APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${${LIBS}})
-		endif()
-		set_property(TARGET ${NEW_TARGET} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${${DIRS}})
 	endif()
 endfunction()
 
