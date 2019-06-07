@@ -4,7 +4,7 @@ if( CMAKE_COMPILER_IS_GNUC )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -fomit-frame-pointer" )
 endif()
 
-add_library( jpeg
+add_library( jpeg STATIC
     jcomapi.c
     jdapimin.c
     jdapistd.c
