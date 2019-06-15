@@ -1182,6 +1182,13 @@ FUNC(Teleport_Relative)
 		(!(args[2] & TELEPORT_AbsoluteAngle) ? activator->angle : 0) +
 		((args[2] & TELEPORT_ActivationAngle) ? (direction<<30)+ANGLE_180 : 0);
 
+	// Check that teleport remains in bounds
+	if(!map->IsValidTileCoordinate(x>>FRACBITS, y>>FRACBITS, 0))
+	{
+		Printf("Error: %s at (%d, %d) attempted to teleport out of bounds. Possible double teleport?\n", activator->GetClass()->GetName().GetChars(), activator->tilex, activator->tiley);
+		return false;
+	}
+
 	activator->Teleport(x, y, angle, !!(args[2] & TELEPORT_NoFog));
 	return 1;
 }
