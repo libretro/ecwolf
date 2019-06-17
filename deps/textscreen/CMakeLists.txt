@@ -8,7 +8,7 @@ if( CMAKE_COMPILER_IS_GNUC )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fomit-frame-pointer" )
 endif( CMAKE_COMPILER_IS_GNUC )
 
-add_library( textscreen
+add_library( textscreen STATIC
 	txt_radiobutton.c
 	txt_window_action.c
 	txt_io.c

@@ -9,7 +9,7 @@ if( "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL
 endif()
 
 add_definitions( -DBZ_NO_STDIO )
-add_library( bz2
+add_library( bz2 STATIC
     blocksort.c
     bzlib.c
     compress.c
