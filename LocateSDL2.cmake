@@ -70,6 +70,11 @@ function(sdl_modernize NEW_TARGET LIBS DIRS)
 			set_property(TARGET ${NEW_TARGET} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${${DIRS}})
 		else()
 			add_library(${NEW_TARGET} INTERFACE IMPORTED)
+
+			# Strip any extra whitespace per CMP0004
+			string(STRIP "${${LIBS}}" "${LIBS}")
+			string(STRIP "${${DIRS}}" "${DIRS}")
+
 			# In CMake 3.11 this could just be target_link_libraries and target_include_directories
 			set_target_properties(${NEW_TARGET} PROPERTIES
 				INTERFACE_LINK_LIBRARIES "${${LIBS}}"

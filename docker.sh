@@ -132,17 +132,15 @@ main() {
 # Minimum supported configuration ----------------------------------------------
 
 dockerfile_ubuntu_minimum() {
-	# libglu deps are to get libsdl2-dev to install
 	cat <<-'EOF'
-		FROM ubuntu:14.04
+		FROM ubuntu:16.04
 
 		RUN apt-get update && \
-		apt-get install g++ cmake mercurial pax-utils lintian \
+		apt-get install g++ cmake mercurial pax-utils lintian sudo \
 			libsdl1.2-dev libsdl-net1.2-dev \
 			libsdl2-dev libsdl2-net-dev \
 			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
-			zlib1g-dev libbz2-dev libgtk2.0-dev \
-			libglu1-mesa-dev libglu1-mesa -y && \
+			zlib1g-dev libbz2-dev libgtk2.0-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
 		mkdir /home/ecwolf/results && \
@@ -216,7 +214,7 @@ export -f test_build_ecwolf
 declare -A ConfigUbuntuMinimum=(
 	[dockerfile]=dockerfile_ubuntu_minimum
 	[dockerimage]='ecwolf-ubuntu'
-	[dockertag]=1
+	[dockertag]=2
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -226,7 +224,7 @@ declare -A ConfigUbuntuMinimum=(
 declare -A ConfigUbuntuMinimumI386=(
 	[dockerfile]=dockerfile_ubuntu_minimum_i386
 	[dockerimage]='i386/ecwolf-ubuntu'
-	[dockertag]=1
+	[dockertag]=2
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -240,13 +238,13 @@ dockerfile_ubuntu_package() {
 	# Packaging requires CMake 3.11 or newer
 	cat <<-'EOF'
 		RUN cd ~ && \
-		curl https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz | tar xz && \
-		cd cmake-3.12.1 && \
+		curl https://cmake.org/files/v3.14/cmake-3.14.5.tar.gz | tar xz && \
+		cd cmake-3.14.5 && \
 		./configure --parallel="$(nproc)" && \
 		make -j "$(nproc)" && \
 		sudo make install && \
 		cd .. && \
-		rm -rf cmake-3.12.1
+		rm -rf cmake-3.14.5
 	EOF
 }
 
@@ -270,7 +268,7 @@ export -f package_ecwolf
 declare -A ConfigUbuntuPackage=(
 	[dockerfile]=dockerfile_ubuntu_package
 	[dockerimage]='ecwolf-ubuntu-package'
-	[dockertag]=1
+	[dockertag]=2
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimum
 	[type]=build
@@ -280,7 +278,7 @@ declare -A ConfigUbuntuPackage=(
 declare -A ConfigUbuntuPackageI386=(
 	[dockerfile]=dockerfile_ubuntu_package_i386
 	[dockerimage]='i386/ecwolf-ubuntu-package'
-	[dockertag]=1
+	[dockertag]=2
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimumI386
 	[type]=build
@@ -289,16 +287,14 @@ declare -A ConfigUbuntuPackageI386=(
 # Clang ------------------------------------------------------------------------
 
 dockerfile_clang() {
-	# libglu deps are to get libsdl2-dev to install
 	cat <<-'EOF'
-		FROM ubuntu:14.04
+		FROM ubuntu:16.04
 
 		RUN apt-get update && \
-		apt-get install clang-3.9 libc++-dev cmake mercurial pax-utils lintian \
+		apt-get install clang-4.0 libc++-dev cmake mercurial pax-utils lintian sudo \
 			libsdl2-dev libsdl2-net-dev \
 			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
-			zlib1g-dev libbz2-dev libgtk2.0-dev \
-			libglu1-mesa-dev libglu1-mesa -y && \
+			zlib1g-dev libbz2-dev libgtk2.0-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
 		mkdir /home/ecwolf/results && \
@@ -311,7 +307,7 @@ dockerfile_clang() {
 
 # Test that ECWolf is buildable with Clang and libc++
 clang_build_ecwolf() {
-	CC=clang-3.9 CXX=clang++-3.9 build_ecwolf -DCMAKE_CXX_FLAGS="-stdlib=libc++" 2>&1 | tee "/results/buildlog.log"
+	CC=clang-4.0 CXX=clang++-4.0 build_ecwolf -DCMAKE_CXX_FLAGS="-stdlib=libc++" 2>&1 | tee "/results/buildlog.log"
 	(( PIPESTATUS[0] == 0 )) || return "${PIPESTATUS[0]}"
 
 	cd ~/build &&
@@ -326,7 +322,7 @@ export -f clang_build_ecwolf
 declare -A ConfigClang=(
 	[dockerfile]=dockerfile_clang
 	[dockerimage]='ecwolf-clang'
-	[dockertag]=1
+	[dockertag]=2
 	[entrypoint]=clang_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -340,8 +336,7 @@ dockerfile_mingw() {
 
 		RUN apt-get update && \
 		apt-get install g++ cmake mercurial g++-mingw-w64-i686 g++-mingw-w64-x86-64 \
-			libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev zlib1g-dev libbz2-dev libjpeg-turbo8-dev \
-			libglu1-mesa-dev libglu1-mesa -y && \
+			libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev zlib1g-dev libbz2-dev libjpeg-turbo8-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
 		mkdir /home/ecwolf/results && \
@@ -401,8 +396,7 @@ dockerfile_android() {
 		apt-get update && \
 		apt-get install libc6:i386 libstdc++6:i386 zlib1g:i386 \
 			g++ cmake mercurial openjdk-8-jdk-headless p7zip-full curl \
-			libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev zlib1g-dev libbz2-dev libjpeg-turbo8-dev \
-			libglu1-mesa-dev libglu1-mesa -y && \
+			libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev zlib1g-dev libbz2-dev libjpeg-turbo8-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
 		mkdir /home/ecwolf/results && \
@@ -417,9 +411,8 @@ dockerfile_android() {
 		rm sdk-tools-linux.zip android-ndk.zip && \
 		mv android-ndk-r14b ndk-bundle && \
 		sed -i 's/__USE_FILE_OFFSET64)/__USE_FILE_OFFSET64) \&\& __ANDROID_API__ >= 24/' /sdk/ndk-bundle/sysroot/usr/include/stdio.h && \
-		mkdir licenses && \
-		printf '\nd56f5187479451eabf01fb78af6dfcb131a6481e' > licenses/android-sdk-license && \
-		tools/bin/sdkmanager 'platforms;android-19' 'build-tools;19.1.0' 'extras;android;m2repository' && \
+		yes | tools/bin/sdkmanager --licenses && \
+		tools/bin/sdkmanager 'platforms;android-26' 'build-tools;19.1.0' 'extras;android;m2repository' && \
 		keytool -genkey -keystore untrusted.keystore -storepass untrusted -keypass untrusted -alias untrusted -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Untrusted,OU=Untrusted,O=Untrusted,L=Untrusted,S=Untrusted,C=US" -noprompt
 
 		USER ecwolf
@@ -448,7 +441,7 @@ build_android() {
 				-DCMAKE_BUILD_TYPE=Release \
 				-DFORCE_CROSSCOMPILE=ON \
 				-DIMPORT_EXECUTABLES=~/build/ImportExecutables.cmake \
-				-DANDROID_SDK=/sdk/platforms/android-19 \
+				-DANDROID_SDK=/sdk/platforms/android-26 \
 				-DANDROID_SDK_TOOLS=/sdk/build-tools/19.1.0 \
 				-DANDROID_SIGN_KEYNAME=untrusted \
 				-DANDROID_SIGN_KEYSTORE=/sdk/untrusted.keystore \
@@ -466,7 +459,7 @@ export -f build_android
 declare -A ConfigAndroid=(
 	[dockerfile]=dockerfile_android
 	[dockerimage]='ecwolf-android'
-	[dockertag]=1
+	[dockertag]=2
 	[entrypoint]=build_android
 	[prereq]=''
 	[type]=build
