@@ -941,7 +941,7 @@ gloabal variables that need to be accessed in SDL_IMFMusicPlayer().
 //byte *curAlSoundPtr = 0;
 //longword curAlLengthLeft = 0;
 
-void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
+static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 {
 	int stereolen = len>>1;
 	int sampleslen = stereolen>>1;
@@ -1028,6 +1028,30 @@ void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
 	}
 }
 
+void SDL_MixEmulators(void *udata, Uint8 *mixed_stream, int len)
+{
+	if(MusicMode != smm_AdLib && !(SoundMode == sdm_AdLib || SoundMode == sdm_PC))
+		return;
+
+	// Setup buffer that we can write emulator data to before mixing in
+	static Uint8 *stream;
+	static int stream_len = 0;
+	if(len > stream_len)
+	{
+		stream = (Uint8*)realloc(stream, len);
+		stream_len = len;
+	}
+
+	memset(stream, 0, len);
+	SDL_IMFMusicPlayer(udata, stream, len);
+
+#if SDL_VERSION_ATLEAST(2,0,0)
+	SDL_MixAudioFormat(mixed_stream, stream, AUDIO_S16, len, SDL_MIX_MAXVOLUME);
+#else
+	SDL_MixAudio(mixed_stream, stream, len, SDL_MIX_MAXVOLUME);
+#endif
+}
+
 ///////////////////////////////////////////////////////////////////////////
 //
 //      SD_Startup() - starts up the Sound Mgr
@@ -1084,7 +1108,7 @@ SD_Startup(void)
 //    YM3812Write(0,8,0); // Set CSM=0 & SEL=0		 // already set in for statement
 
 	samplesPerMusicTick = param_samplerate / MUSIC_RATE;    // SDL_t0FastAsmService played at 700Hz
-	Mix_HookMusic(SDL_IMFMusicPlayer, 0);
+	Mix_SetPostMix(SDL_MixEmulators, 0);
 	Mix_ChannelFinished(SD_ChannelFinished);
 
 	Mix_VolumeMusic(static_cast<int> (ceil(128.0*MULTIPLY_VOLUME(MusicVolume))));
@@ -1419,8 +1443,6 @@ SD_StartMusic(const char* chunk)
 		// We assume that when music equals to NULL, we've an IMF file to play
 		if (music == NULL)
 		{
-			Mix_HookMusic(SDL_IMFMusicPlayer, 0);
-
 			SDL_LockMutex(audioMutex);
 
 			for (int i = 0;i < OPL_CHANNELS;++i)
@@ -1440,8 +1462,6 @@ SD_StartMusic(const char* chunk)
 		}
 		else
 		{
-			Mix_HookMusic(0, 0);
-
 			SDL_LockMutex(audioMutex);
 
 			// Play the music
@@ -1520,15 +1540,11 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 
 			SDL_UnlockMutex(audioMutex);
 
-			Mix_HookMusic(SDL_IMFMusicPlayer, 0);
-
 			SD_MusicOn();
 		}
 		else
 		{
 			SDL_UnlockMutex(audioMutex);
-
-			Mix_HookMusic(0, 0);
 
 			if (Mix_PausedMusic() == 1 && musicchunk == lumpNum)
 			{

@@ -28,7 +28,6 @@ add_jar(ecwolf-android
 	com/beloko/idtech/QuakeQuickCommand.java
 	com/beloko/idtech/QuakeTouchControlsSettings.java
 	com/beloko/idtech/ShowKeyboard.java
-	com/beloko/idtech/SimpleServerAccess.java
 	com/beloko/idtech/SingleMediaScanner.java
 	com/beloko/idtech/TouchControlsEditing.java
 	com/beloko/idtech/Utils.java
@@ -44,7 +43,14 @@ add_jar(ecwolf-android
 	com/mobeta/android/dslv/ResourceDragSortCursorAdapter.java
 	com/mobeta/android/dslv/SimpleDragSortCursorAdapter.java
 	com/mobeta/android/dslv/SimpleFloatViewManager.java
+	org/libsdl/app/HIDDeviceBLESteamController.java
+	org/libsdl/app/HIDDevice.java
+	org/libsdl/app/HIDDeviceManager.java
+	org/libsdl/app/HIDDeviceUSB.java
+	org/libsdl/app/SDL.java
+	org/libsdl/app/SDLAudioManager.java
 	org/libsdl/app/SDLActivity.java
+	org/libsdl/app/SDLControllerManager.java
 	INCLUDE_JARS
 		"${ANDROID_SDK_JAR}"
 		"${ANDROID_SUPPORT_V4_JAR}"
@@ -61,7 +67,7 @@ add_custom_command(TARGET ecwolf-android POST_BUILD
 		"ecwolf-android.jar"
 		"${ANDROID_SUPPORT_V4_JAR}"
 	COMMAND "${ANDROID_AAPT_BINARY}" add -f "${APK_OUTPUT}" "classes.dex" "lib/${CMAKE_ANDROID_ARCH_ABI}/*"
-	COMMAND "${ANDROID_JAR_SIGNER}" -storepass "${ANDROID_SIGN_STOREPASS}" -keystore "${ANDROID_SIGN_KEYSTORE}" "${APK_OUTPUT}" "${ANDROID_SIGN_KEYNAME}"
+	COMMAND "${ANDROID_JAR_SIGNER}" -storepass "${ANDROID_SIGN_STOREPASS}" -keystore "${ANDROID_SIGN_KEYSTORE}" -digestalg SHA1 -sigalg MD5withRSA "${APK_OUTPUT}" "${ANDROID_SIGN_KEYNAME}"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	COMMENT "Creating APK ecwolf.apk"
 )

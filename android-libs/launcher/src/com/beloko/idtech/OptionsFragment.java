@@ -303,37 +303,8 @@ public class OptionsFragment extends Fragment{
 			@Override
 			public void onClick(View v) {
 
-				new SimpleServerAccess(getActivity(),"http://beloko.com/quake_api/check_ver.php?pkg=" + getActivity().getPackageName())
-				{
-					void returnData(ByteArrayOutputStream data)
-					{
-						String ver = data.toString();
-						int ver_int = 0;
-						try{
-							ver_int = Integer.parseInt(ver);
-						}
-						catch (Exception e){
+				SendDebugEmail();
 
-						}
-						if (GD.version < ver_int)
-						{
-							AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-							builder.setMessage("Please first update app from Google Play to access support")
-							.setCancelable(true)
-							.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog, int id) {
-
-								}
-							});
-
-							builder.show();
-						}
-						else
-						{
-							SendDebugEmail();
-						}
-					}
-				};
 			}
 		});
 		return mainView;
@@ -473,7 +444,7 @@ public class OptionsFragment extends Fragment{
 	private void SendDebugEmail()
 	{
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setMessage("Are you sure you want to email the debug log?\nIf yes, please give good information about the problem.\nPLEASE DO NOT send a log if the app was not purchased from Google Play.")
+		builder.setMessage("Are you sure you want to email the debug log?\nIf yes, please give good information about the problem.")
 		.setCancelable(true)
 		.setPositiveButton("SEND EMAIL", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
@@ -494,7 +465,7 @@ public class OptionsFragment extends Fragment{
 					emailIntent.setType("plain/text");
 
 					emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, AppSettings.game.toString() + "_" + GD.version + " Logging file");
-					emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,new String[]{"support@beloko.com"});
+					emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,new String[]{"admin@maniacsvault.net"});
 
 					emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,"Enter description of issue:  ");
 

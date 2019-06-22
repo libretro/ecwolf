@@ -529,15 +529,6 @@ void Android_SetScreenSize(int w, int h)
 	android_screen_width = w;
 	android_screen_height = h;
 
-	static jclass NativeLibClass = 0;
-	static jmethodID setScreenSizeMethod = 0;
-	if (NativeLibClass == 0)
-	{
-		NativeLibClass = env_->FindClass("com/beloko/idtech/wolf3d/NativeLib");
-		setScreenSizeMethod = env_->GetStaticMethodID(NativeLibClass, "setScreenSize", "(II)V");
-	}
-	env_->CallStaticVoidMethod(NativeLibClass, setScreenSizeMethod, android_screen_width, android_screen_height);
-
 	initControls(android_screen_width,-android_screen_height,graphicpath.c_str(),(graphicpath + "/game_controls.xml").c_str());
 }
 
@@ -550,7 +541,6 @@ int Android_EventWatch(void *, SDL_Event *event)
 			Android_SetScreenSize(event->window.data1, event->window.data2);
 		break;
 
-#if 0
 	case SDL_FINGERMOTION:
 		controlsContainer.processPointer(P_MOVE, event->tfinger.fingerId, event->tfinger.x, event->tfinger.y);
 		break;
@@ -560,7 +550,6 @@ int Android_EventWatch(void *, SDL_Event *event)
 	case SDL_FINGERUP:
 		controlsContainer.processPointer(P_UP, event->tfinger.fingerId, event->tfinger.x, event->tfinger.y);
 		break;
-#endif
 	}
 
 	return 0;

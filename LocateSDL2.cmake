@@ -72,8 +72,8 @@ function(sdl_modernize NEW_TARGET LIBS DIRS)
 			add_library(${NEW_TARGET} INTERFACE IMPORTED)
 			# In CMake 3.11 this could just be target_link_libraries and target_include_directories
 			set_target_properties(${NEW_TARGET} PROPERTIES
-				INTERFACE_LINK_LIBRARIES ${${LIBS}}
-				INTERFACE_INCLUDE_DIRECTORIES ${${DIRS}}
+				INTERFACE_LINK_LIBRARIES "${${LIBS}}"
+				INTERFACE_INCLUDE_DIRECTORIES "${${DIRS}}"
 			)
 		endif()
 	endif()
@@ -140,7 +140,7 @@ function(find_sdl_library PKG LIB HEADER INTERNAL_TARGET)
 		if(NOT ${SDL1_VAR}_FOUND)
 			set(SDL_FIND_ERROR YES PARENT_SCOPE)
 		else()
-			message(STATUS "Using system ${PKG}:")
+			message(STATUS "Using system ${PKG}")
 		endif()
 
 		set(${LIB}_LIBRARIES ${${SDL1_VAR}_LIBRARY})
