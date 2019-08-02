@@ -72,6 +72,15 @@ int		AdlibVolume=MAX_VOLUME;
 int		MusicVolume=MAX_VOLUME;
 int		SoundVolume=MAX_VOLUME;
 
+// SDL_mixer values from Mix_QuerySpec
+static struct
+{
+	int frequency;
+	Uint16 format;
+	int channels;
+} AudioSpec;
+static SDL_AudioCVT AudioCVTStereo;
+
 //      Internal variables
 static  bool					SD_Started;
 static  bool					nextsoundpos;
@@ -256,7 +265,7 @@ inline void _SDL_turnOnPCSpeaker(byte pcSample)
 	// Note: You could use a lookup table to make this even faster. Only
 	// 256 table entries are required since the PC samples are just byte
 	// values.
-	pcPhaseLength = (pcSample*60*param_samplerate)/(2*PC_BASE_TIMER);
+	pcPhaseLength = (pcSample*60*AudioSpec.frequency)/(2*PC_BASE_TIMER);
 #ifdef PC_VIBRATO
 	//if(pcVolume<0) pcVolume = -pcVolume;
 	pcPhaseTick = 0;
@@ -941,10 +950,8 @@ gloabal variables that need to be accessed in SDL_IMFMusicPlayer().
 //byte *curAlSoundPtr = 0;
 //longword curAlLengthLeft = 0;
 
-static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int len)
+static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int sampleslen)
 {
-	int stereolen = len>>1;
-	int sampleslen = stereolen>>1;
 	Sint16 *stream16 = (Sint16 *) (void *) stream;    // expect correct alignment
 
 	while(1)
@@ -1042,8 +1049,16 @@ void SDL_MixEmulators(void *udata, Uint8 *mixed_stream, int len)
 		stream_len = len;
 	}
 
+	const int sampleslen = (len/AudioSpec.channels)>>1;
 	memset(stream, 0, len);
-	SDL_IMFMusicPlayer(udata, stream, len);
+	SDL_IMFMusicPlayer(udata, stream, sampleslen);
+
+	if(AudioCVTStereo.needed)
+	{
+		AudioCVTStereo.len = sampleslen<<1;
+		AudioCVTStereo.buf = stream;
+		SDL_ConvertAudio(&AudioCVTStereo);
+	}
 
 #if SDL_VERSION_ATLEAST(2,0,0)
 	SDL_MixAudioFormat(mixed_stream, stream, AUDIO_S16, len, SDL_MIX_MAXVOLUME);
@@ -1085,18 +1100,33 @@ SD_Startup(void)
 	Mix_SetSoundFonts("/usr/share/sounds/sf2/FluidR3_GM.sf2");
 #endif
 
-	if(Mix_OpenAudio(param_samplerate, AUDIO_S16, 2, param_audiobuffer))
+	AudioSpec.frequency = param_samplerate;
+	AudioSpec.format = AUDIO_S16;
+	AudioSpec.channels = 2;
+
+	if(Mix_OpenAudio(AudioSpec.frequency, AudioSpec.format, AudioSpec.channels, param_audiobuffer))
 	{
 		printf("Unable to open audio: %s\n", Mix_GetError());
 		return;
 	}
 	atterm(Mix_CloseAudio);
 
+	if(Mix_QuerySpec(&AudioSpec.frequency, &AudioSpec.format, &AudioSpec.channels) == 0)
+	{
+		printf("SD_Startup: Failed to query audio format!\n");
+	}
+	printf("SD_Startup: Opened audio: %dHz (%d channels)\n", AudioSpec.frequency, AudioSpec.channels);
+
+	if(SDL_BuildAudioCVT(&AudioCVTStereo, AUDIO_S16, 2, AudioSpec.frequency, AudioSpec.format, AudioSpec.channels, AudioSpec.frequency) < 0)
+	{
+		printf("SD_Startup: Failed to build stereo audio conversion: %s\n", SDL_GetError());
+	}
+
 	Mix_ReserveChannels(2);  // reserve player and boss weapon channels
 	Mix_GroupChannels(2, MIX_CHANNELS-1, 1); // group remaining channels
 
 	// Init music
-	if(YM3812Init(1,3579545,param_samplerate))
+	if(YM3812Init(1,3579545,AudioSpec.frequency))
 	{
 		printf("Unable to create virtual OPL!!\n");
 	}
@@ -1107,7 +1137,7 @@ SD_Startup(void)
 	YM3812Write(oplChip,1,0x20,MAX_VOLUME); // Set WSE=1
 //    YM3812Write(0,8,0); // Set CSM=0 & SEL=0		 // already set in for statement
 
-	samplesPerMusicTick = param_samplerate / MUSIC_RATE;    // SDL_t0FastAsmService played at 700Hz
+	samplesPerMusicTick = AudioSpec.frequency / MUSIC_RATE;    // SDL_t0FastAsmService played at 700Hz
 	Mix_SetPostMix(SDL_MixEmulators, 0);
 	Mix_ChannelFinished(SD_ChannelFinished);
 
