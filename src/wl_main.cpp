@@ -355,22 +355,52 @@ static void CollectGC()
 	GC::DelSoftRootHead();
 }
 
-static bool DrawStartupConsole()
+static bool DrawStartupConsole(FString statusStr)
 {
-	static const char* const tempString = "          " GAMENAME " " DOTVERSIONSTR_NOREV "\n\n\nTo be replaced with console...\n\n  The memory thing was just\n     for show anyways.";
+	// Window for printing text to the screen is (12,76), (308, 182)
+	const int textWindowTop = 76 + 2*ConFont->GetHeight();
+	const int textWindowHeight = 182-textWindowTop;
 
-	if(gameinfo.SignonLump.IsEmpty())
-		return false;
-
-	CA_CacheScreen(TexMan(gameinfo.SignonLump));
+	const bool hasSignon = !gameinfo.SignonLump.IsEmpty();
+	if(hasSignon)
+		CA_CacheScreen(TexMan(gameinfo.SignonLump));
+	else
+		screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
 
 	word width, height;
-	VW_MeasurePropString(ConFont, tempString, width, height);
-	px = 160-width/2;
-	py = 76+62-height/2;
-	VWB_DrawPropString(ConFont, tempString, CR_GRAY);
 
-	return true;
+	static const char* const engineVersion = GAMENAME " " DOTVERSIONSTR_NOREV;
+	VW_MeasurePropString(ConFont, engineVersion, width, height);
+	px = 160-width/2;
+	py = 76;
+	VWB_DrawPropString(ConFont, engineVersion, CR_GRAY);
+
+	FString engineMode;
+	switch(Net::InitVars.mode)
+	{
+	case Net::MODE_SinglePlayer:
+		engineMode = "Single player";
+		break;
+	case Net::MODE_Host:
+		engineMode.Format("Hosting %d players", Net::InitVars.numPlayers);
+		break;
+	case Net::MODE_Client:
+		engineMode = "Joining multiplayer";
+		break;
+	}
+	VW_MeasurePropString(ConFont, engineMode, width, height);
+	px = 160-width/2;
+	py += ConFont->GetHeight();
+	VWB_DrawPropString(ConFont, engineMode, CR_GRAY);
+
+	VW_MeasurePropString(ConFont, statusStr, width, height);
+	px = 160-width/2;
+	py = textWindowTop + (textWindowHeight-height)/2;
+	VWB_DrawPropString(ConFont, statusStr, CR_GRAY);
+
+	VH_UpdateScreen();
+
+	return hasSignon;
 }
 
 void I_ShutdownGraphics();
@@ -431,9 +461,7 @@ static void InitGame()
 
 	// Setup a temporary window so if we have to terminate we don't do extra mode sets
 	VL_SetVGAPlaneMode (true);
-	DrawStartupConsole();
-
-	VW_UpdateScreen();
+	DrawStartupConsole("Initializing game engine");
 
 //
 // Load Actors
@@ -487,16 +515,14 @@ static void InitGame()
 //
 // Net game?
 //
-	Net::Init();
+	Net::Init(DrawStartupConsole);
 
 //
 // Finish signon screen
 //
 	VL_SetVGAPlaneMode();
-	if(DrawStartupConsole())
+	if(DrawStartupConsole("Initialization complete"))
 	{
-		VH_UpdateScreen();
-
 		if (!param_nowait)
 			IN_UserInput(70*4);
 	}

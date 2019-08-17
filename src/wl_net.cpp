@@ -53,10 +53,10 @@ namespace Net {
 
 enum
 {
-	NET_REQUEST_CONNECTION,
-	NET_CONNECTION_START,
-	NET_ACK,
-	NET_TICCMD
+	NET_RequestConnection,
+	NET_ConnectionStart,
+	NET_Ack,
+	NET_TicCmd
 };
 
 #pragma pack(1)
@@ -64,14 +64,14 @@ struct RequestPacket
 {
 	// This could be static const BYTE, but I know old Mac compilers I use
 	// sometimes have problems with that. :(
-	enum { Type = NET_REQUEST_CONNECTION };
+	enum { Type = NET_RequestConnection };
 
 	BYTE type;
 };
 
 struct StartPacket
 {
-	enum { Type = NET_CONNECTION_START };
+	enum { Type = NET_ConnectionStart };
 
 	BYTE type;
 	BYTE playerNumber;
@@ -86,7 +86,7 @@ struct StartPacket
 
 struct AckPacket
 {
-	enum { Type = NET_ACK };
+	enum { Type = NET_Ack };
 
 	BYTE type;
 	int32_t TimeCount;
@@ -94,7 +94,7 @@ struct AckPacket
 
 struct TicCmdPacket
 {
-	enum { Type = NET_TICCMD };
+	enum { Type = NET_TicCmd };
 
 	BYTE type;
 	int32_t TimeCount;
@@ -126,6 +126,30 @@ static UDPpacket *Packet;
 // Just so that we know something is happening do a little animation.
 static const char* const Waiting[4] = {"   ", ".  ", ".. ", "..." };
 
+static FString IPaddressToString(IPaddress address)
+{
+	FString out;
+	out.Format("%u.%u.%u.%u:%d", address.host&0xFF, (address.host&0xFF00)>>8, (address.host&0xFF0000)>>16, (address.host&0xFF000000)>>24, BigShort(address.port));
+	return out;
+}
+
+static FString BuildClientList(bool acked[MAXPLAYERS])
+{
+	FString clients;
+
+	for(unsigned i = 1;i < InitVars.numPlayers;++i)
+	{
+		FString client;
+		if(Client[i].address.host)
+			client.Format("%2u: %-21s %-6s", i, IPaddressToString(Client[i].address).GetChars(), acked[i] ? "Synced" : "");
+		else
+			client.Format("%2u: %-21s %-6s", i, "Waiting...", "");
+
+		clients += FString(i != 1 ? "\n": "") + client;
+	}
+	return clients;
+}
+
 // Returns the player number for a given ip address
 static int FindClient(IPaddress address)
 {
@@ -148,23 +172,25 @@ static bool CheckPacketType(const UDPpacket *packet)
 static void SendAck(IPaddress address, int32_t TimeCount)
 {
 	AckPacket ackData;
-	ackData.type = NET_ACK;
+	ackData.type = AckPacket::Type;
 	ackData.TimeCount = TimeCount;
 	UDPpacket packet = { -1, (Uint8*)&ackData, sizeof(AckPacket), sizeof(AckPacket), 0, address };
 
 	SDLNet_UDP_Send(Socket, -1, &packet);
 }
 
-static void StartHost()
+static void StartHost(InitStatusCallback callback)
 {
 	unsigned int waitpos = 0;
 	unsigned int nextclient = 1; // 0 is the host
+	bool acked[MAXPLAYERS] = { false };
 
 	if(!(Socket = SDLNet_UDP_Open(InitVars.port)))
 		throw CFatalError("Could not open UDP socket.");
 
 	// Step 1: Get connection requests from each player
 	Printf("Waiting for %d players:\n   ", InitVars.numPlayers);
+	callback(BuildClientList(acked));
 	while(nextclient != InitVars.numPlayers)
 	{
 		waitpos = (waitpos+1)%4;
@@ -183,6 +209,7 @@ static void StartHost()
 				{
 					Printf("[%d] New connection from %u.%u.%u.%u:%u!\n", nextclient, Packet->address.host&0xFF, (Packet->address.host&0xFF00)>>8, (Packet->address.host&0xFF0000)>>16, (Packet->address.host&0xFF000000)>>24, BigShort(Packet->address.port));
 					Client[nextclient++].address = Packet->address;
+					callback(BuildClientList(acked));
 				}
 
 				Printf("   ");
@@ -203,7 +230,7 @@ static void StartHost()
 	const int startSize = sizeof(StartPacket) + sizeof(StartPacket::Client)*(InitVars.numPlayers-1);
 	StartPacket *startData = (StartPacket *)malloc(startSize);
 	UDPpacket startPacket = { -1, (Uint8*)startData, startSize, startSize, 0 };
-	startData->type = NET_CONNECTION_START;
+	startData->type = StartPacket::Type;
 	startData->numPlayers = InitVars.numPlayers;
 	startData->rngseed = rngseed;
 	for(unsigned int i = 1;i < InitVars.numPlayers;++i)
@@ -212,7 +239,6 @@ static void StartHost()
 		startData->clients[i-1].port = Client[i].address.port;
 	}
 
-	bool acked[MAXPLAYERS] = { false };
 	nextclient = 1;
 	while(nextclient != InitVars.numPlayers)
 	{
@@ -242,6 +268,7 @@ static void StartHost()
 				{
 					acked[client] = true;
 					++nextclient;
+					callback(BuildClientList(acked));
 				}
 			}
 		}
@@ -252,7 +279,7 @@ static void StartHost()
 	Printf("All acked starting game!\n");
 }
 
-static void StartJoin()
+static void StartJoin(InitStatusCallback callback)
 {
 	unsigned int waitpos = 0;
 	if(!(Socket = SDLNet_UDP_Open(InitVars.port)))
@@ -273,9 +300,10 @@ static void StartJoin()
 	Printf("Attempting to connect to %u.%u.%u.%u:%u :\n   ", address.host&0xFF, (address.host&0xFF00)>>8, (address.host&0xFF0000)>>16, (address.host&0xFF000000)>>24, BigShort(address.port));
 
 	// Send a connection request to host
-	Uint8 requestData[] = {NET_REQUEST_CONNECTION};
+	Uint8 requestData[] = {NET_RequestConnection};
 	UDPpacket packet = { -1, requestData, 1, 1, 0, address };
 
+	callback("Waiting for sync");
 	for(;;)
 	{
 		waitpos = (waitpos+1)%4;
@@ -315,6 +343,7 @@ static void StartJoin()
 	}
 
 	Printf("\b\b\bRecieved sync from host! Sending ack...\n");
+	callback("Sync recieved");
 
 	// Send ACK and forget, if we're waiting for ticcmd and we get a start, we'll send another ack then.
 	SendAck(address, 0xFFFFFFFF);
@@ -326,7 +355,8 @@ static void Shutdown()
 	SDLNet_UDP_Close(Socket);
 }
 
-void Init()
+// Returns true when network init finished
+void Init(InitStatusCallback callback)
 {
 	if(InitVars.mode == MODE_SinglePlayer)
 		return;
@@ -341,9 +371,9 @@ void Init()
 	atterm(Shutdown);
 
 	if(InitVars.mode == MODE_Host)
-		StartHost();
+		StartHost(callback);
 	else
-		StartJoin();
+		StartJoin(callback);
 }
 
 void PollControls()
@@ -357,7 +387,7 @@ void PollControls()
 	// We need to send a ticcmd to each player in the game.
 	TicCmdPacket ticcmdData;
 	UDPpacket ticcmdPacket = { -1, (Uint8*)&ticcmdData, sizeof(TicCmdPacket), sizeof(TicCmdPacket), 0 };
-	ticcmdData.type = NET_TICCMD;
+	ticcmdData.type = TicCmdPacket::Type;
 	ticcmdData.TimeCount = gamestate.TimeCount;
 	ticcmdData.controlx = control[ConsolePlayer].controlx;
 	ticcmdData.controly = control[ConsolePlayer].controly;

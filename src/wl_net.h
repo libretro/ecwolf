@@ -41,6 +41,8 @@
 
 namespace Net {
 
+typedef bool (*InitStatusCallback)(FString);
+
 enum Mode
 {
 	MODE_SinglePlayer,
@@ -54,12 +56,11 @@ struct NetInit
 	uint16_t port;
 	byte numPlayers;
 	const char* joinAddress;
-		
 };
 
 extern NetInit InitVars;
 
-void Init();
+void Init(InitStatusCallback callback);
 void PollControls();
 
 }

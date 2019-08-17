@@ -78,9 +78,7 @@ void SetFullscreen(bool isFull)
 
 	// Recalculate the aspect ratio, because this can change from fullscreen to windowed now
 	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
-	screen->Unlock();
 	VL_SetVGAPlaneMode();
-	screen->Lock(false);
 	if(playstate)
 	{
 		DrawPlayScreen();
@@ -111,6 +109,9 @@ void VL_ReadPalette(const char* lump)
 void I_InitGraphics ();
 void	VL_SetVGAPlaneMode (bool forSignon)
 {
+	if(!forSignon)
+		screen->Unlock();
+
 	I_InitGraphics();
 	Video->SetResolution(screenWidth, screenHeight, 8);
 	screen->Lock(true);
@@ -124,6 +125,8 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 	wallheight = new int[SCREENWIDTH];
 
 	NewViewSize(viewsize);
+
+	screen->Lock(false);
 }
 
 /*
