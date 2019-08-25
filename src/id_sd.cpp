@@ -968,16 +968,22 @@ static void SDL_MixEmulators(void *udata, Uint8 *mixed_stream, int len)
 	if(MusicMode != smm_AdLib && !(SoundMode == sdm_AdLib || SoundMode == sdm_PC))
 		return;
 
+	const int sampleslen = (len/AudioSpec.channels)>>1;
+
 	// Setup buffer that we can write emulator data to before mixing in
 	static Uint8 *stream;
 	static int stream_len = 0;
 	if(len > stream_len)
 	{
-		stream = (Uint8*)realloc(stream, len);
-		stream_len = len;
+		// If we're converting from stereo to surround then we need to ensure
+		// that this buffer is large enough to hold any intermediate conversions.
+		if(AudioCVTStereo.needed && AudioCVTStereo.len_mult > AudioCVTStereo.len_ratio)
+			stream_len = (sampleslen<<2)*AudioCVTStereo.len_mult;
+		else
+			stream_len = len;
+		stream = (Uint8*)realloc(stream, stream_len);
 	}
 
-	const int sampleslen = (len/AudioSpec.channels)>>1;
 	memset(stream, 0, len);
 	SDL_IMFMusicPlayer(udata, stream, sampleslen);
 
