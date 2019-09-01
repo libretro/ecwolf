@@ -1191,14 +1191,14 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 
 			// Clean up
 			p = properties[mid].params;
-			unsigned int i = 0;
-			do
+			for (unsigned int i = 0; i < paramc; i++)
 			{
+				if(*p == 0)
+					break;
 				if(*p == 'S' || *p == 'K')
 					delete[] params[i].s;
-				i++;
+				p++;
 			}
-			while(*(++p) != 0 && i < paramc);
 			delete[] params;
 			return true;
 		}
