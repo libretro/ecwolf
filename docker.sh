@@ -140,7 +140,7 @@ dockerfile_ubuntu_minimum() {
 			libsdl1.2-dev libsdl-net1.2-dev \
 			libsdl2-dev libsdl2-net-dev \
 			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
-			zlib1g-dev libbz2-dev libgtk2.0-dev -y && \
+			zlib1g-dev libbz2-dev libgtk-3-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
 		mkdir /home/ecwolf/results && \
@@ -214,7 +214,7 @@ export -f test_build_ecwolf
 declare -A ConfigUbuntuMinimum=(
 	[dockerfile]=dockerfile_ubuntu_minimum
 	[dockerimage]='ecwolf-ubuntu'
-	[dockertag]=2
+	[dockertag]=3
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -224,7 +224,7 @@ declare -A ConfigUbuntuMinimum=(
 declare -A ConfigUbuntuMinimumI386=(
 	[dockerfile]=dockerfile_ubuntu_minimum_i386
 	[dockerimage]='i386/ecwolf-ubuntu'
-	[dockertag]=2
+	[dockertag]=3
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -238,13 +238,13 @@ dockerfile_ubuntu_package() {
 	# Packaging requires CMake 3.11 or newer
 	cat <<-'EOF'
 		RUN cd ~ && \
-		curl https://cmake.org/files/v3.14/cmake-3.14.5.tar.gz | tar xz && \
-		cd cmake-3.14.5 && \
+		curl https://cmake.org/files/v3.15/cmake-3.15.3.tar.gz | tar xz && \
+		cd cmake-3.15.3 && \
 		./configure --parallel="$(nproc)" && \
 		make -j "$(nproc)" && \
 		sudo make install && \
 		cd .. && \
-		rm -rf cmake-3.14.5
+		rm -rf cmake-3.15.3
 	EOF
 }
 
@@ -268,7 +268,7 @@ export -f package_ecwolf
 declare -A ConfigUbuntuPackage=(
 	[dockerfile]=dockerfile_ubuntu_package
 	[dockerimage]='ecwolf-ubuntu-package'
-	[dockertag]=2
+	[dockertag]=3
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimum
 	[type]=build
@@ -278,7 +278,7 @@ declare -A ConfigUbuntuPackage=(
 declare -A ConfigUbuntuPackageI386=(
 	[dockerfile]=dockerfile_ubuntu_package_i386
 	[dockerimage]='i386/ecwolf-ubuntu-package'
-	[dockertag]=2
+	[dockertag]=3
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimumI386
 	[type]=build
@@ -294,7 +294,7 @@ dockerfile_clang() {
 		apt-get install clang-4.0 libc++-dev cmake mercurial pax-utils lintian sudo \
 			libsdl2-dev libsdl2-net-dev \
 			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
-			zlib1g-dev libbz2-dev libgtk2.0-dev -y && \
+			zlib1g-dev libbz2-dev libgtk-3-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
 		mkdir /home/ecwolf/results && \
@@ -322,7 +322,7 @@ export -f clang_build_ecwolf
 declare -A ConfigClang=(
 	[dockerfile]=dockerfile_clang
 	[dockerimage]='ecwolf-clang'
-	[dockertag]=2
+	[dockertag]=3
 	[entrypoint]=clang_build_ecwolf
 	[prereq]=''
 	[type]=test
