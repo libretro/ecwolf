@@ -136,7 +136,7 @@ dockerfile_ubuntu_minimum() {
 		FROM ubuntu:16.04
 
 		RUN apt-get update && \
-		apt-get install g++ cmake mercurial pax-utils lintian sudo \
+		apt-get install g++ cmake git pax-utils lintian sudo \
 			libsdl1.2-dev libsdl-net1.2-dev \
 			libsdl2-dev libsdl2-net-dev \
 			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
@@ -214,7 +214,7 @@ export -f test_build_ecwolf
 declare -A ConfigUbuntuMinimum=(
 	[dockerfile]=dockerfile_ubuntu_minimum
 	[dockerimage]='ecwolf-ubuntu'
-	[dockertag]=3
+	[dockertag]=4
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -224,7 +224,7 @@ declare -A ConfigUbuntuMinimum=(
 declare -A ConfigUbuntuMinimumI386=(
 	[dockerfile]=dockerfile_ubuntu_minimum_i386
 	[dockerimage]='i386/ecwolf-ubuntu'
-	[dockertag]=3
+	[dockertag]=4
 	[entrypoint]=test_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -268,7 +268,7 @@ export -f package_ecwolf
 declare -A ConfigUbuntuPackage=(
 	[dockerfile]=dockerfile_ubuntu_package
 	[dockerimage]='ecwolf-ubuntu-package'
-	[dockertag]=3
+	[dockertag]=4
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimum
 	[type]=build
@@ -278,7 +278,7 @@ declare -A ConfigUbuntuPackage=(
 declare -A ConfigUbuntuPackageI386=(
 	[dockerfile]=dockerfile_ubuntu_package_i386
 	[dockerimage]='i386/ecwolf-ubuntu-package'
-	[dockertag]=3
+	[dockertag]=4
 	[entrypoint]=package_ecwolf
 	[prereq]=ConfigUbuntuMinimumI386
 	[type]=build
@@ -291,7 +291,7 @@ dockerfile_clang() {
 		FROM ubuntu:16.04
 
 		RUN apt-get update && \
-		apt-get install clang-4.0 libc++-dev cmake mercurial pax-utils lintian sudo \
+		apt-get install clang-4.0 libc++-dev cmake git pax-utils lintian sudo \
 			libsdl2-dev libsdl2-net-dev \
 			libflac-dev libogg-dev libvorbis-dev libopus-dev libopusfile-dev libmodplug-dev libfluidsynth-dev \
 			zlib1g-dev libbz2-dev libgtk-3-dev -y && \
@@ -322,7 +322,7 @@ export -f clang_build_ecwolf
 declare -A ConfigClang=(
 	[dockerfile]=dockerfile_clang
 	[dockerimage]='ecwolf-clang'
-	[dockertag]=3
+	[dockertag]=4
 	[entrypoint]=clang_build_ecwolf
 	[prereq]=''
 	[type]=test
@@ -335,7 +335,7 @@ dockerfile_mingw() {
 		FROM ubuntu:18.04
 
 		RUN apt-get update && \
-		apt-get install g++ cmake mercurial g++-mingw-w64-i686 g++-mingw-w64-x86-64 \
+		apt-get install g++ cmake git g++-mingw-w64-i686 g++-mingw-w64-x86-64 \
 			libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev zlib1g-dev libbz2-dev libjpeg-turbo8-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
@@ -380,7 +380,7 @@ export -f build_mingw
 declare -A ConfigMinGW=(
 	[dockerfile]=dockerfile_mingw
 	[dockerimage]='ecwolf-mingw'
-	[dockertag]=1
+	[dockertag]=2
 	[entrypoint]=build_mingw
 	[prereq]=''
 	[type]=build
@@ -395,7 +395,7 @@ dockerfile_android() {
 		RUN dpkg --add-architecture i386 && \
 		apt-get update && \
 		apt-get install libc6:i386 libstdc++6:i386 zlib1g:i386 \
-			g++ cmake mercurial openjdk-8-jdk-headless p7zip-full curl \
+			g++ cmake git openjdk-8-jdk-headless p7zip-full curl \
 			libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev zlib1g-dev libbz2-dev libjpeg-turbo8-dev -y && \
 		useradd -rm ecwolf && \
 		echo "ecwolf ALL=(ALL) NOPASSWD: /usr/bin/make install" >> /etc/sudoers && \
@@ -459,7 +459,7 @@ export -f build_android
 declare -A ConfigAndroid=(
 	[dockerfile]=dockerfile_android
 	[dockerimage]='ecwolf-android'
-	[dockertag]=2
+	[dockertag]=3
 	[entrypoint]=build_android
 	[prereq]=''
 	[type]=build

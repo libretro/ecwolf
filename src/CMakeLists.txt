@@ -1,5 +1,5 @@
 add_custom_target(revision_check ALL
-	COMMAND updaterevision ${CMAKE_CURRENT_BINARY_DIR}/hginfo.h
+	COMMAND updaterevision ${CMAKE_CURRENT_BINARY_DIR}/gitinfo.h
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 	DEPENDS updaterevision
 )
@@ -238,7 +238,7 @@ set(SOURCE_FILES
 	gamemap.cpp
 	gamemap_planes.cpp
 	gamemap_uwmf.cpp
-	hginfo.cpp
+	gitinfo.cpp
 	id_ca.cpp
 	id_in.cpp
 	id_sd.cpp

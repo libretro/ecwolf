@@ -31,31 +31,31 @@
 **
 */
 
-#include "hginfo.h"
+#include "gitinfo.h"
 #include "version.h"
 
 #define __GETSAVESIG(x) #x
 #define GETSAVESIG(x) "ECWOLFSAVE" __GETSAVESIG(x)
-#if HG_DATE_INT < MINSAVEVER
+#if GIT_DATE_INT < MINSAVEVER
 #define SAVEVER	SAVEVERUNDEFINED
 #else
-#define SAVEVER	HG_DATE_INT
+#define SAVEVER GIT_DATE_INT
 #endif
 #define SAVESIG	GETSAVESIG(SAVEVER)
 
 const char *GetVersionDescription()
 {
-	return HG_DESCRIPTION;
+	return GIT_DESCRIPTION;
 }
 
 const char *GetVersionHash()
 {
-	return HG_HASH;
+	return GIT_HASH;
 }
 
 const char *GetVersionTime()
 {
-	return HG_TIME;
+	return GIT_TIME;
 }
 
 unsigned long long GetSaveVersion()
@@ -70,5 +70,5 @@ const char *GetSaveSignature()
 
 const char *GetGameCaption()
 {
-	return GAMENAME " " DOTVERSIONSTR_NOREV " (" HG_TIME ")";
+	return GAMENAME " " DOTVERSIONSTR_NOREV " (" GIT_DESCRIPTION ")";
 }
