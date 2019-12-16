@@ -1,12 +1,8 @@
-cmake_minimum_required( VERSION 2.8.12 )
+cmake_minimum_required( VERSION 3.5.0 )
 
 if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
-
-if( CMAKE_COMPILER_IS_GNUC )
-	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fomit-frame-pointer" )
-endif( CMAKE_COMPILER_IS_GNUC )
 
 add_library( textscreen STATIC
 	txt_radiobutton.c
@@ -30,4 +26,9 @@ add_library( textscreen STATIC
 	txt_gui.c
 	txt_label.c
 )
-target_link_libraries( textscreen SDL::SDL )
+target_link_libraries( textscreen PUBLIC SDL::SDL )
+target_include_directories( textscreen PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
+
+if( CMAKE_COMPILER_IS_GNUC )
+	target_compile_options( textscreen PRIVATE -Wall -fomit-frame-pointer )
+endif( CMAKE_COMPILER_IS_GNUC )

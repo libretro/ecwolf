@@ -112,7 +112,7 @@ void CheckWeaponChange (AActor *self)
 
 	AWeapon *newWeapon = NULL;
 
-	TicCmd_t &cmd = control[self->player - players];
+	TicCmd_t &cmd = control[self->player->GetPlayerNum()];
 
 	if(cmd.buttonstate[bt_nextweapon] && !cmd.buttonheld[bt_nextweapon])
 	{
@@ -157,7 +157,7 @@ void ControlMovement (APlayerPawn *ob)
 	if(playstate == ex_died)
 		return;
 
-	const unsigned int playernum = ob->player - players;
+	const unsigned int playernum = ob->player->GetPlayerNum();
 	int controlx = control[playernum].controlx;
 	int controly = control[playernum].controly;
 	int controlstrafe = control[playernum].controlstrafe;
@@ -328,7 +328,7 @@ void player_t::TakeDamage (int points, AActor *attacker)
 			mo->SetState(mo->PainState);
 	}
 
-	if (godmode != 2 && (this - players) == ConsolePlayer)
+	if (godmode != 2 && GetPlayerNum() == ConsolePlayer)
 		StartDamageFlash (points);
 
 	if (points > 0)

@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=ECWolf
+Name=@PRODUCT_NAME@
 Comment=Advanced Wolfenstein 3D source port
-Exec=ecwolf
-Icon=ecwolf
+Exec=@ENGINE_BINARY_NAME@
+Icon=@ENGINE_BINARY_NAME@
 Categories=Game

@@ -1,6 +1,4 @@
-cmake_minimum_required( VERSION 2.8.12 )
-
-add_definitions(-DTIXML_USE_STL)
+cmake_minimum_required( VERSION 3.5.0 )
 
 add_library(TinyXML STATIC
 	tinystr.cpp
@@ -8,3 +6,7 @@ add_library(TinyXML STATIC
 	tinyxmlerror.cpp
 	tinyxmlparser.cpp
 )
+
+target_compile_definitions(TinyXML PRIVATE -DTIXML_USE_STL)
+
+target_include_directories(TinyXML PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

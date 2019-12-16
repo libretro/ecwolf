@@ -143,7 +143,8 @@ void NewGame (int difficulty, const FString &map, bool displayBriefing, const Cl
 	if(!playerClass)
 		playerClass = ClassDef::FindClass(gameinfo.PlayerClasses[0]);
 
-	memset (&gamestate,0,sizeof(gamestate));
+	// void cast can be removed when we move to C++11
+	memset ((void*)&gamestate,0,sizeof(gamestate));
 	gamestate.difficulty = &SkillInfo::GetSkill(difficulty);
 	strncpy(gamestate.mapname, map, 8);
 	gamestate.mapname[8] = 0;

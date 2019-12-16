@@ -65,6 +65,7 @@ extern class player_t
 		void	BobWeapon(fixed_t *x, fixed_t *y);
 		void	BringUpWeapon();
 		AActor	*FindTarget();
+		inline unsigned int GetPlayerNum() const;
 		void	GiveExtraMan(int amount);
 		void	GivePoints(int32_t points);
 		size_t	PropagateMark();
@@ -130,6 +131,11 @@ extern class player_t
 		int32_t		flags;
 		State		state;
 } players[];
+
+inline unsigned int player_t::GetPlayerNum() const
+{
+	return static_cast<unsigned int>(this - players);
+}
 
 FArchive &operator<< (FArchive &arc, player_t *&player);
 

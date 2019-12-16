@@ -676,8 +676,8 @@ ACTION_FUNCTION(A_ReFire)
 	{
 		ACTION_PARAM_STATE(hold, 0, player->ReadyWeapon->GetAtkState(player->ReadyWeapon->mode, true));
 
-		if((player->ReadyWeapon->mode == AWeapon::PrimaryFire && control[player - players].buttonstate[bt_attack]) ||
-		   (player->ReadyWeapon->mode == AWeapon::AltFire && control[player - players].buttonstate[bt_altattack]))
+		if((player->ReadyWeapon->mode == AWeapon::PrimaryFire && control[player->GetPlayerNum()].buttonstate[bt_attack]) ||
+		   (player->ReadyWeapon->mode == AWeapon::AltFire && control[player->GetPlayerNum()].buttonstate[bt_altattack]))
 		{
 			if(self->MissileState)
 				self->SetState(player->mo->MissileState);

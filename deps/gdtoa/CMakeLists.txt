@@ -1,19 +1,24 @@
-cmake_minimum_required( VERSION 2.8.12 )
+cmake_minimum_required( VERSION 3.5.0 )
 
 set( CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG" )
+
+add_library( gdtoa STATIC
+	dmisc.c
+	dtoa.c
+	misc.c
+)
 
 # Disable warnings for << operator precedence (4554) and
 # unreferenced labels (4102) from VC
 if( MSVC )
-	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4554 /wd4102" )
+	target_compile_options(gdtoa PRIVATE /wd4554 /wd4102 )
 endif()
 
-if( ZD_CMAKE_COMPILER_IS_GNUC_COMPATIBLE )
-	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra" )
-endif()
-
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-add_definitions( -DINFNAN_CHECK -DMULTIPLE_THREADS )
+target_include_directories(gdtoa PUBLIC
+	${CMAKE_CURRENT_BINARY_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_compile_definitions(gdtoa PRIVATE -DINFNAN_CHECK -DMULTIPLE_THREADS)
 
 # These can't be run effectively in a cross compiling environment so we'll just
 # not generate the header and let it error if we haven't collected the data
@@ -28,16 +33,7 @@ if( NOT MSVC AND NOT APPLE AND NOT CMAKE_CROSSCOMPILING )
 	add_custom_command( OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gd_qnan.h
 		COMMAND qnan >${CMAKE_CURRENT_BINARY_DIR}/gd_qnan.h
 		DEPENDS qnan )
-		
-	set( GEN_FP_FILES arith.h gd_qnan.h )
-	set( GEN_FP_DEPS ${CMAKE_CURRENT_BINARY_DIR}/arith.h ${CMAKE_CURRENTY_BINARY_DIR}/gd_qnan.h )
+	target_include_directories( qnan PRIVATE ${CMAKE_CURRENT_BINARY_DIR} )
+
+	target_sources(gdtoa PRIVATE arith.h gd_qnan.h)
 endif()
-
-add_library( gdtoa STATIC
-	${GEN_FP_FILES}
-	dmisc.c
-	dtoa.c
-	misc.c
-	)
-target_link_libraries( gdtoa )
-

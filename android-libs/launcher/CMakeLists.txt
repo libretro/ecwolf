@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5.0)
 
 find_package(Java REQUIRED)
 include(UseJava)
 
-set(APK_OUTPUT "${CMAKE_BINARY_DIR}/ecwolf.apk")
+set(APK_OUTPUT "${CMAKE_BINARY_DIR}/${ENGINE_BINARY_NAME}.apk")
 set(APK_PACKAGE_NAME "com.beloko.wolf3dhg")
 set(APK_ENTRY_ACTIVITY "com.beloko.wolf3d.EntryActivity")
 
@@ -32,7 +32,7 @@ add_custom_target(runadb
 	COMMAND "${ANDROID_ADB_BINARY}" install -r "${APK_OUTPUT}"
 	COMMAND "${ANDROID_ADB_BINARY}" shell am start "${APK_PACKAGE_NAME}/${APK_ENTRY_ACTIVITY}"
 	COMMAND "${ANDROID_ADB_BINARY}" shell logcat
-	DEPENDS ecwolf-android
+	DEPENDS engine-android
 	WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
 	COMMENT "Launching apk via adb..."
 )

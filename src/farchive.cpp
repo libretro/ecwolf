@@ -1126,7 +1126,7 @@ FArchive &FArchive::WriteObject (DObject *obj)
 				player->mo == obj)
 			{
 				id[0] = NEW_PLYR_CLS_OBJ;
-				id[1] = (BYTE)(player - players);
+				id[1] = (BYTE)(player->GetPlayerNum());
 				Write (id, 2);
 			}
 			else
@@ -1158,7 +1158,7 @@ FArchive &FArchive::WriteObject (DObject *obj)
 					player->mo == obj)
 				{
 					id[0] = NEW_PLYR_OBJ;
-					id[1] = (BYTE)(player - players);
+					id[1] = (BYTE)(player->GetPlayerNum());
 					Write (id, 2);
 				}
 				else

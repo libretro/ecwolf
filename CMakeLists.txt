@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5.0)
 project(ECWolf)
 
 if(POLICY CMP0054)
@@ -118,14 +118,9 @@ function( add_pk3 PK3_NAME PK3_DIR )
 	# Touch the zipdir executable here so that the pk3s are forced to rebuild
 	# each time since their dependecy has "changed."
 	if( NOT ANDROID )
-		if(CMAKE_VERSION VERSION_LESS 3.0.0)
-			# CMake 2.8.12 doesn't support generator expressions in install()
-			get_target_property(TARGET_DIR ecwolf RUNTIME_OUTPUT_DIRECTORY)
-		else()
-			set(TARGET_DIR "$<TARGET_FILE_DIR:ecwolf>")
-		endif()
+		set(TARGET_DIR "$<TARGET_FILE_DIR:engine>")
 		add_custom_target( ${PK3_TARGET} ALL
-			COMMAND zipdir -udf $<TARGET_FILE_DIR:ecwolf>/${PK3_NAME} ${PK3_DIR}
+			COMMAND zipdir -udf $<TARGET_FILE_DIR:engine>/${PK3_NAME} ${PK3_DIR}
 			DEPENDS zipdir )
 		install(FILES ${TARGET_DIR}/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_DATAPRODUCTDIR}")
 	else()
@@ -138,8 +133,6 @@ function( add_pk3 PK3_NAME PK3_DIR )
 endfunction()
 
 set(OUTPUT_DIR ${CMAKE_BINARY_DIR} CACHE PATH "Directory in which to build ECWolf.")
-
-set(LZMA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/deps/lzma/C")
 
 option(GPL "Build GPL edition" ON)
 option(USE_LIBTEXTSCREEN "Use libtextscreen instead of console iwad picker." OFF)
@@ -205,12 +198,6 @@ endif()
 if(ANDROID)
 	set(LIBPNG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs)
 	set(LIBPNG_LIBRARY png16_static)
-	set(SIGCPP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/sigc++)
-	set(SIGCPP_LIBRARY sigc++)
-	set(TINYXML_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/TinyXML)
-	set(TINYXML_LIBRARY TinyXML)
-	set(TOUCHCONTROLS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/android-libs/TouchControls)
-	set(TOUCHCONTROLS_LIBRARY touchcontrols)
 
 	add_subdirectory(android-libs/libpng)
 	add_subdirectory(android-libs/sigc++)

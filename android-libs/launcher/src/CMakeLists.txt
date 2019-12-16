@@ -5,7 +5,7 @@ add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/com/beloko/idtech/R.java"
 	COMMENT "Generating resources"
 )
 
-add_jar(ecwolf-android
+add_jar(engine-android
 	${CMAKE_CURRENT_BINARY_DIR}/com/beloko/idtech/R.java
 	com/beloko/idtech/wolf3d/Game.java
 	com/beloko/idtech/wolf3d/NativeLib.java
@@ -56,19 +56,19 @@ add_jar(ecwolf-android
 		"${ANDROID_SUPPORT_V4_JAR}"
 )
 
-add_dependencies(ecwolf-android ecwolf touchcontrols pk3)
+add_dependencies(engine-android engine touchcontrols pk3)
 
-add_custom_command(TARGET ecwolf-android POST_BUILD
-	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:ecwolf>" "${CMAKE_CURRENT_BINARY_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/$<TARGET_FILE_NAME:ecwolf>"
+add_custom_command(TARGET engine-android POST_BUILD
+	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:engine>" "${CMAKE_CURRENT_BINARY_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/$<TARGET_FILE_NAME:engine>"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:touchcontrols>" "${CMAKE_CURRENT_BINARY_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/$<TARGET_FILE_NAME:touchcontrols>"
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:hidapi>" "${CMAKE_CURRENT_BINARY_DIR}/lib/${CMAKE_ANDROID_ARCH_ABI}/$<TARGET_FILE_NAME:hidapi>"
 	COMMAND "${CMAKE_COMMAND}" -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/../assets" "${OUTPUT_DIR}/assets"
 	COMMAND "${ANDROID_AAPT_BINARY}" package -f $<$<CONFIG:DEBUG>:--debug-mode> -M "${CMAKE_CURRENT_SOURCE_DIR}/../AndroidManifest.xml" -S "${CMAKE_CURRENT_SOURCE_DIR}/../res" -A "${OUTPUT_DIR}/assets" -I "${ANDROID_SDK_JAR}" -F "${APK_OUTPUT}"
 	COMMAND "${ANDROID_DX_BINARY}" --dex "--output=classes.dex"
-		"ecwolf-android.jar"
+		"engine-android.jar"
 		"${ANDROID_SUPPORT_V4_JAR}"
 	COMMAND "${ANDROID_AAPT_BINARY}" add -f "${APK_OUTPUT}" "classes.dex" "lib/${CMAKE_ANDROID_ARCH_ABI}/*"
 	COMMAND "${ANDROID_JAR_SIGNER}" -storepass "${ANDROID_SIGN_STOREPASS}" -keystore "${ANDROID_SIGN_KEYSTORE}" -digestalg SHA1 -sigalg MD5withRSA "${APK_OUTPUT}" "${ANDROID_SIGN_KEYNAME}"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-	COMMENT "Creating APK ecwolf.apk"
+	COMMENT "Creating APK ${ENGINE_BINARY_NAME}.apk"
 )

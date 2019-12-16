@@ -70,7 +70,7 @@ void Config::LocateConfigFile(int argc, char* argv[])
 
 	configDir = FileSys::GetDirectoryPath(FileSys::DIR_Configuration);
 
-#ifdef WINDOWS
+#ifdef _WIN32
 	configFile = configDir + "\\" BINNAME ".cfg";
 #else
 	configFile = configDir + "/" BINNAME ".cfg";

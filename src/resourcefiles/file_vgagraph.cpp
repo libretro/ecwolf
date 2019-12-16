@@ -155,7 +155,7 @@ class FVGAGraph : public FResourceFile
 		FVGAGraph(const char* filename, FileReader *file) : FResourceFile(filename, file), lumps(NULL)
 		{
 			FString path(filename);
-			int lastSlash = path.LastIndexOfAny("/\\");
+			int lastSlash = path.LastIndexOfAny("/\\:");
 			extension = path.Mid(lastSlash+10);
 			path = path.Left(lastSlash+1);
 

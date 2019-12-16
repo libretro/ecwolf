@@ -340,7 +340,7 @@ FUNC(Door_Open)
 
 	if(activator->player)
 	{
-		if(control[activator->player - players].buttonheld[bt_use])
+		if(control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 			return 0;
 	}
 
@@ -646,7 +646,7 @@ FUNC(Door_Elevator)
 	{
 		if(activator->player)
 		{
-			if(control[activator->player - players].buttonheld[bt_use])
+			if(control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 				return 0;
 		}
 
@@ -934,9 +934,9 @@ FUNC(Exit_Normal)
 {
 	if(activator->player)
 	{
-		if(control[activator->player - players].buttonheld[bt_use])
+		if(control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 			return 0;
-		control[activator->player - players].buttonheld[bt_use] = true;
+		control[activator->player->GetPlayerNum()].buttonheld[bt_use] = true;
 	}
 
 	playstate = ex_completed;
@@ -949,9 +949,9 @@ FUNC(Exit_Secret)
 	
 	if(activator->player)
 	{
-		if(control[activator->player - players].buttonheld[bt_use])
+		if(control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 			return 0;
-		control[activator->player - players].buttonheld[bt_use] = true;
+		control[activator->player->GetPlayerNum()].buttonheld[bt_use] = true;
 	}
 
 	playstate = ex_secretlevel;
@@ -963,9 +963,9 @@ FUNC(Exit_Victory)
 {
 	if(activator->player)
 	{
-		if(control[activator->player - players].buttonheld[bt_use])
+		if(control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 			return 0;
-		control[activator->player - players].buttonheld[bt_use] = true;
+		control[activator->player->GetPlayerNum()].buttonheld[bt_use] = true;
 	}
 
 	playstate = ex_victorious;
@@ -977,9 +977,9 @@ FUNC(Teleport_NewMap)
 {
 	if(activator->player)
 	{
-		if(control[activator->player - players].buttonheld[bt_use])
+		if(control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 			return 0;
-		control[activator->player - players].buttonheld[bt_use] = true;
+		control[activator->player->GetPlayerNum()].buttonheld[bt_use] = true;
 	}
 
 	playstate = ex_newmap;
@@ -1093,9 +1093,9 @@ FUNC(Exit_VictorySpin)
 {
 	if(activator->player)
 	{
-		if(control[activator->player - players].buttonheld[bt_use])
+		if(control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 			return 0;
-		control[activator->player - players].buttonheld[bt_use] = true;
+		control[activator->player->GetPlayerNum()].buttonheld[bt_use] = true;
 	}
 
 	new EVVictorySpin(activator, direction);
@@ -1155,7 +1155,7 @@ FUNC(Teleport_Relative)
 		return 0;
 	}
 
-	if(activator->player && control[activator->player - players].buttonheld[bt_use])
+	if(activator->player && control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 		return 0;
 
 	// Collect destination points so we can randomly decide

@@ -261,7 +261,7 @@ void ReadConfig(void)
 		uniScreenHeight = sd->GetInteger();
 		config.DeleteSetting("ScreenHeight");
 	}
-	localDesiredFOV = clamp<float>(static_cast<const float>(config.GetSetting("DesiredFOV")->GetFloat()), 45.0f, 180.0f);
+	localDesiredFOV = clamp<float>(static_cast<float>(config.GetSetting("DesiredFOV")->GetFloat()), 45.0f, 180.0f);
 	quitonescape = config.GetSetting("QuitOnEscape")->GetInteger() != 0;
 	movebob = config.GetSetting("MoveBob")->GetInteger();
 	screenGamma = static_cast<float>(config.GetSetting("Gamma")->GetFloat());

@@ -202,7 +202,7 @@ void APlayerPawn::Tick()
 
 	TickPSprites();
 
-	if(player - players == ConsolePlayer)
+	if(player->GetPlayerNum() == ConsolePlayer)
 	{
 		// [RH] Smooth transitions between bobbing and not-bobbing frames.
 		// This also fixes the bug where you can "stick" a weapon off-center by
@@ -248,11 +248,11 @@ void APlayerPawn::Tick()
 	if(gamestate.victoryflag)
 		return;
 
-	if((player - players) == ConsolePlayer)
+	if((player->GetPlayerNum()) == ConsolePlayer)
 		StatusBar->UpdateFace();
 	CheckWeaponChange(this);
 
-	TicCmd_t &cmd = control[player - players];
+	TicCmd_t &cmd = control[player->GetPlayerNum()];
 
 	if(cmd.buttonstate[bt_use])
 		Cmd_Use();

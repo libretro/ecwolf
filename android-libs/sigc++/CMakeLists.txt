@@ -1,6 +1,4 @@
-cmake_minimum_required( VERSION 2.8.12 )
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+cmake_minimum_required( VERSION 3.5.0 )
 
 add_library(sigc++ STATIC
 	sigc++/adaptors/lambda/lambda.cc
@@ -11,3 +9,5 @@ add_library(sigc++ STATIC
 	sigc++/signal_base.cc
 	sigc++/trackable.cc
 )
+
+target_include_directories(sigc++ PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

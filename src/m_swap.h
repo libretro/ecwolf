@@ -22,6 +22,13 @@ static inline DWORD ReadLittle24(const BYTE * const ptr)
 		(DWORD(BYTE(*(ptr+2)))<<16);
 }
 
+static inline DWORD ReadBig24(const BYTE * const ptr)
+{
+	return DWORD(BYTE(*(ptr+2))) |
+		(DWORD(BYTE(*(ptr+1)))<<8) |
+		(DWORD(BYTE(*ptr))<<16);
+}
+
 static inline DWORD ReadLittleLong(const BYTE * const ptr)
 {
 	return DWORD(BYTE(*ptr)) |
@@ -44,20 +51,6 @@ static inline void WriteLittleShort(BYTE * const ptr, WORD value)
 	ptr[1] = (value>>8)&0xFF;
 }
 
-
-// Now for some writing
-// Syntax: char data[x] = {WRITEINT32_DIRECT(integer),WRITEINT32_DIRECT(integer)...}
-#if 0
-#define WRITEINT32_DIRECT(integer) (BYTE)(integer&0xFF),(BYTE)((integer>>8)&0xFF),(BYTE)((integer>>16)&0xFF),(BYTE)((integer>>24)&0xFF)
-#define WRITEINT16_DIRECT(integer) (BYTE)(integer&0xFF),(BYTE)((integer>>8)&0xFF)
-#define WRITEINT8_DIRECT(integer) (BYTE)(integer&0xFF)
-
-#define WRITEINT32(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);*(pointer+2) = (BYTE)((integer>>16)&0xFF);*(pointer+3) = (BYTE)((integer>>24)&0xFF);
-#define WRITEINT24(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);*(pointer+2) = (BYTE)((integer>>16)&0xFF);
-#define WRITEINT16(pointer, integer) *pointer = (BYTE)(integer&0xFF);*(pointer+1) = (BYTE)((integer>>8)&0xFF);
-#define WRITEINT8(pointer, integer) *pointer = (BYTE)(integer&0xFF);
-#endif
-
 // After the fact Byte Swapping ------------------------------------------------
 
 static inline WORD SwapShort(WORD x)
@@ -73,16 +66,32 @@ static inline DWORD SwapLong(DWORD x)
 		((x>>24)&0xFF);
 }
 
+static inline QWORD SwapLongLong(QWORD x)
+{
+	return ((x&0xFF)<<56) |
+		(((x>>8)&0xFF)<<48) |
+		(((x>>16)&0xFF)<<40) |
+		(((x>>24)&0xFF)<<32) |
+		(((x>>32)&0xFF)<<24) |
+		(((x>>40)&0xFF)<<16) |
+		(((x>>48)&0xFF)<<8) |
+		((x>>56)&0xFF);
+}
+
 #ifdef __BIG_ENDIAN__
 #define BigShort(x) (x)
 #define BigLong(x) (x)
+#define BigLongLong(x) (x)
 #define LittleShort SwapShort
 #define LittleLong SwapLong
+#define LittleLongLong SwapLongLong
 #else
 #define BigShort SwapShort
 #define BigLong SwapLong
+#define BigLongLong SwapLongLong
 #define LittleShort(x) (x)
 #define LittleLong(x) (x)
+#define LittleLongLong(x) (x)
 #endif
 
 #endif /* __M_SWAP__ */
