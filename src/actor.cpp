@@ -45,6 +45,7 @@
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_loadsave.h"
+#include "wl_net.h"
 #include "wl_state.h"
 #include "id_us.h"
 #include "m_random.h"
@@ -750,9 +751,12 @@ void StartTravel ()
 	// Set thinker priorities to TRAVEL so that they don't get wiped on level
 	// load.  We'll transfer them to a new actor.
 
-	AActor *player = players[0].mo;
+	for(unsigned int i = 0;i < Net::InitVars.numPlayers;++i)
+	{
+		AActor *player = players[i].mo;
 
-	player->SetPriority(ThinkerList::TRAVEL);
+		player->SetPriority(ThinkerList::TRAVEL);
+	}
 }
 
 void FinishTravel ()
@@ -760,33 +764,32 @@ void FinishTravel ()
 	gamestate.victoryflag = false;
 
 	ThinkerList::Iterator node = thinkerList->GetHead(ThinkerList::TRAVEL);
-	if(!node)
-		return;
-
-	do
+	while(node)
 	{
 		AActor *actor = static_cast<AActor *>((Thinker*)node);
+		node.Next();
+
 		if(actor->IsKindOf(NATIVE_CLASS(PlayerPawn)))
 		{
 			APlayerPawn *player = static_cast<APlayerPawn *>(actor);
-			if(player->player == &players[0])
-			{
-				AActor *playertmp = players[0].mo;
-				player->x = playertmp->x;
-				player->y = playertmp->y;
-				player->angle = playertmp->angle;
-				player->EnterZone(playertmp->GetZone());
 
-				players[0].mo = player;
-				players[0].camera = player;
-				playertmp->Destroy();
+			// The player_t::mo has been replaced with a newly spawned player
+			// we want to transfer properties from the new player object onto
+			// the old one and then put the old one in place of the new one.
+			APlayerPawn *playertmp = player->player->mo;
+			player->x = playertmp->x;
+			player->y = playertmp->y;
+			player->angle = playertmp->angle;
+			player->EnterZone(playertmp->GetZone());
 
-				// We must move the linked list iterator here since we'll
-				// transfer to the new linked list at the SetPriority call
-				player->SetPriority(ThinkerList::PLAYER);
-				continue;
-			}
+			players[0].mo = player;
+			players[0].camera = player;
+			playertmp->Destroy();
+
+			// We must move the linked list iterator here since we'll
+			// transfer to the new linked list at the SetPriority call
+			player->SetPriority(ThinkerList::PLAYER);
+			continue;
 		}
 	}
-	while(node.Next());
 }
