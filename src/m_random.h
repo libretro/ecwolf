@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include "wl_def.h"
 #include "sfmt/SFMT.h"
+#include "farchive.h"
 
 struct PNGHandle;
 
@@ -177,7 +178,10 @@ public:
 	static void StaticClearRandom ();
 	static DWORD StaticSumSeeds ();
 	static void StaticReadRNGState (PNGHandle *png);
+	static void StaticReadRNGState (FArchive &arc, int rngcount);
 	static void StaticWriteRNGState (FILE *file);
+	static void StaticWriteRNGState (FArchive &arc);
+	static DWORD GetRNGCount ();
 	static FRandom *StaticFindRNG(const char *name);
 
 #ifndef NDEBUG

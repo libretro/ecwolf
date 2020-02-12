@@ -39,6 +39,7 @@
 #endif
 #include "wl_main.h"
 #include "id_sd.h"
+#include <SDL.h>
 
 #ifndef ECWOLF_MIXER
 #pragma message "Not using customized SDL_mixer. Features will be disabled. https://bitbucket.org/Blzut3/sdl_mixer-for-ecwolf"

@@ -115,7 +115,7 @@ void VW_MeasurePropString (FFont *font, const char *string, word &width, word &h
 
 =============================================================================
 */
-
+#ifndef LIBRETRO
 #if SDL_VERSION_ATLEAST(2,0,0)
 void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
 {
@@ -144,6 +144,7 @@ void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
 	else
 		Printf("Can't lock texture!\n");
 }
+#endif
 #endif
 
 void VH_UpdateScreen()
@@ -191,8 +192,8 @@ static const uint32_t rndmasks[] = {
 	0x01200000,     // 25   25,22      (this is enough for 8191x4095)
 };
 
-static unsigned int rndbits_y;
-static unsigned int rndmask;
+unsigned int rndbits_y;
+unsigned int rndmask;
 
 // Returns the number of bits needed to represent the given value
 static int log2_ceil(uint32_t x)

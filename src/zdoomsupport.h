@@ -8,7 +8,10 @@
 
 #include <cstring>
 
-#ifdef __ANDROID__
+#if defined(LIBRETRO) && LIBRETRO
+void libretro_log(const char *format, ...);
+#define printf(...) libretro_log(__VA_ARGS__)
+#elif defined(__ANDROID__)
 #include <android/log.h>
 #define printf(...) __android_log_print(ANDROID_LOG_INFO,"ECWolf",__VA_ARGS__)
 #endif

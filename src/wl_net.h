@@ -35,7 +35,9 @@
 #ifndef __WL_NET_H__
 #define __WL_NET_H__
 
+#ifndef LIBRETRO
 #include <SDL_net.h>
+#endif
 
 #include "wl_def.h"
 

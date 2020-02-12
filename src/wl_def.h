@@ -16,7 +16,6 @@
 #elif defined(__GNUC__)
 #	include <stdint.h>
 #endif
-#include <SDL.h>
 
 #if !defined O_BINARY
 #	define O_BINARY 0
@@ -385,8 +384,6 @@ static inline fixed FixedDiv(fixed a, fixed b)
 {
 	return (fixed)(((((int64_t)a)<<32) / b) >> 16);
 }
-
-#define GetTicks() ((SDL_GetTicks()*7)/100)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 

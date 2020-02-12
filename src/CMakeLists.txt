@@ -1,14 +1,16 @@
-add_custom_target(revision_check ALL
-	COMMAND updaterevision ${CMAKE_CURRENT_BINARY_DIR}/gitinfo.h
-	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-	DEPENDS updaterevision
-)
+if (NOT LIBRETRO)
+	add_custom_target(revision_check ALL
+		COMMAND updaterevision ${CMAKE_CURRENT_BINARY_DIR}/gitinfo.h
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		DEPENDS updaterevision
+	)
+endif()
 
 # The ability to start with an empty target was added in CMake 3.11 so since
 # for Android we use a shared library we need to use a macro to determine which
 # function to call.
 macro(initial_sources TARGET)
-	if(ANDROID)
+	if(ANDROID OR LIBRETRO)
 		add_library(engine SHARED ${ARGV})
 	else()
 		add_executable(engine WIN32 ${ARGV})
@@ -93,16 +95,11 @@ initial_sources(
 	filesys.cpp
 	filesys_steam.cpp
 	g_conversation.cpp
-	g_intermission.cpp
 	g_mapinfo.cpp
 	gamemap.cpp
 	gamemap_planes.cpp
 	gamemap_uwmf.cpp
-	gitinfo.cpp
 	id_ca.cpp
-	id_in.cpp
-	id_sd.cpp
-	id_us_1.cpp
 	id_vh.cpp
 	id_vl.cpp
 	language.cpp
@@ -116,7 +113,6 @@ initial_sources(
 	p_switch.cpp
 	r_sprites.cpp
 	scanner.cpp
-	sdlvideo.cpp
 	sndinfo.cpp
 	sndseq.cpp
 	thinker.cpp
@@ -132,26 +128,50 @@ initial_sources(
 	wl_agent.cpp
 	wl_atmos.cpp
 	wl_cloudsky.cpp
-	wl_debug.cpp
 	wl_dir3dspr.cpp
 	wl_draw.cpp
 	wl_floorceiling.cpp
-	wl_game.cpp
-	wl_inter.cpp
 	wl_iwad.cpp
 	wl_loadsave.cpp
-	wl_main.cpp
 	wl_menu.cpp
-	wl_net.cpp
 	wl_parallax.cpp
-	wl_play.cpp
 	wl_state.cpp
-	wl_text.cpp
 	zstrformat.cpp
 	zstring.cpp
 )
+      
+if(LIBRETRO)
+  target_sources(engine PRIVATE
+    libretro/libretro.cpp
+    libretro/id_in.cpp
+    libretro/id_sd.cpp
+    libretro/id_us_1.cpp
+    libretro/wl_play.cpp
+    libretro/wl_game.cpp
+    libretro/wl_inter.cpp
+    libretro/wl_main.cpp
+    libretro/wl_text.cpp
+    libretro/g_conversation.cpp
+    libretro/g_intermission.cpp)
+else()
+  target_sources(engine PRIVATE
+      id_in.cpp
+      id_sd.cpp
+      id_us_1.cpp
+      wl_debug.cpp
+      gitinfo.cpp
+      g_intermission.cpp
+      wl_play.cpp
+      wl_game.cpp
+      wl_main.cpp
+      sdlvideo.cpp
+      wl_text.cpp
+      wl_inter.cpp
+      wl_net.cpp)
+endif()
 
-if(ANDROID)
+
+if(ANDROID AND NOT LIBRETRO)
 	# On Android we build a shared object so create a dummy program so we can
 	# get link errors.
 	add_executable(link-test android/link-test.cpp)
@@ -164,6 +184,10 @@ include(CheckCXXSourceCompiles)
 include(CheckFunctionExists)
 include(FindPkgConfig)
 
+if(LIBRETRO)
+	target_compile_definitions(engine PRIVATE -DLIBRETRO=1)
+endif()
+      
 if(GPL)
 	target_compile_definitions(engine PRIVATE -DUSE_GPL)
 	target_sources(engine PRIVATE dosbox/dbopl.cpp)
@@ -215,7 +239,9 @@ if( ZD_CMAKE_COMPILER_IS_GNUCXX_COMPATIBLE )
 	target_compile_options(engine PRIVATE -Wall -Wextra -Wno-unused -Wno-unused-parameter -Wno-missing-field-initializers)
 endif()
 
-if(WIN32)
+if(LIBRETRO)
+        set(NO_GTK ON)
+elseif(WIN32)
 	set(NO_GTK ON)
 	target_link_libraries(engine PRIVATE comctl32)
 	target_compile_definitions(engine PRIVATE -DNO_STDIO_REDIRECT)
@@ -255,7 +281,7 @@ if(NO_GTK)
 	target_compile_definitions(engine PRIVATE -DNO_GTK=1)
 endif()
 
-if(APPLE)
+if(APPLE AND NOT LIBRETRO)
 	target_sources(engine PRIVATE
 		macosx/filesys.mm
 		macosx/wl_iwad_picker_cocoa.mm
@@ -271,7 +297,7 @@ if(APPLE)
 	if(BUILD_BUNDLE)
 		set_target_properties(engine PROPERTIES MACOSX_BUNDLE ON)
 	endif(BUILD_BUNDLE)
-elseif(ANDROID)
+elseif(ANDROID AND NOT LIBRETRO)
 	target_sources(engine PRIVATE
 		android/android-jni.cpp
 		android/in_android.cpp
@@ -307,17 +333,27 @@ file(GLOB HEADER_FILES
 list(APPEND HEADER_FILES ${CMAKE_CURRENT_BINARY_DIR}/versiondefs.h)
 target_sources(engine PRIVATE ${HEADER_FILES})
 
-add_dependencies(engine revision_check)
-target_link_libraries(engine PRIVATE
-	SDL2::SDL2_mixer
-	SDL2::SDL2_net
-	SDL2::SDL2
-	${BZIP2_LIBRARIES}
-	${JPEG_LIBRARIES}
-	lzma
-	gdtoa
-	ZLIB::ZLIB
-)
+if (LIBRETRO)
+	target_link_libraries(engine PRIVATE
+		${BZIP2_LIBRARIES}
+		${JPEG_LIBRARIES}
+		lzma
+		gdtoa
+		ZLIB::ZLIB
+	)
+else()
+        add_dependencies(engine revision_check)
+	target_link_libraries(engine PRIVATE
+		SDL2::SDL2_mixer
+		SDL2::SDL2_net
+		SDL2::SDL2
+		${BZIP2_LIBRARIES}
+		${JPEG_LIBRARIES}
+		lzma
+		gdtoa
+		ZLIB::ZLIB
+	)
+endif()
 target_include_directories(engine PRIVATE
 	${BZIP2_INCLUDE_DIR}
 	${JPEG_INCLUDE_DIR}
@@ -336,7 +372,7 @@ set_target_properties(engine PROPERTIES
 )
 
 # Install
-if(NOT ANDROID)
+if(NOT ANDROID AND NOT LIBRETRO)
 	install(TARGETS engine BUNDLE DESTINATION ${OUTPUT_DIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
 
 	if(NOT WIN32 AND NOT APPLE)

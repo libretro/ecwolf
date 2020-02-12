@@ -40,16 +40,18 @@
 #include "w_wad.h"
 #include "scanner.h"
 #include "zdoomsupport.h"
+#ifndef LIBRETRO
 #include <SDL_mixer.h>
-
+#endif
 
 // TFuncDeleter can't be used here since Mix_FreeChunk has various attributes
 // on Windows that make it difficult to forward declare. We'd prefer to not
 // include SDL_mixer.h in more places than we absolutely have to.
-struct Mix_ChunkDeleter
-{
-	inline explicit Mix_ChunkDeleter(Mix_Chunk *obj) { Mix_FreeChunk(obj); }
-};
+Mix_ChunkDeleter::Mix_ChunkDeleter(Mix_Chunk *obj) {
+#ifndef LIBRETRO
+	Mix_FreeChunk(obj);
+#endif
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //

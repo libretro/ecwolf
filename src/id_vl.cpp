@@ -41,7 +41,6 @@ unsigned windowedScreenHeight = 480;
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
 float screenGamma = 1.0f;
 
-SDL_Surface *curSurface = NULL;
 unsigned curPitch;
 
 unsigned scaleFactorX, scaleFactorY;
@@ -150,6 +149,7 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 */
 
 static int fadeR = 0, fadeG = 0, fadeB = 0;
+#ifndef LIBRETRO
 void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 {
 	end <<= FRACBITS;
@@ -183,6 +183,7 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 	// issues such as starting facing the wrong angle in super 3d noah's ark.
 	IN_ProcessEvents();
 }
+#endif
 
 void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 {

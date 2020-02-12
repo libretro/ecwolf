@@ -43,7 +43,10 @@
 class SoundInformation;
 
 struct Mix_Chunk;
-struct Mix_ChunkDeleter;
+struct Mix_ChunkDeleter
+{
+	explicit Mix_ChunkDeleter(Mix_Chunk *obj);
+};
 
 class SoundIndex
 {
@@ -75,6 +78,7 @@ class SoundData
 		byte* GetSpeakerData() const { return speakerData; }
 		bool HasType(Type type=ADLIB) const { return lump[type] != -1; }
 		bool IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1 && !isAlias; }
+  	        int GetIndex() const { return index; }
 
 	private:
 		const SoundData &operator= (const SoundData &);

@@ -529,6 +529,18 @@ bool FCompressedMemFile::Open ()
 	return true;
 }
 
+bool FCompressedMemFile::OpenNoCompress ()
+{
+	Close ();
+	m_Mode = EWriting;
+	m_BufferSize = 0;
+	m_MaxBufferSize = 16384;
+	m_Buffer = (unsigned char *)M_Malloc (16384);
+	m_Pos = 0;
+	m_NoCompress = true;
+	return true;
+}
+
 bool FCompressedMemFile::Reopen ()
 {
 	if (m_Buffer == NULL && m_ImplodedBuffer)
@@ -562,6 +574,34 @@ void FCompressedMemFile::Close ()
 		m_ImplodedBuffer = m_Buffer;
 		m_Buffer = NULL;
 	}
+}
+
+int FCompressedMemFile::GetSerializedSize()
+{
+	if (m_ImplodedBuffer == NULL)
+	{
+		I_Error ("FCompressedMemFile must be compressed before storing");
+	}
+
+	DWORD sizes[2];
+	sizes[0] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[0]);
+	sizes[1] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[1]);
+	return (sizes[0] ? sizes[0] : sizes[1])+8;
+}
+
+void FCompressedMemFile::SerializeToBuffer(void *buffer)
+{
+	if (m_ImplodedBuffer == NULL)
+	{
+		I_Error ("FCompressedMemFile must be compressed before storing");
+	}
+
+	DWORD sizes[2];
+	sizes[0] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[0]);
+	sizes[1] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[1]);
+	DWORD size = (sizes[0] ? sizes[0] : sizes[1])+8;
+
+	memcpy ((char *) buffer, m_ImplodedBuffer, size);
 }
 
 void FCompressedMemFile::Serialize (FArchive &arc)

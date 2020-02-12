@@ -48,9 +48,12 @@ bool menusAreFaded = true;
 
 EMenuStyle MenuStyle = MENUSTYLE_Wolf;
 
+#ifndef LIBRETRO
 MENU_LISTENER(EnterControlBase);
+#endif
 
 Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
+#ifndef LIBRETRO
 Menu optionsMenu(80, 80, 190, 28);
 Menu soundBase(24, 45, 284, 24);
 Menu controlBase(CTL_X, CTL_Y, CTL_W, 56, EnterControlBase);
@@ -58,9 +61,11 @@ Menu displayMenu(20, 75, 285, 56);
 Menu automapMenu(40, 55, 260, 56);
 Menu mouseSensitivity(20, 50, 300, 24);
 Menu joySensitivity(20, 30, 300, 24);
+#endif
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
+#ifndef LIBRETRO
 Menu controls(15, 70, 310, 24);
 Menu resolutionMenu(90, 25, 150, 24);
 
@@ -169,6 +174,7 @@ MENU_LISTENER(SetPlayerClassAndSwitch)
 
 	return true;
 }
+#endif
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
@@ -184,7 +190,7 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 		episodes.draw();
 		return false;
 	}
-
+#ifndef LIBRETRO
 	if(ingame)
 	{
 		if(!Confirm(language["CURGAME"]))
@@ -193,12 +199,14 @@ MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 			return false;
 		}
 	}
-
+#endif
 	episode = &ep;
 	return true;
 }
 MENU_LISTENER(StartNewGame)
 {
+	// libretro handles it separately
+#ifndef LIBRETRO
 	const SkillInfo &si = SkillInfo::GetSkill(which);
 	if(si.MustConfirm.IsNotEmpty())
 	{
@@ -213,15 +221,16 @@ MENU_LISTENER(StartNewGame)
 
 	Menu::closeMenus();
 	NewGame(which, episode->StartMap, true, playerClass);
-
 	//
 	// CHANGE "READ THIS!" TO NORMAL COLOR
 	//
 	readThis->setHighlighted(false);
+#endif
 
 	return true;
 }
-MENU_LISTENER(ReadThis)
+#ifndef LIBRETRO
+ MENU_LISTENER(ReadThis)
 {
 	MenuFadeOut();
 	StartCPMusic(gameinfo.FinaleMusic);
@@ -339,7 +348,7 @@ MENU_LISTENER(AdjustViewSize)
 	NewViewSize(viewsize);
 	return true;
 }
-
+#endif
 void CreateMenus()
 {
 	// HACK: Determine menu style by IWAD
@@ -361,8 +370,8 @@ void CreateMenus()
 	MENUWINHGLT_BOTBORDER = ColorMatcher.Pick(RPART(gameinfo.MenuWindowColors[5]), GPART(gameinfo.MenuWindowColors[5]), BPART(gameinfo.MenuWindowColors[5]));
 
 	// Actually initialize the menus
+#ifndef LIBRETRO
 	GameSave::InitMenus();
-
 	mainMenu.setHeadPicture("M_OPTION");
 
 	const bool useEpisodeMenu = EpisodeInfo::GetNumEpisodes() > 1;
@@ -394,6 +403,7 @@ void CreateMenus()
 		MenuItem *tmp = new MenuSwitcherMenuItem(displayName, useEpisodeMenu ? episodes : skills, SetPlayerClassAndSwitch);
 		playerClasses.addItem(tmp);
 	}
+#endif
 
 	episodes.setHeadText(language["STR_WHICHEPISODE"]);
 	for(unsigned int i = 0;i < EpisodeInfo::GetNumEpisodes();++i)
@@ -419,6 +429,7 @@ void CreateMenus()
 	}
 	skills.setCurrentPosition(2);
 
+#ifndef LIBRETRO
 	optionsMenu.setHeadPicture("M_OPTION");
 	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_CL"], controlBase));
 	optionsMenu.addItem(new MenuSwitcherMenuItem(language["STR_SD"], soundBase));
@@ -476,7 +487,6 @@ void CreateMenus()
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_JOYSENS"], joySensitivity));
 	controlBase.addItem(new MenuSwitcherMenuItem(language["STR_CUSTOM"], controls));
 	controlBase.addItem(new BooleanMenuItem(language["STR_ESCQUIT"], quitonescape));
-
 	joySensitivity.setHeadText(language["STR_JOYSENS"]);
 	for(int i = 0;i < JoyNumAxes;++i)
 	{
@@ -493,12 +503,11 @@ void CreateMenus()
 		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].sensitivity, 164, 30, language["STR_SLOW"], language["STR_FAST"]));
 		joySensitivity.addItem(new SliderMenuItem(JoySensitivity[i].deadzone, 150, 20, language["STR_SMALL"], language["STR_LARGE"]));
 	}
-
 	const char* aspectOptions[] = {"Aspect: Auto", "Aspect: 16:9", "Aspect: 16:10", "Aspect: 17:10", "Aspect: 4:3", "Aspect: 5:4", "Aspect: 21:9"};
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
 #ifndef __ANDROID__
 	displayMenu.addItem(new BooleanMenuItem(language["STR_FULLSCREEN"], vid_fullscreen, ToggleFullscreen));
-#endif
+#endif	
 #if SDL_VERSION_ATLEAST(2,0,0)
 	displayMenu.addItem(new BooleanMenuItem(language["STR_VSYNC"], vid_vsync, ToggleVsync));
 #endif
@@ -538,7 +547,10 @@ void CreateMenus()
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTUREDOVERLAY"], am_overlaytextured, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMRATIOS"], am_showratios, ChangeAutomapFlag));
 	automapMenu.addItem(new BooleanMenuItem(language["STR_AMPAUSE"], am_pause, ChangeAutomapFlag));
+#endif
 }
+
+#ifndef LIBRETRO
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -748,7 +760,6 @@ int CP_CheckQuick (ScanCode scancode)
 	return 0;
 }
 
-
 ////////////////////////////////////////////////////////////////////
 //
 // END THE CURRENT GAME
@@ -769,6 +780,8 @@ int CP_EndGame (int)
 
 	return 1;
 }
+
+#endif
 
 ////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////
@@ -846,11 +859,14 @@ void CleanupControlPanel (void)
 		0, 0, screenWidth, screenHeight);
 }
 
+#ifndef LIBRETRO
+
 ////////////////////////////////////////////////////////////////////
 //
 // DELAY FOR AN AMOUNT OF TICS OR UNTIL CONTROLS ARE INACTIVE
 //
 ////////////////////////////////////////////////////////////////////
+
 void TicDelay (int count)
 {
 	ControlInfo ci;
@@ -1049,6 +1065,7 @@ bool Confirm (const char *string)
 
 	return xit;
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -1118,7 +1135,9 @@ void CheckPause (void)
 		}
 
 		SoundStatus ^= 1;
+#ifndef LIBRETRO
 		VW_WaitVBL (3);
+#endif
 		IN_ClearKeysDown ();
 		Paused &= ~1;
 	}
@@ -1174,6 +1193,8 @@ void MenuFadeIn()
 	VL_FadeIn(0, 255, 10);
 }
 
+#ifndef LIBRETRO
+
 void ShowMenu(Menu &menu)
 {
 	// Clear out any residual mouse movement.
@@ -1203,3 +1224,5 @@ void ShowMenu(Menu &menu)
 	if (MousePresent && IN_IsInputGrabbed())
 		IN_CenterMouse();     // Clear accumulated mouse movement
 }
+
+#endif

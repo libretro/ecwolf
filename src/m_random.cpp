@@ -272,8 +272,25 @@ DWORD FRandom::StaticSumSeeds ()
 
 void FRandom::StaticWriteRNGState (FILE *file)
 {
-	FRandom *rng;
 	FPNGChunkArchive arc (file, RAND_ID);
+
+	StaticWriteRNGState (arc);
+}
+
+DWORD FRandom::GetRNGCount ()
+{
+	int ret = 0;
+	FRandom *rng;
+
+	for (rng = FRandom::RNGList; rng != NULL; rng = rng->Next)
+		if (rng->NameCRC != 0)
+			ret++;
+	return ret;
+}
+
+void FRandom::StaticWriteRNGState (FArchive &arc)
+{
+	FRandom *rng;
 
 	arc << rngseed;
 
@@ -300,54 +317,58 @@ void FRandom::StaticWriteRNGState (FILE *file)
 //
 //==========================================================================
 
-void FRandom::StaticReadRNGState (PNGHandle *png)
+void FRandom::StaticReadRNGState (FArchive &arc, int rngcount)
 {
+	int i;
+	DWORD crc;
 	FRandom *rng;
+	arc << rngseed;
+	FRandom::StaticClearRandom ();
 
-	size_t len = M_FindPNGChunk (png, RAND_ID);
-
-	if (len != 0)
+	for (i = rngcount; i; --i)
 	{
-		const size_t sizeof_rng = sizeof(rng->NameCRC) + sizeof(rng->idx) + sizeof(rng->sfmt.u);
-		const int rngcount = (int)((len-4) / sizeof_rng);
-		int i;
-		DWORD crc;
-
-		FPNGChunkArchive arc (png->File->GetFile(), RAND_ID, len);
-
-		arc << rngseed;
-		FRandom::StaticClearRandom ();
-
-		for (i = rngcount; i; --i)
+		arc << crc;
+		for (rng = FRandom::RNGList; rng != NULL; rng = rng->Next)
 		{
-			arc << crc;
-			for (rng = FRandom::RNGList; rng != NULL; rng = rng->Next)
+			if (rng->NameCRC == crc)
 			{
-				if (rng->NameCRC == crc)
-				{
-					arc << rng->idx;
-					if(GameSave::SaveVersion >= 1379630950u)
-						arc << rng->oldidx;
-					for (int i = 0; i < SFMT::N32; ++i)
-					{
-						arc << rng->sfmt.u[i];
-					}
-					break;
-				}
-			}
-			if (rng == NULL)
-			{ // The RNG was removed. Skip it.
-				int idx;
-				DWORD sfmt;
-				arc << idx;
+				arc << rng->idx;
 				if(GameSave::SaveVersion >= 1379630950u)
 					arc << rng->oldidx;
 				for (int i = 0; i < SFMT::N32; ++i)
 				{
-					arc << sfmt;
+					arc << rng->sfmt.u[i];
 				}
+				break;
 			}
 		}
+		if (rng == NULL)
+		{ // The RNG was removed. Skip it.
+			int idx;
+			DWORD sfmt;
+			arc << idx;
+			if(GameSave::SaveVersion >= 1379630950u)
+				arc << rng->oldidx;
+			for (int i = 0; i < SFMT::N32; ++i)
+			{
+				arc << sfmt;
+			}
+		}
+	}
+}
+
+void FRandom::StaticReadRNGState (PNGHandle *png)
+{
+	size_t len = M_FindPNGChunk (png, RAND_ID);
+
+	if (len != 0)
+	{
+		FRandom *rng;
+		const size_t sizeof_rng = sizeof(rng->NameCRC) + sizeof(rng->idx) + sizeof(rng->sfmt.u);
+		const int rngcount = (int)((len-4) / sizeof_rng);
+		FPNGChunkArchive arc (png->File->GetFile(), RAND_ID, len);
+
+		StaticReadRNGState (arc, rngcount);
 		png->File->ResetFilePtr();
 	}
 }

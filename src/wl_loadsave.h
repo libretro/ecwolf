@@ -54,6 +54,7 @@ namespace GameSave
 
 	bool		Load(const FString &filename);
 	bool		Save(const FString &filename, const FString &title);
+	void		Serialize(FArchive &arc);
 }
 
 #endif
