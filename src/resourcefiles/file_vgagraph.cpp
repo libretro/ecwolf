@@ -42,6 +42,8 @@
 #include "lumpremap.h"
 #include "zstring.h"
 
+#include <algorithm>
+
 struct Huffnode
 {
 	public:
@@ -346,12 +348,25 @@ class FVGAGraph : public FResourceFile
 					lumps[i].LumpSize += 4;
 				}
 			}
+
+			// HACK: Wolfstone has a chunk of garbage data after the pictures
+			//       and before the TILE8.  It's a partially zero-filled version
+			//       of the Get Psyched graphic so no idea why it exists or how
+			//       it got there.  Unless I see a reason to change this I
+			//       believe the best method to attack that problem is to detect
+			//       that the size is the same and delete the lump.
+			unsigned int tile8Position = 1+numFonts+numPictures;
+			if(tile8Position < NumLumps && lumps[tile8Position].LumpSize == lumps[tile8Position-1].LumpSize-4)
+			{
+				std::copy(&lumps[tile8Position+1], &lumps[NumLumps], &lumps[tile8Position]);
+				--NumLumps;
+			}
+
 			// HACK: For some reason id decided the tile8 lump will not tell
 			//       its size.  So we need to assume it's right after the
 			//       graphics. To make matters worse, we can't assume a size
 			//       for it since S3DNA has more than 72 tiles.
 			//       We will use the method from before to guess a size.
-			unsigned int tile8Position = 1+numFonts+numPictures;
 			if(tile8Position < NumLumps && (unsigned)lumps[tile8Position].LumpSize > lumps[tile8Position].length)
 			{
 				byte* data = new byte[lumps[tile8Position].length];
