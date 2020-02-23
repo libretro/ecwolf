@@ -9,8 +9,6 @@ void Quit (const char *error,...);
 
 //===========================================================================
 
-extern SDL_Surface *curSurface;
-
 extern  bool	fullscreen, usedoublebuffering;
 extern  unsigned screenWidth, screenHeight, screenBits, curPitch;
 extern  unsigned fullScreenWidth, fullScreenHeight;
@@ -19,8 +17,6 @@ extern  unsigned scaleFactorX, scaleFactorY;
 extern	float	screenGamma;
 
 extern	bool  screenfaded;
-
-extern SDL_Color gamepal[256];
 
 //===========================================================================
 
@@ -38,6 +34,7 @@ void VL_ReadPalette(const char* lump);
 void VL_SetVGAPlaneMode (bool forSignon=false);
 void VL_SetTextMode (void);
 
+void VL_Fade (int start, int end, int red, int green, int blue, int steps);
 void VL_FadeOut     (int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn      (int start, int end, int steps);
 

@@ -22,7 +22,6 @@
 #	include <stdint.h>
 #endif
 #include "id_sd.h"
-#include <SDL.h>
 
 //typedef uintptr_t	Bitu;
 //typedef intptr_t	Bits;

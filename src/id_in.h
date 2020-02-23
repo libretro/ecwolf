@@ -12,6 +12,12 @@
 #define	__DEBUG_InputMgr__
 #endif
 
+typedef	int		ScanCode;
+
+#ifndef LIBRETRO
+
+#include <SDL.h>
+
 #if !SDL_VERSION_ATLEAST(1,3,0)
 #define SDLK_A SDLK_a
 #define SDLK_B SDLK_b
@@ -45,7 +51,6 @@
 #define SDLx_SCANCODE(x) SDL_SCANCODE_##x
 #endif
 
-typedef	int		ScanCode;
 #define	sc_None			0
 #define	sc_Bad			0xff
 #define	sc_Return		SDLx_SCANCODE(RETURN)
@@ -130,6 +135,7 @@ typedef	int		ScanCode;
 #define sc_Peroid		SDLx_SCANCODE(PERIOD)
 
 #define sc_Grave		SDLx_SCANCODE(GRAVE)
+#endif
 
 #define	key_None		0
 

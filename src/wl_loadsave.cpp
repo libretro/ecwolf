@@ -68,6 +68,9 @@ namespace GameSave {
 
 unsigned long long SaveVersion = GetSaveVersion();
 DWORD SaveProdVersion = SAVEPRODVER;
+
+#ifndef LIBRETRO
+
 bool param_foreginsave = false;
 
 static const char* const NEW_SAVE = "    - NEW SAVE -";
@@ -516,8 +519,9 @@ void QuickLoadOrSave(bool load)
 
 	ShowMenu(load ? loadGame : saveGame);
 }
+#endif
 
-static void Serialize(FArchive &arc)
+void Serialize(FArchive &arc)
 {
 	short difficulty;
 	if(arc.IsStoring())
@@ -556,6 +560,8 @@ static void Serialize(FArchive &arc)
 
 	players[0].Serialize(arc);
 }
+
+#ifndef LIBRETRO
 
 #define SNAP_ID MAKE_ID('s','n','A','p')
 
@@ -715,5 +721,5 @@ bool Save(const FString &filename, const FString &title)
 	fclose(fileh);
 	return true;
 }
-
+#endif
 /* end namespace */ }

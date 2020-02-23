@@ -126,10 +126,13 @@ public:
 	bool Open (const char *name, EOpenMode mode);	// Works for reading only
 	bool Open (void *memblock);	// Open for reading only
 	bool Open ();	// Open for writing only
+	bool OpenNoCompress ();
 	bool Reopen ();	// Re-opens imploded file for reading only
 	void Close ();
 	bool IsOpen () const;
 	void GetSizes(unsigned int &one, unsigned int &two) const;
+	int GetSerializedSize();
+	void SerializeToBuffer(void *data);
 
 	void Serialize (FArchive &arc);
 

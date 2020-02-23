@@ -48,7 +48,7 @@ bool queryiwad = true;
 static bool showpreviewgames = false;
 
 int I_PickIWad(WadStuff *wads, int numwads, bool showwin, int defaultiwad);
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(LIBRETRO)
 #include "wl_iwad_picker.cpp"
 #endif
 

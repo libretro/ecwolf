@@ -35,9 +35,69 @@
 #ifndef __G_CONVERSATION_H__
 #define __G_CONVERSATION_H__
 
+#include <zstring.h>
+#include "m_classes.h"
+
 class AActor;
 
 namespace Dialog {
+
+struct Page;
+struct ItemCheck
+{
+	unsigned int Item;
+	unsigned int Amount;
+};
+struct Choice
+{
+	TArray<ItemCheck> Cost;
+	FString Text;
+	FString YesMessage, NoMessage;
+	FString Log;
+	FString SelectSound;
+	union
+	{
+		unsigned int NextPageIndex;
+		Page *NextPage;
+	};
+	unsigned int GiveItem;
+	unsigned int Special;
+	unsigned int Arg[5];
+	bool CloseDialog;
+	bool DisplayCost;
+};
+struct Page
+{
+	TArray<Choice> Choices;
+	TArray<ItemCheck> IfItem;
+	FString Name;
+	FString Panel;
+	FString Voice;
+	FString Dialog;
+	FString Hint;
+	union
+	{
+		unsigned int LinkIndex; // Valid while parsing
+		Page *Link;
+	};
+	unsigned int Drop;
+};
+
+class QuizMenu : public Menu
+{
+public:
+	QuizMenu() : Menu(30, 96, 290, 24) {}
+
+	void loadQuestion(const Page *page);
+
+	void drawBackground() const;
+
+	void draw() const;
+
+private:
+	FString question;
+	FString hint;
+};
 
 extern void ClearConversations();
 // Not yet implemented
@@ -45,6 +105,10 @@ extern void ClearConversations();
 extern void LoadGlobalModule(const char* module);
 extern void StartConversation(AActor *npc);
 
+void GiveConversationItem(AActor *recipient, unsigned int id);
+const Page **FindConversation(AActor *npc);
+void LoadMapModules();
+  
 }
 
 #endif

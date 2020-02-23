@@ -1,5 +1,7 @@
 cmake_minimum_required( VERSION 3.5.0 )
 
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC" )
+
 if(POLICY CMP0054)
 	cmake_policy(SET CMP0054 NEW)
 endif()
