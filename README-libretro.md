@@ -49,3 +49,10 @@ cmake -DLIBRETRO=1 -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cma
 
 * Rewinding through intermission or death fizzling results in glitched screen
 * Sometimes after loading a large asset, FPS drops. If that happens go to retroarch menu for couple of seconds and then back
+
+## Relation to ECWolf
+
+This repository is forked from ecwolf on 23rd February 2020 with the intention
+of quicker handling libretro-related issued and collaboration. This is done
+with full respect of original authors and we would be happy to collaborate with
+them.
