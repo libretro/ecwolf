@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 3.5.0 )
 
 set( CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D_DEBUG" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC" )
 
 add_library( gdtoa STATIC
 	dmisc.c
