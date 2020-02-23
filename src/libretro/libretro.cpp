@@ -977,9 +977,9 @@ static void TransformAutomapInputs(const wl_input_state_t *input)
 		if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
 			pany -= PAN_AMOUNT;
 
-		panx += transform_axis(input->rsx, false, AnalogMoveSensitivity) / 4;
-		pany += transform_axis(input->lsy, false, AnalogMoveSensitivity) / 4;
-		panx += transform_axis(input->lsx, false, AnalogMoveSensitivity) / 4;
+		panx += transform_axis(input->rsx, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
+		pany += transform_axis(input->lsy, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
+		panx += transform_axis(input->lsx, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
 
 		AM_Main.SetPanning(panx, pany, true);
 	}
