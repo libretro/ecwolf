@@ -1434,9 +1434,11 @@ unsigned long long GetSaveVersion()
 	return 1582131136ull; // TODO use git time like standalone
 }
 
+extern unsigned automap;
+
 void SerializeExtra(FArchive &arc, bool &isGameless)
 {
-	DWORD serialize_version = 10;
+	DWORD serialize_version = 11;
 	arc << serialize_version;
 	arc << (QWORD &) GameSave::SaveVersion;
 	arc << GameSave::SaveProdVersion;
@@ -1559,6 +1561,10 @@ void SerializeExtra(FArchive &arc, bool &isGameless)
 		arc << g_state.layoutdone;
 	}
 
+	if (serialize_version >= 11) {
+		arc << automap;
+		arc << Paused;
+	}
 	arc << (DWORD &) playstate;
 	isGameless = map == NULL;
 	arc << isGameless;
