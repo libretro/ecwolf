@@ -252,6 +252,7 @@ private:
 bool IVideo::SetResolution (int width, int height, int bits)
 {
 	int cx1, cx2;
+	PalEntry palette[256];
 
 
 	// Load fonts now so they can be packed into textures straight away,
@@ -265,9 +266,18 @@ bool IVideo::SetResolution (int width, int height, int bits)
 	assert(CleanWidth >= 320);
 	assert(CleanHeight >= 200);
 
+	if (screen) {
+		memcpy (palette, screen->GetPalette(), sizeof(PalEntry)*256);
+	} else {
+		memcpy (palette, GPalette.BaseColors, sizeof(PalEntry)*256);
+	}
+
 	screen = Video->CreateFrameBuffer(width, height, true, NULL);
 	GC::WriteBarrier(screen);
 	screen->SetGamma (screenGamma);
+	memcpy (screen->GetPalette(), palette, sizeof(PalEntry)*256);
+	screen->UpdatePalette();
+	
 	return true;
 }
 
@@ -805,13 +815,6 @@ static void update_variables(bool startup)
 	if (oldfps != fps)
 	{
 		announce_frame_callback();
-	}
-	if ((oldw != screen_width || oldh != screen_height) && Video)
-	{
-		VL_SetVGAPlaneMode (true);
-		if (g_state.stage == PLAY_STEP_A ||
-		    g_state.stage == PLAY_STEP_B)
-			DrawPlayScreen (false);
 	}
 
 	alwaysrun = get_bool_option("ecwolf-alwaysrun");
@@ -1433,7 +1436,7 @@ unsigned long long GetSaveVersion()
 
 void SerializeExtra(FArchive &arc, bool &isGameless)
 {
-	DWORD serialize_version = 9;
+	DWORD serialize_version = 10;
 	arc << serialize_version;
 	arc << (QWORD &) GameSave::SaveVersion;
 	arc << GameSave::SaveProdVersion;
@@ -1502,6 +1505,18 @@ void SerializeExtra(FArchive &arc, bool &isGameless)
 	}
 	arc << flash;
 	arc << amount;
+	if (serialize_version >= 10) {
+		if (screen) {
+			PalEntry *palette = screen->GetPalette();
+			for (int i = 0; i < 256; i++)
+				arc << palette[i];
+		} else {
+			PalEntry dummy;
+			for (int i = 0; i < 256; i++)
+				arc << dummy;
+		}
+	}
+
 	if (!arc.IsStoring() && screen) {
 		screen->SetFlash(flash, amount);
 	}
