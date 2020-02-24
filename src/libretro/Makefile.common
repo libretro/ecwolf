@@ -212,7 +212,7 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/libretro/w32_random.cpp \
 	$(CORE_DIR)/src/dosbox/dbopl.cpp
 
-ifeq ($(NO_STORE),1)
+ifneq ($(NO_STORE),1)
 # Don't bother with Steam/GOG FS 
 SOURCES_CXX += $(CORE_DIR)/src/filesys_steam.cpp
 endif
