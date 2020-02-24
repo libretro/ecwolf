@@ -1295,20 +1295,21 @@ char *my_asnprintf(size_t maxlen, const char *fmt, ...)
 	return ret;
 }
 
+#define MAXNROMS 5
+
 void retro_set_environment(retro_environment_t cb)
 {
 	struct retro_log_callback logging;
 	bool no_rom = false;
-	static const int maxnroms = 5;
-	static struct retro_subsystem_info subsys[maxnroms];
-	char *descs[maxnroms];
+	static struct retro_subsystem_info subsys[MAXNROMS];
+	char *descs[MAXNROMS];
       
 	memset (subsys, 0, sizeof(subsys));
-	for (int i = 0; i < maxnroms; i++) {
+	for (int i = 0; i < MAXNROMS; i++) {
 		descs[i] = my_asnprintf (45, "Additional pack %d", i+1);
 	}
 
-	for (int i = 0; i < maxnroms - 1; i++)
+	for (int i = 0; i < MAXNROMS - 1; i++)
 	{
 		int nroms = i + 1;
 		subsys[i].desc = my_asnprintf (45, "Load with %d packs", nroms);
