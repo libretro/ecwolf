@@ -70,21 +70,29 @@ ifeq ($(platform), unix)
    LIBS := -ldl -lpthread
 
 	GL_LIB := -lGL
+	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), linux-portable)
    TARGET := $(TARGET_NAME)_libretro.$(EXT)
    fpic := -fPIC -nostdlib
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T
 	LIBM :=
 	GL_LIB := -lGL
+	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring osx,$(platform)))
    TARGET := $(TARGET_NAME)_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
    GL_LIB := -framework OpenGL
+	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring ios,$(platform)))
    TARGET := $(TARGET_NAME)_libretro_ios.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
+	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 
 ifeq ($(IOSSDK),)
    IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
