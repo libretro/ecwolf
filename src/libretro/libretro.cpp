@@ -80,7 +80,7 @@ static retro_video_refresh_t video_cb;
 static retro_log_printf_t log_cb;
 static bool libretro_supports_bitmasks = false;
 static int screen_width = 640, screen_height = 400, fps = 35;
-static bool dynamic_fps = true;
+static bool dynamic_fps = false;
 
 const int TIC_TIME_US = 1000000 / TICRATE;
 static const int SAMPLERATE = 44100;
@@ -678,7 +678,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Dynamic FPS",
 		"Try to adjust FPS automatically",
 		BOOL_OPTIONS,
-		"enabled"
+		"disabled"
 	},
 	{ NULL, NULL, NULL, {{0}}, NULL },
 };
