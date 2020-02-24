@@ -108,8 +108,9 @@ public:
 		height_ = height;
 		lr_pitch_ = width_ * sizeof(color_t);
 		lr_buffer_ = (color_t *) malloc (height_ * lr_pitch_);
-		Buffer = (BYTE *) malloc (height_ * width_);
+		Buffer = (BYTE *) malloc (height_ * Pitch);
 		memcpy (SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
+		memset (Buffer, 0, height_ * Pitch);
 		PaletteNeedsUpdate = true;
 	}
 	~LibretroFB () {
