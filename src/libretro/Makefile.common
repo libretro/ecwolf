@@ -15,6 +15,7 @@ INCFLAGS   := \
 	-I$(JPEG_DIR) \
 	-I$(BZIP2_DIR) \
 	-I$(GDTOA_DIR) \
+	-I$(ZLIB_DIR) \
 	-DUSE_GPL=1
 
 ifneq (,$(findstring msvc2003,$(platform)))

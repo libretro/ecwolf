@@ -47,7 +47,7 @@ typedef int16_t SWORD;
 typedef int32_t fixed;
 typedef fixed fixed_t;
 typedef uint32_t longword;
-#ifndef USE_WINDOWS_DWORD
+#ifndef __MINGW32__
 typedef uint32_t DWORD;
 #endif
 typedef int32_t SDWORD;
