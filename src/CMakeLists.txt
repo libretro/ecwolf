@@ -153,6 +153,14 @@ if(LIBRETRO)
     libretro/wl_text.cpp
     libretro/g_conversation.cpp
     libretro/g_intermission.cpp)
+  # Set the libretro core name.
+  set_target_properties(engine PROPERTIES PREFIX "")
+  set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_NAME "ecwolf_libretro")
+  if(ANDROID)
+    set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_NAME "ecwolf_libretro_android")
+  endif()
+  # Output the library to CMake's build directory.
+  set_target_properties(engine PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 if(WIN32)
   target_sources(engine PRIVATE
     libretro/w32_random.cpp)
