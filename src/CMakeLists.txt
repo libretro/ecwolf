@@ -153,6 +153,10 @@ if(LIBRETRO)
     libretro/wl_text.cpp
     libretro/g_conversation.cpp
     libretro/g_intermission.cpp)
+if(WIN32)
+  target_sources(engine PRIVATE
+    libretro/w32_random.cpp)
+endif()
 else()
   target_sources(engine PRIVATE
       id_in.cpp
