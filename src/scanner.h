@@ -67,6 +67,10 @@ enum
 	TK_NoToken = -1
 };
 
+#ifdef __MINGW32__
+#undef ERROR
+#endif
+
 class Scanner
 {
 	public:

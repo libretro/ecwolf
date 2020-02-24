@@ -16,6 +16,9 @@
 #elif defined(__GNUC__)
 #	include <stdint.h>
 #endif
+#ifdef __MINGW32__
+#include <minwindef.h>
+#endif
 
 #if !defined O_BINARY
 #	define O_BINARY 0
