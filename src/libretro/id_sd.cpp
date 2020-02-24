@@ -582,11 +582,11 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
 	case SoundData::DIGITAL:
 		return which.GetDigitalData();
 	case SoundData::ADLIB:
-		if (synth.adlibSynth == NULL)
+		if (!synth.adlibSynth)
 			synth.adlibSynth.Reset(SynthesizeAdlib(which.GetAdLibData()));
 		return synth.adlibSynth;
 	case SoundData::PCSPEAKER:
-		if (synth.pcSynth == NULL)
+		if (!synth.pcSynth)
 			synth.pcSynth.Reset(SynthesizeSpeaker(which.GetSpeakerData()));
 		return synth.pcSynth;
 	}
