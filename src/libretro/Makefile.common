@@ -215,6 +215,7 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/libretro/wl_text.cpp \
 	$(CORE_DIR)/src/libretro/g_conversation.cpp \
 	$(CORE_DIR)/src/libretro/g_intermission.cpp \
+	$(CORE_DIR)/src/libretro/w32_random.cpp \
 	$(CORE_DIR)/src/dosbox/dbopl.cpp
 
 ifneq ($(STATIC_LINKING),1)

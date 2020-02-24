@@ -134,6 +134,8 @@ static bool CreateDirectoryIfNeeded(const char* path)
 	return true;
 #endif
 }
+
+#ifndef LIBRETRO
 void SetupPaths(int argc, const char * const *argv)
 {
 	FString &progDir = SpecialPaths[DIR_Program];
@@ -365,6 +367,7 @@ void SetupPaths(int argc, const char * const *argv)
 	if(!CreateDirectoryIfNeeded(screenshotsDir))
 		screenshotsDir = configDir;
 }
+#endif
 
 }
 
