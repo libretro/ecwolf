@@ -1,5 +1,6 @@
 STATIC_LINKING := 0
 AR             := ar
+NO_STORE       := 1
 
 ifneq ($(V),1)
    Q := @
@@ -206,6 +207,9 @@ CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DCORE=ON -DSDL2=ON -DBASE=O
 			-fno-unsafe-math-optimizations -fno-strict-aliasing -fvisibility=hidden -fomit-frame-pointer \
 			-Wno-sign-compare -Wno-switch -Wno-format-security -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
 CXXFLAGS += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -fpermissive -std=gnu++11
+
+CFLAGS += -DNO_STORE
+CXXFLAGS += -DNO_STORE
 
 ifeq ($(D3XP),ON)
 	CFLAGS	+=	-I$(TOPDIR)/d3xp -D_D3XP

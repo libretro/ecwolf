@@ -5,7 +5,7 @@ LIBRETRO_DIR := $(LOCAL_PATH)/..
 
 include $(LOCAL_PATH)/../Makefile.common
 
-COREFLAGS := -DINLINE=inline -DHAVE_STDINT_H -DHAVE_INTTYPES_H -D__LIBRETRO__ -DVIDEO_RGB565 -DLIBRETRO -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+COREFLAGS := -DINLINE=inline -DHAVE_STDINT_H -DHAVE_INTTYPES_H -D__LIBRETRO__ -DVIDEO_RGB565 -DLIBRETRO -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DNO_STORE
 
 include $(CLEAR_VARS)
 LOCAL_MODULE    := retro

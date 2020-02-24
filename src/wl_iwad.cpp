@@ -655,6 +655,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	LookForGameData(datawadRes, basefiles, "/usr/local/share/games/wolf3d");
 #endif
 
+#if !defined(NO_STORE)
 	// Look for a steam install. (Basically from ZDoom)
 	{
 		struct CommercialGameDir
@@ -706,6 +707,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 			}
 		}
 	}
+#endif
 
 	delete datawadRes;
 
