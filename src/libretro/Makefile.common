@@ -4,7 +4,6 @@ endif
 LZMA_DIR    = $(CORE_DIR)/deps/lzma
 BZIP2_DIR   = $(CORE_DIR)/deps/bzip2
 JPEG_DIR    = $(CORE_DIR)/deps/jpeg-6b
-GDTOA_DIR   = $(CORE_DIR)/deps/gdtoa
 ZLIB_DIR   = $(CORE_DIR)/deps/zlib
 
 INCFLAGS   := \
@@ -14,9 +13,9 @@ INCFLAGS   := \
 	-I$(LZMA_DIR)/C \
 	-I$(JPEG_DIR) \
 	-I$(BZIP2_DIR) \
-	-I$(GDTOA_DIR) \
 	-I$(ZLIB_DIR) \
-	-DUSE_GPL=1
+	-DUSE_GPL=1 \
+	-DDISABLE_GDTOA=1
 
 ifneq (,$(findstring msvc2003,$(platform)))
 INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
@@ -77,11 +76,7 @@ DEPS_ZLIB   := $(ZLIB_DIR)/crc32.c \
        	       $(ZLIB_DIR)/compress.c \
 	       $(ZLIB_DIR)/uncompr.c
 
-DEPS_GDTOA  := $(GDTOA_DIR)/dtoa.c \
-	       $(GDTOA_DIR)/misc.c \
-	       $(GDTOA_DIR)/dmisc.c
-
-SOURCES_C   := $(DEPS_LZMA_C) $(DEPS_BZIP2) $(DEPS_JPEG) $(DEPS_ZLIB) $(DEPS_GDTOA)
+SOURCES_C   := $(DEPS_LZMA_C) $(DEPS_BZIP2) $(DEPS_JPEG) $(DEPS_ZLIB)
 
 SOURCES_CXX := \
 	$(CORE_DIR)/src/g_blake/a_smartanim.cpp \

@@ -359,6 +359,7 @@ void ReadConfig(void)
 =
 ====================
 */
+#ifndef LIBRETRO
 
 void WriteConfig(void)
 {
@@ -368,7 +369,6 @@ void WriteConfig(void)
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
-#ifndef LIBRETRO
 	config.GetSetting("ForceGrabMouse")->SetValue(forcegrabmouse);
 	config.GetSetting("MouseEnabled")->SetValue(mouseenabled);
 	config.GetSetting("JoystickEnabled")->SetValue(joystickenabled);
@@ -390,7 +390,6 @@ void WriteConfig(void)
 		config.GetSetting(keySettingName)->SetValue(SDL2Backconvert(controlScheme[i].keyboard));
 		config.GetSetting(mseSettingName)->SetValue(controlScheme[i].mouse);
 	}
-#endif
 	config.GetSetting("ViewSize")->SetValue(viewsize);
 	config.GetSetting("MouseXAdjustment")->SetValue(mousexadjustment);
 	config.GetSetting("MouseYAdjustment")->SetValue(mouseyadjustment);
@@ -398,7 +397,6 @@ void WriteConfig(void)
 	config.GetSetting("PanYAdjustment")->SetValue(panyadjustment);
 	config.GetSetting("MouseYAxisDisabled")->SetValue(mouseyaxisdisabled);
 	config.GetSetting("AlwaysRun")->SetValue(alwaysrun);
-#ifndef LIBRETRO
 	config.GetSetting("SoundDevice")->SetValue(SoundMode);
 	config.GetSetting("MusicDevice")->SetValue(MusicMode);
 	config.GetSetting("DigitalSoundDevice")->SetValue(DigiMode);
@@ -406,7 +404,6 @@ void WriteConfig(void)
 	config.GetSetting("MusicVolume")->SetValue(MusicVolume);
 	config.GetSetting("DigitizedVolume")->SetValue(SoundVolume);
 	config.GetSetting("Vid_FullScreen")->SetValue(vid_fullscreen);
-#endif
 	config.GetSetting("Vid_Aspect")->SetValue(vid_aspect);
 	config.GetSetting("Vid_Vsync")->SetValue(vid_vsync);
 	config.GetSetting("FullScreenWidth")->SetValue(fullScreenWidth);
@@ -444,3 +441,4 @@ void WriteConfig(void)
 
 	config.SaveConfig();
 }
+#endif
