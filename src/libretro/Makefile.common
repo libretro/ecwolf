@@ -1,24 +1,53 @@
 ifeq ($(LIBRETRO_COMM_DIR),)
 LIBRETRO_COMM_DIR  = $(CORE_DIR)/libretro-common
 endif
-LIBFLAC_DIR    = $(CORE_DIR)/deps/libFLAC
-LIBVORBIS_DIR  = $(CORE_DIR)/deps/libvorbis
-LIBOGG_DIR     = $(CORE_DIR)/deps/libogg
+LZMA_DIR    = $(CORE_DIR)/deps/lzma
+BZIP2_DIR   = $(CORE_DIR)/deps/bzip2
+JPEG_DIR    = $(CORE_DIR)/deps/jpeg-6b
 
 INCFLAGS   := \
 	-I$(CORE_DIR) \
 	-I$(CORE_DIR)/src \
 	-I$(CORE_DIR)/src/g_shared \
-	-I$(CORE_DIR)/deps/lzma/C
+	-I$(LZMA_DIR)/C \
+	-I$(JPEG_DIR) \
+	-I$(BZIP2_DIR)
 
 ifneq (,$(findstring msvc2003,$(platform)))
 INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
-DEPS_LZMA_C := $(CORE_DIR)/deps/lzma/C/7zArcIn.c \
-					$(CORE_DIR)/deps/lzma/C/7zBuf.c
+DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
+					$(LZMA_DIR)/C/7zBuf.c
 
-SOURCES_C   := $(DEPS_LZMA_C)
+DEPS_BZIP2  := $(BZIP2_DIR)/blocksort.c \
+					$(BZIP2_DIR)/bzlib.c \
+					$(BZIP2_DIR)/compress.c \
+					$(BZIP2_DIR)/crctable.c \
+					$(BZIP2_DIR)/decompress.c \
+					$(BZIP2_DIR)/huffman.c \
+					$(BZIP2_DIR)/randtable.c
+
+DEPS_JPEG   := $(JPEG_DIR)/jcomapi.c \
+					$(JPEG_DIR)/jdapistd.c \
+					$(JPEG_DIR)/jdatasrc.c \
+					$(JPEG_DIR)/jdcoefct.c \
+					$(JPEG_DIR)/jddctmgr.c \
+					$(JPEG_DIR)/jdhuff.c \
+					$(JPEG_DIR)/jdinput.c \
+					$(JPEG_DIR)/jdmainct.c \
+					$(JPEG_DIR)/jdmarker.c \
+					$(JPEG_DIR)/jdmaster.c \
+					$(JPEG_DIR)/jdmerge.c \
+					$(JPEG_DIR)/jdphuff.c \
+					$(JPEG_DIR)/jdpostct.c \
+					$(JPEG_DIR)/jdsample.c \
+					$(JPEG_DIR)/jerror.c \
+					$(JPEG_DIR)/jidctint.c \
+					$(JPEG_DIR)/jmemmgr.c \
+					$(JPEG_DIR)/jutils.c
+
+SOURCES_C   := $(DEPS_LZMA_C) $(DEPS_BZIP2) $(DEPS_JPEG)
 
 SOURCES_CXX := \
 	$(CORE_DIR)/src/actor.cpp \
