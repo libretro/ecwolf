@@ -14,4 +14,10 @@ LOCAL_CXXFLAGS  := $(COREFLAGS) $(INCFLAGS)
 LOCAL_CFLAGS    := $(INCFLAGS)
 LOCAL_LDFLAGS   := -Wl,-version-script=$(LIBRETRO_DIR)/link.T
 LOCAL_CPP_FEATURES += exceptions
+
+LOCAL_C_INCLUDES = $(CORE_DIR) \
+						 $(CORE_DIR)/src \
+						 $(CORE_DIR)/src/libretro \
+						 $(CORE_DIR)/src/g_shared
+
 include $(BUILD_SHARED_LIBRARY)
