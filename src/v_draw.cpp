@@ -345,7 +345,7 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32 
 #endif
 }
 
-bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, DWORD tag, va_list tags, DrawParms *parms, bool hw) const
+bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 tag, va_list tags, DrawParms *parms, bool hw) const
 {
 	INTBOOL boolval;
 	int intval;

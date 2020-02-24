@@ -1,3 +1,7 @@
+#ifdef __MINGW32__
+#include <minwindef.h>
+#endif
+
 /*
  * jmorecfg.h
  *
