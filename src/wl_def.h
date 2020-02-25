@@ -390,7 +390,10 @@ static inline fixed FixedDiv(fixed a, fixed b)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 
-#ifndef _WIN32
+#ifdef _3DS
+char* itoa(int value, char* string, int radix);
+char* ltoa(long value, char* string, int radix);
+#elif !defined(_WIN32)
 	static inline char* itoa(int value, char* string, int radix)
 	{
 		sprintf(string, "%d", value);
