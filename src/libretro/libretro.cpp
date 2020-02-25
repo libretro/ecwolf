@@ -1774,3 +1774,17 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 {
 	return defaultiwad;
 }
+
+#ifdef _3DS
+char* itoa(int value, char* string, int radix)
+{
+	sprintf(string, "%d", value);
+	return string;
+}
+
+char* ltoa(long value, char* string, int radix)
+{
+	sprintf(string, "%ld", value);
+	return string;
+}
+#endif
