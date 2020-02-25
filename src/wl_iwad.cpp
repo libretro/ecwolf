@@ -592,6 +592,10 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		else if((datawadRes = FResourceFile::OpenResourceFile(FString(INSTALL_PREFIX "/share/" BINNAME "/") + datawad, NULL, true)))
 			datawadDir = FString(INSTALL_PREFIX "/share/" BINNAME "/");
 #endif
+#ifdef LIBRETRO
+		else if(config.GetSetting("BaseDataPaths") != NULL && (datawadRes = FResourceFile::OpenResourceFile(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/" + datawad, NULL, true)))
+			datawadDir = FString(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/");
+#endif
 	}
 	if(!datawadRes)
 		I_Error("Could not open %s!", datawad);
