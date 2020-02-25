@@ -381,7 +381,7 @@ bool VictoryZoomerStart(wl_state_t *state);
 bool VictoryZoomerStep(wl_state_t *state);
 bool TextReaderStep(wl_state_t *state, const wl_input_state_t *input);
 
-extern int damagecount, bonuscount;
+extern SDWORD damagecount, bonuscount;
 extern bool palshifted;
 void DrawVictory (bool fromIntermission);
 

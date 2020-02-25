@@ -1141,7 +1141,7 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, TexInit &init)
 			else if (sc->str.CompareNoCase("alpha") == 0)
 			{
 				sc.MustGetToken(TK_FloatConst);
-				part.Alpha = clamp(FLOAT2FIXED(sc->decimal), 0, FRACUNIT);
+				part.Alpha = clamp<fixed>(FLOAT2FIXED(sc->decimal), 0, FRACUNIT);
 				// bComplex is not set because it is only needed when the style is not OP_COPY.
 			}
 			else if (sc->str.CompareNoCase("style") == 0)

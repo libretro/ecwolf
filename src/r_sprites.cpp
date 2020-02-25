@@ -668,8 +668,8 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 	// startX and startY indicate where the sprite becomes visible, we only
 	// need to calculate the start since the end will be determined when we hit
 	// the view during drawing.
-	const unsigned int startX = -MIN(leftedge>>FRACBITS, 0);
-	const unsigned int startY = -MIN(upperedge>>FRACBITS, 0);
+	const unsigned int startX = -MIN<unsigned int>(leftedge>>FRACBITS, 0);
+	const unsigned int startY = -MIN<unsigned int>(upperedge>>FRACBITS, 0);
 	const fixed xStep = FixedDiv(tex->xScale, pspritexscale);
 	const fixed yStep = FixedDiv(tex->yScale, pspriteyscale);
 

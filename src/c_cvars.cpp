@@ -292,7 +292,7 @@ void ReadConfig(void)
 		sprintf(hsGraphic, "HighScore%u_Graphic", i);
 
 		config.CreateSetting(hsName, Scores[i].name);
-		config.CreateSetting(hsScore, Scores[i].score);
+		config.CreateSetting(hsScore, (int)Scores[i].score);
 		config.CreateSetting(hsCompleted, Scores[i].completed);
 		config.CreateSetting(hsGraphic, Scores[i].graphic);
 

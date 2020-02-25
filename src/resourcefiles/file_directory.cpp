@@ -41,7 +41,7 @@
 #define stat _stat
 #else
 #include <dirent.h>
-#ifndef __sun
+#if !defined( __sun)
 #include <fts.h>
 #endif
 #endif
