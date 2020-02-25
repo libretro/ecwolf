@@ -124,7 +124,7 @@ bool FRenderStyle::IsVisible(fixed_t alpha) const throw()
 		}
 		else
 		{
-			alpha = clamp(alpha, 0, FRACUNIT);
+			alpha = clamp<fixed>(alpha, 0, FRACUNIT);
 		}
 		return GetAlpha(SrcAlpha, alpha) != 0 || GetAlpha(DestAlpha, alpha) != FRACUNIT;
 	}

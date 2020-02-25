@@ -135,7 +135,6 @@ class AActor : public Thinker,
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;
 
-#pragma pack(push, 1)
 // MSVC and older versions of GCC don't support constant union parts
 // We do this instead of just using a regular word since writing to tilex/y
 // indicates an error.
@@ -152,7 +151,7 @@ class AActor : public Thinker,
 #else
 			struct { COORD_PART fracx; COORD_PART tilex; };
 #endif
-		};
+		} __attribute__((__packed__));
 		union
 		{
 			fixed y;
@@ -161,8 +160,7 @@ class AActor : public Thinker,
 #else
 			struct { COORD_PART fracy; COORD_PART tiley; };
 #endif
-		};
-#pragma pack(pop)
+		} __attribute__((__packed__));
 		fixed z;
 		fixed	velx, vely;
 

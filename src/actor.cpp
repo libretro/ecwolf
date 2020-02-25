@@ -439,10 +439,13 @@ void AActor::Serialize(FArchive &arc)
 	arc << dir;
 	this->dir = static_cast<dirtype>(dir);
 
+	SDWORD xt = x, yt = y;
 	arc << flags
 		<< distance
-		<< x
-		<< y;
+		<< xt
+		<< yt;
+	x = xt;
+	y = yt;
 	if(GameSave::SaveProdVersion >= 0x001003FF && GameSave::SaveVersion >= 1507591295)
 		arc << z;
 	arc << velx

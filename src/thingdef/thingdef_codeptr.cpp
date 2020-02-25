@@ -329,7 +329,7 @@ ACTION_FUNCTION(A_Explode)
 		AActor * const target = iter;
 
 		// Calculate distance from origin to outer bound of target actor
-		const fixed dist = MAX(0, MAX(abs(target->x - self->x), abs(target->y - self->y)) - target->radius) >> (FRACBITS - 6);
+		const fixed dist = MAX<fixed>(0, MAX(abs(target->x - self->x), abs(target->y - self->y)) - target->radius) >> (FRACBITS - 6);
 
 		// First check if the target is in range (also don't mess with ourself)
 		if(dist >= radius || target == self || !(target->flags & FL_SHOOTABLE))

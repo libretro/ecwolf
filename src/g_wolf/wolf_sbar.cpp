@@ -215,7 +215,7 @@ void WolfStatusBar::UpdateFace (int damage)
 
 	const int maxHealth = players[ConsolePlayer].mo ? players[ConsolePlayer].mo->maxhealth : 100;
 	const int damageLevel = macDamage ? (players[ConsolePlayer].health > (maxHealth>>2) ? 0 : 1)
-		: MIN(6, players[ConsolePlayer].health > maxHealth ? 0 : (maxHealth-players[ConsolePlayer].health)/(maxHealth/6));
+	        : MIN<int>(6, players[ConsolePlayer].health > maxHealth ? 0 : (maxHealth-players[ConsolePlayer].health)/(maxHealth/6));
 	if(damage)
 	{
 		static FTextureID ouchFace = TexMan.CheckForTexture("STFOUCH0", FTexture::TEX_Any);
