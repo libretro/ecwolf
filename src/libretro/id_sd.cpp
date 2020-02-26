@@ -404,6 +404,7 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 	{
 		int sample_count = size - 0x2a;
 		void *samples = malloc (size - 0x2a);
+		CHECKMALLOCRESULT(samples);
 		memcpy(samples, ((char*)soundLump.GetMem())+0x2A, size-0x2A);
 		return new Mix_Chunk_Digital(
 			22050,
@@ -434,6 +435,7 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 			return NULL;
 		}
 		void *samples = malloc (size - 44);
+		CHECKMALLOCRESULT(samples);
 		memcpy(samples, ((char*)soundLump.GetMem())+44, size-44);
 		return new Mix_Chunk_Digital(
 			rate,
@@ -459,6 +461,7 @@ Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 	byte *pcSound = sound->data;
 
 	int16_t *samples = (int16_t*) malloc (pcLength * samplesPerSoundTick * 2);
+	CHECKMALLOCRESULT(samples);
 	int16_t *sampleptr = samples;
 	short	pcVolume = 5000;
 
@@ -548,6 +551,7 @@ Mix_Chunk *SynthesizeAdlib(const byte *dataRaw)
 	byte *alSound = (byte *)sound->data;
 
 	int16_t *samples = (int16_t*) malloc (alLength * samplesPerSoundTick * 2);
+	CHECKMALLOCRESULT(samples);
 	int16_t *sampleptr = samples;
 
 	for (int i = 0; i < alLength; i++, alSound++) {
@@ -718,6 +722,7 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
 	this->isLooping = isLooping;
 	this->samples_allocated = 0;
 	this->imf = (byte*) malloc(imf_size * 4);
+	CHECKMALLOCRESULT(this->imf);
 	memcpy(this->imf, imf, imf_size * 4);
 	this->imfptr = 0;
 	this->imfsize = imf_size;

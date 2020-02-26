@@ -187,6 +187,7 @@ bool FZipFile::Open(bool quiet)
 	// Load the entire central directory. Too bad that this contains variable length entries...
 	int dirsize = LittleLong(info.DirectorySize);
 	void *directory = malloc(dirsize);
+	CHECKMALLOCRESULT(directory);
 	Reader->Seek(LittleLong(info.DirectoryOffset), SEEK_SET);
 	Reader->Read(directory, dirsize);
 

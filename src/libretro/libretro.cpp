@@ -108,7 +108,9 @@ public:
 		height_ = height;
 		lr_pitch_ = width_ * sizeof(color_t);
 		lr_buffer_ = (color_t *) malloc (height_ * lr_pitch_);
+		CHECKMALLOCRESULT(lr_buffer_);
 		Buffer = (BYTE *) malloc (height_ * Pitch);
+		CHECKMALLOCRESULT(Buffer);
 		memcpy (SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
 		memset (Buffer, 0, height_ * Pitch);
 		PaletteNeedsUpdate = true;
@@ -352,12 +354,27 @@ void libretro_log(const char *format, ...)
 
 	va_start(va, format);
 	vsnprintf(formatted, sizeof(formatted) - 1, format, va);
-	(log_cb ?: fallback_log)(RETRO_LOG_INFO, "%s", formatted);
+	(log_cb ?: fallback_log)(RETRO_LOG_INFO, "%s\n", formatted);
 	va_end(va);
 }
 
 void Quit (const char *errorStr, ...)
 {
+	va_list va;
+	char formatted[1024];
+
+	va_start(va, errorStr);
+	vsnprintf(formatted, sizeof(formatted) - 1, errorStr, va);
+	va_end(va);
+
+	libretro_log("Fatal error: %s", formatted);
+	struct retro_message msg = {
+				    .msg = formatted,
+				    .frames = fps * 10
+	};
+	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
+	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
+	throw CFatalError(formatted);
 }
 
 void retro_unload_game()
@@ -1301,6 +1318,7 @@ char *my_asnprintf(size_t maxlen, const char *fmt, ...)
 	va_list va;
 
 	char * ret = (char *) malloc (maxlen + 1);
+	CHECKMALLOCRESULT(ret);
 	va_start(va, fmt);
 	vsnprintf(ret, maxlen, fmt, va);
 	va_end(va);
@@ -1330,6 +1348,7 @@ void retro_set_environment(retro_environment_t cb)
 		subsys[i].num_roms = nroms;
 		subsys[i].id = nroms;
 		struct retro_subsystem_rom_info *rom_info = (struct retro_subsystem_rom_info *) malloc(sizeof(rom_info[0]) * nroms);
+		CHECKMALLOCRESULT(rom_info);
 		subsys[i].roms = rom_info;
 		memset (rom_info, 0, sizeof(rom_info[0]) * nroms);
 		rom_info[0].desc = "Main pack";
