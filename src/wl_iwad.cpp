@@ -412,6 +412,21 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 			}
 		}
 
+		if (foundFiles[i].extension.CompareNoCase("WL6") == 0) {
+			switch (vgaheadsz) {
+			case 486: // 1.4
+				mapVersionId = "14";
+				break;
+			case 450: // 1.1 and 1.2
+				mapVersionId = "";
+				break;
+			default:
+				printf("Unknown vgahead, assuming version 1.2. Please report this version to the devs\n");
+				mapVersionId = "";
+				break;
+			}
+		}
+
 		printf("Using map version id %s\n", mapVersionId.GetChars());
 
 		// Before checking the data we must load the remap file.
