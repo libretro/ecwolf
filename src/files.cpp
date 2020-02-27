@@ -384,7 +384,11 @@ struct FileReaderLZMA::StreamPointer
 	CLzmaDec Stream;
 };
 
-static void *SzAlloc(void *, size_t size) { return malloc(size); }
+static void *SzAlloc(void *, size_t size) {
+	void *ret = malloc(size);
+	CHECKMALLOCRESULT(ret);
+	return ret;
+}
 static void SzFree(void *, void *address) { free(address); }
 ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
