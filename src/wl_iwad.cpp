@@ -306,6 +306,7 @@ static bool VerifySpearInstall(const char* directory)
 static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const char* directory)
 {
 	static const unsigned int LoadableBaseFiles[] = { FILE_AUDIOT, FILE_GAMEMAPS, FILE_VGAGRAPH, FILE_VSWAP, BASEFILES };
+	static const int vgaHeadId = 5;
 	static const char* const BaseFileNames[BASEFILES][3] = {
 		{"audiohed", NULL}, {"audiot", NULL},
 		{"gamemaps", "maptemp", NULL}, {"maphead", NULL},
@@ -383,9 +384,41 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 				wadStuff.Path.Push(foundFiles[i].filename[LoadableBaseFiles[j]]);
 		}
 
+		int vgaheadsz = -1;
+		// Size of vgahead is 3 * number of pictures, hence checking
+		// its size is a good way to determine its mapping
+		if (foundFiles[i].isValid & (1<<vgaHeadId)) {
+			FileReader vgaheadReader;
+			if(vgaheadReader.Open(foundFiles[i].filename[vgaHeadId])) {
+				vgaheadsz = vgaheadReader.GetLength();
+			}
+		}
+
+		if (foundFiles[i].extension.CompareNoCase("WL1") == 0) {
+			switch (vgaheadsz) {
+			case 471: // 1.4
+				mapVersionId = "";
+				break;
+			case 462: // 1.1 and 1.2
+				mapVersionId = "12";
+				break;
+			case 426: // 1.0, untested
+				mapVersionId = "10";
+				break;
+			default:
+				printf("Unknown vgahead, assuming version 1.4. Please report this version to the devs\n");
+				mapVersionId = "";
+				break;
+			}
+		}
+
+		printf("Using map version id %s\n", mapVersionId.GetChars());
+
 		// Before checking the data we must load the remap file.
 		FString mapFile;
-		mapFile.Format("%sMAP", foundFiles[i].extension.GetChars());
+		mapFile.Format("%sMAP%s",
+			       foundFiles[i].extension.GetChars(),
+			       mapVersionId.GetChars());
 		for(unsigned int j = res->LumpCount();j-- > 0;)
 		{
 			FResourceLump *lump = res->GetLump(j);
