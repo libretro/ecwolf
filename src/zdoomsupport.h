@@ -63,7 +63,7 @@ static inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s))
 // circular dependency issue.
 template<class T> void FixPathSeperator (T &path) { path.ReplaceChars('\\', '/'); }
 
-static void DPrintf(const char* fmt, ...) {}
+static inline void DPrintf(const char* fmt, ...) {}
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #ifndef __BIG_ENDIAN__
