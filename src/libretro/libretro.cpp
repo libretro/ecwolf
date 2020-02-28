@@ -369,7 +369,7 @@ void Quit (const char *errorStr, ...)
 	va_end(va);
 
 	libretro_log("Fatal error: %s", formatted);
-        msg.msg    = formatted;
+   msg.msg    = formatted;
 	msg.frames = fps * 10;
 	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
 	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
@@ -1237,13 +1237,11 @@ void retro_run(void)
 	// single frame and then we're stuck in slow fps until user
 	// pauses. Limit this by decreasing tics
 	// Over 20 or in init stage is definitely after load
-	if (tics > 20 || (g_state.stage == BEFORE_NON_SHAREWARE && tics > 3)) {
+	if (tics > 20 || (g_state.stage == BEFORE_NON_SHAREWARE && tics > 3))
 		tics = 3;
-	}
 	// Cap at 5 (14 fps)
-	if (tics > 5) {
+	if (tics > 5)
 		tics = 5;
-	}
 
 	unsigned frametics = tics;
 
@@ -1302,8 +1300,8 @@ void retro_get_system_info(struct retro_system_info *info)
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
 	memset(info, 0, sizeof(*info));
-	info->timing.fps = (double) fps;
-	info->timing.sample_rate = (double) SAMPLERATE;
+	info->timing.fps            = (double) fps;
+	info->timing.sample_rate    = (double) SAMPLERATE;
 
 	info->geometry.base_width   = screen_width;
 	info->geometry.base_height  = screen_height;
