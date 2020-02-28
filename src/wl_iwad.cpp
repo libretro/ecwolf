@@ -402,7 +402,7 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 			case 462: // 1.1 and 1.2
 				mapVersionId = "12";
 				break;
-			case 426: // 1.0, untested
+			case 447: // 1.0
 				mapVersionId = "10";
 				break;
 			default:
@@ -427,7 +427,9 @@ static void LookForGameData(FResourceFile *res, TArray<WadStuff> &iwads, const c
 			}
 		}
 
-		printf("Using map version id %s\n", mapVersionId.GetChars());
+		printf("Using asset mapping \"%smap%s\"\n",
+		       foundFiles[i].extension.GetChars(),
+		       mapVersionId.GetChars());
 
 		// Before checking the data we must load the remap file.
 		FString mapFile;
