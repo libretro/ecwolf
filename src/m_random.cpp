@@ -269,13 +269,14 @@ DWORD FRandom::StaticSumSeeds ()
 // Stores the state of every RNG into a savegame.
 //
 //==========================================================================
-
+#ifndef LIBRETRO
 void FRandom::StaticWriteRNGState (FILE *file)
 {
 	FPNGChunkArchive arc (file, RAND_ID);
 
 	StaticWriteRNGState (arc);
 }
+#endif
 
 DWORD FRandom::GetRNGCount ()
 {
@@ -357,6 +358,8 @@ void FRandom::StaticReadRNGState (FArchive &arc, int rngcount)
 	}
 }
 
+#ifndef LIBRETRO
+
 void FRandom::StaticReadRNGState (PNGHandle *png)
 {
 	size_t len = M_FindPNGChunk (png, RAND_ID);
@@ -372,6 +375,8 @@ void FRandom::StaticReadRNGState (PNGHandle *png)
 		png->File->ResetFilePtr();
 	}
 }
+
+#endif
 
 //==========================================================================
 //

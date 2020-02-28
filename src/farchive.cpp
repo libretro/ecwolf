@@ -146,7 +146,9 @@ void FCompressedFile::BeEmpty ()
 	m_BufferSize = 0;
 	m_MaxBufferSize = 0;
 	m_Buffer = NULL;
+#ifndef LIBRETRO
 	m_File = NULL;
+#endif
 	m_NoCompress = false;
 	m_Mode = ENotOpen;
 }
@@ -189,6 +191,8 @@ FCompressedFile::FCompressedFile ()
 	BeEmpty ();
 }
 
+#ifndef LIBRETRO
+
 FCompressedFile::FCompressedFile (const char *name, EOpenMode mode, bool dontCompress)
 {
 	BeEmpty ();
@@ -208,10 +212,14 @@ FCompressedFile::FCompressedFile (FILE *file, EOpenMode mode, bool dontCompress,
 	}
 }
 
+#endif
+
 FCompressedFile::~FCompressedFile ()
 {
 	Close ();
 }
+
+#ifndef LIBRETRO
 
 bool FCompressedFile::Open (const char *name, EOpenMode mode)
 {
@@ -257,9 +265,11 @@ void FCompressedFile::PostOpen ()
 		}
 	}
 }
+#endif
 
 void FCompressedFile::Close ()
 {
+#ifndef LIBRETRO
 	if (m_File)
 	{
 		if (m_Mode == EWriting)
@@ -271,6 +281,7 @@ void FCompressedFile::Close ()
 		fclose (m_File);
 		m_File = NULL;
 	}
+#endif
 	if (m_Buffer)
 	{
 		M_Free (m_Buffer);
@@ -288,10 +299,12 @@ FFile::EOpenMode FCompressedFile::Mode () const
 	return m_Mode;
 }
 
+#ifndef LIBRETRO
 bool FCompressedFile::IsOpen () const
 {
 	return !!m_File;
 }
+#endif
 
 FFile &FCompressedFile::Write (const void *mem, unsigned int len)
 {
@@ -481,6 +494,7 @@ FCompressedMemFile::~FCompressedMemFile ()
 	}
 }
 
+#ifndef LIBRETRO
 bool FCompressedMemFile::Open (const char *name, EOpenMode mode)
 {
 	if (mode == EWriting)
@@ -506,6 +520,7 @@ bool FCompressedMemFile::Open (const char *name, EOpenMode mode)
 	}
 	return false;
 }
+#endif
 
 bool FCompressedMemFile::Open (void *memblock)
 {
@@ -664,6 +679,8 @@ void FCompressedMemFile::GetSizes(unsigned int &compressed, unsigned int &uncomp
 	}
 }
 
+#ifndef LIBRETRO
+
 FPNGChunkFile::FPNGChunkFile (FILE *file, DWORD id)
 	: FCompressedFile (file, EWriting, true, false), m_ChunkID (id)
 {
@@ -722,6 +739,8 @@ FPNGChunkArchive::~FPNGChunkArchive ()
 	// destroyed before the FArchive is destroyed.
 	Close ();
 }
+
+#endif
 
 //============================================
 //

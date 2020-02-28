@@ -39,7 +39,7 @@
 #ifdef _WIN32
 #include <io.h>
 #define stat _stat
-#else
+#elif !defined(LIBRETRO)
 #include <dirent.h>
 #if !defined( __sun)
 #include <fts.h>
@@ -56,42 +56,6 @@
 #include "resourcefile.h"
 #include "zstring.h"
 #include "doomerrors.h"
-
-
-
-//==========================================================================
-//
-// Zip Lump
-//
-//==========================================================================
-
-struct FDirectoryLump : public FResourceLump
-{
-	virtual FileReader *NewReader();
-	virtual int FillCache();
-
-private:
-};
-
-
-//==========================================================================
-//
-// Zip file
-//
-//==========================================================================
-
-class FDirectory : public FResourceFile
-{
-	TArray<FDirectoryLump> Lumps;
-
-	int AddDirectory(const char *dirpath);
-	void AddEntry(const char *fullpath, int size);
-
-public:
-	FDirectory(const char * dirname);
-	bool Open(bool quiet);
-	virtual FResourceLump *GetLump(int no) { return ((unsigned)no < NumLumps)? &Lumps[no] : NULL; }
-};
 
 
 
@@ -121,6 +85,7 @@ FDirectory::FDirectory(const char * directory)
 }
 
 
+#ifndef LIBRETRO
 #ifdef _WIN32
 //==========================================================================
 //
@@ -272,7 +237,7 @@ int FDirectory::AddDirectory(const char *dirpath)
 	return count;
 }
 #endif
-
+#endif
 
 //==========================================================================
 //
