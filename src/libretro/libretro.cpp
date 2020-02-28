@@ -362,16 +362,15 @@ void Quit (const char *errorStr, ...)
 {
 	va_list va;
 	char formatted[1024];
+	struct retro_message msg;
 
 	va_start(va, errorStr);
 	vsnprintf(formatted, sizeof(formatted) - 1, errorStr, va);
 	va_end(va);
 
 	libretro_log("Fatal error: %s", formatted);
-	struct retro_message msg = {
-				    .msg = formatted,
-				    .frames = fps * 10
-	};
+        msg.msg    = formatted;
+	msg.frames = fps * 10;
 	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
 	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
 	throw CFatalError(formatted);
