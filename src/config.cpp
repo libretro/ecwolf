@@ -55,6 +55,7 @@ Config::~Config()
 {
 }
 
+#ifndef LIBRETRO
 void Config::LocateConfigFile(int argc, char* argv[])
 {
 	// Look for --config parameter
@@ -193,6 +194,7 @@ void Config::SaveConfig()
 		fclose(stream);
 	}
 }
+#endif
 
 void Config::CreateSetting(const FName index, int defaultInt)
 {

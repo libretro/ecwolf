@@ -73,6 +73,7 @@
 
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
+extern struct retro_vfs_interface *vfs_interface;
 static retro_environment_t environ_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
@@ -714,6 +715,15 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
+#ifndef _3DS
+	{
+		"ecwolf-memstore",
+		"Store files in memory",
+		"Increases speed at cost of memory and initial load times",
+		BOOL_OPTIONS,
+		"disabled"
+	},
+#endif
 	{ NULL, NULL, NULL, {{0}}, NULL },
 };
 
@@ -810,6 +820,11 @@ static void am_multiple_choice (const char *name, unsigned &var, bool &is_update
 
 static void update_variables(bool startup)
 {
+#ifdef _3DS
+	store_files_in_memory = true;
+#else
+	store_files_in_memory = get_bool_option("ecwolf-memstore");
+#endif
 	int oldw = screen_width;
 	int oldh = screen_height;
 	int oldfps = fps;
@@ -1420,6 +1435,11 @@ void retro_set_environment(retro_environment_t cb)
 	};
 
 	cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
+
+	struct retro_vfs_interface_info vfs_interface_info;
+	vfs_interface_info.required_interface_version = 3;
+	if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_interface_info))
+		vfs_interface = vfs_interface_info.iface;
 }
 
 void ControlMenuItem::draw()

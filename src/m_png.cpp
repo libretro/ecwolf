@@ -75,10 +75,14 @@ struct IHDR
 	BYTE		Interlace;
 };
 
+#ifndef LIBRETRO
+
 PNGHandle::PNGHandle (FILE *file) : File(0), bDeleteFilePtr(true), ChunkPt(0)
 {
 	File = new FileReader(file);
 }
+
+#endif
 
 PNGHandle::PNGHandle (FileReader *file) : File(file), bDeleteFilePtr(false), ChunkPt(0) {}
 PNGHandle::~PNGHandle ()
@@ -377,6 +381,7 @@ bool M_GetPNGText (PNGHandle *png, const char *keyword, char *buffer, size_t buf
 //
 //==========================================================================
 
+#ifndef LIBRETRO
 PNGHandle *M_VerifyPNG (FILE *file)
 {
 	PNGHandle::Chunk chunk;
@@ -456,6 +461,7 @@ PNGHandle *M_VerifyPNG (FILE *file)
 	delete png;
 	return NULL;
 }
+#endif
 
 //==========================================================================
 //

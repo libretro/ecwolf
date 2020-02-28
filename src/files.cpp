@@ -51,6 +51,8 @@
 //
 //==========================================================================
 
+#ifndef LIBRETRO
+
 FileReader::FileReader ()
 : File(NULL), Length(0), StartPos(0), FilePos(0), CloseOnDestruct(false)
 {
@@ -164,6 +166,7 @@ char *FileReader::Gets(char *strbuf, int len)
 	}
 	return p;
 }
+#endif
 
 char *FileReader::GetsFromBuffer(const char * bufptr, char *strbuf, int len)
 {
@@ -195,6 +198,7 @@ char *FileReader::GetsFromBuffer(const char * bufptr, char *strbuf, int len)
 	return strbuf;
 }
 
+#ifndef LIBRETRO
 long FileReader::CalcFileLen() const
 {
 	long endpos;
@@ -204,6 +208,7 @@ long FileReader::CalcFileLen() const
 	fseek (File, 0, SEEK_SET);
 	return endpos;
 }
+#endif
 
 //==========================================================================
 //

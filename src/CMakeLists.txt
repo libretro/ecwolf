@@ -92,8 +92,6 @@ initial_sources(
 	dobjgc.cpp
 	farchive.cpp
 	files.cpp
-	filesys.cpp
-	filesys_steam.cpp
 	g_conversation.cpp
 	g_mapinfo.cpp
 	gamemap.cpp
@@ -143,6 +141,7 @@ initial_sources(
 if(LIBRETRO)
   target_sources(engine PRIVATE
     libretro/libretro.cpp
+    libretro/libretro-vfs.cpp
     libretro/id_in.cpp
     libretro/id_sd.cpp
     libretro/id_us_1.cpp
@@ -167,6 +166,8 @@ if(WIN32)
 endif()
 else()
   target_sources(engine PRIVATE
+      filesys.cpp
+      filesys_steam.cpp
       id_in.cpp
       id_sd.cpp
       id_us_1.cpp
@@ -197,7 +198,7 @@ include(CheckFunctionExists)
 include(FindPkgConfig)
 
 if(LIBRETRO)
-	target_compile_definitions(engine PRIVATE -DLIBRETRO=1)
+	target_compile_definitions(engine PRIVATE -DLIBRETRO=1 -DNO_STORE=1)
 endif()
       
 if(GPL)

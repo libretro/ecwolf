@@ -654,6 +654,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 	// Get a list of potential data paths
 	FString dataPaths;
+#ifndef LIBRETRO
 	if(config.GetSetting("BaseDataPaths") == NULL)
 	{
 		FString configDir = FileSys::GetDirectoryPath(FileSys::DIR_Configuration);
@@ -673,6 +674,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 		config.CreateSetting("BaseDataPaths", dataPaths);
 	}
+#endif
 	dataPaths = config.GetSetting("BaseDataPaths")->GetString();
 
 	TArray<WadStuff> basefiles;

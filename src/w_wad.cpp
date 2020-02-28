@@ -1126,6 +1126,8 @@ const char *FWadCollection::GetWadFullName (int wadnum) const
 //
 //==========================================================================
 
+#ifndef LIBRETRO
+
 bool FWadCollection::IsUncompressedFile(int lump) const
 {
 	if ((unsigned)lump >= (unsigned)NumLumps)
@@ -1140,6 +1142,8 @@ bool FWadCollection::IsUncompressedFile(int lump) const
 	// Any other case means it won't work.
 	return (f != NULL && f->GetFile() != NULL);
 }
+
+#endif
 
 //==========================================================================
 //

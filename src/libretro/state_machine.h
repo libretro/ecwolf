@@ -384,5 +384,6 @@ bool TextReaderStep(wl_state_t *state, const wl_input_state_t *input);
 extern SDWORD damagecount, bonuscount;
 extern bool palshifted;
 void DrawVictory (bool fromIntermission);
+extern bool store_files_in_memory;
 
 #endif
