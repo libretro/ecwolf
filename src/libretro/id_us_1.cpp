@@ -128,7 +128,9 @@ US_PrintSigned(int32_t n)
 {
 	char	buffer[32];
 
-	US_Print(SmallFont, ltoa(n,buffer,10));
+	snprintf(buffer, 30, "%ld", n);
+
+	US_Print(SmallFont, buffer);
 }
 
 ///////////////////////////////////////////////////////////////////////////
