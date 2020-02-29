@@ -954,6 +954,46 @@ void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_li
 		printf("%s", errorMessage.GetChars());
 }
 
+extern const void *PullerADeathCam;
+extern const void *PullerAQuizItem;
+extern const void *PullerAWeaponGiver;
+extern const void *PullerAScoreItem;
+extern const void *PullerAExtraLifeItem;
+extern const void *PullerAMapRevealer;
+extern const void *PullerAInventory;
+extern const void *PullerAAmmo;
+extern const void *PullerABackpackItem;
+extern const void *PullerACustomInventory;
+extern const void *PullerAHealth;
+extern const void *PullerAWeapon;
+extern const void *PullerAKeyGiver;
+extern const void *PullerAKey;
+extern const void *PullerAPatrolPoint;
+extern const void *PullerAPlayerPawn;
+extern const void *PullerARandomSpawner;
+extern const void *PullerASpearOfDestiny;
+
+const void * pullers[] = {
+	PullerADeathCam,
+	PullerAQuizItem,
+	PullerAWeaponGiver,
+	PullerAScoreItem,
+	PullerAExtraLifeItem,
+	PullerAMapRevealer,
+	PullerAInventory,
+	PullerAAmmo,
+	PullerABackpackItem,
+	PullerACustomInventory,
+	PullerAHealth,
+	PullerAWeapon,
+	PullerAKeyGiver,
+	PullerAKey,
+	PullerAPatrolPoint,
+	PullerAPlayerPawn,
+	PullerARandomSpawner,
+	PullerASpearOfDestiny
+ };
+
 bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 {
 	Scanner::SetMessageHandler(ScannerMessageHandler);
