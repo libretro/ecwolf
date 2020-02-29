@@ -1594,10 +1594,11 @@ unsigned long long GetSaveVersion()
 
 extern unsigned automap;
 
-void SerializeExtra(FArchive &arc, bool &isGameless)
+void SerializeExtra(FArchive &arc, bool &isGameless, DWORD &version)
 {
-	DWORD serialize_version = 11;
+	DWORD serialize_version = 12;
 	arc << serialize_version;
+	version = serialize_version;
 	arc << (QWORD &) GameSave::SaveVersion;
 	arc << GameSave::SaveProdVersion;
 
@@ -1738,13 +1739,17 @@ bool retro_serialize(void *data_, size_t size)
 	FCompressedMemFile snapshot;
 	snapshot.Open();
 	{
+		DWORD serialize_version;
 		FArchive arc(snapshot);
-		SerializeExtra(arc, isGameless);
+		SerializeExtra(arc, isGameless, serialize_version);
 
 		FString mapname = gamestate.mapname;
 		arc << mapname;
 		if (!isGameless) {
 			GameSave::Serialize(arc);
+		}
+		if (!isGameless && serialize_version >= 12) {
+			Dialog::quizSerialize(&g_state, arc);
 		}
 		DWORD rngcount = FRandom::GetRNGCount();
 		arc << rngcount;
@@ -1805,7 +1810,8 @@ bool retro_unserialize(const void *data_, size_t size)
 	FCompressedMemFile snapshot;
 	snapshot.Open((void *)data_);
 	FArchive arc(snapshot);
-	SerializeExtra(arc, isGameless);
+	DWORD serialize_version;
+	SerializeExtra(arc, isGameless, serialize_version);
 	FString mapname;
 	arc << mapname;
 	strcpy(gamestate.mapname, mapname);
@@ -1815,6 +1821,10 @@ bool retro_unserialize(const void *data_, size_t size)
 		SetupGameLevel();
 		GameSave::Serialize(arc);
 		loadedgame = false;
+	}
+
+	if (!isGameless && serialize_version >= 12) {
+		Dialog::quizSerialize(&g_state, arc);
 	}
 
 	DWORD rngcount;

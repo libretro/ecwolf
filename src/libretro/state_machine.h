@@ -283,6 +283,7 @@ typedef struct wl_state_s {
 	bool isInQuiz;
 	Dialog::QuizMenu *quizMenu;
 	const Dialog::Page *quizPage;
+	AActor *quizNpc;
 	angle_t iangle;
 	DWORD rndval;
 	TObjPtr<SpriteZoomer> zoomer;
@@ -364,6 +365,7 @@ bool LevelEnterIntermissionStart(wl_state_t *state);
 bool TransitionText (wl_state_t *stage, int exitClusterNum, int enterClusterNum);
 namespace Dialog {
 bool quizHandle(wl_state_t *state, const wl_input_state_t *input);
+void quizSerialize(wl_state_t *state, FArchive &arc);
 }
 void State_Delay(wl_state_t *state, longword delay);
 void SetSoundPriorities(const char *prio);
