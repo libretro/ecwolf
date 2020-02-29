@@ -118,6 +118,8 @@ struct FNullStringData
 
 enum ELumpNum
 {
+	ENSURE_INT_P = 0x7fffffff,
+	ENSURE_INT_M = -0x7fffffff
 };
 
 class FString
