@@ -81,6 +81,7 @@ static retro_log_printf_t log_cb;
 static bool libretro_supports_bitmasks = false;
 static int screen_width = 640, screen_height = 400, fps = 35;
 static bool dynamic_fps = false;
+static int analog_deadzone;
 
 const int TIC_TIME_US = 1000000 / TICRATE;
 static const int SAMPLERATE = 44100;
@@ -491,6 +492,22 @@ struct retro_core_option_definition option_defs_us[] = {
 		"320x200",
 	},
 	{
+		"ecwolf-analog-deadzone",
+		"Analog deadzone",
+		"Configure the deadzone for analog axis.",
+		{
+			{ "0%",  NULL },
+			{ "5%",  NULL },
+			{ "10%",  NULL },
+			{ "15%",  NULL },
+			{ "20%", NULL },
+			{ "25%", NULL },
+			{ "30%", NULL },
+			{ NULL, NULL },
+		},
+		"15%"
+	},
+	{
 		"ecwolf-fps",
 		"Refresh rate (FPS)",
 		"Configure the FPS.",
@@ -849,6 +866,8 @@ static void update_variables(bool startup)
 
 	alwaysrun = get_bool_option("ecwolf-alwaysrun");
 
+	analog_deadzone = get_unsigned_variable("ecwolf-analog-deadzone", 15);
+
 	int newviewsize = get_unsigned_variable("ecwolf-viewsize", 20);
 	if (newviewsize < 4 || newviewsize > 21)
 		newviewsize = 20;
@@ -979,7 +998,13 @@ void IVideo::DumpAdapters ()
 
 static int transform_axis(int val, int run, int sensitivity)
 {
-	return (val * 5 * (1 + run) * sensitivity) / 0x7fff;
+	int sign = val >= 0 ? +1 : -1;
+	int absval = val >= 0 ? val : -val;
+	int deadzone_val = analog_deadzone * 0x7fff / 100;
+	if (absval < deadzone_val)
+		return 0;
+	return sign * ((absval - deadzone_val) * 5 * (1 + run) * sensitivity)
+		/ (0x7fff - deadzone_val);
 }
 
 static void TransformAutomapInputs(const wl_input_state_t *input)
