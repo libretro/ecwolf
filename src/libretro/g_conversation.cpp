@@ -75,6 +75,7 @@ void StartConversation(AActor *npc)
 	g_state.isInQuiz = true;
 	g_state.quizMenu = quiz;
 	g_state.quizPage = *page;
+	g_state.quizNpc = npc;
 }
 
 void closeQuiz(wl_state_t *state)
@@ -88,6 +89,16 @@ void closeQuiz(wl_state_t *state)
 	DrawPlayScreen();
 }
 	
+static void updateQuestion(wl_state_t *state, Page *nextPage) {
+	state->quizPage = state->quizPage->Choices[0].NextPage;
+	if (!state->quizNpc)
+		return;
+	const Page **page = FindConversation(state->quizNpc);
+	if(!page)
+		return;
+	*page = nextPage;
+}
+	
 bool quizHandle(wl_state_t *state, const wl_input_state_t *input)
 {
 	if (input->menuBack)
@@ -96,8 +107,9 @@ bool quizHandle(wl_state_t *state, const wl_input_state_t *input)
 
 		// For S3DNA, proceed to the next page. Probably should factor this
 		// into an option.
-		if(state->quizPage->Choices.Size() > 0)
-			state->quizPage = state->quizPage->Choices[0].NextPage;
+		if(state->quizPage->Choices.Size() > 0) {
+			updateQuestion(state, state->quizPage->Choices[0].NextPage);
+		}
 		closeQuiz(state);
 		return false;
 	}
@@ -120,7 +132,7 @@ bool quizHandle(wl_state_t *state, const wl_input_state_t *input)
 		
 		VW_UpdateScreen();
 
-		state->quizPage = choice.NextPage;
+		updateQuestion(state, choice.NextPage);
 		if(choice.CloseDialog)
 			closeQuiz(state);
 		else
@@ -133,6 +145,45 @@ bool quizHandle(wl_state_t *state, const wl_input_state_t *input)
 	state->quizMenu->handleStep(state, input);
 
 	return true;
+}
+
+void quizSerialize(wl_state_t *state, FArchive &arc)
+{
+	const Conversation *conv = NULL;
+	arc << state->quizNpc;
+
+	if (state->quizNpc)
+	{
+		const unsigned int id = state->quizNpc->GetClass()->Meta.GetMetaInt(AMETA_ConversationID);
+		for(unsigned int i = LoadedModules.Size();i-- > 0;)
+		{
+			conv = LoadedModules[i].Find(id);
+			if (conv)
+				break;
+		}
+	}
+
+	DWORD pos = 0;
+	DWORD pagenum = 0;
+	if (arc.IsStoring()) {
+		pos = state->quizMenu ? state->quizMenu->getCurrentPosition() : 0;
+		if (conv != NULL && conv->Pages.Size() && state->quizPage) {
+			pagenum = state->quizPage - &conv->Pages[0];
+			if (pagenum > conv->Pages.Size())
+				pagenum = 0;
+		}
+	}
+	
+	arc << pagenum;
+	arc << pos;
+	if (!arc.IsStoring() && g_state.isInQuiz) {
+		Page *page = &conv->Pages[pagenum];
+
+		QuizMenu *quiz = new QuizMenu();
+		quiz->loadQuestion(page);
+		g_state.quizMenu = quiz;
+		g_state.quizPage = page;
+	}
 }
 
 }

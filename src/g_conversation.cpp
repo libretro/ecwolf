@@ -60,49 +60,13 @@
 static FRandom pr_conversation("Conversation");
 
 namespace Dialog {
-	
-struct Conversation
+
+const Page *Conversation::Start() const
 {
-	TArray<Page> Pages;
-	unsigned int Actor;
-	bool RandomStart;
-	bool Preserve;
-
-	const Page *Start() const
-	{
-		if(RandomStart)
-			return &Pages[pr_conversation(Pages.Size())];
-		return &Pages[0];
-	}
-};
-
-class ConversationModule
-{
-public:
-	enum ConvNamespace
-	{
-		NS_Strife,
-		NS_Noah
-	};
-
-	const Conversation *Find(unsigned int id) const;
-	void Load(int lump);
-
-	TArray<FString> Include;
-	TMap<unsigned int, Conversation> Conversations;
-	ConvNamespace Namespace;
-	int Lump;
-
-private:
-	void ParseConversation(Scanner &sc);
-	template<typename T>
-	void ParseBlock(Scanner &sc, T &obj, bool (ConversationModule::*handler)(Scanner &, FName, bool, T &));
-
-	bool ParseConvBlock(Scanner &, FName, bool, Conversation &);
-	bool ParsePageBlock(Scanner &, FName, bool, Page &);
-	bool ParseChoiceBlock(Scanner &, FName, bool, Choice &);
-	bool ParseItemCheckBlock(Scanner &, FName, bool, ItemCheck &);
-};
+	if(RandomStart)
+		return &Pages[pr_conversation(Pages.Size())];
+	return &Pages[0];
+}
 
 // ----------------------------------------------------------------------------
 
@@ -399,7 +363,7 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 // ----------------------------------------------------------------------------
 
 static TMap<unsigned int, const Page *> PreservedConversations;
-static TArray<ConversationModule> LoadedModules;
+TArray<ConversationModule> LoadedModules;
 static unsigned int MapModuleStart = 0;
 
 static bool CheckModuleLoaded(int lump)
