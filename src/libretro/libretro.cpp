@@ -129,7 +129,6 @@ public:
 	void ForceBuffering (bool force) {}
 	bool IsValid () { return true; }
 	void Update () {
-		int pixel_count = width_ * height_;
 		ComputePalette();
 		for (int y = 0; y < height_; y++)
 			for (int x = 0; x < width_; x++)
@@ -846,7 +845,6 @@ static void update_variables(bool startup)
 	int oldw = screen_width;
 	int oldh = screen_height;
 	int oldfps = fps;
-	int oldbpp = preferred_bpp;
 
 	const char *resolution = get_string_variable("ecwolf-resolution");
 
@@ -1201,7 +1199,6 @@ void TransformPlayInputs(const wl_input_state_t *input, int newly_pressed)
 static void TransformInputs(wl_input_state_t *input)
 {
 	TicCmd_t &cmd = control[ConsolePlayer];
-	static int am_toggle_was_pressed = 0;
 	static int old_button_mask = 0;
 
 	cmd.controlx = 0;

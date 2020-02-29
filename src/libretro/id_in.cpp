@@ -52,12 +52,6 @@ JoystickSens *JoySensitivity;
 int JoyNumButtons;
 int JoyNumAxes;
 
-
-static int
-INL_GetMouseButtons(void)
-{
-}
-
 void IN_GetJoyDelta(int *dx,int *dy)
 {
 }

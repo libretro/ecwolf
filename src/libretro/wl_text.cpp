@@ -731,8 +731,6 @@ void DrawMultiLineText(const FString str, FFont *font, EColorRange color, ETSAli
 // Helphack switches index 11 and 5 so that the keyboard/blaze pics are reversed.
 static void ShowArticle (wl_state_t *state, const FString &article, wl_stage_t nextStage, bool helphack=false)
 {
-	ControlInfo ci;
-
 	state->article = article;
 	state->textposition = 0;
 	state->numpages = CountPages(state);
