@@ -943,8 +943,20 @@ static void update_variables(bool startup)
 	}
 }
 
+void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
+{
+	FString errorMessage;
+	errorMessage.VFormat(error, list);
+
+	if(level == Scanner::ERROR)
+		throw CRecoverableError(errorMessage);
+	else
+		printf("%s", errorMessage.GetChars());
+}
+
 bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 {
+	Scanner::SetMessageHandler(ScannerMessageHandler);
 	update_variables(true);
 
 	if (!game_init_pixelformat())
