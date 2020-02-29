@@ -14,7 +14,7 @@ static FRandom pr_randomspawn("RandomSpawn");
 
 class ARandomSpawner : public AActor
 {
-	DECLARE_CLASS (ARandomSpawner, AActor)
+	DECLARE_NATIVE_CLASS (RandomSpawner, Actor)
 
 	int bouncecount;
 	FName Species;
