@@ -1270,16 +1270,6 @@ static bool EndSequence6(wl_state_t *state)
 }
 
 void InitThinkerList();
-void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
-{
-	FString errorMessage;
-	errorMessage.VFormat(error, list);
-
-	if(level == Scanner::ERROR)
-		throw CRecoverableError(errorMessage);
-	else
-		printf("%s", errorMessage.GetChars());
-}
 
 bool TopLoopStep(wl_state_t *state, const wl_input_state_t *input) {
 	if (state->isFading) {
