@@ -276,15 +276,13 @@ int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const
 
 int SD_PlaySound(const char* sound,SoundChannel chan)
 {
-	bool            ispos;
 	int             lp,rp;
 
 	lp = LeftPosition;
 	rp = RightPosition;
 	LeftPosition = 0;
 	RightPosition = 0;
-
-	ispos = nextsoundpos;
+ 
 	nextsoundpos = false;
 
 	const SoundData &sindex = SoundInfo[sound];
@@ -456,7 +454,6 @@ Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 	int pcPhaseTick = 0;
 	int pcLastSample = 0;
 	longword	pcPhaseLength = 0;
-	bool		pcActive = false;
 	int pcLength = LittleLong(sound->common.length);
 	byte *pcSound = sound->data;
 
@@ -472,11 +469,9 @@ Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 			if(pcLastSample) {
 					pcPhaseLength = (pcLastSample*60*synthesisRate)/(2*PC_BASE_TIMER);
 					pcPhaseTick = 0;
-					pcActive = true;
 			}
 			else
 			{
-					pcActive = false;
 					pcPhaseTick = 0;
 			}
 		}

@@ -759,10 +759,8 @@ bool Died5(wl_state_t *state)
 void FizzleColorFinish(wl_state_t *state, int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, byte color)
 {
-	unsigned x, y, frame, pixperframe;
-	int32_t  rndval=0;
+	unsigned y;
 
-	pixperframe = width * height / frames;
 	for (y = y1; y < (y1 + height); ++y)
 	{
 		memset(screen->GetBuffer() + (y * SCREENPITCH) + x1, color,

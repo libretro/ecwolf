@@ -1231,7 +1231,6 @@ static bool EndSequence2(wl_state_t *state)
 static bool EndSequence3(wl_state_t *state)
 {
 	if(state->dointermission) {
-			LevelInfo &nextLevel = LevelInfo::Find(state->nextMap);
 			state->stageAfterIntermission = END_SEQUENCE_4;
 			return TransitionText(state, levelInfo->Cluster, -1);
 	}
@@ -1255,7 +1254,6 @@ static bool EndSequence5(wl_state_t *state)
 		return false;
 	}
 
-	IntermissionInfo *intermission = IntermissionInfo::Find(seqName.Mid(12));
 	state->stage = PLAY_INTERMISSION;
 	state->stageAfterIntermission = END_SEQUENCE_6;
 	InitIntermission(&state->intermission, seqName.Mid(12), false);
