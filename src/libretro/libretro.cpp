@@ -83,6 +83,8 @@ static bool libretro_supports_bitmasks = false;
 static int screen_width = 640, screen_height = 400, fps = 35;
 static bool dynamic_fps = false;
 static int analog_deadzone;
+static int preferred_bpp;
+static int bpp;
 
 const int TIC_TIME_US = 1000000 / TICRATE;
 static const int SAMPLERATE = 44100;
@@ -92,7 +94,6 @@ extern AutoMap AM_Overlay;
 
 IVideo *Video = NULL;
 
-static int bpp = 32;
 wl_state_t g_state;
 
 class LibretroFBBase : public DFrameBuffer
@@ -326,6 +327,7 @@ static int set_color_format(void)
 
 int game_init_pixelformat(void)
 {
+	bpp = preferred_bpp;
 	if (set_color_format())
 		return 1;
 	
@@ -534,6 +536,17 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ NULL, NULL },
 		},
 		"35",
+	},
+	{
+		"ecwolf-palette",
+		"Preferred palette format (Restart)",
+		"Actual format is subject to hardware support.",
+		{
+			{ "rgb565",           "RGB565 (16-bit)"},
+			{ "xrgb8888",         "XRGB8888 (24-bit)"},
+			{ NULL, NULL },
+		},
+		"rgb565"
 	},
 	{
 		"ecwolf-alwaysrun",
@@ -828,6 +841,7 @@ static void update_variables(bool startup)
 	int oldw = screen_width;
 	int oldh = screen_height;
 	int oldfps = fps;
+	int oldbpp = preferred_bpp;
 
 	const char *resolution = get_string_variable("ecwolf-resolution");
 
@@ -856,6 +870,15 @@ static void update_variables(bool startup)
 	fps = get_unsigned_variable("ecwolf-fps", 35);
 	if (log_cb)
 		log_cb(RETRO_LOG_INFO, "Got FPS: %u.\n", fps);
+
+	if (startup) {
+		const char *palette = get_string_variable("ecwolf-palette");
+
+		if (palette != NULL && strcmp(palette, "xrgb8888") == 0)
+			preferred_bpp = 32;
+		else
+			preferred_bpp = 16;
+	}
 
 	if (oldw != screen_width || oldh != screen_height || oldfps != fps)
 	{
