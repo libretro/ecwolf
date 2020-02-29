@@ -1055,6 +1055,9 @@ bool retro_load_game(const struct retro_game_info *info)
 	catch (CDoomError &err) {
 		log_cb (RETRO_LOG_ERROR, "Error loading game: %s\n", err.GetMessage());
 		return false;
+	} catch (...) {
+		log_cb (RETRO_LOG_ERROR, "Unknown exception while loading game\n");
+		return false;	  
 	}
 }
 
