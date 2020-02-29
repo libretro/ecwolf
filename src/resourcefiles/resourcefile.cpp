@@ -255,6 +255,7 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 	}
 	else
 	{
+#ifndef LIBRETRO
 		// ECWolf HACK For embedded files, try to load a multi file type since
 		// the file parameter is forced to the wrong type.
 		const char* c = strchr(filename, ':');
@@ -270,6 +271,7 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 				if (resfile != NULL) return resfile;
 			}
 		}
+#endif
 	}
 
 	for(size_t i = 0; i < COUNTOF_FUNCS; i++)
