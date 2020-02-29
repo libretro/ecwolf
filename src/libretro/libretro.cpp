@@ -995,6 +995,7 @@ extern const void *PullerAPatrolPoint;
 extern const void *PullerAPlayerPawn;
 extern const void *PullerARandomSpawner;
 extern const void *PullerASpearOfDestiny;
+bool __AF_A_InitSmartAnim(AActor *, AActor *, const Frame * const, const CallArguments &, struct ActionResult *);
 
 const void * pullers[] = {
 	PullerADeathCam,
@@ -1014,7 +1015,8 @@ const void * pullers[] = {
 	PullerAPatrolPoint,
 	PullerAPlayerPawn,
 	PullerARandomSpawner,
-	PullerASpearOfDestiny
+	PullerASpearOfDestiny,
+	(void*) __AF_A_InitSmartAnim
  };
 
 bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
