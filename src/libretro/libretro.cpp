@@ -480,6 +480,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		{
 			{ "320x200", NULL },
 			{ "320x240", NULL },
+			{ "400x240", NULL },
 			{ "640x400", NULL },
 			{ "640x480", NULL },
 			{ "800x500", NULL },
@@ -492,7 +493,11 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "2560x1600", NULL },
 			{ NULL, NULL },
 		},
+#ifdef _3DS
+		"400x240",
+#else
 		"320x200",
+#endif
 	},
 	{
 		"ecwolf-analog-deadzone",
