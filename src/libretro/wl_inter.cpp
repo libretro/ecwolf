@@ -631,13 +631,13 @@ void DrawVictory (bool fromIntermission)
 		timeString.Format("%02d:%02d", min, sec);
 		Write (TIMEX, TIMEY, timeString);
 
-		itoa (kr, tempstr, 10);
+		snprintf(tempstr, 7, "%d", kr);
 		Write (RATIOX + 8, RATIOY, tempstr, true);
 
-		itoa (sr, tempstr, 10);
+		snprintf(tempstr, 7, "%d", sr);
 		Write (RATIOX + 8, RATIOY + 2, tempstr, true);
 
-		itoa (tr, tempstr, 10);
+		snprintf(tempstr, 7, "%d", tr);
 		Write (RATIOX + 8, RATIOY + 4, tempstr, true);
 	}
 
