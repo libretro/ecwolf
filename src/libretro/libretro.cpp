@@ -480,13 +480,16 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "320x200", NULL },
 			{ "320x240", NULL },
 			{ "400x240", NULL },
+			{ "420x240", NULL }, // third of 720p
 			{ "480x270", NULL }, // psvita half-resolution
+			{ "640x360", NULL }, // half of 720p
 			{ "640x400", NULL },
 			{ "640x480", NULL },
 			{ "800x500", NULL },
 			{ "960x540", NULL }, // psvita resolution
 			{ "960x600", NULL },
 			{ "1024x768", NULL },
+			{ "1280x720", NULL }, // 720p
 			{ "1280x800", NULL },
 			{ "1600x1000", NULL },
 			{ "1920x1200", NULL },
