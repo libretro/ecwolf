@@ -480,9 +480,11 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "320x200", NULL },
 			{ "320x240", NULL },
 			{ "400x240", NULL },
+			{ "480x270", NULL }, // psvita half-resolution
 			{ "640x400", NULL },
 			{ "640x480", NULL },
 			{ "800x500", NULL },
+			{ "960x540", NULL }, // psvita resolution
 			{ "960x600", NULL },
 			{ "1024x768", NULL },
 			{ "1280x800", NULL },
@@ -492,7 +494,9 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "2560x1600", NULL },
 			{ NULL, NULL },
 		},
-#ifdef _3DS
+#ifdef VITA
+		"480x270", // Run at half by default for better frame rate
+#elif defined (_3DS)
 		"400x240",
 #else
 		"320x200",
