@@ -134,7 +134,7 @@ else ifeq ($(platform), libnx)
     CFLAGS	:=	 $(DEFINES) -g -fPIE -I$(LIBNX)/include/ -I$(PORTLIBS)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec
     CFLAGS += $(INCDIRS) -I$(CORE_DIR)/zlib -I$(CORE_DIR)/libogg/include -I$(CORE_DIR)/libvorbis/include \
 		-I$(CORE_DIR)/jpeg-8c -fvisibility=hidden
-    CFLAGS	+= -march=armv8-a -mtune=cortex-a57 -mtp=soft -mcpu=cortex-a57+crc+fp+simd
+    CFLAGS	+= -march=armv8-a -mtune=cortex-a57 -mtp=soft -mcpu=cortex-a57+crc+fp+simd -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
     CXXFLAGS := $(ASFLAGS) $(CFLAGS) -std=gnu++11
     STATIC_LINKING = 1
 # CTR (3DS)
