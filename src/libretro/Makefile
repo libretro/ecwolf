@@ -165,8 +165,8 @@ ifeq ($(DEBUG), 1)
    CFLAGS += -O0 -g -DDEBUG
    CXXFLAGS += -O0 -g -DDEBUG
 else
-   CFLAGS += -O3
-   CXXFLAGS += -O3
+   CFLAGS += -O2
+   CXXFLAGS += -O2
 endif
 
 include Makefile.common
