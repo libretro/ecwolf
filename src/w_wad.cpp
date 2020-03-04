@@ -238,13 +238,10 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 
 		if (!isdir)
 		{
-			try
-			{
-				wadinfo = new FileReader(filename);
-			}
-			catch (CRecoverableError &err)
+			wadinfo = FileReader::SafeOpen(filename);
+			if (wadinfo == NULL)
 			{ // Didn't find file
-				Printf (TEXTCOLOR_RED "%s\n", err.GetMessage());
+				Printf (TEXTCOLOR_RED "File %s couln't be opened\n", filename);
 				PrintLastError ();
 				return;
 			}
