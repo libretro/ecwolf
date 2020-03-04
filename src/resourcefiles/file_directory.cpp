@@ -280,17 +280,9 @@ void FDirectory::AddEntry(const char *fullpath, int size)
 
 FileReader *FDirectoryLump::NewReader()
 {
-	try
-	{
-		FString fullpath = Owner->Filename;
-		fullpath += FullName;
-		printf("%s\n", fullpath.GetChars());
-		return new FileReader(fullpath);
-	}
-	catch (CRecoverableError &)
-	{
-		return NULL;
-	}
+	FString fullpath = Owner->Filename;
+	fullpath += FullName;
+	return FileReader::SafeOpen(fullpath);
 }
 
 //==========================================================================

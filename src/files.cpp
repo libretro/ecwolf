@@ -166,6 +166,19 @@ char *FileReader::Gets(char *strbuf, int len)
 	}
 	return p;
 }
+
+FileReader *FileReader::SafeOpen(const char*filename)
+{
+	try
+	{
+		return new FileReader(filename);
+	}
+	catch (CRecoverableError &)
+	{
+		return NULL;
+	}
+}
+
 #endif
 
 char *FileReader::GetsFromBuffer(const char * bufptr, char *strbuf, int len)

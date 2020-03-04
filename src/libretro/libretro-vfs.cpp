@@ -361,6 +361,14 @@ FileReader::FileReader (const char *filename)
 	}
 }
 
+FileReader *FileReader::SafeOpen(const char *filename)
+{
+	FileReader *ret = new FileReader();
+	if (!ret->Open(filename))
+		return NULL;
+	return ret;
+}
+
 FileReader::FileReader (struct retro_vfs_wrapped_file_handle *file)
 : File(file), Length(0), StartPos(0), FilePos(0), CloseOnDestruct(false)
 {

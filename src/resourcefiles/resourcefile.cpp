@@ -244,14 +244,9 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 {
 	if (file == NULL)
 	{
-		try
-		{
-			file = new FileReader(filename);
-		}
-		catch (CRecoverableError &)
-		{
+		file = FileReader::SafeOpen(filename);
+		if (file == NULL)
 			return NULL;
-		}
 	}
 	else
 	{

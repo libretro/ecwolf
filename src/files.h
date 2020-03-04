@@ -84,6 +84,8 @@ public:
 	// you must call ResetFilePtr() before using this class again.
 	void ResetFilePtr ();
 
+	static FileReader *SafeOpen(const char*filename);
+
 #ifdef LIBRETRO
 	struct retro_vfs_wrapped_file_handle *GetFile () const { return File; }
 #else
