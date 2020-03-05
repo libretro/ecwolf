@@ -499,6 +499,8 @@ struct retro_core_option_definition option_defs_us[] = {
 		},
 #ifdef VITA
 		"480x270", // Run at half by default for better frame rate
+#elif defined(PSP)
+		"480x272",
 #elif defined (_3DS)
 		"400x240",
 #else
