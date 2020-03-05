@@ -70,7 +70,6 @@ ifeq ($(platform), unix)
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
    LIBS := -ldl -lpthread
 
-	GL_LIB := -lGL
 	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), linux-portable)
@@ -78,14 +77,12 @@ else ifeq ($(platform), linux-portable)
    fpic := -fPIC -nostdlib
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T
 	LIBM :=
-	GL_LIB := -lGL
 	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring osx,$(platform)))
    TARGET := $(TARGET_NAME)_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
-   GL_LIB := -framework OpenGL
 	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring ios,$(platform)))
@@ -155,7 +152,6 @@ else
 	CFLAGS += -DUSE_WINDOWS_DWORD
 	CXXFLAGS += -DUSE_WINDOWS_DWORD
    SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
-	GL_LIB := -lopengl32
    LDFLAGS += -lwsock32 -lWS2_32
 endif
 
@@ -246,7 +242,7 @@ ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJECTS)
 else
 	@$(if $(Q), $(shell echo echo LD $@),)
-	$(Q)$(CXX) $(fpic) $(SHARED) -o $@ $(OBJECTS) $(LDFLAGS) $(GL_LIB) $(LIBS)
+	$(Q)$(CXX) $(fpic) $(SHARED) -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS)
 endif
 
 %.o: %.cpp
