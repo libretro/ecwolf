@@ -119,7 +119,7 @@ else ifeq ($(platform), emscripten)
    CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), vita)
-   TARGET := $(TARGET_NAME)_vita.a
+   TARGET := $(TARGET_NAME)_libretro_vita.a
    CC = arm-vita-eabi-gcc
    CXX = arm-vita-eabi-g++
    AR = arm-vita-eabi-ar
