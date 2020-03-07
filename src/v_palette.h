@@ -62,7 +62,7 @@ struct PalEntry
 			BYTE a,r,g,b;
 		};
 		uint32 d;
-	};
+	} __attribute__ ((__packed__));
 #else
 	PalEntry (BYTE ir, BYTE ig, BYTE ib) : b(ib), g(ig), r(ir), a(0) {}
 	PalEntry (BYTE ia, BYTE ir, BYTE ig, BYTE ib) : b(ib), g(ig), r(ir), a(ia) {}
@@ -73,7 +73,7 @@ struct PalEntry
 			BYTE b,g,r,a;
 		};
 		uint32 d;
-	};
+	} __attribute__ ((__packed__));
 #endif
 };
 
