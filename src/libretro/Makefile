@@ -121,7 +121,27 @@ else ifeq ($(platform), vita)
    CXX = arm-vita-eabi-g++
    AR = arm-vita-eabi-ar
    DEFINES += -DVITA=1
-   CFLAGS += $(DEFINES) -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   CFLAGS += $(DEFINES)  -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   CXXFLAGS += $(CFLAGS) -Wl,-q -Wall -O2
+   STATIC_LINKING = 1
+else ifeq ($(platform), wii)
+   EXT=a
+   TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+   CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
+   CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
+   AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
+   CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
+   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DGAMECUBE
+   CXXFLAGS += $(CFLAGS) -Wl,-q -Wall -O2
+   STATIC_LINKING = 1
+else ifeq ($(platform), ngc)
+   EXT=a
+   TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+   CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
+   CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
+   AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
+   CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
+   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DWII
    CXXFLAGS += $(CFLAGS) -Wl,-q -Wall -O2
    STATIC_LINKING = 1
 # Nintendo Switch (libnx)

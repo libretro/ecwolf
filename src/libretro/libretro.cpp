@@ -739,7 +739,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
-#ifndef _3DS
+#if !defined(_3DS) && !defined(GEKKO)
 	{
 		"ecwolf-memstore",
 		"Store files in memory",
@@ -844,7 +844,7 @@ static void am_multiple_choice (const char *name, unsigned &var, bool &is_update
 
 static void update_variables(bool startup)
 {
-#ifdef _3DS
+#if defined(_3DS) || defined(GEKKO)
 	store_files_in_memory = true;
 #else
 	store_files_in_memory = get_bool_option("ecwolf-memstore");
