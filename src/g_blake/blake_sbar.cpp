@@ -183,7 +183,7 @@ void BlakeStatusBar::DrawStatusBar()
 
 	// Draw bottom information
 	FString health;
-	health.Format("%3d", (int) players[0].health);
+	health.Format("%3d", players[0].health);
 	DrawString(HealthFont, health, 128, 162, false);
 
 	FString score;

@@ -55,9 +55,9 @@ using namespace Specials;
 static FRandom pr_teleport("Teleport");
 
 #define DEFINE_SPECIAL(name,num,argc) \
-	static int LN_##name(MapSpot spot, const int32_t args[], MapTrigger::Side direction, AActor *activator);
+	static int LN_##name(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator);
 #define FUNC(name) \
-	static int LN_##name(MapSpot spot, const int32_t args[], MapTrigger::Side direction, AActor *activator)
+	static int LN_##name(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator)
 
 DEFINE_SPECIAL(NOP, 0, 0)
 #include "lnspecials.h"
@@ -326,10 +326,10 @@ class EVDoor : public Thinker
 		SndSeqPlayer *sndseq;
 		FName seqname;
 
-		uint32_t speed;
+		unsigned int speed;
 		int32_t amount;
 		int32_t opentics;
-		uint32_t wait;
+		unsigned int wait;
 		bool direction;
 };
 IMPLEMENT_INTERNAL_CLASS(EVDoor)
@@ -627,8 +627,8 @@ private:
 	MapSpot door;
 	MapSpot next;
 	MapSpot nextDoor;
-	uint32_t elevTag;
-	uint32_t callSpeed;
+	unsigned int elevTag;
+	unsigned int callSpeed;
 	State state;
 };
 IMPLEMENT_INTERNAL_POINTY_CLASS(EVElevator)
@@ -871,9 +871,9 @@ class EVPushwall : public Thinker
 		FName seqname;
 
 		unsigned short	direction;
-		uint32_t	position;
-		uint32_t	speed;
-		uint32_t	distance;
+		unsigned int	position;
+		unsigned int	speed;
+		unsigned int	distance;
 		bool nostop;
 };
 IMPLEMENT_INTERNAL_CLASS(EVPushwall)
@@ -1081,7 +1081,7 @@ class EVVictorySpin : public Thinker
 		}
 
 		bool			doturn;
-		uint32_t	dist;
+		unsigned int	dist;
 		TObjPtr<AActor>	activator;
 		TObjPtr<AActor>	runner;
 };

@@ -115,7 +115,7 @@ class Frame
 				bool operator() (AActor *self, AActor *stateOwner, const Frame * const caller, struct ActionResult *result=NULL) const;
 		} action, thinker;
 		const Frame	*next;
-		DWORD	index;
+		unsigned int	index;
 
 		unsigned int	spriteInf;
 

@@ -1456,8 +1456,7 @@ void retro_run(void)
 		expectframes = !!TopLoopStep(&g_state, &input);
 		if (expectframes != g_state.frame_counter - oldfc) {
 			fprintf(stderr, "State %d[%d] produces %d frames but reports %d\n", oldstage, oldQuiz,
-				(int) g_state.frame_counter - (int) oldfc,
-				expectframes);
+				g_state.frame_counter - oldfc, expectframes);
 		}
 	}
 	while (expectframes == 0);
@@ -1784,7 +1783,7 @@ void SerializeExtra(FArchive &arc, bool &isGameless, DWORD &version)
 	}
 
 	if (serialize_version >= 11) {
-		arc << (DWORD &) automap;
+		arc << automap;
 		arc << Paused;
 	}
 	arc << (DWORD &) playstate;

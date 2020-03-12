@@ -126,7 +126,7 @@ private:
 	const SndSeqInstruction *Current;
 	MapSpot Source;
 
-	uint32_t Delay;
+	unsigned int Delay;
 	bool Playing;
 	bool WaitForDone;
 };

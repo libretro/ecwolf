@@ -216,6 +216,9 @@ virtual void Read (void *mem, unsigned int len);
 inline	FArchive& operator<< (SBYTE &c) { return operator<< ((BYTE &)c); }
 inline	FArchive& operator<< (SWORD &s) { return operator<< ((WORD &)s); }
 inline	FArchive& operator<< (SDWORD &i) { return operator<< ((DWORD &)i); }
+#if defined (__MINGW32__) || defined(_3DS) || defined(VITA)
+inline	FArchive& operator<< (unsigned int &i) { return operator<< ((DWORD &)i); }
+#endif
 inline	FArchive& operator<< (SQWORD &i) { return operator<< ((QWORD &)i); }
 inline	FArchive& operator<< (unsigned char *&str) { return operator<< ((char *&)str); }
 inline	FArchive& operator<< (signed char *&str) { return operator<< ((char *&)str); }

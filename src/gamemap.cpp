@@ -714,7 +714,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 	{
 		if(arc.IsStoring())
 		{
-			uint32_t count = gm->elevatorPosition.CountUsed();
+			unsigned int count = gm->elevatorPosition.CountUsed();
 			arc << count;
 
 			TMap<unsigned int, MapSpot>::Iterator iter(gm->elevatorPosition);
@@ -727,7 +727,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 		}
 		else
 		{
-			uint32_t count;
+			unsigned int count;
 			arc << count;
 
 			gm->elevatorPosition.Clear();
@@ -751,8 +751,8 @@ FArchive &operator<< (FArchive &arc, MapSpot &spot)
 {
 	if(arc.IsStoring())
 	{
-		uint32_t x = INT32_MAX;
-		uint32_t y = INT32_MAX;
+		unsigned int x = INT_MAX;
+		unsigned int y = INT_MAX;
 		if(spot)
 		{
 			x = spot->GetX();
@@ -763,7 +763,7 @@ FArchive &operator<< (FArchive &arc, MapSpot &spot)
 	}
 	else
 	{
-		uint32_t x, y;
+		unsigned int x, y;
 		arc << x << y;
 
 		if(x == INT_MAX || y == INT_MAX)
@@ -779,12 +779,12 @@ FArchive &operator<< (FArchive &arc, const MapSector *&sector)
 {
 	if(arc.IsStoring())
 	{
-		uint32_t index = map->GetSectorIndex(sector);
+		unsigned int index = map->GetSectorIndex(sector);
 		arc << index;
 	}
 	else
 	{
-		uint32_t index;
+		unsigned int index;
 		arc << index;
 
 		sector = map->GetSector(index);
@@ -796,12 +796,12 @@ FArchive &operator<< (FArchive &arc, const MapTile *&tile)
 {
 	if(arc.IsStoring())
 	{
-		uint32_t index = map->GetTileIndex(tile);
+		unsigned int index = map->GetTileIndex(tile);
 		arc << index;
 	}
 	else
 	{
-		uint32_t index;
+		unsigned int index;
 		arc << index;
 
 		tile = map->GetTile(index);
@@ -813,7 +813,7 @@ FArchive &operator<< (FArchive &arc, const MapZone *&zone)
 {
 	if(arc.IsStoring())
 	{
-		uint32_t index;
+		unsigned int index;
 		if(zone)
 			index = zone->index;
 		else
@@ -823,7 +823,7 @@ FArchive &operator<< (FArchive &arc, const MapZone *&zone)
 	}
 	else
 	{
-		uint32_t index;
+		unsigned int index;
 		arc << index;
 
 		if(index != INT_MAX)

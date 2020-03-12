@@ -44,7 +44,7 @@ bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, BYTE
 
 namespace Specials
 {
-	typedef int (*LineSpecialFunction)(MapSpot spot, const int32_t args[], MapTrigger::Side direction, AActor *activator);
+	typedef int (*LineSpecialFunction)(MapSpot spot, const int args[], MapTrigger::Side direction, AActor *activator);
 
 	#define DEFINE_SPECIAL(name,num,args) name = num,
 	enum LineSpecials
