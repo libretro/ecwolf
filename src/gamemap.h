@@ -256,6 +256,7 @@ class GameMap
 		// traversals.  zoneLinks is the table of links (counts the number of
 		// links that are opened).
 		bool*				zoneTraversed;
+		unsigned short *zptrBack;
 		unsigned short**	zoneLinks;
 };
 
