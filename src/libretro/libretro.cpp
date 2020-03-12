@@ -529,6 +529,11 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Refresh rate (FPS)",
 		"Configure the FPS.",
 		{
+			{ "7", NULL },
+			{ "7.8", NULL },
+			{ "8.8", NULL },
+			{ "10", NULL },
+			{ "14", NULL },
 			{ "17.5", NULL },
 			{ "25", NULL },
 			{ "30", NULL },
@@ -551,7 +556,7 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ NULL, NULL },
 		},
 #if defined(PSP)
-		"17.5",
+		"10",
 #else
 		"35",
 #endif
@@ -781,14 +786,32 @@ int AnalogTurnSensitivity = 20;
 static void announce_frame_callback()
 {
 	frame_cb.callback  = frame_time_cb;
-	if (fp10s == TICRATE * 2 + TICRATE / 2)
-		frame_cb.reference = 4 * TIC_TIME_US;
-	else if (fp10s == TICRATE * 5)
-		frame_cb.reference = 2 * TIC_TIME_US;
-	else if (fp10s == TICRATE * 10)
+	switch (fp10s) {
+	case 700: // 70.0 fps, 1 tic/frame
 		frame_cb.reference = TIC_TIME_US;
-	else
+		break;
+	case 350: // 35.0 fps, 2 tics/frame
+		frame_cb.reference = 2 * TIC_TIME_US;
+		break;
+	case 175: // 17.5 fps, 4 tics/frame
+		frame_cb.reference = 4 * TIC_TIME_US;
+		break;
+	case 140: // 14.0 fps, 5 tics/frame
+		frame_cb.reference = 5 * TIC_TIME_US;
+		break;
+	case 100: // 10.0 fps, 7 tics/frame
+		frame_cb.reference = 7 * TIC_TIME_US;
+		break;
+	case 88: // 8.75 fps, 8 tics/frame
+		frame_cb.reference = 8 * TIC_TIME_US;
+		break;
+	case 70: // 7.0 fps, 8 tics/frame
+		frame_cb.reference = 10 * TIC_TIME_US;
+		break;
+	default:
 		frame_cb.reference = 10000000 / fp10s;
+		break;
+	}
 	environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frame_cb);
 }
 
