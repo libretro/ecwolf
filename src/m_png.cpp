@@ -73,7 +73,7 @@ struct IHDR
 	BYTE		Compression;
 	BYTE		Filter;
 	BYTE		Interlace;
-};
+} __attribute__ ((__packed__));
 
 #ifndef LIBRETRO
 
@@ -138,6 +138,8 @@ CVAR(Float, png_gamma, 0.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)*/
 //
 //==========================================================================
 
+#ifndef LIBRETRO
+
 bool M_CreatePNG (FILE *file, const BYTE *buffer, const PalEntry *palette,
 				  ESSType color_type, int width, int height, int pitch)
 {
@@ -183,6 +185,8 @@ bool M_CreatePNG (FILE *file, const BYTE *buffer, const PalEntry *palette,
 
 	return M_SaveBitmap (buffer, color_type, width, height, pitch, file);
 }
+
+#endif
 
 //==========================================================================
 //
@@ -619,45 +623,14 @@ bool M_ReadIDAT (FileReader *file, BYTE *buffer, int width, int height, int pitc
 				// Distribute pixels into the output buffer
 				out = curr;
 				colstep = bytesPerPixel << passwidthshift[pass];
-				switch (bytesPerPixel)
+				for (x = passwidth; x > 0; --x)
 				{
-				case 1:
-					for (x = passwidth; x > 0; --x)
-					{
-						*out = *in;
-						out += colstep;
-						in += 1;
-					}
-					break;
-
-				case 2:
-					for (x = passwidth; x > 0; --x)
-					{
-						*(WORD *)out = *(WORD *)in;
-						out += colstep;
-						in += 2;
-					}
-					break;
-
-				case 3:
-					for (x = passwidth; x > 0; --x)
-					{
-						out[0] = in[0];
-						out[1] = in[1];
-						out[2] = in[2];
-						out += colstep;
-						in += 3;
-					}
-					break;
-
-				case 4:
-					for (x = passwidth; x > 0; --x)
-					{
-						*(DWORD *)out = *(DWORD *)in;
-						out += colstep;
-						in += 4;
-					}
-					break;
+					int y;
+					for (y = 0; y < bytesPerPixel; y++)
+						*out++ = *in++;
+						
+					out += colstep - bytesPerPixel;
+					in += 2;
 				}
 			}
 			if ((curr += passpitch) >= bufferend)
