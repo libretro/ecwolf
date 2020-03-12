@@ -310,7 +310,7 @@ FArchive &operator<< (FArchive &arc, SndSeqPlayer *&seqplayer)
 {
 	FName seqname;
 	MapSpot source;
-	unsigned int offs;
+	uint32_t offs;
 
 	if(arc.IsStoring())
 	{

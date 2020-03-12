@@ -297,9 +297,9 @@ void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, b
 {
 	FString str;
 	if(zerofill)
-		str.Format("%0*d", width, number);
+		str.Format("%0*d", width, (int) number);
 	else
-		str.Format("%*d", width, number);
+		str.Format("%*d", width, (int) number);
 	if(str.Len() > width && cap)
 	{
 		int maxval = width <= 9 ? ninestbl[width] : INT_MAX;

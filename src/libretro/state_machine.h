@@ -293,7 +293,7 @@ typedef struct wl_state_s {
 	SDWORD textposition;
 	SDWORD pagenum;
 	SDWORD numpages;
-	unsigned rowon;
+	uint32_t rowon;
 	byte    fontcolor;
 	int32_t     picx;
 	int32_t     picy;

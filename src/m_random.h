@@ -209,7 +209,7 @@ private:
 	union
 	{
 		w128_t w128[SFMT::N];
-		unsigned int u[SFMT::N32];
+		uint32_t u[SFMT::N32];
 		QWORD u64[SFMT::N64];
 	} sfmt;
 	/** index counter to the 32-bit internal state array */
