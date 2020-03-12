@@ -206,6 +206,7 @@ virtual void Read (void *mem, unsigned int len);
 	INT_OPERATOR(unsigned int);
 	INT_OPERATOR(unsigned long int);
 	INT_OPERATOR(unsigned long long int);
+	INT_OPERATOR(char);
 
 	        //FArchive& operator<< (QWORD_UNION &i) { return operator<< (i.AsOne); }
 		FArchive& operator<< (float &f);
@@ -224,6 +225,8 @@ virtual void Read (void *mem, unsigned int len);
 		void WriteSprite (int spritenum);
 		int ReadSprite ();
 
+inline FArchive& operator<< (unsigned char *&str) { return operator<< ((char *&)str); }
+inline FArchive& operator<< (signed char *&str) { return operator<< ((char *&)str); }
 inline	FArchive& operator<< (bool &b) { return operator<< ((BYTE &)b); }
 inline  FArchive& operator<< (DObject* &object) { return ReadObject (object, const_cast<ClassDef *>(RUNTIME_CLASS(DObject))); }
 
