@@ -224,6 +224,8 @@ virtual void Read (void *mem, unsigned int len);
 		void WriteSprite (int spritenum);
 		int ReadSprite ();
 
+inline FArchive& operator<< (unsigned char *&str) { return operator<< ((char *&)str); }
+inline FArchive& operator<< (signed char *&str) { return operator<< ((char *&)str); }
 inline	FArchive& operator<< (bool &b) { return operator<< ((BYTE &)b); }
 inline  FArchive& operator<< (DObject* &object) { return ReadObject (object, const_cast<ClassDef *>(RUNTIME_CLASS(DObject))); }
 
