@@ -80,7 +80,8 @@ static retro_input_state_t input_state_cb;
 static retro_video_refresh_t video_cb;
 static retro_log_printf_t log_cb;
 static bool libretro_supports_bitmasks = false;
-static int screen_width = 640, screen_height = 400, fps = 35;
+// fp10s is 10 times the FPS
+static int screen_width = 640, screen_height = 400, fp10s = 350;
 static bool dynamic_fps = false;
 static int analog_deadzone;
 static int preferred_bpp;
@@ -373,7 +374,7 @@ void Quit (const char *errorStr, ...)
 
 	libretro_log("Fatal error: %s", formatted);
    msg.msg    = formatted;
-	msg.frames = fps * 10;
+	msg.frames = fp10s;
 	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
 	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
 	throw CFatalError(formatted);
@@ -528,6 +529,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Refresh rate (FPS)",
 		"Configure the FPS.",
 		{
+			{ "17.5", NULL },
 			{ "25", NULL },
 			{ "30", NULL },
 			{ "35", NULL },
@@ -763,12 +765,14 @@ int AnalogTurnSensitivity = 20;
 static void announce_frame_callback()
 {
 	frame_cb.callback  = frame_time_cb;
-	if (fps == TICRATE / 2)
+	if (fp10s == TICRATE * 2 + TICRATE / 2)
+		frame_cb.reference = 4 * TIC_TIME_US;
+	else if (fp10s == TICRATE * 5)
 		frame_cb.reference = 2 * TIC_TIME_US;
-	else if (fps == TICRATE)
+	else if (fp10s == TICRATE * 10)
 		frame_cb.reference = TIC_TIME_US;
 	else
-		frame_cb.reference = 1000000 / fps;
+		frame_cb.reference = 10000000 / fp10s;
 	environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frame_cb);
 }
 
@@ -853,7 +857,7 @@ static void update_variables(bool startup)
 #endif
 	int oldw = screen_width;
 	int oldh = screen_height;
-	int oldfps = fps;
+	int oldfp10s = fp10s;
 
 	const char *resolution = get_string_variable("ecwolf-resolution");
 
@@ -879,9 +883,13 @@ static void update_variables(bool startup)
 		screen_height = 200;
 	}
 
-	fps = get_unsigned_variable("ecwolf-fps", 35);
+	const char *fpsstr = get_string_variable("ecwolf-fps") ?: "35";
+	if (strcmp (fpsstr, "17.5") == 0)
+		fp10s = 175;
+	else
+		fp10s = strtoul(fpsstr, NULL, 0) * 10;
 	if (log_cb)
-		log_cb(RETRO_LOG_INFO, "Got FPS: %u.\n", fps);
+		log_cb(RETRO_LOG_INFO, "Got FPS: %u.%u.\n", fp10s / 10, fp10s % 10);
 
 	if (startup) {
 		const char *palette = get_string_variable("ecwolf-palette");
@@ -892,7 +900,7 @@ static void update_variables(bool startup)
 			preferred_bpp = 16;
 	}
 
-	if (oldw != screen_width || oldh != screen_height || oldfps != fps)
+	if (oldw != screen_width || oldh != screen_height || oldfp10s != fp10s)
 	{
 		struct retro_system_av_info avinfo;
 		retro_get_system_av_info(&avinfo);
@@ -909,7 +917,7 @@ static void update_variables(bool startup)
 			screenHeight = screen_height;
 		}
 	}
-	if (oldfps != fps)
+	if (oldfp10s != fp10s)
 	{
 		announce_frame_callback();
 	}
@@ -1431,7 +1439,7 @@ void retro_get_system_info(struct retro_system_info *info)
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
 	memset(info, 0, sizeof(*info));
-	info->timing.fps            = (double) fps;
+	info->timing.fps            = (double) fp10s / 10.0;
 	info->timing.sample_rate    = (double) SAMPLERATE;
 
 	info->geometry.base_width   = screen_width;
