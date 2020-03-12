@@ -43,6 +43,7 @@ endif
 CORE_DIR    += ../..
 TARGET_NAME := ecwolf
 LIBM		    = -lm
+DISABLE_ADLIB = 0
 
 ifeq ($(ARCHFLAGS),)
 ifeq ($(archs),ppc)

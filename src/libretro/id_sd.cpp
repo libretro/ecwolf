@@ -64,7 +64,9 @@ void    SD_Startup(void)
 	SoundInfo.Init();
 	SoundSeq.Init();
 	SoundPlaying = FString();
+#ifndef DISABLE_ADLIB
 	SD_Startup_Adlib();
+#endif
 
 	SD_Started = true;
 }
@@ -242,6 +244,9 @@ static int cacheptr;
 
 Mix_Chunk *GetMusic(const char* chunk)
 {
+#ifdef DISABLE_ADLIB
+	return NULL;
+#else	
 	for (int i = 0; i < MUSIC_CACHE_SIZE; i++) {
 		if (music_cache[i].name != NULL && strcmp(music_cache[i].name, chunk) == 0)
 			return music_cache[i].chunk;
@@ -262,6 +267,7 @@ Mix_Chunk *GetMusic(const char* chunk)
 	music_cache[cacheptr].chunk = res;
 	cacheptr++;
 	return res;
+#endif
 }
 
 void    SD_ContinueMusic(const char* chunk, int startoffs)
@@ -271,10 +277,12 @@ void    SD_ContinueMusic(const char* chunk, int startoffs)
 	SD_MusicOff();
 
 	Mix_Chunk *sample = GetMusic(chunk);
+	if (!sample)
+		return;
 
 	g_state.musicChannel.sample = sample;
 	g_state.musicChannel.sound = chunk;
-	g_state.musicChannel.type = SoundData::DIGITAL;
+	g_state.musicChannel.type = SoundData::ADLIB;
 	g_state.musicChannel.startTick = currentTick;
 	g_state.musicChannel.isMusic = true;
 	g_state.musicChannel.skipTicks = startoffs;
@@ -425,10 +433,12 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
 	switch(type) {
 	case SoundData::DIGITAL:
 		return which.GetDigitalData();
+#ifndef DISABLE_ADLIB
 	case SoundData::ADLIB:
 		if (!synth.adlibSynth)
 			synth.adlibSynth.Reset(SynthesizeAdlib(which.GetAdLibData()));
 		return synth.adlibSynth;
+#endif
 	case SoundData::PCSPEAKER:
 		if (!synth.pcSynth)
 			synth.pcSynth.Reset(SynthesizeSpeaker(which.GetSpeakerData()));

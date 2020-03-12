@@ -656,6 +656,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
+#ifndef DISABLE_ADLIB
 	{
 		"ecwolf-music-volume",
 		"Volume of music",
@@ -663,6 +664,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		SLIDER_OPTIONS,
 		"20"
 	},
+#endif
 	{
 		"ecwolf-digi-volume",
 		"Volume of digitized sound effects",
@@ -670,6 +672,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		SLIDER_OPTIONS,
 		"20"
 	},
+#ifndef DISABLE_ADLIB
 	{
 		"ecwolf-adlib-volume",
 		"Volume of Adlib sound effects",
@@ -677,6 +680,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		SLIDER_OPTIONS,
 		"20"
 	},
+#endif
 	{
 		"ecwolf-speaker-volume",
 		"Volume of Speaker sound effects",
@@ -703,15 +707,23 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Order of lookup for effects",
 		"Which variants of assets are used in priority",
 		{
+#ifndef DISABLE_ADLIB
 			{ "digi-adlib-speaker", "Digitized, Adlib, Speaker" },
 			{ "digi-adlib", "Digitized, Adlib" },
+#endif
 			{ "digi-speaker", "Digitized, Speaker" },
 			{ "digi", "Digitized only" },
+#ifndef DISABLE_ADLIB
 			{ "adlib", "Adlib only" },
+#endif
 			{ "speaker", "Speaker only" },
 			{ NULL, NULL },
 		},
+#ifndef DISABLE_ADLIB
 		"digi-adlib-speaker",
+#else
+		"digi-speaker",
+#endif
 	},
 	{
 		"ecwolf-aspect",
@@ -953,9 +965,14 @@ static void update_variables(bool startup)
 	if (am_updated)
 		AM_UpdateFlags();
 
+#ifndef DISABLE_ADLIB
 	MusicVolume = get_slider_option("ecwolf-music-volume");
-	SpeakerVolume = get_slider_option("ecwolf-speaker-volume");
 	AdlibVolume = get_slider_option("ecwolf-adlib-volume");
+#else
+	MusicVolume = 0;
+	AdlibVolume = 0;
+#endif
+	SpeakerVolume = get_slider_option("ecwolf-speaker-volume");
 	DigiVolume = get_slider_option("ecwolf-digi-volume");
 	AnalogMoveSensitivity = get_slider_option ("ecwolf-analog-move-sensitivity");
 	AnalogTurnSensitivity = get_slider_option ("ecwolf-analog-turn-sensitivity");
