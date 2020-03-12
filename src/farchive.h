@@ -206,6 +206,7 @@ virtual void Read (void *mem, unsigned int len);
 	INT_OPERATOR(unsigned int);
 	INT_OPERATOR(unsigned long int);
 	INT_OPERATOR(unsigned long long int);
+	INT_OPERATOR(char);
 
 	        //FArchive& operator<< (QWORD_UNION &i) { return operator<< (i.AsOne); }
 		FArchive& operator<< (float &f);
