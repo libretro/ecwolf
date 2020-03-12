@@ -169,7 +169,7 @@ class AWeapon : public AInventory
 
 		WeaponFlags		weaponFlags;
 		const ClassDef	*ammotype[2];
-		int				ammogive[2];
+		SDWORD				ammogive[2];
 		DWORD	ammouse[2];
 		fixed			yadjust;
 		float			fovscale;

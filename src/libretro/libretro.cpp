@@ -1727,7 +1727,7 @@ void SerializeExtra(FArchive &arc, bool &isGameless, DWORD &version)
 		screen->GetFlash(flash, amount);
 	}
 	arc << flash;
-	arc << amount;
+	arc << (int32_t &) amount;
 	if (serialize_version >= 10) {
 		if (screen) {
 			PalEntry *palette = screen->GetPalette();
@@ -1745,7 +1745,7 @@ void SerializeExtra(FArchive &arc, bool &isGameless, DWORD &version)
 	}
 
 	if (serialize_version >= 5) {
-		int num_channels = MIX_CHANNELS;
+		int32_t num_channels = MIX_CHANNELS;
 		arc << num_channels;
 		for (int i = 0; i < num_channels; i++)
 			g_state.channels[i].Serialize(arc);

@@ -101,7 +101,7 @@ class GameMap
 			enum Side { East, North, West, South };
 			unsigned int	action;
 			bool			activate[4];
-			int				arg[5];
+			int32_t				arg[5];
 
 			bool			playerUse;
 			bool			playerCross;

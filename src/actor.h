@@ -168,7 +168,7 @@ class AActor : public Thinker,
 		angle_t pitch;
 		int32_t	health;
 		int32_t	speed, runspeed;
-		int		points;
+		int32_t		points;
 		fixed	radius;
 		fixed	projectilepassheight;
 
