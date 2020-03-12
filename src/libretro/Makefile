@@ -127,7 +127,7 @@ else ifeq ($(platform), ps2)
 	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    STATIC_LINKING = 1
 else ifeq ($(platform), psp1)
-   TARGET := $(TARGET_NAME)_psp1.a
+   TARGET := $(TARGET_NAME)_libretro_psp1.a
    CC = psp-gcc
    CXX = psp-g++
    AR = psp-ar
