@@ -177,7 +177,7 @@ else ifeq ($(platform), libnx)
     CFLAGS += $(INCDIRS) -I$(CORE_DIR)/zlib -I$(CORE_DIR)/libogg/include -I$(CORE_DIR)/libvorbis/include \
 		-I$(CORE_DIR)/jpeg-8c -fvisibility=hidden
     CFLAGS	+= -march=armv8-a -mtune=cortex-a57 -mtp=soft -mcpu=cortex-a57+crc+fp+simd -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-    CXXFLAGS := $(ASFLAGS) $(CFLAGS) -std=gnu++11
+    CXXFLAGS := $(ASFLAGS) $(CFLAGS)
     STATIC_LINKING = 1
 # CTR (3DS)
 else ifeq ($(platform), ctr)
@@ -187,7 +187,7 @@ else ifeq ($(platform), ctr)
 	AR = $(DEVKITARM)/bin/arm-none-eabi-ar$(EXE_EXT)
 	DEFINES += -D_3DS -DARM11 -march=armv6k -mtune=mpcore -mfloat-abi=hard
   CFLAGS += $(DEFINES) -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += $(CFLAGS) -std=gnu++11
+	CXXFLAGS += $(CFLAGS)
 	STATIC_LINKING = 1
 else
    CC = gcc
@@ -260,7 +260,7 @@ TOPDIR ?= $(CURDIR)
 CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DCORE=ON -DSDL2=ON -DBASE=ON -DUSE_FILE32API -ffast-math \
 			-fno-strict-aliasing -fvisibility=hidden -fomit-frame-pointer \
 			-Wno-sign-compare -Wno-switch -Wno-format-security -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
-CXXFLAGS += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -fpermissive -std=gnu++11
+CXXFLAGS += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -fpermissive -std=gnu++98
 
 ifneq ($(platform), emscripten)
 CFLAGS += -fno-unsafe-math-optimizations
