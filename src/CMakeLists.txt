@@ -144,6 +144,7 @@ if(LIBRETRO)
     libretro/libretro-vfs.cpp
     libretro/id_in.cpp
     libretro/id_sd.cpp
+    libretro/id_sd_adlib.cpp
     libretro/id_us_1.cpp
     libretro/wl_play.cpp
     libretro/wl_game.cpp

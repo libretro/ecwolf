@@ -388,4 +388,7 @@ extern bool palshifted;
 void DrawVictory (bool fromIntermission);
 extern bool store_files_in_memory;
 
+Mix_Chunk *SynthesizeAdlibIMF(const byte *dataRaw, size_t size);
+void    SD_Startup_Adlib(void);
+Mix_Chunk *SynthesizeAdlib(const byte *dataRaw);
 #endif

@@ -201,6 +201,7 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/libretro/libretro-vfs.cpp \
 	$(CORE_DIR)/src/libretro/id_in.cpp \
 	$(CORE_DIR)/src/libretro/id_sd.cpp \
+	$(CORE_DIR)/src/libretro/id_sd_adlib.cpp \
 	$(CORE_DIR)/src/libretro/id_us_1.cpp \
 	$(CORE_DIR)/src/libretro/wl_play.cpp \
 	$(CORE_DIR)/src/libretro/wl_game.cpp \
