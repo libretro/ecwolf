@@ -11,12 +11,12 @@
 
 extern struct LRstruct
 {
-	unsigned int killratio;
-	unsigned int secretsratio;
-	unsigned int treasureratio;
-	unsigned int numLevels;
-	unsigned int time;
-	unsigned int par;
+	uint32_t killratio;
+	uint32_t secretsratio;
+	uint32_t treasureratio;
+	uint32_t numLevels;
+	uint32_t time;
+	uint32_t par;
 } LevelRatios;
 
 void DrawHighScores(void);

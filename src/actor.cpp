@@ -126,7 +126,7 @@ FArchive &operator<< (FArchive &arc, const Frame *&frame)
 	else
 	{
 		const ClassDef *cls;
-		unsigned int frameIndex;
+		DWORD frameIndex;
 
 		arc << cls;
 		if(cls)
