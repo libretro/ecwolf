@@ -213,7 +213,7 @@ private:
 		QWORD u64[SFMT::N64];
 	} sfmt;
 	/** index counter to the 32-bit internal state array */
-	int idx;
+	int32_t idx;
 	BYTE oldidx;
 	/** a flag: it is 0 if and only if the internal state is not yet
 	 * initialized. */

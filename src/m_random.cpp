@@ -345,7 +345,7 @@ void FRandom::StaticReadRNGState (FArchive &arc, int rngcount)
 		}
 		if (rng == NULL)
 		{ // The RNG was removed. Skip it.
-			int idx;
+			int32_t idx;
 			DWORD sfmt;
 			arc << idx;
 			if(GameSave::SaveVersion >= 1379630950u)

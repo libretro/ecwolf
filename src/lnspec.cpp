@@ -327,8 +327,8 @@ class EVDoor : public Thinker
 		FName seqname;
 
 		unsigned int speed;
-		int amount;
-		int opentics;
+		int32_t amount;
+		int32_t opentics;
 		unsigned int wait;
 		bool direction;
 };

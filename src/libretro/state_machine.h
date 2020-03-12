@@ -295,9 +295,9 @@ typedef struct wl_state_s {
 	SDWORD numpages;
 	unsigned rowon;
 	byte    fontcolor;
-	int     picx;
-	int     picy;
-	int     picdelay;
+	int32_t     picx;
+	int32_t     picy;
+	int32_t     picdelay;
 	bool    layoutdone;
 
 	struct IntermissionGState intermission;

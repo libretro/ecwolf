@@ -882,7 +882,7 @@ void GameMap::ReadMacData()
 				MapSpot spot = &mapPlane.map[y*64+x];
 				if(trigger.action == Specials::Door_Open || trigger.action == Specials::Door_Elevator)
 				{
-					const unsigned int tex = type/2 != 96/2 ? firstdoor+MIN(trigger.arg[3], 3)*2 : firstdoor+6;
+					const unsigned int tex = type/2 != 96/2 ? firstdoor+MIN<int32_t>(trigger.arg[3], 3)*2 : firstdoor+6;
 					spot->SetTile(&tilePalette[tex+!(trigger.arg[4]&1)]);
 				}
 
@@ -1399,7 +1399,7 @@ void GameMap::ReadPlanesData()
 		{
 			unsigned int elevTag = 0;
 			unsigned int swtchTag = 0;
-			int *lastNext = NULL;
+			int32_t *lastNext = NULL;
 			for(unsigned int i = 0;i < locations.Size();++i)
 			{
 				MapSpot spot = locations[i];
