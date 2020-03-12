@@ -1259,7 +1259,7 @@ void FSingleLumpFont::LoadFON2 (int lump, const BYTE *data)
 {
 	int count, i, totalwidth;
 	int *widths2;
-	WORD *widths;
+	BYTE *widths;
 	const BYTE *palette;
 	const BYTE *data_p;
 
@@ -1276,34 +1276,34 @@ void FSingleLumpFont::LoadFON2 (int lump, const BYTE *data)
 	widths2 = new int[count];
 	if (data[11] & 1)
 	{ // Font specifies a kerning value.
-		GlobalKerning = LittleShort(*(SWORD *)&data[12]);
-		widths = (WORD *)(data + 14);
+		GlobalKerning = ReadLittleShort(&data[12]);
+		widths = (BYTE*)(data + 14);
 	}
 	else
 	{ // Font does not specify a kerning value.
 		GlobalKerning = 0;
-		widths = (WORD *)(data + 12);
+		widths = (BYTE*)(data + 12);
 	}
 	totalwidth = 0;
 
 	if (data[8])
 	{ // Font is mono-spaced.
-		totalwidth = LittleShort(widths[0]);
+		totalwidth = ReadLittleShort(widths);
 		for (i = 0; i < count; ++i)
 		{
 			widths2[i] = totalwidth;
 		}
 		totalwidth *= count;
-		palette = (BYTE *)&widths[1];
+		palette = widths + 2;
 	}
 	else
 	{ // Font has varying character widths.
 		for (i = 0; i < count; ++i)
 		{
-			widths2[i] = LittleShort(widths[i]);
+			widths2[i] = ReadLittleShort(widths + 2 * i);
 			totalwidth += widths2[i];
 		}
-		palette = (BYTE *)(widths + i);
+		palette = widths + 2 * i;
 	}
 
 	if (FirstChar <= ' ' && LastChar >= ' ')
@@ -1427,7 +1427,7 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 	LastChar = 0;
 
 	// Copy header information and then do a sanity check
-	FontHeight = LittleShort(*(const int16_t *)data);
+	FontHeight = ReadLittleShort(data);
 	if(FontHeight == 0 && length >= 1540 )
 	{
 		// ROTT defines the first byte as "color" but doesn't seem to read it.
@@ -1435,7 +1435,7 @@ bool FSingleLumpFont::LoadWolfFont(int lump, const BYTE *data, size_t length)
 		// somebody didn't put zero here, but I haven't really heard of ROTT
 		// mods either. Byte 2 seems to be padding.
 		FontType = ROTTCFONT;
-		FontHeight = LittleShort(*(const int16_t *)(data+2));
+		FontHeight = ReadLittleShort(data+2);
 		memcpy(width, data+229, 31);
 		memcpy(width+31, data+4, 225);
 		memcpy(location, data+710, 62);

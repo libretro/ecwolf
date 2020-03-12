@@ -719,9 +719,9 @@ bool M_ReadIDAT (FileReader *file, BYTE *buffer, int width, int height, int pitc
 static inline void MakeChunk (void *where, DWORD type, size_t len)
 {
 	BYTE *const data = (BYTE *)where;
-	*(DWORD *)(data - 8) = BigLong ((unsigned int)len);
-	*(DWORD *)(data - 4) = type;
-	*(DWORD *)(data + len) = BigLong ((unsigned int)CalcCRC32 (data-4, (unsigned int)(len+4)));
+	WriteBigLong (data - 8, (unsigned int)len);
+	WriteBigLong (data - 4, type);
+	WriteBigLong (data + len, (unsigned int)CalcCRC32 (data-4, (unsigned int)(len+4)));
 }
 
 //==========================================================================

@@ -742,7 +742,7 @@ Mix_Chunk *SynthesizeAdlibIMF(const byte *dataRaw, size_t size)
 	int alLength = size / 4;
 	const byte *alSound = dataRaw;
 	if(alSound[0] != 0 || alSound[1] != 0) {
-		alLength = LittleShort(*(WORD*)alSound) / 4;
+		alLength = ReadLittleShort(alSound) / 4;
 		if (alLength > (size - 2) / 4)
 			alLength = (size - 2) / 4;
 		alSound += 2;
@@ -763,11 +763,11 @@ void Mix_Chunk_IMF::EnsureSpace(int need_samples)
 }
 
 void Mix_Chunk_IMF::EnsureSynthesis(int maxTics)
-{	
+{
 	for (;imfptr < imfsize && sample_count < maxTics * rate / TICRATE; imfptr++) {
 		byte reg = imf[4*imfptr];
 		byte val = imf[4*imfptr + 1];
-		int tics = LittleShort(((WORD *)imf)[imfptr * 2 + 1]);
+		int tics = ReadLittleShort((BYTE *)imf + imfptr * 4 + 2);
 		YM3812Write(musicOpl, reg, val, 20);
 
 		EnsureSpace(sample_count + samplesPerMusicTick * tics);
