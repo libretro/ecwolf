@@ -192,11 +192,22 @@ virtual void Read (void *mem, unsigned int len);
 		void UserWriteClass (const ClassDef *info);
 		void UserReadClass (const ClassDef *&info);
 
-		FArchive& operator<< (BYTE &c);
-		FArchive& operator<< (WORD &s);
-		FArchive& operator<< (DWORD &i);
-		FArchive& operator<< (QWORD &i);
-		//FArchive& operator<< (QWORD_UNION &i) { return operator<< (i.AsOne); }
+	        FArchive& StoreInt(void *p, size_t sz);
+
+#define INT_OPERATOR(type) inline FArchive& operator<< (type &v) { return StoreInt(&v, sizeof(v)); }
+
+	INT_OPERATOR(signed char);
+	INT_OPERATOR(signed short);
+	INT_OPERATOR(signed int);
+	INT_OPERATOR(signed long int);
+	INT_OPERATOR(signed long long int);
+	INT_OPERATOR(unsigned char);
+	INT_OPERATOR(unsigned short);
+	INT_OPERATOR(unsigned int);
+	INT_OPERATOR(unsigned long int);
+	INT_OPERATOR(unsigned long long int);
+
+	        //FArchive& operator<< (QWORD_UNION &i) { return operator<< (i.AsOne); }
 		FArchive& operator<< (float &f);
 		FArchive& operator<< (double &d);
 		FArchive& operator<< (char *&str);
@@ -213,12 +224,6 @@ virtual void Read (void *mem, unsigned int len);
 		void WriteSprite (int spritenum);
 		int ReadSprite ();
 
-inline	FArchive& operator<< (SBYTE &c) { return operator<< ((BYTE &)c); }
-inline	FArchive& operator<< (SWORD &s) { return operator<< ((WORD &)s); }
-inline	FArchive& operator<< (SDWORD &i) { return operator<< ((DWORD &)i); }
-inline	FArchive& operator<< (SQWORD &i) { return operator<< ((QWORD &)i); }
-inline	FArchive& operator<< (unsigned char *&str) { return operator<< ((char *&)str); }
-inline	FArchive& operator<< (signed char *&str) { return operator<< ((char *&)str); }
 inline	FArchive& operator<< (bool &b) { return operator<< ((BYTE &)b); }
 inline  FArchive& operator<< (DObject* &object) { return ReadObject (object, const_cast<ClassDef *>(RUNTIME_CLASS(DObject))); }
 

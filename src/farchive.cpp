@@ -995,57 +995,28 @@ FArchive &FArchive::operator<< (FString &str)
 	return *this;
 }
 
-FArchive &FArchive::operator<< (BYTE &c)
+FArchive& FArchive::StoreInt(void *p, size_t sz)
 {
-	if (m_Storing)
-		Write (&c, sizeof(BYTE));
+#ifdef __BIG_ENDIAN__
+  	if (m_Storing)
+		Write (p, sz);
 	else
-		Read (&c, sizeof(BYTE));
-	return *this;
-}
-
-FArchive &FArchive::operator<< (WORD &w)
-{
-	if (m_Storing)
-	{
-		WORD temp = SWAP_WORD(w);
-		Write (&temp, sizeof(WORD));
+		Read (p, sz);
+#else
+	union {
+		unsigned long long ull;
+		unsigned char b[8];
+	} buffer;
+  	if (m_Storing) {
+		for (int i = 0; i < sz; i++)
+			buffer.b[i] = ((unsigned char *)p)[sz - i - 1];
+		Write (buffer.b, sz);
+	} else {
+		Read (buffer.b, sz);
+		for (int i = 0; i < sz; i++)
+			((unsigned char *)p)[sz - i - 1] = buffer.b[i];
 	}
-	else
-	{
-		Read (&w, sizeof(WORD));
-		w = SWAP_WORD(w);
-	}
-	return *this;
-}
-
-FArchive &FArchive::operator<< (DWORD &w)
-{
-	if (m_Storing)
-	{
-		DWORD temp = SWAP_DWORD(w);
-		Write (&temp, sizeof(DWORD));
-	}
-	else
-	{
-		Read (&w, sizeof(DWORD));
-		w = SWAP_DWORD(w);
-	}
-	return *this;
-}
-
-FArchive &FArchive::operator<< (QWORD &w)
-{
-	if (m_Storing)
-	{
-		QWORD temp = SWAP_QWORD(w);
-		Write (&temp, sizeof(QWORD));
-	}
-	else
-	{
-		Read (&w, sizeof(QWORD));
-		w = SWAP_QWORD(w);
-	}
+#endif
 	return *this;
 }
 

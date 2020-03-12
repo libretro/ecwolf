@@ -189,7 +189,7 @@ static void ContinueCounting(wl_state_t *state)
 	}
 
 	if(state->countCurrent) Erase (tx, ty, tempstr, true);
-	tempstr.Format("%d", (int) state->countCurrent);
+	tempstr.Format("%d", state->countCurrent);
 	Write (tx, ty, tempstr, true, state->bonusFont);
 	state->prevCount = tempstr;
 	if (state->intermissionSndFreq == 0)
@@ -250,10 +250,10 @@ static void InterAddBonus(wl_state_t *state, unsigned int bonus, bool count=fals
 	}
 
 	FString bonusstr;
-	bonusstr.Format("%u", (unsigned) InterState.bonus);
+	bonusstr.Format("%u", InterState.bonus);
 	Erase (36, y>>3, bonusstr, true);
 	InterState.bonus += bonus;
-	bonusstr.Format("%u", (unsigned) InterState.bonus);
+	bonusstr.Format("%u", InterState.bonus);
 	Write (36, y>>3, bonusstr, true, InterState.graphical);
 	VW_UpdateScreen ();
 }
@@ -347,7 +347,7 @@ static void InterStartNormal()
 
 	// Write the starting value based on InterState.bonus in case ForceTally is on
 	FString bonusstr;
-	bonusstr.Format("%u", (unsigned) InterState.bonus);
+	bonusstr.Format("%u", InterState.bonus);
 	Write (36, 7, bonusstr, true);
 
 	Write (37, 14, "%");
@@ -370,7 +370,7 @@ static void InterStartGraphical(wl_state_t *state)
 	VWB_DrawGraphic(TexMan(GraphicalTexID[WI_BONUS]), 104, 72);
 	// Write the starting value based on InterState.bonus in case ForceTally is on
 	FString bonusstr;
-	bonusstr.Format("%u", (unsigned) InterState.bonus);
+	bonusstr.Format("%u", InterState.bonus);
 	Write (36, 9, bonusstr, true, true);
 #ifdef TODO
 	VW_UpdateScreen ();
@@ -779,7 +779,7 @@ void DrawHighScores (void)
 		//
 		// score
 		//
-		buffer.Format("%d", (int) s->score);
+		buffer.Format("%d", s->score);
 		VW_MeasurePropString (font, buffer, w, h);
 		PrintX = 292 - w;
 		US_Print (font, buffer, gameinfo.FontColors[GameInfo::HIGHSCORES]);

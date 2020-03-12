@@ -63,9 +63,9 @@ class GameMap
 		{
 			FString name;
 			FString music;
-			uint32_t width;
-			uint32_t height;
-			uint32_t tileSize;
+			unsigned int width;
+			unsigned int height;
+			unsigned int tileSize;
 		};
 		struct Thing
 		{
@@ -93,13 +93,13 @@ class GameMap
 				arg[0] = arg[1] = arg[2] = arg[3] = arg[4] = 0;
 			}
 
-			uint32_t	x, y, z;
+			unsigned int	x, y, z;
 			// Stores if the trigger hasn't been used yet.
 			// Note that this is set to false on for repeatable actions as well so that secrets are only accounted for once.
 			bool			active;
 
 			enum Side { East, North, West, South };
-			uint32_t	action;
+			unsigned int	action;
 			bool			activate[4];
 			int32_t				arg[5];
 
@@ -142,7 +142,7 @@ class GameMap
 		{
 			const GameMap	*gm;
 
-			uint32_t	depth;
+			unsigned int	depth;
 			struct Map
 			{
 				Map() : tile(NULL), sector(NULL), zone(NULL), visible(false),
@@ -169,14 +169,14 @@ class GameMap
 				FTextureID		texture[4];
 
 				bool			visible;
-				uint32_t	amFlags;
+				unsigned int	amFlags;
 				TObjPtr<Thinker> thinker;
-				uint32_t	slideAmount[4];
-				uint32_t	slideStyle;
+				unsigned int	slideAmount[4];
+				unsigned int	slideStyle;
 				bool			sideSolid[4];
 				TArray<Trigger>	triggers;
 				Tile::Side		pushDirection;
-				uint32_t	pushAmount;
+				unsigned int	pushAmount;
 				Map				*pushReceptor;
 
 				unsigned int	tag;

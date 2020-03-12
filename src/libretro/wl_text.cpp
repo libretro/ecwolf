@@ -563,8 +563,7 @@ static void PageLayout (wl_state_t *state, bool shownumber, bool helphack)
 	if (shownumber)
 	{
 		FString str;
-		str.Format("pg %d of %d", (int) state->pagenum,
-			   (int) state->numpages);
+		str.Format("pg %d of %d", state->pagenum, state->numpages);
 		px = 213;
 		py = 183;
 
