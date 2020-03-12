@@ -86,7 +86,7 @@ FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(fil
 	{
 		FLumpReader *lreader = reinterpret_cast<FLumpReader *>(file);
 
-		for(uint32_t i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
+		for(DWORD i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
 		{
 			FResourceLump *lump = lreader->LumpOwner()->GetLump(i);
 			if(lump->FullName.CompareNoCase(mapheadFile) == 0)
@@ -118,7 +118,7 @@ FResourceLump *FGamemaps::GetLump(int lump)
 
 bool FGamemaps::Open(bool quiet)
 {
-	uint16_t rlewTag;
+	WORD rlewTag;
 
 	// Read the map head.
 	// First two bytes is the tag for the run length encoding
@@ -126,7 +126,7 @@ bool FGamemaps::Open(bool quiet)
 	// hit a 0 offset.
 	unsigned int NumPossibleMaps = (mapheadReader->GetLength()-2)/4;
 	mapheadReader->Seek(0, SEEK_SET);
-	uint32_t* offsets = new uint32_t[NumPossibleMaps];
+	DWORD* offsets = new DWORD[NumPossibleMaps];
 	mapheadReader->Read(&rlewTag, 2);
 	rlewTag = LittleShort(rlewTag);
 	mapheadReader->Read(offsets, NumPossibleMaps*4);

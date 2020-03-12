@@ -96,7 +96,7 @@ void FTextureManager::AddAnim (FAnimDef *anim)
 //
 //==========================================================================
 
-void FTextureManager::AddSimpleAnim (FTextureID picnum, int animcount, int animtype, uint32_t speedmin, uint32_t speedrange)
+void FTextureManager::AddSimpleAnim (FTextureID picnum, int animcount, int animtype, DWORD speedmin, DWORD speedrange)
 {
 	if (AreTexturesCompatible(picnum, picnum + (animcount - 1)))
 	{
@@ -179,7 +179,7 @@ void FTextureManager::InitAnimated (void)
 		const char *anim_p;
 		FTextureID pic1, pic2;
 		int animtype;
-		uint32_t animspeed;
+		DWORD animspeed;
 
 		// Init animation
 		animtype = FAnimDef::ANIM_Forward;
@@ -424,7 +424,7 @@ void FTextureManager::ParseRangeAnim (Scanner &sc, FTextureID picnum, int usetyp
 {
 	int type;
 	FTextureID framenum;
-	uint32_t min, max;
+	DWORD min, max;
 
 	type = FAnimDef::ANIM_Forward;
 	framenum = ParseFramenum (sc, picnum, usetype, missing);
@@ -465,7 +465,7 @@ void FTextureManager::ParseRangeAnim (Scanner &sc, FTextureID picnum, int usetyp
 void FTextureManager::ParsePicAnim (Scanner &sc, FTextureID picnum, int usetype, bool missing, TArray<FAnimDef::FAnimFrame> &frames)
 {
 	FTextureID framenum;
-	uint32_t min, max;
+	DWORD min, max;
 
 	framenum = ParseFramenum (sc, picnum, usetype, missing);
 	ParseTime (sc, min, max);
@@ -519,20 +519,20 @@ FTextureID FTextureManager::ParseFramenum (Scanner &sc, FTextureID basepicnum, i
 //
 //==========================================================================
 
-void FTextureManager::ParseTime (Scanner &sc, uint32_t &min, uint32_t &max)
+void FTextureManager::ParseTime (Scanner &sc, DWORD &min, DWORD &max)
 {
 	if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
 	if (sc->str.Compare ("tics") == 0)
 	{
 		sc.MustGetToken (TK_FloatConst);
-		min = max = uint32_t(sc->decimal * 1000 / 35);
+		min = max = DWORD(sc->decimal * 1000 / 35);
 	}
 	else if (sc->str.Compare ("rand") == 0)
 	{
 		sc.MustGetToken (TK_FloatConst);
-		min = uint32_t(sc->decimal * 1000 / 35);
+		min = DWORD(sc->decimal * 1000 / 35);
 		sc.MustGetToken (TK_FloatConst);
-		max = uint32_t(sc->decimal * 1000 / 35);
+		max = DWORD(sc->decimal * 1000 / 35);
 	}
 	else
 	{
@@ -813,7 +813,7 @@ FDoorAnimation *FTextureManager::FindAnimatedDoor (FTextureID picnum)
 //
 //==========================================================================
 
-void FAnimDef::SetSwitchTime (uint32_t mstime)
+void FAnimDef::SetSwitchTime (DWORD mstime)
 {
 	int speedframe = (AnimType == FAnimDef::ANIM_DiscreteFrames) ? CurFrame : 0;
 
@@ -854,7 +854,7 @@ void FTextureManager::SetTranslation (FTextureID fromtexnum, FTextureID totexnum
 //
 //==========================================================================
 
-void FTextureManager::UpdateAnimations (uint32_t mstime)
+void FTextureManager::UpdateAnimations (DWORD mstime)
 {
 	for (unsigned int j = 0; j < mAnimations.Size(); ++j)
 	{

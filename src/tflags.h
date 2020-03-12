@@ -40,9 +40,9 @@
  * A Qt-inspired type-safe flagset type.
  *
  * T is the enum type of individual flags,
- * TT is the underlying integer type used (defaults to uint32_t)
+ * TT is the underlying integer type used (defaults to DWORD)
  */
-template<typename T, typename TT = uint32_t>
+template<typename T, typename TT = DWORD>
 class TFlags
 {
 	struct ZeroDummy {};

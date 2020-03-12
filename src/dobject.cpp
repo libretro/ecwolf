@@ -408,7 +408,7 @@ void DObject::SerializeUserVars(FArchive &arc)
 #if 0
 	PSymbolTable *symt;
 	FName varname;
-	uint32_t count, j;
+	DWORD count, j;
 	int *varloc = NULL;
 
 	symt = &GetClass()->Symbols;
@@ -450,7 +450,7 @@ void DObject::SerializeUserVars(FArchive &arc)
 		while (varname != NAME_None)
 		{
 			PSymbol *sym = symt->FindSymbol(varname, true);
-			uint32_t wanted = 0;
+			DWORD wanted = 0;
 
 			if (sym != NULL && sym->SymbolType == SYM_Variable)
 			{

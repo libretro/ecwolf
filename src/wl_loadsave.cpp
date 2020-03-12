@@ -67,7 +67,7 @@ extern unsigned vbufPitch;
 namespace GameSave {
 
 unsigned long long SaveVersion = GetSaveVersion();
-uint32_t SaveProdVersion = SAVEPRODVER;
+DWORD SaveProdVersion = SAVEPRODVER;
 
 #ifndef LIBRETRO
 
@@ -592,7 +592,7 @@ bool Load(const FString &filename)
 	delete[] savesig;
 
 	char *prodver = M_GetPNGText(png, "ECWolf Save Product Version");
-	SaveProdVersion = (uint32_t)atoll(prodver);
+	SaveProdVersion = (DWORD)atoll(prodver);
 	delete[] prodver;
 
 	M_GetPNGText(png, "Current Map", gamestate.mapname, 8);

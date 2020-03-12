@@ -47,7 +47,7 @@
 class FSolidTexture : public FTexture
 {
 public:
-	FSolidTexture(uint32_t color);
+	FSolidTexture(DWORD color);
 	~FSolidTexture();
 
 	const BYTE *GetColumn(unsigned int column, const Span **spans_out);
@@ -57,7 +57,7 @@ public:
 protected:
 	BYTE* Pixels;
 	Span **Spans;
-	const uint32_t color;
+	const DWORD color;
 
 	virtual void MakeTexture();
 };
@@ -71,7 +71,7 @@ protected:
 
 FTexture *SolidTexture_TryCreate(const char* color)
 {
-	uint32_t texColor = 0;
+	DWORD texColor = 0;
 	int i = 5;
 	do
 	{
@@ -102,7 +102,7 @@ FTexture *SolidTexture_TryCreate(const char* color)
 //
 //==========================================================================
 
-FSolidTexture::FSolidTexture(uint32_t color) : FTexture(NULL, -1), Pixels(NULL),
+FSolidTexture::FSolidTexture(DWORD color) : FTexture(NULL, -1), Pixels(NULL),
 	Spans(NULL), color(color)
 {
 	Width = 64;

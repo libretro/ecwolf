@@ -41,7 +41,7 @@ struct FRemapTable
 
 	BYTE *Remap;				// For the software renderer
 	PalEntry *Palette;			// The ideal palette this maps to
-	int32_t NumEntries;				// # of elements in this table (usually 256)
+	SDWORD NumEntries;				// # of elements in this table (usually 256)
 	bool Inactive;				// This table is inactive and should be treated as if it was passed as NULL
 
 private:
@@ -72,15 +72,15 @@ extern TAutoGrowArray<FRemapTablePtr, FRemapTable *> translationtables[NUM_TRANS
 #define TRANSLATION_MASK ((1<<TRANSLATION_SHIFT)-1)
 #define TRANSLATIONTYPE_MASK (255<<TRANSLATION_SHIFT)
 
-inline uint32_t TRANSLATION(BYTE a, uint32_t b)
+inline DWORD TRANSLATION(BYTE a, DWORD b)
 {
 	return (a<<TRANSLATION_SHIFT) | b;
 }
-inline int GetTranslationType(uint32_t trans)
+inline int GetTranslationType(DWORD trans)
 {
 	return (trans&TRANSLATIONTYPE_MASK) >> TRANSLATION_SHIFT;
 }
-inline int GetTranslationIndex(uint32_t trans)
+inline int GetTranslationIndex(DWORD trans)
 {
 	return (trans&TRANSLATION_MASK);
 }

@@ -102,9 +102,9 @@ fixed_t 		dc_iscale;
 fixed_t 		dc_texturemid;
 fixed_t			dc_texturefrac;
 int				dc_color;				// [RH] Color for column filler
-uint32_t			dc_srccolor;
-uint32_t			*dc_srcblend;			// [RH] Source and destination
-uint32_t			*dc_destblend;			// blending lookups
+DWORD			dc_srccolor;
+DWORD			*dc_srcblend;			// [RH] Source and destination
+DWORD			*dc_destblend;			// blending lookups
 
 // first pixel in a column (possibly virtual) 
 const BYTE*		dc_source;				
@@ -112,8 +112,8 @@ const BYTE*		dc_source;
 BYTE*			dc_dest;
 int				dc_count;
 
-uint32_t			vplce[4];
-uint32_t			vince[4];
+DWORD			vplce[4];
+DWORD			vince[4];
 BYTE*			palookupoffse[4];
 const BYTE*		bufplce[4];
 
@@ -222,8 +222,8 @@ void R_FillAddColumn (void)
 		return;
 
 	dest = dc_dest;
-	uint32_t *bg2rgb;
-	uint32_t fg;
+	DWORD *bg2rgb;
+	DWORD fg;
 
 	bg2rgb = dc_destblend;
 	fg = dc_srccolor;
@@ -231,7 +231,7 @@ void R_FillAddColumn (void)
 
 	do
 	{
-		uint32_t bg;
+		DWORD bg;
 		bg = (fg + bg2rgb[*dest]) | 0x1f07c1f;
 		*dest = RGB32k[0][0][bg & (bg>>15)];
 		dest += pitch; 
@@ -249,8 +249,8 @@ void R_FillAddClampColumn (void)
 		return;
 
 	dest = dc_dest;
-	uint32_t *bg2rgb;
-	uint32_t fg;
+	DWORD *bg2rgb;
+	DWORD fg;
 
 	bg2rgb = dc_destblend;
 	fg = dc_srccolor;
@@ -258,8 +258,8 @@ void R_FillAddClampColumn (void)
 
 	do
 	{
-		uint32_t a = fg + bg2rgb[*dest];
-		uint32_t b = a;
+		DWORD a = fg + bg2rgb[*dest];
+		DWORD b = a;
 
 		a |= 0x01f07c1f;
 		b &= 0x40100400;
@@ -282,8 +282,8 @@ void R_FillSubClampColumn (void)
 		return;
 
 	dest = dc_dest;
-	uint32_t *bg2rgb;
-	uint32_t fg;
+	DWORD *bg2rgb;
+	DWORD fg;
 
 	bg2rgb = dc_destblend;
 	fg = dc_srccolor | 0x40100400;
@@ -291,8 +291,8 @@ void R_FillSubClampColumn (void)
 
 	do
 	{
-		uint32_t a = fg - bg2rgb[*dest];
-		uint32_t b = a;
+		DWORD a = fg - bg2rgb[*dest];
+		DWORD b = a;
 
 		b &= 0x40100400;
 		b = b - (b >> 5);
@@ -314,8 +314,8 @@ void R_FillRevSubClampColumn (void)
 		return;
 
 	dest = dc_dest;
-	uint32_t *bg2rgb;
-	uint32_t fg;
+	DWORD *bg2rgb;
+	DWORD fg;
 
 	bg2rgb = dc_destblend;
 	fg = dc_srccolor;
@@ -323,8 +323,8 @@ void R_FillRevSubClampColumn (void)
 
 	do
 	{
-		uint32_t a = (bg2rgb[*dest] | 0x40100400) - fg;
-		uint32_t b = a;
+		DWORD a = (bg2rgb[*dest] | 0x40100400) - fg;
+		DWORD b = a;
 
 		b &= 0x40100400;
 		b = b - (b >> 5);
@@ -518,16 +518,16 @@ void R_DrawAddColumnP_C (void)
 	frac = dc_texturefrac;
 
 	{
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
 		int pitch = dc_pitch;
 
 		do
 		{
-			uint32_t fg = colormap[source[frac>>FRACBITS]];
-			uint32_t bg = *dest;
+			DWORD fg = colormap[source[frac>>FRACBITS]];
+			DWORD bg = *dest;
 
 			fg = fg2rgb[fg];
 			bg = bg2rgb[bg];
@@ -598,8 +598,8 @@ void R_DrawTlatedAddColumnP_C (void)
 	frac = dc_texturefrac;
 
 	{
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 		BYTE *translation = dc_translation;
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
@@ -607,8 +607,8 @@ void R_DrawTlatedAddColumnP_C (void)
 
 		do
 		{
-			uint32_t fg = colormap[translation[source[frac>>FRACBITS]]];
-			uint32_t bg = *dest;
+			DWORD fg = colormap[translation[source[frac>>FRACBITS]]];
+			DWORD bg = *dest;
 
 			fg = fg2rgb[fg];
 			bg = bg2rgb[bg];
@@ -642,12 +642,12 @@ void R_DrawShadedColumnP_C (void)
 		const BYTE *source = dc_source;
 		BYTE *colormap = dc_colormap;
 		int pitch = dc_pitch;
-		uint32_t *fgstart = &Col2RGB8[0][dc_color];
+		DWORD *fgstart = &Col2RGB8[0][dc_color];
 
 		do
 		{
-			uint32_t val = colormap[source[frac>>FRACBITS]];
-			uint32_t fg = fgstart[val<<8];
+			DWORD val = colormap[source[frac>>FRACBITS]];
+			DWORD fg = fgstart[val<<8];
 			val = (Col2RGB8[64-val][*dest] + fg) | 0x1f07c1f;
 			*dest = RGB32k[0][0][val & (val>>15)];
 
@@ -678,13 +678,13 @@ void R_DrawAddClampColumnP_C ()
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
 		int pitch = dc_pitch;
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 
 		do
 		{
-			uint32_t a = fg2rgb[colormap[source[frac>>FRACBITS]]] + bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = fg2rgb[colormap[source[frac>>FRACBITS]]] + bg2rgb[*dest];
+			DWORD b = a;
 
 			a |= 0x01f07c1f;
 			b &= 0x40100400;
@@ -720,13 +720,13 @@ void R_DrawAddClampTranslatedColumnP_C ()
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
 		int pitch = dc_pitch;
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 
 		do
 		{
-			uint32_t a = fg2rgb[colormap[translation[source[frac>>FRACBITS]]]] + bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = fg2rgb[colormap[translation[source[frac>>FRACBITS]]]] + bg2rgb[*dest];
+			DWORD b = a;
 
 			a |= 0x01f07c1f;
 			b &= 0x40100400;
@@ -761,13 +761,13 @@ void R_DrawSubClampColumnP_C ()
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
 		int pitch = dc_pitch;
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 
 		do
 		{
-			uint32_t a = (fg2rgb[colormap[source[frac>>FRACBITS]]] | 0x40100400) - bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = (fg2rgb[colormap[source[frac>>FRACBITS]]] | 0x40100400) - bg2rgb[*dest];
+			DWORD b = a;
 
 			b &= 0x40100400;
 			b = b - (b >> 5);
@@ -802,13 +802,13 @@ void R_DrawSubClampTranslatedColumnP_C ()
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
 		int pitch = dc_pitch;
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 
 		do
 		{
-			uint32_t a = (fg2rgb[colormap[translation[source[frac>>FRACBITS]]]] | 0x40100400) - bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = (fg2rgb[colormap[translation[source[frac>>FRACBITS]]]] | 0x40100400) - bg2rgb[*dest];
+			DWORD b = a;
 
 			b &= 0x40100400;
 			b = b - (b >> 5);
@@ -842,13 +842,13 @@ void R_DrawRevSubClampColumnP_C ()
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
 		int pitch = dc_pitch;
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 
 		do
 		{
-			uint32_t a = (bg2rgb[*dest] | 0x40100400) - fg2rgb[colormap[source[frac>>FRACBITS]]];
-			uint32_t b = a;
+			DWORD a = (bg2rgb[*dest] | 0x40100400) - fg2rgb[colormap[source[frac>>FRACBITS]]];
+			DWORD b = a;
 
 			b &= 0x40100400;
 			b = b - (b >> 5);
@@ -883,13 +883,13 @@ void R_DrawRevSubClampTranslatedColumnP_C ()
 		BYTE *colormap = dc_colormap;
 		const BYTE *source = dc_source;
 		int pitch = dc_pitch;
-		uint32_t *fg2rgb = dc_srcblend;
-		uint32_t *bg2rgb = dc_destblend;
+		DWORD *fg2rgb = dc_srcblend;
+		DWORD *bg2rgb = dc_destblend;
 
 		do
 		{
-			uint32_t a = (bg2rgb[*dest] | 0x40100400) - fg2rgb[colormap[translation[source[frac>>FRACBITS]]]];
-			uint32_t b = a;
+			DWORD a = (bg2rgb[*dest] | 0x40100400) - fg2rgb[colormap[translation[source[frac>>FRACBITS]]]];
+			DWORD b = a;
 
 			b &= 0x40100400;
 			b = b - (b >> 5);
@@ -1166,8 +1166,8 @@ void R_DrawSpanTranslucentP_C (void)
 	const BYTE*			colormap = ds_colormap;
 	int 				count;
 	int 				spot;
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	xfrac = ds_xfrac;
 	yfrac = ds_yfrac;
@@ -1185,8 +1185,8 @@ void R_DrawSpanTranslucentP_C (void)
 		do
 		{
 			spot = ((xfrac>>(32-6-6))&(63*64)) + (yfrac>>(32-6));
-			uint32_t fg = colormap[source[spot]];
-			uint32_t bg = *dest;
+			DWORD fg = colormap[source[spot]];
+			DWORD bg = *dest;
 			fg = fg2rgb[fg];
 			bg = bg2rgb[bg];
 			fg = (fg+bg) | 0x1f07c1f;
@@ -1203,8 +1203,8 @@ void R_DrawSpanTranslucentP_C (void)
 		do
 		{
 			spot = ((xfrac >> xshift) & xmask) + (yfrac >> yshift);
-			uint32_t fg = colormap[source[spot]];
-			uint32_t bg = *dest;
+			DWORD fg = colormap[source[spot]];
+			DWORD bg = *dest;
 			fg = fg2rgb[fg];
 			bg = bg2rgb[bg];
 			fg = (fg+bg) | 0x1f07c1f;
@@ -1226,8 +1226,8 @@ void R_DrawSpanMaskedTranslucentP_C (void)
 	const BYTE*			colormap = ds_colormap;
 	int 				count;
 	int 				spot;
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	xfrac = ds_xfrac;
 	yfrac = ds_yfrac;
@@ -1250,8 +1250,8 @@ void R_DrawSpanMaskedTranslucentP_C (void)
 			texdata = source[spot];
 			if (texdata != 0)
 			{
-				uint32_t fg = colormap[texdata];
-				uint32_t bg = *dest;
+				DWORD fg = colormap[texdata];
+				DWORD bg = *dest;
 				fg = fg2rgb[fg];
 				bg = bg2rgb[bg];
 				fg = (fg+bg) | 0x1f07c1f;
@@ -1275,8 +1275,8 @@ void R_DrawSpanMaskedTranslucentP_C (void)
 			texdata = source[spot];
 			if (texdata != 0)
 			{
-				uint32_t fg = colormap[texdata];
-				uint32_t bg = *dest;
+				DWORD fg = colormap[texdata];
+				DWORD bg = *dest;
 				fg = fg2rgb[fg];
 				bg = bg2rgb[bg];
 				fg = (fg+bg) | 0x1f07c1f;
@@ -1300,8 +1300,8 @@ void R_DrawSpanAddClampP_C (void)
 	const BYTE*			colormap = ds_colormap;
 	int 				count;
 	int 				spot;
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	xfrac = ds_xfrac;
 	yfrac = ds_yfrac;
@@ -1319,8 +1319,8 @@ void R_DrawSpanAddClampP_C (void)
 		do
 		{
 			spot = ((xfrac>>(32-6-6))&(63*64)) + (yfrac>>(32-6));
-			uint32_t a = fg2rgb[colormap[source[spot]]] + bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = fg2rgb[colormap[source[spot]]] + bg2rgb[*dest];
+			DWORD b = a;
 
 			a |= 0x01f07c1f;
 			b &= 0x40100400;
@@ -1340,8 +1340,8 @@ void R_DrawSpanAddClampP_C (void)
 		do
 		{
 			spot = ((xfrac >> xshift) & xmask) + (yfrac >> yshift);
-			uint32_t a = fg2rgb[colormap[source[spot]]] + bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = fg2rgb[colormap[source[spot]]] + bg2rgb[*dest];
+			DWORD b = a;
 
 			a |= 0x01f07c1f;
 			b &= 0x40100400;
@@ -1366,8 +1366,8 @@ void R_DrawSpanMaskedAddClampP_C (void)
 	const BYTE*			colormap = ds_colormap;
 	int 				count;
 	int 				spot;
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	xfrac = ds_xfrac;
 	yfrac = ds_yfrac;
@@ -1390,8 +1390,8 @@ void R_DrawSpanMaskedAddClampP_C (void)
 			texdata = source[spot];
 			if (texdata != 0)
 			{
-				uint32_t a = fg2rgb[colormap[texdata]] + bg2rgb[*dest];
-				uint32_t b = a;
+				DWORD a = fg2rgb[colormap[texdata]] + bg2rgb[*dest];
+				DWORD b = a;
 
 				a |= 0x01f07c1f;
 				b &= 0x40100400;
@@ -1418,8 +1418,8 @@ void R_DrawSpanMaskedAddClampP_C (void)
 			texdata = source[spot];
 			if (texdata != 0)
 			{
-				uint32_t a = fg2rgb[colormap[texdata]] + bg2rgb[*dest];
-				uint32_t b = a;
+				DWORD a = fg2rgb[colormap[texdata]] + bg2rgb[*dest];
+				DWORD b = a;
 
 				a |= 0x01f07c1f;
 				b &= 0x40100400;
@@ -1447,11 +1447,11 @@ void R_FillSpan (void)
 // wallscan stuff, in C
 
 #ifndef X86_ASM
-static uint32_t STACK_ARGS vlinec1 ();
+static DWORD STACK_ARGS vlinec1 ();
 static int vlinebits;
 
-uint32_t (STACK_ARGS *dovline1)() = vlinec1;
-uint32_t (STACK_ARGS *doprevline1)() = vlinec1;
+DWORD (STACK_ARGS *dovline1)() = vlinec1;
+DWORD (STACK_ARGS *doprevline1)() = vlinec1;
 
 #ifdef X64_ASM
 extern "C" void vlinetallasm4();
@@ -1462,37 +1462,37 @@ static void STACK_ARGS vlinec4 ();
 void (STACK_ARGS *dovline4)() = vlinec4;
 #endif
 
-static uint32_t STACK_ARGS mvlinec1();
+static DWORD STACK_ARGS mvlinec1();
 static void STACK_ARGS mvlinec4();
 static int mvlinebits;
 
-uint32_t (STACK_ARGS *domvline1)() = mvlinec1;
+DWORD (STACK_ARGS *domvline1)() = mvlinec1;
 void (STACK_ARGS *domvline4)() = mvlinec4;
 
 #else
 
 extern "C"
 {
-uint32_t STACK_ARGS vlineasm1 ();
-uint32_t STACK_ARGS prevlineasm1 ();
-uint32_t STACK_ARGS vlinetallasm1 ();
-uint32_t STACK_ARGS prevlinetallasm1 ();
+DWORD STACK_ARGS vlineasm1 ();
+DWORD STACK_ARGS prevlineasm1 ();
+DWORD STACK_ARGS vlinetallasm1 ();
+DWORD STACK_ARGS prevlinetallasm1 ();
 void STACK_ARGS vlineasm4 ();
 void STACK_ARGS vlinetallasmathlon4 ();
 void STACK_ARGS vlinetallasm4 ();
 void STACK_ARGS setupvlineasm (int);
 void STACK_ARGS setupvlinetallasm (int);
 
-uint32_t STACK_ARGS mvlineasm1();
+DWORD STACK_ARGS mvlineasm1();
 void STACK_ARGS mvlineasm4();
 void STACK_ARGS setupmvlineasm (int);
 }
 
-uint32_t (STACK_ARGS *dovline1)() = vlinetallasm1;
-uint32_t (STACK_ARGS *doprevline1)() = prevlinetallasm1;
+DWORD (STACK_ARGS *dovline1)() = vlinetallasm1;
+DWORD (STACK_ARGS *doprevline1)() = prevlinetallasm1;
 void (STACK_ARGS *dovline4)() = vlinetallasm4;
 
-uint32_t (STACK_ARGS *domvline1)() = mvlineasm1;
+DWORD (STACK_ARGS *domvline1)() = mvlineasm1;
 void (STACK_ARGS *domvline4)() = mvlineasm4;
 #endif
 
@@ -1533,10 +1533,10 @@ void setupvline (int fracbits)
 }
 
 #if !defined(X86_ASM)
-uint32_t STACK_ARGS vlinec1 ()
+DWORD STACK_ARGS vlinec1 ()
 {
-	uint32_t fracstep = dc_iscale;
-	uint32_t frac = dc_texturefrac;
+	DWORD fracstep = dc_iscale;
+	DWORD frac = dc_texturefrac;
 	BYTE *colormap = dc_colormap;
 	int count = dc_count;
 	const BYTE *source = dc_source;
@@ -1559,7 +1559,7 @@ void STACK_ARGS vlinec4 ()
 	BYTE *dest = dc_dest;
 	int count = dc_count;
 	int bits = vlinebits;
-	uint32_t place;
+	DWORD place;
 
 	do
 	{
@@ -1584,10 +1584,10 @@ void setupmvline (int fracbits)
 }
 
 #if !defined(X86_ASM)
-uint32_t STACK_ARGS mvlinec1 ()
+DWORD STACK_ARGS mvlinec1 ()
 {
-	uint32_t fracstep = dc_iscale;
-	uint32_t frac = dc_texturefrac;
+	DWORD fracstep = dc_iscale;
+	DWORD frac = dc_texturefrac;
 	BYTE *colormap = dc_colormap;
 	int count = dc_count;
 	const BYTE *source = dc_source;
@@ -1614,7 +1614,7 @@ void STACK_ARGS mvlinec4 ()
 	BYTE *dest = dc_dest;
 	int count = dc_count;
 	int bits = mvlinebits;
-	uint32_t place;
+	DWORD place;
 
 	do
 	{
@@ -1642,8 +1642,8 @@ void setuptmvline (int bits)
 
 fixed_t tmvline1_add ()
 {
-	uint32_t fracstep = dc_iscale;
-	uint32_t frac = dc_texturefrac;
+	DWORD fracstep = dc_iscale;
+	DWORD frac = dc_texturefrac;
 	BYTE *colormap = dc_colormap;
 	int count = dc_count;
 	const BYTE *source = dc_source;
@@ -1651,16 +1651,16 @@ fixed_t tmvline1_add ()
 	int bits = tmvlinebits;
 	int pitch = dc_pitch;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
 		BYTE pix = source[frac>>bits];
 		if (pix != 0)
 		{
-			uint32_t fg = fg2rgb[colormap[pix]];
-			uint32_t bg = bg2rgb[*dest];
+			DWORD fg = fg2rgb[colormap[pix]];
+			DWORD bg = bg2rgb[*dest];
 			fg = (fg+bg) | 0x1f07c1f;
 			*dest = RGB32k[0][0][fg & (fg>>15)];
 		}
@@ -1677,8 +1677,8 @@ void tmvline4_add ()
 	int count = dc_count;
 	int bits = tmvlinebits;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
@@ -1687,8 +1687,8 @@ void tmvline4_add ()
 			BYTE pix = bufplce[i][vplce[i] >> bits];
 			if (pix != 0)
 			{
-				uint32_t fg = fg2rgb[palookupoffse[i][pix]];
-				uint32_t bg = bg2rgb[dest[i]];
+				DWORD fg = fg2rgb[palookupoffse[i][pix]];
+				DWORD bg = bg2rgb[dest[i]];
 				fg = (fg+bg) | 0x1f07c1f;
 				dest[i] = RGB32k[0][0][fg & (fg>>15)];
 			}
@@ -1700,8 +1700,8 @@ void tmvline4_add ()
 
 fixed_t tmvline1_addclamp ()
 {
-	uint32_t fracstep = dc_iscale;
-	uint32_t frac = dc_texturefrac;
+	DWORD fracstep = dc_iscale;
+	DWORD frac = dc_texturefrac;
 	BYTE *colormap = dc_colormap;
 	int count = dc_count;
 	const BYTE *source = dc_source;
@@ -1709,16 +1709,16 @@ fixed_t tmvline1_addclamp ()
 	int bits = tmvlinebits;
 	int pitch = dc_pitch;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
 		BYTE pix = source[frac>>bits];
 		if (pix != 0)
 		{
-			uint32_t a = fg2rgb[colormap[pix]] + bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = fg2rgb[colormap[pix]] + bg2rgb[*dest];
+			DWORD b = a;
 
 			a |= 0x01f07c1f;
 			b &= 0x40100400;
@@ -1740,8 +1740,8 @@ void tmvline4_addclamp ()
 	int count = dc_count;
 	int bits = tmvlinebits;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
@@ -1750,8 +1750,8 @@ void tmvline4_addclamp ()
 			BYTE pix = bufplce[i][vplce[i] >> bits];
 			if (pix != 0)
 			{
-				uint32_t a = fg2rgb[palookupoffse[i][pix]] + bg2rgb[dest[i]];
-				uint32_t b = a;
+				DWORD a = fg2rgb[palookupoffse[i][pix]] + bg2rgb[dest[i]];
+				DWORD b = a;
 
 				a |= 0x01f07c1f;
 				b &= 0x40100400;
@@ -1768,8 +1768,8 @@ void tmvline4_addclamp ()
 
 fixed_t tmvline1_subclamp ()
 {
-	uint32_t fracstep = dc_iscale;
-	uint32_t frac = dc_texturefrac;
+	DWORD fracstep = dc_iscale;
+	DWORD frac = dc_texturefrac;
 	BYTE *colormap = dc_colormap;
 	int count = dc_count;
 	const BYTE *source = dc_source;
@@ -1777,16 +1777,16 @@ fixed_t tmvline1_subclamp ()
 	int bits = tmvlinebits;
 	int pitch = dc_pitch;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
 		BYTE pix = source[frac>>bits];
 		if (pix != 0)
 		{
-			uint32_t a = (fg2rgb[colormap[pix]] | 0x40100400) - bg2rgb[*dest];
-			uint32_t b = a;
+			DWORD a = (fg2rgb[colormap[pix]] | 0x40100400) - bg2rgb[*dest];
+			DWORD b = a;
 
 			b &= 0x40100400;
 			b = b - (b >> 5);
@@ -1807,8 +1807,8 @@ void tmvline4_subclamp ()
 	int count = dc_count;
 	int bits = tmvlinebits;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
@@ -1817,8 +1817,8 @@ void tmvline4_subclamp ()
 			BYTE pix = bufplce[i][vplce[i] >> bits];
 			if (pix != 0)
 			{
-				uint32_t a = (fg2rgb[palookupoffse[i][pix]] | 0x40100400) - bg2rgb[dest[i]];
-				uint32_t b = a;
+				DWORD a = (fg2rgb[palookupoffse[i][pix]] | 0x40100400) - bg2rgb[dest[i]];
+				DWORD b = a;
 
 				b &= 0x40100400;
 				b = b - (b >> 5);
@@ -1834,8 +1834,8 @@ void tmvline4_subclamp ()
 
 fixed_t tmvline1_revsubclamp ()
 {
-	uint32_t fracstep = dc_iscale;
-	uint32_t frac = dc_texturefrac;
+	DWORD fracstep = dc_iscale;
+	DWORD frac = dc_texturefrac;
 	BYTE *colormap = dc_colormap;
 	int count = dc_count;
 	const BYTE *source = dc_source;
@@ -1843,16 +1843,16 @@ fixed_t tmvline1_revsubclamp ()
 	int bits = tmvlinebits;
 	int pitch = dc_pitch;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
 		BYTE pix = source[frac>>bits];
 		if (pix != 0)
 		{
-			uint32_t a = (bg2rgb[*dest] | 0x40100400) - fg2rgb[colormap[pix]];
-			uint32_t b = a;
+			DWORD a = (bg2rgb[*dest] | 0x40100400) - fg2rgb[colormap[pix]];
+			DWORD b = a;
 
 			b &= 0x40100400;
 			b = b - (b >> 5);
@@ -1873,8 +1873,8 @@ void tmvline4_revsubclamp ()
 	int count = dc_count;
 	int bits = tmvlinebits;
 
-	uint32_t *fg2rgb = dc_srcblend;
-	uint32_t *bg2rgb = dc_destblend;
+	DWORD *fg2rgb = dc_srcblend;
+	DWORD *bg2rgb = dc_destblend;
 
 	do
 	{
@@ -1883,8 +1883,8 @@ void tmvline4_revsubclamp ()
 			BYTE pix = bufplce[i][vplce[i] >> bits];
 			if (pix != 0)
 			{
-				uint32_t a = (bg2rgb[dest[i]] | 0x40100400) - fg2rgb[palookupoffse[i][pix]];
-				uint32_t b = a;
+				DWORD a = (bg2rgb[dest[i]] | 0x40100400) - fg2rgb[palookupoffse[i][pix]];
+				DWORD b = a;
 
 				b &= 0x40100400;
 				b = b - (b >> 5);
@@ -2105,7 +2105,7 @@ static bool R_SetBlendFunc (int op, fixed_t fglevel, fixed_t bglevel, int flags)
 	}
 }
 
-ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, uint32_t color)
+ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, DWORD color)
 {
 	fixed_t fglevel, bglevel;
 

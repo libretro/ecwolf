@@ -59,17 +59,17 @@ struct PCXHeader
   BYTE encoding;
   BYTE bitsPerPixel;
 
-  uint16_t xmin, ymin;
-  uint16_t xmax, ymax;
-  uint16_t horzRes, vertRes;
+  WORD xmin, ymin;
+  WORD xmax, ymax;
+  WORD horzRes, vertRes;
 
   BYTE palette[48];
   BYTE reserved;
   BYTE numColorPlanes;
 
-  uint16_t bytesPerScanLine;
-  uint16_t paletteType;
-  uint16_t horzSize, vertSize;
+  WORD bytesPerScanLine;
+  WORD paletteType;
+  WORD horzSize, vertSize;
 
   BYTE padding[54];
 

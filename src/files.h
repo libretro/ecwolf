@@ -25,21 +25,21 @@ public:
 		return *this;
 	}
 
-	FileReaderBase &operator>> (uint16_t &v)
+	FileReaderBase &operator>> (WORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBase &operator>> (int16_t &v)
+	FileReaderBase &operator>> (SWORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBase &operator>> (uint32_t &v)
+	FileReaderBase &operator>> (DWORD &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -105,21 +105,21 @@ public:
 		return *this;
 	}
 
-	FileReader &operator>> (uint16_t &v)
+	FileReader &operator>> (WORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReader &operator>> (int16_t &v)
+	FileReader &operator>> (SWORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReader &operator>> (uint32_t &v)
+	FileReader &operator>> (DWORD &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -168,21 +168,21 @@ public:
 		return *this;
 	}
 
-	FileReaderZ &operator>> (uint16_t &v)
+	FileReaderZ &operator>> (WORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderZ &operator>> (int16_t &v)
+	FileReaderZ &operator>> (SWORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderZ &operator>> (uint32_t &v)
+	FileReaderZ &operator>> (DWORD &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -230,21 +230,21 @@ public:
 		return *this;
 	}
 
-	FileReaderBZ2 &operator>> (uint16_t &v)
+	FileReaderBZ2 &operator>> (WORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBZ2 &operator>> (int16_t &v)
+	FileReaderBZ2 &operator>> (SWORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBZ2 &operator>> (uint32_t &v)
+	FileReaderBZ2 &operator>> (DWORD &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -294,21 +294,21 @@ public:
 		return *this;
 	}
 
-	FileReaderLZMA &operator>> (uint16_t &v)
+	FileReaderLZMA &operator>> (WORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderLZMA &operator>> (int16_t &v)
+	FileReaderLZMA &operator>> (SWORD &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderLZMA &operator>> (uint32_t &v)
+	FileReaderLZMA &operator>> (DWORD &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);

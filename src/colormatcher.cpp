@@ -50,7 +50,7 @@ FColorMatcher::FColorMatcher ()
 	Pal = NULL;
 }
 
-FColorMatcher::FColorMatcher (const uint32_t *palette)
+FColorMatcher::FColorMatcher (const DWORD *palette)
 {
 	SetPalette (palette);
 }
@@ -66,7 +66,7 @@ FColorMatcher &FColorMatcher::operator= (const FColorMatcher &other)
 	return *this;
 }
 
-void FColorMatcher::SetPalette (const uint32_t *palette)
+void FColorMatcher::SetPalette (const DWORD *palette)
 {
 	Pal = (const PalEntry *)palette;
 }

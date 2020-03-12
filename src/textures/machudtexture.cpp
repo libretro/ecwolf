@@ -90,7 +90,7 @@ FMacHudTexture::FMacHudTexture(const char* name, int lumpnum, int offset, FileRe
 {
 	file.Seek(offset, SEEK_SET);
 
-	uint16_t width, height;
+	WORD width, height;
 	file >> width >> height;
 	Width = BigShort(width);
 	Height = BigShort(height);
@@ -143,7 +143,7 @@ void FMacHudTexture::MakeTexture()
 	}
 }
 
-static bool CheckHudGraphicsLump(FWadLump &lump, unsigned int numgraphics, uint32_t* offsets)
+static bool CheckHudGraphicsLump(FWadLump &lump, unsigned int numgraphics, DWORD* offsets)
 {
 	if(lump.GetLength() < (long)(numgraphics*4)) return false;
 
@@ -188,7 +188,7 @@ void FTextureManager::InitMacHud()
 	if(lumpnum != -1)
 	{
 		FWadLump lump = Wads.OpenLumpNum(lumpnum);
-		uint32_t offsets[NUM_HUDGRAPHICS];
+		DWORD offsets[NUM_HUDGRAPHICS];
 		if(CheckHudGraphicsLump(lump, NUM_HUDGRAPHICS, offsets))
 		{
 			for(unsigned int i = 0;i < NUM_HUDGRAPHICS;++i)
@@ -200,7 +200,7 @@ void FTextureManager::InitMacHud()
 	if(lumpnum != -1)
 	{
 		FWadLump lump = Wads.OpenLumpNum(lumpnum);
-		uint32_t offsets[NUM_INTERGRAPHICS];
+		DWORD offsets[NUM_INTERGRAPHICS];
 		if(CheckHudGraphicsLump(lump, NUM_INTERGRAPHICS, offsets))
 		{
 			for(unsigned int i = 0;i < NUM_INTERGRAPHICS;++i)

@@ -44,8 +44,8 @@
 
 struct GrpInfo
 {
-	uint32_t		Magic[3];
-	uint32_t		NumLumps;
+	DWORD		Magic[3];
+	DWORD		NumLumps;
 };
 
 struct GrpLump
@@ -55,7 +55,7 @@ struct GrpLump
 		struct
 		{
 			char		Name[12];
-			uint32_t		Size;
+			DWORD		Size;
 		};
 		char NameWithZero[13];
 	};
@@ -108,7 +108,7 @@ bool FGrpFile::Open(bool quiet)
 
 	int Position = sizeof(GrpInfo) + NumLumps * sizeof(GrpLump);
 
-	for(uint32_t i = 0; i < NumLumps; i++)
+	for(DWORD i = 0; i < NumLumps; i++)
 	{
 		Lumps[i].Owner = this;
 		Lumps[i].Position = Position;

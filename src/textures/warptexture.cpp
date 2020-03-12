@@ -85,7 +85,7 @@ bool FWarpTexture::CheckModified ()
 
 const BYTE *FWarpTexture::GetPixels ()
 {
-	uint32_t time = gamestate.TimeCount;
+	DWORD time = gamestate.TimeCount;
 
 	if (Pixels == NULL || time != GenTime)
 	{
@@ -96,7 +96,7 @@ const BYTE *FWarpTexture::GetPixels ()
 
 const BYTE *FWarpTexture::GetColumn (unsigned int column, const Span **spans_out)
 {
-	uint32_t time = gamestate.TimeCount*14;
+	DWORD time = gamestate.TimeCount*14;
 
 	if (Pixels == NULL || time != GenTime)
 	{
@@ -124,7 +124,7 @@ const BYTE *FWarpTexture::GetColumn (unsigned int column, const Span **spans_out
 	return Pixels + column*Height;
 }
 
-void FWarpTexture::MakeTexture (uint32_t time)
+void FWarpTexture::MakeTexture (DWORD time)
 {
 	const BYTE *otherpix = SourcePic->GetPixels ();
 
@@ -153,7 +153,7 @@ void FWarpTexture::MakeTexture (uint32_t time)
 		ybits--;
 	}
 
-	uint32_t timebase = uint32_t(time * Speed * 32 / 28);
+	DWORD timebase = DWORD(time * Speed * 32 / 28);
 	for (y = ysize-1; y >= 0; y--)
 	{
 		int xt, xf = (finesine[(timebase+y*128)&FINEMASK]>>13) & xmask;
@@ -162,7 +162,7 @@ void FWarpTexture::MakeTexture (uint32_t time)
 		for (xt = xsize; xt; xt--, xf = (xf+1)&xmask, dest += ysize)
 			*dest = source[xf << ybits];
 	}
-	timebase = uint32_t(time * Speed * 23 / 28);
+	timebase = DWORD(time * Speed * 23 / 28);
 	for (x = xsize-1; x >= 0; x--)
 	{
 		int yt, yf = (finesine[(time+(x+17)*128)&FINEMASK]>>13) & ymask;
@@ -181,7 +181,7 @@ FWarp2Texture::FWarp2Texture (FTexture *source)
 	bWarped = 2;
 }
 
-void FWarp2Texture::MakeTexture (uint32_t time)
+void FWarp2Texture::MakeTexture (DWORD time)
 {
 	const BYTE *otherpix = SourcePic->GetPixels ();
 
@@ -209,7 +209,7 @@ void FWarp2Texture::MakeTexture (uint32_t time)
 		ybits--;
 	}
 
-	uint32_t timebase = uint32_t(time * Speed * 40 / 28);
+	DWORD timebase = DWORD(time * Speed * 40 / 28);
 	for (x = 0; x < xsize; ++x)
 	{
 		BYTE *dest = Pixels + (x << ybits);

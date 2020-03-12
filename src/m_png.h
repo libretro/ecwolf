@@ -51,7 +51,7 @@ bool M_CreatePNG (FILE *file, const BYTE *buffer, const PalEntry *pal,
 bool M_CreateDummyPNG (FILE *file);
 
 // Appends any chunk to a PNG file started with M_CreatePNG.
-bool M_AppendPNGChunk (FILE *file, uint32_t chunkID, const BYTE *chunkData, uint32_t len);
+bool M_AppendPNGChunk (FILE *file, DWORD chunkID, const BYTE *chunkData, DWORD len);
 
 // Adds a tEXt chunk to a PNG file started with M_CreatePNG.
 bool M_AppendPNGText (FILE *file, const char *keyword, const char *text);
@@ -68,9 +68,9 @@ struct PNGHandle
 {
 	struct Chunk
 	{
-		uint32_t		ID;
-		uint32_t		Offset;
-		uint32_t		Size;
+		DWORD		ID;
+		DWORD		Offset;
+		DWORD		Size;
 	};
 
 	FileReader		*File;
@@ -94,11 +94,11 @@ PNGHandle *M_VerifyPNG (FILE *file);
 // Finds a chunk in a PNG file. The file pointer will be positioned at the
 // beginning of the chunk data, and its length will be returned. A return
 // value of 0 indicates the chunk was either not present or had 0 length.
-unsigned int M_FindPNGChunk (PNGHandle *png, uint32_t chunkID);
+unsigned int M_FindPNGChunk (PNGHandle *png, DWORD chunkID);
 
 // Finds a chunk in the PNG file, starting its search at whatever chunk
 // the file pointer is currently positioned at.
-unsigned int M_NextPNGChunk (PNGHandle *png, uint32_t chunkID);
+unsigned int M_NextPNGChunk (PNGHandle *png, DWORD chunkID);
 
 // Finds a PNG text chunk with the given signature and returns a pointer
 // to a NULL-terminated string if present. Returns NULL on failure.

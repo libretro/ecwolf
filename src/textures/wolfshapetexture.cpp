@@ -88,18 +88,18 @@ static bool CheckIfWolfShape(FileReader &file)
 {
 	if(file.GetLength() < 4) return false; // No header
 	
-	uint16_t header[2];
+	WORD header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 
-	uint16_t Left = LittleShort(header[0]);
-	uint16_t Right = LittleShort(header[1]);
+	WORD Left = LittleShort(header[0]);
+	WORD Right = LittleShort(header[1]);
 
-	uint16_t Width = Right-Left;
+	WORD Width = Right-Left;
 	if(Width <= 0 || Width > 256 || file.GetLength() < 4+Width*2)
 		return false;
 
-	uint16_t offsets[256];
+	WORD offsets[256];
 	file.Read(offsets, Width*2);
 	for(int i = 0;i < Width;i++)
 	{
@@ -113,7 +113,7 @@ static bool CheckIfMacShape(FileReader &file)
 {
 	if(file.GetLength() < 2) return false; // No header
 	
-	uint16_t width;
+	WORD width;
 	file.Seek(0, SEEK_SET);
 	file >> width;
 	width = BigShort(width);
@@ -127,7 +127,7 @@ static bool CheckIfMacShape(FileReader &file)
 		file.GetLength() > 776*width + 2)
 		return false;
 
-	uint16_t runOfs[128];
+	WORD runOfs[128];
 	file.Read(runOfs, width*2);
 	for(unsigned int i = 0;i < width;++i)
 	{
@@ -177,7 +177,7 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file, bool mac)
 void FWolfShapeTexture::Init(FileReader &file)
 {
 	// left, right, offsets...
-	uint16_t header[2];
+	WORD header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 	header[0] = LittleShort(header[0]);
@@ -240,7 +240,7 @@ void FWolfShapeTexture::Init(FileReader &file)
 void FWolfShapeTexture::InitMac(FileReader &file)
 {
 	// Width, which implies left offset.
-	uint16_t width;
+	WORD width;
 	file.Seek(0, SEEK_SET);
 	file >> width;
 	Width = BigShort(width);

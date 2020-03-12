@@ -238,7 +238,7 @@ void ContinueMusic (int offs)
 #define WHITESTEPS      20
 #define WHITETICS       6
 
-int32_t damagecount, bonuscount;
+SDWORD damagecount, bonuscount;
 bool palshifted;
 
 /*

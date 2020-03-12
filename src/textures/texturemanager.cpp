@@ -796,7 +796,7 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 void FTextureManager::AddPatches (int lumpnum)
 {
 	FWadLump *file = Wads.ReopenLumpNum (lumpnum);
-	uint32_t numpatches, i;
+	DWORD numpatches, i;
 	char name[9];
 
 	*file >> numpatches;
@@ -1227,7 +1227,7 @@ int FTextureManager::CountLumpTextures (int lumpnum)
 	if (lumpnum >= 0)
 	{
 		FWadLump file = Wads.OpenLumpNum (lumpnum); 
-		uint32_t numtex;
+		DWORD numtex;
 
 		file >> numtex;
 		return int(numtex) >= 0 ? numtex : 0;

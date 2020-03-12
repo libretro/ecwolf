@@ -71,8 +71,8 @@ namespace FileSys {
 static bool QueryPathKey(HKEY key, const char *keypath, const char *valname, FString &value)
 {
 	HKEY steamkey;
-	uint32_t pathtype;
-	uint32_t pathlen;
+	DWORD pathtype;
+	DWORD pathlen;
 	LONG res;
 
 	if(ERROR_SUCCESS == RegOpenKeyEx(key, keypath, 0, KEY_QUERY_VALUE, &steamkey))

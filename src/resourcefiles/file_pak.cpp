@@ -104,7 +104,7 @@ bool FPakFile::Open(bool quiet)
 
 	if (!quiet) Printf(", %d lumps\n", NumLumps);
 
-	for(uint32_t i = 0; i < NumLumps; i++)
+	for(DWORD i = 0; i < NumLumps; i++)
 	{
 		Lumps[i].LumpNameSetup(fileinfo[i].name);
 		Lumps[i].Owner = this;

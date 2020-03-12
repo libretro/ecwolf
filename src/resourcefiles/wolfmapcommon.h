@@ -48,19 +48,19 @@ struct FMapLump : public FResourceLump
 {
 	protected:
 		void ExpandCarmack(const unsigned char* in, unsigned char* out);
-		void ExpandRLEW(const unsigned char* in, unsigned char* out, const uint32_t length, const uint16_t rlewTag);
+		void ExpandRLEW(const unsigned char* in, unsigned char* out, const DWORD length, const WORD rlewTag);
 
 		int FillCache();
 	public:
 		struct
 		{
-			uint32_t	PlaneOffset[PLANES];
-			uint16_t	PlaneLength[PLANES];
-			uint16_t	Width;
-			uint16_t	Height;
+			DWORD	PlaneOffset[PLANES];
+			WORD	PlaneLength[PLANES];
+			WORD	Width;
+			WORD	Height;
 			char	Name[24];
 		} Header;
-		uint16_t rlewTag;
+		WORD rlewTag;
 		bool carmackCompressed;
 		bool rtlMap;
 

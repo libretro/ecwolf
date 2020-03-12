@@ -284,7 +284,7 @@ int IN_JoyAxes()
 		int res = 0;
 		for(int i = 0; i < JoyNumAxes; ++i)
 		{
-			int16_t pos = SDL_GameControllerGetAxis(GameController, (SDL_GameControllerAxis)GameControllerAxisMap[i]);
+			SWORD pos = SDL_GameControllerGetAxis(GameController, (SDL_GameControllerAxis)GameControllerAxisMap[i]);
 			if(pos <= -0x1000)
 				res |= 1 << (i*2);
 			else if(pos >= 0x1000)
@@ -300,7 +300,7 @@ int IN_JoyAxes()
 	int res = 0;
 	for(int i = 0; i < JoyNumAxes && i < 16; ++i)
 	{
-		int16_t pos = SDL_JoystickGetAxis(Joystick, i);
+		SWORD pos = SDL_JoystickGetAxis(Joystick, i);
 		if(pos <= -0x1000)
 			res |= 1 << (i*2);
 		else if(pos >= 0x1000)

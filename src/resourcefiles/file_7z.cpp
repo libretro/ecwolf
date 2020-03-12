@@ -263,7 +263,7 @@ bool F7ZFile::Open(bool quiet)
 	TArray<UInt16> nameUTF16;
 	TArray<char> nameASCII;
 
-	for (uint32_t i = 0; i < NumLumps; ++i)
+	for (DWORD i = 0; i < NumLumps; ++i)
 	{
 		// skip Directories
 		if (SzArEx_IsDir(archPtr, i))
