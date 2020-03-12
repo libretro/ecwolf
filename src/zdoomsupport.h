@@ -53,7 +53,7 @@ static inline unsigned int MakeKey(const char *s, size_t len)
 	memcpy(hashString, s, len);
 	for(size_t i = 0;i < len;++i)
 		hashString[i] = tolower(*s++);
-	const DWORD ret = CalcCRC32(hashString, static_cast<unsigned int>(len));
+	const uint32_t ret = CalcCRC32(hashString, static_cast<unsigned int>(len));
 	delete[] hashString;
 	return ret;
 }
@@ -67,9 +67,9 @@ static inline void DPrintf(const char* fmt, ...) {}
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #ifndef __BIG_ENDIAN__
-#define MAKE_ID(a,b,c,d)	((DWORD)((a)|((b)<<8)|((c)<<16)|((d)<<24)))
+#define MAKE_ID(a,b,c,d)	((uint32_t)((a)|((b)<<8)|((c)<<16)|((d)<<24)))
 #else
-#define MAKE_ID(a,b,c,d)	((DWORD)((d)|((c)<<8)|((b)<<16)|((a)<<24)))
+#define MAKE_ID(a,b,c,d)	((uint32_t)((d)|((c)<<8)|((b)<<16)|((a)<<24)))
 #endif
 
 #define MAXWIDTH 5120
@@ -77,7 +77,7 @@ static inline void DPrintf(const char* fmt, ...) {}
 #define I_FatalError Quit
 void I_Error(const char* format, ...);
 
-#define MulScale16(x,y) (SDWORD((SQWORD(x)*SQWORD(y))>>16))
+#define MulScale16(x,y) (int32_t((int64_t(x)*int64_t(y))>>16))
 
 #if defined(_MSC_VER) || defined(__WATCOMC__)
 #define STACK_ARGS __cdecl

@@ -32,8 +32,8 @@ int VS14Stat(const char *path, struct _stat64i32 *buffer)
 	buffer->st_uid = 0;
 	buffer->st_gid = 0;
 	buffer->st_size = data.nFileSizeLow;
-	buffer->st_atime = (*(QWORD*)&data.ftLastAccessTime) / 10000000 - 11644473600LL;
-	buffer->st_mtime = (*(QWORD*)&data.ftLastWriteTime) / 10000000 - 11644473600LL;
-	buffer->st_ctime = (*(QWORD*)&data.ftCreationTime) / 10000000 - 11644473600LL;
+	buffer->st_atime = (*(uint64_t*)&data.ftLastAccessTime) / 10000000 - 11644473600LL;
+	buffer->st_mtime = (*(uint64_t*)&data.ftLastWriteTime) / 10000000 - 11644473600LL;
+	buffer->st_ctime = (*(uint64_t*)&data.ftCreationTime) / 10000000 - 11644473600LL;
 	return 0;
 }

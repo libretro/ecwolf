@@ -57,14 +57,14 @@ struct TGAHeader
 	BYTE		id_len;
 	BYTE		has_cm;
 	BYTE		img_type;
-	SWORD		cm_first;
-	SWORD		cm_length;
+	int16_t		cm_first;
+	int16_t		cm_length;
 	BYTE		cm_size;
 	
-	SWORD		x_origin;
-	SWORD		y_origin;
-	SWORD		width;
-	SWORD		height;
+	int16_t		x_origin;
+	int16_t		y_origin;
+	int16_t		width;
+	int16_t		height;
 	BYTE		bpp;
 	BYTE		img_desc;
 };
@@ -292,7 +292,7 @@ void FTGATexture::MakeTexture ()
 	BYTE PaletteMap[256];
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
 	TGAHeader hdr;
-	WORD w;
+	uint16_t w;
 	BYTE r,g,b,a;
 	BYTE * buffer;
 
@@ -493,7 +493,7 @@ int FTGATexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCo
 	PalEntry pe[256];
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
 	TGAHeader hdr;
-	WORD w;
+	uint16_t w;
 	BYTE r,g,b,a;
 	BYTE * sbuffer;
 	int transval = 0;

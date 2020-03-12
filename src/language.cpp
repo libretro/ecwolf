@@ -129,7 +129,7 @@ void Language::SetupBlakeStrings(const char* lumpname, const char* prefix)
 	unsigned int pos = 0;
 	unsigned int start = 0;
 	const char* data = reinterpret_cast<const char*>(wadLump.GetMem());
-	static const WORD endToken = ('X'<<8)|'X'; // Since both chars are the same this should be endian safe
+	static const uint16_t endToken = ('X'<<8)|'X'; // Since both chars are the same this should be endian safe
 	while(pos+2 < wadLump.GetSize())
 	{
 		if(data[pos] == '^' && ReadNativeShort((BYTE*) data+pos+1) == endToken)

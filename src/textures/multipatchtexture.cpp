@@ -78,11 +78,11 @@
 //
 struct mappatch_t
 {
-	SWORD	originx;
-	SWORD	originy;
-	SWORD	patch;
-	SWORD	stepdir;
-	SWORD	colormap;
+	int16_t	originx;
+	int16_t	originy;
+	int16_t	patch;
+	int16_t	stepdir;
+	int16_t	colormap;
 } __attribute__((__packed__));
 
 //
@@ -92,13 +92,13 @@ struct mappatch_t
 struct maptexture_t
 {
 	BYTE		name[8];
-	WORD		Flags;				// [RH] Was unused
+	uint16_t		Flags;				// [RH] Was unused
 	BYTE		ScaleX;				// [RH] Scaling (8 is normal)
 	BYTE		ScaleY;				// [RH] Same as above
-	SWORD		width;
-	SWORD		height;
+	int16_t		width;
+	int16_t		height;
 	BYTE		columndirectory[4];	// OBSOLETE
-	SWORD		patchcount;
+	int16_t		patchcount;
 	mappatch_t	patches[1];
 } __attribute__((__packed__));
 
@@ -108,9 +108,9 @@ struct maptexture_t
 
 struct strifemappatch_t
 {
-	SWORD	originx;
-	SWORD	originy;
-	SWORD	patch;
+	int16_t	originx;
+	int16_t	originy;
+	int16_t	patch;
 };
 
 //
@@ -120,12 +120,12 @@ struct strifemappatch_t
 struct strifemaptexture_t
 {
 	BYTE		name[8];
-	WORD		Flags;				// [RH] Was unused
+	uint16_t		Flags;				// [RH] Was unused
 	BYTE		ScaleX;				// [RH] Scaling (8 is normal)
 	BYTE		ScaleY;				// [RH] Same as above
-	SWORD		width;
-	SWORD		height;
-	SWORD		patchcount;
+	int16_t		width;
+	int16_t		height;
+	int16_t		patchcount;
 	strifemappatch_t	patches[1];
 };
 
@@ -175,7 +175,7 @@ protected:
 
 	struct TexPart
 	{
-		SWORD OriginX, OriginY;
+		int16_t OriginX, OriginY;
 		BYTE Rotate;
 		BYTE op;
 		FRemapTable *Translation;
@@ -827,7 +827,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 {
 	FPatchLookup *patchlookup = NULL;
 	int i;
-	DWORD numpatches;
+	uint32_t numpatches;
 
 	if (firstdup == 0)
 	{
@@ -848,7 +848,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 
 		// Check whether the amount of names reported is correct.
 		int lumplength = Wads.LumpLength(patcheslump);
-		if (numpatches > DWORD((lumplength-4)/8))
+		if (numpatches > uint32_t((lumplength-4)/8))
 		{
 			Printf("PNAMES lump is shorter than required (%u entries reported but only %d bytes (%d entries) long\n",
 				numpatches, lumplength, (lumplength-4)/8);
@@ -859,7 +859,7 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 		// Catalog the patches these textures use so we know which
 		// textures they represent.
 		patchlookup = new FPatchLookup[numpatches];
-		for (DWORD i = 0; i < numpatches; ++i)
+		for (uint32_t i = 0; i < numpatches; ++i)
 		{
 			char pname[9];
 			pnames.Read(pname, 8);
@@ -869,16 +869,16 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 	}
 
 	bool isStrife = false;
-	const DWORD *maptex, *directory;
-	DWORD maxoff;
+	const uint32_t *maptex, *directory;
+	uint32_t maxoff;
 	int numtextures;
-	DWORD offset = 0;   // Shut up, GCC!
+	uint32_t offset = 0;   // Shut up, GCC!
 
-	maptex = (const DWORD *)lumpdata;
+	maptex = (const uint32_t *)lumpdata;
 	numtextures = LittleLong(*maptex);
 	maxoff = lumpsize;
 
-	if (maxoff < DWORD(numtextures+1)*4)
+	if (maxoff < uint32_t(numtextures+1)*4)
 	{
 		Printf ("Texture directory is too short");
 		delete[] patchlookup;

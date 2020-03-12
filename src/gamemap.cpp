@@ -721,7 +721,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			TMap<unsigned int, MapSpot>::Pair *pair;
 			while(iter.NextPair(pair))
 			{
-				DWORD key = pair->Key;
+				uint32_t key = pair->Key;
 				arc << key << pair->Value;
 			}
 		}
@@ -733,7 +733,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			gm->elevatorPosition.Clear();
 			while(count-- > 0)
 			{
-				DWORD key;
+				uint32_t key;
 				MapSpot value;
 				arc << key << value;
 

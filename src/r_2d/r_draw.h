@@ -32,7 +32,7 @@
 #include "r_data/renderstyle.h"
 #include "r_2d/r_main.h"
 
-typedef DWORD dsfixed_t;
+typedef uint32_t dsfixed_t;
 
 extern "C" int			ylookup[MAXHEIGHT];
 
@@ -46,9 +46,9 @@ extern "C" fixed_t		dc_iscale;
 extern "C" fixed_t		dc_texturemid;
 extern "C" fixed_t		dc_texturefrac;
 extern "C" int			dc_color;		// [RH] For flat colors (no texturing)
-extern "C" DWORD		dc_srccolor;
-extern "C" DWORD		*dc_srcblend;
-extern "C" DWORD		*dc_destblend;
+extern "C" uint32_t		dc_srccolor;
+extern "C" uint32_t		*dc_srcblend;
+extern "C" uint32_t		*dc_destblend;
 
 // first pixel in a column
 extern "C" const BYTE*	dc_source;
@@ -56,8 +56,8 @@ extern "C" const BYTE*	dc_source;
 extern "C" BYTE			*dc_dest, *dc_destorg;
 extern "C" int			dc_count;
 
-extern "C" DWORD		vplce[4];
-extern "C" DWORD		vince[4];
+extern "C" uint32_t		vplce[4];
+extern "C" uint32_t		vince[4];
 extern "C" BYTE*		palookupoffse[4];
 extern "C" const BYTE*	bufplce[4];
 
@@ -74,8 +74,8 @@ extern "C" unsigned int	horizspans[4];
 // Hook in assembler or system specific BLT here.
 extern void (*R_DrawColumn)(void);
 
-extern DWORD (STACK_ARGS *dovline1) ();
-extern DWORD (STACK_ARGS *doprevline1) ();
+extern uint32_t (STACK_ARGS *dovline1) ();
+extern uint32_t (STACK_ARGS *doprevline1) ();
 #ifdef X64_ASM
 #define dovline4 vlinetallasm4
 extern "C" void vlinetallasm4();
@@ -84,7 +84,7 @@ extern void (STACK_ARGS *dovline4) ();
 #endif
 extern void setupvline (int);
 
-extern DWORD (STACK_ARGS *domvline1) ();
+extern uint32_t (STACK_ARGS *domvline1) ();
 extern void (STACK_ARGS *domvline4) ();
 extern void setupmvline (int);
 
@@ -266,7 +266,7 @@ enum ESPSResult
 	DoDraw0,	// draw this as if r_columnmethod is 0
 	DoDraw1,	// draw this as if r_columnmethod is 1
 };
-ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, DWORD color);
+ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, uint32_t color);
 
 // Call this after finished drawing the current thing, in case its
 // style was STYLE_Shade

@@ -55,7 +55,7 @@
 
 union PNGPalette
 {
-	DWORD palette[256];
+	uint32_t palette[256];
 	BYTE pngpal[256][3];
 };
 
@@ -83,11 +83,11 @@ protected:
 	BYTE ColorType;
 	BYTE Interlace;
 	bool HaveTrans;
-	WORD NonPaletteTrans[3];
+	uint16_t NonPaletteTrans[3];
 
 	BYTE *PaletteMap;
 	int PaletteSize;
-	DWORD StartOfIDAT;
+	uint32_t StartOfIDAT;
 
 	void MakeTexture ();
 
@@ -113,12 +113,12 @@ FTexture *PNGTexture_TryCreate(FileReader & data, int lumpnum)
 {
 	union
 	{
-		DWORD dw;
-		WORD w[2];
+		uint32_t dw;
+		uint16_t w[2];
 		BYTE b[4];
 	} first4bytes;
 
-	DWORD width, height;
+	uint32_t width, height;
 	BYTE bitdepth, colortype, compression, filter, interlace;
 
 	// This is most likely a PNG, but make sure. (Note that if the
@@ -178,7 +178,7 @@ FTexture *PNGTexture_TryCreate(FileReader & data, int lumpnum)
 
 FTexture *PNGTexture_CreateFromFile(PNGHandle *png, const FString &filename)
 {
-	DWORD width, height;
+	uint32_t width, height;
 	BYTE bitdepth, colortype, compression, filter, interlace;
 
 	if (M_FindPNGChunk(png, MAKE_ID('I','H','D','R')) == 0)
@@ -220,7 +220,7 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
   BitDepth(depth), ColorType(colortype), Interlace(interlace), HaveTrans(false),
   PaletteMap(0), PaletteSize(0), StartOfIDAT(0)
 {
-	DWORD len, id;
+	uint32_t len, id;
 	int i;
 
 	UseType = TEX_MiscPatch;
@@ -249,7 +249,7 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 		case MAKE_ID('g','r','A','b'):
 			// This is like GRAB found in an ILBM, except coordinates use 4 bytes
 			{
-				DWORD hotx, hoty;
+				uint32_t hotx, hoty;
 				int ihotx, ihoty;
 				
 				lump.Read(&hotx, 4);
@@ -292,9 +292,9 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 			lump.Read (Trans.Get(), len);
 			HaveTrans = true;
 			// Save for colortype 2
-			NonPaletteTrans[0] = WORD(Trans[0] * 256 + Trans[1]);
-			NonPaletteTrans[1] = WORD(Trans[2] * 256 + Trans[3]);
-			NonPaletteTrans[2] = WORD(Trans[4] * 256 + Trans[5]);
+			NonPaletteTrans[0] = uint16_t(Trans[0] * 256 + Trans[1]);
+			NonPaletteTrans[1] = uint16_t(Trans[2] * 256 + Trans[3]);
+			NonPaletteTrans[2] = uint16_t(Trans[4] * 256 + Trans[5]);
 			break;
 
 		case MAKE_ID('a','l','P','h'):
@@ -521,7 +521,7 @@ void FPNGTexture::MakeTexture ()
 	}
 	else
 	{
-		DWORD len, id;
+		uint32_t len, id;
 		lump->Seek (StartOfIDAT, SEEK_SET);
 		lump->Read(&len, 4);
 		lump->Read(&id, 4);
@@ -661,7 +661,7 @@ int FPNGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCo
 {
 	// Parse pre-IDAT chunks. I skip the CRCs. Is that bad?
 	PalEntry pe[256];
-	DWORD len, id;
+	uint32_t len, id;
 	FileReader *lump;
 	static char bpp[] = {1, 0, 3, 1, 2, 0, 4};
 	int pixwidth = Width * bpp[ColorType];
@@ -701,7 +701,7 @@ int FPNGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCo
 		case MAKE_ID('t','R','N','S'):
 			if (ColorType == 3)
 			{
-				for(DWORD i = 0; i < len; i++)
+				for(uint32_t i = 0; i < len; i++)
 				{
 					(*lump) >> pe[i].a;
 					if (pe[i].a != 0 && pe[i].a != 255)

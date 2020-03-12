@@ -44,12 +44,12 @@
 struct RtlMapHeader
 {
 public:
-	DWORD usedFlag;
-	DWORD crc; // Useless for us, this is just a random value to check maps in multiplayer
-	DWORD rlewTag;
-	DWORD mapSpecials;
-	DWORD planeOffset[PLANES];
-	DWORD planeLength[PLANES];
+	uint32_t usedFlag;
+	uint32_t crc; // Useless for us, this is just a random value to check maps in multiplayer
+	uint32_t rlewTag;
+	uint32_t mapSpecials;
+	uint32_t planeOffset[PLANES];
+	uint32_t planeLength[PLANES];
 	char name[24];
 };
 #pragma pack()
@@ -139,7 +139,7 @@ bool FRtlFile::Open(bool quiet)
 FResourceFile *CheckRtl(const char *filename, FileReader *file, bool quiet)
 {
 	char head[4];
-	DWORD version;
+	uint32_t version;
 
 	if(file->GetLength() >= static_cast<signed>(8+sizeof(RtlMapHeader)*100))
 	{

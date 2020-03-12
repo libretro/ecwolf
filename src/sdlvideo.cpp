@@ -67,7 +67,7 @@ void I_ClosestResolution (int *width, int *height, int bits)
 	int twidth, theight;
 	int cwidth = 0, cheight = 0;
 	int iteration;
-	DWORD closest = 0xFFFFFFFFu;
+	uint32_t closest = 0xFFFFFFFFu;
 
 	for (iteration = 0; iteration < 2; iteration++)
 	{
@@ -80,7 +80,7 @@ void I_ClosestResolution (int *width, int *height, int bits)
 			if (iteration == 0 && (twidth < *width || theight < *height))
 				continue;
 
-			DWORD dist = (twidth - *width) * (twidth - *width)
+			uint32_t dist = (twidth - *width) * (twidth - *width)
 				+ (theight - *height) * (theight - *height);
 
 			if (dist < closest)
@@ -281,7 +281,7 @@ public:
 	friend class SDLVideo;
 
 	virtual void SetVSync (bool vsync);
-	virtual void ScaleCoordsFromWindow(SWORD &x, SWORD &y);
+	virtual void ScaleCoordsFromWindow(int16_t &x, int16_t &y);
 
 private:
 	PalEntry SourcePalette[256];
@@ -317,7 +317,7 @@ IMPLEMENT_INTERNAL_CLASS(SDLFB)
 
 struct MiniModeInfo
 {
-	WORD Width, Height;
+	uint16_t Width, Height;
 };
 
 // PUBLIC FUNCTION PROTOTYPES ----------------------------------------------
@@ -1136,7 +1136,7 @@ void SDLFB::SetVSync (bool vsync)
 #endif
 }
 
-void SDLFB::ScaleCoordsFromWindow(SWORD &x, SWORD &y)
+void SDLFB::ScaleCoordsFromWindow(int16_t &x, int16_t &y)
 {
 #if SDL_VERSION_ATLEAST(2,0,0)
 	int w, h;
@@ -1155,20 +1155,20 @@ void SDLFB::ScaleCoordsFromWindow(SWORD &x, SWORD &y)
 			double yratio = (double)SCREENHEIGHT/realh;
 			if (realw < w)
 			{
-				x = (SWORD)((x - (w - realw)/2)*xratio);
-				y = (SWORD)(y*yratio);
+				x = (int16_t)((x - (w - realw)/2)*xratio);
+				y = (int16_t)(y*yratio);
 			}
 			else
 			{
-				y = (SWORD)((y - (h - realh)/2)*yratio);
-				x = (SWORD)(x*xratio);
+				y = (int16_t)((y - (h - realh)/2)*yratio);
+				x = (int16_t)(x*xratio);
 			}
 		}
 	}
 	else
 	{
-		x = (SWORD)(x*Width/w);
-		y = (SWORD)(y*Height/h);
+		x = (int16_t)(x*Width/w);
+		y = (int16_t)(y*Height/h);
 	}
 #endif
 }

@@ -172,7 +172,7 @@ public:
 	bool Is8BitMode() { return true; }
 
 	void SetVSync (bool vsync) {}
-	void ScaleCoordsFromWindow(SWORD &x, SWORD &y) {}
+	void ScaleCoordsFromWindow(int16_t &x, int16_t &y) {}
 protected:
 	PalEntry FlashedPalette[256];
 	color_t effective_palette_[256];
@@ -1657,16 +1657,16 @@ unsigned long long GetSaveVersion()
 
 extern unsigned automap;
 
-void SerializeExtra(FArchive &arc, bool &isGameless, DWORD &version)
+void SerializeExtra(FArchive &arc, bool &isGameless, uint32_t &version)
 {
-	DWORD serialize_version = 12;
+	uint32_t serialize_version = 12;
 	arc << serialize_version;
 	version = serialize_version;
-	arc << (QWORD &) GameSave::SaveVersion;
+	arc << (uint64_t &) GameSave::SaveVersion;
 	arc << GameSave::SaveProdVersion;
 
-	arc << (DWORD &) g_state.stage;
-	arc << (DWORD &) g_state.stageAfterIntermission;
+	arc << (uint32_t &) g_state.stage;
+	arc << (uint32_t &) g_state.stageAfterIntermission;
 	arc << g_state.transitionSlideshow;
 	arc << g_state.isInQuiz;
 	arc << g_state.isFading;
@@ -1690,7 +1690,7 @@ void SerializeExtra(FArchive &arc, bool &isGameless, DWORD &version)
 	arc << g_state.skill_num;
 	arc << g_state.menuLevel;
 	for (int i = 0; i < MAX_MENU_STACK; i++)
-		arc << (DWORD &) g_state.menuStack[i];
+		arc << (uint32_t &) g_state.menuStack[i];
 
 	arc << g_state.frame_counter;
 	arc << g_state.frame_tic;
@@ -1784,10 +1784,10 @@ void SerializeExtra(FArchive &arc, bool &isGameless, DWORD &version)
 	}
 
 	if (serialize_version >= 11) {
-		arc << (DWORD &) automap;
+		arc << (uint32_t &) automap;
 		arc << Paused;
 	}
-	arc << (DWORD &) playstate;
+	arc << (uint32_t &) playstate;
 	isGameless = map == NULL;
 	arc << isGameless;
 }
@@ -1802,7 +1802,7 @@ bool retro_serialize(void *data_, size_t size)
 	FCompressedMemFile snapshot;
 	snapshot.Open();
 	{
-		DWORD serialize_version;
+		uint32_t serialize_version;
 		FArchive arc(snapshot);
 		SerializeExtra(arc, isGameless, serialize_version);
 
@@ -1814,7 +1814,7 @@ bool retro_serialize(void *data_, size_t size)
 		if (!isGameless && serialize_version >= 12) {
 			Dialog::quizSerialize(&g_state, arc);
 		}
-		DWORD rngcount = FRandom::GetRNGCount();
+		uint32_t rngcount = FRandom::GetRNGCount();
 		arc << rngcount;
 		FRandom::StaticWriteRNGState(arc);
 	}
@@ -1873,7 +1873,7 @@ bool retro_unserialize(const void *data_, size_t size)
 	FCompressedMemFile snapshot;
 	snapshot.Open((void *)data_);
 	FArchive arc(snapshot);
-	DWORD serialize_version;
+	uint32_t serialize_version;
 	SerializeExtra(arc, isGameless, serialize_version);
 	FString mapname;
 	arc << mapname;
@@ -1890,7 +1890,7 @@ bool retro_unserialize(const void *data_, size_t size)
 		Dialog::quizSerialize(&g_state, arc);
 	}
 
-	DWORD rngcount;
+	uint32_t rngcount;
 	arc << rngcount;
 	FRandom::StaticReadRNGState(arc, rngcount);
 

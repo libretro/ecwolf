@@ -325,7 +325,7 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 	// have mostly garbage filled headers (outside of what is precisely needed
 	// since the sample rate is hard coded). I'm not sure if the sounds are
 	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
-	if(size > 0x2A && BigShort(*(WORD*)soundLump.GetMem()) == 1)
+	if(size > 0x2A && BigShort(*(uint16_t*)soundLump.GetMem()) == 1)
 	{
 		int sample_count = size - 0x2a;
 		void *samples = malloc (size - 0x2a);
@@ -343,10 +343,10 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 	// TODO: support skipping extra headers
 	if (size > 44 && memcmp(soundLump.GetMem(), "RIFF", 4) == 0
 	    && memcmp((char*)soundLump.GetMem() + 8, "WAVEfmt ", 8) == 0) {
-		int rate = LittleLong(((DWORD*)soundLump.GetMem())[6]);
-		int bits = LittleShort(((WORD*)soundLump.GetMem())[17]);
-		int channels = LittleShort(((WORD*)soundLump.GetMem())[11]);
-		int format = LittleShort(((WORD*)soundLump.GetMem())[10]);
+		int rate = LittleLong(((uint32_t*)soundLump.GetMem())[6]);
+		int bits = LittleShort(((uint16_t*)soundLump.GetMem())[17]);
+		int channels = LittleShort(((uint16_t*)soundLump.GetMem())[11]);
+		int format = LittleShort(((uint16_t*)soundLump.GetMem())[10]);
 		int sample_count = (size - 44) / (bits / 8);
 		SampleFormat sample_format;
 		if (format == 1 && channels == 1 && bits == 8) {
@@ -371,7 +371,7 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 		);
 	}
 
-	printf ("unknown format. Header: %x\n", BigLong(*(DWORD*)soundLump.GetMem()));
+	printf ("unknown format. Header: %x\n", BigLong(*(uint32_t*)soundLump.GetMem()));
 	return NULL;
 }
 
@@ -455,7 +455,7 @@ void SoundChannelState::Serialize(FArchive &arc)
 	arc << stopTicks;
 	arc << leftPos;
 	arc << rightPos;
-	arc << (DWORD &) type;
+	arc << (uint32_t &) type;
 	arc << isMusic;
 
 	if (!arc.IsStoring())

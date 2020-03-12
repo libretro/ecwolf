@@ -52,16 +52,16 @@ class FIMGZTexture : public FTexture
 	struct ImageHeader
 	{
 		BYTE Magic[4];
-		WORD Width;
-		WORD Height;
-		SWORD LeftOffset;
-		SWORD TopOffset;
+		uint16_t Width;
+		uint16_t Height;
+		int16_t LeftOffset;
+		int16_t TopOffset;
 		BYTE Compression;
 		BYTE Reserved[11];
 	};
 
 public:
-	FIMGZTexture (int lumpnum, WORD w, WORD h, SWORD l, SWORD t);
+	FIMGZTexture (int lumpnum, uint16_t w, uint16_t h, int16_t l, int16_t t);
 	~FIMGZTexture ();
 
 	const BYTE *GetColumn (unsigned int column, const Span **spans_out);
@@ -85,9 +85,9 @@ protected:
 
 FTexture *IMGZTexture_TryCreate(FileReader & file, int lumpnum)
 {
-	DWORD magic = 0;
-	WORD w, h;
-	SWORD l, t;
+	uint32_t magic = 0;
+	uint16_t w, h;
+	int16_t l, t;
 
 	file.Seek(0, SEEK_SET);
 	if (file.Read(&magic, 4) != 4) return NULL;
@@ -102,7 +102,7 @@ FTexture *IMGZTexture_TryCreate(FileReader & file, int lumpnum)
 //
 //==========================================================================
 
-FIMGZTexture::FIMGZTexture (int lumpnum, WORD w, WORD h, SWORD l, SWORD t)
+FIMGZTexture::FIMGZTexture (int lumpnum, uint16_t w, uint16_t h, int16_t l, int16_t t)
 	: FTexture(NULL, lumpnum), Pixels(0), Spans(0)
 {
 	Wads.GetLumpName (Name, lumpnum);

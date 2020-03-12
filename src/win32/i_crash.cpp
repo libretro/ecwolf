@@ -116,7 +116,7 @@ typedef enum _MINIDUMP_TYPE
 } MINIDUMP_TYPE;
 
 typedef struct _MINIDUMP_EXCEPTION_INFORMATION {
-    DWORD ThreadId;
+    uint32_t ThreadId;
     PEXCEPTION_POINTERS ExceptionPointers;
     BOOL ClientPointers;
 } MINIDUMP_EXCEPTION_INFORMATION, *PMINIDUMP_EXCEPTION_INFORMATION;
@@ -142,8 +142,8 @@ typedef struct _MINIDUMP_CALLBACK_INFORMATION {
 // dependencies on it.
 typedef BOOL (WINAPI *THREADWALK) (HANDLE, LPTHREADENTRY32);
 typedef BOOL (WINAPI *MODULEWALK) (HANDLE, LPMODULEENTRY32);
-typedef HANDLE (WINAPI *CREATESNAPSHOT) (DWORD, DWORD);
-typedef BOOL (WINAPI *WRITEDUMP) (HANDLE, DWORD, HANDLE, int,
+typedef HANDLE (WINAPI *CREATESNAPSHOT) (uint32_t, uint32_t);
+typedef BOOL (WINAPI *WRITEDUMP) (HANDLE, uint32_t, HANDLE, int,
 								  PMINIDUMP_EXCEPTION_INFORMATION,
 								  PMINIDUMP_USER_STREAM_INFORMATION,
 								  PMINIDUMP_CALLBACK_INFORMATION);
@@ -169,50 +169,50 @@ namespace zip
 #pragma pack(push,1)
 	struct LocalFileHeader
 	{
-		DWORD	Magic;						// 0
+		uint32_t	Magic;						// 0
 		BYTE	VersionToExtract[2];		// 4
-		WORD	Flags;						// 6
-		WORD	Method;						// 8
-		WORD	ModTime;					// 10
-		WORD	ModDate;					// 12
-		DWORD	CRC32;						// 14
-		DWORD	CompressedSize;				// 18
-		DWORD	UncompressedSize;			// 22
-		WORD	NameLength;					// 26
-		WORD	ExtraLength;				// 28
+		uint16_t	Flags;						// 6
+		uint16_t	Method;						// 8
+		uint16_t	ModTime;					// 10
+		uint16_t	ModDate;					// 12
+		uint32_t	CRC32;						// 14
+		uint32_t	CompressedSize;				// 18
+		uint32_t	UncompressedSize;			// 22
+		uint16_t	NameLength;					// 26
+		uint16_t	ExtraLength;				// 28
 	};
 
 	struct CentralDirectoryEntry
 	{
-		DWORD	Magic;
+		uint32_t	Magic;
 		BYTE	VersionMadeBy[2];
 		BYTE	VersionToExtract[2];
-		WORD	Flags;
-		WORD	Method;
-		WORD	ModTime;
-		WORD	ModDate;
-		DWORD	CRC32;
-		DWORD	CompressedSize;
-		DWORD	UncompressedSize;
-		WORD	NameLength;
-		WORD	ExtraLength;
-		WORD	CommentLength;
-		WORD	StartingDiskNumber;
-		WORD	InternalAttributes;
-		DWORD	ExternalAttributes;
-		DWORD	LocalHeaderOffset;
+		uint16_t	Flags;
+		uint16_t	Method;
+		uint16_t	ModTime;
+		uint16_t	ModDate;
+		uint32_t	CRC32;
+		uint32_t	CompressedSize;
+		uint32_t	UncompressedSize;
+		uint16_t	NameLength;
+		uint16_t	ExtraLength;
+		uint16_t	CommentLength;
+		uint16_t	StartingDiskNumber;
+		uint16_t	InternalAttributes;
+		uint32_t	ExternalAttributes;
+		uint32_t	LocalHeaderOffset;
 	};
 
 	struct EndOfCentralDirectory
 	{
-		DWORD	Magic;
-		WORD	DiskNumber;
-		WORD	FirstDisk;
-		WORD	NumEntries;
-		WORD	NumEntriesOnAllDisks;
-		DWORD	DirectorySize;
-		DWORD	DirectoryOffset;
-		WORD	ZipCommentLength;
+		uint32_t	Magic;
+		uint16_t	DiskNumber;
+		uint16_t	FirstDisk;
+		uint16_t	NumEntries;
+		uint16_t	NumEntriesOnAllDisks;
+		uint32_t	DirectorySize;
+		uint32_t	DirectoryOffset;
+		uint16_t	ZipCommentLength;
 	};
 #pragma pack(pop)
 }
@@ -222,9 +222,9 @@ struct TarFile
 	HANDLE		File;
 	const char *Filename;
 	int			ZipOffset;
-	DWORD		UncompressedSize;
-	DWORD		CompressedSize;
-	DWORD		CRC32;
+	uint32_t		UncompressedSize;
+	uint32_t		CompressedSize;
+	uint32_t		CRC32;
 	bool		Deflated;
 };
 
@@ -248,12 +248,12 @@ static void AddZipFile (HANDLE ziphandle, TarFile *whichfile, short dosdate, sho
 static HANDLE CreateTempFile ();
 
 static void DumpBytes (HANDLE file, BYTE *address);
-static void AddStackInfo (HANDLE file, void *dumpaddress, DWORD code, CONTEXT *ctxt);
-static void StackWalk (HANDLE file, void *dumpaddress, DWORD *topOfStack, DWORD *jump, CONTEXT *ctxt);
+static void AddStackInfo (HANDLE file, void *dumpaddress, uint32_t code, CONTEXT *ctxt);
+static void StackWalk (HANDLE file, void *dumpaddress, uint32_t *topOfStack, uint32_t *jump, CONTEXT *ctxt);
 static void AddToolHelp (HANDLE file);
 
 static HANDLE WriteTextReport ();
-static DWORD WINAPI WriteMiniDumpInAnotherThread (LPVOID lpParam);
+static uint32_t WINAPI WriteMiniDumpInAnotherThread (LPVOID lpParam);
 
 static INT_PTR CALLBACK DetailsDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 static void SetEditControl (HWND control, HWND sizedisplay, int filenum);
@@ -270,7 +270,7 @@ EXCEPTION_POINTERS CrashPointers;
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
 
-static HRESULT (__stdcall *pEnableThemeDialogTexture) (HWND hwnd, DWORD dwFlags);
+static HRESULT (__stdcall *pEnableThemeDialogTexture) (HWND hwnd, uint32_t dwFlags);
 
 static const char PostHeader[] =
 "POST " UPLOAD_URI " HTTP/1.1\r\n"
@@ -324,9 +324,9 @@ static TarFile TarFiles[MAX_FILES];
 static int NumFiles;
 
 static HANDLE DbgProcess;
-static DWORD DbgProcessID;
-static DWORD DbgThreadID;
-static DWORD CrashCode;
+static uint32_t DbgProcessID;
+static uint32_t DbgThreadID;
+static uint32_t CrashCode;
 static PVOID CrashAddress;
 static bool NeedDbgHelp;
 static char CrashSummary[256];
@@ -383,13 +383,13 @@ static bool SafeReadMemory (const void *base, void *buffer, size_t len)
 //
 //==========================================================================
 
-DWORD *GetTopOfStack (void *top)
+uint32_t *GetTopOfStack (void *top)
 {
 	MEMORY_BASIC_INFORMATION memInfo;
 
 	if (VirtualQuery (top, &memInfo, sizeof(memInfo)))
 	{
-		return (DWORD *)((BYTE *)memInfo.BaseAddress + memInfo.RegionSize);
+		return (uint32_t *)((BYTE *)memInfo.BaseAddress + memInfo.RegionSize);
 	}
 	else
 	{
@@ -453,7 +453,7 @@ static HANDLE WriteMyMiniDump (void)
 			else
 			{
 				MiniDumpThreadData dumpdata = { file, pMiniDumpWriteDump, &exceptor };
-				DWORD id;
+				uint32_t id;
 				HANDLE thread = CreateThread (NULL, 0, WriteMiniDumpInAnotherThread,
 					&dumpdata, 0, &id);
 				WaitForSingleObject (thread, INFINITE);
@@ -481,7 +481,7 @@ static HANDLE WriteMyMiniDump (void)
 //
 //==========================================================================
 
-static DWORD WINAPI WriteMiniDumpInAnotherThread (LPVOID lpParam)
+static uint32_t WINAPI WriteMiniDumpInAnotherThread (LPVOID lpParam)
 {
 	MiniDumpThreadData *dumpdata = (MiniDumpThreadData *)lpParam;
 	return dumpdata->pMiniDumpWriteDump (DbgProcess, DbgProcessID,
@@ -500,7 +500,7 @@ void __cdecl Writef (HANDLE file, const char *format, ...)
 {
 	char buffer[1024];
 	va_list args;
-	DWORD len;
+	uint32_t len;
 
 	va_start (args, format);
 	len = vsprintf (buffer, format, args);
@@ -516,9 +516,9 @@ void __cdecl Writef (HANDLE file, const char *format, ...)
 //
 //==========================================================================
 
-static DWORD CALLBACK WriteLogFileStreamer(DWORD_PTR cookie, LPBYTE buffer, LONG cb, LONG *pcb)
+static uint32_t CALLBACK WriteLogFileStreamer(DWORD_PTR cookie, LPBYTE buffer, LONG cb, LONG *pcb)
 {
-	DWORD didwrite;
+	uint32_t didwrite;
 	LONG p, pp;
 
 	// Replace gray foreground color with black.
@@ -581,7 +581,7 @@ HANDLE WriteLogFile(HWND edit)
 //
 //==========================================================================
 
-void CreateCrashLog (char *custominfo, DWORD customsize, HWND richlog)
+void CreateCrashLog (char *custominfo, uint32_t customsize, HWND richlog)
 {
 	// Do not collect information more than once.
 	if (NumFiles != 0)
@@ -604,12 +604,12 @@ void CreateCrashLog (char *custominfo, DWORD customsize, HWND richlog)
 	if (customsize != 0)
 	{
 		HANDLE file = CreateTempFile();
-		DWORD wrote;
+		uint32_t wrote;
 
 		if (file != INVALID_HANDLE_VALUE)
 		{
 			BYTE buffer[512];
-			DWORD left;
+			uint32_t left;
 
 			for (;; customsize -= left, custominfo += left)
 			{
@@ -653,7 +653,7 @@ HANDLE WriteTextReport ()
 
 	static const struct
 	{
-		DWORD Code; const char *Text;
+		uint32_t Code; const char *Text;
 	}
 	exceptions[] =
 	{
@@ -780,7 +780,7 @@ HANDLE WriteTextReport ()
 			ctxt->Rip, ctxt->Rsp, ctxt->SegCs, ctxt->SegSs, ctxt->EFlags);
 #endif
 
-		DWORD j;
+		uint32_t j;
 
 		for (i = 0, j = 1; (size_t)i < sizeof(eflagsBits)/sizeof(eflagsBits[0]); j <<= 1, ++i)
 		{
@@ -803,7 +803,7 @@ HANDLE WriteTextReport ()
 			//" Cr0NpxState=%08x\r\n\r\n"
 			"\r\n"
 			,
-			(WORD)ctxt->FloatSave.ControlWord, (WORD)ctxt->FloatSave.StatusWord, (WORD)ctxt->FloatSave.TagWord,
+			(uint16_t)ctxt->FloatSave.ControlWord, (uint16_t)ctxt->FloatSave.StatusWord, (uint16_t)ctxt->FloatSave.TagWord,
 			ctxt->FloatSave.ErrorOffset, ctxt->FloatSave.ErrorSelector, ctxt->FloatSave.DataOffset,
 			ctxt->FloatSave.DataSelector
 			//, ctxt->FloatSave.Cr0NpxState
@@ -811,9 +811,9 @@ HANDLE WriteTextReport ()
 
 		for (i = 0; i < 8; ++i)
 		{
-			DWORD d0, d1;
-			memcpy(&d0, &ctxt->FloatSave.RegisterArea[20*i+4], sizeof(DWORD));
-			memcpy(&d1, &ctxt->FloatSave.RegisterArea[20*i], sizeof(DWORD));
+			uint32_t d0, d1;
+			memcpy(&d0, &ctxt->FloatSave.RegisterArea[20*i+4], sizeof(uint32_t));
+			memcpy(&d1, &ctxt->FloatSave.RegisterArea[20*i], sizeof(uint32_t));
 			Writef (file, "MM%d=%08x%08x\r\n", i, d0, d1);
 		}
 #else
@@ -942,15 +942,15 @@ static void AddToolHelp (HANDLE file)
 //
 //==========================================================================
 
-static void AddStackInfo (HANDLE file, void *dumpaddress, DWORD code, CONTEXT *ctxt)
+static void AddStackInfo (HANDLE file, void *dumpaddress, uint32_t code, CONTEXT *ctxt)
 {
-	DWORD *addr = (DWORD *)dumpaddress, *jump;
-	DWORD *topOfStack = GetTopOfStack (dumpaddress);
+	uint32_t *addr = (uint32_t *)dumpaddress, *jump;
+	uint32_t *topOfStack = GetTopOfStack (dumpaddress);
 	BYTE peekb;
 #ifdef _M_IX86
-	DWORD peekd;
+	uint32_t peekd;
 #else
-	QWORD peekq;
+	uint64_t peekq;
 #endif
 
 	jump = topOfStack;
@@ -966,7 +966,7 @@ static void AddStackInfo (HANDLE file, void *dumpaddress, DWORD code, CONTEXT *c
 	StackWalk (file, dumpaddress, topOfStack, jump, ctxt);
 
 	Writef (file, "\r\nStack Contents:\r\n");
-	DWORD *scan;
+	uint32_t *scan;
 	for (scan = addr; scan < topOfStack; scan += 4)
 	{
 		int i;
@@ -1002,9 +1002,9 @@ static void AddStackInfo (HANDLE file, void *dumpaddress, DWORD code, CONTEXT *c
 			Writef (file, "         ");
 		}
 #else
-		if ((QWORD *)topOfStack - (QWORD *)scan < 2)
+		if ((uint64_t *)topOfStack - (uint64_t *)scan < 2)
 		{
-			max = (QWORD *)topOfStack - (QWORD *)scan;
+			max = (uint64_t *)topOfStack - (uint64_t *)scan;
 		}
 		else
 		{
@@ -1050,9 +1050,9 @@ static void AddStackInfo (HANDLE file, void *dumpaddress, DWORD code, CONTEXT *c
 //
 //==========================================================================
 
-static void StackWalk (HANDLE file, void *dumpaddress, DWORD *topOfStack, DWORD *jump, CONTEXT *ctxt)
+static void StackWalk (HANDLE file, void *dumpaddress, uint32_t *topOfStack, uint32_t *jump, CONTEXT *ctxt)
 {
-	DWORD *addr = (DWORD *)dumpaddress;
+	uint32_t *addr = (uint32_t *)dumpaddress;
 
 	BYTE *pBaseOfImage = (BYTE *)GetModuleHandle (0);
 	IMAGE_OPTIONAL_HEADER *pHeader = (IMAGE_OPTIONAL_HEADER *)(pBaseOfImage +
@@ -1063,7 +1063,7 @@ static void StackWalk (HANDLE file, void *dumpaddress, DWORD *topOfStack, DWORD 
 	DWORD_PTR codeEnd = codeStart + pHeader->SizeOfCode;
 
 	Writef (file, "\r\nPossible call trace:\r\n %08x  BOOM", CrashAddress);
-	for (DWORD *scan = addr; scan < topOfStack; ++scan)
+	for (uint32_t *scan = addr; scan < topOfStack; ++scan)
 	{
 		if (scan == jump)
 		{
@@ -1089,7 +1089,7 @@ static void StackWalk (HANDLE file, void *dumpaddress, DWORD *topOfStack, DWORD 
 
 			if (chkbyte(bytep - 5, 0xFF, 0xE8) || chkbyte(bytep - 5, 0xFF, 0xE9))
 			{
-				DWORD peekd;
+				uint32_t peekd;
 				if (SafeReadMemory (bytep - 4, &peekd, 4))
 				{
 					DWORD_PTR jumpaddr = peekd + code;
@@ -1249,7 +1249,7 @@ static void StackWalk (HANDLE file, void *dumpaddress, DWORD *topOfStack, DWORD 
 //
 //==========================================================================
 
-static void StackWalk (HANDLE file, void *dumpaddress, DWORD *topOfStack, DWORD *jump, CONTEXT *ctxt)
+static void StackWalk (HANDLE file, void *dumpaddress, uint32_t *topOfStack, uint32_t *jump, CONTEXT *ctxt)
 {
 	RTLLOOKUPFUNCTIONENTRY RtlLookupFunctionEntry;
 	HMODULE kernel;
@@ -1367,7 +1367,7 @@ static void StackWalk (HANDLE file, void *dumpaddress, DWORD *topOfStack, DWORD 
 static void DumpBytes (HANDLE file, BYTE *address)
 {
 	char line[68*3], *line_p = line;
-	DWORD len;
+	uint32_t len;
 	BYTE peek;
 
 	for (int i = 0; i < 16*3; ++i)
@@ -1388,7 +1388,7 @@ static void DumpBytes (HANDLE file, BYTE *address)
 	}
 	*line_p++ = '\r';
 	*line_p++ = '\n';
-	WriteFile (file, line, DWORD(line_p - line), &len, NULL);
+	WriteFile (file, line, uint32_t(line_p - line), &len, NULL);
 }
 
 //==========================================================================
@@ -1464,7 +1464,7 @@ static void CloseTarFiles ()
 //
 //==========================================================================
 
-static DWORD WriteBlock (HANDLE file, LPCVOID buffer, DWORD bytes, z_stream *stream, Bytef *outbuf)
+static uint32_t WriteBlock (HANDLE file, LPCVOID buffer, uint32_t bytes, z_stream *stream, Bytef *outbuf)
 {
 	if (stream == NULL)
 	{
@@ -1473,7 +1473,7 @@ static DWORD WriteBlock (HANDLE file, LPCVOID buffer, DWORD bytes, z_stream *str
 	}
 	else
 	{
-		DWORD wrote = 0;
+		uint32_t wrote = 0;
 
 		stream->next_in = (Bytef *)buffer;
 		stream->avail_in = bytes;
@@ -1514,7 +1514,7 @@ static HANDLE MakeZip ()
 	struct tm *nowtm;
 	int i, numfiles;
 	HANDLE file;
-	DWORD len, dirsize;
+	uint32_t len, dirsize;
 	size_t namelen;
 
 	if (NumFiles == 0)
@@ -1583,11 +1583,11 @@ static HANDLE MakeZip ()
 		central.CRC32 = LittleLong(TarFiles[i].CRC32);
 		central.CompressedSize = LittleLong(TarFiles[i].CompressedSize);
 		central.UncompressedSize = LittleLong(TarFiles[i].UncompressedSize);
-		central.NameLength = LittleShort((WORD)namelen);
+		central.NameLength = LittleShort((uint16_t)namelen);
 		central.LocalHeaderOffset = LittleLong(TarFiles[i].ZipOffset);
 		WriteFile (file, &central, sizeof(central), &len, NULL);
-		WriteFile (file, TarFiles[i].Filename, (DWORD)namelen, &len, NULL);
-		dirsize += DWORD(sizeof(central) + namelen);
+		WriteFile (file, TarFiles[i].Filename, (uint32_t)namelen, &len, NULL);
+		dirsize += uint32_t(sizeof(central) + namelen);
 	}
 
 	// Write the directory terminator
@@ -1611,7 +1611,7 @@ static void AddZipFile (HANDLE ziphandle, TarFile *whichfile, short dosdate, sho
 	zip::LocalFileHeader local = { ZIP_LOCALFILE, };
 	Bytef outbuf[1024], inbuf[1024];
 	z_stream stream;
-	DWORD wrote, len, k;
+	uint32_t wrote, len, k;
 	int err;
 	bool gzip;
 
@@ -1648,11 +1648,11 @@ static void AddZipFile (HANDLE ziphandle, TarFile *whichfile, short dosdate, sho
 	local.ModTime = dostime;
 	local.ModDate = dosdate;
 	local.UncompressedSize = LittleLong(whichfile->UncompressedSize);
-	local.NameLength = LittleShort((WORD)strlen(whichfile->Filename));
+	local.NameLength = LittleShort((uint16_t)strlen(whichfile->Filename));
 	
 	whichfile->ZipOffset = SetFilePointer (ziphandle, 0, NULL, FILE_CURRENT);
 	WriteFile (ziphandle, &local, sizeof(local), &wrote, NULL);
-	WriteFile (ziphandle, whichfile->Filename, (DWORD)strlen(whichfile->Filename), &wrote, NULL);
+	WriteFile (ziphandle, whichfile->Filename, (uint32_t)strlen(whichfile->Filename), &wrote, NULL);
 
 	// Write the file itself and calculate its CRC.
 	SetFilePointer (whichfile->File, 0, NULL, FILE_BEGIN);
@@ -1869,15 +1869,15 @@ static char *UserSummary;
 
 static void AddDescriptionText (HWND edit)
 {
-	DWORD textlen;
+	uint32_t textlen;
 
-	textlen = (DWORD)SendMessage (edit, WM_GETTEXTLENGTH, 0, 0) + 1;
+	textlen = (uint32_t)SendMessage (edit, WM_GETTEXTLENGTH, 0, 0) + 1;
 	if (textlen > 1)
 	{
 		UserSummary = (char *)HeapAlloc (GetProcessHeap(), 0, textlen);
 		if (UserSummary != NULL)
 		{
-			textlen = (DWORD)SendMessage (edit, WM_GETTEXT, textlen, (LPARAM)UserSummary);
+			textlen = (uint32_t)SendMessage (edit, WM_GETTEXT, textlen, (LPARAM)UserSummary);
 		}
 	}
 }
@@ -2129,9 +2129,9 @@ static INT_PTR CALLBACK DetailsDlgProc (HWND hDlg, UINT message, WPARAM wParam, 
 //
 //==========================================================================
 
-static DWORD CALLBACK StreamEditText (DWORD_PTR cookie, LPBYTE buffer, LONG cb, LONG *pcb)
+static uint32_t CALLBACK StreamEditText (DWORD_PTR cookie, LPBYTE buffer, LONG cb, LONG *pcb)
 {
-	DWORD wrote;
+	uint32_t wrote;
 	ReadFile ((HANDLE)cookie, buffer, cb, &wrote, NULL);
 	*pcb = wrote;
 	return wrote == 0;
@@ -2151,14 +2151,14 @@ struct BinStreamInfo
 {
 	int Stage;
 	HANDLE File;
-	DWORD Pointer;
+	uint32_t Pointer;
 };
 
-static DWORD CALLBACK StreamEditBinary (DWORD_PTR cookie, LPBYTE buffer, LONG cb, LONG *pcb)
+static uint32_t CALLBACK StreamEditBinary (DWORD_PTR cookie, LPBYTE buffer, LONG cb, LONG *pcb)
 {
 	BinStreamInfo *info = (BinStreamInfo *)cookie;
 	BYTE buf16[16];
-	DWORD read, i;
+	uint32_t read, i;
 	char *buff_p = (char *)buffer;
 	char *buff_end = (char *)buffer + cb;
 
@@ -2189,7 +2189,7 @@ repeat:
 			{
 				if (i <= read - 4)
 				{
-					DWORD d;
+					uint32_t d;
 					memcpy(&d, &buf16[i], sizeof(d));
 					buff_p += mysnprintf (buff_p, buff_end - buff_p, " %08lx", d);
 					i += 4;
@@ -2248,7 +2248,7 @@ static void SetEditControl (HWND edit, HWND sizedisplay, int filenum)
 {
 	char sizebuf[32];
 	EDITSTREAM stream;
-	DWORD size;
+	uint32_t size;
 	POINT pt = { 0, 0 };
 	const char *rtf = NULL;
 	HGDIOBJ font;
@@ -2324,7 +2324,7 @@ static void SetEditControl (HWND edit, HWND sizedisplay, int filenum)
 
 static char *GetHeader (SOCKET sock)
 {
-	DWORD spaceHave = 0, spaceAt = 0;
+	uint32_t spaceHave = 0, spaceAt = 0;
 	char *space = NULL;
 	char inchar;
 	int got;
@@ -2685,7 +2685,7 @@ gottoken:
 static bool ReadResponse (HWND hDlg, char *header, SOCKET sock, char *buf, int bufsize, HANDLE file)
 {
 	HWND edit = GetDlgItem (hDlg, IDC_BOINGEDIT);
-	DWORD wrote;
+	uint32_t wrote;
 	int len, avail, totalRecv;
 	int recvBytes = 0;
 	POINT pt = { 0, 0 };
@@ -2857,7 +2857,7 @@ struct UploadParmStruct
 //
 //==========================================================================
 
-static DWORD WINAPI UploadProc (LPVOID lpParam)
+static uint32_t WINAPI UploadProc (LPVOID lpParam)
 {
 	char dbghelpPath[MAX_PATH+12];
 	UploadParmStruct *parm = (UploadParmStruct *)lpParam;
@@ -2867,12 +2867,12 @@ static DWORD WINAPI UploadProc (LPVOID lpParam)
 	addrinfo aiHints = { 0 };
 	addrinfo *aiList = NULL;
 	char *header = NULL;
-	DWORD fileLen, fileLeft, contentLength;
+	uint32_t fileLen, fileLeft, contentLength;
 	int bytesSent;
 	int headerLen;
 	int err, i;
 	int retries;
-	DWORD returnval = TRUE;
+	uint32_t returnval = TRUE;
 	HANDLE dbghelp = INVALID_HANDLE_VALUE;
 	HWND status = GetDlgItem (parm->hDlg, IDC_BOINGSTATUS);
 
@@ -3017,8 +3017,8 @@ static DWORD WINAPI UploadProc (LPVOID lpParam)
 		i = 0;
 		while (fileLeft != 0)
 		{
-			DWORD grab = fileLeft > sizeof(xferbuf) ? sizeof(xferbuf) : fileLeft;
-			DWORD didread;
+			uint32_t grab = fileLeft > sizeof(xferbuf) ? sizeof(xferbuf) : fileLeft;
+			uint32_t didread;
 
 			ReadFile (parm->hFile, xferbuf, grab, &didread, NULL);
 			bytesSent = send (sock, xferbuf, didread, 0);
@@ -3176,7 +3176,7 @@ static BOOL CALLBACK BoingDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARA
 	HWND ctrl;
 	WLONG_PTR iconNum;
 	HANDLE icon;
-	DWORD threadID;
+	uint32_t threadID;
 
 	switch (message)
 	{
@@ -3276,15 +3276,15 @@ static void SaveReport (HANDLE file)
 		}
 		else
 		{
-			DWORD fileLen = GetFileSize (file, NULL), fileLeft;
+			uint32_t fileLen = GetFileSize (file, NULL), fileLeft;
 			char xferbuf[1024];
 
 			SetFilePointer (file, 0, NULL, FILE_BEGIN);
 			fileLeft = fileLen;
 			while (fileLeft != 0)
 			{
-				DWORD grab = fileLeft > sizeof(xferbuf) ? sizeof(xferbuf) : fileLeft;
-				DWORD didread;
+				uint32_t grab = fileLeft > sizeof(xferbuf) ? sizeof(xferbuf) : fileLeft;
+				uint32_t didread;
 
 				ReadFile (file, xferbuf, grab, &didread, NULL);
 				WriteFile (ofile, xferbuf, didread, &grab, NULL);
@@ -3327,7 +3327,7 @@ void DisplayCrashLog ()
 		HMODULE uxtheme = LoadLibrary ("uxtheme.dll");
 		if (uxtheme != NULL)
 		{
-			pEnableThemeDialogTexture = (HRESULT (__stdcall *)(HWND,DWORD))GetProcAddress (uxtheme, "EnableThemeDialogTexture");
+			pEnableThemeDialogTexture = (HRESULT (__stdcall *)(HWND,uint32_t))GetProcAddress (uxtheme, "EnableThemeDialogTexture");
 		}
 		INT_PTR result = DialogBox (g_hInst, MAKEINTRESOURCE(IDD_CRASHDIALOG), NULL, (DLGPROC)CrashDlgProc);
 		if (result == IDYES)

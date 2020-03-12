@@ -97,7 +97,7 @@ extern FRandom pr_exrandom;*/
 FRandom M_Random;
 
 // Global seed. This is modified predictably to initialize every RNG.
-DWORD rngseed;
+uint32_t rngseed;
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
 
@@ -235,12 +235,12 @@ void FRandom::StaticClearRandom ()
 //
 //==========================================================================
 
-void FRandom::Init(DWORD seed)
+void FRandom::Init(uint32_t seed)
 {
 	// [RH] Use the RNG's name's CRC to modify the original seed.
 	// This way, new RNGs can be added later, and it doesn't matter
 	// which order they get initialized in.
-	DWORD seeds[2] = { NameCRC, seed };
+	uint32_t seeds[2] = { NameCRC, seed };
 	InitByArray(seeds, 2);
 
 	oldidx = sfmt.u[0]&0xFF;
@@ -250,13 +250,13 @@ void FRandom::Init(DWORD seed)
 //
 // FRandom :: StaticSumSeeds
 //
-// This function produces a DWORD that can be used to check the consistancy
+// This function produces a uint32_t that can be used to check the consistancy
 // of network games between different machines. Only a select few RNGs are
 // used for the sum, because not all RNGs are important to network sync.
 //
 //==========================================================================
 
-DWORD FRandom::StaticSumSeeds ()
+uint32_t FRandom::StaticSumSeeds ()
 {
 	return pr_spawnmobj.sfmt.u[0] + pr_spawnmobj.idx +
 		pr_chase.sfmt.u[0] + pr_chase.idx;
@@ -278,7 +278,7 @@ void FRandom::StaticWriteRNGState (FILE *file)
 }
 #endif
 
-DWORD FRandom::GetRNGCount ()
+uint32_t FRandom::GetRNGCount ()
 {
 	int ret = 0;
 	FRandom *rng;
@@ -321,7 +321,7 @@ void FRandom::StaticWriteRNGState (FArchive &arc)
 void FRandom::StaticReadRNGState (FArchive &arc, int rngcount)
 {
 	int i;
-	DWORD crc;
+	uint32_t crc;
 	FRandom *rng;
 	arc << rngseed;
 	FRandom::StaticClearRandom ();
@@ -346,7 +346,7 @@ void FRandom::StaticReadRNGState (FArchive &arc, int rngcount)
 		if (rng == NULL)
 		{ // The RNG was removed. Skip it.
 			int32_t idx;
-			DWORD sfmt;
+			uint32_t sfmt;
 			arc << idx;
 			if(GameSave::SaveVersion >= 1379630950u)
 				arc << rng->oldidx;
@@ -391,7 +391,7 @@ void FRandom::StaticReadRNGState (PNGHandle *png)
 
 FRandom *FRandom::StaticFindRNG (const char *name)
 {
-	DWORD NameCRC = CalcCRC32 ((const BYTE *)name, (unsigned int)strlen (name));
+	uint32_t NameCRC = CalcCRC32 ((const BYTE *)name, (unsigned int)strlen (name));
 
 	// Use the default RNG if this one happens to have a CRC of 0.
 	//if (NameCRC == 0) return &pr_exrandom;

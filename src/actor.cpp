@@ -126,7 +126,7 @@ FArchive &operator<< (FArchive &arc, const Frame *&frame)
 	else
 	{
 		const ClassDef *cls;
-		DWORD frameIndex;
+		uint32_t frameIndex;
 
 		arc << cls;
 		if(cls)
@@ -439,7 +439,7 @@ void AActor::Serialize(FArchive &arc)
 	arc << dir;
 	this->dir = static_cast<dirtype>(dir);
 
-	SDWORD xt = x, yt = y;
+	int32_t xt = x, yt = y;
 	arc << flags
 		<< distance
 		<< xt

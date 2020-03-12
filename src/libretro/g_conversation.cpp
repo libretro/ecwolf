@@ -163,8 +163,8 @@ void quizSerialize(wl_state_t *state, FArchive &arc)
 		}
 	}
 
-	DWORD pos = 0;
-	DWORD pagenum = 0;
+	uint32_t pos = 0;
+	uint32_t pagenum = 0;
 	if (arc.IsStoring()) {
 		pos = state->quizMenu ? state->quizMenu->getCurrentPosition() : 0;
 		if (conv != NULL && conv->Pages.Size() && state->quizPage) {

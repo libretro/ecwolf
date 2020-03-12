@@ -1470,7 +1470,7 @@ static void ParseMapInfoLump(int lump, bool gameinfoPass)
 void ParseMacMapList(int lumpnum)
 {
 	int songlumpnum = Wads.CheckNumForName("SONGLIST");
-	TArray<WORD> songs;
+	TArray<uint16_t> songs;
 	if(songlumpnum != -1)
 	{
 		FWadLump songlump = Wads.OpenLumpNum(songlumpnum);
@@ -1486,14 +1486,14 @@ void ParseMacMapList(int lumpnum)
 
 	FWadLump lump = Wads.OpenLumpNum(lumpnum);
 
-	WORD numMaps;
+	uint16_t numMaps;
 	lump >> numMaps;
 	lump.Seek(2, SEEK_CUR);
 	numMaps = BigShort(numMaps);
 
 	for(unsigned int i = 0;i < numMaps;++i)
 	{
-		WORD nextLevel, nextSecret, parTime, scenarioNum, floorNum;
+		uint16_t nextLevel, nextSecret, parTime, scenarioNum, floorNum;
 		lump >> nextLevel >> nextSecret >> parTime >> scenarioNum >> floorNum;
 		nextLevel = BigShort(nextLevel);
 		nextSecret = BigShort(nextSecret);

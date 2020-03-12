@@ -216,8 +216,8 @@ FTexture *JPEGTexture_TryCreate(FileReader & data, int lumpnum)
 {
 	union
 	{
-		DWORD dw;
-		WORD w[2];
+		uint32_t dw;
+		uint16_t w[2];
 		BYTE b[4];
 	} first4bytes;
 

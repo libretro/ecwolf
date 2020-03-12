@@ -77,12 +77,12 @@ static bool CheckIfWolfRaw(FileReader &file)
 {
 	if(file.GetLength() < 5) return false;
 	
-	WORD header[2];
+	uint16_t header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 
-	WORD Width = LittleShort(header[0]);
-	WORD Height = LittleShort(header[1]);
+	uint16_t Width = LittleShort(header[0]);
+	uint16_t Height = LittleShort(header[1]);
 	if(file.GetLength() == Width*Height+4) // Raw page
 		return true;
 
@@ -115,7 +115,7 @@ FTexture *WolfRawTexture_TryCreate(FileReader &file, int lumpnum)
 FWolfRawTexture::FWolfRawTexture(int lumpnum, FileReader &file)
 : FTexture(NULL, lumpnum), Pixels(0), Spans(0)
 {
-	WORD header[2];
+	uint16_t header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 	Width = LittleShort(header[0]);

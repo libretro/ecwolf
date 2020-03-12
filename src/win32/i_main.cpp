@@ -49,12 +49,12 @@
 HINSTANCE		g_hInst;
 HWND			ConWindow;
 HANDLE			MainThread;
-DWORD			MainThreadID;
+uint32_t			MainThreadID;
 
 static bool AttachedStdOut = false, MustAllocConsole = false, FancyStdOut = false;
 
 extern EXCEPTION_POINTERS CrashPointers;
-void CreateCrashLog (char *custominfo, DWORD customsize, HWND richedit);
+void CreateCrashLog (char *custominfo, uint32_t customsize, HWND richedit);
 void DisplayCrashLog ();
 
 int WL_Main(int argc, char* argv[]);
@@ -224,7 +224,7 @@ LONG WINAPI CatchAllExceptions (LPEXCEPTION_POINTERS info)
 
 	CrashPointers = *info;
 	DoomSpecificInfo (custominfo, 16384);
-	CreateCrashLog (custominfo, (DWORD)strlen(custominfo), ConWindow);
+	CreateCrashLog (custominfo, (uint32_t)strlen(custominfo), ConWindow);
 
 	// If the main thread crashed, then make it clean up after itself.
 	// Otherwise, put the crashing thread to sleep and signal the main thread to clean up.
@@ -312,11 +312,11 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE nothing, LPSTR cmdline, int n
 		// AttachConsole was introduced with Windows XP. (OTOH, since we
 		// have to share the console with the shell, I'm not sure if it's
 		// a good idea to actually attach to it.)
-		TOptWin32Proc<BOOL(WINAPI *)(DWORD)> attach_console("kernel32.dll", "AttachConsole");
+		TOptWin32Proc<BOOL(WINAPI *)(uint32_t)> attach_console("kernel32.dll", "AttachConsole");
 		if (attach_console != NULL && attach_console.Call(ATTACH_PARENT_PROCESS))
 		{
 			StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-			DWORD foo; WriteFile(StdOut, "\n", 1, &foo, NULL);
+			uint32_t foo; WriteFile(StdOut, "\n", 1, &foo, NULL);
 			AttachedStdOut = true;
 		}
 		if (StdOut == NULL)

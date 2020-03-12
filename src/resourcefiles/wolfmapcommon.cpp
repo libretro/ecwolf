@@ -81,7 +81,7 @@ void FMapLump::ExpandCarmack(const unsigned char* in, unsigned char* out)
 	}
 }
 
-void FMapLump::ExpandRLEW(const unsigned char* in, unsigned char* out, const DWORD length, const WORD rlewTag)
+void FMapLump::ExpandRLEW(const unsigned char* in, unsigned char* out, const uint32_t length, const uint16_t rlewTag)
 {
 	const unsigned char* const end = out+length;
 
@@ -94,8 +94,8 @@ void FMapLump::ExpandRLEW(const unsigned char* in, unsigned char* out, const DWO
 		}
 		else
 		{
-			WORD count = ReadLittleShort((const BYTE*)(in+2));
-			WORD input = ReadLittleShort((const BYTE*)(in+4));
+			uint16_t count = ReadLittleShort((const BYTE*)(in+2));
+			uint16_t input = ReadLittleShort((const BYTE*)(in+4));
 			in += 6;
 			while(count-- > 0)
 			{
@@ -166,10 +166,10 @@ int FMapLump::FillCache()
 		// We do this after the things plane has been read
 		if(rtlMap && i == 1)
 		{
-			const WORD floorTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE))-0xB4;
-			const WORD ceilingTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE+2))-0xC6;
-			const WORD fill = (floorTex&0xFF)|((ceilingTex&0xFF)<<8);
-			WORD *out = reinterpret_cast<WORD*>(output);
+			const uint16_t floorTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE))-0xB4;
+			const uint16_t ceilingTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE+2))-0xC6;
+			const uint16_t fill = (floorTex&0xFF)|((ceilingTex&0xFF)<<8);
+			uint16_t *out = reinterpret_cast<uint16_t*>(output);
 			for(unsigned int j = 0;j < PlaneSize/2;++j)
 				*out++ = fill;
 			output += PlaneSize;

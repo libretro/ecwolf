@@ -341,7 +341,7 @@ void FResourceFile::PostProcessArchive(void *lumps, size_t lumpsize)
 	// Filter out lumps using the same names as the Autoload.* sections
 	// in the ini file use. We reduce the maximum lump concidered after
 	// each one so that we don't risk refiltering already filtered lumps.
-	DWORD max = NumLumps;
+	uint32_t max = NumLumps;
 	//max -= FilterLumpsByGameType(gameinfo.gametype, lumps, lumpsize, max);
 
 	long len;
@@ -366,10 +366,10 @@ void FResourceFile::PostProcessArchive(void *lumps, size_t lumpsize)
 //
 //==========================================================================
 
-int FResourceFile::FilterLumps(FString filtername, void *lumps, size_t lumpsize, DWORD max)
+int FResourceFile::FilterLumps(FString filtername, void *lumps, size_t lumpsize, uint32_t max)
 {
 	FString filter;
-	DWORD start, end;
+	uint32_t start, end;
 
 	if (filtername.IsEmpty())
 	{
@@ -382,7 +382,7 @@ int FResourceFile::FilterLumps(FString filtername, void *lumps, size_t lumpsize,
 
 		// Remove filter prefix from every name
 		void *lump_p = from;
-		for (DWORD i = start; i < end; ++i, lump_p = (BYTE *)lump_p + lumpsize)
+		for (uint32_t i = start; i < end; ++i, lump_p = (BYTE *)lump_p + lumpsize)
 		{
 			FResourceLump *lump = (FResourceLump *)lump_p;
 			assert(lump->FullName.CompareNoCase(filter, (int)filter.Len()) == 0);
@@ -422,7 +422,7 @@ int FResourceFile::FilterLumps(FString filtername, void *lumps, size_t lumpsize,
 //==========================================================================
 
 #if 0
-int FResourceFile::FilterLumpsByGameType(int type, void *lumps, size_t lumpsize, DWORD max)
+int FResourceFile::FilterLumpsByGameType(int type, void *lumps, size_t lumpsize, uint32_t max)
 {
 	static const struct { int match; const char *name; } blanket[] =
 	{
@@ -457,9 +457,9 @@ int FResourceFile::FilterLumpsByGameType(int type, void *lumps, size_t lumpsize,
 //
 //==========================================================================
 
-void FResourceFile::JunkLeftoverFilters(void *lumps, size_t lumpsize, DWORD max)
+void FResourceFile::JunkLeftoverFilters(void *lumps, size_t lumpsize, uint32_t max)
 {
-	DWORD start, end;
+	uint32_t start, end;
 	if (FindPrefixRange("filter/", lumps, lumpsize, max, start, end))
 	{
 		// Since the resource lumps may contain non-POD data besides the
@@ -486,9 +486,9 @@ void FResourceFile::JunkLeftoverFilters(void *lumps, size_t lumpsize, DWORD max)
 //
 //==========================================================================
 
-bool FResourceFile::FindPrefixRange(FString filter, void *lumps, size_t lumpsize, DWORD maxlump, DWORD &start, DWORD &end)
+bool FResourceFile::FindPrefixRange(FString filter, void *lumps, size_t lumpsize, uint32_t maxlump, uint32_t &start, uint32_t &end)
 {
-	DWORD min, max, mid, inside;
+	uint32_t min, max, mid, inside;
 	FResourceLump *lump;
 	int cmp;
 

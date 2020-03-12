@@ -66,8 +66,8 @@
 
 struct IHDR
 {
-	DWORD		Width;
-	DWORD		Height;
+	uint32_t		Width;
+	uint32_t		Height;
 	BYTE		BitDepth;
 	BYTE		ColorType;
 	BYTE		Compression;
@@ -103,7 +103,7 @@ PNGHandle::~PNGHandle ()
 
 // PRIVATE FUNCTION PROTOTYPES ---------------------------------------------
 
-static inline void MakeChunk (void *where, DWORD type, size_t len);
+static inline void MakeChunk (void *where, uint32_t type, size_t len);
 static inline void StuffPalette (const PalEntry *from, BYTE *to);
 static bool WriteIDAT (FILE *file, const BYTE *data, int len);
 static void UnfilterRow (int width, BYTE *dest, BYTE *stream, BYTE *prev, int bpp);
@@ -147,9 +147,9 @@ bool M_CreatePNG (FILE *file, const BYTE *buffer, const PalEntry *palette,
 			  12+2*4+5 +		// IHDR
 			  12+4 +			// gAMA
 			  12+256*3];		// PLTE
-	DWORD *const sig = (DWORD *)&work[0];
+	uint32_t *const sig = (uint32_t *)&work[0];
 	IHDR *const ihdr = (IHDR *)&work[8 + 8];
-	DWORD *const gama = (DWORD *)((BYTE *)ihdr + 2*4+5 + 12);
+	uint32_t *const gama = (uint32_t *)((BYTE *)ihdr + 2*4+5 + 12);
 	BYTE *const plte = (BYTE *)gama + 4 + 12;
 	size_t work_len;
 
@@ -232,10 +232,10 @@ bool M_FinishPNG (FILE *file)
 //
 //==========================================================================
 
-bool M_AppendPNGChunk (FILE *file, DWORD chunkID, const BYTE *chunkData, DWORD len)
+bool M_AppendPNGChunk (FILE *file, uint32_t chunkID, const BYTE *chunkData, uint32_t len)
 {
-	DWORD head[2] = { BigLong((unsigned int)len), chunkID };
-	DWORD crc;
+	uint32_t head[2] = { BigLong((unsigned int)len), chunkID };
+	uint32_t crc;
 
 	if (fwrite (head, 1, 8, file) == 8 &&
 		(len == 0 || fwrite (chunkData, 1, len, file) == len))
@@ -261,10 +261,10 @@ bool M_AppendPNGChunk (FILE *file, DWORD chunkID, const BYTE *chunkData, DWORD l
 
 bool M_AppendPNGText (FILE *file, const char *keyword, const char *text)
 {
-	struct { DWORD len, id; char key[80]; } head;
+	struct { uint32_t len, id; char key[80]; } head;
 	int len = (int)strlen (text);
 	int keylen = MIN ((int)strlen (keyword), 79);
-	DWORD crc;
+	uint32_t crc;
 
 	head.len = BigLong(len + keylen + 1);
 	head.id = MAKE_ID('t','E','X','t');
@@ -300,7 +300,7 @@ bool M_AppendPNGText (FILE *file, const char *keyword, const char *text)
 //
 //==========================================================================
 
-unsigned int M_FindPNGChunk (PNGHandle *png, DWORD id)
+unsigned int M_FindPNGChunk (PNGHandle *png, uint32_t id)
 {
 	png->ChunkPt = 0;
 	return M_NextPNGChunk (png, id);
@@ -314,7 +314,7 @@ unsigned int M_FindPNGChunk (PNGHandle *png, DWORD id)
 //
 //==========================================================================
 
-unsigned int M_NextPNGChunk (PNGHandle *png, DWORD id)
+unsigned int M_NextPNGChunk (PNGHandle *png, uint32_t id)
 {
 	for ( ; png->ChunkPt < png->Chunks.Size(); ++png->ChunkPt)
 	{
@@ -391,7 +391,7 @@ PNGHandle *M_VerifyPNG (FILE *file)
 	PNGHandle::Chunk chunk;
 	FileReader *filer;
 	PNGHandle *png;
-	DWORD data[2];
+	uint32_t data[2];
 	bool sawIDAT = false;
 
 	if (fread (&data, 1, 8, file) != 8)
@@ -644,7 +644,7 @@ bool M_ReadIDAT (FileReader *file, BYTE *buffer, int width, int height, int pitc
 
 		if (chunklen == 0 && !lastIDAT)
 		{
-			DWORD x[3];
+			uint32_t x[3];
 
 			if (file->Read (x, 12) != 12)
 			{
@@ -689,7 +689,7 @@ bool M_ReadIDAT (FileReader *file, BYTE *buffer, int width, int height, int pitc
 //
 //==========================================================================
 
-static inline void MakeChunk (void *where, DWORD type, size_t len)
+static inline void MakeChunk (void *where, uint32_t type, size_t len)
 {
 	BYTE *const data = (BYTE *)where;
 	WriteBigLong (data - 8, (unsigned int)len);
@@ -724,9 +724,9 @@ static void StuffPalette (const PalEntry *from, BYTE *to)
 //
 //==========================================================================
 
-DWORD CalcSum(Byte *row, int len)
+uint32_t CalcSum(Byte *row, int len)
 {
-	DWORD sum = 0;
+	uint32_t sum = 0;
 
 	while (len-- != 0)
 	{
@@ -754,8 +754,8 @@ static int SelectFilter(Byte row[5][1 + MAXWIDTH*3], Byte prior[MAXWIDTH*3], int
 	// As it turns out, it seems no filtering is the best for Doom screenshots,
 	// no matter what the heuristic might determine.
 	return 0;
-	DWORD sum;
-	DWORD bestsum;
+	uint32_t sum;
+	uint32_t bestsum;
 	int bestfilter;
 	int x;
 
@@ -1024,7 +1024,7 @@ bool M_SaveBitmap(const BYTE *from, ESSType color_type, int width, int height, i
 
 static bool WriteIDAT (FILE *file, const BYTE *data, int len)
 {
-	DWORD foo[2], crc;
+	uint32_t foo[2], crc;
 
 	foo[0] = BigLong (len);
 	foo[1] = MAKE_ID('I','D','A','T');

@@ -61,14 +61,14 @@ FArchive &operator<< (FArchive &arc, FTextureID &tex);
 struct FAnimDef
 {
 	FTextureID 	BasePic;
-	WORD	NumFrames;
-	WORD	CurFrame;
+	uint16_t	NumFrames;
+	uint16_t	CurFrame;
 	BYTE	AnimType;
-	DWORD	SwitchTime;			// Time to advance to next frame
+	uint32_t	SwitchTime;			// Time to advance to next frame
 	struct FAnimFrame
 	{
-		DWORD	SpeedMin;		// Speeds are in ms, not tics
-		DWORD	SpeedRange;
+		uint32_t	SpeedMin;		// Speeds are in ms, not tics
+		uint32_t	SpeedRange;
 		FTextureID	FramePic;
 	} Frames[1];
 	enum
@@ -80,20 +80,20 @@ struct FAnimDef
 		ANIM_DiscreteFrames
 	};
 
-	void SetSwitchTime (DWORD mstime);
+	void SetSwitchTime (uint32_t mstime);
 };
 
 struct FSwitchDef
 {
 	FTextureID PreTexture;		// texture to switch from
 	FSwitchDef *PairDef;		// switch def to use to return to PreTexture
-	WORD NumFrames;		// # of animation frames
+	uint16_t NumFrames;		// # of animation frames
 	bool QuestPanel;	// Special texture for Strife mission
 	int Sound;			// sound to play at start of animation. Changed to int to avoiud having to include s_sound here.
 	struct frame		// Array of times followed by array of textures
 	{					//   actual length of each array is <NumFrames>
-		WORD TimeMin;
-		WORD TimeRnd;
+		uint16_t TimeMin;
+		uint16_t TimeRnd;
 		FTextureID Texture;
 	} frames[1];
 };
@@ -115,11 +115,11 @@ struct FDoorAnimation
 // textures from the TEXTURE1/2 lists of patches.
 struct patch_t
 { 
-	SWORD			width;			// bounding box size 
-	SWORD			height; 
-	SWORD			leftoffset; 	// pixels to the left of origin 
-	SWORD			topoffset;		// pixels below the origin 
-	DWORD 			columnofs[8];	// only [width] used
+	int16_t			width;			// bounding box size 
+	int16_t			height; 
+	int16_t			leftoffset; 	// pixels to the left of origin 
+	int16_t			topoffset;		// pixels below the origin 
+	uint32_t 			columnofs[8];	// only [width] used
 	// the [0] is &columnofs[width] 
 };
 
@@ -149,7 +149,7 @@ public:
 	static FTexture *CreateTexture(int lumpnum, int usetype);
 	virtual ~FTexture ();
 
-	SWORD LeftOffset, TopOffset;
+	int16_t LeftOffset, TopOffset;
 
 	BYTE WidthBits, HeightBits;
 
@@ -175,8 +175,8 @@ public:
 	BYTE bMultiPatch:1;		// This is a multipatch texture (we really could use real type info for textures...)
 	BYTE bKeepAround:1; // This texture was used as part of a multi-patch texture. Do not free it.
 
-	WORD Rotations;
-	SWORD SkyOffset;
+	uint16_t Rotations;
+	int16_t SkyOffset;
 
 	enum // UseTypes
 	{
@@ -198,8 +198,8 @@ public:
 
 	struct Span
 	{
-		WORD TopOffset;
-		WORD Length;	// A length of 0 terminates this column
+		uint16_t TopOffset;
+		uint16_t Length;	// A length of 0 terminates this column
 	};
 
 	// Returns a single column of the texture
@@ -279,7 +279,7 @@ public:
 	virtual void HackHack (int newheight);	// called by FMultipatchTexture to discover corrupt patches.
 
 protected:
-	WORD Width, Height, WidthMask;
+	uint16_t Width, Height, WidthMask;
 	static BYTE GrayMap[256];
 	//FNativeTexture *Native;
 
@@ -407,7 +407,7 @@ public:
 	void WriteTexture (FArchive &arc, int picnum);
 	int ReadTexture (FArchive &arc);
 
-	void UpdateAnimations (DWORD mstime);
+	void UpdateAnimations (uint32_t mstime);
 	int GuesstimateNumTextures ();
 
 	FSwitchDef *FindSwitch (FTextureID texture);
@@ -436,7 +436,7 @@ private:
 	void FixAnimations ();
 	//void InitAnimated ();
 	void InitAnimDefs ();
-	void AddSimpleAnim (FTextureID picnum, int animcount, int animtype, DWORD speedmin, DWORD speedrange=0);
+	void AddSimpleAnim (FTextureID picnum, int animcount, int animtype, uint32_t speedmin, uint32_t speedrange=0);
 	void AddComplexAnim (FTextureID picnum, const TArray<FAnimDef::FAnimFrame> &frames);
 	void ParseAnim (Scanner &sc, int usetype);
 	void ParseRangeAnim (Scanner &sc, FTextureID picnum, int usetype, bool missing);
@@ -444,7 +444,7 @@ private:
 	void ParseWarp(Scanner &sc);
 	void ParseCameraTexture(Scanner &sc);
 	FTextureID ParseFramenum (Scanner &sc, FTextureID basepicnum, int usetype, bool allowMissing);
-	void ParseTime (Scanner &sc, DWORD &min, DWORD &max);
+	void ParseTime (Scanner &sc, uint32_t &min, uint32_t &max);
 	FTexture *Texture(FTextureID id) { return Textures[id.GetIndex()].Texture; }
 	void SetTranslation (FTextureID fromtexnum, FTextureID totexnum);
 	void ParseAnimatedDoor(Scanner &sc);
@@ -519,14 +519,14 @@ public:
 	void SetSpeed(float fac) { Speed = fac; }
 	FTexture *GetRedirect(bool wantwarped);
 
-	DWORD GenTime;
+	uint32_t GenTime;
 protected:
 	FTexture *SourcePic;
 	BYTE *Pixels;
 	Span **Spans;
 	float Speed;
 
-	virtual void MakeTexture (DWORD time);
+	virtual void MakeTexture (uint32_t time);
 };
 
 // [GRB] Eternity-like warping
@@ -536,7 +536,7 @@ public:
 	FWarp2Texture (FTexture *source);
 
 protected:
-	void MakeTexture (DWORD time);
+	void MakeTexture (uint32_t time);
 };
 
 // A texture that can be drawn to.

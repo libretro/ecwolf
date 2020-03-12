@@ -75,8 +75,8 @@ public:
 	bool			bFlippable;
 	bool			bReturning;
 	FSwitchDef		*m_SwitchDef;
-	SDWORD			m_Frame;
-	DWORD			m_Timer;
+	int32_t			m_Frame;
+	uint32_t			m_Timer;
 	fixed_t			m_X, m_Y;	// Location of timer sound
 
 protected:

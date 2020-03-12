@@ -109,7 +109,7 @@ struct FVSwapSound : public FResourceLump
 		{
 			const unsigned int samples = (LumpSize - sizeof(WAV_HEADER))/2;
 
-			DWORD *CacheAlign = new DWORD[(LumpSize+3)/4];
+			uint32_t *CacheAlign = new uint32_t[(LumpSize+3)/4];
 			Cache = (char *) CacheAlign;
 			if(LumpSize == 0)
 				return 1;
@@ -134,14 +134,14 @@ struct FVSwapSound : public FResourceLump
 
 			// Do resampling to param_samplerate 16-bit with linear interpolation
 			static const fixed sampleStep = static_cast<fixed>(((double)origSampleRate / param_samplerate)*FRACUNIT);
-			SWORD* data = (SWORD*)(CacheAlign+sizeof(WAV_HEADER)/4);
+			int16_t* data = (int16_t*)(CacheAlign+sizeof(WAV_HEADER)/4);
 			i = 0;
 			fixed samplefrac = 0;
 			unsigned int sample = 0;
 			while(i++ < samples)
 			{
-				SWORD curSample = (SWORD(origdata[sample]) - 128)<<8;
-				SWORD nextSample = sample+1 < numOrigSamples ? (SWORD(origdata[sample+1]) - 128)<<8 : curSample;
+				int16_t curSample = (int16_t(origdata[sample]) - 128)<<8;
+				int16_t nextSample = sample+1 < numOrigSamples ? (int16_t(origdata[sample+1]) - 128)<<8 : curSample;
 
 				*data++ = LittleShort(curSample + ((samplefrac*fixed(nextSample-curSample))>>FRACBITS));
 
@@ -187,7 +187,7 @@ class FVSwap : public FResourceFile
 		{
 			BYTE header[6];
 			Reader->Read(header, 6);
-			WORD numChunks = ReadLittleShort(&header[0]);
+			uint16_t numChunks = ReadLittleShort(&header[0]);
 
 			spriteStart = ReadLittleShort(&header[2]);
 			soundStart = ReadLittleShort(&header[4]);
@@ -222,8 +222,8 @@ class FVSwap : public FResourceFile
 			Reader->Read(soundMap, soundMapSize);
 			for(unsigned int i = 0;i < numDigi;i++)
 			{
-				WORD start = ReadLittleShort(&soundMap[i*4]);
-				WORD end = i == numDigi - 1 ? numChunks - soundStart - 1 : ReadLittleShort(&soundMap[i*4 + 4]);
+				uint16_t start = ReadLittleShort(&soundMap[i*4]);
+				uint16_t end = i == numDigi - 1 ? numChunks - soundStart - 1 : ReadLittleShort(&soundMap[i*4 + 4]);
 
 				if(start + soundStart > numChunks - 1)
 				{ // Read past end of chunks.

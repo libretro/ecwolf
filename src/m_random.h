@@ -89,21 +89,21 @@ public:
 		return operator()();
 	}
 
-	void Init(DWORD seed);
+	void Init(uint32_t seed);
 
 	// SFMT interface
 	unsigned int GenRand32();
-	QWORD GenRand64();
-	void FillArray32(DWORD *array, int size);
-	void FillArray64(QWORD *array, int size);
-	void InitGenRand(DWORD seed);
-	void InitByArray(DWORD *init_key, int key_length);
+	uint64_t GenRand64();
+	void FillArray32(uint32_t *array, int size);
+	void FillArray64(uint64_t *array, int size);
+	void InitGenRand(uint32_t seed);
+	void InitByArray(uint32_t *init_key, int key_length);
 	int GetMinArraySize32();
 	int GetMinArraySize64();
 
 	/* These real versions are due to Isaku Wada */
 	/** generates a random number on [0,1]-real-interval */
-	static inline double ToReal1(DWORD v)
+	static inline double ToReal1(uint32_t v)
 	{
 		return v * (1.0/4294967295.0); 
 		/* divided by 2^32-1 */ 
@@ -116,7 +116,7 @@ public:
 	}
 
 	/** generates a random number on [0,1)-real-interval */
-	static inline double ToReal2(DWORD v)
+	static inline double ToReal2(uint32_t v)
 	{
 		return v * (1.0/4294967296.0); 
 		/* divided by 2^32 */
@@ -129,7 +129,7 @@ public:
 	}
 
 	/** generates a random number on (0,1)-real-interval */
-	static inline double ToReal3(DWORD v)
+	static inline double ToReal3(uint32_t v)
 	{
 		return (((double)v) + 0.5)*(1.0/4294967296.0); 
 		/* divided by 2^32 */
@@ -143,16 +143,16 @@ public:
 	/** These real versions are due to Isaku Wada */
 
 	/** generates a random number on [0,1) with 53-bit resolution*/
-	static inline double ToRes53(QWORD v) 
+	static inline double ToRes53(uint64_t v) 
 	{ 
 		return v * (1.0/18446744073709551616.0L);
 	}
 
 	/** generates a random number on [0,1) with 53-bit resolution from two
 	 * 32 bit integers */
-	static inline double ToRes53Mix(DWORD x, DWORD y) 
+	static inline double ToRes53Mix(uint32_t x, uint32_t y) 
 	{ 
-		return ToRes53(x | ((QWORD)y << 32));
+		return ToRes53(x | ((uint64_t)y << 32));
 	}
 
 	/** generates a random number on [0,1) with 53-bit resolution
@@ -167,7 +167,7 @@ public:
 	 */
 	inline double GenRand_Res53_Mix() 
 	{ 
-		DWORD x, y;
+		uint32_t x, y;
 
 		x = GenRand32();
 		y = GenRand32();
@@ -176,12 +176,12 @@ public:
 
 	// Static interface
 	static void StaticClearRandom ();
-	static DWORD StaticSumSeeds ();
+	static uint32_t StaticSumSeeds ();
 	static void StaticReadRNGState (PNGHandle *png);
 	static void StaticReadRNGState (FArchive &arc, int rngcount);
 	static void StaticWriteRNGState (FILE *file);
 	static void StaticWriteRNGState (FArchive &arc);
-	static DWORD GetRNGCount ();
+	static uint32_t GetRNGCount ();
 	static FRandom *StaticFindRNG(const char *name);
 
 #ifndef NDEBUG
@@ -193,7 +193,7 @@ private:
 	const char *Name;
 #endif
 	FRandom *Next;
-	DWORD NameCRC;
+	uint32_t NameCRC;
 
 	static FRandom *RNGList;
 
@@ -210,7 +210,7 @@ private:
 	{
 		w128_t w128[SFMT::N];
 		uint32_t u[SFMT::N32];
-		QWORD u64[SFMT::N64];
+		uint64_t u64[SFMT::N64];
 	} sfmt;
 	/** index counter to the 32-bit internal state array */
 	int32_t idx;
@@ -222,7 +222,7 @@ private:
 #endif
 };
 
-extern DWORD rngseed;			// The starting seed (not part of state)
+extern uint32_t rngseed;			// The starting seed (not part of state)
 
 // M_Random can be used for numbers that do not affect gameplay
 extern FRandom M_Random;

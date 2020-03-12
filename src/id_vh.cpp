@@ -126,7 +126,7 @@ void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
 		if(!SDL_LockSurface(surf))
 		{
 			const SDL_Color* colors = surf->format->palette->colors;
-			DWORD* dest = reinterpret_cast<DWORD*>(pixels);
+			uint32_t* dest = reinterpret_cast<uint32_t*>(pixels);
 			BYTE* src = reinterpret_cast<BYTE*>(surf->pixels);
 			for(unsigned int y = 0;y < screenHeight;++y)
 			{

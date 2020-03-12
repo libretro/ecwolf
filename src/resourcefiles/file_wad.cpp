@@ -155,7 +155,7 @@ FWadFile::~FWadFile()
 bool FWadFile::Open(bool quiet)
 {
 	wadinfo_t header;
-	DWORD InfoTableOfs;
+	uint32_t InfoTableOfs;
 	bool isBigEndian = false; // Little endian is assumed until proven otherwise
 	const long wadSize = Reader->GetLength();
 
@@ -178,7 +178,7 @@ bool FWadFile::Open(bool quiet)
 
 	Lumps = new FWadFileLump[NumLumps];
 
-	for(DWORD i = 0; i < NumLumps; i++)
+	for(uint32_t i = 0; i < NumLumps; i++)
 	{
 		uppercopy (Lumps[i].Name, fileinfo[i].Name);
 		Lumps[i].Name[8] = 0;
@@ -411,7 +411,7 @@ void FWadFile::SkinHack ()
 	static int namespc = ns_firstskin;
 	bool skinned = false;
 	bool hasmap = false;
-	DWORD i;
+	uint32_t i;
 
 	for (i = 0; i < NumLumps; i++)
 	{
@@ -428,7 +428,7 @@ void FWadFile::SkinHack ()
 			if (!skinned)
 			{
 				skinned = true;
-				DWORD j;
+				uint32_t j;
 
 				for (j = 0; j < NumLumps; j++)
 				{
@@ -466,7 +466,7 @@ void FWadFile::SkinHack ()
 
 void FWadFile::FindStrifeTeaserVoices ()
 {
-	for (DWORD i = 0; i <= NumLumps; ++i)
+	for (uint32_t i = 0; i <= NumLumps; ++i)
 	{
 		if (Lumps[i].Name[0] == 'V' &&
 			Lumps[i].Name[1] == 'O' &&

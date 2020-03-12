@@ -82,7 +82,7 @@ static bool CheckIfPatch(FileReader & file)
 {
 	if (file.GetLength() < 13) return false;	// minimum length of a valid Doom patch
 	
-	DWORD *data = new DWORD[(file.GetLength()+3)/4];
+	uint32_t *data = new uint32_t[(file.GetLength()+3)/4];
 	file.Seek(0, SEEK_SET);
 	file.Read(data, file.GetLength());
 	
@@ -102,12 +102,12 @@ static bool CheckIfPatch(FileReader & file)
 	
 		for (x = 0; x < width; ++x)
 		{
-			DWORD ofs = LittleLong(foo->columnofs[x]);
-			if (ofs == (DWORD)width * 4 + 8)
+			uint32_t ofs = LittleLong(foo->columnofs[x]);
+			if (ofs == (uint32_t)width * 4 + 8)
 			{
 				gapAtStart = false;
 			}
-			else if (ofs >= (DWORD)(file.GetLength()))	// Need one byte for an empty column (but there's patches that don't know that!)
+			else if (ofs >= (uint32_t)(file.GetLength()))	// Need one byte for an empty column (but there's patches that don't know that!)
 			{
 				delete [] data;
 				return false;
@@ -364,7 +364,7 @@ void FPatchTexture::HackHack (int newheight)
 	// one post, where each post has a supposed length of 0.
 	FMemLump lump = Wads.ReadLump (SourceLump);
 	const patch_t *realpatch = (patch_t *)lump.GetMem();
-	const DWORD *cofs = realpatch->columnofs;
+	const uint32_t *cofs = realpatch->columnofs;
 	int x, x2 = LittleShort(realpatch->width);
 
 	if (LittleShort(realpatch->height) == 256)

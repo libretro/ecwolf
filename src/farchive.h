@@ -159,13 +159,13 @@ private:
 class FPNGChunkFile : public FCompressedFile
 {
 public:
-	FPNGChunkFile (FILE *file, DWORD id);					// Create for writing
-	FPNGChunkFile (FILE *file, DWORD id, size_t chunklen);	// Create for reading
+	FPNGChunkFile (FILE *file, uint32_t id);					// Create for writing
+	FPNGChunkFile (FILE *file, uint32_t id, size_t chunklen);	// Create for reading
 
 	void Close ();
 
 private:
-	DWORD m_ChunkID;
+	uint32_t m_ChunkID;
 };
 
 class FArchive
@@ -186,23 +186,23 @@ virtual	void Write (const void *mem, unsigned int len);
 virtual void Read (void *mem, unsigned int len);
 
 		void WriteString (const char *str);
-		void WriteCount (DWORD count);
-		DWORD ReadCount ();
+		void WriteCount (uint32_t count);
+		uint32_t ReadCount ();
 
 		void UserWriteClass (const ClassDef *info);
 		void UserReadClass (const ClassDef *&info);
 
 		FArchive& operator<< (BYTE &c);
-		FArchive& operator<< (WORD &s);
-		FArchive& operator<< (DWORD &i);
-		FArchive& operator<< (QWORD &i);
+		FArchive& operator<< (uint16_t &s);
+		FArchive& operator<< (uint32_t &i);
+		FArchive& operator<< (uint64_t &i);
 		//FArchive& operator<< (QWORD_UNION &i) { return operator<< (i.AsOne); }
 		FArchive& operator<< (float &f);
 		FArchive& operator<< (double &d);
 		FArchive& operator<< (char *&str);
 		FArchive& operator<< (FName &n);
 		FArchive& operator<< (FString &str);
-		FArchive& SerializePointer (void *ptrbase, BYTE **ptr, DWORD elemSize);
+		FArchive& SerializePointer (void *ptrbase, BYTE **ptr, uint32_t elemSize);
 		FArchive& SerializeObject (DObject *&object, const ClassDef *type);
 		FArchive& WriteObject (DObject *obj);
 		FArchive& ReadObject (DObject *&obj, const ClassDef *wanttype);
@@ -214,9 +214,9 @@ virtual void Read (void *mem, unsigned int len);
 		int ReadSprite ();
 
 inline	FArchive& operator<< (SBYTE &c) { return operator<< ((BYTE &)c); }
-inline	FArchive& operator<< (SWORD &s) { return operator<< ((WORD &)s); }
-inline	FArchive& operator<< (SDWORD &i) { return operator<< ((DWORD &)i); }
-inline	FArchive& operator<< (SQWORD &i) { return operator<< ((QWORD &)i); }
+inline	FArchive& operator<< (int16_t &s) { return operator<< ((uint16_t &)s); }
+inline	FArchive& operator<< (int32_t &i) { return operator<< ((uint32_t &)i); }
+inline	FArchive& operator<< (int64_t &i) { return operator<< ((uint64_t &)i); }
 inline	FArchive& operator<< (unsigned char *&str) { return operator<< ((char *&)str); }
 inline	FArchive& operator<< (signed char *&str) { return operator<< ((char *&)str); }
 inline	FArchive& operator<< (bool &b) { return operator<< ((BYTE &)b); }
@@ -225,31 +225,31 @@ inline  FArchive& operator<< (DObject* &object) { return ReadObject (object, con
 protected:
 		enum { EObjectHashSize = 137 };
 
-		DWORD FindObjectIndex (const DObject *obj) const;
-		DWORD MapObject (const DObject *obj);
-		DWORD WriteClass (const ClassDef *info);
+		uint32_t FindObjectIndex (const DObject *obj) const;
+		uint32_t MapObject (const DObject *obj);
+		uint32_t WriteClass (const ClassDef *info);
 		const ClassDef *ReadClass ();
 		const ClassDef *ReadClass (const ClassDef *wanttype);
 		const ClassDef *ReadStoredClass (const ClassDef *wanttype);
-		DWORD HashObject (const DObject *obj) const;
-		DWORD AddName (const char *name);
-		DWORD AddName (unsigned int start);	// Name has already been added to storage
-		DWORD FindName (const char *name) const;
-		DWORD FindName (const char *name, unsigned int bucket) const;
+		uint32_t HashObject (const DObject *obj) const;
+		uint32_t AddName (const char *name);
+		uint32_t AddName (unsigned int start);	// Name has already been added to storage
+		uint32_t FindName (const char *name) const;
+		uint32_t FindName (const char *name, unsigned int bucket) const;
 
 		bool m_Persistent;		// meant for persistent storage (disk)?
 		bool m_Loading;			// extracting objects?
 		bool m_Storing;			// inserting objects?
 		bool m_HubTravel;		// travelling inside a hub?
 		FFile *m_File;			// unerlying file object
-		DWORD m_ObjectCount;	// # of objects currently serialized
-		DWORD m_MaxObjectCount;
-		DWORD m_ClassCount;		// # of unique classes currently serialized
+		uint32_t m_ObjectCount;	// # of objects currently serialized
+		uint32_t m_MaxObjectCount;
+		uint32_t m_ClassCount;		// # of unique classes currently serialized
 
 		struct TypeMap
 		{
 			const ClassDef *toCurrent;	// maps archive type index to execution type index
-			DWORD toArchive;		// maps execution type index to archive type index
+			uint32_t toArchive;		// maps execution type index to archive type index
 
 			enum { NO_INDEX = 0xffffffff };
 		} *m_TypeMap;
@@ -257,14 +257,14 @@ protected:
 		struct ObjectMap
 		{
 			const DObject *object;
-			DWORD hashNext;
+			uint32_t hashNext;
 		} *m_ObjectMap;
-		DWORD m_ObjectHash[EObjectHashSize];
+		uint32_t m_ObjectHash[EObjectHashSize];
 
 		struct NameMap
 		{
-			DWORD StringStart;	// index into m_NameStorage
-			DWORD HashNext;		// next in hash bucket
+			uint32_t StringStart;	// index into m_NameStorage
+			uint32_t HashNext;		// next in hash bucket
 			enum { NO_INDEX = 0xffffffff };
 		};
 		TArray<NameMap> m_Names;
@@ -287,8 +287,8 @@ private:
 class FPNGChunkArchive : public FArchive
 {
 public:
-	FPNGChunkArchive (FILE *file, DWORD chunkid);
-	FPNGChunkArchive (FILE *file, DWORD chunkid, size_t chunklen);
+	FPNGChunkArchive (FILE *file, uint32_t chunkid);
+	FPNGChunkArchive (FILE *file, uint32_t chunkid, size_t chunklen);
 	~FPNGChunkArchive ();
 	FPNGChunkFile Chunk;
 };
@@ -332,7 +332,7 @@ inline FArchive &operator<< (FArchive &arc, TArray<T,TT> &self)
 	}
 	else
 	{
-		DWORD numStored = arc.ReadCount();
+		uint32_t numStored = arc.ReadCount();
 		self.Resize(numStored);
 	}
 	for (unsigned int i = 0; i < self.Count; ++i)

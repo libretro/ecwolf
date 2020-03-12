@@ -47,23 +47,23 @@
 //
 //-----------------------------------------------------------------------
 
-static DWORD Zip_FindCentralDir(FileReader * fin)
+static uint32_t Zip_FindCentralDir(FileReader * fin)
 {
 	unsigned char buf[BUFREADCOMMENT + 4];
-	DWORD FileSize;
-	DWORD uBackRead;
-	DWORD uMaxBack; // maximum size of global comment
-	DWORD uPosFound=0;
+	uint32_t FileSize;
+	uint32_t uBackRead;
+	uint32_t uMaxBack; // maximum size of global comment
+	uint32_t uPosFound=0;
 
 	fin->Seek(0, SEEK_END);
 
 	FileSize = fin->Tell();
-	uMaxBack = MIN<DWORD>(0xffff, FileSize);
+	uMaxBack = MIN<uint32_t>(0xffff, FileSize);
 
 	uBackRead = 4;
 	while (uBackRead < uMaxBack)
 	{
-		DWORD uReadSize, uReadPos;
+		uint32_t uReadSize, uReadPos;
 		int i;
 		if (uBackRead + BUFREADCOMMENT > uMaxBack) 
 			uBackRead = uMaxBack;
@@ -71,11 +71,11 @@ static DWORD Zip_FindCentralDir(FileReader * fin)
 			uBackRead += BUFREADCOMMENT;
 		uReadPos = FileSize - uBackRead;
 
-		uReadSize = MIN<DWORD>((BUFREADCOMMENT + 4), (FileSize - uReadPos));
+		uReadSize = MIN<uint32_t>((BUFREADCOMMENT + 4), (FileSize - uReadPos));
 
 		if (fin->Seek(uReadPos, SEEK_SET) != 0) break;
 
-		if (fin->Read(buf, (SDWORD)uReadSize) != (SDWORD)uReadSize) break;
+		if (fin->Read(buf, (int32_t)uReadSize) != (int32_t)uReadSize) break;
 
 		for (i = (int)uReadSize - 3; (i--) > 0;)
 		{
@@ -106,7 +106,7 @@ enum
 
 struct FZipLump : public FResourceLump
 {
-	WORD	GPFlags;
+	uint16_t	GPFlags;
 	BYTE	Method;
 	int		CompressedSize;
 	int		Position;
@@ -157,7 +157,7 @@ FZipFile::FZipFile(const char * filename, FileReader *file)
 
 bool FZipFile::Open(bool quiet)
 {
-	DWORD centraldir = Zip_FindCentralDir(Reader);
+	uint32_t centraldir = Zip_FindCentralDir(Reader);
 	FZipEndOfCentralDirectory info;
 	int skipped = 0;
 
@@ -193,7 +193,7 @@ bool FZipFile::Open(bool quiet)
 
 	char *dirptr = (char*)directory;
 	FZipLump *lump_p = Lumps;
-	for (DWORD i = 0; i < NumLumps; i++)
+	for (uint32_t i = 0; i < NumLumps; i++)
 	{
 		FZipCentralDirectoryInfo *zip_fh = (FZipCentralDirectoryInfo *)dirptr;
 

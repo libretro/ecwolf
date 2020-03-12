@@ -105,8 +105,8 @@ class IntermissionInfo;
 
 struct IntermissionGState
 {
-	SDWORD step;
-	DWORD demoMode;
+	int32_t step;
+	uint32_t demoMode;
 	FName intermission_name;
 	const IntermissionInfo *intermission;
 	bool gototitle;
@@ -116,8 +116,8 @@ struct IntermissionGState
 	bool image_ready;
 	bool fade_in;
 	bool fade_out;
-	DWORD fade_steps;
-	DWORD wait;
+	uint32_t fade_steps;
+	uint32_t wait;
 };
 
 enum StateMenuType
@@ -216,13 +216,13 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type);
 struct SoundChannelState
 {
 	FString sound;
-	QWORD startTick;
-	QWORD skipTicks;
-	SQWORD stopTicks;
+	uint64_t startTick;
+	uint64_t skipTicks;
+	int64_t stopTicks;
 	Mix_Chunk *sample;
 	bool isMusic;
-	DWORD leftPos;
-	DWORD rightPos;
+	uint32_t leftPos;
+	uint32_t rightPos;
 	SoundData::Type type;
 
 	void Serialize(FArchive &arc);
@@ -246,38 +246,38 @@ typedef struct wl_state_s {
 	fixed fadeStart;
 	fixed fadeEnd;
 	fixed fadeCur;
-	DWORD fadeRed;
-	DWORD fadeGreen;
-	DWORD fadeBlue;
+	uint32_t fadeRed;
+	uint32_t fadeGreen;
+	uint32_t fadeBlue;
 	bool died;
 	bool dointermission;
 	bool playing_title_music;
 	bool level_bonus;
 
-	DWORD episode_num;
-	DWORD skill_num;
-	DWORD menuLevel;
+	uint32_t episode_num;
+	uint32_t skill_num;
+	uint32_t menuLevel;
 	StateMenuType menuStack[MAX_MENU_STACK];
 	SoundChannelState channels[MIX_CHANNELS];
 	SoundChannelState musicChannel;
 
-	DWORD frame_counter;
-	QWORD frame_tic;
-	DWORD tic_rest;
-	QWORD usec;
+	uint32_t frame_counter;
+	uint64_t frame_tic;
+	uint32_t tic_rest;
+	uint64_t usec;
 	FString nextMap;
 
 	bool isCounting;
 	bool isCountingRatio;
 	FString prevCount;
-	SDWORD countCurrent;
-	SDWORD countEnd;
-	SDWORD countStep;
-	DWORD countX;
-	DWORD countY;	
-	SDWORD countFrame;
+	int32_t countCurrent;
+	int32_t countEnd;
+	int32_t countStep;
+	uint32_t countX;
+	uint32_t countY;	
+	int32_t countFrame;
 	bool bonusFont;
-	DWORD intermissionSndFreq;
+	uint32_t intermissionSndFreq;
 	FString intermissionSound;
 	FString transitionSlideshow;
 	bool isInQuiz;
@@ -285,14 +285,14 @@ typedef struct wl_state_s {
 	const Dialog::Page *quizPage;
 	AActor *quizNpc;
 	angle_t iangle;
-	DWORD rndval;
+	uint32_t rndval;
 	TObjPtr<SpriteZoomer> zoomer;
 	bool firstpage;
 	bool newpage;
 	FString article;
-	SDWORD textposition;
-	SDWORD pagenum;
-	SDWORD numpages;
+	int32_t textposition;
+	int32_t pagenum;
+	int32_t numpages;
 	uint32_t rowon;
 	byte    fontcolor;
 	int32_t     picx;
@@ -383,7 +383,7 @@ bool VictoryZoomerStart(wl_state_t *state);
 bool VictoryZoomerStep(wl_state_t *state);
 bool TextReaderStep(wl_state_t *state, const wl_input_state_t *input);
 
-extern SDWORD damagecount, bonuscount;
+extern int32_t damagecount, bonuscount;
 extern bool palshifted;
 void DrawVictory (bool fromIntermission);
 extern bool store_files_in_memory;

@@ -76,11 +76,11 @@ struct StartPacket
 	BYTE type;
 	BYTE playerNumber;
 	BYTE numPlayers;
-	DWORD rngseed;
+	uint32_t rngseed;
 	struct Client
 	{
-		DWORD host;
-		WORD port;
+		uint32_t host;
+		uint16_t port;
 	} clients[];
 };
 

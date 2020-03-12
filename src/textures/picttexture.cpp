@@ -43,38 +43,38 @@
 #pragma pack(1)
 struct PictRect
 {
-	WORD y1, x1, y2, x2;
+	uint16_t y1, x1, y2, x2;
 };
 
 struct ColorTabEntry
 {
-	WORD index;
+	uint16_t index;
 	// 16 bpc color, but we're only considered about the high byte.
 	BYTE r, rLo, g, gLo, b, bLo;
 };
 
 struct ColorTab
 {
-	DWORD id;
-	WORD flags;
-	WORD numColors;
+	uint32_t id;
+	uint16_t flags;
+	uint16_t numColors;
 };
 
 struct PixMap
 {
-	WORD pitch;
+	uint16_t pitch;
 	PictRect bounds;
-	WORD version; // Should be 0
-	WORD packing;
-	DWORD packedSize;
+	uint16_t version; // Should be 0
+	uint16_t packing;
+	uint32_t packedSize;
 	fixed hRes, vRes;
-	WORD type;
-	WORD bpp;
-	WORD compCount;
-	WORD compSize;
-	DWORD planePitch;
-	DWORD colorTablePtr;
-	DWORD reserved;
+	uint16_t type;
+	uint16_t bpp;
+	uint16_t compCount;
+	uint16_t compSize;
+	uint32_t planePitch;
+	uint32_t colorTablePtr;
+	uint32_t reserved;
 
 	// Not technically part of a pixmap, but might work for us
 	ColorTab colorTable;
@@ -181,7 +181,7 @@ void FPictTexture::MakeTexture()
 
 	while(data < end)
 	{
-		WORD opcode;
+		uint16_t opcode;
 		if(version > 1)
 		{
 			opcode = ReadBigShort(data);
@@ -201,7 +201,7 @@ void FPictTexture::MakeTexture()
 			break;
 		case OP_Clip: // Do we care about the clipping rectangle?
 		{
-			WORD regionSize = ReadBigShort(data);
+			uint16_t regionSize = ReadBigShort(data);
 			if(regionSize != 0xA)
 			{
 				// Region is in an undocumented format if it's not rectangular.
@@ -225,10 +225,10 @@ void FPictTexture::MakeTexture()
 			}
 
 			// Convert 48-bit palette to 24-bit for our remapping code
-			DWORD rgb[256] = {};
+			uint32_t rgb[256] = {};
 			for(unsigned int i = 0;i < pm.colorTable.numColors;++i)
 			{
-				WORD index = BigShort(colors[i].index);
+				uint16_t index = BigShort(colors[i].index);
 				if(index > 255)
 					Printf("Color index %d for entry %d out of range in palette.\n", index, i);
 				else

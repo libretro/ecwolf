@@ -60,9 +60,9 @@ class AInventory : public AActor
 		TObjPtr<AActor>	owner;
 
 		FNameNoInit		pickupsound;
-		DWORD	amount;
-		DWORD	maxamount;
-		DWORD	interhubamount;
+		uint32_t	amount;
+		uint32_t	maxamount;
+		uint32_t	interhubamount;
 		FTextureID		icon;
 	protected:
 		virtual AInventory	*CreateCopy(AActor *holder);
@@ -169,8 +169,8 @@ class AWeapon : public AInventory
 
 		WeaponFlags		weaponFlags;
 		const ClassDef	*ammotype[2];
-		SDWORD				ammogive[2];
-		DWORD	ammouse[2];
+		int32_t				ammogive[2];
+		uint32_t	ammouse[2];
 		fixed			yadjust;
 		float			fovscale;
 

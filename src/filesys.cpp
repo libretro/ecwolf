@@ -150,13 +150,13 @@ void SetupPaths(int argc, const char * const *argv)
 	static const GUID gFOLDERID_RoamingAppData = {0x3EB685DBu, 0x65F9u, 0x4CF6u, {0xA0u,0x3Au,0xE3u,0xEFu,0x65u,0x72u,0x9Fu,0x3Du}};
 	static const GUID gFOLDERID_SavedGames = {0x4C5C32FFu, 0xBB9Du, 0x43b0u, {0xB5u,0xB4u,0x2Du,0x72u,0xE5u,0x4Eu,0xAAu,0xA4u}};
 
-	HRESULT (WINAPI* pSHGetKnownFolderPath)(const GUID*,DWORD,HANDLE,PWSTR*) = NULL;
-	HRESULT (WINAPI* pSHGetFolderPathW)(HWND,int,HANDLE,DWORD,LPWSTR) = NULL;
+	HRESULT (WINAPI* pSHGetKnownFolderPath)(const GUID*,uint32_t,HANDLE,PWSTR*) = NULL;
+	HRESULT (WINAPI* pSHGetFolderPathW)(HWND,int,HANDLE,uint32_t,LPWSTR) = NULL;
 	HMODULE shell32 = LoadLibrary ("shell32");
 	if(shell32)
 	{
-		pSHGetKnownFolderPath = (HRESULT (WINAPI*)(const GUID*,DWORD,HANDLE,PWSTR*))GetProcAddress(shell32, "SHGetKnownFolderPath");
-		pSHGetFolderPathW = (HRESULT (WINAPI*)(HWND,int,HANDLE,DWORD,LPWSTR))GetProcAddress(shell32, "SHGetFolderPathW");
+		pSHGetKnownFolderPath = (HRESULT (WINAPI*)(const GUID*,uint32_t,HANDLE,PWSTR*))GetProcAddress(shell32, "SHGetKnownFolderPath");
+		pSHGetFolderPathW = (HRESULT (WINAPI*)(HWND,int,HANDLE,uint32_t,LPWSTR))GetProcAddress(shell32, "SHGetFolderPathW");
 	}
 
 #ifndef _M_X64
@@ -402,7 +402,7 @@ void File::init(FString filename)
 	{
 		wchar_t wname[MAX_PATH];
 		FileSys::ConvertName(filename, wname);
-		DWORD fAttributes = GetFileAttributesW(wname);
+		uint32_t fAttributes = GetFileAttributesW(wname);
 		if(fAttributes != INVALID_FILE_ATTRIBUTES)
 		{
 			existing = true;
@@ -428,7 +428,7 @@ void File::init(FString filename)
 	}
 	else
 	{
-		DWORD fAttributes = GetFileAttributesA(filename);
+		uint32_t fAttributes = GetFileAttributesA(filename);
 		if(fAttributes != INVALID_FILE_ATTRIBUTES)
 		{
 			existing = true;

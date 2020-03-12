@@ -37,8 +37,8 @@
 #include "wl_def.h"
 #include "tarray.h"
 
-#define MAKERGB(r,g,b)		DWORD(((r)<<16)|((g)<<8)|(b))
-#define MAKEARGB(a,r,g,b)	DWORD(((a)<<24)|((r)<<16)|((g)<<8)|(b))
+#define MAKERGB(r,g,b)		uint32_t(((r)<<16)|((g)<<8)|(b))
+#define MAKEARGB(a,r,g,b)	uint32_t(((a)<<24)|((r)<<16)|((g)<<8)|(b))
 
 #define APART(c)			(((c)>>24)&0xff)
 #define RPART(c)			(((c)>>16)&0xff)
@@ -94,7 +94,7 @@ struct FPalette
 
 	// Given an array of colors, fills in remap with values to remap the
 	// passed array of colors to this palette.
-	void MakeRemap (const DWORD *colors, BYTE *remap, const BYTE *useful, int numcolors) const;
+	void MakeRemap (const uint32_t *colors, BYTE *remap, const BYTE *useful, int numcolors) const;
 };
 
 extern FPalette GPalette;

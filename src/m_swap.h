@@ -3,55 +3,55 @@
 
 #include "wl_def.h"
 
-static inline WORD ReadLittleShort(const BYTE * const ptr)
+static inline uint16_t ReadLittleShort(const BYTE * const ptr)
 {
-	return WORD(BYTE(*ptr)) |
-		(WORD(BYTE(*(ptr+1)))<<8);
+	return uint16_t(BYTE(*ptr)) |
+		(uint16_t(BYTE(*(ptr+1)))<<8);
 }
 
-static inline WORD ReadBigShort(const BYTE * const ptr)
+static inline uint16_t ReadBigShort(const BYTE * const ptr)
 {
-	return WORD(BYTE(*(ptr+1))) |
-		(WORD(BYTE(*ptr))<<8);
+	return uint16_t(BYTE(*(ptr+1))) |
+		(uint16_t(BYTE(*ptr))<<8);
 }
 
-static inline DWORD ReadLittle24(const BYTE * const ptr)
+static inline uint32_t ReadLittle24(const BYTE * const ptr)
 {
-	return DWORD(BYTE(*ptr)) |
-		(DWORD(BYTE(*(ptr+1)))<<8) |
-		(DWORD(BYTE(*(ptr+2)))<<16);
+	return uint32_t(BYTE(*ptr)) |
+		(uint32_t(BYTE(*(ptr+1)))<<8) |
+		(uint32_t(BYTE(*(ptr+2)))<<16);
 }
 
-static inline DWORD ReadBig24(const BYTE * const ptr)
+static inline uint32_t ReadBig24(const BYTE * const ptr)
 {
-	return DWORD(BYTE(*(ptr+2))) |
-		(DWORD(BYTE(*(ptr+1)))<<8) |
-		(DWORD(BYTE(*ptr))<<16);
+	return uint32_t(BYTE(*(ptr+2))) |
+		(uint32_t(BYTE(*(ptr+1)))<<8) |
+		(uint32_t(BYTE(*ptr))<<16);
 }
 
-static inline DWORD ReadLittleLong(const BYTE * const ptr)
+static inline uint32_t ReadLittleLong(const BYTE * const ptr)
 {
-	return DWORD(BYTE(*ptr)) |
-		(DWORD(BYTE(*(ptr+1)))<<8) |
-		(DWORD(BYTE(*(ptr+2)))<<16) |
-		(DWORD(BYTE(*(ptr+3)))<<24);
+	return uint32_t(BYTE(*ptr)) |
+		(uint32_t(BYTE(*(ptr+1)))<<8) |
+		(uint32_t(BYTE(*(ptr+2)))<<16) |
+		(uint32_t(BYTE(*(ptr+3)))<<24);
 }
 
-static inline DWORD ReadBigLong(const BYTE * const ptr)
+static inline uint32_t ReadBigLong(const BYTE * const ptr)
 {
-	return (DWORD(BYTE(*ptr))<<24) |
-		(DWORD(BYTE(*(ptr+1)))<<16) |
-		(DWORD(BYTE(*(ptr+2)))<<8) |
-		DWORD(BYTE(*(ptr+3)));
+	return (uint32_t(BYTE(*ptr))<<24) |
+		(uint32_t(BYTE(*(ptr+1)))<<16) |
+		(uint32_t(BYTE(*(ptr+2)))<<8) |
+		uint32_t(BYTE(*(ptr+3)));
 }
 
-static inline void WriteLittleShort(BYTE * const ptr, WORD value)
+static inline void WriteLittleShort(BYTE * const ptr, uint16_t value)
 {
 	ptr[0] = value&0xFF;
 	ptr[1] = (value>>8)&0xFF;
 }
 
-static inline void WriteLittleLong(BYTE * const ptr, DWORD value)
+static inline void WriteLittleLong(BYTE * const ptr, uint32_t value)
 {
 	ptr[0] = value&0xFF;
 	ptr[1] = (value>>8)&0xFF;
@@ -59,7 +59,7 @@ static inline void WriteLittleLong(BYTE * const ptr, DWORD value)
 	ptr[3] = (value>>24)&0xFF;
 }
 
-static inline void WriteBigLong(BYTE * const ptr, DWORD value)
+static inline void WriteBigLong(BYTE * const ptr, uint32_t value)
 {
 	ptr[0] = (value>>24)&0xFF;
 	ptr[1] = (value>>16)&0xFF;
@@ -69,12 +69,12 @@ static inline void WriteBigLong(BYTE * const ptr, DWORD value)
 
 // After the fact Byte Swapping ------------------------------------------------
 
-static inline WORD SwapShort(WORD x)
+static inline uint16_t SwapShort(uint16_t x)
 {
 	return ((x&0xFF)<<8) | ((x>>8)&0xFF);
 }
 
-static inline DWORD SwapLong(DWORD x)
+static inline uint32_t SwapLong(uint32_t x)
 {
 	return ((x&0xFF)<<24) |
 		(((x>>8)&0xFF)<<16) |
@@ -82,7 +82,7 @@ static inline DWORD SwapLong(DWORD x)
 		((x>>24)&0xFF);
 }
 
-static inline QWORD SwapLongLong(QWORD x)
+static inline uint64_t SwapLongLong(uint64_t x)
 {
 	return ((x&0xFF)<<56) |
 		(((x>>8)&0xFF)<<48) |

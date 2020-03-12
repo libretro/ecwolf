@@ -42,17 +42,9 @@ typedef uint8_t byte;
 typedef uint8_t BYTE;
 typedef int8_t SBYTE;
 typedef uint16_t word;
-typedef uint16_t WORD;
-typedef int16_t SWORD;
 typedef int32_t fixed;
 typedef fixed fixed_t;
 typedef uint32_t longword;
-#ifndef __MINGW32__
-typedef uint32_t DWORD;
-#endif
-typedef int32_t SDWORD;
-typedef uint64_t QWORD;
-typedef int64_t SQWORD;
 typedef void * memptr;
 typedef uint32_t uint32;
 typedef uint32_t BITFIELD;
@@ -77,7 +69,7 @@ void NetDPrintf(const char *format, ...);
 #endif
 
 typedef double real64;
-typedef SDWORD int32;
+typedef int32_t int32;
 #include "xs_Float.h"
 
 /*

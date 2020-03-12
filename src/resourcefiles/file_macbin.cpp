@@ -74,45 +74,45 @@ public:
 	char fileCreator[4];
 	BYTE finderFlags;
 	BYTE pad0;
-	WORD verticalPosition;
-	WORD horizontalPosition;
-	WORD folderID;
+	uint16_t verticalPosition;
+	uint16_t horizontalPosition;
+	uint16_t folderID;
 	BYTE protectedFlag;
 	BYTE pad1;
-	DWORD dataForkLength;
-	DWORD resourceForkLength;
-	DWORD creationDate;
-	DWORD modifiedDate;
+	uint32_t dataForkLength;
+	uint32_t resourceForkLength;
+	uint32_t creationDate;
+	uint32_t modifiedDate;
 	char pad2[27];
-	WORD reserved;
+	uint16_t reserved;
 };
 
 struct FResHeader
 {
 public:
-	DWORD resourceOffset;
-	DWORD mapOffset;
-	DWORD resourceLength;
-	DWORD mapLength;
+	uint32_t resourceOffset;
+	uint32_t mapOffset;
+	uint32_t resourceLength;
+	uint32_t mapLength;
 };
 
 struct FMapHeader
 {
 public:
 	// FResHeader copy;
-	DWORD reservedHandle;
-	WORD referenceNumber;
-	WORD forkAttributes;
-	WORD typeListOffset;
-	WORD nameListOffset;
+	uint32_t reservedHandle;
+	uint16_t referenceNumber;
+	uint16_t forkAttributes;
+	uint16_t typeListOffset;
+	uint16_t nameListOffset;
 };
 
 struct FResType
 {
 public:
 	char type[4];
-	WORD numResources;
-	WORD offset;
+	uint16_t numResources;
+	uint16_t offset;
 };
 
 struct FResReference
@@ -121,16 +121,16 @@ public:
 	// We need to have this structure in two parts because...
 	struct RefData
 	{
-		WORD resID;
-		WORD nameOffset;
+		uint16_t resID;
+		uint16_t nameOffset;
 		BYTE attributes;
 		BYTE hiDataOffset; // Yay a 24-bit type!
-		WORD loDataOffset;
-		DWORD reservedHandle;
+		uint16_t loDataOffset;
+		uint32_t reservedHandle;
 	} ref;
 
 	// Stuff we're going to calculate later
-	DWORD dataOffset;
+	uint32_t dataOffset;
 	FString name;
 };
 #pragma pack(pop)
@@ -222,7 +222,7 @@ enum EListType
 
 static const struct BRGRConstant
 {
-	WORD resNum;
+	uint16_t resNum;
 	const char* name;
 	EListType list;
 	bool compressed;
@@ -420,9 +420,9 @@ class FMacBin : public FResourceFile
 			FMacBinHeader header;
 			FResHeader resHeader;
 			FMapHeader mapHeader;
-			DWORD resourceForkOffset;
-			DWORD resTypeListOffset;
-			WORD numTypes;
+			uint32_t resourceForkOffset;
+			uint32_t resTypeListOffset;
+			uint16_t numTypes;
 
 			unsigned int BRGRref = 0xFFFFFFFF;
 			FMacResLump *lists[NUM_LISTS] = { NULL };
@@ -507,7 +507,7 @@ class FMacBin : public FResourceFile
 			// TODO: Do we need to bother with this?
 			// Get the names
 			{
-				DWORD nameListOffset = resourceForkOffset + resHeader.mapOffset + mapHeader.nameListOffset;
+				uint32_t nameListOffset = resourceForkOffset + resHeader.mapOffset + mapHeader.nameListOffset;
 				FResReference *refPtr = refs;
 				char resNamesBuffer[256];
 				for(unsigned int i = 0;i < numTotalResources;++i, ++refPtr)
@@ -589,7 +589,7 @@ class FMacBin : public FResourceFile
 							}
 						}
 
-						DWORD length;
+						uint32_t length;
 						lump->Position = resourceForkOffset + refPtr->dataOffset + resHeader.resourceOffset + 4;
 						lump->Owner = this;
 
@@ -612,7 +612,7 @@ class FMacBin : public FResourceFile
 						else if(brgr && refPtr->ref.resID >= 428 && refPtr->ref.resID < 428+countof(MacSpriteNames))
 						{
 							lump->Compressed = FMacResLump::MODE_Compressed;
-							WORD csize;
+							uint16_t csize;
 							*Reader >> csize;
 							lump->CompressedSize = lump->LumpSize-2;
 							lump->Position += 2;
@@ -630,7 +630,7 @@ class FMacBin : public FResourceFile
 
 			// Rename map lumps. Since a mod can replace maps without chaning
 			// the mapinfo HACK around it by storing some data statically.
-			static WORD mapmax = 0, mapbase = 0;
+			static uint16_t mapmax = 0, mapbase = 0;
 			if(lists[LIST_Maps] && lists[LIST_Maps]->LumpSize >= 4)
 			{
 				Reader->Seek(lists[LIST_Maps]->Position, SEEK_SET);
@@ -663,7 +663,7 @@ class FMacBin : public FResourceFile
 			// fixed size.  Note that a mod can replace textures without
 			// redoing the wall list so HACK around it by storing the last list
 			// statically.
-			static TArray<WORD> walllist;
+			static TArray<uint16_t> walllist;
 			if(lists[LIST_Walls] && lists[LIST_Walls]->LumpSize >= 4)
 			{
 				walllist.Resize(lists[LIST_Walls]->LumpSize/2 - 1);

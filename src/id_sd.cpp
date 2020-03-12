@@ -548,7 +548,7 @@ static int MacSound_Read(SDL_RWops *ops, void *buffer, int size, int nmem)
 	static const unsigned int MacSoundHeaderSize = 0x2A;
 
 	size_t totalsize = size*nmem;
-	DWORD ssize = (DWORD)(MacSound_Size(ops)-MacSoundHeaderSize);
+	uint32_t ssize = (uint32_t)(MacSound_Size(ops)-MacSoundHeaderSize);
 	Sint64 &pos = ((MacSoundData*)ops->hidden.unknown.data1)->pos;
 	if(pos < (Sint64)sizeof(WAV_HEADER))
 	{
@@ -600,7 +600,7 @@ Mix_Chunk* SD_PrepareSound(int which)
 	// have mostly garbage filled headers (outside of what is precisely needed
 	// since the sample rate is hard coded). I'm not sure if the sounds are
 	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
-	if(BigShort(*(WORD*)soundLump.GetMem()) == 1 && size > 0x2A)
+	if(BigShort(*(uint16_t*)soundLump.GetMem()) == 1 && size > 0x2A)
 	{
 		SDL_RWops *ops = SDL_AllocRW();
 		//ops->size = MacSound_Size;

@@ -7,9 +7,9 @@
 #define dimcolor 0xffd700
 
 extern "C" {
-DWORD Col2RGB8[65][256];
-DWORD *Col2RGB8_LessPrecision[65];
-DWORD Col2RGB8_Inverse[65][256];
+uint32_t Col2RGB8[65][256];
+uint32_t *Col2RGB8_LessPrecision[65];
+uint32_t Col2RGB8_Inverse[65][256];
 }
 
 IMPLEMENT_ABSTRACT_CLASS (DCanvas)
@@ -190,8 +190,8 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	if (damount == 0.f)
 		return;
 
-	DWORD *bg2rgb;
-	DWORD fg;
+	uint32_t *bg2rgb;
+	uint32_t fg;
 	int gap;
 	BYTE *spot;
 	int x, y;
@@ -230,7 +230,7 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	{
 		for (x = w; x != 0; x--)
 		{
-			DWORD bg;
+			uint32_t bg;
 
 			bg = bg2rgb[(*spot)&0xff];
 			bg = (fg+bg) | 0x1f07c1f;
@@ -433,8 +433,8 @@ void DFrameBuffer::DrawRateStuff ()
 	// Draws frame time and cumulative fps
 	if (vid_fps)
 	{
-		DWORD ms = I_FPSTime();
-		DWORD howlong = ms - LastMS;
+		uint32_t ms = I_FPSTime();
+		uint32_t howlong = ms - LastMS;
 		if ((signed)howlong >= 0)
 		{
 			char fpsbuff[40];
@@ -446,7 +446,7 @@ void DFrameBuffer::DrawRateStuff ()
 			Clear (rate_x, 0, Width, 8, GPalette.BlackIndex, 0);
 			DrawText (ConFont, CR_WHITE, rate_x, 0, (char *)&fpsbuff[0], TAG_DONE);
 
-			DWORD thisSec = ms/1000;
+			uint32_t thisSec = ms/1000;
 			if (LastSec < thisSec)
 			{
 				LastCount = FrameCount / (thisSec - LastSec);
@@ -803,7 +803,7 @@ DFrameBuffer *screen;
 
 void GenerateLookupTables()
 {
-	static DWORD Col2RGB8_2[63][256];
+	static uint32_t Col2RGB8_2[63][256];
 
 	// create the RGB555 lookup table
 	for(int r = 0;r < 32;r++)
@@ -879,7 +879,7 @@ int ParseHex(const char* hex)
 //
 //==========================================================================
 
-int V_GetColorFromString (const DWORD *palette, const char *cstr)
+int V_GetColorFromString (const uint32_t *palette, const char *cstr)
 {
 	int c[3], i, p;
 	char val[3];
@@ -979,7 +979,7 @@ normal:
 //
 //==========================================================================
 
-int V_GetColor (const DWORD *palette, const char *str)
+int V_GetColor (const uint32_t *palette, const char *str)
 {
 	return V_GetColorFromString(palette, str);
 #if 0

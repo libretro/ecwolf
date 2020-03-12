@@ -43,7 +43,7 @@ extern "C"
 	PfxState GPfx;
 }
 
-static bool AnalyzeMask (DWORD mask, BYTE *shift);
+static bool AnalyzeMask (uint32_t mask, BYTE *shift);
 
 static void Palette16Generic (const PalEntry *pal);
 static void Palette16R5G5B5 (const PalEntry *pal);
@@ -96,9 +96,9 @@ void PfxState::SetFormat (int bits, uint32 redMask, uint32 greenMask, uint32 blu
 			SetPalette = Palette16Generic;
 		}
 		Convert = Convert16;
-		Masks.Bits16.Red = (WORD)redMask;
-		Masks.Bits16.Green = (WORD)greenMask;
-		Masks.Bits16.Blue = (WORD)blueMask;
+		Masks.Bits16.Red = (uint16_t)redMask;
+		Masks.Bits16.Green = (uint16_t)greenMask;
+		Masks.Bits16.Blue = (uint16_t)blueMask;
 		break;
 
 	case 24:
@@ -148,7 +148,7 @@ void PfxState::SetFormat (int bits, uint32 redMask, uint32 greenMask, uint32 blu
 	}
 }
 
-static bool AnalyzeMask (DWORD mask, BYTE *shiftout)
+static bool AnalyzeMask (uint32_t mask, BYTE *shiftout)
 {
 	BYTE shift = 0;
 
@@ -178,12 +178,12 @@ static bool AnalyzeMask (DWORD mask, BYTE *shiftout)
 
 static void Palette16Generic (const PalEntry *pal)
 {
-	WORD *p16;
+	uint16_t *p16;
 	int i;
 
 	for (p16 = GPfxPal.Pal16, i = 256; i != 0; i--, pal++, p16++)
 	{
-		WORD rpart, gpart, bpart;
+		uint16_t rpart, gpart, bpart;
 
 		if (GPfx.RedLeft)	rpart = pal->r << GPfx.RedShift;
 		else				rpart = pal->r >> GPfx.RedShift;
@@ -202,7 +202,7 @@ static void Palette16Generic (const PalEntry *pal)
 
 static void Palette16R5G5B5 (const PalEntry *pal)
 {
-	WORD *p16;
+	uint16_t *p16;
 	int i;
 
 	for (p16 = GPfxPal.Pal16, i = 256; i != 0; i--, pal++, p16++)
@@ -215,7 +215,7 @@ static void Palette16R5G5B5 (const PalEntry *pal)
 
 static void Palette16R5G6B5 (const PalEntry *pal)
 {
-	WORD *p16;
+	uint16_t *p16;
 	int i;
 
 	for (p16 = GPfxPal.Pal16, i = 256; i != 0; i--, pal++, p16++)
@@ -228,12 +228,12 @@ static void Palette16R5G6B5 (const PalEntry *pal)
 
 static void Palette32Generic (const PalEntry *pal)
 {
-	DWORD *p32;
+	uint32_t *p32;
 	int i;
 
 	for (p32 = GPfxPal.Pal32, i = 256; i != 0; i--, pal++, p32++)
 	{
-		DWORD rpart, gpart, bpart;
+		uint32_t rpart, gpart, bpart;
 
 		if (GPfx.RedLeft)	rpart = pal->r << GPfx.RedShift;
 		else				rpart = pal->r >> GPfx.RedShift;
@@ -257,7 +257,7 @@ static void Palette32RGB (const PalEntry *pal)
 
 static void Palette32BGR (const PalEntry *pal)
 {
-	DWORD *p32;
+	uint32_t *p32;
 	int i;
 
 	for (p32 = GPfxPal.Pal32, i = 256; i != 0; i--, pal++, p32++)
@@ -358,7 +358,7 @@ static void Scale8 (BYTE *src, int srcpitch,
 			}
 			for (savedx = x, x >>= 2; x != 0; x--)
 			{
-				DWORD work;
+				uint32_t work;
 
 #ifdef __BIG_ENDIAN__
 				work  = src[xf >> FRACBITS] << 24;	xf += xstep;
@@ -371,7 +371,7 @@ static void Scale8 (BYTE *src, int srcpitch,
 				work |= src[xf >> FRACBITS] << 16;	xf += xstep;
 				work |= src[xf >> FRACBITS] << 24;	xf += xstep;
 #endif
-				*(DWORD *)dest = work;
+				*(uint32_t *)dest = work;
 				dest += 4;
 			}
 			for (savedx &= 3; savedx != 0; savedx--, xf += xstep)
@@ -415,7 +415,7 @@ static void Convert8 (BYTE *src, int srcpitch,
 			}
 			for (savedx = x, x >>= 2; x != 0; x--)
 			{
-				*(DWORD *)dest =
+				*(uint32_t *)dest =
 #ifdef __BIG_ENDIAN__
 					(GPfxPal.Pal8[src[0]] << 24) |
 					(GPfxPal.Pal8[src[1]] << 16) |
@@ -452,7 +452,7 @@ static void Convert8 (BYTE *src, int srcpitch,
 			}
 			for (savedx = x, x >>= 2; x != 0; x--)
 			{
-				DWORD work;
+				uint32_t work;
 
 #ifdef __BIG_ENDIAN__
 				work  = GPfxPal.Pal8[src[xf >> FRACBITS]] << 24;	xf += xstep;
@@ -465,7 +465,7 @@ static void Convert8 (BYTE *src, int srcpitch,
 				work |= GPfxPal.Pal8[src[xf >> FRACBITS]] << 16;	xf += xstep;
 				work |= GPfxPal.Pal8[src[xf >> FRACBITS]] << 24;	xf += xstep;
 #endif
-				*(DWORD *)dest = work;
+				*(uint32_t *)dest = work;
 				dest += 4;
 			}
 			for (savedx &= 3; savedx != 0; savedx--, xf += xstep)
@@ -493,7 +493,7 @@ static void Convert16 (BYTE *src, int srcpitch,
 	}
 
 	int x, y, savedx;
-	WORD *dest = (WORD *)destin;
+	uint16_t *dest = (uint16_t *)destin;
 
 	destpitch = (destpitch >> 1) - destwidth;
 	if (xstep == FRACUNIT && ystep == FRACUNIT)
@@ -509,7 +509,7 @@ static void Convert16 (BYTE *src, int srcpitch,
 			}
 			for (savedx = x, x >>= 1; x != 0; x--)
 			{
-				*(DWORD *)dest =
+				*(uint32_t *)dest =
 #ifdef __BIG_ENDIAN__
 					(GPfxPal.Pal16[src[0]] << 16) |
 					(GPfxPal.Pal16[src[1]]);
@@ -542,7 +542,7 @@ static void Convert16 (BYTE *src, int srcpitch,
 			}
 			for (savedx = x, x >>= 1; x != 0; x--)
 			{
-				DWORD work;
+				uint32_t work;
 
 #ifdef __BIG_ENDIAN__
 				work  = GPfxPal.Pal16[src[xf >> FRACBITS]] << 16;	xf += xstep;
@@ -551,7 +551,7 @@ static void Convert16 (BYTE *src, int srcpitch,
 				work  = GPfxPal.Pal16[src[xf >> FRACBITS]];			xf += xstep;
 				work |= GPfxPal.Pal16[src[xf >> FRACBITS]] << 16;	xf += xstep;
 #endif
-				*(DWORD *)dest = work;
+				*(uint32_t *)dest = work;
 				dest += 2;
 			}
 			if (savedx & 1)
@@ -635,7 +635,7 @@ static void Convert32 (BYTE *src, int srcpitch,
 	}
 
 	int x, y, savedx;
-	DWORD *dest = (DWORD *)destin;
+	uint32_t *dest = (uint32_t *)destin;
 
 	destpitch = (destpitch >> 2) - destwidth;
 	if (xstep == FRACUNIT && ystep == FRACUNIT)

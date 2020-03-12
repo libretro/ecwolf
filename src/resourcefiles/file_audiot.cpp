@@ -66,7 +66,7 @@ class FAudiot : public FUncompressedFile
 			{
 				FLumpReader *lreader = reinterpret_cast<FLumpReader *>(file);
 
-				for(DWORD i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
+				for(uint32_t i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
 				{
 					FResourceLump *lump = lreader->LumpOwner()->GetLump(i);
 					if(lump->FullName.CompareNoCase(audiohedFile) == 0)
@@ -97,14 +97,14 @@ class FAudiot : public FUncompressedFile
 			NumLumps = (audiohedReader->GetLength()/4)-1;
 			audiohedReader->Seek(0, SEEK_SET);
 			Lumps = new FUncompressedLump[NumLumps];
-			DWORD* positions = new DWORD[NumLumps+1];
+			uint32_t* positions = new uint32_t[NumLumps+1];
 			audiohedReader->Read(positions, (NumLumps+1)*4);
 
 			positions[0] = LittleLong(positions[0]);
 			for(unsigned int i = 0;i < NumLumps;++i)
 			{
 				positions[i+1] = LittleLong(positions[i+1]);
-				DWORD size = positions[i+1] - positions[i];
+				uint32_t size = positions[i+1] - positions[i];
 
 				char name[9];
 				sprintf(name, "AUD%05d", i);
@@ -158,7 +158,7 @@ class FAudiot : public FUncompressedFile
 				// the engine may not like that, so issue a warning.
 				if(curseg == 4)
 				{
-					DWORD numsounds = segstart[1] - segstart[0];
+					uint32_t numsounds = segstart[1] - segstart[0];
 					if(segstart[2] - segstart[1] != numsounds || segstart[3] - segstart[2] != numsounds)
 						Printf("Warning: AUDIOT doesn't contain the same number of AdLib, PC Speaker, and Digitized sound chunks.\n");
 				}

@@ -89,7 +89,7 @@ FAutomapTexture::FAutomapTexture (int lumpnum)
 : FTexture(NULL, lumpnum), Pixels(NULL)
 {
 	Width = 320;
-	Height = WORD(Wads.LumpLength(lumpnum) / 320);
+	Height = uint16_t(Wads.LumpLength(lumpnum) / 320);
 	CalcBitSize ();
 
 	DummySpan[0].TopOffset = 0;

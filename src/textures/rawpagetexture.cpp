@@ -97,8 +97,8 @@ static bool CheckIfRaw(FileReader & data)
 
 		for (x = 0; x < width; ++x)
 		{
-			DWORD ofs = LittleLong(foo->columnofs[x]);
-			if (ofs == (DWORD)width * 4 + 8)
+			uint32_t ofs = LittleLong(foo->columnofs[x]);
+			if (ofs == (uint32_t)width * 4 + 8)
 			{
 				gapAtStart = false;
 			}

@@ -64,13 +64,13 @@
 #include "c_cvars.h"
 #include "wl_main.h"
 
-static inline SDWORD DivScale32(const SQWORD a, const SDWORD b)
+static inline int32_t DivScale32(const int64_t a, const int32_t b)
 {
-	return static_cast<SDWORD>((a << 32) / b);
+	return static_cast<int32_t>((a << 32) / b);
 }
-static inline void clearbufshort(void *buffer, unsigned int count, WORD clear)
+static inline void clearbufshort(void *buffer, unsigned int count, uint16_t clear)
 {
-	WORD *b = reinterpret_cast<WORD*>(buffer), * const end = reinterpret_cast<WORD*>(buffer)+count;
+	uint16_t *b = reinterpret_cast<uint16_t*>(buffer), * const end = reinterpret_cast<uint16_t*>(buffer)+count;
 	while(b != end)
 		*b++ = clear;
 }
@@ -407,13 +407,13 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 	while (tag != TAG_DONE)
 	{
 		va_list *more_p;
-		DWORD data;
+		uint32_t data;
 
 		switch (tag)
 		{
 		case TAG_IGNORE:
 		default:
-			data = va_arg(tags, DWORD);
+			data = va_arg(tags, uint32_t);
 			break;
 
 		case TAG_MORE:
@@ -568,7 +568,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 			break;
 
 		case DTA_ColorOverlay:
-			parms->colorOverlay = va_arg(tags, DWORD);
+			parms->colorOverlay = va_arg(tags, uint32_t);
 			break;
 
 		case DTA_FlipX:
@@ -691,7 +691,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 			break;
 
 		case DTA_RenderStyle:
-			parms->style.AsDWORD = va_arg(tags, DWORD);
+			parms->style.AsDWORD = va_arg(tags, uint32_t);
 			break;
 
 		case DTA_SpecialColormap:
@@ -702,7 +702,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 			parms->colormapstyle = va_arg(tags, FColormapStyle *);
 			break;
 		}
-		tag = va_arg(tags, DWORD);
+		tag = va_arg(tags, uint32_t);
 	}
 	va_end (tags);
 
@@ -906,10 +906,10 @@ void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 	}
 
 	BYTE *spot = GetBuffer() + oldyyshifted + xx;
-	DWORD *bg2rgb = Col2RGB8[1+level];
-	DWORD *fg2rgb = Col2RGB8[63-level];
-	DWORD fg = fg2rgb[basecolor];
-	DWORD bg = bg2rgb[*spot];
+	uint32_t *bg2rgb = Col2RGB8[1+level];
+	uint32_t *fg2rgb = Col2RGB8[63-level];
+	uint32_t fg = fg2rgb[basecolor];
+	uint32_t bg = bg2rgb[*spot];
 	bg = (fg+bg) | 0x1f07c1f;
 	*spot = RGB32k[0][0][bg&(bg>>15)];
 }
@@ -1042,7 +1042,7 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32 real
 		}
 		else
 		{ // x-major line
-			fixed_t errorAdj = (((DWORD) deltaY << 16) / (DWORD) deltaX) & 0xffff;
+			fixed_t errorAdj = (((uint32_t) deltaY << 16) / (uint32_t) deltaX) & 0xffff;
 
 			if (WeightingScale == 0)
 			{

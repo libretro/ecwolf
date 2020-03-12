@@ -47,13 +47,13 @@
 struct Huffnode
 {
 	public:
-		WORD	bit0, bit1;	// 0-255 is a character, > is a pointer to a node
+		uint16_t	bit0, bit1;	// 0-255 is a character, > is a pointer to a node
 };
 
 struct Dimensions
 {
 	public:
-		WORD	width, height;
+		uint16_t	width, height;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,8 +61,8 @@ struct Dimensions
 struct FVGALump : public FResourceLump
 {
 	public:
-		DWORD		position;
-		DWORD		length;
+		uint32_t		position;
+		uint32_t		length;
 		Huffnode*	huffman;
 
 		bool		isImage;
@@ -181,7 +181,7 @@ class FVGAGraph : public FResourceFile
 			{
 				FLumpReader *lreader = reinterpret_cast<FLumpReader *>(file);
 
-				for(DWORD i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
+				for(uint32_t i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
 				{
 					FResourceLump *lump = lreader->LumpOwner()->GetLump(i);
 					if(lump->FullName.CompareNoCase(vgaheadFile) == 0)
@@ -309,10 +309,10 @@ class FVGAGraph : public FResourceFile
 						delete[] data;
 
 						bool endhit = false;
-						WORD height = ReadLittleShort(out);
+						uint16_t height = ReadLittleShort(out);
 						for(unsigned int c = 0;c < 256;++c)
 						{
-							WORD offset = ReadLittleShort(&out[c*2+2]);
+							uint16_t offset = ReadLittleShort(&out[c*2+2]);
 							BYTE width = out[c+514];
 
 							int space = lumps[i-1].LumpSize - (offset + width*height);

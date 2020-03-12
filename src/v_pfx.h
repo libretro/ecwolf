@@ -41,8 +41,8 @@
 union PfxUnion
 {
 	BYTE Pal8[256];
-	WORD Pal16[256];
-	DWORD Pal32[256];
+	uint16_t Pal16[256];
+	uint32_t Pal32[256];
 	BYTE Pal24[256][4];
 };
 
@@ -52,9 +52,9 @@ struct PfxState
 	{
 		struct
 		{
-			WORD Red;
-			WORD Green;
-			WORD Blue;
+			uint16_t Red;
+			uint16_t Green;
+			uint16_t Blue;
 		} Bits16;
 		struct
 		{

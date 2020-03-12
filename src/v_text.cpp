@@ -128,14 +128,14 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 	while (tag != TAG_DONE)
 	{
 		va_list *more_p;
-		DWORD data;
+		uint32_t data;
 		void *ptrval;
 
 		switch (tag)
 		{
 		case TAG_IGNORE:
 		default:
-			data = va_arg (tags, DWORD);
+			data = va_arg (tags, uint32_t);
 			break;
 
 		case TAG_MORE:
@@ -152,14 +152,14 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 		case DTA_DestWidth:
 		case DTA_DestHeight:
 			assert(false && "DTA_DestWidth or DTA_DestHeight unsupported.");
-			//*(DWORD *)tags = TAG_IGNORE;
-			data = va_arg (tags, DWORD);
+			//*(uint32_t *)tags = TAG_IGNORE;
+			data = va_arg (tags, uint32_t);
 			break;
 
 		// Translation is specified explicitly by the text.
 		case DTA_Translation:
 			assert(false && "DTA_Translation unsupported.");
-			//*(DWORD *)tags = TAG_IGNORE;
+			//*(uint32_t *)tags = TAG_IGNORE;
 			ptrval = va_arg (tags, void*);
 			break;
 

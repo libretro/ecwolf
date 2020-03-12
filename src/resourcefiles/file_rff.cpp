@@ -45,23 +45,23 @@
 struct RFFInfo
 {
 	// Should be "RFF\x18"
-	DWORD		Magic;
-	DWORD		Version;
-	DWORD		DirOfs;
-	DWORD		NumLumps;
+	uint32_t		Magic;
+	uint32_t		Version;
+	uint32_t		DirOfs;
+	uint32_t		NumLumps;
 };
 
 struct RFFLump
 {
-	DWORD		DontKnow1[4];
-	DWORD		FilePos;
-	DWORD		Size;
-	DWORD		DontKnow2;
-	DWORD		Time;
+	uint32_t		DontKnow1[4];
+	uint32_t		FilePos;
+	uint32_t		Size;
+	uint32_t		DontKnow2;
+	uint32_t		Time;
 	BYTE		Flags;
 	char		Extension[3];
 	char		Name[8];
-	DWORD		IndexNum;	// Used by .sfx, possibly others
+	uint32_t		IndexNum;	// Used by .sfx, possibly others
 };
 
 //==========================================================================
@@ -75,7 +75,7 @@ struct FRFFLump : public FUncompressedLump
 	virtual FileReader *GetReader();
 	virtual int FillCache();
 
-	DWORD		IndexNum;
+	uint32_t		IndexNum;
 
 	int GetIndexNum() const { return IndexNum; }
 };
@@ -150,7 +150,7 @@ bool FRFFFile::Open(bool quiet)
 	Lumps = new FRFFLump[NumLumps];
 
 	if (!quiet) Printf(", %d lumps\n", NumLumps);
-	for (DWORD i = 0; i < NumLumps; ++i)
+	for (uint32_t i = 0; i < NumLumps; ++i)
 	{
 		Lumps[i].Position = LittleLong(lumps[i].FilePos);
 		Lumps[i].LumpSize = LittleLong(lumps[i].Size);

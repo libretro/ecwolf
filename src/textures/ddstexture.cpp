@@ -105,42 +105,42 @@
 
 struct DDPIXELFORMAT
 {
-	DWORD			Size;		// Must be 32
-	DWORD			Flags;
-	DWORD			FourCC;
-	DWORD			RGBBitCount;
-	DWORD			RBitMask, GBitMask, BBitMask;
-	DWORD			RGBAlphaBitMask;
+	uint32_t			Size;		// Must be 32
+	uint32_t			Flags;
+	uint32_t			FourCC;
+	uint32_t			RGBBitCount;
+	uint32_t			RBitMask, GBitMask, BBitMask;
+	uint32_t			RGBAlphaBitMask;
 };
 
 struct DDCAPS2
 {
-	DWORD			Caps1, Caps2;
-	DWORD			Reserved[2];
+	uint32_t			Caps1, Caps2;
+	uint32_t			Reserved[2];
 };
 
 struct DDSURFACEDESC2
 {
-	DWORD			Size;		// Must be 124. DevIL claims some writers set it to 'DDS ' instead.
-	DWORD			Flags;
-	DWORD			Height;
-	DWORD			Width;
+	uint32_t			Size;		// Must be 124. DevIL claims some writers set it to 'DDS ' instead.
+	uint32_t			Flags;
+	uint32_t			Height;
+	uint32_t			Width;
 	union
 	{
-		SDWORD		Pitch;
-		DWORD		LinearSize;
+		int32_t		Pitch;
+		uint32_t		LinearSize;
 	};
-	DWORD			Depth;
-	DWORD			MipMapCount;
-	DWORD			Reserved1[11];
+	uint32_t			Depth;
+	uint32_t			MipMapCount;
+	uint32_t			Reserved1[11];
 	DDPIXELFORMAT	PixelFormat;
 	DDCAPS2			Caps;
-	DWORD			Reserved2;
+	uint32_t			Reserved2;
 };
 
 struct DDSFileHeader
 {
-	DWORD			Magic;
+	uint32_t			Magic;
 	DDSURFACEDESC2	Desc;
 };
 
@@ -167,16 +167,16 @@ protected:
 	BYTE *Pixels;
 	Span **Spans;
 
-	DWORD Format;
+	uint32_t Format;
 
-	DWORD RMask, GMask, BMask, AMask;
+	uint32_t RMask, GMask, BMask, AMask;
 	BYTE RShiftL, GShiftL, BShiftL, AShiftL;
 	BYTE RShiftR, GShiftR, BShiftR, AShiftR;
 
-	SDWORD Pitch;
-	DWORD LinearSize;
+	int32_t Pitch;
+	uint32_t LinearSize;
 
-	static void CalcBitShift (DWORD mask, BYTE *lshift, BYTE *rshift);
+	static void CalcBitShift (uint32_t mask, BYTE *lshift, BYTE *rshift);
 
 	void MakeTexture ();
 	void ReadRGB (FWadLump &lump, BYTE *tcbuf = NULL);
@@ -225,7 +225,7 @@ FTexture *DDSTexture_TryCreate (FileReader &data, int lumpnum)
 	union
 	{
 		DDSURFACEDESC2	surfdesc;
-		DWORD			byteswapping[sizeof(DDSURFACEDESC2) / 4];
+		uint32_t			byteswapping[sizeof(DDSURFACEDESC2) / 4];
 	};
 
 	if (!CheckDDS(data)) return NULL;
@@ -234,7 +234,7 @@ FTexture *DDSTexture_TryCreate (FileReader &data, int lumpnum)
 	data.Read (&surfdesc, sizeof(surfdesc));
 
 #ifdef __BIG_ENDIAN__
-	// Every single element of the header is a DWORD
+	// Every single element of the header is a uint32_t
 	for (unsigned int i = 0; i < sizeof(DDSURFACEDESC2) / 4; ++i)
 	{
 		byteswapping[i] = LittleLong(byteswapping[i]);
@@ -294,8 +294,8 @@ FDDSTexture::FDDSTexture (FileReader &lump, int lumpnum, void *vsurfdesc)
 	TopOffset = 0;
 	bMasked = false;
 
-	Width = WORD(surf->Width);
-	Height = WORD(surf->Height);
+	Width = uint16_t(surf->Width);
+	Height = uint16_t(surf->Height);
 	CalcBitSize ();
 
 	if (surf->PixelFormat.Flags & DDPF_FOURCC)
@@ -346,7 +346,7 @@ FDDSTexture::FDDSTexture (FileReader &lump, int lumpnum, void *vsurfdesc)
 //
 //==========================================================================
 
-void FDDSTexture::CalcBitShift (DWORD mask, BYTE *lshiftp, BYTE *rshiftp)
+void FDDSTexture::CalcBitShift (uint32_t mask, BYTE *lshiftp, BYTE *rshiftp)
 {
 	BYTE shift;
 
@@ -517,8 +517,8 @@ void FDDSTexture::MakeTexture ()
 
 void FDDSTexture::ReadRGB (FWadLump &lump, BYTE *tcbuf)
 {
-	DWORD x, y;
-	DWORD amask = AMask == 0 ? 0 : 0x80000000 >> AShiftL;
+	uint32_t x, y;
+	uint32_t amask = AMask == 0 ? 0 : 0x80000000 >> AShiftL;
 	BYTE *linebuff = new BYTE[Pitch];
 
 	for (y = Height; y > 0; --y)
@@ -528,7 +528,7 @@ void FDDSTexture::ReadRGB (FWadLump &lump, BYTE *tcbuf)
 		lump.Read (linebuff, Pitch);
 		for (x = Width; x > 0; --x)
 		{
-			DWORD c;
+			uint32_t c;
 			if (Format == 4)
 			{
 				c = ReadLittleLong(buffp); buffp += 4;
@@ -549,9 +549,9 @@ void FDDSTexture::ReadRGB (FWadLump &lump, BYTE *tcbuf)
 			{
 				if (amask == 0 || (c & amask))
 				{
-					DWORD r = (c & RMask) << RShiftL; r |= r >> RShiftR;
-					DWORD g = (c & GMask) << GShiftL; g |= g >> GShiftR;
-					DWORD b = (c & BMask) << BShiftL; b |= b >> BShiftR;
+					uint32_t r = (c & RMask) << RShiftL; r |= r >> RShiftR;
+					uint32_t g = (c & GMask) << GShiftL; g |= g >> GShiftR;
+					uint32_t b = (c & BMask) << BShiftL; b |= b >> BShiftR;
 					*pixelp = RGB32k[r >> 27][g >> 27][b >> 27];
 				}
 				else
@@ -563,10 +563,10 @@ void FDDSTexture::ReadRGB (FWadLump &lump, BYTE *tcbuf)
 			}
 			else
 			{
-				DWORD r = (c & RMask) << RShiftL; r |= r >> RShiftR;
-				DWORD g = (c & GMask) << GShiftL; g |= g >> GShiftR;
-				DWORD b = (c & BMask) << BShiftL; b |= b >> BShiftR;
-				DWORD a = (c & AMask) << AShiftL; a |= a >> AShiftR;
+				uint32_t r = (c & RMask) << RShiftL; r |= r >> RShiftR;
+				uint32_t g = (c & GMask) << GShiftL; g |= g >> GShiftR;
+				uint32_t b = (c & BMask) << BShiftL; b |= b >> BShiftR;
+				uint32_t a = (c & AMask) << AShiftL; a |= a >> AShiftR;
 				pixelp[0] = (BYTE)(r>>24);
 				pixelp[1] = (BYTE)(g>>24);
 				pixelp[2] = (BYTE)(b>>24);
@@ -603,7 +603,7 @@ void FDDSTexture::DecompressDXT1 (FWadLump &lump, BYTE *tcbuf)
 		block = blockbuff;
 		for (ox = 0; ox < Width; ox += 4)
 		{
-			WORD color16[2] = { ReadLittleShort(block), ReadLittleShort(block+2) };
+			uint16_t color16[2] = { ReadLittleShort(block), ReadLittleShort(block+2) };
 
 			// Convert color from R5G6B5 to R8G8B8.
 			for (i = 1; i >= 0; --i)
@@ -697,7 +697,7 @@ void FDDSTexture::DecompressDXT3 (FWadLump &lump, bool premultiplied, BYTE *tcbu
 		block = blockbuff;
 		for (ox = 0; ox < Width; ox += 4)
 		{
-			WORD color16[2] = { ReadLittleShort(block + 8), ReadLittleShort(block + 10) };
+			uint16_t color16[2] = { ReadLittleShort(block + 8), ReadLittleShort(block + 10) };
 
 			// Convert color from R5G6B5 to R8G8B8.
 			for (i = 1; i >= 0; --i)
@@ -728,7 +728,7 @@ void FDDSTexture::DecompressDXT3 (FWadLump &lump, bool premultiplied, BYTE *tcbu
 					break;
 				}
 				BYTE yslice = block[12 + y];
-				WORD yalphaslice = ReadLittleShort(block + 2 * y);
+				uint16_t yalphaslice = ReadLittleShort(block + 2 * y);
 				for (x = 0; x < 4; ++x)
 				{
 					if (ox + x >= Width)
@@ -771,7 +771,7 @@ void FDDSTexture::DecompressDXT5 (FWadLump &lump, bool premultiplied, BYTE *tcbu
 	BYTE *block;
 	PalEntry color[4];
 	BYTE palcol[4];
-	DWORD yalphaslice = 0;
+	uint32_t yalphaslice = 0;
 	int ox, oy, x, y, i;
 
 	for (oy = 0; oy < Height; oy += 4)
@@ -780,7 +780,7 @@ void FDDSTexture::DecompressDXT5 (FWadLump &lump, bool premultiplied, BYTE *tcbu
 		block = blockbuff;
 		for (ox = 0; ox < Width; ox += 4)
 		{
-			WORD color16[2] = { ReadLittleShort(block+8), ReadLittleShort(block+10) };
+			uint16_t color16[2] = { ReadLittleShort(block+8), ReadLittleShort(block+10) };
 			BYTE alpha[8];
 
 			// Calculate the eight alpha values.

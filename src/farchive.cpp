@@ -87,29 +87,29 @@
 #define OLD_SPRITE			((BYTE)12)	// Reference to an old sprite name follows
 
 #ifdef __BIG_ENDIAN__
-static inline WORD SWAP_WORD(WORD x) { return x; }
-static inline DWORD SWAP_DWORD(DWORD x) { return x; }
-static inline QWORD SWAP_QWORD(QWORD x) { return x; }
+static inline uint16_t SWAP_WORD(uint16_t x) { return x; }
+static inline uint32_t SWAP_DWORD(uint32_t x) { return x; }
+static inline uint64_t SWAP_QWORD(uint64_t x) { return x; }
 static inline void SWAP_FLOAT(float x) { }
 static inline void SWAP_DOUBLE(double &dst, double src) { dst = src; }
 #else
 #ifdef _MSC_VER
-static inline WORD  SWAP_WORD(WORD x)		{ return _byteswap_ushort(x); }
-static inline DWORD SWAP_DWORD(DWORD x)		{ return _byteswap_ulong(x); }
-static inline QWORD SWAP_QWORD(QWORD x)		{ return _byteswap_uint64(x); }
+static inline uint16_t  SWAP_WORD(uint16_t x)		{ return _byteswap_ushort(x); }
+static inline uint32_t SWAP_DWORD(uint32_t x)		{ return _byteswap_ulong(x); }
+static inline uint64_t SWAP_QWORD(uint64_t x)		{ return _byteswap_uint64(x); }
 static inline void SWAP_DOUBLE(double &dst, double &src)
 {
-	union twiddle { QWORD q; double d; } tdst, tsrc;
+	union twiddle { uint64_t q; double d; } tdst, tsrc;
 	tsrc.d = src;
 	tdst.q = _byteswap_uint64(tsrc.q);
 	dst = tdst.d;
 }
 #else
-static inline WORD  SWAP_WORD(WORD x)		{ return (((x)<<8) | ((x)>>8)); }
-static inline DWORD SWAP_DWORD(DWORD x)		{ return x = (((x)>>24) | (((x)>>8)&0xff00) | (((x)<<8)&0xff0000) | ((x)<<24)); }
-static inline QWORD SWAP_QWORD(QWORD x)
+static inline uint16_t  SWAP_WORD(uint16_t x)		{ return (((x)<<8) | ((x)>>8)); }
+static inline uint32_t SWAP_DWORD(uint32_t x)		{ return x = (((x)>>24) | (((x)>>8)&0xff00) | (((x)<<8)&0xff0000) | ((x)<<24)); }
+static inline uint64_t SWAP_QWORD(uint64_t x)
 {
-	union { QWORD q; DWORD d[2]; } t, u;
+	union { uint64_t q; uint32_t d[2]; } t, u;
 	t.q = x;
 	u.d[0] = SWAP_DWORD(t.d[1]);
 	u.d[1] = SWAP_DWORD(t.d[0]);
@@ -117,8 +117,8 @@ static inline QWORD SWAP_QWORD(QWORD x)
 }
 static inline void SWAP_DOUBLE(double &dst, double &src)
 {
-	union twiddle { double f; DWORD d[2]; } tdst, tsrc;
-	DWORD t;
+	union twiddle { double f; uint32_t d[2]; } tdst, tsrc;
+	uint32_t t;
 
 	tsrc.f = src;
 	t = tsrc.d[0];
@@ -129,7 +129,7 @@ static inline void SWAP_DOUBLE(double &dst, double &src)
 #endif
 static inline void SWAP_FLOAT(float &x)
 {
-	union twiddle { DWORD i; float f; } t;
+	union twiddle { uint32_t i; float f; } t;
 	t.f = x;
 	t.i = SWAP_DWORD(t.i);
 	x = t.f;
@@ -250,8 +250,8 @@ void FCompressedFile::PostOpen ()
 		}
 		else
 		{
-			DWORD sizes[2];
-			fread (sizes, sizeof(DWORD), 2, m_File);
+			uint32_t sizes[2];
+			fread (sizes, sizeof(uint32_t), 2, m_File);
 			sizes[0] = SWAP_DWORD (sizes[0]);
 			sizes[1] = SWAP_DWORD (sizes[1]);
 			unsigned int len = sizes[0] == 0 ? sizes[1] : sizes[0];
@@ -259,8 +259,8 @@ void FCompressedFile::PostOpen ()
 			fread (m_Buffer+8, len, 1, m_File);
 			sizes[0] = SWAP_DWORD (sizes[0]);
 			sizes[1] = SWAP_DWORD (sizes[1]);
-			((DWORD *)m_Buffer)[0] = sizes[0];
-			((DWORD *)m_Buffer)[1] = sizes[1];
+			((uint32_t *)m_Buffer)[0] = sizes[0];
+			((uint32_t *)m_Buffer)[1] = sizes[1];
 			Explode ();
 		}
 	}
@@ -596,7 +596,7 @@ int FCompressedMemFile::GetSerializedSize()
 		I_Error ("FCompressedMemFile must be compressed before storing");
 	}
 
-	DWORD sizes[2];
+	uint32_t sizes[2];
 	sizes[0] = ReadBigLong (m_ImplodedBuffer);
 	sizes[1] = ReadBigLong (m_ImplodedBuffer + 4);
 	return (sizes[0] ? sizes[0] : sizes[1])+8;
@@ -609,10 +609,10 @@ void FCompressedMemFile::SerializeToBuffer(void *buffer)
 		I_Error ("FCompressedMemFile must be compressed before storing");
 	}
 
-	DWORD sizes[2];
+	uint32_t sizes[2];
 	sizes[0] = ReadBigLong (m_ImplodedBuffer);
 	sizes[1] = ReadBigLong (m_ImplodedBuffer+4);
-	DWORD size = (sizes[0] ? sizes[0] : sizes[1])+8;
+	uint32_t size = (sizes[0] ? sizes[0] : sizes[1])+8;
 
 	memcpy ((char *) buffer, m_ImplodedBuffer, size);
 }
@@ -627,7 +627,7 @@ void FCompressedMemFile::Serialize (FArchive &arc)
 		}
 		arc.Write (ZSig, 4);
 
-		DWORD sizes[2];
+		uint32_t sizes[2];
 		sizes[0] = ReadBigLong (m_ImplodedBuffer);
 		sizes[1] = ReadBigLong (m_ImplodedBuffer+4);
 		arc.Write (m_ImplodedBuffer, (sizes[0] ? sizes[0] : sizes[1])+8);
@@ -638,7 +638,7 @@ void FCompressedMemFile::Serialize (FArchive &arc)
 		m_Mode = EReading;
 
 		char sig[4];
-		DWORD sizes[2] = { 0, 0 };
+		uint32_t sizes[2] = { 0, 0 };
 
 		arc.Read (sig, 4);
 
@@ -646,7 +646,7 @@ void FCompressedMemFile::Serialize (FArchive &arc)
 			I_Error ("Expected to extract a compressed file");
 
 		arc << sizes[0] << sizes[1];
-		DWORD len = sizes[0] == 0 ? sizes[1] : sizes[0];
+		uint32_t len = sizes[0] == 0 ? sizes[1] : sizes[0];
 
 		m_Buffer = (BYTE *)M_Malloc (len+8);
 		WriteBigLong(m_Buffer, sizes[0]);
@@ -679,12 +679,12 @@ void FCompressedMemFile::GetSizes(unsigned int &compressed, unsigned int &uncomp
 
 #ifndef LIBRETRO
 
-FPNGChunkFile::FPNGChunkFile (FILE *file, DWORD id)
+FPNGChunkFile::FPNGChunkFile (FILE *file, uint32_t id)
 	: FCompressedFile (file, EWriting, true, false), m_ChunkID (id)
 {
 }
 
-FPNGChunkFile::FPNGChunkFile (FILE *file, DWORD id, size_t chunklen)
+FPNGChunkFile::FPNGChunkFile (FILE *file, uint32_t id, size_t chunklen)
 	: FCompressedFile (file, EReading, true, false), m_ChunkID (id)
 {
 	m_Buffer = (BYTE *)M_Malloc (chunklen);
@@ -697,8 +697,8 @@ FPNGChunkFile::FPNGChunkFile (FILE *file, DWORD id, size_t chunklen)
 // Unlike FCompressedFile::Close, m_File is left open
 void FPNGChunkFile::Close ()
 {
-	DWORD data[2];
-	DWORD crc;
+	uint32_t data[2];
+	uint32_t crc;
 
 	if (m_File)
 	{
@@ -719,13 +719,13 @@ void FPNGChunkFile::Close ()
 	FCompressedFile::Close ();
 }
 
-FPNGChunkArchive::FPNGChunkArchive (FILE *file, DWORD id)
+FPNGChunkArchive::FPNGChunkArchive (FILE *file, uint32_t id)
 	: FArchive (), Chunk (file, id)
 {
 	AttachToFile (Chunk);
 }
 
-FPNGChunkArchive::FPNGChunkArchive (FILE *file, DWORD id, size_t len)
+FPNGChunkArchive::FPNGChunkArchive (FILE *file, uint32_t id, size_t len)
 	: FArchive (), Chunk (file, id, len)
 {
 	AttachToFile (Chunk);
@@ -826,7 +826,7 @@ void FArchive::Close ()
 	}
 }
 
-void FArchive::WriteCount (DWORD count)
+void FArchive::WriteCount (uint32_t count)
 {
 	BYTE out;
 
@@ -841,10 +841,10 @@ void FArchive::WriteCount (DWORD count)
 
 }
 
-DWORD FArchive::ReadCount ()
+uint32_t FArchive::ReadCount ()
 {
 	BYTE in;
-	DWORD count = 0;
+	uint32_t count = 0;
 	int ofs = 0;
 
 	do
@@ -868,7 +868,7 @@ void FArchive::WriteName (const char *name)
 	}
 	else
 	{
-		DWORD index = FindName (name);
+		uint32_t index = FindName (name);
 		if (index != NameMap::NO_INDEX)
 		{
 			id = OLD_NAME;
@@ -896,7 +896,7 @@ const char *FArchive::ReadName ()
 	}
 	else if (id == OLD_NAME)
 	{
-		DWORD index = ReadCount ();
+		uint32_t index = ReadCount ();
 		if (index >= m_Names.Size())
 		{
 			I_Error ("Name %u has not been read yet\n", index);
@@ -905,11 +905,11 @@ const char *FArchive::ReadName ()
 	}
 	else if (id == NEW_NAME)
 	{
-		DWORD index;
-		DWORD size = ReadCount ();
+		uint32_t index;
+		uint32_t size = ReadCount ();
 		char *str;
 
-		index = (DWORD)m_NameStorage.Reserve (size);
+		index = (uint32_t)m_NameStorage.Reserve (size);
 		str = &m_NameStorage[index];
 		Read (str, size-1);
 		str[size-1] = 0;
@@ -931,7 +931,7 @@ void FArchive::WriteString (const char *str)
 	}
 	else
 	{
-		DWORD size = (DWORD)(strlen (str) + 1);
+		uint32_t size = (uint32_t)(strlen (str) + 1);
 		WriteCount (size);
 		Write (str, size - 1);
 	}
@@ -945,7 +945,7 @@ FArchive &FArchive::operator<< (char *&str)
 	}
 	else
 	{
-		DWORD size = ReadCount ();
+		uint32_t size = ReadCount ();
 		char *str2;
 
 		if (size == 0)
@@ -977,7 +977,7 @@ FArchive &FArchive::operator<< (FString &str)
 	}
 	else
 	{
-		DWORD size = ReadCount();
+		uint32_t size = ReadCount();
 
 		if (size == 0)
 		{
@@ -1004,46 +1004,46 @@ FArchive &FArchive::operator<< (BYTE &c)
 	return *this;
 }
 
-FArchive &FArchive::operator<< (WORD &w)
+FArchive &FArchive::operator<< (uint16_t &w)
 {
 	if (m_Storing)
 	{
-		WORD temp = SWAP_WORD(w);
-		Write (&temp, sizeof(WORD));
+		uint16_t temp = SWAP_WORD(w);
+		Write (&temp, sizeof(uint16_t));
 	}
 	else
 	{
-		Read (&w, sizeof(WORD));
+		Read (&w, sizeof(uint16_t));
 		w = SWAP_WORD(w);
 	}
 	return *this;
 }
 
-FArchive &FArchive::operator<< (DWORD &w)
+FArchive &FArchive::operator<< (uint32_t &w)
 {
 	if (m_Storing)
 	{
-		DWORD temp = SWAP_DWORD(w);
-		Write (&temp, sizeof(DWORD));
+		uint32_t temp = SWAP_DWORD(w);
+		Write (&temp, sizeof(uint32_t));
 	}
 	else
 	{
-		Read (&w, sizeof(DWORD));
+		Read (&w, sizeof(uint32_t));
 		w = SWAP_DWORD(w);
 	}
 	return *this;
 }
 
-FArchive &FArchive::operator<< (QWORD &w)
+FArchive &FArchive::operator<< (uint64_t &w)
 {
 	if (m_Storing)
 	{
-		QWORD temp = SWAP_QWORD(w);
-		Write (&temp, sizeof(QWORD));
+		uint64_t temp = SWAP_QWORD(w);
+		Write (&temp, sizeof(uint64_t));
 	}
 	else
 	{
-		Read (&w, sizeof(QWORD));
+		Read (&w, sizeof(uint64_t));
 		w = SWAP_QWORD(w);
 	}
 	return *this;
@@ -1096,15 +1096,15 @@ FArchive &FArchive::operator<< (FName &n)
 	return *this;
 }
 
-FArchive &FArchive::SerializePointer (void *ptrbase, BYTE **ptr, DWORD elemSize)
+FArchive &FArchive::SerializePointer (void *ptrbase, BYTE **ptr, uint32_t elemSize)
 {
-	DWORD w;
+	uint32_t w;
 
 	if (m_Storing)
 	{
 		if (*(void **)ptr)
 		{
-			w = DWORD(((size_t)*ptr - (size_t)ptrbase) / elemSize);
+			w = uint32_t(((size_t)*ptr - (size_t)ptrbase) / elemSize);
 		}
 		else
 		{
@@ -1205,7 +1205,7 @@ FArchive &FArchive::WriteObject (DObject *obj)
 			// to the saved object. Otherwise, save a reference to the
 			// class, then save the object. Again, if this is a player-
 			// controlled actor, remember that.
-			DWORD index = FindObjectIndex (obj);
+			uint32_t index = FindObjectIndex (obj);
 
 			if (index == TypeMap::NO_INDEX)
 			{
@@ -1246,7 +1246,7 @@ FArchive &FArchive::ReadObject (DObject* &obj, const ClassDef *wanttype)
 	BYTE objHead;
 	const ClassDef *type;
 	BYTE playerNum;
-	DWORD index;
+	uint32_t index;
 
 	operator<< (objHead);
 
@@ -1375,7 +1375,7 @@ void FArchive::WriteSprite (int spritenum)
 		m_SpriteMap[spritenum] = (int)(m_NumSprites++);
 		id = NEW_SPRITE;
 		Write (&id, 1);
-		DWORD spriteName = R_GetNameForSprite(spritenum);
+		uint32_t spriteName = R_GetNameForSprite(spritenum);
 		Write (&spriteName, 4);
 
 		// Write the current sprite number as a hint, because
@@ -1398,7 +1398,7 @@ int FArchive::ReadSprite ()
 	Read (&id, 1);
 	if (id == OLD_SPRITE)
 	{
-		DWORD index = ReadCount ();
+		uint32_t index = ReadCount ();
 		if (index >= m_NumSprites)
 		{
 			I_Error ("Sprite %u has not been read yet\n", index);
@@ -1407,8 +1407,8 @@ int FArchive::ReadSprite ()
 	}
 	else if (id == NEW_SPRITE)
 	{
-		DWORD name;
-		DWORD hint;
+		uint32_t name;
+		uint32_t hint;
 
 		Read (&name, 4);
 		hint = ReadCount ();
@@ -1437,37 +1437,37 @@ int FArchive::ReadSprite ()
 	}
 }
 
-DWORD FArchive::AddName (const char *name)
+uint32_t FArchive::AddName (const char *name)
 {
-	DWORD index;
+	uint32_t index;
 	unsigned int hash = MakeKey (name) % EObjectHashSize;
 
 	index = FindName (name, hash);
 	if (index == NameMap::NO_INDEX)
 	{
-		DWORD namelen = (DWORD)(strlen (name) + 1);
-		DWORD strpos = (DWORD)m_NameStorage.Reserve (namelen);
-		NameMap mapper = { strpos, (DWORD)m_NameHash[hash] };
+		uint32_t namelen = (uint32_t)(strlen (name) + 1);
+		uint32_t strpos = (uint32_t)m_NameStorage.Reserve (namelen);
+		NameMap mapper = { strpos, (uint32_t)m_NameHash[hash] };
 
 		memcpy (&m_NameStorage[strpos], name, namelen);
-		m_NameHash[hash] = index = (DWORD)m_Names.Push (mapper);
+		m_NameHash[hash] = index = (uint32_t)m_Names.Push (mapper);
 	}
 	return index;
 }
 
-DWORD FArchive::AddName (unsigned int start)
+uint32_t FArchive::AddName (unsigned int start)
 {
-	DWORD hash = MakeKey (&m_NameStorage[start]) % EObjectHashSize;
-	NameMap mapper = { (DWORD)start, (DWORD)m_NameHash[hash] };
-	return (DWORD)(m_NameHash[hash] = m_Names.Push (mapper));
+	uint32_t hash = MakeKey (&m_NameStorage[start]) % EObjectHashSize;
+	NameMap mapper = { (uint32_t)start, (uint32_t)m_NameHash[hash] };
+	return (uint32_t)(m_NameHash[hash] = m_Names.Push (mapper));
 }
 
-DWORD FArchive::FindName (const char *name) const
+uint32_t FArchive::FindName (const char *name) const
 {
 	return FindName (name, MakeKey (name) % EObjectHashSize);
 }
 
-DWORD FArchive::FindName (const char *name, unsigned int bucket) const
+uint32_t FArchive::FindName (const char *name, unsigned int bucket) const
 {
 	unsigned int map = m_NameHash[bucket];
 
@@ -1476,14 +1476,14 @@ DWORD FArchive::FindName (const char *name, unsigned int bucket) const
 		const NameMap *mapping = &m_Names[map];
 		if (strcmp (name, &m_NameStorage[mapping->StringStart]) == 0)
 		{
-			return (DWORD)map;
+			return (uint32_t)map;
 		}
 		map = mapping->HashNext;
 	}
-	return (DWORD)map;
+	return (uint32_t)map;
 }
 
-DWORD FArchive::WriteClass (const ClassDef *info)
+uint32_t FArchive::WriteClass (const ClassDef *info)
 {
 	if (m_ClassCount >= ClassDef::GetNumClasses())
 	{
@@ -1560,7 +1560,7 @@ const ClassDef *FArchive::ReadClass (const ClassDef *wanttype)
 
 const ClassDef *FArchive::ReadStoredClass (const ClassDef *wanttype)
 {
-	DWORD index = ReadCount ();
+	uint32_t index = ReadCount ();
 	if (index >= m_ClassCount)
 	{
 		I_Error ("Class reference too high (%u; max is %u)\n", index, m_ClassCount);
@@ -1575,9 +1575,9 @@ const ClassDef *FArchive::ReadStoredClass (const ClassDef *wanttype)
 	return type;
 }
 
-DWORD FArchive::MapObject (const DObject *obj)
+uint32_t FArchive::MapObject (const DObject *obj)
 {
-	DWORD i;
+	uint32_t i;
 
 	if (m_ObjectCount >= m_MaxObjectCount)
 	{
@@ -1590,8 +1590,8 @@ DWORD FArchive::MapObject (const DObject *obj)
 		}
 	}
 
-	DWORD index = m_ObjectCount++;
-	DWORD hash = HashObject (obj);
+	uint32_t index = m_ObjectCount++;
+	uint32_t hash = HashObject (obj);
 
 	m_ObjectMap[index].object = obj;
 	m_ObjectMap[index].hashNext = m_ObjectHash[hash];
@@ -1600,14 +1600,14 @@ DWORD FArchive::MapObject (const DObject *obj)
 	return index;
 }
 
-DWORD FArchive::HashObject (const DObject *obj) const
+uint32_t FArchive::HashObject (const DObject *obj) const
 {
-	return (DWORD)((size_t)obj % EObjectHashSize);
+	return (uint32_t)((size_t)obj % EObjectHashSize);
 }
 
-DWORD FArchive::FindObjectIndex (const DObject *obj) const
+uint32_t FArchive::FindObjectIndex (const DObject *obj) const
 {
-	DWORD index = m_ObjectHash[HashObject (obj)];
+	uint32_t index = m_ObjectHash[HashObject (obj)];
 	while (index != TypeMap::NO_INDEX && m_ObjectMap[index].object != obj)
 	{
 		index = m_ObjectMap[index].hashNext;
