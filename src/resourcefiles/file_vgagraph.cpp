@@ -86,8 +86,8 @@ struct FVGALump : public FResourceLump
 			else
 			{
 				// We flip again on big endian so that the code that reads the data makes sense
-				*(WORD*)Cache = LittleShort(dimensions.width);
-				*((WORD*)(Cache+2)) = LittleShort(dimensions.height);
+				WriteLittleShort((BYTE*)Cache, dimensions.width);
+				WriteLittleShort((BYTE*)Cache+2, dimensions.height);
 				memcpy(Cache+4, out, LumpSize-4);
 			}
 			delete[] out;

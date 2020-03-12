@@ -80,7 +80,8 @@ static retro_input_state_t input_state_cb;
 static retro_video_refresh_t video_cb;
 static retro_log_printf_t log_cb;
 static bool libretro_supports_bitmasks = false;
-static int screen_width = 640, screen_height = 400, fps = 35;
+// fp10s is 10 times the FPS
+static int screen_width = 640, screen_height = 400, fp10s = 350;
 static bool dynamic_fps = false;
 static int analog_deadzone;
 static int preferred_bpp;
@@ -373,7 +374,7 @@ void Quit (const char *errorStr, ...)
 
 	libretro_log("Fatal error: %s", formatted);
    msg.msg    = formatted;
-	msg.frames = fps * 10;
+	msg.frames = fp10s;
 	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
 	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
 	throw CFatalError(formatted);
@@ -499,6 +500,8 @@ struct retro_core_option_definition option_defs_us[] = {
 		},
 #ifdef VITA
 		"480x270", // Run at half by default for better frame rate
+#elif defined(PSP)
+		"480x270",
 #elif defined (_3DS)
 		"400x240",
 #else
@@ -526,6 +529,12 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Refresh rate (FPS)",
 		"Configure the FPS.",
 		{
+			{ "7", NULL },
+			{ "7.8", NULL },
+			{ "8.8", NULL },
+			{ "10", NULL },
+			{ "14", NULL },
+			{ "17.5", NULL },
 			{ "25", NULL },
 			{ "30", NULL },
 			{ "35", NULL },
@@ -546,7 +555,11 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "360", NULL },
 			{ NULL, NULL },
 		},
+#if defined(PSP)
+		"10",
+#else
 		"35",
+#endif
 	},
 	{
 		"ecwolf-palette",
@@ -652,6 +665,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
+#ifndef DISABLE_ADLIB
 	{
 		"ecwolf-music-volume",
 		"Volume of music",
@@ -659,6 +673,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		SLIDER_OPTIONS,
 		"20"
 	},
+#endif
 	{
 		"ecwolf-digi-volume",
 		"Volume of digitized sound effects",
@@ -666,6 +681,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		SLIDER_OPTIONS,
 		"20"
 	},
+#ifndef DISABLE_ADLIB
 	{
 		"ecwolf-adlib-volume",
 		"Volume of Adlib sound effects",
@@ -673,6 +689,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		SLIDER_OPTIONS,
 		"20"
 	},
+#endif
 	{
 		"ecwolf-speaker-volume",
 		"Volume of Speaker sound effects",
@@ -699,15 +716,23 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Order of lookup for effects",
 		"Which variants of assets are used in priority",
 		{
+#ifndef DISABLE_ADLIB
 			{ "digi-adlib-speaker", "Digitized, Adlib, Speaker" },
 			{ "digi-adlib", "Digitized, Adlib" },
+#endif
 			{ "digi-speaker", "Digitized, Speaker" },
 			{ "digi", "Digitized only" },
+#ifndef DISABLE_ADLIB
 			{ "adlib", "Adlib only" },
+#endif
 			{ "speaker", "Speaker only" },
 			{ NULL, NULL },
 		},
+#ifndef DISABLE_ADLIB
 		"digi-adlib-speaker",
+#else
+		"digi-speaker",
+#endif
 	},
 	{
 		"ecwolf-aspect",
@@ -761,12 +786,32 @@ int AnalogTurnSensitivity = 20;
 static void announce_frame_callback()
 {
 	frame_cb.callback  = frame_time_cb;
-	if (fps == TICRATE / 2)
-		frame_cb.reference = 2 * TIC_TIME_US;
-	else if (fps == TICRATE)
+	switch (fp10s) {
+	case 700: // 70.0 fps, 1 tic/frame
 		frame_cb.reference = TIC_TIME_US;
-	else
-		frame_cb.reference = 1000000 / fps;
+		break;
+	case 350: // 35.0 fps, 2 tics/frame
+		frame_cb.reference = 2 * TIC_TIME_US;
+		break;
+	case 175: // 17.5 fps, 4 tics/frame
+		frame_cb.reference = 4 * TIC_TIME_US;
+		break;
+	case 140: // 14.0 fps, 5 tics/frame
+		frame_cb.reference = 5 * TIC_TIME_US;
+		break;
+	case 100: // 10.0 fps, 7 tics/frame
+		frame_cb.reference = 7 * TIC_TIME_US;
+		break;
+	case 88: // 8.75 fps, 8 tics/frame
+		frame_cb.reference = 8 * TIC_TIME_US;
+		break;
+	case 70: // 7.0 fps, 8 tics/frame
+		frame_cb.reference = 10 * TIC_TIME_US;
+		break;
+	default:
+		frame_cb.reference = 10000000 / fp10s;
+		break;
+	}
 	environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frame_cb);
 }
 
@@ -851,7 +896,7 @@ static void update_variables(bool startup)
 #endif
 	int oldw = screen_width;
 	int oldh = screen_height;
-	int oldfps = fps;
+	int oldfp10s = fp10s;
 
 	const char *resolution = get_string_variable("ecwolf-resolution");
 
@@ -877,9 +922,13 @@ static void update_variables(bool startup)
 		screen_height = 200;
 	}
 
-	fps = get_unsigned_variable("ecwolf-fps", 35);
+	const char *fpsstr = get_string_variable("ecwolf-fps") ?: "35";
+	if (strcmp (fpsstr, "17.5") == 0)
+		fp10s = 175;
+	else
+		fp10s = strtoul(fpsstr, NULL, 0) * 10;
 	if (log_cb)
-		log_cb(RETRO_LOG_INFO, "Got FPS: %u.\n", fps);
+		log_cb(RETRO_LOG_INFO, "Got FPS: %u.%u.\n", fp10s / 10, fp10s % 10);
 
 	if (startup) {
 		const char *palette = get_string_variable("ecwolf-palette");
@@ -890,7 +939,7 @@ static void update_variables(bool startup)
 			preferred_bpp = 16;
 	}
 
-	if (oldw != screen_width || oldh != screen_height || oldfps != fps)
+	if (oldw != screen_width || oldh != screen_height || oldfp10s != fp10s)
 	{
 		struct retro_system_av_info avinfo;
 		retro_get_system_av_info(&avinfo);
@@ -907,7 +956,7 @@ static void update_variables(bool startup)
 			screenHeight = screen_height;
 		}
 	}
-	if (oldfps != fps)
+	if (oldfp10s != fp10s)
 	{
 		announce_frame_callback();
 	}
@@ -943,9 +992,14 @@ static void update_variables(bool startup)
 	if (am_updated)
 		AM_UpdateFlags();
 
+#ifndef DISABLE_ADLIB
 	MusicVolume = get_slider_option("ecwolf-music-volume");
-	SpeakerVolume = get_slider_option("ecwolf-speaker-volume");
 	AdlibVolume = get_slider_option("ecwolf-adlib-volume");
+#else
+	MusicVolume = 0;
+	AdlibVolume = 0;
+#endif
+	SpeakerVolume = get_slider_option("ecwolf-speaker-volume");
 	DigiVolume = get_slider_option("ecwolf-digi-volume");
 	AnalogMoveSensitivity = get_slider_option ("ecwolf-analog-move-sensitivity");
 	AnalogTurnSensitivity = get_slider_option ("ecwolf-analog-turn-sensitivity");
@@ -1429,7 +1483,7 @@ void retro_get_system_info(struct retro_system_info *info)
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
 	memset(info, 0, sizeof(*info));
-	info->timing.fps            = (double) fps;
+	info->timing.fps            = (double) fp10s / 10.0;
 	info->timing.sample_rate    = (double) SAMPLERATE;
 
 	info->geometry.base_width   = screen_width;

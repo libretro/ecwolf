@@ -83,7 +83,7 @@ struct mappatch_t
 	SWORD	patch;
 	SWORD	stepdir;
 	SWORD	colormap;
-};
+} __attribute__((__packed__));
 
 //
 // A wall texture is a list of patches which are to be combined in a
@@ -100,7 +100,7 @@ struct maptexture_t
 	BYTE		columndirectory[4];	// OBSOLETE
 	SWORD		patchcount;
 	mappatch_t	patches[1];
-};
+} __attribute__((__packed__));
 
 #define MAPTEXF_WORLDPANNING	0x8000
 

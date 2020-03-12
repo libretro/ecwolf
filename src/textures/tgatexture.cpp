@@ -390,12 +390,12 @@ void FTGATexture::MakeTexture ()
 			step_x>>=1;
 			for(int y=0;y<Height;y++)
 			{
-				WORD * p = (WORD*)(ptr + y * Pitch);
+				BYTE * p = ptr + y * Pitch;
 				for(int x=0;x<Width;x++)
 				{
-					int v = LittleLong(*p);
+					int v = ReadLittleLong(p);
 					Pixels[x*Height+y] = RGB32k[(v>>10) & 0x1f][(v>>5) & 0x1f][v & 0x1f];
-					p+=step_x;
+					p+=step_x * 2;
 				}
 			}
 			break;

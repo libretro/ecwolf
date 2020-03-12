@@ -35,25 +35,14 @@
 #include "id_sd.h"
 #include "state_machine.h"
 #include "wl_play.h"
-#ifdef USE_GPL
-#include "dosbox/dbopl.h"
-#else
-#include "mame/fmopl.h"
-#endif
 
 static  bool					SD_Started;
 static  bool					nextsoundpos;
 static  int                     LeftPosition;
 static  int                     RightPosition;
 static const int synthesisRate = 44100;
-#define MUSIC_RATE 700	// Must be a multiple of SOUND_RATE
 #define SOUND_RATE 140	// Also affects PC Speaker sounds
 static const int samplesPerSoundTick = synthesisRate / SOUND_RATE;
-static const int samplesPerMusicTick = synthesisRate / MUSIC_RATE;
-#undef alOut
-#define alOut(n,b) 		YM3812Write(oplChip, n, b, 20)
-
-Mix_Chunk *SynthesizeAdlibIMF(const byte *dataRaw, size_t size);
   
 FString                 SoundPlaying;
 globalsoundpos channelSoundPos[MIX_CHANNELS];
@@ -67,76 +56,6 @@ static TArray<SynthCacheItem> synthCache;
 
 #define PC_BASE_TIMER 1193181
 
-#ifdef USE_GPL
-
-DBOPL::Chip oplChip;
-DBOPL::Chip musicOpl;
-
-static inline bool YM3812Init(int numChips, int clock, int rate)
-{
-	static int inited = false;
-	if (inited)
-		return false;
-	inited = true;
-	oplChip.Setup(rate);
-	musicOpl.Setup(rate);
-	return false;
-}
-
-static inline void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const int &volume)
-{
-	which.WriteReg(reg, val);
-}
-
-static inline void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length)
-{
-	Bit32s buffer[512 * 2];
-	int i;
-
-	// length is at maximum samplesPerMusicTick = param_samplerate / 700
-	// so 512 is sufficient for a sample rate of 358.4 kHz (default 44.1 kHz)
-	if(length > 512)
-		length = 512;
-
-	if(which.opl3Active)
-	{
-		which.GenerateBlock3(length, buffer);
-
-		// GenerateBlock3 generates a number of "length" 32-bit stereo samples
-		// so we only need to convert them to 16-bit samples
-		for(i = 0; i < length; i ++)
-		{
-			// Multiply by 4 to match loudness of MAME emulator.
-			Bit32s sample = buffer[i * 2] << 2;
-			if(sample > 32767) sample = 32767;
-			else if(sample < -32768) sample = -32768;
-			stream[i] = LittleShort(sample);
-		}
-	}
-	else
-	{
-		which.GenerateBlock2(length, buffer);
-
-		// GenerateBlock3 generates a number of "length" 32-bit mono samples
-		// so we need to convert them to 16-bit mono samples
-		for(i = 0; i < length; i++)
-		{
-			// Multiply by 4 to match loudness of MAME emulator.
-			// Then upconvert to stereo.
-			Bit32s sample = buffer[i] << 2;
-			if(sample > 32767) sample = 32767;
-			else if(sample < -32768) sample = -32768;
-			stream[i] = (int16_t) LittleShort(sample);
-		}
-	}
-}
-
-#else
-
-static const int oplChip = 0;
-
-#endif
-
 void    SD_Startup(void)
 {
 	if (SD_Started)
@@ -145,7 +64,9 @@ void    SD_Startup(void)
 	SoundInfo.Init();
 	SoundSeq.Init();
 	SoundPlaying = FString();
-	YM3812Init(1,3579545,synthesisRate);
+#ifndef DISABLE_ADLIB
+	SD_Startup_Adlib();
+#endif
 
 	SD_Started = true;
 }
@@ -323,6 +244,9 @@ static int cacheptr;
 
 Mix_Chunk *GetMusic(const char* chunk)
 {
+#ifdef DISABLE_ADLIB
+	return NULL;
+#else	
 	for (int i = 0; i < MUSIC_CACHE_SIZE; i++) {
 		if (music_cache[i].name != NULL && strcmp(music_cache[i].name, chunk) == 0)
 			return music_cache[i].chunk;
@@ -343,6 +267,7 @@ Mix_Chunk *GetMusic(const char* chunk)
 	music_cache[cacheptr].chunk = res;
 	cacheptr++;
 	return res;
+#endif
 }
 
 void    SD_ContinueMusic(const char* chunk, int startoffs)
@@ -352,10 +277,12 @@ void    SD_ContinueMusic(const char* chunk, int startoffs)
 	SD_MusicOff();
 
 	Mix_Chunk *sample = GetMusic(chunk);
+	if (!sample)
+		return;
 
 	g_state.musicChannel.sample = sample;
 	g_state.musicChannel.sound = chunk;
-	g_state.musicChannel.type = SoundData::DIGITAL;
+	g_state.musicChannel.type = SoundData::ADLIB;
 	g_state.musicChannel.startTick = currentTick;
 	g_state.musicChannel.isMusic = true;
 	g_state.musicChannel.skipTicks = startoffs;
@@ -495,80 +422,6 @@ Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 		);
 }
 
-static void SDL_AlSetChanInst(DBOPL::Chip &oplChip, const Instrument *inst, unsigned int chan)
-{
-	static const byte chanOps[OPL_CHANNELS] = {
-		0, 1, 2, 8, 9, 0xA, 0x10, 0x11, 0x12
-	};
-	byte c,m;
-
-	m = chanOps[chan]; // modulator cell for channel
-	c = m + 3; // carrier cell for channel
-	alOut(m + alChar,inst->mChar);
-	alOut(m + alScale,inst->mScale);
-	alOut(m + alAttack,inst->mAttack);
-	alOut(m + alSus,inst->mSus);
-	alOut(m + alWave,inst->mWave);
-	alOut(c + alChar,inst->cChar);
-	alOut(c + alScale,inst->cScale);
-	alOut(c + alAttack,inst->cAttack);
-	alOut(c + alSus,inst->cSus);
-	alOut(c + alWave,inst->cWave);
-
-	// Note: Switch commenting on these lines for old MUSE compatibility
-//    alOutInIRQ(alFeedCon,inst->nConn);
-
-	alOut(chan + alFreqL,0);
-	alOut(chan + alFreqH,0);
-	alOut(chan + alFeedCon,0);
-}
-static void SDL_AlSetFXInst(DBOPL::Chip &oplChip, const Instrument *inst)
-{
-	SDL_AlSetChanInst(oplChip, inst, 0);
-}
-
-Mix_Chunk *SynthesizeAdlib(const byte *dataRaw)
-{
-	AdLibSound *sound = (AdLibSound*) dataRaw;
-
-	alOut(alFreqH + 0, 0);
-
-	int alLength = LittleLong(sound->common.length);
-	byte alBlock = ((sound->block & 7) << 2) | 0x20;
-	Instrument      *inst = &sound->inst;
-
-	if (!(inst->mSus | inst->cSus))
-	{
-		Quit("SDL_ALPlaySound() - Bad instrument");
-	}
-
-	SDL_AlSetFXInst(oplChip, inst);
-	byte *alSound = (byte *)sound->data;
-
-	int16_t *samples = (int16_t*) malloc (alLength * samplesPerSoundTick * 2);
-	CHECKMALLOCRESULT(samples);
-	int16_t *sampleptr = samples;
-
-	for (int i = 0; i < alLength; i++, alSound++) {
-		if(*alSound)
-		{
-			alOut(alFreqL, *alSound);
-			alOut(alFreqH, alBlock);
-		} else alOut(alFreqH, 0);
-
-		YM3812UpdateOneMono(oplChip, sampleptr, samplesPerSoundTick);
-		sampleptr += samplesPerSoundTick;
-	}
-	return new Mix_Chunk_Digital(
-		synthesisRate,
-		samples,
-		sampleptr - samples,
-		FORMAT_16BIT_LINEAR_SIGNED,
-		false
-		);
-}
-
-
 Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
 {
 	if (!which.HasType(type))
@@ -580,10 +433,12 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
 	switch(type) {
 	case SoundData::DIGITAL:
 		return which.GetDigitalData();
+#ifndef DISABLE_ADLIB
 	case SoundData::ADLIB:
 		if (!synth.adlibSynth)
 			synth.adlibSynth.Reset(SynthesizeAdlib(which.GetAdLibData()));
 		return synth.adlibSynth;
+#endif
 	case SoundData::PCSPEAKER:
 		if (!synth.pcSynth)
 			synth.pcSynth.Reset(SynthesizeSpeaker(which.GetSpeakerData()));
@@ -704,82 +559,4 @@ void Mix_Chunk_Sampled::MixSamples (int16_t *result, int output_rate, size_t siz
 		break;
 	}
 	}
-}
-
-Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
-			     bool isLooping)
-{
-	YM3812Init(1,3579545,synthesisRate);
-	this->rate = rate;
-	this->sample_count = 0;
-	this->chunk_samples = NULL;
-	this->sample_format = FORMAT_16BIT_LINEAR_SIGNED;
-	this->isLooping = isLooping;
-	this->samples_allocated = 0;
-	this->imf = (byte*) malloc(imf_size * 4);
-	CHECKMALLOCRESULT(this->imf);
-	memcpy(this->imf, imf, imf_size * 4);
-	this->imfptr = 0;
-	this->imfsize = imf_size;
-
-	static const Instrument ChannelRelease = {
-		0, 0,
-		0x3F, 0x3F,
-		0xFF, 0xFF,
-		0xF, 0xF,
-		0, 0,
-		0,
-
-		0, 0, {0, 0, 0}
-	};
-
-	for (int i = 0;i < OPL_CHANNELS;++i)
-		SDL_AlSetChanInst(musicOpl, &ChannelRelease, i);
-}
-
-Mix_Chunk *SynthesizeAdlibIMF(const byte *dataRaw, size_t size)
-{
-	int alLength = size / 4;
-	const byte *alSound = dataRaw;
-	if(alSound[0] != 0 || alSound[1] != 0) {
-		alLength = LittleShort(*(WORD*)alSound) / 4;
-		if (alLength > (size - 2) / 4)
-			alLength = (size - 2) / 4;
-		alSound += 2;
-	}
-
-	return new Mix_Chunk_IMF(synthesisRate, alSound, alLength, true);
-}
-
-void Mix_Chunk_IMF::EnsureSpace(int need_samples)
-{
-	if (samples_allocated >= need_samples)
-		return;
-	size_t nl = need_samples + need_samples / 2;
-	if (nl < 256)
-		nl = 256;
-	chunk_samples = realloc(chunk_samples, nl * 2);
-	samples_allocated = nl;
-}
-
-void Mix_Chunk_IMF::EnsureSynthesis(int maxTics)
-{	
-	for (;imfptr < imfsize && sample_count < maxTics * rate / TICRATE; imfptr++) {
-		byte reg = imf[4*imfptr];
-		byte val = imf[4*imfptr + 1];
-		int tics = LittleShort(((WORD *)imf)[imfptr * 2 + 1]);
-		YM3812Write(musicOpl, reg, val, 20);
-
-		EnsureSpace(sample_count + samplesPerMusicTick * tics);
-
-		while (tics) {
-			int curtics = tics;
-			if (curtics > 500 / samplesPerMusicTick)
-				curtics = 500 / samplesPerMusicTick;
-			YM3812UpdateOneMono(musicOpl, (int16_t *)chunk_samples + sample_count, samplesPerMusicTick * curtics);
-			sample_count += samplesPerMusicTick * curtics;
-			tics -= curtics;
-		}
-	}
-//	printf ("synth: %d\n", sample_count);
 }

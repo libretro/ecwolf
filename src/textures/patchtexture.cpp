@@ -82,7 +82,7 @@ static bool CheckIfPatch(FileReader & file)
 {
 	if (file.GetLength() < 13) return false;	// minimum length of a valid Doom patch
 	
-	BYTE *data = new BYTE[file.GetLength()];
+	DWORD *data = new DWORD[(file.GetLength()+3)/4];
 	file.Seek(0, SEEK_SET);
 	file.Read(data, file.GetLength());
 	

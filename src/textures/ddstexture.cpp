@@ -531,11 +531,11 @@ void FDDSTexture::ReadRGB (FWadLump &lump, BYTE *tcbuf)
 			DWORD c;
 			if (Format == 4)
 			{
-				c = LittleLong(*(DWORD *)buffp); buffp += 4;
+				c = ReadLittleLong(buffp); buffp += 4;
 			}
 			else if (Format == 2)
 			{
-				c = LittleShort(*(WORD *)buffp); buffp += 2;
+				c = ReadLittleShort(buffp); buffp += 2;
 			}
 			else if (Format == 3)
 			{
@@ -603,7 +603,7 @@ void FDDSTexture::DecompressDXT1 (FWadLump &lump, BYTE *tcbuf)
 		block = blockbuff;
 		for (ox = 0; ox < Width; ox += 4)
 		{
-			WORD color16[2] = { LittleShort(((WORD *)block)[0]), LittleShort(((WORD *)block)[1]) };
+			WORD color16[2] = { ReadLittleShort(block), ReadLittleShort(block+2) };
 
 			// Convert color from R5G6B5 to R8G8B8.
 			for (i = 1; i >= 0; --i)
@@ -697,7 +697,7 @@ void FDDSTexture::DecompressDXT3 (FWadLump &lump, bool premultiplied, BYTE *tcbu
 		block = blockbuff;
 		for (ox = 0; ox < Width; ox += 4)
 		{
-			WORD color16[2] = { LittleShort(((WORD *)block)[4]), LittleShort(((WORD *)block)[5]) };
+			WORD color16[2] = { ReadLittleShort(block + 8), ReadLittleShort(block + 10) };
 
 			// Convert color from R5G6B5 to R8G8B8.
 			for (i = 1; i >= 0; --i)
@@ -728,7 +728,7 @@ void FDDSTexture::DecompressDXT3 (FWadLump &lump, bool premultiplied, BYTE *tcbu
 					break;
 				}
 				BYTE yslice = block[12 + y];
-				WORD yalphaslice = LittleShort(((WORD *)block)[y]);
+				WORD yalphaslice = ReadLittleShort(block + 2 * y);
 				for (x = 0; x < 4; ++x)
 				{
 					if (ox + x >= Width)
@@ -780,7 +780,7 @@ void FDDSTexture::DecompressDXT5 (FWadLump &lump, bool premultiplied, BYTE *tcbu
 		block = blockbuff;
 		for (ox = 0; ox < Width; ox += 4)
 		{
-			WORD color16[2] = { LittleShort(((WORD *)block)[4]), LittleShort(((WORD *)block)[5]) };
+			WORD color16[2] = { ReadLittleShort(block+8), ReadLittleShort(block+10) };
 			BYTE alpha[8];
 
 			// Calculate the eight alpha values.

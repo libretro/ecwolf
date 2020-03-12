@@ -422,9 +422,8 @@ void FCompressedFile::Implode ()
 	m_Buffer = (BYTE *)M_Malloc (m_BufferSize + 8);
 	m_Pos = 0;
 
-	DWORD *lens = (DWORD *)(m_Buffer);
-	lens[0] = BigLong((unsigned int)outlen);
-	lens[1] = BigLong((unsigned int)len);
+	WriteBigLong(m_Buffer, (unsigned int)outlen);
+	WriteBigLong(m_Buffer + 4, (unsigned int)len);
 
 	if (outlen == 0)
 		memcpy (m_Buffer + 8, oldbuf, len);
@@ -442,9 +441,8 @@ void FCompressedFile::Explode ()
 
 	if (m_Buffer)
 	{
-		unsigned int *ints = (unsigned int *)(m_Buffer);
-		cprlen = BigLong(ints[0]);
-		expandsize = BigLong(ints[1]);
+		cprlen = ReadBigLong(m_Buffer);
+		expandsize = ReadBigLong(m_Buffer + 4);
 
 		expand = (unsigned char *)M_Malloc (expandsize);
 		if (cprlen)
@@ -599,8 +597,8 @@ int FCompressedMemFile::GetSerializedSize()
 	}
 
 	DWORD sizes[2];
-	sizes[0] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[0]);
-	sizes[1] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[1]);
+	sizes[0] = ReadBigLong (m_ImplodedBuffer);
+	sizes[1] = ReadBigLong (m_ImplodedBuffer + 4);
 	return (sizes[0] ? sizes[0] : sizes[1])+8;
 }
 
@@ -612,8 +610,8 @@ void FCompressedMemFile::SerializeToBuffer(void *buffer)
 	}
 
 	DWORD sizes[2];
-	sizes[0] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[0]);
-	sizes[1] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[1]);
+	sizes[0] = ReadBigLong (m_ImplodedBuffer);
+	sizes[1] = ReadBigLong (m_ImplodedBuffer+4);
 	DWORD size = (sizes[0] ? sizes[0] : sizes[1])+8;
 
 	memcpy ((char *) buffer, m_ImplodedBuffer, size);
@@ -630,8 +628,8 @@ void FCompressedMemFile::Serialize (FArchive &arc)
 		arc.Write (ZSig, 4);
 
 		DWORD sizes[2];
-		sizes[0] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[0]);
-		sizes[1] = SWAP_DWORD (((DWORD *)m_ImplodedBuffer)[1]);
+		sizes[0] = ReadBigLong (m_ImplodedBuffer);
+		sizes[1] = ReadBigLong (m_ImplodedBuffer+4);
 		arc.Write (m_ImplodedBuffer, (sizes[0] ? sizes[0] : sizes[1])+8);
 	}
 	else
@@ -651,8 +649,8 @@ void FCompressedMemFile::Serialize (FArchive &arc)
 		DWORD len = sizes[0] == 0 ? sizes[1] : sizes[0];
 
 		m_Buffer = (BYTE *)M_Malloc (len+8);
-		((DWORD *)m_Buffer)[0] = SWAP_DWORD(sizes[0]);
-		((DWORD *)m_Buffer)[1] = SWAP_DWORD(sizes[1]);
+		WriteBigLong(m_Buffer, sizes[0]);
+		WriteBigLong(m_Buffer + 4, sizes[1]);
 		arc.Read (m_Buffer+8, len);
 		m_ImplodedBuffer = m_Buffer;
 		m_Buffer = NULL;
@@ -669,8 +667,8 @@ void FCompressedMemFile::GetSizes(unsigned int &compressed, unsigned int &uncomp
 {
 	if (m_ImplodedBuffer != NULL)
 	{
-		compressed = BigLong(*(unsigned int *)m_ImplodedBuffer);
-		uncompressed = BigLong(*(unsigned int *)(m_ImplodedBuffer + 4));
+		compressed = ReadBigLong(m_ImplodedBuffer);
+		uncompressed = ReadBigLong(m_ImplodedBuffer + 4);
 	}
 	else
 	{

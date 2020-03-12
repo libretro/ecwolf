@@ -209,8 +209,15 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/libretro/wl_text.cpp \
 	$(CORE_DIR)/src/libretro/g_conversation.cpp \
 	$(CORE_DIR)/src/libretro/g_intermission.cpp \
-	$(CORE_DIR)/src/libretro/w32_random.cpp \
-	$(CORE_DIR)/src/dosbox/dbopl.cpp
+	$(CORE_DIR)/src/libretro/w32_random.cpp
+
+ifneq ($(DISABLE_ADLIB), 1)
+	SOURCES_CXX += $(CORE_DIR)/src/dosbox/dbopl.cpp \
+		$(CORE_DIR)/src/libretro/id_sd_adlib.cpp
+else
+        CFLAGS += -DDISABLE_ADLIB
+        CXXFLAGS += -DDISABLE_ADLIB
+endif
 
 ifneq ($(NO_STORE),1)
 # Don't bother with Steam/GOG FS 

@@ -273,15 +273,6 @@ static void InterCountRatio(wl_state_t *state, int ratio, unsigned int x, unsign
 	state->isCountingRatio = true;
 }
 
-static void InterWaitForAck()
-{
-	InterState.acked = false;
-	IN_StartAck ();
-	while (!IN_CheckAck ())
-		BJ_Breathe ();
-	IN_ClearKeysDown();
-}
-
 static void InterDrawNormalTop()
 {
 	FString completedString;

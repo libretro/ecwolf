@@ -479,16 +479,15 @@ void GameMap::SetSpotTag(MapSpot spot, unsigned int tag)
 
 void GameMap::SetupLinks()
 {
-	// Allocate as one large block for locality.
-	const unsigned int zdSize = sizeof(bool)*zonePalette.Size()
-		+ sizeof(unsigned short)*((zonePalette.Size()*(zonePalette.Size()+1))>>1);
-	byte* zoneData = new byte[zdSize + sizeof(unsigned short*)*zonePalette.Size()];
-	memset(zoneData, 0, zdSize);
-	zoneTraversed = reinterpret_cast<bool*>(zoneData);
+	const unsigned int zdSize = ((zonePalette.Size()*(zonePalette.Size()+1))>>1);
+	zoneTraversed = new bool[zonePalette.Size()];
+	memset(zoneTraversed, 0, zonePalette.Size() * sizeof (zoneTraversed[0]));
+	zptrBack = new unsigned short[zdSize];
+	memset(zptrBack, 0, sizeof(zptrBack[0]) * zdSize);	
 
 	// Set up the table
-	unsigned short* ptr = reinterpret_cast<unsigned short*>(zoneData + sizeof(bool)*zonePalette.Size());
-	zoneLinks = reinterpret_cast<unsigned short**>(zoneData+zdSize);
+	unsigned short* ptr = zptrBack;
+	zoneLinks = new unsigned short* [zonePalette.Size()];
 	for(unsigned int i = 0;i < zonePalette.Size();++i)
 	{
 		zoneLinks[i] = ptr;
@@ -554,8 +553,11 @@ void GameMap::UnloadLinks()
 
 	// zoneTraversed holds the base address for our single allocation.
 	delete[] zoneTraversed;
+	delete[] zptrBack;
+	delete[] zoneLinks;
 	zoneTraversed = NULL;
 	zoneLinks = NULL;
+	zptrBack = NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -43,6 +43,7 @@ endif
 CORE_DIR    += ../..
 TARGET_NAME := ecwolf
 LIBM		    = -lm
+DISABLE_ADLIB = 0
 
 ifeq ($(ARCHFLAGS),)
 ifeq ($(archs),ppc)
@@ -115,6 +116,28 @@ else ifeq ($(platform), emscripten)
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
    CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+else ifeq ($(platform), ps2)
+   TARGET := $(TARGET_NAME)_ps2.a
+   CC = ee-gcc
+   CXX = ee-g++
+   AR = ee-ar
+   CFLAGS += -DPS2 -G0 -D__sun
+   CXXFLAGS += -DPS2 -G0 -D__sun
+   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   STATIC_LINKING = 1
+else ifeq ($(platform), psp1)
+   TARGET := $(TARGET_NAME)_libretro_psp1.a
+   CC = psp-gcc
+   CXX = psp-g++
+   AR = psp-ar
+   CFLAGS += -DPSP -G0
+   CXXFLAGS += -DPSP -G0
+   DISABLE_ADLIB = 1
+   CFLAGS += -I$(shell psp-config --pspsdk-path)/include
+   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   STATIC_LINKING = 1
 else ifeq ($(platform), vita)
    TARGET := $(TARGET_NAME)_libretro_vita.a
    CC = arm-vita-eabi-gcc
