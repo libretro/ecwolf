@@ -87,7 +87,6 @@ initial_sources(
 	am_map.cpp
 	colormatcher.cpp
 	config.cpp
-	c_cvars.cpp
 	dobject.cpp
 	dobjgc.cpp
 	farchive.cpp
@@ -167,6 +166,7 @@ if(WIN32)
 endif()
 else()
   target_sources(engine PRIVATE
+      c_cvars.cpp
       filesys.cpp
       filesys_steam.cpp
       id_in.cpp

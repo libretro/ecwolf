@@ -148,7 +148,6 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/am_map.cpp \
 	$(CORE_DIR)/src/colormatcher.cpp \
 	$(CORE_DIR)/src/config.cpp \
-	$(CORE_DIR)/src/c_cvars.cpp \
 	$(CORE_DIR)/src/dobject.cpp \
 	$(CORE_DIR)/src/dobjgc.cpp \
 	$(CORE_DIR)/src/farchive.cpp \

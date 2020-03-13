@@ -30,16 +30,22 @@
 #define assert_ret(x) assert(x)
 #endif
 
+#ifndef LIBRETRO
 bool fullscreen = true;
 bool usedoublebuffering = true;
+#endif
 unsigned screenWidth = 640;
 unsigned screenHeight = 480;
+#ifndef LIBRETRO
 unsigned fullScreenWidth = 640;
 unsigned fullScreenHeight = 480;
 unsigned windowedScreenWidth = 640;
 unsigned windowedScreenHeight = 480;
+#endif
 unsigned screenBits = static_cast<unsigned> (-1);      // use "best" color depth according to libSDL
+#ifndef LIBRETRO
 float screenGamma = 1.0f;
+#endif
 
 unsigned curPitch;
 
@@ -54,6 +60,8 @@ static struct
 } currentBlend;
 
 //===========================================================================
+
+#ifndef LIBRETRO
 
 void ToggleFullscreen()
 {
@@ -85,6 +93,7 @@ void SetFullscreen(bool isFull)
 	IN_AdjustMouse();
 }
 
+#endif
 //===========================================================================
 
 void VL_ReadPalette(const char* lump)

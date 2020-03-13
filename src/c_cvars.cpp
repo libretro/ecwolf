@@ -57,9 +57,7 @@ bool alwaysrun;
 bool mouseenabled, mouseyaxisdisabled, joystickenabled;
 float localDesiredFOV = 90.0f;
 
-#ifdef LIBRETRO
-
-#elif SDL_VERSION_ATLEAST(1,3,0)
+#if SDL_VERSION_ATLEAST(1,3,0)
 // Convert SDL1 keycode to SDL2 scancode
 static const SDL_Scancode SDL2ConversionTable[323] = {
 	SDL_SCANCODE_UNKNOWN,SDL_SCANCODE_UNKNOWN,SDL_SCANCODE_UNKNOWN,SDL_SCANCODE_UNKNOWN,SDL_SCANCODE_UNKNOWN,SDL_SCANCODE_UNKNOWN,SDL_SCANCODE_UNKNOWN,SDL_SCANCODE_UNKNOWN,
@@ -132,7 +130,6 @@ int SDL2Backconvert(int sc) { return sc; }
 
 void FinalReadConfig()
 {
-#ifndef LIBRETRO
 	SDMode  sd;
 	SMMode  sm;
 	SDSMode sds;
@@ -154,7 +151,7 @@ void FinalReadConfig()
 	SD_SetMusicMode(sm);
 	SD_SetSoundMode(sd);
 	SD_SetDigiDevice(sds);
-#endif
+
 	AM_UpdateFlags();
 
 	doWriteConfig = true;
@@ -211,7 +208,6 @@ void ReadConfig(void)
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
 	char mseSettingName[50] = {0};
-#ifndef LIBRETRO
 	forcegrabmouse = config.GetSetting("ForceGrabMouse")->GetInteger() != 0;
 	mouseenabled = config.GetSetting("MouseEnabled")->GetInteger() != 0;
 	joystickenabled = config.GetSetting("JoystickEnabled")->GetInteger() != 0;
@@ -236,7 +232,6 @@ void ReadConfig(void)
 		controlScheme[i].keyboard = SDL2Convert(config.GetSetting(keySettingName)->GetInteger());
 		controlScheme[i].mouse = config.GetSetting(mseSettingName)->GetInteger();
 	}
-#endif
 	viewsize = config.GetSetting("ViewSize")->GetInteger();
 	mousexadjustment = config.GetSetting("MouseXAdjustment")->GetInteger();
 	mouseyadjustment = config.GetSetting("MouseYAdjustment")->GetInteger();
@@ -244,13 +239,11 @@ void ReadConfig(void)
 	panyadjustment = config.GetSetting("PanYAdjustment")->GetInteger();
 	mouseyaxisdisabled = config.GetSetting("MouseYAxisDisabled")->GetInteger() != 0;
 	alwaysrun = config.GetSetting("AlwaysRun")->GetInteger() != 0;
-#ifndef LIBRETRO
 	AdlibVolume = config.GetSetting("SoundVolume")->GetInteger();
 	SD_UpdatePCSpeakerVolume();
 	MusicVolume = config.GetSetting("MusicVolume")->GetInteger();
 	SoundVolume = config.GetSetting("DigitizedVolume")->GetInteger();
 	vid_fullscreen = config.GetSetting("Vid_FullScreen")->GetInteger() != 0;
-#endif
 	vid_aspect = static_cast<Aspect>(config.GetSetting("Vid_Aspect")->GetInteger());
 	vid_vsync = config.GetSetting("Vid_Vsync")->GetInteger() != 0;
 	fullScreenWidth = config.GetSetting("FullScreenWidth")->GetInteger();
@@ -292,7 +285,7 @@ void ReadConfig(void)
 		sprintf(hsGraphic, "HighScore%u_Graphic", i);
 
 		config.CreateSetting(hsName, Scores[i].name);
-		config.CreateSetting(hsScore, (int)Scores[i].score);
+		config.CreateSetting(hsScore, Scores[i].score);
 		config.CreateSetting(hsCompleted, Scores[i].completed);
 		config.CreateSetting(hsGraphic, Scores[i].graphic);
 
@@ -359,7 +352,6 @@ void ReadConfig(void)
 =
 ====================
 */
-#ifndef LIBRETRO
 
 void WriteConfig(void)
 {
@@ -441,4 +433,3 @@ void WriteConfig(void)
 
 	config.SaveConfig();
 }
-#endif

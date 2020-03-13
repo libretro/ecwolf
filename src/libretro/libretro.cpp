@@ -97,6 +97,12 @@ IVideo *Video = NULL;
 
 wl_state_t g_state;
 
+Aspect r_ratio = ASPECT_4_3, vid_aspect = ASPECT_NONE;
+fixed movebob = FRACUNIT;
+
+bool alwaysrun;
+float localDesiredFOV = 90.0f;
+
 class LibretroFBBase : public DFrameBuffer
 {
 public:
@@ -280,7 +286,6 @@ bool IVideo::SetResolution (int width, int height, int bits)
 
 	screen = Video->CreateFrameBuffer(width, height, true, NULL);
 	GC::WriteBarrier(screen);
-	screen->SetGamma (screenGamma);
 	memcpy (screen->GetPalette(), palette, sizeof(PalEntry)*256);
 	screen->UpdatePalette();
 	
@@ -773,6 +778,20 @@ struct retro_core_option_definition option_defs_us[] = {
 		"disabled"
 	},
 #endif
+	{
+		"ecwolf-panx-adjustment",
+		"Horizontal panning speed in automap",
+		"Multiplier for horizontal panning from 0 to 20",
+		SLIDER_OPTIONS,
+		"5"
+	},
+	{
+		"ecwolf-pany-adjustment",
+		"Horizontal panning speed in automap",
+		"Multiplier for horizontal panning from 0 to 20",
+		SLIDER_OPTIONS,
+		"5"
+	},
 	{ NULL, NULL, NULL, {{0}}, NULL },
 };
 
@@ -844,7 +863,7 @@ static unsigned get_unsigned_variable(const char *name, unsigned def)
 	return strtoul(str, NULL, 0);
 }
 
-static int get_slider_option(const char *name)
+static int get_slider_option(const char *name, int def = 20)
 {
 	const char *str = get_string_variable (name);
 
@@ -852,7 +871,7 @@ static int get_slider_option(const char *name)
 		return 20;
 	int ret = strtoul(str, NULL, 0);
 	if (ret < 0 || ret > 20)
-		return 20;
+		return def;
 	return ret;
 }
 
@@ -944,16 +963,15 @@ static void update_variables(bool startup)
 		struct retro_system_av_info avinfo;
 		retro_get_system_av_info(&avinfo);
 		environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &avinfo);
-		fullScreenWidth = screen_width;
-		fullScreenHeight = screen_height;
-		windowedScreenWidth = screen_width;
-		windowedScreenHeight = screen_height;
-		if (screen)
-			SetFullscreen(true);
-		else
-		{
-			screenWidth = screen_width;
-			screenHeight = screen_height;
+		screenWidth = screen_width;
+		screenHeight = screen_height;
+		if (screen) {
+			VL_SetVGAPlaneMode();
+			if(playstate)
+			{
+				DrawPlayScreen();
+			}
+			IN_AdjustMouse();
 		}
 	}
 	if (oldfp10s != fp10s)
@@ -986,8 +1004,8 @@ static void update_variables(bool startup)
 	am_multiple_choice ("ecwolf-am-rotate", am_rotate, am_updated, rotate_options);
 	am_bool_option ("ecwolf-am-drawtexturedwalls", am_drawtexturedwalls, am_updated);
 	am_bool_option ("ecwolf-am-drawtexturedfloors", am_drawfloors, am_updated);
-	am_bool_option ("ecwolf-am-texturedoverlay", am_drawfloors, am_updated);
-	am_bool_option ("ecwolf-am-showratios", am_overlaytextured, am_updated);
+	am_bool_option ("ecwolf-am-texturedoverlay", am_overlaytextured, am_updated);
+	am_bool_option ("ecwolf-am-showratios", am_showratios, am_updated);
 	am_bool_option ("ecwolf-am-pause", am_pause, am_updated);
 	if (am_updated)
 		AM_UpdateFlags();
@@ -1028,6 +1046,11 @@ static void update_variables(bool startup)
 		if (strcmp(aspect, "21:9") == 0)
 			vid_aspect = ASPECT_64_27;
 	}
+
+	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
+
+	panxadjustment = get_slider_option("ecwolf-panx-adjustment", 5);
+	panyadjustment = get_slider_option("ecwolf-pany-adjustment", 5);
 }
 
 void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
@@ -1947,4 +1970,50 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps)
 int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 {
 	return defaultiwad;
+}
+
+/*
+====================
+=
+= ReadConfig
+=
+====================
+*/
+
+void ReadConfig(void)
+{
+	config.CreateSetting("DesiredFOV", localDesiredFOV);
+	config.CreateSetting("MoveBob", FRACUNIT);
+
+	localDesiredFOV = clamp<float>(static_cast<float>(config.GetSetting("DesiredFOV")->GetFloat()), 45.0f, 180.0f);
+	movebob = config.GetSetting("MoveBob")->GetInteger();
+
+	char hsName[50];
+	char hsScore[50];
+	char hsCompleted[50];
+	char hsGraphic[50];
+	for(unsigned int i = 0;i < MaxScores;i++)
+	{
+		sprintf(hsName, "HighScore%u_Name", i);
+		sprintf(hsScore, "HighScore%u_Score", i);
+		sprintf(hsCompleted, "HighScore%u_Completed", i);
+		sprintf(hsGraphic, "HighScore%u_Graphic", i);
+
+		config.CreateSetting(hsName, Scores[i].name);
+		config.CreateSetting(hsScore, (int)Scores[i].score);
+		config.CreateSetting(hsCompleted, Scores[i].completed);
+		config.CreateSetting(hsGraphic, Scores[i].graphic);
+
+		strcpy(Scores[i].name, config.GetSetting(hsName)->GetString());
+		Scores[i].score = config.GetSetting(hsScore)->GetInteger();
+		if(config.GetSetting(hsCompleted)->GetType() == SettingsData::ST_STR)
+			Scores[i].completed = config.GetSetting(hsCompleted)->GetString();
+		else
+			Scores[i].completed.Format("%d", config.GetSetting(hsCompleted)->GetInteger());
+		strncpy(Scores[i].graphic, config.GetSetting(hsGraphic)->GetString(), 8);
+		Scores[i].graphic[8] = 0;
+	}
+
+	// Propogate localDesiredFOV to players[0]
+	players[0].SetFOV(localDesiredFOV);
 }
