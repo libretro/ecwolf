@@ -47,6 +47,7 @@
 #include "g_conversation.h"
 #include "g_intermission.h"
 #include "state_machine.h"
+#include "am_map.h"
 
 #include <clocale>
 
@@ -110,8 +111,6 @@ void    Quit (const char *error,...);
 
 bool	startgame;
 bool	loadedgame;
-int		mousexadjustment;
-int     mouseyadjustment;
 int		panxadjustment;
 int     panyadjustment;
 
@@ -498,7 +497,7 @@ void InitGame()
 //
 // Finish with setting up through the config file.
 //
-	FinalReadConfig();
+	AM_UpdateFlags();
 
 //
 // Load the status bar
