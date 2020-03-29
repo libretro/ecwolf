@@ -177,8 +177,6 @@ else ifeq ($(platform), psl1ght)
    CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
    CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
    STATIC_LINKING = 1
-   # FIXME: Adlib emulator generates garbage on big-endian
-   DISABLE_ADLIB = 1
 # Nintendo Switch (libnx)
 else ifeq ($(platform), libnx)
     include $(DEVKITPRO)/libnx/switch_rules
