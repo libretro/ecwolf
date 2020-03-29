@@ -92,7 +92,7 @@ static inline void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int 
 			Bit32s sample = buffer[i * 2] << 2;
 			if(sample > 32767) sample = 32767;
 			else if(sample < -32768) sample = -32768;
-			stream[i] = LittleShort(sample);
+			stream[i] = sample;
 		}
 	}
 	else
@@ -108,7 +108,7 @@ static inline void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int 
 			Bit32s sample = buffer[i] << 2;
 			if(sample > 32767) sample = 32767;
 			else if(sample < -32768) sample = -32768;
-			stream[i] = (int16_t) LittleShort(sample);
+			stream[i] = sample;
 		}
 	}
 }
