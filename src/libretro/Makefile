@@ -133,7 +133,6 @@ else ifeq ($(platform), psp1)
    AR = psp-ar
    CFLAGS += -DPSP -G0
    CXXFLAGS += -DPSP -G0
-   DISABLE_ADLIB = 1
    CFLAGS += -I$(shell psp-config --pspsdk-path)/include
    CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
