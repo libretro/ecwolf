@@ -353,15 +353,25 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 			sample_format = FORMAT_8BIT_LINEAR_SIGNED;
 			sample_count = size - 44;
 		} else if (format == 1 && channels == 1 && bits == 16) {
-			sample_format = FORMAT_16BIT_LINEAR_SIGNED;
+			sample_format = FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
 		} else {
 			printf ("Unknown WAV variant %d/%d/%d\n",
 				bits, channels, format);
 			return NULL;
 		}
 		void *samples = malloc (size - 44);
+		void *input = ((char*)soundLump.GetMem())+44;
+		int sz = size - 44;
 		CHECKMALLOCRESULT(samples);
-		memcpy(samples, ((char*)soundLump.GetMem())+44, size-44);
+#ifdef __BIG_ENDIAN__
+		if (format == 1 && channels == 1 && bits == 16)
+		  {
+		    for (int i = 0; i < sz; i++)
+		      ((char *)samples)[i] = ((char *)input)[i ^ 1];
+		  }
+		else
+#endif
+		  memcpy(samples, input, sz);
 		return new Mix_Chunk_Digital(
 			rate,
 			samples,
@@ -417,7 +427,7 @@ Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 		synthesisRate,
 		samples,
 		sampleptr - samples,
-		FORMAT_16BIT_LINEAR_SIGNED,
+		FORMAT_16BIT_LINEAR_SIGNED_NATIVE,
 		false
 		);
 }
@@ -553,7 +563,7 @@ void Mix_Chunk_Sampled::MixSamples (int16_t *result, int output_rate, size_t siz
 		mix<int8_t, 0>(result, output_rate,(int8_t *) chunk_samples + start_sample, rate, num_samples, leftmul, rightmul);
 		break;
 	}
-	case FORMAT_16BIT_LINEAR_SIGNED:
+	case FORMAT_16BIT_LINEAR_SIGNED_NATIVE:
 	{
 		mix<int16_t, 0>(result, output_rate,(int16_t *) chunk_samples + start_sample, rate, num_samples, leftmul, rightmul);
 		break;

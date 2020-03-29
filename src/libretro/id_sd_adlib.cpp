@@ -192,7 +192,7 @@ Mix_Chunk *SynthesizeAdlib(const byte *dataRaw)
 		synthesisRate,
 		samples,
 		sampleptr - samples,
-		FORMAT_16BIT_LINEAR_SIGNED,
+		FORMAT_16BIT_LINEAR_SIGNED_NATIVE,
 		false
 		);
 }
@@ -204,7 +204,7 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
 	this->rate = rate;
 	this->sample_count = 0;
 	this->chunk_samples = NULL;
-	this->sample_format = FORMAT_16BIT_LINEAR_SIGNED;
+	this->sample_format = FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
 	this->isLooping = isLooping;
 	this->samples_allocated = 0;
 	this->imf = (byte*) malloc(imf_size * 4);

@@ -167,6 +167,19 @@ else ifeq ($(platform), ngc)
    CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DWII
    CXXFLAGS += $(CFLAGS) -Wl,-q -Wall -O2
    STATIC_LINKING = 1
+# Lightweight PS3 Homebrew SDK
+else ifeq ($(platform), psl1ght)
+   EXT=a
+   TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+   CC = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
+   CXX = $(PS3DEV)/ppu/bin/ppu-g++$(EXE_EXT)
+   CC_AS = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
+   AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
+   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
+   CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
+   STATIC_LINKING = 1
+   # FIXME: Adlib emulator generates garbage on big-endian
+   DISABLE_ADLIB = 1
 # Nintendo Switch (libnx)
 else ifeq ($(platform), libnx)
     include $(DEVKITPRO)/libnx/switch_rules
