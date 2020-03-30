@@ -109,6 +109,8 @@ endif
 else ifneq (,$(findstring qnx,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_qnx.so
    fpic := -fPIC
+   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
 else ifeq ($(platform), emscripten)
    TARGET := $(TARGET_NAME)_libretro_emscripten.bc
