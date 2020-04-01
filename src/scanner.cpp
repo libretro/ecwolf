@@ -28,7 +28,11 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#ifdef __QNX__
+#include <stdarg.h>
+#else
 #include <cstdarg>
+#endif
 
 #include "scanner_support.h"
 #include "scanner.h"

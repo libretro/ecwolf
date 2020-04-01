@@ -112,6 +112,8 @@ else ifneq (,$(findstring qnx,$(platform)))
    CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
+   CC = qcc -Vgcc_ntoarmv7le
+   CXX = QCC -Vgcc_ntoarmv7le
 else ifeq ($(platform), emscripten)
    TARGET := $(TARGET_NAME)_libretro_emscripten.bc
    fpic := -fPIC

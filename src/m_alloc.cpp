@@ -51,14 +51,15 @@
 #endif
 #if defined(__APPLE__)
 #define _msize(p)				malloc_size(p)
-#elif defined(__sun) || defined(__ANDROID__)
+#elif defined(__sun) || defined(__ANDROID__) || defined(__QNX__)
 #define _msize(p)				(*((size_t*)(p)-1))
+#define OWN_ADDED_SIZE 1
 #elif !defined(_WIN32)
 #define _msize(p)				malloc_usable_size(p)	// from glibc/FreeBSD
 #endif
 
 #ifndef _DEBUG
-#if !defined(__sun) && !defined(__ANDROID__)
+#if !defined(OWN_ADDED_SIZE)
 void *M_Malloc(size_t size)
 {
 	void *block = malloc(size);
@@ -128,7 +129,7 @@ void *M_Realloc(void *memblock, size_t size)
 #include <crtdbg.h>
 #endif
 
-#if !defined(__sun) && !defined(__ANDROID__)
+#if !defined(OWN_ADDED_SIZE)
 void *M_Malloc_Dbg(size_t size, const char *file, int lineno)
 {
 	void *block = _malloc_dbg(size, _NORMAL_BLOCK, file, lineno);
@@ -196,7 +197,7 @@ void *M_Realloc_Dbg(void *memblock, size_t size, const char *file, int lineno)
 #endif
 #endif
 
-#if !defined(__sun) && !defined(__ANDROID__)
+#if !defined(OWN_ADDED_SIZE)
 void M_Free (void *block)
 {
 	if (block != NULL)
