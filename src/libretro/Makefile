@@ -70,28 +70,23 @@ ifeq ($(platform), unix)
    fpic := -fPIC
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
    LIBS := -ldl -lpthread
-
-	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), linux-portable)
    TARGET := $(TARGET_NAME)_libretro.$(EXT)
    fpic := -fPIC -nostdlib
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T
 	LIBM :=
-	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring osx,$(platform)))
    TARGET := $(TARGET_NAME)_libretro.dylib
    fpic := -fPIC
    SHARED := -dynamiclib
-	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring ios,$(platform)))
    TARGET := $(TARGET_NAME)_libretro_ios.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
-	CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 
 ifeq ($(IOSSDK),)
    IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
@@ -109,8 +104,7 @@ endif
 else ifneq (,$(findstring qnx,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_qnx.so
    fpic := -fPIC
-   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-   CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
    CC = qcc -Vgcc_ntoarmv7le
    CXX = QCC -Vgcc_ntoarmv7le
@@ -118,28 +112,23 @@ else ifeq ($(platform), emscripten)
    TARGET := $(TARGET_NAME)_libretro_emscripten.bc
    fpic := -fPIC
    SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
-   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-   CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), ps2)
    TARGET := $(TARGET_NAME)_ps2.a
    CC = ee-gcc
    CXX = ee-g++
    AR = ee-ar
-   CFLAGS += -DPS2 -G0 -D__sun
-   CXXFLAGS += -DPS2 -G0 -D__sun
-   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -DPS2 -G0 -D__sun
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    STATIC_LINKING = 1
 else ifeq ($(platform), psp1)
    TARGET := $(TARGET_NAME)_libretro_psp1.a
    CC = psp-gcc
    CXX = psp-g++
    AR = psp-ar
-   CFLAGS += -DPSP -G0
-   CXXFLAGS += -DPSP -G0
-   CFLAGS += -I$(shell psp-config --pspsdk-path)/include
-   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += -DPSP -G0
+   COMMON_CFLAGS += -I$(shell psp-config --pspsdk-path)/include
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    STATIC_LINKING = 1
 else ifeq ($(platform), vita)
    TARGET := $(TARGET_NAME)_libretro_vita.a
@@ -147,18 +136,29 @@ else ifeq ($(platform), vita)
    CXX = arm-vita-eabi-g++
    AR = arm-vita-eabi-ar
    DEFINES += -DVITA=1
-   CFLAGS += $(DEFINES)  -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-   CXXFLAGS += $(CFLAGS) -Wl,-q -Wall -O2
+   COMMON_CFLAGS += $(DEFINES)  -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   CXXFLAGS += -Wl,-q -Wall -O2
    STATIC_LINKING = 1
+# Nintendo WiiU
+else ifeq ($(platform), wiiu)
+   TARGET := $(TARGET_NAME)_libretro_$(platform).a
+   CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
+   CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
+   AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
+   PLATFORM_DEFINES := -DGEKKO -DHW_RVL -DWIIU -mcpu=750 -meabi -mhard-float
+   PLATFORM_DEFINES += -U__INT32_TYPE__ -U __UINT32_TYPE__ -D__INT32_TYPE__=int
+   PLATFORM_DEFINES += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   COMMON_CFLAGS += $(PLATFORM_DEFINES)
+   STATIC_LINKING=1
 else ifeq ($(platform), wii)
    EXT=a
    TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
    CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
    CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
    AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
-   CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
-   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DGAMECUBE
-   CXXFLAGS += $(CFLAGS) -Wl,-q -Wall -O2
+   COMMON_CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DGAMECUBE
+   CXXFLAGS += -Wl,-q -Wall -O2
    STATIC_LINKING = 1
 else ifeq ($(platform), ngc)
    EXT=a
@@ -166,9 +166,9 @@ else ifeq ($(platform), ngc)
    CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
    CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
    AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
-   CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
-   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DWII
-   CXXFLAGS += $(CFLAGS) -Wl,-q -Wall -O2
+   COMMON_CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DWII
+   CXXFLAGS += -Wl,-q -Wall -O2
    STATIC_LINKING = 1
 # Lightweight PS3 Homebrew SDK
 else ifeq ($(platform), psl1ght)
@@ -178,8 +178,7 @@ else ifeq ($(platform), psl1ght)
    CXX = $(PS3DEV)/ppu/bin/ppu-g++$(EXE_EXT)
    CC_AS = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
    AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
-   CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
-   CXXFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
    STATIC_LINKING = 1
 # Nintendo Switch (libnx)
 else ifeq ($(platform), libnx)
@@ -187,11 +186,10 @@ else ifeq ($(platform), libnx)
     EXT=a
     TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
     DEFINES := -DSWITCH=1 -D__SWITCH__=1 -DHAVE_LIBNX=1
-    CFLAGS	:=	 $(DEFINES) -g -fPIE -I$(LIBNX)/include/ -I$(PORTLIBS)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec
-    CFLAGS += $(INCDIRS) -I$(CORE_DIR)/zlib -I$(CORE_DIR)/libogg/include -I$(CORE_DIR)/libvorbis/include \
+    COMMON_CFLAGS	:=	 $(DEFINES) -g -fPIE -I$(LIBNX)/include/ -I$(PORTLIBS)/include/ -ffunction-sections -fdata-sections -ftls-model=local-exec
+    COMMON_CFLAGS += $(INCDIRS) -I$(CORE_DIR)/zlib -I$(CORE_DIR)/libogg/include -I$(CORE_DIR)/libvorbis/include \
 		-I$(CORE_DIR)/jpeg-8c -fvisibility=hidden
-    CFLAGS	+= -march=armv8-a -mtune=cortex-a57 -mtp=soft -mcpu=cortex-a57+crc+fp+simd -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-    CXXFLAGS := $(ASFLAGS) $(CFLAGS)
+    COMMON_CFLAGS	+= -march=armv8-a -mtune=cortex-a57 -mtp=soft -mcpu=cortex-a57+crc+fp+simd -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
     STATIC_LINKING = 1
 # CTR (3DS)
 else ifeq ($(platform), ctr)
@@ -200,14 +198,12 @@ else ifeq ($(platform), ctr)
 	CXX = $(DEVKITARM)/bin/arm-none-eabi-g++$(EXE_EXT)
 	AR = $(DEVKITARM)/bin/arm-none-eabi-ar$(EXE_EXT)
 	DEFINES += -D_3DS -DARM11 -march=armv6k -mtune=mpcore -mfloat-abi=hard
-  CFLAGS += $(DEFINES) -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
-	CXXFLAGS += $(CFLAGS)
+	COMMON_CFLAGS += $(DEFINES) -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 	STATIC_LINKING = 1
 else
    CC = gcc
    TARGET := $(TARGET_NAME)_libretro.dll
-	CFLAGS += -DUSE_WINDOWS_DWORD
-	CXXFLAGS += -DUSE_WINDOWS_DWORD
+   COMMON_CFLAGS += -DUSE_WINDOWS_DWORD
    SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
    LDFLAGS += -lwsock32 -lWS2_32
 endif
@@ -217,11 +213,9 @@ HAVE_OPENGL = 1
 LDFLAGS += $(LIBM)
 
 ifeq ($(DEBUG), 1)
-   CFLAGS += -O0 -g -DDEBUG
-   CXXFLAGS += -O0 -g -DDEBUG
+   COMMON_CFLAGS += -O0 -g -DDEBUG
 else
-   CFLAGS += -O2
-   CXXFLAGS += -O2
+   COMMON_CFLAGS += -O2
 endif
 
 include Makefile.common
@@ -271,23 +265,19 @@ endif
 
 TOPDIR ?= $(CURDIR)
 
-CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DCORE=ON -DSDL2=ON -DBASE=ON -DUSE_FILE32API -ffast-math \
+COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DCORE=ON -DSDL2=ON -DBASE=ON -DUSE_FILE32API -ffast-math \
 			-fno-strict-aliasing -fvisibility=hidden -fomit-frame-pointer \
 			-Wno-sign-compare -Wno-switch -Wno-format-security -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
-CXXFLAGS += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -fpermissive -std=gnu++98
+CXXFLAGS += -fpermissive -std=gnu++98
 
 ifneq ($(platform), emscripten)
-CFLAGS += -fno-unsafe-math-optimizations
+COMMON_CFLAGS += -fno-unsafe-math-optimizations
 endif
 
-CFLAGS += -DNO_STORE
-CXXFLAGS += -DNO_STORE
+COMMON_CFLAGS += -DNO_STORE
 
-ifeq ($(D3XP),ON)
-	CFLAGS	+=	-I$(TOPDIR)/d3xp -D_D3XP
-else
-	CFLAGS	+=	-I$(TOPDIR)/game
-endif
+CFLAGS += $(COMMON_CFLAGS)
+CXXFLAGS += $(COMMON_CFLAGS)
 
 CFLAGS     += $(INCFLAGS)
 CXXFLAGS   += $(INCFLAGS)
@@ -304,7 +294,7 @@ endif
 
 %.o: %.cpp
 	@$(if $(Q), $(shell echo echo CC $<),)
-	$(Q)$(CXX) $(CFLAGS) $(CXXFLAGS) $(fpic) -c -o $@ $<
+	$(Q)$(CXX) $(CXXFLAGS) $(fpic) -c -o $@ $<
 
 %.o: %.c
 	@$(if $(Q), $(shell echo echo CC $<),)
