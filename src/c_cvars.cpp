@@ -207,6 +207,7 @@ void ReadConfig(void)
 
 	char joySettingName[50] = {0};
 	char keySettingName[50] = {0};
+	char keySettingBugName[50] = {0};
 	char mseSettingName[50] = {0};
 	forcegrabmouse = config.GetSetting("ForceGrabMouse")->GetInteger() != 0;
 	mouseenabled = config.GetSetting("MouseEnabled")->GetInteger() != 0;
@@ -214,7 +215,8 @@ void ReadConfig(void)
 	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)
 	{
 		sprintf(joySettingName, "Joystick_%s", controlScheme[i].name);
-		sprintf(keySettingName, "Keybaord_%s", controlScheme[i].name);
+		sprintf(keySettingBugName, "Keybaord_%s", controlScheme[i].name);
+		sprintf(keySettingName, "Keyboard_%s", controlScheme[i].name);
 		sprintf(mseSettingName, "Mouse_%s", controlScheme[i].name);
 		for(unsigned int j = 0;j < 50;j++)
 		{
@@ -222,6 +224,8 @@ void ReadConfig(void)
 				joySettingName[j] = '_';
 			if(keySettingName[j] == ' ')
 				keySettingName[j] = '_';
+			if(keySettingBugName[j] == ' ')
+				keySettingBugName[j] = '_';
 			if(mseSettingName[j] == ' ')
 				mseSettingName[j] = '_';
 		}
@@ -229,7 +233,13 @@ void ReadConfig(void)
 		config.CreateSetting(keySettingName, SDL2Backconvert(controlScheme[i].keyboard));
 		config.CreateSetting(mseSettingName, controlScheme[i].mouse);
 		controlScheme[i].joystick = config.GetSetting(joySettingName)->GetInteger();
-		controlScheme[i].keyboard = SDL2Convert(config.GetSetting(keySettingName)->GetInteger());
+		if (config.GetSetting(keySettingBugName) != NULL) // fix a typo from older versions
+		{
+			controlScheme[i].keyboard = SDL2Convert(config.GetSetting(keySettingBugName)->GetInteger());
+			config.DeleteSetting(keySettingBugName);
+		}
+		else
+			controlScheme[i].keyboard = SDL2Convert(config.GetSetting(keySettingName)->GetInteger());
 		controlScheme[i].mouse = config.GetSetting(mseSettingName)->GetInteger();
 	}
 	viewsize = config.GetSetting("ViewSize")->GetInteger();
@@ -367,7 +377,7 @@ void WriteConfig(void)
 	for(unsigned int i = 0;controlScheme[i].button != bt_nobutton;i++)
 	{
 		sprintf(joySettingName, "Joystick_%s", controlScheme[i].name);
-		sprintf(keySettingName, "Keybaord_%s", controlScheme[i].name);
+		sprintf(keySettingName, "Keyboard_%s", controlScheme[i].name);
 		sprintf(mseSettingName, "Mouse_%s", controlScheme[i].name);
 		for(unsigned int j = 0;j < 50;j++)
 		{
