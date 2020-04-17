@@ -287,6 +287,12 @@ void WolfStatusBar::UpdateFace (int damage)
 ===============
 */
 
+static const int ninestbl[10] = {
+	0, 9, 99, 999, 9999,
+	99999, 999999, 9999999,
+	99999999, 999999999
+};
+
 void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, bool zerofill, bool cap)
 {
 	FString str;
@@ -296,7 +302,7 @@ void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, b
 		str.Format("%*d", width, number);
 	if(str.Len() > width && cap)
 	{
-		int maxval = width <= 9 ? (int) ceil(pow(10., (int)width))-1 : INT_MAX;
+		int maxval = width <= 9 ? ninestbl[width] : INT_MAX;
 		str.Format("%d", maxval);
 	}
 
