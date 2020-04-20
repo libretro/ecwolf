@@ -35,15 +35,119 @@
 #ifndef __G_CONVERSATION_H__
 #define __G_CONVERSATION_H__
 
+#include <zstring.h>
+#include "m_classes.h"
+
 class AActor;
 
 namespace Dialog {
+
+struct Page;
+struct ItemCheck
+{
+	unsigned int Item;
+	unsigned int Amount;
+};
+struct Choice
+{
+	TArray<ItemCheck> Cost;
+	FString Text;
+	FString YesMessage, NoMessage;
+	FString Log;
+	FString SelectSound;
+	union
+	{
+		unsigned int NextPageIndex;
+		Page *NextPage;
+	};
+	unsigned int GiveItem;
+	unsigned int Special;
+	unsigned int Arg[5];
+	bool CloseDialog;
+	bool DisplayCost;
+};
+struct Page
+{
+	TArray<Choice> Choices;
+	TArray<ItemCheck> IfItem;
+	FString Name;
+	FString Panel;
+	FString Voice;
+	FString Dialog;
+	FString Hint;
+	union
+	{
+		unsigned int LinkIndex; // Valid while parsing
+		Page *Link;
+	};
+	unsigned int Drop;
+};
+
+class QuizMenu : public Menu
+{
+public:
+	QuizMenu() : Menu(30, 96, 290, 24) {}
+
+	void loadQuestion(const Page *page);
+
+	void drawBackground() const;
+
+	void draw() const;
+
+private:
+	FString question;
+	FString hint;
+};
+
+struct Conversation
+{
+	TArray<Page> Pages;
+	unsigned int Actor;
+	bool RandomStart;
+	bool Preserve;
+
+	const Page *Start() const;
+};
+
+class ConversationModule
+{
+public:
+	enum ConvNamespace
+	{
+		NS_Strife,
+		NS_Noah
+	};
+
+	const Conversation *Find(unsigned int id) const;
+	void Load(int lump);
+
+	TArray<FString> Include;
+	TMap<unsigned int, Conversation> Conversations;
+	ConvNamespace Namespace;
+	int Lump;
+
+private:
+	void ParseConversation(Scanner &sc);
+	template<typename T>
+	void ParseBlock(Scanner &sc, T &obj, bool (ConversationModule::*handler)(Scanner &, FName, bool, T &));
+
+	bool ParseConvBlock(Scanner &, FName, bool, Conversation &);
+	bool ParsePageBlock(Scanner &, FName, bool, Page &);
+	bool ParseChoiceBlock(Scanner &, FName, bool, Choice &);
+	bool ParseItemCheckBlock(Scanner &, FName, bool, ItemCheck &);
+};
+
 
 extern void ClearConversations();
 // Not yet implemented
 //extern void LoadMapModules();
 extern void LoadGlobalModule(const char* module);
 extern void StartConversation(AActor *npc);
+
+void GiveConversationItem(AActor *recipient, unsigned int id);
+const Page **FindConversation(AActor *npc);
+void LoadMapModules();
+extern TArray<ConversationModule> LoadedModules;
 
 }
 

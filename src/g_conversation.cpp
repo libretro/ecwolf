@@ -60,89 +60,13 @@
 static FRandom pr_conversation("Conversation");
 
 namespace Dialog {
-	
-struct Page;
-struct ItemCheck
+
+const Page *Conversation::Start() const
 {
-	unsigned int Item;
-	unsigned int Amount;
-};
-struct Choice
-{
-	TArray<ItemCheck> Cost;
-	FString Text;
-	FString YesMessage, NoMessage;
-	FString Log;
-	FString SelectSound;
-	union
-	{
-		unsigned int NextPageIndex;
-		Page *NextPage;
-	};
-	unsigned int GiveItem;
-	unsigned int Special;
-	unsigned int Arg[5];
-	bool CloseDialog;
-	bool DisplayCost;
-};
-struct Page
-{
-	TArray<Choice> Choices;
-	TArray<ItemCheck> IfItem;
-	FString Name;
-	FString Panel;
-	FString Voice;
-	FString Dialog;
-	FString Hint;
-	union
-	{
-		unsigned int LinkIndex; // Valid while parsing
-		Page *Link;
-	};
-	unsigned int Drop;
-};
-struct Conversation
-{
-	TArray<Page> Pages;
-	unsigned int Actor;
-	bool RandomStart;
-	bool Preserve;
-
-	const Page *Start() const
-	{
-		if(RandomStart)
-			return &Pages[pr_conversation(Pages.Size())];
-		return &Pages[0];
-	}
-};
-
-class ConversationModule
-{
-public:
-	enum ConvNamespace
-	{
-		NS_Strife,
-		NS_Noah
-	};
-
-	const Conversation *Find(unsigned int id) const;
-	void Load(int lump);
-
-	TArray<FString> Include;
-	TMap<unsigned int, Conversation> Conversations;
-	ConvNamespace Namespace;
-	int Lump;
-
-private:
-	void ParseConversation(Scanner &sc);
-	template<typename T>
-	void ParseBlock(Scanner &sc, T &obj, bool (ConversationModule::*handler)(Scanner &, FName, bool, T &));
-
-	bool ParseConvBlock(Scanner &, FName, bool, Conversation &);
-	bool ParsePageBlock(Scanner &, FName, bool, Page &);
-	bool ParseChoiceBlock(Scanner &, FName, bool, Choice &);
-	bool ParseItemCheckBlock(Scanner &, FName, bool, ItemCheck &);
-};
+	if(RandomStart)
+		return &Pages[pr_conversation(Pages.Size())];
+	return &Pages[0];
+}
 
 // ----------------------------------------------------------------------------
 
@@ -439,7 +363,7 @@ bool ConversationModule::ParseChoiceBlock(Scanner &sc, FName key, bool isValue, 
 // ----------------------------------------------------------------------------
 
 static TMap<unsigned int, const Page *> PreservedConversations;
-static TArray<ConversationModule> LoadedModules;
+TArray<ConversationModule> LoadedModules;
 static unsigned int MapModuleStart = 0;
 
 static bool CheckModuleLoaded(int lump)
@@ -514,7 +438,7 @@ const Page **FindConversation(AActor *npc)
 	return NULL;
 }
 
-static void GiveConversationItem(AActor *recipient, unsigned int id)
+void GiveConversationItem(AActor *recipient, unsigned int id)
 {
 	const ClassDef *cls = ClassDef::FindConversationClass(id);
 	if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(Inventory)))
@@ -523,6 +447,77 @@ static void GiveConversationItem(AActor *recipient, unsigned int id)
 	recipient->GiveInventory(cls);
 }
 
+void QuizMenu::loadQuestion(const Page *page)
+{
+	setHeadText(page->Name);
+
+	question = page->Dialog;
+	if(question[0] == '$')
+		question = language[question.Mid(1)];
+
+	hint = page->Hint;
+	if(hint[0] == '$')
+		hint = language[hint.Mid(1)];
+	hint.Format("(%s)", hint.GetChars());
+
+	for(unsigned int i = 0;i < page->Choices.Size();++i)
+	{
+		FString choice = page->Choices[i].Text;
+		if(choice[0] == '$')
+			choice = language[page->Choices[i].Text.Mid(1)];
+
+		MenuItem *mchoice = new MenuItem(choice);
+		if(page->Choices[i].SelectSound.IsNotEmpty())
+			mchoice->setActivateSound(page->Choices[i].SelectSound);
+		addItem(mchoice);
+	}
+}
+
+void QuizMenu::drawBackground() const
+{
+	DrawPlayScreen();
+	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, statusbary1, screenWidth, statusbary2-statusbary1+CleanYfac);
+
+	WindowX = 0;
+	WindowW = 320;
+	PrintY = 4;
+	US_CPrint(BigFont, headText, gameinfo.FontColors[GameInfo::DIALOG]);
+
+	DrawWindow(14, 21, 292, 134, BKGDCOLOR);
+}
+
+void QuizMenu::draw() const
+{
+	drawBackground();
+
+	FBrokenLines *lines = V_BreakLines(BigFont, 280, question);
+	unsigned int ly = 26;
+	for(FBrokenLines *line = lines;line->Width != -1;++line)
+	{
+		screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, line->Text,
+				 DTA_Clean, true,
+				 TAG_DONE
+			);
+		ly += BigFont->GetHeight() + 1;
+	}
+	delete[] lines;
+
+	if(gamestate.difficulty->QuizHints)
+	{
+		screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, hint,
+				 DTA_Clean, true,
+				 TAG_DONE
+			);
+	}
+
+	drawMenu();
+
+	if(!isAnimating())
+		VWB_DrawGraphic (cursor, getX() - 4, getY() + getHeight(curPos) - 2, MENU_CENTER);
+	VW_UpdateScreen ();
+}
+
+#ifndef LIBRETRO
 #ifdef __ANDROID__
 extern "C"
 {
@@ -534,86 +529,6 @@ void StartConversation(AActor *npc)
 #ifdef __ANDROID__
 	inConversation = 1;
 #endif
-
-	class QuizMenu : public Menu
-	{
-	public:
-		QuizMenu() : Menu(30, 96, 290, 24) {}
-
-		void loadQuestion(const Page *page)
-		{
-			setHeadText(page->Name);
-
-			question = page->Dialog;
-			if(question[0] == '$')
-				question = language[question.Mid(1)];
-
-			hint = page->Hint;
-			if(hint[0] == '$')
-				hint = language[hint.Mid(1)];
-			hint.Format("(%s)", hint.GetChars());
-
-			for(unsigned int i = 0;i < page->Choices.Size();++i)
-			{
-				FString choice = page->Choices[i].Text;
-				if(choice[0] == '$')
-					choice = language[page->Choices[i].Text.Mid(1)];
-
-				MenuItem *mchoice = new MenuItem(choice);
-				if(page->Choices[i].SelectSound.IsNotEmpty())
-					mchoice->setActivateSound(page->Choices[i].SelectSound);
-				addItem(mchoice);
-			}
-		}
-
-		void drawBackground() const
-		{
-			DrawPlayScreen();
-			VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0, statusbary1, screenWidth, statusbary2-statusbary1+CleanYfac);
-
-			WindowX = 0;
-			WindowW = 320;
-			PrintY = 4;
-			US_CPrint(BigFont, headText, gameinfo.FontColors[GameInfo::DIALOG]);
-
-			DrawWindow(14, 21, 292, 134, BKGDCOLOR);
-		}
-
-		void draw() const
-		{
-			drawBackground();
-
-			FBrokenLines *lines = V_BreakLines(BigFont, 280, question);
-			unsigned int ly = 26;
-			for(FBrokenLines *line = lines;line->Width != -1;++line)
-			{
-				screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, line->Text,
-					DTA_Clean, true,
-					TAG_DONE
-				);
-				ly += BigFont->GetHeight() + 1;
-			}
-			delete[] lines;
-
-			if(gamestate.difficulty->QuizHints)
-			{
-				screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, hint,
-					DTA_Clean, true,
-					TAG_DONE
-				);
-			}
-
-			drawMenu();
-
-			if(!isAnimating())
-				VWB_DrawGraphic (cursor, getX() - 4, getY() + getHeight(curPos) - 2, MENU_CENTER);
-			VW_UpdateScreen ();
-		}
-
-	private:
-		FString question;
-		FString hint;
-	};
 
 	const Page **page = FindConversation(npc);
 	if(!page)
@@ -670,5 +585,6 @@ void StartConversation(AActor *npc)
 	inConversation = 0;
 #endif
 }
+#endif
 
 }
