@@ -487,7 +487,7 @@ void SD_SetPosition(int channel, int leftpos, int rightpos)
 {
 	if((leftpos < 0) || (leftpos > 15) || (rightpos < 0) || (rightpos > 15)
 			|| ((leftpos == 15) && (rightpos == 15)))
-		Quit("SD_SetPosition: Illegal position");
+		I_FatalError("SD_SetPosition: Illegal position");
 
 	switch (DigiMode)
 	{
@@ -771,7 +771,7 @@ SDL_ALPlaySound(AdLibSound *sound)
 
 	if (!(inst->mSus | inst->cSus))
 	{
-		Quit("SDL_ALPlaySound() - Bad instrument");
+		I_FatalError("SDL_ALPlaySound() - Bad instrument");
 	}
 
 	SDL_AlSetFXInst(inst);
@@ -1088,7 +1088,7 @@ bool SD_SetSoundMode(SDMode mode)
 				result = true;
 			break;
 		default:
-			Quit("SD_SetSoundMode: Invalid sound mode %i", mode);
+			I_FatalError("SD_SetSoundMode: Invalid sound mode %i", mode);
 			return false;
 	}
 
@@ -1278,8 +1278,6 @@ int SD_PlaySound(const char* sound, SoundChannel chan)
 	if (SoundMode == sdm_Off)
 		return 0;
 
-//    if (!s->length)
-//        Quit("SD_PlaySound() - Zero length sound");
 	if (sindex.GetPriority() < SoundPriority)
 		return 0;
 
@@ -1565,7 +1563,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 			if(startoffs >= sqHackLen)
 			{
 				SDL_UnlockMutex(audioMutex);
-				Quit("SD_StartMusic: Illegal startoffs provided!");
+				I_FatalError("SD_StartMusic: Illegal startoffs provided!");
 			}
 
 			// fast forward to correct position

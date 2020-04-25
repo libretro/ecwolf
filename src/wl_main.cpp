@@ -104,9 +104,6 @@ fixed    pspriteyscale;
 fixed    yaspect;
 int32_t  heightnumerator;
 
-
-void    Quit (const char *error,...);
-
 bool	startgame;
 bool	loadedgame;
 int		mousexadjustment;
@@ -424,10 +421,8 @@ static void InitGame()
 	if(SDL_Init(SDL_INIT_VIDEO) < 0)
 #endif
 	{
-		printf("Unable to init SDL: %s\n", SDL_GetError());
-		exit(1);
+		I_FatalError("Unable to init SDL: %s", SDL_GetError());
 	}
-	atterm(SDL_Quit);
 
 	SDL_ShowCursor(SDL_DISABLE);
 
@@ -653,67 +648,20 @@ void NewViewSize (int width, unsigned int scrWidth, unsigned int scrHeight)
 ==========================
 */
 
-void Quit (const char *errorStr, ...)
+void Quit ()
 {
-#ifdef NOTYET
-	byte *screen;
-#endif
-	char error[256];
-	if(errorStr != NULL)
-	{
-		va_list vlist;
-		va_start(vlist, errorStr);
-		vsprintf(error, errorStr, vlist);
-		va_end(vlist);
-	}
-	else error[0] = 0;
+	throw CNoRunExit();
+}
 
-	ShutdownId ();
+void I_FatalError (const char *format, ...)
+{
+	va_list vlist;
+	va_start(vlist, format);
+	FString error;
+	error.VFormat(format, vlist);
+	va_end(vlist);
 
-	if (error[0] == 0)
-	{
-#ifdef NOTYET
-		#ifndef JAPAN
-		CA_CacheGrChunk (ORDERSCREEN);
-		screen = grsegs[ORDERSCREEN];
-		#endif
-#endif
-
-		WriteConfig ();
-	}
-#ifdef NOTYET
-	else
-	{
-		CA_CacheGrChunk (ERRORSCREEN);
-		screen = grsegs[ERRORSCREEN];
-	}
-#endif
-
-	if (error[0] != 0)
-	{
-#ifdef NOTYET
-		memcpy((byte *)0xb8000,screen+7,7*160);
-		SetTextCursor(9,3);
-#endif
-		puts(error);
-#ifdef NOTYET
-		SetTextCursor(0,7);
-#endif
-		VW_WaitVBL(200);
-		exit(1);
-	}
-	else
-	if (error[0] == 0)
-	{
-#ifdef NOTYET
-		#ifndef JAPAN
-		memcpy((byte *)0xb8000,screen+7,24*160); // 24 for SPEAR/UPLOAD compatibility
-		#endif
-		SetTextCursor(0,23);
-#endif
-	}
-
-	exit(0);
+	throw CFatalError(error);
 }
 
 void I_Error(const char* format, ...)
@@ -1220,7 +1168,7 @@ static const char* CheckParameters(int argc, char *argv[], TArray<FString> &file
 			" --foreignsave          Disable save game validity checking.\n"
 			, GetGameCaption(), defaultSampleRate
 		);
-		exit(1);
+		Quit();
 	}
 
 	r_ratio = static_cast<Aspect>(CheckRatio(screenWidth, screenHeight));
@@ -1272,8 +1220,7 @@ unsigned int I_MakeRNGSeed();
 ==========================
 */
 
-void InitThinkerList();
-void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
+static void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
 {
 	FString errorMessage;
 	errorMessage.VFormat(error, list);
@@ -1281,7 +1228,7 @@ void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_li
 	if(level == Scanner::ERROR)
 		throw CRecoverableError(errorMessage);
 	else
-		printf("%s", errorMessage.GetChars());
+		Printf("%s", errorMessage.GetChars());
 }
 
 // Basically from ZDoom
@@ -1326,7 +1273,6 @@ int WL_Main (int argc, char *argv[])
 		FString progdir(FileSys::GetDirectoryPath(FileSys::DIR_Program));
 
 		Scanner::SetMessageHandler(ScannerMessageHandler);
-		atexit(CallTerminateFunctions);
 
 		printf("ReadConfig: Reading the Configuration.\n");
 		config.LocateConfigFile(argc, argv);
@@ -1348,8 +1294,6 @@ int WL_Main (int argc, char *argv[])
 			language.SetupStrings();
 		}
 
-		InitThinkerList();
-
 		R_InitRenderer();
 
 		printf("InitGame: Setting up the game...\n");
@@ -1361,25 +1305,30 @@ int WL_Main (int argc, char *argv[])
 		printf("DemoLoop: Starting the game loop...\n");
 		DemoLoop();
 
-		Quit("Demo loop exited???");
+		I_FatalError("Demo loop exited???");
 	}
-	catch(class CDoomError &error)
+	catch(CNoRunExit) // Normal exit from deep code
 	{
+		CallTerminateFunctions();
+		SDL_Quit();
+		return 0;
+	}
+	catch(CDoomError &error)
+	{
+		CallTerminateFunctions();
 		SDL_Quit();
 
 #ifdef __ANDROID__
-		if(error.GetMessage())
-			Printf("%s\n", error.GetMessage());
+		Printf("%s\n", error.GetMessage());
 #else
-		if(error.GetMessage())
-			fprintf(stderr, "%s\n", error.GetMessage());
+		fprintf(stderr, "%s\n", error.GetMessage());
 #endif
 
 #ifdef _WIN32
 		I_AcknowledgeError();
 #endif
 
-		exit(-1);
+		return 1;
 	}
 	return 1;
 }

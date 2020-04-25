@@ -819,7 +819,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 					continue;
 				}
 				default:
-					Quit("Tried to use a loop on a frameless state.\n");
+					I_FatalError("Tried to use a loop on a frameless state.");
 					break;
 			}
 			continue;

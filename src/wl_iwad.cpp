@@ -757,7 +757,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 			pick = 0;
 	}
 	if(pick < 0)
-		Quit("");
+		Quit();
 
 	config.GetSetting("DefaultIWad")->SetValue(pick);
 

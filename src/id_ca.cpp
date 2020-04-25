@@ -14,6 +14,7 @@ loaded into the data segment
 =============================================================================
 */
 
+#include "actor.h"
 #include "g_mapinfo.h"
 #include "gamemap.h"
 #include "tmemory.h"
@@ -53,7 +54,7 @@ void CA_UnloadMap(GameMap *map)
 	// to ensure that defferred operations are cleared.
 	AActor::FinishSpawningActors();
 
-	thinkerList->DestroyAll();
+	thinkerList.DestroyAll();
 	delete map;
 
 	// Don't dangle a reference to the map we just unloaded.

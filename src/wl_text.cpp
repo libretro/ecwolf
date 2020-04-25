@@ -437,7 +437,7 @@ static void HandleWord (void)
 	{
 		wword[wordindex] = *text++;
 		if (++wordindex == WORDLIMIT)
-			Quit ("PageLayout: Word limit exceeded");
+			I_FatalError ("PageLayout: Word limit exceeded");
 	}
 	wword[wordindex] = 0;            // stick a null at end for C
 
@@ -643,7 +643,7 @@ static void CountPages (void)
 
 	} while (text<bombpoint);
 
-	Quit ("CacheLayoutGraphics: No ^E to terminate file!");
+	I_FatalError ("CacheLayoutGraphics: No ^E to terminate file!");
 }
 
 /*

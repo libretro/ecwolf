@@ -87,8 +87,7 @@ void Language::ReadLump(int lump, const char* language)
 				}
 				else
 				{
-					printf("Unexpected identifier '%s'\n", sc->str.GetChars());
-					exit(0);
+					sc.ScriptMessage(Scanner::ERROR, "Unexpected identifier '%s'", sc->str.GetChars());
 				}
 			}
 
@@ -108,8 +107,7 @@ void Language::ReadLump(int lump, const char* language)
 		}
 		else
 		{
-			sc.ScriptMessage(Scanner::ERROR, "Unexpected token.\n");
-			exit(0);
+			sc.ScriptMessage(Scanner::ERROR, "Unexpected token.");
 		}
 	}
 }

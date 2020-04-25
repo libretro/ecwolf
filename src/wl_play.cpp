@@ -16,6 +16,7 @@
 #include "thinker.h"
 #include "actor.h"
 #include "textures/textures.h"
+#include "v_video.h"
 #include "wl_agent.h"
 #include "wl_debug.h"
 #include "wl_draw.h"
@@ -1125,7 +1126,7 @@ void PlayLoop (void)
 				PollControls(!i);
 
 				++gamestate.TimeCount;
-				thinkerList->Tick();
+				thinkerList.Tick();
 				AActor::FinishSpawningActors();
 			}
 		}

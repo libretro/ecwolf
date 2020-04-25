@@ -10,7 +10,7 @@
 
 #include <climits>
 
-extern fixed viewshift;
+extern int viewshift;
 extern fixed viewz;
 
 static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int halfheight, fixed planeheight)

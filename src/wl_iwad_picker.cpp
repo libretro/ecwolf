@@ -324,8 +324,7 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 #else
 	if (!TXT_Init())
 	{
-		fprintf(stderr, "Failed to initialise GUI\n");
-		exit(-1);
+		I_FatalError("Failed to initialise GUI");
 	}
 
 	FString caption;
@@ -359,14 +358,6 @@ int I_PickIWad (WadStuff *wads, int numwads, bool showwin, int defaultiwad)
 
 	TXT_Shutdown();
 
-	if (I_WADSEL > -1)
-		return I_WADSEL;
-	else
-	{
-		printf("User canceled.\n");
-		exit(-1);
-	}
-
-	return i-1;
+	return I_WADSEL;
 #endif
 }

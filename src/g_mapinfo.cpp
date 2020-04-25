@@ -1542,13 +1542,13 @@ void G_ParseMapInfo(bool gameinfoPass)
 	if(!gameinfoPass)
 	{
 		if(episodes.Size() == 0)
-			Quit("At least 1 episode must be defined.");
+			I_FatalError("At least 1 episode must be defined.");
 
 		for(unsigned int i = 0;i < gameinfo.PlayerClasses.Size();++i)
 		{
 			const ClassDef *cls = ClassDef::FindClass(gameinfo.PlayerClasses[i]);
 			if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(PlayerPawn)))
-				Quit("'%s' is not a valid player class!", gameinfo.PlayerClasses[i].GetChars());
+				I_FatalError("'%s' is not a valid player class!", gameinfo.PlayerClasses[i].GetChars());
 		}
 	}
 }

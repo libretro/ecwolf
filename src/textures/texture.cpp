@@ -44,7 +44,6 @@
 #include "textures.h"
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
-#define I_Error Quit
 
 typedef bool (*CheckFunc)(FileReader & file);
 typedef FTexture * (*CreateFunc)(FileReader & file, int lumpnum);

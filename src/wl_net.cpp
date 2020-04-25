@@ -363,8 +363,7 @@ void Init(InitStatusCallback callback)
 
 	if(SDLNet_Init() < 0)
 	{
-		printf("Unable to init SDL_net: %s\n", SDLNet_GetError());
-		exit(1);
+		I_FatalError("Unable to init SDL_net: %s", SDLNet_GetError());
 	}
 
 	Packet = SDLNet_AllocPacket(1500);

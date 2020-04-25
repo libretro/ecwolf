@@ -763,7 +763,7 @@ void FinishTravel ()
 {
 	gamestate.victoryflag = false;
 
-	ThinkerList::Iterator node = thinkerList->GetHead(ThinkerList::TRAVEL);
+	ThinkerList::Iterator node = thinkerList.GetHead(ThinkerList::TRAVEL);
 	while(node)
 	{
 		AActor *actor = static_cast<AActor *>((Thinker*)node);

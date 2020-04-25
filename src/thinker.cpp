@@ -42,19 +42,7 @@
 #include "wl_game.h"
 #include "wl_loadsave.h"
 
-ThinkerList *thinkerList;
-
-void DeinitThinkerList()
-{
-	delete thinkerList;
-	thinkerList = NULL;
-}
-
-void InitThinkerList()
-{
-	thinkerList = new ThinkerList();
-	atexit(DeinitThinkerList);
-}
+ThinkerList thinkerList;
 
 ThinkerList::ThinkerList() : nextThinker(NULL)
 {
@@ -209,18 +197,18 @@ Thinker::Thinker(ThinkerList::Priority priority)
 
 void Thinker::Activate(ThinkerList::Priority priority)
 {
-	thinkerList->Register(this, priority);
+	thinkerList.Register(this, priority);
 }
 
 void Thinker::Deactivate()
 {
-	thinkerList->Deregister(this);
+	thinkerList.Deregister(this);
 }
 
 void Thinker::Destroy()
 {
 	if(IsThinking())
-		thinkerList->Deregister(this);
+		thinkerList.Deregister(this);
 	Super::Destroy();
 }
 

@@ -330,7 +330,7 @@ static void processEvent(SDL_Event *event)
 	{
 		// exit if the window is closed
 		case SDL_QUIT:
-			Quit(NULL);
+			Quit();
 
 		// ASCII (Unicode) text entry for saves and stuff like that.
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -364,7 +364,7 @@ static void processEvent(SDL_Event *event)
 			if(Keyboard[sc_Alt])
 			{
 				if(LastScan==SDLx_SCANCODE(F4))
-					Quit(NULL);
+					Quit();
 			}
 
 			if(LastScan == SDLx_SCANCODE(KP_ENTER)) LastScan = SDLx_SCANCODE(RETURN);
@@ -612,7 +612,7 @@ IN_Startup(void)
 				JoyNumAxes = SDL_JoystickNumAxes(Joystick);
 				JoyNumHats = SDL_JoystickNumHats(Joystick);
 				if(param_joystickhat >= JoyNumHats)
-					Quit("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
+					I_FatalError("The joystickhat param must be between 0 and %i!", JoyNumHats - 1);
 				else if(param_joystickhat < 0 && JoyNumHats > 0) // Default to hat 0
 					param_joystickhat = 0;
 

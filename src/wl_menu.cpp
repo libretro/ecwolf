@@ -19,8 +19,9 @@
 #include "language.h"
 #include "w_wad.h"
 #include "c_cvars.h"
-#include "wl_agent.h"
 #include "g_mapinfo.h"
+#include "v_video.h"
+#include "wl_agent.h"
 #include "wl_inter.h"
 #include "wl_draw.h"
 #include "wl_game.h"
@@ -115,7 +116,7 @@ MENU_LISTENER(QuitGame)
 			MenuFadeOut();
 		else
 			VW_FadeOut();
-		Quit(NULL);
+		Quit();
 	}
 
 	// special case
@@ -390,7 +391,7 @@ void CreateMenus()
 		const ClassDef *cls = ClassDef::FindClass(gameinfo.PlayerClasses[i]);
 		const char* displayName = cls->Meta.GetMetaString(APMETA_DisplayName);
 		if(!displayName)
-			Quit("Player class %s has no display name.", cls->GetName().GetChars());
+			I_FatalError("Player class %s has no display name.", cls->GetName().GetChars());
 		MenuItem *tmp = new MenuSwitcherMenuItem(displayName, useEpisodeMenu ? episodes : skills, SetPlayerClassAndSwitch);
 		playerClasses.addItem(tmp);
 	}

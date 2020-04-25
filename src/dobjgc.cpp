@@ -306,8 +306,7 @@ static void MarkRoot()
 	//int i;
 
 	Gray = NULL;
-	if(thinkerList)
-		thinkerList->MarkRoots();
+	thinkerList.MarkRoots();
 	for(unsigned int i = 0;i < Net::InitVars.numPlayers;++i)
 		players[i].PropagateMark();
 	if(map)

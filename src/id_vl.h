@@ -3,10 +3,6 @@
 #ifndef __ID_VL_H__
 #define __ID_VL_H__
 
-// wolf compatability
-
-void Quit (const char *error,...);
-
 //===========================================================================
 
 extern SDL_Surface *curSurface;
@@ -44,7 +40,6 @@ void VL_FadeIn      (int start, int end, int steps);
 byte *VL_LockSurface();
 void VL_UnlockSurface();
 
-#include "v_video.h"
 #define VL_ClearScreen(color) VWB_Clear(color, 0, 0, SCREENWIDTH, SCREENHEIGHT)
 
 #endif
