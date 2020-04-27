@@ -174,9 +174,8 @@ void NewGame (int difficulty, const FString &map, bool displayBriefing, const Cl
 ==========================
 */
 
-void ShutdownId (void)
+static void ShutdownId (void)
 {
-	US_Shutdown ();         // This line is completely useless...
 	SD_Shutdown ();
 	IN_Shutdown ();
 }
@@ -478,8 +477,6 @@ static void InitGame()
 	VH_Startup ();
 	IN_Startup ();
 	SD_Startup ();
-	printf("US_Startup: Starting the User Manager.\n");
-	US_Startup ();
 
 //
 // Load Keys
@@ -1249,10 +1246,16 @@ void atterm(void (*func)(void))
 	else
 		fprintf(stderr, "Failed to register atterm function!\n");
 }
-void CallTerminateFunctions()
+
+static void CallTerminateFunctions()
 {
+	ShutdownId();
+	WriteConfig();
+
 	while(NumTerms > 0)
 		TermFuncs[--NumTerms]();
+
+	SDL_Quit();
 }
 
 #ifdef _WIN32
@@ -1310,13 +1313,11 @@ int WL_Main (int argc, char *argv[])
 	catch(CNoRunExit) // Normal exit from deep code
 	{
 		CallTerminateFunctions();
-		SDL_Quit();
 		return 0;
 	}
 	catch(CDoomError &error)
 	{
 		CallTerminateFunctions();
-		SDL_Quit();
 
 #ifdef __ANDROID__
 		Printf("%s\n", error.GetMessage());
