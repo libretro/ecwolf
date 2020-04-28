@@ -688,7 +688,7 @@ void CheckKeys (void)
 		changeSize = true;
 
 	if(Keyboard[sc_Alt] && Keyboard[sc_Enter])
-		ToggleFullscreen();
+		VL_ToggleFullscreen();
 
 	if(IWad::CheckGameFilter(NAME_Wolf3D))
 	{

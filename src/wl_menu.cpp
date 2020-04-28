@@ -234,7 +234,7 @@ MENU_LISTENER(ReadThis)
 }
 MENU_LISTENER(ToggleFullscreen)
 {
-	SetFullscreen(vid_fullscreen);
+	VL_SetFullscreen(vid_fullscreen);
 	displayMenu.draw();
 
 	IN_AdjustMouse();

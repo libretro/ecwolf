@@ -56,12 +56,12 @@ static struct
 
 //===========================================================================
 
-void ToggleFullscreen()
+void VL_ToggleFullscreen()
 {
-	SetFullscreen(!fullscreen);
+	VL_SetFullscreen(!fullscreen);
 }
 
-void SetFullscreen(bool isFull)
+void VL_SetFullscreen(bool isFull)
 {
 	vid_fullscreen = fullscreen = isFull;
 
