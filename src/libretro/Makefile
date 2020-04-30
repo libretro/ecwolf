@@ -156,7 +156,7 @@ else ifeq ($(platform), wii)
    CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
    CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
    AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
-   COMMON_CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
+   COMMON_CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DGAMECUBE
    CXXFLAGS += -Wl,-q -Wall -O2
    STATIC_LINKING = 1
@@ -166,7 +166,7 @@ else ifeq ($(platform), ngc)
    CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
    CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
    AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
-   COMMON_CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -DMSB_FIRST
+   COMMON_CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DWII
    CXXFLAGS += -Wl,-q -Wall -O2
    STATIC_LINKING = 1
