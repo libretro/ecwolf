@@ -14,9 +14,8 @@ add_custom_command(OUTPUT icon.icns
 		macosx/icon.iconset/icon_512x512@2x.png
 )
 
-
-set(EXTRA_FILES ${EXTRA_FILES} icon.icns)
-set(MACOSX_BUNDLE_ICON_FILE icon.icns)
+target_sources(engine PRIVATE icon.icns)
+set_target_properties(engine PROPERTIES MACOSX_BUNDLE_ICON_FILE icon.icns)
 set_source_files_properties(icon.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 
 if(SDL_LIBRARY)
