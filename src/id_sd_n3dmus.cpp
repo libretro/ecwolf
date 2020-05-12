@@ -25,12 +25,12 @@ static byte  carriers[9] =  {3, 4, 5,11,12,13,19,20,21},
             pcarriers[5] = {19,0xff,0xff,0xff,0xff},
             pmodifiers[5] = {16,17,18,20,21};
 
-static volatile bool    midiOn;
-static volatile int32_t midiError = 0;
-static float    midiTimeScale = 1.86;
-static byte    *midiData, *midiDataStart;
-static byte     midiRunningStatus;
-static longword midiLength, midiDeltaTime;
+static volatile    bool    midiOn;
+static volatile    int32_t midiError = 0;
+static float       midiTimeScale = 1.86;
+static const byte *midiData, *midiDataStart;
+static byte        midiRunningStatus;
+static longword    midiLength, midiDeltaTime;
 
 static longword
 MIDI_VarLength(void)
