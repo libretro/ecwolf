@@ -102,6 +102,7 @@ initial_sources(
 	id_ca.cpp
 	id_in.cpp
 	id_sd.cpp
+	id_sd_n3dmus.cpp
 	id_us_1.cpp
 	id_vh.cpp
 	id_vl.cpp
