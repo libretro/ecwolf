@@ -898,7 +898,7 @@ static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int sampleslen)
 		{
 			if(numreadysamples<sampleslen)
 			{
-				if(MusicMode == smm_AdLib || SoundMode == sdm_AdLib)
+				if(MusicMode != smm_Off || SoundMode == sdm_AdLib)
 					YM3812UpdateOne(oplChip, stream16, numreadysamples);
 
 				// Mix the emulated PC sounds into the AdLib buffer:
@@ -909,7 +909,7 @@ static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int sampleslen)
 			}
 			else
 			{
-				if(MusicMode == smm_AdLib || SoundMode == sdm_AdLib)
+				if(MusicMode != smm_Off || SoundMode == sdm_AdLib)
 					YM3812UpdateOne(oplChip, stream16, sampleslen);
 
 				// Mix the emulated PC sounds into the AdLib buffer:
@@ -979,7 +979,7 @@ static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int sampleslen)
 
 static void SDL_MixEmulators(void *udata, Uint8 *mixed_stream, int len)
 {
-	if(MusicMode != smm_AdLib && !(SoundMode == sdm_AdLib || SoundMode == sdm_PC))
+	if(MusicMode == smm_Off && !(SoundMode == sdm_AdLib || SoundMode == sdm_PC))
 		return;
 
 	const int sampleslen = (len/AudioSpec.channels)>>1;
@@ -1135,6 +1135,7 @@ bool SD_SetMusicMode(SMMode mode)
 			result = true;
 			break;
 		case smm_AdLib:
+		case smm_Midi:
 			if (AdLibPresent)
 				result = true;
 			break;
@@ -1436,6 +1437,7 @@ SD_MusicOff(void)
 		default:
 			break;
 		case smm_AdLib:
+		case smm_Midi:
 			if (music == NULL)
 			{
 				alOut(alEffects, 0);
@@ -1478,7 +1480,7 @@ SD_StartMusic(const char* chunk)
 
 	SD_MusicOff();
 
-	if (MusicMode == smm_AdLib)
+	if (MusicMode != smm_Off)
 	{
 		int lumpNum = Wads.CheckNumForName(chunk, ns_music);
 		if(lumpNum == -1)
@@ -1556,7 +1558,7 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 {
 	SD_MusicOff();
 
-	if (MusicMode == smm_AdLib)
+	if (MusicMode != smm_Off)
 	{
 		int lumpNum = Wads.CheckNumForName(chunk, ns_music);
 		if(lumpNum == -1)
@@ -1675,6 +1677,7 @@ SD_FadeOutMusic(void)
 		default:
 			break;
 		case smm_AdLib:
+		case smm_Midi:
 			// DEBUG - quick hack to turn the music off
 			SD_MusicOff();
 			break;
@@ -1694,6 +1697,7 @@ bool SD_MusicPlaying(void)
 	switch (MusicMode)
 	{
 		case smm_AdLib:
+		case smm_Midi:
 			if (music == NULL)
 				result = sqActive;	// not really thread-safe, but a mutex would be overkill
 			else

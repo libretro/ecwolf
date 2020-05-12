@@ -22,7 +22,7 @@ typedef enum
 
 typedef enum
 {
-	smm_Off,smm_AdLib
+	smm_Off,smm_AdLib,smm_Midi
 } SMMode;
 
 typedef enum

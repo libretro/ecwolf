@@ -138,7 +138,7 @@ void FinalReadConfig()
 	sm = static_cast<SMMode> (config.GetSetting("MusicDevice")->GetInteger());
 	sds = static_cast<SDSMode> (config.GetSetting("DigitalSoundDevice")->GetInteger());
 
-	if ((sd == sdm_AdLib || sm == smm_AdLib) && !AdLibPresent
+	if ((sd == sdm_AdLib || sm != smm_Off) && !AdLibPresent
 			&& !SoundBlasterPresent)
 	{
 		sd = sdm_PC;
