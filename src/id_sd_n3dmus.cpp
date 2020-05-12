@@ -459,6 +459,9 @@ MIDI_TryToStart(const byte *seqPtr, int dataLen)
     if (midiDeltaTime & 0xFFFF0000)
         return false;
 
+    if (MusicMode == smm_Midi)
+        return false;
+
     midiRunningStatus = 0;
     MIDI_ProgramChange(9,0);
     alOutMusic(alEffects, alChar);
