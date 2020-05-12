@@ -115,6 +115,16 @@ static  int                     sqHackLen;
 static  int                     sqHackSeqLen;
 static  longword                sqHackTime;
 
+
+//	Noah3D MIDI playback variables and functions
+extern  volatile bool			midiOn;
+extern	const byte			*midiData, *midiDataStart;
+static	TUniquePtr<const byte[]>	midiChunkFreeable;
+
+void MIDI_IRQService(void);
+bool MIDI_TryToStart(const byte *seqPtr, int dataLen);
+
+
 static int musicchunk=-1;
 Mix_Music *music=NULL;
 TUniquePtr<byte[]> chunkmem;
@@ -937,7 +947,10 @@ static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int sampleslen)
 				}
 			}
 		}
-		if(sqActive)
+
+		if (sqActive && midiOn)
+			MIDI_IRQService();
+		else if (sqActive)
 		{
 			do
 			{
@@ -957,6 +970,7 @@ static void SDL_IMFMusicPlayer(void *udata, Uint8 *stream, int sampleslen)
 				alTimeCount = 0;
 			}
 		}
+
 		numreadysamples = samplesPerMusicTick;
 
 		SDL_UnlockMutex(audioMutex);
@@ -1413,7 +1427,7 @@ SD_MusicOff(void)
 	SDL_LockMutex(audioMutex);
 
 	sqActive = false;
-	musoffs = (int) (sqHackPtr-sqHack);
+	musoffs = (int) (midiOn ? midiData-midiDataStart : sqHackPtr-sqHack);
 
 	SDL_UnlockMutex(audioMutex);
 
@@ -1474,10 +1488,26 @@ SD_StartMusic(const char* chunk)
 		chunkmem = new byte[Wads.LumpLength(lumpNum)];
 		FWadLump lump = Wads.OpenLumpNum(lumpNum);
 		lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
-		SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
 
 		if(music)
 			Mix_FreeMusic(music);
+		music = NULL;
+
+		// But first try to use the MIDI playback code from Noah3D
+		SDL_LockMutex(audioMutex);
+		midiOn = MIDI_TryToStart(chunkmem.Get(), Wads.LumpLength(lumpNum));
+		if (midiOn)
+			midiChunkFreeable = chunkmem.Release();
+		SDL_UnlockMutex(audioMutex);
+
+		if (midiOn)
+		{
+			SD_MusicOn();
+			return;
+		}
+
+		SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
+
 		// Technically an SDL_mixer 2 feature to free the source
 #if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
 		music = Mix_LoadMUS_RW(mus_cunk, true);
@@ -1537,11 +1567,33 @@ SD_ContinueMusic(const char* chunk, int startoffs)
 			SDL_LockMutex(audioMutex);
 			FWadLump lump = Wads.OpenLumpNum(lumpNum);
 			sqHackFreeable.Reset();
+			midiChunkFreeable.Reset();
 			musicchunk = -1;
 
 			// Load our music file from chunk
 			chunkmem = new byte[Wads.LumpLength(lumpNum)];
 			lump.Read(chunkmem.Get(), Wads.LumpLength(lumpNum));
+
+			if(music)
+				Mix_FreeMusic(music);
+			music = NULL;
+
+			// But first try to use the MIDI playback code from Noah3D
+			midiOn = MIDI_TryToStart(chunkmem.Get(), Wads.LumpLength(lumpNum));
+			if (midiOn)
+			{
+				midiChunkFreeable = chunkmem.Release();
+
+				// fast forward to correct position
+				// (needed to reconstruct the instruments)
+				// TODO: This isn't perfect.
+				while (midiData-midiDataStart < startoffs)
+					MIDI_IRQService();
+				SDL_UnlockMutex(audioMutex);
+				SD_MusicOn();
+				return;
+			}
+
 			SDL_RWops *mus_cunk = SDL_RWFromMem(chunkmem.Get(), Wads.LumpLength(lumpNum));
 #if defined(ECWOLF_MIXER) || SDL_VERSION_ATLEAST(2,0,0)
 			music = Mix_LoadMUS_RW(mus_cunk, true);
