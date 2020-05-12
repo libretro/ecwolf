@@ -7,6 +7,7 @@
 #include "mame/fmopl.h"
 #endif
 #include "id_sd.h"
+#include "m_swap.h"
 
 typedef struct
 {
@@ -426,4 +427,43 @@ MIDI_IRQService(void)
 	}
 
 	midiDeltaTime = midiDeltaTime * midiTimeScale;
+}
+
+// MIDI startup code
+
+bool
+MIDI_TryToStart(const byte *seqPtr, int dataLen)
+{
+    if (dataLen < 10)
+        return false;
+
+    if (strncmp((const char *)seqPtr, "MThd", 4) ||
+        ReadBigShort(seqPtr + 8) ||
+        (ReadBigShort(seqPtr + 10) != 1))
+        return false;
+
+    seqPtr += ReadBigLong(seqPtr + 4) + 8;
+    if (strncmp((const char *)seqPtr, "MTrk", 4))
+        return false;
+
+    int32_t seqLength = ReadBigLong(seqPtr + 4);
+    if (!seqLength)
+        return false;
+
+    seqPtr += 8;
+    midiData = seqPtr;
+    midiDataStart = seqPtr;
+    midiLength = seqLength;
+    midiDeltaTime = 0;
+    midiDeltaTime = MIDI_VarLength();
+    if (midiDeltaTime & 0xFFFF0000)
+        return false;
+
+    midiRunningStatus = 0;
+    MIDI_ProgramChange(9,0);
+    alOutMusic(alEffects, alChar);
+    drums = 0;
+
+    midiOn = true;
+    return true;
 }
