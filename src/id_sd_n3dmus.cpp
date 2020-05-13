@@ -9,6 +9,8 @@
 #include "id_sd.h"
 #include "m_swap.h"
 
+#define MUSIC_RATE 700 // TODO: This should be shared with id_sd.cpp
+
 bool N3DTempoEmulation;
 
 typedef struct
@@ -34,6 +36,7 @@ static float       midiTimeScale = 1.86;
 const byte        *midiData, *midiDataStart;
 static byte        midiRunningStatus;
 static longword    midiLength, midiDeltaTime;
+static int32_t     midiDivision;
 
 static longword
 MIDI_VarLength(void)
@@ -391,7 +394,7 @@ MIDI_DoEvent(void)
 			else
 			{
 				tempo = ((int32_t)(*midiData)<<16) + (int32_t)((*(midiData+1))<<8) + (*(midiData+2));
-				midiTimeScale = (double)tempo/2.74176e5;
+				midiTimeScale = (double)tempo*MUSIC_RATE/(1000000*midiDivision);
 			}
 			midiData += length;
 			break;
@@ -450,6 +453,10 @@ MIDI_TryToStart(const byte *seqPtr, int dataLen)
     if (strncmp((const char *)seqPtr, "MThd", 4) ||
         ReadBigShort(seqPtr + 8) ||
         (ReadBigShort(seqPtr + 10) != 1))
+        return false;
+
+    midiDivision = ReadBigShort(seqPtr + 12);
+    if (!N3DTempoEmulation && (midiDivision <= 0))
         return false;
 
     seqPtr += ReadBigLong(seqPtr + 4) + 8;
