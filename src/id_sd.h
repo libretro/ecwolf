@@ -121,6 +121,7 @@ extern  bool			AdLibPresent,
 extern  SDMode          SoundMode;
 extern  SDSMode         DigiMode;
 extern  SMMode          MusicMode;
+extern  bool            N3DTempoEmulation;
 static const int MAX_VOLUME = 20;
 static inline double MULTIPLY_VOLUME(const int &v)
 {

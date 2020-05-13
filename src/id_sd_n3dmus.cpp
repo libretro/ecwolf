@@ -9,6 +9,8 @@
 #include "id_sd.h"
 #include "m_swap.h"
 
+bool N3DTempoEmulation;
+
 typedef struct
 {
 	byte	mChar,cChar,
@@ -380,9 +382,17 @@ MIDI_DoEvent(void)
 		{
 		case 0x51:
 			length = MIDI_VarLength();
-			tempo = ((int32_t)(*midiData)<<16) + (int32_t)((*(midiData+1))<<8) + (*(midiData+2));
-			midiTimeScale = (double)tempo/2.74176e5;
-			midiTimeScale *= 1.1;
+			if (N3DTempoEmulation)
+			{
+				tempo = ((int32_t)(*midiData)<<16) + (int32_t)(int16_t)((*(midiData+1))<<8) + (*(midiData+2));
+				midiTimeScale = (double)tempo/2.74176e5;
+				midiTimeScale *= 1.1;
+			}
+			else
+			{
+				tempo = ((int32_t)(*midiData)<<16) + (int32_t)((*(midiData+1))<<8) + (*(midiData+2));
+				midiTimeScale = (double)tempo/2.74176e5;
+			}
 			midiData += length;
 			break;
 		case 0x2F:
