@@ -161,10 +161,12 @@ MIDI_NoteOn(int channel, byte note, byte velocity)
 		MIDI_NoteOff (channel,note,velocity);
 }
 
+#if 0
 void
 MIDI_ControllerChange(int channel, int id, int value)
 {
 }
+#endif
 
 void
 MIDI_ProgramChange(int channel, int id)
@@ -306,10 +308,12 @@ MIDI_ProgramChange(int channel, int id)
 	}
 }
 
+#if 0
 void
 MIDI_ChannelPressure(int channel, int id)
 {
 }
+#endif
 
 void
 MIDI_ProcessEvent(byte event)
@@ -330,7 +334,7 @@ MIDI_ProcessEvent(byte event)
 	case 0xB0:
 		id = *midiData++;
 		value = *midiData++;
-		MIDI_ControllerChange(event&0xF,id,value);
+//		MIDI_ControllerChange(event&0xF,id,value);
 		break;
 	case 0xC0:
 		value = *midiData++;
@@ -338,7 +342,7 @@ MIDI_ProcessEvent(byte event)
 		break;
 	case 0xD0:
 		value = *midiData++;
-		MIDI_ChannelPressure(event&0xF,value);
+//		MIDI_ChannelPressure(event&0xF,value);
 		break;
 	default:
 		midiError = -7;
