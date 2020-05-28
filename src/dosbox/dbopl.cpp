@@ -843,6 +843,9 @@ INLINE void Channel::GeneratePercussion( Chip* chip, Bit32s* output ) {
 		sample += Op(5)->GetWave( tcIndex, tcVol );
 	}
 	sample <<= 1;
+	if(playVolume)
+		sample = (Bit32s)(sample*MULTIPLY_VOLUME(*playVolume));
+
 	if ( opl3Mode ) {
 		output[0] += sample;
 		output[1] += sample;
