@@ -321,8 +321,10 @@ static void InterDrawNormalTop()
 			completedString = language[levelInfo->CompletionString.Mid(1)];
 		else
 			completedString = levelInfo->CompletionString;
-		completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
-		Write (14, 2, completedString);
+
+		FString formattedString;
+		formattedString.Format(completedString, levelInfo->FloorNumber.GetChars());
+		Write (14, 2, formattedString);
 	}
 	else
 	{
