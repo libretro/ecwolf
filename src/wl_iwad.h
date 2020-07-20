@@ -68,6 +68,7 @@ namespace IWad
 		TArray<FString> Required;
 		FName Game;
 		unsigned int Flags;
+		bool LevelSet;
 	};
 
 	bool CheckGameFilter(FName filter);

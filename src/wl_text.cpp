@@ -559,7 +559,7 @@ static void PageLayout (bool shownumber, bool helphack)
 	if (shownumber)
 	{
 		FString str;
-		str.Format("pg %d of %d", pagenum, numpages);
+		str.Format(gameinfo.PageIndexText, pagenum, numpages);
 		px = 213;
 		py = 183;
 

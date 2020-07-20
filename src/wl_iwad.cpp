@@ -104,12 +104,17 @@ static int CheckFileContents(FResourceFile *file, unsigned int* valid)
 					iwadTypes[k].Ident[l].CompareNoCase(FString(lump->FullName.Mid(5).GetChars(), strcspn(lump->FullName.Mid(5), "."))))))
 				{
 					valid[k] |= 1<<l;
-					if(valid[k] == static_cast<unsigned>((1<<iwadTypes[k].Ident.Size())-1))
-						return k;
 				}
 			}
 		}
 	}
+
+	for(unsigned int k = 0;k < iwadTypes.Size();++k)
+	{
+		if(!iwadTypes[k].LevelSet && valid[k] == static_cast<unsigned>((1<<iwadTypes[k].Ident.Size())-1))
+			return k;
+	}
+
 	return -1;
 }
 
@@ -452,10 +457,9 @@ static void CheckForExpansionRequirements(TArray<WadStuff> &iwads)
 	}
 }
 
-static void ParseIWad(Scanner &sc)
+static IWadData ParseIWad(Scanner &sc)
 {
-	IWadData iwad;
-	iwad.Flags = 0;
+	IWadData iwad = {};
 
 	sc.MustGetToken('{');
 	while(!sc.CheckToken('}'))
@@ -523,7 +527,7 @@ static void ParseIWad(Scanner &sc)
 		}
 	}
 
-	iwadTypes.Push(iwad);
+	return iwad;
 }
 static void ParseIWadInfo(FResourceFile *res)
 {
@@ -541,7 +545,7 @@ static void ParseIWadInfo(FResourceFile *res)
 				sc.MustGetToken(TK_Identifier);
 				if(sc->str.CompareNoCase("IWad") == 0)
 				{
-					ParseIWad(sc);
+					iwadTypes.Push(ParseIWad(sc));
 				}
 				else if(sc->str.CompareNoCase("LevelSet") == 0)
 				{
@@ -552,7 +556,9 @@ static void ParseIWadInfo(FResourceFile *res)
 					ls.Type = iwadTypes.Size();
 					levelSets.Push(ls);
 
-					ParseIWad(sc);
+					IWadData iwad = ParseIWad(sc);
+					iwad.LevelSet = true;
+					iwadTypes.Push(iwad);
 				}
 				else if(sc->str.CompareNoCase("Names") == 0)
 				{
