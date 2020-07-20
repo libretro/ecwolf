@@ -209,6 +209,7 @@ protected:
 
 	void ParseStringArrayAssignment(TArray<FString> &dest)
 	{
+		dest.Clear();
 		sc.MustGetToken('=');
 		do
 		{
