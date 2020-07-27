@@ -299,14 +299,14 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 			else if(sc->str.CompareNoCase("musicalias") == 0)
 			{
 				if(!sc.GetNextString())
-					sc.ScriptMessage(Scanner::ERROR, "Expected music lump name.");
+					sc.ScriptMessage(Scanner::ERROR, "Expected music alias name.");
 				FString musicName = sc->str;
 
 				if(!sc.GetNextString())
-					sc.ScriptMessage(Scanner::ERROR, "Expected music alias name.");
+					sc.ScriptMessage(Scanner::ERROR, "Expected music lump name.");
 
-				MusicData data = {musicName, Wads.GetLumpFile(lumpNum)};
-				MusicAliases[sc->str] = data;
+				MusicData data = {sc->str, Wads.GetLumpFile(lumpNum)};
+				MusicAliases[musicName] = data;
 			}
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown command '%s'.", sc->str.GetChars());
