@@ -201,8 +201,14 @@ void CalcTics()
 //
 // calculate tics since last refresh for adaptive timing
 //
-	if (lasttimecount > GetTimeCount())
-		ResetTimeCount(); // if the game was paused a LONG time
+
+	// Have we arrived too soon?
+	while(lasttimecount == GetTimeCount()+1)
+		SDL_Delay(1);
+
+	// Detect rollover, particularly if the game were paused for a LONG time
+	if(lasttimecount > GetTimeCount())
+		ResetTimeCount();
 
 	uint32_t curtime = SDL_GetTicks();
 	tics = (curtime * 7) / 100 - lasttimecount;
