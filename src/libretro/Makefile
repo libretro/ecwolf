@@ -207,7 +207,7 @@ else
    TARGET := $(TARGET_NAME)_libretro.dll
    COMMON_CFLAGS += -DUSE_WINDOWS_DWORD
    SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
-   LDFLAGS += -lwsock32 -lWS2_32
+   LDFLAGS += -lwsock32 -lws2_32
 endif
 
 HAVE_OPENGL = 1
