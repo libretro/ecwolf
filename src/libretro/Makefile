@@ -203,7 +203,7 @@ else ifeq ($(platform), ctr)
 	COMMON_CFLAGS += $(DEFINES) -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 	STATIC_LINKING = 1
 else
-   CC = gcc
+   CC ?= gcc
    TARGET := $(TARGET_NAME)_libretro.dll
    COMMON_CFLAGS += -DUSE_WINDOWS_DWORD
    SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
