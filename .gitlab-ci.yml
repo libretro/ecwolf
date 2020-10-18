@@ -10,6 +10,8 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static.yml'
   - project: 'libretro-infrastructure/ci-templates'
+    file: '/psp-static.yml'
+  - project: 'libretro-infrastructure/ci-templates'
     file: '/linux-x64.yml'
   - project: 'libretro-infrastructure/ci-templates'
     file: '/windows-x64-mingw.yml'
@@ -73,6 +75,14 @@ libretro-build-vita:
   extends:
     - .core-defs
     - .libretro-vita-static-retroarch-master
+  variables:
+    MAKEFILE_PATH: src/libretro
+    MAKEFILE: Makefile
+
+libretro-build-psp:
+  extends:
+    - .core-defs
+    - .libretro-psp-static-retroarch-master
   variables:
     MAKEFILE_PATH: src/libretro
     MAKEFILE: Makefile
