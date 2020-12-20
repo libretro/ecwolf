@@ -180,7 +180,7 @@ else ifeq ($(platform), psl1ght)
    CXX = $(PS3DEV)/ppu/bin/ppu-g++$(EXE_EXT)
    CC_AS = $(PS3DEV)/ppu/bin/ppu-gcc$(EXE_EXT)
    AR = $(PS3DEV)/ppu/bin/ppu-ar$(EXE_EXT)
-   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__CELLOS_LV2__ -D__PSL1GHT__ -mcpu=cell
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -D__PSL1GHT__ -mcpu=cell
    STATIC_LINKING = 1
 # Nintendo Switch (libnx)
 else ifeq ($(platform), libnx)
