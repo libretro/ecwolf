@@ -36,6 +36,9 @@ else ifneq ($(findstring Darwin,$(shell uname -a)),)
 ifeq ($(shell uname -p),powerpc)
 	arch = ppc
 endif
+ifeq ($(shell uname -p),arm)
+	arch = arm
+endif
 else ifneq ($(findstring MINGW,$(shell uname -a)),)
 	system_platform = win
 endif
@@ -45,20 +48,6 @@ TARGET_NAME := ecwolf
 LIBM		    = -lm
 DISABLE_ADLIB = 0
 
-ifeq ($(ARCHFLAGS),)
-ifeq ($(archs),ppc)
-   ARCHFLAGS = -arch ppc -arch ppc64
-else
-   ARCHFLAGS = -arch i386 -arch x86_64
-endif
-endif
-
-ifeq ($(platform), osx)
-ifndef ($(NOUNIVERSAL))
-   CXXFLAGS += $(ARCHFLAGS)
-   LFLAGS += $(ARCHFLAGS)
-endif
-endif
 
 ifeq ($(STATIC_LINKING), 1)
 EXT := a
@@ -82,6 +71,29 @@ else ifneq (,$(findstring osx,$(platform)))
    fpic := -fPIC
    SHARED := -dynamiclib
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+
+   ifeq ($(CROSS_COMPILE),1)
+		TARGET_RULE   = -target $(LIBRETRO_APPLE_PLATFORM) -isysroot $(LIBRETRO_APPLE_ISYSROOT)
+		CFLAGS   += $(TARGET_RULE)
+		CPPFLAGS += $(TARGET_RULE)
+		CXXFLAGS += $(TARGET_RULE)
+		LDFLAGS  += $(TARGET_RULE)
+   endif
+
+ifeq ($(UNIVERSAL),1)
+ifeq ($(ARCHFLAGS),)
+   ARCHFLAGS = -arch i386 -arch x86_64
+ifeq ($(archs),arm)
+   ARCHFLAGS = -arch arm64
+endif
+ifeq ($(archs),ppc)
+   ARCHFLAGS = -arch ppc -arch ppc64
+endif
+endif
+   CXXFLAGS += $(ARCHFLAGS)
+   LFLAGS += $(ARCHFLAGS)
+endif
+
 else ifneq (,$(findstring ios,$(platform)))
    TARGET := $(TARGET_NAME)_libretro_ios.dylib
 	fpic := -fPIC
@@ -91,9 +103,11 @@ else ifneq (,$(findstring ios,$(platform)))
       IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
    endif
    DEFINES := -DIOS
+   MINVERSION = -miphoneos-version-min=8.0
    CC = cc -arch arm64 -isysroot $(IOSSDK)
-   CC += -miphoneos-version-min=8.0
-   CXXFLAGS += -miphoneos-version-min=8.0
+   CXX = c++ -arch arm64 -isysroot $(IOSSDK)
+   CFLAGS   += $(MINVERSION)
+   CXXFLAGS += $(MINVERSION)
 else ifeq ($(platform), tvos-arm64)
 	TARGET := $(TARGET_NAME)_libretro_tvos.dylib
 	fpic := -fPIC
