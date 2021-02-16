@@ -250,6 +250,8 @@ else()
 			set( NO_GTK ON )
 		endif()
 	endif()
+
+	target_sources(engine PRIVATE posix/i_main.cpp)
 endif()
 
 if(NO_GTK)
@@ -259,19 +261,17 @@ endif()
 if(APPLE)
 	target_sources(engine PRIVATE
 		macosx/filesys.mm
+		macosx/i_main.mm
 		macosx/wl_iwad_picker_cocoa.mm
 	)
 
-	if(FORCE_SDL12)
-		target_sources(engine PRIVATE macosx/SDLMain.m)
-	endif()
-
 	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.cmake)
 
-	option(BUILD_BUNDLE "Build a app bundle on Mac OS X" OFF)
+	option(BUILD_BUNDLE "Build a app bundle on Mac OS X" ON)
 	if(BUILD_BUNDLE)
 		set_target_properties(engine PROPERTIES
 			MACOSX_BUNDLE ON
+			MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/macosx/Info.plist.in"
 			MACOSX_BUNDLE_BUNDLE_NAME "${PRODUCT_NAME}"
 			MACOSX_BUNDLE_GUI_IDENTIFIER "${PRODUCT_IDENTIFIER}"
 			MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"

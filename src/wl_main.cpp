@@ -1333,33 +1333,3 @@ int WL_Main (int argc, char *argv[])
 	}
 	return 1;
 }
-
-// TODO: Move this to a system dependent file?
-#if defined(main) && !defined(__APPLE__)
-#undef main
-#endif
-
-#ifndef NO_GTK
-#include <gtk/gtk.h>
-bool GtkAvailable;
-#endif
-
-#ifndef _WIN32
-#ifdef __ANDROID__
-int main_android(int argc, char *argv[])
-#else
-int main(int argc, char *argv[])
-#endif
-{
-	// Set LC_NUMERIC environment variable in case some library decides to
-	// clear the setlocale call at least this will be correct.
-	// Note that the LANG environment variable is overridden by LC_*
-	setenv("LC_NUMERIC", "C", 1);
-
-#ifndef NO_GTK
-	GtkAvailable = gtk_init_check(&argc, &argv);
-#endif
-
-	return WL_Main(argc, argv);
-}
-#endif

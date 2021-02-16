@@ -484,7 +484,7 @@ const char * getGamePath()
 std::string home_env;
 }
 
-extern int main_android(int, char*[]);
+extern int WL_Main(int, char*[]);
 extern "C"
 int SDL_main(int argc, char* argv[])
 {
@@ -519,7 +519,7 @@ int SDL_main(int argc, char* argv[])
 	LOGI("graphicpath = %s\n", p);
 	graphicpath =  std::string(p);
 
-	main_android(argc-2,argv+2); //Never returns!!
+	WL_Main(argc-2,argv+2); //Never returns!!
 
 	return 0;
 }
