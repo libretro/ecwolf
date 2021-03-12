@@ -108,16 +108,21 @@ else ifneq (,$(findstring ios,$(platform)))
    CXX = c++ -arch arm64 -isysroot $(IOSSDK)
    CFLAGS   += $(MINVERSION)
    CXXFLAGS += $(MINVERSION)
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), tvos-arm64)
 	TARGET := $(TARGET_NAME)_libretro_tvos.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
+   MINVERSION = -mtvos-version-min=11.0
 	CFLAGS += -DIOS
 	ifeq ($(IOSSDK),)
 		IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
 	endif
    CC = cc -arch arm64 -isysroot $(IOSSDK)
-   CC += -mtvos-version-min=11.0
+   CXX = c++ -arch arm64 -isysroot $(IOSSDK)
+   CFLAGS += $(MINVERSION)
+   CXXFLAGS += $(MINVERSION)
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring qnx,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_qnx.so
    fpic := -fPIC
@@ -304,17 +309,14 @@ $(TARGET): $(OBJECTS)
 ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJECTS)
 else
-	@$(if $(Q), $(shell echo echo LD $@),)
-	$(Q)$(CXX) $(fpic) $(SHARED) -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS)
+	$(CXX) $(fpic) $(SHARED) -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS)
 endif
 
 %.o: %.cpp
-	@$(if $(Q), $(shell echo echo CC $<),)
-	$(Q)$(CXX) $(CXXFLAGS) $(fpic) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(fpic) -c -o $@ $<
 
 %.o: %.c
-	@$(if $(Q), $(shell echo echo CC $<),)
-	$(Q)$(CC) $(CFLAGS) $(fpic) -c -o $@ $<
+	$(CC) $(CFLAGS) $(fpic) -c -o $@ $<
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
