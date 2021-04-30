@@ -36,7 +36,9 @@
 #ifdef _WIN32
 #define USE_WINDOWS_DWORD
 #endif
+#ifdef HAVE_LZMA
 #include "LzmaDec.h"
+#endif
 
 #include "files.h"
 #include "filesys.h"
@@ -384,6 +386,7 @@ extern "C" void bz_internal_error (int errcode)
 	I_FatalError("libbzip2: internal error number %d\n", errcode);
 }
 
+#ifdef HAVE_LZMA
 //==========================================================================
 //
 // FileReaderLZMA
@@ -510,6 +513,7 @@ void FileReaderLZMA::FillBuffer ()
 	InPos = 0;
 	InSize = numread;
 }
+#endif
 
 //==========================================================================
 //

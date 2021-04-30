@@ -1,6 +1,7 @@
 STATIC_LINKING := 0
 AR             := ar
 NO_STORE       := 1
+HAVE_LZMA      := 0
 
 ifneq ($(V),1)
    Q := @

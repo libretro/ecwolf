@@ -222,7 +222,9 @@ bool FZipFile::Open(bool quiet)
 		zip_fh->Method = LittleShort(zip_fh->Method);
 		if (zip_fh->Method != METHOD_STORED &&
 			zip_fh->Method != METHOD_DEFLATE &&
+#ifdef HAVE_LZMA
 			zip_fh->Method != METHOD_LZMA &&
+#endif
 			zip_fh->Method != METHOD_BZIP2 &&
 			zip_fh->Method != METHOD_IMPLODE &&
 			zip_fh->Method != METHOD_SHRINK)
@@ -362,11 +364,13 @@ int FZipLump::FillCache()
 		}
 
 		case METHOD_LZMA:
+#ifdef HAVE_LZMA
 		{
 			FileReaderLZMA frz(*Owner->Reader, LumpSize, true);
 			frz.Read(Cache, LumpSize);
+      }
+#endif
 			break;
-		}
 
 		case METHOD_IMPLODE:
 		{

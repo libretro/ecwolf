@@ -1,5 +1,6 @@
-LOCAL_PATH := $(call my-dir)
+LOCAL_PATH   := $(call my-dir)
 
+HAVE_LZMA    := 1
 CORE_DIR     := $(LOCAL_PATH)/../../..
 LIBRETRO_DIR := $(LOCAL_PATH)/..
 

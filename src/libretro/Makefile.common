@@ -11,7 +11,6 @@ INCFLAGS   := \
 	-I$(CORE_DIR)/src \
 	-I$(CORE_DIR)/src/g_shared \
 	-I$(JPEG_DIR) \
-	-I$(LZMA_DIR)/C \
 	-I$(BZIP2_DIR) \
 	-I$(ZLIB_DIR) \
 	-DUSE_GPL=1 \
@@ -21,7 +20,9 @@ ifneq (,$(findstring msvc2003,$(platform)))
 INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
-ifneq ($(STATIC_LINKING), 1)
+ifeq ($(HAVE_LZMA), 1)
+INCFLAGS += -DHAVE_LZMA
+INCFLAGS += -I$(LZMA_DIR)/C
 DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
 					$(LZMA_DIR)/C/7zBuf.c \
 					$(LZMA_DIR)/C/7zCrc.c \
@@ -80,10 +81,6 @@ DEPS_ZLIB   := $(ZLIB_DIR)/crc32.c \
 
 SOURCES_C   := $(DEPS_BZIP2) $(DEPS_JPEG) $(DEPS_ZLIB)
 
-ifneq ($(STATIC_LINKING),1)
-SOURCES_C   += $(DEPS_LZMA_C)
-endif
-
 SOURCES_CXX := \
 	$(CORE_DIR)/src/g_blake/a_smartanim.cpp \
 	$(CORE_DIR)/src/g_blake/blake_sbar.cpp \
@@ -104,7 +101,6 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/r_data/renderstyle.cpp \
 	$(CORE_DIR)/src/resourcefiles/resourcefile.cpp \
 	$(CORE_DIR)/src/resourcefiles/ancientzip.cpp \
-	$(CORE_DIR)/src/resourcefiles/file_7z.cpp \
 	$(CORE_DIR)/src/resourcefiles/file_audiot.cpp \
 	$(CORE_DIR)/src/resourcefiles/file_directory.cpp \
 	$(CORE_DIR)/src/resourcefiles/file_gamemaps.cpp \
@@ -215,6 +211,12 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/libretro/g_conversation.cpp \
 	$(CORE_DIR)/src/libretro/g_intermission.cpp \
 	$(CORE_DIR)/src/libretro/w32_random.cpp
+
+ifeq ($(HAVE_LZMA), 1)
+SOURCES_CXX += $(CORE_DIR)/src/resourcefiles/file_7z.cpp
+SOURCES_C   += $(DEPS_LZMA_C)
+endif
+
 
 ifneq ($(DISABLE_ADLIB), 1)
 	SOURCES_CXX += $(CORE_DIR)/src/dosbox/dbopl.cpp \
