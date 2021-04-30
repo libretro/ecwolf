@@ -11,6 +11,7 @@ INCFLAGS   := \
 	-I$(CORE_DIR)/src \
 	-I$(CORE_DIR)/src/g_shared \
 	-I$(JPEG_DIR) \
+	-I$(LZMA_DIR)/C \
 	-I$(BZIP2_DIR) \
 	-I$(ZLIB_DIR) \
 	-DUSE_GPL=1 \
@@ -21,7 +22,6 @@ INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
 ifneq ($(STATIC_LINKING), 1)
-INCFLAGS    += -I$(LZMA_DIR)/C
 DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
 					$(LZMA_DIR)/C/7zBuf.c \
 					$(LZMA_DIR)/C/7zCrc.c \
