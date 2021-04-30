@@ -10,7 +10,6 @@ INCFLAGS   := \
 	-I$(CORE_DIR) \
 	-I$(CORE_DIR)/src \
 	-I$(CORE_DIR)/src/g_shared \
-	-I$(LZMA_DIR)/C \
 	-I$(JPEG_DIR) \
 	-I$(BZIP2_DIR) \
 	-I$(ZLIB_DIR) \
@@ -21,6 +20,8 @@ ifneq (,$(findstring msvc2003,$(platform)))
 INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
+ifneq ($(STATIC_LINKING), 1)
+INCFLAGS    += -I$(LZMA_DIR)/C
 DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
 					$(LZMA_DIR)/C/7zBuf.c \
 					$(LZMA_DIR)/C/7zCrc.c \
@@ -35,6 +36,7 @@ DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
 					$(LZMA_DIR)/C/Delta.c \
 					$(LZMA_DIR)/C/Lzma2Dec.c \
 					$(LZMA_DIR)/C/Bcj2.c
+endif
 
 DEPS_BZIP2  := $(BZIP2_DIR)/blocksort.c \
 					$(BZIP2_DIR)/bzlib.c \
@@ -76,7 +78,11 @@ DEPS_ZLIB   := $(ZLIB_DIR)/crc32.c \
        	       $(ZLIB_DIR)/compress.c \
 	       $(ZLIB_DIR)/uncompr.c
 
-SOURCES_C   := $(DEPS_LZMA_C) $(DEPS_BZIP2) $(DEPS_JPEG) $(DEPS_ZLIB)
+SOURCES_C   := $(DEPS_BZIP2) $(DEPS_JPEG) $(DEPS_ZLIB)
+
+ifneq ($(STATIC_LINKING),1)
+SOURCES_C   += $(DEPS_LZMA_C)
+endif
 
 SOURCES_CXX := \
 	$(CORE_DIR)/src/g_blake/a_smartanim.cpp \
