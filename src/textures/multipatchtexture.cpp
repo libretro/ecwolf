@@ -1101,7 +1101,7 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, TexInit &init)
 					part.Blend = AddSpecialColormap(r1, g1, b1, r2, g2, b2);
 				}
 			}
-			/*else if (sc->str.CompareNoCase("Blend") == 0)
+			else if (sc->str.CompareNoCase("Blend") == 0)
 			{
 				bComplex = true;
 				if (part.Translation != NULL) delete part.Translation;
@@ -1137,7 +1137,7 @@ void FMultiPatchTexture::ParsePatch(Scanner &sc, TexPart & part, TexInit &init)
 						part.Blend = 0;
 				}
 				else part.Blend.a = 255;
-			}*/
+			}
 			else if (sc->str.CompareNoCase("alpha") == 0)
 			{
 				sc.MustGetToken(TK_FloatConst);
