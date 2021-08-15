@@ -1155,8 +1155,8 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 	info->timing.fps            = (double) fp10s / 10.0;
 	info->timing.sample_rate    = (double) SAMPLERATE;
 
-	info->geometry.base_width   = screen_width;
-	info->geometry.base_height  = screen_height;
+	info->geometry.base_width   = 320;
+	info->geometry.base_height  = 200;
 	info->geometry.max_width    = screen_width;
 	info->geometry.max_height   = screen_height;
 	info->geometry.aspect_ratio = 0.0;
