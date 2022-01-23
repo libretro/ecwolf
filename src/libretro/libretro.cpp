@@ -72,6 +72,7 @@
 #include "g_intermission.h"
 #include "am_map.h"
 #include "wl_loadsave.h"
+#include "compat/msvc.h"
 
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;

@@ -16,6 +16,7 @@
 #include "g_mapinfo.h"
 #include "colormatcher.h"
 #include "state_machine.h"
+#include "compat/msvc.h"
 
 LRstruct LevelRatios;
 

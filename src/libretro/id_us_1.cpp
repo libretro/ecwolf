@@ -26,10 +26,7 @@
 #include "id_in.h"
 #include "id_vh.h"
 #include "id_us.h"
-
-#if _MSC_VER == 1200            // Visual C++ 6
-	#define vsnprintf _vsnprintf
-#endif
+#include "compat/msvc.h"
 
 //	Global variables
 		word		PrintX,PrintY;
