@@ -586,7 +586,8 @@ static void update_variables(bool startup)
 	{
 		char *pch;
 		char str[100];
-		snprintf(str, sizeof(str), "%s", resolution);
+		memset(str, 0, sizeof(str));
+		strncpy(str, resolution, sizeof(str)-2);
 
 		pch = strtok(str, "x");
 		if (pch)
