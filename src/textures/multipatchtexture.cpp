@@ -76,6 +76,7 @@
 // stored in the WAD. The lumps are referenced by number, and patched into
 // the rectangular texture space using origin and possibly other attributes.
 //
+PACK_START
 struct mappatch_t
 {
 	SWORD	originx;
@@ -83,12 +84,14 @@ struct mappatch_t
 	SWORD	patch;
 	SWORD	stepdir;
 	SWORD	colormap;
-} __attribute__((__packed__));
+} PACKED;
+PACK_END
 
 //
 // A wall texture is a list of patches which are to be combined in a
 // predefined order.
 //
+PACK_START
 struct maptexture_t
 {
 	BYTE		name[8];
@@ -100,7 +103,8 @@ struct maptexture_t
 	BYTE		columndirectory[4];	// OBSOLETE
 	SWORD		patchcount;
 	mappatch_t	patches[1];
-} __attribute__((__packed__));
+} PACKED;
+PACK_END
 
 #define MAPTEXF_WORLDPANNING	0x8000
 

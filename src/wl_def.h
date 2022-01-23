@@ -20,6 +20,16 @@
 #include <minwindef.h>
 #endif
 
+#ifdef _MSC_VER
+#define PACKED
+#define PACK_START __pragma(pack(push, 1))
+#define PACK_END __pragma(pack(pop))
+#else
+#define PACKED __attribute__ ((__packed__))
+#define PACK_START
+#define PACK_END
+#endif
+
 #if !defined O_BINARY
 #	define O_BINARY 0
 #endif
