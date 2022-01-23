@@ -10,6 +10,7 @@ INCFLAGS   := \
 	-I$(CORE_DIR) \
 	-I$(CORE_DIR)/src \
 	-I$(CORE_DIR)/src/g_shared \
+	-I$(CORE_DIR)/src/libretro/libretro-common/include \
 	-I$(JPEG_DIR) \
 	-I$(BZIP2_DIR) \
 	-I$(ZLIB_DIR) \
