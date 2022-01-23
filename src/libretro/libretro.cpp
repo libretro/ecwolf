@@ -26,6 +26,8 @@
 #include "wl_play.h"
 #include "wl_net.h"
 #include "libretro.h"
+#include "streams/file_stream.h"
+#include "retro_dirent.h"
 #include "state_machine.h"
 #include "wl_def.h"
 #include "wl_menu.h"
@@ -1260,8 +1262,11 @@ void retro_set_environment(retro_environment_t cb)
 	struct retro_vfs_interface_info vfs_interface_info;
 	vfs_interface_info.required_interface_version = 3;
 	vfs_interface_info.iface = NULL;
-	if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_interface_info))
+	if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_interface_info)) {
 		vfs_interface = vfs_interface_info.iface;
+		filestream_vfs_init(&vfs_interface_info);
+		dirent_vfs_init(&vfs_interface_info);
+	}
 }
 
 void ControlMenuItem::draw()
