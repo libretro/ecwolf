@@ -302,7 +302,7 @@ bool IVideo::SetResolution (int width, int height, int bits)
 }
 
 Net::NetInit Net::InitVars = {
-	MODE_SinglePlayer,
+	Net::MODE_SinglePlayer,
 	5029, //NET_DEFAULT_PORT,
 	1
 };
