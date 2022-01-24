@@ -118,6 +118,22 @@ struct IntermissionGState
 	bool fade_out;
 	DWORD fade_steps;
 	DWORD wait;
+
+	void clear() {
+		step = 0;
+		demoMode = 0;
+		intermission_name = "";
+		intermission = NULL;
+		gototitle = false;
+		finishing = false;
+		finished = false;
+		ret_value = false;
+		image_ready = false;
+		fade_in = false;
+		fade_out = false;
+		fade_steps = 0;
+		wait = 0;
+	}
 };
 
 enum StateMenuType
@@ -231,6 +247,18 @@ struct SoundChannelState
 		return sample != NULL
 			&& startTick <= currentTick && (stopTicks == -1 || currentTick < stopTicks);
 	}
+
+	void clear() {
+		sound = "";
+		startTick = 0;
+		skipTicks = 0;
+		stopTicks = 0;
+		sample = NULL;
+		isMusic = false;
+		leftPos = 0;
+		rightPos = 0;
+		type = SoundData::DIGITAL;
+	}
 };
 
 typedef struct wl_state_s {
@@ -302,6 +330,78 @@ typedef struct wl_state_s {
 
 	struct IntermissionGState intermission;
 	Menu *currentMenu();
+
+	void clear() {
+		// It's tempting to do a memset but this would corrupt FString that has reference counters
+		stage = START;
+		stageAfterIntermission = START;
+		isFading = false;
+		isInWait = false;
+		waitCanBeAcked = false;
+		waitCanTimeout = false;
+		wasAcked = false;
+		ackTimeout = 0;
+		fadeStep = 0;
+		fadeStart = 0;
+		fadeEnd = 0;
+		fadeCur = 0;
+		fadeRed = 0;
+		fadeGreen = 0;
+		fadeBlue = 0;
+		died = false;
+		dointermission = false;
+		playing_title_music = false;
+		level_bonus = false;
+
+		episode_num = 0;
+		skill_num = 0;
+		menuLevel = 0;
+		for (int i = 0; i < MAX_MENU_STACK; i++)
+			menuStack[i] = MAIN_MENU;
+		for (int i = 0; i < MIX_CHANNELS; i++)
+			channels[i].clear();
+		musicChannel.clear();
+
+		frame_counter = 0;
+		frame_tic = 0;
+		tic_rest = 0;
+		usec = 0;
+		nextMap = "";
+
+		isCounting = false;
+		isCountingRatio = false;
+		prevCount = "";
+		countCurrent = 0;
+		countEnd = 0;
+		countStep = 0;
+		countX = 0;
+		countY = 0;
+		countFrame = 0;
+		bonusFont = false;
+		intermissionSndFreq = 0;
+		intermissionSound = "";
+		transitionSlideshow = "";
+		isInQuiz = false;
+		quizMenu = NULL;
+		quizPage = NULL;
+		quizNpc = NULL;
+		iangle = 0;
+		rndval = 0;
+		zoomer = NULL;
+		firstpage = false;
+		newpage = false;
+		article = "";
+		textposition = 0;
+		pagenum = 0;
+		numpages = 0;
+		rowon = 0;
+		fontcolor = 0;
+		picx = 0;
+		picy = 0;
+		picdelay = 0;
+		layoutdone = false;
+		intermission.clear();
+	}
 } wl_state_t;
 
 typedef struct wl_input_state_s
