@@ -124,6 +124,10 @@ public:
 		memcpy (SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
 		memset (Buffer, 0, height_ * Pitch);
 		PaletteNeedsUpdate = true;
+		FlashAmount = 0;
+		Flash.r = 0;
+		Flash.g = 0;
+		Flash.b = 0;
 	}
 	~LibretroFB () {
 		free(lr_buffer_);
@@ -792,15 +796,18 @@ bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 
 	R_InitRenderer();
 
-	printf("InitGame: Setting up the game...\n");
+	log_cb (RETRO_LOG_INFO, "InitGame: Setting up the game...\n");
 	rngseed = I_MakeRNGSeed(); // May change after initializing a net game
 	InitGame();
 
+	log_cb (RETRO_LOG_INFO, "Clearing random...\n");
+
 	FRandom::StaticClearRandom();
 
-	g_state = wl_state_t();
-	g_state.stage = START;
-	g_state.nextMap = "";
+	g_state.clear();
+
+	log_cb (RETRO_LOG_INFO, "Game setup finished...\n");
+
 	return true;
 }
 
