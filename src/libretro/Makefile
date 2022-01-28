@@ -46,7 +46,11 @@ endif
 
 CORE_DIR    += ../..
 TARGET_NAME := ecwolf
+ifneq (,$(findstring msvc,$(platform)))
+LIBM		    =
+else
 LIBM		    = -lm
+endif
 DISABLE_ADLIB = 0
 
 
@@ -222,6 +226,91 @@ else ifeq ($(platform), ctr)
 	DEFINES += -D_3DS -DARM11 -march=armv6k -mtune=mpcore -mfloat-abi=hard
 	COMMON_CFLAGS += $(DEFINES) -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 	STATIC_LINKING = 1
+# Windows MSVC 2010 x64
+else ifeq ($(platform), windows_msvc2010_x64)
+	CC  = cl.exe
+	CXX = cl.exe
+
+	CFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+	CXXFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+
+	PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin/amd64"):$(PATH)
+	PATH := $(PATH):$(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../IDE")
+	LIB := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/lib/amd64")
+	INCLUDE := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/include")
+
+	WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
+	WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
+
+	WindowsSDKIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include")
+	WindowsSDKGlIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include\gl")
+	WindowsSDKLibDir := $(shell cygpath -w "$(WindowsSdkDir)\Lib\x64")
+
+	INCFLAGS_PLATFORM = -I"$(WindowsSdkDirInc)"
+	export INCLUDE := $(INCLUDE);$(WindowsSDKIncludeDir);$(WindowsSDKGlIncludeDir);$(CORE_DIR)/src/libretro/libretro-common/include/compat/msvc
+	export LIB := $(LIB);$(WindowsSDKLibDir)
+
+	TARGET := $(TARGET_NAME)_libretro.dll
+	LDFLAGS += -DLL
+	LIBS = AdvAPI32.lib
+
+# Windows MSVC 2010 x86
+else ifeq ($(platform), windows_msvc2010_x86)
+	CC  = cl.exe
+	CXX = cl.exe
+
+	CFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+	CXXFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+
+	PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin"):$(PATH)
+	PATH := $(PATH):$(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../IDE")
+	LIB := $(shell IFS=$$'\n'; cygpath -w "$(VS100COMNTOOLS)../../VC/lib")
+	INCLUDE := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/include")
+
+        WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.1A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
+        WindowsSdkDir ?= $(shell reg query "HKLM\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A" -v "InstallationFolder" | grep -io '[A-Z]:\\.*')
+
+	WindowsSDKIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include")
+	WindowsSDKGlIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include\gl")
+	WindowsSDKLibDir := $(shell cygpath -w "$(WindowsSdkDir)\Lib")
+
+	INCFLAGS_PLATFORM = -I"$(WindowsSdkDirInc)"
+	export INCLUDE := $(INCLUDE);$(WindowsSDKIncludeDir);$(WindowsSDKGlIncludeDir);$(CORE_DIR)/src/libretro/libretro-common/include/compat/msvc
+	export LIB := $(LIB);$(WindowsSDKLibDir)
+
+	TARGET := $(TARGET_NAME)_libretro.dll
+	LDFLAGS += -DLL
+	LIBS = AdvAPI32.lib
+
+# Windows MSVC 2005 x86
+else ifeq ($(platform), windows_msvc2005_x86)
+	CC  = cl.exe
+	CXX = cl.exe
+
+	CFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+	CXXFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+
+	PATH := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/bin"):$(PATH)
+	PATH := $(PATH):$(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../IDE")
+	INCLUDE := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/include")
+	LIB := $(shell IFS=$$'\n'; cygpath -w "$(VS80COMNTOOLS)../../VC/lib")
+	BIN := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/bin")
+
+        WindowsSdkDir := $(shell reg query "HKLM\SOFTWARE\Microsoft\MicrosoftSDK\InstalledSDKs\8F9E5EF3-A9A5-491B-A889-C58EFFECE8B3" -v "Install Dir" | grep -o '[A-Z]:\\.*')
+
+        WindowsSDKIncludeDir := $(shell cygpath -w "$(WindowsSdkDir)\Include")
+        WindowsSDKLibDir := $(shell cygpath -w "$(WindowsSdkDir)\Lib")
+
+        INCLUDE := $(INCLUDE);$(WindowsSDKIncludeDir);$(WindowsSDKAtlIncludeDir);$(WindowsSDKCrtIncludeDir);$(WindowsSDKGlIncludeDir);$(WindowsSDKMfcIncludeDir);libretro/msvc/msvc-2005
+        LIB := $(LIB);$(WindowsSDKLibDir)
+
+	export INCLUDE := $(INCLUDE);$(INETSDK)/Include;$(CORE_DIR)/src/libretro/libretro-common/include/compat/msvc
+	export LIB := $(LIB);$(WindowsSdkDir);$(INETSDK)/Lib
+	TARGET := $(TARGET_NAME)_libretro.dll
+	PSS_STYLE :=2
+	LDFLAGS += -DLL
+	CFLAGS += -D_CRT_SECURE_NO_DEPRECATE
+	LIBS = AdvAPI32.lib
 else
    CC ?= gcc
    TARGET := $(TARGET_NAME)_libretro.dll
@@ -287,13 +376,14 @@ endif
 
 TOPDIR ?= $(CURDIR)
 
-COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DCORE=ON -DSDL2=ON -DBASE=ON -DUSE_FILE32API -ffast-math \
-			-fno-strict-aliasing -fvisibility=hidden -fomit-frame-pointer \
-			-Wno-sign-compare -Wno-switch -Wno-format-security -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
-CXXFLAGS += -fpermissive -std=gnu++98
+COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DCORE=ON -DSDL2=ON -DBASE=ON -DUSE_FILE32API -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
 
+ifeq (,$(findstring msvc,$(platform)))
+  COMMON_CFLAGS += -ffast-math -fno-strict-aliasing -fvisibility=hidden -fomit-frame-pointer -Wno-sign-compare -Wno-switch -Wno-format-security
+  CXXFLAGS += -fpermissive -std=gnu++98
 ifneq ($(platform), emscripten)
-COMMON_CFLAGS += -fno-unsafe-math-optimizations
+  COMMON_CFLAGS += -fno-unsafe-math-optimizations
+endif
 endif
 
 COMMON_CFLAGS += -DNO_STORE
@@ -304,20 +394,31 @@ CXXFLAGS += $(COMMON_CFLAGS)
 CFLAGS     += $(INCFLAGS)
 CXXFLAGS   += $(INCFLAGS)
 
+OBJOUT   = -o 
+LINKOUT  = -o 
+
+ifneq (,$(findstring msvc,$(platform)))
+	OBJOUT = -Fo
+endif
+
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJECTS)
 else
+ifneq (,$(findstring msvc,$(platform)))
+	link.exe -out:$@ $(OBJECTS) $(LDFLAGS) $(LIBS)
+else
 	$(CXX) $(fpic) $(SHARED) -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS)
+endif
 endif
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(fpic) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(fpic) -c $(OBJOUT)$@ $<
 
 %.o: %.c
-	$(CC) $(CFLAGS) $(fpic) -c -o $@ $<
+	$(CC) $(CFLAGS) $(fpic) -c $(OBJOUT)$@ $<
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
