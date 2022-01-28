@@ -74,6 +74,8 @@
 #include "wl_loadsave.h"
 #include "compat/msvc.h"
 
+static void fallback_log(enum retro_log_level level, const char *fmt, ...);
+
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
 extern struct retro_vfs_interface *vfs_interface;
@@ -81,7 +83,7 @@ static retro_environment_t environ_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_video_refresh_t video_cb;
-static retro_log_printf_t log_cb;
+static retro_log_printf_t log_cb = fallback_log;
 static bool libretro_supports_bitmasks = false;
 // fp10s is 10 times the FPS
 static int screen_width = 640, screen_height = 400, fp10s = 350;
@@ -370,7 +372,7 @@ void libretro_log(const char *format, ...)
 
 	va_start(va, format);
 	vsnprintf(formatted, sizeof(formatted) - 1, format, va);
-	(log_cb ?: fallback_log)(RETRO_LOG_INFO, "%s\n", formatted);
+	log_cb(RETRO_LOG_INFO, "%s\n", formatted);
 	va_end(va);
 }
 
@@ -499,6 +501,14 @@ static const char *get_string_variable(const char *name)
 	return var.value;
 }
 
+static const char *get_string_variable_def(const char *name, const char *def)
+{
+	const char *ret = get_string_variable(name);
+	if (ret)
+		return ret;
+	return def;
+}
+
 static bool get_bool_option(const char *name)
 {
 	const char *str = get_string_variable (name);
@@ -594,7 +604,7 @@ static void update_variables(bool startup)
 		screen_height = 200;
 	}
 
-	const char *fpsstr = get_string_variable("ecwolf-fps") ?: "35";
+	const char *fpsstr = get_string_variable_def("ecwolf-fps", "35");
 	if (strcmp (fpsstr, "17.5") == 0)
 		fp10s = 175;
 	else
@@ -675,7 +685,7 @@ static void update_variables(bool startup)
 	AnalogMoveSensitivity = get_slider_option ("ecwolf-analog-move-sensitivity");
 	AnalogTurnSensitivity = get_slider_option ("ecwolf-analog-turn-sensitivity");
 
-	SetSoundPriorities(get_string_variable("ecwolf-effects-priority") ?: "digi-adlib-speaker");
+	SetSoundPriorities(get_string_variable_def("ecwolf-effects-priority", "digi-adlib-speaker"));
 
 	godmode = get_bool_option("ecwolf-invulnerability");
 	dynamic_fps = get_bool_option("ecwolf-dynamic-fps");
