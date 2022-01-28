@@ -13,7 +13,7 @@
 #	include <stdint.h>
 #	include <string.h>
 #	include <stdarg.h>
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__LIBRETRO__)
 #	include <stdint.h>
 #endif
 #ifdef __MINGW32__
