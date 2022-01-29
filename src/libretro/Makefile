@@ -134,7 +134,8 @@ else ifneq (,$(findstring qnx,$(platform)))
 else ifeq ($(platform), emscripten)
    TARGET := $(TARGET_NAME)_libretro_emscripten.bc
    fpic := -fPIC
-   SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
+   SHARED := -shared -r
+   STATIC_LINKING=1
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), ps2)
    TARGET := $(TARGET_NAME)_ps2.a
@@ -307,7 +308,9 @@ CXXFLAGS   += $(INCFLAGS)
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-ifeq ($(STATIC_LINKING), 1)
+ifeq ($(platform), emscripten)
+	$(LD) $(fpic) $(SHARED) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
+else ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJECTS)
 else
 	$(CXX) $(fpic) $(SHARED) -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS)

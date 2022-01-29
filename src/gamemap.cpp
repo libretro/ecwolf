@@ -230,6 +230,8 @@ void GameMap::ClearVisibility()
 
 bool GameMap::CheckMapExists(const FString &map)
 {
+	if (Wads.CheckNumForName(map) < 0)
+		return false;
 	try
 	{
 		GameMap gm(map);
