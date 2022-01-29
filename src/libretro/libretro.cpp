@@ -26,6 +26,8 @@
 #include "wl_play.h"
 #include "wl_net.h"
 #include "libretro.h"
+#include "streams/file_stream.h"
+#include "retro_dirent.h"
 #include "state_machine.h"
 #include "wl_def.h"
 #include "wl_menu.h"
@@ -70,6 +72,9 @@
 #include "g_intermission.h"
 #include "am_map.h"
 #include "wl_loadsave.h"
+#include "compat/msvc.h"
+
+static void fallback_log(enum retro_log_level level, const char *fmt, ...);
 
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
@@ -78,7 +83,7 @@ static retro_environment_t environ_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_video_refresh_t video_cb;
-static retro_log_printf_t log_cb;
+static retro_log_printf_t log_cb = fallback_log;
 static bool libretro_supports_bitmasks = false;
 // fp10s is 10 times the FPS
 static int screen_width = 640, screen_height = 400, fp10s = 350;
@@ -297,7 +302,7 @@ bool IVideo::SetResolution (int width, int height, int bits)
 }
 
 Net::NetInit Net::InitVars = {
-	MODE_SinglePlayer,
+	Net::MODE_SinglePlayer,
 	5029, //NET_DEFAULT_PORT,
 	1
 };
@@ -367,7 +372,7 @@ void libretro_log(const char *format, ...)
 
 	va_start(va, format);
 	vsnprintf(formatted, sizeof(formatted) - 1, format, va);
-	(log_cb ?: fallback_log)(RETRO_LOG_INFO, "%s\n", formatted);
+	log_cb(RETRO_LOG_INFO, "%s\n", formatted);
 	va_end(va);
 }
 
@@ -496,6 +501,14 @@ static const char *get_string_variable(const char *name)
 	return var.value;
 }
 
+static const char *get_string_variable_def(const char *name, const char *def)
+{
+	const char *ret = get_string_variable(name);
+	if (ret)
+		return ret;
+	return def;
+}
+
 static bool get_bool_option(const char *name)
 {
 	const char *str = get_string_variable (name);
@@ -573,7 +586,8 @@ static void update_variables(bool startup)
 	{
 		char *pch;
 		char str[100];
-		snprintf(str, sizeof(str), "%s", resolution);
+		memset(str, 0, sizeof(str));
+		strncpy(str, resolution, sizeof(str)-2);
 
 		pch = strtok(str, "x");
 		if (pch)
@@ -591,7 +605,7 @@ static void update_variables(bool startup)
 		screen_height = 200;
 	}
 
-	const char *fpsstr = get_string_variable("ecwolf-fps") ?: "35";
+	const char *fpsstr = get_string_variable_def("ecwolf-fps", "35");
 	if (strcmp (fpsstr, "17.5") == 0)
 		fp10s = 175;
 	else
@@ -672,7 +686,7 @@ static void update_variables(bool startup)
 	AnalogMoveSensitivity = get_slider_option ("ecwolf-analog-move-sensitivity");
 	AnalogTurnSensitivity = get_slider_option ("ecwolf-analog-turn-sensitivity");
 
-	SetSoundPriorities(get_string_variable("ecwolf-effects-priority") ?: "digi-adlib-speaker");
+	SetSoundPriorities(get_string_variable_def("ecwolf-effects-priority", "digi-adlib-speaker"));
 
 	godmode = get_bool_option("ecwolf-invulnerability");
 	dynamic_fps = get_bool_option("ecwolf-dynamic-fps");
@@ -1260,8 +1274,11 @@ void retro_set_environment(retro_environment_t cb)
 	struct retro_vfs_interface_info vfs_interface_info;
 	vfs_interface_info.required_interface_version = 3;
 	vfs_interface_info.iface = NULL;
-	if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_interface_info))
+	if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_interface_info)) {
 		vfs_interface = vfs_interface_info.iface;
+		filestream_vfs_init(&vfs_interface_info);
+		dirent_vfs_init(&vfs_interface_info);
+	}
 }
 
 void ControlMenuItem::draw()

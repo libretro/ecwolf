@@ -143,6 +143,7 @@ class AActor : public Thinker,
 #else
 #define COORD_PART word
 #endif
+PACK_START
 		union
 		{
 			fixed x;
@@ -151,7 +152,7 @@ class AActor : public Thinker,
 #else
 			struct { COORD_PART fracx; COORD_PART tilex; };
 #endif
-		} __attribute__((__packed__));
+		} PACKED;
 		union
 		{
 			fixed y;
@@ -160,7 +161,8 @@ class AActor : public Thinker,
 #else
 			struct { COORD_PART fracy; COORD_PART tiley; };
 #endif
-		} __attribute__((__packed__));
+		} PACKED;
+PACK_END
 		fixed z;
 		fixed	velx, vely;
 

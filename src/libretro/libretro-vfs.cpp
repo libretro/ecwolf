@@ -87,55 +87,24 @@
 #include "g_intermission.h"
 #include "am_map.h"
 #include "wl_loadsave.h"
-
-#include <sys/types.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include "streams/file_stream.h"
+#include "retro_dirent.h"
+#include "vfs/vfs_implementation.h"
 
 struct retro_vfs_interface *vfs_interface;
 
-static struct retro_vfs_dir_handle *
-retro_vfs_opendir(const char *dir, bool include_hidden)
+static const char * wrap_retro_vfs_readdir(RDIR *dirstream)
 {
-	return vfs_interface ? vfs_interface->opendir(dir, include_hidden) : (struct retro_vfs_dir_handle *) opendir(dir);
-}
-
-static const char * retro_vfs_readdir(struct retro_vfs_dir_handle *dirstream)
-{
-	if (!vfs_interface) {
-		struct dirent *de = (struct dirent *)readdir ((DIR *) dirstream);
-		if (!de)
-			return NULL;
-		return de->d_name;
-	}
-
-	if (!vfs_interface->readdir(dirstream))
+	if (!retro_readdir(dirstream))
 		return NULL;
-	return vfs_interface->dirent_get_name (dirstream);
+	return retro_dirent_get_name (dirstream);
 }
 
-static void retro_vfs_closedir(struct retro_vfs_dir_handle *dirstream)
-{
-	if (!vfs_interface) {
-		closedir((DIR*)dirstream);
-	} else {
-		vfs_interface->closedir(dirstream);
-	}
-}
-
-static int
-retro_vfs_stat(const char *path, int32_t *size)
-{
-	if (!vfs_interface) {
-		struct stat fileStat;
-		if (stat(path, &fileStat) != 0)
-			return 0;
-		*size = fileStat.st_size;
-		return S_ISDIR(fileStat.st_mode) ? RETRO_VFS_STAT_IS_VALID | RETRO_VFS_STAT_IS_DIRECTORY : RETRO_VFS_STAT_IS_VALID;
-	}
-
-	return vfs_interface->stat(path, size);
+static int wrap_retro_vfs_stat(const char *path, int32_t *size) {
+	if (vfs_interface)
+		return vfs_interface->stat(path, size);
+	else
+		return retro_vfs_stat_impl(path, size);
 }
 
 struct FileMemoryStore
@@ -149,9 +118,8 @@ static TArray<FileMemoryStore> MemoryFiles;
 
 struct retro_vfs_wrapped_file_handle
 {
-	enum { UNKNOWN, LIBRETRO_VFS, STDIO, MEM } type;
-	struct retro_vfs_file_handle *lr;
-	FILE *stdio;
+	enum { UNKNOWN, LIBRETRO_VFS, MEM } type;
+	RFILE *lr;
 	struct FileMemoryStore *memstore;
 	long mem_pos;
 };
@@ -172,34 +140,24 @@ retro_vfs_open_ro(const char *filename) {
 		}
 	}
 
-	if (!vfs_interface) {
-		ret->stdio = fopen (filename, "rb");
-		if (!ret->stdio) {
-			free(ret);
-			return NULL;
-		}
-		ret->type = retro_vfs_wrapped_file_handle::STDIO;
-	} else {
-		ret->lr = vfs_interface->open(filename, RETRO_VFS_FILE_ACCESS_READ, RETRO_VFS_FILE_ACCESS_HINT_NONE);
-		if (!ret->lr) {
-			free(ret);
-			return NULL;
-		}
-		ret->type = retro_vfs_wrapped_file_handle::LIBRETRO_VFS;
-		if (store_files_in_memory) {
-
-			struct FileMemoryStore *store = new FileMemoryStore();
-			store->length = vfs_interface->size(ret->lr);
-			store->contents = malloc (store->length);
-			store->filename = filename;
-			if (store->contents) {
-				vfs_interface->read(ret->lr, store->contents, store->length);
-				vfs_interface->close(ret->lr);
-				ret->type = retro_vfs_wrapped_file_handle::MEM;
-				ret->memstore = store;
-				ret->lr = NULL;
-				MemoryFiles.Push(*store);
-			}
+	ret->lr = filestream_open(filename, RETRO_VFS_FILE_ACCESS_READ, RETRO_VFS_FILE_ACCESS_HINT_NONE);
+	if (!ret->lr) {
+		free(ret);
+		return NULL;
+	}
+	ret->type = retro_vfs_wrapped_file_handle::LIBRETRO_VFS;
+	if (store_files_in_memory) {
+		struct FileMemoryStore *store = new FileMemoryStore();
+		store->length = filestream_get_size(ret->lr);
+		store->contents = malloc (store->length);
+		store->filename = filename;
+		if (store->contents) {
+			filestream_read(ret->lr, store->contents, store->length);
+			filestream_close(ret->lr);
+			ret->type = retro_vfs_wrapped_file_handle::MEM;
+			ret->memstore = store;
+			ret->lr = NULL;
+			MemoryFiles.Push(*store);
 		}
 	}
 	return ret;
@@ -209,20 +167,9 @@ static int64_t retro_vfs_size(struct retro_vfs_wrapped_file_handle *stream)
 {
 	switch (stream->type) {
 	case retro_vfs_wrapped_file_handle::LIBRETRO_VFS:
-		return vfs_interface->size(stream->lr);
+		return filestream_get_size(stream->lr);
 	case retro_vfs_wrapped_file_handle::MEM:
 		return stream->memstore->length;
-	case retro_vfs_wrapped_file_handle::STDIO:
-	{
-		long curpos, endpos;
-		
-		FILE *File = stream->stdio;
-		curpos = ftell (File);
-		fseek (File, 0, SEEK_END);
-		endpos = ftell (File);
-		fseek (File, curpos, SEEK_SET);
-		return endpos;
-	}
 	}
 	return -1;
 }
@@ -231,11 +178,9 @@ static int64_t retro_vfs_tell(struct retro_vfs_wrapped_file_handle *stream)
 {
 	switch (stream->type) {
 	case retro_vfs_wrapped_file_handle::LIBRETRO_VFS:
-		return vfs_interface->tell(stream->lr);
+		return filestream_tell(stream->lr);
 	case retro_vfs_wrapped_file_handle::MEM:
 		return stream->mem_pos;
-	case retro_vfs_wrapped_file_handle::STDIO:
-		return ftell (stream->stdio);
 	}
 	assert(0);
 	return -1;
@@ -245,10 +190,7 @@ static void retro_vfs_close(struct retro_vfs_wrapped_file_handle *stream)
 {
 	switch (stream->type) {
 	case retro_vfs_wrapped_file_handle::LIBRETRO_VFS:
-		vfs_interface->close(stream->lr);
-		break;
-	case retro_vfs_wrapped_file_handle::STDIO:
-		fclose (stream->stdio);
+		filestream_close(stream->lr);
 		break;
 	case retro_vfs_wrapped_file_handle::MEM:
 		break;
@@ -263,9 +205,7 @@ static bool retro_vfs_seek(struct retro_vfs_wrapped_file_handle *stream, int64_t
 {
 	switch (stream->type) {
 	case retro_vfs_wrapped_file_handle::LIBRETRO_VFS:
-		return vfs_interface->seek(stream->lr, pos, RETRO_VFS_SEEK_POSITION_START) >= 0;
-	case retro_vfs_wrapped_file_handle::STDIO:
-		return fseek (stream->stdio, pos, SEEK_SET) == 0;
+		return filestream_seek(stream->lr, pos, RETRO_VFS_SEEK_POSITION_START) >= 0;
 	case retro_vfs_wrapped_file_handle::MEM:
 		if (pos < 0 || pos > stream->memstore->length)
 			return false;
@@ -282,10 +222,7 @@ static int64_t retro_vfs_read(struct retro_vfs_wrapped_file_handle *stream, void
 	int64_t ret = -1;
 	switch (stream->type) {
 	case retro_vfs_wrapped_file_handle::LIBRETRO_VFS:
-		ret = vfs_interface->read(stream->lr, s, len);
-		break;
-	case retro_vfs_wrapped_file_handle::STDIO:
-		ret = fread(s, 1, len, stream->stdio);
+		ret = filestream_read(stream->lr, s, len);
 		break;
 	case retro_vfs_wrapped_file_handle::MEM:
 		ret = len;
@@ -309,7 +246,7 @@ int FDirectory::AddDirectory(const char *dirpath)
 	scanDirectories.Push(dirpath);
 	for(unsigned int i = 0;i < scanDirectories.Size();i++)
 	{
-		struct retro_vfs_dir_handle* directory = retro_vfs_opendir(scanDirectories[i].GetChars(), false);
+		RDIR* directory = retro_opendir(scanDirectories[i].GetChars());
 		if (directory == NULL)
 		{
 			Printf("Could not read directory\n");
@@ -317,7 +254,7 @@ int FDirectory::AddDirectory(const char *dirpath)
 		}
 
 		const char *file;
-		while((file = retro_vfs_readdir(directory)) != NULL)
+		while((file = wrap_retro_vfs_readdir(directory)) != NULL)
 		{
 			if(file[0] == '.') //File is hidden or ./.. directory so ignore it.
 				continue;
@@ -325,7 +262,7 @@ int FDirectory::AddDirectory(const char *dirpath)
 			FString fullFileName = scanDirectories[i] + file;
 
 			int32_t size = -1;
-			int statflags = retro_vfs_stat(fullFileName.GetChars(), &size);
+			int statflags = wrap_retro_vfs_stat(fullFileName.GetChars(), &size);
 
 			if(statflags & RETRO_VFS_STAT_IS_DIRECTORY)
 			{
@@ -335,7 +272,7 @@ int FDirectory::AddDirectory(const char *dirpath)
 			AddEntry(scanDirectories[i] + file, size);
 			count++;
 		}
-		retro_vfs_closedir(directory);
+		retro_closedir(directory);
 	}
 	return count;
 }
@@ -488,7 +425,7 @@ void File::init(FString filename)
 		filename = *fname;
 
 	int32_t size;
-	int statflags = retro_vfs_stat(filename.GetChars(), &size);
+	int statflags = wrap_retro_vfs_stat(filename.GetChars(), &size);
 	if(statflags & RETRO_VFS_STAT_IS_VALID)
 		existing = true;
 
@@ -499,14 +436,14 @@ void File::init(FString filename)
 			directory = true;
 
 			// Populate a base list.
-			retro_vfs_dir_handle *direct = retro_vfs_opendir(filename, false);
+			RDIR *direct = retro_opendir(filename);
 			if(direct != NULL)
 			{
 				const char *file = NULL;
-				while((file = retro_vfs_readdir(direct)) != NULL)
+				while((file = wrap_retro_vfs_readdir(direct)) != NULL)
 					files.Push(file);
 			}
-			retro_vfs_closedir(direct);
+			retro_closedir(direct);
 		}
 	}
 

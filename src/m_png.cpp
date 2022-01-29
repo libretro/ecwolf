@@ -64,6 +64,7 @@
 
 // TYPES -------------------------------------------------------------------
 
+PACK_START
 struct IHDR
 {
 	DWORD		Width;
@@ -73,7 +74,8 @@ struct IHDR
 	BYTE		Compression;
 	BYTE		Filter;
 	BYTE		Interlace;
-} __attribute__ ((__packed__));
+} PACKED;
+PACK_END
 
 #ifndef LIBRETRO
 

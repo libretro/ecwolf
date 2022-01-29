@@ -151,7 +151,7 @@ enum SampleFormat {
 	FORMAT_16BIT_LINEAR_SIGNED_NATIVE
 };
 
-class Mix_Chunk
+struct Mix_Chunk
 {
 public:
 	virtual void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
