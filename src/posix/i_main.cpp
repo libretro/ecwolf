@@ -1,8 +1,8 @@
 /*
-** wl_iwad.h
+** i_main.cpp
 **
 **---------------------------------------------------------------------------
-** Copyright 2012 Braden Obrzut
+** Copyright 2021 Braden Obrzut
 ** All rights reserved.
 **
 ** Redistribution and use in source and binary forms, with or without
@@ -32,49 +32,24 @@
 **
 */
 
-#ifndef __WL_IWAD_H__
-#define __WL_IWAD_H__
+#include <cstdlib>
 
-#include "zstring.h"
-
-// For IWad Pickers so not in namespace
-struct WadStuff
-{
-	WadStuff() : Type(-1), Hidden(false) {}
-
-	TArray<FString> Path;
-	FString Extension;
-	FString Name;
-	int Type;
-	bool Hidden;
-};
-
-namespace IWad
-{
-	enum Flags
-	{
-		REGISTERED = 1, // Enables not-shareware warning
-		HELPHACK = 2,   // Fixes helpart art assets
-		PREVIEW = 4,    // Only show in picker if user opts in
-		RESOURCE = 8    // Used as a component of another option
-	};
-
-	struct IWadData
-	{
-		FString Name;
-		FString Autoname;
-		FString Mapinfo;
-		TArray<FString> Ident;
-		TArray<FString> Required;
-		FName Game;
-		unsigned int Flags;
-		bool LevelSet;
-	};
-
-	bool CheckGameFilter(FName filter);
-	const IWadData &GetGame();
-	unsigned int GetNumIWads();
-	void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad, const FString &progdir);
-}
-
+#ifndef NO_GTK
+#include <gtk/gtk.h>
+bool GtkAvailable;
 #endif
+
+int main(int argc, char *argv[])
+{
+	// Set LC_NUMERIC environment variable in case some library decides to
+	// clear the setlocale call at least this will be correct.
+	// Note that the LANG environment variable is overridden by LC_*
+	setenv("LC_NUMERIC", "C", 1);
+
+#ifndef NO_GTK
+	GtkAvailable = gtk_init_check(&argc, &argv);
+#endif
+
+	extern int WL_Main(int argc, char *argv[]);
+	return WL_Main(argc, argv);
+}

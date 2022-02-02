@@ -74,8 +74,6 @@ static inline void DPrintf(const char* fmt, ...) {}
 
 #define MAXWIDTH 5120
 #define Printf printf
-#define I_FatalError Quit
-void I_Error(const char* format, ...);
 
 #define MulScale16(x,y) (SDWORD((SQWORD(x)*SQWORD(y))>>16))
 

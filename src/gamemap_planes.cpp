@@ -131,18 +131,6 @@ public:
 	{
 	}
 
-	void ClearTables()
-	{
-		// Clear out old data (to be called before initial load)
-		for(unsigned int i = 0;i < 256;++i)
-		{
-			flatTable[i][0].SetInvalid();
-			flatTable[i][1].SetInvalid();
-		}
-		tileTriggers.Clear();
-		thingTable.Clear();
-	}
-
 	void LoadXlat(const FString &baseLumpName, const GameInfo::FStringStack *baseStack, bool included=false)
 	{
 		int lump = Wads.CheckNumForFullName(baseLumpName, true);
@@ -650,6 +638,24 @@ protected:
 	}
 
 private:
+	void ClearTables()
+	{
+		// Clear out old data (to be called before initial load)
+		for(unsigned int i = 0;i < 256;++i)
+		{
+			flatTable[i][0].SetInvalid();
+			flatTable[i][1].SetInvalid();
+		}
+		thingTable.Clear();
+		thingSpecialTable.Clear();
+		tilePalette.Clear();
+		tileTriggers.Clear();
+		modZones.Clear();
+		zonePalette.Clear();
+		musicTable.Clear();
+		FeatureFlags = static_cast<EFeatureFlags>(0);
+	}
+
 	int lump;
 
 	TArray<ThingXlat> thingTable;

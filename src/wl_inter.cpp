@@ -9,6 +9,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "language.h"
+#include "v_video.h"
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_inter.h"
@@ -320,8 +321,10 @@ static void InterDrawNormalTop()
 			completedString = language[levelInfo->CompletionString.Mid(1)];
 		else
 			completedString = levelInfo->CompletionString;
-		completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
-		Write (14, 2, completedString);
+
+		FString formattedString;
+		formattedString.Format(completedString, levelInfo->FloorNumber.GetChars());
+		Write (14, 2, formattedString);
 	}
 	else
 	{

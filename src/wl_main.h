@@ -51,6 +51,5 @@ void            CalcProjection (int32_t focal);
 void			CalcVisibility (fixed vis);
 int				CheckRatio (int width, int height, int *trueratio=NULL);
 void            NewViewSize (int width, unsigned int scrWidth=screenWidth, unsigned int scrHeight=screenHeight);
-void            ShutdownId (void);
 
 #endif

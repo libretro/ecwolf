@@ -10,7 +10,7 @@
 
 #include <climits>
 
-extern fixed viewshift;
+extern int viewshift;
 extern fixed viewz;
 
 static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int halfheight, fixed planeheight)
@@ -54,6 +54,12 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		tex_offsetPitch = -viewwidth-vbufPitch;
 	}
 
+	// Break viewx/viewy apart so we can use the fractional part for texel selection without overflowing.
+	const int viewxTile = viewx>>FRACBITS;
+	const int viewxFrac = (viewx&(FRACUNIT-1))<<8; // 8.24
+	const int viewyTile = viewy>>FRACBITS;
+	const int viewyFrac = (viewy&(FRACUNIT-1))<<8; // 8.24
+
 	unsigned int oldmapx = INT_MAX, oldmapy = INT_MAX;
 	const byte* curshades = NormalLight.Maps;
 	// draw horizontal lines
@@ -67,8 +73,8 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 
 		// Shift in some extra bits so that we don't get spectacular round off.
 		dist = (planenumerator / (y + 1))<<8;
-		gu =  (viewx<<8) + FixedMul(dist, viewcos);
-		gv = -(viewy<<8) + FixedMul(dist, viewsin);
+		gu =  viewxFrac + FixedMul(dist, viewcos);
+		gv = -viewyFrac + FixedMul(dist, viewsin);
 		tex_step = dist / scale;
 		du =  FixedMul(tex_step, viewsin);
 		dv = -FixedMul(tex_step, viewcos);
@@ -84,8 +90,8 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 		{
 			if(((wallheight[x]*heightFactor)>>FRACBITS) <= y)
 			{
-				unsigned int curx = (gu >> (TILESHIFT+8));
-				unsigned int cury = (-(gv >> (TILESHIFT+8)) - 1);
+				unsigned int curx = viewxTile + (gu >> (TILESHIFT+8));
+				unsigned int cury = viewyTile + (-(gv >> (TILESHIFT+8)) - 1);
 
 				if(curx != oldmapx || cury != oldmapy)
 				{
@@ -124,8 +130,8 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 					}
 					else
 					{
-						const int u = (FixedMul((gu>>8)-512, texxscale)) & (texwidth-1);
-						const int v = (FixedMul((gv>>8)+512, texyscale)) & (texheight-1);
+						const int u = (FixedMul((viewxTile<<16)+(gu>>8)-512, texxscale)) & (texwidth-1);
+						const int v = (FixedMul((viewyTile<<16)+(gv>>8)+512, texyscale)) & (texheight-1);
 						const unsigned texoffs = (u * texheight) + v;
 						*tex_offset = curshades[tex[texoffs]];
 					}

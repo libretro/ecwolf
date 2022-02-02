@@ -35,6 +35,7 @@ STR_SGC = "Save Game called\n";
 STR_NONE = "None";
 STR_PC = "PC Speaker";
 STR_ALSB = "AdLib/Sound Blaster";
+STR_MIDI = "SDL_mixer MIDI Synth";
 STR_DISNEY = "Disney Sound Source";
 STR_SB = "Sound Blaster";
 STR_WINDOWEDMOUSE = "Windowed Mouse";

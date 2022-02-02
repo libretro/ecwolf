@@ -316,6 +316,8 @@ world/hitwall NULL
 misc/100percent			{ DSENDBN2 ALENDBN2 PCENDBN2 }
 $alias misc/w_pkup		misc/i_pkup
 $alias misc/ammo_pkup	misc/i_pkup
+$alias misc/health_pkup	misc/i_pkup
+$alias misc/medkit_pkup	misc/i_pkup
 $alias misc/map_pkup	misc/k_pkup
 
 // Defined here since vanilla Wolf3D didn't use it.

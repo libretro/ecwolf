@@ -1,6 +1,7 @@
 # Variables for generating version.h
 
 set(PRODUCT_NAME "ECWolf")
+set(PRODUCT_IDENTIFIER "org.ecwolf.ECWolf")
 if(APPLE OR WIN32)
 	set(PRODUCT_DIRECTORY "${PRODUCT_NAME}")
 else()

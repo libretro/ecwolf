@@ -97,6 +97,10 @@ initial_sources(
 	gamemap_planes.cpp
 	gamemap_uwmf.cpp
 	id_ca.cpp
+	id_in.cpp
+	id_sd.cpp
+	id_sd_n3dmus.cpp
+	id_us_1.cpp
 	id_vh.cpp
 	id_vl.cpp
 	language.cpp
@@ -289,6 +293,8 @@ else()
 			set( NO_GTK ON )
 		endif()
 	endif()
+
+	target_sources(engine PRIVATE posix/i_main.cpp)
 endif()
 
 if(NO_GTK)
@@ -298,18 +304,23 @@ endif()
 if(APPLE AND NOT LIBRETRO)
 	target_sources(engine PRIVATE
 		macosx/filesys.mm
+		macosx/i_main.mm
 		macosx/wl_iwad_picker_cocoa.mm
 	)
 
-	if(FORCE_SDL12)
-		target_sources(engine PRIVATE macosx/SDLMain.m)
-	endif()
+	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.cmake)
 
-	include(${CMAKE_CURRENT_SOURCE_DIR}/macosx/install.txt)
-
-	option(BUILD_BUNDLE "Build a app bundle on Mac OS X" OFF)
+	option(BUILD_BUNDLE "Build a app bundle on Mac OS X" ON)
 	if(BUILD_BUNDLE)
-		set_target_properties(engine PROPERTIES MACOSX_BUNDLE ON)
+		set_target_properties(engine PROPERTIES
+			MACOSX_BUNDLE ON
+			MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/macosx/Info.plist.in"
+			MACOSX_BUNDLE_BUNDLE_NAME "${PRODUCT_NAME}"
+			MACOSX_BUNDLE_GUI_IDENTIFIER "${PRODUCT_IDENTIFIER}"
+			MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+			MACOSX_BUNDLE_LONG_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+			MACOSX_BUNDLE_SHORT_VERSION_STRING "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+		)
 	endif(BUILD_BUNDLE)
 elseif(ANDROID AND NOT LIBRETRO)
 	target_sources(engine PRIVATE

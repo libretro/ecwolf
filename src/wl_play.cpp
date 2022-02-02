@@ -16,6 +16,7 @@
 #include "thinker.h"
 #include "actor.h"
 #include "textures/textures.h"
+#include "v_video.h"
 #include "wl_agent.h"
 #include "wl_debug.h"
 #include "wl_draw.h"
@@ -200,8 +201,14 @@ void CalcTics()
 //
 // calculate tics since last refresh for adaptive timing
 //
-	if (lasttimecount > GetTimeCount())
-		ResetTimeCount(); // if the game was paused a LONG time
+
+	// Have we arrived too soon?
+	while(lasttimecount == GetTimeCount()+1)
+		SDL_Delay(1);
+
+	// Detect rollover, particularly if the game were paused for a LONG time
+	if(lasttimecount > GetTimeCount())
+		ResetTimeCount();
 
 	uint32_t curtime = SDL_GetTicks();
 	tics = (curtime * 7) / 100 - lasttimecount;
@@ -687,7 +694,7 @@ void CheckKeys (void)
 		changeSize = true;
 
 	if(Keyboard[sc_Alt] && Keyboard[sc_Enter])
-		ToggleFullscreen();
+		VL_ToggleFullscreen();
 
 	if(IWad::CheckGameFilter(NAME_Wolf3D))
 	{
@@ -1125,7 +1132,7 @@ void PlayLoop (void)
 				PollControls(!i);
 
 				++gamestate.TimeCount;
-				thinkerList->Tick();
+				thinkerList.Tick();
 				AActor::FinishSpawningActors();
 			}
 		}

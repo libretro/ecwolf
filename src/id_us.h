@@ -61,8 +61,6 @@ extern	HighScore	Scores[];
 
 #define	US_HomeWindow()	{PrintX = WindowX; PrintY = WindowY;}
 
-void            US_Startup(void);
-void            US_Shutdown(void);
 void			US_TextScreen(void),
 				US_UpdateTextScreen(void),
 				US_FinishTextScreen(void);

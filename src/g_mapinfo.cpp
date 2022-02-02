@@ -209,6 +209,7 @@ protected:
 
 	void ParseStringArrayAssignment(TArray<FString> &dest)
 	{
+		dest.Clear();
 		sc.MustGetToken('=');
 		do
 		{
@@ -564,6 +565,10 @@ protected:
 
 GameInfo gameinfo;
 
+GameInfo::GameInfo() : PageIndexText("pg %d of %d")
+{
+}
+
 class GameInfoBlockParser : public MapInfoBlockParser
 {
 public:
@@ -727,6 +732,8 @@ protected:
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::HIGHSCORES]);
 		else if(key.CompareNoCase("pageindexfontcolor") == 0)
 			ParseFontColorAssignment(gameinfo.FontColors[GameInfo::PAGEINDEX]);
+		else if(key.CompareNoCase("pageindextext") == 0)
+			ParseStringAssignment(gameinfo.PageIndexText);
 		else if(key.CompareNoCase("psyched") == 0)
 		{
 			ParseColorArrayAssignment(gameinfo.PsychedColors, 2);
@@ -1542,13 +1549,13 @@ void G_ParseMapInfo(bool gameinfoPass)
 	if(!gameinfoPass)
 	{
 		if(episodes.Size() == 0)
-			Quit("At least 1 episode must be defined.");
+			I_FatalError("At least 1 episode must be defined.");
 
 		for(unsigned int i = 0;i < gameinfo.PlayerClasses.Size();++i)
 		{
 			const ClassDef *cls = ClassDef::FindClass(gameinfo.PlayerClasses[i]);
 			if(!cls || !cls->IsDescendantOf(NATIVE_CLASS(PlayerPawn)))
-				Quit("'%s' is not a valid player class!", gameinfo.PlayerClasses[i].GetChars());
+				I_FatalError("'%s' is not a valid player class!", gameinfo.PlayerClasses[i].GetChars());
 		}
 	}
 }

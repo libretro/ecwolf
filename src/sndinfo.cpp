@@ -222,6 +222,18 @@ SoundIndex SoundInformation::FindSound(const char* logical) const
 	return SoundIndex(index->index);
 }
 
+int SoundInformation::GetMusicLumpNum(FString song) const
+{
+	const int lump = Wads.CheckNumForName(song, ns_music);
+	const int wad = Wads.GetLumpFile(lump);
+
+	const MusicData *alias = MusicAliases.CheckKey(FName(song, true));
+	if(alias && wad <= alias->WadNum)
+		return GetMusicLumpNum(alias->Name);
+
+	return lump;
+}
+
 void SoundInformation::Init()
 {
 	printf("S_Init: Reading SNDINFO defintions.\n");
@@ -286,6 +298,18 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 					++excludeDepth;
 			}
 			else if(sc->str.CompareNoCase("endif") == 0) {}
+			else if(sc->str.CompareNoCase("musicalias") == 0)
+			{
+				if(!sc.GetNextString())
+					sc.ScriptMessage(Scanner::ERROR, "Expected music alias name.");
+				FString musicName = sc->str;
+
+				if(!sc.GetNextString())
+					sc.ScriptMessage(Scanner::ERROR, "Expected music lump name.");
+
+				MusicData data = {sc->str, Wads.GetLumpFile(lumpNum)};
+				MusicAliases[musicName] = data;
+			}
 			else
 				sc.ScriptMessage(Scanner::ERROR, "Unknown command '%s'.", sc->str.GetChars());
 		}

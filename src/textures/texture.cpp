@@ -42,9 +42,9 @@
 #include "bitmap.h"
 #include "colormatcher.h"
 #include "textures.h"
+#include "v_video.h"
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
-#define I_Error Quit
 
 typedef bool (*CheckFunc)(FileReader & file);
 typedef FTexture * (*CreateFunc)(FileReader & file, int lumpnum);
@@ -547,10 +547,10 @@ void FTexture::FillBuffer(BYTE *buff, int pitch, int height, FTextureFormat fmt)
 
 int FTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCopyInfo *inf)
 {
-	/*PalEntry *palette = screen->GetPalette();
+	PalEntry *palette = screen->GetPalette();
 	for(int i=1;i<256;i++) palette[i].a = 255;	// set proper alpha values
 	bmp->CopyPixelData(x, y, GetPixels(), Width, Height, Height, 1, rotate, palette, inf);
-	for(int i=1;i<256;i++) palette[i].a = 0;*/
+	for(int i=1;i<256;i++) palette[i].a = 0;
 	return 0;
 }
 

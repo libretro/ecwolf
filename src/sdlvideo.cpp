@@ -664,6 +664,9 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 	FlashAmount = 0;
 
 #if SDL_VERSION_ATLEAST(2,0,0)
+	Renderer = NULL;
+	Texture = NULL;
+
 	if (oldwin)
 	{
 		// In some cases (Mac OS X fullscreen) SDL2 doesn't like having multiple windows which
@@ -688,8 +691,6 @@ SDLFB::SDLFB (int width, int height, bool fullscreen)
 	ForceSDLFocus(Screen);
 #endif
 
-	Renderer = NULL;
-	Texture = NULL;
 	ResetSDLRenderer ();
 
 #ifdef __ANDROID__

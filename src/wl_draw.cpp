@@ -10,7 +10,7 @@
 #include "c_cvars.h"
 #include "r_sprites.h"
 #include "r_data/colormaps.h"
-
+#include "v_video.h"
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
 #include "wl_shade.h"

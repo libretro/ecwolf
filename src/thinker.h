@@ -80,7 +80,7 @@ extern class ThinkerList
 		// think, but end up being destroyed.
 		Iterator					nextThinker;
 		EmbeddedList<Thinker>::List	thinkers[NUM_TYPES];
-} *thinkerList;
+} thinkerList;
 
 class Thinker : public DObject, public EmbeddedList<Thinker>::Node
 {

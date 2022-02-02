@@ -41,6 +41,7 @@
 #include "actor.h"
 #include "thingdef/thingdef.h"
 #include "v_palette.h"
+#include "v_video.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_main.h"
@@ -376,7 +377,7 @@ void R_LoadSprite(const FString &name)
 unsigned int CalcRotate(AActor *ob);
 extern byte* vbuf;
 extern unsigned vbufPitch;
-extern fixed viewshift;
+extern int viewshift;
 extern fixed viewz;
 
 void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height)

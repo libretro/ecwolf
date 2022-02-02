@@ -73,7 +73,7 @@
 // MACROS ------------------------------------------------------------------
 
 #define FORUM_URL		"http://forum.drdteam.org/viewforum.php?f=174"
-#define BUGS_FORUM_URL	"https://bitbucket.org/Blzut3/ecwolf/issues"
+#define BUGS_FORUM_URL	"https://bitbucket.org/ecwolf/ecwolf/issues"
 #define REMOTE_HOST		"localhost"
 #define REMOTE_PORT		"80"
 #define UPLOAD_URI		"/test.php"

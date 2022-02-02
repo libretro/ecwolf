@@ -3,10 +3,6 @@
 #ifndef __ID_VL_H__
 #define __ID_VL_H__
 
-// wolf compatability
-
-void Quit (const char *error,...);
-
 //===========================================================================
 
 extern  bool	fullscreen, usedoublebuffering;
@@ -26,8 +22,8 @@ extern	bool  screenfaded;
 
 #define VL_WaitVBL(a) SDL_Delay((a)*8)
 
-void ToggleFullscreen();
-void SetFullscreen(bool isFull);
+void VL_ToggleFullscreen();
+void VL_SetFullscreen(bool isFull);
 
 void VL_ReadPalette(const char* lump);
 
@@ -41,7 +37,6 @@ void VL_FadeIn      (int start, int end, int steps);
 byte *VL_LockSurface();
 void VL_UnlockSurface();
 
-#include "v_video.h"
 #define VL_ClearScreen(color) VWB_Clear(color, 0, 0, SCREENWIDTH, SCREENHEIGHT)
 
 #endif

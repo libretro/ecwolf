@@ -554,7 +554,7 @@ void Serialize(FArchive &arc)
 	if(SaveVersion > 1395865826)
 		arc << LevelRatios.par;
 
-	thinkerList->Serialize(arc);
+	thinkerList.Serialize(arc);
 
 	arc << map;
 

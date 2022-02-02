@@ -76,7 +76,9 @@ enum ESSType
 	SS_BGRA
 };
 
-void Quit(const char *errorStr, ...);
+void I_Error(const char* format, ...);
+void I_FatalError(const char *errorStr, ...);
+void Quit();
 void NetDPrintf(const char *format, ...);
 
 #define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
@@ -398,7 +400,8 @@ static inline fixed FixedDiv(fixed a, fixed b)
 	return (fixed)(((((int64_t)a)<<32) / b) >> 16);
 }
 
-#define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
+
+#define CHECKMALLOCRESULT(x) if(!(x)) I_FatalError("Out of memory at %s:%i", __FILE__, __LINE__)
 
 #if !defined(_WIN32) && !defined(LIBRETRO)
 	static inline char* itoa(int value, char* string, int radix)
