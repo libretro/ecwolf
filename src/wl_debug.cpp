@@ -19,6 +19,7 @@
 #include "actor.h"
 #include "language.h"
 #include "m_png.h"
+#include "v_video.h"
 #include "wl_agent.h"
 #include "wl_debug.h"
 #include "wl_draw.h"
@@ -376,7 +377,7 @@ int DebugKeys (void)
 		return 1;
 	}
 	else if (Keyboard[sc_Q])        // Q = fast quit
-		Quit (NULL);
+		Quit ();
 	else if (Keyboard[sc_S])        // S = slow motion
 	{
 		US_CenterWindow(30,3);

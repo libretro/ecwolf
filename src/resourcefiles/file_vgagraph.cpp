@@ -103,7 +103,7 @@ struct FVGALump : public FResourceLump
 		
 			if(!LumpSize || !dest)
 			{
-				Quit("length or dest is null!");
+				I_FatalError("length or dest is null!");
 				return NULL;
 			}
 		

@@ -93,7 +93,7 @@ protected:
 
 static bool P_StartButton (MapSpot spot, MapTile::Side side, FSwitchDef *Switch, fixed_t x, fixed_t y, bool useagain)
 {
-	ThinkerList::Iterator iter = thinkerList->GetHead(ThinkerList::WORLD);
+	ThinkerList::Iterator iter = thinkerList.GetHead(ThinkerList::WORLD);
 	while(iter)
 	{
 		if(iter->IsThinkerType<DActiveButton>())

@@ -9,6 +9,7 @@
 #include "g_mapinfo.h"
 #include "thingdef/thingdef.h"
 #include "thinker.h"
+#include "v_video.h"
 #include "wl_act.h"
 #include "wl_agent.h"
 #include "wl_draw.h"

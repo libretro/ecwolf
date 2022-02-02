@@ -110,6 +110,7 @@ class SoundInformation
 		const SoundData	&operator[] (const char* logical) const { return operator[](FindSound(logical)); }
 		const SoundData	&operator[] (const SoundIndex &index) const;
 		uint32_t		GetLastPlayTick(const SoundData &sound) const { return lastPlayTicks[sound.index]; }
+		int				GetMusicLumpNum(FString song) const;
 		void			SetLastPlayTick(const SoundData &sound, uint32_t value) const { lastPlayTicks[sound.index] = value; }
 
 	protected:
@@ -118,9 +119,16 @@ class SoundInformation
 		void		ParseSoundInformation(int lumpNum);
 
 	private:
+		struct MusicData
+		{
+			FString Name;
+			int WadNum;
+		};
+
 		SoundData			nullIndex;
 		TArray<SoundData>	sounds;
 		TArray<uint32_t>	lastPlayTicks;
+		TMap<FName, MusicData> MusicAliases;
 
 		struct HashIndex;
 		HashIndex*	hashTable;

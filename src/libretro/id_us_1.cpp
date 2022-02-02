@@ -35,8 +35,6 @@
 //	Internal variables
 #define	ConfigVersion	1
 
-static	bool		US_Started;
-
 HighScore	Scores[MaxScores] =
 			{
 				{"id software-'92",10000,"1",""},
@@ -51,34 +49,6 @@ HighScore	Scores[MaxScores] =
 //	Internal routines
 
 //	Public routines
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_Startup() - Starts the User Mgr
-//
-///////////////////////////////////////////////////////////////////////////
-void US_Startup()
-{
-	if (US_Started)
-		return;
-
-	US_Started = true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-//
-//	US_Shutdown() - Shuts down the User Mgr
-//
-///////////////////////////////////////////////////////////////////////////
-void
-US_Shutdown(void)
-{
-	if (!US_Started)
-		return;
-
-	US_Started = false;
-}
 
 //	Window/Printing routines
 

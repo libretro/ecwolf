@@ -73,6 +73,11 @@
 #include "am_map.h"
 #include "wl_loadsave.h"
 #include "compat/msvc.h"
+#include "thinker.h"
+#include "thingdef/thingdef.h"
+#include "farchive.h"
+#include "thinker.h"
+#include "thingdef/thingdef.h"
 
 static void fallback_log(enum retro_log_level level, const char *fmt, ...);
 
@@ -376,22 +381,17 @@ void libretro_log(const char *format, ...)
 	va_end(va);
 }
 
-void Quit (const char *errorStr, ...)
+void Quit ()
 {
 	va_list va;
-	char formatted[1024];
 	struct retro_message msg;
 
-	va_start(va, errorStr);
-	vsnprintf(formatted, sizeof(formatted) - 1, errorStr, va);
-	va_end(va);
-
-	libretro_log("Fatal error: %s", formatted);
-   msg.msg    = formatted;
+	libretro_log("Fatal error");
+	msg.msg    = "Fatal error";
 	msg.frames = fp10s;
 	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
 	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
-	throw CFatalError(formatted);
+	throw CFatalError("Fatal error");
 }
 
 void retro_unload_game()
@@ -806,7 +806,7 @@ bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 		language.SetupStrings();
 	}
    
-	InitThinkerList();
+	thinkerList.DestroyAll(static_cast<ThinkerList::Priority>(0));
 
 	R_InitRenderer();
 
@@ -1572,7 +1572,7 @@ bool retro_unserialize(const void *data_, size_t size)
 	FString mapname;
 	arc << mapname;
 	strcpy(gamestate.mapname, mapname);
-	thinkerList->DestroyAll(ThinkerList::TRAVEL);
+	thinkerList.DestroyAll(ThinkerList::TRAVEL);
 	if (!isGameless) {
 		loadedgame = true;
 		SetupGameLevel();
@@ -1688,4 +1688,21 @@ void ReadConfig(void)
 
 	// Propogate localDesiredFOV to players[0]
 	players[0].SetFOV(localDesiredFOV);
+}
+
+void I_FatalError (const char *format, ...)
+{
+        struct retro_message msg;
+	va_list vlist;
+	va_start(vlist, format);
+	FString error;
+	error.VFormat(format, vlist);
+	va_end(vlist);
+
+	msg.msg    = error.GetChars();
+	msg.frames = 360;
+	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, (void*)&msg);
+
+	environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0);
+	throw CFatalError(error);
 }

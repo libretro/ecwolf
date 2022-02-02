@@ -9,6 +9,7 @@
 #include "id_vh.h"
 #include "id_us.h"
 #include "language.h"
+#include "v_video.h"
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_inter.h"

@@ -41,6 +41,7 @@
 #include "language.h"
 #include "r_sprites.h"
 #include "tarray.h"
+#include "v_video.h"
 #include "wl_agent.h"
 #include "wl_draw.h"
 #include "wl_game.h"

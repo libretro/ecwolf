@@ -435,7 +435,7 @@ void PlayLoopA (void)
 		for (unsigned int i = 0;i < tics;++i)
 		{
 			++gamestate.TimeCount;
-			thinkerList->Tick();
+			thinkerList.Tick();
 			AActor::FinishSpawningActors();
 			ClearActions();
 		}

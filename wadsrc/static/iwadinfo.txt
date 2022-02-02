@@ -153,6 +153,26 @@ IWad
 	Game = "MacWolf3D"
 }
 
+IWad
+{
+	Name = "Wolfstone 3D"
+	Autoname = "Wolf.Wolfstone.Wolfstone3D"
+	Mapinfo = "mapinfo/wolf3d.txt"
+	MustContain = "WOLFSTON", "VSWAP", "GAMEMAPS", "VGAGRAPH"
+	Flags = HelpHack
+	Game = "Wolf3D"
+}
+
+IWad
+{
+	Name = "Elite Hans: Die Neue Ordnung"
+	Autoname = "Wolf.Wolfstone.EliteHans"
+	Mapinfo = "mapinfo/wolf3d.txt"
+	MustContain = "ELITEHAN", "VSWAP", "GAMEMAPS", "VGAGRAPH"
+	Flags = HelpHack
+	Game = "Wolf3D"
+}
+
 LevelSet "wolflvls.bin"
 {
 	Name = "Wolfenstein 3D: The Second Encounter"
@@ -169,4 +189,6 @@ Names
 	"huntbgin.wad"
 	"wolfdemo.bin"
 	"wolf3d.bin"
+	"elitehans.pk3"
+	"wolfstone.pk3"
 }

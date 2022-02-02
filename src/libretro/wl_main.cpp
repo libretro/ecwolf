@@ -107,8 +107,6 @@ fixed    yaspect;
 int32_t  heightnumerator;
 extern  bool menusAreFaded;
 
-void    Quit (const char *error,...);
-
 bool	startgame;
 bool	loadedgame;
 int		panxadjustment;
@@ -193,7 +191,6 @@ void State_Delay(wl_state_t *state, longword delay) {
 
 void ShutdownId (void)
 {
-	US_Shutdown ();         // This line is completely useless...
 	SD_Shutdown ();
 	IN_Shutdown ();
 }
@@ -485,7 +482,6 @@ void InitGame()
 	IN_Startup ();
 	SD_Startup ();
 	printf("US_Startup: Starting the User Manager.\n");
-	US_Startup ();
 
 //
 // Load Keys

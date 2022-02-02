@@ -28,11 +28,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#ifdef __QNX__
+/* On QNX/Blackberry cstdarg is broken, on the other hand stdarg.h is
+   universal, hence let's use stdarg.h.  */
 #include <stdarg.h>
-#else
-#include <cstdarg>
-#endif
 
 #include "scanner_support.h"
 #include "scanner.h"
