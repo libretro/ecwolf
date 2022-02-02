@@ -226,6 +226,52 @@ private:
 	void EnsureSpace(int samples);
 };
 
+class Mix_Chunk_N3D : public Mix_Chunk_Sampled
+{
+public:
+        Mix_Chunk_N3D(int rate, const byte *imf, size_t imf_size,
+		      bool isLooping);
+        ~Mix_Chunk_N3D() {
+		free (midiFile);
+		delete midiOpl;
+	}
+
+	int GetLengthTicks() {
+		return sample_count * TICRATE / rate + 1;
+	}
+
+	void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
+		     fixed leftmul, fixed rightmul) {
+		EnsureSynthesis(start_ticks + (size * TICRATE) / output_rate + 1);
+		MixSamples(samples, output_rate, size, start_ticks, leftmul, rightmul);
+	}
+
+private:
+	size_t samples_allocated;
+	bool   midiOn;
+	int32_t midiError;
+	float       midiTimeScale;
+	const byte        *midiData, *midiDataStart;
+	byte       *midiFile;
+	byte        midiRunningStatus;
+	longword    midiLength, midiDeltaTime;
+	int32_t     midiDivision;
+	bool N3DTempoEmulation;
+	longword    curtics;
+	DBOPL::Chip *midiOpl;
+
+	void EnsureSynthesis(int tics);
+	void EnsureSpace(int samples);
+	void MIDI_IRQService(void);
+	void MIDI_DoEvent(void);
+	void MIDI_ProcessEvent(byte event);
+	void MIDI_SkipMetaEvent(void);
+	void MIDI_ProgramChange(int channel, int id);
+	void MIDI_NoteOn(int channel, byte note, byte velocity);
+	void MIDI_NoteOff(int channel, int note, int velocity);
+	longword MIDI_VarLength(void);
+};
+
 
 Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type);
 
@@ -488,7 +534,10 @@ extern bool palshifted;
 void DrawVictory (bool fromIntermission);
 extern bool store_files_in_memory;
 
-Mix_Chunk *SynthesizeAdlibIMF(const byte *dataRaw, size_t size);
+Mix_Chunk *SynthesizeAdlibIMFOrN3D(const byte *dataRaw, size_t size);
+bool midiN3DValidate(const byte *dataIn, size_t dataLen);
 void    SD_Startup_Adlib(void);
 Mix_Chunk *SynthesizeAdlib(const byte *dataRaw);
+void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length);
+
 #endif

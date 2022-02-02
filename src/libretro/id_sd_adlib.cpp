@@ -70,7 +70,7 @@ static inline void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const 
 	which.WriteReg(reg, val);
 }
 
-static inline void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length)
+void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length)
 {
 	Bit32s buffer[512 * 2];
 	int i;
@@ -228,8 +228,11 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
 		SDL_AlSetChanInst(musicOpl, &ChannelRelease, i);
 }
 
-Mix_Chunk *SynthesizeAdlibIMF(const byte *dataRaw, size_t size)
+Mix_Chunk *SynthesizeAdlibIMFOrN3D(const byte *dataRaw, size_t size)
 {
+	if (midiN3DValidate(dataRaw, size)) {
+		return new Mix_Chunk_N3D(synthesisRate, dataRaw, size, true);
+	}
 	int alLength = size / 4;
 	const byte *alSound = dataRaw;
 	if(alSound[0] != 0 || alSound[1] != 0) {

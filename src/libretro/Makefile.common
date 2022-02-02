@@ -221,7 +221,8 @@ endif
 
 ifneq ($(DISABLE_ADLIB), 1)
 	SOURCES_CXX += $(CORE_DIR)/src/dosbox/dbopl.cpp \
-		$(CORE_DIR)/src/libretro/id_sd_adlib.cpp
+		$(CORE_DIR)/src/libretro/id_sd_adlib.cpp \
+		$(CORE_DIR)/src/libretro/id_sd_n3dmus.cpp
 else
         CFLAGS += -DDISABLE_ADLIB
         CXXFLAGS += -DDISABLE_ADLIB

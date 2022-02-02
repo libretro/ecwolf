@@ -262,7 +262,8 @@ Mix_Chunk *GetMusic(const char* chunk)
 
 	FMemLump soundLump = Wads.ReadLump(lumpNum);
 
-	Mix_Chunk *res = SynthesizeAdlibIMF((const byte *) soundLump.GetMem(), size);
+	Mix_Chunk *res = SynthesizeAdlibIMFOrN3D((const byte *) soundLump.GetMem(), size);
+
 	music_cache[cacheptr].name = strdup(chunk);
 	music_cache[cacheptr].chunk = res;
 	cacheptr++;
