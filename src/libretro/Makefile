@@ -232,8 +232,8 @@ else ifeq ($(platform), windows_msvc2010_x64)
 	CC  = cl.exe
 	CXX = cl.exe
 
-	CFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
-	CXXFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+	CFLAGS += -wd4711 -wd4514 -wd4820 -wd4668 -wd4242 -wd4244 -wd4365 -DNO_VA_COPY=1
+	CXXFLAGS += -wd4711 -wd4514 -wd4820 -wd4668 -wd4242 -wd4244 -wd4365 -DNO_VA_COPY=1
 
 	PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin/amd64"):$(PATH)
 	PATH := $(PATH):$(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../IDE")
@@ -260,8 +260,8 @@ else ifeq ($(platform), windows_msvc2010_x86)
 	CC  = cl.exe
 	CXX = cl.exe
 
-	CFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
-	CXXFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+	CFLAGS += -wd4711 -wd4514 -wd4820 -wd4668 -wd4242 -wd4244 -wd4365 -DNO_VA_COPY=1
+	CXXFLAGS += -wd4711 -wd4514 -wd4820 -wd4668 -wd4242 -wd4244 -wd4365 -DNO_VA_COPY=1
 
 	PATH := $(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../../VC/bin"):$(PATH)
 	PATH := $(PATH):$(shell IFS=$$'\n'; cygpath "$(VS100COMNTOOLS)../IDE")
@@ -288,8 +288,8 @@ else ifeq ($(platform), windows_msvc2005_x86)
 	CC  = cl.exe
 	CXX = cl.exe
 
-	CFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
-	CXXFLAGS += -wd4711 -wd4514 -wd4820 -DNO_VA_COPY=1
+	CFLAGS += -wd4711 -wd4514 -wd4820 -wd4668 -wd4242 -wd4244 -wd4365 -DNO_VA_COPY=1
+	CXXFLAGS += -wd4711 -wd4514 -wd4820 -wd4668 -wd4242 -wd4244 -wd4365 -DNO_VA_COPY=1
 
 	PATH := $(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../../VC/bin"):$(PATH)
 	PATH := $(PATH):$(shell IFS=$$'\n'; cygpath "$(VS80COMNTOOLS)../IDE")
