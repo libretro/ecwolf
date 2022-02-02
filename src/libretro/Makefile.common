@@ -6,6 +6,12 @@ BZIP2_DIR   = $(CORE_DIR)/deps/bzip2
 JPEG_DIR    = $(CORE_DIR)/deps/jpeg-6b
 ZLIB_DIR   = $(CORE_DIR)/deps/zlib
 
+ifneq ($(STATIC_LINKING),1)
+ifeq (,$(findstring msvc,$(platform)))
+HAVE_LZMA = 1
+endif
+endif
+
 INCFLAGS   := \
 	-I$(CORE_DIR) \
 	-I$(CORE_DIR)/src \
@@ -22,8 +28,6 @@ INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
 ifeq ($(HAVE_LZMA), 1)
-INCFLAGS += -DHAVE_LZMA
-INCFLAGS += -I$(LZMA_DIR)/C
 DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
 					$(LZMA_DIR)/C/7zBuf.c \
 					$(LZMA_DIR)/C/7zCrc.c \
@@ -38,6 +42,10 @@ DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
 					$(LZMA_DIR)/C/Delta.c \
 					$(LZMA_DIR)/C/Lzma2Dec.c \
 					$(LZMA_DIR)/C/Bcj2.c
+LZMA_CXX :=	$(CORE_DIR)/src/resourcefiles/file_7z.cpp
+INCFLAGS +=     -I$(LZMA_DIR)/C
+else
+INCFLAGS +=     -DDISABLE_LZMA
 endif
 
 DEPS_BZIP2  := $(BZIP2_DIR)/blocksort.c \
@@ -213,12 +221,6 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/libretro/g_intermission.cpp \
 	$(CORE_DIR)/src/libretro/w32_random.cpp
 
-ifeq ($(HAVE_LZMA), 1)
-SOURCES_CXX += $(CORE_DIR)/src/resourcefiles/file_7z.cpp
-SOURCES_C   += $(DEPS_LZMA_C)
-endif
-
-
 ifneq ($(DISABLE_ADLIB), 1)
 	SOURCES_CXX += $(CORE_DIR)/src/dosbox/dbopl.cpp \
 		$(CORE_DIR)/src/libretro/id_sd_adlib.cpp \
@@ -227,6 +229,9 @@ else
         CFLAGS += -DDISABLE_ADLIB
         CXXFLAGS += -DDISABLE_ADLIB
 endif
+
+SOURCES_C += $(DEPS_LZMA_C)
+SOURCES_CXX += $(LZMA_CXX)
 
 ifneq ($(NO_STORE),1)
 # Don't bother with Steam/GOG FS 

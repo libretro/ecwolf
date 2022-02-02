@@ -226,7 +226,7 @@ FResourceFile *CheckGRP(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckRFF(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckPak(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckZip(const char *filename, FileReader *file, bool quiet);
-#ifdef HAVE_LZMA
+#ifndef DISABLE_LZMA
 FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet);
 #else
 static FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet) { return NULL; }
