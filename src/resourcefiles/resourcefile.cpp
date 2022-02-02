@@ -670,7 +670,6 @@ FExternalLump::~FExternalLump()
 // For external lumps this reopens the file each time it is accessed
 //
 //==========================================================================
-#ifdef LIBRETRO
 int FExternalLump::FillCache()
 {
 	Cache = new char[LumpSize];
@@ -687,5 +686,4 @@ int FExternalLump::FillCache()
 	RefCount = 1;
 	return 1;
 }
-#endif
 

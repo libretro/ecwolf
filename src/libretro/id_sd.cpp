@@ -35,6 +35,7 @@
 #include "id_sd.h"
 #include "state_machine.h"
 #include "wl_play.h"
+#include "dosbox/dbopl.h"
 
 static  bool					SD_Started;
 static  bool					nextsoundpos;
@@ -570,4 +571,10 @@ void Mix_Chunk_Sampled::MixSamples (int16_t *result, int output_rate, size_t siz
 		break;
 	}
 	}
+}
+
+void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const int &volume)
+{
+	which.SetVolume(volume);
+	which.WriteReg(reg, val);
 }

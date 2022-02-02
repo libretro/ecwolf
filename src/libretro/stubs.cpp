@@ -35,8 +35,6 @@
 //	Internal variables
 #define	ConfigVersion	1
 
-static	bool		US_Started;
-
 HighScore	Scores[MaxScores] =
 			{
 				{"id software-'92",10000,"1",""},

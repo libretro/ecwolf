@@ -21,6 +21,7 @@
 #include "g_intermission.h"
 #include "g_mapinfo.h"
 #include "r_sprites.h"
+#include "v_video.h"
 #include "wl_inter.h"
 #include "wl_draw.h"
 #include "wl_play.h"
@@ -1226,7 +1227,7 @@ bool GameMapEnd (wl_state_t *state)
 
 			LevelInfo &teleportMap = LevelInfo::FindByNumber(NewMap.newmap);
 			if(teleportMap.MapName[0] == 0)
-				Quit("Tried to teleport to unkown map.");
+				I_FatalError("Tried to teleport to unkown map.");
 			next = teleportMap.MapName;
 		}
 

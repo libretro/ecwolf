@@ -168,7 +168,7 @@ Mix_Chunk *SynthesizeAdlib(const byte *dataRaw)
 
 	if (!(inst->mSus | inst->cSus))
 	{
-		Quit("SDL_ALPlaySound() - Bad instrument");
+		I_FatalError("SDL_ALPlaySound() - Bad instrument");
 	}
 
 	SDL_AlSetFXInst(oplChip, inst);

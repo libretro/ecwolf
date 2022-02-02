@@ -442,7 +442,7 @@ static void HandleWord (wl_state_t *state)
 	{
 		wword[wordindex] = nextchar(state);
 		if (++wordindex == WORDLIMIT)
-			Quit ("PageLayout: Word limit exceeded");
+			I_FatalError ("PageLayout: Word limit exceeded");
 	}
 	wword[wordindex] = 0;            // stick a null at end for C
 
@@ -648,7 +648,7 @@ static int CountPages (wl_state_t *state)
 	} while (text(state)<bombpoint);
 
 	state->textposition = 0;
-	Quit ("CacheLayoutGraphics: No ^E to terminate file!");
+	I_FatalError ("CacheLayoutGraphics: No ^E to terminate file!");
 	return numpages;
 }
 
