@@ -44,6 +44,7 @@
 #include "filesys.h"
 #include "templates.h"
 #include "zdoomsupport.h"
+#include "doomerrors.h"
 
 //==========================================================================
 //
