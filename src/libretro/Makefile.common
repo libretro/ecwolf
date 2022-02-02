@@ -5,10 +5,7 @@ LZMA_DIR    = $(CORE_DIR)/deps/lzma
 BZIP2_DIR   = $(CORE_DIR)/deps/bzip2
 JPEG_DIR    = $(CORE_DIR)/deps/jpeg-6b
 ZLIB_DIR   = $(CORE_DIR)/deps/zlib
-
-ifeq (,$(findstring msvc,$(platform)))
 HAVE_LZMA = 1
-endif
 
 INCFLAGS   := \
 	-I$(CORE_DIR) \

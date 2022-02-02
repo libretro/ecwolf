@@ -38,6 +38,9 @@
 #endif
 #ifndef DISABLE_LZMA
 #include "LzmaDec.h"
+#ifdef _MSC_VER
+#define DWORD_IS_DEFINED 1
+#endif
 #endif
 
 #include "files.h"
