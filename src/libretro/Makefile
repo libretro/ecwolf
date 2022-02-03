@@ -142,11 +142,11 @@ else ifeq ($(platform), emscripten)
    STATIC_LINKING=1
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), ps2)
-   TARGET := $(TARGET_NAME)_ps2.a
-   CC = ee-gcc
-   CXX = ee-g++
-   AR = ee-ar
-   COMMON_CFLAGS += -DPS2 -G0 -D__sun
+   TARGET := $(TARGET_NAME)_libretro_ps2.a
+   CC = mips64r5900el-ps2-elf-gcc
+   CXX = mips64r5900el-ps2-elf-g++
+   AR = mips64r5900el-ps2-elf-ar
+   COMMON_CFLAGS += -G0 -DPS2
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    STATIC_LINKING = 1
 else ifeq ($(platform), psp1)
