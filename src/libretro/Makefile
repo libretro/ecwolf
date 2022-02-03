@@ -142,11 +142,11 @@ else ifeq ($(platform), emscripten)
    STATIC_LINKING=1
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), ps2)
-   TARGET := $(TARGET_NAME)_ps2.a
-   CC = ee-gcc
-   CXX = ee-g++
-   AR = ee-ar
-   COMMON_CFLAGS += -DPS2 -G0 -D__sun
+   TARGET := $(TARGET_NAME)_libretro_ps2.a
+   CC = mips64r5900el-ps2-elf-gcc
+   CXX = mips64r5900el-ps2-elf-g++
+   AR = mips64r5900el-ps2-elf-ar
+   COMMON_CFLAGS += -G0 -DPS2
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    STATIC_LINKING = 1
 else ifeq ($(platform), psp1)
@@ -312,6 +312,53 @@ else ifeq ($(platform), windows_msvc2005_x86)
 	LDFLAGS += -DLL
 	CFLAGS += -D_CRT_SECURE_NO_DEPRECATE
 	LIBS = AdvAPI32.lib
+# RS90
+else ifeq ($(platform), rs90)
+   TARGET := $(TARGET_NAME)_libretro.so
+   CC = /opt/rs90-toolchain/usr/bin/mipsel-linux-gcc
+   CXX = /opt/rs90-toolchain/usr/bin/mipsel-linux-g++
+   AR = /opt/rs90-toolchain/usr/bin/mipsel-linux-ar
+   fpic := -fPIC
+   SHARED := -shared -Wl,-version-script=$(CORE_DIR)/link.T
+   PLATFORM_DEFINES := -DCC_RESAMPLER -DCC_RESAMPLER_NO_HIGHPASS
+   COMMON_CFLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+
+# GCW0
+else ifeq ($(platform), gcw0)
+   TARGET := $(TARGET_NAME)_libretro.so
+   CC = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
+   CXX = /opt/gcw0-toolchain/usr/bin/mipsel-linux-g++
+   AR = /opt/gcw0-toolchain/usr/bin/mipsel-linux-ar
+   fpic := -fPIC
+   SHARED := -shared -Wl,--version-script=link.T -Wl,-no-undefined
+   COMMON_CFLAGS += -march=mips32 -mtune=mips32r2 -mhard-float
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   LIBS = -lm
+# RETROFW
+else ifeq ($(platform), retrofw)
+	EXT ?= so
+	TARGET := $(TARGET_NAME)_libretro.$(EXT)
+	CC = /opt/retrofw-toolchain/usr/bin/mipsel-linux-gcc
+	CXX = /opt/retrofw-toolchain/usr/bin/mipsel-linux-g++
+	AR = /opt/retrofw-toolchain/usr/bin/mipsel-linux-ar
+	fpic := -fPIC
+	SHARED := -shared -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
+	COMMON_CFLAGS += -ffast-math -march=mips32 -mtune=mips32 -mhard-float
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	LIBS = -lm
+# MIYOO
+else ifeq ($(platform), miyoo)
+	TARGET := $(TARGET_NAME)_libretro.so
+	fpic := -fPIC
+	SHARED := -shared -Wl,-version-script=link.T
+	CC = /opt/miyoo/usr/bin/arm-linux-gcc
+	CXX = /opt/miyoo/usr/bin/arm-linux-g++
+	AR = /opt/miyoo/usr/bin/arm-linux-ar
+	PLATFORM_DEFINES += -D_GNU_SOURCE
+	COMMON_CFLAGS += -fomit-frame-pointer -ffast-math -march=armv5te -mtune=arm926ej-s
+	COMMON_CFLAGS += -fno-common -ftree-vectorize -funswitch-loops
+   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else
    CC ?= gcc
    TARGET := $(TARGET_NAME)_libretro.dll
