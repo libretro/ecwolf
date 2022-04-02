@@ -117,7 +117,13 @@ function( add_pk3 PK3_NAME PK3_DIR )
 
 	# Touch the zipdir executable here so that the pk3s are forced to rebuild
 	# each time since their dependecy has "changed."
-	if( NOT ANDROID )
+	if( LIBRETRO )
+		set(TARGET_DIR "$<TARGET_FILE_DIR:ecwolf_libretro>")
+		add_custom_target( ${PK3_TARGET} ALL
+			COMMAND zipdir -udf $<TARGET_FILE_DIR:ecwolf_libretro>/${PK3_NAME} ${PK3_DIR}
+			DEPENDS zipdir )
+		install(FILES ${TARGET_DIR}/${PK3_NAME} DESTINATION "${CMAKE_INSTALL_DATAPRODUCTDIR}")
+	elseif( NOT ANDROID )
 		set(TARGET_DIR "$<TARGET_FILE_DIR:engine>")
 		add_custom_target( ${PK3_TARGET} ALL
 			COMMAND zipdir -udf $<TARGET_FILE_DIR:engine>/${PK3_NAME} ${PK3_DIR}
@@ -140,6 +146,12 @@ option(USE_LIBTEXTSCREEN "Use libtextscreen instead of console iwad picker." OFF
 option(INTERNAL_ZLIB "Force build with internal zlib" OFF)
 option(INTERNAL_BZIP2 "Force build with internal bzip2" OFF)
 option(INTERNAL_JPEG "Force build with internal libjpeg" OFF)
+
+if(LIBRETRO)
+	set(INTERNAL_JPEG ON)
+	set(INTERNAL_BZIP2 ON)
+	set(INTERNAL_ZLIB ON)
+endif()
 
 if(NOT INTERNAL_ZLIB)
 	find_package(ZLIB QUIET)
@@ -191,7 +203,9 @@ endif()
 add_subdirectory(tools/zipdir)
 add_subdirectory(tools/updaterevision)
 
-add_subdirectory(deps/gdtoa)
+if(NOT LIBRETRO)
+        add_subdirectory(deps/gdtoa)
+endif()
 add_subdirectory(deps/lzma)
 if(GPL AND USE_LIBTEXTSCREEN)
 	add_subdirectory(deps/textscreen)

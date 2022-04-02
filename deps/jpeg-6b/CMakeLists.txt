@@ -1,6 +1,8 @@
 cmake_minimum_required( VERSION 2.8.12 )
 
-set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC" )
+if(LIBRETRO AND NOT LIBRETRO_STATIC)
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
 
 if( CMAKE_COMPILER_IS_GNUC )
 	set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -fomit-frame-pointer" )
