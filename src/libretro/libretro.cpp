@@ -223,11 +223,19 @@ public:
 
 protected:
 	void ComputeEffectivePalette() {
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++) {
+#ifdef PS2
+			effective_palette_[i] =
+				(FlashedPalette[i].b<<16)
+				| (FlashedPalette[i].g<<8)
+				| (FlashedPalette[i].r);
+#else
 			effective_palette_[i] =
 				(FlashedPalette[i].r<<16)
 				| (FlashedPalette[i].g<<8)
 				| (FlashedPalette[i].b);
+#endif
+		}
 	}
 };
 
@@ -236,11 +244,19 @@ public:
 	LibretroFB16 (int width, int height) : LibretroFB<uint16_t> (width, height)  {}
 protected:
 	void ComputeEffectivePalette() {
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++) {
+#ifdef PS2
+			effective_palette_[i] =
+				(FlashedPalette[i].b >> 3 << 10)
+				| (FlashedPalette[i].g >> 3 << 5)
+				| (FlashedPalette[i].r >> 3);
+#else
 			effective_palette_[i] =
 				(FlashedPalette[i].r >> 3 << 11)
 				| (FlashedPalette[i].g >> 2 << 5)
 				| (FlashedPalette[i].b >> 3);
+#endif
+		}
 	}
 };
 
