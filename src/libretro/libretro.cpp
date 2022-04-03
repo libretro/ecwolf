@@ -18,6 +18,7 @@
 
 #include "wl_def.h"
 #include "c_cvars.h"
+#include "streams/file_stream.h" // Must be before id_sd.h
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -26,7 +27,6 @@
 #include "wl_play.h"
 #include "wl_net.h"
 #include "libretro.h"
-#include "streams/file_stream.h"
 #include "retro_dirent.h"
 #include "state_machine.h"
 #include "wl_def.h"

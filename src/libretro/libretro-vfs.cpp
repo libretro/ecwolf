@@ -35,6 +35,7 @@
 
 #include "wl_def.h"
 #include "c_cvars.h"
+#include "streams/file_stream.h" // Must be before id_sd.h
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -87,7 +88,6 @@
 #include "g_intermission.h"
 #include "am_map.h"
 #include "wl_loadsave.h"
-#include "streams/file_stream.h"
 #include "retro_dirent.h"
 #include "vfs/vfs_implementation.h"
 
