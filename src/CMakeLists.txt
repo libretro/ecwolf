@@ -270,6 +270,12 @@ else()
 	check_function_exists(strnicmp STRNICMP_EXISTS)
 	check_function_exists(atoll ATOLL_EXISTS)
 endif()
+
+check_function_exists(malloc_usable_size MALLOC_USABLE_SIZE)
+if(MALLOC_USABLE_SIZE)
+	target_compile_definitions(${ENGINE_TARGET} PRIVATE -DHAS_MALLOC_USABLE_SIZE=1)
+endif()
+
 if(NOT STRICMP_EXISTS)
 	target_compile_definitions(${ENGINE_TARGET} PRIVATE -Dstricmp=strcasecmp)
 endif()
