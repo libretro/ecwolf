@@ -226,11 +226,7 @@ FResourceFile *CheckGRP(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckRFF(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckPak(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckZip(const char *filename, FileReader *file, bool quiet);
-#ifndef DISABLE_LZMA
 FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet);
-#else
-static FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet) { return NULL; }
-#endif
 FResourceFile *CheckLump(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckDir(const char *filename, FileReader *file, bool quiet);
 FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet);
