@@ -169,7 +169,7 @@ libretro-build-osx-ppc:
     - .libretro-osx-cmake-ppc
     - .core-defs
   variables:
-    CORE_ARGS: -DCMAKE_BUILD_TYPE=Release -DLIBRETRO=ON -DCMAKE_SHARED_LIBRARY_RUNTIME_C_FLAG=""
+    CORE_ARGS: -DCMAKE_BUILD_TYPE=Release -DLIBRETRO=ON -DCMAKE_OSX_DEPLOYMENT_TARGET="10.4"
 
 # Windows msvc10 64-bit
 libretro-build-windows-msvc10-x64:
