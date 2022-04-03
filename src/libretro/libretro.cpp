@@ -1144,9 +1144,9 @@ void retro_run(void)
 		wl_stage_t oldstage = g_state.stage;
 		bool oldQuiz = g_state.isInQuiz;
 		expectframes = !!TopLoopStep(&g_state, &input);
-		if (expectframes != g_state.frame_counter - oldfc) {
+		if (expectframes != (int) (g_state.frame_counter - oldfc)) {
 			fprintf(stderr, "State %d[%d] produces %d frames but reports %d\n", oldstage, oldQuiz,
-				g_state.frame_counter - oldfc, expectframes);
+				(int) (g_state.frame_counter - oldfc), expectframes);
 		}
 	}
 	while (expectframes == 0);

@@ -390,7 +390,7 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 {
 	PCSound *sound = (PCSound*) dataRaw;
-	int pcPhaseTick = 0;
+	longword pcPhaseTick = 0;
 	int pcLastSample = 0;
 	longword	pcPhaseLength = 0;
 	int pcLength = LittleLong(sound->common.length);
@@ -439,7 +439,9 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
 	if (!which.HasType(type))
 		return NULL;
 	int idx = which.GetIndex();
-	if (idx >= synthCache.Size())
+	if (idx < 0)
+		return NULL;
+	if (idx >= (int) synthCache.Size())
 		synthCache.Resize(idx + 1);
 	SynthCacheItem &synth = synthCache[idx];
 	switch(type) {

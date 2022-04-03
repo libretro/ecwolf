@@ -326,7 +326,7 @@ void AdvanceIntermission(wl_state_t *wlstate, struct IntermissionGState *state)
 		state->finished = true;
 		return;
 	}
-	if (state->step == -1) {		
+	if (state->step < 0) {		
 		// For a cast call we want the bar area to display the names
 		if(viewsize > 20)
 		{
@@ -337,7 +337,7 @@ void AdvanceIntermission(wl_state_t *wlstate, struct IntermissionGState *state)
 		state->step = 0;
 		return;
 	}
-	if (state->step >= state->intermission->Actions.Size()) {
+	if (state->step >= (int) state->intermission->Actions.Size()) {
 		if(state->intermission->Link != NAME_None) {
 			state->intermission_name = state->intermission->Link;
 			state->intermission = IntermissionInfo::Find(state->intermission->Link);

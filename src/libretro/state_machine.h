@@ -196,7 +196,7 @@ public:
 };
 
 namespace DBOPL {
-	class Chip;
+	struct Chip;
 }
 
 class Mix_Chunk_IMF : public Mix_Chunk_Sampled
@@ -231,10 +231,7 @@ class Mix_Chunk_N3D : public Mix_Chunk_Sampled
 public:
         Mix_Chunk_N3D(int rate, const byte *imf, size_t imf_size,
 		      bool isLooping);
-        ~Mix_Chunk_N3D() {
-		free (midiFile);
-		delete midiOpl;
-	}
+        ~Mix_Chunk_N3D();
 
 	int GetLengthTicks() {
 		return sample_count * TICRATE / rate + 1;
@@ -291,7 +288,7 @@ struct SoundChannelState
 
 	bool isPlaying(long long currentTick) {
 		return sample != NULL
-			&& startTick <= currentTick && (stopTicks == -1 || currentTick < stopTicks);
+		  && (long long) startTick <= currentTick && (stopTicks == -1 || currentTick < stopTicks);
 	}
 
 	void clear() {
