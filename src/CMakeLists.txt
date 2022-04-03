@@ -12,6 +12,8 @@ else()
         set(ENGINE_TARGET engine)
 endif()
 
+set(DISABLE_ADLIB OFF)      
+
 # The ability to start with an empty target was added in CMake 3.11 so since
 # for Android we use a shared library we need to use a macro to determine which
 # function to call.
@@ -151,8 +153,6 @@ if(LIBRETRO)
     libretro/libretro-vfs.cpp
     libretro/id_in.cpp
     libretro/id_sd.cpp
-    libretro/id_sd_adlib.cpp
-    libretro/id_sd_n3dmus.cpp
     libretro/id_us_1.cpp
     libretro/wl_play.cpp
     libretro/wl_game.cpp
@@ -161,6 +161,17 @@ if(LIBRETRO)
     libretro/wl_text.cpp
     libretro/g_conversation.cpp
     libretro/g_intermission.cpp)
+  if(PS2)
+    set(DISABLE_ADLIB ON)
+  endif()
+  if(NOT DISABLE_ADLIB)
+    target_sources(${ENGINE_TARGET} PRIVATE
+      libretro/id_sd_adlib.cpp
+      libretro/id_sd_n3dmus.cpp)
+  else()
+    target_compile_definitions(${ENGINE_TARGET} PRIVATE -DDISABLE_ADLIB=1)
+  endif()
+
   if(NOT LIBRETRO_STATIC)
 	set(ENGINE_BINARY_NAME "ecwolf_libretro${LIBRETRO_SUFFIX}")
   endif()
@@ -251,7 +262,9 @@ endif()
       
 if(GPL)
 	target_compile_definitions(${ENGINE_TARGET} PRIVATE -DUSE_GPL)
-	target_sources(${ENGINE_TARGET} PRIVATE dosbox/dbopl.cpp)
+	if(NOT DISABLE_ADLIB)
+		target_sources(${ENGINE_TARGET} PRIVATE dosbox/dbopl.cpp)
+	endif()
 
 	if(USE_LIBTEXTSCREEN)
 		target_compile_definitions(${ENGINE_TARGET} PRIVATE -DUSE_TEXTSCREEN)

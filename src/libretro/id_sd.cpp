@@ -577,6 +577,8 @@ void Mix_Chunk_Sampled::MixSamples (int16_t *result, int output_rate, size_t siz
 
 void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const int &volume)
 {
+#ifndef DISABLE_ADLIB
 	which.SetVolume(volume);
 	which.WriteReg(reg, val);
+#endif
 }
