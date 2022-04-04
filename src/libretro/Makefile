@@ -177,6 +177,15 @@ else ifeq ($(platform), wiiu)
    PLATFORM_DEFINES += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    COMMON_CFLAGS += $(PLATFORM_DEFINES)
    STATIC_LINKING=1
+# DOS
+else ifeq ($(platform), dos)
+	TARGET := $(TARGET_NAME)_libretro_$(platform).a
+	CC = i586-pc-msdosdjgpp-gcc
+	AR = i586-pc-msdosdjgpp-ar
+	CXX = i586-pc-msdosdjgpp-g++
+	COMMON_CFLAGS += -march=i386
+	STATIC_LINKING=1
+
 else ifeq ($(platform), wii)
    EXT=a
    TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
