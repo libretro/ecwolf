@@ -1287,7 +1287,7 @@ bool TopLoopStep(wl_state_t *state, const wl_input_state_t *input) {
 			state->wasAcked = true;
 			state->isInWait = false;
 		}
-		if (state->waitCanTimeout && state->ackTimeout < GetTimeCount())
+		if (state->waitCanTimeout && state->ackTimeout < (longword) GetTimeCount())
 			state->isInWait = false;
 		VH_UpdateScreen();
 		return true;

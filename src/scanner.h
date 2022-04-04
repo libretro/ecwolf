@@ -95,7 +95,7 @@ class Scanner
 			int				number;
 			double			decimal;
 			bool			boolean;
-			char			token;
+			signed char			token;
 			unsigned int	tokenLine;
 			unsigned int	tokenLinePosition;
 			unsigned int	scanPos;

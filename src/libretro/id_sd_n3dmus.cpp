@@ -428,7 +428,7 @@ Mix_Chunk_N3D::MIDI_IRQService(void)
 
 void Mix_Chunk_N3D::EnsureSpace(int need_samples)
 {
-	if (samples_allocated >= need_samples)
+	if ((int)samples_allocated >= need_samples)
 		return;
 	size_t nl = need_samples + need_samples / 2;
 	if (nl < 256)
@@ -520,4 +520,9 @@ Mix_Chunk_N3D::Mix_Chunk_N3D(int rate, const byte *dataIn, size_t dataLen,
     midiError = 0;
 
     curtics = 0;
+}
+
+Mix_Chunk_N3D::~Mix_Chunk_N3D() {
+    free (midiFile);
+    delete midiOpl;
 }

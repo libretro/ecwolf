@@ -237,7 +237,7 @@ Mix_Chunk *SynthesizeAdlibIMFOrN3D(const byte *dataRaw, size_t size)
 	const byte *alSound = dataRaw;
 	if(alSound[0] != 0 || alSound[1] != 0) {
 		alLength = ReadLittleShort(alSound) / 4;
-		if (alLength > (size - 2) / 4)
+		if (alLength > (int) (size - 2) / 4)
 			alLength = (size - 2) / 4;
 		alSound += 2;
 	}

@@ -51,7 +51,7 @@
 #endif
 #if defined(__APPLE__)
 #define _msize(p)				malloc_size(p)
-#elif defined(__sun) || defined(__ANDROID__) || defined(__QNX__) || defined(USE_OWN_ADDED_SIZE)
+#elif defined(__sun) || defined(__ANDROID__) || defined(__QNX__) || defined(USE_OWN_ADDED_SIZE) || defined(__DJGPP__) || defined(__UCLIBC__) && !defined(HAS_MALLOC_USABLE_SIZE)
 #define _msize(p)				(*((size_t*)(p)-1))
 #define OWN_ADDED_SIZE 1
 #elif !defined(_WIN32)

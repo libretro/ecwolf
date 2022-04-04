@@ -1008,12 +1008,12 @@ FArchive& FArchive::StoreInt(void *p, size_t sz)
 		unsigned char b[8];
 	} buffer;
   	if (m_Storing) {
-		for (int i = 0; i < sz; i++)
+		for (size_t i = 0; i < sz; i++)
 			buffer.b[i] = ((unsigned char *)p)[sz - i - 1];
 		Write (buffer.b, sz);
 	} else {
 		Read (buffer.b, sz);
-		for (int i = 0; i < sz; i++)
+		for (size_t i = 0; i < sz; i++)
 			((unsigned char *)p)[sz - i - 1] = buffer.b[i];
 	}
 #endif

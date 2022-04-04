@@ -328,7 +328,7 @@ namespace StringFormat
 		 */
 		const char *decimal_point = ".";/* locale specific decimal point */
 		int signflag;					/* true if float is negative */
-		int expt;						/* integer value of exponent */
+		int expt = 0;						/* integer value of exponent */
 		char expchar = 'e';				/* exponent character: [eEpP\0] */
 		char *dtoaend;					/* pointer to end of converted digits */
 		int expsize = 0;				/* character count for expstr */

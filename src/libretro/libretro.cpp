@@ -18,6 +18,7 @@
 
 #include "wl_def.h"
 #include "c_cvars.h"
+#include "streams/file_stream.h" // Must be before id_sd.h
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -26,7 +27,6 @@
 #include "wl_play.h"
 #include "wl_net.h"
 #include "libretro.h"
-#include "streams/file_stream.h"
 #include "retro_dirent.h"
 #include "state_machine.h"
 #include "wl_def.h"
@@ -223,11 +223,19 @@ public:
 
 protected:
 	void ComputeEffectivePalette() {
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++) {
+#ifdef PS2
+			effective_palette_[i] =
+				(FlashedPalette[i].b<<16)
+				| (FlashedPalette[i].g<<8)
+				| (FlashedPalette[i].r);
+#else
 			effective_palette_[i] =
 				(FlashedPalette[i].r<<16)
 				| (FlashedPalette[i].g<<8)
 				| (FlashedPalette[i].b);
+#endif
+		}
 	}
 };
 
@@ -236,11 +244,19 @@ public:
 	LibretroFB16 (int width, int height) : LibretroFB<uint16_t> (width, height)  {}
 protected:
 	void ComputeEffectivePalette() {
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++) {
+#ifdef PS2
+			effective_palette_[i] =
+				(FlashedPalette[i].b >> 3 << 10)
+				| (FlashedPalette[i].g >> 3 << 5)
+				| (FlashedPalette[i].r >> 3);
+#else
 			effective_palette_[i] =
 				(FlashedPalette[i].r >> 3 << 11)
 				| (FlashedPalette[i].g >> 2 << 5)
 				| (FlashedPalette[i].b >> 3);
+#endif
+		}
 	}
 };
 
@@ -1144,9 +1160,9 @@ void retro_run(void)
 		wl_stage_t oldstage = g_state.stage;
 		bool oldQuiz = g_state.isInQuiz;
 		expectframes = !!TopLoopStep(&g_state, &input);
-		if (expectframes != g_state.frame_counter - oldfc) {
+		if (expectframes != (int) (g_state.frame_counter - oldfc)) {
 			fprintf(stderr, "State %d[%d] produces %d frames but reports %d\n", oldstage, oldQuiz,
-				g_state.frame_counter - oldfc, expectframes);
+				(int) (g_state.frame_counter - oldfc), expectframes);
 		}
 	}
 	while (expectframes == 0);

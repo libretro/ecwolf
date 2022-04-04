@@ -1343,11 +1343,11 @@ void FMultiPatchTexture::ResolvePatches()
 				TArray<FTextureID> list;
 				TexMan.ListTextures(Inits[i].TexName, list, true);
 				// ListTextures should give the newest texture first. Could probably skip zero here, but why micro-optimize?
-				for (unsigned int i = 0; i < list.Size(); ++i)
+				for (unsigned int j = 0; j < list.Size(); ++j)
 				{
-					if (list[i] != id && !TexMan[list[i]]->bMultiPatch)
+					if (list[j] != id && !TexMan[list[j]]->bMultiPatch)
 					{
-						texno = list[i];
+						texno = list[j];
 						break;
 					}
 				}

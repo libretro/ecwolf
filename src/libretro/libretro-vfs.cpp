@@ -35,6 +35,7 @@
 
 #include "wl_def.h"
 #include "c_cvars.h"
+#include "streams/file_stream.h" // Must be before id_sd.h
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -87,7 +88,6 @@
 #include "g_intermission.h"
 #include "am_map.h"
 #include "wl_loadsave.h"
-#include "streams/file_stream.h"
 #include "retro_dirent.h"
 #include "vfs/vfs_implementation.h"
 
@@ -131,7 +131,7 @@ retro_vfs_open_ro(const char *filename) {
 	struct retro_vfs_wrapped_file_handle *ret = (struct retro_vfs_wrapped_file_handle *) malloc (sizeof (*ret));
 	CHECKMALLOCRESULT(ret);
 	memset(ret, 0, sizeof(*ret));
-	for (int i = 0; i < MemoryFiles.Size(); i++) {
+	for (size_t i = 0; i < MemoryFiles.Size(); i++) {
 		if (MemoryFiles[i].filename.CompareNoCase(filename) == 0) {
 			ret->type = retro_vfs_wrapped_file_handle::MEM;
 			ret->memstore = &MemoryFiles[i];
@@ -170,8 +170,9 @@ static int64_t retro_vfs_size(struct retro_vfs_wrapped_file_handle *stream)
 		return filestream_get_size(stream->lr);
 	case retro_vfs_wrapped_file_handle::MEM:
 		return stream->memstore->length;
+	default:
+	  	return -1;
 	}
-	return -1;
 }
 
 static int64_t retro_vfs_tell(struct retro_vfs_wrapped_file_handle *stream)
@@ -181,9 +182,10 @@ static int64_t retro_vfs_tell(struct retro_vfs_wrapped_file_handle *stream)
 		return filestream_tell(stream->lr);
 	case retro_vfs_wrapped_file_handle::MEM:
 		return stream->mem_pos;
+	default:
+	  	assert(0);
+		return -1;
 	}
-	assert(0);
-	return -1;
 }
 
 static void retro_vfs_close(struct retro_vfs_wrapped_file_handle *stream)
