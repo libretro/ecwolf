@@ -149,6 +149,7 @@ else ifeq ($(platform), ps2)
    COMMON_CFLAGS += -G0 -DPS2
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    STATIC_LINKING = 1
+   DISABLE_ADLIB = 1
 else ifeq ($(platform), psp1)
    TARGET := $(TARGET_NAME)_libretro_psp1.a
    CC = psp-gcc
