@@ -153,6 +153,7 @@ enum SampleFormat {
 
 struct Mix_Chunk
 {
+	virtual ~Mix_Chunk() {}
 public:
 	virtual void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
 			     fixed leftmul, fixed rightmul) = 0;
@@ -161,6 +162,10 @@ public:
 	
 class Mix_Chunk_Sampled : public Mix_Chunk
 {
+public:
+	virtual ~Mix_Chunk_Sampled() {
+		free(chunk_samples);
+	}
 protected:
 	int rate;
 	int sample_count;
@@ -204,7 +209,7 @@ class Mix_Chunk_IMF : public Mix_Chunk_Sampled
 public:
         Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
 		      bool isLooping);
-        ~Mix_Chunk_IMF() {
+        virtual ~Mix_Chunk_IMF() {
 		free (imf);
 	}
 

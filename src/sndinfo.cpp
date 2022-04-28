@@ -40,7 +40,9 @@
 #include "w_wad.h"
 #include "scanner.h"
 #include "zdoomsupport.h"
-#ifndef LIBRETRO
+#ifdef LIBRETRO
+#include "state_machine.h"
+#else
 #include <SDL_mixer.h>
 #endif
 
@@ -48,7 +50,9 @@
 // on Windows that make it difficult to forward declare. We'd prefer to not
 // include SDL_mixer.h in more places than we absolutely have to.
 Mix_ChunkDeleter::Mix_ChunkDeleter(Mix_Chunk *obj) {
-#ifndef LIBRETRO
+#ifdef LIBRETRO
+	delete obj;
+#else
 	Mix_FreeChunk(obj);
 #endif
 }
