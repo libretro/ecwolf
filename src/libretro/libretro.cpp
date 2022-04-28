@@ -399,7 +399,6 @@ void libretro_log(const char *format, ...)
 
 void Quit ()
 {
-	va_list va;
 	struct retro_message msg;
 
 	libretro_log("Fatal error");
