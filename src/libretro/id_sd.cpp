@@ -236,6 +236,10 @@ struct MusicCacheItem
 {
 	const char *name;
 	Mix_Chunk *chunk;
+
+	~MusicCacheItem() {
+		delete chunk;
+	}
 };
 
 #define MUSIC_CACHE_SIZE 20

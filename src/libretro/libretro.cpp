@@ -314,6 +314,10 @@ bool IVideo::SetResolution (int width, int height, int bits)
 		memcpy (palette, GPalette.BaseColors, sizeof(PalEntry)*256);
 	}
 
+	if (screen) {
+		delete screen;
+	}
+
 	screen = Video->CreateFrameBuffer(width, height, true, NULL);
 	GC::WriteBarrier(screen);
 	memcpy (screen->GetPalette(), palette, sizeof(PalEntry)*256);
@@ -399,7 +403,6 @@ void libretro_log(const char *format, ...)
 
 void Quit ()
 {
-	va_list va;
 	struct retro_message msg;
 
 	libretro_log("Fatal error");
@@ -413,6 +416,10 @@ void Quit ()
 void retro_unload_game()
 {
 	CallTerminateFunctions();
+	if (screen) {
+		delete screen;
+		screen = NULL;
+	}
 }
 
 static char g_wad_dir[1024];
