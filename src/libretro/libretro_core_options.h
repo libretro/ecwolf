@@ -379,6 +379,13 @@ struct retro_core_option_definition option_defs_us[] = {
 	},
 #endif
 	{
+		"ecwolf-preload-digisounds",
+		"Preload digitized sounds",
+		"Increases speed at cost of memory and initial load times",
+		BOOL_OPTIONS,
+		"enabled"
+	},
+	{
 		"ecwolf-panx-adjustment",
 		"Horizontal panning speed in automap",
 		"Multiplier for horizontal panning from 0 to 20",

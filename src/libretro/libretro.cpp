@@ -111,6 +111,7 @@ Aspect r_ratio = ASPECT_4_3, vid_aspect = ASPECT_NONE;
 fixed movebob = FRACUNIT;
 
 bool alwaysrun;
+bool preload_digital_sounds;
 float localDesiredFOV = 90.0f;
 
 class LibretroFBBase : public DFrameBuffer
@@ -599,6 +600,8 @@ static void update_variables(bool startup)
 #else
 	store_files_in_memory = get_bool_option("ecwolf-memstore");
 #endif
+	preload_digital_sounds = get_bool_option("ecwolf-preload-digisounds");
+	
 	int oldw = screen_width;
 	int oldh = screen_height;
 	int oldfp10s = fp10s;

@@ -325,36 +325,54 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 	if(size == 0)
 		return NULL;
 
-	FMemLump soundLump = Wads.ReadLump(which);
+	Mix_Chunk_Digital *ret = new Mix_Chunk_Digital(which);
+
+	if (ret && preload_digital_sounds) {
+		ret->loadSound();
+	}
+
+	return ret;
+}
+
+
+void Mix_Chunk_Digital::loadSound() {
+	if (chunk_samples != NULL) {
+		return;
+	}
+
+	FMemLump soundLump = Wads.ReadLump(whichLump);
+	size_t size = soundLump.GetSize();
+	void *mem = soundLump.GetMem();
 
 	// 0x2A is the size of the sound header. From what I can tell the csnds
 	// have mostly garbage filled headers (outside of what is precisely needed
 	// since the sample rate is hard coded). I'm not sure if the sounds are
 	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
-	if(size > 0x2A && BigShort(*(WORD*)soundLump.GetMem()) == 1)
+	if(size > 0x2A && BigShort(*(WORD*)mem) == 1)
 	{
-		int sample_count = size - 0x2a;
-		void *samples = malloc (size - 0x2a);
-		CHECKMALLOCRESULT(samples);
-		memcpy(samples, ((char*)soundLump.GetMem())+0x2A, size-0x2A);
-		return new Mix_Chunk_Digital(
-			22050,
-			samples,
-			sample_count,
-			FORMAT_8BIT_LINEAR_UNSIGNED,
-			false
-		);
+		sample_count = size - 0x2a;
+
+		rate = 22050;
+		sample_format = FORMAT_8BIT_LINEAR_UNSIGNED;
+		isLooping = false;
+		isValid = true;
+		isMetadataLoaded = true;
+
+		chunk_samples = malloc (size - 0x2a);
+		if (chunk_samples)
+			memcpy(chunk_samples, ((char*)mem)+0x2A, size-0x2A);
+
+		return;
 	}
 
 	// TODO: support skipping extra headers
-	if (size > 44 && memcmp(soundLump.GetMem(), "RIFF", 4) == 0
-	    && memcmp((char*)soundLump.GetMem() + 8, "WAVEfmt ", 8) == 0) {
-		int rate = LittleLong(((DWORD*)soundLump.GetMem())[6]);
-		int bits = LittleShort(((WORD*)soundLump.GetMem())[17]);
-		int channels = LittleShort(((WORD*)soundLump.GetMem())[11]);
-		int format = LittleShort(((WORD*)soundLump.GetMem())[10]);
-		int sample_count = (size - 44) / (bits / 8);
-		SampleFormat sample_format;
+	if (size > 44 && memcmp(mem, "RIFF", 4) == 0
+	    && memcmp((char*)mem + 8, "WAVEfmt ", 8) == 0) {
+		rate = LittleLong(((DWORD*)mem)[6]);
+		int bits = LittleShort(((WORD*)mem)[17]);
+		int channels = LittleShort(((WORD*)mem)[11]);
+		int format = LittleShort(((WORD*)mem)[10]);
+		sample_count = (size - 44) / (bits / 8);
 		if (format == 1 && channels == 1 && bits == 8) {
 			sample_format = FORMAT_8BIT_LINEAR_SIGNED;
 			sample_count = size - 44;
@@ -363,32 +381,35 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 		} else {
 			printf ("Unknown WAV variant %d/%d/%d\n",
 				bits, channels, format);
-			return NULL;
+			isValid = false;
+			isMetadataLoaded = true;
+			return;
 		}
-		void *samples = malloc (size - 44);
-		void *input = ((char*)soundLump.GetMem())+44;
+		chunk_samples = malloc (size - 44);
+		void *input = ((char*)mem)+44;
 		int sz = size - 44;
-		CHECKMALLOCRESULT(samples);
+		if (chunk_samples) {
 #ifdef __BIG_ENDIAN__
-		if (format == 1 && channels == 1 && bits == 16)
-		  {
-		    for (int i = 0; i < sz; i++)
-		      ((char *)samples)[i] = ((char *)input)[i ^ 1];
-		  }
-		else
+			if (format == 1 && channels == 1 && bits == 16)
+			{
+				for (int i = 0; i < sz; i++)
+					((char *)chunk_samples)[i] = ((char *)input)[i ^ 1];
+			}
+			else
 #endif
-		  memcpy(samples, input, sz);
-		return new Mix_Chunk_Digital(
-			rate,
-			samples,
-			sample_count,
-			sample_format,
-			false
-		);
+				memcpy(chunk_samples, input, sz);
+		}
+		isValid = true;
+		isMetadataLoaded = true;
+		isLooping = false;
+
+		return;
 	}
 
-	printf ("unknown format. Header: %x\n", BigLong(*(DWORD*)soundLump.GetMem()));
-	return NULL;
+	printf ("unknown format. Header: %x\n", BigLong(*(DWORD*)mem));
+	isValid = false;
+	isMetadataLoaded = true;
+	return;
 }
 
 Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)

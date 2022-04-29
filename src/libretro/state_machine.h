@@ -180,24 +180,47 @@ protected:
 class Mix_Chunk_Digital : public Mix_Chunk_Sampled
 {
 public:
-	Mix_Chunk_Digital(int rate, void *samples, int sample_count, SampleFormat sample_format,
-			  bool isLooping)
-	{
-		this->rate = rate;
-		this->sample_count = sample_count;
-		this->chunk_samples = samples;
-		this->sample_format = sample_format;
-		this->isLooping = isLooping;
+       Mix_Chunk_Digital(int rate, void *samples, int sample_count, SampleFormat sample_format,
+                         bool isLooping) : whichLump(-1), isMetadataLoaded(true), isValid(true), reloadable(false)
+       {
+               this->rate = rate;
+               this->sample_count = sample_count;
+               this->chunk_samples = samples;
+               this->sample_format = sample_format;
+               this->isLooping = isLooping;
+       }
+	
+	Mix_Chunk_Digital(int lump) : whichLump(lump), isMetadataLoaded(false), isValid(true), reloadable(true) {
+		this->rate = 0;
+		this->sample_count = 0;
+		this->chunk_samples = NULL;
+		this->sample_format = FORMAT_8BIT_LINEAR_UNSIGNED;
+		this->isLooping = false;
 	}
 
 	int GetLengthTicks() {
+		if (!isValid)
+			return 0;
+		if (!isMetadataLoaded)
+			loadSound();
+		if (!isValid)
+			return 0;
 		return sample_count * TICRATE / rate + 1;
 	}
 
 	void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
 		     fixed leftmul, fixed rightmul) {
+		if (samples == NULL)
+			loadSound();
 		MixSamples(samples, output_rate, size, start_ticks, leftmul, rightmul);
 	}
+
+	void loadSound();
+
+	int whichLump;
+	bool isMetadataLoaded;
+	bool isValid;
+	bool reloadable;
 };
 
 namespace DBOPL {
@@ -535,6 +558,7 @@ extern SDWORD damagecount, bonuscount;
 extern bool palshifted;
 void DrawVictory (bool fromIntermission);
 extern bool store_files_in_memory;
+extern bool preload_digital_sounds;
 
 Mix_Chunk *SynthesizeAdlibIMFOrN3D(const byte *dataRaw, size_t size);
 bool midiN3DValidate(const byte *dataIn, size_t dataLen);
