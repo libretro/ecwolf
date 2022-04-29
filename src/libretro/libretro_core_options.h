@@ -160,7 +160,7 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "360", NULL },
 			{ NULL, NULL },
 		},
-#if defined(PSP)
+#if defined(PSP) || defined(RS90)
 		"17.5",
 #else
 		"35",
@@ -369,7 +369,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
-#if !defined(_3DS) && !defined(GEKKO)
+#if !defined(_3DS) && !defined(GEKKO) && !defined(RS90)
 	{
 		"ecwolf-memstore",
 		"Store files in memory",

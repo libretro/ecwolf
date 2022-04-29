@@ -595,12 +595,18 @@ static void am_multiple_choice (const char *name, unsigned &var, bool &is_update
 
 static void update_variables(bool startup)
 {
-#if defined(_3DS) || defined(GEKKO)
+#if defined(RS90)
+	store_files_in_memory = false;
+#elif defined(_3DS) || defined(GEKKO)
 	store_files_in_memory = true;
 #else
 	store_files_in_memory = get_bool_option("ecwolf-memstore");
 #endif
+#ifdef RS90
+	preload_digital_sounds = false;
+#else
 	preload_digital_sounds = get_bool_option("ecwolf-preload-digisounds");
+#endif
 	
 	int oldw = screen_width;
 	int oldh = screen_height;
