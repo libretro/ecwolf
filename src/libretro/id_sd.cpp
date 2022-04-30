@@ -58,6 +58,7 @@ struct SynthCacheItem
 
 static TArray<SynthCacheItem> synthCache;
 static TMap<int, Mix_Chunk_Digital *> unloadableSounds;
+static TMap<int, TUniquePtr<Mix_Chunk_Digital, Mix_ChunkDeleter> > digiProxies;
 
 #define PC_BASE_TIMER 1193181
 
@@ -98,6 +99,11 @@ void    SD_Startup(void)
 
 void SD_Shutdown(void)
 {
+	digiProxies.Clear();
+	unloadableSounds.Clear();
+	synthCache.Clear();
+
+	SD_Started = false;
 }
 
 void
@@ -347,6 +353,10 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 {
 	if (which < 0)
 		return NULL;
+	if (digiProxies.CheckKey(which)) {
+		return new Mix_Chunk_Proxy(digiProxies[which]);
+	}
+	
 	int size = Wads.LumpLength(which);
 	if(size == 0)
 		return NULL;
@@ -357,16 +367,13 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 		ret->loadSound();
 	}
 
-	return ret;
+	digiProxies[which] = ret;
+
+	return new Mix_Chunk_Proxy(ret);
 }
 
 Mix_Chunk_Digital::~Mix_Chunk_Digital() {
-	if (whichLump >= 0 && reloadable) {
-		if (isLoaded()) {
-			loaded_sound_size -= GetDataSize();
-			unloadableSounds.Remove(whichLump);
-		}
-	}
+	unloadSound();
 }
 
 void Mix_Chunk_Digital::unloadSound() {

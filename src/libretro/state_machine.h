@@ -159,6 +159,23 @@ public:
 			     fixed leftmul, fixed rightmul) = 0;
 	virtual int GetLengthTicks() = 0;
 };
+
+class Mix_Chunk_Proxy : public Mix_Chunk
+{
+public:
+	Mix_Chunk_Proxy(Mix_Chunk *real_in) : real(real_in) {
+	}
+
+	void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
+		     fixed leftmul, fixed rightmul) {
+		real->MixInto(samples, output_rate, size, start_ticks, leftmul, rightmul);
+	}
+	int GetLengthTicks() {
+		return real->GetLengthTicks();
+	}
+private:
+	Mix_Chunk *real;
+};
 	
 class Mix_Chunk_Sampled : public Mix_Chunk
 {
