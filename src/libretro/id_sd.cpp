@@ -469,19 +469,24 @@ void Mix_Chunk_Digital::loadSound() {
 	return;
 }
 
-Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
+Mix_Chunk_Speaker::Mix_Chunk_Speaker(const byte *dataRaw)
 {
 	PCSound *sound = (PCSound*) dataRaw;
-	longword pcPhaseTick = 0;
-	int pcLastSample = 0;
-	longword	pcPhaseLength = 0;
 	int pcLength = LittleLong(sound->common.length);
 	byte *pcSound = sound->data;
 
-	int16_t *samples = (int16_t*) malloc (pcLength * samplesPerSoundTick * 2);
-	CHECKMALLOCRESULT(samples);
-	int16_t *sampleptr = samples;
-	short	pcVolume = 5000;
+	if (pcLength <= 0) {
+		length_pc_ticks = 0;
+		return;
+	}
+
+	states = (speaker_state *) malloc(pcLength * sizeof(speaker_state));
+	length_pc_ticks = pcLength;
+
+	longword pcPhaseTick = 0;
+	int pcLastSample = 0;
+	longword	pcPhaseLength = 0;
+	bool sign = false;
 
 	for (int i = 0; i < pcLength; i++, pcSound++) {
 		if(*pcSound!=pcLastSample)
@@ -497,23 +502,61 @@ Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 			}
 		}
 
-		for (int j = 0; j < samplesPerSoundTick; j++) {
-			*sampleptr++ = pcVolume;
+		states[i].phaseTick = pcPhaseTick;
+		states[i].phaseLength = pcPhaseLength;
+		states[i].sign = sign;
+
+		pcPhaseTick += samplesPerSoundTick;
+		if ((pcPhaseTick / pcPhaseLength) & 1) 
+		{
+			sign = !sign;
+		}
+		pcPhaseTick %= pcPhaseLength;
+	}
+}
+
+void Mix_Chunk_Speaker::MixInto(int16_t *result, int output_rate, size_t size, int start_ticks,
+				fixed leftmul, fixed rightmul)
+{
+	int start_pc_tick = start_ticks * (SOUND_RATE / TICRATE);
+	int num_pc_ticks = (size * (long long)SOUND_RATE + output_rate - 1) / output_rate;
+	int16_t *outptr = result;
+	size_t sample_ctr = 0;
+
+	if(output_rate != synthesisRate) {
+		printf("Speaker resampling is not supported (from %d to %d)\n", synthesisRate, output_rate);
+		return;
+	}
+	if (start_pc_tick >= length_pc_ticks || start_pc_tick < 0)
+		return;
+	if (num_pc_ticks > length_pc_ticks - start_pc_tick)
+		num_pc_ticks = length_pc_ticks - start_pc_tick;
+	if (num_pc_ticks <= 0)
+		return;
+
+	for (int pc_tick = start_pc_tick; pc_tick < start_pc_tick + num_pc_ticks; pc_tick++) {
+		longword pcPhaseLength = states[pc_tick].phaseLength;
+		longword pcPhaseTick = states[pc_tick].phaseTick;
+		bool sign = states[pc_tick].sign;
+
+		for (int j = 0; j < samplesPerSoundTick && sample_ctr < size; j++, sample_ctr++) {
+			int16_t val = sign ? 5000 : -5000;
+			int16_t l = val * leftmul >> FRACBITS;
+			int16_t r = val * rightmul >> FRACBITS;
+			*outptr++ += l;
+			*outptr++ += r;
 			// Update the PC speaker state:
 			if(pcPhaseTick++ >= pcPhaseLength)
 			{
-				pcVolume = -pcVolume;
+				sign = !sign;
 				pcPhaseTick = 0;
 			}
 		}
 	}
-	return new Mix_Chunk_Digital(
-		synthesisRate,
-		samples,
-		sampleptr - samples,
-		FORMAT_16BIT_LINEAR_SIGNED_NATIVE,
-		false
-		);
+}
+
+int Mix_Chunk_Speaker::GetLengthTicks() {
+	return (length_pc_ticks + 1) / (SOUND_RATE / TICRATE);
 }
 
 Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
@@ -537,7 +580,7 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
 #endif
 	case SoundData::PCSPEAKER:
 		if (!synth.pcSynth)
-			synth.pcSynth.Reset(SynthesizeSpeaker(which.GetSpeakerData()));
+			synth.pcSynth.Reset(new Mix_Chunk_Speaker(which.GetSpeakerData()));
 		return synth.pcSynth;
 	}
 	return NULL;

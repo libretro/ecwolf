@@ -176,7 +176,28 @@ public:
 private:
 	Mix_Chunk *real;
 };
-	
+
+class Mix_Chunk_Speaker : public Mix_Chunk
+{
+public:
+	Mix_Chunk_Speaker(const byte *dataRaw);
+	~Mix_Chunk_Speaker() {
+		free(states);
+	}
+	int GetLengthTicks();
+	void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
+		     fixed leftmul, fixed rightmul);
+private:
+	uint32_t length_pc_ticks;
+	// Never dumped to disk, so bitfields are fine
+	struct speaker_state {
+		uint16_t phaseTick:15;
+		uint16_t phaseLength:15;
+		uint8_t sign:1;
+	};
+	speaker_state *states;
+};
+
 class Mix_Chunk_Sampled : public Mix_Chunk
 {
 public:
