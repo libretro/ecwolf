@@ -416,6 +416,7 @@ void Quit ()
 
 void retro_unload_game()
 {
+	SoundInfo.Clear();
 	CallTerminateFunctions();
 	if (screen) {
 		delete screen;
@@ -1112,15 +1113,41 @@ static void mixChannel(long long tic, SoundChannelState *channel)
 	channel->sample->MixInto (soundbuf, SAMPLERATE, SAMPLERATE / TICRATE, start_tic, leftmul, rightmul);
 }
 
+#define MB(x) ((x) << 20)
+
+size_t limit_sound_cache_size =
+#ifdef RS90
+	MB(5)
+#else
+	MB(15)
+#endif
+	;
+
 void generate_audio(long long tic)
 {
 	memset (soundbuf, 0, sizeof(soundbuf));
+	touched_sound_size = 0;
 	for (int channelno = 0; channelno < MIX_CHANNELS; channelno++) {
 		mixChannel(tic, &g_state.channels[channelno]);
 	}
 	if (MusicVolume != 0)
 		mixChannel(tic, &g_state.musicChannel);
 	audio_batch_cb(soundbuf, SAMPLERATE / TICRATE);
+	if (!preload_digital_sounds) {
+		// We don't want to keep dropping and reloading the same files every frame
+		if (limit_sound_cache_size <= (touched_sound_size * 3) / 2) {
+			limit_sound_cache_size = (touched_sound_size * 3) / 2;
+#ifdef RS90
+			if (limit_sound_cache_size >= MB(7))
+				limit_sound_cache_size = MB(7);
+#endif		
+		}
+
+		if (loaded_sound_size > limit_sound_cache_size) {
+			decreaseSoundCache(limit_sound_cache_size);
+		}
+		
+	}
 }
 
 void generate_silent_audio(void)

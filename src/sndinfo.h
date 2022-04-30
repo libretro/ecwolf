@@ -107,6 +107,7 @@ class SoundInformation
 
 		SoundIndex		FindSound(const char* logical) const;
 		void			Init();
+	        void                    Clear();
 		const SoundData	&operator[] (const char* logical) const { return operator[](FindSound(logical)); }
 		const SoundData	&operator[] (const SoundIndex &index) const;
 		uint32_t		GetLastPlayTick(const SoundData &sound) const { return lastPlayTicks[sound.index]; }

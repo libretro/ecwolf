@@ -44,18 +44,42 @@ static  int                     RightPosition;
 static const int synthesisRate = 44100;
 #define SOUND_RATE 140	// Also affects PC Speaker sounds
 static const int samplesPerSoundTick = synthesisRate / SOUND_RATE;
+uint64_t used_digital_gen;
+size_t loaded_sound_size;
+size_t touched_sound_size;
   
 FString                 SoundPlaying;
 globalsoundpos channelSoundPos[MIX_CHANNELS];
 struct SynthCacheItem
 {
-	        TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> adlibSynth;
-	        TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> pcSynth;
+	TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> adlibSynth;
+	TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> pcSynth;
 };
 
 static TArray<SynthCacheItem> synthCache;
+static TMap<int, Mix_Chunk_Digital *> unloadableSounds;
 
 #define PC_BASE_TIMER 1193181
+
+void decreaseSoundCache(size_t target)
+{
+	while (loaded_sound_size > target) { // TODO: use better algorithm
+		uint64_t leastRecentlyUsed = ~(uint64_t)0;
+		int leastRecentlyUsedIndex = -1;
+		TMap<int, Mix_Chunk_Digital *>::Iterator it(unloadableSounds);
+		TMap<int, Mix_Chunk_Digital *>::Pair *pair;
+		while (it.NextPair(pair)) {
+			if (pair->Value->lastUsed < leastRecentlyUsed) {
+				leastRecentlyUsed = pair->Value->lastUsed;
+				leastRecentlyUsedIndex = pair->Key;
+			}
+		}
+
+		if (leastRecentlyUsedIndex < 0)
+			break;
+		unloadableSounds[leastRecentlyUsedIndex]->unloadSound();
+	}
+}
 
 void    SD_Startup(void)
 {
@@ -321,6 +345,8 @@ bool    SD_SoundPlaying(void)
 
 struct Mix_Chunk *SD_PrepareSound(int which)
 {
+	if (which < 0)
+		return NULL;
 	int size = Wads.LumpLength(which);
 	if(size == 0)
 		return NULL;
@@ -334,9 +360,28 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 	return ret;
 }
 
+Mix_Chunk_Digital::~Mix_Chunk_Digital() {
+	if (whichLump >= 0 && reloadable) {
+		if (isLoaded()) {
+			loaded_sound_size -= GetDataSize();
+			unloadableSounds.Remove(whichLump);
+		}
+	}
+}
+
+void Mix_Chunk_Digital::unloadSound() {
+	if (!isLoaded() || !reloadable) {
+		return;
+	}
+
+	free(chunk_samples);
+	chunk_samples = NULL;
+	loaded_sound_size -= GetDataSize();
+	unloadableSounds.Remove(whichLump);
+}
 
 void Mix_Chunk_Digital::loadSound() {
-	if (chunk_samples != NULL) {
+	if (isLoaded()) {
 		return;
 	}
 
@@ -359,8 +404,11 @@ void Mix_Chunk_Digital::loadSound() {
 		isMetadataLoaded = true;
 
 		chunk_samples = malloc (size - 0x2a);
-		if (chunk_samples)
+		if (chunk_samples) {
 			memcpy(chunk_samples, ((char*)mem)+0x2A, size-0x2A);
+			loaded_sound_size += size-0x2A;
+			unloadableSounds[whichLump] = this;
+		}
 
 		return;
 	}
@@ -398,6 +446,8 @@ void Mix_Chunk_Digital::loadSound() {
 			else
 #endif
 				memcpy(chunk_samples, input, sz);
+			loaded_sound_size += sz;
+			unloadableSounds[whichLump] = this;
 		}
 		isValid = true;
 		isMetadataLoaded = true;

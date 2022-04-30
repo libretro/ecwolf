@@ -176,6 +176,9 @@ protected:
 			fixed leftmul, fixed rightmul);
 };
 
+extern uint64_t used_digital_gen;
+extern size_t loaded_sound_size;
+extern size_t touched_sound_size;
 
 class Mix_Chunk_Digital : public Mix_Chunk_Sampled
 {
@@ -198,6 +201,8 @@ public:
 		this->isLooping = false;
 	}
 
+	virtual ~Mix_Chunk_Digital();
+
 	int GetLengthTicks() {
 		if (!isValid)
 			return 0;
@@ -210,17 +215,37 @@ public:
 
 	void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
 		     fixed leftmul, fixed rightmul) {
-		if (samples == NULL)
+		if (leftmul == 0 && rightmul == 0)
+			return;
+		int start_sample = (start_ticks * rate) / TICRATE;
+		if (!isLooping && (start_sample >= sample_count || start_sample < 0))
+			return;
+
+		if (!isLoaded())
 			loadSound();
+		lastUsed = used_digital_gen++;
+		if (reloadable)
+			touched_sound_size += GetDataSize();
 		MixSamples(samples, output_rate, size, start_ticks, leftmul, rightmul);
 	}
 
+	size_t GetDataSize() const {
+		int bytes_per_sample = 1;
+		if (sample_format == FORMAT_16BIT_LINEAR_SIGNED_NATIVE) {
+			bytes_per_sample = 2;
+		}
+		return sample_count * bytes_per_sample;
+	}
+
 	void loadSound();
+	void unloadSound();
+	bool isLoaded() { return chunk_samples != NULL; }
 
 	int whichLump;
 	bool isMetadataLoaded;
 	bool isValid;
 	bool reloadable;
+	uint64_t lastUsed;
 };
 
 namespace DBOPL {
@@ -565,5 +590,6 @@ bool midiN3DValidate(const byte *dataIn, size_t dataLen);
 void    SD_Startup_Adlib(void);
 Mix_Chunk *SynthesizeAdlib(const byte *dataRaw);
 void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length);
+void decreaseSoundCache(size_t target);
 
 #endif
