@@ -85,6 +85,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Internal resolution",
 		"Configure the resolution.",
 		{
+		        { "240x160", NULL },
 			{ "320x200", NULL },
 			{ "320x240", NULL },
 			{ "400x240", NULL },
@@ -105,7 +106,9 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "2560x1600", NULL },
 			{ NULL, NULL },
 		},
-#if defined(VITA) || defined(PSP)
+#if defined(RS90)
+		"240x160",
+#elif defined(VITA) || defined(PSP)
 		"480x270",
 #elif defined (_3DS)
 		"400x240",
