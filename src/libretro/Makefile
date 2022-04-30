@@ -333,6 +333,7 @@ else ifeq ($(platform), rs90)
    PLATFORM_DEFINES := -DCC_RESAMPLER -DCC_RESAMPLER_NO_HIGHPASS
    COMMON_CFLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DRS90=1
+   DISABLE_ADLIB = 1
 
 # GCW0
 else ifeq ($(platform), gcw0)
