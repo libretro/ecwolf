@@ -164,6 +164,10 @@ if(LIBRETRO)
   if(PS2)
     set(DISABLE_ADLIB ON)
   endif()
+  if(RS90) # TODO: Autodetect when we compile for RS90
+    set(DISABLE_ADLIB ON)
+    target_compile_definitions(${ENGINE_TARGET} PRIVATE -DRS90=1)
+  endif()
   if(NOT DISABLE_ADLIB)
     target_sources(${ENGINE_TARGET} PRIVATE
       libretro/id_sd_adlib.cpp
