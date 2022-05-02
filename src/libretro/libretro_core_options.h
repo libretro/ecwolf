@@ -85,6 +85,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Internal resolution",
 		"Configure the resolution.",
 		{
+		        { "240x160", NULL },
 			{ "320x200", NULL },
 			{ "320x240", NULL },
 			{ "400x240", NULL },
@@ -105,7 +106,9 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "2560x1600", NULL },
 			{ NULL, NULL },
 		},
-#if defined(VITA) || defined(PSP)
+#if defined(RS90)
+		"240x160",
+#elif defined(VITA) || defined(PSP)
 		"480x270",
 #elif defined (_3DS)
 		"400x240",
@@ -160,7 +163,7 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "360", NULL },
 			{ NULL, NULL },
 		},
-#if defined(PSP)
+#if defined(PSP) || defined(RS90)
 		"17.5",
 #else
 		"35",
@@ -369,7 +372,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
-#if !defined(_3DS) && !defined(GEKKO)
+#if !defined(_3DS) && !defined(GEKKO) && !defined(RS90)
 	{
 		"ecwolf-memstore",
 		"Store files in memory",
@@ -378,6 +381,13 @@ struct retro_core_option_definition option_defs_us[] = {
 		"disabled"
 	},
 #endif
+	{
+		"ecwolf-preload-digisounds",
+		"Preload digitized sounds",
+		"Increases speed at cost of memory and initial load times",
+		BOOL_OPTIONS,
+		"enabled"
+	},
 	{
 		"ecwolf-panx-adjustment",
 		"Horizontal panning speed in automap",

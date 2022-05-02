@@ -125,6 +125,15 @@ SoundInformation::SoundInformation() : hashTable(NULL)
 
 SoundInformation::~SoundInformation()
 {
+	Clear();
+}
+
+void SoundInformation::Clear()
+{
+	sounds.Clear();
+	lastPlayTicks.Clear();
+	MusicAliases.Clear();
+
 	if(hashTable)
 	{
 		// Clean up hash table links
@@ -139,6 +148,7 @@ SoundInformation::~SoundInformation()
 			}
 		}
 		delete[] hashTable;
+		hashTable = NULL;
 	}
 }
 

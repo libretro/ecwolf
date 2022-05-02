@@ -111,6 +111,7 @@ Aspect r_ratio = ASPECT_4_3, vid_aspect = ASPECT_NONE;
 fixed movebob = FRACUNIT;
 
 bool alwaysrun;
+bool preload_digital_sounds;
 float localDesiredFOV = 90.0f;
 
 class LibretroFBBase : public DFrameBuffer
@@ -415,6 +416,7 @@ void Quit ()
 
 void retro_unload_game()
 {
+	SoundInfo.Clear();
 	CallTerminateFunctions();
 	if (screen) {
 		delete screen;
@@ -594,11 +596,19 @@ static void am_multiple_choice (const char *name, unsigned &var, bool &is_update
 
 static void update_variables(bool startup)
 {
-#if defined(_3DS) || defined(GEKKO)
+#if defined(RS90)
+	store_files_in_memory = false;
+#elif defined(_3DS) || defined(GEKKO)
 	store_files_in_memory = true;
 #else
 	store_files_in_memory = get_bool_option("ecwolf-memstore");
 #endif
+#ifdef RS90
+	preload_digital_sounds = false;
+#else
+	preload_digital_sounds = get_bool_option("ecwolf-preload-digisounds");
+#endif
+	
 	int oldw = screen_width;
 	int oldh = screen_height;
 	int oldfp10s = fp10s;
@@ -1103,15 +1113,41 @@ static void mixChannel(long long tic, SoundChannelState *channel)
 	channel->sample->MixInto (soundbuf, SAMPLERATE, SAMPLERATE / TICRATE, start_tic, leftmul, rightmul);
 }
 
+#define MB(x) ((x) << 20)
+
+size_t limit_sound_cache_size =
+#ifdef RS90
+	MB(5)
+#else
+	MB(15)
+#endif
+	;
+
 void generate_audio(long long tic)
 {
 	memset (soundbuf, 0, sizeof(soundbuf));
+	touched_sound_size = 0;
 	for (int channelno = 0; channelno < MIX_CHANNELS; channelno++) {
 		mixChannel(tic, &g_state.channels[channelno]);
 	}
 	if (MusicVolume != 0)
 		mixChannel(tic, &g_state.musicChannel);
 	audio_batch_cb(soundbuf, SAMPLERATE / TICRATE);
+	if (!preload_digital_sounds) {
+		// We don't want to keep dropping and reloading the same files every frame
+		if (limit_sound_cache_size <= (touched_sound_size * 3) / 2) {
+			limit_sound_cache_size = (touched_sound_size * 3) / 2;
+#ifdef RS90
+			if (limit_sound_cache_size >= MB(7))
+				limit_sound_cache_size = MB(7);
+#endif		
+		}
+
+		if (loaded_sound_size > limit_sound_cache_size) {
+			decreaseSoundCache(limit_sound_cache_size);
+		}
+		
+	}
 }
 
 void generate_silent_audio(void)

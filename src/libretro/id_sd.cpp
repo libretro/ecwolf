@@ -44,18 +44,43 @@ static  int                     RightPosition;
 static const int synthesisRate = 44100;
 #define SOUND_RATE 140	// Also affects PC Speaker sounds
 static const int samplesPerSoundTick = synthesisRate / SOUND_RATE;
+uint64_t used_digital_gen;
+size_t loaded_sound_size;
+size_t touched_sound_size;
   
 FString                 SoundPlaying;
 globalsoundpos channelSoundPos[MIX_CHANNELS];
 struct SynthCacheItem
 {
-	        TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> adlibSynth;
-	        TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> pcSynth;
+	TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> adlibSynth;
+	TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> pcSynth;
 };
 
 static TArray<SynthCacheItem> synthCache;
+static TMap<int, Mix_Chunk_Digital *> unloadableSounds;
+static TMap<int, TUniquePtr<Mix_Chunk_Digital, Mix_ChunkDeleter> > digiProxies;
 
 #define PC_BASE_TIMER 1193181
+
+void decreaseSoundCache(size_t target)
+{
+	while (loaded_sound_size > target) { // TODO: use better algorithm
+		uint64_t leastRecentlyUsed = ~(uint64_t)0;
+		int leastRecentlyUsedIndex = -1;
+		TMap<int, Mix_Chunk_Digital *>::Iterator it(unloadableSounds);
+		TMap<int, Mix_Chunk_Digital *>::Pair *pair;
+		while (it.NextPair(pair)) {
+			if (pair->Value->lastUsed < leastRecentlyUsed) {
+				leastRecentlyUsed = pair->Value->lastUsed;
+				leastRecentlyUsedIndex = pair->Key;
+			}
+		}
+
+		if (leastRecentlyUsedIndex < 0)
+			break;
+		unloadableSounds[leastRecentlyUsedIndex]->unloadSound();
+	}
+}
 
 void    SD_Startup(void)
 {
@@ -74,6 +99,11 @@ void    SD_Startup(void)
 
 void SD_Shutdown(void)
 {
+	digiProxies.Clear();
+	unloadableSounds.Clear();
+	synthCache.Clear();
+
+	SD_Started = false;
 }
 
 void
@@ -321,40 +351,83 @@ bool    SD_SoundPlaying(void)
 
 struct Mix_Chunk *SD_PrepareSound(int which)
 {
+	if (which < 0)
+		return NULL;
+	if (digiProxies.CheckKey(which)) {
+		return new Mix_Chunk_Proxy(digiProxies[which]);
+	}
+	
 	int size = Wads.LumpLength(which);
 	if(size == 0)
 		return NULL;
 
-	FMemLump soundLump = Wads.ReadLump(which);
+	Mix_Chunk_Digital *ret = new Mix_Chunk_Digital(which);
+
+	if (ret && preload_digital_sounds) {
+		ret->loadSound();
+	}
+
+	digiProxies[which] = ret;
+
+	return new Mix_Chunk_Proxy(ret);
+}
+
+Mix_Chunk_Digital::~Mix_Chunk_Digital() {
+	unloadSound();
+}
+
+void Mix_Chunk_Digital::unloadSound() {
+	if (!isLoaded() || !reloadable) {
+		return;
+	}
+
+	free(chunk_samples);
+	chunk_samples = NULL;
+	loaded_sound_size -= GetDataSize();
+	unloadableSounds.Remove(whichLump);
+}
+
+void Mix_Chunk_Digital::loadSound() {
+	if (isLoaded()) {
+		return;
+	}
+
+	FMemLump soundLump = Wads.ReadLump(whichLump);
+	size_t size = soundLump.GetSize();
+	void *mem = soundLump.GetMem();
 
 	// 0x2A is the size of the sound header. From what I can tell the csnds
 	// have mostly garbage filled headers (outside of what is precisely needed
 	// since the sample rate is hard coded). I'm not sure if the sounds are
 	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
-	if(size > 0x2A && BigShort(*(WORD*)soundLump.GetMem()) == 1)
+	if(size > 0x2A && BigShort(*(WORD*)mem) == 1)
 	{
-		int sample_count = size - 0x2a;
-		void *samples = malloc (size - 0x2a);
-		CHECKMALLOCRESULT(samples);
-		memcpy(samples, ((char*)soundLump.GetMem())+0x2A, size-0x2A);
-		return new Mix_Chunk_Digital(
-			22050,
-			samples,
-			sample_count,
-			FORMAT_8BIT_LINEAR_UNSIGNED,
-			false
-		);
+		sample_count = size - 0x2a;
+
+		rate = 22050;
+		sample_format = FORMAT_8BIT_LINEAR_UNSIGNED;
+		isLooping = false;
+		isValid = true;
+		isMetadataLoaded = true;
+
+		chunk_samples = malloc (size - 0x2a);
+		if (chunk_samples) {
+			memcpy(chunk_samples, ((char*)mem)+0x2A, size-0x2A);
+			loaded_sound_size += size-0x2A;
+			unloadableSounds[whichLump] = this;
+		}
+
+		return;
 	}
 
 	// TODO: support skipping extra headers
-	if (size > 44 && memcmp(soundLump.GetMem(), "RIFF", 4) == 0
-	    && memcmp((char*)soundLump.GetMem() + 8, "WAVEfmt ", 8) == 0) {
-		int rate = LittleLong(((DWORD*)soundLump.GetMem())[6]);
-		int bits = LittleShort(((WORD*)soundLump.GetMem())[17]);
-		int channels = LittleShort(((WORD*)soundLump.GetMem())[11]);
-		int format = LittleShort(((WORD*)soundLump.GetMem())[10]);
-		int sample_count = (size - 44) / (bits / 8);
-		SampleFormat sample_format;
+	if (size > 44 && memcmp(mem, "RIFF", 4) == 0
+	    && memcmp((char*)mem + 8, "WAVEfmt ", 8) == 0) {
+		rate = LittleLong(((DWORD*)mem)[6]);
+		int bits = LittleShort(((WORD*)mem)[17]);
+		int channels = LittleShort(((WORD*)mem)[11]);
+		int format = LittleShort(((WORD*)mem)[10]);
+		sample_count = (size - 44) / (bits / 8);
 		if (format == 1 && channels == 1 && bits == 8) {
 			sample_format = FORMAT_8BIT_LINEAR_SIGNED;
 			sample_count = size - 44;
@@ -363,47 +436,57 @@ struct Mix_Chunk *SD_PrepareSound(int which)
 		} else {
 			printf ("Unknown WAV variant %d/%d/%d\n",
 				bits, channels, format);
-			return NULL;
+			isValid = false;
+			isMetadataLoaded = true;
+			return;
 		}
-		void *samples = malloc (size - 44);
-		void *input = ((char*)soundLump.GetMem())+44;
+		chunk_samples = malloc (size - 44);
+		void *input = ((char*)mem)+44;
 		int sz = size - 44;
-		CHECKMALLOCRESULT(samples);
+		if (chunk_samples) {
 #ifdef __BIG_ENDIAN__
-		if (format == 1 && channels == 1 && bits == 16)
-		  {
-		    for (int i = 0; i < sz; i++)
-		      ((char *)samples)[i] = ((char *)input)[i ^ 1];
-		  }
-		else
+			if (format == 1 && channels == 1 && bits == 16)
+			{
+				for (int i = 0; i < sz; i++)
+					((char *)chunk_samples)[i] = ((char *)input)[i ^ 1];
+			}
+			else
 #endif
-		  memcpy(samples, input, sz);
-		return new Mix_Chunk_Digital(
-			rate,
-			samples,
-			sample_count,
-			sample_format,
-			false
-		);
+				memcpy(chunk_samples, input, sz);
+			loaded_sound_size += sz;
+			unloadableSounds[whichLump] = this;
+		}
+		isValid = true;
+		isMetadataLoaded = true;
+		isLooping = false;
+
+		return;
 	}
 
-	printf ("unknown format. Header: %x\n", BigLong(*(DWORD*)soundLump.GetMem()));
-	return NULL;
+	printf ("unknown format. Header: %x\n", BigLong(*(DWORD*)mem));
+	isValid = false;
+	isMetadataLoaded = true;
+	return;
 }
 
-Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
+Mix_Chunk_Speaker::Mix_Chunk_Speaker(const byte *dataRaw)
 {
 	PCSound *sound = (PCSound*) dataRaw;
-	longword pcPhaseTick = 0;
-	int pcLastSample = 0;
-	longword	pcPhaseLength = 0;
 	int pcLength = LittleLong(sound->common.length);
 	byte *pcSound = sound->data;
 
-	int16_t *samples = (int16_t*) malloc (pcLength * samplesPerSoundTick * 2);
-	CHECKMALLOCRESULT(samples);
-	int16_t *sampleptr = samples;
-	short	pcVolume = 5000;
+	if (pcLength <= 0) {
+		length_pc_ticks = 0;
+		return;
+	}
+
+	states = (speaker_state *) malloc(pcLength * sizeof(speaker_state));
+	length_pc_ticks = pcLength;
+
+	longword pcPhaseTick = 0;
+	int pcLastSample = 0;
+	longword	pcPhaseLength = 0;
+	bool sign = false;
 
 	for (int i = 0; i < pcLength; i++, pcSound++) {
 		if(*pcSound!=pcLastSample)
@@ -419,23 +502,61 @@ Mix_Chunk *SynthesizeSpeaker(const byte *dataRaw)
 			}
 		}
 
-		for (int j = 0; j < samplesPerSoundTick; j++) {
-			*sampleptr++ = pcVolume;
+		states[i].phaseTick = pcPhaseTick;
+		states[i].phaseLength = pcPhaseLength;
+		states[i].sign = sign;
+
+		pcPhaseTick += samplesPerSoundTick;
+		if ((pcPhaseTick / pcPhaseLength) & 1) 
+		{
+			sign = !sign;
+		}
+		pcPhaseTick %= pcPhaseLength;
+	}
+}
+
+void Mix_Chunk_Speaker::MixInto(int16_t *result, int output_rate, size_t size, int start_ticks,
+				fixed leftmul, fixed rightmul)
+{
+	int start_pc_tick = start_ticks * (SOUND_RATE / TICRATE);
+	int num_pc_ticks = (size * (long long)SOUND_RATE + output_rate - 1) / output_rate;
+	int16_t *outptr = result;
+	size_t sample_ctr = 0;
+
+	if(output_rate != synthesisRate) {
+		printf("Speaker resampling is not supported (from %d to %d)\n", synthesisRate, output_rate);
+		return;
+	}
+	if (start_pc_tick >= length_pc_ticks || start_pc_tick < 0)
+		return;
+	if (num_pc_ticks > length_pc_ticks - start_pc_tick)
+		num_pc_ticks = length_pc_ticks - start_pc_tick;
+	if (num_pc_ticks <= 0)
+		return;
+
+	for (int pc_tick = start_pc_tick; pc_tick < start_pc_tick + num_pc_ticks; pc_tick++) {
+		longword pcPhaseLength = states[pc_tick].phaseLength;
+		longword pcPhaseTick = states[pc_tick].phaseTick;
+		bool sign = states[pc_tick].sign;
+
+		for (int j = 0; j < samplesPerSoundTick && sample_ctr < size; j++, sample_ctr++) {
+			int16_t val = sign ? 5000 : -5000;
+			int16_t l = val * leftmul >> FRACBITS;
+			int16_t r = val * rightmul >> FRACBITS;
+			*outptr++ += l;
+			*outptr++ += r;
 			// Update the PC speaker state:
 			if(pcPhaseTick++ >= pcPhaseLength)
 			{
-				pcVolume = -pcVolume;
+				sign = !sign;
 				pcPhaseTick = 0;
 			}
 		}
 	}
-	return new Mix_Chunk_Digital(
-		synthesisRate,
-		samples,
-		sampleptr - samples,
-		FORMAT_16BIT_LINEAR_SIGNED_NATIVE,
-		false
-		);
+}
+
+int Mix_Chunk_Speaker::GetLengthTicks() {
+	return (length_pc_ticks + 1) / (SOUND_RATE / TICRATE);
 }
 
 Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
@@ -459,7 +580,7 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type)
 #endif
 	case SoundData::PCSPEAKER:
 		if (!synth.pcSynth)
-			synth.pcSynth.Reset(SynthesizeSpeaker(which.GetSpeakerData()));
+			synth.pcSynth.Reset(new Mix_Chunk_Speaker(which.GetSpeakerData()));
 		return synth.pcSynth;
 	}
 	return NULL;
