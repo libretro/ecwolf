@@ -596,7 +596,7 @@ static void am_multiple_choice (const char *name, unsigned &var, bool &is_update
 
 static void update_variables(bool startup)
 {
-#if defined(RS90)
+#if defined(RS90) || defined(MIYOO)
 	store_files_in_memory = false;
 #elif defined(_3DS) || defined(GEKKO)
 	store_files_in_memory = true;
@@ -1116,7 +1116,7 @@ static void mixChannel(long long tic, SoundChannelState *channel)
 #define MB(x) ((x) << 20)
 
 size_t limit_sound_cache_size =
-#ifdef RS90
+#if defined(RS90) || defined(MIYOO)
 	MB(5)
 #else
 	MB(15)
@@ -1137,7 +1137,7 @@ void generate_audio(long long tic)
 		// We don't want to keep dropping and reloading the same files every frame
 		if (limit_sound_cache_size <= (touched_sound_size * 3) / 2) {
 			limit_sound_cache_size = (touched_sound_size * 3) / 2;
-#ifdef RS90
+#if defined(RS90) || defined(MIYOO)
 			if (limit_sound_cache_size >= MB(7))
 				limit_sound_cache_size = MB(7);
 #endif		

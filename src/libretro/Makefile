@@ -366,10 +366,9 @@ else ifeq ($(platform), miyoo)
 	CC = /opt/miyoo/usr/bin/arm-linux-gcc
 	CXX = /opt/miyoo/usr/bin/arm-linux-g++
 	AR = /opt/miyoo/usr/bin/arm-linux-ar
-	COMMON_CFLAGS += -D_GNU_SOURCE -DUSE_OWN_ADDED_SIZE
+	COMMON_CFLAGS += -DUSE_OWN_ADDED_SIZE
 	COMMON_CFLAGS += -fomit-frame-pointer -ffast-math -march=armv5te -mtune=arm926ej-s
-	COMMON_CFLAGS += -fno-common -ftree-vectorize -funswitch-loops
-   COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+	COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp -DMIYOO
 else
    CC ?= gcc
    TARGET := $(TARGET_NAME)_libretro.dll
