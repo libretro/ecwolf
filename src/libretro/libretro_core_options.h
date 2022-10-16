@@ -243,7 +243,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Textured walls in automap",
 		"Draw textured walls in automap.",
 		BOOL_OPTIONS,
-		"disabled"
+		"enabled"
 	},
 	{
 		"ecwolf-am-drawtexturedfloors",
@@ -271,7 +271,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Pause game in automap",
 		"Pause game when in automap.",
 		BOOL_OPTIONS,
-		"disabled"
+		"enabled"
 	},
 #ifndef DISABLE_ADLIB
 	{
