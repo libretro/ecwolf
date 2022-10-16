@@ -587,7 +587,7 @@ static void am_bool_option (const char *name, bool &var, bool &is_updated)
 
 static void am_multiple_choice (const char *name, unsigned &var, bool &is_updated, const char **values)
 {
-	bool newval = get_multiple_choice_option(name, values);
+	int newval = get_multiple_choice_option(name, values);
 	if (newval != var) {
 		var = newval;
 		is_updated = true;
@@ -902,27 +902,22 @@ static void TransformAutomapInputs(const wl_input_state_t *input)
 		AM_Main.SetScale(FRACUNIT*122/128, true);
 	}
 
-	if(am_pause)
-	{
-		const fixed PAN_AMOUNT = FixedDiv(FRACUNIT*10, AM_Main.GetScreenScale());
-		const fixed PAN_ANALOG_MULTIPLIER = PAN_AMOUNT/100;
-		fixed panx = 0, pany = 0;
+	const fixed PAN_AMOUNT = FixedDiv(FRACUNIT*10, AM_Main.GetScreenScale());
+	const fixed PAN_ANALOG_MULTIPLIER = PAN_AMOUNT/100;
+	fixed panx = 0, pany = 0;
 
-		if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_LEFT))
-			panx += PAN_AMOUNT;
-		if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_RIGHT))
-			panx -= PAN_AMOUNT;
-		if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_UP))
-			pany += PAN_AMOUNT;
-		if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
-			pany -= PAN_AMOUNT;
-
-		panx -= transform_axis(input->rsx, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
-		pany -= transform_axis(input->lsy, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
-		panx -= transform_axis(input->lsx, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
-
-		AM_Main.SetPanning(panx, pany, true);
-	}
+	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_LEFT))
+		panx += PAN_AMOUNT;
+	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_RIGHT))
+		panx -= PAN_AMOUNT;
+	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_UP))
+		pany += PAN_AMOUNT;
+	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
+		pany -= PAN_AMOUNT;
+	panx -= transform_axis(input->rsx, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
+	pany -= transform_axis(input->lsy, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
+	panx -= transform_axis(input->lsx, false, AnalogMoveSensitivity) * PAN_ANALOG_MULTIPLIER;
+	AM_Main.SetPanning(panx, pany, true);
 }
 
 void TransformPlayInputs(const wl_input_state_t *input, int newly_pressed)
@@ -950,6 +945,8 @@ void TransformPlayInputs(const wl_input_state_t *input, int newly_pressed)
 		cmd.buttonstate[bt_attack] = 1;
 	if(newly_pressed & (1<<RETRO_DEVICE_ID_JOYPAD_B))
 		cmd.buttonstate[bt_use] = 1;
+	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_Y))
+		cmd.buttonstate[bt_showstatusbar] = 1;
 	if(newly_pressed & (1<<RETRO_DEVICE_ID_JOYPAD_L2))
 		cmd.buttonstate[bt_prevweapon] = 1;
 	if(newly_pressed & (1<<RETRO_DEVICE_ID_JOYPAD_R2))
@@ -1036,7 +1033,7 @@ static void TransformInputs(wl_input_state_t *input)
 		return;
 	}
 
-	if (automap)
+	if (automap == AMA_Normal && am_pause)
 		TransformAutomapInputs(input);
 	else
 		TransformPlayInputs(input, newly_pressed);
@@ -1318,6 +1315,7 @@ void retro_set_environment(retro_environment_t cb)
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,  "Fire" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B, "Use" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X, "Run" },
+		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y, "Show Status" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Map" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,  "Previous weapon" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2, "Next weapon" },
