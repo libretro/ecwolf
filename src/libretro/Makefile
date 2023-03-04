@@ -175,6 +175,7 @@ else ifeq ($(platform), wiiu)
    CXX = $(DEVKITPPC)/bin/powerpc-eabi-g++$(EXE_EXT)
    AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
    PLATFORM_DEFINES := -DGEKKO -DHW_RVL -DWIIU -mcpu=750 -meabi -mhard-float
+   PLATFORM_DEFINES := -ffunction-sections -fdata-sections -D__wiiu__ -D__wut__
    PLATFORM_DEFINES += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
    COMMON_CFLAGS += $(PLATFORM_DEFINES)
    STATIC_LINKING=1
