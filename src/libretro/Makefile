@@ -374,7 +374,10 @@ else
    CC ?= gcc
    TARGET := $(TARGET_NAME)_libretro.dll
    COMMON_CFLAGS += -DUSE_WINDOWS_DWORD
-   SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
+   SHARED := -shared -static-libgcc -static-libstdc++ -Wl,--version-script=$(CORE_DIR)/link.T -Wl,--no-undefined
+ifneq ($(DEBUG),1)
+   SHARED += -s
+endif
    LDFLAGS += -lwsock32 -lws2_32
 endif
 
