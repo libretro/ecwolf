@@ -397,8 +397,8 @@ struct retro_core_option_definition option_defs_us[] = {
 	},
 	{
 		"ecwolf-pany-adjustment",
-		"Horizontal panning speed in automap",
-		"Multiplier for horizontal panning from 0 to 20",
+		"Vertical panning speed in automap",
+		"Multiplier for vertical panning from 0 to 20",
 		SLIDER_OPTIONS,
 		"5"
 	},
