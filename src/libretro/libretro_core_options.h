@@ -372,7 +372,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
-#if !defined(_3DS) && !defined(GEKKO) && !defined(RS90)
+#if !defined(_3DS) && !defined(GEKKO) && !defined(RS90) && !defined(MIYOO)
 	{
 		"ecwolf-memstore",
 		"Store files in memory",
@@ -381,6 +381,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		"disabled"
 	},
 #endif
+#if !defined(RS90)
 	{
 		"ecwolf-preload-digisounds",
 		"Preload digitized sounds",
@@ -388,6 +389,7 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"enabled"
 	},
+#endif
 	{
 		"ecwolf-panx-adjustment",
 		"Horizontal panning speed in automap",
