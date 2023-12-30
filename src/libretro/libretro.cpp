@@ -316,6 +316,7 @@ bool IVideo::SetResolution (int width, int height, int bits)
 	}
 
 	if (screen) {
+		screen->ObjectFlags |= OF_YesReallyDelete;
 		delete screen;
 	}
 
@@ -339,6 +340,11 @@ void I_InitGraphics () {
 }
 
 void I_ShutdownGraphics () {
+	if (screen) {
+		screen->ObjectFlags |= OF_YesReallyDelete;
+		delete screen;
+		screen = NULL;
+	}
 }
 
 static struct retro_frame_time_callback frame_cb;   
@@ -418,10 +424,6 @@ void retro_unload_game()
 {
 	SoundInfo.Clear();
 	CallTerminateFunctions();
-	if (screen) {
-		delete screen;
-		screen = NULL;
-	}
 }
 
 static char g_wad_dir[1024];
