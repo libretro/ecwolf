@@ -53,9 +53,6 @@ extern "C" {
 #define SLIDER_OPTIONS		 \
 	{			 \
 		{ "Off", NULL }, \
-		{ "1", NULL },	 \
-		{ "2", NULL },	 \
-		{ "3", NULL },   \
 		{ "1", NULL },   \
 		{ "2", NULL },   \
 		{ "3", NULL },   \
