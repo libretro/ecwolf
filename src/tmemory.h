@@ -460,7 +460,7 @@ public:
 		Reference();
 	}
 
-	void Swap(const Self &other)
+	void Swap(Self &other)
 	{
 		T *oldptr = p;
 		TSharedPtrRef *oldref = r;
