@@ -113,12 +113,13 @@ else ifneq (,$(findstring ios,$(platform)))
    CXX = c++ -arch arm64 -isysroot $(IOSSDK)
    CFLAGS   += $(MINVERSION)
    CXXFLAGS += $(MINVERSION)
+   LDFLAGS  += $(MINVERSION)
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifeq ($(platform), tvos-arm64)
 	TARGET := $(TARGET_NAME)_libretro_tvos.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
-   MINVERSION = -mtvos-version-min=11.0
+   MINVERSION = -mappletvos-version-min=11.0
 	CFLAGS += -DIOS
 	ifeq ($(IOSSDK),)
 		IOSSDK := $(shell xcodebuild -version -sdk appletvos Path)
@@ -127,6 +128,7 @@ else ifeq ($(platform), tvos-arm64)
    CXX = c++ -arch arm64 -isysroot $(IOSSDK)
    CFLAGS += $(MINVERSION)
    CXXFLAGS += $(MINVERSION)
+   LDFLAGS += $(MINVERSION)
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
 else ifneq (,$(findstring qnx,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_qnx.so
