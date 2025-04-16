@@ -143,6 +143,7 @@ else ifeq ($(platform), emscripten)
    SHARED := -shared -r
    STATIC_LINKING=1
    COMMON_CFLAGS += -Dstricmp=strcasecmp -Dstrnicmp=strncasecmp
+   AR = /opt/emsdk/upstream/emscripten/emar
 else ifeq ($(platform), ps2)
    TARGET := $(TARGET_NAME)_libretro_ps2.a
    CC = mips64r5900el-ps2-elf-gcc
@@ -469,9 +470,7 @@ endif
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-ifeq ($(platform), emscripten)
-	$(LD) $(fpic) $(SHARED) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS)
-else ifeq ($(STATIC_LINKING), 1)
+ifeq ($(STATIC_LINKING), 1)
 	$(AR) rcs $@ $(OBJECTS)
 else
 ifneq (,$(findstring msvc,$(platform)))
