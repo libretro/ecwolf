@@ -116,6 +116,21 @@ MENU_LISTENER(ChangeAMRotate)
 }
 void CreateMenus()
 {
+	// CreateMenus runs on every retro_load_game. The menu objects are static
+	// globals, so clear them first to free the previous load's items;
+	// otherwise each reload appends a fresh set (and re-adds the load/save
+	// items), leaving duplicate pointers that are double-freed when the menus
+	// are destroyed at process exit.
+	mainMenu.clear();
+	playerClasses.clear();
+	episodes.clear();
+	skills.clear();
+	soundMenu.clear();
+	controlMenu.clear();
+	displayMenu.clear();
+	automapMenu.clear();
+	optionsMenu.clear();
+
 	// HACK: Determine menu style by IWAD
 	if(IWad::CheckGameFilter("Blake"))
 		MenuStyle = MENUSTYLE_Blake;

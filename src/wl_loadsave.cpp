@@ -494,10 +494,12 @@ void InitMenus()
 
 	bool canLoad = SetupSaveGames();
 
-	if(!loadItem)
-		loadItem = new MenuItem(language["STR_LG"]);
-	if(!saveItem)
-		saveItem = new MenuItem(language["STR_SG"]);
+	// Always create these fresh: CreateMenus clears mainMenu (which owns and
+	// deletes them) before each rebuild, so reusing the old pointers would
+	// dereference freed memory. InitMenus runs from inside CreateMenus, after
+	// that clear, so the previous items are already gone here.
+	loadItem = new MenuItem(language["STR_LG"]);
+	saveItem = new MenuItem(language["STR_SG"]);
 
 	loadItem->setEnabled(canLoad);
 	// Saving is enabled only while a game is running.
