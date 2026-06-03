@@ -458,9 +458,8 @@ void Mix_Chunk_Digital::loadSound() {
 		chunk_samples = malloc (size - 44);
 		void *input = ((char*)mem)+44;
 		int sz = size - 44;
-		if (chunk_samples)
-		{
-#ifdef MSB_FIRST
+		if (chunk_samples) {
+#ifdef __BIG_ENDIAN__
 			if (format == 1 && channels == 1 && bits == 16)
 			{
 				for (int i = 0; i < sz; i++)

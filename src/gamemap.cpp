@@ -90,7 +90,7 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 	// Otherwise we open the relevent lumps.
 	if(isWad)
 	{
-		file = FResourceFile::OpenResourceFile(mapWad.GetChars(), Wads.ReopenLumpNum(markerLump));
+		file = FResourceFile::OpenResourceFile(mapWad.GetChars(), Wads.ReopenLumpNum(markerLump), true);
 		if(!file || file->LumpCount() < 2) // Maps must be 2 lumps in size
 		{
 			FString error;

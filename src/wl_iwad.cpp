@@ -130,7 +130,7 @@ static int CheckData(WadStuff &wad)
 
 	for(unsigned int i = 0;i < wad.Path.Size();++i)
 	{
-		TUniquePtr<FResourceFile> file(FResourceFile::OpenResourceFile(wad.Path[i], NULL));
+		TUniquePtr<FResourceFile> file(FResourceFile::OpenResourceFile(wad.Path[i], NULL, true));
 		if(file)
 		{
 			LumpRemapper::RemapAll(); // Fix lump names if needed
@@ -159,7 +159,7 @@ static bool CheckStandalone(const char* directory, FString filename, FString ext
 
 		FString path;
 		path.Format("%s/%s", directory, filename.GetChars());
-		TUniquePtr<FResourceFile> file(FResourceFile::OpenResourceFile(path, NULL));
+		TUniquePtr<FResourceFile> file(FResourceFile::OpenResourceFile(path, NULL, true));
 		if(file)
 		{
 			TUniquePtr<unsigned int[]> valid(new unsigned int[iwadTypes.Size()]);
@@ -286,7 +286,7 @@ static bool VerifySpearInstall(const char* directory)
 	else if(File(dir, dir.getInsensitiveFile("gamemaps.sod", false)).exists())
 		currentMission = -1;
 
-	log_cb(RETRO_LOG_WARN, "Spear of Destiny is not set to the original mission. Attempting remap for files in: %s\n", directory);
+	Printf("Spear of Destiny is not set to the original mission. Attempting remap for files in: %s\n", directory);
 	for(unsigned int i = 0;i < 3;++i)
 	{
 		File srcFile(dir, dir.getInsensitiveFile(MissionFiles[i] + "sod", false));
@@ -636,16 +636,16 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		showpreviewgames = config.GetSetting("ShowPreviewGames")->GetInteger() != 0;
 
 	FString datawadDir;
-	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL);
+	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL, true);
 	if(!datawadRes)
 	{
-		if((datawadRes = FResourceFile::OpenResourceFile(progdir + PATH_SEPARATOR + datawad, NULL)))
+		if((datawadRes = FResourceFile::OpenResourceFile(progdir + PATH_SEPARATOR + datawad, NULL, true)))
 			datawadDir = progdir + PATH_SEPARATOR;
 #if !defined(__APPLE__) && !defined(_WIN32)
 		else if((datawadRes = FResourceFile::OpenResourceFile(FString(INSTALL_PREFIX "/share/" BINNAME "/") + datawad, NULL, true)))
 			datawadDir = FString(INSTALL_PREFIX "/share/" BINNAME "/");
 #endif
-		else if(config.GetSetting("BaseDataPaths") != NULL && (datawadRes = FResourceFile::OpenResourceFile(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/" + datawad, NULL)))
+		else if(config.GetSetting("BaseDataPaths") != NULL && (datawadRes = FResourceFile::OpenResourceFile(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/" + datawad, NULL, true)))
 			datawadDir = FString(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/");
 	}
 	if(!datawadRes)

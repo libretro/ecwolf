@@ -33,7 +33,13 @@
 **
 */
 
+#ifdef _WIN32
+#define USE_WINDOWS_DWORD
+#endif
 #include "LzmaDec.h"
+#ifdef _MSC_VER
+#define DWORD_IS_DEFINED 1
+#endif
 
 #include "files.h"
 #include "filesys.h"

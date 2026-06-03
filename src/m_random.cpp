@@ -178,14 +178,23 @@ FRandom::FRandom (const char *name)
 
 FRandom::~FRandom ()
 {
-	FRandom **prev = &RNGList;
-	FRandom *rng   = RNGList;
+	FRandom *rng, **prev;
+
+	FRandom *last = NULL;
+
+	prev = &RNGList;
+	rng = RNGList;
 
 	while (rng != NULL && rng != this)
+	{
+		last = rng;
 		rng = rng->Next;
+	}
 
 	if (rng != NULL)
+	{
 		*prev = rng->Next;
+	}
 }
 
 //==========================================================================
@@ -361,10 +370,13 @@ FRandom *FRandom::StaticFindRNG (const char *name)
 	//if (NameCRC == 0) return &pr_exrandom;
 
 	// Find the RNG in the list, sorted by CRC
-	FRandom *probe = RNGList;
+	FRandom **prev = &RNGList, *probe = RNGList;
 
 	while (probe != NULL && probe->NameCRC < NameCRC)
+	{
+		prev = &probe->Next;
 		probe = probe->Next;
+	}
 	// Found one so return it.
 	if (probe == NULL || probe->NameCRC != NameCRC)
 	{

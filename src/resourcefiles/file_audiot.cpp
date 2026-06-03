@@ -89,7 +89,7 @@ class FAudiot : public FUncompressedFile
 		{
 		}
 
-		bool Open(void)
+		bool Open(bool quiet)
 		{
 			unsigned int segstart[4] = {0};
 			unsigned int curseg = 0;
@@ -149,6 +149,21 @@ class FAudiot : public FUncompressedFile
 
 			MidiHack(segstart[3]);
 
+			if(!quiet)
+			{
+				Printf(", %d lumps\n", NumLumps);
+
+				// Check that there are the same number of each sound type.
+				// Technically the format can contain differing numbers, but
+				// the engine may not like that, so issue a warning.
+				if(curseg == 4)
+				{
+					uint32_t numsounds = segstart[1] - segstart[0];
+					if(segstart[2] - segstart[1] != numsounds || segstart[3] - segstart[2] != numsounds)
+						Printf("Warning: AUDIOT doesn't contain the same number of AdLib, PC Speaker, and Digitized sound chunks.\n");
+				}
+			}
+
 			LumpRemapper::AddFile(extension, this, LumpRemapper::AUDIOT);
 			return true;
 		}
@@ -183,7 +198,7 @@ class FAudiot : public FUncompressedFile
 		TUniquePtr<FileReader> audiohedReader;
 };
 
-FResourceFile *CheckAudiot(const char *filename, FileReader *file)
+FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet)
 {
 	FString fname(filename);
 	int lastSlash = fname.LastIndexOfAny("/\\:");
@@ -196,7 +211,7 @@ FResourceFile *CheckAudiot(const char *filename, FileReader *file)
 	{
 		FResourceFile *rf = new FAudiot(filename, file);
 
-		if(rf->Open()) return rf;
+		if(rf->Open(quiet)) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
 	}

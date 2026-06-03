@@ -161,6 +161,7 @@ void FPictTexture::MakeTexture()
 	switch(version) // skip header
 	{
 		default:
+			Printf("Invalid version\n");
 			return;
 		case 1:
 			data += 0xC;
@@ -191,83 +192,90 @@ void FPictTexture::MakeTexture()
 
 		switch(opcode)
 		{
-			default:
-			case OP_EndPic:
-				goto FinishTexture;
+		default:
+			Printf("Unknown opcode %04X in %s\n", opcode, Name.GetChars());
+		case OP_EndPic:
+			goto FinishTexture;
 
-			case OP_NOP:
-				break;
-			case OP_Clip: // Do we care about the clipping rectangle?
+		case OP_NOP:
+			break;
+		case OP_Clip: // Do we care about the clipping rectangle?
+		{
+			uint16_t regionSize = ReadBigShort(data);
+			if(regionSize != 0xA)
+			{
+				// Region is in an undocumented format if it's not rectangular.
+				Printf("Non-rectangular clipping region in %s.\n", Name.GetChars());
+				return;
+			}
+			data += regionSize;
+			break;
+		}
+		case OP_PackBitsRect:
+		{
+			PixMap pm = *(const PixMap *)data;
+			const ColorTabEntry *colors = (const ColorTabEntry *)(data+sizeof(PixMap));
+			pm.pitch = BigShort(pm.pitch)&0x7FFF;
+			pm.colorTable.numColors = BigShort(pm.colorTable.numColors);
+
+			if(BigShort(pm.compCount) != 1 || BigShort(pm.compSize) != 8)
+			{
+				Printf("Only 8bpp images are supported.\n");
+				return;
+			}
+
+			// Convert 48-bit palette to 24-bit for our remapping code
+			uint32_t rgb[256] = {};
+			for(unsigned int i = 0;i < pm.colorTable.numColors;++i)
+			{
+				uint16_t index = BigShort(colors[i].index);
+				if(index > 255)
+					Printf("Color index %d for entry %d out of range in palette.\n", index, i);
+				else
+					rgb[index] = MAKERGB(colors[i].r, colors[i].g, colors[i].b);
+			}
+			GPalette.MakeRemap(rgb, remap, NULL, pm.colorTable.numColors+1);
+
+			data += sizeof(PixMap)+(pm.colorTable.numColors+1)*sizeof(ColorTabEntry)
+			// Skip over src and dest rectangles and mode unless we know we
+			// need to do something  with them.
+				+ 2*sizeof(PictRect) + 2;
+
+			uint8_t *dest = rowMajor.Get();
+			uint8_t *start = dest;
+			for(unsigned int i = 0;i < Height;++i, dest = (start += Width))
+			{
+				// Get size of compressed row
+				int rowSize;
+				if(pm.pitch <= 250)
+					rowSize = *data++;
+				else
 				{
-					uint16_t regionSize = ReadBigShort(data);
-					if(regionSize != 0xA)
-					{
-						// Region is in an undocumented format if it's not rectangular.
-						return;
-					}
-					data += regionSize;
-					break;
+					rowSize = ReadBigShort(data);
+					data += 2;
 				}
-			case OP_PackBitsRect:
+
+				while(rowSize > 0)
 				{
-					PixMap pm = *(const PixMap *)data;
-					const ColorTabEntry *colors = (const ColorTabEntry *)(data+sizeof(PixMap));
-					pm.pitch = BigShort(pm.pitch)&0x7FFF;
-					pm.colorTable.numColors = BigShort(pm.colorTable.numColors);
-
-					if(BigShort(pm.compCount) != 1 || BigShort(pm.compSize) != 8)
-						return;
-
-					// Convert 48-bit palette to 24-bit for our remapping code
-					uint32_t rgb[256] = {};
-					for(unsigned int i = 0;i < pm.colorTable.numColors;++i)
+					uint8_t code = *data++;
+					if(code & 0x80) // Run of single color
 					{
-						uint16_t index = BigShort(colors[i].index);
-						if(index <= 255)
-							rgb[index] = MAKERGB(colors[i].r, colors[i].g, colors[i].b);
+						uint8_t color = *data++;
+						memset(dest, color, 257-code);
+						dest += 257-code;
+						rowSize -= 2;
 					}
-					GPalette.MakeRemap(rgb, remap, NULL, pm.colorTable.numColors+1);
-
-					data += sizeof(PixMap)+(pm.colorTable.numColors+1)*sizeof(ColorTabEntry)
-						// Skip over src and dest rectangles and mode unless we know we
-						// need to do something  with them.
-						+ 2*sizeof(PictRect) + 2;
-
-					uint8_t *dest = rowMajor.Get();
-					uint8_t *start = dest;
-					for(unsigned int i = 0;i < Height;++i, dest = (start += Width))
+					else // Copy from source
 					{
-						// Get size of compressed row
-						int rowSize;
-						if(pm.pitch <= 250)
-							rowSize = *data++;
-						else
-						{
-							rowSize = ReadBigShort(data);
-							data += 2;
-						}
-
-						while(rowSize > 0)
-						{
-							uint8_t code = *data++;
-							if(code & 0x80) // Run of single color
-							{
-								uint8_t color = *data++;
-								memset(dest, color, 257-code);
-								dest += 257-code;
-								rowSize -= 2;
-							}
-							else // Copy from source
-							{
-								memcpy(dest, data, code+1);
-								data += code+1;
-								dest += code+1;
-								rowSize -= code+2;
-							}
-						}
+						memcpy(dest, data, code+1);
+						data += code+1;
+						dest += code+1;
+						rowSize -= code+2;
 					}
-					break;
 				}
+			}
+			break;
+		}
 
 		}
 	}

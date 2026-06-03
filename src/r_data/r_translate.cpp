@@ -410,6 +410,7 @@ void FRemapTable::AddDesaturation(int start, int end, double r1, double g1, doub
 void FRemapTable::AddToTranslation(const char * range)
 {
 	int start,end;
+	bool desaturated = false;
 	Scanner sc(range, int(strlen(range)));
 	sc.SetScriptIdentifier("Translation");
 
@@ -517,6 +518,7 @@ void FRemapTable::AddToTranslation(const char * range)
 	}
 	catch (CRecoverableError &err)
 	{
+		Printf("Error in translation '%s':\n%s\n", range, err.GetMessage());
 	}
 }
 
@@ -760,4 +762,20 @@ void R_DeinitTranslationTables()
 		translationtables[i].Clear();
 	}
 	BloodTranslationColors.Clear();
+}
+
+//----------------------------------------------------------------------------
+//
+// [RH] Create a player's translation table based on a given mid-range color.
+// [GRB] Split to 2 functions (because of player setup menu)
+//
+//----------------------------------------------------------------------------
+
+static void SetRemap(FRemapTable *table, int i, float r, float g, float b)
+{
+	int ir = clamp (int(r * 255.f), 0, 255);
+	int ig = clamp (int(g * 255.f), 0, 255);
+	int ib = clamp (int(b * 255.f), 0, 255);
+	table->Remap[i] = ColorMatcher.Pick (ir, ig, ib);
+	table->Palette[i] = PalEntry(255, ir, ig, ib);
 }

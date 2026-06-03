@@ -70,7 +70,7 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
   #define MY_CPU_LE
 #endif
 
-#if defined(MSB_FIRST) \
+#if defined(__BIG_ENDIAN__) \
     || defined(__ARMEB__) \
     || defined(__THUMBEB__) \
     || defined(__AARCH64EB__) \

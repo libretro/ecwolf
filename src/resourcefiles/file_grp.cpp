@@ -72,7 +72,7 @@ class FGrpFile : public FUncompressedFile
 {
 public:
 	FGrpFile(const char * filename, FileReader *file);
-	bool Open();
+	bool Open(bool quiet);
 };
 
 
@@ -94,7 +94,7 @@ FGrpFile::FGrpFile(const char *filename, FileReader *file)
 //
 //==========================================================================
 
-bool FGrpFile::Open()
+bool FGrpFile::Open(bool quiet)
 {
 	GrpInfo header;
 
@@ -119,6 +119,7 @@ bool FGrpFile::Open()
 		fileinfo[i].NameWithZero[12] = '\0';	// Be sure filename is null-terminated
 		Lumps[i].LumpNameSetup(fileinfo[i].NameWithZero);
 	}
+	if (!quiet) Printf(", %d lumps\n", NumLumps);
 
 	delete[] fileinfo;
 	return true;
@@ -131,7 +132,7 @@ bool FGrpFile::Open()
 //
 //==========================================================================
 
-FResourceFile *CheckGRP(const char *filename, FileReader *file)
+FResourceFile *CheckGRP(const char *filename, FileReader *file, bool quiet)
 {
 	char head[12];
 
@@ -143,7 +144,7 @@ FResourceFile *CheckGRP(const char *filename, FileReader *file)
 		if (!memcmp(head, "KenSilverman", 12))
 		{
 			FResourceFile *rf = new FGrpFile(filename, file);
-			if (rf->Open()) return rf;
+			if (rf->Open(quiet)) return rf;
 			rf->Reader = NULL; // to avoid destruction of reader
 			delete rf;
 		}

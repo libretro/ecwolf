@@ -15,7 +15,7 @@
 #include "m_random.h"
 #include "SFMT-params.h"
 
-#if defined(MSB_FIRST) && !defined(__amd64) && !defined(BIG_ENDIAN64)
+#if defined(__BIG_ENDIAN__) && !defined(__amd64) && !defined(BIG_ENDIAN64)
 #define BIG_ENDIAN64 1
 #endif
 #if defined(HAVE_ALTIVEC) && !defined(BIG_ENDIAN64)

@@ -448,6 +448,7 @@ realize_virt_arrays (j_common_ptr cinfo)
 {
 	my_mem_ptr mem = (my_mem_ptr) cinfo->mem;
 	long space_per_minheight;
+	long minheights;
 	jvirt_barray_ptr bptr;
 
 	/* Compute the minimum space needed (maxaccess rows in each buffer)
@@ -469,6 +470,7 @@ realize_virt_arrays (j_common_ptr cinfo)
 
 	for (bptr = mem->virt_barray_list; bptr != NULL; bptr = bptr->next) {
 		if (bptr->mem_buffer == NULL) { /* if not realized yet */
+			minheights = ((long) bptr->rows_in_array - 1L) / bptr->maxaccess + 1L;
 			bptr->rows_in_mem = bptr->rows_in_array;
 			bptr->mem_buffer = alloc_barray(cinfo, JPOOL_IMAGE,
 				bptr->blocksperrow, bptr->rows_in_mem);

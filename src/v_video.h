@@ -70,6 +70,8 @@ class IVideo
 	virtual bool NextMode (int *width, int *height, bool *letterbox) = 0;
 
 	virtual bool SetResolution (int width, int height, int bits);
+
+	virtual void DumpAdapters();
 };
 
 extern IVideo *Video;

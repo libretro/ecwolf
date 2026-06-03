@@ -391,7 +391,9 @@ FFont *V_GetFont(const char *name)
 FArchive &SerializeFFontPtr (FArchive &arc, FFont* &font)
 {
 	if (arc.IsStoring ())
+	{
 		arc << font->Name;
+	}
 	else
 	{
 		char *name = NULL;
@@ -400,7 +402,7 @@ FArchive &SerializeFFontPtr (FArchive &arc, FFont* &font)
 		font = V_GetFont(name);
 		if (font == NULL)
 		{
-			log_cb(RETRO_LOG_ERROR, "Could not load font %s\n", name);
+			Printf ("Could not load font %s\n", name);
 			font = SmallFont;
 		}
 		delete[] name;
@@ -1176,7 +1178,7 @@ void FSingleLumpFont::LoadTranslations()
 
 			// We'll be loading the texture with +1 on all the colors, so
 			// calculate luminosity shifted.
-			for(unsigned int i = 0;i < 256;++i)
+			for(unsigned int i = 0, j = 0;i < 256;++i)
 				luminosity[i] = ((double)(i-1))/lastcolor;
 			break;
 		}

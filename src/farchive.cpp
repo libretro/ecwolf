@@ -86,7 +86,7 @@
 #define NEW_SPRITE			((uint8_t)11)	// A new sprite name follows
 #define OLD_SPRITE			((uint8_t)12)	// Reference to an old sprite name follows
 
-#ifdef MSB_FIRST
+#ifdef __BIG_ENDIAN__
 static inline uint16_t SWAP_WORD(uint16_t x) { return x; }
 static inline uint32_t SWAP_DWORD(uint32_t x) { return x; }
 static inline uint64_t SWAP_QWORD(uint64_t x) { return x; }
@@ -817,7 +817,7 @@ FArchive &FArchive::operator<< (FString &str)
 
 FArchive& FArchive::StoreInt(void *p, size_t sz)
 {
-#ifdef MSB_FIRST
+#ifdef __BIG_ENDIAN__
   	if (m_Storing)
 		Write (p, sz);
 	else

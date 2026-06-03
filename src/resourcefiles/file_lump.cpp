@@ -45,7 +45,7 @@ class FLumpFile : public FUncompressedFile
 {
 public:
 	FLumpFile(const char * filename, FileReader *file);
-	bool Open();
+	bool Open(bool quiet);
 };
 
 
@@ -65,8 +65,10 @@ FLumpFile::FLumpFile(const char *filename, FileReader *file) : FUncompressedFile
 //
 //==========================================================================
 
-bool FLumpFile::Open()
+bool FLumpFile::Open(bool quiet)
 {
+	if(!quiet) printf("\n");
+
 	FString name(Filename);
 	long lastSlash = name.LastIndexOf('/') > name.LastIndexOf('\\') ? name.LastIndexOf('/') : name.LastIndexOf('\\');
 	long dot = name.LastIndexOf('.');
@@ -94,11 +96,11 @@ bool FLumpFile::Open()
 //
 //==========================================================================
 
-FResourceFile *CheckLump(const char *filename, FileReader *file)
+FResourceFile *CheckLump(const char *filename, FileReader *file, bool quiet)
 {
 	// always succeeds
 	FResourceFile *rf = new FLumpFile(filename, file);
-	if (rf->Open()) return rf;
+	if (rf->Open(quiet)) return rf;
 	delete rf;
 	return NULL;
 }

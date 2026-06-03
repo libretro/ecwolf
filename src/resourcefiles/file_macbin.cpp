@@ -402,7 +402,7 @@ class FMacBin : public FResourceFile
 
 		FResourceLump *GetLump(int index) { return &Lumps[index]; }
 
-		bool Open()
+		bool Open(bool quiet)
 		{
 			// Kill data types we definitely don't care about.
 			static const char* const IgnoreTypes[] = {
@@ -701,11 +701,13 @@ class FMacBin : public FResourceFile
 				}
 			}
 
+			if(!quiet) Printf(", %d lumps\n", NumLumps);
+
 			return true;
 		}
 };
 
-FResourceFile *CheckMacBin(const char *filename, FileReader *file)
+FResourceFile *CheckMacBin(const char *filename, FileReader *file, bool quiet)
 {
 	if(file->GetLength() > 128)
 	{
@@ -721,7 +723,7 @@ FResourceFile *CheckMacBin(const char *filename, FileReader *file)
 			BigLong(sizes[0]) + BigLong(sizes[1]) < static_cast<unsigned>(file->GetLength()))
 		{
 			FResourceFile *rf = new FMacBin(filename, file);
-			if(rf->Open()) return rf;
+			if(rf->Open(quiet)) return rf;
 			rf->Reader = NULL; // to avoid destruction of reader
 			delete rf;
 		}

@@ -172,7 +172,9 @@ void JPEG_ErrorExit (j_common_ptr cinfo)
 void JPEG_OutputMessage (j_common_ptr cinfo)
 {
 	char buffer[JMSG_LENGTH_MAX];
+
 	(*cinfo->err->format_message) (cinfo, buffer);
+	Printf (TEXTCOLOR_ORANGE "JPEG failure: %s\n", buffer);
 }
 
 //==========================================================================
@@ -388,7 +390,10 @@ void FJPEGTexture::MakeTexture ()
 		if (!((cinfo.out_color_space == JCS_RGB && cinfo.num_components == 3) ||
 			  (cinfo.out_color_space == JCS_CMYK && cinfo.num_components == 4) ||
 			  (cinfo.out_color_space == JCS_GRAYSCALE && cinfo.num_components == 1)))
+		{
+			Printf (TEXTCOLOR_ORANGE "Unsupported color format\n");
 			throw -1;
+		}
 
 		jpeg_start_decompress(&cinfo);
 
@@ -397,6 +402,7 @@ void FJPEGTexture::MakeTexture ()
 
 		while (cinfo.output_scanline < cinfo.output_height)
 		{
+			int num_scanlines = jpeg_read_scanlines(&cinfo, &buff, 1);
 			uint8_t *in = buff;
 			uint8_t *out = Pixels + y;
 			switch (cinfo.out_color_space)
@@ -446,6 +452,7 @@ void FJPEGTexture::MakeTexture ()
 	}
 	catch (int)
 	{
+		Printf (TEXTCOLOR_ORANGE "   in texture %s\n", Name.GetChars());
 		jpeg_destroy_decompress(&cinfo);
 	}
 	if (buff != NULL)
@@ -487,6 +494,7 @@ int FJPEGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FC
 			  (cinfo.out_color_space == JCS_CMYK && cinfo.num_components == 4) ||
 			  (cinfo.out_color_space == JCS_GRAYSCALE && cinfo.num_components == 1)))
 		{
+			Printf (TEXTCOLOR_ORANGE "Unsupported color format\n");
 			throw -1;
 		}
 		jpeg_start_decompress(&cinfo);
@@ -528,6 +536,7 @@ int FJPEGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FC
 	}
 	catch(int)
 	{
+		Printf (TEXTCOLOR_ORANGE "   in JPEG texture %s\n", Name.GetChars());
 	}
 	jpeg_destroy_decompress(&cinfo);
 	if (buff != NULL) delete [] buff;

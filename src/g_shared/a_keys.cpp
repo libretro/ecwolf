@@ -428,17 +428,56 @@ void P_DeinitKeyMessages()
 
 bool P_CheckKeys (AActor *owner, int keynum, bool remote)
 {
+	const char *failtext = NULL;
+	SoundIndex *failsound;
+	int numfailsounds;
+
 	if (owner == NULL) return false;
 	if (keynum<=0 || keynum>255) return true;
 	// Just a safety precaution. The messages should have been initialized upon game start.
 	if (!keysdone) P_InitKeyMessages();
 
-	if (locks[keynum]) 
+	SoundIndex failage[2] = { SoundInfo.FindSound("*keytry"), SoundInfo.FindSound("misc/keytry") };
+
+	if (!locks[keynum]) 
+	{
+		/*if (keynum == 103 && (gameinfo.flags & GI_SHAREWARE))
+			failtext = "$TXT_RETAIL_ONLY";
+		else*/
+			failtext = "$TXT_DOES_NOT_WORK";
+
+		failsound = failage;
+		numfailsounds = countof(failage);
+	}
+	else
 	{
 		if (locks[keynum]->check(owner)) return true;
+		failtext = remote? locks[keynum]->RemoteMsg : locks[keynum]->Message;
+		failsound = &locks[keynum]->locksound[0];
+		numfailsounds = locks[keynum]->locksound.Size();
 	}
 
 	// If we get here, that means the actor isn't holding an appropriate key.
+
+	/*if (owner == players[consoleplayer].camera)
+	{
+		PrintMessage(failtext);
+
+		// Play the first defined key sound.
+		for (int i = 0; i < numfailsounds; ++i)
+		{
+			if (failsound[i] != 0)
+			{
+				int snd = S_FindSkinnedSound(owner, failsound[i]);
+				if (snd != 0)
+				{
+					S_Sound (owner, CHAN_VOICE, snd, 1, ATTN_NORM);
+					break;
+				}
+			}
+		}
+	}*/
+
 	return false;
 }
 

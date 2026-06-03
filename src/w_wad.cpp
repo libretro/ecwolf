@@ -69,6 +69,14 @@ struct FWadCollection::LumpRecord
 	FResourceLump *lump;
 };
 
+// EXTERNAL FUNCTION PROTOTYPES --------------------------------------------
+
+// PUBLIC FUNCTION PROTOTYPES ----------------------------------------------
+
+// PRIVATE FUNCTION PROTOTYPES ---------------------------------------------
+
+static void PrintLastError ();
+
 // PUBLIC DATA DEFINITIONS -------------------------------------------------
 
 FWadCollection Wads;
@@ -161,7 +169,10 @@ void FWadCollection::InitMultipleFiles (TArray<FString> &filenames)
 	numfiles = 0;
 
 	for(unsigned i=0;i<filenames.Size(); i++)
+	{
+		int baselump = NumLumps;
 		AddFile (filenames[i]);
+	}
 
 	NumLumps = LumpInfo.Size();
 	if (NumLumps == 0)
@@ -210,6 +221,7 @@ int FWadCollection::AddExternalFile(const char *filename)
 
 void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 {
+	int startlump;
 	bool isdir = false;
 
 	if (wadinfo == NULL)
@@ -218,7 +230,8 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 		File info(filename);
 		if (!info.exists())
 		{
-			log_cb(RETRO_LOG_ERROR, "Could not stat %s\n", filename);
+			Printf(TEXTCOLOR_RED "Could not stat %s\n", filename);
+			PrintLastError();
 			return;
 		}
 		isdir = info.isDirectory();
@@ -226,15 +239,17 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 		if (!isdir)
 		{
 			wadinfo = FileReader::SafeOpen(filename);
-			if (wadinfo == NULL) // Didn't find file
-			{ 
-				log_cb(RETRO_LOG_ERROR, "File %s couln't be opened\n", filename);
+			if (wadinfo == NULL)
+			{ // Didn't find file
+				Printf (TEXTCOLOR_RED "File %s couln't be opened\n", filename);
+				PrintLastError ();
 				return;
 			}
 		}
 	}
 
-	log_cb (RETRO_LOG_INFO, " adding %s", filename);
+	Printf (" adding %s", filename);
+	startlump = NumLumps;
 
 	FResourceFile *resfile;
 	
@@ -1216,21 +1231,37 @@ long FWadLump::Seek (long offset, int origin)
 
 long FWadLump::Read (void *buffer, long len)
 {
-	if (!Lump)
-		return FileReader::Read(buffer, len);
+	long numread;
+	long startread = FilePos;
 
-	if (FilePos + len > Length)
-		len = Length - FilePos;
-	memcpy(buffer, Lump->Cache + FilePos, len);
-	FilePos += len;
-	return len;
+	if (Lump != NULL)
+	{
+		if (FilePos + len > Length)
+		{
+			len = Length - FilePos;
+		}
+		memcpy(buffer, Lump->Cache + FilePos, len);
+		FilePos += len;
+		numread = len;
+	}
+	else
+	{
+		numread = FileReader::Read(buffer, len);
+	}
+	return numread;
 }
 
 char *FWadLump::Gets(char *strbuf, int len)
 {
 	if (Lump != NULL)
+	{
 		return GetsFromBuffer(Lump->Cache, strbuf, len);
-	return FileReader::Gets(strbuf, len);
+	}
+	else
+	{
+		return FileReader::Gets(strbuf, len);
+	}
+	return strbuf;
 }
 
 // FMemLump -----------------------------------------------------------------
@@ -1273,3 +1304,52 @@ FString::FString (ELumpNum lumpnum)
 			numread, size, lumpnum, Wads.GetLumpFullName((int)lumpnum));
 	}
 }
+
+//==========================================================================
+//
+// PrintLastError
+//
+//==========================================================================
+
+#ifdef _WIN32
+//#define WIN32_LEAN_AND_MEAN
+//#include <windows.h>
+
+extern "C" {
+__declspec(dllimport) unsigned long __stdcall FormatMessageA(
+    unsigned long dwFlags,
+    const void *lpSource,
+    unsigned long dwMessageId,
+    unsigned long dwLanguageId,
+    char **lpBuffer,
+    unsigned long nSize,
+    va_list *Arguments
+    );
+__declspec(dllimport) void * __stdcall LocalFree (void *);
+__declspec(dllimport) unsigned long __stdcall GetLastError ();
+}
+
+static void PrintLastError ()
+{
+	char *lpMsgBuf;
+	FormatMessageA(0x1300 /*FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+							FORMAT_MESSAGE_FROM_SYSTEM | 
+							FORMAT_MESSAGE_IGNORE_INSERTS*/,
+		NULL,
+		GetLastError(),
+		1 << 10 /*MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT)*/, // Default language
+		&lpMsgBuf,
+		0,
+		NULL 
+	);
+	Printf (TEXTCOLOR_RED "  %s\n", lpMsgBuf);
+	// Free the buffer.
+	LocalFree( lpMsgBuf );
+}
+#else
+#include <cerrno>
+static void PrintLastError ()
+{
+	Printf (TEXTCOLOR_RED "  %s\n", strerror(errno));
+}
+#endif

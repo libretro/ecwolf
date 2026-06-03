@@ -741,6 +741,7 @@ void GameMap::ReadMacData()
 {
 	static const uint8_t TEX_MASK = 0x1F;
 	static const uint8_t NUM_MASK = 0x3F;
+	static const uint8_t DOOR_TEX = 31;
 	static const uint8_t BLOCKING = 0x80;
 
 	FileReader &lump = *lumps[0];

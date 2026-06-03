@@ -86,8 +86,8 @@ private:
 	void JunkLeftoverFilters(void *lumps, size_t lumpsize, uint32_t max);
 
 public:
-	static FResourceFile *OpenResourceFile(const char *filename, FileReader *file);
-	static FResourceFile *OpenDirectory(const char *filename);
+	static FResourceFile *OpenResourceFile(const char *filename, FileReader *file, bool quiet = false);
+	static FResourceFile *OpenDirectory(const char *filename, bool quiet = false);
 	virtual ~FResourceFile();
 	FileReader *GetReader() const { return Reader; }
 	uint32_t LumpCount() const { return NumLumps; }
@@ -95,7 +95,7 @@ public:
 	void SetFirstLump(uint32_t f) { FirstLump = f; }
 
 	virtual void FindStrifeTeaserVoices ();
-	virtual bool Open() = 0;
+	virtual bool Open(bool quiet) = 0;
 	virtual FResourceLump *GetLump(int no) = 0;
 };
 
@@ -181,7 +181,7 @@ class FDirectory : public FResourceFile
 
 public:
 	FDirectory(const char * dirname);
-	bool Open();
+	bool Open(bool quiet);
 	virtual FResourceLump *GetLump(int no) { return ((unsigned)no < NumLumps)? &Lumps[no] : NULL; }
 };
 

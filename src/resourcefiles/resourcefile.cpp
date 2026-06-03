@@ -219,28 +219,28 @@ int FResourceLump::ReleaseCache()
 //
 //==========================================================================
 
-typedef FResourceFile * (*CheckFunc)(const char *filename, FileReader *file);
+typedef FResourceFile * (*CheckFunc)(const char *filename, FileReader *file, bool quiet);
 
-FResourceFile *CheckWad(const char *filename, FileReader *file);
-FResourceFile *CheckGRP(const char *filename, FileReader *file);
-FResourceFile *CheckRFF(const char *filename, FileReader *file);
-FResourceFile *CheckPak(const char *filename, FileReader *file);
-FResourceFile *CheckZip(const char *filename, FileReader *file);
-FResourceFile *Check7Z(const char *filename, FileReader *file);
-FResourceFile *CheckLump(const char *filename, FileReader *file);
-FResourceFile *CheckDir(const char *filename, FileReader *file);
-FResourceFile *CheckVGAGraph(const char *filename, FileReader *file);
-FResourceFile *CheckVSwap(const char *filename, FileReader *file);
-FResourceFile *CheckAudiot(const char *filename, FileReader *file);
-FResourceFile *CheckGamemaps(const char *filename, FileReader *file);
-FResourceFile *CheckMacBin(const char *filename, FileReader *file);
-FResourceFile *CheckRtl(const char *filename, FileReader *file);
+FResourceFile *CheckWad(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckGRP(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckRFF(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckPak(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckZip(const char *filename, FileReader *file, bool quiet);
+FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckLump(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckDir(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckVSwap(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckAudiot(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckGamemaps(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckMacBin(const char *filename, FileReader *file, bool quiet);
+FResourceFile *CheckRtl(const char *filename, FileReader *file, bool quiet);
 
 #define COUNTOF_FUNCS 13
 #define EMBEDDABLE_START 8 // Should point to AudioT
 static CheckFunc funcs[COUNTOF_FUNCS] = { CheckWad, CheckZip, Check7Z, CheckPak, CheckGRP, CheckRFF, CheckRtl, CheckMacBin, CheckAudiot, CheckVGAGraph, CheckGamemaps, CheckVSwap, CheckLump };
 
-FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader *file)
+FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader *file, bool quiet)
 {
 	if (file == NULL)
 	{
@@ -254,15 +254,15 @@ FResourceFile *FResourceFile::OpenResourceFile(const char *filename, FileReader 
 
 	for(size_t i = 0; i < COUNTOF_FUNCS; i++)
 	{
-		FResourceFile *resfile = funcs[i](filename, file);
+		FResourceFile *resfile = funcs[i](filename, file, quiet);
 		if (resfile != NULL) return resfile;
 	}
 	return NULL;
 }
 
-FResourceFile *FResourceFile::OpenDirectory(const char *filename)
+FResourceFile *FResourceFile::OpenDirectory(const char *filename, bool quiet)
 {
-	return CheckDir(filename, NULL);
+	return CheckDir(filename, NULL, quiet);
 }
 
 //==========================================================================

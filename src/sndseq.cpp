@@ -108,12 +108,14 @@ SndSeqTable SoundSeq;
 
 void SndSeqTable::Init()
 {
+	Printf("S_Init: Reading SNDSEQ defintions.\n");
+
 	int lastLump = 0;
 	int lump = 0;
-	log_cb(RETRO_LOG_INFO, "S_Init: Reading SNDSEQ definitions.\n");
-
 	while((lump = Wads.FindLump("SNDSEQ", &lastLump)) != -1)
+	{
 		ParseSoundSequence(lump);
+	}
 }
 
 void SndSeqTable::ParseSoundSequence(int lumpnum)

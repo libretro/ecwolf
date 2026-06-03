@@ -75,10 +75,14 @@ void CA_CacheMap (const FString &mapname, bool loading)
 	static TUniquePtr<GameMap, TFuncDeleter<GameMap, CA_UnloadMap> > map;
 	map.Reset();
 
+	Printf("\n");
+
 	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
 	::map = map = new GameMap(mapname);
 	map->LoadMap(loading);
+
+	Printf("\n%s - %s\n\n", mapname.GetChars(), levelInfo->GetName(map).GetChars());
 
 	CalcVisibility(gLevelVisibility);
 }

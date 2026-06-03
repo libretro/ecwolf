@@ -477,6 +477,7 @@ public:
 					}
 					if(!nextDoor)
 					{
+						Printf("Failed to perform elevator teleport.\n");
 						state = Finished;
 						break;
 					}
@@ -672,7 +673,10 @@ FUNC(Door_Elevator)
 	// to call to our location.
 	MapSpot swtch = map->GetSpotByTag(args[0], NULL);
 	if(!swtch)
+	{
+		Printf("Door_Elevator: Could not find switch.\n");
 		return 0;
+	}
 	MapTrigger *trig = NULL; 
 	for(unsigned int i = 0;i < swtch->triggers.Size();++i)
 	{
@@ -683,7 +687,10 @@ FUNC(Door_Elevator)
 		}
 	}
 	if(!trig)
+	{
+		Printf("Door_Elevator: Could not find elevator trigger.\n");
 		return 0;
+	}
 
 	// Call elevator
 	if(map->elevatorPosition[trig->arg[0]] != swtch)
@@ -1138,7 +1145,10 @@ FUNC(Teleport_Relative)
 	};
 
 	if(!spot)
+	{
+		Printf("Error: Attempted to relative teleport without a reference point.\n");
 		return 0;
+	}
 
 	if(activator->player && control[activator->player->GetPlayerNum()].buttonheld[bt_use])
 		return 0;
@@ -1169,7 +1179,10 @@ FUNC(Teleport_Relative)
 
 	// Check that teleport remains in bounds
 	if(!map->IsValidTileCoordinate(x>>FRACBITS, y>>FRACBITS, 0))
+	{
+		Printf("Error: %s at (%d, %d) attempted to teleport out of bounds. Possible double teleport?\n", activator->GetClass()->GetName().GetChars(), activator->tilex, activator->tiley);
 		return false;
+	}
 
 	activator->Teleport(x, y, angle, !!(args[2] & TELEPORT_NoFog));
 	return 1;

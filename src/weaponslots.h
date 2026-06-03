@@ -79,6 +79,7 @@ struct FWeaponSlots
 	void LocalSetup(const ClassDef *type);
 	void SendDifferences(const FWeaponSlots &other);
 	int RestoreSlots (FConfigFile *config, const char *section);
+	void PrintSettings();
 
 	void AddSlot(int slot, const ClassDef *type, bool feedback);
 	void AddSlotDefault(int slot, const ClassDef *type, bool feedback);

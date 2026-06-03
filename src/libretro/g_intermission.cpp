@@ -256,7 +256,7 @@ static void ShowFader(struct IntermissionGState *state, FaderIntermissionAction 
 static bool ShowTextScreen(TextScreenIntermissionAction *textscreen, bool demoMode)
 {
 	if(textscreen->TextSpeed)
-		log_cb(RETRO_LOG_WARN, "Text screen has a non-zero textspeed which isn't supported at this time.\n");
+		Printf("Warning: Text screen has a non-zero textspeed which isn't supported at this time.\n");
 
 	ShowImage(textscreen, true);
 
