@@ -152,10 +152,18 @@ public:
 	bool IsValid () { return true; }
 	void Update () {
 		ComputePalette();
-		for (int y = 0; y < height_; y++)
+		// Source (Buffer) is 8bpp with a possibly-padded Pitch; destination is
+		// tightly packed color_t. Hoist the row strides out of the inner loop
+		// instead of recomputing the divisions per pixel.
+		const int dst_stride = lr_pitch_ / (int)sizeof(color_t);
+		const uint8_t *src_row = Buffer;
+		color_t *dst_row = lr_buffer_;
+		for (int y = 0; y < height_; y++) {
 			for (int x = 0; x < width_; x++)
-				lr_buffer_[y * (lr_pitch_ / sizeof(lr_buffer_[0])) + x]
-					= effective_palette_[Buffer[y * (Pitch / sizeof (Buffer[0])) + x]];
+				dst_row[x] = effective_palette_[src_row[x]];
+			src_row += Pitch;
+			dst_row += dst_stride;
+		}
 		ShowFrame();
 	}
 	void ShowFrame() {
