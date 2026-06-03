@@ -52,7 +52,6 @@ static const int samplesPerMusicTick = synthesisRate / MUSIC_RATE;
 #ifdef USE_GPL
 
 DBOPL::Chip oplChip;
-DBOPL::Chip musicOpl;
 
 static inline bool YM3812Init(int numChips, int clock, int rate)
 {
@@ -61,7 +60,6 @@ static inline bool YM3812Init(int numChips, int clock, int rate)
 		return false;
 	inited = true;
 	oplChip.Setup(rate);
-	musicOpl.Setup(rate);
 	return false;
 }
 
@@ -213,6 +211,11 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 	this->imfptr = 0;
 	this->imfsize = imf_size;
 
+	// Own OPL chip, set up to this chunk's synthesis rate, so interleaved
+	// lazy synthesis of different cached tracks doesn't share register state.
+	this->imfOpl = new DBOPL::Chip();
+	this->imfOpl->Setup(synthesisRate);
+
 	static const Instrument ChannelRelease = {
 		0, 0,
 		0x3F, 0x3F,
@@ -225,7 +228,7 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 	};
 
 	for (int i = 0;i < OPL_CHANNELS;++i)
-		SDL_AlSetChanInst(musicOpl, &ChannelRelease, i);
+		SDL_AlSetChanInst(*imfOpl, &ChannelRelease, i);
 }
 
 Mix_Chunk *SynthesizeAdlibIMFOrN3D(const uint8_t *dataRaw, size_t size)
@@ -262,7 +265,7 @@ void Mix_Chunk_IMF::EnsureSynthesis(int maxTics)
 		uint8_t reg = imf[4*imfptr];
 		uint8_t val = imf[4*imfptr + 1];
 		int tics = ReadLittleShort((uint8_t *)imf + imfptr * 4 + 2);
-		YM3812Write(musicOpl, reg, val, 20);
+		YM3812Write(*imfOpl, reg, val, 20);
 
 		EnsureSpace(sample_count + samplesPerMusicTick * tics);
 
@@ -270,7 +273,7 @@ void Mix_Chunk_IMF::EnsureSynthesis(int maxTics)
 			int curtics = tics;
 			if (curtics > 500 / samplesPerMusicTick)
 				curtics = 500 / samplesPerMusicTick;
-			YM3812UpdateOneMono(musicOpl, (int16_t *)chunk_samples + sample_count, samplesPerMusicTick * curtics);
+			YM3812UpdateOneMono(*imfOpl, (int16_t *)chunk_samples + sample_count, samplesPerMusicTick * curtics);
 			sample_count += samplesPerMusicTick * curtics;
 			tics -= curtics;
 		}

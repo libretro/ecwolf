@@ -304,6 +304,7 @@ public:
 		      bool isLooping);
         virtual ~Mix_Chunk_IMF() {
 		free (imf);
+		delete imfOpl;
 	}
 
 	int GetLengthTicks() {
@@ -320,6 +321,11 @@ private:
 	size_t samples_allocated;
 	uint8_t *imf;
 	size_t imfptr, imfsize;
+	// Each music chunk owns its OPL chip so the lazily-advanced synthesis state
+	// of one cached track can't corrupt another's (e.g. the in-game track
+	// clobbering the menu track, which made notes drop out after returning to
+	// the menu).
+	DBOPL::Chip *imfOpl;
 	void EnsureSynthesis(int tics);
 	void EnsureSpace(int samples);
 };
