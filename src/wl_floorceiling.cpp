@@ -62,6 +62,22 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 
 	unsigned int oldmapx = INT_MAX, oldmapy = INT_MAX;
 	const uint8_t* curshades = NormalLight.Maps;
+
+	// Precompute the per-column wall-clip threshold once. The inner pixel loop
+	// only needs to compare y against (wallheight[x]*heightFactor)>>FRACBITS,
+	// which depends on x but not y, so hoist the multiply+shift out of the
+	// O(viewwidth*viewheight) loop into this O(viewwidth) pass.
+	static int *wallclip = NULL;
+	static int wallclip_size = 0;
+	if(viewwidth > wallclip_size)
+	{
+		delete[] wallclip;
+		wallclip = new int[viewwidth];
+		wallclip_size = viewwidth;
+	}
+	for(int x = 0; x < viewwidth; ++x)
+		wallclip[x] = (wallheight[x]*heightFactor)>>FRACBITS;
+
 	// draw horizontal lines
 	for(int y = y0;floor ? y+halfheight < viewheight : y < halfheight; ++y, tex_offset += tex_offsetPitch)
 	{
@@ -88,7 +104,7 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 
 		for(unsigned int x = 0;x < (unsigned)viewwidth; ++x, ++tex_offset)
 		{
-			if(((wallheight[x]*heightFactor)>>FRACBITS) <= y)
+			if(wallclip[x] <= y)
 			{
 				unsigned int curx = viewxTile + (gu >> (TILESHIFT+8));
 				unsigned int cury = viewyTile + (-(gv >> (TILESHIFT+8)) - 1);
