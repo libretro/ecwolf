@@ -441,7 +441,7 @@ endif
 
 TOPDIR ?= $(CURDIR)
 
-COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DCORE=ON -DSDL2=ON -DBASE=ON -DUSE_FILE32API -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
+COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DUSE_FILE32API -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
 
 ifeq (,$(findstring msvc,$(platform)))
   COMMON_CFLAGS += -ffast-math -fno-strict-aliasing -fvisibility=hidden -fomit-frame-pointer -Wno-sign-compare -Wno-switch -Wno-format-security

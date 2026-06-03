@@ -20,7 +20,10 @@ extern	bool  screenfaded;
 // VGA hardware routines
 //
 
-#define VL_WaitVBL(a) SDL_Delay((a)*8)
+// VL_WaitVBL intentionally does nothing in the libretro core: frame pacing is
+// owned by the frontend, and the engine must not sleep on a wall clock. (The
+// only historical callers are under #ifndef LIBRETRO / #ifdef TODO.)
+#define VL_WaitVBL(a) ((void)0)
 
 void VL_ToggleFullscreen();
 void VL_SetFullscreen(bool isFull);
