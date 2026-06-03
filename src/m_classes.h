@@ -132,12 +132,15 @@ class MultipleChoiceMenuItem : public MenuItem
 		int					curOption;
 		const unsigned int	numOptions;
 		char**				options;
+		// If non-NULL, the item keeps curOption in sync with *boundValue so that
+		// external changes to the value (e.g. via core options) are reflected.
+		int					*boundValue;
 
 	public:
 		/**
 		 * @param options Name of the possible options.  Use NULL to indicate a disabled option as to keep the positions correct.
 		 */
-		MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, unsigned int numOptions, int curOption=0);
+		MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, unsigned int numOptions, int curOption=0, int *boundValue=NULL);
 		~MultipleChoiceMenuItem();
 
 		void	activate();

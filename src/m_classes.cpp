@@ -159,8 +159,8 @@ void SliderMenuItem::right()
 	SD_PlaySound("menu/move1");
 }
 
-MultipleChoiceMenuItem::MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, unsigned int numOptions, int curOption) : MenuItem("", changeListener),
-	curOption(curOption), numOptions(numOptions)
+MultipleChoiceMenuItem::MultipleChoiceMenuItem(MENU_LISTENER_PROTOTYPE(changeListener), const char** options, unsigned int numOptions, int curOption, int *boundValue) : MenuItem("", changeListener),
+	curOption(curOption), numOptions(numOptions), boundValue(boundValue)
 {
 	// Copy all of the options
 	this->options = new char *[numOptions];
@@ -206,6 +206,14 @@ void MultipleChoiceMenuItem::activate()
 
 void MultipleChoiceMenuItem::draw()
 {
+	// Reflect external changes to the bound value (e.g. via core options).
+	if(boundValue != NULL && *boundValue != curOption &&
+		*boundValue >= 0 && (unsigned)*boundValue < numOptions &&
+		options[*boundValue] != NULL)
+	{
+		curOption = *boundValue;
+		setText(options[curOption]);
+	}
 	DrawWindow(PrintX, PrintY, menu->getWidth()-menu->getIndent()-menu->getX(), BigFont->GetHeight(), BKGDCOLOR, BKGDCOLOR, BKGDCOLOR);
 	MenuItem::draw();
 }
