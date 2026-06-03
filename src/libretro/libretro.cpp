@@ -1395,6 +1395,12 @@ void retro_run(void)
 			// Drop to the top menu level so the escape path pops out fully.
 			g_state.menuLevel = 1;
 			g_state.stage = MENU_EXITING_ESCAPE_1;
+		} else if (g_state.isInWait) {
+			// Intro/attract/advisory and title-demo screens advance on any key
+			// (input->screenAcked). Don't toggle the paused overlay here: that
+			// would swallow the press and leave the screen stuck. Falling
+			// through lets the ack advance it (the title screen leads to the
+			// main menu).
 		} else {
 			Paused ^= 1;
 		}
