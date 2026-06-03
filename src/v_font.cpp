@@ -2933,6 +2933,37 @@ EColorRange V_ParseFontColor (const uint8_t *&color_value, int normalcolor, int 
 //
 //==========================================================================
 
+// Mirrors the format detection in the FSingleLumpFont constructor without
+// building anything. A resource pack (e.g. a hi-res asset pack) can introduce a
+// lump that shares a font's name (SMALLFNT, BIGFONT, ...) but isn't in any
+// single-lump font format the engine understands. Constructing FSingleLumpFont
+// from such a lump fatal-errors, so check first and fall back to the
+// FONTDEFS-defined font instead of aborting.
+static bool IsRecognizableSingleLumpFont(int lump)
+{
+	if(lump < 0)
+		return false;
+	FMemLump data1 = Wads.ReadLump(lump);
+	size_t size = data1.GetSize();
+	if(size == 0)
+		return false;
+	const uint8_t *data = (const uint8_t *)data1.GetMem();
+	// BMF
+	if(size >= 4 && data[0] == 0xE1 && data[1] == 0xE6 && data[2] == 0xD5 && data[3] == 0x1A)
+		return true;
+	// FON1 / FON2
+	if(size >= 4 && data[0] == 'F' && data[1] == 'O' && data[2] == 'N' &&
+		(data[3] == '1' || data[3] == '2'))
+		return true;
+	// Wolf font (needs at least the 770-byte header/tables)
+	if(size >= 770)
+		return true;
+	// Tile8 (ReadLump's size is one larger than the real lump)
+	if(size >= 1 && (size - 1) % 64 == 0)
+		return true;
+	return false;
+}
+
 static FFont *FindNewestFont(const char* fullname, const char* lumpname)
 {
 	// Load either the FONTDEFS font or the single lump font based on whichever
@@ -2940,7 +2971,8 @@ static FFont *FindNewestFont(const char* fullname, const char* lumpname)
 
 	FFont *font = FFont::FindFont(fullname);
 	int slLumpNum = Wads.CheckNumForName(lumpname);
-	if(slLumpNum >= 0 && (!font || slLumpNum > font->GetLump()))
+	if(slLumpNum >= 0 && (!font || slLumpNum > font->GetLump()) &&
+		IsRecognizableSingleLumpFont(slLumpNum))
 		font = new FSingleLumpFont(fullname, slLumpNum);
 	return font;
 }
