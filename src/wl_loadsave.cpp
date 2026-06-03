@@ -397,12 +397,23 @@ bool SetupSaveGames()
 	}
 
 	loadGame.clear();
+	saveGame.clear();
+
+	// The save menu always offers a "new save" slot first, then one entry per
+	// existing save (selecting it overwrites that save).
+	saveGame.addItem(new MenuItem("New Save"));
+
 	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
 	{
-		MenuItem *item = new MenuItem(SaveFile::files[i].name);
-		item->setEnabled(!SaveFile::files[i].hide &&
+		MenuItem *litem = new MenuItem(SaveFile::files[i].name);
+		litem->setEnabled(!SaveFile::files[i].hide &&
 			!SaveFile::files[i].oldVersion && SaveFile::files[i].hasFiles);
-		loadGame.addItem(item);
+		loadGame.addItem(litem);
+
+		// Overwriting hidden/foreign saves isn't offered.
+		MenuItem *sitem = new MenuItem(SaveFile::files[i].name);
+		sitem->setEnabled(!SaveFile::files[i].hide);
+		saveGame.addItem(sitem);
 	}
 
 	return canLoad;
@@ -421,33 +432,57 @@ bool LoadFromSlot(int which)
 
 // Writes a new save with an auto-generated name (map + timestamp). Interactive
 // naming is a later step.
-bool SaveAuto()
+// Generates the auto title "MAPNAME hh:mm:ss" for a new save.
+static FString MakeAutoTitle()
 {
-	if(!ingame)
-		return false;
-
-	// Pick a free savegamN.ecs filename.
-	FString filename;
-	for(unsigned int i = 0;i < 10000;i++)
-	{
-		filename.Format("savegam%u%s", i, ECS_EXT);
-		long probeLen = 0;
-		uint8_t *probe = VFS_ReadFile(GetFullSaveFileName(filename), &probeLen);
-		if(probe)
-		{
-			free(probe);
-			continue; // exists, try next
-		}
-		break;
-	}
-
-	// Auto title: "MAPNAME hh:mm:ss".
 	FString title;
 	unsigned int gametime = gamestate.TimeCount/70;
 	FString mapname = gamestate.mapname;
 	mapname.ToUpper();
 	title.Format("%s %02d:%02d:%02d", mapname.GetChars(),
 		gametime/3600, (gametime%3600)/60, gametime%60);
+	return title;
+}
+
+// Writes a save for the save-menu slot "which": slot 0 is a brand new save (a
+// free savegamN.ecs, auto-named); slots 1..N overwrite existing save N-1,
+// keeping its filename and name. Returns true on success. Interactive naming is
+// a later step.
+bool SaveToSlot(int which)
+{
+	if(!ingame)
+		return false;
+
+	FString filename;
+	FString title;
+
+	if(which <= 0)
+	{
+		// New save: find a free savegamN.ecs.
+		for(unsigned int i = 0;i < 10000;i++)
+		{
+			filename.Format("savegam%u%s", i, ECS_EXT);
+			long probeLen = 0;
+			uint8_t *probe = VFS_ReadFile(GetFullSaveFileName(filename), &probeLen);
+			if(probe)
+			{
+				free(probe);
+				continue; // exists, try next
+			}
+			break;
+		}
+		title = MakeAutoTitle();
+	}
+	else
+	{
+		// Overwrite an existing save (menu index "which" maps to files[which-1]
+		// because slot 0 is the "new save" entry).
+		unsigned int idx = (unsigned)(which - 1);
+		if(idx >= SaveFile::files.Size())
+			return false;
+		filename = SaveFile::files[idx].filename;
+		title = SaveFile::files[idx].name;
+	}
 
 	return Save(filename, title);
 }

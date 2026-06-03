@@ -147,6 +147,7 @@ enum StateMenuType
 	DISPLAY_MENU,
 	AUTOMAP_MENU,
 	LOAD_MENU,
+	SAVE_MENU,
 };
 
 #define MIX_CHANNELS 8

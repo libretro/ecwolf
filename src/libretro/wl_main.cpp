@@ -933,6 +933,8 @@ wl_state_t::currentMenu() {
 		return &automapMenu;
 	case LOAD_MENU:
 		return &GameSave::GetLoadMenu();
+	case SAVE_MENU:
+		return &GameSave::GetSaveMenu();
 	}
 	return NULL;
 }
@@ -1196,20 +1198,10 @@ static bool handleChoice(wl_state_t *state, int pos)
 			pushMenu(state, LOAD_MENU);
 			state->stage = MENU_PREPARE;
 			break;
-		case 5: // Save Game (auto-named for now; enabled only in-game)
-			if (ingame && GameSave::SaveAuto())
-			{
-				// Saved successfully: drop back into the game.
-				CleanupControlPanel ();
-				ContinueMusic (lastgamemusicoffset);
-				DrawPlayScreen (false);
-				state->menuLevel = 0;
-				state->stage = PLAY_STEP_A;
-			}
-			else
-			{
-				state->stage = MENU_PREPARE;
-			}
+		case 5: // Save Game (pick a slot; enabled only in-game)
+			if (ingame)
+				pushMenu(state, SAVE_MENU);
+			state->stage = MENU_PREPARE;
 			break;
 		case 6: // Read This!
 			// HelpScreens drives its own fade via the state machine
@@ -1289,6 +1281,21 @@ static bool handleChoice(wl_state_t *state, int pos)
 		else
 		{
 			// Old/incompatible save or read failure: stay in the load menu.
+			state->stage = MENU_PREPARE;
+		}
+		break;
+	case SAVE_MENU:
+		if(GameSave::SaveToSlot(pos))
+		{
+			// Saved: drop back into the running game.
+			CleanupControlPanel ();
+			ContinueMusic (lastgamemusicoffset);
+			DrawPlayScreen (false);
+			state->menuLevel = 0;
+			state->stage = PLAY_STEP_A;
+		}
+		else
+		{
 			state->stage = MENU_PREPARE;
 		}
 		break;
