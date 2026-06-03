@@ -93,26 +93,6 @@
 */
 #define DEFAULT_GCPAUSE		150	// 150% (wait for memory to increase by half before next GC)
 
-/*
-@@ DEFAULT_GCMUL defines the default speed of garbage collection relative to
-@* memory allocation as a percentage.
-** CHANGE it if you want to change the granularity of the garbage
-** collection. (Higher values mean coarser collections. 0 represents
-** infinity, where each step performs a full collection.) You can also
-** change this value dynamically.
-*/
-#define DEFAULT_GCMUL		400 // GC runs 'quadruple the speed' of memory allocation
-
-// Number of sectors to mark for each step.
-#define SECTORSTEPSIZE	32
-#define POLYSTEPSIZE 120
-#define SIDEDEFSTEPSIZE 240
-
-#define GCSTEPSIZE		1024u
-#define GCSWEEPMAX		40
-#define GCSWEEPCOST		10
-#define GCFINALIZECOST	100
-
 // TYPES -------------------------------------------------------------------
 
 // EXTERNAL FUNCTION PROTOTYPES --------------------------------------------
@@ -134,8 +114,6 @@ size_t Threshold;
 size_t Estimate;
 DObject *Root;
 int Pause = DEFAULT_GCPAUSE;
-int StepMul = DEFAULT_GCMUL;
-int StepCount;
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
 
@@ -198,7 +176,6 @@ static void Reap()
 void Step()
 {
 	Reap();
-	StepCount++;
 }
 
 //==========================================================================

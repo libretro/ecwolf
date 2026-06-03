@@ -76,12 +76,6 @@ namespace GC
 	// Size of GC pause.
 	extern int Pause;
 
-	// Size of GC steps.
-	extern int StepMul;
-
-	// Frees all objects, whether they're dead or not.
-	void FreeAll();
-
 	// Does one collection step.
 	void Step();
 
