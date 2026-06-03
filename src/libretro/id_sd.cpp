@@ -501,7 +501,10 @@ void Mix_Chunk_Digital::loadSound() {
 			return;
 		}
 		sample_count = frames;
-		sample_format = (bits == 8) ? FORMAT_8BIT_LINEAR_SIGNED
+		// 8-bit WAV PCM is unsigned (0..255, silence at 128); 16-bit WAV PCM is
+		// signed. Decoding 8-bit as signed inverts and DC-biases the waveform,
+		// which plays back as loud distortion, so use the unsigned format for it.
+		sample_format = (bits == 8) ? FORMAT_8BIT_LINEAR_UNSIGNED
 					    : FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
 		isLooping = false;
 
@@ -509,15 +512,15 @@ void Mix_Chunk_Digital::loadSound() {
 		if (chunk_samples) {
 			if (bits == 8) {
 				const uint8_t *in = pcm;
-				int8_t *out = (int8_t *)chunk_samples;
+				uint8_t *out = (uint8_t *)chunk_samples;
 				for (int i = 0; i < frames; i++) {
 					if (channels == 1) {
-						out[i] = (int8_t)in[i];
+						out[i] = in[i];
 					} else {
-						// Downmix stereo to mono.
-						int s = (int)(int8_t)in[i * 2] +
-							(int)(int8_t)in[i * 2 + 1];
-						out[i] = (int8_t)(s / 2);
+						// Downmix stereo to mono (unsigned).
+						int s = (int)in[i * 2] +
+							(int)in[i * 2 + 1];
+						out[i] = (uint8_t)(s / 2);
 					}
 				}
 			} else { // 16-bit
