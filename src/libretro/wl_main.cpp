@@ -891,6 +891,14 @@ void PrepareMainMenu (wl_state_t *state)
 	// there via handleChoice.)
 	pushMenu(state, MAIN_MENU);
 
+	// Refresh the save slots and the Load/Save item state every time the menu
+	// opens: new saves may exist, and Save is only available while playing.
+	bool canLoad = GameSave::SetupSaveGames();
+	if (GameSave::GetLoadMenuItem())
+		GameSave::GetLoadMenuItem()->setEnabled(canLoad);
+	if (GameSave::GetSaveMenuItem())
+		GameSave::GetSaveMenuItem()->setEnabled(ingame);
+
 	// Item 7 and 8 read differently depending on whether a game is running:
 	// "View Scores"/"Back to Demo" at the title, "End Game"/"Back to Game"
 	// once a game is in progress.
@@ -923,6 +931,8 @@ wl_state_t::currentMenu() {
 		return &displayMenu;
 	case AUTOMAP_MENU:
 		return &automapMenu;
+	case LOAD_MENU:
+		return &GameSave::GetLoadMenu();
 	}
 	return NULL;
 }
@@ -1182,6 +1192,25 @@ static bool handleChoice(wl_state_t *state, int pos)
 			pushMenu(state, DISPLAY_MENU);
 			state->stage = MENU_PREPARE;
 			break;
+		case 4: // Load Game
+			pushMenu(state, LOAD_MENU);
+			state->stage = MENU_PREPARE;
+			break;
+		case 5: // Save Game (auto-named for now; enabled only in-game)
+			if (ingame && GameSave::SaveAuto())
+			{
+				// Saved successfully: drop back into the game.
+				CleanupControlPanel ();
+				ContinueMusic (lastgamemusicoffset);
+				DrawPlayScreen (false);
+				state->menuLevel = 0;
+				state->stage = PLAY_STEP_A;
+			}
+			else
+			{
+				state->stage = MENU_PREPARE;
+			}
+			break;
 		case 6: // Read This!
 			// HelpScreens drives its own fade via the state machine
 			// (ShowArticle/TextReaderStep). Don't call MenuFadeOut here: it is
@@ -1249,6 +1278,19 @@ static bool handleChoice(wl_state_t *state, int pos)
 		state->stage = START_GAME;
 		state->menuLevel = 0;
 		// TODO: confirmation
+		break;
+	case LOAD_MENU:
+		if(GameSave::LoadFromSlot(pos))
+		{
+			loadedgame = true;
+			state->stage = START_GAME;
+			state->menuLevel = 0;
+		}
+		else
+		{
+			// Old/incompatible save or read failure: stay in the load menu.
+			state->stage = MENU_PREPARE;
+		}
 		break;
 	case SOUND_MENU:
 	case CONTROL_MENU:

@@ -452,6 +452,15 @@ void retro_unload_game()
 
 static char g_wad_dir[1024];
 static char g_basename[1024];
+// Directory the frontend gives us for writable save files. Empty until set in
+// retro_load_game; GameSave falls back to the current directory if unset.
+static char g_save_dir[1024] = "";
+
+// Exposes the frontend's save directory to the save/load code.
+const char *Libretro_GetSaveDir(void)
+{
+	return g_save_dir;
+}
 
 static void extract_basename(char *buf, const char *path, size_t size)
 {
@@ -926,6 +935,18 @@ bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 		const char* sysDir = 0;
 		environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &sysDir);
 		IWad::SelectGame(files, extension, MAIN_PK3, sysDir);
+
+		// Remember the frontend's save directory (falls back to system dir, then
+		// the game directory) so native save files have a writable home.
+		{
+			const char* saveDir = 0;
+			if (environ_cb(RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY, &saveDir) && saveDir && *saveDir)
+				snprintf(g_save_dir, sizeof(g_save_dir), "%s", saveDir);
+			else if (sysDir && *sysDir)
+				snprintf(g_save_dir, sizeof(g_save_dir), "%s", sysDir);
+			else
+				snprintf(g_save_dir, sizeof(g_save_dir), "%s", g_wad_dir);
+		}
 
 		for (size_t i = 0; i < num_info; i++)
 			if (info[i].path)

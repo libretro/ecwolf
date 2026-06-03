@@ -59,6 +59,12 @@
 #include "wl_menu.h"
 #include "wl_play.h"
 #include "textures/textures.h"
+#include "libretro.h"
+#include "streams/file_stream.h"
+
+// Frontend save directory and the in-progress-game flag.
+extern const char *Libretro_GetSaveDir(void);
+extern bool ingame;
 
 void R_RenderView();
 extern uint8_t* vbuf;
@@ -70,13 +76,30 @@ unsigned long long SaveVersion = GetSaveVersion();
 uint32_t SaveProdVersion = SAVEPRODVER;
 bool param_foreginsave = false;
 
-// ---- Menu scaffold ----
-// Layer 1: the Load/Save menus exist so the main menu can reference them, but
-// the slot list, naming and on-disk handling are not wired up yet (Layer 6).
-// The Load/Save main-menu entries are therefore created disabled.
+#define MAX_SAVENAME 31
 #define LSM_Y   55
 #define LSM_W   175
 #define LSM_X   (320-LSM_W-10)
+
+// Native (non-savestate) ECWolf save files. The format is intentionally simple
+// and contains no PNG/thumbnail: a short text header (one field per line)
+// followed by the raw game-state snapshot produced by FCompressedMemFile. All
+// I/O goes through the libretro VFS (filestream_*), never raw stdio.
+static const char* const ECS_MAGIC = "ECWOLFSAVE2\n";
+static const char* const ECS_EXT   = ".ecs";
+
+struct SaveFile
+{
+	public:
+		static TArray<SaveFile> files;
+
+		bool    hide;
+		bool    hasFiles;
+		bool    oldVersion;
+		FString name;     // Displayed on the menu.
+		FString filename;
+};
+TArray<SaveFile> SaveFile::files;
 
 static Menu loadGame(LSM_X, LSM_Y, LSM_W, 24);
 static Menu saveGame(LSM_X, LSM_Y, LSM_W, 24);
@@ -88,27 +111,370 @@ Menu &GetSaveMenu() { return saveGame; }
 MenuItem *GetLoadMenuItem() { return loadItem; }
 MenuItem *GetSaveMenuItem() { return saveItem; }
 
+static FString GetSaveDir()
+{
+	const char *dir = Libretro_GetSaveDir();
+	return (dir && *dir) ? FString(dir) : FString(".");
+}
+static FString GetFullSaveFileName(const FString &filename)
+{
+	return GetSaveDir() + PATH_SEPARATOR + filename;
+}
+
+// ---- VFS helpers -----------------------------------------------------------
+
+// Reads a whole file into a malloc'd buffer via the VFS. Returns NULL on
+// failure; on success *outLen receives the length and the caller frees().
+static uint8_t *VFS_ReadFile(const FString &path, long *outLen)
+{
+	RFILE *f = filestream_open(path.GetChars(),
+		RETRO_VFS_FILE_ACCESS_READ, RETRO_VFS_FILE_ACCESS_HINT_NONE);
+	if(!f)
+		return NULL;
+
+	filestream_seek(f, 0, RETRO_VFS_SEEK_POSITION_END);
+	int64_t len = filestream_tell(f);
+	filestream_seek(f, 0, RETRO_VFS_SEEK_POSITION_START);
+	if(len <= 0)
+	{
+		filestream_close(f);
+		return NULL;
+	}
+
+	uint8_t *buf = (uint8_t*)malloc((size_t)len);
+	if(!buf)
+	{
+		filestream_close(f);
+		return NULL;
+	}
+	int64_t got = filestream_read(f, buf, len);
+	filestream_close(f);
+	if(got != len)
+	{
+		free(buf);
+		return NULL;
+	}
+	*outLen = (long)len;
+	return buf;
+}
+
+static bool VFS_WriteFile(const FString &path, const void *data, size_t len)
+{
+	return filestream_write_file(path.GetChars(), data, (int64_t)len);
+}
+
+// Splits a save image into its header lines and the snapshot body. Returns the
+// offset of the body (just past the header) or -1 if the magic doesn't match.
+// Each recognised "Key: value" line is stored into the matching out-param.
+static long ParseSaveHeader(const uint8_t *buf, long len,
+	FString &title, FString &mapname, FString &gameWad, FString &mapWad,
+	unsigned long long &saveVer, uint32_t &prodVer)
+{
+	size_t magicLen = strlen(ECS_MAGIC);
+	if((size_t)len < magicLen || memcmp(buf, ECS_MAGIC, magicLen) != 0)
+		return -1;
+
+	long pos = (long)magicLen;
+	saveVer = 0;
+	prodVer = 0;
+	// Header ends at the first blank line ("\n").
+	while(pos < len)
+	{
+		// Find end of this line.
+		long start = pos;
+		while(pos < len && buf[pos] != '\n')
+			++pos;
+		long lineLen = pos - start;
+		if(pos < len)
+			++pos; // skip '\n'
+
+		if(lineLen == 0)
+			return pos; // blank line: body follows
+
+		FString line((const char*)(buf + start), (size_t)lineLen);
+		long colon = line.IndexOf(':');
+		if(colon < 0)
+			continue;
+		FString key = line.Left(colon);
+		FString val = line.Mid(colon + 1);
+		while(val.Len() && val[0] == ' ')
+			val = val.Mid(1);
+
+		if(key.Compare("Title") == 0)            title = val;
+		else if(key.Compare("Map") == 0)         mapname = val;
+		else if(key.Compare("GameWad") == 0)     gameWad = val;
+		else if(key.Compare("MapWad") == 0)      mapWad = val;
+		else if(key.Compare("SaveVer") == 0)     saveVer = strtoull(val.GetChars(), NULL, 10);
+		else if(key.Compare("ProdVer") == 0)     prodVer = (uint32_t)strtoul(val.GetChars(), NULL, 10);
+	}
+	return -1; // no blank line: malformed
+}
+
+// ---- Load / Save -----------------------------------------------------------
+
+bool Load(const FString &filename)
+{
+	long len = 0;
+	uint8_t *buf = VFS_ReadFile(GetFullSaveFileName(filename), &len);
+	if(!buf)
+	{
+		Message(language["STR_FAILREAD"]);
+		return false;
+	}
+
+	FString title, mapname, gameWad, mapWad;
+	unsigned long long saveVer = 0;
+	uint32_t prodVer = 0;
+	long body = ParseSaveHeader(buf, len, title, mapname, gameWad, mapWad, saveVer, prodVer);
+	if(body < 0)
+	{
+		free(buf);
+		return false;
+	}
+
+	SaveVersion = saveVer;
+	SaveProdVersion = prodVer;
+
+	strncpy(gamestate.mapname, mapname, 8);
+	gamestate.mapname[8] = 0;
+
+	// Mirror retro_unserialize's preparation: a save can be loaded from the
+	// title (no game running), so clear any existing thinkers and mark the
+	// level as a load before SetupGameLevel. With loadedgame set, SetupGameLevel
+	// caches the map for restore instead of spawning a fresh level.
+	thinkerList.DestroyAll(ThinkerList::TRAVEL);
+	loadedgame = true;
+	SetupGameLevel();
+
+	{
+		FCompressedMemFile snapshot;
+		snapshot.Open((void*)(buf + body));
+		FArchive arc(snapshot);
+		Serialize(arc);
+		uint32_t rngcount = 0;
+		arc << rngcount;
+		FRandom::StaticReadRNGState(arc, rngcount);
+	}
+
+	free(buf);
+
+	// Loading at just the wrong moment can leave the wrong play state.
+	playstate = ex_stillplaying;
+	return true;
+}
+
+bool Save(const FString &filename, const FString &title)
+{
+	SaveVersion = GetSaveVersion();
+	SaveProdVersion = SAVEPRODVER;
+
+	// Build the snapshot body in memory.
+	FCompressedMemFile snapshot;
+	snapshot.Open();
+	{
+		FArchive arc(snapshot);
+		Serialize(arc);
+		uint32_t rngcount = FRandom::GetRNGCount();
+		arc << rngcount;
+		FRandom::StaticWriteRNGState(arc);
+	}
+	unsigned int snapSize = snapshot.GetSerializedSize();
+
+	// Header.
+	FString gameWadString;
+	for(unsigned int i = 0;i < IWad::GetNumIWads();++i)
+	{
+		if(i)
+			gameWadString += ';';
+		gameWadString += Wads.GetWadName(FWadCollection::IWAD_FILENUM + i);
+	}
+	FString mapWad = Wads.GetWadName(Wads.GetLumpFile(map->GetMarketLumpNum()));
+
+	FString header;
+	header += ECS_MAGIC;
+	header.AppendFormat("SaveVer: %llu\n", (unsigned long long)SaveVersion);
+	header.AppendFormat("ProdVer: %u\n", (unsigned)SaveProdVersion);
+	header.AppendFormat("Title: %s\n", title.GetChars());
+	header.AppendFormat("Map: %s\n", gamestate.mapname);
+	header.AppendFormat("GameWad: %s\n", gameWadString.GetChars());
+	header.AppendFormat("MapWad: %s\n", mapWad.GetChars());
+	header += "\n"; // blank line terminates the header
+
+	size_t headerLen = header.Len();
+	uint8_t *image = (uint8_t*)malloc(headerLen + snapSize);
+	if(!image)
+	{
+		Message(language["STR_FAILWRITE"]);
+		return false;
+	}
+	memcpy(image, header.GetChars(), headerLen);
+	snapshot.SerializeToBuffer(image + headerLen);
+
+	bool ok = VFS_WriteFile(GetFullSaveFileName(filename), image, headerLen + snapSize);
+	free(image);
+
+	if(!ok)
+	{
+		Message(language["STR_FAILWRITE"]);
+		return false;
+	}
+	return true;
+}
+
+// ---- Save slot enumeration -------------------------------------------------
+
+bool SetupSaveGames()
+{
+	bool canLoad = false;
+
+	SaveFile::files.Clear();
+
+	File saveDir(GetSaveDir());
+	const TArray<FString> &files = saveDir.getFileList();
+
+	for(unsigned int i = 0;i < files.Size();i++)
+	{
+		const FString &fn = files[i];
+		if(fn.Len() < 5 || fn.Mid(fn.Len()-4, 4).Compare(ECS_EXT) != 0)
+			continue;
+
+		long len = 0;
+		uint8_t *buf = VFS_ReadFile(GetFullSaveFileName(fn), &len);
+		if(!buf)
+			continue;
+
+		FString title, mapname, gameWad, mapWad;
+		unsigned long long saveVer = 0;
+		uint32_t prodVer = 0;
+		long body = ParseSaveHeader(buf, len, title, mapname, gameWad, mapWad, saveVer, prodVer);
+		free(buf);
+		if(body < 0)
+			continue;
+
+		SaveFile sFile;
+		sFile.filename = fn;
+		sFile.name = title.Len() ? title : fn;
+		sFile.hasFiles = true;
+		sFile.hide = false;
+
+		// Version check.
+		if((saveVer == SAVEVERUNDEFINED && prodVer < MINSAVEPRODVER) || saveVer < MINSAVEVER)
+			sFile.oldVersion = true;
+		else
+			sFile.oldVersion = false;
+
+		// WAD checks: the map WAD and every game WAD must be loaded.
+		if(mapWad.Len() && Wads.CheckIfWadLoaded(mapWad) < 0 && !param_foreginsave)
+			sFile.hasFiles = false;
+		if(gameWad.Len())
+		{
+			int lastIndex = 0, nextIndex = 0;
+			int expectedIwads = IWad::GetNumIWads();
+			do
+			{
+				nextIndex = gameWad.IndexOf(';', lastIndex);
+				FString one = gameWad.Mid(lastIndex, nextIndex < 0 ? gameWad.Len()-lastIndex : nextIndex-lastIndex);
+				if(Wads.CheckIfWadLoaded(one) < 0 && !param_foreginsave)
+				{
+					sFile.hide = true;
+					break;
+				}
+				else
+					--expectedIwads;
+				lastIndex = nextIndex + 1;
+			}
+			while(nextIndex != -1);
+
+			if(expectedIwads != 0 && !param_foreginsave)
+				sFile.hide = true;
+			else if(!sFile.hide)
+				canLoad = true;
+		}
+		else
+			canLoad = true;
+
+		SaveFile::files.Push(sFile);
+	}
+
+	loadGame.clear();
+	for(unsigned int i = 0;i < SaveFile::files.Size();i++)
+	{
+		MenuItem *item = new MenuItem(SaveFile::files[i].name);
+		item->setEnabled(!SaveFile::files[i].hide &&
+			!SaveFile::files[i].oldVersion && SaveFile::files[i].hasFiles);
+		loadGame.addItem(item);
+	}
+
+	return canLoad;
+}
+
+// Loads the save in load-menu slot "which"; returns true if a game was loaded.
+bool LoadFromSlot(int which)
+{
+	if(which < 0 || (unsigned)which >= SaveFile::files.Size())
+		return false;
+	if(SaveFile::files[which].oldVersion || !SaveFile::files[which].hasFiles ||
+		SaveFile::files[which].hide)
+		return false;
+	return Load(SaveFile::files[which].filename);
+}
+
+// Writes a new save with an auto-generated name (map + timestamp). Interactive
+// naming is a later step.
+bool SaveAuto()
+{
+	if(!ingame)
+		return false;
+
+	// Pick a free savegamN.ecs filename.
+	FString filename;
+	for(unsigned int i = 0;i < 10000;i++)
+	{
+		filename.Format("savegam%u%s", i, ECS_EXT);
+		long probeLen = 0;
+		uint8_t *probe = VFS_ReadFile(GetFullSaveFileName(filename), &probeLen);
+		if(probe)
+		{
+			free(probe);
+			continue; // exists, try next
+		}
+		break;
+	}
+
+	// Auto title: "MAPNAME hh:mm:ss".
+	FString title;
+	unsigned int gametime = gamestate.TimeCount/70;
+	FString mapname = gamestate.mapname;
+	mapname.ToUpper();
+	title.Format("%s %02d:%02d:%02d", mapname.GetChars(),
+		gametime/3600, (gametime%3600)/60, gametime%60);
+
+	return Save(filename, title);
+}
+
 void InitMenus()
 {
 	loadGame.setHeadPicture("M_LOADGM");
 	saveGame.setHeadPicture("M_SAVEGM");
+
+	bool canLoad = SetupSaveGames();
 
 	if(!loadItem)
 		loadItem = new MenuItem(language["STR_LG"]);
 	if(!saveItem)
 		saveItem = new MenuItem(language["STR_SG"]);
 
-	// Slot enumeration is implemented in a later layer; until then these are
-	// inert placeholders so the main menu lays out correctly.
-	loadItem->setEnabled(false);
-	saveItem->setEnabled(false);
+	loadItem->setEnabled(canLoad);
+	// Saving is enabled only while a game is running.
+	saveItem->setEnabled(ingame);
 }
 
 void QuickLoadOrSave(bool load)
 {
-	// Implemented with the save-slot system in a later layer.
+	// Quick save/load uses the slot system; not wired to a hotkey yet.
 	(void)load;
 }
+
 
 
 void Serialize(FArchive &arc)
