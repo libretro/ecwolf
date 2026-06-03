@@ -1163,9 +1163,16 @@ static bool handleChoice(wl_state_t *state, int pos)
 			// a second visit.
 			HelpScreens(state);
 			break;
+		case 8: // Back to Demo
+			return popMenu(state);
+		case 9: // Quit
+			Libretro_RequestQuit();
+			state->stage = MENU_PREPARE;
+			break;
 		default:
-			// Sound/Control/Display/Load/Save/ReadThis/Scores/Demo/Quit are
-			// added in later layers; for now re-show the main menu.
+			// View Scores / End Game (7) needs the non-blocking high-scores
+			// screen and the in-game menu; added in a later step. For now any
+			// unhandled item just re-shows the main menu.
 			state->stage = MENU_PREPARE;
 			break;
 		}

@@ -567,6 +567,8 @@ void HelpScreens (wl_state_t *state);
 // Pushes in-game menu changes (sound/control/display/automap settings) back to
 // the frontend's core options so the two stay in sync. Defined in libretro.cpp.
 void Libretro_SyncOptionsFromEngine(void);
+// Cleanly requests core shutdown from the menu's Quit item. Defined in libretro.cpp.
+void Libretro_RequestQuit(void);
 bool GameLoopInit (wl_state_t *state);
 bool GameMapEnd (wl_state_t *state);
 

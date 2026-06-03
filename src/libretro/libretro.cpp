@@ -839,6 +839,15 @@ void Libretro_SyncOptionsFromEngine(void)
 	set_option_bool("ecwolf-am-pause", am_pause);
 }
 
+// Cleanly ask the frontend to close the core (used by the menu's Quit item).
+// Unlike Quit(), this is not an error path: it does not log a fatal error or
+// throw; it just requests shutdown.
+void Libretro_RequestQuit(void)
+{
+	if (environ_cb)
+		environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, NULL);
+}
+
 void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
 {
 	FString errorMessage;
