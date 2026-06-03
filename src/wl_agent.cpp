@@ -77,7 +77,7 @@ DBaseStatusBar *StatusBar;
 DBaseStatusBar *CreateStatusBar_Blake();
 DBaseStatusBar *CreateStatusBar_Wolf3D();
 
-void DestroyStatusBar() { delete StatusBar; }
+void DestroyStatusBar() { delete StatusBar; StatusBar = NULL; }
 void CreateStatusBar()
 {
 	if(IWad::CheckGameFilter("Blake"))
