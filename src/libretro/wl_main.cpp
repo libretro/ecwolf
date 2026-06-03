@@ -1144,7 +1144,11 @@ static bool handleChoice(wl_state_t *state, int pos)
 			state->stage = MENU_PREPARE;
 			break;
 		case 6: // Read This!
-			MenuFadeOut();
+			// HelpScreens drives its own fade via the state machine
+			// (ShowArticle/TextReaderStep). Don't call MenuFadeOut here: it is
+			// redundant and toggles menusAreFaded, whose paired MenuFadeIn is
+			// never reached on this path, tripping the assert in MenuFadeOut on
+			// a second visit.
 			HelpScreens(state);
 			break;
 		default:
