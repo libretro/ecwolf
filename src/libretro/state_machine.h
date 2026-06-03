@@ -559,6 +559,7 @@ typedef struct wl_input_state_s
 
 void State_FadeOut(wl_state_t *state, int start = 0, int end = 255, int steps = 30);
 bool GameMapStart (wl_state_t *state);
+void HelpScreens (wl_state_t *state);
 bool GameLoopInit (wl_state_t *state);
 bool GameMapEnd (wl_state_t *state);
 

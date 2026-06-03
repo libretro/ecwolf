@@ -1129,6 +1129,10 @@ static bool handleChoice(wl_state_t *state, int pos)
 			state->stage = MENU_PREPARE;
 			State_FadeOut(state);
 			break;
+		case 6: // Read This!
+			MenuFadeOut();
+			HelpScreens(state);
+			break;
 		default:
 			// Sound/Control/Display/Load/Save/ReadThis/Scores/Demo/Quit are
 			// added in later layers; for now re-show the main menu.

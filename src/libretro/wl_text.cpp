@@ -800,7 +800,7 @@ bool TextReaderStep(wl_state_t *state, const wl_input_state_t *input) {
 =
 =================
 */
-#ifdef TODO
+#ifndef TODO
 void HelpScreens (wl_state_t *state)
 {
 	int lumpNum = Wads.CheckNumForName("HELPART", ns_global);
@@ -809,9 +809,15 @@ void HelpScreens (wl_state_t *state)
 		FMemLump lump = Wads.ReadLump(lumpNum);
 
 		backgroundFlat = TexMan(gameinfo.FinaleFlat);
-		ShowArticle(state,reinterpret_cast<const char*>(lump.GetMem()));
+		// Return to the main menu once the article reader is done.
+		state->stageAfterIntermission = MENU_PREPARE;
+		ShowArticle(state, reinterpret_cast<const char*>(lump.GetMem()), MENU_PREPARE,
+			!!(IWad::GetGame().Flags & IWad::HELPHACK));
+		return;
 	}
 
+	// No help article: just go back to the menu.
+	state->stage = MENU_PREPARE;
 	State_FadeOut(state);
 }
 #endif

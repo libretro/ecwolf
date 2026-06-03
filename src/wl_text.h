@@ -26,7 +26,7 @@ enum ETSAnchor
 
 extern void DrawMultiLineText(const FString str, FFont *font, EColorRange color, ETSAlignment align, ETSAnchor anchor);
 
-extern  void    HelpScreens(void);
+// HelpScreens is declared in the libretro state_machine.h (needs wl_state_t).
 
 // Returns true if a screen as displayed.
 extern  bool    EndText(int exitClusterNum, int enterClusterNum=-1);
