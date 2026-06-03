@@ -220,6 +220,8 @@ protected:
 	bool isLooping;
 	void MixSamples(int16_t *samples, int output_rate, size_t size, int start_ticks,
 			fixed leftmul, fixed rightmul);
+	void MixSegment(int16_t *samples, int output_rate, int start_sample,
+			int num_samples, fixed leftmul, fixed rightmul);
 };
 
 extern uint64_t used_digital_gen;

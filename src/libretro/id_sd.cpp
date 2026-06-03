@@ -877,10 +877,51 @@ void Mix_Chunk_Sampled::MixSamples (int16_t *result, int output_rate, size_t siz
 	}
 	if (start_sample >= sample_count || start_sample < 0)
 		return;
+	if (num_samples <= 0)
+		return;
+
+	// A looping sound whose play window runs off the end must wrap back to
+	// the start within this call rather than truncating: truncating drops
+	// the tail of the window every time the loop point falls mid-window,
+	// which for music (whose length is not tic-aligned, unlike synthesised
+	// IMF/N3D) is an audible gap/click on every loop. Wrapping only works
+	// cleanly when input rate == output rate (one input sample maps to one
+	// output pair, so the output advances by exactly the number of input
+	// samples consumed); looping sounds are resampled to the engine rate at
+	// load, so this holds. For the non-looping or rate-mismatched cases fall
+	// back to a single clamped segment as before.
+	if (isLooping && rate == output_rate &&
+	    num_samples > sample_count - start_sample) {
+		int remaining = num_samples;
+		int pos = start_sample;
+		int16_t *out = result;
+		while (remaining > 0) {
+			int chunk = sample_count - pos;
+			if (chunk > remaining)
+				chunk = remaining;
+			MixSegment(out, output_rate, pos, chunk, leftmul, rightmul);
+			out += chunk * 2;       // one stereo pair per input sample
+			remaining -= chunk;
+			pos += chunk;
+			if (pos >= sample_count)
+				pos = 0;        // wrap to the loop start
+		}
+		return;
+	}
+
 	if (num_samples > sample_count - start_sample)
 		num_samples = sample_count - start_sample;
 	if (num_samples <= 0)
 		return;
+	MixSegment(result, output_rate, start_sample, num_samples, leftmul, rightmul);
+}
+
+// Mix num_samples of this chunk starting at sample offset start_sample into
+// result. No bounds/loop logic: callers guarantee [start_sample, start_sample
+// + num_samples) lies within the buffer.
+void Mix_Chunk_Sampled::MixSegment (int16_t *result, int output_rate, int start_sample,
+				    int num_samples, fixed leftmul, fixed rightmul)
+{
 	switch (sample_format)
 	{
 	case FORMAT_8BIT_LINEAR_UNSIGNED:
