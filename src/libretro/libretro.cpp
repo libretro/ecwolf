@@ -370,19 +370,22 @@ void I_ShutdownGraphics () {
 	}
 }
 
-static struct retro_frame_time_callback frame_cb;   
+// Duration of one presented frame, in microseconds, for the selected FPS.
+// Set by compute_frame_reference() whenever the FPS option changes.
+static retro_usec_t frame_reference_us;
 
-static void frame_time_cb(retro_usec_t usec)
+// Advance the fixed game-time clock by exactly one frame. ECWolf's
+// simulation runs on a fixed tic clock, so game time always steps by the
+// reference frame duration rather than by however long the frontend took to
+// present the frame. Called once at the top of retro_run (which the frontend
+// invokes once per frame), so no frame-time callback from the frontend is
+// needed.
+static void advance_frame_time(void)
 {
-	// Always advance by the fixed reference frame duration for the selected
-	// FPS. ECWolf's simulation runs on a fixed tic clock, so pinning usec
-	// here keeps game time stepping deterministically regardless of how long
-	// the frontend actually took to present the frame.
-	usec = frame_cb.reference;
-	g_state.usec += usec;
+	g_state.usec += frame_reference_us;
 	g_state.frame_tic = g_state.usec / TIC_TIME_US;
-	tics = (usec + g_state.tic_rest) / TIC_TIME_US;
-	g_state.tic_rest = (usec + g_state.tic_rest) % TIC_TIME_US;
+	tics = (frame_reference_us + g_state.tic_rest) / TIC_TIME_US;
+	g_state.tic_rest = (frame_reference_us + g_state.tic_rest) % TIC_TIME_US;
 }
 
 int32_t GetTimeCount()
@@ -526,36 +529,36 @@ int AnalogMoveSensitivity = 20;
 int AnalogTurnSensitivity = 20;
 int MouseTurnSensitivity = 10;
 
-static void announce_frame_callback()
+// Recompute the per-frame game-time step for the selected FPS. The comments
+// give the resulting tics/frame (the simulation runs at TICRATE == 70 Hz).
+static void compute_frame_reference()
 {
-	frame_cb.callback  = frame_time_cb;
 	switch (fp10s) {
 	case 700: // 70.0 fps, 1 tic/frame
-		frame_cb.reference = TIC_TIME_US;
+		frame_reference_us = TIC_TIME_US;
 		break;
 	case 350: // 35.0 fps, 2 tics/frame
-		frame_cb.reference = 2 * TIC_TIME_US;
+		frame_reference_us = 2 * TIC_TIME_US;
 		break;
 	case 175: // 17.5 fps, 4 tics/frame
-		frame_cb.reference = 4 * TIC_TIME_US;
+		frame_reference_us = 4 * TIC_TIME_US;
 		break;
 	case 140: // 14.0 fps, 5 tics/frame
-		frame_cb.reference = 5 * TIC_TIME_US;
+		frame_reference_us = 5 * TIC_TIME_US;
 		break;
 	case 100: // 10.0 fps, 7 tics/frame
-		frame_cb.reference = 7 * TIC_TIME_US;
+		frame_reference_us = 7 * TIC_TIME_US;
 		break;
 	case 88: // 8.75 fps, 8 tics/frame
-		frame_cb.reference = 8 * TIC_TIME_US;
+		frame_reference_us = 8 * TIC_TIME_US;
 		break;
 	case 70: // 7.0 fps, 8 tics/frame
-		frame_cb.reference = 10 * TIC_TIME_US;
+		frame_reference_us = 10 * TIC_TIME_US;
 		break;
 	default:
-		frame_cb.reference = 10000000 / fp10s;
+		frame_reference_us = 10000000 / fp10s;
 		break;
 	}
-	environ_cb(RETRO_ENVIRONMENT_SET_FRAME_TIME_CALLBACK, &frame_cb);
 }
 
 static const char *get_string_variable(const char *name)
@@ -717,7 +720,7 @@ static void update_variables(bool startup)
 	}
 	if (oldfp10s != fp10s)
 	{
-		announce_frame_callback();
+		compute_frame_reference();
 	}
 
 	alwaysrun = get_bool_option("ecwolf-alwaysrun");
@@ -925,7 +928,7 @@ bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 	if (!game_init_pixelformat())
 		return false;
 
-	announce_frame_callback();
+	compute_frame_reference();
 
 	ReadConfig();
 
@@ -1382,6 +1385,13 @@ void retro_run(void)
 {
 	int expectframes = 0;
 	wl_input_state_t input;
+
+	// Advance the fixed game-time clock by one frame. The frontend calls
+	// retro_run exactly once per presented frame, so this replaces the old
+	// frame-time callback (which ignored the frontend's measured delta and
+	// used the fixed reference duration anyway).
+	advance_frame_time();
+
 	long long framestarttic = GetTimeCount();
 
 	// When we load something we end up having very slow
