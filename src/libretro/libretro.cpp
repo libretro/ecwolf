@@ -158,9 +158,28 @@ public:
 		const int dst_stride = lr_pitch_ / (int)sizeof(color_t);
 		const uint8_t *src_row = Buffer;
 		color_t *dst_row = lr_buffer_;
+		const color_t * const pal = effective_palette_;
+		const int w = width_;
 		for (int y = 0; y < height_; y++) {
-			for (int x = 0; x < width_; x++)
-				dst_row[x] = effective_palette_[src_row[x]];
+			const uint8_t * const s = src_row;
+			color_t * const d = dst_row;
+			int x = 0;
+			// Unroll by 8: the per-pixel work is a dependent byte-indexed
+			// palette lookup which no SSE2/NEON gather can vectorise, so the
+			// win here is purely from amortising loop overhead and exposing
+			// instruction-level parallelism across the independent lookups.
+			for (; x + 8 <= w; x += 8) {
+				d[x+0] = pal[s[x+0]];
+				d[x+1] = pal[s[x+1]];
+				d[x+2] = pal[s[x+2]];
+				d[x+3] = pal[s[x+3]];
+				d[x+4] = pal[s[x+4]];
+				d[x+5] = pal[s[x+5]];
+				d[x+6] = pal[s[x+6]];
+				d[x+7] = pal[s[x+7]];
+			}
+			for (; x < w; x++)
+				d[x] = pal[s[x]];
 			src_row += Pitch;
 			dst_row += dst_stride;
 		}
