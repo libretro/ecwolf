@@ -179,267 +179,63 @@ void SetThreshold()
 
 //==========================================================================
 //
-// PropagateMark
+// Reap
 //
-// Marks the top-most gray object black and marks all objects it points to
-// gray.
+// Deterministic replacement for the old tri-color incremental collector.
+// Walks the Root list and deletes every object that has been Destroy()ed
+// (OF_EuthanizeMe).  Object lifetime is driven entirely by explicit Destroy()
+// calls (and the thinker lists), not by reachability tracing, so there is no
+// mark phase, no gray list, and no write barriers.  ~DObject() still unlinks
+// the object from Root and nulls all inbound pointers via
+// StaticPointerSubstitution(), so deleting here cannot leave dangling refs.
 //
 //==========================================================================
 
-size_t PropagateMark()
+static void Reap()
 {
-	DObject *obj = Gray;
-	assert(obj->IsGray());
-	obj->Gray2Black();
-	Gray = obj->GCNext;
-	return !(obj->ObjectFlags & OF_EuthanizeMe) ? obj->PropagateMark() :
-		obj->GetClass()->GetSize();
-}
-
-//==========================================================================
-//
-// PropagateAll
-//
-// Empties the gray list by propagating every single object in it.
-//
-//==========================================================================
-
-static size_t PropagateAll()
-{
-	size_t m = 0;
-	while (Gray != NULL)
+	DObject *curr = Root;
+	while (curr != NULL)
 	{
-		m += PropagateMark();
-	}
-	return m;
-}
-
-//==========================================================================
-//
-// SweepList
-//
-// Runs a limited sweep on a list, returning the location where to resume
-// the sweep at next time. (FIXME: Horrible Engrish in this description.)
-//
-//==========================================================================
-
-static DObject **SweepList(DObject **p, size_t count, size_t *finalize_count)
-{
-	DObject *curr;
-	int deadmask = OtherWhite();
-	size_t finalized = 0;
-
-	while ((curr = *p) != NULL && count-- > 0)
-	{
-		if ((curr->ObjectFlags ^ OF_WhiteBits) & deadmask)	// not dead?
+		// Capture the successor before a possible delete: ~DObject() unlinks
+		// curr from Root, so we must not read curr->ObjNext afterwards.
+		DObject *next = curr->ObjNext;
+		if ((curr->ObjectFlags & OF_EuthanizeMe) &&
+		    !(curr->ObjectFlags & (OF_Fixed | OF_Rooted)))
 		{
-			assert(!curr->IsDead() || (curr->ObjectFlags & OF_Fixed));
-			curr->MakeWhite();	// make it white (for next cycle)
-			p = &curr->ObjNext;
-		}
-		else	// must erase 'curr'
-		{
-			assert(curr->IsDead());
-			*p = curr->ObjNext;
-			if (!(curr->ObjectFlags & OF_EuthanizeMe))
-			{	// The object must be destroyed before it can be finalized.
-				// Note that thinkers must already have been destroyed. If they get here without
-				// having been destroyed first, it means they somehow became unattached from the
-				// thinker lists. If I don't maintain the invariant that all live thinkers must
-				// be in a thinker list, then I need to add write barriers for every time a
-				// thinker pointer is changed. This seems easier and perfectly reasonable, since
-				// a live thinker that isn't on a thinker list isn't much of a thinker.
-
-				// However, this can happen during deletion of the thinker list while cleaning up
-				// from a savegame error so we can't assume that any thinker that gets here is an error.
-
-				curr->Destroy();
-			}
-			curr->ObjectFlags |= OF_Cleanup;
+			curr->ObjectFlags |= OF_YesReallyDelete;
 			delete curr;
-			finalized++;
 		}
+		curr = next;
 	}
-	if (finalize_count != NULL)
-	{
-		*finalize_count = finalized;
-	}
-	return p;
+	Estimate = AllocBytes;
+	SetThreshold();
 }
 
 //==========================================================================
 //
 // Mark
 //
-// Mark a single object gray.
+// No-op: there is no tracing collector to mark for.  Kept because callers
+// (PropagateMark implementations, Serialize helpers) reference it.
 //
 //==========================================================================
 
 void Mark(DObject **obj)
 {
-	DObject *lobj = *obj;
-	if (lobj != NULL)
-	{
-		if (lobj->ObjectFlags & OF_EuthanizeMe)
-		{
-			*obj = (DObject *)NULL;
-		}
-		else if (lobj->IsWhite())
-		{
-			lobj->White2Gray();
-			lobj->GCNext = Gray;
-			Gray = lobj;
-		}
-	}
-}
-
-//==========================================================================
-//
-// MarkRoot
-//
-// Mark the root set of objects.
-//
-//==========================================================================
-
-static void MarkRoot()
-{
-	//int i;
-
-	Gray = NULL;
-	thinkerList.MarkRoots();
-	for(unsigned int i = 0;i < Net::InitVars.numPlayers;++i)
-		players[i].PropagateMark();
-	if(map)
-		map->PropagateMark();
-	Mark(screen);
-	// Mark soft roots.
-	if (SoftRoots != NULL)
-	{
-		DObject **probe = &SoftRoots->ObjNext;
-		while (*probe != NULL)
-		{
-			DObject *soft = *probe;
-			probe = &soft->ObjNext;
-			if ((soft->ObjectFlags & (OF_Rooted | OF_EuthanizeMe)) == OF_Rooted)
-			{
-				Mark(soft);
-			}
-		}
-	}
-	// Time to propagate the marks.
-	State = GCS_Propagate;
-	StepCount = 0;
-}
-
-//==========================================================================
-//
-// Atomic
-//
-// If their were any propagations that needed to be done atomicly, they
-// would go here. It also sets things up for the sweep state.
-//
-//==========================================================================
-
-static void Atomic()
-{
-	// Flip current white
-	CurrentWhite = OtherWhite();
-	SweepPos = &Root;
-	State = GCS_Sweep;
-	Estimate = AllocBytes;
-}
-
-//==========================================================================
-//
-// SingleStep
-//
-// Performs one step of the collector.
-//
-//==========================================================================
-
-static size_t SingleStep()
-{
-	switch (State)
-	{
-	case GCS_Pause:
-		MarkRoot();		// Start a new collection
-		return 0;
-
-	case GCS_Propagate:
-		if (Gray != NULL)
-		{
-			return PropagateMark();
-		}
-		else
-		{ // no more gray objects
-			Atomic();	// finish mark phase
-			return 0;
-		}
-
-	case GCS_Sweep: {
-		size_t old = AllocBytes;
-		size_t finalize_count;
-		SweepPos = SweepList(SweepPos, GCSWEEPMAX, &finalize_count);
-		if (*SweepPos == NULL)
-		{ // Nothing more to sweep?
-			State = GCS_Finalize;
-		}
-		assert(old >= AllocBytes);
-		Estimate -= old - AllocBytes;
-		return (GCSWEEPMAX - finalize_count) * GCSWEEPCOST + finalize_count * GCFINALIZECOST;
-	  }
-
-	case GCS_Finalize:
-		State = GCS_Pause;		// end collection
-		Dept = 0;
-		return 0;
-
-	default:
-		assert(0);
-		return 0;
-	}
+	(void)obj;
 }
 
 //==========================================================================
 //
 // Step
 //
-// Performs enough single steps to cover GCSTEPSIZE * StepMul% bytes of
-// memory.
+// Formerly one incremental collection step.  Now simply reaps dead objects.
 //
 //==========================================================================
 
 void Step()
 {
-	size_t lim = (GCSTEPSIZE/100) * StepMul;
-	size_t olim;
-	if (lim == 0)
-	{
-		lim = (~(size_t)0) / 2;		// no limit
-	}
-	Dept += AllocBytes - Threshold;
-	do
-	{
-		olim = lim;
-		lim -= SingleStep();
-	} while (olim > lim && State != GCS_Pause);
-	if (State != GCS_Pause)
-	{
-		if (Dept < GCSTEPSIZE)
-		{
-			Threshold = AllocBytes + GCSTEPSIZE;	// - lim/StepMul
-		}
-		else
-		{
-			Dept -= GCSTEPSIZE;
-			Threshold = AllocBytes;
-		}
-	}
-	else
-	{
-		assert(AllocBytes >= Estimate);
-		SetThreshold();
-	}
+	Reap();
 	StepCount++;
 }
 
@@ -453,54 +249,26 @@ void Step()
 
 void FullGC()
 {
-	if (State <= GCS_Propagate)
-	{
-		// Reset sweep mark to sweep all elements (returning them to white)
-		SweepPos = &Root;
-		// Reset other collector lists
-		Gray = NULL;
-		State = GCS_Sweep;
-	}
-	// Finish any pending sweep phase
-	while (State != GCS_Finalize)
-	{
-		SingleStep();
-	}
-	MarkRoot();
-	while (State != GCS_Pause)
-	{
-		SingleStep();
-	}
-	SetThreshold();
+	// Delete everything that has been Destroy()ed. Objects that are still
+	// live (not euthanized) remain on the Root list until they are
+	// Destroy()ed in the normal course of play or at level teardown.
+	Reap();
 }
 
 //==========================================================================
 //
 // Barrier
 //
-// Implements a write barrier to maintain the invariant that a black node
-// never points to a white node by making the node pointed at gray.
+// Formerly a write barrier maintaining the tri-color invariant. With the
+// tracing collector gone there is no invariant to maintain, so this is a
+// no-op. Kept so the inline GC::WriteBarrier wrappers still resolve.
 //
 //==========================================================================
 
 void Barrier(DObject *pointing, DObject *pointed)
 {
-	assert(pointing == NULL || (pointing->IsBlack() && !pointing->IsDead()));
-	assert(pointed->IsWhite() && !pointed->IsDead());
-	assert(State != GCS_Finalize && State != GCS_Pause);
-	// The invariant only needs to be maintained in the propagate state.
-	if (State == GCS_Propagate)
-	{
-		pointed->White2Gray();
-		pointed->GCNext = Gray;
-		Gray = pointed;
-	}
-	// In other states, we can mark the pointing object white so this
-	// barrier won't be triggered again, saving a few cycles in the future.
-	else if (pointing != NULL)
-	{
-		pointing->MakeWhite();
-	}
+	(void)pointing;
+	(void)pointed;
 }
 
 void DelSoftRootHead()
@@ -601,19 +369,9 @@ void DelSoftRoot(DObject *obj)
 
 size_t DSectorMarker::PropagateMark()
 {
-	//int i;
-	int marked = 0;
-	bool moretodo = false;
-
-	// If there are more sectors to mark, put ourself back into the gray
-	// list.
-	if (moretodo)
-	{
-		Black2Gray();
-		GCNext = GC::Gray;
-		GC::Gray = this;
-	}
-	return marked;
+	// Sector marking was part of the tracing collector, which no longer
+	// exists. Nothing to propagate.
+	return 0;
 }
 
 //==========================================================================
