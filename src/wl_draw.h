@@ -25,7 +25,7 @@ extern	int r_extralight;
 
 extern  unsigned screenloc[3];
 
-extern  bool fizzlein, fpscounter;
+extern  bool fizzlein;
 
 extern  fixed   viewx,viewy;                    // the focal point
 extern  fixed   viewsin,viewcos;

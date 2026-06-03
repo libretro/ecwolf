@@ -67,10 +67,8 @@ unsigned vbufPitch = 0;
 
 int32_t	lasttimecount;
 int32_t	frameon;
-bool	fpscounter;
 int		r_extralight;
 
-int fps_frames=0, fps_time=0, fps=0;
 
 TUniquePtr<int[]> wallheight;
 int min_wallheight;
@@ -1264,35 +1262,5 @@ void    ThreeDRefresh (void)
 
 		// don't make a big tic count
 		ResetTimeCount();
-	}
-	else if (fpscounter)
-	{
-		FString fpsDisplay;
-		fpsDisplay.Format("%2u fps", fps);
-
-		uint16_t x = 0;
-		uint16_t y = 0;
-		uint16_t width, height;
-		VW_MeasurePropString(ConFont, fpsDisplay, width, height);
-		MenuToRealCoords(x, y, width, height, MENU_TOP);
-		VWB_Clear(GPalette.BlackIndex, x, y, x+width+1, y+height+1);
-		px = 0;
-		py = 0;
-		pa = MENU_TOP;
-		VWB_DrawPropString(ConFont, fpsDisplay, CR_WHITE);
-		pa = MENU_CENTER;
-	}
-
-	if (fpscounter)
-	{
-		fps_frames++;
-		fps_time+=tics;
-
-		if(fps_time>35)
-		{
-			fps_time-=35;
-			fps=fps_frames<<1;
-			fps_frames=0;
-		}
 	}
 }
