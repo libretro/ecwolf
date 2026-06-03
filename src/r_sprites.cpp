@@ -510,6 +510,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 	}
 	const uint8_t *src;
+	const FTexture::Span *spans;
 
 	uint8_t *dest;
 	int i;
@@ -521,7 +522,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 	dxx/=(signed)texWidth,dzz/=(signed)texWidth;
 	dxa+=dxx,dza+=dzz;
 	int nexti = (int)((ny1+(dxa>>8))*::scale/(nx1+(dza>>8))+centerx);
-	src = tex->GetColumn(flip ? texWidth - 1 : 0, NULL);
+	src = tex->GetColumn(flip ? texWidth - 1 : 0, &spans);
 
 	for(i = x1, x = 0; i < x2; ++i)
 	{
@@ -529,7 +530,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		{
 			++x;
 			assert(x < texWidth);
-			src = tex->GetColumn(flip ? texWidth - x - 1 : x, NULL);
+			src = tex->GetColumn(flip ? texWidth - x - 1 : x, &spans);
 
 			dxa += dxx;
 			dza += dzz;
@@ -546,12 +547,25 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		if(i < 0 || i >= viewwidth || wallheight[i] > (signed)height || scale == 0 || -(viewheight/2 - viewshift - topoffset) >= scale)
 			continue;
 		
-		dest = vbuf + i + (upperedge > 0 ? vbufPitch*upperedge : 0);
-		for(fixed y = startY*yStep;y < endY;y += yStep)
+		// Walk the column's opaque spans and draw only the rows that fall in
+		// one, skipping transparent gaps instead of testing every pixel (see
+		// ScaleSprite). Row 0 maps to texture coordinate startY*yStep, each row
+		// advancing by yStep and the destination by vbufPitch.
+		uint8_t * const destCol = vbuf + i + (upperedge > 0 ? vbufPitch*upperedge : 0);
+		const fixed yStart = startY*yStep;
+		for(const FTexture::Span *span = spans; span->Length != 0; ++span)
 		{
-			if(src[y>>FRACBITS])
+			const fixed spanTop = (fixed)span->TopOffset << FRACBITS;
+			const fixed spanBot = (fixed)(span->TopOffset + span->Length) << FRACBITS;
+			const fixed lo = MAX<fixed>(spanTop, yStart);
+			const fixed hi = MIN<fixed>(spanBot, endY);
+			if(lo >= hi)
+				continue;
+			const int r = (lo - yStart + yStep - 1) / yStep;
+			fixed y = yStart + (fixed)r*yStep;
+			dest = destCol + (size_t)r*vbufPitch;
+			for(; y < hi; y += yStep, dest += vbufPitch)
 				*dest = colormap[src[y>>FRACBITS]];
-			dest += vbufPitch;
 		}
 
 		dyScale = (height/256.0)*(actor->scaleY/65536.);
