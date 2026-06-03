@@ -369,13 +369,6 @@ struct retro_core_option_definition option_defs_us[] = {
 		BOOL_OPTIONS,
 		"disabled"
 	},
-	{
-		"ecwolf-dynamic-fps",
-		"Dynamic FPS",
-		"Try to adjust FPS automatically",
-		BOOL_OPTIONS,
-		"disabled"
-	},
 #if !defined(_3DS) && !defined(GEKKO) && !defined(RS90) && !defined(MIYOO)
 	{
 		"ecwolf-memstore",

@@ -92,7 +92,6 @@ retro_log_printf_t log_cb = fallback_log;
 static bool libretro_supports_bitmasks = false;
 // fp10s is 10 times the FPS
 static int screen_width = 640, screen_height = 400, fp10s = 350;
-static bool dynamic_fps = false;
 static int analog_deadzone;
 static int preferred_bpp;
 static int bpp;
@@ -375,8 +374,11 @@ static struct retro_frame_time_callback frame_cb;
 
 static void frame_time_cb(retro_usec_t usec)
 {
-	if (!dynamic_fps)
-		usec = frame_cb.reference;
+	// Always advance by the fixed reference frame duration for the selected
+	// FPS. ECWolf's simulation runs on a fixed tic clock, so pinning usec
+	// here keeps game time stepping deterministically regardless of how long
+	// the frontend actually took to present the frame.
+	usec = frame_cb.reference;
 	g_state.usec += usec;
 	g_state.frame_tic = g_state.usec / TIC_TIME_US;
 	tics = (usec + g_state.tic_rest) / TIC_TIME_US;
@@ -765,7 +767,6 @@ static void update_variables(bool startup)
 	SetSoundPriorities(get_string_variable_def("ecwolf-effects-priority", "digi-adlib-speaker"));
 
 	godmode = get_bool_option("ecwolf-invulnerability");
-	dynamic_fps = get_bool_option("ecwolf-dynamic-fps");
 
 	const char *aspect = get_string_variable ("ecwolf-aspect");
 
