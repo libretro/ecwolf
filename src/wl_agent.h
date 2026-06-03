@@ -68,7 +68,6 @@ extern class player_t
 		inline unsigned int GetPlayerNum() const;
 		void	GiveExtraMan(int amount);
 		void	GivePoints(int32_t points);
-		size_t	PropagateMark();
 		void	Reborn();
 		void	Serialize(FArchive &arc);
 		void	SetPSprite(const Frame *frame, PSprite layer);

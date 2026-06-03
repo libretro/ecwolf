@@ -125,27 +125,6 @@ void DObject::Destroy ()
 	ObjectFlags = (ObjectFlags & ~OF_Fixed) | OF_EuthanizeMe;
 }
 
-size_t DObject::PropagateMark()
-{
-	const ClassDef *info = GetClass();
-	if (!ClassDef::bShutdown)
-	{
-		const size_t *offsets = info->FlatPointers;
-		if (offsets == NULL)
-		{
-			const_cast<ClassDef *>(info)->BuildFlatPointers();
-			offsets = info->FlatPointers;
-		}
-		while (*offsets != ~(size_t)0)
-		{
-			GC::Mark((DObject **)((uint8_t *)this + *offsets));
-			offsets++;
-		}
-		return info->GetSize();
-	}
-	return 0;
-}
-
 size_t DObject::PointerSubstitution (DObject *old, DObject *notOld)
 {
 	const ClassDef *info = GetClass();

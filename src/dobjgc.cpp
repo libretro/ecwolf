@@ -115,21 +115,6 @@
 
 // TYPES -------------------------------------------------------------------
 
-// This object is responsible for marking sectors during the propagate
-// stage. In case there are many, many sectors, it lets us break them
-// up instead of marking them all at once.
-class DSectorMarker : public DObject
-{
-	DECLARE_CLASS(DSectorMarker, DObject)
-public:
-	DSectorMarker() : SecNum(0),PolyNum(0),SideNum(0) {}
-	size_t PropagateMark();
-	int SecNum;
-	int PolyNum;
-	int SideNum;
-};
-IMPLEMENT_INTERNAL_CLASS(DSectorMarker)
-
 // EXTERNAL FUNCTION PROTOTYPES --------------------------------------------
 
 // PUBLIC FUNCTION PROTOTYPES ----------------------------------------------
@@ -159,8 +144,6 @@ int StepCount;
 size_t Dept;
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
-
-static DSectorMarker *SectorMarker;
 
 // CODE --------------------------------------------------------------------
 
@@ -209,20 +192,6 @@ static void Reap()
 	}
 	Estimate = AllocBytes;
 	SetThreshold();
-}
-
-//==========================================================================
-//
-// Mark
-//
-// No-op: there is no tracing collector to mark for.  Kept because callers
-// (PropagateMark implementations, Serialize helpers) reference it.
-//
-//==========================================================================
-
-void Mark(DObject **obj)
-{
-	(void)obj;
 }
 
 //==========================================================================
@@ -356,22 +325,6 @@ void DelSoftRoot(DObject *obj)
 	}
 }
 
-}
-
-//==========================================================================
-//
-// DSectorMarker :: PropagateMark
-//
-// Propagates marks across a few sectors and reinserts itself into the
-// gray list if it didn't do them all.
-//
-//==========================================================================
-
-size_t DSectorMarker::PropagateMark()
-{
-	// Sector marking was part of the tracing collector, which no longer
-	// exists. Nothing to propagate.
-	return 0;
 }
 
 //==========================================================================

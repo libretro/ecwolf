@@ -154,10 +154,6 @@ namespace GC
 		Threshold = AllocBytes;
 	}
 
-	// Marks a white object gray. If the object wants to die, the pointer
-	// is NULLed instead.
-	void Mark(DObject **obj);
-
 	// For cleanup
 	void DelSoftRootHead();
 
@@ -166,19 +162,6 @@ namespace GC
 
 	// Unroots an object.
 	void DelSoftRoot(DObject *obj);
-
-	template<class T> void Mark(T *&obj)
-	{
-		union
-		{
-			T *t;
-			DObject *o;
-		};
-		o = obj;
-		Mark(&o);
-		obj = t;
-	}
-	template<class T> void Mark(TObjPtr<T> &obj);
 }
 
 // A template class to help with handling read barriers. It does not
@@ -256,7 +239,6 @@ public:
 	}
 
 	template<class U> friend inline FArchive &operator<<(FArchive &arc, TObjPtr<U> &o);
-	template<class U> friend inline void GC::Mark(TObjPtr<U> &obj);
 	friend class DObject;
 };
 
@@ -270,11 +252,6 @@ template<class T> inline FArchive &operator<<(FArchive &arc, TObjPtr<T> &o)
 template<class T,class U> inline T barrier_cast(TObjPtr<U> &o)
 {
 	return static_cast<T>(static_cast<U *>(o));
-}
-
-template<class T> inline void GC::Mark(TObjPtr<T> &obj)
-{
-	GC::Mark(&obj.o);
 }
 
 #define RUNTIME_CLASS(cls) cls::__StaticClass
@@ -398,10 +375,6 @@ public:
 	{
 		ObjectFlags |= OF_Black;
 	}
-
-	// Marks all objects pointed to by this one. Returns the (approximate)
-	// amount of memory used by this object.
-	virtual size_t PropagateMark();
 
 protected:
 	// This form of placement new and delete is for use *only* by ClassDef's

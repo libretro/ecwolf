@@ -69,7 +69,6 @@ extern class ThinkerList
 		void	Serialize(FArchive &arc);
 		void	Tick();
 
-		void	MarkRoots();
 	protected:
 		friend class Thinker;
 		void	Register(Thinker *thinker, Priority type=NORMAL);
@@ -100,7 +99,6 @@ class Thinker : public DObject, public EmbeddedList<Thinker>::Node
 		void			SetPriority(ThinkerList::Priority priority);
 		virtual void	Tick()=0;
 		virtual void	PostBeginPlay() {}
-		size_t			PropagateMark();
 
 	private:
 		friend class ThinkerList;

@@ -69,23 +69,6 @@ void ThinkerList::DestroyAll(Priority start)
 	GC::FullGC();
 }
 
-void ThinkerList::MarkRoots()
-{
-	for(unsigned int i = 0;i < NUM_TYPES;++i)
-	{
-		Iterator iter(thinkers[i]);
-		while(iter.Next())
-		{
-			Thinker *thinker = iter;
-			if(!(thinker->ObjectFlags & OF_EuthanizeMe))
-			{
-				GC::Mark(thinker);
-				break;
-			}
-		}
-	}
-}
-
 void ThinkerList::Tick()
 {
 	for(unsigned int i = FIRST_TICKABLE;i < NUM_TYPES;++i)
@@ -216,27 +199,6 @@ void Thinker::Init()
 {
 	Super::Init();
 	EmbeddedList<Thinker>::List::ValidateNode(this);
-}
-
-size_t Thinker::PropagateMark()
-{
-	if(IsThinking())
-	{
-		Thinker *next = static_cast<Thinker*>(elNext);
-		Thinker *prev = static_cast<Thinker*>(elPrev);
-		if(next)
-		{
-			assert(!(next->ObjectFlags & OF_EuthanizeMe));
-			GC::Mark(next);
-		}
-
-		if(prev)
-		{
-			assert(!(prev->ObjectFlags & OF_EuthanizeMe));
-			GC::Mark(prev);
-		}
-	}
-	return Super::PropagateMark();
 }
 
 void Thinker::Serialize(FArchive &arc)

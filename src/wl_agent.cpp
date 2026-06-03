@@ -875,16 +875,6 @@ AActor *player_t::FindTarget()
 	return closest;
 }
 
-size_t player_t::PropagateMark()
-{
-	GC::Mark(mo);
-	GC::Mark(camera);
-	GC::Mark(ReadyWeapon);
-	if(PendingWeapon != WP_NOCHANGE)
-		GC::Mark(PendingWeapon);
-	return sizeof(*this);
-}
-
 void player_t::Reborn()
 {
 	ReadyWeapon = NULL;
