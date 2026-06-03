@@ -435,7 +435,6 @@ public:
 
 protected:
 	void DrawRateStuff ();
-	void CopyFromBuff (uint8_t *src, int srcPitch, int width, int height, uint8_t *dest);
 
 	DFrameBuffer () {}
 
