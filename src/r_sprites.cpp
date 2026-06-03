@@ -437,21 +437,40 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	}
 	const uint8_t *src;
 	uint8_t *destBase = vbuf + actx + startX + ((upperedge>>3) > 0 ? vbufPitch*(upperedge>>3) : 0);
-	uint8_t *dest = destBase;
 	unsigned int i;
-	fixed x, y;
-	for(i = actx+startX, x = startX*xStep;x < xRun;x += xStep, ++i, dest = ++destBase)
+	fixed x;
+	// Screen-row 0 of the inner loop maps to texture coordinate startY*yStep;
+	// each successive row advances the texture coordinate by yStep and the
+	// destination by vbufPitch. Walk the column's opaque spans and touch only
+	// the rows that land inside one, skipping transparent gaps entirely instead
+	// of testing every pixel. Wolf3D sprites are mostly transparent, so this
+	// avoids many dead iterations. No behavioural change: the rows skipped are
+	// exactly the transparent pixels the old per-pixel test discarded.
+	const fixed yStart = startY*yStep;
+	for(i = actx+startX, x = startX*xStep;x < xRun;x += xStep, ++i, ++destBase)
 	{
 		if(wallheight[i] > (signed)height)
 			continue;
 
-		src = tex->GetColumn(flip ? texWidth - (x>>FRACBITS) - 1 : (x>>FRACBITS), NULL);
+		const FTexture::Span *spans;
+		src = tex->GetColumn(flip ? texWidth - (x>>FRACBITS) - 1 : (x>>FRACBITS), &spans);
 
-		for(y = startY*yStep;y < yRun;y += yStep)
+		for(; spans->Length != 0; ++spans)
 		{
-			if(src[y>>FRACBITS])
+			const fixed spanTop = (fixed)spans->TopOffset << FRACBITS;
+			const fixed spanBot = (fixed)(spans->TopOffset + spans->Length) << FRACBITS;
+			// Clip the span to the visible [yStart, yRun) texture window.
+			const fixed lo = MAX<fixed>(spanTop, yStart);
+			const fixed hi = MIN<fixed>(spanBot, yRun);
+			if(lo >= hi)
+				continue;
+			// First inner-loop row whose texture coordinate reaches lo:
+			// yStart + r*yStep >= lo  =>  r = ceil((lo - yStart)/yStep).
+			const int r = (lo - yStart + yStep - 1) / yStep;
+			fixed y = yStart + (fixed)r*yStep;
+			uint8_t *dest = destBase + (size_t)r*vbufPitch;
+			for(; y < hi; y += yStep, dest += vbufPitch)
 				*dest = colormap[src[y>>FRACBITS]];
-			dest += vbufPitch;
 		}
 	}
 }
