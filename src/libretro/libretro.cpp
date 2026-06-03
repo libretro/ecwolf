@@ -942,8 +942,18 @@ void TransformPlayInputs(const wl_input_state_t *input, int newly_pressed)
 	cmd.controly = transform_axis(input->lsy, runbutton, AnalogMoveSensitivity);
 	cmd.controlstrafe = transform_axis(input->lsx, runbutton, AnalogMoveSensitivity);
 	// Relative mouse X turns the player, added on top of analog/d-pad turning.
+	// controlx is consumed once per tic by ControlMovement, and a rendered
+	// frame spans 'tics' tics (e.g. 2 at the default 35fps). The analog stick
+	// is a held value so per-tic application is correct, but a mouse delta is a
+	// one-shot displacement for the whole frame: divide it across the tics so
+	// the per-tic sum equals exactly one frame's worth of turn. Without this
+	// the same motion turns 'tics'x as far and varies as tics fluctuates,
+	// which reads as heavy/laggy aiming.
 	if (input->mouse_x)
-		cmd.controlx += input->mouse_x * MouseTurnSensitivity;
+	{
+		unsigned t = tics ? tics : 1;
+		cmd.controlx += (input->mouse_x * MouseTurnSensitivity) / (int)t;
+	}
 	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_UP))
 		cmd.controly = -delta;
 	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
