@@ -34,6 +34,7 @@
 #include "wl_main.h"
 #include "id_sd.h"
 #include "state_machine.h"
+#include "deps/stb/id_sd_ogg.h"
 #include "wl_play.h"
 #ifdef USE_GPL
 #include "dosbox/dbopl.h"
@@ -240,6 +241,22 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 
 Mix_Chunk *SynthesizeAdlibIMFOrN3D(const uint8_t *dataRaw, size_t size)
 {
+	// Ogg Vorbis music track (e.g. a high-quality replacement for the IMF
+	// tune). Decode to mono 16-bit PCM and play it as a looping digital
+	// chunk; MixSamples resamples the native rate to the output rate.
+	if (OggIsOgg(dataRaw, size)) {
+		int ogg_rate = 0, ogg_samples = 0;
+		int16_t *pcm = OggDecodeToMonoPCM(dataRaw, size,
+						  synthesisRate, &ogg_rate, &ogg_samples);
+		if (pcm != NULL)
+			return new Mix_Chunk_Digital(ogg_rate, pcm, ogg_samples,
+						     FORMAT_16BIT_LINEAR_SIGNED_NATIVE,
+						     true);
+		// Fall through to OPL synthesis on decode failure (the lump is
+		// almost certainly not really an IMF/N3D tune, but returning a
+		// best-effort silent IMF is preferable to a hard failure).
+	}
+
 	if (midiN3DValidate(dataRaw, size)) {
 		return new Mix_Chunk_N3D(synthesisRate, dataRaw, size, true);
 	}

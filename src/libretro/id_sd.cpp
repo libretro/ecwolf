@@ -34,6 +34,7 @@
 #include "wl_main.h"
 #include "id_sd.h"
 #include "state_machine.h"
+#include "deps/stb/id_sd_ogg.h"
 #include "wl_play.h"
 #include "dosbox/dbopl.h"
 
@@ -542,6 +543,32 @@ void Mix_Chunk_Digital::loadSound() {
 		isValid = true;
 		isMetadataLoaded = true;
 
+		return;
+	}
+
+	// Ogg Vorbis (e.g. high-quality replacement sounds shipped in PK3s).
+	// Decode the whole stream to mono 16-bit PCM up front; the generic
+	// resampler in MixSamples converts the native rate to the output rate.
+	if (OggIsOgg((const uint8_t *)mem, size)) {
+		int ogg_rate = 0, ogg_samples = 0;
+		int16_t *pcm = OggDecodeToMonoPCM((const uint8_t *)mem, size,
+						  synthesisRate, &ogg_rate, &ogg_samples);
+		if (pcm == NULL) {
+			printf ("Failed to decode Ogg Vorbis sound\n");
+			sample_count = 0;
+			isValid = false;
+			isMetadataLoaded = true;
+			return;
+		}
+		rate = ogg_rate;
+		sample_count = ogg_samples;
+		sample_format = FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
+		isLooping = false;
+		chunk_samples = pcm;
+		loaded_sound_size += (size_t)ogg_samples * 2;
+		unloadableSounds[whichLump] = this;
+		isValid = true;
+		isMetadataLoaded = true;
 		return;
 	}
 

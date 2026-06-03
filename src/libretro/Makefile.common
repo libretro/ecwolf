@@ -10,6 +10,7 @@ INCFLAGS   := \
 	-I$(CORE_DIR) \
 	-I$(CORE_DIR)/src \
 	-I$(CORE_DIR)/src/g_shared \
+	-I$(CORE_DIR)/src/libretro \
 	-I$(CORE_DIR)/src/libretro/libretro-common/include \
 	-I$(JPEG_DIR) \
 	-I$(BZIP2_DIR) \
@@ -223,6 +224,11 @@ else
 endif
 
 SOURCES_C += $(DEPS_LZMA_C)
+# Ogg Vorbis decoder (stb_vorbis, public domain) plus the shared decode helper,
+# used for Ogg sound effects and music tracks.
+SOURCES_C += \
+	$(CORE_DIR)/src/libretro/deps/stb/stb_vorbis_impl.c \
+	$(CORE_DIR)/src/libretro/deps/stb/id_sd_ogg.c
 # ecwolf.pk3 base data, embedded so the core carries it internally.
 SOURCES_C += $(CORE_DIR)/src/libretro/ecwolf_pk3_data.c
 SOURCES_CXX += $(LZMA_CXX)
