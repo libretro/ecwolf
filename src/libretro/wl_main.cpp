@@ -1197,13 +1197,16 @@ static bool handleChoice(wl_state_t *state, int pos)
 	case SOUND_MENU:
 	case CONTROL_MENU:
 	case AUTOMAP_MENU:
-		// Items are sliders/booleans/labels adjusted with left/right (Enter
-		// toggles a boolean); pressing Enter otherwise just keeps the menu open.
+		// Sliders are adjusted with left/right; booleans toggle and
+		// multiple-choice items advance when activated with Enter.
+		state->currentMenu()->getIndex(pos)->activate();
 		state->stage = MENU_PREPARE;
 		break;
 	case DISPLAY_MENU:
 		if(pos == 2) // Automap Options
 			pushMenu(state, AUTOMAP_MENU);
+		else
+			state->currentMenu()->getIndex(pos)->activate();
 		state->stage = MENU_PREPARE;
 		break;
 	}

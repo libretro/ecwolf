@@ -89,6 +89,13 @@ BooleanMenuItem::BooleanMenuItem(const char string[36], bool &value, MENU_LISTEN
 {
 }
 
+void BooleanMenuItem::activate()
+{
+	value ^= 1;
+	if(activateListener != NULL)
+		activateListener(value);
+}
+
 
 void BooleanMenuItem::draw()
 {

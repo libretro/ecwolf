@@ -68,6 +68,7 @@ class MenuItem
 		void		setVisible(bool visible=true) { this->visible = visible; }
 
 		virtual void	draw();
+		virtual void	activate() {}
 		virtual void	left() {}
 		virtual void	right() {}
 		virtual bool	playActivateSound() { return true; }
@@ -104,7 +105,8 @@ class MenuSwitcherMenuItem : public MenuItem
 		 */
 		MenuSwitcherMenuItem(const char string[36], Menu &menu, MENU_LISTENER_PROTOTYPE(activateListener)=NULL);
 
-		void	activate();
+		// activate() inherits the base no-op; submenu switching is driven by
+		// handleChoice in the libretro port.
 };
 
 class SliderMenuItem : public MenuItem
@@ -159,7 +161,8 @@ class TextInputMenuItem : public MenuItem
 		 */
 		TextInputMenuItem(const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false);
 
-		void		activate();
+		// activate() inherits the base no-op until non-blocking text entry is
+		// implemented for the libretro port.
 		void		draw();
 		const char	*getValue() const { return value; }
 		void		setValue(const FString &text) { value = text; }
