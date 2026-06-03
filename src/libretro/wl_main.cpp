@@ -1087,12 +1087,14 @@ Menu::handleStep(wl_state_t *state, const wl_input_state_t *input)
 		PrintX = getX() + getIndent();
 		PrintY = getY() + getHeight(curPos);
 		getIndex(curPos)->draw();
+		Libretro_SyncOptionsFromEngine();
 		break;
 	case dir_East:
 		getIndex(curPos)->right();
 		PrintX = getX() + getIndent();
 		PrintY = getY() + getHeight(curPos);
 		getIndex(curPos)->draw();
+		Libretro_SyncOptionsFromEngine();
 		break;
 	}
 
@@ -1200,13 +1202,17 @@ static bool handleChoice(wl_state_t *state, int pos)
 		// Sliders are adjusted with left/right; booleans toggle and
 		// multiple-choice items advance when activated with Enter.
 		state->currentMenu()->getIndex(pos)->activate();
+		Libretro_SyncOptionsFromEngine();
 		state->stage = MENU_PREPARE;
 		break;
 	case DISPLAY_MENU:
 		if(pos == 2) // Automap Options
 			pushMenu(state, AUTOMAP_MENU);
 		else
+		{
 			state->currentMenu()->getIndex(pos)->activate();
+			Libretro_SyncOptionsFromEngine();
+		}
 		state->stage = MENU_PREPARE;
 		break;
 	}

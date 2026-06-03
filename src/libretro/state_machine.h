@@ -564,6 +564,9 @@ typedef struct wl_input_state_s
 void State_FadeOut(wl_state_t *state, int start = 0, int end = 255, int steps = 30);
 bool GameMapStart (wl_state_t *state);
 void HelpScreens (wl_state_t *state);
+// Pushes in-game menu changes (sound/control/display/automap settings) back to
+// the frontend's core options so the two stay in sync. Defined in libretro.cpp.
+void Libretro_SyncOptionsFromEngine(void);
 bool GameLoopInit (wl_state_t *state);
 bool GameMapEnd (wl_state_t *state);
 

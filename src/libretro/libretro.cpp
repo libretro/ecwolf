@@ -778,6 +778,67 @@ static void update_variables(bool startup)
 	panyadjustment = get_slider_option("ecwolf-pany-adjustment", 5);
 }
 
+// Push a single core option value back to the frontend so its options UI
+// reflects a change made from the in-game menu. Value strings must match the
+// option's defined vocabulary (see update_variables / the core options table).
+static void set_option_value(const char *key, const char *value)
+{
+	struct retro_variable var;
+	var.key = key;
+	var.value = value;
+	environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, &var);
+}
+
+static void set_option_bool(const char *key, bool value)
+{
+	set_option_value(key, value ? "enabled" : "disabled");
+}
+
+static void set_option_slider(const char *key, int value)
+{
+	char buf[16];
+	snprintf(buf, sizeof(buf), "%d", value);
+	set_option_value(key, buf);
+}
+
+// Inverse of update_variables for the settings exposed by the in-game menu:
+// writes the current engine globals back to the frontend's core options so the
+// two stay in sync when a value is changed from the menu. Safe to call any time;
+// it is a no-op if the frontend does not support RETRO_ENVIRONMENT_SET_VARIABLE.
+void Libretro_SyncOptionsFromEngine(void)
+{
+	static const char *overlay_options[] = {"off", "on", "both", NULL};
+	static const char *rotate_options[] = {"off", "on", "overlay_only", NULL};
+
+	if (!environ_cb || !environ_cb(RETRO_ENVIRONMENT_SET_VARIABLE, NULL))
+		return;
+
+	// Sound
+	set_option_slider("ecwolf-music-volume", MusicVolume);
+	set_option_slider("ecwolf-adlib-volume", AdlibVolume);
+	set_option_slider("ecwolf-speaker-volume", SpeakerVolume);
+	set_option_slider("ecwolf-digi-volume", DigiVolume);
+
+	// Control
+	set_option_bool("ecwolf-alwaysrun", alwaysrun);
+	set_option_slider("ecwolf-panx-adjustment", panxadjustment);
+	set_option_slider("ecwolf-pany-adjustment", panyadjustment);
+
+	// Display
+	set_option_slider("ecwolf-viewsize", viewsize);
+
+	// Automap
+	if (am_overlay <= 2)
+		set_option_value("ecwolf-am-overlay", overlay_options[am_overlay]);
+	if (am_rotate <= 2)
+		set_option_value("ecwolf-am-rotate", rotate_options[am_rotate]);
+	set_option_bool("ecwolf-am-drawtexturedwalls", am_drawtexturedwalls);
+	set_option_bool("ecwolf-am-drawtexturedfloors", am_drawfloors);
+	set_option_bool("ecwolf-am-texturedoverlay", am_overlaytextured);
+	set_option_bool("ecwolf-am-showratios", am_showratios);
+	set_option_bool("ecwolf-am-pause", am_pause);
+}
+
 void ScannerMessageHandler(Scanner::MessageLevel level, const char *error, va_list list)
 {
 	FString errorMessage;
