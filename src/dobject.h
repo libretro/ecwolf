@@ -50,17 +50,11 @@ enum EInPlace { EC_InPlace };
 enum EObjectFlags
 {
 	// GC flags
-	OF_White0			= 1 << 0,		// Object is white (type 0)
-	OF_White1			= 1 << 1,		// Object is white (type 1)
-	OF_Black			= 1 << 2,		// Object is black
 	OF_Fixed			= 1 << 3,		// Object is fixed (should not be collected)
 	OF_Rooted			= 1 << 4,		// Object is soft-rooted
 	OF_EuthanizeMe		= 1 << 5,		// Object wants to die
 	OF_Cleanup			= 1 << 6,		// Object is now being deleted by the collector
 	OF_YesReallyDelete	= 1 << 7,		// Object is being deleted outside the collector, and this is okay, so don't print a warning
-
-	OF_WhiteBits		= OF_White0 | OF_White1,
-	OF_MarkBits			= OF_WhiteBits | OF_Black,
 
 	// Other flags
 	OF_JustSpawned		= 1 << 8,		// Thinker was spawned this tic
@@ -72,46 +66,20 @@ template<class T> class TObjPtr;
 
 namespace GC
 {
-	enum EGCState
-	{
-		GCS_Pause,
-		GCS_Propagate,
-		GCS_Sweep,
-		GCS_Finalize
-	};
-
 	// Number of bytes currently allocated through M_Malloc/M_Realloc.
 	extern size_t AllocBytes;
 
 	// Amount of memory to allocate before triggering a collection.
 	extern size_t Threshold;
 
-	// List of gray objects.
-	extern DObject *Gray;
-
 	// List of every object.
 	extern DObject *Root;
-
-	// Current white value for potentially-live objects.
-	extern uint32_t CurrentWhite;
-
-	// Current collector state.
-	extern EGCState State;
-
-	// Position of GC sweep in the list of objects.
-	extern DObject **SweepPos;
 
 	// Size of GC pause.
 	extern int Pause;
 
 	// Size of GC steps.
 	extern int StepMul;
-
-	// Current white value for known-dead objects.
-	static inline uint32_t OtherWhite()
-	{
-		return CurrentWhite ^ OF_WhiteBits;
-	}
 
 	// Frees all objects, whether they're dead or not.
 	void FreeAll();
@@ -122,10 +90,8 @@ namespace GC
 	// Does a complete collection.
 	void FullGC();
 
-	// Handles the grunt work for a write barrier.
-	void Barrier(DObject *pointing, DObject *pointed);
-
-	// Handles a write barrier.
+	// Handles a write barrier. No-ops now that collection is deterministic;
+	// kept so existing call sites still resolve.
 	static inline void WriteBarrier(DObject *pointing, DObject *pointed);
 
 	// Handles a write barrier for a pointer that isn't inside an object.
@@ -273,7 +239,6 @@ private:
 	const ClassDef *Class;				// This object's type
 public:
 	DObject *ObjNext;			// Keep track of all allocated objects
-	DObject *GCNext;			// Next object in this collection list
 	uint32_t ObjectFlags;			// Flags for this object
 
 public:
@@ -326,56 +291,6 @@ public:
 		M_Free(mem);
 	}
 
-	// GC fiddling
-
-	// An object is white if either white bit is set.
-	bool IsWhite() const
-	{
-		return !!(ObjectFlags & OF_WhiteBits);
-	}
-
-	bool IsBlack() const
-	{
-		return !!(ObjectFlags & OF_Black);
-	}
-
-	// An object is gray if it isn't white or black.
-	bool IsGray() const
-	{
-		return !(ObjectFlags & OF_MarkBits);
-	}
-
-	// An object is dead if it's the other white.
-	bool IsDead() const
-	{
-		return !!(ObjectFlags & GC::OtherWhite() & OF_WhiteBits);
-	}
-
-	void ChangeWhite()
-	{
-		ObjectFlags ^= OF_WhiteBits;
-	}
-
-	void MakeWhite()
-	{
-		ObjectFlags = (ObjectFlags & ~OF_MarkBits) | (GC::CurrentWhite & OF_WhiteBits);
-	}
-
-	void White2Gray()
-	{
-		ObjectFlags &= ~OF_WhiteBits;
-	}
-
-	void Black2Gray()
-	{
-		ObjectFlags &= ~OF_Black;
-	}
-
-	void Gray2Black()
-	{
-		ObjectFlags |= OF_Black;
-	}
-
 protected:
 	// This form of placement new and delete is for use *only* by ClassDef's
 	// CreateNew() method. Do not use them for some other purpose.
@@ -394,18 +309,13 @@ protected:
 
 static inline void GC::WriteBarrier(DObject *pointing, DObject *pointed)
 {
-	if (pointed != NULL && pointed->IsWhite() && pointing->IsBlack())
-	{
-		Barrier(pointing, pointed);
-	}
+	(void)pointing;
+	(void)pointed;
 }
 
 static inline void GC::WriteBarrier(DObject *pointed)
 {
-	if (pointed != NULL && State == GCS_Propagate && pointed->IsWhite())
-	{
-		Barrier(NULL, pointed);
-	}
+	(void)pointed;
 }
 
 #endif //__DOBJECT_H__

@@ -132,16 +132,11 @@ namespace GC
 size_t AllocBytes;
 size_t Threshold;
 size_t Estimate;
-DObject *Gray;
 DObject *Root;
 DObject *SoftRoots;
-DObject **SweepPos;
-uint32_t CurrentWhite = OF_White0 | OF_Fixed;
-EGCState State = GCS_Pause;
 int Pause = DEFAULT_GCPAUSE;
 int StepMul = DEFAULT_GCMUL;
 int StepCount;
-size_t Dept;
 
 // PRIVATE DATA DEFINITIONS ------------------------------------------------
 
@@ -224,22 +219,6 @@ void FullGC()
 	Reap();
 }
 
-//==========================================================================
-//
-// Barrier
-//
-// Formerly a write barrier maintaining the tri-color invariant. With the
-// tracing collector gone there is no invariant to maintain, so this is a
-// no-op. Kept so the inline GC::WriteBarrier wrappers still resolve.
-//
-//==========================================================================
-
-void Barrier(DObject *pointing, DObject *pointed)
-{
-	(void)pointing;
-	(void)pointed;
-}
-
 void DelSoftRootHead()
 {
 	if (SoftRoots != NULL)
@@ -291,7 +270,6 @@ void AddSoftRoot(DObject *obj)
 	obj->ObjNext = SoftRoots->ObjNext;
 	SoftRoots->ObjNext = obj;
 	obj->ObjectFlags |= OF_Rooted;
-	WriteBarrier(obj);
 }
 
 //==========================================================================

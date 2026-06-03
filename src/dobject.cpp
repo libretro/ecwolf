@@ -62,7 +62,6 @@ DObject *DObject::__InPlaceConstructor(const ClassDef *classDef, void *mem)
 DObject::DObject ()
 : Class(0), ObjectFlags(0)
 {
-	ObjectFlags = GC::CurrentWhite & OF_WhiteBits;
 	ObjNext = GC::Root;
 	GC::Root = this;
 }
@@ -70,7 +69,6 @@ DObject::DObject ()
 DObject::DObject (const ClassDef *inClass)
 : Class(inClass), ObjectFlags(0)
 {
-	ObjectFlags = GC::CurrentWhite & OF_WhiteBits;
 	ObjNext = GC::Root;
 	GC::Root = this;
 }
@@ -97,24 +95,7 @@ DObject::~DObject ()
 			if (*probe == this)
 			{
 				*probe = ObjNext;
-				if (&ObjNext == GC::SweepPos)
-				{
-					GC::SweepPos = probe;
-				}
 				break;
-			}
-		}
-
-		// If it's gray, also unlink it from the gray list.
-		if (this->IsGray())
-		{
-			for (probe = &GC::Gray; *probe != NULL; probe = &((*probe)->GCNext))
-			{
-				if (*probe == this)
-				{
-					*probe = GCNext;
-					break;
-				}
 			}
 		}
 	}
