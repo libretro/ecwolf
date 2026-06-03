@@ -841,7 +841,12 @@ popMenu(wl_state_t *state)
 		// DEALLOCATE EVERYTHING
 		//
 		CleanupControlPanel ();
-		if (param_tedlevel || startgame || loadedgame)
+		if (ingame)
+			// A game is in progress (the menu was opened mid-game): redraw the
+			// play screen over the menu and resume where we left off, rather
+			// than restarting the level or dropping to the title/demo.
+			state->stage = GAME_DRAW_PLAY_SCREEN;
+		else if (param_tedlevel || startgame || loadedgame)
 			state->stage = START_GAME;
 		else
 			state->stage = START_DEMO_INTERMISSION;
@@ -870,6 +875,13 @@ void PrepareMainMenu (wl_state_t *state)
 	// to the episode/skill selection; now New Game from the main menu leads
 	// there via handleChoice.)
 	pushMenu(state, MAIN_MENU);
+
+	// Item 7 and 8 read differently depending on whether a game is running:
+	// "View Scores"/"Back to Demo" at the title, "End Game"/"Back to Game"
+	// once a game is in progress.
+	mainMenu[7]->setText(language[ingame ? "STR_EG" : "STR_VS"]);
+	mainMenu[8]->setText(language[ingame ? "STR_BG" : "STR_BD"]);
+
 	state->currentMenu()->validateCurPos();
 	state->currentMenu()->draw();
 	Menu::closeMenus(false);

@@ -1388,6 +1388,13 @@ void retro_run(void)
 		if (g_state.stage == PLAY_STEP_A || g_state.stage == PLAY_STEP_B) {
 			g_state.stage = MAIN_MENU_PREPARE;
 			Paused = 0;
+		} else if (g_state.stage == MENU_PREPARE || g_state.stage == MENU_RUN) {
+			// The menu is already open: Start closes it the same way the
+			// "Back to Game"/"Back to Demo" item does (resume the running game
+			// or return to the demo), rather than toggling the paused overlay.
+			// Drop to the top menu level so the escape path pops out fully.
+			g_state.menuLevel = 1;
+			g_state.stage = MENU_EXITING_ESCAPE_1;
 		} else {
 			Paused ^= 1;
 		}
