@@ -376,6 +376,10 @@ void InitPalette (const char* defpalname)
 	GPalette.SetPalette (pal);
 	GPalette.MakeGoodRemap ();
 	ColorMatcher.SetPalette ((uint32_t *)GPalette.BaseColors);
+	// Recalculate the grayscale colormap for the new palette; otherwise it
+	// keeps the values from whatever palette was loaded first and renders
+	// incorrectly after a palette change.
+	FTexture::InitGrayMap ();
 
 	// The BUILD engine already has a transparent color, so it doesn't need any remapping.
 	if (!usingBuild)
