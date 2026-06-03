@@ -65,7 +65,7 @@ class FPakFile : public FUncompressedFile
 {
 public:
 	FPakFile(const char * filename, FileReader *file);
-	bool Open(bool quiet);
+	bool Open();
 };
 
 
@@ -88,7 +88,7 @@ FPakFile::FPakFile(const char *filename, FileReader *file) : FUncompressedFile(f
 //
 //==========================================================================
 
-bool FPakFile::Open(bool quiet)
+bool FPakFile::Open()
 {
 	dpackheader_t header;
 
@@ -101,8 +101,6 @@ bool FPakFile::Open(bool quiet)
 	Reader->Read (fileinfo, NumLumps * sizeof(dpackfile_t));
 
 	Lumps = new FUncompressedLump[NumLumps];
-
-	if (!quiet) Printf(", %d lumps\n", NumLumps);
 
 	for(uint32_t i = 0; i < NumLumps; i++)
 	{
@@ -124,7 +122,7 @@ bool FPakFile::Open(bool quiet)
 //
 //==========================================================================
 
-FResourceFile *CheckPak(const char *filename, FileReader *file, bool quiet)
+FResourceFile *CheckPak(const char *filename, FileReader *file)
 {
 	char head[4];
 
@@ -136,7 +134,7 @@ FResourceFile *CheckPak(const char *filename, FileReader *file, bool quiet)
 		if (!memcmp(head, "PACK", 4))
 		{
 			FResourceFile *rf = new FPakFile(filename, file);
-			if (rf->Open(quiet)) return rf;
+			if (rf->Open()) return rf;
 			rf->Reader = NULL; // to avoid destruction of reader
 			delete rf;
 		}

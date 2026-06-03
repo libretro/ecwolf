@@ -40,11 +40,9 @@
 #include "v_text.h"
 
 #include "v_video.h"
-//#include "hu_stuff.h"
 #include "w_wad.h"
 #include "m_swap.h"
 
-//#include "doomstat.h"
 #include "templates.h"
 #include "zstring.h"
 
@@ -86,7 +84,7 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 	uint32_t tag;
 
 	int			maxstrlen = INT_MAX;
-	int 		w, maxwidth;
+	int 		w;
 	const uint8_t *ch;
 	int 		c;
 	int 		cx;
@@ -115,7 +113,6 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 	cy = y;
 
 	// Parse the tag list to see if we need to adjust for scaling.
- 	maxwidth = Width;
 	scalex = scaley = 1;
 
 #ifndef NO_VA_COPY
@@ -128,14 +125,11 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 	while (tag != TAG_DONE)
 	{
 		va_list *more_p;
-		uint32_t data;
-		void *ptrval;
 
 		switch (tag)
 		{
 		case TAG_IGNORE:
 		default:
-			data = va_arg (tags, uint32_t);
 			break;
 
 		case TAG_MORE:
@@ -152,15 +146,11 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 		case DTA_DestWidth:
 		case DTA_DestHeight:
 			assert(false && "DTA_DestWidth or DTA_DestHeight unsupported.");
-			//*(uint32_t *)tags = TAG_IGNORE;
-			data = va_arg (tags, uint32_t);
 			break;
 
 		// Translation is specified explicitly by the text.
 		case DTA_Translation:
 			assert(false && "DTA_Translation unsupported.");
-			//*(uint32_t *)tags = TAG_IGNORE;
-			ptrval = va_arg (tags, void*);
 			break;
 
 		case DTA_CleanNoMove_1:
@@ -169,7 +159,6 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 			{
 				scalex = CleanXfac_1;
 				scaley = CleanYfac_1;
-				maxwidth = Width - (Width % scalex);
 			}
 			break;
 
@@ -179,7 +168,6 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 			{
 				scalex = CleanXfac;
 				scaley = CleanYfac;
-				maxwidth = Width - (Width % scalex);
 			}
 			break;
 
@@ -189,12 +177,10 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 			if (boolval)
 			{
 				scalex = scaley = 1;
-				maxwidth = 320;
 			}
 			break;
 
 		case DTA_VirtualWidth:
-			maxwidth = va_arg (tags, int);
 			scalex = scaley = 1;
 			break;
 

@@ -214,7 +214,7 @@ class FVGAGraph : public FResourceFile
 				delete[] lumps;
 		}
 
-		bool Open(bool quiet)
+		bool Open()
 		{
 			vgadictReader->Read(huffman, sizeof(huffman));
 			for(unsigned int i = 0;i < 255;++i)
@@ -305,7 +305,6 @@ class FVGAGraph : public FResourceFile
 						uint8_t* data = new uint8_t[lumps[i-1].length];
 						uint8_t* out = new uint8_t[lumps[i-1].LumpSize];
 						Reader->Read(data, lumps[i-1].length);
-						uint8_t* endPtr = lumps[i-1].HuffExpand(data, out);
 						delete[] data;
 
 						bool endhit = false;
@@ -387,7 +386,6 @@ class FVGAGraph : public FResourceFile
 			// We don't care about the PICTABLE lump now so we can just skip
 			// over it.
 			--NumLumps;
-			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
 			LumpRemapper::AddFile(extension, this, LumpRemapper::VGAGRAPH);
 			return true;
@@ -407,7 +405,7 @@ class FVGAGraph : public FResourceFile
 		TUniquePtr<FileReader> vgadictReader;
 };
 
-FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
+FResourceFile *CheckVGAGraph(const char *filename, FileReader *file)
 {
 	FString fname(filename);
 	int lastSlash = fname.LastIndexOfAny("/\\:");
@@ -419,7 +417,7 @@ FResourceFile *CheckVGAGraph(const char *filename, FileReader *file, bool quiet)
 	if(fname.Len() == 8 && fname.CompareNoCase("vgagraph") == 0) // file must be vgagraph.something
 	{
 		FResourceFile *rf = new FVGAGraph(filename, file);
-		if(rf->Open(quiet)) return rf;
+		if(rf->Open()) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
 	}

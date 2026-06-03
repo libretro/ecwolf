@@ -94,7 +94,7 @@ static inline uint64_t SwapLongLong(uint64_t x)
 		((x>>56)&0xFF);
 }
 
-#ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
 #define BigShort(x) (x)
 #define BigLong(x) (x)
 #define BigLongLong(x) (x)

@@ -27,10 +27,8 @@ static const int samplesPerMusicTick = synthesisRate / MUSIC_RATE;
 
 // This table maps channel numbers to carrier and modulator op cells
 static uint8_t  carriers[9] =  {3, 4, 5,11,12,13,19,20,21},
-            modifiers[9] = { 0, 1, 2, 8, 9,10,16,17,18},
+            modifiers[9] = { 0, 1, 2, 8, 9,10,16,17,18};
 // This table maps percussive voice numbers to op cells
-            pcarriers[5] = {19,0xff,0xff,0xff,0xff},
-            pmodifiers[5] = {16,17,18,20,21};
 
 uint32_t
 Mix_Chunk_N3D::MIDI_VarLength(void)

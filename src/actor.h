@@ -147,7 +147,7 @@ PACK_START
 		union
 		{
 			fixed x;
-#ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
 			struct { COORD_PART tilex; COORD_PART fracx; };
 #else
 			struct { COORD_PART fracx; COORD_PART tilex; };
@@ -156,7 +156,7 @@ PACK_START
 		union
 		{
 			fixed y;
-#ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
 			struct { COORD_PART tiley; COORD_PART fracy; };
 #else
 			struct { COORD_PART fracy; COORD_PART tiley; };

@@ -414,13 +414,9 @@ bool AActor::IsFast() const
 
 void AActor::PrintInventory()
 {
-	Printf("%s inventory:\n", GetClass()->GetName().GetChars());
 	AInventory *item = inventory;
 	while(item)
-	{
-		Printf("  %s (%d/%d)\n", item->GetClass()->GetName().GetChars(), item->amount, item->maxamount);
 		item = item->inventory;
-	}
 }
 
 void AActor::Serialize(FArchive &arc)

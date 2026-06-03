@@ -239,10 +239,7 @@ ACTION_FUNCTION(A_ChangeFlag)
 		flag = flag.Mid(flag.IndexOf(".")+1);
 	}
 	if(!ClassDef::SetFlag(self->GetClass(), self, prefix, flag, value))
-	{
-		Printf("A_ChangeFlag: Attempt to change unknown flag '%s'.\n", (prefix.IsEmpty() ? flag.GetChars() : (prefix + "." + flag).GetChars()));
 		return false;
-	}
 
 	const bool countsKill = !!(self->flags & FL_COUNTKILL);
 	const bool countsSecret = !!(self->flags & FL_COUNTSECRET);

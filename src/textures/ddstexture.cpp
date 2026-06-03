@@ -233,12 +233,10 @@ FTexture *DDSTexture_TryCreate (FileReader &data, int lumpnum)
 	data.Seek (4, SEEK_SET);
 	data.Read (&surfdesc, sizeof(surfdesc));
 
-#ifdef __BIG_ENDIAN__
-	// Every single element of the header is a uint32_t
+#ifdef MSB_FIRST
+	/* Every single element of the header is a uint32_t */
 	for (unsigned int i = 0; i < sizeof(DDSURFACEDESC2) / 4; ++i)
-	{
 		byteswapping[i] = LittleLong(byteswapping[i]);
-	}
 	// Undo the byte swap for the pixel format
 	surfdesc.PixelFormat.FourCC = LittleLong(surfdesc.PixelFormat.FourCC);
 #endif
@@ -412,20 +410,8 @@ void FDDSTexture::Unload ()
 
 FTextureFormat FDDSTexture::GetFormat()
 {
-#if 0
-	switch (Format)
-	{
-	case ID_DXT1:	return TEX_DXT1;
-	case ID_DXT2:	return TEX_DXT2;
-	case ID_DXT3:	return TEX_DXT3;
-	case ID_DXT4:	return TEX_DXT4;
-	case ID_DXT5:	return TEX_DXT5;
-	default:		return TEX_RGB;
-	}
-#else
 	// For now, create a true color texture to preserve all colors.
 	return TEX_RGB;
-#endif
 }
 
 //==========================================================================

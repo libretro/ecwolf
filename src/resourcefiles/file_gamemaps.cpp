@@ -51,7 +51,7 @@ class FGamemaps : public FResourceFile
 		~FGamemaps();
 
 		FResourceLump *GetLump(int lump);
-		bool Open(bool quiet);
+		bool Open();
 
 	private:
 		FMapLump* Lumps;
@@ -116,7 +116,7 @@ FResourceLump *FGamemaps::GetLump(int lump)
 	return &Lumps[lump];
 }
 
-bool FGamemaps::Open(bool quiet)
+bool FGamemaps::Open()
 {
 	uint16_t rlewTag;
 
@@ -173,11 +173,10 @@ bool FGamemaps::Open(bool quiet)
 		dataLump.LumpSize += dataLump.Header.Width*dataLump.Header.Height*PLANES*2;
 	}
 	delete[] offsets;
-	if(!quiet) Printf(", %d lumps\n", NumLumps);
 	return true;
 }
 
-FResourceFile *CheckGamemaps(const char *filename, FileReader *file, bool quiet)
+FResourceFile *CheckGamemaps(const char *filename, FileReader *file)
 {
 	FString fname(filename);
 	int lastSlash = fname.LastIndexOfAny("/\\:");
@@ -190,7 +189,7 @@ FResourceFile *CheckGamemaps(const char *filename, FileReader *file, bool quiet)
 	if(fname.Len() == 8 && (fname.CompareNoCase("gamemaps") == 0 || fname.Left(7).CompareNoCase("maptemp") == 0))
 	{
 		FResourceFile *rf = new FGamemaps(filename, file);
-		if(rf->Open(quiet)) return rf;
+		if(rf->Open()) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
 	}

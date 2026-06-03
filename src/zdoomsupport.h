@@ -61,14 +61,13 @@ template<class T> void FixPathSeperator (T &path) { path.ReplaceChars('\\', '/')
 static inline void DPrintf(const char* fmt, ...) {}
 
 #define countof(x) (sizeof(x)/sizeof(x[0]))
-#ifndef __BIG_ENDIAN__
-#define MAKE_ID(a,b,c,d)	((uint32_t)((a)|((b)<<8)|((c)<<16)|((d)<<24)))
-#else
+#ifdef MSB_FIRST
 #define MAKE_ID(a,b,c,d)	((uint32_t)((d)|((c)<<8)|((b)<<16)|((a)<<24)))
+#else
+#define MAKE_ID(a,b,c,d)	((uint32_t)((a)|((b)<<8)|((c)<<16)|((d)<<24)))
 #endif
 
 #define MAXWIDTH 5120
-#define Printf printf
 
 #define MulScale16(x,y) (int32_t((int64_t(x)*int64_t(y))>>16))
 

@@ -465,9 +465,6 @@ static TMap<int, ClassDef *> EditorNumberTable, ConversationIDTable;
 SymbolTable ClassDef::globalSymbols;
 bool ClassDef::bShutdown = false;
 
-// Minimize warning spam for deprecated feature in 1.4
-static bool g_ThingEdNumWarning;
-
 ClassDef::ClassDef() : tentative(false)
 {
 	defaultInstance = NULL;
@@ -1092,7 +1089,6 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 			//   F - Float
 			//   S - String
 			bool optional = false;
-			bool done = false;
 			const char* p = properties[mid].params;
 			unsigned int paramc = 0;
 			if(*p != 0)
@@ -1116,10 +1112,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 								if(!optional)
 									sc.MustGetToken(TK_Identifier);
 								else if(!sc.CheckToken(TK_Identifier))
-								{
-									done = true;
 									break;
-								}
 								params[paramc].s = new char[sc->str.Len()+1];
 								strcpy(params[paramc].s, sc->str);
 								break;
@@ -1141,10 +1134,7 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 								if(!optional) // Float also includes integers
 									sc.MustGetToken(TK_FloatConst);
 								else if(!sc.CheckToken(TK_FloatConst))
-								{
-									done = true;
 									break;
-								}
 								params[paramc].i = (negate ? -1 : 1) * static_cast<int64_t> (sc->decimal);
 								break;
 							case 'F':
@@ -1154,20 +1144,14 @@ bool ClassDef::SetProperty(ClassDef *newClass, const char* className, const char
 								if(!optional)
 									sc.MustGetToken(TK_FloatConst);
 								else if(!sc.CheckToken(TK_FloatConst))
-								{
-									done = true;
 									break;
-								}
 								params[paramc].f = (negate ? -1 : 1) * sc->decimal;
 								break;
 							case 'S':
 								if(!optional)
 									sc.MustGetToken(TK_StringConst);
 								else if(!sc.CheckToken(TK_StringConst))
-								{
-									done = true;
 									break;
-								}
 								params[paramc].s = new char[sc->str.Len()+1];
 								strcpy(params[paramc].s, sc->str);
 								break;

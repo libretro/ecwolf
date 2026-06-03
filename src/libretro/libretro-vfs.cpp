@@ -251,7 +251,7 @@ int FDirectory::AddDirectory(const char *dirpath)
 		RDIR* directory = retro_opendir(scanDirectories[i].GetChars());
 		if (directory == NULL)
 		{
-			Printf("Could not read directory\n");
+			log_cb(RETRO_LOG_ERROR, "Could not read directory\n");
 			return 0;
 		}
 

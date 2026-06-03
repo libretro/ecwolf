@@ -31,7 +31,7 @@ bool FWeaponSlot::AddWeapon(const ClassDef *type)
 	
 	if (!type->IsDescendantOf(NATIVE_CLASS(Weapon)))
 	{
-		Printf("Can't add non-weapon %s to weapon slots\n", type->GetName().GetChars());
+		log_cb(RETRO_LOG_ERROR, "Can't add non-weapon %s to weapon slots\n", type->GetName().GetChars());
 		return false;
 	}
 
@@ -523,7 +523,7 @@ void FWeaponSlots::SetFromGameInfo()
 			const ClassDef *cls = ClassDef::FindClass(gameinfo.DefaultWeaponSlots[i][j]);
 			if (cls == NULL)
 			{
-				Printf("Unknown weapon class '%s' found in default weapon slot assignments\n",
+				log_cb(RETRO_LOG_ERROR, "Unknown weapon class '%s' found in default weapon slot assignments\n",
 					gameinfo.DefaultWeaponSlots[i][j].GetChars());
 			}
 			else
@@ -683,80 +683,6 @@ int FWeaponSlots::RestoreSlots(FConfigFile *config, const char *section)
 
 //===========================================================================
 //
-// CCMD setslot
-//
-//===========================================================================
-
-void FWeaponSlots::PrintSettings()
-{
-	for (int i = 1; i <= NUM_WEAPON_SLOTS; ++i)
-	{
-		int slot = i % NUM_WEAPON_SLOTS;
-		if (Slots[slot].Size() > 0)
-		{
-			Printf("Slot[%d]=", slot);
-			for (int j = 0; j < Slots[slot].Size(); ++j)
-			{
-				Printf("%s ", Slots[slot].GetWeapon(j)->GetName().GetChars());
-			}
-			Printf("\n");
-		}
-	}
-}
-
-/*CCMD (setslot)
-{
-	int slot;
-
-	if (argv.argc() < 2 || (slot = atoi (argv[1])) >= NUM_WEAPON_SLOTS)
-	{
-		Printf("Usage: setslot [slot] [weapons]\nCurrent slot assignments:\n");
-		if (players[consoleplayer].mo != NULL)
-		{
-			FString config(GameConfig->GetConfigPath(false));
-			Printf(TEXTCOLOR_BLUE "Add the following to " TEXTCOLOR_ORANGE "%s" TEXTCOLOR_BLUE
-				" to retain these bindings:\n" TEXTCOLOR_NORMAL "[", config.GetChars());
-			if (WeaponSection.IsNotEmpty())
-			{
-				Printf("%s.", WeaponSection.GetChars());
-			}
-			Printf("%s.Weapons]\n", players[consoleplayer].mo->GetClass()->GetName().GetChars());
-		}
-		players[consoleplayer].weapons.PrintSettings();
-		return;
-	}
-
-	if (ParsingKeyConf)
-	{
-		KeyConfWeapons.Push(argv.args());
-	}
-	else if (PlayingKeyConf != NULL)
-	{
-		PlayingKeyConf->Slots[slot].Clear();
-		for (int i = 2; i < argv.argc(); ++i)
-		{
-			PlayingKeyConf->Slots[slot].AddWeapon(argv[i]);
-		}
-	}
-	else
-	{
-		if (argv.argc() == 2)
-		{
-			Printf ("Slot %d cleared\n", slot);
-		}
-
-		Net_WriteByte(DEM_SETSLOT);
-		Net_WriteByte(slot);
-		Net_WriteByte(argv.argc()-2);
-		for (int i = 2; i < argv.argc(); i++)
-		{
-			Net_WriteWeapon(ClassDef::FindClass(argv[i]));
-		}
-	}
-}*/
-
-//===========================================================================
-//
 // CCMD addslot
 //
 //===========================================================================
@@ -764,36 +690,8 @@ void FWeaponSlots::PrintSettings()
 void FWeaponSlots::AddSlot(int slot, const ClassDef *type, bool feedback)
 {
 	if (type != NULL && !Slots[slot].AddWeapon(type) && feedback)
-	{
-		Printf ("Could not add %s to slot %d\n", type->GetName().GetChars(), slot);
-	}
+		log_cb (RETRO_LOG_ERROR, "Could not add %s to slot %d\n", type->GetName().GetChars(), slot);
 }
-
-/*CCMD (addslot)
-{
-	unsigned int slot;
-
-	if (argv.argc() != 3 || (slot = atoi (argv[1])) >= NUM_WEAPON_SLOTS)
-	{
-		Printf ("Usage: addslot <slot> <weapon>\n");
-		return;
-	}
-
-	if (ParsingKeyConf)
-	{
-		KeyConfWeapons.Push(argv.args());
-	}
-	else if (PlayingKeyConf != NULL)
-	{
-		PlayingKeyConf->AddSlot(int(slot), ClassDef::FindClass(argv[2]), false);
-	}
-	else
-	{
-		Net_WriteByte(DEM_ADDSLOT);
-		Net_WriteByte(slot);
-		Net_WriteWeapon(ClassDef::FindClass(argv[2]));
-	}
-}*/
 
 //===========================================================================
 //
@@ -822,9 +720,7 @@ void FWeaponSlots::AddSlotDefault(int slot, const ClassDef *type, bool feedback)
 		{
 		case SLOTDEF_Full:
 			if (feedback)
-			{
-				Printf ("Could not add %s to slot %d\n", type->GetName().GetChars(), slot);
-			}
+				log_cb (RETRO_LOG_ERROR, "Could not add %s to slot %d\n", type->GetName().GetChars(), slot);
 			break;
 
 		default:
@@ -837,36 +733,3 @@ void FWeaponSlots::AddSlotDefault(int slot, const ClassDef *type, bool feedback)
 	}
 }
 
-/*CCMD (addslotdefault)
-{
-	const ClassDef *type;
-	unsigned int slot;
-
-	if (argv.argc() != 3 || (slot = atoi (argv[1])) >= NUM_WEAPON_SLOTS)
-	{
-		Printf ("Usage: addslotdefault <slot> <weapon>\n");
-		return;
-	}
-
-	type = ClassDef::FindClass (argv[2]);
-	if (type == NULL || !type->IsDescendantOf (NATIVE_CLASS(Weapon)))
-	{
-		Printf ("%s is not a weapon\n", argv[2]);
-		return;
-	}
-
-	if (ParsingKeyConf)
-	{
-		KeyConfWeapons.Push(argv.args());
-	}
-	else if (PlayingKeyConf != NULL)
-	{
-		PlayingKeyConf->AddSlotDefault(int(slot), ClassDef::FindClass(argv[2]), false);
-	}
-	else
-	{
-		Net_WriteByte(DEM_ADDSLOTDEFAULT);
-		Net_WriteByte(slot);
-		Net_WriteWeapon(ClassDef::FindClass(argv[2]));
-	}
-}*/
