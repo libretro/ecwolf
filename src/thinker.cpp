@@ -243,7 +243,7 @@ void Thinker::Serialize(FArchive &arc)
 {
 	if(GameSave::SaveVersion > 1451884199)
 	{
-		BYTE priority = thinkerPriority;
+		uint8_t priority = thinkerPriority;
 		arc << priority;
 		thinkerPriority = static_cast<ThinkerList::Priority>(priority);
 	}

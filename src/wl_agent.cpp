@@ -633,7 +633,7 @@ void APlayerPawn::Cmd_Use()
 
 	bool doNothing = true;
 	bool isRepeatable = false;
-	BYTE lastTrigger = 0;
+	uint8_t lastTrigger = 0;
 	MapSpot spot = map->GetSpot(checkx, checky, 0);
 	for(unsigned int i = 0;i < spot->triggers.Size();++i)
 	{
@@ -908,7 +908,7 @@ void player_t::Reborn()
 
 void player_t::Serialize(FArchive &arc)
 {
-	BYTE state = this->state;
+	uint8_t state = this->state;
 	arc << state;
 	this->state = static_cast<State>(state);
 
@@ -1031,7 +1031,7 @@ void player_t::AdjustFOV()
 
 FArchive &operator<< (FArchive &arc, player_t *&player)
 {
-	return arc.SerializePointer(players, (BYTE**)&player, sizeof(players[0]));
+	return arc.SerializePointer(players, (uint8_t**)&player, sizeof(players[0]));
 }
 
 /*

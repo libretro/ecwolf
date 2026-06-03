@@ -281,7 +281,7 @@ int FZipExploder::Explode(unsigned char *out, unsigned int outsize,
 				throw CExplosionError("Not enough output space");
 			}
 			if ((unsigned int)dist > bIdx) {
-				/* Anything before the first input byte is zero. */
+				/* Anything before the first input uint8_t is zero. */
 				int zeros = dist - bIdx;
 				if (len < zeros)
 					zeros = len;

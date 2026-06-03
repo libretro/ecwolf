@@ -537,7 +537,7 @@ void AutoMap::DrawActor(AActor *actor, fixed x, fixed y, fixed scale)
 	}
 }
 
-void AutoMap::DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32 realcolor) const
+void AutoMap::DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint32_t realcolor) const
 {
 	// Let us make an assumption that point 0 is always left of point 1
 	if(x0 > x1)
@@ -655,7 +655,7 @@ void AutoMap::DrawStats() const
 			gamestate.secretcount, gamestate.secrettotal,
 			gamestate.treasurecount, gamestate.treasuretotal);
 
-		word sw, sh;
+		uint16_t sw, sh;
 		VW_MeasurePropString(SmallFont, statString, sw, sh);
 		screen->Dim(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
 

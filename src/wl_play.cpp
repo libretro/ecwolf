@@ -167,7 +167,7 @@ TicCmd_t control[MAXPLAYERS];
 //===========================================================================
 
 
-void CenterWindow (word w, word h);
+void CenterWindow (uint16_t w, uint16_t h);
 int StopMusic (void);
 void StartMusic (void);
 void ContinueMusic (int offs);
@@ -510,7 +510,7 @@ void PollJoystickMove (void)
 void PollControls (bool absolutes)
 {
 	int i;
-	byte buttonbits;
+	uint8_t buttonbits;
 
 	TicCmd_t &cmd = control[ConsolePlayer];
 

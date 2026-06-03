@@ -182,10 +182,10 @@ void FWadCollection::InitMultipleFiles (TArray<FString> &filenames)
 	RenameSprites();
 
 	// [RH] Set up hash table
-	FirstLumpIndex = new DWORD[NumLumps];
-	NextLumpIndex = new DWORD[NumLumps];
-	FirstLumpIndex_FullName = new DWORD[NumLumps];
-	NextLumpIndex_FullName = new DWORD[NumLumps];
+	FirstLumpIndex = new uint32_t[NumLumps];
+	NextLumpIndex = new uint32_t[NumLumps];
+	FirstLumpIndex_FullName = new uint32_t[NumLumps];
+	NextLumpIndex_FullName = new uint32_t[NumLumps];
 	InitHashChains ();
 	LumpInfo.ShrinkToFit();
 	Files.ShrinkToFit();
@@ -260,7 +260,7 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 
 	if (resfile != NULL)
 	{
-		DWORD lumpstart = LumpInfo.Size();
+		uint32_t lumpstart = LumpInfo.Size();
 
 		resfile->SetFirstLump(lumpstart);
 
@@ -268,7 +268,7 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 
 		// [ECWolf] Do this first.
 		bool noEmbedded = true;
-		for (DWORD i=0; i < resfile->LumpCount(); i++)
+		for (uint32_t i=0; i < resfile->LumpCount(); i++)
 		{
 			FResourceLump *lump = resfile->GetLump(i);
 			if (lump->Flags & LUMPF_EMBEDDED)
@@ -288,7 +288,7 @@ void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 
 		if(noEmbedded)
 		{
-			for (DWORD i=0; i < resfile->LumpCount(); i++)
+			for (uint32_t i=0; i < resfile->LumpCount(); i++)
 			{
 				FResourceLump *lump = resfile->GetLump(i);
 				FWadCollection::LumpRecord *lump_p = &LumpInfo[LumpInfo.Reserve(1)];
@@ -322,7 +322,7 @@ void FWadCollection::FindEmbeddedWolfData(FResourceFile *res, const char* filena
 	};
 	unsigned int count = 0;
 
-	for(DWORD i = 0; i < res->LumpCount(); ++i)
+	for(uint32_t i = 0; i < res->LumpCount(); ++i)
 	{
 		FResourceLump *lump = res->GetLump(i);
 
@@ -421,9 +421,9 @@ int FWadCollection::CheckNumForName (const char *name, int space)
 	union
 	{
 		char uname[8];
-		QWORD qname;
+		uint64_t qname;
 	};
-	DWORD i;
+	uint32_t i;
 
 	if (name == NULL)
 	{
@@ -467,9 +467,9 @@ int FWadCollection::CheckNumForName (const char *name, int space, int wadnum, bo
 	union
 	{
 		char uname[8];
-		QWORD qname;
+		uint64_t qname;
 	};
-	DWORD i;
+	uint32_t i;
 
 	if (wadnum < 0)
 	{
@@ -526,7 +526,7 @@ int FWadCollection::GetNumForName (const char *name, int space)
 
 int FWadCollection::CheckNumForFullName (const char *name, bool trynormal, int namespc)
 {
-	DWORD i;
+	uint32_t i;
 
 	if (name == NULL)
 	{
@@ -551,7 +551,7 @@ int FWadCollection::CheckNumForFullName (const char *name, bool trynormal, int n
 
 int FWadCollection::CheckNumForFullName (const char *name, int wadnum)
 {
-	DWORD i;
+	uint32_t i;
 
 	if (wadnum < 0)
 	{
@@ -685,10 +685,10 @@ int FWadCollection::GetLumpFlags (int lump)
 //
 //==========================================================================
 
-DWORD FWadCollection::LumpNameHash (const char *s)
+uint32_t FWadCollection::LumpNameHash (const char *s)
 {
-	const DWORD *table = GetCRCTable ();;
-	DWORD hash = 0xffffffff;
+	const uint32_t *table = GetCRCTable ();;
+	uint32_t hash = 0xffffffff;
 	int i;
 
 	for (i = 8; i > 0 && *s; --i, ++s)
@@ -765,7 +765,7 @@ int FWadCollection::FindLump (const char *name, int *lastlump, bool anyns)
 	union
 	{
 		char name8[8];
-		QWORD qname;
+		uint64_t qname;
 	};
 	LumpRecord *lump_p;
 
@@ -1035,7 +1035,7 @@ FWadLump *FWadCollection::ReopenLumpNum (int lump)
 
 FileReader *FWadCollection::GetFileReader(int wadnum)
 {
-	if ((DWORD)wadnum >= Files.Size())
+	if ((uint32_t)wadnum >= Files.Size())
 	{
 		return NULL;
 	}
@@ -1054,7 +1054,7 @@ const char *FWadCollection::GetWadName (int wadnum) const
 {
 	const char *name, *slash;
 
-	if ((DWORD)wadnum >= Files.Size())
+	if ((uint32_t)wadnum >= Files.Size())
 	{
 		return NULL;
 	}
@@ -1071,7 +1071,7 @@ const char *FWadCollection::GetWadName (int wadnum) const
 
 int FWadCollection::GetFirstLump (int wadnum) const
 {
-	if ((DWORD)wadnum >= Files.Size())
+	if ((uint32_t)wadnum >= Files.Size())
 	{
 		return 0;
 	}
@@ -1086,7 +1086,7 @@ int FWadCollection::GetFirstLump (int wadnum) const
 
 int FWadCollection::GetLastLump (int wadnum) const
 {
-	if ((DWORD)wadnum >= Files.Size())
+	if ((uint32_t)wadnum >= Files.Size())
 	{
 		return 0;
 	}

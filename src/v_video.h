@@ -84,8 +84,8 @@ class FTexture;
 // Think of TagItems as an array of the following structure:
 //
 // struct TagItem {
-//     DWORD ti_Tag;
-//     DWORD ti_Data;
+//     uint32_t ti_Tag;
+//     uint32_t ti_Data;
 // };
 
 #define TAG_DONE	(0)  /* Used to indicate the end of the Tag list */
@@ -94,7 +94,7 @@ class FTexture;
 #define TAG_MORE	(2)  /* Ends this list and continues with the	*/
 						 /* list pointed to in ti_Data 				*/
 
-#define TAG_USER	((DWORD)(1u<<30))
+#define TAG_USER	((uint32_t)(1u<<30))
 
 enum
 {
@@ -130,7 +130,7 @@ enum
 	DTA_HUDRules,		// use fullscreen HUD rules to position and size textures
 	DTA_KeepRatio,		// doesn't adjust screen size for DTA_Virtual* if the aspect ratio is not 4:3
 	DTA_RenderStyle,	// same as render style for actors
-	DTA_ColorOverlay,	// DWORD: ARGB to overlay on top of image; limited to black for software
+	DTA_ColorOverlay,	// uint32_t: ARGB to overlay on top of image; limited to black for software
 	DTA_BilinearFilter,	// bool: apply bilinear filtering to the image
 	DTA_SpecialColormap,// pointer to FSpecialColormapParameters (likely to be forever hardware-only)
 	DTA_ColormapStyle,	// pointer to FColormapStyle (hardware-only)
@@ -175,7 +175,7 @@ public:
 	virtual ~DCanvas ();
 
 	// Member variable access
-	inline BYTE *GetBuffer () const { return Buffer; }
+	inline uint8_t *GetBuffer () const { return Buffer; }
 	inline int GetWidth () const { return Width; }
 	inline int GetHeight () const { return Height; }
 	inline int GetPitch () const { return Pitch; }
@@ -188,10 +188,10 @@ public:
 	virtual bool IsLocked () { return Buffer != NULL; }	// Returns true if the surface is locked
 
 	// Draw a linear block of pixels into the canvas
-	virtual void DrawBlock (int x, int y, int width, int height, const BYTE *src) const;
+	virtual void DrawBlock (int x, int y, int width, int height, const uint8_t *src) const;
 
 	// Reads a linear block of pixels into the view buffer.
-	virtual void GetBlock (int x, int y, int width, int height, BYTE *dest) const;
+	virtual void GetBlock (int x, int y, int width, int height, uint8_t *dest) const;
 
 	// Dim the entire canvas for the menus
 	virtual void Dim (PalEntry color = 0);
@@ -205,25 +205,25 @@ public:
 	// Fill a simple polygon with a texture
 	virtual void FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 		double originx, double originy, double scalex, double scaley, angle_t rotation,
-		struct FDynamicColormap *colormap, int lightlevel, int palcolor=0, uint32 rgbcolor=0);
+		struct FDynamicColormap *colormap, int lightlevel, int palcolor=0, uint32_t rgbcolor=0);
 
 	// Set an area to a specified color
-	virtual void Clear (int left, int top, int right, int bottom, int palcolor, uint32 color);
+	virtual void Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color);
 
 	// Draws a line
-	virtual void DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32 realcolor);
+	virtual void DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor);
 
 	// Draws a single pixel
-	virtual void DrawPixel(int x, int y, int palcolor, uint32 rgbcolor);
+	virtual void DrawPixel(int x, int y, int palcolor, uint32_t rgbcolor);
 
 	// Calculate gamma table
-	void CalcGamma (float gamma, BYTE gammalookup[256]);
+	void CalcGamma (float gamma, uint8_t gammalookup[256]);
 
 
 	// Retrieves a buffer containing image data for a screenshot.
 	// Hint: Pitch can be negative for upside-down images, in which case buffer
 	// points to the last row in the buffer, which will be the first row output.
-	virtual void GetScreenshotBuffer(const BYTE *&buffer, int &pitch, ESSType &color_type);
+	virtual void GetScreenshotBuffer(const uint8_t *&buffer, int &pitch, ESSType &color_type);
 
 	// Releases the screenshot buffer.
 	virtual void ReleaseScreenshotBuffer();
@@ -265,10 +265,10 @@ public:
 		double top;
 		double left;
 		fixed_t alpha;
-		uint32 fillcolor;
+		uint32_t fillcolor;
 		FRemapTable *remap;
-		const BYTE *translation;
-		uint32 colorOverlay;
+		const uint8_t *translation;
+		uint32_t colorOverlay;
 		INTBOOL alphaChannel;
 		INTBOOL flipX;
 		fixed_t shadowAlpha;
@@ -282,15 +282,15 @@ public:
 	};
 
 protected:
-	BYTE *Buffer;
+	uint8_t *Buffer;
 	int Width;
 	int Height;
 	int Pitch;
 	int LockCount;
 
-	bool ClipBox (int &left, int &top, int &width, int &height, const BYTE *&src, const int srcpitch) const;
-	virtual void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32 tag, va_list tags);
-	bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32 tag, va_list tags, DrawParms *parms, bool hw) const;
+	bool ClipBox (int &left, int &top, int &width, int &height, const uint8_t *&src, const int srcpitch) const;
+	virtual void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
+	bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const;
 
 	DCanvas() {}
 
@@ -316,7 +316,7 @@ public:
 	void Unlock ();
 
 protected:
-	BYTE *MemBuffer;
+	uint8_t *MemBuffer;
 
 	DSimpleCanvas() {}
 };
@@ -414,7 +414,7 @@ public:
 	virtual FNativePalette *CreatePalette(FRemapTable *remap);
 
 	// Precaches or unloads a texture
-	virtual void GetHitlist(BYTE *hitlist);
+	virtual void GetHitlist(uint8_t *hitlist);
 
 	// Report a game restart
 	virtual void GameRestart();
@@ -427,7 +427,7 @@ public:
 	virtual int GetPixelDoubling() const { return 0; }
 	virtual int GetTrueHeight() { return GetHeight(); }
 
-	uint32 GetLastFPS() const { return LastCount; }
+	uint32_t GetLastFPS() const { return LastCount; }
 
 	virtual void PaletteChanged () = 0;
 	virtual int QueryNewPalette () = 0;
@@ -435,12 +435,12 @@ public:
 
 protected:
 	void DrawRateStuff ();
-	void CopyFromBuff (BYTE *src, int srcPitch, int width, int height, BYTE *dest);
+	void CopyFromBuff (uint8_t *src, int srcPitch, int width, int height, uint8_t *dest);
 
 	DFrameBuffer () {}
 
 private:
-	uint32 LastMS, LastSec, FrameCount, LastCount, LastTic;
+	uint32_t LastMS, LastSec, FrameCount, LastCount, LastTic;
 };
 
 
@@ -455,18 +455,18 @@ extern DFrameBuffer *screen;
 // special R10B10G10 format for efficient blending computation.
 //		--RRRRRrrr--BBBBBbbb--GGGGGggg--   at level 64
 //		--------rrrr------bbbb------gggg   at level 1
-extern "C" DWORD Col2RGB8[65][256];
+extern "C" uint32_t Col2RGB8[65][256];
 
 // Col2RGB8_LessPrecision is the same as Col2RGB8, but the LSB for red
 // and blue are forced to zero, so if the blend overflows, it won't spill
 // over into the next component's value.
 //		--RRRRRrrr-#BBBBBbbb-#GGGGGggg--  at level 64
 //      --------rrr#------bbb#------gggg  at level 1
-extern "C" DWORD *Col2RGB8_LessPrecision[65];
+extern "C" uint32_t *Col2RGB8_LessPrecision[65];
 
 // Col2RGB8_Inverse is the same as Col2RGB8_LessPrecision, except the source
 // palette has been inverted.
-extern "C" DWORD Col2RGB8_Inverse[65][256];
+extern "C" uint32_t Col2RGB8_Inverse[65][256];
 
 // "Magic" numbers used during the blending:
 //		--000001111100000111110000011111	= 0x01f07c1f
@@ -477,13 +477,13 @@ extern "C" DWORD Col2RGB8_Inverse[65][256];
 //		--111111111111111111111111111111	= 0x3FFFFFFF
 
 // 16-bit Lookup Table
-extern BYTE RGB32k[32][32][32];
+extern uint8_t RGB32k[32][32][32];
 void GenerateLookupTables();
 
 // Returns the closest color to the one desired. String
 // should be of the form "rr gg bb".
-int V_GetColorFromString (const DWORD *palette, const char *colorstring);
+int V_GetColorFromString (const uint32_t *palette, const char *colorstring);
 // Similar to above, but can handle names
-int V_GetColor (const DWORD *palette, const char *str);
+int V_GetColor (const uint32_t *palette, const char *str);
 
 #endif /* __V_VIDEO_H__ */

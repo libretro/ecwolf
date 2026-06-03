@@ -15,7 +15,7 @@ typedef struct {
 #define MAXPOINTS 400
 point3d_t points[MAXPOINTS];
 
-byte moon[100]={
+uint8_t moon[100]={
 	0,  0, 27, 18, 15, 16, 19, 29,  0,  0,
 	0, 22, 16, 15, 15, 16, 16, 18, 24,  0,
 	27, 17, 15, 17, 16, 16, 17, 17, 18, 29,
@@ -50,12 +50,12 @@ void Init3DPoints()
 
 #ifdef USE_STARSKY
 
-void DrawStarSky(byte *vbuf, uint32_t vbufPitch)
+void DrawStarSky(uint8_t *vbuf, uint32_t vbufPitch)
 {
 	int hvheight = viewheight >> 1;
 	int hvwidth = viewwidth >> 1;
 
-	byte *ptr = vbuf;
+	uint8_t *ptr = vbuf;
 	int i;
 	for(i = 0; i < hvheight; i++, ptr += vbufPitch)
 		memset(ptr, 0, viewwidth);
@@ -98,7 +98,7 @@ void DrawStarSky(byte *vbuf, uint32_t vbufPitch)
 
 #ifdef USE_RAIN
 
-void DrawRain(byte *vbuf, uint32_t vbufPitch)
+void DrawRain(uint8_t *vbuf, uint32_t vbufPitch)
 {
 #if defined(USE_FLOORCEILINGTEX) && defined(FIXRAINSNOWLEAKS)
 	fixed dist;                                // distance to row projection
@@ -161,7 +161,7 @@ void DrawRain(byte *vbuf, uint32_t vbufPitch)
 
 #ifdef USE_SNOW
 
-void DrawSnow(byte *vbuf, uint32_t vbufPitch)
+void DrawSnow(uint8_t *vbuf, uint32_t vbufPitch)
 {
 #if defined(USE_FLOORCEILINGTEX) && defined(FIXRAINSNOWLEAKS)
 	fixed dist;                                // distance to row projection

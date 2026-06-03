@@ -33,6 +33,6 @@ extern fixed_t			sprtopscreen;
 extern bool				sprflipvert;
 
 
-void R_DrawMaskedColumn (const BYTE *column, const FTexture::Span *spans);
+void R_DrawMaskedColumn (const uint8_t *column, const FTexture::Span *spans);
 
 #endif

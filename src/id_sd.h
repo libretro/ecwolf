@@ -33,8 +33,8 @@ typedef enum
 #pragma pack(push, 1)
 typedef struct
 {
-	longword        length;
-	word            priority;
+	uint32_t        length;
+	uint16_t            priority;
 } SoundCommon;
 
 #define ORIG_SOUNDCOMMON_SIZE 6
@@ -49,7 +49,7 @@ typedef struct
 typedef struct
 {
 	SoundCommon     common;
-	byte            data[1];
+	uint8_t            data[1];
 } PCSound;
 
 //      Register addresses
@@ -68,7 +68,7 @@ typedef struct
 
 typedef struct
 {
-	byte    mChar,cChar,
+	uint8_t    mChar,cChar,
 			mScale,cScale,
 			mAttack,cAttack,
 			mSus,cSus,
@@ -78,7 +78,7 @@ typedef struct
 			// These are only for Muse - these bytes are really unused
 			voice,
 			mode;
-	byte    unused[3];
+	uint8_t    unused[3];
 } Instrument;
 
 #define ORIG_INSTRUMENT_SIZE 16
@@ -87,8 +87,8 @@ typedef struct
 {
 	SoundCommon     common;
 	Instrument      inst;
-	byte            block;
-	byte            data[1];
+	uint8_t            block;
+	uint8_t            data[1];
 } AdLibSound;
 
 #define ORIG_ADLIBSOUND_SIZE (ORIG_SOUNDCOMMON_SIZE + ORIG_INSTRUMENT_SIZE + 2)
@@ -101,8 +101,8 @@ typedef struct
 
 typedef struct
 {
-	word    length;
-	word    values[1];
+	uint16_t    length;
+	uint16_t    values[1];
 } MusicGroup;
 
 typedef struct

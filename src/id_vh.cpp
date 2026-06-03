@@ -16,17 +16,17 @@ int	    pa=MENU_CENTER,px,py;
 
 //==========================================================================
 
-void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation, bool stencil, BYTE stencilcolor)
+void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation, bool stencil, uint8_t stencilcolor)
 {
 	int		    width, height;
 	FTexture	*source;
-	byte	    ch;
+	uint8_t	    ch;
 	int cx = px, cy = py;
 
 	height = font->GetHeight();
 	FRemapTable *remap = font->GetColorTranslation(translation);
 
-	while ((ch = (byte)*string++)!=0)
+	while ((ch = (uint8_t)*string++)!=0)
 	{
 		if(ch == '\n')
 		{
@@ -42,8 +42,8 @@ void VWB_DrawPropString(FFont *font, const char* string, EColorRange translation
 	}
 }
 
-// Prints a string with word wrapping
-void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char* string, EColorRange translation, bool stencil, BYTE stencilcolor)
+// Prints a string with uint16_t wrapping
+void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char* string, EColorRange translation, bool stencil, uint8_t stencilcolor)
 {
 	const char* lineStart = string;
 	const char* lastBreak = string;
@@ -51,7 +51,7 @@ void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFo
 	unsigned int cx = 0;
 	char ch;
 
-	while ((ch = (byte)*string++)!=0)
+	while ((ch = (uint8_t)*string++)!=0)
 	{
 		if(ch == '\n')
 		{
@@ -85,7 +85,7 @@ void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFo
 	py += font->GetHeight();
 }
 
-void VW_MeasurePropString (FFont *font, const char *string, word &width, word &height, word *finalWidth)
+void VW_MeasurePropString (FFont *font, const char *string, uint16_t &width, uint16_t &height, uint16_t *finalWidth)
 {
 	int w = 0;
 
@@ -99,7 +99,7 @@ void VW_MeasurePropString (FFont *font, const char *string, word &width, word &h
 			continue;
 		}
 
-		w += font->GetCharWidth(*((byte *)string));
+		w += font->GetCharWidth(*((uint8_t *)string));
 		if(w > width)
 			width = w;
 	}
@@ -126,8 +126,8 @@ void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
 		if(!SDL_LockSurface(surf))
 		{
 			const SDL_Color* colors = surf->format->palette->colors;
-			DWORD* dest = reinterpret_cast<DWORD*>(pixels);
-			BYTE* src = reinterpret_cast<BYTE*>(surf->pixels);
+			uint32_t* dest = reinterpret_cast<uint32_t*>(pixels);
+			uint8_t* src = reinterpret_cast<uint8_t*>(surf->pixels);
 			for(unsigned int y = 0;y < screenHeight;++y)
 			{
 				for(unsigned int x = 0;x < screenWidth;++x, ++src)
@@ -224,11 +224,11 @@ void VH_Startup()
 	AM_ChangeResolution();
 }
 
-byte *fizzleSurface = NULL;
+uint8_t *fizzleSurface = NULL;
 void FizzleFadeStart()
 {
 	screen->Lock(false);
-	fizzleSurface = new byte[SCREENHEIGHT*SCREENPITCH];
+	fizzleSurface = new uint8_t[SCREENHEIGHT*SCREENPITCH];
 	memcpy(fizzleSurface, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
 	screen->Unlock();
 }
@@ -246,7 +246,7 @@ bool FizzleFade (int x1, int y1,
 
 	frame = GetTimeCount();
 	screen->Lock(false);
-	byte * const srcptr = new byte[SCREENHEIGHT*SCREENPITCH];
+	uint8_t * const srcptr = new uint8_t[SCREENHEIGHT*SCREENPITCH];
 	memcpy(srcptr, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
 	screen->Unlock();
 
@@ -263,7 +263,7 @@ bool FizzleFade (int x1, int y1,
 			return true;
 		}
 
-		byte *destptr = fizzleSurface;
+		uint8_t *destptr = fizzleSurface;
 
 		if(destptr != NULL)
 		{
@@ -345,7 +345,7 @@ void VWB_DrawFill(FTexture *tex, int ix, int iy, int ix2, int iy2, bool local)
 	screen->FlatFill(ix, iy, ix2, iy2, tex, local);
 }
 
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, uint8_t stencilcolor)
 {
 	double x = ix, y = iy;
 
@@ -375,7 +375,7 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 	screen->Unlock();
 }
 
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, BYTE stencilcolor)
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, uint8_t stencilcolor)
 {
 	if(!tex)
 		return;

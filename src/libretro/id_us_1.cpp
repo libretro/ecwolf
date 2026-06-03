@@ -29,8 +29,8 @@
 #include "compat/msvc.h"
 
 //	Global variables
-		word		PrintX,PrintY;
-		word		WindowX,WindowY,WindowW,WindowH;
+		uint16_t		PrintX,PrintY;
+		uint16_t		WindowX,WindowY,WindowW,WindowH;
 
 //	Internal variables
 #define	ConfigVersion	1
@@ -60,7 +60,7 @@ HighScore	Scores[MaxScores] =
 ///////////////////////////////////////////////////////////////////////////
 void US_Print(FFont *font, const char *sorg, EColorRange translation)
 {
-	static word width, height, finalWidth, finalHeight;
+	static uint16_t width, height, finalWidth, finalHeight;
 
 	px = PrintX;
 	py = PrintY;
@@ -77,7 +77,7 @@ void US_Print(FFont *font, const char *sorg, EColorRange translation)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_PrintUnsigned(longword n)
+US_PrintUnsigned(uint32_t n)
 {
 	char	buffer[32];
 	sprintf(buffer, "%lu", static_cast<long unsigned int> (n));
@@ -108,7 +108,7 @@ US_PrintSigned(int32_t n)
 void
 USL_PrintInCenter(const char *s,Rect r)
 {
-	word	w,h,
+	uint16_t	w,h,
 			rw,rh;
 
 	VW_MeasurePropString(SmallFont, s,w,h);
@@ -147,7 +147,7 @@ US_PrintCentered(const char *s)
 void
 US_CPrintLine(FFont *font, const char *s, EColorRange translation)
 {
-	word	w,h;
+	uint16_t	w,h;
 
 	VW_MeasurePropString(font, s,w,h);
 
@@ -209,7 +209,7 @@ US_ClearWindow(void)
 //	US_DrawWindow() - Draws a frame and sets the current window parms
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_DrawWindow(word x,word y,word w,word h)
+void US_DrawWindow(uint16_t x,uint16_t y,uint16_t w,uint16_t h)
 {
 	enum
 	{
@@ -267,7 +267,7 @@ void US_DrawWindow(word x,word y,word w,word h)
 //		middle of the screen
 //
 ///////////////////////////////////////////////////////////////////////////
-void US_CenterWindow(word w,word h)
+void US_CenterWindow(uint16_t w,uint16_t h)
 {
 	US_DrawWindow(((MaxX / 8) - w) / 2,((MaxY / 8) - h) / 2,w,h);
 	PrintX = WindowX;
@@ -317,11 +317,11 @@ US_RestoreWindow(WindowRec *win)
 //	USL_XORICursor() - XORs the I-bar text cursor. Used by US_LineInput()
 //
 ///////////////////////////////////////////////////////////////////////////
-static void USL_XORICursor(FFont *font, int x,int y,const char *s,word cursor,EColorRange translation)
+static void USL_XORICursor(FFont *font, int x,int y,const char *s,uint16_t cursor,EColorRange translation)
 {
 	static	bool	status;		// VGA doesn't XOR...
 	char	buf[MaxString];
-	word	w,h;
+	uint16_t	w,h;
 
 	// Bound the copy to the buffer and keep the cursor terminator in range.
 	size_t slen = strlen(s);
@@ -371,7 +371,7 @@ char USL_RotateChar(char ch, int dir)
 //
 ///////////////////////////////////////////////////////////////////////////
 bool US_LineInput(FFont *font, int x,int y,char *buf,const char *def,bool escok,
-				int maxchars,int maxwidth, byte clearcolor, EColorRange translation)
+				int maxchars,int maxwidth, uint8_t clearcolor, EColorRange translation)
 {
 	return 1;
 }

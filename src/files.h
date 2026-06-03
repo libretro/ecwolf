@@ -13,33 +13,33 @@ public:
 	virtual ~FileReaderBase() {}
 	virtual long Read (void *buffer, long len) = 0;
 
-	FileReaderBase &operator>> (BYTE &v)
+	FileReaderBase &operator>> (uint8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderBase &operator>> (SBYTE &v)
+	FileReaderBase &operator>> (int8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderBase &operator>> (WORD &v)
+	FileReaderBase &operator>> (uint16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBase &operator>> (SWORD &v)
+	FileReaderBase &operator>> (int16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBase &operator>> (DWORD &v)
+	FileReaderBase &operator>> (uint32_t &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -93,33 +93,33 @@ public:
 #endif
 	virtual const char *GetBuffer() const { return NULL; }
 
-	FileReader &operator>> (BYTE &v)
+	FileReader &operator>> (uint8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReader &operator>> (SBYTE &v)
+	FileReader &operator>> (int8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReader &operator>> (WORD &v)
+	FileReader &operator>> (uint16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReader &operator>> (SWORD &v)
+	FileReader &operator>> (int16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReader &operator>> (DWORD &v)
+	FileReader &operator>> (uint32_t &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -156,33 +156,33 @@ public:
 
 	virtual long Read (void *buffer, long len);
 
-	FileReaderZ &operator>> (BYTE &v)
+	FileReaderZ &operator>> (uint8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderZ &operator>> (SBYTE &v)
+	FileReaderZ &operator>> (int8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderZ &operator>> (WORD &v)
+	FileReaderZ &operator>> (uint16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderZ &operator>> (SWORD &v)
+	FileReaderZ &operator>> (int16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderZ &operator>> (DWORD &v)
+	FileReaderZ &operator>> (uint32_t &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -202,7 +202,7 @@ private:
 	FileReader &File;
 	bool SawEOF;
 	z_stream Stream;
-	BYTE InBuff[BUFF_SIZE];
+	uint8_t InBuff[BUFF_SIZE];
 
 	void FillBuffer ();
 
@@ -218,33 +218,33 @@ public:
 
 	long Read (void *buffer, long len);
 
-	FileReaderBZ2 &operator>> (BYTE &v)
+	FileReaderBZ2 &operator>> (uint8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderBZ2 &operator>> (SBYTE &v)
+	FileReaderBZ2 &operator>> (int8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderBZ2 &operator>> (WORD &v)
+	FileReaderBZ2 &operator>> (uint16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBZ2 &operator>> (SWORD &v)
+	FileReaderBZ2 &operator>> (int16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderBZ2 &operator>> (DWORD &v)
+	FileReaderBZ2 &operator>> (uint32_t &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -264,7 +264,7 @@ private:
 	FileReader &File;
 	bool SawEOF;
 	bz_stream Stream;
-	BYTE InBuff[BUFF_SIZE];
+	uint8_t InBuff[BUFF_SIZE];
 
 	void FillBuffer ();
 
@@ -282,33 +282,33 @@ public:
 
 	long Read (void *buffer, long len);
 
-	FileReaderLZMA &operator>> (BYTE &v)
+	FileReaderLZMA &operator>> (uint8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderLZMA &operator>> (SBYTE &v)
+	FileReaderLZMA &operator>> (int8_t &v)
 	{
 		Read (&v, 1);
 		return *this;
 	}
 
-	FileReaderLZMA &operator>> (WORD &v)
+	FileReaderLZMA &operator>> (uint16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderLZMA &operator>> (SWORD &v)
+	FileReaderLZMA &operator>> (int16_t &v)
 	{
 		Read (&v, 2);
 		v = LittleShort(v);
 		return *this;
 	}
 
-	FileReaderLZMA &operator>> (DWORD &v)
+	FileReaderLZMA &operator>> (uint32_t &v)
 	{
 		Read (&v, 4);
 		v = LittleLong(v);
@@ -331,7 +331,7 @@ private:
 	size_t Size;
 	size_t InPos, InSize;
 	size_t OutProcessed;
-	BYTE InBuff[BUFF_SIZE];
+	uint8_t InBuff[BUFF_SIZE];
 
 	void FillBuffer ();
 

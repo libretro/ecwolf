@@ -72,10 +72,10 @@ class SoundData
 		SoundData();
 		~SoundData();
 
-		byte* GetAdLibData() const { return adlibData; }
+		uint8_t* GetAdLibData() const { return adlibData; }
 		Mix_Chunk *GetDigitalData() const { return digitalData; }
 		unsigned short GetPriority() const { return priority; }
-		byte* GetSpeakerData() const { return speakerData; }
+		uint8_t* GetSpeakerData() const { return speakerData; }
 		bool HasType(Type type=ADLIB) const { return lump[type] != -1; }
 		bool IsNull() const { return lump[0] == -1 && lump[1] == -1 && lump[2] == -1 && !isAlias; }
   	        int GetIndex() const { return index; }
@@ -88,7 +88,7 @@ class SoundData
 		FString logicalName;
 		SoundIndex index;
 		TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> digitalData;
-		TUniquePtr<byte[]> adlibData, speakerData;
+		TUniquePtr<uint8_t[]> adlibData, speakerData;
 		int lump[3];
 		unsigned short priority;
 

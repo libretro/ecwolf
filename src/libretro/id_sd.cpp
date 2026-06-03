@@ -297,7 +297,7 @@ Mix_Chunk *GetMusic(const char* chunk)
 
 	FMemLump soundLump = Wads.ReadLump(lumpNum);
 
-	Mix_Chunk *res = SynthesizeAdlibIMFOrN3D((const byte *) soundLump.GetMem(), size);
+	Mix_Chunk *res = SynthesizeAdlibIMFOrN3D((const uint8_t *) soundLump.GetMem(), size);
 
 	music_cache[cacheptr].name = strdup(chunk);
 	music_cache[cacheptr].chunk = res;
@@ -400,7 +400,7 @@ void Mix_Chunk_Digital::loadSound() {
 	// have mostly garbage filled headers (outside of what is precisely needed
 	// since the sample rate is hard coded). I'm not sure if the sounds are
 	// 8-bit or 16-bit, but it looks like the sample rate is coded to ~22050.
-	if(size > 0x2A && BigShort(*(WORD*)mem) == 1)
+	if(size > 0x2A && BigShort(*(uint16_t*)mem) == 1)
 	{
 		sample_count = size - 0x2a;
 
@@ -423,10 +423,10 @@ void Mix_Chunk_Digital::loadSound() {
 	// TODO: support skipping extra headers
 	if (size > 44 && memcmp(mem, "RIFF", 4) == 0
 	    && memcmp((char*)mem + 8, "WAVEfmt ", 8) == 0) {
-		rate = LittleLong(((DWORD*)mem)[6]);
-		int bits = LittleShort(((WORD*)mem)[17]);
-		int channels = LittleShort(((WORD*)mem)[11]);
-		int format = LittleShort(((WORD*)mem)[10]);
+		rate = LittleLong(((uint32_t*)mem)[6]);
+		int bits = LittleShort(((uint16_t*)mem)[17]);
+		int channels = LittleShort(((uint16_t*)mem)[11]);
+		int format = LittleShort(((uint16_t*)mem)[10]);
 		sample_count = (size - 44) / (bits / 8);
 		if (format == 1 && channels == 1 && bits == 8) {
 			sample_format = FORMAT_8BIT_LINEAR_SIGNED;
@@ -463,17 +463,17 @@ void Mix_Chunk_Digital::loadSound() {
 		return;
 	}
 
-	printf ("unknown format. Header: %x\n", BigLong(*(DWORD*)mem));
+	printf ("unknown format. Header: %x\n", BigLong(*(uint32_t*)mem));
 	isValid = false;
 	isMetadataLoaded = true;
 	return;
 }
 
-Mix_Chunk_Speaker::Mix_Chunk_Speaker(const byte *dataRaw)
+Mix_Chunk_Speaker::Mix_Chunk_Speaker(const uint8_t *dataRaw)
 {
 	PCSound *sound = (PCSound*) dataRaw;
 	int pcLength = LittleLong(sound->common.length);
-	byte *pcSound = sound->data;
+	uint8_t *pcSound = sound->data;
 
 	if (pcLength <= 0) {
 		length_pc_ticks = 0;
@@ -483,9 +483,9 @@ Mix_Chunk_Speaker::Mix_Chunk_Speaker(const byte *dataRaw)
 	states = (speaker_state *) malloc(pcLength * sizeof(speaker_state));
 	length_pc_ticks = pcLength;
 
-	longword pcPhaseTick = 0;
+	uint32_t pcPhaseTick = 0;
 	int pcLastSample = 0;
-	longword	pcPhaseLength = 0;
+	uint32_t	pcPhaseLength = 0;
 	bool sign = false;
 
 	for (int i = 0; i < pcLength; i++, pcSound++) {
@@ -535,8 +535,8 @@ void Mix_Chunk_Speaker::MixInto(int16_t *result, int output_rate, size_t size, i
 		return;
 
 	for (int pc_tick = start_pc_tick; pc_tick < start_pc_tick + num_pc_ticks; pc_tick++) {
-		longword pcPhaseLength = states[pc_tick].phaseLength;
-		longword pcPhaseTick = states[pc_tick].phaseTick;
+		uint32_t pcPhaseLength = states[pc_tick].phaseLength;
+		uint32_t pcPhaseTick = states[pc_tick].phaseTick;
 		bool sign = states[pc_tick].sign;
 
 		for (int j = 0; j < samplesPerSoundTick && sample_ctr < size; j++, sample_ctr++) {
@@ -594,7 +594,7 @@ void SoundChannelState::Serialize(FArchive &arc)
 	arc << stopTicks;
 	arc << leftPos;
 	arc << rightPos;
-	arc << (DWORD &) type;
+	arc << (uint32_t &) type;
 	arc << isMusic;
 
 	if (!arc.IsStoring())

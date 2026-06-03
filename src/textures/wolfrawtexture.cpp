@@ -55,12 +55,12 @@ public:
 	FWolfRawTexture (int lumpnum, FileReader &file);
 	~FWolfRawTexture ();
 
-	const BYTE *GetColumn (unsigned int column, const Span **spans_out);
-	const BYTE *GetPixels ();
+	const uint8_t *GetColumn (unsigned int column, const Span **spans_out);
+	const uint8_t *GetPixels ();
 	void Unload ();
 
 protected:
-	BYTE *Pixels;
+	uint8_t *Pixels;
 	Span **Spans;
 	bool Mac;
 
@@ -77,12 +77,12 @@ static bool CheckIfWolfRaw(FileReader &file)
 {
 	if(file.GetLength() < 5) return false;
 	
-	WORD header[2];
+	uint16_t header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 
-	WORD Width = LittleShort(header[0]);
-	WORD Height = LittleShort(header[1]);
+	uint16_t Width = LittleShort(header[0]);
+	uint16_t Height = LittleShort(header[1]);
 	if(file.GetLength() == Width*Height+4) // Raw page
 		return true;
 
@@ -115,7 +115,7 @@ FTexture *WolfRawTexture_TryCreate(FileReader &file, int lumpnum)
 FWolfRawTexture::FWolfRawTexture(int lumpnum, FileReader &file)
 : FTexture(NULL, lumpnum), Pixels(0), Spans(0)
 {
-	WORD header[2];
+	uint16_t header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 	Width = LittleShort(header[0]);
@@ -170,7 +170,7 @@ void FWolfRawTexture::Unload ()
 //
 //==========================================================================
 
-const BYTE *FWolfRawTexture::GetPixels ()
+const uint8_t *FWolfRawTexture::GetPixels ()
 {
 	if (Pixels == NULL)
 	{
@@ -185,7 +185,7 @@ const BYTE *FWolfRawTexture::GetPixels ()
 //
 //==========================================================================
 
-const BYTE *FWolfRawTexture::GetColumn (unsigned int column, const Span **spans_out)
+const uint8_t *FWolfRawTexture::GetColumn (unsigned int column, const Span **spans_out)
 {
 	if (Pixels == NULL)
 	{
@@ -223,16 +223,16 @@ const BYTE *FWolfRawTexture::GetColumn (unsigned int column, const Span **spans_
 void FWolfRawTexture::MakeTexture ()
 {
 	FMemLump lump = Wads.ReadLump (SourceLump);
-	const BYTE* data = ((const BYTE*)lump.GetMem())+4;
+	const uint8_t* data = ((const uint8_t*)lump.GetMem())+4;
 
-	Pixels = new BYTE[Width*Height];
+	Pixels = new uint8_t[Width*Height];
 	memset(Pixels, 0, Width*Height);
 
 	if(Mac)
 	{
 		for(unsigned int y = 0;y < Height;++y)
 		{
-			BYTE *dest = Pixels+y;
+			uint8_t *dest = Pixels+y;
 			for(unsigned int x = 0;x < Width;++x)
 			{
 				*dest = GPalette.Remap[*data++];

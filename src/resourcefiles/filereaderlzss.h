@@ -19,7 +19,7 @@ private:
 
 	FileReader &File;
 	bool SawEOF;
-	BYTE InBuff[BUFF_SIZE];
+	uint8_t InBuff[BUFF_SIZE];
 
 	enum StreamState
 	{
@@ -32,17 +32,17 @@ private:
 	{
 		StreamState State;
 
-		BYTE *In;
+		uint8_t *In;
 		unsigned int AvailIn;
 		unsigned int InternalOut;
 
-		const BYTE *WindowData;
-		BYTE *InternalBuffer;
-		BYTE CFlags, Bits;
+		const uint8_t *WindowData;
+		uint8_t *InternalBuffer;
+		uint8_t CFlags, Bits;
 
 		// Double sized window so that we can avoid shuffling bytes around until
 		// we can purge a whole window of data.
-		BYTE Window[WINDOW_SIZE*2+INTERNAL_BUFFER_SIZE];
+		uint8_t Window[WINDOW_SIZE*2+INTERNAL_BUFFER_SIZE];
 	} Stream;
 
 	void FillBuffer()
@@ -60,7 +60,7 @@ private:
 		Stream.AvailIn = numread+Stream.AvailIn;
 	}
 
-	// Reads a flag byte.
+	// Reads a flag uint8_t.
 	void PrepareBlocks()
 	{
 		assert(Stream.InternalBuffer == Stream.WindowData);
@@ -107,12 +107,12 @@ private:
 			Stream.AvailIn -= 2;
 
 #ifndef MACWOLF
-			WORD pos = ReadBigShort(Stream.In);
-			BYTE len = (pos & 0xF)+1;
+			uint16_t pos = ReadBigShort(Stream.In);
+			uint8_t len = (pos & 0xF)+1;
 			pos >>= 4;
 #else
-			WORD pos = BigEndian ? ReadBigShort(Stream.In) : ReadLittleShort(Stream.In);
-			BYTE len = ((pos>>12) & 0xF)+3;
+			uint16_t pos = BigEndian ? ReadBigShort(Stream.In) : ReadLittleShort(Stream.In);
+			uint8_t len = ((pos>>12) & 0xF)+3;
 			pos = 0xFFF-(pos&0xFFF);
 #endif
 			Stream.In += 2;
@@ -125,9 +125,9 @@ private:
 			}
 #endif
 
-			const BYTE* copyStart = Stream.InternalBuffer-pos-1;
+			const uint8_t* copyStart = Stream.InternalBuffer-pos-1;
 
-			// Complete overlap: Single byte repeated
+			// Complete overlap: Single uint8_t repeated
 			if(pos == 0)
 				memset(Stream.InternalBuffer, *copyStart, len);
 			// No overlap: One copy
@@ -153,7 +153,7 @@ private:
 		}
 		else
 		{
-			// Uncompressed byte.
+			// Uncompressed uint8_t.
 			*Stream.InternalBuffer++ = *Stream.In++;
 			--Stream.AvailIn;
 			++Stream.InternalOut;
@@ -187,7 +187,7 @@ public:
 	long Read(void *buffer, long len)
 	{
 
-		BYTE *Out = (BYTE*)buffer;
+		uint8_t *Out = (uint8_t*)buffer;
 		long AvailOut = len;
 
 		do
@@ -233,6 +233,6 @@ public:
 		while(AvailOut && Stream.State != STREAM_FINAL);
 
 		assert(AvailOut == 0);
-		return static_cast<long>(Out - (BYTE*)buffer);
+		return static_cast<long>(Out - (uint8_t*)buffer);
 	}
 };

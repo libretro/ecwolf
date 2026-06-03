@@ -160,7 +160,7 @@ void State_Ack(wl_state_t *state) {
 	state->waitCanTimeout = false;
 }
 
-void State_UserInput(wl_state_t *state, longword delay) {
+void State_UserInput(wl_state_t *state, uint32_t delay) {
 	IN_StartAck ();
 	state->isInWait = true;
 	state->waitCanBeAcked = true;
@@ -169,7 +169,7 @@ void State_UserInput(wl_state_t *state, longword delay) {
 	state->ackTimeout = GetTimeCount() + delay;
 }
 
-void State_Delay(wl_state_t *state, longword delay) {
+void State_Delay(wl_state_t *state, uint32_t delay) {
 	state->isInWait = true;
 	state->wasAcked = false;
 	state->waitCanTimeout = true;
@@ -381,7 +381,7 @@ static bool DrawStartupConsole(FString statusStr)
 	else
 		screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
 
-	word width, height;
+	uint16_t width, height;
 
 	static const char* const engineVersion = GAMENAME " " DOTVERSIONSTR_NOREV;
 	VW_MeasurePropString(ConFont, engineVersion, width, height);
@@ -536,8 +536,8 @@ void InitGame()
 		DoJukebox();
 #endif
 #ifdef NOTYET
-	vdisp = (byte *) (0xa0000+PAGE1START);
-	vbuf = (byte *) (0xa0000+PAGE2START);
+	vdisp = (uint8_t *) (0xa0000+PAGE1START);
+	vbuf = (uint8_t *) (0xa0000+PAGE2START);
 #endif
 }
 
@@ -684,7 +684,7 @@ static void PG13 (void)
 	if(gameinfo.AdvisoryPic.IsEmpty())
 		return;
 
-	BYTE color = ColorMatcher.Pick(RPART(gameinfo.AdvisoryColor), GPART(gameinfo.AdvisoryColor), BPART(gameinfo.AdvisoryColor));
+	uint8_t color = ColorMatcher.Pick(RPART(gameinfo.AdvisoryColor), GPART(gameinfo.AdvisoryColor), BPART(gameinfo.AdvisoryColor));
 
 	VWB_Clear(color, 0, 0, screenWidth, screenHeight);
 	FTexture *tex = TexMan(gameinfo.AdvisoryPic);
@@ -1276,7 +1276,7 @@ bool TopLoopStep(wl_state_t *state, const wl_input_state_t *input) {
 			state->wasAcked = true;
 			state->isInWait = false;
 		}
-		if (state->waitCanTimeout && state->ackTimeout < (longword) GetTimeCount())
+		if (state->waitCanTimeout && state->ackTimeout < (uint32_t) GetTimeCount())
 			state->isInWait = false;
 		VH_UpdateScreen();
 		return true;

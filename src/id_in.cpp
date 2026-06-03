@@ -284,7 +284,7 @@ int IN_JoyAxes()
 		int res = 0;
 		for(int i = 0; i < JoyNumAxes; ++i)
 		{
-			SWORD pos = SDL_GameControllerGetAxis(GameController, (SDL_GameControllerAxis)GameControllerAxisMap[i]);
+			int16_t pos = SDL_GameControllerGetAxis(GameController, (SDL_GameControllerAxis)GameControllerAxisMap[i]);
 			if(pos <= -0x1000)
 				res |= 1 << (i*2);
 			else if(pos >= 0x1000)
@@ -300,7 +300,7 @@ int IN_JoyAxes()
 	int res = 0;
 	for(int i = 0; i < JoyNumAxes && i < 16; ++i)
 	{
-		SWORD pos = SDL_JoystickGetAxis(Joystick, i);
+		int16_t pos = SDL_JoystickGetAxis(Joystick, i);
 		if(pos <= -0x1000)
 			res |= 1 << (i*2);
 		else if(pos >= 0x1000)
@@ -386,7 +386,7 @@ static void processEvent(SDL_Event *event)
 			}
 
 #if !SDL_VERSION_ATLEAST(1,3,0)
-			static const byte ASCIINames[] = // Unshifted ASCII for scan codes       // TODO: keypad
+			static const uint8_t ASCIINames[] = // Unshifted ASCII for scan codes       // TODO: keypad
 			{
 			//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,8  ,9  ,0  ,0  ,0  ,13 ,0  ,0  ,	// 0
@@ -398,7 +398,7 @@ static void processEvent(SDL_Event *event)
 				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,	// 6
 				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0		// 7
 			};
-			static const byte ShiftNames[] = // Shifted ASCII for scan codes
+			static const uint8_t ShiftNames[] = // Shifted ASCII for scan codes
 			{
 			//	 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 				0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,8  ,9  ,0  ,0  ,0  ,13 ,0  ,0  ,	// 0
@@ -718,7 +718,7 @@ IN_ClearWheel()
 void
 IN_ReadControl(int player,ControlInfo *info)
 {
-	word		buttons;
+	uint16_t		buttons;
 	int			dx,dy;
 	Motion		mx,my;
 
@@ -891,9 +891,9 @@ void IN_Ack (void)
 //		button up.
 //
 ///////////////////////////////////////////////////////////////////////////
-bool IN_UserInput(longword delay)
+bool IN_UserInput(uint32_t delay)
 {
-	longword	lasttime;
+	uint32_t	lasttime;
 
 	lasttime = GetTimeCount();
 	IN_StartAck ();

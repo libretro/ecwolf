@@ -33,8 +33,8 @@ static inline void VWB_DrawFill(FTexture *tex, double x, double y, double x2, do
 {
 	VWB_DrawFill(tex, static_cast<int>(x), static_cast<int>(y), static_cast<int>(x2), static_cast<int>(y2), local);
 }
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, BYTE stencilcolor=0);
-void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, BYTE stencilcolor=0);
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, uint8_t stencilcolor=0);
+void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu=MENU_NONE, struct FRemapTable *remap=NULL, bool stencil=false, uint8_t stencilcolor=0);
 template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offset)
 {
 	x = screenWidth/2 + (x-160)*scaleFactorX;
@@ -54,8 +54,8 @@ template<class T> void MenuToRealCoords(T &x, T &y, T &w, T &h, MenuOffset offse
 	h *= scaleFactorY;
 }
 
-void VWB_DrawPropString(FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
-void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, BYTE stencilcolor=0);
+void VWB_DrawPropString(FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, uint8_t stencilcolor=0);
+void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFont *font, const char *string, EColorRange translation=CR_UNTRANSLATED, bool stencil=false, uint8_t stencilcolor=0);
 
 void VH_UpdateScreen();
 #define VW_UpdateScreen VH_UpdateScreen
@@ -67,7 +67,7 @@ void VH_UpdateScreen();
 #define VW_WaitVBL		    VL_WaitVBL
 #define VW_FadeIn()		    VL_FadeIn(0,255,30);
 #define VW_FadeOut()	    VL_FadeOut(0,255,0,0,0,30);
-void	VW_MeasurePropString (FFont *font, const char *string, word &width, word &height, word *finalWidth=NULL);
+void	VW_MeasurePropString (FFont *font, const char *string, uint16_t &width, uint16_t &height, uint16_t *finalWidth=NULL);
 
 void    VH_Startup();
 void FizzleFadeStart();

@@ -93,7 +93,7 @@ namespace GC
 	extern DObject *Root;
 
 	// Current white value for potentially-live objects.
-	extern uint32 CurrentWhite;
+	extern uint32_t CurrentWhite;
 
 	// Current collector state.
 	extern EGCState State;
@@ -108,7 +108,7 @@ namespace GC
 	extern int StepMul;
 
 	// Current white value for known-dead objects.
-	static inline uint32 OtherWhite()
+	static inline uint32_t OtherWhite()
 	{
 		return CurrentWhite ^ OF_WhiteBits;
 	}
@@ -297,7 +297,7 @@ private:
 public:
 	DObject *ObjNext;			// Keep track of all allocated objects
 	DObject *GCNext;			// Next object in this collection list
-	uint32 ObjectFlags;			// Flags for this object
+	uint32_t ObjectFlags;			// Flags for this object
 
 public:
 	DObject ();

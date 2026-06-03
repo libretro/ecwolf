@@ -56,9 +56,9 @@
 
 TAutoGrowArray<FRemapTablePtr, FRemapTable *> translationtables[NUM_TRANSLATION_TABLES];
 
-BYTE identitymap[256];
+uint8_t identitymap[256];
 
-const BYTE IcePalette[16][3] =
+const uint8_t IcePalette[16][3] =
 {
 	{  10,  8, 18 },
 	{  15, 15, 26 },
@@ -110,7 +110,7 @@ FRemapTable::~FRemapTable()
 
 void FRemapTable::Alloc(int count)
 {
-	Remap = (BYTE *)M_Malloc(count*sizeof(*Remap) + count*sizeof(*Palette));
+	Remap = (uint8_t *)M_Malloc(count*sizeof(*Remap) + count*sizeof(*Palette));
 	assert (Remap != NULL);
 	Palette = (PalEntry *)(Remap + count*(sizeof(*Remap)));
 	NumEntries = count;
@@ -689,7 +689,7 @@ void R_InitTranslationTables ()
 	// Doom palette has no good substitutes for these bluish-tinted grays, so
 	// they will just look gray unless you use a different PLAYPAL with Doom.
 
-	BYTE IcePaletteRemap[16];
+	uint8_t IcePaletteRemap[16];
 	for (i = 0; i < 16; ++i)
 	{
 		IcePaletteRemap[i] = ColorMatcher.Pick (IcePalette[i][0], IcePalette[i][1], IcePalette[i][2]);
@@ -708,7 +708,7 @@ void R_InitTranslationTables ()
 	// set up shading tables for shaded columns
 	// 16 colormap sets, progressing from full alpha to minimum visible alpha
 
-	/*BYTE *table = shadetables;
+	/*uint8_t *table = shadetables;
 
 	// Full alpha
 	for (i = 0; i < 16; ++i)
@@ -723,8 +723,8 @@ void R_InitTranslationTables ()
 			int a = (NUMCOLORMAPS - j) * 256 / NUMCOLORMAPS * (16-i);
 			for (int k = 0; k < 256; ++k)
 			{
-				BYTE v = (((k+2) * a) + 256) >> 14;
-				table[k] = MIN<BYTE> (v, 64);
+				uint8_t v = (((k+2) * a) + 256) >> 14;
+				table[k] = MIN<uint8_t> (v, 64);
 			}
 			table += 256;
 		}

@@ -47,13 +47,13 @@
 struct Huffnode
 {
 	public:
-		WORD	bit0, bit1;	// 0-255 is a character, > is a pointer to a node
+		uint16_t	bit0, bit1;	// 0-255 is a character, > is a pointer to a node
 };
 
 struct Dimensions
 {
 	public:
-		WORD	width, height;
+		uint16_t	width, height;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,8 +61,8 @@ struct Dimensions
 struct FVGALump : public FResourceLump
 {
 	public:
-		DWORD		position;
-		DWORD		length;
+		uint32_t		position;
+		uint32_t		length;
 		Huffnode*	huffman;
 
 		bool		isImage;
@@ -73,8 +73,8 @@ struct FVGALump : public FResourceLump
 		{
 			Owner->Reader->Seek(position+(noSkip ? 0 : 4), SEEK_SET);
 
-			byte* data = new byte[length];
-			byte* out = new byte[LumpSize];
+			uint8_t* data = new uint8_t[length];
+			uint8_t* out = new uint8_t[LumpSize];
 			memset(out, 0, LumpSize);
 			Owner->Reader->Read(data, length);
 			HuffExpand(data, out);
@@ -86,8 +86,8 @@ struct FVGALump : public FResourceLump
 			else
 			{
 				// We flip again on big endian so that the code that reads the data makes sense
-				WriteLittleShort((BYTE*)Cache, dimensions.width);
-				WriteLittleShort((BYTE*)Cache+2, dimensions.height);
+				WriteLittleShort((uint8_t*)Cache, dimensions.width);
+				WriteLittleShort((uint8_t*)Cache+2, dimensions.height);
 				memcpy(Cache+4, out, LumpSize-4);
 			}
 			delete[] out;
@@ -96,9 +96,9 @@ struct FVGALump : public FResourceLump
 			return 1;
 		}
 
-		byte *HuffExpand(byte* source, byte* dest)
+		uint8_t *HuffExpand(uint8_t* source, uint8_t* dest)
 		{
-			byte *end, *send;
+			uint8_t *end, *send;
 			Huffnode *headptr, *huffptr;
 		
 			if(!LumpSize || !dest)
@@ -114,9 +114,9 @@ struct FVGALump : public FResourceLump
 			end=dest+LumpSize;
 			send=source+length;
 
-			byte val = *source++;
-			byte mask = 1;
-			word nodeval;
+			uint8_t val = *source++;
+			uint8_t mask = 1;
+			uint16_t nodeval;
 			huffptr = headptr;
 			while(1)
 			{
@@ -134,7 +134,7 @@ struct FVGALump : public FResourceLump
 			
 				if(nodeval<256)
 				{
-					*dest++ = (byte) nodeval;
+					*dest++ = (uint8_t) nodeval;
 					written++;
 					huffptr = headptr;
 					if(dest>=end) break;
@@ -181,7 +181,7 @@ class FVGAGraph : public FResourceFile
 			{
 				FLumpReader *lreader = reinterpret_cast<FLumpReader *>(file);
 
-				for(DWORD i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
+				for(uint32_t i = 0; i < lreader->LumpOwner()->LumpCount(); ++i)
 				{
 					FResourceLump *lump = lreader->LumpOwner()->GetLump(i);
 					if(lump->FullName.CompareNoCase(vgaheadFile) == 0)
@@ -227,7 +227,7 @@ class FVGAGraph : public FResourceFile
 			vgaheadReader->Seek(0, SEEK_SET);
 			lumps = new FVGALump[NumLumps];
 			// The vgahead has 24-bit ints.
-			BYTE* data = new BYTE[NumLumps*3];
+			uint8_t* data = new uint8_t[NumLumps*3];
 			vgaheadReader->Read(data, NumLumps*3);
 
 			unsigned int numPictures = 0;
@@ -271,10 +271,10 @@ class FVGAGraph : public FResourceFile
 					Reader->Seek(lumps[0].position+4, SEEK_SET);
 					lumps[0].LumpSize = (NumLumps-1)*4;
 
-					byte* data = new byte[lumps[0].length];
-					byte* out = new byte[lumps[0].LumpSize];
+					uint8_t* data = new uint8_t[lumps[0].length];
+					uint8_t* out = new uint8_t[lumps[0].LumpSize];
 					Reader->Read(data, lumps[0].length);
-					byte* endPtr = lumps[0].HuffExpand(data, out);
+					uint8_t* endPtr = lumps[0].HuffExpand(data, out);
 					delete[] data;
 
 					lumps[0].LumpSize = (unsigned int)(endPtr - out);
@@ -302,18 +302,18 @@ class FVGAGraph : public FResourceFile
 					{
 						Reader->Seek(lumps[i-1].position+4, SEEK_SET);
 
-						byte* data = new byte[lumps[i-1].length];
-						byte* out = new byte[lumps[i-1].LumpSize];
+						uint8_t* data = new uint8_t[lumps[i-1].length];
+						uint8_t* out = new uint8_t[lumps[i-1].LumpSize];
 						Reader->Read(data, lumps[i-1].length);
-						byte* endPtr = lumps[i-1].HuffExpand(data, out);
+						uint8_t* endPtr = lumps[i-1].HuffExpand(data, out);
 						delete[] data;
 
 						bool endhit = false;
-						WORD height = ReadLittleShort(out);
+						uint16_t height = ReadLittleShort(out);
 						for(unsigned int c = 0;c < 256;++c)
 						{
-							WORD offset = ReadLittleShort(&out[c*2+2]);
-							BYTE width = out[c+514];
+							uint16_t offset = ReadLittleShort(&out[c*2+2]);
+							uint8_t width = out[c+514];
 
 							int space = lumps[i-1].LumpSize - (offset + width*height);
 							if(space < 0)
@@ -369,11 +369,11 @@ class FVGAGraph : public FResourceFile
 			//       We will use the method from before to guess a size.
 			if(tile8Position < NumLumps && (unsigned)lumps[tile8Position].LumpSize > lumps[tile8Position].length)
 			{
-				byte* data = new byte[lumps[tile8Position].length];
-				byte* out = new byte[64*256];
+				uint8_t* data = new uint8_t[lumps[tile8Position].length];
+				uint8_t* out = new uint8_t[64*256];
 				Reader->Seek(lumps[tile8Position].position, SEEK_SET);
 				Reader->Read(data, lumps[tile8Position].length);
-				byte* endPtr = lumps[tile8Position].HuffExpand(data, out);
+				uint8_t* endPtr = lumps[tile8Position].HuffExpand(data, out);
 				delete[] data;
 				delete[] out;
 

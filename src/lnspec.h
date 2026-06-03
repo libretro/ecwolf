@@ -40,7 +40,7 @@
 class AActor;
 
 // p_switch.cpp
-bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, BYTE special, bool *quest=NULL);
+bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, uint8_t special, bool *quest=NULL);
 
 namespace Specials
 {

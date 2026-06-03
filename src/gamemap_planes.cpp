@@ -215,13 +215,13 @@ public:
 		return FString();
 	}
 
-	WORD GetTilePalette(TArray<MapTile> &tilePalette)
+	uint16_t GetTilePalette(TArray<MapTile> &tilePalette)
 	{
-		WORD max = 0;
-		WORD min = 0xFFFF;
+		uint16_t max = 0;
+		uint16_t min = 0xFFFF;
 
-		TMap<WORD, MapTile>::Iterator iter(this->tilePalette);
-		TMap<WORD, MapTile>::Pair *pair;
+		TMap<uint16_t, MapTile>::Iterator iter(this->tilePalette);
+		TMap<uint16_t, MapTile>::Pair *pair;
 		while(iter.NextPair(pair))
 		{
 			if(pair->Key > max)
@@ -243,8 +243,8 @@ public:
 	}
 	void GetZonePalette(TArray<MapZone> &zonePalette)
 	{
-		TMap<WORD, MapZone>::Iterator iter(this->zonePalette);
-		TMap<WORD, MapZone>::Pair *pair;
+		TMap<uint16_t, MapZone>::Iterator iter(this->zonePalette);
+		TMap<uint16_t, MapZone>::Pair *pair;
 		while(iter.NextPair(pair))
 		{
 			pair->Value.index = zonePalette.Size();
@@ -659,11 +659,11 @@ private:
 	int lump;
 
 	TArray<ThingXlat> thingTable;
-	TMap<WORD, ThingSpecialXlat> thingSpecialTable;
-	TMap<WORD, MapTile> tilePalette;
-	TMap<WORD, MapTrigger> tileTriggers;
-	TMap<WORD, ModZone> modZones;
-	TMap<WORD, MapZone> zonePalette;
+	TMap<uint16_t, ThingSpecialXlat> thingSpecialTable;
+	TMap<uint16_t, MapTile> tilePalette;
+	TMap<uint16_t, MapTrigger> tileTriggers;
+	TMap<uint16_t, ModZone> modZones;
+	TMap<uint16_t, MapZone> zonePalette;
 	TMap<unsigned, FString> musicTable;
 	FTextureID flatTable[256][2]; // Floor/ceiling textures
 	EFeatureFlags FeatureFlags;
@@ -734,15 +734,15 @@ struct HolowallProducer
 struct MacTile
 {
 	unsigned int tilenum;
-	WORD wallnum1, wallnum2;
+	uint16_t wallnum1, wallnum2;
 	bool used;
 };
 void GameMap::ReadMacData()
 {
-	static const BYTE TEX_MASK = 0x1F;
-	static const BYTE NUM_MASK = 0x3F;
-	static const BYTE DOOR_TEX = 31;
-	static const BYTE BLOCKING = 0x80;
+	static const uint8_t TEX_MASK = 0x1F;
+	static const uint8_t NUM_MASK = 0x3F;
+	static const uint8_t DOOR_TEX = 31;
+	static const uint8_t BLOCKING = 0x80;
 
 	FileReader &lump = *lumps[0];
 	lump.Seek(0, SEEK_SET);
@@ -754,8 +754,8 @@ void GameMap::ReadMacData()
 	Plane &mapPlane = NewPlane();
 	mapPlane.depth = 64;
 
-	BYTE tilemap[64*64];
-	BYTE areamap[64];
+	uint8_t tilemap[64*64];
+	uint8_t areamap[64];
 	lump.Read(tilemap, 64*64);
 	lump.Read(areamap, 64);
 
@@ -772,7 +772,7 @@ void GameMap::ReadMacData()
 		}
 	}
 
-	WORD numSpawn, spawnListOfs;
+	uint16_t numSpawn, spawnListOfs;
 	lump >> numSpawn >> spawnListOfs;
 	numSpawn = LittleShort(numSpawn);
 	spawnListOfs = LittleShort(spawnListOfs);
@@ -781,7 +781,7 @@ void GameMap::ReadMacData()
 
 	// Load in the wall list so we can build a tile set.
 	FWadLump wallListLump = Wads.OpenLumpName("WALLLIST");
-	TArray<WORD> walltexs;
+	TArray<uint16_t> walltexs;
 	walltexs.Resize(wallListLump.GetLength()/2 - 1);
 	wallListLump.Seek(2, SEEK_SET);
 	wallListLump.Read(&walltexs[0], walltexs.Size()*2);
@@ -862,7 +862,7 @@ void GameMap::ReadMacData()
 	lump.Seek(spawnListOfs, SEEK_SET);
 	for(unsigned int i = 0;i < numSpawn;++i)
 	{
-		BYTE x, y, type, pwallTile;
+		uint8_t x, y, type, pwallTile;
 		lump >> x >> y >> type;
 		if(type == 98)
 		{
@@ -918,7 +918,7 @@ void GameMap::ReadMacData()
 
 /* Reads old format maps... well technically WDC format maps.
  * char[6] - Magic "WDC3.1"
- * int32 - Number of maps (Should be 1 in our case)
+ * int32_t - Number of maps (Should be 1 in our case)
  * int16 - Number of planes
  * int16 - (Max) name length
  * --- The following would be repeated per map ---
@@ -955,7 +955,7 @@ void GameMap::ReadPlanesData()
 
 	// Read plane count
 	lump->Seek(10, SEEK_SET);
-	WORD numPlanes, nameLength;
+	uint16_t numPlanes, nameLength;
 	lump->Read(&numPlanes, 2);
 	lump->Read(&nameLength, 2);
 	numPlanes = LittleShort(numPlanes);
@@ -966,11 +966,11 @@ void GameMap::ReadPlanesData()
 	name[nameLength] = 0;
 	header.name = name;
 
-	WORD dimensions[2];
+	uint16_t dimensions[2];
 	lump->Read(dimensions, 4);
 	dimensions[0] = LittleShort(dimensions[0]);
 	dimensions[1] = LittleShort(dimensions[1]);
-	DWORD size = dimensions[0]*dimensions[1];
+	uint32_t size = dimensions[0]*dimensions[1];
 	header.width = dimensions[0];
 	header.height = dimensions[1];
 
@@ -979,12 +979,12 @@ void GameMap::ReadPlanesData()
 
 	// We need to store the spots marked for ambush since it's stored in the
 	// tiles plane instead of the objects plane.
-	TArray<WORD> ambushSpots;
+	TArray<uint16_t> ambushSpots;
 	TArray<MapTrigger> triggers;
-	TMap<WORD, TArray<MapSpot> > elevatorSpots;
+	TMap<uint16_t, TArray<MapSpot> > elevatorSpots;
 
 	// Read and store the info plane so we can reference it
-	TUniquePtr<WORD[]> infoplane(new WORD[size]);
+	TUniquePtr<uint16_t[]> infoplane(new uint16_t[size]);
 	if(numPlanes > 3)
 	{
 		lump->Seek(size*2*3, SEEK_CUR);
@@ -1002,7 +1002,7 @@ void GameMap::ReadPlanesData()
 		if(plane == 3) // Info plane is already read
 			continue;
 
-		TUniquePtr<WORD[]> oldplane(new WORD[size]);
+		TUniquePtr<uint16_t[]> oldplane(new uint16_t[size]);
 		lump->Read(oldplane.Get(), size*2);
 
 		switch(plane)
@@ -1012,11 +1012,11 @@ void GameMap::ReadPlanesData()
 
 			case Plane_Tiles:
 			{
-				WORD tileStart = xlat.GetTilePalette(tilePalette);
+				uint16_t tileStart = xlat.GetTilePalette(tilePalette);
 				xlat.GetZonePalette(zonePalette);
 
-				TArray<WORD> fillSpots;
-				TMap<WORD, Xlat::ModZone> changeTriggerSpots;
+				TArray<uint16_t> fillSpots;
+				TMap<uint16_t, Xlat::ModZone> changeTriggerSpots;
 				
 
 				for(unsigned int i = 0;i < size;++i)
@@ -1090,8 +1090,8 @@ void GameMap::ReadPlanesData()
 					}
 				}
 
-				TMap<WORD, Xlat::ModZone>::Iterator iter(changeTriggerSpots);
-				TMap<WORD, Xlat::ModZone>::Pair *pair;
+				TMap<uint16_t, Xlat::ModZone>::Iterator iter(changeTriggerSpots);
+				TMap<uint16_t, Xlat::ModZone>::Pair *pair;
 				while(iter.NextPair(pair))
 				{
 					// Look for and switch exit triggers.
@@ -1296,8 +1296,8 @@ void GameMap::ReadPlanesData()
 			case Plane_Flats:
 			{
 				// Look for all unique floor/ceiling texture combinations.
-				WORD type = sectorPalette.Size();
-				TMap<WORD, WORD> flatMap;
+				uint16_t type = sectorPalette.Size();
+				TMap<uint16_t, uint16_t> flatMap;
 				for(unsigned int i = 0;i < size;++i)
 				{
 					oldplane[i] = LittleShort(oldplane[i]);
@@ -1308,8 +1308,8 @@ void GameMap::ReadPlanesData()
 
 				// Build the palette.
 				sectorPalette.Resize(type);
-				TMap<WORD, WORD>::ConstIterator iter(flatMap);
-				TMap<WORD, WORD>::ConstPair *pair;
+				TMap<uint16_t, uint16_t>::ConstIterator iter(flatMap);
+				TMap<uint16_t, uint16_t>::ConstPair *pair;
 				while(iter.NextPair(pair))
 				{
 					Sector &sect = sectorPalette[pair->Value];
@@ -1350,7 +1350,7 @@ void GameMap::ReadPlanesData()
 		Trigger &templateTrigger = triggers[i];
 
 		// Check the info plane and if set move the activation point to a switch ot touch plate
-		const WORD info = infoplane[templateTrigger.y*header.width + templateTrigger.x];
+		const uint16_t info = infoplane[templateTrigger.y*header.width + templateTrigger.x];
 		if(info)
 		{
 			MapSpot target = GetSpot(templateTrigger.x, templateTrigger.y, 0);
@@ -1384,8 +1384,8 @@ void GameMap::ReadPlanesData()
 	}
 
 	// Install elevators
-	TMap<WORD, TArray<MapSpot> >::ConstIterator iter(elevatorSpots);
-	TMap<WORD, TArray<MapSpot> >::ConstPair *pair;
+	TMap<uint16_t, TArray<MapSpot> >::ConstIterator iter(elevatorSpots);
+	TMap<uint16_t, TArray<MapSpot> >::ConstPair *pair;
 	while(iter.NextPair(pair))
 	{
 		const TArray<MapSpot> &locations = pair->Value;

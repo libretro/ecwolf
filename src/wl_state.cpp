@@ -166,8 +166,8 @@ static inline short CheckSide(AActor *ob, unsigned int x, unsigned int y, MapTri
 
 bool TryWalk (AActor *ob)
 {
-	word zonex = ob->tilex;
-	word zoney = ob->tiley;
+	uint16_t zonex = ob->tilex;
+	uint16_t zoney = ob->tiley;
 
 	switch (ob->dir)
 	{

@@ -83,8 +83,8 @@ struct TMoveInsert<SoundData>
 		data->isAlias = other.isAlias;
 		data->aliasLinks = other.aliasLinks;
 		(void)TMoveInsert<TUniquePtr<Mix_Chunk, Mix_ChunkDeleter> >(&data->digitalData, other.digitalData);
-		(void)TMoveInsert<TUniquePtr<byte[]> >(&data->adlibData, other.adlibData);
-		(void)TMoveInsert<TUniquePtr<byte[]> >(&data->speakerData, other.speakerData);
+		(void)TMoveInsert<TUniquePtr<uint8_t[]> >(&data->adlibData, other.adlibData);
+		(void)TMoveInsert<TUniquePtr<uint8_t[]> >(&data->speakerData, other.speakerData);
 		memcpy(data->lump, other.lump, sizeof(data->lump));
 	}
 };
@@ -375,8 +375,8 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 				else
 				{
 					unsigned int length = Wads.LumpLength(sndLump);
-					TUniquePtr<byte[]> &data = i == 1 ? idx.adlibData : idx.speakerData;
-					data.Reset(new byte[length]);
+					TUniquePtr<uint8_t[]> &data = i == 1 ? idx.adlibData : idx.speakerData;
+					data.Reset(new uint8_t[length]);
 
 					FWadLump soundReader = Wads.OpenLumpNum(sndLump);
 					soundReader.Read(data.Get(), length);

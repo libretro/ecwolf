@@ -105,8 +105,8 @@ class IntermissionInfo;
 
 struct IntermissionGState
 {
-	SDWORD step;
-	DWORD demoMode;
+	int32_t step;
+	uint32_t demoMode;
 	FName intermission_name;
 	const IntermissionInfo *intermission;
 	bool gototitle;
@@ -116,8 +116,8 @@ struct IntermissionGState
 	bool image_ready;
 	bool fade_in;
 	bool fade_out;
-	DWORD fade_steps;
-	DWORD wait;
+	uint32_t fade_steps;
+	uint32_t wait;
 
 	void clear() {
 		step = 0;
@@ -180,7 +180,7 @@ private:
 class Mix_Chunk_Speaker : public Mix_Chunk
 {
 public:
-	Mix_Chunk_Speaker(const byte *dataRaw);
+	Mix_Chunk_Speaker(const uint8_t *dataRaw);
 	~Mix_Chunk_Speaker() {
 		free(states);
 	}
@@ -293,7 +293,7 @@ namespace DBOPL {
 class Mix_Chunk_IMF : public Mix_Chunk_Sampled
 {
 public:
-        Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
+        Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 		      bool isLooping);
         virtual ~Mix_Chunk_IMF() {
 		free (imf);
@@ -311,7 +311,7 @@ public:
 
 private:
 	size_t samples_allocated;
-	byte *imf;
+	uint8_t *imf;
 	size_t imfptr, imfsize;
 	void EnsureSynthesis(int tics);
 	void EnsureSpace(int samples);
@@ -320,7 +320,7 @@ private:
 class Mix_Chunk_N3D : public Mix_Chunk_Sampled
 {
 public:
-        Mix_Chunk_N3D(int rate, const byte *imf, size_t imf_size,
+        Mix_Chunk_N3D(int rate, const uint8_t *imf, size_t imf_size,
 		      bool isLooping);
         ~Mix_Chunk_N3D();
 
@@ -339,25 +339,25 @@ private:
 	bool   midiOn;
 	int32_t midiError;
 	float       midiTimeScale;
-	const byte        *midiData, *midiDataStart;
-	byte       *midiFile;
-	byte        midiRunningStatus;
-	longword    midiLength, midiDeltaTime;
+	const uint8_t        *midiData, *midiDataStart;
+	uint8_t       *midiFile;
+	uint8_t        midiRunningStatus;
+	uint32_t    midiLength, midiDeltaTime;
 	int32_t     midiDivision;
 	bool N3DTempoEmulation;
-	longword    curtics;
+	uint32_t    curtics;
 	DBOPL::Chip *midiOpl;
 
 	void EnsureSynthesis(int tics);
 	void EnsureSpace(int samples);
 	void MIDI_IRQService(void);
 	void MIDI_DoEvent(void);
-	void MIDI_ProcessEvent(byte event);
+	void MIDI_ProcessEvent(uint8_t event);
 	void MIDI_SkipMetaEvent(void);
 	void MIDI_ProgramChange(int channel, int id);
-	void MIDI_NoteOn(int channel, byte note, byte velocity);
+	void MIDI_NoteOn(int channel, uint8_t note, uint8_t velocity);
 	void MIDI_NoteOff(int channel, int note, int velocity);
-	longword MIDI_VarLength(void);
+	uint32_t MIDI_VarLength(void);
 };
 
 
@@ -366,13 +366,13 @@ Mix_Chunk *GetSoundDataType(const SoundData &which, SoundData::Type type);
 struct SoundChannelState
 {
 	FString sound;
-	QWORD startTick;
-	QWORD skipTicks;
-	SQWORD stopTicks;
+	uint64_t startTick;
+	uint64_t skipTicks;
+	int64_t stopTicks;
 	Mix_Chunk *sample;
 	bool isMusic;
-	DWORD leftPos;
-	DWORD rightPos;
+	uint32_t leftPos;
+	uint32_t rightPos;
 	SoundData::Type type;
 
 	void Serialize(FArchive &arc);
@@ -403,43 +403,43 @@ typedef struct wl_state_s {
 	bool waitCanBeAcked;
 	bool waitCanTimeout;
 	bool wasAcked;
-	longword ackTimeout;
+	uint32_t ackTimeout;
 	fixed fadeStep;
 	fixed fadeStart;
 	fixed fadeEnd;
 	fixed fadeCur;
-	DWORD fadeRed;
-	DWORD fadeGreen;
-	DWORD fadeBlue;
+	uint32_t fadeRed;
+	uint32_t fadeGreen;
+	uint32_t fadeBlue;
 	bool died;
 	bool dointermission;
 	bool playing_title_music;
 	bool level_bonus;
 
-	DWORD episode_num;
-	DWORD skill_num;
-	DWORD menuLevel;
+	uint32_t episode_num;
+	uint32_t skill_num;
+	uint32_t menuLevel;
 	StateMenuType menuStack[MAX_MENU_STACK];
 	SoundChannelState channels[MIX_CHANNELS];
 	SoundChannelState musicChannel;
 
-	DWORD frame_counter;
-	QWORD frame_tic;
-	DWORD tic_rest;
-	QWORD usec;
+	uint32_t frame_counter;
+	uint64_t frame_tic;
+	uint32_t tic_rest;
+	uint64_t usec;
 	FString nextMap;
 
 	bool isCounting;
 	bool isCountingRatio;
 	FString prevCount;
-	SDWORD countCurrent;
-	SDWORD countEnd;
-	SDWORD countStep;
-	DWORD countX;
-	DWORD countY;	
-	SDWORD countFrame;
+	int32_t countCurrent;
+	int32_t countEnd;
+	int32_t countStep;
+	uint32_t countX;
+	uint32_t countY;	
+	int32_t countFrame;
 	bool bonusFont;
-	DWORD intermissionSndFreq;
+	uint32_t intermissionSndFreq;
 	FString intermissionSound;
 	FString transitionSlideshow;
 	bool isInQuiz;
@@ -447,16 +447,16 @@ typedef struct wl_state_s {
 	const Dialog::Page *quizPage;
 	AActor *quizNpc;
 	angle_t iangle;
-	DWORD rndval;
+	uint32_t rndval;
 	TObjPtr<SpriteZoomer> zoomer;
 	bool firstpage;
 	bool newpage;
 	FString article;
-	SDWORD textposition;
-	SDWORD pagenum;
-	SDWORD numpages;
+	int32_t textposition;
+	int32_t pagenum;
+	int32_t numpages;
 	unsigned rowon;
-	byte    fontcolor;
+	uint8_t    fontcolor;
 	int32_t     picx;
 	int32_t     picy;
 	int32_t     picdelay;
@@ -589,7 +589,7 @@ bool LevelIntermissionCount2(wl_state_t *state, bool isAcked);
 bool LevelIntermissionCount3(wl_state_t *state, bool isAcked);
 bool LevelIntermissionCountBonus(wl_state_t *state, bool isAcked);
 bool LevelIntermissionWait(wl_state_t *state, bool isAcked);
-void State_UserInput(wl_state_t *state, longword delay);
+void State_UserInput(wl_state_t *state, uint32_t delay);
 bool updatePsych1(wl_state_t *state);
 bool updatePsych2(wl_state_t *state);
 bool updatePsych3(wl_state_t *state);
@@ -601,7 +601,7 @@ namespace Dialog {
 bool quizHandle(wl_state_t *state, const wl_input_state_t *input);
 void quizSerialize(wl_state_t *state, FArchive &arc);
 }
-void State_Delay(wl_state_t *state, longword delay);
+void State_Delay(wl_state_t *state, uint32_t delay);
 void SetSoundPriorities(const char *prio);
 extern wl_state_t g_state;
 bool Died1(wl_state_t *state);
@@ -617,16 +617,16 @@ bool VictoryZoomerStart(wl_state_t *state);
 bool VictoryZoomerStep(wl_state_t *state);
 bool TextReaderStep(wl_state_t *state, const wl_input_state_t *input);
 
-extern SDWORD damagecount, bonuscount;
+extern int32_t damagecount, bonuscount;
 extern bool palshifted;
 void DrawVictory (bool fromIntermission);
 extern bool store_files_in_memory;
 extern bool preload_digital_sounds;
 
-Mix_Chunk *SynthesizeAdlibIMFOrN3D(const byte *dataRaw, size_t size);
-bool midiN3DValidate(const byte *dataIn, size_t dataLen);
+Mix_Chunk *SynthesizeAdlibIMFOrN3D(const uint8_t *dataRaw, size_t size);
+bool midiN3DValidate(const uint8_t *dataIn, size_t dataLen);
 void    SD_Startup_Adlib(void);
-Mix_Chunk *SynthesizeAdlib(const byte *dataRaw);
+Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw);
 void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length);
 void decreaseSoundCache(size_t target);
 

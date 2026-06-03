@@ -66,7 +66,7 @@ static unsigned rightmargin[TEXTROWS];
 static const char* text;
 static unsigned rowon;
 
-static byte    fontcolor;
+static uint8_t    fontcolor;
 static EColorRange textcolor;
 static int     picx;
 static int     picy;
@@ -263,7 +263,7 @@ static void HandleCommand (bool helphack)
 			if(i == '[') // Textcolo translation
 			{
 				fontcolor = 255;
-				const BYTE *colorname = (const BYTE *)(text);
+				const uint8_t *colorname = (const uint8_t *)(text);
 				textcolor = V_ParseFontColor(colorname, CR_UNTRANSLATED, CR_UNTRANSLATED+1);
 				while(*text++ != ']');
 			}
@@ -425,15 +425,15 @@ static void HandleWord (void)
 {
 	char    wword[WORDLIMIT];
 	int     wordindex;
-	word    wwidth,wheight,newpos;
+	uint16_t    wwidth,wheight,newpos;
 
 
 	//
-	// copy the next word into [word]
+	// copy the next uint16_t into [uint16_t]
 	//
 	wword[0] = *text++;
 	wordindex = 1;
-	while (byte(*text)>32)
+	while (uint8_t(*text)>32)
 	{
 		wword[wordindex] = *text++;
 		if (++wordindex == WORDLIMIT)
@@ -478,7 +478,7 @@ static void HandleWord (void)
 =
 = PageLayout
 =
-= Clears the screen, draws the pics on the page, and word wraps the text.
+= Clears the screen, draws the pics on the page, and uint16_t wraps the text.
 = Returns a pointer to the terminating command
 =
 =====================
@@ -516,7 +516,7 @@ static void PageLayout (bool shownumber, bool helphack)
 	// make sure we are starting layout text (^P first command)
 	// [BL] Why? How about assuming ^P?
 	//
-	while (byte(*text) <= 32)
+	while (uint8_t(*text) <= 32)
 		text++;
 
 	if (*text == '^' && toupper(*(text+1)) == 'P')
@@ -691,7 +691,7 @@ void DrawMultiLineText(const FString str, FFont *font, EColorRange color, ETSAli
 		pos = str.IndexOf('\n', oldpos);
 		const FString line = str.Mid(oldpos, pos - oldpos);
 
-		word width, height;
+		uint16_t width, height;
 		VW_MeasurePropString(font, line, width, height);
 
 		switch(align)

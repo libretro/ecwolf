@@ -83,11 +83,11 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 {
 	INTBOOL boolval;
 	va_list tags;
-	uint32 tag;
+	uint32_t tag;
 
 	int			maxstrlen = INT_MAX;
 	int 		w, maxwidth;
-	const BYTE *ch;
+	const uint8_t *ch;
 	int 		c;
 	int 		cx;
 	int 		cy;
@@ -110,7 +110,7 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 	height = font->GetHeight () + 1;
 	kerning = font->GetDefaultKerning ();
 
-	ch = (const BYTE *)string;
+	ch = (const uint8_t *)string;
 	cx = x;
 	cy = y;
 
@@ -123,19 +123,19 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 #else
 	tags = taglist;
 #endif
-	tag = va_arg(tags, uint32);
+	tag = va_arg(tags, uint32_t);
 
 	while (tag != TAG_DONE)
 	{
 		va_list *more_p;
-		DWORD data;
+		uint32_t data;
 		void *ptrval;
 
 		switch (tag)
 		{
 		case TAG_IGNORE:
 		default:
-			data = va_arg (tags, DWORD);
+			data = va_arg (tags, uint32_t);
 			break;
 
 		case TAG_MORE:
@@ -152,14 +152,14 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 		case DTA_DestWidth:
 		case DTA_DestHeight:
 			assert(false && "DTA_DestWidth or DTA_DestHeight unsupported.");
-			//*(DWORD *)tags = TAG_IGNORE;
-			data = va_arg (tags, DWORD);
+			//*(uint32_t *)tags = TAG_IGNORE;
+			data = va_arg (tags, uint32_t);
 			break;
 
 		// Translation is specified explicitly by the text.
 		case DTA_Translation:
 			assert(false && "DTA_Translation unsupported.");
-			//*(DWORD *)tags = TAG_IGNORE;
+			//*(uint32_t *)tags = TAG_IGNORE;
 			ptrval = va_arg (tags, void*);
 			break;
 
@@ -210,7 +210,7 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 			height = va_arg (tags, int);
 			break;
 		}
-		tag = va_arg (tags, uint32);
+		tag = va_arg (tags, uint32_t);
 	}
 	va_end(tags);
 
@@ -286,7 +286,7 @@ void STACK_ARGS DCanvas::DrawTextA (FFont *font, int normalcolor, int x, int y, 
 //
 // Find string width using this font
 //
-int FFont::StringWidth (const BYTE *string) const
+int FFont::StringWidth (const uint8_t *string) const
 {
 	int w = 0;
 	int maxw = 0;
@@ -328,7 +328,7 @@ int FFont::StringWidth (const BYTE *string) const
 //
 // Break long lines of text into multiple lines no longer than maxwidth pixels
 //
-static void breakit (FBrokenLines *line, FFont *font, const BYTE *start, const BYTE *stop, FString &linecolor)
+static void breakit (FBrokenLines *line, FFont *font, const uint8_t *start, const uint8_t *stop, FString &linecolor)
 {
 	if (!linecolor.IsEmpty())
 	{
@@ -339,11 +339,11 @@ static void breakit (FBrokenLines *line, FFont *font, const BYTE *start, const B
 	line->Width = font->StringWidth (line->Text);
 }
 
-FBrokenLines *V_BreakLines (FFont *font, int maxwidth, const BYTE *string)
+FBrokenLines *V_BreakLines (FFont *font, int maxwidth, const uint8_t *string)
 {
 	FBrokenLines lines[128];	// Support up to 128 lines (should be plenty)
 
-	const BYTE *space = NULL, *start = string;
+	const uint8_t *space = NULL, *start = string;
 	size_t i, ii;
 	int c, w, nw;
 	FString lastcolor, linecolor;
@@ -360,7 +360,7 @@ FBrokenLines *V_BreakLines (FFont *font, int maxwidth, const BYTE *string)
 			{
 				if (*string == '[')
 				{
-					const BYTE *start = string;
+					const uint8_t *start = string;
 					while (*string != ']' && *string != '\0')
 					{
 						string++;
@@ -430,7 +430,7 @@ FBrokenLines *V_BreakLines (FFont *font, int maxwidth, const BYTE *string)
 	// String here is pointing one character after the '\0'
 	if (i < countof(lines) && --string - start >= 1)
 	{
-		const BYTE *s = start;
+		const uint8_t *s = start;
 
 		while (s < string)
 		{

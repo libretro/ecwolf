@@ -32,7 +32,7 @@
 #include "r_data/renderstyle.h"
 #include "r_2d/r_main.h"
 
-typedef DWORD dsfixed_t;
+typedef uint32_t dsfixed_t;
 
 extern "C" int			ylookup[MAXHEIGHT];
 
@@ -46,23 +46,23 @@ extern "C" fixed_t		dc_iscale;
 extern "C" fixed_t		dc_texturemid;
 extern "C" fixed_t		dc_texturefrac;
 extern "C" int			dc_color;		// [RH] For flat colors (no texturing)
-extern "C" DWORD		dc_srccolor;
-extern "C" DWORD		*dc_srcblend;
-extern "C" DWORD		*dc_destblend;
+extern "C" uint32_t		dc_srccolor;
+extern "C" uint32_t		*dc_srcblend;
+extern "C" uint32_t		*dc_destblend;
 
 // first pixel in a column
-extern "C" const BYTE*	dc_source;
+extern "C" const uint8_t*	dc_source;
 
-extern "C" BYTE			*dc_dest, *dc_destorg;
+extern "C" uint8_t			*dc_dest, *dc_destorg;
 extern "C" int			dc_count;
 
-extern "C" DWORD		vplce[4];
-extern "C" DWORD		vince[4];
-extern "C" BYTE*		palookupoffse[4];
-extern "C" const BYTE*	bufplce[4];
+extern "C" uint32_t		vplce[4];
+extern "C" uint32_t		vince[4];
+extern "C" uint8_t*		palookupoffse[4];
+extern "C" const uint8_t*	bufplce[4];
 
 // [RH] Temporary buffer for column drawing
-extern "C" BYTE			*dc_temp;
+extern "C" uint8_t			*dc_temp;
 extern "C" unsigned int	dc_tspans[4][MAXHEIGHT];
 extern "C" unsigned int	*dc_ctspan[4];
 extern "C" unsigned int	horizspans[4];
@@ -74,8 +74,8 @@ extern "C" unsigned int	horizspans[4];
 // Hook in assembler or system specific BLT here.
 extern void (*R_DrawColumn)(void);
 
-extern DWORD (STACK_ARGS *dovline1) ();
-extern DWORD (STACK_ARGS *doprevline1) ();
+extern uint32_t (STACK_ARGS *dovline1) ();
+extern uint32_t (STACK_ARGS *doprevline1) ();
 #ifdef X64_ASM
 #define dovline4 vlinetallasm4
 extern "C" void vlinetallasm4();
@@ -84,7 +84,7 @@ extern void (STACK_ARGS *dovline4) ();
 #endif
 extern void setupvline (int);
 
-extern DWORD (STACK_ARGS *domvline1) ();
+extern uint32_t (STACK_ARGS *domvline1) ();
 extern void (STACK_ARGS *domvline4) ();
 extern void setupmvline (int);
 
@@ -103,8 +103,8 @@ extern void (*R_DrawTranslatedColumn)(void);
 // Span drawing for rows, floor/ceiling. No Spectre effect needed.
 extern void (*R_DrawSpan)(void);
 void R_SetupSpanBits(FTexture *tex);
-void R_SetSpanColormap(BYTE *colormap);
-void R_SetSpanSource(const BYTE *pixels);
+void R_SetSpanColormap(uint8_t *colormap);
+void R_SetSpanSource(const uint8_t *pixels);
 
 // Span drawing for masked textures.
 extern void (*R_DrawSpanMasked)(void);
@@ -123,7 +123,7 @@ extern void (*R_DrawSpanMaskedAddClamp)(void);
 
 // [RH] Span blit into an interleaved intermediate buffer
 extern void (*R_DrawColumnHoriz)(void);
-void R_DrawMaskedColumnHoriz (const BYTE *column, const FTexture::Span *spans);
+void R_DrawMaskedColumnHoriz (const uint8_t *column, const FTexture::Span *spans);
 
 // [RH] Initialize the above pointers
 void R_InitColumnDrawers ();
@@ -193,7 +193,7 @@ extern void (STACK_ARGS *rt_map4cols)(int sx, int yl, int yh);
 void rt_draw4cols (int sx);
 
 // [RH] Preps the temporary horizontal buffer.
-void rt_initcols (BYTE *buffer=NULL);
+void rt_initcols (uint8_t *buffer=NULL);
 
 void R_DrawFogBoundary (int x1, int x2, short *uclip, short *dclip);
 
@@ -246,14 +246,14 @@ extern "C" int				ds_ybits;
 extern "C" fixed_t			ds_alpha;
 
 // start of a 64*64 tile image
-extern "C" const BYTE*		ds_source;
+extern "C" const uint8_t*		ds_source;
 
 extern "C" int				ds_color;		// [RH] For flat color (no texturing)
 
-extern BYTE shadetables[/*NUMCOLORMAPS*16*256*/];
+extern uint8_t shadetables[/*NUMCOLORMAPS*16*256*/];
 extern FDynamicColormap ShadeFakeColormap[16];
-extern BYTE identitymap[256];
-extern BYTE *dc_translation;
+extern uint8_t identitymap[256];
+extern uint8_t *dc_translation;
 
 // [RH] Added for muliresolution support
 void R_InitShadeMaps();
@@ -266,7 +266,7 @@ enum ESPSResult
 	DoDraw0,	// draw this as if r_columnmethod is 0
 	DoDraw1,	// draw this as if r_columnmethod is 1
 };
-ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, DWORD color);
+ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, uint32_t color);
 
 // Call this after finished drawing the current thing, in case its
 // style was STYLE_Shade
@@ -278,13 +278,13 @@ bool R_GetTransMaskDrawers (fixed_t (**tmvline1)(), void (**tmvline4)());
 // Retrieve column data for wallscan. Should probably be removed
 // to just use the texture's GetColumn() method. It just exists
 // for double-layer skies.
-const BYTE *R_GetColumn (FTexture *tex, int col);
-void wallscan (int x1, int x2, short *uwal, short *dwal, fixed_t *swal, fixed_t *lwal, fixed_t yrepeat, const BYTE *(*getcol)(FTexture *tex, int col)=R_GetColumn);
+const uint8_t *R_GetColumn (FTexture *tex, int col);
+void wallscan (int x1, int x2, short *uwal, short *dwal, fixed_t *swal, fixed_t *lwal, fixed_t yrepeat, const uint8_t *(*getcol)(FTexture *tex, int col)=R_GetColumn);
 
 // maskwallscan is exactly like wallscan but does not draw anything where the texture is color 0.
-void maskwallscan (int x1, int x2, short *uwal, short *dwal, fixed_t *swal, fixed_t *lwal, fixed_t yrepeat, const BYTE *(*getcol)(FTexture *tex, int col)=R_GetColumn);
+void maskwallscan (int x1, int x2, short *uwal, short *dwal, fixed_t *swal, fixed_t *lwal, fixed_t yrepeat, const uint8_t *(*getcol)(FTexture *tex, int col)=R_GetColumn);
 
 // transmaskwallscan is like maskwallscan, but it can also blend to the background
-void transmaskwallscan (int x1, int x2, short *uwal, short *dwal, fixed_t *swal, fixed_t *lwal, fixed_t yrepeat, const BYTE *(*getcol)(FTexture *tex, int col)=R_GetColumn);
+void transmaskwallscan (int x1, int x2, short *uwal, short *dwal, fixed_t *swal, fixed_t *lwal, fixed_t yrepeat, const uint8_t *(*getcol)(FTexture *tex, int col)=R_GetColumn);
 
 #endif

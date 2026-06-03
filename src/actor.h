@@ -136,12 +136,12 @@ class AActor : public Thinker,
 		dirtype	dir;
 
 // MSVC and older versions of GCC don't support constant union parts
-// We do this instead of just using a regular word since writing to tilex/y
+// We do this instead of just using a regular uint16_t since writing to tilex/y
 // indicates an error.
 #if !defined(_MSC_VER) && (__GNUC__ > 4 || __GNUC_MINOR__ >= 6)
-#define COORD_PART const word
+#define COORD_PART const uint16_t
 #else
-#define COORD_PART word
+#define COORD_PART uint16_t
 #endif
 PACK_START
 		union
@@ -180,7 +180,7 @@ PACK_END
 		short			ticcount;
 
 		short       viewx;
-		word        viewheight;
+		uint16_t        viewheight;
 		fixed       transx,transy;      // in global coord
 
 		FTextureID	overheadIcon;

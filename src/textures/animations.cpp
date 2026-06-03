@@ -96,7 +96,7 @@ void FTextureManager::AddAnim (FAnimDef *anim)
 //
 //==========================================================================
 
-void FTextureManager::AddSimpleAnim (FTextureID picnum, int animcount, int animtype, DWORD speedmin, DWORD speedrange)
+void FTextureManager::AddSimpleAnim (FTextureID picnum, int animcount, int animtype, uint32_t speedmin, uint32_t speedrange)
 {
 	if (AreTexturesCompatible(picnum, picnum + (animcount - 1)))
 	{
@@ -152,7 +152,7 @@ void FTextureManager::AddComplexAnim (FTextureID picnum, const TArray<FAnimDef::
 // PWAD lump called ANIMATED rather than a static table in this module to
 // allow wad designers to insert or modify animation sequences.
 //
-// Lump format is an array of byte packed animdef_t structures, terminated
+// Lump format is an array of uint8_t packed animdef_t structures, terminated
 // by a structure with istexture == -1. The lump can be generated from a
 // text source file using SWANTBLS.EXE, distributed with the BOOM utils.
 // The standard list of switches and animations is contained in the example
@@ -167,7 +167,7 @@ CVAR(Bool, debuganimated, false, 0)
 
 void FTextureManager::InitAnimated (void)
 {
-	const BITFIELD texflags = TEXMAN_Overridable;
+	const uint32_t texflags = TEXMAN_Overridable;
 		// I think better not! This is only for old ANIMATED definition that
 		// don't know about ZDoom's more flexible texture system.
 		// | FTextureManager::TEXMAN_TryAny;
@@ -179,7 +179,7 @@ void FTextureManager::InitAnimated (void)
 		const char *anim_p;
 		FTextureID pic1, pic2;
 		int animtype;
-		DWORD animspeed;
+		uint32_t animspeed;
 
 		// Init animation
 		animtype = FAnimDef::ANIM_Forward;
@@ -206,8 +206,8 @@ void FTextureManager::InitAnimated (void)
 			FTexture *tex1 = Texture(pic1);
 			FTexture *tex2 = Texture(pic2);
 
-			animspeed = (BYTE(anim_p[19]) << 0)  | (BYTE(anim_p[20]) << 8) |
-						(BYTE(anim_p[21]) << 16) | (BYTE(anim_p[22]) << 24);
+			animspeed = (uint8_t(anim_p[19]) << 0)  | (uint8_t(anim_p[20]) << 8) |
+						(uint8_t(anim_p[21]) << 16) | (uint8_t(anim_p[22]) << 24);
 
 			// SMMU-style swirly hack? Don't apply on already-warping texture
 			if (animspeed > 65535 && tex1 != NULL && !tex1->bWarped)
@@ -264,7 +264,7 @@ void FTextureManager::InitAnimated (void)
 
 void FTextureManager::InitAnimDefs ()
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	int lump, lastlump = 0;
 	
 	while ((lump = Wads.FindLump ("ANIMDEFS", &lastlump)) != -1)
@@ -327,7 +327,7 @@ void FTextureManager::InitAnimDefs ()
 
 void FTextureManager::ParseAnim (Scanner &sc, int usetype)
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	TArray<FAnimDef::FAnimFrame> frames (32);
 	FTextureID picnum;
 	int defined = 0;
@@ -424,7 +424,7 @@ void FTextureManager::ParseRangeAnim (Scanner &sc, FTextureID picnum, int usetyp
 {
 	int type;
 	FTextureID framenum;
-	DWORD min, max;
+	uint32_t min, max;
 
 	type = FAnimDef::ANIM_Forward;
 	framenum = ParseFramenum (sc, picnum, usetype, missing);
@@ -465,7 +465,7 @@ void FTextureManager::ParseRangeAnim (Scanner &sc, FTextureID picnum, int usetyp
 void FTextureManager::ParsePicAnim (Scanner &sc, FTextureID picnum, int usetype, bool missing, TArray<FAnimDef::FAnimFrame> &frames)
 {
 	FTextureID framenum;
-	DWORD min, max;
+	uint32_t min, max;
 
 	framenum = ParseFramenum (sc, picnum, usetype, missing);
 	ParseTime (sc, min, max);
@@ -492,7 +492,7 @@ void FTextureManager::ParsePicAnim (Scanner &sc, FTextureID picnum, int usetype,
 
 FTextureID FTextureManager::ParseFramenum (Scanner &sc, FTextureID basepicnum, int usetype, bool allowMissing)
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	FTextureID framenum;
 
 	if (sc.CheckToken(TK_IntConst))
@@ -519,20 +519,20 @@ FTextureID FTextureManager::ParseFramenum (Scanner &sc, FTextureID basepicnum, i
 //
 //==========================================================================
 
-void FTextureManager::ParseTime (Scanner &sc, DWORD &min, DWORD &max)
+void FTextureManager::ParseTime (Scanner &sc, uint32_t &min, uint32_t &max)
 {
 	if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
 	if (sc->str.Compare ("tics") == 0)
 	{
 		sc.MustGetToken (TK_FloatConst);
-		min = max = DWORD(sc->decimal * 1000 / 35);
+		min = max = uint32_t(sc->decimal * 1000 / 35);
 	}
 	else if (sc->str.Compare ("rand") == 0)
 	{
 		sc.MustGetToken (TK_FloatConst);
-		min = DWORD(sc->decimal * 1000 / 35);
+		min = uint32_t(sc->decimal * 1000 / 35);
 		sc.MustGetToken (TK_FloatConst);
-		max = DWORD(sc->decimal * 1000 / 35);
+		max = uint32_t(sc->decimal * 1000 / 35);
 	}
 	else
 	{
@@ -551,7 +551,7 @@ void FTextureManager::ParseTime (Scanner &sc, DWORD &min, DWORD &max)
 
 void FTextureManager::ParseWarp(Scanner &sc)
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny | TEXMAN_ShortNameOnly;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny | TEXMAN_ShortNameOnly;
 	bool isflat = false;
 	bool type2 = sc->str.Compare ("warp2") == 0;	// [GRB]
 	if(!sc.GetNextString()) sc.ScriptMessage(Scanner::ERROR, "Expected string.");
@@ -618,7 +618,7 @@ void FTextureManager::ParseCameraTexture(Scanner &sc)
 {
 	sc.ScriptMessage(Scanner::ERROR, "Not ready yet to do cameras!");
 #if 0
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny | TEXMAN_ShortNameOnly;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny | TEXMAN_ShortNameOnly;
 	int width, height;
 	int fitwidth, fitheight;
 	FString picname;
@@ -728,7 +728,7 @@ void FTextureManager::FixAnimations ()
 
 void FTextureManager::ParseAnimatedDoor(Scanner &sc)
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	FDoorAnimation anim;
 	TArray<FTextureID> frames;
 	bool error = false;
@@ -813,7 +813,7 @@ FDoorAnimation *FTextureManager::FindAnimatedDoor (FTextureID picnum)
 //
 //==========================================================================
 
-void FAnimDef::SetSwitchTime (DWORD mstime)
+void FAnimDef::SetSwitchTime (uint32_t mstime)
 {
 	int speedframe = (AnimType == FAnimDef::ANIM_DiscreteFrames) ? CurFrame : 0;
 
@@ -854,7 +854,7 @@ void FTextureManager::SetTranslation (FTextureID fromtexnum, FTextureID totexnum
 //
 //==========================================================================
 
-void FTextureManager::UpdateAnimations (DWORD mstime)
+void FTextureManager::UpdateAnimations (uint32_t mstime)
 {
 	for (unsigned int j = 0; j < mAnimations.Size(); ++j)
 	{

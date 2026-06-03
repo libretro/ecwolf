@@ -37,7 +37,7 @@ void VL_Fade (int start, int end, int red, int green, int blue, int steps);
 void VL_FadeOut     (int start, int end, int red, int green, int blue, int steps);
 void VL_FadeIn      (int start, int end, int steps);
 
-byte *VL_LockSurface();
+uint8_t *VL_LockSurface();
 void VL_UnlockSurface();
 
 #define VL_ClearScreen(color) VWB_Clear(color, 0, 0, SCREENWIDTH, SCREENHEIGHT)

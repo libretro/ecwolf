@@ -63,7 +63,7 @@ static int STACK_ARGS SortSwitchDefs (const void *a, const void *b)
 
 void FTextureManager::InitSwitchList ()
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	int lump = Wads.CheckNumForName ("SWITCHES");
 
 	if (lump != -1)
@@ -110,7 +110,7 @@ void FTextureManager::InitSwitchList ()
 
 void FTextureManager::ProcessSwitchDef (Scanner &sc)
 {
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	FString picname;
 	FSwitchDef *def1, *def2;
 	FTextureID picnum;
@@ -226,7 +226,7 @@ void FTextureManager::ProcessSwitchDef (Scanner &sc)
 FSwitchDef *FTextureManager::ParseSwitchDef (Scanner &sc, bool ignoreBad)
 {
 	typedef FName FSoundID; // For now
-	const BITFIELD texflags = TEXMAN_Overridable | TEXMAN_TryAny;
+	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
 	FSwitchDef *def;
 	TArray<FSwitchDef::frame> frames;
 	FSwitchDef::frame thisframe;

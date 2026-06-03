@@ -182,12 +182,12 @@ unsigned int R_GetNumLoadedSprites()
 	return loadedSprites.Size();
 }
 
-void R_GetSpriteHitlist(BYTE* hitlist)
+void R_GetSpriteHitlist(uint8_t* hitlist)
 {
 	// Start by getting a list of currently in use sprites and then tell the
 	// precacher to load them.
 
-	BYTE* sprites = new BYTE[loadedSprites.Size()];
+	uint8_t* sprites = new uint8_t[loadedSprites.Size()];
 	memset(sprites, 0, loadedSprites.Size());
 
 	for(AActor::Iterator iter = AActor::GetIterator();iter.Next();)
@@ -375,7 +375,7 @@ void R_LoadSprite(const FString &name)
 
 // From wl_draw.cpp
 unsigned int CalcRotate(AActor *ob);
-extern byte* vbuf;
+extern uint8_t* vbuf;
 extern unsigned vbufPitch;
 extern int viewshift;
 extern fixed viewz;
@@ -426,7 +426,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	const fixed xRun = MIN<fixed>(texWidth<<FRACBITS, xStep*(viewwidth-actx));
 	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, (yStep*((viewheight<<3)-upperedge))>>3);
 
-	const BYTE *colormap;
+	const uint8_t *colormap;
 	if((actor->flags & FL_BRIGHT) || frame->fullbright)
 		colormap = NormalLight.Maps;
 	else
@@ -435,9 +435,9 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 		const int tz = FixedMul(r_depthvisibility<<8, height);
 		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 	}
-	const BYTE *src;
-	byte *destBase = vbuf + actx + startX + ((upperedge>>3) > 0 ? vbufPitch*(upperedge>>3) : 0);
-	byte *dest = destBase;
+	const uint8_t *src;
+	uint8_t *destBase = vbuf + actx + startX + ((upperedge>>3) > 0 ? vbufPitch*(upperedge>>3) : 0);
+	uint8_t *dest = destBase;
 	unsigned int i;
 	fixed x, y;
 	for(i = actx+startX, x = startX*xStep;x < xRun;x += xStep, ++i, dest = ++destBase)
@@ -462,8 +462,8 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		return;
 
 	const unsigned int texWidth = tex->GetWidth();
-	unsigned height1 = (word)(heightnumerator/(nx1>>8));
-	unsigned height2 = (word)(heightnumerator/(nx2>>8));
+	unsigned height1 = (uint16_t)(heightnumerator/(nx1>>8));
+	unsigned height2 = (uint16_t)(heightnumerator/(nx2>>8));
 	
 	unsigned height = height1;
 
@@ -481,7 +481,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 	fixed endY = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-upperedge));
 
 	// [XA] TODO: shade the sprite per-column?
-	const BYTE *colormap;
+	const uint8_t *colormap;
 	if((actor->flags & FL_BRIGHT) || frame->fullbright)
 		colormap = NormalLight.Maps;
 	else
@@ -490,9 +490,9 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		const int tz = FixedMul(r_depthvisibility<<8, height);
 		colormap = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 	}
-	const BYTE *src;
+	const uint8_t *src;
 
-	byte *dest;
+	uint8_t *dest;
 	int i;
 	unsigned int x;
 
@@ -545,7 +545,7 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 }
 
 bool UseWolf4SDL3DSpriteScaler = false;
-void Scale3DShaper(int, int, FTexture *, uint32_t, fixed, fixed, fixed, fixed, byte *, unsigned);
+void Scale3DShaper(int, int, FTexture *, uint32_t, fixed, fixed, fixed, fixed, uint8_t *, unsigned);
 
 // This function from Wolf4SDL more or less verbatim at the moment.
 void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
@@ -646,7 +646,7 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 	if(tex == NULL)
 		return;
 
-	const BYTE *colormap;
+	const uint8_t *colormap;
 	if(frame->fullbright)
 		colormap = NormalLight.Maps;
 	else
@@ -678,9 +678,9 @@ void R_DrawPlayerSprite(AActor *actor, const Frame *frame, fixed offsetX, fixed 
 	const int y1 = upperedge>>FRACBITS;
 	const fixed xRun = MIN<fixed>(tex->GetWidth()<<FRACBITS, xStep*(viewwidth-x1-startX));
 	const fixed yRun = MIN<fixed>(tex->GetHeight()<<FRACBITS, yStep*(viewheight-y1));
-	const BYTE *src;
-	byte *destBase = vbuf+x1+startX + (y1 > 0 ? vbufPitch*y1 : 0);
-	byte *dest = destBase;
+	const uint8_t *src;
+	uint8_t *destBase = vbuf+x1+startX + (y1 > 0 ? vbufPitch*y1 : 0);
+	uint8_t *dest = destBase;
 	fixed x, y;
 	for(x = startX*xStep;x < xRun;x += xStep)
 	{

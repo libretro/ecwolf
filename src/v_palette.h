@@ -37,8 +37,8 @@
 #include "wl_def.h"
 #include "tarray.h"
 
-#define MAKERGB(r,g,b)		DWORD(((r)<<16)|((g)<<8)|(b))
-#define MAKEARGB(a,r,g,b)	DWORD(((a)<<24)|((r)<<16)|((g)<<8)|(b))
+#define MAKERGB(r,g,b)		uint32_t(((r)<<16)|((g)<<8)|(b))
+#define MAKEARGB(a,r,g,b)	uint32_t(((a)<<24)|((r)<<16)|((g)<<8)|(b))
 
 #define APART(c)			(((c)>>24)&0xff)
 #define RPART(c)			(((c)>>16)&0xff)
@@ -48,34 +48,34 @@
 struct PalEntry
 {
 	PalEntry () {}
-	PalEntry (uint32 argb) { d = argb; }
-	operator uint32 () const { return d; }
-	PalEntry &operator= (uint32 other) { d = other; return *this; }
+	PalEntry (uint32_t argb) { d = argb; }
+	operator uint32_t () const { return d; }
+	PalEntry &operator= (uint32_t other) { d = other; return *this; }
 	PalEntry InverseColor() const { PalEntry nc; nc.a = a; nc.r = 255 - r; nc.g = 255 - g; nc.b = 255 - b; return nc; }
 #ifdef __BIG_ENDIAN__
-	PalEntry (BYTE ir, BYTE ig, BYTE ib) : a(0), r(ir), g(ig), b(ib) {}
-	PalEntry (BYTE ia, BYTE ir, BYTE ig, BYTE ib) : a(ia), r(ir), g(ig), b(ib) {}
+	PalEntry (uint8_t ir, uint8_t ig, uint8_t ib) : a(0), r(ir), g(ig), b(ib) {}
+	PalEntry (uint8_t ia, uint8_t ir, uint8_t ig, uint8_t ib) : a(ia), r(ir), g(ig), b(ib) {}
 PACK_START
 	union
 	{
 		struct
 		{
-			BYTE a,r,g,b;
+			uint8_t a,r,g,b;
 		};
-		uint32 d;
+		uint32_t d;
 	} PACKED;
 PACK_END
 #else
-	PalEntry (BYTE ir, BYTE ig, BYTE ib) : b(ib), g(ig), r(ir), a(0) {}
-	PalEntry (BYTE ia, BYTE ir, BYTE ig, BYTE ib) : b(ib), g(ig), r(ir), a(ia) {}
+	PalEntry (uint8_t ir, uint8_t ig, uint8_t ib) : b(ib), g(ig), r(ir), a(0) {}
+	PalEntry (uint8_t ia, uint8_t ir, uint8_t ig, uint8_t ib) : b(ib), g(ig), r(ir), a(ia) {}
 PACK_START
 	union
 	{
 		struct
 		{
-			BYTE b,g,r,a;
+			uint8_t b,g,r,a;
 		};
-		uint32 d;
+		uint32_t d;
 	} PACKED;
 PACK_END
 #endif
@@ -84,28 +84,28 @@ PACK_END
 struct FPalette
 {
 	FPalette ();
-	FPalette (const BYTE *colors);
+	FPalette (const uint8_t *colors);
 
-	void SetPalette (const BYTE *colors);
+	void SetPalette (const uint8_t *colors);
 
 	void MakeGoodRemap ();
 
 	PalEntry	BaseColors[256];	// non-gamma corrected palette
-	BYTE		Remap[256];			// remap original palette indices to in-game indices
+	uint8_t		Remap[256];			// remap original palette indices to in-game indices
 
-	BYTE		WhiteIndex;			// white in original palette index
-	BYTE		BlackIndex;			// black in original palette index
+	uint8_t		WhiteIndex;			// white in original palette index
+	uint8_t		BlackIndex;			// black in original palette index
 
 	// Given an array of colors, fills in remap with values to remap the
 	// passed array of colors to this palette.
-	void MakeRemap (const DWORD *colors, BYTE *remap, const BYTE *useful, int numcolors) const;
+	void MakeRemap (const uint32_t *colors, uint8_t *remap, const uint8_t *useful, int numcolors) const;
 };
 
 extern FPalette GPalette;
 // The color overlay to use for depleted items
 #define DIM_OVERLAY MAKEARGB(170,0,0,0)
 
-int BestColor (const uint32 *pal, int r, int g, int b, int first=1, int num=255);
+int BestColor (const uint32_t *pal, int r, int g, int b, int first=1, int num=255);
 void DoBlending (const PalEntry *from, PalEntry *to, int count, int r, int g, int b, int a);
 
 void InitPalette (const char* defpalette);

@@ -126,10 +126,10 @@ void    SD_Startup_Adlib(void)
 
 static void SDL_AlSetChanInst(DBOPL::Chip &oplChip, const Instrument *inst, unsigned int chan)
 {
-	static const byte chanOps[OPL_CHANNELS] = {
+	static const uint8_t chanOps[OPL_CHANNELS] = {
 		0, 1, 2, 8, 9, 0xA, 0x10, 0x11, 0x12
 	};
-	byte c,m;
+	uint8_t c,m;
 
 	m = chanOps[chan]; // modulator cell for channel
 	c = m + 3; // carrier cell for channel
@@ -156,14 +156,14 @@ static void SDL_AlSetFXInst(DBOPL::Chip &oplChip, const Instrument *inst)
 	SDL_AlSetChanInst(oplChip, inst, 0);
 }
 
-Mix_Chunk *SynthesizeAdlib(const byte *dataRaw)
+Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 {
 	AdLibSound *sound = (AdLibSound*) dataRaw;
 
 	alOut(alFreqH + 0, 0);
 
 	int alLength = LittleLong(sound->common.length);
-	byte alBlock = ((sound->block & 7) << 2) | 0x20;
+	uint8_t alBlock = ((sound->block & 7) << 2) | 0x20;
 	Instrument      *inst = &sound->inst;
 
 	if (!(inst->mSus | inst->cSus))
@@ -172,7 +172,7 @@ Mix_Chunk *SynthesizeAdlib(const byte *dataRaw)
 	}
 
 	SDL_AlSetFXInst(oplChip, inst);
-	byte *alSound = (byte *)sound->data;
+	uint8_t *alSound = (uint8_t *)sound->data;
 
 	int16_t *samples = (int16_t*) malloc (alLength * samplesPerSoundTick * 2);
 	CHECKMALLOCRESULT(samples);
@@ -197,7 +197,7 @@ Mix_Chunk *SynthesizeAdlib(const byte *dataRaw)
 		);
 }
 
-Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
+Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 			     bool isLooping)
 {
 	YM3812Init(1,3579545,synthesisRate);
@@ -207,7 +207,7 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
 	this->sample_format = FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
 	this->isLooping = isLooping;
 	this->samples_allocated = 0;
-	this->imf = (byte*) malloc(imf_size * 4);
+	this->imf = (uint8_t*) malloc(imf_size * 4);
 	CHECKMALLOCRESULT(this->imf);
 	memcpy(this->imf, imf, imf_size * 4);
 	this->imfptr = 0;
@@ -228,13 +228,13 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const byte *imf, size_t imf_size,
 		SDL_AlSetChanInst(musicOpl, &ChannelRelease, i);
 }
 
-Mix_Chunk *SynthesizeAdlibIMFOrN3D(const byte *dataRaw, size_t size)
+Mix_Chunk *SynthesizeAdlibIMFOrN3D(const uint8_t *dataRaw, size_t size)
 {
 	if (midiN3DValidate(dataRaw, size)) {
 		return new Mix_Chunk_N3D(synthesisRate, dataRaw, size, true);
 	}
 	int alLength = size / 4;
-	const byte *alSound = dataRaw;
+	const uint8_t *alSound = dataRaw;
 	if(alSound[0] != 0 || alSound[1] != 0) {
 		alLength = ReadLittleShort(alSound) / 4;
 		if (alLength > (int) (size - 2) / 4)
@@ -259,9 +259,9 @@ void Mix_Chunk_IMF::EnsureSpace(int need_samples)
 void Mix_Chunk_IMF::EnsureSynthesis(int maxTics)
 {
 	for (;imfptr < imfsize && sample_count < maxTics * rate / TICRATE; imfptr++) {
-		byte reg = imf[4*imfptr];
-		byte val = imf[4*imfptr + 1];
-		int tics = ReadLittleShort((BYTE *)imf + imfptr * 4 + 2);
+		uint8_t reg = imf[4*imfptr];
+		uint8_t val = imf[4*imfptr + 1];
+		int tics = ReadLittleShort((uint8_t *)imf + imfptr * 4 + 2);
 		YM3812Write(musicOpl, reg, val, 20);
 
 		EnsureSpace(sample_count + samplesPerMusicTick * tics);

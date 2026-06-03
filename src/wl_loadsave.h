@@ -42,7 +42,7 @@ class MenuItem;
 namespace GameSave
 {
 	extern unsigned long long SaveVersion;
-	extern DWORD SaveProdVersion;
+	extern uint32_t SaveProdVersion;
 	extern bool param_foreginsave;
 
 	Menu		&GetLoadMenu();

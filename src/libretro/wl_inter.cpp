@@ -50,7 +50,7 @@ static void Erase (int x, int y, const char *string, bool rightAlign=false)
 	double nx = x*8;
 	double ny = y*8;
 
-	word width, height;
+	uint16_t width, height;
 	VW_MeasurePropString(IntermissionFont, string, width, height);
 
 	if(rightAlign)
@@ -72,7 +72,7 @@ static void Write (int x, int y, const char *string, bool rightAlign=false, bool
 
 	if(rightAlign)
 	{
-		word width, height;
+		uint16_t width, height;
 		VW_MeasurePropString(font, string, width, height);
 		nx -= width;
 	}
@@ -721,7 +721,7 @@ void DrawHighScores (void)
 {
 	FString buffer;
 
-	word i, w, h;
+	uint16_t i, w, h;
 	HighScore *s;
 
 	FFont *font = V_GetFont(gameinfo.HighScoresFont);
@@ -806,7 +806,7 @@ void CheckHighScore (int32_t score, const LevelInfo *levelInfo)
 	if (!gameinfo.TrackHighScores)
 		return;
 
-	word i, j;
+	uint16_t i, j;
 	int n;
 	HighScore myscore;
 

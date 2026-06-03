@@ -241,7 +241,7 @@ class EVDoor : public Thinker
 
 		void Serialize(FArchive &arc)
 		{
-			BYTE state = this->state;
+			uint8_t state = this->state;
 			arc << state;
 			this->state = static_cast<State>(state);
 
@@ -589,7 +589,7 @@ public:
 	{
 		if(GameSave::SaveVersion > 1438232816)
 		{
-			BYTE state = this->state;
+			uint8_t state = this->state;
 			arc << state;
 			this->state = static_cast<State>(state);
 

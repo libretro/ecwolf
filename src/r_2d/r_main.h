@@ -28,7 +28,7 @@
 #include "r_data/colormaps.h"
 
 
-typedef BYTE lighttable_t;	// This could be wider for >8 bit display.
+typedef uint8_t lighttable_t;	// This could be wider for >8 bit display.
 
 //
 // POV related.

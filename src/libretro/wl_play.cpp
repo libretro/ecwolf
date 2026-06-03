@@ -120,7 +120,7 @@ TicCmd_t control[MAXPLAYERS];
 //===========================================================================
 
 
-void CenterWindow (word w, word h);
+void CenterWindow (uint16_t w, uint16_t h);
 int StopMusic (void);
 void StartMusic (void);
 void ContinueMusic (int offs);
@@ -238,7 +238,7 @@ void ContinueMusic (int offs)
 #define WHITESTEPS      20
 #define WHITETICS       6
 
-SDWORD damagecount, bonuscount;
+int32_t damagecount, bonuscount;
 bool palshifted;
 
 /*

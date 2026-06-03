@@ -54,12 +54,12 @@ public:
 	FRottFlatTexture (int lumpnum, FileReader &file);
 	~FRottFlatTexture ();
 
-	const BYTE *GetColumn (unsigned int column, const Span **spans_out);
-	const BYTE *GetPixels ();
+	const uint8_t *GetColumn (unsigned int column, const Span **spans_out);
+	const uint8_t *GetPixels ();
 	void Unload ();
 
 protected:
-	BYTE *Pixels;
+	uint8_t *Pixels;
 	Span **Spans;
 
 	virtual void MakeTexture ();
@@ -75,12 +75,12 @@ static bool CheckIfRottFlat(FileReader &file)
 {
 	if(file.GetLength() < 9) return false;
 	
-	WORD header[2];
+	uint16_t header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 
-	WORD Width = LittleShort(header[0]);
-	WORD Height = LittleShort(header[1]);
+	uint16_t Width = LittleShort(header[0]);
+	uint16_t Height = LittleShort(header[1]);
 	if(file.GetLength() == Width*Height+8)
 		return true;
 	return false;
@@ -108,7 +108,7 @@ FTexture *RottFlatTexture_TryCreate(FileReader &file, int lumpnum)
 FRottFlatTexture::FRottFlatTexture(int lumpnum, FileReader &file)
 : FTexture(NULL, lumpnum), Pixels(0), Spans(0)
 {
-	WORD header[4];
+	uint16_t header[4];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 8);
 	Width = LittleShort(header[0]);
@@ -155,7 +155,7 @@ void FRottFlatTexture::Unload ()
 //
 //==========================================================================
 
-const BYTE *FRottFlatTexture::GetPixels ()
+const uint8_t *FRottFlatTexture::GetPixels ()
 {
 	if (Pixels == NULL)
 	{
@@ -170,7 +170,7 @@ const BYTE *FRottFlatTexture::GetPixels ()
 //
 //==========================================================================
 
-const BYTE *FRottFlatTexture::GetColumn (unsigned int column, const Span **spans_out)
+const uint8_t *FRottFlatTexture::GetColumn (unsigned int column, const Span **spans_out)
 {
 	if (Pixels == NULL)
 	{
@@ -208,9 +208,9 @@ const BYTE *FRottFlatTexture::GetColumn (unsigned int column, const Span **spans
 void FRottFlatTexture::MakeTexture ()
 {
 	FMemLump lump = Wads.ReadLump (SourceLump);
-	const BYTE* data = ((const BYTE*)lump.GetMem())+8;
+	const uint8_t* data = ((const uint8_t*)lump.GetMem())+8;
 
-	Pixels = new BYTE[Width*Height];
+	Pixels = new uint8_t[Width*Height];
 	memset(Pixels, 0, Width*Height);
 	memcpy(Pixels, data, Width*Height);
 }

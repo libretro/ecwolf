@@ -55,7 +55,7 @@ cloudsky_t cloudSkys[] = {
 	{ 4,     1200, 290, 0 },
 };
 
-byte skyc[65536L];
+uint8_t skyc[65536L];
 
 long cloudx = 0, cloudy = 0;
 cloudsky_t *curSky = NULL;
@@ -100,31 +100,31 @@ void SplitS(unsigned size,unsigned x1,unsigned y1,unsigned x2,unsigned y2)
 if(size==1) return;
 if(!skyc[((x1+size/2)*256+y1)])
 {
-	skyc[((x1+size/2)*256+y1)]=(byte)(((int)skyc[(x1*256+y1)]
+	skyc[((x1+size/2)*256+y1)]=(uint8_t)(((int)skyc[(x1*256+y1)]
 			+(int)skyc[((x2&0xff)*256+y1)])/2)+rand()%(size*2)-size;
 	if(!skyc[((x1+size/2)*256+y1)]) skyc[((x1+size/2)*256+y1)]=1;
 }
 if(!skyc[((x1+size/2)*256+(y2&0xff))])
 {
-	skyc[((x1+size/2)*256+(y2&0xff))]=(byte)(((int)skyc[(x1*256+(y2&0xff))]
+	skyc[((x1+size/2)*256+(y2&0xff))]=(uint8_t)(((int)skyc[(x1*256+(y2&0xff))]
 			+(int)skyc[((x2&0xff)*256+(y2&0xff))])/2)+rand()%(size*2)-size;
 	if(!skyc[((x1+size/2)*256+(y2&0xff))])
 		skyc[((x1+size/2)*256+(y2&0xff))]=1;
 }
 if(!skyc[(x1*256+y1+size/2)])
 {
-	skyc[(x1*256+y1+size/2)]=(byte)(((int)skyc[(x1*256+y1)]
+	skyc[(x1*256+y1+size/2)]=(uint8_t)(((int)skyc[(x1*256+y1)]
 			+(int)skyc[(x1*256+(y2&0xff))])/2)+rand()%(size*2)-size;
 	if(!skyc[(x1*256+y1+size/2)]) skyc[(x1*256+y1+size/2)]=1;
 }
 if(!skyc[((x2&0xff)*256+y1+size/2)])
 {
-	skyc[((x2&0xff)*256+y1+size/2)]=(byte)(((int)skyc[((x2&0xff)*256+y1)]
+	skyc[((x2&0xff)*256+y1+size/2)]=(uint8_t)(((int)skyc[((x2&0xff)*256+y1)]
 			+(int)skyc[((x2&0xff)*256+(y2&0xff))])/2)+rand()%(size*2)-size;
 	if(!skyc[((x2&0xff)*256+y1+size/2)]) skyc[((x2&0xff)*256+y1+size/2)]=1;
 }
 
-skyc[((x1+size/2)*256+y1+size/2)]=(byte)(((int)skyc[(x1*256+y1)]
+skyc[((x1+size/2)*256+y1+size/2)]=(uint8_t)(((int)skyc[(x1*256+y1)]
 		+(int)skyc[((x2&0xff)*256+y1)]+(int)skyc[(x1*256+(y2&0xff))]
 		+(int)skyc[((x2&0xff)*256+(y2&0xff))])/4)+rand()%(size*2)-size;
 
@@ -165,7 +165,7 @@ void InitSky()
 						val += skyc[((j + n - 1) & 0xff) * 256 + ((i + m - 1) & 0xff)];
 					}
 				}
-				skyc[j * 256 + i] = (byte)(val >> 3);
+				skyc[j * 256 + i] = (uint8_t)(val >> 3);
 			}
 		}
 	}
@@ -182,7 +182,7 @@ void InitSky()
 
 	colormap_t *curMap = &colorMaps[curSky->colorMapIndex];
 	int numColors = curMap->numColors;
-	byte colormap[256];
+	uint8_t colormap[256];
 	colormapentry_t *curEntry = curMap->entries;
 	for(int calcedCols = 0; calcedCols < numColors; curEntry++)
 	{
@@ -208,7 +208,7 @@ void InitSky()
 }
 
 // Based on Textured Floor and Ceiling by DarkOne
-void DrawClouds(byte *vbuf, unsigned vbufPitch, int min_wallheight)
+void DrawClouds(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight)
 {
 	// Move clouds
 	fixed moveDist = tics * curSky->speed;

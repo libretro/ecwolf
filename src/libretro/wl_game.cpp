@@ -101,7 +101,7 @@ bool GameLoop (void);
 
 int leftchannel, rightchannel;
 #define ATABLEMAX 15
-const byte righttable[ATABLEMAX][ATABLEMAX * 2] = {
+const uint8_t righttable[ATABLEMAX][ATABLEMAX * 2] = {
 { 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 6, 0, 0, 0, 0, 0, 1, 3, 5, 8, 8, 8, 8, 8, 8, 8, 8},
 { 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 6, 4, 0, 0, 0, 0, 0, 2, 4, 6, 8, 8, 8, 8, 8, 8, 8, 8},
 { 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 4, 1, 0, 0, 0, 1, 2, 4, 6, 8, 8, 8, 8, 8, 8, 8, 8},
@@ -118,7 +118,7 @@ const byte righttable[ATABLEMAX][ATABLEMAX * 2] = {
 { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8},
 { 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8}
 };
-const byte lefttable[ATABLEMAX][ATABLEMAX * 2] = {
+const uint8_t lefttable[ATABLEMAX][ATABLEMAX * 2] = {
 { 8, 8, 8, 8, 8, 8, 8, 8, 5, 3, 1, 0, 0, 0, 0, 0, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
 { 8, 8, 8, 8, 8, 8, 8, 8, 6, 4, 2, 0, 0, 0, 0, 0, 4, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
 { 8, 8, 8, 8, 8, 8, 8, 8, 6, 4, 2, 1, 0, 0, 0, 1, 4, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8},
@@ -331,7 +331,7 @@ void DrawPlayBorderSides(void)
 	}
 	else
 	{
-		byte colors[3] =
+		uint8_t colors[3] =
 		{
 			ColorMatcher.Pick(RPART(gameinfo.Border.topcolor), GPART(gameinfo.Border.topcolor), BPART(gameinfo.Border.topcolor)),
 			ColorMatcher.Pick(RPART(gameinfo.Border.bottomcolor), GPART(gameinfo.Border.bottomcolor), BPART(gameinfo.Border.bottomcolor)),
@@ -758,7 +758,7 @@ bool Died5(wl_state_t *state)
 }
 
 void FizzleColorFinish(wl_state_t *state, int x1, int y1,
-	unsigned width, unsigned height, unsigned frames, byte color)
+	unsigned width, unsigned height, unsigned frames, uint8_t color)
 {
 	unsigned y;
 
@@ -774,7 +774,7 @@ extern unsigned int rndbits_y;
 extern unsigned int rndmask;
 
 bool FizzleColorStep(wl_state_t *state, int x1, int y1,
-	unsigned width, unsigned height, unsigned frames, byte color)
+	unsigned width, unsigned height, unsigned frames, uint8_t color)
 {
 	unsigned pixperframe;
 
@@ -825,9 +825,9 @@ bool FizzleColorStep(wl_state_t *state, int x1, int y1,
 
 bool DeathFizzle(wl_state_t *state) {
 	// Fizzle fade used a slightly darker shade of red.
-	byte fr = RPART(players[0].mo->damagecolor)*2/3;
-	byte fg = GPART(players[0].mo->damagecolor)*2/3;
-	byte fb = BPART(players[0].mo->damagecolor)*2/3;
+	uint8_t fr = RPART(players[0].mo->damagecolor)*2/3;
+	uint8_t fg = GPART(players[0].mo->damagecolor)*2/3;
+	uint8_t fb = BPART(players[0].mo->damagecolor)*2/3;
 	if (!FizzleColorStep(state, viewscreenx,viewscreeny,viewwidth,viewheight,70,ColorMatcher.Pick(fr,fg,fb)))
 		return true;
 

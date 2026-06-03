@@ -30,13 +30,13 @@ static int GetParallaxStartTexture()
 
 #endif
 
-void DrawParallax(byte *vbuf, unsigned vbufPitch)
+void DrawParallax(uint8_t *vbuf, unsigned vbufPitch)
 {
 	int startpage = GetParallaxStartTexture();
 	int midangle = player->angle * (FINEANGLES / ANGLES);
 	int skyheight = viewheight >> 1;
 	int curtex = -1;
-	byte *skytex;
+	uint8_t *skytex;
 
 	startpage += USE_PARALLAX - 1;
 

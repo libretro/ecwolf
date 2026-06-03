@@ -75,8 +75,8 @@ public:
 	bool			bFlippable;
 	bool			bReturning;
 	FSwitchDef		*m_SwitchDef;
-	SDWORD			m_Frame;
-	DWORD			m_Timer;
+	int32_t			m_Frame;
+	uint32_t			m_Timer;
 	fixed_t			m_X, m_Y;	// Location of timer sound
 
 protected:
@@ -219,7 +219,7 @@ bool P_CheckSwitchRange(AActor *user, line_t *line, int sideno)
 
 // Temp function
 static inline ENamedName S_FindSound(FName sound) { return (ENamedName)(int)sound; }
-bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, BYTE special, bool *quest)
+bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, uint8_t special, bool *quest)
 {
 //	int texture;
 	ENamedName sound;
@@ -345,7 +345,7 @@ void DActiveButton::Serialize (FArchive &arc)
 {
 	Super::Serialize (arc);
 
-	BYTE side = m_Side;
+	uint8_t side = m_Side;
 	arc << side;
 	m_Side = static_cast<MapTile::Side> (side);
 

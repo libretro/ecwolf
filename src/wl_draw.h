@@ -19,7 +19,7 @@ extern  fixed finetangent[FINEANGLES/2 + ANG180];
 extern	fixed finesine[FINEANGLES+FINEANGLES/4];
 extern	fixed* finecosine;
 extern  TUniquePtr<int[]> wallheight;
-extern  word horizwall[],vertwall[];
+extern  uint16_t horizwall[],vertwall[];
 extern  int32_t    frameon;
 extern	int r_extralight;
 
@@ -34,8 +34,8 @@ void    ThreeDRefresh (void);
 
 typedef struct
 {
-	word leftpix,rightpix;
-	word dataofs[64];
+	uint16_t leftpix,rightpix;
+	uint16_t dataofs[64];
 // table data after dataofs[rightpix-leftpix+1]
 } t_compshape;
 

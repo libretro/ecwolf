@@ -364,7 +364,7 @@ static bool DrawStartupConsole(FString statusStr)
 	else
 		screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
 
-	word width, height;
+	uint16_t width, height;
 
 	static const char* const engineVersion = GAMENAME " " DOTVERSIONSTR_NOREV;
 	VW_MeasurePropString(ConFont, engineVersion, width, height);
@@ -531,8 +531,8 @@ static void InitGame()
 		DoJukebox();
 
 #ifdef NOTYET
-	vdisp = (byte *) (0xa0000+PAGE1START);
-	vbuf = (byte *) (0xa0000+PAGE2START);
+	vdisp = (uint8_t *) (0xa0000+PAGE1START);
+	vbuf = (uint8_t *) (0xa0000+PAGE2START);
 #endif
 }
 
@@ -704,7 +704,7 @@ static void PG13 (void)
 	if(gameinfo.AdvisoryPic.IsEmpty())
 		return;
 
-	BYTE color = ColorMatcher.Pick(RPART(gameinfo.AdvisoryColor), GPART(gameinfo.AdvisoryColor), BPART(gameinfo.AdvisoryColor));
+	uint8_t color = ColorMatcher.Pick(RPART(gameinfo.AdvisoryColor), GPART(gameinfo.AdvisoryColor), BPART(gameinfo.AdvisoryColor));
 
 	VWB_Clear(color, 0, 0, screenWidth, screenHeight);
 	FTexture *tex = TexMan(gameinfo.AdvisoryPic);

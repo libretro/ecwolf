@@ -1081,7 +1081,7 @@ void Message (const char *string)
 		TOPBRDR = ColorMatcher.Pick(RPART(gameinfo.MessageColors[1]), GPART(gameinfo.MessageColors[1]), BPART(gameinfo.MessageColors[1])),
 		BOTBRDR = ColorMatcher.Pick(RPART(gameinfo.MessageColors[2]), GPART(gameinfo.MessageColors[2]), BPART(gameinfo.MessageColors[2]));
 
-	word width, height;
+	uint16_t width, height;
 
 	FString measureString;
 	measureString.Format("%s_", string);

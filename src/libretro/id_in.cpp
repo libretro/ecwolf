@@ -147,7 +147,7 @@ void IN_Ack (void)
 }
 
 
-bool IN_UserInput(longword delay)
+bool IN_UserInput(uint32_t delay)
 {
     return 0;
 }

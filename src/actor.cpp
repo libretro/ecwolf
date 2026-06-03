@@ -435,11 +435,11 @@ void AActor::Serialize(FArchive &arc)
 	else
 		sprite = arc.ReadSprite();
 
-	BYTE dir = this->dir;
+	uint8_t dir = this->dir;
 	arc << dir;
 	this->dir = static_cast<dirtype>(dir);
 
-	SDWORD xt = x, yt = y;
+	int32_t xt = x, yt = y;
 	arc << flags
 		<< distance
 		<< xt

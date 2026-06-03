@@ -43,38 +43,38 @@
 #pragma pack(1)
 struct PictRect
 {
-	WORD y1, x1, y2, x2;
+	uint16_t y1, x1, y2, x2;
 };
 
 struct ColorTabEntry
 {
-	WORD index;
-	// 16 bpc color, but we're only considered about the high byte.
-	BYTE r, rLo, g, gLo, b, bLo;
+	uint16_t index;
+	// 16 bpc color, but we're only considered about the high uint8_t.
+	uint8_t r, rLo, g, gLo, b, bLo;
 };
 
 struct ColorTab
 {
-	DWORD id;
-	WORD flags;
-	WORD numColors;
+	uint32_t id;
+	uint16_t flags;
+	uint16_t numColors;
 };
 
 struct PixMap
 {
-	WORD pitch;
+	uint16_t pitch;
 	PictRect bounds;
-	WORD version; // Should be 0
-	WORD packing;
-	DWORD packedSize;
+	uint16_t version; // Should be 0
+	uint16_t packing;
+	uint32_t packedSize;
 	fixed hRes, vRes;
-	WORD type;
-	WORD bpp;
-	WORD compCount;
-	WORD compSize;
-	DWORD planePitch;
-	DWORD colorTablePtr;
-	DWORD reserved;
+	uint16_t type;
+	uint16_t bpp;
+	uint16_t compCount;
+	uint16_t compSize;
+	uint32_t planePitch;
+	uint32_t colorTablePtr;
+	uint32_t reserved;
 
 	// Not technically part of a pixmap, but might work for us
 	ColorTab colorTable;
@@ -92,9 +92,9 @@ enum EOpCodes
 class FPictTexture : public FTexture
 {
 public:
-	FPictTexture (int lumpnum, PictRect bounds, BYTE version);
+	FPictTexture (int lumpnum, PictRect bounds, uint8_t version);
 
-	const BYTE *GetColumn (unsigned int column, const Span **spans_out)
+	const uint8_t *GetColumn (unsigned int column, const Span **spans_out)
 	{
 		if (!Pixels)
 			MakeTexture ();
@@ -120,7 +120,7 @@ public:
 		}
 		return Pixels.Get() + column*Height;
 	}
-	const BYTE *GetPixels ()
+	const uint8_t *GetPixels ()
 	{
 		if(!Pixels)
 			MakeTexture();
@@ -129,14 +129,14 @@ public:
 	void Unload () { Pixels.Reset(); }
 
 protected:
-	TUniquePtr<BYTE[]> Pixels;
+	TUniquePtr<uint8_t[]> Pixels;
 	Span **Spans;
-	BYTE version;
+	uint8_t version;
 
 	virtual void MakeTexture ();
 };
 
-FPictTexture::FPictTexture(int lumpnum, PictRect bounds, BYTE version)
+FPictTexture::FPictTexture(int lumpnum, PictRect bounds, uint8_t version)
 : FTexture(NULL, lumpnum), Spans(NULL), version(version)
 {
 	bounds.y1 = BigShort(bounds.y1);
@@ -153,11 +153,11 @@ FPictTexture::FPictTexture(int lumpnum, PictRect bounds, BYTE version)
 
 void FPictTexture::MakeTexture()
 {
-	BYTE remap[256] = {};
+	uint8_t remap[256] = {};
 
 	FMemLump lump = Wads.ReadLump(SourceLump);
-	const BYTE* data = (const BYTE*)lump.GetMem();
-	const BYTE* end = data+lump.GetSize();
+	const uint8_t* data = (const uint8_t*)lump.GetMem();
+	const uint8_t* end = data+lump.GetSize();
 	switch(version) // skip header
 	{
 		default:
@@ -176,12 +176,12 @@ void FPictTexture::MakeTexture()
 
 	// We'll read row major to make things easy and then flip to column major
 	// while remapping to our palette.
-	TUniquePtr<BYTE[]> rowMajor(new BYTE[Width*Height]);
-	Pixels.Reset(new BYTE[Width*Height]);
+	TUniquePtr<uint8_t[]> rowMajor(new uint8_t[Width*Height]);
+	Pixels.Reset(new uint8_t[Width*Height]);
 
 	while(data < end)
 	{
-		WORD opcode;
+		uint16_t opcode;
 		if(version > 1)
 		{
 			opcode = ReadBigShort(data);
@@ -201,7 +201,7 @@ void FPictTexture::MakeTexture()
 			break;
 		case OP_Clip: // Do we care about the clipping rectangle?
 		{
-			WORD regionSize = ReadBigShort(data);
+			uint16_t regionSize = ReadBigShort(data);
 			if(regionSize != 0xA)
 			{
 				// Region is in an undocumented format if it's not rectangular.
@@ -225,10 +225,10 @@ void FPictTexture::MakeTexture()
 			}
 
 			// Convert 48-bit palette to 24-bit for our remapping code
-			DWORD rgb[256] = {};
+			uint32_t rgb[256] = {};
 			for(unsigned int i = 0;i < pm.colorTable.numColors;++i)
 			{
-				WORD index = BigShort(colors[i].index);
+				uint16_t index = BigShort(colors[i].index);
 				if(index > 255)
 					Printf("Color index %d for entry %d out of range in palette.\n", index, i);
 				else
@@ -241,8 +241,8 @@ void FPictTexture::MakeTexture()
 			// need to do something  with them.
 				+ 2*sizeof(PictRect) + 2;
 
-			BYTE *dest = rowMajor.Get();
-			BYTE *start = dest;
+			uint8_t *dest = rowMajor.Get();
+			uint8_t *start = dest;
 			for(unsigned int i = 0;i < Height;++i, dest = (start += Width))
 			{
 				// Get size of compressed row
@@ -257,10 +257,10 @@ void FPictTexture::MakeTexture()
 
 				while(rowSize > 0)
 				{
-					BYTE code = *data++;
+					uint8_t code = *data++;
 					if(code & 0x80) // Run of single color
 					{
-						BYTE color = *data++;
+						uint8_t color = *data++;
 						memset(dest, color, 257-code);
 						dest += 257-code;
 						rowSize -= 2;
@@ -286,7 +286,7 @@ FinishTexture:
 
 FTexture *PictTexture_TryCreate(FileReader & file, int lumpnum)
 {
-	BYTE header[0x28];
+	uint8_t header[0x28];
 	file.Seek(0, SEEK_SET);
 	long bytesRead = file.Read(header, 0x28);
 	if(bytesRead < 0xD) // Version 1 files with single end of file instruction
@@ -294,7 +294,7 @@ FTexture *PictTexture_TryCreate(FileReader & file, int lumpnum)
 
 	// At this point we can determine if we have a version 2 or version 2
 	// extended format.
-	BYTE version = 2;
+	uint8_t version = 2;
 	// Technically version 2 (extended) files don't need to have the size here
 	// but it looks like they put the lower bytes of the size anyway.
 	if(ReadBigShort(header) != (Wads.LumpLength(lumpnum)&0xFFFF))

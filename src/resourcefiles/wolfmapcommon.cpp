@@ -39,12 +39,12 @@
 
 void FMapLump::ExpandCarmack(const unsigned char* in, unsigned char* out)
 {
-	const unsigned char* const end = out + ReadLittleShort((const BYTE*)in);
+	const unsigned char* const end = out + ReadLittleShort((const uint8_t*)in);
 	const unsigned char* const start = out;
 	in += 2;
 
 	const unsigned char* copy;
-	BYTE length;
+	uint8_t length;
 	while(out < end)
 	{
 		length = *in++;
@@ -62,7 +62,7 @@ void FMapLump::ExpandCarmack(const unsigned char* in, unsigned char* out)
 		}
 		else if(*in == CARMACK_FARTAG)
 		{
-			copy = start+(ReadLittleShort((const BYTE*)(in+1))*2);
+			copy = start+(ReadLittleShort((const uint8_t*)(in+1))*2);
 			in += 3;
 		}
 		else
@@ -81,25 +81,25 @@ void FMapLump::ExpandCarmack(const unsigned char* in, unsigned char* out)
 	}
 }
 
-void FMapLump::ExpandRLEW(const unsigned char* in, unsigned char* out, const DWORD length, const WORD rlewTag)
+void FMapLump::ExpandRLEW(const unsigned char* in, unsigned char* out, const uint32_t length, const uint16_t rlewTag)
 {
 	const unsigned char* const end = out+length;
 
 	while(out < end)
 	{
-		if(ReadLittleShort((const BYTE*)in) != rlewTag)
+		if(ReadLittleShort((const uint8_t*)in) != rlewTag)
 		{
 			*out++ = *in++;
 			*out++ = *in++;
 		}
 		else
 		{
-			WORD count = ReadLittleShort((const BYTE*)(in+2));
-			WORD input = ReadLittleShort((const BYTE*)(in+4));
+			uint16_t count = ReadLittleShort((const uint8_t*)(in+2));
+			uint16_t input = ReadLittleShort((const uint8_t*)(in+4));
 			in += 6;
 			while(count-- > 0)
 			{
-				WriteLittleShort((BYTE*)out, input);
+				WriteLittleShort((uint8_t*)out, input);
 				out += 2;
 			}
 		}
@@ -115,10 +115,10 @@ int FMapLump::FillCache()
 
 	Cache = new char[LumpSize];
 	strcpy(Cache, "WDC3.1");
-	WriteLittleShort((BYTE*)&Cache[10], rtlMap ? 4 : 3);
-	WriteLittleShort((BYTE*)&Cache[12], 16);
-	WriteLittleShort((BYTE*)&Cache[HEADERSIZE-4], Header.Width);
-	WriteLittleShort((BYTE*)&Cache[HEADERSIZE-2], Header.Height);
+	WriteLittleShort((uint8_t*)&Cache[10], rtlMap ? 4 : 3);
+	WriteLittleShort((uint8_t*)&Cache[12], 16);
+	WriteLittleShort((uint8_t*)&Cache[HEADERSIZE-4], Header.Width);
+	WriteLittleShort((uint8_t*)&Cache[HEADERSIZE-2], Header.Height);
 	memcpy(&Cache[14], Header.Name, 16);
 
 	// Read map data and expand it
@@ -143,9 +143,9 @@ int FMapLump::FillCache()
 
 			if(carmackCompressed)
 			{
-				unsigned char* tempOut = new unsigned char[ReadLittleShort((BYTE*)input)];
+				unsigned char* tempOut = new unsigned char[ReadLittleShort((uint8_t*)input)];
 				ExpandCarmack(input, tempOut);
-				ExpandRLEW(tempOut+2, output, ReadLittleShort((const BYTE*)tempOut), rlewTag);
+				ExpandRLEW(tempOut+2, output, ReadLittleShort((const uint8_t*)tempOut), rlewTag);
 				delete[] tempOut;
 			}
 			else
@@ -153,7 +153,7 @@ int FMapLump::FillCache()
 				if(rtlMap)
 					ExpandRLEW(input, output, PlaneSize, rlewTag);
 				else
-					ExpandRLEW(input+2, output, ReadLittleShort((const BYTE*)input), rlewTag);
+					ExpandRLEW(input+2, output, ReadLittleShort((const uint8_t*)input), rlewTag);
 			}
 
 			delete[] input;
@@ -166,10 +166,10 @@ int FMapLump::FillCache()
 		// We do this after the things plane has been read
 		if(rtlMap && i == 1)
 		{
-			const WORD floorTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE))-0xB4;
-			const WORD ceilingTex = ReadLittleShort((const BYTE*)(Cache+HEADERSIZE+2))-0xC6;
-			const WORD fill = (floorTex&0xFF)|((ceilingTex&0xFF)<<8);
-			WORD *out = reinterpret_cast<WORD*>(output);
+			const uint16_t floorTex = ReadLittleShort((const uint8_t*)(Cache+HEADERSIZE))-0xB4;
+			const uint16_t ceilingTex = ReadLittleShort((const uint8_t*)(Cache+HEADERSIZE+2))-0xC6;
+			const uint16_t fill = (floorTex&0xFF)|((ceilingTex&0xFF)<<8);
+			uint16_t *out = reinterpret_cast<uint16_t*>(output);
 			for(unsigned int j = 0;j < PlaneSize/2;++j)
 				*out++ = fill;
 			output += PlaneSize;

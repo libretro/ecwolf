@@ -55,12 +55,12 @@ public:
 	FWolfShapeTexture (int lumpnum, FileReader &file, bool mac=false);
 	~FWolfShapeTexture ();
 
-	const BYTE *GetColumn (unsigned int column, const Span **spans_out);
-	const BYTE *GetPixels ();
+	const uint8_t *GetColumn (unsigned int column, const Span **spans_out);
+	const uint8_t *GetPixels ();
 	void Unload ();
 
 protected:
-	BYTE *Pixels;
+	uint8_t *Pixels;
 	Span **Spans;
 	int TopCrop;
 
@@ -88,18 +88,18 @@ static bool CheckIfWolfShape(FileReader &file)
 {
 	if(file.GetLength() < 4) return false; // No header
 	
-	WORD header[2];
+	uint16_t header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 
-	WORD Left = LittleShort(header[0]);
-	WORD Right = LittleShort(header[1]);
+	uint16_t Left = LittleShort(header[0]);
+	uint16_t Right = LittleShort(header[1]);
 
-	WORD Width = Right-Left;
+	uint16_t Width = Right-Left;
 	if(Width <= 0 || Width > 256 || file.GetLength() < 4+Width*2)
 		return false;
 
-	WORD offsets[256];
+	uint16_t offsets[256];
 	file.Read(offsets, Width*2);
 	for(int i = 0;i < Width;i++)
 	{
@@ -113,7 +113,7 @@ static bool CheckIfMacShape(FileReader &file)
 {
 	if(file.GetLength() < 2) return false; // No header
 	
-	WORD width;
+	uint16_t width;
 	file.Seek(0, SEEK_SET);
 	file >> width;
 	width = BigShort(width);
@@ -127,7 +127,7 @@ static bool CheckIfMacShape(FileReader &file)
 		file.GetLength() > 776*width + 2)
 		return false;
 
-	WORD runOfs[128];
+	uint16_t runOfs[128];
 	file.Read(runOfs, width*2);
 	for(unsigned int i = 0;i < width;++i)
 	{
@@ -177,7 +177,7 @@ FWolfShapeTexture::FWolfShapeTexture(int lumpnum, FileReader &file, bool mac)
 void FWolfShapeTexture::Init(FileReader &file)
 {
 	// left, right, offsets...
-	WORD header[2];
+	uint16_t header[2];
 	file.Seek(0, SEEK_SET);
 	file.Read(header, 4);
 	header[0] = LittleShort(header[0]);
@@ -213,10 +213,10 @@ void FWolfShapeTexture::Init(FileReader &file)
 	int minStart = 64;
 	int maxEnd = 0;
 	FMemLump lump = Wads.ReadLump (SourceLump);
-	const BYTE* data = (const BYTE*)lump.GetMem();
+	const uint8_t* data = (const uint8_t*)lump.GetMem();
 	for(int x = 0;x < Width;++x)
 	{
-		const BYTE* column = data+ReadLittleShort(&data[4+x*2]);
+		const uint8_t* column = data+ReadLittleShort(&data[4+x*2]);
 		int start, end;
 		while((end = ReadLittleShort(column)) != 0)
 		{
@@ -240,7 +240,7 @@ void FWolfShapeTexture::Init(FileReader &file)
 void FWolfShapeTexture::InitMac(FileReader &file)
 {
 	// Width, which implies left offset.
-	WORD width;
+	uint16_t width;
 	file.Seek(0, SEEK_SET);
 	file >> width;
 	Width = BigShort(width);
@@ -254,10 +254,10 @@ void FWolfShapeTexture::InitMac(FileReader &file)
 	int minStart = 128;
 	int maxEnd = 0;
 	FMemLump lump = Wads.ReadLump (SourceLump);
-	const BYTE* data = (const BYTE*)lump.GetMem();
+	const uint8_t* data = (const uint8_t*)lump.GetMem();
 	for(int x = 0;x < Width;++x)
 	{
-		const BYTE* column = data+ReadBigShort(&data[2+x*2]);
+		const uint8_t* column = data+ReadBigShort(&data[2+x*2]);
 		int start, end;
 		while((start = ReadBigShort(column)) != 0xFFFF)
 		{
@@ -315,7 +315,7 @@ void FWolfShapeTexture::Unload ()
 //
 //==========================================================================
 
-const BYTE *FWolfShapeTexture::GetPixels ()
+const uint8_t *FWolfShapeTexture::GetPixels ()
 {
 	if (Pixels == NULL)
 	{
@@ -330,7 +330,7 @@ const BYTE *FWolfShapeTexture::GetPixels ()
 //
 //==========================================================================
 
-const BYTE *FWolfShapeTexture::GetColumn (unsigned int column, const Span **spans_out)
+const uint8_t *FWolfShapeTexture::GetColumn (unsigned int column, const Span **spans_out)
 {
 	if (Pixels == NULL)
 	{
@@ -372,20 +372,20 @@ const BYTE *FWolfShapeTexture::GetColumn (unsigned int column, const Span **span
 void FWolfShapeTexture::MakeTexture ()
 {
 	FMemLump lump = Wads.ReadLump (SourceLump);
-	const BYTE* data = (const BYTE*)lump.GetMem();
+	const uint8_t* data = (const uint8_t*)lump.GetMem();
 
-	Pixels = new BYTE[Width*Height];
+	Pixels = new uint8_t[Width*Height];
 	memset(Pixels, 0, Width*Height);
 
 	for(int x = 0;x < Width;x++)
 	{
-		BYTE* out = Pixels+(x*Height);
-		const BYTE* column = data+ReadLittleShort(&data[4+x*2]);
+		uint8_t* out = Pixels+(x*Height);
+		const uint8_t* column = data+ReadLittleShort(&data[4+x*2]);
 		int start, end;
 		while((end = ReadLittleShort(column)) != 0)
 		{
 			end = (end>>1) - TopCrop;
-			const BYTE* in = data+int16_t(ReadLittleShort(column+2))+TopCrop;
+			const uint8_t* in = data+int16_t(ReadLittleShort(column+2))+TopCrop;
 			start = (ReadLittleShort(column+4)>>1) - TopCrop;
 			column += 6;
 			for(int y = start;y < end;y++)
@@ -397,19 +397,19 @@ void FWolfShapeTexture::MakeTexture ()
 void FMacShapeTexture::MakeTexture ()
 {
 	FMemLump lump = Wads.ReadLump (SourceLump);
-	const BYTE* data = (const BYTE*)lump.GetMem();
+	const uint8_t* data = (const uint8_t*)lump.GetMem();
 
-	Pixels = new BYTE[Width*Height];
+	Pixels = new uint8_t[Width*Height];
 	memset(Pixels, 0, Width*Height);
 
 	for(int x = 0;x < Width;x++)
 	{
-		BYTE* out = Pixels+(x*Height);
-		const BYTE* column = data+ReadBigShort(&data[2+x*2]);
+		uint8_t* out = Pixels+(x*Height);
+		const uint8_t* column = data+ReadBigShort(&data[2+x*2]);
 		int start, end;
 		while((start = ReadBigShort(column)) != 0xFFFF)
 		{
-			const BYTE* in = data+int16_t(ReadBigShort(column+4))+TopCrop;
+			const uint8_t* in = data+int16_t(ReadBigShort(column+4))+TopCrop;
 			start = (start>>1) - TopCrop;
 			end = (ReadBigShort(column+2)>>1) - TopCrop;
 			column += 6;

@@ -48,7 +48,7 @@ enum SpecialSprites
 bool R_CheckSpriteValid(unsigned int spr);
 class FTexture *R_GetAMSprite(AActor *actor, angle_t rotangle, bool &flip);
 unsigned int R_GetSprite(const char* spr);
-void R_GetSpriteHitlist(BYTE* hitlist);
+void R_GetSpriteHitlist(uint8_t* hitlist);
 void R_InitSprites();
 void R_LoadSprite(const FString &name);
 

@@ -39,57 +39,57 @@
 
 union _xs_doubleints
 {
-	real64 val;
-	uint32 ival[2];
+	double val;
+	uint32_t ival[2];
 };
 
 #if 0
-#define _xs_doublecopysgn(a,b)      ((int32*)&a)[_xs_iexp_]&=~(((int32*)&b)[_xs_iexp_]&0x80000000)
-#define _xs_doubleisnegative(a)     ((((int32*)&a)[_xs_iexp_])|0x80000000)
+#define _xs_doublecopysgn(a,b)      ((int32_t*)&a)[_xs_iexp_]&=~(((int32_t*)&b)[_xs_iexp_]&0x80000000)
+#define _xs_doubleisnegative(a)     ((((int32_t*)&a)[_xs_iexp_])|0x80000000)
 #endif
 
 // ====================================================================================================================
 //  Constants
 // ====================================================================================================================
-const real64 _xs_doublemagic			= real64 (6755399441055744.0); 	    //2^52 * 1.5,  uses limited precisicion to floor
-const real64 _xs_doublemagicdelta      	= (1.5e-8);                         //almost .5f = .5f + 1e^(number of exp bit)
-const real64 _xs_doublemagicroundeps	= (.5f-_xs_doublemagicdelta);       //almost .5f = .5f - 1e^(number of exp bit)
+const double _xs_doublemagic			= double (6755399441055744.0); 	    //2^52 * 1.5,  uses limited precisicion to floor
+const double _xs_doublemagicdelta      	= (1.5e-8);                         //almost .5f = .5f + 1e^(number of exp bit)
+const double _xs_doublemagicroundeps	= (.5f-_xs_doublemagicdelta);       //almost .5f = .5f - 1e^(number of exp bit)
 
 
 // ====================================================================================================================
 //  Prototypes
 // ====================================================================================================================
-static int32 xs_CRoundToInt      (real64 val, real64 dmr =  _xs_doublemagic);
-static int32 xs_ToInt            (real64 val, real64 dme = -_xs_doublemagicroundeps);
-static int32 xs_FloorToInt       (real64 val, real64 dme =  _xs_doublemagicroundeps);
-static int32 xs_CeilToInt        (real64 val, real64 dme =  _xs_doublemagicroundeps);
-static int32 xs_RoundToInt       (real64 val);
+static int32_t xs_CRoundToInt      (double val, double dmr =  _xs_doublemagic);
+static int32_t xs_ToInt            (double val, double dme = -_xs_doublemagicroundeps);
+static int32_t xs_FloorToInt       (double val, double dme =  _xs_doublemagicroundeps);
+static int32_t xs_CeilToInt        (double val, double dme =  _xs_doublemagicroundeps);
+static int32_t xs_RoundToInt       (double val);
 
-//int32 versions
-finline static int32 xs_CRoundToInt      (int32 val)   {return val;}
-finline static int32 xs_ToInt            (int32 val)   {return val;}
+//int32_t versions
+finline static int32_t xs_CRoundToInt      (int32_t val)   {return val;}
+finline static int32_t xs_ToInt            (int32_t val)   {return val;}
 
 
 
 // ====================================================================================================================
 //  Fix Class
 // ====================================================================================================================
-template <int32 N> class xs_Fix
+template <int32_t N> class xs_Fix
 {
 public:
-    typedef int32 Fix;
+    typedef int32_t Fix;
 
     // ====================================================================================================================
     //  Basic Conversion from Numbers
     // ====================================================================================================================
-    finline static Fix       ToFix       (int32 val)    {return val<<N;}
-    finline static Fix       ToFix       (real64 val)   {return xs_ConvertToFixed(val);}
+    finline static Fix       ToFix       (int32_t val)    {return val<<N;}
+    finline static Fix       ToFix       (double val)   {return xs_ConvertToFixed(val);}
 
     // ====================================================================================================================
     //  Basic Conversion to Numbers
     // ====================================================================================================================
-    finline static real64    ToReal      (Fix f)        {return real64(f)/real64(1<<N);}
-    finline static int32     ToInt       (Fix f)        {return f>>N;}
+    finline static double    ToReal      (Fix f)        {return double(f)/double(1<<N);}
+    finline static int32_t     ToInt       (Fix f)        {return f>>N;}
 
 
 
@@ -97,7 +97,7 @@ protected:
     // ====================================================================================================================
     // Helper function - mainly to preserve _xs_DEFAULT_CONVERSION
     // ====================================================================================================================
-    finline static int32 xs_ConvertToFixed (real64 val)
+    finline static int32_t xs_ConvertToFixed (double val)
     {
     #if _xs_DEFAULT_CONVERSION==0
         return xs_CRoundToInt(val, _xs_doublemagic/(1<<N));
@@ -116,20 +116,20 @@ protected:
 //  Inline implementation
 // ====================================================================================================================
 // ====================================================================================================================
-finline static int32 xs_CRoundToInt(real64 val, real64 dmr)
+finline static int32_t xs_CRoundToInt(double val, double dmr)
 {
 #if _xs_DEFAULT_CONVERSION==0
 	_xs_doubleints uval;
 	uval.val = val + dmr;
 	return uval.ival[_xs_iman_];
 #else
-    return int32(floor(val+.5));
+    return int32_t(floor(val+.5));
 #endif
 }
 
 
 // ====================================================================================================================
-finline static int32 xs_ToInt(real64 val, real64 dme)
+finline static int32_t xs_ToInt(double val, double dme)
 {
     /* unused - something else I tried...
             _xs_doublecopysgn(dme,val);
@@ -143,20 +143,20 @@ finline static int32 xs_ToInt(real64 val, real64 dme)
 	// fastest C-style float->int conversion, but unfortunately,
 	// checking for SSE support every time you need to do a
 	// conversion completely negates its performance advantage.
-	return int32(val);
+	return int32_t(val);
 #else
 #if _xs_DEFAULT_CONVERSION==0
 	return (val<0) ?   xs_CRoundToInt(val-dme) : 
 					   xs_CRoundToInt(val+dme);
 #else
-    return int32(val);
+    return int32_t(val);
 #endif
 #endif
 }
 
 
 // ====================================================================================================================
-finline static int32 xs_FloorToInt(real64 val, real64 dme)
+finline static int32_t xs_FloorToInt(double val, double dme)
 {
 #if _xs_DEFAULT_CONVERSION==0
     return xs_CRoundToInt (val - dme);
@@ -167,7 +167,7 @@ finline static int32 xs_FloorToInt(real64 val, real64 dme)
 
 
 // ====================================================================================================================
-finline static int32 xs_CeilToInt(real64 val, real64 dme)
+finline static int32_t xs_CeilToInt(double val, double dme)
 {
 #if _xs_DEFAULT_CONVERSION==0
     return xs_CRoundToInt (val + dme);
@@ -178,7 +178,7 @@ finline static int32 xs_CeilToInt(real64 val, real64 dme)
 
 
 // ====================================================================================================================
-finline static int32 xs_RoundToInt(real64 val)
+finline static int32_t xs_RoundToInt(double val)
 {
 #if _xs_DEFAULT_CONVERSION==0
 	// Yes, it is important that two fadds be generated, so you cannot override the dmr
@@ -197,24 +197,24 @@ finline static int32 xs_RoundToInt(real64 val)
 //  Unsigned variants
 // ====================================================================================================================
 // ====================================================================================================================
-finline static uint32 xs_CRoundToUInt(real64 val)
+finline static uint32_t xs_CRoundToUInt(double val)
 {
-	return (uint32)xs_CRoundToInt(val);
+	return (uint32_t)xs_CRoundToInt(val);
 }
 
-finline static uint32 xs_FloorToUInt(real64 val)
+finline static uint32_t xs_FloorToUInt(double val)
 {
-	return (uint32)xs_FloorToInt(val);
+	return (uint32_t)xs_FloorToInt(val);
 }
 
-finline static uint32 xs_CeilToUInt(real64 val)
+finline static uint32_t xs_CeilToUInt(double val)
 {
-	return (uint32)xs_CeilToInt(val);
+	return (uint32_t)xs_CeilToInt(val);
 }
 
-finline static uint32 xs_RoundToUInt(real64 val)
+finline static uint32_t xs_RoundToUInt(double val)
 {
-	return (uint32)xs_RoundToInt(val);
+	return (uint32_t)xs_RoundToInt(val);
 }
 
 

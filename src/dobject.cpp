@@ -316,7 +316,7 @@ size_t DObject::PropagateMark()
 		}
 		while (*offsets != ~(size_t)0)
 		{
-			GC::Mark((DObject **)((BYTE *)this + *offsets));
+			GC::Mark((DObject **)((uint8_t *)this + *offsets));
 			offsets++;
 		}
 		return info->GetSize();
@@ -336,9 +336,9 @@ size_t DObject::PointerSubstitution (DObject *old, DObject *notOld)
 	}
 	while (*offsets != ~(size_t)0)
 	{
-		if (*(DObject **)((BYTE *)this + *offsets) == old)
+		if (*(DObject **)((uint8_t *)this + *offsets) == old)
 		{
-			*(DObject **)((BYTE *)this + *offsets) = notOld;
+			*(DObject **)((uint8_t *)this + *offsets) = notOld;
 			changed++;
 		}
 		offsets++;
@@ -408,7 +408,7 @@ void DObject::SerializeUserVars(FArchive &arc)
 #if 0
 	PSymbolTable *symt;
 	FName varname;
-	DWORD count, j;
+	uint32_t count, j;
 	int *varloc = NULL;
 
 	symt = &GetClass()->Symbols;
@@ -427,7 +427,7 @@ void DObject::SerializeUserVars(FArchive &arc)
 					if (var->bUserVar)
 					{
 						count = var->ValueType.Type == VAL_Array ? var->ValueType.size : 1;
-						varloc = (int *)(reinterpret_cast<BYTE *>(this) + var->offset);
+						varloc = (int *)(reinterpret_cast<uint8_t *>(this) + var->offset);
 
 						arc << var->SymbolName;
 						arc.WriteCount(count);
@@ -450,7 +450,7 @@ void DObject::SerializeUserVars(FArchive &arc)
 		while (varname != NAME_None)
 		{
 			PSymbol *sym = symt->FindSymbol(varname, true);
-			DWORD wanted = 0;
+			uint32_t wanted = 0;
 
 			if (sym != NULL && sym->SymbolType == SYM_Variable)
 			{
@@ -459,7 +459,7 @@ void DObject::SerializeUserVars(FArchive &arc)
 				if (var->bUserVar)
 				{
 					wanted = var->ValueType.Type == VAL_Array ? var->ValueType.size : 1;
-					varloc = (int *)(reinterpret_cast<BYTE *>(this) + var->offset);
+					varloc = (int *)(reinterpret_cast<uint8_t *>(this) + var->offset);
 				}
 			}
 			count = arc.ReadCount();

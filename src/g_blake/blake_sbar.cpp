@@ -156,7 +156,7 @@ void BlakeStatusBar::DrawStatusBar()
 	if(viewsize < 20)
 	{
 		// Draw outset border
-		static byte colors[3] =
+		static uint8_t colors[3] =
 		{
 			ColorMatcher.Pick(RPART(gameinfo.Border.topcolor), GPART(gameinfo.Border.topcolor), BPART(gameinfo.Border.topcolor)),
 			ColorMatcher.Pick(RPART(gameinfo.Border.bottomcolor), GPART(gameinfo.Border.bottomcolor), BPART(gameinfo.Border.bottomcolor)),
@@ -270,7 +270,7 @@ void BlakeStatusBar::DrawStatusBar()
 
 void BlakeStatusBar::DrawString(FFont *font, const char* string, double x, double y, bool shadow, EColorRange color, bool center) const
 {
-	word strWidth, strHeight;
+	uint16_t strWidth, strHeight;
 	VW_MeasurePropString(font, string, strWidth, strHeight);
 
 	if(center)

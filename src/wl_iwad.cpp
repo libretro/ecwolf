@@ -257,7 +257,7 @@ struct BaseFile
 {
 	FString	extension;
 	FString	filename[BASEFILES];
-	BYTE	isValid;
+	uint8_t	isValid;
 };
 /* Steam ships Spear of Destiny in the mission pack 3 state, so we need to go
  * and correct steam installs.

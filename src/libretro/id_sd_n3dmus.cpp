@@ -14,7 +14,7 @@
 
 typedef struct
 {
-	byte	mChar,cChar,
+	uint8_t	mChar,cChar,
 		mScale,cScale,
 		mAttack,cAttack,
 		mSustain,cSustain,
@@ -26,16 +26,16 @@ static const int synthesisRate = 44100;
 static const int samplesPerMusicTick = synthesisRate / MUSIC_RATE;
 
 // This table maps channel numbers to carrier and modulator op cells
-static byte  carriers[9] =  {3, 4, 5,11,12,13,19,20,21},
+static uint8_t  carriers[9] =  {3, 4, 5,11,12,13,19,20,21},
             modifiers[9] = { 0, 1, 2, 8, 9,10,16,17,18},
 // This table maps percussive voice numbers to op cells
             pcarriers[5] = {19,0xff,0xff,0xff,0xff},
             pmodifiers[5] = {16,17,18,20,21};
 
-longword
+uint32_t
 Mix_Chunk_N3D::MIDI_VarLength(void)
 {
-	longword value = 0;
+	uint32_t value = 0;
 	while (*midiData & 0x80)
 		value = (value << 7) + (*midiData++ & 0x7F);
 	value = (value << 7) + *midiData++;
@@ -44,9 +44,9 @@ Mix_Chunk_N3D::MIDI_VarLength(void)
 
 
 
-static word	NoteTable[12] = {0x157,0x16b,0x181,0x198,0x1b0,0x1ca,0x1e5,0x202,0x220,0x241,0x263,0x287};
+static uint16_t	NoteTable[12] = {0x157,0x16b,0x181,0x198,0x1b0,0x1ca,0x1e5,0x202,0x220,0x241,0x263,0x287};
 
-static byte	drums = 0;
+static uint8_t	drums = 0;
 
 static inst_t	instrument[14] = {
 	{0x21, 0x31, 0x4f, 0x00, 0xf2, 0xd2, 0x52, 0x73, 0x00, 0x00, 0x06},
@@ -77,7 +77,7 @@ extern const int oplChip;
 void
 Mix_Chunk_N3D::MIDI_SkipMetaEvent(void)
 {
-	longword length = MIDI_VarLength();
+	uint32_t length = MIDI_VarLength();
 	midiData += length;
 }
 
@@ -85,7 +85,7 @@ void
 Mix_Chunk_N3D::MIDI_NoteOff(int channel, int note, int velocity)
 {
 	unsigned	fnumber;
-	byte	octave;
+	uint8_t	octave;
 	if (channel == 9)
 	{
 		switch (note)
@@ -115,7 +115,7 @@ Mix_Chunk_N3D::MIDI_NoteOff(int channel, int note, int velocity)
 }
 
 void
-Mix_Chunk_N3D::MIDI_NoteOn(int channel, byte note, byte velocity)
+Mix_Chunk_N3D::MIDI_NoteOn(int channel, uint8_t note, uint8_t velocity)
 {
 	unsigned	fnumber;
 	int	octave;
@@ -161,14 +161,14 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 	// S3DNA RESTORATION - While an inst_t pointer can be used with direct
 	// access to all fields, based on generated machine code it looks like
 	// this wasn't the way the code was written
-	byte	*inst;
+	uint8_t	*inst;
 	if (channel == 9)
 	{
 		int	note;
 		unsigned	fnumber;
 		int	octave;
 
-		inst = (byte *)&instrument[9];
+		inst = (uint8_t *)&instrument[9];
 		alOutMusic(modifiers[6]+alChar, *inst++);
 		alOutMusic(carriers[6]+alChar, *inst++);
 		alOutMusic(modifiers[6]+alScale, *inst++);
@@ -198,7 +198,7 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 		alOutMusic(alFreqL+8,fnumber&0xFF);
 		alOutMusic(alFreqH+8,octave+((fnumber>>8)&3));
 
-		inst = (byte *)&instrument[10];
+		inst = (uint8_t *)&instrument[10];
 		alOutMusic(0x31,*inst); inst += 2;
 		alOutMusic(0x51,*inst); inst += 2;
 		alOutMusic(0x71,*inst); inst += 2;
@@ -207,7 +207,7 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 		alOutMusic(0xF1,*inst);
 		alOutMusic(0xC7,0);
 
-		inst = (byte *)&instrument[12];
+		inst = (uint8_t *)&instrument[12];
 		alOutMusic(0x32,*inst); inst += 2;
 		alOutMusic(0x52,*inst); inst += 2;
 		alOutMusic(0x72,*inst); inst += 2;
@@ -215,7 +215,7 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 
 		alOutMusic(0xF2,*inst);
 
-		inst = (byte *)&instrument[11];
+		inst = (uint8_t *)&instrument[11];
 		alOutMusic(0x34,*inst); inst += 2;
 		alOutMusic(0x54,*inst); inst += 2;
 		alOutMusic(0x74,*inst); inst += 2;
@@ -224,7 +224,7 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 		alOutMusic(0xF4,*inst);
 		alOutMusic(0xC8,0);
 
-		inst = (byte *)&instrument[10];
+		inst = (uint8_t *)&instrument[10];
 		alOutMusic(0x35,*inst); inst += 2;
 		alOutMusic(0x55,*inst); inst += 2;
 		alOutMusic(0x75,*inst); inst += 2;
@@ -240,40 +240,40 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 		switch (id & 0xF8)
 		{
 		case 0:
-			inst = (byte *)&instrument[0];
+			inst = (uint8_t *)&instrument[0];
 			break;
 		case 8:
-			inst = (byte *)&instrument[8];
+			inst = (uint8_t *)&instrument[8];
 			break;
 		case 16:
-			inst = (byte *)&instrument[1];
+			inst = (uint8_t *)&instrument[1];
 			break;
 		case 24:
-			inst = (byte *)&instrument[0];
+			inst = (uint8_t *)&instrument[0];
 			break;
 		case 32:
-			inst = (byte *)&instrument[2];
+			inst = (uint8_t *)&instrument[2];
 			break;
 		case 40:
 		case 48:
-			inst = (byte *)&instrument[0];
+			inst = (uint8_t *)&instrument[0];
 			break;
 		case 56:
 		case 64:
-			inst = (byte *)&instrument[6];
+			inst = (uint8_t *)&instrument[6];
 			break;
 		case 72:
-			inst = (byte *)&instrument[7];
+			inst = (uint8_t *)&instrument[7];
 			break;
 		case 80:
 		case 88:
 		case 96:
-			inst = (byte *)&instrument[0];
+			inst = (uint8_t *)&instrument[0];
 			break;
 		case 104:
 		case 112:
 		case 120:
-			inst = (byte *)&instrument[8];
+			inst = (uint8_t *)&instrument[8];
 			break;
 		default:
 			midiError = -8;
@@ -296,9 +296,9 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 }
 
 void
-Mix_Chunk_N3D::MIDI_ProcessEvent(byte event)
+Mix_Chunk_N3D::MIDI_ProcessEvent(uint8_t event)
 {
-	byte	note,velocity,id,value;
+	uint8_t	note,velocity,id,value;
 	switch (event&0xF0)
 	{
 	case 0x80:
@@ -333,9 +333,9 @@ Mix_Chunk_N3D::MIDI_ProcessEvent(byte event)
 void
 Mix_Chunk_N3D::MIDI_DoEvent(void)
 {
-	byte	event;
-	longword	length;
-	longword	tempo;
+	uint8_t	event;
+	uint32_t	length;
+	uint32_t	tempo;
 
 	event = *midiData++;
 	if (!(event & 0x80))
@@ -448,8 +448,8 @@ void Mix_Chunk_N3D::EnsureSynthesis(int maxTics)
 }
 
 // MIDI startup code
-bool midiN3DValidate(const byte *dataIn, size_t dataLen) {
-    const byte *seqPtr = dataIn;
+bool midiN3DValidate(const uint8_t *dataIn, size_t dataLen) {
+    const uint8_t *seqPtr = dataIn;
       
     if (dataLen < 10)
         return false;
@@ -468,7 +468,7 @@ bool midiN3DValidate(const byte *dataIn, size_t dataLen) {
         return false;
 	
     seqPtr += 8;
-    longword deltaTime = 0;
+    uint32_t deltaTime = 0;
     while (*seqPtr & 0x80)
 	deltaTime = (deltaTime << 7) + (*seqPtr++ & 0x7F);
     deltaTime = (deltaTime << 7) + *seqPtr++;
@@ -478,10 +478,10 @@ bool midiN3DValidate(const byte *dataIn, size_t dataLen) {
     return true;
 }
 
-Mix_Chunk_N3D::Mix_Chunk_N3D(int rate, const byte *dataIn, size_t dataLen,
+Mix_Chunk_N3D::Mix_Chunk_N3D(int rate, const uint8_t *dataIn, size_t dataLen,
 			     bool isLooping)
 {
-    const byte *seqPtr;
+    const uint8_t *seqPtr;
 
     midiOpl = new DBOPL::Chip();
     midiOpl->Setup(rate);
@@ -492,7 +492,7 @@ Mix_Chunk_N3D::Mix_Chunk_N3D(int rate, const byte *dataIn, size_t dataLen,
     this->sample_format = FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
     this->isLooping = isLooping;
     this->samples_allocated = 0;
-    this->midiFile = (byte*) malloc(dataLen);
+    this->midiFile = (uint8_t*) malloc(dataLen);
     CHECKMALLOCRESULT(this->midiFile);
     memcpy(this->midiFile, dataIn, dataLen);
 

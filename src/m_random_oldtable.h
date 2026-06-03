@@ -6,7 +6,7 @@
 //	Hacked up for Catacomb 3D
 //
 
-static const BYTE old_rndtable[256] =
+static const uint8_t old_rndtable[256] =
 {
 	  0,   8, 109, 220, 222, 241, 149, 107,  75, 248, 254, 140,  16,  66,
 	 74,  21, 211,  47,  80, 242, 154,  27, 205, 128, 161,  89,  77,  36,

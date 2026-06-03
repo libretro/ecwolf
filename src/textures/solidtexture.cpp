@@ -47,17 +47,17 @@
 class FSolidTexture : public FTexture
 {
 public:
-	FSolidTexture(DWORD color);
+	FSolidTexture(uint32_t color);
 	~FSolidTexture();
 
-	const BYTE *GetColumn(unsigned int column, const Span **spans_out);
-	const BYTE *GetPixels();
+	const uint8_t *GetColumn(unsigned int column, const Span **spans_out);
+	const uint8_t *GetPixels();
 	void Unload();
 
 protected:
-	BYTE* Pixels;
+	uint8_t* Pixels;
 	Span **Spans;
-	const DWORD color;
+	const uint32_t color;
 
 	virtual void MakeTexture();
 };
@@ -71,7 +71,7 @@ protected:
 
 FTexture *SolidTexture_TryCreate(const char* color)
 {
-	DWORD texColor = 0;
+	uint32_t texColor = 0;
 	int i = 5;
 	do
 	{
@@ -102,7 +102,7 @@ FTexture *SolidTexture_TryCreate(const char* color)
 //
 //==========================================================================
 
-FSolidTexture::FSolidTexture(DWORD color) : FTexture(NULL, -1), Pixels(NULL),
+FSolidTexture::FSolidTexture(uint32_t color) : FTexture(NULL, -1), Pixels(NULL),
 	Spans(NULL), color(color)
 {
 	Width = 64;
@@ -149,7 +149,7 @@ void FSolidTexture::Unload ()
 //
 //==========================================================================
 
-const BYTE *FSolidTexture::GetPixels()
+const uint8_t *FSolidTexture::GetPixels()
 {
 	if(!Pixels)
 		MakeTexture();
@@ -162,7 +162,7 @@ const BYTE *FSolidTexture::GetPixels()
 //
 //==========================================================================
 
-const BYTE *FSolidTexture::GetColumn(unsigned int column, const Span **spans_out)
+const uint8_t *FSolidTexture::GetColumn(unsigned int column, const Span **spans_out)
 {
 	if (!Pixels)
 		MakeTexture();
@@ -197,7 +197,7 @@ const BYTE *FSolidTexture::GetColumn(unsigned int column, const Span **spans_out
 
 void FSolidTexture::MakeTexture()
 {
-	Pixels = new BYTE[Width*Height];
+	Pixels = new uint8_t[Width*Height];
 
 	memset(Pixels, RGB32k[RPART(color)>>3][GPART(color)>>3][BPART(color)>>3], Width*Height);
 }

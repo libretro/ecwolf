@@ -190,7 +190,7 @@ class GameMap
 		bool			ActivateTrigger(Trigger &trig, Trigger::Side direction, AActor *activator);
 		void			ClearVisibility();
 		const Header	&GetHeader() const { return header; }
-		void			GetHitlist(BYTE* hitlist) const;
+		void			GetHitlist(uint8_t* hitlist) const;
 		int				GetMarketLumpNum() const { return markerLump; }
 		Plane::Map		*GetSpot(unsigned int x, unsigned int y, unsigned int z) const { return &GetPlane(z).map[y*header.width+x]; }
 		Plane::Map		*GetSpotByTag(unsigned int tag, Plane::Map *start) const;

@@ -45,23 +45,23 @@
 struct RFFInfo
 {
 	// Should be "RFF\x18"
-	DWORD		Magic;
-	DWORD		Version;
-	DWORD		DirOfs;
-	DWORD		NumLumps;
+	uint32_t		Magic;
+	uint32_t		Version;
+	uint32_t		DirOfs;
+	uint32_t		NumLumps;
 };
 
 struct RFFLump
 {
-	DWORD		DontKnow1[4];
-	DWORD		FilePos;
-	DWORD		Size;
-	DWORD		DontKnow2;
-	DWORD		Time;
-	BYTE		Flags;
+	uint32_t		DontKnow1[4];
+	uint32_t		FilePos;
+	uint32_t		Size;
+	uint32_t		DontKnow2;
+	uint32_t		Time;
+	uint8_t		Flags;
 	char		Extension[3];
 	char		Name[8];
-	DWORD		IndexNum;	// Used by .sfx, possibly others
+	uint32_t		IndexNum;	// Used by .sfx, possibly others
 };
 
 //==========================================================================
@@ -75,7 +75,7 @@ struct FRFFLump : public FUncompressedLump
 	virtual FileReader *GetReader();
 	virtual int FillCache();
 
-	DWORD		IndexNum;
+	uint32_t		IndexNum;
 
 	int GetIndexNum() const { return IndexNum; }
 };
@@ -88,11 +88,11 @@ struct FRFFLump : public FUncompressedLump
 
 void BloodCrypt (void *data, int key, int len)
 {
-	int p = (BYTE)key, i;
+	int p = (uint8_t)key, i;
 
 	for (i = 0; i < len; ++i)
 	{
-		((BYTE *)data)[i] ^= (unsigned char)(p+(i>>1));
+		((uint8_t *)data)[i] ^= (unsigned char)(p+(i>>1));
 	}
 }
 
@@ -150,7 +150,7 @@ bool FRFFFile::Open(bool quiet)
 	Lumps = new FRFFLump[NumLumps];
 
 	if (!quiet) Printf(", %d lumps\n", NumLumps);
-	for (DWORD i = 0; i < NumLumps; ++i)
+	for (uint32_t i = 0; i < NumLumps; ++i)
 	{
 		Lumps[i].Position = LittleLong(lumps[i].FilePos);
 		Lumps[i].LumpSize = LittleLong(lumps[i].Size);
@@ -228,7 +228,7 @@ int FRFFLump::FillCache()
 	if (Flags & LUMPF_BLOODCRYPT)
 	{
 		int cryptlen = LumpSize < 256 ? LumpSize : 256;
-		BYTE *data = (BYTE *)Cache;
+		uint8_t *data = (uint8_t *)Cache;
 		
 		for (int i = 0; i < cryptlen; ++i)
 		{

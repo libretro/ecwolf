@@ -56,7 +56,7 @@ struct NetInit
 {
 	Mode mode;
 	uint16_t port;
-	byte numPlayers;
+	uint8_t numPlayers;
 	const char* joinAddress;
 };
 

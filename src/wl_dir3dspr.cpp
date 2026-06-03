@@ -8,7 +8,7 @@
 #include "c_cvars.h"
 
 void Scale3DShaper(int x1, int x2, FTexture *shape, uint32_t flags, fixed ny1, fixed ny2,
-				fixed nx1, fixed nx2, byte *vbuf, unsigned vbufPitch)
+				fixed nx1, fixed nx2, uint8_t *vbuf, unsigned vbufPitch)
 {
 	//printf("%s(%d, %d, %p, %d, %f, %f, %f, %f, %p, %d)\n", __FUNCTION__, x1, x2, shape, flags, FIXED2FLOAT(ny1), FIXED2FLOAT(ny2), FIXED2FLOAT(nx1), FIXED2FLOAT(nx2), vbuf, vbufPitch);
 	fixed dxx=(ny2-ny1)<<8,dzz=(nx2-nx1)<<8;
@@ -55,7 +55,7 @@ void Scale3DShaper(int x1, int x2, FTexture *shape, uint32_t flags, fixed ny1, f
 		}
 
 		const FTexture::Span *spans;
-		const BYTE *line=shape->GetColumn(i, &spans);
+		const uint8_t *line=shape->GetColumn(i, &spans);
 
 		for(;slinex<elinex && slinex<x2;slinex++, height += dheight)
 		{
@@ -74,7 +74,7 @@ void Scale3DShaper(int x1, int x2, FTexture *shape, uint32_t flags, fixed ny1, f
 
 					int ycnt=j*pixheight;
 					int screndy=(ycnt>>6)+upperedge;
-					byte *vmem;
+					uint8_t *vmem;
 					if(screndy<0) vmem=vbuf+slinex;
 					else vmem=vbuf+screndy*vbufPitch+slinex;
 					for(;j<endy;j++)
@@ -84,7 +84,7 @@ void Scale3DShaper(int x1, int x2, FTexture *shape, uint32_t flags, fixed ny1, f
 						screndy=(ycnt>>6)+upperedge;
 						if(scrstarty!=screndy && screndy>0)
 						{
-							BYTE col=line[j];
+							uint8_t col=line[j];
 							if(scrstarty<0) scrstarty=0;
 							if(screndy>viewheight) screndy=viewheight,j=endy;
 

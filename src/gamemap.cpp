@@ -296,7 +296,7 @@ bool GameMap::TraverseLink(const Zone* src, const Zone* dest)
 }
 
 // Get a list of textures to precache
-void GameMap::GetHitlist(BYTE* hitlist) const
+void GameMap::GetHitlist(uint8_t* hitlist) const
 {
 	R_GetSpriteHitlist(hitlist);
 
@@ -685,7 +685,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 
 		for(unsigned int i = 0;i < gm->GetHeader().width*gm->GetHeader().height;++i)
 		{
-			BYTE pushdir = plane.map[i].pushDirection;
+			uint8_t pushdir = plane.map[i].pushDirection;
 			arc << pushdir;
 			plane.map[i].pushDirection = static_cast<MapTile::Side>(pushdir);
 
@@ -723,7 +723,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			TMap<unsigned int, MapSpot>::Pair *pair;
 			while(iter.NextPair(pair))
 			{
-				DWORD key = pair->Key;
+				uint32_t key = pair->Key;
 				arc << key << pair->Value;
 			}
 		}
@@ -735,7 +735,7 @@ FArchive &operator<< (FArchive &arc, GameMap *&gm)
 			gm->elevatorPosition.Clear();
 			while(count-- > 0)
 			{
-				DWORD key;
+				uint32_t key;
 				MapSpot value;
 				arc << key << value;
 

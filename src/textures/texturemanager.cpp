@@ -148,7 +148,7 @@ void FTextureManager::DeleteAll()
 //==========================================================================
 
 FTexture *SolidTexture_TryCreate(const char *color);
-FTextureID FTextureManager::CheckForTexture (const char *name, int usetype, BITFIELD flags)
+FTextureID FTextureManager::CheckForTexture (const char *name, int usetype, uint32_t flags)
 {
 	int i;
 	int firstfound = -1;
@@ -332,7 +332,7 @@ int FTextureManager::ListTextures (const char *name, TArray<FTextureID> &list, b
 //
 //==========================================================================
 
-FTextureID FTextureManager::GetTexture (const char *name, int usetype, BITFIELD flags)
+FTextureID FTextureManager::GetTexture (const char *name, int usetype, uint32_t flags)
 {
 	FTextureID i;
 
@@ -360,7 +360,7 @@ FTextureID FTextureManager::GetTexture (const char *name, int usetype, BITFIELD 
 //
 //==========================================================================
 
-FTexture *FTextureManager::FindTexture(const char *texname, int usetype, BITFIELD flags)
+FTexture *FTextureManager::FindTexture(const char *texname, int usetype, uint32_t flags)
 {
 	FTextureID texnum = CheckForTexture (texname, usetype, flags);
 	return !texnum.isValid()? NULL : Textures[texnum.GetIndex()].Texture;
@@ -796,7 +796,7 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 void FTextureManager::AddPatches (int lumpnum)
 {
 	FWadLump *file = Wads.ReopenLumpNum (lumpnum);
-	DWORD numpatches, i;
+	uint32_t numpatches, i;
 	char name[9];
 
 	*file >> numpatches;
@@ -1227,7 +1227,7 @@ int FTextureManager::CountLumpTextures (int lumpnum)
 	if (lumpnum >= 0)
 	{
 		FWadLump file = Wads.OpenLumpNum (lumpnum); 
-		DWORD numtex;
+		uint32_t numtex;
 
 		file >> numtex;
 		return int(numtex) >= 0 ? numtex : 0;
@@ -1245,14 +1245,14 @@ int FTextureManager::CountLumpTextures (int lumpnum)
 
 void FTextureManager::PrecacheLevel (void)
 {
-	BYTE *hitlist;
+	uint8_t *hitlist;
 	// We use +1 to account for unknown textures
 	int cnt = NumTextures()+1;
 
 //	if (demoplayback)
 //		return;
 
-	hitlist = new BYTE[cnt];
+	hitlist = new uint8_t[cnt];
 	memset (hitlist, 0, cnt);
 
 	map->GetHitlist(hitlist+1);

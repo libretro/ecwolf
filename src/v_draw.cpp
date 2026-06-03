@@ -64,13 +64,13 @@
 #include "c_cvars.h"
 #include "wl_main.h"
 
-static inline SDWORD DivScale32(const SQWORD a, const SDWORD b)
+static inline int32_t DivScale32(const int64_t a, const int32_t b)
 {
-	return static_cast<SDWORD>((a << 32) / b);
+	return static_cast<int32_t>((a << 32) / b);
 }
-static inline void clearbufshort(void *buffer, unsigned int count, WORD clear)
+static inline void clearbufshort(void *buffer, unsigned int count, uint16_t clear)
 {
-	WORD *b = reinterpret_cast<WORD*>(buffer), * const end = reinterpret_cast<WORD*>(buffer)+count;
+	uint16_t *b = reinterpret_cast<uint16_t*>(buffer), * const end = reinterpret_cast<uint16_t*>(buffer)+count;
 	while(b != end)
 		*b++ = clear;
 }
@@ -96,10 +96,10 @@ extern "C" short spanend[MAXHEIGHT];
 // For routines that take RGB colors, cache the previous lookup in case there
 // are several repetitions with the same color.
 static int LastPal = -1;
-static uint32 LastRGB;
+static uint32_t LastRGB;
 
 
-static int PalFromRGB(uint32 rgb)
+static int PalFromRGB(uint32_t rgb)
 {
 	if (LastPal >= 0 && LastRGB == rgb)
 	{
@@ -129,7 +129,7 @@ void STACK_ARGS DCanvas::DrawTexture (FTexture *img, double x, double y, int tag
 	DrawTextureV(img, x, y, tags_first, tags);
 }
 
-void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32 tag, va_list tags)
+void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32_t tag, va_list tags)
 {
 #ifndef NO_SWRENDER
 	FTexture::Span unmaskedSpan[2];
@@ -185,7 +185,7 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32 
 	fixedcolormap = dc_colormap;
 	ESPSResult mode = R_SetPatchStyle (parms.style, parms.alpha, 0, parms.fillcolor);
 
-	BYTE *destorgsave = dc_destorg;
+	uint8_t *destorgsave = dc_destorg;
 	dc_destorg = screen->GetBuffer();
 
 	double x0 = parms.x - parms.left * parms.destwidth / parms.texwidth;
@@ -193,7 +193,7 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32 
 
 	if (mode != DontDraw)
 	{
-		const BYTE *pixels;
+		const uint8_t *pixels;
 		int stop4;
 
 		if (spanptr == NULL)
@@ -345,7 +345,7 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32 
 #endif
 }
 
-bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 tag, va_list tags, DrawParms *parms, bool hw) const
+bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const
 {
 	INTBOOL boolval;
 	int intval;
@@ -407,13 +407,13 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 	while (tag != TAG_DONE)
 	{
 		va_list *more_p;
-		DWORD data;
+		uint32_t data;
 
 		switch (tag)
 		{
 		case TAG_IGNORE:
 		default:
-			data = va_arg(tags, DWORD);
+			data = va_arg(tags, uint32_t);
 			break;
 
 		case TAG_MORE:
@@ -556,7 +556,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 			break;
 
 		case DTA_FillColor:
-			parms->fillcolor = va_arg(tags, uint32);
+			parms->fillcolor = va_arg(tags, uint32_t);
 			break;
 
 		case DTA_Translation:
@@ -568,7 +568,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 			break;
 
 		case DTA_ColorOverlay:
-			parms->colorOverlay = va_arg(tags, DWORD);
+			parms->colorOverlay = va_arg(tags, uint32_t);
 			break;
 
 		case DTA_FlipX:
@@ -691,7 +691,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 			break;
 
 		case DTA_RenderStyle:
-			parms->style.AsDWORD = va_arg(tags, DWORD);
+			parms->style.AsDWORD = va_arg(tags, uint32_t);
 			break;
 
 		case DTA_SpecialColormap:
@@ -702,7 +702,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32 ta
 			parms->colormapstyle = va_arg(tags, FColormapStyle *);
 			break;
 		}
-		tag = va_arg(tags, DWORD);
+		tag = va_arg(tags, uint32_t);
 	}
 	va_end (tags);
 
@@ -905,17 +905,17 @@ void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 		oldyyshifted = yy * GetPitch();
 	}
 
-	BYTE *spot = GetBuffer() + oldyyshifted + xx;
-	DWORD *bg2rgb = Col2RGB8[1+level];
-	DWORD *fg2rgb = Col2RGB8[63-level];
-	DWORD fg = fg2rgb[basecolor];
-	DWORD bg = bg2rgb[*spot];
+	uint8_t *spot = GetBuffer() + oldyyshifted + xx;
+	uint32_t *bg2rgb = Col2RGB8[1+level];
+	uint32_t *fg2rgb = Col2RGB8[63-level];
+	uint32_t fg = fg2rgb[basecolor];
+	uint32_t bg = bg2rgb[*spot];
 	bg = (fg+bg) | 0x1f07c1f;
 	*spot = RGB32k[0][0][bg&(bg>>15)];
 }
 
-void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32 realcolor)
-//void DrawTransWuLine (int x0, int y0, int x1, int y1, BYTE palColor)
+void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor)
+//void DrawTransWuLine (int x0, int y0, int x1, int y1, uint8_t palColor)
 {
 	const int WeightingScale = 0;
 	const int WEIGHTBITS = 6;
@@ -959,7 +959,7 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32 real
 	}
 	else if (deltaX == 0)
 	{ // vertical line
-		BYTE *spot = GetBuffer() + y0*GetPitch() + x0;
+		uint8_t *spot = GetBuffer() + y0*GetPitch() + x0;
 		int pitch = GetPitch ();
 		do
 		{
@@ -969,7 +969,7 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32 real
 	}
 	else if (deltaX == deltaY)
 	{ // diagonal line.
-		BYTE *spot = GetBuffer() + y0*GetPitch() + x0;
+		uint8_t *spot = GetBuffer() + y0*GetPitch() + x0;
 		int advance = GetPitch() + xDir;
 		do
 		{
@@ -1042,7 +1042,7 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32 real
 		}
 		else
 		{ // x-major line
-			fixed_t errorAdj = (((DWORD) deltaY << 16) / (DWORD) deltaX) & 0xffff;
+			fixed_t errorAdj = (((uint32_t) deltaY << 16) / (uint32_t) deltaX) & 0xffff;
 
 			if (WeightingScale == 0)
 			{
@@ -1074,14 +1074,14 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32 real
 	Unlock();
 }
 
-void DCanvas::DrawPixel(int x, int y, int palColor, uint32 realcolor)
+void DCanvas::DrawPixel(int x, int y, int palColor, uint32_t realcolor)
 {
 	if (palColor < 0)
 	{
 		palColor = PalFromRGB(realcolor);
 	}
 
-	Buffer[Pitch * y + x] = (BYTE)palColor;
+	Buffer[Pitch * y + x] = (uint8_t)palColor;
 }
 
 //==========================================================================
@@ -1092,10 +1092,10 @@ void DCanvas::DrawPixel(int x, int y, int palColor, uint32 realcolor)
 //
 //==========================================================================
 
-void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uint32 color)
+void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color)
 {
 	int x, y;
-	BYTE *dest;
+	uint8_t *dest;
 
 	if (left == right || top == bottom)
 	{
@@ -1151,7 +1151,7 @@ void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uin
 
 void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	double originx, double originy, double scalex, double scaley, angle_t rotation,
-	FDynamicColormap *colormap, int lightlevel, int palcolor, uint32 rgbcolor)
+	FDynamicColormap *colormap, int lightlevel, int palcolor, uint32_t rgbcolor)
 {
 #ifndef NO_SWRENDER
 	// Use an equation similar to player sprites to determine shade
@@ -1321,11 +1321,11 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 // V_DrawBlock
 // Draw a linear block of pixels into the view buffer.
 //
-void DCanvas::DrawBlock (int x, int y, int _width, int _height, const BYTE *src) const
+void DCanvas::DrawBlock (int x, int y, int _width, int _height, const uint8_t *src) const
 {
 	int srcpitch = _width;
 	int destpitch;
-	BYTE *dest;
+	uint8_t *dest;
 
 	if (ClipBox (x, y, _width, _height, src, srcpitch))
 	{
@@ -1347,9 +1347,9 @@ void DCanvas::DrawBlock (int x, int y, int _width, int _height, const BYTE *src)
 // V_GetBlock
 // Gets a linear block of pixels from the view buffer.
 //
-void DCanvas::GetBlock (int x, int y, int _width, int _height, BYTE *dest) const
+void DCanvas::GetBlock (int x, int y, int _width, int _height, uint8_t *dest) const
 {
-	const BYTE *src;
+	const uint8_t *src;
 
 #ifdef RANGECHECK 
 	if (x<0
@@ -1372,7 +1372,7 @@ void DCanvas::GetBlock (int x, int y, int _width, int _height, BYTE *dest) const
 }
 
 // Returns true if the box was completely clipped. False otherwise.
-bool DCanvas::ClipBox (int &x, int &y, int &w, int &h, const BYTE *&src, const int srcpitch) const
+bool DCanvas::ClipBox (int &x, int &y, int &w, int &h, const uint8_t *&src, const int srcpitch) const
 {
 	if (x >= Width || y >= Height || x+w <= 0 || y+h <= 0)
 	{ // Completely clipped off screen

@@ -13,16 +13,16 @@
 extern int viewshift;
 extern fixed viewz;
 
-static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int halfheight, fixed planeheight)
+static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, int halfheight, fixed planeheight)
 {
 	fixed dist;                                // distance to row projection
 	fixed tex_step;                            // global step per one screen pixel
 	fixed gu, gv, du, dv;                      // global texture coordinates
-	const byte *tex = NULL;
+	const uint8_t *tex = NULL;
 	int texwidth, texheight;
 	fixed texxscale, texyscale;
 	FTextureID lasttex;
-	byte *tex_offset;
+	uint8_t *tex_offset;
 	bool useOptimized = false;
 
 	if(planeheight == 0) // Eye level
@@ -61,7 +61,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 	const int viewyFrac = (viewy&(FRACUNIT-1))<<8; // 8.24
 
 	unsigned int oldmapx = INT_MAX, oldmapy = INT_MAX;
-	const byte* curshades = NormalLight.Maps;
+	const uint8_t* curshades = NormalLight.Maps;
 	// draw horizontal lines
 	for(int y = y0;floor ? y+halfheight < viewheight : y < halfheight; ++y, tex_offset += tex_offsetPitch)
 	{
@@ -146,7 +146,7 @@ static void R_DrawPlane(byte *vbuf, unsigned vbufPitch, int min_wallheight, int 
 // Textured Floor and Ceiling by DarkOne
 // With multi-textured floors and ceilings stored in lower and upper bytes of
 // according tile in third mapplane, respectively.
-void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight)
+void DrawFloorAndCeiling(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight)
 {
 	const int halfheight = (viewheight >> 1) - viewshift;
 

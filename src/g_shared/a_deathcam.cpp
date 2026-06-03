@@ -118,7 +118,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., fadey, screenWidth, fadeh);
 
-	word width, height;
+	uint16_t width, height;
 	VW_MeasurePropString(IntermissionFont, language["STR_SEEAGAIN"], width, height);
 	px = 160 - (width/2);
 	py = ((200 - StatusBar->GetHeight(false) - StatusBar->GetHeight(true)) - height)/2;

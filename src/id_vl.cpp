@@ -225,10 +225,10 @@ void VL_FadeIn (int start, int end, int steps)
 =============================================================================
 */
 
-byte *VL_LockSurface()
+uint8_t *VL_LockSurface()
 {
 	screen->Lock(false);
-	return (byte *) screen->GetBuffer();
+	return (uint8_t *) screen->GetBuffer();
 }
 
 void VL_UnlockSurface()

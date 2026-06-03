@@ -7,9 +7,9 @@
 #define dimcolor 0xffd700
 
 extern "C" {
-DWORD Col2RGB8[65][256];
-DWORD *Col2RGB8_LessPrecision[65];
-DWORD Col2RGB8_Inverse[65][256];
+uint32_t Col2RGB8[65][256];
+uint32_t *Col2RGB8_LessPrecision[65];
+uint32_t Col2RGB8_Inverse[65][256];
 }
 
 IMPLEMENT_ABSTRACT_CLASS (DCanvas)
@@ -171,7 +171,7 @@ void DCanvas::Dim (PalEntry color)
 	{
 		float dim[4] = { color.r/255.f, color.g/255.f, color.b/255.f, color.a/255.f };
 		//V_AddBlend (dimmer.r/255.f, dimmer.g/255.f, dimmer.b/255.f, amount, dim);
-		dimmer = PalEntry (BYTE(dim[0]*255), BYTE(dim[1]*255), BYTE(dim[2]*255));
+		dimmer = PalEntry (uint8_t(dim[0]*255), uint8_t(dim[1]*255), uint8_t(dim[2]*255));
 		amount = dim[3];
 	}
 	Dim (dimmer, amount, 0, 0, Width, Height);
@@ -190,10 +190,10 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	if (damount == 0.f)
 		return;
 
-	DWORD *bg2rgb;
-	DWORD fg;
+	uint32_t *bg2rgb;
+	uint32_t fg;
 	int gap;
-	BYTE *spot;
+	uint8_t *spot;
 	int x, y;
 
 	if (x1 >= Width || y1 >= Height)
@@ -230,7 +230,7 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	{
 		for (x = w; x != 0; x--)
 		{
-			DWORD bg;
+			uint32_t bg;
 
 			bg = bg2rgb[(*spot)&0xff];
 			bg = (fg+bg) | 0x1f07c1f;
@@ -250,7 +250,7 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 //
 //==========================================================================
 
-void DCanvas::GetScreenshotBuffer(const BYTE *&buffer, int &pitch, ESSType &color_type)
+void DCanvas::GetScreenshotBuffer(const uint8_t *&buffer, int &pitch, ESSType &color_type)
 {
 	Lock(true);
 	buffer = GetBuffer();
@@ -278,7 +278,7 @@ void DCanvas::ReleaseScreenshotBuffer()
 //
 //==========================================================================
 
-void DCanvas::CalcGamma (float gamma, BYTE gammalookup[256])
+void DCanvas::CalcGamma (float gamma, uint8_t gammalookup[256])
 {
 	// I found this formula on the web at
 	// <http://panda.mostang.com/sane/sane-gamma.html>,
@@ -289,7 +289,7 @@ void DCanvas::CalcGamma (float gamma, BYTE gammalookup[256])
 
 	for (i = 0; i < 256; i++)
 	{
-		gammalookup[i] = (BYTE)(255.0 * pow (i / 255.0, invgamma));
+		gammalookup[i] = (uint8_t)(255.0 * pow (i / 255.0, invgamma));
 	}
 }
 
@@ -342,7 +342,7 @@ DSimpleCanvas::DSimpleCanvas (int width, int height)
 #endif
 		Pitch = width + 32 - 8;
 	}
-	MemBuffer = new BYTE[Pitch * height];
+	MemBuffer = new uint8_t[Pitch * height];
 	memset (MemBuffer, 0, Pitch * height);
 }
 
@@ -433,8 +433,8 @@ void DFrameBuffer::DrawRateStuff ()
 	// Draws frame time and cumulative fps
 	if (vid_fps)
 	{
-		DWORD ms = I_FPSTime();
-		DWORD howlong = ms - LastMS;
+		uint32_t ms = I_FPSTime();
+		uint32_t howlong = ms - LastMS;
 		if ((signed)howlong >= 0)
 		{
 			char fpsbuff[40];
@@ -446,7 +446,7 @@ void DFrameBuffer::DrawRateStuff ()
 			Clear (rate_x, 0, Width, 8, GPalette.BlackIndex, 0);
 			DrawText (ConFont, CR_WHITE, rate_x, 0, (char *)&fpsbuff[0], TAG_DONE);
 
-			DWORD thisSec = ms/1000;
+			uint32_t thisSec = ms/1000;
 			if (LastSec < thisSec)
 			{
 				LastCount = FrameCount / (thisSec - LastSec);
@@ -463,7 +463,7 @@ void DFrameBuffer::DrawRateStuff ()
 	{
 		int i = I_GetTime(false);
 		int tics = i - LastTic;
-		BYTE *buffer = GetBuffer();
+		uint8_t *buffer = GetBuffer();
 
 		LastTic = i;
 		if (tics > 20) tics = 20;
@@ -511,7 +511,7 @@ void DFrameBuffer::DrawRateStuff ()
 //
 //==========================================================================
 
-void DFrameBuffer::CopyFromBuff (BYTE *src, int srcPitch, int width, int height, BYTE *dest)
+void DFrameBuffer::CopyFromBuff (uint8_t *src, int srcPitch, int width, int height, uint8_t *dest)
 {
 	if (Pitch == width && Pitch == Width && srcPitch == width)
 	{
@@ -690,13 +690,13 @@ void DFrameBuffer::WipeCleanup()
 //
 //===========================================================================
 
-void DFrameBuffer::GetHitlist(BYTE *hitlist)
+void DFrameBuffer::GetHitlist(uint8_t *hitlist)
 {
 #if 0
-	BYTE *spritelist;
+	uint8_t *spritelist;
 	int i;
 
-	spritelist = new BYTE[sprites.Size()];
+	spritelist = new uint8_t[sprites.Size()];
 	
 	// Precache textures (and sprites).
 	memset (spritelist, 0, sprites.Size());
@@ -795,15 +795,15 @@ bool FNativeTexture::CheckWrapping(bool wrapping)
 // -----------------------------------------------------------------------------
 
 int DisplayWidth, DisplayHeight, DisplayBits;
-BYTE RGB32k[32][32][32];
+uint8_t RGB32k[32][32][32];
 
-// [RH] The framebuffer is no longer a mere byte array.
+// [RH] The framebuffer is no longer a mere uint8_t array.
 // There's also only one, not four.
 DFrameBuffer *screen;
 
 void GenerateLookupTables()
 {
-	static DWORD Col2RGB8_2[63][256];
+	static uint32_t Col2RGB8_2[63][256];
 
 	// create the RGB555 lookup table
 	for(int r = 0;r < 32;r++)
@@ -879,7 +879,7 @@ int ParseHex(const char* hex)
 //
 //==========================================================================
 
-int V_GetColorFromString (const DWORD *palette, const char *cstr)
+int V_GetColorFromString (const uint32_t *palette, const char *cstr)
 {
 	int c[3], i, p;
 	char val[3];
@@ -979,7 +979,7 @@ normal:
 //
 //==========================================================================
 
-int V_GetColor (const DWORD *palette, const char *str)
+int V_GetColor (const uint32_t *palette, const char *str)
 {
 	return V_GetColorFromString(palette, str);
 #if 0

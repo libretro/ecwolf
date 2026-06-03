@@ -625,7 +625,7 @@ bool AWeapon::HandlePickup(AInventory *item, bool &good)
 
 void AWeapon::Serialize(FArchive &arc)
 {
-	BYTE mode = this->mode;
+	uint8_t mode = this->mode;
 	arc << mode;
 	this->mode = static_cast<FireMode>(mode);
 

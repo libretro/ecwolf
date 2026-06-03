@@ -49,7 +49,7 @@
 =============================================================================
 */
 
-void DrawFloorAndCeiling(byte *vbuf, unsigned vbufPitch, int min_wallheight);
+void DrawFloorAndCeiling(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight);
 
 const RatioInformation AspectCorrection[] =
 {
@@ -62,7 +62,7 @@ const RatioInformation AspectCorrection[] =
 	/* 64:27 */  {1720, 346, 0x1C71C, 0,                    48*173/300, true},
 };
 
-/*static*/ byte *vbuf = NULL;
+/*static*/ uint8_t *vbuf = NULL;
 unsigned vbufPitch = 0;
 
 int32_t	lasttimecount;
@@ -118,7 +118,7 @@ int     lasttexture;
 // ray tracing variables
 //
 short    focaltx,focalty,viewtx,viewty;
-longword xpartialup,xpartialdown,ypartialup,ypartialdown;
+uint32_t xpartialup,xpartialdown,ypartialup,ypartialdown;
 
 short   midangle;
 short   angle;
@@ -130,7 +130,7 @@ int     pixx;
 short   xtile,ytile;
 short   xtilestep,ytilestep;
 int32_t    xintercept,yintercept;
-word    xstep,ystep;
+uint16_t    xstep,ystep;
 int     texdelta;
 int		texheight;
 
@@ -209,12 +209,12 @@ void TransformActor (AActor *ob)
 		return;
 	}
 
-	ob->viewx = (word)(centerx + ny*scale/nx);
+	ob->viewx = (uint16_t)(centerx + ny*scale/nx);
 
 //
 // calculate height (heightnumerator/(nx>>8))
 //
-	ob->viewheight = (word)((heightnumerator<<8)/nx);
+	ob->viewheight = (uint16_t)((heightnumerator<<8)/nx);
 }
 
 //==========================================================================
@@ -249,7 +249,7 @@ int CalcHeight()
 ===================
 */
 
-const byte *postsource;
+const uint8_t *postsource;
 int postx;
 
 void ScalePost()
@@ -258,11 +258,11 @@ void ScalePost()
 		return;
 
 	int ywcount, yoffs, yw, yd, yendoffs;
-	byte col;
+	uint8_t col;
 
 	const int shade = LIGHT2SHADE(gLevelLight + r_extralight);
 	const int tz = FixedMul(r_depthvisibility<<8, wallheight[postx]);
-	BYTE *curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
+	uint8_t *curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 
 	ywcount = yd = wallheight[postx];
 	if(yd <= 0)
@@ -317,7 +317,7 @@ void ScalePost()
 	}
 }
 
-void GlobalScalePost(byte *vidbuf, unsigned pitch)
+void GlobalScalePost(uint8_t *vidbuf, unsigned pitch)
 {
 	vbuf = vidbuf;
 	vbufPitch = pitch;
@@ -381,7 +381,7 @@ void HitVertWall (void)
 	DetermineHitDir(true);
 
 	tilehit->amFlags |= AM_Visible;
-	texture = (yintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (word)yintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
+	texture = (yintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (uint16_t)yintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
 	if (xtilestep == -1 && !tilehit->tile->offsetVertical)
 	{
 		texture = (FRACUNIT - texture)&(FRACUNIT-1);
@@ -453,7 +453,7 @@ void HitHorizWall (void)
 	DetermineHitDir(false);
 
 	tilehit->amFlags |= AM_Visible;
-	texture = (xintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (word)xintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
+	texture = (xintercept+texdelta+SlideTextureOffset(tilehit->slideStyle, (uint16_t)xintercept, tilehit->slideAmount[hitdir]))&(FRACUNIT-1);
 	if(!tilehit->tile->offsetHorizontal)
 	{
 		if (ytilestep == -1)
@@ -680,9 +680,9 @@ void DrawPlayerWeapon (void)
 
 void AsmRefresh()
 {
-	static word xspot[2],yspot[2];
+	static uint16_t xspot[2],yspot[2];
 	int32_t xstep=0,ystep=0;
-	longword xpartial=0,ypartial=0;
+	uint32_t xpartial=0,ypartial=0;
 	MapSpot focalspot = map->GetSpot(focaltx, focalty, 0);
 	bool playerInPushwallBackTile = focalspot->pushAmount != 0;
 
@@ -785,7 +785,7 @@ void AsmRefresh()
 			if(ytilestep==1 && (yintercept>>16)>=ytile) goto horizentry;
 vertentry:
 
-			if((uint32_t)yintercept>mapheight*65536-1 || (word)xtile>=mapwidth)
+			if((uint32_t)yintercept>mapheight*65536-1 || (uint16_t)xtile>=mapwidth)
 			{
 				if(xtile<0) xintercept=0, xtile=0;
 				else if((unsigned)xtile>=mapwidth) xintercept=mapwidth<<TILESHIFT, xtile=mapwidth-1;
@@ -807,7 +807,7 @@ vertentry:
 					int32_t yintbuf=yintercept+(ystep>>1);
 					if((yintbuf>>16)!=(yintercept>>16))
 						goto passvert;
-					if(CheckSlidePass(tilehit->slideStyle, (word)yintbuf, tilehit->slideAmount[hitdir]))
+					if(CheckSlidePass(tilehit->slideStyle, (uint16_t)yintbuf, tilehit->slideAmount[hitdir]))
 						goto passvert;
 					yintercept=yintbuf;
 					xintercept=(xtile<<TILESHIFT)|0x8000;
@@ -865,13 +865,13 @@ vertentry:
 						{
 							int pwallposi = tilehit->pushAmount;
 							if(tilehit->pushDirection==MapTile::North) pwallposi = 64-tilehit->pushAmount;
-							if((tilehit->pushDirection==MapTile::South && (word)yintercept<(pwallposi<<10))
-								|| (tilehit->pushDirection==MapTile::North && (word)yintercept>(pwallposi<<10)))
+							if((tilehit->pushDirection==MapTile::South && (uint16_t)yintercept<(pwallposi<<10))
+								|| (tilehit->pushDirection==MapTile::North && (uint16_t)yintercept>(pwallposi<<10)))
 							{
 								if(((uint32_t)yintercept>>16)==tilehit->GetY() && xtile==(signed)tilehit->GetX())
 								{
-									if((tilehit->pushDirection==MapTile::South && (int32_t)((word)yintercept)+ystep<(pwallposi<<10))
-										|| (tilehit->pushDirection==MapTile::North && (int32_t)((word)yintercept)+ystep>(pwallposi<<10)))
+									if((tilehit->pushDirection==MapTile::South && (int32_t)((uint16_t)yintercept)+ystep<(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::North && (int32_t)((uint16_t)yintercept)+ystep>(pwallposi<<10)))
 										goto passvert;
 
 									if(tilehit->pushDirection==MapTile::South)
@@ -906,8 +906,8 @@ vertentry:
 								}
 								else
 								{
-									if((tilehit->pushDirection==MapTile::South && (int32_t)((word)yintercept)+ystep>(pwallposi<<10))
-										|| (tilehit->pushDirection==MapTile::North && (int32_t)((word)yintercept)+ystep<(pwallposi<<10)))
+									if((tilehit->pushDirection==MapTile::South && (int32_t)((uint16_t)yintercept)+ystep>(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::North && (int32_t)((uint16_t)yintercept)+ystep<(pwallposi<<10)))
 										goto passvert;
 
 									if(tilehit->pushDirection==MapTile::South)
@@ -952,7 +952,7 @@ passvert:
 			if(xtilestep==1 && (xintercept>>16)>=xtile) goto vertentry;
 horizentry:
 
-			if((uint32_t)xintercept>mapwidth*65536-1 || (word)ytile>=mapheight)
+			if((uint32_t)xintercept>mapwidth*65536-1 || (uint16_t)ytile>=mapheight)
 			{
 				if(ytile<0) yintercept=0, ytile=0;
 				else if((unsigned)ytile>=mapheight) yintercept=mapheight<<TILESHIFT, ytile=mapheight-1;
@@ -974,7 +974,7 @@ horizentry:
 					int32_t xintbuf=xintercept+(xstep>>1);
 					if((xintbuf>>16)!=(xintercept>>16))
 						goto passhoriz;
-					if(CheckSlidePass(tilehit->slideStyle, (word)xintbuf, tilehit->slideAmount[hitdir]))
+					if(CheckSlidePass(tilehit->slideStyle, (uint16_t)xintbuf, tilehit->slideAmount[hitdir]))
 						goto passhoriz;
 					xintercept=xintbuf;
 					yintercept=(ytile<<TILESHIFT)+0x8000;
@@ -1032,13 +1032,13 @@ horizentry:
 						{
 							int pwallposi = tilehit->pushAmount;
 							if(tilehit->pushDirection==MapTile::West) pwallposi = 64-tilehit->pushAmount;
-							if((tilehit->pushDirection==MapTile::East && (word)xintercept<(pwallposi<<10))
-								|| (tilehit->pushDirection==MapTile::West && (word)xintercept>(pwallposi<<10)))
+							if((tilehit->pushDirection==MapTile::East && (uint16_t)xintercept<(pwallposi<<10))
+								|| (tilehit->pushDirection==MapTile::West && (uint16_t)xintercept>(pwallposi<<10)))
 							{
 								if(((uint32_t)xintercept>>16)==tilehit->GetX() && ytile==(signed)tilehit->GetY())
 								{
-									if((tilehit->pushDirection==MapTile::East && (int32_t)((word)xintercept)+xstep<(pwallposi<<10))
-										|| (tilehit->pushDirection==MapTile::West && (int32_t)((word)xintercept)+xstep>(pwallposi<<10)))
+									if((tilehit->pushDirection==MapTile::East && (int32_t)((uint16_t)xintercept)+xstep<(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::West && (int32_t)((uint16_t)xintercept)+xstep>(pwallposi<<10)))
 										goto passhoriz;
 
 									if(tilehit->pushDirection==MapTile::East)
@@ -1073,8 +1073,8 @@ horizentry:
 								}
 								else
 								{
-									if((tilehit->pushDirection==MapTile::East && (int32_t)((word)xintercept)+xstep>(pwallposi<<10))
-										|| (tilehit->pushDirection==MapTile::West && (int32_t)((word)xintercept)+xstep<(pwallposi<<10)))
+									if((tilehit->pushDirection==MapTile::East && (int32_t)((uint16_t)xintercept)+xstep>(pwallposi<<10))
+										|| (tilehit->pushDirection==MapTile::West && (int32_t)((uint16_t)xintercept)+xstep<(pwallposi<<10)))
 										goto passhoriz;
 
 									if(tilehit->pushDirection==MapTile::East)
@@ -1270,9 +1270,9 @@ void    ThreeDRefresh (void)
 		FString fpsDisplay;
 		fpsDisplay.Format("%2u fps", fps);
 
-		word x = 0;
-		word y = 0;
-		word width, height;
+		uint16_t x = 0;
+		uint16_t y = 0;
+		uint16_t width, height;
 		VW_MeasurePropString(ConFont, fpsDisplay, width, height);
 		MenuToRealCoords(x, y, width, height, MENU_TOP);
 		VWB_Clear(GPalette.BlackIndex, x, y, x+width+1, y+height+1);

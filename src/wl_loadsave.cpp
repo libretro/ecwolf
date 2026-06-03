@@ -61,13 +61,13 @@
 #include "textures/textures.h"
 
 void R_RenderView();
-extern byte* vbuf;
+extern uint8_t* vbuf;
 extern unsigned vbufPitch;
 
 namespace GameSave {
 
 unsigned long long SaveVersion = GetSaveVersion();
-DWORD SaveProdVersion = SAVEPRODVER;
+uint32_t SaveProdVersion = SAVEPRODVER;
 
 #ifndef LIBRETRO
 
@@ -148,7 +148,7 @@ public:
 
 				if(saveFile.oldVersion)
 				{
-					word width, height;
+					uint16_t width, height;
 					VW_MeasurePropString(SmallFont, language["MNU_DIFFVERSION"], width, height);
 
 					px = SAVEPICX + (SAVEPICW - width)/2;
@@ -190,7 +190,7 @@ public:
 			}
 			else
 			{
-				word width, height;
+				uint16_t width, height;
 				VW_MeasurePropString(SmallFont, language["MNU_NOPICTURE"], width, height);
 
 				px = SAVEPICX + (SAVEPICW - width)/2;
@@ -592,7 +592,7 @@ bool Load(const FString &filename)
 	delete[] savesig;
 
 	char *prodver = M_GetPNGText(png, "ECWolf Save Product Version");
-	SaveProdVersion = (DWORD)atoll(prodver);
+	SaveProdVersion = (uint32_t)atoll(prodver);
 	delete[] prodver;
 
 	M_GetPNGText(png, "Current Map", gamestate.mapname, 8);
@@ -623,7 +623,7 @@ void SaveScreenshot(FILE *file)
 	static const int SAVEPICWIDTH = 216;
 	static const int SAVEPICHEIGHT = 162;
 
-	vbuf = new byte[SAVEPICHEIGHT*SAVEPICWIDTH];
+	vbuf = new uint8_t[SAVEPICHEIGHT*SAVEPICWIDTH];
 	vbufPitch = SAVEPICWIDTH;
 
 	int oldviewsize = viewsize;

@@ -57,7 +57,7 @@
 #include "templates.h"
 #include "g_mapinfo.h"
 
-static bool R_CheckForFixedLights(const BYTE *colormaps);
+static bool R_CheckForFixedLights(const uint8_t *colormaps);
 
 
 extern "C" {
@@ -74,13 +74,13 @@ struct FakeCmap
 };
 
 TArray<FakeCmap> fakecmaps;
-BYTE *realcolormaps;
+uint8_t *realcolormaps;
 size_t numfakecmaps;
 
 
 
 TArray<FSpecialColormap> SpecialColormaps;
-BYTE DesaturateColormap[31][256];
+uint8_t DesaturateColormap[31][256];
 
 struct FSpecialColormapParameters
 {
@@ -211,7 +211,7 @@ FDynamicColormap *GetSpecialLights (PalEntry color, PalEntry fade, int desaturat
 
 	//if (Renderer->UsesColormap())
 	{
-		colormap->Maps = new BYTE[NUMCOLORMAPS*256];
+		colormap->Maps = new uint8_t[NUMCOLORMAPS*256];
 		colormap->BuildLights ();
 	}
 	//else colormap->Maps = NULL;
@@ -249,7 +249,7 @@ void FDynamicColormap::BuildLights ()
 	int l, c;
 	int lr, lg, lb, ld, ild;
 	PalEntry colors[256], basecolors[256];
-	BYTE *shade;
+	uint8_t *shade;
 
 	if (Maps == NULL)
 		return;
@@ -293,7 +293,7 @@ void FDynamicColormap::BuildLights ()
 			Fade.r, Fade.g, Fade.b, l * (256 / NUMCOLORMAPS));
 
 		shade = Maps + 256*l;
-		if ((DWORD)Color == MAKERGB(255,255,255))
+		if ((uint32_t)Color == MAKERGB(255,255,255))
 		{ // White light, so we can just pick the colors directly
 			for (c = 0; c < 256; c++)
 			{
@@ -377,7 +377,7 @@ void FDynamicColormap::RebuildAllLights()
 		{
 			if (cm->Maps == NULL)
 			{
-				cm->Maps = new BYTE[NUMCOLORMAPS*256];
+				cm->Maps = new uint8_t[NUMCOLORMAPS*256];
 				cm->BuildLights ();
 			}
 		}
@@ -395,9 +395,9 @@ void R_SetDefaultColormap (const char *name)
 	if (strnicmp (fakecmaps[0].name, name, 8) != 0)
 	{
 		int i, j;
-		BYTE map[256];
-		BYTE unremap[256];
-		BYTE remap[256];
+		uint8_t map[256];
+		uint8_t unremap[256];
+		uint8_t remap[256];
 		int lump = Wads.CheckNumForName (name, ns_colormaps);
 		if (lump == -1)
 			lump = Wads.CheckNumForName (name, ns_global);
@@ -436,7 +436,7 @@ void R_SetDefaultColormap (const char *name)
 			remap[0] = 0;
 			for (i = 0; i < numLumpMaps; ++i)
 			{
-				BYTE *map2 = &realcolormaps[i*256];
+				uint8_t *map2 = &realcolormaps[i*256];
 				lumpr.Read (map, 256);
 				for (j = 0; j < 256; ++j)
 				{
@@ -518,9 +518,9 @@ void R_InitColormaps ()
 	cm.blend = 0;
 	fakecmaps.Push(cm);
 
-	DWORD NumLumps = Wads.GetNumLumps();
+	uint32_t NumLumps = Wads.GetNumLumps();
 
-	for (DWORD i = 0; i < NumLumps; i++)
+	for (uint32_t i = 0; i < NumLumps; i++)
 	{
 		if (Wads.GetLumpNamespace(i) == ns_colormaps)
 		{
@@ -537,12 +537,12 @@ void R_InitColormaps ()
 			}
 		}
 	}
-	realcolormaps = new BYTE[256*NUMCOLORMAPS*fakecmaps.Size()];
+	realcolormaps = new uint8_t[256*NUMCOLORMAPS*fakecmaps.Size()];
 	R_SetDefaultColormap (gameinfo.GameColormap);
 
 	if (fakecmaps.Size() > 1)
 	{
-		BYTE unremap[256], remap[256], mapin[256];
+		uint8_t unremap[256], remap[256], mapin[256];
 		int i;
 		unsigned j;
 
@@ -559,11 +559,11 @@ void R_InitColormaps ()
 			{
 				int k, r, g, b;
 				FWadLump lump = Wads.OpenLumpNum (fakecmaps[j].lump);
-				BYTE *const map = realcolormaps + NUMCOLORMAPS*256*j;
+				uint8_t *const map = realcolormaps + NUMCOLORMAPS*256*j;
 
 				for (k = 0; k < NUMCOLORMAPS; ++k)
 				{
-					BYTE *map2 = &map[k*256];
+					uint8_t *map2 = &map[k*256];
 					lump.Read (mapin, 256);
 					map2[0] = 0;
 					for (r = 1; r < 256; ++r)
@@ -601,7 +601,7 @@ void R_InitColormaps ()
 	// desaturated colormaps. These are used for texture composition
 	for(int m = 0; m < 31; m++)
 	{
-		BYTE *shade = DesaturateColormap[m];
+		uint8_t *shade = DesaturateColormap[m];
 		for (int c = 0; c < 256; c++)
 		{
 			int intensity = (GPalette.BaseColors[c].r * 77 +
@@ -625,10 +625,10 @@ void R_InitColormaps ()
 //
 //==========================================================================
 
-static bool R_CheckForFixedLights(const BYTE *colormaps)
+static bool R_CheckForFixedLights(const uint8_t *colormaps)
 {
-	const BYTE *lastcolormap = colormaps + (NUMCOLORMAPS - 1) * 256;
-	BYTE freq[256];
+	const uint8_t *lastcolormap = colormaps + (NUMCOLORMAPS - 1) * 256;
+	uint8_t freq[256];
 	int i, j;
 
 	// Count the frequencies of different colors in the final colormap.
@@ -645,7 +645,7 @@ static bool R_CheckForFixedLights(const BYTE *colormaps)
 	// final coloramp.
 	for (i = 255; i >= 0; --i)
 	{
-		BYTE color = lastcolormap[i];
+		uint8_t color = lastcolormap[i];
 		if (freq[color] > 10)		// arbitrary number to decide "common" colors
 		{
 			continue;
@@ -672,7 +672,7 @@ static bool R_CheckForFixedLights(const BYTE *colormaps)
 //
 //==========================================================================
 
-DWORD R_ColormapNumForName (const char *name)
+uint32_t R_ColormapNumForName (const char *name)
 {
 	if (strnicmp (name, "COLORMAP", 8))
 	{	// COLORMAP always returns 0
@@ -696,8 +696,8 @@ DWORD R_ColormapNumForName (const char *name)
 //
 //==========================================================================
 
-DWORD R_BlendForColormap (DWORD map)
+uint32_t R_BlendForColormap (uint32_t map)
 {
 	return APART(map) ? map : 
-		map < fakecmaps.Size() ? DWORD(fakecmaps[map].blend) : 0;
+		map < fakecmaps.Size() ? uint32_t(fakecmaps[map].blend) : 0;
 }

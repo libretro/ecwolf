@@ -21,9 +21,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(_arch_dreamcast)
-#	include <kos.h>
-#elif !defined(_WIN32)
+#if !defined(_WIN32)
 #	include <stdint.h>
 #	include <string.h>
 #	include <stdarg.h>
@@ -48,38 +46,17 @@
 #	define O_BINARY 0
 #endif
 
-#ifdef _arch_dreamcast
-typedef uint8 uint8_t;
-typedef uint16 uint16_t;
-typedef uint32 uint32_t;
-typedef int8 int8_t;
-typedef int16 int16_t;
-typedef int32 int32_t;
-typedef int64 int64_t;
-typedef ptr_t uintptr_t;
-#endif
 
 #define FRACBITS 16
 #define FRACUNIT (1<<FRACBITS)
 
-typedef uint8_t byte;
-typedef uint8_t BYTE;
-typedef int8_t SBYTE;
-typedef uint16_t word;
-typedef uint16_t WORD;
-typedef int16_t SWORD;
+// Width-named integer aliases (uint8_t/uint16_t/uint32_t/uint64_t and friends) have been
+// removed in favour of using <stdint.h> types directly. The semantic types
+// below are intentionally kept: fixed/fixed_t carry 16.16 fixed-point intent
+// and angle_t is a BAM angle (defined later).
 typedef int32_t fixed;
 typedef fixed fixed_t;
-typedef uint32_t longword;
-#ifndef USE_WINDOWS_DWORD
-typedef uint32_t DWORD;
-#endif
-typedef int32_t SDWORD;
-typedef uint64_t QWORD;
-typedef int64_t SQWORD;
 typedef void * memptr;
-typedef uint32_t uint32;
-typedef uint32_t BITFIELD;
 typedef int INTBOOL;
 
 // Screenshot buffer image data types
@@ -102,8 +79,6 @@ void NetDPrintf(const char *format, ...);
 #define stricmp _stricmp
 #endif
 
-typedef double real64;
-typedef SDWORD int32;
 #include "xs_Float.h"
 
 /*
@@ -436,16 +411,16 @@ static inline fixed FixedDiv(fixed a, fixed b)
 #define lengthof(x) (sizeof(x) / sizeof(*(x)))
 #define endof(x)    ((x) + lengthof(x))
 
-static inline word READWORD(byte *&ptr)
+static inline uint16_t READWORD(uint8_t *&ptr)
 {
-	word val = ptr[0] | ptr[1] << 8;
+	uint16_t val = ptr[0] | ptr[1] << 8;
 	ptr += 2;
 	return val;
 }
 
-static inline longword READLONGWORD(byte *&ptr)
+static inline uint32_t READLONGWORD(uint8_t *&ptr)
 {
-	longword val = ptr[0] | ptr[1] << 8 | ptr[2] << 16 | ptr[3] << 24;
+	uint32_t val = ptr[0] | ptr[1] << 8 | ptr[2] << 16 | ptr[3] << 24;
 	ptr += 4;
 	return val;
 }
@@ -481,7 +456,7 @@ static inline longword READLONGWORD(byte *&ptr)
 	*************************************************************/
 
 	// The feature flags are stored as a wall in the upper right corner of each level
-	static inline word GetFeatureFlags()
+	static inline uint16_t GetFeatureFlags()
 	{
 		return ffDataTopRight;
 	}
@@ -489,11 +464,11 @@ static inline longword READLONGWORD(byte *&ptr)
 #endif
 
 #ifdef USE_PARALLAX
-	void DrawParallax(byte *vbuf, unsigned vbufPitch);
+	void DrawParallax(uint8_t *vbuf, unsigned vbufPitch);
 #endif
 
 #ifdef USE_DIR3DSPR
-	void Scale3DShape(byte *vbuf, unsigned vbufPitch, statobj_t *ob);
+	void Scale3DShape(uint8_t *vbuf, unsigned vbufPitch, statobj_t *ob);
 #endif
 
 #endif

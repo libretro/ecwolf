@@ -47,7 +47,7 @@ fixed_t 		sprtopscreen;
 
 bool			sprflipvert;
 
-void R_DrawMaskedColumn (const BYTE *column, const FTexture::Span *span)
+void R_DrawMaskedColumn (const uint8_t *column, const FTexture::Span *span)
 {
 	while (span->Length != 0)
 	{
