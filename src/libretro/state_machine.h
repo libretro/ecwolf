@@ -269,6 +269,11 @@ public:
 
 		if (!isLoaded())
 			loadSound();
+		// loadSound() can fail (e.g. an unsupported sound/WAV variant), leaving
+		// the chunk invalid with no sample buffer. Don't try to mix from a
+		// missing buffer.
+		if (!isValid || !isLoaded())
+			return;
 		lastUsed = used_digital_gen++;
 		if (reloadable)
 			touched_sound_size += GetDataSize();

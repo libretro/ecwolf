@@ -451,6 +451,7 @@ void Mix_Chunk_Digital::loadSound() {
 		} else {
 			printf ("Unknown WAV variant %d/%d/%d\n",
 				bits, channels, format);
+			sample_count = 0;
 			isValid = false;
 			isMetadataLoaded = true;
 			return;
@@ -690,6 +691,8 @@ void Mix_Chunk_Sampled::MixSamples (int16_t *result, int output_rate, size_t siz
 {
 	int start_sample = (start_ticks * rate) / TICRATE;
 	int num_samples = (size * (long long)rate) / output_rate;
+	if (chunk_samples == NULL || sample_count <= 0)
+		return;
 	if (isLooping) {
 		start_sample %= sample_count;
 	}
