@@ -842,12 +842,18 @@ popMenu(wl_state_t *state)
 		//
 		CleanupControlPanel ();
 		if (ingame)
+		{
 			// A game is in progress (the menu was opened mid-game): resume the
-			// play loop exactly where it left off. The game state was never torn
-			// down, and PlayLoopA redraws the 3D view and HUD over the menu on
-			// the next frame, so we must not go through GAME_DRAW_PLAY_SCREEN /
-			// GAME_LOAD_MAP, which would reload the map and restart the level.
+			// play loop exactly where it left off, without reloading the map.
+			// PrepareMainMenu switched to the menu music and the menu painted
+			// over the screen, so restore the level music and repaint the play
+			// screen border/status bar before re-entering the play loop. We must
+			// not use the GAME_DRAW_PLAY_SCREEN stage, which chains into
+			// GAME_LOAD_MAP and would restart the level.
+			StartMusic ();
+			DrawPlayScreen (false);
 			state->stage = PLAY_STEP_A;
+		}
 		else if (param_tedlevel || startgame || loadedgame)
 			state->stage = START_GAME;
 		else
