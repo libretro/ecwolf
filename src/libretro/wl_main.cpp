@@ -365,7 +365,6 @@ void DoJukebox(void)
 static void CollectGC()
 {
 	GC::FullGC();
-	GC::DelSoftRootHead();
 }
 
 static bool DrawStartupConsole(FString statusStr)

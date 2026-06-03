@@ -133,7 +133,6 @@ size_t AllocBytes;
 size_t Threshold;
 size_t Estimate;
 DObject *Root;
-DObject *SoftRoots;
 int Pause = DEFAULT_GCPAUSE;
 int StepMul = DEFAULT_GCMUL;
 int StepCount;
@@ -178,7 +177,7 @@ static void Reap()
 		// curr from Root, so we must not read curr->ObjNext afterwards.
 		DObject *next = curr->ObjNext;
 		if ((curr->ObjectFlags & OF_EuthanizeMe) &&
-		    !(curr->ObjectFlags & (OF_Fixed | OF_Rooted)))
+		    !(curr->ObjectFlags & OF_Fixed))
 		{
 			curr->ObjectFlags |= OF_YesReallyDelete;
 			delete curr;
@@ -217,90 +216,6 @@ void FullGC()
 	// live (not euthanized) remain on the Root list until they are
 	// Destroy()ed in the normal course of play or at level teardown.
 	Reap();
-}
-
-void DelSoftRootHead()
-{
-	if (SoftRoots != NULL)
-	{
-		// Don't let the destructor print a warning message
-		SoftRoots->ObjectFlags |= OF_YesReallyDelete;
-		delete SoftRoots;
-	}
-	SoftRoots = NULL;
-}
-
-//==========================================================================
-//
-// AddSoftRoot
-//
-// Marks an object as a soft root. A soft root behaves exactly like a root
-// in MarkRoot, except it can be added at run-time.
-//
-//==========================================================================
-
-void AddSoftRoot(DObject *obj)
-{
-	DObject **probe;
-
-	// Are there any soft roots yet?
-	if (SoftRoots == NULL)
-	{
-		// Create a new object to root the soft roots off of, and stick
-		// it at the end of the object list, so we know that anything
-		// before it is not a soft root.
-		SoftRoots = new DObject;
-		SoftRoots->ObjectFlags |= OF_Fixed;
-		probe = &Root;
-		while (*probe != NULL)
-		{
-			probe = &(*probe)->ObjNext;
-		}
-		Root = SoftRoots->ObjNext;
-		SoftRoots->ObjNext = NULL;
-		*probe = SoftRoots;
-	}
-	// Mark this object as rooted and move it after the SoftRoots marker.
-	probe = &Root;
-	while (*probe != NULL && *probe != obj)
-	{
-		probe = &(*probe)->ObjNext;
-	}
-	*probe = (*probe)->ObjNext;
-	obj->ObjNext = SoftRoots->ObjNext;
-	SoftRoots->ObjNext = obj;
-	obj->ObjectFlags |= OF_Rooted;
-}
-
-//==========================================================================
-//
-// DelSoftRoot
-//
-// Unroots an object so that it must be reachable or it will get collected.
-//
-//==========================================================================
-
-void DelSoftRoot(DObject *obj)
-{
-	DObject **probe;
-
-	if (!(obj->ObjectFlags & OF_Rooted))
-	{ // Not rooted, so nothing to do.
-		return;
-	}
-	obj->ObjectFlags &= ~OF_Rooted;
-	// Move object out of the soft roots part of the list.
-	probe = &SoftRoots;
-	while (*probe != NULL && *probe != obj)
-	{
-		probe = &(*probe)->ObjNext;
-	}
-	if (*probe == obj)
-	{
-		*probe = obj->ObjNext;
-		obj->ObjNext = Root;
-		Root = obj;
-	}
 }
 
 }
