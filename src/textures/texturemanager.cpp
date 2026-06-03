@@ -817,35 +817,6 @@ void FTextureManager::AddPatches (int lumpnum)
 }
 
 
-//==========================================================================
-//
-// FTextureManager :: LoadTexturesX
-//
-// Initializes the texture list with the textures from the world map.
-//
-//==========================================================================
-#if 0
-void FTextureManager::LoadTextureX(int wadnum)
-{
-	// Use the most recent PNAMES for this WAD.
-	// Multiple PNAMES in a WAD will be ignored.
-	int pnames = Wads.CheckNumForName("PNAMES", ns_global, wadnum, false);
-
-	if (pnames < 0)
-	{
-		// should never happen except for zdoom.pk3
-		return;
-	}
-
-	// Only add the patches if the PNAMES come from the current file
-	// Otherwise they have already been processed.
-	if (Wads.GetLumpFile(pnames) == wadnum) TexMan.AddPatches (pnames);
-
-	int texlump1 = Wads.CheckNumForName ("TEXTURE1", ns_global, wadnum);
-	int texlump2 = Wads.CheckNumForName ("TEXTURE2", ns_global, wadnum);
-	AddTexturesLumps (texlump1, texlump2, pnames);
-}
-#endif
 
 //==========================================================================
 //

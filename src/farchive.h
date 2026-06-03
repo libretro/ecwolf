@@ -321,18 +321,6 @@ inline FArchive &operator<< (FArchive &arc, TArray<T,TT> &self)
 	return arc;
 }
 
-#if 0
-struct sector_t;
-struct line_t;
-struct vertex_t;
-struct side_t;
-
-FArchive &operator<< (FArchive &arc, sector_t *&sec);
-FArchive &operator<< (FArchive &arc, const sector_t *&sec);
-FArchive &operator<< (FArchive &arc, line_t *&line);
-FArchive &operator<< (FArchive &arc, vertex_t *&vert);
-FArchive &operator<< (FArchive &arc, side_t *&side);
-#endif
 
 template<typename T, typename TT>
 FArchive& operator<< (FArchive& arc, TFlags<T, TT>& flag)

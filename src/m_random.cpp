@@ -389,32 +389,4 @@ FRandom *FRandom::StaticFindRNG (const char *name)
 	return probe;
 }
 
-//==========================================================================
-//
-// FRandom :: StaticPrintSeeds
-//
-// Prints a snapshot of the current RNG states. This is probably wrong.
-//
-//==========================================================================
-
-#if 0
-#ifndef NDEBUG
-void FRandom::StaticPrintSeeds ()
-{
-	FRandom *rng = RNGList;
-
-	while (rng != NULL)
-	{
-		int idx = rng->idx < SFMT::N32 ? rng->idx : 0;
-		Printf ("%s: %08x .. %d\n", rng->Name, rng->sfmt.u[idx], idx);
-		rng = rng->Next;
-	}
-}
-
-CCMD (showrngs)
-{
-	FRandom::StaticPrintSeeds ();
-}
-#endif
-#endif
 

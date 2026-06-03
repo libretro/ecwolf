@@ -339,23 +339,6 @@ private:
 };
 
 // Use TArray<TUniquePtr>
-#if 0
-// TDeletingArray -----------------------------------------------------------
-// An array that deletes its elements when it gets deleted.
-template<class T, class TT=T>
-class TDeletingArray : public TArray<T, TT>
-{
-public:
-	~TDeletingArray<T, TT> ()
-	{
-		for (unsigned int i = 0; i < TArray<T,TT>::Size(); ++i)
-		{
-			if ((*this)[i] != NULL) 
-				delete (*this)[i];
-		}
-	}
-};
-#endif
 
 // TAutoGrowArray -----------------------------------------------------------
 // An array with accessors that automatically grow the array as needed.

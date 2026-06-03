@@ -1467,29 +1467,3 @@ FArchive &operator<< (FArchive &arc, const ClassDef * &info)
 	return arc;
 }
 
-#if 0
-FArchive &operator<< (FArchive &arc, sector_t *&sec)
-{
-	return arc.SerializePointer (sectors, (uint8_t **)&sec, sizeof(*sectors));
-}
-
-FArchive &operator<< (FArchive &arc, const sector_t *&sec)
-{
-	return arc.SerializePointer (sectors, (uint8_t **)&sec, sizeof(*sectors));
-}
-
-FArchive &operator<< (FArchive &arc, line_t *&line)
-{
-	return arc.SerializePointer (lines, (uint8_t **)&line, sizeof(*lines));
-}
-
-FArchive &operator<< (FArchive &arc, vertex_t *&vert)
-{
-	return arc.SerializePointer (vertexes, (uint8_t **)&vert, sizeof(*vertexes));
-}
-
-FArchive &operator<< (FArchive &arc, side_t *&side)
-{
-	return arc.SerializePointer (sides, (uint8_t **)&side, sizeof(*sides));
-}
-#endif

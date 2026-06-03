@@ -395,42 +395,6 @@ int FResourceFile::FilterLumps(FString filtername, void *lumps, size_t lumpsize,
 	return end - start;
 }
 
-//==========================================================================
-//
-// FResourceFile :: FilterLumpsByGameType
-//
-// Matches any lumps that match "filter/game-<gametype>/*". Includes
-// inclusive gametypes like Raven.
-//
-//==========================================================================
-
-#if 0
-int FResourceFile::FilterLumpsByGameType(int type, void *lumps, size_t lumpsize, uint32_t max)
-{
-	static const struct { int match; const char *name; } blanket[] =
-	{
-		{ GAME_Raven,			"game-Raven" },
-		{ GAME_DoomStrifeChex,	"game-DoomStrifeChex" },
-		{ GAME_DoomChex,		"game-DoomChex" },
-		{ GAME_Any, NULL }
-	};
-	if (type == 0)
-	{
-		return 0;
-	}
-	int count = 0;
-	for (int i = 0; blanket[i].name != NULL; ++i)
-	{
-		if (type & blanket[i].match)
-		{
-			count += FilterLumps(blanket[i].name, lumps, lumpsize, max);
-		}
-	}
-	FString filter = "game-";
-	filter += GameNames[type];
-	return count + FilterLumps(filter, lumps, lumpsize, max);
-}
-#endif
 
 //==========================================================================
 //
