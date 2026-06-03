@@ -842,10 +842,12 @@ popMenu(wl_state_t *state)
 		//
 		CleanupControlPanel ();
 		if (ingame)
-			// A game is in progress (the menu was opened mid-game): redraw the
-			// play screen over the menu and resume where we left off, rather
-			// than restarting the level or dropping to the title/demo.
-			state->stage = GAME_DRAW_PLAY_SCREEN;
+			// A game is in progress (the menu was opened mid-game): resume the
+			// play loop exactly where it left off. The game state was never torn
+			// down, and PlayLoopA redraws the 3D view and HUD over the menu on
+			// the next frame, so we must not go through GAME_DRAW_PLAY_SCREEN /
+			// GAME_LOAD_MAP, which would reload the map and restart the level.
+			state->stage = PLAY_STEP_A;
 		else if (param_tedlevel || startgame || loadedgame)
 			state->stage = START_GAME;
 		else
