@@ -152,10 +152,9 @@ void ResetTimeCount()
 
 void Delay(int wolfticks)
 {
-#ifdef TODO
-	if(wolfticks>0)
-		SDL_Delay(wolfticks * 100 / 7);
-#endif
+	// No-op in the libretro core: the frontend owns frame pacing and the core
+	// must not sleep on a wall clock.
+	(void)wolfticks;
 }
 
 /*
