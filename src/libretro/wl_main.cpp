@@ -862,28 +862,10 @@ void PrepareMainMenu (wl_state_t *state)
 
 	Menu::closeMenus(false);
 
-	StateMenuType menu;
-
-	if(EpisodeInfo::GetNumEpisodes() > 1)
-		menu = EPISODE_MENU;
-	else
-		menu = SKILL_MENU;
-#ifdef TODO
-	if (gameinfo.TrackHighScores == true)
-	{
-		mainMenu[mainMenu.countItems()-3]->setText(language["STR_VS"]);
-		mainMenu[mainMenu.countItems()-3]->setEnabled(true);
-	}
-	else
-	{
-		mainMenu[mainMenu.countItems()-3]->setText(language["STR_EG"]);
-		mainMenu[mainMenu.countItems()-3]->setEnabled(false);
-	}
-	mainMenu[mainMenu.countItems()-2]->setText(language["STR_BD"]);
-	mainMenu[mainMenu.countItems()-2]->setHighlighted(false);
-	mainMenu[3]->setEnabled(false);
-#endif
-	pushMenu(state, menu);
+	// Show the iconic Wolf3D main menu. (Previously the port skipped straight
+	// to the episode/skill selection; now New Game from the main menu leads
+	// there via handleChoice.)
+	pushMenu(state, MAIN_MENU);
 	state->currentMenu()->validateCurPos();
 	state->currentMenu()->draw();
 	Menu::closeMenus(false);
@@ -1136,6 +1118,24 @@ static bool handleChoice(wl_state_t *state, int pos)
 {
 	switch(state->menuStack[state->menuLevel - 1])
 	{
+	case MAIN_MENU:
+		switch(pos)
+		{
+		case 0: // New Game
+			if(EpisodeInfo::GetNumEpisodes() > 1)
+				pushMenu(state, EPISODE_MENU);
+			else
+				pushMenu(state, SKILL_MENU);
+			state->stage = MENU_PREPARE;
+			State_FadeOut(state);
+			break;
+		default:
+			// Sound/Control/Display/Load/Save/ReadThis/Scores/Demo/Quit are
+			// added in later layers; for now re-show the main menu.
+			state->stage = MENU_PREPARE;
+			break;
+		}
+		break;
 	case EPISODE_MENU:
 	{
 		EpisodeInfo &ep = EpisodeInfo::GetEpisode(pos);

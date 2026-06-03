@@ -68,6 +68,47 @@ namespace GameSave {
 
 unsigned long long SaveVersion = GetSaveVersion();
 uint32_t SaveProdVersion = SAVEPRODVER;
+bool param_foreginsave = false;
+
+// ---- Menu scaffold ----
+// Layer 1: the Load/Save menus exist so the main menu can reference them, but
+// the slot list, naming and on-disk handling are not wired up yet (Layer 6).
+// The Load/Save main-menu entries are therefore created disabled.
+#define LSM_Y   55
+#define LSM_W   175
+#define LSM_X   (320-LSM_W-10)
+
+static Menu loadGame(LSM_X, LSM_Y, LSM_W, 24);
+static Menu saveGame(LSM_X, LSM_Y, LSM_W, 24);
+static MenuItem *loadItem = NULL;
+static MenuItem *saveItem = NULL;
+
+Menu &GetLoadMenu() { return loadGame; }
+Menu &GetSaveMenu() { return saveGame; }
+MenuItem *GetLoadMenuItem() { return loadItem; }
+MenuItem *GetSaveMenuItem() { return saveItem; }
+
+void InitMenus()
+{
+	loadGame.setHeadPicture("M_LOADGM");
+	saveGame.setHeadPicture("M_SAVEGM");
+
+	if(!loadItem)
+		loadItem = new MenuItem(language["STR_LG"]);
+	if(!saveItem)
+		saveItem = new MenuItem(language["STR_SG"]);
+
+	// Slot enumeration is implemented in a later layer; until then these are
+	// inert placeholders so the main menu lays out correctly.
+	loadItem->setEnabled(false);
+	saveItem->setEnabled(false);
+}
+
+void QuickLoadOrSave(bool load)
+{
+	// Implemented with the save-slot system in a later layer.
+	(void)load;
+}
 
 
 void Serialize(FArchive &arc)

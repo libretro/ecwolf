@@ -99,6 +99,26 @@ void CreateMenus()
 	MENUWINHGLT_BOTBORDER = ColorMatcher.Pick(RPART(gameinfo.MenuWindowColors[5]), GPART(gameinfo.MenuWindowColors[5]), BPART(gameinfo.MenuWindowColors[5]));
 
 	// Actually initialize the menus
+	GameSave::InitMenus();
+
+	// Main menu. In the libretro port submenu navigation is driven by
+	// handleChoice() switching on the StateMenuType rather than by
+	// MenuSwitcherMenuItem, so these are plain items whose position is
+	// interpreted in handleChoice(MAIN_MENU, pos).
+	mainMenu.setHeadPicture("M_OPTION");
+	mainMenu.addItem(new MenuItem(language["STR_NG"]));       // 0: New Game
+	mainMenu.addItem(new MenuItem(language["STR_SD"]));       // 1: Sound
+	mainMenu.addItem(new MenuItem(language["STR_CL"]));       // 2: Control
+	mainMenu.addItem(new MenuItem(language["STR_DISPLAY"]));  // 3: Display
+	mainMenu.addItem(GameSave::GetLoadMenuItem());            // 4: Load Game
+	mainMenu.addItem(GameSave::GetSaveMenuItem());            // 5: Save Game
+	readThis = new MenuItem(language["STR_RT"]);              // 6: Read This
+	readThis->setVisible(gameinfo.DrawReadThis);
+	readThis->setHighlighted(true);
+	mainMenu.addItem(readThis);
+	mainMenu.addItem(new MenuItem(language["STR_VS"]));       // 7: View Scores / End Game
+	mainMenu.addItem(new MenuItem(language["STR_BD"]));       // 8: Back to Demo / game
+	mainMenu.addItem(new MenuItem(language["STR_QT"]));       // 9: Quit
 
 	episodes.setHeadText(language["STR_WHICHEPISODE"]);
 	for(unsigned int i = 0;i < EpisodeInfo::GetNumEpisodes();++i)
