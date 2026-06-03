@@ -792,6 +792,43 @@ void DrawHighScores (void)
 
 //===========================================================================
 
+/*
+==================
+=
+= ViewScores / HighScoresStep
+=
+= Non-blocking high-scores screen reachable from the main menu. ViewScores
+= draws the table and fades in; HighScoresStep waits for any menu input and
+= then returns to the menu.
+=
+==================
+*/
+
+void ViewScores (wl_state_t *state)
+{
+	StartCPMusic (gameinfo.ScoresMusic);
+	DrawHighScores ();
+	State_FadeIn (state, 0, 255, 10);
+	state->stage = HIGH_SCORES_STEP;
+}
+
+bool HighScoresStep (wl_state_t *state, const wl_input_state_t *input)
+{
+	if (input->menuEnter || input->menuBack ||
+		input->menuDir == dir_North || input->menuDir == dir_South ||
+		input->menuDir == dir_West || input->menuDir == dir_East)
+	{
+		StartCPMusic (gameinfo.MenuMusic);
+		state->stage = MENU_PREPARE;
+		return false;
+	}
+	DrawHighScores ();
+	VW_UpdateScreen ();
+	return true;
+}
+
+//===========================================================================
+
 
 /*
 =======================

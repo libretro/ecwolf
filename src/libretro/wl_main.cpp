@@ -1190,6 +1190,26 @@ static bool handleChoice(wl_state_t *state, int pos)
 			// a second visit.
 			HelpScreens(state);
 			break;
+		case 7: // View Scores (main menu) / End Game (in-game)
+			if (!ingame)
+			{
+				ViewScores(state);
+			}
+			else
+			{
+				// End Game: kill the player with no lives left so the normal
+				// death / game-over sequence runs and returns to the title.
+				// Tear down the menu and let the play loop process the new
+				// playstate (GAME_END_MAP -> ex_died -> DIED1).
+				CleanupControlPanel ();
+				players[0].lives = 0;
+				playstate = ex_died;
+				players[0].killerobj = NULL;
+				players[0].mo->Die();
+				state->menuLevel = 0;
+				state->stage = GAME_END_MAP;
+			}
+			break;
 		case 8: // Back to Demo
 			return popMenu(state);
 		case 9: // Quit
@@ -1606,6 +1626,8 @@ bool TopLoopStep(wl_state_t *state, const wl_input_state_t *input) {
 		return VictoryZoomerStep(state);
 	case TEXT_READER_STEP:
 		return TextReaderStep(state, input);
+	case HIGH_SCORES_STEP:
+		return HighScoresStep(state, input);
 	}
 	assert(false);
 	return true;
