@@ -830,6 +830,7 @@ unsigned int I_MakeRNGSeed();
 
 extern Menu episodes;
 extern Menu skills;
+extern Menu optionsMenu;
 extern Menu soundMenu;
 extern Menu controlMenu;
 extern Menu displayMenu;
@@ -899,13 +900,13 @@ void PrepareMainMenu (wl_state_t *state)
 	if (GameSave::GetSaveMenuItem())
 		GameSave::GetSaveMenuItem()->setEnabled(ingame);
 
-	// Item 7 reads "View Scores" at the title and "End Game" once a game is
-	// running. Item 8 ("Back to Game") only makes sense while a game is in
+	// Item 5 reads "View Scores" at the title and "End Game" once a game is
+	// running. Item 6 ("Back to Game") only makes sense while a game is in
 	// progress, so it is hidden at the title (where there is nothing to go back
 	// to) and shown, paired with End Game, in-game.
-	mainMenu[7]->setText(language[ingame ? "STR_EG" : "STR_VS"]);
-	mainMenu[8]->setText(language["STR_BG"]);
-	mainMenu[8]->setVisible(ingame);
+	mainMenu[5]->setText(language[ingame ? "STR_EG" : "STR_VS"]);
+	mainMenu[6]->setText(language["STR_BG"]);
+	mainMenu[6]->setVisible(ingame);
 
 	state->currentMenu()->validateCurPos();
 	state->currentMenu()->draw();
@@ -925,6 +926,8 @@ wl_state_t::currentMenu() {
 		return &episodes;
 	case SKILL_MENU:
 		return &skills;
+	case OPTIONS_MENU:
+		return &optionsMenu;
 	case SOUND_MENU:
 		return &soundMenu;
 	case CONTROL_MENU:
@@ -1184,28 +1187,20 @@ static bool handleChoice(wl_state_t *state, int pos)
 			state->stage = MENU_PREPARE;
 			State_FadeOut(state);
 			break;
-		case 1: // Sound Options
-			pushMenu(state, SOUND_MENU);
+		case 1: // Options (submenu)
+			pushMenu(state, OPTIONS_MENU);
 			state->stage = MENU_PREPARE;
 			break;
-		case 2: // Control Setup
-			pushMenu(state, CONTROL_MENU);
-			state->stage = MENU_PREPARE;
-			break;
-		case 3: // Display Options
-			pushMenu(state, DISPLAY_MENU);
-			state->stage = MENU_PREPARE;
-			break;
-		case 4: // Load Game
+		case 2: // Load Game
 			pushMenu(state, LOAD_MENU);
 			state->stage = MENU_PREPARE;
 			break;
-		case 5: // Save Game (pick a slot; enabled only in-game)
+		case 3: // Save Game (pick a slot; enabled only in-game)
 			if (ingame)
 				pushMenu(state, SAVE_MENU);
 			state->stage = MENU_PREPARE;
 			break;
-		case 6: // Read This!
+		case 4: // Read This!
 			// HelpScreens drives its own fade via the state machine
 			// (ShowArticle/TextReaderStep). Don't call MenuFadeOut here: it is
 			// redundant and toggles menusAreFaded, whose paired MenuFadeIn is
@@ -1213,7 +1208,7 @@ static bool handleChoice(wl_state_t *state, int pos)
 			// a second visit.
 			HelpScreens(state);
 			break;
-		case 7: // View Scores (main menu) / End Game (in-game)
+		case 5: // View Scores (main menu) / End Game (in-game)
 			if (!ingame)
 			{
 				ViewScores(state);
@@ -1233,19 +1228,35 @@ static bool handleChoice(wl_state_t *state, int pos)
 				state->stage = GAME_END_MAP;
 			}
 			break;
-		case 8: // Back to Game (only shown/reachable in-game)
+		case 6: // Back to Game (only shown/reachable in-game)
 			return popMenu(state);
-		case 9: // Quit
+		case 7: // Quit
 			Libretro_RequestQuit();
 			state->stage = MENU_PREPARE;
 			break;
 		default:
-			// View Scores / End Game (7) needs the non-blocking high-scores
-			// screen and the in-game menu; added in a later step. For now any
-			// unhandled item just re-shows the main menu.
 			state->stage = MENU_PREPARE;
 			break;
 		}
+		break;
+	case OPTIONS_MENU:
+		// The Options submenu groups the configuration sub-menus.
+		switch(pos)
+		{
+		case 0: // Control Setup
+			pushMenu(state, CONTROL_MENU);
+			break;
+		case 1: // Sound Options
+			pushMenu(state, SOUND_MENU);
+			break;
+		case 2: // Display Options
+			pushMenu(state, DISPLAY_MENU);
+			break;
+		case 3: // Automap Options
+			pushMenu(state, AUTOMAP_MENU);
+			break;
+		}
+		state->stage = MENU_PREPARE;
 		break;
 	case EPISODE_MENU:
 	{
@@ -1304,20 +1315,11 @@ static bool handleChoice(wl_state_t *state, int pos)
 	case SOUND_MENU:
 	case CONTROL_MENU:
 	case AUTOMAP_MENU:
+	case DISPLAY_MENU:
 		// Sliders are adjusted with left/right; booleans toggle and
 		// multiple-choice items advance when activated with Enter.
 		state->currentMenu()->getIndex(pos)->activate();
 		Libretro_SyncOptionsFromEngine();
-		state->stage = MENU_PREPARE;
-		break;
-	case DISPLAY_MENU:
-		if(pos == 2) // Automap Options
-			pushMenu(state, AUTOMAP_MENU);
-		else
-		{
-			state->currentMenu()->getIndex(pos)->activate();
-			Libretro_SyncOptionsFromEngine();
-		}
 		state->stage = MENU_PREPARE;
 		break;
 	}

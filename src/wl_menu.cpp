@@ -59,6 +59,7 @@ Menu soundMenu(24, 45, 284, 24);
 Menu controlMenu(CTL_X, CTL_Y, CTL_W, 56);
 Menu displayMenu(20, 75, 285, 56);
 Menu automapMenu(40, 55, 260, 56);
+Menu optionsMenu(80, 80, 190, 28);
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
@@ -134,18 +135,24 @@ void CreateMenus()
 	// interpreted in handleChoice(MAIN_MENU, pos).
 	mainMenu.setHeadPicture("M_OPTION");
 	mainMenu.addItem(new MenuItem(language["STR_NG"]));       // 0: New Game
-	mainMenu.addItem(new MenuItem(language["STR_SD"]));       // 1: Sound
-	mainMenu.addItem(new MenuItem(language["STR_CL"]));       // 2: Control
-	mainMenu.addItem(new MenuItem(language["STR_DISPLAY"]));  // 3: Display
-	mainMenu.addItem(GameSave::GetLoadMenuItem());            // 4: Load Game
-	mainMenu.addItem(GameSave::GetSaveMenuItem());            // 5: Save Game
-	readThis = new MenuItem(language["STR_RT"]);              // 6: Read This
+	mainMenu.addItem(new MenuItem(language["STR_OPTIONS"]));  // 1: Options (submenu)
+	mainMenu.addItem(GameSave::GetLoadMenuItem());            // 2: Load Game
+	mainMenu.addItem(GameSave::GetSaveMenuItem());            // 3: Save Game
+	readThis = new MenuItem(language["STR_RT"]);              // 4: Read This
 	readThis->setVisible(gameinfo.DrawReadThis);
 	readThis->setHighlighted(true);
 	mainMenu.addItem(readThis);
-	mainMenu.addItem(new MenuItem(language["STR_VS"]));       // 7: View Scores / End Game
-	mainMenu.addItem(new MenuItem(language["STR_BD"]));       // 8: Back to Demo / game
-	mainMenu.addItem(new MenuItem(language["STR_QT"]));       // 9: Quit
+	mainMenu.addItem(new MenuItem(language["STR_VS"]));       // 5: View Scores / End Game
+	mainMenu.addItem(new MenuItem(language["STR_BD"]));       // 6: Back to Demo / game
+	mainMenu.addItem(new MenuItem(language["STR_QT"]));       // 7: Quit
+
+	// Options submenu: Control, Sound, Display and Automap, matching the
+	// standalone layout. Positions are interpreted in handleChoice(OPTIONS_MENU).
+	optionsMenu.setHeadPicture("M_OPTION");
+	optionsMenu.addItem(new MenuItem(language["STR_CL"]));        // 0: Control Setup
+	optionsMenu.addItem(new MenuItem(language["STR_SD"]));        // 1: Sound Options
+	optionsMenu.addItem(new MenuItem(language["STR_DISPLAY"]));   // 2: Display Options
+	optionsMenu.addItem(new MenuItem(language["STR_AMOPTIONS"])); // 3: Automap Options
 
 	episodes.setHeadText(language["STR_WHICHEPISODE"]);
 	for(unsigned int i = 0;i < EpisodeInfo::GetNumEpisodes();++i)
@@ -196,13 +203,12 @@ void CreateMenus()
 	controlMenu.addItem(new SliderMenuItem(panyadjustment, 192, 20, language["STR_SLOW"], language["STR_FAST"]));
 
 	// Display Options: window/vsync are owned by the libretro frontend and have
-	// no engine globals here, so expose the engine-side display settings that
-	// are live: the screen (view) size, plus a link to the automap options.
-	// NewViewSize recomputes the 3D view when the size changes.
+	// no engine globals here, so expose the engine-side display setting that is
+	// live: the screen (view) size. NewViewSize recomputes the 3D view when the
+	// size changes. (Automap options are now a separate entry under Options.)
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
 	displayMenu.addItem(new LabelMenuItem(language["STR_SCREENSIZE"]));
 	displayMenu.addItem(new SliderMenuItem(viewsize, 110, 21, language["STR_SMALL"], language["STR_LARGE"], AdjustViewSize));
-	displayMenu.addItem(new MenuItem(language["STR_AMOPTIONS"]));
 
 	// Automap Options: all of these are live engine globals; AM_UpdateFlags
 	// applies the change immediately.
