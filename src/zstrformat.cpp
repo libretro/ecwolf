@@ -85,14 +85,8 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <math.h>
-#include <stdlib.h>
-#include <locale.h>
 
 #include "zstring.h"
-#ifndef DISABLE_GDTOA
-#include "gdtoa.h"
-#endif
 
 #ifndef _MSC_VER
 #include <stdint.h>
@@ -100,20 +94,6 @@
 typedef unsigned __int64 uint64_t;
 typedef signed __int64 int64_t;
 #endif
-
-/*
- * MAXEXPDIG is the maximum number of decimal digits needed to store a
- * floating point exponent in the largest supported format.  It should
- * be ceil(log10(LDBL_MAX_10_EXP)) or, if hexadecimal floating point
- * conversions are supported, ceil(log10(LDBL_MAX_EXP)).  But since it
- * is presently never greater than 5 in practice, we fudge it.
- */
-#define	MAXEXPDIG	6
-#if LDBL_MAX_EXP > 999999
-#error "floating point buffers too small"
-#endif
-
-#define DEFPREC		6
 
 static const char hexits[16] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 static const char HEXits[16] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
@@ -124,8 +104,6 @@ static const char dotchar = '.';
 namespace StringFormat
 {
 	static int writepad (OutputFunc output, void *outputData, const char *pad, int padsize, int spaceToFill);
-	static int printandpad (OutputFunc output, void *outputData, const char *p, const char *ep, int len, const char *with, int padsize);
-	static int exponent (char *p0, int exp, int fmtch);
 
 	int Worker (OutputFunc output, void *outputData, const char *fmt, ...)
 	{
@@ -309,32 +287,8 @@ namespace StringFormat
 		uint64_t int64arg = 0;
 		const void *voidparg;
 		const char *charparg;
-		double dblarg;
 		const char *xits = hexits;
 		int inlen = len;
-		/*
-		 * We can decompose the printed representation of floating
-		 * point numbers into several parts, some of which may be empty:
-		 *
-		 * [+|-| ] [0x|0X] MMM . NNN [e|E|p|P] [+|-] ZZ
-		 *    A       B     ---C---      D       E   F
-		 *
-		 * A:	'sign' holds this value if present; '\0' otherwise
-		 * B:	hexprefix holds the 'x' or 'X'; '\0' if not hexadecimal
-		 * C:	obuff points to the string MMMNNN.  Leading and trailing
-		 *		zeros are not in the string and must be added.
-		 * D:	expchar holds this character; '\0' if no exponent, e.g. %f
-		 * F:	at least two digits for decimal, at least one digit for hex
-		 */
-		const char *decimal_point = ".";/* locale specific decimal point */
-		int signflag;					/* true if float is negative */
-		int expt = 0;						/* integer value of exponent */
-		char expchar = 'e';				/* exponent character: [eEpP\0] */
-		char *dtoaend;					/* pointer to end of converted digits */
-		int expsize = 0;				/* character count for expstr */
-		int ndig = 0;					/* actual number of digits returned by dtoa */
-		char expstr[MAXEXPDIG+2];		/* buffer for exponent string: e+ZZZ */
-		char *dtoaresult = NULL;		/* buffer allocated by dtoa */
 
 		// Using a bunch of if/else if statements is faster than a switch, because a switch generates
 		// a jump table. A jump table means a possible data cache miss and a hefty penalty while the
@@ -626,124 +580,6 @@ namespace StringFormat
 				*va_arg (arglist, int *) = inlen;
 			}
 		}
-#ifndef DISABLE_GDTOA
-		else if (type == 'f' || type == 'F')
-		{
-			expchar = '\0';
-			goto fp_begin;
-		}
-		else if (type == 'g' || type == 'G')
-		{
-			expchar = type - ('g' - 'e');
-			if (precision == 0)
-			{
-				precision = 1;
-			}
-			goto fp_begin;
-		}
-#endif
-#ifndef DISABLE_GDTOA
-		else if (type == 'e' || type == 'E')
-		{
-			expchar = type;
-			if (precision < 0)	// account for digit before decpt
-			{
-				precision = DEFPREC + 1;
-			}
-			else
-			{
-				precision++;
-			}
-fp_begin:
-			if (precision < 0)
-			{
-				precision = DEFPREC;
-			}
-			dblarg = va_arg(arglist, double);
-			obuff = dtoaresult = dtoa(dblarg, expchar ? 2 : 3, precision, &expt, &signflag, &dtoaend);
-//fp_common:
-#ifdef __ANDROID__
-			decimal_point = ".";
-#else
-			decimal_point = localeconv()->decimal_point;
-#endif
-			flags |= F_SIGNED;
-			if (signflag)
-			{
-				flags |= F_NEGATIVE;
-			}
-			if (expt == INT_MAX)	// inf or nan
-			{
-				if (*obuff == 'N')
-				{
-					obuff = (type >= 'a') ? "nan" : "NAN";
-					flags &= ~F_SIGNED;
-				}
-				else
-				{
-					obuff = (type >= 'a') ? "inf" : "INF";
-				}
-				bufflen = 3;
-				flags &= ~F_ZERO;
-			}
-			else
-			{
-				flags |= F_FPT;
-				ndig = (int)(dtoaend - obuff);
-				if (type == 'g' || type == 'G')
-				{
-					if (expt > -4 && expt <= precision)
-					{ // Make %[gG] smell like %[fF].
-						expchar = '\0';
-						if (flags & F_HASH)
-						{
-							precision -= expt;
-						}
-						else
-						{
-							precision = ndig - expt;
-						}
-						if (precision < 0)
-						{
-							precision = 0;
-						}
-					}
-					else
-					{ // Make %[gG] smell like %[eE], but trim trailing zeroes if no # flag.
-						if (!(flags & F_HASH))
-						{
-							precision = ndig;
-						}
-					}
-				}
-				if (expchar)
-				{
-					expsize = exponent(expstr, expt - 1, expchar);
-					bufflen = expsize + precision;
-					if (precision > 1 || (flags & F_HASH))
-					{
-						++bufflen;
-					}
-				}
-				else
-				{ // space for digits before decimal point
-					if (expt > 0)
-					{
-						bufflen = expt;
-					}
-					else	// "0"
-					{
-						bufflen = 1;
-					}
-					// space for decimal pt and following digits
-					if (precision != 0 || (flags & F_HASH))
-					{
-						bufflen += precision + 1;
-					}
-				}
-			}
-		}
-#endif
 		
 		// Check for sign prefix (only for signed numbers)
 		if (flags & F_SIGNED)
@@ -798,55 +634,9 @@ fp_begin:
 			outlen += output (outputData, prefix, prefixlen);
 		}
 		outlen += writepad (output, outputData, zeroes, sizeof(spaces), postprefixzeros);
-		if (!(flags & F_FPT))
+		if (bufflen > 0)
 		{
-			if (bufflen > 0)
-			{
-				outlen += output (outputData, obuff, bufflen);
-			}
-		}
-		else
-		{
-			if (expchar == '\0')	// %[fF] or sufficiently short %[gG]
-			{
-				if (expt <= 0)
-				{
-					outlen += output (outputData, zeroes, 1);
-					if (precision != 0 || (flags & F_HASH))
-					{
-						outlen += output (outputData, decimal_point, 1);
-					}
-					outlen += writepad (output, outputData, zeroes, sizeof(zeroes), -expt);
-					// already handled initial 0's
-					precision += expt;
-				}
-				else
-				{
-					outlen += printandpad (output, outputData, obuff, dtoaend, expt, zeroes, sizeof(zeroes));
-					obuff += expt;
-					if (precision || (flags & F_HASH))
-					{
-						outlen += output (outputData, decimal_point, 1);
-					}
-				}
-				outlen += printandpad (output, outputData, obuff, dtoaend, precision, zeroes, sizeof(zeroes));
-			}
-			else						// %[eE] or sufficiently long %[gG]
-			{
-				if (precision > 1 || (flags & F_HASH))
-				{
-					buffer[0] = *obuff++;
-					buffer[1] = *decimal_point;
-					outlen += output (outputData, buffer, 2);
-					outlen += output (outputData, obuff, ndig - 1);
-					outlen += writepad (output, outputData, zeroes, sizeof(zeroes), precision - ndig);
-				}
-				else		// XeYY
-				{
-					outlen += output (outputData, obuff, 1);
-				}
-				outlen += output (outputData, expstr, expsize);
-			}
+			outlen += output (outputData, obuff, bufflen);
 		}
 
         if ((flags & F_MINUS) && fieldlen < width)
@@ -854,13 +644,6 @@ fp_begin:
 			outlen += writepad (output, outputData, pad, sizeof(spaces), width - fieldlen);
 		}
 		len += outlen;
-		if (dtoaresult != NULL)
-		{
-#ifndef DISABLE_GDTOA
-			freedtoa(dtoaresult);
-#endif
-			dtoaresult = NULL;
-		}
 	}
 	}
 	}
@@ -875,64 +658,6 @@ fp_begin:
 			spaceToFill -= count;
 		}
 		return outlen;
-	}
-
-	static int printandpad (OutputFunc output, void *outputData, const char *p, const char *ep, int len, const char *with, int padsize)
-	{
-		int outlen = 0;
-		int n2 = (int)(ep - p);
-		if (n2 > len)
-		{
-			n2 = len;
-		}
-		if (n2 > 0)
-		{
-			outlen = output (outputData, p, n2);	
-		}
-		return outlen + writepad (output, outputData, with, padsize, len - (n2 > 0 ? n2 : 0));
-	}
-
-	static int exponent (char *p0, int exp, int fmtch)
-	{
-		char *p, *t;
-		char expbuf[MAXEXPDIG];
-
-		p = p0;
-		*p++ = fmtch;
-		if (exp < 0)
-		{
-			exp = -exp;
-			*p++ = '-';
-		}
-		else
-		{
-			*p++ = '+';
-		}
-		t = expbuf + MAXEXPDIG;
-		if (exp > 9)
-		{
-			do
-			{
-				*--t = '0' + (exp % 10);
-			}
-			while ((exp /= 10) > 9);
-			*--t = '0' + exp;
-			for(; t < expbuf + MAXEXPDIG; *p++ = *t++)
-			{ }
-		}
-		else
-		{
-			// Exponents for decimal floating point conversions
-			// (%[eEgG]) must be at least two characters long,
-			// whereas exponents for hexadecimal conversions can
-			// be only one character long.
-			if (fmtch == 'e' || fmtch == 'E')
-			{
-				*p++ = '0';
-			}
-			*p++ = '0' + exp;
-		}
-		return (int)(p - p0);
 	}
 };
 
