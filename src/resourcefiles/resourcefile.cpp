@@ -583,17 +583,13 @@ FExternalLump::FExternalLump(const char *_filename, int filesize)
 
 	if (filesize == -1)
 	{
-		FILE *f = fopen(_filename,"rb");
-		if (f != NULL)
-		{
-			fseek(f, 0, SEEK_END);
-			LumpSize = ftell(f);
-			fclose(f);
-		}
+		// Route through the (VFS-backed) FileReader rather than raw stdio so
+		// the frontend controls file access.
+		FileReader f;
+		if (f.Open(_filename))
+			LumpSize = f.GetLength();
 		else
-		{
 			LumpSize = 0;
-		}
 	}
 	else
 	{
@@ -616,11 +612,10 @@ FExternalLump::~FExternalLump()
 int FExternalLump::FillCache()
 {
 	Cache = new char[LumpSize];
-	FILE *f = fopen(filename, "rb");
-	if (f != NULL)
+	FileReader f;
+	if (f.Open(filename))
 	{
-		fread(Cache, 1, LumpSize, f);
-		fclose(f);
+		f.Read(Cache, LumpSize);
 	}
 	else
 	{
