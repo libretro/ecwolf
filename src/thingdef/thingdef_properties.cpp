@@ -585,6 +585,20 @@ HANDLE_PROPERTY(pickupmessage)
 	cls->Meta.SetMetaString(AMETA_PickupMessage, message);
 }
 
+// Death messages. This engine has no facility to display them, but storing the
+// strings lets mods that define them load cleanly and keeps the data available.
+HANDLE_PROPERTY(obituary)
+{
+	STRING_PARAM(message, 0);
+	cls->Meta.SetMetaString(AMETA_Obituary, message);
+}
+
+HANDLE_PROPERTY(hitobituary)
+{
+	STRING_PARAM(message, 0);
+	cls->Meta.SetMetaString(AMETA_HitObituary, message);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DEFINE_PROP_PREFIX(name, class, prefix, params) { A##class::__StaticClass, #prefix, #name, #params, __Handler_##name }
@@ -619,6 +633,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(halolight, Actor, IFI_S),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
 	DEFINE_PROP(height, Actor, I),
+	DEFINE_PROP(hitobituary, Actor, S),
 	DEFINE_PROP(icon, Inventory, S),
 	DEFINE_PROP(interhubamount, Inventory, I),
 	DEFINE_PROP(maxamount, Inventory, I),
@@ -628,6 +643,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(missilefrequency, Actor, F),
 	DEFINE_PROP(MONSTER, Actor,),
 	DEFINE_PROP_PREFIX(movebob, PlayerPawn, Player, F),
+	DEFINE_PROP(obituary, Actor, S),
 	DEFINE_PROP(overheadicon, Actor, S),
 	DEFINE_PROP(painchance, Actor, I),
 	DEFINE_PROP(painsound, Actor, S),
