@@ -90,13 +90,6 @@ namespace GC
 	// Does a complete collection.
 	void FullGC();
 
-	// Handles a write barrier. No-ops now that collection is deterministic;
-	// kept so existing call sites still resolve.
-	static inline void WriteBarrier(DObject *pointing, DObject *pointed);
-
-	// Handles a write barrier for a pointer that isn't inside an object.
-	static inline void WriteBarrier(DObject *pointed);
-
 	// Handles a read barrier.
 	template<class T> inline T *ReadBarrier(T *&obj)
 	{
@@ -306,16 +299,5 @@ protected:
 
 	virtual void	Init() {}
 };
-
-static inline void GC::WriteBarrier(DObject *pointing, DObject *pointed)
-{
-	(void)pointing;
-	(void)pointed;
-}
-
-static inline void GC::WriteBarrier(DObject *pointed)
-{
-	(void)pointed;
-}
 
 #endif //__DOBJECT_H__

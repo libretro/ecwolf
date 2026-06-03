@@ -166,9 +166,6 @@ void AActor::AddInventory(AInventory *item)
 			if(next->inventory == NULL)
 			{
 				next->inventory = item;
-
-				// Prevent the GC from cleaning this item
-				GC::WriteBarrier(item);
 				break;
 			}
 		}

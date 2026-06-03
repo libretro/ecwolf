@@ -142,19 +142,10 @@ void ThinkerList::Register(Thinker *thinker, Priority type)
 {
 	thinkers[type].Push(thinker);
 	thinker->thinkerPriority = type;
-
-	Iterator head(thinker);
-	if(head.Next())
-	{
-		GC::WriteBarrier(thinker, head);
-		GC::WriteBarrier(head, thinker);
-	}
-	GC::WriteBarrier(thinker);
 }
 
 void ThinkerList::Deregister(Thinker *thinker)
 {
-	Thinker * const prev = static_cast<Thinker*>(thinker->elPrev);
 	Thinker * const next = static_cast<Thinker*>(thinker->elNext);
 
 	// If we're about to think this thinker then we should probably skip it.
@@ -162,11 +153,6 @@ void ThinkerList::Deregister(Thinker *thinker)
 		nextThinker = next;
 
 	thinkers[thinker->thinkerPriority].Remove(thinker);
-	if(prev && next)
-	{
-		GC::WriteBarrier(prev, next);
-		GC::WriteBarrier(next, prev);
-	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////

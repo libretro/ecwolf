@@ -329,7 +329,6 @@ bool IVideo::SetResolution (int width, int height, int bits)
 	}
 
 	screen = Video->CreateFrameBuffer(width, height, true, NULL);
-	GC::WriteBarrier(screen);
 	memcpy (screen->GetPalette(), palette, sizeof(PalEntry)*256);
 	screen->UpdatePalette();
 	
