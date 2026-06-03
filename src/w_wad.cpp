@@ -1123,24 +1123,6 @@ const char *FWadCollection::GetWadFullName (int wadnum) const
 //
 //==========================================================================
 
-#ifndef LIBRETRO
-
-bool FWadCollection::IsUncompressedFile(int lump) const
-{
-	if ((unsigned)lump >= (unsigned)NumLumps)
-	{
-		I_Error ("IsUncompressedFile: %u >= NumLumps",lump);
-	}
-
-	FResourceLump *l = LumpInfo[lump].lump;
-	FileReader *f = l->GetReader();
-	
-	// We can access the file only if we get the FILE pointer from the FileReader here.
-	// Any other case means it won't work.
-	return (f != NULL && f->GetFile() != NULL);
-}
-
-#endif
 
 //==========================================================================
 //

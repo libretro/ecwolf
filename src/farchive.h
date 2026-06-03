@@ -62,16 +62,10 @@ public:
 
 virtual	~FFile () {}
 
-#ifndef LIBRETRO
-virtual	bool Open (const char *name, EOpenMode mode) = 0;
-#endif
 virtual	void Close () = 0;
 virtual	void Flush () = 0;
 virtual EOpenMode Mode () const = 0;
 virtual bool IsPersistent () const = 0;
-#ifndef LIBRETRO
-virtual bool IsOpen () const = 0;
-#endif
 
 virtual	FFile& Write (const void *, unsigned int) = 0;
 virtual	FFile& Read (void *, unsigned int) = 0;
@@ -85,15 +79,8 @@ class FCompressedFile : public FFile
 {
 public:
 	FCompressedFile ();
-#ifndef LIBRETRO
-	FCompressedFile (const char *name, EOpenMode mode, bool dontcompress = false);
-	FCompressedFile (FILE *file, EOpenMode mode, bool dontcompress = false, bool postopen=true);
-#endif
 	~FCompressedFile ();
 
-#ifndef LIBRETRO
-	bool Open (const char *name, EOpenMode mode);
-#endif
 	void Close ();
 	void Flush ();
 	EOpenMode Mode () const;
@@ -113,9 +100,6 @@ protected:
 	unsigned char *m_Buffer;
 	bool m_NoCompress;
 	EOpenMode m_Mode;
-#ifndef LIBRETRO
-	FILE *m_File;
-#endif
 
 	void Implode ();
 	void Explode ();
@@ -130,9 +114,6 @@ class FCompressedMemFile : public FCompressedFile
 {
 public:
 	FCompressedMemFile ();
-#ifndef LIBRETRO
-	FCompressedMemFile (FILE *file);	// Create for reading
-#endif
 	~FCompressedMemFile ();
 
 	bool Open (const char *name, EOpenMode mode);	// Works for reading only
@@ -291,16 +272,6 @@ private:
 };
 
 // Create an FPNGChunkFile and FArchive in one step
-#ifndef LIBRETRO
-class FPNGChunkArchive : public FArchive
-{
-public:
-	FPNGChunkArchive (FILE *file, uint32_t chunkid);
-	FPNGChunkArchive (FILE *file, uint32_t chunkid, size_t chunklen);
-	~FPNGChunkArchive ();
-	FPNGChunkFile Chunk;
-};
-#endif
 
 inline FArchive &operator<< (FArchive &arc, PalEntry &p)
 {

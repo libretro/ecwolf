@@ -392,19 +392,6 @@ static inline fixed FixedDiv(fixed a, fixed b)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) I_FatalError("Out of memory at %s:%i", __FILE__, __LINE__)
 
-#if !defined(_WIN32) && !defined(LIBRETRO)
-	static inline char* itoa(int value, char* string, int radix)
-	{
-		sprintf(string, "%d", value);
-		return string;
-	}
-
-	static inline char* ltoa(long value, char* string, int radix)
-	{
-		sprintf(string, "%ld", value);
-		return string;
-	}
-#endif
 
 #define typeoffsetof(type,variable) ((int)(size_t)&((type*)1)->variable - 1)
 

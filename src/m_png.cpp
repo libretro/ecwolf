@@ -77,14 +77,6 @@ struct IHDR
 } PACKED;
 PACK_END
 
-#ifndef LIBRETRO
-
-PNGHandle::PNGHandle (FILE *file) : File(0), bDeleteFilePtr(true), ChunkPt(0)
-{
-	File = new FileReader(file);
-}
-
-#endif
 
 PNGHandle::PNGHandle (FileReader *file) : File(file), bDeleteFilePtr(false), ChunkPt(0) {}
 PNGHandle::~PNGHandle ()
@@ -140,55 +132,6 @@ CVAR(Float, png_gamma, 0.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)*/
 //
 //==========================================================================
 
-#ifndef LIBRETRO
-
-bool M_CreatePNG (FILE *file, const uint8_t *buffer, const PalEntry *palette,
-				  ESSType color_type, int width, int height, int pitch)
-{
-	uint8_t work[8 +				// signature
-			  12+2*4+5 +		// IHDR
-			  12+4 +			// gAMA
-			  12+256*3];		// PLTE
-	uint32_t *const sig = (uint32_t *)&work[0];
-	IHDR *const ihdr = (IHDR *)&work[8 + 8];
-	uint32_t *const gama = (uint32_t *)((uint8_t *)ihdr + 2*4+5 + 12);
-	uint8_t *const plte = (uint8_t *)gama + 4 + 12;
-	size_t work_len;
-
-	sig[0] = MAKE_ID(137,'P','N','G');
-	sig[1] = MAKE_ID(13,10,26,10);
-
-	ihdr->Width = BigLong(width);
-	ihdr->Height = BigLong(height);
-	ihdr->BitDepth = 8;
-	ihdr->ColorType = color_type == SS_PAL ? 3 : 2;
-	ihdr->Compression = 0;
-	ihdr->Filter = 0;
-	ihdr->Interlace = 0;
-	MakeChunk (ihdr, MAKE_ID('I','H','D','R'), 2*4+5);
-
-	// Assume a display exponent of 2.2 (100000/2.2 ~= 45454.5)
-	*gama = BigLong (int (45454.5f * (png_gamma == 0.f ? Gamma : png_gamma)));
-	MakeChunk (gama, MAKE_ID('g','A','M','A'), 4);
-
-	if (color_type == SS_PAL)
-	{
-		StuffPalette (palette, plte);
-		MakeChunk (plte, MAKE_ID('P','L','T','E'), 256*3);
-		work_len = sizeof(work);
-	}
-	else
-	{
-		work_len = sizeof(work) - (12+256*3);
-	}
-
-	if (fwrite (work, 1, work_len, file) != work_len)
-		return false;
-
-	return M_SaveBitmap (buffer, color_type, width, height, pitch, file);
-}
-
-#endif
 
 //==========================================================================
 //
@@ -387,87 +330,6 @@ bool M_GetPNGText (PNGHandle *png, const char *keyword, char *buffer, size_t buf
 //
 //==========================================================================
 
-#ifndef LIBRETRO
-PNGHandle *M_VerifyPNG (FILE *file)
-{
-	PNGHandle::Chunk chunk;
-	FileReader *filer;
-	PNGHandle *png;
-	uint32_t data[2];
-	bool sawIDAT = false;
-
-	if (fread (&data, 1, 8, file) != 8)
-	{
-		return NULL;
-	}
-	if (data[0] != MAKE_ID(137,'P','N','G') || data[1] != MAKE_ID(13,10,26,10))
-	{ // Does not have PNG signature
-		return NULL;
-	}
-	if (fread (&data, 1, 8, file) != 8)
-	{
-		return NULL;
-	}
-	if (data[1] != MAKE_ID('I','H','D','R'))
-	{ // IHDR must be the first chunk
-		return NULL;
-	}
-
-	// It looks like a PNG so far, so start creating a PNGHandle for it
-	png = new PNGHandle (file);
-	filer = png->File;
-	chunk.ID = data[1];
-	chunk.Offset = 16;
-	chunk.Size = BigLong((unsigned int)data[0]);
-	png->Chunks.Push (chunk);
-	filer->Seek (16, SEEK_SET);
-
-	while (filer->Seek (chunk.Size + 4, SEEK_CUR) == 0)
-	{
-		// If the file ended before an IEND was encountered, it's not a PNG.
-		if (filer->Read (&data, 8) != 8)
-		{
-			break;
-		}
-		// An IEND chunk terminates the PNG and must be empty
-		if (data[1] == MAKE_ID('I','E','N','D'))
-		{
-			if (data[0] == 0 && sawIDAT)
-			{
-				return png;
-			}
-			break;
-		}
-		// A PNG must include an IDAT chunk
-		if (data[1] == MAKE_ID('I','D','A','T'))
-		{
-			sawIDAT = true;
-		}
-		chunk.ID = data[1];
-		chunk.Offset = ftell (file);
-		chunk.Size = BigLong((unsigned int)data[0]);
-		png->Chunks.Push (chunk);
-
-		// If this is a text chunk, also record its contents.
-		if (data[1] == MAKE_ID('t','E','X','t'))
-		{
-			char *str = new char[chunk.Size + 1];
-
-			if (filer->Read (str, chunk.Size) != (long)chunk.Size)
-			{
-				delete[] str;
-				break;
-			}
-			str[chunk.Size] = 0;
-			png->TextChunks.Push (str);
-			chunk.Size = 0;		// Don't try to seek past its contents again.
-		}
-	}
-
-	delete png;
-	return NULL;
-}
-#endif
 
 //==========================================================================
 //

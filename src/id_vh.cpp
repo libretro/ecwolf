@@ -115,37 +115,6 @@ void VW_MeasurePropString (FFont *font, const char *string, uint16_t &width, uin
 
 =============================================================================
 */
-#ifndef LIBRETRO
-#if SDL_VERSION_ATLEAST(2,0,0)
-void Blit8BitSurfaceToTexture(SDL_Texture *tex, SDL_Surface *surf)
-{
-	void* pixels;
-	int pitch;
-	if(!SDL_LockTexture(tex, NULL, &pixels, &pitch))
-	{
-		if(!SDL_LockSurface(surf))
-		{
-			const SDL_Color* colors = surf->format->palette->colors;
-			uint32_t* dest = reinterpret_cast<uint32_t*>(pixels);
-			uint8_t* src = reinterpret_cast<uint8_t*>(surf->pixels);
-			for(unsigned int y = 0;y < screenHeight;++y)
-			{
-				for(unsigned int x = 0;x < screenWidth;++x, ++src)
-					*dest++ = (colors[*src].r<<16)|(colors[*src].g<<8)|(colors[*src].b);
-				src += (screenWidth-surf->pitch);
-				dest += (screenWidth-pitch/4);
-			}
-			SDL_UnlockSurface(surf);
-		}
-		else
-			Printf("Can't lock surface!\n");
-		SDL_UnlockTexture(tex);
-	}
-	else
-		Printf("Can't lock texture!\n");
-}
-#endif
-#endif
 
 void VH_UpdateScreen()
 {

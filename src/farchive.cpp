@@ -146,9 +146,6 @@ void FCompressedFile::BeEmpty ()
 	m_BufferSize = 0;
 	m_MaxBufferSize = 0;
 	m_Buffer = NULL;
-#ifndef LIBRETRO
-	m_File = NULL;
-#endif
 	m_NoCompress = false;
 	m_Mode = ENotOpen;
 }
@@ -191,97 +188,15 @@ FCompressedFile::FCompressedFile ()
 	BeEmpty ();
 }
 
-#ifndef LIBRETRO
-
-FCompressedFile::FCompressedFile (const char *name, EOpenMode mode, bool dontCompress)
-{
-	BeEmpty ();
-	Open (name, mode);
-	m_NoCompress = dontCompress;
-}
-
-FCompressedFile::FCompressedFile (FILE *file, EOpenMode mode, bool dontCompress, bool postopen)
-{
-	BeEmpty ();
-	m_Mode = mode;
-	m_File = file;
-	m_NoCompress = dontCompress;
-	if (postopen)
-	{
-		PostOpen ();
-	}
-}
-
-#endif
 
 FCompressedFile::~FCompressedFile ()
 {
 	Close ();
 }
 
-#ifndef LIBRETRO
-
-bool FCompressedFile::Open (const char *name, EOpenMode mode)
-{
-	Close ();
-	if (name == NULL)
-		return false;
-	m_Mode = mode;
-	m_File = fopen (name, mode == EReading ? "rb" : "wb");
-	PostOpen ();
-	return !!m_File;
-}
-
-void FCompressedFile::PostOpen ()
-{
-	if (m_File && m_Mode == EReading)
-	{
-		char sig[4];
-		fread (sig, 4, 1, m_File);
-		if (sig[0] != ZSig[0] || sig[1] != ZSig[1] || sig[2] != ZSig[2] || sig[3] != ZSig[3])
-		{
-			fclose (m_File);
-			m_File = NULL;
-			if (sig[0] == LZOSig[0] && sig[1] == LZOSig[1] && sig[2] == LZOSig[2] && sig[3] == LZOSig[3])
-			{
-				Printf ("Compressed files from older ZDooms are not supported.\n");
-			}
-			return;
-		}
-		else
-		{
-			uint32_t sizes[2];
-			fread (sizes, sizeof(uint32_t), 2, m_File);
-			sizes[0] = SWAP_DWORD (sizes[0]);
-			sizes[1] = SWAP_DWORD (sizes[1]);
-			unsigned int len = sizes[0] == 0 ? sizes[1] : sizes[0];
-			m_Buffer = (uint8_t *)M_Malloc (len+8);
-			fread (m_Buffer+8, len, 1, m_File);
-			sizes[0] = SWAP_DWORD (sizes[0]);
-			sizes[1] = SWAP_DWORD (sizes[1]);
-			((uint32_t *)m_Buffer)[0] = sizes[0];
-			((uint32_t *)m_Buffer)[1] = sizes[1];
-			Explode ();
-		}
-	}
-}
-#endif
 
 void FCompressedFile::Close ()
 {
-#ifndef LIBRETRO
-	if (m_File)
-	{
-		if (m_Mode == EWriting)
-		{
-			Implode ();
-			fwrite (ZSig, 4, 1, m_File);
-			fwrite (m_Buffer, m_BufferSize + 8, 1, m_File);
-		}
-		fclose (m_File);
-		m_File = NULL;
-	}
-#endif
 	if (m_Buffer)
 	{
 		M_Free (m_Buffer);
@@ -299,12 +214,6 @@ FFile::EOpenMode FCompressedFile::Mode () const
 	return m_Mode;
 }
 
-#ifndef LIBRETRO
-bool FCompressedFile::IsOpen () const
-{
-	return !!m_File;
-}
-#endif
 
 FFile &FCompressedFile::Write (const void *mem, unsigned int len)
 {
@@ -492,33 +401,6 @@ FCompressedMemFile::~FCompressedMemFile ()
 	}
 }
 
-#ifndef LIBRETRO
-bool FCompressedMemFile::Open (const char *name, EOpenMode mode)
-{
-	if (mode == EWriting)
-	{
-		if (name)
-		{
-			I_Error ("FCompressedMemFile cannot write to disk");
-		}
-		else
-		{
-			return Open ();
-		}
-	}
-	else
-	{
-		bool res = FCompressedFile::Open (name, EReading);
-		if (res)
-		{
-			fclose (m_File);
-			m_File = NULL;
-		}
-		return res;
-	}
-	return false;
-}
-#endif
 
 bool FCompressedMemFile::Open (void *memblock)
 {
@@ -677,68 +559,6 @@ void FCompressedMemFile::GetSizes(unsigned int &compressed, unsigned int &uncomp
 	}
 }
 
-#ifndef LIBRETRO
-
-FPNGChunkFile::FPNGChunkFile (FILE *file, uint32_t id)
-	: FCompressedFile (file, EWriting, true, false), m_ChunkID (id)
-{
-}
-
-FPNGChunkFile::FPNGChunkFile (FILE *file, uint32_t id, size_t chunklen)
-	: FCompressedFile (file, EReading, true, false), m_ChunkID (id)
-{
-	m_Buffer = (uint8_t *)M_Malloc (chunklen);
-	m_BufferSize = (unsigned int)chunklen;
-	fread (m_Buffer, chunklen, 1, m_File);
-	// Skip the CRC for now. Maybe later it will be used.
-	fseek (m_File, 4, SEEK_CUR);
-}
-
-// Unlike FCompressedFile::Close, m_File is left open
-void FPNGChunkFile::Close ()
-{
-	uint32_t data[2];
-	uint32_t crc;
-
-	if (m_File)
-	{
-		if (m_Mode == EWriting)
-		{
-			crc = CalcCRC32 ((uint8_t *)&m_ChunkID, 4);
-			crc = AddCRC32 (crc, (uint8_t *)m_Buffer, m_BufferSize);
-
-			data[0] = BigLong(m_BufferSize);
-			data[1] = m_ChunkID;
-			fwrite (data, 8, 1, m_File);
-			fwrite (m_Buffer, m_BufferSize, 1, m_File);
-			crc = SWAP_DWORD (crc);
-			fwrite (&crc, 4, 1, m_File);
-		}
-		m_File = NULL;
-	}
-	FCompressedFile::Close ();
-}
-
-FPNGChunkArchive::FPNGChunkArchive (FILE *file, uint32_t id)
-	: FArchive (), Chunk (file, id)
-{
-	AttachToFile (Chunk);
-}
-
-FPNGChunkArchive::FPNGChunkArchive (FILE *file, uint32_t id, size_t len)
-	: FArchive (), Chunk (file, id, len)
-{
-	AttachToFile (Chunk);
-}
-
-FPNGChunkArchive::~FPNGChunkArchive ()
-{
-	// Close before FArchive's destructor, because Chunk will be
-	// destroyed before the FArchive is destroyed.
-	Close ();
-}
-
-#endif
 
 //============================================
 //

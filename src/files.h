@@ -55,22 +55,15 @@ public:
 
 };
 
-#ifdef LIBRETRO
 struct retro_vfs_wrapped_file_handle;
-#endif
 
 class FileReader : public FileReaderBase
 {
 public:
 	FileReader ();
 	FileReader (const char *filename);
-#ifdef LIBRETRO
 	FileReader (struct retro_vfs_wrapped_file_handle *file);
 	FileReader (struct retro_vfs_wrapped_file_handle *file, long length);
-#else
-	FileReader (FILE *file);
-	FileReader (FILE *file, long length);
-#endif
 	bool Open (const char *filename);
 	virtual ~FileReader ();
 
@@ -86,11 +79,7 @@ public:
 
 	static FileReader *SafeOpen(const char*filename);
 
-#ifdef LIBRETRO
 	struct retro_vfs_wrapped_file_handle *GetFile () const { return File; }
-#else
-	FILE *GetFile () const { return File; }
-#endif
 	virtual const char *GetBuffer() const { return NULL; }
 
 	FileReader &operator>> (uint8_t &v)
@@ -132,11 +121,7 @@ protected:
 
 	char *GetsFromBuffer(const char * bufptr, char *strbuf, int len);
 
-#ifdef LIBRETRO
 	struct retro_vfs_wrapped_file_handle *File;
-#else
-	FILE *File;
-#endif
 	long Length;
 	long StartPos;
 	long FilePos;

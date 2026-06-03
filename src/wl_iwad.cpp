@@ -48,9 +48,6 @@ bool queryiwad = true;
 static bool showpreviewgames = false;
 
 int I_PickIWad(WadStuff *wads, int numwads, bool showwin, int defaultiwad);
-#if !defined(_WIN32) && !defined(LIBRETRO)
-#include "wl_iwad_picker.cpp"
-#endif
 
 namespace IWad {
 
@@ -648,10 +645,8 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		else if((datawadRes = FResourceFile::OpenResourceFile(FString(INSTALL_PREFIX "/share/" BINNAME "/") + datawad, NULL, true)))
 			datawadDir = FString(INSTALL_PREFIX "/share/" BINNAME "/");
 #endif
-#ifdef LIBRETRO
 		else if(config.GetSetting("BaseDataPaths") != NULL && (datawadRes = FResourceFile::OpenResourceFile(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/" + datawad, NULL, true)))
 			datawadDir = FString(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/");
-#endif
 	}
 	if(!datawadRes)
 		I_Error("Could not open %s!", datawad);
@@ -660,27 +655,6 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 
 	// Get a list of potential data paths
 	FString dataPaths;
-#ifndef LIBRETRO
-	if(config.GetSetting("BaseDataPaths") == NULL)
-	{
-		FString configDir = FileSys::GetDirectoryPath(FileSys::DIR_Configuration);
-		dataPaths = ".;$PROGDIR";
-
-		// On OS X our default config directory is ~/Library/Preferences which isn't a good place to put data at all.
-#if !defined(__APPLE__)
-		dataPaths += FString(";") + configDir;
-#endif
-
-		// Add documents and application support directories if they're not mapped to the config directory.
-		FString tmp;
-		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_Documents)).Compare(configDir) != 0)
-			dataPaths += FString(";") + tmp;
-		if((tmp = FileSys::GetDirectoryPath(FileSys::DIR_ApplicationSupport)).Compare(configDir) != 0)
-			dataPaths += FString(";") + tmp;
-
-		config.CreateSetting("BaseDataPaths", dataPaths);
-	}
-#endif
 	dataPaths = config.GetSetting("BaseDataPaths")->GetString();
 
 	TArray<WadStuff> basefiles;

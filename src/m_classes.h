@@ -67,9 +67,6 @@ class MenuItem
 		void		setText(const char string[80]);
 		void		setVisible(bool visible=true) { this->visible = visible; }
 
-#ifndef LIBRETRO
-		virtual void	activate();
-#endif
 		virtual void	draw();
 		virtual void	left() {}
 		virtual void	right() {}
