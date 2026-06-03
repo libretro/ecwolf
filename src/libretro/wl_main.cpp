@@ -899,11 +899,13 @@ void PrepareMainMenu (wl_state_t *state)
 	if (GameSave::GetSaveMenuItem())
 		GameSave::GetSaveMenuItem()->setEnabled(ingame);
 
-	// Item 7 and 8 read differently depending on whether a game is running:
-	// "View Scores"/"Back to Demo" at the title, "End Game"/"Back to Game"
-	// once a game is in progress.
+	// Item 7 reads "View Scores" at the title and "End Game" once a game is
+	// running. Item 8 ("Back to Game") only makes sense while a game is in
+	// progress, so it is hidden at the title (where there is nothing to go back
+	// to) and shown, paired with End Game, in-game.
 	mainMenu[7]->setText(language[ingame ? "STR_EG" : "STR_VS"]);
-	mainMenu[8]->setText(language[ingame ? "STR_BG" : "STR_BD"]);
+	mainMenu[8]->setText(language["STR_BG"]);
+	mainMenu[8]->setVisible(ingame);
 
 	state->currentMenu()->validateCurPos();
 	state->currentMenu()->draw();
@@ -1231,7 +1233,7 @@ static bool handleChoice(wl_state_t *state, int pos)
 				state->stage = GAME_END_MAP;
 			}
 			break;
-		case 8: // Back to Demo
+		case 8: // Back to Game (only shown/reachable in-game)
 			return popMenu(state);
 		case 9: // Quit
 			Libretro_RequestQuit();
