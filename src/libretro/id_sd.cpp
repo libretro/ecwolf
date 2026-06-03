@@ -47,6 +47,21 @@ static const int samplesPerSoundTick = synthesisRate / SOUND_RATE;
 uint64_t used_digital_gen;
 size_t loaded_sound_size;
 size_t touched_sound_size;
+
+// Saturating S16 accumulate. Mixing sums multiple mono voices (up to
+// MIX_CHANNELS + music) into one stereo buffer; the per-voice value is computed
+// at full int precision and this clamps the running sum to the int16 range so
+// overlapping loud voices clip cleanly instead of wrapping (which sounds like
+// loud crackle).
+static inline void mix_acc(int16_t *dst, int value)
+{
+	int sum = (int)*dst + value;
+	if (sum > 32767)
+		sum = 32767;
+	else if (sum < -32768)
+		sum = -32768;
+	*dst = (int16_t)sum;
+}
   
 FString                 SoundPlaying;
 globalsoundpos channelSoundPos[MIX_CHANNELS];
@@ -540,11 +555,11 @@ void Mix_Chunk_Speaker::MixInto(int16_t *result, int output_rate, size_t size, i
 		bool sign = states[pc_tick].sign;
 
 		for (int j = 0; j < samplesPerSoundTick && sample_ctr < size; j++, sample_ctr++) {
-			int16_t val = sign ? 5000 : -5000;
-			int16_t l = val * leftmul >> FRACBITS;
-			int16_t r = val * rightmul >> FRACBITS;
-			*outptr++ += l;
-			*outptr++ += r;
+			int val = sign ? 5000 : -5000;
+			int l = (val * leftmul) >> FRACBITS;
+			int r = (val * rightmul) >> FRACBITS;
+			mix_acc(outptr++, l);
+			mix_acc(outptr++, r);
 			// Update the PC speaker state:
 			if(pcPhaseTick++ >= pcPhaseLength)
 			{
@@ -605,12 +620,13 @@ template <typename T, int bias>
 static void
 mix_no_upscale(int16_t *result, const T *input, int num_samples, fixed leftmul, fixed rightmul)
 {
+	const int shift = FRACBITS - (16 - (int)sizeof(T) * 8);
 	int16_t *outptr = result;
 	for (int i = 0; i < num_samples; i++) {
-		int16_t l = (input[i] - bias) * leftmul >> (FRACBITS - (16 - sizeof(T) * 8));
-		int16_t r = (input[i] - bias) * rightmul >> (FRACBITS - (16 - sizeof(T) * 8));
-		*outptr++ += l;
-		*outptr++ += r;    
+		int l = ((input[i] - bias) * leftmul) >> shift;
+		int r = ((input[i] - bias) * rightmul) >> shift;
+		mix_acc(outptr++, l);
+		mix_acc(outptr++, r);
 	}
 }
 
@@ -618,13 +634,14 @@ template <typename T, int bias>
 static void
 mix_int_upscale(int16_t *result, const T *input, int num_samples, int upsample, fixed leftmul, fixed rightmul)
 {
+	const int shift = FRACBITS - (16 - (int)sizeof(T) * 8);
 	int16_t *outptr = result;
 	for (int i = 0; i < num_samples; i++) {
-		int16_t l = (input[i] - bias) * leftmul >> (FRACBITS - (16 - sizeof(T) * 8));
-		int16_t r = (input[i] - bias) * rightmul >> (FRACBITS - (16 - sizeof(T) * 8));
+		int l = ((input[i] - bias) * leftmul) >> shift;
+		int r = ((input[i] - bias) * rightmul) >> shift;
 		for (int j = 0 ; j < upsample; j++) {
-			*outptr++ += l;
-			*outptr++ += r;    
+			mix_acc(outptr++, l);
+			mix_acc(outptr++, r);
 		}
 	}
 }
@@ -633,13 +650,14 @@ template <typename T, int bias>
 static void
 mix_fractional_upscale(int16_t *result, int output_rate, const T *input, int input_rate, int num_samples, fixed leftmul, fixed rightmul)
 {
+	const int shift = FRACBITS - (16 - (int)sizeof(T) * 8);
 	int16_t *outptr = result;
 	for (int i = 0; i < num_samples; i++) {
-		int16_t l = (input[i] - bias) * leftmul >> (FRACBITS - (16 - sizeof(T) * 8));
-		int16_t r = (input[i] - bias) * rightmul >> (FRACBITS - (16 - sizeof(T) * 8));
+		int l = ((input[i] - bias) * leftmul) >> shift;
+		int r = ((input[i] - bias) * rightmul) >> shift;
 		while ((outptr - result) / 2 * (long long)input_rate < i * (long long) output_rate) {
-			*outptr++ += l;
-			*outptr++ += r;    
+			mix_acc(outptr++, l);
+			mix_acc(outptr++, r);
 		}
 	}
 }
@@ -684,7 +702,7 @@ void Mix_Chunk_Sampled::MixSamples (int16_t *result, int output_rate, size_t siz
 	{
 	case FORMAT_8BIT_LINEAR_UNSIGNED:
 	{
-		mix<uint8_t, 0x8000>(result, output_rate,(uint8_t *) chunk_samples + start_sample, rate, num_samples, leftmul, rightmul);
+		mix<uint8_t, 0x80>(result, output_rate,(uint8_t *) chunk_samples + start_sample, rate, num_samples, leftmul, rightmul);
 		break;
 	}
 	case FORMAT_8BIT_LINEAR_SIGNED:

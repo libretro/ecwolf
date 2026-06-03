@@ -1065,11 +1065,19 @@ static void poll_inputs(wl_input_state_t *input)
 	input->rsx = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X);
 }
 
-static int16_t soundbuf[SAMPLERATE / TICRATE * 2];
+// Audio is emitted once per retro_run frame. A frame is at most MAX_FRAMETICS
+// tics (the cap enforced in retro_run); each tic is exactly SAMPLES_PER_TIC
+// stereo sample pairs (44100/70 = 630, no remainder, so the cadence is exact and
+// deterministic). The whole frame is mixed into soundbuf and handed to the
+// frontend in a single audio_batch_cb call (lower callback overhead, one buffer
+// zero, better latency than one call per tic).
+#define MAX_FRAMETICS    5
+#define SAMPLES_PER_TIC  (SAMPLERATE / TICRATE)
+static int16_t soundbuf[SAMPLES_PER_TIC * MAX_FRAMETICS * 2];
 
 #define TO_SDL_POSITION(pos) (((64 - ((pos) * (pos))) * 3) + 63)
 
-static void mixChannel(long long tic, SoundChannelState *channel)
+static void mixChannel(long long tic, SoundChannelState *channel, int16_t *outbuf)
 {
 	if (!channel->isPlaying(tic))
 		return;
@@ -1109,7 +1117,7 @@ static void mixChannel(long long tic, SoundChannelState *channel)
 		return;
 	int start_tic = tic - channel->startTick + channel->skipTicks;
 
-	channel->sample->MixInto (soundbuf, SAMPLERATE, SAMPLERATE / TICRATE, start_tic, leftmul, rightmul);
+	channel->sample->MixInto (outbuf, SAMPLERATE, SAMPLES_PER_TIC, start_tic, leftmul, rightmul);
 }
 
 #define MB(x) ((x) << 20)
@@ -1122,37 +1130,53 @@ size_t limit_sound_cache_size =
 #endif
 	;
 
-void generate_audio(long long tic)
+// Mix one tic's worth of audio into the slice of soundbuf at the given tic index
+// within the current frame. Does not touch the frontend; callers batch the whole
+// frame into a single audio_batch_cb (see generate_audio_frame).
+static void mix_one_tic(long long tic, int tic_index)
 {
-	memset (soundbuf, 0, sizeof(soundbuf));
-	touched_sound_size = 0;
+	int16_t *outbuf = soundbuf + tic_index * SAMPLES_PER_TIC * 2;
 	for (int channelno = 0; channelno < MIX_CHANNELS; channelno++) {
-		mixChannel(tic, &g_state.channels[channelno]);
+		mixChannel(tic, &g_state.channels[channelno], outbuf);
 	}
 	if (MusicVolume != 0)
-		mixChannel(tic, &g_state.musicChannel);
-	audio_batch_cb(soundbuf, SAMPLERATE / TICRATE);
-	if (!preload_digital_sounds) {
-		// We don't want to keep dropping and reloading the same files every frame
-		if (limit_sound_cache_size <= (touched_sound_size * 3) / 2) {
-			limit_sound_cache_size = (touched_sound_size * 3) / 2;
-#if defined(RS90) || defined(MIYOO)
-			if (limit_sound_cache_size >= MB(7))
-				limit_sound_cache_size = MB(7);
-#endif		
-		}
+		mixChannel(tic, &g_state.musicChannel, outbuf);
+}
 
-		if (loaded_sound_size > limit_sound_cache_size) {
-			decreaseSoundCache(limit_sound_cache_size);
-		}
-		
+static void trim_sound_cache(void)
+{
+	if (preload_digital_sounds)
+		return;
+	// We don't want to keep dropping and reloading the same files every frame
+	if (limit_sound_cache_size <= (touched_sound_size * 3) / 2) {
+		limit_sound_cache_size = (touched_sound_size * 3) / 2;
+#if defined(RS90) || defined(MIYOO)
+		if (limit_sound_cache_size >= MB(7))
+			limit_sound_cache_size = MB(7);
+#endif
 	}
+	if (loaded_sound_size > limit_sound_cache_size)
+		decreaseSoundCache(limit_sound_cache_size);
+}
+
+// Produce a whole frame of audio (frametics tics) in one shot: zero the buffer
+// once, mix every tic into its slice, then emit a single batched callback.
+void generate_audio_frame(long long framestarttic, unsigned frametics)
+{
+	if (frametics > MAX_FRAMETICS)
+		frametics = MAX_FRAMETICS;
+	memset (soundbuf, 0, frametics * SAMPLES_PER_TIC * 2 * sizeof(soundbuf[0]));
+	touched_sound_size = 0;
+	for (unsigned i = 0; i < frametics; i++)
+		mix_one_tic(framestarttic + i, i);
+	audio_batch_cb(soundbuf, frametics * SAMPLES_PER_TIC);
+	trim_sound_cache();
 }
 
 void generate_silent_audio(void)
 {
-	memset (soundbuf, 0, sizeof(soundbuf));
-	audio_batch_cb(soundbuf, SAMPLERATE / TICRATE);
+	memset (soundbuf, 0, SAMPLES_PER_TIC * 2 * sizeof(soundbuf[0]));
+	audio_batch_cb(soundbuf, SAMPLES_PER_TIC);
 }
 
 
@@ -1170,9 +1194,9 @@ void retro_run(void)
 	// Over 20 or in init stage is definitely after load
 	if (tics > 20 || (g_state.stage == BEFORE_NON_SHAREWARE && tics > 3))
 		tics = 3;
-	// Cap at 5 (14 fps)
-	if (tics > 5)
-		tics = 5;
+	// Cap at MAX_FRAMETICS (14 fps); this also bounds the audio frame buffer.
+	if (tics > MAX_FRAMETICS)
+		tics = MAX_FRAMETICS;
 
 	unsigned frametics = tics;
 
@@ -1210,8 +1234,7 @@ void retro_run(void)
 	while (expectframes == 0);
 
 	assert(frametics > 0);
-	for (unsigned i = 0; i < frametics; i++)
-		generate_audio(framestarttic + i);
+	generate_audio_frame(framestarttic, frametics);
 }
 
 
