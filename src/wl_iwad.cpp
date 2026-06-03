@@ -642,7 +642,7 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		if((datawadRes = FResourceFile::OpenResourceFile(progdir + PATH_SEPARATOR + datawad, NULL)))
 			datawadDir = progdir + PATH_SEPARATOR;
 #if !defined(__APPLE__) && !defined(_WIN32)
-		else if((datawadRes = FResourceFile::OpenResourceFile(FString(INSTALL_PREFIX "/share/" BINNAME "/") + datawad, NULL, true)))
+		else if((datawadRes = FResourceFile::OpenResourceFile(FString(INSTALL_PREFIX "/share/" BINNAME "/") + datawad, NULL)))
 			datawadDir = FString(INSTALL_PREFIX "/share/" BINNAME "/");
 #endif
 		else if(config.GetSetting("BaseDataPaths") != NULL && (datawadRes = FResourceFile::OpenResourceFile(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/" + datawad, NULL)))
