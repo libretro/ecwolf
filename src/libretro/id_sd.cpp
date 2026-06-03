@@ -65,7 +65,7 @@ static inline void mix_acc(int16_t *dst, int value)
 	*dst = (int16_t)sum;
 }
   
-FString                 SoundPlaying;
+SoundIndex              SoundPlaying;
 globalsoundpos channelSoundPos[MIX_CHANNELS];
 struct SynthCacheItem
 {
@@ -106,7 +106,7 @@ void    SD_Startup(void)
 
 	SoundInfo.Init();
 	SoundSeq.Init();
-	SoundPlaying = FString();
+	SoundPlaying = SoundIndex();
 #ifndef DISABLE_ADLIB
 	SD_Startup_Adlib();
 #endif
