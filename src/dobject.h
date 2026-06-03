@@ -76,9 +76,6 @@ namespace GC
 	// Size of GC pause.
 	extern int Pause;
 
-	// Does one collection step.
-	void Step();
-
 	// Does a complete collection.
 	void FullGC();
 
@@ -96,13 +93,7 @@ namespace GC
 	static inline void CheckGC()
 	{
 		if (AllocBytes >= Threshold)
-			Step();
-	}
-
-	// Forces a collection to start now.
-	static inline void StartCollection()
-	{
-		Threshold = AllocBytes;
+			FullGC();
 	}
 }
 

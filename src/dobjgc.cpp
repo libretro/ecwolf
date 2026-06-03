@@ -152,19 +152,6 @@ static void Reap()
 
 //==========================================================================
 //
-// Step
-//
-// Formerly one incremental collection step.  Now simply reaps dead objects.
-//
-//==========================================================================
-
-void Step()
-{
-	Reap();
-}
-
-//==========================================================================
-//
 // FullGC
 //
 // Collects everything in one fell swoop.
