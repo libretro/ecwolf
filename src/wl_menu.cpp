@@ -57,6 +57,8 @@ Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
 Menu soundMenu(24, 45, 284, 24);
 Menu controlMenu(CTL_X, CTL_Y, CTL_W, 56);
+Menu displayMenu(20, 75, 285, 56);
+Menu automapMenu(40, 55, 260, 56);
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
@@ -79,6 +81,28 @@ MENU_LISTENER(StartNewGame)
 {
 	// libretro handles it separately
 
+	return true;
+}
+MENU_LISTENER(AdjustViewSize)
+{
+	NewViewSize(viewsize);
+	return true;
+}
+MENU_LISTENER(ChangeAutomapFlag)
+{
+	AM_UpdateFlags();
+	return true;
+}
+MENU_LISTENER(ChangeAMOverlay)
+{
+	am_overlay = which;
+	AM_UpdateFlags();
+	return true;
+}
+MENU_LISTENER(ChangeAMRotate)
+{
+	am_rotate = which;
+	AM_UpdateFlags();
 	return true;
 }
 void CreateMenus()
@@ -170,6 +194,28 @@ void CreateMenus()
 	controlMenu.addItem(new SliderMenuItem(panxadjustment, 192, 20, language["STR_SLOW"], language["STR_FAST"]));
 	controlMenu.addItem(new LabelMenuItem(language["STR_PANYADJ"]));
 	controlMenu.addItem(new SliderMenuItem(panyadjustment, 192, 20, language["STR_SLOW"], language["STR_FAST"]));
+
+	// Display Options: window/vsync are owned by the libretro frontend and have
+	// no engine globals here, so expose the engine-side display settings that
+	// are live: the screen (view) size, plus a link to the automap options.
+	// NewViewSize recomputes the 3D view when the size changes.
+	displayMenu.setHeadText(language["STR_DISPLAY"]);
+	displayMenu.addItem(new LabelMenuItem(language["STR_SCREENSIZE"]));
+	displayMenu.addItem(new SliderMenuItem(viewsize, 110, 21, language["STR_SMALL"], language["STR_LARGE"], AdjustViewSize));
+	displayMenu.addItem(new MenuItem(language["STR_AMOPTIONS"]));
+
+	// Automap Options: all of these are live engine globals; AM_UpdateFlags
+	// applies the change immediately.
+	const char* overlayOptions[] = { language["STR_AMOVERLAYOFF"], language["STR_AMOVERLAYON"], language["STR_AMOVERLAYBOTH"] };
+	const char* rotateOptions[] = { language["STR_AMROTATEOFF"], language["STR_AMROTATEON"], language["STR_AMROTATEOVERLAY"] };
+	automapMenu.setHeadText(language["STR_AMOPTIONS"]);
+	automapMenu.addItem(new MultipleChoiceMenuItem(ChangeAMOverlay, overlayOptions, 3, am_overlay));
+	automapMenu.addItem(new MultipleChoiceMenuItem(ChangeAMRotate, rotateOptions, 3, am_rotate));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTURES"], am_drawtexturedwalls, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMFLOORS"], am_drawfloors, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMTEXTUREDOVERLAY"], am_overlaytextured, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMRATIOS"], am_showratios, ChangeAutomapFlag));
+	automapMenu.addItem(new BooleanMenuItem(language["STR_AMPAUSE"], am_pause, ChangeAutomapFlag));
 }
 
 

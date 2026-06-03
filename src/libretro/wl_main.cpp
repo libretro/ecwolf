@@ -829,6 +829,8 @@ extern Menu episodes;
 extern Menu skills;
 extern Menu soundMenu;
 extern Menu controlMenu;
+extern Menu displayMenu;
+extern Menu automapMenu;
 
 static bool
 popMenu(wl_state_t *state)
@@ -890,6 +892,10 @@ wl_state_t::currentMenu() {
 		return &soundMenu;
 	case CONTROL_MENU:
 		return &controlMenu;
+	case DISPLAY_MENU:
+		return &displayMenu;
+	case AUTOMAP_MENU:
+		return &automapMenu;
 	}
 	return NULL;
 }
@@ -1143,6 +1149,10 @@ static bool handleChoice(wl_state_t *state, int pos)
 			pushMenu(state, CONTROL_MENU);
 			state->stage = MENU_PREPARE;
 			break;
+		case 3: // Display Options
+			pushMenu(state, DISPLAY_MENU);
+			state->stage = MENU_PREPARE;
+			break;
 		case 6: // Read This!
 			// HelpScreens drives its own fade via the state machine
 			// (ShowArticle/TextReaderStep). Don't call MenuFadeOut here: it is
@@ -1186,8 +1196,14 @@ static bool handleChoice(wl_state_t *state, int pos)
 		break;
 	case SOUND_MENU:
 	case CONTROL_MENU:
+	case AUTOMAP_MENU:
 		// Items are sliders/booleans/labels adjusted with left/right (Enter
 		// toggles a boolean); pressing Enter otherwise just keeps the menu open.
+		state->stage = MENU_PREPARE;
+		break;
+	case DISPLAY_MENU:
+		if(pos == 2) // Automap Options
+			pushMenu(state, AUTOMAP_MENU);
 		state->stage = MENU_PREPARE;
 		break;
 	}
