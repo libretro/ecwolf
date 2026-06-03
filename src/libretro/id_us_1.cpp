@@ -323,8 +323,14 @@ static void USL_XORICursor(FFont *font, int x,int y,const char *s,word cursor,EC
 	char	buf[MaxString];
 	word	w,h;
 
-	strcpy(buf,s);
-	buf[cursor] = '\0';
+	// Bound the copy to the buffer and keep the cursor terminator in range.
+	size_t slen = strlen(s);
+	if (slen >= sizeof(buf))
+		slen = sizeof(buf) - 1;
+	memcpy(buf, s, slen);
+	buf[slen] = '\0';
+	if (cursor < slen)
+		buf[cursor] = '\0';
  	VW_MeasurePropString(font, buf,w,h);
 
 	px = x + w - 1;

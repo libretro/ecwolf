@@ -803,29 +803,18 @@ int CheckRatio (int width, int height, int *trueratio)
 #define IFARG(str) if(!strcmp(arg, (str)))
 
 #ifndef _WIN32
-// I_MakeRNGSeed is from ZDoom
-#include <time.h>
-
-// Return a random seed, preferably one with lots of entropy.
+// Return the RNG seed for a fresh game.
+//
+// A libretro core must be deterministic: runahead runs two copies of the core
+// from the same starting point, and netplay/bsv replay require identical state
+// across instances. Seeding from time()/<dev/urandom> (as standalone ZDoom does)
+// makes the first frames of every session diverge, defeating all of the above.
+// The full RNG state (including the seed) is serialized into the save state, so
+// load/restore remains exact; only a brand-new game is affected, and vanilla
+// Wolf3D itself started from a fixed RNG table. We therefore use a constant.
 unsigned int I_MakeRNGSeed()
 {
-	unsigned int seed;
-	int file;
-
-	// Try reading from /dev/urandom first, then /dev/random, then
-	// if all else fails, use a crappy seed from time().
-	seed = time(NULL);
-	file = open("/dev/urandom", O_RDONLY);
-	if (file < 0)
-	{
-		file = open("/dev/random", O_RDONLY);
-	}
-	if (file >= 0)
-	{
-		read(file, &seed, sizeof(seed));
-		close(file);
-	}
-	return seed;
+	return 0u;
 }
 #else
 unsigned int I_MakeRNGSeed();

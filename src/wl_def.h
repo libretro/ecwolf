@@ -1,6 +1,20 @@
 #ifndef WL_DEF_H
 #define WL_DEF_H
 
+// Endianness: MSB_FIRST is the single source of truth (libretro convention).
+// All engine code keys off __BIG_ENDIAN__ at compile time; we derive it here so
+// that defining (or not defining) MSB_FIRST in the build is sufficient. There are
+// no runtime endianness checks anywhere in the codebase.
+#if defined(MSB_FIRST)
+#	ifndef __BIG_ENDIAN__
+#		define __BIG_ENDIAN__ 1
+#	endif
+#else
+#	ifdef __BIG_ENDIAN__
+#		error "MSB_FIRST is the endianness source of truth but __BIG_ENDIAN__ was defined without it"
+#	endif
+#endif
+
 #include <assert.h>
 #include <fcntl.h>
 #include <math.h>

@@ -192,6 +192,21 @@ class FVSwap : public FResourceFile
 			spriteStart = ReadLittleShort(&header[2]);
 			soundStart = ReadLittleShort(&header[4]);
 
+			// The VSWAP header is untrusted file input. The chunk directory is
+			// 6 bytes per chunk (a 4-byte offset table followed by a 2-byte
+			// length table, each numChunks entries). The directory walk below
+			// indexes data[i*4] and data[i*2 + 4*numChunks] for i < soundStart,
+			// and later reads entry (numChunks-1). Without these invariants a
+			// crafted VSWAP yields out-of-bounds reads (soundStart > numChunks)
+			// or an unsigned underflow (numChunks == 0).
+			if(numChunks == 0 || soundStart > numChunks || spriteStart > soundStart)
+			{
+				if(!quiet)
+					Printf("\nVSWAP header is invalid (numChunks=%u spriteStart=%u soundStart=%u).\n",
+						(unsigned)numChunks, (unsigned)spriteStart, (unsigned)soundStart);
+				return false;
+			}
+
 			Lumps = new FUncompressedLump[soundStart];
 
 

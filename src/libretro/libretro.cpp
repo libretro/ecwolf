@@ -1630,7 +1630,16 @@ bool retro_unserialize(const void *data_, size_t size)
 	SerializeExtra(arc, isGameless, serialize_version);
 	FString mapname;
 	arc << mapname;
-	strcpy(gamestate.mapname, mapname);
+	// gamestate.mapname is a fixed char[9]; the save blob is untrusted (any
+	// .state the frontend hands us), so never strcpy an arbitrary-length name
+	// into it. Truncate to the field size and always NUL-terminate.
+	{
+		size_t mapname_len = strlen(mapname);
+		if (mapname_len >= sizeof(gamestate.mapname))
+			mapname_len = sizeof(gamestate.mapname) - 1;
+		memcpy(gamestate.mapname, mapname.GetChars(), mapname_len);
+		gamestate.mapname[mapname_len] = '\0';
+	}
 	thinkerList.DestroyAll(ThinkerList::TRAVEL);
 	if (!isGameless) {
 		loadedgame = true;
@@ -1735,7 +1744,16 @@ void ReadConfig(void)
 		config.CreateSetting(hsCompleted, Scores[i].completed);
 		config.CreateSetting(hsGraphic, Scores[i].graphic);
 
-		strcpy(Scores[i].name, config.GetSetting(hsName)->GetString());
+		// Scores[i].name is char[MaxHighName+1]; the config value is external
+		// data, so bound the copy instead of strcpy.
+		{
+			const char *hsname = config.GetSetting(hsName)->GetString();
+			size_t hsname_len = strlen(hsname);
+			if (hsname_len >= sizeof(Scores[i].name))
+				hsname_len = sizeof(Scores[i].name) - 1;
+			memcpy(Scores[i].name, hsname, hsname_len);
+			Scores[i].name[hsname_len] = '\0';
+		}
 		Scores[i].score = config.GetSetting(hsScore)->GetInteger();
 		if(config.GetSetting(hsCompleted)->GetType() == SettingsData::ST_STR)
 			Scores[i].completed = config.GetSetting(hsCompleted)->GetString();
