@@ -41,11 +41,13 @@
 #include "mame/fmopl.h"
 #endif
 
-static const int synthesisRate = 44100;
-#define MUSIC_RATE 700	// Must be a multiple of SOUND_RATE
-#define SOUND_RATE 140	// Also affects PC Speaker sounds
-static const int samplesPerSoundTick = synthesisRate / SOUND_RATE;
-static const int samplesPerMusicTick = synthesisRate / MUSIC_RATE;
+// Rates and the OPL block-buffer size now live in state_machine.h (included
+// above) as the single source of truth shared with id_sd.cpp and
+// id_sd_n3dmus.cpp. Keep short local aliases so the synthesis code below reads
+// the same as before; the compile-time invariants are asserted in the header.
+static const int synthesisRate        = SYNTHESIS_RATE;
+static const int samplesPerSoundTick  = SAMPLES_PER_SOUND_TICK;
+static const int samplesPerMusicTick  = SAMPLES_PER_MUSIC_TICK;
 #undef alOut
 #define alOut(n,b) 		YM3812Write(oplChip, n, b, 20)
 
@@ -70,13 +72,18 @@ static inline void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const 
 
 void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length)
 {
-	Bit32s buffer[512 * 2];
+	Bit32s buffer[OPL_BLOCK_SAMPLES * 2];
 	int i;
 
-	// length is at maximum samplesPerMusicTick = param_samplerate / 700
-	// so 512 is sufficient for a sample rate of 358.4 kHz (default 44.1 kHz)
-	if(length > 512)
-		length = 512;
+	// length is bounded by the EnsureSynthesis caller (samplesPerMusicTick *
+	// (500 / samplesPerMusicTick) = 441 samples at the fixed 44100 Hz synthesis
+	// rate), which is <= OPL_BLOCK_SAMPLES. The clamp below is a defensive cap;
+	// a compile-time assert above guarantees the buffer is large enough so this
+	// never actually truncates a real request. (The synthesis rate is fixed at
+	// 44100 and independent of the frontend output rate, which the generic
+	// resampler in MixSamples handles.)
+	if(length > OPL_BLOCK_SAMPLES)
+		length = OPL_BLOCK_SAMPLES;
 
 	if(which.opl3Active)
 	{

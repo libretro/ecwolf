@@ -10,7 +10,8 @@
 #include "m_swap.h"
 #include "state_machine.h"
 
-#define MUSIC_RATE 700 // TODO: This should be shared with id_sd.cpp
+// MUSIC_RATE / SYNTHESIS_RATE now come from state_machine.h (shared with
+// id_sd.cpp and id_sd_adlib.cpp).
 
 typedef struct
 {
@@ -22,8 +23,8 @@ typedef struct
 		mFeedConn;
 } inst_t;
 
-static const int synthesisRate = 44100;
-static const int samplesPerMusicTick = synthesisRate / MUSIC_RATE;
+static const int synthesisRate        = SYNTHESIS_RATE;
+static const int samplesPerMusicTick  = SAMPLES_PER_MUSIC_TICK;
 
 // This table maps channel numbers to carrier and modulator op cells
 static uint8_t  carriers[9] =  {3, 4, 5,11,12,13,19,20,21},

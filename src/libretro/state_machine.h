@@ -654,6 +654,37 @@ void DrawVictory (bool fromIntermission);
 extern bool store_files_in_memory;
 extern bool preload_digital_sounds;
 
+// Shared OPL synthesis rates. Single source of truth for id_sd.cpp,
+// id_sd_adlib.cpp and id_sd_n3dmus.cpp (these used to each define their own
+// copies, which risked drifting apart). The OPL chip is always synthesised at
+// SYNTHESIS_RATE; the generic resampler in Mix_Chunk_Sampled::MixSamples
+// converts from this fixed rate to whatever rate the frontend requests, so
+// SYNTHESIS_RATE is intentionally independent of the output sample rate.
+#define SYNTHESIS_RATE 44100
+#define MUSIC_RATE     700  // Must be a multiple of SOUND_RATE.
+#define SOUND_RATE     140  // Also affects PC Speaker sounds.
+#define SAMPLES_PER_SOUND_TICK (SYNTHESIS_RATE / SOUND_RATE)
+#define SAMPLES_PER_MUSIC_TICK (SYNTHESIS_RATE / MUSIC_RATE)
+
+// Per-call sample limit of YM3812UpdateOneMono's on-stack OPL output buffer.
+// The IMF EnsureSynthesis loop clamps each call to (500 / SAMPLES_PER_MUSIC_TICK)
+// music tics, i.e. SAMPLES_PER_MUSIC_TICK * (500 / SAMPLES_PER_MUSIC_TICK)
+// samples. Overrunning this buffer would silently truncate the request:
+// sample_count would advance past what was actually written, leaving a gap of
+// uninitialised PCM that plays back as music dropping notes / decaying to
+// garbage over time. The N3D synth calls with exactly SAMPLES_PER_MUSIC_TICK.
+#define OPL_BLOCK_SAMPLES 512
+
+// Compile-time invariants (C++98 negative-array-size idiom: a violated
+// condition yields a negative array size, which is a build error -- resolved
+// entirely at compile time, no runtime code). These pin the assumptions the
+// synthesis loops rely on, so changing any rate above can no longer silently
+// corrupt audio: it becomes a build failure here instead.
+typedef char id_sd_music_multiple_of_sound[(MUSIC_RATE % SOUND_RATE == 0) ? 1 : -1];
+typedef char id_sd_music_tick_nonzero[(SAMPLES_PER_MUSIC_TICK > 0) ? 1 : -1];
+typedef char id_sd_opl_block_big_enough[
+	(SAMPLES_PER_MUSIC_TICK * (500 / SAMPLES_PER_MUSIC_TICK) <= OPL_BLOCK_SAMPLES) ? 1 : -1];
+
 Mix_Chunk *SynthesizeAdlibIMFOrN3D(const uint8_t *dataRaw, size_t size);
 bool midiN3DValidate(const uint8_t *dataIn, size_t dataLen);
 void    SD_Startup_Adlib(void);

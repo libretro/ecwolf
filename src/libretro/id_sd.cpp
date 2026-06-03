@@ -41,9 +41,10 @@ static  bool					SD_Started;
 static  bool					nextsoundpos;
 static  int                     LeftPosition;
 static  int                     RightPosition;
-static const int synthesisRate = 44100;
-#define SOUND_RATE 140	// Also affects PC Speaker sounds
-static const int samplesPerSoundTick = synthesisRate / SOUND_RATE;
+// Rates now come from state_machine.h (shared with id_sd_adlib.cpp and
+// id_sd_n3dmus.cpp). Short local aliases keep the code below unchanged.
+static const int synthesisRate       = SYNTHESIS_RATE;
+static const int samplesPerSoundTick = SAMPLES_PER_SOUND_TICK;
 uint64_t used_digital_gen;
 size_t loaded_sound_size;
 size_t touched_sound_size;
