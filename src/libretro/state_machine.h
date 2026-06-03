@@ -263,17 +263,23 @@ public:
 		     fixed leftmul, fixed rightmul) {
 		if (leftmul == 0 && rightmul == 0)
 			return;
+
+		// Load before reading rate/sample_count below: for a chunk whose
+		// metadata has never been loaded both are still 0, which would make
+		// the bounds guard compute start_sample == 0 and bail out as if the
+		// sound were already past its end (so it would never play on its
+		// first trigger). loadSound() populates rate, sample_count and the
+		// PCM buffer together. It can also fail (e.g. an unsupported
+		// sound/WAV variant), leaving the chunk invalid with no buffer.
+		if (!isLoaded())
+			loadSound();
+		if (!isValid || !isLoaded())
+			return;
+
 		int start_sample = (start_ticks * rate) / TICRATE;
 		if (!isLooping && (start_sample >= sample_count || start_sample < 0))
 			return;
 
-		if (!isLoaded())
-			loadSound();
-		// loadSound() can fail (e.g. an unsupported sound/WAV variant), leaving
-		// the chunk invalid with no sample buffer. Don't try to mix from a
-		// missing buffer.
-		if (!isValid || !isLoaded())
-			return;
 		lastUsed = used_digital_gen++;
 		if (reloadable)
 			touched_sound_size += GetDataSize();
