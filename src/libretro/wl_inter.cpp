@@ -822,7 +822,10 @@ bool HighScoresStep (wl_state_t *state, const wl_input_state_t *input)
 		state->stage = MENU_PREPARE;
 		return false;
 	}
-	DrawHighScores ();
+	// The high-scores screen is static once drawn, so it is rendered once in
+	// ViewScores. Don't rebuild it every frame (ClearMScreen + DrawStripes +
+	// per-entry font measuring/printing is wasteful); just present the existing
+	// framebuffer, mirroring the article reader (TextReaderStep).
 	VW_UpdateScreen ();
 	return true;
 }
