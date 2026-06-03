@@ -24,6 +24,7 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 	FTextureID lasttex;
 	uint8_t *tex_offset;
 	bool useOptimized = false;
+	bool isMasked = false;
 
 	if(planeheight == 0) // Eye level
 		return;
@@ -129,6 +130,12 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 							texyscale = -texture->yScale>>10;
 
 							useOptimized = texwidth == 64 && texheight == 64 && texxscale == FRACUNIT>>10 && texyscale == -FRACUNIT>>10;
+
+							// Masked flats (textures with holes) skip their
+							// transparent texels so whatever was drawn behind
+							// them (e.g. the opposite plane) shows through,
+							// matching upstream ECWolf.
+							isMasked = texture->bMasked;
 						}
 					}
 					else
@@ -142,14 +149,26 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 						const int u = (gu>>18) & 63;
 						const int v = (-gv>>18) & 63;
 						const unsigned texoffs = (u * 64) + v;
-						*tex_offset = curshades[tex[texoffs]];
+						if(isMasked)
+						{
+							if(const uint8_t c = tex[texoffs])
+								*tex_offset = curshades[c];
+						}
+						else
+							*tex_offset = curshades[tex[texoffs]];
 					}
 					else
 					{
 						const int u = (FixedMul((viewxTile<<16)+(gu>>8)-512, texxscale)) & (texwidth-1);
 						const int v = (FixedMul((viewyTile<<16)+(gv>>8)+512, texyscale)) & (texheight-1);
 						const unsigned texoffs = (u * texheight) + v;
-						*tex_offset = curshades[tex[texoffs]];
+						if(isMasked)
+						{
+							if(const uint8_t c = tex[texoffs])
+								*tex_offset = curshades[c];
+						}
+						else
+							*tex_offset = curshades[tex[texoffs]];
 					}
 				}
 			}
