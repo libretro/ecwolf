@@ -117,6 +117,9 @@ int     panyadjustment;
 bool param_nowait = false;
 int     param_difficulty = 1;           // default is "normal"
 const char* param_tedlevel = NULL;            // default is not to start a level
+// Playback offset of the in-game music when the menu was opened, so the track
+// can resume from the same spot rather than restarting on "Back to Game".
+static int lastgamemusicoffset = 0;
 int     param_joystickindex = 0;
 
 int     param_joystickhat = -1;
@@ -846,11 +849,12 @@ popMenu(wl_state_t *state)
 			// A game is in progress (the menu was opened mid-game): resume the
 			// play loop exactly where it left off, without reloading the map.
 			// PrepareMainMenu switched to the menu music and the menu painted
-			// over the screen, so restore the level music and repaint the play
-			// screen border/status bar before re-entering the play loop. We must
-			// not use the GAME_DRAW_PLAY_SCREEN stage, which chains into
+			// over the screen, so resume the level music from where it was when
+			// the menu opened (rather than restarting the track) and repaint the
+			// play screen border/status bar before re-entering the play loop. We
+			// must not use the GAME_DRAW_PLAY_SCREEN stage, which chains into
 			// GAME_LOAD_MAP and would restart the level.
-			StartMusic ();
+			ContinueMusic (lastgamemusicoffset);
 			DrawPlayScreen (false);
 			state->stage = PLAY_STEP_A;
 		}
@@ -874,7 +878,10 @@ void PrepareMainMenu (wl_state_t *state)
 {
 	bool idEasterEgg = Wads.CheckNumForName("IDGUYPAL") != -1;
 
-	StartCPMusic (gameinfo.MenuMusic);
+	// Switch to the menu music, remembering where the previous (in-game) track
+	// was so "Back to Game" can resume it from the same spot. StartCPMusic
+	// returns the offset of the track it replaced.
+	lastgamemusicoffset = StartCPMusic (gameinfo.MenuMusic);
 	SetupControlPanel ();
 
 	Menu::closeMenus(false);
