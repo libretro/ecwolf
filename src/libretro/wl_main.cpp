@@ -1294,9 +1294,20 @@ static bool handleChoice(wl_state_t *state, int pos)
 	case LOAD_MENU:
 		if(GameSave::LoadFromSlot(pos))
 		{
-			loadedgame = true;
-			state->stage = START_GAME;
+			// Load() already set gamestate.mapname, ran SetupGameLevel() and
+			// restored the snapshot (map, thinkers, player, levelInfo). Enter
+			// the play loop directly: routing through START_GAME would run
+			// GameLoopInit, which wipes gamestate and resets the level to the
+			// episode's start map (wrong music, wrong next map, crash).
+			loadedgame = false;
+			players[0].PendingWeapon = WP_NOCHANGE;
+			// Play the loaded level's own music (Load left loadedgame set, so
+			// SetupGameLevel skipped StartMusic); levelInfo now points at the
+			// restored map, so this picks the correct track.
+			StartMusic ();
+			DrawPlayScreen (false);
 			state->menuLevel = 0;
+			state->stage = PLAY_STEP_A;
 		}
 		else
 		{
