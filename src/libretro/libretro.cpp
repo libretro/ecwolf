@@ -447,6 +447,12 @@ void Quit ()
 void retro_unload_game()
 {
 	SoundInfo.Clear();
+	// Reset the sound system's "started" latch (and drop its caches) so a
+	// subsequent retro_load_game re-runs SD_Startup -> SoundInfo.Init() and
+	// rebuilds the sound hash table. Without this, SD_Started stays true after
+	// unload, SD_Startup early-returns on the next load, and FindSound()
+	// dereferences the now-NULL hash table (e.g. via P_InitKeyMessages).
+	SD_Shutdown();
 	CallTerminateFunctions();
 }
 
