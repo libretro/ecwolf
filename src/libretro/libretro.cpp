@@ -1666,6 +1666,14 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 void retro_reset(void)
 {
+	// Restart the currently loaded content from the beginning, the same way
+	// the tail of retro_load_game leaves things: reseed the RNG and return
+	// the game state machine to START, which replays the title/notice
+	// sequence and begins a fresh game (START_GAME -> GameLoopInit wipes
+	// gamestate and resets to the first level). The engine, WADs and actor
+	// definitions stay loaded, so this does not re-read content.
+	FRandom::StaticClearRandom();
+	g_state.clear();
 }
 
 size_t retro_serialize_size(void)
