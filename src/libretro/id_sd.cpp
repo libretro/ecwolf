@@ -404,6 +404,77 @@ void Mix_Chunk_Digital::unloadSound() {
 	unloadableSounds.Remove(whichLump);
 }
 
+// Resample a mono buffer to out_rate when its native rate exceeds it. The
+// core's software mixer only upsamples, so a sound stored above the output
+// rate (e.g. a 48 kHz WAV) would otherwise hit the "downsampling not
+// supported" path and play as silence. Returns a newly malloc()'d buffer of
+// (*frames_io) samples at out_rate and frees src; on allocation failure frees
+// src and returns NULL. is8bit selects unsigned-8 (silence at 128) vs
+// signed-16 interpolation. Rates equal or src already below out_rate: src is
+// returned unchanged (the mixer upsamples those itself).
+static void *resample_mono_pcm(void *src, int *frames_io, int in_rate,
+			       int out_rate, int is8bit)
+{
+	int in_frames = *frames_io;
+	long long n;
+	int i;
+
+	if (in_rate <= out_rate || in_frames <= 0)
+		return src;
+
+	n = (long long)in_frames * out_rate / in_rate;
+	if (n < 1)
+		n = 1;
+
+	if (is8bit) {
+		const uint8_t *in = (const uint8_t *)src;
+		uint8_t *out = (uint8_t *)malloc((size_t)n);
+		if (out == NULL) {
+			free(src);
+			return NULL;
+		}
+		for (i = 0; i < (int)n; i++) {
+			long long pos = (long long)i * in_rate * 65536 / out_rate;
+			int idx = (int)(pos >> 16);
+			int frac = (int)(pos & 0xffff);
+			int s0, s1;
+			if (idx >= in_frames - 1) {
+				out[i] = in[in_frames - 1];
+				continue;
+			}
+			s0 = in[idx];
+			s1 = in[idx + 1];
+			out[i] = (uint8_t)(s0 + (((s1 - s0) * frac) >> 16));
+		}
+		free(src);
+		*frames_io = (int)n;
+		return out;
+	} else {
+		const int16_t *in = (const int16_t *)src;
+		int16_t *out = (int16_t *)malloc((size_t)n * sizeof(int16_t));
+		if (out == NULL) {
+			free(src);
+			return NULL;
+		}
+		for (i = 0; i < (int)n; i++) {
+			long long pos = (long long)i * in_rate * 65536 / out_rate;
+			int idx = (int)(pos >> 16);
+			int frac = (int)(pos & 0xffff);
+			int s0, s1;
+			if (idx >= in_frames - 1) {
+				out[i] = in[in_frames - 1];
+				continue;
+			}
+			s0 = in[idx];
+			s1 = in[idx + 1];
+			out[i] = (int16_t)(s0 + (((s1 - s0) * frac) >> 16));
+		}
+		free(src);
+		*frames_io = (int)n;
+		return out;
+	}
+}
+
 void Mix_Chunk_Digital::loadSound() {
 	if (isLoaded()) {
 		return;
@@ -536,6 +607,22 @@ void Mix_Chunk_Digital::loadSound() {
 						out[i] = (int16_t)((l + r) / 2);
 					}
 				}
+			}
+			// The mixer cannot downsample, so bring WAVs stored above the
+			// engine rate (e.g. 48 kHz) down to it; lower rates are left for
+			// the mixer to upsample. resample_mono_pcm frees the old buffer.
+			if (rate > synthesisRate) {
+				chunk_samples = resample_mono_pcm(chunk_samples, &frames,
+								  rate, synthesisRate,
+								  bits == 8);
+				if (chunk_samples == NULL) {
+					sample_count = 0;
+					isValid = false;
+					isMetadataLoaded = true;
+					return;
+				}
+				rate = synthesisRate;
+				sample_count = frames;
 			}
 			loaded_sound_size += (size_t)frames * bytes_per_sample;
 			unloadableSounds[whichLump] = this;
