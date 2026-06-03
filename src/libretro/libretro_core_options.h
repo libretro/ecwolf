@@ -317,6 +317,13 @@ struct retro_core_option_definition option_defs_us[] = {
 		"20"
 	},
 	{
+		"ecwolf-mouse-turn-sensitivity",
+		"Mouse turn sensitivity",
+		"Sensitivity of turning with the mouse from Off to 20",
+		SLIDER_OPTIONS,
+		"10"
+	},
+	{
 		"ecwolf-effects-priority",
 		"Order of lookup for effects",
 		"Which variants of assets are used in priority",

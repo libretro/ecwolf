@@ -491,6 +491,7 @@ int AdlibVolume = 20;
 int DigiVolume = 20;
 int AnalogMoveSensitivity = 20;
 int AnalogTurnSensitivity = 20;
+int MouseTurnSensitivity = 10;
 
 static void announce_frame_callback()
 {
@@ -728,6 +729,7 @@ static void update_variables(bool startup)
 	DigiVolume = get_slider_option("ecwolf-digi-volume");
 	AnalogMoveSensitivity = get_slider_option ("ecwolf-analog-move-sensitivity");
 	AnalogTurnSensitivity = get_slider_option ("ecwolf-analog-turn-sensitivity");
+	MouseTurnSensitivity = get_slider_option ("ecwolf-mouse-turn-sensitivity");
 
 	SetSoundPriorities(get_string_variable_def("ecwolf-effects-priority", "digi-adlib-speaker"));
 
@@ -933,11 +935,15 @@ static void TransformAutomapInputs(const wl_input_state_t *input)
 void TransformPlayInputs(const wl_input_state_t *input, int newly_pressed)
 {
 	TicCmd_t &cmd = control[ConsolePlayer];
+	static int old_mouse_buttons = 0;
 	int runbutton = !!(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_X));
 	int delta = (runbutton == !alwaysrun) ? RUNMOVE : BASEMOVE;
 	cmd.controlx = transform_axis(input->rsx, runbutton, AnalogTurnSensitivity);
 	cmd.controly = transform_axis(input->lsy, runbutton, AnalogMoveSensitivity);
 	cmd.controlstrafe = transform_axis(input->lsx, runbutton, AnalogMoveSensitivity);
+	// Relative mouse X turns the player, added on top of analog/d-pad turning.
+	if (input->mouse_x)
+		cmd.controlx += input->mouse_x * MouseTurnSensitivity;
 	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_UP))
 		cmd.controly = -delta;
 	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_DOWN))
@@ -953,7 +959,11 @@ void TransformPlayInputs(const wl_input_state_t *input, int newly_pressed)
 
 	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_A))
 		cmd.buttonstate[bt_attack] = 1;
+	if(input->mouse_buttons & 1)
+		cmd.buttonstate[bt_attack] = 1;
 	if(newly_pressed & (1<<RETRO_DEVICE_ID_JOYPAD_B))
+		cmd.buttonstate[bt_use] = 1;
+	if((input->mouse_buttons & 2) && !(old_mouse_buttons & 2))
 		cmd.buttonstate[bt_use] = 1;
 	if(input->button_mask & (1<<RETRO_DEVICE_ID_JOYPAD_Y))
 		cmd.buttonstate[bt_showstatusbar] = 1;
@@ -984,6 +994,8 @@ void TransformPlayInputs(const wl_input_state_t *input, int newly_pressed)
 
 
 	*/
+
+	old_mouse_buttons = input->mouse_buttons;
 }
 
 // TODO: mouse, keyboard
@@ -1049,6 +1061,49 @@ static void TransformInputs(wl_input_state_t *input)
 		TransformPlayInputs(input, newly_pressed);
 }
 
+// Keyboard support: map a small set of keys onto the same virtual joypad bitmask
+// the rest of the input code already consumes, so keyboard is just another input
+// source rather than a separate path. (The engine's old Keyboard[]/scancode layer
+// is not used in the libretro build.)
+static int keyboard_button_mask = 0;
+
+static int keycode_to_joypad_bit(unsigned keycode)
+{
+	switch (keycode) {
+	case RETROK_UP:        return 1 << RETRO_DEVICE_ID_JOYPAD_UP;
+	case RETROK_DOWN:      return 1 << RETRO_DEVICE_ID_JOYPAD_DOWN;
+	case RETROK_LEFT:      return 1 << RETRO_DEVICE_ID_JOYPAD_LEFT;
+	case RETROK_RIGHT:     return 1 << RETRO_DEVICE_ID_JOYPAD_RIGHT;
+	case RETROK_LCTRL:
+	case RETROK_RCTRL:     return 1 << RETRO_DEVICE_ID_JOYPAD_A;       // Fire
+	case RETROK_SPACE:     return 1 << RETRO_DEVICE_ID_JOYPAD_B;       // Use
+	case RETROK_LSHIFT:
+	case RETROK_RSHIFT:    return 1 << RETRO_DEVICE_ID_JOYPAD_X;       // Run
+	case RETROK_COMMA:     return 1 << RETRO_DEVICE_ID_JOYPAD_L;       // Strafe left
+	case RETROK_PERIOD:    return 1 << RETRO_DEVICE_ID_JOYPAD_R;       // Strafe right
+	case RETROK_TAB:       return 1 << RETRO_DEVICE_ID_JOYPAD_SELECT;  // Map
+	case RETROK_ESCAPE:    return 1 << RETRO_DEVICE_ID_JOYPAD_START;   // Pause/menu
+	case RETROK_RETURN:    return 1 << RETRO_DEVICE_ID_JOYPAD_A;       // Menu confirm / fire
+	case RETROK_LEFTBRACKET:  return 1 << RETRO_DEVICE_ID_JOYPAD_L2;   // Prev weapon
+	case RETROK_RIGHTBRACKET: return 1 << RETRO_DEVICE_ID_JOYPAD_R2;   // Next weapon
+	default:               return 0;
+	}
+}
+
+static void keyboard_event_cb(bool down, unsigned keycode,
+			      uint32_t character, uint16_t key_modifiers)
+{
+	(void)character;
+	(void)key_modifiers;
+	int bit = keycode_to_joypad_bit(keycode);
+	if (!bit)
+		return;
+	if (down)
+		keyboard_button_mask |= bit;
+	else
+		keyboard_button_mask &= ~bit;
+}
+
 static void poll_inputs(wl_input_state_t *input)
 {
 	input_poll_cb();
@@ -1068,9 +1123,21 @@ static void poll_inputs(wl_input_state_t *input)
 		}
 	}
 
+	// Fold in keyboard keys mapped to the same virtual buttons.
+	input->button_mask |= keyboard_button_mask;
+
 	input->lsx = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X);
 	input->lsy = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y);
 	input->rsx = input_state_cb(0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X);
+
+	// Mouse: relative motion drives turning (X) and optional move (Y); the two
+	// main buttons map to Fire / Use. Read unconditionally — the frontend
+	// reports zero motion and no buttons when no mouse is present.
+	input->mouse_x = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_X);
+	input->mouse_y = input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_Y);
+	input->mouse_buttons =
+		  (input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_LEFT)  ? 1 : 0)
+		| (input_state_cb(0, RETRO_DEVICE_MOUSE, 0, RETRO_DEVICE_ID_MOUSE_RIGHT) ? 2 : 0);
 }
 
 // Audio is emitted once per retro_run frame. A frame is at most MAX_FRAMETICS
@@ -1360,6 +1427,19 @@ void retro_set_environment(retro_environment_t cb)
 	};
 
 	cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
+
+	static const struct retro_controller_description port_devices[] = {
+		{ "Joypad", RETRO_DEVICE_JOYPAD },
+		{ "Mouse",  RETRO_DEVICE_MOUSE  },
+	};
+	static const struct retro_controller_info ports[] = {
+		{ port_devices, 2 },
+		{ NULL, 0 },
+	};
+	cb(RETRO_ENVIRONMENT_SET_CONTROLLER_INFO, (void *)ports);
+
+	struct retro_keyboard_callback kbcb = { keyboard_event_cb };
+	cb(RETRO_ENVIRONMENT_SET_KEYBOARD_CALLBACK, &kbcb);
 
 	struct retro_vfs_interface_info vfs_interface_info;
 	vfs_interface_info.required_interface_version = 3;

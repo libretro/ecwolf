@@ -545,6 +545,9 @@ typedef struct wl_input_state_s
 	int lsx;
 	int lsy;
 	int rsx;
+	int mouse_x;
+	int mouse_y;
+	int mouse_buttons;
 
 	// Interpreted input
 	Direction menuDir;
