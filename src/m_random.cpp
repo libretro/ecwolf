@@ -59,15 +59,10 @@
 
 #include <assert.h>
 
-//#include "doomstat.h"
 #include "wl_def.h"
 #include "m_random.h"
-//#include "farchive.h"
-//#include "b_bot.h"
 #include "m_png.h"
 #include "m_crc32.h"
-//#include "i_system.h"
-//#include "c_dispatch.h"
 #include "files.h"
 #include "farchive.h"
 #include "wl_loadsave.h"

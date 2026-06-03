@@ -37,7 +37,6 @@
 #include "m_swap.h"
 #include "zdoomsupport.h"
 #include "files.h"
-//#include "r_local.h"
 #include "w_wad.h"
 #include "templates.h"
 #include "m_png.h"

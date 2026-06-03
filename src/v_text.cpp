@@ -40,11 +40,9 @@
 #include "v_text.h"
 
 #include "v_video.h"
-//#include "hu_stuff.h"
 #include "w_wad.h"
 #include "m_swap.h"
 
-//#include "doomstat.h"
 #include "templates.h"
 #include "zstring.h"
 

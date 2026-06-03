@@ -35,23 +35,14 @@
 #include <stddef.h>
 
 #include "templates.h"
-//#include "r_draw.h"
-//#include "r_main.h"
 #include "r_translate.h"
-//#include "v_video.h"
-//#include "g_game.h"
 #include "colormatcher.h"
-//#include "d_netinf.h"
 #include "v_palette.h"
 #include "scanner.h"
-//#include "sc_man.h"
 #include "doomerrors.h"
-//#include "i_system.h"
 #include "w_wad.h"
 #include "farchive.h"
 
-//#include "gi.h"
-//#include "stats.h"
 #include "zdoomsupport.h"
 
 TAutoGrowArray<FRemapTablePtr, FRemapTable *> translationtables[NUM_TRANSLATION_TABLES];

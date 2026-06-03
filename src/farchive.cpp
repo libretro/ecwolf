@@ -45,16 +45,11 @@
 #include <zlib.h>
 #include <stdlib.h>
 
-//#include "doomtype.h"
 #include "farchive.h"
 #include "m_swap.h"
 #include "m_crc32.h"
-//#include "cmdlib.h"
-//#include "i_system.h"
 #include "c_cvars.h"
-//#include "c_dispatch.h"
 #include "wl_agent.h"
-//#include "m_misc.h"
 #include "dobject.h"
 #include "r_sprites.h"
 #include "g_shared/a_inventory.h"

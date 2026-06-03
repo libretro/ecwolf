@@ -33,19 +33,10 @@
 */
 
 #include "templates.h"
-//#include "i_system.h"
 #include "wl_def.h"
-//#include "p_local.h"
-//#include "p_lnspec.h"
-//#include "p_3dmidtex.h"
 #include "m_random.h"
-//#include "g_game.h"
-//#include "s_sound.h"
-//#include "doomstat.h"
-//#include "r_state.h"
 #include "w_wad.h"
 #include "tarray.h"
-//#include "cmdlib.h"
 #include "farchive.h"
 #include "gamemap.h"
 #include "thinker.h"
@@ -54,7 +45,6 @@
 #include "id_sd.h"
 #include "wl_game.h"
 
-//#include "gi.h"
 
 #define BUTTONTIME 70
 

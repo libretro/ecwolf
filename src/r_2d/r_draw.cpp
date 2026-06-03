@@ -27,24 +27,15 @@
 
 #include "templates.h"
 #include "wl_def.h"
-//#include "i_system.h"
 #include "w_wad.h"
 #include "r_draw.h"
 #include "r_main.h"
 #include "v_video.h"
-//#include "doomstat.h"
-//#include "st_stuff.h"
-//#include "a_hexenglobal.h"
-//#include "g_game.h"
-//#include "g_level.h"
 #include "r_data/r_translate.h"
 #include "v_palette.h"
 #include "r_data/colormaps.h"
 #include "textures/textures.h"
 
-//#include "gi.h"
-//#include "stats.h"
-//#include "x86.h"
 
 #undef RANGECHECK
 #define r_drawtrans 1

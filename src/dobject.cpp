@@ -35,19 +35,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#include "cmdlib.h"
 #include "dobject.h"
 #include "actordef.h"
-//#include "doomstat.h"		// Ideally, DObjects can be used independant of Doom.
-//#include "d_player.h"		// See p_user.cpp to find out why this doesn't work.
-//#include "g_game.h"			// Needed for bodyque.
 #include "wl_agent.h"
-//#include "c_dispatch.h"
-//#include "i_system.h"
-//#include "r_state.h"
-//#include "stats.h"
-//#include "a_sharedglobal.h"
-//#include "dsectoreffect.h"
 #include "thingdef/thingdef.h"
 #include "zdoomsupport.h"
 

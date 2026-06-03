@@ -35,7 +35,6 @@
 
 #include "wl_def.h"
 #include "files.h"
-//#include "r_main.h"
 #include "templates.h"
 #include "textures.h"
 #include "wl_draw.h"

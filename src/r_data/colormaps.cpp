@@ -38,18 +38,7 @@
 #include <float.h>
 
 #include "wl_def.h"
-//#include "i_system.h"
 #include "w_wad.h"
-//#include "doomdef.h"
-//#include "r_local.h"
-//#include "r_sky.h"
-//#include "c_dispatch.h"
-//#include "sc_man.h"
-//#include "v_text.h"
-//#include "st_start.h"
-//#include "doomstat.h"
-//#include "r_bsp.h"
-//#include "r_segs.h"
 #include "v_palette.h"
 #include "colormatcher.h"
 #include "colormaps.h"
