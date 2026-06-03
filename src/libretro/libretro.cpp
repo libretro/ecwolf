@@ -1416,6 +1416,17 @@ void retro_run(void)
 			// Drop to the top menu level so the escape path pops out fully.
 			g_state.menuLevel = 1;
 			g_state.stage = MENU_EXITING_ESCAPE_1;
+		} else if (g_state.stage == HIGH_SCORES_STEP) {
+			// On the high-scores screen Start dismisses back to the menu, the
+			// same as any other key there (see HighScoresStep) - it must not
+			// toggle the paused overlay.
+			StartCPMusic(gameinfo.MenuMusic);
+			g_state.stage = MENU_PREPARE;
+		} else if (g_state.stage == TEXT_READER_STEP) {
+			// In the "Read This!" article reader Start exits the same way the
+			// Back key does (TextReaderStep), returning to wherever the reader
+			// was opened from (the main menu), rather than pausing.
+			g_state.stage = g_state.stageAfterIntermission;
 		} else if (g_state.isInWait || g_state.isFading) {
 			// Intro/attract/advisory and title-demo screens advance on any key
 			// (input->screenAcked). They are also briefly fading when first
