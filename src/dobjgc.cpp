@@ -96,7 +96,6 @@ namespace GC
 {
 size_t AllocBytes;
 size_t Threshold;
-size_t Estimate;
 DObject *Root;
 int Pause = DEFAULT_GCPAUSE;
 
@@ -114,7 +113,7 @@ int Pause = DEFAULT_GCPAUSE;
 
 void SetThreshold()
 {
-	Threshold = (Estimate / 100) * Pause;
+	Threshold = (AllocBytes / 100) * Pause;
 }
 
 //==========================================================================
@@ -146,7 +145,6 @@ static void Reap()
 		}
 		curr = next;
 	}
-	Estimate = AllocBytes;
 	SetThreshold();
 }
 
