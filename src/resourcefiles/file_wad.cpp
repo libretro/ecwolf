@@ -195,6 +195,26 @@ bool FWadFile::Open()
 
 	delete[] fileinfo;
 
+	SetNamespace("S_START", "S_END", ns_sprites);
+	SetNamespace("F_START", "F_END", ns_flats, HACK_FLAT);
+	SetNamespace("C_START", "C_END", ns_colormaps);
+	SetNamespace("A_START", "A_END", ns_acslibrary);
+	SetNamespace("TX_START", "TX_END", ns_newtextures);
+	SetNamespace("V_START", "V_END", ns_strifevoices);
+	SetNamespace("HI_START", "HI_END", ns_hires);
+	SetNamespace("VX_START", "VX_END", ns_voxels);
+
+	// ROTT Namespaces
+	SetNamespace("WALLSTRT", "WALLSTOP", ns_flats, HACK_ROTT);
+	SetNamespace("ANIMSTRT", "ANIMSTOP", ns_flats, HACK_ROTT2);
+	SetNamespace("DOORSTRT", "DOORSTOP", ns_flats, HACK_ROTT);
+	SetNamespace("EXITSTRT", "EXITSTOP", ns_flats, HACK_ROTT);
+	SetNamespace("ELEVSTRT", "ELEVSTOP", ns_flats, HACK_ROTT);
+	SetNamespace("SIDESTRT", "SIDESTOP", ns_flats, HACK_ROTT);
+	SetNamespace("UPDNSTRT", "UPDNSTOP", ns_flats);
+
+	SkinHack();
+
 	return true;
 }
 
