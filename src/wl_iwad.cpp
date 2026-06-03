@@ -40,6 +40,7 @@
 #include "tarray.h"
 #include "tmemory.h"
 #include "version.h"
+#include "libretro/ecwolf_pk3_data.h"
 #include "w_wad.h"
 #include "wl_iwad.h"
 #include "zstring.h"
@@ -636,20 +637,14 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		showpreviewgames = config.GetSetting("ShowPreviewGames")->GetInteger() != 0;
 
 	FString datawadDir;
-	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad, NULL);
+	// The base data (ecwolf.pk3) is embedded in the core, so open it straight
+	// from memory rather than searching the filesystem. The byte array has
+	// static lifetime, so the MemoryReader (owned by the FResourceFile) can
+	// reference it for as long as the resource file lives.
+	FResourceFile *datawadRes = FResourceFile::OpenResourceFile(datawad,
+		new MemoryReader((const char *)ecwolf_pk3_data, (long)ecwolf_pk3_data_size));
 	if(!datawadRes)
-	{
-		if((datawadRes = FResourceFile::OpenResourceFile(progdir + PATH_SEPARATOR + datawad, NULL)))
-			datawadDir = progdir + PATH_SEPARATOR;
-#if !defined(__APPLE__) && !defined(_WIN32)
-		else if((datawadRes = FResourceFile::OpenResourceFile(FString(INSTALL_PREFIX "/share/" BINNAME "/") + datawad, NULL)))
-			datawadDir = FString(INSTALL_PREFIX "/share/" BINNAME "/");
-#endif
-		else if(config.GetSetting("BaseDataPaths") != NULL && (datawadRes = FResourceFile::OpenResourceFile(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/" + datawad, NULL)))
-			datawadDir = FString(FString(config.GetSetting("BaseDataPaths")->GetString()) + "/");
-	}
-	if(!datawadRes)
-		I_Error("Could not open %s!", datawad);
+		I_Error("Could not open embedded %s!", datawad);
 
 	ParseIWadInfo(datawadRes);
 

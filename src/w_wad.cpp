@@ -49,6 +49,8 @@
 #include "resourcefiles/resourcefile.h"
 #include "zdoomsupport.h"
 #include "filesys.h"
+#include "version.h"
+#include "libretro/ecwolf_pk3_data.h"
 
 // Work around missing defines for ECWolf
 #ifndef PATH_MAX
@@ -211,6 +213,27 @@ int FWadCollection::AddExternalFile(const char *filename)
 void FWadCollection::AddFile (const char *filename, FileReader *wadinfo)
 {
 	bool isdir = false;
+
+	if (wadinfo == NULL)
+	{
+		// The base data (ecwolf.pk3) is embedded in the core and is never read
+		// from the filesystem. Identify it by basename and hand the resource
+		// opener a MemoryReader over the embedded bytes. The byte array has
+		// static lifetime, so the reader (owned by the FResourceFile) may
+		// reference it for as long as the resource file lives.
+		const char *base = strrchr(filename, '/');
+#ifdef _WIN32
+		const char *baseBack = strrchr(filename, '\\');
+		if (baseBack && (!base || baseBack > base))
+			base = baseBack;
+#endif
+		base = base ? base + 1 : filename;
+		if (stricmp(base, MAIN_PK3) == 0)
+		{
+			wadinfo = new MemoryReader((const char *)ecwolf_pk3_data,
+				(long)ecwolf_pk3_data_size);
+		}
+	}
 
 	if (wadinfo == NULL)
 	{

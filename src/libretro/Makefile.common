@@ -223,6 +223,8 @@ else
 endif
 
 SOURCES_C += $(DEPS_LZMA_C)
+# ecwolf.pk3 base data, embedded so the core carries it internally.
+SOURCES_C += $(CORE_DIR)/src/libretro/ecwolf_pk3_data.c
 SOURCES_CXX += $(LZMA_CXX)
 
 ifneq ($(STATIC_LINKING),1)
