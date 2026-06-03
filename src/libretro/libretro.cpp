@@ -343,7 +343,6 @@ bool IVideo::SetResolution (int width, int height, int bits)
 	}
 
 	if (screen) {
-		screen->ObjectFlags |= OF_YesReallyDelete;
 		delete screen;
 	}
 
@@ -367,7 +366,6 @@ void I_InitGraphics () {
 
 void I_ShutdownGraphics () {
 	if (screen) {
-		screen->ObjectFlags |= OF_YesReallyDelete;
 		delete screen;
 		screen = NULL;
 	}

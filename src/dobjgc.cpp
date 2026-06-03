@@ -138,7 +138,6 @@ static void Reap()
 		DObject *next = curr->ObjNext;
 		if (curr->ObjectFlags & OF_EuthanizeMe)
 		{
-			curr->ObjectFlags |= OF_YesReallyDelete;
 			delete curr;
 		}
 		curr = next;

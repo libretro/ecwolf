@@ -51,7 +51,6 @@ enum EObjectFlags
 {
 	// GC flags
 	OF_EuthanizeMe		= 1 << 5,		// Object wants to die
-	OF_YesReallyDelete	= 1 << 7,		// Object is being deleted outside the collector, and this is okay, so don't print a warning
 
 	// Other flags
 	OF_JustSpawned		= 1 << 8,		// Thinker was spawned this tic
