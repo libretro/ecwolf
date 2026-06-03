@@ -631,7 +631,26 @@ void FDecorateParser::ParseActorStateAction(StateDefinition &thisState, int func
 		}
 	}
 	else
+	{
 		sc.ScriptMessage(Scanner::WARNING, "Could not find function %s.", sc->str.GetChars());
+
+		// The function isn't implemented by this engine (e.g. a mod authored for
+		// a fork with extra action functions). Rather than abort, consume and
+		// discard its argument list so the rest of the actor parses; the unknown
+		// action simply does nothing. String constants are skipped as single
+		// tokens so a ')' inside a string doesn't end the list early.
+		if(sc.CheckToken('('))
+		{
+			int depth = 1;
+			while(depth > 0 && sc.GetNextToken())
+			{
+				if(sc->token == '(')
+					++depth;
+				else if(sc->token == ')')
+					--depth;
+			}
+		}
+	}
 }
 
 //  Returns the state that it parsed (DPARSER_CTL_None if none), sets up thisState
