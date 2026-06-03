@@ -435,20 +435,54 @@ void Mix_Chunk_Digital::loadSound() {
 		return;
 	}
 
-	// TODO: support skipping extra headers
-	if (size > 44 && memcmp(mem, "RIFF", 4) == 0
-	    && memcmp((char*)mem + 8, "WAVEfmt ", 8) == 0) {
-		rate = LittleLong(((uint32_t*)mem)[6]);
-		int bits = LittleShort(((uint16_t*)mem)[17]);
-		int channels = LittleShort(((uint16_t*)mem)[11]);
-		int format = LittleShort(((uint16_t*)mem)[10]);
-		sample_count = (size - 44) / (bits / 8);
-		if (format == 1 && channels == 1 && bits == 8) {
-			sample_format = FORMAT_8BIT_LINEAR_SIGNED;
-			sample_count = size - 44;
-		} else if (format == 1 && channels == 1 && bits == 16) {
-			sample_format = FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
-		} else {
+	// Parse the WAV by walking its RIFF chunks rather than assuming a fixed
+	// 44-byte header. Real-world packs ship WAVs with an extended fmt chunk or
+	// extra chunks (LIST/fact/INFO) before data, so the audio does not always
+	// start at offset 44. Reading from a hard-coded offset plays chunk headers
+	// as samples, which comes out as loud noise.
+	if (size > 12 && memcmp(mem, "RIFF", 4) == 0
+	    && memcmp((char*)mem + 8, "WAVE", 4) == 0) {
+		const uint8_t *base = (const uint8_t *)mem;
+		size_t pos = 12; // past "RIFF"<size>"WAVE"
+		const uint8_t *fmt = NULL;
+		size_t fmt_size = 0;
+		const uint8_t *pcm = NULL;
+		size_t pcm_size = 0;
+
+		while (pos + 8 <= size) {
+			const uint8_t *id = base + pos;
+			uint32_t clen = ReadLittleLong(base + pos + 4);
+			size_t body = pos + 8;
+			if (body > size)
+				break;
+			if (clen > size - body)
+				clen = (uint32_t)(size - body); // clamp truncated chunk
+			if (memcmp(id, "fmt ", 4) == 0) {
+				fmt = base + body;
+				fmt_size = clen;
+			} else if (memcmp(id, "data", 4) == 0) {
+				pcm = base + body;
+				pcm_size = clen;
+			}
+			// Chunks are word-aligned: an odd length is padded by one byte.
+			pos = body + clen + (clen & 1);
+		}
+
+		if (!fmt || fmt_size < 16 || !pcm || pcm_size == 0) {
+			printf ("Unknown WAV variant (malformed)\n");
+			sample_count = 0;
+			isValid = false;
+			isMetadataLoaded = true;
+			return;
+		}
+
+		int format = ReadLittleShort(fmt + 0);
+		int channels = ReadLittleShort(fmt + 2);
+		rate = ReadLittleLong(fmt + 4);
+		int bits = ReadLittleShort(fmt + 14);
+
+		if (format != 1 || (bits != 8 && bits != 16) ||
+		    (channels != 1 && channels != 2)) {
 			printf ("Unknown WAV variant %d/%d/%d\n",
 				bits, channels, format);
 			sample_count = 0;
@@ -456,26 +490,53 @@ void Mix_Chunk_Digital::loadSound() {
 			isMetadataLoaded = true;
 			return;
 		}
-		chunk_samples = malloc (size - 44);
-		void *input = ((char*)mem)+44;
-		int sz = size - 44;
-		if (chunk_samples)
-		{
-#ifdef MSB_FIRST
-			if (format == 1 && channels == 1 && bits == 16)
-			{
-				for (int i = 0; i < sz; i++)
-					((char *)chunk_samples)[i] = ((char *)input)[i ^ 1];
+
+		int bytes_per_sample = bits / 8;
+		int frame_bytes = bytes_per_sample * channels;
+		int frames = (int)(pcm_size / frame_bytes);
+		if (frames <= 0) {
+			sample_count = 0;
+			isValid = false;
+			isMetadataLoaded = true;
+			return;
+		}
+		sample_count = frames;
+		sample_format = (bits == 8) ? FORMAT_8BIT_LINEAR_SIGNED
+					    : FORMAT_16BIT_LINEAR_SIGNED_NATIVE;
+		isLooping = false;
+
+		chunk_samples = malloc ((size_t)frames * bytes_per_sample);
+		if (chunk_samples) {
+			if (bits == 8) {
+				const uint8_t *in = pcm;
+				int8_t *out = (int8_t *)chunk_samples;
+				for (int i = 0; i < frames; i++) {
+					if (channels == 1) {
+						out[i] = (int8_t)in[i];
+					} else {
+						// Downmix stereo to mono.
+						int s = (int)(int8_t)in[i * 2] +
+							(int)(int8_t)in[i * 2 + 1];
+						out[i] = (int8_t)(s / 2);
+					}
+				}
+			} else { // 16-bit
+				int16_t *out = (int16_t *)chunk_samples;
+				for (int i = 0; i < frames; i++) {
+					if (channels == 1) {
+						out[i] = (int16_t)ReadLittleShort(pcm + i * 2);
+					} else {
+						int l = (int16_t)ReadLittleShort(pcm + (i * 2) * 2);
+						int r = (int16_t)ReadLittleShort(pcm + (i * 2 + 1) * 2);
+						out[i] = (int16_t)((l + r) / 2);
+					}
+				}
 			}
-			else
-#endif
-				memcpy(chunk_samples, input, sz);
-			loaded_sound_size += sz;
+			loaded_sound_size += (size_t)frames * bytes_per_sample;
 			unloadableSounds[whichLump] = this;
 		}
 		isValid = true;
 		isMetadataLoaded = true;
-		isLooping = false;
 
 		return;
 	}
