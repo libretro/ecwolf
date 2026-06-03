@@ -1620,6 +1620,12 @@ void retro_init()
 
 void retro_deinit()
 {
+	// Tear down the process-lifetime actor/class system that LoadActors
+	// built (once) during the first retro_load_game. It is freed here, at
+	// the partner of static init, rather than in retro_unload_game, because
+	// native classes are registered at static-init time and the table is
+	// reused across content reloads.
+	ClassDef::UnloadActors();
 }
 
 unsigned retro_api_version(void)

@@ -464,6 +464,7 @@ void MetaTable::SetMetaString(uint32_t id, const char* value)
 static TMap<int, ClassDef *> EditorNumberTable, ConversationIDTable;
 SymbolTable ClassDef::globalSymbols;
 bool ClassDef::bShutdown = false;
+bool ClassDef::bActorsLoaded = false;
 
 ClassDef::ClassDef() : tentative(false)
 {
@@ -907,20 +908,17 @@ bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 
 void ClassDef::LoadActors()
 {
-	// The actor/class system is set up once per process: native classes are
-	// registered at static-init time (DeclareNativeClass) and never recreated,
+	// The actor/class system is process-lifetime data, not per-load-game
+	// data: native classes are created once at static-init time
+	// (DeclareNativeClass) and can never be recreated within the process,
 	// and the native parent-pointer fixup below is a one-shot in-place
-	// transform. Running this a second time -- e.g. when content is reloaded
-	// in the same process image, which is the norm on statically linked
-	// console builds -- would reinterpret already-resolved parent pointers as
-	// the original placeholders and read freed/garbage memory. The matching
-	// UnloadActors() (which deletes every ClassDef) is likewise a process-exit
-	// teardown, so it is no longer registered as a per-unload atterm handler.
-	// Build the table once and reuse it for the lifetime of the process.
-	static bool loaded = false;
-	if(loaded)
+	// transform. Build the table once and reuse it across content reloads
+	// (which reuse the same address space on statically linked console
+	// builds); UnloadActors() tears it down once at retro_deinit and resets
+	// this flag so a later re-init can rebuild it.
+	if(bActorsLoaded)
 		return;
-	loaded = true;
+	bActorsLoaded = true;
 
 	printf("ClassDef: Loading actor definitions.\n");
 
@@ -1251,6 +1249,13 @@ void ClassDef::UnloadActors()
 	AActor::damageExpressions.Clear();
 	for(unsigned int i = 0;i < globalSymbols.Size();++i)
 		delete globalSymbols[i];
+	globalSymbols.Clear();
+
+	// Drop every (now freed) entry from the class table and allow LoadActors
+	// to run again. Without clearing the table its iterator would walk freed
+	// ClassDef pointers on the next load.
+	ClassTable().Clear();
+	bActorsLoaded = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

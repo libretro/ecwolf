@@ -288,6 +288,7 @@ class ClassDef
 		size_t					GetSize() const { return size; }
 		const Frame				*GetState(unsigned int index) const { return &frameList[index]; }
 		static void				LoadActors();
+		static bool				bActorsLoaded;
 		bool					IsStateOwner(const Frame *frame) const { return frame >= &frameList[0] && frame < &frameList[frameList.Size()]; }
 		static void				UnloadActors();
 
