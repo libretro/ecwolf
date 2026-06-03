@@ -281,15 +281,32 @@ void ScalePost()
 		yw=(texyscale>>2)-1;
 	}
 
-	while(yendoffs >= viewheight)
+	// Fast-forward the source texture coordinate across the rows that fall
+	// below the screen in a single step. The iterative form below advances one
+	// off-screen row at a time, which for a close (tall) wall can be thousands
+	// of iterations per column every frame:
+	//   while(yendoffs >= viewheight) {
+	//       ywcount -= texyscale;
+	//       while(ywcount <= 0) { ywcount += yd; yw--; }
+	//       yendoffs--;
+	//   }
+	// Over N = yendoffs - viewheight + 1 rows, ywcount drops by N*texyscale and
+	// yw is decremented once per yd of accumulated deficit. Computed directly
+	// this is exact (verified bit-identical to the loop), and yendoffs ends at
+	// viewheight - 1 just as the loop leaves it.
+	if(yendoffs >= viewheight)
 	{
-		ywcount -= texyscale;
-		while(ywcount <= 0)
+		const int N = yendoffs - viewheight + 1;
+		long long v = (long long)ywcount - (long long)N*texyscale;
+		if(v > 0)
+			ywcount = (int)v;
+		else
 		{
-			ywcount += yd;
-			yw--;
+			const long long rolls = (-v)/yd + 1;
+			ywcount = (int)(v + rolls*yd);
+			yw -= (int)rolls;
 		}
-		yendoffs--;
+		yendoffs = viewheight - 1;
 	}
 	if(yw < 0)
 		yw = (texyscale>>2) - ((-yw) % (texyscale>>2));
