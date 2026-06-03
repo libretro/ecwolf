@@ -305,6 +305,10 @@ class FVGAGraph : public FResourceFile
 						uint8_t* data = new uint8_t[lumps[i-1].length];
 						uint8_t* out = new uint8_t[lumps[i-1].LumpSize];
 						Reader->Read(data, lumps[i-1].length);
+						// HuffExpand decompresses the chunk into out; the
+						// font/image detection below reads the decompressed
+						// header, so this call is required for its side effect.
+						lumps[i-1].HuffExpand(data, out);
 						delete[] data;
 
 						bool endhit = false;
