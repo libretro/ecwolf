@@ -284,8 +284,12 @@ static void InterDrawNormalTop()
 			completedString = language[levelInfo->CompletionString.Mid(1)];
 		else
 			completedString = levelInfo->CompletionString;
-		completedString.Format(completedString, levelInfo->FloorNumber.GetChars());
-		Write (14, 2, completedString);
+		// Don't Format() completedString into itself: it would be both the
+		// format string and the destination buffer, which can read freed memory
+		// mid-format. Format into a separate string instead.
+		FString formattedString;
+		formattedString.Format(completedString, levelInfo->FloorNumber.GetChars());
+		Write (14, 2, formattedString);
 	}
 	else
 	{
