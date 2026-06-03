@@ -71,6 +71,7 @@ void I_Error(const char* format, ...);
 void I_FatalError(const char *errorStr, ...);
 void Quit();
 void NetDPrintf(const char *format, ...);
+void libretro_log(const char *format, ...);
 
 #define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)
 #define FLOAT2FIXED(x) (fixed_t((x)*FRACUNIT))

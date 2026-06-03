@@ -411,7 +411,7 @@ void libretro_log(const char *format, ...)
 
 	va_start(va, format);
 	vsnprintf(formatted, sizeof(formatted) - 1, format, va);
-	log_cb(RETRO_LOG_INFO, "%s\n", formatted);
+	log_cb(RETRO_LOG_INFO, "%s", formatted);
 	va_end(va);
 }
 
@@ -419,7 +419,7 @@ void Quit ()
 {
 	struct retro_message msg;
 
-	libretro_log("Fatal error");
+	libretro_log("Fatal error\n");
 	msg.msg    = "Fatal error";
 	msg.frames = fp10s;
 	environ_cb(RETRO_ENVIRONMENT_SET_MESSAGE, &msg);
