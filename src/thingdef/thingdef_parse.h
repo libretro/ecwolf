@@ -58,6 +58,7 @@ struct StateDefinition
 	int duration;
 	unsigned randDuration;
 	bool fullbright;
+	bool zonebright;
 	fixed_t offsetX;
 	fixed_t offsetY;
 	NextType nextType;

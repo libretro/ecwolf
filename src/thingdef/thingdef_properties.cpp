@@ -564,6 +564,27 @@ HANDLE_PROPERTY(PROJECTILE)
 	defaults->flags |= FL_MISSILE;
 }
 
+// The following properties come from mods authored for engine forks that add
+// extra actor features (halo/zone lighting). This engine doesn't implement those
+// effects, but recognizing the properties lets such mods load cleanly instead of
+// warning. The light definitions are parsed and otherwise ignored; pickupmessage
+// is stored so it is available to the inventory system.
+HANDLE_PROPERTY(halolight)
+{
+	// id, radius, light [, littype] - parsed and ignored (no lighting renderer).
+}
+
+HANDLE_PROPERTY(zonelight)
+{
+	// id, light [, littype] - parsed and ignored (no lighting renderer).
+}
+
+HANDLE_PROPERTY(pickupmessage)
+{
+	STRING_PARAM(message, 0);
+	cls->Meta.SetMetaString(AMETA_PickupMessage, message);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 #define DEFINE_PROP_PREFIX(name, class, prefix, params) { A##class::__StaticClass, #prefix, #name, #params, __Handler_##name }
@@ -595,6 +616,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(dropitem, Actor, S_II),
 	DEFINE_PROP_PREFIX(forwardmove, PlayerPawn, Player, F_F),
 	DEFINE_PROP(gibhealth, Actor, I),
+	DEFINE_PROP(halolight, Actor, IFI_S),
 	DEFINE_PROP(health, Actor, I_IIIIIIII),
 	DEFINE_PROP(height, Actor, I),
 	DEFINE_PROP(icon, Inventory, S),
@@ -609,6 +631,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(overheadicon, Actor, S),
 	DEFINE_PROP(painchance, Actor, I),
 	DEFINE_PROP(painsound, Actor, S),
+	DEFINE_PROP(pickupmessage, Actor, S),
 	DEFINE_PROP(pickupsound, Inventory, S),
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(PROJECTILE, Actor,),
@@ -629,6 +652,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(xscale, Actor, F),
 	DEFINE_PROP(yadjust, Weapon, F),
 	DEFINE_PROP(yscale, Actor, F),
+	DEFINE_PROP(zonelight, Actor, II_S),
 
 	{ NULL, NULL, NULL, NULL }
 };

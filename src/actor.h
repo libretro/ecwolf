@@ -61,7 +61,8 @@ enum
 	AMETA_DefaultHealth7,
 	AMETA_DefaultHealth8,
 	AMETA_DefaultHealth9,
-	AMETA_ConversationID
+	AMETA_ConversationID,
+	AMETA_PickupMessage
 };
 
 enum
