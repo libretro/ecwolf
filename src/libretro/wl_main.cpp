@@ -1359,7 +1359,15 @@ static bool exitMenuEscape(wl_state_t *state)
 {
 	SD_PlaySound("menu/escape");
 
-	return popMenu(state);
+	bool ret = popMenu(state);
+	// popMenu only sets the next stage when the whole menu closes (menuLevel
+	// reached 0). If a parent menu remains, it leaves the stage at
+	// MENU_EXITING_ESCAPE_2, which would re-enter here next frame and keep
+	// popping until the stack drained. Re-prepare the parent menu instead so
+	// Back/Start back out exactly one level.
+	if (state->menuLevel > 0)
+		state->stage = MENU_PREPARE;
+	return ret;
 }
 
 static bool EndSequence1(wl_state_t *state)

@@ -1410,11 +1410,10 @@ void retro_run(void)
 			g_state.stage = MAIN_MENU_PREPARE;
 			Paused = 0;
 		} else if (g_state.stage == MENU_PREPARE || g_state.stage == MENU_RUN) {
-			// The menu is already open: Start closes it the same way the
-			// "Back to Game"/"Back to Demo" item does (resume the running game
-			// or return to the demo), rather than toggling the paused overlay.
-			// Drop to the top menu level so the escape path pops out fully.
-			g_state.menuLevel = 1;
+			// A menu is open: Start backs out one level, exactly like the Back
+			// key (menuBack -> MENU_EXITING_ESCAPE_1). From a submenu it returns
+			// to the parent menu; from the main menu it pops out fully (resuming
+			// the running game or returning to the demo).
 			g_state.stage = MENU_EXITING_ESCAPE_1;
 		} else if (g_state.stage == HIGH_SCORES_STEP) {
 			// On the high-scores screen Start dismisses back to the menu, the
