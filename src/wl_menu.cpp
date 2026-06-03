@@ -54,6 +54,7 @@ Menu mainMenu(MENU_X, MENU_Y, MENU_W, 24);
 Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
+Menu soundMenu(24, 45, 284, 24);
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
@@ -144,6 +145,18 @@ void CreateMenus()
 	}
 	skills.setCurrentPosition(2);
 
+	// Sound Options: the libretro port drives sound through live volume globals
+	// (read each tic by the mixer) rather than the DOS device modes, so expose
+	// those as sliders. Range 0..20 matches the core's volume options.
+	soundMenu.setHeadText(language["STR_SOUNDCONFIG"]);
+	soundMenu.addItem(new LabelMenuItem(language["STR_DIGITALDEVICE"]));
+	soundMenu.addItem(new SliderMenuItem(DigiVolume, 192, 20, language["STR_SOFT"], language["STR_LOUD"]));
+	soundMenu.addItem(new LabelMenuItem(language["STR_ADLIBDEVICE"]));
+	soundMenu.addItem(new SliderMenuItem(AdlibVolume, 192, 20, language["STR_SOFT"], language["STR_LOUD"]));
+	soundMenu.addItem(new LabelMenuItem(language["STR_MUSICDEVICE"]));
+	soundMenu.addItem(new SliderMenuItem(MusicVolume, 192, 20, language["STR_SOFT"], language["STR_LOUD"]));
+	soundMenu.addItem(new LabelMenuItem(language["STR_PC"]));
+	soundMenu.addItem(new SliderMenuItem(SpeakerVolume, 192, 20, language["STR_SOFT"], language["STR_LOUD"]));
 }
 
 

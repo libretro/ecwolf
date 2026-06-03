@@ -827,6 +827,7 @@ unsigned int I_MakeRNGSeed();
 
 extern Menu episodes;
 extern Menu skills;
+extern Menu soundMenu;
 
 static bool
 popMenu(wl_state_t *state)
@@ -884,6 +885,8 @@ wl_state_t::currentMenu() {
 		return &episodes;
 	case SKILL_MENU:
 		return &skills;
+	case SOUND_MENU:
+		return &soundMenu;
 	}
 	return NULL;
 }
@@ -1129,6 +1132,10 @@ static bool handleChoice(wl_state_t *state, int pos)
 			state->stage = MENU_PREPARE;
 			State_FadeOut(state);
 			break;
+		case 1: // Sound Options
+			pushMenu(state, SOUND_MENU);
+			state->stage = MENU_PREPARE;
+			break;
 		case 6: // Read This!
 			MenuFadeOut();
 			HelpScreens(state);
@@ -1165,6 +1172,11 @@ static bool handleChoice(wl_state_t *state, int pos)
 		state->stage = START_GAME;
 		state->menuLevel = 0;
 		// TODO: confirmation
+		break;
+	case SOUND_MENU:
+		// Items are sliders/labels adjusted with left/right; pressing Enter
+		// just keeps the menu open.
+		state->stage = MENU_PREPARE;
 		break;
 	}
 	return false;
