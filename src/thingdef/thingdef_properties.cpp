@@ -631,7 +631,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(overheadicon, Actor, S),
 	DEFINE_PROP(painchance, Actor, I),
 	DEFINE_PROP(painsound, Actor, S),
-	DEFINE_PROP(pickupmessage, Actor, S),
+	DEFINE_PROP(pickupmessage, Inventory, S),
 	DEFINE_PROP(pickupsound, Inventory, S),
 	DEFINE_PROP(points, Actor, I),
 	DEFINE_PROP(PROJECTILE, Actor,),
