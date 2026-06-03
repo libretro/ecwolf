@@ -338,12 +338,9 @@ FTextureID FTextureManager::GetTexture (const char *name, int usetype, uint32_t 
 		i = CheckForTexture (name, usetype, flags | TEXMAN_TryAny);
 	}
 
+	// Use a default texture instead of aborting like Doom did
 	if (!i.Exists())
-	{
-		// Use a default texture instead of aborting like Doom did
-		Printf ("Unknown texture: \"%s\"\n", name);
 		i = DefaultTexture;
-	}
 	return FTextureID(i);
 }
 
@@ -434,14 +431,8 @@ FTextureID FTextureManager::CreateTexture (int lumpnum, int usetype)
 	if (lumpnum != -1)
 	{
 		FTexture *out = FTexture::CreateTexture(lumpnum, usetype);
-
-		if (out != NULL) return AddTexture (out);
-		else
-		{
-			if(Wads.LumpLength(lumpnum) > 0)
-				Printf (TEXTCOLOR_ORANGE "Invalid data encountered for texture %s\n", Wads.GetLumpFullPath(lumpnum).GetChars());
-			return FTextureID(-1);
-		}
+		if (out != NULL)
+			return AddTexture (out);
 	}
 	return FTextureID(-1);
 }
@@ -658,16 +649,8 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 					int lumpnum = Wads.CheckNumForFullName(sc.String, true, ns_patches);
 					if (lumpnum == -1) lumpnum = Wads.CheckNumForFullName(sc.String, true, ns_graphics);
 
-					if (tlist.Size() == 0)
-					{
-						Printf("Attempting to remap non-existent texture %s to %s\n",
-							texname.GetChars(), sc.String);
-					}
-					else if (lumpnum == -1)
-					{
-						Printf("Attempting to remap texture %s to non-existent lump %s\n",
-							texname.GetChars(), sc.String);
-					}
+					if (tlist.Size() == 0) { }
+					else if (lumpnum == -1) { }
 					else
 					{
 						for(unsigned int i = 0; i < tlist.Size(); i++)
@@ -739,7 +722,6 @@ void FTextureManager::LoadTextureDefs(int wadnum, const char *lumpname)
 							}
 						}
 					}				
-					//else Printf("Unable to define hires texture '%s'\n", tex->Name);
 				}
 				else */if (sc->str.CompareNoCase("texture") == 0)
 				{
@@ -820,7 +802,6 @@ void FTextureManager::AddPatches (int lumpnum)
 void FTextureManager::AddTexturesForWad(int wadnum)
 {
 	int firsttexture = Textures.Size();
-	int lumpcount = Wads.GetNumLumps();
 
 	FirstTextureForFile.Push(firsttexture);
 
@@ -944,10 +925,7 @@ void FTextureManager::SortTexturesByType(int start, int end)
 	for(unsigned j = 0; j<newtextures.Size(); j++)
 	{
 		if (newtextures[j] != NULL)
-		{
-			Printf("Texture %s has unknown type!\n", newtextures[j]->Name.GetChars());
 			AddTexture(newtextures[j]);
-		}
 	}
 }
 

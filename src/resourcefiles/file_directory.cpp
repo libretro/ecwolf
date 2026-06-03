@@ -87,10 +87,9 @@ FDirectory::FDirectory(const char * directory)
 //
 //==========================================================================
 
-bool FDirectory::Open(bool quiet)
+bool FDirectory::Open()
 {
 	NumLumps = AddDirectory(Filename);
-	if (!quiet) Printf(", %d lumps\n", NumLumps);
 	PostProcessArchive(&Lumps[0], sizeof(FDirectoryLump));
 	return true;
 }
@@ -149,10 +148,10 @@ int FDirectoryLump::FillCache()
 //
 //==========================================================================
 
-FResourceFile *CheckDir(const char *filename, FileReader *file, bool quiet)
+FResourceFile *CheckDir(const char *filename, FileReader *file)
 {
 	FResourceFile *rf = new FDirectory(filename);
-	if (rf->Open(quiet)) return rf;
+	if (rf->Open()) return rf;
 	delete rf;
 	return NULL;
 }

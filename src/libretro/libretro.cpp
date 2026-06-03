@@ -88,7 +88,7 @@ static retro_environment_t environ_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_video_refresh_t video_cb;
-static retro_log_printf_t log_cb = fallback_log;
+retro_log_printf_t log_cb = fallback_log;
 static bool libretro_supports_bitmasks = false;
 // fp10s is 10 times the FPS
 static int screen_width = 640, screen_height = 400, fp10s = 350;
@@ -829,7 +829,7 @@ bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 	{
 		TArray<FString> wadfiles, files;
      
-		Printf("IWad: Selecting base game data.\n");
+		log_cb(RETRO_LOG_INFO, "IWad: Selecting base game data.\n");
 		char name_without_ext[1023];
 
 		extract_directory(g_wad_dir, info->path, sizeof(g_wad_dir));
@@ -882,11 +882,6 @@ bool retro_load_game(const struct retro_game_info *info)
 		log_cb (RETRO_LOG_ERROR, "Unknown exception while loading game\n");
 		return false;	  
 	}
-}
-
-void IVideo::DumpAdapters ()
-{
-	Printf("Multi-monitor support unavailable.\n");
 }
 
 static int transform_axis(int val, int run, int sensitivity)

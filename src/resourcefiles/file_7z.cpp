@@ -32,9 +32,6 @@
 **
 **
 */
-#ifdef _WIN32
-#define USE_WINDOWS_DWORD
-#endif
 
 #include "7z.h"
 #include "7zCrc.h"
@@ -193,7 +190,7 @@ class F7ZFile : public FResourceFile
 
 public:
 	F7ZFile(const char * filename, FileReader *filer);
-	bool Open(bool quiet);
+	bool Open();
 	virtual ~F7ZFile();
 	virtual FResourceLump *GetLump(int no) { return ((unsigned)no < NumLumps)? &Lumps[no] : NULL; }
 };
@@ -220,7 +217,7 @@ F7ZFile::F7ZFile(const char * filename, FileReader *filer)
 //
 //==========================================================================
 
-bool F7ZFile::Open(bool quiet)
+bool F7ZFile::Open()
 {
 	Archive = new C7zArchive(Reader);
 	int skipped = 0;
@@ -231,26 +228,6 @@ bool F7ZFile::Open(bool quiet)
 	{
 		delete Archive;
 		Archive = NULL;
-		if (!quiet)
-		{
-			Printf("\n" TEXTCOLOR_RED "%s: ", Filename);
-			if (res == SZ_ERROR_UNSUPPORTED)
-			{
-				Printf("Decoder does not support this archive\n");
-			}
-			else if (res == SZ_ERROR_MEM)
-			{
-				Printf("Cannot allocate memory\n");
-			}
-			else if (res == SZ_ERROR_CRC)
-			{
-				Printf("CRC error\n");
-			}
-			else
-			{
-				Printf("error #%d\n", res);
-			}
-		}
 		return false;
 	}
 
@@ -312,12 +289,9 @@ bool F7ZFile::Open(bool quiet)
 
 		if (SZ_OK != Archive->Extract(Lumps[0].Position, &temp[0]))
 		{
-			if (!quiet) Printf("\n%s: unsupported 7z/LZMA file!\n", Filename);
 			return false;
 		}
 	}
-
-	if (!quiet) Printf(", %d lumps\n", NumLumps);
 
 	PostProcessArchive(&Lumps[0], sizeof(F7ZLump));
 	return true;
@@ -361,7 +335,7 @@ int F7ZLump::FillCache()
 //
 //==========================================================================
 
-FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet)
+FResourceFile *Check7Z(const char *filename, FileReader *file)
 {
 	char head[k7zSignatureSize];
 
@@ -373,7 +347,7 @@ FResourceFile *Check7Z(const char *filename, FileReader *file, bool quiet)
 		if (!memcmp(head, k7zSignature, k7zSignatureSize))
 		{
 			FResourceFile *rf = new F7ZFile(filename, file);
-			if (rf->Open(quiet)) return rf;
+			if (rf->Open()) return rf;
 
 			rf->Reader = NULL; // to avoid destruction of reader
 			delete rf;

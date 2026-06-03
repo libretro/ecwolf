@@ -117,38 +117,13 @@ bool P_ChangeSwitchTexture (MapSpot spot, MapTile::Side side, int useAgain, uint
 	ENamedName sound;
 	FSwitchDef *Switch;
 
-#if 0
-	if ((Switch = TexMan.FindSwitch (side->GetTexture(side_t::top))) != NULL)
-	{
-		texture = side_t::top;
-	}
-	else if ((Switch = TexMan.FindSwitch (side->GetTexture(side_t::bottom))) != NULL)
-	{
-		texture = side_t::bottom;
-	}
-	else if ((Switch = TexMan.FindSwitch (side->GetTexture(side_t::mid))) != NULL)
-	{
-		texture = side_t::mid;
-	}
-	else
-	{
-		if (quest != NULL)
-		{
-			*quest = false;
-		}
-		return false;
-	}
-#else
 	Switch = TexMan.FindSwitch(spot->texture[side]);
 	if(!Switch)
 		return false;
-#endif
 
 	// EXIT SWITCH?
 	if (Switch->Sound != 0)
-	{
 		sound = (ENamedName)Switch->Sound;
-	}
 	else
 	{
 		sound = S_FindSound (

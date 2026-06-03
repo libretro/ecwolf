@@ -71,10 +71,7 @@ void FTextureManager::InitSwitchList ()
 		{
 			// [RH] Check for switches that aren't really switches
 			if (stricmp (list_p, list_p+9) == 0)
-			{
-				Printf ("Switch %s in SWITCHES has the same 'on' state\n", list_p);
 				continue;
-			}
 			// [RH] Skip this switch if its textures can't be found.
 			if (CheckForTexture (list_p /* .name1 */, FTexture::TEX_Wall, texflags).Exists() &&
 				CheckForTexture (list_p + 9 /* .name2 */, FTexture::TEX_Wall, texflags).Exists())
@@ -248,10 +245,7 @@ FSwitchDef *FTextureManager::ParseSwitchDef (Scanner &sc, bool ignoreBad)
 				sc.ScriptMessage(Scanner::ERROR, "Expected string.");
 			picnum = CheckForTexture (sc->str, FTexture::TEX_Wall, texflags);
 			if (!picnum.Exists() && !ignoreBad)
-			{
-				//Printf ("Unknown switch texture %s\n", sc.String);
 				bad = true;
-			}
 			thisframe.Texture = picnum;
 			if(!sc.GetNextString ())
 				sc.ScriptMessage(Scanner::ERROR, "Expected string.");

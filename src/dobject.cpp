@@ -66,13 +66,6 @@ DObject::DObject (const ClassDef *inClass)
 DObject::~DObject ()
 {
 	DObject **probe;
-	const ClassDef *type = GetClass();
-
-	if (!(ObjectFlags & OF_YesReallyDelete))
-	{
-		Printf ("Warning: '%s' is freed outside the GC process.\n",
-			type != NULL ? type->GetName().GetChars() : "==some object==");
-	}
 
 	// Find all pointers that reference this object and NULL them.
 	StaticPointerSubstitution(this, NULL);

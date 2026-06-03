@@ -23,13 +23,13 @@
 #endif //_xs_DEFAULT_CONVERSION
 
 
-#if __BIG_ENDIAN__
-	#define _xs_iexp_				0
-	#define _xs_iman_				1
+#ifdef MSB_FIRST
+#define _xs_iexp_ 0
+#define _xs_iman_ 1
 #else
-	#define _xs_iexp_				1       //intel is little endian
-	#define _xs_iman_				0
-#endif //BigEndian_
+#define _xs_iexp_ 1
+#define _xs_iman_ 0
+#endif
 
 #ifdef __GNUC__
 #define finline inline

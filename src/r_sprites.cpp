@@ -566,7 +566,6 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 
 	fixed nx1,nx2,ny1,ny2;
 	int viewx1,viewx2;
-	fixed diradd;
 	fixed playx = viewx;
 	fixed playy = viewy;
 

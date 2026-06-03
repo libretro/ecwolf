@@ -256,15 +256,9 @@ FPNGTexture::FPNGTexture (FileReader &lump, int lumpnum, const FString &filename
 				ihotx = BigLong((int)hotx);
 				ihoty = BigLong((int)hoty);
 				if (ihotx < -32768 || ihotx > 32767)
-				{
-					Printf ("X-Offset for PNG texture %s is bad: %d (0x%08x)\n", Wads.GetLumpFullName (lumpnum), ihotx, ihotx);
 					ihotx = 0;
-				}
 				if (ihoty < -32768 || ihoty > 32767)
-				{
-					Printf ("Y-Offset for PNG texture %s is bad: %d (0x%08x)\n", Wads.GetLumpFullName (lumpnum), ihoty, ihoty);
 					ihoty = 0;
-				}
 				LeftOffset = ihotx;
 				TopOffset = ihoty;
 			}
@@ -429,17 +423,8 @@ void FPNGTexture::Unload ()
 
 FTextureFormat FPNGTexture::GetFormat()
 {
-#if 0
-	switch (ColorType)
-	{
-	case 3:		return TEX_Pal;
-	case 0:		return TEX_Gray;
-	default:	return TEX_RGB;
-	}
-#else
 	// For now, create a true color texture to preserve all colors.
 	return TEX_RGB;
-#endif
 }
 
 //==========================================================================

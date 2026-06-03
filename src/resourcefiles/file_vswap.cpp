@@ -189,7 +189,7 @@ class FVSwap : public FResourceFile
 			}
 		}
 
-		bool Open(bool quiet)
+		bool Open()
 		{
 			uint8_t header[6];
 			Reader->Read(header, 6);
@@ -206,12 +206,7 @@ class FVSwap : public FResourceFile
 			// crafted VSWAP yields out-of-bounds reads (soundStart > numChunks)
 			// or an unsigned underflow (numChunks == 0).
 			if(numChunks == 0 || soundStart > numChunks || spriteStart > soundStart)
-			{
-				if(!quiet)
-					Printf("\nVSWAP header is invalid (numChunks=%u spriteStart=%u soundStart=%u).\n",
-						(unsigned)numChunks, (unsigned)spriteStart, (unsigned)soundStart);
 				return false;
-			}
 
 			Lumps = new FUncompressedLump[soundStart];
 
@@ -269,7 +264,6 @@ class FVSwap : public FResourceFile
 			NumLumps = soundStart + numDigi;
 
 			delete[] data;
-			if(!quiet) Printf(", %d lumps\n", NumLumps);
 
 			LumpRemapper::AddFile(extension, this, LumpRemapper::VSWAP);
 			return true;
@@ -293,7 +287,7 @@ class FVSwap : public FResourceFile
 		FString	vswapFile;
 };
 
-FResourceFile *CheckVSwap(const char *filename, FileReader *file, bool quiet)
+FResourceFile *CheckVSwap(const char *filename, FileReader *file)
 {
 	FString fname(filename);
 	int lastSlash = fname.LastIndexOfAny("/\\:");
@@ -305,7 +299,7 @@ FResourceFile *CheckVSwap(const char *filename, FileReader *file, bool quiet)
 	if(fname.Len() == 5 && fname.CompareNoCase("vswap") == 0) // file must be vswap.something
 	{
 		FResourceFile *rf = new FVSwap(filename, file);
-		if(rf->Open(quiet)) return rf;
+		if(rf->Open()) return rf;
 		rf->Reader = NULL; // to avoid destruction of reader
 		delete rf;
 	}

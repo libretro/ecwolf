@@ -319,7 +319,6 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 {
 	INTBOOL boolval;
 	int intval;
-	bool translationset = false;
 	bool virtBottom;
 
 	if (img == NULL || img->UseType == FTexture::TEX_Null)
@@ -377,13 +376,11 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 	while (tag != TAG_DONE)
 	{
 		va_list *more_p;
-		uint32_t data;
 
 		switch (tag)
 		{
 		case TAG_IGNORE:
 		default:
-			data = va_arg(tags, uint32_t);
 			break;
 
 		case TAG_MORE:

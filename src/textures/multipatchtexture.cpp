@@ -296,10 +296,6 @@ FMultiPatchTexture::FMultiPatchTexture (const void *texdef, FPatchLookup *patchl
 		else
 			mpatch.d++;
 	}
-	if (NumParts == 0)
-	{
-		Printf ("Texture %s is left without any patches\n", Name.GetChars());
-	}
 
 	DefinitionLump = deflumpnum;
 }
@@ -753,17 +749,12 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 
 		// Check whether the amount of names reported is correct.
 		if ((signed)numpatches < 0)
-		{
-			Printf("Corrupt PNAMES lump found (negative amount of entries reported)");
 			return;
-		}
 
 		// Check whether the amount of names reported is correct.
 		int lumplength = Wads.LumpLength(patcheslump);
 		if (numpatches > uint32_t((lumplength-4)/8))
 		{
-			Printf("PNAMES lump is shorter than required (%u entries reported but only %d bytes (%d entries) long\n",
-				numpatches, lumplength, (lumplength-4)/8);
 			// Truncate but continue reading. Who knows how many such lumps exist?
 			numpatches = (lumplength-4)/8;
 		}
@@ -792,7 +783,6 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 
 	if (maxoff < uint32_t(numtextures+1)*4)
 	{
-		Printf ("Texture directory is too short");
 		delete[] patchlookup;
 		return;
 	}
@@ -803,7 +793,6 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 		offset = LittleLong(directory[i]);
 		if (offset > maxoff)
 		{
-			Printf ("Bad texture directory");
 			delete[] patchlookup;
 			return;
 		}
@@ -839,7 +828,6 @@ void FTextureManager::AddTexturesLump (const void *lumpdata, int lumpsize, int d
 		offset = LittleLong(directory[i]);
 		if (offset > maxoff)
 		{
-			Printf ("Bad texture directory");
 			delete[] patchlookup;
 			return;
 		}
@@ -1232,7 +1220,6 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 	if (Width <= 0 || Height <= 0)
 	{
 		UseType = FTexture::TEX_Null;
-		Printf("Texture %s has invalid dimensions (%d, %d)\n", Name.GetChars(), Width, Height);
 		Width = Height = 1;
 	}
 	CalcBitSize ();
@@ -1262,7 +1249,6 @@ void FMultiPatchTexture::ResolvePatches()
 				if (texno == id)
 				{
 					if (Inits[i].HasLine) Inits[i].sc.ScriptMessage(Scanner::WARNING, "Texture '%s' references itself as patch\n", Inits[i].TexName.GetChars());
-					else Printf("Texture '%s' references itself as patch\n", Inits[i].TexName.GetChars());
 				}
 				else
 				{
@@ -1276,7 +1262,6 @@ void FMultiPatchTexture::ResolvePatches()
 				if (!Inits[i].Silent)
 				{
 					if (Inits[i].HasLine) Inits[i].sc.ScriptMessage(Scanner::WARNING, "Unknown patch '%s' in texture '%s'\n", Inits[i].TexName.GetChars(), Name.GetChars());
-					else Printf("Unknown patch '%s' in texture '%s'\n", Inits[i].TexName.GetChars(), Name.GetChars());
 				}
 			}
 			else

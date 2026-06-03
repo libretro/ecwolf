@@ -61,7 +61,7 @@ class FRtlFile : public FResourceFile
 		~FRtlFile();
 
 		FResourceLump *GetLump(int lump);
-		bool Open(bool quiet);
+		bool Open();
 
 	private:
 		FMapLump*	Lumps;
@@ -82,7 +82,7 @@ FResourceLump *FRtlFile::GetLump(int lump)
 	return &Lumps[lump];
 }
 
-bool FRtlFile::Open(bool quiet)
+bool FRtlFile::Open()
 {
 	RtlMapHeader header[100];
 
@@ -132,11 +132,10 @@ bool FRtlFile::Open(bool quiet)
 		memcpy(dataLump.Header.Name, header[i].name, 24);
 		dataLump.LumpSize += dataLump.Header.Width*dataLump.Header.Height*RTLCONVERTEDPLANES*2;
 	}
-	if(!quiet) Printf(", %d lumps\n", NumLumps);
 	return true;
 }
 
-FResourceFile *CheckRtl(const char *filename, FileReader *file, bool quiet)
+FResourceFile *CheckRtl(const char *filename, FileReader *file)
 {
 	char head[4];
 	uint32_t version;
@@ -150,7 +149,7 @@ FResourceFile *CheckRtl(const char *filename, FileReader *file, bool quiet)
 		if((!memcmp(head, "RTL", 4) || !memcmp(head, "RTC", 4)) && LittleLong(version) == 0x0101)
 		{
 			FResourceFile *rf = new FRtlFile(filename, file);
-			if(rf->Open(quiet)) return rf;
+			if(rf->Open()) return rf;
 			rf->Reader = NULL; // to avoid destruction of reader
 			delete rf;
 		}

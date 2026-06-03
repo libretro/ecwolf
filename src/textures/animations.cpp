@@ -218,14 +218,7 @@ void FTextureManager::ParseAnim (Scanner &sc, int usetype)
 	if (!picnum.Exists())
 	{
 		if (optional)
-		{
 			missing = true;
-		}
-		else
-		{
-			//Printf (PRINT_BOLD, "ANIMDEFS: Can't find %s\n", sc->str);
-			Printf ("ANIMDEFS: Can't find %s\n", sc->str.GetChars());
-		}
 	}
 
 	// no decals on animating textures, by default
@@ -525,9 +518,6 @@ void FTextureManager::FixAnimations ()
 		{
 			bool nodecals;
 			bool noremap = false;
-			const char *name;
-
-			name = Texture(anim->BasePic)->Name;
 			nodecals = Texture(anim->BasePic)->bNoDecals;
 			for (j = 0; j < anim->NumFrames; ++j)
 			{

@@ -227,7 +227,7 @@ bool TryWalk (AActor *ob)
 			return false;
 
 		default:
-			Printf ("Walk: Bad dir");
+			log_cb (RETRO_LOG_ERROR, "Walk: Bad dir");
 			assert(ob->dir <= nodir);
 	}
 
@@ -662,7 +662,7 @@ bool MoveObj (AActor *ob, int32_t move)
 			return true;
 
 		default:
-			Printf ("MoveObj: bad dir!\n");
+			log_cb (RETRO_LOG_ERROR, "MoveObj: bad dir!\n");
 			assert(ob->dir <= nodir);
 	}
 

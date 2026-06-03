@@ -60,11 +60,7 @@
 #define __cdecl
 #endif
 
-#ifndef __BIG_ENDIAN__
-#define MAKE_ID(a,b,c,d)	((a)|((b)<<8)|((c)<<16)|((d)<<24))
-#define LittleShort(x)		(x)
-#define LittleLong(x)		(x)
-#else
+#ifdef MSB_FIRST
 #define MAKE_ID(a,b,c,d)	((d)|((c)<<8)|((b)<<16)|((a)<<24))
 static unsigned short LittleShort(unsigned short x)
 {
@@ -75,6 +71,10 @@ static unsigned int LittleLong(unsigned int x)
 {
 	return (x>>24) | ((x>>8) & 0xff00) | ((x<<8) & 0xff0000) | (x<<24);
 }
+#else
+#define MAKE_ID(a,b,c,d)	((a)|((b)<<8)|((c)<<16)|((d)<<24))
+#define LittleShort(x)		(x)
+#define LittleLong(x)		(x)
 #endif
 
 #define ZIP_LOCALFILE	MAKE_ID('P','K',3,4)
@@ -1139,12 +1139,6 @@ int method_to_version(int method)
 {
 	// Apparently, real-world programs get confused by setting the version
 	// to extract field to something other than 2.0.
-#if 0
-	if (method == METHOD_LZMA || method == METHOD_PPMD)
-		return 63;
-	if (method == METHOD_BZIP2)
-		return 46;
-#endif
 	// Default anything else to PKZIP 2.0.
 	return 20;
 }
