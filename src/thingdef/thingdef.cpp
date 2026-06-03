@@ -907,8 +907,22 @@ bool ClassDef::IsDescendantOf(const ClassDef *parent) const
 
 void ClassDef::LoadActors()
 {
+	// The actor/class system is set up once per process: native classes are
+	// registered at static-init time (DeclareNativeClass) and never recreated,
+	// and the native parent-pointer fixup below is a one-shot in-place
+	// transform. Running this a second time -- e.g. when content is reloaded
+	// in the same process image, which is the norm on statically linked
+	// console builds -- would reinterpret already-resolved parent pointers as
+	// the original placeholders and read freed/garbage memory. The matching
+	// UnloadActors() (which deletes every ClassDef) is likewise a process-exit
+	// teardown, so it is no longer registered as a per-unload atterm handler.
+	// Build the table once and reuse it for the lifetime of the process.
+	static bool loaded = false;
+	if(loaded)
+		return;
+	loaded = true;
+
 	printf("ClassDef: Loading actor definitions.\n");
-	atterm(&ClassDef::UnloadActors);
 
 	// First iterate through the native classes and fix their parent pointers
 	// In order to keep things simple what I did was in DeclareNativeClass I
