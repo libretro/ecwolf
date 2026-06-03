@@ -142,6 +142,7 @@ enum StateMenuType
 	EPISODE_MENU,
 	SKILL_MENU,
 	SOUND_MENU,
+	CONTROL_MENU,
 };
 
 #define MIX_CHANNELS 8

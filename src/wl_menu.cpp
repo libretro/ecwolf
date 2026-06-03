@@ -19,6 +19,7 @@
 #include "language.h"
 #include "w_wad.h"
 #include "c_cvars.h"
+#include "wl_main.h"
 #include "g_mapinfo.h"
 #include "v_video.h"
 #include "wl_agent.h"
@@ -55,6 +56,7 @@ Menu playerClasses(NM_X, NM_Y, NM_W, 24);
 Menu episodes(NE_X+4, NE_Y-1, NE_W+7, 83);
 Menu skills(NM_X, NM_Y, NM_W, 24);
 Menu soundMenu(24, 45, 284, 24);
+Menu controlMenu(CTL_X, CTL_Y, CTL_W, 56);
 MENU_LISTENER(SetEpisodeAndSwitchToSkill)
 {
 	EpisodeInfo &ep = EpisodeInfo::GetEpisode(which);
@@ -157,6 +159,17 @@ void CreateMenus()
 	soundMenu.addItem(new SliderMenuItem(MusicVolume, 192, 20, language["STR_SOFT"], language["STR_LOUD"]));
 	soundMenu.addItem(new LabelMenuItem(language["STR_PC"]));
 	soundMenu.addItem(new SliderMenuItem(SpeakerVolume, 192, 20, language["STR_SOFT"], language["STR_LOUD"]));
+
+	// Control Setup: in the libretro port input devices/bindings are handled by
+	// the frontend, so only the control settings that exist as live engine
+	// globals are exposed: the Always Run toggle and the analog automap pan
+	// sensitivity (read each frame by the automap / movement code).
+	controlMenu.setHeadPicture("M_CONTRL");
+	controlMenu.addItem(new BooleanMenuItem(language["STR_ALWAYSRUN"], alwaysrun));
+	controlMenu.addItem(new LabelMenuItem(language["STR_PANXADJ"]));
+	controlMenu.addItem(new SliderMenuItem(panxadjustment, 192, 20, language["STR_SLOW"], language["STR_FAST"]));
+	controlMenu.addItem(new LabelMenuItem(language["STR_PANYADJ"]));
+	controlMenu.addItem(new SliderMenuItem(panyadjustment, 192, 20, language["STR_SLOW"], language["STR_FAST"]));
 }
 
 
