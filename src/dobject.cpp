@@ -65,28 +65,25 @@ DObject::DObject (const ClassDef *inClass)
 
 DObject::~DObject ()
 {
-	if (!(ObjectFlags & OF_Cleanup))
+	DObject **probe;
+	const ClassDef *type = GetClass();
+
+	if (!(ObjectFlags & OF_YesReallyDelete))
 	{
-		DObject **probe;
-		const ClassDef *type = GetClass();
+		Printf ("Warning: '%s' is freed outside the GC process.\n",
+			type != NULL ? type->GetName().GetChars() : "==some object==");
+	}
 
-		if (!(ObjectFlags & OF_YesReallyDelete))
+	// Find all pointers that reference this object and NULL them.
+	StaticPointerSubstitution(this, NULL);
+
+	// Now unlink this object from the GC list.
+	for (probe = &GC::Root; *probe != NULL; probe = &((*probe)->ObjNext))
+	{
+		if (*probe == this)
 		{
-			Printf ("Warning: '%s' is freed outside the GC process.\n",
-				type != NULL ? type->GetName().GetChars() : "==some object==");
-		}
-
-		// Find all pointers that reference this object and NULL them.
-		StaticPointerSubstitution(this, NULL);
-
-		// Now unlink this object from the GC list.
-		for (probe = &GC::Root; *probe != NULL; probe = &((*probe)->ObjNext))
-		{
-			if (*probe == this)
-			{
-				*probe = ObjNext;
-				break;
-			}
+			*probe = ObjNext;
+			break;
 		}
 	}
 }
