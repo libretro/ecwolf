@@ -1070,17 +1070,21 @@ static int keyboard_button_mask = 0;
 static int keycode_to_joypad_bit(unsigned keycode)
 {
 	switch (keycode) {
-	case RETROK_UP:        return 1 << RETRO_DEVICE_ID_JOYPAD_UP;
-	case RETROK_DOWN:      return 1 << RETRO_DEVICE_ID_JOYPAD_DOWN;
-	case RETROK_LEFT:      return 1 << RETRO_DEVICE_ID_JOYPAD_LEFT;
-	case RETROK_RIGHT:     return 1 << RETRO_DEVICE_ID_JOYPAD_RIGHT;
+	case RETROK_UP:
+	case RETROK_w:         return 1 << RETRO_DEVICE_ID_JOYPAD_UP;       // Forward
+	case RETROK_DOWN:
+	case RETROK_s:         return 1 << RETRO_DEVICE_ID_JOYPAD_DOWN;     // Backward
+	case RETROK_LEFT:      return 1 << RETRO_DEVICE_ID_JOYPAD_LEFT;     // Turn left
+	case RETROK_RIGHT:     return 1 << RETRO_DEVICE_ID_JOYPAD_RIGHT;    // Turn right
 	case RETROK_LCTRL:
 	case RETROK_RCTRL:     return 1 << RETRO_DEVICE_ID_JOYPAD_A;       // Fire
 	case RETROK_SPACE:     return 1 << RETRO_DEVICE_ID_JOYPAD_B;       // Use
 	case RETROK_LSHIFT:
 	case RETROK_RSHIFT:    return 1 << RETRO_DEVICE_ID_JOYPAD_X;       // Run
-	case RETROK_COMMA:     return 1 << RETRO_DEVICE_ID_JOYPAD_L;       // Strafe left
-	case RETROK_PERIOD:    return 1 << RETRO_DEVICE_ID_JOYPAD_R;       // Strafe right
+	case RETROK_COMMA:
+	case RETROK_a:         return 1 << RETRO_DEVICE_ID_JOYPAD_L;       // Strafe left
+	case RETROK_PERIOD:
+	case RETROK_d:         return 1 << RETRO_DEVICE_ID_JOYPAD_R;       // Strafe right
 	case RETROK_TAB:       return 1 << RETRO_DEVICE_ID_JOYPAD_SELECT;  // Map
 	case RETROK_ESCAPE:    return 1 << RETRO_DEVICE_ID_JOYPAD_START;   // Pause/menu
 	case RETROK_RETURN:    return 1 << RETRO_DEVICE_ID_JOYPAD_A;       // Menu confirm / fire
@@ -1287,7 +1291,15 @@ void retro_run(void)
 	poll_inputs(&input);
 	TransformInputs(&input);
 	if (input.pauseToggled) {
-		Paused ^= 1;
+		// During gameplay, Start opens the main menu rather than performing
+		// a freeze-pause. Outside of play (e.g. intermissions, text screens)
+		// it keeps the old toggle-pause behaviour.
+		if (g_state.stage == PLAY_STEP_A || g_state.stage == PLAY_STEP_B) {
+			g_state.stage = MAIN_MENU_PREPARE;
+			Paused = 0;
+		} else {
+			Paused ^= 1;
+		}
 	}
 	if (Paused & 1) {
 		VWB_DrawGraphic(TexMan("PAUSED"), (20 - 4)*8, 80 - 2*8);
@@ -1419,7 +1431,7 @@ void retro_set_environment(retro_environment_t cb)
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Map" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2,  "Previous weapon" },
 		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2, "Next weapon" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Pause" },
+		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Toggle menu" },
 		{ 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_X, "Strafe" },
 		{ 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_LEFT, RETRO_DEVICE_ID_ANALOG_Y, "Move" },
 		{ 0, RETRO_DEVICE_ANALOG, RETRO_DEVICE_INDEX_ANALOG_RIGHT, RETRO_DEVICE_ID_ANALOG_X, "Turn" },
@@ -1430,7 +1442,7 @@ void retro_set_environment(retro_environment_t cb)
 
 	static const struct retro_controller_description port_devices[] = {
 		{ "Joypad", RETRO_DEVICE_JOYPAD },
-		{ "Mouse",  RETRO_DEVICE_MOUSE  },
+		{ "RetroKeyboard/RetroMouse",  RETRO_DEVICE_MOUSE  },
 	};
 	static const struct retro_controller_info ports[] = {
 		{ port_devices, 2 },
