@@ -226,11 +226,6 @@ endif
 SOURCES_C += $(DEPS_LZMA_C)
 SOURCES_CXX += $(LZMA_CXX)
 
-ifneq ($(NO_STORE),1)
-# Don't bother with Steam/GOG FS 
-SOURCES_CXX += $(CORE_DIR)/src/filesys_steam.cpp
-endif
-
 ifneq ($(STATIC_LINKING),1)
 SOURCES_C += \
 	$(CORE_DIR)/src/libretro/libretro-common/compat/compat_posix_string.c \
