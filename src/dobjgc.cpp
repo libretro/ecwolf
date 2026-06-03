@@ -88,8 +88,6 @@
 
 // EXTERNAL DATA DECLARATIONS ----------------------------------------------
 
-//extern DThinker *NextToThink;
-
 // PUBLIC DATA DEFINITIONS -------------------------------------------------
 
 namespace GC
@@ -165,12 +163,4 @@ void FullGC()
 }
 
 }
-
-//==========================================================================
-//
-// STAT gc
-//
-// Provides information about the current garbage collector state.
-//
-//==========================================================================
 
