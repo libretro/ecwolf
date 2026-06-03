@@ -122,7 +122,6 @@ int     param_joystickindex = 0;
 
 int     param_joystickhat = -1;
 int     param_samplerate = 44100;
-int     param_audiobuffer = 2048 / (44100 / param_samplerate);
 static 	int32_t lastBlinkTime;
 
 //===========================================================================

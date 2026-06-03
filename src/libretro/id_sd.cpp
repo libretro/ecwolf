@@ -623,8 +623,8 @@ mix_no_upscale(int16_t *result, const T *input, int num_samples, fixed leftmul, 
 	const int shift = FRACBITS - (16 - (int)sizeof(T) * 8);
 	int16_t *outptr = result;
 	for (int i = 0; i < num_samples; i++) {
-		int l = ((input[i] - bias) * leftmul) >> shift;
-		int r = ((input[i] - bias) * rightmul) >> shift;
+		int l = (int)(((long long)(input[i] - bias) * leftmul) >> shift);
+		int r = (int)(((long long)(input[i] - bias) * rightmul) >> shift);
 		mix_acc(outptr++, l);
 		mix_acc(outptr++, r);
 	}
@@ -637,8 +637,8 @@ mix_int_upscale(int16_t *result, const T *input, int num_samples, int upsample, 
 	const int shift = FRACBITS - (16 - (int)sizeof(T) * 8);
 	int16_t *outptr = result;
 	for (int i = 0; i < num_samples; i++) {
-		int l = ((input[i] - bias) * leftmul) >> shift;
-		int r = ((input[i] - bias) * rightmul) >> shift;
+		int l = (int)(((long long)(input[i] - bias) * leftmul) >> shift);
+		int r = (int)(((long long)(input[i] - bias) * rightmul) >> shift);
 		for (int j = 0 ; j < upsample; j++) {
 			mix_acc(outptr++, l);
 			mix_acc(outptr++, r);
@@ -653,8 +653,8 @@ mix_fractional_upscale(int16_t *result, int output_rate, const T *input, int inp
 	const int shift = FRACBITS - (16 - (int)sizeof(T) * 8);
 	int16_t *outptr = result;
 	for (int i = 0; i < num_samples; i++) {
-		int l = ((input[i] - bias) * leftmul) >> shift;
-		int r = ((input[i] - bias) * rightmul) >> shift;
+		int l = (int)(((long long)(input[i] - bias) * leftmul) >> shift);
+		int r = (int)(((long long)(input[i] - bias) * rightmul) >> shift);
 		while ((outptr - result) / 2 * (long long)input_rate < i * (long long) output_rate) {
 			mix_acc(outptr++, l);
 			mix_acc(outptr++, r);

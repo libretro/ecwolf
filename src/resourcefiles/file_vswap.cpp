@@ -132,21 +132,27 @@ struct FVSwapSound : public FResourceLump
 				pos += chunks[i].length;
 			}
 
-			// Do resampling to param_samplerate 16-bit with linear interpolation
-			static const fixed sampleStep = static_cast<fixed>(((double)origSampleRate / param_samplerate)*FRACUNIT);
+			// Do resampling to param_samplerate 16-bit with linear interpolation.
+			// Not static: the step depends on this sound's origSampleRate, which
+			// can differ between sounds, so caching it across calls would detune
+			// every sound after the first.
+			const fixed sampleStep = static_cast<fixed>(((double)origSampleRate / param_samplerate)*FRACUNIT);
 			int16_t* data = (int16_t*)(CacheAlign+sizeof(WAV_HEADER)/4);
 			i = 0;
 			fixed samplefrac = 0;
 			unsigned int sample = 0;
 			while(i++ < samples)
 			{
-				int16_t curSample = (int16_t(origdata[sample]) - 128)<<8;
-				int16_t nextSample = sample+1 < numOrigSamples ? (int16_t(origdata[sample+1]) - 128)<<8 : curSample;
+				int curSample = ((int)origdata[sample] - 128) << 8;
+				int nextSample = sample+1 < numOrigSamples ? (((int)origdata[sample+1] - 128) << 8) : curSample;
 
-				*data++ = LittleShort(curSample + ((samplefrac*fixed(nextSample-curSample))>>FRACBITS));
+				// 64-bit interpolation: samplefrac*(nextSample-curSample) can
+				// exceed int32 (up to ~4.3e9) before the shift, so widen it.
+				int interp = (int)(((long long)samplefrac * (nextSample - curSample)) >> FRACBITS);
+				*data++ = LittleShort((int16_t)(curSample + interp));
 
 				samplefrac += sampleStep;
-				if(samplefrac > FRACUNIT)
+				if(samplefrac >= FRACUNIT)
 				{
 					samplefrac -= FRACUNIT;
 					++sample;
