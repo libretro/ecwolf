@@ -176,8 +176,7 @@ static void Reap()
 		// Capture the successor before a possible delete: ~DObject() unlinks
 		// curr from Root, so we must not read curr->ObjNext afterwards.
 		DObject *next = curr->ObjNext;
-		if ((curr->ObjectFlags & OF_EuthanizeMe) &&
-		    !(curr->ObjectFlags & OF_Fixed))
+		if (curr->ObjectFlags & OF_EuthanizeMe)
 		{
 			curr->ObjectFlags |= OF_YesReallyDelete;
 			delete curr;

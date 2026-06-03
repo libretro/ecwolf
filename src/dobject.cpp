@@ -103,7 +103,7 @@ DObject::~DObject ()
 
 void DObject::Destroy ()
 {
-	ObjectFlags = (ObjectFlags & ~OF_Fixed) | OF_EuthanizeMe;
+	ObjectFlags |= OF_EuthanizeMe;
 }
 
 size_t DObject::PointerSubstitution (DObject *old, DObject *notOld)

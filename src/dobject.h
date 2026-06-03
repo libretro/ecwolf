@@ -50,7 +50,6 @@ enum EInPlace { EC_InPlace };
 enum EObjectFlags
 {
 	// GC flags
-	OF_Fixed			= 1 << 3,		// Object is fixed (should not be collected)
 	OF_EuthanizeMe		= 1 << 5,		// Object wants to die
 	OF_Cleanup			= 1 << 6,		// Object is now being deleted by the collector
 	OF_YesReallyDelete	= 1 << 7,		// Object is being deleted outside the collector, and this is okay, so don't print a warning
