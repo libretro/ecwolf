@@ -223,12 +223,6 @@ static inline Bits MakeVolume( Bitu wave, Bitu volume ) {
 	Bitu index = total & 0xff;
 	Bitu sig = ExpTable[ index ];
 	Bitu exp = total >> 8;
-#if 0
-	//Check if we overflow the 31 shift limit
-	if ( exp >= 32 ) {
-		LOG_MSG( "WTF %d %d", total, exp );
-	}
-#endif
 	return (sig >> exp);
 };
 
@@ -1481,33 +1475,6 @@ void InitTables( void ) {
 		uintptr_t blah = reinterpret_cast<uintptr_t>( &(chan->op[opNum]) );
 		OpOffsetTable[i] = (Bit16u) (ChanOffsetTable[ chNum ] + blah);
 	}
-#if 0
-	//Stupid checks if table's are correct
-	for ( Bitu i = 0; i < 18; i++ ) {
-		Bit32u find = (Bit16u)( &(chip->chan[ i ]) );
-		for ( Bitu c = 0; c < 32; c++ ) {
-			if ( ChanOffsetTable[c] == find ) {
-				find = 0;
-				break;
-			}
-		}
-		if ( find ) {
-			find = find;
-		}
-	}
-	for ( Bitu i = 0; i < 36; i++ ) {
-		Bit32u find = (Bit16u)( &(chip->chan[ i / 2 ].op[i % 2]) );
-		for ( Bitu c = 0; c < 64; c++ ) {
-			if ( OpOffsetTable[c] == find ) {
-				find = 0;
-				break;
-			}
-		}
-		if ( find ) {
-			find = find;
-		}
-	}
-#endif
 }
 
 /*Bit32u Handler::WriteAddr( Bit32u port, Bit8u val ) {

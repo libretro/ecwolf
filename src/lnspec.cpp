@@ -800,11 +800,6 @@ class EVPushwall : public Thinker
 					Destroy();
 					return;
 					// Maybe in the future this can be a flag or something
-					#if 0
-					FString error;
-					error.Format("\"I'm free!\" -Pushwall @ (%d, %d)", spot->GetX(), spot->GetY());
-					throw CRecoverableError(error);
-					#endif
 				}
 
 				if(!nostop && !CheckSpotFree(moveTo))

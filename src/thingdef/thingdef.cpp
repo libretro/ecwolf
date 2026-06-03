@@ -949,10 +949,6 @@ void ClassDef::LoadActors()
 
 	ReleaseFunctionTable();
 	delete symbolPool;
-#if 0
-	// Debug code - Dump actor tree visually.
-	DumpClasses();
-#endif
 
 	R_InitSprites();
 

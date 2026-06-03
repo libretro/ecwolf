@@ -1246,10 +1246,6 @@ void FTextureManager::PrecacheLevel (void)
 			tex->Unload();
 	}
 
-#if 0
-	// Debug code - Show number of textures precached
-	Printf("%d textures precached\n", numcached);
-#endif
 	delete[] hitlist;
 }
 

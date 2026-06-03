@@ -319,27 +319,6 @@ DSimpleCanvas::DSimpleCanvas (int width, int height)
 	}
 	else
 	{
-#if 0
-		// If we couldn't figure out the CPU's L1 cache line size, assume
-		// it's 32 bytes wide.
-		if (CPU.DataL1LineSize == 0)
-		{
-			CPU.DataL1LineSize = 32;
-		}
-		// The Athlon and P3 have very different caches, apparently.
-		// I am going to generalize the Athlon's performance to all AMD
-		// processors and the P3's to all non-AMD processors. I don't know
-		// how smart that is, but I don't have a vast plethora of
-		// processors to test with.
-		if (CPU.bIsAMD)
-		{
-			Pitch = width + CPU.DataL1LineSize;
-		}
-		else
-		{
-			Pitch = width + MAX(0, CPU.DataL1LineSize - 8);
-		}
-#endif
 		Pitch = width + 32 - 8;
 	}
 	MemBuffer = new uint8_t[Pitch * height];
@@ -429,77 +408,6 @@ DFrameBuffer::DFrameBuffer (int width, int height)
 
 void DFrameBuffer::DrawRateStuff ()
 {
-#if 0
-	// Draws frame time and cumulative fps
-	if (vid_fps)
-	{
-		uint32_t ms = I_FPSTime();
-		uint32_t howlong = ms - LastMS;
-		if ((signed)howlong >= 0)
-		{
-			char fpsbuff[40];
-			int chars;
-			int rate_x;
-
-			chars = mysnprintf (fpsbuff, countof(fpsbuff), "%2u ms (%3u fps)", howlong, LastCount);
-			rate_x = Width - chars * 8;
-			Clear (rate_x, 0, Width, 8, GPalette.BlackIndex, 0);
-			DrawText (ConFont, CR_WHITE, rate_x, 0, (char *)&fpsbuff[0], TAG_DONE);
-
-			uint32_t thisSec = ms/1000;
-			if (LastSec < thisSec)
-			{
-				LastCount = FrameCount / (thisSec - LastSec);
-				LastSec = thisSec;
-				FrameCount = 0;
-			}
-			FrameCount++;
-		}
-		LastMS = ms;
-	}
-
-	// draws little dots on the bottom of the screen
-	if (ticker)
-	{
-		int i = I_GetTime(false);
-		int tics = i - LastTic;
-		uint8_t *buffer = GetBuffer();
-
-		LastTic = i;
-		if (tics > 20) tics = 20;
-
-		// Buffer can be NULL if we're doing hardware accelerated 2D
-		if (buffer != NULL)
-		{
-			buffer += (GetHeight()-1) * GetPitch();
-			
-			for (i = 0; i < tics*2; i += 2)		buffer[i] = 0xff;
-			for ( ; i < 20*2; i += 2)			buffer[i] = 0x00;
-		}
-		else
-		{
-			for (i = 0; i < tics*2; i += 2)		Clear(i, Height-1, i+1, Height, 255, 0);
-			for ( ; i < 20*2; i += 2)			Clear(i, Height-1, i+1, Height, 0, 0);
-		}
-	}
-
-	// draws the palette for debugging
-	if (vid_showpalette)
-	{
-		// This used to just write the palette to the display buffer.
-		// With hardware-accelerated 2D, that doesn't work anymore.
-		// Drawing it as a texture does and continues to show how
-		// well the PalTex shader is working.
-		static FPaletteTester palette;
-
-		palette.SetTranslation(vid_showpalette);
-		DrawTexture(&palette, 0, 0,
-			DTA_DestWidth, 16*7,
-			DTA_DestHeight, 16*7,
-			DTA_Masked, false,
-			TAG_DONE);
-	}
-#endif
 }
 
 //==========================================================================
@@ -620,10 +528,6 @@ bool DFrameBuffer::WipeStartScreen(int type)
 
 void DFrameBuffer::WipeEndScreen()
 {
-#if 0
-	wipe_EndScreen();
-	Unlock();
-#endif
 }
 
 //==========================================================================
@@ -638,10 +542,6 @@ void DFrameBuffer::WipeEndScreen()
 
 bool DFrameBuffer::WipeDo(int ticks)
 {
-#if 0
-	Lock(true);
-	return wipe_ScreenWipe(ticks);
-#endif
 	return false;
 }
 
@@ -653,9 +553,6 @@ bool DFrameBuffer::WipeDo(int ticks)
 
 void DFrameBuffer::WipeCleanup()
 {
-#if 0
-	wipe_Cleanup();
-#endif
 }
 
 //===========================================================================
@@ -666,75 +563,6 @@ void DFrameBuffer::WipeCleanup()
 
 void DFrameBuffer::GetHitlist(uint8_t *hitlist)
 {
-#if 0
-	uint8_t *spritelist;
-	int i;
-
-	spritelist = new uint8_t[sprites.Size()];
-	
-	// Precache textures (and sprites).
-	memset (spritelist, 0, sprites.Size());
-
-	{
-		AActor *actor;
-		TThinkerIterator<AActor> iterator;
-
-		while ( (actor = iterator.Next ()) )
-			spritelist[actor->sprite] = 1;
-	}
-
-	for (i = (int)(sprites.Size () - 1); i >= 0; i--)
-	{
-		if (spritelist[i])
-		{
-			int j, k;
-			for (j = 0; j < sprites[i].numframes; j++)
-			{
-				const spriteframe_t *frame = &SpriteFrames[sprites[i].spriteframes + j];
-
-				for (k = 0; k < 16; k++)
-				{
-					FTextureID pic = frame->Texture[k];
-					if (pic.isValid())
-					{
-						hitlist[pic.GetIndex()] = 1;
-					}
-				}
-			}
-		}
-	}
-
-	delete[] spritelist;
-
-	for (i = numsectors - 1; i >= 0; i--)
-	{
-		hitlist[sectors[i].GetTexture(sector_t::floor).GetIndex()] = 
-			hitlist[sectors[i].GetTexture(sector_t::ceiling).GetIndex()] |= 2;
-	}
-
-	for (i = numsides - 1; i >= 0; i--)
-	{
-		hitlist[sides[i].GetTexture(side_t::top).GetIndex()] =
-		hitlist[sides[i].GetTexture(side_t::mid).GetIndex()] =
-		hitlist[sides[i].GetTexture(side_t::bottom).GetIndex()] |= 1;
-	}
-
-	// Sky texture is always present.
-	// Note that F_SKY1 is the name used to
-	//	indicate a sky floor/ceiling as a flat,
-	//	while the sky texture is stored like
-	//	a wall texture, with an episode dependant
-	//	name.
-
-	if (sky1texture.isValid())
-	{
-		hitlist[sky1texture.GetIndex()] |= 1;
-	}
-	if (sky2texture.isValid())
-	{
-		hitlist[sky2texture.GetIndex()] |= 1;
-	}
-#endif
 }
 
 //==========================================================================
@@ -956,20 +784,6 @@ normal:
 int V_GetColor (const uint32_t *palette, const char *str)
 {
 	return V_GetColorFromString(palette, str);
-#if 0
-	FString string = V_GetColorStringByName (str);
-	int res;
-
-	if (!string.IsEmpty())
-	{
-		res = V_GetColorFromString (palette, string);
-	}
-	else
-	{
-		res = V_GetColorFromString (palette, str);
-	}
-	return res;
-#endif
 }
 
 void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int realheight, int *cleanx, int *cleany, int *_cx1, int *_cx2)

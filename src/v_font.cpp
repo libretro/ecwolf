@@ -965,23 +965,6 @@ void FFont::LoadTranslations()
 
 void FFont::Preload() const
 {
-#if 0
-	// First and last char are the same? Wait until it's actually needed
-	// since nothing is gained by preloading now.
-	if (FirstChar == LastChar)
-	{
-		return;
-	}
-	for (int i = MAX(FirstChar, 0x21); i < MIN(LastChar, 0x7e); ++i)
-	{
-		int foo;
-		FTexture *pic = GetChar(i, &foo);
-		if (pic != NULL)
-		{
-			pic->GetNative(false);
-		}
-	}
-#endif
 }
 
 //==========================================================================
@@ -2616,17 +2599,6 @@ void V_InitFontColors ()
 
 	while ((lump = Wads.FindLump ("TEXTCOLO", &lastlump)) != -1)
 	{
-#if 0
-		if (gameinfo.flags & GI_NOTEXTCOLOR)
-		{
-			// Chex3 contains a bad TEXTCOLO lump, probably to force all text to be green.
-			// This renders the Gray, Gold, Red and Yellow color range inoperable, some of
-			// which are used by the menu. So we have no choice but to skip this lump so that
-			// all colors work properly.
-			// The text colors should be the end user's choice anyway.
-			if (Wads.GetLumpFile(lump) == 1) continue;
-		}
-#endif
 		Scanner sc(lump);
 
 		while (sc.GetNextString())

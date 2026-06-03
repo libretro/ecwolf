@@ -141,14 +141,6 @@ void APlayerPawn::GiveStartingInventory()
 
 	SetupWeaponSlots();
 
-#if 0
-	AInventory *inv = inventory;
-	while(inv)
-	{
-		Printf("%s %d/%d\n", inv->GetClass()->GetName().GetChars(), inv->amount, inv->maxamount);
-		inv = inv->inventory;
-	}
-#endif
 }
 
 AWeapon *APlayerPawn::PickNewWeapon()

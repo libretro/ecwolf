@@ -180,128 +180,12 @@ size_t DObject::StaticPointerSubstitution (DObject *old, DObject *notOld)
 		changed += probe->PointerSubstitution(old, notOld);
 	}
 
-#if 0
-	// Go through the bodyque.
-	for (i = 0; i < BODYQUESIZE; ++i)
-	{
-		if (bodyque[i] == old)
-		{
-			bodyque[i] = static_cast<AActor *>(notOld);
-			changed++;
-		}
-	}
-
-	// Go through players.
-	for (i = 0; i < MAXPLAYERS; i++)
-	{
-		if (playeringame[i])
-			changed += players[i].FixPointers (old, notOld);
-	}
-
-	// Go through sectors.
-	if (sectors != NULL)
-	{
-		for (i = 0; i < numsectors; ++i)
-		{
-#define SECTOR_CHECK(f,t) \
-	if (sectors[i].f.p == static_cast<t *>(old)) { sectors[i].f = static_cast<t *>(notOld); changed++; }
-			SECTOR_CHECK( SoundTarget, AActor );
-			SECTOR_CHECK( CeilingSkyBox, ASkyViewpoint );
-			SECTOR_CHECK( FloorSkyBox, ASkyViewpoint );
-			SECTOR_CHECK( SecActTarget, ASectorAction );
-			SECTOR_CHECK( floordata, DSectorEffect );
-			SECTOR_CHECK( ceilingdata, DSectorEffect );
-			SECTOR_CHECK( lightingdata, DSectorEffect );
-#undef SECTOR_CHECK
-		}
-	}
-
-	// Go through bot stuff.
-	if (bglobal.firstthing.p == (AActor *)old)		bglobal.firstthing = (AActor *)notOld, ++changed;
-	if (bglobal.body1.p == (AActor *)old)			bglobal.body1 = (AActor *)notOld, ++changed;
-	if (bglobal.body2.p == (AActor *)old)			bglobal.body2 = (AActor *)notOld, ++changed;
-#endif
 
 	return changed;
 }
 
 void DObject::SerializeUserVars(FArchive &arc)
 {
-#if 0
-	PSymbolTable *symt;
-	FName varname;
-	uint32_t count, j;
-	int *varloc = NULL;
-
-	symt = &GetClass()->Symbols;
-
-	if (arc.IsStoring())
-	{
-		// Write all user variables.
-		for (; symt != NULL; symt = symt->ParentSymbolTable)
-		{
-			for (unsigned i = 0; i < symt->Symbols.Size(); ++i)
-			{
-				PSymbol *sym = symt->Symbols[i];
-				if (sym->SymbolType == SYM_Variable)
-				{
-					PSymbolVariable *var = static_cast<PSymbolVariable *>(sym);
-					if (var->bUserVar)
-					{
-						count = var->ValueType.Type == VAL_Array ? var->ValueType.size : 1;
-						varloc = (int *)(reinterpret_cast<uint8_t *>(this) + var->offset);
-
-						arc << var->SymbolName;
-						arc.WriteCount(count);
-						for (j = 0; j < count; ++j)
-						{
-							arc << varloc[j];
-						}
-					}
-				}
-			}
-		}
-		// Write terminator.
-		varname = NAME_None;
-		arc << varname;
-	}
-	else
-	{
-		// Read user variables until 'None' is encountered.
-		arc << varname;
-		while (varname != NAME_None)
-		{
-			PSymbol *sym = symt->FindSymbol(varname, true);
-			uint32_t wanted = 0;
-
-			if (sym != NULL && sym->SymbolType == SYM_Variable)
-			{
-				PSymbolVariable *var = static_cast<PSymbolVariable *>(sym);
-
-				if (var->bUserVar)
-				{
-					wanted = var->ValueType.Type == VAL_Array ? var->ValueType.size : 1;
-					varloc = (int *)(reinterpret_cast<uint8_t *>(this) + var->offset);
-				}
-			}
-			count = arc.ReadCount();
-			for (j = 0; j < MIN(wanted, count); ++j)
-			{
-				arc << varloc[j];
-			}
-			if (wanted < count)
-			{
-				// Ignore remaining values from archive.
-				for (; j < count; ++j)
-				{
-					int foo;
-					arc << foo;
-				}
-			}
-			arc << varname;
-		}
-	}
-#endif
 }
 
 void DObject::Serialize (FArchive &arc)

@@ -642,41 +642,6 @@ namespace StringFormat
 			goto fp_begin;
 		}
 #endif
-#if 0
-		// The hdtoa function provided with FreeBSD uses a hexadecimal FP constant.
-		// Microsoft's compiler does not support these, so I would need to hack it
-		// together with ints instead. It's very do-able, but until I actually have
-		// some reason to print hex FP numbers, I won't bother.
-		else if (type == 'a' || type == 'A')
-		{
-			if (type == 'A')
-			{
-				xits = HEXits;
-				hexprefix = 'X';
-				expchar = 'P';
-			}
-			else
-			{
-				hexprefix = 'x';
-				expchar = 'p';
-			}
-			if (precision >= 0)
-			{
-				precision++;
-			}
-			dblarg = va_arg(arglist, double);
-			dtoaresult = obuff = hdtoa(dblarg, xits, precision, &expt, &signflag, &dtoaend);
-			if (precision < 0)
-			{
-				precision = (int)(dtoaend - obuff);
-			}
-			if (expt == INT_MAX)
-			{
-				hexprefix = '\0';
-			}
-			goto fp_common;
-		}
-#endif
 #ifndef DISABLE_GDTOA
 		else if (type == 'e' || type == 'E')
 		{

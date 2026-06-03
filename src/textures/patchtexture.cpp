@@ -252,20 +252,6 @@ void FPatchTexture::MakeTexture ()
 	maxcol = (const column_t *)((const uint8_t *)patch + Wads.LumpLength (SourceLump) - 3);
 
 	// Check for badly-sized patches
-#if 0	// Such textures won't be created so there's no need to check here
-	if (LittleShort(patch->width) <= 0 || LittleShort(patch->height) <= 0)
-	{
-		lump = Wads.ReadLump ("-BADPATC");
-		patch = (const patch_t *)lump.GetMem();
-		Printf (PRINT_BOLD, "Patch %s has a non-positive size.\n", Name);
-	}
-	else if (LittleShort(patch->width) > 2048 || LittleShort(patch->height) > 2048)
-	{
-		lump = Wads.ReadLump ("-BADPATC");
-		patch = (const patch_t *)lump.GetMem();
-		Printf (PRINT_BOLD, "Patch %s is too big.\n", Name);
-	}
-#endif
 
 	if (bNoRemap0)
 	{

@@ -122,27 +122,6 @@ FTexture * FTexture::CreateTexture (int lumpnum, int usetype)
 				tex->UseType = usetype;
 
 				// [BL] Don't need to repeat mistakes :)
-#if 0
-				if (usetype == FTexture::TEX_Flat) 
-				{
-					int w = tex->GetWidth();
-					int h = tex->GetHeight();
-
-					// Auto-scale flats with dimensions 128x128 and 256x256.
-					// In hindsight, a bad idea, but RandomLag made it sound better than it really is.
-					// Now we're stuck with this stupid behaviour.
-					if (w==128 && h==128) 
-					{
-						tex->xScale = tex->yScale = 2*FRACUNIT;
-						tex->bWorldPanning = true;
-					}
-					else if (w==256 && h==256) 
-					{
-						tex->xScale = tex->yScale = 4*FRACUNIT;
-						tex->bWorldPanning = true;
-					}
-				}
-#endif
 				return tex;
 			}
 		}

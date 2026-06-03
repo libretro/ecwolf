@@ -43,10 +43,6 @@ union _xs_doubleints
 	uint32_t ival[2];
 };
 
-#if 0
-#define _xs_doublecopysgn(a,b)      ((int32_t*)&a)[_xs_iexp_]&=~(((int32_t*)&b)[_xs_iexp_]&0x80000000)
-#define _xs_doubleisnegative(a)     ((((int32_t*)&a)[_xs_iexp_])|0x80000000)
-#endif
 
 // ====================================================================================================================
 //  Constants
