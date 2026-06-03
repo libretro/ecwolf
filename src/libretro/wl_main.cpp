@@ -900,13 +900,20 @@ void PrepareMainMenu (wl_state_t *state)
 	if (GameSave::GetSaveMenuItem())
 		GameSave::GetSaveMenuItem()->setEnabled(ingame);
 
-	// Item 5 reads "View Scores" at the title and "End Game" once a game is
-	// running. Item 6 ("Back to Game") only makes sense while a game is in
-	// progress, so it is hidden at the title (where there is nothing to go back
-	// to) and shown, paired with End Game, in-game.
-	mainMenu[5]->setText(language[ingame ? "STR_EG" : "STR_VS"]);
-	mainMenu[6]->setText(language["STR_BG"]);
-	mainMenu[6]->setVisible(ingame);
+	// Item "View Scores" / "End Game" and "Back to Game" are relabelled and
+	// (for Back to Game) hidden at runtime. Address them by stored pointer, not
+	// by menu position: Menu::operator[] counts only visible items, so once
+	// Back to Game is hidden the positions shift and an index would land on the
+	// wrong entry (this previously hid Quit).
+	extern MenuItem *GetViewScoresItem();
+	extern MenuItem *GetBackToGameItem();
+	if (GetViewScoresItem())
+		GetViewScoresItem()->setText(language[ingame ? "STR_EG" : "STR_VS"]);
+	if (GetBackToGameItem())
+	{
+		GetBackToGameItem()->setText(language["STR_BG"]);
+		GetBackToGameItem()->setVisible(ingame);
+	}
 
 	state->currentMenu()->validateCurPos();
 	state->currentMenu()->draw();

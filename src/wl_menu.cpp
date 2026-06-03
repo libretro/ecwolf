@@ -45,6 +45,14 @@ int BORDCOLOR, BORD2COLOR, BORD3COLOR, BKGDCOLOR, STRIPE, STRIPEBG,
 	MENUWIN_BACKGROUND, MENUWIN_TOPBORDER, MENUWIN_BOTBORDER,
 	MENUWINHGLT_BACKGROUND, MENUWINHGLT_TOPBORDER, MENUWINHGLT_BOTBORDER;
 static MenuItem	*readThis;
+// Pointers to the two main-menu items that get relabelled/hidden at runtime,
+// kept so we can address them directly. Menu::operator[] indexes by *visible*
+// position, which shifts when an item is hidden, so positional access here
+// would target the wrong item (it previously hid Quit).
+static MenuItem	*viewScoresItem;
+static MenuItem	*backToGameItem;
+MenuItem *GetViewScoresItem() { return viewScoresItem; }
+MenuItem *GetBackToGameItem() { return backToGameItem; }
 // Android version reads this elsewhere so non-static.
 bool menusAreFaded = true;
 
@@ -142,8 +150,10 @@ void CreateMenus()
 	readThis->setVisible(gameinfo.DrawReadThis);
 	readThis->setHighlighted(true);
 	mainMenu.addItem(readThis);
-	mainMenu.addItem(new MenuItem(language["STR_VS"]));       // 5: View Scores / End Game
-	mainMenu.addItem(new MenuItem(language["STR_BD"]));       // 6: Back to Demo / game
+	viewScoresItem = new MenuItem(language["STR_VS"]);        // 5: View Scores / End Game
+	mainMenu.addItem(viewScoresItem);
+	backToGameItem = new MenuItem(language["STR_BD"]);        // 6: Back to Demo / game
+	mainMenu.addItem(backToGameItem);
 	mainMenu.addItem(new MenuItem(language["STR_QT"]));       // 7: Quit
 
 	// Options submenu: Control, Sound, Display and Automap, matching the
