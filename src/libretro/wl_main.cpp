@@ -858,7 +858,7 @@ void PrepareMainMenu (wl_state_t *state)
 
 static int redrawitem = 1, lastitem = -1;
 
-enu *
+Menu *
 wl_state_t::currentMenu() {
 	if (menuLevel == 0)
 		return NULL;
@@ -889,7 +889,7 @@ wl_state_t::currentMenu() {
 
 
 void
-enu::prepareMenu()
+Menu::prepareMenu()
 {
 	if (redrawitem)
 	{
@@ -904,7 +904,7 @@ enu::prepareMenu()
 
 
 bool
-enu::handleStep(wl_state_t *state, const wl_input_state_t *input)
+Menu::handleStep(wl_state_t *state, const wl_input_state_t *input)
 {
 	//
 	// CHANGE GUN SHAPE
