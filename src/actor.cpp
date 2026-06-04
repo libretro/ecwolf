@@ -45,6 +45,7 @@
 #include "wl_agent.h"
 #include "wl_game.h"
 #include "wl_loadsave.h"
+#include "version.h"
 #include "wl_net.h"
 #include "wl_state.h"
 #include "id_us.h"
@@ -375,6 +376,8 @@ void AActor::Init()
 
 	distance = 0;
 	dir = nodir;
+	haloLightMask = 0;
+	zoneLightMask = 0;
 	soundZone = NULL;
 	inventory = NULL;
 
@@ -486,6 +489,13 @@ void AActor::Serialize(FArchive &arc)
 
 	if(GameSave::SaveProdVersion >= 0x001002FF && GameSave::SaveVersion > 1374914454)
 		arc << projectilepassheight;
+
+	// Halo lighting (backported). Guarded so pre-feature saves load with the
+	// Init() default of 0; the bit is otherwise persistent state set by
+	// A_EnableHaloLight.
+	if(GameSave::SaveVersion >= SAVEVER_HALOLIGHT)
+		arc << haloLightMask
+		    << zoneLightMask;
 
 	if(arc.IsLoading() && !hasActorRef)
 		actors.Remove(this);

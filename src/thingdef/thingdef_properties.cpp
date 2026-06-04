@@ -40,6 +40,7 @@
 #include "thingdef/thingdef_type.h"
 #include "thingdef/thingdef_expression.h"
 #include "v_video.h"
+#include "r_halo.h"
 
 #define IS_EXPR(no) params[no].isExpression
 #define EXPR_PARAM(var, no) ExpressionNode *var = params[no].expr;
@@ -571,12 +572,30 @@ HANDLE_PROPERTY(PROJECTILE)
 // is stored so it is available to the inventory system.
 HANDLE_PROPERTY(halolight)
 {
-	// id, radius, light [, littype] - parsed and ignored (no lighting renderer).
+	// id, radius, light [, littype]. The littype (colored-light) argument is
+	// accepted for mod compatibility but ignored; halos are monochrome here.
+	INT_PARAM(id, 0);
+	FLOAT_PARAM(radius, 1);
+	INT_PARAM(light, 2);
+
+	// Give this class its own halo list on the first halolight line, or when a
+	// subclass adds halos (so it does not mutate an inherited parent's list).
+	if(cls->Meta.GetMetaInt(AMETA_HaloLights, -1) == -1 || cls->Meta.IsInherited(AMETA_HaloLights))
+		cls->Meta.SetMetaInt(AMETA_HaloLights, Halo_NewList());
+
+	Halo_ListAdd(cls->Meta.GetMetaInt(AMETA_HaloLights), id, light, radius);
 }
 
 HANDLE_PROPERTY(zonelight)
 {
-	// id, light [, littype] - parsed and ignored (no lighting renderer).
+	// id, light [, littype]. littype accepted for compatibility but ignored.
+	INT_PARAM(id, 0);
+	INT_PARAM(light, 1);
+
+	if(cls->Meta.GetMetaInt(AMETA_ZoneLights, -1) == -1 || cls->Meta.IsInherited(AMETA_ZoneLights))
+		cls->Meta.SetMetaInt(AMETA_ZoneLights, Zone_NewList());
+
+	Zone_ListAdd(cls->Meta.GetMetaInt(AMETA_ZoneLights), id, light);
 }
 
 HANDLE_PROPERTY(pickupmessage)

@@ -142,6 +142,40 @@ ACTION_FUNCTION(A_ActiveSound)
 	return true;
 }
 
+// Enable/disable one of this actor's class-declared halo lights (by id 0..31).
+// The id selects which halolight definitions on the class become active for
+// this instance; the renderer reads haloLightMask each frame.
+ACTION_FUNCTION(A_EnableHaloLight)
+{
+	ACTION_PARAM_INT(id, 0);
+	ACTION_PARAM_BOOL(enabled, 1);
+
+	if(id < 0 || id > 31)
+		return true;
+
+	if(enabled)
+		self->haloLightMask |= (1 << id);
+	else
+		self->haloLightMask &= ~(1 << id);
+	return true;
+}
+
+// As A_EnableHaloLight, for zone lights (boosts the whole zone the actor is in).
+ACTION_FUNCTION(A_EnableZoneLight)
+{
+	ACTION_PARAM_INT(id, 0);
+	ACTION_PARAM_BOOL(enabled, 1);
+
+	if(id < 0 || id > 31)
+		return true;
+
+	if(enabled)
+		self->zoneLightMask |= (1 << id);
+	else
+		self->zoneLightMask &= ~(1 << id);
+	return true;
+}
+
 ACTION_FUNCTION(A_AlertMonsters)
 {
 	madenoise = true;

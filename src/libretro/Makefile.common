@@ -101,6 +101,7 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/r_data/colormaps.cpp \
 	$(CORE_DIR)/src/r_data/r_translate.cpp \
 	$(CORE_DIR)/src/r_data/renderstyle.cpp \
+	$(CORE_DIR)/src/r_halo.cpp \
 	$(CORE_DIR)/src/resourcefiles/resourcefile.cpp \
 	$(CORE_DIR)/src/resourcefiles/ancientzip.cpp \
 	$(CORE_DIR)/src/resourcefiles/file_audiot.cpp \

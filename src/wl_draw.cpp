@@ -14,6 +14,7 @@
 #include "wl_cloudsky.h"
 #include "wl_atmos.h"
 #include "wl_shade.h"
+#include "r_halo.h"
 #include "actor.h"
 #include "id_ca.h"
 #include "gamemap.h"
@@ -1193,6 +1194,11 @@ void R_RenderView()
 	if(GetFeatureFlags() & FF_STARSKY)
 		DrawStarSky(vbuf, vbufPitch);
 #endif
+
+	// Collect this frame's active halo lights before drawing the floor/ceiling
+	// (which applies them) so they reflect current actor positions/state.
+	Halo_Populate();
+	Zone_Populate((int)map->GetNumZones());
 
 	WallRefresh ();
 

@@ -64,7 +64,9 @@ enum
 	AMETA_ConversationID,
 	AMETA_PickupMessage,
 	AMETA_Obituary,
-	AMETA_HitObituary
+	AMETA_HitObituary,
+	AMETA_HaloLights,
+	AMETA_ZoneLights
 };
 
 enum
@@ -134,6 +136,12 @@ class AActor : public Thinker,
 
 		// Basic properties from objtype
 		ActorFlags flags;
+
+		// Bitfield of which class-declared halo lights (by id 0..31) are
+		// currently active on this actor; toggled by A_EnableHaloLight.
+		int         haloLightMask;
+		// As above for zone lights (A_EnableZoneLight).
+		int         zoneLightMask;
 
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;

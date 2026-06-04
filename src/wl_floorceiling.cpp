@@ -7,8 +7,10 @@
 #include "wl_main.h"
 #include "wl_shade.h"
 #include "r_data/colormaps.h"
+#include "r_halo.h"
 
 #include <climits>
+#include <math.h>
 
 extern int viewshift;
 extern fixed viewz;
@@ -79,6 +81,18 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 	for(int x = 0; x < viewwidth; ++x)
 		wallclip[x] = (wallheight[x]*heightFactor)>>FRACBITS;
 
+	// Per-column halo light boost for the current row, recomputed each row from
+	// the active halos. Allocated lazily and only used when halos are present.
+	const int numHalos = Halo_ActiveCount();
+	static int *halolight = NULL;
+	static int halolight_size = 0;
+	if(numHalos > 0 && viewwidth > halolight_size)
+	{
+		delete[] halolight;
+		halolight = new int[viewwidth];
+		halolight_size = viewwidth;
+	}
+
 	// draw horizontal lines
 	for(int y = y0;floor ? y+halfheight < viewheight : y < halfheight; ++y, tex_offset += tex_offsetPitch)
 	{
@@ -103,6 +117,58 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 		const int tz = FixedMul(FixedDiv(r_depthvisibility, abs(planeheight)), abs(((halfheight)<<16) - ((halfheight-y)<<16)));
 		curshades = &NormalLight.Maps[GETPALOOKUP(tz, shade)<<8];
 
+		// Halo lighting: for each active halo, find the screen-x span where this
+		// row's ray crosses the halo circle (ray-circle intersection) and add
+		// the halo's light to the per-column boost. Overlapping halos sum, which
+		// is how stacked concentric halolight rings form a radial gradient.
+		//
+		// Ray in map space: P(t) = S + V*t, t in [0,1], S=(gu,gv) leftmost,
+		// E=S+V=rightmost. A halo covers P where ||P-C|| <= R, i.e.
+		// (V.V)t^2 + 2(V.(S-C))t + ((S-C).(S-C) - R^2) <= 0. Solve the quadratic
+		// for the t-interval, clamp to [0,1], scale to screen columns.
+		if(numHalos > 0)
+		{
+			memset(halolight, 0, sizeof(int)*viewwidth);
+
+			const double Sx = FIXED2FLOAT(gu);
+			const double Sy = FIXED2FLOAT(gv);
+			const double Vx = FIXED2FLOAT(du) * (double)viewwidth;
+			const double Vy = FIXED2FLOAT(dv) * (double)viewwidth;
+			const double a = Vx*Vx + Vy*Vy;
+
+			if(a > 0.0)
+			{
+				int hi;
+				for(hi = 0; hi < numHalos; ++hi)
+				{
+					const haloinst_t *h = Halo_Active(hi);
+					const double scx = Sx - h->cx;
+					const double scy = Sy - h->cy;
+					const double b = 2.0*(Vx*scx + Vy*scy);
+					const double c = (scx*scx + scy*scy) - h->radius*h->radius;
+					const double disc = b*b - 4.0*a*c;
+					if(disc > 0.0)
+					{
+						const double sq = sqrt(disc);
+						double t1 = (-b - sq)/(2.0*a);
+						double t2 = (-b + sq)/(2.0*a);
+						if(t1 < 0.0) t1 = 0.0;
+						if(t2 > 1.0) t2 = 1.0;
+						int x1 = (int)(t1*viewwidth);
+						int x2 = (int)(t2*viewwidth);
+						if(x1 < 0) x1 = 0;
+						if(x2 > viewwidth) x2 = viewwidth;
+						{
+							int hx;
+							for(hx = x1; hx < x2; ++hx)
+								halolight[hx] += h->light;
+						}
+					}
+				}
+			}
+		}
+
+		int curzonelight = 0;
 		for(unsigned int x = 0;x < (unsigned)viewwidth; ++x, ++tex_offset)
 		{
 			if(wallclip[x] <= y)
@@ -115,6 +181,11 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 					oldmapx = curx;
 					oldmapy = cury;
 					const MapSpot spot = map->GetSpot(oldmapx%mapwidth, oldmapy%mapheight, 0);
+
+					// Zone light boost for this map cell (0 when the zone has no
+					// active zonelight, which is the common case).
+					curzonelight = (spot->zone != NULL)
+						? Zone_LightForIndex(spot->zone->index) : 0;
 
 					if(spot->sector)
 					{
@@ -144,6 +215,17 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 
 				if(tex)
 				{
+					// Per-pixel shade: boost the light level where a halo covers
+					// this column, recomputing the colormap row with the added
+					// light. Cheap branch keeps the no-halo fast path intact.
+					const uint8_t *pixshades = curshades;
+					const int hb = (numHalos > 0 ? halolight[x] : 0) + curzonelight;
+					if(hb != 0)
+					{
+						const int bshade = LIGHT2SHADE(gLevelLight + r_extralight + hb);
+						pixshades = &NormalLight.Maps[GETPALOOKUP(tz, bshade)<<8];
+					}
+
 					if(useOptimized)
 					{
 						const int u = (gu>>18) & 63;
@@ -152,10 +234,10 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 						if(isMasked)
 						{
 							if(const uint8_t c = tex[texoffs])
-								*tex_offset = curshades[c];
+								*tex_offset = pixshades[c];
 						}
 						else
-							*tex_offset = curshades[tex[texoffs]];
+							*tex_offset = pixshades[tex[texoffs]];
 					}
 					else
 					{
@@ -165,10 +247,10 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 						if(isMasked)
 						{
 							if(const uint8_t c = tex[texoffs])
-								*tex_offset = curshades[c];
+								*tex_offset = pixshades[c];
 						}
 						else
-							*tex_offset = curshades[tex[texoffs]];
+							*tex_offset = pixshades[tex[texoffs]];
 					}
 				}
 			}
