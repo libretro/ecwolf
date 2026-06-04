@@ -140,17 +140,12 @@ void	R_DrawFuzzColumnP_C (void);
 void	R_DrawTranslatedColumnP_C (void);
 void	R_DrawShadedColumnP_C (void);
 void	R_DrawSpanP_C (void);
-void	R_DrawSpanMaskedP_C (void);
-
-void	R_DrawSpanTranslucentP_C (void);
-void	R_DrawSpanMaskedTranslucentP_C (void);
 
 void	R_DrawTlatedLucentColumnP_C (void);
 #define R_DrawTlatedLucentColumn R_DrawTlatedLucentColumnP_C
 
 void	R_FillColumnP (void);
 void	R_FillColumnHorizP (void);
-void	R_FillSpan (void);
 
 extern "C" int				ds_y;
 extern "C" int				ds_x1;
@@ -164,12 +159,9 @@ extern "C" dsfixed_t		ds_xstep;
 extern "C" dsfixed_t		ds_ystep;
 extern "C" int				ds_xbits;
 extern "C" int				ds_ybits;
-extern "C" fixed_t			ds_alpha;
 
 // start of a 64*64 tile image
 extern "C" const uint8_t*		ds_source;
-
-extern "C" int				ds_color;		// [RH] For flat color (no texturing)
 
 extern uint8_t shadetables[/*NUMCOLORMAPS*16*256*/];
 extern FDynamicColormap ShadeFakeColormap[16];

@@ -47,7 +47,6 @@ void (*colfunc) (void);
 void (*basecolfunc) (void);
 void (*fuzzcolfunc) (void);
 void (*transcolfunc) (void);
-void (*spanfunc) (void);
 
 void (*hcolfunc_pre) (void);
 void (*hcolfunc_post1) (int hx, int sx, int yl, int yh);
@@ -97,7 +96,6 @@ void R_InitRenderer(void)
 	colfunc = basecolfunc = R_DrawColumnP_C;
 	fuzzcolfunc = R_DrawFuzzColumnP_C;
 	transcolfunc = R_DrawTranslatedColumnP_C;
-	spanfunc = R_DrawSpanP_C;
 
 	// [RH] Horizontal column drawers
 	hcolfunc_pre = R_DrawColumnHorizP_C;
