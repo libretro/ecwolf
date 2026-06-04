@@ -132,14 +132,17 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 
 			// Our gu/gv are view-relative with 8 extra fractional bits, while
 			// halo centers are absolute world coordinates. Convert the ray to
-			// world space using the same mapping the texture sampler uses:
-			//   world = (viewTile<<FRACBITS) + (g>>8)
+			// world space using the same signed mapping the tile lookup uses:
+			//   world_x = (viewxTile<<FRACBITS) + (gu>>8)
+			//   world_y = (viewyTile<<FRACBITS) - (gv>>8)   (gv is negated for Y)
 			// so S and C live in the same space and the intersection lands
-			// under the lamp instead of being offset by the view position.
+			// under the lamp. The Y term must be negated to match cury's
+			// (viewyTile + (-(gv>>(TILESHIFT+8)) - 1)) mapping; the texture
+			// sampler hides this because its lookup wraps mod texheight.
 			const double Sx = FIXED2FLOAT((viewxTile<<FRACBITS) + (gu>>8));
-			const double Sy = FIXED2FLOAT((viewyTile<<FRACBITS) + (gv>>8));
+			const double Sy = FIXED2FLOAT((viewyTile<<FRACBITS) - (gv>>8));
 			const double Vx = FIXED2FLOAT(du>>8) * (double)viewwidth;
-			const double Vy = FIXED2FLOAT(dv>>8) * (double)viewwidth;
+			const double Vy = FIXED2FLOAT(-(dv>>8)) * (double)viewwidth;
 			const double a = Vx*Vx + Vy*Vy;
 
 			if(a > 0.0)
