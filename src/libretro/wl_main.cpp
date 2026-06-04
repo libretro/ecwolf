@@ -32,6 +32,7 @@
 #include "g_shared/a_keys.h"
 #include "g_mapinfo.h"
 #include "wl_draw.h"
+#include "wl_shade.h"
 #include "wl_inter.h"
 #include "wl_iwad.h"
 #include "wl_play.h"
@@ -254,7 +255,12 @@ void BuildTables (void)
 
 void CalcVisibility(fixed vis)
 {
-	r_depthvisibility = FixedDiv(FixedMul((160*FRACUNIT),vis),focallengthy<<16);
+	// focallengthy scales with centerx (i.e. with render resolution), so the
+	// original fixed 160 reference half-width made r_depthvisibility shrink at
+	// high resolutions, over-darkening the depth fog (distant floor/ceiling
+	// went much darker at 4K than at 320-wide). Use the actual centerx as the
+	// reference so the visibility falloff is resolution-independent.
+	r_depthvisibility = FixedDiv(FixedMul(((centerx > 0 ? centerx : 160)*FRACUNIT),vis),focallengthy<<16);
 }
 
 /*
@@ -563,6 +569,11 @@ static void SetViewSize (unsigned int screenWidth, unsigned int screenHeight)
 		CalcProjection(players[ConsolePlayer].mo->radius);
 	else
 		CalcProjection (FOCALLENGTH);
+
+	// focallengthy/centerx just changed, so refresh the depth-visibility term;
+	// it is otherwise only set at map load and would go stale (and mis-scaled
+	// for the new resolution) after a view-size or resolution change.
+	CalcVisibility(gLevelVisibility);
 }
 
 void NewViewSize (int width, unsigned int scrWidth, unsigned int scrHeight)
