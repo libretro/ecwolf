@@ -507,7 +507,7 @@ int FTGATexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCo
 
 	if (hdr.has_cm)
 	{
-		memset(pe, 0, 256*sizeof(PalEntry));
+		memset((void*)pe, 0, 256*sizeof(PalEntry));
 		for (int i = hdr.cm_first; i < hdr.cm_first + hdr.cm_length && i < 256; i++)
 		{
 			switch (hdr.cm_size)

@@ -297,7 +297,7 @@ Mix_Chunk_N3D::MIDI_ProgramChange(int channel, int id)
 void
 Mix_Chunk_N3D::MIDI_ProcessEvent(uint8_t event)
 {
-	uint8_t	note,velocity,id,value;
+	uint8_t	note,velocity,value;
 	switch (event&0xF0)
 	{
 	case 0x80:
@@ -311,7 +311,7 @@ Mix_Chunk_N3D::MIDI_ProcessEvent(uint8_t event)
 		MIDI_NoteOn(event&0xF,note,velocity);
 		break;
 	case 0xB0:
-		id = *midiData++;
+		midiData++;
 		value = *midiData++;
 //		MIDI_ControllerChange(event&0xF,id,value);
 		break;

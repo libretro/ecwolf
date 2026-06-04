@@ -213,7 +213,7 @@ bool M_AppendPNGText (FILE *file, const char *keyword, const char *text)
 	head.len = BigLong(len + keylen + 1);
 	head.id = MAKE_ID('t','E','X','t');
 	memset (&head.key, 0, sizeof(head.key));
-	strncpy (head.key, keyword, keylen);
+	memcpy (head.key, keyword, keylen);
 	head.key[keylen] = 0;
 
 	if ((int)fwrite (&head, 1, keylen + 9, file) == keylen + 9 &&

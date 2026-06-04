@@ -2446,7 +2446,7 @@ void V_InitCustomFonts()
 		Scanner sc(llump);
 		while (sc.GetNextString())
 		{
-			memset (lumplist, 0, sizeof(lumplist));
+			memset ((void*)lumplist, 0, sizeof(lumplist));
 			memset (notranslate, 0, sizeof(notranslate));
 			namebuffer = sc->str;
 			format = 0;
