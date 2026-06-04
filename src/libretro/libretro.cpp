@@ -119,17 +119,10 @@ bool alwaysrun;
 bool preload_digital_sounds;
 float localDesiredFOV = 90.0f;
 
-class LibretroFBBase : public DCanvas
+template <typename color_t> class LibretroFB : public DCanvas
 {
 public:
-	LibretroFBBase(int width, int height) : DCanvas (width, height) {}
-	virtual void ShowFrame() = 0;
-};
-
-template <typename color_t> class LibretroFB : public LibretroFBBase
-{
-public:
-	LibretroFB(int width, int height) : LibretroFBBase (width, height) {
+	LibretroFB(int width, int height) : DCanvas (width, height) {
 		width_ = width;
 		height_ = height;
 		lr_pitch_ = width_ * sizeof(color_t);
@@ -1502,7 +1495,7 @@ void retro_run(void)
 	unsigned frametics = tics;
 
 	if (tics == 0) {
-		((LibretroFBBase *)screen)->ShowFrame();
+		screen->ShowFrame();
 		in_retro_run = false;
 		return;
 	}

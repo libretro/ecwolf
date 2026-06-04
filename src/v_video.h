@@ -195,6 +195,9 @@ public:
 	virtual bool SetFlash (PalEntry rgb, int amount) = 0;
 	virtual void GetFlash (PalEntry &rgb, int &amount) = 0;
 
+	// Re-present the last frame without re-rendering (no game tics elapsed).
+	virtual void ShowFrame () = 0;
+
 	// 2D drawing ----------------------------------------------------------
 	// These have a single implementation (in v_draw/v_text/v_video) and are
 	// never overridden, so they are non-virtual: direct calls, no vtable slot.
