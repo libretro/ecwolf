@@ -68,50 +68,19 @@ extern "C" unsigned int	*dc_ctspan[4];
 extern "C" unsigned int	horizspans[4];
 
 
-// [RH] Pointers to the different column and span drawers...
-
-// The span blitting interface.
-// Hook in system specific BLT here.
-extern void (*R_DrawColumn)(void);
+// [RH] The former R_Draw* column/span blitter pointers were removed: after the
+// x86 ASM drawers were deleted each pointed at a single C function, so callers
+// now invoke the C implementations (R_Draw*P_C) directly.
 
 extern void setuptmvline (int);
 
-// The Spectre/Invisibility effect.
-extern void (*R_DrawFuzzColumn)(void);
-
-// [RH] Draw shaded column
-extern void (*R_DrawShadedColumn)(void);
-
-// Draw with color translation tables, for player sprite rendering,
-//	Green/Red/Blue/Indigo shirts.
-extern void (*R_DrawTranslatedColumn)(void);
-
-// Span drawing for rows, floor/ceiling. No Spectre effect needed.
-extern void (*R_DrawSpan)(void);
 void R_SetupSpanBits(FTexture *tex);
 void R_SetSpanColormap(uint8_t *colormap);
 void R_SetSpanSource(const uint8_t *pixels);
 
-// Span drawing for masked textures.
-extern void (*R_DrawSpanMasked)(void);
-
-// Span drawing for translucent textures.
-extern void (*R_DrawSpanTranslucent)(void);
-
-// Span drawing for masked, translucent textures.
-extern void (*R_DrawSpanMaskedTranslucent)(void);
-
-// Span drawing for translucent, additive textures.
-extern void (*R_DrawSpanAddClamp)(void);
-
-// Span drawing for masked, translucent, additive textures.
-extern void (*R_DrawSpanMaskedAddClamp)(void);
-
-// [RH] Span blit into an interleaved intermediate buffer
-extern void (*R_DrawColumnHoriz)(void);
 void R_DrawMaskedColumnHoriz (const uint8_t *column, const FTexture::Span *spans);
 
-// [RH] Initialize the above pointers
+// [RH] Initialize rt_map4cols and any other remaining runtime drawer state
 void R_InitColumnDrawers ();
 
 // [RH] Moves data from the temporary buffer to the screen.

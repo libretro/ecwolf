@@ -62,20 +62,11 @@ short					spanend[MAXHEIGHT];
 }
 int 			scaledviewwidth;
 
-// [RH] Pointers to the different column drawers.
-//		These get changed depending on the current
-//		screen depth.
-void (*R_DrawColumnHoriz)(void);
-void (*R_DrawColumn)(void);
-void (*R_DrawFuzzColumn)(void);
-void (*R_DrawTranslatedColumn)(void);
-void (*R_DrawShadedColumn)(void);
-void (*R_DrawSpan)(void);
-void (*R_DrawSpanMasked)(void);
-void (*R_DrawSpanTranslucent)(void);
-void (*R_DrawSpanMaskedTranslucent)(void);
-void (*R_DrawSpanAddClamp)(void);
-void (*R_DrawSpanMaskedAddClamp)(void);
+// rt_map4cols remains a runtime pointer: hcolfunc_post4 dispatches among the
+// rt_*4cols blend/translation variants, of which this is one. The former
+// R_Draw* column/span blitter pointers were removed once the x86 ASM paths
+// were deleted left each resolving to a single C function; their call sites
+// now reference the C implementations directly.
 void (STACK_ARGS *rt_map4cols)(int,int,int);
 
 //
@@ -1693,18 +1684,12 @@ const uint8_t *R_GetColumn (FTexture *tex, int col)
 // [RH] Initialize the column drawer pointers
 void R_InitColumnDrawers ()
 {
-	R_DrawColumnHoriz			= R_DrawColumnHorizP_C;
-	R_DrawColumn				= R_DrawColumnP_C;
-	R_DrawFuzzColumn			= R_DrawFuzzColumnP_C;
-	R_DrawTranslatedColumn		= R_DrawTranslatedColumnP_C;
-	R_DrawShadedColumn			= R_DrawShadedColumnP_C;
-	R_DrawSpan					= R_DrawSpanP_C;
-	R_DrawSpanMasked			= R_DrawSpanMaskedP_C;
-	rt_map4cols					= rt_map4cols_c;
-	R_DrawSpanTranslucent		= R_DrawSpanTranslucentP_C;
-	R_DrawSpanMaskedTranslucent = R_DrawSpanMaskedTranslucentP_C;
-	R_DrawSpanAddClamp			= R_DrawSpanAddClampP_C;
-	R_DrawSpanMaskedAddClamp	= R_DrawSpanMaskedAddClampP_C;
+	// The column/span blitter pointers used to dispatch between x86 ASM and C
+	// implementations; with the ASM gone each resolved to a single C function,
+	// so those pointers were removed and their call sites now call the C
+	// functions directly. rt_map4cols remains a pointer because it is one
+	// member of the rt_*4cols family that hcolfunc_post4 genuinely dispatches.
+	rt_map4cols = rt_map4cols_c;
 }
 
 // [RH] Choose column drawers in a single place
@@ -1894,7 +1879,7 @@ ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, 
 		}
 	}
 	basecolormapsave = basecolormap;
-	hcolfunc_pre = R_DrawColumnHoriz;
+	hcolfunc_pre = R_DrawColumnHorizP_C;
 
 	// Check for special modes
 	if (style.BlendOp == STYLEOP_Fuzz)
@@ -1907,7 +1892,7 @@ ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, 
 		// Shaded drawer only gets 16 levels of alpha because it saves memory.
 		if ((alpha >>= 12) == 0)
 			return DontDraw;
-		colfunc = R_DrawShadedColumn;
+		colfunc = R_DrawShadedColumnP_C;
 		hcolfunc_post1 = rt_shaded1col;
 		hcolfunc_post4 = rt_shaded4cols;
 		dc_color = fixedcolormap ? fixedcolormap[APART(color)] : basecolormap->Maps[APART(color)];

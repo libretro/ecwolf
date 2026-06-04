@@ -95,13 +95,13 @@ void R_InitRenderer(void)
 	R_InitTranslationTables ();
 	R_InitColumnDrawers ();
 
-	colfunc = basecolfunc = R_DrawColumn;
-	fuzzcolfunc = R_DrawFuzzColumn;
-	transcolfunc = R_DrawTranslatedColumn;
-	spanfunc = R_DrawSpan;
+	colfunc = basecolfunc = R_DrawColumnP_C;
+	fuzzcolfunc = R_DrawFuzzColumnP_C;
+	transcolfunc = R_DrawTranslatedColumnP_C;
+	spanfunc = R_DrawSpanP_C;
 
 	// [RH] Horizontal column drawers
-	hcolfunc_pre = R_DrawColumnHoriz;
+	hcolfunc_pre = R_DrawColumnHorizP_C;
 	hcolfunc_post1 = rt_map1col;
 	hcolfunc_post4 = rt_map4cols;
 }
