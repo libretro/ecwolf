@@ -838,8 +838,8 @@ void rt_draw4cols (int sx)
 	// max/min calculations below.
 	for (x = 0; x < 4; ++x)
 	{
-		dc_ctspan[x][0] = screen->GetHeight()+1;
-		dc_ctspan[x][1] = screen->GetHeight();
+		dc_ctspan[x][0] = V_GetHeight()+1;
+		dc_ctspan[x][1] = V_GetHeight();
 	}
 
 	for (;;)

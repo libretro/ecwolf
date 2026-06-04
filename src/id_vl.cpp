@@ -72,13 +72,10 @@ void I_InitGraphics ();
 void	VL_SetVGAPlaneMode (bool forSignon)
 {
 	if(!forSignon)
-		screen->Unlock();
 
 	I_InitGraphics();
 	Video->SetResolution(screenWidth, screenHeight);
-	screen->Lock(true);
 	R_SetupBuffer ();
-	screen->Unlock();
 
 	scaleFactorX = CleanXfac;
 	scaleFactorY = CleanYfac;
@@ -88,7 +85,6 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 
 	NewViewSize(viewsize);
 
-	screen->Lock(false);
 }
 
 /*
@@ -146,11 +142,9 @@ void VL_FadeIn (int start, int end, int steps)
 
 uint8_t *VL_LockSurface()
 {
-	screen->Lock(false);
-	return (uint8_t *) screen->GetBuffer();
+	return (uint8_t *) V_GetBuffer();
 }
 
 void VL_UnlockSurface()
 {
-	screen->Unlock();
 }

@@ -767,7 +767,7 @@ void FizzleColorFinish(wl_state_t *state, int x1, int y1,
 
 	for (y = y1; y < (y1 + height); ++y)
 	{
-		memset(screen->GetBuffer() + (y * SCREENPITCH) + x1, color,
+		memset(V_GetBuffer() + (y * SCREENPITCH) + x1, color,
 		       width); 
 	}
 	VH_UpdateScreen();
@@ -812,7 +812,7 @@ bool FizzleColorStep(wl_state_t *state, int x1, int y1,
 		//
 		// copy one pixel
 		//
-		*(screen->GetBuffer() + (y1 + y) * SCREENPITCH + x1 + x)
+		*(V_GetBuffer() + (y1 + y) * SCREENPITCH + x1 + x)
 			= color;
 
 		if(state->rndval == 0) {		// entire sequence has been completed

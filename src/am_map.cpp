@@ -317,7 +317,7 @@ void AutoMap::Draw()
 	const fixed scale = GetScreenScale();
 
 	if(!(amFlags & AMF_Overlay))
-		screen->Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, BackgroundColor.palcolor, BackgroundColor.color);
+		V_Clear(amx, amy+1, amx+amsizex, amy+amsizey+1, BackgroundColor.palcolor, BackgroundColor.color);
 
 	const fixed playerx = players[0].mo->x;
 	const fixed playery = players[0].mo->y;
@@ -408,10 +408,10 @@ void AutoMap::Draw()
 					// graphics in the TILE8, we need to override the scaling.
 					if(tex->UseType == FTexture::TEX_FontChar)
 						texScale *= 8;
-					screen->FillSimplePoly(tex, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness);
+					V_FillSimplePoly(tex, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness);
 				}
 				else if(color)
-					screen->FillSimplePoly(NULL, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness, color->palcolor, color->color);
+					V_FillSimplePoly(NULL, &points[0], points.Size(), originx, originy, texScale, texScale, ~amangle, &NormalLight, brightness, color->palcolor, color->color);
 			}
 
 			// We need to check this even if the origin tile isn't visible since
@@ -460,11 +460,11 @@ void AutoMap::Draw()
 				// Noah's ark TILE8
 				if(tex->UseType == FTexture::TEX_FontChar)
 					texScale *= 8;
-				screen->FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
+				V_FillSimplePoly(tex, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, texScale, texScale, ~amangle, &NormalLight, 256);
 			}
 		}
 		else
-			screen->FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);
+			V_FillSimplePoly(NULL, &pwall.points[0], pwall.points.Size(), originx + pwall.shiftx, originy + pwall.shifty, origTexScale, origTexScale, ~amangle, &NormalLight, 256, WallColor.palcolor, WallColor.color);
 	}
 
 	DrawVector(AM_Arrow, 8, FixedMul(playerx - ofsx, scale), FixedMul(playery - ofsy, scale), scale, (amFlags & AMF_Rotate) ? 0 : ANGLE_90-players[0].mo->angle, ArrowColor);
@@ -513,7 +513,7 @@ void AutoMap::DrawActor(AActor *actor, fixed x, fixed y, fixed scale)
 	{
 		double width = tex->GetScaledWidthDouble()*FIXED2FLOAT(scale>>6);
 		double height = tex->GetScaledHeightDouble()*FIXED2FLOAT(scale>>6);
-		screen->DrawTexture(tex, x, y,
+		V_DrawTexture(tex, x, y,
 			DTA_DestWidthF, width,
 			DTA_DestHeightF, height,
 			DTA_ClipLeft, amx,
@@ -525,7 +525,7 @@ void AutoMap::DrawActor(AActor *actor, fixed x, fixed y, fixed scale)
 	}
 	else
 	{
-		screen->DrawTexture(tex, x - (scale>>(FRACBITS+1)), y - (scale>>(FRACBITS+1)),
+		V_DrawTexture(tex, x - (scale>>(FRACBITS+1)), y - (scale>>(FRACBITS+1)),
 			DTA_DestWidthF, FIXED2FLOAT(scale),
 			DTA_DestHeightF, FIXED2FLOAT(scale),
 			DTA_ClipLeft, amx,
@@ -619,7 +619,7 @@ void AutoMap::DrawClippedLine(int x0, int y0, int x1, int y1, int palcolor, uint
 	}
 	while(true);
 
-	screen->DrawLine(x0, y0+1, x1, y1+1, palcolor, realcolor);
+	V_DrawLine(x0, y0+1, x1, y1+1, palcolor, realcolor);
 }
 
 void AutoMap::DrawStats() const
@@ -633,15 +633,15 @@ void AutoMap::DrawStats() const
 	if(amFlags & AMF_DispInfo)
 	{
 		infHeight = SmallFont->GetHeight()+2;
-		screen->Dim(GPalette.BlackIndex, 0.5f, 0, 0, screenWidth, infHeight*CleanYfac);
+		V_DimRect(GPalette.BlackIndex, 0.5f, 0, 0, screenWidth, infHeight*CleanYfac);
 
-		screen->DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, CleanYfac, levelInfo->GetName(map),
+		V_DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, CleanYfac, levelInfo->GetName(map),
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 
 		unsigned int seconds = gamestate.TimeCount/70;
 		statString.Format("%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
-		screen->DrawText(SmallFont, gameinfo.automap.FontColor,
+		V_DrawText(SmallFont, gameinfo.automap.FontColor,
 			screenWidth - (SmallFont->GetCharWidth('0')*6 + SmallFont->GetCharWidth(':')*2 + 2)*CleanXfac, CleanYfac,
 			statString,
 			DTA_CleanNoMove, true,
@@ -657,9 +657,9 @@ void AutoMap::DrawStats() const
 
 		uint16_t sw, sh;
 		VW_MeasurePropString(SmallFont, statString, sw, sh);
-		screen->Dim(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
+		V_DimRect(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
 
-		screen->DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, infHeight*CleanYfac, statString,
+		V_DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, infHeight*CleanYfac, statString,
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 	}

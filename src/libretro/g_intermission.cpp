@@ -178,7 +178,7 @@ static bool ShowImage(IntermissionAction *image, bool drawonly)
 static void DrawCastName(CastIntermissionAction *cast)
 {
 	int width = BigFont->StringWidth(cast->Name);
-	screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG],
+	V_DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG],
 		(screenWidth - width*CleanXfac)/2, statusbary2 + (screenHeight - statusbary2 - BigFont->GetHeight())/2,
 		cast->Name,
 		DTA_CleanNoMove, true,

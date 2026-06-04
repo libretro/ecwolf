@@ -102,15 +102,15 @@ void BlakeStatusBar::DrawLed(double percent, double x, double y) const
 	double w = dim->GetScaledWidthDouble();
 	double h = dim->GetScaledHeightDouble();
 
-	screen->VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
+	V_VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
 
 	int lightclip = xs_ToInt(y + h*(1-percent));
-	screen->DrawTexture(dim, x, y,
+	V_DrawTexture(dim, x, y,
 		DTA_DestWidthF, w,
 		DTA_DestHeightF, h,
 		DTA_ClipBottom, lightclip,
 		TAG_DONE);
-	screen->DrawTexture(light, x, y,
+	V_DrawTexture(light, x, y,
 		DTA_DestWidthF, w,
 		DTA_DestHeightF, h,
 		DTA_ClipTop, lightclip,
@@ -133,10 +133,10 @@ void BlakeStatusBar::DrawStatusBar()
 	double sty = 200-STATUSLINES;
 	double stw = 320;
 	double sth = STATUSLINES;
-	screen->VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
+	V_VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
 	int boty = xs_ToInt(sty);
 
-	screen->DrawTexture(TexMan(STBar), stx, sty,
+	V_DrawTexture(TexMan(STBar), stx, sty,
 		DTA_DestWidthF, stw,
 		DTA_DestHeightF, sth,
 		TAG_DONE);
@@ -145,10 +145,10 @@ void BlakeStatusBar::DrawStatusBar()
 	sty = 0;
 	stw = 320;
 	sth = STATUSTOPLINES;
-	screen->VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
+	V_VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
 	int topy = xs_ToInt(sth);
 
-	screen->DrawTexture(TexMan(STBarTop), stx, 0.0,
+	V_DrawTexture(TexMan(STBarTop), stx, 0.0,
 		DTA_DestWidthF, stw,
 		DTA_DestHeightF, sth,
 		TAG_DONE);
@@ -199,8 +199,8 @@ void BlakeStatusBar::DrawStatusBar()
 			sty = 176;
 			stw = weapon->GetScaledWidthDouble();
 			sth = weapon->GetScaledHeightDouble();
-			screen->VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
-			screen->DrawTexture(weapon, stx, sty,
+			V_VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
+			V_DrawTexture(weapon, stx, sty,
 				DTA_DestWidthF, stw,
 				DTA_DestHeightF, sth,
 				TAG_DONE);
@@ -260,8 +260,8 @@ void BlakeStatusBar::DrawStatusBar()
 		sty = 179;
 		stw = tex->GetScaledWidthDouble();
 		sth = tex->GetScaledHeightDouble();
-		screen->VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
-		screen->DrawTexture(tex, stx, sty,
+		V_VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
+		V_DrawTexture(tex, stx, sty,
 			DTA_DestWidthF, stw,
 			DTA_DestHeightF, sth,
 			TAG_DONE);
@@ -298,8 +298,8 @@ void BlakeStatusBar::DrawString(FFont *font, const char* string, double x, doubl
 			if(shadow)
 			{
 				tx = x + 1, ty = y + 1, tw = tex->GetScaledWidthDouble(), th = tex->GetScaledHeightDouble();
-				screen->VirtualToRealCoords(tx, ty, tw, th, 320, 200, true, true);
-				screen->DrawTexture(tex, tx, ty,
+				V_VirtualToRealCoords(tx, ty, tw, th, 320, 200, true, true);
+				V_DrawTexture(tex, tx, ty,
 					DTA_DestWidthF, tw,
 					DTA_DestHeightF, th,
 					DTA_FillColor, GPalette.BlackIndex,
@@ -307,8 +307,8 @@ void BlakeStatusBar::DrawString(FFont *font, const char* string, double x, doubl
 			}
 
 			tx = x, ty = y, tw = tex->GetScaledWidthDouble(), th = tex->GetScaledHeightDouble();
-			screen->VirtualToRealCoords(tx, ty, tw, th, 320, 200, true, true);
-			screen->DrawTexture(tex, tx, ty,
+			V_VirtualToRealCoords(tx, ty, tw, th, 320, 200, true, true);
+			V_DrawTexture(tex, tx, ty,
 				DTA_DestWidthF, tw,
 				DTA_DestHeightF, th,
 				DTA_Translation, remap,

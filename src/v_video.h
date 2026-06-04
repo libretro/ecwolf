@@ -47,14 +47,14 @@ extern int DisplayWidth, DisplayHeight, DisplayBits;
 bool V_DoModeSetup (int width, int height, int bits);
 void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int realheight, int *cleanx, int *cleany, int *cx1=NULL, int *cx2=NULL);
 
-struct DCanvas;
+struct framebuffer_t;
 
 class IVideo
 {
  public:
 	virtual ~IVideo () {}
 
-	virtual DCanvas *CreateFrameBuffer (int width, int height) = 0;
+	virtual framebuffer_t *CreateFrameBuffer (int width, int height) = 0;
 
 	virtual bool SetResolution (int width, int height);
 };
@@ -152,116 +152,18 @@ class player_t;
 //
 // [RH] Made screens more implementation-independant:
 //
-// The framebuffer. A plain struct (no virtuals, no inheritance, no template):
-// the libretro core has exactly one video surface, so DCanvas holds the 8bpp
-// indexed render Buffer, the 2D drawing primitives, and the palette-expand /
-// present path directly. The output pixel format (32bpp XRGB8888 or 16bpp
-// RGB565) is a runtime field (bpp), branched at the two spots that touch
-// output pixels, rather than a class template.
-struct DCanvas
+// The framebuffer. Pure data (no methods): the libretro core has exactly one
+// video surface, held by the global 'screen' below. The 8bpp indexed Buffer is
+// rendered through the palette into a 16- or 32-bpp output (bpp, runtime). All
+// behaviour lives in the free functions declared after this struct and in
+// libretro.cpp (present path); v_draw/v_text/v_video hold the 2D drawing.
+struct framebuffer_t
 {
-	DCanvas (int width, int height, int bpp);
-	~DCanvas ();
-
-	// Member variable access
-	inline uint8_t *GetBuffer () const { return Buffer; }
-	inline int GetWidth () const { return Width; }
-	inline int GetHeight () const { return Height; }
-	inline int GetPitch () const { return Pitch; }
-
-	bool IsValid () { return Buffer != NULL; }
-
-	// Surface access / presentation
-	bool Lock (bool buffered=true) { return true; }
-	void Unlock () {}
-	void Update ();
-	void ShowFrame ();
-	PalEntry *GetPalette () { return SourcePalette; }
-	void UpdatePalette () { PaletteNeedsUpdate = true; }
-	bool SetFlash (PalEntry rgb, int amount);
-	void GetFlash (PalEntry &rgb, int &amount) { rgb = Flash; amount = FlashAmount; }
-
-	// 2D drawing ----------------------------------------------------------
-
-	// Dim the entire canvas for the menus
-	void Dim (PalEntry color = 0);
-
-	// Dim part of the canvas
-	void Dim (PalEntry color, float amount, int x1, int y1, int w, int h);
-
-	// Fill an area with a texture
-	void FlatFill (int left, int top, int right, int bottom, FTexture *src, bool local_origin=false);
-
-	// Fill a simple polygon with a texture
-	void FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
-		double originx, double originy, double scalex, double scaley, angle_t rotation,
-		struct FDynamicColormap *colormap, int lightlevel, int palcolor=0, uint32_t rgbcolor=0);
-
-	// Set an area to a specified color
-	void Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color);
-
-	// Draws a line
-	void DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor);
-
-	// 2D Texture drawing
-	void STACK_ARGS DrawTexture (FTexture *img, double x, double y, int tags, ...);
-	void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom=false, bool handleaspect=true) const;
-
-	// 2D Text drawing
-	void STACK_ARGS DrawText (FFont *font, int normalcolor, int x, int y, const char *string, ...);
-	void DrawTextV (FFont *font, int normalcolor, int x, int y, const char *string, va_list tags);
-
-	struct DrawParms
-	{
-		double x, y;
-		double texwidth;
-		double texheight;
-		double destwidth;
-		double destheight;
-		double virtWidth;
-		double virtHeight;
-		double windowleft;
-		double windowright;
-		int dclip;
-		int uclip;
-		int lclip;
-		int rclip;
-		double top;
-		double left;
-		fixed_t alpha;
-		uint32_t fillcolor;
-		FRemapTable *remap;
-		const uint8_t *translation;
-		uint32_t colorOverlay;
-		INTBOOL alphaChannel;
-		INTBOOL flipX;
-		fixed_t shadowAlpha;
-		int shadowColor;
-		INTBOOL keepratio;
-		INTBOOL masked;
-		INTBOOL bilinear;
-		FRenderStyle style;
-		struct FSpecialColormap *specialcolormap;
-		struct FColormapStyle *colormapstyle;
-	};
-
-	// --- framebuffer / present state (was DSimpleCanvas + LibretroFB) ---
 	uint8_t *Buffer;          // 8bpp indexed render target
 	int Width;
 	int Height;
 	int Pitch;
 	int bpp;                  // 16 or 32: output pixel format, runtime
-
-	void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
-	bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const;
-
-	void PUTTRANSDOT (int xx, int yy, int basecolor, int level);
-
-	// present helpers
-	void present ();
-	bool query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes);
-	void ComputePalette ();
-	void expand_palette (void *dst, int dst_stride_pixels);
 
 	void        *lr_buffer_;       // fallback output buffer (bpp-sized pixels)
 	int          lr_pitch_;        // in bytes
@@ -274,13 +176,43 @@ struct DCanvas
 	uint32_t     effective_palette_[256];   // widest form; used as 16/32 per bpp
 };
 
-
 // This is the screen updated by I_FinishUpdate.
-extern DCanvas *screen;
+extern framebuffer_t *screen;
 
-#define SCREENWIDTH (screen->GetWidth ())
-#define SCREENHEIGHT (screen->GetHeight ())
-#define SCREENPITCH (screen->GetPitch ())
+// Lifecycle / present (libretro.cpp)
+framebuffer_t *V_NewFrameBuffer (int width, int height, int bpp);
+void V_DeleteFrameBuffer (framebuffer_t *fb);
+void V_Update ();
+void V_ShowFrame ();
+bool V_SetFlash (PalEntry rgb, int amount);
+void V_GetFlash (PalEntry &rgb, int &amount);
+
+// Accessors
+inline uint8_t *V_GetBuffer () { return screen->Buffer; }
+inline int      V_GetWidth ()  { return screen->Width; }
+inline int      V_GetHeight () { return screen->Height; }
+inline int      V_GetPitch ()  { return screen->Pitch; }
+inline bool     V_IsValid ()   { return screen->Buffer != NULL; }
+inline PalEntry *V_GetPalette () { return screen->SourcePalette; }
+inline void     V_UpdatePalette () { screen->PaletteNeedsUpdate = true; }
+
+// 2D drawing (v_draw.cpp / v_text.cpp / v_video.cpp)
+void V_Dim (PalEntry color = 0);
+void V_DimRect (PalEntry color, float amount, int x1, int y1, int w, int h);
+void V_FlatFill (int left, int top, int right, int bottom, FTexture *src, bool local_origin=false);
+void V_FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
+	double originx, double originy, double scalex, double scaley, angle_t rotation,
+	struct FDynamicColormap *colormap, int lightlevel, int palcolor=0, uint32_t rgbcolor=0);
+void V_Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color);
+void V_DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor);
+void STACK_ARGS V_DrawTexture (FTexture *img, double x, double y, int tags, ...);
+void V_VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom=false, bool handleaspect=true);
+void STACK_ARGS V_DrawText (FFont *font, int normalcolor, int x, int y, const char *string, ...);
+void V_DrawTextV (FFont *font, int normalcolor, int x, int y, const char *string, va_list tags);
+
+#define SCREENWIDTH (screen->Width)
+#define SCREENHEIGHT (screen->Height)
+#define SCREENPITCH (screen->Pitch)
 
 // Col2RGB8 is a pre-multiplied palette for color lookup. It is stored in a
 // special R10B10G10 format for efficient blending computation.

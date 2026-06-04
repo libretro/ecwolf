@@ -766,7 +766,7 @@ void SpriteZoomer::Draw()
 	const double yscale = double(viewheight*count)/double(zoomtime*64);
 	const double xscale = yscale/FIXED2FLOAT(yaspect);
 
-	screen->DrawTexture(gmoverTex, viewscreenx + (viewwidth>>1), viewscreeny + (viewheight>>1) + yscale*32,
+	V_DrawTexture(gmoverTex, viewscreenx + (viewwidth>>1), viewscreeny + (viewheight>>1) + yscale*32,
 		DTA_DestWidthF, gmoverTex->GetScaledWidthDouble()*xscale,
 		DTA_DestHeightF, gmoverTex->GetScaledHeightDouble()*yscale,
 		TAG_DONE);

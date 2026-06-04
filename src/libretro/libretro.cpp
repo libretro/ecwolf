@@ -120,84 +120,101 @@ bool preload_digital_sounds;
 float localDesiredFOV = 90.0f;
 
 // ---------------------------------------------------------------------------
-// DCanvas: the single concrete framebuffer. 8bpp indexed Buffer rendered
-// through the palette into a 16- or 32-bpp output (runtime bpp), presented to
-// the frontend either via a frontend-owned software framebuffer or the
-// fallback lr_buffer_.
+// The single concrete framebuffer. 8bpp indexed Buffer rendered through the
+// palette into a 16- or 32-bpp output (runtime bpp), presented to the frontend
+// either via a frontend-owned software framebuffer or the fallback lr_buffer_.
 // ---------------------------------------------------------------------------
 
-DCanvas::DCanvas (int width, int height, int _bpp)
+static void V_ExpandPalette (void *dst, int dst_stride);
+static bool V_QueryFrontendFB (void **out_pixels, size_t *out_pitch_bytes);
+static void V_Present ();
+static void V_ComputePalette ();
+
+framebuffer_t *V_NewFrameBuffer (int width, int height, int _bpp)
 {
-	Width = width;
-	Height = height;
-	bpp = _bpp;
+	framebuffer_t *fb = (framebuffer_t *) malloc (sizeof(framebuffer_t));
+	CHECKMALLOCRESULT(fb);
+
+	fb->Width = width;
+	fb->Height = height;
+	fb->bpp = _bpp;
 
 	// Making the pitch a power of 2 is very bad for performance: keep it
 	// slightly longer than the width at high resolutions to spread cache
 	// lines across column draws (empirically derived in the original code).
 	if (width <= 640)
-		Pitch = width;
+		fb->Pitch = width;
 	else
-		Pitch = width + 32 - 8;
+		fb->Pitch = width + 32 - 8;
 
-	width_ = width;
-	height_ = height;
-	lr_pitch_ = width_ * (bpp / 8);
-	lr_buffer_ = malloc (height_ * lr_pitch_);
-	CHECKMALLOCRESULT(lr_buffer_);
-	Buffer = (uint8_t *) malloc (height_ * Pitch);
-	CHECKMALLOCRESULT(Buffer);
-	memcpy (SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
-	memset (Buffer, 0, height_ * Pitch);
-	PaletteNeedsUpdate = true;
-	FlashAmount = 0;
-	Flash.r = 0;
-	Flash.g = 0;
-	Flash.b = 0;
+	fb->width_ = width;
+	fb->height_ = height;
+	fb->lr_pitch_ = fb->width_ * (_bpp / 8);
+	fb->lr_buffer_ = malloc (fb->height_ * fb->lr_pitch_);
+	CHECKMALLOCRESULT(fb->lr_buffer_);
+	fb->Buffer = (uint8_t *) malloc (fb->height_ * fb->Pitch);
+	CHECKMALLOCRESULT(fb->Buffer);
+	memcpy (fb->SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
+	memset (fb->Buffer, 0, fb->height_ * fb->Pitch);
+	fb->PaletteNeedsUpdate = true;
+	fb->FlashAmount = 0;
+	fb->Flash.r = 0;
+	fb->Flash.g = 0;
+	fb->Flash.b = 0;
+	return fb;
 }
 
-DCanvas::~DCanvas ()
+void V_DeleteFrameBuffer (framebuffer_t *fb)
 {
-	free(lr_buffer_);
-	free(Buffer);
+	if (fb == NULL)
+		return;
+	free(fb->lr_buffer_);
+	free(fb->Buffer);
+	free(fb);
 }
 
-void DCanvas::Update ()
+void V_Update ()
 {
-	ComputePalette();
-	present();
+	V_ComputePalette();
+	V_Present();
 }
 
-void DCanvas::ShowFrame ()
+void V_ShowFrame ()
 {
 	// Re-present path (no game tics elapsed this retro_run). We do not assume
 	// lr_buffer_ still holds the last frame: a frontend buffer is only valid
-	// for the retro_run that requested it, so re-expand. ComputePalette() is a
-	// no-op unless the palette changed.
-	present();
+	// for the retro_run that requested it, so re-expand. V_ComputePalette() is
+	// a no-op unless the palette changed.
+	V_Present();
 }
 
-bool DCanvas::SetFlash (PalEntry rgb, int amount)
+bool V_SetFlash (PalEntry rgb, int amount)
 {
-	Flash = rgb;
-	FlashAmount = amount;
-	PaletteNeedsUpdate = true;
+	screen->Flash = rgb;
+	screen->FlashAmount = amount;
+	screen->PaletteNeedsUpdate = true;
 	return true;
+}
+
+void V_GetFlash (PalEntry &rgb, int &amount)
+{
+	rgb = screen->Flash;
+	amount = screen->FlashAmount;
 }
 
 // Expand the 8bpp indexed Buffer into dst (bpp-sized pixels). dst_stride is in
 // pixels, not bytes. The per-pixel work is a dependent byte-indexed palette
 // lookup that no SSE2/NEON gather can vectorise; the bpp branch is hoisted out
 // of the loops so the inner loop is a tight unrolled lookup of one pixel type.
-void DCanvas::expand_palette (void *dst, int dst_stride)
+static void V_ExpandPalette (void *dst, int dst_stride)
 {
-	const int w = width_;
-	if (bpp == 32)
+	const int w = screen->width_;
+	if (screen->bpp == 32)
 	{
-		const uint32_t * const pal = effective_palette_;
-		const uint8_t *src_row = Buffer;
+		const uint32_t * const pal = screen->effective_palette_;
+		const uint8_t *src_row = screen->Buffer;
 		uint32_t *dst_row = (uint32_t *) dst;
-		for (int y = 0; y < height_; y++) {
+		for (int y = 0; y < screen->height_; y++) {
 			const uint8_t * const s = src_row;
 			uint32_t * const d = dst_row;
 			int x = 0;
@@ -209,16 +226,16 @@ void DCanvas::expand_palette (void *dst, int dst_stride)
 			}
 			for (; x < w; x++)
 				d[x] = pal[s[x]];
-			src_row += Pitch;
+			src_row += screen->Pitch;
 			dst_row += dst_stride;
 		}
 	}
 	else
 	{
-		const uint32_t * const pal = effective_palette_;
-		const uint8_t *src_row = Buffer;
+		const uint32_t * const pal = screen->effective_palette_;
+		const uint8_t *src_row = screen->Buffer;
 		uint16_t *dst_row = (uint16_t *) dst;
-		for (int y = 0; y < height_; y++) {
+		for (int y = 0; y < screen->height_; y++) {
 			const uint8_t * const s = src_row;
 			uint16_t * const d = dst_row;
 			int x = 0;
@@ -230,7 +247,7 @@ void DCanvas::expand_palette (void *dst, int dst_stride)
 			}
 			for (; x < w; x++)
 				d[x] = (uint16_t) pal[s[x]];
-			src_row += Pitch;
+			src_row += screen->Pitch;
 			dst_row += dst_stride;
 		}
 	}
@@ -238,8 +255,8 @@ void DCanvas::expand_palette (void *dst, int dst_stride)
 
 // Ask the frontend for a software framebuffer valid for this retro_run frame.
 // On success sets *out_pixels / *out_pitch_bytes and returns true; returns
-// false (use lr_buffer_) when unsupported, dimensions/format mismatch, etc.
-bool DCanvas::query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes)
+// false (use screen->lr_buffer_) when unsupported, dimensions/format mismatch, etc.
+static bool V_QueryFrontendFB (void **out_pixels, size_t *out_pitch_bytes)
 {
 	struct retro_framebuffer fb;
 
@@ -252,30 +269,30 @@ bool DCanvas::query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes)
 		return false;
 
 	memset (&fb, 0, sizeof(fb));
-	fb.width        = (unsigned) width_;
-	fb.height       = (unsigned) height_;
+	fb.width        = (unsigned) screen->width_;
+	fb.height       = (unsigned) screen->height_;
 	fb.access_flags = RETRO_MEMORY_ACCESS_WRITE;
 
 	if (!environ_cb (RETRO_ENVIRONMENT_GET_CURRENT_SOFTWARE_FRAMEBUFFER, &fb))
 		return false;
 	if (fb.data == NULL)
 		return false;
-	if (fb.width != (unsigned) width_ || fb.height != (unsigned) height_)
+	if (fb.width != (unsigned) screen->width_ || fb.height != (unsigned) screen->height_)
 		return false;
 
 	// Only render directly when the frontend's format matches what
-	// expand_palette() produces for this bpp.
+	// expand_palette() produces for this screen->bpp.
 	enum retro_pixel_format expected;
 #ifdef PS2
 	// PS2 packs custom BGR byte orders that match neither XRGB8888 nor RGB565,
 	// so never render directly into a frontend-owned buffer there.
 	expected = (enum retro_pixel_format) -1;
 #else
-	expected = (bpp == 32) ? RETRO_PIXEL_FORMAT_XRGB8888 : RETRO_PIXEL_FORMAT_RGB565;
+	expected = (screen->bpp == 32) ? RETRO_PIXEL_FORMAT_XRGB8888 : RETRO_PIXEL_FORMAT_RGB565;
 #endif
 	if (fb.format != expected)
 		return false;
-	if (fb.pitch < (size_t) (width_ * (bpp / 8)))
+	if (fb.pitch < (size_t) (screen->width_ * (screen->bpp / 8)))
 		return false;
 
 	*out_pixels      = fb.data;
@@ -283,52 +300,52 @@ bool DCanvas::query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes)
 	return true;
 }
 
-void DCanvas::present ()
+static void V_Present ()
 {
 	void *out_pixels;
 	size_t out_pitch_bytes;
-	const int px = bpp / 8;
-	if (query_frontend_fb (&out_pixels, &out_pitch_bytes)) {
-		expand_palette (out_pixels, (int) (out_pitch_bytes / px));
+	const int px = screen->bpp / 8;
+	if (V_QueryFrontendFB (&out_pixels, &out_pitch_bytes)) {
+		V_ExpandPalette (out_pixels, (int) (out_pitch_bytes / px));
 		if (video_cb)
-			video_cb (out_pixels, width_, height_, out_pitch_bytes);
+			video_cb (out_pixels, screen->width_, screen->height_, out_pitch_bytes);
 	} else {
-		expand_palette (lr_buffer_, lr_pitch_ / px);
+		V_ExpandPalette (screen->lr_buffer_, screen->lr_pitch_ / px);
 		if (video_cb)
-			video_cb (lr_buffer_, width_, height_, lr_pitch_);
+			video_cb (screen->lr_buffer_, screen->width_, screen->height_, screen->lr_pitch_);
 	}
 	g_state.frame_counter++;
 }
 
-void DCanvas::ComputePalette ()
+static void V_ComputePalette ()
 {
-	if (!PaletteNeedsUpdate)
+	if (!screen->PaletteNeedsUpdate)
 		return;
-	PaletteNeedsUpdate = false;
-	memcpy (FlashedPalette, SourcePalette, 256*sizeof(PalEntry));
-	if (FlashAmount)
-		DoBlending (FlashedPalette, FlashedPalette, 256, Flash.r, Flash.g, Flash.b, FlashAmount);
+	screen->PaletteNeedsUpdate = false;
+	memcpy (screen->FlashedPalette, screen->SourcePalette, 256*sizeof(PalEntry));
+	if (screen->FlashAmount)
+		DoBlending (screen->FlashedPalette, screen->FlashedPalette, 256, screen->Flash.r, screen->Flash.g, screen->Flash.b, screen->FlashAmount);
 
-	if (bpp == 32)
+	if (screen->bpp == 32)
 	{
 		for (int i = 0; i < 256; i++)
 #ifdef PS2
-			effective_palette_[i] =
-				(FlashedPalette[i].b<<16) | (FlashedPalette[i].g<<8) | (FlashedPalette[i].r);
+			screen->effective_palette_[i] =
+				(screen->FlashedPalette[i].b<<16) | (screen->FlashedPalette[i].g<<8) | (screen->FlashedPalette[i].r);
 #else
-			effective_palette_[i] =
-				(FlashedPalette[i].r<<16) | (FlashedPalette[i].g<<8) | (FlashedPalette[i].b);
+			screen->effective_palette_[i] =
+				(screen->FlashedPalette[i].r<<16) | (screen->FlashedPalette[i].g<<8) | (screen->FlashedPalette[i].b);
 #endif
 	}
 	else
 	{
 		for (int i = 0; i < 256; i++)
 #ifdef PS2
-			effective_palette_[i] =
-				(FlashedPalette[i].b >> 3 << 10) | (FlashedPalette[i].g >> 3 << 5) | (FlashedPalette[i].r >> 3);
+			screen->effective_palette_[i] =
+				(screen->FlashedPalette[i].b >> 3 << 10) | (screen->FlashedPalette[i].g >> 3 << 5) | (screen->FlashedPalette[i].r >> 3);
 #else
-			effective_palette_[i] =
-				(FlashedPalette[i].r >> 3 << 11) | (FlashedPalette[i].g >> 2 << 5) | (FlashedPalette[i].b >> 3);
+			screen->effective_palette_[i] =
+				(screen->FlashedPalette[i].r >> 3 << 11) | (screen->FlashedPalette[i].g >> 2 << 5) | (screen->FlashedPalette[i].b >> 3);
 #endif
 	}
 }
@@ -339,8 +356,8 @@ public:
 	LibretroVideo () {}
 	~LibretroVideo () {}
 
-	DCanvas *CreateFrameBuffer (int width, int height) {
-		return new DCanvas(width, height, bpp);
+	framebuffer_t *CreateFrameBuffer (int width, int height) {
+		return V_NewFrameBuffer(width, height, bpp);
 	}
 };
 
@@ -362,18 +379,18 @@ bool IVideo::SetResolution (int width, int height)
 	assert(CleanHeight >= 200);
 
 	if (screen) {
-		memcpy (palette, screen->GetPalette(), sizeof(PalEntry)*256);
+		memcpy (palette, V_GetPalette(), sizeof(PalEntry)*256);
 	} else {
 		memcpy (palette, GPalette.BaseColors, sizeof(PalEntry)*256);
 	}
 
 	if (screen) {
-		delete screen;
+		V_DeleteFrameBuffer(screen);
 	}
 
 	screen = Video->CreateFrameBuffer(width, height);
-	memcpy (screen->GetPalette(), palette, sizeof(PalEntry)*256);
-	screen->UpdatePalette();
+	memcpy (V_GetPalette(), palette, sizeof(PalEntry)*256);
+	V_UpdatePalette();
 	
 	return true;
 }
@@ -391,7 +408,7 @@ void I_InitGraphics () {
 
 void I_ShutdownGraphics () {
 	if (screen) {
-		delete screen;
+		V_DeleteFrameBuffer(screen);
 		screen = NULL;
 	}
 }
@@ -1439,7 +1456,7 @@ void retro_run(void)
 	unsigned frametics = tics;
 
 	if (tics == 0) {
-		screen->ShowFrame();
+		V_ShowFrame();
 		in_retro_run = false;
 		return;
 	}
@@ -1800,13 +1817,13 @@ void SerializeExtra(FArchive &arc, bool &isGameless, uint32_t &version)
 	PalEntry flash = PalEntry(0,0,0);
 	int amount = 0;
 	if (arc.IsStoring() && screen) {
-		screen->GetFlash(flash, amount);
+		V_GetFlash(flash, amount);
 	}
 	arc << flash;
 	arc << (int32_t &) amount;
 	if (serialize_version >= 10) {
 		if (screen) {
-			PalEntry *palette = screen->GetPalette();
+			PalEntry *palette = V_GetPalette();
 			for (int i = 0; i < 256; i++)
 				arc << palette[i];
 		} else {
@@ -1817,7 +1834,7 @@ void SerializeExtra(FArchive &arc, bool &isGameless, uint32_t &version)
 	}
 
 	if (!arc.IsStoring() && screen) {
-		screen->SetFlash(flash, amount);
+		V_SetFlash(flash, amount);
 	}
 
 	if (serialize_version >= 5) {

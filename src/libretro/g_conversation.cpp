@@ -126,7 +126,7 @@ bool quizHandle(wl_state_t *state, const wl_input_state_t *input)
 		state->quizMenu->drawBackground();
 
 		int size = BigFont->StringWidth(response);
-		screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::MENU_SELECTION], 160-size/2, 88, response,
+		V_DrawText(BigFont, gameinfo.FontColors[GameInfo::MENU_SELECTION], 160-size/2, 88, response,
 				 DTA_Clean, true,
 				 TAG_DONE);
 		

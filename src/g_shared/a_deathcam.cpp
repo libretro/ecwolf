@@ -115,7 +115,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 		fadey = StatusBar->GetHeight(true);
 		fadeh = 200-StatusBar->GetHeight(false) - fadey + 1;
 	}
-	screen->VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
+	V_VirtualToRealCoords(fadex, fadey, fadew, fadeh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), 0., fadey, screenWidth, fadeh);
 
 	uint16_t width, height;

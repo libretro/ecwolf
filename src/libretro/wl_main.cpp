@@ -379,7 +379,7 @@ static bool DrawStartupConsole(FString statusStr)
 	if(hasSignon)
 		CA_CacheScreen(TexMan(gameinfo.SignonLump));
 	else
-		screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
+		V_Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
 
 	uint16_t width, height;
 

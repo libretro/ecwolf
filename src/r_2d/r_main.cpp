@@ -62,15 +62,15 @@ void (STACK_ARGS *hcolfunc_post4) (int sx, int yl, int yh);
 
 void R_SetupBuffer(void)
 {
-	int pitch = screen->GetPitch();
-	uint8_t *lineptr = screen->GetBuffer();
+	int pitch = V_GetPitch();
+	uint8_t *lineptr = V_GetBuffer();
 	if (dc_pitch != pitch)
 	{
 		dc_pitch = pitch;
 		R_InitFuzzTable (pitch);
 	}
 	dc_destorg = lineptr;
-	for (int i = 0; i < screen->GetHeight(); i++)
+	for (int i = 0; i < V_GetHeight(); i++)
 		ylookup[i] = i * pitch;
 }
 

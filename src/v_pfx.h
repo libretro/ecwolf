@@ -35,7 +35,7 @@
 #define __V_PFX_H__
 
 //
-// Pixel format conversion routines, for use with DCanvas implementations
+// Pixel format conversion routines.
 //
 
 union PfxUnion

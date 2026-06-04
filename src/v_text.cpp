@@ -51,7 +51,7 @@
 //
 // Write a string using the given font
 //
-void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *string, va_list taglist)
+void V_DrawTextV(FFont *font, int normalcolor, int x, int y, const char *string, va_list taglist)
 {
 	INTBOOL boolval;
 	va_list tags;
@@ -207,7 +207,7 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 			if (forcedwidth)
 			{
 				w = forcedwidth;
-				DrawTexture (pic, cx, cy,
+				V_DrawTexture (pic, cx, cy,
 					DTA_Translation, range,
 					DTA_DestWidth, forcedwidth,
 					DTA_DestHeight, height,
@@ -215,7 +215,7 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 			}
 			else
 			{
-				DrawTexture (pic, cx, cy,
+				V_DrawTexture (pic, cx, cy,
 					DTA_Translation, range,
 					TAG_MORE, &tags);
 			}
@@ -226,11 +226,11 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 	va_end(taglist);
 }
 
-void STACK_ARGS DCanvas::DrawText (FFont *font, int normalcolor, int x, int y, const char *string, ...)
+void STACK_ARGS V_DrawText (FFont *font, int normalcolor, int x, int y, const char *string, ...)
 {
 	va_list tags;
 	va_start(tags, string);
-	DrawTextV(font, normalcolor, x, y, string, tags);
+	V_DrawTextV(font, normalcolor, x, y, string, tags);
 }
 
 //

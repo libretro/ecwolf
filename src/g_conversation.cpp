@@ -494,7 +494,7 @@ void QuizMenu::draw() const
 	unsigned int ly = 26;
 	for(FBrokenLines *line = lines;line->Width != -1;++line)
 	{
-		screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, line->Text,
+		V_DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, line->Text,
 				 DTA_Clean, true,
 				 TAG_DONE
 			);
@@ -504,7 +504,7 @@ void QuizMenu::draw() const
 
 	if(gamestate.difficulty->QuizHints)
 	{
-		screen->DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, hint,
+		V_DrawText(BigFont, gameinfo.FontColors[GameInfo::DIALOG], 26, ly, hint,
 				 DTA_Clean, true,
 				 TAG_DONE
 			);

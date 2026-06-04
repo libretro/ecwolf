@@ -11,14 +11,14 @@ uint32_t Col2RGB8_Inverse[65][256];
 
 //==========================================================================
 //
-// DCanvas :: FlatFill
+// V_FlatFill
 //
 // Fill an area with a texture. If local_origin is false, then the origin
 // used for the wrapping is (0,0). Otherwise, (left,right) is used.
 //
 //==========================================================================
 
-void DCanvas::FlatFill (int left, int top, int right, int bottom, FTexture *src, bool local_origin)
+void V_FlatFill (int left, int top, int right, int bottom, FTexture *src, bool local_origin)
 {
 	int w = src->GetWidth();
 	int h = src->GetHeight();
@@ -28,7 +28,7 @@ void DCanvas::FlatFill (int left, int top, int right, int bottom, FTexture *src,
 	{
 		for (int x = local_origin ? left : (left / w * w); x < right; x += w)
 		{
-			DrawTexture (src, x, y,
+			V_DrawTexture (src, x, y,
 				DTA_ClipLeft, left,
 				DTA_ClipRight, right,
 				DTA_ClipTop, top,
@@ -42,13 +42,13 @@ void DCanvas::FlatFill (int left, int top, int right, int bottom, FTexture *src,
 
 //==========================================================================
 //
-// DCanvas :: Dim
+// V_Dim
 //
 // Applies a colored overlay to the entire screen.
 //
 //==========================================================================
 
-void DCanvas::Dim (PalEntry color)
+void V_Dim (PalEntry color)
 {
 	PalEntry dimmer = PalEntry(0xffd700);
 	float amount    = -1.0f;
@@ -60,18 +60,18 @@ void DCanvas::Dim (PalEntry color)
 		dimmer = PalEntry (uint8_t(dim[0]*255), uint8_t(dim[1]*255), uint8_t(dim[2]*255));
 		amount = dim[3];
 	}
-	Dim (dimmer, amount, 0, 0, Width, Height);
+	V_DimRect (dimmer, amount, 0, 0, screen->Width, screen->Height);
 }
 
 //==========================================================================
 //
-// DCanvas :: Dim
+// V_Dim
 //
 // Applies a colored overlay to an area of the screen.
 //
 //==========================================================================
 
-void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
+void V_DimRect (PalEntry color, float damount, int x1, int y1, int w, int h)
 {
 	if (damount == 0.f)
 		return;
@@ -82,12 +82,12 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	uint8_t *spot;
 	int x, y;
 
-	if (x1 >= Width || y1 >= Height)
+	if (x1 >= screen->Width || y1 >= screen->Height)
 		return;
-	if (x1 + w > Width)
-		w = Width - x1;
-	if (y1 + h > Height)
-		h = Height - y1;
+	if (x1 + w > screen->Width)
+		w = screen->Width - x1;
+	if (y1 + h > screen->Height)
+		h = screen->Height - y1;
 	if (w <= 0 || h <= 0)
 		return;
 
@@ -100,8 +100,8 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 			 (((color.b * amount) >> 4) << 10);
 	}
 
-	spot = Buffer + x1 + y1*Pitch;
-	gap = Pitch - w;
+	spot = screen->Buffer + x1 + y1*screen->Pitch;
+	gap = screen->Pitch - w;
 	for (y = h; y != 0; y--)
 	{
 		for (x = w; x != 0; x--)
@@ -122,7 +122,7 @@ uint8_t RGB32k[32][32][32];
 
 // [RH] The framebuffer is no longer a mere uint8_t array.
 // There's also only one, not four.
-DCanvas *screen;
+framebuffer_t *screen;
 
 void GenerateLookupTables(void)
 {

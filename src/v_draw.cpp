@@ -51,6 +51,46 @@
 #include "c_cvars.h"
 #include "wl_main.h"
 
+// DrawParms and the helpers below were members of the old DCanvas class; they
+// are internal to the 2D texture-draw path and now live file-local here.
+struct DrawParms
+{
+	double x, y;
+	double texwidth;
+	double texheight;
+	double destwidth;
+	double destheight;
+	double virtWidth;
+	double virtHeight;
+	double windowleft;
+	double windowright;
+	int dclip;
+	int uclip;
+	int lclip;
+	int rclip;
+	double top;
+	double left;
+	fixed_t alpha;
+	uint32_t fillcolor;
+	FRemapTable *remap;
+	const uint8_t *translation;
+	uint32_t colorOverlay;
+	INTBOOL alphaChannel;
+	INTBOOL flipX;
+	fixed_t shadowAlpha;
+	int shadowColor;
+	INTBOOL keepratio;
+	INTBOOL masked;
+	INTBOOL bilinear;
+	FRenderStyle style;
+	struct FSpecialColormap *specialcolormap;
+	struct FColormapStyle *colormapstyle;
+};
+
+static void STACK_ARGS V_DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
+static bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw);
+static void PUTTRANSDOT (int xx, int yy, int basecolor, int level);
+
 static inline void clearbufshort(void *buffer, unsigned int count, uint16_t clear)
 {
 	uint16_t *b = reinterpret_cast<uint16_t*>(buffer), * const end = reinterpret_cast<uint16_t*>(buffer)+count;
@@ -93,14 +133,14 @@ static int PalFromRGB(uint32_t rgb)
 	return LastPal;
 }
 
-void STACK_ARGS DCanvas::DrawTexture (FTexture *img, double x, double y, int tags_first, ...)
+void STACK_ARGS V_DrawTexture (FTexture *img, double x, double y, int tags_first, ...)
 {
 	va_list tags;
 	va_start(tags, tags_first);
-	DrawTextureV(img, x, y, tags_first, tags);
+	V_DrawTextureV(img, x, y, tags_first, tags);
 }
 
-void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32_t tag, va_list tags)
+static void STACK_ARGS V_DrawTextureV(FTexture *img, double x, double y, uint32_t tag, va_list tags)
 {
 	FTexture::Span unmaskedSpan[2];
 	const FTexture::Span **spanptr, *spans;
@@ -156,7 +196,7 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32_
 	ESPSResult mode = R_SetPatchStyle (parms.style, parms.alpha, 0, parms.fillcolor);
 
 	uint8_t *destorgsave = dc_destorg;
-	dc_destorg = screen->GetBuffer();
+	dc_destorg = screen->Buffer;
 
 	double x0 = parms.x - parms.left * parms.destwidth / parms.texwidth;
 	double y0 = parms.y - parms.top * parms.destheight / parms.texheight;
@@ -197,13 +237,13 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32_
 
 		if (bottomclipper[0] != parms.dclip)
 		{
-			clearbufshort(bottomclipper, screen->GetWidth(), (short)parms.dclip);
+			clearbufshort(bottomclipper, screen->Width, (short)parms.dclip);
 		}
 		if (parms.uclip != 0)
 		{
 			if (topclipper[0] != parms.uclip)
 			{
-				clearbufshort(topclipper, screen->GetWidth(), (short)parms.uclip);
+				clearbufshort(topclipper, screen->Width, (short)parms.uclip);
 			}
 			mceilingclip = topclipper;
 		}
@@ -297,7 +337,7 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32_
 
 }
 
-bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const
+static bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw)
 {
 	INTBOOL boolval;
 	int intval;
@@ -323,10 +363,10 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 
 	parms->windowleft = 0;
 	parms->windowright = parms->texwidth;
-	parms->dclip = this->GetHeight();
+	parms->dclip = screen->Height;
 	parms->uclip = 0;
 	parms->lclip = 0;
-	parms->rclip = this->GetWidth();
+	parms->rclip = screen->Width;
 	parms->destwidth = parms->windowright;
 	parms->destheight = parms->texheight;
 	parms->top = img->GetScaledTopOffset();
@@ -340,8 +380,8 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 	parms->flipX = false;
 	parms->shadowAlpha = 0;
 	parms->shadowColor = 0;
-	parms->virtWidth = this->GetWidth();
-	parms->virtHeight = this->GetHeight();
+	parms->virtWidth = screen->Width;
+	parms->virtHeight = screen->Height;
 	parms->keepratio = false;
 	parms->style.BlendOp = 255;		// Dummy "not set" value
 	parms->masked = true;
@@ -395,8 +435,8 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 			boolval = va_arg(tags, INTBOOL);
 			if (boolval)
 			{
-				parms->x = (parms->x - 160.0) * CleanXfac + (Width * 0.5);
-				parms->y = (parms->y - 100.0) * CleanYfac + (Height * 0.5);
+				parms->x = (parms->x - 160.0) * CleanXfac + (screen->Width * 0.5);
+				parms->y = (parms->y - 100.0) * CleanYfac + (screen->Height * 0.5);
 				parms->destwidth = parms->texwidth * CleanXfac;
 				parms->destheight = parms->texheight * CleanYfac;
 			}
@@ -446,11 +486,11 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 				intval      = va_arg(tags, int);
 
 				if (intval == HUD_HorizCenter)
-					parms->x += Width * 0.5;
+					parms->x += screen->Width * 0.5;
 				else if (xright)
-					parms->x = Width + parms->x;
+					parms->x = screen->Width + parms->x;
 				if (ybot)
-					parms->y = Height + parms->y;
+					parms->y = screen->Height + parms->y;
 			}
 			break;
 
@@ -566,9 +606,9 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 
 		case DTA_ClipBottom:
 			parms->dclip = va_arg(tags, int);
-			if (parms->dclip > this->GetHeight())
+			if (parms->dclip > screen->Height)
 			{
-				parms->dclip = this->GetHeight();
+				parms->dclip = screen->Height;
 			}
 			break;
 
@@ -582,8 +622,8 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 
 		case DTA_ClipRight:
 			parms->rclip = va_arg(tags, int);
-			if (parms->rclip > this->GetWidth())
-				parms->rclip = this->GetWidth();
+			if (parms->rclip > screen->Width)
+				parms->rclip = screen->Width;
 			break;
 
 		case DTA_ShadowAlpha:
@@ -642,9 +682,9 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 		return false;
 	}
 
-	if (parms->virtWidth != Width || parms->virtHeight != Height)
+	if (parms->virtWidth != screen->Width || parms->virtHeight != screen->Height)
 	{
-		VirtualToRealCoords(parms->x, parms->y, parms->destwidth, parms->destheight,
+		V_VirtualToRealCoords(parms->x, parms->y, parms->destwidth, parms->destheight,
 			parms->virtWidth, parms->virtHeight, virtBottom, !parms->keepratio);
 	}
 
@@ -673,10 +713,10 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 	return true;
 }
 
-void DCanvas::VirtualToRealCoords(double &x, double &y, double &w, double &h,
-	double vwidth, double vheight, bool vbottom, bool handleaspect) const
+void V_VirtualToRealCoords(double &x, double &y, double &w, double &h,
+	double vwidth, double vheight, bool vbottom, bool handleaspect)
 {
-	int myratio = handleaspect ? CheckRatio (Width, Height) : 0;
+	int myratio = handleaspect ? CheckRatio (screen->Width, screen->Height) : 0;
 	double right = x + w;
 	double bottom = y + h;
 
@@ -685,28 +725,28 @@ void DCanvas::VirtualToRealCoords(double &x, double &y, double &w, double &h,
 	  // specified virtual size to avoid undesired stretching of the
 	  // image. Does not handle non-4:3 virtual sizes. I'll worry about
 	  // those if somebody expresses a desire to use them.
-		x = (x - vwidth * 0.5) * Width * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + Width * 0.5;
-		w = (right - vwidth * 0.5) * Width * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + Width * 0.5 - x;
+		x = (x - vwidth * 0.5) * screen->Width * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screen->Width * 0.5;
+		w = (right - vwidth * 0.5) * screen->Width * 960 / (vwidth * AspectCorrection[myratio].baseWidth) + screen->Width * 0.5 - x;
 	}
 	else
 	{
-		x = x * Width / vwidth;
-		w = right * Width / vwidth - x;
+		x = x * screen->Width / vwidth;
+		w = right * screen->Width / vwidth - x;
 	}
 	if (AspectCorrection[myratio].tallscreen)
 	{ // The target surface is 5:4
-		y = (y - vheight * 0.5) * Height * 600 / (vheight * AspectCorrection[myratio].baseHeight) + Height * 0.5;
-		h = (bottom - vheight * 0.5) * Height * 600 / (vheight * AspectCorrection[myratio].baseHeight) + Height * 0.5 - y;
+		y = (y - vheight * 0.5) * screen->Height * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screen->Height * 0.5;
+		h = (bottom - vheight * 0.5) * screen->Height * 600 / (vheight * AspectCorrection[myratio].baseHeight) + screen->Height * 0.5 - y;
 		if (vbottom)
-			y += (Height - Height * AspectCorrection[myratio].multiplier / 48.0) * 0.5;
+			y += (screen->Height - screen->Height * AspectCorrection[myratio].multiplier / 48.0) * 0.5;
 	}
 	else
 	{
-		y = y * Height / vheight;
-		h = bottom * Height / vheight - y;
+		y = y * screen->Height / vheight;
+		h = bottom * screen->Height / vheight - y;
 	}
 }
-void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
+static void PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 {
 	static int oldyy;
 	static int oldyyshifted;
@@ -714,20 +754,20 @@ void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 	if (yy == oldyy+1)
 	{
 		oldyy++;
-		oldyyshifted += GetPitch();
+		oldyyshifted += screen->Pitch;
 	}
 	else if (yy == oldyy-1)
 	{
 		oldyy--;
-		oldyyshifted -= GetPitch();
+		oldyyshifted -= screen->Pitch;
 	}
 	else if (yy != oldyy)
 	{
 		oldyy = yy;
-		oldyyshifted = yy * GetPitch();
+		oldyyshifted = yy * screen->Pitch;
 	}
 
-	uint8_t *spot = GetBuffer() + oldyyshifted + xx;
+	uint8_t *spot = screen->Buffer + oldyyshifted + xx;
 	uint32_t *bg2rgb = Col2RGB8[1+level];
 	uint32_t *fg2rgb = Col2RGB8[63-level];
 	uint32_t fg = fg2rgb[basecolor];
@@ -736,7 +776,7 @@ void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 	*spot = RGB32k[0][0][bg&(bg>>15)];
 }
 
-void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor)
+void V_DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor)
 {
 	const int WeightingScale = 0;
 	const int WEIGHTBITS = 6;
@@ -747,7 +787,7 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t re
 	if (palColor < 0)
 		palColor = PalFromRGB(realcolor);
 
-	Lock();
+
 	int deltaX, deltaY, xDir;
 
 	if (y0 > y1)
@@ -774,12 +814,12 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t re
 		{
 			swapvalues (x0, x1);
 		}
-		memset (GetBuffer() + y0*GetPitch() + x0, palColor, deltaX+1);
+		memset (screen->Buffer + y0*screen->Pitch + x0, palColor, deltaX+1);
 	}
 	else if (deltaX == 0)
 	{ // vertical line
-		uint8_t *spot = GetBuffer() + y0*GetPitch() + x0;
-		int pitch = GetPitch ();
+		uint8_t *spot = screen->Buffer + y0*screen->Pitch + x0;
+		int pitch = screen->Pitch;
 		do
 		{
 			*spot = palColor;
@@ -788,8 +828,8 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t re
 	}
 	else if (deltaX == deltaY)
 	{ // diagonal line.
-		uint8_t *spot = GetBuffer() + y0*GetPitch() + x0;
-		int advance = GetPitch() + xDir;
+		uint8_t *spot = screen->Buffer + y0*screen->Pitch + x0;
+		int advance = screen->Pitch + xDir;
 		do
 		{
 			*spot = palColor;
@@ -890,18 +930,18 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t re
 		}
 		PUTTRANSDOT (x1, y1, palColor, 0);
 	}
-	Unlock();
+
 }
 
 //==========================================================================
 //
-// DCanvas :: Clear
+// V_Clear
 //
 // Set an area to a specified color.
 //
 //==========================================================================
 
-void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color)
+void V_Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color)
 {
 	int x, y;
 	uint8_t *dest;
@@ -909,36 +949,36 @@ void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uin
 	if (left == right || top == bottom)
 		return;
 
-	if (left >= Width || right <= 0 || top >= Height || bottom <= 0)
+	if (left >= screen->Width || right <= 0 || top >= screen->Height || bottom <= 0)
 		return;
 	left = MAX(0,left);
-	right = MIN(Width,right);
+	right = MIN(screen->Width,right);
 	top = MAX(0,top);
-	bottom = MIN(Height,bottom);
+	bottom = MIN(screen->Height,bottom);
 
 	if (palcolor < 0)
 	{
 		if (APART(color) != 255)
 		{
-			Dim(color, APART(color)/255.f, left, top, right - left, bottom - top);
+			V_DimRect(color, APART(color)/255.f, left, top, right - left, bottom - top);
 			return;
 		}
 
 		palcolor = PalFromRGB(color);
 	}
 
-	dest = Buffer + top * Pitch + left;
+	dest = screen->Buffer + top * screen->Pitch + left;
 	x = right - left;
 	for (y = top; y < bottom; y++)
 	{
 		memset(dest, palcolor, x);
-		dest += Pitch;
+		dest += screen->Pitch;
 	}
 }
 
 //==========================================================================
 //
-// DCanvas :: FillSimplePoly
+// V_FillSimplePoly
 //
 // Fills a simple polygon with a texture. Here, "simple" means that a
 // horizontal scanline at any vertical position within the polygon will
@@ -951,7 +991,7 @@ void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uin
 //
 //==========================================================================
 
-void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
+void V_FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	double originx, double originy, double scalex, double scaley, angle_t rotation,
 	FDynamicColormap *colormap, int lightlevel, int palcolor, uint32_t rgbcolor)
 {
@@ -966,7 +1006,7 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	bool dorotate = rot != 0;
 	double cosrot = 1, sinrot = 0;
 
-	if (--npoints < 2 || Buffer == NULL)
+	if (--npoints < 2 || screen->Buffer == NULL)
 	{ // not a polygon or we're not locked
 		return;
 	}
@@ -993,9 +1033,9 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 			rightx = points[i].X;
 		}
 	}
-	if (topy >= Height ||		// off the bottom of the screen
+	if (topy >= screen->Height ||		// off the bottom of the screen
 			boty <= 0 ||			// off the top of the screen
-			leftx >= Width ||		// off the right of the screen
+			leftx >= screen->Width ||		// off the right of the screen
 			rightx <= 0)			// off the left of the screen
 	{
 		return;
@@ -1027,13 +1067,13 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	{
 		x = FLOAT2FIXED(points[pt1].X + 0.5f);
 		y2 = xs_RoundToInt(points[pt2].Y + 0.5f);
-		if (y1 >= y2 || (y1 < 0 && y2 < 0) || (y1 >= Height && y2 >= Height))
+		if (y1 >= y2 || (y1 < 0 && y2 < 0) || (y1 >= screen->Height && y2 >= screen->Height))
 		{
 		}
 		else
 		{
 			fixed_t xinc = FLOAT2FIXED((points[pt2].X - points[pt1].X) / (points[pt2].Y - points[pt1].Y));
-			int y3 = MIN(y2, Height);
+			int y3 = MIN(y2, screen->Height);
 			if (y1 < 0)
 			{
 				x += xinc * -y1;
@@ -1041,7 +1081,7 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 			}
 			for (y = y1; y < y3; ++y)
 			{
-				spanend[y] = clamp<short>(x >> FRACBITS, -1, Width);
+				spanend[y] = clamp<short>(x >> FRACBITS, -1, screen->Width);
 				x += xinc;
 			}
 		}
@@ -1058,13 +1098,13 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	{
 		x = FLOAT2FIXED(points[pt1].X + 0.5f);
 		y2 = xs_RoundToInt(points[pt2].Y + 0.5f);
-		if (y1 >= y2 || (y1 < 0 && y2 < 0) || (y1 >= Height && y2 >= Height))
+		if (y1 >= y2 || (y1 < 0 && y2 < 0) || (y1 >= screen->Height && y2 >= screen->Height))
 		{
 		}
 		else
 		{
 			fixed_t xinc = FLOAT2FIXED((points[pt2].X - points[pt1].X) / (points[pt2].Y - points[pt1].Y));
-			int y3 = MIN(y2, Height);
+			int y3 = MIN(y2, screen->Height);
 			if (y1 < 0)
 			{
 				x += xinc * -y1;
@@ -1074,10 +1114,10 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 			{
 				int x1 = x >> FRACBITS;
 				int x2 = spanend[y];
-				if (x2 > x1 && x2 > 0 && x1 < Width)
+				if (x2 > x1 && x2 > 0 && x1 < screen->Width)
 				{
 					x1 = MAX(x1, 0);
-					x2 = MIN(x2, Width);
+					x2 = MIN(x2, screen->Width);
 
 					if(tex)
 					{
@@ -1098,7 +1138,7 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 						R_DrawSpanP_C();
 					}
 					else
-						memset(this->Buffer + y * this->Pitch + x1, palcolor, x2 - x1);
+						memset(screen->Buffer + y * screen->Pitch + x1, palcolor, x2 - x1);
 				}
 				x += xinc;
 			}

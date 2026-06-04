@@ -118,8 +118,7 @@ void VW_MeasurePropString (FFont *font, const char *string, uint16_t &width, uin
 
 void VH_UpdateScreen()
 {
-	screen->Update();
-	screen->Lock(false);
+	V_Update();
 }
 
 /*
@@ -196,10 +195,8 @@ void VH_Startup()
 uint8_t *fizzleSurface = NULL;
 void FizzleFadeStart()
 {
-	screen->Lock(false);
 	fizzleSurface = new uint8_t[SCREENHEIGHT*SCREENPITCH];
-	memcpy(fizzleSurface, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
-	screen->Unlock();
+	memcpy(fizzleSurface, V_GetBuffer(), SCREENHEIGHT*SCREENPITCH);
 }
 bool FizzleFade (int x1, int y1,
 	unsigned width, unsigned height, unsigned frames, bool abortable)
@@ -214,7 +211,6 @@ bool FizzleFade (int x1, int y1,
 	IN_StartAck ();
 
 	frame = GetTimeCount();
-	screen->Lock(false);
 	// The screen buffer currently holds the target image (drawn by the caller
 	// after FizzleFadeStart snapshotted the start image into fizzleSurface).
 	// Snapshot the target into srcptr, then seed the screen buffer with the
@@ -224,9 +220,9 @@ bool FizzleFade (int x1, int y1,
 	// The libretro framebuffer keeps GetBuffer() stable across Update()/Lock(),
 	// so destptr remains valid for the whole fade.
 	uint8_t * const srcptr = new uint8_t[SCREENHEIGHT*SCREENPITCH];
-	memcpy(srcptr, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
-	memcpy(screen->GetBuffer(), fizzleSurface, SCREENHEIGHT*SCREENPITCH);
-	uint8_t * const destptr = screen->GetBuffer();
+	memcpy(srcptr, V_GetBuffer(), SCREENHEIGHT*SCREENPITCH);
+	memcpy(V_GetBuffer(), fizzleSurface, SCREENHEIGHT*SCREENPITCH);
+	uint8_t * const destptr = V_GetBuffer();
 
 	do
 	{
@@ -315,27 +311,26 @@ finished:
 
 void VWB_Clear(int color, int x1, int y1, int x2, int y2)
 {
-	screen->Clear(x1, y1, x2, y2, color, GPalette.BaseColors[color]);
+	V_Clear(x1, y1, x2, y2, color, GPalette.BaseColors[color]);
 }
 
 void VWB_DrawFill(FTexture *tex, int ix, int iy, int ix2, int iy2, bool local)
 {
-	screen->FlatFill(ix, iy, ix2, iy2, tex, local);
+	V_FlatFill(ix, iy, ix2, iy2, tex, local);
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOffset menu, FRemapTable *remap, bool stencil, uint8_t stencilcolor)
 {
 	double x = ix, y = iy;
 
-	screen->Lock(false);
 	if(menu)
 		MenuToRealCoords(x, y, wd, hd, menu);
 	else
-		screen->VirtualToRealCoords(x, y, wd, hd, 320, 200, true, true);
+		V_VirtualToRealCoords(x, y, wd, hd, 320, 200, true, true);
 
 	if(stencil)
 	{
-		screen->DrawTexture(tex, x, y,
+		V_DrawTexture(tex, x, y,
 			DTA_DestWidthF, wd,
 			DTA_DestHeightF, hd,
 			DTA_Translation, remap,
@@ -344,13 +339,12 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, double wd, double hd, MenuOf
 	}
 	else
 	{
-		screen->DrawTexture(tex, x, y,
+		V_DrawTexture(tex, x, y,
 			DTA_DestWidthF, wd,
 			DTA_DestHeightF, hd,
 			DTA_Translation, remap,
 			TAG_DONE);
 	}
-	screen->Unlock();
 }
 
 void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable *remap, bool stencil, uint8_t stencilcolor)
@@ -364,20 +358,18 @@ void VWB_DrawGraphic(FTexture *tex, int ix, int iy, MenuOffset menu, FRemapTable
 
 void CA_CacheScreen(FTexture* tex, bool noaspect)
 {
-	screen->Lock(false);
-	screen->Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
+	V_Clear(0, 0, SCREENWIDTH, SCREENHEIGHT, GPalette.BlackIndex, 0);
 	if(noaspect)
 	{
-		screen->DrawTexture(tex, 0, 0,
+		V_DrawTexture(tex, 0, 0,
 			DTA_DestWidth, SCREENWIDTH,
 			DTA_DestHeight, SCREENHEIGHT,
 			TAG_DONE);
 	}
 	else
 	{
-		screen->DrawTexture(tex, 0, 0,
+		V_DrawTexture(tex, 0, 0,
 			DTA_Fullscreen, true,
 			TAG_DONE);
 	}
-	screen->Unlock();
 }

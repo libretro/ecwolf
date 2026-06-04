@@ -58,7 +58,7 @@ static void Erase (int x, int y, const char *string, bool rightAlign=false)
 
 	double fw = width;
 	double fh = height;
-	screen->VirtualToRealCoords(nx, ny, fw, fh, 320, 200, true, true);
+	V_VirtualToRealCoords(nx, ny, fw, fh, 320, 200, true, true);
 	VWB_DrawFill(TexMan(levelInfo->GetBorderTexture()), nx, ny, nx+fw, ny+fh);
 }
 
@@ -430,7 +430,7 @@ static double getClearY()
 	// since we need to over clear a bit in order to account for
 	// rounding errors and so we don't need to worry about fonts.
 	double clearx = 0, clearw = 0, clearh = 0;
-	screen->VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
+	V_VirtualToRealCoords(clearx, cleary, clearw, clearh, 320, 200, true, true);
 	return cleary;
 }
 
@@ -668,8 +668,8 @@ bool PreloadUpdate (unsigned current, unsigned total)
 	double ow = w - 1;
 	double oh = h - 1;
 	double ox = x, oy = y;
-	screen->VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
-	screen->VirtualToRealCoords(ox, oy, ow, oh, 320, 200, true, true);
+	V_VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
+	V_VirtualToRealCoords(ox, oy, ow, oh, 320, 200, true, true);
 
 	if (current)
 	{

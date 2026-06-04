@@ -343,8 +343,8 @@ void InitPalette (const char* defpalname)
 
 	if(screen)
 	{
-		memcpy(screen->GetPalette(), GPalette.BaseColors, sizeof(PalEntry)*256);
-		screen->UpdatePalette();
+		memcpy(V_GetPalette(), GPalette.BaseColors, sizeof(PalEntry)*256);
+		V_UpdatePalette();
 	}
 }
 
@@ -398,5 +398,5 @@ void V_ForceBlend (int blendr, int blendg, int blendb, int blenda)
 	BlendB = blendb;
 	BlendA = blenda;
 
-	screen->SetFlash (PalEntry (BlendR, BlendG, BlendB), BlendA);
+	V_SetFlash (PalEntry (BlendR, BlendG, BlendB), BlendA);
 }
