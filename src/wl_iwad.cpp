@@ -686,60 +686,6 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 	LookForGameData(datawadRes, basefiles, "/usr/local/share/games/wolf3d");
 #endif
 
-#if !defined(NO_STORE)
-	// Look for a steam install. (Basically from ZDoom)
-	{
-		struct CommercialGameDir
-		{
-			FileSys::ESteamApp app;
-			const char* dir;
-		};
-
-		static const CommercialGameDir steamDirs[] =
-		{
-			{FileSys::APP_Wolfenstein3D, PATH_SEPARATOR "base"},
-			{FileSys::APP_SpearOfDestiny, PATH_SEPARATOR "base"},
-			{FileSys::APP_NoahsArk, ""},
-#if defined(__APPLE__)
-			{FileSys::APP_ThrowbackPack, PATH_SEPARATOR "Blake Stone AOG.app/Contents/Resources/BlakestoneAOG"},
-			{FileSys::APP_ThrowbackPack, PATH_SEPARATOR "Blake Stone PS.app/Contents/Resources/BlakestonePS"}
-#else
-			{FileSys::APP_ThrowbackPack, PATH_SEPARATOR "Blake Stone"},
-			{FileSys::APP_ThrowbackPack, PATH_SEPARATOR "Planet Strike"}
-#endif
-		};
-		for(unsigned int i = 0;i < countof(steamDirs);++i)
-			LookForGameData(datawadRes, basefiles, FileSys::GetSteamPath(steamDirs[i].app) + steamDirs[i].dir);
-
-		static const CommercialGameDir gogDirs[] = 
-		{
-			{FileSys::APP_Wolfenstein3D, ""},
-			{FileSys::APP_SpearOfDestiny, PATH_SEPARATOR "M1"}
-		};
-		for(unsigned int i = 0;i < countof(gogDirs);++i)
-		{
-			FString path = FileSys::GetGOGPath(gogDirs[i].app) + gogDirs[i].dir;
-			LookForGameData(datawadRes, basefiles, path);
-
-			// Find mission packs which GOG was so kind to remove the hack for.
-			if(!path.IsEmpty() && gogDirs[i].app == FileSys::APP_SpearOfDestiny)
-			{
-				for(unsigned int mp = 2;mp <= 3;++mp)
-				{
-					File dir(path.Left(path.Len()-1) + char('0' + mp));
-					TArray<FString> files = dir.getFileList();
-					for(unsigned int f = 0;f < files.Size();++f)
-					{
-						if(files[f].Right(4).CompareNoCase(".SOD") == 0)
-							File(dir, files[f]).rename(files[f].Left(files[f].Len()-4) + ".sd" + char('0' + mp));
-					}
-					LookForGameData(datawadRes, basefiles, dir.getDirectory());
-				}
-			}
-		}
-	}
-#endif
-
 	delete datawadRes;
 
 	// Check requirements now as opposed to with LookForGameData so that reqs

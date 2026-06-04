@@ -1,6 +1,5 @@
 STATIC_LINKING := 0
 AR             := ar
-NO_STORE       := 1
 HAVE_LZMA      := 0
 
 ifneq ($(V),1)
@@ -450,13 +449,8 @@ ifneq ($(platform), emscripten)
 endif
 endif
 
-COMMON_CFLAGS += -DNO_STORE
-
-CFLAGS += $(COMMON_CFLAGS)
-CXXFLAGS += $(COMMON_CFLAGS)
-
-CFLAGS     += $(INCFLAGS)
-CXXFLAGS   += $(INCFLAGS)
+CFLAGS   += $(COMMON_CFLAGS) $(INCFLAGS)
+CXXFLAGS += $(COMMON_CFLAGS) $(INCFLAGS)
 
 OBJOUT   = -o 
 LINKOUT  = -o 

@@ -21,8 +21,7 @@ extern	bool  screenfaded;
 //
 
 // VL_WaitVBL intentionally does nothing in the libretro core: frame pacing is
-// owned by the frontend, and the engine must not sleep on a wall clock. (The
-// only historical callers are under #ifndef LIBRETRO / #ifdef TODO.)
+// owned by the frontend, and the engine must not sleep on a wall clock.
 #define VL_WaitVBL(a) ((void)0)
 
 void VL_ToggleFullscreen();

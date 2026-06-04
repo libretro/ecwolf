@@ -7,13 +7,9 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#if !defined(_WIN32)
-#	include <stdint.h>
-#	include <string.h>
-#	include <stdarg.h>
-#elif defined(__GNUC__) || defined(__LIBRETRO__)
-#	include <stdint.h>
-#endif
+#include <stdint.h>
+#include <string.h>
+#include <stdarg.h>
 #ifdef __MINGW32__
 #include <minwindef.h>
 #endif
