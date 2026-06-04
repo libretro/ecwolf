@@ -184,12 +184,6 @@ public:
 	virtual void Unlock () = 0;
 	virtual bool IsLocked () { return Buffer != NULL; }	// Returns true if the surface is locked
 
-	// Draw a linear block of pixels into the canvas
-	virtual void DrawBlock (int x, int y, int width, int height, const uint8_t *src) const;
-
-	// Reads a linear block of pixels into the view buffer.
-	virtual void GetBlock (int x, int y, int width, int height, uint8_t *dest) const;
-
 	// Dim the entire canvas for the menus
 	virtual void Dim (PalEntry color = 0);
 
@@ -210,26 +204,10 @@ public:
 	// Draws a line
 	virtual void DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor);
 
-	// Draws a single pixel
-	virtual void DrawPixel(int x, int y, int palcolor, uint32_t rgbcolor);
-
-	// Calculate gamma table
-	void CalcGamma (float gamma, uint8_t gammalookup[256]);
-
-
-	// Retrieves a buffer containing image data for a screenshot.
-	// Hint: Pitch can be negative for upside-down images, in which case buffer
-	// points to the last row in the buffer, which will be the first row output.
-	virtual void GetScreenshotBuffer(const uint8_t *&buffer, int &pitch, ESSType &color_type);
-
-	// Releases the screenshot buffer.
-	virtual void ReleaseScreenshotBuffer();
-
 	// Text drawing functions -----------------------------------------------
 
 	// 2D Texture drawing
 	void STACK_ARGS DrawTexture (FTexture *img, double x, double y, int tags, ...);
-	void FillBorder (FTexture *img);	// Fills the border around a 4:3 part of the screen on non-4:3 displays
 	void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom=false, bool handleaspect=true) const;
 
 	// Code that uses these (i.e. SBARINFO) should probably be evaluated for using doubles all around instead.
@@ -285,7 +263,6 @@ protected:
 	int Pitch;
 	int LockCount;
 
-	bool ClipBox (int &left, int &top, int &width, int &height, const uint8_t *&src, const int srcpitch) const;
 	virtual void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
 	bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const;
 
@@ -317,23 +294,6 @@ protected:
 	DSimpleCanvas() {}
 };
 
-// This class represents a native texture, as opposed to an FTexture.
-class FNativeTexture
-{
-public:
-	virtual ~FNativeTexture();
-	virtual bool Update() = 0;
-	virtual bool CheckWrapping(bool wrapping);
-};
-
-// This class represents a texture lookup palette.
-class FNativePalette
-{
-public:
-	virtual ~FNativePalette();
-	virtual bool Update() = 0;
-};
-
 // A canvas that represents the actual display. The video code is responsible
 // for actually implementing this. Built on top of SimpleCanvas, because it
 // needs a system memory buffer when buffered output is enabled.
@@ -352,51 +312,15 @@ public:
 	// Return a pointer to 256 palette entries that can be written to.
 	virtual PalEntry *GetPalette () = 0;
 
-	// Stores the palette with flash blended in into 256 dwords
-	virtual void GetFlashedPalette (PalEntry palette[256]) = 0;
-
 	// Mark the palette as changed. It will be updated on the next Update().
 	virtual void UpdatePalette () = 0;
 
-	// Sets the gamma level. Returns false if the hardware does not support
-	// gamma changing. (Always true for now, since palettes can always be
-	// gamma adjusted.)
-	virtual bool SetGamma (float gamma) = 0;
-
 	// Sets a color flash. RGB is the color, and amount is 0-256, with 256
-	// being all flash and 0 being no flash. Returns false if the hardware
-	// does not support this. (Always true for now, since palettes can always
-	// be flashed.)
+	// being all flash and 0 being no flash.
 	virtual bool SetFlash (PalEntry rgb, int amount) = 0;
 
 	// Converse of SetFlash
 	virtual void GetFlash (PalEntry &rgb, int &amount) = 0;
-
-	// Tells the device to recreate itself with the new setting from vid_refreshrate.
-	virtual void NewRefreshRate ();
-
-	// Create a native texture from a game texture.
-	virtual FNativeTexture *CreateTexture(FTexture *gametex, bool wrapping);
-
-	// Create a palette texture from a remap/palette table.
-	virtual FNativePalette *CreatePalette(FRemapTable *remap);
-
-	// Precaches or unloads a texture
-	virtual void GetHitlist(uint8_t *hitlist);
-
-	// Report a game restart
-	virtual void GameRestart();
-
-	// Screen wiping
-	virtual bool WipeStartScreen(int type);
-	virtual void WipeEndScreen();
-	virtual bool WipeDo(int ticks);
-	virtual void WipeCleanup();
-	virtual int GetPixelDoubling() const { return 0; }
-	virtual int GetTrueHeight() { return GetHeight(); }
-
-	virtual void PaletteChanged () = 0;
-	virtual int QueryNewPalette () = 0;
 
 protected:
 	DFrameBuffer () {}

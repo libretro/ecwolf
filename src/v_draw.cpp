@@ -791,45 +791,6 @@ void DCanvas::VirtualToRealCoordsInt(int &x, int &y, int &w, int &h,
 	h = int(dy + dh + 0.5) - y;
 }
 
-void DCanvas::FillBorder (FTexture *img)
-{
-	int myratio = CheckRatio (Width, Height);
-	if (myratio == 0)
-	{ // This is a 4:3 display, so no border to show
-		return;
-	}
-	int bordtop, bordbottom, bordleft, bordright, bord;
-	if (myratio & 4)
-	{ // Screen is taller than it is wide
-		bordleft = bordright = 0;
-		bord = Height - Height * AspectCorrection[myratio].multiplier / 48;
-		bordtop = bord / 2;
-		bordbottom = bord - bordtop;
-	}
-	else
-	{ // Screen is wider than it is tall
-		bordtop = bordbottom = 0;
-		bord = Width - Width * AspectCorrection[myratio].multiplier / 48;
-		bordleft = bord / 2;
-		bordright = bord - bordleft;
-	}
-
-	if (img != NULL)
-	{
-		FlatFill (0, 0, Width, bordtop, img);									// Top
-		FlatFill (0, bordtop, bordleft, Height - bordbottom, img);				// Left
-		FlatFill (Width - bordright, bordtop, Width, Height - bordbottom, img);	// Right
-		FlatFill (0, Height - bordbottom, Width, Height, img);					// Bottom
-	}
-	else
-	{
-		Clear (0, 0, Width, bordtop, GPalette.BlackIndex, 0);									// Top
-		Clear (0, bordtop, bordleft, Height - bordbottom, GPalette.BlackIndex, 0);				// Left
-		Clear (Width - bordright, bordtop, Width, Height - bordbottom, GPalette.BlackIndex, 0);	// Right
-		Clear (0, Height - bordbottom, Width, Height, GPalette.BlackIndex, 0);					// Bottom
-	}
-}
-
 void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 {
 	static int oldyy;
@@ -1018,16 +979,6 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t re
 		PUTTRANSDOT (x1, y1, palColor, 0);
 	}
 	Unlock();
-}
-
-void DCanvas::DrawPixel(int x, int y, int palColor, uint32_t realcolor)
-{
-	if (palColor < 0)
-	{
-		palColor = PalFromRGB(realcolor);
-	}
-
-	Buffer[Pitch * y + x] = (uint8_t)palColor;
 }
 
 //==========================================================================
@@ -1260,88 +1211,4 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 /*								*/
 /********************************/
 
-
-//
-// V_DrawBlock
-// Draw a linear block of pixels into the view buffer.
-//
-void DCanvas::DrawBlock (int x, int y, int _width, int _height, const uint8_t *src) const
-{
-	int srcpitch = _width;
-	int destpitch;
-	uint8_t *dest;
-
-	if (ClipBox (x, y, _width, _height, src, srcpitch))
-	{
-		return;		// Nothing to draw
-	}
-
-	destpitch = Pitch;
-	dest = Buffer + y*Pitch + x;
-
-	do
-	{
-		memcpy (dest, src, _width);
-		src += srcpitch;
-		dest += destpitch;
-	} while (--_height);
-}
-
-//
-// V_GetBlock
-// Gets a linear block of pixels from the view buffer.
-//
-void DCanvas::GetBlock (int x, int y, int _width, int _height, uint8_t *dest) const
-{
-	const uint8_t *src;
-
-#ifdef RANGECHECK 
-	if (x<0
-		||x+_width > Width
-		|| y<0
-		|| y+_height>Height)
-	{
-		assert (0 && "Bad V_GetBlock");
-	}
-#endif
-
-	src = Buffer + y*Pitch + x;
-
-	while (_height--)
-	{
-		memcpy (dest, src, _width);
-		src += Pitch;
-		dest += _width;
-	}
-}
-
-// Returns true if the box was completely clipped. False otherwise.
-bool DCanvas::ClipBox (int &x, int &y, int &w, int &h, const uint8_t *&src, const int srcpitch) const
-{
-	if (x >= Width || y >= Height || x+w <= 0 || y+h <= 0)
-	{ // Completely clipped off screen
-		return true;
-	}
-	if (x < 0)				// clip left edge
-	{
-		src -= x;
-		w += x;
-		x = 0;
-	}
-	if (x+w > Width)		// clip right edge
-	{
-		w = Width - x;
-	}
-	if (y < 0)				// clip top edge
-	{
-		src -= y*srcpitch;
-		h += y;
-		y = 0;
-	}
-	if (y+h > Height)		// clip bottom edge
-	{
-		h = Height - y;
-	}
-	return false;
-}
 

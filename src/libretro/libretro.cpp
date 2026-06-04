@@ -152,8 +152,6 @@ public:
 
 	bool Lock (bool buffer) { return true; }
 	void Unlock () {}
-	bool Relock () { return true; }
-	void ForceBuffering (bool force) {}
 	bool IsValid () { return true; }
 	void Update () {
 		ComputePalette();
@@ -192,14 +190,9 @@ private:
 	}
 public:
 	PalEntry *GetPalette () { return SourcePalette; }
-	void GetFlashedPalette (PalEntry pal[256]) {
-		ComputePalette();
-		memcpy(pal, FlashedPalette, 256 * sizeof (PalEntry));
-	}
 	void UpdatePalette () {
 		PaletteNeedsUpdate = true;
 	}
-	bool SetGamma (float gamma) { return true; }
 	bool SetFlash (PalEntry rgb, int amount) {
 		Flash = rgb;
 		FlashAmount = amount;
@@ -211,12 +204,6 @@ public:
 		amount = FlashAmount;
 	}
 
-	void PaletteChanged () {
-		PaletteNeedsUpdate = true;
-	}
-	int QueryNewPalette () { return 0; }
-
-	void ScaleCoordsFromWindow(int16_t &x, int16_t &y) {}
 protected:
 	PalEntry FlashedPalette[256];
 	color_t effective_palette_[256];
