@@ -78,7 +78,15 @@ void CA_CacheMap (const FString &mapname, bool loading)
 	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
 	::map = map = new GameMap(mapname);
-	map->LoadMap(loading);
+	if(!map->IsValid())
+	{
+		// Construction failed (missing/invalid map data). The error has
+		// already been logged; leave the map loaded-but-empty rather than
+		// dereferencing invalid data.
+		return;
+	}
+	if(!map->LoadMap(loading))
+		return;
 
 	CalcVisibility(gLevelVisibility);
 }

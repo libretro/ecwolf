@@ -79,9 +79,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 
 	if(markerLump == -1)
 	{
-		FString error;
-		error.Format("Could not find map %s!", map.GetChars());
-		throw CRecoverableError(error);
+		libretro_log("Could not find map %s!\n", map.GetChars());
+		return; // valid stays false; callers check IsValid()
 	}
 
 	// Hmm... What follows is some massive copy and paste, but I can't really
@@ -93,9 +92,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 		file = FResourceFile::OpenResourceFile(mapWad.GetChars(), Wads.ReopenLumpNum(markerLump));
 		if(!file || file->LumpCount() < 2) // Maps must be 2 lumps in size
 		{
-			FString error;
-			error.Format("Map %s is in an unknown format.", map.GetChars());
-			throw CRecoverableError(error);
+			libretro_log("Map %s is in an unknown format.\n", map.GetChars());
+			return; // valid stays false
 		}
 
 		// First lump is assumed marker
@@ -111,9 +109,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 		{
 			if(stricmp(lump->Name, "TEXTMAP") != 0)
 			{
-				FString error;
-				error.Format("Invalid map format for %s!", map.GetChars());
-				throw CRecoverableError(error);
+				libretro_log("Invalid map format for %s!\n", map.GetChars());
+				return; // valid stays false
 			}
 
 			isUWMF = true;
@@ -131,9 +128,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 			}
 			if(!valid)
 			{
-				FString error;
-				error.Format("ENDMAP not found for map %s!", map.GetChars());
-				throw CRecoverableError(error);
+				libretro_log("ENDMAP not found for map %s!\n", map.GetChars());
+				return; // valid stays false
 			}
 		}
 	}
@@ -156,9 +152,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 				lumps[0] = Wads.ReopenLumpNum(markerLump);
 				if(lumps[0]->GetLength() <= 0)
 				{
-					FString error;
-					error.Format("Invalid map format for %s!", map.GetChars());
-					throw CRecoverableError(error);
+					libretro_log("Invalid map format for %s!\n", map.GetChars());
+					return; // valid stays false
 				}
 			}
 			
@@ -180,9 +175,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
 			}
 			if(!valid)
 			{
-				FString error;
-				error.Format("ENDMAP not found for map %s!", map.GetChars());
-				throw CRecoverableError(error);
+				libretro_log("ENDMAP not found for map %s!\n", map.GetChars());
+				return; // valid stays false
 			}
 		}
 	}
@@ -232,15 +226,8 @@ bool GameMap::CheckMapExists(const FString &map)
 {
 	if (Wads.CheckNumForName(map) < 0)
 		return false;
-	try
-	{
-		GameMap gm(map);
-		return true;
-	}
-	catch(CRecoverableError &)
-	{
-		return false;
-	}
+	GameMap gm(map);
+	return gm.IsValid();
 }
 
 bool GameMap::CheckLink(const Zone *zone1, const Zone *zone2, bool recurse)
@@ -390,10 +377,13 @@ void GameMap::LinkZones(const Zone *zone1, const Zone *zone2, bool open)
 		++value;
 }
 
-void GameMap::LoadMap(bool loadingSave)
+bool GameMap::LoadMap(bool loadingSave)
 {
 	if(!valid)
-		throw CRecoverableError("Tried to load invalid map!");
+	{
+		libretro_log("Tried to load invalid map!\n");
+		return false;
+	}
 
 	if(isUWMF)
 		ReadUWMFData();
@@ -402,6 +392,8 @@ void GameMap::LoadMap(bool loadingSave)
 
 	if(!loadingSave)
 		ScanTiles();
+
+	return true;
 }
 
 GameMap::Plane &GameMap::NewPlane()
