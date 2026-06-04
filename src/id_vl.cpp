@@ -68,13 +68,11 @@ void VL_ReadPalette(const char* lump)
 =======================
 */
 
-void I_InitGraphics ();
 void	VL_SetVGAPlaneMode (bool forSignon)
 {
 	if(!forSignon)
 
-	I_InitGraphics();
-	Video->SetResolution(screenWidth, screenHeight);
+	V_SetResolution(screenWidth, screenHeight);
 	R_SetupBuffer ();
 
 	scaleFactorX = CleanXfac;

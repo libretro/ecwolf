@@ -49,17 +49,10 @@ void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int real
 
 struct framebuffer_t;
 
-class IVideo
-{
- public:
-	virtual ~IVideo () {}
-
-	virtual framebuffer_t *CreateFrameBuffer (int width, int height) = 0;
-
-	virtual bool SetResolution (int width, int height);
-};
-
-extern IVideo *Video;
+// Create the framebuffer for the given mode and make it current (replaces any
+// existing one, preserving the palette). Was IVideo::SetResolution; the
+// single-backend IVideo/LibretroVideo factory it lived on has been removed.
+bool V_SetResolution (int width, int height);
 
 class FTexture;
 

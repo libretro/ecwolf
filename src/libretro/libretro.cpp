@@ -108,7 +108,6 @@ static const int SAMPLERATE = 44100;
 extern AutoMap AM_Main;
 extern AutoMap AM_Overlay;
 
-IVideo *Video = NULL;
 
 wl_state_t g_state;
 
@@ -350,26 +349,10 @@ static void V_ComputePalette ()
 	}
 }
 
-class LibretroVideo : public IVideo
-{
-public:
-	LibretroVideo () {}
-	~LibretroVideo () {}
-
-	framebuffer_t *CreateFrameBuffer (int width, int height) {
-		return V_NewFrameBuffer(width, height, bpp);
-	}
-};
-
-bool IVideo::SetResolution (int width, int height)
+bool V_SetResolution (int width, int height)
 {
 	int cx1, cx2;
 	PalEntry palette[256];
-
-
-	// Load fonts now so they can be packed into textures straight away,
-	// if D3DFB is being used for the display.
-	//FFont::StaticPreloadFonts();
 
 	V_CalcCleanFacs(320, 200, width, height, &CleanXfac, &CleanYfac, &cx1, &cx2);
 
@@ -388,10 +371,10 @@ bool IVideo::SetResolution (int width, int height)
 		V_DeleteFrameBuffer(screen);
 	}
 
-	screen = Video->CreateFrameBuffer(width, height);
+	screen = V_NewFrameBuffer(width, height, bpp);
 	memcpy (V_GetPalette(), palette, sizeof(PalEntry)*256);
 	V_UpdatePalette();
-	
+
 	return true;
 }
 
@@ -401,10 +384,6 @@ Net::NetInit Net::InitVars = {
 	1
 };
 
-
-void I_InitGraphics () {
-	Video = new LibretroVideo();
-}
 
 void I_ShutdownGraphics () {
 	if (screen) {
