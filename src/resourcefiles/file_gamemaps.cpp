@@ -57,6 +57,7 @@ class FGamemaps : public FResourceFile
 		FMapLump* Lumps;
 
 		TUniquePtr<FileReader> mapheadReader;
+		FString missingHead;
 		// Gamemaps = Carmack+RLEW, Maptemp = RLEW
 		bool carmacked;
 };
@@ -97,12 +98,10 @@ FGamemaps::FGamemaps(const char* filename, FileReader *file) : FResourceFile(fil
 		}
 	}
 
+	// Missing maphead is reported by Open() (gated by the CheckGamemaps
+	// factory) rather than thrown; stash the diagnostic message.
 	if(!mapheadReader)
-	{
-		FString error;
-		error.Format("Could not open gamemaps since %s is missing.", mapheadFile.GetChars());
-		throw CRecoverableError(error);
-	}
+		missingHead.Format("Could not open gamemaps since %s is missing.", mapheadFile.GetChars());
 }
 
 FGamemaps::~FGamemaps()
@@ -119,6 +118,12 @@ FResourceLump *FGamemaps::GetLump(int lump)
 bool FGamemaps::Open()
 {
 	uint16_t rlewTag;
+
+	if(!mapheadReader)
+	{
+		libretro_log("%s\n", missingHead.GetChars());
+		return false;
+	}
 
 	// Read the map head.
 	// First two bytes is the tag for the run length encoding

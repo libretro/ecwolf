@@ -194,18 +194,13 @@ class FVGAGraph : public FResourceFile
 				}
 			}
 
+			// Missing companion files are reported by Open() (which the
+			// CheckVGAGraph factory already gates on) rather than thrown; stash
+			// the first missing name for the diagnostic.
 			if(!vgadictReader)
-			{
-				FString error;
-				error.Format("Could not open vgagraph since %s is missing.", vgadictFile.GetChars());
-				throw CRecoverableError(error);
-			}
-			if(!vgaheadReader)
-			{
-				FString error;
-				error.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
-				throw CRecoverableError(error);
-			}
+				missingFile.Format("Could not open vgagraph since %s is missing.", vgadictFile.GetChars());
+			else if(!vgaheadReader)
+				missingFile.Format("Could not open vgagraph since %s is missing.", vgaheadFile.GetChars());
 		}
 
 		~FVGAGraph()
@@ -216,6 +211,12 @@ class FVGAGraph : public FResourceFile
 
 		bool Open()
 		{
+			if(!vgadictReader || !vgaheadReader)
+			{
+				libretro_log("%s\n", missingFile.GetChars());
+				return false;
+			}
+
 			vgadictReader->Read(huffman, sizeof(huffman));
 			for(unsigned int i = 0;i < 255;++i)
 			{
@@ -407,6 +408,7 @@ class FVGAGraph : public FResourceFile
 		FVGALump* lumps;
 
 		FString extension;
+		FString missingFile;
 		TUniquePtr<FileReader> vgaheadReader;
 		TUniquePtr<FileReader> vgadictReader;
 };
