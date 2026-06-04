@@ -1480,7 +1480,7 @@ ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, 
 
 	// [RH] Choose column drawers in a single place
 	if (style.Flags & STYLEF_TransSoulsAlpha)
-		alpha = fixed_t( * FRACUNIT);
+		alpha = fixed_t(0.75f * FRACUNIT);
 	else if (style.Flags & STYLEF_Alpha1)
 		alpha = FRACUNIT;
 	else
