@@ -163,6 +163,26 @@ static bool VFS_WriteFile(const FString &path, const void *data, size_t len)
 	return filestream_write_file(path.GetChars(), data, (int64_t)len);
 }
 
+// Portable decimal string -> unsigned long long. strtoull() is C99 and is not
+// available on older MSVC (pre-2013) which the libretro DOS/Win targets still
+// build with, so parse the digits by hand. Leading whitespace is skipped;
+// parsing stops at the first non-digit. Overflow is not expected for the save
+// version stamp, which is a fixed-width date integer.
+static unsigned long long ECS_ParseU64(const char *s)
+{
+	unsigned long long v = 0;
+	if(s == NULL)
+		return 0;
+	while(*s == ' ' || *s == '\t')
+		++s;
+	while(*s >= '0' && *s <= '9')
+	{
+		v = v * 10ull + (unsigned long long)(*s - '0');
+		++s;
+	}
+	return v;
+}
+
 // Splits a save image into its header lines and the snapshot body. Returns the
 // offset of the body (just past the header) or -1 if the magic doesn't match.
 // Each recognised "Key: value" line is stored into the matching out-param.
@@ -204,7 +224,7 @@ static long ParseSaveHeader(const uint8_t *buf, long len,
 		else if(key.Compare("Map") == 0)         mapname = val;
 		else if(key.Compare("GameWad") == 0)     gameWad = val;
 		else if(key.Compare("MapWad") == 0)      mapWad = val;
-		else if(key.Compare("SaveVer") == 0)     saveVer = strtoull(val.GetChars(), NULL, 10);
+		else if(key.Compare("SaveVer") == 0)     saveVer = ECS_ParseU64(val.GetChars());
 		else if(key.Compare("ProdVer") == 0)     prodVer = (uint32_t)strtoul(val.GetChars(), NULL, 10);
 	}
 	return -1; // no blank line: malformed
