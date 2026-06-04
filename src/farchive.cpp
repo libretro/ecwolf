@@ -42,6 +42,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <assert.h>
 #include <zlib.h>
 #include <stdlib.h>
 
@@ -233,7 +234,8 @@ FFile &FCompressedFile::Write (const void *mem, unsigned int len)
 	}
 	else
 	{
-		I_Error ("Tried to write to reading cfile");
+		// Writing to a read-mode cfile is an engine wiring error.
+		assert (0 && "Tried to write to reading cfile");
 	}
 	return *this;
 }
@@ -244,7 +246,12 @@ FFile &FCompressedFile::Read (void *mem, unsigned int len)
 	{
 		if (m_Pos + len > m_BufferSize)
 		{
-			I_Error ("Attempt to read past end of cfile");
+			// Corrupt/truncated save: reading past the buffer would overread.
+			// Zero the destination so the caller gets defined data; the
+			// FArchive driving this read detects the failure via its own
+			// bounds checks and aborts the load.
+			memset (mem, 0, len);
+			return *this;
 		}
 		if (len == 1)
 			*(uint8_t *)mem = m_Buffer[m_Pos];
@@ -254,7 +261,8 @@ FFile &FCompressedFile::Read (void *mem, unsigned int len)
 	}
 	else
 	{
-		I_Error ("Tried to read from writing cfile");
+		// Reading from a write-mode cfile is an engine wiring error.
+		assert (0 && "Tried to read from writing cfile");
 	}
 	return *this;
 }
@@ -358,8 +366,15 @@ void FCompressedFile::Explode ()
 			r = uncompress (expand, &newlen, m_Buffer + 8, cprlen);
 			if (r != Z_OK || newlen != expandsize)
 			{
+				// Corrupt/truncated compressed save. Leave an empty buffer so
+				// any subsequent read is bounds-rejected (and zero-filled) and
+				// the FArchive's Failed() check aborts the load.
 				M_Free (expand);
-				I_Error ("Could not decompress buffer: %s", M_ZLibError(r).GetChars());
+				if (FreeOnExplode ())
+					M_Free (m_Buffer);
+				m_Buffer = NULL;
+				m_BufferSize = 0;
+				return;
 			}
 		}
 		else
@@ -438,18 +453,9 @@ bool FCompressedMemFile::Reopen ()
 		m_Mode = EReading;
 		m_Buffer = m_ImplodedBuffer;
 		m_SourceFromMem = true;
-		try
-		{
-			Explode ();
-		}
-		catch(...)
-		{
-			// If we just leave things as they are, m_Buffer and m_ImplodedBuffer
-			// both point to the same memory block and both will try to free it.
-			m_Buffer = NULL;
-			m_SourceFromMem = false;
-			throw;
-		}
+		// Explode() no longer throws; on failure it frees and nulls m_Buffer
+		// itself, so the previous try/catch cleanup is no longer needed.
+		Explode ();
 		m_SourceFromMem = false;
 		return true;
 	}
@@ -470,7 +476,7 @@ int FCompressedMemFile::GetSerializedSize()
 {
 	if (m_ImplodedBuffer == NULL)
 	{
-		I_Error ("FCompressedMemFile must be compressed before storing");
+		assert (0 && "FCompressedMemFile must be compressed before storing");
 	}
 
 	uint32_t sizes[2];
@@ -483,7 +489,7 @@ void FCompressedMemFile::SerializeToBuffer(void *buffer)
 {
 	if (m_ImplodedBuffer == NULL)
 	{
-		I_Error ("FCompressedMemFile must be compressed before storing");
+		assert (0 && "FCompressedMemFile must be compressed before storing");
 	}
 
 	uint32_t sizes[2];
@@ -500,7 +506,7 @@ void FCompressedMemFile::Serialize (FArchive &arc)
 	{
 		if (m_ImplodedBuffer == NULL)
 		{
-			I_Error ("FCompressedMemFile must be compressed before storing");
+			assert (0 && "FCompressedMemFile must be compressed before storing");
 		}
 		arc.Write (ZSig, 4);
 
@@ -520,7 +526,11 @@ void FCompressedMemFile::Serialize (FArchive &arc)
 		arc.Read (sig, 4);
 
 		if (sig[0] != ZSig[0] || sig[1] != ZSig[1] || sig[2] != ZSig[2] || sig[3] != ZSig[3])
-			I_Error ("Expected to extract a compressed file");
+		{
+			// Corrupt save: not the expected compressed-file signature.
+			arc.SetFailed ();
+			return;
+		}
 
 		arc << sizes[0] << sizes[1];
 		uint32_t len = sizes[0] == 0 ? sizes[1] : sizes[0];
@@ -575,6 +585,7 @@ void FArchive::AttachToFile (FFile &file)
 	unsigned int i;
 
 	m_HubTravel = false;
+	m_Failed = false;
 	m_File = &file;
 	m_MaxObjectCount = m_ObjectCount = 0;
 	m_ObjectMap = NULL;
@@ -714,7 +725,9 @@ const char *FArchive::ReadName ()
 		uint32_t index = ReadCount ();
 		if (index >= m_Names.Size())
 		{
-			I_Error ("Name %u has not been read yet\n", index);
+			// Corrupt save: index would read out of bounds. Flag and bail.
+			SetFailed ();
+			return NULL;
 		}
 		return &m_NameStorage[m_Names[index].StringStart];
 	}
@@ -733,7 +746,7 @@ const char *FArchive::ReadName ()
 	}
 	else
 	{
-		I_Error ("Expected a name but got something else\n");
+		SetFailed ();
 		return NULL;
 	}
 }
@@ -1050,7 +1063,10 @@ FArchive &FArchive::ReadObject (DObject* &obj, const ClassDef *wanttype)
 		index = ReadCount ();
 		if (index >= m_ObjectCount)
 		{
-			I_Error ("Object reference too high (%u; max is %u)\n", index, m_ObjectCount);
+			// Corrupt save: object reference out of range.
+			SetFailed ();
+			obj = NULL;
+			break;
 		}
 		obj = (DObject *)m_ObjectMap[index].object;
 		break;
@@ -1142,7 +1158,9 @@ FArchive &FArchive::ReadObject (DObject* &obj, const ClassDef *wanttype)
 		break;
 
 	default:
-		I_Error ("Unknown object code (%d) in archive\n", objHead);
+		SetFailed ();
+		obj = NULL;
+		break;
 	}
 	return *this;
 }
@@ -1187,7 +1205,9 @@ int FArchive::ReadSprite ()
 		uint32_t index = ReadCount ();
 		if (index >= m_NumSprites)
 		{
-			I_Error ("Sprite %u has not been read yet\n", index);
+			// Corrupt save: sprite index out of range.
+			SetFailed ();
+			return 0;
 		}
 		return m_SpriteMap[index];
 	}
@@ -1218,7 +1238,7 @@ int FArchive::ReadSprite ()
 	}
 	else
 	{
-		I_Error ("Expected a sprite but got something else\n");
+		SetFailed ();
 		return 0;
 	}
 }
@@ -1273,12 +1293,11 @@ uint32_t FArchive::WriteClass (const ClassDef *info)
 {
 	if (m_ClassCount >= ClassDef::GetNumClasses())
 	{
-		I_Error ("Too many unique classes have been written.\nOnly %u were registered\n",
-			ClassDef::GetNumClasses());
+		assert (0 && "Too many unique classes written (engine invariant)");
 	}
 	if (m_TypeMap[info->ClassIndex].toArchive != TypeMap::NO_INDEX)
 	{
-		I_Error ("Attempt to write '%s' twice.\n", info->GetName().GetChars());
+		assert (0 && "Attempt to write a class twice (engine invariant)");
 	}
 	m_TypeMap[info->ClassIndex].toArchive = m_ClassCount;
 	m_TypeMap[m_ClassCount].toCurrent = info;
@@ -1296,8 +1315,9 @@ const ClassDef *FArchive::ReadClass ()
 
 	if (m_ClassCount >= ClassDef::GetNumClasses())
 	{
-		I_Error ("Too many unique classes have been read.\nOnly %u were registered\n",
-			ClassDef::GetNumClasses());
+		// Corrupt save: more classes than were ever registered.
+		SetFailed ();
+		return NULL;
 	}
 	operator<< (typeName.val);
 	FName zaname(typeName.val, true);
@@ -1312,18 +1332,17 @@ const ClassDef *FArchive::ReadClass ()
 			return cls;
 		}
 	}
-	I_Error ("Unknown class '%s'\n", typeName.val);
+	SetFailed ();
 	return NULL;
 }
 
 const ClassDef *FArchive::ReadClass (const ClassDef *wanttype)
 {
 	const ClassDef *type = ReadClass ();
-	if (!type->IsDescendantOf (wanttype))
+	if (type == NULL || !type->IsDescendantOf (wanttype))
 	{
-		I_Error ("Expected to extract an object of type '%s'.\n"
-				 "Found one of type '%s' instead.\n",
-			wanttype->GetName().GetChars(), type->GetName().GetChars());
+		SetFailed ();
+		return NULL;
 	}
 	return type;
 }
@@ -1333,14 +1352,14 @@ const ClassDef *FArchive::ReadStoredClass (const ClassDef *wanttype)
 	uint32_t index = ReadCount ();
 	if (index >= m_ClassCount)
 	{
-		I_Error ("Class reference too high (%u; max is %u)\n", index, m_ClassCount);
+		SetFailed ();
+		return NULL;
 	}
 	const ClassDef *type = m_TypeMap[index].toCurrent;
-	if (!type->IsDescendantOf (wanttype))
+	if (type == NULL || !type->IsDescendantOf (wanttype))
 	{
-		I_Error ("Expected to extract an object of type '%s'.\n"
-				 "Found one of type '%s' instead.\n",
-			wanttype->GetName().GetChars(), type->GetName().GetChars());
+		SetFailed ();
+		return NULL;
 	}
 	return type;
 }
@@ -1428,7 +1447,8 @@ void FArchive::UserReadClass (const ClassDef *&type)
 		type = NULL;
 		break;
 	default:
-		I_Error ("Unknown class type %d in archive.\n", newclass);
+		SetFailed ();
+		type = NULL;
 		break;
 	}
 }

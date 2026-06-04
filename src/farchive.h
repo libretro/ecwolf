@@ -158,6 +158,13 @@ public:
 		inline bool IsLoading () const { return m_Loading; }
 		inline bool IsStoring () const { return m_Storing; }
 		inline bool IsPeristent () const { return m_Persistent; }
+
+		// Set when corrupt serialized data is detected mid-stream (e.g. an
+		// out-of-range index or a truncated read). The fixed operator<< /
+		// Read signatures cannot return a status, so they record failure here
+		// and bail safely; the load entry point checks Failed() afterwards.
+		inline bool Failed () const { return m_Failed; }
+		void SetFailed () { m_Failed = true; }
 		
 		void SetHubTravel () { m_HubTravel = true; }
 
@@ -229,6 +236,7 @@ protected:
 		bool m_Persistent;		// meant for persistent storage (disk)?
 		bool m_Loading;			// extracting objects?
 		bool m_Storing;			// inserting objects?
+		bool m_Failed;			// corrupt serialized data detected?
 		bool m_HubTravel;		// travelling inside a hub?
 		FFile *m_File;			// unerlying file object
 		uint32_t m_ObjectCount;	// # of objects currently serialized

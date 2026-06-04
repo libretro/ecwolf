@@ -274,6 +274,14 @@ bool Load(const FString &filename)
 		uint32_t rngcount = 0;
 		arc << rngcount;
 		FRandom::StaticReadRNGState(arc, rngcount);
+
+		if(arc.Failed())
+		{
+			// Corrupt save data was detected during deserialization.
+			free(buf);
+			libretro_log("Save file is corrupt; load aborted.\n");
+			return false;
+		}
 	}
 
 	free(buf);
