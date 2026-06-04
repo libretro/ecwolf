@@ -176,6 +176,102 @@ ACTION_FUNCTION(A_EnableZoneLight)
 	return true;
 }
 
+// ---------------------------------------------------------------------------
+// Assorted DECORATE actions backported from LZWolf for mod compatibility.
+// ---------------------------------------------------------------------------
+
+// Change the current music track at runtime (custom music triggers).
+ACTION_FUNCTION(A_StartMusic)
+{
+	ACTION_PARAM_STRING(song, 0);
+
+	SD_StartMusic(song);
+	return true;
+}
+
+// Teleport this actor to an absolute map position (map units).
+ACTION_FUNCTION(A_ResetPosition)
+{
+	ACTION_PARAM_DOUBLE(x, 0);
+	ACTION_PARAM_DOUBLE(y, 1);
+
+	self->x = FLOAT2FIXED(x);
+	self->y = FLOAT2FIXED(y);
+	return true;
+}
+
+// Set the health of this actor (or the player it controls). Clamps to a
+// minimum of 1, matching the buddha-style behaviour in the original.
+ACTION_FUNCTION(A_SetHealth)
+{
+	ACTION_PARAM_INT(health, 0);
+
+	const int newhealth = (health <= 0) ? 1 : health;
+
+	player_t *player = self->player;
+	if(player)
+	{
+		player->health = newhealth;
+		self->health = newhealth;
+		if(player->mo)
+			player->mo->health = newhealth;
+	}
+	else
+		self->health = newhealth;
+	return true;
+}
+
+// Switch the player's pending weapon to the best weapon in the given slot.
+ACTION_FUNCTION(A_SelectWeapon)
+{
+	ACTION_PARAM_INT(slot, 0);
+
+	player_t *player = self->player;
+	if(player == NULL || slot < 0 || slot >= NUM_WEAPON_SLOTS)
+		return true;
+
+	AWeapon *newWeapon = player->weapons.Slots[slot].PickWeapon(player);
+	if(newWeapon && newWeapon != player->ReadyWeapon)
+		player->PendingWeapon = newWeapon;
+	return true;
+}
+
+// Mirror this actor's position/angle across a plane through the camera, used
+// for mirror-room effects. axis 0 mirrors X, axis 1 mirrors Y.
+ACTION_FUNCTION(A_MirrorPosition)
+{
+	ACTION_PARAM_DOUBLE(mirx, 0);
+	ACTION_PARAM_INT(axis, 1);
+
+	const fixed_t mirxfixed = FLOAT2FIXED(mirx);
+	AActor * const cam = players[0].camera;
+	if(cam == NULL)
+		return false;
+
+	self->x = cam->x;
+	self->y = cam->y;
+
+	const int curang = (cam->angle>>ANGLETOFINESHIFT)*360/FINEANGLES;
+	if(axis == 0)
+	{
+		self->x = mirxfixed + (mirxfixed - cam->x);
+		self->angle = ((360 + 180 - curang) % 360)*ANGLE_1;
+	}
+	else if(axis == 1)
+	{
+		self->y = mirxfixed + (mirxfixed - cam->y);
+		self->angle = ((360 - curang) % 360)*ANGLE_1;
+	}
+
+	const unsigned int mapwidth = map->GetHeader().width;
+	const unsigned int mapheight = map->GetHeader().height;
+	if(self->x < 0 || (self->x >= FLOAT2FIXED(mapwidth)))
+		self->x = 0;
+	if(self->y < 0 || (self->y >= FLOAT2FIXED(mapheight)))
+		self->y = 0;
+	return false;
+}
+
 ACTION_FUNCTION(A_AlertMonsters)
 {
 	madenoise = true;
