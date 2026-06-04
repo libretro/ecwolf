@@ -36,9 +36,6 @@
 #include "r_data/colormaps.h"
 #include "textures/textures.h"
 
-
-#define r_drawtrans 1
-
 // status bar height at bottom of screen
 // [RH] status bar position at bottom of screen
 extern	int		ST_Y;
@@ -1324,19 +1321,11 @@ void R_InitColumnDrawers ()
 	rt_map4cols = rt_map4cols_c;
 }
 
-// [RH] Choose column drawers in a single place
-//EXTERN_CVAR (Int, r_drawfuzz)
-//EXTERN_CVAR (Bool, r_drawtrans)
-//EXTERN_CVAR (Float, transsouls)
-#define transsouls 0.75f
-
 static FDynamicColormap *basecolormapsave;
 
 static bool R_SetBlendFunc (int op, fixed_t fglevel, fixed_t bglevel, int flags)
 {
-	// r_drawtrans is a seriously bad thing to turn off. I wonder if I should
-	// just remove it completely.
-	if (!r_drawtrans || (op == STYLEOP_Add && fglevel == FRACUNIT && bglevel == 0 && !(flags & STYLEF_InvertSource)))
+	if (op == STYLEOP_Add && fglevel == FRACUNIT && bglevel == 0 && !(flags & STYLEF_InvertSource))
 	{
 		if (flags & STYLEF_ColorIsFixed)
 		{
@@ -1471,8 +1460,9 @@ static bool R_SetBlendFunc (int op, fixed_t fglevel, fixed_t bglevel, int flags)
 		return true;
 
 	default:
-		return false;
+		break;
 	}
+	return false;
 }
 
 ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, uint32_t color)
@@ -1488,18 +1478,13 @@ ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, 
 		color = 0;
 	}
 
+	// [RH] Choose column drawers in a single place
 	if (style.Flags & STYLEF_TransSoulsAlpha)
-	{
-		alpha = fixed_t(transsouls * FRACUNIT);
-	}
+		alpha = fixed_t( * FRACUNIT);
 	else if (style.Flags & STYLEF_Alpha1)
-	{
 		alpha = FRACUNIT;
-	}
 	else
-	{
 		alpha = clamp<fixed_t> (alpha, 0, FRACUNIT);
-	}
 
 	dc_translation = NULL;
 	if (translation != 0)
@@ -1530,9 +1515,7 @@ ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, 
 		dc_color = fixedcolormap ? fixedcolormap[APART(color)] : basecolormap->Maps[APART(color)];
 		dc_colormap = (basecolormap = &ShadeFakeColormap[16-alpha])->Maps;
 		if (fixedlightlev >= 0 && fixedcolormap == NULL)
-		{
 			dc_colormap += fixedlightlev;
-		}
 		return r_columnmethod ? DoDraw1 : DoDraw0;
 	}
 
@@ -1567,7 +1550,7 @@ ESPSResult R_SetPatchStyle (FRenderStyle style, fixed_t alpha, int translation, 
 	return r_columnmethod ? DoDraw1 : DoDraw0;
 }
 
-void R_FinishSetPatchStyle ()
+void R_FinishSetPatchStyle(void)
 {
 	basecolormap = basecolormapsave;
 }
@@ -1600,4 +1583,3 @@ bool R_GetTransMaskDrawers (fixed_t (**tmvline1)(), void (**tmvline4)())
 	}
 	return false;
 }
-
