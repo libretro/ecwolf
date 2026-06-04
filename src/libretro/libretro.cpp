@@ -151,44 +151,40 @@ public:
 	bool IsValid () { return true; }
 	void Update () {
 		ComputePalette();
-		// Source (Buffer) is 8bpp with a possibly-padded Pitch; destination is
-		// tightly packed color_t. Hoist the row strides out of the inner loop
-		// instead of recomputing the divisions per pixel.
-		const int dst_stride = lr_pitch_ / (int)sizeof(color_t);
-		const uint8_t *src_row = Buffer;
-		color_t *dst_row = lr_buffer_;
-		const color_t * const pal = effective_palette_;
-		const int w = width_;
-		for (int y = 0; y < height_; y++) {
-			const uint8_t * const s = src_row;
-			color_t * const d = dst_row;
-			int x = 0;
-			// Unroll by 8: the per-pixel work is a dependent byte-indexed
-			// palette lookup which no SSE2/NEON gather can vectorise, so the
-			// win here is purely from amortising loop overhead and exposing
-			// instruction-level parallelism across the independent lookups.
-			for (; x + 8 <= w; x += 8) {
-				d[x+0] = pal[s[x+0]];
-				d[x+1] = pal[s[x+1]];
-				d[x+2] = pal[s[x+2]];
-				d[x+3] = pal[s[x+3]];
-				d[x+4] = pal[s[x+4]];
-				d[x+5] = pal[s[x+5]];
-				d[x+6] = pal[s[x+6]];
-				d[x+7] = pal[s[x+7]];
-			}
-			for (; x < w; x++)
-				d[x] = pal[s[x]];
-			src_row += Pitch;
-			dst_row += dst_stride;
-		}
-		ShowFrame();
+		present();
 	}
 	void ShowFrame() {
-		if (video_cb)
-			video_cb(lr_buffer_, width_, height_, lr_pitch_);
+		// Re-present path (taken when no game tics elapsed this retro_run).
+		// We do not assume lr_buffer_ still holds the last frame: a frontend
+		// buffer is only valid for the retro_run that requested it, so we must
+		// re-expand. ComputePalette() is a no-op unless the palette changed,
+		// so the only added cost over the old behaviour is one expand pass,
+		// which is required for correctness with frontend-owned buffers.
+		present();
+	}
+private:
+	// Present one frame: render the 8bpp Buffer through the palette into
+	// either a frontend-owned software framebuffer (when available and a
+	// format/size match) or the fallback lr_buffer_, then hand the result to
+	// video_cb. Rendering directly into the frontend buffer skips both the
+	// intermediate lr_buffer_ and the copy the frontend would otherwise make
+	// of it in retro_video_refresh_t; the frontend buffer may be GPU-mapped.
+	void present () {
+		void *out_pixels;
+		size_t out_pitch_bytes;
+		if (query_frontend_fb (&out_pixels, &out_pitch_bytes)) {
+			expand_palette ((color_t *) out_pixels,
+				(int) (out_pitch_bytes / sizeof(color_t)));
+			if (video_cb)
+				video_cb (out_pixels, width_, height_, out_pitch_bytes);
+		} else {
+			expand_palette (lr_buffer_, lr_pitch_ / (int)sizeof(color_t));
+			if (video_cb)
+				video_cb (lr_buffer_, width_, height_, lr_pitch_);
+		}
 		g_state.frame_counter++;
 	}
+public:
 	PalEntry *GetPalette () { return SourcePalette; }
 	void GetFlashedPalette (PalEntry pal[256]) {
 		ComputePalette();
@@ -224,7 +220,80 @@ protected:
 	PalEntry FlashedPalette[256];
 	color_t effective_palette_[256];
 	virtual void ComputeEffectivePalette() = 0;
+	// The retro_pixel_format this subclass produces. Used to validate the
+	// format the frontend reports for its software framebuffer before we
+	// render directly into it.
+	virtual enum retro_pixel_format ExpectedRetroFormat() = 0;
 private:
+	// Palette-expand the 8bpp indexed Buffer into dst. Source (Buffer) is
+	// 8bpp with a possibly-padded Pitch; dst_stride is the destination row
+	// stride in units of color_t (not bytes). The strides are hoisted out of
+	// the inner loop instead of recomputing per pixel.
+	void expand_palette (color_t *dst, int dst_stride) {
+		const uint8_t *src_row = Buffer;
+		color_t *dst_row = dst;
+		const color_t * const pal = effective_palette_;
+		const int w = width_;
+		for (int y = 0; y < height_; y++) {
+			const uint8_t * const s = src_row;
+			color_t * const d = dst_row;
+			int x = 0;
+			// Unroll by 8: the per-pixel work is a dependent byte-indexed
+			// palette lookup which no SSE2/NEON gather can vectorise, so the
+			// win here is purely from amortising loop overhead and exposing
+			// instruction-level parallelism across the independent lookups.
+			for (; x + 8 <= w; x += 8) {
+				d[x+0] = pal[s[x+0]];
+				d[x+1] = pal[s[x+1]];
+				d[x+2] = pal[s[x+2]];
+				d[x+3] = pal[s[x+3]];
+				d[x+4] = pal[s[x+4]];
+				d[x+5] = pal[s[x+5]];
+				d[x+6] = pal[s[x+6]];
+				d[x+7] = pal[s[x+7]];
+			}
+			for (; x < w; x++)
+				d[x] = pal[s[x]];
+			src_row += Pitch;
+			dst_row += dst_stride;
+		}
+	}
+
+	// Ask the frontend for a software framebuffer for the current retro_run
+	// iteration. On success, sets *out_pixels / *out_pitch_bytes and returns
+	// true; the buffer is only valid for this frame and must be handed to
+	// video_cb as-is. Returns false (use lr_buffer_) when the call is
+	// unsupported, the dimensions don't match, or the reported format differs
+	// from what this subclass produces.
+	bool query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes) {
+		struct retro_framebuffer fb;
+		fb.width        = (unsigned) width_;
+		fb.height       = (unsigned) height_;
+		fb.access_flags = RETRO_MEMORY_ACCESS_WRITE;
+
+		if (!environ_cb)
+			return false;
+		if (!environ_cb (RETRO_ENVIRONMENT_GET_CURRENT_SOFTWARE_FRAMEBUFFER, &fb))
+			return false;
+		if (fb.data == NULL)
+			return false;
+		// The frontend may hand back a buffer of a different size or a
+		// different (e.g. converted) format than we asked for. We only render
+		// directly when both match what expand_palette() will produce; the
+		// pitch may legitimately differ from width*sizeof(color_t), so it is
+		// honoured rather than required to be tight.
+		if (fb.width != (unsigned) width_ || fb.height != (unsigned) height_)
+			return false;
+		if (fb.format != ExpectedRetroFormat())
+			return false;
+		if (fb.pitch < width_ * sizeof(color_t))
+			return false;
+
+		*out_pixels      = fb.data;
+		*out_pitch_bytes = fb.pitch;
+		return true;
+	}
+
 	void ComputePalette() {
 		if (!PaletteNeedsUpdate)
 			return;
@@ -264,6 +333,16 @@ protected:
 #endif
 		}
 	}
+	enum retro_pixel_format ExpectedRetroFormat() {
+#ifdef PS2
+		// PS2 packs a custom BGR byte order that does not match the
+		// frontend's XRGB8888 expectation, so never render directly into a
+		// frontend-owned buffer there.
+		return (enum retro_pixel_format) -1;
+#else
+		return RETRO_PIXEL_FORMAT_XRGB8888;
+#endif
+	}
 };
 
 class LibretroFB16 : public LibretroFB<uint16_t> {
@@ -284,6 +363,16 @@ protected:
 				| (FlashedPalette[i].b >> 3);
 #endif
 		}
+	}
+	enum retro_pixel_format ExpectedRetroFormat() {
+#ifdef PS2
+		// PS2 packs 0RGB1555 in BGR order, which is neither the requested
+		// RGB565 nor a layout the frontend would report, so direct rendering
+		// is disabled there.
+		return (enum retro_pixel_format) -1;
+#else
+		return RETRO_PIXEL_FORMAT_RGB565;
+#endif
 	}
 };
 
