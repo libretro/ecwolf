@@ -1449,16 +1449,32 @@ void STACK_ARGS vlinec4 ()
 	uint8_t *dest = dc_dest;
 	int count = dc_count;
 	int bits = vlinebits;
-	uint32_t place;
+	int pitch = dc_pitch;
+	/* Hoist the four independent columns into locals and split the loop body
+	** into phases (four texture loads, then four colormap loads, then four
+	** stores). The four columns are independent, so issuing their texture
+	** loads together lets an out-of-order core overlap the load latency the
+	** old fused form serialized. Output is identical to the fused version. */
+	uint32_t p0 = vplce[0], p1 = vplce[1], p2 = vplce[2], p3 = vplce[3];
+	const uint32_t i0 = vince[0], i1 = vince[1], i2 = vince[2], i3 = vince[3];
+	const uint8_t *b0 = bufplce[0], *b1 = bufplce[1], *b2 = bufplce[2], *b3 = bufplce[3];
+	const uint8_t *c0 = palookupoffse[0], *c1 = palookupoffse[1], *c2 = palookupoffse[2], *c3 = palookupoffse[3];
 
 	do
 	{
-		dest[0] = palookupoffse[0][bufplce[0][(place=vplce[0])>>bits]]; vplce[0] = place+vince[0];
-		dest[1] = palookupoffse[1][bufplce[1][(place=vplce[1])>>bits]]; vplce[1] = place+vince[1];
-		dest[2] = palookupoffse[2][bufplce[2][(place=vplce[2])>>bits]]; vplce[2] = place+vince[2];
-		dest[3] = palookupoffse[3][bufplce[3][(place=vplce[3])>>bits]]; vplce[3] = place+vince[3];
-		dest += dc_pitch;
+		uint8_t t0 = b0[p0>>bits];
+		uint8_t t1 = b1[p1>>bits];
+		uint8_t t2 = b2[p2>>bits];
+		uint8_t t3 = b3[p3>>bits];
+		dest[0] = c0[t0];
+		dest[1] = c1[t1];
+		dest[2] = c2[t2];
+		dest[3] = c3[t3];
+		p0 += i0; p1 += i1; p2 += i2; p3 += i3;
+		dest += pitch;
 	} while (--count);
+
+	vplce[0] = p0; vplce[1] = p1; vplce[2] = p2; vplce[3] = p3;
 }
 
 void setupmvline (int fracbits)
@@ -1496,18 +1512,30 @@ void STACK_ARGS mvlinec4 ()
 	uint8_t *dest = dc_dest;
 	int count = dc_count;
 	int bits = mvlinebits;
-	uint32_t place;
+	int pitch = dc_pitch;
+	/* Same phased restructure as vlinec4; the per-column transparency test is
+	** kept (masked draw) but the four texture fetches are still issued
+	** together before the masked stores. Output identical to the fused form. */
+	uint32_t p0 = vplce[0], p1 = vplce[1], p2 = vplce[2], p3 = vplce[3];
+	const uint32_t i0 = vince[0], i1 = vince[1], i2 = vince[2], i3 = vince[3];
+	const uint8_t *b0 = bufplce[0], *b1 = bufplce[1], *b2 = bufplce[2], *b3 = bufplce[3];
+	const uint8_t *c0 = palookupoffse[0], *c1 = palookupoffse[1], *c2 = palookupoffse[2], *c3 = palookupoffse[3];
 
 	do
 	{
-		uint8_t pix;
-
-		pix = bufplce[0][(place=vplce[0])>>bits]; if(pix) dest[0] = palookupoffse[0][pix]; vplce[0] = place+vince[0];
-		pix = bufplce[1][(place=vplce[1])>>bits]; if(pix) dest[1] = palookupoffse[1][pix]; vplce[1] = place+vince[1];
-		pix = bufplce[2][(place=vplce[2])>>bits]; if(pix) dest[2] = palookupoffse[2][pix]; vplce[2] = place+vince[2];
-		pix = bufplce[3][(place=vplce[3])>>bits]; if(pix) dest[3] = palookupoffse[3][pix]; vplce[3] = place+vince[3];
-		dest += dc_pitch;
+		uint8_t t0 = b0[p0>>bits];
+		uint8_t t1 = b1[p1>>bits];
+		uint8_t t2 = b2[p2>>bits];
+		uint8_t t3 = b3[p3>>bits];
+		if (t0) dest[0] = c0[t0];
+		if (t1) dest[1] = c1[t1];
+		if (t2) dest[2] = c2[t2];
+		if (t3) dest[3] = c3[t3];
+		p0 += i0; p1 += i1; p2 += i2; p3 += i3;
+		dest += pitch;
 	} while (--count);
+
+	vplce[0] = p0; vplce[1] = p1; vplce[2] = p2; vplce[3] = p3;
 }
 
 extern "C" short spanend[MAXHEIGHT];
