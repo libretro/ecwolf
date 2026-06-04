@@ -77,12 +77,11 @@ class FAudiot : public FUncompressedFile
 				}
 			}
 
+			// audiohedReader is left null on failure; Open() detects this and
+			// fails cleanly, which the CheckAudiot factory turns into a NULL
+			// return (no exception needed). Stash the name for the diagnostic.
 			if(!audiohedReader)
-			{
-				FString error;
-				error.Format("Could not open audiot since %s is missing.", audiohedFile.GetChars());
-				throw CRecoverableError(error);
-			}
+				missingHed.Format("Could not open audiot since %s is missing.", audiohedFile.GetChars());
 		}
 
 		~FAudiot()
@@ -93,6 +92,12 @@ class FAudiot : public FUncompressedFile
 		{
 			unsigned int segstart[4] = {0};
 			unsigned int curseg = 0;
+
+			if(!audiohedReader)
+			{
+				libretro_log("%s\n", missingHed.GetChars());
+				return false;
+			}
 
 			NumLumps = (audiohedReader->GetLength()/4)-1;
 			audiohedReader->Seek(0, SEEK_SET);
@@ -180,6 +185,7 @@ class FAudiot : public FUncompressedFile
 
 	private:
 		FString	 extension;
+		FString	 missingHed;
 		TUniquePtr<FileReader> audiohedReader;
 };
 
