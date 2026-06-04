@@ -539,56 +539,6 @@ protected:
 	void MakeTexture (uint32_t time);
 };
 
-// A texture that can be drawn to.
-class DCanvas;
-class FCanvasTexture : public FTexture
-{
-public:
-	FCanvasTexture (const char *name, int width, int height);
-	~FCanvasTexture ();
-
-	const uint8_t *GetColumn (unsigned int column, const Span **spans_out);
-	const uint8_t *GetPixels ();
-	void Unload ();
-	bool CheckModified ();
-	void NeedUpdate() { bNeedsUpdate=true; }
-	void SetUpdated() { bNeedsUpdate = false; bDidUpdate = true; bFirstUpdate = false; }
-	DCanvas *GetCanvas() { return Canvas; }
-	void MakeTexture ();
-
-protected:
-
-	DCanvas *Canvas;
-	uint8_t *Pixels;
-	Span DummySpans[2];
-	bool bNeedsUpdate;
-	bool bDidUpdate;
-	bool bPixelsAllocated;
-public:
-	bool bFirstUpdate;
-
-	friend struct FCanvasTextureInfo;
-};
-
-// This list keeps track of the cameras that draw into canvas textures.
-struct FCanvasTextureInfo
-{
-	FCanvasTextureInfo *Next;
-	//TObjPtr<AActor> Viewpoint;
-	FCanvasTexture *Texture;
-	FTextureID PicNum;
-	int FOV;
-
-	static void Add (AActor *viewpoint, FTextureID picnum, int fov);
-	static void UpdateAll ();
-	static void EmptyList ();
-	static void Serialize (FArchive &arc);
-	static void Mark();
-
-private:
-	static FCanvasTextureInfo *List;
-};
-
 extern FTextureManager TexMan;
 
 #endif
