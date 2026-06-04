@@ -41,25 +41,8 @@
 #include "tarray.h"
 #include "name.h"
 
-// Android doesn't apply here since printf is redefined to be LOGI
-#if defined(__GNUC__) && !defined(__ANDROID__)
-#define PRINTFISH(x) __attribute__((format(printf, 2, x)))
-#else
-#define PRINTFISH(x)
-#endif
-
-#if defined(__GNUC__) && !defined(__ANDROID__)
-#define GCCPRINTF(stri,firstargi)		__attribute__((format(printf,stri,firstargi)))
-#define GCCFORMAT(stri)					__attribute__((format(printf,stri,0)))
-#define GCCNOWARN						__attribute__((unused))
-#else
-#define GCCPRINTF(a,b)
-#define GCCFORMAT(a)
-#define GCCNOWARN
-#endif
-
-extern "C" int mysnprintf(char *buffer, size_t count, const char *format, ...) GCCPRINTF(3,4);
-extern "C" int myvsnprintf(char *buffer, size_t count, const char *format, va_list argptr) GCCFORMAT(3);
+extern "C" int mysnprintf(char *buffer, size_t count, const char *format, ...);
+extern "C" int myvsnprintf(char *buffer, size_t count, const char *format, va_list argptr);
 
 struct FStringData
 {
@@ -249,10 +232,10 @@ public:
 	void Substitute (const char *oldstr, const char *newstr);
 	void Substitute (const char *oldstr, const char *newstr, size_t oldstrlen, size_t newstrlen);
 
-	void Format (const char *fmt, ...) PRINTFISH(3);
-	void AppendFormat (const char *fmt, ...) PRINTFISH(3);
-	void VFormat (const char *fmt, va_list arglist) PRINTFISH(0);
-	void VAppendFormat (const char *fmt, va_list arglist) PRINTFISH(0);
+	void Format (const char *fmt, ...);
+	void AppendFormat (const char *fmt, ...);
+	void VFormat (const char *fmt, va_list arglist);
+	void VAppendFormat (const char *fmt, va_list arglist);
 
 	bool IsInt () const;
 	bool IsFloat () const;
@@ -335,8 +318,6 @@ namespace StringFormat
 	int VWorker (OutputFunc output, void *outputData, const char *fmt, va_list arglist);
 	int Worker (OutputFunc output, void *outputData, const char *fmt, ...);
 };
-
-#undef PRINTFISH
 
 // FName inline implementations that take FString parameters
 

@@ -66,7 +66,6 @@ class ExpressionNode
 		~ExpressionNode();
 
 		const Value &Evaluate(AActor *self);
-		//void	DumpExpression(std::stringstream &out, std::string endLabel=std::string()) const;
 
 		static ExpressionNode	*ParseExpression(const ClassDef *cls, TypeHierarchy &types, Scanner &sc, ExpressionNode *root=NULL, unsigned char opLevel=255);
 	protected:
