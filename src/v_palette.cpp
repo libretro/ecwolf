@@ -69,41 +69,9 @@ static int STACK_ARGS sortforremap2 (const void *a, const void *b);
 uint8_t newgamma[256];
 double Gamma = 1.f;
 
-/*CUSTOM_CVAR (Float, Gamma, 1.f, CVAR_ARCHIVE|CVAR_GLOBALCONFIG)
-{
-	if (self == 0.f)
-	{ // Gamma values of 0 are illegal.
-		self = 1.f;
-		return;
-	}
-
-	if (screen != NULL)
-	{
-		screen->SetGamma (self);
-	}
-}
-
-CCMD (bumpgamma)
-{
-	// [RH] Gamma correction tables are now generated
-	// on the fly for *any* gamma level.
-	// Q: What are reasonable limits to use here?
-
-	float newgamma = Gamma + 0.1f;
-
-	if (newgamma > 3.0)
-		newgamma = 1.0;
-
-	Gamma = newgamma;
-	Printf ("Gamma correction level %g\n", *Gamma);
-}*/
-
-
 /****************************/
 /* Palette management stuff */
 /****************************/
-
-extern "C" uint8_t BestColor_MMX (uint32_t rgb, const uint32_t *pal);
 
 int BestColor (const uint32_t *pal_in, int r, int g, int b, int first, int num)
 {
@@ -305,21 +273,14 @@ static int STACK_ARGS sortforremap2 (const void *a, const void *b)
 	const RemappingWork *bp = (const RemappingWork *)b;
 
 	if (ap->Color == bp->Color)
-	{
 		return bp->Foreign - ap->Foreign;
-	}
-	else
-	{
-		return ap->Color - bp->Color;
-	}
+	return ap->Color - bp->Color;
 }
 
 static bool FixBuildPalette (uint8_t *opal, int lump, bool blood)
 {
 	if (Wads.LumpLength (lump) < 768)
-	{
 		return false;
-	}
 
 	FMemLump data = Wads.ReadLump (lump);
 	const uint8_t *ipal = (const uint8_t *)data.GetMem();
@@ -352,13 +313,9 @@ void InitPalette (const char* defpalname)
 	int lump;
 
 	if ((lump = Wads.CheckNumForFullName ("palette.dat")) >= 0 && Wads.LumpLength (lump) >= 768)
-	{
 		usingBuild = FixBuildPalette (pal, lump, false);
-	}
 	else if ((lump = Wads.CheckNumForFullName ("blood.pal")) >= 0 && Wads.LumpLength (lump) >= 768)
-	{
 		usingBuild = FixBuildPalette (pal, lump, true);
-	}
 
 	if (!usingBuild)
 	{
@@ -391,17 +348,13 @@ void InitPalette (const char* defpalname)
 	}
 }
 
-extern "C" void STACK_ARGS DoBlending_MMX (const PalEntry *from, PalEntry *to, int count, int r, int g, int b, int a);
-extern void DoBlending_SSE2 (const PalEntry *from, PalEntry *to, int count, int r, int g, int b, int a);
-
 void DoBlending (const PalEntry *from, PalEntry *to, int count, int r, int g, int b, int a)
 {
+	int i, ia;
 	if (a == 0)
 	{
 		if (from != to)
-		{
 			memcpy (to, from, count * sizeof(uint32_t));
-		}
 	}
 	else if (a == 256)
 	{
@@ -409,11 +362,8 @@ void DoBlending (const PalEntry *from, PalEntry *to, int count, int r, int g, in
 		int i;
 
 		for (i = 0; i < count; i++)
-		{
 			to[i] = t;
-		}
 	}
-	int i, ia;
 
 	ia = 256 - a;
 	r *= a;
@@ -450,62 +400,6 @@ void V_ForceBlend (int blendr, int blendg, int blendb, int blenda)
 
 	screen->SetFlash (PalEntry (BlendR, BlendG, BlendB), BlendA);
 }
-
-/*CCMD (testblend)
-{
-	FString colorstring;
-	int color;
-	float amt;
-
-	if (argv.argc() < 3)
-	{
-		Printf ("testblend <color> <amount>\n");
-	}
-	else
-	{
-		if ( !(colorstring = V_GetColorStringByName (argv[1])).IsEmpty() )
-		{
-			color = V_GetColorFromString (NULL, colorstring);
-		}
-		else
-		{
-			color = V_GetColorFromString (NULL, argv[1]);
-		}
-		amt = (float)atof (argv[2]);
-		if (amt > 1.0f)
-			amt = 1.0f;
-		else if (amt < 0.0f)
-			amt = 0.0f;
-		BaseBlendR = RPART(color);
-		BaseBlendG = GPART(color);
-		BaseBlendB = BPART(color);
-		BaseBlendA = amt;
-	}
-}
-
-CCMD (testfade)
-{
-	FString colorstring;
-	uint32_t color;
-
-	if (argv.argc() < 2)
-	{
-		Printf ("testfade <color>\n");
-	}
-	else
-	{
-		if ( !(colorstring = V_GetColorStringByName (argv[1])).IsEmpty() )
-		{
-			color = V_GetColorFromString (NULL, colorstring);
-		}
-		else
-		{
-			color = V_GetColorFromString (NULL, argv[1]);
-		}
-		level.fadeto = color;
-		NormalLight.ChangeFade (color);
-	}
-}*/
 
 /****** Colorspace Conversion Functions ******/
 
@@ -581,35 +475,3 @@ void HSVtoRGB (float *r, float *g, float *b, float h, float s, float v)
 	default:	*r = v; *g = p; *b = q; break;
 	}
 }
-
-/*CCMD (testcolor)
-{
-	FString colorstring;
-	uint32_t color;
-	int desaturate;
-
-	if (argv.argc() < 2)
-	{
-		Printf ("testcolor <color> [desaturation]\n");
-	}
-	else
-	{
-		if ( !(colorstring = V_GetColorStringByName (argv[1])).IsEmpty() )
-		{
-			color = V_GetColorFromString (NULL, colorstring);
-		}
-		else
-		{
-			color = V_GetColorFromString (NULL, argv[1]);
-		}
-		if (argv.argc() > 2)
-		{
-			desaturate = atoi (argv[2]);
-		}
-		else
-		{
-			desaturate = NormalLight.Desaturate;
-		}
-		NormalLight.ChangeColor (color, desaturate);
-	}
-}*/

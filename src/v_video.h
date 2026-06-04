@@ -375,35 +375,8 @@ public:
 	// Converse of SetFlash
 	virtual void GetFlash (PalEntry &rgb, int &amount) = 0;
 
-	// Returns the number of video pages the frame buffer is using.
-	virtual int GetPageCount () = 0;
-
-	// Returns true if running fullscreen.
-	virtual bool IsFullscreen () = 0;
-
-	// Changes the vsync setting, if supported by the device.
-	virtual void SetVSync (bool vsync);
-
 	// Tells the device to recreate itself with the new setting from vid_refreshrate.
 	virtual void NewRefreshRate ();
-
-	// Set the rect defining the area affected by blending.
-	virtual void SetBlendingRect (int x1, int y1, int x2, int y2);
-
-	bool Accel2D;	// If true, 2D drawing can be accelerated.
-
-	// Begin 2D drawing operations. This is like Update, but it doesn't end
-	// the scene, and it doesn't present the image yet. If you are going to
-	// be covering the entire screen with 2D elements, then pass false to
-	// avoid copying the software buffer to the screen.
-	// Returns true if hardware-accelerated 2D has been entered, false if not.
-	virtual bool Begin2D(bool copy3d);
-
-	// DrawTexture calls after Begin2D use native textures.
-
-	// Draws the blending rectangle over the viewwindow if in hardware-
-	// accelerated 2D mode.
-	virtual void DrawBlendingRect();
 
 	// Create a native texture from a game texture.
 	virtual FNativeTexture *CreateTexture(FTexture *gametex, bool wrapping);
@@ -425,19 +398,11 @@ public:
 	virtual int GetPixelDoubling() const { return 0; }
 	virtual int GetTrueHeight() { return GetHeight(); }
 
-	uint32_t GetLastFPS() const { return LastCount; }
-
 	virtual void PaletteChanged () = 0;
 	virtual int QueryNewPalette () = 0;
-	virtual bool Is8BitMode() = 0;
 
 protected:
-	void DrawRateStuff ();
-
 	DFrameBuffer () {}
-
-private:
-	uint32_t LastMS, LastSec, FrameCount, LastCount, LastTic;
 };
 
 

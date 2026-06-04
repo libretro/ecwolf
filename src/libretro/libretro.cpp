@@ -210,17 +210,12 @@ public:
 		rgb = Flash;
 		amount = FlashAmount;
 	}
-	void SetFullscreen (bool fullscreen) {}
-	int GetPageCount () { return 0; }
-	bool IsFullscreen () { return false; }
 
 	void PaletteChanged () {
 		PaletteNeedsUpdate = true;
 	}
 	int QueryNewPalette () { return 0; }
-	bool Is8BitMode() { return true; }
 
-	void SetVSync (bool vsync) {}
 	void ScaleCoordsFromWindow(int16_t &x, int16_t &y) {}
 protected:
 	PalEntry FlashedPalette[256];

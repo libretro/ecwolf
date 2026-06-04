@@ -33,11 +33,8 @@ public:
 	bool SetGamma(float gamma) { Gamma = gamma; return true; }
 	bool SetFlash(PalEntry rgb, int amount) { return false; }
 	void GetFlash(PalEntry &rgb, int &amount) { }
-	int GetPageCount() { return 0; }
-	bool IsFullscreen() { return 0; }
 	void PaletteChanged() {}
 	int QueryNewPalette() { return 0; }
-	bool Is8BitMode() { return false; }
 
 	float Gamma;
 };
@@ -146,25 +143,13 @@ void DCanvas::FlatFill (int left, int top, int right, int bottom, FTexture *src,
 
 void DCanvas::Dim (PalEntry color)
 {
-	PalEntry dimmer;
-	float amount;
-
-	//if (dimamount >= 0)
-	//{
-		dimmer = PalEntry(dimcolor);
-		amount = dimamount;
-	//}
-	//else
-	//{
-		//dimmer = gameinfo.dimcolor;
-		//amount = gameinfo.dimamount;
-	//}
+	PalEntry dimmer = PalEntry(dimcolor);
+	float amount = dimamount;
 
 	// Add the cvar's dimming on top of the color passed to the function
 	if (color.a != 0)
 	{
 		float dim[4] = { color.r/255.f, color.g/255.f, color.b/255.f, color.a/255.f };
-		//V_AddBlend (dimmer.r/255.f, dimmer.g/255.f, dimmer.b/255.f, amount, dim);
 		dimmer = PalEntry (uint8_t(dim[0]*255), uint8_t(dim[1]*255), uint8_t(dim[2]*255));
 		amount = dim[3];
 	}
@@ -191,26 +176,16 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	int x, y;
 
 	if (x1 >= Width || y1 >= Height)
-	{
 		return;
-	}
 	if (x1 + w > Width)
-	{
 		w = Width - x1;
-	}
 	if (y1 + h > Height)
-	{
 		h = Height - y1;
-	}
 	if (w <= 0 || h <= 0)
-	{
 		return;
-	}
 
 	{
-		int amount;
-
-		amount = (int)(damount * 64);
+		int amount = (int)(damount * 64);
 		bg2rgb = Col2RGB8[64-amount];
 
 		fg = (((color.r * amount) >> 4) << 20) |
@@ -224,9 +199,7 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	{
 		for (x = w; x != 0; x--)
 		{
-			uint32_t bg;
-
-			bg = bg2rgb[(*spot)&0xff];
+			uint32_t bg = bg2rgb[(*spot)&0xff];
 			bg = (fg+bg) | 0x1f07c1f;
 			*spot = RGB32k[0][0][bg&(bg>>15)];
 			spot++;
@@ -282,9 +255,7 @@ void DCanvas::CalcGamma (float gamma, uint8_t gammalookup[256])
 	int i;
 
 	for (i = 0; i < 256; i++)
-	{
 		gammalookup[i] = (uint8_t)(255.0 * pow (i / 255.0, invgamma));
-	}
 }
 
 //==========================================================================
@@ -312,9 +283,7 @@ DSimpleCanvas::DSimpleCanvas (int width, int height)
 		Pitch = width;
 	}
 	else
-	{
 		Pitch = width + 32 - 8;
-	}
 	MemBuffer = new uint8_t[Pitch * height];
 	memset (MemBuffer, 0, Pitch * height);
 }
@@ -388,32 +357,6 @@ void DSimpleCanvas::Unlock ()
 DFrameBuffer::DFrameBuffer (int width, int height)
 	: DSimpleCanvas (width, height)
 {
-	LastMS = LastSec = FrameCount = LastCount = LastTic = 0;
-	Accel2D = false;
-}
-
-//==========================================================================
-//
-// DFrameBuffer :: DrawRateStuff
-//
-// Draws the fps counter, dot ticker, and palette debug.
-//
-//==========================================================================
-
-void DFrameBuffer::DrawRateStuff ()
-{
-}
-
-//==========================================================================
-//
-// DFrameBuffer :: SetVSync
-//
-// Turns vertical sync on and off, if supported.
-//
-//==========================================================================
-
-void DFrameBuffer::SetVSync (bool vsync)
-{
 }
 
 //==========================================================================
@@ -426,46 +369,6 @@ void DFrameBuffer::SetVSync (bool vsync)
 //==========================================================================
 
 void DFrameBuffer::NewRefreshRate ()
-{
-}
-
-//==========================================================================
-//
-// DFrameBuffer :: SetBlendingRect
-//
-// Defines the area of the screen containing the 3D view.
-//
-//==========================================================================
-
-void DFrameBuffer::SetBlendingRect (int x1, int y1, int x2, int y2)
-{
-}
-
-//==========================================================================
-//
-// DFrameBuffer :: Begin2D
-//
-// Signal that 3D rendering is complete, and the rest of the operations on
-// the canvas until Unlock() will be 2D ones.
-//
-//==========================================================================
-
-bool DFrameBuffer::Begin2D (bool copy3d)
-{
-	return false;
-}
-
-//==========================================================================
-//
-// DFrameBuffer :: DrawBlendingRect
-//
-// In hardware 2D modes, the blending rect needs to be drawn separately
-// from transferring the 3D scene to video memory, because the weapon
-// sprite is drawn on top of that.
-//
-//==========================================================================
-
-void DFrameBuffer::DrawBlendingRect()
 {
 }
 
