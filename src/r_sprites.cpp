@@ -398,7 +398,7 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	if(actor->sprite == SPR_NONE || loadedSprites[actor->sprite].numFrames == 0)
 		return;
 
-	bool flip = false;
+	bool flip = actor->FlipSprite;
 	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
 	FTexture *tex;
 	if(spr.rotations == 0)
@@ -407,7 +407,8 @@ void ScaleSprite(AActor *actor, int xcenter, const Frame *frame, unsigned height
 	{
 		const unsigned int rot = CalcRotate(actor);
 		tex = TexMan[spr.texture[rot]];
-		flip = (spr.mirror>>rot)&1;
+		if((spr.mirror>>rot)&1)
+			flip = !flip;
 	}
 	if(tex == NULL)
 		return;
@@ -582,7 +583,7 @@ void Scale3DShaper(int, int, FTexture *, uint32_t, fixed, fixed, fixed, fixed, u
 // This function from Wolf4SDL more or less verbatim at the moment.
 void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 {
-	bool flip = false;
+	bool flip = actor->FlipSprite;
 	const Sprite &spr = spriteFrames[loadedSprites[actor->sprite].frames+frame->frame];
 	FTexture *tex;
 	if(spr.rotations == 0)
@@ -591,7 +592,8 @@ void Scale3DSprite(AActor *actor, const Frame *frame, unsigned height)
 	{
 		const unsigned int rot = CalcRotate(actor);
 		tex = TexMan[spr.texture[rot]];
-		flip = (spr.mirror>>rot)&1;
+		if((spr.mirror>>rot)&1)
+			flip = !flip;
 	}
 	if(tex == NULL)
 		return;

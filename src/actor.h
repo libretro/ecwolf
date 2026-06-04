@@ -187,6 +187,7 @@ PACK_END
 
 		const Frame		*state;
 		unsigned int	sprite;
+		bool			FlipSprite;   // horizontally mirror the sprite (DECORATE flipsprite)
 		fixed			scaleX, scaleY;
 		short			ticcount;
 

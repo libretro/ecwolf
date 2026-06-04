@@ -261,6 +261,12 @@ HANDLE_PROPERTY(forwardmove)
 	}
 }
 
+HANDLE_PROPERTY(flipsprite)
+{
+	INT_PARAM(flip, 0);
+	defaults->FlipSprite = flip ? true : false;
+}
+
 HANDLE_PROPERTY(gibhealth)
 {
 	INT_PARAM(health, 0);
@@ -647,6 +653,7 @@ extern const PropDef properties[] =
 	DEFINE_PROP(deathsound, Actor, S),
 	DEFINE_PROP_PREFIX(displayname, PlayerPawn, Player, S),
 	DEFINE_PROP(dropitem, Actor, S_II),
+	DEFINE_PROP(flipsprite, Actor, I),
 	DEFINE_PROP_PREFIX(forwardmove, PlayerPawn, Player, F_F),
 	DEFINE_PROP(gibhealth, Actor, I),
 	DEFINE_PROP(halolight, Actor, IFI_S),
