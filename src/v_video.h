@@ -47,13 +47,6 @@ extern int DisplayWidth, DisplayHeight, DisplayBits;
 bool V_DoModeSetup (int width, int height, int bits);
 void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int realheight, int *cleanx, int *cleany, int *cx1=NULL, int *cx2=NULL);
 
-enum EDisplayType
-{
-	DISPLAY_WindowOnly,
-	DISPLAY_FullscreenOnly,
-	DISPLAY_Both
-};
-
 class DCanvas;
 
 class IVideo
@@ -61,13 +54,7 @@ class IVideo
  public:
 	virtual ~IVideo () {}
 
-	virtual EDisplayType GetDisplayType () = 0;
-	virtual void SetWindowedScale (float scale) = 0;
-
 	virtual DCanvas *CreateFrameBuffer (int width, int height, bool fs, DCanvas *old) = 0;
-
-	virtual void StartModeIterator (int bits, bool fs) = 0;
-	virtual bool NextMode (int *width, int *height, bool *letterbox) = 0;
 
 	virtual bool SetResolution (int width, int height, int bits);
 };

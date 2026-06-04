@@ -375,29 +375,11 @@ public:
 	LibretroVideo () {}
 	~LibretroVideo () {}
 
-	EDisplayType GetDisplayType () { return DISPLAY_Both; }
-	void SetWindowedScale (float scale) {};
-
 	DCanvas *CreateFrameBuffer (int width, int height, bool fs, DCanvas *old) {
 		if (bpp == 32)
 			return new LibretroFB32(width, height);
 		return new LibretroFB16(width, height);		
 	}
-
-	void StartModeIterator (int bits, bool fs) {
-		modeCounter = 0;
-	}
-	bool NextMode (int *width, int *height, bool *letterbox) {
-		if (modeCounter >= 1)
-			return false;
-		*width = screen_width;
-		*height = screen_height;
-		*letterbox = false;
-		modeCounter++;
-		return false;
-	}
-private:
-	int modeCounter;
 };
 
 bool IVideo::SetResolution (int width, int height, int bits)
