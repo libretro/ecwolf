@@ -189,6 +189,10 @@ else ifeq ($(platform), dos)
 	CXX = i586-pc-msdosdjgpp-g++
 	COMMON_CFLAGS += -march=i386
 	STATIC_LINKING=1
+	# DJGPP targets COFF, which has no ELF symbol-visibility model; GCC warns
+	# (-Wattributes) on every visibility attribute it is asked to emit. Skip the
+	# -fvisibility=hidden flag below for this platform to keep the build clean.
+	NO_FVISIBILITY=1
 
 else ifeq ($(platform), wii)
    EXT=a
@@ -442,7 +446,11 @@ TOPDIR ?= $(CURDIR)
 COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DUSE_FILE32API -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
 
 ifeq (,$(findstring msvc,$(platform)))
+ifeq ($(NO_FVISIBILITY),1)
+  COMMON_CFLAGS += -ffast-math -fno-strict-aliasing -fomit-frame-pointer -Wno-sign-compare -Wno-switch -Wno-format-security
+else
   COMMON_CFLAGS += -ffast-math -fno-strict-aliasing -fvisibility=hidden -fomit-frame-pointer -Wno-sign-compare -Wno-switch -Wno-format-security
+endif
   CXXFLAGS += -fpermissive -std=gnu++98
 ifneq ($(platform), emscripten)
   COMMON_CFLAGS += -fno-unsafe-math-optimizations
