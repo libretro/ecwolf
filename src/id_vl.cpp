@@ -68,10 +68,8 @@ void VL_ReadPalette(const char* lump)
 =======================
 */
 
-void	VL_SetVGAPlaneMode (bool forSignon)
+void	VL_SetVGAPlaneMode (bool /*forSignon*/)
 {
-	if(!forSignon)
-
 	V_SetResolution(screenWidth, screenHeight);
 	R_SetupBuffer ();
 
