@@ -37,7 +37,6 @@
 #include "textures/textures.h"
 
 
-#undef RANGECHECK
 #define r_drawtrans 1
 
 // status bar height at bottom of screen
@@ -973,32 +972,15 @@ void R_SetupSpanBits(FTexture *tex)
 // Draws the actual span.
 void R_DrawSpanP_C (void)
 {
-	dsfixed_t			xfrac;
-	dsfixed_t			yfrac;
-	dsfixed_t			xstep;
-	dsfixed_t			ystep;
-	uint8_t*				dest;
 	const uint8_t*			source = ds_source;
 	const uint8_t*			colormap = ds_colormap;
-	int 				count;
 	int 				spot;
-
-#ifdef RANGECHECK 
-	assert (!(ds_x2 < ds_x1 || ds_x1 < 0
-		|| ds_x2 >= screen->width || ds_y > screen->height) &&
-		"R_DrawSpan: span coordinates out of range");
-//		dscount++;
-#endif
-
-	xfrac = ds_xfrac;
-	yfrac = ds_yfrac;
-
-	dest = ylookup[ds_y] + ds_x1 + dc_destorg;
-
-	count = ds_x2 - ds_x1 + 1;
-
-	xstep = ds_xstep;
-	ystep = ds_ystep;
+	dsfixed_t xfrac = ds_xfrac;
+	dsfixed_t yfrac = ds_yfrac;
+	uint8_t *dest = ylookup[ds_y] + ds_x1 + dc_destorg;
+	int count = ds_x2 - ds_x1 + 1;
+	dsfixed_t xstep = ds_xstep;
+	dsfixed_t ystep = ds_ystep;
 
 	if (ds_xbits == 6 && ds_ybits == 6)
 	{
@@ -1042,25 +1024,15 @@ void R_DrawSpanP_C (void)
 // [RH] Draw a span with holes
 void R_DrawSpanMaskedP_C (void)
 {
-	dsfixed_t			xfrac;
-	dsfixed_t			yfrac;
-	dsfixed_t			xstep;
-	dsfixed_t			ystep;
-	uint8_t*				dest;
 	const uint8_t*			source = ds_source;
 	const uint8_t*			colormap = ds_colormap;
-	int 				count;
 	int 				spot;
-
-	xfrac = ds_xfrac;
-	yfrac = ds_yfrac;
-
-	dest = ylookup[ds_y] + ds_x1 + dc_destorg;
-
-	count = ds_x2 - ds_x1 + 1;
-
-	xstep = ds_xstep;
-	ystep = ds_ystep;
+	dsfixed_t xfrac = ds_xfrac;
+	dsfixed_t yfrac = ds_yfrac;
+	uint8_t *dest = ylookup[ds_y] + ds_x1 + dc_destorg;
+	int count = ds_x2 - ds_x1 + 1;
+	dsfixed_t xstep = ds_xstep;
+	dsfixed_t ystep = ds_ystep;
 
 	if (ds_xbits == 6 && ds_ybits == 6)
 	{
@@ -1104,27 +1076,17 @@ void R_DrawSpanMaskedP_C (void)
 
 void R_DrawSpanTranslucentP_C (void)
 {
-	dsfixed_t			xfrac;
-	dsfixed_t			yfrac;
-	dsfixed_t			xstep;
-	dsfixed_t			ystep;
-	uint8_t*				dest;
 	const uint8_t*			source = ds_source;
 	const uint8_t*			colormap = ds_colormap;
-	int 				count;
 	int 				spot;
 	uint32_t *fg2rgb = dc_srcblend;
 	uint32_t *bg2rgb = dc_destblend;
-
-	xfrac = ds_xfrac;
-	yfrac = ds_yfrac;
-
-	dest = ylookup[ds_y] + ds_x1 + dc_destorg;
-
-	count = ds_x2 - ds_x1 + 1;
-
-	xstep = ds_xstep;
-	ystep = ds_ystep;
+	dsfixed_t xfrac = ds_xfrac;
+	dsfixed_t yfrac = ds_yfrac;
+	uint8_t *dest = ylookup[ds_y] + ds_x1 + dc_destorg;
+	int count = ds_x2 - ds_x1 + 1;
+	dsfixed_t xstep = ds_xstep;
+	dsfixed_t ystep = ds_ystep;
 
 	if (ds_xbits == 6 && ds_ybits == 6)
 	{

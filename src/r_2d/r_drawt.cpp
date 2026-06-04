@@ -66,10 +66,8 @@ void rt_copy1col_c (int hx, int sx, int yl, int yh)
 {
 	uint8_t *source;
 	uint8_t *dest;
-	int count;
 	int pitch;
-
-	count = yh-yl;
+	int count = yh-yl;
 	if (count < 0)
 		return;
 	count++;
