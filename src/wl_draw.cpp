@@ -250,6 +250,9 @@ int CalcHeight()
 
 const uint8_t *postsource;
 int postx;
+// World position of the current wall column, used to sample halo/zone light
+// at the wall (see Halo_LightAtFixed). Captured in HitVert/HitHorizWall.
+int32_t postshadex, postshadey;
 
 void ScalePost()
 {
@@ -259,7 +262,7 @@ void ScalePost()
 	int ywcount, yoffs, yw, yd, yendoffs;
 	uint8_t col;
 
-	const int shade = LIGHT2SHADE(gLevelLight + r_extralight);
+	const int shade = LIGHT2SHADE(gLevelLight + r_extralight + Halo_LightAtFixed(postshadex, postshadey));
 	const int tz = FixedMul(r_depthvisibility<<8, wallheight[postx]);
 	uint8_t *curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 
@@ -404,6 +407,10 @@ void HitVertWall (void)
 		xintercept += TILEGLOBAL;
 	}
 
+	// World position of this wall column, for halo light sampling.
+	postshadex = xintercept-(int32_t)xtilestep;
+	postshadey = yintercept;
+
 	if(lastside==1 && lastintercept==xtile && lasttilehit==tilehit && !(lasttilehit->tile->offsetVertical))
 	{
 		texture -= texture%texxscale;
@@ -477,6 +484,10 @@ void HitHorizWall (void)
 		else
 			texture = (FRACUNIT - texture)&(FRACUNIT-1);
 	}
+
+	// World position of this wall column, for halo light sampling.
+	postshadex = xintercept;
+	postshadey = yintercept-(int32_t)ytilestep;
 
 	if(lastside==0 && lastintercept==ytile && lasttilehit==tilehit && !(lasttilehit->tile->offsetHorizontal))
 	{
