@@ -12,36 +12,6 @@ uint32_t *Col2RGB8_LessPrecision[65];
 uint32_t Col2RGB8_Inverse[65][256];
 }
 
-IMPLEMENT_ABSTRACT_CLASS (DCanvas)
-IMPLEMENT_ABSTRACT_CLASS (DFrameBuffer)
-
-class DDummyFrameBuffer : public DFrameBuffer
-{
-	DECLARE_CLASS (DDummyFrameBuffer, DFrameBuffer);
-public:
-	DDummyFrameBuffer (int width, int height)
-		: DFrameBuffer (0, 0)
-	{
-		Width = width;
-		Height = height;
-	}
-	bool Lock(bool buffered) { return false; }
-	void Update() { }
-	PalEntry *GetPalette() { return NULL; }
-	void GetFlashedPalette(PalEntry palette[256]) { }
-	void UpdatePalette() { }
-	bool SetGamma(float gamma) { Gamma = gamma; return true; }
-	bool SetFlash(PalEntry rgb, int amount) { return false; }
-	void GetFlash(PalEntry &rgb, int &amount) { }
-	void PaletteChanged() {}
-	int QueryNewPalette() { return 0; }
-
-	float Gamma;
-};
-IMPLEMENT_INTERNAL_CLASS (DDummyFrameBuffer)
-
-IMPLEMENT_INTERNAL_CLASS (DSimpleCanvas)
-
 DCanvas *DCanvas::CanvasChain = NULL;
 
 //==========================================================================
