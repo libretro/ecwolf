@@ -115,7 +115,7 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 		// Depth fog
 		const int shade = LIGHT2SHADE(gLevelLight + r_extralight);
 		const int tz = FixedMul(FixedDiv(r_depthvisibility, abs(planeheight)), abs(((halfheight)<<16) - ((halfheight-y)<<16)));
-		curshades = &NormalLight.Maps[GETPALOOKUP(tz, shade)<<8];
+		curshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), shade)<<8];
 
 		// Halo lighting: for each active halo, find the screen-x span where this
 		// row's ray crosses the halo circle (ray-circle intersection) and add
@@ -229,7 +229,7 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 					if(hb != 0)
 					{
 						const int bshade = LIGHT2SHADE(gLevelLight + r_extralight + hb);
-						pixshades = &NormalLight.Maps[GETPALOOKUP(tz, bshade)<<8];
+						pixshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), bshade)<<8];
 					}
 
 					if(useOptimized)
