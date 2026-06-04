@@ -377,11 +377,13 @@ class FVGAGraph : public FResourceFile
 				Reader->Seek(lumps[tile8Position].position, SEEK_SET);
 				Reader->Read(data, lumps[tile8Position].length);
 				uint8_t* endPtr = lumps[tile8Position].HuffExpand(data, out);
+				// Compute the size from the expansion result before freeing
+				// the buffers; using endPtr/out after delete[] is undefined.
+				lumps[tile8Position].LumpSize = (unsigned int)(endPtr - out)&~0x3F;
 				delete[] data;
 				delete[] out;
 
 				lumps[tile8Position].noSkip = true;
-				lumps[tile8Position].LumpSize = (unsigned int)(endPtr - out)&~0x3F;
 			}
 			if(dimensions != NULL)
 				delete[] dimensions;

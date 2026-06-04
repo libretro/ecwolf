@@ -316,10 +316,10 @@ class Mix_Chunk_IMF : public Mix_Chunk_Sampled
 public:
         Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 		      bool isLooping);
-        virtual ~Mix_Chunk_IMF() {
-		free (imf);
-		delete imfOpl;
-	}
+        // Defined out-of-line in id_sd_adlib.cpp where DBOPL::Chip is a
+        // complete type; deleting imfOpl here (with Chip only forward-declared)
+        // would skip its destructor and is undefined behaviour.
+        virtual ~Mix_Chunk_IMF();
 
 	int GetLengthTicks() {
 		return sample_count * TICRATE / rate + 1;

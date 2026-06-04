@@ -239,6 +239,14 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 		SDL_AlSetChanInst(*imfOpl, &ChannelRelease, i);
 }
 
+// Out-of-line so DBOPL::Chip is a complete type at the delete site (see the
+// declaration in state_machine.h).
+Mix_Chunk_IMF::~Mix_Chunk_IMF()
+{
+	free (imf);
+	delete imfOpl;
+}
+
 Mix_Chunk *SynthesizeAdlibIMFOrN3D(const uint8_t *dataRaw, size_t size)
 {
 	// Ogg Vorbis music track (e.g. a high-quality replacement for the IMF
