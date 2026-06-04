@@ -278,7 +278,10 @@ int FZipExploder::Explode(unsigned char *out, unsigned int outsize,
 			len += minMatchLen;
 			dist++;
 			if (bIdx + len > outsize) {
-				throw CExplosionError("Not enough output space");
+				/* Corrupt/malformed imploded data: would write past the
+				 * output buffer. Bail with the same error return the other
+				 * failure paths in this function use rather than throwing. */
+				return 1;
 			}
 			if ((unsigned int)dist > bIdx) {
 				/* Anything before the first input uint8_t is zero. */
