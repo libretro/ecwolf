@@ -56,7 +56,7 @@ const FName SpecialThingNames[SMT_NumThings] = {
 	"$Player1Start"
 };
 
-GameMap::GameMap(const FString &map) : map(map), valid(false), isUWMF(false),
+GameMap::GameMap(const FString &map) : map(map), valid(false), loadFailed(false), isUWMF(false),
 	file(NULL), zoneTraversed(NULL), zoneLinks(NULL)
 {
 	lumps[0] = NULL;
@@ -390,8 +390,14 @@ bool GameMap::LoadMap(bool loadingSave)
 	else
 		ReadPlanesData();
 
+	if(loadFailed)
+		return false;
+
 	if(!loadingSave)
 		ScanTiles();
+
+	if(loadFailed)
+		return false;
 
 	return true;
 }
@@ -410,7 +416,14 @@ GameMap::Plane &GameMap::NewPlane()
 GameMap::Trigger &GameMap::NewTrigger(unsigned int x, unsigned int y, unsigned int z)
 {
 	if(z >= planes.Size())
-		throw CRecoverableError("Trigger assigned to non-existant plane!");
+	{
+		// Corrupt map data: a trigger references a plane that does not exist.
+		// Flag the load as failed (LoadMap aborts on this) and fall back to
+		// plane 0 so this call can still return a valid reference.
+		libretro_log("Trigger assigned to non-existant plane!\n");
+		loadFailed = true;
+		z = 0;
+	}
 
 	MapSpot spot = GetSpot(x, y, z);
 	Trigger newTrig;

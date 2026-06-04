@@ -233,6 +233,7 @@ class GameMap
 		FString	map;
 
 		bool	valid;
+		bool	loadFailed;	// set when a fatal error is hit mid-parse
 		bool	isWad;
 		bool	isUWMF;
 		int		markerLump;

@@ -127,18 +127,23 @@ public:
 		MapTrigger		triggerTemplate;
 	};
 
-	Xlat() : lump(0)
+	Xlat() : lump(0), failed(false)
 	{
 	}
+
+	// Set instead of throwing on a fatal translator error; ReadPlanesData
+	// checks this after using the Xlat and aborts the load cleanly.
+	bool Failed() const { return failed; }
+	void ClearFailed() { failed = false; }
 
 	void LoadXlat(const FString &baseLumpName, const GameInfo::FStringStack *baseStack, bool included=false)
 	{
 		int lump = Wads.CheckNumForFullName(baseLumpName, true);
 		if(lump == -1)
 		{
-			FString error;
-			error.Format("Could not open map translator '%s'.", baseLumpName.GetChars());
-			throw CRecoverableError(error);
+			libretro_log("Could not open map translator '%s'.\n", baseLumpName.GetChars());
+			failed = true;
+			return;
 		}
 
 		if(!included)
@@ -230,7 +235,11 @@ public:
 				min = pair->Key;
 		}
 		if(min > max)
-			throw CRecoverableError("No tiles found for translation!");
+		{
+			libretro_log("No tiles found for translation!\n");
+			failed = true;
+			return 0;
+		}
 
 		tilePalette.Resize(max-min+1);
 
@@ -657,6 +666,7 @@ private:
 	}
 
 	int lump;
+	bool failed;
 
 	TArray<ThingXlat> thingTable;
 	TMap<uint16_t, ThingSpecialXlat> thingSpecialTable;
@@ -936,6 +946,11 @@ void GameMap::ReadPlanesData()
 	else
 		xlat.LoadXlat(levelInfo->Translator, &gameinfo.Translator);
 
+	if(xlat.Failed())
+	{
+		loadFailed = true;
+		return;
+	}
 	Xlat::EFeatureFlags FeatureFlags = xlat.GetFeatureFlags();
 	sectorPalette.Clear();
 
@@ -1012,6 +1027,11 @@ void GameMap::ReadPlanesData()
 			case Plane_Tiles:
 			{
 				uint16_t tileStart = xlat.GetTilePalette(tilePalette);
+				if(xlat.Failed())
+				{
+					loadFailed = true;
+					return;
+				}
 				xlat.GetZonePalette(zonePalette);
 
 				TArray<uint16_t> fillSpots;
