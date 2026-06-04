@@ -63,7 +63,7 @@ void (STACK_ARGS *hcolfunc_post4) (int sx, int yl, int yh);
 void R_SetupBuffer(void)
 {
 	int pitch = screen->GetPitch();
-	uint8_t *lineptr = screen->GetBuffer() + 0 * pitch;
+	uint8_t *lineptr = screen->GetBuffer();
 	if (dc_pitch != pitch)
 	{
 		dc_pitch = pitch;
@@ -90,8 +90,8 @@ void R_InitRenderer(void)
 	atterm(R_ShutdownRenderer);
 	/* viewwidth / viewheight are set by the defaults */
 
-	R_InitTranslationTables ();
-	R_InitColumnDrawers ();
+	R_InitTranslationTables();
+	R_InitColumnDrawers();
 
 	colfunc = basecolfunc = R_DrawColumnP_C;
 	fuzzcolfunc = R_DrawFuzzColumnP_C;

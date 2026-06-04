@@ -745,8 +745,6 @@ void FFont::BuildTranslations (const double *luminosity, const uint8_t *identity
 			continue;
 		}
 
-		assert(parmstart->RangeStart >= 0);
-
 		remap.Remap[0] = 0;
 		remap.Palette[0] = 0;
 
@@ -1003,8 +1001,6 @@ FFont::FFont (int lump)
 
 FSingleLumpFont::FSingleLumpFont (const char *name, int lump) : FFont(lump)
 {
-	assert(lump >= 0);
-
 	Name = copystring (name);
 
 	FMemLump data1 = Wads.ReadLump (lump);
@@ -1180,7 +1176,6 @@ void FSingleLumpFont::LoadTranslations()
 
 		default:
 			// Should be unreachable; internal font-type enum.
-			assert (0 && "Unknown font type in FSingleLumpFont::LoadTranslation");
 			break;
 	}
 
@@ -1557,16 +1552,10 @@ void FSingleLumpFont::LoadBMF(int lump, const uint8_t *data)
 	// Now scan through the characters again, creating glyphs for each one.
 	for (i = chari = 0; i < numchars; ++i, chari += 6 + chardata[chari+1] * chardata[chari+2])
 	{
-		assert(chardata[chari] - FirstChar >= 0);
-		assert(chardata[chari] - FirstChar < count);
 		if (chardata[chari] == ' ')
-		{
 			SpaceWidth = chardata[chari+5];
-		}
 		else if (chardata[chari] == 'N')
-		{
 			nwidth = chardata[chari+5];
-		}
 		Chars[chardata[chari] - FirstChar].XMove = chardata[chari+5];
 		if (chardata[chari+1] == 0 || chardata[chari+2] == 0)
 		{ // Empty character: skip it.
@@ -1817,9 +1806,7 @@ FFontChar1::FFontChar1 (FTexture *sourcelump)
 {
 	UseType = FTexture::TEX_FontChar;
 	BaseTexture = sourcelump;
-
 	// now copy all the properties from the base texture
-	assert(BaseTexture != NULL);
 	CopySize(BaseTexture);
 	Pixels = NULL;
 }
@@ -2569,7 +2556,7 @@ void V_InitCustomFonts()
 //
 //==========================================================================
 
-void V_InitFontColors ()
+void V_InitFontColors(void)
 {
 	TArray<FName> names;
 	int lump, lastlump = 0;
@@ -2802,7 +2789,6 @@ void V_InitFontColors ()
 	qsort (&TranslationLookup[0], TranslationLookup.Size(), sizeof(TranslationLookup[0]), TranslationMapCompare);
 
 	NumTextColors = index;
-	assert (NumTextColors >= NUM_TEXT_COLORS);
 }
 
 //==========================================================================
@@ -2998,16 +2984,12 @@ void V_InitFonts()
 
 	if(!(Tile8Font = FindNewestFont("Tile8", "TILE8")))
 		Tile8Font = FindNewestFont("Tile8", "IFNT");
-
-	assert(SmallFont && SmallFont2 && BigFont && ConFont && IntermissionFont);
 }
 
 void V_ClearFonts()
 {
 	while (FFont::FirstFont != NULL)
-	{
 		delete FFont::FirstFont;
-	}
 	FFont::FirstFont = NULL;
 	SmallFont = SmallFont2 = BigFont = ConFont = IntermissionFont = NULL;
 }

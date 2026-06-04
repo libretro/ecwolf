@@ -779,7 +779,6 @@ int FWadCollection::FindLump (const char *name, int *lastlump, bool anyns)
 
 	uppercopy (name8, name);
 
-	assert(lastlump != NULL && *lastlump >= 0);
 	lump_p = &LumpInfo[*lastlump];
 	while (lump_p < &LumpInfo[NumLumps])
 	{
@@ -809,10 +808,7 @@ int FWadCollection::FindLump (const char *name, int *lastlump, bool anyns)
 
 int FWadCollection::FindLumpMulti (const char **names, int *lastlump, bool anyns, int *nameindex)
 {
-	LumpRecord *lump_p;
-
-	assert(lastlump != NULL && *lastlump >= 0);
-	lump_p = &LumpInfo[*lastlump];
+	LumpRecord *lump_p = &LumpInfo[*lastlump];
 	while (lump_p < &LumpInfo[NumLumps])
 	{
 		FResourceLump *lump = lump_p->lump;

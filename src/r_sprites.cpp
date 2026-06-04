@@ -529,7 +529,6 @@ void Scale3DSpriter(AActor *actor, int x1, int x2, FTexture *tex, bool flip, con
 		while(i > nexti)
 		{
 			++x;
-			assert(x < texWidth);
 			src = tex->GetColumn(flip ? texWidth - x - 1 : x, &spans);
 
 			dxa += dxx;
@@ -788,7 +787,6 @@ void SpriteZoomer::Tick()
 		}
 	}
 
-	assert(count <= zoomtime);
 	if(++count > zoomtime)
 		Destroy();
 }

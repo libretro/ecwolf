@@ -37,11 +37,6 @@
 #include "renderstyle.h"
 #include "c_cvars.h"
 
-#define r_drawtrans true
-#define r_drawfuzz 1
-//CVAR (Bool, r_drawtrans, true, 0)
-//CVAR (Int, r_drawfuzz, 1, CVAR_ARCHIVE)
-
 // Convert legacy render styles to flexible render styles.
 
 // Apple's GCC 4.0.1 apparently wants to initialize the AsDWORD member of FRenderStyle
@@ -113,19 +108,13 @@ FArchive &operator<< (FArchive &arc, FRenderStyle &style)
 bool FRenderStyle::IsVisible(fixed_t alpha) const throw()
 {
 	if (BlendOp == STYLEOP_None)
-	{
 		return false;
-	}
 	if (BlendOp == STYLEOP_Add || BlendOp == STYLEOP_RevSub)
 	{
 		if (Flags & STYLEF_Alpha1)
-		{
 			alpha = FRACUNIT;
-		}
 		else
-		{
 			alpha = clamp<fixed>(alpha, 0, FRACUNIT);
-		}
 		return GetAlpha(SrcAlpha, alpha) != 0 || GetAlpha(DestAlpha, alpha) != FRACUNIT;
 	}
 	// Treat anything else as visible.
@@ -137,7 +126,7 @@ bool FRenderStyle::IsVisible(fixed_t alpha) const throw()
 //
 // FRenderStyle :: CheckFuzz
 //
-// Adjusts settings based on r_drawfuzz CVAR
+// Adjusts settings
 //
 //==========================================================================
 
@@ -145,42 +134,16 @@ void FRenderStyle::CheckFuzz()
 {
 	switch (BlendOp)
 	{
-	default:
-		return;
-
-	case STYLEOP_FuzzOrAdd:
-		if (r_drawtrans && r_drawfuzz == 0)
-		{
-			BlendOp = STYLEOP_Add;
+		default:
 			return;
-		}
-		break;
 
-	case STYLEOP_FuzzOrSub:
-		if (r_drawtrans && r_drawfuzz == 0)
-		{
-			BlendOp = STYLEOP_Sub;
-			return;
-		}
-		break;
-
-	case STYLEOP_FuzzOrRevSub:
-		if (r_drawtrans && r_drawfuzz == 0)
-		{
-			BlendOp = STYLEOP_RevSub;
-			return;
-		}
-		break;
+		case STYLEOP_FuzzOrAdd:
+		case STYLEOP_FuzzOrSub:
+		case STYLEOP_FuzzOrRevSub:
+			break;
 	}
 
-	if (r_drawfuzz == 2)
-	{
-		BlendOp = STYLEOP_Shadow;
-	}
-	else
-	{
-		BlendOp = STYLEOP_Fuzz;
-	}
+	BlendOp = STYLEOP_Fuzz;
 }
 
 fixed_t GetAlpha(int type, fixed_t alpha)

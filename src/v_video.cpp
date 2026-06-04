@@ -3,9 +3,6 @@
 #include "thingdef/thingdef.h"
 #include "wl_main.h"
 
-#define dimamount (-1.f)
-#define dimcolor 0xffd700
-
 extern "C" {
 uint32_t Col2RGB8[65][256];
 uint32_t *Col2RGB8_LessPrecision[65];
@@ -47,15 +44,14 @@ void DCanvas::FlatFill (int left, int top, int right, int bottom, FTexture *src,
 //
 // DCanvas :: Dim
 //
-// Applies a colored overlay to the entire screen, with the opacity
-// determined by the dimamount cvar.
+// Applies a colored overlay to the entire screen.
 //
 //==========================================================================
 
 void DCanvas::Dim (PalEntry color)
 {
-	PalEntry dimmer = PalEntry(dimcolor);
-	float amount = dimamount;
+	PalEntry dimmer = PalEntry(0xffd700);
+	float amount    = -1.0f;
 
 	// Add the cvar's dimming on top of the color passed to the function
 	if (color.a != 0)
@@ -128,7 +124,7 @@ uint8_t RGB32k[32][32][32];
 // There's also only one, not four.
 DCanvas *screen;
 
-void GenerateLookupTables()
+void GenerateLookupTables(void)
 {
 	static uint32_t Col2RGB8_2[63][256];
 
@@ -266,27 +262,19 @@ normal:
 			{
 				// Skip leading whitespace
 				while (*cstr <= ' ' && *cstr != '\0')
-				{
 					cstr++;
-				}
 				// Extract a component and convert it to eight-bit
 				for (p = 0; *cstr > ' '; ++p, ++cstr)
 				{
 					if (p < 2)
-					{
 						val[p] = *cstr;
-					}
 				}
 				if (p == 0)
-				{
 					c[i] = 0;
-				}
 				else
 				{
 					if (p == 1)
-					{
 						val[1] = val[0];
-					}
 					c[i] = ParseHex (val);
 				}
 			}
@@ -294,8 +282,7 @@ normal:
 	}
 	if (palette)
 		return ColorMatcher.Pick (c[0], c[1], c[2]);
-	else
-		return MAKERGB(c[0], c[1], c[2]);
+	return MAKERGB(c[0], c[1], c[2]);
 }
 
 //==========================================================================
@@ -313,12 +300,10 @@ int V_GetColor (const uint32_t *palette, const char *str)
 
 void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int realheight, int *cleanx, int *cleany, int *_cx1, int *_cx2)
 {
-	int ratio;
 	int cwidth;
 	int cheight;
 	int cx1, cy1, cx2, cy2;
-
-	ratio = CheckRatio(realwidth, realheight);
+	int ratio = CheckRatio(realwidth, realheight);
 	if (ratio & 4)
 	{
 		cwidth = realwidth;

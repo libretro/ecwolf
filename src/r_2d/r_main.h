@@ -19,7 +19,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #ifndef __R_MAIN_H__
 #define __R_MAIN_H__
 
@@ -56,9 +55,8 @@ extern void (*hcolfunc_pre) (void);
 extern void (*hcolfunc_post1) (int hx, int sx, int yl, int yh);
 extern void (STACK_ARGS *hcolfunc_post4) (int sx, int yl, int yh);
 
-
-void R_SetupBuffer ();
-void R_InitRenderer();
+void R_SetupBuffer(void);
+void R_InitRenderer(void);
 
 
 #endif // __R_MAIN_H__

@@ -102,8 +102,6 @@ struct FPalette
 };
 
 extern FPalette GPalette;
-// The color overlay to use for depleted items
-#define DIM_OVERLAY MAKEARGB(170,0,0,0)
 
 int BestColor (const uint32_t *pal, int r, int g, int b, int first=1, int num=255);
 void DoBlending (const PalEntry *from, PalEntry *to, int count, int r, int g, int b, int a);
@@ -125,10 +123,5 @@ void V_SetBlend (int blendr, int blendg, int blendb, int blenda);
 // same as the old. This function will perform the blending
 // even if the blend hasn't changed.
 void V_ForceBlend (int blendr, int blendg, int blendb, int blenda);
-
-
-// Colorspace conversion RGB <-> HSV
-void RGBtoHSV (float r, float g, float b, float *h, float *s, float *v);
-void HSVtoRGB (float *r, float *g, float *b, float h, float s, float v);
 
 #endif //__V_PALETTE_H__

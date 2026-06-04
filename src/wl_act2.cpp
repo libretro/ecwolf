@@ -510,7 +510,6 @@ ACTION_FUNCTION(A_Chase)
 		// if it doesn't find one switches to idle. Wolf3D, however, never had
 		// explicit targets so the player was assumed to always be targeted.
 		self->target = players[pr_chase()%Net::InitVars.numPlayers].mo;
-		assert(self->target);
 	}
 
 	if (self->dir == nodir)

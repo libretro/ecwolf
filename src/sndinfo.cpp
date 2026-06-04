@@ -244,9 +244,7 @@ void SoundInformation::Init()
 	int lastLump = 0;
 	int lump = 0;
 	while((lump = Wads.FindLump("SNDINFO", &lastLump)) != -1)
-	{
 		ParseSoundInformation(lump);
-	}
 
 	CreateHashTable();
 }
@@ -326,7 +324,6 @@ void SoundInformation::ParseSoundInformation(int lumpNum)
 
 			if(!sc.GetNextString())
 				sc.ScriptMessage(Scanner::ERROR, "Expected logical name.");
-			assert(sc->str[0] != '}');
 
 			SoundData &idx = AddSound(sc->str);
 			// Initialize/clean in case we're replacing

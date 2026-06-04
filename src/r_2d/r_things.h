@@ -30,7 +30,7 @@ extern short*			mfloorclip;
 extern short*			mceilingclip;
 extern fixed_t			spryscale;
 extern fixed_t			sprtopscreen;
-extern bool				sprflipvert;
+extern bool			sprflipvert;
 
 
 void R_DrawMaskedColumn (const uint8_t *column, const FTexture::Span *spans);

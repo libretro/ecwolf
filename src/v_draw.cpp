@@ -51,10 +51,6 @@
 #include "c_cvars.h"
 #include "wl_main.h"
 
-static inline int32_t DivScale32(const int64_t a, const int32_t b)
-{
-	return static_cast<int32_t>((a << 32) / b);
-}
 static inline void clearbufshort(void *buffer, unsigned int count, uint16_t clear)
 {
 	uint16_t *b = reinterpret_cast<uint16_t*>(buffer), * const end = reinterpret_cast<uint16_t*>(buffer)+count;
@@ -75,14 +71,10 @@ int CleanXfac_1, CleanYfac_1, CleanWidth_1, CleanHeight_1;
 // FillSimplePoly uses this
 extern "C" short spanend[MAXHEIGHT];
 
-#define hud_scale false
-//CVAR (Bool, hud_scale, false, CVAR_ARCHIVE);
-
 // For routines that take RGB colors, cache the previous lookup in case there
 // are several repetitions with the same color.
 static int LastPal = -1;
 static uint32_t LastRGB;
-
 
 static int PalFromRGB(uint32_t rgb)
 {
@@ -92,17 +84,11 @@ static int PalFromRGB(uint32_t rgb)
 	}
 	// Quick check for black and white.
 	if (rgb == MAKEARGB(255,0,0,0))
-	{
 		LastPal = GPalette.BlackIndex;
-	}
 	else if (rgb == MAKEARGB(255,255,255,255))
-	{
 		LastPal = GPalette.WhiteIndex;
-	}
 	else
-	{
 		LastPal = ColorMatcher.Pick(RPART(rgb), GPART(rgb), BPART(rgb));
-	}
 	LastRGB = rgb;
 	return LastPal;
 }
@@ -201,13 +187,9 @@ void STACK_ARGS DCanvas::DrawTextureV(FTexture *img, double x, double y, uint32_
 		double iyscale = 1 / yscale;
 
 		spryscale = FLOAT2FIXED(yscale);
-		assert(spryscale > 2);
 
 		sprflipvert = false;
-		//dc_iscale = FLOAT2FIXED(iyscale);
-		//dc_texturemid = FLOAT2FIXED((-y0) * iyscale);
-		//dc_iscale = 0xffffffffu / (unsigned)spryscale;
-		dc_iscale = DivScale32(1, spryscale);
+		dc_iscale     = static_cast<int32_t>(0x100000000 / spryscale);
 		dc_texturemid = FixedMul(-sprtopscreen, dc_iscale) + FixedMul(centeryfrac-FRACUNIT, dc_iscale);
 		fixed_t frac = 0;
 		double xiscale = img->GetWidth() / parms.destwidth;
@@ -460,31 +442,15 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 		case DTA_HUDRules:
 			{
 				bool xright = parms->x < 0;
-				bool ybot = parms->y < 0;
-				intval = va_arg(tags, int);
+				bool ybot   = parms->y < 0;
+				intval      = va_arg(tags, int);
 
-				if (hud_scale)
-				{
-					parms->x *= CleanXfac;
-					if (intval == HUD_HorizCenter)
-						parms->x += Width * 0.5;
-					else if (xright)
-						parms->x = Width + parms->x;
-					parms->y *= CleanYfac;
-					if (ybot)
-						parms->y = Height + parms->y;
-					parms->destwidth = parms->texwidth * CleanXfac;
-					parms->destheight = parms->texheight * CleanYfac;
-				}
-				else
-				{
-					if (intval == HUD_HorizCenter)
-						parms->x += Width * 0.5;
-					else if (xright)
-						parms->x = Width + parms->x;
-					if (ybot)
-						parms->y = Height + parms->y;
-				}
+				if (intval == HUD_HorizCenter)
+					parms->x += Width * 0.5;
+				else if (xright)
+					parms->x = Width + parms->x;
+				if (ybot)
+					parms->y = Height + parms->y;
 			}
 			break;
 
@@ -617,9 +583,7 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 		case DTA_ClipRight:
 			parms->rclip = va_arg(tags, int);
 			if (parms->rclip > this->GetWidth())
-			{
 				parms->rclip = this->GetWidth();
-			}
 			break;
 
 		case DTA_ShadowAlpha:
@@ -685,40 +649,26 @@ bool DCanvas::ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t 
 	}
 
 	if (parms->destwidth <= 0 || parms->destheight <= 0)
-	{
 		return false;
-	}
 
 	if (parms->remap != NULL)
-	{
 		parms->translation = parms->remap->Remap;
-	}
 
 	if (parms->style.BlendOp == 255)
 	{
 		if (parms->fillcolor != ~0u)
 		{
 			if (parms->alphaChannel)
-			{
 				parms->style = STYLE_Shaded;
-			}
 			else if (parms->alpha < FRACUNIT)
-			{
 				parms->style = STYLE_TranslucentStencil;
-			}
 			else
-			{
 				parms->style = STYLE_Stencil;
-			}
 		}
 		else if (parms->alpha < FRACUNIT)
-		{
 			parms->style = STYLE_Translucent;
-		}
 		else
-		{
 			parms->style = STYLE_Normal;
-		}
 	}
 	return true;
 }
@@ -748,9 +698,7 @@ void DCanvas::VirtualToRealCoords(double &x, double &y, double &w, double &h,
 		y = (y - vheight * 0.5) * Height * 600 / (vheight * AspectCorrection[myratio].baseHeight) + Height * 0.5;
 		h = (bottom - vheight * 0.5) * Height * 600 / (vheight * AspectCorrection[myratio].baseHeight) + Height * 0.5 - y;
 		if (vbottom)
-		{
 			y += (Height - Height * AspectCorrection[myratio].multiplier / 48.0) * 0.5;
-		}
 	}
 	else
 	{
@@ -789,7 +737,6 @@ void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 }
 
 void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor)
-//void DrawTransWuLine (int x0, int y0, int x1, int y1, uint8_t palColor)
 {
 	const int WeightingScale = 0;
 	const int WEIGHTBITS = 6;
@@ -798,9 +745,7 @@ void DCanvas::DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t re
 	const int WEIGHTMASK = (NUMWEIGHTS-1);
 
 	if (palColor < 0)
-	{
 		palColor = PalFromRGB(realcolor);
-	}
 
 	Lock();
 	int deltaX, deltaY, xDir;
@@ -962,17 +907,10 @@ void DCanvas::Clear (int left, int top, int right, int bottom, int palcolor, uin
 	uint8_t *dest;
 
 	if (left == right || top == bottom)
-	{
 		return;
-	}
-
-	assert(left < right);
-	assert(top < bottom);
 
 	if (left >= Width || right <= 0 || top >= Height || bottom <= 0)
-	{
 		return;
-	}
 	left = MAX(0,left);
 	right = MIN(Width,right);
 	top = MAX(0,top);
@@ -1056,9 +994,9 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 		}
 	}
 	if (topy >= Height ||		// off the bottom of the screen
-		boty <= 0 ||			// off the top of the screen
-		leftx >= Width ||		// off the right of the screen
-		rightx <= 0)			// off the left of the screen
+			boty <= 0 ||			// off the top of the screen
+			leftx >= Width ||		// off the right of the screen
+			rightx <= 0)			// off the left of the screen
 	{
 		return;
 	}
@@ -1167,7 +1105,9 @@ void DCanvas::FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 		}
 		y1 = y2;
 		pt1 = pt2;
-		pt2--;			if (pt2 < 0) pt2 = npoints;
+		pt2--;
+		if (pt2 < 0)
+			pt2 = npoints;
 	} while (pt1 != botpt);
 }
 

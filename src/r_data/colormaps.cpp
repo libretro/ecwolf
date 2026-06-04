@@ -46,14 +46,9 @@
 #include "templates.h"
 #include "g_mapinfo.h"
 
-static bool R_CheckForFixedLights(const uint8_t *colormaps);
-
-
 extern "C" {
 FDynamicColormap NormalLight;
 }
-bool NormalLightHasFixedLights;
-
 
 struct FakeCmap 
 {
@@ -64,9 +59,6 @@ struct FakeCmap
 
 TArray<FakeCmap> fakecmaps;
 uint8_t *realcolormaps;
-size_t numfakecmaps;
-
-
 
 TArray<FSpecialColormap> SpecialColormaps;
 uint8_t DesaturateColormap[31][256];
@@ -304,77 +296,6 @@ void FDynamicColormap::BuildLights ()
 
 //==========================================================================
 //
-//
-//
-//==========================================================================
-
-void FDynamicColormap::ChangeColor (PalEntry lightcolor, int desaturate)
-{
-	if (lightcolor != Color || desaturate != Desaturate)
-	{
-		Color = lightcolor;
-		// [BB] desaturate must be in [0,255]
-		Desaturate = clamp(desaturate, 0, 255);
-		if (Maps) BuildLights ();
-	}
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FDynamicColormap::ChangeFade (PalEntry fadecolor)
-{
-	if (fadecolor != Fade)
-	{
-		Fade = fadecolor;
-		if (Maps) BuildLights ();
-	}
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FDynamicColormap::ChangeColorFade (PalEntry lightcolor, PalEntry fadecolor)
-{
-	if (lightcolor != Color || fadecolor != Fade)
-	{
-		Color = lightcolor;
-		Fade = fadecolor;
-		if (Maps) BuildLights ();
-	}
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FDynamicColormap::RebuildAllLights()
-{
-	//if (Renderer->UsesColormap())
-	{
-		FDynamicColormap *cm;
-
-		for (cm = &NormalLight; cm != NULL; cm = cm->Next)
-		{
-			if (cm->Maps == NULL)
-			{
-				cm->Maps = new uint8_t[NUMCOLORMAPS*256];
-				cm->BuildLights ();
-			}
-		}
-	}
-}
-
-//==========================================================================
-//
 // R_SetDefaultColormap
 //
 //==========================================================================
@@ -475,7 +396,7 @@ void R_SetDefaultColormap (const char *name)
 //
 //==========================================================================
 
-void R_DeinitColormaps ()
+void R_DeinitColormaps(void)
 {
 	SpecialColormaps.Clear();
 	fakecmaps.Clear();
@@ -493,7 +414,7 @@ void R_DeinitColormaps ()
 //
 //==========================================================================
 
-void R_InitColormaps ()
+void R_InitColormaps(void)
 {
 	// [RH] Try and convert BOOM colormaps into blending values.
 	//		This is a really rough hack, but it's better than
@@ -576,8 +497,6 @@ void R_InitColormaps ()
 	NormalLight.Color = PalEntry (255, 255, 255);
 	NormalLight.Fade = 0;
 	NormalLight.Maps = realcolormaps;
-	NormalLightHasFixedLights = R_CheckForFixedLights(realcolormaps);
-	numfakecmaps = fakecmaps.Size();
 
 	// build default special maps (e.g. invulnerability)
 
@@ -603,90 +522,4 @@ void R_InitColormaps ()
 			shade[c] = ColorMatcher.Pick(r, g, b);
 		}
 	}
-}
-
-//==========================================================================
-//
-// R_CheckForFixedLights
-//
-// Returns true if there are any entries in the colormaps that are the
-// same for every colormap and not the fade color.
-//
-//==========================================================================
-
-static bool R_CheckForFixedLights(const uint8_t *colormaps)
-{
-	const uint8_t *lastcolormap = colormaps + (NUMCOLORMAPS - 1) * 256;
-	uint8_t freq[256];
-	int i, j;
-
-	// Count the frequencies of different colors in the final colormap.
-	// If they occur more than X amount of times, we ignore them as a
-	// potential fixed light.
-
-	memset(freq, 0, sizeof(freq));
-	for (i = 0; i < 256; ++i)
-	{
-		freq[lastcolormap[i]]++;
-	}
-
-	// Now check the colormaps for fixed lights that are uncommon in the
-	// final coloramp.
-	for (i = 255; i >= 0; --i)
-	{
-		uint8_t color = lastcolormap[i];
-		if (freq[color] > 10)		// arbitrary number to decide "common" colors
-		{
-			continue;
-		}
-		// It's rare in the final colormap. See if it's the same for all colormaps.
-		for (j = 0; j < NUMCOLORMAPS - 1; ++j)
-		{
-			if (colormaps[j * 256 + i] != color)
-				break;
-		}
-		if (j == NUMCOLORMAPS - 1)
-		{ // It was the same all the way across.
-			return true;
-		}
-	}
-	return false;
-}
-
-//==========================================================================
-//
-// [RH] Returns an index into realcolormaps. Multiply it by
-//		256*NUMCOLORMAPS to find the start of the colormap to use.
-//		WATERMAP is an exception and returns a blending value instead.
-//
-//==========================================================================
-
-uint32_t R_ColormapNumForName (const char *name)
-{
-	if (strnicmp (name, "COLORMAP", 8))
-	{	// COLORMAP always returns 0
-		for(int i=fakecmaps.Size()-1; i > 0; i--)
-		{
-			if (!strnicmp(name, fakecmaps[i].name, 8))
-			{
-				return i;
-			}
-		}
-				
-		if (!strnicmp (name, "WATERMAP", 8))
-			return MAKEARGB (128,0,0x4f,0xa5);
-	}
-	return 0;
-}
-
-//==========================================================================
-//
-// R_BlendForColormap
-//
-//==========================================================================
-
-uint32_t R_BlendForColormap (uint32_t map)
-{
-	return APART(map) ? map : 
-		map < fakecmaps.Size() ? uint32_t(fakecmaps[map].blend) : 0;
 }

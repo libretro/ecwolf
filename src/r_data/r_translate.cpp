@@ -1,6 +1,6 @@
 /*
 ** r_translate.cpp
-** Translatioo table handling
+** Translation table handling
 **
 **---------------------------------------------------------------------------
 ** Copyright 1998-2006 Randy Heit
@@ -632,7 +632,7 @@ static void PushIdentityTable(int slot)
 //
 //----------------------------------------------------------------------------
 
-void R_InitTranslationTables ()
+void R_InitTranslationTables(void)
 {
 	int i;//, j;
 
@@ -725,9 +725,7 @@ void R_InitTranslationTables ()
 
 	// Set up a guaranteed identity map
 	for (i = 0; i < 256; ++i)
-	{
 		identitymap[i] = i;
-	}
 }
 
 //----------------------------------------------------------------------------
@@ -736,7 +734,7 @@ void R_InitTranslationTables ()
 //
 //----------------------------------------------------------------------------
 
-void R_DeinitTranslationTables()
+void R_DeinitTranslationTables(void)
 {
 	for (int i = 0; i < NUM_TRANSLATION_TABLES; ++i)
 	{

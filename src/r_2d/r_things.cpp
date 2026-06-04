@@ -64,13 +64,9 @@ void R_DrawMaskedColumn (const uint8_t *column, const FTexture::Span *span)
 		}
 
 		if (dc_yh >= mfloorclip[dc_x])
-		{
 			dc_yh = mfloorclip[dc_x] - 1;
-		}
 		if (dc_yl < mceilingclip[dc_x])
-		{
 			dc_yl = mceilingclip[dc_x];
-		}
 
 		if (dc_yl <= dc_yh)
 		{

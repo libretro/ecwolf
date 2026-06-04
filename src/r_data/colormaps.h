@@ -3,24 +3,15 @@
 
 #include "v_palette.h"
 
-void R_InitColormaps ();
-void R_DeinitColormaps ();
+void R_InitColormaps(void);
+void R_DeinitColormaps(void);
 
-uint32_t R_ColormapNumForName(const char *name);	// killough 4/4/98
 void R_SetDefaultColormap (const char *name);	// [RH] change normal fadetable
-uint32_t R_BlendForColormap (uint32_t map);		// [RH] return calculated blend for a colormap
 extern uint8_t *realcolormaps;						// [RH] make the colormaps externally visible
-extern size_t numfakecmaps;
-
-
 
 struct FDynamicColormap
 {
-	void ChangeFade (PalEntry fadecolor);
-	void ChangeColor (PalEntry lightcolor, int desaturate);
-	void ChangeColorFade (PalEntry lightcolor, PalEntry fadecolor);
 	void BuildLights ();
-	static void RebuildAllLights();
 
 	uint8_t *Maps;
 	PalEntry Color;
@@ -55,35 +46,13 @@ struct FSpecialColormap
 
 extern TArray<FSpecialColormap> SpecialColormaps;
 
-// some utility functions to store special colormaps in powerup blends
-#define SPECIALCOLORMAP_MASK 0x00b60000
-
-inline int MakeSpecialColormap(int index)
-{
-	assert(index >= 0 && index < 65536);
-	return index | SPECIALCOLORMAP_MASK;
-}
-
-inline bool IsSpecialColormap(int map)
-{
-	return (map & 0xFFFF0000) == SPECIALCOLORMAP_MASK;
-}
-
-inline int GetSpecialColormap(int blend)
-{
-	return IsSpecialColormap(blend) ? blend & 0xFFFF : NOFIXEDCOLORMAP;
-}
-
 int AddSpecialColormap(float r1, float g1, float b1, float r2, float g2, float b2);
-
-
 
 extern uint8_t DesaturateColormap[31][256];
 extern "C" 
 {
 extern FDynamicColormap NormalLight;
 }
-extern bool NormalLightHasFixedLights;
 
 FDynamicColormap *GetSpecialLights (PalEntry lightcolor, PalEntry fadecolor, int desaturate);
 

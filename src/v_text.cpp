@@ -119,12 +119,10 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 		// We don't handle these. :(
 		case DTA_DestWidth:
 		case DTA_DestHeight:
-			assert(false && "DTA_DestWidth or DTA_DestHeight unsupported.");
 			break;
 
 		// Translation is specified explicitly by the text.
 		case DTA_Translation:
-			assert(false && "DTA_Translation unsupported.");
 			break;
 
 		case DTA_CleanNoMove_1:
