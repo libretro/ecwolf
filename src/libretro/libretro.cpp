@@ -119,119 +119,93 @@ bool alwaysrun;
 bool preload_digital_sounds;
 float localDesiredFOV = 90.0f;
 
-template <typename color_t> class LibretroFB : public DCanvas
+// ---------------------------------------------------------------------------
+// DCanvas: the single concrete framebuffer. 8bpp indexed Buffer rendered
+// through the palette into a 16- or 32-bpp output (runtime bpp), presented to
+// the frontend either via a frontend-owned software framebuffer or the
+// fallback lr_buffer_.
+// ---------------------------------------------------------------------------
+
+DCanvas::DCanvas (int width, int height, int _bpp)
 {
-public:
-	LibretroFB(int width, int height) : DCanvas (width, height) {
-		width_ = width;
-		height_ = height;
-		lr_pitch_ = width_ * sizeof(color_t);
-		lr_buffer_ = (color_t *) malloc (height_ * lr_pitch_);
-		CHECKMALLOCRESULT(lr_buffer_);
-		Buffer = (uint8_t *) malloc (height_ * Pitch);
-		CHECKMALLOCRESULT(Buffer);
-		memcpy (SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
-		memset (Buffer, 0, height_ * Pitch);
-		PaletteNeedsUpdate = true;
-		FlashAmount = 0;
-		Flash.r = 0;
-		Flash.g = 0;
-		Flash.b = 0;
-	}
-	~LibretroFB () {
-		free(lr_buffer_);
-		free(Buffer);
-	}
+	Width = width;
+	Height = height;
+	bpp = _bpp;
 
-	bool Lock (bool buffer) { return true; }
-	void Unlock () {}
-	bool IsValid () { return true; }
-	void Update () {
-		ComputePalette();
-		present();
-	}
-	void ShowFrame() {
-		// Re-present path (taken when no game tics elapsed this retro_run).
-		// We do not assume lr_buffer_ still holds the last frame: a frontend
-		// buffer is only valid for the retro_run that requested it, so we must
-		// re-expand. ComputePalette() is a no-op unless the palette changed,
-		// so the only added cost over the old behaviour is one expand pass,
-		// which is required for correctness with frontend-owned buffers.
-		present();
-	}
-private:
-	// Present one frame: render the 8bpp Buffer through the palette into
-	// either a frontend-owned software framebuffer (when available and a
-	// format/size match) or the fallback lr_buffer_, then hand the result to
-	// video_cb. Rendering directly into the frontend buffer skips both the
-	// intermediate lr_buffer_ and the copy the frontend would otherwise make
-	// of it in retro_video_refresh_t; the frontend buffer may be GPU-mapped.
-	void present () {
-		void *out_pixels;
-		size_t out_pitch_bytes;
-		if (query_frontend_fb (&out_pixels, &out_pitch_bytes)) {
-			expand_palette ((color_t *) out_pixels,
-				(int) (out_pitch_bytes / sizeof(color_t)));
-			if (video_cb)
-				video_cb (out_pixels, width_, height_, out_pitch_bytes);
-		} else {
-			expand_palette (lr_buffer_, lr_pitch_ / (int)sizeof(color_t));
-			if (video_cb)
-				video_cb (lr_buffer_, width_, height_, lr_pitch_);
-		}
-		g_state.frame_counter++;
-	}
-public:
-	PalEntry *GetPalette () { return SourcePalette; }
-	void UpdatePalette () {
-		PaletteNeedsUpdate = true;
-	}
-	bool SetFlash (PalEntry rgb, int amount) {
-		Flash = rgb;
-		FlashAmount = amount;
-		PaletteNeedsUpdate = true;
-		return true;
-	}
-	void GetFlash (PalEntry &rgb, int &amount) {
-		rgb = Flash;
-		amount = FlashAmount;
-	}
+	// Making the pitch a power of 2 is very bad for performance: keep it
+	// slightly longer than the width at high resolutions to spread cache
+	// lines across column draws (empirically derived in the original code).
+	if (width <= 640)
+		Pitch = width;
+	else
+		Pitch = width + 32 - 8;
 
-protected:
-	PalEntry FlashedPalette[256];
-	color_t effective_palette_[256];
-	virtual void ComputeEffectivePalette() = 0;
-	// The retro_pixel_format this subclass produces. Used to validate the
-	// format the frontend reports for its software framebuffer before we
-	// render directly into it.
-	virtual enum retro_pixel_format ExpectedRetroFormat() = 0;
-private:
-	// Palette-expand the 8bpp indexed Buffer into dst. Source (Buffer) is
-	// 8bpp with a possibly-padded Pitch; dst_stride is the destination row
-	// stride in units of color_t (not bytes). The strides are hoisted out of
-	// the inner loop instead of recomputing per pixel.
-	void expand_palette (color_t *dst, int dst_stride) {
+	width_ = width;
+	height_ = height;
+	lr_pitch_ = width_ * (bpp / 8);
+	lr_buffer_ = malloc (height_ * lr_pitch_);
+	CHECKMALLOCRESULT(lr_buffer_);
+	Buffer = (uint8_t *) malloc (height_ * Pitch);
+	CHECKMALLOCRESULT(Buffer);
+	memcpy (SourcePalette, GPalette.BaseColors, sizeof(PalEntry)*256);
+	memset (Buffer, 0, height_ * Pitch);
+	PaletteNeedsUpdate = true;
+	FlashAmount = 0;
+	Flash.r = 0;
+	Flash.g = 0;
+	Flash.b = 0;
+}
+
+DCanvas::~DCanvas ()
+{
+	free(lr_buffer_);
+	free(Buffer);
+}
+
+void DCanvas::Update ()
+{
+	ComputePalette();
+	present();
+}
+
+void DCanvas::ShowFrame ()
+{
+	// Re-present path (no game tics elapsed this retro_run). We do not assume
+	// lr_buffer_ still holds the last frame: a frontend buffer is only valid
+	// for the retro_run that requested it, so re-expand. ComputePalette() is a
+	// no-op unless the palette changed.
+	present();
+}
+
+bool DCanvas::SetFlash (PalEntry rgb, int amount)
+{
+	Flash = rgb;
+	FlashAmount = amount;
+	PaletteNeedsUpdate = true;
+	return true;
+}
+
+// Expand the 8bpp indexed Buffer into dst (bpp-sized pixels). dst_stride is in
+// pixels, not bytes. The per-pixel work is a dependent byte-indexed palette
+// lookup that no SSE2/NEON gather can vectorise; the bpp branch is hoisted out
+// of the loops so the inner loop is a tight unrolled lookup of one pixel type.
+void DCanvas::expand_palette (void *dst, int dst_stride)
+{
+	const int w = width_;
+	if (bpp == 32)
+	{
+		const uint32_t * const pal = effective_palette_;
 		const uint8_t *src_row = Buffer;
-		color_t *dst_row = dst;
-		const color_t * const pal = effective_palette_;
-		const int w = width_;
+		uint32_t *dst_row = (uint32_t *) dst;
 		for (int y = 0; y < height_; y++) {
 			const uint8_t * const s = src_row;
-			color_t * const d = dst_row;
+			uint32_t * const d = dst_row;
 			int x = 0;
-			// Unroll by 8: the per-pixel work is a dependent byte-indexed
-			// palette lookup which no SSE2/NEON gather can vectorise, so the
-			// win here is purely from amortising loop overhead and exposing
-			// instruction-level parallelism across the independent lookups.
 			for (; x + 8 <= w; x += 8) {
-				d[x+0] = pal[s[x+0]];
-				d[x+1] = pal[s[x+1]];
-				d[x+2] = pal[s[x+2]];
-				d[x+3] = pal[s[x+3]];
-				d[x+4] = pal[s[x+4]];
-				d[x+5] = pal[s[x+5]];
-				d[x+6] = pal[s[x+6]];
-				d[x+7] = pal[s[x+7]];
+				d[x+0] = pal[s[x+0]]; d[x+1] = pal[s[x+1]];
+				d[x+2] = pal[s[x+2]]; d[x+3] = pal[s[x+3]];
+				d[x+4] = pal[s[x+4]]; d[x+5] = pal[s[x+5]];
+				d[x+6] = pal[s[x+6]]; d[x+7] = pal[s[x+7]];
 			}
 			for (; x < w; x++)
 				d[x] = pal[s[x]];
@@ -239,135 +213,125 @@ private:
 			dst_row += dst_stride;
 		}
 	}
-
-	// Ask the frontend for a software framebuffer for the current retro_run
-	// iteration. On success, sets *out_pixels / *out_pitch_bytes and returns
-	// true; the buffer is only valid for this frame and must be handed to
-	// video_cb as-is. Returns false (use lr_buffer_) when the call is
-	// unsupported, the dimensions don't match, or the reported format differs
-	// from what this subclass produces.
-	bool query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes) {
-		struct retro_framebuffer fb;
-
-		// GET_CURRENT_SOFTWARE_FRAMEBUFFER is only valid during retro_run.
-		// ECWolf presents frames during retro_load_game too (the startup
-		// console), where the frontend has no current frame and its handler
-		// dereferences uninitialised state.
-		if (!in_retro_run)
-			return false;
-		if (!environ_cb)
-			return false;
-
-		// Zero the whole struct: the core sets only width/height/access_flags;
-		// the frontend fills in data/pitch/format/memory_flags. Leaving those
-		// as stack garbage makes the frontend act on a bogus format/pitch.
-		memset (&fb, 0, sizeof(fb));
-		fb.width        = (unsigned) width_;
-		fb.height       = (unsigned) height_;
-		fb.access_flags = RETRO_MEMORY_ACCESS_WRITE;
-
-		if (!environ_cb (RETRO_ENVIRONMENT_GET_CURRENT_SOFTWARE_FRAMEBUFFER, &fb))
-			return false;
-		if (fb.data == NULL)
-			return false;
-		// The frontend may hand back a buffer of a different size or a
-		// different (e.g. converted) format than we asked for. We only render
-		// directly when both match what expand_palette() will produce; the
-		// pitch may legitimately differ from width*sizeof(color_t), so it is
-		// honoured rather than required to be tight.
-		if (fb.width != (unsigned) width_ || fb.height != (unsigned) height_)
-			return false;
-		if (fb.format != ExpectedRetroFormat())
-			return false;
-		if (fb.pitch < width_ * sizeof(color_t))
-			return false;
-
-		*out_pixels      = fb.data;
-		*out_pitch_bytes = fb.pitch;
-		return true;
-	}
-
-	void ComputePalette() {
-		if (!PaletteNeedsUpdate)
-			return;
-		PaletteNeedsUpdate = false;
-		memcpy (FlashedPalette, SourcePalette, 256*sizeof(PalEntry));
-		if (FlashAmount)
-		{
-			DoBlending (FlashedPalette, FlashedPalette, 256, Flash.r, Flash.g, Flash.b, FlashAmount);
-		}
-		ComputeEffectivePalette();
-	}
-	color_t *lr_buffer_;
-	int lr_pitch_, width_, height_;
-	int FlashAmount;
-	bool PaletteNeedsUpdate;
-	PalEntry Flash;
-	PalEntry SourcePalette[256];
-};
-
-class LibretroFB32 : public LibretroFB<uint32_t> {
-public:
-	LibretroFB32 (int width, int height) : LibretroFB<uint32_t> (width, height) {}
-
-protected:
-	void ComputeEffectivePalette() {
-		for (int i = 0; i < 256; i++) {
-#ifdef PS2
-			effective_palette_[i] =
-				(FlashedPalette[i].b<<16)
-				| (FlashedPalette[i].g<<8)
-				| (FlashedPalette[i].r);
-#else
-			effective_palette_[i] =
-				(FlashedPalette[i].r<<16)
-				| (FlashedPalette[i].g<<8)
-				| (FlashedPalette[i].b);
-#endif
+	else
+	{
+		const uint32_t * const pal = effective_palette_;
+		const uint8_t *src_row = Buffer;
+		uint16_t *dst_row = (uint16_t *) dst;
+		for (int y = 0; y < height_; y++) {
+			const uint8_t * const s = src_row;
+			uint16_t * const d = dst_row;
+			int x = 0;
+			for (; x + 8 <= w; x += 8) {
+				d[x+0] = (uint16_t) pal[s[x+0]]; d[x+1] = (uint16_t) pal[s[x+1]];
+				d[x+2] = (uint16_t) pal[s[x+2]]; d[x+3] = (uint16_t) pal[s[x+3]];
+				d[x+4] = (uint16_t) pal[s[x+4]]; d[x+5] = (uint16_t) pal[s[x+5]];
+				d[x+6] = (uint16_t) pal[s[x+6]]; d[x+7] = (uint16_t) pal[s[x+7]];
+			}
+			for (; x < w; x++)
+				d[x] = (uint16_t) pal[s[x]];
+			src_row += Pitch;
+			dst_row += dst_stride;
 		}
 	}
-	enum retro_pixel_format ExpectedRetroFormat() {
-#ifdef PS2
-		// PS2 packs a custom BGR byte order that does not match the
-		// frontend's XRGB8888 expectation, so never render directly into a
-		// frontend-owned buffer there.
-		return (enum retro_pixel_format) -1;
-#else
-		return RETRO_PIXEL_FORMAT_XRGB8888;
-#endif
-	}
-};
+}
 
-class LibretroFB16 : public LibretroFB<uint16_t> {
-public:
-	LibretroFB16 (int width, int height) : LibretroFB<uint16_t> (width, height)  {}
-protected:
-	void ComputeEffectivePalette() {
-		for (int i = 0; i < 256; i++) {
+// Ask the frontend for a software framebuffer valid for this retro_run frame.
+// On success sets *out_pixels / *out_pitch_bytes and returns true; returns
+// false (use lr_buffer_) when unsupported, dimensions/format mismatch, etc.
+bool DCanvas::query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes)
+{
+	struct retro_framebuffer fb;
+
+	// GET_CURRENT_SOFTWARE_FRAMEBUFFER is only valid during retro_run. ECWolf
+	// also presents during retro_load_game (startup console), where the
+	// frontend has no current frame.
+	if (!in_retro_run)
+		return false;
+	if (!environ_cb)
+		return false;
+
+	memset (&fb, 0, sizeof(fb));
+	fb.width        = (unsigned) width_;
+	fb.height       = (unsigned) height_;
+	fb.access_flags = RETRO_MEMORY_ACCESS_WRITE;
+
+	if (!environ_cb (RETRO_ENVIRONMENT_GET_CURRENT_SOFTWARE_FRAMEBUFFER, &fb))
+		return false;
+	if (fb.data == NULL)
+		return false;
+	if (fb.width != (unsigned) width_ || fb.height != (unsigned) height_)
+		return false;
+
+	// Only render directly when the frontend's format matches what
+	// expand_palette() produces for this bpp.
+	enum retro_pixel_format expected;
+#ifdef PS2
+	// PS2 packs custom BGR byte orders that match neither XRGB8888 nor RGB565,
+	// so never render directly into a frontend-owned buffer there.
+	expected = (enum retro_pixel_format) -1;
+#else
+	expected = (bpp == 32) ? RETRO_PIXEL_FORMAT_XRGB8888 : RETRO_PIXEL_FORMAT_RGB565;
+#endif
+	if (fb.format != expected)
+		return false;
+	if (fb.pitch < (size_t) (width_ * (bpp / 8)))
+		return false;
+
+	*out_pixels      = fb.data;
+	*out_pitch_bytes = fb.pitch;
+	return true;
+}
+
+void DCanvas::present ()
+{
+	void *out_pixels;
+	size_t out_pitch_bytes;
+	const int px = bpp / 8;
+	if (query_frontend_fb (&out_pixels, &out_pitch_bytes)) {
+		expand_palette (out_pixels, (int) (out_pitch_bytes / px));
+		if (video_cb)
+			video_cb (out_pixels, width_, height_, out_pitch_bytes);
+	} else {
+		expand_palette (lr_buffer_, lr_pitch_ / px);
+		if (video_cb)
+			video_cb (lr_buffer_, width_, height_, lr_pitch_);
+	}
+	g_state.frame_counter++;
+}
+
+void DCanvas::ComputePalette ()
+{
+	if (!PaletteNeedsUpdate)
+		return;
+	PaletteNeedsUpdate = false;
+	memcpy (FlashedPalette, SourcePalette, 256*sizeof(PalEntry));
+	if (FlashAmount)
+		DoBlending (FlashedPalette, FlashedPalette, 256, Flash.r, Flash.g, Flash.b, FlashAmount);
+
+	if (bpp == 32)
+	{
+		for (int i = 0; i < 256; i++)
 #ifdef PS2
 			effective_palette_[i] =
-				(FlashedPalette[i].b >> 3 << 10)
-				| (FlashedPalette[i].g >> 3 << 5)
-				| (FlashedPalette[i].r >> 3);
+				(FlashedPalette[i].b<<16) | (FlashedPalette[i].g<<8) | (FlashedPalette[i].r);
 #else
 			effective_palette_[i] =
-				(FlashedPalette[i].r >> 3 << 11)
-				| (FlashedPalette[i].g >> 2 << 5)
-				| (FlashedPalette[i].b >> 3);
+				(FlashedPalette[i].r<<16) | (FlashedPalette[i].g<<8) | (FlashedPalette[i].b);
 #endif
-		}
 	}
-	enum retro_pixel_format ExpectedRetroFormat() {
+	else
+	{
+		for (int i = 0; i < 256; i++)
 #ifdef PS2
-		// PS2 packs 0RGB1555 in BGR order, which is neither the requested
-		// RGB565 nor a layout the frontend would report, so direct rendering
-		// is disabled there.
-		return (enum retro_pixel_format) -1;
+			effective_palette_[i] =
+				(FlashedPalette[i].b >> 3 << 10) | (FlashedPalette[i].g >> 3 << 5) | (FlashedPalette[i].r >> 3);
 #else
-		return RETRO_PIXEL_FORMAT_RGB565;
+			effective_palette_[i] =
+				(FlashedPalette[i].r >> 3 << 11) | (FlashedPalette[i].g >> 2 << 5) | (FlashedPalette[i].b >> 3);
 #endif
 	}
-};
+}
 
 class LibretroVideo : public IVideo
 {
@@ -376,9 +340,7 @@ public:
 	~LibretroVideo () {}
 
 	DCanvas *CreateFrameBuffer (int width, int height, bool fs, DCanvas *old) {
-		if (bpp == 32)
-			return new LibretroFB32(width, height);
-		return new LibretroFB16(width, height);		
+		return new DCanvas(width, height, bpp);
 	}
 };
 

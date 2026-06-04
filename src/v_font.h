@@ -39,7 +39,7 @@
 #include "name.h"
 #include "textures/textures.h"
 
-class DCanvas;
+struct DCanvas;
 struct FRemapTable;
 class FArchive;
 

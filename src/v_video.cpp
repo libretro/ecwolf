@@ -14,51 +14,6 @@ uint32_t Col2RGB8_Inverse[65][256];
 
 //==========================================================================
 //
-// DCanvas Constructor
-//
-//==========================================================================
-
-DCanvas::DCanvas (int _width, int _height)
-{
-	// Init member vars
-	Buffer = NULL;
-	Width = _width;
-	Height = _height;
-
-	// Making the pitch a power of 2 is very bad for performance: try to
-	// maximize the number of cache lines that can be filled for each column
-	// drawing operation by making the pitch slightly longer than the width
-	// at high resolutions. (Empirically derived in the original code.)
-	if (_width <= 640)
-		Pitch = _width;
-	else
-		Pitch = _width + 32 - 8;
-}
-
-//==========================================================================
-//
-// DCanvas Destructor
-//
-//==========================================================================
-
-DCanvas::~DCanvas ()
-{
-}
-
-//==========================================================================
-//
-// DCanvas :: IsValid
-//
-//==========================================================================
-
-bool DCanvas::IsValid ()
-{
-	// A nun-subclassed DCanvas is never valid
-	return false;
-}
-
-//==========================================================================
-//
 // DCanvas :: FlatFill
 //
 // Fill an area with a texture. If local_origin is false, then the origin

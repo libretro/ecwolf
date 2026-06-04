@@ -47,7 +47,7 @@ extern int DisplayWidth, DisplayHeight, DisplayBits;
 bool V_DoModeSetup (int width, int height, int bits);
 void V_CalcCleanFacs (int designwidth, int designheight, int realwidth, int realheight, int *cleanx, int *cleany, int *cx1=NULL, int *cx2=NULL);
 
-class DCanvas;
+struct DCanvas;
 
 class IVideo
 {
@@ -152,18 +152,16 @@ class player_t;
 //
 // [RH] Made screens more implementation-independant:
 //
-// The single software framebuffer surface. Formerly an abstract
-// DObject->DCanvas->DSimpleCanvas->DFrameBuffer chain inherited from ZDoom's
-// multi-backend design; the libretro port has exactly one backend
-// (LibretroFB<color_t>), so the layers are folded into this one concrete base
-// that owns the 8bpp Buffer and carries the 2D drawing primitives. The
-// palette/present interface (Lock/Update/GetPalette/...) is left virtual so
-// the color_t-templated LibretroFB can specialise it.
-class DCanvas
+// The framebuffer. A plain struct (no virtuals, no inheritance, no template):
+// the libretro core has exactly one video surface, so DCanvas holds the 8bpp
+// indexed render Buffer, the 2D drawing primitives, and the palette-expand /
+// present path directly. The output pixel format (32bpp XRGB8888 or 16bpp
+// RGB565) is a runtime field (bpp), branched at the two spots that touch
+// output pixels, rather than a class template.
+struct DCanvas
 {
-public:
-	DCanvas (int width, int height);
-	virtual ~DCanvas ();
+	DCanvas (int width, int height, int bpp);
+	~DCanvas ();
 
 	// Member variable access
 	inline uint8_t *GetBuffer () const { return Buffer; }
@@ -171,23 +169,19 @@ public:
 	inline int GetHeight () const { return Height; }
 	inline int GetPitch () const { return Pitch; }
 
-	virtual bool IsValid ();
+	bool IsValid () { return Buffer != NULL; }
 
-	// Surface access / presentation (implemented by LibretroFB)
-	virtual bool Lock (bool buffered=true) = 0;
-	virtual void Unlock () = 0;
-	virtual void Update () = 0;
-	virtual PalEntry *GetPalette () = 0;
-	virtual void UpdatePalette () = 0;
-	virtual bool SetFlash (PalEntry rgb, int amount) = 0;
-	virtual void GetFlash (PalEntry &rgb, int &amount) = 0;
-
-	// Re-present the last frame without re-rendering (no game tics elapsed).
-	virtual void ShowFrame () = 0;
+	// Surface access / presentation
+	bool Lock (bool buffered=true) { return true; }
+	void Unlock () {}
+	void Update ();
+	void ShowFrame ();
+	PalEntry *GetPalette () { return SourcePalette; }
+	void UpdatePalette () { PaletteNeedsUpdate = true; }
+	bool SetFlash (PalEntry rgb, int amount);
+	void GetFlash (PalEntry &rgb, int &amount) { rgb = Flash; amount = FlashAmount; }
 
 	// 2D drawing ----------------------------------------------------------
-	// These have a single implementation (in v_draw/v_text/v_video) and are
-	// never overridden, so they are non-virtual: direct calls, no vtable slot.
 
 	// Dim the entire canvas for the menus
 	void Dim (PalEntry color = 0);
@@ -251,19 +245,33 @@ public:
 		struct FColormapStyle *colormapstyle;
 	};
 
-protected:
-	uint8_t *Buffer;
+	// --- framebuffer / present state (was DSimpleCanvas + LibretroFB) ---
+	uint8_t *Buffer;          // 8bpp indexed render target
 	int Width;
 	int Height;
 	int Pitch;
+	int bpp;                  // 16 or 32: output pixel format, runtime
 
 	void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
 	bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const;
 
-	DCanvas() {}
-
-private:
 	void PUTTRANSDOT (int xx, int yy, int basecolor, int level);
+
+	// present helpers
+	void present ();
+	bool query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes);
+	void ComputePalette ();
+	void expand_palette (void *dst, int dst_stride_pixels);
+
+	void        *lr_buffer_;       // fallback output buffer (bpp-sized pixels)
+	int          lr_pitch_;        // in bytes
+	int          width_, height_;
+	int          FlashAmount;
+	bool         PaletteNeedsUpdate;
+	PalEntry     Flash;
+	PalEntry     SourcePalette[256];
+	PalEntry     FlashedPalette[256];
+	uint32_t     effective_palette_[256];   // widest form; used as 16/32 per bpp
 };
 
 
