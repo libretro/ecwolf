@@ -88,6 +88,12 @@ static retro_environment_t environ_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_video_refresh_t video_cb;
+// True only for the duration of a retro_run call. The frontend software
+// framebuffer (GET_CURRENT_SOFTWARE_FRAMEBUFFER) is only valid inside
+// retro_run; ECWolf also presents frames during retro_load_game (e.g. the
+// startup console drawn by DrawStartupConsole), where querying it is invalid
+// and crashes RetroArch's Vulkan backend. Direct rendering is gated on this.
+static bool in_retro_run = false;
 retro_log_printf_t log_cb = fallback_log;
 static bool libretro_supports_bitmasks = false;
 // fp10s is 10 times the FPS
@@ -267,12 +273,24 @@ private:
 	// from what this subclass produces.
 	bool query_frontend_fb (void **out_pixels, size_t *out_pitch_bytes) {
 		struct retro_framebuffer fb;
+
+		// GET_CURRENT_SOFTWARE_FRAMEBUFFER is only valid during retro_run.
+		// ECWolf presents frames during retro_load_game too (the startup
+		// console), where the frontend has no current frame and its handler
+		// dereferences uninitialised state.
+		if (!in_retro_run)
+			return false;
+		if (!environ_cb)
+			return false;
+
+		// Zero the whole struct: the core sets only width/height/access_flags;
+		// the frontend fills in data/pitch/format/memory_flags. Leaving those
+		// as stack garbage makes the frontend act on a bogus format/pitch.
+		memset (&fb, 0, sizeof(fb));
 		fb.width        = (unsigned) width_;
 		fb.height       = (unsigned) height_;
 		fb.access_flags = RETRO_MEMORY_ACCESS_WRITE;
 
-		if (!environ_cb)
-			return false;
 		if (!environ_cb (RETRO_ENVIRONMENT_GET_CURRENT_SOFTWARE_FRAMEBUFFER, &fb))
 			return false;
 		if (fb.data == NULL)
@@ -1475,6 +1493,10 @@ void retro_run(void)
 	int expectframes = 0;
 	wl_input_state_t input;
 
+	// The frontend software framebuffer may only be queried inside retro_run.
+	// Set on entry and cleared before every return below.
+	in_retro_run = true;
+
 	// Advance the fixed game-time clock by one frame. The frontend calls
 	// retro_run exactly once per presented frame, so this replaces the old
 	// frame-time callback (which ignored the frontend's measured delta and
@@ -1499,6 +1521,7 @@ void retro_run(void)
 
 	if (tics == 0) {
 		((LibretroFBBase *)screen)->ShowFrame();
+		in_retro_run = false;
 		return;
 	}
 
@@ -1546,6 +1569,7 @@ void retro_run(void)
 		VWB_DrawGraphic(TexMan("PAUSED"), (20 - 4)*8, 80 - 2*8);
 		VH_UpdateScreen();
 		generate_silent_audio();
+		in_retro_run = false;
 		return;
 	}
 	do
@@ -1563,6 +1587,7 @@ void retro_run(void)
 
 	assert(frametics > 0);
 	generate_audio_frame(framestarttic, frametics);
+	in_retro_run = false;
 }
 
 
