@@ -215,9 +215,18 @@ bool FizzleFade (int x1, int y1,
 
 	frame = GetTimeCount();
 	screen->Lock(false);
+	// The screen buffer currently holds the target image (drawn by the caller
+	// after FizzleFadeStart snapshotted the start image into fizzleSurface).
+	// Snapshot the target into srcptr, then seed the screen buffer with the
+	// start image so the reveal can composite target pixels directly into the
+	// screen buffer in place. This avoids the per-frame full-frame copy of the
+	// composite back to the screen that the previous implementation performed.
+	// The libretro framebuffer keeps GetBuffer() stable across Update()/Lock(),
+	// so destptr remains valid for the whole fade.
 	uint8_t * const srcptr = new uint8_t[SCREENHEIGHT*SCREENPITCH];
 	memcpy(srcptr, screen->GetBuffer(), SCREENHEIGHT*SCREENPITCH);
-	screen->Unlock();
+	memcpy(screen->GetBuffer(), fizzleSurface, SCREENHEIGHT*SCREENPITCH);
+	uint8_t * const destptr = screen->GetBuffer();
 
 	do
 	{
@@ -231,8 +240,6 @@ bool FizzleFade (int x1, int y1,
 			fizzleSurface = NULL;
 			return true;
 		}
-
-		uint8_t *destptr = fizzleSurface;
 
 		if(destptr != NULL)
 		{
@@ -269,7 +276,6 @@ bool FizzleFade (int x1, int y1,
 					goto finished;
 			}
 
-			memcpy(screen->GetBuffer(), destptr, SCREENHEIGHT*SCREENPITCH);
 			VH_UpdateScreen();
 		}
 		else
@@ -288,13 +294,16 @@ bool FizzleFade (int x1, int y1,
 	} while (1);
 
 finished:
+	// destptr is the screen buffer; force the remaining region to the target
+	// image in place. The unrevealed area outside the fade rectangle still
+	// holds the start image that seeded the buffer, matching the previous
+	// behaviour where the full composite was copied to the screen.
 	for (y = y1; y < (y1 + height); ++y)
 	{
-		memcpy(fizzleSurface + (y * SCREENPITCH) + x1,
+		memcpy(destptr + (y * SCREENPITCH) + x1,
 					srcptr + (y * SCREENPITCH) + x1,
 					width); 
 	}
-	memcpy(screen->GetBuffer(), fizzleSurface, SCREENHEIGHT * SCREENPITCH);
 	VH_UpdateScreen();
 	delete[] fizzleSurface;
 	delete[] srcptr;
