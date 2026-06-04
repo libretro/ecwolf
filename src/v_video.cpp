@@ -12,8 +12,6 @@ uint32_t *Col2RGB8_LessPrecision[65];
 uint32_t Col2RGB8_Inverse[65][256];
 }
 
-DCanvas *DCanvas::CanvasChain = NULL;
-
 //==========================================================================
 //
 // DCanvas Constructor
@@ -24,13 +22,17 @@ DCanvas::DCanvas (int _width, int _height)
 {
 	// Init member vars
 	Buffer = NULL;
-	LockCount = 0;
 	Width = _width;
 	Height = _height;
 
-	// Add to list of active canvases
-	Next = CanvasChain;
-	CanvasChain = this;
+	// Making the pitch a power of 2 is very bad for performance: try to
+	// maximize the number of cache lines that can be filled for each column
+	// drawing operation by making the pitch slightly longer than the width
+	// at high resolutions. (Empirically derived in the original code.)
+	if (_width <= 640)
+		Pitch = _width;
+	else
+		Pitch = _width + 32 - 8;
 }
 
 //==========================================================================
@@ -41,22 +43,6 @@ DCanvas::DCanvas (int _width, int _height)
 
 DCanvas::~DCanvas ()
 {
-	// Remove from list of active canvases
-	DCanvas *probe = CanvasChain, **prev;
-
-	prev = &CanvasChain;
-	probe = CanvasChain;
-
-	while (probe != NULL)
-	{
-		if (probe == this)
-		{
-			*prev = probe->Next;
-			break;
-		}
-		prev = &probe->Next;
-		probe = probe->Next;
-	}
 }
 
 //==========================================================================
@@ -178,107 +164,6 @@ void DCanvas::Dim (PalEntry color, float damount, int x1, int y1, int w, int h)
 	}
 }
 
-//==========================================================================
-//
-// DSimpleCanvas Constructor
-//
-// A simple canvas just holds a buffer in main memory.
-//
-//==========================================================================
-
-DSimpleCanvas::DSimpleCanvas (int width, int height)
-	: DCanvas (width, height)
-{
-	// Making the pitch a power of 2 is very bad for performance
-	// Try to maximize the number of cache lines that can be filled
-	// for each column drawing operation by making the pitch slightly
-	// longer than the width. The values used here are all based on
-	// empirical evidence.
-
-	if (width <= 640)
-	{
-		// For low resolutions, just keep the pitch the same as the width.
-		// Some speedup can be seen using the technique below, but the speedup
-		// is so marginal that I don't consider it worthwhile.
-		Pitch = width;
-	}
-	else
-		Pitch = width + 32 - 8;
-	MemBuffer = new uint8_t[Pitch * height];
-	memset (MemBuffer, 0, Pitch * height);
-}
-
-//==========================================================================
-//
-// DSimpleCanvas Destructor
-//
-//==========================================================================
-
-DSimpleCanvas::~DSimpleCanvas ()
-{
-	if (MemBuffer != NULL)
-	{
-		delete[] MemBuffer;
-		MemBuffer = NULL;
-	}
-}
-
-//==========================================================================
-//
-// DSimpleCanvas :: IsValid
-//
-//==========================================================================
-
-bool DSimpleCanvas::IsValid ()
-{
-	return (MemBuffer != NULL);
-}
-
-//==========================================================================
-//
-// DSimpleCanvas :: Lock
-//
-//==========================================================================
-
-bool DSimpleCanvas::Lock (bool)
-{
-	if (LockCount == 0)
-	{
-		Buffer = MemBuffer;
-	}
-	LockCount++;
-	return false;		// System surfaces are never lost
-}
-
-//==========================================================================
-//
-// DSimpleCanvas :: Unlock
-//
-//==========================================================================
-
-void DSimpleCanvas::Unlock ()
-{
-	if (--LockCount <= 0)
-	{
-		LockCount = 0;
-		Buffer = NULL;	// Enforce buffer access only between Lock/Unlock
-	}
-}
-
-//==========================================================================
-//
-// DFrameBuffer Constructor
-//
-// A frame buffer canvas is the most common and represents the image that
-// gets drawn to the screen.
-//
-//==========================================================================
-
-DFrameBuffer::DFrameBuffer (int width, int height)
-	: DSimpleCanvas (width, height)
-{
-}
-
 // -----------------------------------------------------------------------------
 
 int DisplayWidth, DisplayHeight, DisplayBits;
@@ -286,7 +171,7 @@ uint8_t RGB32k[32][32][32];
 
 // [RH] The framebuffer is no longer a mere uint8_t array.
 // There's also only one, not four.
-DFrameBuffer *screen;
+DCanvas *screen;
 
 void GenerateLookupTables()
 {

@@ -54,7 +54,7 @@ enum EDisplayType
 	DISPLAY_Both
 };
 
-class DFrameBuffer;
+class DCanvas;
 
 class IVideo
 {
@@ -64,7 +64,7 @@ class IVideo
 	virtual EDisplayType GetDisplayType () = 0;
 	virtual void SetWindowedScale (float scale) = 0;
 
-	virtual DFrameBuffer *CreateFrameBuffer (int width, int height, bool fs, DFrameBuffer *old) = 0;
+	virtual DCanvas *CreateFrameBuffer (int width, int height, bool fs, DCanvas *old) = 0;
 
 	virtual void StartModeIterator (int bits, bool fs) = 0;
 	virtual bool NextMode (int *width, int *height, bool *letterbox) = 0;
@@ -165,6 +165,13 @@ class player_t;
 //
 // [RH] Made screens more implementation-independant:
 //
+// The single software framebuffer surface. Formerly an abstract
+// DObject->DCanvas->DSimpleCanvas->DFrameBuffer chain inherited from ZDoom's
+// multi-backend design; the libretro port has exactly one backend
+// (LibretroFB<color_t>), so the layers are folded into this one concrete base
+// that owns the 8bpp Buffer and carries the 2D drawing primitives. The
+// palette/present interface (Lock/Update/GetPalette/...) is left virtual so
+// the color_t-templated LibretroFB can specialise it.
 class DCanvas
 {
 public:
@@ -179,10 +186,16 @@ public:
 
 	virtual bool IsValid ();
 
-	// Access control
-	virtual bool Lock (bool buffered=true) = 0;		// Returns true if the surface was lost since last time
+	// Surface access / presentation (implemented by LibretroFB)
+	virtual bool Lock (bool buffered=true) = 0;
 	virtual void Unlock () = 0;
-	virtual bool IsLocked () { return Buffer != NULL; }	// Returns true if the surface is locked
+	virtual void Update () = 0;
+	virtual PalEntry *GetPalette () = 0;
+	virtual void UpdatePalette () = 0;
+	virtual bool SetFlash (PalEntry rgb, int amount) = 0;
+	virtual void GetFlash (PalEntry &rgb, int &amount) = 0;
+
+	// 2D drawing -----------------------------------------------------------
 
 	// Dim the entire canvas for the menus
 	virtual void Dim (PalEntry color = 0);
@@ -204,23 +217,13 @@ public:
 	// Draws a line
 	virtual void DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor);
 
-	// Text drawing functions -----------------------------------------------
-
 	// 2D Texture drawing
 	void STACK_ARGS DrawTexture (FTexture *img, double x, double y, int tags, ...);
 	void VirtualToRealCoords(double &x, double &y, double &w, double &h, double vwidth, double vheight, bool vbottom=false, bool handleaspect=true) const;
 
-	// Code that uses these (i.e. SBARINFO) should probably be evaluated for using doubles all around instead.
-	void VirtualToRealCoordsFixed(fixed_t &x, fixed_t &y, fixed_t &w, fixed_t &h, int vwidth, int vheight, bool vbottom=false, bool handleaspect=true) const;
-	void VirtualToRealCoordsInt(int &x, int &y, int &w, int &h, int vwidth, int vheight, bool vbottom=false, bool handleaspect=true) const;
-
 	// 2D Text drawing
 	void STACK_ARGS DrawText (FFont *font, int normalcolor, int x, int y, const char *string, ...);
-#ifndef DrawText	// See WinUser.h for the definition of DrawText as a macro
-	void STACK_ARGS DrawTextA (FFont *font, int normalcolor, int x, int y, const char *string, ...);
-#endif
 	void DrawTextV (FFont *font, int normalcolor, int x, int y, const char *string, va_list tags);
-	void STACK_ARGS DrawChar (FFont *font, int normalcolor, int x, int y, int character, ...);
 
 	struct DrawParms
 	{
@@ -261,7 +264,6 @@ protected:
 	int Width;
 	int Height;
 	int Pitch;
-	int LockCount;
 
 	virtual void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
 	bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const;
@@ -269,66 +271,12 @@ protected:
 	DCanvas() {}
 
 private:
-	// Keep track of canvases, for automatic destruction at exit
-	DCanvas *Next;
-	static DCanvas *CanvasChain;
-
 	void PUTTRANSDOT (int xx, int yy, int basecolor, int level);
-};
-
-// A canvas in system memory.
-
-class DSimpleCanvas : public DCanvas
-{
-public:
-	DSimpleCanvas (int width, int height);
-	~DSimpleCanvas ();
-
-	bool IsValid ();
-	bool Lock (bool buffered=true);
-	void Unlock ();
-
-protected:
-	uint8_t *MemBuffer;
-
-	DSimpleCanvas() {}
-};
-
-// A canvas that represents the actual display. The video code is responsible
-// for actually implementing this. Built on top of SimpleCanvas, because it
-// needs a system memory buffer when buffered output is enabled.
-
-class DFrameBuffer : public DSimpleCanvas
-{
-public:
-	DFrameBuffer (int width, int height);
-
-	// Force the surface to use buffered output if true is passed.
-	virtual bool Lock (bool buffered) = 0;
-
-	// Make the surface visible. Also implies Unlock().
-	virtual void Update () = 0;
-
-	// Return a pointer to 256 palette entries that can be written to.
-	virtual PalEntry *GetPalette () = 0;
-
-	// Mark the palette as changed. It will be updated on the next Update().
-	virtual void UpdatePalette () = 0;
-
-	// Sets a color flash. RGB is the color, and amount is 0-256, with 256
-	// being all flash and 0 being no flash.
-	virtual bool SetFlash (PalEntry rgb, int amount) = 0;
-
-	// Converse of SetFlash
-	virtual void GetFlash (PalEntry &rgb, int &amount) = 0;
-
-protected:
-	DFrameBuffer () {}
 };
 
 
 // This is the screen updated by I_FinishUpdate.
-extern DFrameBuffer *screen;
+extern DCanvas *screen;
 
 #define SCREENWIDTH (screen->GetWidth ())
 #define SCREENHEIGHT (screen->GetHeight ())

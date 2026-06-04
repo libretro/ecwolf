@@ -540,7 +540,7 @@ protected:
 };
 
 // A texture that can be drawn to.
-class DSimpleCanvas;
+class DCanvas;
 class FCanvasTexture : public FTexture
 {
 public:
@@ -553,12 +553,12 @@ public:
 	bool CheckModified ();
 	void NeedUpdate() { bNeedsUpdate=true; }
 	void SetUpdated() { bNeedsUpdate = false; bDidUpdate = true; bFirstUpdate = false; }
-	DSimpleCanvas *GetCanvas() { return Canvas; }
+	DCanvas *GetCanvas() { return Canvas; }
 	void MakeTexture ();
 
 protected:
 
-	DSimpleCanvas *Canvas;
+	DCanvas *Canvas;
 	uint8_t *Pixels;
 	Span DummySpans[2];
 	bool bNeedsUpdate;

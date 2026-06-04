@@ -47,32 +47,6 @@
 #include "zstring.h"
 
 //
-// DrawChar
-//
-// Write a single character using the given font
-//
-void STACK_ARGS DCanvas::DrawChar (FFont *font, int normalcolor, int x, int y, int character, ...)
-{
-	if (font == NULL)
-		return;
-
-	if (normalcolor >= NumTextColors)
-		normalcolor = CR_UNTRANSLATED;
-
-	FTexture *pic;
-	int dummy;
-
-	if (NULL != (pic = font->GetChar (character, &dummy)))
-	{
-		const FRemapTable *range = font->GetColorTranslation ((EColorRange)normalcolor);
-		va_list taglist;
-		va_start (taglist, character);
-		DrawTexture (pic, x, y, DTA_Translation, range, TAG_MORE, &taglist);
-		va_end (taglist);
-	}
-}
-
-//
 // DrawText
 //
 // Write a string using the given font
@@ -255,14 +229,6 @@ void DCanvas::DrawTextV(FFont *font, int normalcolor, int x, int y, const char *
 }
 
 void STACK_ARGS DCanvas::DrawText (FFont *font, int normalcolor, int x, int y, const char *string, ...)
-{
-	va_list tags;
-	va_start(tags, string);
-	DrawTextV(font, normalcolor, x, y, string, tags);
-}
-
-// A synonym so that this can still be used in files that #include Windows headers
-void STACK_ARGS DCanvas::DrawTextA (FFont *font, int normalcolor, int x, int y, const char *string, ...)
 {
 	va_list tags;
 	va_start(tags, string);

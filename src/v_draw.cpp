@@ -758,39 +758,6 @@ void DCanvas::VirtualToRealCoords(double &x, double &y, double &w, double &h,
 		h = bottom * Height / vheight - y;
 	}
 }
-
-void DCanvas::VirtualToRealCoordsFixed(fixed_t &x, fixed_t &y, fixed_t &w, fixed_t &h,
-	int vwidth, int vheight, bool vbottom, bool handleaspect) const
-{
-	double dx, dy, dw, dh;
-
-	dx = FIXED2FLOAT(x);
-	dy = FIXED2FLOAT(y);
-	dw = FIXED2FLOAT(w);
-	dh = FIXED2FLOAT(h);
-	VirtualToRealCoords(dx, dy, dw, dh, vwidth, vheight, vbottom, handleaspect);
-	x = FLOAT2FIXED(dx);
-	y = FLOAT2FIXED(dy);
-	w = FLOAT2FIXED(dw);
-	h = FLOAT2FIXED(dh);
-}
-
-void DCanvas::VirtualToRealCoordsInt(int &x, int &y, int &w, int &h,
-	int vwidth, int vheight, bool vbottom, bool handleaspect) const
-{
-	double dx, dy, dw, dh;
-
-	dx = x;
-	dy = y;
-	dw = w;
-	dh = h;
-	VirtualToRealCoords(dx, dy, dw, dh, vwidth, vheight, vbottom, handleaspect);
-	x = int(dx + 0.5);
-	y = int(dy + 0.5);
-	w = int(dx + dw + 0.5) - x;
-	h = int(dy + dh + 0.5) - y;
-}
-
 void DCanvas::PUTTRANSDOT (int xx, int yy, int basecolor, int level)
 {
 	static int oldyy;

@@ -119,10 +119,10 @@ bool alwaysrun;
 bool preload_digital_sounds;
 float localDesiredFOV = 90.0f;
 
-class LibretroFBBase : public DFrameBuffer
+class LibretroFBBase : public DCanvas
 {
 public:
-	LibretroFBBase(int width, int height) : DFrameBuffer (width, height) {}
+	LibretroFBBase(int width, int height) : DCanvas (width, height) {}
 	virtual void ShowFrame() = 0;
 };
 
@@ -385,7 +385,7 @@ public:
 	EDisplayType GetDisplayType () { return DISPLAY_Both; }
 	void SetWindowedScale (float scale) {};
 
-	DFrameBuffer *CreateFrameBuffer (int width, int height, bool fs, DFrameBuffer *old) {
+	DCanvas *CreateFrameBuffer (int width, int height, bool fs, DCanvas *old) {
 		if (bpp == 32)
 			return new LibretroFB32(width, height);
 		return new LibretroFB16(width, height);		
