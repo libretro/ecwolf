@@ -872,7 +872,10 @@ static int DoPushwall(MapSpot spot, MapTrigger::Side direction, const int *args,
 	static const unsigned int PUSHWALL_DIR_ABSOLUTE = 0x8;
 
 	if(args[2] & PUSHWALL_DIR_DIAGONAL)
-		throw CRecoverableError("Diagonal pushwalls not yet supported!");
+	{
+		libretro_log("Diagonal pushwalls not yet supported!\n");
+		return 0;
+	}
 
 	bool absolute = !!(args[2]&PUSHWALL_DIR_ABSOLUTE);
 	MapTrigger::Side dir = absolute ? MapTrigger::Side((args[2]>>1)&0x3) : MapTrigger::Side((direction + 1 + (args[2]>>1))&0x3);

@@ -283,7 +283,10 @@ void SetupGameLevel (void)
 
 		// Check to see if a player spawned
 		if(players[0].mo == NULL)
-			throw CRecoverableError("No player 1 start!");
+		{
+			libretro_log("No player 1 start!\n");
+			return;
+		}
 	}
 }
 
