@@ -339,12 +339,12 @@ public:
 	LibretroVideo () {}
 	~LibretroVideo () {}
 
-	DCanvas *CreateFrameBuffer (int width, int height, bool fs, DCanvas *old) {
+	DCanvas *CreateFrameBuffer (int width, int height) {
 		return new DCanvas(width, height, bpp);
 	}
 };
 
-bool IVideo::SetResolution (int width, int height, int bits)
+bool IVideo::SetResolution (int width, int height)
 {
 	int cx1, cx2;
 	PalEntry palette[256];
@@ -371,7 +371,7 @@ bool IVideo::SetResolution (int width, int height, int bits)
 		delete screen;
 	}
 
-	screen = Video->CreateFrameBuffer(width, height, true, NULL);
+	screen = Video->CreateFrameBuffer(width, height);
 	memcpy (screen->GetPalette(), palette, sizeof(PalEntry)*256);
 	screen->UpdatePalette();
 	

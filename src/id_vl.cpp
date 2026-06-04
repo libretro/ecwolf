@@ -75,7 +75,7 @@ void	VL_SetVGAPlaneMode (bool forSignon)
 		screen->Unlock();
 
 	I_InitGraphics();
-	Video->SetResolution(screenWidth, screenHeight, 8);
+	Video->SetResolution(screenWidth, screenHeight);
 	screen->Lock(true);
 	R_SetupBuffer ();
 	screen->Unlock();

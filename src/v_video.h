@@ -54,9 +54,9 @@ class IVideo
  public:
 	virtual ~IVideo () {}
 
-	virtual DCanvas *CreateFrameBuffer (int width, int height, bool fs, DCanvas *old) = 0;
+	virtual DCanvas *CreateFrameBuffer (int width, int height) = 0;
 
-	virtual bool SetResolution (int width, int height, int bits);
+	virtual bool SetResolution (int width, int height);
 };
 
 extern IVideo *Video;
