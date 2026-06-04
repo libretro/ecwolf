@@ -34,6 +34,7 @@
 */
 
 #include <stdio.h>
+#include <setjmp.h>
 extern "C"
 {
 #define boolean jboolean
@@ -156,10 +157,23 @@ FLumpSourceMgr::FLumpSourceMgr (FileReader *lump, j_decompress_ptr cinfo)
 //
 //==========================================================================
 
+// libjpeg's default error handler calls exit(); the original code instead
+// threw a C++ exception out of error_exit and caught it. To remove exceptions
+// while keeping the same recover-and-clean-up behaviour, we use libjpeg's
+// documented mechanism: an error manager that carries a setjmp buffer. On a
+// fatal libjpeg error we longjmp back to the decode function, which then
+// performs its normal cleanup. The only automatic object on the unwound path
+// (FLumpSourceMgr) is trivially destructible, so the longjmp is well defined.
+struct FJPEGErrorMgr
+{
+	struct jpeg_error_mgr pub;	// must be first: libjpeg treats this as jpeg_error_mgr
+	jmp_buf setjmp_buffer;
+};
+
 void JPEG_ErrorExit (j_common_ptr cinfo)
 {
 	(*cinfo->err->output_message) (cinfo);
-	throw -1;
+	longjmp (((FJPEGErrorMgr *)cinfo->err)->setjmp_buffer, 1);
 }
 
 //==========================================================================
@@ -368,26 +382,39 @@ const uint8_t *FJPEGTexture::GetPixels ()
 void FJPEGTexture::MakeTexture ()
 {
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
-	JSAMPLE *buff = NULL;
+	// volatile: modified between setjmp and a potential longjmp, and read in
+	// the longjmp recovery path, so its value must survive the non-local jump.
+	JSAMPLE * volatile buff = NULL;
 
 	jpeg_decompress_struct cinfo;
-	jpeg_error_mgr jerr;
+	FJPEGErrorMgr jerr;
 
 	Pixels = new uint8_t[Width * Height];
 	memset (Pixels, 0xBA, Width * Height);
 
-	cinfo.err = jpeg_std_error(&jerr);
+	cinfo.err = jpeg_std_error(&jerr.pub);
 	cinfo.err->output_message = JPEG_OutputMessage;
 	cinfo.err->error_exit = JPEG_ErrorExit;
 	jpeg_create_decompress(&cinfo);
-	try
 	{
 		FLumpSourceMgr sourcemgr(&lump, &cinfo);
+		if (setjmp(jerr.setjmp_buffer))
+		{
+			// A fatal libjpeg error longjmp'd back here. Clean up and bail.
+			jpeg_destroy_decompress(&cinfo);
+			if (buff != NULL)
+				delete[] buff;
+			return;
+		}
+
 		jpeg_read_header(&cinfo, TRUE);
 		if (!((cinfo.out_color_space == JCS_RGB && cinfo.num_components == 3) ||
 			  (cinfo.out_color_space == JCS_CMYK && cinfo.num_components == 4) ||
 			  (cinfo.out_color_space == JCS_GRAYSCALE && cinfo.num_components == 1)))
-			throw -1;
+		{
+			jpeg_destroy_decompress(&cinfo);
+			return;
+		}
 
 		jpeg_start_decompress(&cinfo);
 
@@ -443,10 +470,6 @@ void FJPEGTexture::MakeTexture ()
 		jpeg_finish_decompress(&cinfo);
 		jpeg_destroy_decompress(&cinfo);
 	}
-	catch (int)
-	{
-		jpeg_destroy_decompress(&cinfo);
-	}
 	if (buff != NULL)
 	{
 		delete[] buff;
@@ -467,26 +490,35 @@ int FJPEGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FC
 	PalEntry pe[256];
 
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
-	JSAMPLE *buff = NULL;
+	// volatile: see MakeTexture; value must survive the setjmp/longjmp path.
+	JSAMPLE * volatile buff = NULL;
 
 	jpeg_decompress_struct cinfo;
-	jpeg_error_mgr jerr;
+	FJPEGErrorMgr jerr;
 
-	cinfo.err = jpeg_std_error(&jerr);
+	cinfo.err = jpeg_std_error(&jerr.pub);
 	cinfo.err->output_message = JPEG_OutputMessage;
 	cinfo.err->error_exit = JPEG_ErrorExit;
 	jpeg_create_decompress(&cinfo);
 
-	try
 	{
 		FLumpSourceMgr sourcemgr(&lump, &cinfo);
+		if (setjmp(jerr.setjmp_buffer))
+		{
+			// Fatal libjpeg error: fall through to the shared cleanup below.
+			jpeg_destroy_decompress(&cinfo);
+			if (buff != NULL) delete [] buff;
+			return 0;
+		}
+
 		jpeg_read_header(&cinfo, TRUE);
 
 		if (!((cinfo.out_color_space == JCS_RGB && cinfo.num_components == 3) ||
 			  (cinfo.out_color_space == JCS_CMYK && cinfo.num_components == 4) ||
 			  (cinfo.out_color_space == JCS_GRAYSCALE && cinfo.num_components == 1)))
 		{
-			throw -1;
+			jpeg_destroy_decompress(&cinfo);
+			return 0;
 		}
 		jpeg_start_decompress(&cinfo);
 
@@ -524,9 +556,6 @@ int FJPEGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FC
 			break;
 		}
 		jpeg_finish_decompress(&cinfo);
-	}
-	catch(int)
-	{
 	}
 	jpeg_destroy_decompress(&cinfo);
 	if (buff != NULL) delete [] buff;
