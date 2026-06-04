@@ -142,22 +142,16 @@ SetSoundLoc(fixed gx,fixed gy)
 	fixed   xt,yt;
 	int     x,y;
 
-//
-// translate point to view centered coordinates
-//
+	// translate point to view centered coordinates
 	gx -= viewx;
 	gy -= viewy;
 
-//
-// calculate newx
-//
+	// calculate newx
 	xt = FixedMul(gx,viewcos);
 	yt = FixedMul(gy,viewsin);
 	x = (xt - yt) >> TILESHIFT;
 
-//
-// calculate newy
-//
+	// calculate newy
 	xt = FixedMul(gx,viewsin);
 	yt = FixedMul(gy,viewcos);
 	y = (yt + xt) >> TILESHIFT;

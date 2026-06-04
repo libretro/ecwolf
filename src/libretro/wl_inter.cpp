@@ -266,8 +266,6 @@ static void InterAddBonus(wl_state_t *state, unsigned int bonus, bool count=fals
  */
 static void InterCountRatio(wl_state_t *state, int ratio, unsigned int x, unsigned int y)
 {
-	static const unsigned int VBLWAIT = 30;
-
 	if (InterState.graphical)
 		InterWriteCounter(state, 1, ratio, 1, x, y, "misc/end_bonus1", 0);
 	else
@@ -275,7 +273,7 @@ static void InterCountRatio(wl_state_t *state, int ratio, unsigned int x, unsign
 	state->isCountingRatio = true;
 }
 
-static void InterDrawNormalTop()
+static void InterDrawNormalTop(void)
 {
 	FString completedString;
 	if(!levelInfo->CompletionString.IsEmpty())
@@ -336,7 +334,7 @@ static void InterDrawGraphicalTop()
 	}
 }
 
-static void InterDoBonus()
+static void InterDoBonus(void)
 {
 	FString bonusString;
 	bonusString.Format("%d bonus!", levelInfo->LevelBonus);

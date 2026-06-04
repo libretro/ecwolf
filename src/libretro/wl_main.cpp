@@ -85,7 +85,7 @@
 */
 
 //
-// proejection variables
+// projection variables
 //
 fixed    focallength;
 fixed    focallengthy;
@@ -309,51 +309,6 @@ void CalcProjection (int32_t focal)
 	}
 }
 
-//===========================================================================
-
-#ifdef TODO
-Menu musicMenu(CTL_X, CTL_Y-6, 280, 32);
-static TArray<FString> songList;
-
-MENU_LISTENER(ChangeMusic)
-{
-	StartCPMusic(songList[which]);
-	for(unsigned int i = 0;i < songList.Size();++i)
-		musicMenu[i]->setHighlighted(i == (unsigned)which);
-	musicMenu.draw();
-	return true;
-}
-
-void DoJukebox(void)
-{
-	IN_ClearKeysDown();
-	if (!AdLibPresent && !SoundBlasterPresent)
-		return;
-
-	VW_FadeOut ();
-
-	ClearMScreen ();
-	musicMenu.setHeadText(language["ROBSJUKEBOX"], true);
-	for(unsigned int i = 0;i < (unsigned)Wads.GetNumLumps();++i)
-	{
-		if(Wads.GetLumpNamespace(i) != ns_music)
-			continue;
-
-		FString langString;
-		langString.Format("MUS_%s", Wads.GetLumpFullName(i));
-		const char* trackName = language[langString];
-		if(trackName == langString.GetChars())
-			musicMenu.addItem(new MenuItem(Wads.GetLumpFullName(i), ChangeMusic));
-		else
-			musicMenu.addItem(new MenuItem(language[langString], ChangeMusic));
-		songList.Push(Wads.GetLumpFullName(i));
-
-	}
-	musicMenu.show();
-	return;
-}
-#endif
-
 /*
 ==========================
 =
@@ -428,7 +383,7 @@ void UninitGame()
   P_DeinitKeyMessages();
 }
 
-void InitGame()
+void InitGame(void)
 {
 	//
 	// Mapinfo
@@ -490,34 +445,21 @@ void InitGame()
 	P_InitKeyMessages();
 	atterm(P_DeinitKeyMessages);
 
-//
-// Finish with setting up through the config file.
-//
+	// Finish with setting up through the config file.
 	AM_UpdateFlags();
 
-//
-// Load the status bar
-//
+	// Load the status bar
 	CreateStatusBar();
 
-//
-// initialize the menusalcProjection
+	// initialize the menusalcProjection
 	printf("CreateMenus: Preparing the menu system...\n");
 	CreateMenus();
 
-//
-// Load Noah's Ark quiz
-//
+	// Load Noah's Ark quiz
 	Dialog::LoadGlobalModule("NOAHQUIZ");
-//
-// Net game?
-//
-#ifdef TODO
-	Net::Init(DrawStartupConsole);
-#endif
-//
-// Finish signon screen
-//
+
+	// Finish signon screen
+
 	VL_SetVGAPlaneMode();
 	if(DrawStartupConsole("Initialization complete"))
 	{
@@ -527,17 +469,11 @@ void InitGame()
 	else // Delay for a moment to allow the user to enter the jukebox if desired
 		IN_UserInput(16);
 
-//
-// HOLDING DOWN 'M' KEY?
-//
+	// HOLDING DOWN 'M' KEY?
 	IN_ProcessEvents();
 #ifdef TODO
 	if (Keyboard[sc_M])
 		DoJukebox();
-#endif
-#ifdef NOTYET
-	vdisp = (uint8_t *) (0xa0000+PAGE1START);
-	vbuf = (uint8_t *) (0xa0000+PAGE2START);
 #endif
 }
 
@@ -922,7 +858,7 @@ void PrepareMainMenu (wl_state_t *state)
 
 static int redrawitem = 1, lastitem = -1;
 
-Menu *
+enu *
 wl_state_t::currentMenu() {
 	if (menuLevel == 0)
 		return NULL;
@@ -953,7 +889,7 @@ wl_state_t::currentMenu() {
 
 
 void
-Menu::prepareMenu()
+enu::prepareMenu()
 {
 	if (redrawitem)
 	{
@@ -968,7 +904,7 @@ Menu::prepareMenu()
 
 
 bool
-Menu::handleStep(wl_state_t *state, const wl_input_state_t *input)
+enu::handleStep(wl_state_t *state, const wl_input_state_t *input)
 {
 	//
 	// CHANGE GUN SHAPE
@@ -1730,7 +1666,7 @@ void atterm(void (*func)(void))
                fprintf(stderr, "Failed to register atterm function!\n");
 }
 
-void CallTerminateFunctions()
+void CallTerminateFunctions(void)
 {
        while(NumTerms > 0)
                TermFuncs[--NumTerms]();
