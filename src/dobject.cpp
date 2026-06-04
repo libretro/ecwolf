@@ -34,6 +34,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "dobject.h"
 #include "actordef.h"
@@ -135,13 +136,9 @@ void DObject::Serialize (FArchive &arc)
 
 void DObject::CheckIfSerialized () const
 {
-	if (!(ObjectFlags & OF_SerialSuccess))
-	{
-		I_Error (
-			"BUG: %s::Serialize\n"
-			"(or one of its superclasses) needs to call\n"
-			"Super::Serialize\n",
-			__StaticClass->GetName().GetChars());
-	}
+	// Engine invariant: a Serialize override (or a superclass) failed to call
+	// Super::Serialize. This is a programmer error, never data-driven.
+	assert ((ObjectFlags & OF_SerialSuccess) &&
+		"A Serialize method (or a superclass) must call Super::Serialize");
 }
 
