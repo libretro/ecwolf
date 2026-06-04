@@ -65,6 +65,8 @@ actor Actor native
 	action native A_Chase(state melee="*", state ranged="*", int flags = 0);
 	action native A_CustomMissile(string missiletype, float spawnheight = 32, int spawnoffset = 0, float angle = 0, int aimflags = 0);
 	action native A_Dormant(state frame = "See", int flags = 0);
+	action native A_EnableHaloLight(int id, bool enabled = true);
+	action native A_EnableZoneLight(int id, bool enabled = true);
 	action native A_Explode(int damage = 128, int radius = 128, int flags = XF_HURTSOURCE, bool alert = false, int fulldamageradius = 0);
 	action native A_FaceTarget(float max_turn = 0, float max_pitch = 270);
 	action native A_Fall();
@@ -77,14 +79,19 @@ actor Actor native
 	action native A_Look(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180, state frame = "*");
 	action native A_LookEx(int flags = 0, float minseedist = 0, float maxseedist = 0, float maxheardist = 0, float fov = 180, state frame = "*"); // Alias
 	action native A_MeleeAttack(int damage, float accuracy = 0.6275, string hitsound = "", string misssound = "*");
+	action native A_MirrorPosition(float x, int axis);
 	action native A_MonsterRefire(int chance, state abort);
 	action native A_Pain();
 	action native A_PlaySound(string soundname);
+	action native A_ResetPosition(float x, float y);
 	action native A_ScaleVelocity(float scale);
 	action native A_Scream();
+	action native A_SelectWeapon(int slot);
+	action native A_SetHealth(int health);
 	action native A_SetTics(float duration);
 	action native A_SpawnItem(string type, float distance = 0, float zheight = 0);
 	action native A_SpawnItemEx(string type, float xoffset = 0, float yoffset = 0, float zoffset = 0, float xvel = 0, float yvel = 0, float zvel = 0, float angle = 0, int flags = 0, int failchance = 0);
+	action native A_StartMusic(string song);
 	action native A_Stop();
 	action native A_TakeInventory(string type, int amount);
 	action native A_Wander();
