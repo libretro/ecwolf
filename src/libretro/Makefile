@@ -193,6 +193,11 @@ else ifeq ($(platform), dos)
 	# (-Wattributes) on every visibility attribute it is asked to emit. Skip the
 	# -fvisibility=hidden flag below for this platform to keep the build clean.
 	NO_FVISIBILITY=1
+	# DJGPP's <inttypes.h> does not define the C99 PRI* format macros, so
+	# libretro-common's retro_common_api.h hits its '#error inttypes.h is being
+	# screwy' guard. Pre-define the ones it checks for; int64_t is long long on
+	# this 32-bit target, so use the 'll' length modifier.
+	COMMON_CFLAGS += -DPRId64='"lld"' -DPRIu64='"llu"' -DPRIx64='"llx"' -DPRIuPTR='"u"'
 
 else ifeq ($(platform), wii)
    EXT=a
