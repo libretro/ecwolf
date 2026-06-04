@@ -15,12 +15,6 @@ uint32_t Col2RGB8_Inverse[65][256];
 IMPLEMENT_ABSTRACT_CLASS (DCanvas)
 IMPLEMENT_ABSTRACT_CLASS (DFrameBuffer)
 
-#if defined(_DEBUG) && defined(_M_IX86)
-#define DBGBREAK	{ __asm int 3 }
-#else
-#define DBGBREAK
-#endif
-
 class DDummyFrameBuffer : public DFrameBuffer
 {
 	DECLARE_CLASS (DDummyFrameBuffer, DFrameBuffer);
@@ -31,16 +25,16 @@ public:
 		Width = width;
 		Height = height;
 	}
-	bool Lock(bool buffered) { DBGBREAK; return false; }
-	void Update() { DBGBREAK; }
-	PalEntry *GetPalette() { DBGBREAK; return NULL; }
-	void GetFlashedPalette(PalEntry palette[256]) { DBGBREAK; }
-	void UpdatePalette() { DBGBREAK; }
+	bool Lock(bool buffered) { return false; }
+	void Update() { }
+	PalEntry *GetPalette() { return NULL; }
+	void GetFlashedPalette(PalEntry palette[256]) { }
+	void UpdatePalette() { }
 	bool SetGamma(float gamma) { Gamma = gamma; return true; }
-	bool SetFlash(PalEntry rgb, int amount) { DBGBREAK; return false; }
-	void GetFlash(PalEntry &rgb, int &amount) { DBGBREAK; }
-	int GetPageCount() { DBGBREAK; return 0; }
-	bool IsFullscreen() { DBGBREAK; return 0; }
+	bool SetFlash(PalEntry rgb, int amount) { return false; }
+	void GetFlash(PalEntry &rgb, int &amount) { }
+	int GetPageCount() { return 0; }
+	bool IsFullscreen() { return 0; }
 	void PaletteChanged() {}
 	int QueryNewPalette() { return 0; }
 	bool Is8BitMode() { return false; }

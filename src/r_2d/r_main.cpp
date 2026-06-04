@@ -62,32 +62,18 @@ void (STACK_ARGS *hcolfunc_post4) (int sx, int yl, int yh);
 //
 //==========================================================================
 
-#define RenderTarget screen
-#define viewwindowx 0
-#define viewwindowy 0
-void R_SetupBuffer ()
+void R_SetupBuffer(void)
 {
-	//static uint8_t *lastbuff = NULL;
-
-	int pitch = RenderTarget->GetPitch();
-	uint8_t *lineptr = RenderTarget->GetBuffer() + viewwindowy*pitch + viewwindowx;
-
-	//if (dc_pitch != pitch || lineptr != lastbuff)
+	int pitch = screen->GetPitch();
+	uint8_t *lineptr = screen->GetBuffer() + 0 * pitch;
+	if (dc_pitch != pitch)
 	{
-		if (dc_pitch != pitch)
-		{
-			dc_pitch = pitch;
-			R_InitFuzzTable (pitch);
-#if defined(X86_ASM) || defined(X64_ASM)
-			ASM_PatchPitch ();
-#endif
-		}
-		dc_destorg = lineptr;
-		for (int i = 0; i < RenderTarget->GetHeight(); i++)
-		{
-			ylookup[i] = i * pitch;
-		}
+		dc_pitch = pitch;
+		R_InitFuzzTable (pitch);
 	}
+	dc_destorg = lineptr;
+	for (int i = 0; i < screen->GetHeight(); i++)
+		ylookup[i] = i * pitch;
 }
 
 //==========================================================================
@@ -96,18 +82,16 @@ void R_SetupBuffer ()
 //
 //==========================================================================
 
-void R_ShutdownRenderer()
+void R_ShutdownRenderer(void)
 {
 	R_DeinitTranslationTables ();
 }
 
-void R_InitRenderer()
+void R_InitRenderer(void)
 {
 	atterm(R_ShutdownRenderer);
-	// viewwidth / viewheight are set by the defaults
+	/* viewwidth / viewheight are set by the defaults */
 
-	//R_InitPlanes ();
-	//R_InitShadeMaps();
 	R_InitTranslationTables ();
 	R_InitColumnDrawers ();
 

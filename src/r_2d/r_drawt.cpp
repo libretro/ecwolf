@@ -61,14 +61,7 @@ unsigned int dc_tspans[4][MAXHEIGHT];
 unsigned int *dc_ctspan[4];
 unsigned int *horizspan[4];
 
-#ifdef X86_ASM
-extern "C" void R_SetupShadedCol();
-extern "C" void R_SetupAddCol();
-extern "C" void R_SetupAddClampCol();
-#endif
-
-#ifndef X86_ASM
-// Copies one span at hx to the screen at sx.
+/* Copies one span at hx to the screen at sx. */
 void rt_copy1col_c (int hx, int sx, int yl, int yh)
 {
 	uint8_t *source;
@@ -220,7 +213,6 @@ void STACK_ARGS rt_map4cols_c (int sx, int yl, int yh)
 		dest += pitch*2;
 	} while (--count);
 }
-#endif
 
 void rt_Translate1col(const uint8_t *translation, int hx, int yl, int yh)
 {
@@ -852,22 +844,6 @@ void rt_draw4cols (int sx)
 		dc_ctspan[x][1] = screen->GetHeight();
 	}
 
-#ifdef X86_ASM
-	// Setup assembly routines for changed colormaps or other parameters.
-	if (hcolfunc_post4 == rt_shaded4cols)
-	{
-		R_SetupShadedCol();
-	}
-	else if (hcolfunc_post4 == rt_addclamp4cols || hcolfunc_post4 == rt_tlateaddclamp4cols)
-	{
-		R_SetupAddClampCol();
-	}
-	else if (hcolfunc_post4 == rt_add4cols || hcolfunc_post4 == rt_tlateadd4cols)
-	{
-		R_SetupAddCol();
-	}
-#endif
-
 	for (;;)
 	{
 		// If a column is out of spans, mark it as such
@@ -876,19 +852,13 @@ void rt_draw4cols (int sx)
 		for (x = 0; x < 4; ++x)
 		{
 			if (horizspan[x] >= dc_ctspan[x])
-			{
 				bad |= 1 << x;
-			}
 			else if ((horizspan[x]+2)[0] < minnexttop)
-			{
 				minnexttop = (horizspan[x]+2)[0];
-			}
 		}
 		// Once all columns are out of spans, we're done
 		if (bad == 15)
-		{
 			return;
-		}
 
 		// Find the largest shared area for the spans in each column
 		maxtop = MAX (MAX (horizspan[0][0], horizspan[1][0]),

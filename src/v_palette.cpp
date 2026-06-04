@@ -107,13 +107,6 @@ extern "C" uint8_t BestColor_MMX (uint32_t rgb, const uint32_t *pal);
 
 int BestColor (const uint32_t *pal_in, int r, int g, int b, int first, int num)
 {
-#ifdef X86_ASM
-	if (CPU.bMMX)
-	{
-		int pre = 256 - num - first;
-		return BestColor_MMX (((first+pre)<<24)|(r<<16)|(g<<8)|b, pal_in-pre) - pre;
-	}
-#endif
 	const PalEntry *pal = (const PalEntry *)pal_in;
 	int bestcolor = first;
 	int bestdist = 257*257+257*257+257*257;

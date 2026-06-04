@@ -64,7 +64,7 @@ int 			scaledviewwidth;
 
 // [RH] Pointers to the different column drawers.
 //		These get changed depending on the current
-//		screen depth and asm/no asm.
+//		screen depth.
 void (*R_DrawColumnHoriz)(void);
 void (*R_DrawColumn)(void);
 void (*R_DrawFuzzColumn)(void);
@@ -125,7 +125,6 @@ FDynamicColormap ShadeFakeColormap[16];
 /*									*/
 /************************************/
 
-#ifndef	X86_ASM
 //
 // A column is a vertical slice/span from a wall texture that,
 //	given the DOOM style restrictions on the view orientation,
@@ -176,7 +175,6 @@ void R_DrawColumnP_C (void)
 		} while (--count);
 	}
 } 
-#endif
 
 // [RH] Just fills a column with a color
 void R_FillColumnP (void)
@@ -368,7 +366,6 @@ void R_InitFuzzTable (int fuzzoff)
 	}
 }
 
-#ifndef X86_ASM
 //
 // Creates a fuzzy image by copying pixels from adjacent ones above and below.
 // Used with an all black colormap, this could create the SHADOW effect,
@@ -444,7 +441,6 @@ void R_DrawFuzzColumnP_C (void)
 		fuzzpos = fuzz;
 	}
 } 
-#endif
 
 //
 // R_DrawTranlucentColumn
@@ -487,8 +483,7 @@ The point of this format is that the two colours now can be added, and
 then be converted to a RGB table index very easily: First, we just set
 all the frac bits and the four upper zero bits to 1. It's now possible
 to get the RGB table index by anding the current value >> 5 with the
-current value >> 19. When asm-optimised, this should be the fastest
-algorithm that uses RGB tables.
+current value >> 19.
 
 */
 
@@ -916,33 +911,26 @@ void R_DrawRevSubClampTranslatedColumnP_C ()
 // swapped.
 //
 extern "C" {
-int						ds_color;				// [RH] color for non-textured spans
+	int						ds_color;				// [RH] color for non-textured spans
 
-int 					ds_y;
-int 					ds_x1;
-int 					ds_x2;
+	int 					ds_y;
+	int 					ds_x1;
+	int 					ds_x2;
 
-lighttable_t*			ds_colormap;
+	lighttable_t*			ds_colormap;
 
-dsfixed_t 				ds_xfrac;
-dsfixed_t 				ds_yfrac;
-dsfixed_t 				ds_xstep;
-dsfixed_t 				ds_ystep;
-int						ds_xbits;
-int						ds_ybits;
+	dsfixed_t 				ds_xfrac;
+	dsfixed_t 				ds_yfrac;
+	dsfixed_t 				ds_xstep;
+	dsfixed_t 				ds_ystep;
+	int						ds_xbits;
+	int						ds_ybits;
 
-// start of a floor/ceiling tile image 
-const uint8_t*				ds_source;
+	// start of a floor/ceiling tile image 
+	const uint8_t*				ds_source;
 
-// just for profiling
-int 					dscount;
-
-#ifdef X86_ASM
-extern "C" void R_SetSpanSource_ASM (const uint8_t *flat);
-extern "C" void STACK_ARGS R_SetSpanSize_ASM (int xbits, int ybits);
-extern "C" void R_SetSpanColormap_ASM (uint8_t *colormap);
-extern "C" uint8_t *ds_curcolormap, *ds_cursource, *ds_curtiltedsource;
-#endif
+	// just for profiling
+	int 					dscount;
 }
 
 //==========================================================================
@@ -956,12 +944,6 @@ extern "C" uint8_t *ds_curcolormap, *ds_cursource, *ds_curtiltedsource;
 void R_SetSpanSource(const uint8_t *pixels)
 {
 	ds_source = pixels;
-#ifdef X86_ASM
-	if (ds_cursource != ds_source)
-	{
-		R_SetSpanSource_ASM(pixels);
-	}
-#endif
 }
 
 //==========================================================================
@@ -975,12 +957,6 @@ void R_SetSpanSource(const uint8_t *pixels)
 void R_SetSpanColormap(uint8_t *colormap)
 {
 	ds_colormap = colormap;
-#ifdef X86_ASM
-	if (ds_colormap != ds_curcolormap)
-	{
-		R_SetSpanColormap_ASM (ds_colormap);
-	}
-#endif
 }
 
 //==========================================================================
@@ -997,21 +973,13 @@ void R_SetupSpanBits(FTexture *tex)
 	ds_xbits = tex->WidthBits;
 	ds_ybits = tex->HeightBits;
 	if ((1 << ds_xbits) > tex->GetWidth())
-	{
 		ds_xbits--;
-	}
 	if ((1 << ds_ybits) > tex->GetHeight())
-	{
 		ds_ybits--;
-	}
-#ifdef X86_ASM
-	R_SetSpanSize_ASM (ds_xbits, ds_ybits);
-#endif
 }
 
 //
 // Draws the actual span.
-#ifndef X86_ASM
 void R_DrawSpanP_C (void)
 {
 	dsfixed_t			xfrac;
@@ -1142,7 +1110,6 @@ void R_DrawSpanMaskedP_C (void)
 		} while (--count);
 	}
 }
-#endif
 
 void R_DrawSpanTranslucentP_C (void)
 {
@@ -1435,21 +1402,14 @@ void R_FillSpan (void)
 
 // wallscan stuff, in C
 
-#ifndef X86_ASM
 static uint32_t STACK_ARGS vlinec1 ();
 static int vlinebits;
 
 uint32_t (STACK_ARGS *dovline1)() = vlinec1;
 uint32_t (STACK_ARGS *doprevline1)() = vlinec1;
 
-#ifdef X64_ASM
-extern "C" void vlinetallasm4();
-#define dovline4 vlinetallasm4
-extern "C" void setupvlinetallasm (int);
-#else
 static void STACK_ARGS vlinec4 ();
 void (STACK_ARGS *dovline4)() = vlinec4;
-#endif
 
 static uint32_t STACK_ARGS mvlinec1();
 static void STACK_ARGS mvlinec4();
@@ -1458,71 +1418,12 @@ static int mvlinebits;
 uint32_t (STACK_ARGS *domvline1)() = mvlinec1;
 void (STACK_ARGS *domvline4)() = mvlinec4;
 
-#else
-
-extern "C"
-{
-uint32_t STACK_ARGS vlineasm1 ();
-uint32_t STACK_ARGS prevlineasm1 ();
-uint32_t STACK_ARGS vlinetallasm1 ();
-uint32_t STACK_ARGS prevlinetallasm1 ();
-void STACK_ARGS vlineasm4 ();
-void STACK_ARGS vlinetallasmathlon4 ();
-void STACK_ARGS vlinetallasm4 ();
-void STACK_ARGS setupvlineasm (int);
-void STACK_ARGS setupvlinetallasm (int);
-
-uint32_t STACK_ARGS mvlineasm1();
-void STACK_ARGS mvlineasm4();
-void STACK_ARGS setupmvlineasm (int);
-}
-
-uint32_t (STACK_ARGS *dovline1)() = vlinetallasm1;
-uint32_t (STACK_ARGS *doprevline1)() = prevlinetallasm1;
-void (STACK_ARGS *dovline4)() = vlinetallasm4;
-
-uint32_t (STACK_ARGS *domvline1)() = mvlineasm1;
-void (STACK_ARGS *domvline4)() = mvlineasm4;
-#endif
-
 void setupvline (int fracbits)
 {
-#ifdef X86_ASM
-	if (CPU.Family <= 5)
-	{
-		if (fracbits >= 24)
-		{
-			setupvlineasm (fracbits);
-			dovline4 = vlineasm4;
-			dovline1 = vlineasm1;
-			doprevline1 = prevlineasm1;
-		}
-		else
-		{
-			setupvlinetallasm (fracbits);
-			dovline1 = vlinetallasm1;
-			doprevline1 = prevlinetallasm1;
-			dovline4 = vlinetallasm4;
-		}
-	}
-	else
-	{
-		setupvlinetallasm (fracbits);
-		if (CPU.bIsAMD && CPU.AMDFamily >= 7)
-		{
-			dovline4 = vlinetallasmathlon4;
-		}
-	}
-#else
 	vlinebits = fracbits;
-#ifdef X64_ASM
-	setupvlinetallasm(fracbits);
-#endif
-#endif
 }
 
-#if !defined(X86_ASM)
-uint32_t STACK_ARGS vlinec1 ()
+uint32_t STACK_ARGS vlinec1 (void)
 {
 	uint32_t fracstep = dc_iscale;
 	uint32_t frac = dc_texturefrac;
@@ -1559,21 +1460,13 @@ void STACK_ARGS vlinec4 ()
 		dest += dc_pitch;
 	} while (--count);
 }
-#endif
 
 void setupmvline (int fracbits)
 {
-#if defined(X86_ASM)
-	setupmvlineasm (fracbits);
-	domvline1 = mvlineasm1;
-	domvline4 = mvlineasm4;
-#else
 	mvlinebits = fracbits;
-#endif
 }
 
-#if !defined(X86_ASM)
-uint32_t STACK_ARGS mvlinec1 ()
+uint32_t STACK_ARGS mvlinec1 (void)
 {
 	uint32_t fracstep = dc_iscale;
 	uint32_t frac = dc_texturefrac;
@@ -1616,7 +1509,6 @@ void STACK_ARGS mvlinec4 ()
 		dest += dc_pitch;
 	} while (--count);
 }
-#endif
 
 extern "C" short spanend[MAXHEIGHT];
 extern fixed_t rw_light;
@@ -1911,23 +1803,6 @@ const uint8_t *R_GetColumn (FTexture *tex, int col)
 // [RH] Initialize the column drawer pointers
 void R_InitColumnDrawers ()
 {
-#ifdef X86_ASM
-	R_DrawColumn				= R_DrawColumnP_ASM;
-	R_DrawColumnHoriz			= R_DrawColumnHorizP_ASM;
-	R_DrawFuzzColumn			= R_DrawFuzzColumnP_ASM;
-	R_DrawTranslatedColumn		= R_DrawTranslatedColumnP_C;
-	R_DrawShadedColumn			= R_DrawShadedColumnP_C;
-	R_DrawSpan					= R_DrawSpanP_ASM;
-	R_DrawSpanMasked			= R_DrawSpanMaskedP_ASM;
-	if (CPU.Family <= 5)
-	{
-		rt_map4cols				= rt_map4cols_asm2;
-	}
-	else
-	{
-		rt_map4cols				= rt_map4cols_asm1;
-	}
-#else
 	R_DrawColumnHoriz			= R_DrawColumnHorizP_C;
 	R_DrawColumn				= R_DrawColumnP_C;
 	R_DrawFuzzColumn			= R_DrawFuzzColumnP_C;
@@ -1936,7 +1811,6 @@ void R_InitColumnDrawers ()
 	R_DrawSpan					= R_DrawSpanP_C;
 	R_DrawSpanMasked			= R_DrawSpanMaskedP_C;
 	rt_map4cols					= rt_map4cols_c;
-#endif
 	R_DrawSpanTranslucent		= R_DrawSpanTranslucentP_C;
 	R_DrawSpanMaskedTranslucent = R_DrawSpanMaskedTranslucentP_C;
 	R_DrawSpanAddClamp			= R_DrawSpanAddClampP_C;
