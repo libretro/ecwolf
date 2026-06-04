@@ -41,9 +41,6 @@
 #include "tarray.h"
 #include "name.h"
 
-extern "C" int mysnprintf(char *buffer, size_t count, const char *format, ...);
-extern "C" int myvsnprintf(char *buffer, size_t count, const char *format, va_list argptr);
-
 struct FStringData
 {
 	unsigned int Len;		// Length of string, excluding terminating null
