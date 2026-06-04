@@ -195,27 +195,29 @@ public:
 	virtual bool SetFlash (PalEntry rgb, int amount) = 0;
 	virtual void GetFlash (PalEntry &rgb, int &amount) = 0;
 
-	// 2D drawing -----------------------------------------------------------
+	// 2D drawing ----------------------------------------------------------
+	// These have a single implementation (in v_draw/v_text/v_video) and are
+	// never overridden, so they are non-virtual: direct calls, no vtable slot.
 
 	// Dim the entire canvas for the menus
-	virtual void Dim (PalEntry color = 0);
+	void Dim (PalEntry color = 0);
 
 	// Dim part of the canvas
-	virtual void Dim (PalEntry color, float amount, int x1, int y1, int w, int h);
+	void Dim (PalEntry color, float amount, int x1, int y1, int w, int h);
 
 	// Fill an area with a texture
-	virtual void FlatFill (int left, int top, int right, int bottom, FTexture *src, bool local_origin=false);
+	void FlatFill (int left, int top, int right, int bottom, FTexture *src, bool local_origin=false);
 
 	// Fill a simple polygon with a texture
-	virtual void FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
+	void FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 		double originx, double originy, double scalex, double scaley, angle_t rotation,
 		struct FDynamicColormap *colormap, int lightlevel, int palcolor=0, uint32_t rgbcolor=0);
 
 	// Set an area to a specified color
-	virtual void Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color);
+	void Clear (int left, int top, int right, int bottom, int palcolor, uint32_t color);
 
 	// Draws a line
-	virtual void DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor);
+	void DrawLine(int x0, int y0, int x1, int y1, int palColor, uint32_t realcolor);
 
 	// 2D Texture drawing
 	void STACK_ARGS DrawTexture (FTexture *img, double x, double y, int tags, ...);
@@ -265,7 +267,7 @@ protected:
 	int Height;
 	int Pitch;
 
-	virtual void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
+	void STACK_ARGS DrawTextureV (FTexture *img, double x, double y, uint32_t tag, va_list tags);
 	bool ParseDrawTextureTags (FTexture *img, double x, double y, uint32_t tag, va_list tags, DrawParms *parms, bool hw) const;
 
 	DCanvas() {}
