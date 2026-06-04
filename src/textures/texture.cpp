@@ -507,7 +507,8 @@ void FTexture::FillBuffer(uint8_t *buff, int pitch, int height, FTextureFormat f
 	}
 
 	default:
-		I_Error("FTexture::FillBuffer: Unsupported format %d", fmt);
+		// Internal format enum; an unknown value is an engine bug, not data.
+		assert (0 && "FTexture::FillBuffer: unsupported format");
 	}
 }
 

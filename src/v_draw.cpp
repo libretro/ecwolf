@@ -1301,7 +1301,7 @@ void DCanvas::GetBlock (int x, int y, int _width, int _height, uint8_t *dest) co
 		|| y<0
 		|| y+_height>Height)
 	{
-		I_Error ("Bad V_GetBlock");
+		assert (0 && "Bad V_GetBlock");
 	}
 #endif
 

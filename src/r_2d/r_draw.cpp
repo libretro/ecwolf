@@ -1025,11 +1025,9 @@ void R_DrawSpanP_C (void)
 	int 				spot;
 
 #ifdef RANGECHECK 
-	if (ds_x2 < ds_x1 || ds_x1 < 0
-		|| ds_x2 >= screen->width || ds_y > screen->height)
-	{
-		I_Error ("R_DrawSpan: %i to %i at %i", ds_x1, ds_x2, ds_y);
-	}
+	assert (!(ds_x2 < ds_x1 || ds_x1 < 0
+		|| ds_x2 >= screen->width || ds_y > screen->height) &&
+		"R_DrawSpan: span coordinates out of range");
 //		dscount++;
 #endif
 

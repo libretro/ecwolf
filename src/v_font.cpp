@@ -1179,8 +1179,8 @@ void FSingleLumpFont::LoadTranslations()
 		}
 
 		default:
-			// Should be unreachable.
-			I_Error("Unknown font type in FSingleLumpFont::LoadTranslation.");
+			// Should be unreachable; internal font-type enum.
+			assert (0 && "Unknown font type in FSingleLumpFont::LoadTranslation");
 			break;
 	}
 
