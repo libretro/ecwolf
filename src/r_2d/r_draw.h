@@ -74,15 +74,6 @@ extern "C" unsigned int	horizspans[4];
 // Hook in system specific BLT here.
 extern void (*R_DrawColumn)(void);
 
-extern uint32_t (STACK_ARGS *dovline1) ();
-extern uint32_t (STACK_ARGS *doprevline1) ();
-extern void (STACK_ARGS *dovline4) ();
-extern void setupvline (int);
-
-extern uint32_t (STACK_ARGS *domvline1) ();
-extern void (STACK_ARGS *domvline4) ();
-extern void setupmvline (int);
-
 extern void setuptmvline (int);
 
 // The Spectre/Invisibility effect.
