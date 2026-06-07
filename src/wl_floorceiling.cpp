@@ -176,6 +176,149 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 		}
 
 		int curzonelight = 0;
+
+		// Fast path: no halo or zone lighting active (the common case). The map
+		// cell - and thus the texture - only changes roughly every ~100 pixels
+		// (texture cells are large relative to a screen row), and the visible
+		// span of a row is contiguous, so instead of recomputing the cell and
+		// re-testing visibility/branches for every pixel we walk the row in
+		// runs of constant cell. Each run resolves its texture once (reusing the
+		// lasttex cache exactly as before) and then a tight inner loop does only
+		// the texel fetch, shade and write. The slow path below (used when halos
+		// or zonelights are present) is the original per-pixel loop, unchanged.
+		if(!anyLight)
+		{
+			const int SHIFT = TILESHIFT+8;
+			int x = 0;
+			while(x < viewwidth)
+			{
+				// Resolve the cell at the span start (same mapping as before).
+				unsigned int curx = viewxTile + (gu >> SHIFT);
+				unsigned int cury = viewyTile + (-(gv >> SHIFT) - 1);
+				if(curx != oldmapx || cury != oldmapy)
+				{
+					oldmapx = curx;
+					oldmapy = cury;
+					const MapSpot spot = map->GetSpot(oldmapx%mapwidth, oldmapy%mapheight, 0);
+
+					FTextureID curtex = spot->sector ? spot->sector->texture[floor ? MapSector::Floor : MapSector::Ceiling] : FNullTextureID();
+					if (curtex != lasttex)
+					{
+						lasttex = curtex;
+						if(curtex.isValid())
+						{
+							FTexture * const texture = TexMan(curtex);
+							tex = texture->GetPixels();
+							texwidth = texture->GetWidth();
+							texheight = texture->GetHeight();
+							texxscale = texture->xScale>>10;
+							texyscale = -texture->yScale>>10;
+							useOptimized = texwidth == 64 && texheight == 64 && texxscale == FRACUNIT>>10 && texyscale == -FRACUNIT>>10;
+							isMasked = texture->bMasked;
+						}
+						else
+							tex = NULL;
+					}
+				}
+
+				// Number of pixels until gu's cell index (gu >> SHIFT) changes.
+				// gu advances by du each pixel; find the smallest n>=1 that
+				// crosses a 2^SHIFT boundary. du==0 never crosses. Targets are
+				// computed in 64-bit to avoid overflow when gu is near INT_MAX.
+				int runGu;
+				if(du > 0)
+				{
+					const int64_t target = ((int64_t)(gu >> SHIFT) + 1) << SHIFT;
+					runGu = (int)((target - gu + du - 1) / du);
+				}
+				else if(du < 0)
+				{
+					const int64_t target = ((int64_t)(gu >> SHIFT) << SHIFT) - 1;
+					runGu = (int)(((int64_t)gu - target + (-(int64_t)du) - 1) / (-(int64_t)du));
+				}
+				else
+					runGu = INT_MAX;
+
+				int runGv;
+				if(dv > 0)
+				{
+					const int64_t target = ((int64_t)(gv >> SHIFT) + 1) << SHIFT;
+					runGv = (int)((target - gv + dv - 1) / dv);
+				}
+				else if(dv < 0)
+				{
+					const int64_t target = ((int64_t)(gv >> SHIFT) << SHIFT) - 1;
+					runGv = (int)(((int64_t)gv - target + (-(int64_t)dv) - 1) / (-(int64_t)dv));
+				}
+				else
+					runGv = INT_MAX;
+
+				int run = runGu < runGv ? runGu : runGv;
+				if(run < 1) run = 1;                       // never stall
+				if(run > viewwidth - x) run = viewwidth - x; // clip to row
+
+				// Tight inner loop over the constant-cell run. The cell, texture
+				// and branch selectors are fixed for the whole run, so only the
+				// per-pixel visibility test, texel fetch and write remain. The
+				// wallclip test stays per-pixel because a row's visible region
+				// can have interior gaps (a pillar between two open areas).
+				if(tex)
+				{
+					if(useOptimized)
+					{
+						for(int i = 0; i < run; ++i, ++x, ++tex_offset)
+						{
+							if(wallclip[x] <= y)
+							{
+								const int u = (gu>>18) & 63;
+								const int v = (-gv>>18) & 63;
+								const unsigned texoffs = (u * 64) + v;
+								if(isMasked)
+								{
+									if(const uint8_t c = tex[texoffs])
+										*tex_offset = curshades[c];
+								}
+								else
+									*tex_offset = curshades[tex[texoffs]];
+							}
+							gu += du;
+							gv += dv;
+						}
+					}
+					else
+					{
+						for(int i = 0; i < run; ++i, ++x, ++tex_offset)
+						{
+							if(wallclip[x] <= y)
+							{
+								const int u = (FixedMul((viewxTile<<16)+(gu>>8)-512, texxscale)) & (texwidth-1);
+								const int v = (FixedMul((viewyTile<<16)-(gv>>8)+512, texyscale)) & (texheight-1);
+								const unsigned texoffs = (u * texheight) + v;
+								if(isMasked)
+								{
+									if(const uint8_t c = tex[texoffs])
+										*tex_offset = curshades[c];
+								}
+								else
+									*tex_offset = curshades[tex[texoffs]];
+							}
+							gu += du;
+							gv += dv;
+						}
+					}
+				}
+				else
+				{
+					// No texture for this cell: advance without drawing.
+					gu += du * run;
+					gv += dv * run;
+					tex_offset += run;
+					x += run;
+				}
+			}
+			continue;
+		}
+
 		for(unsigned int x = 0;x < (unsigned)viewwidth; ++x, ++tex_offset)
 		{
 			if(wallclip[x] <= y)
