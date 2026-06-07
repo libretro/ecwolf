@@ -93,4 +93,28 @@ static void FString_C_Release(FString_C *s)
 	s->Chars = NULL;
 }
 
+/*
+** Query and comparison operations. These mirror the inline FString members of
+** the same names; each reduces to the same str* call or length test, so they
+** are codegen-neutral with FString. The CompareNoCase/Compare variants assume
+** the same stricmp/strnicmp/strcmp the build maps in (e.g. strcasecmp).
+*/
+#define FSTRING_C_ISEMPTY(s)    (FSTRING_C_LEN(s) == 0)
+#define FSTRING_C_ISNOTEMPTY(s) (FSTRING_C_LEN(s) != 0)
+
+static int FString_C_Compare(const FString_C *s, const char *other)
+{
+	return strcmp(s->Chars, other);
+}
+
+static int FString_C_CompareNoCase(const FString_C *s, const char *other)
+{
+	return stricmp(s->Chars, other);
+}
+
+static int FString_C_CompareNoCaseN(const FString_C *s, const char *other, int len)
+{
+	return strnicmp(s->Chars, other, (size_t)len);
+}
+
 #endif
