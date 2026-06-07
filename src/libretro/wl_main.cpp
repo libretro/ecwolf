@@ -749,7 +749,6 @@ int CheckRatio (int width, int height, int *trueratio)
 
 #define IFARG(str) if(!strcmp(arg, (str)))
 
-#ifndef _WIN32
 // Return the RNG seed for a fresh game.
 //
 // A libretro core must be deterministic: runahead runs two copies of the core
@@ -759,13 +758,13 @@ int CheckRatio (int width, int height, int *trueratio)
 // The full RNG state (including the seed) is serialized into the save state, so
 // load/restore remains exact; only a brand-new game is affected, and vanilla
 // Wolf3D itself started from a fixed RNG table. We therefore use a constant.
+// This holds on every platform, so the definition is unconditional (Windows
+// formerly got an identical constant from w32_random.cpp, which only existed to
+// pull in CryptGenRandom/time() entropy that a deterministic core must not use).
 unsigned int I_MakeRNGSeed()
 {
 	return 0u;
 }
-#else
-unsigned int I_MakeRNGSeed();
-#endif
 
 /*
 ==========================
