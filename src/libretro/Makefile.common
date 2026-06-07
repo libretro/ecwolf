@@ -189,6 +189,7 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/weaponslots.cpp \
 	$(CORE_DIR)/src/wl_act2.cpp \
 	$(CORE_DIR)/src/wl_agent.cpp \
+	$(CORE_DIR)/src/wl_atmos.cpp \
 	$(CORE_DIR)/src/wl_cloudsky.cpp \
 	$(CORE_DIR)/src/wl_dir3dspr.cpp \
 	$(CORE_DIR)/src/wl_draw.cpp \
@@ -230,8 +231,6 @@ SOURCES_C += \
 	$(CORE_DIR)/src/libretro/deps/stb/id_sd_ogg.c
 # ecwolf.pk3 base data, embedded so the core carries it internally.
 SOURCES_C += $(CORE_DIR)/src/libretro/ecwolf_pk3_data.c
-# Converted from C++ to C (atmospheric effects; plain integer/DSP math).
-SOURCES_C += $(CORE_DIR)/src/wl_atmos.c
 SOURCES_CXX += $(LZMA_CXX)
 
 ifneq ($(STATIC_LINKING),1)
