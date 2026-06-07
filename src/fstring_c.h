@@ -46,6 +46,10 @@ typedef struct FString_C
 #define FSTRING_C_GETCHARS(s) ((const char *)(s)->Chars)
 #define FSTRING_C_LEN(s)      (FSTRING_C_DATA(s)->Len)
 
+/* Forward declaration: every operation that assigns Chars releases the prior
+** buffer first, so it is also defined here for use before its definition. */
+static void FString_C_Release(FString_C *s);
+
 /* Allocate a data block holding room for 'len' chars (plus header and null),
 ** padded as FStringData::Alloc does, and return a pointer to the char area. */
 static char *FString_C_AllocBuffer(size_t len)
@@ -66,6 +70,7 @@ static char *FString_C_AllocBuffer(size_t len)
 static void FString_C_InitCStr(FString_C *s, const char *src)
 {
 	size_t len = (src != NULL) ? strlen(src) : 0;
+	FString_C_Release(s);
 	s->Chars = FString_C_AllocBuffer(len);
 	if (s->Chars != NULL)
 	{
@@ -84,14 +89,24 @@ static void FString_C_Copy(FString_C *dst, const FString_C *src)
 }
 
 /* Release this string's hold on its buffer, freeing it at zero refs
-** (FStringData::Release + Dealloc). */
+** (FStringData::Release + Dealloc). A NULL Chars (never-initialized or already
+** released) is treated as empty and is a no-op, so the convention throughout is
+** that Chars == NULL means "no buffer held". */
 static void FString_C_Release(FString_C *s)
 {
-	FStringData_C *data = FSTRING_C_DATA(s);
-	if (--data->RefCount <= 0)
-		free(data);
-	s->Chars = NULL;
+	if (s->Chars != NULL)
+	{
+		FStringData_C *data = FSTRING_C_DATA(s);
+		if (--data->RefCount <= 0)
+			free(data);
+		s->Chars = NULL;
+	}
 }
+
+/* Zero-initialize to the empty/no-buffer state. A local 'FString_C s;' must be
+** FString_C_Init'd (or assigned by an Init, Format or Concat op) before use,
+** since unlike FString there is no default constructor. */
+#define FSTRING_C_INIT(s) ((s)->Chars = NULL)
 
 /*
 ** Query and comparison operations. These mirror the inline FString members of
@@ -121,6 +136,7 @@ static int FString_C_CompareNoCaseN(const FString_C *s, const char *other, int l
 ** Used by Left/Mid below. */
 static void FString_C_InitSubstr(FString_C *s, const char *src, size_t len)
 {
+	FString_C_Release(s);
 	s->Chars = FString_C_AllocBuffer(len);
 	if (s->Chars != NULL)
 	{
@@ -179,6 +195,7 @@ static void FString_C_VFormat(FString_C *dst, const char *fmt, va_list arglist)
 {
 	va_list ap;
 	int needed;
+	FString_C_Release(dst);		/* drop any prior buffer, like FString::VFormat */
 	va_copy(ap, arglist);
 	needed = vsnprintf(NULL, 0, fmt, ap);
 	va_end(ap);
@@ -209,13 +226,15 @@ static void FString_C_Concat(FString_C *dst, const FString_C *head, const FStrin
 {
 	size_t len1 = FSTRING_C_LEN(head);
 	size_t len2 = FSTRING_C_LEN(tail);
-	dst->Chars = FString_C_AllocBuffer(len1 + len2);
-	if (dst->Chars != NULL)
+	char *buf = FString_C_AllocBuffer(len1 + len2);
+	if (buf != NULL)
 	{
-		if (len1 != 0) memcpy(dst->Chars, head->Chars, len1);
-		if (len2 != 0) memcpy(dst->Chars + len1, tail->Chars, len2);
-		dst->Chars[len1 + len2] = '\0';
+		if (len1 != 0) memcpy(buf, head->Chars, len1);
+		if (len2 != 0) memcpy(buf + len1, tail->Chars, len2);
+		buf[len1 + len2] = '\0';
 	}
+	FString_C_Release(dst);		/* free prior AFTER reading head/tail (may alias dst) */
+	dst->Chars = buf;
 }
 
 /* As FString_C_Concat but the tail is a plain C string
@@ -224,13 +243,15 @@ static void FString_C_ConcatCStr(FString_C *dst, const FString_C *head, const ch
 {
 	size_t len1 = FSTRING_C_LEN(head);
 	size_t len2 = (tail != NULL) ? strlen(tail) : 0;
-	dst->Chars = FString_C_AllocBuffer(len1 + len2);
-	if (dst->Chars != NULL)
+	char *buf = FString_C_AllocBuffer(len1 + len2);
+	if (buf != NULL)
 	{
-		if (len1 != 0) memcpy(dst->Chars, head->Chars, len1);
-		if (len2 != 0) memcpy(dst->Chars + len1, tail, len2);
-		dst->Chars[len1 + len2] = '\0';
+		if (len1 != 0) memcpy(buf, head->Chars, len1);
+		if (len2 != 0) memcpy(buf + len1, tail, len2);
+		buf[len1 + len2] = '\0';
 	}
+	FString_C_Release(dst);		/* free prior AFTER reading head (may alias dst) */
+	dst->Chars = buf;
 }
 
 #endif
