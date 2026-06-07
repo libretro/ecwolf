@@ -97,5 +97,6 @@ void         Zone_ListAdd(int list, int id, int light);
 */
 void         Zone_Populate(int zoneCount);
 int          Zone_LightForIndex(int zoneIndex);
+int          Zone_AnyActive(void);
 
 #endif

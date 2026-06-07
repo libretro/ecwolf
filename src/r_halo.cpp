@@ -209,6 +209,7 @@ void Zone_ListAdd(int list, int id, int light)
 static int *s_zonelight   = NULL;
 static int  s_zonelightcap = 0;
 static int  s_zonecount    = 0;
+static int  s_zoneany      = 0;   /* nonzero if any zone has light this frame */
 
 void Zone_Populate(int zoneCount)
 {
@@ -216,6 +217,7 @@ void Zone_Populate(int zoneCount)
 	unsigned int mapwidth, mapheight;
 
 	s_zonecount = zoneCount;
+	s_zoneany = 0;
 	if (zoneCount <= 0)
 		return;
 
@@ -263,6 +265,7 @@ void Zone_Populate(int zoneCount)
 					if (d->light == 0)
 						continue;
 					s_zonelight[zi] += d->light << 3;
+					s_zoneany = 1;
 				}
 			}
 		}
@@ -274,4 +277,9 @@ int Zone_LightForIndex(int zoneIndex)
 	if (zoneIndex < 0 || zoneIndex >= s_zonecount || s_zonelight == NULL)
 		return 0;
 	return s_zonelight[zoneIndex];
+}
+
+int Zone_AnyActive(void)
+{
+	return s_zoneany;
 }

@@ -84,6 +84,11 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 	// Per-column halo light boost for the current row, recomputed each row from
 	// the active halos. Allocated lazily and only used when halos are present.
 	const int numHalos = Halo_ActiveCount();
+	// Whether any halo or zone lighting can contribute this frame. When false
+	// (the overwhelmingly common case) the per-row/per-cell/per-pixel light
+	// boost work is skipped entirely and the plane draws on the same tight
+	// path as before the lighting feature existed.
+	const bool anyLight = (numHalos > 0) || (Zone_AnyActive() != 0);
 	static int *halolight = NULL;
 	static int halolight_size = 0;
 	if(numHalos > 0 && viewwidth > halolight_size)
@@ -193,7 +198,7 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 
 					// Zone light boost for this map cell (0 when the zone has no
 					// active zonelight, which is the common case).
-					curzonelight = (spot->zone != NULL)
+					curzonelight = (anyLight && spot->zone != NULL)
 						? Zone_LightForIndex(spot->zone->index) : 0;
 
 					if(spot->sector)
@@ -228,11 +233,14 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 					// this column, recomputing the colormap row with the added
 					// light. Cheap branch keeps the no-halo fast path intact.
 					const uint8_t *pixshades = curshades;
-					const int hb = (numHalos > 0 ? halolight[x] : 0) + curzonelight;
-					if(hb != 0)
+					if(anyLight)
 					{
-						const int bshade = LIGHT2SHADE(gLevelLight + r_extralight + hb);
-						pixshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), bshade)<<8];
+						const int hb = (numHalos > 0 ? halolight[x] : 0) + curzonelight;
+						if(hb != 0)
+						{
+							const int bshade = LIGHT2SHADE(gLevelLight + r_extralight + hb);
+							pixshades = &NormalLight.Maps[GETPALOOKUP(MAX(tz, MINZ), bshade)<<8];
+						}
 					}
 
 					if(useOptimized)
