@@ -39,6 +39,7 @@
 #include "id_sd.h"
 #include "g_mapinfo.h"
 #include "g_shared/a_deathcam.h"
+#include "g_shared/a_ambient.h"
 #include "g_shared/a_inventory.h"
 #include "lnspec.h"
 #include "m_random.h"
@@ -772,9 +773,57 @@ ACTION_FUNCTION(A_Pain)
 
 ACTION_FUNCTION(A_PlaySound)
 {
-	ACTION_PARAM_STRING(sound, 0);
+	// Channel selectors (mirrors the generic/weapon/voice pools the libretro
+	// backend exposes). CHAN_AUTO picks a free generic channel.
+	enum
+	{
+		CHAN_AUTO = 1,
+		CHAN_WEAPON = 2,
+		CHAN_VOICE = 3,
+		CHAN_ITEM = 4,
+		CHAN_BODY = 5
+	};
 
-	PlaySoundLocActor(sound, self);
+	ACTION_PARAM_STRING(sound, 0);
+	ACTION_PARAM_INT(channel, 1);
+	ACTION_PARAM_DOUBLE(volume, 2);
+	ACTION_PARAM_BOOL(looping, 3);
+	ACTION_PARAM_DOUBLE(attenuation, 4);
+
+	enum SoundChannel sndchan = SD_GENERIC;
+	if(channel == CHAN_WEAPON)
+		sndchan = SD_WEAPONS;
+	else if(channel == CHAN_VOICE)
+		sndchan = SD_BOSSWEAPONS;
+
+	// A looping sound is registered against the actor's spawnid so the ambient
+	// machinery (LoopedAudio) can manage it; a one-shot plays and is forgotten.
+	PlaySoundLocGlobal(sound, self->x, self->y, sndchan,
+		looping ? self->spawnid : 0, looping, volume);
+	return true;
+}
+
+ACTION_FUNCTION(A_AmbientJumpState)
+{
+	ACTION_PARAM_STATE(frame, 0, NULL);
+	ACTION_PARAM_BOOL(enter, 1);
+
+	AAmbient *ambient = reinterpret_cast<AAmbient *>(self);
+	ambient->JumpState(frame, enter);
+	return true;
+}
+
+ACTION_FUNCTION(A_SetVolume)
+{
+	ACTION_PARAM_DOUBLE(volume, 0);
+
+	LoopedAudio::setVolume(self->spawnid, volume);
+	return true;
+}
+
+ACTION_FUNCTION(A_StopSound)
+{
+	LoopedAudio::stopSoundFrom(self->spawnid);
 	return true;
 }
 

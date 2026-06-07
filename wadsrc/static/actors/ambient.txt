@@ -1,5 +1,51 @@
-// Ambient: looping positional ambient sounds. The state machine that drives
-// the sound (using A_AmbientJumpState/A_SetVolume) is added with those actions.
+// Ambient: looping positional ambient sound. While the player is in the same
+// map zone as this actor, the sound fades in (Start* states) and loops; when
+// the player leaves the zone it fades out (End* states) and stops. The sound,
+// here a placeholder, is overridden per-instance in mods via a subclass.
 actor Ambient native
 {
+	states
+	{
+	Spawn:
+		TNT1 A 30
+	Check:
+		TNT1 A 70 A_AmbientJumpState("Start", true)
+		loop
+
+	Start:
+		TNT1 A 70 A_PlaySound("guard/sight", 1, 0.2, true, 0.0)
+		goto StartLevel1
+	End:
+		TNT1 A 70 A_SetVolume(0.8)
+		goto EndLevel1
+
+	StartLevel1:
+		TNT1 A 70 A_SetVolume(0.4)
+		goto StartLevel2
+	StartLevel2:
+		TNT1 A 70 A_SetVolume(0.6)
+		goto StartLevel3
+	StartLevel3:
+		TNT1 A 70 A_SetVolume(0.8)
+		goto StartLevel4
+	StartLevel4:
+		TNT1 A 70 A_SetVolume(1.0)
+		goto WaitEnd
+	WaitEnd:
+		TNT1 A 70 A_AmbientJumpState("End", false)
+		loop
+
+	EndLevel1:
+		TNT1 A 70 A_SetVolume(0.6)
+		goto EndLevel2
+	EndLevel2:
+		TNT1 A 70 A_SetVolume(0.4)
+		goto EndLevel3
+	EndLevel3:
+		TNT1 A 70 A_SetVolume(0.2)
+		goto EndLevel4
+	EndLevel4:
+		TNT1 A 70 A_StopSound
+		goto Check
+	}
 }

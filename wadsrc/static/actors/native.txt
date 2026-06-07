@@ -83,7 +83,10 @@ actor Actor native
 	action native A_MirrorPosition(float x, int axis);
 	action native A_MonsterRefire(int chance, state abort);
 	action native A_Pain();
-	action native A_PlaySound(string soundname);
+	action native A_PlaySound(string soundname, int channel = 1, float volume = 1.0, bool looping = false, float attenuation = 1.0);
+	action native A_AmbientJumpState(state frame, bool enter);
+	action native A_SetVolume(float volume);
+	action native A_StopSound(int slot = 0);
 	action native A_RadiusWake(int radius);
 	action native A_ResetPosition(float x, float y);
 	action native A_ScaleVelocity(float scale);

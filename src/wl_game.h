@@ -62,7 +62,7 @@ extern struct NewMap_t
 #define PlaySoundLocTile(s,tx,ty)       PlaySoundLocGlobal(s,(((int32_t)(tx) << TILESHIFT) + (1L << (TILESHIFT - 1))),(((int32_t)ty << TILESHIFT) + (1L << (TILESHIFT - 1))),SD_GENERIC)
 #define PlaySoundLocActor(s,ob)         PlaySoundLocGlobal(s,(ob)->x,(ob)->y,SD_GENERIC)
 #define PlaySoundLocActorBoss(s,ob)     PlaySoundLocGlobal(s,(ob)->x,(ob)->y,SD_BOSSWEAPONS)
-int     PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan,bool looping=false,double volume=1.0);
+int     PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan,unsigned int objId=0,bool looping=false,double volume=1.0);
 void UpdateSoundLoc(void);
 
 // Looping/ambient positional audio. Sounds are registered against the spawnid

@@ -188,8 +188,13 @@ SetSoundLoc(fixed gx,fixed gy)
 =
 ==========================
 */
-int PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan,bool looping,double volume)
+int PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan,unsigned int objId,bool looping,double volume)
 {
+	// A looping sound owned by an actor registers once; if it is already
+	// registered, leave the existing entry (and its channel) alone.
+	if(looping && objId != 0 && LoopedAudio::has(objId))
+		return -1;
+
 	SetSoundLoc(gx, gy);
 	SD_PositionSound(leftchannel, rightchannel);
 
@@ -200,8 +205,13 @@ int PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan,bool looping,dou
 		channelSoundPos[channel - 1].globalsoundy = gy;
 		channelSoundPos[channel - 1].valid = 1;
 	}
-	// Channel index the sound landed on (0..MIX_CHANNELS-1), or -1 if it did
-	// not play. SD_PlaySound returns channel+1 (0 == "did not play").
+
+	// Register the loop against its owning actor so updateSoundPos can manage
+	// it (re-home/stop as the player moves). channel-1 is the 0-based index
+	// (0 == "did not play" from SD_PlaySound).
+	if(looping && objId != 0)
+		LoopedAudio::add(objId, channel - 1, s, 1.0, volume);
+
 	return channel - 1;
 }
 
