@@ -328,7 +328,7 @@ void R_InitSprites()
 	}
 }
 
-void R_LoadSprite(const FString &name)
+void R_LoadSprite(const char *name)
 {
 	if(loadedSprites.Size() == 0)
 	{
@@ -339,7 +339,7 @@ void R_LoadSprite(const FString &name)
 		loadedSprites.Push(sprInf);
 	}
 
-	if(name.Len() != 4)
+	if(strlen(name) != 4)
 	{
 		printf("Sprite name invalid.\n");
 		return;
@@ -350,7 +350,7 @@ void R_LoadSprite(const FString &name)
 	sprInf.frames = 0;
 	sprInf.numFrames = 0;
 
-	strcpy(sprInf.name, name.GetChars());
+	strcpy(sprInf.name, name);
 	if(loadedSprites.Size() > 0)
 	{
 		if(sprInf.iname == lastSprite)
