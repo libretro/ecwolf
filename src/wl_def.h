@@ -31,6 +31,19 @@
 #	define O_BINARY 0
 #endif
 
+/* Portable inline keyword: 'inline' in C++ and C99, '__inline' on MSVC, and
+** empty for strict C89 compilers that lack any inline (the functions using it
+** are already declared 'static', so they remain valid, just not inlined). */
+#ifdef __cplusplus
+#	define ECWOLF_INLINE inline
+#elif defined(_MSC_VER)
+#	define ECWOLF_INLINE __inline
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#	define ECWOLF_INLINE inline
+#else
+#	define ECWOLF_INLINE
+#endif
+
 
 #define FRACBITS 16
 #define FRACUNIT (1<<FRACBITS)
@@ -252,7 +265,7 @@ class AActor;
 struct AActor;
 #endif
 
-enum Button
+typedef enum Button
 {
 	bt_nobutton=-1,
 	bt_attack=0,
@@ -294,9 +307,9 @@ enum Button
 	bt_panleft,
 	bt_panright,
 	NUMAMBUTTONS
-};
+} Button;
 
-struct ControlScheme
+typedef struct ControlScheme
 {
 	enum
 	{
@@ -313,11 +326,13 @@ struct ControlScheme
 	int			mouse;
 	int			axis;
 	bool		negative;
-};
+} ControlScheme;
 
 extern ControlScheme controlScheme[];
 extern ControlScheme amControlScheme[];
+#ifdef __cplusplus
 extern ControlScheme &schemeAutomapKey;
+#endif
 
 enum
 {
@@ -364,12 +379,12 @@ extern const struct RatioInformation
 #define CorrectWidthFactor(x)	((x)*AspectCorrection[r_ratio].multiplier/48)
 #define CorrectHeightFactor(x)	((x)*48/AspectCorrection[r_ratio].multiplier)
 
-static inline fixed FixedMul(fixed a, fixed b)
+static ECWOLF_INLINE fixed FixedMul(fixed a, fixed b)
 {
 	return (fixed)(((int64_t)a * b + 0x8000) >> 16);
 }
 
-static inline fixed FixedDiv(fixed a, fixed b)
+static ECWOLF_INLINE fixed FixedDiv(fixed a, fixed b)
 {
 	return (fixed)(((((int64_t)a)<<32) / b) >> 16);
 }
@@ -383,17 +398,17 @@ static inline fixed FixedDiv(fixed a, fixed b)
 #define lengthof(x) (sizeof(x) / sizeof(*(x)))
 #define endof(x)    ((x) + lengthof(x))
 
-static inline uint16_t READWORD(uint8_t *&ptr)
+static ECWOLF_INLINE uint16_t READWORD(uint8_t **ptr)
 {
-	uint16_t val = ptr[0] | ptr[1] << 8;
-	ptr += 2;
+	uint16_t val = (*ptr)[0] | (*ptr)[1] << 8;
+	*ptr += 2;
 	return val;
 }
 
-static inline uint32_t READLONGWORD(uint8_t *&ptr)
+static ECWOLF_INLINE uint32_t READLONGWORD(uint8_t **ptr)
 {
-	uint32_t val = ptr[0] | ptr[1] << 8 | ptr[2] << 16 | ptr[3] << 24;
-	ptr += 4;
+	uint32_t val = (*ptr)[0] | (*ptr)[1] << 8 | (*ptr)[2] << 16 | (*ptr)[3] << 24;
+	*ptr += 4;
 	return val;
 }
 
