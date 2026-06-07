@@ -189,6 +189,31 @@ ACTION_FUNCTION(A_StartMusic)
 	return true;
 }
 
+// Wake up (jump to the RadiusWake state of) every shootable actor within
+// radius map units, except this actor. Used by alarm/trigger props.
+ACTION_FUNCTION(A_RadiusWake)
+{
+	ACTION_PARAM_INT(radius, 0);
+
+	AActor::Iterator iter = AActor::GetIterator();
+	while(iter.Next())
+	{
+		AActor *target = iter;
+		fixed dist;
+		const Frame *wakestate;
+
+		dist = MAX<fixed>(0, MAX(abs(target->x - self->x), abs(target->y - self->y)) - target->radius) >> (FRACBITS - 6);
+
+		if(dist >= radius || target == self || !(target->flags & FL_SHOOTABLE))
+			continue;
+
+		wakestate = self->FindState("RadiusWake");
+		if(wakestate)
+			self->SetState(wakestate);
+	}
+	return true;
+}
+
 // Teleport this actor to an absolute map position (map units).
 ACTION_FUNCTION(A_ResetPosition)
 {
@@ -524,6 +549,52 @@ ACTION_FUNCTION(A_GunFlash)
 	if(self->MeleeState)
 		self->SetState(self->MeleeState);
 	self->player->SetPSprite(flash, player_t::ps_flash);
+	return true;
+}
+
+// Move this actor a fixed distance in one of the eight cardinal/intercardinal
+// directions (or nodir for no movement). Distance is in map units.
+ACTION_FUNCTION(A_InertMove)
+{
+	ACTION_PARAM_DOUBLE(moveflt, 0);
+	ACTION_PARAM_INT(dir, 1);
+
+	fixed move = FLOAT2FIXED(moveflt);
+
+	switch(dir)
+	{
+		case north:
+			self->y -= move;
+			break;
+		case northeast:
+			self->x += move;
+			self->y -= move;
+			break;
+		case east:
+			self->x += move;
+			break;
+		case southeast:
+			self->x += move;
+			self->y += move;
+			break;
+		case south:
+			self->y += move;
+			break;
+		case southwest:
+			self->x -= move;
+			self->y += move;
+			break;
+		case west:
+			self->x -= move;
+			break;
+		case northwest:
+			self->x -= move;
+			self->y -= move;
+			break;
+		case nodir:
+		default:
+			break;
+	}
 	return true;
 }
 

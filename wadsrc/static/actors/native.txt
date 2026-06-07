@@ -72,6 +72,7 @@ actor Actor native
 	action native A_Fall();
 	action native A_GiveExtraMan(int amount = 1);
 	action native A_GiveInventory(string type, int amount = 0);
+	action native A_InertMove(float move, int dir);
 	action native A_Jump(int chance, state frame, ...);
 	action native A_JumpIf(bool expression, state frame);
 	action native A_JumpIfCloser(float distance, state frame);
@@ -83,6 +84,7 @@ actor Actor native
 	action native A_MonsterRefire(int chance, state abort);
 	action native A_Pain();
 	action native A_PlaySound(string soundname);
+	action native A_RadiusWake(int radius);
 	action native A_ResetPosition(float x, float y);
 	action native A_ScaleVelocity(float scale);
 	action native A_Scream();
