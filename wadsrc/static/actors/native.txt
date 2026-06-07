@@ -2,6 +2,7 @@ const int CHF_DONTDODGE = 1;
 const int CHF_BACKOFF = 2;
 const int CHF_NOSIGHTCHECK = 4;
 const int CHF_NOPLAYACTIVE = 8;
+const int CHF_ALWAYSDODGE = 16;
 
 const int CMF_AIMOFFSET = 1;
 const int CMF_AIMDIRECTION = 2;

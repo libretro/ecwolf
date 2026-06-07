@@ -492,7 +492,8 @@ ACTION_FUNCTION(A_Chase)
 		CHF_DONTDODGE = 1,
 		CHF_BACKOFF = 2,
 		CHF_NOSIGHTCHECK = 4,
-		CHF_NOPLAYACTIVE = 8
+		CHF_NOPLAYACTIVE = 8,
+		CHF_ALWAYSDODGE = 16
 	};
 
 	ACTION_PARAM_STATE(melee, 0, self->MeleeState);
@@ -516,7 +517,7 @@ ACTION_FUNCTION(A_Chase)
 	{
 		if (pathing)
 			SelectPathDir (self);
-		else if (dodge)
+		else if (dodge || (flags & CHF_ALWAYSDODGE))
 			SelectDodgeDir (self);
 		else
 			SelectChaseDir (self);
@@ -655,7 +656,7 @@ ACTION_FUNCTION(A_Chase)
 			dist = dx>dy ? dx : dy;
 			if ((flags & CHF_BACKOFF) && dist < 4)
 				SelectRunDir (self);
-			else if (dodge)
+			else if (dodge || (flags & CHF_ALWAYSDODGE))
 				SelectDodgeDir (self);
 			else
 				SelectChaseDir (self);
