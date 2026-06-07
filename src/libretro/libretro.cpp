@@ -1676,6 +1676,13 @@ void retro_init()
 
 void retro_deinit()
 {
+	// Release the cached map (and reap its thinkers) while the actor classes
+	// are still alive. The map handle has static storage duration, so if it
+	// were left to destruct at process exit it would reap door/elevator
+	// thinkers after ClassDef::UnloadActors() below has freed their classes,
+	// dereferencing freed ClassDef::FlatPointers (use-after-free).
+	CA_DisposeMap();
+
 	// Tear down the process-lifetime actor/class system that LoadActors
 	// built (once) during the first retro_load_game. It is freed here, at
 	// the partner of static init, rather than in retro_unload_game, because

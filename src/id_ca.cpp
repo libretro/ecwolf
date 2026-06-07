@@ -62,6 +62,22 @@ void CA_UnloadMap(GameMap *map)
 		::map = NULL;
 }
 
+// Owning handle for the currently cached map. File-scope (rather than a
+// function-static inside CA_CacheMap) so it can be released explicitly during
+// shutdown via CA_DisposeMap. Releasing it reaps the map's thinkers, which
+// dereference their actors' ClassDef::FlatPointers; if that were left to a
+// static-duration destructor at process exit it would run after
+// ClassDef::UnloadActors() has freed those ClassDefs - a use-after-free.
+static TUniquePtr<GameMap, TFuncDeleter<GameMap, CA_UnloadMap> > mapHandle;
+
+// Release the cached map (and its thinkers) now. Called from retro_deinit
+// before ClassDef::UnloadActors() so the reap happens while the actor classes
+// are still alive.
+void CA_DisposeMap()
+{
+	mapHandle.Reset();
+}
+
 /*
 ======================
 =
@@ -72,12 +88,11 @@ void CA_UnloadMap(GameMap *map)
 
 void CA_CacheMap (const FString &mapname, bool loading)
 {
-	static TUniquePtr<GameMap, TFuncDeleter<GameMap, CA_UnloadMap> > map;
-	map.Reset();
+	mapHandle.Reset();
 
 	strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
-	::map = map = new GameMap(mapname);
+	::map = mapHandle = new GameMap(mapname);
 	if(!map->IsValid())
 	{
 		// Construction failed (missing/invalid map data). The error has
