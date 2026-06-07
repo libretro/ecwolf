@@ -23,6 +23,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* The comparison helpers below use stricmp/strnicmp. On MSVC these are real
+** functions (declared via the project's compat headers / <string.h>); on
+** POSIX targets the build maps them to strcasecmp/strncasecmp, which are
+** declared in <strings.h>. Include it there so the calls are not implicit
+** declarations under strict C. */
+#if !defined(_MSC_VER)
+#include <strings.h>
+#endif
+
 /* Header stored immediately before the character data, identical in layout to
 ** FStringData (Len, AllocLen, RefCount), so the two models are interchangeable
 ** at the storage level. */
