@@ -799,7 +799,7 @@ void GameMap::ReadMacData()
 		
 
 	// Find used tiles
-	MacTile wallsused[TEX_MASK+1+5];
+	MacTile wallsused[TEX_MASK+1+5] = {};
 	for(unsigned int i = 0;i < 64*64;++i)
 		wallsused[tilemap[i]&TEX_MASK].used = true;
 
