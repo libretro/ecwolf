@@ -23,14 +23,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* The comparison helpers below use stricmp/strnicmp. On MSVC these are real
-** functions (declared via the project's compat headers / <string.h>); on
-** POSIX targets the build maps them to strcasecmp/strncasecmp, which are
-** declared in <strings.h>. Include it there so the calls are not implicit
-** declarations under strict C. */
-#if !defined(_MSC_VER)
-#include <strings.h>
-#endif
+/* The comparison helpers below use stricmp/strnicmp. The build provides these:
+** MSVC maps them to _stricmp / the project compat layer, and other targets map
+** stricmp/strnicmp to strcasecmp/strncasecmp (declared in <string.h> on the
+** toolchains this project targets). This header is included after wl_def.h,
+** which establishes those mappings, so no extra include is needed here. */
 
 /* Header stored immediately before the character data, identical in layout to
 ** FStringData (Len, AllocLen, RefCount), so the two models are interchangeable
