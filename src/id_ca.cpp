@@ -86,7 +86,7 @@ void CA_DisposeMap()
 ======================
 */
 
-void CA_CacheMap (const FString &mapname, bool loading)
+void CA_CacheMap (const char *mapname, bool loading)
 {
 	mapHandle.Reset();
 

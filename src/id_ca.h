@@ -8,7 +8,7 @@ extern	class LevelInfo *levelInfo;
 
 //===========================================================================
 
-void CA_CacheMap (const class FString &mapname, bool loading);
+void CA_CacheMap (const char *mapname, bool loading);
 
 // Release the currently cached map and its thinkers. Used at shutdown to
 // control reap ordering relative to ClassDef::UnloadActors().
