@@ -34,8 +34,6 @@
 
 /* $Id: dbopl.cpp,v 1.10 2009-06-10 19:54:51 harekiet Exp $ */
 
-#ifdef USE_GPL
-
 #define INLINE inline
 #define GCC_UNLIKELY(x) x
 
@@ -1505,4 +1503,3 @@ void Handler::Init( Bitu rate ) {
 
 };		//Namespace DBOPL
 
-#endif  // ifdef USE_GPL

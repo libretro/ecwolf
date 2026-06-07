@@ -1,11 +1,7 @@
 // Music playback code from DOS port of Super 3-D Noah's Ark
 // Originally recreated as a part of reverse-engineering the DOS executable
 
-#ifdef USE_GPL
 #include "dosbox/dbopl.h"
-#else
-#include "mame/fmopl.h"
-#endif
 #include "id_sd.h"
 #include "m_swap.h"
 #include "state_machine.h"
@@ -65,12 +61,8 @@ static inst_t	instrument[14] = {
 };
 
 
-#ifdef USE_GPL
 #define oplChip *midiOpl
 void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const int &volume);
-#else
-extern const int oplChip;
-#endif
 
 
 void

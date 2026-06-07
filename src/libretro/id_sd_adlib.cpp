@@ -36,11 +36,7 @@
 #include "state_machine.h"
 #include "deps/stb/id_sd_ogg.h"
 #include "wl_play.h"
-#ifdef USE_GPL
 #include "dosbox/dbopl.h"
-#else
-#include "mame/fmopl.h"
-#endif
 
 // Rates and the OPL block-buffer size now live in state_machine.h (included
 // above) as the single source of truth shared with id_sd.cpp and
@@ -51,8 +47,6 @@ static const int samplesPerSoundTick  = SAMPLES_PER_SOUND_TICK;
 static const int samplesPerMusicTick  = SAMPLES_PER_MUSIC_TICK;
 #undef alOut
 #define alOut(n,b) 		YM3812Write(oplChip, n, b, 20)
-
-#ifdef USE_GPL
 
 DBOPL::Chip oplChip;
 
@@ -118,12 +112,6 @@ void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length)
 		}
 	}
 }
-
-#else
-
-static const int oplChip = 0;
-
-#endif
 
 void    SD_Startup_Adlib(void)
 {
