@@ -992,6 +992,16 @@ bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
    
 	thinkerList.DestroyAll(static_cast<ThinkerList::Priority>(0));
 
+	// DestroyAll frees the player actor, but players[].mo is a raw pointer
+	// (unlike camera, a TObjPtr the GC nulls automatically), so it would
+	// dangle. InitGame() below runs SetViewSize before the map respawns the
+	// player, and SetViewSize dereferences players[ConsolePlayer].mo->radius
+	// after only a non-NULL check - a use-after-free on the second load of a
+	// session. Null it here so that guard correctly falls back to FOCALLENGTH
+	// until the new player is spawned.
+	for(unsigned int i = 0; i < MAXPLAYERS; ++i)
+		players[i].mo = NULL;
+
 	R_InitRenderer();
 
 	log_cb (RETRO_LOG_INFO, "InitGame: Setting up the game...\n");
