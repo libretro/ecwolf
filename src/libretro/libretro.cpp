@@ -473,6 +473,13 @@ void Quit ()
 
 void retro_unload_game()
 {
+	// Release the cached map before the resource files it references are torn
+	// down. The map's lumps (e.g. FGamemaps' FMapLump array) are owned by the
+	// WAD collection; a subsequent retro_load_game re-runs Wads.InitMultipleFiles
+	// and frees the old FGamemaps, after which disposing a still-live map would
+	// call FResourceLump::ReleaseCache on freed lump storage (use-after-free).
+	CA_DisposeMap();
+
 	SoundInfo.Clear();
 	// Reset the sound system's "started" latch (and drop its caches) so a
 	// subsequent retro_load_game re-runs SD_Startup -> SoundInfo.Init() and
