@@ -1,0 +1,96 @@
+/*
+** fstring_c.h
+**
+** A C string type, layout- and semantics-compatible with FString (zstring.h),
+** intended as the eventual C replacement for it. Like FString, an FString_C is
+** ABI-identical to a single 'char *Chars' that points at the character data;
+** the reference count, length and allocation size live in an FStringData_C
+** header in the bytes immediately *before* Chars. So FString_C_GetChars() is a
+** single pointer load, exactly like FString::operator const char*(), and the
+** copy-on-write reference counting matches FString's, keeping copies cheap.
+**
+** This header only provides the storage and the core operations needed to
+** prove the model is codegen-compatible with FString. The full operation set
+** (concatenation, formatting, comparisons, case folding, ...) and the call-site
+** migration are done in later, separately verified steps.
+**
+** Valid as C89 and C++.
+*/
+
+#ifndef __FSTRING_C_H__
+#define __FSTRING_C_H__
+
+#include <stdlib.h>
+#include <string.h>
+
+/* Header stored immediately before the character data, identical in layout to
+** FStringData (Len, AllocLen, RefCount), so the two models are interchangeable
+** at the storage level. */
+typedef struct FStringData_C
+{
+	unsigned int Len;		/* length excluding terminating null */
+	unsigned int AllocLen;	/* bytes allocated for the string */
+	int RefCount;			/* < 0 means locked for writing */
+} FStringData_C;
+
+/* The string itself is just a char* to the data, mirroring FString. */
+typedef struct FString_C
+{
+	char *Chars;
+} FString_C;
+
+/* Reach the header sitting just before the character data. */
+#define FSTRING_C_DATA(s) (((FStringData_C *)(s)->Chars) - 1)
+
+/* Single pointer load - matches FString::operator const char* / GetChars(). */
+#define FSTRING_C_GETCHARS(s) ((const char *)(s)->Chars)
+#define FSTRING_C_LEN(s)      (FSTRING_C_DATA(s)->Len)
+
+/* Allocate a data block holding room for 'len' chars (plus header and null),
+** padded as FStringData::Alloc does, and return a pointer to the char area. */
+static char *FString_C_AllocBuffer(size_t len)
+{
+	size_t total = len + 1 + sizeof(FStringData_C);
+	FStringData_C *block;
+	total = (total + 7) & ~(size_t)7;	/* pad up, as FStringData::Alloc */
+	block = (FStringData_C *)malloc(total);
+	if (block == NULL)
+		return NULL;
+	block->Len = (unsigned int)len;
+	block->AllocLen = (unsigned int)(total - sizeof(FStringData_C) - 1);
+	block->RefCount = 1;
+	return (char *)(block + 1);
+}
+
+/* Construct from a C string (FString(const char*)). */
+static void FString_C_InitCStr(FString_C *s, const char *src)
+{
+	size_t len = (src != NULL) ? strlen(src) : 0;
+	s->Chars = FString_C_AllocBuffer(len);
+	if (s->Chars != NULL)
+	{
+		if (len != 0)
+			memcpy(s->Chars, src, len);
+		s->Chars[len] = '\0';
+	}
+}
+
+/* Share another string's buffer, bumping the reference count (FString's
+** AttachToOther / copy constructor). Cheap copy, no allocation. */
+static void FString_C_Copy(FString_C *dst, const FString_C *src)
+{
+	dst->Chars = src->Chars;
+	FSTRING_C_DATA(dst)->RefCount++;
+}
+
+/* Release this string's hold on its buffer, freeing it at zero refs
+** (FStringData::Release + Dealloc). */
+static void FString_C_Release(FString_C *s)
+{
+	FStringData_C *data = FSTRING_C_DATA(s);
+	if (--data->RefCount <= 0)
+		free(data);
+	s->Chars = NULL;
+}
+
+#endif
