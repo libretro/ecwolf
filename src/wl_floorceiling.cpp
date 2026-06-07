@@ -194,13 +194,14 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 					curzonelight = (anyLight && spot->zone != NULL)
 						? Zone_LightForIndex(spot->zone->index) : 0;
 
-					if(spot->sector)
+					FTextureID curtex = spot->sector ? spot->sector->texture[floor ? MapSector::Floor : MapSector::Ceiling] : FNullTextureID();
+
+					if (curtex != lasttex)
 					{
-						FTextureID curtex = spot->sector->texture[floor ? MapSector::Floor : MapSector::Ceiling];
-						if (curtex != lasttex && curtex.isValid())
+						lasttex = curtex;
+						if(curtex.isValid())
 						{
 							FTexture * const texture = TexMan(curtex);
-							lasttex = curtex;
 							tex = texture->GetPixels();
 							texwidth = texture->GetWidth();
 							texheight = texture->GetHeight();
@@ -215,9 +216,9 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 							// matching upstream ECWolf.
 							isMasked = texture->bMasked;
 						}
+						else
+							tex = NULL;
 					}
-					else
-						tex = NULL;
 				}
 
 				if(tex)
