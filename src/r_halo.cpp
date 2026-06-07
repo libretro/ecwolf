@@ -10,6 +10,8 @@
 #include <math.h>
 #if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 #include <emmintrin.h>
+#elif defined(__aarch64__)
+#include <arm_neon.h>
 #endif
 
 #include "r_halo.h"
@@ -255,6 +257,81 @@ void Halo_RowSpans(int *halolight, int viewwidth,
 				_mm_storeu_pd(da, disc);
 				_mm_storeu_pd(t1a, t1v);
 				_mm_storeu_pd(t2a, t2v);
+				for (lane = 0; lane < 2; ++lane)
+				{
+					double t1, t2;
+					int x1, x2, hx, lit;
+					if (!(da[lane] > 0.0))
+						continue;
+					t1 = t1a[lane];
+					t2 = t2a[lane];
+					if (t1 < 0.0) t1 = 0.0;
+					if (t2 > 1.0) t2 = 1.0;
+					x1 = (int)(t1 * viewwidth);
+					x2 = (int)(t2 * viewwidth);
+					if (x1 < 0) x1 = 0;
+					if (x2 > viewwidth) x2 = viewwidth;
+					lit = s_lit[hi + lane];
+					for (hx = x1; hx < x2; ++hx)
+						halolight[hx] += lit;
+				}
+			}
+			}
+		}
+	}
+#elif defined(__aarch64__)
+	/* AArch64 NEON path. float64x2_t holds two doubles; vsqrtq_f64 and
+	** vdivq_f64 are IEEE-754 compliant on AArch64 (full precision, correct
+	** rounding), so each lane matches the scalar reference bit-for-bit - the
+	** same reason real division is used instead of a reciprocal estimate.
+	** (32-bit ARM NEON has neither double-precision lanes nor IEEE-strict
+	** divide/sqrt, so it falls through to the scalar loop below.) */
+	{
+		const float64x2_t vSx = vdupq_n_f64(Sx);
+		const float64x2_t vSy = vdupq_n_f64(Sy);
+		const float64x2_t vVx = vdupq_n_f64(Vx);
+		const float64x2_t vVy = vdupq_n_f64(Vy);
+		const float64x2_t vTwo = vdupq_n_f64(2.0);
+		const float64x2_t v4a = vdupq_n_f64(4.0 * a);
+		const float64x2_t v2a = vdupq_n_f64(2.0 * a);
+		const float64x2_t vZero = vdupq_n_f64(0.0);
+
+		for (; hi + 1 < s_nactive; hi += 2)
+		{
+			float64x2_t cx = vld1q_f64(&s_cx[hi]);
+			float64x2_t cy = vld1q_f64(&s_cy[hi]);
+			float64x2_t r2 = vld1q_f64(&s_r2[hi]);
+
+			float64x2_t scx = vsubq_f64(vSx, cx);
+			float64x2_t scy = vsubq_f64(vSy, cy);
+			/* b = 2*(Vx*scx + Vy*scy) */
+			float64x2_t b = vmulq_f64(vTwo,
+				vaddq_f64(vmulq_f64(vVx, scx), vmulq_f64(vVy, scy)));
+			/* c = scx*scx + scy*scy - r2 */
+			float64x2_t c = vsubq_f64(
+				vaddq_f64(vmulq_f64(scx, scx), vmulq_f64(scy, scy)), r2);
+			/* disc = b*b - 4a*c */
+			float64x2_t disc = vsubq_f64(vmulq_f64(b, b), vmulq_f64(v4a, c));
+
+			/* Skip the sqrt/divide/store when neither lane intersects. The
+			** compare yields all-ones per lane where disc > 0; max-across the
+			** unsigned lane bits is zero only when both lanes missed. */
+			uint64x2_t gt = vcgtq_f64(disc, vZero);
+			if (vmaxvq_u32(vreinterpretq_u32_u64(gt)) == 0)
+				continue;
+
+			{
+			float64x2_t sq = vsqrtq_f64(disc);
+			float64x2_t nb = vsubq_f64(vZero, b);
+			float64x2_t t1v = vdivq_f64(vsubq_f64(nb, sq), v2a);
+			float64x2_t t2v = vdivq_f64(vaddq_f64(nb, sq), v2a);
+
+			{
+				double t1a[2], t2a[2], da[2];
+				int lane;
+				vst1q_f64(da, disc);
+				vst1q_f64(t1a, t1v);
+				vst1q_f64(t2a, t2v);
 				for (lane = 0; lane < 2; ++lane)
 				{
 					double t1, t2;
