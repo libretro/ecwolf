@@ -952,6 +952,22 @@ const void * pullers[] = {
 bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 {
 	Scanner::SetMessageHandler(ScannerMessageHandler);
+
+	// On a content reload, the previous session's actors were already freed
+	// (their GameMap and thinkers torn down), but player_t holds several raw
+	// actor pointers - mo, ReadyWeapon, PendingWeapon - which, unlike the
+	// TObjPtr members the GC nulls automatically, are left dangling. Load-time
+	// code runs before the new map respawns the player and dereferences them
+	// after only non-NULL checks: ReadConfig() -> player_t::SetFOV reads
+	// ReadyWeapon, and InitGame() -> SetViewSize reads mo->radius. Clear them
+	// up front so every such guard correctly sees "no player yet".
+	for(unsigned int i = 0; i < MAXPLAYERS; ++i)
+	{
+		players[i].mo = NULL;
+		players[i].ReadyWeapon = NULL;
+		players[i].PendingWeapon = NULL;
+	}
+
 	update_variables(true);
 
 	if (!game_init_pixelformat())
@@ -998,16 +1014,6 @@ bool try_retro_load_game(const struct retro_game_info *info, size_t num_info)
 	}
    
 	thinkerList.DestroyAll(static_cast<ThinkerList::Priority>(0));
-
-	// DestroyAll frees the player actor, but players[].mo is a raw pointer
-	// (unlike camera, a TObjPtr the GC nulls automatically), so it would
-	// dangle. InitGame() below runs SetViewSize before the map respawns the
-	// player, and SetViewSize dereferences players[ConsolePlayer].mo->radius
-	// after only a non-NULL check - a use-after-free on the second load of a
-	// session. Null it here so that guard correctly falls back to FOCALLENGTH
-	// until the new player is spawned.
-	for(unsigned int i = 0; i < MAXPLAYERS; ++i)
-		players[i].mo = NULL;
 
 	R_InitRenderer();
 
