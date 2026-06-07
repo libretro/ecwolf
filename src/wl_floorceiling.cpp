@@ -150,36 +150,7 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 			const double Vy = FIXED2FLOAT(-(dv>>8)) * (double)viewwidth;
 			const double a = Vx*Vx + Vy*Vy;
 
-			if(a > 0.0)
-			{
-				int hi;
-				for(hi = 0; hi < numHalos; ++hi)
-				{
-					const haloinst_t *h = Halo_Active(hi);
-					const double scx = Sx - h->cx;
-					const double scy = Sy - h->cy;
-					const double b = 2.0*(Vx*scx + Vy*scy);
-					const double c = (scx*scx + scy*scy) - h->radius*h->radius;
-					const double disc = b*b - 4.0*a*c;
-					if(disc > 0.0)
-					{
-						const double sq = sqrt(disc);
-						double t1 = (-b - sq)/(2.0*a);
-						double t2 = (-b + sq)/(2.0*a);
-						if(t1 < 0.0) t1 = 0.0;
-						if(t2 > 1.0) t2 = 1.0;
-						int x1 = (int)(t1*viewwidth);
-						int x2 = (int)(t2*viewwidth);
-						if(x1 < 0) x1 = 0;
-						if(x2 > viewwidth) x2 = viewwidth;
-						{
-							int hx;
-							for(hx = x1; hx < x2; ++hx)
-								halolight[hx] += h->light;
-						}
-					}
-				}
-			}
+			Halo_RowSpans(halolight, viewwidth, Sx, Sy, Vx, Vy, a);
 		}
 
 		int curzonelight = 0;

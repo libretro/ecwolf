@@ -75,6 +75,12 @@ haloinst_t  *Halo_Active(int index);
 */
 int          Halo_LightAtFixed(fixed xintercept, fixed yintercept);
 
+/* Per-scanline halo span accumulation for the floor/ceiling drawer. Adds each
+** active halo's light to halolight[0..viewwidth) where the ray S + V*t (t in
+** [0,1]) crosses the halo circle. SSE2-accelerated; bit-identical to scalar. */
+void         Halo_RowSpans(int *halolight, int viewwidth,
+	double Sx, double Sy, double Vx, double Vy, double a);
+
 /* ---- zone lighting -------------------------------------------------------
 **
 ** A "zonelight" boosts the light level of the entire map zone an actor stands

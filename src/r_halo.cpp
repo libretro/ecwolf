@@ -8,6 +8,9 @@
 
 #include <stdlib.h>
 #include <math.h>
+#if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#include <emmintrin.h>
+#endif
 
 #include "r_halo.h"
 #include "actor.h"
@@ -73,15 +76,35 @@ static haloinst_t *s_active   = NULL;
 static int         s_nactive  = 0;
 static int         s_activecap = 0;
 
+/* Structure-of-arrays mirror of s_active, kept contiguous so the per-row span
+** kernel (Halo_RowSpans) can load halo fields with packed SSE2 loads instead
+** of gathering from the AoS struct. Grown in lockstep with s_active. */
+static double *s_cx    = NULL;
+static double *s_cy    = NULL;
+static double *s_r2    = NULL;
+static int    *s_lit   = NULL;
+
 static void Halo_PushActive(double cx, double cy, double radius, int light)
 {
 	if (s_nactive == s_activecap)
 	{
 		int newcap = s_activecap ? s_activecap * 2 : 16;
 		haloinst_t *p = (haloinst_t *)realloc(s_active, newcap * sizeof(haloinst_t));
+		double *pcx, *pcy, *pr2;
+		int *plit;
 		if (!p)
 			return;
 		s_active = p;
+		pcx = (double *)realloc(s_cx, newcap * sizeof(double));
+		pcy = (double *)realloc(s_cy, newcap * sizeof(double));
+		pr2 = (double *)realloc(s_r2, newcap * sizeof(double));
+		plit = (int *)realloc(s_lit, newcap * sizeof(int));
+		if (!pcx || !pcy || !pr2 || !plit)
+			return;
+		s_cx = pcx;
+		s_cy = pcy;
+		s_r2 = pr2;
+		s_lit = plit;
 		s_activecap = newcap;
 	}
 	s_active[s_nactive].cx     = cx;
@@ -89,6 +112,10 @@ static void Halo_PushActive(double cx, double cy, double radius, int light)
 	s_active[s_nactive].radius = radius;
 	s_active[s_nactive].r2     = radius * radius;
 	s_active[s_nactive].light  = light;
+	s_cx[s_nactive]  = cx;
+	s_cy[s_nactive]  = cy;
+	s_r2[s_nactive]  = radius * radius;
+	s_lit[s_nactive] = light;
 	s_nactive++;
 }
 
@@ -154,6 +181,130 @@ int Halo_LightAtFixed(fixed xintercept, fixed yintercept)
 			light += h->light;
 	}
 	return light;
+}
+
+/*
+** Per-scanline halo span accumulation (floor/ceiling drawer).
+**
+** For the ray P(t) = S + V*t, t in [0,1], find for each active halo the
+** screen-column interval where the ray is inside the halo circle, and add the
+** halo's light to halolight[] across that interval. This is the dominant cost
+** in the floor/ceiling stage when lamps are in view (one quadratic solve per
+** halo per scanline), so the per-halo discriminant/root math is done two halos
+** at a time with SSE2 packed doubles. The span fill stays scalar (it is
+** data-dependent) and the output is bit-identical to the scalar reference:
+** the packed path performs the same operations (b = 2(V.sc), c = sc.sc - r2,
+** disc = b*b - 4ac, roots (-b -+ sqrt)/2a) so each lane matches the scalar
+** result exactly.
+*/
+void Halo_RowSpans(int *halolight, int viewwidth,
+	double Sx, double Sy, double Vx, double Vy, double a)
+{
+	int hi = 0;
+
+	if (a <= 0.0)
+		return;
+
+#if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+	{
+		const __m128d vSx = _mm_set1_pd(Sx);
+		const __m128d vSy = _mm_set1_pd(Sy);
+		const __m128d vVx = _mm_set1_pd(Vx);
+		const __m128d vVy = _mm_set1_pd(Vy);
+		const __m128d vTwo = _mm_set1_pd(2.0);
+		const __m128d v4a = _mm_set1_pd(4.0 * a);
+		const __m128d v2a = _mm_set1_pd(2.0 * a);
+
+		for (; hi + 1 < s_nactive; hi += 2)
+		{
+			/* Load two halos' centers/r2 (contiguous SoA). */
+			__m128d cx = _mm_loadu_pd(&s_cx[hi]);
+			__m128d cy = _mm_loadu_pd(&s_cy[hi]);
+			__m128d r2 = _mm_loadu_pd(&s_r2[hi]);
+
+			__m128d scx = _mm_sub_pd(vSx, cx);
+			__m128d scy = _mm_sub_pd(vSy, cy);
+			/* b = 2*(Vx*scx + Vy*scy) */
+			__m128d b = _mm_mul_pd(vTwo,
+				_mm_add_pd(_mm_mul_pd(vVx, scx), _mm_mul_pd(vVy, scy)));
+			/* c = scx*scx + scy*scy - r2 */
+			__m128d c = _mm_sub_pd(
+				_mm_add_pd(_mm_mul_pd(scx, scx), _mm_mul_pd(scy, scy)), r2);
+			/* disc = b*b - 4a*c */
+			__m128d disc = _mm_sub_pd(_mm_mul_pd(b, b), _mm_mul_pd(v4a, c));
+
+			/* Common case: neither lane's ray crosses this halo on this row.
+			** Skip the sqrt/divide/store entirely - this is what keeps the
+			** packed path ahead of scalar, since sqrt is the dominant cost and
+			** most halo/scanline pairs do not intersect. */
+			if (_mm_movemask_pd(_mm_cmpgt_pd(disc, _mm_setzero_pd())) == 0)
+				continue;
+
+			/* At least one lane intersects. Sqrt both (the masked-out lane's
+			** NaN is harmless - it is dropped by the per-lane disc>0 test).
+			** Division (not reciprocal-multiply) matches scalar rounding. */
+			{
+			__m128d sq = _mm_sqrt_pd(disc);
+			__m128d nb = _mm_sub_pd(_mm_setzero_pd(), b);
+			__m128d t1v = _mm_div_pd(_mm_sub_pd(nb, sq), v2a);
+			__m128d t2v = _mm_div_pd(_mm_add_pd(nb, sq), v2a);
+
+			{
+				double t1a[2], t2a[2], da[2];
+				int lane;
+				_mm_storeu_pd(da, disc);
+				_mm_storeu_pd(t1a, t1v);
+				_mm_storeu_pd(t2a, t2v);
+				for (lane = 0; lane < 2; ++lane)
+				{
+					double t1, t2;
+					int x1, x2, hx, lit;
+					if (!(da[lane] > 0.0))
+						continue;
+					t1 = t1a[lane];
+					t2 = t2a[lane];
+					if (t1 < 0.0) t1 = 0.0;
+					if (t2 > 1.0) t2 = 1.0;
+					x1 = (int)(t1 * viewwidth);
+					x2 = (int)(t2 * viewwidth);
+					if (x1 < 0) x1 = 0;
+					if (x2 > viewwidth) x2 = viewwidth;
+					lit = s_lit[hi + lane];
+					for (hx = x1; hx < x2; ++hx)
+						halolight[hx] += lit;
+				}
+			}
+			}
+		}
+	}
+#endif
+
+	/* Scalar tail (and the whole loop when SSE2 is unavailable). Identical math
+	** to the packed path so results match lane-for-lane. */
+	for (; hi < s_nactive; ++hi)
+	{
+		double scx = Sx - s_cx[hi];
+		double scy = Sy - s_cy[hi];
+		double b = 2.0 * (Vx * scx + Vy * scy);
+		double c = (scx * scx + scy * scy) - s_r2[hi];
+		double disc = b * b - 4.0 * a * c;
+		if (disc > 0.0)
+		{
+			double sq = sqrt(disc);
+			double t1 = (-b - sq) / (2.0 * a);
+			double t2 = (-b + sq) / (2.0 * a);
+			int x1, x2, hx, lit;
+			if (t1 < 0.0) t1 = 0.0;
+			if (t2 > 1.0) t2 = 1.0;
+			x1 = (int)(t1 * viewwidth);
+			x2 = (int)(t2 * viewwidth);
+			if (x1 < 0) x1 = 0;
+			if (x2 > viewwidth) x2 = viewwidth;
+			lit = s_lit[hi];
+			for (hx = x1; hx < x2; ++hx)
+				halolight[hx] += lit;
+		}
+	}
 }
 
 /* ---- zone lighting ------------------------------------------------------ */
