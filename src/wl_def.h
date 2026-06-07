@@ -290,7 +290,6 @@ enum Button
 
 struct ControlScheme
 {
-public:
 	enum
 	{
 		MWheel_Left = 33,
@@ -298,10 +297,6 @@ public:
 		MWheel_Down = 35,
 		MWheel_Up = 36
 	};
-
-	static void	setKeyboard(ControlScheme* scheme, Button button, int value);
-	static void setJoystick(ControlScheme* scheme, Button button, int value);
-	static void setMouse(ControlScheme* scheme, Button button, int value);
 
 	Button		button;
 	const char*	name;

@@ -72,39 +72,6 @@ unsigned tics;
 #define JoyAx(x) (32+(x<<1))
 #define CS_AxisDigital -1
 
-void ControlScheme::setKeyboard(ControlScheme* scheme, Button button, int value)
-{
-	for(int i = 0;scheme[i].button != bt_nobutton;i++)
-	{
-		if(scheme[i].keyboard == value)
-			scheme[i].keyboard = -1;
-		if(scheme[i].button == button)
-			scheme[i].keyboard = value;
-	}
-}
-
-void ControlScheme::setJoystick(ControlScheme* scheme, Button button, int value)
-{
-	for(int i = 0;scheme[i].button != bt_nobutton;i++)
-	{
-		if(scheme[i].joystick == value)
-			scheme[i].joystick = -1;
-		if(scheme[i].button == button)
-			scheme[i].joystick = value;
-	}
-}
-
-void ControlScheme::setMouse(ControlScheme* scheme, Button button, int value)
-{
-	for(int i = 0;scheme[i].button != bt_nobutton;i++)
-	{
-		if(scheme[i].mouse == value)
-			scheme[i].mouse = -1;
-		if(scheme[i].button == button)
-			scheme[i].mouse = value;
-	}
-}
-
 int viewsize;
 
 bool demorecord, demoplayback;
