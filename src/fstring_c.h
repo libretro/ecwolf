@@ -197,4 +197,40 @@ static void FString_C_Format(FString_C *dst, const char *fmt, ...)
 	va_end(arglist);
 }
 
+/*
+** Concatenation (FString::operator+ / the (head,tail) constructors). Mirrors
+** the ctor: allocate len1+len2, copy head then tail. dst must be unused; it is
+** freshly allocated and is independent of head/tail (no shared buffer), so the
+** caller owns it and must Release it. In C the temporary that C++ created and
+** destroyed for 'a + b' becomes this explicit dst that the caller frees - that
+** lifetime is the call site's responsibility, the crux of the migration.
+*/
+static void FString_C_Concat(FString_C *dst, const FString_C *head, const FString_C *tail)
+{
+	size_t len1 = FSTRING_C_LEN(head);
+	size_t len2 = FSTRING_C_LEN(tail);
+	dst->Chars = FString_C_AllocBuffer(len1 + len2);
+	if (dst->Chars != NULL)
+	{
+		if (len1 != 0) memcpy(dst->Chars, head->Chars, len1);
+		if (len2 != 0) memcpy(dst->Chars + len1, tail->Chars, len2);
+		dst->Chars[len1 + len2] = '\0';
+	}
+}
+
+/* As FString_C_Concat but the tail is a plain C string
+** (FString::operator+(const char*) / FString(const FString&, const char*)). */
+static void FString_C_ConcatCStr(FString_C *dst, const FString_C *head, const char *tail)
+{
+	size_t len1 = FSTRING_C_LEN(head);
+	size_t len2 = (tail != NULL) ? strlen(tail) : 0;
+	dst->Chars = FString_C_AllocBuffer(len1 + len2);
+	if (dst->Chars != NULL)
+	{
+		if (len1 != 0) memcpy(dst->Chars, head->Chars, len1);
+		if (len2 != 0) memcpy(dst->Chars + len1, tail, len2);
+		dst->Chars[len1 + len2] = '\0';
+	}
+}
+
 #endif
