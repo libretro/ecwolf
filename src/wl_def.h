@@ -14,6 +14,8 @@
 #include <minwindef.h>
 #endif
 #include <libretro.h>
+/* Provides 'bool' for C translation units (no-op under C++); MSVC-C89-safe. */
+#include <boolean.h>
 
 #ifdef _MSC_VER
 #define PACKED
@@ -33,16 +35,16 @@
 #define FRACBITS 16
 #define FRACUNIT (1<<FRACBITS)
 
-// Width-named integer aliases (uint8_t/uint16_t/uint32_t/uint64_t and friends) have been
-// removed in favour of using <stdint.h> types directly. The semantic types
-// below are intentionally kept: fixed/fixed_t carry 16.16 fixed-point intent
-// and angle_t is a BAM angle (defined later).
+/* Width-named integer aliases (uint8_t/uint16_t/uint32_t/uint64_t and friends) have been */
+/* removed in favour of using <stdint.h> types directly. The semantic types */
+/* below are intentionally kept: fixed/fixed_t carry 16.16 fixed-point intent */
+/* and angle_t is a BAM angle (defined later). */
 typedef int32_t fixed;
 typedef fixed fixed_t;
 typedef void * memptr;
 typedef int INTBOOL;
 
-// Screenshot buffer image data types
+/* Screenshot buffer image data types */
 enum ESSType
 {
 	SS_PAL,
@@ -63,7 +65,9 @@ void libretro_log(const char *format, ...);
 #define stricmp _stricmp
 #endif
 
+#ifdef __cplusplus
 #include "xs_Float.h"
+#endif
 
 /*
 =============================================================================
@@ -85,8 +89,8 @@ void libretro_log(const char *format, ...);
 
 #define ICONARROWS      90
 #define PUSHABLETILE    98
-#define EXITTILE        99          // at end of castle
-#define AREATILE        107         // first of NUMAREAS floor tiles
+#define EXITTILE        99          /* at end of castle */
+#define AREATILE        107         /* first of NUMAREAS floor tiles */
 #define NUMAREAS        37
 #define ELEVATORTILE    21
 #define AMBUSHTILE      106
@@ -95,7 +99,7 @@ void libretro_log(const char *format, ...);
 #define NUMBERCHARS     9
 
 
-//----------------
+/*---------------- */
 
 #define EXTRAPOINTS     40000
 
@@ -106,7 +110,7 @@ void libretro_log(const char *format, ...);
 
 #define SCREENBWIDE     80
 
-#define HEIGHTRATIO     0.50            // also defined in id_mm.c
+#define HEIGHTRATIO     0.50            /* also defined in id_mm.c */
 
 #define FLASHCOLOR      5
 #define FLASHTICS       4
@@ -158,7 +162,7 @@ typedef uint32_t angle_t;
 #define STARTAMMO       8
 
 
-// object flag values
+/* object flag values */
 
 enum ActorFlag
 {
@@ -194,7 +198,7 @@ enum ItemFlag
 	IF_AUTOACTIVATE		= 0x00000001,
 	IF_INVBAR			= 0x00000002,
 	IF_ALWAYSPICKUP		= 0x00000004,
-	IF_INACTIVE			= 0x00000008, // For picked up items that remain on the map
+	IF_INACTIVE			= 0x00000008, /* For picked up items that remain on the map */
 };
 
 enum WeaponFlag
@@ -236,13 +240,17 @@ typedef enum {
 static const int dirdeltax[9] = { 1, 1, 0, -1, -1, -1, 0, 1, 0 };
 static const int dirdeltay[9] = { 0, -1, -1, -1, 0, 1, 1, 1, 0 };
 
-//--------------------
-//
-// thinking actor structure
-//
-//--------------------
+/*-------------------- */
+/* */
+/* thinking actor structure */
+/* */
+/*-------------------- */
 
+#ifdef __cplusplus
 class AActor;
+#else
+struct AActor;
+#endif
 
 enum Button
 {
@@ -278,7 +286,7 @@ enum Button
 	bt_showstatusbar,
 	NUMBUTTONS,
 
-	// AM buttons
+	/* AM buttons */
 	bt_zoomin = 0,
 	bt_zoomout,
 	bt_panup,
@@ -399,16 +407,16 @@ static inline uint32_t READLONGWORD(uint8_t *&ptr)
 */
 
 #ifdef USE_FEATUREFLAGS
-	// The currently available feature flags
+	/* The currently available feature flags */
 	#define FF_STARSKY      0x0001
 	#define FF_PARALLAXSKY  0x0002
 	#define FF_CLOUDSKY     0x0004
 	#define FF_RAIN         0x0010
 	#define FF_SNOW         0x0020
 
-	// The ffData... variables contain the 16-bit values of the according corners of the current level.
-	// The corners are overwritten with adjacent tiles after initialization in SetupGameLevel
-	// to avoid interpretation as e.g. doors.
+	/* The ffData... variables contain the 16-bit values of the according corners of the current level. */
+	/* The corners are overwritten with adjacent tiles after initialization in SetupGameLevel */
+	/* to avoid interpretation as e.g. doors. */
 	extern int ffDataTopLeft, ffDataTopRight, ffDataBottomLeft, ffDataBottomRight;
 
 	/*************************************************************
@@ -419,7 +427,7 @@ static inline uint32_t READLONGWORD(uint8_t *&ptr)
 	* ffDataBottomRight: unused
 	*************************************************************/
 
-	// The feature flags are stored as a wall in the upper right corner of each level
+	/* The feature flags are stored as a wall in the upper right corner of each level */
 	static inline uint16_t GetFeatureFlags()
 	{
 		return ffDataTopRight;
