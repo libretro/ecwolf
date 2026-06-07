@@ -420,6 +420,7 @@ void AActor::Init()
 	dir = nodir;
 	haloLightMask = 0;
 	zoneLightMask = 0;
+	zoneindex = 0;
 	soundZone = NULL;
 	inventory = NULL;
 

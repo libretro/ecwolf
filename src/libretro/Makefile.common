@@ -86,6 +86,7 @@ SOURCES_C   := $(DEPS_BZIP2) $(DEPS_JPEG) $(DEPS_ZLIB)
 SOURCES_CXX := \
 	$(CORE_DIR)/src/g_blake/a_smartanim.cpp \
 	$(CORE_DIR)/src/g_blake/blake_sbar.cpp \
+	$(CORE_DIR)/src/g_shared/a_ambient.cpp \
 	$(CORE_DIR)/src/g_shared/a_deathcam.cpp \
 	$(CORE_DIR)/src/g_shared/a_inventory.cpp \
 	$(CORE_DIR)/src/g_shared/a_keys.cpp \

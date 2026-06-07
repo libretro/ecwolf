@@ -149,6 +149,11 @@ class AActor : public Thinker,
 		// that owns them (see LoopedAudio). Assigned at spawn, 0 when unlinked.
 		unsigned int spawnid;
 
+		// Cached map-zone index for ambient actors (see AAmbient). Updated by
+		// A_UpdateZoneIndex; compared against the player's zone to gate ambient
+		// sound state transitions.
+		int         zoneindex;
+
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;
 

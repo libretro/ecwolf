@@ -1,0 +1,5 @@
+// Ambient: looping positional ambient sounds. The state machine that drives
+// the sound (using A_AmbientJumpState/A_SetVolume) is added with those actions.
+actor Ambient native
+{
+}
