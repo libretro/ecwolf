@@ -35,6 +35,7 @@
 #include "thingdef/thingdef.h"
 #include "wl_loadsave.h"
 #include "am_map.h"
+#include "r_halo.h"
 
 #include <climits>
 
@@ -234,6 +235,7 @@ void CreateMenus()
 	displayMenu.setHeadText(language["STR_DISPLAY"]);
 	displayMenu.addItem(new LabelMenuItem(language["STR_SCREENSIZE"]));
 	displayMenu.addItem(new SliderMenuItem(viewsize, 110, 21, language["STR_SMALL"], language["STR_LARGE"], AdjustViewSize));
+	displayMenu.addItem(new BooleanMenuItem(language["STR_HALOLIGHTING"], r_halolighting));
 
 	// Automap Options: all of these are live engine globals; AM_UpdateFlags
 	// applies the change immediately.

@@ -26,6 +26,9 @@ static halolist_t *s_lists  = NULL;
 static int         s_nlists = 0;
 static int         s_listcap = 0;
 
+/* Display Options toggle; default on. */
+bool r_halolighting = true;
+
 int Halo_NewList(void)
 {
 	if (s_nlists == s_listcap)
@@ -118,6 +121,8 @@ void Halo_Populate(void)
 
 int Halo_ActiveCount(void)
 {
+	if (!r_halolighting)
+		return 0;
 	return s_nactive;
 }
 
@@ -134,7 +139,7 @@ int Halo_LightAtFixed(fixed xintercept, fixed yintercept)
 	int i;
 	double px, py;
 
-	if (s_nactive == 0)
+	if (s_nactive == 0 || !r_halolighting)
 		return 0;
 
 	px = FIXED2FLOAT(xintercept);
@@ -281,5 +286,7 @@ int Zone_LightForIndex(int zoneIndex)
 
 int Zone_AnyActive(void)
 {
+	if (!r_halolighting)
+		return 0;
 	return s_zoneany;
 }

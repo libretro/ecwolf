@@ -112,6 +112,7 @@ STR_AMTEXTUREDOVERLAY = "Textured Overlay";
 STR_AMPAUSE = "Pause Game";
 STR_AMRATIOS = "Show Level Ratios";
 STR_SCREENSIZE = "Screen Size";
+STR_HALOLIGHTING = "Halo Lighting";
 STR_SMALL = "Small";
 STR_LARGE = "Large";
 

@@ -23,6 +23,11 @@
 
 #include "wl_def.h"
 
+/* User toggle (Display Options "Halo Lighting"). When false, the floor/ceiling
+** and wall drawers skip all halo/zone light work and draw on the plain path.
+** Defaults to true. Read live each frame; no callback needed. */
+extern bool r_halolighting;
+
 /* A halo declared on an actor class (template definition). */
 typedef struct
 {
