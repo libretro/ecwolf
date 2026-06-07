@@ -126,12 +126,14 @@ map "MAP09"
 	floornumber = 9
 	music = "WARMARCH"
 	cluster = 1
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP10"
 {
 	next = "MAP02"
-	secretnext = "MAP10"
+	secretnext = "MAP02"
 	defaultceiling = "#400040"
 	floornumber = 10
 	music = "CORNER"
@@ -249,12 +251,14 @@ map "MAP19"
 	floornumber = 9
 	music = "WARMARCH"
 	cluster = 2
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP20"
 {
 	next = "MAP12"
-	secretnext = "MAP20"
+	secretnext = "MAP12"
 	defaultceiling = "#4040FC"
 	floornumber = 10
 	music = "DUNGEON"
@@ -367,12 +371,14 @@ map "MAP29"
 	floornumber = 9
 	music = "ULTIMATE"
 	cluster = 3
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP30"
 {
 	next = "MAP28"
-	secretnext = "MAP30"
+	secretnext = "MAP28"
 	defaultceiling = "#000098"
 	floornumber = 10
 	music = "PACMAN"
@@ -490,12 +496,14 @@ map "MAP39"
 	floornumber = 9
 	music = "WARMARCH"
 	cluster = 4
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP40"
 {
 	next = "MAP34"
-	secretnext = "MAP40"
+	secretnext = "MAP34"
 	defaultceiling = "#483818"
 	floornumber = 10
 	music = "CORNER"
@@ -611,12 +619,14 @@ map "MAP49"
 	floornumber = 9
 	music = "WARMARCH"
 	cluster = 5
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP50"
 {
 	next = "MAP46"
-	secretnext = "MAP50"
+	secretnext = "MAP46"
 	defaultceiling = "#580000"
 	floornumber = 10
 	music = "DUNGEON"
@@ -732,12 +742,14 @@ map "MAP59"
 	floornumber = 9
 	music = "ULTIMATE"
 	cluster = 6
+	completionstring = "$STR_SECRETCOMPLETED"
+	levelbonus = 15000
 }
 
 map "MAP60"
 {
 	next = "MAP54"
-	secretnext = "MAP60"
+	secretnext = "MAP54"
 	defaultceiling = "#483818"
 	floornumber = 10
 	music = "FUNKYOU"

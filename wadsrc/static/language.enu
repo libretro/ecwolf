@@ -93,6 +93,7 @@ STR_SECRETCOMPLETED = "\nsecret floor\n completed";
 STR_TRANSDEFEATED = "\n trans\n grosse\ndefeated!";
 STR_WILHELMDEFEATED = "\nbarnacle\nwilhelm\ndefeated!";
 STR_UBERDEFEATED = "\nubermutant\ndefeated!";
+STR_DEATHKNIGHTDEFEATED = "\n death\n knight\ndefeated!";
 STR_SECRETTUNNELCOMPLETED = "\nsecret tunnel\n    area\n  completed!";
 STR_SECRETCASTLECOMPLETED = "\nsecret castle\n    area\n  completed!";
 STR_SELECTRES = "Screen Resolution";
