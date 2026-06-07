@@ -252,7 +252,7 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 					else
 					{
 						const int u = (FixedMul((viewxTile<<16)+(gu>>8)-512, texxscale)) & (texwidth-1);
-						const int v = (FixedMul((viewyTile<<16)+(gv>>8)+512, texyscale)) & (texheight-1);
+						const int v = (FixedMul((viewyTile<<16)-(gv>>8)+512, texyscale)) & (texheight-1);
 						const unsigned texoffs = (u * texheight) + v;
 						if(isMasked)
 						{
