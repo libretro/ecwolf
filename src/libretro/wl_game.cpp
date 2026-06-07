@@ -188,18 +188,21 @@ SetSoundLoc(fixed gx,fixed gy)
 =
 ==========================
 */
-void PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan)
+int PlaySoundLocGlobal(const char* s,fixed gx,fixed gy,int chan,bool looping,double volume)
 {
 	SetSoundLoc(gx, gy);
 	SD_PositionSound(leftchannel, rightchannel);
 
-	int channel = SD_PlaySound(s, static_cast<SoundChannel> (chan));
+	int channel = SD_PlaySound(s, static_cast<SoundChannel> (chan), looping, volume);
 	if(channel)
 	{
 		channelSoundPos[channel - 1].globalsoundx = gx;
 		channelSoundPos[channel - 1].globalsoundy = gy;
 		channelSoundPos[channel - 1].valid = 1;
 	}
+	// Channel index the sound landed on (0..MIX_CHANNELS-1), or -1 if it did
+	// not play. SD_PlaySound returns channel+1 (0 == "did not play").
+	return channel - 1;
 }
 
 void UpdateSoundLoc(void)
@@ -1248,4 +1251,254 @@ bool GameMapEnd (wl_state_t *state)
 	}
 	state->stage = GAME_LOAD_MAP;
 	return true;
+}
+
+//==========================================================================
+//
+// LoopedAudio
+//
+// Registry of looping/ambient sounds keyed by the spawnid of the owning
+// actor. Backported from LZWolf (adapted to the engine's TMap container and
+// the libretro sound backend's per-channel API). Only the nearest few sources
+// are given one of the limited generic mixer channels; updateSoundPos (called
+// once per tic) re-homes or stops sources as the player moves and keeps each
+// active source's world position current so the mixer can pan it.
+//
+//==========================================================================
+
+namespace LoopedAudio
+{
+	struct Chan
+	{
+		SndChannel channel;
+		FString sound;
+		double attenuation;
+		double volume;
+
+		Chan() : channel(-1), attenuation(0.0), volume(1.0) {}
+		Chan(SndChannel channel_, const char *sound_, double attenuation_, double volume_)
+			: channel(channel_), sound(sound_), attenuation(attenuation_), volume(volume_) {}
+	};
+
+	typedef TMap<ObjId, Chan> ChanMap;
+	static ChanMap chans;
+
+	bool has(ObjId objId)
+	{
+		return chans.CheckKey(objId) != NULL;
+	}
+
+	void add(ObjId objId, SndChannel channel, const char *sound, double attenuation, double volume)
+	{
+		chans[objId] = Chan(channel, sound, attenuation, volume);
+	}
+
+	bool claimed(SndChannel channel)
+	{
+		ChanMap::Iterator it(chans);
+		ChanMap::Pair *pair;
+		while(it.NextPair(pair))
+		{
+			if(pair->Value.channel == channel)
+				return true;
+		}
+		return false;
+	}
+
+	void finished(SndChannel channel)
+	{
+		ChanMap::Iterator it(chans);
+		ChanMap::Pair *pair;
+		while(it.NextPair(pair))
+		{
+			// Keep the objId but clear the channel; the sound will be
+			// restarted on a (possibly different) channel later.
+			if(pair->Value.channel == channel)
+				pair->Value.channel = -1;
+		}
+	}
+
+	static int tileDist(AActor *ob, AActor *check)
+	{
+		if(ob == NULL || check == NULL)
+			return 0x7fffffff;
+		return MAX(abs(check->tilex - ob->tilex), abs(check->tiley - ob->tiley));
+	}
+
+	void updateSoundPos(void)
+	{
+		AActor *player = players[0].mo;
+		if(player == NULL)
+			return;
+
+		// Sort the registered sources by distance to the player. Only the two
+		// closest keep a channel (the generic pool is small); farther ones are
+		// stopped, and a closer one with no channel is (re)started looping.
+		// Done one transition per call to mirror the upstream behaviour.
+		typedef TMap<ObjId, int> DistMap;
+		DistMap dist;
+		{
+			ChanMap::Iterator it(chans);
+			ChanMap::Pair *pair;
+			while(it.NextPair(pair))
+			{
+				AActor *ob = AActor::FindBySpawnID(pair->Key);
+				dist[pair->Key] = tileDist(ob, player);
+			}
+		}
+
+		// Rank: count how many sources are strictly closer than each one.
+		ChanMap::Iterator it(chans);
+		ChanMap::Pair *pair;
+		while(it.NextPair(pair))
+		{
+			const ObjId id = pair->Key;
+			Chan &chan = pair->Value;
+			int myDist = dist[id];
+
+			int closer = 0;
+			DistMap::Iterator dit(dist);
+			DistMap::Pair *dpair;
+			while(dit.NextPair(dpair))
+			{
+				if(dpair->Key == id)
+					continue;
+				if(dpair->Value < myDist
+					|| (dpair->Value == myDist && dpair->Key < id))
+					++closer;
+			}
+
+			AActor *ob = AActor::FindBySpawnID(id);
+
+			if(closer >= 2 || ob == NULL)
+			{
+				// Too distant (or owner gone): release the channel.
+				if(chan.channel != -1)
+				{
+					globalsoundpos *soundpos = &channelSoundPos[chan.channel];
+					if(soundpos->valid)
+					{
+						soundpos->valid = 0;
+						SD_StopChannel(chan.channel);
+					}
+					chan.channel = -1;
+				}
+			}
+			else
+			{
+				// Proximal: start looping if not already on a channel.
+				if(chan.channel == -1 && !chan.sound.IsEmpty())
+				{
+					int c = PlaySoundLocGlobal(chan.sound, ob->x, ob->y, SD_GENERIC, true, chan.volume);
+					if(c >= 0)
+						chan.channel = c;
+					break; // one (re)start per call
+				}
+			}
+		}
+
+		// Keep active sources' positions current for panning.
+		ChanMap::Iterator it2(chans);
+		ChanMap::Pair *pair2;
+		while(it2.NextPair(pair2))
+		{
+			const Chan &chan = pair2->Value;
+			AActor *ob = AActor::FindBySpawnID(pair2->Key);
+			if(chan.channel != -1 && ob != NULL)
+			{
+				globalsoundpos *soundpos = &channelSoundPos[chan.channel];
+				soundpos->globalsoundx = ob->x;
+				soundpos->globalsoundy = ob->y;
+			}
+		}
+	}
+
+	void stopSoundFrom(ObjId objId, bool halt_only)
+	{
+		Chan *chan = chans.CheckKey(objId);
+		if(chan == NULL)
+			return;
+
+		if(chan->channel != -1)
+		{
+			globalsoundpos *soundpos = &channelSoundPos[chan->channel];
+			if(soundpos->valid)
+			{
+				soundpos->valid = 0;
+				SD_StopChannel(chan->channel);
+			}
+			if(halt_only)
+				chan->channel = -1;
+		}
+
+		if(!halt_only)
+			chans.Remove(objId);
+	}
+
+	void setVolume(ObjId objId, double volume)
+	{
+		Chan *chan = chans.CheckKey(objId);
+		if(chan == NULL)
+			return;
+
+		chan->volume = volume;
+		if(chan->channel != -1)
+		{
+			globalsoundpos *soundpos = &channelSoundPos[chan->channel];
+			if(soundpos->valid)
+				SD_SetChannelVolume(chan->channel, volume);
+		}
+	}
+
+	void stopActiveSounds(bool halt_only)
+	{
+		// Collect ids first; stopSoundFrom mutates the map.
+		TArray<ObjId> ids;
+		{
+			ChanMap::Iterator it(chans);
+			ChanMap::Pair *pair;
+			while(it.NextPair(pair))
+				ids.Push(pair->Key);
+		}
+		for(unsigned int i = 0; i < ids.Size(); i++)
+			stopSoundFrom(ids[i], halt_only);
+		if(!halt_only)
+			chans.Clear();
+	}
+
+	void Serialize(FArchive &arc)
+	{
+		// Explicit count + entries (FArchive has no TMap operator). Channels are
+		// not stored: on load every entry starts with channel == -1 and is
+		// re-homed by the next updateSoundPos.
+		if(arc.IsStoring())
+		{
+			uint32_t count = 0;
+			ChanMap::Iterator it(chans);
+			ChanMap::Pair *pair;
+			while(it.NextPair(pair))
+				++count;
+			arc << count;
+			ChanMap::Iterator it2(chans);
+			while(it2.NextPair(pair))
+			{
+				ObjId id = pair->Key;
+				arc << id << pair->Value.sound << pair->Value.attenuation << pair->Value.volume;
+			}
+		}
+		else
+		{
+			chans.Clear();
+			uint32_t count = 0;
+			arc << count;
+			for(uint32_t i = 0; i < count; i++)
+			{
+				ObjId id;
+				FString sound;
+				double attenuation, volume;
+				arc << id << sound << attenuation << volume;
+				chans[id] = Chan(-1, sound, attenuation, volume);
+			}
+		}
+	}
 }

@@ -153,6 +153,41 @@ IMPLEMENT_POINTY_CLASS(Actor)
 	DECLARE_POINTER(target)
 END_POINTERS
 
+// Per-spawn unique id allocator. Each spawned actor gets a monotonically
+// increasing spawnid used to key looping/ambient sounds to their owner (see
+// LoopedAudio). LastKey is serialized so ids stay stable across save/load.
+namespace ActorSpawnID
+{
+	unsigned int LastKey = 1;
+
+	void NewActor(AActor *actor)
+	{
+		actor->spawnid = LastKey++;
+	}
+
+	void UnlinkActor(AActor *actor)
+	{
+		actor->spawnid = 0;
+	}
+
+	void Serialize(FArchive &arc)
+	{
+		arc << LastKey;
+	}
+}
+
+AActor *AActor::FindBySpawnID(unsigned int id)
+{
+	if(id == 0)
+		return NULL;
+	for(AActor::Iterator iter = AActor::GetIterator(); iter.Next();)
+	{
+		if(iter->spawnid == id)
+			return iter;
+	}
+	return NULL;
+}
+
 void AActor::AddInventory(AInventory *item)
 {
 	item->AttachToOwner(this);
@@ -195,6 +230,13 @@ void AActor::Destroy()
 {
 	Super::Destroy();
 	RemoveFromWorld();
+
+	// Stop any looping/ambient sound keyed to this actor, then release its id.
+	if(spawnid != 0)
+	{
+		LoopedAudio::stopSoundFrom(spawnid);
+		ActorSpawnID::UnlinkActor(this);
+	}
 
 	// Inventory items don't have a registered thinker so we must free them now
 	if(inventory)
@@ -667,6 +709,7 @@ AActor *AActor::Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags
 		type = type->GetReplacement();
 
 	AActor *actor = type->CreateInstance();
+	ActorSpawnID::NewActor(actor);
 	actor->x = x;
 	actor->y = y;
 	actor->z = z;

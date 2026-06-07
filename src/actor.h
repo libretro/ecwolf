@@ -124,6 +124,8 @@ class AActor : public Thinker,
 		void			SetState(const Frame *state, bool norun=false);
 		void			SpawnFog();
 		static AActor	*Spawn(const ClassDef *type, fixed x, fixed y, fixed z, int flags);
+		// Find a live actor by its spawnid (see LoopedAudio); NULL if gone.
+		static AActor	*FindBySpawnID(unsigned int id);
 		int32_t			SpawnHealth() const;
 		bool			Teleport(fixed x, fixed y, angle_t angle, bool nofog=false);
 		virtual void	Tick();
@@ -142,6 +144,10 @@ class AActor : public Thinker,
 		int         haloLightMask;
 		// As above for zone lights (A_EnableZoneLight).
 		int         zoneLightMask;
+
+		// Unique per-spawn id used to key looping/ambient sounds to the actor
+		// that owns them (see LoopedAudio). Assigned at spawn, 0 when unlinked.
+		unsigned int spawnid;
 
 		int32_t	distance; // if negative, wait for that door to open
 		dirtype	dir;

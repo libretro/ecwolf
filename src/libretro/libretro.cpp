@@ -1746,7 +1746,7 @@ extern unsigned automap;
 
 void SerializeExtra(FArchive &arc, bool &isGameless, uint32_t &version)
 {
-	uint32_t serialize_version = 12;
+	uint32_t serialize_version = 13;
 	arc << serialize_version;
 	version = serialize_version;
 	arc << (uint64_t &) GameSave::SaveVersion;
@@ -1901,6 +1901,10 @@ bool retro_serialize(void *data_, size_t size)
 		if (!isGameless && serialize_version >= 12) {
 			Dialog::quizSerialize(&g_state, arc);
 		}
+		if (!isGameless && serialize_version >= 13) {
+			LoopedAudio::Serialize(arc);
+			ActorSpawnID::Serialize(arc);
+		}
 		uint32_t rngcount = FRandom::GetRNGCount();
 		arc << rngcount;
 		FRandom::StaticWriteRNGState(arc);
@@ -1984,6 +1988,10 @@ bool retro_unserialize(const void *data_, size_t size)
 
 	if (!isGameless && serialize_version >= 12) {
 		Dialog::quizSerialize(&g_state, arc);
+	}
+	if (!isGameless && serialize_version >= 13) {
+		LoopedAudio::Serialize(arc);
+		ActorSpawnID::Serialize(arc);
 	}
 
 	uint32_t rngcount;

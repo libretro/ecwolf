@@ -145,6 +145,16 @@ void SD_SetChannelVolume(int channel, double volume)
 	g_state.channels[channel].chanVolume = volume;
 }
 
+void SD_StopChannel(int channel)
+{
+	if (channel < 0 || channel >= MIX_CHANNELS)
+		return;
+	g_state.channels[channel].sample = NULL;
+	g_state.channels[channel].sound = "";
+	g_state.channels[channel].chanLooping = false;
+	g_state.channels[channel].chanVolume = 1.0;
+}
+
 
 struct SoundPriorities
 {
@@ -258,7 +268,7 @@ int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const
 	return channel + 1;
 }
 
-int SD_PlaySound(const char* sound,SoundChannel chan)
+int SD_PlaySound(const char* sound,SoundChannel chan,bool looping,double volume)
 {
 	int             lp,rp;
 
@@ -275,7 +285,7 @@ int SD_PlaySound(const char* sound,SoundChannel chan)
 		return 0;
 	}
 
-	int channel = SD_PlayDigitized(sound, currentPriorities, sindex, lp, rp, chan);
+	int channel = SD_PlayDigitized(sound, currentPriorities, sindex, lp, rp, chan, looping, volume);
 	//		SoundPositioned = ispos;
 	SoundPlaying = sound;
 	return channel;

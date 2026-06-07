@@ -456,6 +456,7 @@ void PlayLoopA (void)
 	GC::CheckGC();
 
 	UpdateSoundLoc ();      // JAB
+	LoopedAudio::updateSoundPos ();
 }
 
 bool PlayLoopB (wl_state_t *state)
