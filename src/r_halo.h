@@ -36,6 +36,7 @@ typedef struct
 {
 	double cx, cy;    /* center, map units */
 	double radius;
+	double r2;        /* radius*radius, precomputed for the per-column test */
 	int    light;
 } haloinst_t;
 

@@ -84,6 +84,7 @@ static void Halo_PushActive(double cx, double cy, double radius, int light)
 	s_active[s_nactive].cx     = cx;
 	s_active[s_nactive].cy     = cy;
 	s_active[s_nactive].radius = radius;
+	s_active[s_nactive].r2     = radius * radius;
 	s_active[s_nactive].light  = light;
 	s_nactive++;
 }
@@ -144,7 +145,7 @@ int Halo_LightAtFixed(fixed xintercept, fixed yintercept)
 		const haloinst_t *h = &s_active[i];
 		double dx = px - h->cx;
 		double dy = py - h->cy;
-		if (dx * dx + dy * dy <= h->radius * h->radius)
+		if (dx * dx + dy * dy <= h->r2)
 			light += h->light;
 	}
 	return light;
