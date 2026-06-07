@@ -8,6 +8,7 @@
 #include "m_classes.h"
 #include "m_random.h"
 #include "wl_def.h"
+#include "fstring_c.h"
 #include "wl_menu.h"
 #include "wl_iwad.h"
 #include "id_ca.h"
@@ -343,9 +344,11 @@ void Message (const char *string)
 
 	uint16_t width, height;
 
-	FString measureString;
-	measureString.Format("%s_", string);
-	VW_MeasurePropString(BigFont, measureString, width, height);
+	FString_C measureString;
+	FSTRING_C_INIT(&measureString);
+	FString_C_Format(&measureString, "%s_", string);
+	VW_MeasurePropString(BigFont, FSTRING_C_GETCHARS(&measureString), width, height);
+	FString_C_Release(&measureString);
 	width = MIN<int>(width, 320 - 10);
 	height = MIN<int>(height, 200 - 10);
 
