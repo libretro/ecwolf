@@ -1336,9 +1336,25 @@ static void mixChannel(long long tic, SoundChannelState *channel, int16_t *outbu
 		sdlright = 0;	
 	fixed leftmul = (FRACUNIT * volume * sdlleft) / (20 * 255);
 	fixed rightmul = (FRACUNIT * volume * sdlright) / (20 * 255);
+	// Per-channel volume scalar (ambient/looping sounds; 1.0 for everything
+	// else, so one-shot mixing is bit-identical to before).
+	if (channel->chanVolume != 1.0) {
+		leftmul = (fixed)(leftmul * channel->chanVolume);
+		rightmul = (fixed)(rightmul * channel->chanVolume);
+	}
 	if (leftmul == 0 && rightmul == 0)
 		return;
 	int start_tic = tic - channel->startTick + channel->skipTicks;
+	// A looping channel plays indefinitely, so start_tic grows without bound
+	// and (start_tic * rate) would overflow a 32-bit int after ~1 hour. The
+	// mixer reduces start_sample modulo the loop length anyway, so reduce in
+	// tic-space first to keep the intermediate bounded. GetLengthTicks() is the
+	// sample's loop period in tics.
+	if (channel->chanLooping) {
+		int loopTics = channel->sample->GetLengthTicks();
+		if (loopTics > 0)
+			start_tic %= loopTics;
+	}
 
 	channel->sample->MixInto (outbuf, SAMPLERATE, SAMPLES_PER_TIC, start_tic, leftmul, rightmul);
 }

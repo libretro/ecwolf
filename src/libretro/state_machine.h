@@ -401,6 +401,11 @@ struct SoundChannelState
 	uint32_t leftPos;
 	uint32_t rightPos;
 	SoundData::Type type;
+	// Ambient/looping support: a looping channel never auto-expires (stopTicks
+	// == -1) and is mixed at chanVolume (1.0 = full). Non-looping playback
+	// leaves chanVolume at 1.0, matching prior behaviour exactly.
+	bool chanLooping;
+	double chanVolume;
 
 	void Serialize(FArchive &arc);
 
@@ -419,6 +424,8 @@ struct SoundChannelState
 		leftPos = 0;
 		rightPos = 0;
 		type = SoundData::DIGITAL;
+		chanLooping = false;
+		chanVolume = 1.0;
 	}
 };
 

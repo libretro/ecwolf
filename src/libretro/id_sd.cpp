@@ -136,6 +136,15 @@ void    SD_SetPosition(int channel, int leftvol,int rightvol) {
 	g_state.channels[channel].rightPos = rightvol;
 }
 
+void SD_SetChannelVolume(int channel, double volume)
+{
+	if (channel < 0 || channel >= MIX_CHANNELS)
+		return;
+	if (volume < 0.0)
+		volume = 0.0;
+	g_state.channels[channel].chanVolume = volume;
+}
+
 
 struct SoundPriorities
 {
@@ -189,7 +198,7 @@ void SetSoundPriorities(const char *prio)
 	currentPriorities = PrioFromString(prio);
 }
 
-int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const SoundData &which,int leftpos,int rightpos,SoundChannel chan)
+int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const SoundData &which,int leftpos,int rightpos,SoundChannel chan,bool looping=false,double volume=1.0)
 {
 	// If this sound has been played too recently, don't play it again.
 	// (Fix for extremely loud sounds when one plays over itself too much.)
@@ -237,7 +246,13 @@ int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const
 	g_state.channels[channel].startTick = currentTick;
 	g_state.channels[channel].skipTicks = 0;
 	g_state.channels[channel].isMusic = false;
-	g_state.channels[channel].stopTicks = currentTick + sample->GetLengthTicks() + 1;
+	g_state.channels[channel].chanLooping = looping;
+	g_state.channels[channel].chanVolume = volume;
+	// A looping sound never auto-expires; the mixer wraps it at the loop point.
+	// One-shot sounds stop after their length as before.
+	g_state.channels[channel].stopTicks = looping
+		? -1
+		: (int64_t)(currentTick + sample->GetLengthTicks() + 1);
 
 	// Return channel + 1 because zero is a valid channel.
 	return channel + 1;
@@ -793,8 +808,14 @@ void SoundChannelState::Serialize(FArchive &arc)
 	arc << (uint32_t &) type;
 	arc << isMusic;
 
-	if (!arc.IsStoring())
+	if (!arc.IsStoring()) {
 		sample = isMusic ? GetMusic(sound) : GetSoundDataType(SoundInfo[sound], type);
+		// Not part of the on-disk format (kept stable): a freshly loaded channel
+		// is a one-shot at full volume. Looping ambient sounds are re-established
+		// by their owning actors after load, not restored from the mixer state.
+		chanLooping = false;
+		chanVolume = 1.0;
+	}
 }
 
 template <typename T, int bias>
