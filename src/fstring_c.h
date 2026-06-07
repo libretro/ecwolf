@@ -117,4 +117,41 @@ static int FString_C_CompareNoCaseN(const FString_C *s, const char *other, int l
 	return strnicmp(s->Chars, other, (size_t)len);
 }
 
+/* Construct from the first 'len' chars of src (FString(const char*, size_t)).
+** Used by Left/Mid below. */
+static void FString_C_InitSubstr(FString_C *s, const char *src, size_t len)
+{
+	s->Chars = FString_C_AllocBuffer(len);
+	if (s->Chars != NULL)
+	{
+		if (len != 0)
+			memcpy(s->Chars, src, len);
+		s->Chars[len] = '\0';
+	}
+}
+
+/* dst = first 'numChars' chars of src (FString::Left). dst must be unused. */
+static void FString_C_Left(FString_C *dst, const FString_C *src, size_t numChars)
+{
+	size_t len = FSTRING_C_LEN(src);
+	if (len < numChars)
+		numChars = len;
+	FString_C_InitSubstr(dst, src->Chars, numChars);
+}
+
+/* dst = up to 'numChars' chars of src starting at 'pos' (FString::Mid). Passing
+** numChars = ~(size_t)0 takes the rest of the string, as FString's default. */
+static void FString_C_Mid(FString_C *dst, const FString_C *src, size_t pos, size_t numChars)
+{
+	size_t len = FSTRING_C_LEN(src);
+	if (pos >= len)
+	{
+		FString_C_InitSubstr(dst, "", 0);
+		return;
+	}
+	if (pos + numChars > len || pos + numChars < pos)
+		numChars = len - pos;
+	FString_C_InitSubstr(dst, src->Chars + pos, numChars);
+}
+
 #endif
