@@ -33,6 +33,7 @@
 */
 
 #include "wl_def.h"
+#include "fstring_c.h"
 #include "am_map.h"
 #include "colormatcher.h"
 #include "id_ca.h"
@@ -627,7 +628,8 @@ void AutoMap::DrawStats() const
 	if(!(amFlags & (AMF_DispInfo|AMF_DispRatios)))
 		return;
 
-	FString statString;
+	FString_C statString;
+	FSTRING_C_INIT(&statString);
 	unsigned int infHeight = 0;
 
 	if(amFlags & AMF_DispInfo)
@@ -640,29 +642,31 @@ void AutoMap::DrawStats() const
 			TAG_DONE);
 
 		unsigned int seconds = gamestate.TimeCount/70;
-		statString.Format("%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
+		FString_C_Format(&statString, "%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
 		V_DrawText(SmallFont, gameinfo.automap.FontColor,
 			screenWidth - (SmallFont->GetCharWidth('0')*6 + SmallFont->GetCharWidth(':')*2 + 2)*CleanXfac, CleanYfac,
-			statString,
+			FSTRING_C_GETCHARS(&statString),
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 	}
 
 	if(amFlags & AMF_DispRatios)
 	{
-		statString.Format("K: %d/%d\nS: %d/%d\nT: %d/%d",
+		FString_C_Format(&statString, "K: %d/%d\nS: %d/%d\nT: %d/%d",
 			gamestate.killcount, gamestate.killtotal,
 			gamestate.secretcount, gamestate.secrettotal,
 			gamestate.treasurecount, gamestate.treasuretotal);
 
 		uint16_t sw, sh;
-		VW_MeasurePropString(SmallFont, statString, sw, sh);
+		VW_MeasurePropString(SmallFont, FSTRING_C_GETCHARS(&statString), sw, sh);
 		V_DimRect(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
 
-		V_DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, infHeight*CleanYfac, statString,
+		V_DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, infHeight*CleanYfac, FSTRING_C_GETCHARS(&statString),
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 	}
+
+	FString_C_Release(&statString);
 }
 
 void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, fixed scale, angle_t angle, const Color &c) const
