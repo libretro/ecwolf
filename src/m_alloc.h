@@ -35,11 +35,17 @@
 #define __M_ALLOC_H__
 
 #include <stdlib.h>
+/* zdoomsupport.h is C++ and is not needed by anything declared here (these are
+** plain C declarations using only size_t/void*). It is included for C++ TUs
+** that have historically relied on getting it transitively through this
+** header; C translation units skip it so this header is usable from C. */
+#ifdef __cplusplus
 #include "zdoomsupport.h"
+#endif
 
-// These are the same as the same stdlib functions,
-// except they bomb out with a fatal error
-// when they can't get the memory.
+/* These are the same as the same stdlib functions,
+** except they bomb out with a fatal error
+** when they can't get the memory. */
 
 #if defined(_DEBUG)
 #define M_Malloc(s)		M_Malloc_Dbg(s, __FILE__, __LINE__)
