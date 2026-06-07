@@ -85,6 +85,13 @@ static double *s_cx    = NULL;
 static double *s_cy    = NULL;
 static double *s_r2    = NULL;
 static int    *s_lit   = NULL;
+static double *s_fd    = NULL;   /* forward distance of center along view dir */
+static double *s_rad   = NULL;   /* radius (map units), for the cull band */
+
+/* View origin/direction captured at the start of the floor/ceiling pass, used
+** by the per-row cull: a halo at forward distance s_fd can only light a row
+** whose rendered forward distance is within s_rad of it. */
+static double s_eyeX = 0.0, s_eyeY = 0.0, s_vdX = 1.0, s_vdY = 0.0;
 
 static void Halo_PushActive(double cx, double cy, double radius, int light)
 {
@@ -92,7 +99,7 @@ static void Halo_PushActive(double cx, double cy, double radius, int light)
 	{
 		int newcap = s_activecap ? s_activecap * 2 : 16;
 		haloinst_t *p = (haloinst_t *)realloc(s_active, newcap * sizeof(haloinst_t));
-		double *pcx, *pcy, *pr2;
+		double *pcx, *pcy, *pr2, *pfd, *prad;
 		int *plit;
 		if (!p)
 			return;
@@ -101,12 +108,16 @@ static void Halo_PushActive(double cx, double cy, double radius, int light)
 		pcy = (double *)realloc(s_cy, newcap * sizeof(double));
 		pr2 = (double *)realloc(s_r2, newcap * sizeof(double));
 		plit = (int *)realloc(s_lit, newcap * sizeof(int));
-		if (!pcx || !pcy || !pr2 || !plit)
+		pfd = (double *)realloc(s_fd, newcap * sizeof(double));
+		prad = (double *)realloc(s_rad, newcap * sizeof(double));
+		if (!pcx || !pcy || !pr2 || !plit || !pfd || !prad)
 			return;
 		s_cx = pcx;
 		s_cy = pcy;
 		s_r2 = pr2;
 		s_lit = plit;
+		s_fd = pfd;
+		s_rad = prad;
 		s_activecap = newcap;
 	}
 	s_active[s_nactive].cx     = cx;
@@ -118,6 +129,7 @@ static void Halo_PushActive(double cx, double cy, double radius, int light)
 	s_cy[s_nactive]  = cy;
 	s_r2[s_nactive]  = radius * radius;
 	s_lit[s_nactive] = light;
+	s_rad[s_nactive] = radius;
 	s_nactive++;
 }
 
@@ -186,20 +198,40 @@ int Halo_LightAtFixed(fixed xintercept, fixed yintercept)
 }
 
 /*
+** Capture the view origin/direction for this floor/ceiling pass and precompute
+** each active halo's forward distance along the view direction. Called once per
+** plane (floor, then ceiling) before the per-row span loop. The per-row cull in
+** Halo_RowSpans uses s_fd[]: a halo whose forward distance differs from the
+** row's rendered forward distance by more than its radius cannot reach that
+** row, so its quadratic solve is skipped. This is conservative (it never drops
+** a halo the solve would have hit) because the forward-distance gap is a lower
+** bound on the true center-to-row-plane distance.
+*/
+void Halo_BeginPlanes(double eyeX, double eyeY, double vdirX, double vdirY)
+{
+	int i;
+	s_eyeX = eyeX;
+	s_eyeY = eyeY;
+	s_vdX = vdirX;
+	s_vdY = vdirY;
+	for (i = 0; i < s_nactive; ++i)
+		s_fd[i] = (s_cx[i] - eyeX) * vdirX + (s_cy[i] - eyeY) * vdirY;
+}
+
+/*
 ** Per-scanline halo span accumulation (floor/ceiling drawer).
 **
-** For the ray P(t) = S + V*t, t in [0,1], find for each active halo the
+** rowdist is the row's rendered forward distance from the eye along the view
+** direction (same units as s_fd). Halos whose forward distance is more than
+** their radius from rowdist are culled before the quadratic solve.
+**
+** For the ray P(t) = S + V*t, t in [0,1], find for each surviving halo the
 ** screen-column interval where the ray is inside the halo circle, and add the
-** halo's light to halolight[] across that interval. This is the dominant cost
-** in the floor/ceiling stage when lamps are in view (one quadratic solve per
-** halo per scanline), so the per-halo discriminant/root math is done two halos
-** at a time with SSE2 packed doubles. The span fill stays scalar (it is
-** data-dependent) and the output is bit-identical to the scalar reference:
-** the packed path performs the same operations (b = 2(V.sc), c = sc.sc - r2,
-** disc = b*b - 4ac, roots (-b -+ sqrt)/2a) so each lane matches the scalar
-** result exactly.
+** halo's light to halolight[] across that interval. The per-halo discriminant/
+** root math is done two halos at a time with SSE2 (or NEON on AArch64); the
+** span fill stays scalar. Output is bit-identical to the scalar reference.
 */
-void Halo_RowSpans(int *halolight, int viewwidth,
+void Halo_RowSpans(int *halolight, int viewwidth, double rowdist,
 	double Sx, double Sy, double Vx, double Vy, double a)
 {
 	int hi = 0;
@@ -219,6 +251,16 @@ void Halo_RowSpans(int *halolight, int viewwidth,
 
 		for (; hi + 1 < s_nactive; hi += 2)
 		{
+			/* Cull: skip the pair only if both halos are out of the forward
+			** band (a surviving lane still goes through the exact disc test). */
+			double d0 = s_fd[hi] - rowdist;
+			double d1 = s_fd[hi + 1] - rowdist;
+			if (d0 < 0.0) d0 = -d0;
+			if (d1 < 0.0) d1 = -d1;
+			if (d0 > s_rad[hi] && d1 > s_rad[hi + 1])
+				continue;
+
+			{
 			/* Load two halos' centers/r2 (contiguous SoA). */
 			__m128d cx = _mm_loadu_pd(&s_cx[hi]);
 			__m128d cy = _mm_loadu_pd(&s_cy[hi]);
@@ -277,6 +319,7 @@ void Halo_RowSpans(int *halolight, int viewwidth,
 				}
 			}
 			}
+			}
 		}
 	}
 #elif defined(__aarch64__)
@@ -298,6 +341,14 @@ void Halo_RowSpans(int *halolight, int viewwidth,
 
 		for (; hi + 1 < s_nactive; hi += 2)
 		{
+			double d0 = s_fd[hi] - rowdist;
+			double d1 = s_fd[hi + 1] - rowdist;
+			if (d0 < 0.0) d0 = -d0;
+			if (d1 < 0.0) d1 = -d1;
+			if (d0 > s_rad[hi] && d1 > s_rad[hi + 1])
+				continue;
+
+			{
 			float64x2_t cx = vld1q_f64(&s_cx[hi]);
 			float64x2_t cy = vld1q_f64(&s_cy[hi]);
 			float64x2_t r2 = vld1q_f64(&s_r2[hi]);
@@ -352,19 +403,25 @@ void Halo_RowSpans(int *halolight, int viewwidth,
 				}
 			}
 			}
+			}
 		}
 	}
 #endif
 
-	/* Scalar tail (and the whole loop when SSE2 is unavailable). Identical math
-	** to the packed path so results match lane-for-lane. */
+	/* Scalar tail (and the whole loop when SSE2/NEON is unavailable). Identical
+	** math to the packed path so results match lane-for-lane. */
 	for (; hi < s_nactive; ++hi)
 	{
-		double scx = Sx - s_cx[hi];
-		double scy = Sy - s_cy[hi];
-		double b = 2.0 * (Vx * scx + Vy * scy);
-		double c = (scx * scx + scy * scy) - s_r2[hi];
-		double disc = b * b - 4.0 * a * c;
+		double fdd = s_fd[hi] - rowdist;
+		double scx, scy, b, c, disc;
+		if (fdd < 0.0) fdd = -fdd;
+		if (fdd > s_rad[hi])
+			continue;
+		scx = Sx - s_cx[hi];
+		scy = Sy - s_cy[hi];
+		b = 2.0 * (Vx * scx + Vy * scy);
+		c = (scx * scx + scy * scy) - s_r2[hi];
+		disc = b * b - 4.0 * a * c;
 		if (disc > 0.0)
 		{
 			double sq = sqrt(disc);

@@ -75,10 +75,16 @@ haloinst_t  *Halo_Active(int index);
 */
 int          Halo_LightAtFixed(fixed xintercept, fixed yintercept);
 
-/* Per-scanline halo span accumulation for the floor/ceiling drawer. Adds each
-** active halo's light to halolight[0..viewwidth) where the ray S + V*t (t in
-** [0,1]) crosses the halo circle. SSE2-accelerated; bit-identical to scalar. */
-void         Halo_RowSpans(int *halolight, int viewwidth,
+/* Capture view origin/direction and precompute per-halo forward distances for
+** the per-row cull. Call once per plane before the row loop. */
+void         Halo_BeginPlanes(double eyeX, double eyeY, double vdirX, double vdirY);
+
+/* Per-scanline halo span accumulation for the floor/ceiling drawer. rowdist is
+** the row's rendered forward distance from the eye along the view direction.
+** Adds each surviving halo's light to halolight[0..viewwidth) where the ray
+** S + V*t (t in [0,1]) crosses the halo circle. SSE2/NEON-accelerated;
+** bit-identical to scalar. */
+void         Halo_RowSpans(int *halolight, int viewwidth, double rowdist,
 	double Sx, double Sy, double Vx, double Vy, double a);
 
 /* ---- zone lighting -------------------------------------------------------

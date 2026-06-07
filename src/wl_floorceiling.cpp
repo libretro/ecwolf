@@ -98,6 +98,21 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 		halolight_size = viewwidth;
 	}
 
+	// Per-row halo cull: capture the eye and view direction in the same
+	// (Y-negated) world space Sx/Sy use, and precompute each halo's forward
+	// distance. The eye is FIXED2FLOAT(viewx/viewy); the forward direction is
+	// (viewcos, -viewsin) because Sy negates the gv (world-Y) term. rowdist
+	// below is the forward distance of the row's ray midpoint, so a halo more
+	// than its radius off that distance is skipped before the quadratic.
+	if(numHalos > 0)
+	{
+		const double eyeX = FIXED2FLOAT(viewx);
+		const double eyeY = FIXED2FLOAT(viewy);
+		const double vdX = FIXED2FLOAT(viewcos);
+		const double vdY = -FIXED2FLOAT(viewsin);
+		Halo_BeginPlanes(eyeX, eyeY, vdX, vdY);
+	}
+
 	// draw horizontal lines
 	for(int y = y0;floor ? y+halfheight < viewheight : y < halfheight; ++y, tex_offset += tex_offsetPitch)
 	{
@@ -150,7 +165,14 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 			const double Vy = FIXED2FLOAT(-(dv>>8)) * (double)viewwidth;
 			const double a = Vx*Vx + Vy*Vy;
 
-			Halo_RowSpans(halolight, viewwidth, Sx, Sy, Vx, Vy, a);
+			// Forward distance of the row's ray midpoint from the eye along the
+			// view direction, in the same space as the halos' precomputed s_fd.
+			const double midX = Sx + 0.5*Vx;
+			const double midY = Sy + 0.5*Vy;
+			const double rowdist = (midX - FIXED2FLOAT(viewx)) * FIXED2FLOAT(viewcos)
+				+ (midY - FIXED2FLOAT(viewy)) * (-FIXED2FLOAT(viewsin));
+
+			Halo_RowSpans(halolight, viewwidth, rowdist, Sx, Sy, Vx, Vy, a);
 		}
 
 		int curzonelight = 0;
