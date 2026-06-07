@@ -154,4 +154,47 @@ static void FString_C_Mid(FString_C *dst, const FString_C *src, size_t pos, size
 	FString_C_InitSubstr(dst, src->Chars + pos, numChars);
 }
 
+/*
+** printf-style formatting (FString::Format / VFormat). FString uses its own
+** StringFormat::VWorker, but only standard printf specifiers are used in the
+** codebase (%d, %s, %X, width/precision/flags, %*d, ...), for which vsnprintf
+** produces identical output; this delegates to vsnprintf with the usual
+** size-probe-then-allocate pattern rather than porting the 662-line custom
+** formatter. dst must be unused (it is freshly allocated here).
+*/
+#include <stdarg.h>
+#include <stdio.h>
+
+/* Old MSVC (pre-2013) lacks va_copy; the build's compat layer defines it, but
+** define a fallback so this header is self-sufficient. */
+#if !defined(va_copy) && !defined(__cplusplus)
+#	if defined(__va_copy)
+#		define va_copy(d, s) __va_copy(d, s)
+#	else
+#		define va_copy(d, s) ((d) = (s))
+#	endif
+#endif
+
+static void FString_C_VFormat(FString_C *dst, const char *fmt, va_list arglist)
+{
+	va_list ap;
+	int needed;
+	va_copy(ap, arglist);
+	needed = vsnprintf(NULL, 0, fmt, ap);
+	va_end(ap);
+	if (needed < 0)
+		needed = 0;
+	dst->Chars = FString_C_AllocBuffer((size_t)needed);
+	if (dst->Chars != NULL)
+		vsnprintf(dst->Chars, (size_t)needed + 1, fmt, arglist);
+}
+
+static void FString_C_Format(FString_C *dst, const char *fmt, ...)
+{
+	va_list arglist;
+	va_start(arglist, fmt);
+	FString_C_VFormat(dst, fmt, arglist);
+	va_end(arglist);
+}
+
 #endif
