@@ -4,3 +4,8 @@ android-libs/launcher/src/com/beloko/idtech/R.java
 /*build*/
 /results/
 /.idea/
+*.o
+*.so
+*.dll
+*.dylib
+*.a
