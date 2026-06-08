@@ -103,7 +103,7 @@ public:
 
 private:
 	static void LatchNumber (int x, int y, unsigned width, int32_t number, bool zerofill, bool cap=false);
-	static void LatchString (int x, int y, unsigned width, const FString &str);
+	static void LatchString (int x, int y, unsigned width, const char *str);
 	static void StatusDrawFace(FTexture *pic);
 	static void StatusDrawPic(unsigned x, unsigned y, const char* pic);
 
@@ -306,10 +306,10 @@ void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, b
 		str.Format("%d", maxval);
 	}
 
-	LatchString(x, y, width, str);
+	LatchString(x, y, width, str.GetChars());
 }
 
-void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &str)
+void WolfStatusBar::LatchString (int x, int y, unsigned width, const char *str)
 {
 	static FFont *HudFont = NULL;
 	if(!HudFont)
@@ -320,8 +320,9 @@ void WolfStatusBar::LatchString (int x, int y, unsigned width, const FString &st
 	y = 200-(STATUSLINES-y);// + HudFont->GetHeight();
 
 	int cwidth;
+	size_t len = strlen(str);
 	FRemapTable *remap = HudFont->GetColorTranslation(CR_UNTRANSLATED);
-	for(unsigned int i = MAX<int>(0, (int)(str.Len()-width));i < str.Len();++i)
+	for(unsigned int i = MAX<int>(0, (int)(len-width));i < len;++i)
 	{
 		VWB_DrawGraphic(HudFont->GetChar(str[i], &cwidth), x, y, MENU_NONE, remap);
 		x += cwidth;
@@ -359,7 +360,7 @@ void WolfStatusBar::DrawLevel (void)
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
 	FString str;
 	str.Format("%*s", StatusBarConfig.Floor.Digits, levelInfo->FloorNumber.GetChars());
-	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,str);
+	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,str.GetChars());
 }
 
 //===========================================================================
