@@ -289,19 +289,36 @@ class FVSwap : public FResourceFile
 
 FResourceFile *CheckVSwap(const char *filename, FileReader *file)
 {
-	FString fname(filename);
-	int lastSlash = fname.LastIndexOfAny("/\\:");
-	if(lastSlash != -1)
-		fname = fname.Mid(lastSlash+1, 5);
-	else
-		fname = fname.Left(5);
-
-	if(fname.Len() == 5 && fname.CompareNoCase("vswap") == 0) // file must be vswap.something
+	// Find the basename: everything after the last '/', '\' or ':'.
+	const char *base = filename;
+	const char *p;
+	for(p = filename;*p != '\0';++p)
 	{
-		FResourceFile *rf = new FVSwap(filename, file);
-		if(rf->Open()) return rf;
-		rf->Reader = NULL; // to avoid destruction of reader
-		delete rf;
+		if(*p == '/' || *p == '\\' || *p == ':')
+			base = p + 1;
+	}
+
+	// The file must be "vswap.something": the basename starts with exactly
+	// the five letters "vswap" (case-insensitive) followed by a sixth char.
+	{
+		static const char vswapName[5] = { 'v', 's', 'w', 'a', 'p' };
+		bool match = true;
+		int i;
+		for(i = 0;i < 5;++i)
+		{
+			if(base[i] == '\0' || tolower((unsigned char)base[i]) != vswapName[i])
+			{
+				match = false;
+				break;
+			}
+		}
+		if(match)
+		{
+			FResourceFile *rf = new FVSwap(filename, file);
+			if(rf->Open()) return rf;
+			rf->Reader = NULL; // to avoid destruction of reader
+			delete rf;
+		}
 	}
 	return NULL;
 }

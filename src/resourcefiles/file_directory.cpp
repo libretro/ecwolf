@@ -63,16 +63,30 @@
 FDirectory::FDirectory(const char * directory)
 : FResourceFile(NULL, NULL)
 {
-	FString dirname;
+	char dirname[1024];
+	size_t i;
 
 	#ifdef _WIN32
 		directory = _fullpath(NULL, directory, _MAX_PATH);
 	#else
 		// Todo for Linux: Resolve the path befire using it
 	#endif
-	dirname = directory;
-	dirname.ReplaceChars('\\', '/');
-	if (dirname[dirname.Len()-1] != '/') dirname += '/';
+	// Copy the directory into a local buffer, normalising backslashes to
+	// forward slashes and guaranteeing a trailing slash. Plain C string ops
+	// only, so this is safe on older compilers.
+	{
+		size_t dirlen = strlen(directory);
+		if(dirlen >= sizeof(dirname) - 1)
+			dirlen = sizeof(dirname) - 2;
+		for(i = 0;i < dirlen;++i)
+			dirname[i] = (directory[i] == '\\') ? '/' : directory[i];
+		dirname[dirlen] = '\0';
+		if(dirlen == 0 || dirname[dirlen-1] != '/')
+		{
+			dirname[dirlen] = '/';
+			dirname[dirlen+1] = '\0';
+		}
+	}
 	free((void*)directory);
 	char* cFilename = new char[strlen(dirname) + 1];
 	memcpy(cFilename, dirname, strlen(dirname)+1);
@@ -121,8 +135,18 @@ void FDirectory::AddEntry(const char *fullpath, int size)
 
 FileReader *FDirectoryLump::NewReader()
 {
-	FString fullpath = Owner->Filename;
-	fullpath += FullName;
+	char fullpath[1024];
+	const char *base = Owner->Filename;
+	const char *tail = FullName.GetChars();
+	size_t baseLen = strlen(base);
+	size_t tailLen = strlen(tail);
+	if(baseLen >= sizeof(fullpath))
+		baseLen = sizeof(fullpath) - 1;
+	if(baseLen + tailLen >= sizeof(fullpath))
+		tailLen = sizeof(fullpath) - 1 - baseLen;
+	memcpy(fullpath, base, baseLen);
+	memcpy(fullpath + baseLen, tail, tailLen);
+	fullpath[baseLen + tailLen] = '\0';
 	return FileReader::SafeOpen(fullpath);
 }
 
