@@ -265,11 +265,27 @@ bool F7ZFile::Open()
 			nameASCII[c] = static_cast<char>(nameUTF16[c]);
 		}
 
-		FString name = &nameASCII[0];
-		FixPathSeperator(name);
-		name.ToLower();
-
-		lump_p->LumpNameSetup(name);
+		/* Build the lump name with plain C strings: copy the ASCII name, then
+		** fix path separators ('\\' -> '/') and lowercase in place using only
+		** ISO C89 (tolower). LumpNameSetup takes a string object, which constructs
+		** implicitly from this const char* at the call (as the directory reader
+		** already relies on). */
+		{
+			char name[256];
+			size_t nl = strlen(&nameASCII[0]);
+			size_t k;
+			if(nl >= sizeof(name))
+				nl = sizeof(name) - 1;
+			memcpy(name, &nameASCII[0], nl);
+			name[nl] = '\0';
+			for(k = 0; k < nl; ++k)
+			{
+				if(name[k] == '\\')
+					name[k] = '/';
+				name[k] = (char)tolower((unsigned char)name[k]);
+			}
+			lump_p->LumpNameSetup(name);
+		}
 		lump_p->LumpSize = static_cast<int>(SzArEx_GetFileSize(archPtr, i));
 		lump_p->Owner = this;
 		lump_p->Flags = LUMPF_ZIPFILE;
