@@ -43,12 +43,37 @@
 #include "wl_game.h"
 #include "wl_shade.h"
 
-#define CheckKey(x) if(key.CompareNoCase(x) == 0)
+// Case-insensitive comparison of a UWMF key against a literal, using only ISO
+// C89 facilities so the parser does not need the string class or any
+// platform-specific case-insensitive compare.
+static bool UwmfKeyEquals(const char *key, const char *literal)
+{
+	size_t i;
+	for(i = 0;;++i)
+	{
+		int a = tolower((unsigned char)key[i]);
+		int b = tolower((unsigned char)literal[i]);
+		if(a != b)
+			return false;
+		if(a == '\0')
+			return true;
+	}
+}
+
+#define CheckKey(x) if(UwmfKeyEquals(key, x))
 
 #define StartParseBlock \
 	while(!sc.CheckToken('}')) { \
 		sc.MustGetToken(TK_Identifier); \
-		FString key(sc->str); \
+		char key[64]; \
+		{ \
+			const char *uwmfKeySrc = sc->str.GetChars(); \
+			size_t uwmfKeyLen = strlen(uwmfKeySrc); \
+			if(uwmfKeyLen >= sizeof(key)) \
+				uwmfKeyLen = sizeof(key) - 1; \
+			memcpy(key, uwmfKeySrc, uwmfKeyLen); \
+			key[uwmfKeyLen] = '\0'; \
+		} \
 		if(sc.CheckToken('=')) {
 #define EndParseBlock \
 			else \
@@ -289,7 +314,15 @@ class UWMFParser : public TextMapParser
 			while(sc.TokensLeft())
 			{
 				sc.MustGetToken(TK_Identifier);
-				FString key(sc->str);
+				char key[64];
+				{
+					const char *uwmfKeySrc = sc->str.GetChars();
+					size_t uwmfKeyLen = strlen(uwmfKeySrc);
+					if(uwmfKeyLen >= sizeof(key))
+						uwmfKeyLen = sizeof(key) - 1;
+					memcpy(key, uwmfKeySrc, uwmfKeyLen);
+					key[uwmfKeyLen] = '\0';
+				}
 				if(sc.CheckToken('='))
 				{
 					CheckKey("namespace")
