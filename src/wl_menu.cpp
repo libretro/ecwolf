@@ -8,7 +8,6 @@
 #include "m_classes.h"
 #include "m_random.h"
 #include "wl_def.h"
-#include "fstring_c.h"
 #include "wl_menu.h"
 #include "wl_iwad.h"
 #include "id_ca.h"
@@ -344,11 +343,19 @@ void Message (const char *string)
 
 	uint16_t width, height;
 
-	FString_C measureString;
-	FSTRING_C_INIT(&measureString);
-	FString_C_Format(&measureString, "%s_", string);
-	VW_MeasurePropString(BigFont, FSTRING_C_GETCHARS(&measureString), width, height);
-	FString_C_Release(&measureString);
+	// Measure the message plus a trailing underscore. Menu strings are short;
+	// build the measured copy in a fixed stack buffer with an explicit bound so
+	// an overlong source cannot overflow, with no heap allocation or helper.
+	char measureString[256];
+	{
+		size_t len = strlen(string);
+		if(len > sizeof(measureString) - 2)
+			len = sizeof(measureString) - 2;
+		memcpy(measureString, string, len);
+		measureString[len] = '_';
+		measureString[len + 1] = '\0';
+	}
+	VW_MeasurePropString(BigFont, measureString, width, height);
 	width = MIN<int>(width, 320 - 10);
 	height = MIN<int>(height, 200 - 10);
 
