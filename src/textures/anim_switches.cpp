@@ -102,7 +102,7 @@ void FTextureManager::InitSwitchList ()
 void FTextureManager::ProcessSwitchDef (Scanner &sc)
 {
 	const uint32_t texflags = TEXMAN_Overridable | TEXMAN_TryAny;
-	FString picname;
+	char picname[256];
 	FSwitchDef *def1, *def2;
 	FTextureID picnum;
 	//int gametype;
@@ -142,7 +142,17 @@ void FTextureManager::ProcessSwitchDef (Scanner &sc)
 	if(!sc.GetNextString ())
 		sc.ScriptMessage(Scanner::ERROR, "Expected string.");
 	picnum = CheckForTexture (sc->str, FTexture::TEX_Wall, texflags);
-	picname = sc->str;
+	/* Copy the switch's base texture name now: the GetNextString loop below
+	** overwrites sc->str, so a borrowed pointer would dangle by the time the
+	** error message reads it. Bounded copy, only ISO C89 string functions. */
+	{
+		const char *src = sc->str.GetChars();
+		size_t len = strlen(src);
+		if(len >= sizeof(picname))
+			len = sizeof(picname) - 1;
+		memcpy(picname, src, len);
+		picname[len] = '\0';
+	}
 	while (sc.GetNextString ())
 	{
 		if (sc->str.Compare ("quest") == 0)
@@ -202,7 +212,7 @@ void FTextureManager::ProcessSwitchDef (Scanner &sc)
 	def2->PreTexture = def1->frames[def1->NumFrames-1].Texture;
 	if (def1->PreTexture == def2->PreTexture)
 	{
-		sc.ScriptMessage (Scanner::ERROR, "The on state for switch %s must end with a texture other than %s", picname.GetChars(), picname.GetChars());
+		sc.ScriptMessage (Scanner::ERROR, "The on state for switch %s must end with a texture other than %s", picname, picname);
 	}
 	AddSwitchPair(def1, def2);
 	def1->QuestPanel = def2->QuestPanel = quest;
