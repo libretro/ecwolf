@@ -66,7 +66,7 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), loadFailed(false)
 
 	// PK3 format maps
 	char mapWad[64];
-	snprintf(mapWad, sizeof(mapWad), "maps/%s.wad", map.GetChars());
+	sprintf(mapWad, "maps/%s.wad", map.GetChars());
 
 	int wadLump = Wads.CheckNumForFullName(mapWad);
 	if(wadLump > markerLump)

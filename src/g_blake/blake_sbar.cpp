@@ -175,19 +175,19 @@ void BlakeStatusBar::DrawStatusBar()
 	if(levelInfo->LevelNumber > 20)
 		strcpy(area, "SECRET");
 	else
-		snprintf(area, sizeof(area), "AREA: %d", levelInfo->LevelNumber);
-	snprintf(lives, sizeof(lives), "LIVES: %d", players[0].lives);
+		sprintf(area, "AREA: %d", levelInfo->LevelNumber);
+	sprintf(lives, "LIVES: %d", players[0].lives);
 	DrawString(IndexFont, area, 18, 5, true, CR_WHITE);
 	DrawString(IndexFont, levelInfo->GetName(map), 160, 5, true, CR_WHITE, true);
 	DrawString(IndexFont, lives, 267, 5, true, CR_WHITE);
 
 	// Draw bottom information
 	char health[16];
-	snprintf(health, sizeof(health), "%3d", players[0].health);
+	sprintf(health, "%3d", players[0].health);
 	DrawString(HealthFont, health, 128, 162, false);
 
 	char score[16];
-	snprintf(score, sizeof(score), "%7d", CurrentScore);
+	sprintf(score, "%7d", CurrentScore);
 	DrawString(ScoreFont, score, 256, 155, false);
 
 	if(players[0].ReadyWeapon)
@@ -211,7 +211,7 @@ void BlakeStatusBar::DrawStatusBar()
 		DrawLed(static_cast<double>(amount)/static_cast<double>(players[0].ReadyWeapon->ammo[AWeapon::PrimaryFire]->maxamount), 243, 155);
 
 		char ammo[16];
-		snprintf(ammo, sizeof(ammo), "%3d%%", amount);
+		sprintf(ammo, "%3d%%", amount);
 		DrawString(IndexFont, ammo, 252, 190, false, CR_LIGHTBLUE);
 	}
 

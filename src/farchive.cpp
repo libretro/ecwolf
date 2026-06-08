@@ -161,7 +161,7 @@ static FString M_ZLibError(int zerr)
 	else if (zerr < -6)
 	{
 		char out[16];
-		snprintf(out, sizeof(out), "%d", zerr);
+		sprintf(out, "%d", zerr);
 		return out;
 	}
 	else
