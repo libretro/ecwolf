@@ -184,9 +184,9 @@ HANDLE_PROPERTY(damage)
 			cls->Meta.SetMetaInt(AMETA_Damage, -1);
 		else
 		{
-			FString defFormula;
-			defFormula.Format("random(1,8)*%d", (int) dmg);
-			Scanner sc(defFormula.GetChars(), defFormula.Len());
+			char defFormula[64];
+			sprintf(defFormula, "random(1,8)*%d", (int) dmg);
+			Scanner sc(defFormula, strlen(defFormula));
 			cls->Meta.SetMetaInt(AMETA_Damage,
 				AActor::damageExpressions.Push(ExpressionNode::ParseExpression(defaults->GetClass(), TypeHierarchy::staticTypes, sc, NULL)));
 		}
@@ -541,11 +541,28 @@ HANDLE_PROPERTY(weaponslot)
 		I_Error("Valid slots range from 0 and 9.");
 
 	STRING_PARAM(firstWeapon, 1);
-	FString weaponsList = firstWeapon;
+	char weaponsList[1024];
+	size_t weaponsLen = 0;
+	weaponsList[0] = '\0';
+	{
+		size_t firstLen = strlen(firstWeapon);
+		if(firstLen >= sizeof(weaponsList))
+			firstLen = sizeof(weaponsList) - 1;
+		memcpy(weaponsList, firstWeapon, firstLen);
+		weaponsList[firstLen] = '\0';
+		weaponsLen = firstLen;
+	}
 	for(unsigned int i = 2;i < PARAM_COUNT;++i)
 	{
 		STRING_PARAM(weapon, i);
-		weaponsList << ' ' << weapon;
+		size_t weaponLen = strlen(weapon);
+		// Need room for a separating space, the weapon name, and the NUL.
+		if(weaponsLen + 1 + weaponLen >= sizeof(weaponsList))
+			break;
+		weaponsList[weaponsLen++] = ' ';
+		memcpy(weaponsList + weaponsLen, weapon, weaponLen);
+		weaponsLen += weaponLen;
+		weaponsList[weaponsLen] = '\0';
 	}
 
 	cls->Meta.SetMetaString(APMETA_Slot0 + slot, weaponsList);

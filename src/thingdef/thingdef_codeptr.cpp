@@ -388,13 +388,23 @@ ACTION_FUNCTION(A_ChangeFlag)
 	const bool countedSecret = !!(self->flags & FL_COUNTSECRET);
 	const bool countedItem = !!(self->flags & FL_COUNTITEM);
 
-	FString prefix;
-	if(flag.IndexOf(".") != -1)
+	// flag may be of the form "prefix.name"; split on the first '.' into an
+	// optional prefix and the flag name, using only plain C string ops.
+	const char *flagName = flag.GetChars();
+	const char *prefix = NULL;
+	char prefixBuffer[256];
+	const char *dot = strchr(flagName, '.');
+	if(dot != NULL)
 	{
-		prefix = flag.Left(flag.IndexOf("."));
-		flag = flag.Mid(flag.IndexOf(".")+1);
+		size_t prefixLen = (size_t)(dot - flagName);
+		if(prefixLen >= sizeof(prefixBuffer))
+			prefixLen = sizeof(prefixBuffer) - 1;
+		memcpy(prefixBuffer, flagName, prefixLen);
+		prefixBuffer[prefixLen] = '\0';
+		prefix = prefixBuffer;
+		flagName = dot + 1;
 	}
-	if(!ClassDef::SetFlag(self->GetClass(), self, prefix.GetChars(), flag.GetChars(), value))
+	if(!ClassDef::SetFlag(self->GetClass(), self, prefix, flagName, value))
 		return false;
 
 	const bool countsKill = !!(self->flags & FL_COUNTKILL);
