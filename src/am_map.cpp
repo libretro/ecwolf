@@ -629,9 +629,9 @@ void AutoMap::DrawStats() const
 
 	// The two stat strings (timer and kill/secret/treasure ratios) are short and
 	// are not live at the same time, so a single fixed stack buffer holds
-	// whichever one is being drawn, with no heap allocation or helper.
+	// whichever one is being drawn, with no heap allocation or helper. Each
+	// branch fills the buffer with sprintf before reading it.
 	char statString[128];
-	statString[0] = '\0';
 	unsigned int infHeight = 0;
 
 	if(amFlags & AMF_DispInfo)
