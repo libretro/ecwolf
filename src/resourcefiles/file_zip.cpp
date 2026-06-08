@@ -192,7 +192,19 @@ bool FZipFile::Open()
 		FZipCentralDirectoryInfo *zip_fh = (FZipCentralDirectoryInfo *)dirptr;
 
 		int len = LittleShort(zip_fh->NameLength);
-		FString name(dirptr + sizeof(FZipCentralDirectoryInfo), len);
+		/* The zip directory name is not NUL-terminated, so copy exactly len
+		** bytes into a bounded buffer and terminate it ourselves. Plain C
+		** strings only; LumpNameSetup constructs its argument implicitly from
+		** the const char* (and clamps to eight characters), as the other
+		** resource readers do. */
+		char name[1024];
+		int namelen = len;
+		if(namelen < 0)
+			namelen = 0;
+		if(namelen >= (int)sizeof(name))
+			namelen = (int)sizeof(name) - 1;
+		memcpy(name, dirptr + sizeof(FZipCentralDirectoryInfo), namelen);
+		name[namelen] = '\0';
 		dirptr += sizeof(FZipCentralDirectoryInfo) + 
 				  LittleShort(zip_fh->NameLength) + 
 				  LittleShort(zip_fh->ExtraLength) + 
@@ -205,7 +217,7 @@ bool FZipFile::Open()
 		}
 		
 		// skip Directories
-		if (name[len - 1] == '/' && LittleLong(zip_fh->UncompressedSize) == 0) 
+		if (namelen > 0 && name[namelen - 1] == '/' && LittleLong(zip_fh->UncompressedSize) == 0) 
 		{
 			skipped++;
 			continue;
@@ -233,8 +245,15 @@ bool FZipFile::Open()
 			continue;
 		}
 
-		FixPathSeperator(name);
-		name.ToLower();
+		{
+			int k;
+			for(k = 0; k < namelen; ++k)
+			{
+				if(name[k] == '\\')
+					name[k] = '/';
+				name[k] = (char)tolower((unsigned char)name[k]);
+			}
+		}
 
 		lump_p->LumpNameSetup(name);
 		lump_p->LumpSize = LittleLong(zip_fh->UncompressedSize);
