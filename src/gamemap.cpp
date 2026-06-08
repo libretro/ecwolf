@@ -65,8 +65,8 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), loadFailed(false)
 	markerLump = Wads.CheckNumForName(map);
 
 	// PK3 format maps
-	FString mapWad;
-	mapWad.Format("maps/%s.wad", map.GetChars());
+	char mapWad[64];
+	snprintf(mapWad, sizeof(mapWad), "maps/%s.wad", map.GetChars());
 
 	int wadLump = Wads.CheckNumForFullName(mapWad);
 	if(wadLump > markerLump)
@@ -89,7 +89,7 @@ GameMap::GameMap(const FString &map) : map(map), valid(false), loadFailed(false)
 	// Otherwise we open the relevent lumps.
 	if(isWad)
 	{
-		file = FResourceFile::OpenResourceFile(mapWad.GetChars(), Wads.ReopenLumpNum(markerLump));
+		file = FResourceFile::OpenResourceFile(mapWad, Wads.ReopenLumpNum(markerLump));
 		if(!file || file->LumpCount() < 2) // Maps must be 2 lumps in size
 		{
 			libretro_log("Map %s is in an unknown format.\n", map.GetChars());
