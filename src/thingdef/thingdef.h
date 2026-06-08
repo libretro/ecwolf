@@ -295,7 +295,7 @@ class ClassDef
 		unsigned int			ClassIndex;
 		MetaTable				Meta;
 
-		static bool	SetFlag(const ClassDef *newClass, AActor *instance, const FString &prefix, const FString &flagName, bool set);
+		static bool	SetFlag(const ClassDef *newClass, AActor *instance, const char *prefix, const char *flagName, bool set);
 	protected:
 		friend class DObject;
 		friend class StateLabel;

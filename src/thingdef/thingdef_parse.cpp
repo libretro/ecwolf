@@ -352,7 +352,7 @@ bool FDecorateParser::ParseActorFlag()
 		flagName = sc->str;
 	}
 
-	if(!ClassDef::SetFlag(newClass, (AActor*)newClass->defaultInstance, prefix, flagName, set))
+	if(!ClassDef::SetFlag(newClass, (AActor*)newClass->defaultInstance, prefix.GetChars(), flagName.GetChars(), set))
 	{
 		sc.ScriptMessage(Scanner::WARNING, "Unknown flag '%s' for actor '%s'.", flagName.GetChars(), newClass->name.GetChars());
 		return false;

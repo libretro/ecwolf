@@ -1042,16 +1042,32 @@ const Frame *ClassDef::ResolveStateIndex(unsigned int index) const
 	return &frameList[index];
 }
 
-bool ClassDef::SetFlag(const ClassDef *newClass, AActor *instance, const FString &prefix, const FString &flagName, bool set)
+// Case-insensitive comparison using only ISO C89 (tolower from <ctype.h>),
+// so it is safe on MSVC where strcasecmp is unavailable. Returns <0, 0, or >0
+// like strcmp.
+static int FlagNameCompareNoCase(const char *a, const char *b)
+{
+	for(;; ++a, ++b)
+	{
+		int ca = tolower((unsigned char)*a);
+		int cb = tolower((unsigned char)*b);
+		if(ca != cb)
+			return ca - cb;
+		if(ca == 0)
+			return 0;
+	}
+}
+
+bool ClassDef::SetFlag(const ClassDef *newClass, AActor *instance, const char *prefix, const char *flagName, bool set)
 {
 	int min = 0;
 	int max = sizeof(flags)/sizeof(FlagDef) - 1;
 	while(min <= max)
 	{
 		int mid = (min+max)/2;
-		int ret = flagName.CompareNoCase(flags[mid].name);
-		if(ret == 0 && !prefix.IsEmpty())
-			ret = prefix.CompareNoCase(flags[mid].prefix);
+		int ret = FlagNameCompareNoCase(flagName, flags[mid].name);
+		if(ret == 0 && prefix != NULL && prefix[0] != '\0')
+			ret = FlagNameCompareNoCase(prefix, flags[mid].prefix);
 
 		if(ret == 0)
 		{

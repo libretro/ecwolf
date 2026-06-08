@@ -394,7 +394,7 @@ ACTION_FUNCTION(A_ChangeFlag)
 		prefix = flag.Left(flag.IndexOf("."));
 		flag = flag.Mid(flag.IndexOf(".")+1);
 	}
-	if(!ClassDef::SetFlag(self->GetClass(), self, prefix, flag, value))
+	if(!ClassDef::SetFlag(self->GetClass(), self, prefix.GetChars(), flag.GetChars(), value))
 		return false;
 
 	const bool countsKill = !!(self->flags & FL_COUNTKILL);
