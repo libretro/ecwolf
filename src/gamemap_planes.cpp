@@ -1251,9 +1251,13 @@ void GameMap::ReadPlanesData()
 									++i;
 
 									const PalEntry c = GPalette.BaseColors[oldplane[i]>>8], f = GPalette.BaseColors[oldplane[i]&0xFF];
-									FString ceilingColor, floorColor;
-									ceilingColor.Format("#%02X%02X%02X", c.r, c.g, c.b);
-									floorColor.Format("#%02X%02X%02X", f.r, f.g, f.b);
+									// "#RRGGBB" is always seven characters plus the
+									// terminator, so format the two color names into
+									// fixed stack buffers and look them up directly,
+									// with no heap FString or Format helper.
+									char ceilingColor[8], floorColor[8];
+									sprintf(ceilingColor, "#%02X%02X%02X", c.r, c.g, c.b);
+									sprintf(floorColor, "#%02X%02X%02X", f.r, f.g, f.b);
 
 									defaultCeiling = TexMan.GetTexture(ceilingColor, FTexture::TEX_Flat);
 									defaultFloor = TexMan.GetTexture(floorColor, FTexture::TEX_Flat);
