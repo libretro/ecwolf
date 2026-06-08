@@ -33,7 +33,6 @@
 */
 
 #include "wl_def.h"
-#include "fstring_c.h"
 #include "am_map.h"
 #include "colormatcher.h"
 #include "id_ca.h"
@@ -628,8 +627,11 @@ void AutoMap::DrawStats() const
 	if(!(amFlags & (AMF_DispInfo|AMF_DispRatios)))
 		return;
 
-	FString_C statString;
-	FSTRING_C_INIT(&statString);
+	// The two stat strings (timer and kill/secret/treasure ratios) are short and
+	// are not live at the same time, so a single fixed stack buffer holds
+	// whichever one is being drawn, with no heap allocation or helper.
+	char statString[128];
+	statString[0] = '\0';
 	unsigned int infHeight = 0;
 
 	if(amFlags & AMF_DispInfo)
@@ -642,31 +644,29 @@ void AutoMap::DrawStats() const
 			TAG_DONE);
 
 		unsigned int seconds = gamestate.TimeCount/70;
-		FString_C_Format(&statString, "%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
+		sprintf(statString, "%02d:%02d:%02d", seconds/3600, (seconds%3600)/60, seconds%60);
 		V_DrawText(SmallFont, gameinfo.automap.FontColor,
 			screenWidth - (SmallFont->GetCharWidth('0')*6 + SmallFont->GetCharWidth(':')*2 + 2)*CleanXfac, CleanYfac,
-			FSTRING_C_GETCHARS(&statString),
+			statString,
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 	}
 
 	if(amFlags & AMF_DispRatios)
 	{
-		FString_C_Format(&statString, "K: %d/%d\nS: %d/%d\nT: %d/%d",
+		sprintf(statString, "K: %d/%d\nS: %d/%d\nT: %d/%d",
 			gamestate.killcount, gamestate.killtotal,
 			gamestate.secretcount, gamestate.secrettotal,
 			gamestate.treasurecount, gamestate.treasuretotal);
 
 		uint16_t sw, sh;
-		VW_MeasurePropString(SmallFont, FSTRING_C_GETCHARS(&statString), sw, sh);
+		VW_MeasurePropString(SmallFont, statString, sw, sh);
 		V_DimRect(GPalette.BlackIndex, 0.5f, 0, infHeight*CleanYfac, (sw+3)*CleanXfac, (sh+2)*CleanYfac);
 
-		V_DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, infHeight*CleanYfac, FSTRING_C_GETCHARS(&statString),
+		V_DrawText(SmallFont, gameinfo.automap.FontColor, 2*CleanXfac, infHeight*CleanYfac, statString,
 			DTA_CleanNoMove, true,
 			TAG_DONE);
 	}
-
-	FString_C_Release(&statString);
 }
 
 void AutoMap::DrawVector(const AMVectorPoint *points, unsigned int numPoints, fixed x, fixed y, fixed scale, angle_t angle, const Color &c) const
