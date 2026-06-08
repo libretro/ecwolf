@@ -121,7 +121,6 @@ void ConversationModule::ParseBlock(Scanner &sc, T &obj, bool (ConversationModul
 
 void ConversationModule::ParseConversation(Scanner &sc)
 {
-	FString key;
 
 	while(sc.TokensLeft())
 	{
