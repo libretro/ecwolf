@@ -67,13 +67,22 @@ FLumpFile::FLumpFile(const char *filename, FileReader *file) : FUncompressedFile
 
 bool FLumpFile::Open()
 {
-	FString name(Filename);
-	long lastSlash = name.LastIndexOf('/') > name.LastIndexOf('\\') ? name.LastIndexOf('/') : name.LastIndexOf('\\');
-	long dot = name.LastIndexOf('.');
-	if(lastSlash != -1)
-		name = name.Mid(lastSlash+1, dot-lastSlash-1);
-	else if(dot != -1)
-		name = name.Mid(0, dot);
+	/* Derive the lump name from the file name using plain C strings: find the last
+	** path separator and the last dot, then copy the basename (without
+	** extension) into a bounded buffer. uppercopy takes a const char* and the
+	** result is clamped to eight characters via Lumps->Name[8] = 0 below. Only
+	** ISO C89 string functions are used (strrchr, strlen, memcpy). */
+	const char *slashFwd = strrchr(Filename, '/');
+	const char *slashBack = strrchr(Filename, '\\');
+	const char *lastSlash = slashFwd > slashBack ? slashFwd : slashBack;
+	const char *dot = strrchr(Filename, '.');
+	const char *base = lastSlash != NULL ? lastSlash + 1 : Filename;
+	size_t len = dot != NULL && dot >= base ? (size_t)(dot - base) : strlen(base);
+	char name[256];
+	if(len >= sizeof(name))
+		len = sizeof(name) - 1;
+	memcpy(name, base, len);
+	name[len] = '\0';
 
 	Lumps = new FUncompressedLump[1];	// must use array allocator
 	uppercopy(Lumps->Name, name);
