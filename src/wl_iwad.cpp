@@ -505,6 +505,23 @@ static void CheckForExpansionRequirements(TArray<WadStuff> &iwads)
 	}
 }
 
+// Case-insensitive comparison of an IWADINFO key against a literal, using only
+// ISO C89 facilities so the parser does not need the string class or any
+// platform-specific case-insensitive compare.
+static bool IWadKeyEquals(const char *key, const char *literal)
+{
+	size_t i;
+	for(i = 0;;++i)
+	{
+		int a = tolower((unsigned char)key[i]);
+		int b = tolower((unsigned char)literal[i]);
+		if(a != b)
+			return false;
+		if(a == '\0')
+			return true;
+	}
+}
+
 static IWadData ParseIWad(Scanner &sc)
 {
 	IWadData iwad = {};
@@ -513,9 +530,17 @@ static IWadData ParseIWad(Scanner &sc)
 	while(!sc.CheckToken('}'))
 	{
 		sc.MustGetToken(TK_Identifier);
-		FString key = sc->str;
+		char key[64];
+		{
+			const char *src = sc->str.GetChars();
+			size_t keyLen = strlen(src);
+			if(keyLen >= sizeof(key))
+				keyLen = sizeof(key) - 1;
+			memcpy(key, src, keyLen);
+			key[keyLen] = '\0';
+		}
 		sc.MustGetToken('=');
-		if(key.CompareNoCase("Flags") == 0)
+		if(IWadKeyEquals(key, "Flags"))
 		{
 			do
 			{
@@ -533,29 +558,29 @@ static IWadData ParseIWad(Scanner &sc)
 			}
 			while(sc.CheckToken(','));
 		}
-		else if(key.CompareNoCase("Game") == 0)
+		else if(IWadKeyEquals(key, "Game"))
 		{
 			// This specifies a filter to be used for switching between things
 			// like environment sounds.
 			sc.MustGetToken(TK_StringConst);
 			iwad.Game = sc->str;
 		}
-		else if(key.CompareNoCase("Name") == 0)
+		else if(IWadKeyEquals(key, "Name"))
 		{
 			sc.MustGetToken(TK_StringConst);
 			iwad.Name = sc->str;
 		}
-		else if(key.CompareNoCase("Autoname") == 0)
+		else if(IWadKeyEquals(key, "Autoname"))
 		{
 			sc.MustGetToken(TK_StringConst);
 			iwad.Autoname = sc->str;
 		}
-		else if(key.CompareNoCase("Mapinfo") == 0)
+		else if(IWadKeyEquals(key, "Mapinfo"))
 		{
 			sc.MustGetToken(TK_StringConst);
 			iwad.Mapinfo = sc->str;
 		}
-		else if(key.CompareNoCase("MustContain") == 0)
+		else if(IWadKeyEquals(key, "MustContain"))
 		{
 			do
 			{
@@ -564,7 +589,7 @@ static IWadData ParseIWad(Scanner &sc)
 			}
 			while(sc.CheckToken(','));
 		}
-		else if(key.CompareNoCase("Required") == 0)
+		else if(IWadKeyEquals(key, "Required"))
 		{
 			do
 			{
