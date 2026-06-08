@@ -594,8 +594,13 @@ void FDecorateParser::ParseActorStateAction(StateDefinition &thisState, int func
 						{
 							if(thisState.frames.Len() > 1)
 								sc.ScriptMessage(Scanner::ERROR, "State offsets not allowed on multistate definitions.");
-							FString label;
-							label.Format("%d", sc->number);
+							// Build the numeric state label in a small fixed
+							// stack buffer; StateLabel takes const FString& and
+							// FString is constructible from char*, so this drops
+							// a heap FString and the Format helper with no change
+							// in behavior.
+							char label[16];
+							sprintf(label, "%d", sc->number);
 							val.label = StateLabel(label, newClass);
 						}
 						else
