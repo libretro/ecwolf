@@ -248,7 +248,7 @@ void MultipleChoiceMenuItem::right()
 	SD_PlaySound("menu/move1");
 }
 
-TextInputMenuItem::TextInputMenuItem(const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener), bool clearFirst) : MenuItem("", posteditListener), clearFirst(clearFirst), max(max), preeditListener(preeditListener)
+TextInputMenuItem::TextInputMenuItem(const char *text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener), MENU_LISTENER_PROTOTYPE(posteditListener), bool clearFirst) : MenuItem("", posteditListener), clearFirst(clearFirst), max(max), preeditListener(preeditListener)
 {
 	setValue(text);
 }

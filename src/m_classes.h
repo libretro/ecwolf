@@ -162,7 +162,7 @@ class TextInputMenuItem : public MenuItem
 		 * @param preeditListener Executed before editing the information, if returns false the field will not be edited.
 		 * @param posteditListener Execued after editing the information.
 		 */
-		TextInputMenuItem(const FString &text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false);
+		TextInputMenuItem(const char *text, unsigned int max, MENU_LISTENER_PROTOTYPE(preeditListener)=NULL, MENU_LISTENER_PROTOTYPE(posteditListener)=NULL, bool clearFirst=false);
 
 		// activate() inherits the base no-op until non-blocking text entry is
 		// implemented for the libretro port.
