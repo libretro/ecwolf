@@ -295,18 +295,18 @@ static const int ninestbl[10] = {
 
 void WolfStatusBar::LatchNumber (int x, int y, unsigned width, int32_t number, bool zerofill, bool cap)
 {
-	FString str;
+	char str[64];
 	if(zerofill)
-		str.Format("%0*d", width, number);
+		sprintf(str, "%0*d", width, number);
 	else
-		str.Format("%*d", width, number);
-	if(str.Len() > width && cap)
+		sprintf(str, "%*d", width, number);
+	if(strlen(str) > width && cap)
 	{
 		int maxval = width <= 9 ? ninestbl[width] : INT_MAX;
-		str.Format("%d", maxval);
+		sprintf(str, "%d", maxval);
 	}
 
-	LatchString(x, y, width, str.GetChars());
+	LatchString(x, y, width, str);
 }
 
 void WolfStatusBar::LatchString (int x, int y, unsigned width, const char *str)
@@ -358,9 +358,9 @@ void WolfStatusBar::DrawHealth (void)
 void WolfStatusBar::DrawLevel (void)
 {
 	if((viewsize == 21 && ingame) || !StatusBarConfig.Floor.Enabled) return;
-	FString str;
-	str.Format("%*s", StatusBarConfig.Floor.Digits, levelInfo->FloorNumber.GetChars());
-	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,str.GetChars());
+	char str[256];
+	sprintf(str, "%*s", StatusBarConfig.Floor.Digits, levelInfo->FloorNumber.GetChars());
+	LatchString (StatusBarConfig.Floor.X,StatusBarConfig.Floor.Y,StatusBarConfig.Floor.Digits,str);
 }
 
 //===========================================================================
@@ -561,72 +561,81 @@ void WolfStatusBar::SetupStatusbar()
 		while(sc.TokensLeft())
 		{
 			sc.MustGetToken(TK_Identifier);
-			FString key = sc->str;
-			key.ToLower();
+			char key[128];
+			{
+				const char *src = sc->str.GetChars();
+				size_t keyLen = strlen(src);
+				size_t ki;
+				if(keyLen >= sizeof(key))
+					keyLen = sizeof(key) - 1;
+				for(ki = 0;ki < keyLen;++ki)
+					key[ki] = (char)tolower((unsigned char)src[ki]);
+				key[keyLen] = '\0';
+			}
 			sc.MustGetToken('=');
 			sc.MustGetToken(TK_IntConst);
 			unsigned int value = sc->number;
 
 			LatchConfig *var = NULL;
-			FString extrakey;
-			if(key.IndexOf("ammo") == 0)
+			const char *extrakey = "";
+			if(strncmp(key, "ammo", 4) == 0)
 			{
-				extrakey = key.Mid(4);
+				extrakey = key + 4;
 				var = &StatusBarConfig.Ammo;
 			}
-			else if(key.IndexOf("floor") == 0)
+			else if(strncmp(key, "floor", 5) == 0)
 			{
-				extrakey = key.Mid(5);
+				extrakey = key + 5;
 				var = &StatusBarConfig.Floor;
 			}
-			else if(key.IndexOf("health") == 0)
+			else if(strncmp(key, "health", 6) == 0)
 			{
-				extrakey = key.Mid(6);
+				extrakey = key + 6;
 				var = &StatusBarConfig.Health;
 			}
-			else if(key.IndexOf("items") == 0)
+			else if(strncmp(key, "items", 5) == 0)
 			{
-				extrakey = key.Mid(5);
+				extrakey = key + 5;
 				var = &StatusBarConfig.Items;
 			}
-			else if(key.IndexOf("keys") == 0)
+			else if(strncmp(key, "keys", 4) == 0)
 			{
-				extrakey = key.Mid(4);
+				extrakey = key + 4;
 				var = &StatusBarConfig.Keys;
 			}
-			else if(key.IndexOf("lives") == 0)
+			else if(strncmp(key, "lives", 5) == 0)
 			{
-				extrakey = key.Mid(5);
+				extrakey = key + 5;
 				var = &StatusBarConfig.Lives;
 			}
-			else if(key.IndexOf("mugshot") == 0)
+			else if(strncmp(key, "mugshot", 7) == 0)
 			{
-				extrakey = key.Mid(7);
+				extrakey = key + 7;
 				var = &StatusBarConfig.Mugshot;
 			}
-			else if(key.IndexOf("score") == 0)
+			else if(strncmp(key, "score", 5) == 0)
 			{
-				extrakey = key.Mid(5);
+				extrakey = key + 5;
 				var = &StatusBarConfig.Score;
 			}
-			else if(key.IndexOf("weapon") == 0)
+			else if(strncmp(key, "weapon", 6) == 0)
 			{
-				extrakey = key.Mid(6);
+				extrakey = key + 6;
 				var = &StatusBarConfig.Weapon;
 			}
 			else
-				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key.GetChars());
+				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key);
 
-			if(extrakey.Compare("enabled") == 0)
+			if(strcmp(extrakey, "enabled") == 0)
 				var->Enabled = value;
-			else if(extrakey.Compare("digits") == 0)
+			else if(strcmp(extrakey, "digits") == 0)
 				var->Digits = value;
-			else if(extrakey.Compare("x") == 0)
+			else if(strcmp(extrakey, "x") == 0)
 				var->X = value;
-			else if(extrakey.Compare("y") == 0)
+			else if(strcmp(extrakey, "y") == 0)
 				var->Y = value;
 			else
-				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key.GetChars());
+				sc.ScriptMessage(Scanner::ERROR, "Unknown key '%s'.\n", key);
 		}
 	}
 }
