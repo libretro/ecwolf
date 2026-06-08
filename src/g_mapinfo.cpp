@@ -200,6 +200,18 @@ protected:
 		dest = sc->str;
 	}
 
+	// Parse a "= <string>" assignment and return the value as a C string for
+	// callers that only feed it straight into a const char* API (texture and
+	// font lookups). The pointer is owned by the scanner's current token and is
+	// valid until the next token is read, which is fine for immediate use. This
+	// avoids a throwaway FString temporary on those paths.
+	const char *ParseStringValue()
+	{
+		sc.MustGetToken('=');
+		sc.MustGetToken(TK_StringConst);
+		return sc->str.GetChars();
+	}
+
 	void ParseNameAssignment(FName &dest)
 	{
 		sc.MustGetToken('=');
@@ -425,21 +437,15 @@ protected:
 			ParseNext(mapInfo.NextVictory);
 		else if(key.CompareNoCase("bordertexture") == 0)
 		{
-			FString textureName;
-			ParseStringAssignment(textureName);
-			mapInfo.BorderTexture = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
+			mapInfo.BorderTexture = TexMan.GetTexture(ParseStringValue(), FTexture::TEX_Flat);
 		}
 		else if(key.CompareNoCase("defaultfloor") == 0)
 		{
-			FString textureName;
-			ParseStringAssignment(textureName);
-			mapInfo.DefaultTexture[MapSector::Floor] = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
+			mapInfo.DefaultTexture[MapSector::Floor] = TexMan.GetTexture(ParseStringValue(), FTexture::TEX_Flat);
 		}
 		else if(key.CompareNoCase("defaultceiling") == 0)
 		{
-			FString textureName;
-			ParseStringAssignment(textureName);
-			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(textureName, FTexture::TEX_Flat);
+			mapInfo.DefaultTexture[MapSector::Ceiling] = TexMan.GetTexture(ParseStringValue(), FTexture::TEX_Flat);
 		}
 		else if(key.CompareNoCase("DefaultLighting") == 0)
 			ParseIntAssignment(mapInfo.DefaultLighting);
@@ -519,9 +525,7 @@ protected:
 			ParseBoolAssignment(mapInfo.ForceTally);
 		else if(key.CompareNoCase("HighScoresGraphic") == 0)
 		{
-			FString texName;
-			ParseStringAssignment(texName);
-			mapInfo.HighScoresGraphic = TexMan.CheckForTexture(texName, FTexture::TEX_Any);
+			mapInfo.HighScoresGraphic = TexMan.CheckForTexture(ParseStringValue(), FTexture::TEX_Any);
 		}
 		else if(key.CompareNoCase("LevelBonus") == 0)
 			ParseIntAssignment(mapInfo.LevelBonus);
@@ -549,9 +553,7 @@ protected:
 			mapInfo.SpawnWithWeaponRaised = true;
 		else if(key.CompareNoCase("TitlePatch") == 0)
 		{
-			FString textureName;
-			ParseStringAssignment(textureName);
-			mapInfo.TitlePatch = TexMan.GetTexture(textureName, FTexture::TEX_Any);
+			mapInfo.TitlePatch = TexMan.GetTexture(ParseStringValue(), FTexture::TEX_Any);
 		}
 		else if(key.CompareNoCase("Translator") == 0)
 			ParseStringAssignment(mapInfo.Translator);
@@ -843,9 +845,7 @@ protected:
 			ParseStringAssignment(episode.EpisodePicture);
 		else if(key.CompareNoCase("key") == 0)
 		{
-			FString tmp;
-			ParseStringAssignment(tmp);
-			episode.Shortcut = tmp[0];
+			episode.Shortcut = ParseStringValue()[0];
 		}
 		else if(key.CompareNoCase("remove") == 0)
 			useEpisode = false;
@@ -958,9 +958,7 @@ protected:
 			ParseFontColorAssignment(cluster->TextColor);
 		else if(sc->str.CompareNoCase("textfont") == 0)
 		{
-			FString fontName;
-			ParseStringAssignment(fontName);
-			cluster->TextFont = V_GetFont(fontName);
+			cluster->TextFont = V_GetFont(ParseStringValue());
 		}
 		else
 			return false;
@@ -1346,9 +1344,7 @@ protected:
 				ParseTicAssignment(textscreen->TextDelay);
 			else if(sc->str.CompareNoCase("TextFont") == 0)
 			{
-				FString fontName;
-				ParseStringAssignment(fontName);
-				textscreen->TextFont = V_GetFont(fontName);
+				textscreen->TextFont = V_GetFont(ParseStringValue());
 			}
 			else if(sc->str.CompareNoCase("TextSpeed") == 0)
 				ParseTicAssignment(textscreen->TextSpeed);
