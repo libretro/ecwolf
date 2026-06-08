@@ -417,7 +417,7 @@ FFont::FFont (const char *name, const char *nametemplate, int first, int count, 
 {
 	int i;
 	FTextureID lump;
-	FString buffer;
+	char buffer[256];
 	FTexture **charlumps;
 	int maxyoffs;
 	bool stcfn121 = false;
@@ -440,9 +440,9 @@ FFont::FFont (const char *name, const char *nametemplate, int first, int count, 
 	for (i = 0; i < count; i++)
 	{
 		charlumps[i] = NULL;
-		buffer.Format (nametemplate, i + start);
+		sprintf (buffer, nametemplate, i + start);
 
-		lump = TexMan.CheckForTexture(buffer.GetChars(), FTexture::TEX_MiscPatch);
+		lump = TexMan.CheckForTexture(buffer, FTexture::TEX_MiscPatch);
 
 		if (lump.isValid())
 		{
