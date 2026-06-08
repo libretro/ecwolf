@@ -132,9 +132,9 @@ void Language::SetupBlakeStrings(const char* lumpname, const char* prefix)
 	{
 		if(data[pos] == '^' && ReadNativeShort((uint8_t*) data+pos+1) == endToken)
 		{
-			FString name;
+			char name[256];
 			FString str(data+start, pos-start);
-			name.Format("%s%d", prefix, num++);
+			sprintf(name, "%s%d", prefix, num++);
 
 			strings[name] = str;
 
