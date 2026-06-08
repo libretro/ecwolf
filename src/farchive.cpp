@@ -160,8 +160,8 @@ static FString M_ZLibError(int zerr)
 	}
 	else if (zerr < -6)
 	{
-		FString out;
-		out.Format("%d", zerr);
+		char out[16];
+		snprintf(out, sizeof(out), "%d", zerr);
 		return out;
 	}
 	else

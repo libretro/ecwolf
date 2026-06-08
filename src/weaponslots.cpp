@@ -56,9 +56,10 @@ bool FWeaponSlot::AddWeapon(const ClassDef *type)
 
 void FWeaponSlot :: AddWeaponList(const char *list, bool clear)
 {
-	FString copy(list);
-	char *buff = copy.LockBuffer();
+	char *buff = (char *)malloc(strlen(list) + 1);
 	char *tok;
+
+	strcpy(buff, list);
 
 	if (clear)
 	{
@@ -70,6 +71,7 @@ void FWeaponSlot :: AddWeaponList(const char *list, bool clear)
 		AddWeapon(tok);
 		tok = strtok(NULL, " ");
 	}
+	free(buff);
 }
 
 //===========================================================================

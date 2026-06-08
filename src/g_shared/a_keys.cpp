@@ -141,12 +141,12 @@ static const char * keywords_lock[]={
 	"LOCKEDSOUND",
 	NULL
 };
-static int MatchString(const FString &token, const char* keywords[])
+static int MatchString(const char *token, const char* keywords[])
 {
 	int i = 0;
 	do
 	{
-		if(token.CompareNoCase(*keywords) == 0)
+		if(strcasecmp(token, *keywords) == 0)
 			return i;
 		++i;
 	}
@@ -263,7 +263,7 @@ static void ParseLock(Scanner &sc)
 	while (!sc.CheckToken('}'))
 	{
 		sc.MustGetToken(TK_Identifier);
-		switch(i = MatchString(sc->str, keywords_lock))
+		switch(i = MatchString(sc->str.GetChars(), keywords_lock))
 		{
 		case 0:	// Any
 			keygroup = ParseKeygroup(sc);
