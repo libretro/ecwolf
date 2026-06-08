@@ -76,7 +76,7 @@ void Config::CreateSetting(const FName index, double defaultFloat)
 	}
 }
 
-void Config::CreateSetting(const FName index, FString defaultString)
+void Config::CreateSetting(const FName index, const char *defaultString)
 {
 	SettingsData *data;
 	if(!FindIndex(index, data))

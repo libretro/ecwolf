@@ -2113,7 +2113,7 @@ void ReadConfig(void)
 
 		config.CreateSetting(hsName, Scores[i].name);
 		config.CreateSetting(hsScore, (int)Scores[i].score);
-		config.CreateSetting(hsCompleted, Scores[i].completed);
+		config.CreateSetting(hsCompleted, Scores[i].completed.GetChars());
 		config.CreateSetting(hsGraphic, Scores[i].graphic);
 
 		// Scores[i].name is char[MaxHighName+1]; the config value is external

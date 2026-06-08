@@ -86,7 +86,7 @@ class Config
 		void			CreateSetting(const FName index, int defaultInt);
 		void			CreateSetting(const FName index, unsigned int defaultInt) { CreateSetting(index, (int)defaultInt); }
 		void			CreateSetting(const FName index, double defaultFloat);
-		void			CreateSetting(const FName index, FString defaultString);
+		void			CreateSetting(const FName index, const char *defaultString);
 		void			DeleteSetting(const FName index);
 
 		FString			GetConfigDir() const { return configDir; }
