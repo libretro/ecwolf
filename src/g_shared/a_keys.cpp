@@ -141,12 +141,28 @@ static const char * keywords_lock[]={
 	"LOCKEDSOUND",
 	NULL
 };
+static int MatchStringNoCase(const char *a, const char *b)
+{
+	/* Case-insensitive compare using only ISO C89 (tolower from <ctype.h>);
+	** avoids the non-standard stricmp/strcasecmp. Returns 0 when equal. */
+	while(*a != '\0' && *b != '\0')
+	{
+		int ca = tolower((unsigned char)*a);
+		int cb = tolower((unsigned char)*b);
+		if(ca != cb)
+			return ca - cb;
+		++a;
+		++b;
+	}
+	return tolower((unsigned char)*a) - tolower((unsigned char)*b);
+}
+
 static int MatchString(const char *token, const char* keywords[])
 {
 	int i = 0;
 	do
 	{
-		if(strcasecmp(token, *keywords) == 0)
+		if(MatchStringNoCase(token, *keywords) == 0)
 			return i;
 		++i;
 	}
