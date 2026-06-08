@@ -225,14 +225,14 @@ SoundIndex SoundInformation::FindSound(const char* logical) const
 	return SoundIndex(index->index);
 }
 
-int SoundInformation::GetMusicLumpNum(FString song) const
+int SoundInformation::GetMusicLumpNum(const char *song) const
 {
 	const int lump = Wads.CheckNumForName(song, ns_music);
 	const int wad = Wads.GetLumpFile(lump);
 
 	const MusicData *alias = MusicAliases.CheckKey(FName(song, true));
 	if(alias && wad <= alias->WadNum)
-		return GetMusicLumpNum(alias->Name);
+		return GetMusicLumpNum(alias->Name.GetChars());
 
 	return lump;
 }

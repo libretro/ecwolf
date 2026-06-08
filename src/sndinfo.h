@@ -113,7 +113,7 @@ class SoundInformation
 		const SoundData	&operator[] (const char* logical) const { return operator[](FindSound(logical)); }
 		const SoundData	&operator[] (const SoundIndex &index) const;
 		uint32_t		GetLastPlayTick(const SoundData &sound) const { return lastPlayTicks[sound.index]; }
-		int				GetMusicLumpNum(FString song) const;
+		int				GetMusicLumpNum(const char *song) const;
 		void			SetLastPlayTick(const SoundData &sound, uint32_t value) const { lastPlayTicks[sound.index] = value; }
 
 	protected:
