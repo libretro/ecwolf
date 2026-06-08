@@ -1,5 +1,4 @@
 #include "wl_def.h"
-#include "fstring_c.h"
 #include "wl_play.h"
 #include "am_map.h"
 #include "id_in.h"
@@ -68,11 +67,19 @@ void VWB_DrawPropStringWrap(unsigned int wrapWidth, unsigned int wrapHeight, FFo
 		cx += font->GetCharWidth(ch);
 		if(cx > wrapWidth)
 		{
-			FString_C part;
-			FSTRING_C_INIT(&part);
-			FString_C_InitSubstr(&part, lineStart, static_cast<size_t>(lastBreak-lineStart));
-			VWB_DrawPropString(font, FSTRING_C_GETCHARS(&part), translation, stencil, stencilcolor);
-			FString_C_Release(&part);
+			// Copy the wrapped line segment into a fixed stack buffer with an
+			// explicit bound (a single wrapped line is short; an overlong
+			// segment is truncated rather than overflowing) and draw it
+			// directly, with no heap allocation or helper.
+			char part[512];
+			{
+				size_t partLen = static_cast<size_t>(lastBreak - lineStart);
+				if(partLen > sizeof(part) - 1)
+					partLen = sizeof(part) - 1;
+				memcpy(part, lineStart, partLen);
+				part[partLen] = '\0';
+			}
+			VWB_DrawPropString(font, part, translation, stencil, stencilcolor);
 
 			lineStart = lastBreak;
 			cx -= lastBreakX;
