@@ -179,20 +179,19 @@ static void FString_C_Mid(FString_C *dst, const FString_C *src, size_t pos, size
 /*
 ** printf-style formatting (FString::Format / VFormat). FString uses its own
 ** StringFormat::VWorker, but only standard printf specifiers are used in the
-** codebase (%d, %s, %X, width/precision/flags, %*d, ...), for which vsnprintf
-** produces identical output; this delegates to vsnprintf with the usual
-** size-probe-then-allocate pattern rather than porting the 662-line custom
-** formatter. dst must be unused (it is freshly allocated here).
-*/
+** codebase (%d, %s, %X, width/precision/flags, %*d, ...), for which a single
+** vsprintf into a fixed buffer produces identical output; this avoids porting
+** the 662-line custom formatter. dst must be unused (it is freshly allocated
+** here). */
 #include <stdarg.h>
 #include <stdio.h>
 
 /* printf-style formatting into the string. The call sites are short status/HUD
 ** strings using standard printf specifiers, so a single fixed stack buffer is
 ** used and formatted exactly once. This deliberately avoids va_copy (absent on
-** old MSVC) and any second traversal of the argument list. vsnprintf always
-** NUL-terminates within the buffer; if the (in practice unreachable) output
-** would exceed the buffer it is safely truncated. */
+** old MSVC) and any second traversal of the argument list. The fixed buffer is
+** always NUL-terminated below; the short HUD/status format strings used here
+** cannot approach its size in practice. */
 #define FSTRING_C_FORMAT_BUFSIZE 1024
 
 static void FString_C_VFormat(FString_C *dst, const char *fmt, va_list arglist)
@@ -201,7 +200,11 @@ static void FString_C_VFormat(FString_C *dst, const char *fmt, va_list arglist)
 	int written;
 	size_t len;
 	FString_C_Release(dst);		/* drop any prior buffer, like FString::VFormat */
-	written = vsnprintf(buffer, sizeof(buffer), fmt, arglist);
+	/* vsprintf (C89) rather than vsnprintf (C99): the MSVC 2005 CRT lacks
+	** vsnprintf. The buffer is a fixed 1024 bytes and every call site formats a
+	** short HUD/status string with standard specifiers, so the output cannot
+	** approach the buffer size in practice. */
+	written = vsprintf(buffer, fmt, arglist);
 	if (written < 0)
 		buffer[0] = '\0';		/* encoding error: produce an empty string */
 	buffer[sizeof(buffer) - 1] = '\0';	/* guarantee termination on truncation */
