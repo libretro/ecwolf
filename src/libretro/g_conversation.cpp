@@ -118,9 +118,9 @@ bool quizHandle(wl_state_t *state, const wl_input_state_t *input)
 	{
 		int answer = state->quizMenu->getCurrentPosition();
 		const Choice &choice = state->quizPage->Choices[answer];
-		FString response = choice.YesMessage;
+		const char *response = choice.YesMessage.GetChars();
 		if(response[0] == '$')
-			response = language[response.Mid(1)];
+			response = language[response + 1];
 		GiveConversationItem(players[0].mo, choice.GiveItem);
 
 		state->quizMenu->drawBackground();
