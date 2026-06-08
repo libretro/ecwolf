@@ -271,9 +271,9 @@ static bool ShowTextScreen(TextScreenIntermissionAction *textscreen, bool demoMo
 	{
 		px = textscreen->PrintX;
 
-		FString str = textscreen->Text[i];
+		const char *str = textscreen->Text[i].GetChars();
 		if(str[0] == '$')
-			str = language[str.Mid(1)];
+			str = language[str + 1];
 
 		DrawMultiLineText(str, textscreen->TextFont, textscreen->TextColor, textscreen->Alignment, textscreen->Anchor);
 	}

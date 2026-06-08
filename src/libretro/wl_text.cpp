@@ -678,43 +678,64 @@ static void ShowBriefing(FString str)
 	}
 	py = 8;
 
-	DrawMultiLineText(str, font, textcolor, alignment, anchor);
+	DrawMultiLineText(str.GetChars(), font, textcolor, alignment, anchor);
 }
 
-void DrawMultiLineText(const FString str, FFont *font, EColorRange color, ETSAlignment align, ETSAnchor anchor)
+void DrawMultiLineText(const char *str, FFont *font, EColorRange color, ETSAlignment align, ETSAnchor anchor)
 {
 	int oldpa = pa;
 	pa = anchor;
 
 	const int basepx = px;
-	long pos = -1, oldpos;
-	do
+
+	/* Split on '\n' using plain C strings. Work on a mutable copy so each
+	** line can be NUL-terminated in place and handed to the const char*
+	** drawing routines; this avoids owning-string substring helpers and imposes no
+	** length limit on a line. */
+	size_t len = strlen(str);
+	char *buf = (char *)malloc(len + 1);
+	if(buf == NULL)
 	{
-		oldpos = pos+1;
-		pos = str.IndexOf('\n', oldpos);
-		const FString line = str.Mid(oldpos, pos - oldpos);
-
-		uint16_t width, height;
-		VW_MeasurePropString(font, line, width, height);
-
-		switch(align)
-		{
-			default:
-				px = basepx;
-				break;
-			case TS_Right:
-				px = basepx - width;
-				break;
-			case TS_Center:
-				px = basepx - width/2;
-				break;
-		}
-
-		VWB_DrawPropString(font, line, color);
-
-		py += font->GetHeight();
+		pa = oldpa;
+		return;
 	}
-	while(pos != -1);
+	memcpy(buf, str, len + 1);
+
+	{
+		char *linestart = buf;
+		for(;;)
+		{
+			char *nl = strchr(linestart, '\n');
+			if(nl != NULL)
+				*nl = '\0';
+
+			uint16_t width, height;
+			VW_MeasurePropString(font, linestart, width, height);
+
+			switch(align)
+			{
+				default:
+					px = basepx;
+					break;
+				case TS_Right:
+					px = basepx - width;
+					break;
+				case TS_Center:
+					px = basepx - width/2;
+					break;
+			}
+
+			VWB_DrawPropString(font, linestart, color);
+
+			py += font->GetHeight();
+
+			if(nl == NULL)
+				break;
+			linestart = nl + 1;
+		}
+	}
+
+	free(buf);
 
 	pa = oldpa;
 }

@@ -24,7 +24,7 @@ enum ETSAnchor
 	TS_Bottom = MENU_BOTTOM
 };
 
-extern void DrawMultiLineText(const FString str, FFont *font, EColorRange color, ETSAlignment align, ETSAnchor anchor);
+extern void DrawMultiLineText(const char *str, FFont *font, EColorRange color, ETSAlignment align, ETSAnchor anchor);
 
 // HelpScreens is declared in the libretro state_machine.h (needs wl_state_t).
 
