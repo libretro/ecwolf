@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <ivorbisfile.h>
+#include "ivorbisfile.h"
 
 int OggIsOgg(const uint8_t *mem, size_t size)
 {

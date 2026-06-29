@@ -230,7 +230,13 @@ SOURCES_C += $(DEPS_LZMA_C)
 # int16 mixer with no float->int16 conversion anywhere on the path. id_sd_ogg.c
 # is the shared decode helper both the SFX and music paths call.
 TREMOR_DIR := $(CORE_DIR)/src/libretro/deps/tremor
-INCFLAGS   += -I$(TREMOR_DIR) -I$(TREMOR_DIR)/ogg
+# Only expose deps/tremor/include on the angle-bracket search path (it holds
+# just <ogg/*.h>). Deliberately do NOT add $(TREMOR_DIR) itself: on a
+# case-insensitive filesystem (macOS) Tremor's block.h would otherwise satisfy
+# a system <Block.h> include and get parsed standalone. Tremor's own sources
+# reach their siblings (misc.h, block.h, ...) through quote includes, which
+# already search each file's own directory.
+INCFLAGS   += -I$(TREMOR_DIR)/include
 SOURCES_C += \
 	$(TREMOR_DIR)/bitwise.c \
 	$(TREMOR_DIR)/framing.c \

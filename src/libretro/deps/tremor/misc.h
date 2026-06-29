@@ -41,6 +41,29 @@
 #include <sys/types.h>
 #endif
 
+/* Some toolchains (the Android NDK on arm64, several console SDKs such as the
+ * PS2 EE, ...) do not expose the BSD endian macros through <sys/types.h>. When
+ * BYTE_ORDER, LITTLE_ENDIAN and BIG_ENDIAN are all undefined the preprocessor
+ * treats each as 0, so BOTH comparisons below become 0==0 and "union magic" is
+ * defined twice (a redefinition error). Derive the macros from the compiler's
+ * own endianness when they are missing so exactly one branch is taken. */
+#if !defined(BYTE_ORDER) || !defined(LITTLE_ENDIAN) || !defined(BIG_ENDIAN)
+#  undef BYTE_ORDER
+#  undef LITTLE_ENDIAN
+#  undef BIG_ENDIAN
+#  define LITTLE_ENDIAN 1234
+#  define BIG_ENDIAN    4321
+#  if (defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && \
+       (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)) || \
+      defined(__BIG_ENDIAN__) || defined(_BIG_ENDIAN) || \
+      defined(__ARMEB__) || defined(__MIPSEB__) || defined(__PPC__) || \
+      defined(__powerpc__)
+#    define BYTE_ORDER BIG_ENDIAN
+#  else
+#    define BYTE_ORDER LITTLE_ENDIAN
+#  endif
+#endif
+
 #if BYTE_ORDER==LITTLE_ENDIAN
 union magic {
   struct {
