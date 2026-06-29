@@ -224,11 +224,30 @@ else
 endif
 
 SOURCES_C += $(DEPS_LZMA_C)
-# Ogg Vorbis decoder (stb_vorbis, public domain) plus the shared decode helper,
-# used for Ogg sound effects and music tracks.
+# Ogg Vorbis decoder used for Ogg sound effects and music tracks. Tremor
+# (libvorbisidec) is the fixed-point Vorbis decoder; together with libogg's
+# bitstream framing it gives a deterministic integer-only decode that feeds the
+# int16 mixer with no float->int16 conversion anywhere on the path. id_sd_ogg.c
+# is the shared decode helper both the SFX and music paths call.
+TREMOR_DIR := $(CORE_DIR)/src/libretro/deps/tremor
+INCFLAGS   += -I$(TREMOR_DIR) -I$(TREMOR_DIR)/ogg
 SOURCES_C += \
-	$(CORE_DIR)/src/libretro/deps/stb/stb_vorbis_impl.c \
-	$(CORE_DIR)/src/libretro/deps/stb/id_sd_ogg.c
+	$(TREMOR_DIR)/bitwise.c \
+	$(TREMOR_DIR)/framing.c \
+	$(TREMOR_DIR)/mdct.c \
+	$(TREMOR_DIR)/block.c \
+	$(TREMOR_DIR)/window.c \
+	$(TREMOR_DIR)/synthesis.c \
+	$(TREMOR_DIR)/info.c \
+	$(TREMOR_DIR)/floor0.c \
+	$(TREMOR_DIR)/floor1.c \
+	$(TREMOR_DIR)/res012.c \
+	$(TREMOR_DIR)/mapping0.c \
+	$(TREMOR_DIR)/registry.c \
+	$(TREMOR_DIR)/codebook.c \
+	$(TREMOR_DIR)/sharedbook.c \
+	$(TREMOR_DIR)/vorbisfile.c \
+	$(TREMOR_DIR)/id_sd_ogg.c
 # ecwolf.pk3 base data, embedded so the core carries it internally.
 SOURCES_C += $(CORE_DIR)/src/libretro/ecwolf_pk3_data.c
 SOURCES_CXX += $(LZMA_CXX)
