@@ -55,6 +55,7 @@
 #include "bitmap.h"
 #include "textures.h"
 #include "v_video.h"
+#include "dds_rdds.h"
 
 // Since we want this to compile under Linux too, we need to define this
 // stuff ourselves instead of including a DirectX header.
@@ -166,22 +167,7 @@ protected:
 	uint8_t *Pixels;
 	Span **Spans;
 
-	uint32_t Format;
-
-	uint32_t RMask, GMask, BMask, AMask;
-	uint8_t RShiftL, GShiftL, BShiftL, AShiftL;
-	uint8_t RShiftR, GShiftR, BShiftR, AShiftR;
-
-	int32_t Pitch;
-	uint32_t LinearSize;
-
-	static void CalcBitShift (uint32_t mask, uint8_t *lshift, uint8_t *rshift);
-
 	void MakeTexture ();
-	void ReadRGB (FWadLump &lump, uint8_t *tcbuf = NULL);
-	void DecompressDXT1 (FWadLump &lump, uint8_t *tcbuf = NULL);
-	void DecompressDXT3 (FWadLump &lump, bool premultiplied, uint8_t *tcbuf = NULL);
-	void DecompressDXT5 (FWadLump &lump, bool premultiplied, uint8_t *tcbuf = NULL);
 
 	int CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCopyInfo *inf = NULL);
 	bool UseBasePalette();
@@ -295,79 +281,11 @@ FDDSTexture::FDDSTexture (FileReader &lump, int lumpnum, void *vsurfdesc)
 	Height = uint16_t(surf->Height);
 	CalcBitSize ();
 
-	if (surf->PixelFormat.Flags & DDPF_FOURCC)
-	{
-		Format = surf->PixelFormat.FourCC;
-		Pitch = 0;
-		LinearSize = surf->LinearSize;
-	}
-	else	// DDPF_RGB
-	{
-		Format = surf->PixelFormat.RGBBitCount >> 3;
-		CalcBitShift (RMask = surf->PixelFormat.RBitMask, &RShiftL, &RShiftR);
-		CalcBitShift (GMask = surf->PixelFormat.GBitMask, &GShiftL, &GShiftR);
-		CalcBitShift (BMask = surf->PixelFormat.BBitMask, &BShiftL, &BShiftR);
-		if (surf->PixelFormat.Flags & DDPF_ALPHAPIXELS)
-		{
-			CalcBitShift (AMask = surf->PixelFormat.RGBAlphaBitMask, &AShiftL, &AShiftR);
-		}
-		else
-		{
-			AMask = 0;
-			AShiftL = AShiftR = 0;
-		}
-		if (surf->Flags & DDSD_PITCH)
-		{
-			Pitch = surf->Pitch;
-		}
-		else
-		{
-			Pitch = (Width * Format + 3) & ~3;
-		}
-		LinearSize = Pitch * Height;
-	}
-}
+	// The DDS byte stream (header + mip data) is handed verbatim to the
+	// rdds decoder in MakeTexture()/CopyTrueColorPixels(), so no pixel
+	// format, mask or pitch bookkeeping is needed here; the caller
+	// (DDSTexture_TryCreate) has already screened for a supported layout.
 
-//==========================================================================
-//
-// Returns the number of bits the color must be shifted to produce
-// an 8-bit value, as in:
-//
-// c   = (color & mask) << lshift;
-// c  |= c >> rshift;
-// c >>= 24;
-//
-// For any color of at least 4 bits, this ensures that the result
-// of the calculation for c will be fully saturated, given a maximum
-// value for the input bit mask.
-//
-//==========================================================================
-
-void FDDSTexture::CalcBitShift (uint32_t mask, uint8_t *lshiftp, uint8_t *rshiftp)
-{
-	uint8_t shift;
-
-	if (mask == 0)
-	{
-		*lshiftp = *rshiftp = 0;
-		return;
-	}
-
-	shift = 0;
-	while ((mask & 0x80000000) == 0)
-	{
-		mask <<= 1;
-		shift++;
-	}
-	*lshiftp = shift;
-
-	shift = 0;
-	while (mask & 0x80000000)
-	{
-		mask <<= 1;
-		shift++;
-	}
-	*rshiftp = shift;
 }
 
 //==========================================================================
@@ -471,389 +389,36 @@ const uint8_t *FDDSTexture::GetPixels ()
 void FDDSTexture::MakeTexture ()
 {
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
+	int lumplen = Wads.LumpLength (SourceLump);
 
 	Pixels = new uint8_t[Width*Height];
 
-	lump.Seek (sizeof(DDSURFACEDESC2) + 4, SEEK_SET);
+	uint8_t *raw = new uint8_t[lumplen > 0 ? lumplen : 1];
+	lump.Seek (0, SEEK_SET);
+	lump.Read (raw, lumplen);
 
-	if (Format >= 1 && Format <= 4)		// RGB: Format is # of bytes per pixel
+	unsigned dw = 0, dh = 0;
+	uint8_t *rgba = DDS_DecodeRGBA (raw, (size_t)lumplen, &dw, &dh);
+	delete[] raw;
+
+	if (rgba != NULL && dw == (unsigned)Width && dh == (unsigned)Height)
 	{
-		ReadRGB (lump);
+		int masked = 0;
+		DDS_PalettizeColumnMajor (rgba, Width, Height, &RGB32k[0][0][0], Pixels, &masked);
+		bMasked = masked ? true : false;
+		free(rgba);
 	}
-	else if (Format == ID_DXT1)
+	else
 	{
-		DecompressDXT1 (lump);
-	}
-	else if (Format == ID_DXT3 || Format == ID_DXT2)
-	{
-		DecompressDXT3 (lump, Format == ID_DXT2);
-	}
-	else if (Format == ID_DXT5 || Format == ID_DXT4)
-	{
-		DecompressDXT5 (lump, Format == ID_DXT4);
+		// Decode failed or produced unexpected dimensions: leave a
+		// defined, fully transparent texture rather than garbage.
+		if (rgba != NULL)
+			free(rgba);
+		memset(Pixels, 0, (size_t)Width*Height);
+		bMasked = true;
 	}
 }
 
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FDDSTexture::ReadRGB (FWadLump &lump, uint8_t *tcbuf)
-{
-	uint32_t x, y;
-	uint32_t amask = AMask == 0 ? 0 : 0x80000000 >> AShiftL;
-	uint8_t *linebuff = new uint8_t[Pitch];
-
-	for (y = Height; y > 0; --y)
-	{
-		uint8_t *buffp = linebuff;
-		uint8_t *pixelp = tcbuf? tcbuf + 4*y*Height : Pixels + y;
-		lump.Read (linebuff, Pitch);
-		for (x = Width; x > 0; --x)
-		{
-			uint32_t c;
-			if (Format == 4)
-			{
-				c = ReadLittleLong(buffp); buffp += 4;
-			}
-			else if (Format == 2)
-			{
-				c = ReadLittleShort(buffp); buffp += 2;
-			}
-			else if (Format == 3)
-			{
-				c = buffp[0] | (buffp[1] << 8) | (buffp[2] << 16); buffp += 3;
-			}
-			else //  Format == 1
-			{
-				c = *buffp++;
-			}
-			if (!tcbuf)
-			{
-				if (amask == 0 || (c & amask))
-				{
-					uint32_t r = (c & RMask) << RShiftL; r |= r >> RShiftR;
-					uint32_t g = (c & GMask) << GShiftL; g |= g >> GShiftR;
-					uint32_t b = (c & BMask) << BShiftL; b |= b >> BShiftR;
-					*pixelp = RGB32k[r >> 27][g >> 27][b >> 27];
-				}
-				else
-				{
-					*pixelp = 0;
-					bMasked = true;
-				}
-				pixelp += Height;
-			}
-			else
-			{
-				uint32_t r = (c & RMask) << RShiftL; r |= r >> RShiftR;
-				uint32_t g = (c & GMask) << GShiftL; g |= g >> GShiftR;
-				uint32_t b = (c & BMask) << BShiftL; b |= b >> BShiftR;
-				uint32_t a = (c & AMask) << AShiftL; a |= a >> AShiftR;
-				pixelp[0] = (uint8_t)(r>>24);
-				pixelp[1] = (uint8_t)(g>>24);
-				pixelp[2] = (uint8_t)(b>>24);
-				pixelp[3] = (uint8_t)(a>>24);
-				pixelp+=4;
-			}
-		}
-	}
-	delete[] linebuff;
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FDDSTexture::DecompressDXT1 (FWadLump &lump, uint8_t *tcbuf)
-{
-	const long blocklinelen = ((Width + 3) >> 2) << 3;
-	uint8_t *blockbuff = new uint8_t[blocklinelen];
-	uint8_t *block;
-	PalEntry color[4];
-	uint8_t palcol[4];
-	int ox, oy, x, y, i;
-
-	color[0].a = 255;
-	color[1].a = 255;
-	color[2].a = 255;
-
-	for (oy = 0; oy < Height; oy += 4)
-	{
-		lump.Read (blockbuff, blocklinelen);
-		block = blockbuff;
-		for (ox = 0; ox < Width; ox += 4)
-		{
-			uint16_t color16[2] = { ReadLittleShort(block), ReadLittleShort(block+2) };
-
-			// Convert color from R5G6B5 to R8G8B8.
-			for (i = 1; i >= 0; --i)
-			{
-				color[i].r = ((color16[i] & 0xF800) >> 8) | (color16[i] >> 13);
-				color[i].g = ((color16[i] & 0x07E0) >> 3) | ((color16[i] & 0x0600) >> 9);
-				color[i].b = ((color16[i] & 0x001F) << 3) | ((color16[i] & 0x001C) >> 2);
-			}
-			if (color16[0] > color16[1])
-			{ // Four-color block: derive the other two colors.
-				color[2].r = (color[0].r + color[0].r + color[1].r + 1) / 3;
-				color[2].g = (color[0].g + color[0].g + color[1].g + 1) / 3;
-				color[2].b = (color[0].b + color[0].b + color[1].b + 1) / 3;
-
-				color[3].r = (color[0].r + color[1].r + color[1].r + 1) / 3;
-				color[3].g = (color[0].g + color[1].g + color[1].g + 1) / 3;
-				color[3].b = (color[0].b + color[1].b + color[1].b + 1) / 3;
-				color[3].a = 255;
-			}
-			else
-			{ // Three-color block: derive the other color.
-				color[2].r = (color[0].r + color[1].r) / 2;
-				color[2].g = (color[0].g + color[1].g) / 2;
-				color[2].b = (color[0].b + color[1].b) / 2;
-
-				color[3].a = color[3].b = color[3].g = color[3].r = 0;
-
-				// If you have a three-color block, presumably that transparent
-				// color is going to be used.
-				bMasked = true;
-			}
-			// Pick colors from the palette for each of the four colors.
-			/*if (!tcbuf)*/ for (i = 3; i >= 0; --i)
-			{
-				palcol[i] = color[i].a ? RGB32k[color[i].r >> 3][color[i].g >> 3][color[i].b >> 3] : 0;
-			}
-			// Now decode this 4x4 block to the pixel buffer.
-			for (y = 0; y < 4; ++y)
-			{
-				if (oy + y >= Height)
-				{
-					break;
-				}
-				uint8_t yslice = block[4 + y];
-				for (x = 0; x < 4; ++x)
-				{
-					if (ox + x >= Width)
-					{
-						break;
-					}
-					int ci = (yslice >> (x + x)) & 3;
-					if (!tcbuf) 
-					{
-						Pixels[oy + y + (ox + x) * Height] = palcol[ci];
-					}
-					else
-					{
-						uint8_t * tcp = &tcbuf[(ox + x)*4 + (oy + y) * Width*4];
-						tcp[0] = color[ci].r;
-						tcp[1] = color[ci].g;
-						tcp[2] = color[ci].b;
-						tcp[3] = color[ci].a;
-					}
-				}
-			}
-			block += 8;
-		}
-	}
-	delete[] blockbuff;
-}
-
-//==========================================================================
-//
-// DXT3: Decompression is identical to DXT1, except every 64-bit block is
-// preceded by another 64-bit block with explicit alpha values.
-//
-//==========================================================================
-
-void FDDSTexture::DecompressDXT3 (FWadLump &lump, bool premultiplied, uint8_t *tcbuf)
-{
-	const long blocklinelen = ((Width + 3) >> 2) << 4;
-	uint8_t *blockbuff = new uint8_t[blocklinelen];
-	uint8_t *block;
-	PalEntry color[4];
-	uint8_t palcol[4];
-	int ox, oy, x, y, i;
-
-	for (oy = 0; oy < Height; oy += 4)
-	{
-		lump.Read (blockbuff, blocklinelen);
-		block = blockbuff;
-		for (ox = 0; ox < Width; ox += 4)
-		{
-			uint16_t color16[2] = { ReadLittleShort(block + 8), ReadLittleShort(block + 10) };
-
-			// Convert color from R5G6B5 to R8G8B8.
-			for (i = 1; i >= 0; --i)
-			{
-				color[i].r = ((color16[i] & 0xF800) >> 8) | (color16[i] >> 13);
-				color[i].g = ((color16[i] & 0x07E0) >> 3) | ((color16[i] & 0x0600) >> 9);
-				color[i].b = ((color16[i] & 0x001F) << 3) | ((color16[i] & 0x001C) >> 2);
-			}
-			// Derive the other two colors.
-			color[2].r = (color[0].r + color[0].r + color[1].r + 1) / 3;
-			color[2].g = (color[0].g + color[0].g + color[1].g + 1) / 3;
-			color[2].b = (color[0].b + color[0].b + color[1].b + 1) / 3;
-
-			color[3].r = (color[0].r + color[1].r + color[1].r + 1) / 3;
-			color[3].g = (color[0].g + color[1].g + color[1].g + 1) / 3;
-			color[3].b = (color[0].b + color[1].b + color[1].b + 1) / 3;
-
-			// Pick colors from the palette for each of the four colors.
-			if (!tcbuf) for (i = 3; i >= 0; --i)
-			{
-				palcol[i] = RGB32k[color[i].r >> 3][color[i].g >> 3][color[i].b >> 3];
-			}
-			// Now decode this 4x4 block to the pixel buffer.
-			for (y = 0; y < 4; ++y)
-			{
-				if (oy + y >= Height)
-				{
-					break;
-				}
-				uint8_t yslice = block[12 + y];
-				uint16_t yalphaslice = ReadLittleShort(block + 2 * y);
-				for (x = 0; x < 4; ++x)
-				{
-					if (ox + x >= Width)
-					{
-						break;
-					}
-					if (!tcbuf)
-					{
-						Pixels[oy + y + (ox + x) * Height] = ((yalphaslice >> (x*4)) & 15) < 8 ?
-							(bMasked = true, 0) : palcol[(yslice >> (x + x)) & 3];
-					}
-					else
-					{
-						uint8_t * tcp = &tcbuf[(ox + x)*4 + (oy + y) * Width*4];
-						int c = (yslice >> (x + x)) & 3;
-						tcp[0] = color[c].r;
-						tcp[1] = color[c].g;
-						tcp[2] = color[c].b;
-						tcp[3] = color[c].a;
-					}
-				}
-			}
-			block += 16;
-		}
-	}
-	delete[] blockbuff;
-}
-
-//==========================================================================
-//
-// DXT5: Decompression is identical to DXT3, except every 64-bit alpha block
-// contains interpolated alpha values, similar to the 64-bit color block.
-//
-//==========================================================================
-
-void FDDSTexture::DecompressDXT5 (FWadLump &lump, bool premultiplied, uint8_t *tcbuf)
-{
-	const long blocklinelen = ((Width + 3) >> 2) << 4;
-	uint8_t *blockbuff = new uint8_t[blocklinelen];
-	uint8_t *block;
-	PalEntry color[4];
-	uint8_t palcol[4];
-	uint32_t yalphaslice = 0;
-	int ox, oy, x, y, i;
-
-	for (oy = 0; oy < Height; oy += 4)
-	{
-		lump.Read (blockbuff, blocklinelen);
-		block = blockbuff;
-		for (ox = 0; ox < Width; ox += 4)
-		{
-			uint16_t color16[2] = { ReadLittleShort(block+8), ReadLittleShort(block+10) };
-			uint8_t alpha[8];
-
-			// Calculate the eight alpha values.
-			alpha[0] = block[0];
-			alpha[1] = block[1];
-
-			if (alpha[0] > alpha[1])
-			{ // Eight-alpha block: derive the other six alphas.
-				for (i = 0; i < 6; ++i)
-				{
-					alpha[i + 2] = ((6 - i) * alpha[0] + (i + 1) * alpha[1] + 3) / 7;
-				}
-			}
-			else
-			{ // Six-alpha block: derive the other four alphas.
-				for (i = 0; i < 4; ++i)
-				{
-					alpha[i + 2] = ((4 - i) * alpha[0] + (i + 1) * alpha[1] + 2) / 5;
-				}
-				alpha[6] = 0;
-				alpha[7] = 255;
-			}
-
-			// Convert color from R5G6B5 to R8G8B8.
-			for (i = 1; i >= 0; --i)
-			{
-				color[i].r = ((color16[i] & 0xF800) >> 8) | (color16[i] >> 13);
-				color[i].g = ((color16[i] & 0x07E0) >> 3) | ((color16[i] & 0x0600) >> 9);
-				color[i].b = ((color16[i] & 0x001F) << 3) | ((color16[i] & 0x001C) >> 2);
-			}
-			// Derive the other two colors.
-			color[2].r = (color[0].r + color[0].r + color[1].r + 1) / 3;
-			color[2].g = (color[0].g + color[0].g + color[1].g + 1) / 3;
-			color[2].b = (color[0].b + color[0].b + color[1].b + 1) / 3;
-
-			color[3].r = (color[0].r + color[1].r + color[1].r + 1) / 3;
-			color[3].g = (color[0].g + color[1].g + color[1].g + 1) / 3;
-			color[3].b = (color[0].b + color[1].b + color[1].b + 1) / 3;
-
-			// Pick colors from the palette for each of the four colors.
-			if (!tcbuf) for (i = 3; i >= 0; --i)
-			{
-				palcol[i] = RGB32k[color[i].r >> 3][color[i].g >> 3][color[i].b >> 3];
-			}
-			// Now decode this 4x4 block to the pixel buffer.
-			for (y = 0; y < 4; ++y)
-			{
-				if (oy + y >= Height)
-				{
-					break;
-				}
-				// Alpha values are stored in 3 bytes for 2 rows
-				if ((y & 1) == 0)
-				{
-					yalphaslice = block[y*3] | (block[y*3+1] << 8) | (block[y*3+2] << 16);
-				}
-				else
-				{
-					yalphaslice >>= 12;
-				}
-				uint8_t yslice = block[12 + y];
-				for (x = 0; x < 4; ++x)
-				{
-					if (ox + x >= Width)
-					{
-						break;
-					}
-					if (!tcbuf)
-					{
-						Pixels[oy + y + (ox + x) * Height] = alpha[((yalphaslice >> (x*3)) & 7)] < 128 ?
-							(bMasked = true, 0) : palcol[(yslice >> (x + x)) & 3];
-					}
-					else
-					{
-						uint8_t * tcp = &tcbuf[(ox + x)*4 + (oy + y) * Width*4];
-						int c = (yslice >> (x + x)) & 3;
-						tcp[0] = color[c].r;
-						tcp[1] = color[c].g;
-						tcp[2] = color[c].b;
-						tcp[3] = alpha[((yalphaslice >> (x*3)) & 7)];
-					}
-				}
-			}
-			block += 16;
-		}
-	}
-	delete[] blockbuff;
-}
 
 //===========================================================================
 //
@@ -864,33 +429,29 @@ void FDDSTexture::DecompressDXT5 (FWadLump &lump, bool premultiplied, uint8_t *t
 int FDDSTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCopyInfo *inf)
 {
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
+	int lumplen = Wads.LumpLength (SourceLump);
 
-	uint8_t *TexBuffer = new uint8_t[4*Width*Height];
+	uint8_t *raw = new uint8_t[lumplen > 0 ? lumplen : 1];
+	lump.Seek (0, SEEK_SET);
+	lump.Read (raw, lumplen);
 
-	lump.Seek (sizeof(DDSURFACEDESC2) + 4, SEEK_SET);
+	unsigned dw = 0, dh = 0;
+	uint8_t *rgba = DDS_DecodeRGBA (raw, (size_t)lumplen, &dw, &dh);
+	delete[] raw;
 
-	if (Format >= 1 && Format <= 4)		// RGB: Format is # of bytes per pixel
+	// rdds decodes mip 0 to row-major RGBA8 (bytes R,G,B,A), exactly the
+	// layout CopyPixelDataRGB expects for CF_RGBA.
+	if (rgba != NULL && dw == (unsigned)Width && dh == (unsigned)Height)
 	{
-		ReadRGB (lump, TexBuffer);
+		bmp->CopyPixelDataRGB(x, y, rgba, Width, Height, 4, Width*4, rotate, CF_RGBA, inf);
 	}
-	else if (Format == ID_DXT1)
+	if (rgba != NULL)
 	{
-		DecompressDXT1 (lump, TexBuffer);
+		free(rgba);
 	}
-	else if (Format == ID_DXT3 || Format == ID_DXT2)
-	{
-		DecompressDXT3 (lump, Format == ID_DXT2, TexBuffer);
-	}
-	else if (Format == ID_DXT5 || Format == ID_DXT4)
-	{
-		DecompressDXT5 (lump, Format == ID_DXT4, TexBuffer);
-	}
-
-	// All formats decompress to RGBA.
-	bmp->CopyPixelDataRGB(x, y, TexBuffer, Width, Height, 4, Width*4, rotate, CF_RGBA, inf);
-	delete [] TexBuffer;
 	return -1;
-}	
+}
+
 
 //===========================================================================
 //

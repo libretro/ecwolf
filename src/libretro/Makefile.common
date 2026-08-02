@@ -11,6 +11,7 @@ INCFLAGS   := \
 	-I$(CORE_DIR)/src \
 	-I$(CORE_DIR)/src/g_shared \
 	-I$(CORE_DIR)/src/libretro \
+	-I$(CORE_DIR)/src/libretro-common/include \
 	-I$(CORE_DIR)/src/libretro/libretro-common/include \
 	-I$(JPEG_DIR) \
 	-I$(BZIP2_DIR) \
@@ -82,6 +83,10 @@ DEPS_ZLIB   := $(ZLIB_DIR)/crc32.c \
 
 SOURCES_C   := $(DEPS_BZIP2) $(DEPS_JPEG) $(DEPS_ZLIB)
 
+# RetroArch libretro-common DDS decoder (rdds), vendored under
+# src/libretro-common so the FDDSTexture glue is self-contained.
+SOURCES_C   += $(CORE_DIR)/src/libretro-common/formats/dds/rdds.c
+
 SOURCES_CXX := \
 	$(CORE_DIR)/src/g_blake/a_smartanim.cpp \
 	$(CORE_DIR)/src/g_blake/blake_sbar.cpp \
@@ -124,6 +129,7 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/textures/automaptexture.cpp \
 	$(CORE_DIR)/src/textures/bitmap.cpp \
 	$(CORE_DIR)/src/textures/ddstexture.cpp \
+	$(CORE_DIR)/src/textures/dds_rdds.cpp \
 	$(CORE_DIR)/src/textures/emptytexture.cpp \
 	$(CORE_DIR)/src/textures/flattexture.cpp \
 	$(CORE_DIR)/src/textures/imgztexture.cpp \
