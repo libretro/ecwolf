@@ -19,6 +19,7 @@
 #include "wl_def.h"
 #include "c_cvars.h"
 #include "streams/file_stream.h" // Must be before id_sd.h
+#include "vfs/vfs_hybrid.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -83,7 +84,6 @@ static void fallback_log(enum retro_log_level level, const char *fmt, ...);
 
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
-extern struct retro_vfs_interface *vfs_interface;
 static retro_environment_t environ_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
@@ -1673,13 +1673,24 @@ void retro_set_environment(retro_environment_t cb)
 	struct retro_keyboard_callback kbcb = { keyboard_event_cb };
 	cb(RETRO_ENVIRONMENT_SET_KEYBOARD_CALLBACK, &kbcb);
 
-	struct retro_vfs_interface_info vfs_interface_info;
-	vfs_interface_info.required_interface_version = 3;
-	vfs_interface_info.iface = NULL;
-	if (cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_interface_info)) {
-		vfs_interface = vfs_interface_info.iface;
-		filestream_vfs_init(&vfs_interface_info);
-		dirent_vfs_init(&vfs_interface_info);
+	/* Hybrid VFS replaces the wholesale adoption above this line's
+	   history: filestream_vfs_init(frontend) routed every read of
+	   every file through the frontend interface, one indirect ABI
+	   call per operation even for plain local paths, and disabled
+	   local file mappings.  vfs_hybrid_init() negotiates the
+	   frontend interface itself (v4 down to v1), dispatches per
+	   file - local implementation first, frontend for URI-shaped
+	   paths and sandboxed-platform fallback - and installs the
+	   filestream, path, and dirent front doors plus the mapped-ptr
+	   sideband in one call.  With no frontend VFS it leaves the
+	   direct local path untouched.  The log interface is fetched
+	   here so the hybrid's dispatch diagnostics are visible. */
+	{
+		struct retro_log_callback hybrid_log;
+		retro_log_printf_t hybrid_log_fn = NULL;
+		if (cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &hybrid_log))
+			hybrid_log_fn = hybrid_log.log;
+		vfs_hybrid_init(cb, hybrid_log_fn);
 	}
 }
 

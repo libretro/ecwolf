@@ -36,6 +36,7 @@
 #include "wl_def.h"
 #include "c_cvars.h"
 #include "streams/file_stream.h" // Must be before id_sd.h
+#include "file/file_path.h"
 #include "id_sd.h"
 #include "id_in.h"
 #include "id_vl.h"
@@ -91,8 +92,6 @@
 #include "retro_dirent.h"
 #include "vfs/vfs_implementation.h"
 
-struct retro_vfs_interface *vfs_interface;
-
 static const char * wrap_retro_vfs_readdir(RDIR *dirstream)
 {
 	if (!retro_readdir(dirstream))
@@ -100,11 +99,16 @@ static const char * wrap_retro_vfs_readdir(RDIR *dirstream)
 	return retro_dirent_get_name (dirstream);
 }
 
+/* Routed through the file_path front doors rather than a raw
+   retro_vfs_interface pointer: with vfs_hybrid_init() installed these
+   dispatch local-first with frontend fallback, and with no frontend
+   VFS at all they collapse to the local implementation - so this
+   wrapper no longer needs to know which case it is in. */
 static int wrap_retro_vfs_stat(const char *path, int32_t *size) {
-	if (vfs_interface)
-		return vfs_interface->stat(path, size);
-	else
-		return retro_vfs_stat_impl(path, size);
+	int flags = path_stat(path);
+	if (size)
+		*size = (int32_t)path_get_size(path);
+	return flags;
 }
 
 struct FileMemoryStore

@@ -277,5 +277,6 @@ SOURCES_C += \
 	$(CORE_DIR)/src/libretro/libretro-common/streams/file_stream.c \
 	$(CORE_DIR)/src/libretro/libretro-common/string/stdstring.c \
 	$(CORE_DIR)/src/libretro/libretro-common/time/rtime.c \
-	$(CORE_DIR)/src/libretro/libretro-common/vfs/vfs_implementation.c
+	$(CORE_DIR)/src/libretro/libretro-common/vfs/vfs_implementation.c \
+	$(CORE_DIR)/src/libretro/libretro-common/vfs/vfs_hybrid.c
 endif
