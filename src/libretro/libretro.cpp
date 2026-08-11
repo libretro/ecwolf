@@ -1731,10 +1731,23 @@ void retro_set_environment(retro_environment_t cb)
 	struct retro_log_callback logging;
 	bool no_rom = false;
 	static struct retro_subsystem_info subsys[MAXNROMS];
-	char *descs[MAXNROMS];
-      
+	// Built once and reused: frontends call retro_set_environment more than
+	// once, and rebuilding these tables re-allocated every string and
+	// rom_info block on each call, leaking the previous set. The tables are
+	// static and immutable after construction, so construct them once.
+	static bool subsys_built = false;
+	// The extra-pack description strings are referenced by rom_info slots
+	// j = 1..nroms-1 across subsystems 1..MAXNROMS-1 packs, i.e. only
+	// descs[0..MAXNROMS-3]; the old loop allocated MAXNROMS of them and
+	// leaked the last two (LSan: 92 bytes in 2 allocations).
+	static char *descs[MAXNROMS - 2];
+
+	if (subsys_built)
+		goto subsys_ready;
+	subsys_built = true;
+
 	memset (subsys, 0, sizeof(subsys));
-	for (int i = 0; i < MAXNROMS; i++) {
+	for (int i = 0; i < MAXNROMS - 2; i++) {
 		descs[i] = my_asnprintf (45, "Additional pack %d", i+1);
 	}
 
@@ -1762,6 +1775,7 @@ void retro_set_environment(retro_environment_t cb)
 		}
 	}
 
+subsys_ready:
 	cb(RETRO_ENVIRONMENT_SET_SUBSYSTEM_INFO, subsys);
 
 	environ_cb = cb;

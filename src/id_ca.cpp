@@ -90,7 +90,13 @@ void CA_CacheMap (const char *mapname, bool loading)
 {
 	mapHandle.Reset();
 
-	strncpy(gamestate.mapname, mapname, 8);
+	/* SetupGameLevel passes gamestate.mapname itself here (wl_game.cpp), so
+	 * an unconditional strncpy copies a buffer onto itself -- undefined
+	 * behaviour that AddressSanitizer's interceptor turns into a hard abort
+	 * at every level start. When source and destination are the same object
+	 * the copy is a no-op; only copy when they differ. */
+	if (mapname != gamestate.mapname)
+		strncpy(gamestate.mapname, mapname, 8);
 	levelInfo = &LevelInfo::Find(mapname);
 	::map = mapHandle = new GameMap(mapname);
 	if(!map->IsValid())
