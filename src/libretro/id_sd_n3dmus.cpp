@@ -62,7 +62,7 @@ static inst_t	instrument[14] = {
 
 
 #define oplChip *midiOpl
-void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const int &volume);
+void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, int volume);
 
 
 void

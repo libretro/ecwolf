@@ -123,10 +123,11 @@ extern  SDSMode         DigiMode;
 extern  SMMode          MusicMode;
 extern  bool            N3DTempoEmulation;
 static const int MAX_VOLUME = 20;
-static inline double MULTIPLY_VOLUME(const int &v)
-{
-	return (double(v)+0.3)/(MAX_VOLUME+0.3);
-}
+/* The old MULTIPLY_VOLUME() double helper lived here; the OPL core now takes
+ * an integer Q16 multiplier derived once in DBOPL::Chip::SetVolume (see
+ * dosbox/dbopl.cpp), so no per-sample floating point remains in the audio
+ * path. dbopl.h checks at compile time that its copy of MAX_VOLUME matches
+ * this one. */
 extern	int				AdlibVolume;
 extern	int				MusicVolume;
 extern	int				DigiVolume;

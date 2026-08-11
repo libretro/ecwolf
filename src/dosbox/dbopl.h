@@ -31,6 +31,23 @@ typedef uint16_t	Bit16u;
 typedef int16_t		Bit16s;
 typedef uint8_t		Bit8u;
 typedef int8_t		Bit8s;
+typedef uint64_t	Bit64u;
+typedef int64_t		Bit64s;
+
+/* ECWolf: integer output-volume scaling.
+ *
+ * DBOPL_VOLUME_UNITY is the Q16 multiplier for "no attenuation". The percussion
+ * sample path compares against it to skip the multiply entirely, so the common
+ * full-volume case is both bit-exact and free. Kept in sync with id_sd.h's
+ * MAX_VOLUME by the compile-time check below. */
+#define DBOPL_VOLUME_SH     16
+#define DBOPL_VOLUME_UNITY  (1 << DBOPL_VOLUME_SH)
+#define DBOPL_MAX_VOLUME    20
+
+/* C++98 negative-array-size assert: if id_sd.h's MAX_VOLUME ever moves away
+ * from 20 this fails at build time rather than silently rescaling the OPL
+ * output. Same idiom as the rate invariants in state_machine.h. */
+typedef char dbopl_max_volume_matches_id_sd[(MAX_VOLUME == DBOPL_MAX_VOLUME) ? 1 : -1];
 
 
 //Use 8 handlers based on a small logatirmic wavetabe and an exponential table for volume
@@ -185,7 +202,13 @@ struct Channel {
 	Bit8u fourMask;
 	Bit8s maskLeft;		//Sign extended values for both channel's panning
 	Bit8s maskRight;
-	const int *playVolume; // ECWolf
+	/* ECWolf: Q16 output-volume multiplier, copied from Chip::volumeMul.
+	 * This used to be a `const int*` aimed at Chip::volume, which in turn
+	 * pointed at a reference parameter -- callers pass a literal (see
+	 * id_sd_adlib.cpp), so the pointee died at the end of the call and every
+	 * later dereference in GeneratePercussion read a dangling stack slot.
+	 * Holding the multiplier by value removes the lifetime problem entirely. */
+	Bit32s playVolume;
 
 	//Forward the channel data to the operators of the channel
 	void SetChanData( const Chip* chip, Bit32u data );
@@ -241,7 +264,9 @@ struct Chip {
 	Bit8u waveFormMask;
 	//0 or -1 when enabled
 	Bit8s opl3Active;
-	const int *volume; // ECWolf
+	/* ECWolf: Q16 output-volume multiplier (65536 == unity). Integer, so the
+	 * percussion mix no longer performs a double multiply per sample. */
+	Bit32s volumeMul;
 
 	//Return the maximum amount of samples before and LFO change
 	Bit32u ForwardLFO( Bit32u samples );
@@ -249,7 +274,7 @@ struct Chip {
 
 	void WriteBD( Bit8u val );
 	void WriteReg(Bit32u reg, Bit8u val);
-	void SetVolume(const int &volume);
+	void SetVolume(int volume);
 
 	Bit32u WriteAddr( Bit32u port, Bit8u val );
 

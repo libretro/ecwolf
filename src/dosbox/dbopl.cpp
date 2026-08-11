@@ -37,11 +37,19 @@
 #define INLINE inline
 #define GCC_UNLIKELY(x) x
 
-#include <math.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "dbopl.h"
+#include "dbopl_tables.h"
+
+#if ( DBOPL_WAVE != WAVE_TABLEMUL )
+/* The non-default wave generators still build their tables with libm at
+ * startup; only the WAVE_TABLEMUL mode ECWolf ships has been converted to the
+ * pregenerated exact tables. */
+#include <math.h>
+#endif
 
 
 #ifndef PI
@@ -632,7 +640,7 @@ Channel::Channel() {
 	feedback = 31;
 	fourMask = 0;
 	synthHandler = &Channel::BlockTemplate< sm2FM >;
-	playVolume = NULL;
+	playVolume = DBOPL_VOLUME_UNITY;
 };
 
 void Channel::SetChanData( const Chip* chip, Bit32u data ) {
@@ -672,7 +680,7 @@ void Channel::UpdateFrequency( const Chip* chip, Bit8u fourOp ) {
 }
 
 void Channel::WriteA0( const Chip* chip, Bit8u val ) {
-	playVolume = chip->volume;
+	playVolume = chip->volumeMul;
 	Bit8u fourOp = chip->reg104 & chip->opl3Active & fourMask;
 	//Don't handle writes to silent fourop channels
 	if ( fourOp > 0x80 )
@@ -685,7 +693,7 @@ void Channel::WriteA0( const Chip* chip, Bit8u val ) {
 }
 
 void Channel::WriteB0( const Chip* chip, Bit8u val ) {
-	playVolume = chip->volume;
+	playVolume = chip->volumeMul;
 	Bit8u fourOp = chip->reg104 & chip->opl3Active & fourMask;
 	//Don't handle writes to silent fourop channels
 	if ( fourOp > 0x80 )
@@ -833,9 +841,16 @@ INLINE void Channel::GeneratePercussion( Chip* chip, Bit32s* output ) {
 		Bit32u tcIndex = (1 + phaseBit) << 8;
 		sample += Op(5)->GetWave( tcIndex, tcVol );
 	}
-	sample <<= 1;
-	if(playVolume)
-		sample = (Bit32s)(sample*MULTIPLY_VOLUME(*playVolume));
+	/* <<= on a negative value is undefined in C++98; the multiply is the
+	 * defined spelling and compiles to the same shift. */
+	sample *= 2;
+	/* ECWolf: Q16 integer scale. Unity is the overwhelmingly common case
+	 * (every current caller asks for MAX_VOLUME), and skipping it keeps that
+	 * path bit-identical as well as branch-free in the multiply. Rounding is
+	 * half-up rather than the old truncate-toward-zero so the scaled signal
+	 * stays centred instead of drifting towards zero on negative samples. */
+	if (playVolume != DBOPL_VOLUME_UNITY)
+		sample = (Bit32s)(((Bit64s)sample * playVolume + (1 << (DBOPL_VOLUME_SH - 1))) >> DBOPL_VOLUME_SH);
 
 	if ( opl3Mode ) {
 		output[0] += sample;
@@ -992,7 +1007,7 @@ Chip::Chip() {
 	regBD = 0;
 	reg104 = 0;
 	opl3Active = 0;
-	volume = NULL;
+	volumeMul = DBOPL_VOLUME_UNITY;
 }
 
 INLINE Bit32u Chip::ForwardNoise() {
@@ -1174,9 +1189,30 @@ void Chip::WriteReg( Bit32u reg, Bit8u val ) {
 	}
 }
 
-void Chip::SetVolume(const int &volume)
+/* ECWolf: convert a 0..MAX_VOLUME setting into a Q16 multiplier.
+ *
+ * The float original was MULTIPLY_VOLUME(v) = (v + 0.3) / (MAX_VOLUME + 0.3),
+ * evaluated as a double and applied per sample. Multiplying numerator and
+ * denominator by 10 makes it the exact rational (10v + 3) / (10*MAX_VOLUME + 3),
+ * so the multiplier is computed here once, in integers, with round-half-up.
+ * v == MAX_VOLUME yields exactly DBOPL_VOLUME_UNITY, which the sample path
+ * short-circuits.
+ *
+ * Note this takes its argument by value. It used to take `const int&` and
+ * stash the address, which left Chip::volume dangling as soon as the caller's
+ * temporary died. */
+void Chip::SetVolume(int volume)
 {
-	this->volume = &volume;
+	Bit32s num, den;
+
+	if (volume < 0)
+		volume = 0;
+	if (volume > DBOPL_MAX_VOLUME)
+		volume = DBOPL_MAX_VOLUME;
+
+	num = 10 * volume + 3;
+	den = 10 * DBOPL_MAX_VOLUME + 3;
+	volumeMul = (Bit32s)(((Bit64s)num * DBOPL_VOLUME_UNITY * 2 + den) / (2 * (Bit64s)den));
 }
 
 
@@ -1222,17 +1258,31 @@ void Chip::GenerateBlock3( Bitu total, Bit32s* output  ) {
 }
 
 void Chip::Setup( Bit32u rate ) {
-	double original = OPLRATE;
-//	double original = rate;
-	double scale = original / (double)rate;
+	/* Rate scaling is the exact rational OPLRATE/rate == 14318180/(288*rate).
+	 * This used to be evaluated as a double; every value below is either
+	 * truncated or rounded to an integer straight afterwards, and some of the
+	 * truncation boundaries are close (the tightest, linearRates[4], sits
+	 * 2.5e-3 from an integer). Doing the arithmetic on the rational directly
+	 * removes the question: the results are exactly what the algorithm asks
+	 * for, on every target, with no dependence on FPU precision or rounding
+	 * mode. Reduced by gcd so the intermediates stay small -- the widest is
+	 * SCALE_NUM * (32 << 21) ~= 9.6e14, comfortably inside Bit64s.
+	 *
+	 * SCALE_MUL_ROUND / SCALE_MUL_TRUNC evaluate scale*x, SCALE_DIV_TRUNC
+	 * evaluates x/scale, each matching the rounding the original cast did. */
+	const Bit64s scaleNum = 14318180;
+	const Bit64s scaleDen = (Bit64s)288 * rate;
+#define SCALE_MUL_TRUNC( x )  (Bit32u)( ( scaleNum * (Bit64s)(x) ) / scaleDen )
+#define SCALE_MUL_ROUND( x )  (Bit32u)( ( scaleNum * (Bit64s)(x) * 2 + scaleDen ) / ( scaleDen * 2 ) )
+#define SCALE_DIV_TRUNC( x )  (Bit32u)( ( (Bit64s)(x) * scaleDen ) / scaleNum )
 
 	//Noise counter is run at the same precision as general waves
-	noiseAdd = (Bit32u)( 0.5 + scale * ( 1 << LFO_SH ) );
+	noiseAdd = SCALE_MUL_ROUND( 1 << LFO_SH );
 	noiseCounter = 0;
 	noiseValue = 1;	//Make sure it triggers the noise xor the first time
 	//The low frequency oscillation counter
 	//Every time his overflows vibrato and tremoloindex are increased
-	lfoAdd = (Bit32u)( 0.5 + scale * ( 1 << LFO_SH ) );
+	lfoAdd = SCALE_MUL_ROUND( 1 << LFO_SH );
 	lfoCounter = 0;
 	vibratoIndex = 0;
 	tremoloIndex = 0;
@@ -1240,12 +1290,11 @@ void Chip::Setup( Bit32u rate ) {
 	//With higher octave this gets shifted up
 	//-1 since the freqCreateTable = *2
 #ifdef WAVE_PRECISION
-	double freqScale = ( 1 << 7 ) * scale * ( 1 << ( WAVE_SH - 1 - 10));
 	for ( int i = 0; i < 16; i++ ) {
-		freqMul[i] = (Bit32u)( 0.5 + freqScale * FreqCreateTable[ i ] );
+		freqMul[i] = SCALE_MUL_ROUND( ( 1 << 7 ) * ( 1 << ( WAVE_SH - 1 - 10 ) ) * (Bit64s)FreqCreateTable[ i ] );
 	}
 #else
-	Bit32u freqScale = (Bit32u)( 0.5 + scale * ( 1 << ( WAVE_SH - 1 - 10)));
+	Bit32u freqScale = SCALE_MUL_ROUND( 1 << ( WAVE_SH - 1 - 10 ) );
 	for ( int i = 0; i < 16; i++ ) {
 		freqMul[i] = freqScale * FreqCreateTable[ i ];
 	}
@@ -1255,16 +1304,16 @@ void Chip::Setup( Bit32u rate ) {
 	for ( Bit8u i = 0; i < 76; i++ ) {
 		Bit8u index, shift;
 		EnvelopeSelect( i, index, shift );
-		linearRates[i] = (Bit32u)( scale * (EnvelopeIncreaseTable[ index ] << ( RATE_SH + ENV_EXTRA - shift - 3 )));
+		linearRates[i] = SCALE_MUL_TRUNC( EnvelopeIncreaseTable[ index ] << ( RATE_SH + ENV_EXTRA - shift - 3 ) );
 	}
 	//Generate the best matching attack rate
 	for ( Bit8u i = 0; i < 62; i++ ) {
 		Bit8u index, shift;
 		EnvelopeSelect( i, index, shift );
 		//Original amount of samples the attack would take
-		Bit32s original = (Bit32u)( (AttackSamplesTable[ index ] << shift) / scale);
+		Bit32s original = SCALE_DIV_TRUNC( AttackSamplesTable[ index ] << shift );
 
-		Bit32s guessAdd = (Bit32u)( scale * (EnvelopeIncreaseTable[ index ] << ( RATE_SH - shift - 3 )));
+		Bit32s guessAdd = SCALE_MUL_TRUNC( EnvelopeIncreaseTable[ index ] << ( RATE_SH - shift - 3 ) );
 		Bit32s bestAdd = guessAdd;
 		Bit32u bestDiff = 1 << 30;
 		for( Bit32u passes = 0; passes < 16; passes ++ ) {
@@ -1290,15 +1339,24 @@ void Chip::Setup( Bit32u rate ) {
 				if ( !bestDiff )
 					break;
 			}
+			/* The refinement step overflowed a 32-bit signed int:
+			 * (original - diff) reaches 2*original (~5e5), so the <<12
+			 * alone hits ~2e9, and guessAdd*mul is far past INT_MAX
+			 * (UBSan: "4158 * 591053 cannot be represented in type
+			 * 'int'"). That is undefined behaviour, which means the
+			 * attack rates a build ends up with depend on the compiler.
+			 * Widening the intermediates makes the search well defined
+			 * and lets it actually converge -- see the commit message
+			 * for the 26 rates this corrects. */
 			//Below our target
 			if ( diff < 0 ) {
 				//Better than the last time
-				Bit32s mul = ((original - diff) << 12) / original;
-				guessAdd = ((guessAdd * mul) >> 12);
+				Bit64s mul = ( ( (Bit64s)original - diff ) << 12 ) / original;
+				guessAdd = (Bit32s)( ( (Bit64s)guessAdd * mul ) >> 12 );
 				guessAdd++;
 			} else if ( diff > 0 ) {
-				Bit32s mul = ((original - diff) << 12) / original;
-				guessAdd = (guessAdd * mul) >> 12;
+				Bit64s mul = ( ( (Bit64s)original - diff ) << 12 ) / original;
+				guessAdd = (Bit32s)( ( (Bit64s)guessAdd * mul ) >> 12 );
 				guessAdd--;
 			}
 		}
@@ -1343,6 +1401,9 @@ void Chip::Setup( Bit32u rate ) {
 		WriteReg( i, 0xff );
 		WriteReg( i, 0x0 );
 	}
+#undef SCALE_MUL_TRUNC
+#undef SCALE_MUL_ROUND
+#undef SCALE_DIV_TRUNC
 }
 
 static bool doneTables = false;
@@ -1368,22 +1429,26 @@ void InitTables( void ) {
 	}
 #endif
 #if ( DBOPL_WAVE == WAVE_TABLEMUL )
-	//Multiplication based tables
-	for ( int i = 0; i < 384; i++ ) {
-		int s = i * 8;
-		//TODO maybe keep some of the precision errors of the original table?
-		double val = ( 0.5 + ( pow(2.0, -1.0 + ( 255 - s) * ( 1.0 /256 ) )) * ( 1 << MUL_SH ));
-		MulTable[i] = (Bit16u)(val);
-	}
+	/* The multiplication and wave base tables are a fixed set of integers
+	 * fully determined at compile time. They used to be recomputed on every
+	 * startup with pow()/sin(), which made the AdLib output depend on the
+	 * host libm and on the compiler's floating point settings -- and the
+	 * rounding margins are thin: MulTable[341] lands 1.755e-4 below its
+	 * round-half-up tie point, so a relative error of 4.3e-6 flips it.
+	 * tools/dbopl_gentables.py derives the same integers with exact
+	 * big-integer arithmetic and certifies every entry's distance from its
+	 * rounding boundary; the results are byte-identical to what a conforming
+	 * libm produced, and now identical on every target by construction. */
+	memcpy( MulTable, MulTableInit, sizeof( MulTable ) );
 
 	//Sine Wave Base
+	memcpy( &WaveTable[ 0x0200 ], WaveSineInit, sizeof( WaveSineInit ) );
 	for ( int i = 0; i < 512; i++ ) {
-		WaveTable[ 0x0200 + i ] = (Bit16s)(sin( (i + 0.5) * (PI / 512.0) ) * 4084);
 		WaveTable[ 0x0000 + i ] = -WaveTable[ 0x200 + i ];
 	}
 	//Exponential wave
+	memcpy( &WaveTable[ 0x0700 ], WaveExpInit, sizeof( WaveExpInit ) );
 	for ( int i = 0; i < 256; i++ ) {
-		WaveTable[ 0x700 + i ] = (Bit16s)( 0.5 + ( pow(2.0, -1.0 + ( 255 - i * 8) * ( 1.0 /256 ) ) ) * 4085 );
 		WaveTable[ 0x6ff - i ] = -WaveTable[ 0x700 + i ];
 	}
 #endif
@@ -1440,7 +1505,9 @@ void InitTables( void ) {
 		TremoloTable[TREMOLO_TABLE - 1 - i] = val;
 	}
 	//Create a table with offsets of the channels from the start of the chip
-	DBOPL::Chip* chip = 0;
+	/* The offsets used to be computed by dereferencing null Chip and Channel
+	 * pointers, which UBSan rightly flags as member access through null.
+	 * offsetof() is the defined way to ask the same question. */
 	for ( Bitu i = 0; i < 32; i++ ) {
 		Bitu index = i & 0xf;
 		if ( index >= 9 ) {
@@ -1454,8 +1521,7 @@ void InitTables( void ) {
 		//Add back the bits for highest ones
 		if ( i >= 16 )
 			index += 9;
-		uintptr_t blah = reinterpret_cast<uintptr_t>( &(chip->chan[ index ]) );
-		ChanOffsetTable[i] = (Bit16u) blah;
+		ChanOffsetTable[i] = (Bit16u)( offsetof( DBOPL::Chip, chan ) + index * sizeof( DBOPL::Channel ) );
 	}
 	//Same for operators
 	for ( Bitu i = 0; i < 64; i++ ) {
@@ -1468,9 +1534,7 @@ void InitTables( void ) {
 		if ( chNum >= 12 )
 			chNum += 16 - 12;
 		Bitu opNum = ( i % 8 ) / 3;
-		DBOPL::Channel* chan = 0;
-		uintptr_t blah = reinterpret_cast<uintptr_t>( &(chan->op[opNum]) );
-		OpOffsetTable[i] = (Bit16u) (ChanOffsetTable[ chNum ] + blah);
+		OpOffsetTable[i] = (Bit16u)( ChanOffsetTable[ chNum ] + offsetof( DBOPL::Channel, op ) + opNum * sizeof( DBOPL::Operator ) );
 	}
 }
 

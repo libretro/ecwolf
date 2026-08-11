@@ -60,7 +60,7 @@ static inline bool YM3812Init(int numChips, int clock, int rate)
 	return false;
 }
 
-static inline void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, const int &volume)
+static inline void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, int volume)
 {
 	which.WriteReg(reg, val);
 }

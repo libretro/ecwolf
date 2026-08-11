@@ -134,12 +134,6 @@ struct retro_core_option_definition option_defs_us[] = {
 		"Refresh rate (FPS)",
 		"Configure the FPS.",
 		{
-			{ "7", NULL },
-			{ "7.8", NULL },
-			{ "8.8", NULL },
-			{ "10", NULL },
-			{ "14", NULL },
-			{ "17.5", NULL },
 			{ "25", NULL },
 			{ "30", NULL },
 			{ "35", NULL },
@@ -160,11 +154,7 @@ struct retro_core_option_definition option_defs_us[] = {
 			{ "360", NULL },
 			{ NULL, NULL },
 		},
-#if defined(PSP) || defined(RS90)
-		"17.5",
-#else
 		"35",
-#endif
 	},
 	{
 		"ecwolf-palette",

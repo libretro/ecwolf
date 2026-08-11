@@ -569,21 +569,6 @@ static void compute_frame_reference()
 	case 350: // 35.0 fps, 2 tics/frame
 		frame_reference_us = 2 * TIC_TIME_US;
 		break;
-	case 175: // 17.5 fps, 4 tics/frame
-		frame_reference_us = 4 * TIC_TIME_US;
-		break;
-	case 140: // 14.0 fps, 5 tics/frame
-		frame_reference_us = 5 * TIC_TIME_US;
-		break;
-	case 100: // 10.0 fps, 7 tics/frame
-		frame_reference_us = 7 * TIC_TIME_US;
-		break;
-	case 88: // 8.75 fps, 8 tics/frame
-		frame_reference_us = 8 * TIC_TIME_US;
-		break;
-	case 70: // 7.0 fps, 8 tics/frame
-		frame_reference_us = 10 * TIC_TIME_US;
-		break;
 	default:
 		frame_reference_us = 10000000 / fp10s;
 		break;
@@ -715,10 +700,13 @@ static void update_variables(bool startup)
 	}
 
 	const char *fpsstr = get_string_variable_def("ecwolf-fps", "35");
-	if (strcmp (fpsstr, "17.5") == 0)
-		fp10s = 175;
-	else
-		fp10s = strtoul(fpsstr, NULL, 0) * 10;
+	fp10s = strtoul(fpsstr, NULL, 0) * 10;
+	// The sub-25 fps options (7/7.8/8.8/10/14/17.5) were removed; a stale
+	// saved config can still hand us one of the old strings (including
+	// "17.5", which parses as 170 here now that its special case is gone),
+	// so clamp to the new floor rather than running the game in slow motion.
+	if (fp10s < 250)
+		fp10s = 250;
 	if (log_cb)
 		log_cb(RETRO_LOG_INFO, "Got FPS: %u.%u.\n", fp10s / 10, fp10s % 10);
 
@@ -1317,6 +1305,14 @@ static void poll_inputs(wl_input_state_t *input)
 // deterministic). The whole frame is mixed into soundbuf and handed to the
 // frontend in a single audio_batch_cb call (lower callback overhead, one buffer
 // zero, better latency than one call per tic).
+//
+// MAX_FRAMETICS must cover the slowest FPS option with headroom: the 25 fps
+// floor needs at most 3 tics/frame (the 2/3 alternation of 70/25), and the
+// post-load catch-up clamp caps at 3, so 5 leaves margin without growing the
+// static buffer. Any new FPS option below 25 must raise this again -- an
+// option needing more tics than MAX_FRAMETICS silently discards audio and
+// runs the simulation slow, which is exactly the bug the 10-tic bump fixed
+// for the since-removed 7 fps setting.
 #define MAX_FRAMETICS    5
 #define SAMPLES_PER_TIC  (SAMPLERATE / TICRATE)
 static int16_t soundbuf[SAMPLES_PER_TIC * MAX_FRAMETICS * 2];
@@ -1435,10 +1431,18 @@ void generate_audio_frame(long long framestarttic, unsigned frametics)
 	trim_sound_cache();
 }
 
-void generate_silent_audio(void)
+// Emit a full frame of silence. Takes the frame's tic count so slow-FPS
+// frames (2+ tics) don't underrun the frontend's audio buffer while paused:
+// the frontend expects samplerate * frame_time samples per retro_run, and
+// emitting a single tic's worth at e.g. 35 fps delivered only half that.
+void generate_silent_audio(unsigned frametics)
 {
-	memset (soundbuf, 0, SAMPLES_PER_TIC * 2 * sizeof(soundbuf[0]));
-	audio_batch_cb(soundbuf, SAMPLES_PER_TIC);
+	if (frametics < 1)
+		frametics = 1;
+	if (frametics > MAX_FRAMETICS)
+		frametics = MAX_FRAMETICS;
+	memset (soundbuf, 0, frametics * SAMPLES_PER_TIC * 2 * sizeof(soundbuf[0]));
+	audio_batch_cb(soundbuf, frametics * SAMPLES_PER_TIC);
 }
 
 
@@ -1457,8 +1461,6 @@ void retro_run(void)
 	// used the fixed reference duration anyway).
 	advance_frame_time();
 
-	long long framestarttic = GetTimeCount();
-
 	// When we load something we end up having very slow
 	// retro_run. Then next invocation to retro_run
 	// tries to cover the same length of time (tics) with a
@@ -1467,11 +1469,26 @@ void retro_run(void)
 	// Over 20 or in init stage is definitely after load
 	if (tics > 20 || (g_state.stage == BEFORE_NON_SHAREWARE && tics > 3))
 		tics = 3;
-	// Cap at MAX_FRAMETICS (14 fps); this also bounds the audio frame buffer.
+	// Cap at MAX_FRAMETICS; this also bounds the audio frame buffer.
 	if (tics > MAX_FRAMETICS)
 		tics = MAX_FRAMETICS;
 
 	unsigned frametics = tics;
+
+	// Mix the tic window that ENDS at the current game tic. GetTimeCount()
+	// reports the tic reached after advance_frame_time(), so at N tics/frame
+	// this frame owns [now - N + 1, now]. The old code started the window AT
+	// GetTimeCount(), which only lines up frame-to-frame when the per-frame
+	// tic count is constant, i.e. at the exact divisor settings 70/35 fps.
+	// Everywhere else the fractional tic carry makes consecutive windows
+	// overlap or leave gaps -- at 50 fps ~40% of frames replayed or skipped a
+	// 630-sample tic, an audible click/warble on every occurrence, worst on
+	// sustained OPL tones. Anchoring the window to its end makes consecutive
+	// windows exactly contiguous at every frame rate (the tic sequence, and
+	// therefore the mixed PCM, becomes byte-identical regardless of FPS; only
+	// the batching varies), while keeping the catch-up clamps above meaningful:
+	// clamped tics still drop the oldest audio, as intended.
+	long long framestarttic = GetTimeCount() - (long long)frametics + 1;
 
 	if (tics == 0) {
 		V_ShowFrame();
@@ -1522,7 +1539,7 @@ void retro_run(void)
 	if (Paused & 1) {
 		VWB_DrawGraphic(TexMan("PAUSED"), (20 - 4)*8, 80 - 2*8);
 		VH_UpdateScreen();
-		generate_silent_audio();
+		generate_silent_audio(frametics);
 		in_retro_run = false;
 		return;
 	}
