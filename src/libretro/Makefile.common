@@ -1,5 +1,5 @@
 ifeq ($(LIBRETRO_COMM_DIR),)
-LIBRETRO_COMM_DIR  = $(CORE_DIR)/libretro-common
+LIBRETRO_COMM_DIR  = $(CORE_DIR)/src/libretro/libretro-common
 endif
 BZIP2_DIR   = $(CORE_DIR)/deps/bzip2
 
