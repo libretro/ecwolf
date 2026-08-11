@@ -152,32 +152,6 @@ static const char ZSig[4] = { 'F', 'L', 'Z', 'L' };
 //
 // M_ZlibError
 //
-static FString M_ZLibError(int zerr)
-{
-	if (zerr >= 0)
-	{
-		return "OK";
-	}
-	else if (zerr < -6)
-	{
-		char out[16];
-		sprintf(out, "%d", zerr);
-		return out;
-	}
-	else
-	{
-		static const char *errs[6] =
-		{
-			"Errno",
-			"Stream Error",
-			"Data Error",
-			"Memory Error",
-			"Buffer Error",
-			"Version Error"
-		};
-		return errs[-zerr - 1];
-	}
-}
 
 FCompressedFile::FCompressedFile ()
 {
