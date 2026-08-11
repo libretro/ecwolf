@@ -35,19 +35,41 @@
 #ifndef __M_CRC32__
 #define __M_CRC32__
 
-#include <zlib.h>
 #include "wl_def.h"
+extern "C"
+{
+#include "encodings/crc32.h"
+}
 
-// zlib includes some CRC32 stuff, so just use that
+// CRC32 via libretro-common's encoding_crc32 (identical polynomial and
+// pre/post conditioning to zlib's crc32()). The byte-stepping table for
+// CRC1 is generated locally once, since the library does not export its
+// internal table.
 
-inline const uint32_t *GetCRCTable () { return (const uint32_t *)get_crc_table(); }
+inline const uint32_t *GetCRCTable ()
+{
+	static uint32_t table[256];
+	static bool built = false;
+	if (!built)
+	{
+		for (uint32_t i = 0; i < 256; i++)
+		{
+			uint32_t c = i;
+			for (int k = 0; k < 8; k++)
+				c = (c & 1) ? 0xEDB88320u ^ (c >> 1) : c >> 1;
+			table[i] = c;
+		}
+		built = true;
+	}
+	return table;
+}
 inline uint32_t CalcCRC32 (const uint8_t *buf, unsigned int len)
 {
-	return crc32 (0, buf, len);
+	return encoding_crc32 (0, buf, len);
 }
 inline uint32_t AddCRC32 (uint32_t crc, const uint8_t *buf, unsigned int len)
 {
-	return crc32 (crc, buf, len);
+	return encoding_crc32 (crc, buf, len);
 }
 inline uint32_t CRC1 (uint32_t crc, const uint8_t c, const uint32_t *crcTable)
 {

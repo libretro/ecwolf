@@ -2,7 +2,7 @@
 #define FILES_H
 
 #include <stdio.h>
-#include <zlib.h>
+#include "libretro/rzlib_shim.h"
 #include "bzlib.h"
 #include "wl_def.h"
 #include "m_swap.h"

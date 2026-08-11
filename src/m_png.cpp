@@ -36,7 +36,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <zlib.h>
+#include "libretro/rzlib_shim.h"
 #ifdef _WIN32
 #include <malloc.h>		// for alloca()
 #endif

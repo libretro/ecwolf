@@ -43,12 +43,12 @@
 #include <stddef.h>
 #include <string.h>
 #include <assert.h>
-#include <zlib.h>
 #include <stdlib.h>
 
 #include "farchive.h"
 #include "m_swap.h"
 #include "m_crc32.h"
+#include "libretro/rzlib_shim.h"
 #include "c_cvars.h"
 #include "wl_agent.h"
 #include "dobject.h"
