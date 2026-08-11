@@ -1,3 +1,0 @@
-[submodule "src/libretro/libretro-common"]
-	path = src/libretro/libretro-common
-	url = https://github.com/libretro/libretro-common.git

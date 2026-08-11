@@ -7,8 +7,6 @@
 # Core definitions
 .core-defs:
   variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-    GIT_SUBMODULE_PATHS: src/libretro/libretro-common
     JNI_PATH: src/libretro
     MAKEFILE_PATH: src/libretro
     CORENAME: ecwolf
