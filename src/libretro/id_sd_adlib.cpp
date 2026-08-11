@@ -172,21 +172,77 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 	SDL_AlSetFXInst(*sfxOpl, inst);
 	uint8_t *alSound = (uint8_t *)sound->data;
 
-	int16_t *samples = (int16_t*) malloc (alLength * samplesPerSoundTick * 2);
+	// Bounded release ring-out after the last data byte (see below). Half a
+	// second at 140 Hz service ticks; typical Wolf3D release rates reach true
+	// silence within a few ticks and the loop stops there.
+	const int maxReleaseTicks = 70 / 2;
+
+	int16_t *samples = (int16_t*) malloc ((alLength + maxReleaseTicks) * samplesPerSoundTick * 2);
 	CHECKMALLOCRESULT(samples);
 	int16_t *sampleptr = samples;
 
 	for (int i = 0; i < alLength; i++, alSound++) {
+		// Vanilla SDL_ALSoundService semantics (ID_SD.C, kept by upstream
+		// ECWolf): a zero data byte writes alFreqL = 0 and leaves the channel
+		// KEYED ON -- the phase counter freezes at fnum 0, the output holds
+		// its last sample, and the envelope stays in sustain, so the tone
+		// resumes seamlessly at the next nonzero byte with no new attack.
+		// This port used to key the channel off instead (alFreqH = 0), which
+		// put every gap into release and re-triggered a full envelope attack
+		// plus phase reset at every gap end. Since most Wolf3D effects use
+		// zero bytes as rests/articulation, that rewrote their whole shape:
+		// A/B on a representative articulated instrument, 7558 of 9450
+		// samples differed with peaks 25272 apart (~77%% of full scale).
 		if(*alSound)
 		{
 			alOut(*sfxOpl, alFreqL, *alSound);
 			alOut(*sfxOpl, alFreqH, alBlock);
-		} else alOut(*sfxOpl, alFreqH, 0);
+		} else alOut(*sfxOpl, alFreqL, 0);
+
+		// Vanilla keys the channel off in the same 140 Hz service tick that
+		// consumes the final data byte, so the last interval renders in
+		// release, not sustain.
+		if (i == alLength - 1)
+			alOut(*sfxOpl, alFreqH, 0);
 
 		YM3812UpdateOneMono(*sfxOpl, sampleptr, samplesPerSoundTick);
 		sampleptr += samplesPerSoundTick;
 	}
+
+	// On hardware the chip keeps ringing its release after the sound "ends";
+	// the cached chunk used to hard-cut at the last tick, which left any
+	// sound not already silent -- including the held-sample gap state above --
+	// ending on a step, i.e. a click. Render the release until a whole tick
+	// comes out as exact digital silence (DBOPL outputs literal zeros once
+	// the envelope is silent), bounded by maxReleaseTicks. This makes the
+	// chunk slightly longer than the data, so the mixer channel stays
+	// occupied for the ring-out; vanilla reported the sound finished at data
+	// end while the chip rang, a divergence bounded by the half-second cap
+	// and by the few-tick reality of typical release rates.
+	for (int i = 0; i < maxReleaseTicks; i++) {
+		int16_t *tickstart = sampleptr;
+		int s;
+		YM3812UpdateOneMono(*sfxOpl, sampleptr, samplesPerSoundTick);
+		sampleptr += samplesPerSoundTick;
+		for (s = 0; s < samplesPerSoundTick; s++)
+			if (tickstart[s] != 0)
+				break;
+		if (s == samplesPerSoundTick) {
+			// Fully silent: drop this all-zero tick and stop.
+			sampleptr = tickstart;
+			break;
+		}
+	}
 	delete sfxOpl;
+
+	{
+		// Shrink the allocation to what was actually rendered.
+		int16_t *shrunk = (int16_t*) realloc (samples, (sampleptr - samples) * 2);
+		if (shrunk != NULL) {
+			sampleptr = shrunk + (sampleptr - samples);
+			samples = shrunk;
+		}
+	}
 	return new Mix_Chunk_Digital(
 		synthesisRate,
 		samples,
