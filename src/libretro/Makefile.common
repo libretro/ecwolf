@@ -1,7 +1,6 @@
 ifeq ($(LIBRETRO_COMM_DIR),)
 LIBRETRO_COMM_DIR  = $(CORE_DIR)/libretro-common
 endif
-LZMA_DIR    = $(CORE_DIR)/deps/lzma
 BZIP2_DIR   = $(CORE_DIR)/deps/bzip2
 
 INCFLAGS   := \
@@ -17,22 +16,7 @@ ifneq (,$(findstring msvc2003,$(platform)))
 INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
-DEPS_LZMA_C := $(LZMA_DIR)/C/7zArcIn.c \
-					$(LZMA_DIR)/C/7zBuf.c \
-					$(LZMA_DIR)/C/7zCrc.c \
-					$(LZMA_DIR)/C/CpuArch.c \
-					$(LZMA_DIR)/C/LzmaDec.c \
-					$(LZMA_DIR)/C/7zCrcOpt.c \
-					$(LZMA_DIR)/C/7zStream.c \
-					$(LZMA_DIR)/C/7zDec.c \
-					$(LZMA_DIR)/C/Bra.c \
-					$(LZMA_DIR)/C/Bra86.c \
-					$(LZMA_DIR)/C/BraIA64.c \
-					$(LZMA_DIR)/C/Delta.c \
-					$(LZMA_DIR)/C/Lzma2Dec.c \
-					$(LZMA_DIR)/C/Bcj2.c
-LZMA_CXX :=	$(CORE_DIR)/src/resourcefiles/file_7z.cpp
-INCFLAGS +=     -I$(LZMA_DIR)/C
+
 ifeq ($(STATIC_LINKING),1)
 INCFLAGS += -DSeqInStream_Read2=ecwolf_SeqInStream_Read2 -DSeqInStream_Read=ecwolf_SeqInStream_Read -DSeqInStream_ReadByte=ecwolf_SeqInStream_ReadByte -DLookInStream_SeekTo=ecwolf_LookInStream_SeekTo -DLookInStream_LookRead=ecwolf_LookInStream_LookRead -DLookInStream_Read2=ecwolf_LookInStream_Read2 -DLookInStream_Read=ecwolf_LookInStream_Read -DSecToLook_CreateVTable=ecwolf_SecToLook_CreateVTable -DSecToRead_CreateVTable=ecwolf_SecToRead_CreateVTable -DCrcGenerateTable=ecwolf_CrcGenerateTable -DCrcUpdateT1=ecwolf_CrcUpdateT1 -Dg_CrcUpdate=ecwolf_g_CrcUpdate -Dg_CrcTable=ecwolf_g_CrcTable -DCrcUpdate=ecwolf_CrcUpdate -Dk7zSignature=ecwolf_k7zSignature -DSzArEx_GetFileNameUtf16=ecwolf_SzArEx_GetFileNameUtf16 -DSzAr_DecodeFolder=ecwolf_SzAr_DecodeFolder -DSzArEx_Extract=ecwolf_SzArEx_Extract -DBuf_Free=ecwolf_Buf_Free -DBuf_Init=ecwolf_Buf_Init -DBuf_Create=ecwolf_Buf_Create -DCrcCalc=ecwolf_CrcCalc -DSzArEx_Open=ecwolf_SzArEx_Open -DSzAr_GetFolderUnpackSize=ecwolf_SzAr_GetFolderUnpackSize -DSzGetNextFolderItem=ecwolf_SzGetNextFolderItem -DSzArEx_Free=ecwolf_SzArEx_Free -DSzArEx_Init=ecwolf_SzArEx_Init -DSzBitUi64s_Free=ecwolf_SzBitUi64s_Free -DSzBitUi32s_Free=ecwolf_SzBitUi32s_Free -Dg_CrcUpdateT4=ecwolf_g_CrcUpdateT4 -Dg_CrcUpdateT8=ecwolf_g_CrcUpdateT8 -DCrcUpdateT4=ecwolf_CrcUpdateT4 -DCrcUpdateT8=ecwolf_CrcUpdateT8 -DLzmaDec_InitDicAndState=ecwolf_LzmaDec_InitDicAndState -DLzmaDec_Init=ecwolf_LzmaDec_Init -DLzmaDec_DecodeToDic=ecwolf_LzmaDec_DecodeToDic -DLzmaDec_DecodeToBuf=ecwolf_LzmaDec_DecodeToBuf -DLzmaDec_FreeProbs=ecwolf_LzmaDec_FreeProbs -DLzmaDec_Free=ecwolf_LzmaDec_Free -DLzmaProps_Decode=ecwolf_LzmaProps_Decode -DLzmaDec_AllocateProbs=ecwolf_LzmaDec_AllocateProbs -DLzmaDec_Allocate=ecwolf_LzmaDec_Allocate -DLzmaDecode=ecwolf_LzmaDecode -DLzma2Dec_AllocateProbs=ecwolf_Lzma2Dec_AllocateProbs -DLzma2Dec_Init=ecwolf_Lzma2Dec_Init -DLzma2Dec_DecodeToDic=ecwolf_Lzma2Dec_DecodeToDic -DBcj2Dec_Init=ecwolf_Bcj2Dec_Init -DBcj2Dec_Decode=ecwolf_Bcj2Dec_Decode -DDelta_Init=ecwolf_Delta_Init -DDelta_Encode=ecwolf_Delta_Encode -DDelta_Decode=ecwolf_Delta_Decode -DLzma2Dec_Allocate=ecwolf_Lzma2Dec_Allocate -DLzma2Dec_DecodeToBuf=ecwolf_Lzma2Dec_DecodeToBuf -DLzma2Decode=ecwolf_Lzma2Decode -DIA64_Convert=ecwolf_IA64_Convert -DSPARC_Convert=ecwolf_SPARC_Convert -Dx86_Convert=ecwolf_x86_Convert -DPPC_Convert=ecwolf_PPC_Convert -DARMT_Convert=ecwolf_ARMT_Convert -DARM_Convert=ecwolf_ARM_Convert
 endif
@@ -51,7 +35,13 @@ SOURCES_C   := $(DEPS_BZIP2) \
 	$(CORE_DIR)/src/libretro/libretro-common/formats/jpeg/rjpeg.c \
 	$(CORE_DIR)/src/libretro/libretro-common/features/features_cpu.c \
 	$(CORE_DIR)/src/libretro/libretro-common/encodings/encoding_deflate.c \
-	$(CORE_DIR)/src/libretro/libretro-common/encodings/encoding_crc32.c
+	$(CORE_DIR)/src/libretro/libretro-common/encodings/encoding_crc32.c \
+	$(CORE_DIR)/src/libretro/libretro-common/formats/7z/r7z_archive.c \
+	$(CORE_DIR)/src/libretro/libretro-common/formats/7z/r7z_lzma.c \
+	$(CORE_DIR)/src/libretro/libretro-common/formats/7z/r7z_lzma2.c \
+	$(CORE_DIR)/src/libretro/libretro-common/formats/7z/r7z_lzma_stream.c \
+	$(CORE_DIR)/src/libretro/libretro-common/formats/7z/r7z_bcj2.c \
+	$(CORE_DIR)/src/libretro/libretro-common/formats/7z/r7z_filters.c
 
 # RetroArch libretro-common DDS decoder (rdds), vendored under
 # src/libretro-common so the FDDSTexture glue is self-contained.
@@ -92,6 +82,7 @@ SOURCES_CXX := \
 	$(CORE_DIR)/src/resourcefiles/file_vswap.cpp \
 	$(CORE_DIR)/src/resourcefiles/file_wad.cpp \
 	$(CORE_DIR)/src/resourcefiles/file_zip.cpp \
+	$(CORE_DIR)/src/resourcefiles/file_7z.cpp \
 	$(CORE_DIR)/src/resourcefiles/wolfmapcommon.cpp \
 	$(CORE_DIR)/src/sfmt/SFMT.cpp \
 	$(CORE_DIR)/src/textures/anim_switches.cpp \
@@ -199,7 +190,7 @@ else
         CXXFLAGS += -DDISABLE_ADLIB
 endif
 
-SOURCES_C += $(DEPS_LZMA_C)
+SOURCES_C +=
 # Ogg Vorbis decoder used for Ogg sound effects and music tracks. Tremor
 # (libvorbisidec) is the fixed-point Vorbis decoder; together with libogg's
 # bitstream framing it gives a deterministic integer-only decode that feeds the
@@ -232,7 +223,7 @@ SOURCES_C += \
 	$(TREMOR_DIR)/id_sd_ogg.c
 # ecwolf.pk3 base data, embedded so the core carries it internally.
 SOURCES_C += $(CORE_DIR)/src/libretro/ecwolf_pk3_data.c
-SOURCES_CXX += $(LZMA_CXX)
+SOURCES_CXX +=
 
 ifneq ($(STATIC_LINKING),1)
 SOURCES_C += \

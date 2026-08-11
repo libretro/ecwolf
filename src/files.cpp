@@ -33,7 +33,11 @@
 **
 */
 
-#include "LzmaDec.h"
+extern "C"
+{
+#include "7z/r7z_lzma.h"
+}
+#include "tarray.h"
 
 #include "files.h"
 #include "filesys.h"
@@ -251,122 +255,108 @@ extern "C" void bz_internal_error (int errcode)
 //
 //==========================================================================
 
-// This is retarded but necessary to work around the inclusion of windows.h in recent
-// LZMA versions, meaning it's no longer possible to include the LZMA headers in files.h. 
-// As a result we cannot declare the CLzmaDec member in the header so we work around
-// it my wrapping it into another struct that can be declared anonymously in the header.
+// The decoder state lives behind an opaque pointer (a pattern kept from the
+// LZMA-SDK days, when its headers could not be included from files.h); it
+// now also carries the whole-stream decode result, since rlzma_dec_decode
+// is a one-shot whole-block decoder rather than an incremental one. The
+// only real-world caller (FZipLump::FillCache) performs a single full-size
+// Read anyway; partial reads are still honoured from the decoded buffer.
 struct FileReaderLZMA::StreamPointer
 {
-	CLzmaDec Stream;
+	rlzma_dec_t Dec;
+	TArray<uint8_t> Out;
+	size_t OutPos;
+	bool Decoded;
 };
-
-static void *SzAlloc(void *, size_t size) {
-	void *ret = malloc(size);
-	CHECKMALLOCRESULT(ret);
-	return ret;
-}
-static void SzFree(void *, void *address) { free(address); }
-ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 FileReaderLZMA::FileReaderLZMA (FileReader &file, size_t uncompressed_size, bool zip)
 : File(file), SawEOF(false)
 {
-	uint8_t header[4 + LZMA_PROPS_SIZE];
-	int err;
+	uint8_t header[4 + RLZMA_PROPS_SIZE];
 
 	assert(zip == true);
 
 	Size = uncompressed_size;
 	OutProcessed = 0;
 
-	// Read zip LZMA properties header
+	// Zip method-14 payload: 2-byte version, 2-byte props size, then the
+	// LZMA properties, then the raw stream.
 	if (File.Read(header, sizeof(header)) < (long)sizeof(header))
 	{
-		I_Error("FileReaderLZMA: File too shart\n");
+		I_Error("FileReaderLZMA: File too short\n");
 	}
-	if (header[2] + header[3] * 256 != LZMA_PROPS_SIZE)
+	if (header[2] + header[3] * 256 != RLZMA_PROPS_SIZE)
 	{
 		I_Error("FileReaderLZMA: LZMA props size is %d (expected %d)\n",
-			header[2] + header[3] * 256, LZMA_PROPS_SIZE);
+			header[2] + header[3] * 256, RLZMA_PROPS_SIZE);
 	}
-
-	FillBuffer();
 
 	Streamp = new StreamPointer;
-	LzmaDec_Construct(&Streamp->Stream);
-	err = LzmaDec_Allocate(&Streamp->Stream, header + 4, LZMA_PROPS_SIZE, &g_Alloc);
+	Streamp->OutPos = 0;
+	Streamp->Decoded = false;
 
-	if (err != SZ_OK)
+	if (rlzma_dec_init(&Streamp->Dec, header + 4) != RLZMA_OK)
 	{
-		I_Error("FileReaderLZMA: LzmaDec_Allocate failed: %d\n", err);
+		I_Error("FileReaderLZMA: unsupported LZMA properties\n");
 	}
-
-	LzmaDec_Init(&Streamp->Stream);
 }
 
 FileReaderLZMA::~FileReaderLZMA ()
 {
-	LzmaDec_Free(&Streamp->Stream, &g_Alloc);
 	delete Streamp;
 }
 
 long FileReaderLZMA::Read (void *buffer, long len)
 {
-	int err;
-	Byte *next_out = (Byte *)buffer;
-
-	do
+	if (!Streamp->Decoded)
 	{
-		ELzmaFinishMode finish_mode = LZMA_FINISH_ANY;
-		ELzmaStatus status;
-		size_t out_processed = len;
-		size_t in_processed = InSize;
+		// Whole-stream decode. Zip gives no compressed length at this
+		// layer, so read a generous slice of the remaining container and
+		// widen it if the decoder reports truncated input: LZMA streams
+		// smaller than their plaintext are the overwhelmingly common case,
+		// and the ladder caps at the container end.
+		long remain = File.GetLength() - File.Tell();
+		if (remain < 0)
+			remain = 0;
+		long want = (long)(Size + Size / 4 + 1024);
+		if (want > remain)
+			want = remain;
 
-		err = LzmaDec_DecodeToBuf(&Streamp->Stream, next_out, &out_processed, InBuff + InPos, &in_processed, finish_mode, &status);
-		InPos += in_processed;
-		InSize -= in_processed;
-		next_out += out_processed;
-		len = (long)(len - out_processed);
-		if (err != SZ_OK)
+		TArray<uint8_t> in;
+		in.Resize(want);
+		long got = want > 0 ? File.Read(&in[0], want) : 0;
+
+		Streamp->Out.Resize(Size);
+		for (;;)
 		{
-			I_Error ("Corrupt LZMA stream");
-		}
-		if (in_processed == 0 && out_processed == 0)
-		{
-			if (status != LZMA_STATUS_FINISHED_WITH_MARK)
-			{
+			int r = rlzma_dec_decode(&Streamp->Dec,
+				Size ? &Streamp->Out[0] : NULL, Size,
+				got ? &in[0] : NULL, (size_t)got);
+			if (r == RLZMA_OK)
+				break;
+			if (got >= remain)
 				I_Error ("Corrupt LZMA stream");
-			}
+			// Truncated input: widen toward the container end and retry.
+			long more = got ? got : 1024;
+			if (got + more > remain)
+				more = remain - got;
+			in.Resize(got + more);
+			long extra = File.Read(&in[got], more);
+			if (extra <= 0)
+				I_Error ("Corrupt LZMA stream");
+			got += extra;
 		}
-		if (InSize == 0 && !SawEOF)
-		{
-			FillBuffer ();
-		}
-	} while (err == SZ_OK && len != 0);
-
-	if (err != Z_OK && err != Z_STREAM_END)
-	{
-		I_Error ("Corrupt LZMA stream");
+		Streamp->Decoded = true;
 	}
 
-	if (len != 0)
+	if ((size_t)len > Size - Streamp->OutPos)
+		len = (long)(Size - Streamp->OutPos);
+	if (len > 0)
 	{
-		I_Error ("Ran out of data in LZMA stream");
+		memcpy(buffer, &Streamp->Out[Streamp->OutPos], len);
+		Streamp->OutPos += len;
 	}
-
-	return (long)(next_out - (Byte *)buffer);
-}
-
-void FileReaderLZMA::FillBuffer ()
-{
-	long numread = File.Read(InBuff, BUFF_SIZE);
-
-	if (numread < BUFF_SIZE)
-	{
-		SawEOF = true;
-	}
-	InPos = 0;
-	InSize = numread;
+	return len;
 }
 
 //==========================================================================

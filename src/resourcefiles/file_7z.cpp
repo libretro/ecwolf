@@ -33,8 +33,10 @@
 **
 */
 
-#include "7z.h"
-#include "7zCrc.h"
+extern "C"
+{
+#include "7z/r7z_archive.h"
+}
 
 #include "resourcefile.h"
 #include "w_zip.h"
@@ -53,113 +55,58 @@
 //
 //-----------------------------------------------------------------------
 
-extern ISzAlloc g_Alloc;
-
-struct CZDFileInStream
-{
-	ISeekInStream s;
-	FileReader *File;
-
-	CZDFileInStream(FileReader *_file)
-	{
-		s.Read = Read;
-		s.Seek = Seek;
-		File = _file;
-	}
-
-	static SRes Read(void *pp, void *buf, size_t *size)
-	{
-		CZDFileInStream *p = (CZDFileInStream *)pp;
-		long numread = p->File->Read(buf, (long)*size);
-		if (numread < 0)
-		{
-			*size = 0;
-			return SZ_ERROR_READ;
-		}
-		*size = numread;
-		return SZ_OK;
-	}
-
-	static SRes Seek(void *pp, Int64 *pos, ESzSeek origin)
-	{
-		CZDFileInStream *p = (CZDFileInStream *)pp;
-		int move_method;
-		int res;
-		if (origin == SZ_SEEK_SET)
-		{
-			move_method = SEEK_SET;
-		}
-		else if (origin == SZ_SEEK_CUR)
-		{
-			move_method = SEEK_CUR;
-		}
-		else if (origin == SZ_SEEK_END)
-		{
-			move_method = SEEK_END;
-		}
-		else
-		{
-			return 1;
-		}
-		res = p->File->Seek((long)*pos, move_method);
-		*pos = p->File->Tell();
-		return res;
-	}
-};
-
+// Memory-backed archive wrapper over libretro-common's r7z. The old
+// LZMA-SDK path streamed the container through a LookToRead window but
+// still decompressed and cached whole folders; r7z takes the archive
+// resident and extracts whole entries, which for the mod-sized archives
+// this path serves is the same memory story without the SDK.
 struct C7zArchive
 {
-	CSzArEx DB;
-	CZDFileInStream ArchiveStream;
-	CLookToRead LookStream;
-	UInt32 BlockIndex;
-	Byte *OutBuffer;
-	size_t OutBufferSize;
+	TArray<uint8_t> Data;
+	r7z_archive_t *Arch;
 
-	C7zArchive(FileReader *file) : ArchiveStream(file)
+	C7zArchive(FileReader *file) : Arch(NULL)
 	{
-		if (g_CrcTable[1] == 0)
-		{
-			CrcGenerateTable();
-		}
 		file->Seek(0, SEEK_SET);
-		LookToRead_CreateVTable(&LookStream, false);
-		LookStream.realStream = &ArchiveStream.s;
-		LookToRead_Init(&LookStream);
-		SzArEx_Init(&DB);
-		BlockIndex = 0xFFFFFFFF;
-		OutBuffer = NULL;
-		OutBufferSize = 0;
+		long len = file->GetLength();
+		if (len > 0)
+		{
+			Data.Resize(len);
+			if (file->Read(&Data[0], len) != len)
+				Data.Resize(0);
+		}
 	}
 
 	~C7zArchive()
 	{
-		if (OutBuffer != NULL)
-		{
-			IAlloc_Free(&g_Alloc, OutBuffer);
-		}
-		SzArEx_Free(&DB, &g_Alloc);
+		if (Arch != NULL)
+			r7z_archive_close(Arch);
 	}
 
-	SRes Open()
+	int Open()
 	{
-		return SzArEx_Open(&DB, &LookStream.s, &g_Alloc, &g_Alloc);
+		if (Data.Size() == 0)
+			return -1;
+		return r7z_archive_open(&Arch, &Data[0], Data.Size());
 	}
 
-	SRes Extract(UInt32 file_index, char *buffer)
+	int Extract(uint32_t file_index, char *buffer)
 	{
-		size_t offset, out_size_processed;
-		SRes res = SzArEx_Extract(&DB, &LookStream.s, file_index,
-			&BlockIndex, &OutBuffer, &OutBufferSize,
-			&offset, &out_size_processed,
-			&g_Alloc, &g_Alloc);
-		if (res == SZ_OK)
+		uint8_t *out = NULL;
+		size_t out_len = 0;
+		int res = r7z_archive_extract(Arch, file_index, &out, &out_len);
+		if (res == 0 && out != NULL)
 		{
-			memcpy(buffer, OutBuffer + offset, out_size_processed);
+			memcpy(buffer, out, out_len);
+			free(out);
+			return 0;
 		}
-		return res;
+		if (out != NULL)
+			free(out);
+		return res != 0 ? res : -1;
 	}
 };
+
 //==========================================================================
 //
 // Zip Lump
@@ -221,48 +168,48 @@ bool F7ZFile::Open()
 {
 	Archive = new C7zArchive(Reader);
 	int skipped = 0;
-	SRes res;
 
-	res = Archive->Open();
-	if (res != SZ_OK)
+	if (Archive->Open() != 0)
 	{
 		delete Archive;
 		Archive = NULL;
 		return false;
 	}
 
-	CSzArEx* const archPtr = &Archive->DB;
 
-	NumLumps = archPtr->NumFiles;
+	NumLumps = r7z_archive_num_entries(Archive->Arch);
 	Lumps = new F7ZLump[NumLumps];
 
 	F7ZLump *lump_p = Lumps;
-	TArray<UInt16> nameUTF16;
 	TArray<char> nameASCII;
 
 	for (uint32_t i = 0; i < NumLumps; ++i)
 	{
+		const r7z_entry_t *ent = r7z_archive_entry(Archive->Arch, i);
+
 		// skip Directories
-		if (SzArEx_IsDir(archPtr, i))
+		if (ent == NULL || ent->is_dir)
 		{
 			skipped++;
 			continue;
 		}
 
-		const size_t nameLength = SzArEx_GetFileNameUtf16(archPtr, i, NULL);
+		// Entry names are NUL-terminated UTF-16.
+		size_t nameLength = 0;
+		while (ent->name != NULL && ent->name[nameLength] != 0)
+			nameLength++;
+		nameLength++; /* include the terminator, as the SDK count did */
 
-		if (0 == nameLength)
+		if (nameLength <= 1)
 		{
 			++skipped;
 			continue;
 		}
 
-		nameUTF16.Resize((unsigned)nameLength);
 		nameASCII.Resize((unsigned)nameLength);
-		SzArEx_GetFileNameUtf16(archPtr, i, &nameUTF16[0]);
 		for (size_t c = 0; c < nameLength; ++c)
 		{
-			nameASCII[c] = static_cast<char>(nameUTF16[c]);
+			nameASCII[c] = static_cast<char>(ent->name[c]);
 		}
 
 		/* Build the lump name with plain C strings: copy the ASCII name, then
@@ -286,7 +233,7 @@ bool F7ZFile::Open()
 			}
 			lump_p->LumpNameSetup(name);
 		}
-		lump_p->LumpSize = static_cast<int>(SzArEx_GetFileSize(archPtr, i));
+		lump_p->LumpSize = static_cast<int>(ent->size);
 		lump_p->Owner = this;
 		lump_p->Flags = LUMPF_ZIPFILE;
 		lump_p->Position = i;
@@ -303,7 +250,7 @@ bool F7ZFile::Open()
 		TArray<char> temp;
 		temp.Resize(Lumps[0].LumpSize);
 
-		if (SZ_OK != Archive->Extract(Lumps[0].Position, &temp[0]))
+		if (0 != Archive->Extract(Lumps[0].Position, &temp[0]))
 		{
 			return false;
 		}
@@ -353,14 +300,16 @@ int F7ZLump::FillCache()
 
 FResourceFile *Check7Z(const char *filename, FileReader *file)
 {
-	char head[k7zSignatureSize];
+	/* 7z signature: '7' 'z' 0xBC 0xAF 0x27 0x1C (was k7zSignature in the SDK). */
+	static const unsigned char sig[6] = { '7', 'z', 0xBC, 0xAF, 0x27, 0x1C };
+	char head[sizeof(sig)];
 
-	if (file->GetLength() >= k7zSignatureSize)
+	if (file->GetLength() >= (long)sizeof(sig))
 	{
 		file->Seek(0, SEEK_SET);
-		file->Read(&head, k7zSignatureSize);
+		file->Read(&head, sizeof(sig));
 		file->Seek(0, SEEK_SET);
-		if (!memcmp(head, k7zSignature, k7zSignatureSize))
+		if (!memcmp(head, sig, sizeof(sig)))
 		{
 			FResourceFile *rf = new F7ZFile(filename, file);
 			if (rf->Open()) return rf;
