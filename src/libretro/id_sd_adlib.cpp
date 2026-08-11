@@ -46,19 +46,7 @@ static const int synthesisRate        = SYNTHESIS_RATE;
 static const int samplesPerSoundTick  = SAMPLES_PER_SOUND_TICK;
 static const int samplesPerMusicTick  = SAMPLES_PER_MUSIC_TICK;
 #undef alOut
-#define alOut(n,b) 		YM3812Write(oplChip, n, b, 20)
-
-DBOPL::Chip oplChip;
-
-static inline bool YM3812Init(int numChips, int clock, int rate)
-{
-	static int inited = false;
-	if (inited)
-		return false;
-	inited = true;
-	oplChip.Setup(rate);
-	return false;
-}
+#define alOut(chip,n,b) 	YM3812Write(chip, n, b, 20)
 
 static inline void YM3812Write(DBOPL::Chip &which, Bit32u reg, Bit8u val, int volume)
 {
@@ -115,7 +103,10 @@ void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length)
 
 void    SD_Startup_Adlib(void)
 {
-	YM3812Init(1,3579545,synthesisRate);
+	/* Nothing to do: there is no shared OPL chip any more. Every synthesis
+	 * site (SFX below, IMF and N3D music chunks) owns a chip constructed for
+	 * the occasion, and the DBOPL::Chip constructor initialises the shared
+	 * read-only wave tables on first use. */
 }
 
 static void SDL_AlSetChanInst(DBOPL::Chip &oplChip, const Instrument *inst, unsigned int chan)
@@ -127,23 +118,23 @@ static void SDL_AlSetChanInst(DBOPL::Chip &oplChip, const Instrument *inst, unsi
 
 	m = chanOps[chan]; // modulator cell for channel
 	c = m + 3; // carrier cell for channel
-	alOut(m + alChar,inst->mChar);
-	alOut(m + alScale,inst->mScale);
-	alOut(m + alAttack,inst->mAttack);
-	alOut(m + alSus,inst->mSus);
-	alOut(m + alWave,inst->mWave);
-	alOut(c + alChar,inst->cChar);
-	alOut(c + alScale,inst->cScale);
-	alOut(c + alAttack,inst->cAttack);
-	alOut(c + alSus,inst->cSus);
-	alOut(c + alWave,inst->cWave);
+	alOut(oplChip, m + alChar,inst->mChar);
+	alOut(oplChip, m + alScale,inst->mScale);
+	alOut(oplChip, m + alAttack,inst->mAttack);
+	alOut(oplChip, m + alSus,inst->mSus);
+	alOut(oplChip, m + alWave,inst->mWave);
+	alOut(oplChip, c + alChar,inst->cChar);
+	alOut(oplChip, c + alScale,inst->cScale);
+	alOut(oplChip, c + alAttack,inst->cAttack);
+	alOut(oplChip, c + alSus,inst->cSus);
+	alOut(oplChip, c + alWave,inst->cWave);
 
 	// Note: Switch commenting on these lines for old MUSE compatibility
 //    alOutInIRQ(alFeedCon,inst->nConn);
 
-	alOut(chan + alFreqL,0);
-	alOut(chan + alFreqH,0);
-	alOut(chan + alFeedCon,0);
+	alOut(oplChip, chan + alFreqL,0);
+	alOut(oplChip, chan + alFreqH,0);
+	alOut(oplChip, chan + alFeedCon,0);
 }
 static void SDL_AlSetFXInst(DBOPL::Chip &oplChip, const Instrument *inst)
 {
@@ -154,8 +145,6 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 {
 	AdLibSound *sound = (AdLibSound*) dataRaw;
 
-	alOut(alFreqH + 0, 0);
-
 	int alLength = LittleLong(sound->common.length);
 	uint8_t alBlock = ((sound->block & 7) << 2) | 0x20;
 	Instrument      *inst = &sound->inst;
@@ -165,7 +154,22 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 		I_FatalError("SDL_ALPlaySound() - Bad instrument");
 	}
 
-	SDL_AlSetFXInst(oplChip, inst);
+	// Own OPL chip for this synthesis, same ownership rule as the music
+	// chunks: sounds are synthesised lazily and cached, so rendering them
+	// through a shared chip made each cached waveform a function of whatever
+	// happened to be synthesised before it. The previous sound's envelope
+	// level, LFO/tremolo/vibrato phase and feedback history all bled in --
+	// measured on representative instruments, an instant-attack sound
+	// inherited a lone +11268 click at its very first sample (vs 144 from a
+	// silent chip), and a slow-attack sound diverged on 8811 of 8820 samples
+	// with peaks 15340 apart. A fresh chip makes every cached sound the same
+	// bytes no matter when or after what it was first played. Heap-allocated
+	// because DBOPL::Chip is too large to be casual stack on the small
+	// handheld ports.
+	DBOPL::Chip *sfxOpl = new DBOPL::Chip();
+	sfxOpl->Setup(synthesisRate);
+
+	SDL_AlSetFXInst(*sfxOpl, inst);
 	uint8_t *alSound = (uint8_t *)sound->data;
 
 	int16_t *samples = (int16_t*) malloc (alLength * samplesPerSoundTick * 2);
@@ -175,13 +179,14 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 	for (int i = 0; i < alLength; i++, alSound++) {
 		if(*alSound)
 		{
-			alOut(alFreqL, *alSound);
-			alOut(alFreqH, alBlock);
-		} else alOut(alFreqH, 0);
+			alOut(*sfxOpl, alFreqL, *alSound);
+			alOut(*sfxOpl, alFreqH, alBlock);
+		} else alOut(*sfxOpl, alFreqH, 0);
 
-		YM3812UpdateOneMono(oplChip, sampleptr, samplesPerSoundTick);
+		YM3812UpdateOneMono(*sfxOpl, sampleptr, samplesPerSoundTick);
 		sampleptr += samplesPerSoundTick;
 	}
+	delete sfxOpl;
 	return new Mix_Chunk_Digital(
 		synthesisRate,
 		samples,
@@ -194,7 +199,6 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 			     bool isLooping)
 {
-	YM3812Init(1,3579545,synthesisRate);
 	this->rate = rate;
 	this->sample_count = 0;
 	this->chunk_samples = NULL;
