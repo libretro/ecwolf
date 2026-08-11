@@ -191,36 +191,13 @@ else
 endif
 
 SOURCES_C +=
-# Ogg Vorbis decoder used for Ogg sound effects and music tracks. Tremor
-# (libvorbisidec) is the fixed-point Vorbis decoder; together with libogg's
-# bitstream framing it gives a deterministic integer-only decode that feeds the
-# int16 mixer with no float->int16 conversion anywhere on the path. id_sd_ogg.c
-# is the shared decode helper both the SFX and music paths call.
-TREMOR_DIR := $(CORE_DIR)/src/libretro/deps/tremor
-# Only expose deps/tremor/include on the angle-bracket search path (it holds
-# just <ogg/*.h>). Deliberately do NOT add $(TREMOR_DIR) itself: on a
-# case-insensitive filesystem (macOS) Tremor's block.h would otherwise satisfy
-# a system <Block.h> include and get parsed standalone. Tremor's own sources
-# reach their siblings (misc.h, block.h, ...) through quote includes, which
-# already search each file's own directory.
-INCFLAGS   += -I$(TREMOR_DIR)/include
+# Ogg Vorbis decoder for Ogg sound effects and music tracks: libretro-common
+# rvorbis via its fixed-point s16 pipeline (Q20/Q28/Q27 integer arithmetic,
+# native int16 output), preserving the bit-identical cross-platform decode
+# the previous Tremor path provided, without the vendored tree.
 SOURCES_C += \
-	$(TREMOR_DIR)/bitwise.c \
-	$(TREMOR_DIR)/framing.c \
-	$(TREMOR_DIR)/mdct.c \
-	$(TREMOR_DIR)/block.c \
-	$(TREMOR_DIR)/window.c \
-	$(TREMOR_DIR)/synthesis.c \
-	$(TREMOR_DIR)/info.c \
-	$(TREMOR_DIR)/floor0.c \
-	$(TREMOR_DIR)/floor1.c \
-	$(TREMOR_DIR)/res012.c \
-	$(TREMOR_DIR)/mapping0.c \
-	$(TREMOR_DIR)/registry.c \
-	$(TREMOR_DIR)/codebook.c \
-	$(TREMOR_DIR)/sharedbook.c \
-	$(TREMOR_DIR)/vorbisfile.c \
-	$(TREMOR_DIR)/id_sd_ogg.c
+	$(CORE_DIR)/src/libretro/id_sd_ogg.c \
+	$(CORE_DIR)/src/libretro/libretro-common/formats/vorbis/rvorbis.c
 # ecwolf.pk3 base data, embedded so the core carries it internally.
 SOURCES_C += $(CORE_DIR)/src/libretro/ecwolf_pk3_data.c
 SOURCES_CXX +=

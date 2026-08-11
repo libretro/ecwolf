@@ -34,7 +34,7 @@
 #include "wl_main.h"
 #include "id_sd.h"
 #include "state_machine.h"
-#include "deps/tremor/id_sd_ogg.h"
+#include "id_sd_ogg.h"
 #include "wl_play.h"
 #include "dosbox/dbopl.h"
 
