@@ -34,12 +34,10 @@
 */
 
 #include <stdio.h>
-#include <setjmp.h>
+#include <stdlib.h>
 extern "C"
 {
-#define boolean jboolean
-#include <jpeglib.h>
-#undef boolean
+#include "formats/rjpeg.h"
 }
 
 #include "wl_def.h"
@@ -53,145 +51,56 @@ extern "C"
 #define TEXTCOLOR_ORANGE
 
 
-struct FLumpSourceMgr : public jpeg_source_mgr
+// Decode an entire JPEG lump with rjpeg (libretro-common). Returns a
+// malloc'd RGBA buffer (R at byte 0) the caller must free(), or NULL on any
+// failure. rjpeg handles baseline and progressive 8-bit grayscale/YCbCr
+// streams; CMYK -- which libjpeg accepted here before -- is not supported
+// and fails cleanly.
+static uint8_t *JPEG_DecodeRGBA (FWadLump &lump, unsigned *width, unsigned *height)
 {
-	FileReader *Lump;
-	JOCTET Buffer[4096];
-	bool StartOfFile;
+	long len = lump.GetLength();
+	if (len <= 0)
+		return NULL;
 
-	FLumpSourceMgr (FileReader *lump, j_decompress_ptr cinfo);
-	static void InitSource (j_decompress_ptr cinfo);
-	static jboolean FillInputBuffer (j_decompress_ptr cinfo);
-	static void SkipInputData (j_decompress_ptr cinfo, long num_bytes);
-	static void TermSource (j_decompress_ptr cinfo);
-};
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FLumpSourceMgr::InitSource (j_decompress_ptr cinfo)
-{
-	((FLumpSourceMgr *)(cinfo->src))->StartOfFile = true;
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-jboolean FLumpSourceMgr::FillInputBuffer (j_decompress_ptr cinfo)
-{
-	FLumpSourceMgr *me = (FLumpSourceMgr *)(cinfo->src);
-	long nbytes = me->Lump->Read (me->Buffer, sizeof(me->Buffer));
-
-	if (nbytes <= 0)
+	uint8_t *raw = new uint8_t[len];
+	lump.Seek(0, SEEK_SET);
+	if (lump.Read(raw, len) != len)
 	{
-		me->Buffer[0] = (JOCTET)0xFF;
-		me->Buffer[1] = (JOCTET)JPEG_EOI;
-		nbytes = 2;
+		delete[] raw;
+		return NULL;
 	}
-	me->next_input_byte = me->Buffer;
-	me->bytes_in_buffer = nbytes;
-	me->StartOfFile = false;
-	return TRUE;
-}
 
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FLumpSourceMgr::SkipInputData (j_decompress_ptr cinfo, long num_bytes)
-{
-	FLumpSourceMgr *me = (FLumpSourceMgr *)(cinfo->src);
-	if (num_bytes <= (long)me->bytes_in_buffer)
+	rjpeg_t *rj = rjpeg_alloc();
+	if (rj == NULL)
 	{
-		me->bytes_in_buffer -= num_bytes;
-		me->next_input_byte += num_bytes;
+		delete[] raw;
+		return NULL;
 	}
-	else
+
+	void *out = NULL;
+	*width = *height = 0;
+	rjpeg_set_buf_ptr(rj, raw, (size_t)len);
+	rjpeg_set_out_rgba(rj, true);
+	// rjpeg_process_image returns 0 for "call again" (progressive streams
+	// decode one scan per call), 1 when the image is complete, negative on
+	// error. Bound the loop defensively against a malformed stream that
+	// never completes.
+	int ok = 0;
+	for (int iter = 0; iter < 4096 && ok == 0; iter++)
+		ok = rjpeg_process_image(rj, &out, (size_t)len, width, height, true);
+	rjpeg_free(rj);
+	delete[] raw;
+
+	if (ok <= 0 || out == NULL || *width == 0 || *height == 0)
 	{
-		num_bytes -= (long)me->bytes_in_buffer;
-		me->Lump->Seek (num_bytes, SEEK_CUR);
-		FillInputBuffer (cinfo);
+		if (out != NULL)
+			free(out);
+		printf("Failed to decode JPEG lump\n");
+		return NULL;
 	}
+	return (uint8_t *)out;
 }
 
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void FLumpSourceMgr::TermSource (j_decompress_ptr cinfo)
-{
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-FLumpSourceMgr::FLumpSourceMgr (FileReader *lump, j_decompress_ptr cinfo)
-: Lump (lump)
-{
-	cinfo->src = this;
-	init_source = InitSource;
-	fill_input_buffer = FillInputBuffer;
-	skip_input_data = SkipInputData;
-	resync_to_restart = jpeg_resync_to_restart;
-	term_source = TermSource;
-	bytes_in_buffer = 0;
-	next_input_byte = NULL;
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-// libjpeg's default error handler calls exit(); the original code instead
-// threw a C++ exception out of error_exit and caught it. To remove exceptions
-// while keeping the same recover-and-clean-up behaviour, we use libjpeg's
-// documented mechanism: an error manager that carries a setjmp buffer. On a
-// fatal libjpeg error we longjmp back to the decode function, which then
-// performs its normal cleanup. The only automatic object on the unwound path
-// (FLumpSourceMgr) is trivially destructible, so the longjmp is well defined.
-struct FJPEGErrorMgr
-{
-	struct jpeg_error_mgr pub;	// must be first: libjpeg treats this as jpeg_error_mgr
-	jmp_buf setjmp_buffer;
-};
-
-void JPEG_ErrorExit (j_common_ptr cinfo)
-{
-	(*cinfo->err->output_message) (cinfo);
-	longjmp (((FJPEGErrorMgr *)cinfo->err)->setjmp_buffer, 1);
-}
-
-//==========================================================================
-//
-//
-//
-//==========================================================================
-
-void JPEG_OutputMessage (j_common_ptr cinfo)
-{
-	char buffer[JMSG_LENGTH_MAX];
-	(*cinfo->err->format_message) (cinfo, buffer);
-}
-
-//==========================================================================
-//
-// A JPEG texture
-//
 //==========================================================================
 
 class FJPEGTexture : public FTexture
@@ -382,98 +291,33 @@ const uint8_t *FJPEGTexture::GetPixels ()
 void FJPEGTexture::MakeTexture ()
 {
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
-	// volatile: modified between setjmp and a potential longjmp, and read in
-	// the longjmp recovery path, so its value must survive the non-local jump.
-	JSAMPLE * volatile buff = NULL;
-
-	jpeg_decompress_struct cinfo;
-	FJPEGErrorMgr jerr;
 
 	Pixels = new uint8_t[Width * Height];
 	memset (Pixels, 0xBA, Width * Height);
 
-	cinfo.err = jpeg_std_error(&jerr.pub);
-	cinfo.err->output_message = JPEG_OutputMessage;
-	cinfo.err->error_exit = JPEG_ErrorExit;
-	jpeg_create_decompress(&cinfo);
+	unsigned w = 0, h = 0;
+	uint8_t *rgba = JPEG_DecodeRGBA (lump, &w, &h);
+	if (rgba == NULL)
+		return;
+
+	// Convert to the paletted, column-major layout the software renderer
+	// expects. rjpeg hands back straight RGBA for every stream it accepts
+	// (grayscale decodes with r == g == b, which lands on the same gray
+	// palette entries the old GrayMap path chose).
+	int cw = MIN<int>(Width, (int)w);
+	int ch = MIN<int>(Height, (int)h);
+	for (int y = 0; y < ch; y++)
 	{
-		FLumpSourceMgr sourcemgr(&lump, &cinfo);
-		if (setjmp(jerr.setjmp_buffer))
+		const uint8_t *in = rgba + (size_t)y * w * 4;
+		uint8_t *out = Pixels + y;
+		for (int x = 0; x < cw; x++)
 		{
-			// A fatal libjpeg error longjmp'd back here. Clean up and bail.
-			jpeg_destroy_decompress(&cinfo);
-			if (buff != NULL)
-				delete[] buff;
-			return;
+			*out = RGB32k[in[0] >> 3][in[1] >> 3][in[2] >> 3];
+			out += Height;
+			in += 4;
 		}
-
-		jpeg_read_header(&cinfo, TRUE);
-		if (!((cinfo.out_color_space == JCS_RGB && cinfo.num_components == 3) ||
-			  (cinfo.out_color_space == JCS_CMYK && cinfo.num_components == 4) ||
-			  (cinfo.out_color_space == JCS_GRAYSCALE && cinfo.num_components == 1)))
-		{
-			jpeg_destroy_decompress(&cinfo);
-			return;
-		}
-
-		jpeg_start_decompress(&cinfo);
-
-		int y = 0;
-		buff = new uint8_t[cinfo.output_width * cinfo.output_components];
-
-		while (cinfo.output_scanline < cinfo.output_height)
-		{
-			uint8_t *in = buff;
-			uint8_t *out = Pixels + y;
-			switch (cinfo.out_color_space)
-			{
-			case JCS_RGB:
-				for (int x = Width; x > 0; --x)
-				{
-					*out = RGB32k[in[0]>>3][in[1]>>3][in[2]>>3];
-					out += Height;
-					in += 3;
-				}
-				break;
-
-			case JCS_GRAYSCALE:
-				for (int x = Width; x > 0; --x)
-				{
-					*out = GrayMap[in[0]];
-					out += Height;
-					in += 1;
-				}
-				break;
-
-			case JCS_CMYK:
-				// What are you doing using a CMYK image? :)
-				for (int x = Width; x > 0; --x)
-				{
-					// To be precise, these calculations should use 255, but
-					// 256 is much faster and virtually indistinguishable.
-					int r = in[3] - (((256-in[0])*in[3]) >> 8);
-					int g = in[3] - (((256-in[1])*in[3]) >> 8);
-					int b = in[3] - (((256-in[2])*in[3]) >> 8);
-					*out = RGB32k[r >> 3][g >> 3][b >> 3];
-					out += Height;
-					in += 4;
-				}
-				break;
-
-			default:
-				// The other colorspaces were considered above and discarded,
-				// but GCC will complain without a default for them here.
-				break;
-			}
-			y++;
-		}
-		jpeg_finish_decompress(&cinfo);
-		jpeg_destroy_decompress(&cinfo);
 	}
-	if (buff != NULL)
-	{
-		delete[] buff;
-	}
+	free (rgba);
 }
 
 
@@ -487,78 +331,16 @@ void FJPEGTexture::MakeTexture ()
 
 int FJPEGTexture::CopyTrueColorPixels(FBitmap *bmp, int x, int y, int rotate, FCopyInfo *inf)
 {
-	PalEntry pe[256];
-
 	FWadLump lump = Wads.OpenLumpNum (SourceLump);
-	// volatile: see MakeTexture; value must survive the setjmp/longjmp path.
-	JSAMPLE * volatile buff = NULL;
 
-	jpeg_decompress_struct cinfo;
-	FJPEGErrorMgr jerr;
+	unsigned w = 0, h = 0;
+	uint8_t *rgba = JPEG_DecodeRGBA (lump, &w, &h);
+	if (rgba == NULL)
+		return 0;
 
-	cinfo.err = jpeg_std_error(&jerr.pub);
-	cinfo.err->output_message = JPEG_OutputMessage;
-	cinfo.err->error_exit = JPEG_ErrorExit;
-	jpeg_create_decompress(&cinfo);
-
-	{
-		FLumpSourceMgr sourcemgr(&lump, &cinfo);
-		if (setjmp(jerr.setjmp_buffer))
-		{
-			// Fatal libjpeg error: fall through to the shared cleanup below.
-			jpeg_destroy_decompress(&cinfo);
-			if (buff != NULL) delete [] buff;
-			return 0;
-		}
-
-		jpeg_read_header(&cinfo, TRUE);
-
-		if (!((cinfo.out_color_space == JCS_RGB && cinfo.num_components == 3) ||
-			  (cinfo.out_color_space == JCS_CMYK && cinfo.num_components == 4) ||
-			  (cinfo.out_color_space == JCS_GRAYSCALE && cinfo.num_components == 1)))
-		{
-			jpeg_destroy_decompress(&cinfo);
-			return 0;
-		}
-		jpeg_start_decompress(&cinfo);
-
-		int yc = 0;
-		buff = new uint8_t[cinfo.output_height * cinfo.output_width * cinfo.output_components];
-
-
-		while (cinfo.output_scanline < cinfo.output_height)
-		{
-			uint8_t * ptr = buff + cinfo.output_width * cinfo.output_components * yc;
-			jpeg_read_scanlines(&cinfo, &ptr, 1);
-			yc++;
-		}
-
-		switch (cinfo.out_color_space)
-		{
-		case JCS_RGB:
-			bmp->CopyPixelDataRGB(x, y, buff, cinfo.output_width, cinfo.output_height, 
-				3, cinfo.output_width * cinfo.output_components, rotate, CF_RGB, inf);
-			break;
-
-		case JCS_GRAYSCALE:
-			for(int i=0;i<256;i++) pe[i]=PalEntry(255,i,i,i);	// default to a gray map
-			bmp->CopyPixelData(x, y, buff, cinfo.output_width, cinfo.output_height, 
-				1, cinfo.output_width, rotate, pe, inf);
-			break;
-
-		case JCS_CMYK:
-			bmp->CopyPixelDataRGB(x, y, buff, cinfo.output_width, cinfo.output_height, 
-				4, cinfo.output_width * cinfo.output_components, rotate, CF_CMYK, inf);
-			break;
-
-		default:
-			assert(0);
-			break;
-		}
-		jpeg_finish_decompress(&cinfo);
-	}
-	jpeg_destroy_decompress(&cinfo);
-	if (buff != NULL) delete [] buff;
+	bmp->CopyPixelDataRGB (x, y, rgba, MIN<int>(Width, (int)w), MIN<int>(Height, (int)h),
+		4, w * 4, rotate, CF_RGBA, inf);
+	free (rgba);
 	return 0;
 }
 
