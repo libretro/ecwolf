@@ -476,6 +476,10 @@ Mix_Chunk_N3D::Mix_Chunk_N3D(int rate, const uint8_t *dataIn, size_t dataLen,
 
     midiOpl = new DBOPL::Chip();
     midiOpl->Setup(rate);
+    /* Waveform select on, matching vanilla's global startup write; the N3D
+     * instrument tables program operator waveforms that DBOPL otherwise
+     * masks to wave 0. */
+    midiOpl->WriteReg(0x01, 0x20);
 
     this->rate = rate;
     this->sample_count = 0;

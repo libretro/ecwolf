@@ -168,6 +168,14 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 	// handheld ports.
 	DBOPL::Chip *sfxOpl = new DBOPL::Chip();
 	sfxOpl->Setup(synthesisRate);
+	// Enable waveform select (reg 0x01 bit 5), as vanilla's startup did once
+	// for its single global chip. Without it DBOPL masks every E0 waveform
+	// write to wave 0, so any instrument with a non-sine operator waveform
+	// (the heartbeat, all four bonus pickups, ...) played with the wrong
+	// timbre. Measured on stable note windows against the reference set,
+	// spectral cosine similarity: BONUS2 0.60 -> 0.9994, BONUS3 0.66 ->
+	// 0.9915, BONUS4 0.04 -> 0.9975, heartbeat 0.70 -> 0.9998.
+	sfxOpl->WriteReg(0x01, 0x20);
 
 	SDL_AlSetFXInst(*sfxOpl, inst);
 	uint8_t *alSound = (uint8_t *)sound->data;
@@ -287,6 +295,10 @@ Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
 	// lazy synthesis of different cached tracks doesn't share register state.
 	this->imfOpl = new DBOPL::Chip();
 	this->imfOpl->Setup(synthesisRate);
+	// Waveform select on, as vanilla's global startup write provided. The
+	// Wolf3D IMF streams program operator waveforms via E0 but never write
+	// reg 0x01 themselves -- they relied on the engine having enabled it.
+	this->imfOpl->WriteReg(0x01, 0x20);
 
 	static const Instrument ChannelRelease = {
 		0, 0,
