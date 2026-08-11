@@ -285,18 +285,18 @@ int FDirectory::AddDirectory(const char *dirpath)
 
 
 FileReader::FileReader ()
-: File(NULL), Length(0), StartPos(0), FilePos(0), CloseOnDestruct(false)
+: File(NULL), Length(0), StartPos(0), FilePos(0), RBase(0), RFill(0), CloseOnDestruct(false)
 {
 }
 
 FileReader::FileReader (const FileReader &other, long length)
-: File(other.File), Length(length), CloseOnDestruct(false)
+: File(other.File), Length(length), RBase(0), RFill(0), CloseOnDestruct(false)
 {
 	FilePos = StartPos = retro_vfs_tell (other.File);
 }
 
 FileReader::FileReader (const char *filename)
-: File(NULL), Length(0), StartPos(0), FilePos(0), CloseOnDestruct(false)
+: File(NULL), Length(0), StartPos(0), FilePos(0), RBase(0), RFill(0), CloseOnDestruct(false)
 {
 	if (!Open(filename))
 	{
@@ -313,13 +313,13 @@ FileReader *FileReader::SafeOpen(const char *filename)
 }
 
 FileReader::FileReader (struct retro_vfs_wrapped_file_handle *file)
-: File(file), Length(0), StartPos(0), FilePos(0), CloseOnDestruct(false)
+: File(file), Length(0), StartPos(0), FilePos(0), RBase(0), RFill(0), CloseOnDestruct(false)
 {
 	Length = retro_vfs_size(file);
 }
 
 FileReader::FileReader (struct retro_vfs_wrapped_file_handle *file, long length)
-: File(file), Length(length), CloseOnDestruct(true)
+: File(file), Length(length), RBase(0), RFill(0), CloseOnDestruct(true)
 {
 	FilePos = StartPos = retro_vfs_tell (file);
 }
@@ -341,6 +341,7 @@ bool FileReader::Open (const char *filename)
 	StartPos = 0;
 	CloseOnDestruct = true;
 	Length = retro_vfs_size(File);
+	RFill = 0;
 	return true;
 }
 
@@ -348,6 +349,9 @@ bool FileReader::Open (const char *filename)
 void FileReader::ResetFilePtr ()
 {
 	FilePos = retro_vfs_tell (File);
+	// External code may have modified the file through the raw handle;
+	// drop the cached window.
+	RFill = 0;
 }
 
 long FileReader::Tell () const
@@ -384,8 +388,41 @@ long FileReader::Read (void *buffer, long len)
 	if (FilePos + len > StartPos + Length)
 	{
 		len = Length - FilePos + StartPos;
+		if (len <= 0) return 0;
 	}
-	len = (long)retro_vfs_read (File, buffer, len);
+
+	// Large reads bypass the window: one positioned read straight into the
+	// caller's buffer. The explicit seek keys every read to FilePos, which
+	// also makes raw-handle sharing between readers robust instead of
+	// dependent on whoever moved the handle last.
+	if (len >= RBUF_SIZE)
+	{
+		if (!retro_vfs_seek (File, FilePos))
+			return 0;
+		len = (long)retro_vfs_read (File, buffer, len);
+		FilePos += len;
+		return len;
+	}
+
+	// Serve small reads from the window; refill on miss.
+	if (RFill == 0 || FilePos < RBase || FilePos + len > RBase + RFill)
+	{
+		long want = StartPos + Length - FilePos;
+		if (want > (long)RBUF_SIZE)
+			want = RBUF_SIZE;
+		if (!retro_vfs_seek (File, FilePos))
+			return 0;
+		RBase = FilePos;
+		RFill = (long)retro_vfs_read (File, RBuf, want);
+		if (RFill <= 0)
+		{
+			RFill = 0;
+			return 0;
+		}
+		if (len > RFill)
+			len = RFill;
+	}
+	memcpy (buffer, RBuf + (FilePos - RBase), len);
 	FilePos += len;
 	return len;
 }
@@ -394,9 +431,14 @@ char *FileReader::Gets(char *strbuf, int len)
 {
 	if (len <= 0 || FilePos >= StartPos + Length) return NULL;
 	long pos = Tell();
-	retro_vfs_read (File, strbuf, len);
+	// Route through Read(): the old code read through the raw handle at its
+	// current position (not FilePos!) and past the region bound; Read()
+	// positions explicitly, respects StartPos+Length, and serves the
+	// typical short line from the buffered window.
+	long got = Read (strbuf, len);
+	if (got <= 0) return NULL;
 	char *p = strbuf;
-	for (p = strbuf; p < strbuf + len - 1 && p - strbuf < Length - pos  && *p && *p != '\n'; p++);
+	for (p = strbuf; p < strbuf + len - 1 && p - strbuf < got && *p && *p != '\n'; p++);
 	*p = 0;
 	Seek(pos + p - strbuf, SEEK_SET);
 	return strbuf;

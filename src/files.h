@@ -126,6 +126,20 @@ protected:
 	long StartPos;
 	long FilePos;
 
+	// Small-read window. Load-path profiling measured ~5400 sub-256-byte
+	// reads (1262 of exactly one byte) funnelling through Read() -- header
+	// parsers and per-lump texture format probes -- each crossing the whole
+	// VFS wrapper stack. Reads smaller than the window are served from this
+	// in-object buffer, refilled with one explicit positioned read. The
+	// window is keyed to ABSOLUTE file offsets (RBase), so sharing the raw
+	// handle between readers (FWadLump does) and Seek() in any direction
+	// never invalidate it, and the default copy of the object copies a
+	// coherent window. RFill == 0 means empty.
+	enum { RBUF_SIZE = 512 };
+	unsigned char RBuf[RBUF_SIZE];
+	long RBase;
+	long RFill;
+
 private:
 	long CalcFileLen () const;
 protected:
