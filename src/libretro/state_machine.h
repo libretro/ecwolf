@@ -166,6 +166,13 @@ public:
 	virtual void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
 			     fixed leftmul, fixed rightmul) = 0;
 	virtual int GetLengthTicks() = 0;
+	// Ticks during which the sound should be treated as occupying its
+	// channel for scheduling (channel reuse, SD_SoundPlaying). Defaults to
+	// the full PCM length; AdLib effects override it with their DATA length
+	// so a long release ring-out keeps sounding without blocking new sounds
+	// -- vanilla reported the sound finished at data end while the chip
+	// rang, and scheduling off the ring length starves rapid sounds.
+	virtual int GetBusyTicks() { return GetLengthTicks(); }
 };
 
 class Mix_Chunk_Proxy : public Mix_Chunk
@@ -232,7 +239,7 @@ class Mix_Chunk_Digital : public Mix_Chunk_Sampled
 {
 public:
        Mix_Chunk_Digital(int rate, void *samples, int sample_count, SampleFormat sample_format,
-                         bool isLooping) : whichLump(-1), isMetadataLoaded(true), isValid(true), reloadable(false)
+                         bool isLooping) : whichLump(-1), isMetadataLoaded(true), isValid(true), reloadable(false), busyTicksOverride(-1)
        {
                this->rate = rate;
                this->sample_count = sample_count;
@@ -241,7 +248,7 @@ public:
                this->isLooping = isLooping;
        }
 	
-	Mix_Chunk_Digital(int lump) : whichLump(lump), isMetadataLoaded(false), isValid(true), reloadable(true) {
+	Mix_Chunk_Digital(int lump) : whichLump(lump), isMetadataLoaded(false), isValid(true), reloadable(true), busyTicksOverride(-1) {
 		this->rate = 0;
 		this->sample_count = 0;
 		this->chunk_samples = NULL;
@@ -260,6 +267,15 @@ public:
 			return 0;
 		return sample_count * TICRATE / rate + 1;
 	}
+
+	int GetBusyTicks() {
+		if (busyTicksOverride >= 0)
+			return busyTicksOverride;
+		return GetLengthTicks();
+	}
+	// Set by SynthesizeAdlib: the data portion's length, excluding the
+	// appended release ring-out.
+	int busyTicksOverride;
 
 	void MixInto(int16_t *samples, int output_rate, size_t size, int start_ticks,
 		     fixed leftmul, fixed rightmul) {

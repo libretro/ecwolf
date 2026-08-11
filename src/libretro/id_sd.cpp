@@ -236,7 +236,15 @@ int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const
 		int oldest = -1, available = -1;
 		int i;
 		for (i = 2; i < MIX_CHANNELS; i++) {
-			if (!g_state.channels[i].isPlaying(currentTick)) {
+			// Availability uses the busy window (data length for AdLib
+			// effects), not the PCM length: an effect's release ring-out
+			// keeps mixing but must not block the channel, or rapid
+			// sounds drop out waiting behind multi-second tails.
+			SoundChannelState &ch = g_state.channels[i];
+			bool busy = ch.isPlaying(currentTick) && ch.sample != NULL
+			  && (ch.chanLooping
+			      || (long long)currentTick < (long long)ch.startTick + ch.sample->GetBusyTicks() + 1);
+			if (!busy) {
 				available = i;
 				break;
 			}
@@ -384,7 +392,14 @@ bool    SD_SoundPlaying(void)
 {
 	uint32_t currentTick = GetTimeCount();
 	for (int i = 0; i < MIX_CHANNELS; i++) {
-		if (g_state.channels[i].isPlaying(currentTick))
+		// Vanilla semantics: a sound counts as playing for its DATA
+		// duration; the appended AdLib release ring-out keeps mixing but
+		// no longer reports as busy (vanilla's chip rang after
+		// SD_SoundFinished too).
+		SoundChannelState &ch = g_state.channels[i];
+		if (ch.isPlaying(currentTick) && ch.sample != NULL
+		    && (ch.chanLooping
+		        || (long long)currentTick < (long long)ch.startTick + ch.sample->GetBusyTicks() + 1))
 			return true;
 	}
 

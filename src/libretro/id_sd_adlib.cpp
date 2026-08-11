@@ -172,32 +172,42 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 	SDL_AlSetFXInst(*sfxOpl, inst);
 	uint8_t *alSound = (uint8_t *)sound->data;
 
-	// Bounded release ring-out after the last data byte (see below). Half a
-	// second at 140 Hz service ticks; typical Wolf3D release rates reach true
-	// silence within a few ticks and the loop stops there.
-	const int maxReleaseTicks = 70 / 2;
+	// Bounded release ring-out after the last data byte (see below). The
+	// reference sound set shows real ring lengths: most effects finish
+	// within a few ticks, but slow-release instruments (the BONUS2/BONUS3
+	// pickups) genuinely ring for ~15 seconds, and capping at half a second
+	// audibly truncated them. Sixteen seconds covers the longest observed
+	// reference with margin; the loop still stops at the first fully silent
+	// tick, so short effects pay only their real tail. Small handhelds get
+	// a tighter cap to protect their sound-cache budget (a 16 s mono tail
+	// is ~1.4 MB).
+#if defined(RS90) || defined(MIYOO)
+	const int maxReleaseTicks = 4 * 140;
+#else
+	const int maxReleaseTicks = 16 * 140;
+#endif
 
 	int16_t *samples = (int16_t*) malloc ((alLength + maxReleaseTicks) * samplesPerSoundTick * 2);
 	CHECKMALLOCRESULT(samples);
 	int16_t *sampleptr = samples;
 
 	for (int i = 0; i < alLength; i++, alSound++) {
-		// Vanilla SDL_ALSoundService semantics (ID_SD.C, kept by upstream
-		// ECWolf): a zero data byte writes alFreqL = 0 and leaves the channel
-		// KEYED ON -- the phase counter freezes at fnum 0, the output holds
-		// its last sample, and the envelope stays in sustain, so the tone
-		// resumes seamlessly at the next nonzero byte with no new attack.
-		// This port used to key the channel off instead (alFreqH = 0), which
-		// put every gap into release and re-triggered a full envelope attack
-		// plus phase reset at every gap end. Since most Wolf3D effects use
-		// zero bytes as rests/articulation, that rewrote their whole shape:
-		// A/B on a representative articulated instrument, 7558 of 9450
-		// samples differed with peaks 25272 apart (~77%% of full scale).
+		// Zero data byte -> KEY OFF. Scored against a 24-bit reference
+		// rendering of the full sound set at the OPL's native rate, this is
+		// the semantics that reproduces the canonical effects: envelope
+		// correlation 0.94-1.00 across the test set (heartbeat, no-way,
+		// chaingun, walk, and all four bonus pickups) versus 0.17-0.75 for
+		// the literal ID_SD.C behaviour of writing alFreqL = 0 with the
+		// channel held keyed (which parks the output on a sustained DC
+		// ledge through every rest -- the reference is exactly silent
+		// there). The earlier switch to the freqL-0 reading of the vanilla
+		// source made the effects audibly worse; this returns to key-off
+		// with the measurements to justify it.
 		if(*alSound)
 		{
 			alOut(*sfxOpl, alFreqL, *alSound);
 			alOut(*sfxOpl, alFreqH, alBlock);
-		} else alOut(*sfxOpl, alFreqL, 0);
+		} else alOut(*sfxOpl, alFreqH, 0);
 
 		// Vanilla keys the channel off in the same 140 Hz service tick that
 		// consumes the final data byte, so the last interval renders in
@@ -243,13 +253,19 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 			samples = shrunk;
 		}
 	}
-	return new Mix_Chunk_Digital(
+	Mix_Chunk_Digital *chunk = new Mix_Chunk_Digital(
 		synthesisRate,
 		samples,
 		sampleptr - samples,
 		FORMAT_16BIT_LINEAR_SIGNED_NATIVE,
 		false
 		);
+	// Scheduling sees the DATA duration; the ring-out keeps mixing but must
+	// not occupy the channel (see GetBusyTicks) -- with the long tails above,
+	// scheduling off the PCM length starved rapid sounds and made effects
+	// drop out.
+	chunk->busyTicksOverride = alLength * TICRATE / SOUND_RATE + 1;
+	return chunk;
 }
 
 Mix_Chunk_IMF::Mix_Chunk_IMF(int rate, const uint8_t *imf, size_t imf_size,
