@@ -35,6 +35,8 @@
 #ifndef __ACTORDEF_H__
 #define __ACTORDEF_H__
 
+#include <stddef.h> /* offsetof for DECLARE_POINTER */
+
 #include "dobject.h"
 #include "tarray.h"
 
@@ -77,9 +79,13 @@
 #define IMPLEMENT_POINTY_CLASS(name) \
 	__IMPCLS(A##name, #name) \
 	const size_t A##name::__PointerOffsets[] = {
-// Similar to typeoffsetof, but doesn't cast to int.
+// Member offset without forming a fake object: the old spelling took
+// &((ThisClass*)1)->ptr, which performs a member-operator call on a
+// misaligned non-object (UBSan flagged every DECLARE_POINTER at static
+// init). offsetof on these non-standard-layout types is conditionally
+// supported and well-defined under GCC/Clang/MSVC.
 #define DECLARE_POINTER(ptr) \
-	(size_t)&((ThisClass*)1)->ptr - 1,
+	offsetof(ThisClass, ptr),
 #define END_POINTERS ~(size_t)0 };
 #define NATIVE_CLASS(name) A##name::__StaticClass
 

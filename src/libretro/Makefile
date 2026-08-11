@@ -10,6 +10,21 @@ ifneq ($(SANITIZER),)
    CFLAGS   := -fsanitize=$(SANITIZER) $(CFLAGS)
    CXXFLAGS := -fsanitize=$(SANITIZER) $(CXXFLAGS)
    LDFLAGS  := -fsanitize=$(SANITIZER) $(LDFLAGS)
+   # The vptr check is disabled by design: actor default instances are
+   # allocated raw (M_Malloc + memcpy of the parent's defaults,
+   # ClassDef::InitializeActorClass) and never constructed, because the
+   # DObject constructor enrols every object in the GC root list and
+   # defaults must not participate in GC. Every DECORATE property handler
+   # therefore performs downcasts and member accesses on memory with no
+   # dynamic type, which is benign for the field writes they do (layouts
+   # match by construction) but is exactly what -fsanitize=vptr exists to
+   # flag -- ~110 reports per run, all this one pattern. Disabling vptr
+   # keeps the remaining UBSan checks meaningful; remove this line to
+   # audit the defaults pattern itself.
+   ifneq (,$(findstring undefined,$(SANITIZER)))
+      CFLAGS   += -fno-sanitize=vptr
+      CXXFLAGS += -fno-sanitize=vptr
+   endif
 endif
 
 ifeq ($(platform),)
@@ -464,6 +479,10 @@ endif
 
 CFLAGS   += $(COMMON_CFLAGS) $(INCFLAGS)
 CXXFLAGS += $(COMMON_CFLAGS) $(INCFLAGS)
+# offsetof on the non-standard-layout actor classes (DECLARE_POINTER) is
+# conditionally-supported and well-defined on every toolchain this core
+# builds with; C++-only flag, hence not in COMMON_CFLAGS.
+CXXFLAGS += -Wno-invalid-offsetof
 
 OBJOUT   = -o 
 LINKOUT  = -o 

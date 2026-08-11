@@ -99,6 +99,13 @@ class Scanner
 			unsigned int	tokenLine;
 			unsigned int	tokenLinePosition;
 			unsigned int	scanPos;
+		
+			// Zero the scalar members: parser states are copied (nextState,
+			// rewind snapshots) before every field has been written by a
+			// scan, and the compiler-generated copy reads them (UBSan:
+			// invalid bool load).
+			ParserState() : number(0), decimal(0), boolean(false),
+				token(0), tokenLine(0), tokenLinePosition(0), scanPos(0) {}
 		};
 
 		Scanner(int lump);

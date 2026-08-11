@@ -312,36 +312,6 @@ US_RestoreWindow(WindowRec *win)
 
 //	Input routines
 
-///////////////////////////////////////////////////////////////////////////
-//
-//	USL_XORICursor() - XORs the I-bar text cursor. Used by US_LineInput()
-//
-///////////////////////////////////////////////////////////////////////////
-static void USL_XORICursor(FFont *font, int x,int y,const char *s,uint16_t cursor,EColorRange translation)
-{
-	static	bool	status;		// VGA doesn't XOR...
-	char	buf[MaxString];
-	uint16_t	w,h;
-
-	// Bound the copy to the buffer and keep the cursor terminator in range.
-	size_t slen = strlen(s);
-	if (slen >= sizeof(buf))
-		slen = sizeof(buf) - 1;
-	memcpy(buf, s, slen);
-	buf[slen] = '\0';
-	if (cursor < slen)
-		buf[cursor] = '\0';
- 	VW_MeasurePropString(font, buf,w,h);
-
-	px = x + w - 1;
-	py = y;
-	if (status^=1)
-	{
-		const char cursorString[2] = {font->GetCursor(), 0};
-		VWB_DrawPropString(font, cursorString, translation);
-	}
-}
-
 char USL_RotateChar(char ch, int dir)
 {
 	static const char charSet[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ.,-!?0123456789";

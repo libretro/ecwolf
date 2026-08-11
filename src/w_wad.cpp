@@ -156,11 +156,9 @@ void FWadCollection::DeleteAll ()
 
 void FWadCollection::InitMultipleFiles (TArray<FString> &filenames)
 {
-	int numfiles;
 
 	// open all the files, load headers, and count lumps
 	DeleteAll();
-	numfiles = 0;
 
 	for(unsigned i=0;i<filenames.Size(); i++)
 		AddFile (filenames[i]);
@@ -720,6 +718,12 @@ void FWadCollection::InitHashChains (void)
 	char name[8];
 	unsigned int i, j;
 
+	// Nothing to hash before any file is loaded; the index arrays are
+	// still null and memset(NULL, ..., 0) is undefined per the nonnull
+	// attribute (UBSan flagged all four calls during early startup).
+	if (NumLumps == 0)
+		return;
+
 	// Mark all buckets as empty
 	memset (FirstLumpIndex, 255, NumLumps*sizeof(FirstLumpIndex[0]));
 	memset (NextLumpIndex, 255, NumLumps*sizeof(NextLumpIndex[0]));
@@ -1240,6 +1244,8 @@ long FWadLump::Read (void *buffer, long len)
 
 	if (FilePos + len > Length)
 		len = Length - FilePos;
+	if (len <= 0)
+		return 0;
 	memcpy(buffer, Lump->Cache + FilePos, len);
 	FilePos += len;
 	return len;

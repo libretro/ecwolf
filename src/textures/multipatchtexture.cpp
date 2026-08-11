@@ -1208,8 +1208,9 @@ FMultiPatchTexture::FMultiPatchTexture (Scanner &sc, int usetype)
 		}
 
 		NumParts = parts.Size();
-		Parts = new TexPart[NumParts];
-		memcpy(Parts, &parts[0], NumParts * sizeof(*Parts));
+		Parts = new TexPart[parts.Size()];
+		if (parts.Size() > 0)
+			memcpy(Parts, &parts[0], parts.Size() * sizeof(*Parts));
 		Inits = new TexInit[NumParts];
 		for (int i = 0; i < NumParts; i++)
 		{

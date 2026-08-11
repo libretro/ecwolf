@@ -59,6 +59,12 @@ struct StateDefinition
 	unsigned randDuration;
 	bool fullbright;
 	bool zonebright;
+
+	// Zero the POD members: instances are built up field by field during
+	// parsing and copied into containers before every field is assigned,
+	// so compiler-generated copies read them (UBSan: invalid bool loads).
+	StateDefinition() : duration(0), randDuration(0), fullbright(false),
+		zonebright(false), offsetX(0), offsetY(0), nextType(NORMAL) {}
 	fixed_t offsetX;
 	fixed_t offsetY;
 	NextType nextType;

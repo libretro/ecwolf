@@ -81,7 +81,7 @@ static bool CheckIfRottFlat(FileReader &file)
 
 	uint16_t Width = LittleShort(header[0]);
 	uint16_t Height = LittleShort(header[1]);
-	if(file.GetLength() == Width*Height+8)
+	if(file.GetLength() == (int64_t)Width*Height+8)
 		return true;
 	return false;
 }

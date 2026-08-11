@@ -286,10 +286,19 @@ class ClassDef
 		const ClassDef			*GetParent() const { return parent; }
 		const ClassDef			*GetReplacement(bool respectMapinfo=true) const;
 		size_t					GetSize() const { return size; }
-		const Frame				*GetState(unsigned int index) const { return &frameList[index]; }
+		// Null-safe: indexing an empty frameList would form a null reference
+		// (UBSan flagged this via the parser's label resolution on state-less
+		// actors); out-of-range lookups now answer NULL instead of UB.
+		const Frame				*GetState(unsigned int index) const { return index < frameList.Size() ? &frameList[index] : NULL; }
 		static void				LoadActors();
 		static bool				bActorsLoaded;
-		bool					IsStateOwner(const Frame *frame) const { return frame >= &frameList[0] && frame < &frameList[frameList.Size()]; }
+		bool					IsStateOwner(const Frame *frame) const
+		{
+			if (frameList.Size() == 0)
+				return false;
+			const Frame *base = &frameList[0];
+			return frame >= base && frame < base + frameList.Size();
+		}
 		static void				UnloadActors();
 
 		unsigned int			ClassIndex;

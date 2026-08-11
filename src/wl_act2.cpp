@@ -326,7 +326,7 @@ ACTION_FUNCTION(A_CustomMissile)
 	};
 
 	ACTION_PARAM_STRING(missiletype, 0);
-	ACTION_PARAM_DOUBLE(spawnheight, 1);
+	ACTION_PARAM_DOUBLE(spawnheight, 1); (void)spawnheight;
 	ACTION_PARAM_INT(spawnoffset, 2);
 	ACTION_PARAM_DOUBLE(angleOffset, 3);
 	ACTION_PARAM_INT(flags, 4);
@@ -426,7 +426,7 @@ STAND
 
 ACTION_FUNCTION(A_Look)
 {
-	ACTION_PARAM_INT(flags, 0);
+	ACTION_PARAM_INT(flags, 0); (void)flags;
 	ACTION_PARAM_DOUBLE(minseedist, 1);
 	ACTION_PARAM_DOUBLE(maxseedist, 2);
 	ACTION_PARAM_DOUBLE(maxheardist, 3);

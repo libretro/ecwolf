@@ -254,11 +254,15 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 	delete sfxOpl;
 
 	{
-		// Shrink the allocation to what was actually rendered.
-		int16_t *shrunk = (int16_t*) realloc (samples, (sampleptr - samples) * 2);
+		// Shrink the allocation to what was actually rendered. Take the
+		// rendered count before the realloc: forming shrunk + (sampleptr -
+		// samples) afterwards reads the freed pointer's value, which GCC
+		// rightly flags (-Wuse-after-free) and which is formally undefined.
+		size_t rendered = (size_t)(sampleptr - samples);
+		int16_t *shrunk = (int16_t*) realloc (samples, rendered * 2);
 		if (shrunk != NULL) {
-			sampleptr = shrunk + (sampleptr - samples);
 			samples = shrunk;
+			sampleptr = shrunk + rendered;
 		}
 	}
 	Mix_Chunk_Digital *chunk = new Mix_Chunk_Digital(

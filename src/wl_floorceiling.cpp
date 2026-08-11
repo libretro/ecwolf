@@ -21,8 +21,11 @@ static void R_DrawPlane(uint8_t *vbuf, unsigned vbufPitch, int min_wallheight, i
 	fixed tex_step;                            // global step per one screen pixel
 	fixed gu, gv, du, dv;                      // global texture coordinates
 	const uint8_t *tex = NULL;
-	int texwidth, texheight;
-	fixed texxscale, texyscale;
+	// Zero-initialized: assigned only when a texture is present; GCC cannot
+	// prove the guarded uses are dominated by the assignment (-Wmaybe-
+	// uninitialized), and a deterministic 0 is strictly safer regardless.
+	int texwidth = 0, texheight = 0;
+	fixed texxscale = 0, texyscale = 0;
 	FTextureID lasttex;
 	uint8_t *tex_offset;
 	bool useOptimized = false;

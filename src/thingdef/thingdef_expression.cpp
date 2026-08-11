@@ -346,7 +346,7 @@ const Type *ExpressionNode::GetType() const
 ExpressionNode *ExpressionNode::ParseExpression(const ClassDef *cls, TypeHierarchy &types, Scanner &sc, ExpressionNode *root, unsigned char opLevel)
 {
 	// We can't back out of our level in this recursion
-	unsigned char initialLevel = opLevel;
+	unsigned char initialLevel = opLevel; (void)initialLevel;
 	if(root == NULL)
 		root = new ExpressionNode();
 

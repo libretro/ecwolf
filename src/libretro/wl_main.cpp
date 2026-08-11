@@ -823,7 +823,7 @@ pushMenu(wl_state_t *state, StateMenuType menu)
 
 void PrepareMainMenu (wl_state_t *state)
 {
-	bool idEasterEgg = Wads.CheckNumForName("IDGUYPAL") != -1;
+	bool idEasterEgg = Wads.CheckNumForName("IDGUYPAL") != -1; (void)idEasterEgg;
 
 	// Switch to the menu music, remembering where the previous (in-game) track
 	// was so "Back to Game" can resume it from the same spot. StartCPMusic
@@ -1006,7 +1006,7 @@ Menu::handleStep(wl_state_t *state, const wl_input_state_t *input)
 		//
 		// MOVE TO NEXT AVAILABLE SPOT
 		//
-		int oldPos = curPos;
+		int oldPos = curPos; (void)oldPos;
 		do
 		{
 			if (curPos == 0)
@@ -1047,7 +1047,7 @@ Menu::handleStep(wl_state_t *state, const wl_input_state_t *input)
 		if(countItems() <= 1)
 			break;
 
-		int oldPos = curPos;
+		int oldPos = curPos; (void)oldPos;
 		do
 		{
 			unsigned int lastPos = countItems() - 1;

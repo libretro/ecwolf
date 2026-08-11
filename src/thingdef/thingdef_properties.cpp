@@ -300,7 +300,7 @@ HANDLE_PROPERTY(health)
 
 HANDLE_PROPERTY(height)
 {
-	INT_PARAM(height, 0);
+	INT_PARAM(height, 0); (void)height;
 
 	// Dummy property so using it doesn't print an error/warning.
 	// For forwards compatibility solid actors should have a height of 64

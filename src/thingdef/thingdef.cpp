@@ -629,7 +629,11 @@ AActor *ClassDef::CreateInstance() const
 void ClassDef::FinalizeActorClass()
 {
 	// Sort the symbol table.
-	qsort(&symbols[0], symbols.Size(), sizeof(symbols[0]), SymbolCompare);
+	// Guard the empty case: &symbols[0] forms a null reference and hands
+	// qsort a null base, both undefined (UBSan flagged each on every
+	// symbol-less actor class).
+	if (symbols.Size() > 1)
+		qsort(&symbols[0], symbols.Size(), sizeof(symbols[0]), SymbolCompare);
 
 	// Register conversation id into table if assigned
 	if(int convid = Meta.GetMetaInt(AMETA_ConversationID))
@@ -791,7 +795,10 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	FString thisLabel;
 	Frame *prevFrame = NULL;
 	Frame *loopPoint = NULL;
-	Frame *thisFrame = &frameList[0];
+	// A state-less actor leaves frameList empty; &frameList[0] would form a
+	// null reference (UBSan). Take the base as a pointer, which is null-safe.
+	Frame *frameBase = frameList.Size() ? &frameList[0] : NULL;
+	Frame *thisFrame = frameBase;
 	for(unsigned int iter = 0;iter < stateDefs.Size();++iter)
 	{
 		const StateDefinition &thisStateDef = stateDefs[iter];
@@ -805,7 +812,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 					stateList[thisStateDef.label] = INT_MAX;
 					break;
 				case StateDefinition::NORMAL:
-					stateList[thisStateDef.label] = (unsigned int)(thisFrame - &frameList[0]);
+					stateList[thisStateDef.label] = (unsigned int)(thisFrame - frameBase);
 					continue;
 				case StateDefinition::GOTO:
 				{
@@ -827,7 +834,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 		{
 			if(i == 0 && !thisStateDef.label.IsEmpty())
 			{
-				stateList[thisStateDef.label] = (unsigned int)(thisFrame - &frameList[0]);
+				stateList[thisStateDef.label] = (unsigned int)(thisFrame - frameBase);
 				loopPoint = thisFrame;
 			}
 			memcpy(thisFrame->sprite, thisStateDef.sprite, 4);
@@ -840,7 +847,7 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 			thisFrame->action = thisStateDef.functions[0];
 			thisFrame->thinker = thisStateDef.functions[1];
 			thisFrame->next = NULL;
-			thisFrame->index = (unsigned int)(thisFrame - &frameList[0]);
+			thisFrame->index = (unsigned int)(thisFrame - frameBase);
 			thisFrame->spriteInf = 0;
 			// Only free the action arguments if we are the last frame using them.
 			thisFrame->freeActionArgs = i == thisStateDef.frames.Len()-1;
@@ -872,7 +879,9 @@ void ClassDef::InstallStates(const TArray<StateDefinition> &stateDefs)
 	}
 
 	// Safe guard to make sure state counting stays in sync
-	assert(thisFrame == &frameList[frameList.Size()]);
+	// One-past-end via operator[] forms an out-of-range reference (null when
+	// the list is empty -- UBSan); compare through the base pointer instead.
+	assert(thisFrame == (frameList.Size() ? frameBase + frameList.Size() : frameBase));
 
 	// Resolve Gotos
 	for(unsigned int iter = 0;iter < gotos.Size();++iter)

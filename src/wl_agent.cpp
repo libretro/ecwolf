@@ -162,7 +162,7 @@ void ControlMovement (APlayerPawn *ob)
 	int controly = control[playernum].controly;
 	int controlstrafe = control[playernum].controlstrafe;
 
-	int32_t oldx,oldy;
+	int32_t oldx,oldy; (void)oldx; (void)oldy;
 	angle_t angle;
 	int strafe = controlstrafe;
 
@@ -1218,8 +1218,8 @@ ACTION_FUNCTION(A_FireCustomMissile)
 	ACTION_PARAM_DOUBLE(angleOffset, 1);
 	ACTION_PARAM_BOOL(useammo, 2);
 	ACTION_PARAM_INT(spawnoffset, 3);
-	ACTION_PARAM_INT(spawnheight, 4);
-	ACTION_PARAM_BOOL(aim, 5);
+	ACTION_PARAM_INT(spawnheight, 4); (void)spawnheight;
+	ACTION_PARAM_BOOL(aim, 5); (void)aim;
 
 	if(useammo && !self->player->ReadyWeapon->DepleteAmmo())
 		return false;

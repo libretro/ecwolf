@@ -268,8 +268,12 @@ class TSharedPtr
 			(void)Deleter(p);
 
 			// All active SharedPtrs count as 1 weak reference in order to
-			// optimize the TWeakPtr implementation slightly.
-			if(--r->weak == 0)
+			// optimize the TWeakPtr implementation slightly. The shared null
+			// sentinel is a static and must never be deleted; its counts are
+			// kept from reaching zero by construction, but the explicit guard
+			// makes that invariant local (and quiets -Wfree-nonheap-object,
+			// which cannot see it).
+			if(--r->weak == 0 && r != &TSharedPtrRef::NullRef<void>::Null)
 				delete r;
 		}
 	}

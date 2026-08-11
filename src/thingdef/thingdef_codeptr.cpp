@@ -438,7 +438,7 @@ ACTION_FUNCTION(A_ChangeVelocity)
 
 	ACTION_PARAM_DOUBLE(x, 0);
 	ACTION_PARAM_DOUBLE(y, 1);
-	ACTION_PARAM_DOUBLE(z, 2);
+	ACTION_PARAM_DOUBLE(z, 2); (void)z;
 	ACTION_PARAM_INT(flags, 3);
 
 	fixed fx, fy;
@@ -512,7 +512,7 @@ ACTION_FUNCTION(A_Explode)
 ACTION_FUNCTION(A_FaceTarget)
 {
 	ACTION_PARAM_DOUBLE(max_turn, 0);
-	ACTION_PARAM_DOUBLE(max_pitch, 1);
+	ACTION_PARAM_DOUBLE(max_pitch, 1); (void)max_pitch;
 
 	A_Face(self, self->target, angle_t(max_turn*ANGLE_45/45));
 	return true;
@@ -798,7 +798,7 @@ ACTION_FUNCTION(A_PlaySound)
 	ACTION_PARAM_INT(channel, 1);
 	ACTION_PARAM_DOUBLE(volume, 2);
 	ACTION_PARAM_BOOL(looping, 3);
-	ACTION_PARAM_DOUBLE(attenuation, 4);
+	ACTION_PARAM_DOUBLE(attenuation, 4); (void)attenuation;
 
 	enum SoundChannel sndchan = SD_GENERIC;
 	if(channel == CHAN_WEAPON)
@@ -872,13 +872,13 @@ ACTION_FUNCTION(A_SpawnItem)
 {
 	ACTION_PARAM_STRING(className, 0);
 	ACTION_PARAM_DOUBLE(distance, 1);
-	ACTION_PARAM_DOUBLE(zheight, 2);
+	ACTION_PARAM_DOUBLE(zheight, 2); (void)zheight;
 
 	const ClassDef *cls = ClassDef::FindClass(className);
 	if(cls == NULL)
 		return false;
 
-	AActor *newobj = AActor::Spawn(cls,
+	AActor::Spawn(cls,
 		self->x + fixed(distance*finecosine[self->angle>>ANGLETOFINESHIFT])/64,
 		self->y - fixed(distance*finesine[self->angle>>ANGLETOFINESHIFT])/64,
 		0, SPAWN_AllowReplacement);
@@ -896,10 +896,10 @@ ACTION_FUNCTION(A_SpawnItemEx)
 	ACTION_PARAM_STRING(className, 0);
 	ACTION_PARAM_DOUBLE(xoffset, 1);
 	ACTION_PARAM_DOUBLE(yoffset, 2);
-	ACTION_PARAM_DOUBLE(zoffset, 3);
+	ACTION_PARAM_DOUBLE(zoffset, 3); (void)zoffset;
 	ACTION_PARAM_DOUBLE(xvel, 4);
 	ACTION_PARAM_DOUBLE(yvel, 5);
-	ACTION_PARAM_DOUBLE(zvel, 6);
+	ACTION_PARAM_DOUBLE(zvel, 6); (void)zvel;
 	ACTION_PARAM_DOUBLE(angle, 7);
 	ACTION_PARAM_INT(flags, 8);
 	ACTION_PARAM_INT(chance, 9);

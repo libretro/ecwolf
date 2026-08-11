@@ -224,7 +224,6 @@ static void STACK_ARGS V_DrawTextureV(FTexture *img, double x, double y, uint32_
 		sprtopscreen &= ~(FRACUNIT - 1);
 
 		double yscale = parms.destheight / img->GetHeight();
-		double iyscale = 1 / yscale;
 
 		spryscale = FLOAT2FIXED(yscale);
 

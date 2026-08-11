@@ -239,8 +239,12 @@ class Mix_Chunk_Digital : public Mix_Chunk_Sampled
 {
 public:
        Mix_Chunk_Digital(int rate, void *samples, int sample_count, SampleFormat sample_format,
-                         bool isLooping) : whichLump(-1), isMetadataLoaded(true), isValid(true), reloadable(false), busyTicksOverride(-1)
-       {
+                         bool isLooping) : busyTicksOverride(-1),
+			whichLump(-1),
+			isMetadataLoaded(true),
+			isValid(true),
+			reloadable(false)
+		{
                this->rate = rate;
                this->sample_count = sample_count;
                this->chunk_samples = samples;
@@ -248,7 +252,7 @@ public:
                this->isLooping = isLooping;
        }
 	
-	Mix_Chunk_Digital(int lump) : whichLump(lump), isMetadataLoaded(false), isValid(true), reloadable(true), busyTicksOverride(-1) {
+	Mix_Chunk_Digital(int lump) : busyTicksOverride(-1), whichLump(lump), isMetadataLoaded(false), isValid(true), reloadable(true) {
 		this->rate = 0;
 		this->sample_count = 0;
 		this->chunk_samples = NULL;
