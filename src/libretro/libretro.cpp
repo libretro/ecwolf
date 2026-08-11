@@ -1317,6 +1317,99 @@ static void poll_inputs(wl_input_state_t *input)
 #define SAMPLES_PER_TIC  (SAMPLERATE / TICRATE)
 static int16_t soundbuf[SAMPLES_PER_TIC * MAX_FRAMETICS * 2];
 
+// ---------------------------------------------------------------------------
+// Audio delivery FIFO.
+//
+// Mixing stays tic-granular (mix_one_tic), but DELIVERY to the frontend is
+// per presented frame: every retro_run emits exactly the number of samples
+// the frame's wall-time is worth, sliced out of this ring. Before this, the
+// frame's whole tic batch went out in one call and frames that contained no
+// new tic emitted NOTHING -- fine at fps <= 70, catastrophic above it: at
+// 120 fps ~42% of frames were silent gaps between 630-sample bursts (and at
+// 360 fps four out of five), which wrecked frontends' audio-driven pacing:
+// both the sound and the frame pacing audibly/visibly broke.
+//
+// The sample budget derives from the same g_state.usec that drives the tic
+// clock, so audio time and game time cannot drift apart by construction:
+//     target(usec) = usec * 44100 / 1e6 = usec * 441 / 10000
+// and since SAMPLES_PER_TIC * 70 == SAMPLERATE exactly, the target never
+// runs ahead of the tics mixed so far by a full tic (deficit stays in
+// [0, SAMPLES_PER_TIC)) -- the ring cannot underrun in normal operation.
+//
+// Deliberately NOT serialized: after a savestate load the accounting
+// self-resyncs (see audio_emit_due) instead of adding fields to g_state.
+// ---------------------------------------------------------------------------
+#define AUDIO_RING_TICS (MAX_FRAMETICS + 2)
+#define AUDIO_RING_FRAMES (AUDIO_RING_TICS * SAMPLES_PER_TIC)
+static int16_t audio_ring[AUDIO_RING_FRAMES * 2];
+static long long audio_ring_written;   // stereo frames appended to the ring
+static long long audio_ring_emitted;   // stereo frames handed to the frontend
+static long long audio_dropped_frames; // frames' worth of tics the catch-up
+                                       // clamps discarded (excluded from the
+                                       // target so a drop doesn't become a
+                                       // permanent deficit)
+
+// Append `frames` stereo frames from `src` to the ring.
+static void audio_ring_append(const int16_t *src, unsigned frames)
+{
+	while (frames > 0) {
+		unsigned pos = (unsigned)(audio_ring_written % AUDIO_RING_FRAMES);
+		unsigned run = AUDIO_RING_FRAMES - pos;
+		if (run > frames)
+			run = frames;
+		memcpy(audio_ring + pos * 2, src, run * 2 * sizeof(int16_t));
+		src += run * 2;
+		audio_ring_written += run;
+		frames -= run;
+	}
+}
+
+// Emit exactly the samples this frame's wall-time is due. Called once per
+// retro_run on every path, INCLUDING frames that advanced zero tics.
+static void audio_emit_due(void)
+{
+	// Standing latency: the delivery target trails the mix clock so the
+	// ring is never empty when a frame comes due. Without it the ring
+	// drains every frame and a zero-tic frame (fps > 70) has nothing to
+	// emit -- the frontend sees a silent gap. One tic (~14 ms) suffices up
+	// to 70 fps, where every frame mixes at least one tic. Above 70 fps,
+	// zero-tic frames arrive in streaks (at 360 fps up to six in a row
+	// thanks to the microsecond truncation of the frame duration), and one
+	// tic of cover falls just short -- measured: two zero-sample frames per
+	// 10 s at 360 fps -- so those settings carry two tics (~29 ms). The
+	// raw target never leads the mixed tics by a full tic, so subtracting
+	// one-or-two tics guarantees fill >= due on every frame.
+	long long standing = (fp10s > 700) ? 2 * SAMPLES_PER_TIC : SAMPLES_PER_TIC;
+	long long target = g_state.usec * 441 / 10000 - audio_dropped_frames
+	                   - standing;
+	long long fill = audio_ring_written - audio_ring_emitted;
+	long long due = target - audio_ring_emitted;
+
+	// Startup: the standing latency makes the first frame's target
+	// negative. Nothing is owed yet.
+	if (due < 0)
+		due = 0;
+	// Discontinuity (savestate load, FPS change mid-run): the target and
+	// the ring no longer agree. Resync by treating the ring's current
+	// content as exactly what is owed.
+	if (due > fill + 2 * SAMPLES_PER_TIC) {
+		audio_ring_emitted = target - fill;
+		due = fill;
+	}
+	if (due > fill)
+		due = fill;
+
+	while (due > 0) {
+		unsigned pos = (unsigned)(audio_ring_emitted % AUDIO_RING_FRAMES);
+		unsigned run = AUDIO_RING_FRAMES - pos;
+		if ((long long)run > due)
+			run = (unsigned)due;
+		audio_batch_cb(audio_ring + pos * 2, run);
+		audio_ring_emitted += run;
+		due -= run;
+	}
+}
+
 #define TO_SDL_POSITION(pos) (((64 - ((pos) * (pos))) * 3) + 63)
 
 static void mixChannel(long long tic, SoundChannelState *channel, int16_t *outbuf)
@@ -1427,7 +1520,8 @@ void generate_audio_frame(long long framestarttic, unsigned frametics)
 	touched_sound_size = 0;
 	for (unsigned i = 0; i < frametics; i++)
 		mix_one_tic(framestarttic + i, i);
-	audio_batch_cb(soundbuf, frametics * SAMPLES_PER_TIC);
+	audio_ring_append(soundbuf, frametics * SAMPLES_PER_TIC);
+	audio_emit_due();
 	trim_sound_cache();
 }
 
@@ -1442,7 +1536,8 @@ void generate_silent_audio(unsigned frametics)
 	if (frametics > MAX_FRAMETICS)
 		frametics = MAX_FRAMETICS;
 	memset (soundbuf, 0, frametics * SAMPLES_PER_TIC * 2 * sizeof(soundbuf[0]));
-	audio_batch_cb(soundbuf, frametics * SAMPLES_PER_TIC);
+	audio_ring_append(soundbuf, frametics * SAMPLES_PER_TIC);
+	audio_emit_due();
 }
 
 
@@ -1467,11 +1562,21 @@ void retro_run(void)
 	// single frame and then we're stuck in slow fps until user
 	// pauses. Limit this by decreasing tics
 	// Over 20 or in init stage is definitely after load
-	if (tics > 20 || (g_state.stage == BEFORE_NON_SHAREWARE && tics > 3))
-		tics = 3;
-	// Cap at MAX_FRAMETICS; this also bounds the audio frame buffer.
-	if (tics > MAX_FRAMETICS)
-		tics = MAX_FRAMETICS;
+	{
+		unsigned rawtics = tics;
+		if (tics > 20 || (g_state.stage == BEFORE_NON_SHAREWARE && tics > 3))
+			tics = 3;
+		// Cap at MAX_FRAMETICS; this also bounds the audio frame buffer.
+		if (tics > MAX_FRAMETICS)
+			tics = MAX_FRAMETICS;
+		// Tics discarded here were counted into g_state.usec but will never
+		// be mixed; exclude their samples from the delivery target or the
+		// FIFO accounting would carry a permanent deficit. (Unreachable with
+		// the current per-frame advance -- max 3 tics at the 25 fps floor --
+		// but kept correct in case the clamps ever fire again.)
+		if (rawtics > tics)
+			audio_dropped_frames += (long long)(rawtics - tics) * SAMPLES_PER_TIC;
+	}
 
 	unsigned frametics = tics;
 
@@ -1491,6 +1596,13 @@ void retro_run(void)
 	long long framestarttic = GetTimeCount() - (long long)frametics + 1;
 
 	if (tics == 0) {
+		// A frame that advanced no whole tic (fps > 70). The frontend still
+		// needs its per-frame duties honoured: poll input (state only --
+		// edge detection happens in TransformInputs on tic-advancing frames
+		// against the stored previous state, so no press is lost), emit the
+		// fractional audio this frame is due from the ring, and re-present.
+		input_poll_cb();
+		audio_emit_due();
 		V_ShowFrame();
 		in_retro_run = false;
 		return;
