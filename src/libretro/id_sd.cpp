@@ -233,7 +233,7 @@ int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const
 	int channel = chan;
 	if(chan == SD_GENERIC)
 	{
-		int oldest = -1, available = -1;
+		int oldest = -1, idle = -1, ringing = -1;
 		int i;
 		for (i = 2; i < MIX_CHANNELS; i++) {
 			// Availability uses the busy window (data length for AdLib
@@ -241,18 +241,34 @@ int SD_PlayDigitized(const char *sound, const SoundPriorities &priorities, const
 			// keeps mixing but must not block the channel, or rapid
 			// sounds drop out waiting behind multi-second tails.
 			SoundChannelState &ch = g_state.channels[i];
-			bool busy = ch.isPlaying(currentTick) && ch.sample != NULL
+			bool mixing = ch.isPlaying(currentTick) && ch.sample != NULL;
+			bool busy = mixing
 			  && (ch.chanLooping
 			      || (long long)currentTick < (long long)ch.startTick + ch.sample->GetBusyTicks() + 1);
-			if (!busy) {
-				available = i;
-				break;
+			if (busy) {
+				if (oldest == -1 || ch.startTick < g_state.channels[oldest].startTick)
+					oldest = i;
+			} else if (mixing) {
+				// Past its busy window but still mixing a release ring-out.
+				// Prefer the oldest ring for reuse (below).
+				if (ringing == -1 || ch.startTick < g_state.channels[ringing].startTick)
+					ringing = i;
+			} else if (idle == -1) {
+				idle = i;
 			}
-			if (oldest == -1 || g_state.channels[i].startTick < g_state.channels[oldest].startTick)
-				oldest = i;
 		}
-		if (available != -1)
-			channel = available;
+		// Reuse a RINGING channel before a fully idle one: on the single
+		// hardware chip every new effect cut the previous effect's release
+		// ring, so at most one tail ever sounded at a time. Preferring idle
+		// channels here let up to six 15-second tails (the slow-release
+		// BONUS2/BONUS3 pickups) pile up under rapid pickups into a ringing
+		// smear no DOS machine ever produced. Cutting the oldest ring keeps
+		// overlapping DATA polyphony intact while bounding the tails the
+		// way the real chip did.
+		if (ringing != -1)
+			channel = ringing;
+		else if (idle != -1)
+			channel = idle;
 		else
 			channel = oldest;
 	}
