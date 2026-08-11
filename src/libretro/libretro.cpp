@@ -84,6 +84,8 @@ static void fallback_log(enum retro_log_level level, const char *fmt, ...);
 
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
+// Whether the frontend accepts video_cb(NULL, ...) as "same frame again".
+static bool frontend_can_dupe;
 static retro_environment_t environ_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
@@ -1400,8 +1402,14 @@ static void audio_emit_due(void)
 		due = 0;
 	// Discontinuity (savestate load, FPS change mid-run): the target and
 	// the ring no longer agree. Resync by treating the ring's current
-	// content as exactly what is owed.
-	if (due > fill + SAMPLES_PER_TIC) {
+	// content as exactly what is owed. The threshold must admit the largest
+	// LEGITIMATE shortfall: the fixed-phase call at the top of retro_run
+	// runs before this frame's tics are mixed, so at the 25 fps floor `due`
+	// can lead `fill` by up to a whole frame (MAX_FRAMETICS tics) plus the
+	// sub-tic fraction -- a tighter threshold misread every 25 fps frame as
+	// a discontinuity and dropped the audio it "forgave" (79% of the
+	// stream). Real discontinuities jump by far more than one frame.
+	if (due > fill + (MAX_FRAMETICS + 1) * SAMPLES_PER_TIC) {
 		audio_ring_emitted = target - fill;
 		due = fill;
 	}
@@ -1589,6 +1597,21 @@ void retro_run(void)
 
 	unsigned frametics = tics;
 
+	// Fixed-phase audio emission: hand the frontend this frame's samples at
+	// the TOP of retro_run, before any game stepping or rendering. The
+	// audio write is where audio-synced frontends block to pace the core,
+	// and emitting it after the (frame-dependent) render made the pacing
+	// point breathe by the whole render time -- at 120 fps, tic frames paid
+	// a 3D render before the write while dupe frames paid nothing, and that
+	// difference is exactly the frame time deviation the frontend reports.
+	// Emitting min(due, fill) here is always safe; above 70 fps it is the
+	// ENTIRE due (due < one tic <= fill by the standing-latency invariant),
+	// so the pacing point is phase-constant. At 70 fps and below, the
+	// remainder that needs this frame's own tics goes out in
+	// generate_audio_frame as before -- those settings mix every frame and
+	// have no bimodality to fix.
+	audio_emit_due();
+
 	// Mix the tic window that ENDS at the current game tic. GetTimeCount()
 	// reports the tic reached after advance_frame_time(), so at N tics/frame
 	// this frame owns [now - N + 1, now]. The old code started the window AT
@@ -1608,11 +1631,21 @@ void retro_run(void)
 		// A frame that advanced no whole tic (fps > 70). The frontend still
 		// needs its per-frame duties honoured: poll input (state only --
 		// edge detection happens in TransformInputs on tic-advancing frames
-		// against the stored previous state, so no press is lost), emit the
-		// fractional audio this frame is due from the ring, and re-present.
+		// against the stored previous state, so no press is lost) and
+		// present. Audio already went out in the fixed-phase emission
+		// above. When the frontend supports frame duping, tell it this is
+		// the same frame instead of re-running the full-screen palette
+		// expansion on unchanged content -- at 120 fps that conversion ran
+		// ~50 times a second for nothing (290 at 360 fps), and its cost on
+		// otherwise-empty frames was the other half of the frame time
+		// deviation.
 		input_poll_cb();
-		audio_emit_due();
-		V_ShowFrame();
+		if (frontend_can_dupe && video_cb) {
+			video_cb(NULL, screen->width_, screen->height_, screen->lr_pitch_);
+			g_state.frame_counter++;
+		} else {
+			V_ShowFrame();
+		}
 		in_retro_run = false;
 		return;
 	}
@@ -1778,6 +1811,11 @@ void retro_set_environment(retro_environment_t cb)
 subsys_ready:
 	cb(RETRO_ENVIRONMENT_SET_SUBSYSTEM_INFO, subsys);
 
+	{
+		bool can_dupe = false;
+		if (cb(RETRO_ENVIRONMENT_GET_CAN_DUPE, &can_dupe))
+			frontend_can_dupe = can_dupe;
+	}
 	environ_cb = cb;
 
 	cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);

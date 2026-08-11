@@ -112,6 +112,22 @@ void    SD_Startup(void)
 #endif
 
 	SD_Started = true;
+
+	// Synthesise every AdLib and PC-speaker effect up front when the user
+	// asked for preloading. First-play synthesis otherwise runs inline in
+	// whatever frame first triggers the sound, and it is not cheap: the
+	// slow-release BONUS2 pickup renders ~14 seconds of OPL output, ~70 ms
+	// of CPU -- nine dropped frames at 120 fps on the first treasure grab.
+	// Doing it here moves the cost into the load, where a fraction of a
+	// second is invisible. Must run after SD_Startup_Adlib: the synthesis
+	// rate is not set before it, and DBOPL::Chip::Setup(0) divides by zero.
+	if (preload_digital_sounds) {
+		for (unsigned i = 0; i < SoundInfo.GetNumSounds(); i++) {
+			const SoundData &snd = SoundInfo.GetSound(i);
+			GetSoundDataType(snd, SoundData::ADLIB);
+			GetSoundDataType(snd, SoundData::PCSPEAKER);
+		}
+	}
 }
 
 void SD_Shutdown(void)
@@ -759,11 +775,17 @@ Mix_Chunk_Speaker::Mix_Chunk_Speaker(const uint8_t *dataRaw)
 		states[i].sign = sign;
 
 		pcPhaseTick += samplesPerSoundTick;
-		if ((pcPhaseTick / pcPhaseLength) & 1) 
-		{
-			sign = !sign;
+		// pcPhaseLength is 0 until the first nonzero data byte (and during
+		// any zero-byte stretch): the speaker's timer gate is off, no phase
+		// runs. Dividing by it crashed on every PC-speaker sound with a
+		// silent lead-in the moment speaker priority was actually used.
+		if (pcPhaseLength) {
+			if ((pcPhaseTick / pcPhaseLength) & 1)
+			{
+				sign = !sign;
+			}
+			pcPhaseTick %= pcPhaseLength;
 		}
-		pcPhaseTick %= pcPhaseLength;
 	}
 }
 
@@ -792,7 +814,11 @@ void Mix_Chunk_Speaker::MixInto(int16_t *result, int output_rate, size_t size, i
 		bool sign = states[pc_tick].sign;
 
 		for (int j = 0; j < samplesPerSoundTick && sample_ctr < size; j++, sample_ctr++) {
-			int val = sign ? 5000 : -5000;
+			// Gate off (phaseLength 0, i.e. a zero data byte): the speaker is
+			// silent. The old code kept emitting the +/-5000 square and, with
+			// the per-sample phase check below, toggled it every sample -- a
+			// Nyquist-frequency buzz where vanilla hardware output nothing.
+			int val = pcPhaseLength ? (sign ? 5000 : -5000) : 0;
 			int l = (val * leftmul) >> FRACBITS;
 			int r = (val * rightmul) >> FRACBITS;
 			mix_acc(outptr++, l);

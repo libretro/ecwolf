@@ -113,6 +113,9 @@ class SoundInformation
 		const SoundData	&operator[] (const char* logical) const { return operator[](FindSound(logical)); }
 		const SoundData	&operator[] (const SoundIndex &index) const;
 		uint32_t		GetLastPlayTick(const SoundData &sound) const { return lastPlayTicks[sound.index]; }
+		// Enumeration for the libretro core's synth precache (SD_PrecacheAllSynth).
+		unsigned		GetNumSounds() const { return sounds.Size(); }
+		const SoundData	&GetSound(unsigned i) const { return sounds[i]; }
 		int				GetMusicLumpNum(const char *song) const;
 		void			SetLastPlayTick(const SoundData &sound, uint32_t value) const { lastPlayTicks[sound.index] = value; }
 
