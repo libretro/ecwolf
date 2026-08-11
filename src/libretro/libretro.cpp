@@ -1368,20 +1368,29 @@ static void audio_ring_append(const int16_t *src, unsigned frames)
 // retro_run on every path, INCLUDING frames that advanced zero tics.
 static void audio_emit_due(void)
 {
-	// Standing latency: the delivery target trails the mix clock so the
-	// ring is never empty when a frame comes due. Without it the ring
-	// drains every frame and a zero-tic frame (fps > 70) has nothing to
-	// emit -- the frontend sees a silent gap. One tic (~14 ms) suffices up
-	// to 70 fps, where every frame mixes at least one tic. Above 70 fps,
-	// zero-tic frames arrive in streaks (at 360 fps up to six in a row
-	// thanks to the microsecond truncation of the frame duration), and one
-	// tic of cover falls just short -- measured: two zero-sample frames per
-	// 10 s at 360 fps -- so those settings carry two tics (~29 ms). The
-	// raw target never leads the mixed tics by a full tic, so subtracting
-	// one-or-two tics guarantees fill >= due on every frame.
-	long long standing = (fp10s > 700) ? 2 * SAMPLES_PER_TIC : SAMPLES_PER_TIC;
-	long long target = g_state.usec * 441 / 10000 - audio_dropped_frames
-	                   - standing;
+	// Delivery target, in the SAME units as the tic clock. The first
+	// version of this computed usec * 441 / 10000 (exact real-time samples
+	// at 44100 Hz) -- but the tic clock runs on the truncated
+	// TIC_TIME_US = 14285 us, and 14285 us of "real" samples is 629.9685,
+	// not the 630 a tic actually mixes. The two clocks therefore drifted
+	// ~2-6 samples per second apart and the ring fill grew without bound,
+	// silently overwriting unplayed audio after roughly half an hour of
+	// play. Scaling usec by SAMPLES_PER_TIC / TIC_TIME_US instead makes the
+	// target and the mix clock two views of the same integer timeline: the
+	// fill is provably bounded and the effective output rate is
+	// 630 / 14285 us = 44102 Hz, a fixed +50 ppm the frontend's rate
+	// control absorbs exactly like any refresh-rate mismatch.
+	//
+	// Standing latency: one tic. With tic-consistent units,
+	//     floor(usec*630/14285) - 630  <  630*floor(usec/14285)
+	// holds for every usec, i.e. the target-minus-one-tic can never lead
+	// the mixed tics -- fill >= due on EVERY frame at EVERY fps, including
+	// arbitrarily long zero-tic streaks above 70 fps. One tic (~14.3 ms) is
+	// also the floor: smooth +/-1-sample delivery from 630-sample-quantized
+	// synthesis needs 629 samples of cover in the worst phase, so nothing
+	// meaningfully lower can stay gapless.
+	long long target = g_state.usec * SAMPLES_PER_TIC / TIC_TIME_US
+	                   - audio_dropped_frames - SAMPLES_PER_TIC;
 	long long fill = audio_ring_written - audio_ring_emitted;
 	long long due = target - audio_ring_emitted;
 
@@ -1392,7 +1401,7 @@ static void audio_emit_due(void)
 	// Discontinuity (savestate load, FPS change mid-run): the target and
 	// the ring no longer agree. Resync by treating the ring's current
 	// content as exactly what is owed.
-	if (due > fill + 2 * SAMPLES_PER_TIC) {
+	if (due > fill + SAMPLES_PER_TIC) {
 		audio_ring_emitted = target - fill;
 		due = fill;
 	}
