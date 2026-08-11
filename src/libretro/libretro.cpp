@@ -233,21 +233,39 @@ static void V_ExpandPalette (void *dst, int dst_stride)
 	}
 	else
 	{
-		const uint32_t * const pal = screen->effective_palette_;
+		// RGB565: the 16-bit twin palette keeps the whole table in 512
+		// bytes, and adjacent pixels pair into single aligned 32-bit
+		// stores, halving both the table's cache footprint and the store
+		// count -- the wins that matter on the MIPS/ARM handheld targets
+		// where this pass dominates frame cost. Byte-identical output: on
+		// little-endian, (p0 | p1<<16) stored at d+x lays out exactly
+		// d[x]=p0, d[x+1]=p1; big-endian targets keep the scalar form.
+		const uint16_t * const pal = screen->effective_palette16_;
 		const uint8_t *src_row = screen->Buffer;
 		uint16_t *dst_row = (uint16_t *) dst;
 		for (int y = 0; y < screen->height_; y++) {
 			const uint8_t * const s = src_row;
 			uint16_t * const d = dst_row;
 			int x = 0;
+#if !defined(MSB_FIRST) && !defined(WORDS_BIGENDIAN)
+			if (((uintptr_t) d & 3) == 0) {
+				uint32_t * const d32 = (uint32_t *) d;
+				for (; x + 8 <= w; x += 8) {
+					d32[(x>>1)+0] = (uint32_t) pal[s[x+0]] | ((uint32_t) pal[s[x+1]] << 16);
+					d32[(x>>1)+1] = (uint32_t) pal[s[x+2]] | ((uint32_t) pal[s[x+3]] << 16);
+					d32[(x>>1)+2] = (uint32_t) pal[s[x+4]] | ((uint32_t) pal[s[x+5]] << 16);
+					d32[(x>>1)+3] = (uint32_t) pal[s[x+6]] | ((uint32_t) pal[s[x+7]] << 16);
+				}
+			}
+#endif
 			for (; x + 8 <= w; x += 8) {
-				d[x+0] = (uint16_t) pal[s[x+0]]; d[x+1] = (uint16_t) pal[s[x+1]];
-				d[x+2] = (uint16_t) pal[s[x+2]]; d[x+3] = (uint16_t) pal[s[x+3]];
-				d[x+4] = (uint16_t) pal[s[x+4]]; d[x+5] = (uint16_t) pal[s[x+5]];
-				d[x+6] = (uint16_t) pal[s[x+6]]; d[x+7] = (uint16_t) pal[s[x+7]];
+				d[x+0] = pal[s[x+0]]; d[x+1] = pal[s[x+1]];
+				d[x+2] = pal[s[x+2]]; d[x+3] = pal[s[x+3]];
+				d[x+4] = pal[s[x+4]]; d[x+5] = pal[s[x+5]];
+				d[x+6] = pal[s[x+6]]; d[x+7] = pal[s[x+7]];
 			}
 			for (; x < w; x++)
-				d[x] = (uint16_t) pal[s[x]];
+				d[x] = pal[s[x]];
 			src_row += screen->Pitch;
 			dst_row += dst_stride;
 		}
@@ -348,6 +366,8 @@ static void V_ComputePalette ()
 			screen->effective_palette_[i] =
 				(screen->FlashedPalette[i].r >> 3 << 11) | (screen->FlashedPalette[i].g >> 2 << 5) | (screen->FlashedPalette[i].b >> 3);
 #endif
+		for (int i = 0; i < 256; i++)
+			screen->effective_palette16_[i] = (uint16_t) screen->effective_palette_[i];
 	}
 }
 

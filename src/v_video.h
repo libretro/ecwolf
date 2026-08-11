@@ -167,6 +167,10 @@ struct framebuffer_t
 	PalEntry     SourcePalette[256];
 	PalEntry     FlashedPalette[256];
 	uint32_t     effective_palette_[256];   // widest form; used as 16/32 per bpp
+	// 16-bit twin of effective_palette_ for the RGB565 expand path: the
+	// whole table is 512 bytes (one or two cache lines on the handheld
+	// targets), and its entries pair directly into 32-bit stores.
+	uint16_t     effective_palette16_[256];
 };
 
 // This is the screen updated by I_FinishUpdate.
