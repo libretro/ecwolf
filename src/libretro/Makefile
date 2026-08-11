@@ -481,8 +481,13 @@ CFLAGS   += $(COMMON_CFLAGS) $(INCFLAGS)
 CXXFLAGS += $(COMMON_CFLAGS) $(INCFLAGS)
 # offsetof on the non-standard-layout actor classes (DECLARE_POINTER) is
 # conditionally-supported and well-defined on every toolchain this core
-# builds with; C++-only flag, hence not in COMMON_CFLAGS.
+# builds with; C++-only flag, hence not in COMMON_CFLAGS.  GCC/Clang
+# spelling, so it has to stay off the MSVC command line: cl rejects it
+# outright with 'D8021: invalid numeric argument'.  Nothing to silence
+# there anyway, MSVC has no equivalent diagnostic.
+ifeq (,$(findstring msvc,$(platform)))
 CXXFLAGS += -Wno-invalid-offsetof
+endif
 
 OBJOUT   = -o 
 LINKOUT  = -o 
