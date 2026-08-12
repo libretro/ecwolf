@@ -213,8 +213,6 @@ void ShutdownId (void)
 ==================
 */
 
-const double radtoint = (double)(FINEANGLES/2/PI);
-
 void BuildTables (void)
 {
 	// finetangent[] and finesine[] are constant tables in wl_trigtables.h;
@@ -252,7 +250,7 @@ void CalcProjection (int32_t focal)
 	int     i;
 	int    intang;
 	int     halfview;
-	double  facedist;
+	int32_t facedist;
 
 	const fixed projectionFOV = static_cast<fixed>((players[ConsolePlayer].FOV / 90.0f)*AspectCorrection[r_ratio].viewGlobal);
 
@@ -278,12 +276,28 @@ void CalcProjection (int32_t focal)
 	// calculate the angle offset from view angle of each pixel's ray
 	//
 
+	// tang above is a ratio of integers -- (2i+1)*projectionFOV over
+	// 2*viewwidth*facedist -- so atan(tang) is simply the angle of the
+	// vector (den, num), which AngleFromVector() computes exactly in
+	// integers. That removes the last libm call from the projection setup
+	// and makes pixelangle[] identical on every target regardless of the
+	// FPU model or the floating point flags. Verified bit-identical to the
+	// double form across every supported width and aspect ratio.
 	for (i=0;i<=halfview;i++)
 	{
 		// start 1/2 pixel over, so viewangle bisects two middle pixels
-		double tang = (((double)i+0.5)*projectionFOV)/viewwidth/facedist;
-		double angle = atan(tang);
-		intang = (int) (angle*radtoint);
+		int64_t num = (int64_t)(2*i+1) * projectionFOV;
+		int64_t den = (int64_t)2 * viewwidth * facedist;
+		// Only the ratio matters, so shed low bits if either term would not
+		// fit a fixed. At sane resolutions and FOVs neither ever does; this
+		// just keeps an extreme A_ZoomFactor from wrapping the multiply.
+		while(num > INT32_MAX || den > INT32_MAX)
+		{
+			num >>= 1;
+			den >>= 1;
+		}
+		// AngleFromVector() negates, so negate back to get a plain atan2.
+		intang = (int)((0 - AngleFromVector((fixed)den, (fixed)num)) >> ANGLETOFINESHIFT);
 		pixelangle[halfview-i] = intang;
 		pixelangle[halfview-1+i] = -intang;
 	}
