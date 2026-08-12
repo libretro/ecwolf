@@ -291,7 +291,10 @@ void CalcProjection (int32_t focal)
 		// Only the ratio matters, so shed low bits if either term would not
 		// fit a fixed. At sane resolutions and FOVs neither ever does; this
 		// just keeps an extreme A_ZoomFactor from wrapping the multiply.
-		while(num > INT32_MAX || den > INT32_MAX)
+		// 0x7fffffffl rather than INT32_MAX: C++98 only exposes the stdint
+		// limit macros when __STDC_LIMIT_MACROS is defined, and the tree
+		// already spells this constant out elsewhere.
+		while(num > 0x7fffffffl || den > 0x7fffffffl)
 		{
 			num >>= 1;
 			den >>= 1;
