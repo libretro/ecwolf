@@ -641,7 +641,6 @@ bool Died1(wl_state_t *state)
 
 bool Died2 (wl_state_t *state)
 {
-	float   fangle;
 	int32_t dx,dy;
 	angle_t iangle;
 
@@ -650,14 +649,14 @@ bool Died2 (wl_state_t *state)
 	//
 	if(players[0].killerobj)
 	{
+		// This site used the opposite sign convention to the other angle
+		// lookups: dy was pre-inverted and the result was not negated.
+		// atan2(-dy, dx) == -atan2(dy, dx), so passing the raw deltas to
+		// AngleFromVector() (which itself negates) lands on the same angle.
 		dx = players[0].killerobj->x - players[0].mo->x;
-		dy = players[0].mo->y - players[0].killerobj->y;
+		dy = players[0].killerobj->y - players[0].mo->y;
 
-		fangle = (float) atan2((float) dy, (float) dx);     // returns -pi to pi
-		if (fangle<0)
-			fangle = (float) (M_PI*2+fangle);
-
-		iangle = (angle_t) (fangle*ANGLE_180/M_PI);
+		iangle = AngleFromVector(dx, dy);
 	}
 	else
 	{
