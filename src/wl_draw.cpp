@@ -81,6 +81,97 @@ TUniquePtr<short[]> pixelangle;
 #include "wl_trigtables.h"
 const fixed *finecosine = finesine+ANG90;
 
+/*
+====================
+=
+= AngleFromVector
+=
+= Returns the angle_t an actor would need to face to look along (dx, dy),
+= i.e. the integer equivalent of
+=
+=     0 - (angle_t)(atan2(dy, dx) * ANGLE_180 / M_PI)
+=
+= CORDIC vectoring, entirely in integers, so the result does not depend on
+= the host libm, the FPU model, or the compiler's floating point flags.
+= The vector is normalised up to full 64-bit headroom first, which is what
+= keeps short deltas as accurate as long ones.
+=
+====================
+*/
+
+angle_t AngleFromVector(fixed dx, fixed dy)
+{
+	int64_t x, y, nx, ny, mag;
+	angle_t ang = 0;
+	int i;
+
+	/* Exact answers for the eight axis-aligned and diagonal directions.
+	 * Actors in a tile-grid game sit on these constantly, and the CORDIC
+	 * residual would otherwise leave them a couple of units off true. */
+	if(dy == 0)
+		return dx >= 0 ? 0 : ANGLE_180;
+	if(dx == 0)
+		return dy < 0 ? ANGLE_90 : ANGLE_90*3;
+	if(dx == dy)
+		return dx > 0 ? ANGLE_45*7 : ANGLE_45*3;
+	if((int64_t)dx == -(int64_t)dy)	/* int64: -dy is UB at INT32_MIN */
+		return dx > 0 ? ANGLE_45 : ANGLE_45*5;
+
+	x = dx;
+	y = dy;
+
+	/* Fold onto the +x half plane; CORDIC only converges within +-90 degrees. */
+	if(x < 0)
+	{
+		if(y >= 0)
+		{
+			nx = y;
+			y  = -x;
+			x  = nx;
+			ang += ANGLE_90;
+		}
+		else
+		{
+			nx = -y;
+			y  = x;
+			x  = nx;
+			ang -= ANGLE_90;
+		}
+	}
+
+	/* Scale up so the iteration keeps full precision on short vectors. The
+	 * CORDIC gain is ~1.647, so 2^59 headroom cannot overflow int64_t. */
+	mag = x > (y < 0 ? -y : y) ? x : (y < 0 ? -y : y);
+	while(mag < ((int64_t)1<<58))
+	{
+		x <<= 1;
+		y <<= 1;
+		mag <<= 1;
+	}
+
+	for(i = 0; i < 32; ++i)
+	{
+		if(y > 0)
+		{
+			nx = x + (y>>i);
+			ny = y - (x>>i);
+			ang += finearctan[i];
+		}
+		else if(y < 0)
+		{
+			nx = x - (y>>i);
+			ny = y + (x>>i);
+			ang -= finearctan[i];
+		}
+		else
+			break;
+		x = nx;
+		y = ny;
+	}
+
+	return 0 - ang;
+}
+
 //
 // refresh variables
 //

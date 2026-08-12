@@ -18,6 +18,10 @@ extern  TUniquePtr<short[]> pixelangle;
 extern  const fixed finetangent[FINEANGLES/2 + ANG180];
 extern	const fixed finesine[FINEANGLES+FINEANGLES/4];
 extern	const fixed* finecosine;
+extern  const angle_t finearctan[32];
+
+// Integer replacement for atan2()-derived facing angles. See wl_draw.cpp.
+angle_t AngleFromVector(fixed dx, fixed dy);
 extern  TUniquePtr<int[]> wallheight;
 extern  uint16_t horizwall[],vertwall[];
 extern  int32_t    frameon;

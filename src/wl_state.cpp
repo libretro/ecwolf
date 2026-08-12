@@ -2,6 +2,7 @@
 
 #include "wl_def.h"
 #include "id_ca.h"
+#include "wl_draw.h"
 #include "id_sd.h"
 #include "id_us.h"
 #include "g_mapinfo.h"
@@ -1062,10 +1063,7 @@ static bool CheckSightTo (AActor *ob, AActor *target, double minseedist, double 
 		// see if they are looking in the right direction
 		//
 		fov /= 2;
-		float angle = (float) atan2 ((float) deltay, (float) deltax);
-		if (angle<0)
-			angle = (float) (M_PI*2+angle);
-		angle_t iangle = 0-(angle_t)(angle*ANGLE_180/M_PI);
+		angle_t iangle = AngleFromVector(deltax, deltay);
 		angle_t lowerAngle = MIN(iangle, ob->angle);
 		angle_t upperAngle = MAX(iangle, ob->angle);
 		if(MIN(upperAngle - lowerAngle, lowerAngle - upperAngle) > angle_t(fov*ANGLE_1))

@@ -2326,4 +2326,18 @@ const fixed finesine[FINEANGLES+FINEANGLES/4] =
 	      65534,       65535,       65535,       65535,       65535,       65535,       65535,       65535
 };
 
+/* atan(2^-i) expressed in angle_t units (2^32 == one full turn), used by
+** AngleFromVector()'s CORDIC vectoring loop. */
+const angle_t finearctan[32] =
+{
+	 536870912u,  316933406u,  167458907u,   85004756u,
+	  42667331u,   21354465u,   10679838u,    5340245u,
+	   2670163u,    1335087u,     667544u,     333772u,
+	    166886u,      83443u,      41722u,      20861u,
+	     10430u,       5215u,       2608u,       1304u,
+	       652u,        326u,        163u,         81u,
+	        41u,         20u,         10u,          5u,
+	         3u,          1u,          1u,          0u
+};
+
 #endif

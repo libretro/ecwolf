@@ -846,10 +846,7 @@ AActor *player_t::FindTarget()
 			{
 				const int dist = MAX(abs(check->x - mo->x), abs(check->y - mo->y));
 
-				float angle = (float) atan2 ((float) (check->y - mo->y), (float) (check->x - mo->x));
-				if (angle<0)
-					angle = (float) (M_PI*2+angle);
-				angle_t iangle = 0-(angle_t)(angle*ANGLE_180/M_PI);
+				angle_t iangle = AngleFromVector(check->x - mo->x, check->y - mo->y);
 				angle_t lowerAngle = MIN(iangle, mo->angle);
 				angle_t upperAngle = MAX(iangle, mo->angle);
 				if(MIN(upperAngle - lowerAngle, lowerAngle - upperAngle) <= (ANGLE_90/9) &&
