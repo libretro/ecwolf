@@ -773,13 +773,10 @@ void DamageActor (AActor *ob, AActor *attacker, unsigned damage)
 
 	madenoise = true;
 
-	//
 	// do double damage if shooting a non attack mode actor
-	//
 	if ( !(ob->flags & FL_ATTACKMODE) )
 		damage <<= 1;
 
-	NetDPrintf("%s %d points\n", __FUNCTION__, FixedMul(damage, gamestate.difficulty->PlayerDamageFactor));
 	ob->health -= FixedMul(damage, gamestate.difficulty->PlayerDamageFactor);
 	// Ensure that we're targetting a player for now.
 	if(attacker && attacker->player)

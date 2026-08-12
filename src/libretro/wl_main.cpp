@@ -603,21 +603,6 @@ void I_Error(const char* format, ...)
 
 //==========================================================================
 
-static bool DebugNetwork = false;
-
-void NetDPrintf(const char* format, ...)
-{
-	if(!DebugNetwork)
-		return;
-
-	va_list vlist;
-	va_start(vlist, format);
-	vprintf(format, vlist);
-	va_end(vlist);
-}
-
-//==========================================================================
-
 /*
 ==================
 =

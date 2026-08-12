@@ -309,7 +309,6 @@ void player_t::TakeDamage (int points, AActor *attacker)
 	if (gamestate.victoryflag)
 		return;
 	points = (points*gamestate.difficulty->DamageFactor)>>FRACBITS;
-	NetDPrintf("%s %d points\n", __FUNCTION__, points);
 
 	if (!godmode)
 		mo->health = health -= points;

@@ -771,10 +771,7 @@ ACTION_FUNCTION(A_WolfAttack)
 
 	AActor *target = self->target;
 	if(!target)
-	{
-		NetDPrintf("Actor %s called A_WolfAttack without target.\n", self->GetClass()->GetName().GetChars());
 		return true;
-	}
 
 	runspeed *= 37.5;
 

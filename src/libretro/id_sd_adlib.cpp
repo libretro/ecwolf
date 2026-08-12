@@ -136,10 +136,6 @@ static void SDL_AlSetChanInst(DBOPL::Chip &oplChip, const Instrument *inst, unsi
 	alOut(oplChip, chan + alFreqH,0);
 	alOut(oplChip, chan + alFeedCon,0);
 }
-static void SDL_AlSetFXInst(DBOPL::Chip &oplChip, const Instrument *inst)
-{
-	SDL_AlSetChanInst(oplChip, inst, 0);
-}
 
 Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 {
@@ -177,7 +173,7 @@ Mix_Chunk *SynthesizeAdlib(const uint8_t *dataRaw)
 	// 0.9915, BONUS4 0.04 -> 0.9975, heartbeat 0.70 -> 0.9998.
 	sfxOpl->WriteReg(0x01, 0x20);
 
-	SDL_AlSetFXInst(*sfxOpl, inst);
+	SDL_AlSetChanInst(*sfxOpl, inst, 0);
 	uint8_t *alSound = (uint8_t *)sound->data;
 
 	// Bounded release ring-out after the last data byte (see below). The

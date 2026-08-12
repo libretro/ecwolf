@@ -68,7 +68,6 @@ enum ESSType
 void I_Error(const char* format, ...);
 void I_FatalError(const char *errorStr, ...);
 void Quit();
-void NetDPrintf(const char *format, ...);
 void libretro_log(const char *format, ...);
 
 #define FIXED2FLOAT(fixed) ((double)(fixed)/65536.0)

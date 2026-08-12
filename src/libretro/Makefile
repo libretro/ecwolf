@@ -463,7 +463,7 @@ endif
 
 TOPDIR ?= $(CURDIR)
 
-COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -DUSE_FILE32API -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
+COMMON_CFLAGS   += -Wall -DLIBRETRO -D__LIBRETRO__ $(fpic) -I$(TOPDIR) -I$(TOPDIR)/sys/libretro/config
 
 ifeq (,$(findstring msvc,$(platform)))
 ifeq ($(NO_FVISIBILITY),1)

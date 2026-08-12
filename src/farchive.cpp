@@ -290,14 +290,7 @@ void FCompressedFile::Implode ()
 
 		// If the data could not be compressed, store it as-is.
 		if (r != Z_OK || outlen >= len)
-		{
-			DPrintf ("cfile could not be compressed\n");
 			outlen = 0;
-		}
-		else
-		{
-			DPrintf ("cfile shrank from %lu to %lu bytes\n", len, outlen);
-		}
 	}
 	else
 	{
@@ -622,7 +615,6 @@ void FArchive::Close ()
 	{
 		m_File->Close ();
 		m_File = NULL;
-		DPrintf ("Processed %u objects\n", m_ObjectCount);
 	}
 }
 

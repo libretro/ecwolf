@@ -257,7 +257,6 @@ void AActor::Die()
 		// a usable target to give points to then we should give to player 1
 		// and possibly investigate.
 		players[0].GivePoints(points);
-		NetDPrintf("%s %d points with no target\n", __FUNCTION__, points);
 	}
 
 	if(flags & FL_COUNTKILL)

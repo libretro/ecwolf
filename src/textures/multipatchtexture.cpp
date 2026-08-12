@@ -1251,11 +1251,6 @@ void FMultiPatchTexture::ResolvePatches()
 				{
 					if (Inits[i].HasLine) Inits[i].sc.ScriptMessage(Scanner::WARNING, "Texture '%s' references itself as patch\n", Inits[i].TexName.GetChars());
 				}
-				else
-				{
-					// If it could be resolved, just print a developer warning.
-					DPrintf("Resolved self-referencing texture by picking an older entry for %s\n", Inits[i].TexName.GetChars());
-				}
 			}
 
 			if (!texno.isValid())

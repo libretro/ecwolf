@@ -54,8 +54,6 @@ static inline unsigned int MakeKey(const char *s, size_t len)
 }
 static inline unsigned int MakeKey(const char *s) { return MakeKey(s, strlen(s)); }
 
-static inline void DPrintf(const char* fmt, ...) {}
-
 #define countof(x) (sizeof(x)/sizeof(x[0]))
 #ifdef MSB_FIRST
 #define MAKE_ID(a,b,c,d)	((uint32_t)((d)|((c)<<8)|((b)<<16)|((a)<<24)))
