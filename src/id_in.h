@@ -8,12 +8,7 @@
 #ifndef	__ID_IN__
 #define	__ID_IN__
 
-#ifdef	__DEBUG__
-#define	__DEBUG_InputMgr__
-#endif
-
 typedef	int		ScanCode;
-
 
 #define	key_None		0
 

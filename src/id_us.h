@@ -10,10 +10,6 @@
 
 #include "v_font.h"
 
-#ifdef	__DEBUG__
-#define	__DEBUG_UserMgr__
-#endif
-
 typedef struct
 {
 	int x,y;

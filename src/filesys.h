@@ -44,41 +44,6 @@
 #define PATH_SEPARATOR "/"
 #endif
 
-namespace FileSys
-{
-	enum ESpecialDirectory
-	{
-		DIR_Program,
-		DIR_Configuration,
-		DIR_Saves,
-		DIR_ApplicationSupport,
-		DIR_Documents,
-		DIR_Screenshots,
-
-		NUM_SPECIAL_DIRECTORIES
-	};
-
-	enum ESteamApp
-	{
-		APP_Wolfenstein3D,
-		APP_SpearOfDestiny,
-		APP_ThrowbackPack,
-		APP_NoahsArk,
-
-		NUM_STEAM_APPS
-	};
-
-	FString GetDirectoryPath(ESpecialDirectory dir);
-	FString GetSteamPath(ESteamApp game);
-	FString GetGOGPath(ESteamApp game);
-	void SetDirectoryPath(ESpecialDirectory dir, const FString &path);
-	void SetupPaths(int argc, const char* const *argv);
-
-#ifdef __APPLE__
-	FString OSX_FindFolder(ESpecialDirectory dir);
-#endif
-}
-
 class File
 {
 	public:

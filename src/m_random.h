@@ -184,14 +184,7 @@ public:
 	static uint32_t GetRNGCount ();
 	static FRandom *StaticFindRNG(const char *name);
 
-#ifndef NDEBUG
-//	static void StaticPrintSeeds ();
-#endif
-
 private:
-#ifndef NDEBUG
-	const char *Name;
-#endif
 	FRandom *Next;
 	uint32_t NameCRC;
 
@@ -217,9 +210,6 @@ private:
 	uint8_t oldidx;
 	/** a flag: it is 0 if and only if the internal state is not yet
 	 * initialized. */
-#ifndef NDEBUG
-	bool initialized;
-#endif
 };
 
 extern uint32_t rngseed;			// The starting seed (not part of state)

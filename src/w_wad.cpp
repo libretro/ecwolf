@@ -1168,21 +1168,6 @@ FWadLump::FWadLump (const FWadLump &copy) : FileReader()
 	if ((Lump = copy.Lump)) Lump->CacheLump();
 }
 
-#ifdef _DEBUG
-FWadLump & FWadLump::operator= (const FWadLump &copy)
-{
-	// Only the debug build actually calls this!
-	File = copy.File;
-	Length = copy.Length;
-	FilePos = copy.FilePos;
-	StartPos = copy.StartPos;
-	CloseOnDestruct = false;
-	if ((Lump = copy.Lump)) Lump->CacheLump();
-	return *this;
-}
-#endif
-
-
 FWadLump::FWadLump(FResourceLump *lump, bool alwayscache)
 : FileReader()
 {

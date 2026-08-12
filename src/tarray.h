@@ -483,18 +483,6 @@ public:
 
 	hash_t CountUsed() const
 	{
-#ifdef _DEBUG
-		hash_t used = 0;
-		hash_t ct = Size;
-		for (Node *n = Nodes; ct-- > 0; ++n)
-		{
-			if (!n->IsNil())
-			{
-				++used;
-			}
-		}
-		assert (used == NumUsed);
-#endif
 		return NumUsed;
 	}
 

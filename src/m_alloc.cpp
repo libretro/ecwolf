@@ -32,11 +32,10 @@
 **
 */
 
-#if defined(__FreeBSD__)
 #include <stdlib.h>
+#if defined(__FreeBSD__)
 #include <malloc_np.h>
 #elif defined(__APPLE__)
-#include <stdlib.h>
 #include <malloc/malloc.h>
 #else
 #include <malloc.h>
@@ -72,7 +71,6 @@ union alloc_header {
 };
 #endif
 
-#ifndef _DEBUG
 #if !defined(OWN_ADDED_SIZE)
 void *M_Malloc(size_t size)
 {
@@ -137,78 +135,6 @@ void *M_Realloc(void *memblock, size_t size)
 	GC::AllocBytes += _msize(block);
 	return block;
 }
-#endif
-#else
-#ifdef _MSC_VER
-#include <crtdbg.h>
-#endif
-
-#if !defined(OWN_ADDED_SIZE)
-void *M_Malloc_Dbg(size_t size, const char *file, int lineno)
-{
-	void *block = _malloc_dbg(size, _NORMAL_BLOCK, file, lineno);
-
-	if (block == NULL)
-		I_FatalError("Could not malloc %zu bytes", size);
-
-	GC::AllocBytes += _msize(block);
-	return block;
-}
-
-void *M_Realloc_Dbg(void *memblock, size_t size, const char *file, int lineno)
-{
-	if (memblock != NULL)
-	{
-		GC::AllocBytes -= _msize(memblock);
-	}
-	void *block = _realloc_dbg(memblock, size, _NORMAL_BLOCK, file, lineno);
-	if (block == NULL)
-	{
-		I_FatalError("Could not realloc %zu bytes", size);
-	}
-	GC::AllocBytes += _msize(block);
-	return block;
-}
-#else
-void *M_Malloc_Dbg(size_t size, const char *file, int lineno)
-{
-	void *block = _malloc_dbg(size+sizeof(size_t), _NORMAL_BLOCK, file, lineno);
-
-	if (block == NULL)
-		I_FatalError("Could not malloc %zu bytes", size);
-
-	alloc_header *sizeStore = (alloc_header *) block;
-	sizeStore->alloc_size = size;
-	block = sizeStore+1;
-
-	GC::AllocBytes += _msize(block);
-	return block;
-}
-
-void *M_Realloc_Dbg(void *memblock, size_t size, const char *file, int lineno)
-{
-	if(memblock == NULL)
-		return M_Malloc_Dbg(size, file, lineno);
-
-	if (memblock != NULL)
-	{
-		GC::AllocBytes -= _msize(memblock);
-	}
-	alloc_header *block = _realloc_dbg(((alloc_header*) memblock)-1, size+sizeof(alloc_header), _NORMAL_BLOCK, file, lineno);
-
-	if (block == NULL)
-	{
-		I_FatalError("Could not realloc %zu bytes", size);
-	}
-
-	alloc_header *sizeStore = (alloc_header *) block;
-	sizeStore->alloc_size = size;
-	block = sizeStore+1;
-
-	GC::AllocBytes += _msize(block);
-	return block;
-}
-#endif
 #endif
 
 #if !defined(OWN_ADDED_SIZE)

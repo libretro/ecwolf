@@ -104,9 +104,6 @@ class FWadLump : public FileReader
 public:
 	FWadLump ();
 	FWadLump (const FWadLump &copy);
-#ifdef _DEBUG
-	FWadLump & operator= (const FWadLump &copy);
-#endif
 	~FWadLump();
 
 	long Seek (long offset, int origin);

@@ -481,15 +481,10 @@ public:
 	inline Self &operator=(const TSharedPtr<T2,D2> &other) { Reset(other); return *this; }
 
 	inline T *Get() const { return CheckedAccess(); }
-#ifdef NDEBUG
 	// If any of these are used without checking for NULL, we'll get a NULL
 	// dereference.  So in release mode, don't bother checking the reference.
 	inline T &operator*() const { return *p; }
 	inline T *operator->() const { return p; }
-#else
-	inline T &operator*() const { return *CheckedAccess(); }
-	inline T *operator->() const { return CheckedAccess(); }
-#endif
 
 	inline operator bool() const { return CheckedAccess() != NULL; }
 	inline operator T*() const { return CheckedAccess();  }

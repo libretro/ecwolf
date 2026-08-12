@@ -87,52 +87,6 @@ const ClassType *BinarySearch (const ClassType *first, int max,
 
 //==========================================================================
 //
-// BinarySearchFlexible
-//
-// THIS DOES NOT WORK RIGHT WITH VISUAL C++
-// ONLY ONE COMPTYPE SEEMS TO BE USED FOR ANY INSTANCE OF THIS FUNCTION
-// IN A DEBUG BUILD. RELEASE MIGHT BE DIFFERENT--I DIDN'T BOTHER TRYING.
-//
-// Similar to BinarySearch, except another function is used to copmare
-// items in the array.
-//
-// Template parameters:
-//		IndexType -		The type used to index the array (int, size_t, etc.)
-//		KeyType -		The type of the key
-//		CompType -		A class with a static DoCompare(IndexType, KeyType) method.
-//
-// Function parameters:
-//		max -			The number of elements in the array
-//		key -			The key value to look for
-//		noIndex -		The value to return if no matching element is found.
-//
-// Returns:
-//		The index of the matching element or noIndex.
-//==========================================================================
-
-template<class IndexType, class KeyType, class CompType>
-inline
-IndexType BinarySearchFlexible (IndexType max, const KeyType key, IndexType noIndex)
-{
-	IndexType min = 0;
-	--max;
-
-	while (min <= max)
-	{
-		IndexType mid = (min + max) / 2;
-		int lexx = CompType::DoCompare (mid, key);
-		if (lexx == 0)
-			return mid;
-		else if (lexx < 0)
-			min = mid + 1;
-		else
-			max = mid - 1;
-	}
-	return noIndex;
-}
-
-//==========================================================================
-//
 // MIN
 //
 // Returns the minimum of a and b.

@@ -135,10 +135,6 @@ static const uint8_t old_rndtable[256] =
 FRandom::FRandom ()
 : NameCRC (0)
 {
-#ifndef NDEBUG
-	Name = NULL;
-	initialized = false;
-#endif
 	Next = RNGList;
 	RNGList = this;
 }
@@ -154,15 +150,6 @@ FRandom::FRandom ()
 FRandom::FRandom (const char *name)
 {
 	NameCRC = CalcCRC32 ((const uint8_t *)name, (unsigned int)strlen (name));
-#ifndef NDEBUG
-	initialized = false;
-	Name = name;
-	// A CRC of 0 is reserved for nameless RNGs that don't get stored
-	// in savegames. The chance is very low that you would get a CRC of 0,
-	// but it's still possible.
-	assert (NameCRC != 0);
-#endif
-
 	// Insert the RNG in the list, sorted by CRC
 	FRandom **prev = &RNGList, *probe = RNGList;
 
@@ -171,16 +158,6 @@ FRandom::FRandom (const char *name)
 		prev = &probe->Next;
 		probe = probe->Next;
 	}
-
-#ifndef NDEBUG
-	if (probe != NULL)
-	{
-		// Because RNGs are identified by their CRCs in save games,
-		// no two RNGs can have names that hash to the same CRC.
-		// Obviously, this means every RNG must have a unique name.
-		assert (probe->NameCRC != NameCRC);
-	}
-#endif
 
 	Next = probe;
 	*prev = this;

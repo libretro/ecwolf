@@ -362,7 +362,6 @@ unsigned int FRandom::GenRand32()
 {
 	uint32_t r;
 
-	assert(initialized);
 	if (idx >= SFMT::N32)
 	{
 		GenRandAll();
@@ -387,7 +386,6 @@ uint64_t FRandom::GenRand64()
 	uint64_t r;
 #endif
 
-	assert(initialized);
 	assert(idx % 2 == 0);
 
 	if (idx >= SFMT::N32)
@@ -435,7 +433,6 @@ uint64_t FRandom::GenRand64()
 */
 void FRandom::FillArray32(uint32_t *array, int size)
 {
-	assert(initialized);
 	assert(idx == SFMT::N32);
 	assert(size % 4 == 0);
 	assert(size >= SFMT::N32);
@@ -472,7 +469,6 @@ void FRandom::FillArray32(uint32_t *array, int size)
 */
 void FRandom::FillArray64(uint64_t *array, int size)
 {
-	assert(initialized);
 	assert(idx == SFMT::N32);
 	assert(size % 2 == 0);
 	assert(size >= SFMT::N64);
@@ -504,9 +500,6 @@ void FRandom::InitGenRand(uint32_t seed)
 	}
 	idx = SFMT::N32;
 	PeriodCertification();
-#ifndef NDEBUG
-	initialized = 1;
-#endif
 }
 
 /**
@@ -577,7 +570,4 @@ void FRandom::InitByArray(uint32_t *init_key, int key_length)
 
 	idx = SFMT::N32;
 	PeriodCertification();
-#ifndef NDEBUG
-	initialized = 1;
-#endif
 }
