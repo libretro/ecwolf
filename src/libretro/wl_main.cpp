@@ -217,34 +217,8 @@ const double radtoint = (double)(FINEANGLES/2/PI);
 
 void BuildTables (void)
 {
-	//
-	// calculate fine tangents
-	//
-
-	int i;
-	for(i=0;i<FINEANGLES/8;i++)
-	{
-		double tang=tan((i+0.5)/radtoint);
-		finetangent[i + FINEANGLES/2] = finetangent[i]=(fixed)(tang*FRACUNIT);
-		finetangent[FINEANGLES/4-1-i]=(fixed)((1/tang)*FRACUNIT);
-		finetangent[FINEANGLES/4+i]=-finetangent[FINEANGLES/4-1-i];
-		finetangent[FINEANGLES/2-1-i]=-finetangent[i];
-	}
-	memcpy(finetangent + FINEANGLES/2, finetangent, sizeof(fixed)*ANG180);
-
-	//
-	// costable overlays sintable with a quarter phase shift
-	// ANGLES is assumed to be divisable by four
-	//
-
-	float angle = 0;
-	float anglestep = (float)(PI/2/ANG90);
-	for(i=0; i<FINEANGLES; i++)
-	{
-		finesine[i]=fixed(FRACUNIT*sin(angle));
-		angle+=anglestep;
-	}
-	memcpy(&finesine[FINEANGLES], finesine, FINEANGLES*sizeof(fixed)/4);
+	// finetangent[] and finesine[] are constant tables in wl_trigtables.h;
+	// nothing is computed here any more.
 
 #if defined(USE_STARSKY) || defined(USE_RAIN) || defined(USE_SNOW)
 	Init3DPoints();

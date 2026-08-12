@@ -15,9 +15,9 @@
 // math tables
 //
 extern  TUniquePtr<short[]> pixelangle;
-extern  fixed finetangent[FINEANGLES/2 + ANG180];
-extern	fixed finesine[FINEANGLES+FINEANGLES/4];
-extern	fixed* finecosine;
+extern  const fixed finetangent[FINEANGLES/2 + ANG180];
+extern	const fixed finesine[FINEANGLES+FINEANGLES/4];
+extern	const fixed* finecosine;
 extern  TUniquePtr<int[]> wallheight;
 extern  uint16_t horizwall[],vertwall[];
 extern  int32_t    frameon;

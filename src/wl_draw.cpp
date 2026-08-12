@@ -78,9 +78,8 @@ int min_wallheight;
 // math tables
 //
 TUniquePtr<short[]> pixelangle;
-fixed finetangent[FINEANGLES/2 + ANG180];
-fixed finesine[FINEANGLES+FINEANGLES/4];
-fixed *finecosine = finesine+ANG90;
+#include "wl_trigtables.h"
+const fixed *finecosine = finesine+ANG90;
 
 //
 // refresh variables
