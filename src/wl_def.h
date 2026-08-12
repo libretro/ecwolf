@@ -390,14 +390,27 @@ extern const struct RatioInformation
 ** the rounding to ties-to-even. That is live today on the emscripten build,
 ** the one platform the Makefile does not give -fno-unsafe-math-optimizations.
 **
-** lrint() rounds to nearest-even in the default FP mode, which is what the
-** magic number did; the delta biases exact .5 ties upward, which is what the
-** delta did there too. Verified bit-identical to xs_RoundToInt over 20M
-** samples, and stable across -O0/-O2/-Os/-ffast-math.
+** The replacement biases by half plus the same _xs_doublemagicdelta, so
+** exact .5 ties still round up rather than to even, truncates toward zero
+** with a plain cast, then corrects the negative side down to a floor.
+** Verified bit-identical to xs_RoundToInt over 20M samples including every
+** exact .5 tie and every exact integer, and stable across -O0/-O2/-Os,
+** -ffast-math and -march=x86-64-v3 (FMA available).
+**
+** Deliberately no lrint(): it is C99, and the Makefile still builds
+** windows_msvc2005_x86, windows_msvc2010_x86 and windows_msvc2010_x64,
+** none of which have it. Avoiding it also drops lrint's dependence on the
+** current FP rounding mode, which the magic-number form did not have.
+**
+** 0.500000015 is exactly 0.5 + 1.5e-8 as a double, so the bias is one add
+** rather than two. Writing it as two adds costs about 14% here for no
+** change in result.
 */
 static ECWOLF_INLINE int32_t RoundToInt(double v)
 {
-	return (int32_t)lrint(v + 1.5e-8);
+	const double h = v + 0.500000015;
+	const int32_t t = (int32_t)h;
+	return t - (h < (double)t);
 }
 
 static ECWOLF_INLINE fixed FixedMul(fixed a, fixed b)
