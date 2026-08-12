@@ -126,9 +126,6 @@ public:
 
 	~FString ();
 
-	// Discard string's contents, create a new buffer, and lock it.
-	char *LockNewBuffer(size_t len);
-
 	char *LockBuffer();		// Obtain write access to the character buffer
 	void UnlockBuffer();	// Allow shared access to the character buffer
 
@@ -195,39 +192,10 @@ public:
 
 	void ToUpper ();
 	void ToLower ();
-	void SwapCase ();
-
-	void StripLeft ();
-	void StripLeft (const FString &charset);
-	void StripLeft (const char *charset);
-
-	void StripRight ();
-	void StripRight (const FString &charset);
-	void StripRight (const char *charset);
-
-	void StripLeftRight ();
-	void StripLeftRight (const FString &charset);
-	void StripLeftRight (const char *charset);
 
 	void Insert (size_t index, const FString &instr);
 	void Insert (size_t index, const char *instr);
 	void Insert (size_t index, const char *instr, size_t instrlen);
-
-	void ReplaceChars (char oldchar, char newchar);
-	void ReplaceChars (const char *oldcharset, char newchar);
-
-	void StripChars (char killchar);
-	void StripChars (const char *killchars);
-
-	void MergeChars (char merger);
-	void MergeChars (char merger, char newchar);
-	void MergeChars (const char *charset, char newchar);
-
-	void Substitute (const FString &oldstr, const FString &newstr);
-	void Substitute (const char *oldstr, const FString &newstr);
-	void Substitute (const FString &oldstr, const char *newstr);
-	void Substitute (const char *oldstr, const char *newstr);
-	void Substitute (const char *oldstr, const char *newstr, size_t oldstrlen, size_t newstrlen);
 
 	void Format (const char *fmt, ...);
 	void AppendFormat (const char *fmt, ...);
@@ -235,10 +203,6 @@ public:
 	void VAppendFormat (const char *fmt, va_list arglist);
 
 	bool IsInt () const;
-	bool IsFloat () const;
-	long ToLong (int base=0) const;
-	unsigned long ToULong (int base=0) const;
-	double ToDouble () const;
 
 	size_t Len() const { return Data()->Len; }
 	bool IsEmpty() const { return Len() == 0; }

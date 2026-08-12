@@ -76,17 +76,11 @@ const ClassType *BinarySearch (const ClassType *first, int max,
 		const ClassType *probe = &first[mid];
 		const KeyType &seekey = probe->*keyptr;
 		if (seekey == key)
-		{
 			return probe;
-		}
 		else if (seekey < key)
-		{
 			min = mid + 1;
-		}
 		else
-		{
 			max = mid - 1;
-		}
 	}
 	return NULL;
 }
@@ -128,17 +122,11 @@ IndexType BinarySearchFlexible (IndexType max, const KeyType key, IndexType noIn
 		IndexType mid = (min + max) / 2;
 		int lexx = CompType::DoCompare (mid, key);
 		if (lexx == 0)
-		{
 			return mid;
-		}
 		else if (lexx < 0)
-		{
 			min = mid + 1;
-		}
 		else
-		{
 			max = mid - 1;
-		}
 	}
 	return noIndex;
 }

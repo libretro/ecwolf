@@ -784,8 +784,16 @@ void SelectGame(TArray<FString> &wadfiles, const char* iwad, const char* datawad
 		if(dotterm == -1)
 			dotterm = (long)autoloadkey.Len();
 
-		FString autoload = autoloadkey.Mid(0, dotterm);
-		autoload.StripChars('.');
+		// Key is the first dotterm characters of autoloadkey with the '.'
+		// separators removed.
+		const char *keysrc = autoloadkey.GetChars();
+		FString autoload;
+		for(long key = 0;key < dotterm;++key)
+		{
+			if(keysrc[key] != '.')
+				autoload += keysrc[key];
+		}
+
 		config.CreateSetting(autoload, "");
 		autoload = config.GetSetting(autoload)->GetString();
 		for(long i = 0, term;i < (long)autoload.Len();i = term+1)
