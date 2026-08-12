@@ -187,7 +187,7 @@ void ControlMovement (APlayerPawn *ob)
 		if(ob->player->ReadyWeapon && ob->player->ReadyWeapon->fovscale > 0)
 		{
 			// Turn rate feeds ob->angle below, so this has to be identical on
-			// every target. xs_ToInt() rounds via the magic-number trick, whose
+			// every target. This used to go through xs_ToInt(), whose
 			// add is evaluated at 80-bit under x87 excess precision and then
 			// rounded to double on the store -- a double rounding that moves the
 			// result by one on ~0.025% of inputs.
@@ -197,11 +197,11 @@ void ControlMovement (APlayerPawn *ob)
 			// evaluation mode, and integral for every value the clamp permits
 			// (exactness holds down to 2^-9, well below the 0.02 floor). The
 			// product and the truncation are then plain integer work, and match
-			// what xs_ToInt() returns on a strict-double host bit for bit.
+			// that conversion returned on a strict-double host bit for bit.
 			const int64_t fovfixed =
 				(int64_t)((double)ob->player->ReadyWeapon->fovscale * 4294967296.0);
 			const int64_t scaled = (int64_t)controlx * fovfixed;
-			// xs_ToInt() truncates toward zero; a bare >> would floor.
+			// The conversion truncated toward zero; a bare >> would floor.
 			controlx = (int)(scaled >= 0 ? (scaled >> 32) : -((-scaled) >> 32));
 		}
 

@@ -45,7 +45,6 @@
 #include "wl_agent.h"
 #include "wl_def.h"
 #include "wl_play.h"
-#include "xs_Float.h"
 #include "thingdef/thingdef.h"
 
 enum
@@ -104,7 +103,7 @@ void BlakeStatusBar::DrawLed(double percent, double x, double y) const
 
 	V_VirtualToRealCoords(x, y, w, h, 320, 200, true, true);
 
-	int lightclip = xs_ToInt(y + h*(1-percent));
+	int lightclip = (int)(y + h*(1-percent));
 	V_DrawTexture(dim, x, y,
 		DTA_DestWidthF, w,
 		DTA_DestHeightF, h,
@@ -134,7 +133,7 @@ void BlakeStatusBar::DrawStatusBar()
 	double stw = 320;
 	double sth = STATUSLINES;
 	V_VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
-	int boty = xs_ToInt(sty);
+	int boty = (int)(sty);
 
 	V_DrawTexture(TexMan(STBar), stx, sty,
 		DTA_DestWidthF, stw,
@@ -146,7 +145,7 @@ void BlakeStatusBar::DrawStatusBar()
 	stw = 320;
 	sth = STATUSTOPLINES;
 	V_VirtualToRealCoords(stx, sty, stw, sth, 320, 200, true, true);
-	int topy = xs_ToInt(sth);
+	int topy = (int)(sth);
 
 	V_DrawTexture(TexMan(STBarTop), stx, 0.0,
 		DTA_DestWidthF, stw,

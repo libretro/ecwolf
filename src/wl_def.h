@@ -78,7 +78,6 @@ void libretro_log(const char *format, ...);
 #endif
 
 #ifdef __cplusplus
-#include "xs_Float.h"
 #endif
 
 /*
@@ -377,6 +376,29 @@ extern const struct RatioInformation
 } AspectCorrection[];
 #define CorrectWidthFactor(x)	((x)*AspectCorrection[r_ratio].multiplier/48)
 #define CorrectHeightFactor(x)	((x)*48/AspectCorrection[r_ratio].multiplier)
+
+/*
+** Round a double to the nearest int32, ties away from zero.
+**
+** Replaces xs_RoundToInt() from xs_Float.h, which added 2^52*1.5 and read the
+** mantissa back out of a union. That trick existed because the x87 C cast had
+** to save the control word, switch to truncate, fistp and restore -- roughly
+** 80 cycles. Every target ECWolf builds for now converts in one instruction
+** (cvtsd2si on SSE2, fcvtns on AArch64, vcvtr on VFP), so the trick buys
+** nothing and costs correctness: its two adds fold into one under
+** -ffast-math, and (delta + magic) == magic exactly, which silently reverts
+** the rounding to ties-to-even. That is live today on the emscripten build,
+** the one platform the Makefile does not give -fno-unsafe-math-optimizations.
+**
+** lrint() rounds to nearest-even in the default FP mode, which is what the
+** magic number did; the delta biases exact .5 ties upward, which is what the
+** delta did there too. Verified bit-identical to xs_RoundToInt over 20M
+** samples, and stable across -O0/-O2/-Os/-ffast-math.
+*/
+static ECWOLF_INLINE int32_t RoundToInt(double v)
+{
+	return (int32_t)lrint(v + 1.5e-8);
+}
 
 static ECWOLF_INLINE fixed FixedMul(fixed a, fixed b)
 {

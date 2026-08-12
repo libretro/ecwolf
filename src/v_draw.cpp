@@ -1054,18 +1054,18 @@ void V_FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 		R_SetSpanSource(tex->GetPixels());
 		scalex = double(1u << (32 - ds_xbits)) / scalex;
 		scaley = double(1u << (32 - ds_ybits)) / scaley;
-		ds_xstep = xs_RoundToInt(cosrot * scalex);
-		ds_ystep = xs_RoundToInt(sinrot * scaley);
+		ds_xstep = RoundToInt(cosrot * scalex);
+		ds_ystep = RoundToInt(sinrot * scaley);
 	}
 
 	// Travel down the right edge and create an outline of that edge.
 	pt1 = toppt;
 	pt2 = toppt + 1;	if (pt2 > npoints) pt2 = 0;
-	y1 = xs_RoundToInt(points[pt1].Y + 0.5f);
+	y1 = RoundToInt(points[pt1].Y + 0.5f);
 	do
 	{
 		x = FLOAT2FIXED(points[pt1].X + 0.5f);
-		y2 = xs_RoundToInt(points[pt2].Y + 0.5f);
+		y2 = RoundToInt(points[pt2].Y + 0.5f);
 		if (y1 >= y2 || (y1 < 0 && y2 < 0) || (y1 >= screen->Height && y2 >= screen->Height))
 		{
 		}
@@ -1092,11 +1092,11 @@ void V_FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 	// Travel down the left edge and fill it in.
 	pt1 = toppt;
 	pt2 = toppt - 1;	if (pt2 < 0) pt2 = npoints;
-	y1 = xs_RoundToInt(points[pt1].Y + 0.5f);
+	y1 = RoundToInt(points[pt1].Y + 0.5f);
 	do
 	{
 		x = FLOAT2FIXED(points[pt1].X + 0.5f);
-		y2 = xs_RoundToInt(points[pt2].Y + 0.5f);
+		y2 = RoundToInt(points[pt2].Y + 0.5f);
 		if (y1 >= y2 || (y1 < 0 && y2 < 0) || (y1 >= screen->Height && y2 >= screen->Height))
 		{
 		}
@@ -1131,8 +1131,8 @@ void V_FillSimplePoly(FTexture *tex, FVector2 *points, int npoints,
 							tex.X = t * cosrot - tex.Y * sinrot;
 							tex.Y = tex.Y * cosrot + t * sinrot;
 						}
-						ds_xfrac = xs_RoundToInt(tex.X * scalex);
-						ds_yfrac = xs_RoundToInt(tex.Y * scaley);
+						ds_xfrac = RoundToInt(tex.X * scalex);
+						ds_yfrac = RoundToInt(tex.Y * scaley);
 
 						R_DrawSpanP_C();
 					}
