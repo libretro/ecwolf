@@ -166,6 +166,16 @@ void AM_UpdateFlags()
 
 void AM_Toggle()
 {
+	// The automap reads level geometry and the player actor, so it can only
+	// be raised while a level is loaded.
+	if(!map || !players[0].mo)
+	{
+		automap = AMA_Off;
+		if(am_pause)
+			Paused &= ~2;
+		return;
+	}
+
 	++automap;
 	if(automap == AMA_Overlay && am_overlay == AMO_Off)
 		++automap;

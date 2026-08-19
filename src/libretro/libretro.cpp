@@ -1232,7 +1232,7 @@ static void TransformInputs(wl_input_state_t *input)
 		return;
 	}
 
-	if (automap == AMA_Normal && am_pause)
+	if (automap == AMA_Normal && am_pause && map && players[0].mo)
 		TransformAutomapInputs(input);
 	else
 		TransformPlayInputs(input, newly_pressed);

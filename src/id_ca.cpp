@@ -15,8 +15,10 @@ loaded into the data segment
 */
 
 #include "actor.h"
+#include "am_map.h"
 #include "g_mapinfo.h"
 #include "gamemap.h"
+#include "id_in.h"
 #include "tmemory.h"
 #include "wl_def.h"
 #include "wl_game.h"
@@ -59,7 +61,17 @@ void CA_UnloadMap(GameMap *map)
 
 	// Don't dangle a reference to the map we just unloaded.
 	if(::map == map)
+	{
 		::map = NULL;
+
+		// The automap follows the map it draws, so it comes down with it.
+		if(automap != AMA_Off)
+		{
+			automap = AMA_Off;
+			if(am_pause)
+				Paused &= ~2;
+		}
+	}
 }
 
 // Owning handle for the currently cached map. File-scope (rather than a
