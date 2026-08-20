@@ -1359,6 +1359,12 @@ static bool EndSequence6(wl_state_t *state)
 void InitThinkerList();
 
 bool TopLoopStep(wl_state_t *state, const wl_input_state_t *input) {
+	// A fizzle-in owns the screen until it has revealed the whole image, one
+	// step and one presented frame per call, whichever stage started it.
+	if (fizzleActive) {
+		FizzleFadeStep();
+		return true;
+	}
 	if (state->isFading) {
 		state->fadeCur += state->fadeStep * tics;
 		if (state->fadeStep < 0 ? state->fadeCur > state->fadeEnd : state->fadeCur < state->fadeEnd) {

@@ -1379,7 +1379,7 @@ void    ThreeDRefresh (void)
 	if (fizzlein)
 	{
 		if(gameinfo.DeathTransition == GameInfo::TRANSITION_Fizzle)
-			FizzleFade(0, 0, screenWidth, screenHeight, 20, false);
+			FizzleFadeBegin(0, 0, screenWidth, screenHeight, 20);
 		else
 			VL_FadeIn(0, 255, 24);
 		fizzlein = false;

@@ -209,113 +209,131 @@ void FizzleFadeStart()
 	fizzleSurface = new uint8_t[SCREENHEIGHT*SCREENPITCH];
 	memcpy(fizzleSurface, V_GetBuffer(), SCREENHEIGHT*SCREENPITCH);
 }
-bool FizzleFade (int x1, int y1,
-	unsigned width, unsigned height, unsigned frames, bool abortable)
-{
-	unsigned x, y, frame, pixperframe;
-	int32_t  rndval=0;
+// A fizzle-in reveals the target image one step at a time. The reveal state
+// lives here so a caller can drive it a frame at a time from its own loop
+// rather than spinning out the whole fade in one go.
+bool fizzleActive = false;
+static uint8_t *fizzleTarget = NULL;
+static int32_t  fizzleRnd;
+static unsigned fizzlePixPerStep;
+static unsigned fizzleWidth, fizzleHeight;
+static unsigned fizzlePitch, fizzleBufferHeight;
+static int      fizzleX1, fizzleY1;
 
+static void FizzleFadeRelease()
+{
+	delete[] fizzleSurface;
+	delete[] fizzleTarget;
+	fizzleSurface = NULL;
+	fizzleTarget = NULL;
+	fizzleActive = false;
+}
+
+void FizzleFadeBegin (int x1, int y1,
+	unsigned width, unsigned height, unsigned frames)
+{
 	assert(fizzleSurface != NULL);
 
-	pixperframe = width * height / frames;
+	fizzleX1 = x1;
+	fizzleY1 = y1;
+	fizzleWidth = width;
+	fizzleHeight = height;
+	fizzlePixPerStep = width * height / frames;
+	fizzleRnd = 0;
+	fizzlePitch = SCREENPITCH;
+	fizzleBufferHeight = SCREENHEIGHT;
 
-	IN_StartAck ();
-
-	frame = GetTimeCount();
 	// The screen buffer currently holds the target image (drawn by the caller
 	// after FizzleFadeStart snapshotted the start image into fizzleSurface).
-	// Snapshot the target into srcptr, then seed the screen buffer with the
-	// start image so the reveal can composite target pixels directly into the
-	// screen buffer in place. This avoids the per-frame full-frame copy of the
-	// composite back to the screen that the previous implementation performed.
-	// The libretro framebuffer keeps GetBuffer() stable across Update()/Lock(),
-	// so destptr remains valid for the whole fade.
-	uint8_t * const srcptr = new uint8_t[SCREENHEIGHT*SCREENPITCH];
-	memcpy(srcptr, V_GetBuffer(), SCREENHEIGHT*SCREENPITCH);
+	// Snapshot the target into fizzleTarget, then seed the screen buffer with
+	// the start image so the reveal can composite target pixels directly into
+	// the screen buffer in place. This avoids the per-step full-frame copy of
+	// the composite back to the screen.
+	fizzleTarget = new uint8_t[SCREENHEIGHT*SCREENPITCH];
+	memcpy(fizzleTarget, V_GetBuffer(), SCREENHEIGHT*SCREENPITCH);
 	memcpy(V_GetBuffer(), fizzleSurface, SCREENHEIGHT*SCREENPITCH);
-	uint8_t * const destptr = V_GetBuffer();
 
-	do
+	fizzleActive = true;
+}
+
+// Reveals one step's worth of pixels and presents. Returns true once the
+// whole rectangle is on screen, at which point the reveal state is gone.
+bool FizzleFadeStep ()
+{
+	uint8_t *destptr = V_GetBuffer();
+	unsigned x, y, p, i;
+
+	// The buffer the reveal was set up against is the one it composites into,
+	// so a resolution change part way through ends the fade where it stands.
+	if((unsigned)SCREENPITCH != fizzlePitch
+	   || (unsigned)SCREENHEIGHT != fizzleBufferHeight)
 	{
-		IN_ProcessEvents();
+		FizzleFadeRelease();
+		return true;
+	}
 
-		if(abortable && IN_CheckAck ())
+	for(p = 0; p < fizzlePixPerStep; p++)
+	{
+		//
+		// seperate random value into x/y pair
+		//
+
+		x = fizzleRnd >> rndbits_y;
+		y = fizzleRnd & ((1 << rndbits_y) - 1);
+
+		//
+		// advance to next random element
+		//
+
+		fizzleRnd = (fizzleRnd >> 1) ^ (fizzleRnd & 1 ? 0 : rndmask);
+
+		if(destptr != NULL && (x >= fizzleWidth || y >= fizzleHeight))
 		{
-			VH_UpdateScreen();
-			delete[] fizzleSurface;
-			delete[] srcptr;
-			fizzleSurface = NULL;
-			return true;
+			if(fizzleRnd == 0)		// entire sequence has been completed
+				goto finished;
+			p--;
+			continue;
 		}
 
+		//
+		// copy one pixel
+		//
 		if(destptr != NULL)
-		{
-			for(unsigned p = 0; p < pixperframe; p++)
-			{
-				//
-				// seperate random value into x/y pair
-				//
+			*(destptr + (fizzleY1 + y) * SCREENPITCH + fizzleX1 + x)
+				= *(fizzleTarget + (fizzleY1 + y) * SCREENPITCH + fizzleX1 + x);
 
-				x = rndval >> rndbits_y;
-				y = rndval & ((1 << rndbits_y) - 1);
+		if(fizzleRnd == 0)		// entire sequence has been completed
+			goto finished;
+	}
 
-				//
-				// advance to next random element
-				//
-
-				rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
-
-				if(x >= width || y >= height)
-				{
-					if(rndval == 0)     // entire sequence has been completed
-						goto finished;
-					p--;
-					continue;
-				}
-
-				//
-				// copy one pixel
-				//
-				*(destptr + (y1 + y) * SCREENPITCH + x1 + x)
-					= *(srcptr + (y1 + y) * SCREENPITCH + x1 + x);
-
-				if(rndval == 0)		// entire sequence has been completed
-					goto finished;
-			}
-
-			VH_UpdateScreen();
-		}
-		else
-		{
-			// No surface, so only enhance rndval
-			for(unsigned p = 0; p < pixperframe; p++)
-			{
-				rndval = (rndval >> 1) ^ (rndval & 1 ? 0 : rndmask);
-				if(rndval == 0)
-					goto finished;
-			}
-		}
-
-		frame++;
-		Delay(frame - GetTimeCount());        // don't go too fast
-	} while (1);
+	if(destptr != NULL)
+		VH_UpdateScreen();
+	return false;
 
 finished:
-	// destptr is the screen buffer; force the remaining region to the target
-	// image in place. The unrevealed area outside the fade rectangle still
-	// holds the start image that seeded the buffer, matching the previous
-	// behaviour where the full composite was copied to the screen.
-	for (y = y1; y < (y1 + height); ++y)
+	if(destptr != NULL)
 	{
-		memcpy(destptr + (y * SCREENPITCH) + x1,
-					srcptr + (y * SCREENPITCH) + x1,
-					width); 
+		// destptr is the screen buffer; force the remaining region to the
+		// target image in place. The unrevealed area outside the fade
+		// rectangle still holds the start image that seeded the buffer.
+		for (i = fizzleY1; i < (fizzleY1 + fizzleHeight); ++i)
+		{
+			memcpy(destptr + (i * SCREENPITCH) + fizzleX1,
+				fizzleTarget + (i * SCREENPITCH) + fizzleX1,
+				fizzleWidth);
+		}
+		VH_UpdateScreen();
 	}
-	VH_UpdateScreen();
-	delete[] fizzleSurface;
-	delete[] srcptr;
-	fizzleSurface = NULL;
-	return false;
+	FizzleFadeRelease();
+	return true;
+}
+
+void FizzleFade (int x1, int y1,
+	unsigned width, unsigned height, unsigned frames)
+{
+	FizzleFadeBegin(x1, y1, width, height, frames);
+	while(!FizzleFadeStep())
+		;
 }
 
 //==========================================================================

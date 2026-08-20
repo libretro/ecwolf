@@ -124,7 +124,7 @@ ACTION_FUNCTION(A_FinishDeathCam)
 	py = ((200 - StatusBar->GetHeight(false) - StatusBar->GetHeight(true)) - height)/2;
 	VWB_DrawPropString(IntermissionFont, language["STR_SEEAGAIN"], CR_UNTRANSLATED);
 
-	FizzleFade(0, static_cast<unsigned int>(fadey), screenWidth, static_cast<unsigned int>(fadeh), 70, false);
+	FizzleFade(0, static_cast<unsigned int>(fadey), screenWidth, static_cast<unsigned int>(fadeh), 70);
 
 	A_Face(cam, cam->actor);
 

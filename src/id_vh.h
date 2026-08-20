@@ -71,7 +71,11 @@ void	VW_MeasurePropString (FFont *font, const char *string, uint16_t &width, uin
 
 void    VH_Startup();
 void FizzleFadeStart();
-bool FizzleFade (int x1, int y1,
-	unsigned width, unsigned height, unsigned frames, bool abortable);
+void FizzleFadeBegin (int x1, int y1,
+	unsigned width, unsigned height, unsigned frames);
+bool FizzleFadeStep ();
+void FizzleFade (int x1, int y1,
+	unsigned width, unsigned height, unsigned frames);
+extern bool fizzleActive;
 
 #endif
