@@ -381,9 +381,18 @@ Mix_Chunk *GetMusic(const char* chunk)
 
 	Mix_Chunk *res = SynthesizeAdlibIMFOrN3D((const uint8_t *) soundLump.GetMem(), size);
 
+	// Ring over the fixed table: a full game has more music tracks than the
+	// table holds. The slot about to be reused is the least recently loaded
+	// one, and the track being loaded here becomes the one playing, so an
+	// evicted chunk is never the chunk the music channel points at.
+	if (music_cache[cacheptr].name != NULL)
+	{
+		free((void *) music_cache[cacheptr].name);
+		delete music_cache[cacheptr].chunk;
+	}
 	music_cache[cacheptr].name = strdup(chunk);
 	music_cache[cacheptr].chunk = res;
-	cacheptr++;
+	cacheptr = (cacheptr + 1) % MUSIC_CACHE_SIZE;
 	return res;
 #endif
 }
