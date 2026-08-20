@@ -469,5 +469,9 @@ bool PlayLoopB (wl_state_t *state)
 		state->stage = VICTORY_ZOOMER_START;
 	else
 		state->stage = GAME_END_MAP;
-	return false;
+
+	// The screen went out above, so this step owns the frame whichever way
+	// it leaves the play loop; the stage it hands over to runs on the next
+	// call rather than presenting a second time in this one.
+	return true;
 }

@@ -863,7 +863,7 @@ bool Died6(wl_state_t *state)
 
 	CheckHighScore (players[0].score,levelInfo);
 	state->stage = START_DEMO_INTERMISSION;
-	return false;
+	return true;
 }
 
 //==========================================================================
