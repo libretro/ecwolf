@@ -103,10 +103,18 @@ void YM3812UpdateOneMono(DBOPL::Chip &which, int16_t *stream, int length)
 
 void    SD_Startup_Adlib(void)
 {
-	/* Nothing to do: there is no shared OPL chip any more. Every synthesis
-	 * site (SFX below, IMF and N3D music chunks) owns a chip constructed for
-	 * the occasion, and the DBOPL::Chip constructor initialises the shared
-	 * read-only wave tables on first use. */
+	/* There is no shared OPL chip any more: every synthesis site (SFX below,
+	 * IMF and N3D music chunks) owns a chip constructed for the occasion, and
+	 * the DBOPL::Chip constructor initialises the shared read-only wave tables
+	 * on first use.
+	 *
+	 * Setting one up does carry a one-off cost, though: DBOPL::Chip::Setup
+	 * derives the envelope rate tables by search, and caches them for every
+	 * later chip at the same rate. Bring a chip up here so that search lands
+	 * in the load rather than in whichever retro_run first starts music. */
+	DBOPL::Chip *primer = new DBOPL::Chip();
+	primer->Setup(synthesisRate);
+	delete primer;
 }
 
 static void SDL_AlSetChanInst(DBOPL::Chip &oplChip, const Instrument *inst, unsigned int chan)
