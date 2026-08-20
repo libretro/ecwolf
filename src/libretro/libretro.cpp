@@ -279,9 +279,7 @@ static bool V_QueryFrontendFB (void **out_pixels, size_t *out_pitch_bytes)
 {
 	struct retro_framebuffer fb;
 
-	// GET_CURRENT_SOFTWARE_FRAMEBUFFER is only valid during retro_run. ECWolf
-	// also presents during retro_load_game (startup console), where the
-	// frontend has no current frame.
+	// GET_CURRENT_SOFTWARE_FRAMEBUFFER is only valid during retro_run.
 	if (!in_retro_run)
 		return false;
 	if (!environ_cb)
@@ -324,6 +322,12 @@ static void V_Present ()
 	void *out_pixels;
 	size_t out_pitch_bytes;
 	const int px = screen->bpp / 8;
+
+	// video_cb belongs to retro_run. ECWolf also draws during
+	// retro_load_game (startup console), and those images stay in the 8bpp
+	// buffer until the first retro_run expands and presents it.
+	if (!in_retro_run)
+		return;
 	if (V_QueryFrontendFB (&out_pixels, &out_pitch_bytes)) {
 		V_ExpandPalette (out_pixels, (int) (out_pitch_bytes / px));
 		if (video_cb)
