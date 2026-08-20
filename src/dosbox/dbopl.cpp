@@ -1257,6 +1257,12 @@ void Chip::GenerateBlock3( Bitu total, Bit32s* output  ) {
 	}
 }
 
+/* Rate the cached envelope rate tables below were built for. Zero means the
+ * cache holds nothing yet, and no chip is ever set up at a zero rate. */
+static Bit32u ratesCacheRate = 0;
+static Bit32u ratesCacheLinear[76];
+static Bit32u ratesCacheAttack[76];
+
 void Chip::Setup( Bit32u rate ) {
 	/* Rate scaling is the exact rational OPLRATE/rate == 14318180/(288*rate).
 	 * This used to be evaluated as a double; every value below is either
@@ -1300,71 +1306,85 @@ void Chip::Setup( Bit32u rate ) {
 	}
 #endif
 
-	//-3 since the real envelope takes 8 steps to reach the single value we supply
-	for ( Bit8u i = 0; i < 76; i++ ) {
-		Bit8u index, shift;
-		EnvelopeSelect( i, index, shift );
-		linearRates[i] = SCALE_MUL_TRUNC( EnvelopeIncreaseTable[ index ] << ( RATE_SH + ENV_EXTRA - shift - 3 ) );
-	}
-	//Generate the best matching attack rate
-	for ( Bit8u i = 0; i < 62; i++ ) {
-		Bit8u index, shift;
-		EnvelopeSelect( i, index, shift );
-		//Original amount of samples the attack would take
-		Bit32s original = SCALE_DIV_TRUNC( AttackSamplesTable[ index ] << shift );
-
-		Bit32s guessAdd = SCALE_MUL_TRUNC( EnvelopeIncreaseTable[ index ] << ( RATE_SH - shift - 3 ) );
-		Bit32s bestAdd = guessAdd;
-		Bit32u bestDiff = 1 << 30;
-		for( Bit32u passes = 0; passes < 16; passes ++ ) {
-			Bit32s volume = ENV_MAX;
-			Bit32s samples = 0;
-			Bit32u count = 0;
-			while ( volume > 0 && samples < original * 2 ) {
-				count += guessAdd;
-				Bit32s change = count >> RATE_SH;
-				count &= RATE_MASK;
-				if ( GCC_UNLIKELY(change) ) { // less than 1 %
-					volume += ( ~volume * change ) >> 3;
-				}
-				samples++;
-
-			}
-			Bit32s diff = original - samples;
-			Bit32u lDiff = labs( diff );
-			//Init last on first pass
-			if ( lDiff < bestDiff ) {
-				bestDiff = lDiff;
-				bestAdd = guessAdd;
-				if ( !bestDiff )
-					break;
-			}
-			/* The refinement step overflowed a 32-bit signed int:
-			 * (original - diff) reaches 2*original (~5e5), so the <<12
-			 * alone hits ~2e9, and guessAdd*mul is far past INT_MAX
-			 * (UBSan: "4158 * 591053 cannot be represented in type
-			 * 'int'"). That is undefined behaviour, which means the
-			 * attack rates a build ends up with depend on the compiler.
-			 * Widening the intermediates makes the search well defined
-			 * and lets it actually converge -- see the commit message
-			 * for the 26 rates this corrects. */
-			//Below our target
-			if ( diff < 0 ) {
-				//Better than the last time
-				Bit64s mul = ( ( (Bit64s)original - diff ) << 12 ) / original;
-				guessAdd = (Bit32s)( ( (Bit64s)guessAdd * mul ) >> 12 );
-				guessAdd++;
-			} else if ( diff > 0 ) {
-				Bit64s mul = ( ( (Bit64s)original - diff ) << 12 ) / original;
-				guessAdd = (Bit32s)( ( (Bit64s)guessAdd * mul ) >> 12 );
-				guessAdd--;
-			}
+	/* linearRates and attackRates are a function of the sample rate alone,
+	 * and the attack rate search below dominates the cost of bringing a chip
+	 * up: 62 rates, 16 refinement passes each, every pass stepping an
+	 * envelope one sample at a time over twice the attack length. Chips are
+	 * created per music track at one fixed rate, so keep the last set and
+	 * copy it when the rate matches. */
+	if ( rate == ratesCacheRate ) {
+		memcpy( linearRates, ratesCacheLinear, sizeof( linearRates ) );
+		memcpy( attackRates, ratesCacheAttack, sizeof( attackRates ) );
+	} else {
+		//-3 since the real envelope takes 8 steps to reach the single value we supply
+		for ( Bit8u i = 0; i < 76; i++ ) {
+			Bit8u index, shift;
+			EnvelopeSelect( i, index, shift );
+			linearRates[i] = SCALE_MUL_TRUNC( EnvelopeIncreaseTable[ index ] << ( RATE_SH + ENV_EXTRA - shift - 3 ) );
 		}
-		attackRates[i] = bestAdd;
-	}
-	for ( Bit8u i = 62; i < 76; i++ ) {
-		//This should provide instant volume maximizing
-		attackRates[i] = 8 << RATE_SH;
+		//Generate the best matching attack rate
+		for ( Bit8u i = 0; i < 62; i++ ) {
+			Bit8u index, shift;
+			EnvelopeSelect( i, index, shift );
+			//Original amount of samples the attack would take
+			Bit32s original = SCALE_DIV_TRUNC( AttackSamplesTable[ index ] << shift );
+
+			Bit32s guessAdd = SCALE_MUL_TRUNC( EnvelopeIncreaseTable[ index ] << ( RATE_SH - shift - 3 ) );
+			Bit32s bestAdd = guessAdd;
+			Bit32u bestDiff = 1 << 30;
+			for( Bit32u passes = 0; passes < 16; passes ++ ) {
+				Bit32s volume = ENV_MAX;
+				Bit32s samples = 0;
+				Bit32u count = 0;
+				while ( volume > 0 && samples < original * 2 ) {
+					count += guessAdd;
+					Bit32s change = count >> RATE_SH;
+					count &= RATE_MASK;
+					if ( GCC_UNLIKELY(change) ) { // less than 1 %
+						volume += ( ~volume * change ) >> 3;
+					}
+					samples++;
+
+				}
+				Bit32s diff = original - samples;
+				Bit32u lDiff = labs( diff );
+				//Init last on first pass
+				if ( lDiff < bestDiff ) {
+					bestDiff = lDiff;
+					bestAdd = guessAdd;
+					if ( !bestDiff )
+						break;
+				}
+				/* The refinement step overflowed a 32-bit signed int:
+				 * (original - diff) reaches 2*original (~5e5), so the <<12
+				 * alone hits ~2e9, and guessAdd*mul is far past INT_MAX
+				 * (UBSan: "4158 * 591053 cannot be represented in type
+				 * 'int'"). That is undefined behaviour, which means the
+				 * attack rates a build ends up with depend on the compiler.
+				 * Widening the intermediates makes the search well defined
+				 * and lets it actually converge -- see the commit message
+				 * for the 26 rates this corrects. */
+				//Below our target
+				if ( diff < 0 ) {
+					//Better than the last time
+					Bit64s mul = ( ( (Bit64s)original - diff ) << 12 ) / original;
+					guessAdd = (Bit32s)( ( (Bit64s)guessAdd * mul ) >> 12 );
+					guessAdd++;
+				} else if ( diff > 0 ) {
+					Bit64s mul = ( ( (Bit64s)original - diff ) << 12 ) / original;
+					guessAdd = (Bit32s)( ( (Bit64s)guessAdd * mul ) >> 12 );
+					guessAdd--;
+				}
+			}
+			attackRates[i] = bestAdd;
+		}
+		for ( Bit8u i = 62; i < 76; i++ ) {
+			//This should provide instant volume maximizing
+			attackRates[i] = 8 << RATE_SH;
+		}
+		memcpy( ratesCacheLinear, linearRates, sizeof( linearRates ) );
+		memcpy( ratesCacheAttack, attackRates, sizeof( attackRates ) );
+		ratesCacheRate = rate;
 	}
 	//Setup the channels with the correct four op flags
 	//Channels are accessed through a table so they appear linear here
