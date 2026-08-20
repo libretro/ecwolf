@@ -509,6 +509,11 @@ void retro_unload_game()
 	// unload, SD_Startup early-returns on the next load, and FindSound()
 	// dereferences the now-NULL hash table (e.g. via P_InitKeyMessages).
 	SD_Shutdown();
+
+	// The palette-derived tables are keyed on the palette bytes alone, so tell
+	// them the content behind their colormap lumps and fonts is going away.
+	VL_InvalidatePaletteTables();
+
 	CallTerminateFunctions();
 }
 

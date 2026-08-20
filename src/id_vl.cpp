@@ -50,11 +50,35 @@ static struct
 
 //===========================================================================
 
+// The colormaps, the texture manager's colour caches and the font
+// translations are all a pure function of the loaded palette, so they are
+// rebuilt only when the palette bytes differ from the ones they were built
+// from. GPalette.Remap is derived from BaseColors, and the blend only
+// reaches screen->Flash, so BaseColors alone identifies the tables.
+static bool paletteTablesValid = false;
+static PalEntry paletteTablesBase[256];
+
+// Called when the WAD collection is torn down: the next palette read must
+// rebuild against the incoming content's colormap lumps and fonts even when
+// it loads the same colours.
+void VL_InvalidatePaletteTables()
+{
+	paletteTablesValid = false;
+}
+
 void VL_ReadPalette(const char* lump)
 {
 	InitPalette(lump);
 	if(currentBlend.amount)
 		V_SetBlend(currentBlend.r, currentBlend.g, currentBlend.b, currentBlend.amount);
+
+	if(paletteTablesValid
+	   && memcmp(paletteTablesBase, GPalette.BaseColors, sizeof(paletteTablesBase)) == 0)
+		return;
+
+	memcpy(paletteTablesBase, GPalette.BaseColors, sizeof(paletteTablesBase));
+	paletteTablesValid = true;
+
 	R_InitColormaps();
 	TexMan.InvalidatePalette();
 	V_RetranslateFonts();

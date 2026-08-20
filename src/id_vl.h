@@ -28,6 +28,7 @@ void VL_ToggleFullscreen();
 void VL_SetFullscreen(bool isFull);
 
 void VL_ReadPalette(const char* lump);
+void VL_InvalidatePaletteTables();
 
 void VL_SetVGAPlaneMode (bool forSignon=false);
 void VL_SetTextMode (void);
